@@ -19,192 +19,336 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
-import org.eclipse.tractusx.bpdm.pool.entity.*
+import com.neovisionaries.i18n.CountryCode
+import org.eclipse.tractusx.bpdm.common.dto.*
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
+import org.eclipse.tractusx.bpdm.common.model.ClassificationType
+import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
+import org.eclipse.tractusx.bpdm.pool.api.model.ConfidenceCriteriaDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressDto
+import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.entity.ConfidenceCriteria
+import org.eclipse.tractusx.bpdm.pool.entity.LegalEntity
+import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddress
+import org.eclipse.tractusx.bpdm.pool.entity.Site
+import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
+import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
+import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
+import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
+import java.util.*
 
 @Service
-class BusinessPartnerEquivalenceService {
-    fun isEquivalent(original: LegalEntity, updated: LegalEntity): Boolean =
-        original.bpn != updated.bpn ||
-                isEquivalent(original.legalForm, updated.legalForm) ||
-                isEquivalentLegalEntityIdentifier(original.identifiers, updated.identifiers) ||
-                isEquivalentLegalEntityState(original.states, updated.states) ||
-                isEquivalentLogisticAddress(original.addresses, updated.addresses) ||
-                isEquivalent(original.sites, updated.sites) ||
-                isEquivalentLegalEntityClassification(original.classifications, updated.classifications) ||
-                isEquivalent(original.legalName, updated.legalName) ||
-                isEquivalent(original.legalAddress, updated.legalAddress)
+class BusinessPartnerEquivalenceService(
+    private val legalEntityRepository: LegalEntityRepository,
+    private val siteRepository: SiteRepository,
+    private val logisticAddressRepository: LogisticAddressRepository
+) {
 
+    fun isEquivalent(updateDto: LegalEntityPartnerUpdateRequest): Boolean {
+        val entity = legalEntityRepository.findByBpn(updateDto.bpnl)
+            ?: throw BpdmValidationException(TaskStepBuildService.CleaningError.INVALID_LEGAL_ENTITY_BPN.message)
 
-    private fun isEquivalentLegalEntityIdentifier(
-        originalSet: MutableSet<LegalEntityIdentifier>,
-        updatedSet: MutableSet<LegalEntityIdentifier>
-    ): Boolean {
-        return isEquivalent(originalSet, updatedSet) { entity1, entity2 ->
-            isEquivalent(entity1, entity2)
-        }
+        return toEquivalenceDto(updateDto) == toEquivalenceDto(entity)
     }
 
-    private fun isEquivalent(original: LegalEntityIdentifier, updated: LegalEntityIdentifier): Boolean =
-        original.value != updated.value ||
-                isEquivalent(original.type, updated.type) ||
-                original.issuingBody != updated.issuingBody
+    fun isEquivalent(updateDto: SitePartnerUpdateRequest): Boolean {
+        val entity =
+            siteRepository.findByBpn(updateDto.bpns) ?: throw BpdmValidationException(TaskStepBuildService.CleaningError.INVALID_LEGAL_ENTITY_BPN.message)
 
-    private fun isEquivalent(original: IdentifierType, updated: IdentifierType): Boolean =
-        original.technicalKey != updated.technicalKey ||
-                original.name != updated.name ||
-                original.businessPartnerType.name != updated.businessPartnerType.name
-
-
-    private fun isEquivalentLegalEntityState(
-        originalSet: MutableSet<LegalEntityState>,
-        updatedSet: MutableSet<LegalEntityState>
-    ): Boolean {
-        return isEquivalent(originalSet, updatedSet) { entity1, entity2 ->
-            isEquivalent(entity1, entity2)
-        }
+        return toEquivalenceDto(updateDto) == toEquivalenceDto(entity)
     }
 
-    private fun isEquivalent(original: LegalEntityState, updated: LegalEntityState): Boolean =
-                original.validFrom != updated.validFrom ||
-                original.validTo != updated.validTo ||
-                original.type != updated.type
+    fun isEquivalent(updateDto: AddressPartnerUpdateRequest): Boolean {
+        val entity = logisticAddressRepository.findByBpn(updateDto.bpna)
+            ?: throw BpdmValidationException(TaskStepBuildService.CleaningError.INVALID_LEGAL_ENTITY_BPN.message)
 
-
-    private fun isEquivalentLegalEntityClassification(
-        originalSet: MutableSet<LegalEntityClassification>,
-        updatedSet: MutableSet<LegalEntityClassification>
-    ): Boolean {
-        return isEquivalent(originalSet, updatedSet) { entity1, entity2 ->
-            isEquivalent(entity1, entity2)
-        }
+        return toEquivalenceDto(updateDto) == toEquivalenceDto(entity)
     }
 
+    private fun toEquivalenceDto(legalEntity: LegalEntity) =
+        with(legalEntity) {
+            LegalEntityEquivalenceDto(
+                legalForm = legalForm?.technicalKey,
+                legalName = legalName.value,
+                legalShortName = legalName.shortName,
+                identifiers = identifiers.map { IdentifierEquivalenceDto(it.value, it.type.technicalKey) }.toSortedSet(compareBy { it.value }),
+                states = states.map { StateEquivalenceDto(it.validFrom, it.validTo, it.type) }.toSortedSet(compareBy { it.validFrom }),
+                classifications = classifications.map { ClassificationEquivalenceDto(it.code, it.value, it.type) }.toSortedSet(compareBy { it.value }),
+                confidenceCriteria = toEquivalenceDto(confidenceCriteria),
+                legalAddress = toEquivalenceDto(legalEntity.legalAddress)
+            )
+        }
 
-    private fun isEquivalent(original: LegalEntityClassification, updated: LegalEntityClassification): Boolean {
-        return (
-                original.value != updated.value ||
-                        original.code != updated.code ||
-                        original.type != updated.type
+
+    private fun toEquivalenceDto(request: LegalEntityPartnerUpdateRequest) =
+        with(request.legalEntity) {
+            LegalEntityEquivalenceDto(
+                legalForm = legalForm,
+                legalName = legalName,
+                legalShortName = legalShortName,
+                identifiers = identifiers.map { IdentifierEquivalenceDto(it.value, it.type) }.toSortedSet(compareBy { it.value }),
+                states = states.map { StateEquivalenceDto(it.validFrom, it.validTo, it.type) }.toSortedSet(compareBy { it.validFrom }),
+                classifications = classifications.map { ClassificationEquivalenceDto(it.code, it.value, it.type) }.toSortedSet(compareBy { it.value }),
+                confidenceCriteria = toEquivalenceDto(confidenceCriteria),
+                legalAddress = toEquivalenceDto(request.legalAddress)
+            )
+        }
+
+    private fun toEquivalenceDto(site: Site) =
+        with(site) {
+            SiteEquivalenceDto(
+                name = name,
+                states = states.map { StateEquivalenceDto(it.validFrom, it.validTo, it.type) }.toSortedSet(compareBy { it.validFrom }),
+                confidenceCriteria = toEquivalenceDto(confidenceCriteria),
+                mainAddress = toEquivalenceDto(mainAddress)
+            )
+        }
+
+
+    private fun toEquivalenceDto(request: SitePartnerUpdateRequest) =
+        with(request.site) {
+            SiteEquivalenceDto(
+                name = name,
+                states = states.map { StateEquivalenceDto(it.validFrom, it.validTo, it.type) }.toSortedSet(compareBy { it.validFrom }),
+                confidenceCriteria = toEquivalenceDto(confidenceCriteria),
+                mainAddress = toEquivalenceDto(mainAddress)
+            )
+        }
+
+    private fun toEquivalenceDto(logisticAddress: LogisticAddress) =
+        LogisticAddressEquivalenceDto(
+            name = logisticAddress.name,
+            states = logisticAddress.states.map { StateEquivalenceDto(it.validFrom, it.validTo, it.type) }.toSortedSet(compareBy { it.validFrom }),
+            identifiers = logisticAddress.identifiers.map { IdentifierEquivalenceDto(it.value, it.type.technicalKey) }.toSortedSet(compareBy { it.value }),
+            physicalPostalAddress = with(logisticAddress.physicalPostalAddress) {
+                PhysicalAddressEquivalenceDto(
+                    geographicCoordinates = with(geographicCoordinates) { this?.let { GeoCoordinateDto(longitude, latitude, altitude) } },
+                    country = country,
+                    administrativeAreaLevel1 = administrativeAreaLevel1?.regionCode,
+                    administrativeAreaLevel2 = administrativeAreaLevel2,
+                    administrativeAreaLevel3 = administrativeAreaLevel3,
+                    postalCode = postCode,
+                    city = city,
+                    district = districtLevel1,
+                    companyPostalCode = companyPostCode,
+                    industrialZone = industrialZone,
+                    building = building,
+                    floor = floor,
+                    door = door,
+                    street = with(street) {
+                        this?.let {
+                            StreetEquivalenceDto(
+                                name,
+                                houseNumber,
+                                houseNumberSupplement,
+                                milestone,
+                                direction,
+                                namePrefix,
+                                additionalNamePrefix,
+                                nameSuffix,
+                                additionalNameSuffix
+                            )
+                        }
+                    }
                 )
-    }
+            },
+            alternativePostalAddress = with(logisticAddress.alternativePostalAddress) {
+                this?.let {
+                    AlternativeEquivalenceDto(
+                        geographicCoordinates = geographicCoordinates?.let { with(geographicCoordinates) { GeoCoordinateDto(longitude, latitude, altitude) } },
+                        country = country,
+                        administrativeAreaLevel1 = administrativeAreaLevel1?.regionCode,
+                        postalCode = postCode,
+                        city = city,
+                        deliveryServiceType = deliveryServiceType,
+                        deliveryServiceQualifier = deliveryServiceQualifier,
+                        deliveryServiceNumber = deliveryServiceNumber
+                    )
+                }
+            },
+            confidenceCriteria = toEquivalenceDto(logisticAddress.confidenceCriteria)
+        )
 
-    private fun isEquivalent(original: Name, updated: Name): Boolean =
-        original.value != updated.value ||
-                original.shortName != updated.shortName
-
-    private fun isEquivalent(original: LegalForm?, updated: LegalForm?): Boolean =
-        original?.name != updated?.name ||
-                original?.technicalKey != updated?.technicalKey ||
-                original?.abbreviation != updated?.abbreviation
-
-
-    private fun isEquivalentLogisticAddress(
-        originalSet: MutableSet<LogisticAddress>,
-        updatedSet: MutableSet<LogisticAddress>
-    ): Boolean {
-        return isEquivalent(originalSet, updatedSet) { entity1, entity2 ->
-            isEquivalent(entity1, entity2)
-        }
-    }
-
-
-    fun isEquivalent(original: LogisticAddress, updated: LogisticAddress): Boolean =
-        original.bpn != updated.bpn ||
-                original.name != updated.name ||
-                isEquivalent(original.physicalPostalAddress, updated.physicalPostalAddress) ||
-                isEquivalent(original.alternativePostalAddress, updated.alternativePostalAddress)
+    private fun toEquivalenceDto(request: AddressPartnerUpdateRequest) =
+        toEquivalenceDto(request.address)
 
 
-    fun isEquivalentLogisticAddressSite(original: LogisticAddress, updated: LogisticAddress): Boolean =
-        original.name != updated.name ||
-                isEquivalent(original.physicalPostalAddress, updated.physicalPostalAddress) ||
-                isEquivalent(original.alternativePostalAddress, updated.alternativePostalAddress)
-
-
-    private fun isEquivalent(
-        originalSet: MutableSet<Site>,
-        updatedSet: MutableSet<Site>
-    ): Boolean {
-        return isEquivalent(originalSet, updatedSet) { entity1, entity2 ->
-            isEquivalent(entity1, entity2)
-        }
-    }
-
-    fun isEquivalent(original: Site, updated: Site): Boolean =
-        original.bpn != updated.bpn ||
-                original.name != updated.name ||
-                isEquivalentLogisticAddressSite(original.mainAddress, updated.mainAddress)
-
-    private fun isEquivalent(
-        original: AlternativePostalAddress?,
-        updated: AlternativePostalAddress?
-    ): Boolean =
-        isEquivalent(original?.geographicCoordinates, updated?.geographicCoordinates) ||
-                original?.country != updated?.country ||
-                isEquivalent(original?.administrativeAreaLevel1, updated?.administrativeAreaLevel1) ||
-                original?.postCode != updated?.postCode ||
-                original?.city != updated?.city ||
-                original?.deliveryServiceType != updated?.deliveryServiceType ||
-                original?.deliveryServiceNumber != updated?.deliveryServiceNumber ||
-                original?.deliveryServiceQualifier != updated?.deliveryServiceQualifier
-
-
-    private fun isEquivalent(original: GeographicCoordinate?, updated: GeographicCoordinate?): Boolean =
-        original?.latitude != updated?.latitude ||
-                original?.longitude != updated?.longitude ||
-                original?.altitude != updated?.altitude
-
-    private fun isEquivalent(original: Region?, updated: Region?): Boolean =
-        original?.countryCode != updated?.countryCode ||
-                original?.regionCode != updated?.regionCode ||
-                original?.regionName != updated?.regionName
-
-
-    private fun isEquivalent(
-        original: PhysicalPostalAddress,
-        updated: PhysicalPostalAddress
-    ): Boolean =
-        original.country.name != updated.country.name ||
-                original.administrativeAreaLevel1 != updated.administrativeAreaLevel1 ||
-                original.administrativeAreaLevel2 != updated.administrativeAreaLevel2 ||
-                original.administrativeAreaLevel3 != updated.administrativeAreaLevel3 ||
-                original.administrativeAreaLevel4 != updated.administrativeAreaLevel4 ||
-                original.postCode != updated.postCode ||
-                original.city != updated.city ||
-                original.districtLevel1 != updated.districtLevel1 ||
-                original.districtLevel2 != updated.districtLevel2 ||
-                original.companyPostCode != updated.companyPostCode ||
-                original.industrialZone != updated.industrialZone ||
-                original.building != updated.building ||
-                original.floor != updated.floor ||
-                original.door != updated.door ||
-                isEquivalent(original.geographicCoordinates, updated.geographicCoordinates) ||
-                isEquivalent(original.street, updated.street)
-
-    private fun isEquivalent(original: Street?, updated: Street?): Boolean =
-        original?.name != updated?.name ||
-                original?.houseNumber != updated?.houseNumber ||
-                original?.milestone != updated?.milestone ||
-                original?.direction != updated?.direction
-
-    private fun <T> isEquivalent(
-        originalSet: MutableSet<T>,
-        updatedSet: MutableSet<T>,
-        comparator: (T, T) -> Boolean
-    ): Boolean {
-        if (originalSet.size != updatedSet.size) {
-            return true
+    private fun toEquivalenceDto(logisticAddress: LogisticAddressDto) =
+        with(logisticAddress) {
+            LogisticAddressEquivalenceDto(
+                name = logisticAddress.name,
+                states = states.map { StateEquivalenceDto(it.validFrom, it.validTo, it.type) }.toSortedSet(compareBy { it.validFrom }),
+                identifiers = identifiers.map { IdentifierEquivalenceDto(it.value, it.type) }.toSortedSet(compareBy { it.value }),
+                physicalPostalAddress = with(physicalPostalAddress) {
+                    PhysicalAddressEquivalenceDto(
+                        geographicCoordinates = with(geographicCoordinates) { this?.let { GeoCoordinateDto(longitude, latitude, altitude) } },
+                        country = country,
+                        administrativeAreaLevel1 = administrativeAreaLevel1,
+                        administrativeAreaLevel2 = administrativeAreaLevel2,
+                        administrativeAreaLevel3 = administrativeAreaLevel3,
+                        postalCode = postalCode,
+                        city = city,
+                        district = district,
+                        companyPostalCode = companyPostalCode,
+                        industrialZone = industrialZone,
+                        building = building,
+                        floor = floor,
+                        door = door,
+                        street = with(street) {
+                            this?.let {
+                                StreetEquivalenceDto(
+                                    name,
+                                    houseNumber,
+                                    houseNumberSupplement,
+                                    milestone,
+                                    direction,
+                                    namePrefix,
+                                    additionalNamePrefix,
+                                    nameSuffix,
+                                    additionalNameSuffix
+                                )
+                            }
+                        }
+                    )
+                },
+                alternativePostalAddress = with(logisticAddress.alternativePostalAddress) {
+                    this?.let {
+                        AlternativeEquivalenceDto(
+                            geographicCoordinates = with(geographicCoordinates) { this?.let { GeoCoordinateDto(longitude, latitude, altitude) } },
+                            country = country,
+                            administrativeAreaLevel1 = administrativeAreaLevel1,
+                            postalCode = postalCode,
+                            city = city,
+                            deliveryServiceType = deliveryServiceType,
+                            deliveryServiceQualifier = deliveryServiceQualifier,
+                            deliveryServiceNumber = deliveryServiceNumber
+                        )
+                    }
+                },
+                confidenceCriteria = toEquivalenceDto(confidenceCriteria)
+            )
         }
 
-        for (originalEntity in originalSet) {
-            val updatedEntity = updatedSet.find { comparator(it, originalEntity) }
-
-            if (updatedEntity == null || comparator(originalEntity, updatedEntity)) {
-                return true
-            }
+    private fun toEquivalenceDto(confidenceCriteriaDto: ConfidenceCriteriaDto) =
+        with(confidenceCriteriaDto) {
+            ConfidenceCriteriaEquivalenceDto(
+                sharedByOwner,
+                checkedByExternalDataSource,
+                numberOfBusinessPartners,
+                lastConfidenceCheckAt,
+                nextConfidenceCheckAt,
+                confidenceLevel
+            )
         }
 
-        return false
+    private fun toEquivalenceDto(confidenceCriteria: ConfidenceCriteria) =
+        with(confidenceCriteria) {
+            ConfidenceCriteriaEquivalenceDto(
+                sharedByOwner,
+                checkedByExternalDataSource,
+                numberOfBusinessPartners,
+                lastConfidenceCheckAt,
+                nextConfidenceCheckAt,
+                confidenceLevel
+            )
+        }
+
+    data class LegalEntityEquivalenceDto(
+        override val legalForm: String?,
+        val legalName: String?,
+        override val legalShortName: String?,
+        override val identifiers: SortedSet<IdentifierEquivalenceDto>,
+        override val states: SortedSet<StateEquivalenceDto>,
+        override val classifications: SortedSet<ClassificationEquivalenceDto>,
+        override val confidenceCriteria: ConfidenceCriteriaEquivalenceDto?,
+        val legalAddress: LogisticAddressEquivalenceDto?
+    ) : IBaseLegalEntityDto
+
+    data class SiteEquivalenceDto(
+        override val name: String?,
+        override val states: Collection<StateEquivalenceDto>,
+        override val confidenceCriteria: ConfidenceCriteriaEquivalenceDto?,
+        val mainAddress: LogisticAddressEquivalenceDto
+    ) : IBaseSiteDto
+
+    data class LogisticAddressEquivalenceDto(
+        val name: String?,
+        override val states: Collection<StateEquivalenceDto>,
+        override val identifiers: Collection<IdentifierEquivalenceDto>,
+        override val physicalPostalAddress: PhysicalAddressEquivalenceDto?,
+        override val alternativePostalAddress: AlternativeEquivalenceDto?,
+        override val confidenceCriteria: ConfidenceCriteriaEquivalenceDto?
+    ) : IBaseLogisticAddressDto
+
+    data class IdentifierEquivalenceDto(
+        override val value: String,
+        override val type: String,
+    ) : IAddressIdentifierDto, ILegalEntityIdentifierDto {
+        override val issuingBody: String? = null
     }
+
+    data class StateEquivalenceDto(
+        override val validFrom: LocalDateTime?,
+        override val validTo: LocalDateTime?,
+        override val type: BusinessStateType,
+    ) : IAddressStateDto, ILegalEntityStateDto, ISiteStateDto
+
+    data class ClassificationEquivalenceDto(
+        override val code: String?,
+        override val value: String?,
+        override val type: ClassificationType
+    ) : ILegalEntityClassificationDto
+
+    data class PhysicalAddressEquivalenceDto(
+        override val geographicCoordinates: GeoCoordinateDto?,
+        override val country: CountryCode?,
+        override val administrativeAreaLevel1: String?,
+        override val administrativeAreaLevel2: String?,
+        override val administrativeAreaLevel3: String?,
+        override val postalCode: String?,
+        override val city: String?,
+        override val district: String?,
+        override val street: StreetEquivalenceDto?,
+        override val companyPostalCode: String?,
+        override val industrialZone: String?,
+        override val building: String?,
+        override val floor: String?,
+        override val door: String?
+    ) : IBasePhysicalPostalAddressDto
+
+    data class AlternativeEquivalenceDto(
+        override val geographicCoordinates: GeoCoordinateDto?,
+        override val country: CountryCode?,
+        override val administrativeAreaLevel1: String?,
+        override val postalCode: String?,
+        override val city: String?,
+        override val deliveryServiceType: DeliveryServiceType?,
+        override val deliveryServiceQualifier: String?,
+        override val deliveryServiceNumber: String?
+    ) : IBaseAlternativePostalAddressDto
+
+    data class StreetEquivalenceDto(
+        override val name: String?,
+        override val houseNumber: String?,
+        override val houseNumberSupplement: String?,
+        override val milestone: String?,
+        override val direction: String?,
+        override val namePrefix: String?,
+        override val additionalNamePrefix: String?,
+        override val nameSuffix: String?,
+        override val additionalNameSuffix: String?
+    ) : IStreetDetailedDto
+
+    data class ConfidenceCriteriaEquivalenceDto(
+        override val sharedByOwner: Boolean?,
+        override val checkedByExternalDataSource: Boolean?,
+        override val numberOfBusinessPartners: Int?,
+        override val lastConfidenceCheckAt: LocalDateTime?,
+        override val nextConfidenceCheckAt: LocalDateTime?,
+        override val confidenceLevel: Int?
+    ) : IConfidenceCriteriaDto
 }

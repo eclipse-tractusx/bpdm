@@ -31,14 +31,12 @@ import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
-import org.eclipse.tractusx.bpdm.gate.config.PoolConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
 import org.eclipse.tractusx.bpdm.gate.entity.generic.*
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmMissingStageException
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
-import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerGenericDto
 import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRequest
@@ -56,11 +54,7 @@ class BusinessPartnerService(
     private val sharingStateService: SharingStateService,
     private val changelogRepository: ChangelogRepository,
     private val orchestrationApiClient: OrchestrationApiClient,
-    private val orchestratorMappings: OrchestratorMappings,
-    private val sharingStateRepository: SharingStateRepository,
-    private val poolClient: PoolApiClient,
-    private val syncRecordService: SyncRecordService,
-    private val poolConfigProperties: PoolConfigProperties
+    private val sharingStateRepository: SharingStateRepository
 ) {
     private val logger = KotlinLogging.logger { }
 
@@ -103,15 +97,15 @@ class BusinessPartnerService(
         val externalIds = entityCandidates.map { it.externalId }
         assertInputStageExists(externalIds)
 
-        val validatedEntities = filterUpdateCandidates(entityCandidates, StageType.Output)
+        val changedBusinessPartners = filterUpdateCandidates(entityCandidates, StageType.Output)
 
-        val resolutionResults = resolveCandidatesForStage(validatedEntities, StageType.Output)
+        val resolutionResults = resolveCandidatesForStage(changedBusinessPartners, StageType.Output)
 
         saveChangelog(resolutionResults)
 
-        val partners = resolutionResults.map { it.businessPartner }
+        val changedPartners = resolutionResults.map { it.businessPartner }
 
-        val successRequests = partners.map {
+        val successRequests = entityCandidates.map {
             SharingStateService.SuccessRequest(
                 SharingStateService.SharingStateIdentifierDto(it.externalId, BusinessPartnerType.GENERIC),
                 it.bpnA!!
@@ -119,7 +113,7 @@ class BusinessPartnerService(
         }
         sharingStateService.setSuccess(successRequests)
 
-        return businessPartnerRepository.saveAll(partners)
+        return businessPartnerRepository.saveAll(changedPartners)
     }
 
     private fun getBusinessPartners(pageRequest: PageRequest, externalIds: Collection<String>?, stage: StageType): Page<BusinessPartner> {

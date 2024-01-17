@@ -24,7 +24,9 @@ import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
+import org.eclipse.tractusx.bpdm.pool.api.model.ConfidenceCriteriaDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressDto
+import org.eclipse.tractusx.bpdm.pool.api.model.SiteStateDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.dto.AddressMetadataDto
@@ -52,7 +54,8 @@ class BusinessPartnerBuildService(
     private val changelogService: PartnerChangelogService,
     private val siteRepository: SiteRepository,
     private val logisticAddressRepository: LogisticAddressRepository,
-    private val requestValidationService: RequestValidationService
+    private val requestValidationService: RequestValidationService,
+    private val businessPartnerEquivalenceService: BusinessPartnerEquivalenceService
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -63,7 +66,6 @@ class BusinessPartnerBuildService(
     @Transactional
     fun createLegalEntities(requests: Collection<LegalEntityPartnerCreateRequest>): LegalEntityPartnerCreateResponseWrapper {
         logger.info { "Create ${requests.size} new legal entities" }
-
 
         val errorsByRequest = requestValidationService.validateLegalEntitiesToCreateFromController(requests)
         val errors = errorsByRequest.flatMap { it.value }
@@ -100,8 +102,36 @@ class BusinessPartnerBuildService(
         return LegalEntityPartnerCreateResponseWrapper(legalEntityResponse, errors)
     }
 
+    fun createSitesWithLegalAddressAsMain(requests: Collection<SiteCreateRequestWithLegalAddressAsMain>): SitePartnerCreateResponseWrapper {
+        logger.info { "Create ${requests.size} new sites with legal address as site main address" }
+
+        val legalEntities = legalEntityRepository.findDistinctByBpnIn(requests.map { it.bpnLParent })
+        val legalEntitiesByBpn = legalEntities.associateBy { it.bpn }
+
+        val bpnSs = bpnIssuingService.issueSiteBpns(requests.size)
+
+        val createdSites = requests.zip(bpnSs).map { (siteRequest, bpnS) ->
+            val legalEntityParent =
+                legalEntitiesByBpn[siteRequest.bpnLParent] ?: throw BpdmValidationException("Parent ${siteRequest.bpnLParent} not found for site to create")
+            createSite(siteRequest, bpnS, legalEntityParent)
+                .apply { mainAddress = legalEntityParent.legalAddress }
+                .apply { mainAddress.site = this }
+        }
+
+        changelogService.createChangelogEntries(createdSites.map {
+            ChangelogEntryCreateRequest(it.bpn, ChangelogType.CREATE, BusinessPartnerType.SITE)
+        })
+
+        siteRepository.saveAll(createdSites)
+
+        val siteResponse = createdSites.mapIndexed { index, site -> site.toUpsertDto(index.toString()) }
+
+        return SitePartnerCreateResponseWrapper(siteResponse, emptyList())
+
+    }
+
     @Transactional
-    fun createSites(requests: Collection<SitePartnerCreateRequest>): SitePartnerCreateResponseWrapper {
+    fun createSitesWithMainAddress(requests: Collection<SitePartnerCreateRequest>): SitePartnerCreateResponseWrapper {
         logger.info { "Create ${requests.size} new sites" }
 
         val errorsByRequest = requestValidationService.validateSitesToCreateFromController(requests)
@@ -188,23 +218,37 @@ class BusinessPartnerBuildService(
         val bpnsToFetch = validRequests.map { it.bpnl }
         val legalEntities = legalEntityRepository.findDistinctByBpnIn(bpnsToFetch)
         businessPartnerFetchService.fetchDependenciesWithLegalAddress(legalEntities)
-
-        changelogService.createChangelogEntries(legalEntities.map {
-            ChangelogEntryCreateRequest(it.bpn, ChangelogType.UPDATE, BusinessPartnerType.LEGAL_ENTITY)
-        })
-        changelogService.createChangelogEntries(legalEntities.map {
-            ChangelogEntryCreateRequest(it.legalAddress.bpn, ChangelogType.UPDATE, BusinessPartnerType.ADDRESS)
-        })
-
         val requestsByBpn = validRequests.associateBy { it.bpnl }
-        val updatedLegalEntities = legalEntities.map { legalEntity ->
-            val request = requestsByBpn[legalEntity.bpn]!!
-            updateLegalEntity(legalEntity, request.legalEntity, request.legalEntity.legalName, legalEntityMetadataMap)
-            updateLogisticAddress(legalEntity.legalAddress, request.legalAddress, addressMetadataMap)
-            legalEntityRepository.save(legalEntity)
+
+        val legalEntityRequestPairs = legalEntities.map { legalEntity -> Pair(legalEntity, requestsByBpn[legalEntity.bpn]!!) }
+        legalEntityRequestPairs.forEach { (legalEntity, request) ->
+            if (!businessPartnerEquivalenceService.isEquivalent(request)) {
+                updateLegalEntity(legalEntity, request.legalEntity, request.legalEntity.legalName, legalEntityMetadataMap)
+                updateLogisticAddress(legalEntity.legalAddress, request.legalAddress, addressMetadataMap)
+                legalEntityRepository.save(legalEntity)
+
+                changelogService.createChangelogEntries(
+                    listOf(
+                        ChangelogEntryCreateRequest(
+                            legalEntity.bpn,
+                            ChangelogType.UPDATE,
+                            BusinessPartnerType.LEGAL_ENTITY
+                        )
+                    )
+                )
+                changelogService.createChangelogEntries(
+                    listOf(
+                        ChangelogEntryCreateRequest(
+                            legalEntity.legalAddress.bpn,
+                            ChangelogType.UPDATE,
+                            BusinessPartnerType.ADDRESS
+                        )
+                    )
+                )
+            }
         }
 
-        val legalEntityResponses = updatedLegalEntities.map { it.toUpsertDto(it.bpn) }
+        val legalEntityResponses = legalEntityRequestPairs.map { (legalEntity, request) -> legalEntity.toUpsertDto(request.bpnl) }
 
         return LegalEntityPartnerUpdateResponseWrapper(legalEntityResponses, errors)
     }
@@ -221,23 +265,29 @@ class BusinessPartnerBuildService(
 
         val bpnsToFetch = validRequests.map { it.bpns }
         val sites = siteRepository.findDistinctByBpnIn(bpnsToFetch)
-
-        changelogService.createChangelogEntries(sites.map {
-            ChangelogEntryCreateRequest(it.bpn, ChangelogType.UPDATE, BusinessPartnerType.SITE)
-        })
-        changelogService.createChangelogEntries(sites.map {
-            ChangelogEntryCreateRequest(it.mainAddress.bpn, ChangelogType.UPDATE, BusinessPartnerType.ADDRESS)
-        })
-
         val requestByBpnMap = validRequests.associateBy { it.bpns }
-        val updatedSites = sites.map {
-            val request = requestByBpnMap[it.bpn]!!
-            updateSite(it, request.site)
-            updateLogisticAddress(it.mainAddress, request.site.mainAddress, addressMetadataMap)
-            siteRepository.save(it)
+
+        val siteRequestPairs = sites.map { site -> Pair(site, requestByBpnMap[site.bpn]!!) }
+        siteRequestPairs.forEach { (site, request) ->
+            if (!businessPartnerEquivalenceService.isEquivalent(request)) {
+                updateSite(site, request.site)
+                updateLogisticAddress(site.mainAddress, request.site.mainAddress, addressMetadataMap)
+                siteRepository.save(site)
+
+                changelogService.createChangelogEntries(listOf(ChangelogEntryCreateRequest(site.bpn, ChangelogType.UPDATE, BusinessPartnerType.SITE)))
+                changelogService.createChangelogEntries(
+                    listOf(
+                        ChangelogEntryCreateRequest(
+                            site.mainAddress.bpn,
+                            ChangelogType.UPDATE,
+                            BusinessPartnerType.ADDRESS
+                        )
+                    )
+                )
+            }
         }
 
-        val siteResponses = updatedSites.map { it.toUpsertDto(it.bpn) }
+        val siteResponses = siteRequestPairs.map { (site, request) -> site.toUpsertDto(request.bpns) }
 
         return SitePartnerUpdateResponseWrapper(siteResponses, errors)
     }
@@ -252,16 +302,17 @@ class BusinessPartnerBuildService(
         val addresses = logisticAddressRepository.findDistinctByBpnIn(validRequests.map { it.bpna })
         val metadataMap = metadataService.getMetadata(validRequests.map { it.address }).toMapping()
 
-        changelogService.createChangelogEntries(addresses.map {
-            ChangelogEntryCreateRequest(it.bpn, ChangelogType.UPDATE, BusinessPartnerType.ADDRESS)
-        })
+        val addressRequestPairs = addresses.sortedBy { it.bpn }.zip(requests.sortedBy { it.bpna })
+        addressRequestPairs.forEach { (address, request) ->
+            if (!businessPartnerEquivalenceService.isEquivalent(request)) {
+                updateLogisticAddress(address, request.address, metadataMap)
+                logisticAddressRepository.save(address)
 
-        val requestsByBpn = validRequests.associateBy { it.bpna }
-        val updatedAddresses = addresses.map { address ->
-            updateLogisticAddress(address, requestsByBpn[address.bpn]!!.address, metadataMap)
-            logisticAddressRepository.save(address)
+                changelogService.createChangelogEntries(listOf(ChangelogEntryCreateRequest(address.bpn, ChangelogType.UPDATE, BusinessPartnerType.ADDRESS)))
+            }
         }
-        val addressResponses = updatedAddresses.map { it.toDto() }
+
+        val addressResponses = addresses.map { it.toDto() }
 
         return AddressPartnerUpdateResponseWrapper(addressResponses, errors)
     }
@@ -392,6 +443,13 @@ class BusinessPartnerBuildService(
         val idTypes: Map<String, IdentifierType>,
         val regions: Map<String, Region>
     )
+
+    data class SiteCreateRequestWithLegalAddressAsMain(
+        override val name: String,
+        override val states: Collection<SiteStateDto>,
+        override val confidenceCriteria: ConfidenceCriteriaDto,
+        val bpnLParent: String
+    ) : IBaseSiteDto
 
     companion object {
 
@@ -526,6 +584,7 @@ class BusinessPartnerBuildService(
                 throw BpdmValidationException(TaskStepBuildService.CleaningError.LEGAL_NAME_IS_NULL.message)
             }
 
+
             legalEntity.currentness = createCurrentnessTimestamp()
 
             legalEntity.legalName = Name(value = legalName, shortName = legalEntityDto.legalShortName)
@@ -605,7 +664,5 @@ class BusinessPartnerBuildService(
                 confidenceLevel = confidenceCriteria.confidenceLevel!!
             )
     }
-
-
 
 }

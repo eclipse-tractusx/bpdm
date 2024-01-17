@@ -22,7 +22,9 @@ package org.eclipse.tractusx.bpdm.pool.controller
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.PoolSiteApi
-import org.eclipse.tractusx.bpdm.pool.api.model.request.*
+import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteBpnSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.service.AddressService
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
@@ -65,7 +67,7 @@ class SiteController(
     override fun createSite(
         requests: Collection<SitePartnerCreateRequest>
     ): SitePartnerCreateResponseWrapper {
-        return businessPartnerBuildService.createSites(requests)
+        return businessPartnerBuildService.createSitesWithMainAddress(requests)
     }
 
     @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getChangePoolPartnerDataAsRole())")

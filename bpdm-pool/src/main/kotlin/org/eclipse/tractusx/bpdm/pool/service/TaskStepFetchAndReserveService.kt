@@ -88,6 +88,17 @@ class TaskStepFetchAndReserveService(
                     )
                 )
             )
+        } catch (ex: Throwable) {
+            logger.error(ex) { "An unexpected error occurred during golden record task processing" }
+            TaskStepResultEntryDto(
+                taskId = taskStep.taskId,
+                errors = listOf(
+                    TaskErrorDto(
+                        type = TaskErrorType.Unspecified,
+                        description = "An unexpected error occurred during Pool update"
+                    )
+                )
+            )
         }
     }
 
