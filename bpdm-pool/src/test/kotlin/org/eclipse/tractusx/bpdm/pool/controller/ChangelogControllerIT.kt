@@ -77,8 +77,8 @@ class ChangelogControllerIT @Autowired constructor(
         val bpnA2 = createdStructures[1].legalEntity.legalAddress.bpna
 
         val toUpdate = listOf(
-            BusinessPartnerNonVerboseValues.legalEntityUpdate1.copy(bpnl = bpnL1),
-            BusinessPartnerNonVerboseValues.legalEntityUpdate2.copy(bpnl = bpnL2)
+            with(BusinessPartnerNonVerboseValues.legalEntityUpdate1) { copy(bpnl = bpnL1, legalEntity = legalEntity.copy(legalName = "New Name 1")) },
+            with(BusinessPartnerNonVerboseValues.legalEntityUpdate2) { copy(bpnl = bpnL2, legalEntity = legalEntity.copy(legalName = "New Name 2")) }
         )
         poolClient.legalEntities.updateBusinessPartners(
             toUpdate
@@ -144,7 +144,10 @@ class ChangelogControllerIT @Autowired constructor(
                     bpns = bpnS1, site =
                     BusinessPartnerNonVerboseValues.siteUpdate1.site.copy(name = name1)
                 ),
-                BusinessPartnerNonVerboseValues.siteUpdate2.copy(bpns = bpnS2)
+                BusinessPartnerNonVerboseValues.siteUpdate2.copy(
+                    bpns = bpnS2, site =
+                    BusinessPartnerNonVerboseValues.siteUpdate2.site.copy(name = name1)
+                )
             )
         )
 
@@ -212,7 +215,10 @@ class ChangelogControllerIT @Autowired constructor(
                     bpna = bpnA1,
                     address = BusinessPartnerNonVerboseValues.addressPartnerUpdate1.address.copy(name = nameUpdate)
                 ),
-                BusinessPartnerNonVerboseValues.addressPartnerUpdate2.copy(bpna = bpnA2)
+                BusinessPartnerNonVerboseValues.addressPartnerUpdate2.copy(
+                    bpna = bpnA2,
+                    address = BusinessPartnerNonVerboseValues.addressPartnerUpdate2.address.copy(name = nameUpdate)
+                )
             )
         )
 
