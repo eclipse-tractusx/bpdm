@@ -25,51 +25,18 @@ import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.bpdm.pool.api.model.ConfidenceCriteriaDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressDto
-import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.entity.ConfidenceCriteria
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntity
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddress
 import org.eclipse.tractusx.bpdm.pool.entity.Site
-import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
-import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
-import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
-import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.util.*
 
 @Service
-class BusinessPartnerEquivalenceService(
-    private val legalEntityRepository: LegalEntityRepository,
-    private val siteRepository: SiteRepository,
-    private val logisticAddressRepository: LogisticAddressRepository
-) {
+class BusinessPartnerEquivalenceMapper {
 
-    fun isEquivalent(updateDto: LegalEntityPartnerUpdateRequest): Boolean {
-        val entity = legalEntityRepository.findByBpn(updateDto.bpnl)
-            ?: throw BpdmValidationException(TaskStepBuildService.CleaningError.INVALID_LEGAL_ENTITY_BPN.message)
-
-        return toEquivalenceDto(updateDto) == toEquivalenceDto(entity)
-    }
-
-    fun isEquivalent(updateDto: SitePartnerUpdateRequest): Boolean {
-        val entity =
-            siteRepository.findByBpn(updateDto.bpns) ?: throw BpdmValidationException(TaskStepBuildService.CleaningError.INVALID_LEGAL_ENTITY_BPN.message)
-
-        return toEquivalenceDto(updateDto) == toEquivalenceDto(entity)
-    }
-
-    fun isEquivalent(updateDto: AddressPartnerUpdateRequest): Boolean {
-        val entity = logisticAddressRepository.findByBpn(updateDto.bpna)
-            ?: throw BpdmValidationException(TaskStepBuildService.CleaningError.INVALID_LEGAL_ENTITY_BPN.message)
-
-        return toEquivalenceDto(updateDto) == toEquivalenceDto(entity)
-    }
-
-    private fun toEquivalenceDto(legalEntity: LegalEntity) =
+    fun toEquivalenceDto(legalEntity: LegalEntity) =
         with(legalEntity) {
             LegalEntityEquivalenceDto(
                 legalForm = legalForm?.technicalKey,
@@ -83,22 +50,7 @@ class BusinessPartnerEquivalenceService(
             )
         }
 
-
-    private fun toEquivalenceDto(request: LegalEntityPartnerUpdateRequest) =
-        with(request.legalEntity) {
-            LegalEntityEquivalenceDto(
-                legalForm = legalForm,
-                legalName = legalName,
-                legalShortName = legalShortName,
-                identifiers = identifiers.map { IdentifierEquivalenceDto(it.value, it.type) }.toSortedSet(compareBy { it.value }),
-                states = states.map { StateEquivalenceDto(it.validFrom, it.validTo, it.type) }.toSortedSet(compareBy { it.validFrom }),
-                classifications = classifications.map { ClassificationEquivalenceDto(it.code, it.value, it.type) }.toSortedSet(compareBy { it.value }),
-                confidenceCriteria = toEquivalenceDto(confidenceCriteria),
-                legalAddress = toEquivalenceDto(request.legalAddress)
-            )
-        }
-
-    private fun toEquivalenceDto(site: Site) =
+    fun toEquivalenceDto(site: Site) =
         with(site) {
             SiteEquivalenceDto(
                 name = name,
@@ -108,18 +60,7 @@ class BusinessPartnerEquivalenceService(
             )
         }
 
-
-    private fun toEquivalenceDto(request: SitePartnerUpdateRequest) =
-        with(request.site) {
-            SiteEquivalenceDto(
-                name = name,
-                states = states.map { StateEquivalenceDto(it.validFrom, it.validTo, it.type) }.toSortedSet(compareBy { it.validFrom }),
-                confidenceCriteria = toEquivalenceDto(confidenceCriteria),
-                mainAddress = toEquivalenceDto(mainAddress)
-            )
-        }
-
-    private fun toEquivalenceDto(logisticAddress: LogisticAddress) =
+    fun toEquivalenceDto(logisticAddress: LogisticAddress) =
         LogisticAddressEquivalenceDto(
             name = logisticAddress.name,
             states = logisticAddress.states.map { StateEquivalenceDto(it.validFrom, it.validTo, it.type) }.toSortedSet(compareBy { it.validFrom }),
@@ -172,66 +113,6 @@ class BusinessPartnerEquivalenceService(
             },
             confidenceCriteria = toEquivalenceDto(logisticAddress.confidenceCriteria)
         )
-
-    private fun toEquivalenceDto(request: AddressPartnerUpdateRequest) =
-        toEquivalenceDto(request.address)
-
-
-    private fun toEquivalenceDto(logisticAddress: LogisticAddressDto) =
-        with(logisticAddress) {
-            LogisticAddressEquivalenceDto(
-                name = logisticAddress.name,
-                states = states.map { StateEquivalenceDto(it.validFrom, it.validTo, it.type) }.toSortedSet(compareBy { it.validFrom }),
-                identifiers = identifiers.map { IdentifierEquivalenceDto(it.value, it.type) }.toSortedSet(compareBy { it.value }),
-                physicalPostalAddress = with(physicalPostalAddress) {
-                    PhysicalAddressEquivalenceDto(
-                        geographicCoordinates = with(geographicCoordinates) { this?.let { GeoCoordinateDto(longitude, latitude, altitude) } },
-                        country = country,
-                        administrativeAreaLevel1 = administrativeAreaLevel1,
-                        administrativeAreaLevel2 = administrativeAreaLevel2,
-                        administrativeAreaLevel3 = administrativeAreaLevel3,
-                        postalCode = postalCode,
-                        city = city,
-                        district = district,
-                        companyPostalCode = companyPostalCode,
-                        industrialZone = industrialZone,
-                        building = building,
-                        floor = floor,
-                        door = door,
-                        street = with(street) {
-                            this?.let {
-                                StreetEquivalenceDto(
-                                    name,
-                                    houseNumber,
-                                    houseNumberSupplement,
-                                    milestone,
-                                    direction,
-                                    namePrefix,
-                                    additionalNamePrefix,
-                                    nameSuffix,
-                                    additionalNameSuffix
-                                )
-                            }
-                        }
-                    )
-                },
-                alternativePostalAddress = with(logisticAddress.alternativePostalAddress) {
-                    this?.let {
-                        AlternativeEquivalenceDto(
-                            geographicCoordinates = with(geographicCoordinates) { this?.let { GeoCoordinateDto(longitude, latitude, altitude) } },
-                            country = country,
-                            administrativeAreaLevel1 = administrativeAreaLevel1,
-                            postalCode = postalCode,
-                            city = city,
-                            deliveryServiceType = deliveryServiceType,
-                            deliveryServiceQualifier = deliveryServiceQualifier,
-                            deliveryServiceNumber = deliveryServiceNumber
-                        )
-                    }
-                },
-                confidenceCriteria = toEquivalenceDto(confidenceCriteria)
-            )
-        }
 
     private fun toEquivalenceDto(confidenceCriteriaDto: ConfidenceCriteriaDto) =
         with(confidenceCriteriaDto) {

@@ -23,10 +23,7 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.util.replace
-import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
-import org.eclipse.tractusx.bpdm.pool.api.model.ConfidenceCriteriaDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressDto
-import org.eclipse.tractusx.bpdm.pool.api.model.SiteStateDto
+import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.dto.AddressMetadataDto
@@ -55,7 +52,7 @@ class BusinessPartnerBuildService(
     private val siteRepository: SiteRepository,
     private val logisticAddressRepository: LogisticAddressRepository,
     private val requestValidationService: RequestValidationService,
-    private val businessPartnerEquivalenceService: BusinessPartnerEquivalenceService
+    private val businessPartnerEquivalenceMapper: BusinessPartnerEquivalenceMapper
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -79,7 +76,7 @@ class BusinessPartnerBuildService(
 
         val requestsByLegalEntities = validRequests
             .mapIndexed { bpnIndex, request ->
-                val legalEntity = createLegalEntity(request.legalEntity, bpnLs[bpnIndex], request.legalEntity.legalName, legalEntityMetadataMap)
+                val legalEntity = createLegalEntity(request.legalEntity, bpnLs[bpnIndex], legalEntityMetadataMap)
                 val legalAddress = createLogisticAddress(request.legalAddress, bpnAs[bpnIndex], legalEntity, addressMetadataMap)
                 legalEntity.legalAddress = legalAddress
                 Pair(legalEntity, request)
@@ -222,9 +219,12 @@ class BusinessPartnerBuildService(
 
         val legalEntityRequestPairs = legalEntities.map { legalEntity -> Pair(legalEntity, requestsByBpn[legalEntity.bpn]!!) }
         legalEntityRequestPairs.forEach { (legalEntity, request) ->
-            if (!businessPartnerEquivalenceService.isEquivalent(request)) {
-                updateLegalEntity(legalEntity, request.legalEntity, request.legalEntity.legalName, legalEntityMetadataMap)
-                updateLogisticAddress(legalEntity.legalAddress, request.legalAddress, addressMetadataMap)
+            val legalEntityBeforeUpdate = businessPartnerEquivalenceMapper.toEquivalenceDto(legalEntity)
+            updateLegalEntity(legalEntity, request.legalEntity, legalEntityMetadataMap)
+            updateLogisticAddress(legalEntity.legalAddress, request.legalAddress, addressMetadataMap)
+            val legalEntityAfterUpdate = businessPartnerEquivalenceMapper.toEquivalenceDto(legalEntity)
+
+            if (legalEntityBeforeUpdate != legalEntityAfterUpdate) {
                 legalEntityRepository.save(legalEntity)
 
                 changelogService.createChangelogEntries(
@@ -269,9 +269,12 @@ class BusinessPartnerBuildService(
 
         val siteRequestPairs = sites.map { site -> Pair(site, requestByBpnMap[site.bpn]!!) }
         siteRequestPairs.forEach { (site, request) ->
-            if (!businessPartnerEquivalenceService.isEquivalent(request)) {
-                updateSite(site, request.site)
-                updateLogisticAddress(site.mainAddress, request.site.mainAddress, addressMetadataMap)
+            val siteBeforeUpdate = businessPartnerEquivalenceMapper.toEquivalenceDto(site)
+            updateSite(site, request.site)
+            updateLogisticAddress(site.mainAddress, request.site.mainAddress, addressMetadataMap)
+            val siteAfterUpdate = businessPartnerEquivalenceMapper.toEquivalenceDto(site)
+
+            if (siteBeforeUpdate != siteAfterUpdate) {
                 siteRepository.save(site)
 
                 changelogService.createChangelogEntries(listOf(ChangelogEntryCreateRequest(site.bpn, ChangelogType.UPDATE, BusinessPartnerType.SITE)))
@@ -304,8 +307,11 @@ class BusinessPartnerBuildService(
 
         val addressRequestPairs = addresses.sortedBy { it.bpn }.zip(requests.sortedBy { it.bpna })
         addressRequestPairs.forEach { (address, request) ->
-            if (!businessPartnerEquivalenceService.isEquivalent(request)) {
-                updateLogisticAddress(address, request.address, metadataMap)
+            val addressBeforeUpdate = businessPartnerEquivalenceMapper.toEquivalenceDto(address)
+            updateLogisticAddress(address, request.address, metadataMap)
+            val addressAfterUpdate = businessPartnerEquivalenceMapper.toEquivalenceDto(address)
+
+            if (addressBeforeUpdate != addressAfterUpdate) {
                 logisticAddressRepository.save(address)
 
                 changelogService.createChangelogEntries(listOf(ChangelogEntryCreateRequest(address.bpn, ChangelogType.UPDATE, BusinessPartnerType.ADDRESS)))
@@ -550,51 +556,39 @@ class BusinessPartnerBuildService(
         }
 
         fun createLegalEntity(
-            legalEntityDto: IBaseLegalEntityDto,
+            legalEntityDto: LegalEntityDto,
             bpnL: String,
-            legalNameValue: String?,
             metadataMap: LegalEntityMetadataMapping
         ): LegalEntity {
-
-            if (legalNameValue == null) {
-                throw BpdmValidationException(TaskStepBuildService.CleaningError.LEGAL_NAME_IS_NULL.message)
-            }
-
             // it has to be validated that the legalForm exits
             val legalForm = legalEntityDto.legalForm?.let { metadataMap.legalForms[it]!! }
-            val legalName = Name(value = legalNameValue, shortName = legalEntityDto.legalShortName)
+            val legalName = Name(value = legalEntityDto.legalName, shortName = legalEntityDto.legalShortName)
             val newLegalEntity = LegalEntity(
                 bpn = bpnL,
                 legalName = legalName,
                 legalForm = legalForm,
                 currentness = Instant.now().truncatedTo(ChronoUnit.MICROS),
-                confidenceCriteria = createConfidenceCriteria(legalEntityDto.confidenceCriteria!!)
+                confidenceCriteria = createConfidenceCriteria(legalEntityDto.confidenceCriteria)
             )
-            updateLegalEntity(newLegalEntity, legalEntityDto, legalNameValue, metadataMap)
+            updateLegalEntity(newLegalEntity, legalEntityDto, metadataMap)
 
             return newLegalEntity
         }
         fun updateLegalEntity(
             legalEntity: LegalEntity,
-            legalEntityDto: IBaseLegalEntityDto,
-            legalName: String?,
+            legalEntityDto: LegalEntityDto,
             metadataMap: LegalEntityMetadataMapping
         ) {
-            if(legalName == null) {
-                throw BpdmValidationException(TaskStepBuildService.CleaningError.LEGAL_NAME_IS_NULL.message)
-            }
-
-
             legalEntity.currentness = createCurrentnessTimestamp()
 
-            legalEntity.legalName = Name(value = legalName, shortName = legalEntityDto.legalShortName)
+            legalEntity.legalName = Name(value = legalEntityDto.legalName, shortName = legalEntityDto.legalShortName)
 
             legalEntity.legalForm = legalEntityDto.legalForm?.let { metadataMap.legalForms[it]!! }
 
             legalEntity.identifiers.replace(legalEntityDto.identifiers.map { toLegalEntityIdentifier(it, metadataMap.idTypes, legalEntity) })
             legalEntity.states.replace(legalEntityDto.states.map { toLegalEntityState(it, legalEntity) })
             legalEntity.classifications.replace(legalEntityDto.classifications.map { toLegalEntityClassification(it, legalEntity) }.toSet())
-            legalEntity.confidenceCriteria = createConfidenceCriteria(legalEntityDto.confidenceCriteria!!)
+            legalEntity.confidenceCriteria = createConfidenceCriteria(legalEntityDto.confidenceCriteria)
         }
 
         fun createPhysicalAddress(physicalAddress: IBasePhysicalPostalAddressDto, regions: Map<String, Region>): PhysicalPostalAddress {
