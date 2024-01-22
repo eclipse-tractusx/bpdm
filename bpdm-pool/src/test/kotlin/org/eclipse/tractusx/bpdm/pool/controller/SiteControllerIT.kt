@@ -32,6 +32,14 @@ import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteBpnSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.util.*
+import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
+import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues
+import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerVerboseValues
+import org.eclipse.tractusx.bpdm.test.testdata.pool.LegalEntityStructureRequest
+import org.eclipse.tractusx.bpdm.test.testdata.pool.SiteStructureRequest
+import org.eclipse.tractusx.bpdm.test.util.AssertHelpers
+import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
+import org.eclipse.tractusx.bpdm.test.util.PoolDataHelpers
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -45,12 +53,15 @@ import java.time.Instant
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class SiteControllerIT @Autowired constructor(
     val testHelpers: TestHelpers,
-    val poolClient: PoolClientImpl
+    val poolClient: PoolClientImpl,
+    val dbTestHelpers: DbTestHelpers,
+    val assertHelpers: AssertHelpers,
+    val poolDataHelpers: PoolDataHelpers,
 ) {
     @BeforeEach
     fun beforeEach() {
-        testHelpers.truncateDbTables()
-        testHelpers.createTestMetadata()
+        dbTestHelpers.truncateDbTables()
+        poolDataHelpers.createPoolMetadata()
     }
 
     /**
@@ -126,7 +137,7 @@ class SiteControllerIT @Autowired constructor(
             )
         )
 
-        testHelpers.assertRecursively(searchResult.content)
+        assertHelpers.assertRecursively(searchResult.content)
             .ignoringFieldsOfTypes(Instant::class.java)
             .ignoringFields(
                 SiteWithMainAddressVerboseDto::mainAddress.name + "." + LogisticAddressVerboseDto::bpna.name,
@@ -191,7 +202,7 @@ class SiteControllerIT @Autowired constructor(
                 )
             )
 
-        testHelpers.assertRecursively(searchResult.content)
+        assertHelpers.assertRecursively(searchResult.content)
             .ignoringFieldsOfTypes(Instant::class.java)
             .ignoringFields(
                 SiteWithMainAddressVerboseDto::mainAddress.name + "." + LogisticAddressVerboseDto::bpna.name,
@@ -490,7 +501,7 @@ class SiteControllerIT @Autowired constructor(
         val toSearch = expected.map { it.bpnSite!! }
 
         val response = poolClient.sites.searchMainAddresses(toSearch)
-        testHelpers.assertRecursively(response).isEqualTo(expected)
+        assertHelpers.assertRecursively(response).isEqualTo(expected)
     }
 
     /**
@@ -518,7 +529,7 @@ class SiteControllerIT @Autowired constructor(
         val toSearch = expected.map { it.bpnSite!! }.plus("NON-EXISTENT")
 
         val response = poolClient.sites.searchMainAddresses(toSearch)
-        testHelpers.assertRecursively(response).isEqualTo(expected)
+        assertHelpers.assertRecursively(response).isEqualTo(expected)
     }
 
     @Test
@@ -565,14 +576,14 @@ class SiteControllerIT @Autowired constructor(
 
         val firstPage = poolClient.sites.getSitesPaginated(paginationRequest = PaginationRequest(0, 10))
 
-        testHelpers.assertRecursively(firstPage).ignoringFieldsOfTypes(Instant::class.java).isEqualTo(expectedFirstPage)
+        assertHelpers.assertRecursively(firstPage).ignoringFieldsOfTypes(Instant::class.java).isEqualTo(expectedFirstPage)
 
     }
 
     private fun assertThatCreatedSitesEqual(actuals: Collection<SitePartnerCreateVerboseDto>, expected: Collection<SitePartnerCreateVerboseDto>) {
         actuals.forEach { assertThat(it.site.bpns).matches(testHelpers.bpnSPattern) }
 
-        testHelpers.assertRecursively(actuals)
+        assertHelpers.assertRecursively(actuals)
             .ignoringFields(
                 SitePartnerCreateVerboseDto::site.name + "." + SiteVerboseDto::bpns.name,
                 SitePartnerCreateVerboseDto::site.name + "." + SiteVerboseDto::bpnLegalEntity.name,

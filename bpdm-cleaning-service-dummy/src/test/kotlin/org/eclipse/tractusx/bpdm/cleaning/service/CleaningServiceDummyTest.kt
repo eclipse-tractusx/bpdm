@@ -19,8 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.cleaning.service
 
-import org.assertj.core.api.Assertions
-import org.assertj.core.api.RecursiveComparisonAssert
 import org.eclipse.tractusx.bpdm.cleaning.testdata.CommonValues.businessPartnerWithBpnA
 import org.eclipse.tractusx.bpdm.cleaning.testdata.CommonValues.businessPartnerWithBpnLAndBpnAAndLegalAddressType
 import org.eclipse.tractusx.bpdm.cleaning.testdata.CommonValues.businessPartnerWithBpnSAndBpnAAndLegalAndSiteMainAddressType
@@ -29,7 +27,9 @@ import org.eclipse.tractusx.bpdm.cleaning.testdata.CommonValues.businessPartnerW
 import org.eclipse.tractusx.bpdm.cleaning.testdata.CommonValues.expectedLegalEntityDto
 import org.eclipse.tractusx.bpdm.cleaning.testdata.CommonValues.expectedLogisticAddressDto
 import org.eclipse.tractusx.bpdm.cleaning.testdata.CommonValues.expectedSiteDto
+import org.eclipse.tractusx.bpdm.test.util.AssertHelpers
 import org.eclipse.tractusx.orchestrator.api.model.*
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -40,7 +40,8 @@ import java.util.*
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 class CleaningServiceDummyTest @Autowired constructor(
-    val cleaningServiceDummy: CleaningServiceDummy
+    val cleaningServiceDummy: CleaningServiceDummy,
+    val assertHelpers: AssertHelpers
 ) {
 
 
@@ -142,28 +143,22 @@ class CleaningServiceDummyTest @Autowired constructor(
         return TaskStepReservationResponse(listOf(TaskStepReservationEntryDto(UUID.randomUUID().toString(), fullDto)), Instant.MIN)
     }
 
-    fun <T> assertRecursively(actual: T): RecursiveComparisonAssert<*> {
-        return Assertions.assertThat(actual)
-            .usingRecursiveComparison()
-            .ignoringCollectionOrder()
-            .ignoringAllOverriddenEquals()
-            .ignoringFieldsOfTypes(Instant::class.java)
-    }
+
 
     private fun assertLegalEntitiesEqual(actual: LegalEntityDto?, expected: LegalEntityDto) =
-        assertRecursively(actual)
+        assertHelpers.assertRecursively(actual)
             .ignoringFields(LegalEntityDto::bpnLReference.name)
             .ignoringFields("${LegalEntityDto::legalAddress.name}.${LogisticAddressDto::bpnAReference.name}")
             .isEqualTo(expected)
 
     private fun assertSitesEqual(actual: SiteDto?, expected: SiteDto) =
-        assertRecursively(actual)
+        assertHelpers.assertRecursively(actual)
             .ignoringFields(SiteDto::bpnSReference.name)
             .ignoringFields("${SiteDto::mainAddress.name}.${LogisticAddressDto::bpnAReference.name}")
             .isEqualTo(expected)
 
     private fun assertAddressesEqual(actual: LogisticAddressDto?, expected: LogisticAddressDto) =
-        assertRecursively(actual)
+        assertHelpers.assertRecursively(actual)
             .ignoringFields(LogisticAddressDto::bpnAReference.name)
             .isEqualTo(expected)
 }

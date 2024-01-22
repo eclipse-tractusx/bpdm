@@ -29,6 +29,13 @@ import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryVerboseDto
 import org.eclipse.tractusx.bpdm.pool.util.*
+import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
+import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues
+import org.eclipse.tractusx.bpdm.test.testdata.pool.LegalEntityStructureRequest
+import org.eclipse.tractusx.bpdm.test.testdata.pool.SiteStructureRequest
+import org.eclipse.tractusx.bpdm.test.util.AssertHelpers
+import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
+import org.eclipse.tractusx.bpdm.test.util.PoolDataHelpers
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -45,13 +52,16 @@ import java.time.Instant
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class ChangelogControllerIT @Autowired constructor(
     val testHelpers: TestHelpers,
-    val poolClient: PoolClientImpl
+    val poolClient: PoolClientImpl,
+    val dbTestHelpers: DbTestHelpers,
+    val assertHelpers: AssertHelpers,
+    val poolDataHelpers: PoolDataHelpers,
 ) {
 
     @BeforeEach
     fun beforeEach() {
-        testHelpers.truncateDbTables()
-        testHelpers.createTestMetadata()
+        dbTestHelpers.truncateDbTables()
+        poolDataHelpers.createPoolMetadata()
     }
 
     /**
@@ -465,7 +475,7 @@ class ChangelogControllerIT @Autowired constructor(
 
     private fun checkEqual(expected: PageDto<ChangelogEntryVerboseDto>) =
         { actualResponse: PageDto<ChangelogEntryVerboseDto> ->
-            testHelpers.assertRecursively(actualResponse).isEqualTo(expected)
+            assertHelpers.assertRecursively(actualResponse).isEqualTo(expected)
             Unit
         }
 

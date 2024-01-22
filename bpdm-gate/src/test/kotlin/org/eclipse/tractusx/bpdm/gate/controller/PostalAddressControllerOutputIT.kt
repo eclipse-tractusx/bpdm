@@ -46,10 +46,11 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.repository.GateAddressRepository
-import org.eclipse.tractusx.bpdm.gate.util.BusinessPartnerNonVerboseValues
-import org.eclipse.tractusx.bpdm.gate.util.BusinessPartnerVerboseValues
-import org.eclipse.tractusx.bpdm.gate.util.DbTestHelpers
+
 import org.eclipse.tractusx.bpdm.gate.util.PostgreSQLContextInitializer
+import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerNonVerboseValues
+import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerVerboseValues
+import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

@@ -20,8 +20,6 @@
 package com.catenax.bpdm.bridge.dummy
 
 import com.catenax.bpdm.bridge.dummy.service.SyncService
-import com.catenax.bpdm.bridge.dummy.util.DbTestHelpers
-import com.catenax.bpdm.bridge.dummy.util.PostgreSQLContextInitializer
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
@@ -32,6 +30,8 @@ import org.eclipse.tractusx.bpdm.common.service.BaseSyncRecordService
 import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogDto
+import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
+import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

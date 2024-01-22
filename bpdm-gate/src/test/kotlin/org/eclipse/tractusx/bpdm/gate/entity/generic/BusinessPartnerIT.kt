@@ -53,8 +53,9 @@ import org.eclipse.tractusx.bpdm.gate.entity.PhysicalPostalAddress
 import org.eclipse.tractusx.bpdm.gate.entity.Street
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.PostalAddressRepository
-import org.eclipse.tractusx.bpdm.gate.util.DbTestHelpers
-import org.eclipse.tractusx.bpdm.gate.util.PostgreSQLContextInitializer
+import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
+import org.eclipse.tractusx.bpdm.test.util.AssertHelpers
+import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
@@ -71,6 +72,7 @@ import java.time.LocalDateTime
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 internal class BusinessPartnerIT @Autowired constructor(
     val testHelpers: DbTestHelpers,
+    val assertHelpers: AssertHelpers,
 ) {
 
     @Autowired
@@ -106,7 +108,7 @@ internal class BusinessPartnerIT @Autowired constructor(
         assertEquals(savedEntity.nameParts.toList(), foundEntity.nameParts.toList())
         assertEquals(savedEntity.identifiers.toList(), foundEntity.identifiers.toList())
         assertEquals(savedEntity.classifications.toList(), foundEntity.classifications.toList())
-        testHelpers.assertRecursively(foundEntity.states.toList()).isEqualTo(savedEntity.states.toList())
+        assertHelpers.assertRecursively(foundEntity.states.toList()).isEqualTo(savedEntity.states.toList())
     }
 
 

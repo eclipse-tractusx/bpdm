@@ -29,9 +29,9 @@ import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError.
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
-import org.eclipse.tractusx.bpdm.gate.util.BusinessPartnerNonVerboseValues
-import org.eclipse.tractusx.bpdm.gate.util.DbTestHelpers
-import org.eclipse.tractusx.bpdm.gate.util.PostgreSQLContextInitializer
+import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
+import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerNonVerboseValues
+import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

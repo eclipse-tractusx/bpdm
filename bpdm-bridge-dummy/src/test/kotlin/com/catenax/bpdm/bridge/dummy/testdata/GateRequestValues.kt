@@ -19,184 +19,186 @@
 
 package com.catenax.bpdm.bridge.dummy.testdata
 
+import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.*
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateInputRequest
+import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerVerboseValues
 
 object GateRequestValues {
 
     val identifier1 =
         LegalEntityIdentifierDto(
-            value = CommonValues.identifierValue1,
-            type = CommonValues.identifierTypeTechnicalKey1,
-            issuingBody = CommonValues.identifierIssuingBodyName1,
+            value = BusinessPartnerVerboseValues.identifierValue1,
+            type = BusinessPartnerVerboseValues.identifierTypeTechnicalKey1,
+            issuingBody = BusinessPartnerVerboseValues.identifierIssuingBodyName1,
         )
     val identifier2 =
         LegalEntityIdentifierDto(
-            value = CommonValues.identifierValue2,
-            CommonValues.identifierTypeTechnicalKey2,
-            CommonValues.identifierIssuingBodyName2,
+            value = BusinessPartnerVerboseValues.identifierValue2,
+            BusinessPartnerVerboseValues.identifierTypeTechnicalKey2,
+            BusinessPartnerVerboseValues.identifierIssuingBodyName2,
         )
     val identifier3 =
         LegalEntityIdentifierDto(
-            value = CommonValues.identifierValue3,
-            type = CommonValues.identifierTypeTechnicalKey3,
-            issuingBody = CommonValues.identifierIssuingBodyName3,
+            value = BusinessPartnerVerboseValues.identifierValue3,
+            type = BusinessPartnerVerboseValues.identifierTypeTechnicalKey3,
+            issuingBody = BusinessPartnerVerboseValues.identifierIssuingBodyName3,
         )
     val identifier4 =
         LegalEntityIdentifierDto(
-            value = CommonValues.identifierValue5,
-            type = CommonValues.identifierTypeTechnicalKey4,
-            issuingBody = CommonValues.identifierIssuingBodyName4,
+            value = BusinessPartnerVerboseValues.identifierValue5,
+            type = BusinessPartnerVerboseValues.identifierTypeTechnicalKey4,
+            issuingBody = BusinessPartnerVerboseValues.identifierIssuingBodyName4,
         )
 
     val identifier5 =
         LegalEntityIdentifierDto(
-            value = CommonValues.identifierValue5,
-            type = CommonValues.identifierTypeTechnicalKey5,
-            issuingBody = CommonValues.identifierIssuingBodyName5,
+            value = BusinessPartnerVerboseValues.identifierValue5,
+            type = BusinessPartnerVerboseValues.identifierTypeTechnicalKey5,
+            issuingBody = BusinessPartnerVerboseValues.identifierIssuingBodyName5,
         )
 
     val leBusinessStatus1 = LegalEntityStateDto(
-        description = CommonValues.businessStatusOfficialDenotation1,
-        validFrom = CommonValues.businessStatusValidFrom1,
-        validTo = CommonValues.businessStatusValidUntil1,
-        type = CommonValues.businessStateType1
+        description = BusinessPartnerVerboseValues.businessStatusOfficialDenotation1,
+        validFrom = BusinessPartnerVerboseValues.businessStatusValidFrom1,
+        validTo = BusinessPartnerVerboseValues.businessStatusValidUntil1,
+        type = BusinessPartnerVerboseValues.businessStateType1
     )
 
     val leBusinessStatus2 = LegalEntityStateDto(
-        description = CommonValues.businessStatusOfficialDenotation2,
-        validFrom = CommonValues.businessStatusValidFrom2,
-        validTo = CommonValues.businessStatusValidUntil2,
-        type = CommonValues.businessStateType2
+        description = BusinessPartnerVerboseValues.businessStatusOfficialDenotation2,
+        validFrom = BusinessPartnerVerboseValues.businessStatusValidFrom2,
+        validTo = BusinessPartnerVerboseValues.businessStatusValidUntil2,
+        type = BusinessPartnerVerboseValues.businessStateType2
     )
 
     val siteBusinessStatus1 = SiteStateDto(
-        description = CommonValues.businessStatusOfficialDenotation1,
-        validFrom = CommonValues.businessStatusValidFrom1,
-        validTo = CommonValues.businessStatusValidUntil1,
-        type = CommonValues.businessStateType1
+        description = BusinessPartnerVerboseValues.businessStatusOfficialDenotation1,
+        validFrom = BusinessPartnerVerboseValues.businessStatusValidFrom1,
+        validTo = BusinessPartnerVerboseValues.businessStatusValidUntil1,
+        type = BusinessPartnerVerboseValues.businessStateType1
     )
 
     val siteBusinessStatus2 = SiteStateDto(
-        description = CommonValues.businessStatusOfficialDenotation2,
-        validFrom = CommonValues.businessStatusValidFrom2,
-        validTo = CommonValues.businessStatusValidUntil2,
-        type = CommonValues.businessStateType2
+        description = BusinessPartnerVerboseValues.businessStatusOfficialDenotation2,
+        validFrom = BusinessPartnerVerboseValues.businessStatusValidFrom2,
+        validTo = BusinessPartnerVerboseValues.businessStatusValidUntil2,
+        type = BusinessPartnerVerboseValues.businessStateType2
     )
 
     val classification1 = LegalEntityClassificationDto(
-        type = CommonValues.classificationType,
-        code = CommonValues.classificationCode1,
-        value = CommonValues.classificationValue1
+        type = BusinessPartnerVerboseValues.classificationType,
+        code = BusinessPartnerVerboseValues.classificationCode1,
+        value = BusinessPartnerVerboseValues.classificationValue1
     )
 
     val classification2 = LegalEntityClassificationDto(
-        type = CommonValues.classificationType,
-        code = CommonValues.classificationCode2,
-        value = CommonValues.classificationValue2
+        type = BusinessPartnerVerboseValues.classificationType,
+        code = BusinessPartnerVerboseValues.classificationCode2,
+        value = BusinessPartnerVerboseValues.classificationValue2
     )
 
     val classification3 = LegalEntityClassificationDto(
-        type = CommonValues.classificationType,
-        code = CommonValues.classificationCode3,
-        value = CommonValues.classificationValue3
+        type = BusinessPartnerVerboseValues.classificationType,
+        code = BusinessPartnerVerboseValues.classificationCode3,
+        value = BusinessPartnerVerboseValues.classificationValue3
     )
 
     val classification4 = LegalEntityClassificationDto(
-        type = CommonValues.classificationType,
-        code = CommonValues.classificationCode4,
-        value = CommonValues.classificationValue4
+        type = BusinessPartnerVerboseValues.classificationType,
+        code = BusinessPartnerVerboseValues.classificationCode4,
+        value = BusinessPartnerVerboseValues.classificationValue4
     )
 
-    val geoCoordinate1 = GeoCoordinateDto(CommonValues.geoCoordinates1.first, CommonValues.geoCoordinates1.second)
-    val geoCoordinate2 = GeoCoordinateDto(CommonValues.geoCoordinates2.first, CommonValues.geoCoordinates2.second)
+    val geoCoordinate1 = GeoCoordinateDto(BusinessPartnerVerboseValues.geoCoordinates1.first, BusinessPartnerVerboseValues.geoCoordinates1.second)
+    val geoCoordinate2 = GeoCoordinateDto(BusinessPartnerVerboseValues.geoCoordinates2.first, BusinessPartnerVerboseValues.geoCoordinates2.second)
 
     val postalAddress1 = PhysicalPostalAddressDto(
         geographicCoordinates = geoCoordinate1,
-        country = CommonValues.country1,
-        postalCode = CommonValues.postCode1,
-        city = CommonValues.city1,
+        country = CountryCode.DE,
+        postalCode = BusinessPartnerVerboseValues.postCode1,
+        city = BusinessPartnerVerboseValues.city1,
         administrativeAreaLevel1 = null,
-        administrativeAreaLevel2 = CommonValues.county1,
+        administrativeAreaLevel2 = BusinessPartnerVerboseValues.county1,
         administrativeAreaLevel3 = null,
-        district = CommonValues.district1,
+        district = BusinessPartnerVerboseValues.district1,
         companyPostalCode = null,
-        industrialZone = CommonValues.industrialZone1,
-        building = CommonValues.building1,
-        floor = CommonValues.floor1,
-        door = CommonValues.door1,
-        street = StreetDto(name = CommonValues.street1, houseNumber = CommonValues.houseNumber1, direction = CommonValues.direction1),
+        industrialZone = BusinessPartnerVerboseValues.industrialZone1,
+        building = BusinessPartnerVerboseValues.building1,
+        floor = BusinessPartnerVerboseValues.floor1,
+        door = BusinessPartnerVerboseValues.door1,
+        street = StreetDto(name = BusinessPartnerVerboseValues.street1, houseNumber = BusinessPartnerVerboseValues.houseNumber1, direction = BusinessPartnerVerboseValues.direction1),
     )
 
     val postalAddress2 = PhysicalPostalAddressDto(
         geographicCoordinates = geoCoordinate2,
-        country = CommonValues.country2,
-        postalCode = CommonValues.postCode2,
-        city = CommonValues.city2,
+        country = CountryCode.US,
+        postalCode = BusinessPartnerVerboseValues.postCode2,
+        city = BusinessPartnerVerboseValues.city2,
         administrativeAreaLevel1 = null,
-        administrativeAreaLevel2 = CommonValues.county2,
+        administrativeAreaLevel2 = BusinessPartnerVerboseValues.county2,
         administrativeAreaLevel3 = null,
-        district = CommonValues.district2,
+        district = BusinessPartnerVerboseValues.district2,
         companyPostalCode = null,
-        industrialZone = CommonValues.industrialZone2,
-        building = CommonValues.building2,
-        floor = CommonValues.floor2,
-        door = CommonValues.door2,
-        street = StreetDto(name = CommonValues.street2, houseNumber = CommonValues.houseNumber2, direction = CommonValues.direction2),
+        industrialZone = BusinessPartnerVerboseValues.industrialZone2,
+        building = BusinessPartnerVerboseValues.building2,
+        floor = BusinessPartnerVerboseValues.floor2,
+        door = BusinessPartnerVerboseValues.door2,
+        street = StreetDto(name = BusinessPartnerVerboseValues.street2, houseNumber = BusinessPartnerVerboseValues.houseNumber2, direction = BusinessPartnerVerboseValues.direction2),
     )
     val postalAddress3 = PhysicalPostalAddressDto(
         geographicCoordinates = geoCoordinate1,
-        country = CommonValues.country1,
-        postalCode = CommonValues.postCode1,
-        city = CommonValues.city1,
+        country = CountryCode.DE,
+        postalCode = BusinessPartnerVerboseValues.postCode1,
+        city = BusinessPartnerVerboseValues.city1,
         administrativeAreaLevel1 = null,
-        administrativeAreaLevel2 = CommonValues.county1,
+        administrativeAreaLevel2 = BusinessPartnerVerboseValues.county1,
         administrativeAreaLevel3 = null,
-        district = CommonValues.district1,
+        district = BusinessPartnerVerboseValues.district1,
         companyPostalCode = null,
-        industrialZone = CommonValues.industrialZone1,
-        building = CommonValues.building1,
-        floor = CommonValues.floor1,
-        door = CommonValues.door1,
-        street = StreetDto(name = CommonValues.street1, houseNumber = CommonValues.houseNumber1, direction = CommonValues.direction1),
+        industrialZone = BusinessPartnerVerboseValues.industrialZone1,
+        building = BusinessPartnerVerboseValues.building1,
+        floor = BusinessPartnerVerboseValues.floor1,
+        door = BusinessPartnerVerboseValues.door1,
+        street = StreetDto(name = BusinessPartnerVerboseValues.street1, houseNumber = BusinessPartnerVerboseValues.houseNumber1, direction = BusinessPartnerVerboseValues.direction1),
     )
 
     //New Values for Logistic Addresses Tests
     val postalAddressLogisticAddress1 = PhysicalPostalAddressDto(
         geographicCoordinates = geoCoordinate1,
-        country = CommonValues.country1,
-        postalCode = CommonValues.postCode1,
-        city = CommonValues.city1,
+        country = CountryCode.DE,
+        postalCode = BusinessPartnerVerboseValues.postCode1,
+        city = BusinessPartnerVerboseValues.city1,
         administrativeAreaLevel1 = null,
-        administrativeAreaLevel2 = CommonValues.county1,
+        administrativeAreaLevel2 = BusinessPartnerVerboseValues.county1,
         administrativeAreaLevel3 = null,
-        district = CommonValues.district1,
+        district = BusinessPartnerVerboseValues.district1,
         companyPostalCode = null,
-        industrialZone = CommonValues.industrialZone1,
-        building = CommonValues.building1,
-        floor = CommonValues.floor1,
-        door = CommonValues.door1,
-        street = StreetDto(name = CommonValues.street1, houseNumber = CommonValues.houseNumber1, direction = CommonValues.direction1),
+        industrialZone = BusinessPartnerVerboseValues.industrialZone1,
+        building = BusinessPartnerVerboseValues.building1,
+        floor = BusinessPartnerVerboseValues.floor1,
+        door = BusinessPartnerVerboseValues.door1,
+        street = StreetDto(name = BusinessPartnerVerboseValues.street1, houseNumber = BusinessPartnerVerboseValues.houseNumber1, direction = BusinessPartnerVerboseValues.direction1),
     )
 
     val postalAddressLogisticAddress2 = PhysicalPostalAddressDto(
         geographicCoordinates = geoCoordinate2,
-        country = CommonValues.country2,
-        postalCode = CommonValues.postCode2,
-        city = CommonValues.city2,
+        country = CountryCode.US,
+        postalCode = BusinessPartnerVerboseValues.postCode2,
+        city = BusinessPartnerVerboseValues.city2,
         administrativeAreaLevel1 = null,
-        administrativeAreaLevel2 = CommonValues.county2,
+        administrativeAreaLevel2 = BusinessPartnerVerboseValues.county2,
         administrativeAreaLevel3 = null,
-        district = CommonValues.district2,
+        district = BusinessPartnerVerboseValues.district2,
         companyPostalCode = null,
-        industrialZone = CommonValues.industrialZone2,
-        building = CommonValues.building2,
-        floor = CommonValues.floor2,
-        door = CommonValues.door2,
-        street = StreetDto(name = CommonValues.street2, houseNumber = CommonValues.houseNumber2, direction = CommonValues.direction2),
+        industrialZone = BusinessPartnerVerboseValues.industrialZone2,
+        building = BusinessPartnerVerboseValues.building2,
+        floor = BusinessPartnerVerboseValues.floor2,
+        door = BusinessPartnerVerboseValues.door2,
+        street = StreetDto(name = BusinessPartnerVerboseValues.street2, houseNumber = BusinessPartnerVerboseValues.houseNumber2, direction = BusinessPartnerVerboseValues.direction2),
     )
 
     val address1 = LogisticAddressDto(
@@ -223,27 +225,27 @@ object GateRequestValues {
 
     val legalEntity1 = LegalEntityDto(
         identifiers = listOf(identifier1, identifier2),
-        legalNameParts = listOf(CommonValues.name1),
-        legalShortName = CommonValues.shortName1,
-        legalForm = CommonValues.legalFormTechnicalKey1,
+        legalNameParts = listOf(BusinessPartnerVerboseValues.name1),
+        legalShortName = BusinessPartnerVerboseValues.shortName1,
+        legalForm = BusinessPartnerVerboseValues.legalFormTechnicalKey1,
         states = listOf(leBusinessStatus1),
         classifications = listOf(classification1, classification2),
     )
 
     val legalEntity2 = LegalEntityDto(
         identifiers = listOf(identifier3, identifier4),
-        legalNameParts = listOf(CommonValues.name3),
-        legalShortName = CommonValues.shortName3,
-        legalForm = CommonValues.legalFormTechnicalKey2,
+        legalNameParts = listOf(BusinessPartnerVerboseValues.name3),
+        legalShortName = BusinessPartnerVerboseValues.shortName3,
+        legalForm = BusinessPartnerVerboseValues.legalFormTechnicalKey2,
         states = listOf(leBusinessStatus2),
         classifications = listOf(classification3, classification4),
     )
 
     val legalEntity3 = LegalEntityDto(
         identifiers = listOf(identifier5),
-        legalNameParts = listOf(CommonValues.name1),
-        legalShortName = CommonValues.shortName1,
-        legalForm = CommonValues.legalFormTechnicalKey1,
+        legalNameParts = listOf(BusinessPartnerVerboseValues.name1),
+        legalShortName = BusinessPartnerVerboseValues.shortName1,
+        legalForm = BusinessPartnerVerboseValues.legalFormTechnicalKey1,
         states = listOf(leBusinessStatus1),
         classifications = listOf(classification1, classification2),
     )
@@ -251,67 +253,67 @@ object GateRequestValues {
     val legalEntityGateInputRequest1 = LegalEntityGateInputRequest(
         legalEntity = legalEntity1,
         legalAddress = address1,
-        externalId = CommonValues.externalId1,
+        externalId = BusinessPartnerVerboseValues.externalId1,
     )
 
     val legalEntityGateInputRequest2 = LegalEntityGateInputRequest(
         legalEntity = legalEntity2,
         legalAddress = address2,
-        externalId = CommonValues.externalId2,
+        externalId = BusinessPartnerVerboseValues.externalId2,
     )
 
     val legalEntityGateInputRequest3 = LegalEntityGateInputRequest(
         legalEntity = legalEntity3,
         legalAddress = address3,
-        externalId = CommonValues.externalId3,
+        externalId = BusinessPartnerVerboseValues.externalId3,
     )
 
 
     val site1 = SiteGateDto(
-        nameParts = listOf(CommonValues.nameSite1),
+        nameParts = listOf(BusinessPartnerVerboseValues.nameSite1),
         states = listOf(siteBusinessStatus1)
     )
 
     val site2 = SiteGateDto(
-        nameParts = listOf(CommonValues.nameSite2),
+        nameParts = listOf(BusinessPartnerVerboseValues.nameSite2),
         states = listOf(siteBusinessStatus2)
     )
 
     val siteGateInputRequest1 = SiteGateInputRequest(
         site = site1,
-        externalId = CommonValues.externalIdSite1,
-        legalEntityExternalId = CommonValues.externalId1,
+        externalId = BusinessPartnerVerboseValues.externalIdSite1,
+        legalEntityExternalId = BusinessPartnerVerboseValues.externalId1,
         mainAddress = address1
     )
 
     val siteGateInputRequest2 = SiteGateInputRequest(
         site = site2,
-        externalId = CommonValues.externalIdSite2,
-        legalEntityExternalId = CommonValues.externalId2,
+        externalId = BusinessPartnerVerboseValues.externalIdSite2,
+        legalEntityExternalId = BusinessPartnerVerboseValues.externalId2,
         mainAddress = address2
     )
 
     val addressGateInputRequest1 = AddressGateInputRequest(
         address = address1.copy(
-            nameParts = listOf(CommonValues.name1),
+            nameParts = listOf(BusinessPartnerVerboseValues.name1),
             identifiers = listOf(
-                //AddressIdentifierDto(CommonValues.identifierValue1, CommonValues.identifierTypeTechnicalKey1)
+                //AddressIdentifierDto(BusinessPartnerVerboseValues.identifierValue1, BusinessPartnerVerboseValues.identifierTypeTechnicalKey1)
             )
         ),
-        externalId = CommonValues.externalIdAddress1,
-        legalEntityExternalId = CommonValues.externalId1,
+        externalId = BusinessPartnerVerboseValues.externalIdAddress1,
+        legalEntityExternalId = BusinessPartnerVerboseValues.externalId1,
 
         )
 
     val addressGateInputRequest2 = AddressGateInputRequest(
         address = address2.copy(
-            nameParts = listOf(CommonValues.name2),
+            nameParts = listOf(BusinessPartnerVerboseValues.name2),
             identifiers = listOf(
-                //AddressIdentifierDto(CommonValues.identifierValue2, CommonValues.identifierTypeTechnicalKey2)
+                //AddressIdentifierDto(BusinessPartnerVerboseValues.identifierValue2, BusinessPartnerVerboseValues.identifierTypeTechnicalKey2)
             )
         ),
-        externalId = CommonValues.externalIdAddress2,
-        siteExternalId = CommonValues.externalIdSite1,
+        externalId = BusinessPartnerVerboseValues.externalIdAddress2,
+        siteExternalId = BusinessPartnerVerboseValues.externalIdSite1,
 
         )
 

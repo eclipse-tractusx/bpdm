@@ -19,9 +19,14 @@
 
 package com.catenax.bpdm.bridge.dummy
 
-import com.catenax.bpdm.bridge.dummy.util.BpdmGateContextInitializer
-import com.catenax.bpdm.bridge.dummy.util.BpdmPoolContextInitializer
-import com.catenax.bpdm.bridge.dummy.util.PostgreSQLContextInitializer
+
+
+
+import org.eclipse.tractusx.bpdm.test.containers.BpdmGateContextInitializer
+import org.eclipse.tractusx.bpdm.test.containers.BpdmPoolContextInitializer
+import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
+
+
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles

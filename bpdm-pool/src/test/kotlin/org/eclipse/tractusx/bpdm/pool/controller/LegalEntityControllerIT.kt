@@ -28,10 +28,18 @@ import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.util.*
-import org.eclipse.tractusx.bpdm.pool.util.BusinessPartnerNonVerboseValues.addressIdentifier
-import org.eclipse.tractusx.bpdm.pool.util.BusinessPartnerNonVerboseValues.addressIdentifier1
-import org.eclipse.tractusx.bpdm.pool.util.BusinessPartnerNonVerboseValues.addressIdentifier2
-import org.eclipse.tractusx.bpdm.pool.util.BusinessPartnerNonVerboseValues.logisticAddress3
+import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
+
+import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues
+import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues.addressIdentifier
+import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues.addressIdentifier1
+import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues.addressIdentifier2
+import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues.logisticAddress3
+import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerVerboseValues
+import org.eclipse.tractusx.bpdm.test.testdata.pool.LegalEntityStructureRequest
+import org.eclipse.tractusx.bpdm.test.util.AssertHelpers
+import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
+import org.eclipse.tractusx.bpdm.test.util.PoolDataHelpers
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -51,13 +59,16 @@ import java.time.Instant
 class LegalEntityControllerIT @Autowired constructor(
     val testHelpers: TestHelpers,
     val webTestClient: WebTestClient,
-    val poolClient: PoolClientImpl
+    val poolClient: PoolClientImpl,
+    val dbTestHelpers: DbTestHelpers,
+    val assertHelpers: AssertHelpers,
+    val poolDataHelpers: PoolDataHelpers,
 ) {
 
     @BeforeEach
     fun beforeEach() {
-        testHelpers.truncateDbTables()
-        testHelpers.createTestMetadata()
+        dbTestHelpers.truncateDbTables()
+        poolDataHelpers.createPoolMetadata()
     }
 
     /**
@@ -781,7 +792,7 @@ class LegalEntityControllerIT @Autowired constructor(
         actuals.forEach { assertThat(it.legalEntity.currentness).isBetween(justBeforeCreate, now) }
         actuals.forEach { assertThat(it.legalEntity.bpnl).matches(testHelpers.bpnLPattern) }
 
-        testHelpers.assertRecursively(actuals)
+        assertHelpers.assertRecursively(actuals)
             .ignoringFields(LegalEntityPartnerCreateVerboseDto::index.name)
             .ignoringFieldsOfTypes(Instant::class.java)
             .ignoringFieldsMatchingRegexes(".*${LegalEntityVerboseDto::bpnl.name}")
@@ -796,7 +807,7 @@ class LegalEntityControllerIT @Autowired constructor(
         val justBeforeCreate = now.minusSeconds(3)
         actuals.forEach { assertThat(it.legalEntity.currentness).isBetween(justBeforeCreate, now) }
 
-        testHelpers.assertRecursively(actuals)
+        assertHelpers.assertRecursively(actuals)
             .ignoringFieldsOfTypes(Instant::class.java)
             .ignoringFields(LegalEntityPartnerCreateVerboseDto::index.name)
             .isEqualTo(expected)

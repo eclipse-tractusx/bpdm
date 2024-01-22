@@ -52,10 +52,11 @@ import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
-import org.eclipse.tractusx.bpdm.gate.util.BusinessPartnerNonVerboseValues
-import org.eclipse.tractusx.bpdm.gate.util.BusinessPartnerVerboseValues
-import org.eclipse.tractusx.bpdm.gate.util.DbTestHelpers
+
 import org.eclipse.tractusx.bpdm.gate.util.PostgreSQLContextInitializer
+import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerNonVerboseValues
+import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerVerboseValues
+import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension

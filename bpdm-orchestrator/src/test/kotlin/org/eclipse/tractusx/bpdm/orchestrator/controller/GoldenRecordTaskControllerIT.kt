@@ -24,7 +24,7 @@ import org.assertj.core.api.ThrowableAssert
 import org.assertj.core.data.TemporalUnitOffset
 import org.eclipse.tractusx.bpdm.orchestrator.config.TaskConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.service.GoldenRecordTaskStorage
-import org.eclipse.tractusx.bpdm.orchestrator.testdata.BusinessPartnerTestValues
+import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerGenericCommonValues
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.junit.jupiter.api.BeforeEach
@@ -128,8 +128,8 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
         assertThat(reservedTasks.map { it.taskId }).isEqualTo(createdTasks.map { it.taskId })
 
         // ...and with the correct business partner information
-        assertThat(reservedTasks[0].businessPartner.generic).isEqualTo(BusinessPartnerTestValues.businessPartner1)
-        assertThat(reservedTasks[1].businessPartner.generic).isEqualTo(BusinessPartnerTestValues.businessPartner2)
+        assertThat(reservedTasks[0].businessPartner.generic).isEqualTo(BusinessPartnerGenericCommonValues.businessPartner1)
+        assertThat(reservedTasks[1].businessPartner.generic).isEqualTo(BusinessPartnerGenericCommonValues.businessPartner2)
         assertThat(reservedTasks[1].businessPartner.legalEntity).isNull()
         assertThat(reservedTasks[1].businessPartner.site).isNull()
         assertThat(reservedTasks[1].businessPartner.address).isNull()
@@ -186,7 +186,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
         // reserve task for step==CleanAndSync
         val reservedTasks1 = reserveTasks(TaskStep.CleanAndSync, 1).reservedTasks
         val taskId = reservedTasks1.single().taskId
-        assertThat(reservedTasks1[0].businessPartner.generic).isEqualTo(BusinessPartnerTestValues.businessPartner1)
+        assertThat(reservedTasks1[0].businessPartner.generic).isEqualTo(BusinessPartnerGenericCommonValues.businessPartner1)
 
         // now in stepState==Reserved
         assertProcessingStateDto(
@@ -195,7 +195,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
         )
 
         // resolve task
-        val businessPartnerFull1 = BusinessPartnerTestValues.businessPartner2Full
+        val businessPartnerFull1 = BusinessPartnerGenericCommonValues.businessPartner2Full
         val resultEntry1 = TaskStepResultEntryDto(
             taskId = taskId,
             businessPartner = businessPartnerFull1
@@ -289,10 +289,10 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
     fun `expect exception on requesting too many cleaning tasks`() {
         // Create entries above the upsert limit of 3
         val businessPartners = listOf(
-            BusinessPartnerTestValues.businessPartner1,
-            BusinessPartnerTestValues.businessPartner1,
-            BusinessPartnerTestValues.businessPartner1,
-            BusinessPartnerTestValues.businessPartner1
+            BusinessPartnerGenericCommonValues.businessPartner1,
+            BusinessPartnerGenericCommonValues.businessPartner1,
+            BusinessPartnerGenericCommonValues.businessPartner1,
+            BusinessPartnerGenericCommonValues.businessPartner1
         )
 
         assertBadRequestException {
@@ -386,7 +386,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
                 listOf(
                     TaskStepResultEntryDto(
                         taskId = tasksIds[0],
-                        businessPartner = BusinessPartnerTestValues.businessPartner1Full
+                        businessPartner = BusinessPartnerGenericCommonValues.businessPartner1Full
                     )
                 )
             )
@@ -398,7 +398,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
             listOf(
                 TaskStepResultEntryDto(
                     taskId = tasksIds[0],
-                    businessPartner = BusinessPartnerTestValues.businessPartner1Full
+                    businessPartner = BusinessPartnerGenericCommonValues.businessPartner1Full
                 )
             )
         )
@@ -410,7 +410,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
                 listOf(
                     TaskStepResultEntryDto(
                         taskId = tasksIds[0],
-                        businessPartner = BusinessPartnerTestValues.businessPartner1Full
+                        businessPartner = BusinessPartnerGenericCommonValues.businessPartner1Full
                     )
                 )
             )
@@ -468,7 +468,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
     @Test
     fun `wait for task retention timeout after success`() {
         // create single task in UpdateFromPool mode (only one step)
-        createTasks(TaskMode.UpdateFromPool, listOf(BusinessPartnerTestValues.businessPartner1))
+        createTasks(TaskMode.UpdateFromPool, listOf(BusinessPartnerGenericCommonValues.businessPartner1))
 
         // reserve task
         val reservedTask = reserveTasks(TaskStep.Clean).reservedTasks.single()
@@ -501,7 +501,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
     @Test
     fun `wait for task retention timeout after error`() {
         // create single task in UpdateFromPool mode (only one step)
-        createTasks(TaskMode.UpdateFromPool, listOf(BusinessPartnerTestValues.businessPartner1))
+        createTasks(TaskMode.UpdateFromPool, listOf(BusinessPartnerGenericCommonValues.businessPartner1))
 
         // reserve task
         val reservedTask = reserveTasks(TaskStep.Clean).reservedTasks.single()
@@ -536,7 +536,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
         orchestratorClient.goldenRecordTasks.createTasks(
             TaskCreateRequest(
                 mode = mode,
-                businessPartners = businessPartners ?: listOf(BusinessPartnerTestValues.businessPartner1, BusinessPartnerTestValues.businessPartner2)
+                businessPartners = businessPartners ?: listOf(BusinessPartnerGenericCommonValues.businessPartner1, BusinessPartnerGenericCommonValues.businessPartner2)
             )
         )
 

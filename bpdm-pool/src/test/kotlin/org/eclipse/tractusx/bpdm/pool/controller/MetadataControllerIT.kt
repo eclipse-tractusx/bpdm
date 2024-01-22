@@ -38,6 +38,10 @@ import org.eclipse.tractusx.bpdm.pool.repository.FieldQualityRuleRepository
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
 import org.eclipse.tractusx.bpdm.pool.service.toDto
 import org.eclipse.tractusx.bpdm.pool.util.*
+import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
+import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues
+import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerVerboseValues
+import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -63,7 +67,7 @@ private typealias GetFunction = (client: WebTestClient, page: Int, size: Int) ->
 @ActiveProfiles("test")
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class MetadataControllerIT @Autowired constructor(
-    private val testHelpers: TestHelpers,
+    private val dbTestHelpers: DbTestHelpers,
     private val webTestClient: WebTestClient,
     private val identifierTypeRepository: IdentifierTypeRepository,
     private val fieldQualityRuleRepository: FieldQualityRuleRepository,
@@ -185,7 +189,8 @@ class MetadataControllerIT @Autowired constructor(
 
     @BeforeEach
     fun beforeEach() {
-        testHelpers.truncateDbTables()
+        dbTestHelpers.truncateDbTables()
+
     }
 
     /**

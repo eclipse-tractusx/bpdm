@@ -19,10 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.util
 
-import jakarta.persistence.EntityManager
-import jakarta.persistence.EntityManagerFactory
 import org.assertj.core.api.Assertions
-import org.assertj.core.api.RecursiveComparisonAssert
 import org.eclipse.tractusx.bpdm.common.model.SyncStatus
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.request.IdentifiersSearchRequest
@@ -30,6 +27,10 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorCode
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SyncDto
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
+import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues
+import org.eclipse.tractusx.bpdm.test.testdata.pool.LegalEntityStructureRequest
+import org.eclipse.tractusx.bpdm.test.testdata.pool.LegalEntityStructureResponse
+import org.eclipse.tractusx.bpdm.test.testdata.pool.SiteStructureResponse
 import org.junit.Assert
 import org.junit.jupiter.api.assertThrows
 import org.springframework.http.HttpStatus
@@ -41,11 +42,10 @@ import java.time.Instant
 
 private const val ASYNC_TIMEOUT_IN_MS: Long = 5 * 1000 //5 seconds
 private const val ASYNC_CHECK_INTERVAL_IN_MS: Long = 200
-private const val BPDM_DB_SCHEMA_NAME: String = "bpdm"
+
 
 @Component
 class TestHelpers(
-    entityManagerFactory: EntityManagerFactory,
     private val bpnConfigProperties: BpnConfigProperties,
     private val poolClient: PoolClientImpl
 ) {
@@ -53,31 +53,6 @@ class TestHelpers(
     val bpnLPattern = createBpnPattern(bpnConfigProperties.legalEntityChar)
     val bpnSPattern = createBpnPattern(bpnConfigProperties.siteChar)
     val bpnAPattern = createBpnPattern(bpnConfigProperties.addressChar)
-
-
-    val em: EntityManager = entityManagerFactory.createEntityManager()
-
-
-    fun truncateDbTables() {
-        em.transaction.begin()
-
-        em.createNativeQuery(
-            """
-            DO $$ DECLARE table_names RECORD;
-            BEGIN
-                FOR table_names IN SELECT table_name
-                    FROM information_schema.tables
-                    WHERE table_schema='$BPDM_DB_SCHEMA_NAME'
-                    AND table_name NOT IN ('flyway_schema_history','regions') 
-                LOOP 
-                    EXECUTE format('TRUNCATE TABLE $BPDM_DB_SCHEMA_NAME.%I CONTINUE IDENTITY CASCADE;', table_names.table_name);
-                END LOOP;
-            END $$;
-        """.trimIndent()
-        ).executeUpdate()
-
-        em.transaction.commit()
-    }
 
 
     /**
@@ -182,20 +157,6 @@ class TestHelpers(
     /**
      * Creates metadata needed for test data defined in the [BusinessPartnerNonVerboseValues]
      */
-    fun createTestMetadata() {
-
-        poolClient.metadata.createLegalForm(BusinessPartnerNonVerboseValues.legalForm1)
-        poolClient.metadata.createLegalForm(BusinessPartnerNonVerboseValues.legalForm2)
-        poolClient.metadata.createLegalForm(BusinessPartnerNonVerboseValues.legalForm3)
-
-        poolClient.metadata.createIdentifierType(BusinessPartnerNonVerboseValues.identifierTypeDto1)
-        poolClient.metadata.createIdentifierType(BusinessPartnerNonVerboseValues.identifierTypeDto2)
-        poolClient.metadata.createIdentifierType(BusinessPartnerNonVerboseValues.identifierTypeDto3)
-
-        poolClient.metadata.createIdentifierType(BusinessPartnerNonVerboseValues.addressIdentifierTypeDto1)
-        poolClient.metadata.createIdentifierType(BusinessPartnerNonVerboseValues.addressIdentifierTypeDto2)
-        poolClient.metadata.createIdentifierType(BusinessPartnerNonVerboseValues.addressIdentifierTypeDto3)
-    }
 
 
     fun startSyncAndAwaitSuccess(client: WebTestClient, syncPath: String): SyncDto {
@@ -226,13 +187,6 @@ class TestHelpers(
     }
 
 
-    fun <T> assertRecursively(actual: T): RecursiveComparisonAssert<*> {
-        return Assertions.assertThat(actual)
-            .usingRecursiveComparison()
-            .ignoringCollectionOrder()
-            .ignoringAllOverriddenEquals()
-            .ignoringFieldsOfTypes(Instant::class.java)
-    }
 
     fun <ERROR : ErrorCode> assertErrorResponse(errorResponse: ErrorInfo<ERROR>, codeToCheck: ERROR, keyToCheck: String) {
         Assertions.assertThat(errorResponse.entityKey).isEqualTo(keyToCheck)
