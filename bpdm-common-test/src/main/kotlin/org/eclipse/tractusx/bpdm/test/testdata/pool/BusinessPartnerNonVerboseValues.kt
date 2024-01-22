@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.util
+package org.eclipse.tractusx.bpdm.test.testdata.pool
 
 import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
@@ -34,6 +34,9 @@ object BusinessPartnerNonVerboseValues {
         IdentifierTypeDto(BusinessPartnerVerboseValues.identifierType2.technicalKey, IdentifierBusinessPartnerType.LEGAL_ENTITY, BusinessPartnerVerboseValues.identifierType2.name)
     val identifierTypeDto3 =
         IdentifierTypeDto(BusinessPartnerVerboseValues.identifierType3.technicalKey, IdentifierBusinessPartnerType.LEGAL_ENTITY, BusinessPartnerVerboseValues.identifierType3.name)
+    val identifierTypeDto4 =
+        IdentifierTypeDto(BusinessPartnerVerboseValues.identifierType4.technicalKey, IdentifierBusinessPartnerType.LEGAL_ENTITY, BusinessPartnerVerboseValues.identifierType4.name)
+
 
     val addressIdentifierTypeDto1 =
         IdentifierTypeDto("ADDR_KEY_ONE", IdentifierBusinessPartnerType.ADDRESS, "IdentNameOne")

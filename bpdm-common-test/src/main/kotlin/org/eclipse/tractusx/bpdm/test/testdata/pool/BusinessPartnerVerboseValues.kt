@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.util
+package org.eclipse.tractusx.bpdm.test.testdata.pool
 
 import com.neovisionaries.i18n.CountryCode
 import com.neovisionaries.i18n.LanguageCode
@@ -54,6 +54,7 @@ object BusinessPartnerVerboseValues {
     val identifierType1 = TypeKeyNameVerboseDto("VAT_DE", "Steuernummer")
     val identifierType2 = TypeKeyNameVerboseDto("VAT_US", "VAT USA")
     val identifierType3 = TypeKeyNameVerboseDto("VAT_FR", "VAT France")
+    val identifierType4 = TypeKeyNameVerboseDto("VAT_NL", "VAT Netherlands")
 
     val identifier1 =
         LegalEntityIdentifierVerboseDto("ID-XYZ", identifierType1, "Agency X")

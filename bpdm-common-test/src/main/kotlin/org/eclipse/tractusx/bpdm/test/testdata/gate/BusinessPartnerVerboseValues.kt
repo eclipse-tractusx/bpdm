@@ -17,16 +17,15 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.util
+package org.eclipse.tractusx.bpdm.test.testdata.gate
 
 import com.neovisionaries.i18n.CountryCode
+import com.neovisionaries.i18n.LanguageCode
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
-import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
-import org.eclipse.tractusx.bpdm.common.model.ClassificationType
-import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
+import org.eclipse.tractusx.bpdm.common.model.*
 import org.eclipse.tractusx.bpdm.gate.api.model.*
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.*
@@ -54,16 +53,21 @@ object BusinessPartnerVerboseValues {
     const val identifierValue2 = "US123456789"
     const val identifierValue3 = "FR123456789"
     const val identifierValue4 = "NL123456789"
+    const val identifierValue5 = "US777882222"
+
 
     const val identifierIssuingBodyName1 = "Agency X"
     const val identifierIssuingBodyName2 = "Body Y"
     const val identifierIssuingBodyName3 = "Official Z"
     const val identifierIssuingBodyName4 = "Gov A"
+    const val identifierIssuingBodyName5 = "Gov B"
+
 
     const val identifierTypeTechnicalKey1 = "VAT_DE"
     const val identifierTypeTechnicalKey2 = "VAT_US"
     const val identifierTypeTechnicalKey3 = "VAT_FR"
     const val identifierTypeTechnicalKey4 = "VAT_NL"
+    const val identifierTypeTechnicalKey5 = "VAT_US"
 
     const val businessStatusDescription1 = "Active"
     const val businessStatusDescription2 = "Insolvent"
@@ -112,6 +116,7 @@ object BusinessPartnerVerboseValues {
         technicalKey = CountryCode.DE,
         name = CountryCode.DE.getName()
     )
+
     val country2 = TypeKeyNameVerboseDto(
         technicalKey = CountryCode.US,
         name = CountryCode.US.getName()
@@ -818,5 +823,160 @@ object BusinessPartnerVerboseValues {
         createdAt = Instant.now(),
         updatedAt = Instant.now()
     )
+
+    val now = Instant.now()
+
+
+    const val bpn1 = "BPNL0000000000XY"
+    const val bpn2 = "BPNL0000000001XZ"
+    const val bpn3 = "BPNL0000000002XY"
+
+    const val bpnSite1 = "BPNS0000000001XY"
+    const val bpnSite2 = "BPNS0000000002XY"
+    const val bpnSite3 = "BPNS0000000003X9"
+
+    const val bpnAddress1 = "BPNA0000000001XY"
+    const val bpnAddress2 = "BPNA0000000002XY"
+    const val bpnAddress3 = "BPNA0000000003X9"
+
+    val language1 = LanguageCode.de
+    val language2 = LanguageCode.en
+
+    val characterSet1 = CharacterSet.WESTERN_LATIN_STANDARD
+    val characterSet2 = CharacterSet.GREEK
+
+
+
+    const val name1 = "Business Partner Name"
+    const val name2 = "Company ABC AG"
+    const val name3 = "Another Organisation Corp"
+    const val name4 = "Catena Test Name"
+
+    const val nameSite1 = "Site A"
+    const val nameSite2 = "Site B"
+
+
+    const val identifierIssuingBodyTechnicalKey1 = "issuing body 1"
+    const val identifierIssuingBodyTechnicalKey2 = "issuing body 2"
+    const val identifierIssuingBodyTechnicalKey3 = "issuing body 3"
+    const val identifierIssuingBodyTechnicalKey4 = "issuing body 4"
+
+
+    const val identifierIssuingBody1 = "Agency X"
+    const val identifierIssuingBody2 = "Body Y"
+    const val identifierIssuingBody3 = "Official Z"
+    const val identifierIssuingBody4 = "Gov A"
+
+    const val identifierIssuingBodyUrl1 = "http://catenax-host/issuing-body1"
+    const val identifierIssuingBodyUrl2 = "http://catenax-host/issuing-body2"
+    const val identifierIssuingBodyUrl3 = "http://catenax-host/issuing-body3"
+    const val identifierIssuingBodyUrl4 = "http://catenax-host/issuing-body4"
+
+    const val identifierStatusTechnicalKey1 = "ACTIVE"
+    const val identifierStatusTechnicalKey2 = "EXPIRED"
+    const val identifierStatusTechnicalKey3 = "PENDING"
+    const val identifierStatusTechnicalKey4 = "UNKNOWN"
+
+    const val identifierStatusName1 = "Active"
+    const val identifierStatusName2 = "Expired"
+    const val identifierStatusName3 = "Pending"
+    const val identifierStatusName4 = "Unknown Status"
+
+    const val identifierTypeName1 = "Steuernummer"
+    const val identifierTypeName2 = "VAT USA"
+    const val identifierTypeName3 = "VAT France"
+    const val identifierTypeName4 = "VAT Netherlands"
+
+    const val identifierTypeUrl1 = "http://catenax-host/id-type1"
+    const val identifierTypeUrl2 = "http://catenax-host/id-type2"
+    const val identifierTypeUrl3 = "http://catenax-host/id-type3"
+    const val identifierTypeUrl4 = "http://catenax-host/id-type4"
+
+
+    val nameType1 = NameType.OTHER
+
+    const val shortName1 = "short1"
+    const val shortName2 = "short2"
+    const val shortName3 = "short3"
+    const val shortName4 = "short4"
+
+
+    const val legalFormTechnicalKey1 = "LF1"
+    const val legalFormTechnicalKey2 = "LF2"
+
+    const val legalFormName1 = "Limited Liability Company"
+    const val legalFormName2 = "Gemeinschaft mit beschränkter Haftung"
+
+    const val legalFormAbbreviation1 = "LLC"
+    const val legalFormAbbreviation2 = "GmbH"
+
+    const val businessStatusOfficialDenotation1 = "Active"
+    const val businessStatusOfficialDenotation2 = "Insolvent"
+
+
+    val classificationType = ClassificationType.NACE
+
+    const val classificationValue1 = "Sale of motor vehicles"
+    const val classificationValue2 = "Data processing, hosting and related activities"
+    const val classificationValue3 = "Other information service activities"
+    const val classificationValue4 = "Financial and insurance activities"
+
+    const val classificationCode1 = "code1"
+    const val classificationCode2 = "code2"
+    const val classificationCode3 = "code3"
+    const val classificationCode4 = "code4"
+
+    const val careOf1 = "Caring Entity Co"
+    const val careOf2 = "Another Caring Entity"
+
+    const val context1 = "Context1"
+    const val context2 = "Context2"
+
+    val adminAreaLevel1RegionCode_1: String = "adminAreaLevel1RegionCode_1"
+    val adminAreaLevel1RegionCode_2: String = "adminAreaLevel1RegionCode_2"
+
+    const val county1 = "Stuttgart"
+    const val county2 = " Fulton County"
+
+    const val city1 = "Stuttgart"
+    const val city2 = "Atlanta"
+
+
+    const val district1 = "Vaihingen"
+    const val district2 = "TODO"
+    const val district3 = "TODO"
+
+    const val street1 = "Mercedesstraße"
+    const val street2 = "TODO"
+    const val street3 = "TODO"
+
+    const val houseNumber1 = ""
+    const val houseNumber2 = ""
+    const val houseNumber3 = ""
+
+    const val direction1 = "direction1"
+    const val direction2 = "direction1"
+
+    const val industrialZone1 = "Werk 1"
+    const val industrialZone2 = "Industrial Zone Two"
+    const val industrialZone3 = "Industrial Zone Three"
+
+    const val building1 = "Bauteil A"
+    const val building2 = "Building Two"
+    const val building3 = "Building Two"
+
+    const val floor1 = "Etage 1"
+    const val floor2 = "Floor Two"
+    const val floor3 = "Floor Two"
+
+    const val door1 = "Door One"
+    const val door2 = "Door Two"
+    const val door3 = "Door Two"
+
+    const val postCode1 = "70546 "
+    const val postCode2 = "70547"
+
+    val geoCoordinates1 = Triple(0f, 0f, 0f)
+    val geoCoordinates2 = Triple(1f, 1f, 0f)
 
 }

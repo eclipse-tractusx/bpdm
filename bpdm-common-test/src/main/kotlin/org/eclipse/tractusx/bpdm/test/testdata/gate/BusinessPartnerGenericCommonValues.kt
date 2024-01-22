@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.testdata
+package org.eclipse.tractusx.bpdm.test.testdata.gate
 
 import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
@@ -29,25 +29,21 @@ import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.orchestrator.api.model.*
 import java.time.LocalDateTime
 
-/**
- * Contains complex test values of business partners that can be used as templates by the test classes
- * Test values here should have as many unique values as possible to reduce the probability of finding matching errors
- */
-object BusinessPartnerTestValues {
+object BusinessPartnerGenericCommonValues {
 
     //Business Partner with two entries in every collection
     val businessPartner1 = BusinessPartnerGenericDto(
-        nameParts = listOf("NamePart1", "NamePart2"),
+        nameParts = listOf("part-cleaned-1", "name-cleaned-2"),
         identifiers = listOf(
             BusinessPartnerIdentifierDto(
-                type = "identifier-type-1",
-                value = "identifier-value-1",
-                issuingBody = "issuingBody-1"
+                type = "identifier-type-1-cleaned",
+                value = "identifier-value-1-cleaned",
+                issuingBody = "issuingBody-1-cleaned"
             ),
             BusinessPartnerIdentifierDto(
-                type = "identifier-type-2",
-                value = "identifier-value-2",
-                issuingBody = "issuingBody-2"
+                type = "identifier-type-2-cleaned",
+                value = "identifier-value-2-cleaned",
+                issuingBody = "issuingBody-2-cleaned"
             ),
         ),
         states = listOf(
@@ -66,21 +62,22 @@ object BusinessPartnerTestValues {
             BusinessPartnerRole.CUSTOMER,
             BusinessPartnerRole.SUPPLIER
         ),
+        ownerBpnL = "BPNL_CLEANED_VALUES",
         legalEntity = LegalEntityRepresentation(
-            legalEntityBpn = "BPNLTEST",
-            legalName = "legal-name",
-            shortName = "shortname",
-            legalForm = "legal-form",
+            legalEntityBpn = "000000123AAA123",
+            legalName = "legal-name-cleaned",
+            shortName = "shot-name-cleaned",
+            legalForm = "legal-form-cleaned",
             classifications = listOf(
                 BusinessPartnerClassificationDto(
                     type = ClassificationType.NACE,
-                    code = "code-1",
-                    value = "value-1"
+                    code = "code-1-cleaned",
+                    value = "value-1-cleaned"
                 ),
                 BusinessPartnerClassificationDto(
                     type = ClassificationType.NAF,
-                    code = "code-2",
-                    value = "value-2"
+                    code = "code-2-cleaned",
+                    value = "value-2-cleaned"
                 ),
             ),
             confidenceCriteria = ConfidenceCriteriaDto(
@@ -93,28 +90,28 @@ object BusinessPartnerTestValues {
             )
         ),
         site = SiteRepresentation(
-            siteBpn = "BPNSTEST",
-            name = "site name",
+            siteBpn = "000000123BBB222",
+            name = "Site Name",
             confidenceCriteria = ConfidenceCriteriaDto(
-                sharedByOwner = true,
-                checkedByExternalDataSource = true,
-                numberOfBusinessPartners = 7,
-                lastConfidenceCheckAt = LocalDateTime.of(2022, 4, 3, 2, 1),
-                nextConfidenceCheckAt = LocalDateTime.of(2026, 4, 3, 2, 1),
-                confidenceLevel = 1
+                sharedByOwner = false,
+                checkedByExternalDataSource = false,
+                numberOfBusinessPartners = 8,
+                lastConfidenceCheckAt = LocalDateTime.of(2023, 4, 3, 2, 1),
+                nextConfidenceCheckAt = LocalDateTime.of(2024, 4, 3, 2, 1),
+                confidenceLevel = 2
             )
         ),
         address = AddressRepresentation(
-            addressBpn = "BPNATEST",
-            name = "address name",
+            addressBpn = "000000123CCC333",
+            name = "Address Name",
             addressType = AddressType.AdditionalAddress,
             physicalPostalAddress = PhysicalPostalAddressDto(
                 geographicCoordinates = GeoCoordinateDto(0.5f, 0.5f, 0.5f),
-                country = CountryCode.DE,
-                administrativeAreaLevel1 = "DE-BW",
-                administrativeAreaLevel2 = "bw-admin-level-2",
-                administrativeAreaLevel3 = "bw-admin-level-3",
-                postalCode = "phys-postal-code",
+                country = CountryCode.PT,
+                administrativeAreaLevel1 = "PT-PT",
+                administrativeAreaLevel2 = "pt-admin-level-2-cleaned",
+                administrativeAreaLevel3 = "pt-admin-level-3-cleaned",
+                postalCode = "phys-postal-code-cleaned",
                 city = "city",
                 district = "district",
                 street = StreetDto(
@@ -137,24 +134,23 @@ object BusinessPartnerTestValues {
             ),
             alternativePostalAddress = AlternativePostalAddressDto(
                 geographicCoordinates = GeoCoordinateDto(0.6f, 0.6f, 0.6f),
-                country = CountryCode.DE,
-                administrativeAreaLevel1 = "DE-BY",
-                postalCode = "alt-post-code",
-                city = "alt-city",
-                deliveryServiceNumber = "delivery-service-number",
-                deliveryServiceQualifier = "delivery-service-qualifier",
+                country = CountryCode.PT,
+                administrativeAreaLevel1 = "PT-PT",
+                postalCode = "postal-code-cleaned",
+                city = "alt-city-cleaned",
+                deliveryServiceNumber = "delivery-service-number-cleaned",
+                deliveryServiceQualifier = "delivery-service-qualifier-cleaned",
                 deliveryServiceType = DeliveryServiceType.PO_BOX
             ),
             confidenceCriteria = ConfidenceCriteriaDto(
-                sharedByOwner = true,
+                sharedByOwner = false,
                 checkedByExternalDataSource = true,
-                numberOfBusinessPartners = 7,
-                lastConfidenceCheckAt = LocalDateTime.of(2022, 4, 3, 2, 1),
-                nextConfidenceCheckAt = LocalDateTime.of(2026, 4, 3, 2, 1),
-                confidenceLevel = 1
+                numberOfBusinessPartners = 4,
+                lastConfidenceCheckAt = LocalDateTime.of(2020, 4, 3, 2, 1),
+                nextConfidenceCheckAt = LocalDateTime.of(2028, 4, 3, 2, 1),
+                confidenceLevel = 5
             )
-        ),
-        ownerBpnL = "BPNL_OWNER_TEST_1"
+        )
     )
 
     //Business Partner with single entry in every collection
@@ -262,6 +258,7 @@ object BusinessPartnerTestValues {
         ),
         ownerBpnL = "BPNL_OWNER_TEST_2"
     )
+
 
     val logisticAddress1 = LogisticAddressDto(
         name = "Address Name 1",
