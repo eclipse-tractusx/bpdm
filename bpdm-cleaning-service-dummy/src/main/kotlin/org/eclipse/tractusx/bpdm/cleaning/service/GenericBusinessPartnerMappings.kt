@@ -35,7 +35,6 @@ val dummyConfidenceCriteria = ConfidenceCriteriaDto(
 )
 
 fun BusinessPartnerGenericDto.toLegalEntityDto(bpnReferenceDto: BpnReferenceDto, legalAddress: LogisticAddressDto): LegalEntityDto {
-
     return LegalEntityDto(
         bpnLReference = bpnReferenceDto,
         hasChanged = address.addressType in setOf(AddressType.LegalAddress, AddressType.LegalAndSiteMainAddress),
@@ -91,7 +90,6 @@ fun BusinessPartnerGenericDto.toLogisticAddressDto(bpnReferenceDto: BpnReference
 }
 
 fun BusinessPartnerGenericDto.toSiteDto(bpnReferenceDto: BpnReferenceDto, siteAddressReference: LogisticAddressDto): SiteDto {
-
 
     return SiteDto(
         bpnSReference = bpnReferenceDto,

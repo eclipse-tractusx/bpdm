@@ -21,12 +21,12 @@ package org.eclipse.tractusx.bpdm.cleaning.service
 
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.cleaning.util.md5
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
-import java.util.*
 
 @Service
 class CleaningServiceDummy(
@@ -101,12 +101,7 @@ class CleaningServiceDummy(
     fun createSiteDtoIfNeeded(businessPartner: BusinessPartnerGenericDto, addressPartner: LogisticAddressDto): SiteDto? {
         if (!shouldCreateSite(businessPartner)) return null
 
-        val siteAddressReference = when (businessPartner.address.addressType) {
-            AddressType.SiteMainAddress, AddressType.LegalAndSiteMainAddress -> addressPartner.bpnAReference
-            else -> generateNewBpnRequestIdentifier()
-        }
-
-        val siteMainAddress = addressPartner.copy(bpnAReference = siteAddressReference)
+        val siteMainAddress = addressPartner.copy(bpnAReference = generateBpnRequestIdentifier(businessPartner.createSiteMainAddressReferenceValue()))
         return createSiteRepresentation(businessPartner, siteMainAddress)
     }
 
@@ -115,45 +110,28 @@ class CleaningServiceDummy(
         addressType: AddressType,
         genericPartner: BusinessPartnerGenericDto
     ): LegalEntityDto {
-        val legalAddressBpnReference = if (addressType == AddressType.LegalAddress || addressType == AddressType.LegalAndSiteMainAddress) {
-            addressPartner.bpnAReference
-        } else {
-            generateNewBpnRequestIdentifier()
-        }
-
+        val legalAddressBpnReference = generateBpnRequestIdentifier(genericPartner.createLegalAddressReferenceValue())
         val legalAddress = addressPartner.copy(bpnAReference = legalAddressBpnReference)
 
-        val bpnReferenceDto = createBpnReference(genericPartner.legalEntity.legalEntityBpn)
-
-        return genericPartner.toLegalEntityDto(bpnReferenceDto, legalAddress)
+        val legalEntityBpnReference = generateBpnRequestIdentifier(genericPartner.createLegalEntityReferenceValue())
+        return genericPartner.toLegalEntityDto(legalEntityBpnReference, legalAddress)
 
     }
 
     fun createAddressRepresentation(genericPartner: BusinessPartnerGenericDto): LogisticAddressDto {
-        val bpnReferenceDto = createBpnReference(genericPartner.address.addressBpn)
+        val bpnReferenceDto = generateNewBpnRequestIdentifier(genericPartner.createAdditionalAddressReferenceValue())
         return genericPartner.toLogisticAddressDto(bpnReferenceDto)
     }
 
     fun createSiteRepresentation(genericPartner: BusinessPartnerGenericDto, siteAddressReference: LogisticAddressDto): SiteDto {
-        val bpnReferenceDto = createBpnReference(genericPartner.site.siteBpn)
+        val bpnReferenceDto = generateBpnRequestIdentifier(genericPartner.createSiteReferenceValue())
         return genericPartner.toSiteDto(bpnReferenceDto, siteAddressReference)
     }
 
-    fun createBpnReference(bpn: String?): BpnReferenceDto {
-        return if (bpn != null) {
-            BpnReferenceDto(bpn, BpnReferenceType.Bpn)
-        } else {
-            // Generate a new UUID and create a BpnReferenceDto object if bpnL/bpnS/bpnA is null
-            generateNewBpnRequestIdentifier()
-        }
-    }
-
-    private fun generateNewBpnRequestIdentifier() = BpnReferenceDto(UUID.randomUUID().toString(), BpnReferenceType.BpnRequestIdentifier)
+    private fun generateNewBpnRequestIdentifier(fromString: String) = BpnReferenceDto(fromString.md5(), BpnReferenceType.BpnRequestIdentifier)
 
     fun shouldCreateSite(genericPartner: BusinessPartnerGenericDto): Boolean {
-        return genericPartner.address.addressType == AddressType.SiteMainAddress ||
-                genericPartner.address.addressType == AddressType.LegalAndSiteMainAddress ||
-                genericPartner.site.siteBpn != null
+        return genericPartner.ownerBpnL != null && genericPartner.site.name != null
     }
 
     private fun BusinessPartnerGenericDto.update(
@@ -175,6 +153,26 @@ class CleaningServiceDummy(
             address = address.copy(addressType = addressType, confidenceCriteria = relevantAddress.confidenceCriteria)
         )
     }
+
+    private fun BusinessPartnerGenericDto.createLegalEntityReferenceValue() =
+        "LEGAL_ENTITY" + (legalEntity.legalName ?: nameParts.joinToString { " " })
+
+    private fun BusinessPartnerGenericDto.createLegalAddressReferenceValue() =
+        "LEGAL_ADDRESS" + createLegalEntityReferenceValue()
+
+    private fun BusinessPartnerGenericDto.createSiteReferenceValue() =
+        "SITE" + createLegalEntityReferenceValue() + site.name
+
+    private fun BusinessPartnerGenericDto.createSiteMainAddressReferenceValue() =
+        if (address.addressType == AddressType.LegalAndSiteMainAddress)
+            createLegalAddressReferenceValue()
+        else
+            "SITE_MAIN_ADDRESS" + createSiteReferenceValue()
+
+    private fun BusinessPartnerGenericDto.createAdditionalAddressReferenceValue() =
+        "ADDITIONAL_ADDRESS" + createSiteReferenceValue()
+
+    private fun generateBpnRequestIdentifier(fromString: String) = BpnReferenceDto(fromString.md5(), BpnReferenceType.BpnRequestIdentifier)
 
 
 }
