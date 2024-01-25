@@ -49,7 +49,7 @@ interface PartnerChangelogEntryRepository : JpaRepository<PartnerChangelogEntry,
         fun byUpdatedGreaterThan(modifiedAfter: Instant?) =
             Specification<PartnerChangelogEntry> { root, _, builder ->
                 modifiedAfter?.let {
-                    builder.greaterThanOrEqualTo(root.get(PartnerChangelogEntry::updatedAt.name), modifiedAfter)
+                    builder.greaterThan(root.get(PartnerChangelogEntry::updatedAt.name), modifiedAfter)
                 }
             }
 
