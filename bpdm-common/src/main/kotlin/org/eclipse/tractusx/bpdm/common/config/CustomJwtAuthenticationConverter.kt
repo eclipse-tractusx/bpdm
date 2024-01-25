@@ -52,7 +52,7 @@ import java.util.stream.Collectors
  * }
  *
  */
-class CustomJwtAuthenticationConverter(private val resourceId: String) : Converter<Jwt, AbstractAuthenticationToken> {
+class CustomJwtAuthenticationConverter(private val resourceId: String, private val requiredBpn: String? = null) : Converter<Jwt, AbstractAuthenticationToken> {
     private val defaultGrantedAuthoritiesConverter = JwtGrantedAuthoritiesConverter()
 
     override fun convert(source: Jwt): AbstractAuthenticationToken {
@@ -63,7 +63,11 @@ class CustomJwtAuthenticationConverter(private val resourceId: String) : Convert
 
     @Suppress("UNCHECKED_CAST")
     companion object {
-        private fun extractResourceRoles(jwt: Jwt, resourceId: String): Collection<GrantedAuthority> {
+        private fun extractResourceRoles(jwt: Jwt, resourceId: String, requiredBpn: String? = null): Collection<GrantedAuthority> {
+            if (requiredBpn != null && requiredBpn != jwt.claims["bpn"]) {
+                return emptyList()
+            }
+
             val resourceAccess = jwt.getClaim<Map<String, Any>>("resource_access")
             val resource: Map<String?, Any?>? = resourceAccess?.get(resourceId) as Map<String?, Any?>?
             val resourceRoles: Collection<String>? = resource?.get("roles") as Collection<String>?
