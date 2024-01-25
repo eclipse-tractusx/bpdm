@@ -92,6 +92,11 @@ class BusinessPartnerBuildService(
             ChangelogEntryCreateRequest(it.legalAddress.bpn, ChangelogType.CREATE, BusinessPartnerType.ADDRESS)
         })
 
+        legalEntities.map {
+
+            logger.info { logger.info { "Legal Entity ${it.bpn} was created" } }
+
+        }
         legalEntityRepository.saveAll(legalEntities)
 
         val legalEntityResponse = legalEntities.map { it.toUpsertDto(requestsByLegalEntities[it]!!.index) }
@@ -162,6 +167,12 @@ class BusinessPartnerBuildService(
             ChangelogEntryCreateRequest(it.mainAddress.bpn, ChangelogType.CREATE, BusinessPartnerType.ADDRESS)
         })
 
+        sites.map {
+
+            logger.info { "Site ${it.bpn} was created" }
+
+        }
+
         siteRepository.saveAll(sites)
 
         val siteResponse = sites.map { it.toUpsertDto(requestsBySites[it]!!.index) }
@@ -225,6 +236,8 @@ class BusinessPartnerBuildService(
             val legalEntityAfterUpdate = businessPartnerEquivalenceMapper.toEquivalenceDto(legalEntity)
 
             if (legalEntityBeforeUpdate != legalEntityAfterUpdate) {
+                logger.info { "Legal Entity ${legalEntity.bpn} was updated" }
+
                 legalEntityRepository.save(legalEntity)
 
                 changelogService.createChangelogEntries(
@@ -275,6 +288,8 @@ class BusinessPartnerBuildService(
             val siteAfterUpdate = businessPartnerEquivalenceMapper.toEquivalenceDto(site)
 
             if (siteBeforeUpdate != siteAfterUpdate) {
+                logger.info { "Site ${site.bpn} was updated" }
+
                 siteRepository.save(site)
 
                 changelogService.createChangelogEntries(listOf(ChangelogEntryCreateRequest(site.bpn, ChangelogType.UPDATE, BusinessPartnerType.SITE)))
@@ -312,6 +327,8 @@ class BusinessPartnerBuildService(
             val addressAfterUpdate = businessPartnerEquivalenceMapper.toEquivalenceDto(address)
 
             if (addressBeforeUpdate != addressAfterUpdate) {
+                logger.info { "Address ${address.bpn} was updated" }
+
                 logisticAddressRepository.save(address)
 
                 changelogService.createChangelogEntries(listOf(ChangelogEntryCreateRequest(address.bpn, ChangelogType.UPDATE, BusinessPartnerType.ADDRESS)))
@@ -370,7 +387,9 @@ class BusinessPartnerBuildService(
             }
 
         logisticAddressRepository.saveAll(addressesWithIndex.map { (address, _) -> address })
-        return addressesWithIndex.map { (address, index) -> address.toCreateResponse(index) }
+        return addressesWithIndex.map { (address, index) ->
+            address.toCreateResponse(index).also { logger.info { "Address ${address.bpn} was created" } }
+        }
     }
 
 

@@ -19,6 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
+import mu.KLogger
+import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.StageType
@@ -44,6 +46,7 @@ class SitePersistenceService(
     private val changelogRepository: ChangelogRepository,
     private val sharingStateService: SharingStateService
 ) {
+    private val logger: KLogger = KotlinLogging.logger {}
 
     @Transactional
     fun persistSitesBP(sites: Collection<SiteGateInputRequest>, datatype: StageType) {
@@ -64,10 +67,12 @@ class SitePersistenceService(
                     updateAddress(logisticAddressRecord, fullSite.mainAddress)
                     updateSite(existingSite, site, legalEntityRecord)
                     siteRepository.save(existingSite)
+                    logger.info { "Site ${existingSite.bpn} was updated" }
                     saveChangelog(site.externalId, ChangelogType.UPDATE, datatype)
                 }
                 ?: run {
                     siteRepository.save(fullSite)
+                    logger.info { "Site ${fullSite.bpn} was created" }
                     saveChangelog(site.externalId, ChangelogType.CREATE, datatype)
                     sharingStateService.upsertSharingState(site.toSharingStateDTO())
                 }
