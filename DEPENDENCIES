@@ -14,7 +14,7 @@ maven/mavencentral/com.github.docker-java/docker-java-api/3.3.0, Apache-2.0, app
 maven/mavencentral/com.github.docker-java/docker-java-transport-zerodep/3.3.0, Apache-2.0 AND (Apache-2.0 AND BSD-3-Clause), approved, #7946
 maven/mavencentral/com.github.docker-java/docker-java-transport/3.3.0, Apache-2.0, approved, #7942
 maven/mavencentral/com.github.stephenc.jcip/jcip-annotations/1.0-1, Apache-2.0, approved, CQ21949
-maven/mavencentral/com.github.tomakehurst/wiremock-jre8-standalone/2.35.0, MIT AND Apache-2.0, approved, #6979
+maven/mavencentral/com.github.tomakehurst/wiremock-jre8-standalone/2.35.1, MIT AND Apache-2.0, approved, #6979
 maven/mavencentral/com.google.code.gson/gson/2.10.1, Apache-2.0, approved, #6159
 maven/mavencentral/com.jayway.jsonpath/json-path/2.8.0, Apache-2.0, approved, clearlydefined
 maven/mavencentral/com.neovisionaries/nv-i18n/1.29, Apache-2.0, approved, clearlydefined
