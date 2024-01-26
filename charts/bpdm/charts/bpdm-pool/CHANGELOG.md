@@ -9,6 +9,7 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 ### Changed
 
 - Update application version to 5.0.0
+- increase container's default groupid to 10001
 
 ## [5.1.1] - 2023-11-16
 
