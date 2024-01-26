@@ -81,6 +81,8 @@ spec:
             - mountPath: /etc/conf
               name: config
               readOnly: true
+            - mountPath: /tmp
+              name: cache
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -101,3 +103,6 @@ spec:
                   name: {{ include "bpdm.fullname" . }}
               - secret:
                   name: {{ include "bpdm.fullname" . }}
+        - name: cache
+          emptyDir:
+            sizeLimit: 200Mi
