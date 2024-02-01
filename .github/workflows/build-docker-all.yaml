@@ -47,7 +47,7 @@ jobs:
     secrets: inherit
     with:
       imageName: bpdm-pool
-      dockerfilePath: ./bpdm-pool
+      dockerfilePath: ./docker/pool
       push: ${{ github.event_name != 'pull_request' }}
 
   build-docker-gate:
@@ -55,7 +55,7 @@ jobs:
     secrets: inherit
     with:
       imageName: bpdm-gate
-      dockerfilePath: ./bpdm-gate
+      dockerfilePath: ./docker/gate
       push: ${{ github.event_name != 'pull_request' }}
 
   build-docker-bridge-dummy:
@@ -63,7 +63,7 @@ jobs:
     secrets: inherit
     with:
       imageName: bpdm-bridge-dummy
-      dockerfilePath: ./bpdm-bridge-dummy
+      dockerfilePath: ./docker/bridge-dummy
       push: ${{ github.event_name != 'pull_request' }}
 
   build-docker-cleaning-service:
@@ -71,7 +71,7 @@ jobs:
     secrets: inherit
     with:
       imageName: bpdm-cleaning-service-dummy
-      dockerfilePath: ./bpdm-cleaning-service-dummy
+      dockerfilePath: ./docker/cleaning-service-dummy
       push: ${{ github.event_name != 'pull_request' }}
 
   build-docker-orchestrator:
@@ -79,5 +79,5 @@ jobs:
     secrets: inherit
     with:
       imageName: bpdm-orchestrator
-      dockerfilePath: ./bpdm-orchestrator
+      dockerfilePath: ./docker/orchestrator
       push: ${{ github.event_name != 'pull_request' }}

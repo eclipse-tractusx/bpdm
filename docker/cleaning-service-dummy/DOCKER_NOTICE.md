@@ -1,16 +1,16 @@
 ## Notice for Docker image
 
-DockerHub: [https://hub.docker.com/r/tractusx/bpdm-bridge-dummy](https://hub.docker.com/r/tractusx/bpdm-bridge-dummy)
+DockerHub: [https://hub.docker.com/r/tractusx/bpdm-cleaning-service-dummy](https://hub.docker.com/r/tractusx/bpdm-cleaning-service-dummy)
 
 Eclipse Tractus-X product(s) installed within the image:
 
-**BPDM Bridge**
+**BPDM Cleaning Service Dummy**
 
 Eclipse Tractus-X product(s) installed within the image:
 
 - GitHub: https://github.com/eclipse-tractusx/bpdm 
 - Project home: https://projects.eclipse.org/projects/automotive.tractusx
-- Bridge Dockerfile: https://github.com/eclipse-tractusx/bpdm/blob/main/bpdm-brige-dumy/Dockerfile 
+- Cleaning Service Dummy Dockerfile: https://github.com/eclipse-tractusx/bpdm/blob/main/docker/cleaning-service-dummy/Dockerfile
 - Project license: [Apache License, Version 2.0](https://github.com/eclipse-tractusx/bpdm/blob/main/LICENSE)
 
 
