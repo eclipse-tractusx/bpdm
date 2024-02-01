@@ -10,7 +10,7 @@ COPY --from=build /home/app/bpdm-orchestrator/target/bpdm-orchestrator.jar /usr/
 RUN apk update && apk upgrade --no-cache libssl3 libcrypto3
 ARG USERNAME=bpdm
 ARG USERID=10001
-ARG GID=3000
+ARG GID=10001
 RUN addgroup -g $GID -S $USERNAME
 RUN adduser -u $USERID -S $USERNAME $USERNAME
 USER $USERNAME
