@@ -30,7 +30,8 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMa
 
 @Configuration
 class BpdmSecurityConfigurerAdapterImpl(
-    val securityConfigProperties: SecurityConfigProperties
+    val securityConfigProperties: SecurityConfigProperties,
+    val bpnConfigProperties: BpnConfigProperties
 ) : BpdmSecurityConfigurerAdapter {
 
     override fun configure(http: HttpSecurity) {
@@ -48,7 +49,7 @@ class BpdmSecurityConfigurerAdapterImpl(
         }
         http.oauth2ResourceServer {
             it.jwt { jwt ->
-                jwt.jwtAuthenticationConverter(CustomJwtAuthenticationConverter(securityConfigProperties.clientId))
+                jwt.jwtAuthenticationConverter(CustomJwtAuthenticationConverter(securityConfigProperties.clientId, bpnConfigProperties.ownerBpnL))
             }
         }
     }
