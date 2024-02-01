@@ -10,6 +10,7 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
 - Update application version to 5.0.0
 - increase container's default groupid to 10001
+- container is now executed with read-only root file systems
 
 ## [1.0.1] - 2023-11-23
 
