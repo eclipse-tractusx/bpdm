@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.cleaning.service
 
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.cleaning.util.md5
+import org.eclipse.tractusx.bpdm.cleaning.util.toUUID
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.*
@@ -119,7 +119,7 @@ class CleaningServiceDummy(
     }
 
     fun createAddressRepresentation(genericPartner: BusinessPartnerGenericDto): LogisticAddressDto {
-        val bpnReferenceDto = generateNewBpnRequestIdentifier(genericPartner.createAdditionalAddressReferenceValue())
+        val bpnReferenceDto = generateBpnRequestIdentifier(genericPartner.createAdditionalAddressReferenceValue())
         return genericPartner.toLogisticAddressDto(bpnReferenceDto)
     }
 
@@ -127,8 +127,6 @@ class CleaningServiceDummy(
         val bpnReferenceDto = generateBpnRequestIdentifier(genericPartner.createSiteReferenceValue())
         return genericPartner.toSiteDto(bpnReferenceDto, siteAddressReference)
     }
-
-    private fun generateNewBpnRequestIdentifier(fromString: String) = BpnReferenceDto(fromString.md5(), BpnReferenceType.BpnRequestIdentifier)
 
     fun shouldCreateSite(genericPartner: BusinessPartnerGenericDto): Boolean {
         return genericPartner.ownerBpnL != null && genericPartner.site.name != null
@@ -148,14 +146,14 @@ class CleaningServiceDummy(
         }
 
         return copy(
-            legalEntity = legalEntity.copy(confidenceCriteria = legalEntityDto.confidenceCriteria),
-            site = site.copy(confidenceCriteria = siteDto?.confidenceCriteria),
-            address = address.copy(addressType = addressType, confidenceCriteria = relevantAddress.confidenceCriteria)
+            legalEntity = legalEntity.copy(legalName = legalEntityDto.legalName, confidenceCriteria = legalEntityDto.confidenceCriteria),
+            site = site.copy(name = siteDto?.name, confidenceCriteria = siteDto?.confidenceCriteria),
+            address = address.copy(name = logisticAddress?.name, addressType = addressType, confidenceCriteria = relevantAddress.confidenceCriteria)
         )
     }
 
     private fun BusinessPartnerGenericDto.createLegalEntityReferenceValue() =
-        "LEGAL_ENTITY" + (legalEntity.legalName ?: nameParts.joinToString { " " })
+        "LEGAL_ENTITY" + (legalEntity.legalName ?: nameParts.joinToString(" "))
 
     private fun BusinessPartnerGenericDto.createLegalAddressReferenceValue() =
         "LEGAL_ADDRESS" + createLegalEntityReferenceValue()
@@ -172,7 +170,8 @@ class CleaningServiceDummy(
     private fun BusinessPartnerGenericDto.createAdditionalAddressReferenceValue() =
         "ADDITIONAL_ADDRESS" + createSiteReferenceValue()
 
-    private fun generateBpnRequestIdentifier(fromString: String) = BpnReferenceDto(fromString.md5(), BpnReferenceType.BpnRequestIdentifier)
+    private fun generateBpnRequestIdentifier(fromString: String) =
+        BpnReferenceDto(fromString.toUUID().toString(), BpnReferenceType.BpnRequestIdentifier)
 
 
 }
