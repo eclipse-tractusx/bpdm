@@ -266,7 +266,7 @@ fun Relation.toDto(): RelationVerboseDto {
 }
 
 fun PartnerChangelogEntry.toDto(): ChangelogEntryVerboseDto {
-    return ChangelogEntryVerboseDto(bpn, businessPartnerType, createdAt, changelogType)
+    return ChangelogEntryVerboseDto(bpn, businessPartnerType, updatedAt, changelogType)
 }
 
 fun Region.toRegionDto(): RegionDto {
