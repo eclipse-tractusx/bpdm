@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.config
+package org.eclipse.tractusx.bpdm.cleaning.config
 
 import org.eclipse.tractusx.bpdm.common.util.BpdmWebClientProvider
 import org.eclipse.tractusx.bpdm.common.util.ClientConfigurationProperties
@@ -30,9 +30,8 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
 
-
-@ConfigurationProperties(prefix = OrchestratorClientConfigProperties.PREFIX)
-data class OrchestratorClientConfigProperties(
+@ConfigurationProperties(prefix = OrchestratorConfigProperties.PREFIX)
+data class OrchestratorConfigProperties(
     override val baseUrl: String = "http://localhost:8085",
     override val securityEnabled: Boolean = false,
     override val oauth2ClientRegistration: String = "orchestrator-client"
@@ -44,12 +43,12 @@ data class OrchestratorClientConfigProperties(
 
 @Configuration
 class OrchestratorClientConfiguration(
-    clientProperties: OrchestratorClientConfigProperties,
+    clientProperties: OrchestratorConfigProperties,
 ) : BpdmWebClientProvider(
     clientProperties
 ) {
     @Bean
-    @ConditionalOnBoundProperty(OrchestratorClientConfigProperties.PREFIX, OrchestratorClientConfigProperties::class, true)
+    @ConditionalOnBoundProperty(OrchestratorConfigProperties.PREFIX, OrchestratorConfigProperties::class, true)
     fun authorizedOrchestratorClient(
         clientRegistrationRepository: ClientRegistrationRepository,
         oAuth2AuthorizedClientService: OAuth2AuthorizedClientService
@@ -57,8 +56,7 @@ class OrchestratorClientConfiguration(
         OrchestrationApiClientImpl { provideAuthorizedClient(clientRegistrationRepository, oAuth2AuthorizedClientService) }
 
     @Bean
-    @ConditionalOnBoundProperty(OrchestratorClientConfigProperties.PREFIX, OrchestratorClientConfigProperties::class, false)
+    @ConditionalOnBoundProperty(OrchestratorConfigProperties.PREFIX, OrchestratorConfigProperties::class, false)
     fun unauthorizedOrchestratorClient(): OrchestrationApiClient =
         OrchestrationApiClientImpl { provideUnauthorizedClient() }
 }
-

@@ -26,6 +26,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteBpnSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
+import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.service.AddressService
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
 import org.eclipse.tractusx.bpdm.pool.service.SearchService
@@ -41,21 +42,21 @@ class SiteController(
     val searchService: SearchService,
 ) : PoolSiteApi {
 
-    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadPoolPartnerDataAsRole())")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun searchMainAddresses(
         bpnS: Collection<String>
     ): Collection<MainAddressVerboseDto> {
         return addressService.findMainAddresses(bpnS)
     }
 
-    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadPoolPartnerDataAsRole())")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun getSite(
         bpns: String
     ): SiteWithMainAddressVerboseDto {
         return siteService.findByBpn(bpns.uppercase())
     }
 
-    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadPoolPartnerDataAsRole())")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun searchSites(
         siteSearchRequest: SiteBpnSearchRequest,
         paginationRequest: PaginationRequest
@@ -63,21 +64,21 @@ class SiteController(
         return siteService.findByPartnerBpns(siteSearchRequest, paginationRequest)
     }
 
-    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getChangePoolPartnerDataAsRole())")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")
     override fun createSite(
         requests: Collection<SitePartnerCreateRequest>
     ): SitePartnerCreateResponseWrapper {
         return businessPartnerBuildService.createSitesWithMainAddress(requests)
     }
 
-    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getChangePoolPartnerDataAsRole())")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")
     override fun updateSite(
         requests: Collection<SitePartnerUpdateRequest>
     ): SitePartnerUpdateResponseWrapper {
         return businessPartnerBuildService.updateSites(requests)
     }
 
-    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadPoolPartnerDataAsRole())")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun getSitesPaginated(
         paginationRequest: PaginationRequest
     ): PageDto<SiteMatchVerboseDto> {

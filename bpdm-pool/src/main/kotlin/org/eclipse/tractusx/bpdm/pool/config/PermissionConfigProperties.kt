@@ -19,10 +19,29 @@
 
 package org.eclipse.tractusx.bpdm.pool.config
 
+import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties.Companion.PREFIX
 import org.springframework.boot.context.properties.ConfigurationProperties
 
 
-@ConfigurationProperties(prefix = "bpdm.client.pool-orchestrator")
-data class OrchestratorClientConfigProperties(
-    val baseUrl: String = "http://localhost:8085/"
-)
+@ConfigurationProperties(prefix = PREFIX)
+data class PermissionConfigProperties(
+    val readPartner: String = "read_partner",
+    val writePartner: String = "write_partner",
+    val readMetaData: String = "read_meta_data",
+    val writeMetaData: String = "write_meta_data"
+) {
+    companion object {
+        const val PREFIX = "bpdm.security.permissions"
+
+        //Keep the fully qualified name up to data here
+        private const val QUALIFIED_NAME = "org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties"
+        private const val BEAN_QUALIFIER = "'$PREFIX-$QUALIFIED_NAME'"
+
+        const val READ_PARTNER = "@${BEAN_QUALIFIER}.getReadPartner()"
+        const val WRITE_PARTNER = "@${BEAN_QUALIFIER}.getWritePartner()"
+        const val READ_METADATA = "@${BEAN_QUALIFIER}.getReadMetaData()"
+        const val WRITE_METADATA = "@${BEAN_QUALIFIER}.getWriteMetaData()"
+    }
+}
+
+

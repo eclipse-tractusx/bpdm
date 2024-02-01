@@ -20,27 +20,42 @@
 package org.eclipse.tractusx.bpdm.common.config
 
 import mu.KotlinLogging
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.eclipse.tractusx.bpdm.common.util.ConditionalOnBoundProperty
+import org.eclipse.tractusx.bpdm.common.util.HasEnablingProperty
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
+import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer
+import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfigurationSource
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
+@ConfigurationProperties(prefix = SecurityConfigProperties.PREFIX)
+data class SecurityConfigProperties(
+    override val enabled: Boolean = false,
+    val clientId: String = "BPDM_GATE",
+    val realm: String = "master",
+    val authUrl: String = "http://localhost:8180",
+    val tokenUrl: String = "http://localhost:8180/realms/master/protocol/openid-connect/token",
+    val refreshUrl: String = "http://localhost:8180/realms/master/protocol/openid-connect/token",
+    val corsOrigins: Collection<String> = emptyList()
+) : HasEnablingProperty {
+    companion object {
+        const val PREFIX = "bpdm.security"
+    }
+}
 
 @EnableWebSecurity
-@ConditionalOnProperty(
-    value = ["bpdm.security.enabled"],
-    havingValue = "false",
-    matchIfMissing = true
-)
 @Configuration
+@ConditionalOnBoundProperty(SecurityConfigProperties.PREFIX, SecurityConfigProperties::class, havingValue = false)
 class NoAuthenticationConfig {
 
     private val logger = KotlinLogging.logger { }
@@ -53,22 +68,40 @@ class NoAuthenticationConfig {
 }
 
 @EnableWebSecurity
-@ConditionalOnProperty(
-    value = ["bpdm.security.enabled"],
-    havingValue = "true"
-)
 @Configuration
 @EnableMethodSecurity(prePostEnabled = true)
+@ConditionalOnBoundProperty(SecurityConfigProperties.PREFIX, SecurityConfigProperties::class, havingValue = true)
 class OAuthSecurityConfig(
-    val configProperties: SecurityConfigProperties,
-    val bpdmSecurityConfigurerAdapter: BpdmSecurityConfigurerAdapter
+    val configProperties: SecurityConfigProperties
 ) {
     private val logger = KotlinLogging.logger { }
 
     @Bean
-    fun filterChain(http: HttpSecurity): SecurityFilterChain {
+    @ConditionalOnMissingBean
+    fun customJwtAuthenticationConverter(): CustomJwtAuthenticationConverter {
+        return CustomJwtAuthenticationConverter(configProperties.clientId)
+    }
+
+    @Bean
+    fun filterChain(http: HttpSecurity, customJwtAuthenticationConverter: CustomJwtAuthenticationConverter): SecurityFilterChain {
         logger.info { "Security active, securing endpoint" }
-        bpdmSecurityConfigurerAdapter.configure(http)
+        http.csrf { it.disable() }
+        http.cors {}
+        http.sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
+        http.authorizeHttpRequests {
+            it.requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.OPTIONS, "/api/**")).permitAll()
+            it.requestMatchers(AntPathRequestMatcher.antMatcher("/")).permitAll() // forwards to swagger
+            it.requestMatchers(AntPathRequestMatcher.antMatcher("/docs/api-docs/**")).permitAll()
+            it.requestMatchers(AntPathRequestMatcher.antMatcher("/ui/swagger-ui/**")).permitAll()
+            it.requestMatchers(AntPathRequestMatcher.antMatcher("/actuator/health/**")).permitAll()
+            it.requestMatchers(AntPathRequestMatcher.antMatcher("/error")).permitAll()
+            it.requestMatchers(AntPathRequestMatcher.antMatcher("/api/**")).authenticated()
+        }
+        http.oauth2ResourceServer {
+            it.jwt { jwt ->
+                jwt.jwtAuthenticationConverter(customJwtAuthenticationConverter)
+            }
+        }
         return http.build()
     }
 

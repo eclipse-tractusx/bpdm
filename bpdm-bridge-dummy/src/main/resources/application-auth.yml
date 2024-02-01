@@ -18,11 +18,6 @@
 ################################################################################
 
 bpdm:
-  permissions:
-    # Security config (defined in common) for restricting access to the bridge dummy resource server
-    bridge:
-      syncAuthorities: sync_company_data
-
   security:
     # Security config (defined in common) for restricting access to the bridge dummy resource server
     cors-origins: '*'
@@ -34,20 +29,12 @@ bpdm:
     realm: master
     refresh-url: ${bpdm.security.token-url}
     token-url: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}/protocol/openid-connect/token
+    permissions:
+      sync: sync_company_data
 
 spring:
   security:
     oauth2:
-      client:
-        provider:
-          catena-keycloak-provider:
-            issuer-uri: ${bpdm.security.auth-server-url:http://localhost:8180}/realms/${bpdm.security.realm:master}
-        registration:
-          bridge-client:
-            authorization-grant-type: client_credentials
-            client-id: ${bpdm.security.client-id}
-            client-secret: ${bpdm.security.credentials.secret}
-            provider: catena-keycloak-provider
       resourceserver:
         # Spring security
         jwt:

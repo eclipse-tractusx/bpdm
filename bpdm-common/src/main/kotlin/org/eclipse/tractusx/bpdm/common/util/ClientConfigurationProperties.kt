@@ -17,14 +17,19 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package com.catenax.bpdm.bridge.dummy.config
+package org.eclipse.tractusx.bpdm.common.util
 
-import org.springframework.boot.context.properties.ConfigurationProperties
+interface ClientConfigurationProperties : HasEnablingProperty {
+    val baseUrl: String
+    val securityEnabled: Boolean
+    val oauth2ClientRegistration: String
+
+    override val enabled get() = securityEnabled
+
+    companion object {
+        const val PREFIX = "bpdm.client"
+    }
+}
 
 
-@ConfigurationProperties(prefix = "bpdm.client.pool")
-data class PoolConfigProperties(
-    val baseUrl: String = "http://localhost:8080/",
-    val securityEnabled: Boolean = false,
-    val oauth2ClientRegistration: String?
-)
+

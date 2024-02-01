@@ -18,12 +18,6 @@
 ################################################################################
 
 bpdm:
-  pool-security:
-    changeMetaData: change_meta_data
-    changePoolPartnerData: change_pool_partner_data
-    readMetaData: read_meta_data
-    readPoolPartnerData: read_pool_partner_data
-
   security:
     auth-server-url: http://localhost:8180
     auth-url: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}/protocol/openid-connect/auth
@@ -33,6 +27,11 @@ bpdm:
     realm: master
     refresh-url: ${bpdm.security.token-url}
     token-url: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}/protocol/openid-connect/token
+    permissions:
+      readPartner: read_partner
+      writePartner: write_partner
+      readMetaData: read_meta_data
+      writeMetaData: write_meta_data
 
 spring:
   security:

@@ -57,7 +57,7 @@ class CustomJwtAuthenticationConverter(private val resourceId: String, private v
 
     override fun convert(source: Jwt): AbstractAuthenticationToken {
         val authorities: Collection<GrantedAuthority> =
-            defaultGrantedAuthoritiesConverter.convert(source)!!.plus(extractResourceRoles(source, resourceId)).toSet()
+            defaultGrantedAuthoritiesConverter.convert(source)!!.plus(extractResourceRoles(source, resourceId, requiredBpn)).toSet()
         return JwtAuthenticationToken(source, authorities)
     }
 
@@ -73,7 +73,7 @@ class CustomJwtAuthenticationConverter(private val resourceId: String, private v
             val resourceRoles: Collection<String>? = resource?.get("roles") as Collection<String>?
             return if (resourceRoles != null) {
                 resourceRoles.stream()
-                    .map { role: String -> SimpleGrantedAuthority("ROLE_$role") }
+                    .map { role: String -> SimpleGrantedAuthority(role) }
                     .collect(Collectors.toSet())
             } else emptySet()
         }

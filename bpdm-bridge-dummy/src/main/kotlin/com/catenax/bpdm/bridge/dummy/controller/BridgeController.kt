@@ -19,6 +19,7 @@
 
 package com.catenax.bpdm.bridge.dummy.controller
 
+import com.catenax.bpdm.bridge.dummy.config.PermissionConfigProperties
 import com.catenax.bpdm.bridge.dummy.service.SyncService
 import io.swagger.v3.oas.annotations.Operation
 import org.springframework.security.access.prepost.PreAuthorize
@@ -34,7 +35,7 @@ class BridgeController(
         summary = "Start sync between Gate and Pool"
     )
     @PostMapping("/sync")
-    @PreAuthorize("hasAnyAuthority(@bridgeAuthProperties.syncAuthority)")
+    @PreAuthorize("hasAnyAuthority(${PermissionConfigProperties.SYNC})")
     override fun triggerSync() {
         syncService.sync()
     }

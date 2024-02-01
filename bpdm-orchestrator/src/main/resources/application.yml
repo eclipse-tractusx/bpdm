@@ -26,6 +26,9 @@ bpdm:
     version: '@project.version@'
     description: '@project.description@'
 
+    security:
+      enabled: false
+
     # Api Request Restrictions
     api:
         upsert-limit: 100
