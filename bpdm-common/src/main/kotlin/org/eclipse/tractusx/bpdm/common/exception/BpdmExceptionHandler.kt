@@ -19,12 +19,15 @@
 
 package org.eclipse.tractusx.bpdm.common.exception
 
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 import mu.KotlinLogging
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.context.request.WebRequest
+import org.springframework.web.servlet.ModelAndView
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 import kotlin.reflect.full.findAnnotations
 
@@ -53,4 +56,7 @@ open class BpdmExceptionHandler : ResponseEntityExceptionHandler() {
 
     }
 
+    open fun resolveException(request: HttpServletRequest, response: HttpServletResponse, handler: Any?, ex: Exception): ModelAndView? {
+        TODO("Not yet implemented")
+    }
 }

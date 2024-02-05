@@ -17,27 +17,27 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.exception
-
 import org.eclipse.tractusx.bpdm.common.exception.BpdmExceptionHandler
-import org.springframework.web.bind.annotation.ControllerAdvice
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import org.springframework.web.servlet.HandlerExceptionResolver
+import org.springframework.web.servlet.config.annotation.EnableWebMvc
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
+import org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver
 
-@ControllerAdvice
-class GateExceptionHandler : BpdmExceptionHandler() {
-//    override fun resolveException(
-//        request: HttpServletRequest,
-//        response: HttpServletResponse,
-//        handler: Any?,
-//        ex: Exception
-//    ): ModelAndView? {
-//        if (ex is HttpMessageNotReadableException) {
-//            val errorMessage = "Invalid JSON request. Please check your request payload."
-//            val responseBody = ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage)
-//            response.status = HttpStatus.BAD_REQUEST.value()
-//            response.writer.write(responseBody.toString())
-//            return ModelAndView()
-//        }
-//        // Handle other exceptions as needed
-//        return null
-//    }
+@Configuration
+@EnableWebMvc
+class ExceptionHandlerConfig : WebMvcConfigurer {
+
+    @Bean
+    fun bpdmExceptionHandler(): BpdmExceptionHandler {
+        return BpdmExceptionHandler()
+    }
+
+    @Bean
+    fun handlerExceptionResolver(): HandlerExceptionResolver {
+        val resolver = ExceptionHandlerExceptionResolver()
+        resolver.order = 0 // Set the order to ensure it's checked before other resolvers
+        return resolver
+    }
 }
