@@ -21,8 +21,7 @@ bpdm:
   client:
     orchestrator:
       security-enabled: true
-  orchestrator-security:
-    oauth2-client-registration: orchestrator-client
+      oauth2-client-registration: orchestrator-client
 
 spring:
   security:

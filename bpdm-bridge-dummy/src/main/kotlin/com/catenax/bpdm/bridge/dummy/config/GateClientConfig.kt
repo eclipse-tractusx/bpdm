@@ -17,48 +17,46 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.config
+package com.catenax.bpdm.bridge.dummy.config
 
 import org.eclipse.tractusx.bpdm.common.util.BpdmWebClientProvider
 import org.eclipse.tractusx.bpdm.common.util.ClientConfigurationProperties
 import org.eclipse.tractusx.bpdm.common.util.ConditionalOnBoundProperty
-import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
-import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClientImpl
+import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
+import org.eclipse.tractusx.bpdm.gate.api.client.GateClientImpl
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
 
-
-@ConfigurationProperties(prefix = OrchestratorClientConfigProperties.PREFIX)
-data class OrchestratorClientConfigProperties(
-    override val baseUrl: String = "http://localhost:8085",
+@ConfigurationProperties(prefix = GateConfigProperties.PREFIX)
+data class GateConfigProperties(
+    override val baseUrl: String = "http://localhost:8081",
     override val securityEnabled: Boolean = false,
-    override val oauth2ClientRegistration: String = "orchestrator-client"
+    override val oauth2ClientRegistration: String = "gate-client"
 ) : ClientConfigurationProperties {
     companion object {
-        const val PREFIX = "${ClientConfigurationProperties.PREFIX}.orchestrator"
+        const val PREFIX = "${ClientConfigurationProperties.PREFIX}.gate"
     }
 }
 
 @Configuration
-class OrchestratorClientConfiguration(
-    clientProperties: OrchestratorClientConfigProperties,
+class GateClientConfiguration(
+    clientProperties: GateConfigProperties,
 ) : BpdmWebClientProvider(
     clientProperties
 ) {
     @Bean
-    @ConditionalOnBoundProperty(OrchestratorClientConfigProperties.PREFIX, OrchestratorClientConfigProperties::class, true)
-    fun authorizedOrchestratorClient(
+    @ConditionalOnBoundProperty(GateConfigProperties.PREFIX, GateConfigProperties::class, true)
+    fun authorizedGateClient(
         clientRegistrationRepository: ClientRegistrationRepository,
         oAuth2AuthorizedClientService: OAuth2AuthorizedClientService
-    ): OrchestrationApiClient =
-        OrchestrationApiClientImpl { provideAuthorizedClient(clientRegistrationRepository, oAuth2AuthorizedClientService) }
+    ): GateClient =
+        GateClientImpl { provideAuthorizedClient(clientRegistrationRepository, oAuth2AuthorizedClientService) }
 
     @Bean
-    @ConditionalOnBoundProperty(OrchestratorClientConfigProperties.PREFIX, OrchestratorClientConfigProperties::class, false)
-    fun unauthorizedOrchestratorClient(): OrchestrationApiClient =
-        OrchestrationApiClientImpl { provideUnauthorizedClient() }
+    @ConditionalOnBoundProperty(GateConfigProperties.PREFIX, GateConfigProperties::class, false)
+    fun unauthorizedGateClient(): GateClient =
+        GateClientImpl { provideUnauthorizedClient() }
 }
-

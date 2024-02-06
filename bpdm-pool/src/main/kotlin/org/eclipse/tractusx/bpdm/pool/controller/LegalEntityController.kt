@@ -31,6 +31,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSea
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.pool.config.ControllerConfigProperties
+import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.service.*
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -48,7 +49,7 @@ class LegalEntityController(
     val addressService: AddressService
 ) : PoolLegalEntityApi {
 
-    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadPoolPartnerDataAsRole())")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun getLegalEntities(
         bpSearchRequest: LegalEntityPropertiesSearchRequest,
         paginationRequest: PaginationRequest
@@ -59,19 +60,19 @@ class LegalEntityController(
         )
     }
 
-    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadPoolPartnerDataAsRole())")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun getLegalEntity(idValue: String, idType: String?): LegalEntityWithLegalAddressVerboseDto {
         val actualType = idType ?: bpnConfigProperties.id
         return if (actualType == bpnConfigProperties.id) businessPartnerFetchService.findLegalEntityIgnoreCase(idValue.uppercase())
         else businessPartnerFetchService.findLegalEntityIgnoreCase(actualType, idValue)
     }
 
-    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getChangePoolPartnerDataAsRole())")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun setLegalEntityCurrentness(bpnl: String) {
         businessPartnerBuildService.setBusinessPartnerCurrentness(bpnl.uppercase())
     }
 
-    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadPoolPartnerDataAsRole())")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun searchLegalEntitys(
         bpnLs: Collection<String>
     ): ResponseEntity<Collection<LegalEntityWithLegalAddressVerboseDto>> {
@@ -89,7 +90,7 @@ class LegalEntityController(
         return siteService.findByPartnerBpn(bpnl.uppercase(), paginationRequest.page, paginationRequest.size)
     }
 
-    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadPoolPartnerDataAsRole())")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun getAddresses(
         bpnl: String,
         paginationRequest: PaginationRequest
@@ -97,21 +98,21 @@ class LegalEntityController(
         return addressService.findByPartnerBpn(bpnl.uppercase(), paginationRequest.page, paginationRequest.size)
     }
 
-    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadPoolPartnerDataAsRole())")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun searchLegalAddresses(
         bpnLs: Collection<String>
     ): Collection<LegalAddressVerboseDto> {
         return addressService.findLegalAddresses(bpnLs)
     }
 
-    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getChangePoolPartnerDataAsRole())")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")
     override fun createBusinessPartners(
         businessPartners: Collection<LegalEntityPartnerCreateRequest>
     ): LegalEntityPartnerCreateResponseWrapper {
         return businessPartnerBuildService.createLegalEntities(businessPartners)
     }
 
-    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getChangePoolPartnerDataAsRole())")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")
     override fun updateBusinessPartners(
         businessPartners: Collection<LegalEntityPartnerUpdateRequest>
     ): LegalEntityPartnerUpdateResponseWrapper {

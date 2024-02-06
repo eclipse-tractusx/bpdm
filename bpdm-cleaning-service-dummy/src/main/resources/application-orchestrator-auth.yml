@@ -20,7 +20,21 @@
 bpdm:
   client:
     orchestrator:
-      base-url: http://localhost:8085/
-      security:
-        enabled: true
+      security-enabled: true
+      oauth2-client-registration: orchestrator-client
+
+
+spring:
+  security:
+    oauth2:
+      client:
+        provider:
+          orchestrator-oauth2-provider:
+            issuer-uri: http://localhost:8180/realms/master
+        registration:
+          orchestrator-client:
+            authorization-grant-type: client_credentials
+            client-id: BPDM_CLEANING_SERVICE
+            client-secret:
+            provider: orchestrator-oauth2-provider
 

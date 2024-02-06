@@ -21,8 +21,7 @@ bpdm:
   client:
     pool:
       security-enabled: true
-  gate-security:
-    oauth2-client-registration: pool-client
+      oauth2-client-registration: pool-client
 
 spring:
   security:

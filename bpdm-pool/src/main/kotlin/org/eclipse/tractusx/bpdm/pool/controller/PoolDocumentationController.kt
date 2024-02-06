@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.eclipse.tractusx.bpdm.pool.api.PoolDocumentationApi
+import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.service.GateDocumentationService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -31,7 +32,7 @@ class PoolDocumentationController(
     val documentationService: GateDocumentationService
 ) : PoolDocumentationApi {
 
-    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadMetaDataAsRole())")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun getMermaidPoolPersistence(): ResponseEntity<String> {
         return ResponseEntity(documentationService.getMermaidPoolPersistence(), HttpStatus.OK)
     }

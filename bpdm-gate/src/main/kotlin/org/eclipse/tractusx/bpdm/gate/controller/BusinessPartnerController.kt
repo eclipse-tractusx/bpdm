@@ -27,6 +27,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequ
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
+import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.service.BusinessPartnerService
 import org.eclipse.tractusx.bpdm.gate.util.containsDuplicates
 import org.springframework.http.HttpStatus
@@ -40,7 +41,7 @@ class BusinessPartnerController(
     val apiConfigProperties: ApiConfigProperties
 ) : GateBusinessPartnerApi {
 
-    @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getChangeCompanyInputDataAsRole())")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_INPUT_AUTHORITY})")
     override fun upsertBusinessPartnersInput(businessPartners: Collection<BusinessPartnerInputRequest>): ResponseEntity<Collection<BusinessPartnerInputDto>> {
         if (businessPartners.size > apiConfigProperties.upsertLimit || businessPartners.map { it.externalId }.containsDuplicates()) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
@@ -49,7 +50,7 @@ class BusinessPartnerController(
         return ResponseEntity.ok(result)
     }
 
-    @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyInputDataAsRole())")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_INPUT_AUTHORITY})")
     override fun getBusinessPartnersInput(
         externalIds: Collection<String>?,
         paginationRequest: PaginationRequest
@@ -57,7 +58,7 @@ class BusinessPartnerController(
         return businessPartnerService.getBusinessPartnersInput(paginationRequest.toPageRequest(), externalIds)
     }
 
-    @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyOutputDataAsRole())")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_OUTPUT_AUTHORITY})")
     override fun getBusinessPartnersOutput(
         externalIds: Collection<String>?,
         paginationRequest: PaginationRequest

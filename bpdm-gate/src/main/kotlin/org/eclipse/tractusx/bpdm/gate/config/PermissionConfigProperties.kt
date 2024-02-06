@@ -19,13 +19,27 @@
 
 package org.eclipse.tractusx.bpdm.gate.config
 
+import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties.Companion.PREFIX
 import org.springframework.boot.context.properties.ConfigurationProperties
 
 
-@ConfigurationProperties(prefix = "bpdm.client.pool")
-data class PoolConfigProperties(
-    val baseUrl: String = "http://localhost:8080",
-    val searchChangelogPageSize: Int = 100,
-    val securityEnabled: Boolean = false,
-    val oauth2ClientRegistration: String?
-)
+@ConfigurationProperties(prefix = PREFIX)
+data class PermissionConfigProperties(
+    val readInput: String = "read_input",
+    val writeInput: String = "write_input",
+    val readOutput: String = "read_output",
+    val writeOutput: String = "write_output"
+) {
+    companion object {
+        const val PREFIX = "bpdm.security.permissions"
+
+        //Keep the fully qualified name up to date here
+        private const val QUALIFIED_NAME = "org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties"
+        private const val BEAN_QUALIFIER = "'$PREFIX-$QUALIFIED_NAME'"
+
+        const val READ_INPUT_AUTHORITY = "@$BEAN_QUALIFIER.getReadInput()"
+        const val WRITE_INPUT_AUTHORITY = "@$BEAN_QUALIFIER.getWriteInput()"
+        const val READ_OUTPUT_AUTHORITY = "@$BEAN_QUALIFIER.getReadOutput()"
+        const val WRITE_OUTPUT_AUTHORITY = "@$BEAN_QUALIFIER.getWriteOutput()"
+    }
+}

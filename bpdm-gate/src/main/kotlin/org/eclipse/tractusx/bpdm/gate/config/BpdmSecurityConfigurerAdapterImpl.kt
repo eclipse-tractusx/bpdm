@@ -19,38 +19,21 @@
 
 package org.eclipse.tractusx.bpdm.gate.config
 
-import org.eclipse.tractusx.bpdm.common.config.BpdmSecurityConfigurerAdapter
 import org.eclipse.tractusx.bpdm.common.config.CustomJwtAuthenticationConverter
 import org.eclipse.tractusx.bpdm.common.config.SecurityConfigProperties
+import org.eclipse.tractusx.bpdm.common.util.ConditionalOnBoundProperty
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.http.HttpMethod
-import org.springframework.security.config.annotation.web.builders.HttpSecurity
-import org.springframework.security.config.http.SessionCreationPolicy
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher
 
 @Configuration
-class BpdmSecurityConfigurerAdapterImpl(
+@ConditionalOnBoundProperty(SecurityConfigProperties.PREFIX, SecurityConfigProperties::class, havingValue = true)
+class GateSecurityConfiguration(
     val securityConfigProperties: SecurityConfigProperties,
     val bpnConfigProperties: BpnConfigProperties
-) : BpdmSecurityConfigurerAdapter {
+) {
 
-    override fun configure(http: HttpSecurity) {
-        http.csrf { it.disable() }
-        http.cors {}
-        http.sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
-        http.authorizeHttpRequests {
-            it.requestMatchers(antMatcher(HttpMethod.OPTIONS, "/api/**")).permitAll()
-            it.requestMatchers(antMatcher("/")).permitAll() // forwards to swagger
-            it.requestMatchers(antMatcher("/docs/api-docs/**")).permitAll()
-            it.requestMatchers(antMatcher("/ui/swagger-ui/**")).permitAll()
-            it.requestMatchers(antMatcher("/actuator/health/**")).permitAll()
-            it.requestMatchers(antMatcher("/error")).permitAll()
-            it.requestMatchers(antMatcher("/api/**")).authenticated()
-        }
-        http.oauth2ResourceServer {
-            it.jwt { jwt ->
-                jwt.jwtAuthenticationConverter(CustomJwtAuthenticationConverter(securityConfigProperties.clientId, bpnConfigProperties.ownerBpnL))
-            }
-        }
+    @Bean
+    fun customJwtAuthenticationConverter(): CustomJwtAuthenticationConverter {
+        return CustomJwtAuthenticationConverter(securityConfigProperties.clientId, bpnConfigProperties.ownerBpnL)
     }
 }

@@ -25,25 +25,32 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsAddressTypesRespon
 import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsConfidenceCriteriaResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsSharingStatesResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsStagesResponse
+import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.service.StatsService
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class StatsController(
     private val statsService: StatsService
 ) : StatsApi {
+
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_INPUT_AUTHORITY})")
     override fun countPartnersBySharingState(): StatsSharingStatesResponse {
         return statsService.countSharingStates()
     }
 
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_INPUT_AUTHORITY})")
     override fun countPartnersPerStage(): StatsStagesResponse {
         return statsService.countBusinessPartnersPerStage()
     }
 
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_INPUT_AUTHORITY})")
     override fun countAddressTypes(stage: StageType): StatsAddressTypesResponse {
         return statsService.countAddressTypes(stage)
     }
 
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_INPUT_AUTHORITY})")
     override fun getConfidenceCriteriaStats(): StatsConfidenceCriteriaResponse {
         return statsService.getConfidenceCriteriaStats()
     }

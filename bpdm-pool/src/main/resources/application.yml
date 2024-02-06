@@ -40,13 +40,9 @@ bpdm:
 
   # Orchestrator Client
   client:
-    pool-orchestrator:
+    orchestrator:
       base-url: http://localhost:8085/
       golden-record-scheduler-cron-expr: '-'
-
-  # SaaS adapter configuration
-  saas:
-    enabled: false
 
   # Disable Security on default
   security:

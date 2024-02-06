@@ -17,5 +17,21 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.config
+package com.catenax.bpdm.bridge.dummy.config
 
+import com.catenax.bpdm.bridge.dummy.config.PermissionConfigProperties.Companion.PREFIX
+import org.springframework.boot.context.properties.ConfigurationProperties
+
+
+@ConfigurationProperties(prefix = PREFIX)
+class PermissionConfigProperties(
+    @Suppress("unused") val sync: String = "sync_company_data"
+) {
+    companion object {
+        const val PREFIX = "bpdm.security.permissions"
+        private const val QUALIFIED_NAME = "com.catenax.bpdm.bridge.dummy.config.PermissionConfigProperties"
+        private const val BEAN_QUALIFIER = "'$PREFIX-$QUALIFIED_NAME'"
+
+        const val SYNC = "@$BEAN_QUALIFIER.getSync()"
+    }
+}

@@ -18,11 +18,6 @@
 ################################################################################
 
 bpdm:
-  # Orchestrator roles
-  orchestrator-security:
-    createTask: create_task
-    processTaskPrefix: process_task_step
-    viewTask: view_task
 
   # OAuth configuration
   security:
@@ -34,6 +29,14 @@ bpdm:
     realm: master
     refresh-url: ${bpdm.security.token-url}
     token-url: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}/protocol/openid-connect/token
+    permissions:
+      createTask: create_task
+      viewTask: view_task
+      processTask:
+        clean: process_task_clean
+        cleanAndSync: process_task_cleanAndSync
+        poolSync: process_task_poolSync
+
 
 # Spring security
 spring:

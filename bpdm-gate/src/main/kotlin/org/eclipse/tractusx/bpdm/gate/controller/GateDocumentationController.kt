@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.controller
 
 import org.eclipse.tractusx.bpdm.gate.api.GateDocumentationApi
+import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.service.DocumentationService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -31,7 +32,7 @@ class GateDocumentationController(
     val documentationService: DocumentationService
 ) : GateDocumentationApi {
 
-    @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyOutputDataAsRole())")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_INPUT_AUTHORITY})")
     override fun getMermaidGatePersistence(): ResponseEntity<String> {
         
         return ResponseEntity(documentationService.getMermaidGatePersistence(), HttpStatus.OK)

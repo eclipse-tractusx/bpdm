@@ -21,6 +21,7 @@ bpdm:
   client:
     orchestrator:
       security-enabled: true
+      oauth2-client-registration: orchestrator-client
 
 spring:
   security:
@@ -29,8 +30,8 @@ spring:
         provider:
           orchestrator-oauth2-provider:
             issuer-uri: ${bpdm.security.auth-server-url:http://localhost:8180}/realms/${bpdm.security.realm:master}
-        registration: # Note that the oauth2-client-registration property is NOT the client id of the gate in keycloak
-          gate-client:
+        registration:
+          orchestrator-client:
             authorization-grant-type: client_credentials
             client-id: ${bpdm.security.client-id}
             client-secret: ${bpdm.security.credentials.secret}

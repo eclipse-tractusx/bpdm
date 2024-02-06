@@ -17,14 +17,8 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.cleaning.config
+package org.eclipse.tractusx.bpdm.common.util
 
-
-import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
-import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClientImpl
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager
@@ -37,49 +31,23 @@ import org.springframework.web.reactive.function.client.WebClient
 import java.util.function.Consumer
 
 
-@Configuration
-class ClientsConfig {
+open class BpdmWebClientProvider(
+    val clientProperties: ClientConfigurationProperties
+) {
+    fun provideAuthorizedClient(clientRegistrationRepository: ClientRegistrationRepository, oAuth2AuthorizedClientService: OAuth2AuthorizedClientService) =
+        webClientBuilder()
+            .apply(oauth2Configuration(clientRegistrationRepository, oAuth2AuthorizedClientService, clientProperties.oauth2ClientRegistration))
+            .build()
 
+    fun provideUnauthorizedClient() =
+        webClientBuilder().build()
 
-    @Bean
-    @ConditionalOnProperty(
-        value = ["bpdm.client.orchestrator.security-enabled"],
-        havingValue = "false",
-        matchIfMissing = true
-    )
-    fun orchestratorClientNoAuth(orchestratorConfigProperties: OrchestratorConfigProperties): OrchestrationApiClient {
-        val url = orchestratorConfigProperties.baseUrl
-        return OrchestrationApiClientImpl { webClientBuilder(url).build() }
-    }
-
-
-    @Bean
-    @ConditionalOnProperty(
-        value = ["bpdm.client.orchestrator.security-enabled"],
-        havingValue = "true"
-    )
-    fun orchestratorClientWithAuth(
-        orchestratorConfigProperties: OrchestratorConfigProperties,
-        clientRegistrationRepository: ClientRegistrationRepository,
-        authorizedClientService: OAuth2AuthorizedClientService
-    ): OrchestrationApiClient {
-        val url = orchestratorConfigProperties.baseUrl
-        val clientRegistrationId = orchestratorConfigProperties.oauth2ClientRegistration
-            ?: throw IllegalArgumentException("bpdm.orchestrator.oauth2-client-registration is required if bpdm.orchestrator.security-enabled is set")
-        return OrchestrationApiClientImpl {
-            webClientBuilder(url)
-                .apply(oauth2Configuration(clientRegistrationRepository, authorizedClientService, clientRegistrationId))
-                .build()
-        }
-    }
-
-
-    private fun webClientBuilder(url: String) =
+    protected fun webClientBuilder() =
         WebClient.builder()
-            .baseUrl(url)
+            .baseUrl(clientProperties.baseUrl)
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
 
-    private fun oauth2Configuration(
+    protected fun oauth2Configuration(
         clientRegistrationRepository: ClientRegistrationRepository,
         authorizedClientService: OAuth2AuthorizedClientService,
         clientRegistrationId: String
@@ -90,7 +58,7 @@ class ClientsConfig {
         return oauth.oauth2Configuration()
     }
 
-    private fun authorizedClientManager(
+    protected fun authorizedClientManager(
         clientRegistrationRepository: ClientRegistrationRepository,
         authorizedClientService: OAuth2AuthorizedClientService
     ): OAuth2AuthorizedClientManager {
