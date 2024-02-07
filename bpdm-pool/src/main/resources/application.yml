@@ -42,7 +42,11 @@ bpdm:
   client:
     orchestrator:
       base-url: http://localhost:8085/
-      golden-record-scheduler-cron-expr: '-'
+
+  # Golden Record Task Processing
+  tasks:
+    cron: '-'
+    batchSize: 100
 
   # Disable Security on default
   security:
