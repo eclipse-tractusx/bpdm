@@ -27,5 +27,5 @@ data class BpnConfigProperties(
     val agencyName: String = "Catena-X",
     var name: String = "Business Partner Number",
     val id: String = "CX_BPN",
-    val ownerBpnL: String? = null
+    val ownerBpnL: String = ""
 )
