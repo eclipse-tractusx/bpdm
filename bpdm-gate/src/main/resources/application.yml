@@ -31,7 +31,8 @@ bpdm:
         agency-name: Catena-X
         id: CX_BPN
         name: Business Partner Number
-        owner-bpn-l: '# Insert owner BPNL here'
+        # Insert owner BPNL here
+        owner-bpn-l:
     api:
         upsert-limit: 100
 
