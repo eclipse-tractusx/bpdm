@@ -20,21 +20,25 @@
 package org.eclipse.tractusx.bpdm.gate.config
 
 import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.stereotype.Component
 
-@Component
 @ConfigurationProperties(prefix = "bpdm.tasks")
 data class GoldenRecordTaskConfigProperties(
     val creation: CreationProperties = CreationProperties(),
     val check: TaskProcessProperties = TaskProcessProperties()
 ) {
     data class CreationProperties(
-        val fromSharingMember: TaskProcessProperties = TaskProcessProperties(),
+        val fromSharingMember: CreationTaskProperties = CreationTaskProperties(),
         val fromPool: TaskProcessProperties = TaskProcessProperties()
     )
 
     data class TaskProcessProperties(
-        var batchSize: Int = 100,
-        var cron: String = "-",
+        val batchSize: Int = 100,
+        val cron: String = "-",
+    )
+
+    data class CreationTaskProperties(
+        val startsAsReady: Boolean = false,
+        val batchSize: Int = 100,
+        val cron: String = "-",
     )
 }

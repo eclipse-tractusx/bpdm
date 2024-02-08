@@ -65,7 +65,7 @@ interface GateSharingStateApi {
     @ApiResponses(
         value = [
             ApiResponse(responseCode = "204", description = "All business partners put in ready to be shared state"),
-            ApiResponse(responseCode = "404", description = "Business partners can't be put into ready state (e.g. external-ID not found, wrong sharing state)")
+            ApiResponse(responseCode = "400", description = "Business partners can't be put into ready state (e.g. external-ID not found, wrong sharing state)")
         ]
     )
     @PostMapping("/ready")

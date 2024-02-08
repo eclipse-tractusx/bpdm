@@ -27,6 +27,7 @@ import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
+import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.SharingState
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidStateException
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidStateRequestException
@@ -44,7 +45,10 @@ const val ERROR_MISSING_BPN = "Request for Success state but no BPN specified."
 const val ERROR_MISSING_TASK = "Request for Pending state but no task-id specified."
 
 @Service
-class SharingStateService(private val stateRepository: SharingStateRepository) {
+class SharingStateService(
+    private val stateRepository: SharingStateRepository,
+    private val goldenRecordTaskConfigProperties: GoldenRecordTaskConfigProperties
+) {
 
     private val logger = KotlinLogging.logger { }
 
@@ -155,7 +159,12 @@ class SharingStateService(private val stateRepository: SharingStateRepository) {
     }
 
     private fun setInitial(sharingState: SharingState): SharingState {
-        sharingState.sharingStateType = SharingStateType.Initial
+        sharingState.sharingStateType =
+                //If new business partner data should be immediately ready to be shared our initial state is ready instead
+            if (goldenRecordTaskConfigProperties.creation.fromSharingMember.startsAsReady)
+                SharingStateType.Ready
+            else
+                SharingStateType.Initial
         sharingState.sharingErrorCode = null
         sharingState.sharingErrorMessage = null
         sharingState.sharingProcessStarted = null

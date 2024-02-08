@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class SharingStateController(
-    val sharingStateService: SharingStateService
+    private val sharingStateService: SharingStateService
 ) : GateSharingStateApi {
     private val logger = KotlinLogging.logger { }
 
@@ -45,6 +45,7 @@ class SharingStateController(
     ): PageDto<SharingStateDto> {
         return sharingStateService.findSharingStates(paginationRequest, businessPartnerType, externalIds)
     }
+
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_INPUT_AUTHORITY})")
     override fun postSharingStateReady(request: PostSharingStateReadyRequest) {

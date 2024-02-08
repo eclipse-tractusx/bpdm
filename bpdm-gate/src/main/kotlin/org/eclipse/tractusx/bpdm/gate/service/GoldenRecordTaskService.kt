@@ -35,7 +35,6 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.data.domain.Pageable
-import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -53,7 +52,6 @@ class GoldenRecordTaskService(
 ) {
     private val logger = KotlinLogging.logger { }
 
-    @Scheduled(cron = "#{@goldenRecordTaskConfigProperties.getCreation().getFromSharingMember().getCron()}")
     @Transactional
     fun createTasksForReadyBusinessPartners() {
         logger.info { "Started scheduled task to create golden record tasks from ready business partners" }
@@ -84,7 +82,6 @@ class GoldenRecordTaskService(
         logger.info { "Created ${createdTasks.size} new golden record tasks from ready business partners" }
     }
 
-    @Scheduled(cron = "#{@goldenRecordTaskConfigProperties.getCheck().getCron()}")
     @Transactional
     fun resolvePendingTasks() {
         logger.info { "Started scheduled task to resolve pending golden record tasks" }
@@ -129,7 +126,6 @@ class GoldenRecordTaskService(
         logger.info { "Resolved ${businessPartnersToUpsert.size} tasks as successful and ${errorRequests.size} as errors" }
     }
 
-    @Scheduled(cron = "#{@goldenRecordTaskConfigProperties.getCreation().getFromPool().getCron()}")
     @Transactional
     fun createTasksForGoldenRecordUpdates() {
         logger.info { "Started scheduled task to create golden record tasks from Pool updates" }
