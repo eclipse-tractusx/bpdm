@@ -299,13 +299,21 @@ sequenceDiagram
     Gate-->>Gate: Persist Business Partner Data Input
     Gate-->>Gate: Set Sharing State to 'Initial'
     Gate-->>Gate: Add Changelog Entry 'Create' for Business Partner Input
-    Gate->>Orchestrator: POST api/golden-record-tasks <br> Payload: Business Partner Input Data in mode 'UpdateFromSharingMember'
-    Orchestrator-->>Orchestrator: Create Golden Record Task for Business Partner Data
-    Orchestrator-->>Orchestrator: Set Golden Record Task State <br> Result State: 'Pending'
-    Orchestrator-->>Orchestrator: Set Golden Record Task State <br> Step: 'CleanAndSync' <br> StepState: 'Queued'
-    Orchestrator-->>Gate: Created Golden Record Task
-    Gate-->>Gate: Set Sharing State <br> Type: 'PENDING' <br> Task ID: Golden Record Task ID
     Gate-->>SharingMember: Upserted Business Partner
+
+    SharingMember->>Gate: POST api/catena/sharing-state/ready <br> Payload: External ID A
+    Gate-->>Gate: Set Sharing State to 'Ready'
+    Gate-->>SharingMember: OK
+
+    loop Polling for Ready Business Partners
+        Gate-->>Gate: Fetch Business Partners in State 'Ready'
+        Gate->>Orchestrator: POST api/golden-record-tasks <br> Payload: Business Partner Input Data in mode 'UpdateFromSharingMember'
+        Orchestrator-->>Orchestrator: Create Golden Record Task for Business Partner Data
+        Orchestrator-->>Orchestrator: Set Golden Record Task State <br> Result State: 'Pending'
+        Orchestrator-->>Orchestrator: Set Golden Record Task State <br> Step: 'CleanAndSync' <br> StepState: 'Queued'
+        Orchestrator-->>Gate: Created Golden Record Task
+        Gate-->>Gate: Set Sharing State <br> Type: 'PENDING' <br> Task ID: Golden Record Task ID
+    end
 
     loop Polling for Step 'CleanAndSync'
         CleaningServiceDummy->>Orchestrator: POST api/golden-record-tasks/step-reservations <br> Payload: Step 'CleanAndSync'
