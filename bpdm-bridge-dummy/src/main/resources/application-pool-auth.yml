@@ -20,19 +20,32 @@
 bpdm:
   client:
     pool:
+      # Name of the Spring oauth2 client registration entry for connecting to the Pool
+      # This registration will be used to configure this application's webclients that want to access the Pool
       oauth2-client-registration: pool-client
+      # Whether to enable oauth2 authentication when connecting to the Pool
       security-enabled: true
-
+#
+# From here on are framework and dependency configuration
+# More information about those properties can be taken from the respective documentation of Spring or the dependency
+#
 spring:
   security:
     oauth2:
       client:
         provider:
+          # Create an oauth2 provider for the pool and infer token issuing uri from the security properties
+          # If auth profile is not set use equivalent defaults
           pool-oauth2-provider:
             issuer-uri: ${bpdm.security.auth-server-url:http://localhost:8180}/realms/${bpdm.security.realm:master}
         registration:
+          # Register oauth2 client information on how to acquire a token for the Pool
           pool-client:
+            # The pool client should use client credentials mechanism to request a token from the provider
             authorization-grant-type: client_credentials
-            client-id: ${bpdm.security.client-id}
-            client-secret: ${bpdm.security.credentials.secret}
+            # Use a default client id for the client credentials request
+            client-id: BPDM_POOL_CLIENT
+            # No secret on default (please update credentials for production)
+            client-secret:
+            # Use the specified provider above to infer the issuing token uri
             provider: pool-oauth2-provider

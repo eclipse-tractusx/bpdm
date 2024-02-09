@@ -18,31 +18,44 @@
 ################################################################################
 
 bpdm:
-
-  # OAuth configuration
   security:
+    # Allowed origins for CORS
     cors-origins: '*'
+    # Whether endpoints should be authenticated/authorized
     enabled: true
+    # Base-URL including protocol of the Keycloak server
     auth-server-url: http://localhost:8180
+    # URL to the auth endpoint of the Keycloak server
     auth-url: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}/protocol/openid-connect/auth
-    client-id: BPDM_ORCHESTRATOR
+    # This application's resource or client. Used for finding permissions in the given Bearer token
+    client-id: BPDM_GATE
+    # The keycloak realm to consider
     realm: master
+    # URL to the token refresh endpoint of the Keycloak server
     refresh-url: ${bpdm.security.token-url}
+    # URL to the token validation endpoint of the Keycloak server
     token-url: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}/protocol/openid-connect/token
     permissions:
+      # Name of permission for creating new tasks
       createTask: create_task
+      # Name of permission for view status of tasks
       viewTask: view_task
       processTask:
+        # Name of permission to reserve and post results for tasks in state 'Clean'
         clean: process_task_clean
+        # Name of permission to reserve and post results for tasks in state 'CleanAndSync'
         cleanAndSync: process_task_cleanAndSync
+        # Name of permission to reserve and post results for tasks in state 'PoolSync'
         poolSync: process_task_poolSync
-
-
-# Spring security
+#
+# From here on are framework and dependency configuration
+# More information about those properties can be taken from the respective documentation of Spring or the dependency
+#
 spring:
   security:
     oauth2:
       resourceserver:
+        # Infer the uris for token validation from the application's security properties
         jwt:
           issuer-uri: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}
           jwk-set-uri: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}/protocol/openid-connect/certs

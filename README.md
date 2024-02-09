@@ -5,52 +5,37 @@
 This repository is part of the overarching Eclipse Tractus-X project.
 
 BPDM is an acronym for business partner data management.
-This project provides core services for querying, adding and changing business partner base information in the Eclipse Tractus-X landscape.
+This project serves two main purposes:
 
-Currently, BPDM consists of the Pool and Gate services.
+1. Provide services for for querying and sharing business partner information
+2. Establish an infrastructure for realising the Golden Record process which turns business partner information from sharing members to Golden Records, that is
+   cleaned and enriched business partner data uniquely identified by a business partner number (BPN)
 
-## BPDM Pool
+The following sections give an overview of this repository's structure.
 
-The BPDM Pool is the single source of truth in Eclipse Tractus-X for business partner base information such as addresses and official identifiers.
-Each record in the Pool has a unique identifier with which it can be referenced across the entire Eclipse Tractus-X landscape, the business partner number.
-Business partner records are divided into legal entities, sites and partner addresses.
-Self-explanatory, a legal entity record represents the legal entity information about a business partner.
-A site may represent legal entity's plant or campus which is big enough to contain several contact/delivery addresses.
-Finally, an address partner is a location of legal entity or site with a single contact/delivery address.
-A legal entity may have several sites and address partner.
-Further, a site may have several address partners.
+## BPDM Applications
 
-The Pool offers an API to query these business partner records by BPN, other identifier or by text search.
+Heart of this project is the source code for the BPDM applications.
+Together, those applications provide the infrastucture for the Golden Record process.
+The BPDM solution contains the following applications:
 
-## BPDM Gate
+- [Pool](bpdm-pool): The single source of truth for Golden Records and BPNs
+- [Gate](bpdm-gate): Holds business partner data from sharing members and allows them to share the data to the golden record process
+- [Orchestrator](bpdm-orchestrator): Facilitates business partner data between Gate, Pool and external cleaning services
+- [Cleaning Service Dummy](bpdm-cleaning-service-dummy): A dummy implementation of a cleaning service, responsible for processing business partner data and
+  turning it one step closer to a Golden Record
+- [Bridge Dummy](bpdm-bridge-dummy): A legacy dummy implementation directly exchanging business partners between Gate and Pool
 
-The BPDM Gate offers an API for Eclipse Tractus-X members to share their own business partner data with Eclipse Tractus-X. Such members are called sharing
-members.
-Via the Gate service they can add their own business partner records but also retrieve cleaned and enhanced data back in return over the sharing process.
-Shared business partner records that have successfully gone through the sharing process end up in the BPDM Pool and will receive a BPN there (or merge with an
-existing record).
+Subfolders for BPDM applications are easily recognizable by the `bpdm` prefix.
 
-## BPDM Bridge Dummy
+## BPDM Charts
 
-The BPDM Bridge Dummy offers an API for Eclipse Tractus-X
-members to sync between Gate and Pool. It is nothing but Bridge between Gate and Pool as a simple replacement for a dedicated sharing service.
-Via Bridge dummy service they can sync their added business partner records through the sharing process end up in the BPDM Pool.
-
-## BPDM Cleaning Service Dummy
-
-The BPDM Cleaning Service Dummy will offers provider to figure out how to connect the BPDM Pool and the Gate applications to form the golden record process: The process on how a record in the Gate becomes a golden record in the Pool which, in turn, gets distributed back to all Gates.
-
-## BPDM Orchestrator
-
-The BPDM Orchestrator is a passive component that offers standardized APIs for the BPDM Gate, BPDM Pool and Data Curation and Enrichment Services to orchestrate the process of Golden Record Creation and handling the different states a business partner record can have during this process.
-
-## Installation
-
-For installation instructions for the BPDM applications please refer to the [INSTALL](INSTALL.md) file.
+With the source code for the applications this repository also contains [Helm Charts](charts) that demonstrate how to deploy the applications in a Kubernetes
+environment.
 
 ## Container images
 
-This application provides container images for demonstration purposes.
+BPDM provides container images for demonstration purposes.
 The base image used, to build this demo application image is `eclipse-temurin:17-jre-alpine`
 
 Docker Hub:
@@ -88,24 +73,9 @@ Furthermore, apart from the release workflows there also exists code scanning wo
 2. Periodically, workflows execute a KICS and Trivy scan to ensure quality standards of the Docker images and Helm charts.
 3. For a more thorough security check the packaged applications are send to a VeraCode scan, which happens periodically and after a push to main
 
-## License Check
+## Documentation
 
-Licenses of all maven dependencies need to be approved by eclipse.
-The Eclipse Dash License Tool can be used to check the license approval status of dependencies and to request reviews by the intellectual property team.
-
-Generate summary of dependencies and their approval status:
-
-```bash
-mvn org.eclipse.dash:license-tool-plugin:license-check -Ddash.summary=DEPENDENCIES
-```
-
-Automatically create IP Team review requests:
-
-```bash
-mvn org.eclipse.dash:license-tool-plugin:license-check -Ddash.iplab.token=<token>
-```
-
-Check the [Eclipse Dash License Tool documentation](https://github.com/eclipse/dash-licenses) for more detailed information.
+This README is just the gateway to more detailed documentation files that may be found in the [docs](docs) folder
 
 ## NOTICE
 

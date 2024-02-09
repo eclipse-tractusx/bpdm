@@ -17,62 +17,71 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################################
 
-# Default port
-server:
-    port: 8084
-
+# BPDM application specific configuration
 bpdm:
+  # Name of this application (shown in Swagger) (on default set by maven resource filtering)
     name: '@project.name@'
-    description: '@project.description@'
+  # Version of this application (shown in Swagger) (on default set by maven resource filtering)
     version: '@project.version@'
-
-    # Connection to Orchestrator
+  # Description of this application (shown in Swagger) (on default set by maven resource filtering)
+    description: '@project.description@'
+  # Client connection configuration
     client:
+      # Orchestrator connection configuration
         orchestrator:
+          # The base-url of the Orchestrator-API
           base-url: http://localhost:8085/
-
-  # Logging Configuration
+  # BPDM application specific logging configuration
     logging:
+      # Default username logged if no user could be authenticated in the request
       unknown-user: Anonymous
-
-  # Cleaning Service Configurations
     cleaningService:
+      # When and how often the cleaning service should poll for golden record tasks in the orchestrator
       pollingCron: '-'
-
-# Logging Configuration
+#
+# From here on are framework and dependency configuration
+# More information about those properties can be taken from the respective documentation of Spring or the dependency
+#
+server:
+  # The port this application runs on
+  port: 8084
 logging:
-  unknown-user: Anonymous
   pattern:
+    # Use BPDM custom log pattern
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) %green([%-10.10X{user:-System}]) %magenta([%-10.10X{request:-No Request}]) %yellow([%-15.15t]) %cyan(%-40.40logger{39}) : %m%n%wEx"
   level:
+    # On default show only logs from INFO and above
     root: INFO
     org:
       eclipse:
         tractusx:
           bpdm:
+            # Logs from this application's package should be DEBUG and above
             cleaning: DEBUG
-
-# Enable actuator endpoints
 management:
   endpoint:
     health:
       probes:
+        # Enable actuator health endpoints for probing
         enabled: true
   health:
     livenessState:
+      # Include liveness state in health response (responsive at all)
       enabled: true
     readinessState:
+      # Include readiness state in health response (ready to accept traffic)
       enabled: true
-
-# Springdoc swagger configuration
 springdoc:
-    api-docs:
-        enabled: true
-        path: /docs/api-docs
-    swagger-ui:
-        csrf:
-            enabled: true
-        disable-swagger-default-url: true
-        path: /ui/swagger-ui
-        show-common-extensions: true
+  api-docs:
+    # Generate Open-API document
+    enabled: true
+    # The path of the Open-API document
+    path: /docs/api-docs
+  swagger-ui:
+    # Swagger UI should not be available at its default URL (instead on location defined in path)
+    disable-swagger-default-url: true
+    # Override default Swagger UI location
+    path: /ui/swagger-ui
+    # Show validation specific information for properties (pattern, minimum, maximum, etc...)
+    show-common-extensions: true
 
