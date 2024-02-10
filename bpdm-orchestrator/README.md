@@ -1,8 +1,7 @@
-# Use Cases
+# BPDM Orchestrator
 
-This folder contains use case descriptions for the BPDM API:
-
-* [Counting Business Partners](count-business-partners.md)
+The BPDM Orchestrator is a passive component that offers standardized APIs for the BPDM Gate, BPDM Pool and Data Curation and Enrichment Services to orchestrate
+the process of Golden Record Creation and handling the different states a business partner record can have during this process.
 
 ## NOTICE
 

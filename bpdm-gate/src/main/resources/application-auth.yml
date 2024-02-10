@@ -19,35 +19,43 @@
 
 bpdm:
   security:
+    # Allowed origins for CORS
     cors-origins: '*'
+    # Whether endpoints should be authenticated/authorized
     enabled: true
-    #Generic OAuth configuration
+    # Base-URL including protocol of the Keycloak server
     auth-server-url: http://localhost:8180
+    # URL to the auth endpoint of the Keycloak server
     auth-url: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}/protocol/openid-connect/auth
+    # This application's resource or client. Used for finding permissions in the given Bearer token
     client-id: BPDM_GATE
+    # The keycloak realm to consider
     realm: master
+    # URL to the token refresh endpoint of the Keycloak server
     refresh-url: ${bpdm.security.token-url}
+    # URL to the token validation endpoint of the Keycloak server
     token-url: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}/protocol/openid-connect/token
     permissions:
+      # Name of the permission to read business partner input data
       readInput: read_input
+      # Name of the permission to upsert input business partner input data
       writeInput: write_input
+      # Name of the permission to read business partner output data
       readOutput: read_output
+      # Name of the permission to upsert business partner output data
       writeOutput: write_input
-
-#Spring OAuth configuration
+#
+# From here on are framework and dependency configuration
+# More information about those properties can be taken from the respective documentation of Spring or the dependency
+#
 spring:
   security:
     oauth2:
       resourceserver:
+        # Infer the uris for token validation from the application's security properties
         jwt:
           issuer-uri: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}
           jwk-set-uri: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}/protocol/openid-connect/certs
-
-#Springdoc configuration
-springdoc:
-  swagger-ui:
-    oauth:
-      client-id: PUBLIC_CLIENT
 
 
 

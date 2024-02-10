@@ -17,111 +17,133 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################################
 
-# Change default port since 8080 is reserved for pool
-server:
-    port: 8081
-
+# BPDM application specific configuration
 bpdm:
+  # Name of this application (shown in Swagger) (on default set by maven resource filtering)
     name: '@project.name@'
+  # Version of this application (shown in Swagger) (on default set by maven resource filtering)
     version: '@project.version@'
+  # Description of this application (shown in Swagger) (on default set by maven resource filtering)
     description: '@project.description@'
-
-    # Configuration specific to the service logic
     bpn:
-        agency-name: Catena-X
-        id: CX_BPN
-        name: Business Partner Number
-        # Insert owner BPNL here
+      # Specify the BPNL of the owner of this Gate here
+      # If set, the BPNL will be attached to business partner data a sharing member claim as their own
+      # This way the golden record process knows who claims the business partner
+      # Additionally, if set and security is enabled all incoming tokens need to have a "BPN" claim with the matching BPNL or otherwise they will not be authorized
         owner-bpn-l:
     api:
+      # The maximum amount of business partner entries a sharing member can upsert per request
         upsert-limit: 100
-
-    # Configuration for golden record tasks
     tasks:
         creation:
             fromSharingMember:
-                batchSize: 100
-                cron: '-'
+              # When and how often the Gate checks for new business partner data to be shared
+              cron: '-'
+              # Up to how many golden record tasks can be created when checking
+              batchSize: 100
             fromPool:
-                batchSize: 100
+              # When and how often the Gate checks for golden record updates from the Pool
                 cron: '-'
+              # Up to how many golden record tasks can be created when checking
+                batchSize: 100
         check:
-            batchSize: 100
+          # When and how often the status of golden record tasks should be checked
             cron: '-'
-
-    # Connection to the pool and orchestrator  [No auth on default]
+          # How many golden record tasks can be checked in one request
+            batchSize: 100
+  # Client connection configuration
     client:
         orchestrator:
+          # The base-url of the Orchestrator-API
             base-url: http://localhost:8085
+          # Connect to the Orchestrator-API without authenticating on default (use orchestrator-auth profile to activate)
             security-enabled: false
         pool:
+          # The base-url of the Pool-API
             base-url: http://localhost:8080
+          # Connect to the Pool-API without authenticating on default (use orchestrator-auth profile to activate)
             security-enabled: false
-
-    # No security on default
     security:
+      # API will not be secured per default
         enabled: false
-
-    # Datasource host
     datasource:
+      # Host name of the used datasource
         host: localhost
-
-# Logging Configuration
+      # The database schema to use for this application
+        schema: bpdmgate
+#
+# From here on are framework and dependency configuration
+# More information about those properties can be taken from the respective documentation of Spring or the dependency
+#
+server:
+  # Change default port to avoid clash with other BPDM applications
+  port: 8081
 logging:
-    unknown-user: Anonymous
     pattern:
+      # Use BPDM custom log pattern
         console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) %green([%-10.10X{user:-System}]) %magenta([%-10.10X{request:-No Request}]) %yellow([%-15.15t]) %cyan(%-40.40logger{39}) : %m%n%wEx"
     level:
+      # On default show only logs from INFO and above
         root: INFO
         org:
             eclipse:
                 tractusx:
                     bpdm:
+                      # Logs from this application's package should be DEBUG and above
                         gate: DEBUG
-
-# Enable actuator endpoints
 management:
     endpoint:
         health:
             probes:
+              # Enable actuator health endpoints for probing
                 enabled: true
     health:
         livenessState:
+          # Include liveness state in health response (responsive at all)
             enabled: true
         readinessState:
+          # Include readiness state in health response (ready to accept traffic)
             enabled: true
-
-# Datasource configuration
 spring:
     datasource:
+      # We use postgres as datasource
         driverClassName: org.postgresql.Driver
+      # No password on default (Change for production)
         password: ''
+      # Connect to postgres database over jdbc protocol
         url: jdbc:postgresql://${bpdm.datasource.host}:5432/bpdm
+      # Default username for BPDM applications
         username: bpdm
-    # Flyway configuration
     flyway:
+      # Activate flyway for automatic database migration
         enabled: true
-        schemas: bpdmgate
-    # Send updates and inserts out in batches to decrease network connections to the database
+      # Apply migrations to this application's default schema
+        schemas: ${bpdm.datasource.schema}
     jpa:
+      # JPA should speak Postgresql
         database-platform: org.hibernate.dialect.PostgreSQLDialect
         properties:
+          # We use hibernate as JPA implementation
             hibernate:
-                default_schema: bpdmgate
-                jdbc:
-                    batch_size: 16
+              # Hibernate should assume the default schema of this application on default
+              default_schema: ${bpdm.datasource.schema}
+              # Send updates and inserts out in batches to decrease network connections to the database
+              jdbc:
+                batch_size: 16
                 order_inserts: true
                 order_updates: true
-
-# Springdoc swagger configuration
 springdoc:
     api-docs:
-        path: /docs/api-docs
+      # Generate Open-API document
+      enabled: true
+      # Set custom path for the document
+      path: /docs/api-docs
     swagger-ui:
-        csrf:
-            enabled: true
+      # Swagger UI should not be available at its default URL (instead on location defined in path)
         disable-swagger-default-url: true
+      # Override default Swagger UI location
         path: /ui/swagger-ui
+      # Show validation specific information for properties (pattern, minimum, maximum, etc...)
         show-common-extensions: true
 
 

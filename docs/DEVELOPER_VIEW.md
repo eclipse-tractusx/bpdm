@@ -1,3 +1,29 @@
+# Developer View
+
+Documentation here concerns developers who want to contribute to this repository.
+
+## License Check
+
+Licenses of all maven dependencies need to be approved by eclipse.
+The Eclipse Dash License Tool can be used to check the license approval status of dependencies and to request reviews by the intellectual property team.
+
+Generate summary of dependencies and their approval status:
+
+```bash
+mvn org.eclipse.dash:license-tool-plugin:license-check -Ddash.summary=DEPENDENCIES
+```
+
+Automatically create IP Team review requests:
+
+```bash
+mvn org.eclipse.dash:license-tool-plugin:license-check -Ddash.iplab.token=<token>
+```
+
+Check the [Eclipse Dash License Tool documentation](https://github.com/eclipse/dash-licenses) for more detailed information.
+
+## Branching Strategy
+
+```mermaid
 ---
 title: BPDM Branching Strategy
 ---
@@ -35,4 +61,4 @@ gitGraph
     checkout main
     branch "fix/C"
     commit id: "fix(C)"
-
+```
