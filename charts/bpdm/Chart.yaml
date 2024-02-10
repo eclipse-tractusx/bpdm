@@ -22,7 +22,7 @@ apiVersion: v2
 name: bpdm
 type: application
 description: A Helm chart for Kubernetes that deploys the BPDM applications
-version: 4.0.0-alpha.8
+version: 4.0.0-alpha.9
 appVersion: "5.0.0-alpha.6"
 home: https://github.com/eclipse-tractusx/bpdm
 sources:
@@ -41,7 +41,7 @@ dependencies:
     alias: bpdm-pool
     condition: bpdm-pool.enabled
   - name: bpdm-bridge-dummy
-    version: 2.0.0-alpha.8
+    version: 2.0.0-alpha.9
     alias: bpdm-bridge-dummy
     condition: bpdm-bridge-dummy.enabled
   - name: bpdm-cleaning-service-dummy
