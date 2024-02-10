@@ -4,12 +4,26 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
-## [5.0.0] - [unreleased]
+## [5.0.0] - [2024-02-10]
 
-### Fixed
+## Added
 
-- BPDM Modules: Update Spring version to 3.1.7 to fix vulnerabilities 
+- Golden Record Process Use Case: Update sharing member business partner from update in golden record
+- BPDM Gate: Stats endpoints
+- BPDM Gate: Additional possible roles to business partner
+- BPDM Cleaning Service Dummy: Duplicate check based on business partner name
+- Confidence criteria for all data models
 
+### Changed
+
+- Increase Spring Boot version to 3.1.8
+- Changed generic business partner model to include LSA typed properties
+- Addresses can now be legal and site main addresses at the same time
+- BPDM Gate: Refuse request if token is not issued for owner BPNL
+
+### Deleted
+
+- BPDM Pool: Opensearch component
 
 ## [4.1.0] - 2023-11-03
 
