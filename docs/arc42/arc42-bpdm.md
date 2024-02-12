@@ -19,6 +19,9 @@
   - [Upload Business Partner (BPN-L)](#upload-business-partner-bpn-l)
   - [Upsert Generic Business Partner](#upsert-generic-business-partner)
   - [Update on Golden Record Change](#update-on-golden-record-change)
+- [Business Partner Data Records - States](#business-partner-data-records---states)
+  - [Automatically executing golden record process](#automatically-executing-golden-record-process)
+  - [Manually triggering golden record process](#manually-triggering-golden-record-process)
 - [Deployment View](#deployment-view)
   - [Applications Deployment without Kubernetes](#applications-deployment-without-kubernetes)
   - [Single Application Kubernetes Deployment](#single-application-kubernetes-deployment)
@@ -29,6 +32,7 @@
 - [Quality Requirements](#quality-requirements)
 - [Risks and Technical Debts](#risks-and-technical-debts)
 - [Glossary](#glossary)
+  - [NOTICE](#notice)
 
 # Introduction and Goals
 
@@ -42,7 +46,8 @@ The BPN, as the unique identifier of the Golden Record, can be stored as a verif
 
 The Golden Record business partner data in combination with the BPN acts as the basis for a range of supplementary value-added services to optimize business partner data management. These are referred to as value-added services. Together with decentralized, self-determined identity management, they create a global, cross-industry standard for business partner data and a possible 360° view of the value chain. 
 
-> ⚠️ **HINT**: A Business Partner Data cleaning as well as Golden Record Creation Process is **not** part of this reference implementation!
+> [!NOTE]
+> A Business Partner Data cleaning as well as Golden Record Creation Process is **not** part of this reference implementation!
 
 **Additional Information Material**:
 * Visit BPDM on the official Catena-X Website: [bpdm_catenax_website](https://catena-x.net/en/offers-standards/bpdm)
@@ -62,7 +67,8 @@ The following goals have been established for this system:
 
 ## Requirements Overview
 
-> :warning: **Note:** Cross-Check with CACs
+> [!IMPORTANT]
+> **Cross-Check with CACs**
 
 
 ![bpdm_usecase_diagram](../assets/usecase_diagram.drawio.svg)
@@ -291,6 +297,10 @@ sequenceDiagram
 
 ## Upsert Generic Business Partner
 
+> [!NOTE]
+> An additional endpoint was implemented as requirements came up that required business partner data records not to be fed directly into the golden record process after an upload. Instead, this endpoint makes it possible to change the status of a business partner data record from "inital" to "ready". Only data records with the status "ready" are fed into the golden record process.
+> We are aware that the existing integration scenarios, such as with the portal team, are impacted by this. For this reason, we recommend that the gate is configured accordingly so that the status is set to "ready" by default when a data record is uploaded. The operator can configure this behavior in the gate individually based on the requirements.
+
 ```mermaid
 sequenceDiagram
     autonumber
@@ -410,6 +420,47 @@ sequenceDiagram
     SharingMember->>Gate: POST api/catena/output/business-partners/search <br> Payload: External ID
     Gate-->>SharingMember: Business Partner Output
     
+```
+
+# Business Partner Data Records - States
+
+This sections describes the different states a business partner data record can have.
+
+## Automatically executing golden record process
+
+```mermaid
+---
+title: state diagram business partner for automatically executing golden record process
+---
+stateDiagram-v2
+    [*] --> ready: sharing member uploads bp into gate
+    note right of ready
+      Gate is configured to automatically <br> set state to ready after bp upload
+    end note
+    ready --> pending: scheduler initiates <br> the golden record process
+    state if_state <<choice>>
+    pending --> if_state: run golden record process
+    if_state --> success: if golden record process succeeded
+    if_state --> error: if golden record process failed
+```
+
+## Manually triggering golden record process
+
+```mermaid
+---
+title: state diagram business partner for manual golden record process triggering
+---
+stateDiagram-v2
+    [*] --> initial: sharing member uploads bp into gate
+    note right of initial
+      POST api/catena/sharing-state/ready <br> Payload: External ID A
+    end note
+    initial --> ready: sharing member or third-party <br> service calls separate endpoint
+    ready --> pending: scheduler initiates <br> the golden record process
+    state if_state <<choice>>
+    pending --> if_state: run golden record process
+    if_state --> success: if golden record process succeeded
+    if_state --> error: if golden record process failed
 ```
 
 # Deployment View
@@ -554,6 +605,7 @@ In addition to the Spring standard logs the BPDM applications keep a log of the 
 * [003-orchestrator_serviceApi_vs_messagebus_approach](../decision-records/003-orchestrator_serviceApi_vs_messagebus_approach.md)
 * [004-openapi_descriptions](../decision-records/004-openapi_descriptions.md)
 * [005-edc-usage-for-third-party-services](../decision-records/005-edc-usage-for-third-party-services.md)
+* [006-bpdm-edc-asset-structuring (TBD)](../decision-records/006-bpdm-edc-asset-structuring.md)
 
 # Quality Requirements
 
