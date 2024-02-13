@@ -21,7 +21,6 @@ package org.eclipse.tractusx.bpdm.gate.controller
 
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
-import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
@@ -50,7 +49,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 internal class SiteControllerInputIT @Autowired constructor(
     val gateClient: GateClient,
     private val siteRepository: SiteRepository,
-    private val dbTestHelpers: DbTestHelpers
+    private val testHelpers: DbTestHelpers,
 ) {
     companion object {
         @RegisterExtension
@@ -62,7 +61,7 @@ internal class SiteControllerInputIT @Autowired constructor(
 
     @BeforeEach
     fun beforeEach() {
-        dbTestHelpers.truncateDbTables()
+        testHelpers.truncateDbTables()
     }
 
     /**
@@ -87,7 +86,8 @@ internal class SiteControllerInputIT @Autowired constructor(
 
         val site = gateClient.sites.getSiteByExternalId(BusinessPartnerVerboseValues.externalIdSite1)
 
-        assertThat(site).usingRecursiveComparison().ignoringFieldsMatchingRegexes(".*administrativeAreaLevel1*").isEqualTo(expectedSite)
+        testHelpers.assertRecursively(site).isEqualTo(expectedSite)
+
     }
 
     /**
@@ -124,7 +124,6 @@ internal class SiteControllerInputIT @Autowired constructor(
 
         val totalElements = 2L
         val totalPages = 1
-        val pageValue = 0
         val contentSize = 2
 
         val legalEntities = listOf(
@@ -143,15 +142,15 @@ internal class SiteControllerInputIT @Autowired constructor(
         val paginationValue = PaginationRequest(page, size)
         val pageResponse = gateClient.sites.getSites(paginationValue)
 
-        assertThat(pageResponse).usingRecursiveComparison().ignoringFieldsMatchingRegexes(".*administrativeAreaLevel1*").isEqualTo(
-            PageDto(
-                totalElements = totalElements,
-                totalPages = totalPages,
-                page = pageValue,
-                contentSize = contentSize,
-                content = expectedSites
-            )
+        val expectedPage = PageDto(
+            totalElements,
+            totalPages,
+            page,
+            contentSize,
+            content = expectedSites
         )
+
+        testHelpers.assertRecursively(pageResponse).isEqualTo(expectedPage)
 
     }
 
@@ -172,7 +171,6 @@ internal class SiteControllerInputIT @Autowired constructor(
 
         val totalElements = 2L
         val totalPages = 1
-        val pageValue = 0
         val contentSize = 2
 
         val legalEntities = listOf(
@@ -193,15 +191,15 @@ internal class SiteControllerInputIT @Autowired constructor(
         val paginationValue = PaginationRequest(page, size)
         val pageResponse = gateClient.sites.getSitesByExternalIds(paginationValue, externalIds)
 
-        assertThat(pageResponse).usingRecursiveComparison().ignoringFieldsMatchingRegexes(".*administrativeAreaLevel1*").isEqualTo(
-            PageDto(
-                totalElements = totalElements,
-                totalPages = totalPages,
-                page = pageValue,
-                contentSize = contentSize,
-                content = expectedSites
-            )
+        val expectedPage = PageDto(
+            totalElements,
+            totalPages,
+            page,
+            contentSize,
+            content = expectedSites
         )
+
+        testHelpers.assertRecursively(pageResponse).isEqualTo(expectedPage)
     }
 
     /**

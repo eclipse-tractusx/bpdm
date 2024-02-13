@@ -21,7 +21,6 @@ package org.eclipse.tractusx.bpdm.gate.controller
 
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
-import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.model.StageType
@@ -169,9 +168,8 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
             content = expectedLegalEntities
         )
 
-        assertThat(pageResponse).usingRecursiveComparison().ignoringCollectionOrder().ignoringAllOverriddenEquals()
-            .ignoringFieldsMatchingRegexes(".*processStartedAt*", ".*administrativeAreaLevel1*.")
-            .isEqualTo(expectedPage)
+        testHelpers.assertRecursively(pageResponse).isEqualTo(expectedPage)
+
     }
 
     /**
@@ -209,7 +207,10 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
         gateClient.legalEntities.upsertLegalEntities(legalEntities)
         gateClient.legalEntities.upsertLegalEntitiesOutput(legalEntitiesOutput)
 
-        val pageResponse = gateClient.legalEntities.getLegalEntitiesOutput(paginationValue, listOf(BusinessPartnerVerboseValues.externalId1, BusinessPartnerVerboseValues.externalId2))
+        val pageResponse = gateClient.legalEntities.getLegalEntitiesOutput(
+            paginationValue,
+            listOf(BusinessPartnerVerboseValues.externalId1, BusinessPartnerVerboseValues.externalId2)
+        )
 
         val expectedPage = PageDto(
             totalElements,
@@ -219,8 +220,8 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
             content = expectedLegalEntities
         )
 
-        assertThat(pageResponse).usingRecursiveComparison().ignoringCollectionOrder().ignoringAllOverriddenEquals()
-            .ignoringFieldsMatchingRegexes(".*processStartedAt*", ".*administrativeAreaLevel1*.")
-            .isEqualTo(expectedPage)
+        testHelpers.assertRecursively(pageResponse).isEqualTo(expectedPage)
+
     }
+
 }

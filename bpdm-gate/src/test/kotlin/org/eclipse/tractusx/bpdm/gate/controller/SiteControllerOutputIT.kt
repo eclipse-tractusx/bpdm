@@ -21,7 +21,6 @@ package org.eclipse.tractusx.bpdm.gate.controller
 
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
-import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.model.StageType
@@ -164,7 +163,6 @@ internal class SiteControllerOutputIT @Autowired constructor(
 
         val totalElements = 2L
         val totalPages = 1
-        val pageValue = 0
         val contentSize = 2
 
         val sites = listOf(
@@ -195,15 +193,16 @@ internal class SiteControllerOutputIT @Autowired constructor(
         val paginationValue = PaginationRequest(page, size)
         val pageResponse = gateClient.sites.getSitesOutput(paginationValue, emptyList())
 
-        assertThat(pageResponse).usingRecursiveComparison().ignoringFieldsMatchingRegexes(".*administrativeAreaLevel1*", ".*processStartedAt*").isEqualTo(
-            PageDto(
-                totalElements = totalElements,
-                totalPages = totalPages,
-                page = pageValue,
-                contentSize = contentSize,
-                content = expectedSites
-            )
+        val expectedPage = PageDto(
+            totalElements,
+            totalPages,
+            page,
+            contentSize,
+            content = expectedSites
         )
+
+        testHelpers.assertRecursively(pageResponse).isEqualTo(expectedPage)
+
     }
 
     /**
@@ -223,7 +222,6 @@ internal class SiteControllerOutputIT @Autowired constructor(
 
         val totalElements = 2L
         val totalPages = 1
-        val pageValue = 0
         val contentSize = 2
 
         val sites = listOf(
@@ -252,16 +250,18 @@ internal class SiteControllerOutputIT @Autowired constructor(
         gateClient.sites.upsertSitesOutput(sitesOutput)
 
         val paginationValue = PaginationRequest(page, size)
-        val pageResponse = gateClient.sites.getSitesOutput(paginationValue, listOf(BusinessPartnerVerboseValues.externalIdSite1, BusinessPartnerVerboseValues.externalIdSite2))
+        val pageResponse =
+            gateClient.sites.getSitesOutput(paginationValue, listOf(BusinessPartnerVerboseValues.externalIdSite1, BusinessPartnerVerboseValues.externalIdSite2))
 
-        assertThat(pageResponse).usingRecursiveComparison().ignoringFieldsMatchingRegexes(".*administrativeAreaLevel1*", ".*processStartedAt*").isEqualTo(
-            PageDto(
-                totalElements = totalElements,
-                totalPages = totalPages,
-                page = pageValue,
-                contentSize = contentSize,
-                content = expectedSites
-            )
+        val expectedPage = PageDto(
+            totalElements,
+            totalPages,
+            page,
+            contentSize,
+            content = expectedSites
         )
+
+        testHelpers.assertRecursively(pageResponse).isEqualTo(expectedPage)
+
     }
 }
