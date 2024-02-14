@@ -23,21 +23,4 @@ import org.eclipse.tractusx.bpdm.common.exception.BpdmExceptionHandler
 import org.springframework.web.bind.annotation.ControllerAdvice
 
 @ControllerAdvice
-class GateExceptionHandler : BpdmExceptionHandler() {
-//    override fun resolveException(
-//        request: HttpServletRequest,
-//        response: HttpServletResponse,
-//        handler: Any?,
-//        ex: Exception
-//    ): ModelAndView? {
-//        if (ex is HttpMessageNotReadableException) {
-//            val errorMessage = "Invalid JSON request. Please check your request payload."
-//            val responseBody = ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage)
-//            response.status = HttpStatus.BAD_REQUEST.value()
-//            response.writer.write(responseBody.toString())
-//            return ModelAndView()
-//        }
-//        // Handle other exceptions as needed
-//        return null
-//    }
-}
+class GateExceptionHandler : BpdmExceptionHandler()

@@ -19,15 +19,15 @@
 
 package org.eclipse.tractusx.bpdm.common.exception
 
-import jakarta.servlet.http.HttpServletRequest
-import jakarta.servlet.http.HttpServletResponse
 import mu.KotlinLogging
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatusCode
 import org.springframework.http.ResponseEntity
+import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.context.request.WebRequest
-import org.springframework.web.servlet.ModelAndView
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 import kotlin.reflect.full.findAnnotations
 
@@ -35,6 +35,17 @@ import kotlin.reflect.full.findAnnotations
 open class BpdmExceptionHandler : ResponseEntityExceptionHandler() {
 
     private val kotlinLogger = KotlinLogging.logger { }
+
+    override fun handleHttpMessageNotReadable(
+        ex: HttpMessageNotReadableException,
+        headers: HttpHeaders,
+        status: HttpStatusCode,
+        request: WebRequest
+    ): ResponseEntity<Any>? {
+        logException(ex)
+        val body = createProblemDetail(ex, status, ex.toString(), null as String?, null as Array<Any?>?, request)
+        return handleExceptionInternal(ex, body, headers, status, request)
+    }
 
     @ExceptionHandler(value = [Exception::class])
     protected fun logException(
@@ -54,9 +65,5 @@ open class BpdmExceptionHandler : ResponseEntityExceptionHandler() {
             logger.debug(ex)
         }
 
-    }
-
-    open fun resolveException(request: HttpServletRequest, response: HttpServletResponse, handler: Any?, ex: Exception): ModelAndView? {
-        TODO("Not yet implemented")
     }
 }
