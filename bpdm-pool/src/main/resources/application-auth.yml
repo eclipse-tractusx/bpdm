@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2021,2023 Contributors to the Eclipse Foundation
+# Copyright (c) 2021,2024 Contributors to the Eclipse Foundation
 #
 # See the NOTICE file(s) distributed with this work for additional
 # information regarding copyright ownership.
@@ -18,26 +18,41 @@
 ################################################################################
 
 bpdm:
-  pool-security:
-    changeMetaData: change_meta_data
-    changePoolPartnerData: change_pool_partner_data
-    readMetaData: read_meta_data
-    readPoolPartnerData: read_pool_partner_data
-
   security:
-    auth-server-url: http://localhost:8180
-    auth-url: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}/protocol/openid-connect/auth
-    client-id: BPDM_Client
+    # Allowed origins for CORS
     cors-origins: '*'
+    # Whether endpoints should be authenticated/authorized
     enabled: true
+    # Base-URL including protocol of the Keycloak server
+    auth-server-url: http://localhost:8180
+    # URL to the auth endpoint of the Keycloak server
+    auth-url: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}/protocol/openid-connect/auth
+    # This application's resource or client. Used for finding permissions in the given Bearer token
+    client-id: BPDM_POOL
+    # The keycloak realm to consider
     realm: master
+    # URL to the token refresh endpoint of the Keycloak server
     refresh-url: ${bpdm.security.token-url}
+    # URL to the token validation endpoint of the Keycloak server
     token-url: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}/protocol/openid-connect/token
-
+    permissions:
+      # Name of the permission to read business partners
+      readPartner: read_partner
+      # Name of the permissions to upsert business partners
+      writePartner: write_partner
+      # Name of the permission to read metadata
+      readMetaData: read_meta_data
+      # Name of the permission to create new metadata
+      writeMetaData: write_meta_data
+#
+# From here on are framework and dependency configuration
+# More information about those properties can be taken from the respective documentation of Spring or the dependency
+#
 spring:
   security:
     oauth2:
       resourceserver:
+        # Infer the uris for token validation from the application's security properties
         jwt:
           issuer-uri: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}
           jwk-set-uri: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}/protocol/openid-connect/certs

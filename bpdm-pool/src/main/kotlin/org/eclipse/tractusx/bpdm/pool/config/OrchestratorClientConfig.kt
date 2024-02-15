@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021,2023 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021,2024 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -19,28 +19,46 @@
 
 package org.eclipse.tractusx.bpdm.pool.config
 
+import org.eclipse.tractusx.bpdm.common.util.BpdmWebClientProvider
+import org.eclipse.tractusx.bpdm.common.util.ClientConfigurationProperties
+import org.eclipse.tractusx.bpdm.common.util.ConditionalOnBoundProperty
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClientImpl
+import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.http.HttpHeaders
-import org.springframework.http.MediaType
-import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
 
+
+@ConfigurationProperties(prefix = OrchestratorClientConfigProperties.PREFIX)
+data class OrchestratorClientConfigProperties(
+    override val baseUrl: String = "http://localhost:8085",
+    override val securityEnabled: Boolean = false,
+    override val oauth2ClientRegistration: String = "orchestrator-client"
+) : ClientConfigurationProperties {
+    companion object {
+        const val PREFIX = "${ClientConfigurationProperties.PREFIX}.orchestrator"
+    }
+}
 
 @Configuration
-class OrchestratorClientConfig {
+class OrchestratorClientConfiguration(
+    clientProperties: OrchestratorClientConfigProperties,
+) : BpdmWebClientProvider(
+    clientProperties
+) {
+    @Bean
+    @ConditionalOnBoundProperty(OrchestratorClientConfigProperties.PREFIX, OrchestratorClientConfigProperties::class, true)
+    fun authorizedOrchestratorClient(
+        clientRegistrationRepository: ClientRegistrationRepository,
+        oAuth2AuthorizedClientService: OAuth2AuthorizedClientService
+    ): OrchestrationApiClient =
+        OrchestrationApiClientImpl { provideAuthorizedClient(clientRegistrationRepository, oAuth2AuthorizedClientService) }
 
     @Bean
-    fun orchestratorClientNoAuth(configProperties: OrchestratorClientConfigProperties): OrchestrationApiClient {
-        val url = configProperties.baseUrl
-        return OrchestrationApiClientImpl { webClientBuilder(url).build() }
-    }
-
-
-    private fun webClientBuilder(url: String) =
-        WebClient.builder()
-            .baseUrl(url)
-            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-
+    @ConditionalOnBoundProperty(OrchestratorClientConfigProperties.PREFIX, OrchestratorClientConfigProperties::class, false)
+    fun unauthorizedOrchestratorClient(): OrchestrationApiClient =
+        OrchestrationApiClientImpl { provideUnauthorizedClient() }
 }
+

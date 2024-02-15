@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021,2023 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021,2024 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.gate.controller
 
-import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
@@ -27,7 +26,10 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.repository.SiteRepository
-import org.eclipse.tractusx.bpdm.gate.util.*
+import org.eclipse.tractusx.bpdm.gate.util.BusinessPartnerNonVerboseValues
+import org.eclipse.tractusx.bpdm.gate.util.BusinessPartnerVerboseValues
+import org.eclipse.tractusx.bpdm.gate.util.DbTestHelpers
+import org.eclipse.tractusx.bpdm.gate.util.PostgreSQLContextInitializer
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue

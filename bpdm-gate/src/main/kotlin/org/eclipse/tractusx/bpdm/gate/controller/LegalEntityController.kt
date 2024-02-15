@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021,2023 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021,2024 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -27,6 +27,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateOutputReq
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityGateInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityGateOutputResponse
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
+import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.service.LegalEntityService
 import org.eclipse.tractusx.bpdm.gate.util.containsDuplicates
 import org.springframework.http.HttpStatus
@@ -39,7 +40,7 @@ class LegalEntityController(
     val legalEntityService: LegalEntityService,
     val apiConfigProperties: ApiConfigProperties
 ) : GateLegalEntityApi {
-    @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getChangeCompanyInputDataAsRole())")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_INPUT_AUTHORITY})")
     override fun upsertLegalEntities(legalEntities: Collection<LegalEntityGateInputRequest>): ResponseEntity<Unit> {
         if (legalEntities.size > apiConfigProperties.upsertLimit || legalEntities.map { it.externalId }.containsDuplicates()) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
@@ -48,12 +49,12 @@ class LegalEntityController(
         return ResponseEntity(HttpStatus.OK)
     }
 
-    @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyInputDataAsRole())")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_INPUT_AUTHORITY})")
     override fun getLegalEntityByExternalId(externalId: String): LegalEntityGateInputDto {
         return legalEntityService.getLegalEntityByExternalId(externalId)
     }
 
-    @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyInputDataAsRole())")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_INPUT_AUTHORITY})")
     override fun getLegalEntitiesByExternalIds(
         paginationRequest: PaginationRequest,
         externalIds: Collection<String>
@@ -61,12 +62,12 @@ class LegalEntityController(
         return legalEntityService.getLegalEntities(page = paginationRequest.page, size = paginationRequest.size, externalIds = externalIds)
     }
 
-    @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyInputDataAsRole())")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_INPUT_AUTHORITY})")
     override fun getLegalEntities(paginationRequest: PaginationRequest): PageDto<LegalEntityGateInputDto> {
         return legalEntityService.getLegalEntities(page = paginationRequest.page, size = paginationRequest.size)
     }
 
-    @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyOutputDataAsRole())")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_OUTPUT_AUTHORITY})")
     override fun getLegalEntitiesOutput(
         paginationRequest: PaginationRequest,
         externalIds: Collection<String>?
@@ -74,7 +75,7 @@ class LegalEntityController(
         return legalEntityService.getLegalEntitiesOutput(externalIds = externalIds, page = paginationRequest.page, size = paginationRequest.size)
     }
 
-    @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getChangeCompanyOutputDataAsRole())")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_OUTPUT_AUTHORITY})")
     override fun upsertLegalEntitiesOutput(legalEntities: Collection<LegalEntityGateOutputRequest>): ResponseEntity<Unit> {
         if (legalEntities.size > apiConfigProperties.upsertLimit || legalEntities.map { it.externalId }.containsDuplicates()) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)

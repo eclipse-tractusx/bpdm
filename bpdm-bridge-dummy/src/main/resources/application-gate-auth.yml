@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2021,2023 Contributors to the Eclipse Foundation
+# Copyright (c) 2021,2024 Contributors to the Eclipse Foundation
 #
 # See the NOTICE file(s) distributed with this work for additional
 # information regarding copyright ownership.
@@ -21,21 +21,34 @@
 bpdm:
   client:
     gate:
+      # Name of the Spring oauth2 client registration entry for connecting to the Gate
+      # This registration will be used to configure this application's webclients that want to access the Gate
       oauth2-client-registration: gate-client
+      # Whether to enable oauth2 authentication when connecting to the Gate
       security-enabled: true
-
+#
+# From here on are framework and dependency configuration
+# More information about those properties can be taken from the respective documentation of Spring or the dependency
+#
 spring:
   security:
     oauth2:
       client:
         provider:
+          # Create an oauth2 provider for the gate and infer token issuing uri from the security properties
+          # If auth profile is not set use equivalent defaults
           gate-oauth2-provider:
             issuer-uri: ${bpdm.security.auth-server-url:http://localhost:8180}/realms/${bpdm.security.realm:master}
         registration:
+          # Register oauth2 client information on how to acquire a token for the Gate
           gate-client:
+            # The gate client should use client credentials mechanism to request a token from the provider
             authorization-grant-type: client_credentials
-            client-id: ${bpdm.security.client-id}
-            client-secret: ${bpdm.security.credentials.secret}
+            # Use a default client id for the client credentials request
+            client-id: BPDM_GATE_CLIENT
+            # No secret on default (please update credentials for production)
+            client-secret:
+            # Use the specified provider above to infer the issuing token uri
             provider: gate-oauth2-provider
 
 

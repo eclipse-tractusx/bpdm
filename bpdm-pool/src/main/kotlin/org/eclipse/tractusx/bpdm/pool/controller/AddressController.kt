@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021,2023 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021,2024 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -30,6 +30,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerUpdateRequ
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerUpdateResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.service.AddressService
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
 import org.eclipse.tractusx.bpdm.pool.service.SearchService
@@ -43,7 +44,7 @@ class AddressController(
     private val searchService: SearchService
 ) : PoolAddressApi {
 
-    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadPoolPartnerDataAsRole())")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun getAddresses(
         addressSearchRequest: AddressPartnerSearchRequest,
         paginationRequest: PaginationRequest
@@ -52,14 +53,14 @@ class AddressController(
         return searchService.searchAddresses(addressSearchRequest, paginationRequest)
     }
 
-    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadPoolPartnerDataAsRole())")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun getAddress(
         bpna: String
     ): LogisticAddressVerboseDto {
         return addressService.findByBpn(bpna.uppercase())
     }
 
-    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadPoolPartnerDataAsRole())")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun searchAddresses(
         addressSearchRequest: AddressPartnerBpnSearchRequest,
         paginationRequest: PaginationRequest
@@ -67,14 +68,14 @@ class AddressController(
         return addressService.findByPartnerAndSiteBpns(addressSearchRequest, paginationRequest)
     }
 
-    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getChangePoolPartnerDataAsRole())")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")
     override fun createAddresses(
         requests: Collection<AddressPartnerCreateRequest>
     ): AddressPartnerCreateResponseWrapper {
         return businessPartnerBuildService.createAddresses(requests)
     }
 
-    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getChangePoolPartnerDataAsRole())")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")
     override fun updateAddresses(
         requests: Collection<AddressPartnerUpdateRequest>
     ): AddressPartnerUpdateResponseWrapper {

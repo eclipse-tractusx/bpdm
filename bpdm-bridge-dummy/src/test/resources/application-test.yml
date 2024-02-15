@@ -23,7 +23,7 @@ bpdm:
 
   client:
     pool:
-      alias: bpdm-pool
+      base-url: bpdm-pool
 
 logging:
   level:

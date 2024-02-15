@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
-## [4.0.0] - tbd
+## [4.0.0] - 2024-02-10
 
 ### Changed
 
@@ -14,6 +14,7 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 - update BPDM Orchestrator Chart to version 2.0.0
 - update BPDM Cleaning Service Dummy Chart to version 2.0.0
 - update BPDM Bridge Chart to version 2.0.0
+- update copyright for 2024
 
 ## [3.1.2] - 2023-11-16
 

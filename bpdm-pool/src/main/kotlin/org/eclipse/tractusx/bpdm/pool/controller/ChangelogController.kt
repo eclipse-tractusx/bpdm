@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021,2023 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021,2024 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.pool.api.PoolChangelogApi
 import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryVerboseDto
 import org.eclipse.tractusx.bpdm.pool.config.ControllerConfigProperties
+import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmRequestSizeException
 import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
 import org.springframework.security.access.prepost.PreAuthorize
@@ -36,7 +37,7 @@ class ChangelogController(
     private val controllerConfigProperties: ControllerConfigProperties
 ) : PoolChangelogApi {
 
-    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadPoolPartnerDataAsRole())")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun getChangelogEntries(
         changelogSearchRequest: ChangelogSearchRequest,
         paginationRequest: PaginationRequest

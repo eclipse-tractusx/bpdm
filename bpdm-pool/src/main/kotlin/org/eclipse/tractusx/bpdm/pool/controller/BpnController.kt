@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021,2023 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021,2024 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -23,6 +23,7 @@ import org.eclipse.tractusx.bpdm.pool.api.PoolBpnApi
 import org.eclipse.tractusx.bpdm.pool.api.model.request.IdentifiersSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingDto
 import org.eclipse.tractusx.bpdm.pool.config.ControllerConfigProperties
+import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerFetchService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -36,7 +37,7 @@ class BpnController(
     val controllerConfigProperties: ControllerConfigProperties
 ) : PoolBpnApi {
 
-    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadPoolPartnerDataAsRole())")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun findBpnsByIdentifiers(@RequestBody request: IdentifiersSearchRequest): ResponseEntity<Set<BpnIdentifierMappingDto>> {
         if (request.idValues.size > controllerConfigProperties.searchRequestLimit) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)

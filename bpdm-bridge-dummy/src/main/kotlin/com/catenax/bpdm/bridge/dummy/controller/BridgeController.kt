@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021,2023 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021,2024 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -19,6 +19,7 @@
 
 package com.catenax.bpdm.bridge.dummy.controller
 
+import com.catenax.bpdm.bridge.dummy.config.PermissionConfigProperties
 import com.catenax.bpdm.bridge.dummy.service.SyncService
 import io.swagger.v3.oas.annotations.Operation
 import org.springframework.security.access.prepost.PreAuthorize
@@ -34,7 +35,7 @@ class BridgeController(
         summary = "Start sync between Gate and Pool"
     )
     @PostMapping("/sync")
-    @PreAuthorize("hasAnyAuthority(@bridgeAuthProperties.syncAuthority)")
+    @PreAuthorize("hasAnyAuthority(${PermissionConfigProperties.SYNC})")
     override fun triggerSync() {
         syncService.sync()
     }

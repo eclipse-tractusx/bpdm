@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021,2023 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021,2024 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -23,6 +23,7 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.RequestWithKey
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorCode
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
+import org.eclipse.tractusx.bpdm.pool.config.GoldenRecordTaskConfigProperties
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
@@ -35,15 +36,16 @@ class TaskStepFetchAndReserveService(
     private val orchestrationClient: OrchestrationApiClient,
     private val taskStepBuildService: TaskStepBuildService,
     private val requestValidationService: RequestValidationService,
-    private val bpnRequestIdentifierRepository: BpnRequestIdentifierRepository
+    private val bpnRequestIdentifierRepository: BpnRequestIdentifierRepository,
+    private val goldenRecordTaskConfigProperties: GoldenRecordTaskConfigProperties
 ) {
     private val logger = KotlinLogging.logger { }
 
-    @Scheduled(cron = "\${bpdm.client.pool-orchestrator.golden-record-scheduler-cron-expr:-}", zone = "UTC")
+    @Scheduled(cron = "#{${GoldenRecordTaskConfigProperties.GET_CRON}}", zone = "UTC")
     fun fetchAndReserve() {
         try {
             logger.info { "Starting polling for cleaning tasks from Orchestrator..." }
-            val reservationRequest = TaskStepReservationRequest(step = TaskStep.PoolSync, amount = 10)
+            val reservationRequest = TaskStepReservationRequest(step = TaskStep.PoolSync, amount = goldenRecordTaskConfigProperties.batchSize)
             val taskStepReservation = orchestrationClient.goldenRecordTasks.reserveTasksForStep(reservationRequest = reservationRequest)
 
             logger.info { "${taskStepReservation.reservedTasks.size} tasks found for cleaning. Proceeding with cleaning..." }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021,2023 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021,2024 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.PoolMetadataApi
 import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
+import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.service.MetadataService
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
@@ -37,12 +38,12 @@ class MetadataController(
     val metadataService: MetadataService
 ) : PoolMetadataApi {
 
-    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getChangeMetaDataAsRole())")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_METADATA})")
     override fun createIdentifierType(identifierType: IdentifierTypeDto): IdentifierTypeDto {
         return metadataService.createIdentifierType(identifierType)
     }
 
-    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadMetaDataAsRole())")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
     override fun getIdentifierTypes(
         paginationRequest: PaginationRequest,
         businessPartnerType: IdentifierBusinessPartnerType,
@@ -51,32 +52,32 @@ class MetadataController(
         return metadataService.getIdentifierTypes(PageRequest.of(paginationRequest.page, paginationRequest.size), businessPartnerType, country)
     }
 
-    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getChangeMetaDataAsRole())")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_METADATA})")
     override fun createLegalForm(type: LegalFormRequest): LegalFormDto {
         return metadataService.createLegalForm(type)
     }
 
-    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadMetaDataAsRole())")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
     override fun getLegalForms(paginationRequest: PaginationRequest): PageDto<LegalFormDto> {
         return metadataService.getLegalForms(PageRequest.of(paginationRequest.page, paginationRequest.size))
     }
 
-    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadMetaDataAsRole())")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
     override fun getFieldQualityRules(country: CountryCode): ResponseEntity<Collection<FieldQualityRuleDto>> {
         return ResponseEntity(metadataService.getFieldQualityRules(country), HttpStatus.OK)
     }
 
-    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadMetaDataAsRole())")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
     override fun getAdminAreasLevel1(paginationRequest: PaginationRequest): PageDto<CountrySubdivisionDto> {
         return metadataService.getCountrySubdivisions(paginationRequest)
     }
 
-    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadMetaDataAsRole())")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
     override fun getRegions(paginationRequest: PaginationRequest): PageDto<RegionDto> {
         return metadataService.getRegions(paginationRequest)
     }
 
-    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getChangeMetaDataAsRole())")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_METADATA})")
     override fun createRegion(type: RegionDto): RegionDto {
         return metadataService.createRegion(type)
     }

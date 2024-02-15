@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021,2023 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021,2024 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -27,5 +27,5 @@ data class BpnConfigProperties(
     val agencyName: String = "Catena-X",
     var name: String = "Business Partner Number",
     val id: String = "CX_BPN",
-    val ownerBpnL: String? = null
+    val ownerBpnL: String = ""
 )

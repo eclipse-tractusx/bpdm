@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021,2023 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021,2024 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -52,19 +52,19 @@ import java.util.stream.Collectors
  * }
  *
  */
-class CustomJwtAuthenticationConverter(private val resourceId: String, private val requiredBpn: String? = null) : Converter<Jwt, AbstractAuthenticationToken> {
+class CustomJwtAuthenticationConverter(private val resourceId: String, private val requiredBpn: String = "") : Converter<Jwt, AbstractAuthenticationToken> {
     private val defaultGrantedAuthoritiesConverter = JwtGrantedAuthoritiesConverter()
 
     override fun convert(source: Jwt): AbstractAuthenticationToken {
         val authorities: Collection<GrantedAuthority> =
-            defaultGrantedAuthoritiesConverter.convert(source)!!.plus(extractResourceRoles(source, resourceId)).toSet()
+            defaultGrantedAuthoritiesConverter.convert(source)!!.plus(extractResourceRoles(source, resourceId, requiredBpn)).toSet()
         return JwtAuthenticationToken(source, authorities)
     }
 
     @Suppress("UNCHECKED_CAST")
     companion object {
-        private fun extractResourceRoles(jwt: Jwt, resourceId: String, requiredBpn: String? = null): Collection<GrantedAuthority> {
-            if (requiredBpn != null && requiredBpn != jwt.claims["bpn"]) {
+        private fun extractResourceRoles(jwt: Jwt, resourceId: String, requiredBpn: String = ""): Collection<GrantedAuthority> {
+            if (requiredBpn.isNotBlank() && requiredBpn != jwt.claims["bpn"]) {
                 return emptyList()
             }
 
@@ -73,7 +73,7 @@ class CustomJwtAuthenticationConverter(private val resourceId: String, private v
             val resourceRoles: Collection<String>? = resource?.get("roles") as Collection<String>?
             return if (resourceRoles != null) {
                 resourceRoles.stream()
-                    .map { role: String -> SimpleGrantedAuthority("ROLE_$role") }
+                    .map { role: String -> SimpleGrantedAuthority(role) }
                     .collect(Collectors.toSet())
             } else emptySet()
         }

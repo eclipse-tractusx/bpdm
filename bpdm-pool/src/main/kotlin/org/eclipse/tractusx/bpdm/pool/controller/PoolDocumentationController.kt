@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021,2023 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021,2024 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.eclipse.tractusx.bpdm.pool.api.PoolDocumentationApi
+import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.service.GateDocumentationService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -31,7 +32,7 @@ class PoolDocumentationController(
     val documentationService: GateDocumentationService
 ) : PoolDocumentationApi {
 
-    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadMetaDataAsRole())")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun getMermaidPoolPersistence(): ResponseEntity<String> {
         return ResponseEntity(documentationService.getMermaidPoolPersistence(), HttpStatus.OK)
     }

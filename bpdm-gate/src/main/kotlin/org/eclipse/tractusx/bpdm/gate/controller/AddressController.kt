@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021,2023 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021,2024 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -27,6 +27,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateOutputDto
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
+import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.service.AddressService
 import org.eclipse.tractusx.bpdm.gate.util.containsDuplicates
 import org.springframework.http.HttpStatus
@@ -41,7 +42,7 @@ class AddressController(
 ) : GateAddressApi {
 
 
-    @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getChangeCompanyInputDataAsRole())")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_INPUT_AUTHORITY})")
     override fun upsertAddresses(addresses: Collection<AddressGateInputRequest>): ResponseEntity<Unit> {
         if (addresses.size > apiConfigProperties.upsertLimit || addresses.map { it.externalId }.containsDuplicates()) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
@@ -57,13 +58,13 @@ class AddressController(
     }
 
 
-    @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyInputDataAsRole())")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_INPUT_AUTHORITY})")
     override fun getAddressByExternalId(externalId: String): AddressGateInputDto {
 
         return addressService.getAddressByExternalId(externalId)
     }
 
-    @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyInputDataAsRole())")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_INPUT_AUTHORITY})")
     override fun getAddressesByExternalIds(
         paginationRequest: PaginationRequest,
         externalIds: Collection<String>
@@ -71,12 +72,12 @@ class AddressController(
         return addressService.getAddresses(page = paginationRequest.page, size = paginationRequest.size, externalIds = externalIds)
     }
 
-    @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyInputDataAsRole())")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_INPUT_AUTHORITY})")
     override fun getAddresses(paginationRequest: PaginationRequest): PageDto<AddressGateInputDto> {
         return addressService.getAddresses(page = paginationRequest.page, size = paginationRequest.size)
     }
 
-    @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyOutputDataAsRole())")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_OUTPUT_AUTHORITY})")
     override fun getAddressesOutput(
         paginationRequest: PaginationRequest,
         externalIds: Collection<String>?
@@ -84,7 +85,7 @@ class AddressController(
         return addressService.getAddressesOutput(externalIds = externalIds, page = paginationRequest.page, size = paginationRequest.size)
     }
 
-    @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getChangeCompanyOutputDataAsRole())")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_OUTPUT_AUTHORITY})")
     override fun upsertAddressesOutput(addresses: Collection<AddressGateOutputRequest>): ResponseEntity<Unit> {
         if (addresses.size > apiConfigProperties.upsertLimit || addresses.map { it.externalId }.containsDuplicates()) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
