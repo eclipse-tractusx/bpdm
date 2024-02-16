@@ -41,7 +41,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
 import org.eclipse.tractusx.bpdm.gate.service.GoldenRecordTaskService
 import org.eclipse.tractusx.bpdm.gate.util.*
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryResponse
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -466,19 +466,19 @@ class BusinessPartnerControllerIT @Autowired constructor(
             page = 0,
             contentSize = 3,
             content = listOf(
-                ChangelogEntryVerboseDto(
+                ChangelogEntryResponse(
                     bpn = BusinessPartnerVerboseValues.bpOutputDtoCleaned.legalEntity.legalEntityBpn,
                     businessPartnerType = BusinessPartnerType.LEGAL_ENTITY,
                     timestamp = Instant.now(),
                     changelogType = ChangelogType.UPDATE
                 ),
-                ChangelogEntryVerboseDto(
+                ChangelogEntryResponse(
                     bpn = BusinessPartnerVerboseValues.bpOutputDtoCleaned.address.addressBpn,
                     businessPartnerType = BusinessPartnerType.ADDRESS,
                     timestamp = Instant.now(),
                     changelogType = ChangelogType.UPDATE
                 ),
-                ChangelogEntryVerboseDto(
+                ChangelogEntryResponse(
                     bpn = BusinessPartnerVerboseValues.bpOutputDtoCleaned.site!!.siteBpn!!,
                     businessPartnerType = BusinessPartnerType.SITE,
                     timestamp = Instant.now(),

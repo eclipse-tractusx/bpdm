@@ -29,8 +29,8 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateOutputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateInputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateInputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateOutputResponse
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -75,7 +75,7 @@ interface GateAddressApi {
     )
     @GetMapping("/input/addresses/{externalId}")
     @GetExchange("/input/addresses/{externalId}")
-    fun getAddressByExternalId(@Parameter(description = "External ID") @PathVariable externalId: String): AddressGateInputDto
+    fun getAddressByExternalId(@Parameter(description = "External ID") @PathVariable externalId: String): AddressGateInputResponse
 
     @Operation(
         summary = "Returns addresses by an array of external IDs from the input stage",
@@ -93,7 +93,7 @@ interface GateAddressApi {
     fun getAddressesByExternalIds(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @RequestBody externalIds: Collection<String>
-    ): PageDto<AddressGateInputDto>
+    ): PageDto<AddressGateInputResponse>
 
     @Operation(
         summary = "Returns addresses from the input stage",
@@ -108,7 +108,7 @@ interface GateAddressApi {
     )
     @GetMapping("/input/addresses")
     @GetExchange("/input/addresses")
-    fun getAddresses(@ParameterObject @Valid paginationRequest: PaginationRequest): PageDto<AddressGateInputDto>
+    fun getAddresses(@ParameterObject @Valid paginationRequest: PaginationRequest): PageDto<AddressGateInputResponse>
 
     @Operation(
         summary = "Returns addresses by an array of external IDs from the output stage",
@@ -126,7 +126,7 @@ interface GateAddressApi {
     fun getAddressesOutput(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @RequestBody(required = false) externalIds: Collection<String>?
-    ): PageDto<AddressGateOutputDto>
+    ): PageDto<AddressGateOutputResponse>
 
     @Operation(
         summary = "Creates or updates an existing address in the output stage",

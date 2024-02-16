@@ -27,7 +27,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerBpnSearchR
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerUpdateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
@@ -48,7 +48,7 @@ class AddressController(
     override fun getAddresses(
         addressSearchRequest: AddressPartnerSearchRequest,
         paginationRequest: PaginationRequest
-    ): PageDto<AddressMatchVerboseDto> {
+    ): PageDto<AddressMatchResponse> {
 
         return searchService.searchAddresses(addressSearchRequest, paginationRequest)
     }

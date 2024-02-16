@@ -36,7 +36,7 @@ data class SiteGateOutputResponse(
 
     // TODO OpenAPI description for complex field does not work!!
     @get:Schema(description = SiteDescription.mainAddress)
-    val mainAddress: AddressGateOutputDto,
+    val mainAddress: AddressGateOutputResponse,
 
     @get:Schema(description = CommonDescription.externalId)
     val externalId: String,

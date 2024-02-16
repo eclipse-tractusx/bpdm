@@ -26,7 +26,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import jakarta.validation.Valid
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangelogSearchRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogDto
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
@@ -56,7 +56,7 @@ interface GateChangelogApi {
     fun getInputChangelog(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @RequestBody searchRequest: ChangelogSearchRequest
-    ): PageChangeLogDto<ChangelogGateDto>
+    ): PageChangeLogDto<ChangelogGateResponse>
 
     @Operation(
         summary = "Returns changelog entries for changes to the business partner output stage",
@@ -74,5 +74,5 @@ interface GateChangelogApi {
     fun getOutputChangelog(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @RequestBody searchRequest: ChangelogSearchRequest
-    ): PageChangeLogDto<ChangelogGateDto>
+    ): PageChangeLogDto<ChangelogGateResponse>
 }

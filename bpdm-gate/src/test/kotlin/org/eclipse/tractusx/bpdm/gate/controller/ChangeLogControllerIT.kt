@@ -49,7 +49,7 @@ import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.exception.ChangeLogOutputError
 import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangelogSearchRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
 import org.eclipse.tractusx.bpdm.gate.util.BusinessPartnerNonVerboseValues
@@ -104,8 +104,17 @@ internal class ChangeLogControllerIT @Autowired constructor(
         val searchResult = gateClient.changelog.getInputChangelog(PaginationRequest(), searchRequest)
 
         assertRecursively(searchResult.content)
-            .ignoringFieldsMatchingRegexes(".*${ChangelogGateDto::timestamp.name}")
-            .isEqualTo(listOf(ChangelogGateDto(BusinessPartnerVerboseValues.externalIdAddress1, BusinessPartnerType.ADDRESS, instant, ChangelogType.CREATE)))
+            .ignoringFieldsMatchingRegexes(".*${ChangelogGateResponse::timestamp.name}")
+            .isEqualTo(
+                listOf(
+                    ChangelogGateResponse(
+                        BusinessPartnerVerboseValues.externalIdAddress1,
+                        BusinessPartnerType.ADDRESS,
+                        instant,
+                        ChangelogType.CREATE
+                    )
+                )
+            )
     }
 
 
@@ -156,8 +165,17 @@ internal class ChangeLogControllerIT @Autowired constructor(
 
         val searchResult = gateClient.changelog.getInputChangelog(PaginationRequest(), searchRequest)
 
-        assertRecursively(searchResult.content).ignoringFieldsMatchingRegexes(".*${ChangelogGateDto::timestamp.name}")
-            .isEqualTo(listOf(ChangelogGateDto(BusinessPartnerVerboseValues.externalIdAddress1, BusinessPartnerType.ADDRESS, instant, ChangelogType.CREATE)))
+        assertRecursively(searchResult.content).ignoringFieldsMatchingRegexes(".*${ChangelogGateResponse::timestamp.name}")
+            .isEqualTo(
+                listOf(
+                    ChangelogGateResponse(
+                        BusinessPartnerVerboseValues.externalIdAddress1,
+                        BusinessPartnerType.ADDRESS,
+                        instant,
+                        ChangelogType.CREATE
+                    )
+                )
+            )
     }
 
     /**
@@ -172,11 +190,11 @@ internal class ChangeLogControllerIT @Autowired constructor(
 
         val searchResult = gateClient.changelog.getInputChangelog(PaginationRequest(), searchRequest)
 
-        assertRecursively(searchResult.content).ignoringFieldsMatchingRegexes(".*${ChangelogGateDto::timestamp.name}")
+        assertRecursively(searchResult.content).ignoringFieldsMatchingRegexes(".*${ChangelogGateResponse::timestamp.name}")
             .isEqualTo(
                 listOf(
-                    ChangelogGateDto(BusinessPartnerVerboseValues.legalEntityAddressId, BusinessPartnerType.ADDRESS, instant, ChangelogType.CREATE),
-                    ChangelogGateDto(BusinessPartnerVerboseValues.externalIdAddress1, BusinessPartnerType.ADDRESS, instant, ChangelogType.CREATE)
+                    ChangelogGateResponse(BusinessPartnerVerboseValues.legalEntityAddressId, BusinessPartnerType.ADDRESS, instant, ChangelogType.CREATE),
+                    ChangelogGateResponse(BusinessPartnerVerboseValues.externalIdAddress1, BusinessPartnerType.ADDRESS, instant, ChangelogType.CREATE)
                 )
             )
     }
@@ -208,11 +226,11 @@ internal class ChangeLogControllerIT @Autowired constructor(
 
         val searchResult = gateClient.changelog.getInputChangelog(PaginationRequest(), searchRequest)
 
-        assertRecursively(searchResult.content).ignoringFieldsMatchingRegexes(".*${ChangelogGateDto::timestamp.name}")
+        assertRecursively(searchResult.content).ignoringFieldsMatchingRegexes(".*${ChangelogGateResponse::timestamp.name}")
             .isEqualTo(
                 listOf(
-                    ChangelogGateDto(BusinessPartnerVerboseValues.legalEntityAddressId, BusinessPartnerType.ADDRESS, instant, ChangelogType.CREATE),
-                    ChangelogGateDto(BusinessPartnerVerboseValues.externalIdAddress1, BusinessPartnerType.ADDRESS, instant, ChangelogType.CREATE)
+                    ChangelogGateResponse(BusinessPartnerVerboseValues.legalEntityAddressId, BusinessPartnerType.ADDRESS, instant, ChangelogType.CREATE),
+                    ChangelogGateResponse(BusinessPartnerVerboseValues.externalIdAddress1, BusinessPartnerType.ADDRESS, instant, ChangelogType.CREATE)
                 )
             )
     }
@@ -229,12 +247,12 @@ internal class ChangeLogControllerIT @Autowired constructor(
 
         val searchResult = gateClient.changelog.getInputChangelog(paginationRequest = PaginationRequest(), searchRequest)
 
-        assertRecursively(searchResult.content).ignoringFieldsMatchingRegexes(".*${ChangelogGateDto::timestamp.name}")
+        assertRecursively(searchResult.content).ignoringFieldsMatchingRegexes(".*${ChangelogGateResponse::timestamp.name}")
             .isEqualTo(
                 listOf(
-                    ChangelogGateDto(BusinessPartnerVerboseValues.legalEntityAddressId, BusinessPartnerType.ADDRESS, instant, ChangelogType.CREATE),
-                    ChangelogGateDto(BusinessPartnerVerboseValues.externalId1, BusinessPartnerType.LEGAL_ENTITY, instant, ChangelogType.CREATE),
-                    ChangelogGateDto(BusinessPartnerVerboseValues.externalIdAddress1, BusinessPartnerType.ADDRESS, instant, ChangelogType.CREATE)
+                    ChangelogGateResponse(BusinessPartnerVerboseValues.legalEntityAddressId, BusinessPartnerType.ADDRESS, instant, ChangelogType.CREATE),
+                    ChangelogGateResponse(BusinessPartnerVerboseValues.externalId1, BusinessPartnerType.LEGAL_ENTITY, instant, ChangelogType.CREATE),
+                    ChangelogGateResponse(BusinessPartnerVerboseValues.externalIdAddress1, BusinessPartnerType.ADDRESS, instant, ChangelogType.CREATE)
                 )
             )
     }

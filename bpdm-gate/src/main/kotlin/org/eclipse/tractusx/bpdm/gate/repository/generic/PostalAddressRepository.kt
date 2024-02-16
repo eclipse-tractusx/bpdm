@@ -21,15 +21,15 @@ package org.eclipse.tractusx.bpdm.gate.repository.generic
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.model.StageType
-import org.eclipse.tractusx.bpdm.gate.entity.generic.PostalAddress
+import org.eclipse.tractusx.bpdm.gate.entity.generic.PostalAddressDb
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 
 @Repository
-interface PostalAddressRepository : JpaRepository<PostalAddress, Long> {
+interface PostalAddressRepository : JpaRepository<PostalAddressDb, Long> {
 
-    @Query("SELECT a.addressType as type, COUNT(a.addressType) as count FROM BusinessPartner b JOIN b.postalAddress AS a WHERE b.stage = :stage GROUP BY a.addressType")
+    @Query("SELECT a.addressType as type, COUNT(a.addressType) as count FROM BusinessPartnerDb b JOIN b.postalAddress AS a WHERE b.stage = :stage GROUP BY a.addressType")
     fun countAddressTypes(stage: StageType): List<AddressTypeCount>
 
 

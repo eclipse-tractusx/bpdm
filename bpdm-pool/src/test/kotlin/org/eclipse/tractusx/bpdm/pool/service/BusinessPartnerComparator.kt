@@ -23,8 +23,8 @@ import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.ILegalEntityStateDto
 import org.eclipse.tractusx.bpdm.common.dto.ISiteStateDto
 import org.eclipse.tractusx.bpdm.pool.api.model.*
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressResponse
 import org.eclipse.tractusx.orchestrator.api.model.AddressIdentifierDto
 import org.eclipse.tractusx.orchestrator.api.model.AddressStateDto
 import org.eclipse.tractusx.orchestrator.api.model.LegalEntityClassificationDto
@@ -36,7 +36,7 @@ import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import java.util.function.BiPredicate
 
-fun compareLegalEntity(verboseRequest: LegalEntityWithLegalAddressVerboseDto, legalEntity: LegalEntityDto?) {
+fun compareLegalEntity(verboseRequest: LegalEntityWithLegalAddressResponse, legalEntity: LegalEntityDto?) {
 
     val verboseLegalEntity = verboseRequest.legalEntity
 
@@ -52,7 +52,7 @@ fun compareLegalEntity(verboseRequest: LegalEntityWithLegalAddressVerboseDto, le
     compareLogisticAddress(verboseLegalAddress, legalEntity?.legalAddress)
 }
 
-fun compareSite(verboseRequest: SiteWithMainAddressVerboseDto, site: SiteDto?) {
+fun compareSite(verboseRequest: SiteWithMainAddressResponse, site: SiteDto?) {
 
     val verboseSite = verboseRequest.site
 

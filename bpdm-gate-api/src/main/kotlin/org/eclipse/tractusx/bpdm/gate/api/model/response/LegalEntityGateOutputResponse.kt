@@ -36,7 +36,7 @@ data class LegalEntityGateOutputResponse(
 
     // TODO OpenAPI description for complex field does not work!!
     @get:Schema(description = LegalEntityDescription.legalAddress)
-    val legalAddress: AddressGateOutputDto,
+    val legalAddress: AddressGateOutputResponse,
 
     @get:Schema(description = CommonDescription.externalId, required = true)
     val externalId: String,

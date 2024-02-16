@@ -19,10 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.pool.dto
 
-import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
-import org.eclipse.tractusx.bpdm.pool.entity.LegalForm
+import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
+import org.eclipse.tractusx.bpdm.pool.entity.LegalFormDb
 
 data class LegalEntityMetadataDto(
-    val idTypes: Collection<IdentifierType>,
-    val legalForms: Collection<LegalForm>,
+    val idTypes: Collection<IdentifierTypeDb>,
+    val legalForms: Collection<LegalFormDb>,
 )

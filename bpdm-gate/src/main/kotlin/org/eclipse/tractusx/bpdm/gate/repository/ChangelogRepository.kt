@@ -39,7 +39,7 @@ interface ChangelogRepository : JpaRepository<ChangelogEntry, Long>, JpaSpecific
         fun byExternalIdsIn(externalIds: Collection<String>?) =
             Specification<ChangelogEntry> { root, _, _ ->
                 externalIds?.let {
-                    if(externalIds.isNotEmpty())
+                    if (externalIds.isNotEmpty())
                         root.get<String>(ChangelogEntry::externalId.name).`in`(externalIds)
                     else
                         null

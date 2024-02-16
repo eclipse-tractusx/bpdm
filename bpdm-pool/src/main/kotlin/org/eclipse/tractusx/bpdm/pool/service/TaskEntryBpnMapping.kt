@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
-import org.eclipse.tractusx.bpdm.pool.entity.BpnRequestIdentifierMapping
+import org.eclipse.tractusx.bpdm.pool.entity.BpnRequestIdentifierMappingDb
 import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.orchestrator.api.model.BpnReferenceDto
 import org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType
@@ -77,7 +77,7 @@ class TaskEntryBpnMapping(taskEntries: List<TaskStepReservationEntryDto>, bpnReq
     fun writeCreatedMappingsToDb(bpnRequestIdentifierRepository: BpnRequestIdentifierRepository) {
 
         val mappingsToCreate = createdBpnByRequestIdentifier.map{
-            BpnRequestIdentifierMapping(requestIdentifier=it.key, bpn =it.value)
+            BpnRequestIdentifierMappingDb(requestIdentifier = it.key, bpn = it.value)
         }
         bpnRequestIdentifierRepository.saveAll(mappingsToCreate)
     }

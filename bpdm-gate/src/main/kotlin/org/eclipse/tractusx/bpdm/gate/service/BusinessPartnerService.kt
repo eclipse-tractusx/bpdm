@@ -82,7 +82,7 @@ class BusinessPartnerService(
     }
 
 
-    private fun upsertBusinessPartnersInputFromCandidates(entityCandidates: List<BusinessPartner>): List<BusinessPartner> {
+    private fun upsertBusinessPartnersInputFromCandidates(entityCandidates: List<BusinessPartnerDb>): List<BusinessPartnerDb> {
         val resolutionResults = resolveCandidatesForStage(entityCandidates, StageType.Input)
 
         saveChangelog(resolutionResults)
@@ -93,7 +93,7 @@ class BusinessPartnerService(
         return businessPartnerRepository.saveAll(partners)
     }
 
-    fun upsertBusinessPartnersOutputFromCandidates(entityCandidates: List<BusinessPartner>): List<BusinessPartner> {
+    fun upsertBusinessPartnersOutputFromCandidates(entityCandidates: List<BusinessPartnerDb>): List<BusinessPartnerDb> {
         val externalIds = entityCandidates.map { it.externalId }
         assertInputStageExists(externalIds)
 
@@ -116,7 +116,7 @@ class BusinessPartnerService(
         return businessPartnerRepository.saveAll(changedPartners)
     }
 
-    private fun getBusinessPartners(pageRequest: PageRequest, externalIds: Collection<String>?, stage: StageType): Page<BusinessPartner> {
+    private fun getBusinessPartners(pageRequest: PageRequest, externalIds: Collection<String>?, stage: StageType): Page<BusinessPartnerDb> {
         return when {
             externalIds.isNullOrEmpty() -> businessPartnerRepository.findByStage(stage, pageRequest)
             else -> businessPartnerRepository.findByStageAndExternalIdIn(stage, externalIds, pageRequest)
@@ -132,7 +132,7 @@ class BusinessPartnerService(
         }
     }
 
-    private fun saveChangelog(partner: BusinessPartner, changelogType: ChangelogType) {
+    private fun saveChangelog(partner: BusinessPartnerDb, changelogType: ChangelogType) {
         changelogRepository.save(ChangelogEntry(partner.externalId, BusinessPartnerType.GENERIC, changelogType, partner.stage))
     }
 
@@ -154,7 +154,7 @@ class BusinessPartnerService(
      * process will not start. If Business Partner has the same data, but linked sharing state has an error state,
      * Business Partner will start the process again.
      */
-    private fun filterUpdateCandidates(entities: List<BusinessPartner>, stage: StageType): List<BusinessPartner> {
+    private fun filterUpdateCandidates(entities: List<BusinessPartnerDb>, stage: StageType): List<BusinessPartnerDb> {
         val externalIds = entities.map { it.externalId }
         val persistedBusinessPartnerMap = businessPartnerRepository.findByStageAndExternalIdIn(stage, externalIds).associateBy { it.externalId }
         val sharingStatesMap =
@@ -168,7 +168,7 @@ class BusinessPartnerService(
         }
     }
 
-    private fun hasChanges(entity: BusinessPartner, persistedBP: BusinessPartner): Boolean {
+    private fun hasChanges(entity: BusinessPartnerDb, persistedBP: BusinessPartnerDb): Boolean {
 
         return entity.nameParts != persistedBP.nameParts ||
                 entity.roles != persistedBP.roles ||
@@ -190,7 +190,7 @@ class BusinessPartnerService(
                 postalAddressHasChanges(entity.postalAddress, persistedBP.postalAddress)
     }
 
-    private fun postalAddressHasChanges(entityPostalAddress: PostalAddress, persistedPostalAddress: PostalAddress): Boolean {
+    private fun postalAddressHasChanges(entityPostalAddress: PostalAddressDb, persistedPostalAddress: PostalAddressDb): Boolean {
         return (entityPostalAddress.addressType != persistedPostalAddress.addressType) ||
                 (entityPostalAddress.alternativePostalAddress != persistedPostalAddress.alternativePostalAddress) ||
                 (entityPostalAddress.physicalPostalAddress != persistedPostalAddress.physicalPostalAddress)
@@ -202,7 +202,7 @@ class BusinessPartnerService(
      * Resolving a candidate means to exchange the candidate entity with the existing entity and copy from the candidate to that existing entity.
      *
      */
-    private fun resolveCandidatesForStage(entityCandidates: List<BusinessPartner>, stage: StageType): List<ResolutionResult> {
+    private fun resolveCandidatesForStage(entityCandidates: List<BusinessPartnerDb>, stage: StageType): List<ResolutionResult> {
         val existingPartnersByExternalId = businessPartnerRepository.findByStageAndExternalIdIn(stage, entityCandidates.map { it.externalId })
             .associateBy { it.externalId }
 
@@ -216,11 +216,11 @@ class BusinessPartnerService(
     }
 
     data class ResolutionResult(
-        val businessPartner: BusinessPartner,
+        val businessPartner: BusinessPartnerDb,
         val wasResolved: Boolean
     )
 
-    private fun copyValues(fromPartner: BusinessPartner, toPartner: BusinessPartner): BusinessPartner {
+    private fun copyValues(fromPartner: BusinessPartnerDb, toPartner: BusinessPartnerDb): BusinessPartnerDb {
         return toPartner.apply {
             stage = fromPartner.stage
             shortName = fromPartner.shortName
@@ -246,28 +246,28 @@ class BusinessPartnerService(
         }
     }
 
-    private fun copyValues(fromState: State, toState: State) =
+    private fun copyValues(fromState: StateDb, toState: StateDb) =
         toState.apply {
             validFrom = fromState.validFrom
             validTo = fromState.validTo
             type = fromState.type
         }
 
-    private fun copyValues(fromClassification: Classification, toClassification: Classification) =
+    private fun copyValues(fromClassification: ClassificationDb, toClassification: ClassificationDb) =
         toClassification.apply {
             value = fromClassification.value
             type = fromClassification.type
             code = fromClassification.code
         }
 
-    private fun copyValues(fromIdentifier: Identifier, toIdentifier: Identifier) =
+    private fun copyValues(fromIdentifier: IdentifierDb, toIdentifier: IdentifierDb) =
         toIdentifier.apply {
             type = fromIdentifier.type
             value = fromIdentifier.value
             issuingBody = fromIdentifier.issuingBody
         }
 
-    private fun copyValues(fromPostalAddress: PostalAddress, toPostalAddress: PostalAddress) =
+    private fun copyValues(fromPostalAddress: PostalAddressDb, toPostalAddress: PostalAddressDb) =
         toPostalAddress.apply {
             addressType = fromPostalAddress.addressType
             physicalPostalAddress = fromPostalAddress.physicalPostalAddress

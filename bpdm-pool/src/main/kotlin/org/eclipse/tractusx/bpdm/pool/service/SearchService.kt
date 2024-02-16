@@ -23,9 +23,9 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.BusinessPartnerSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteMatchVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteMatchResponse
 
 /**
  * Provides search functionality on the Catena-x data for the BPDM system
@@ -38,7 +38,7 @@ interface SearchService {
     fun searchLegalEntities(
         searchRequest: BusinessPartnerSearchRequest,
         paginationRequest: PaginationRequest
-    ): PageDto<LegalEntityMatchVerboseDto>
+    ): PageDto<LegalEntityMatchResponse>
 
     /**
      * Find addresses by matching their field values to [searchRequest] field query texts
@@ -46,13 +46,13 @@ interface SearchService {
     fun searchAddresses(
         searchRequest: AddressPartnerSearchRequest,
         paginationRequest: PaginationRequest
-    ): PageDto<AddressMatchVerboseDto>
+    ): PageDto<AddressMatchResponse>
 
     /**
      * Find sites by matching their field values to [searchRequest] field query texts
      */
     fun searchSites(
         paginationRequest: PaginationRequest
-    ): PageDto<SiteMatchVerboseDto>
+    ): PageDto<SiteMatchResponse>
 
 }

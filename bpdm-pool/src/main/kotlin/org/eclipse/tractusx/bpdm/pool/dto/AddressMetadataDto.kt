@@ -19,10 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.pool.dto
 
-import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
-import org.eclipse.tractusx.bpdm.pool.entity.Region
+import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
+import org.eclipse.tractusx.bpdm.pool.entity.RegionDb
 
 data class AddressMetadataDto(
-    val idTypes: Collection<IdentifierType>,
-    val regions: Collection<Region>
+    val idTypes: Collection<IdentifierTypeDb>,
+    val regions: Collection<RegionDb>
 )

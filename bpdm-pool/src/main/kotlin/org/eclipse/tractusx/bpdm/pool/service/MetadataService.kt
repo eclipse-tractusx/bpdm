@@ -57,16 +57,16 @@ class MetadataService(
     @Transactional
     fun createIdentifierType(type: IdentifierTypeDto): IdentifierTypeDto {
         if (identifierTypeRepository.findByBusinessPartnerTypeAndTechnicalKey(type.businessPartnerType, type.technicalKey) != null)
-            throw BpdmAlreadyExists(IdentifierType::class.simpleName!!, "${type.technicalKey}/${type.businessPartnerType}")
+            throw BpdmAlreadyExists(IdentifierTypeDb::class.simpleName!!, "${type.technicalKey}/${type.businessPartnerType}")
 
         logger.info { "Create new Identifier-Type with key ${type.technicalKey}, businessPartnerType ${type.businessPartnerType} and name ${type.name}" }
-        val entity = IdentifierType(
+        val entity = IdentifierTypeDb(
             technicalKey = type.technicalKey,
             businessPartnerType = type.businessPartnerType,
             name = type.name
         )
         entity.details.addAll(
-            type.details.map { IdentifierTypeDetail(entity, it.country, it.mandatory) }.toSet()
+            type.details.map { IdentifierTypeDetailDb(entity, it.country, it.mandatory) }.toSet()
         )
         return identifierTypeRepository.save(entity).toDto()
     }
@@ -87,11 +87,11 @@ class MetadataService(
     @Transactional
     fun createLegalForm(request: LegalFormRequest): LegalFormDto {
         if (legalFormRepository.findByTechnicalKey(request.technicalKey) != null)
-            throw BpdmAlreadyExists(LegalForm::class.simpleName!!, request.technicalKey)
+            throw BpdmAlreadyExists(LegalFormDb::class.simpleName!!, request.technicalKey)
 
         logger.info { "Create new Legal-Form with key ${request.technicalKey} and name ${request.name}" }
 
-        val legalForm = LegalForm(
+        val legalForm = LegalFormDb(
             technicalKey = request.technicalKey,
             name = request.name,
             abbreviation = request.abbreviation
@@ -163,7 +163,7 @@ class MetadataService(
         return AddressMetadataDto(idTypes, regions)
     }
 
-    fun getRegions(requests: Collection<IBaseLogisticAddressDto>): Set<Region> {
+    fun getRegions(requests: Collection<IBaseLogisticAddressDto>): Set<RegionDb> {
 
         val regionKeys = requests.mapNotNull { it.physicalPostalAddress?.administrativeAreaLevel1 }
             .plus(requests.mapNotNull { it.alternativePostalAddress?.administrativeAreaLevel1 })
@@ -172,7 +172,7 @@ class MetadataService(
         return regions
     }
 
-    fun getIdentifiers(requests: Collection<IBaseLogisticAddressDto>): Set<IdentifierType> {
+    fun getIdentifiers(requests: Collection<IBaseLogisticAddressDto>): Set<IdentifierTypeDb> {
         val idTypeKeys = requests.flatMap { it.identifiers }.map { it.type }.toSet()
         val idTypes = identifierTypeRepository.findByBusinessPartnerTypeAndTechnicalKeyIn(IdentifierBusinessPartnerType.ADDRESS, idTypeKeys)
         return idTypes
@@ -182,7 +182,7 @@ class MetadataService(
     /**
      * If no country rule exists use default rules
      */
-    private fun mergeRules(defaultRule: FieldQualityRule?, countryRule: FieldQualityRule?): FieldQualityRule? {
+    private fun mergeRules(defaultRule: FieldQualityRuleDb?, countryRule: FieldQualityRuleDb?): FieldQualityRuleDb? {
 
         if (countryRule == null) {
             return defaultRule
@@ -196,7 +196,7 @@ class MetadataService(
     fun createRegion(request: RegionDto): RegionDto {
         logger.info { "Create new Region with key ${request.regionCode} and name ${request.regionName}" }
 
-        val region = Region(
+        val region = RegionDb(
             countryCode = request.countryCode,
             regionCode = request.regionCode,
             regionName = request.regionName

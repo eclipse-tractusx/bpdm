@@ -42,8 +42,8 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerBpnSearchR
 import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteBpnSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressResponse
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -404,7 +404,7 @@ class BridgeSyncIT @Autowired constructor(
 
     }
 
-    private fun allLegalEntitiesFromPool(): Collection<LegalEntityMatchVerboseDto> {
+    private fun allLegalEntitiesFromPool(): Collection<LegalEntityMatchResponse> {
         val poolLegalEntityResponses = poolClient.legalEntities.getLegalEntities(
             bpSearchRequest = LegalEntityPropertiesSearchRequest.EmptySearchRequest,
             paginationRequest = DEFAULT_PAGINATION_REQUEST
@@ -446,7 +446,7 @@ class BridgeSyncIT @Autowired constructor(
             .filter { it.sharingStateType == SharingStateType.Success && it.bpn != null }
     }
 
-    private fun assertEqualLegalEntity(gateVersion: LegalEntityGateInputRequest, poolVersion: LegalEntityMatchVerboseDto) {
+    private fun assertEqualLegalEntity(gateVersion: LegalEntityGateInputRequest, poolVersion: LegalEntityMatchResponse) {
         assertThat(poolVersion.legalEntity.legalShortName).isEqualTo(gateVersion.legalEntity.legalShortName)
         //       assertThat(poolVersion.legalAddress.name).isEqualTo(gateVersion.legalAddress.nameParts.first())
         assertThat(poolVersion.legalAddress.physicalPostalAddress.street?.name).isEqualTo(gateVersion.legalAddress.physicalPostalAddress.street?.name)
@@ -456,7 +456,7 @@ class BridgeSyncIT @Autowired constructor(
         assertThat(poolVersion.legalAddress.alternativePostalAddress?.city).isEqualTo(gateVersion.legalAddress.alternativePostalAddress?.city)
     }
 
-    private fun assertEqualSite(gateVersion: SiteGateInputRequest, poolVersion: SiteWithMainAddressVerboseDto) {
+    private fun assertEqualSite(gateVersion: SiteGateInputRequest, poolVersion: SiteWithMainAddressResponse) {
         assertThat(poolVersion.site.name).isEqualTo(gateVersion.site.nameParts.first())
         assertThat(poolVersion.mainAddress.physicalPostalAddress.street?.name).isEqualTo(gateVersion.mainAddress.physicalPostalAddress.street?.name)
     }

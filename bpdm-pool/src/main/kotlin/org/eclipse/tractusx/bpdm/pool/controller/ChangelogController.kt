@@ -23,7 +23,7 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.PoolChangelogApi
 import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryResponse
 import org.eclipse.tractusx.bpdm.pool.config.ControllerConfigProperties
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmRequestSizeException
@@ -41,7 +41,7 @@ class ChangelogController(
     override fun getChangelogEntries(
         changelogSearchRequest: ChangelogSearchRequest,
         paginationRequest: PaginationRequest
-    ): PageDto<ChangelogEntryVerboseDto> {
+    ): PageDto<ChangelogEntryResponse> {
 
         changelogSearchRequest.bpns?.let { bpns ->
             if (bpns.size > controllerConfigProperties.searchRequestLimit) {

@@ -64,7 +64,7 @@ interface PoolLegalEntityApi {
     fun getLegalEntities(
         @ParameterObject bpSearchRequest: LegalEntityPropertiesSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageDto<LegalEntityMatchVerboseDto>
+    ): PageDto<LegalEntityMatchResponse>
 
     @Operation(
         summary = "Returns a legal entity by identifier, like BPN, DUNS or EU VAT ID, specified by the identifier type",
@@ -91,7 +91,7 @@ interface PoolLegalEntityApi {
         @Parameter(description = "Identifier value") @PathVariable idValue: String,
         @Parameter(description = "Type of identifier to use, defaults to BPN when omitted", schema = Schema(defaultValue = "BPN"))
         @RequestParam idType: String? = "BPN"
-    ): LegalEntityWithLegalAddressVerboseDto
+    ): LegalEntityWithLegalAddressResponse
 
     @Operation(
         summary = "Confirms that the data of a legal entity business partner is still up to date.",
@@ -131,7 +131,7 @@ interface PoolLegalEntityApi {
     @PostExchange("/search")
     fun searchLegalEntitys(
         @RequestBody bpnLs: Collection<String>
-    ): ResponseEntity<Collection<LegalEntityWithLegalAddressVerboseDto>>
+    ): ResponseEntity<Collection<LegalEntityWithLegalAddressResponse>>
 
     @Operation(
         summary = "Returns all sites of a legal entity with a specific BPNL",
@@ -184,7 +184,7 @@ interface PoolLegalEntityApi {
     fun searchLegalAddresses(
         @RequestBody
         bpnLs: Collection<String>
-    ): Collection<LegalAddressVerboseDto>
+    ): Collection<LegalAddressResponse>
 
     @Operation(
         summary = "Creates a new legal entity",

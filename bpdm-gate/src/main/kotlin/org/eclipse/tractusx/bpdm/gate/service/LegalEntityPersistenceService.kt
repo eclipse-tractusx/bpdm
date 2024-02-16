@@ -27,10 +27,10 @@ import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateOutputRequest
-import org.eclipse.tractusx.bpdm.gate.entity.AddressState
+import org.eclipse.tractusx.bpdm.gate.entity.AddressStateDb
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
-import org.eclipse.tractusx.bpdm.gate.entity.LegalEntity
-import org.eclipse.tractusx.bpdm.gate.entity.LogisticAddress
+import org.eclipse.tractusx.bpdm.gate.entity.LegalEntityDb
+import org.eclipse.tractusx.bpdm.gate.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.eclipse.tractusx.bpdm.gate.repository.GateAddressRepository
 import org.eclipse.tractusx.bpdm.gate.repository.LegalEntityRepository
@@ -88,10 +88,10 @@ class LegalEntityPersistenceService(
     }
 
     private fun updateLegalEntity(
-        legalEntity: LegalEntity,
+        legalEntity: LegalEntityDb,
         legalEntityRequest: LegalEntityGateInputRequest,
-        logisticAddressRecord: LogisticAddress
-    ): LegalEntity {
+        logisticAddressRecord: LogisticAddressDb
+    ): LegalEntityDb {
         val legalEntityDto = legalEntityRequest.legalEntity
 
         legalEntity.externalId = legalEntityRequest.externalId
@@ -110,7 +110,7 @@ class LegalEntityPersistenceService(
         return legalEntity
     }
 
-    private fun updateAddress(address: LogisticAddress, changeAddress: LogisticAddress) {
+    private fun updateAddress(address: LogisticAddressDb, changeAddress: LogisticAddressDb) {
 
         address.externalId = changeAddress.externalId
         address.legalEntity = changeAddress.legalEntity
@@ -123,8 +123,8 @@ class LegalEntityPersistenceService(
 
     }
 
-    fun toEntityAddress(dto: AddressState, address: LogisticAddress): AddressState {
-        return AddressState(dto.description, dto.validFrom, dto.validTo, dto.type, address)
+    fun toEntityAddress(dto: AddressStateDb, address: LogisticAddressDb): AddressStateDb {
+        return AddressStateDb(dto.description, dto.validFrom, dto.validTo, dto.type, address)
     }
 
     @Transactional
@@ -170,10 +170,10 @@ class LegalEntityPersistenceService(
     }
 
     private fun updateLegalEntityOutput(
-        legalEntity: LegalEntity,
+        legalEntity: LegalEntityDb,
         legalEntityRequest: LegalEntityGateOutputRequest,
-        logisticAddressRecord: LogisticAddress
-    ): LegalEntity {
+        logisticAddressRecord: LogisticAddressDb
+    ): LegalEntityDb {
         val legalEntityDto = legalEntityRequest.legalEntity
 
         legalEntity.bpn = legalEntityRequest.bpn

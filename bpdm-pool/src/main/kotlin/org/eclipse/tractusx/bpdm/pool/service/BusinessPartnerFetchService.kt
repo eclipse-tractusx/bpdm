@@ -23,10 +23,10 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
-import org.eclipse.tractusx.bpdm.pool.entity.LegalEntity
-import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityIdentifier
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressResponse
+import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
+import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
+import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityIdentifierDb
 import org.eclipse.tractusx.bpdm.pool.repository.AddressIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityIdentifierRepository
@@ -49,19 +49,19 @@ class BusinessPartnerFetchService(
     private val logger = KotlinLogging.logger { }
 
     /**
-     * Fetch a business partner by [bpn] and return as [LegalEntityWithLegalAddressVerboseDto]
+     * Fetch a business partner by [bpn] and return as [LegalEntityWithLegalAddressResponse]
      */
-    fun findLegalEntityIgnoreCase(bpn: String): LegalEntityWithLegalAddressVerboseDto {
+    fun findLegalEntityIgnoreCase(bpn: String): LegalEntityWithLegalAddressResponse {
         logger.debug { "Executing findLegalEntityIgnoreCase() with parameters $bpn" }
         return findLegalEntityOrThrow(bpn).toLegalEntityWithLegalAddress()
     }
 
 
     /**
-     * Fetch a business partner by [identifierValue] (ignoring case) of [identifierType] and return as [LegalEntityWithLegalAddressVerboseDto]
+     * Fetch a business partner by [identifierValue] (ignoring case) of [identifierType] and return as [LegalEntityWithLegalAddressResponse]
      */
     @Transactional
-    fun findLegalEntityIgnoreCase(identifierType: String, identifierValue: String): LegalEntityWithLegalAddressVerboseDto {
+    fun findLegalEntityIgnoreCase(identifierType: String, identifierValue: String): LegalEntityWithLegalAddressResponse {
         logger.debug { "Executing findLegalEntityIgnoreCase() with parameters $identifierType and $identifierValue" }
         return findLegalEntityOrThrow(identifierType, identifierValue).toLegalEntityWithLegalAddress()
     }
@@ -70,7 +70,7 @@ class BusinessPartnerFetchService(
      * Fetch business partners by BPN in [bpns]
      */
     @Transactional
-    fun fetchByBpns(bpns: Collection<String>): Set<LegalEntity> {
+    fun fetchByBpns(bpns: Collection<String>): Set<LegalEntityDb> {
         logger.debug { "Executing fetchByBpns() with parameters $bpns " }
         return fetchLegalEntityDependencies(legalEntityRepository.findDistinctByBpnIn(bpns))
     }
@@ -79,7 +79,7 @@ class BusinessPartnerFetchService(
      * Fetch business partners by BPN in [bpns] and map to dtos
      */
     @Transactional
-    fun fetchDtosByBpns(bpns: Collection<String>): Collection<LegalEntityWithLegalAddressVerboseDto> {
+    fun fetchDtosByBpns(bpns: Collection<String>): Collection<LegalEntityWithLegalAddressResponse> {
         logger.debug { "Executing fetchDtosByBpns() with parameters $bpns " }
         return fetchByBpns(bpns).map { it.toLegalEntityWithLegalAddress() }
     }
@@ -101,14 +101,14 @@ class BusinessPartnerFetchService(
         }
     }
 
-    fun fetchDependenciesWithLegalAddress(partners: Set<LegalEntity>): Set<LegalEntity> {
+    fun fetchDependenciesWithLegalAddress(partners: Set<LegalEntityDb>): Set<LegalEntityDb> {
         fetchLegalEntityDependencies(partners)
         legalEntityRepository.joinLegalAddresses(partners)
         addressService.fetchLogisticAddressDependencies(partners.map { it.legalAddress }.toSet())
         return partners
     }
 
-    fun fetchLegalEntityDependencies(partners: Set<LegalEntity>): Set<LegalEntity> {
+    fun fetchLegalEntityDependencies(partners: Set<LegalEntityDb>): Set<LegalEntityDb> {
 
         legalEntityRepository.joinIdentifiers(partners)
         legalEntityRepository.joinStates(partners)
@@ -124,18 +124,18 @@ class BusinessPartnerFetchService(
         return partners
     }
 
-    fun fetchIdentifierDependencies(identifiers: Set<LegalEntityIdentifier>): Set<LegalEntityIdentifier> {
+    fun fetchIdentifierDependencies(identifiers: Set<LegalEntityIdentifierDb>): Set<LegalEntityIdentifierDb> {
         legalEntityIdentifierRepository.joinType(identifiers)
 
         return identifiers
     }
 
 
-    private fun findLegalEntityOrThrow(bpn: String): LegalEntity {
-        return legalEntityRepository.findByBpn(bpn) ?: throw BpdmNotFoundException(LegalEntity::class.simpleName!!, bpn)
+    private fun findLegalEntityOrThrow(bpn: String): LegalEntityDb {
+        return legalEntityRepository.findByBpn(bpn) ?: throw BpdmNotFoundException(LegalEntityDb::class.simpleName!!, bpn)
     }
 
-    fun findLegalEntityOrThrow(identifierTypeKey: String, identifierValue: String): LegalEntity {
+    fun findLegalEntityOrThrow(identifierTypeKey: String, identifierValue: String): LegalEntityDb {
         val identifierType = findIdentifierTypeOrThrow(identifierTypeKey, IdentifierBusinessPartnerType.LEGAL_ENTITY)
         return legalEntityRepository.findByIdentifierTypeAndValueIgnoreCase(identifierType, identifierValue)
             ?: throw BpdmNotFoundException("Identifier Value", identifierValue)
@@ -143,6 +143,6 @@ class BusinessPartnerFetchService(
 
     private fun findIdentifierTypeOrThrow(identifierTypeKey: String, businessPartnerType: IdentifierBusinessPartnerType) =
         identifierTypeRepository.findByBusinessPartnerTypeAndTechnicalKey(businessPartnerType, identifierTypeKey)
-            ?: throw BpdmNotFoundException(IdentifierType::class, "$identifierTypeKey/$businessPartnerType")
+            ?: throw BpdmNotFoundException(IdentifierTypeDb::class, "$identifierTypeKey/$businessPartnerType")
 
 }

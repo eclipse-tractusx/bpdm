@@ -30,7 +30,7 @@ import com.github.tomakehurst.wiremock.verification.LoggedRequest
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.service.BaseSyncRecordService
 import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangelogSearchRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogDto
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.BeforeEach
@@ -89,7 +89,7 @@ class SyncStateIT @Autowired constructor(
     fun `successful sync`() {
         // all 3 syncs successful
 
-        val responseGateChangelog: PageChangeLogDto<ChangelogGateDto> =
+        val responseGateChangelog: PageChangeLogDto<ChangelogGateResponse> =
             PageChangeLogDto(
                 totalElements = 0,
                 totalPages = 0,
@@ -145,7 +145,7 @@ class SyncStateIT @Autowired constructor(
     fun `sync with errors`() {
         // 2nd & 3rd sync fail; 1st, 4th, 5th sync successful
 
-        val responseGateChangelog: PageChangeLogDto<ChangelogGateDto> =
+        val responseGateChangelog: PageChangeLogDto<ChangelogGateResponse> =
             PageChangeLogDto(
                 totalElements = 0,
                 totalPages = 0,

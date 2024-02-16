@@ -27,10 +27,10 @@ import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.service.toDto
 import org.eclipse.tractusx.bpdm.pool.api.model.*
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateResponse
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -239,17 +239,17 @@ object BusinessPartnerVerboseValues {
         addressType = AddressType.AdditionalAddress
     )
 
-    val addressPartnerCreate1 = AddressPartnerCreateVerboseDto(
+    val addressPartnerCreate1 = AddressPartnerCreateResponse(
         address = addressPartner1,
         index = "1"
     )
 
-    val addressPartnerCreate2 = AddressPartnerCreateVerboseDto(
+    val addressPartnerCreate2 = AddressPartnerCreateResponse(
         address = addressPartner2,
         index = "2"
     )
 
-    val addressPartnerCreate3 = AddressPartnerCreateVerboseDto(
+    val addressPartnerCreate3 = AddressPartnerCreateResponse(
         address = addressPartner3,
         index = "3"
     )
@@ -284,7 +284,7 @@ object BusinessPartnerVerboseValues {
         updatedAt = Instant.now(),
     )
 
-    val siteUpsert1 = SitePartnerCreateVerboseDto(
+    val siteUpsert1 = SitePartnerCreateResponse(
         site = site1,
         mainAddress = addressPartner1.copy(
             bpnSite = site1.bpns,
@@ -294,7 +294,7 @@ object BusinessPartnerVerboseValues {
         index = "1"
     )
 
-    val siteUpsert2 = SitePartnerCreateVerboseDto(
+    val siteUpsert2 = SitePartnerCreateResponse(
         site = site2,
         mainAddress = addressPartner2.copy(
             bpnSite = site2.bpns,
@@ -304,7 +304,7 @@ object BusinessPartnerVerboseValues {
         index = "2"
     )
 
-    val siteUpsert3 = SitePartnerCreateVerboseDto(
+    val siteUpsert3 = SitePartnerCreateResponse(
         site = site3,
         mainAddress = addressPartner3.copy(
             bpnSite = site3.bpns,
@@ -315,7 +315,7 @@ object BusinessPartnerVerboseValues {
     )
 
 
-    val legalEntity1 = LegalEntityWithLegalAddressVerboseDto(
+    val legalEntity1 = LegalEntityWithLegalAddressResponse(
         LegalEntityVerboseDto(
             bpnl = "BPNL000000000001",
             legalName = "Business Partner Name",
@@ -354,7 +354,7 @@ object BusinessPartnerVerboseValues {
         )
     )
 
-    val legalEntity2 = LegalEntityWithLegalAddressVerboseDto(
+    val legalEntity2 = LegalEntityWithLegalAddressResponse(
         LegalEntityVerboseDto(
             bpnl = "BPNL0000000001YN",
             legalName = "Another Organisation Corp",
@@ -393,7 +393,7 @@ object BusinessPartnerVerboseValues {
         )
     )
 
-    val legalEntity3 = LegalEntityWithLegalAddressVerboseDto(
+    val legalEntity3 = LegalEntityWithLegalAddressResponse(
         LegalEntityVerboseDto(
             bpnl = "BPNL0000000002XY",
             legalName = "好公司  合伙制企业",
@@ -432,7 +432,7 @@ object BusinessPartnerVerboseValues {
         )
     )
 
-    val legalEntityUpsert1 = LegalEntityPartnerCreateVerboseDto(
+    val legalEntityUpsert1 = LegalEntityPartnerCreateResponse(
         legalEntity = LegalEntityVerboseDto(
             bpnl = "BPNL000000000001",
             legalName = "Business Partner Name",
@@ -453,7 +453,7 @@ object BusinessPartnerVerboseValues {
         index = "1"
     )
 
-    val legalEntityUpsert2 = LegalEntityPartnerCreateVerboseDto(
+    val legalEntityUpsert2 = LegalEntityPartnerCreateResponse(
         legalEntity = LegalEntityVerboseDto(
             bpnl = "BPNL0000000001YN",
             legalName = "Another Organisation Corp",
@@ -474,7 +474,7 @@ object BusinessPartnerVerboseValues {
         index = "2"
     )
 
-    val legalEntityUpsert3 = LegalEntityPartnerCreateVerboseDto(
+    val legalEntityUpsert3 = LegalEntityPartnerCreateResponse(
         legalEntity = LegalEntityVerboseDto(
             bpnl = "BPNL0000000002XY",
             legalName = "好公司  合伙制企业",
@@ -495,7 +495,7 @@ object BusinessPartnerVerboseValues {
         index = "3"
     )
 
-    val legalEntityUpsertMultipleIdentifier = LegalEntityPartnerCreateVerboseDto(
+    val legalEntityUpsertMultipleIdentifier = LegalEntityPartnerCreateResponse(
         legalEntity = LegalEntityVerboseDto(
             bpnl = "BPNL000000000001",
             legalName = "Business Partner Name",

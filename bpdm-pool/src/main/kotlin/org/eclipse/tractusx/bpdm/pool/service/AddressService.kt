@@ -26,9 +26,9 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerBpnSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.MainAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddress
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalAddressResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.MainAddressResponse
+import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
@@ -80,7 +80,7 @@ class AddressService(
         return addressPage.toDto(addressPage.content.map { it.toDto() })
     }
 
-    fun findLegalAddresses(bpnLs: Collection<String>): Collection<LegalAddressVerboseDto> {
+    fun findLegalAddresses(bpnLs: Collection<String>): Collection<LegalAddressResponse> {
         logger.debug { "Executing findLegalAddresses() with parameters $bpnLs" }
         val legalEntities = legalEntityRepository.findDistinctByBpnIn(bpnLs)
         legalEntityRepository.joinLegalAddresses(legalEntities)
@@ -89,7 +89,7 @@ class AddressService(
         return addresses.map { it.toLegalAddressResponse() }
     }
 
-    fun findMainAddresses(bpnS: Collection<String>): Collection<MainAddressVerboseDto> {
+    fun findMainAddresses(bpnS: Collection<String>): Collection<MainAddressResponse> {
         logger.debug { "Executing findMainAddresses() with parameters $bpnS" }
         val sites = siteRepository.findDistinctByBpnIn(bpnS)
         siteRepository.joinAddresses(sites)
@@ -98,7 +98,7 @@ class AddressService(
         return addresses.map { it.toMainAddressResponse() }
     }
 
-    fun fetchLogisticAddressDependencies(addresses: Set<LogisticAddress>): Set<LogisticAddress> {
+    fun fetchLogisticAddressDependencies(addresses: Set<LogisticAddressDb>): Set<LogisticAddressDb> {
         logisticAddressRepository.joinLegalEntities(addresses)
         logisticAddressRepository.joinSites(addresses)
         logisticAddressRepository.joinRegions(addresses)

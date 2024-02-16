@@ -517,14 +517,14 @@ class AddressControllerIT @Autowired constructor(
         testHelpers.assertErrorResponse(response.errors.last(), AddressUpdateError.AddressNotFound, secondInvalidBpn)
     }
 
-    private fun assertCreatedAddressesAreEqual(actuals: Collection<AddressPartnerCreateVerboseDto>, expected: Collection<AddressPartnerCreateVerboseDto>) {
+    private fun assertCreatedAddressesAreEqual(actuals: Collection<AddressPartnerCreateResponse>, expected: Collection<AddressPartnerCreateResponse>) {
         actuals.forEach { assertThat(it.address.bpna).matches(testHelpers.bpnAPattern) }
 
         testHelpers.assertRecursively(actuals)
             .ignoringFields(
-                AddressPartnerCreateVerboseDto::address.name + "." + LogisticAddressVerboseDto::bpna.name,
-                AddressPartnerCreateVerboseDto::address.name + "." + LogisticAddressVerboseDto::bpnLegalEntity.name,
-                AddressPartnerCreateVerboseDto::address.name + "." + LogisticAddressVerboseDto::bpnSite.name
+                AddressPartnerCreateResponse::address.name + "." + LogisticAddressVerboseDto::bpna.name,
+                AddressPartnerCreateResponse::address.name + "." + LogisticAddressVerboseDto::bpnLegalEntity.name,
+                AddressPartnerCreateResponse::address.name + "." + LogisticAddressVerboseDto::bpnSite.name
             )
             .isEqualTo(expected)
     }

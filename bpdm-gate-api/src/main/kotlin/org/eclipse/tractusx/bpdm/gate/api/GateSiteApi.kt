@@ -29,7 +29,7 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateOutputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteGateInputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteGateOutputResponse
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
@@ -75,7 +75,7 @@ interface GateSiteApi {
     )
     @GetMapping("/input/sites/{externalId}")
     @GetExchange("/input/sites/{externalId}")
-    fun getSiteByExternalId(@Parameter(description = "External ID") @PathVariable externalId: String): SiteGateInputDto
+    fun getSiteByExternalId(@Parameter(description = "External ID") @PathVariable externalId: String): SiteGateInputResponse
 
     @Operation(
         summary = "Returns sites by an array of external IDs from the input stage",
@@ -93,7 +93,7 @@ interface GateSiteApi {
     fun getSitesByExternalIds(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @RequestBody externalIds: Collection<String>
-    ): PageDto<SiteGateInputDto>
+    ): PageDto<SiteGateInputResponse>
 
     @Operation(
         summary = "Returns sites from the input stage",
@@ -108,7 +108,7 @@ interface GateSiteApi {
     )
     @GetMapping("/input/sites")
     @GetExchange("/input/sites")
-    fun getSites(@ParameterObject @Valid paginationRequest: PaginationRequest): PageDto<SiteGateInputDto>
+    fun getSites(@ParameterObject @Valid paginationRequest: PaginationRequest): PageDto<SiteGateInputResponse>
 
     @Operation(
         summary = "Returns sites by an array of external IDs from the output stage",

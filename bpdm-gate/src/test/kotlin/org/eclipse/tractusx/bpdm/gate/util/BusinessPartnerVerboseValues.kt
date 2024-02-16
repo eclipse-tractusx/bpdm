@@ -376,7 +376,7 @@ object BusinessPartnerVerboseValues {
     )
 
     //Response values for Site and LegalEntity created Addresses (Input)
-    val addressGateInputResponseLegalEntity1 = AddressGateInputDto(
+    val addressGateInputResponseLegalEntity1 = AddressGateInputResponse(
         address = physicalAddress1.copy(
             nameParts = emptyList(), //listOf(CommonValues.name1),
         ),
@@ -384,7 +384,7 @@ object BusinessPartnerVerboseValues {
         legalEntityExternalId = externalId1,
     )
 
-    val addressGateInputResponseSite1 = AddressGateInputDto(
+    val addressGateInputResponseSite1 = AddressGateInputResponse(
         address = physicalAddress1.copy(
             nameParts = emptyList(), //listOf(CommonValues.nameSite1),
         ),
@@ -392,7 +392,7 @@ object BusinessPartnerVerboseValues {
         siteExternalId = externalIdSite1,
     )
 
-    val logisticAddressGateInputResponse1 = AddressGateInputDto(
+    val logisticAddressGateInputResponse1 = AddressGateInputResponse(
         address = logisticAddress1.copy(
             nameParts = listOf("Business Partner Name"),
             identifiers = listOf(
@@ -404,7 +404,7 @@ object BusinessPartnerVerboseValues {
         legalEntityExternalId = externalId1,
     )
 
-    val logisticAddressGateInputResponse2 = AddressGateInputDto(
+    val logisticAddressGateInputResponse2 = AddressGateInputResponse(
         address = logisticAddress2.copy(
             nameParts = listOf("Company ABC AG"),
             identifiers = listOf(
@@ -417,7 +417,7 @@ object BusinessPartnerVerboseValues {
     )
 
     //Output Response Values
-    val logisticAddressGateOutputResponse1 = AddressGateOutputDto(
+    val logisticAddressGateOutputResponse1 = AddressGateOutputResponse(
         address = logisticAddress1.copy(
             nameParts = listOf("Business Partner Name"),
         ),
@@ -426,7 +426,7 @@ object BusinessPartnerVerboseValues {
         bpna = "BPNA0000000001XY"
     )
 
-    val logisticAddressGateOutputResponse2 = AddressGateOutputDto(
+    val logisticAddressGateOutputResponse2 = AddressGateOutputResponse(
         address = logisticAddress2.copy(
             nameParts = listOf("Company ABC AG"),
         ),
@@ -435,9 +435,9 @@ object BusinessPartnerVerboseValues {
         bpna = "BPNA0000000002XY"
     )
 
-    val legalEntityGateInputResponse1 = LegalEntityGateInputDto(
+    val legalEntityGateInputResponse1 = LegalEntityGateInputResponse(
         legalEntity = legalEntity1,
-        legalAddress = AddressGateInputDto(
+        legalAddress = AddressGateInputResponse(
             address = logisticAddress1,
             externalId = "${externalId1}_legalAddress",
             legalEntityExternalId = externalId1,
@@ -446,9 +446,9 @@ object BusinessPartnerVerboseValues {
         externalId = externalId1,
     )
 
-    val legalEntityGateInputResponse2 = LegalEntityGateInputDto(
+    val legalEntityGateInputResponse2 = LegalEntityGateInputResponse(
         legalEntity = legalEntity2,
-        legalAddress = AddressGateInputDto(
+        legalAddress = AddressGateInputResponse(
             address = logisticAddress2,
             externalId = "${externalId2}_legalAddress",
             legalEntityExternalId = externalId2,
@@ -472,7 +472,7 @@ object BusinessPartnerVerboseValues {
         legalEntity = legalEntity1,
         externalId = externalId1,
         bpnl = "BPNL0000000000XY",
-        legalAddress = AddressGateOutputDto(
+        legalAddress = AddressGateOutputResponse(
             address = physicalAddress1,
             externalId = "${externalId1}_legalAddress",
             legalEntityExternalId = externalId1,
@@ -486,7 +486,7 @@ object BusinessPartnerVerboseValues {
         legalEntity = legalEntity2,
         externalId = externalId2,
         bpnl = "BPNL0000000001XZ",
-        legalAddress = AddressGateOutputDto(
+        legalAddress = AddressGateOutputResponse(
             address = physicalAddress2,
             externalId = "${externalId2}_legalAddress",
             legalEntityExternalId = externalId2,
@@ -495,10 +495,10 @@ object BusinessPartnerVerboseValues {
         )
     )
 
-    val persistencesiteGateInputResponse1 = SiteGateInputDto(
+    val persistencesiteGateInputResponse1 = SiteGateInputResponse(
         site = site1, externalId = externalIdSite1,
         legalEntityExternalId = externalId1,
-        mainAddress = AddressGateInputDto(
+        mainAddress = AddressGateInputResponse(
             address = physicalAddress1,
             externalId = "${externalIdSite1}_site",
             legalEntityExternalId = null,
@@ -506,10 +506,10 @@ object BusinessPartnerVerboseValues {
         )
     )
 
-    val persistenceSiteGateInputResponse2 = SiteGateInputDto(
+    val persistenceSiteGateInputResponse2 = SiteGateInputResponse(
         site = site2, externalId = externalIdSite2,
         legalEntityExternalId = externalId2,
-        mainAddress = AddressGateInputDto(
+        mainAddress = AddressGateInputResponse(
             address = physicalAddress2,
             externalId = "${externalIdSite2}_site",
             legalEntityExternalId = null,
@@ -521,7 +521,7 @@ object BusinessPartnerVerboseValues {
         site = site1, externalId = externalIdSite1,
         legalEntityExternalId = externalId1,
         bpns = "BPNS0000000001XY",
-        mainAddress = AddressGateOutputDto(
+        mainAddress = AddressGateOutputResponse(
             address = physicalAddress1,
             externalId = "${externalIdSite1}_site",
             legalEntityExternalId = null,
@@ -534,7 +534,7 @@ object BusinessPartnerVerboseValues {
         site = site2, externalId = externalIdSite2,
         legalEntityExternalId = externalId2,
         bpns = "BPNS0000000002XY",
-        mainAddress = AddressGateOutputDto(
+        mainAddress = AddressGateOutputResponse(
             address = physicalAddress2,
             externalId = "${externalIdSite2}_site",
             legalEntityExternalId = null,
@@ -544,7 +544,7 @@ object BusinessPartnerVerboseValues {
     )
 
     //Response values for Site and LegalEntity created Addresses (Output)
-    val addressGateOutputResponseLegalEntity1 = AddressGateOutputDto(
+    val addressGateOutputResponseLegalEntity1 = AddressGateOutputResponse(
         address = physicalAddress1.copy(
             nameParts = emptyList(),
             identifiers = listOf(
@@ -556,7 +556,7 @@ object BusinessPartnerVerboseValues {
         bpna = "BPNA0000000001XY"
     )
 
-    val addressGateOutputResponseSite1 = AddressGateOutputDto(
+    val addressGateOutputResponseSite1 = AddressGateOutputResponse(
         address = physicalAddress1.copy(
             nameParts = emptyList(),
             identifiers = listOf(

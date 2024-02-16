@@ -47,10 +47,10 @@ import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.bpdm.common.model.StageType
-import org.eclipse.tractusx.bpdm.gate.entity.AlternativePostalAddress
-import org.eclipse.tractusx.bpdm.gate.entity.GeographicCoordinate
-import org.eclipse.tractusx.bpdm.gate.entity.PhysicalPostalAddress
-import org.eclipse.tractusx.bpdm.gate.entity.Street
+import org.eclipse.tractusx.bpdm.gate.entity.AlternativePostalAddressDb
+import org.eclipse.tractusx.bpdm.gate.entity.GeographicCoordinateDb
+import org.eclipse.tractusx.bpdm.gate.entity.PhysicalPostalAddressDb
+import org.eclipse.tractusx.bpdm.gate.entity.StreetDb
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.PostalAddressRepository
 import org.eclipse.tractusx.bpdm.gate.util.DbTestHelpers
@@ -150,10 +150,10 @@ internal class BusinessPartnerIT @Autowired constructor(
     }
 
 
-    private fun createBusinessPartner(): BusinessPartner {
+    private fun createBusinessPartner(): BusinessPartnerDb {
         val postalAddress = createPostalAddress()
 
-        return BusinessPartner(
+        return BusinessPartnerDb(
             externalId = "testExternalId",
             nameParts = mutableListOf("testNameParts", "testNameParts2", "testNameParts3", "testNameParts4", "testNameParts5"),
             shortName = "testShortName",
@@ -179,8 +179,8 @@ internal class BusinessPartnerIT @Autowired constructor(
         )
     }
 
-    private fun createPostalAddress(): PostalAddress {
-        return PostalAddress(
+    private fun createPostalAddress(): PostalAddressDb {
+        return PostalAddressDb(
             addressType = AddressType.LegalAddress,
             physicalPostalAddress = createPhysicalPostalAddress(),
             alternativePostalAddress = null
@@ -188,8 +188,8 @@ internal class BusinessPartnerIT @Autowired constructor(
     }
 
     private fun createPhysicalPostalAddress() =
-        PhysicalPostalAddress(
-            geographicCoordinates = GeographicCoordinate(
+        PhysicalPostalAddressDb(
+            geographicCoordinates = GeographicCoordinateDb(
                 altitude = 10.0f,
                 latitude = 52.0f,
                 longitude = 13.0f
@@ -201,7 +201,7 @@ internal class BusinessPartnerIT @Autowired constructor(
             postalCode = "10115",
             city = "Berlin",
             district = "district9",
-            street = Street(
+            street = StreetDb(
                 name = "unknown street",
                 houseNumberSupplement = "house-number-supplement",
                 namePrefix = "Un",
@@ -216,8 +216,8 @@ internal class BusinessPartnerIT @Autowired constructor(
         )
 
     private fun createAlternativePostalAddress() =
-        AlternativePostalAddress(
-            geographicCoordinates = GeographicCoordinate(
+        AlternativePostalAddressDb(
+            geographicCoordinates = GeographicCoordinateDb(
                 altitude = 15.0f,
                 latitude = 52.5f,
                 longitude = 13.5f
@@ -231,25 +231,25 @@ internal class BusinessPartnerIT @Autowired constructor(
             deliveryServiceNumber = "12345"
         )
 
-    private fun createIdentifier(): Identifier {
+    private fun createIdentifier(): IdentifierDb {
 
-        return Identifier(
+        return IdentifierDb(
             value = "1234567890",
             type = "Passport",
             issuingBody = "Government of XYZ"
         )
     }
 
-    private fun createState(): State {
-        return State(
+    private fun createState(): StateDb {
+        return StateDb(
             type = BusinessStateType.ACTIVE,
             validFrom = LocalDateTime.now(),
             validTo = LocalDateTime.now().plusDays(365)
         )
     }
-    private fun createClassification(): Classification {
+    private fun createClassification(): ClassificationDb {
 
-        return Classification(
+        return ClassificationDb(
             value = "A1",
             code = "OP123",
             type = ClassificationType.NACE

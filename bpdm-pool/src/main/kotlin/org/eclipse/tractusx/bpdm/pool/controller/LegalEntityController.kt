@@ -53,7 +53,7 @@ class LegalEntityController(
     override fun getLegalEntities(
         bpSearchRequest: LegalEntityPropertiesSearchRequest,
         paginationRequest: PaginationRequest
-    ): PageDto<LegalEntityMatchVerboseDto> {
+    ): PageDto<LegalEntityMatchResponse> {
         return searchService.searchLegalEntities(
             BusinessPartnerSearchRequest(bpSearchRequest),
             paginationRequest
@@ -61,7 +61,7 @@ class LegalEntityController(
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
-    override fun getLegalEntity(idValue: String, idType: String?): LegalEntityWithLegalAddressVerboseDto {
+    override fun getLegalEntity(idValue: String, idType: String?): LegalEntityWithLegalAddressResponse {
         val actualType = idType ?: bpnConfigProperties.id
         return if (actualType == bpnConfigProperties.id) businessPartnerFetchService.findLegalEntityIgnoreCase(idValue.uppercase())
         else businessPartnerFetchService.findLegalEntityIgnoreCase(actualType, idValue)
@@ -75,7 +75,7 @@ class LegalEntityController(
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun searchLegalEntitys(
         bpnLs: Collection<String>
-    ): ResponseEntity<Collection<LegalEntityWithLegalAddressVerboseDto>> {
+    ): ResponseEntity<Collection<LegalEntityWithLegalAddressResponse>> {
         if (bpnLs.size > controllerConfigProperties.searchRequestLimit) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
@@ -101,7 +101,7 @@ class LegalEntityController(
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun searchLegalAddresses(
         bpnLs: Collection<String>
-    ): Collection<LegalAddressVerboseDto> {
+    ): Collection<LegalAddressResponse> {
         return addressService.findLegalAddresses(bpnLs)
     }
 

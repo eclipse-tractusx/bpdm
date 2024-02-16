@@ -43,7 +43,7 @@ class GateQueryService(
     fun getChangedExternalIdsByBusinessPartnerType(modifiedAfter: Instant?): Map<BusinessPartnerType?, Set<String>> {
         var page = 0
         var totalPages: Int
-        val content = mutableListOf<ChangelogGateDto>()
+        val content = mutableListOf<ChangelogGateResponse>()
 
         do {
             val pageResponse = gateClient.changelog.getInputChangelog(
@@ -138,13 +138,13 @@ class GateQueryService(
             .mapValues { it.value.bpn!! }
     }
 
-    private fun getLegalEntitiesInput(externalIds: Set<String>): Collection<LegalEntityGateInputDto> {
+    private fun getLegalEntitiesInput(externalIds: Set<String>): Collection<LegalEntityGateInputResponse> {
         if (externalIds.isEmpty()) {
             return emptyList()
         }
 
         var page = 0
-        val validContent = mutableListOf<LegalEntityGateInputDto>()
+        val validContent = mutableListOf<LegalEntityGateInputResponse>()
 
         do {
             val pageResponse = gateClient.legalEntities.getLegalEntitiesByExternalIds(
@@ -159,13 +159,13 @@ class GateQueryService(
         return validContent
     }
 
-    private fun getSitesInput(externalIds: Set<String>): Collection<SiteGateInputDto> {
+    private fun getSitesInput(externalIds: Set<String>): Collection<SiteGateInputResponse> {
         if (externalIds.isEmpty()) {
             return emptyList()
         }
 
         var page = 0
-        val validContent = mutableListOf<SiteGateInputDto>()
+        val validContent = mutableListOf<SiteGateInputResponse>()
 
         do {
             val pageResponse = gateClient.sites.getSitesByExternalIds(
@@ -180,13 +180,13 @@ class GateQueryService(
         return validContent
     }
 
-    private fun getAddressesInput(externalIds: Set<String>): Collection<AddressGateInputDto> {
+    private fun getAddressesInput(externalIds: Set<String>): Collection<AddressGateInputResponse> {
         if (externalIds.isEmpty()) {
             return emptyList()
         }
 
         var page = 0
-        val validContent = mutableListOf<AddressGateInputDto>()
+        val validContent = mutableListOf<AddressGateInputResponse>()
 
         do {
             val pageResponse = gateClient.addresses.getAddressesByExternalIds(

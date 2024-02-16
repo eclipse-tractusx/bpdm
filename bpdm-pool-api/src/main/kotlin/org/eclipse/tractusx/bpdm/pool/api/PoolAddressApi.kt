@@ -31,7 +31,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerBpnSearchR
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerUpdateResponseWrapper
 import org.springdoc.core.annotations.ParameterObject
@@ -64,7 +64,7 @@ interface PoolAddressApi {
     fun getAddresses(
         @ParameterObject addressSearchRequest: AddressPartnerSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageDto<AddressMatchVerboseDto>
+    ): PageDto<AddressMatchResponse>
 
     @Operation(
         summary = "Returns an address by its BPNA",

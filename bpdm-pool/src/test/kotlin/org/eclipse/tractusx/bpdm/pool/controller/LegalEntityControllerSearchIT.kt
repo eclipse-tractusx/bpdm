@@ -27,7 +27,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchResponse
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -97,8 +97,8 @@ class LegalEntityControllerSearchIT @Autowired constructor(
         val expected = PageDto(
             2, 1, 0, 2,
             listOf(
-                LegalEntityMatchVerboseDto(score = 0f, legalEntity = givenPartner1, legalAddress = legalAddress1),
-                LegalEntityMatchVerboseDto(score = 0f, legalEntity = givenPartner2, legalAddress = legalAddress2)
+                LegalEntityMatchResponse(score = 0f, legalEntity = givenPartner1, legalAddress = legalAddress1),
+                LegalEntityMatchResponse(score = 0f, legalEntity = givenPartner2, legalAddress = legalAddress2)
             )
         )
 
@@ -117,12 +117,12 @@ class LegalEntityControllerSearchIT @Autowired constructor(
 
         val expectedFirstPage = PageDto(
             2, 2, 0, 1, listOf(
-                LegalEntityMatchVerboseDto(score = 0f, legalEntity = givenPartner1, legalAddress = legalAddress1)
+                LegalEntityMatchResponse(score = 0f, legalEntity = givenPartner1, legalAddress = legalAddress1)
             )
         )
         val expectedSecondPage = PageDto(
             2, 2, 1, 1, listOf(
-                LegalEntityMatchVerboseDto(score = 0f, legalEntity = givenPartner2, legalAddress = legalAddress2)
+                LegalEntityMatchResponse(score = 0f, legalEntity = givenPartner2, legalAddress = legalAddress2)
             )
         )
 
@@ -133,7 +133,7 @@ class LegalEntityControllerSearchIT @Autowired constructor(
         assertPageEquals(secondPage, expectedSecondPage)
     }
 
-    private fun searchBusinessPartnerBySiteName(siteName: String, page: Int, size: Int): PageDto<LegalEntityMatchVerboseDto> {
+    private fun searchBusinessPartnerBySiteName(siteName: String, page: Int, size: Int): PageDto<LegalEntityMatchResponse> {
         val sitePropertiesSearchRequest = SitePropertiesSearchRequest(siteName)
 
         return poolClient.legalEntities.getLegalEntities(
@@ -144,9 +144,9 @@ class LegalEntityControllerSearchIT @Autowired constructor(
 
     }
 
-    private fun assertPageEquals(actual: PageDto<LegalEntityMatchVerboseDto>, expected: PageDto<LegalEntityMatchVerboseDto>) {
+    private fun assertPageEquals(actual: PageDto<LegalEntityMatchResponse>, expected: PageDto<LegalEntityMatchResponse>) {
         testHelpers.assertRecursively(actual)
-            .ignoringFieldsMatchingRegexes(".*${LegalEntityMatchVerboseDto::score.name}")
+            .ignoringFieldsMatchingRegexes(".*${LegalEntityMatchResponse::score.name}")
             .isEqualTo(expected)
     }
 }

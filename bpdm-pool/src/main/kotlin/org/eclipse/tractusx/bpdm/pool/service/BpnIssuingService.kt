@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.service
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
-import org.eclipse.tractusx.bpdm.pool.entity.ConfigurationEntry
+import org.eclipse.tractusx.bpdm.pool.entity.ConfigurationEntryDb
 import org.eclipse.tractusx.bpdm.pool.exception.BpnInvalidCounterValueException
 import org.eclipse.tractusx.bpdm.pool.exception.BpnMaxNumberReachedException
 import org.eclipse.tractusx.bpdm.pool.repository.ConfigurationEntryRepository
@@ -97,9 +97,9 @@ class BpnIssuingService(
         return "${bpnConfigProperties.id}$bpnChar$code$checksum"
     }
 
-    private fun getOrCreateCounter(bpnCounterKey: String): ConfigurationEntry {
+    private fun getOrCreateCounter(bpnCounterKey: String): ConfigurationEntryDb {
         return configurationEntryRepository.findByKey(bpnCounterKey) ?: run {
-            val newEntry = ConfigurationEntry(bpnCounterKey, 0.toString())
+            val newEntry = ConfigurationEntryDb(bpnCounterKey, 0.toString())
             configurationEntryRepository.save(newEntry)
         }
     }

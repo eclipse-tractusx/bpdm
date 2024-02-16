@@ -24,7 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.GateLegalEntityApi
 import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateOutputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityGateInputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityGateOutputResponse
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
@@ -50,7 +50,7 @@ class LegalEntityController(
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_INPUT_AUTHORITY})")
-    override fun getLegalEntityByExternalId(externalId: String): LegalEntityGateInputDto {
+    override fun getLegalEntityByExternalId(externalId: String): LegalEntityGateInputResponse {
         return legalEntityService.getLegalEntityByExternalId(externalId)
     }
 
@@ -58,12 +58,12 @@ class LegalEntityController(
     override fun getLegalEntitiesByExternalIds(
         paginationRequest: PaginationRequest,
         externalIds: Collection<String>
-    ): PageDto<LegalEntityGateInputDto> {
+    ): PageDto<LegalEntityGateInputResponse> {
         return legalEntityService.getLegalEntities(page = paginationRequest.page, size = paginationRequest.size, externalIds = externalIds)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_INPUT_AUTHORITY})")
-    override fun getLegalEntities(paginationRequest: PaginationRequest): PageDto<LegalEntityGateInputDto> {
+    override fun getLegalEntities(paginationRequest: PaginationRequest): PageDto<LegalEntityGateInputResponse> {
         return legalEntityService.getLegalEntities(page = paginationRequest.page, size = paginationRequest.size)
     }
 

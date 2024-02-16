@@ -174,7 +174,7 @@ class GateUpdateService(
 
     private fun buildLegalEntityGateOutputRequest(
         requestEntry: GateLegalEntityInfo?,
-        poolResponse: LegalEntityPartnerCreateVerboseDto
+        poolResponse: LegalEntityPartnerCreateResponse
     ): LegalEntityGateOutputRequest? {
         if (requestEntry == null) {
             logger.warn { "No matching request for Pool response for ${poolResponse.legalEntity.bpnl} found, can't update the Gate output state" }
@@ -188,7 +188,7 @@ class GateUpdateService(
         )
     }
 
-    private fun buildSiteGateOutputRequest(requestEntry: GateSiteInfo?, poolResponse: SitePartnerCreateVerboseDto): SiteGateOutputRequest? {
+    private fun buildSiteGateOutputRequest(requestEntry: GateSiteInfo?, poolResponse: SitePartnerCreateResponse): SiteGateOutputRequest? {
         if (requestEntry == null) {
             logger.warn { "No matching request for Pool response for ${poolResponse.site.bpns} found, can't update the Gate output state" }
             return null

@@ -25,7 +25,7 @@ import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchResponse
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -100,7 +100,7 @@ class AddressControllerSearchIT @Autowired constructor(
     fun `search address via name`() {
         val expected = PageDto(
             1, 1, 0, 1, listOf(
-                AddressMatchVerboseDto(0f, givenAddress1)
+                AddressMatchResponse(0f, givenAddress1)
             )
         )
 
@@ -121,7 +121,7 @@ class AddressControllerSearchIT @Autowired constructor(
     @Test
     fun `search address via name not found`() {
         val expected = PageDto(
-            0, 0, 0, 0, emptyList<AddressMatchVerboseDto>()
+            0, 0, 0, 0, emptyList<AddressMatchResponse>()
         )
 
 
@@ -134,9 +134,9 @@ class AddressControllerSearchIT @Autowired constructor(
     }
 
 
-    private fun assertPageEquals(actual: PageDto<AddressMatchVerboseDto>, expected: PageDto<AddressMatchVerboseDto>) {
+    private fun assertPageEquals(actual: PageDto<AddressMatchResponse>, expected: PageDto<AddressMatchResponse>) {
         testHelpers.assertRecursively(actual)
-            .ignoringFieldsMatchingRegexes(".*${AddressMatchVerboseDto::score.name}")
+            .ignoringFieldsMatchingRegexes(".*${AddressMatchResponse::score.name}")
             .isEqualTo(expected)
     }
 }

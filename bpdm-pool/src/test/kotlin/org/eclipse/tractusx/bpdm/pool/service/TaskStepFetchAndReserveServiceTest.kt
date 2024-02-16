@@ -31,8 +31,8 @@ import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.*
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressResponse
 import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.service.TaskStepBuildService.CleaningError
 import org.eclipse.tractusx.bpdm.pool.util.BusinessPartnerNonVerboseValues.addressIdentifierTypeDto1
@@ -1462,7 +1462,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
 
     }
 
-    fun compareLegalEntity(verboseRequest: LegalEntityWithLegalAddressVerboseDto, legalEntity: LegalEntityDto?) {
+    fun compareLegalEntity(verboseRequest: LegalEntityWithLegalAddressResponse, legalEntity: LegalEntityDto?) {
 
         val verboseLegalEntity = verboseRequest.legalEntity
 
@@ -1478,7 +1478,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         compareLogisticAddress(verboseLegalAddress, legalEntity?.legalAddress)
     }
 
-    fun compareSite(verboseRequest: SiteWithMainAddressVerboseDto, site: SiteDto?) {
+    fun compareSite(verboseRequest: SiteWithMainAddressResponse, site: SiteDto?) {
 
         val verboseSite = verboseRequest.site
 

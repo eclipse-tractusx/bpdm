@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.util
 
 import com.neovisionaries.i18n.CountryCode
 import org.apache.commons.csv.CSVFormat
-import org.eclipse.tractusx.bpdm.pool.entity.Region
+import org.eclipse.tractusx.bpdm.pool.entity.RegionDb
 import java.io.InputStream
 
 /**
@@ -29,20 +29,20 @@ import java.io.InputStream
  */
 class CreateSQLScriptToInsertRegions {
 
-    fun readCsv(inputStream: InputStream): List<Region> =
+    fun readCsv(inputStream: InputStream): List<RegionDb> =
         CSVFormat.Builder.create(CSVFormat.DEFAULT).apply {
             setIgnoreSurroundingSpaces(true)
         }.build().parse(inputStream.reader())
             .drop(1) // Dropping the header
             .map {
-                Region(
+                RegionDb(
                     countryCode = CountryCode.getByAlpha2Code(it[0]),
                     regionName = it[1],
                     regionCode = it[2],
                 )
             }
 
-    fun createSqlScript(regions: List<Region>): String {
+    fun createSqlScript(regions: List<RegionDb>): String {
 
         val builder = StringBuilder()
         regions

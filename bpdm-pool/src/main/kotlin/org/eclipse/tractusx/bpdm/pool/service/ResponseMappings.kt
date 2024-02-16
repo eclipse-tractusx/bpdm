@@ -34,30 +34,30 @@ fun <S, T> Page<S>.toDto(dtoContent: Collection<T>): PageDto<T> {
     return PageDto(this.totalElements, this.totalPages, this.number, this.numberOfElements, dtoContent)
 }
 
-fun LegalEntity.toMatchDto(score: Float): LegalEntityMatchVerboseDto {
-    return LegalEntityMatchVerboseDto(
+fun LegalEntityDb.toMatchDto(score: Float): LegalEntityMatchResponse {
+    return LegalEntityMatchResponse(
         score = score,
         legalEntity = this.toDto(),
         legalAddress = legalAddress.toDto(),
     )
 }
 
-fun LegalEntity.toUpsertDto(entryId: String?): LegalEntityPartnerCreateVerboseDto {
-    return LegalEntityPartnerCreateVerboseDto(
+fun LegalEntityDb.toUpsertDto(entryId: String?): LegalEntityPartnerCreateResponse {
+    return LegalEntityPartnerCreateResponse(
         legalEntity = toDto(),
         legalAddress = legalAddress.toDto(),
         index = entryId
     )
 }
 
-fun LegalEntity.toLegalEntityWithLegalAddress(): LegalEntityWithLegalAddressVerboseDto {
-    return LegalEntityWithLegalAddressVerboseDto(
+fun LegalEntityDb.toLegalEntityWithLegalAddress(): LegalEntityWithLegalAddressResponse {
+    return LegalEntityWithLegalAddressResponse(
         legalAddress = legalAddress.toDto(),
         legalEntity = toDto()
     )
 }
 
-fun LegalEntity.toDto(): LegalEntityVerboseDto {
+fun LegalEntityDb.toDto(): LegalEntityVerboseDto {
     return LegalEntityVerboseDto(
         bpnl = bpn,
         legalName = legalName.value,
@@ -74,40 +74,40 @@ fun LegalEntity.toDto(): LegalEntityVerboseDto {
     )
 }
 
-fun LegalEntityIdentifier.toDto(): LegalEntityIdentifierVerboseDto {
+fun LegalEntityIdentifierDb.toDto(): LegalEntityIdentifierVerboseDto {
     return LegalEntityIdentifierVerboseDto(value, type.toTypeKeyNameDto(), issuingBody)
 }
 
-fun AddressIdentifier.toDto(): AddressIdentifierVerboseDto {
+fun AddressIdentifierDb.toDto(): AddressIdentifierVerboseDto {
     return AddressIdentifierVerboseDto(value, type.toTypeKeyNameDto())
 }
 
-fun IdentifierType.toTypeKeyNameDto(): TypeKeyNameVerboseDto<String> {
+fun IdentifierTypeDb.toTypeKeyNameDto(): TypeKeyNameVerboseDto<String> {
     return TypeKeyNameVerboseDto(technicalKey, name)
 }
 
-fun IdentifierType.toDto(): IdentifierTypeDto {
+fun IdentifierTypeDb.toDto(): IdentifierTypeDto {
     return IdentifierTypeDto(technicalKey, businessPartnerType, name,
         details.map { IdentifierTypeDetailDto(it.countryCode, it.mandatory) })
 }
 
-fun LegalForm.toDto(): LegalFormDto {
+fun LegalFormDb.toDto(): LegalFormDto {
     return LegalFormDto(technicalKey, name, abbreviation)
 }
 
-fun LegalEntityState.toDto(): LegalEntityStateVerboseDto {
+fun LegalEntityStateDb.toDto(): LegalEntityStateVerboseDto {
     return LegalEntityStateVerboseDto(validFrom, validTo, type.toDto())
 }
 
-fun SiteState.toDto(): SiteStateVerboseDto {
+fun SiteStateDb.toDto(): SiteStateVerboseDto {
     return SiteStateVerboseDto(validFrom, validTo, type.toDto())
 }
 
-fun AddressState.toDto(): AddressStateVerboseDto {
+fun AddressStateDb.toDto(): AddressStateVerboseDto {
     return AddressStateVerboseDto(validFrom, validTo, type.toDto())
 }
 
-fun LogisticAddress.toDto(): LogisticAddressVerboseDto {
+fun LogisticAddressDb.toDto(): LogisticAddressVerboseDto {
     return LogisticAddressVerboseDto(
         bpna = bpn,
         bpnLegalEntity = legalEntity?.bpn,
@@ -126,8 +126,8 @@ fun LogisticAddress.toDto(): LogisticAddressVerboseDto {
     )
 }
 
-fun LogisticAddress.toLegalAddressResponse(): LegalAddressVerboseDto {
-    return LegalAddressVerboseDto(
+fun LogisticAddressDb.toLegalAddressResponse(): LegalAddressResponse {
+    return LegalAddressResponse(
         physicalPostalAddress = physicalPostalAddress.toDto(),
         alternativePostalAddress = alternativePostalAddress?.toDto(),
         bpnLegalEntity = legalEntity?.bpn!!,
@@ -136,8 +136,8 @@ fun LogisticAddress.toLegalAddressResponse(): LegalAddressVerboseDto {
     )
 }
 
-fun LogisticAddress.toMainAddressResponse(): MainAddressVerboseDto {
-    return MainAddressVerboseDto(
+fun LogisticAddressDb.toMainAddressResponse(): MainAddressResponse {
+    return MainAddressResponse(
         physicalPostalAddress = physicalPostalAddress.toDto(),
         alternativePostalAddress = alternativePostalAddress?.toDto(),
         bpnSite = site?.bpn!!,
@@ -146,7 +146,7 @@ fun LogisticAddress.toMainAddressResponse(): MainAddressVerboseDto {
     )
 }
 
-fun PhysicalPostalAddress.toDto(): PhysicalPostalAddressVerboseDto {
+fun PhysicalPostalAddressDb.toDto(): PhysicalPostalAddressVerboseDto {
     return PhysicalPostalAddressVerboseDto(
         geographicCoordinates = geographicCoordinates?.toDto(),
         countryVerbose = country.toDto(),
@@ -165,7 +165,7 @@ fun PhysicalPostalAddress.toDto(): PhysicalPostalAddressVerboseDto {
     )
 }
 
-fun AlternativePostalAddress.toDto(): AlternativePostalAddressVerboseDto {
+fun AlternativePostalAddressDb.toDto(): AlternativePostalAddressVerboseDto {
     return AlternativePostalAddressVerboseDto(
         geographicCoordinates = geographicCoordinates?.toDto(),
         countryVerbose = country.toDto(),
@@ -178,7 +178,7 @@ fun AlternativePostalAddress.toDto(): AlternativePostalAddressVerboseDto {
     )
 }
 
-private fun Street.toDto(): StreetDto {
+private fun StreetDb.toDto(): StreetDto {
     return StreetDto(
         name = name,
         houseNumber = houseNumber,
@@ -192,33 +192,33 @@ private fun Street.toDto(): StreetDto {
     )
 }
 
-fun LogisticAddress.toMatchDto(score: Float): AddressMatchVerboseDto {
-    return AddressMatchVerboseDto(score, this.toDto())
+fun LogisticAddressDb.toMatchDto(score: Float): AddressMatchResponse {
+    return AddressMatchResponse(score, this.toDto())
 }
 
-fun LogisticAddress.toCreateResponse(index: String?): AddressPartnerCreateVerboseDto {
-    return AddressPartnerCreateVerboseDto(
+fun LogisticAddressDb.toCreateResponse(index: String?): AddressPartnerCreateResponse {
+    return AddressPartnerCreateResponse(
         address = toDto(),
         index = index
     )
 }
 
-fun Site.toMatchDto(): SiteMatchVerboseDto {
-    return SiteMatchVerboseDto(
+fun SiteDb.toMatchDto(): SiteMatchResponse {
+    return SiteMatchResponse(
         mainAddress = this.mainAddress.toDto(),
         site = this.toDto(),
     )
 }
 
-fun Site.toUpsertDto(entryId: String?): SitePartnerCreateVerboseDto {
-    return SitePartnerCreateVerboseDto(
+fun SiteDb.toUpsertDto(entryId: String?): SitePartnerCreateResponse {
+    return SitePartnerCreateResponse(
         site = toDto(),
         mainAddress = mainAddress.toDto(),
         index = entryId
     )
 }
 
-fun Site.toDto(): SiteVerboseDto {
+fun SiteDb.toDto(): SiteVerboseDto {
     return SiteVerboseDto(
         bpn,
         name,
@@ -230,8 +230,8 @@ fun Site.toDto(): SiteVerboseDto {
     )
 }
 
-fun Site.toPoolDto(): SiteWithMainAddressVerboseDto {
-    return SiteWithMainAddressVerboseDto(
+fun SiteDb.toPoolDto(): SiteWithMainAddressResponse {
+    return SiteWithMainAddressResponse(
 
         site = SiteVerboseDto(
             bpn,
@@ -247,15 +247,15 @@ fun Site.toPoolDto(): SiteWithMainAddressVerboseDto {
 }
 
 
-fun GeographicCoordinate.toDto(): GeoCoordinateDto {
+fun GeographicCoordinateDb.toDto(): GeoCoordinateDto {
     return GeoCoordinateDto(longitude, latitude, altitude)
 }
 
-fun LegalEntityClassification.toDto(): LegalEntityClassificationVerboseDto {
+fun LegalEntityClassificationDb.toDto(): LegalEntityClassificationVerboseDto {
     return LegalEntityClassificationVerboseDto(value, code, type.toDto())
 }
 
-fun Relation.toDto(): RelationVerboseDto {
+fun RelationDb.toDto(): RelationVerboseDto {
     return RelationVerboseDto(
         type = type.toDto(),
         startBpnl = startNode.bpn,
@@ -265,19 +265,19 @@ fun Relation.toDto(): RelationVerboseDto {
     )
 }
 
-fun PartnerChangelogEntry.toDto(): ChangelogEntryVerboseDto {
-    return ChangelogEntryVerboseDto(bpn, businessPartnerType, updatedAt, changelogType)
+fun PartnerChangelogEntryDb.toDto(): ChangelogEntryResponse {
+    return ChangelogEntryResponse(bpn, businessPartnerType, updatedAt, changelogType)
 }
 
-fun Region.toRegionDto(): RegionDto {
+fun RegionDb.toRegionDto(): RegionDto {
     return RegionDto(countryCode = countryCode, regionCode = regionCode, regionName = regionName)
 }
 
-fun Region.toCountrySubdivisionDto(): CountrySubdivisionDto {
+fun RegionDb.toCountrySubdivisionDto(): CountrySubdivisionDto {
     return CountrySubdivisionDto(countryCode = countryCode, code = regionCode, name = regionName)
 }
 
-fun ConfidenceCriteria.toDto(): ConfidenceCriteriaDto =
+fun ConfidenceCriteriaDb.toDto(): ConfidenceCriteriaDto =
     ConfidenceCriteriaDto(
         sharedByOwner,
         checkedByExternalDataSource,
@@ -287,7 +287,7 @@ fun ConfidenceCriteria.toDto(): ConfidenceCriteriaDto =
         confidenceLevel
     )
 
-private fun getAddressType(logisticAddress: LogisticAddress): AddressType {
+private fun getAddressType(logisticAddress: LogisticAddressDb): AddressType {
     return when {
         logisticAddress.legalEntity?.legalAddress == logisticAddress &&
                 logisticAddress.site?.mainAddress == logisticAddress -> AddressType.LegalAndSiteMainAddress

@@ -23,7 +23,7 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.model.SyncStatus
 import org.eclipse.tractusx.bpdm.common.service.BaseSyncRecordService
 import org.eclipse.tractusx.bpdm.pool.api.model.SyncType
-import org.eclipse.tractusx.bpdm.pool.entity.SyncRecord
+import org.eclipse.tractusx.bpdm.pool.entity.SyncRecordDb
 import org.eclipse.tractusx.bpdm.pool.repository.SyncRecordRepository
 import org.springframework.stereotype.Service
 import java.time.Instant
@@ -31,18 +31,18 @@ import java.time.Instant
 @Service
 class SyncRecordService(
     private val syncRecordRepository: SyncRecordRepository
-) : BaseSyncRecordService<SyncType, SyncRecord>() {
+) : BaseSyncRecordService<SyncType, SyncRecordDb>() {
 
     override val logger = KotlinLogging.logger { }
 
     override fun newSyncRecord(type: SyncType, initialFromTime: Instant) =
-        SyncRecord(
+        SyncRecordDb(
             type = type,
             status = SyncStatus.NOT_SYNCED,
             fromTime = initialFromTime
         )
 
-    override fun save(record: SyncRecord) =
+    override fun save(record: SyncRecordDb) =
         syncRecordRepository.save(record)
 
     override fun findByType(type: SyncType) =

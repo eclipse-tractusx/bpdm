@@ -24,12 +24,12 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.BusinessPartnerSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteMatchVerboseDto
-import org.eclipse.tractusx.bpdm.pool.entity.LegalEntity
-import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddress
-import org.eclipse.tractusx.bpdm.pool.entity.Site
+import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteMatchResponse
+import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
+import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
+import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
@@ -64,7 +64,7 @@ class BusinessPartnerSearchService(
     override fun searchLegalEntities(
         searchRequest: BusinessPartnerSearchRequest,
         paginationRequest: PaginationRequest
-    ): PageDto<LegalEntityMatchVerboseDto> {
+    ): PageDto<LegalEntityMatchResponse> {
         val legalEntityPage = searchAndPrepareLegalEntityPage(searchRequest, paginationRequest)
         businessPartnerFetchService.fetchLegalEntityDependencies(legalEntityPage.content.map { (_, legalEntity) -> legalEntity }.toSet())
 
@@ -77,7 +77,7 @@ class BusinessPartnerSearchService(
     private fun searchAndPrepareLegalEntityPage(
         searchRequest: BusinessPartnerSearchRequest,
         paginationRequest: PaginationRequest
-    ): PageDto<Pair<Float, LegalEntity>> {
+    ): PageDto<Pair<Float, LegalEntityDb>> {
         return if (searchRequest == BusinessPartnerSearchRequest.EmptySearchRequest) {
             paginateLegalEntities(paginationRequest)
         } else {
@@ -85,7 +85,7 @@ class BusinessPartnerSearchService(
         }
     }
 
-    private fun paginateLegalEntities(paginationRequest: PaginationRequest): PageDto<Pair<Float, LegalEntity>> {
+    private fun paginateLegalEntities(paginationRequest: PaginationRequest): PageDto<Pair<Float, LegalEntityDb>> {
         logger.debug { "Paginate database for legal entities" }
         val legalEntityPage = legalEntityRepository.findAll(PageRequest.of(paginationRequest.page, paginationRequest.size))
 
@@ -95,7 +95,7 @@ class BusinessPartnerSearchService(
     private fun searchLegalEntity(
         searchRequest: BusinessPartnerSearchRequest,
         paginationRequest: PaginationRequest
-    ): PageDto<Pair<Float, LegalEntity>> {
+    ): PageDto<Pair<Float, LegalEntityDb>> {
         logger.debug { "Search for legal entities" }
 
         // Concatenate and convert to lowercase.
@@ -121,7 +121,7 @@ class BusinessPartnerSearchService(
     override fun searchAddresses(
         searchRequest: AddressPartnerSearchRequest,
         paginationRequest: PaginationRequest
-    ): PageDto<AddressMatchVerboseDto> {
+    ): PageDto<AddressMatchResponse> {
         val addressPage = searchAndPrepareAddressPage(searchRequest, paginationRequest)
         addressService.fetchLogisticAddressDependencies(addressPage.content.map { (_, address) -> address }.toSet())
         return with(addressPage) {
@@ -133,7 +133,7 @@ class BusinessPartnerSearchService(
     private fun searchAndPrepareAddressPage(
         searchRequest: AddressPartnerSearchRequest,
         paginationRequest: PaginationRequest
-    ): PageDto<Pair<Float, LogisticAddress>> {
+    ): PageDto<Pair<Float, LogisticAddressDb>> {
 
         return if (searchRequest == AddressPartnerSearchRequest.EmptySearchRequest) {
             paginateAddressPartner(paginationRequest)
@@ -142,7 +142,7 @@ class BusinessPartnerSearchService(
         }
     }
 
-    private fun paginateAddressPartner(paginationRequest: PaginationRequest): PageDto<Pair<Float, LogisticAddress>> {
+    private fun paginateAddressPartner(paginationRequest: PaginationRequest): PageDto<Pair<Float, LogisticAddressDb>> {
         logger.debug { "Paginate database for address partners" }
         val addressPage = logisticAddressRepository.findAll(PageRequest.of(paginationRequest.page, paginationRequest.size))
 
@@ -152,7 +152,7 @@ class BusinessPartnerSearchService(
     private fun searchAddress(
         searchRequest: AddressPartnerSearchRequest,
         paginationRequest: PaginationRequest
-    ): PageDto<Pair<Float, LogisticAddress>> {
+    ): PageDto<Pair<Float, LogisticAddressDb>> {
         logger.debug { "Search for addresses" }
 
         // Concatenate and convert to lowercase.
@@ -177,7 +177,7 @@ class BusinessPartnerSearchService(
      */
     override fun searchSites(
         paginationRequest: PaginationRequest
-    ): PageDto<SiteMatchVerboseDto> {
+    ): PageDto<SiteMatchResponse> {
         val sitePage = searchAndPreparePageSite(paginationRequest)
         siteService.fetchSiteDependenciesPage(sitePage.content.map { site -> site }.toSet())
 
@@ -189,11 +189,11 @@ class BusinessPartnerSearchService(
 
     private fun searchAndPreparePageSite(
         paginationRequest: PaginationRequest
-    ): PageDto<Site> {
+    ): PageDto<SiteDb> {
         return paginateSite(paginationRequest)
     }
 
-    private fun paginateSite(paginationRequest: PaginationRequest): PageDto<Site> {
+    private fun paginateSite(paginationRequest: PaginationRequest): PageDto<SiteDb> {
         logger.debug { "Paginate database for sites" }
         val sitePage = siteRepository.findAll(PageRequest.of(paginationRequest.page, paginationRequest.size))
 

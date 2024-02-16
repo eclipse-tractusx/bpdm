@@ -19,9 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.repository
 
-import org.eclipse.tractusx.bpdm.pool.entity.AddressState
+import org.eclipse.tractusx.bpdm.pool.entity.AddressStateDb
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.PagingAndSortingRepository
 
-interface AddressStateRepository : PagingAndSortingRepository<AddressState, Long>, CrudRepository<AddressState, Long> {
+interface AddressStateRepository : PagingAndSortingRepository<AddressStateDb, Long>, CrudRepository<AddressStateDb, Long> {
 }

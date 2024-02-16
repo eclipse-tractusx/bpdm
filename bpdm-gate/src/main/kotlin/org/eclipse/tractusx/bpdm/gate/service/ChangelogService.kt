@@ -23,7 +23,7 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.exception.ChangeLogOutputError
-import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogDto
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
@@ -48,7 +48,7 @@ class ChangelogService(private val changelogRepository: ChangelogRepository) {
         stage: StageType?,
         page: Int,
         pageSize: Int
-    ): PageChangeLogDto<ChangelogGateDto> {
+    ): PageChangeLogDto<ChangelogGateResponse> {
 
         logger.debug { "Executing getChangeLogEntries() with parameters $externalIds // $businessPartnerTypes // $stage // $createdAt" }
 

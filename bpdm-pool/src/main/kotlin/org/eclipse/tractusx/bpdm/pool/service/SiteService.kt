@@ -25,8 +25,8 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteBpnSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.entity.Site
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressResponse
+import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.springframework.data.domain.PageRequest
@@ -51,7 +51,7 @@ class SiteService(
         return page.toDto(page.content.map { it.toDto() })
     }
 
-    fun findByPartnerBpns(siteSearchRequest: SiteBpnSearchRequest, paginationRequest: PaginationRequest): PageDto<SiteWithMainAddressVerboseDto> {
+    fun findByPartnerBpns(siteSearchRequest: SiteBpnSearchRequest, paginationRequest: PaginationRequest): PageDto<SiteWithMainAddressResponse> {
         logger.debug { "Executing findByPartnerBpns() with parameters $siteSearchRequest // $paginationRequest" }
         val partners =
             if (siteSearchRequest.legalEntities.isNotEmpty()) legalEntityRepository.findDistinctByBpnIn(siteSearchRequest.legalEntities) else emptyList()
@@ -61,20 +61,20 @@ class SiteService(
         return sitePage.toDto(sitePage.content.map { it.toPoolDto() })
     }
 
-    fun findByBpn(bpn: String): SiteWithMainAddressVerboseDto {
+    fun findByBpn(bpn: String): SiteWithMainAddressResponse {
         logger.debug { "Executing findByBpn() with parameters $bpn " }
         val site = siteRepository.findByBpn(bpn) ?: throw BpdmNotFoundException("Site", bpn)
         return site.toPoolDto()
     }
 
-    private fun fetchSiteDependencies(sites: Set<Site>) {
+    private fun fetchSiteDependencies(sites: Set<SiteDb>) {
         siteRepository.joinAddresses(sites)
         siteRepository.joinStates(sites)
         val addresses = sites.flatMap { it.addresses }.toSet()
         addressService.fetchLogisticAddressDependencies(addresses)
     }
 
-    fun fetchSiteDependenciesPage(sites: Set<Site>): Set<Site> {
+    fun fetchSiteDependenciesPage(sites: Set<SiteDb>): Set<SiteDb> {
         siteRepository.joinAddresses(sites)
         siteRepository.joinStates(sites)
         val addresses = sites.flatMap { it.addresses }.toSet()

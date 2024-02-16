@@ -775,22 +775,22 @@ class LegalEntityControllerIT @Autowired constructor(
 
     }
 
-    fun assertThatCreatedLegalEntitiesEqual(actuals: Collection<LegalEntityPartnerCreateVerboseDto>, expected: Collection<LegalEntityPartnerCreateVerboseDto>) {
+    fun assertThatCreatedLegalEntitiesEqual(actuals: Collection<LegalEntityPartnerCreateResponse>, expected: Collection<LegalEntityPartnerCreateResponse>) {
         val now = Instant.now()
         val justBeforeCreate = now.minusSeconds(2)
         actuals.forEach { assertThat(it.legalEntity.currentness).isBetween(justBeforeCreate, now) }
         actuals.forEach { assertThat(it.legalEntity.bpnl).matches(testHelpers.bpnLPattern) }
 
         testHelpers.assertRecursively(actuals)
-            .ignoringFields(LegalEntityPartnerCreateVerboseDto::index.name)
+            .ignoringFields(LegalEntityPartnerCreateResponse::index.name)
             .ignoringFieldsOfTypes(Instant::class.java)
             .ignoringFieldsMatchingRegexes(".*${LegalEntityVerboseDto::bpnl.name}")
             .isEqualTo(expected)
     }
 
     fun assertThatModifiedLegalEntitiesEqual(
-        actuals: Collection<LegalEntityPartnerCreateVerboseDto>,
-        expected: Collection<LegalEntityPartnerCreateVerboseDto>
+        actuals: Collection<LegalEntityPartnerCreateResponse>,
+        expected: Collection<LegalEntityPartnerCreateResponse>
     ) {
         val now = Instant.now()
         val justBeforeCreate = now.minusSeconds(3)
@@ -798,7 +798,7 @@ class LegalEntityControllerIT @Autowired constructor(
 
         testHelpers.assertRecursively(actuals)
             .ignoringFieldsOfTypes(Instant::class.java)
-            .ignoringFields(LegalEntityPartnerCreateVerboseDto::index.name)
+            .ignoringFields(LegalEntityPartnerCreateResponse::index.name)
             .isEqualTo(expected)
     }
 
@@ -806,7 +806,7 @@ class LegalEntityControllerIT @Autowired constructor(
         .get()
         .uri(EndpointValues.CATENA_LEGAL_ENTITY_PATH + "/${bpn}")
         .exchange().expectStatus().isOk
-        .returnResult<LegalEntityWithLegalAddressVerboseDto>()
+        .returnResult<LegalEntityWithLegalAddressResponse>()
         .responseBody
         .blockFirst()!!.legalEntity.currentness
 
@@ -819,7 +819,7 @@ class LegalEntityControllerIT @Autowired constructor(
             throw IllegalArgumentException("Can't change case of string $value")
     }
 
-    private fun toLegalAddressResponse(it: LogisticAddressVerboseDto) = LegalAddressVerboseDto(
+    private fun toLegalAddressResponse(it: LogisticAddressVerboseDto) = LegalAddressResponse(
         physicalPostalAddress = it.physicalPostalAddress,
         alternativePostalAddress = it.alternativePostalAddress,
         bpnLegalEntity = it.bpnLegalEntity!!,
