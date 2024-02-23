@@ -28,10 +28,12 @@ The BPDM solution contains the following applications:
 
 Subfolders for BPDM applications are easily recognizable by the `bpdm` prefix.
 
-## BPDM Charts
+## Installation
 
-With the source code for the applications this repository also contains [Helm Charts](charts) that demonstrate how to deploy the applications in a Kubernetes
-environment.
+Installation instructions for the BPDM services can be found in the following places:
+
+1. [Local Installation](docs/OPERATOR_VIEW.md): Details how to install and configure the BPDM services on a host machine.
+2. [Helm Installation](charts/bpdm/README.md): Explains how to use given Helm Charts to install the BPDM services on a kubernetes environment.
 
 ## Container images
 
