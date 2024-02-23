@@ -71,7 +71,7 @@
 
     <pluginRepositories>
         <pluginRepository>
-            <id>dash-licenses-snapshots</id>
+            <id>dash-licenses</id>
             <url>https://repo.eclipse.org/content/repositories/dash-licenses/</url>
             <snapshots>
                 <enabled>true</enabled>
