@@ -4,7 +4,7 @@
 - [Introduction and Goals](#introduction-and-goals)
   - [Goals Overview](#goals-overview)
   - [Requirements Overview](#requirements-overview)
-  - [Quality Goals {#\_quality\_goals}](#quality-goals-_quality_goals)
+  - [Quality Goals](#quality-goals)
   - [Stakeholders](#stakeholders)
 - [Architecture Constraints](#architecture-constraints)
 - [System Scope and Context](#system-scope-and-context)
@@ -71,7 +71,7 @@ The following goals have been established for this system:
 > **Cross-Check with CACs**
 
 
-![bpdm_usecase_diagram](../assets/usecase_diagram.drawio.svg)
+![bpdm_usecase_diagram](assets/usecase_diagram.drawio.svg)
 
 
 
@@ -87,7 +87,7 @@ The following Usecases together with its requirements exist for this system:
 | BPDM-R6 | Provide unique business partner IDs                    | For each Golden Record a unique ID, the so called Business Partner Number (BPN) is created             |
 
 
-## Quality Goals {#\_quality\_goals}
+## Quality Goals
 
 | Priority | Quality Goal            | Scenario                                                                                                                                                                                                                                                                                                                                                                                             |
 | -------- | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -98,8 +98,6 @@ The following Usecases together with its requirements exist for this system:
 | 2        | Reliability             | The Golden Record Application is a central foundation in the Catena-X Network. It provides all participants and services, business partner data and the unique Business Partner Number (BPN) as identifier. Therefore the BPDM Services must be always/highly available                                                                                                                              |
 | 2        | Functional Stability    | Since the Golden Record Application is a central foundation in the Catena-X Network the defined standards of the API and datamodel for the associated Release Version must be fulfilled                                                                                                                                                                                                              |
 | 1        | Sensitivity of data     | the uploaded business partner data is highly sensitive, that's why it must be ensured that no unauthorized user/system can access data which does not belong to it. More over it must be guaranteed that no one can see the business partners related to the specific Catena-X Member.                                                                                                               |
-
-![](images/iso_25010.png)
 
 ## Stakeholders
 | Role/Name               | Expectations                                                                                                 | Example                                                                                                                                     |
@@ -123,7 +121,7 @@ The following Usecases together with its requirements exist for this system:
 
 The following figure depicts the business context setup for BPDM:
 
-![bpdm_business_context](../assets/cx_bpdm_context_business.drawio.svg)
+![bpdm_business_context](assets/cx_bpdm_context_business.drawio.svg)
 
 The following are the various components of the business context setup:
 
@@ -152,7 +150,7 @@ The following are the various components of the business context setup:
 ## Technical Context
 
 The technical context setup including deployment is depicted in the following figure:
-![cx_bpdm_deployment_context](../assets/cx_bpdm_context_technical.drawio.svg)
+![cx_bpdm_deployment_context](assets/cx_bpdm_context_technical.drawio.svg)
 
 * The BPDM Application follows a microservice approach to separate the different components of the system.
 * Within Catena-X there will be only one central operation environment that operates the BPDM Application. This operation environment provides the services and data for other operation environment or applications which needs to consume business partner data or golden record data.
@@ -161,7 +159,7 @@ The technical context setup including deployment is depicted in the following fi
 # Solution Strategy (High Level Picture)
 The following high level view gives a basic overview about the BPDM Components:
 
-![cx_bpdm_highlevel](../assets/cx_bpdm_highlevel.drawio.svg)
+![cx_bpdm_highlevel](assets/cx_bpdm_highlevel.drawio.svg)
 
 
 **BPDM Gate**
@@ -189,12 +187,12 @@ The following high level view gives a basic overview about the BPDM Components:
 
 Due to a transmission phase there are two concepts of Business Partner Upload Models. The target is to only have the generic Business Partner on the BPDM Gate.
 
-![bpdm_current_architecture_LSA](../assets/cx_bpdm_architecture_v3_2.drawio.svg)
+![bpdm_current_architecture_LSA](assets/cx_bpdm_architecture_v3_2.drawio.svg)
 
 
 ## High-Level Architecture (Generic Endpoint)
 
-![bpdm_current_architecture_Generic](../assets/cx_bpdm_architecture_v3_3.drawio.svg)
+![bpdm_current_architecture_Generic](assets/cx_bpdm_architecture_v3_3.drawio.svg)
 
 **Simulator Service**
 * To become more independent in testing the BPDM Application, a Simulator Service was developed.
@@ -609,7 +607,7 @@ In addition to the Spring standard logs the BPDM applications keep a log of the 
 
 # Quality Requirements
 
-* see: [Quality Goals](#quality-goals-_quality_goals)
+* see: [Quality Goals](#quality-goals)
 
 # Risks and Technical Debts
 
