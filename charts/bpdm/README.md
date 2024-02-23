@@ -44,11 +44,10 @@ image:
 
 ## Helm Dependencies
 
-On default, the Helm deployment also contains a PostgreSQL and Opensearch deployment.
+On default, the Helm deployment also contains a PostgreSQL deployment.
 You can configure these deployments in your value file as well.
-For this, consider the documentation of the correspondent dependency [PostgreSQL](https://artifacthub.io/packages/helm/bitnami/postgresql/11.9.13)
-or [Opensearch](https://opensearch.org/docs/latest/dashboards/install/helm/).
-In case you want to use an already deployed database or Opensearch instance you can also disable the respective dependency and overwrite the default host
+For this, consider the documentation of the correspondent dependency [PostgreSQL](https://artifacthub.io/packages/helm/bitnami/postgresql/11.9.13).
+In case you want to use an already deployed database instance you can also disable the respective dependency and overwrite the default host
 address in the `applicationConfig`:
 
 ```yaml

@@ -9,6 +9,7 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 ### Changed
 
 - set default memory limit and request to 512 Mi
+- removed mentions of Opensearch from README
 
 ## [6.0.0] - 2024-02-10
 
