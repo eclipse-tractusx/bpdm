@@ -35,19 +35,16 @@ in the GitHub organization https://github.com/eclipse-tractusx:
 
 This project leverages the following third party content.
 
+### Dependencies
+
 See [DEPENDENCIES](DEPENDENCIES) file.
 
-### Regions
+### Administrative Areas Level 1
 
-The initial load of the regions according to ISO-3166-2 is done from the CSV file at:
-
-`bpdm-pool/src/main/resources/regions/IP2LOCATION-ISO3166-2.CSV`
-
-This file is under the following license:
-
-`This works is licensed under Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0).`
-
-`"This site or product includes IP2Location™ ISO 3166-2 Subdivision Code which available from https://www.ip2location.com."`
+- Description: CSV file content for ISO-3166-2
+- SPDX-License-Identifier: [CC-BY-4.0](LICENSES/CC-BY-4.0.txt)
+- File Location: [IP2LOCATION-ISO3166-2.CSV](bpdm-pool/src/main/resources/regions/IP2LOCATION-ISO3166-2.CSV)
+- Source URL: https://www.ip2location.com
 
 ## Cryptography
 
