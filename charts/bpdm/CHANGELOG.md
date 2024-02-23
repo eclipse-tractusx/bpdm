@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
+## [4.0.1] - 2024-02-23
+
+### Changed
+
+- update BPDM Pool Chart to version 6.0.1
+- update BPDM Gate Chart to version 5.0.1
+- update BPDM Orchestrator Chart to version 2.0.1
+- update BPDM Cleaning Service Dummy Chart to version 2.0.1
+- update BPDM Bridge Chart to version 2.0.1
+
 ## [4.0.0] - 2024-02-10
 
 ### Changed
