@@ -20,11 +20,13 @@
 package org.eclipse.tractusx.bpdm.pool.api.client
 
 import org.eclipse.tractusx.bpdm.common.service.ParameterObjectArgumentResolver
-import org.eclipse.tractusx.bpdm.pool.api.*
+import org.eclipse.tractusx.bpdm.pool.api.PoolChangelogApi
+import org.eclipse.tractusx.bpdm.pool.api.PoolLegalEntityApi
+import org.eclipse.tractusx.bpdm.pool.api.PoolSaasApi
+import org.eclipse.tractusx.bpdm.pool.api.PoolSiteApi
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.support.WebClientAdapter
 import org.springframework.web.service.invoker.HttpServiceProxyFactory
-import java.time.Duration
 
 /**
  * In a Spring configuration a bean of this class is instantiated passing a webClientProvider which configures the web client with e.g. OIDC configuration.
@@ -37,22 +39,21 @@ class PoolClientImpl(
 ) : PoolApiClient {
 
     private val httpServiceProxyFactory: HttpServiceProxyFactory by lazy {
-        HttpServiceProxyFactory
-            .builder(WebClientAdapter.forClient(webClientProvider()))
+        HttpServiceProxyFactory.builder()
+            .exchangeAdapter(WebClientAdapter.create(webClientProvider()))
             .customArgumentResolver(ParameterObjectArgumentResolver())
-            .blockTimeout(Duration.ofSeconds(30))
             .build()
     }
 
-    override val addresses by lazy { createClient<PoolAddressApi>() }
+    override val addresses by lazy { createClient<AddressApiClient>() }
 
-    override val bpns by lazy { createClient<PoolBpnApi>() }
+    override val bpns by lazy { createClient<BpnApiClient>() }
 
     override val changelogs by lazy { createClient<PoolChangelogApi>() }
 
     override val legalEntities by lazy { createClient<PoolLegalEntityApi>() }
 
-    override val metadata by lazy { createClient<PoolMetadataApi>() }
+    override val metadata by lazy { createClient<MetadataApiClient>() }
 
     override val sites by lazy { createClient<PoolSiteApi>() }
 

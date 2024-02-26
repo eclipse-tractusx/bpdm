@@ -33,13 +33,8 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.service.annotation.GetExchange
-import org.springframework.web.service.annotation.HttpExchange
-import org.springframework.web.service.annotation.PostExchange
-import org.springframework.web.service.annotation.PutExchange
 
 @RequestMapping("/api/catena/sharing-state", produces = [MediaType.APPLICATION_JSON_VALUE])
-@HttpExchange("/api/catena/sharing-state")
 interface GateSharingStateApi {
 
     @Operation(
@@ -51,7 +46,6 @@ interface GateSharingStateApi {
         ]
     )
     @GetMapping
-    @GetExchange
     fun getSharingStates(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @Parameter(description = "Business partner type") @RequestParam(required = false) businessPartnerType: BusinessPartnerType?,
@@ -69,7 +63,6 @@ interface GateSharingStateApi {
         ]
     )
     @PostMapping("/ready")
-    @PostExchange("/ready")
     fun postSharingStateReady(@RequestBody request: PostSharingStateReadyRequest)
 
 
@@ -85,7 +78,6 @@ interface GateSharingStateApi {
         ]
     )
     @PutMapping
-    @PutExchange
     fun upsertSharingState(@RequestBody request: SharingStateDto)
 
 

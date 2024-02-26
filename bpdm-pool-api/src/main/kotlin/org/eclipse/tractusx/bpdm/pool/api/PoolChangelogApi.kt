@@ -33,11 +33,8 @@ import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.service.annotation.HttpExchange
-import org.springframework.web.service.annotation.PostExchange
 
 @RequestMapping("/api/catena/business-partners/changelog", produces = [MediaType.APPLICATION_JSON_VALUE])
-@HttpExchange("/api/catena/business-partners/changelog")
 interface PoolChangelogApi {
 
     @Operation(
@@ -51,7 +48,6 @@ interface PoolChangelogApi {
         ]
     )
     @PostMapping("/search")
-    @PostExchange("/search")
     fun getChangelogEntries(
         @RequestBody changelogSearchRequest: ChangelogSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest

@@ -26,6 +26,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.util.CommonApiPathNames
+import org.eclipse.tractusx.bpdm.pool.api.PoolAddressApi.Companion.ADDRESS_PATH
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerBpnSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
@@ -37,15 +39,16 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerUpdateRes
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.service.annotation.GetExchange
-import org.springframework.web.service.annotation.HttpExchange
-import org.springframework.web.service.annotation.PostExchange
-import org.springframework.web.service.annotation.PutExchange
 
 
-@RequestMapping("/api/catena/addresses", produces = [MediaType.APPLICATION_JSON_VALUE])
-@HttpExchange("/api/catena/addresses")
+@RequestMapping(ADDRESS_PATH, produces = [MediaType.APPLICATION_JSON_VALUE])
 interface PoolAddressApi {
+
+    companion object{
+        const val ADDRESS_PATH = "/api/catena/addresses"
+        const val PATHVAR_BPNA = "bpna"
+        const val SUBPATH_BPNA = "/{$PATHVAR_BPNA}"
+    }
 
     @Operation(
         summary = "Returns addresses by different search parameters",
@@ -60,7 +63,6 @@ interface PoolAddressApi {
         ]
     )
     @GetMapping
-    @GetExchange
     fun getAddresses(
         @ParameterObject addressSearchRequest: AddressPartnerSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
@@ -77,10 +79,9 @@ interface PoolAddressApi {
             ApiResponse(responseCode = "404", description = "No address found under specified BPNA", content = [Content()])
         ]
     )
-    @GetMapping("/{bpna}")
-    @GetExchange("/{bpna}")
+    @GetMapping(SUBPATH_BPNA)
     fun getAddress(
-        @Parameter(description = "BPNA value") @PathVariable bpna: String
+        @Parameter(description = "BPNA value") @PathVariable(PATHVAR_BPNA) bpna: String
     ): LogisticAddressVerboseDto
 
     @Operation(
@@ -93,8 +94,7 @@ interface PoolAddressApi {
             ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()])
         ]
     )
-    @PostMapping("/search")
-    @PostExchange("/search")
+    @PostMapping(CommonApiPathNames.SUBPATH_SEARCH)
     fun searchAddresses(
         @RequestBody addressSearchRequest: AddressPartnerBpnSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
@@ -114,7 +114,6 @@ interface PoolAddressApi {
         ]
     )
     @PostMapping
-    @PostExchange
     fun createAddresses(
         @RequestBody
         requests: Collection<AddressPartnerCreateRequest>
@@ -132,11 +131,9 @@ interface PoolAddressApi {
         ]
     )
     @PutMapping
-    @PutExchange
     fun updateAddresses(
         @RequestBody
         requests: Collection<AddressPartnerUpdateRequest>
     ): AddressPartnerUpdateResponseWrapper
-
 
 }

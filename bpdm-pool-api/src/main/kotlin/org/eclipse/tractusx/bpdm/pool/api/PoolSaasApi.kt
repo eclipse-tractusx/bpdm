@@ -36,13 +36,9 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.service.annotation.GetExchange
-import org.springframework.web.service.annotation.HttpExchange
-import org.springframework.web.service.annotation.PostExchange
 
 
 @RequestMapping("/api/saas", produces = [MediaType.APPLICATION_JSON_VALUE])
-@HttpExchange("/api/saas")
 interface PoolSaasApi {
 
     @Operation(
@@ -59,7 +55,6 @@ interface PoolSaasApi {
         ]
     )
     @PostMapping("/business-partner/sync")
-    @PostExchange("/business-partner/sync")
     fun importBusinessPartners(): SyncDto
 
     @Operation(
@@ -73,7 +68,6 @@ interface PoolSaasApi {
         ]
     )
     @GetMapping("/business-partner/sync")
-    @GetExchange("/business-partner/sync")
     fun getSyncStatus(): SyncDto
 
     @Operation(
@@ -87,7 +81,6 @@ interface PoolSaasApi {
         ]
     )
     @PostMapping("/identifier-mappings/filter")
-    @PostExchange("/identifier-mappings/filter")
     fun getImportEntries(@RequestBody importIdFilterRequest: ImportIdFilterRequest): ImportIdMappingDto
 
     @Operation(
@@ -101,6 +94,5 @@ interface PoolSaasApi {
         ]
     )
     @GetMapping("/identifier-mappings")
-    @GetExchange("/identifier-mappings")
     fun getImportEntries(@ParameterObject paginationRequest: PaginationRequest): PageDto<ImportIdEntry>
 }

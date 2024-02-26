@@ -19,19 +19,22 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.client
 
-import org.eclipse.tractusx.bpdm.pool.api.*
+import org.eclipse.tractusx.bpdm.pool.api.PoolChangelogApi
+import org.eclipse.tractusx.bpdm.pool.api.PoolLegalEntityApi
+import org.eclipse.tractusx.bpdm.pool.api.PoolSaasApi
+import org.eclipse.tractusx.bpdm.pool.api.PoolSiteApi
 
 interface PoolApiClient {
 
-    val addresses: PoolAddressApi
+    val addresses: AddressApiClient
 
-    val bpns: PoolBpnApi
+    val bpns: BpnApiClient
 
     val changelogs: PoolChangelogApi
 
     val legalEntities: PoolLegalEntityApi
 
-    val metadata: PoolMetadataApi
+    val metadata: MetadataApiClient
 
     val sites: PoolSiteApi
 

@@ -38,13 +38,8 @@ import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.service.annotation.GetExchange
-import org.springframework.web.service.annotation.HttpExchange
-import org.springframework.web.service.annotation.PostExchange
-import org.springframework.web.service.annotation.PutExchange
 
 @RequestMapping("/api/catena/legal-entities", produces = [MediaType.APPLICATION_JSON_VALUE])
-@HttpExchange("/api/catena/legal-entities")
 interface PoolLegalEntityApi {
 
     @Operation(
@@ -60,7 +55,6 @@ interface PoolLegalEntityApi {
         ]
     )
     @GetMapping
-    @GetExchange
     fun getLegalEntities(
         @ParameterObject bpSearchRequest: LegalEntityPropertiesSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
@@ -86,7 +80,6 @@ interface PoolLegalEntityApi {
         ]
     )
     @GetMapping("/{idValue}")
-    @GetExchange("/{idValue}")
     fun getLegalEntity(
         @Parameter(description = "Identifier value") @PathVariable idValue: String,
         @Parameter(description = "Type of identifier to use, defaults to BPN when omitted", schema = Schema(defaultValue = "BPN"))
@@ -106,7 +99,6 @@ interface PoolLegalEntityApi {
         ]
     )
     @PostMapping("/{bpnl}/confirm-up-to-date")
-    @PostExchange("/{bpnl}/confirm-up-to-date")
     fun setLegalEntityCurrentness(
         @Parameter(description = "BPNL value") @PathVariable bpnl: String
     )
@@ -128,7 +120,6 @@ interface PoolLegalEntityApi {
         ]
     )
     @PostMapping("/search")
-    @PostExchange("/search")
     fun searchLegalEntitys(
         @RequestBody bpnLs: Collection<String>
     ): ResponseEntity<Collection<LegalEntityWithLegalAddressVerboseDto>>
@@ -145,7 +136,6 @@ interface PoolLegalEntityApi {
         ]
     )
     @GetMapping("/{bpnl}/sites")
-    @GetExchange("/{bpnl}/sites")
     fun getSites(
         @Parameter(description = "BPNL value") @PathVariable bpnl: String,
         @ParameterObject paginationRequest: PaginationRequest
@@ -163,7 +153,6 @@ interface PoolLegalEntityApi {
         ]
     )
     @GetMapping("/{bpnl}/addresses")
-    @GetExchange("/{bpnl}/addresses")
     fun getAddresses(
         @Parameter(description = "BPNL value") @PathVariable bpnl: String,
         @ParameterObject paginationRequest: PaginationRequest
@@ -180,7 +169,6 @@ interface PoolLegalEntityApi {
         ]
     )
     @PostMapping("/legal-addresses/search")
-    @PostExchange("/legal-addresses/search")
     fun searchLegalAddresses(
         @RequestBody
         bpnLs: Collection<String>
@@ -199,7 +187,6 @@ interface PoolLegalEntityApi {
         ]
     )
     @PostMapping
-    @PostExchange
     fun createBusinessPartners(
         @RequestBody
         businessPartners: Collection<LegalEntityPartnerCreateRequest>
@@ -218,7 +205,6 @@ interface PoolLegalEntityApi {
         ]
     )
     @PutMapping
-    @PutExchange
     fun updateBusinessPartners(
         @RequestBody
         businessPartners: Collection<LegalEntityPartnerUpdateRequest>
