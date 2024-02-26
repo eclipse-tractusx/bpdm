@@ -22,6 +22,7 @@ package com.catenax.bpdm.bridge.dummy.service
 import com.catenax.bpdm.bridge.dummy.dto.*
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressDto
@@ -53,16 +54,30 @@ class PoolUpdateService(
     }
 
     fun updateLegalEntitiesInPool(entriesToUpdate: Collection<GateLegalEntityInfo>): LegalEntityPartnerUpdateResponseWrapper {
-        val updateRequests = entriesToUpdate.map {
-            LegalEntityPartnerUpdateRequest(
-                legalEntity = gateToPoolLegalEntity(it.legalEntity),
-                legalAddress = gateToPoolLogisticAddress(it.legalAddress.address),
-                bpnl = it.bpn!!
-            )
+        val errorListException = mutableListOf<ErrorInfo<LegalEntityUpdateError>>()
+        val updateRequests = mutableListOf<LegalEntityPartnerUpdateRequest>()
+
+        entriesToUpdate.forEach {
+            try {
+                updateRequests.add(
+                    LegalEntityPartnerUpdateRequest(
+                        legalEntity = gateToPoolLegalEntity(it.legalEntity),
+                        legalAddress = gateToPoolLogisticAddress(it.legalAddress.address),
+                        bpnl = it.bpn!!
+                    )
+                )
+            } catch (e: BpdmNullMappingException) {
+                logger.info { "Error processing ${it.externalId}" }
+                val errorMapped = ErrorInfo(LegalEntityUpdateError.LegalEntityDuplicateIdentifier, "Error on mapping '${it.legalEntity}' message ${e.message}", it.bpn)
+                errorListException.add(errorMapped)
+            }
         }
 
-        return poolClient.legalEntities.updateBusinessPartners(updateRequests)
-            .also { logger.info { "Pool accepted ${it.entityCount} updated legal entities, ${it.errorCount} were refused" } }
+        val result = poolClient.legalEntities.updateBusinessPartners(updateRequests)
+        val updatedResult = result.copy(errors = result.errors + errorListException)
+        logger.info { "Pool accepted ${updatedResult.entityCount} updated legal entities, ${updatedResult.errorCount} were refused" }
+
+        return updatedResult
     }
 
     fun createSitesInPool(entriesToCreate: Collection<GateSiteInfo>): SitePartnerCreateResponseWrapper {
