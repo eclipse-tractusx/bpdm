@@ -20,13 +20,8 @@
 package com.catenax.bpdm.bridge.dummy
 
 import com.catenax.bpdm.bridge.dummy.client.BridgeClient
-import com.catenax.bpdm.bridge.dummy.testdata.CommonValues
 import com.catenax.bpdm.bridge.dummy.testdata.GateRequestValues
 import com.catenax.bpdm.bridge.dummy.testdata.GateRequestValues.addressGateInputRequest1
-import com.catenax.bpdm.bridge.dummy.util.BpdmGateContextInitializer
-import com.catenax.bpdm.bridge.dummy.util.BpdmPoolContextInitializer
-import com.catenax.bpdm.bridge.dummy.util.PostgreSQLContextInitializer
-import com.catenax.bpdm.bridge.dummy.util.TestHelpers
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
@@ -44,6 +39,12 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSea
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteBpnSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
+import org.eclipse.tractusx.bpdm.test.containers.BpdmGateContextInitializer
+import org.eclipse.tractusx.bpdm.test.containers.BpdmPoolContextInitializer
+import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
+import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerVerboseValues
+import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
+import org.eclipse.tractusx.bpdm.test.util.PoolDataHelpers
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -60,13 +61,14 @@ class BridgeSyncIT @Autowired constructor(
     val bridgeClient: BridgeClient,
     val gateClient: GateClient,
     val poolClient: PoolApiClient,
-    val testHelpers: TestHelpers
+    val testHelpers: DbTestHelpers,
+    val poolDataHelpers: PoolDataHelpers,
 ) {
 
     @BeforeEach
     fun beforeEach() {
-        testHelpers.truncateDbTables()
-        testHelpers.createPoolMetadata()
+        testHelpers.truncateDbTables();
+        poolDataHelpers.createPoolMetadata()
     }
 
     @Test
@@ -248,7 +250,7 @@ class BridgeSyncIT @Autowired constructor(
             legalEntity = GateRequestValues.legalEntity1.copy(legalShortName = "ChangedShortNam"),
             legalAddress = GateRequestValues.address1.copy(
                 physicalPostalAddress = GateRequestValues.postalAddress1.copy(
-                    street = StreetDto(name = "Changed Street Entiy", houseNumber = CommonValues.houseNumber1, direction = CommonValues.direction1),
+                    street = StreetDto(name = "Changed Street Entiy", houseNumber = BusinessPartnerVerboseValues.houseNumber1, direction = BusinessPartnerVerboseValues.direction1),
                 ),
             ),
         )
@@ -315,7 +317,7 @@ class BridgeSyncIT @Autowired constructor(
             site = GateRequestValues.site1.copy(nameParts = listOf("ChangedNamePart1")),
             mainAddress = GateRequestValues.address1.copy(
                 physicalPostalAddress = GateRequestValues.postalAddress1.copy(
-                    street = StreetDto(name = "Changed Street Site", houseNumber = CommonValues.houseNumber1, direction = CommonValues.direction1),
+                    street = StreetDto(name = "Changed Street Site", houseNumber = BusinessPartnerVerboseValues.houseNumber1, direction = BusinessPartnerVerboseValues.direction1),
                 ),
             )
         )
@@ -382,7 +384,7 @@ class BridgeSyncIT @Autowired constructor(
             address = GateRequestValues.address1.copy(
                 nameParts = listOf("Changed Address Name"),
                 physicalPostalAddress = GateRequestValues.postalAddress1
-                    .copy(street = StreetDto(name = "UpdateSteet", houseNumber = CommonValues.houseNumber1, direction = CommonValues.direction1))
+                    .copy(street = StreetDto(name = "UpdateSteet", houseNumber = BusinessPartnerVerboseValues.houseNumber1, direction = BusinessPartnerVerboseValues.direction1))
             ),
 
             )

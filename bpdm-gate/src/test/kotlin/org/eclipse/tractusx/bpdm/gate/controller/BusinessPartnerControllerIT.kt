@@ -27,6 +27,7 @@ import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
 import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerClassificationDto
@@ -42,6 +43,13 @@ import org.eclipse.tractusx.bpdm.gate.service.GoldenRecordTaskService
 import org.eclipse.tractusx.bpdm.gate.util.*
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryVerboseDto
+import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
+import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerGenericCommonValues
+import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerNonVerboseValues
+import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerVerboseValues
+import org.eclipse.tractusx.bpdm.test.util.AssertHelpers
+import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
+
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -65,6 +73,7 @@ import java.time.Instant
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class BusinessPartnerControllerIT @Autowired constructor(
     val testHelpers: DbTestHelpers,
+    val assertHelpers: AssertHelpers,
     val gateClient: GateClient,
     val objectMapper: ObjectMapper,
     val goldenRecordTaskService: GoldenRecordTaskService
@@ -172,7 +181,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
         val upsertSharingStateResponses = readSharingStates(BusinessPartnerType.GENERIC, externalIds)
 
 
-        testHelpers.assertRecursively(upsertSharingStateResponses).isEqualTo(upsertSharingStatesRequests)
+        assertHelpers.assertRecursively(upsertSharingStateResponses).isEqualTo(upsertSharingStatesRequests)
 
     }
 
@@ -186,7 +195,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
         assertUpsertResponsesMatchRequests(insertResponses, insertRequests)
 
         val searchResponse1Page = gateClient.businessParters.getBusinessPartnersInput(null)
-        testHelpers.assertRecursively(searchResponse1Page.content).isEqualTo(insertResponses)
+        assertHelpers.assertRecursively(searchResponse1Page.content).isEqualTo(insertResponses)
 
         val updateRequests = listOf(
             BusinessPartnerNonVerboseValues.bpInputRequestFull.copy(externalId = externalId)
@@ -195,7 +204,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
         assertUpsertResponsesMatchRequests(updateResponses, updateRequests)
 
         val searchResponse2Page = gateClient.businessParters.getBusinessPartnersInput(null)
-        testHelpers.assertRecursively(searchResponse2Page.content).isEqualTo(updateResponses)
+        assertHelpers.assertRecursively(searchResponse2Page.content).isEqualTo(updateResponses)
     }
 
     @Test
@@ -399,7 +408,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
                 listOf(
                     TaskClientStateDto(
                         taskId = "0",
-                        businessPartnerResult = BusinessPartnerGenericValues.businessPartner1,
+                        businessPartnerResult = BusinessPartnerGenericCommonValues.businessPartner1,
                         processingState = TaskProcessingStateDto(
                             resultState = ResultState.Success,
                             step = TaskStep.CleanAndSync,
@@ -439,7 +448,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
         val taskStateResponse = TaskStateResponse(
             listOf(
                 TaskClientStateDto(
-                    taskId = "0", businessPartnerResult = BusinessPartnerGenericValues.businessPartner1, processingState = TaskProcessingStateDto(
+                    taskId = "0", businessPartnerResult = BusinessPartnerGenericCommonValues.businessPartner1, processingState = TaskProcessingStateDto(
                         resultState = ResultState.Success,
                         step = TaskStep.CleanAndSync,
                         stepState = StepState.Queued,
@@ -544,7 +553,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
         //Firstly verifies if the Sharing States was created for new Business Partners
         val externalIds = listOf(externalId4, externalId5)
         val upsertSharingStateResponses = readSharingStates(BusinessPartnerType.GENERIC, externalIds)
-        testHelpers
+        assertHelpers
             .assertRecursively(upsertSharingStateResponses)
             .ignoringFieldsMatchingRegexes(".*${SharingStateDto::sharingProcessStarted.name}")
             .isEqualTo(createdSharingState)
@@ -559,7 +568,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
                 sharingStateType = SharingStateType.Success,
                 sharingErrorCode = null,
                 sharingErrorMessage = null,
-                bpn = BusinessPartnerGenericValues.businessPartner1.address.addressBpn,
+                bpn = BusinessPartnerGenericCommonValues.businessPartner1.address.addressBpn,
                 sharingProcessStarted = null,
                 taskId = "0"
             ),
@@ -577,7 +586,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
 
         //Check for both Sharing State changes (Error and Success)
         val readCleanedSharingState = readSharingStates(BusinessPartnerType.GENERIC, externalIds)
-        testHelpers.assertRecursively(readCleanedSharingState)
+        assertHelpers.assertRecursively(readCleanedSharingState)
             .ignoringFieldsMatchingRegexes(".*${SharingStateDto::sharingProcessStarted.name}")
             .isEqualTo(cleanedSharingState)
 
@@ -615,7 +624,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
         //Firstly verifies if the Sharing States was created for new Business Partner
         val externalIds = listOf(externalId3)
         val upsertSharingStateResponses = readSharingStates(BusinessPartnerType.GENERIC, externalIds)
-        testHelpers
+        assertHelpers
             .assertRecursively(upsertSharingStateResponses)
             .ignoringFieldsMatchingRegexes(".*${SharingStateDto::sharingProcessStarted.name}")
             .isEqualTo(createdSharingState)
@@ -638,7 +647,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
 
         //Check for Sharing State
         val readCleanedSharingState = readSharingStates(BusinessPartnerType.GENERIC, externalIds)
-        testHelpers.assertRecursively(readCleanedSharingState)
+        assertHelpers.assertRecursively(readCleanedSharingState)
             .ignoringFieldsMatchingRegexes(".*${SharingStateDto::sharingProcessStarted.name}")
             .isEqualTo(cleanedSharingState)
 
@@ -684,7 +693,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
         assertUpsertOutputResponsesMatchRequests(searchResponsePage.content, outputBusinessPartners)
 
         //Assert that sharing state are created
-        testHelpers.assertRecursively(upsertSharingStateResponses).ignoringFieldsMatchingRegexes(".*${SharingStateDto::sharingProcessStarted.name}")
+        assertHelpers.assertRecursively(upsertSharingStateResponses).ignoringFieldsMatchingRegexes(".*${SharingStateDto::sharingProcessStarted.name}")
             .isEqualTo(upsertSharingStatesRequests)
     }
 
@@ -708,7 +717,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
     private fun assertBusinessPartnersUpsertedCorrectly(upsertedBusinessPartners: Collection<BusinessPartnerInputDto>) {
         val searchResponsePage = gateClient.businessParters.getBusinessPartnersInput(null)
         assertEquals(upsertedBusinessPartners.size.toLong(), searchResponsePage.totalElements)
-        testHelpers.assertRecursively(searchResponsePage.content).isEqualTo(upsertedBusinessPartners)
+        assertHelpers.assertRecursively(searchResponsePage.content).isEqualTo(upsertedBusinessPartners)
 
         val sharingStateResponse = gateClient.sharingState.getSharingStates(PaginationRequest(), businessPartnerType = null, externalIds = null)
         assertEquals(upsertedBusinessPartners.size.toLong(), sharingStateResponse.totalElements)

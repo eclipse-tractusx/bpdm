@@ -28,14 +28,20 @@ import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchVerboseDto
-import org.eclipse.tractusx.bpdm.pool.util.*
+import org.eclipse.tractusx.bpdm.pool.util.TestHelpers
+import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
+import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues
+import org.eclipse.tractusx.bpdm.test.testdata.pool.LegalEntityStructureRequest
+import org.eclipse.tractusx.bpdm.test.testdata.pool.SiteStructureRequest
+import org.eclipse.tractusx.bpdm.test.util.AssertHelpers
+import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
+import org.eclipse.tractusx.bpdm.test.util.PoolDataHelpers
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
-import org.springframework.test.web.reactive.server.WebTestClient
 
 /**
  * Integration tests for the search endpoint of the business partner controller
@@ -46,8 +52,10 @@ import org.springframework.test.web.reactive.server.WebTestClient
 @ActiveProfiles(value = ["test"])
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class LegalEntityControllerSearchIT @Autowired constructor(
-    val webTestClient: WebTestClient,
+    val dbTestHelpers: DbTestHelpers,
+    val poolDataHelpers: PoolDataHelpers,
     val testHelpers: TestHelpers,
+    val assertHelpers: AssertHelpers,
     val poolClient: PoolClientImpl
 ) {
 
@@ -74,9 +82,8 @@ class LegalEntityControllerSearchIT @Autowired constructor(
 
     @BeforeEach
     fun beforeEach() {
-        testHelpers.truncateDbTables()
-
-        testHelpers.createTestMetadata()
+        dbTestHelpers.truncateDbTables()
+        poolDataHelpers.createPoolMetadata()
         val givenStructure = testHelpers.createBusinessPartnerStructure(listOf(partnerStructure1, partnerStructure2))
         givenPartner1 = with(givenStructure[0].legalEntity) { legalEntity }
         givenPartner2 = with(givenStructure[1].legalEntity) { legalEntity }
@@ -145,7 +152,7 @@ class LegalEntityControllerSearchIT @Autowired constructor(
     }
 
     private fun assertPageEquals(actual: PageDto<LegalEntityMatchVerboseDto>, expected: PageDto<LegalEntityMatchVerboseDto>) {
-        testHelpers.assertRecursively(actual)
+        assertHelpers.assertRecursively(actual)
             .ignoringFieldsMatchingRegexes(".*${LegalEntityMatchVerboseDto::score.name}")
             .isEqualTo(expected)
     }

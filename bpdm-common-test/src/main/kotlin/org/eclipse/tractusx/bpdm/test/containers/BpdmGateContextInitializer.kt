@@ -17,11 +17,12 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package com.catenax.bpdm.bridge.dummy.util
+package org.eclipse.tractusx.bpdm.test.containers
 
 
-import com.catenax.bpdm.bridge.dummy.util.PostgreSQLContextInitializer.Companion.postgreSQLContainer
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.test.containers.BpdmPoolContextInitializer.Companion.bpdmPoolContainer
+import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer.Companion.postgreSQLContainer
 import org.springframework.boot.test.util.TestPropertyValues
 import org.springframework.context.ApplicationContextInitializer
 import org.springframework.context.ConfigurableApplicationContext
@@ -35,20 +36,20 @@ import java.time.Duration
  */
 
 
-class BpdmPoolContextInitializer : ApplicationContextInitializer<ConfigurableApplicationContext> {
+class BpdmGateContextInitializer : ApplicationContextInitializer<ConfigurableApplicationContext> {
 
     private val logger = KotlinLogging.logger { }
 
     companion object {
-        const val POOL_CONTAINER_STARTUP_TIMEOUT_SEC = 300L
-        const val BPDM_PORT = 8080
-        const val DEBUG_PORT = 8050
-        const val IMAGE = "maven-pool"
+        const val GATE_CONTAINER_STARTUP_TIMEOUT_SEC = 300L
+        const val BPDM_PORT = 8081
+        const val DEBUG_PORT = 8051
+        const val IMAGE = "maven-gate"
 
-        val bpdmPoolContainer: GenericContainer<*> =
+        private val bpdmGateContainer: GenericContainer<*> =
             GenericContainer(IMAGE)
-                .dependsOn(listOf<Startable>(postgreSQLContainer))
-                .withNetwork(postgreSQLContainer.network)
+                .dependsOn(listOf<Startable>(postgreSQLContainer, bpdmPoolContainer))
+                .withNetwork(postgreSQLContainer.getNetwork())
                 .withExposedPorts(BPDM_PORT, DEBUG_PORT)
                 .withEnv(
                     "JAVA_OPTIONS",
@@ -59,19 +60,19 @@ class BpdmPoolContextInitializer : ApplicationContextInitializer<ConfigurableApp
 
     override fun initialize(applicationContext: ConfigurableApplicationContext) {
         val postgresNetworkAlias = applicationContext.environment.getProperty("bpdm.datasource.alias")
+        val bpdmPoolAlias = applicationContext.environment.getProperty("bpdm.client.pool.alias")
         val dataBase = postgreSQLContainer.getDatabaseName()
-        val bpdmAlias = applicationContext.environment.getProperty("bpdm.client.pool.alias")
-        bpdmPoolContainer.withNetworkAliases(bpdmAlias)
-            .waitingFor(
-                HttpWaitStrategy()
-                    .forPort(BPDM_PORT)
-                    .forStatusCodeMatching { response -> response == 200 || response == 401 }
-                    .withStartupTimeout(Duration.ofSeconds(POOL_CONTAINER_STARTUP_TIMEOUT_SEC))
-            )
-
-        bpdmPoolContainer.withEnv(
+        bpdmGateContainer.waitingFor(
+            HttpWaitStrategy()
+                .forPort(BPDM_PORT)
+                .forStatusCodeMatching { response -> response == 200 || response == 401 }
+                .withStartupTimeout(Duration.ofSeconds(GATE_CONTAINER_STARTUP_TIMEOUT_SEC))
+        )
+        bpdmGateContainer.withEnv(
             "spring.datasource.url", "jdbc:postgresql://${postgresNetworkAlias}:5432/${dataBase}?loggerLevel=OFF"
         )
+            .withEnv("bpdm.client.pool.base-url", "http://$bpdmPoolAlias:8080/api/catena")
+
             .withEnv(
                 "spring.datasource.username", postgreSQLContainer.username
             )
@@ -80,10 +81,11 @@ class BpdmPoolContextInitializer : ApplicationContextInitializer<ConfigurableApp
             )
             .start()
 
+
         TestPropertyValues.of(
-            "bpdm.client.pool.base-url=http://localhost:${bpdmPoolContainer.getMappedPort(BPDM_PORT)}",
+            "bpdm.client.gate.base-url=http://localhost:${bpdmGateContainer.getMappedPort(BPDM_PORT)}",
         ).applyTo(applicationContext.environment)
 
-        logger.info { "[!!!] Pool can be remote-debugged on port ${bpdmPoolContainer.getMappedPort(DEBUG_PORT)} " }
+        logger.info { "[!!!] Gate can be remote-debugged on port ${bpdmGateContainer.getMappedPort(DEBUG_PORT)} " }
     }
 }

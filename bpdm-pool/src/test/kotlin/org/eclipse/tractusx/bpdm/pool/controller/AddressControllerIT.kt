@@ -30,7 +30,19 @@ import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerBpnSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.util.*
-import org.eclipse.tractusx.bpdm.pool.util.BusinessPartnerNonVerboseValues.addressIdentifier
+
+
+
+import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
+import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues
+import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues.addressIdentifier
+import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerVerboseValues
+import org.eclipse.tractusx.bpdm.test.testdata.pool.LegalEntityStructureRequest
+import org.eclipse.tractusx.bpdm.test.testdata.pool.SiteStructureRequest
+import org.eclipse.tractusx.bpdm.test.util.AssertHelpers
+import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
+import org.eclipse.tractusx.bpdm.test.util.PoolDataHelpers
+
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -43,13 +55,16 @@ import org.springframework.test.context.ContextConfiguration
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class AddressControllerIT @Autowired constructor(
     val testHelpers: TestHelpers,
+    val dbTestHelpers: DbTestHelpers,
+    val assertHelpers: AssertHelpers,
+    val poolDataHelpers: PoolDataHelpers,
     val poolClient: PoolApiClient
 ) {
 
     @BeforeEach
     fun beforeEach() {
-        testHelpers.truncateDbTables()
-        testHelpers.createTestMetadata()
+        dbTestHelpers.truncateDbTables()
+        poolDataHelpers.createPoolMetadata()
     }
 
     /**
@@ -281,7 +296,7 @@ class AddressControllerIT @Autowired constructor(
 
         assertCreatedAddressesAreEqual(response.entities, expected)
 //        response.entities.forEach { assertThat(it.address.bpn).matches(testHelpers.bpnAPattern) }
-//        testHelpers.assertRecursively(response.entities)
+//        assertHelpers.assertRecursively(response.entities)
 //            .ignoringFields(LogisticAddressResponse::bpn.name)
 //            .isEqualTo(expected)
         assertThat(response.errorCount).isEqualTo(0)
@@ -418,10 +433,10 @@ class AddressControllerIT @Autowired constructor(
         val response = poolClient.addresses.createAddresses(toCreate)
         assertCreatedAddressesAreEqual(response.entities, expected)
 //        response.entities.forEach { assertThat(it.address.bpn).matches(testHelpers.bpnAPattern) }
-//        testHelpers.assertRecursively(response.entities).ignoringFields(LogisticAddressResponse::bpn.name).isEqualTo(expected)
+//        assertHelpers.assertRecursively(response.entities).ignoringFields(LogisticAddressResponse::bpn.name).isEqualTo(expected)
 
         assertThat(response.errorCount).isEqualTo(3)
-        testHelpers.assertRecursively(response.errors)
+        assertHelpers.assertRecursively(response.errors)
             .ignoringFields(ErrorInfo<AddressCreateError>::message.name)
             .isEqualTo(expectedErrors)
     }
@@ -520,7 +535,7 @@ class AddressControllerIT @Autowired constructor(
     private fun assertCreatedAddressesAreEqual(actuals: Collection<AddressPartnerCreateVerboseDto>, expected: Collection<AddressPartnerCreateVerboseDto>) {
         actuals.forEach { assertThat(it.address.bpna).matches(testHelpers.bpnAPattern) }
 
-        testHelpers.assertRecursively(actuals)
+        assertHelpers.assertRecursively(actuals)
             .ignoringFields(
                 AddressPartnerCreateVerboseDto::address.name + "." + LogisticAddressVerboseDto::bpna.name,
                 AddressPartnerCreateVerboseDto::address.name + "." + LogisticAddressVerboseDto::bpnLegalEntity.name,
@@ -532,7 +547,7 @@ class AddressControllerIT @Autowired constructor(
     private fun assertAddressesAreEqual(actuals: Collection<LogisticAddressVerboseDto>, expected: Collection<LogisticAddressVerboseDto>) {
         actuals.forEach { assertThat(it.bpna).matches(testHelpers.bpnAPattern) }
 
-        testHelpers.assertRecursively(actuals)
+        assertHelpers.assertRecursively(actuals)
             .ignoringFields(
                 LogisticAddressVerboseDto::bpna.name,
                 LogisticAddressVerboseDto::bpnLegalEntity.name,

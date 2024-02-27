@@ -17,43 +17,16 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.util
+package org.eclipse.tractusx.bpdm.test.util
 
-import jakarta.persistence.EntityManager
-import jakarta.persistence.EntityManagerFactory
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.RecursiveComparisonAssert
 import org.springframework.stereotype.Component
 import java.time.Instant
 import java.time.LocalDateTime
 
-private const val BPDM_DB_SCHEMA_NAME: String = "bpdmgate"
-
 @Component
-class DbTestHelpers(entityManagerFactory: EntityManagerFactory) {
-
-    val em: EntityManager = entityManagerFactory.createEntityManager()
-
-    fun truncateDbTables() {
-        em.transaction.begin()
-
-        em.createNativeQuery(
-            """
-            DO $$ DECLARE table_names RECORD;
-            BEGIN
-                FOR table_names IN SELECT table_name
-                    FROM information_schema.tables
-                    WHERE table_schema='$BPDM_DB_SCHEMA_NAME'
-                    AND table_name NOT IN ('flyway_schema_history') 
-                LOOP 
-                    EXECUTE format('TRUNCATE TABLE $BPDM_DB_SCHEMA_NAME.%I CONTINUE IDENTITY CASCADE;', table_names.table_name);
-                END LOOP;
-            END $$;
-        """.trimIndent()
-        ).executeUpdate()
-
-        em.transaction.commit()
-    }
+class AssertHelpers {
 
     fun <T> assertRecursively(actual: T): RecursiveComparisonAssert<*> {
         return Assertions.assertThat(actual)
@@ -62,5 +35,4 @@ class DbTestHelpers(entityManagerFactory: EntityManagerFactory) {
             .ignoringAllOverriddenEquals()
             .ignoringFieldsOfTypes(Instant::class.java, LocalDateTime::class.java)
     }
-
 }

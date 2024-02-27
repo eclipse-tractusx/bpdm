@@ -26,14 +26,21 @@ import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchVerboseDto
-import org.eclipse.tractusx.bpdm.pool.util.*
+import org.eclipse.tractusx.bpdm.pool.util.TestHelpers
+import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
+import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues
+
+import org.eclipse.tractusx.bpdm.test.testdata.pool.LegalEntityStructureRequest
+import org.eclipse.tractusx.bpdm.test.testdata.pool.SiteStructureRequest
+import org.eclipse.tractusx.bpdm.test.util.AssertHelpers
+import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
+import org.eclipse.tractusx.bpdm.test.util.PoolDataHelpers
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
-import org.springframework.test.web.reactive.server.WebTestClient
 
 /**
  * Integration tests for the search endpoint of the address controller
@@ -43,7 +50,9 @@ import org.springframework.test.web.reactive.server.WebTestClient
 @ActiveProfiles("test")
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class AddressControllerSearchIT @Autowired constructor(
-    val webTestClient: WebTestClient,
+    val dbTestHelpers: DbTestHelpers,
+    val poolDataHelpers: PoolDataHelpers,
+    val assertHelpers: AssertHelpers,
     val testHelpers: TestHelpers,
     val poolClient: PoolClientImpl
 ) {
@@ -81,9 +90,8 @@ class AddressControllerSearchIT @Autowired constructor(
 
     @BeforeEach
     fun beforeEach() {
-        testHelpers.truncateDbTables()
-
-        testHelpers.createTestMetadata()
+        dbTestHelpers.truncateDbTables()
+        poolDataHelpers.createPoolMetadata()
 
 
         val givenStructure = testHelpers.createBusinessPartnerStructure(listOf(partnerStructure3))
@@ -135,7 +143,7 @@ class AddressControllerSearchIT @Autowired constructor(
 
 
     private fun assertPageEquals(actual: PageDto<AddressMatchVerboseDto>, expected: PageDto<AddressMatchVerboseDto>) {
-        testHelpers.assertRecursively(actual)
+        assertHelpers.assertRecursively(actual)
             .ignoringFieldsMatchingRegexes(".*${AddressMatchVerboseDto::score.name}")
             .isEqualTo(expected)
     }

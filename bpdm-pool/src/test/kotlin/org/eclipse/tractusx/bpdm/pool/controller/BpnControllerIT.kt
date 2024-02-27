@@ -25,10 +25,13 @@ import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityIdentifierDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.IdentifiersSearchRequest
-import org.eclipse.tractusx.bpdm.pool.util.BusinessPartnerNonVerboseValues
-import org.eclipse.tractusx.bpdm.pool.util.LegalEntityStructureRequest
-import org.eclipse.tractusx.bpdm.pool.util.PostgreSQLContextInitializer
+
 import org.eclipse.tractusx.bpdm.pool.util.TestHelpers
+import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
+import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues
+import org.eclipse.tractusx.bpdm.test.testdata.pool.LegalEntityStructureRequest
+import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
+import org.eclipse.tractusx.bpdm.test.util.PoolDataHelpers
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -44,7 +47,9 @@ import org.springframework.test.context.ContextConfiguration
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class BpnControllerIT @Autowired constructor(
     val testHelpers: TestHelpers,
-    val poolClient: PoolClientImpl
+    val poolClient: PoolClientImpl,
+    val dbTestHelpers: DbTestHelpers,
+    val poolDataHelpers: PoolDataHelpers,
 ) {
 
     val identifierType = BusinessPartnerNonVerboseValues.legalEntityCreate1.legalEntity.identifiers.first().type
@@ -67,8 +72,8 @@ class BpnControllerIT @Autowired constructor(
         ) }
         val legalEntityCreate3 = BusinessPartnerNonVerboseValues.legalEntityCreate3
 
-        testHelpers.truncateDbTables()
-        testHelpers.createTestMetadata()
+        dbTestHelpers.truncateDbTables()
+        poolDataHelpers.createPoolMetadata()
         testHelpers.createBusinessPartnerStructure(
             listOf(
                 LegalEntityStructureRequest(legalEntity = legalEntityCreate1),

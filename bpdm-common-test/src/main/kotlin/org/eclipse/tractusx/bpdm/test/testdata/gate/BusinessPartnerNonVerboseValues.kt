@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.util
+package org.eclipse.tractusx.bpdm.test.testdata.gate
 
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateOutputChildRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressIdentifierDto

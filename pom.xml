@@ -38,6 +38,7 @@
 
     <modules>
         <module>bpdm-common</module>
+        <module>bpdm-common-test</module>
         <module>bpdm-pool-api</module>
         <module>bpdm-pool</module>
         <module>bpdm-gate-api</module>
@@ -84,6 +85,11 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>bpdm-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>bpdm-common-test</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

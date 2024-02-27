@@ -35,11 +35,13 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAdd
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.service.TaskStepBuildService.CleaningError
-import org.eclipse.tractusx.bpdm.pool.util.BusinessPartnerNonVerboseValues.addressIdentifierTypeDto1
-import org.eclipse.tractusx.bpdm.pool.util.BusinessPartnerNonVerboseValues.addressIdentifierTypeDto2
-import org.eclipse.tractusx.bpdm.pool.util.BusinessPartnerVerboseValues
-import org.eclipse.tractusx.bpdm.pool.util.PostgreSQLContextInitializer
-import org.eclipse.tractusx.bpdm.pool.util.TestHelpers
+
+import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
+import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues.addressIdentifierTypeDto1
+import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues.addressIdentifierTypeDto2
+import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerVerboseValues
+import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
+import org.eclipse.tractusx.bpdm.test.util.PoolDataHelpers
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.eclipse.tractusx.orchestrator.api.model.AddressIdentifierDto
 import org.eclipse.tractusx.orchestrator.api.model.AddressStateDto
@@ -75,15 +77,16 @@ import java.util.function.BiPredicate
 class TaskStepFetchAndReserveServiceTest @Autowired constructor(
     val cleaningStepService: TaskStepFetchAndReserveService,
     val bpnRequestIdentifierRepository: BpnRequestIdentifierRepository,
-    val testHelpers: TestHelpers,
-    val poolClient: PoolClientImpl
+    val poolClient: PoolClientImpl,
+    val dbTestHelpers: DbTestHelpers,
+    val poolDataHelpers: PoolDataHelpers,
 ) {
 
 
     @BeforeEach
     fun beforeEach() {
-        testHelpers.truncateDbTables()
-        testHelpers.createTestMetadata()
+        dbTestHelpers.truncateDbTables()
+        poolDataHelpers.createPoolMetadata()
     }
 
     @Test
