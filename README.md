@@ -35,29 +35,6 @@ Installation instructions for the BPDM services can be found in the following pl
 1. [Local Installation](docs/OPERATOR_VIEW.md): Details how to install and configure the BPDM services on a host machine.
 2. [Helm Installation](charts/bpdm/README.md): Explains how to use given Helm Charts to install the BPDM services on a kubernetes environment.
 
-## Container images
-
-BPDM provides container images for demonstration purposes.
-The base image used, to build this demo application image is `eclipse-temurin:17-jre-alpine`
-
-Docker Hub:
-
-* [eclipse-temurin](https://hub.docker.com/_/eclipse-temurin)
-* [17-jre-alpine](https://hub.docker.com/layers/library/eclipse-temurin/17-jre-alpine/images/sha256-02c04793fa49ad5cd193c961403223755f9209a67894622e05438598b32f210e?context=explore)
-
-Source:
-
-* [temurin-build](https://github.com/adoptium/temurin-build)
-* [temurin docker repo info](https://github.com/docker-library/repo-info/tree/master/repos/eclipse-temurin)
-
-## Notice for Docker image
-
-* [BPDM Pool](./bpdm-pool/DOCKER_NOTICE.md)
-* [BPDM Gate](./bpdm-gate/DOCKER_NOTICE.md)
-* [BPDM Orchestrator](./bpdm-orchestrator/DOCKER_NOTICE.md)
-* [BPDM Cleaning Service Dummy](./bpdm-cleaning-service-dummy/DOCKER_NOTICE.md)
-* [BPDM Bridge Dummy](./bpdm-bridge-dummy/DOCKER_NOTICE.md)
-
 ## GitHub Workflows
 
 For releasing new Docker images of the BPDM Pool and Gate we use GitHub Actions/Workflows, by convention found in the `.github/workflows` folder.

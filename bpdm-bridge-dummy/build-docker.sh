@@ -23,6 +23,6 @@
 
 cd ..
 
-docker build . -f bpdm-pool/Dockerfile -t maven-pool
-docker build . -f bpdm-gate/Dockerfile -t maven-gate
-docker build . -f bpdm-bridge-dummy/Dockerfile -t maven-bridge
+docker build . -f docker/pool/Dockerfile -t maven-pool
+docker build . -f docker/gate/Dockerfile -t maven-gate
+docker build . -f docker/bridge-dummy/Dockerfile -t maven-bridge

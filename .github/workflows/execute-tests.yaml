@@ -44,10 +44,10 @@ jobs:
         uses: docker/setup-buildx-action@v2
 
       - name: Build docker image pool
-        run: docker build -f bpdm-pool/Dockerfile  -t maven-pool .
+        run: docker build -f docker/pool/Dockerfile  -t maven-pool .
 
       - name: Build docker image gate
-        run: docker build -f bpdm-gate/Dockerfile  -t maven-gate .
+        run: docker build -f docker/gate/Dockerfile  -t maven-gate .
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3

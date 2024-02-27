@@ -1,16 +1,16 @@
 ## Notice for Docker image
 
-DockerHub: [https://hub.docker.com/r/tractusx/bpdm-gate](https://hub.docker.com/r/tractusx/bpdm-gate)
+DockerHub: [https://hub.docker.com/r/tractusx/bpdm-orchestrator](https://hub.docker.com/r/tractusx/bpdm-orchestrator)
 
 Eclipse Tractus-X product(s) installed within the image:
 
-**BPDM Gate**
+**BPDM Orchestrator**
 
 Eclipse Tractus-X product(s) installed within the image:
 
 - GitHub: https://github.com/eclipse-tractusx/bpdm 
 - Project home: https://projects.eclipse.org/projects/automotive.tractusx
-- Gate Dockerfile: https://github.com/eclipse-tractusx/bpdm/blob/main/bpdm-gate/Dockerfile
+- Orchestrator Dockerfile: https://github.com/eclipse-tractusx/bpdm/blob/main/docker/orchestrator/Dockerfile
 - Project license: [Apache License, Version 2.0](https://github.com/eclipse-tractusx/bpdm/blob/main/LICENSE)
 
 

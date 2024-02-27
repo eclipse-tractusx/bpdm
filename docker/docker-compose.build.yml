@@ -26,13 +26,13 @@ services:
   gate:
     build:
       context: .
-      dockerfile: ./bpdm-gate/Dockerfile
+      dockerfile: ./docker/gate/Dockerfile
     image: maven-gate
     working_dir: .
 
   pool:
     build:
       context: .
-      dockerfile: ./bpdm-pool/Dockerfile
+      dockerfile: ./docker/pool/Dockerfile
     image: maven-pool
     working_dir: .
