@@ -54,7 +54,7 @@ class BusinessPartnerService(
     private val sharingStateService: SharingStateService,
     private val changelogRepository: ChangelogRepository,
     private val orchestrationApiClient: OrchestrationApiClient,
-    private val sharingStateRepository: SharingStateRepository
+    private val sharingStateRepository: SharingStateRepository,
 ) {
     private val logger = KotlinLogging.logger { }
 
@@ -89,7 +89,10 @@ class BusinessPartnerService(
 
         val partners = resolutionResults.map { it.businessPartner }
         sharingStateService.setInitial(partners.map { SharingStateService.SharingStateIdentifierDto(it.externalId, BusinessPartnerType.GENERIC) })
+        partners.map {
 
+            logger.info { "Business Partner ${it.bpnA ?: it.bpnS ?: it.bpnL} was created or updated" }
+        }
         return businessPartnerRepository.saveAll(partners)
     }
 

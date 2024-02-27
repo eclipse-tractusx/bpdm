@@ -20,6 +20,8 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 
+import mu.KLogger
+import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.StageType
@@ -46,6 +48,7 @@ class LegalEntityPersistenceService(
     private val changelogRepository: ChangelogRepository,
     private val sharingStateService: SharingStateService
 ) {
+    private val logger: KLogger = KotlinLogging.logger {}
 
     @Transactional
     fun persistLegalEntitiesBP(legalEntities: Collection<LegalEntityGateInputRequest>, datatype: StageType) {
@@ -69,10 +72,12 @@ class LegalEntityPersistenceService(
                     updateLegalEntity(existingLegalEntity, legalEntity, logisticAddressRecord)
 
                     gateLegalEntityRepository.save(existingLegalEntity)
+                    logger.info { "Legal Entity ${existingLegalEntity.bpn} was updated" }
                     saveChangelog(legalEntity.externalId, ChangelogType.UPDATE, datatype)
                 }
                 ?: run {
                     gateLegalEntityRepository.save(fullLegalEntity)
+                    logger.info { "Legal Entity ${fullLegalEntity.bpn} was created" }
                     saveChangelog(legalEntity.externalId, ChangelogType.CREATE, datatype)
                 }
         }

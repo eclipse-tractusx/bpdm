@@ -20,6 +20,8 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import jakarta.transaction.Transactional
+import mu.KLogger
+import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.common.util.replace
@@ -46,7 +48,7 @@ class AddressPersistenceService(
     private val sharingStateService: SharingStateService,
     private val changelogRepository: ChangelogRepository
 ) {
-
+    private val logger: KLogger = KotlinLogging.logger {}
     @Transactional
     fun persistAddressBP(addresses: Collection<AddressGateInputRequest>, dataType: StageType) {
 
@@ -70,10 +72,12 @@ class AddressPersistenceService(
                 ?.let { existingAddress ->
                     updateAddress(existingAddress, address, legalEntityRecord, siteRecord)
                     gateAddressRepository.save(existingAddress)
+                    logger.info { "Address ${existingAddress.bpn} was updated" }
                     saveChangelog(address.externalId, ChangelogType.UPDATE, dataType)
                 }
                 ?: run {
                     gateAddressRepository.save(fullAddress)
+                    logger.info { "Address ${fullAddress.bpn} was created" }
                     saveChangelog(address.externalId, ChangelogType.CREATE, dataType)
                 }
         }
