@@ -37,21 +37,23 @@ bpdm:
     tasks:
         creation:
             fromSharingMember:
-              # When and how often the Gate checks for new business partner data to be shared
-              cron: '-'
-              # Up to how many golden record tasks can be created when checking
-              batchSize: 100
-            fromPool:
-              # When and how often the Gate checks for golden record updates from the Pool
+                # If true, new business partner input data will be directly ready to be shared
+                # If false, new business partner input data need to be manually set to ready
+                starts-as-ready: false
+                # When and how often the Gate checks for new business partner data to be shared
                 cron: '-'
-              # Up to how many golden record tasks can be created when checking
+                # Up to how many golden record tasks can be created when checking
                 batchSize: 100
+            fromPool:
+                # When and how often the Gate checks for golden record updates from the Pool
+                batchSize: 100
+                # Up to how many golden record tasks can be created when checking
+                cron: '-'
         check:
-          # When and how often the status of golden record tasks should be checked
-            cron: '-'
-          # How many golden record tasks can be checked in one request
             batchSize: 100
-  # Client connection configuration
+            cron: '-'
+
+    # Connection to the pool and orchestrator  [No auth on default]
     client:
         orchestrator:
           # The base-url of the Orchestrator-API
