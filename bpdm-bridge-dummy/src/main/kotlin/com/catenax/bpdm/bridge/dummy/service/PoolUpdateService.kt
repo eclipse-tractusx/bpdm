@@ -41,16 +41,27 @@ class PoolUpdateService(
     private val logger = KotlinLogging.logger { }
 
     fun createLegalEntitiesInPool(entriesToCreate: Collection<GateLegalEntityInfo>): LegalEntityPartnerCreateResponseWrapper {
-        val createRequests = entriesToCreate.map {
-            LegalEntityPartnerCreateRequest(
-                legalEntity = gateToPoolLegalEntity(it.legalEntity),
-                legalAddress = gateToPoolLogisticAddress(it.legalAddress.address),
-                index = it.externalId
-            )
+        val errorListException = mutableListOf<ErrorInfo<LegalEntityCreateError>>()
+        val createRequests = mutableListOf<LegalEntityPartnerCreateRequest>()
+
+        entriesToCreate.forEach {
+            try {
+                createRequests.add( LegalEntityPartnerCreateRequest(
+                    legalEntity = gateToPoolLegalEntity(it.legalEntity),
+                    legalAddress = gateToPoolLogisticAddress(it.legalAddress.address),
+                    index = it.externalId)
+                )
+            }catch (e: BpdmNullMappingException){
+                val errorMapped = mapError(it, e.message!!,LegalEntityCreateError.LegalEntityErrorMapping)
+                errorListException.add(errorMapped)
+            }
         }
 
-        return poolClient.legalEntities.createBusinessPartners(createRequests)
-            .also { logger.info { "Pool accepted ${it.entityCount} new legal entities, ${it.errorCount} were refused" } }
+        val result = poolClient.legalEntities.createBusinessPartners(createRequests)
+        val createdResult = result.copy(errors = result.errors + errorListException)
+        logger.info { "Pool accepted ${createdResult.entityCount} new legal entities, ${createdResult.errorCount} were refused" }
+
+        return createdResult
     }
 
     fun updateLegalEntitiesInPool(entriesToUpdate: Collection<GateLegalEntityInfo>): LegalEntityPartnerUpdateResponseWrapper {
@@ -67,8 +78,7 @@ class PoolUpdateService(
                     )
                 )
             } catch (e: BpdmNullMappingException) {
-                logger.info { "Error processing ${it.externalId}" }
-                val errorMapped = ErrorInfo(LegalEntityUpdateError.LegalEntityDuplicateIdentifier, "Error on mapping '${it.legalEntity}' message ${e.message}", it.bpn)
+                val errorMapped = mapError(it, e.message!!,LegalEntityUpdateError.LegalEntityErrorMapping)
                 errorListException.add(errorMapped)
             }
         }
@@ -79,6 +89,21 @@ class PoolUpdateService(
 
         return updatedResult
     }
+
+    private fun <T : ErrorCode> mapError(
+        record: GateLegalEntityInfo,
+        message: String,
+        errorCode: T
+    ): ErrorInfo<T> {
+        logger.info { "Error processing ${record.externalId}" }
+        logger.error { "Error message: $message" }
+        return ErrorInfo(
+            errorCode,
+            "Error on mapping '${record.legalEntity}' with bpn ${record.bpn} and externalId ${record.externalId}",
+            record.bpn
+        )
+    }
+
 
     fun createSitesInPool(entriesToCreate: Collection<GateSiteInfo>): SitePartnerCreateResponseWrapper {
         val leParentBpnByExternalId = entriesToCreate
