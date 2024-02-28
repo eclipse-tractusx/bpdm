@@ -30,6 +30,7 @@ import org.eclipse.tractusx.bpdm.gate.repository.SiteRepository
 import org.eclipse.tractusx.bpdm.gate.util.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerNonVerboseValues
 import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerVerboseValues
+import org.eclipse.tractusx.bpdm.test.util.AssertHelpers
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -48,9 +49,10 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 @ActiveProfiles("test")
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 internal class SiteControllerOutputIT @Autowired constructor(
-    val gateClient: GateClient,
-    private val gateSiteRepository: SiteRepository,
-    val testHelpers: DbTestHelpers
+    private val dbHelpers: DbTestHelpers,
+    private val assertHelpers: AssertHelpers,
+    private val gateClient: GateClient,
+    private val gateSiteRepository: SiteRepository
 ) {
     companion object {
 
@@ -68,7 +70,7 @@ internal class SiteControllerOutputIT @Autowired constructor(
 
     @BeforeEach
     fun beforeEach() {
-        testHelpers.truncateDbTables()
+        dbHelpers.truncateDbTables()
     }
 
     /**
@@ -202,7 +204,7 @@ internal class SiteControllerOutputIT @Autowired constructor(
             content = expectedSites
         )
 
-        testHelpers.assertRecursively(pageResponse).isEqualTo(expectedPage)
+        assertHelpers.assertRecursively(pageResponse).isEqualTo(expectedPage)
 
     }
 
@@ -262,7 +264,7 @@ internal class SiteControllerOutputIT @Autowired constructor(
             content = expectedSites
         )
 
-        testHelpers.assertRecursively(pageResponse).isEqualTo(expectedPage)
+        assertHelpers.assertRecursively(pageResponse).isEqualTo(expectedPage)
 
     }
 }

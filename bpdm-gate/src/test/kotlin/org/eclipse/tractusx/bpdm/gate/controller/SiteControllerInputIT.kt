@@ -29,6 +29,7 @@ import org.eclipse.tractusx.bpdm.gate.repository.SiteRepository
 import org.eclipse.tractusx.bpdm.gate.util.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerNonVerboseValues
 import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerVerboseValues
+import org.eclipse.tractusx.bpdm.test.util.AssertHelpers
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -48,9 +49,10 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 @ActiveProfiles("test")
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 internal class SiteControllerInputIT @Autowired constructor(
-    val gateClient: GateClient,
-    private val siteRepository: SiteRepository,
-    private val testHelpers: DbTestHelpers,
+    private val dbHelpers: DbTestHelpers,
+    private val assertHelpers: AssertHelpers,
+    private val gateClient: GateClient,
+    private val siteRepository: SiteRepository
 ) {
     companion object {
         @RegisterExtension
@@ -62,7 +64,7 @@ internal class SiteControllerInputIT @Autowired constructor(
 
     @BeforeEach
     fun beforeEach() {
-        testHelpers.truncateDbTables()
+        dbHelpers.truncateDbTables()
     }
 
     /**
@@ -87,7 +89,7 @@ internal class SiteControllerInputIT @Autowired constructor(
 
         val site = gateClient.sites.getSiteByExternalId(BusinessPartnerVerboseValues.externalIdSite1)
 
-        testHelpers.assertRecursively(site).isEqualTo(expectedSite)
+        assertHelpers.assertRecursively(site).isEqualTo(expectedSite)
 
     }
 
@@ -151,7 +153,7 @@ internal class SiteControllerInputIT @Autowired constructor(
             content = expectedSites
         )
 
-        testHelpers.assertRecursively(pageResponse).isEqualTo(expectedPage)
+        assertHelpers.assertRecursively(pageResponse).isEqualTo(expectedPage)
 
     }
 
@@ -200,7 +202,7 @@ internal class SiteControllerInputIT @Autowired constructor(
             content = expectedSites
         )
 
-        testHelpers.assertRecursively(pageResponse).isEqualTo(expectedPage)
+        assertHelpers.assertRecursively(pageResponse).isEqualTo(expectedPage)
     }
 
     /**

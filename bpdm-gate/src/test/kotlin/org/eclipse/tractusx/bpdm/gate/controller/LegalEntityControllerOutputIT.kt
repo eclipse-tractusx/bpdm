@@ -30,6 +30,7 @@ import org.eclipse.tractusx.bpdm.gate.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.gate.util.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerNonVerboseValues
 import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerVerboseValues
+import org.eclipse.tractusx.bpdm.test.util.AssertHelpers
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -48,9 +49,10 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 @ActiveProfiles("test")
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 internal class LegalEntityControllerOutputIT @Autowired constructor(
-    val gateClient: GateClient,
-    private val gateLegalEntityRepository: LegalEntityRepository,
-    private val testHelpers: DbTestHelpers
+    private val dbHelpers: DbTestHelpers,
+    private val assertHelpers: AssertHelpers,
+    private val gateClient: GateClient,
+    private val gateLegalEntityRepository: LegalEntityRepository
 ) {
     companion object {
 
@@ -68,7 +70,7 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
 
     @BeforeEach
     fun beforeEach() {
-        testHelpers.truncateDbTables()
+        dbHelpers.truncateDbTables()
     }
 
     /**
@@ -169,7 +171,7 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
             content = expectedLegalEntities
         )
 
-        testHelpers.assertRecursively(pageResponse).isEqualTo(expectedPage)
+        assertHelpers.assertRecursively(pageResponse).isEqualTo(expectedPage)
 
     }
 
@@ -221,7 +223,7 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
             content = expectedLegalEntities
         )
 
-        testHelpers.assertRecursively(pageResponse).isEqualTo(expectedPage)
+        assertHelpers.assertRecursively(pageResponse).isEqualTo(expectedPage)
 
     }
 
