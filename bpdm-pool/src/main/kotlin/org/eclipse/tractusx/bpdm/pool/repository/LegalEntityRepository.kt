@@ -19,8 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.repository
 
-import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
-import org.eclipse.tractusx.bpdm.pool.entity.LegalEntity
+import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
+import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.Query
@@ -28,36 +28,36 @@ import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.PagingAndSortingRepository
 import java.time.Instant
 
-interface LegalEntityRepository : PagingAndSortingRepository<LegalEntity, Long>, CrudRepository<LegalEntity, Long> {
-    fun findByBpn(bpn: String): LegalEntity?
+interface LegalEntityRepository : PagingAndSortingRepository<LegalEntityDb, Long>, CrudRepository<LegalEntityDb, Long> {
+    fun findByBpn(bpn: String): LegalEntityDb?
 
     fun existsByBpn(bpn: String): Boolean
 
-    fun findDistinctByBpnIn(bpns: Collection<String>): Set<LegalEntity>
+    fun findDistinctByBpnIn(bpns: Collection<String>): Set<LegalEntityDb>
 
-    fun findByUpdatedAtAfter(updatedAt: Instant, pageable: Pageable): Page<LegalEntity>
+    fun findByUpdatedAtAfter(updatedAt: Instant, pageable: Pageable): Page<LegalEntityDb>
 
-    @Query("SELECT p FROM LegalEntity p WHERE LOWER(p.legalName.value) LIKE :value ORDER BY LENGTH(p.legalName.value)")
-    fun findByLegalNameValue(value: String, pageable: Pageable): Page<LegalEntity>
+    @Query("SELECT p FROM LegalEntityDb p WHERE LOWER(p.legalName.value) LIKE :value ORDER BY LENGTH(p.legalName.value)")
+    fun findByLegalNameValue(value: String, pageable: Pageable): Page<LegalEntityDb>
 
-    @Query("SELECT DISTINCT i.legalEntity FROM LegalEntityIdentifier i WHERE i.type = :type AND upper(i.value) = upper(:idValue)")
-    fun findByIdentifierTypeAndValueIgnoreCase(type: IdentifierType, idValue: String): LegalEntity?
+    @Query("SELECT DISTINCT i.legalEntity FROM LegalEntityIdentifierDb i WHERE i.type = :type AND upper(i.value) = upper(:idValue)")
+    fun findByIdentifierTypeAndValueIgnoreCase(type: IdentifierTypeDb, idValue: String): LegalEntityDb?
 
-    @Query("SELECT DISTINCT p FROM LegalEntity p LEFT JOIN FETCH p.legalForm WHERE p IN :partners")
-    fun joinLegalForm(partners: Set<LegalEntity>): Set<LegalEntity>
+    @Query("SELECT DISTINCT p FROM LegalEntityDb p LEFT JOIN FETCH p.legalForm WHERE p IN :partners")
+    fun joinLegalForm(partners: Set<LegalEntityDb>): Set<LegalEntityDb>
 
-    @Query("SELECT DISTINCT p FROM LegalEntity p LEFT JOIN FETCH p.identifiers WHERE p IN :partners")
-    fun joinIdentifiers(partners: Set<LegalEntity>): Set<LegalEntity>
+    @Query("SELECT DISTINCT p FROM LegalEntityDb p LEFT JOIN FETCH p.identifiers WHERE p IN :partners")
+    fun joinIdentifiers(partners: Set<LegalEntityDb>): Set<LegalEntityDb>
 
-    @Query("SELECT DISTINCT p FROM LegalEntity p LEFT JOIN FETCH p.states WHERE p IN :partners")
-    fun joinStates(partners: Set<LegalEntity>): Set<LegalEntity>
+    @Query("SELECT DISTINCT p FROM LegalEntityDb p LEFT JOIN FETCH p.states WHERE p IN :partners")
+    fun joinStates(partners: Set<LegalEntityDb>): Set<LegalEntityDb>
 
-    @Query("SELECT DISTINCT p FROM LegalEntity p LEFT JOIN FETCH p.classifications WHERE p IN :partners")
-    fun joinClassifications(partners: Set<LegalEntity>): Set<LegalEntity>
+    @Query("SELECT DISTINCT p FROM LegalEntityDb p LEFT JOIN FETCH p.classifications WHERE p IN :partners")
+    fun joinClassifications(partners: Set<LegalEntityDb>): Set<LegalEntityDb>
 
-    @Query("SELECT DISTINCT p FROM LegalEntity p LEFT JOIN FETCH p.startNodeRelations LEFT JOIN FETCH p.endNodeRelations WHERE p IN :partners")
-    fun joinRelations(partners: Set<LegalEntity>): Set<LegalEntity>
+    @Query("SELECT DISTINCT p FROM LegalEntityDb p LEFT JOIN FETCH p.startNodeRelations LEFT JOIN FETCH p.endNodeRelations WHERE p IN :partners")
+    fun joinRelations(partners: Set<LegalEntityDb>): Set<LegalEntityDb>
 
-    @Query("SELECT DISTINCT p FROM LegalEntity p LEFT JOIN FETCH p.legalAddress WHERE p IN :partners")
-    fun joinLegalAddresses(partners: Set<LegalEntity>): Set<LegalEntity>
+    @Query("SELECT DISTINCT p FROM LegalEntityDb p LEFT JOIN FETCH p.legalAddress WHERE p IN :partners")
+    fun joinLegalAddresses(partners: Set<LegalEntityDb>): Set<LegalEntityDb>
 }

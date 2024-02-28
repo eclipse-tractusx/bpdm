@@ -26,7 +26,7 @@ import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteBpnSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.entity.Site
+import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.springframework.data.domain.PageRequest
@@ -67,14 +67,14 @@ class SiteService(
         return site.toPoolDto()
     }
 
-    private fun fetchSiteDependencies(sites: Set<Site>) {
+    private fun fetchSiteDependencies(sites: Set<SiteDb>) {
         siteRepository.joinAddresses(sites)
         siteRepository.joinStates(sites)
         val addresses = sites.flatMap { it.addresses }.toSet()
         addressService.fetchLogisticAddressDependencies(addresses)
     }
 
-    fun fetchSiteDependenciesPage(sites: Set<Site>): Set<Site> {
+    fun fetchSiteDependenciesPage(sites: Set<SiteDb>): Set<SiteDb> {
         siteRepository.joinAddresses(sites)
         siteRepository.joinStates(sites)
         val addresses = sites.flatMap { it.addresses }.toSet()

@@ -51,7 +51,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ErrorInfo
-import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
+import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntryDb
 
 import org.eclipse.tractusx.bpdm.gate.util.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerNonVerboseValues
@@ -126,10 +126,10 @@ internal class ChangeLogControllerIT @Autowired constructor(
             .usingRecursiveComparison()
             .ignoringAllOverriddenEquals()
             .ignoringCollectionOrder()
-            .isEqualTo(emptyList<ChangelogEntry>())
+            .isEqualTo(emptyList<ChangelogEntryDb>())
 
         assertRecursively(searchResult.content)
-            .isEqualTo(emptyList<ChangelogEntry>())
+            .isEqualTo(emptyList<ChangelogEntryDb>())
 
         assertRecursively(searchResult.errors)
             .isEqualTo(
@@ -195,7 +195,7 @@ internal class ChangeLogControllerIT @Autowired constructor(
         val searchResult = gateClient.changelog.getInputChangelog(PaginationRequest(), searchRequest)
 
         assertRecursively(searchResult.content)
-            .isEqualTo(emptyList<ChangelogEntry>())
+            .isEqualTo(emptyList<ChangelogEntryDb>())
     }
 
     /**

@@ -19,12 +19,13 @@
 
 package org.eclipse.tractusx.bpdm.pool.repository
 
-import org.eclipse.tractusx.bpdm.pool.entity.BpnRequestIdentifierMapping
+import org.eclipse.tractusx.bpdm.pool.entity.BpnRequestIdentifierMappingDb
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.PagingAndSortingRepository
 
-interface BpnRequestIdentifierRepository : PagingAndSortingRepository<BpnRequestIdentifierMapping, Long>, CrudRepository<BpnRequestIdentifierMapping, Long> {
+interface BpnRequestIdentifierRepository : PagingAndSortingRepository<BpnRequestIdentifierMappingDb, Long>,
+    CrudRepository<BpnRequestIdentifierMappingDb, Long> {
 
-    fun findDistinctByRequestIdentifierIn(requestIdentifiers: Collection<String>): Set<BpnRequestIdentifierMapping>
+    fun findDistinctByRequestIdentifierIn(requestIdentifiers: Collection<String>): Set<BpnRequestIdentifierMappingDb>
 
 }

@@ -396,7 +396,7 @@ class BusinessPartnerBuildService(
     private fun createLogisticAddress(
         dto: LogisticAddressDto,
         bpn: String,
-        legalEntity: LegalEntity,
+        legalEntity: LegalEntityDb,
         metadataMap: AddressMetadataMapping
     ) = createLogisticAddressInternal(dto, bpn, metadataMap)
         .also { it.legalEntity = legalEntity }
@@ -404,7 +404,7 @@ class BusinessPartnerBuildService(
     private fun createLogisticAddress(
         dto: LogisticAddressDto,
         bpn: String,
-        site: Site,
+        site: SiteDb,
         metadataMap: AddressMetadataMapping
     ) = createLogisticAddressInternal(dto, bpn, metadataMap)
         .also { it.site = site }
@@ -413,8 +413,8 @@ class BusinessPartnerBuildService(
         dto: LogisticAddressDto,
         bpn: String,
         metadataMap: AddressMetadataMapping
-    ): LogisticAddress {
-        val address = LogisticAddress(
+    ): LogisticAddressDb {
+        val address = LogisticAddressDb(
             bpn = bpn,
             legalEntity = null,
             site = null,
@@ -429,7 +429,7 @@ class BusinessPartnerBuildService(
         return address
     }
 
-    private fun updateLogisticAddress(address: LogisticAddress, dto: LogisticAddressDto, metadataMap: AddressMetadataMapping) {
+    private fun updateLogisticAddress(address: LogisticAddressDb, dto: LogisticAddressDto, metadataMap: AddressMetadataMapping) {
         address.name = dto.name
         address.physicalPostalAddress = createPhysicalAddress(dto.physicalPostalAddress, metadataMap.regions)
         address.alternativePostalAddress = dto.alternativePostalAddress?.let { createAlternativeAddress(it, metadataMap.regions) }
@@ -460,13 +460,13 @@ class BusinessPartnerBuildService(
 
 
     data class LegalEntityMetadataMapping(
-        val idTypes: Map<String, IdentifierType>,
-        val legalForms: Map<String, LegalForm>
+        val idTypes: Map<String, IdentifierTypeDb>,
+        val legalForms: Map<String, LegalFormDb>
     )
 
     data class AddressMetadataMapping(
-        val idTypes: Map<String, IdentifierType>,
-        val regions: Map<String, Region>
+        val idTypes: Map<String, IdentifierTypeDb>,
+        val regions: Map<String, RegionDb>
     )
 
     data class SiteCreateRequestWithLegalAddressAsMain(
@@ -482,8 +482,8 @@ class BusinessPartnerBuildService(
             return Instant.now().truncatedTo(ChronoUnit.MICROS)
         }
 
-        fun toLegalEntityState(dto: ILegalEntityStateDto, legalEntity: LegalEntity): LegalEntityState {
-            return LegalEntityState(
+        fun toLegalEntityState(dto: ILegalEntityStateDto, legalEntity: LegalEntityDb): LegalEntityStateDb {
+            return LegalEntityStateDb(
                 validFrom = dto.validFrom,
                 validTo = dto.validTo,
                 type = dto.type,
@@ -491,8 +491,8 @@ class BusinessPartnerBuildService(
             )
         }
 
-        fun toSiteState(dto: ISiteStateDto, site: Site): SiteState {
-            return SiteState(
+        fun toSiteState(dto: ISiteStateDto, site: SiteDb): SiteStateDb {
+            return SiteStateDb(
                 validFrom = dto.validFrom,
                 validTo = dto.validTo,
                 type = dto.type,
@@ -500,8 +500,8 @@ class BusinessPartnerBuildService(
             )
         }
 
-        fun toAddressState(dto: IAddressStateDto, address: LogisticAddress): AddressState {
-            return AddressState(
+        fun toAddressState(dto: IAddressStateDto, address: LogisticAddressDb): AddressStateDb {
+            return AddressStateDb(
                 validFrom = dto.validFrom,
                 validTo = dto.validTo,
                 type = dto.type,
@@ -509,11 +509,11 @@ class BusinessPartnerBuildService(
             )
         }
 
-        fun toLegalEntityClassification(dto: IBaseClassificationDto, partner: LegalEntity): LegalEntityClassification {
+        fun toLegalEntityClassification(dto: IBaseClassificationDto, partner: LegalEntityDb): LegalEntityClassificationDb {
 
             val dtoType = dto.type ?: throw BpdmValidationException(TaskStepBuildService.CleaningError.CLASSIFICATION_TYPE_IS_NULL.message)
 
-            return LegalEntityClassification(
+            return LegalEntityClassificationDb(
                 value = dto.value,
                 code = dto.code,
                 type = dtoType,
@@ -523,10 +523,10 @@ class BusinessPartnerBuildService(
 
         fun toLegalEntityIdentifier(
             dto: ILegalEntityIdentifierDto,
-            idTypes: Map<String, IdentifierType>,
-            partner: LegalEntity
-        ): LegalEntityIdentifier {
-            return LegalEntityIdentifier(
+            idTypes: Map<String, IdentifierTypeDb>,
+            partner: LegalEntityDb
+        ): LegalEntityIdentifierDb {
+            return LegalEntityIdentifierDb(
                 value = dto.value,
                 type = idTypes[dto.type]!!,
                 issuingBody = dto.issuingBody,
@@ -536,17 +536,17 @@ class BusinessPartnerBuildService(
 
         fun toAddressIdentifier(
             dto: IAddressIdentifierDto,
-            idTypes: Map<String, IdentifierType>,
-            partner: LogisticAddress
-        ): AddressIdentifier {
-            return AddressIdentifier(
+            idTypes: Map<String, IdentifierTypeDb>,
+            partner: LogisticAddressDb
+        ): AddressIdentifierDb {
+            return AddressIdentifierDb(
                 value = dto.value,
                 type = idTypes[dto.type]!!,
                 address = partner
             )
         }
 
-        fun updateSite(site: Site, siteDto: IBaseSiteDto) {
+        fun updateSite(site: SiteDb, siteDto: IBaseSiteDto) {
 
             val name = siteDto.name ?: throw BpdmValidationException(TaskStepBuildService.CleaningError.SITE_NAME_IS_NULL.message)
 
@@ -561,12 +561,12 @@ class BusinessPartnerBuildService(
         fun createSite(
             siteDto: IBaseSiteDto,
             bpnS: String,
-            partner: LegalEntity
-        ): Site {
+            partner: LegalEntityDb
+        ): SiteDb {
 
             val name = siteDto.name ?: throw BpdmValidationException(TaskStepBuildService.CleaningError.SITE_NAME_IS_NULL.message)
 
-            val site = Site(bpn = bpnS, name = name, legalEntity = partner, confidenceCriteria = createConfidenceCriteria(siteDto.confidenceCriteria!!))
+            val site = SiteDb(bpn = bpnS, name = name, legalEntity = partner, confidenceCriteria = createConfidenceCriteria(siteDto.confidenceCriteria!!))
 
             site.states.addAll(siteDto.states
                 .map { toSiteState(it, site) })
@@ -578,11 +578,11 @@ class BusinessPartnerBuildService(
             legalEntityDto: LegalEntityDto,
             bpnL: String,
             metadataMap: LegalEntityMetadataMapping
-        ): LegalEntity {
+        ): LegalEntityDb {
             // it has to be validated that the legalForm exits
             val legalForm = legalEntityDto.legalForm?.let { metadataMap.legalForms[it]!! }
-            val legalName = Name(value = legalEntityDto.legalName, shortName = legalEntityDto.legalShortName)
-            val newLegalEntity = LegalEntity(
+            val legalName = NameDb(value = legalEntityDto.legalName, shortName = legalEntityDto.legalShortName)
+            val newLegalEntity = LegalEntityDb(
                 bpn = bpnL,
                 legalName = legalName,
                 legalForm = legalForm,
@@ -594,13 +594,13 @@ class BusinessPartnerBuildService(
             return newLegalEntity
         }
         fun updateLegalEntity(
-            legalEntity: LegalEntity,
+            legalEntity: LegalEntityDb,
             legalEntityDto: LegalEntityDto,
             metadataMap: LegalEntityMetadataMapping
         ) {
             legalEntity.currentness = createCurrentnessTimestamp()
 
-            legalEntity.legalName = Name(value = legalEntityDto.legalName, shortName = legalEntityDto.legalShortName)
+            legalEntity.legalName = NameDb(value = legalEntityDto.legalName, shortName = legalEntityDto.legalShortName)
 
             legalEntity.legalForm = legalEntityDto.legalForm?.let { metadataMap.legalForms[it]!! }
 
@@ -610,14 +610,14 @@ class BusinessPartnerBuildService(
             legalEntity.confidenceCriteria = createConfidenceCriteria(legalEntityDto.confidenceCriteria)
         }
 
-        fun createPhysicalAddress(physicalAddress: IBasePhysicalPostalAddressDto, regions: Map<String, Region>): PhysicalPostalAddress {
+        fun createPhysicalAddress(physicalAddress: IBasePhysicalPostalAddressDto, regions: Map<String, RegionDb>): PhysicalPostalAddressDb {
 
             if (physicalAddress.country == null || physicalAddress.city == null) {
                 throw BpdmValidationException(TaskStepBuildService.CleaningError.COUNTRY_CITY_IS_NULL.message)
             }
 
-            return PhysicalPostalAddress(
-                geographicCoordinates = physicalAddress.geographicCoordinates?.let { GeographicCoordinate(it.latitude, it.longitude, it.altitude) },
+            return PhysicalPostalAddressDb(
+                geographicCoordinates = physicalAddress.geographicCoordinates?.let { GeographicCoordinateDb(it.latitude, it.longitude, it.altitude) },
                 country = physicalAddress.country!!,
                 administrativeAreaLevel1 = regions[physicalAddress.administrativeAreaLevel1],
                 administrativeAreaLevel2 = physicalAddress.administrativeAreaLevel2,
@@ -626,7 +626,7 @@ class BusinessPartnerBuildService(
                 city = physicalAddress.city!!,
                 districtLevel1 = physicalAddress.district,
                 street = physicalAddress.street?.let {
-                    Street(
+                    StreetDb(
                         name = it.name,
                         houseNumber = it.houseNumber,
                         houseNumberSupplement = it.houseNumberSupplement,
@@ -646,7 +646,7 @@ class BusinessPartnerBuildService(
             )
         }
 
-        fun createAlternativeAddress(alternativeAddress: IBaseAlternativePostalAddressDto, regions: Map<String, Region>): AlternativePostalAddress {
+        fun createAlternativeAddress(alternativeAddress: IBaseAlternativePostalAddressDto, regions: Map<String, RegionDb>): AlternativePostalAddressDb {
 
             if (alternativeAddress.country == null || alternativeAddress.city == null ||
                 alternativeAddress.deliveryServiceType == null || alternativeAddress.deliveryServiceNumber == null
@@ -655,8 +655,8 @@ class BusinessPartnerBuildService(
                 throw BpdmValidationException(TaskStepBuildService.CleaningError.ALTERNATIVE_ADDRESS_DATA_IS_NULL.message)
             }
 
-            return AlternativePostalAddress(
-                geographicCoordinates = alternativeAddress.geographicCoordinates?.let { GeographicCoordinate(it.latitude, it.longitude, it.altitude) },
+            return AlternativePostalAddressDb(
+                geographicCoordinates = alternativeAddress.geographicCoordinates?.let { GeographicCoordinateDb(it.latitude, it.longitude, it.altitude) },
                 country = alternativeAddress.country!!,
                 administrativeAreaLevel1 = regions[alternativeAddress.administrativeAreaLevel1],
                 postCode = alternativeAddress.postalCode,
@@ -668,7 +668,7 @@ class BusinessPartnerBuildService(
         }
 
         fun createConfidenceCriteria(confidenceCriteria: IConfidenceCriteriaDto) =
-            ConfidenceCriteria(
+            ConfidenceCriteriaDb(
                 sharedByOwner = confidenceCriteria.sharedByOwner!!,
                 checkedByExternalDataSource = confidenceCriteria.checkedByExternalDataSource!!,
                 numberOfBusinessPartners = confidenceCriteria.numberOfBusinessPartners!!,

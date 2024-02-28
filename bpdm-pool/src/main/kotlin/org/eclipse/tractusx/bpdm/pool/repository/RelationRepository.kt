@@ -19,9 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.repository
 
-import org.eclipse.tractusx.bpdm.pool.entity.Relation
+import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.PagingAndSortingRepository
 
-interface RelationRepository : PagingAndSortingRepository<Relation, Long>, CrudRepository<Relation, Long> {
+interface RelationRepository : PagingAndSortingRepository<RelationDb, Long>, CrudRepository<RelationDb, Long> {
 }

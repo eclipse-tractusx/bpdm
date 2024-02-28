@@ -19,27 +19,27 @@
 
 package org.eclipse.tractusx.bpdm.pool.repository
 
-import org.eclipse.tractusx.bpdm.pool.entity.LegalEntity
-import org.eclipse.tractusx.bpdm.pool.entity.Site
+import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
+import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.PagingAndSortingRepository
 
-interface SiteRepository : PagingAndSortingRepository<Site, Long>, CrudRepository<Site, Long> {
-    @Query("SELECT DISTINCT s FROM Site s LEFT JOIN FETCH s.addresses WHERE s IN :sites")
-    fun joinAddresses(sites: Set<Site>): Set<Site>
+interface SiteRepository : PagingAndSortingRepository<SiteDb, Long>, CrudRepository<SiteDb, Long> {
+    @Query("SELECT DISTINCT s FROM SiteDb s LEFT JOIN FETCH s.addresses WHERE s IN :sites")
+    fun joinAddresses(sites: Set<SiteDb>): Set<SiteDb>
 
-    @Query("SELECT DISTINCT p FROM Site p LEFT JOIN FETCH p.states WHERE p IN :partners")
-    fun joinStates(partners: Set<Site>): Set<Site>
+    @Query("SELECT DISTINCT p FROM SiteDb p LEFT JOIN FETCH p.states WHERE p IN :partners")
+    fun joinStates(partners: Set<SiteDb>): Set<SiteDb>
 
-    @Query("SELECT s FROM Site s join s.legalEntity p where p.bpn=:bpn")
-    fun findByLegalEntityBpn(bpn: String, pageable: Pageable): Page<Site>
+    @Query("SELECT s FROM SiteDb s join s.legalEntity p where p.bpn=:bpn")
+    fun findByLegalEntityBpn(bpn: String, pageable: Pageable): Page<SiteDb>
 
-    fun findByLegalEntityInOrBpnIn(partners: Collection<LegalEntity>, bpns: Collection<String>, pageable: Pageable): Page<Site>
+    fun findByLegalEntityInOrBpnIn(partners: Collection<LegalEntityDb>, bpns: Collection<String>, pageable: Pageable): Page<SiteDb>
 
-    fun findByBpn(bpn: String): Site?
+    fun findByBpn(bpn: String): SiteDb?
 
-    fun findDistinctByBpnIn(bpns: Collection<String>): Set<Site>
+    fun findDistinctByBpnIn(bpns: Collection<String>): Set<SiteDb>
 }

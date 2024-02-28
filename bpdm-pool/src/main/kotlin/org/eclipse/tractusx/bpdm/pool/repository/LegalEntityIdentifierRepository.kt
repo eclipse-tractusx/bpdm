@@ -20,18 +20,18 @@
 package org.eclipse.tractusx.bpdm.pool.repository
 
 import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingDto
-import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
-import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityIdentifier
+import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
+import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityIdentifierDb
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 
-interface LegalEntityIdentifierRepository : CrudRepository<LegalEntityIdentifier, Long> {
-    fun findByValueIn(identifierValues: Collection<String>): Set<LegalEntityIdentifier>
+interface LegalEntityIdentifierRepository : CrudRepository<LegalEntityIdentifierDb, Long> {
+    fun findByValueIn(identifierValues: Collection<String>): Set<LegalEntityIdentifierDb>
 
-    @Query("SELECT DISTINCT i FROM LegalEntityIdentifier i LEFT JOIN FETCH i.type WHERE i IN :identifiers")
-    fun joinType(identifiers: Set<LegalEntityIdentifier>): Set<LegalEntityIdentifier>
+    @Query("SELECT DISTINCT i FROM LegalEntityIdentifierDb i LEFT JOIN FETCH i.type WHERE i IN :identifiers")
+    fun joinType(identifiers: Set<LegalEntityIdentifierDb>): Set<LegalEntityIdentifierDb>
 
-    @Query("SELECT new org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingDto(i.value,i.legalEntity.bpn) FROM LegalEntityIdentifier i WHERE i.type = :identifierType AND i.value in :values")
-    fun findBpnsByIdentifierTypeAndValues(identifierType: IdentifierType, values: Collection<String>): Set<BpnIdentifierMappingDto>
+    @Query("SELECT new org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingDto(i.value,i.legalEntity.bpn) FROM LegalEntityIdentifierDb i WHERE i.type = :identifierType AND i.value in :values")
+    fun findBpnsByIdentifierTypeAndValues(identifierType: IdentifierTypeDb, values: Collection<String>): Set<BpnIdentifierMappingDto>
 
 }

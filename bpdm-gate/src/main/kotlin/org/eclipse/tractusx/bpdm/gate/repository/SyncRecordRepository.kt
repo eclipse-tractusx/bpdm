@@ -19,11 +19,11 @@
 
 package org.eclipse.tractusx.bpdm.gate.repository
 
-import org.eclipse.tractusx.bpdm.gate.entity.SyncRecord
-import org.eclipse.tractusx.bpdm.gate.entity.SyncType
+import org.eclipse.tractusx.bpdm.gate.entity.SyncRecordDb
+import org.eclipse.tractusx.bpdm.gate.entity.SyncTypeDb
 import org.springframework.data.repository.CrudRepository
 
-interface SyncRecordRepository : CrudRepository<SyncRecord, Long> {
+interface SyncRecordRepository : CrudRepository<SyncRecordDb, Long> {
 
-    fun findByType(type: SyncType): SyncRecord?
+    fun findByType(type: SyncTypeDb): SyncRecordDb?
 }

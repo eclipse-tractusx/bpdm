@@ -19,11 +19,11 @@
 
 package org.eclipse.tractusx.bpdm.pool.repository
 
-import org.eclipse.tractusx.bpdm.pool.entity.ImportEntry
+import org.eclipse.tractusx.bpdm.pool.entity.ImportEntryDb
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.PagingAndSortingRepository
 
-interface ImportEntryRepository : CrudRepository<ImportEntry, Long>, PagingAndSortingRepository<ImportEntry, Long> {
+interface ImportEntryRepository : CrudRepository<ImportEntryDb, Long>, PagingAndSortingRepository<ImportEntryDb, Long> {
 
-    fun findByImportIdentifierIn(importIdentifier: Collection<String>): Set<ImportEntry>
+    fun findByImportIdentifierIn(importIdentifier: Collection<String>): Set<ImportEntryDb>
 }

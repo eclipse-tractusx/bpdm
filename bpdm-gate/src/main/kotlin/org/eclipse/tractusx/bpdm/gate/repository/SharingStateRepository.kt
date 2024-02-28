@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.repository
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
-import org.eclipse.tractusx.bpdm.gate.entity.SharingState
+import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.Specification
@@ -30,16 +30,17 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.PagingAndSortingRepository
 
-interface SharingStateRepository : PagingAndSortingRepository<SharingState, Long>, CrudRepository<SharingState, Long>, JpaSpecificationExecutor<SharingState> {
+interface SharingStateRepository : PagingAndSortingRepository<SharingStateDb, Long>, CrudRepository<SharingStateDb, Long>,
+    JpaSpecificationExecutor<SharingStateDb> {
 
     object Specs {
         /**
          * Restrict to entries with any one of the given externalIds; ignore if null
          */
         fun byExternalIdsIn(externalIds: Collection<String>?) =
-            Specification<SharingState> { root, _, _ ->
+            Specification<SharingStateDb> { root, _, _ ->
                 externalIds?.let {
-                    root.get<String>(SharingState::externalId.name).`in`(externalIds)
+                    root.get<String>(SharingStateDb::externalId.name).`in`(externalIds)
                 }
             }
 
@@ -47,22 +48,22 @@ interface SharingStateRepository : PagingAndSortingRepository<SharingState, Long
          * Restrict to entries with the given businessPartnerType; ignore if null
          */
         fun byBusinessPartnerType(businessPartnerType: BusinessPartnerType?) =
-            Specification<SharingState> { root, _, builder ->
+            Specification<SharingStateDb> { root, _, builder ->
                 businessPartnerType?.let {
-                    builder.equal(root.get<BusinessPartnerType>(SharingState::businessPartnerType.name), businessPartnerType)
+                    builder.equal(root.get<BusinessPartnerType>(SharingStateDb::businessPartnerType.name), businessPartnerType)
                 }
             }
     }
 
-    fun findByExternalIdInAndBusinessPartnerType(externalId: Collection<String>, businessPartnerType: BusinessPartnerType): Collection<SharingState>
+    fun findByExternalIdInAndBusinessPartnerType(externalId: Collection<String>, businessPartnerType: BusinessPartnerType): Collection<SharingStateDb>
 
-    fun findBySharingStateType(sharingStateType: SharingStateType): Set<SharingState>
+    fun findBySharingStateType(sharingStateType: SharingStateType): Set<SharingStateDb>
 
-    fun findBySharingStateType(sharingStateType: SharingStateType, pageable: Pageable): Page<SharingState>
+    fun findBySharingStateType(sharingStateType: SharingStateType, pageable: Pageable): Page<SharingStateDb>
 
-    fun findBySharingStateTypeAndTaskIdNotNull(sharingStateType: SharingStateType, pageable: Pageable): Page<SharingState>
+    fun findBySharingStateTypeAndTaskIdNotNull(sharingStateType: SharingStateType, pageable: Pageable): Page<SharingStateDb>
 
-    @Query("SELECT s.sharingStateType as type, COUNT(s.sharingStateType) as count FROM SharingState AS s GROUP BY s.sharingStateType")
+    @Query("SELECT s.sharingStateType as type, COUNT(s.sharingStateType) as count FROM SharingStateDb AS s GROUP BY s.sharingStateType")
     fun countSharingStateTypes(): List<SharingStateTypeCount>
 
     interface SharingStateTypeCount {

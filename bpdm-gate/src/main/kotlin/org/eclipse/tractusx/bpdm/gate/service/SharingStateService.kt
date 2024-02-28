@@ -28,7 +28,7 @@ import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
 import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
-import org.eclipse.tractusx.bpdm.gate.entity.SharingState
+import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidStateException
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidStateRequestException
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmMissingPartnerException
@@ -111,26 +111,26 @@ class SharingStateService(
         }
     }
 
-    fun setInitial(sharingStateIds: List<SharingStateIdentifierDto>): List<SharingState> {
+    fun setInitial(sharingStateIds: List<SharingStateIdentifierDto>): List<SharingStateDb> {
         val sharingStates = getOrCreate(sharingStateIds)
         return sharingStates.map { setInitial(it) }
     }
 
-    fun setSuccess(successRequests: List<SuccessRequest>): List<SharingState> {
+    fun setSuccess(successRequests: List<SuccessRequest>): List<SharingStateDb> {
         val sharingStates = getOrCreate(successRequests.map { it.sharingStateId })
         return sharingStates
             .zip(successRequests)
             .map { (sharingState, request) -> setSuccess(sharingState, request.bpn, request.startTimeOverwrite) }
     }
 
-    fun setPending(pendingRequests: List<PendingRequest>): List<SharingState> {
+    fun setPending(pendingRequests: List<PendingRequest>): List<SharingStateDb> {
         val sharingStates = getOrCreate(pendingRequests.map { it.sharingStateId })
         return sharingStates
             .zip(pendingRequests)
             .map { (sharingState, request) -> setPending(sharingState, request.taskId, request.startTimeOverwrite) }
     }
 
-    fun setError(errorRequests: List<ErrorRequest>): List<SharingState>{
+    fun setError(errorRequests: List<ErrorRequest>): List<SharingStateDb> {
         val sharingStates = getOrCreate(errorRequests.map { it.sharingStateId })
 
         return sharingStates
@@ -138,7 +138,7 @@ class SharingStateService(
             .map { (sharingState, request) -> setError(sharingState, request.errorCode, request.errorMessage, request.startTimeOverwrite) }
     }
 
-    fun setReady(externalIds: List<String>): List<SharingState> {
+    fun setReady(externalIds: List<String>): List<SharingStateDb> {
         val existingSharingStates = stateRepository.findByExternalIdInAndBusinessPartnerType(externalIds, BusinessPartnerType.GENERIC)
         val existingIds = existingSharingStates.map { it.externalId }.toSet()
         val missingIds = externalIds.minus(existingIds)
@@ -158,7 +158,7 @@ class SharingStateService(
         return correctStates.map { setReady(it) }
     }
 
-    private fun setInitial(sharingState: SharingState): SharingState {
+    private fun setInitial(sharingState: SharingStateDb): SharingStateDb {
         sharingState.sharingStateType =
                 //If new business partner data should be immediately ready to be shared our initial state is ready instead
             if (goldenRecordTaskConfigProperties.creation.fromSharingMember.startsAsReady)
@@ -173,7 +173,7 @@ class SharingStateService(
         return stateRepository.save(sharingState)
     }
 
-    private fun setSuccess(sharingState: SharingState, bpn: String, startTimeOverwrite: LocalDateTime? = null): SharingState {
+    private fun setSuccess(sharingState: SharingStateDb, bpn: String, startTimeOverwrite: LocalDateTime? = null): SharingStateDb {
 
         sharingState.sharingStateType = SharingStateType.Success
         sharingState.sharingErrorCode = null
@@ -184,7 +184,7 @@ class SharingStateService(
         return stateRepository.save(sharingState)
     }
 
-    private fun setPending(sharingState: SharingState, taskId: String, startTimeOverwrite: LocalDateTime? = null): SharingState {
+    private fun setPending(sharingState: SharingStateDb, taskId: String, startTimeOverwrite: LocalDateTime? = null): SharingStateDb {
         sharingState.sharingStateType = SharingStateType.Pending
         sharingState.sharingErrorCode = null
         sharingState.sharingErrorMessage = null
@@ -195,11 +195,11 @@ class SharingStateService(
     }
 
     private fun setError(
-        sharingState: SharingState,
+        sharingState: SharingStateDb,
         sharingErrorCode: BusinessPartnerSharingError,
         sharingErrorMessage: String? = null,
         startTimeOverwrite: LocalDateTime? = null
-    ): SharingState {
+    ): SharingStateDb {
         sharingState.sharingStateType = SharingStateType.Error
         sharingState.sharingErrorCode = sharingErrorCode
         sharingState.sharingErrorMessage = sharingErrorMessage
@@ -209,8 +209,8 @@ class SharingStateService(
     }
 
     private fun setReady(
-        sharingState: SharingState
-    ): SharingState {
+        sharingState: SharingStateDb
+    ): SharingStateDb {
         sharingState.sharingStateType = SharingStateType.Ready
         sharingState.sharingErrorCode = null
         sharingState.sharingErrorMessage = null
@@ -221,8 +221,7 @@ class SharingStateService(
     }
 
 
-
-    private fun getOrCreate(sharingStateIdentifiers: List<SharingStateIdentifierDto>): List<SharingState>{
+    private fun getOrCreate(sharingStateIdentifiers: List<SharingStateIdentifierDto>): List<SharingStateDb> {
         val identifiersByType = sharingStateIdentifiers.groupBy { it.businessPartnerType }
 
         val sharingStates = identifiersByType.flatMap { entry -> getOrCreate(entry.value.map { it.externalId }, entry.key) }
@@ -232,13 +231,13 @@ class SharingStateService(
     }
 
 
-    private fun getOrCreate(externalIds: List<String>, businessPartnerType: BusinessPartnerType): List<SharingState> {
+    private fun getOrCreate(externalIds: List<String>, businessPartnerType: BusinessPartnerType): List<SharingStateDb> {
         val sharingStates = stateRepository.findByExternalIdInAndBusinessPartnerType(externalIds, businessPartnerType)
         val sharingStatesByExternalId = sharingStates.associateBy { it.externalId }
 
         return externalIds.map { externalId ->
             sharingStatesByExternalId[externalId]
-                ?: SharingState(
+                ?: SharingStateDb(
                     externalId,
                     businessPartnerType = businessPartnerType,
                     sharingStateType = SharingStateType.Initial,
@@ -246,12 +245,12 @@ class SharingStateService(
                     sharingErrorMessage = null,
                     bpn = null,
                     sharingProcessStarted = null
-            )
+                )
         }
     }
 
 
-    private fun getOrCreate(externalId: String, businessPartnerType: BusinessPartnerType): SharingState {
+    private fun getOrCreate(externalId: String, businessPartnerType: BusinessPartnerType): SharingStateDb {
         return getOrCreate(listOf(externalId), businessPartnerType).single()
     }
 

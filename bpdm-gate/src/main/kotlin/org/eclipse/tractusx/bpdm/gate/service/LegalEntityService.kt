@@ -26,7 +26,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateInputRequ
 import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityGateInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityGateOutputResponse
-import org.eclipse.tractusx.bpdm.gate.entity.LegalEntity
+import org.eclipse.tractusx.bpdm.gate.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.gate.repository.LegalEntityRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
@@ -100,19 +100,19 @@ class LegalEntityService(
 
     }
 
-    private fun toValidOutputLegalEntities(legalEntityPage: Page<LegalEntity>): List<LegalEntityGateOutputResponse> {
+    private fun toValidOutputLegalEntities(legalEntityPage: Page<LegalEntityDb>): List<LegalEntityGateOutputResponse> {
         return legalEntityPage.content.map { legalEntity ->
             legalEntity.toLegalEntityGateOutputResponse()
         }
     }
 
-    private fun toValidLegalEntities(legalEntityPage: Page<LegalEntity>): List<LegalEntityGateInputDto> {
+    private fun toValidLegalEntities(legalEntityPage: Page<LegalEntityDb>): List<LegalEntityGateInputDto> {
         return legalEntityPage.content.map { legalEntity ->
             legalEntity.toLegalEntityGateInputResponse()
         }
     }
 
-    private fun toValidSingleLegalEntity(legalEntity: LegalEntity): LegalEntityGateInputDto {
+    private fun toValidSingleLegalEntity(legalEntity: LegalEntityDb): LegalEntityGateInputDto {
         return LegalEntityGateInputDto(
             legalEntity = legalEntity.toLegalEntityDto(),
             legalAddress = legalEntity.legalAddress.toAddressGateInputResponse(legalEntity.legalAddress),

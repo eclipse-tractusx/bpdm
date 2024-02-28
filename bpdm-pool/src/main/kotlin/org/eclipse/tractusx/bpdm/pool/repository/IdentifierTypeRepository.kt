@@ -21,39 +21,39 @@ package org.eclipse.tractusx.bpdm.pool.repository
 
 import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
-import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDetail
+import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
+import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDetailDb
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.PagingAndSortingRepository
 
 interface IdentifierTypeRepository :
-    PagingAndSortingRepository<IdentifierType, Long>, CrudRepository<IdentifierType, Long>, JpaSpecificationExecutor<IdentifierType> {
+    PagingAndSortingRepository<IdentifierTypeDb, Long>, CrudRepository<IdentifierTypeDb, Long>, JpaSpecificationExecutor<IdentifierTypeDb> {
 
     object Specs {
         fun byBusinessPartnerType(businessPartnerType: IdentifierBusinessPartnerType) =
-            Specification<IdentifierType> { root, _, builder ->
-                builder.equal(root.get<IdentifierBusinessPartnerType>(IdentifierType::businessPartnerType.name), businessPartnerType)
+            Specification<IdentifierTypeDb> { root, _, builder ->
+                builder.equal(root.get<IdentifierBusinessPartnerType>(IdentifierTypeDb::businessPartnerType.name), businessPartnerType)
             }
 
         fun byCountry(countryCode: CountryCode?) =
             countryCode?.let {
-                Specification<IdentifierType> { root, query, builder ->
-                    val subquery = query.subquery(IdentifierTypeDetail::class.java)
+                Specification<IdentifierTypeDb> { root, query, builder ->
+                    val subquery = query.subquery(IdentifierTypeDetailDb::class.java)
                     val subRoot = subquery.from(subquery.resultType)
 
                     // Check if an IdentifierTypeDetail exists for the IdentifierType where the countryCode is null or equal to given countryCode
                     builder.exists(
                         subquery.where(
                             builder.equal(
-                                subRoot.get<IdentifierType>(IdentifierTypeDetail::identifierType.name),
+                                subRoot.get<IdentifierTypeDb>(IdentifierTypeDetailDb::identifierType.name),
                                 root
                             ),
                             builder.or(
-                                subRoot.get<CountryCode>(IdentifierTypeDetail::countryCode.name).isNull,
+                                subRoot.get<CountryCode>(IdentifierTypeDetailDb::countryCode.name).isNull,
                                 builder.equal(
-                                    subRoot.get<CountryCode>(IdentifierTypeDetail::countryCode.name),
+                                    subRoot.get<CountryCode>(IdentifierTypeDetailDb::countryCode.name),
                                     countryCode
                                 )
                             )
@@ -63,6 +63,6 @@ interface IdentifierTypeRepository :
             }
     }
 
-    fun findByBusinessPartnerTypeAndTechnicalKey(businessPartnerType: IdentifierBusinessPartnerType, key: String): IdentifierType?
-    fun findByBusinessPartnerTypeAndTechnicalKeyIn(businessPartnerType: IdentifierBusinessPartnerType, technicalKeys: Set<String>): Set<IdentifierType>
+    fun findByBusinessPartnerTypeAndTechnicalKey(businessPartnerType: IdentifierBusinessPartnerType, key: String): IdentifierTypeDb?
+    fun findByBusinessPartnerTypeAndTechnicalKeyIn(businessPartnerType: IdentifierBusinessPartnerType, technicalKeys: Set<String>): Set<IdentifierTypeDb>
 }

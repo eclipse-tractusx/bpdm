@@ -19,26 +19,26 @@
 
 package org.eclipse.tractusx.bpdm.gate.repository.generic
 
-import org.eclipse.tractusx.bpdm.gate.entity.generic.ConfidenceCriteria
+import org.eclipse.tractusx.bpdm.gate.entity.generic.ConfidenceCriteriaDb
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 
-interface ConfidenceCriteriaRepository : JpaRepository<ConfidenceCriteria, Long>, CrudRepository<ConfidenceCriteria, Long> {
+interface ConfidenceCriteriaRepository : JpaRepository<ConfidenceCriteriaDb, Long>, CrudRepository<ConfidenceCriteriaDb, Long> {
 
-    @Query("SELECT AVG(c.numberOfBusinessPartners) FROM ConfidenceCriteria AS c")
+    @Query("SELECT AVG(c.numberOfBusinessPartners) FROM ConfidenceCriteriaDb AS c")
     fun averageNumberOfBusinessPartners(): Float?
 
-    @Query("SELECT COUNT(c.numberOfBusinessPartners) FROM ConfidenceCriteria AS c WHERE c.numberOfBusinessPartners <= 1")
+    @Query("SELECT COUNT(c.numberOfBusinessPartners) FROM ConfidenceCriteriaDb AS c WHERE c.numberOfBusinessPartners <= 1")
     fun countUnique(): Long?
 
-    @Query("SELECT COUNT(c.sharedByOwner) FROM ConfidenceCriteria AS c")
+    @Query("SELECT COUNT(c.sharedByOwner) FROM ConfidenceCriteriaDb AS c")
     fun countSharedByOwner(): Long?
 
-    @Query("SELECT COUNT(c.checkedByExternalDataSource) FROM ConfidenceCriteria AS c")
+    @Query("SELECT COUNT(c.checkedByExternalDataSource) FROM ConfidenceCriteriaDb AS c")
     fun countCheckedByExternalDataSource(): Long?
 
-    @Query("SELECT AVG(c.confidenceLevel) FROM ConfidenceCriteria AS c")
+    @Query("SELECT AVG(c.confidenceLevel) FROM ConfidenceCriteriaDb AS c")
     fun averageConfidenceLevel(): Float?
 
 }

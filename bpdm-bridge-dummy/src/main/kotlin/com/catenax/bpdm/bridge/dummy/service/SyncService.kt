@@ -19,7 +19,7 @@
 
 package com.catenax.bpdm.bridge.dummy.service
 
-import com.catenax.bpdm.bridge.dummy.entity.SyncType
+import com.catenax.bpdm.bridge.dummy.entity.SyncTypeDb
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.springframework.stereotype.Service
@@ -39,14 +39,14 @@ class SyncService(
 
     fun sync() {
         logger.info("Bridge sync started...")
-        val syncRecord = syncRecordService.setSynchronizationStart(SyncType.GATE_TO_POOL)
+        val syncRecord = syncRecordService.setSynchronizationStart(SyncTypeDb.GATE_TO_POOL)
         try {
             syncInternal(syncRecord.fromTime)
             logger.info("Bridge sync completed")
-            syncRecordService.setSynchronizationSuccess(SyncType.GATE_TO_POOL)
+            syncRecordService.setSynchronizationSuccess(SyncTypeDb.GATE_TO_POOL)
         } catch (e: Exception) {
             logger.error("Bridge sync failed with critical error:", e)
-            syncRecordService.setSynchronizationError(SyncType.GATE_TO_POOL, e.toString(), null)
+            syncRecordService.setSynchronizationError(SyncTypeDb.GATE_TO_POOL, e.toString(), null)
             throw e
         }
     }

@@ -19,8 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.repository
 
-import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDetail
+import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDetailDb
 import org.springframework.data.jpa.repository.JpaRepository
 
-interface IdentifierTypeDetailRepository : JpaRepository<IdentifierTypeDetail, Long> {
+interface IdentifierTypeDetailRepository : JpaRepository<IdentifierTypeDetailDb, Long> {
 }

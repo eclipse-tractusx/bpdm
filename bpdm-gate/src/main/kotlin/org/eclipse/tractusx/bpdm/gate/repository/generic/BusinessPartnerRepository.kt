@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.repository.generic
 
 import org.eclipse.tractusx.bpdm.common.model.StageType
-import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartner
+import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
@@ -31,23 +31,23 @@ import org.springframework.stereotype.Repository
 
 
 @Repository
-interface BusinessPartnerRepository : JpaRepository<BusinessPartner, Long>, CrudRepository<BusinessPartner, Long> {
+interface BusinessPartnerRepository : JpaRepository<BusinessPartnerDb, Long>, CrudRepository<BusinessPartnerDb, Long> {
 
-    fun findByStageAndExternalIdIn(stage: StageType, externalId: Collection<String>): Set<BusinessPartner>
+    fun findByStageAndExternalIdIn(stage: StageType, externalId: Collection<String>): Set<BusinessPartnerDb>
 
-    fun findByStageAndExternalIdIn(stage: StageType, externalId: Collection<String>, pageable: Pageable): Page<BusinessPartner>
+    fun findByStageAndExternalIdIn(stage: StageType, externalId: Collection<String>, pageable: Pageable): Page<BusinessPartnerDb>
 
-    fun findByStage(stage: StageType, pageable: Pageable): Page<BusinessPartner>
+    fun findByStage(stage: StageType, pageable: Pageable): Page<BusinessPartnerDb>
 
-    @Query("SELECT e FROM BusinessPartner e WHERE e.stage = :stage AND (e.bpnL IN :bpnL OR e.bpnS IN :bpnS OR e.bpnA IN :bpnA)")
+    @Query("SELECT e FROM BusinessPartnerDb e WHERE e.stage = :stage AND (e.bpnL IN :bpnL OR e.bpnS IN :bpnS OR e.bpnA IN :bpnA)")
     fun findByStageAndBpnLInOrBpnSInOrBpnAIn(
         @Param("stage") stage: StageType?,
         @Param("bpnL") bpnLList: List<String?>?,
         @Param("bpnS") bpnSList: List<String?>?,
         @Param("bpnA") bpnAList: List<String?>?
-    ): Set<BusinessPartner>
+    ): Set<BusinessPartnerDb>
 
-    @Query("SELECT b.stage as stage, COUNT(b.stage) as count FROM BusinessPartner AS b GROUP BY b.stage")
+    @Query("SELECT b.stage as stage, COUNT(b.stage) as count FROM BusinessPartnerDb AS b GROUP BY b.stage")
     fun countPerStages(): List<PartnersPerStageCount>
 
     interface PartnersPerStageCount {

@@ -28,7 +28,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerBpnSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.MainAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddress
+import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
@@ -98,7 +98,7 @@ class AddressService(
         return addresses.map { it.toMainAddressResponse() }
     }
 
-    fun fetchLogisticAddressDependencies(addresses: Set<LogisticAddress>): Set<LogisticAddress> {
+    fun fetchLogisticAddressDependencies(addresses: Set<LogisticAddressDb>): Set<LogisticAddressDb> {
         logisticAddressRepository.joinLegalEntities(addresses)
         logisticAddressRepository.joinSites(addresses)
         logisticAddressRepository.joinRegions(addresses)

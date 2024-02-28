@@ -20,22 +20,22 @@
 package org.eclipse.tractusx.bpdm.gate.repository
 
 import org.eclipse.tractusx.bpdm.common.model.StageType
-import org.eclipse.tractusx.bpdm.gate.entity.Site
+import org.eclipse.tractusx.bpdm.gate.entity.SiteDb
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.repository.CrudRepository
 
-interface SiteRepository : JpaRepository<Site, Long>, CrudRepository<Site, Long> {
+interface SiteRepository : JpaRepository<SiteDb, Long>, CrudRepository<SiteDb, Long> {
 
-    fun findByExternalIdIn(externalId: Collection<String>): Set<Site>
+    fun findByExternalIdIn(externalId: Collection<String>): Set<SiteDb>
 
-    fun findByExternalId(externalId: String): Site?
+    fun findByExternalId(externalId: String): SiteDb?
 
-    fun findByExternalIdAndStage(externalId: String, stage: StageType): Site?
+    fun findByExternalIdAndStage(externalId: String, stage: StageType): SiteDb?
 
-    fun findByExternalIdInAndStage(externalId: Collection<String>?, stage: StageType, pageable: Pageable): Page<Site>
+    fun findByExternalIdInAndStage(externalId: Collection<String>?, stage: StageType, pageable: Pageable): Page<SiteDb>
 
-    fun findByStage(stage: StageType, pageable: Pageable): Page<Site>
+    fun findByStage(stage: StageType, pageable: Pageable): Page<SiteDb>
 
 }

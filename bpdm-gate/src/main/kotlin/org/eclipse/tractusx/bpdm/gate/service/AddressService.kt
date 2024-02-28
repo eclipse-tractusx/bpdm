@@ -26,7 +26,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateOutputDto
-import org.eclipse.tractusx.bpdm.gate.entity.LogisticAddress
+import org.eclipse.tractusx.bpdm.gate.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.gate.repository.GateAddressRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
@@ -55,7 +55,7 @@ class AddressService(
         )
     }
 
-    private fun toValidLogisticAddresses(logisticAddressPage: Page<LogisticAddress>): List<AddressGateInputDto> {
+    private fun toValidLogisticAddresses(logisticAddressPage: Page<LogisticAddressDb>): List<AddressGateInputDto> {
         return logisticAddressPage.content.map { logisticAddress ->
             logisticAddress.toAddressGateInputResponse(logisticAddress)
         }
@@ -91,7 +91,7 @@ class AddressService(
 
     }
 
-    private fun toValidOutputLogisticAddresses(logisticAddressPage: Page<LogisticAddress>): List<AddressGateOutputDto> {
+    private fun toValidOutputLogisticAddresses(logisticAddressPage: Page<LogisticAddressDb>): List<AddressGateOutputDto> {
         return logisticAddressPage.content.map { logisticAddress ->
             logisticAddress.toAddressGateOutputResponse(logisticAddress)
         }
