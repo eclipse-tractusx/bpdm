@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.repository
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.entity.PartnerChangelogEntry
+import org.eclipse.tractusx.bpdm.pool.entity.PartnerChangelogEntryDb
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.Specification
@@ -28,16 +28,16 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import java.time.Instant
 
-interface PartnerChangelogEntryRepository : JpaRepository<PartnerChangelogEntry, Long>, JpaSpecificationExecutor<PartnerChangelogEntry> {
+interface PartnerChangelogEntryRepository : JpaRepository<PartnerChangelogEntryDb, Long>, JpaSpecificationExecutor<PartnerChangelogEntryDb> {
     object Specs {
         /**
          * Restrict to entries with any one of the given BPNs; ignore if empty
          */
         fun byBpnsIn(bpns: Set<String>?) =
-            Specification<PartnerChangelogEntry> { root, _, _ ->
-                bpns?.let{
-                    if(bpns.isNotEmpty())
-                        root.get<String>(PartnerChangelogEntry::bpn.name).`in`(bpns.map { bpn -> bpn.uppercase() })
+            Specification<PartnerChangelogEntryDb> { root, _, _ ->
+                bpns?.let {
+                    if (bpns.isNotEmpty())
+                        root.get<String>(PartnerChangelogEntryDb::bpn.name).`in`(bpns.map { bpn -> bpn.uppercase() })
                     else
                         null
                 }
@@ -47,9 +47,9 @@ interface PartnerChangelogEntryRepository : JpaRepository<PartnerChangelogEntry,
          * Restrict to entries updated after the given instant; ignore if null
          */
         fun byUpdatedGreaterThan(modifiedAfter: Instant?) =
-            Specification<PartnerChangelogEntry> { root, _, builder ->
+            Specification<PartnerChangelogEntryDb> { root, _, builder ->
                 modifiedAfter?.let {
-                    builder.greaterThan(root.get(PartnerChangelogEntry::updatedAt.name), modifiedAfter)
+                    builder.greaterThan(root.get(PartnerChangelogEntryDb::updatedAt.name), modifiedAfter)
                 }
             }
 
@@ -57,10 +57,10 @@ interface PartnerChangelogEntryRepository : JpaRepository<PartnerChangelogEntry,
          * Restrict to entries with any one of the given LSA types; ignore if empty
          */
         fun byBusinessPartnerTypesIn(businessPartnerTypes: Set<BusinessPartnerType>?) =
-            Specification<PartnerChangelogEntry> { root, _, _ ->
+            Specification<PartnerChangelogEntryDb> { root, _, _ ->
                 businessPartnerTypes?.let {
                     if (businessPartnerTypes.isNotEmpty())
-                        root.get<String>(PartnerChangelogEntry::businessPartnerType.name).`in`(businessPartnerTypes)
+                        root.get<String>(PartnerChangelogEntryDb::businessPartnerType.name).`in`(businessPartnerTypes)
                     else
                         null
                 }
@@ -71,5 +71,5 @@ interface PartnerChangelogEntryRepository : JpaRepository<PartnerChangelogEntry,
         createdAt: Instant,
         businessPartnerType: Collection<BusinessPartnerType>,
         pageable: Pageable
-    ): Page<PartnerChangelogEntry>
+    ): Page<PartnerChangelogEntryDb>
 }

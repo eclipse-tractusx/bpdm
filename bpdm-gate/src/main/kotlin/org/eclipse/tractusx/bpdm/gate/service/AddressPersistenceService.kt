@@ -28,10 +28,10 @@ import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateOutputRequest
-import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
-import org.eclipse.tractusx.bpdm.gate.entity.LegalEntity
-import org.eclipse.tractusx.bpdm.gate.entity.LogisticAddress
-import org.eclipse.tractusx.bpdm.gate.entity.Site
+import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntryDb
+import org.eclipse.tractusx.bpdm.gate.entity.LegalEntityDb
+import org.eclipse.tractusx.bpdm.gate.entity.LogisticAddressDb
+import org.eclipse.tractusx.bpdm.gate.entity.SiteDb
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.eclipse.tractusx.bpdm.gate.repository.GateAddressRepository
 import org.eclipse.tractusx.bpdm.gate.repository.LegalEntityRepository
@@ -86,7 +86,7 @@ class AddressPersistenceService(
         sharingStateService.setInitial(initRequests)
     }
 
-    private fun updateAddress(address: LogisticAddress, changeAddress: AddressGateInputRequest, legalEntityRecord: LegalEntity?, siteRecord: Site?) {
+    private fun updateAddress(address: LogisticAddressDb, changeAddress: AddressGateInputRequest, legalEntityRecord: LegalEntityDb?, siteRecord: SiteDb?) {
 
         address.externalId = changeAddress.externalId
         address.legalEntity = legalEntityRecord
@@ -143,7 +143,12 @@ class AddressPersistenceService(
         sharingStateService.setSuccess(successRequests)
     }
 
-    private fun updateAddressOutput(address: LogisticAddress, changeAddress: AddressGateOutputRequest, legalEntityRecord: LegalEntity?, siteRecord: Site?) {
+    private fun updateAddressOutput(
+        address: LogisticAddressDb,
+        changeAddress: AddressGateOutputRequest,
+        legalEntityRecord: LegalEntityDb?,
+        siteRecord: SiteDb?
+    ) {
 
         address.bpn = changeAddress.bpn
         address.externalId = changeAddress.externalId
@@ -159,7 +164,7 @@ class AddressPersistenceService(
     }
 
     private fun saveChangelog(externalId: String, changelogType: ChangelogType, stage: StageType) {
-        changelogRepository.save(ChangelogEntry(externalId, BusinessPartnerType.ADDRESS, changelogType, stage))
+        changelogRepository.save(ChangelogEntryDb(externalId, BusinessPartnerType.ADDRESS, changelogType, stage))
     }
 
 }

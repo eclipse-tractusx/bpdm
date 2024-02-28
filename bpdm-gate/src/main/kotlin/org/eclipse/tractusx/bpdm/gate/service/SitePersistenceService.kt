@@ -85,21 +85,21 @@ class SitePersistenceService(
     //Creates Changelog For both Site and Logistic Address when they are created or updated
     private fun saveChangelog(externalId: String, changelogType: ChangelogType, stage: StageType) {
         val mainAddressExternalId = getMainAddressExternalIdForSiteExternalId(externalId)
-        changelogRepository.save(ChangelogEntry(mainAddressExternalId, BusinessPartnerType.ADDRESS, changelogType, stage))
-        changelogRepository.save(ChangelogEntry(externalId, BusinessPartnerType.SITE, changelogType, stage))
+        changelogRepository.save(ChangelogEntryDb(mainAddressExternalId, BusinessPartnerType.ADDRESS, changelogType, stage))
+        changelogRepository.save(ChangelogEntryDb(externalId, BusinessPartnerType.SITE, changelogType, stage))
     }
 
-    private fun getAddressRecord(externalId: String, datatype: StageType): LogisticAddress {
+    private fun getAddressRecord(externalId: String, datatype: StageType): LogisticAddressDb {
         return addressRepository.findByExternalIdAndStage(externalId, datatype)
             ?: throw BpdmNotFoundException("Business Partner", "Error")
     }
 
-    private fun getLegalEntityRecord(externalId: String, datatype: StageType): LegalEntity {
+    private fun getLegalEntityRecord(externalId: String, datatype: StageType): LegalEntityDb {
         return legalEntityRepository.findByExternalIdAndStage(externalId, datatype)
             ?: throw BpdmNotFoundException("Business Partner", externalId)
     }
 
-    private fun updateSite(site: Site, updatedSite: SiteGateInputRequest, legalEntityRecord: LegalEntity) {
+    private fun updateSite(site: SiteDb, updatedSite: SiteGateInputRequest, legalEntityRecord: LegalEntityDb) {
 
         site.externalId = updatedSite.externalId
         site.legalEntity = legalEntityRecord
@@ -110,7 +110,7 @@ class SitePersistenceService(
 
     }
 
-    private fun updateAddress(address: LogisticAddress, changeAddress: LogisticAddress) {
+    private fun updateAddress(address: LogisticAddressDb, changeAddress: LogisticAddressDb) {
 
         address.externalId = changeAddress.externalId
         address.legalEntity = changeAddress.legalEntity
@@ -123,8 +123,8 @@ class SitePersistenceService(
 
     }
 
-    fun toEntityAddress(dto: AddressState, address: LogisticAddress): AddressState {
-        return AddressState(dto.description, dto.validFrom, dto.validTo, dto.type, address)
+    fun toEntityAddress(dto: AddressStateDb, address: LogisticAddressDb): AddressStateDb {
+        return AddressStateDb(dto.description, dto.validFrom, dto.validTo, dto.type, address)
     }
 
     @Transactional
@@ -167,7 +167,7 @@ class SitePersistenceService(
         sharingStateService.setSuccess(successRequests)
     }
 
-    private fun updateSiteOutput(site: Site, updatedSite: SiteGateOutputRequest, legalEntityRecord: LegalEntity) {
+    private fun updateSiteOutput(site: SiteDb, updatedSite: SiteGateOutputRequest, legalEntityRecord: LegalEntityDb) {
 
         site.bpn = updatedSite.bpn
         site.externalId = updatedSite.externalId

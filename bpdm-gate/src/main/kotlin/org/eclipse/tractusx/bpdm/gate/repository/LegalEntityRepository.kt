@@ -20,21 +20,21 @@
 package org.eclipse.tractusx.bpdm.gate.repository
 
 import org.eclipse.tractusx.bpdm.common.model.StageType
-import org.eclipse.tractusx.bpdm.gate.entity.LegalEntity
+import org.eclipse.tractusx.bpdm.gate.entity.LegalEntityDb
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.repository.CrudRepository
 
-interface LegalEntityRepository : JpaRepository<LegalEntity, Long>, CrudRepository<LegalEntity, Long> {
+interface LegalEntityRepository : JpaRepository<LegalEntityDb, Long>, CrudRepository<LegalEntityDb, Long> {
 
-    fun findDistinctByExternalIdIn(externalId: Collection<String>): Set<LegalEntity>
+    fun findDistinctByExternalIdIn(externalId: Collection<String>): Set<LegalEntityDb>
 
-    fun findByExternalId(externalId: String): LegalEntity?
+    fun findByExternalId(externalId: String): LegalEntityDb?
 
-    fun findByExternalIdAndStage(externalId: String, stage: StageType): LegalEntity?
+    fun findByExternalIdAndStage(externalId: String, stage: StageType): LegalEntityDb?
 
-    fun findByExternalIdInAndStage(externalId: Collection<String>?, stage: StageType, pageable: Pageable): Page<LegalEntity>
+    fun findByExternalIdInAndStage(externalId: Collection<String>?, stage: StageType, pageable: Pageable): Page<LegalEntityDb>
 
-    fun findByStage(stage: StageType, pageable: Pageable): Page<LegalEntity>
+    fun findByStage(stage: StageType, pageable: Pageable): Page<LegalEntityDb>
 }

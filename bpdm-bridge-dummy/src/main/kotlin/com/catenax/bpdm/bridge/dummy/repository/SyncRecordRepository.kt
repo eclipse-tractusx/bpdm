@@ -19,11 +19,11 @@
 
 package com.catenax.bpdm.bridge.dummy.repository
 
-import com.catenax.bpdm.bridge.dummy.entity.SyncRecord
-import com.catenax.bpdm.bridge.dummy.entity.SyncType
+import com.catenax.bpdm.bridge.dummy.entity.SyncRecordDb
+import com.catenax.bpdm.bridge.dummy.entity.SyncTypeDb
 import org.springframework.data.repository.CrudRepository
 
-interface SyncRecordRepository : CrudRepository<SyncRecord, Long> {
+interface SyncRecordRepository : CrudRepository<SyncRecordDb, Long> {
 
-    fun findByType(type: SyncType): SyncRecord?
+    fun findByType(type: SyncTypeDb): SyncRecordDb?
 }

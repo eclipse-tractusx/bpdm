@@ -19,9 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.pool.repository
 
-import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityClassification
+import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityClassificationDb
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.PagingAndSortingRepository
 
-interface LegalEntityClassificationRepository : PagingAndSortingRepository<LegalEntityClassification, Long>, CrudRepository<LegalEntityClassification, Long> {
+interface LegalEntityClassificationRepository : PagingAndSortingRepository<LegalEntityClassificationDb, Long>,
+    CrudRepository<LegalEntityClassificationDb, Long> {
 }

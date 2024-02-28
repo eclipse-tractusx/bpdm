@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.repository
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.StageType
-import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
+import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntryDb
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
@@ -29,7 +29,7 @@ import org.springframework.data.jpa.repository.Query
 import java.time.Instant
 
 
-interface ChangelogRepository : JpaRepository<ChangelogEntry, Long>, JpaSpecificationExecutor<ChangelogEntry> {
+interface ChangelogRepository : JpaRepository<ChangelogEntryDb, Long>, JpaSpecificationExecutor<ChangelogEntryDb> {
 
     object Specs {
 
@@ -37,10 +37,10 @@ interface ChangelogRepository : JpaRepository<ChangelogEntry, Long>, JpaSpecific
          * Restrict to entries with any one of the given ExternalIds; ignore if empty
          */
         fun byExternalIdsIn(externalIds: Collection<String>?) =
-            Specification<ChangelogEntry> { root, _, _ ->
+            Specification<ChangelogEntryDb> { root, _, _ ->
                 externalIds?.let {
-                    if(externalIds.isNotEmpty())
-                        root.get<String>(ChangelogEntry::externalId.name).`in`(externalIds)
+                    if (externalIds.isNotEmpty())
+                        root.get<String>(ChangelogEntryDb::externalId.name).`in`(externalIds)
                     else
                         null
                 }
@@ -50,9 +50,9 @@ interface ChangelogRepository : JpaRepository<ChangelogEntry, Long>, JpaSpecific
          * Restrict to entries created at or after the given instant; ignore if null
          */
         fun byCreatedAtGreaterThan(createdAt: Instant?) =
-            Specification<ChangelogEntry> { root, _, builder ->
+            Specification<ChangelogEntryDb> { root, _, builder ->
                 createdAt?.let {
-                    builder.greaterThanOrEqualTo(root.get(ChangelogEntry::createdAt.name), createdAt)
+                    builder.greaterThanOrEqualTo(root.get(ChangelogEntryDb::createdAt.name), createdAt)
                 }
             }
 
@@ -60,24 +60,24 @@ interface ChangelogRepository : JpaRepository<ChangelogEntry, Long>, JpaSpecific
          * Restrict to entries for the BusinessPartnerType; ignore if empty
          */
         fun byBusinessPartnerTypes(businessPartnerTypes: Set<BusinessPartnerType>?) =
-            Specification<ChangelogEntry> { root, _, builder ->
+            Specification<ChangelogEntryDb> { root, _, builder ->
                 businessPartnerTypes?.let {
                     if (businessPartnerTypes.isNotEmpty())
-                        root.get<String>(ChangelogEntry::businessPartnerType.name).`in`(businessPartnerTypes)
+                        root.get<String>(ChangelogEntryDb::businessPartnerType.name).`in`(businessPartnerTypes)
                     else
                         null
                 }
             }
 
         fun byStage(stage: StageType?) =
-            Specification<ChangelogEntry> { root, _, builder ->
+            Specification<ChangelogEntryDb> { root, _, builder ->
                 stage?.let {
-                    builder.equal(root.get<StageType>(ChangelogEntry::stage.name), stage)
+                    builder.equal(root.get<StageType>(ChangelogEntryDb::stage.name), stage)
                 }
             }
     }
 
-    @Query("select distinct u.externalId from ChangelogEntry u where u.externalId in :externalIdList")
+    @Query("select distinct u.externalId from ChangelogEntryDb u where u.externalId in :externalIdList")
     fun findExternalIdsInListDistinct(externalIdList: Collection<String>): Set<String>
 
 

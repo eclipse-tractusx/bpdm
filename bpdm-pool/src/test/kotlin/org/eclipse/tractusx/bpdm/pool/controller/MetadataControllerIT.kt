@@ -31,9 +31,9 @@ import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalFormDto
 import org.eclipse.tractusx.bpdm.pool.api.model.QualityLevel
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
-import org.eclipse.tractusx.bpdm.pool.entity.FieldQualityRule
-import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
-import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDetail
+import org.eclipse.tractusx.bpdm.pool.entity.FieldQualityRuleDb
+import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
+import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDetailDb
 import org.eclipse.tractusx.bpdm.pool.repository.FieldQualityRuleRepository
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
 import org.eclipse.tractusx.bpdm.pool.service.toDto
@@ -319,26 +319,26 @@ class MetadataControllerIT @Autowired constructor(
      */
     @Test
     fun getValidIdentifiersForCountry() {
-        val identifierType1 = IdentifierType(
+        val identifierType1 = IdentifierTypeDb(
             technicalKey = BusinessPartnerNonVerboseValues.identifierType1.technicalKey,
             businessPartnerType = IdentifierBusinessPartnerType.LEGAL_ENTITY,
             name = BusinessPartnerNonVerboseValues.identifierType1.name,
         )
-        identifierType1.details.add(IdentifierTypeDetail(identifierType1, null, true))
+        identifierType1.details.add(IdentifierTypeDetailDb(identifierType1, null, true))
 
-        val identifierType2 = IdentifierType(
+        val identifierType2 = IdentifierTypeDb(
             technicalKey = BusinessPartnerNonVerboseValues.identifierType2.technicalKey,
             businessPartnerType = IdentifierBusinessPartnerType.LEGAL_ENTITY,
             name = BusinessPartnerNonVerboseValues.identifierType2.name
         )
-        identifierType2.details.add(IdentifierTypeDetail(identifierType2, UK, false))
+        identifierType2.details.add(IdentifierTypeDetailDb(identifierType2, UK, false))
 
-        val identifierType3 = IdentifierType(
+        val identifierType3 = IdentifierTypeDb(
             technicalKey = BusinessPartnerNonVerboseValues.identifierType3.technicalKey,
             businessPartnerType = IdentifierBusinessPartnerType.LEGAL_ENTITY,
             name = BusinessPartnerNonVerboseValues.identifierType3.name
         )
-        identifierType3.details.add(IdentifierTypeDetail(identifierType3, PL, false))
+        identifierType3.details.add(IdentifierTypeDetailDb(identifierType3, PL, false))
 
         val givenIdentifierTypes = listOf(identifierType1, identifierType2, identifierType3)
 
@@ -405,8 +405,8 @@ class MetadataControllerIT @Autowired constructor(
     }
 
 
-    private fun addressRuleMandatory(country: CountryCode?, field: String): FieldQualityRule {
-        return FieldQualityRule(
+    private fun addressRuleMandatory(country: CountryCode?, field: String): FieldQualityRuleDb {
+        return FieldQualityRuleDb(
             countryCode = country,
             fieldPath = field,
             schemaName = "address",
@@ -414,8 +414,8 @@ class MetadataControllerIT @Autowired constructor(
         )
     }
 
-    private fun addressRuleForbidden(country: CountryCode?, field: String): FieldQualityRule {
-        return FieldQualityRule(
+    private fun addressRuleForbidden(country: CountryCode?, field: String): FieldQualityRuleDb {
+        return FieldQualityRuleDb(
             countryCode = country,
             fieldPath = field,
             schemaName = "address",
@@ -423,8 +423,8 @@ class MetadataControllerIT @Autowired constructor(
         )
     }
 
-    private fun addressRuleOptional(country: CountryCode?, field: String): FieldQualityRule {
-        return FieldQualityRule(
+    private fun addressRuleOptional(country: CountryCode?, field: String): FieldQualityRuleDb {
+        return FieldQualityRuleDb(
             countryCode = country,
             fieldPath = field,
             schemaName = "address",

@@ -19,17 +19,17 @@
 
 package org.eclipse.tractusx.bpdm.pool.repository
 
-import org.eclipse.tractusx.bpdm.pool.entity.Region
+import org.eclipse.tractusx.bpdm.pool.entity.RegionDb
 import org.springframework.data.domain.Sort
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.PagingAndSortingRepository
 
-interface RegionRepository : PagingAndSortingRepository<Region, Long>, CrudRepository<Region, Long> {
+interface RegionRepository : PagingAndSortingRepository<RegionDb, Long>, CrudRepository<RegionDb, Long> {
 
     companion object {
-        val DEFAULT_SORTING = Sort.by(Region::countryCode.name, Region::regionCode.name)
+        val DEFAULT_SORTING = Sort.by(RegionDb::countryCode.name, RegionDb::regionCode.name)
     }
 
-    fun findByRegionCodeIn(regionCodes: Set<String>): Set<Region>
+    fun findByRegionCodeIn(regionCodes: Set<String>): Set<RegionDb>
 
 }

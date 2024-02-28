@@ -24,9 +24,9 @@ import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
-import org.eclipse.tractusx.bpdm.pool.entity.LegalEntity
-import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityIdentifier
+import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
+import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
+import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityIdentifierDb
 import org.eclipse.tractusx.bpdm.pool.repository.AddressIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityIdentifierRepository
@@ -70,7 +70,7 @@ class BusinessPartnerFetchService(
      * Fetch business partners by BPN in [bpns]
      */
     @Transactional
-    fun fetchByBpns(bpns: Collection<String>): Set<LegalEntity> {
+    fun fetchByBpns(bpns: Collection<String>): Set<LegalEntityDb> {
         logger.debug { "Executing fetchByBpns() with parameters $bpns " }
         return fetchLegalEntityDependencies(legalEntityRepository.findDistinctByBpnIn(bpns))
     }
@@ -101,14 +101,14 @@ class BusinessPartnerFetchService(
         }
     }
 
-    fun fetchDependenciesWithLegalAddress(partners: Set<LegalEntity>): Set<LegalEntity> {
+    fun fetchDependenciesWithLegalAddress(partners: Set<LegalEntityDb>): Set<LegalEntityDb> {
         fetchLegalEntityDependencies(partners)
         legalEntityRepository.joinLegalAddresses(partners)
         addressService.fetchLogisticAddressDependencies(partners.map { it.legalAddress }.toSet())
         return partners
     }
 
-    fun fetchLegalEntityDependencies(partners: Set<LegalEntity>): Set<LegalEntity> {
+    fun fetchLegalEntityDependencies(partners: Set<LegalEntityDb>): Set<LegalEntityDb> {
 
         legalEntityRepository.joinIdentifiers(partners)
         legalEntityRepository.joinStates(partners)
@@ -124,18 +124,18 @@ class BusinessPartnerFetchService(
         return partners
     }
 
-    fun fetchIdentifierDependencies(identifiers: Set<LegalEntityIdentifier>): Set<LegalEntityIdentifier> {
+    fun fetchIdentifierDependencies(identifiers: Set<LegalEntityIdentifierDb>): Set<LegalEntityIdentifierDb> {
         legalEntityIdentifierRepository.joinType(identifiers)
 
         return identifiers
     }
 
 
-    private fun findLegalEntityOrThrow(bpn: String): LegalEntity {
-        return legalEntityRepository.findByBpn(bpn) ?: throw BpdmNotFoundException(LegalEntity::class.simpleName!!, bpn)
+    private fun findLegalEntityOrThrow(bpn: String): LegalEntityDb {
+        return legalEntityRepository.findByBpn(bpn) ?: throw BpdmNotFoundException(LegalEntityDb::class.simpleName!!, bpn)
     }
 
-    fun findLegalEntityOrThrow(identifierTypeKey: String, identifierValue: String): LegalEntity {
+    fun findLegalEntityOrThrow(identifierTypeKey: String, identifierValue: String): LegalEntityDb {
         val identifierType = findIdentifierTypeOrThrow(identifierTypeKey, IdentifierBusinessPartnerType.LEGAL_ENTITY)
         return legalEntityRepository.findByIdentifierTypeAndValueIgnoreCase(identifierType, identifierValue)
             ?: throw BpdmNotFoundException("Identifier Value", identifierValue)
@@ -143,6 +143,6 @@ class BusinessPartnerFetchService(
 
     private fun findIdentifierTypeOrThrow(identifierTypeKey: String, businessPartnerType: IdentifierBusinessPartnerType) =
         identifierTypeRepository.findByBusinessPartnerTypeAndTechnicalKey(businessPartnerType, identifierTypeKey)
-            ?: throw BpdmNotFoundException(IdentifierType::class, "$identifierTypeKey/$businessPartnerType")
+            ?: throw BpdmNotFoundException(IdentifierTypeDb::class, "$identifierTypeKey/$businessPartnerType")
 
 }

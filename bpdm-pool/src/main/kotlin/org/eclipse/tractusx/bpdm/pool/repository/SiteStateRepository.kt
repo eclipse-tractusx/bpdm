@@ -19,9 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.repository
 
-import org.eclipse.tractusx.bpdm.pool.entity.SiteState
+import org.eclipse.tractusx.bpdm.pool.entity.SiteStateDb
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.PagingAndSortingRepository
 
-interface SiteStateRepository : PagingAndSortingRepository<SiteState, Long>, CrudRepository<SiteState, Long> {
+interface SiteStateRepository : PagingAndSortingRepository<SiteStateDb, Long>, CrudRepository<SiteStateDb, Long> {
 }

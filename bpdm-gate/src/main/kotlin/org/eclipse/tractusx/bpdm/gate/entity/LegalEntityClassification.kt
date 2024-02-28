@@ -43,6 +43,6 @@ class LegalEntityClassification(
 
     @ManyToOne
     @JoinColumn(name = "legal_entity_id", nullable = false)
-    var legalEntity: LegalEntity
+    var legalEntity: LegalEntityDb
 
 ) : BaseEntity()

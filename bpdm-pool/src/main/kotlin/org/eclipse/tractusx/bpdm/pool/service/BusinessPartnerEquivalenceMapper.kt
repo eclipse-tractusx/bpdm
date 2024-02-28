@@ -25,10 +25,10 @@ import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.bpdm.pool.api.model.ConfidenceCriteriaDto
-import org.eclipse.tractusx.bpdm.pool.entity.ConfidenceCriteria
-import org.eclipse.tractusx.bpdm.pool.entity.LegalEntity
-import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddress
-import org.eclipse.tractusx.bpdm.pool.entity.Site
+import org.eclipse.tractusx.bpdm.pool.entity.ConfidenceCriteriaDb
+import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
+import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
+import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.util.*
@@ -36,7 +36,7 @@ import java.util.*
 @Service
 class BusinessPartnerEquivalenceMapper {
 
-    fun toEquivalenceDto(legalEntity: LegalEntity) =
+    fun toEquivalenceDto(legalEntity: LegalEntityDb) =
         with(legalEntity) {
             LegalEntityEquivalenceDto(
                 legalForm = legalForm?.technicalKey,
@@ -50,7 +50,7 @@ class BusinessPartnerEquivalenceMapper {
             )
         }
 
-    fun toEquivalenceDto(site: Site) =
+    fun toEquivalenceDto(site: SiteDb) =
         with(site) {
             SiteEquivalenceDto(
                 name = name,
@@ -60,7 +60,7 @@ class BusinessPartnerEquivalenceMapper {
             )
         }
 
-    fun toEquivalenceDto(logisticAddress: LogisticAddress) =
+    fun toEquivalenceDto(logisticAddress: LogisticAddressDb) =
         LogisticAddressEquivalenceDto(
             name = logisticAddress.name,
             states = logisticAddress.states.map { StateEquivalenceDto(it.validFrom, it.validTo, it.type) }.toSortedSet(compareBy { it.validFrom }),
@@ -126,7 +126,7 @@ class BusinessPartnerEquivalenceMapper {
             )
         }
 
-    private fun toEquivalenceDto(confidenceCriteria: ConfidenceCriteria) =
+    private fun toEquivalenceDto(confidenceCriteria: ConfidenceCriteriaDb) =
         with(confidenceCriteria) {
             ConfidenceCriteriaEquivalenceDto(
                 sharedByOwner,

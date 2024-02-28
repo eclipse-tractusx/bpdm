@@ -26,7 +26,7 @@ import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
-import org.eclipse.tractusx.bpdm.gate.entity.SyncType
+import org.eclipse.tractusx.bpdm.gate.entity.SyncTypeDb
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
@@ -130,7 +130,7 @@ class GoldenRecordTaskService(
     fun createTasksForGoldenRecordUpdates() {
         logger.info { "Started scheduled task to create golden record tasks from Pool updates" }
 
-        val syncRecord = syncRecordService.getOrCreateRecord(SyncType.POOL_TO_GATE_OUTPUT)
+        val syncRecord = syncRecordService.getOrCreateRecord(SyncTypeDb.POOL_TO_GATE_OUTPUT)
 
         val pageRequest = PaginationRequest(0, properties.creation.fromPool.batchSize)
         val changelogSearchRequest = ChangelogSearchRequest(syncRecord.finishedAt)
@@ -165,8 +165,8 @@ class GoldenRecordTaskService(
         sharingStateService.setPending(pendingRequests)
 
         if (poolUpdatedEntries.isNotEmpty()) {
-            syncRecordService.setSynchronizationStart(SyncType.POOL_TO_GATE_OUTPUT)
-            syncRecordService.setSynchronizationSuccess(SyncType.POOL_TO_GATE_OUTPUT, poolUpdatedEntries.last().timestamp)
+            syncRecordService.setSynchronizationStart(SyncTypeDb.POOL_TO_GATE_OUTPUT)
+            syncRecordService.setSynchronizationSuccess(SyncTypeDb.POOL_TO_GATE_OUTPUT, poolUpdatedEntries.last().timestamp)
         }
 
         logger.info { "Created ${tasks.size} new golden record tasks from pool updates" }

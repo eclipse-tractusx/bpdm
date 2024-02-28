@@ -26,7 +26,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteGateInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteGateOutputResponse
-import org.eclipse.tractusx.bpdm.gate.entity.Site
+import org.eclipse.tractusx.bpdm.gate.entity.SiteDb
 import org.eclipse.tractusx.bpdm.gate.repository.SiteRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
@@ -55,7 +55,7 @@ class SiteService(
         )
     }
 
-    private fun toValidSite(sitePage: Page<Site>): List<SiteGateInputDto> {
+    private fun toValidSite(sitePage: Page<SiteDb>): List<SiteGateInputDto> {
         return sitePage.content.map { site ->
             site.toSiteGateInputResponse(site)
         }
@@ -88,7 +88,7 @@ class SiteService(
 
     }
 
-    private fun toValidOutputSites(sitePage: Page<Site>): List<SiteGateOutputResponse> {
+    private fun toValidOutputSites(sitePage: Page<SiteDb>): List<SiteGateOutputResponse> {
         return sitePage.content.map { sites ->
             sites.toSiteGateOutputResponse(sites)
         }

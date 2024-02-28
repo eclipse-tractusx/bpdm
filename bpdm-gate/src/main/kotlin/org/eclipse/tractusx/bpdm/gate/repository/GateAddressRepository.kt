@@ -20,21 +20,21 @@
 package org.eclipse.tractusx.bpdm.gate.repository
 
 import org.eclipse.tractusx.bpdm.common.model.StageType
-import org.eclipse.tractusx.bpdm.gate.entity.LogisticAddress
+import org.eclipse.tractusx.bpdm.gate.entity.LogisticAddressDb
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.PagingAndSortingRepository
 
-interface GateAddressRepository : PagingAndSortingRepository<LogisticAddress, Long>, CrudRepository<LogisticAddress, Long> {
+interface GateAddressRepository : PagingAndSortingRepository<LogisticAddressDb, Long>, CrudRepository<LogisticAddressDb, Long> {
 
-    fun findByExternalIdIn(externalId: Collection<String>): Set<LogisticAddress>
+    fun findByExternalIdIn(externalId: Collection<String>): Set<LogisticAddressDb>
 
-    fun findByExternalId(externalId: String): LogisticAddress?
+    fun findByExternalId(externalId: String): LogisticAddressDb?
 
-    fun findByExternalIdAndStage(externalId: String, stage: StageType): LogisticAddress?
+    fun findByExternalIdAndStage(externalId: String, stage: StageType): LogisticAddressDb?
 
-    fun findByExternalIdInAndStage(externalId: Collection<String>?, stage: StageType, pageable: Pageable): Page<LogisticAddress>
+    fun findByExternalIdInAndStage(externalId: Collection<String>?, stage: StageType, pageable: Pageable): Page<LogisticAddressDb>
 
-    fun findByStage(stage: StageType, pageable: Pageable): Page<LogisticAddress>
+    fun findByStage(stage: StageType, pageable: Pageable): Page<LogisticAddressDb>
 }
