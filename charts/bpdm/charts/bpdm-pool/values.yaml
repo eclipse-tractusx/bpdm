@@ -50,6 +50,7 @@ securityContext:
 service:
   type: ClusterIP
   port: 8080
+  targetPort: 8080
 
 autoscaling:
   enabled: false
@@ -115,18 +116,25 @@ startupProbe:
   periodSeconds: 15
 
 applicationConfig:
-#  bpdm:
-#    datasource:
-#      host: ...
+  bpdm:
+    datasource:
+      # If empty sets kubernetes postgres service with same release name
+      host:
+    client:
+      orchestrator:
+        # If empty sets kubernetes BPDM Orchestrator service with same release name
+        base-url:
 
 applicationSecrets:
-#  spring:
-#    datasource:
-#      password: ...
+  spring:
+    dataSource:
+      # Change this password for production
+      password: &postgresPass  bpdm
 
 postgres:
   enabled: true
   auth:
     database: bpdm
     username: bpdm
+    password: *postgresPass
 

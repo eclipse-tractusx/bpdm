@@ -1,6 +1,6 @@
 ---
 ################################################################################
-  # Copyright (c) 2021,2024 Contributors to the Eclipse Foundation
+# Copyright (c) 2021,2024 Contributors to the Eclipse Foundation
 #
 # See the NOTICE file(s) distributed with this work for additional
 # information regarding copyright ownership.
@@ -18,4 +18,14 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################################
 
-{{ include "bpdm-common.ingress" . -}}
+apiVersion: v2
+type: library
+name: bpdm-common
+version: 1.0.0
+description: A library Helm Chart for other BPDM Charts
+home: https://eclipse-tractusx.github.io/docs/kits/Business%20Partner%20Kit/Adoption%20View
+sources:
+  - https://github.com/eclipse-tractusx/bpdm
+maintainers:
+  - name: Nico Koprowski
+  - name: Fabio D. Mota

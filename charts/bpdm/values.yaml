@@ -35,12 +35,18 @@ bpdm-bridge-dummy:
 
 bpdm-cleaning-service-dummy:
   enabled: true
+  postgres:
+    enabled: false
 
 bpdm-orchestrator:
   enabled: true
+  postgres:
+    enabled: false
 
 postgres:
   enabled: true
   auth:
     database: bpdm
     username: bpdm
+    # Change for production
+    password: bpdm

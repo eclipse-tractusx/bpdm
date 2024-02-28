@@ -22,7 +22,7 @@ apiVersion: v2
 type: application
 name: bpdm-bridge-dummy
 appVersion: "5.0.1"
-version: 2.0.3
+version: 2.0.4
 description: A Helm chart for deploying the BPDM bridge dummy service
 home: https://eclipse-tractusx.github.io/docs/kits/Business%20Partner%20Kit/Adoption%20View
 sources:
@@ -33,6 +33,9 @@ dependencies:
     repository: https://charts.bitnami.com/bitnami
     alias: postgres
     condition: postgres.enabled
+  - name: bpdm-common
+    version: 1.0.0
+    repository: "file://../bpdm-common"
 maintainers:
   - name: Nico Koprowski
   - name: Fabio D. Mota
