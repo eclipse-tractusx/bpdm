@@ -29,6 +29,10 @@ import org.springframework.web.bind.annotation.RequestMapping
 
 @RequestMapping("/api/catena", produces = [MediaType.APPLICATION_JSON_VALUE])
 interface PoolDocumentationApi {
+    companion object {
+        const val SUBPATH_MERMAID = "/mermaid/"
+
+    }
 
     @Operation(
         summary = "Get mermaid class diagramm for the pool JPA model",
@@ -38,6 +42,6 @@ interface PoolDocumentationApi {
             ApiResponse(responseCode = "200", description = "Entity model as mermaid diagramm"),
         ]
     )
-    @GetMapping("/mermaid/", produces = [MediaType.TEXT_PLAIN_VALUE])
+    @GetMapping(SUBPATH_MERMAID, produces = [MediaType.TEXT_PLAIN_VALUE])
     fun getMermaidPoolPersistence(): ResponseEntity<String>
 }

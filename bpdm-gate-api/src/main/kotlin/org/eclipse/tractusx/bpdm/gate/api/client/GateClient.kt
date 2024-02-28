@@ -19,19 +19,17 @@
 
 package org.eclipse.tractusx.bpdm.gate.api.client
 
-import org.eclipse.tractusx.bpdm.gate.api.*
-
 interface GateClient {
 
-    val businessParters: GateBusinessPartnerApi
+    val businessParters: BusinessPartnerApiClient
 
-    val addresses: GateAddressApi
+    val addresses: AddressApiClient
 
-    val legalEntities: GateLegalEntityApi
+    val legalEntities: LegalEntityApiClient
 
-    val sites: GateSiteApi
+    val sites: SiteApiClient
 
-    val changelog: GateChangelogApi
+    val changelog: ChangelogApiClient
 
-    val sharingState: GateSharingStateApi
+    val sharingState: SharingStateApiClient
 }

@@ -19,9 +19,7 @@
 
 package com.catenax.bpdm.bridge.dummy.client
 
-import com.catenax.bpdm.bridge.dummy.controller.BridgeApi
-
 interface BridgeClient {
 
-    fun bridge(): BridgeApi
+    fun bridge(): BridgeApiClient
 }

@@ -17,21 +17,17 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.client
+package com.catenax.bpdm.bridge.dummy.client
 
-interface PoolApiClient {
+import com.catenax.bpdm.bridge.dummy.controller.BridgeApi
+import org.springframework.web.service.annotation.HttpExchange
+import org.springframework.web.service.annotation.PostExchange
 
-    val addresses: AddressApiClient
+@HttpExchange("/api/bridge")
+interface BridgeApiClient : BridgeApi {
 
-    val bpns: BpnApiClient
-
-    val changelogs: ChangeLogApiClient
-
-    val legalEntities: LegalEntityApiClient
-
-    val metadata: MetadataApiClient
-
-    val sites: SiteApiClient
-
-    val saas: SaasApiClient
+    @PostExchange("/sync")
+    override fun triggerSync() {
+        TODO("Not yet implemented")
+    }
 }

@@ -23,17 +23,13 @@ import io.swagger.v3.oas.annotations.Operation
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.service.annotation.HttpExchange
-import org.springframework.web.service.annotation.PostExchange
 
 @RequestMapping("/api/bridge", produces = [MediaType.APPLICATION_JSON_VALUE])
-@HttpExchange("/api/bridge")
 interface BridgeApi {
 
     @Operation(
         summary = "Start sync between Gate and Pool"
     )
     @PostMapping("/sync")
-    @PostExchange("/sync")
     fun triggerSync()
 }

@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.orchestrator.api.client
 
 import org.eclipse.tractusx.bpdm.common.service.ParameterObjectArgumentResolver
-import org.eclipse.tractusx.orchestrator.api.GoldenRecordTaskApi
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.support.WebClientAdapter
 import org.springframework.web.service.invoker.HttpServiceProxyFactory
@@ -44,7 +43,7 @@ class OrchestrationApiClientImpl(
             .build()
     }
 
-    override val goldenRecordTasks by lazy { createClient<GoldenRecordTaskApi>() }
+    override val goldenRecordTasks by lazy { createClient<GoldenRecordTaskApiClient>() }
 
     private inline fun <reified T> createClient() =
         httpServiceProxyFactory.createClient(T::class.java)

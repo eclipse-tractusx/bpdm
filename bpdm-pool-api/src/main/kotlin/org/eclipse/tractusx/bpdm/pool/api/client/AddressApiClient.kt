@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.client
 
+import jakarta.validation.Valid
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.util.CommonApiPathNames
@@ -31,8 +32,8 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerUpdateRequ
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerUpdateResponseWrapper
+import org.springdoc.core.annotations.ParameterObject
 import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.service.annotation.GetExchange
 import org.springframework.web.service.annotation.HttpExchange
@@ -44,17 +45,17 @@ interface AddressApiClient: PoolAddressApi {
 
     @GetExchange
     override fun getAddresses(
-        addressSearchRequest: AddressPartnerSearchRequest,
-        paginationRequest: PaginationRequest
+        @ParameterObject addressSearchRequest: AddressPartnerSearchRequest,
+        @ParameterObject @Valid paginationRequest: PaginationRequest
     ): PageDto<AddressMatchVerboseDto>
 
     @GetExchange(PoolAddressApi.SUBPATH_BPNA)
     override fun getAddress(@PathVariable(PoolAddressApi.PATHVAR_BPNA) bpna: String): LogisticAddressVerboseDto
 
-    @PostMapping(CommonApiPathNames.SUBPATH_SEARCH)
+    @PostExchange(CommonApiPathNames.SUBPATH_SEARCH)
     override fun searchAddresses(
         @RequestBody addressSearchRequest: AddressPartnerBpnSearchRequest,
-        paginationRequest: PaginationRequest
+        @ParameterObject @Valid paginationRequest: PaginationRequest
     ): PageDto<LogisticAddressVerboseDto>
 
     @PostExchange

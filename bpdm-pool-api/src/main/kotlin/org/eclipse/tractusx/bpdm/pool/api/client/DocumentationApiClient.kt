@@ -19,19 +19,13 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.client
 
-interface PoolApiClient {
+import org.eclipse.tractusx.bpdm.pool.api.PoolDocumentationApi
+import org.springframework.http.ResponseEntity
+import org.springframework.web.service.annotation.GetExchange
+import org.springframework.web.service.annotation.HttpExchange
 
-    val addresses: AddressApiClient
-
-    val bpns: BpnApiClient
-
-    val changelogs: ChangeLogApiClient
-
-    val legalEntities: LegalEntityApiClient
-
-    val metadata: MetadataApiClient
-
-    val sites: SiteApiClient
-
-    val saas: SaasApiClient
+@HttpExchange("/api/catena")
+interface DocumentationApiClient : PoolDocumentationApi {
+    @GetExchange(PoolDocumentationApi.SUBPATH_MERMAID)
+    override fun getMermaidPoolPersistence(): ResponseEntity<String>
 }

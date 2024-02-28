@@ -29,14 +29,11 @@ import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.service.annotation.HttpExchange
-import org.springframework.web.service.annotation.PostExchange
 
 const val TagClient = "Task Client"
 const val TagWorker = "Task Worker"
 
 @RequestMapping("/api/golden-record-tasks", produces = [MediaType.APPLICATION_JSON_VALUE])
-@HttpExchange("/api/golden-record-tasks")
 interface GoldenRecordTaskApi {
 
     @Operation(
@@ -58,7 +55,6 @@ interface GoldenRecordTaskApi {
     )
     @Tag(name = TagClient)
     @PostMapping
-    @PostExchange
     fun createTasks(@RequestBody createRequest: TaskCreateRequest): TaskCreateResponse
 
     @Operation(
@@ -76,7 +72,6 @@ interface GoldenRecordTaskApi {
     )
     @Tag(name = TagClient)
     @PostMapping("/state/search")
-    @PostExchange("/state/search")
     fun searchTaskStates(@RequestBody stateRequest: TaskStateRequest): TaskStateResponse
 
     @Operation(
@@ -97,7 +92,6 @@ interface GoldenRecordTaskApi {
     )
     @Tag(name = TagWorker)
     @PostMapping("/step-reservations")
-    @PostExchange("/step-reservations")
     fun reserveTasksForStep(@RequestBody reservationRequest: TaskStepReservationRequest): TaskStepReservationResponse
 
     @Operation(
@@ -123,6 +117,5 @@ interface GoldenRecordTaskApi {
     )
     @Tag(name = TagWorker)
     @PostMapping("/step-results")
-    @PostExchange("/step-results")
     fun resolveStepResults(@RequestBody resultRequest: TaskStepResultRequest)
 }
