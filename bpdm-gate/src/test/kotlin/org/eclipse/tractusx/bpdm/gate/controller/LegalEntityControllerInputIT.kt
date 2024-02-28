@@ -25,11 +25,11 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
-import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityGateInputDto
 import org.eclipse.tractusx.bpdm.gate.repository.LegalEntityRepository
 
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.GATE_API_INPUT_LEGAL_ENTITIES_PATH
@@ -174,8 +174,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
         gateClient.legalEntities.upsertLegalEntities(legalEntities)
         val legalEntity = gateClient.legalEntities.getLegalEntityByExternalId(BusinessPartnerVerboseValues.externalId1)
 
-        assertThat(legalEntity).usingRecursiveComparison().ignoringCollectionOrder().ignoringAllOverriddenEquals()
-            .ignoringFieldsMatchingRegexes(".*administrativeAreaLevel1*").isEqualTo(expectedLegalEntity)
+        assertLegalEntitiesEqual(legalEntity, expectedLegalEntity)
 
     }
 
@@ -233,11 +232,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
             content = expectedLegalEntities
         )
 
-        // TODO check administrativeAreaLevel1
-        assertThat(pageResponse).usingRecursiveComparison().ignoringCollectionOrder().ignoringAllOverriddenEquals()
-            .ignoringFieldsMatchingRegexes(".*administrativeAreaLevel1*").isEqualTo(
-                expectedPage
-            )
+        assertPageLegalEntitiesEqual(pageResponse, expectedPage)
     }
 
 
@@ -278,10 +273,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
             content = expectedLegalEntities
         )
 
-        assertThat(pageResponse).usingRecursiveComparison().ignoringCollectionOrder().ignoringAllOverriddenEquals()
-            .ignoringFieldsMatchingRegexes(".*administrativeAreaLevel1*").isEqualTo(
-                expectedPage
-            )
+        assertPageLegalEntitiesEqual(pageResponse, expectedPage)
     }
 
     /**
@@ -324,4 +316,11 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
         assertNotEquals(legalEntityRecordExternal2, null)
 
     }
+
+    private fun assertPageLegalEntitiesEqual(actual: PageDto<LegalEntityGateInputDto>, expected: PageDto<LegalEntityGateInputDto>) =
+        testHelpers.assertRecursively(actual).isEqualTo(expected)
+
+    private fun assertLegalEntitiesEqual(actual: LegalEntityGateInputDto, expected: LegalEntityGateInputDto) =
+        testHelpers.assertRecursively(actual).isEqualTo(expected)
+
 }
