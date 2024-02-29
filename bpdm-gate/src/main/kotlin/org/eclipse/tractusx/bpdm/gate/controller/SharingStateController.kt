@@ -25,7 +25,7 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.GateSharingStateApi
 import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateResponse
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.service.SharingStateService
 import org.springframework.security.access.prepost.PreAuthorize
@@ -42,7 +42,7 @@ class SharingStateController(
         paginationRequest: PaginationRequest,
         businessPartnerType: BusinessPartnerType?,
         externalIds: Collection<String>?
-    ): PageDto<SharingStateDto> {
+    ): PageDto<SharingStateResponse> {
         return sharingStateService.findSharingStates(paginationRequest, businessPartnerType, externalIds)
     }
 
@@ -53,7 +53,7 @@ class SharingStateController(
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_OUTPUT_AUTHORITY})")
-    override fun upsertSharingState(request: SharingStateDto) {
+    override fun upsertSharingState(request: SharingStateResponse) {
         logger.info { "upsertSharingState() called with $request" }
         sharingStateService.upsertSharingState(request)
     }

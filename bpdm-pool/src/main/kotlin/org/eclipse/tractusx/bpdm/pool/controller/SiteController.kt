@@ -45,14 +45,14 @@ class SiteController(
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun searchMainAddresses(
         bpnS: Collection<String>
-    ): Collection<MainAddressVerboseDto> {
+    ): Collection<MainAddressVerboseResponse> {
         return addressService.findMainAddresses(bpnS)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun getSite(
         bpns: String
-    ): SiteWithMainAddressVerboseDto {
+    ): SiteWithMainAddressVerboseResponse {
         return siteService.findByBpn(bpns.uppercase())
     }
 
@@ -60,7 +60,7 @@ class SiteController(
     override fun searchSites(
         siteSearchRequest: SiteBpnSearchRequest,
         paginationRequest: PaginationRequest
-    ): PageDto<SiteWithMainAddressVerboseDto> {
+    ): PageDto<SiteWithMainAddressVerboseResponse> {
         return siteService.findByPartnerBpns(siteSearchRequest, paginationRequest)
     }
 
@@ -81,7 +81,7 @@ class SiteController(
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun getSitesPaginated(
         paginationRequest: PaginationRequest
-    ): PageDto<SiteMatchVerboseDto> {
+    ): PageDto<SiteMatchVerboseResponse> {
         return searchService.searchSites(paginationRequest)
     }
 }

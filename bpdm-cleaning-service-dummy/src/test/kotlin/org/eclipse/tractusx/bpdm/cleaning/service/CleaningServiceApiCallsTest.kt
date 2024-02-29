@@ -122,9 +122,9 @@ class CleaningServiceApiCallsTest @Autowired constructor(
     }
 
     // Helper method to create a sample TaskStepReservationResponse
-    private fun createSampleTaskStepReservationResponse(businessPartnerGenericDto: BusinessPartnerGenericDto): TaskStepReservationResponse {
-        val fullDto = BusinessPartnerFullDto(businessPartnerGenericDto)
-        return TaskStepReservationResponse(listOf(TaskStepReservationEntryDto(fixedTaskId, fullDto)), Instant.MIN)
+    private fun createSampleTaskStepReservationResponse(businessPartnerGenericDto: BusinessPartnerGeneric): TaskStepReservationResponse {
+        val fullDto = BusinessPartnerFull(businessPartnerGenericDto)
+        return TaskStepReservationResponse(listOf(TaskStepReservationEntry(fixedTaskId, fullDto)), Instant.MIN)
     }
 
 }

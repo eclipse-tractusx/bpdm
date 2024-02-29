@@ -70,7 +70,7 @@ class GoldenRecordTaskStateMachine(
         state.taskModifiedAt = now
     }
 
-    fun doResolveTaskToSuccess(task: GoldenRecordTask, step: TaskStep, resultBusinessPartner: BusinessPartnerFullDto) {
+    fun doResolveTaskToSuccess(task: GoldenRecordTask, step: TaskStep, resultBusinessPartner: BusinessPartnerFull) {
         logger.debug { "Executing doResolveTaskToSuccess() with parameters $task // $step and $resultBusinessPartner" }
         val state = task.processingState
         val now = Instant.now()
@@ -94,7 +94,7 @@ class GoldenRecordTaskStateMachine(
         task.businessPartner = resultBusinessPartner
     }
 
-    fun doResolveTaskToError(task: GoldenRecordTask, step: TaskStep, errors: List<TaskErrorDto>) {
+    fun doResolveTaskToError(task: GoldenRecordTask, step: TaskStep, errors: List<TaskError>) {
         logger.debug { "Executing doResolveTaskToError() with parameters $task // $step and $errors" }
         val state = task.processingState
 
@@ -112,7 +112,7 @@ class GoldenRecordTaskStateMachine(
             throw BpdmIllegalStateException(task.taskId, state)
         }
 
-        val errors = listOf(TaskErrorDto(TaskErrorType.Timeout, "Timeout reached"))
+        val errors = listOf(TaskError(TaskErrorType.Timeout, "Timeout reached"))
         resolveStateToError(state, errors)
     }
 
@@ -125,7 +125,7 @@ class GoldenRecordTaskStateMachine(
         state.taskRetentionTimeout = now.plus(taskConfigProperties.taskRetentionTimeout)
     }
 
-    private fun resolveStateToError(state: TaskProcessingState, errors: List<TaskErrorDto>) {
+    private fun resolveStateToError(state: TaskProcessingState, errors: List<TaskError>) {
         val now = Instant.now()
         state.resultState = ResultState.Error
         state.errors = errors

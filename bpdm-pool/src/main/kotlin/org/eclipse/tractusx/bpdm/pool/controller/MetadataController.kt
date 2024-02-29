@@ -39,7 +39,7 @@ class MetadataController(
 ) : PoolMetadataApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_METADATA})")
-    override fun createIdentifierType(identifierType: IdentifierTypeDto): IdentifierTypeDto {
+    override fun createIdentifierType(identifierType: IdentifierType): IdentifierType {
         return metadataService.createIdentifierType(identifierType)
     }
 
@@ -48,37 +48,37 @@ class MetadataController(
         paginationRequest: PaginationRequest,
         businessPartnerType: IdentifierBusinessPartnerType,
         country: CountryCode?
-    ): PageDto<IdentifierTypeDto> {
+    ): PageDto<IdentifierType> {
         return metadataService.getIdentifierTypes(PageRequest.of(paginationRequest.page, paginationRequest.size), businessPartnerType, country)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_METADATA})")
-    override fun createLegalForm(type: LegalFormRequest): LegalFormDto {
+    override fun createLegalForm(type: LegalFormRequest): LegalForm {
         return metadataService.createLegalForm(type)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
-    override fun getLegalForms(paginationRequest: PaginationRequest): PageDto<LegalFormDto> {
+    override fun getLegalForms(paginationRequest: PaginationRequest): PageDto<LegalForm> {
         return metadataService.getLegalForms(PageRequest.of(paginationRequest.page, paginationRequest.size))
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
-    override fun getFieldQualityRules(country: CountryCode): ResponseEntity<Collection<FieldQualityRuleDto>> {
+    override fun getFieldQualityRules(country: CountryCode): ResponseEntity<Collection<FieldQualityRule>> {
         return ResponseEntity(metadataService.getFieldQualityRules(country), HttpStatus.OK)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
-    override fun getAdminAreasLevel1(paginationRequest: PaginationRequest): PageDto<CountrySubdivisionDto> {
+    override fun getAdminAreasLevel1(paginationRequest: PaginationRequest): PageDto<CountrySubdivision> {
         return metadataService.getCountrySubdivisions(paginationRequest)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
-    override fun getRegions(paginationRequest: PaginationRequest): PageDto<RegionDto> {
+    override fun getRegions(paginationRequest: PaginationRequest): PageDto<Region> {
         return metadataService.getRegions(paginationRequest)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_METADATA})")
-    override fun createRegion(type: RegionDto): RegionDto {
+    override fun createRegion(type: Region): Region {
         return metadataService.createRegion(type)
     }
 

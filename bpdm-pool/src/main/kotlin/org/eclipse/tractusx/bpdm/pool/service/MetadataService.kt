@@ -21,15 +21,15 @@ package org.eclipse.tractusx.bpdm.pool.service
 
 import com.neovisionaries.i18n.CountryCode
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.IBaseLegalEntityDto
-import org.eclipse.tractusx.bpdm.common.dto.IBaseLogisticAddressDto
+import org.eclipse.tractusx.bpdm.common.dto.IBaseLegalEntity
+import org.eclipse.tractusx.bpdm.common.dto.IBaseLogisticAddress
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
-import org.eclipse.tractusx.bpdm.pool.dto.AddressMetadataDto
-import org.eclipse.tractusx.bpdm.pool.dto.LegalEntityMetadataDto
+import org.eclipse.tractusx.bpdm.pool.dto.AddressMetadata
+import org.eclipse.tractusx.bpdm.pool.dto.LegalEntityMetadata
 import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmAlreadyExists
 import org.eclipse.tractusx.bpdm.pool.repository.FieldQualityRuleRepository
@@ -55,7 +55,7 @@ class MetadataService(
     private val logger = KotlinLogging.logger { }
 
     @Transactional
-    fun createIdentifierType(type: IdentifierTypeDto): IdentifierTypeDto {
+    fun createIdentifierType(type: IdentifierType): IdentifierType {
         if (identifierTypeRepository.findByBusinessPartnerTypeAndTechnicalKey(type.businessPartnerType, type.technicalKey) != null)
             throw BpdmAlreadyExists(IdentifierTypeDb::class.simpleName!!, "${type.technicalKey}/${type.businessPartnerType}")
 
@@ -75,7 +75,7 @@ class MetadataService(
         pageRequest: Pageable,
         businessPartnerType: IdentifierBusinessPartnerType,
         country: CountryCode? = null
-    ): PageDto<IdentifierTypeDto> {
+    ): PageDto<IdentifierType> {
         val spec = Specification.allOf(
             IdentifierTypeRepository.Specs.byBusinessPartnerType(businessPartnerType),
             IdentifierTypeRepository.Specs.byCountry(country)
@@ -85,7 +85,7 @@ class MetadataService(
     }
 
     @Transactional
-    fun createLegalForm(request: LegalFormRequest): LegalFormDto {
+    fun createLegalForm(request: LegalFormRequest): LegalForm {
         if (legalFormRepository.findByTechnicalKey(request.technicalKey) != null)
             throw BpdmAlreadyExists(LegalFormDb::class.simpleName!!, request.technicalKey)
 
@@ -100,7 +100,7 @@ class MetadataService(
         return legalFormRepository.save(legalForm).toDto()
     }
 
-    fun getLegalForms(pageRequest: Pageable): PageDto<LegalFormDto> {
+    fun getLegalForms(pageRequest: Pageable): PageDto<LegalForm> {
         val page = legalFormRepository.findAll(pageRequest)
         return page.toDto(page.content.map { it.toDto() })
     }
@@ -108,7 +108,7 @@ class MetadataService(
     /**
      * Get quality rules for the given country merged with the default rules. Forbidden rules are ignored.
      */
-    fun getFieldQualityRules(country: CountryCode): Collection<FieldQualityRuleDto> {
+    fun getFieldQualityRules(country: CountryCode): Collection<FieldQualityRule> {
 
         val defaultRules = fieldQualityRuleRepository.findByCountryCodeIsNullOrderBySchemaNameAscFieldPathAsc()
         val rulesForCountry = fieldQualityRuleRepository.findByCountryCodeOrderBySchemaNameAscFieldPathAsc(country)
@@ -129,7 +129,7 @@ class MetadataService(
         val resultList = mergedRulesForCountry.filter {
             it.qualityLevel != QualityLevel.FORBIDDEN
         }.map { rule ->
-            FieldQualityRuleDto(
+            FieldQualityRule(
                 fieldPath = rule.fieldPath,
                 schemaName = rule.schemaName,
                 country = (if (rule.countryCode != null) rule.countryCode else country)!!,
@@ -141,17 +141,17 @@ class MetadataService(
         return resultList
     }
 
-    fun getMetadata(requests: Collection<IBaseLegalEntityDto>): LegalEntityMetadataDto {
+    fun getMetadata(requests: Collection<IBaseLegalEntity>): LegalEntityMetadata {
         val idTypeKeys = requests.flatMap { it.identifiers }.map { it.type }.toSet()
         val idTypes = identifierTypeRepository.findByBusinessPartnerTypeAndTechnicalKeyIn(IdentifierBusinessPartnerType.LEGAL_ENTITY, idTypeKeys)
 
         val legalFormKeys = requests.mapNotNull { it.legalForm }.toSet()
         val legalForms = legalFormRepository.findByTechnicalKeyIn(legalFormKeys)
 
-        return LegalEntityMetadataDto(idTypes, legalForms)
+        return LegalEntityMetadata(idTypes, legalForms)
     }
 
-    fun getMetadata(requests: Collection<IBaseLogisticAddressDto>): AddressMetadataDto {
+    fun getMetadata(requests: Collection<IBaseLogisticAddress>): AddressMetadata {
         val idTypeKeys = requests.flatMap { it.identifiers }.map { it.type }.toSet()
         val idTypes = identifierTypeRepository.findByBusinessPartnerTypeAndTechnicalKeyIn(IdentifierBusinessPartnerType.ADDRESS, idTypeKeys)
 
@@ -160,10 +160,10 @@ class MetadataService(
             .toSet()
         val regions = regionRepository.findByRegionCodeIn(regionKeys)
 
-        return AddressMetadataDto(idTypes, regions)
+        return AddressMetadata(idTypes, regions)
     }
 
-    fun getRegions(requests: Collection<IBaseLogisticAddressDto>): Set<RegionDb> {
+    fun getRegions(requests: Collection<IBaseLogisticAddress>): Set<RegionDb> {
 
         val regionKeys = requests.mapNotNull { it.physicalPostalAddress?.administrativeAreaLevel1 }
             .plus(requests.mapNotNull { it.alternativePostalAddress?.administrativeAreaLevel1 })
@@ -172,7 +172,7 @@ class MetadataService(
         return regions
     }
 
-    fun getIdentifiers(requests: Collection<IBaseLogisticAddressDto>): Set<IdentifierTypeDb> {
+    fun getIdentifiers(requests: Collection<IBaseLogisticAddress>): Set<IdentifierTypeDb> {
         val idTypeKeys = requests.flatMap { it.identifiers }.map { it.type }.toSet()
         val idTypes = identifierTypeRepository.findByBusinessPartnerTypeAndTechnicalKeyIn(IdentifierBusinessPartnerType.ADDRESS, idTypeKeys)
         return idTypes
@@ -193,7 +193,7 @@ class MetadataService(
 
 
     @Transactional
-    fun createRegion(request: RegionDto): RegionDto {
+    fun createRegion(request: Region): Region {
         logger.info { "Create new Region with key ${request.regionCode} and name ${request.regionName}" }
 
         val region = RegionDb(
@@ -205,13 +205,13 @@ class MetadataService(
         return regionRepository.save(region).toRegionDto()
     }
 
-    fun getRegions(paginationRequest: PaginationRequest): PageDto<RegionDto> {
+    fun getRegions(paginationRequest: PaginationRequest): PageDto<Region> {
         val pageRequest = paginationRequest.toPageRequest(RegionRepository.DEFAULT_SORTING)
         val page = regionRepository.findAll(pageRequest)
         return page.toDto(page.content.map { it.toRegionDto() })
     }
 
-    fun getCountrySubdivisions(paginationRequest: PaginationRequest): PageDto<CountrySubdivisionDto> {
+    fun getCountrySubdivisions(paginationRequest: PaginationRequest): PageDto<CountrySubdivision> {
         val pageRequest = paginationRequest.toPageRequest(RegionRepository.DEFAULT_SORTING)
         val page = regionRepository.findAll(pageRequest)
         return page.toDto(page.content.map { it.toCountrySubdivisionDto() })

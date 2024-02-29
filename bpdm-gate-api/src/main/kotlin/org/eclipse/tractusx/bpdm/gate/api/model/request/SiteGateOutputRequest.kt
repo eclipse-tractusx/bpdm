@@ -26,14 +26,14 @@ import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.SiteDescription
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateOutputChildRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.SiteGate
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(description = SiteDescription.headerUpsertRequest)
 data class SiteGateOutputRequest(
 
     @field:JsonUnwrapped
-    val site: SiteGateDto,
+    val site: SiteGate,
 
     // TODO OpenAPI description for complex field does not work!!
     @get:Schema(description = SiteDescription.mainAddress)

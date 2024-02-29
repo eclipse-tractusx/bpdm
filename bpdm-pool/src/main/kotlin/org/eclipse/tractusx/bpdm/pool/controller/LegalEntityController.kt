@@ -22,8 +22,8 @@ package org.eclipse.tractusx.bpdm.pool.controller
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.PoolLegalEntityApi
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerbose
+import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerbose
 import org.eclipse.tractusx.bpdm.pool.api.model.request.BusinessPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerUpdateRequest
@@ -53,7 +53,7 @@ class LegalEntityController(
     override fun getLegalEntities(
         bpSearchRequest: LegalEntityPropertiesSearchRequest,
         paginationRequest: PaginationRequest
-    ): PageDto<LegalEntityMatchVerboseDto> {
+    ): PageDto<LegalEntityMatchVerboseResponse> {
         return searchService.searchLegalEntities(
             BusinessPartnerSearchRequest(bpSearchRequest),
             paginationRequest
@@ -61,7 +61,7 @@ class LegalEntityController(
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
-    override fun getLegalEntity(idValue: String, idType: String?): LegalEntityWithLegalAddressVerboseDto {
+    override fun getLegalEntity(idValue: String, idType: String?): LegalEntityWithLegalAddressVerboseResponse {
         val actualType = idType ?: bpnConfigProperties.id
         return if (actualType == bpnConfigProperties.id) businessPartnerFetchService.findLegalEntityIgnoreCase(idValue.uppercase())
         else businessPartnerFetchService.findLegalEntityIgnoreCase(actualType, idValue)
@@ -75,7 +75,7 @@ class LegalEntityController(
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun searchLegalEntitys(
         bpnLs: Collection<String>
-    ): ResponseEntity<Collection<LegalEntityWithLegalAddressVerboseDto>> {
+    ): ResponseEntity<Collection<LegalEntityWithLegalAddressVerboseResponse>> {
         if (bpnLs.size > controllerConfigProperties.searchRequestLimit) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
@@ -86,7 +86,7 @@ class LegalEntityController(
     override fun getSites(
         bpnl: String,
         paginationRequest: PaginationRequest
-    ): PageDto<SiteVerboseDto> {
+    ): PageDto<SiteVerbose> {
         return siteService.findByPartnerBpn(bpnl.uppercase(), paginationRequest.page, paginationRequest.size)
     }
 
@@ -94,14 +94,14 @@ class LegalEntityController(
     override fun getAddresses(
         bpnl: String,
         paginationRequest: PaginationRequest
-    ): PageDto<LogisticAddressVerboseDto> {
+    ): PageDto<LogisticAddressVerbose> {
         return addressService.findByPartnerBpn(bpnl.uppercase(), paginationRequest.page, paginationRequest.size)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun searchLegalAddresses(
         bpnLs: Collection<String>
-    ): Collection<LegalAddressVerboseDto> {
+    ): Collection<LegalAddressVerboseResponse> {
         return addressService.findLegalAddresses(bpnLs)
     }
 

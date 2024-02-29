@@ -25,7 +25,7 @@ import java.time.Instant
 data class TaskProcessingState(
     val mode: TaskMode,
     var resultState: ResultState,
-    var errors: List<TaskErrorDto> = emptyList(),
+    var errors: List<TaskError> = emptyList(),
 
     var step: TaskStep,
     var stepState: StepState,

@@ -25,7 +25,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.RequestWithKey
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.SiteDescription
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
-import org.eclipse.tractusx.bpdm.pool.api.model.SiteDto
+import org.eclipse.tractusx.bpdm.pool.api.model.Site
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(description = SiteDescription.headerUpdateRequest)
@@ -35,7 +35,7 @@ data class SitePartnerUpdateRequest(
     val bpns: String,
 
     @field:JsonUnwrapped
-    val site: SiteDto
+    val site: Site
 
 ): RequestWithKey {
     override fun getRequestKey(): String {

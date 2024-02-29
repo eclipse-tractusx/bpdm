@@ -21,20 +21,24 @@ package org.eclipse.tractusx.bpdm.pool.service
 
 import org.eclipse.tractusx.bpdm.pool.entity.BpnRequestIdentifierMappingDb
 import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
-import org.eclipse.tractusx.orchestrator.api.model.BpnReferenceDto
+import org.eclipse.tractusx.orchestrator.api.model.BpnReference
 import org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType
-import org.eclipse.tractusx.orchestrator.api.model.TaskStepReservationEntryDto
+import org.eclipse.tractusx.orchestrator.api.model.TaskStepReservationEntry
 
-class TaskEntryBpnMapping(taskEntries: List<TaskStepReservationEntryDto>, bpnRequestIdentifierRepository: BpnRequestIdentifierRepository) {
+class TaskEntryBpnMapping(taskEntries: List<TaskStepReservationEntry>, bpnRequestIdentifierRepository: BpnRequestIdentifierRepository) {
 
-    private val bpnByRequestIdentifier:  MutableMap<String, String>
-    private val createdBpnByRequestIdentifier:  MutableMap<String, String> = mutableMapOf()
-    init{
+    private val bpnByRequestIdentifier: MutableMap<String, String>
+    private val createdBpnByRequestIdentifier: MutableMap<String, String> = mutableMapOf()
+
+    init {
         this.bpnByRequestIdentifier = readRequestMappings(taskEntries, bpnRequestIdentifierRepository)
 
     }
 
-    private fun readRequestMappings(taskEntries: List<TaskStepReservationEntryDto>,  bpnRequestIdentifierRepository: BpnRequestIdentifierRepository ): MutableMap<String, String> {
+    private fun readRequestMappings(
+        taskEntries: List<TaskStepReservationEntry>,
+        bpnRequestIdentifierRepository: BpnRequestIdentifierRepository
+    ): MutableMap<String, String> {
 
         val references = taskEntries.mapNotNull { it.businessPartner.legalEntity?.bpnLReference } +
                 taskEntries.mapNotNull { it.businessPartner.legalEntity?.legalAddress?.bpnAReference } +
@@ -49,9 +53,9 @@ class TaskEntryBpnMapping(taskEntries: List<TaskStepReservationEntryDto>, bpnReq
         return bpnByRequestIdentifier.toMutableMap()
     }
 
-    fun getBpn(bpnReference: BpnReferenceDto?): String? {
+    fun getBpn(bpnReference: BpnReference?): String? {
 
-        return if(bpnReference == null) {
+        return if (bpnReference == null) {
             null
         } else if (bpnReference.referenceType == BpnReferenceType.BpnRequestIdentifier) {
             bpnByRequestIdentifier[bpnReference.referenceValue]
@@ -60,15 +64,15 @@ class TaskEntryBpnMapping(taskEntries: List<TaskStepReservationEntryDto>, bpnReq
         }
     }
 
-    fun hasBpnFor(bpnReference: BpnReferenceDto?): Boolean {
+    fun hasBpnFor(bpnReference: BpnReference?): Boolean {
 
         return bpnReference != null && (bpnReference.referenceType == BpnReferenceType.Bpn
-                ||  (bpnReference.referenceType == BpnReferenceType.BpnRequestIdentifier
+                || (bpnReference.referenceType == BpnReferenceType.BpnRequestIdentifier
                 && bpnByRequestIdentifier.containsKey(bpnReference.referenceValue)))
     }
 
 
-    fun addMapping(bpnLReference: BpnReferenceDto, bpn: String) {
+    fun addMapping(bpnLReference: BpnReference, bpn: String) {
 
         createdBpnByRequestIdentifier[bpnLReference.referenceValue] = bpn
         bpnByRequestIdentifier[bpnLReference.referenceValue] = bpn

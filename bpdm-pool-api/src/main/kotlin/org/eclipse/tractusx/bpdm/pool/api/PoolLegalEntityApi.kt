@@ -28,8 +28,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerbose
+import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerbose
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
@@ -58,7 +58,7 @@ interface PoolLegalEntityApi {
     fun getLegalEntities(
         @ParameterObject bpSearchRequest: LegalEntityPropertiesSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageDto<LegalEntityMatchVerboseDto>
+    ): PageDto<LegalEntityMatchVerboseResponse>
 
     @Operation(
         summary = "Returns a legal entity by identifier, like BPN, DUNS or EU VAT ID, specified by the identifier type",
@@ -84,7 +84,7 @@ interface PoolLegalEntityApi {
         @Parameter(description = "Identifier value") @PathVariable idValue: String,
         @Parameter(description = "Type of identifier to use, defaults to BPN when omitted", schema = Schema(defaultValue = "BPN"))
         @RequestParam idType: String? = "BPN"
-    ): LegalEntityWithLegalAddressVerboseDto
+    ): LegalEntityWithLegalAddressVerboseResponse
 
     @Operation(
         summary = "Confirms that the data of a legal entity business partner is still up to date.",
@@ -122,7 +122,7 @@ interface PoolLegalEntityApi {
     @PostMapping("/search")
     fun searchLegalEntitys(
         @RequestBody bpnLs: Collection<String>
-    ): ResponseEntity<Collection<LegalEntityWithLegalAddressVerboseDto>>
+    ): ResponseEntity<Collection<LegalEntityWithLegalAddressVerboseResponse>>
 
     @Operation(
         summary = "Returns all sites of a legal entity with a specific BPNL",
@@ -139,7 +139,7 @@ interface PoolLegalEntityApi {
     fun getSites(
         @Parameter(description = "BPNL value") @PathVariable bpnl: String,
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageDto<SiteVerboseDto>
+    ): PageDto<SiteVerbose>
 
     @Operation(
         summary = "Returns all addresses of a legal entity with a specific BPNL",
@@ -156,7 +156,7 @@ interface PoolLegalEntityApi {
     fun getAddresses(
         @Parameter(description = "BPNL value") @PathVariable bpnl: String,
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageDto<LogisticAddressVerboseDto>
+    ): PageDto<LogisticAddressVerbose>
 
     @Operation(
         summary = "Search Legal Addresses",
@@ -172,7 +172,7 @@ interface PoolLegalEntityApi {
     fun searchLegalAddresses(
         @RequestBody
         bpnLs: Collection<String>
-    ): Collection<LegalAddressVerboseDto>
+    ): Collection<LegalAddressVerboseResponse>
 
     @Operation(
         summary = "Creates a new legal entity",

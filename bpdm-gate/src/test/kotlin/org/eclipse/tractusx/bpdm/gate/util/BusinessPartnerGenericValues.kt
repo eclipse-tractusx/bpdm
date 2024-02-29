@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.util
 import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
-import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
+import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinate
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
@@ -32,27 +32,27 @@ import java.time.LocalDateTime
 object BusinessPartnerGenericValues {
 
     //Business Partner with two entries in every collection
-    val businessPartner1 = BusinessPartnerGenericDto(
+    val businessPartner1 = BusinessPartnerGeneric(
         nameParts = listOf("part-cleaned-1", "name-cleaned-2"),
         identifiers = listOf(
-            BusinessPartnerIdentifierDto(
+            BusinessPartnerIdentifier(
                 type = "identifier-type-1-cleaned",
                 value = "identifier-value-1-cleaned",
                 issuingBody = "issuingBody-1-cleaned"
             ),
-            BusinessPartnerIdentifierDto(
+            BusinessPartnerIdentifier(
                 type = "identifier-type-2-cleaned",
                 value = "identifier-value-2-cleaned",
                 issuingBody = "issuingBody-2-cleaned"
             ),
         ),
         states = listOf(
-            BusinessPartnerStateDto(
+            BusinessPartnerState(
                 validFrom = LocalDateTime.of(2020, 9, 22, 15, 50),
                 validTo = LocalDateTime.of(2023, 10, 23, 16, 40),
                 type = BusinessStateType.INACTIVE
             ),
-            BusinessPartnerStateDto(
+            BusinessPartnerState(
                 validFrom = LocalDateTime.of(2000, 8, 21, 14, 30),
                 validTo = LocalDateTime.of(2020, 9, 22, 15, 50),
                 type = BusinessStateType.ACTIVE
@@ -69,18 +69,18 @@ object BusinessPartnerGenericValues {
             shortName = "shot-name-cleaned",
             legalForm = "legal-form-cleaned",
             classifications = listOf(
-                BusinessPartnerClassificationDto(
+                BusinessPartnerClassification(
                     type = ClassificationType.NACE,
                     code = "code-1-cleaned",
                     value = "value-1-cleaned"
                 ),
-                BusinessPartnerClassificationDto(
+                BusinessPartnerClassification(
                     type = ClassificationType.NAF,
                     code = "code-2-cleaned",
                     value = "value-2-cleaned"
                 ),
             ),
-            confidenceCriteria = ConfidenceCriteriaDto(
+            confidenceCriteria = ConfidenceCriteria(
                 sharedByOwner = true,
                 checkedByExternalDataSource = true,
                 numberOfBusinessPartners = 7,
@@ -92,7 +92,7 @@ object BusinessPartnerGenericValues {
         site = SiteRepresentation(
             siteBpn = "000000123BBB222",
             name = "Site Name",
-            confidenceCriteria = ConfidenceCriteriaDto(
+            confidenceCriteria = ConfidenceCriteria(
                 sharedByOwner = false,
                 checkedByExternalDataSource = false,
                 numberOfBusinessPartners = 8,
@@ -105,8 +105,8 @@ object BusinessPartnerGenericValues {
             addressBpn = "000000123CCC333",
             name = "Address Name",
             addressType = AddressType.AdditionalAddress,
-            physicalPostalAddress = PhysicalPostalAddressDto(
-                geographicCoordinates = GeoCoordinateDto(0.5f, 0.5f, 0.5f),
+            physicalPostalAddress = PhysicalPostalAddress(
+                geographicCoordinates = GeoCoordinate(0.5f, 0.5f, 0.5f),
                 country = CountryCode.PT,
                 administrativeAreaLevel1 = "PT-PT",
                 administrativeAreaLevel2 = "pt-admin-level-2-cleaned",
@@ -114,7 +114,7 @@ object BusinessPartnerGenericValues {
                 postalCode = "phys-postal-code-cleaned",
                 city = "city",
                 district = "district",
-                street = StreetDto(
+                street = Street(
                     name = "name",
                     houseNumber = "house-number",
                     houseNumberSupplement = "house-number-supplement",
@@ -132,8 +132,8 @@ object BusinessPartnerGenericValues {
                 floor = "floor",
                 door = "door"
             ),
-            alternativePostalAddress = AlternativePostalAddressDto(
-                geographicCoordinates = GeoCoordinateDto(0.6f, 0.6f, 0.6f),
+            alternativePostalAddress = AlternativePostalAddress(
+                geographicCoordinates = GeoCoordinate(0.6f, 0.6f, 0.6f),
                 country = CountryCode.PT,
                 administrativeAreaLevel1 = "PT-PT",
                 postalCode = "postal-code-cleaned",
@@ -142,7 +142,7 @@ object BusinessPartnerGenericValues {
                 deliveryServiceQualifier = "delivery-service-qualifier-cleaned",
                 deliveryServiceType = DeliveryServiceType.PO_BOX
             ),
-            confidenceCriteria = ConfidenceCriteriaDto(
+            confidenceCriteria = ConfidenceCriteria(
                 sharedByOwner = false,
                 checkedByExternalDataSource = true,
                 numberOfBusinessPartners = 4,

@@ -29,8 +29,8 @@ import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputResponse
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntryDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.*
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmMissingStageException
@@ -38,7 +38,7 @@ import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerGenericDto
+import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerGeneric
 import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRequest
 import org.eclipse.tractusx.orchestrator.api.model.TaskCreateResponse
 import org.eclipse.tractusx.orchestrator.api.model.TaskMode
@@ -59,7 +59,7 @@ class BusinessPartnerService(
     private val logger = KotlinLogging.logger { }
 
     @Transactional
-    fun upsertBusinessPartnersInput(dtos: List<BusinessPartnerInputRequest>): List<BusinessPartnerInputDto> {
+    fun upsertBusinessPartnersInput(dtos: List<BusinessPartnerInputRequest>): List<BusinessPartnerInputResponse> {
         logger.debug { "Executing upsertBusinessPartnersInput() with parameters $dtos" }
         val entities = dtos.map { dto -> businessPartnerMappings.toBusinessPartnerInput(dto) }
         //Validation method
@@ -67,14 +67,14 @@ class BusinessPartnerService(
         return upsertBusinessPartnersInputFromCandidates(validatedEntities).map(businessPartnerMappings::toBusinessPartnerInputDto)
     }
 
-    fun getBusinessPartnersInput(pageRequest: PageRequest, externalIds: Collection<String>?): PageDto<BusinessPartnerInputDto> {
+    fun getBusinessPartnersInput(pageRequest: PageRequest, externalIds: Collection<String>?): PageDto<BusinessPartnerInputResponse> {
         logger.debug { "Executing getBusinessPartnersInput() with parameters $pageRequest and $externalIds" }
         val stage = StageType.Input
         return getBusinessPartners(pageRequest, externalIds, stage)
             .toPageDto(businessPartnerMappings::toBusinessPartnerInputDto)
     }
 
-    fun getBusinessPartnersOutput(pageRequest: PageRequest, externalIds: Collection<String>?): PageDto<BusinessPartnerOutputDto> {
+    fun getBusinessPartnersOutput(pageRequest: PageRequest, externalIds: Collection<String>?): PageDto<BusinessPartnerOutputResponse> {
         logger.debug { "Executing getBusinessPartnersOutput() with parameters $pageRequest and $externalIds" }
         val stage = StageType.Output
         return getBusinessPartners(pageRequest, externalIds, stage)
@@ -278,7 +278,7 @@ class BusinessPartnerService(
         }
 
 
-    private fun createGoldenRecordTasks(mode: TaskMode, orchestratorBusinessPartnersDto: List<BusinessPartnerGenericDto>): TaskCreateResponse {
+    private fun createGoldenRecordTasks(mode: TaskMode, orchestratorBusinessPartnersDto: List<BusinessPartnerGeneric>): TaskCreateResponse {
         return orchestrationApiClient.goldenRecordTasks.createTasks(
             TaskCreateRequest(
                 mode, orchestratorBusinessPartnersDto

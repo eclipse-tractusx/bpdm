@@ -23,22 +23,22 @@ import com.neovisionaries.i18n.CountryCode
 import com.neovisionaries.i18n.LanguageCode
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
+import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerbose
 import org.eclipse.tractusx.bpdm.common.model.NamedType
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 
-fun <T : NamedType> T.toDto(): TypeKeyNameVerboseDto<T> {
-    return TypeKeyNameVerboseDto(this, getTypeName())
+fun <T : NamedType> T.toDto(): TypeKeyNameVerbose<T> {
+    return TypeKeyNameVerbose(this, getTypeName())
 }
 
-fun LanguageCode.toDto(): TypeKeyNameVerboseDto<LanguageCode> {
-    return TypeKeyNameVerboseDto(this, getName())
+fun LanguageCode.toDto(): TypeKeyNameVerbose<LanguageCode> {
+    return TypeKeyNameVerbose(this, getName())
 }
 
-fun CountryCode.toDto(): TypeKeyNameVerboseDto<CountryCode> {
-    return TypeKeyNameVerboseDto(this, getName())
+fun CountryCode.toDto(): TypeKeyNameVerbose<CountryCode> {
+    return TypeKeyNameVerbose(this, getName())
 }
 
 fun PaginationRequest.toPageRequest(sort: Sort = Sort.unsorted()) =

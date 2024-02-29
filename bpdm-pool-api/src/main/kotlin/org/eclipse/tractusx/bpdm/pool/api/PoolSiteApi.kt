@@ -53,7 +53,7 @@ interface PoolSiteApi {
     fun searchMainAddresses(
         @RequestBody
         bpnS: Collection<String>
-    ): Collection<MainAddressVerboseDto>
+    ): Collection<MainAddressVerboseResponse>
 
     @Operation(
         summary = "Returns a site by its BPNS",
@@ -69,7 +69,7 @@ interface PoolSiteApi {
     @GetMapping("/{bpns}")
     fun getSite(
         @Parameter(description = "BPNS value") @PathVariable bpns: String
-    ): SiteWithMainAddressVerboseDto
+    ): SiteWithMainAddressVerboseResponse
 
     @Operation(
         summary = "Returns sites by an array of BPNS and/or an array of corresponding BPNL",
@@ -85,7 +85,7 @@ interface PoolSiteApi {
     fun searchSites(
         @RequestBody siteSearchRequest: SiteBpnSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageDto<SiteWithMainAddressVerboseDto>
+    ): PageDto<SiteWithMainAddressVerboseResponse>
 
     @Operation(
         summary = "Creates a new site",
@@ -135,5 +135,5 @@ interface PoolSiteApi {
     @GetMapping
     fun getSitesPaginated(
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageDto<SiteMatchVerboseDto>
+    ): PageDto<SiteMatchVerboseResponse>
 }

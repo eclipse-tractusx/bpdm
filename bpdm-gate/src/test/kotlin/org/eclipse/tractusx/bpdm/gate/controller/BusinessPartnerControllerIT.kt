@@ -30,19 +30,19 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
-import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerClassificationDto
-import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerIdentifierDto
-import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerStateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerClassification
+import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerIdentifier
+import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerState
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateResponse
 import org.eclipse.tractusx.bpdm.gate.service.GoldenRecordTaskService
 import org.eclipse.tractusx.bpdm.gate.util.*
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryVerboseResponse
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerGenericCommonValues
 import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerNonVerboseValues
@@ -146,7 +146,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
         val externalIds = listOf(externalId1, externalId2, externalId3)
 
         val upsertSharingStatesRequests = listOf(
-            SharingStateDto(
+            SharingStateResponse(
                 businessPartnerType = BusinessPartnerType.GENERIC,
                 externalId = externalId1,
                 sharingStateType = SharingStateType.Pending,
@@ -156,7 +156,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
                 sharingProcessStarted = null,
                 taskId = "0"
             ),
-            SharingStateDto(
+            SharingStateResponse(
                 businessPartnerType = BusinessPartnerType.GENERIC,
                 externalId = externalId2,
                 sharingStateType = SharingStateType.Pending,
@@ -166,7 +166,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
                 sharingProcessStarted = null,
                 taskId = "1"
             ),
-            SharingStateDto(
+            SharingStateResponse(
                 businessPartnerType = BusinessPartnerType.GENERIC,
                 externalId = externalId3,
                 sharingStateType = SharingStateType.Pending,
@@ -294,16 +294,16 @@ class BusinessPartnerControllerIT @Autowired constructor(
         assertEquals(0, searchResponsePage2.content.size)
     }
 
-    private fun assertUpsertResponsesMatchRequests(responses: Collection<BusinessPartnerInputDto>, requests: List<BusinessPartnerInputRequest>) {
+    private fun assertUpsertResponsesMatchRequests(responses: Collection<BusinessPartnerInputResponse>, requests: List<BusinessPartnerInputRequest>) {
         Assertions.assertThat(responses)
             .usingRecursiveComparison()
             .ignoringFieldsOfTypes(Instant::class.java)
             .isEqualTo(requests.map(::toExpectedResponse))
     }
 
-    private fun toExpectedResponse(request: BusinessPartnerInputRequest): BusinessPartnerInputDto {
+    private fun toExpectedResponse(request: BusinessPartnerInputRequest): BusinessPartnerInputResponse {
         // same sorting order as defined for entity
-        return BusinessPartnerInputDto(
+        return BusinessPartnerInputResponse(
             externalId = request.externalId,
             nameParts = request.nameParts,
             identifiers = request.identifiers.toSortedSet(identifierDtoComparator),
@@ -319,29 +319,29 @@ class BusinessPartnerControllerIT @Autowired constructor(
     }
 
     val identifierDtoComparator = compareBy(
-        BusinessPartnerIdentifierDto::type,
-        BusinessPartnerIdentifierDto::value,
-        BusinessPartnerIdentifierDto::issuingBody
+        BusinessPartnerIdentifier::type,
+        BusinessPartnerIdentifier::value,
+        BusinessPartnerIdentifier::issuingBody
     )
 
-    val stateDtoComparator = compareBy(nullsFirst(), BusinessPartnerStateDto::validFrom)       // here null means MIN
-        .thenBy(nullsLast(), BusinessPartnerStateDto::validTo)        // here null means MAX
-        .thenBy(BusinessPartnerStateDto::type)
+    val stateDtoComparator = compareBy(nullsFirst(), BusinessPartnerState::validFrom)       // here null means MIN
+        .thenBy(nullsLast(), BusinessPartnerState::validTo)        // here null means MAX
+        .thenBy(BusinessPartnerState::type)
 
     val classificationDtoComparator = compareBy(
-        BusinessPartnerClassificationDto::type,
-        BusinessPartnerClassificationDto::code,
-        BusinessPartnerClassificationDto::value
+        BusinessPartnerClassification::type,
+        BusinessPartnerClassification::code,
+        BusinessPartnerClassification::value
     )
 
     private fun mockOrchestratorApi() {
         val taskCreateResponse =
             TaskCreateResponse(
                 listOf(
-                    TaskClientStateDto(
+                    TaskClientState(
                         taskId = "0",
                         businessPartnerResult = null,
-                        processingState = TaskProcessingStateDto(
+                        processingState = TaskProcessingState(
                             resultState = ResultState.Pending,
                             step = TaskStep.CleanAndSync,
                             stepState = StepState.Queued,
@@ -351,10 +351,10 @@ class BusinessPartnerControllerIT @Autowired constructor(
                             timeout = Instant.now()
                         )
                     ),
-                    TaskClientStateDto(
+                    TaskClientState(
                         taskId = "1",
                         businessPartnerResult = null,
-                        processingState = TaskProcessingStateDto(
+                        processingState = TaskProcessingState(
                             resultState = ResultState.Pending,
                             step = TaskStep.CleanAndSync,
                             stepState = StepState.Queued,
@@ -364,10 +364,10 @@ class BusinessPartnerControllerIT @Autowired constructor(
                             timeout = Instant.now()
                         )
                     ),
-                    TaskClientStateDto(
+                    TaskClientState(
                         taskId = "2",
                         businessPartnerResult = null,
-                        processingState = TaskProcessingStateDto(
+                        processingState = TaskProcessingState(
                             resultState = ResultState.Pending,
                             step = TaskStep.CleanAndSync,
                             stepState = StepState.Queued,
@@ -377,10 +377,10 @@ class BusinessPartnerControllerIT @Autowired constructor(
                             timeout = Instant.now()
                         )
                     ),
-                    TaskClientStateDto(
+                    TaskClientState(
                         taskId = "3",
                         businessPartnerResult = null,
-                        processingState = TaskProcessingStateDto(
+                        processingState = TaskProcessingState(
                             resultState = ResultState.Pending,
                             step = TaskStep.CleanAndSync,
                             stepState = StepState.Queued,
@@ -406,10 +406,10 @@ class BusinessPartnerControllerIT @Autowired constructor(
         val taskStateResponse =
             TaskStateResponse(
                 listOf(
-                    TaskClientStateDto(
+                    TaskClientState(
                         taskId = "0",
                         businessPartnerResult = BusinessPartnerGenericCommonValues.businessPartner1,
-                        processingState = TaskProcessingStateDto(
+                        processingState = TaskProcessingState(
                             resultState = ResultState.Success,
                             step = TaskStep.CleanAndSync,
                             stepState = StepState.Queued,
@@ -419,16 +419,16 @@ class BusinessPartnerControllerIT @Autowired constructor(
                             timeout = Instant.now()
                         )
                     ),
-                    TaskClientStateDto(
+                    TaskClientState(
                         taskId = "1",
                         businessPartnerResult = null,
-                        processingState = TaskProcessingStateDto(
+                        processingState = TaskProcessingState(
                             resultState = ResultState.Error,
                             step = TaskStep.CleanAndSync,
                             stepState = StepState.Queued,
                             errors = listOf(
-                                TaskErrorDto(TaskErrorType.Timeout, "Major Error"),
-                                TaskErrorDto(TaskErrorType.Unspecified, "Minor Error")
+                                TaskError(TaskErrorType.Timeout, "Major Error"),
+                                TaskError(TaskErrorType.Unspecified, "Minor Error")
                             ),
                             createdAt = Instant.now(),
                             modifiedAt = Instant.now(),
@@ -447,8 +447,8 @@ class BusinessPartnerControllerIT @Autowired constructor(
     private fun mockOrchestratorApiCleanedResponseSizeOne() {
         val taskStateResponse = TaskStateResponse(
             listOf(
-                TaskClientStateDto(
-                    taskId = "0", businessPartnerResult = BusinessPartnerGenericCommonValues.businessPartner1, processingState = TaskProcessingStateDto(
+                TaskClientState(
+                    taskId = "0", businessPartnerResult = BusinessPartnerGenericCommonValues.businessPartner1, processingState = TaskProcessingState(
                         resultState = ResultState.Success,
                         step = TaskStep.CleanAndSync,
                         stepState = StepState.Queued,
@@ -475,19 +475,19 @@ class BusinessPartnerControllerIT @Autowired constructor(
             page = 0,
             contentSize = 3,
             content = listOf(
-                ChangelogEntryVerboseDto(
+                ChangelogEntryVerboseResponse(
                     bpn = BusinessPartnerVerboseValues.bpOutputDtoCleaned.legalEntity.legalEntityBpn,
                     businessPartnerType = BusinessPartnerType.LEGAL_ENTITY,
                     timestamp = Instant.now(),
                     changelogType = ChangelogType.UPDATE
                 ),
-                ChangelogEntryVerboseDto(
+                ChangelogEntryVerboseResponse(
                     bpn = BusinessPartnerVerboseValues.bpOutputDtoCleaned.address.addressBpn,
                     businessPartnerType = BusinessPartnerType.ADDRESS,
                     timestamp = Instant.now(),
                     changelogType = ChangelogType.UPDATE
                 ),
-                ChangelogEntryVerboseDto(
+                ChangelogEntryVerboseResponse(
                     bpn = BusinessPartnerVerboseValues.bpOutputDtoCleaned.site!!.siteBpn!!,
                     businessPartnerType = BusinessPartnerType.SITE,
                     timestamp = Instant.now(),
@@ -505,7 +505,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
     }
 
 
-    fun readSharingStates(businessPartnerType: BusinessPartnerType?, externalIds: Collection<String>?): Collection<SharingStateDto> {
+    fun readSharingStates(businessPartnerType: BusinessPartnerType?, externalIds: Collection<String>?): Collection<SharingStateResponse> {
 
         return gateClient.sharingState.getSharingStates(PaginationRequest(), businessPartnerType, externalIds).content
     }
@@ -528,7 +528,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
         val externalId5 = BusinessPartnerNonVerboseValues.bpInputRequestError.externalId
 
         val createdSharingState = listOf(
-            SharingStateDto(
+            SharingStateResponse(
                 businessPartnerType = BusinessPartnerType.GENERIC,
                 externalId = externalId4,
                 sharingStateType = SharingStateType.Pending,
@@ -538,7 +538,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
                 sharingProcessStarted = null,
                 taskId = "0"
             ),
-            SharingStateDto(
+            SharingStateResponse(
                 businessPartnerType = BusinessPartnerType.GENERIC,
                 externalId = externalId5,
                 sharingStateType = SharingStateType.Pending,
@@ -555,14 +555,14 @@ class BusinessPartnerControllerIT @Autowired constructor(
         val upsertSharingStateResponses = readSharingStates(BusinessPartnerType.GENERIC, externalIds)
         assertHelpers
             .assertRecursively(upsertSharingStateResponses)
-            .ignoringFieldsMatchingRegexes(".*${SharingStateDto::sharingProcessStarted.name}")
+            .ignoringFieldsMatchingRegexes(".*${SharingStateResponse::sharingProcessStarted.name}")
             .isEqualTo(createdSharingState)
 
         // Call Finish Cleaning Method
         goldenRecordTaskService.resolvePendingTasks()
 
         val cleanedSharingState = listOf(
-            SharingStateDto(
+            SharingStateResponse(
                 businessPartnerType = BusinessPartnerType.GENERIC,
                 externalId = externalId4,
                 sharingStateType = SharingStateType.Success,
@@ -572,7 +572,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
                 sharingProcessStarted = null,
                 taskId = "0"
             ),
-            SharingStateDto(
+            SharingStateResponse(
                 businessPartnerType = BusinessPartnerType.GENERIC,
                 externalId = externalId5,
                 sharingStateType = SharingStateType.Error,
@@ -587,7 +587,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
         //Check for both Sharing State changes (Error and Success)
         val readCleanedSharingState = readSharingStates(BusinessPartnerType.GENERIC, externalIds)
         assertHelpers.assertRecursively(readCleanedSharingState)
-            .ignoringFieldsMatchingRegexes(".*${SharingStateDto::sharingProcessStarted.name}")
+            .ignoringFieldsMatchingRegexes(".*${SharingStateResponse::sharingProcessStarted.name}")
             .isEqualTo(cleanedSharingState)
 
         //Assert that Cleaned Golden Record is persisted in the Output correctly
@@ -609,7 +609,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
         val externalId3 = BusinessPartnerNonVerboseValues.bpInputRequestChina.externalId
 
         val createdSharingState = listOf(
-            SharingStateDto(
+            SharingStateResponse(
                 businessPartnerType = BusinessPartnerType.GENERIC,
                 externalId = externalId3,
                 sharingStateType = SharingStateType.Pending,
@@ -626,14 +626,14 @@ class BusinessPartnerControllerIT @Autowired constructor(
         val upsertSharingStateResponses = readSharingStates(BusinessPartnerType.GENERIC, externalIds)
         assertHelpers
             .assertRecursively(upsertSharingStateResponses)
-            .ignoringFieldsMatchingRegexes(".*${SharingStateDto::sharingProcessStarted.name}")
+            .ignoringFieldsMatchingRegexes(".*${SharingStateResponse::sharingProcessStarted.name}")
             .isEqualTo(createdSharingState)
 
         // Call Finish Cleaning Method
         goldenRecordTaskService.resolvePendingTasks()
 
         val cleanedSharingState = listOf(
-            SharingStateDto(
+            SharingStateResponse(
                 businessPartnerType = BusinessPartnerType.GENERIC,
                 externalId = externalId3,
                 sharingStateType = SharingStateType.Error,
@@ -648,7 +648,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
         //Check for Sharing State
         val readCleanedSharingState = readSharingStates(BusinessPartnerType.GENERIC, externalIds)
         assertHelpers.assertRecursively(readCleanedSharingState)
-            .ignoringFieldsMatchingRegexes(".*${SharingStateDto::sharingProcessStarted.name}")
+            .ignoringFieldsMatchingRegexes(".*${SharingStateResponse::sharingProcessStarted.name}")
             .isEqualTo(cleanedSharingState)
 
     }
@@ -674,7 +674,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
         goldenRecordTaskService.createTasksForGoldenRecordUpdates()
 
         val upsertSharingStatesRequests = listOf(
-            SharingStateDto(
+            SharingStateResponse(
                 businessPartnerType = BusinessPartnerType.GENERIC,
                 externalId = externalId4,
                 sharingStateType = SharingStateType.Pending,
@@ -693,11 +693,11 @@ class BusinessPartnerControllerIT @Autowired constructor(
         assertUpsertOutputResponsesMatchRequests(searchResponsePage.content, outputBusinessPartners)
 
         //Assert that sharing state are created
-        assertHelpers.assertRecursively(upsertSharingStateResponses).ignoringFieldsMatchingRegexes(".*${SharingStateDto::sharingProcessStarted.name}")
+        assertHelpers.assertRecursively(upsertSharingStateResponses).ignoringFieldsMatchingRegexes(".*${SharingStateResponse::sharingProcessStarted.name}")
             .isEqualTo(upsertSharingStatesRequests)
     }
 
-    private fun assertUpsertOutputResponsesMatchRequests(responses: Collection<BusinessPartnerOutputDto>, requests: List<BusinessPartnerOutputDto>) {
+    private fun assertUpsertOutputResponsesMatchRequests(responses: Collection<BusinessPartnerOutputResponse>, requests: List<BusinessPartnerOutputResponse>) {
         Assertions.assertThat(responses)
             .usingRecursiveComparison()
             .ignoringCollectionOrder()
@@ -714,7 +714,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
         goldenRecordTaskService.createTasksForReadyBusinessPartners()
     }
 
-    private fun assertBusinessPartnersUpsertedCorrectly(upsertedBusinessPartners: Collection<BusinessPartnerInputDto>) {
+    private fun assertBusinessPartnersUpsertedCorrectly(upsertedBusinessPartners: Collection<BusinessPartnerInputResponse>) {
         val searchResponsePage = gateClient.businessParters.getBusinessPartnersInput(null)
         assertEquals(upsertedBusinessPartners.size.toLong(), searchResponsePage.totalElements)
         assertHelpers.assertRecursively(searchResponsePage.content).isEqualTo(upsertedBusinessPartners)
@@ -723,7 +723,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
         assertEquals(upsertedBusinessPartners.size.toLong(), sharingStateResponse.totalElements)
         Assertions.assertThat(sharingStateResponse.content).isEqualTo(
             upsertedBusinessPartners.map {
-                SharingStateDto(
+                SharingStateResponse(
                     businessPartnerType = BusinessPartnerType.GENERIC,
                     externalId = it.externalId,
                     sharingStateType = SharingStateType.Initial

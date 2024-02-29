@@ -61,7 +61,7 @@ class TaskStepFetchAndReserveService(
 
     }
 
-    fun upsertGoldenRecordIntoPool(taskEntries: List<TaskStepReservationEntryDto>): List<TaskStepResultEntryDto> {
+    fun upsertGoldenRecordIntoPool(taskEntries: List<TaskStepReservationEntry>): List<TaskStepResultEntry> {
 
         val taskEntryBpnMapping = TaskEntryBpnMapping(taskEntries, bpnRequestIdentifierRepository)
 
@@ -76,15 +76,15 @@ class TaskStepFetchAndReserveService(
         return taskResults
     }
 
-    private fun businessPartnerTaskResult(taskStep: TaskStepReservationEntryDto, taskEntryBpnMapping: TaskEntryBpnMapping): TaskStepResultEntryDto {
+    private fun businessPartnerTaskResult(taskStep: TaskStepReservationEntry, taskEntryBpnMapping: TaskEntryBpnMapping): TaskStepResultEntry {
 
         return try {
             taskStepBuildService.upsertBusinessPartner(taskStep, taskEntryBpnMapping)
         } catch (ex: BpdmValidationException) {
-            TaskStepResultEntryDto(
+            TaskStepResultEntry(
                 taskId = taskStep.taskId,
                 errors = listOf(
-                    TaskErrorDto(
+                    TaskError(
                         type = TaskErrorType.Unspecified,
                         description = ex.message ?: ""
                     )
@@ -92,10 +92,10 @@ class TaskStepFetchAndReserveService(
             )
         } catch (ex: Throwable) {
             logger.error(ex) { "An unexpected error occurred during golden record task processing" }
-            TaskStepResultEntryDto(
+            TaskStepResultEntry(
                 taskId = taskStep.taskId,
                 errors = listOf(
-                    TaskErrorDto(
+                    TaskError(
                         type = TaskErrorType.Unspecified,
                         description = "An unexpected error occurred during Pool update"
                     )
@@ -104,8 +104,9 @@ class TaskStepFetchAndReserveService(
         }
     }
 
-    private fun validateTasks( taskEntries: List<TaskStepReservationEntryDto>,  requestMappings: TaskEntryBpnMapping
-    ): Map<TaskStepReservationEntryDto, TaskStepResultEntryDto?> {
+    private fun validateTasks(
+        taskEntries: List<TaskStepReservationEntry>, requestMappings: TaskEntryBpnMapping
+    ): Map<TaskStepReservationEntry, TaskStepResultEntry?> {
 
         val validationErrorsByTaskEntry = requestValidationService.validateTasksFromOrchestrator(taskEntries, requestMappings)
 
@@ -118,9 +119,9 @@ class TaskStepFetchAndReserveService(
     }
 
     private fun taskStepResultEntryDtoOnExistingError(
-        taskEntry: TaskStepReservationEntryDto,
+        taskEntry: TaskStepReservationEntry,
         validationErrorsByTaskEntry: Map<RequestWithKey, Collection<ErrorInfo<ErrorCode>>>
-    ): TaskStepResultEntryDto? {
+    ): TaskStepResultEntry? {
 
         val errors = validationErrorsByTaskEntry[taskEntry]
         return if (errors != null) {
@@ -130,9 +131,9 @@ class TaskStepFetchAndReserveService(
         }
     }
 
-    private fun taskStepResultEntryDto(taskId: String, errors: Collection<ErrorInfo<ErrorCode>>): TaskStepResultEntryDto {
+    private fun taskStepResultEntryDto(taskId: String, errors: Collection<ErrorInfo<ErrorCode>>): TaskStepResultEntry {
 
-        return TaskStepResultEntryDto(taskId = taskId, errors = errors.map { TaskErrorDto(type = TaskErrorType.Unspecified, description = it.message) })
+        return TaskStepResultEntry(taskId = taskId, errors = errors.map { TaskError(type = TaskErrorType.Unspecified, description = it.message) })
     }
 
 }

@@ -27,7 +27,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.common.util.CommonApiPathNames
 import org.eclipse.tractusx.bpdm.pool.api.PoolBpnApi.Companion.BPN_PATH
 import org.eclipse.tractusx.bpdm.pool.api.model.request.IdentifiersSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingResponse
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
@@ -59,5 +59,5 @@ interface PoolBpnApi {
         ]
     )
     @PostMapping(CommonApiPathNames.SUBPATH_SEARCH)
-    fun findBpnsByIdentifiers(@RequestBody request: IdentifiersSearchRequest): ResponseEntity<Set<BpnIdentifierMappingDto>>
+    fun findBpnsByIdentifiers(@RequestBody request: IdentifiersSearchRequest): ResponseEntity<Set<BpnIdentifierMappingResponse>>
 }

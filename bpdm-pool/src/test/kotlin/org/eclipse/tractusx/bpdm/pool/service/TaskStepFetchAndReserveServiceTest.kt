@@ -21,43 +21,42 @@ package org.eclipse.tractusx.bpdm.pool.service
 
 import com.neovisionaries.i18n.CountryCode
 import org.assertj.core.api.Assertions.assertThat
-import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
-import org.eclipse.tractusx.bpdm.common.dto.ILegalEntityStateDto
-import org.eclipse.tractusx.bpdm.common.dto.ISiteStateDto
-import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
+import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinate
+import org.eclipse.tractusx.bpdm.common.dto.ILegalEntityState
+import org.eclipse.tractusx.bpdm.common.dto.ISiteState
+import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerbose
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.*
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseResponse
 import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.service.TaskStepBuildService.CleaningError
-
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
-import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues.addressIdentifierTypeDto1
-import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues.addressIdentifierTypeDto2
+import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues.addressIdentifierType1
+import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues.addressIdentifierType2
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerVerboseValues
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.eclipse.tractusx.bpdm.test.util.PoolDataHelpers
 import org.eclipse.tractusx.orchestrator.api.model.*
-import org.eclipse.tractusx.orchestrator.api.model.AddressIdentifierDto
-import org.eclipse.tractusx.orchestrator.api.model.AddressStateDto
-import org.eclipse.tractusx.orchestrator.api.model.AlternativePostalAddressDto
+import org.eclipse.tractusx.orchestrator.api.model.AddressIdentifier
+import org.eclipse.tractusx.orchestrator.api.model.AddressState
+import org.eclipse.tractusx.orchestrator.api.model.AlternativePostalAddress
 import org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType.Bpn
 import org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType.BpnRequestIdentifier
-import org.eclipse.tractusx.orchestrator.api.model.ConfidenceCriteriaDto
-import org.eclipse.tractusx.orchestrator.api.model.LegalEntityClassificationDto
-import org.eclipse.tractusx.orchestrator.api.model.LegalEntityDto
-import org.eclipse.tractusx.orchestrator.api.model.LegalEntityIdentifierDto
-import org.eclipse.tractusx.orchestrator.api.model.LegalEntityStateDto
-import org.eclipse.tractusx.orchestrator.api.model.LogisticAddressDto
-import org.eclipse.tractusx.orchestrator.api.model.PhysicalPostalAddressDto
-import org.eclipse.tractusx.orchestrator.api.model.SiteDto
-import org.eclipse.tractusx.orchestrator.api.model.SiteStateDto
-import org.eclipse.tractusx.orchestrator.api.model.StreetDto
+import org.eclipse.tractusx.orchestrator.api.model.ConfidenceCriteria
+import org.eclipse.tractusx.orchestrator.api.model.LegalEntity
+import org.eclipse.tractusx.orchestrator.api.model.LegalEntityClassification
+import org.eclipse.tractusx.orchestrator.api.model.LegalEntityIdentifier
+import org.eclipse.tractusx.orchestrator.api.model.LegalEntityState
+import org.eclipse.tractusx.orchestrator.api.model.LogisticAddress
+import org.eclipse.tractusx.orchestrator.api.model.PhysicalPostalAddress
+import org.eclipse.tractusx.orchestrator.api.model.Site
+import org.eclipse.tractusx.orchestrator.api.model.SiteState
+import org.eclipse.tractusx.orchestrator.api.model.Street
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -107,8 +106,8 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
 
         val createLegalEntityRequest = minFullBusinessPartner().copy(
             legalEntity = emptyLegalEntity().copy(
-                bpnLReference = BpnReferenceDto(referenceValue = "123", referenceType = BpnRequestIdentifier),
-                legalAddress =  minLogisticAddress(BpnReferenceDto(referenceValue = "A777", referenceType = BpnRequestIdentifier))
+                bpnLReference = BpnReference(referenceValue = "123", referenceType = BpnRequestIdentifier),
+                legalAddress = minLogisticAddress(BpnReference(referenceValue = "A777", referenceType = BpnRequestIdentifier))
             )
         )
 
@@ -123,8 +122,8 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         val leAddressRefValue = "222"
         val createLegalEntityRequest = minFullBusinessPartner().copy(
             legalEntity = minValidLegalEntity(
-                bpnLReference = BpnReferenceDto(referenceValue = leRefValue, referenceType = BpnRequestIdentifier),
-                bpnAReference = BpnReferenceDto(referenceValue = leAddressRefValue, referenceType = BpnRequestIdentifier)
+                bpnLReference = BpnReference(referenceValue = leRefValue, referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReference(referenceValue = leAddressRefValue, referenceType = BpnRequestIdentifier)
             )
         )
         val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createLegalEntityRequest)
@@ -147,8 +146,8 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         val leAddressRefValue = "222"
         val createLegalEntityRequest = minFullBusinessPartner().copy(
             legalEntity = fullValidLegalEntity(
-                bpnLReference = BpnReferenceDto(referenceValue = leRefValue, referenceType = BpnRequestIdentifier),
-                bpnAReference = BpnReferenceDto(referenceValue = leAddressRefValue, referenceType = BpnRequestIdentifier)
+                bpnLReference = BpnReference(referenceValue = leRefValue, referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReference(referenceValue = leAddressRefValue, referenceType = BpnRequestIdentifier)
             )
         )
         val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createLegalEntityRequest)
@@ -173,10 +172,10 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         val additionalAddressRefValue = "333"
         val createLegalEntityRequest = minFullBusinessPartner().copy(
             legalEntity = minValidLegalEntity(
-                bpnLReference = BpnReferenceDto(referenceValue = leRefValue, referenceType = BpnRequestIdentifier),
-                bpnAReference = BpnReferenceDto(referenceValue = leAddressRefValue, referenceType = BpnRequestIdentifier)
+                bpnLReference = BpnReference(referenceValue = leRefValue, referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReference(referenceValue = leAddressRefValue, referenceType = BpnRequestIdentifier)
             ),
-            address = minLogisticAddress(BpnReferenceDto(referenceValue = additionalAddressRefValue, referenceType = BpnRequestIdentifier))
+            address = minLogisticAddress(BpnReference(referenceValue = additionalAddressRefValue, referenceType = BpnRequestIdentifier))
         )
         val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createLegalEntityRequest)
         assertThat(createResult[0].taskId).isEqualTo("TASK_1")
@@ -200,15 +199,15 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
     @Test
     fun `create legal entity with invalid identifiers`() {
 
-        val leRef = BpnReferenceDto(referenceValue = "123", referenceType = BpnRequestIdentifier)
+        val leRef = BpnReference(referenceValue = "123", referenceType = BpnRequestIdentifier)
         val createLegalEntityRequest = minFullBusinessPartner().copy(
             legalEntity = minValidLegalEntity(
                 bpnLReference = leRef,
-                bpnAReference = BpnReferenceDto(referenceValue = "222", referenceType = BpnRequestIdentifier)
+                bpnAReference = BpnReference(referenceValue = "222", referenceType = BpnRequestIdentifier)
             ).copy(
                 identifiers = listOf(
                     legalEntityIdentifierDto(leRef.referenceValue, 1L, BusinessPartnerVerboseValues.identifierType1),
-                    legalEntityIdentifierDto(leRef.referenceValue, 2L, TypeKeyNameVerboseDto("Invalid", "Invalid"))
+                    legalEntityIdentifierDto(leRef.referenceValue, 2L, TypeKeyNameVerbose("Invalid", "Invalid"))
                 )
             )
         )
@@ -223,8 +222,8 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
 
         val createLegalEntityRequest = minFullBusinessPartner().copy(
             legalEntity = minValidLegalEntity(
-                bpnLReference = BpnReferenceDto(referenceValue = "123", referenceType = BpnRequestIdentifier),
-                bpnAReference = BpnReferenceDto(referenceValue = "222", referenceType = BpnRequestIdentifier)
+                bpnLReference = BpnReference(referenceValue = "123", referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReference(referenceValue = "222", referenceType = BpnRequestIdentifier)
             ).copy(
                 legalForm = "Invalid Form"
             )
@@ -238,11 +237,11 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
     @Test
     fun `create legal entity with invalid duplicate identifier`() {
 
-        val leRef = BpnReferenceDto(referenceValue = "123", referenceType = BpnRequestIdentifier)
+        val leRef = BpnReference(referenceValue = "123", referenceType = BpnRequestIdentifier)
         val createLegalEntityRequest = minFullBusinessPartner().copy(
             legalEntity = minValidLegalEntity(
                 bpnLReference = leRef,
-                bpnAReference = BpnReferenceDto(referenceValue = "222", referenceType = BpnRequestIdentifier)
+                bpnAReference = BpnReference(referenceValue = "222", referenceType = BpnRequestIdentifier)
             ).copy(
                 identifiers = listOf(
                     legalEntityIdentifierDto(leRef.referenceValue, 1L, BusinessPartnerVerboseValues.identifierType1),
@@ -259,11 +258,11 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
     @Test
     fun `create 2 legal entities with invalid duplicate identifier`() {
 
-        val leRef1 = BpnReferenceDto(referenceValue = "111", referenceType = BpnRequestIdentifier)
+        val leRef1 = BpnReference(referenceValue = "111", referenceType = BpnRequestIdentifier)
         val createLegalEntityRequest = minFullBusinessPartner().copy(
             legalEntity = minValidLegalEntity(
                 bpnLReference = leRef1,
-                bpnAReference = BpnReferenceDto(referenceValue = "444", referenceType = BpnRequestIdentifier)
+                bpnAReference = BpnReference(referenceValue = "444", referenceType = BpnRequestIdentifier)
             ).copy(
                 identifiers = listOf(
                     legalEntityIdentifierDto(leRef1.referenceValue, 1L, BusinessPartnerVerboseValues.identifierType1),
@@ -275,11 +274,11 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         assertThat(createResult[0].taskId).isEqualTo("TASK_1")
         assertThat(createResult[0].errors.size).isEqualTo(0)
 
-        val leRef2 = BpnReferenceDto(referenceValue = "222", referenceType = BpnRequestIdentifier)
+        val leRef2 = BpnReference(referenceValue = "222", referenceType = BpnRequestIdentifier)
         val createLegalEntityRequest2 = minFullBusinessPartner().copy(
             legalEntity = minValidLegalEntity(
                 bpnLReference = leRef2,
-                bpnAReference = BpnReferenceDto(referenceValue = "333", referenceType = BpnRequestIdentifier)
+                bpnAReference = BpnReference(referenceValue = "333", referenceType = BpnRequestIdentifier)
             ).copy(
                 identifiers = listOf(
                     legalEntityIdentifierDto(leRef1.referenceValue, 1L, BusinessPartnerVerboseValues.identifierType1),
@@ -295,10 +294,10 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
     @Test
     fun `create legal entity with invalid address administrativeAreaLevel1`() {
 
-        val bpnAReference = BpnReferenceDto(referenceValue = "222", referenceType = BpnRequestIdentifier)
+        val bpnAReference = BpnReference(referenceValue = "222", referenceType = BpnRequestIdentifier)
         val createLegalEntityRequest = minFullBusinessPartner().copy(
             legalEntity = minValidLegalEntity(
-                bpnLReference = BpnReferenceDto(referenceValue = "123", referenceType = BpnRequestIdentifier),
+                bpnLReference = BpnReference(referenceValue = "123", referenceType = BpnRequestIdentifier),
                 bpnAReference = bpnAReference
             ).copy(
                 legalAddress = minLogisticAddress(bpnAReference).copy(
@@ -317,16 +316,16 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
     @Test
     fun `create legal entity with invalid address identifier`() {
 
-        val bpnAReference = BpnReferenceDto(referenceValue = "222", referenceType = BpnRequestIdentifier)
+        val bpnAReference = BpnReference(referenceValue = "222", referenceType = BpnRequestIdentifier)
         val createLegalEntityRequest = minFullBusinessPartner().copy(
             legalEntity = minValidLegalEntity(
-                bpnLReference = BpnReferenceDto(referenceValue = "123", referenceType = BpnRequestIdentifier),
+                bpnLReference = BpnReference(referenceValue = "123", referenceType = BpnRequestIdentifier),
                 bpnAReference = bpnAReference
             ).copy(
                 legalAddress = minLogisticAddress(bpnAReference).copy(
                     identifiers = listOf(
-                        addressIdentifierDto(bpnAReference.referenceValue, 1L, TypeKeyNameVerboseDto(addressIdentifierTypeDto1.technicalKey, "")),
-                        addressIdentifierDto(bpnAReference.referenceValue, 2L, TypeKeyNameVerboseDto("Invalid Ident", ""))
+                        addressIdentifierDto(bpnAReference.referenceValue, 1L, TypeKeyNameVerbose(addressIdentifierType1.technicalKey, "")),
+                        addressIdentifierDto(bpnAReference.referenceValue, 2L, TypeKeyNameVerbose("Invalid Ident", ""))
                     ),
                 )
             )
@@ -340,16 +339,16 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
     @Test
     fun `create legal entity with invalid duplicated address identifier`() {
 
-        val bpnAReference = BpnReferenceDto(referenceValue = "222", referenceType = BpnRequestIdentifier)
+        val bpnAReference = BpnReference(referenceValue = "222", referenceType = BpnRequestIdentifier)
         val createLegalEntityRequest = minFullBusinessPartner().copy(
             legalEntity = minValidLegalEntity(
-                bpnLReference = BpnReferenceDto(referenceValue = "123", referenceType = BpnRequestIdentifier),
+                bpnLReference = BpnReference(referenceValue = "123", referenceType = BpnRequestIdentifier),
                 bpnAReference = bpnAReference
             ).copy(
                 legalAddress = minLogisticAddress(bpnAReference).copy(
                     identifiers = listOf(
-                        addressIdentifierDto(bpnAReference.referenceValue, 1L, TypeKeyNameVerboseDto(addressIdentifierTypeDto1.technicalKey, "")),
-                        addressIdentifierDto(bpnAReference.referenceValue, 1L, TypeKeyNameVerboseDto(addressIdentifierTypeDto1.technicalKey, ""))
+                        addressIdentifierDto(bpnAReference.referenceValue, 1L, TypeKeyNameVerbose(addressIdentifierType1.technicalKey, "")),
+                        addressIdentifierDto(bpnAReference.referenceValue, 1L, TypeKeyNameVerbose(addressIdentifierType1.technicalKey, ""))
                     ),
                 )
             )
@@ -368,8 +367,8 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         val leAddressRefValue = "222"
         val createLegalEntityRequest = minFullBusinessPartner().copy(
             legalEntity = minValidLegalEntity(
-                bpnLReference = BpnReferenceDto(referenceValue = leRefValue, referenceType = BpnRequestIdentifier),
-                bpnAReference = BpnReferenceDto(referenceValue = leAddressRefValue, referenceType = BpnRequestIdentifier)
+                bpnLReference = BpnReference(referenceValue = leRefValue, referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReference(referenceValue = leAddressRefValue, referenceType = BpnRequestIdentifier)
             )
         )
         val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createLegalEntityRequest)
@@ -390,8 +389,8 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         val leAddressRefValue = "222"
         val createLegalEntityRequest = minFullBusinessPartner().copy(
             legalEntity = minValidLegalEntity(
-                bpnLReference = BpnReferenceDto(referenceValue = leRefValue, referenceType = BpnRequestIdentifier),
-                bpnAReference = BpnReferenceDto(referenceValue = leAddressRefValue, referenceType = BpnRequestIdentifier)
+                bpnLReference = BpnReference(referenceValue = leRefValue, referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReference(referenceValue = leAddressRefValue, referenceType = BpnRequestIdentifier)
             )
         )
         val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createLegalEntityRequest)
@@ -403,8 +402,8 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         val leAddressRefValue2 = "diffenrentBpnA"
         val createLegalEntityRequest2 = minFullBusinessPartner().copy(
             legalEntity = minValidLegalEntity(
-                bpnLReference = BpnReferenceDto(referenceValue = leRefValue2, referenceType = BpnRequestIdentifier),
-                bpnAReference = BpnReferenceDto(referenceValue = leAddressRefValue2, referenceType = BpnRequestIdentifier)
+                bpnLReference = BpnReference(referenceValue = leRefValue2, referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReference(referenceValue = leAddressRefValue2, referenceType = BpnRequestIdentifier)
             )
         )
 
@@ -427,8 +426,8 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         val leAddressRefValue = "222"
         val createLegalEntityRequest = minFullBusinessPartner().copy(
             legalEntity = fullValidLegalEntity(
-                bpnLReference = BpnReferenceDto(referenceValue = leRefValue, referenceType = BpnRequestIdentifier),
-                bpnAReference = BpnReferenceDto(referenceValue = leAddressRefValue, referenceType = BpnRequestIdentifier)
+                bpnLReference = BpnReference(referenceValue = leRefValue, referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReference(referenceValue = leAddressRefValue, referenceType = BpnRequestIdentifier)
             )
         )
         val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createLegalEntityRequest)
@@ -461,8 +460,8 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         val leAddressRefValue = "222"
         val createLegalEntityRequest = minFullBusinessPartner().copy(
             legalEntity = fullValidLegalEntity(
-                bpnLReference = BpnReferenceDto(referenceValue = leRefValue, referenceType = BpnRequestIdentifier),
-                bpnAReference = BpnReferenceDto(referenceValue = leAddressRefValue, referenceType = BpnRequestIdentifier)
+                bpnLReference = BpnReference(referenceValue = leRefValue, referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReference(referenceValue = leAddressRefValue, referenceType = BpnRequestIdentifier)
             )
         )
         val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createLegalEntityRequest)
@@ -492,11 +491,11 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
     @Test
     fun `update legal entity invalid identifier type `() {
 
-        val leRef = BpnReferenceDto(referenceValue = "123", referenceType = BpnRequestIdentifier)
+        val leRef = BpnReference(referenceValue = "123", referenceType = BpnRequestIdentifier)
         val createLegalEntityRequest = minFullBusinessPartner().copy(
             legalEntity = minValidLegalEntity(
                 bpnLReference = leRef,
-                bpnAReference = BpnReferenceDto(referenceValue = "222", referenceType = BpnRequestIdentifier)
+                bpnAReference = BpnReference(referenceValue = "222", referenceType = BpnRequestIdentifier)
             )
         )
         val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createLegalEntityRequest)
@@ -508,7 +507,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
                 legalName = "Changed Legal Entity",
                 identifiers = listOf(
                     legalEntityIdentifierDto(leRef.referenceValue, 1L, BusinessPartnerVerboseValues.identifierType1),
-                    legalEntityIdentifierDto(leRef.referenceValue, 2L, TypeKeyNameVerboseDto("Invalid", "Invalid"))
+                    legalEntityIdentifierDto(leRef.referenceValue, 2L, TypeKeyNameVerbose("Invalid", "Invalid"))
                 ),
                 legalAddress = createResult[0].businessPartner?.legalEntity?.legalAddress?.copy(
                     hasChanged = true,
@@ -526,11 +525,11 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
     @Test
     fun `update legal entity invalid legal form `() {
 
-        val leRef = BpnReferenceDto(referenceValue = "123", referenceType = BpnRequestIdentifier)
+        val leRef = BpnReference(referenceValue = "123", referenceType = BpnRequestIdentifier)
         val createLegalEntityRequest = minFullBusinessPartner().copy(
             legalEntity = minValidLegalEntity(
                 bpnLReference = leRef,
-                bpnAReference = BpnReferenceDto(referenceValue = "222", referenceType = BpnRequestIdentifier)
+                bpnAReference = BpnReference(referenceValue = "222", referenceType = BpnRequestIdentifier)
             )
         )
         val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createLegalEntityRequest)
@@ -557,11 +556,11 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
     @Test
     fun `update legal entity not existing bpn `() {
 
-        val leRef = BpnReferenceDto(referenceValue = "123", referenceType = BpnRequestIdentifier)
+        val leRef = BpnReference(referenceValue = "123", referenceType = BpnRequestIdentifier)
         val createLegalEntityRequest = minFullBusinessPartner().copy(
             legalEntity = minValidLegalEntity(
                 bpnLReference = leRef,
-                bpnAReference = BpnReferenceDto(referenceValue = "222", referenceType = BpnRequestIdentifier)
+                bpnAReference = BpnReference(referenceValue = "222", referenceType = BpnRequestIdentifier)
             )
         )
         val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createLegalEntityRequest)
@@ -569,7 +568,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
 
         val updateLegalEntityRequest = createResult[0].businessPartner?.copy(
             legalEntity = createResult[0].businessPartner?.legalEntity?.copy(
-                bpnLReference = BpnReferenceDto(referenceValue = "InvalidBPN", referenceType = Bpn),
+                bpnLReference = BpnReference(referenceValue = "InvalidBPN", referenceType = Bpn),
                 hasChanged = true,
                 legalName = "Changed Legal Entity",
                 legalAddress = createResult[0].businessPartner?.legalEntity?.legalAddress?.copy(
@@ -588,11 +587,11 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
     @Test
     fun `update legal entity with changed identifiers `() {
 
-        val leRef = BpnReferenceDto(referenceValue = "123", referenceType = BpnRequestIdentifier)
+        val leRef = BpnReference(referenceValue = "123", referenceType = BpnRequestIdentifier)
         val createLegalEntityRequest = minFullBusinessPartner().copy(
             legalEntity = minValidLegalEntity(
                 bpnLReference = leRef,
-                bpnAReference = BpnReferenceDto(referenceValue = "222", referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReference(referenceValue = "222", referenceType = BpnRequestIdentifier),
             ).copy(
                 identifiers = listOf(
                     legalEntityIdentifierDto(leRef.referenceValue, 1L, BusinessPartnerVerboseValues.identifierType1),
@@ -625,11 +624,11 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
     @Test
     fun `update legal entity by reference value with invalid identifier type `() {
 
-        val leRef = BpnReferenceDto(referenceValue = "123", referenceType = BpnRequestIdentifier)
+        val leRef = BpnReference(referenceValue = "123", referenceType = BpnRequestIdentifier)
         val createLegalEntityRequest = minFullBusinessPartner().copy(
             legalEntity = minValidLegalEntity(
                 bpnLReference = leRef,
-                bpnAReference = BpnReferenceDto(referenceValue = "222", referenceType = BpnRequestIdentifier)
+                bpnAReference = BpnReference(referenceValue = "222", referenceType = BpnRequestIdentifier)
             )
         )
         val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createLegalEntityRequest)
@@ -641,7 +640,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
                 legalName = "Changed Legal Entity",
                 identifiers = listOf(
                     legalEntityIdentifierDto(leRef.referenceValue, 1L, BusinessPartnerVerboseValues.identifierType1),
-                    legalEntityIdentifierDto(leRef.referenceValue, 2L, TypeKeyNameVerboseDto("Invalid", "Invalid"))
+                    legalEntityIdentifierDto(leRef.referenceValue, 2L, TypeKeyNameVerbose("Invalid", "Invalid"))
                 ),
                 legalAddress = createLegalEntityRequest.legalEntity?.legalAddress?.copy(
                     hasChanged = true,
@@ -665,12 +664,12 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         val mainAddressRefValue = "mainAddressRefValue"
         val createSiteRequest = minFullBusinessPartner().copy(
             legalEntity = minValidLegalEntity(
-                bpnLReference = BpnReferenceDto(referenceValue = leRefValue, referenceType = BpnRequestIdentifier),
-                bpnAReference = BpnReferenceDto(referenceValue = leAddressRefValue, referenceType = BpnRequestIdentifier)
+                bpnLReference = BpnReference(referenceValue = leRefValue, referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReference(referenceValue = leAddressRefValue, referenceType = BpnRequestIdentifier)
             ),
             site = minValidSite(
-                bpnSReference = BpnReferenceDto(referenceValue = siteRefValue, referenceType = BpnRequestIdentifier),
-                bpnAReference = BpnReferenceDto(referenceValue = mainAddressRefValue, referenceType = BpnRequestIdentifier)
+                bpnSReference = BpnReference(referenceValue = siteRefValue, referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReference(referenceValue = mainAddressRefValue, referenceType = BpnRequestIdentifier)
             )
         )
 
@@ -690,12 +689,12 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         val mainAddressRefValue = "mainAddressRefValue"
         val createSiteRequest = minFullBusinessPartner().copy(
             legalEntity = minValidLegalEntity(
-                bpnLReference = BpnReferenceDto(referenceValue = leRefValue, referenceType = BpnRequestIdentifier),
-                bpnAReference = BpnReferenceDto(referenceValue = leAddressRefValue, referenceType = BpnRequestIdentifier)
+                bpnLReference = BpnReference(referenceValue = leRefValue, referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReference(referenceValue = leAddressRefValue, referenceType = BpnRequestIdentifier)
             ),
             site = fullValidSite(
-                bpnSReference = BpnReferenceDto(referenceValue = siteRefValue, referenceType = BpnRequestIdentifier),
-                bpnAReference = BpnReferenceDto(referenceValue = mainAddressRefValue, referenceType = BpnRequestIdentifier)
+                bpnSReference = BpnReference(referenceValue = siteRefValue, referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReference(referenceValue = mainAddressRefValue, referenceType = BpnRequestIdentifier)
             )
         )
 
@@ -717,15 +716,15 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         val additionalAddressRefValue = "77"
         val createSiteRequest = minFullBusinessPartner().copy(
             legalEntity = minValidLegalEntity(
-                bpnLReference = BpnReferenceDto(referenceValue = leRefValue, referenceType = BpnRequestIdentifier),
-                bpnAReference = BpnReferenceDto(referenceValue = leAddressRefValue, referenceType = BpnRequestIdentifier)
+                bpnLReference = BpnReference(referenceValue = leRefValue, referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReference(referenceValue = leAddressRefValue, referenceType = BpnRequestIdentifier)
             ),
             site = minValidSite(
-                bpnSReference = BpnReferenceDto(referenceValue = siteRefValue, referenceType = BpnRequestIdentifier),
-                bpnAReference = BpnReferenceDto(referenceValue = mainAddressRefValue, referenceType = BpnRequestIdentifier)
+                bpnSReference = BpnReference(referenceValue = siteRefValue, referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReference(referenceValue = mainAddressRefValue, referenceType = BpnRequestIdentifier)
             ),
             address = minLogisticAddress(
-                bpnAReference = BpnReferenceDto(referenceValue = additionalAddressRefValue, referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReference(referenceValue = additionalAddressRefValue, referenceType = BpnRequestIdentifier),
             )
         )
 
@@ -748,12 +747,12 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
 
         val createSiteRequest = minFullBusinessPartner().copy(
             legalEntity = minValidLegalEntity(
-                bpnLReference = BpnReferenceDto(referenceValue = "123", referenceType = BpnRequestIdentifier),
-                bpnAReference = BpnReferenceDto(referenceValue = "222", referenceType = BpnRequestIdentifier)
+                bpnLReference = BpnReference(referenceValue = "123", referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReference(referenceValue = "222", referenceType = BpnRequestIdentifier)
             ),
             site = fullValidSite(
-                bpnSReference = BpnReferenceDto(referenceValue = "siteRefValue", referenceType = BpnRequestIdentifier),
-                bpnAReference = BpnReferenceDto(referenceValue = "mainAddressRefValue", referenceType = BpnRequestIdentifier)
+                bpnSReference = BpnReference(referenceValue = "siteRefValue", referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReference(referenceValue = "mainAddressRefValue", referenceType = BpnRequestIdentifier)
             ).copy(
                 mainAddress = null
             )
@@ -769,23 +768,23 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
     @Test
     fun `create Site with invalid addresses administration level 1 and invalid identifier`() {
 
-        val bpnAReference = BpnReferenceDto(referenceValue = "222", referenceType = BpnRequestIdentifier)
-        val additionalReference = BpnReferenceDto(referenceValue = "additionalRef", referenceType = BpnRequestIdentifier)
+        val bpnAReference = BpnReference(referenceValue = "222", referenceType = BpnRequestIdentifier)
+        val additionalReference = BpnReference(referenceValue = "additionalRef", referenceType = BpnRequestIdentifier)
         val createSiteRequest = minFullBusinessPartner().copy(
             legalEntity = minValidLegalEntity(
-                bpnLReference = BpnReferenceDto(referenceValue = "123", referenceType = BpnRequestIdentifier),
-                bpnAReference = BpnReferenceDto(referenceValue = "222", referenceType = BpnRequestIdentifier)
+                bpnLReference = BpnReference(referenceValue = "123", referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReference(referenceValue = "222", referenceType = BpnRequestIdentifier)
             ),
             site = fullValidSite(
-                bpnSReference = BpnReferenceDto(referenceValue = "siteRefValue", referenceType = BpnRequestIdentifier),
-                bpnAReference = BpnReferenceDto(referenceValue = "mainAddressRefValue", referenceType = BpnRequestIdentifier)
+                bpnSReference = BpnReference(referenceValue = "siteRefValue", referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReference(referenceValue = "mainAddressRefValue", referenceType = BpnRequestIdentifier)
             ).copy(
                 mainAddress = minLogisticAddress(bpnAReference).copy(
                     physicalPostalAddress = minPhysicalPostalAddressDto(bpnAReference).copy(
                         administrativeAreaLevel1 = "Invalid"
                     ),
                     identifiers = listOf(
-                        addressIdentifierDto(bpnAReference.referenceValue, 1L, TypeKeyNameVerboseDto("InvalidKey1", "InvalidName1")),
+                        addressIdentifierDto(bpnAReference.referenceValue, 1L, TypeKeyNameVerbose("InvalidKey1", "InvalidName1")),
                     )
                 )
             ),
@@ -794,7 +793,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
                     administrativeAreaLevel1 = "InvalidAdditional"
                 ),
                 identifiers = listOf(
-                    addressIdentifierDto(additionalReference.referenceValue, 2L, TypeKeyNameVerboseDto("InvalidKey2", "InvalidName2")),
+                    addressIdentifierDto(additionalReference.referenceValue, 2L, TypeKeyNameVerbose("InvalidKey2", "InvalidName2")),
                 )
             ),
 
@@ -815,17 +814,17 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
     @Test
     fun `create Site with same identifier in main address and additional address`() {
 
-        val bpnAReference = BpnReferenceDto(referenceValue = "222", referenceType = BpnRequestIdentifier)
-        val additionalReference = BpnReferenceDto(referenceValue = "additionalRef", referenceType = BpnRequestIdentifier)
-        val sameIdentifier = addressIdentifierDto(bpnAReference.referenceValue, 1L, TypeKeyNameVerboseDto(addressIdentifierTypeDto1.technicalKey, ""))
+        val bpnAReference = BpnReference(referenceValue = "222", referenceType = BpnRequestIdentifier)
+        val additionalReference = BpnReference(referenceValue = "additionalRef", referenceType = BpnRequestIdentifier)
+        val sameIdentifier = addressIdentifierDto(bpnAReference.referenceValue, 1L, TypeKeyNameVerbose(addressIdentifierType1.technicalKey, ""))
         val createSiteRequest = minFullBusinessPartner().copy(
             legalEntity = minValidLegalEntity(
-                bpnLReference = BpnReferenceDto(referenceValue = "123", referenceType = BpnRequestIdentifier),
-                bpnAReference = BpnReferenceDto(referenceValue = "222", referenceType = BpnRequestIdentifier)
+                bpnLReference = BpnReference(referenceValue = "123", referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReference(referenceValue = "222", referenceType = BpnRequestIdentifier)
             ),
             site = minValidSite(
-                bpnSReference = BpnReferenceDto(referenceValue = "siteRefValue", referenceType = BpnRequestIdentifier),
-                bpnAReference = BpnReferenceDto(referenceValue = "mainAddressRefValue", referenceType = BpnRequestIdentifier)
+                bpnSReference = BpnReference(referenceValue = "siteRefValue", referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReference(referenceValue = "mainAddressRefValue", referenceType = BpnRequestIdentifier)
             ).copy(
                 mainAddress = minLogisticAddress(bpnAReference).copy(
                     identifiers = listOf(
@@ -856,12 +855,12 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         val mainAddressRefValue = "mainAddressRefValue"
         val createSiteRequest = minFullBusinessPartner().copy(
             legalEntity = minValidLegalEntity(
-                bpnLReference = BpnReferenceDto(referenceValue = leRefValue, referenceType = BpnRequestIdentifier),
-                bpnAReference = BpnReferenceDto(referenceValue = leAddressRefValue, referenceType = BpnRequestIdentifier)
+                bpnLReference = BpnReference(referenceValue = leRefValue, referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReference(referenceValue = leAddressRefValue, referenceType = BpnRequestIdentifier)
             ),
             site = minValidSite(
-                bpnSReference = BpnReferenceDto(referenceValue = siteRefValue, referenceType = BpnRequestIdentifier),
-                bpnAReference = BpnReferenceDto(referenceValue = mainAddressRefValue, referenceType = BpnRequestIdentifier)
+                bpnSReference = BpnReference(referenceValue = siteRefValue, referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReference(referenceValue = mainAddressRefValue, referenceType = BpnRequestIdentifier)
             )
         )
 
@@ -884,12 +883,12 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         val mainAddressRefValue = "mainAddressRefValue"
         val createSiteRquest = minFullBusinessPartner().copy(
             legalEntity = minValidLegalEntity(
-                bpnLReference = BpnReferenceDto(referenceValue = "123", referenceType = BpnRequestIdentifier),
-                bpnAReference = BpnReferenceDto(referenceValue = "222", referenceType = BpnRequestIdentifier)
+                bpnLReference = BpnReference(referenceValue = "123", referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReference(referenceValue = "222", referenceType = BpnRequestIdentifier)
             ),
             site = minValidSite(
-                bpnSReference = BpnReferenceDto(referenceValue = siteRefValue, referenceType = BpnRequestIdentifier),
-                bpnAReference = BpnReferenceDto(referenceValue = mainAddressRefValue, referenceType = BpnRequestIdentifier)
+                bpnSReference = BpnReference(referenceValue = siteRefValue, referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReference(referenceValue = mainAddressRefValue, referenceType = BpnRequestIdentifier)
             )
         )
 
@@ -901,7 +900,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
             site = createSiteRquest.site?.copy(
                 name = "ChangedName",
                 hasChanged = true,
-                bpnSReference = BpnReferenceDto(referenceValue = "InvalidBPN", referenceType = Bpn),
+                bpnSReference = BpnReference(referenceValue = "InvalidBPN", referenceType = Bpn),
             )
         )
         val updateResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = updateSiteRequest)
@@ -912,16 +911,16 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
     @Test
     fun `update Site with invalid address administration level 1 and invalid identifier`() {
 
-        val bpnASiteReference = BpnReferenceDto(referenceValue = "222", referenceType = BpnRequestIdentifier)
-        val additionalReference = BpnReferenceDto(referenceValue = "7777", referenceType = BpnRequestIdentifier)
+        val bpnASiteReference = BpnReference(referenceValue = "222", referenceType = BpnRequestIdentifier)
+        val additionalReference = BpnReference(referenceValue = "7777", referenceType = BpnRequestIdentifier)
         val siteRefValue = "siteRefValue"
         val createSiteReuqest = minFullBusinessPartner().copy(
             legalEntity = minValidLegalEntity(
-                bpnLReference = BpnReferenceDto(referenceValue = "123", referenceType = BpnRequestIdentifier),
-                bpnAReference = BpnReferenceDto(referenceValue = "222", referenceType = BpnRequestIdentifier)
+                bpnLReference = BpnReference(referenceValue = "123", referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReference(referenceValue = "222", referenceType = BpnRequestIdentifier)
             ),
             site = minValidSite(
-                bpnSReference = BpnReferenceDto(referenceValue = siteRefValue, referenceType = BpnRequestIdentifier),
+                bpnSReference = BpnReference(referenceValue = siteRefValue, referenceType = BpnRequestIdentifier),
                 bpnAReference = bpnASiteReference
             )
         )
@@ -939,7 +938,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
                         administrativeAreaLevel1 = "Invalid"
                     ),
                     identifiers = listOf(
-                        addressIdentifierDto(bpnASiteReference.referenceValue, 1L, TypeKeyNameVerboseDto("InvalidKey1", "InvalidName1")),
+                        addressIdentifierDto(bpnASiteReference.referenceValue, 1L, TypeKeyNameVerbose("InvalidKey1", "InvalidName1")),
                     )
                 )
             ),
@@ -948,7 +947,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
                     administrativeAreaLevel1 = "InvalidAdditional"
                 ),
                 identifiers = listOf(
-                    addressIdentifierDto(additionalReference.referenceValue, 2L, TypeKeyNameVerboseDto("InvalidKey2", "InvalidName2")),
+                    addressIdentifierDto(additionalReference.referenceValue, 2L, TypeKeyNameVerbose("InvalidKey2", "InvalidName2")),
                 )
             ),
         )
@@ -966,21 +965,22 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
     @Test
     fun `update Site with same address identifiers in main address and additional address`() {
 
-        val mainAddressRefValue = BpnReferenceDto(referenceValue = "A222", referenceType = BpnRequestIdentifier)
-        val additionalAddressReference = BpnReferenceDto(referenceValue = "A333", referenceType = BpnRequestIdentifier)
-        val sameAddressIdentifier = addressIdentifierDto(additionalAddressReference.referenceValue, 2L, TypeKeyNameVerboseDto(addressIdentifierTypeDto2.technicalKey, ""))
+        val mainAddressRefValue = BpnReference(referenceValue = "A222", referenceType = BpnRequestIdentifier)
+        val additionalAddressReference = BpnReference(referenceValue = "A333", referenceType = BpnRequestIdentifier)
+        val sameAddressIdentifier =
+            addressIdentifierDto(additionalAddressReference.referenceValue, 2L, TypeKeyNameVerbose(addressIdentifierType2.technicalKey, ""))
         val createSiteRequest = minFullBusinessPartner().copy(
             legalEntity = minValidLegalEntity(
-                bpnLReference = BpnReferenceDto(referenceValue = "LE123", referenceType = BpnRequestIdentifier),
-                bpnAReference = BpnReferenceDto(referenceValue = "A111LE", referenceType = BpnRequestIdentifier)
+                bpnLReference = BpnReference(referenceValue = "LE123", referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReference(referenceValue = "A111LE", referenceType = BpnRequestIdentifier)
             ),
             site = minValidSite(
-                bpnSReference = BpnReferenceDto(referenceValue = "siteRefValue", referenceType = BpnRequestIdentifier),
+                bpnSReference = BpnReference(referenceValue = "siteRefValue", referenceType = BpnRequestIdentifier),
                 bpnAReference = mainAddressRefValue
             ).copy(
                 mainAddress = minLogisticAddress(mainAddressRefValue).copy(
                     identifiers = listOf(
-                        addressIdentifierDto(mainAddressRefValue.referenceValue, 1L, TypeKeyNameVerboseDto(addressIdentifierTypeDto1.technicalKey, "")),
+                        addressIdentifierDto(mainAddressRefValue.referenceValue, 1L, TypeKeyNameVerbose(addressIdentifierType1.technicalKey, "")),
                     )
                 )
             ),
@@ -1003,7 +1003,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
                 hasChanged = true,
                 mainAddress = createResult[0].businessPartner?.site?.mainAddress?.copy(
                     identifiers = listOf(
-                        addressIdentifierDto(mainAddressRefValue.referenceValue, 1L, TypeKeyNameVerboseDto(addressIdentifierTypeDto1.technicalKey, "")),
+                        addressIdentifierDto(mainAddressRefValue.referenceValue, 1L, TypeKeyNameVerbose(addressIdentifierType1.technicalKey, "")),
                         sameAddressIdentifier,
                     )
                 )
@@ -1018,20 +1018,20 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
     @Test
     fun `update Site with same reference value`() {
 
-        val mainAddressRefValue = BpnReferenceDto(referenceValue = "A222", referenceType = BpnRequestIdentifier)
-        val additionalAddressReference = BpnReferenceDto(referenceValue = "A333", referenceType = BpnRequestIdentifier)
+        val mainAddressRefValue = BpnReference(referenceValue = "A222", referenceType = BpnRequestIdentifier)
+        val additionalAddressReference = BpnReference(referenceValue = "A333", referenceType = BpnRequestIdentifier)
         val createSiteRequest = minFullBusinessPartner().copy(
             legalEntity = minValidLegalEntity(
-                bpnLReference = BpnReferenceDto(referenceValue = "LE123", referenceType = BpnRequestIdentifier),
-                bpnAReference = BpnReferenceDto(referenceValue = "A111LE", referenceType = BpnRequestIdentifier)
+                bpnLReference = BpnReference(referenceValue = "LE123", referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReference(referenceValue = "A111LE", referenceType = BpnRequestIdentifier)
             ),
             site = minValidSite(
-                bpnSReference = BpnReferenceDto(referenceValue = "siteRefValue", referenceType = BpnRequestIdentifier),
+                bpnSReference = BpnReference(referenceValue = "siteRefValue", referenceType = BpnRequestIdentifier),
                 bpnAReference = mainAddressRefValue
             ).copy(
                 mainAddress = minLogisticAddress(mainAddressRefValue).copy(
                     identifiers = listOf(
-                        addressIdentifierDto(mainAddressRefValue.referenceValue, 1L, TypeKeyNameVerboseDto(addressIdentifierTypeDto1.technicalKey, "")),
+                        addressIdentifierDto(mainAddressRefValue.referenceValue, 1L, TypeKeyNameVerbose(addressIdentifierType1.technicalKey, "")),
                     )
                 )
             ),
@@ -1039,7 +1039,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
                 bpnAReference = additionalAddressReference,
             ).copy(
                 identifiers = listOf(
-                    addressIdentifierDto(mainAddressRefValue.referenceValue, 2L, TypeKeyNameVerboseDto(addressIdentifierTypeDto2.technicalKey, "")),
+                    addressIdentifierDto(mainAddressRefValue.referenceValue, 2L, TypeKeyNameVerbose(addressIdentifierType2.technicalKey, "")),
                 )
             )
         )
@@ -1067,11 +1067,11 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         val additionalAddressRefValue = "77"
         val fullBpWithAddress = minFullBusinessPartner().copy(
             legalEntity = minValidLegalEntity(
-                bpnLReference = BpnReferenceDto(referenceValue = leRefValue, referenceType = BpnRequestIdentifier),
-                bpnAReference = BpnReferenceDto(referenceValue = leAddressRefValue, referenceType = BpnRequestIdentifier)
+                bpnLReference = BpnReference(referenceValue = leRefValue, referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReference(referenceValue = leAddressRefValue, referenceType = BpnRequestIdentifier)
             ),
             address = fullLogisticAddressDto(
-                bpnAReference = BpnReferenceDto(referenceValue = additionalAddressRefValue, referenceType = BpnRequestIdentifier)
+                bpnAReference = BpnReference(referenceValue = additionalAddressRefValue, referenceType = BpnRequestIdentifier)
             )
         )
 
@@ -1094,8 +1094,8 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         val fullBpWithLegalEntity = referenceIds.map {
             minFullBusinessPartner().copy(
                 legalEntity = fullValidLegalEntity(
-                    bpnLReference = BpnReferenceDto(referenceValue = "" + it, referenceType = BpnRequestIdentifier),
-                    bpnAReference = BpnReferenceDto(referenceValue = "address" + it, referenceType = BpnRequestIdentifier)
+                    bpnLReference = BpnReference(referenceValue = "" + it, referenceType = BpnRequestIdentifier),
+                    bpnAReference = BpnReference(referenceValue = "address" + it, referenceType = BpnRequestIdentifier)
                 )
             )
         }
@@ -1113,8 +1113,8 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         val fullBpWithLegalEntity2 = referenceIds2.map {
             minFullBusinessPartner().copy(
                 legalEntity = fullValidLegalEntity(
-                    bpnLReference = BpnReferenceDto(referenceValue = "" + it, referenceType = BpnRequestIdentifier),
-                    bpnAReference = BpnReferenceDto(referenceValue = "address" + it, referenceType = BpnRequestIdentifier)
+                    bpnLReference = BpnReference(referenceValue = "" + it, referenceType = BpnRequestIdentifier),
+                    bpnAReference = BpnReference(referenceValue = "address" + it, referenceType = BpnRequestIdentifier)
                 )
             )
         }
@@ -1127,8 +1127,8 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
     @Test
     fun `update legal entity and create legal entity in one request with duplicated identifier`() {
 
-        val leCreateRef1 = BpnReferenceDto(referenceValue = "LE111", referenceType = BpnRequestIdentifier)
-        val leCreateAddressRef1 = BpnReferenceDto(referenceValue = "LE111A22", referenceType = BpnRequestIdentifier)
+        val leCreateRef1 = BpnReference(referenceValue = "LE111", referenceType = BpnRequestIdentifier)
+        val leCreateAddressRef1 = BpnReference(referenceValue = "LE111A22", referenceType = BpnRequestIdentifier)
         val createLegalEntity1 = minFullBusinessPartner().copy(
             legalEntity = minValidLegalEntity(bpnLReference = leCreateRef1, bpnAReference = leCreateAddressRef1).copy(
                 identifiers = listOf(
@@ -1151,8 +1151,8 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
                 legalName = "Changed Legal Entity"
             )
         )
-        val leCreateRef2 = BpnReferenceDto(referenceValue = "LE222", referenceType = BpnRequestIdentifier)
-        val leCreateAddressRef2 = BpnReferenceDto(referenceValue = "LE222A333", referenceType = BpnRequestIdentifier)
+        val leCreateRef2 = BpnReference(referenceValue = "LE222", referenceType = BpnRequestIdentifier)
+        val leCreateAddressRef2 = BpnReference(referenceValue = "LE222A333", referenceType = BpnRequestIdentifier)
         val createLegalEntity2 = minFullBusinessPartner().copy(
             legalEntity = minValidLegalEntity(bpnLReference = leCreateRef2, bpnAReference = leCreateAddressRef2).copy(
                 identifiers = listOf(
@@ -1161,8 +1161,8 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
                 )
             )
         )
-        val updateTask = TaskStepReservationEntryDto(taskId = "TASK_2", businessPartner = updatedFullBpLegalEntity!!)
-        val createTask2 = TaskStepReservationEntryDto(taskId = "TASK_3", businessPartner = createLegalEntity2)
+        val updateTask = TaskStepReservationEntry(taskId = "TASK_2", businessPartner = updatedFullBpLegalEntity!!)
+        val createTask2 = TaskStepReservationEntry(taskId = "TASK_3", businessPartner = createLegalEntity2)
         val createUpdateResult = cleaningStepService.upsertGoldenRecordIntoPool(listOf(updateTask, createTask2))
 
         assertThat(createUpdateResult[0].taskId).isEqualTo("TASK_2")
@@ -1175,10 +1175,10 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
     @Test
     fun `create legal entity and create site in one request with duplicated identifier`() {
 
-        val leCreateRef1 = BpnReferenceDto(referenceValue = "LE111", referenceType = BpnRequestIdentifier)
-        val leCreateAddressRef1 = BpnReferenceDto(referenceValue = "LE111A11", referenceType = BpnRequestIdentifier)
-        val additionalAddressLeRef1 = BpnReferenceDto(referenceValue = "LE111A33", referenceType = BpnRequestIdentifier)
-        val duplicatIdentifier = addressIdentifierDto(leCreateAddressRef1.referenceValue, 1L, TypeKeyNameVerboseDto(addressIdentifierTypeDto1.technicalKey, ""))
+        val leCreateRef1 = BpnReference(referenceValue = "LE111", referenceType = BpnRequestIdentifier)
+        val leCreateAddressRef1 = BpnReference(referenceValue = "LE111A11", referenceType = BpnRequestIdentifier)
+        val additionalAddressLeRef1 = BpnReference(referenceValue = "LE111A33", referenceType = BpnRequestIdentifier)
+        val duplicatIdentifier = addressIdentifierDto(leCreateAddressRef1.referenceValue, 1L, TypeKeyNameVerbose(addressIdentifierType1.technicalKey, ""))
         val createLegalEntity1 = minFullBusinessPartner().copy(
             legalEntity = minValidLegalEntity(bpnLReference = leCreateRef1, bpnAReference = leCreateAddressRef1).copy(
                 legalAddress = minLogisticAddress(leCreateAddressRef1).copy(
@@ -1189,28 +1189,28 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
             ),
             address = minLogisticAddress(additionalAddressLeRef1).copy(
                 identifiers = listOf(
-                    addressIdentifierDto(additionalAddressLeRef1.referenceValue, 2L, TypeKeyNameVerboseDto(addressIdentifierTypeDto1.technicalKey, "")),
+                    addressIdentifierDto(additionalAddressLeRef1.referenceValue, 2L, TypeKeyNameVerbose(addressIdentifierType1.technicalKey, "")),
                 )
             )
         )
 
-        val leCreateRef2 = BpnReferenceDto(referenceValue = "LE222", referenceType = BpnRequestIdentifier)
-        val leCreateAddressRef2 = BpnReferenceDto(referenceValue = "LE222A22", referenceType = BpnRequestIdentifier)
-        val createSiteRef2 = BpnReferenceDto(referenceValue = "SE333", referenceType = BpnRequestIdentifier)
-        val mainAddressRef2 = BpnReferenceDto(referenceValue = "SE333A66", referenceType = BpnRequestIdentifier)
-        val additionalAddressSiteRef2 = BpnReferenceDto(referenceValue = "SE333A88", referenceType = BpnRequestIdentifier)
+        val leCreateRef2 = BpnReference(referenceValue = "LE222", referenceType = BpnRequestIdentifier)
+        val leCreateAddressRef2 = BpnReference(referenceValue = "LE222A22", referenceType = BpnRequestIdentifier)
+        val createSiteRef2 = BpnReference(referenceValue = "SE333", referenceType = BpnRequestIdentifier)
+        val mainAddressRef2 = BpnReference(referenceValue = "SE333A66", referenceType = BpnRequestIdentifier)
+        val additionalAddressSiteRef2 = BpnReference(referenceValue = "SE333A88", referenceType = BpnRequestIdentifier)
         val createSite1 = minFullBusinessPartner().copy(
             legalEntity = minValidLegalEntity(bpnLReference = leCreateRef2, bpnAReference = leCreateAddressRef2).copy(
                 legalAddress = minLogisticAddress(leCreateAddressRef2).copy(
                     identifiers = listOf(
-                        addressIdentifierDto(leCreateAddressRef2.referenceValue, 3L, TypeKeyNameVerboseDto(addressIdentifierTypeDto1.technicalKey, "")),
+                        addressIdentifierDto(leCreateAddressRef2.referenceValue, 3L, TypeKeyNameVerbose(addressIdentifierType1.technicalKey, "")),
                     )
                 )
             ),
             site = minValidSite(bpnSReference = createSiteRef2, bpnAReference = mainAddressRef2).copy(
                 mainAddress = minLogisticAddress(mainAddressRef2).copy(
                     identifiers = listOf(
-                        addressIdentifierDto(mainAddressRef2.referenceValue, 4L, TypeKeyNameVerboseDto(addressIdentifierTypeDto1.technicalKey, "")),
+                        addressIdentifierDto(mainAddressRef2.referenceValue, 4L, TypeKeyNameVerbose(addressIdentifierType1.technicalKey, "")),
                     )
                 )
             ),
@@ -1221,8 +1221,8 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
             )
         )
 
-        val createLegalEntityTask = TaskStepReservationEntryDto(taskId = "TASK_1", businessPartner = createLegalEntity1)
-        val createSiteTask = TaskStepReservationEntryDto(taskId = "TASK_2", businessPartner = createSite1)
+        val createLegalEntityTask = TaskStepReservationEntry(taskId = "TASK_1", businessPartner = createLegalEntity1)
+        val createSiteTask = TaskStepReservationEntry(taskId = "TASK_2", businessPartner = createSite1)
         val createResult = cleaningStepService.upsertGoldenRecordIntoPool(listOf(createLegalEntityTask, createSiteTask))
         assertThat(createResult[0].taskId).isEqualTo("TASK_1")
         assertThat(createResult[1].taskId).isEqualTo("TASK_2")
@@ -1231,26 +1231,26 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         assertThat(createResult[0].errors[0].description).isEqualTo("Duplicate Address Identifier: Value 'value_LE111A11_1' of type 'ADDR_KEY_ONE'")
     }
 
-    fun upsertGoldenRecordIntoPool(taskId: String, businessPartner: BusinessPartnerFullDto): List<TaskStepResultEntryDto> {
+    fun upsertGoldenRecordIntoPool(taskId: String, businessPartner: BusinessPartnerFull): List<TaskStepResultEntry> {
 
         val taskStep = singleTaskStep(taskId = taskId, businessPartner = businessPartner)
         return cleaningStepService.upsertGoldenRecordIntoPool(taskStep)
     }
 
-    fun singleTaskStep(taskId: String, businessPartner: BusinessPartnerFullDto): List<TaskStepReservationEntryDto> {
+    fun singleTaskStep(taskId: String, businessPartner: BusinessPartnerFull): List<TaskStepReservationEntry> {
 
         return listOf(
-            TaskStepReservationEntryDto(
+            TaskStepReservationEntry(
                 taskId = taskId,
                 businessPartner = businessPartner
             )
         )
     }
 
-    fun multipleTaskStep(businessPartners: List<BusinessPartnerFullDto>): List<TaskStepReservationEntryDto> {
+    fun multipleTaskStep(businessPartners: List<BusinessPartnerFull>): List<TaskStepReservationEntry> {
 
         return businessPartners.map {
-            TaskStepReservationEntryDto(
+            TaskStepReservationEntry(
                 taskId = it.legalEntity?.bpnLReference?.referenceValue!!,
                 businessPartner = it
             )
@@ -1259,19 +1259,19 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
     }
 
 
-    fun minFullBusinessPartner(): BusinessPartnerFullDto {
+    fun minFullBusinessPartner(): BusinessPartnerFull {
 
-        return BusinessPartnerFullDto(generic = BusinessPartnerGenericDto())
+        return BusinessPartnerFull(generic = BusinessPartnerGeneric())
     }
 
-    fun emptyLegalEntity(): LegalEntityDto {
+    fun emptyLegalEntity(): LegalEntity {
 
-        return LegalEntityDto()
+        return LegalEntity()
     }
 
-    fun minValidLegalEntity(bpnLReference: BpnReferenceDto, bpnAReference: BpnReferenceDto): LegalEntityDto {
+    fun minValidLegalEntity(bpnLReference: BpnReference, bpnAReference: BpnReference): LegalEntity {
 
-        return LegalEntityDto(
+        return LegalEntity(
             bpnLReference = bpnLReference,
             legalName = "legalName_" + bpnLReference.referenceValue,
             legalAddress = minLogisticAddress(bpnAReference = bpnAReference),
@@ -1279,9 +1279,9 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         )
     }
 
-    fun fullValidLegalEntity(bpnLReference: BpnReferenceDto, bpnAReference: BpnReferenceDto): LegalEntityDto {
+    fun fullValidLegalEntity(bpnLReference: BpnReference, bpnAReference: BpnReference): LegalEntity {
 
-        return LegalEntityDto(
+        return LegalEntity(
             bpnLReference = bpnLReference,
             legalName = "legalName_" + bpnLReference.referenceValue,
             legalShortName = "shortName_" + bpnLReference.referenceValue,
@@ -1303,44 +1303,44 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         )
     }
 
-    fun legalEntityIdentifierDto(name: String, id: Long, type: TypeKeyNameVerboseDto<String>): LegalEntityIdentifierDto {
+    fun legalEntityIdentifierDto(name: String, id: Long, type: TypeKeyNameVerbose<String>): LegalEntityIdentifier {
 
-        return LegalEntityIdentifierDto(
+        return LegalEntityIdentifier(
             value = "value_" + name + "_" + id,
             issuingBody = "issuingBody_" + name + "_" + id,
             type = type.technicalKey
         )
     }
 
-    fun addressIdentifierDto(name: String, id: Long, type: TypeKeyNameVerboseDto<String>): AddressIdentifierDto {
+    fun addressIdentifierDto(name: String, id: Long, type: TypeKeyNameVerbose<String>): AddressIdentifier {
 
-        return AddressIdentifierDto(
+        return AddressIdentifier(
             value = "value_" + name + "_" + id,
             type = type.technicalKey
         )
     }
 
-    fun legalEntityState(name: String, id: Long, type: BusinessStateType): LegalEntityStateDto {
+    fun legalEntityState(name: String, id: Long, type: BusinessStateType): LegalEntityState {
 
-        return LegalEntityStateDto(
+        return LegalEntityState(
             validFrom = LocalDateTime.now().plusDays(id),
             validTo = LocalDateTime.now().plusDays(id + 2),
             type = type
         )
     }
 
-    fun siteState(name: String, id: Long, type: BusinessStateType): SiteStateDto {
+    fun siteState(name: String, id: Long, type: BusinessStateType): SiteState {
 
-        return SiteStateDto(
+        return SiteState(
             validFrom = LocalDateTime.now().plusDays(id),
             validTo = LocalDateTime.now().plusDays(id + 2),
             type = type
         )
     }
 
-    fun addressState(name: String, id: Long, type: BusinessStateType): AddressStateDto {
+    fun addressState(name: String, id: Long, type: BusinessStateType): AddressState {
 
-        return AddressStateDto(
+        return AddressState(
             validFrom = LocalDateTime.now().plusDays(id),
             validTo = LocalDateTime.now().plusDays(id + 2),
             type = type
@@ -1348,51 +1348,51 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
     }
 
 
-    fun classificationDto(name: String, id: Long, type: ClassificationType): LegalEntityClassificationDto {
+    fun classificationDto(name: String, id: Long, type: ClassificationType): LegalEntityClassification {
 
-        return LegalEntityClassificationDto(
+        return LegalEntityClassification(
             code = "code_" + name + "_" + id,
             value = "value_" + name + "_" + id,
             type = type
         )
     }
 
-    fun minLogisticAddress(bpnAReference: BpnReferenceDto): LogisticAddressDto {
+    fun minLogisticAddress(bpnAReference: BpnReference): LogisticAddress {
 
-        return LogisticAddressDto(
+        return LogisticAddress(
             bpnAReference = bpnAReference,
             physicalPostalAddress = minPhysicalPostalAddressDto(bpnAReference),
             confidenceCriteria = fullConfidenceCriteria()
         )
     }
 
-    private fun minPhysicalPostalAddressDto(bpnAReference: BpnReferenceDto) = PhysicalPostalAddressDto(
+    private fun minPhysicalPostalAddressDto(bpnAReference: BpnReference) = PhysicalPostalAddress(
         country = CountryCode.DE,
         city = "City_" + bpnAReference.referenceValue
     )
 
-    fun fullLogisticAddressDto(bpnAReference: BpnReferenceDto): LogisticAddressDto {
+    fun fullLogisticAddressDto(bpnAReference: BpnReference): LogisticAddress {
 
-        return LogisticAddressDto(
+        return LogisticAddress(
             bpnAReference = bpnAReference,
             name = "name_" + bpnAReference.referenceValue,
             identifiers = listOf(
-                addressIdentifierDto(bpnAReference.referenceValue, 1L, TypeKeyNameVerboseDto(addressIdentifierTypeDto1.technicalKey, "")),
-                addressIdentifierDto(bpnAReference.referenceValue, 2L, TypeKeyNameVerboseDto(addressIdentifierTypeDto2.technicalKey, ""))
+                addressIdentifierDto(bpnAReference.referenceValue, 1L, TypeKeyNameVerbose(addressIdentifierType1.technicalKey, "")),
+                addressIdentifierDto(bpnAReference.referenceValue, 2L, TypeKeyNameVerbose(addressIdentifierType2.technicalKey, ""))
             ),
             states = listOf(
                 addressState(bpnAReference.referenceValue, 1L, BusinessStateType.ACTIVE),
                 addressState(bpnAReference.referenceValue, 2L, BusinessStateType.INACTIVE)
             ),
-            physicalPostalAddress = PhysicalPostalAddressDto(
-                geographicCoordinates = GeoCoordinateDto(longitude = 1.1f, latitude = 2.2f, altitude = 3.3f),
+            physicalPostalAddress = PhysicalPostalAddress(
+                geographicCoordinates = GeoCoordinate(longitude = 1.1f, latitude = 2.2f, altitude = 3.3f),
                 country = CountryCode.DE,
                 administrativeAreaLevel1 = "AD-07",
                 administrativeAreaLevel2 = "adminArea2_" + bpnAReference.referenceValue,
                 administrativeAreaLevel3 = "adminArea3_" + bpnAReference.referenceValue,
                 postalCode = "postalCode_" + bpnAReference.referenceValue,
                 city = "city_" + bpnAReference.referenceValue,
-                street = StreetDto(
+                street = Street(
                     name = "name_" + bpnAReference.referenceValue,
                     houseNumber = "houseNumber_" + bpnAReference.referenceValue,
                     houseNumberSupplement = "houseNumberSupplement_" + bpnAReference.referenceValue,
@@ -1410,8 +1410,8 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
                 floor = "floor_" + bpnAReference.referenceValue,
                 door = "door_" + bpnAReference.referenceValue,
             ),
-            alternativePostalAddress = AlternativePostalAddressDto(
-                geographicCoordinates = GeoCoordinateDto(longitude = 12.3f, latitude = 4.56f, altitude = 7.89f),
+            alternativePostalAddress = AlternativePostalAddress(
+                geographicCoordinates = GeoCoordinate(longitude = 12.3f, latitude = 4.56f, altitude = 7.89f),
                 country = CountryCode.DE,
                 administrativeAreaLevel1 = "DE-BW",
                 postalCode = "alternate_postalCode_" + bpnAReference.referenceValue,
@@ -1424,9 +1424,9 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         )
     }
 
-    fun minValidSite(bpnSReference: BpnReferenceDto, bpnAReference: BpnReferenceDto): SiteDto {
+    fun minValidSite(bpnSReference: BpnReference, bpnAReference: BpnReference): Site {
 
-        return SiteDto(
+        return Site(
             bpnSReference = bpnSReference,
             name = "siteName_" + bpnSReference.referenceValue,
             mainAddress = minLogisticAddress(bpnAReference = bpnAReference),
@@ -1434,9 +1434,9 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         )
     }
 
-    fun fullValidSite(bpnSReference: BpnReferenceDto, bpnAReference: BpnReferenceDto): SiteDto {
+    fun fullValidSite(bpnSReference: BpnReference, bpnAReference: BpnReference): Site {
 
-        return SiteDto(
+        return Site(
             bpnSReference = bpnSReference,
             name = "siteName_" + bpnSReference.referenceValue,
             states = listOf(
@@ -1448,7 +1448,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
     }
 
     fun fullConfidenceCriteria() =
-        ConfidenceCriteriaDto(
+        ConfidenceCriteria(
             sharedByOwner = true,
             numberOfBusinessPartners = 1,
             checkedByExternalDataSource = true,
@@ -1457,7 +1457,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
             confidenceLevel = 10
         )
 
-    fun assertTaskError(step: TaskStepResultEntryDto, taskId: String, error: CleaningError) {
+    fun assertTaskError(step: TaskStepResultEntry, taskId: String, error: CleaningError) {
 
         assertThat(step.taskId).isEqualTo(taskId)
         assertThat(step.errors.size).isEqualTo(1)
@@ -1465,7 +1465,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
 
     }
 
-    fun compareLegalEntity(verboseRequest: LegalEntityWithLegalAddressVerboseDto, legalEntity: LegalEntityDto?) {
+    fun compareLegalEntity(verboseRequest: LegalEntityWithLegalAddressVerboseResponse, legalEntity: LegalEntity?) {
 
         val verboseLegalEntity = verboseRequest.legalEntity
 
@@ -1481,7 +1481,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         compareLogisticAddress(verboseLegalAddress, legalEntity?.legalAddress)
     }
 
-    fun compareSite(verboseRequest: SiteWithMainAddressVerboseDto, site: SiteDto?) {
+    fun compareSite(verboseRequest: SiteWithMainAddressVerboseResponse, site: Site?) {
 
         val verboseSite = verboseRequest.site
 
@@ -1496,7 +1496,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         compareLogisticAddress(verboseMainAddress, mainAddress)
     }
 
-    private fun compareLogisticAddress(verboseAddress: LogisticAddressVerboseDto, address: LogisticAddressDto?) {
+    private fun compareLogisticAddress(verboseAddress: LogisticAddressVerbose, address: LogisticAddress?) {
 
         assertThat(verboseAddress.name).isEqualTo(address?.name)
         compareAddressStates(verboseAddress.states, address?.states)
@@ -1506,7 +1506,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         val verbosePhysicalAddress = verboseAddress.physicalPostalAddress
         val physicalAddress = address?.physicalPostalAddress
         assertThat(verbosePhysicalAddress).usingRecursiveComparison()
-            .ignoringFields(PhysicalPostalAddressVerboseDto::countryVerbose.name, PhysicalPostalAddressVerboseDto::administrativeAreaLevel1Verbose.name)
+            .ignoringFields(PhysicalPostalAddressVerbose::countryVerbose.name, PhysicalPostalAddressVerbose::administrativeAreaLevel1Verbose.name)
             .isEqualTo(physicalAddress)
         assertThat(verbosePhysicalAddress.country.name).isEqualTo(physicalAddress?.country?.name)
         assertThat(verbosePhysicalAddress.administrativeAreaLevel1).isEqualTo(physicalAddress?.administrativeAreaLevel1)
@@ -1519,7 +1519,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         assertThat(verboseAlternAddress?.administrativeAreaLevel1).isEqualTo(alternAddress?.administrativeAreaLevel1)
     }
 
-    fun compareAddressStates(statesVerbose: Collection<AddressStateVerboseDto>, states: Collection<AddressStateDto>?) {
+    fun compareAddressStates(statesVerbose: Collection<AddressStateVerbose>, states: Collection<AddressState>?) {
 
         assertThat(statesVerbose.size).isEqualTo(states?.size ?: 0)
         val sortedVerboseStates = statesVerbose.sortedBy { it.validFrom }
@@ -1527,13 +1527,13 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         sortedVerboseStates.indices.forEach {
             assertThat(sortedVerboseStates[it].typeVerbose.technicalKey.name).isEqualTo(sortedStates!![it].type.name)
             assertThat(sortedVerboseStates[it]).usingRecursiveComparison()
-                .withEqualsForFields(isEqualToIgnoringMilliseconds(), AddressStateVerboseDto::validTo.name)
-                .withEqualsForFields(isEqualToIgnoringMilliseconds(), AddressStateVerboseDto::validFrom.name)
-                .ignoringFields(AddressStateVerboseDto::typeVerbose.name).isEqualTo(sortedStates[it])
+                .withEqualsForFields(isEqualToIgnoringMilliseconds(), AddressStateVerbose::validTo.name)
+                .withEqualsForFields(isEqualToIgnoringMilliseconds(), AddressStateVerbose::validFrom.name)
+                .ignoringFields(AddressStateVerbose::typeVerbose.name).isEqualTo(sortedStates[it])
         }
     }
 
-    fun compareAddressIdentifiers(identifiersVerbose: Collection<AddressIdentifierVerboseDto>, identifiers: Collection<AddressIdentifierDto>?) {
+    fun compareAddressIdentifiers(identifiersVerbose: Collection<AddressIdentifierVerbose>, identifiers: Collection<AddressIdentifier>?) {
 
         assertThat(identifiersVerbose.size).isEqualTo(identifiers?.size ?: 0)
         val sortedVerboseIdentifiers = identifiersVerbose.sortedBy { it.typeVerbose.name }
@@ -1541,12 +1541,12 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         sortedVerboseIdentifiers.indices.forEach {
             assertThat(sortedVerboseIdentifiers[it].typeVerbose.technicalKey).isEqualTo(sortedIdentifiers[it].type)
             assertThat(sortedVerboseIdentifiers[it]).usingRecursiveComparison()
-                .ignoringFields(AddressIdentifierVerboseDto::typeVerbose.name)
+                .ignoringFields(AddressIdentifierVerbose::typeVerbose.name)
                 .isEqualTo(sortedIdentifiers[it])
         }
     }
 
-    fun compareStates(statesVerbose: Collection<LegalEntityStateVerboseDto>, states: Collection<ILegalEntityStateDto>?) {
+    fun compareStates(statesVerbose: Collection<LegalEntityStateVerbose>, states: Collection<ILegalEntityState>?) {
 
         assertThat(statesVerbose.size).isEqualTo(states?.size ?: 0)
         val sortedVerboseStates = statesVerbose.sortedBy { it.validFrom }
@@ -1554,14 +1554,14 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         sortedVerboseStates.indices.forEach {
             assertThat(sortedVerboseStates[it].typeVerbose.technicalKey.name).isEqualTo(sortedStates[it].type.name)
             assertThat(sortedVerboseStates[it]).usingRecursiveComparison()
-                .withEqualsForFields(isEqualToIgnoringMilliseconds(), LegalEntityStateVerboseDto::validTo.name )
-                .withEqualsForFields(isEqualToIgnoringMilliseconds(), LegalEntityStateVerboseDto::validFrom.name)
-                .ignoringFields(LegalEntityStateVerboseDto::typeVerbose.name)
+                .withEqualsForFields(isEqualToIgnoringMilliseconds(), LegalEntityStateVerbose::validTo.name)
+                .withEqualsForFields(isEqualToIgnoringMilliseconds(), LegalEntityStateVerbose::validFrom.name)
+                .ignoringFields(LegalEntityStateVerbose::typeVerbose.name)
                 .isEqualTo(sortedStates[it])
         }
     }
 
-    fun compareSiteStates(statesVerbose: Collection<SiteStateVerboseDto>, states: Collection<ISiteStateDto>?) {
+    fun compareSiteStates(statesVerbose: Collection<SiteStateVerbose>, states: Collection<ISiteState>?) {
 
         assertThat(statesVerbose.size).isEqualTo(states?.size ?: 0)
         val sortedVerboseStates = statesVerbose.sortedBy { it.validFrom }
@@ -1569,9 +1569,9 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         sortedVerboseStates.indices.forEach {
             assertThat(sortedVerboseStates[it].typeVerbose.technicalKey.name).isEqualTo(sortedStates[it].type.name)
             assertThat(sortedVerboseStates[it]).usingRecursiveComparison()
-                .withEqualsForFields(isEqualToIgnoringMilliseconds(), SiteStateVerboseDto::validTo.name)
-                .withEqualsForFields(isEqualToIgnoringMilliseconds(), SiteStateVerboseDto::validFrom.name)
-                .ignoringFields(SiteStateVerboseDto::typeVerbose.name)
+                .withEqualsForFields(isEqualToIgnoringMilliseconds(), SiteStateVerbose::validTo.name)
+                .withEqualsForFields(isEqualToIgnoringMilliseconds(), SiteStateVerbose::validFrom.name)
+                .ignoringFields(SiteStateVerbose::typeVerbose.name)
                 .isEqualTo(sortedStates[it])
         }
     }
@@ -1584,8 +1584,8 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
     }
 
     fun compareClassifications(
-        classificationsVerbose: Collection<LegalEntityClassificationVerboseDto>,
-        classifications: Collection<LegalEntityClassificationDto>?
+        classificationsVerbose: Collection<LegalEntityClassificationVerbose>,
+        classifications: Collection<LegalEntityClassification>?
     ) {
 
         assertThat(classificationsVerbose.size).isEqualTo(classifications?.size ?: 0)
@@ -1594,12 +1594,12 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         sortedVerboseClassifications.indices.forEach {
             assertThat(sortedVerboseClassifications[it].typeVerbose.technicalKey.name).isEqualTo(sortedClassifications[it].type.name)
             assertThat(sortedVerboseClassifications[it]).usingRecursiveComparison()
-                .ignoringFields(LegalEntityClassificationVerboseDto::typeVerbose.name)
+                .ignoringFields(LegalEntityClassificationVerbose::typeVerbose.name)
                 .isEqualTo(sortedClassifications[it])
         }
     }
 
-    fun compareIdentifiers(identifiersVerbose: Collection<LegalEntityIdentifierVerboseDto>, identifiers: Collection<LegalEntityIdentifierDto>?) {
+    fun compareIdentifiers(identifiersVerbose: Collection<LegalEntityIdentifierVerbose>, identifiers: Collection<LegalEntityIdentifier>?) {
 
         assertThat(identifiersVerbose.size).isEqualTo(identifiers?.size ?: 0)
         val sortedVerboseIdentifiers = identifiersVerbose.sortedBy { it.typeVerbose.name }
@@ -1607,7 +1607,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         sortedVerboseIdentifiers.indices.forEach {
             assertThat(sortedVerboseIdentifiers[it].typeVerbose.technicalKey).isEqualTo(sortedIdentifiers[it].type)
             assertThat(sortedVerboseIdentifiers[it]).usingRecursiveComparison()
-                .ignoringFields(LegalEntityIdentifierVerboseDto::typeVerbose.name).isEqualTo(sortedIdentifiers[it])
+                .ignoringFields(LegalEntityIdentifierVerbose::typeVerbose.name).isEqualTo(sortedIdentifiers[it])
         }
     }
 

@@ -26,9 +26,9 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierType
+import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerbose
+import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerbose
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteBpnSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.util.*
@@ -120,7 +120,7 @@ class SiteControllerIT @Autowired constructor(
         val siteSearchRequest = SiteBpnSearchRequest(emptyList(), listOf(bpnS1, bpnS2))
         val searchResult = poolClient.sites.searchSites(siteSearchRequest, PaginationRequest())
 
-        val expectedSiteWithReference1 = SiteWithMainAddressVerboseDto(
+        val expectedSiteWithReference1 = SiteWithMainAddressVerboseResponse(
             site = BusinessPartnerVerboseValues.site1.copy(bpnLegalEntity = bpnL),
             mainAddress = BusinessPartnerVerboseValues.addressPartner1.copy(
                 isMainAddress = true,
@@ -128,7 +128,7 @@ class SiteControllerIT @Autowired constructor(
                 bpnSite = BusinessPartnerVerboseValues.site1.bpns
             )
         )
-        val expectedSiteWithReference2 = SiteWithMainAddressVerboseDto(
+        val expectedSiteWithReference2 = SiteWithMainAddressVerboseResponse(
             site = BusinessPartnerVerboseValues.site2.copy(bpnLegalEntity = bpnL),
             mainAddress = BusinessPartnerVerboseValues.addressPartner2.copy(
                 isMainAddress = true,
@@ -140,7 +140,7 @@ class SiteControllerIT @Autowired constructor(
         assertHelpers.assertRecursively(searchResult.content)
             .ignoringFieldsOfTypes(Instant::class.java)
             .ignoringFields(
-                SiteWithMainAddressVerboseDto::mainAddress.name + "." + LogisticAddressVerboseDto::bpna.name,
+                SiteWithMainAddressVerboseResponse::mainAddress.name + "." + LogisticAddressVerbose::bpna.name,
             )
             .isEqualTo(listOf(expectedSiteWithReference1, expectedSiteWithReference2))
     }
@@ -175,7 +175,7 @@ class SiteControllerIT @Autowired constructor(
         val searchResult = poolClient.sites.searchSites(siteSearchRequest, PaginationRequest())
 
         val expectedSiteWithReference1 =
-            SiteWithMainAddressVerboseDto(
+            SiteWithMainAddressVerboseResponse(
                 site = BusinessPartnerVerboseValues.site1.copy(bpnLegalEntity = bpnL1),
                 mainAddress = BusinessPartnerVerboseValues.addressPartner1.copy(
                     isMainAddress = true,
@@ -184,7 +184,7 @@ class SiteControllerIT @Autowired constructor(
                 )
             )
         val expectedSiteWithReference2 =
-            SiteWithMainAddressVerboseDto(
+            SiteWithMainAddressVerboseResponse(
                 site = BusinessPartnerVerboseValues.site2.copy(bpnLegalEntity = bpnL1),
                 mainAddress = BusinessPartnerVerboseValues.addressPartner2.copy(
                     isMainAddress = true,
@@ -193,7 +193,7 @@ class SiteControllerIT @Autowired constructor(
                 )
             )
         val expectedSiteWithReference3 =
-            SiteWithMainAddressVerboseDto(
+            SiteWithMainAddressVerboseResponse(
                 site = BusinessPartnerVerboseValues.site3.copy(bpnLegalEntity = bpnL2),
                 mainAddress = BusinessPartnerVerboseValues.addressPartner3.copy(
                     isMainAddress = true,
@@ -205,7 +205,7 @@ class SiteControllerIT @Autowired constructor(
         assertHelpers.assertRecursively(searchResult.content)
             .ignoringFieldsOfTypes(Instant::class.java)
             .ignoringFields(
-                SiteWithMainAddressVerboseDto::mainAddress.name + "." + LogisticAddressVerboseDto::bpna.name,
+                SiteWithMainAddressVerboseResponse::mainAddress.name + "." + LogisticAddressVerbose::bpna.name,
             )
             .isEqualTo(listOf(expectedSiteWithReference1, expectedSiteWithReference2, expectedSiteWithReference3))
     }
@@ -248,7 +248,7 @@ class SiteControllerIT @Autowired constructor(
     @Test
     fun `create sites entities and get duplicate identifier error on address`() {
         poolClient.metadata.createIdentifierType(
-            IdentifierTypeDto(
+            IdentifierType(
                 technicalKey = BusinessPartnerNonVerboseValues.addressIdentifier.type,
                 businessPartnerType = IdentifierBusinessPartnerType.ADDRESS, name = BusinessPartnerNonVerboseValues.addressIdentifier.value
             )
@@ -303,7 +303,7 @@ class SiteControllerIT @Autowired constructor(
     fun `update site entities and get duplicate identifier error`() {
 
         poolClient.metadata.createIdentifierType(
-            IdentifierTypeDto(
+            IdentifierType(
                 technicalKey = BusinessPartnerNonVerboseValues.addressIdentifier.type,
                 businessPartnerType = IdentifierBusinessPartnerType.ADDRESS, name = BusinessPartnerNonVerboseValues.addressIdentifier.value
             )
@@ -549,7 +549,7 @@ class SiteControllerIT @Autowired constructor(
 
         val bpnL1 = createdStructures[0].legalEntity.legalEntity.bpnl
 
-        val legalAddress1: LogisticAddressVerboseDto =
+        val legalAddress1: LogisticAddressVerbose =
             BusinessPartnerVerboseValues.addressPartner1.copy(
                 isMainAddress = true,
                 addressType = AddressType.SiteMainAddress,
@@ -558,7 +558,7 @@ class SiteControllerIT @Autowired constructor(
             )
         val site1 = BusinessPartnerVerboseValues.site1.copy(bpnLegalEntity = bpnL1)
 
-        val legalAddress2: LogisticAddressVerboseDto =
+        val legalAddress2: LogisticAddressVerbose =
             BusinessPartnerVerboseValues.addressPartner2.copy(
                 isMainAddress = true,
                 addressType = AddressType.SiteMainAddress,
@@ -569,8 +569,8 @@ class SiteControllerIT @Autowired constructor(
 
         val expectedFirstPage = PageDto(
             2, 1, 0, 2, listOf(
-                SiteMatchVerboseDto(mainAddress = legalAddress1, site = site1),
-                SiteMatchVerboseDto(mainAddress = legalAddress2, site = site2)
+                SiteMatchVerboseResponse(mainAddress = legalAddress1, site = site1),
+                SiteMatchVerboseResponse(mainAddress = legalAddress2, site = site2)
             )
         )
 
@@ -580,16 +580,16 @@ class SiteControllerIT @Autowired constructor(
 
     }
 
-    private fun assertThatCreatedSitesEqual(actuals: Collection<SitePartnerCreateVerboseDto>, expected: Collection<SitePartnerCreateVerboseDto>) {
+    private fun assertThatCreatedSitesEqual(actuals: Collection<SitePartnerCreateVerboseResponse>, expected: Collection<SitePartnerCreateVerboseResponse>) {
         actuals.forEach { assertThat(it.site.bpns).matches(testHelpers.bpnSPattern) }
 
         assertHelpers.assertRecursively(actuals)
             .ignoringFields(
-                SitePartnerCreateVerboseDto::site.name + "." + SiteVerboseDto::bpns.name,
-                SitePartnerCreateVerboseDto::site.name + "." + SiteVerboseDto::bpnLegalEntity.name,
-                SitePartnerCreateVerboseDto::mainAddress.name + "." + LogisticAddressVerboseDto::bpna.name,
-                SitePartnerCreateVerboseDto::mainAddress.name + "." + LogisticAddressVerboseDto::bpnSite.name,
-                SitePartnerCreateVerboseDto::index.name
+                SitePartnerCreateVerboseResponse::site.name + "." + SiteVerbose::bpns.name,
+                SitePartnerCreateVerboseResponse::site.name + "." + SiteVerbose::bpnLegalEntity.name,
+                SitePartnerCreateVerboseResponse::mainAddress.name + "." + LogisticAddressVerbose::bpna.name,
+                SitePartnerCreateVerboseResponse::mainAddress.name + "." + LogisticAddressVerbose::bpnSite.name,
+                SitePartnerCreateVerboseResponse::index.name
             )
             .isEqualTo(expected)
     }

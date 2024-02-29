@@ -26,14 +26,14 @@ import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityDescription
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateOutputChildRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityDto
+import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntity
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(description = LegalEntityDescription.headerUpsertRequest)
 data class LegalEntityGateOutputRequest(
 
     @field:JsonUnwrapped
-    val legalEntity: LegalEntityDto,
+    val legalEntity: LegalEntity,
 
     // TODO OpenAPI description for complex field does not work!!
     @get:Schema(description = LegalEntityDescription.legalAddress)

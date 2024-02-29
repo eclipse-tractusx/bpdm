@@ -138,27 +138,26 @@ class CleaningServiceDummyTest @Autowired constructor(
     }
 
     // Helper method to create a sample TaskStepReservationResponse
-    private fun createSampleTaskStepReservationResponse(businessPartnerGenericDto: BusinessPartnerGenericDto): TaskStepReservationResponse {
-        val fullDto = BusinessPartnerFullDto(businessPartnerGenericDto)
-        return TaskStepReservationResponse(listOf(TaskStepReservationEntryDto(UUID.randomUUID().toString(), fullDto)), Instant.MIN)
+    private fun createSampleTaskStepReservationResponse(businessPartnerGenericDto: BusinessPartnerGeneric): TaskStepReservationResponse {
+        val fullDto = BusinessPartnerFull(businessPartnerGenericDto)
+        return TaskStepReservationResponse(listOf(TaskStepReservationEntry(UUID.randomUUID().toString(), fullDto)), Instant.MIN)
     }
 
 
-
-    private fun assertLegalEntitiesEqual(actual: LegalEntityDto?, expected: LegalEntityDto) =
+    private fun assertLegalEntitiesEqual(actual: LegalEntity?, expected: LegalEntity) =
         assertHelpers.assertRecursively(actual)
-            .ignoringFields(LegalEntityDto::bpnLReference.name)
-            .ignoringFields("${LegalEntityDto::legalAddress.name}.${LogisticAddressDto::bpnAReference.name}")
+            .ignoringFields(LegalEntity::bpnLReference.name)
+            .ignoringFields("${LegalEntity::legalAddress.name}.${LogisticAddress::bpnAReference.name}")
             .isEqualTo(expected)
 
-    private fun assertSitesEqual(actual: SiteDto?, expected: SiteDto) =
+    private fun assertSitesEqual(actual: Site?, expected: Site) =
         assertHelpers.assertRecursively(actual)
-            .ignoringFields(SiteDto::bpnSReference.name)
-            .ignoringFields("${SiteDto::mainAddress.name}.${LogisticAddressDto::bpnAReference.name}")
+            .ignoringFields(Site::bpnSReference.name)
+            .ignoringFields("${Site::mainAddress.name}.${LogisticAddress::bpnAReference.name}")
             .isEqualTo(expected)
 
-    private fun assertAddressesEqual(actual: LogisticAddressDto?, expected: LogisticAddressDto) =
+    private fun assertAddressesEqual(actual: LogisticAddress?, expected: LogisticAddress) =
         assertHelpers.assertRecursively(actual)
-            .ignoringFields(LogisticAddressDto::bpnAReference.name)
+            .ignoringFields(LogisticAddress::bpnAReference.name)
             .isEqualTo(expected)
 }

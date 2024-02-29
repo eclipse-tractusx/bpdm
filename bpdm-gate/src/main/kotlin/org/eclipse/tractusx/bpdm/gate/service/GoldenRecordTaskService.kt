@@ -172,7 +172,7 @@ class GoldenRecordTaskService(
         logger.info { "Created ${tasks.size} new golden record tasks from pool updates" }
     }
 
-    private fun createGoldenRecordTasks(mode: TaskMode, orchestratorBusinessPartnersDto: List<BusinessPartnerGenericDto>): List<TaskClientStateDto> {
+    private fun createGoldenRecordTasks(mode: TaskMode, orchestratorBusinessPartnersDto: List<BusinessPartnerGeneric>): List<TaskClientState> {
         if (orchestratorBusinessPartnersDto.isEmpty())
             return emptyList()
 

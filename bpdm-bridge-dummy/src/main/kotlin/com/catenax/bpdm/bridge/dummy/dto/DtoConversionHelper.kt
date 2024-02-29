@@ -21,31 +21,31 @@ package com.catenax.bpdm.bridge.dummy.dto
 
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateOutputChildRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.SiteGate
 import org.eclipse.tractusx.bpdm.pool.api.model.*
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddress
 import java.time.LocalDateTime
 import kotlin.reflect.KProperty
-import org.eclipse.tractusx.bpdm.gate.api.model.AddressIdentifierDto as Gate_AddressIdentifierDto
-import org.eclipse.tractusx.bpdm.gate.api.model.AddressStateDto as Gate_AddressStateDto
-import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityClassificationDto as Gate_LegalEntityClassificationDto
-import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityDto as Gate_LegalEntityDto
-import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityIdentifierDto as Gate_LegalEntityIdentifierDto
-import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityStateDto as Gate_LegalEntityStateDto
-import org.eclipse.tractusx.bpdm.gate.api.model.LogisticAddressDto as Gate_LogisticAddressDto
-import org.eclipse.tractusx.bpdm.gate.api.model.PhysicalPostalAddressDto as Gate_PhysicalPostalAddressDto
-import org.eclipse.tractusx.bpdm.gate.api.model.SiteStateDto as Gate_SiteStateDto
-import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto as Pool_AddressIdentifierDto
-import org.eclipse.tractusx.bpdm.pool.api.model.AddressStateDto as Pool_AddressStateDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityClassificationDto as Pool_LegalEntityClassificationDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityDto as Pool_LegalEntityDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityIdentifierDto as Pool_LegalEntityIdentifierDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityStateDto as Pool_LegalEntityStateDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto as Pool_LogisticAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.PhysicalPostalAddressDto as Pool_PhysicalPostalAddressDto1
-import org.eclipse.tractusx.bpdm.pool.api.model.SiteStateDto as Pool_SiteStateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.AddressIdentifier as Gate_AddressIdentifierDto
+import org.eclipse.tractusx.bpdm.gate.api.model.AddressState as Gate_AddressStateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntity as Gate_LegalEntityDto
+import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityClassification as Gate_LegalEntityClassificationDto
+import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityIdentifier as Gate_LegalEntityIdentifierDto
+import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityState as Gate_LegalEntityStateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.LogisticAddress as Gate_LogisticAddressDto
+import org.eclipse.tractusx.bpdm.gate.api.model.PhysicalPostalAddress as Gate_PhysicalPostalAddressDto
+import org.eclipse.tractusx.bpdm.gate.api.model.SiteState as Gate_SiteStateDto
+import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifier as Pool_AddressIdentifierDto
+import org.eclipse.tractusx.bpdm.pool.api.model.AddressState as Pool_AddressStateDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntity as Pool_LegalEntityDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityClassification as Pool_LegalEntityClassificationDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityIdentifier as Pool_LegalEntityIdentifierDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityState as Pool_LegalEntityStateDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerbose as Pool_LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.PhysicalPostalAddress as Pool_PhysicalPostalAddressDto1
+import org.eclipse.tractusx.bpdm.pool.api.model.SiteState as Pool_SiteStateDto
 
-val dummyConfidenceCriteria = ConfidenceCriteriaDto(
+val dummyConfidenceCriteria = ConfidenceCriteria(
     sharedByOwner = false,
     numberOfBusinessPartners = 1,
     checkedByExternalDataSource = false,
@@ -98,8 +98,8 @@ fun gateToPoolSiteState(gateDto: Gate_SiteStateDto): Pool_SiteStateDto {
     )
 }
 
-fun gateToPoolLogisticAddress(gateDto: Gate_LogisticAddressDto): LogisticAddressDto {
-    return LogisticAddressDto(
+fun gateToPoolLogisticAddress(gateDto: Gate_LogisticAddressDto): LogisticAddress {
+    return LogisticAddress(
         name = gateDto.nameParts.firstOrNull(),
         states = gateDto.states.map(::gateToPoolAddressState),
         identifiers = gateDto.identifiers.map(::gateToPoolAddressIdentifier),
@@ -124,23 +124,23 @@ fun gateToPoolAddressIdentifier(gateDto: Gate_AddressIdentifierDto): Pool_Addres
     )
 }
 
-fun gateToPoolAlternativeAddress(gateDto: org.eclipse.tractusx.bpdm.gate.api.model.AlternativePostalAddressDto): AlternativePostalAddressDto {
+fun gateToPoolAlternativeAddress(gateDto: org.eclipse.tractusx.bpdm.gate.api.model.AlternativePostalAddress): AlternativePostalAddress {
     fun buildNullMappingException(nullField: KProperty<*>) =
-        BpdmNullMappingException(AlternativePostalAddressDto::class, AlternativePostalAddressDto::class, nullField)
+        BpdmNullMappingException(AlternativePostalAddress::class, AlternativePostalAddress::class, nullField)
 
-    return AlternativePostalAddressDto(
+    return AlternativePostalAddress(
         geographicCoordinates = gateDto.geographicCoordinates,
         country = gateDto.country
-            ?: throw buildNullMappingException(AlternativePostalAddressDto::country),
+            ?: throw buildNullMappingException(AlternativePostalAddress::country),
         administrativeAreaLevel1 = gateDto.administrativeAreaLevel1,
         postalCode = gateDto.postalCode,
         city = gateDto.city
-            ?: throw buildNullMappingException(AlternativePostalAddressDto::city),
+            ?: throw buildNullMappingException(AlternativePostalAddress::city),
         deliveryServiceType = gateDto.deliveryServiceType
-            ?: throw buildNullMappingException(AlternativePostalAddressDto::deliveryServiceType),
+            ?: throw buildNullMappingException(AlternativePostalAddress::deliveryServiceType),
         deliveryServiceQualifier = gateDto.deliveryServiceQualifier,
         deliveryServiceNumber = gateDto.deliveryServiceNumber
-            ?: throw buildNullMappingException(AlternativePostalAddressDto::deliveryServiceNumber)
+            ?: throw buildNullMappingException(AlternativePostalAddress::deliveryServiceNumber)
     )
 }
 
@@ -164,7 +164,7 @@ fun gateToPoolPhysicalAddress(gateDto: Gate_PhysicalPostalAddressDto): Pool_Phys
         building = gateDto.building,
         floor = gateDto.floor,
         door = gateDto.door,
-        street = StreetDto(
+        street = Street(
             name = gateDto.street?.name,
             houseNumber = gateDto.street?.houseNumber,
             milestone = gateDto.street?.milestone,
@@ -179,7 +179,7 @@ fun gateToPoolPhysicalAddress(gateDto: Gate_PhysicalPostalAddressDto): Pool_Phys
 }
 
 
-fun poolToGateLegalEntity(legalEntity: LegalEntityVerboseDto): Gate_LegalEntityDto {
+fun poolToGateLegalEntity(legalEntity: LegalEntityVerbose): Gate_LegalEntityDto {
     val identifiers = legalEntity.identifiers.map {
         Gate_LegalEntityIdentifierDto(
             value = it.value,
@@ -212,7 +212,7 @@ fun poolToGateLegalEntity(legalEntity: LegalEntityVerboseDto): Gate_LegalEntityD
     )
 }
 
-fun poolToGateSite(site: SiteVerboseDto): SiteGateDto {
+fun poolToGateSite(site: SiteVerbose): SiteGate {
     val states = site.states.map {
         Gate_SiteStateDto(
             description = null,
@@ -221,7 +221,7 @@ fun poolToGateSite(site: SiteVerboseDto): SiteGateDto {
             type = it.typeVerbose.technicalKey
         )
     }
-    return SiteGateDto(
+    return SiteGate(
         nameParts = listOfNotNull(site.name),
         states = states
     )
@@ -258,9 +258,9 @@ fun poolToGateLogisticAddress(address: Pool_LogisticAddressVerboseDto): Gate_Log
     )
 }
 
-private fun poolToGatePhysicalAddress(address: PhysicalPostalAddressVerboseDto): Gate_PhysicalPostalAddressDto {
+private fun poolToGatePhysicalAddress(address: PhysicalPostalAddressVerbose): Gate_PhysicalPostalAddressDto {
     val street = address.street?.let {
-        org.eclipse.tractusx.bpdm.gate.api.model.StreetDto(
+        org.eclipse.tractusx.bpdm.gate.api.model.Street(
             name = it.name,
             houseNumber = it.houseNumber,
             milestone = it.milestone,
@@ -285,8 +285,8 @@ private fun poolToGatePhysicalAddress(address: PhysicalPostalAddressVerboseDto):
     )
 }
 
-private fun poolToGateAlternativeAddress(address: AlternativePostalAddressVerboseDto): org.eclipse.tractusx.bpdm.gate.api.model.AlternativePostalAddressDto {
-    return org.eclipse.tractusx.bpdm.gate.api.model.AlternativePostalAddressDto(
+private fun poolToGateAlternativeAddress(address: AlternativePostalAddressVerboseDto): org.eclipse.tractusx.bpdm.gate.api.model.AlternativePostalAddress {
+    return org.eclipse.tractusx.bpdm.gate.api.model.AlternativePostalAddress(
         geographicCoordinates = address.geographicCoordinates,
         country = address.country,
         postalCode = address.postalCode,

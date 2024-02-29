@@ -25,19 +25,19 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityDescription
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
-import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityDto
-import org.eclipse.tractusx.bpdm.gate.api.model.LogisticAddressDto
+import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntity
+import org.eclipse.tractusx.bpdm.gate.api.model.LogisticAddress
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(description = LegalEntityDescription.headerUpsertRequest)
 data class LegalEntityGateInputRequest(
 
     @field:JsonUnwrapped
-    val legalEntity: LegalEntityDto,
+    val legalEntity: LegalEntity,
 
     // TODO OpenAPI description for complex field does not work!!
     @get:Schema(description = LegalEntityDescription.legalAddress)
-    val legalAddress: LogisticAddressDto,
+    val legalAddress: LogisticAddress,
 
     @get:Schema(description = CommonDescription.externalId, required = true)
     val externalId: String

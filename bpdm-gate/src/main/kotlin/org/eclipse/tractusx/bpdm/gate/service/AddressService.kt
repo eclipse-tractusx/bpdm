@@ -24,8 +24,8 @@ import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateOutputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateInputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateInputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateOutputResponse
 import org.eclipse.tractusx.bpdm.gate.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.gate.repository.GateAddressRepository
 import org.springframework.data.domain.Page
@@ -38,7 +38,7 @@ class AddressService(
     private val addressRepository: GateAddressRepository,
 ) {
 
-    fun getAddresses(page: Int, size: Int, externalIds: Collection<String>? = null): PageDto<AddressGateInputDto> {
+    fun getAddresses(page: Int, size: Int, externalIds: Collection<String>? = null): PageDto<AddressGateInputResponse> {
 
         val logisticAddressPage = if (externalIds != null) {
             addressRepository.findByExternalIdInAndStage(externalIds, StageType.Input, PageRequest.of(page, size))
@@ -55,13 +55,13 @@ class AddressService(
         )
     }
 
-    private fun toValidLogisticAddresses(logisticAddressPage: Page<LogisticAddressDb>): List<AddressGateInputDto> {
+    private fun toValidLogisticAddresses(logisticAddressPage: Page<LogisticAddressDb>): List<AddressGateInputResponse> {
         return logisticAddressPage.content.map { logisticAddress ->
             logisticAddress.toAddressGateInputResponse(logisticAddress)
         }
     }
 
-    fun getAddressByExternalId(externalId: String): AddressGateInputDto {
+    fun getAddressByExternalId(externalId: String): AddressGateInputResponse {
 
         val logisticAddress =
             addressRepository.findByExternalIdAndStage(externalId, StageType.Input) ?: throw BpdmNotFoundException("Logistic Address", externalId)
@@ -73,7 +73,7 @@ class AddressService(
     /**
      * Get output addresses by fetching addresses from the database.
      */
-    fun getAddressesOutput(externalIds: Collection<String>? = null, page: Int, size: Int): PageDto<AddressGateOutputDto> {
+    fun getAddressesOutput(externalIds: Collection<String>? = null, page: Int, size: Int): PageDto<AddressGateOutputResponse> {
 
         val logisticAddressPage = if (!externalIds.isNullOrEmpty()) {
             addressRepository.findByExternalIdInAndStage(externalIds, StageType.Output, PageRequest.of(page, size))
@@ -91,7 +91,7 @@ class AddressService(
 
     }
 
-    private fun toValidOutputLogisticAddresses(logisticAddressPage: Page<LogisticAddressDb>): List<AddressGateOutputDto> {
+    private fun toValidOutputLogisticAddresses(logisticAddressPage: Page<LogisticAddressDb>): List<AddressGateOutputResponse> {
         return logisticAddressPage.content.map { logisticAddress ->
             logisticAddress.toAddressGateOutputResponse(logisticAddress)
         }

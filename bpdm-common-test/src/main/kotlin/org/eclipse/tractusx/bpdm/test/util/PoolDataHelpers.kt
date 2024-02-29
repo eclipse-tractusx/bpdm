@@ -39,11 +39,11 @@ class PoolDataHelpers(val poolClient:PoolApiClient? ) {
         poolClient!!.metadata.createIdentifierType(BusinessPartnerNonVerboseValues.identifierTypeDto1)
         poolClient!!.metadata.createIdentifierType(BusinessPartnerNonVerboseValues.identifierTypeDto2)
         poolClient!!.metadata.createIdentifierType(BusinessPartnerNonVerboseValues.identifierTypeDto3)
-        poolClient!!.metadata.createIdentifierType(BusinessPartnerNonVerboseValues.identifierTypeDto4)
+        poolClient!!.metadata.createIdentifierType(BusinessPartnerNonVerboseValues.identifierType4)
 
-        poolClient!!.metadata.createIdentifierType(BusinessPartnerNonVerboseValues.addressIdentifierTypeDto1)
-        poolClient!!.metadata.createIdentifierType(BusinessPartnerNonVerboseValues.addressIdentifierTypeDto2)
-        poolClient!!.metadata.createIdentifierType(BusinessPartnerNonVerboseValues.addressIdentifierTypeDto3)
+        poolClient!!.metadata.createIdentifierType(BusinessPartnerNonVerboseValues.addressIdentifierType1)
+        poolClient!!.metadata.createIdentifierType(BusinessPartnerNonVerboseValues.addressIdentifierType2)
+        poolClient!!.metadata.createIdentifierType(BusinessPartnerNonVerboseValues.addressIdentifierType3)
 
     }
 

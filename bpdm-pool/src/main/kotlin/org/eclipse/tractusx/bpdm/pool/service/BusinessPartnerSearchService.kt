@@ -24,9 +24,9 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.BusinessPartnerSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteMatchVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchVerboseResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchVerboseResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteMatchVerboseResponse
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
@@ -64,7 +64,7 @@ class BusinessPartnerSearchService(
     override fun searchLegalEntities(
         searchRequest: BusinessPartnerSearchRequest,
         paginationRequest: PaginationRequest
-    ): PageDto<LegalEntityMatchVerboseDto> {
+    ): PageDto<LegalEntityMatchVerboseResponse> {
         val legalEntityPage = searchAndPrepareLegalEntityPage(searchRequest, paginationRequest)
         businessPartnerFetchService.fetchLegalEntityDependencies(legalEntityPage.content.map { (_, legalEntity) -> legalEntity }.toSet())
 
@@ -121,7 +121,7 @@ class BusinessPartnerSearchService(
     override fun searchAddresses(
         searchRequest: AddressPartnerSearchRequest,
         paginationRequest: PaginationRequest
-    ): PageDto<AddressMatchVerboseDto> {
+    ): PageDto<AddressMatchVerboseResponse> {
         val addressPage = searchAndPrepareAddressPage(searchRequest, paginationRequest)
         addressService.fetchLogisticAddressDependencies(addressPage.content.map { (_, address) -> address }.toSet())
         return with(addressPage) {
@@ -177,7 +177,7 @@ class BusinessPartnerSearchService(
      */
     override fun searchSites(
         paginationRequest: PaginationRequest
-    ): PageDto<SiteMatchVerboseDto> {
+    ): PageDto<SiteMatchVerboseResponse> {
         val sitePage = searchAndPreparePageSite(paginationRequest)
         siteService.fetchSiteDependenciesPage(sitePage.content.map { site -> site }.toSet())
 

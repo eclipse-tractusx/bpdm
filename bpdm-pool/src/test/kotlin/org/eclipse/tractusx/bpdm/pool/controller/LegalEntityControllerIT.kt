@@ -23,9 +23,9 @@ import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierType
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityVerbose
+import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerbose
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
@@ -165,7 +165,7 @@ class LegalEntityControllerIT @Autowired constructor(
     @Test
     fun `create legal entities and get duplicate identifier error on address`() {
         poolClient.metadata.createIdentifierType(
-            IdentifierTypeDto(
+            IdentifierType(
                 technicalKey = addressIdentifier.type,
                 businessPartnerType = IdentifierBusinessPartnerType.ADDRESS, name = addressIdentifier.value
             )
@@ -385,7 +385,7 @@ class LegalEntityControllerIT @Autowired constructor(
     @Test
     fun `don't create legal entity with same address identifier`() {
         poolClient.metadata.createIdentifierType(
-            IdentifierTypeDto(
+            IdentifierType(
                 technicalKey = addressIdentifier.type,
                 businessPartnerType = IdentifierBusinessPartnerType.ADDRESS, name = addressIdentifier.value
             )
@@ -786,22 +786,25 @@ class LegalEntityControllerIT @Autowired constructor(
 
     }
 
-    fun assertThatCreatedLegalEntitiesEqual(actuals: Collection<LegalEntityPartnerCreateVerboseDto>, expected: Collection<LegalEntityPartnerCreateVerboseDto>) {
+    fun assertThatCreatedLegalEntitiesEqual(
+        actuals: Collection<LegalEntityPartnerCreateVerboseResponse>,
+        expected: Collection<LegalEntityPartnerCreateVerboseResponse>
+    ) {
         val now = Instant.now()
         val justBeforeCreate = now.minusSeconds(2)
         actuals.forEach { assertThat(it.legalEntity.currentness).isBetween(justBeforeCreate, now) }
         actuals.forEach { assertThat(it.legalEntity.bpnl).matches(testHelpers.bpnLPattern) }
 
         assertHelpers.assertRecursively(actuals)
-            .ignoringFields(LegalEntityPartnerCreateVerboseDto::index.name)
+            .ignoringFields(LegalEntityPartnerCreateVerboseResponse::index.name)
             .ignoringFieldsOfTypes(Instant::class.java)
-            .ignoringFieldsMatchingRegexes(".*${LegalEntityVerboseDto::bpnl.name}")
+            .ignoringFieldsMatchingRegexes(".*${LegalEntityVerbose::bpnl.name}")
             .isEqualTo(expected)
     }
 
     fun assertThatModifiedLegalEntitiesEqual(
-        actuals: Collection<LegalEntityPartnerCreateVerboseDto>,
-        expected: Collection<LegalEntityPartnerCreateVerboseDto>
+        actuals: Collection<LegalEntityPartnerCreateVerboseResponse>,
+        expected: Collection<LegalEntityPartnerCreateVerboseResponse>
     ) {
         val now = Instant.now()
         val justBeforeCreate = now.minusSeconds(3)
@@ -809,7 +812,7 @@ class LegalEntityControllerIT @Autowired constructor(
 
         assertHelpers.assertRecursively(actuals)
             .ignoringFieldsOfTypes(Instant::class.java)
-            .ignoringFields(LegalEntityPartnerCreateVerboseDto::index.name)
+            .ignoringFields(LegalEntityPartnerCreateVerboseResponse::index.name)
             .isEqualTo(expected)
     }
 
@@ -817,7 +820,7 @@ class LegalEntityControllerIT @Autowired constructor(
         .get()
         .uri(EndpointValues.CATENA_LEGAL_ENTITY_PATH + "/${bpn}")
         .exchange().expectStatus().isOk
-        .returnResult<LegalEntityWithLegalAddressVerboseDto>()
+        .returnResult<LegalEntityWithLegalAddressVerboseResponse>()
         .responseBody
         .blockFirst()!!.legalEntity.currentness
 
@@ -830,7 +833,7 @@ class LegalEntityControllerIT @Autowired constructor(
             throw IllegalArgumentException("Can't change case of string $value")
     }
 
-    private fun toLegalAddressResponse(it: LogisticAddressVerboseDto) = LegalAddressVerboseDto(
+    private fun toLegalAddressResponse(it: LogisticAddressVerbose) = LegalAddressVerboseResponse(
         physicalPostalAddress = it.physicalPostalAddress,
         alternativePostalAddress = it.alternativePostalAddress,
         bpnLegalEntity = it.bpnLegalEntity!!,

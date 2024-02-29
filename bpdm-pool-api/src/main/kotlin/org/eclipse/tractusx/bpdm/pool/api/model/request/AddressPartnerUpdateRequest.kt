@@ -25,7 +25,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.RequestWithKey
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LogisticAddressDescription
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddress
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(description = LogisticAddressDescription.headerUpdateRequest)
@@ -35,7 +35,7 @@ data class AddressPartnerUpdateRequest(
     val bpna: String,
 
     @field:JsonUnwrapped
-    val address: LogisticAddressDto
+    val address: LogisticAddress
 
 ): RequestWithKey {
     override fun getRequestKey(): String {

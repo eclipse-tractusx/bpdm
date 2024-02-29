@@ -30,7 +30,7 @@ import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializ
 data class AddressGateOutputChildRequest(
 
     @field:JsonUnwrapped
-    val address: LogisticAddressDto,
+    val address: LogisticAddress,
 
     // TODO rename to bpna
     @get:Schema(description = LogisticAddressDescription.bpna)

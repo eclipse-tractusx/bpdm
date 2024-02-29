@@ -27,5 +27,5 @@ data class TaskStepResultRequest(
     @get:Schema(description = "The step queue containing the tasks for which results are posted", required = true)
     val step: TaskStep,
 
-    val results: List<TaskStepResultEntryDto>
+    val results: List<TaskStepResultEntry>
 )
