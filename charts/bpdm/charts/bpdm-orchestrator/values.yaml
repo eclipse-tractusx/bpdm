@@ -118,14 +118,11 @@ startupProbe:
 
 # Used to overwrite the default property values of the application configuration
 applicationConfig:
-#  bpdm:
-#    api:
-#      upsert-limit: ...
 
 # Used to overwrite the secret property values of the application configuration
 applicationSecrets:
-#  bpdm:
-#    security:
-#     client-id: ...
+
+
+
 
 

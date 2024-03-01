@@ -1,6 +1,6 @@
 ---
 ################################################################################
-  # Copyright (c) 2021,2024 Contributors to the Eclipse Foundation
+# Copyright (c) 2021,2024 Contributors to the Eclipse Foundation
 #
 # See the NOTICE file(s) distributed with this work for additional
 # information regarding copyright ownership.
@@ -18,4 +18,18 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################################
 
-{{ include "bpdm-common.ingress" . -}}
+{{- define "bpdm-common.service" -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "bpdm.fullname" . }}
+  labels:
+    {{- include "bpdm.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.targetPort }}
+  selector:
+    {{- include "bpdm.selectorLabels" . | nindent 4 }}
+{{- end -}}
