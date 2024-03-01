@@ -32,9 +32,9 @@ data:
       datasource:
         host: {{ include "bpdm.postgresDependency" . }}
       pool:
-        base-url: {{include "bpdm-bridge.poolServiceName" .}}
+        base-url: http://{{ include "bpdm.toReleaseName" (list . "bpdm-pool") }}
       gate:
-        base-url: {{include "bpdm-bridge.gateServiceName" .}}
+        base-url: http://{{ include "bpdm.toReleaseName" (list . "bpdm-gate") }}
   external.yml: |-
     # External properties for overwriting application config
     {{- if .Values.applicationConfig }}

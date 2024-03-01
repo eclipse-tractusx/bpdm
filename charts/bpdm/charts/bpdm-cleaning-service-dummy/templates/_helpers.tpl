@@ -99,8 +99,6 @@ Create name of application secret
 {{- end }}
 
 
-
-
 {{/*
 Invoke include on given definition with postgresql dependency context
 Usage: include "includeWithPostgresContext" (list $ "your_include_function_here")
@@ -109,4 +107,16 @@ Usage: include "includeWithPostgresContext" (list $ "your_include_function_here"
 {{- $ := index . 0 }}
 {{- $function := index . 1 }}
 {{- include $function (dict "Values" $.Values.postgres "Chart" (dict "Name" "postgres") "Release" $.Release) }}
+{{- end }}
+
+{{- define "bpdm.toReleaseName" -}}
+{{- $top := first . }}
+{{- $name := index . 1 }}
+{{- if contains $name $top.Release.Name }}
+{{- $top.Release.Name | trunc 63 | trimSuffix "-" }}
+{{- else if hasPrefix $top.Release.Name $name  }}
+{{- $name | trunc 63 | trimSuffix "-" }}
+{{- else }}
+{{- printf "%s-%s" $top.Release.Name $name | trunc 63 | trimSuffix "-" }}
+{{- end }}
 {{- end }}

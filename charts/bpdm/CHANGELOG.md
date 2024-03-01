@@ -8,6 +8,20 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
 ### Changed
 
+- update BPDM Pool Chart to version 6.0.2
+- update BPDM Gate Chart to version 5.0.2
+- update BPDM Orchestrator Chart to version 2.0.2
+- update BPDM Cleaning Service Dummy Chart to version 2.0.2
+- update BPDM Bridge Chart to version 2.0.2
+
+### Removed
+
+- postgres fullNameOverride
+
+## [4.0.1] - 2024-02-23
+
+### Changed
+
 - update BPDM Pool Chart to version 6.0.1
 - update BPDM Gate Chart to version 5.0.1
 - update BPDM Orchestrator Chart to version 2.0.1
