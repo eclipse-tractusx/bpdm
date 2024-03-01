@@ -61,31 +61,6 @@ app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
-{{- define "bpdm-gate.poolServiceName" -}}
-{{- $config := .Values.applicationConfig -}}
-{{- if and $config (not (empty $config.bpdm)) -}}
-    {{- $bpdm := $config.bpdm -}}
-    {{- if and $bpdm (not (empty $bpdm.pool)) -}}
-        {{- $pool := $bpdm.pool -}}
-        {{- if and $pool (not (empty (index $pool "base-url"))) -}}
-            {{- index $pool "base-url" -}}
-        {{- else -}}
-            {{- print "http://" (printf "%s-bpdm-pool" .Release.Name) ":8080" -}}
-        {{- end -}}
-    {{- else -}}
-        {{- print "http://" (printf "%s-bpdm-pool" .Release.Name) ":8080" -}}
-    {{- end -}}
-{{- else -}}
-    {{- print "http://" (printf "%s-bpdm-pool" .Release.Name) ":8080" -}}
-{{- end -}}
-{{- end }}
-
-
-
-
-
-
-
 {{/*
 Selector labels
 */}}
@@ -117,4 +92,16 @@ Usage: include "includeWithPostgresContext" (list $ "your_include_function_here"
 {{- $ := index . 0 }}
 {{- $function := index . 1 }}
 {{- include $function (dict "Values" $.Values.postgres "Chart" (dict "Name" "postgres") "Release" $.Release) }}
+{{- end }}
+
+{{- define "bpdm.toReleaseName" -}}
+{{- $top := first . }}
+{{- $name := index . 1 }}
+{{- if contains $name $top.Release.Name }}
+{{- $top.Release.Name | trunc 63 | trimSuffix "-" }}
+{{- else if hasPrefix $top.Release.Name $name  }}
+{{- $name | trunc 63 | trimSuffix "-" }}
+{{- else }}
+{{- printf "%s-%s" $top.Release.Name $name | trunc 63 | trimSuffix "-" }}
+{{- end }}
 {{- end }}

@@ -120,10 +120,9 @@ applicationConfig:
 #      host: ...
 
 applicationSecrets:
-  spring:
-    datasource:
-      # overwrite for security reasons
-      password: bpdm
+#  spring:
+#    datasource:
+#      password: ...
 
 postgres:
   enabled: true

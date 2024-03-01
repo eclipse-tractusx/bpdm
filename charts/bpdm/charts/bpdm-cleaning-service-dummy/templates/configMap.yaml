@@ -30,7 +30,7 @@ data:
     # which can be overwritten by external.yml
     bpdm:
       orchestrator:
-        base-url: {{include "bpdm-cleaning-service-dummy.orchestratorServiceName" .}}
+        base-url: http://{{ include "bpdm.toReleaseName" (list . "bpdm-orchestrator") }}
   external.yml: |-
     # External properties for overwriting application config
     {{- if .Values.applicationConfig }}

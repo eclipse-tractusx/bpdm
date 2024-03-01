@@ -21,20 +21,17 @@
 bpdm-gate:
   enabled: true
   postgres:
-    # use the name that was override on postgres.fullnameOverride to be used by the application on connection
-    fullnameOverride: ""
+    enabled: false
 
 bpdm-pool:
   enabled: true
   postgres:
-    # use the name that was override on postgres.fullnameOverride to be used by the application on connection
-    fullnameOverride: ""
+    enabled: false
 
 bpdm-bridge-dummy:
   enabled: true
   postgres:
-    # use the name that was override on postgres.fullnameOverride to be used by the application on connection
-    fullnameOverride: ""
+    enabled: false
 
 bpdm-cleaning-service-dummy:
   enabled: true
@@ -43,8 +40,6 @@ bpdm-orchestrator:
   enabled: true
 
 postgres:
-  # override the name of the postgres deploy
-  fullnameOverride: ""
   enabled: true
   auth:
     database: bpdm
