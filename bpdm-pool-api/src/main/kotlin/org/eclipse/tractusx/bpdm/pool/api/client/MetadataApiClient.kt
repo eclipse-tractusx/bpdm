@@ -37,31 +37,31 @@ import org.springframework.web.service.annotation.PostExchange
 interface MetadataApiClient: PoolMetadataApi {
 
     @PostExchange("/identifier-types")
-    override fun createIdentifierType(@RequestBody identifierType: IdentifierTypeDto): IdentifierTypeDto
+    override fun createIdentifierType(@RequestBody identifierType: IdentifierType): IdentifierType
 
     @PostExchange("/legal-forms")
-    override fun createLegalForm(@RequestBody type: LegalFormRequest): LegalFormDto
+    override fun createLegalForm(@RequestBody type: LegalFormRequest): LegalForm
 
     @PostExchange("/regions")
-    override fun createRegion(@RequestBody type: RegionDto): RegionDto
+    override fun createRegion(@RequestBody type: Region): Region
 
     @GetExchange("/administrative-areas-level1")
-    override fun getAdminAreasLevel1(@ParameterObject paginationRequest: PaginationRequest): PageDto<CountrySubdivisionDto>
+    override fun getAdminAreasLevel1(@ParameterObject paginationRequest: PaginationRequest): PageDto<CountrySubdivision>
 
     @GetExchange("/field-quality-rules/")
-    override fun getFieldQualityRules(@RequestParam country: CountryCode): ResponseEntity<Collection<FieldQualityRuleDto>>
+    override fun getFieldQualityRules(@RequestParam country: CountryCode): ResponseEntity<Collection<FieldQualityRule>>
 
     @GetExchange("/identifier-types")
     override fun getIdentifierTypes(
         paginationRequest: PaginationRequest,
         @RequestParam businessPartnerType: IdentifierBusinessPartnerType,
         @RequestParam country: CountryCode?
-    ): PageDto<IdentifierTypeDto>
+    ): PageDto<IdentifierType>
 
     @GetExchange("/legal-forms")
-    override fun getLegalForms(paginationRequest: PaginationRequest): PageDto<LegalFormDto>
+    override fun getLegalForms(paginationRequest: PaginationRequest): PageDto<LegalForm>
 
 
     @GetExchange("/regions")
-    override fun getRegions(paginationRequest: PaginationRequest): PageDto<RegionDto>
+    override fun getRegions(paginationRequest: PaginationRequest): PageDto<Region>
 }

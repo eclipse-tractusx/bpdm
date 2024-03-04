@@ -26,7 +26,7 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.GateLegalEntityApi
 import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateOutputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityGateInputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityGateOutputResponse
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.ResponseEntity
@@ -42,13 +42,13 @@ interface LegalEntityApiClient : GateLegalEntityApi {
     @GetExchange("/input/legal-entities")
     override fun getLegalEntities(
         @ParameterObject @Valid paginationRequest: PaginationRequest
-    ): PageDto<LegalEntityGateInputDto>
+    ): PageDto<LegalEntityGateInputResponse>
 
     @PostExchange("/input/legal-entities/search")
     override fun getLegalEntitiesByExternalIds(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @RequestBody externalIds: Collection<String>
-    ): PageDto<LegalEntityGateInputDto>
+    ): PageDto<LegalEntityGateInputResponse>
 
     @PostExchange("/output/legal-entities/search")
     override fun getLegalEntitiesOutput(
@@ -59,7 +59,7 @@ interface LegalEntityApiClient : GateLegalEntityApi {
     @GetExchange("/input/legal-entities/{externalId}")
     override fun getLegalEntityByExternalId(
         @Parameter(description = "External ID") @PathVariable externalId: String
-    ): LegalEntityGateInputDto
+    ): LegalEntityGateInputResponse
 
     @PutExchange("/input/legal-entities")
     override fun upsertLegalEntities(
