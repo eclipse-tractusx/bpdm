@@ -33,13 +33,9 @@ import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.service.annotation.GetExchange
-import org.springframework.web.service.annotation.HttpExchange
-import org.springframework.web.service.annotation.PostExchange
 
 
 @RequestMapping("/api/catena", produces = [MediaType.APPLICATION_JSON_VALUE])
-@HttpExchange("/api/catena")
 interface PoolMetadataApi {
 
     companion object DescriptionObject {
@@ -63,7 +59,6 @@ interface PoolMetadataApi {
         ]
     )
     @PostMapping("/identifier-types")
-    @PostExchange("/identifier-types")
     fun createIdentifierType(@RequestBody identifierType: IdentifierTypeDto): IdentifierTypeDto
 
     @Operation(
@@ -77,7 +72,6 @@ interface PoolMetadataApi {
         ]
     )
     @GetMapping("/identifier-types")
-    @GetExchange("/identifier-types")
     fun getIdentifierTypes(
         @ParameterObject paginationRequest: PaginationRequest,
         @Parameter businessPartnerType: IdentifierBusinessPartnerType,
@@ -99,7 +93,6 @@ interface PoolMetadataApi {
         ]
     )
     @PostMapping("/legal-forms")
-    @PostExchange("/legal-forms")
     fun createLegalForm(@RequestBody type: LegalFormRequest): LegalFormDto
 
     @Operation(
@@ -113,7 +106,6 @@ interface PoolMetadataApi {
         ]
     )
     @GetMapping("/legal-forms")
-    @GetExchange("/legal-forms")
     fun getLegalForms(@ParameterObject paginationRequest: PaginationRequest): PageDto<LegalFormDto>
 
 
@@ -129,7 +121,6 @@ interface PoolMetadataApi {
         ]
     )
     @GetMapping("/field-quality-rules/")
-    @GetExchange("/field-quality-rules/")
     fun getFieldQualityRules(@Parameter(description = "ISO 3166-1 alpha-2 country code") @RequestParam country: CountryCode): ResponseEntity<Collection<FieldQualityRuleDto>>
 
     @Operation(
@@ -145,7 +136,6 @@ interface PoolMetadataApi {
         ]
     )
     @PostMapping("/regions")
-    @PostExchange("/regions")
     fun createRegion(@RequestBody type: RegionDto): RegionDto
 
     @Operation(
@@ -160,7 +150,6 @@ interface PoolMetadataApi {
         ]
     )
     @GetMapping("/regions")
-    @GetExchange("/regions")
     fun getRegions(@ParameterObject paginationRequest: PaginationRequest): PageDto<RegionDto>
 
     @Operation(
@@ -174,7 +163,6 @@ interface PoolMetadataApi {
         ]
     )
     @GetMapping("/administrative-areas-level1")
-    @GetExchange("/administrative-areas-level1")
     fun getAdminAreasLevel1(@ParameterObject paginationRequest: PaginationRequest): PageDto<CountrySubdivisionDto>
 
 }

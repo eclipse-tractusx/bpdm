@@ -19,7 +19,6 @@
 
 package com.catenax.bpdm.bridge.dummy.client
 
-import com.catenax.bpdm.bridge.dummy.controller.BridgeApi
 import org.eclipse.tractusx.bpdm.common.service.ParameterObjectArgumentResolver
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.support.WebClientAdapter
@@ -38,7 +37,7 @@ class BridgeClientImpl(
             .build()
     }
 
-    private val bridgeClient by lazy { httpServiceProxyFactory.createClient(BridgeApi::class.java) }
+    private val bridgeClient by lazy { httpServiceProxyFactory.createClient(BridgeApiClient::class.java) }
 
     override fun bridge() = bridgeClient
 }

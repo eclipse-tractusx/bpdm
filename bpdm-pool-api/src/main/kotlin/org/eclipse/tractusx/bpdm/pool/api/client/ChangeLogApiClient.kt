@@ -19,19 +19,23 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.client
 
-interface PoolApiClient {
+import org.eclipse.tractusx.bpdm.common.dto.PageDto
+import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.PoolChangelogApi
+import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryVerboseDto
+import org.springdoc.core.annotations.ParameterObject
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.service.annotation.HttpExchange
+import org.springframework.web.service.annotation.PostExchange
 
-    val addresses: AddressApiClient
+@HttpExchange(PoolChangelogApi.CHANGELOG_PATH)
+interface ChangeLogApiClient : PoolChangelogApi {
 
-    val bpns: BpnApiClient
+    @PostExchange(PoolChangelogApi.SUBPATH_SEARCH)
+    override fun getChangelogEntries(
+        @RequestBody changelogSearchRequest: ChangelogSearchRequest,
+        @ParameterObject paginationRequest: PaginationRequest
+    ): PageDto<ChangelogEntryVerboseDto>
 
-    val changelogs: ChangeLogApiClient
-
-    val legalEntities: LegalEntityApiClient
-
-    val metadata: MetadataApiClient
-
-    val sites: SiteApiClient
-
-    val saas: SaasApiClient
 }

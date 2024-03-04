@@ -31,11 +31,8 @@ import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.service.annotation.GetExchange
-import org.springframework.web.service.annotation.HttpExchange
 
 @RequestMapping("/api/catena/stats", produces = [MediaType.APPLICATION_JSON_VALUE])
-@HttpExchange("/api/catena/stats")
 interface StatsApi {
 
     @Operation
@@ -45,7 +42,6 @@ interface StatsApi {
         ]
     )
     @GetMapping("/sharing-states")
-    @GetExchange("/sharing-states")
     fun countPartnersBySharingState(): StatsSharingStatesResponse
 
     @Operation
@@ -55,7 +51,6 @@ interface StatsApi {
         ]
     )
     @GetMapping("/stages")
-    @GetExchange("/stages")
     fun countPartnersPerStage(): StatsStagesResponse
 
     @Operation
@@ -65,7 +60,6 @@ interface StatsApi {
         ]
     )
     @GetMapping("/{stage}/address-types")
-    @GetExchange("/{stage}/address-types")
     fun countAddressTypes(@PathVariable("stage") stage: StageType): StatsAddressTypesResponse
 
     @Operation
@@ -75,7 +69,6 @@ interface StatsApi {
         ]
     )
     @GetMapping("/confidence-criteria")
-    @GetExchange("/confidence-criteria")
     fun getConfidenceCriteriaStats(): StatsConfidenceCriteriaResponse
 
 

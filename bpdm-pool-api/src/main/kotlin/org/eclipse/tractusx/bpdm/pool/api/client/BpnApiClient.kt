@@ -19,19 +19,17 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.client
 
-interface PoolApiClient {
+import org.eclipse.tractusx.bpdm.common.util.CommonApiPathNames
+import org.eclipse.tractusx.bpdm.pool.api.PoolBpnApi
+import org.eclipse.tractusx.bpdm.pool.api.model.request.IdentifiersSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingDto
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.service.annotation.HttpExchange
+import org.springframework.web.service.annotation.PostExchange
 
-    val addresses: AddressApiClient
-
-    val bpns: BpnApiClient
-
-    val changelogs: ChangeLogApiClient
-
-    val legalEntities: LegalEntityApiClient
-
-    val metadata: MetadataApiClient
-
-    val sites: SiteApiClient
-
-    val saas: SaasApiClient
+@HttpExchange(PoolBpnApi.BPN_PATH)
+interface BpnApiClient: PoolBpnApi {
+    @PostExchange(CommonApiPathNames.SUBPATH_SEARCH)
+    override fun findBpnsByIdentifiers(@RequestBody request: IdentifiersSearchRequest): ResponseEntity<Set<BpnIdentifierMappingDto>>
 }

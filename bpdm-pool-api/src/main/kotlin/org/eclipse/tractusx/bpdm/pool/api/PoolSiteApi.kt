@@ -34,13 +34,8 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.service.annotation.GetExchange
-import org.springframework.web.service.annotation.HttpExchange
-import org.springframework.web.service.annotation.PostExchange
-import org.springframework.web.service.annotation.PutExchange
 
 @RequestMapping("/api/catena/sites", produces = [MediaType.APPLICATION_JSON_VALUE])
-@HttpExchange("/api/catena/sites")
 interface PoolSiteApi {
 
 
@@ -55,7 +50,6 @@ interface PoolSiteApi {
         ]
     )
     @PostMapping("/main-addresses/search", produces = ["application/json"])
-    @PostExchange("/main-addresses/search")
     fun searchMainAddresses(
         @RequestBody
         bpnS: Collection<String>
@@ -73,7 +67,6 @@ interface PoolSiteApi {
         ]
     )
     @GetMapping("/{bpns}")
-    @GetExchange("/{bpns}")
     fun getSite(
         @Parameter(description = "BPNS value") @PathVariable bpns: String
     ): SiteWithMainAddressVerboseDto
@@ -89,7 +82,6 @@ interface PoolSiteApi {
         ]
     )
     @PostMapping("/search")
-    @PostExchange("/search")
     fun searchSites(
         @RequestBody siteSearchRequest: SiteBpnSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
@@ -108,7 +100,6 @@ interface PoolSiteApi {
         ]
     )
     @PostMapping
-    @PostExchange
     fun createSite(
         @RequestBody
         requests: Collection<SitePartnerCreateRequest>
@@ -126,7 +117,6 @@ interface PoolSiteApi {
         ]
     )
     @PutMapping
-    @PutExchange
     fun updateSite(
         @RequestBody
         requests: Collection<SitePartnerUpdateRequest>
@@ -143,7 +133,6 @@ interface PoolSiteApi {
         ]
     )
     @GetMapping
-    @GetExchange
     fun getSitesPaginated(
         @ParameterObject paginationRequest: PaginationRequest
     ): PageDto<SiteMatchVerboseDto>

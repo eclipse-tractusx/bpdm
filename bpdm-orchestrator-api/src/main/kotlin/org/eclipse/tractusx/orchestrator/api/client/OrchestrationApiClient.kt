@@ -19,9 +19,7 @@
 
 package org.eclipse.tractusx.orchestrator.api.client
 
-import org.eclipse.tractusx.orchestrator.api.GoldenRecordTaskApi
-
 interface OrchestrationApiClient {
 
-    val goldenRecordTasks: GoldenRecordTaskApi
+    val goldenRecordTasks: GoldenRecordTaskApiClient
 }

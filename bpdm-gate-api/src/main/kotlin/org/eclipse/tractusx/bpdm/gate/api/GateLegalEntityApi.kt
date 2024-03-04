@@ -35,13 +35,8 @@ import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.service.annotation.GetExchange
-import org.springframework.web.service.annotation.HttpExchange
-import org.springframework.web.service.annotation.PostExchange
-import org.springframework.web.service.annotation.PutExchange
 
 @RequestMapping("/api/catena", produces = [MediaType.APPLICATION_JSON_VALUE])
-@HttpExchange("/api/catena")
 interface GateLegalEntityApi {
 
     @Operation(
@@ -59,7 +54,6 @@ interface GateLegalEntityApi {
         ]
     )
     @PutMapping("/input/legal-entities")
-    @PutExchange("/input/legal-entities")
     fun upsertLegalEntities(@RequestBody legalEntities: Collection<LegalEntityGateInputRequest>): ResponseEntity<Unit>
 
     @Operation(
@@ -74,7 +68,6 @@ interface GateLegalEntityApi {
         ]
     )
     @GetMapping("/input/legal-entities/{externalId}")
-    @GetExchange("/input/legal-entities/{externalId}")
     fun getLegalEntityByExternalId(@Parameter(description = "External ID") @PathVariable externalId: String): LegalEntityGateInputDto
 
     @Operation(
@@ -89,7 +82,6 @@ interface GateLegalEntityApi {
         ]
     )
     @PostMapping("/input/legal-entities/search")
-    @PostExchange("/input/legal-entities/search")
     fun getLegalEntitiesByExternalIds(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @RequestBody externalIds: Collection<String>
@@ -107,7 +99,6 @@ interface GateLegalEntityApi {
         ]
     )
     @GetMapping("/input/legal-entities")
-    @GetExchange("/input/legal-entities")
     fun getLegalEntities(@ParameterObject @Valid paginationRequest: PaginationRequest): PageDto<LegalEntityGateInputDto>
 
     @Operation(
@@ -122,7 +113,6 @@ interface GateLegalEntityApi {
         ]
     )
     @PostMapping("/output/legal-entities/search")
-    @PostExchange("/output/legal-entities/search")
     fun getLegalEntitiesOutput(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @RequestBody(required = false) externalIds: Collection<String>?
@@ -143,6 +133,5 @@ interface GateLegalEntityApi {
         ]
     )
     @PutMapping("/output/legal-entities")
-    @PutExchange("/output/legal-entities")
     fun upsertLegalEntitiesOutput(@RequestBody legalEntities: Collection<LegalEntityGateOutputRequest>): ResponseEntity<Unit>
 }

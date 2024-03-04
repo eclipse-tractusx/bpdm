@@ -26,12 +26,13 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.service.annotation.GetExchange
-import org.springframework.web.service.annotation.HttpExchange
 
 @RequestMapping("/api/catena", produces = [MediaType.APPLICATION_JSON_VALUE])
-@HttpExchange("/api/catena")
 interface PoolDocumentationApi {
+    companion object {
+        const val SUBPATH_MERMAID = "/mermaid/"
+
+    }
 
     @Operation(
         summary = "Get mermaid class diagramm for the pool JPA model",
@@ -41,7 +42,6 @@ interface PoolDocumentationApi {
             ApiResponse(responseCode = "200", description = "Entity model as mermaid diagramm"),
         ]
     )
-    @GetMapping("/mermaid/", produces = [MediaType.TEXT_PLAIN_VALUE])
-    @GetExchange("/mermaid/")
+    @GetMapping(SUBPATH_MERMAID, produces = [MediaType.TEXT_PLAIN_VALUE])
     fun getMermaidPoolPersistence(): ResponseEntity<String>
 }

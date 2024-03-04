@@ -24,6 +24,8 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import org.eclipse.tractusx.bpdm.common.util.CommonApiPathNames
+import org.eclipse.tractusx.bpdm.pool.api.PoolBpnApi.Companion.BPN_PATH
 import org.eclipse.tractusx.bpdm.pool.api.model.request.IdentifiersSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingDto
 import org.springframework.http.MediaType
@@ -31,12 +33,13 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.service.annotation.HttpExchange
-import org.springframework.web.service.annotation.PostExchange
 
-@RequestMapping("/api/catena/bpn", produces = [MediaType.APPLICATION_JSON_VALUE])
-@HttpExchange("/api/catena/bpn")
+@RequestMapping(BPN_PATH, produces = [MediaType.APPLICATION_JSON_VALUE])
 interface PoolBpnApi {
+
+    companion object{
+        const val BPN_PATH = "/api/catena/bpn"
+    }
 
     @Operation(
         summary = "Returns a list of identifier mappings of an identifier to a BPNL/A/S, specified by a business partner type, identifier type and identifier values",
@@ -55,7 +58,6 @@ interface PoolBpnApi {
             ApiResponse(responseCode = "404", description = "Specified identifier type not found", content = [Content()])
         ]
     )
-    @PostMapping("/search")
-    @PostExchange("/search")
+    @PostMapping(CommonApiPathNames.SUBPATH_SEARCH)
     fun findBpnsByIdentifiers(@RequestBody request: IdentifiersSearchRequest): ResponseEntity<Set<BpnIdentifierMappingDto>>
 }

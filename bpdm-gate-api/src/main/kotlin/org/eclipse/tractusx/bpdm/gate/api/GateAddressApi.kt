@@ -35,13 +35,8 @@ import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.service.annotation.GetExchange
-import org.springframework.web.service.annotation.HttpExchange
-import org.springframework.web.service.annotation.PostExchange
-import org.springframework.web.service.annotation.PutExchange
 
 @RequestMapping("/api/catena", produces = [MediaType.APPLICATION_JSON_VALUE])
-@HttpExchange("/api/catena")
 interface GateAddressApi {
 
     @Operation(
@@ -59,7 +54,6 @@ interface GateAddressApi {
         ]
     )
     @PutMapping("/input/addresses")
-    @PutExchange("/input/addresses")
     fun upsertAddresses(@RequestBody addresses: Collection<AddressGateInputRequest>): ResponseEntity<Unit>
 
     @Operation(
@@ -74,7 +68,6 @@ interface GateAddressApi {
         ]
     )
     @GetMapping("/input/addresses/{externalId}")
-    @GetExchange("/input/addresses/{externalId}")
     fun getAddressByExternalId(@Parameter(description = "External ID") @PathVariable externalId: String): AddressGateInputDto
 
     @Operation(
@@ -89,7 +82,6 @@ interface GateAddressApi {
         ]
     )
     @PostMapping("/input/addresses/search")
-    @PostExchange("/input/addresses/search")
     fun getAddressesByExternalIds(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @RequestBody externalIds: Collection<String>
@@ -107,7 +99,6 @@ interface GateAddressApi {
         ]
     )
     @GetMapping("/input/addresses")
-    @GetExchange("/input/addresses")
     fun getAddresses(@ParameterObject @Valid paginationRequest: PaginationRequest): PageDto<AddressGateInputDto>
 
     @Operation(
@@ -122,7 +113,6 @@ interface GateAddressApi {
         ]
     )
     @PostMapping("/output/addresses/search")
-    @PostExchange("/output/addresses/search")
     fun getAddressesOutput(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @RequestBody(required = false) externalIds: Collection<String>?
@@ -144,6 +134,5 @@ interface GateAddressApi {
         ]
     )
     @PutMapping("/output/addresses")
-    @PutExchange("/output/addresses")
     fun upsertAddressesOutput(@RequestBody addresses: Collection<AddressGateOutputRequest>): ResponseEntity<Unit>
 }

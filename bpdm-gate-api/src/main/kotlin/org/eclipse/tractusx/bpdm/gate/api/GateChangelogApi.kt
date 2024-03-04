@@ -33,11 +33,8 @@ import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.service.annotation.HttpExchange
-import org.springframework.web.service.annotation.PostExchange
 
 @RequestMapping("/api/catena", produces = [MediaType.APPLICATION_JSON_VALUE])
-@HttpExchange("/api/catena")
 interface GateChangelogApi {
 
     @Operation(
@@ -52,7 +49,6 @@ interface GateChangelogApi {
         ]
     )
     @PostMapping("/input/changelog/search")
-    @PostExchange("/input/changelog/search")
     fun getInputChangelog(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @RequestBody searchRequest: ChangelogSearchRequest
@@ -70,7 +66,6 @@ interface GateChangelogApi {
         ]
     )
     @PostMapping("/output/changelog/search")
-    @PostExchange("/output/changelog/search")
     fun getOutputChangelog(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @RequestBody searchRequest: ChangelogSearchRequest

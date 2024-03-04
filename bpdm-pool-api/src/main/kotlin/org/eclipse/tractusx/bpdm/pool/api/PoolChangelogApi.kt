@@ -26,6 +26,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.PoolChangelogApi.Companion.CHANGELOG_PATH
 import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryVerboseDto
 import org.springdoc.core.annotations.ParameterObject
@@ -33,12 +34,13 @@ import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.service.annotation.HttpExchange
-import org.springframework.web.service.annotation.PostExchange
 
-@RequestMapping("/api/catena/business-partners/changelog", produces = [MediaType.APPLICATION_JSON_VALUE])
-@HttpExchange("/api/catena/business-partners/changelog")
+@RequestMapping(CHANGELOG_PATH, produces = [MediaType.APPLICATION_JSON_VALUE])
 interface PoolChangelogApi {
+    companion object {
+        const val CHANGELOG_PATH = "/api/catena/business-partners/changelog"
+        const val SUBPATH_SEARCH = "/search"
+    }
 
     @Operation(
         summary = "Returns changelog entries as of a specified timestamp, optionally filtered by a list of BPNL/S/A, or business partner types"
@@ -50,8 +52,7 @@ interface PoolChangelogApi {
             ApiResponse(responseCode = "404", description = "No business partner found for specified bpn", content = [Content()])
         ]
     )
-    @PostMapping("/search")
-    @PostExchange("/search")
+    @PostMapping(SUBPATH_SEARCH)
     fun getChangelogEntries(
         @RequestBody changelogSearchRequest: ChangelogSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest

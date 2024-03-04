@@ -36,12 +36,8 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.service.annotation.HttpExchange
-import org.springframework.web.service.annotation.PostExchange
-import org.springframework.web.service.annotation.PutExchange
 
 @RequestMapping("/api/catena", produces = [MediaType.APPLICATION_JSON_VALUE])
-@HttpExchange("/api/catena")
 interface GateBusinessPartnerApi {
 
     @Operation(
@@ -58,7 +54,6 @@ interface GateBusinessPartnerApi {
         ]
     )
     @PutMapping("/input/business-partners")
-    @PutExchange("/input/business-partners")
     fun upsertBusinessPartnersInput(@RequestBody businessPartners: Collection<BusinessPartnerInputRequest>): ResponseEntity<Collection<BusinessPartnerInputDto>>
 
     @Operation(
@@ -72,7 +67,6 @@ interface GateBusinessPartnerApi {
         ]
     )
     @PostMapping("/input/business-partners/search")
-    @PostExchange("/input/business-partners/search")
     fun getBusinessPartnersInput(
         @RequestBody externalIds: Collection<String>? = null,
         @ParameterObject @Valid paginationRequest: PaginationRequest = PaginationRequest()
@@ -91,7 +85,6 @@ interface GateBusinessPartnerApi {
         ]
     )
     @PostMapping("/output/business-partners/search")
-    @PostExchange("/output/business-partners/search")
     fun getBusinessPartnersOutput(
         @RequestBody externalIds: Collection<String>? = null,
         @ParameterObject @Valid paginationRequest: PaginationRequest = PaginationRequest()

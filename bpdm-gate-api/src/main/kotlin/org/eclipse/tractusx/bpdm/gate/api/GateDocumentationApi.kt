@@ -26,11 +26,8 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.service.annotation.GetExchange
-import org.springframework.web.service.annotation.HttpExchange
 
 @RequestMapping("/api/catena", produces = [MediaType.APPLICATION_JSON_VALUE])
-@HttpExchange("/api/catena")
 interface GateDocumentationApi {
 
     @Operation(
@@ -42,6 +39,5 @@ interface GateDocumentationApi {
         ]
     )
     @GetMapping("/mermaid/", produces = [MediaType.TEXT_PLAIN_VALUE])
-    @GetExchange("/mermaid/")
     fun getMermaidGatePersistence(): ResponseEntity<String>
 }

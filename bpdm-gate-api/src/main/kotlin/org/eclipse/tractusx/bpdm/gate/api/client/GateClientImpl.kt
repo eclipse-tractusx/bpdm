@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.gate.api.client
 
 import org.eclipse.tractusx.bpdm.common.service.ParameterObjectArgumentResolver
-import org.eclipse.tractusx.bpdm.gate.api.*
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.support.WebClientAdapter
 import org.springframework.web.service.invoker.HttpServiceProxyFactory
@@ -44,17 +43,17 @@ class GateClientImpl(
             .build()
     }
 
-    override val businessParters by lazy { createClient<GateBusinessPartnerApi>() }
+    override val businessParters by lazy { createClient<BusinessPartnerApiClient>() }
 
-    override val addresses by lazy { createClient<GateAddressApi>() }
+    override val addresses by lazy { createClient<AddressApiClient>() }
 
-    override val legalEntities by lazy { createClient<GateLegalEntityApi>() }
+    override val legalEntities by lazy { createClient<LegalEntityApiClient>() }
 
-    override val sites by lazy { createClient<GateSiteApi>() }
+    override val sites by lazy { createClient<SiteApiClient>() }
 
-    override val changelog by lazy { createClient<GateChangelogApi>() }
+    override val changelog by lazy { createClient<ChangelogApiClient>() }
 
-    override val sharingState by lazy { createClient<GateSharingStateApi>() }
+    override val sharingState by lazy { createClient<SharingStateApiClient>() }
 
     private inline fun <reified T> createClient() =
         httpServiceProxyFactory.createClient(T::class.java)

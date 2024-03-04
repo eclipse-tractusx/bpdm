@@ -35,13 +35,8 @@ import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.service.annotation.GetExchange
-import org.springframework.web.service.annotation.HttpExchange
-import org.springframework.web.service.annotation.PostExchange
-import org.springframework.web.service.annotation.PutExchange
 
 @RequestMapping("/api/catena", produces = [MediaType.APPLICATION_JSON_VALUE])
-@HttpExchange("/api/catena")
 interface GateSiteApi {
 
     @Operation(
@@ -59,7 +54,6 @@ interface GateSiteApi {
         ]
     )
     @PutMapping("/input/sites")
-    @PutExchange("/input/sites")
     fun upsertSites(@RequestBody sites: Collection<SiteGateInputRequest>): ResponseEntity<Unit>
 
     @Operation(
@@ -74,7 +68,6 @@ interface GateSiteApi {
         ]
     )
     @GetMapping("/input/sites/{externalId}")
-    @GetExchange("/input/sites/{externalId}")
     fun getSiteByExternalId(@Parameter(description = "External ID") @PathVariable externalId: String): SiteGateInputDto
 
     @Operation(
@@ -89,7 +82,6 @@ interface GateSiteApi {
         ]
     )
     @PostMapping("/input/sites/search")
-    @PostExchange("/input/sites/search")
     fun getSitesByExternalIds(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @RequestBody externalIds: Collection<String>
@@ -107,7 +99,6 @@ interface GateSiteApi {
         ]
     )
     @GetMapping("/input/sites")
-    @GetExchange("/input/sites")
     fun getSites(@ParameterObject @Valid paginationRequest: PaginationRequest): PageDto<SiteGateInputDto>
 
     @Operation(
@@ -122,7 +113,6 @@ interface GateSiteApi {
         ]
     )
     @PostMapping("/output/sites/search")
-    @PostExchange("/output/sites/search")
     fun getSitesOutput(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @RequestBody(required = false) externalIds: Collection<String>?
@@ -143,6 +133,5 @@ interface GateSiteApi {
         ]
     )
     @PutMapping("/output/sites")
-    @PutExchange("/output/sites")
     fun upsertSitesOutput(@RequestBody sites: Collection<SiteGateOutputRequest>): ResponseEntity<Unit>
 }
