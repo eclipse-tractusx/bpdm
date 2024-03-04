@@ -28,8 +28,8 @@ import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateOutputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerbose
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -174,7 +174,7 @@ class GateUpdateService(
 
     private fun buildLegalEntityGateOutputRequest(
         requestEntry: GateLegalEntityInfo?,
-        poolResponse: LegalEntityPartnerCreateVerboseDto
+        poolResponse: LegalEntityPartnerCreateVerboseResponse
     ): LegalEntityGateOutputRequest? {
         if (requestEntry == null) {
             logger.warn { "No matching request for Pool response for ${poolResponse.legalEntity.bpnl} found, can't update the Gate output state" }
@@ -188,7 +188,7 @@ class GateUpdateService(
         )
     }
 
-    private fun buildSiteGateOutputRequest(requestEntry: GateSiteInfo?, poolResponse: SitePartnerCreateVerboseDto): SiteGateOutputRequest? {
+    private fun buildSiteGateOutputRequest(requestEntry: GateSiteInfo?, poolResponse: SitePartnerCreateVerboseResponse): SiteGateOutputRequest? {
         if (requestEntry == null) {
             logger.warn { "No matching request for Pool response for ${poolResponse.site.bpns} found, can't update the Gate output state" }
             return null
@@ -202,7 +202,7 @@ class GateUpdateService(
         )
     }
 
-    private fun buildAddressGateOutputRequest(requestEntry: GateAddressInfo?, poolResponse: LogisticAddressVerboseDto): AddressGateOutputRequest? {
+    private fun buildAddressGateOutputRequest(requestEntry: GateAddressInfo?, poolResponse: LogisticAddressVerbose): AddressGateOutputRequest? {
         if (requestEntry == null) {
             logger.warn { "No matching request for Pool response for ${poolResponse.bpna} found, can't update the Gate output state" }
             return null
@@ -223,12 +223,12 @@ class GateUpdateService(
         bpn: String?,
         errorInfo: ErrorInfo<*>,
         processStarted: Boolean
-    ): SharingStateDto? {
+    ): SharingStateResponse? {
         if (externalId == null) {
             logger.warn { "Couldn't determine externalId for $errorInfo, can't update the Gate sharing state" }
             return null
         }
-        return SharingStateDto(
+        return SharingStateResponse(
             businessPartnerType = businessPartnerType,
             externalId = externalId,
             sharingStateType = SharingStateType.Error,
@@ -254,7 +254,7 @@ class GateUpdateService(
             gateClient.addresses.upsertAddressesOutput(listOf(it))
         }
 
-    private fun upsertSharingState(request: SharingStateDto?) =
+    private fun upsertSharingState(request: SharingStateResponse?) =
         request?.let {
             gateClient.sharingState.upsertSharingState(it)
         }

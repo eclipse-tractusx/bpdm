@@ -24,9 +24,9 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.neovisionaries.i18n.CountryCode
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
-import org.eclipse.tractusx.bpdm.common.dto.IBaseAlternativePostalAddressDto
-import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
+import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinate
+import org.eclipse.tractusx.bpdm.common.dto.IBaseAlternativePostalAddress
+import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerbose
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.PostalAddressDescription
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
@@ -35,15 +35,15 @@ import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializ
 @Schema(description = PostalAddressDescription.headerAlternative)
 data class AlternativePostalAddressVerboseDto(
 
-    override val geographicCoordinates: GeoCoordinateDto?,
+    override val geographicCoordinates: GeoCoordinate?,
 
     @field:JsonProperty("country")
     @get:Schema(description = PostalAddressDescription.country)
-    val countryVerbose: TypeKeyNameVerboseDto<CountryCode>,
+    val countryVerbose: TypeKeyNameVerbose<CountryCode>,
 
     @field:JsonProperty("administrativeAreaLevel1")
     @get:Schema(description = PostalAddressDescription.administrativeAreaLevel1)
-    val administrativeAreaLevel1Verbose: RegionDto?,
+    val administrativeAreaLevel1Verbose: Region?,
 
     override val postalCode: String?,
     override val city: String,
@@ -51,7 +51,7 @@ data class AlternativePostalAddressVerboseDto(
     override val deliveryServiceQualifier: String?,
     override val deliveryServiceNumber: String
 
-) : IBaseAlternativePostalAddressDto {
+) : IBaseAlternativePostalAddress {
 
     @get:JsonIgnore
     override val country: CountryCode

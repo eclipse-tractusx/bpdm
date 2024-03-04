@@ -26,7 +26,7 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
-import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateResponse
 import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidStateException
@@ -55,7 +55,7 @@ class SharingStateService(
     /**
      * Upsert fixed sharing state based on given DTO
      */
-    fun upsertSharingState(request: SharingStateDto) {
+    fun upsertSharingState(request: SharingStateResponse) {
         logger.info { "Executing upsertSharingState() with parameters $request" }
         val sharingState = getOrCreate(request.externalId, request.businessPartnerType)
 
@@ -89,7 +89,7 @@ class SharingStateService(
         paginationRequest: PaginationRequest,
         businessPartnerType: BusinessPartnerType?,
         externalIds: Collection<String>?
-    ): PageDto<SharingStateDto> {
+    ): PageDto<SharingStateResponse> {
 
         logger.info { "findSharingStates() called with $paginationRequest // $businessPartnerType and $externalIds" }
 
@@ -98,7 +98,7 @@ class SharingStateService(
         val sharingStatePage = stateRepository.findAll(spec, pageRequest)
 
         return sharingStatePage.toPageDto {
-            SharingStateDto(
+            SharingStateResponse(
                 externalId = it.externalId,
                 businessPartnerType = it.businessPartnerType,
                 sharingStateType = it.sharingStateType,

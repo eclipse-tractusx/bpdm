@@ -21,12 +21,12 @@ package org.eclipse.tractusx.bpdm.gate.api.model.request
 
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
-import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerIdentifierDto
-import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerStateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerIdentifier
+import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerState
 import org.eclipse.tractusx.bpdm.gate.api.model.IBaseBusinessPartnerGateDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressRepresentationInputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityRepresentationInputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteRepresentationInputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressRepresentationInputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityRepresentationInputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteRepresentationInputResponse
 
 @Schema(
     description = "Generic business partner with external id",
@@ -36,12 +36,12 @@ data class BusinessPartnerInputRequest(
 
     override val externalId: String,
     override val nameParts: List<String> = emptyList(),
-    override val identifiers: Collection<BusinessPartnerIdentifierDto> = emptyList(),
-    override val states: Collection<BusinessPartnerStateDto> = emptyList(),
+    override val identifiers: Collection<BusinessPartnerIdentifier> = emptyList(),
+    override val states: Collection<BusinessPartnerState> = emptyList(),
     override val roles: Collection<BusinessPartnerRole> = emptyList(),
     override val isOwnCompanyData: Boolean = false,
-    override val legalEntity: LegalEntityRepresentationInputDto = LegalEntityRepresentationInputDto(),
-    override val site: SiteRepresentationInputDto = SiteRepresentationInputDto(),
-    override val address: AddressRepresentationInputDto = AddressRepresentationInputDto()
+    override val legalEntity: LegalEntityRepresentationInputResponse = LegalEntityRepresentationInputResponse(),
+    override val site: SiteRepresentationInputResponse = SiteRepresentationInputResponse(),
+    override val address: AddressRepresentationInputResponse = AddressRepresentationInputResponse()
 
 ) : IBaseBusinessPartnerGateDto

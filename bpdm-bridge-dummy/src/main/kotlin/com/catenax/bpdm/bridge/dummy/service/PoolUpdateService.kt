@@ -25,8 +25,8 @@ import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressDto
-import org.eclipse.tractusx.bpdm.pool.api.model.SiteDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddress
+import org.eclipse.tractusx.bpdm.pool.api.model.Site
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.springframework.stereotype.Service
@@ -113,7 +113,7 @@ class PoolUpdateService(
             leParentBpnByExternalId[entry.legalEntityExternalId]
                 ?.let { leParentBpn ->
                     SitePartnerCreateRequest(
-                        site = SiteDto(
+                        site = Site(
                             name = entry.site.nameParts.firstOrNull() ?: "",
                             states = entry.site.states.map(::gateToPoolSiteState),
                             mainAddress = gateToPoolLogisticAddress(entry.mainAddress),
@@ -138,7 +138,7 @@ class PoolUpdateService(
     fun updateSitesInPool(entriesToUpdate: Collection<GateSiteInfo>): SitePartnerUpdateResponseWrapper {
         val updateRequests = entriesToUpdate.map {
             SitePartnerUpdateRequest(
-                site = SiteDto(
+                site = Site(
                     name = it.site.nameParts.firstOrNull() ?: "",
                     states = it.site.states.map(::gateToPoolSiteState),
                     mainAddress = gateToPoolLogisticAddress(it.mainAddress),
@@ -178,7 +178,7 @@ class PoolUpdateService(
             siteParentBpnByExternalId[entry.siteExternalId]
                 ?.let { siteParentBpn ->
                     AddressPartnerCreateRequest(
-                        address = LogisticAddressDto(
+                        address = LogisticAddress(
                             name = entry.address.nameParts.firstOrNull(),
                             states = entry.address.states.map(::gateToPoolAddressState),
                             identifiers = entry.address.identifiers.map(::gateToPoolAddressIdentifier),
@@ -219,7 +219,7 @@ class PoolUpdateService(
     fun updateAddressesInPool(entriesToUpdate: Collection<GateAddressInfo>): AddressPartnerUpdateResponseWrapper {
         val updateRequests = entriesToUpdate.map {
             AddressPartnerUpdateRequest(
-                address = LogisticAddressDto(
+                address = LogisticAddress(
                     name = it.address.nameParts.firstOrNull(),
                     states = it.address.states.map(::gateToPoolAddressState),
                     identifiers = it.address.identifiers.map(::gateToPoolAddressIdentifier),

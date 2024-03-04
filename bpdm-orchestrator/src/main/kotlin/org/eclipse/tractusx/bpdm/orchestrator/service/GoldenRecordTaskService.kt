@@ -69,7 +69,7 @@ class GoldenRecordTaskService(
         val pendingTimeout = tasks.minOfOrNull { calculateTaskPendingTimeout(it.processingState) } ?: now
 
         val taskEntries = tasks.map { task ->
-            TaskStepReservationEntryDto(
+            TaskStepReservationEntry(
                 taskId = task.taskId,
                 businessPartner = task.businessPartner
             )
@@ -141,29 +141,29 @@ class GoldenRecordTaskService(
 
     private fun initTask(
         createRequest: TaskCreateRequest,
-        businessPartnerGeneric: BusinessPartnerGenericDto
+        businessPartnerGeneric: BusinessPartnerGeneric
     ) = GoldenRecordTask(
         taskId = UUID.randomUUID().toString(),
-        businessPartner = BusinessPartnerFullDto(
+        businessPartner = BusinessPartnerFull(
             generic = businessPartnerGeneric
         ),
         processingState = goldenRecordTaskStateMachine.initProcessingState(createRequest.mode)
     )
 
-    private fun toTaskClientStateDto(task: GoldenRecordTask): TaskClientStateDto {
+    private fun toTaskClientStateDto(task: GoldenRecordTask): TaskClientState {
         val businessPartnerResult = when (task.processingState.resultState) {
             ResultState.Success -> task.businessPartner.generic
             else -> null
         }
-        return TaskClientStateDto(
+        return TaskClientState(
             taskId = task.taskId,
             processingState = toTaskProcessingStateDto(task.processingState),
             businessPartnerResult = businessPartnerResult
         )
     }
 
-    private fun toTaskProcessingStateDto(processingState: TaskProcessingState): TaskProcessingStateDto {
-        return TaskProcessingStateDto(
+    private fun toTaskProcessingStateDto(processingState: TaskProcessingState): org.eclipse.tractusx.orchestrator.api.model.TaskProcessingState {
+        return TaskProcessingState(
             resultState = processingState.resultState,
             step = processingState.step,
             stepState = processingState.stepState,

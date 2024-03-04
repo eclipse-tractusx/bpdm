@@ -24,8 +24,8 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.PoolLegalEntityApi
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerbose
+import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerbose
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
@@ -51,36 +51,36 @@ interface LegalEntityApiClient : PoolLegalEntityApi {
     override fun getAddresses(
         @PathVariable bpnl: String,
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageDto<LogisticAddressVerboseDto>
+    ): PageDto<LogisticAddressVerbose>
 
     @GetExchange
     override fun getLegalEntities(
         @ParameterObject bpSearchRequest: LegalEntityPropertiesSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageDto<LegalEntityMatchVerboseDto>
+    ): PageDto<LegalEntityMatchVerboseResponse>
 
     @GetExchange("/{idValue}")
     override fun getLegalEntity(
         @PathVariable idValue: String,
         @Parameter(description = "Type of identifier to use, defaults to BPN when omitted", schema = Schema(defaultValue = "BPN"))
         @RequestParam idType: String?
-    ): LegalEntityWithLegalAddressVerboseDto
+    ): LegalEntityWithLegalAddressVerboseResponse
 
     @GetExchange("/{bpnl}/sites")
     override fun getSites(
         @PathVariable bpnl: String,
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageDto<SiteVerboseDto>
+    ): PageDto<SiteVerbose>
 
     @PostExchange("/legal-addresses/search")
     override fun searchLegalAddresses(
         @RequestBody bpnLs: Collection<String>
-    ): Collection<LegalAddressVerboseDto>
+    ): Collection<LegalAddressVerboseResponse>
 
     @PostExchange("/search")
     override fun searchLegalEntitys(
         @RequestBody bpnLs: Collection<String>
-    ): ResponseEntity<Collection<LegalEntityWithLegalAddressVerboseDto>>
+    ): ResponseEntity<Collection<LegalEntityWithLegalAddressVerboseResponse>>
 
     @PostExchange("/{bpnl}/confirm-up-to-date")
     override fun setLegalEntityCurrentness(

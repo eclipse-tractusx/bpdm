@@ -26,9 +26,9 @@ import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
-import org.eclipse.tractusx.bpdm.pool.dto.AddressMetadataDto
+import org.eclipse.tractusx.bpdm.pool.dto.AddressMetadata
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
-import org.eclipse.tractusx.bpdm.pool.dto.LegalEntityMetadataDto
+import org.eclipse.tractusx.bpdm.pool.dto.LegalEntityMetadata
 import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
@@ -351,7 +351,7 @@ class BusinessPartnerBuildService(
     private fun createAddressesForLegalEntity(
         validRequests: Collection<AddressPartnerCreateRequest>,
         metadataMap: AddressMetadataMapping
-    ): Collection<AddressPartnerCreateVerboseDto> {
+    ): Collection<AddressPartnerCreateVerboseResponse> {
 
         val bpnLsToFetch = validRequests.map { it.bpnParent }
         val parentLegalEntities = businessPartnerFetchService.fetchByBpns(bpnLsToFetch)
@@ -372,7 +372,7 @@ class BusinessPartnerBuildService(
     private fun createAddressesForSite(
         validRequests: Collection<AddressPartnerCreateRequest>,
         metadataMap: AddressMetadataMapping
-    ): List<AddressPartnerCreateVerboseDto> {
+    ): List<AddressPartnerCreateVerboseResponse> {
 
         val bpnsToFetch = validRequests.map { it.bpnParent }
         val siteParents = siteRepository.findDistinctByBpnIn(bpnsToFetch)
@@ -394,7 +394,7 @@ class BusinessPartnerBuildService(
 
 
     private fun createLogisticAddress(
-        dto: LogisticAddressDto,
+        dto: LogisticAddress,
         bpn: String,
         legalEntity: LegalEntityDb,
         metadataMap: AddressMetadataMapping
@@ -402,7 +402,7 @@ class BusinessPartnerBuildService(
         .also { it.legalEntity = legalEntity }
 
     private fun createLogisticAddress(
-        dto: LogisticAddressDto,
+        dto: LogisticAddress,
         bpn: String,
         site: SiteDb,
         metadataMap: AddressMetadataMapping
@@ -410,7 +410,7 @@ class BusinessPartnerBuildService(
         .also { it.site = site }
 
     private fun createLogisticAddressInternal(
-        dto: LogisticAddressDto,
+        dto: LogisticAddress,
         bpn: String,
         metadataMap: AddressMetadataMapping
     ): LogisticAddressDb {
@@ -429,7 +429,7 @@ class BusinessPartnerBuildService(
         return address
     }
 
-    private fun updateLogisticAddress(address: LogisticAddressDb, dto: LogisticAddressDto, metadataMap: AddressMetadataMapping) {
+    private fun updateLogisticAddress(address: LogisticAddressDb, dto: LogisticAddress, metadataMap: AddressMetadataMapping) {
         address.name = dto.name
         address.physicalPostalAddress = createPhysicalAddress(dto.physicalPostalAddress, metadataMap.regions)
         address.alternativePostalAddress = dto.alternativePostalAddress?.let { createAlternativeAddress(it, metadataMap.regions) }
@@ -446,13 +446,13 @@ class BusinessPartnerBuildService(
         address.confidenceCriteria = createConfidenceCriteria(dto.confidenceCriteria)
     }
 
-    private fun LegalEntityMetadataDto.toMapping() =
+    private fun LegalEntityMetadata.toMapping() =
         LegalEntityMetadataMapping(
             idTypes = idTypes.associateBy { it.technicalKey },
             legalForms = legalForms.associateBy { it.technicalKey }
         )
 
-    private fun AddressMetadataDto.toMapping() =
+    private fun AddressMetadata.toMapping() =
         AddressMetadataMapping(
             idTypes = idTypes.associateBy { it.technicalKey },
             regions = regions.associateBy { it.regionCode }
@@ -471,10 +471,10 @@ class BusinessPartnerBuildService(
 
     data class SiteCreateRequestWithLegalAddressAsMain(
         override val name: String,
-        override val states: Collection<SiteStateDto>,
-        override val confidenceCriteria: ConfidenceCriteriaDto,
+        override val states: Collection<SiteState>,
+        override val confidenceCriteria: ConfidenceCriteria,
         val bpnLParent: String
-    ) : IBaseSiteDto
+    ) : IBaseSite
 
     companion object {
 
@@ -482,7 +482,7 @@ class BusinessPartnerBuildService(
             return Instant.now().truncatedTo(ChronoUnit.MICROS)
         }
 
-        fun toLegalEntityState(dto: ILegalEntityStateDto, legalEntity: LegalEntityDb): LegalEntityStateDb {
+        fun toLegalEntityState(dto: ILegalEntityState, legalEntity: LegalEntityDb): LegalEntityStateDb {
             return LegalEntityStateDb(
                 validFrom = dto.validFrom,
                 validTo = dto.validTo,
@@ -491,7 +491,7 @@ class BusinessPartnerBuildService(
             )
         }
 
-        fun toSiteState(dto: ISiteStateDto, site: SiteDb): SiteStateDb {
+        fun toSiteState(dto: ISiteState, site: SiteDb): SiteStateDb {
             return SiteStateDb(
                 validFrom = dto.validFrom,
                 validTo = dto.validTo,
@@ -500,7 +500,7 @@ class BusinessPartnerBuildService(
             )
         }
 
-        fun toAddressState(dto: IAddressStateDto, address: LogisticAddressDb): AddressStateDb {
+        fun toAddressState(dto: IAddressState, address: LogisticAddressDb): AddressStateDb {
             return AddressStateDb(
                 validFrom = dto.validFrom,
                 validTo = dto.validTo,
@@ -509,7 +509,7 @@ class BusinessPartnerBuildService(
             )
         }
 
-        fun toLegalEntityClassification(dto: IBaseClassificationDto, partner: LegalEntityDb): LegalEntityClassificationDb {
+        fun toLegalEntityClassification(dto: IBaseClassification, partner: LegalEntityDb): LegalEntityClassificationDb {
 
             val dtoType = dto.type ?: throw BpdmValidationException(TaskStepBuildService.CleaningError.CLASSIFICATION_TYPE_IS_NULL.message)
 
@@ -522,7 +522,7 @@ class BusinessPartnerBuildService(
         }
 
         fun toLegalEntityIdentifier(
-            dto: ILegalEntityIdentifierDto,
+            dto: ILegalEntityIdentifier,
             idTypes: Map<String, IdentifierTypeDb>,
             partner: LegalEntityDb
         ): LegalEntityIdentifierDb {
@@ -535,7 +535,7 @@ class BusinessPartnerBuildService(
         }
 
         fun toAddressIdentifier(
-            dto: IAddressIdentifierDto,
+            dto: IAddressIdentifier,
             idTypes: Map<String, IdentifierTypeDb>,
             partner: LogisticAddressDb
         ): AddressIdentifierDb {
@@ -546,7 +546,7 @@ class BusinessPartnerBuildService(
             )
         }
 
-        fun updateSite(site: SiteDb, siteDto: IBaseSiteDto) {
+        fun updateSite(site: SiteDb, siteDto: IBaseSite) {
 
             val name = siteDto.name ?: throw BpdmValidationException(TaskStepBuildService.CleaningError.SITE_NAME_IS_NULL.message)
 
@@ -559,7 +559,7 @@ class BusinessPartnerBuildService(
         }
 
         fun createSite(
-            siteDto: IBaseSiteDto,
+            siteDto: IBaseSite,
             bpnS: String,
             partner: LegalEntityDb
         ): SiteDb {
@@ -575,27 +575,27 @@ class BusinessPartnerBuildService(
         }
 
         fun createLegalEntity(
-            legalEntityDto: LegalEntityDto,
+            legalEntity: LegalEntity,
             bpnL: String,
             metadataMap: LegalEntityMetadataMapping
         ): LegalEntityDb {
             // it has to be validated that the legalForm exits
-            val legalForm = legalEntityDto.legalForm?.let { metadataMap.legalForms[it]!! }
-            val legalName = NameDb(value = legalEntityDto.legalName, shortName = legalEntityDto.legalShortName)
+            val legalForm = legalEntity.legalForm?.let { metadataMap.legalForms[it]!! }
+            val legalName = NameDb(value = legalEntity.legalName, shortName = legalEntity.legalShortName)
             val newLegalEntity = LegalEntityDb(
                 bpn = bpnL,
                 legalName = legalName,
                 legalForm = legalForm,
                 currentness = Instant.now().truncatedTo(ChronoUnit.MICROS),
-                confidenceCriteria = createConfidenceCriteria(legalEntityDto.confidenceCriteria)
+                confidenceCriteria = createConfidenceCriteria(legalEntity.confidenceCriteria)
             )
-            updateLegalEntity(newLegalEntity, legalEntityDto, metadataMap)
+            updateLegalEntity(newLegalEntity, legalEntity, metadataMap)
 
             return newLegalEntity
         }
         fun updateLegalEntity(
             legalEntity: LegalEntityDb,
-            legalEntityDto: LegalEntityDto,
+            legalEntityDto: LegalEntity,
             metadataMap: LegalEntityMetadataMapping
         ) {
             legalEntity.currentness = createCurrentnessTimestamp()
@@ -610,7 +610,7 @@ class BusinessPartnerBuildService(
             legalEntity.confidenceCriteria = createConfidenceCriteria(legalEntityDto.confidenceCriteria)
         }
 
-        fun createPhysicalAddress(physicalAddress: IBasePhysicalPostalAddressDto, regions: Map<String, RegionDb>): PhysicalPostalAddressDb {
+        fun createPhysicalAddress(physicalAddress: IBasePhysicalPostalAddress, regions: Map<String, RegionDb>): PhysicalPostalAddressDb {
 
             if (physicalAddress.country == null || physicalAddress.city == null) {
                 throw BpdmValidationException(TaskStepBuildService.CleaningError.COUNTRY_CITY_IS_NULL.message)
@@ -646,7 +646,7 @@ class BusinessPartnerBuildService(
             )
         }
 
-        fun createAlternativeAddress(alternativeAddress: IBaseAlternativePostalAddressDto, regions: Map<String, RegionDb>): AlternativePostalAddressDb {
+        fun createAlternativeAddress(alternativeAddress: IBaseAlternativePostalAddress, regions: Map<String, RegionDb>): AlternativePostalAddressDb {
 
             if (alternativeAddress.country == null || alternativeAddress.city == null ||
                 alternativeAddress.deliveryServiceType == null || alternativeAddress.deliveryServiceNumber == null
@@ -667,7 +667,7 @@ class BusinessPartnerBuildService(
             )
         }
 
-        fun createConfidenceCriteria(confidenceCriteria: IConfidenceCriteriaDto) =
+        fun createConfidenceCriteria(confidenceCriteria: IConfidenceCriteria) =
             ConfidenceCriteriaDb(
                 sharedByOwner = confidenceCriteria.sharedByOwner!!,
                 checkedByExternalDataSource = confidenceCriteria.checkedByExternalDataSource!!,

@@ -26,7 +26,7 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.GateSharingStateApi
 import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateResponse
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
@@ -42,12 +42,12 @@ interface SharingStateApiClient : GateSharingStateApi {
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @Parameter(description = "Business partner type") @RequestParam(required = false) businessPartnerType: BusinessPartnerType?,
         @Parameter(description = "External IDs") @RequestParam(required = false) externalIds: Collection<String>?
-    ): PageDto<SharingStateDto>
+    ): PageDto<SharingStateResponse>
 
     @PostExchange("/ready")
     override fun postSharingStateReady(@RequestBody request: PostSharingStateReadyRequest)
 
     @PutExchange
-    override fun upsertSharingState(@RequestBody request: SharingStateDto)
+    override fun upsertSharingState(@RequestBody request: SharingStateResponse)
 
 }

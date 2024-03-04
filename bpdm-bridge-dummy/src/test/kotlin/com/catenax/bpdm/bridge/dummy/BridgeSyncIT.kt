@@ -26,19 +26,19 @@ import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
-import org.eclipse.tractusx.bpdm.gate.api.model.StreetDto
+import org.eclipse.tractusx.bpdm.gate.api.model.Street
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateResponse
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerbose
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerBpnSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteBpnSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchVerboseResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseResponse
 import org.eclipse.tractusx.bpdm.test.containers.BpdmGateContextInitializer
 import org.eclipse.tractusx.bpdm.test.containers.BpdmPoolContextInitializer
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
@@ -250,7 +250,11 @@ class BridgeSyncIT @Autowired constructor(
             legalEntity = GateRequestValues.legalEntity1.copy(legalShortName = "ChangedShortNam"),
             legalAddress = GateRequestValues.address1.copy(
                 physicalPostalAddress = GateRequestValues.postalAddress1.copy(
-                    street = StreetDto(name = "Changed Street Entiy", houseNumber = BusinessPartnerVerboseValues.houseNumber1, direction = BusinessPartnerVerboseValues.direction1),
+                    street = Street(
+                        name = "Changed Street Entiy",
+                        houseNumber = BusinessPartnerVerboseValues.houseNumber1,
+                        direction = BusinessPartnerVerboseValues.direction1
+                    ),
                 ),
             ),
         )
@@ -317,7 +321,11 @@ class BridgeSyncIT @Autowired constructor(
             site = GateRequestValues.site1.copy(nameParts = listOf("ChangedNamePart1")),
             mainAddress = GateRequestValues.address1.copy(
                 physicalPostalAddress = GateRequestValues.postalAddress1.copy(
-                    street = StreetDto(name = "Changed Street Site", houseNumber = BusinessPartnerVerboseValues.houseNumber1, direction = BusinessPartnerVerboseValues.direction1),
+                    street = Street(
+                        name = "Changed Street Site",
+                        houseNumber = BusinessPartnerVerboseValues.houseNumber1,
+                        direction = BusinessPartnerVerboseValues.direction1
+                    ),
                 ),
             )
         )
@@ -384,7 +392,13 @@ class BridgeSyncIT @Autowired constructor(
             address = GateRequestValues.address1.copy(
                 nameParts = listOf("Changed Address Name"),
                 physicalPostalAddress = GateRequestValues.postalAddress1
-                    .copy(street = StreetDto(name = "UpdateSteet", houseNumber = BusinessPartnerVerboseValues.houseNumber1, direction = BusinessPartnerVerboseValues.direction1))
+                    .copy(
+                        street = Street(
+                            name = "UpdateSteet",
+                            houseNumber = BusinessPartnerVerboseValues.houseNumber1,
+                            direction = BusinessPartnerVerboseValues.direction1
+                        )
+                    )
             ),
 
             )
@@ -406,7 +420,7 @@ class BridgeSyncIT @Autowired constructor(
 
     }
 
-    private fun allLegalEntitiesFromPool(): Collection<LegalEntityMatchVerboseDto> {
+    private fun allLegalEntitiesFromPool(): Collection<LegalEntityMatchVerboseResponse> {
         val poolLegalEntityResponses = poolClient.legalEntities.getLegalEntities(
             bpSearchRequest = LegalEntityPropertiesSearchRequest.EmptySearchRequest,
             paginationRequest = DEFAULT_PAGINATION_REQUEST
@@ -415,7 +429,7 @@ class BridgeSyncIT @Autowired constructor(
 
     }
 
-    private fun buildBpnByExternalIdMap(sharingStatesOkay: List<SharingStateDto>) =
+    private fun buildBpnByExternalIdMap(sharingStatesOkay: List<SharingStateResponse>) =
         sharingStatesOkay
             .associateBy { it.externalId }
             .mapValues { it.value.bpn }
@@ -438,7 +452,7 @@ class BridgeSyncIT @Autowired constructor(
 
     }
 
-    private fun readSuccessfulSharingStatesWithBpn(): List<SharingStateDto> {
+    private fun readSuccessfulSharingStatesWithBpn(): List<SharingStateResponse> {
         val sharingStates = gateClient.sharingState.getSharingStates(
             paginationRequest = DEFAULT_PAGINATION_REQUEST,
             businessPartnerType = null,
@@ -448,7 +462,7 @@ class BridgeSyncIT @Autowired constructor(
             .filter { it.sharingStateType == SharingStateType.Success && it.bpn != null }
     }
 
-    private fun assertEqualLegalEntity(gateVersion: LegalEntityGateInputRequest, poolVersion: LegalEntityMatchVerboseDto) {
+    private fun assertEqualLegalEntity(gateVersion: LegalEntityGateInputRequest, poolVersion: LegalEntityMatchVerboseResponse) {
         assertThat(poolVersion.legalEntity.legalShortName).isEqualTo(gateVersion.legalEntity.legalShortName)
         //       assertThat(poolVersion.legalAddress.name).isEqualTo(gateVersion.legalAddress.nameParts.first())
         assertThat(poolVersion.legalAddress.physicalPostalAddress.street?.name).isEqualTo(gateVersion.legalAddress.physicalPostalAddress.street?.name)
@@ -458,12 +472,12 @@ class BridgeSyncIT @Autowired constructor(
         assertThat(poolVersion.legalAddress.alternativePostalAddress?.city).isEqualTo(gateVersion.legalAddress.alternativePostalAddress?.city)
     }
 
-    private fun assertEqualSite(gateVersion: SiteGateInputRequest, poolVersion: SiteWithMainAddressVerboseDto) {
+    private fun assertEqualSite(gateVersion: SiteGateInputRequest, poolVersion: SiteWithMainAddressVerboseResponse) {
         assertThat(poolVersion.site.name).isEqualTo(gateVersion.site.nameParts.first())
         assertThat(poolVersion.mainAddress.physicalPostalAddress.street?.name).isEqualTo(gateVersion.mainAddress.physicalPostalAddress.street?.name)
     }
 
-    private fun assertEqualAddress(gateVersion: AddressGateInputRequest, poolVersion: LogisticAddressVerboseDto) {
+    private fun assertEqualAddress(gateVersion: AddressGateInputRequest, poolVersion: LogisticAddressVerbose) {
         assertThat(poolVersion.name).isEqualTo(gateVersion.address.nameParts.first())
         assertThat(poolVersion.physicalPostalAddress.street?.name).isEqualTo(gateVersion.address.physicalPostalAddress.street?.name)
         assertThat(poolVersion.physicalPostalAddress.city).isEqualTo(gateVersion.address.physicalPostalAddress.city)

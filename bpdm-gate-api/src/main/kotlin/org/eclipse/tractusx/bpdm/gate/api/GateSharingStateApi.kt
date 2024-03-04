@@ -29,7 +29,7 @@ import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateResponse
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
@@ -50,7 +50,7 @@ interface GateSharingStateApi {
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @Parameter(description = "Business partner type") @RequestParam(required = false) businessPartnerType: BusinessPartnerType?,
         @Parameter(description = "External IDs") @RequestParam(required = false) externalIds: Collection<String>?
-    ): PageDto<SharingStateDto>
+    ): PageDto<SharingStateResponse>
 
     @Operation(
         summary = "Sets the given business partners into ready to be shared state",
@@ -78,7 +78,7 @@ interface GateSharingStateApi {
         ]
     )
     @PutMapping
-    fun upsertSharingState(@RequestBody request: SharingStateDto)
+    fun upsertSharingState(@RequestBody request: SharingStateResponse)
 
 
 }

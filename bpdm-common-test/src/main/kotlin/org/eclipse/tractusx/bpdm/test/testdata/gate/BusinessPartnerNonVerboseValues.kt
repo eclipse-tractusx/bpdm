@@ -20,15 +20,15 @@
 package org.eclipse.tractusx.bpdm.test.testdata.gate
 
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateOutputChildRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.AddressIdentifierDto
+import org.eclipse.tractusx.bpdm.gate.api.model.AddressIdentifier
 import org.eclipse.tractusx.bpdm.gate.api.model.request.*
-import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressRepresentationInputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressRepresentationInputResponse
 
 object BusinessPartnerNonVerboseValues {
 
     val physicalAddressMinimal = BusinessPartnerVerboseValues.physicalAddressMinimal
 
-    val bpPostalAddressInputDtoMinimal = AddressRepresentationInputDto(
+    val bpPostalAddressInputDtoMinimal = AddressRepresentationInputResponse(
         addressType = null,
         name = null,
         physicalPostalAddress = physicalAddressMinimal
@@ -101,7 +101,7 @@ object BusinessPartnerNonVerboseValues {
         address = BusinessPartnerVerboseValues.physicalAddress1.copy(
             nameParts = BusinessPartnerVerboseValues.logisticAddressGateInputResponse1.address.nameParts,
             identifiers = listOf(
-                AddressIdentifierDto(BusinessPartnerVerboseValues.identifierValue1, BusinessPartnerVerboseValues.identifierTypeTechnicalKey1)
+                AddressIdentifier(BusinessPartnerVerboseValues.identifierValue1, BusinessPartnerVerboseValues.identifierTypeTechnicalKey1)
             )
         ),
         externalId = BusinessPartnerVerboseValues.externalIdAddress1,
@@ -112,7 +112,7 @@ object BusinessPartnerNonVerboseValues {
         address = BusinessPartnerVerboseValues.physicalAddress2.copy(
             nameParts = BusinessPartnerVerboseValues.logisticAddressGateInputResponse2.address.nameParts,
             identifiers = listOf(
-                AddressIdentifierDto(BusinessPartnerVerboseValues.identifierValue1, BusinessPartnerVerboseValues.identifierTypeTechnicalKey1)
+                AddressIdentifier(BusinessPartnerVerboseValues.identifierValue1, BusinessPartnerVerboseValues.identifierTypeTechnicalKey1)
             )
         ),
         externalId = BusinessPartnerVerboseValues.externalIdAddress2,
@@ -124,7 +124,7 @@ object BusinessPartnerNonVerboseValues {
         address = BusinessPartnerVerboseValues.physicalAddress1.copy(
             nameParts = BusinessPartnerVerboseValues.logisticAddressGateOutputResponse1.address.nameParts,
             identifiers = listOf(
-                AddressIdentifierDto(BusinessPartnerVerboseValues.identifierValue1, BusinessPartnerVerboseValues.identifierTypeTechnicalKey1)
+                AddressIdentifier(BusinessPartnerVerboseValues.identifierValue1, BusinessPartnerVerboseValues.identifierTypeTechnicalKey1)
             )
         ),
         externalId = BusinessPartnerVerboseValues.externalIdAddress1,
@@ -136,7 +136,7 @@ object BusinessPartnerNonVerboseValues {
         address = BusinessPartnerVerboseValues.physicalAddress2.copy(
             nameParts = BusinessPartnerVerboseValues.logisticAddressGateOutputResponse2.address.nameParts,
             identifiers = listOf(
-                AddressIdentifierDto(BusinessPartnerVerboseValues.identifierValue1, BusinessPartnerVerboseValues.identifierTypeTechnicalKey1)
+                AddressIdentifier(BusinessPartnerVerboseValues.identifierValue1, BusinessPartnerVerboseValues.identifierTypeTechnicalKey1)
             )
         ),
         externalId = BusinessPartnerVerboseValues.externalIdAddress2,

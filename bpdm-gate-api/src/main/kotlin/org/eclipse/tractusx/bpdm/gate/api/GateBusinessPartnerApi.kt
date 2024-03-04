@@ -27,8 +27,8 @@ import jakarta.validation.Valid
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputResponse
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -54,7 +54,7 @@ interface GateBusinessPartnerApi {
         ]
     )
     @PutMapping("/input/business-partners")
-    fun upsertBusinessPartnersInput(@RequestBody businessPartners: Collection<BusinessPartnerInputRequest>): ResponseEntity<Collection<BusinessPartnerInputDto>>
+    fun upsertBusinessPartnersInput(@RequestBody businessPartners: Collection<BusinessPartnerInputRequest>): ResponseEntity<Collection<BusinessPartnerInputResponse>>
 
     @Operation(
         summary = "Search business partner by external ID. An empty external ID list returns a paginated list of all business partners.",
@@ -70,7 +70,7 @@ interface GateBusinessPartnerApi {
     fun getBusinessPartnersInput(
         @RequestBody externalIds: Collection<String>? = null,
         @ParameterObject @Valid paginationRequest: PaginationRequest = PaginationRequest()
-    ): PageDto<BusinessPartnerInputDto>
+    ): PageDto<BusinessPartnerInputResponse>
 
 
     @Operation(
@@ -88,6 +88,6 @@ interface GateBusinessPartnerApi {
     fun getBusinessPartnersOutput(
         @RequestBody externalIds: Collection<String>? = null,
         @ParameterObject @Valid paginationRequest: PaginationRequest = PaginationRequest()
-    ): PageDto<BusinessPartnerOutputDto>
+    ): PageDto<BusinessPartnerOutputResponse>
 
 }

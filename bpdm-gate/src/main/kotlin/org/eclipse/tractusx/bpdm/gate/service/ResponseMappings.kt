@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.service
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
-import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
+import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinate
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.model.*
@@ -67,7 +67,7 @@ fun AddressGateOutputRequest.toAddressGateOutput(legalEntity: LegalEntityDb?, si
     return logisticAddress
 }
 
-fun toEntityAddress(dto: AddressStateDto, address: LogisticAddressDb): AddressStateDb {
+fun toEntityAddress(dto: AddressState, address: LogisticAddressDb): AddressStateDb {
     return AddressStateDb(dto.description, dto.validFrom, dto.validTo, dto.type, address)
 }
 
@@ -75,7 +75,7 @@ fun toNameParts(namePartsValue: String, address: LogisticAddressDb?, site: SiteD
     return NamePartsDb(address, site, legalEntity, namePartsValue)
 }
 
-fun AlternativePostalAddressDto.toAlternativePostalAddressEntity() =
+fun AlternativePostalAddress.toAlternativePostalAddressEntity() =
     AlternativePostalAddressDb(
         geographicCoordinates = geographicCoordinates?.toGeographicCoordinateEntity(),
         country = country,
@@ -87,7 +87,7 @@ fun AlternativePostalAddressDto.toAlternativePostalAddressEntity() =
         deliveryServiceQualifier = deliveryServiceQualifier
     )
 
-fun PhysicalPostalAddressDto.toPhysicalPostalAddressEntity() =
+fun PhysicalPostalAddress.toPhysicalPostalAddressEntity() =
     PhysicalPostalAddressDb(
         geographicCoordinates = geographicCoordinates?.toGeographicCoordinateEntity(),
         country = country,
@@ -105,7 +105,7 @@ fun PhysicalPostalAddressDto.toPhysicalPostalAddressEntity() =
         door = door
     )
 
-fun GeoCoordinateDto.toGeographicCoordinateEntity(): GeographicCoordinateDb {
+fun GeoCoordinate.toGeographicCoordinateEntity(): GeographicCoordinateDb {
     return GeographicCoordinateDb(
         latitude = latitude,
         longitude = longitude,
@@ -113,7 +113,7 @@ fun GeoCoordinateDto.toGeographicCoordinateEntity(): GeographicCoordinateDb {
     )
 }
 
-private fun StreetDto.toStreetEntity(): StreetDb {
+private fun Street.toStreetEntity(): StreetDb {
     return StreetDb(
         name = name,
         houseNumber = houseNumber,
@@ -180,12 +180,12 @@ fun SiteGateOutputRequest.toSiteGate(legalEntity: LegalEntityDb, datatype: Stage
     return site
 }
 
-fun toEntityAddress(dto: SiteStateDto, site: SiteDb): SiteStateDb {
+fun toEntityAddress(dto: SiteState, site: SiteDb): SiteStateDb {
     return SiteStateDb(dto.description, dto.validFrom, dto.validTo, dto.type, site)
 }
 
-fun ChangelogEntryDb.toGateDto(): ChangelogGateDto {
-    return ChangelogGateDto(
+fun ChangelogEntryDb.toGateDto(): ChangelogGateResponse {
+    return ChangelogGateResponse(
         externalId = externalId,
         businessPartnerType = businessPartnerType,
         timestamp = createdAt,
@@ -249,19 +249,19 @@ fun toRoles(role: BusinessPartnerRole, legalEntity: LegalEntityDb?, site: SiteDb
     return RolesDb(legalEntity, address, site, role)
 }
 
-fun toEntityAddressIdentifiers(dto: AddressIdentifierDto, address: LogisticAddressDb): AddressIdentifierDb {
+fun toEntityAddressIdentifiers(dto: AddressIdentifier, address: LogisticAddressDb): AddressIdentifierDb {
     return AddressIdentifierDb(dto.value, dto.type, address)
 }
 
-fun toEntityState(dto: LegalEntityStateDto, legalEntity: LegalEntityDb): LegalEntityStateDb {
+fun toEntityState(dto: LegalEntityState, legalEntity: LegalEntityDb): LegalEntityStateDb {
     return LegalEntityStateDb(dto.description, dto.validFrom, dto.validTo, dto.type, legalEntity)
 }
 
-fun toEntityClassification(dto: LegalEntityClassificationDto, legalEntity: LegalEntityDb): LegalEntityClassification {
-    return LegalEntityClassification(dto.value, dto.code, dto.type, legalEntity)
+fun toEntityClassification(dto: LegalEntityClassification, legalEntity: LegalEntityDb): LegalEntityClassificationDb {
+    return LegalEntityClassificationDb(dto.value, dto.code, dto.type, legalEntity)
 }
 
-fun toEntityIdentifiers(dto: LegalEntityIdentifierDto, legalEntity: LegalEntityDb): LegalEntityIdentifierDb {
+fun toEntityIdentifiers(dto: LegalEntityIdentifier, legalEntity: LegalEntityDb): LegalEntityIdentifierDb {
     return LegalEntityIdentifierDb(dto.value, dto.type, dto.issuingBody, legalEntity)
 }
 
@@ -274,9 +274,9 @@ fun getLegalAddressExternalIdForLegalEntityExternalId(legalEntityExternalId: Str
 }
 
 //Logistic Address mapping to AddressGateInputResponse
-fun LogisticAddressDb.toAddressGateInputResponse(logisticAddressPage: LogisticAddressDb): AddressGateInputDto {
+fun LogisticAddressDb.toAddressGateInputResponse(logisticAddressPage: LogisticAddressDb): AddressGateInputResponse {
 
-    return AddressGateInputDto(
+    return AddressGateInputResponse(
         address = logisticAddressPage.toLogisticAddressDto(),
         externalId = externalId,
         legalEntityExternalId = legalEntity?.externalId,
@@ -285,9 +285,9 @@ fun LogisticAddressDb.toAddressGateInputResponse(logisticAddressPage: LogisticAd
 }
 
 //Logistic Address mapping to LogisticAddressDto
-fun LogisticAddressDb.toLogisticAddressDto(): LogisticAddressDto {
+fun LogisticAddressDb.toLogisticAddressDto(): LogisticAddress {
 
-    return LogisticAddressDto(
+    return LogisticAddress(
         nameParts = getNamePartValues(nameParts),
         states = mapToDtoStates(states),
         roles = roles.map { it.roleName },
@@ -301,12 +301,12 @@ fun getNamePartValues(nameparts: MutableSet<NamePartsDb>): Collection<String> {
     return nameparts.map { it.namePart }
 }
 
-fun mapToDtoStates(states: MutableSet<AddressStateDb>): Collection<AddressStateDto> {
-    return states.map { AddressStateDto(it.description, it.validFrom, it.validTo, it.type) }
+fun mapToDtoStates(states: MutableSet<AddressStateDb>): Collection<AddressState> {
+    return states.map { AddressState(it.description, it.validFrom, it.validTo, it.type) }
 }
 
 fun AlternativePostalAddressDb.toAlternativePostalAddressDto() =
-    AlternativePostalAddressDto(
+    AlternativePostalAddress(
         deliveryServiceType = deliveryServiceType,
         deliveryServiceNumber = deliveryServiceNumber,
         deliveryServiceQualifier = deliveryServiceQualifier,
@@ -317,8 +317,8 @@ fun AlternativePostalAddressDb.toAlternativePostalAddressDto() =
         city = city
     )
 
-fun PhysicalPostalAddressDb.toPhysicalPostalAddress(): PhysicalPostalAddressDto =
-    PhysicalPostalAddressDto(
+fun PhysicalPostalAddressDb.toPhysicalPostalAddress(): PhysicalPostalAddress =
+    PhysicalPostalAddress(
         geographicCoordinates = geographicCoordinates?.toGeographicCoordinateDto(),
         country = country,
         postalCode = postalCode,
@@ -335,13 +335,13 @@ fun PhysicalPostalAddressDb.toPhysicalPostalAddress(): PhysicalPostalAddressDto 
         street = street?.toStreetDto()
     )
 
-fun GeographicCoordinateDb.toGeographicCoordinateDto(): GeoCoordinateDto {
-    return GeoCoordinateDto(longitude, latitude, altitude)
+fun GeographicCoordinateDb.toGeographicCoordinateDto(): GeoCoordinate {
+    return GeoCoordinate(longitude, latitude, altitude)
 }
 
-private fun StreetDb.toStreetDto(): StreetDto {
+private fun StreetDb.toStreetDto(): Street {
 
-    return StreetDto(
+    return Street(
         name = name,
         houseNumber = houseNumber,
         houseNumberSupplement = houseNumberSupplement,
@@ -354,9 +354,9 @@ private fun StreetDb.toStreetDto(): StreetDto {
     )
 }
 
-fun LegalEntityDb.toLegalEntityDto(): LegalEntityDto {
+fun LegalEntityDb.toLegalEntityDto(): LegalEntity {
 
-    return LegalEntityDto(
+    return LegalEntity(
         legalNameParts = getNamePartValues(nameParts),
         legalForm = legalForm,
         legalShortName = shortName,
@@ -367,29 +367,29 @@ fun LegalEntityDb.toLegalEntityDto(): LegalEntityDto {
     )
 }
 
-fun mapToLegalEntityStateDto(states: MutableSet<LegalEntityStateDb>): Collection<LegalEntityStateDto> {
-    return states.map { LegalEntityStateDto(it.description, it.validFrom, it.validTo, it.type) }
+fun mapToLegalEntityStateDto(states: MutableSet<LegalEntityStateDb>): Collection<LegalEntityState> {
+    return states.map { LegalEntityState(it.description, it.validFrom, it.validTo, it.type) }
 }
 
-fun mapToLegalEntityClassificationsDto(classification: MutableSet<LegalEntityClassification>): Collection<LegalEntityClassificationDto> {
-    return classification.map { LegalEntityClassificationDto(it.type, it.code, it.value) }
+fun mapToLegalEntityClassificationsDto(classification: MutableSet<LegalEntityClassificationDb>): Collection<LegalEntityClassification> {
+    return classification.map { LegalEntityClassification(it.type, it.code, it.value) }
 }
 
-fun mapToLegalEntityIdentifiersDto(identifiers: MutableSet<LegalEntityIdentifierDb>): Collection<LegalEntityIdentifierDto> {
-    return identifiers.map { LegalEntityIdentifierDto(it.value, it.type, it.issuingBody) }
+fun mapToLegalEntityIdentifiersDto(identifiers: MutableSet<LegalEntityIdentifierDb>): Collection<LegalEntityIdentifier> {
+    return identifiers.map { LegalEntityIdentifier(it.value, it.type, it.issuingBody) }
 }
 
-fun mapToAddressIdentifiersDto(identifiers: MutableSet<AddressIdentifierDb>): Collection<AddressIdentifierDto> {
-    return identifiers.map { AddressIdentifierDto(it.value, it.type) }
+fun mapToAddressIdentifiersDto(identifiers: MutableSet<AddressIdentifierDb>): Collection<AddressIdentifier> {
+    return identifiers.map { AddressIdentifier(it.value, it.type) }
 }
 
-fun AddressIdentifierDb.mapToAddressIdentifiersDto(): AddressIdentifierDto {
-    return AddressIdentifierDto(value, type)
+fun AddressIdentifierDb.mapToAddressIdentifiersDto(): AddressIdentifier {
+    return AddressIdentifier(value, type)
 }
 
 //LegalEntity mapping to LegalEntityGateInputResponse
-fun LegalEntityDb.toLegalEntityGateInputResponse(): LegalEntityGateInputDto {
-    return LegalEntityGateInputDto(
+fun LegalEntityDb.toLegalEntityGateInputResponse(): LegalEntityGateInputResponse {
+    return LegalEntityGateInputResponse(
         legalEntity = toLegalEntityDto(),
         legalAddress = legalAddress.toAddressGateInputResponse(legalAddress),
         externalId = externalId,
@@ -397,21 +397,21 @@ fun LegalEntityDb.toLegalEntityGateInputResponse(): LegalEntityGateInputDto {
 }
 
 //Site mapping to SiteDto
-fun SiteDb.toSiteDto(): SiteGateDto {
-    return SiteGateDto(
+fun SiteDb.toSiteDto(): SiteGate {
+    return SiteGate(
         roles = roles.map { it.roleName },
         nameParts = getNamePartValues(nameParts),
         states = mapToDtoSitesStates(states)
     )
 }
 
-fun mapToDtoSitesStates(states: MutableSet<SiteStateDb>): Collection<SiteStateDto> {
-    return states.map { SiteStateDto(it.description, it.validFrom, it.validTo, it.type) }
+fun mapToDtoSitesStates(states: MutableSet<SiteStateDb>): Collection<SiteState> {
+    return states.map { SiteState(it.description, it.validFrom, it.validTo, it.type) }
 }
 
 //Site mapping to SiteGateInputResponse
-fun SiteDb.toSiteGateInputResponse(sitePage: SiteDb): SiteGateInputDto {
-    return SiteGateInputDto(
+fun SiteDb.toSiteGateInputResponse(sitePage: SiteDb): SiteGateInputResponse {
+    return SiteGateInputResponse(
         site = sitePage.toSiteDto(),
         externalId = externalId,
         legalEntityExternalId = legalEntity.externalId,
@@ -421,8 +421,8 @@ fun SiteDb.toSiteGateInputResponse(sitePage: SiteDb): SiteGateInputDto {
 }
 
 //Logistic Address mapping to AddressGateOutputResponse
-fun LogisticAddressDb.toAddressGateOutputResponse(logisticAddressPage: LogisticAddressDb): AddressGateOutputDto {
-    return AddressGateOutputDto(
+fun LogisticAddressDb.toAddressGateOutputResponse(logisticAddressPage: LogisticAddressDb): AddressGateOutputResponse {
+    return AddressGateOutputResponse(
         address = logisticAddressPage.toLogisticAddressDto(),
         externalId = externalId,
         legalEntityExternalId = legalEntity?.externalId,
@@ -452,34 +452,34 @@ fun LegalEntityDb.toLegalEntityGateOutputResponse(): LegalEntityGateOutputRespon
     )
 }
 
-fun AddressGateInputRequest.toSharingStateDTO(): SharingStateDto {
+fun AddressGateInputRequest.toSharingStateDTO(): SharingStateResponse {
 
-    return SharingStateDto(BusinessPartnerType.ADDRESS, externalId)
+    return SharingStateResponse(BusinessPartnerType.ADDRESS, externalId)
 }
 
-fun SiteGateInputRequest.toSharingStateDTO(): SharingStateDto {
+fun SiteGateInputRequest.toSharingStateDTO(): SharingStateResponse {
 
-    return SharingStateDto(BusinessPartnerType.SITE, externalId)
+    return SharingStateResponse(BusinessPartnerType.SITE, externalId)
 }
 
-fun LegalEntityGateInputRequest.toSharingStateDTO(): SharingStateDto {
+fun LegalEntityGateInputRequest.toSharingStateDTO(): SharingStateResponse {
 
-    return SharingStateDto(BusinessPartnerType.LEGAL_ENTITY, externalId)
+    return SharingStateResponse(BusinessPartnerType.LEGAL_ENTITY, externalId)
 }
 
-fun AddressGateOutputRequest.toSharingStateDTO(sharingStateType: SharingStateType): SharingStateDto {
+fun AddressGateOutputRequest.toSharingStateDTO(sharingStateType: SharingStateType): SharingStateResponse {
 
-    return SharingStateDto(BusinessPartnerType.ADDRESS, externalId, sharingStateType = sharingStateType, bpn = bpn)
+    return SharingStateResponse(BusinessPartnerType.ADDRESS, externalId, sharingStateType = sharingStateType, bpn = bpn)
 }
 
-fun SiteGateOutputRequest.toSharingStateDTO(sharingStateType: SharingStateType): SharingStateDto {
+fun SiteGateOutputRequest.toSharingStateDTO(sharingStateType: SharingStateType): SharingStateResponse {
 
-    return SharingStateDto(BusinessPartnerType.SITE, externalId, sharingStateType = sharingStateType, bpn = bpn)
+    return SharingStateResponse(BusinessPartnerType.SITE, externalId, sharingStateType = sharingStateType, bpn = bpn)
 }
 
-fun LegalEntityGateOutputRequest.toSharingStateDTO(sharingStateType: SharingStateType): SharingStateDto {
+fun LegalEntityGateOutputRequest.toSharingStateDTO(sharingStateType: SharingStateType): SharingStateResponse {
 
-    return SharingStateDto(BusinessPartnerType.LEGAL_ENTITY, externalId, sharingStateType = sharingStateType, bpn = bpn)
+    return SharingStateResponse(BusinessPartnerType.LEGAL_ENTITY, externalId, sharingStateType = sharingStateType, bpn = bpn)
 }
 
 

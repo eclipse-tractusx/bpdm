@@ -24,7 +24,7 @@ import jakarta.persistence.EntityManager
 import jakarta.persistence.EntityManagerFactory
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDto
+import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierType
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
 import org.springframework.stereotype.Component
 
@@ -64,19 +64,19 @@ class TestHelpers(
     }
 
     fun createPoolMetadata() {
-        val identifierTypeDto1 =
-            IdentifierTypeDto(CommonValues.identifierTypeTechnicalKey1, IdentifierBusinessPartnerType.LEGAL_ENTITY, CommonValues.identifierTypeName1)
-        val identifierTypeDto2 =
-            IdentifierTypeDto(CommonValues.identifierTypeTechnicalKey2, IdentifierBusinessPartnerType.LEGAL_ENTITY, CommonValues.identifierTypeName2)
-        val identifierTypeDto3 =
-            IdentifierTypeDto(CommonValues.identifierTypeTechnicalKey3, IdentifierBusinessPartnerType.LEGAL_ENTITY, CommonValues.identifierTypeName3)
-        val identifierTypeDto4 =
-            IdentifierTypeDto(CommonValues.identifierTypeTechnicalKey4, IdentifierBusinessPartnerType.LEGAL_ENTITY, CommonValues.identifierTypeName4)
+        val identifierType1 =
+            IdentifierType(CommonValues.identifierTypeTechnicalKey1, IdentifierBusinessPartnerType.LEGAL_ENTITY, CommonValues.identifierTypeName1)
+        val identifierType2 =
+            IdentifierType(CommonValues.identifierTypeTechnicalKey2, IdentifierBusinessPartnerType.LEGAL_ENTITY, CommonValues.identifierTypeName2)
+        val identifierType3 =
+            IdentifierType(CommonValues.identifierTypeTechnicalKey3, IdentifierBusinessPartnerType.LEGAL_ENTITY, CommonValues.identifierTypeName3)
+        val identifierType4 =
+            IdentifierType(CommonValues.identifierTypeTechnicalKey4, IdentifierBusinessPartnerType.LEGAL_ENTITY, CommonValues.identifierTypeName4)
 
-        poolClient.metadata.createIdentifierType(identifierTypeDto1)
-        poolClient.metadata.createIdentifierType(identifierTypeDto2)
-        poolClient.metadata.createIdentifierType(identifierTypeDto3)
-        poolClient.metadata.createIdentifierType(identifierTypeDto4)
+        poolClient.metadata.createIdentifierType(identifierType1)
+        poolClient.metadata.createIdentifierType(identifierType2)
+        poolClient.metadata.createIdentifierType(identifierType3)
+        poolClient.metadata.createIdentifierType(identifierType4)
 
         val legalForm1 = LegalFormRequest(
             technicalKey = CommonValues.legalFormTechnicalKey1,

@@ -24,8 +24,8 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.PoolSaasApi
 import org.eclipse.tractusx.bpdm.pool.api.model.ImportIdEntry
 import org.eclipse.tractusx.bpdm.pool.api.model.request.ImportIdFilterRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ImportIdMappingDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SyncDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.ImportIdMappingResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SyncResponse
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.service.annotation.GetExchange
 import org.springframework.web.service.annotation.HttpExchange
@@ -34,14 +34,14 @@ import org.springframework.web.service.annotation.PostExchange
 @HttpExchange("/api/saas")
 interface SaasApiClient : PoolSaasApi {
     @PostExchange("/identifier-mappings/filter")
-    override fun getImportEntries(@RequestBody importIdFilterRequest: ImportIdFilterRequest): ImportIdMappingDto
+    override fun getImportEntries(@RequestBody importIdFilterRequest: ImportIdFilterRequest): ImportIdMappingResponse
 
     @GetExchange("/identifier-mappings")
     override fun getImportEntries(paginationRequest: PaginationRequest): PageDto<ImportIdEntry>
 
     @GetExchange("/business-partner/sync")
-    override fun getSyncStatus(): SyncDto
+    override fun getSyncStatus(): SyncResponse
 
     @PostExchange("/business-partner/sync")
-    override fun importBusinessPartners(): SyncDto
+    override fun importBusinessPartners(): SyncResponse
 }

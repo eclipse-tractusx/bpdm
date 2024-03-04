@@ -25,7 +25,7 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.GateSiteApi
 import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateOutputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteGateInputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteGateOutputResponse
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.ResponseEntity
@@ -39,16 +39,16 @@ import org.springframework.web.service.annotation.PutExchange
 @HttpExchange("/api/catena")
 interface SiteApiClient : GateSiteApi {
     @GetExchange("/input/sites/{externalId}")
-    override fun getSiteByExternalId(@PathVariable externalId: String): SiteGateInputDto
+    override fun getSiteByExternalId(@PathVariable externalId: String): SiteGateInputResponse
 
     @GetExchange("/input/sites")
-    override fun getSites(@ParameterObject @Valid paginationRequest: PaginationRequest): PageDto<SiteGateInputDto>
+    override fun getSites(@ParameterObject @Valid paginationRequest: PaginationRequest): PageDto<SiteGateInputResponse>
 
     @PostExchange("/input/sites/search")
     override fun getSitesByExternalIds(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @RequestBody externalIds: Collection<String>
-    ): PageDto<SiteGateInputDto>
+    ): PageDto<SiteGateInputResponse>
 
     @PostExchange("/output/sites/search")
     override fun getSitesOutput(

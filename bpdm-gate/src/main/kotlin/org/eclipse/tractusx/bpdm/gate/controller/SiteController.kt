@@ -24,7 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.GateSiteApi
 import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateOutputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteGateInputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteGateOutputResponse
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
@@ -52,7 +52,7 @@ class SiteController(
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_INPUT_AUTHORITY})")
-    override fun getSiteByExternalId(externalId: String): SiteGateInputDto {
+    override fun getSiteByExternalId(externalId: String): SiteGateInputResponse {
         return siteService.getSiteByExternalId(externalId)
     }
 
@@ -60,12 +60,12 @@ class SiteController(
     override fun getSitesByExternalIds(
         paginationRequest: PaginationRequest,
         externalIds: Collection<String>
-    ): PageDto<SiteGateInputDto> {
+    ): PageDto<SiteGateInputResponse> {
         return siteService.getSites(page = paginationRequest.page, size = paginationRequest.size, externalIds = externalIds)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_INPUT_AUTHORITY})")
-    override fun getSites(paginationRequest: PaginationRequest): PageDto<SiteGateInputDto> {
+    override fun getSites(paginationRequest: PaginationRequest): PageDto<SiteGateInputResponse> {
         return siteService.getSites(page = paginationRequest.page, size = paginationRequest.size)
     }
 

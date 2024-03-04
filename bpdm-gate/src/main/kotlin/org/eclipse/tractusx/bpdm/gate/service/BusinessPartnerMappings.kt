@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 
-import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
+import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinate
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.model.*
@@ -37,8 +37,8 @@ import org.springframework.stereotype.Service
 @Service
 class BusinessPartnerMappings {
 
-    fun toBusinessPartnerInputDto(entity: BusinessPartnerDb): BusinessPartnerInputDto {
-        return BusinessPartnerInputDto(
+    fun toBusinessPartnerInputDto(entity: BusinessPartnerDb): BusinessPartnerInputResponse {
+        return BusinessPartnerInputResponse(
             externalId = entity.externalId,
             nameParts = entity.nameParts,
             identifiers = entity.identifiers.map(::toIdentifierDto),
@@ -53,8 +53,8 @@ class BusinessPartnerMappings {
         )
     }
 
-    fun toBusinessPartnerOutputDto(entity: BusinessPartnerDb): BusinessPartnerOutputDto {
-        return BusinessPartnerOutputDto(
+    fun toBusinessPartnerOutputDto(entity: BusinessPartnerDb): BusinessPartnerOutputResponse {
+        return BusinessPartnerOutputResponse(
             externalId = entity.externalId,
             nameParts = entity.nameParts,
             identifiers = entity.identifiers.map(::toIdentifierDto),
@@ -94,8 +94,8 @@ class BusinessPartnerMappings {
         )
     }
 
-    private fun toLegalEntityComponentInputDto(entity: BusinessPartnerDb): LegalEntityRepresentationInputDto {
-        return LegalEntityRepresentationInputDto(
+    private fun toLegalEntityComponentInputDto(entity: BusinessPartnerDb): LegalEntityRepresentationInputResponse {
+        return LegalEntityRepresentationInputResponse(
             legalEntityBpn = entity.bpnL,
             legalName = entity.legalName,
             shortName = entity.shortName,
@@ -104,28 +104,28 @@ class BusinessPartnerMappings {
         )
     }
 
-    private fun toSiteComponentInputDto(entity: BusinessPartnerDb): SiteRepresentationInputDto {
-        return SiteRepresentationInputDto(
+    private fun toSiteComponentInputDto(entity: BusinessPartnerDb): SiteRepresentationInputResponse {
+        return SiteRepresentationInputResponse(
             siteBpn = entity.bpnS,
             name = entity.siteName
         )
     }
 
-    private fun toAddressComponentInputDto(entity: BusinessPartnerDb): AddressRepresentationInputDto {
-        return AddressRepresentationInputDto(
+    private fun toAddressComponentInputDto(entity: BusinessPartnerDb): AddressRepresentationInputResponse {
+        return AddressRepresentationInputResponse(
             addressBpn = entity.bpnA,
             name = entity.addressName,
             addressType = entity.postalAddress.addressType,
-            physicalPostalAddress = entity.postalAddress.physicalPostalAddress?.toPhysicalPostalAddress() ?: PhysicalPostalAddressDto(),
-            alternativePostalAddress = entity.postalAddress.alternativePostalAddress?.toAlternativePostalAddressDto() ?: AlternativePostalAddressDto()
+            physicalPostalAddress = entity.postalAddress.physicalPostalAddress?.toPhysicalPostalAddress() ?: PhysicalPostalAddress(),
+            alternativePostalAddress = entity.postalAddress.alternativePostalAddress?.toAlternativePostalAddressDto() ?: AlternativePostalAddress()
         )
     }
 
-    private fun toLegalEntityComponentOutputDto(entity: BusinessPartnerDb): LegalEntityRepresentationOutputDto {
-        return LegalEntityRepresentationOutputDto(
+    private fun toLegalEntityComponentOutputDto(entity: BusinessPartnerDb): LegalEntityRepresentationOutputResponse {
+        return LegalEntityRepresentationOutputResponse(
             legalEntityBpn = entity.bpnL ?: throw BpdmNullMappingException(
                 BusinessPartnerDb::class,
-                BusinessPartnerOutputDto::class,
+                BusinessPartnerOutputResponse::class,
                 BusinessPartnerDb::bpnL,
                 entity.externalId
             ),
@@ -140,11 +140,11 @@ class BusinessPartnerMappings {
         )
     }
 
-    private fun toSiteComponentOutputDto(entity: BusinessPartnerDb): SiteRepresentationOutputDto? {
+    private fun toSiteComponentOutputDto(entity: BusinessPartnerDb): SiteRepresentationOutputResponse? {
         return entity
             .takeIf { it.bpnS != null }
             ?.let {
-                SiteRepresentationOutputDto(
+                SiteRepresentationOutputResponse(
                     siteBpn = entity.bpnS!!,
                     name = entity.siteName,
                     confidenceCriteria = entity.siteConfidence?.let { toConfidenceDto(it) } ?: throw BpdmInvalidPartnerException(
@@ -155,18 +155,18 @@ class BusinessPartnerMappings {
             }
     }
 
-    private fun toAddressComponentOutputDto(entity: BusinessPartnerDb): AddressComponentOutputDto {
-        return AddressComponentOutputDto(
+    private fun toAddressComponentOutputDto(entity: BusinessPartnerDb): AddressComponentOutputResponse {
+        return AddressComponentOutputResponse(
             addressBpn = entity.bpnA ?: throw BpdmNullMappingException(
                 BusinessPartnerDb::class,
-                BusinessPartnerOutputDto::class,
+                BusinessPartnerOutputResponse::class,
                 BusinessPartnerDb::bpnA,
                 entity.externalId
             ),
             entity.addressName,
             addressType = entity.postalAddress.addressType,
-            physicalPostalAddress = entity.postalAddress.physicalPostalAddress?.toPhysicalPostalAddress() ?: PhysicalPostalAddressDto(),
-            alternativePostalAddress = entity.postalAddress.alternativePostalAddress?.toAlternativePostalAddressDto() ?: AlternativePostalAddressDto(),
+            physicalPostalAddress = entity.postalAddress.physicalPostalAddress?.toPhysicalPostalAddress() ?: PhysicalPostalAddress(),
+            alternativePostalAddress = entity.postalAddress.alternativePostalAddress?.toAlternativePostalAddressDto() ?: AlternativePostalAddress(),
             confidenceCriteria = entity.addressConfidence?.let { toConfidenceDto(it) } ?: throw BpdmInvalidPartnerException(
                 entity.externalId,
                 "Missing legal entity confidence criteria"
@@ -175,7 +175,7 @@ class BusinessPartnerMappings {
     }
 
     private fun toConfidenceDto(entity: ConfidenceCriteriaDb) =
-        ConfidenceCriteriaDto(
+        ConfidenceCriteria(
             sharedByOwner = entity.sharedByOwner,
             checkedByExternalDataSource = entity.checkedByExternalDataSource,
             numberOfBusinessPartners = entity.numberOfBusinessPartners,
@@ -185,7 +185,7 @@ class BusinessPartnerMappings {
         )
 
 
-    private fun toPostalAddress(dto: AddressRepresentationInputDto) =
+    private fun toPostalAddress(dto: AddressRepresentationInputResponse) =
         PostalAddressDb(
             addressType = dto.addressType,
             physicalPostalAddress = normalize(dto.physicalPostalAddress)?.let(::toPhysicalPostalAddress),
@@ -193,15 +193,15 @@ class BusinessPartnerMappings {
         )
 
     // convert empty DTO to null
-    private fun normalize(dto: PhysicalPostalAddressDto?) =
-        if (dto != PhysicalPostalAddressDto()) dto
+    private fun normalize(dto: PhysicalPostalAddress?) =
+        if (dto != PhysicalPostalAddress()) dto
         else null
 
-    private fun normalize(dto: AlternativePostalAddressDto?) =
-        if (dto != AlternativePostalAddressDto()) dto
+    private fun normalize(dto: AlternativePostalAddress?) =
+        if (dto != AlternativePostalAddress()) dto
         else null
 
-    private fun toPhysicalPostalAddress(dto: PhysicalPostalAddressDto) =
+    private fun toPhysicalPostalAddress(dto: PhysicalPostalAddress) =
         PhysicalPostalAddressDb(
             geographicCoordinates = dto.geographicCoordinates?.let(::toGeographicCoordinate),
             country = dto.country,
@@ -221,7 +221,7 @@ class BusinessPartnerMappings {
 
 
     private fun toAlternativePostalAddressDto(entity: AlternativePostalAddressDb) =
-        AlternativePostalAddressDto(
+        AlternativePostalAddress(
             geographicCoordinates = entity.geographicCoordinates?.let(::toGeoCoordinateDto),
             country = entity.country,
             administrativeAreaLevel1 = entity.administrativeAreaLevel1,
@@ -232,7 +232,7 @@ class BusinessPartnerMappings {
             deliveryServiceNumber = entity.deliveryServiceNumber
         )
 
-    private fun toAlternativePostalAddress(dto: AlternativePostalAddressDto) =
+    private fun toAlternativePostalAddress(dto: AlternativePostalAddress) =
         AlternativePostalAddressDb(
             geographicCoordinates = dto.geographicCoordinates?.let(::toGeographicCoordinate),
             country = dto.country,
@@ -246,7 +246,7 @@ class BusinessPartnerMappings {
 
 
     private fun toStreetDto(entity: StreetDb) =
-        StreetDto(
+        Street(
             name = entity.name,
             houseNumber = entity.houseNumber,
             houseNumberSupplement = entity.houseNumberSupplement,
@@ -259,7 +259,7 @@ class BusinessPartnerMappings {
         )
 
 
-    private fun toStreet(dto: StreetDto) =
+    private fun toStreet(dto: Street) =
         StreetDb(
             name = dto.name,
             houseNumber = dto.houseNumber,
@@ -273,9 +273,9 @@ class BusinessPartnerMappings {
         )
 
     private fun toIdentifierDto(entity: IdentifierDb) =
-        BusinessPartnerIdentifierDto(type = entity.type, value = entity.value, issuingBody = entity.issuingBody)
+        BusinessPartnerIdentifier(type = entity.type, value = entity.value, issuingBody = entity.issuingBody)
 
-    private fun toIdentifier(dto: BusinessPartnerIdentifierDto) =
+    private fun toIdentifier(dto: BusinessPartnerIdentifier) =
         dto.type?.let { type ->
             dto.value?.let { value ->
                 IdentifierDb(type = type, value = value, issuingBody = dto.issuingBody)
@@ -283,20 +283,20 @@ class BusinessPartnerMappings {
         }
 
     private fun toStateDto(entity: StateDb) =
-        BusinessPartnerStateDto(type = entity.type, validFrom = entity.validFrom, validTo = entity.validTo)
+        BusinessPartnerState(type = entity.type, validFrom = entity.validFrom, validTo = entity.validTo)
 
-    private fun toState(dto: BusinessPartnerStateDto) =
+    private fun toState(dto: BusinessPartnerState) =
         dto.type?.let { StateDb(type = it, validFrom = dto.validFrom, validTo = dto.validTo) }
 
     private fun toClassificationDto(entity: ClassificationDb) =
-        BusinessPartnerClassificationDto(type = entity.type, code = entity.code, value = entity.value)
+        BusinessPartnerClassification(type = entity.type, code = entity.code, value = entity.value)
 
-    private fun toClassification(dto: BusinessPartnerClassificationDto) =
+    private fun toClassification(dto: BusinessPartnerClassification) =
         dto.type?.let { ClassificationDb(type = it, code = dto.code, value = dto.value) }
 
     private fun toGeoCoordinateDto(entity: GeographicCoordinateDb) =
-        GeoCoordinateDto(latitude = entity.latitude, longitude = entity.longitude, altitude = entity.altitude)
+        GeoCoordinate(latitude = entity.latitude, longitude = entity.longitude, altitude = entity.altitude)
 
-    private fun toGeographicCoordinate(dto: GeoCoordinateDto) =
+    private fun toGeographicCoordinate(dto: GeoCoordinate) =
         GeographicCoordinateDb(latitude = dto.latitude, longitude = dto.longitude, altitude = dto.altitude)
 }

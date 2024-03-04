@@ -25,7 +25,7 @@ import org.eclipse.tractusx.orchestrator.api.model.*
 import java.time.LocalDateTime
 
 
-val dummyConfidenceCriteria = ConfidenceCriteriaDto(
+val dummyConfidenceCriteria = ConfidenceCriteria(
     sharedByOwner = false,
     numberOfBusinessPartners = 1,
     checkedByExternalDataSource = false,
@@ -34,8 +34,8 @@ val dummyConfidenceCriteria = ConfidenceCriteriaDto(
     confidenceLevel = 0
 )
 
-fun BusinessPartnerGenericDto.toLegalEntityDto(bpnReferenceDto: BpnReferenceDto, legalAddress: LogisticAddressDto): LegalEntityDto {
-    return LegalEntityDto(
+fun BusinessPartnerGeneric.toLegalEntityDto(bpnReferenceDto: BpnReference, legalAddress: LogisticAddress): LegalEntity {
+    return LegalEntity(
         bpnLReference = bpnReferenceDto,
         hasChanged = address.addressType in setOf(AddressType.LegalAddress, AddressType.LegalAndSiteMainAddress),
         legalName = nameParts.joinToString(" "),
@@ -49,35 +49,35 @@ fun BusinessPartnerGenericDto.toLegalEntityDto(bpnReferenceDto: BpnReferenceDto,
     )
 }
 
-fun BusinessPartnerClassificationDto.toLegalEntityClassificationDto(): LegalEntityClassificationDto {
+fun BusinessPartnerClassification.toLegalEntityClassificationDto(): LegalEntityClassification {
 
-    return LegalEntityClassificationDto(code = code, type = type, value = value)
+    return LegalEntityClassification(code = code, type = type, value = value)
 }
 
-fun BusinessPartnerIdentifierDto.toLegalEntityIdentifierDto(): LegalEntityIdentifierDto? {
+fun BusinessPartnerIdentifier.toLegalEntityIdentifierDto(): LegalEntityIdentifier? {
 
     return value?.let { value ->
         type?.let { type ->
-            LegalEntityIdentifierDto(value = value, type = type, issuingBody = issuingBody)
+            LegalEntityIdentifier(value = value, type = type, issuingBody = issuingBody)
         }
     }
 
 }
 
-fun BusinessPartnerStateDto.toLegalEntityState(): LegalEntityStateDto? {
+fun BusinessPartnerState.toLegalEntityState(): LegalEntityState? {
 
-    return type?.let { LegalEntityStateDto(validFrom, validTo, it) }
+    return type?.let { LegalEntityState(validFrom, validTo, it) }
 }
 
-fun BusinessPartnerStateDto.toSiteState(): SiteStateDto? {
+fun BusinessPartnerState.toSiteState(): SiteState? {
 
-    return type?.let { SiteStateDto(validFrom, validTo, it) }
+    return type?.let { SiteState(validFrom, validTo, it) }
 }
 
-fun BusinessPartnerGenericDto.toLogisticAddressDto(bpnReferenceDto: BpnReferenceDto):
-        LogisticAddressDto {
+fun BusinessPartnerGeneric.toLogisticAddressDto(bpnReferenceDto: BpnReference):
+        LogisticAddress {
 
-    return LogisticAddressDto(
+    return LogisticAddress(
         bpnAReference = bpnReferenceDto,
         hasChanged = address.addressType == AddressType.AdditionalAddress,
         name = address.name,
@@ -89,9 +89,9 @@ fun BusinessPartnerGenericDto.toLogisticAddressDto(bpnReferenceDto: BpnReference
     )
 }
 
-fun BusinessPartnerGenericDto.toSiteDto(bpnReferenceDto: BpnReferenceDto, siteAddressReference: LogisticAddressDto): SiteDto {
+fun BusinessPartnerGeneric.toSiteDto(bpnReferenceDto: BpnReference, siteAddressReference: LogisticAddress): Site {
 
-    return SiteDto(
+    return Site(
         bpnSReference = bpnReferenceDto,
         hasChanged = address.addressType in setOf(AddressType.SiteMainAddress, AddressType.LegalAndSiteMainAddress),
         name = site.name,

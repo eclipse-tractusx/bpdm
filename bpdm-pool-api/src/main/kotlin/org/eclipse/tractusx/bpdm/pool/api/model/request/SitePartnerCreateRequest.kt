@@ -26,14 +26,14 @@ import org.eclipse.tractusx.bpdm.common.dto.RequestWithKey
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.SiteDescription
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
-import org.eclipse.tractusx.bpdm.pool.api.model.SiteDto
+import org.eclipse.tractusx.bpdm.pool.api.model.Site
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(description = SiteDescription.headerCreateRequest)
 data class SitePartnerCreateRequest(
 
     @field:JsonUnwrapped
-    val site: SiteDto,
+    val site: Site,
 
     @Schema(description = SiteDescription.bpnlParent)
     val bpnlParent: String,

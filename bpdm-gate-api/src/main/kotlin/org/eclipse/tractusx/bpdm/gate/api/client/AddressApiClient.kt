@@ -26,8 +26,8 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.GateAddressApi
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateOutputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateInputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateInputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateOutputResponse
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PathVariable
@@ -41,24 +41,24 @@ import org.springframework.web.service.annotation.PutExchange
 interface AddressApiClient : GateAddressApi {
 
     @GetExchange("/input/addresses/{externalId}")
-    override fun getAddressByExternalId(@Parameter(description = "External ID") @PathVariable externalId: String): AddressGateInputDto
+    override fun getAddressByExternalId(@Parameter(description = "External ID") @PathVariable externalId: String): AddressGateInputResponse
 
     @GetExchange("/input/addresses")
     override fun getAddresses(
         @ParameterObject @Valid paginationRequest: PaginationRequest
-    ): PageDto<AddressGateInputDto>
+    ): PageDto<AddressGateInputResponse>
 
     @PostExchange("/input/addresses/search")
     override fun getAddressesByExternalIds(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @RequestBody externalIds: Collection<String>
-    ): PageDto<AddressGateInputDto>
+    ): PageDto<AddressGateInputResponse>
 
     @PostExchange("/output/addresses/search")
     override fun getAddressesOutput(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @RequestBody(required = false) externalIds: Collection<String>?
-    ): PageDto<AddressGateOutputDto>
+    ): PageDto<AddressGateOutputResponse>
 
     @PutExchange("/input/addresses")
     override fun upsertAddresses(

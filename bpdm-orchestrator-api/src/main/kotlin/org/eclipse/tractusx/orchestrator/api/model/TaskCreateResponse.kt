@@ -24,5 +24,5 @@ import io.swagger.v3.oas.annotations.media.Schema
 @Schema(description = "Response object for giving a list of created tasks")
 data class TaskCreateResponse(
 
-    val createdTasks: List<TaskClientStateDto>
+    val createdTasks: List<TaskClientState>
 )

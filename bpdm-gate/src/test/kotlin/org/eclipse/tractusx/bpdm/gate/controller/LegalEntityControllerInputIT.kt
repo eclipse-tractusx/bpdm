@@ -29,7 +29,7 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityGateInputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.repository.LegalEntityRepository
 
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.GATE_API_INPUT_LEGAL_ENTITIES_PATH
@@ -319,10 +319,10 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
 
     }
 
-    private fun assertPageLegalEntitiesEqual(actual: PageDto<LegalEntityGateInputDto>, expected: PageDto<LegalEntityGateInputDto>) =
+    private fun assertPageLegalEntitiesEqual(actual: PageDto<LegalEntityGateInputResponse>, expected: PageDto<LegalEntityGateInputResponse>) =
         assertHelpers.assertRecursively(actual).isEqualTo(expected)
 
-    private fun assertLegalEntitiesEqual(actual: LegalEntityGateInputDto, expected: LegalEntityGateInputDto) =
+    private fun assertLegalEntitiesEqual(actual: LegalEntityGateInputResponse, expected: LegalEntityGateInputResponse) =
         assertHelpers.assertRecursively(actual).isEqualTo(expected)
 
 }

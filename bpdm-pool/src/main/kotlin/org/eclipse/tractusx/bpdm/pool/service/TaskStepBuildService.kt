@@ -20,32 +20,32 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import jakarta.transaction.Transactional
-import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
-import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto
-import org.eclipse.tractusx.bpdm.pool.api.model.AddressStateDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityClassificationDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityIdentifierDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityStateDto
-import org.eclipse.tractusx.bpdm.pool.api.model.SiteStateDto
-import org.eclipse.tractusx.bpdm.pool.api.model.StreetDto
+import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinate
+import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifier
+import org.eclipse.tractusx.bpdm.pool.api.model.AddressState
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityClassification
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityIdentifier
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityState
+import org.eclipse.tractusx.bpdm.pool.api.model.SiteState
+import org.eclipse.tractusx.bpdm.pool.api.model.Street
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorCode
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.orchestrator.api.model.*
-import org.eclipse.tractusx.orchestrator.api.model.AlternativePostalAddressDto
-import org.eclipse.tractusx.orchestrator.api.model.ConfidenceCriteriaDto
-import org.eclipse.tractusx.orchestrator.api.model.LegalEntityDto
-import org.eclipse.tractusx.orchestrator.api.model.LogisticAddressDto
-import org.eclipse.tractusx.orchestrator.api.model.PhysicalPostalAddressDto
-import org.eclipse.tractusx.orchestrator.api.model.SiteDto
+import org.eclipse.tractusx.orchestrator.api.model.AlternativePostalAddress
+import org.eclipse.tractusx.orchestrator.api.model.ConfidenceCriteria
+import org.eclipse.tractusx.orchestrator.api.model.LegalEntity
+import org.eclipse.tractusx.orchestrator.api.model.LogisticAddress
+import org.eclipse.tractusx.orchestrator.api.model.PhysicalPostalAddress
+import org.eclipse.tractusx.orchestrator.api.model.Site
 import org.springframework.stereotype.Service
-import org.eclipse.tractusx.bpdm.pool.api.model.AlternativePostalAddressDto as AlternativePostalAddressPoolDto
-import org.eclipse.tractusx.bpdm.pool.api.model.ConfidenceCriteriaDto as ConfidenceCriteriaPoolDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityDto as LegalEntityPoolDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressDto as LogisticAddressPoolDto
-import org.eclipse.tractusx.bpdm.pool.api.model.PhysicalPostalAddressDto as PhysicalPostalAddressPoolDto
-import org.eclipse.tractusx.bpdm.pool.api.model.SiteDto as SitePoolDto
+import org.eclipse.tractusx.bpdm.pool.api.model.AlternativePostalAddress as AlternativePostalAddressPoolDto
+import org.eclipse.tractusx.bpdm.pool.api.model.ConfidenceCriteria as ConfidenceCriteriaPoolDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntity as LegalEntityPoolDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddress as LogisticAddressPoolDto
+import org.eclipse.tractusx.bpdm.pool.api.model.PhysicalPostalAddress as PhysicalPostalAddressPoolDto
+import org.eclipse.tractusx.bpdm.pool.api.model.Site as SitePoolDto
 
 
 @Service
@@ -81,7 +81,7 @@ class TaskStepBuildService(
     }
 
     @Transactional
-    fun upsertBusinessPartner(taskEntry: TaskStepReservationEntryDto, taskEntryBpnMapping: TaskEntryBpnMapping): TaskStepResultEntryDto {
+    fun upsertBusinessPartner(taskEntry: TaskStepReservationEntry, taskEntryBpnMapping: TaskEntryBpnMapping): TaskStepResultEntry {
         val businessPartnerDto = taskEntry.businessPartner
 
         val legalEntityResult = upsertLegalEntity(businessPartnerDto.legalEntity, taskEntryBpnMapping)
@@ -105,7 +105,7 @@ class TaskStepBuildService(
         val taskErrors = legalEntityResult.errors
             .plus(siteResult?.errors ?: emptyList())
             .plus(addressResult?.errors ?: emptyList())
-            .map { TaskErrorDto(TaskErrorType.Unspecified, it.message) }
+            .map { TaskError(TaskErrorType.Unspecified, it.message) }
 
         val bpna = addressResult?.addressBpn ?: siteResult?.mainAddressBpn ?: legalEntityResult.legalAddressBpn
         val genericWithBpn = with(businessPartnerDto.generic) {
@@ -140,9 +140,9 @@ class TaskStepBuildService(
             }
         }
 
-        return TaskStepResultEntryDto(
+        return TaskStepResultEntry(
             taskId = taskEntry.taskId,
-            businessPartner = BusinessPartnerFullDto(
+            businessPartner = BusinessPartnerFull(
                 generic = genericWithBpn,
                 legalEntity = legalEntityWithBpn,
                 site = siteWithBpn,
@@ -154,7 +154,7 @@ class TaskStepBuildService(
 
 
     fun upsertLegalEntity(
-        legalEntityDto: LegalEntityDto?, taskEntryBpnMapping: TaskEntryBpnMapping
+        legalEntityDto: LegalEntity?, taskEntryBpnMapping: TaskEntryBpnMapping
     ): LegalEntityUpsertResponse {
         val bpnLReference = legalEntityDto?.bpnLReference ?: throw BpdmValidationException(CleaningError.LEGAL_ENTITY_IS_NULL.message)
 
@@ -169,7 +169,7 @@ class TaskStepBuildService(
     }
 
     private fun createLegalEntity(
-        legalEntityDto: LegalEntityDto, taskEntryBpnMapping: TaskEntryBpnMapping
+        legalEntityDto: LegalEntity, taskEntryBpnMapping: TaskEntryBpnMapping
     ): LegalEntityUpsertResponse {
         val legalAddress = legalEntityDto.legalAddress ?: throw BpdmValidationException(CleaningError.LEGAL_ADDRESS_IS_NULL.message)
         val bpnAReference =
@@ -193,7 +193,7 @@ class TaskStepBuildService(
 
     private fun updateLegalEntity(
         bpnL: String,
-        legalEntityDto: LegalEntityDto
+        legalEntityDto: LegalEntity
     ): LegalEntityUpsertResponse {
         val legalAddress = legalEntityDto.legalAddress ?: throw BpdmValidationException(CleaningError.LEGAL_ADDRESS_IS_NULL.message)
 
@@ -208,9 +208,9 @@ class TaskStepBuildService(
     }
 
     private fun upsertSite(
-        siteDto: SiteDto?,
+        siteDto: Site?,
         legalEntityBpn: String,
-        legalAddressReference: BpnReferenceDto?,
+        legalAddressReference: BpnReference?,
         taskEntryBpnMapping: TaskEntryBpnMapping
     ): SiteUpsertResponse {
         val bpnSReference = siteDto?.bpnSReference ?: throw BpdmValidationException(CleaningError.BPNS_IS_NULL.message)
@@ -225,9 +225,9 @@ class TaskStepBuildService(
     }
 
     private fun createSite(
-        siteDto: SiteDto,
+        siteDto: Site,
         legalEntityBpn: String,
-        legalAddressReference: BpnReferenceDto?,
+        legalAddressReference: BpnReference?,
         taskEntryBpnMapping: TaskEntryBpnMapping
     ): SiteUpsertResponse {
         val mainAddressReference = siteDto.mainAddress?.bpnAReference ?: throw BpdmValidationException(CleaningError.MAIN_ADDRESS_BPN_REFERENCE_MISSING.message)
@@ -235,7 +235,7 @@ class TaskStepBuildService(
         val result = if (mainAddressReference.referenceValue == legalAddressReference?.referenceValue) {
             val createRequest = BusinessPartnerBuildService.SiteCreateRequestWithLegalAddressAsMain(
                 name = siteDto.name ?: throw BpdmValidationException(CleaningError.SITE_NAME_MISSING.message),
-                states = siteDto.states.map { SiteStateDto(it.validFrom, it.validTo, it.type) },
+                states = siteDto.states.map { SiteState(it.validFrom, it.validTo, it.type) },
                 confidenceCriteria = siteDto.confidenceCriteria?.let { toPoolDto(it) }
                     ?: throw BpdmValidationException(CleaningError.SITE_CONFIDENCE_CRITERIA_MISSING.message),
                 bpnLParent = legalEntityBpn
@@ -262,7 +262,7 @@ class TaskStepBuildService(
 
     private fun updateSite(
         bpnS: String,
-        siteDto: SiteDto
+        siteDto: Site
     ): SiteUpsertResponse {
         val updateRequest = SitePartnerUpdateRequest(
             bpns = bpnS,
@@ -275,7 +275,7 @@ class TaskStepBuildService(
     }
 
     private fun upsertLogisticAddress(
-        addressDto: LogisticAddressDto?,
+        addressDto: LogisticAddress?,
         legalEntityBpn: String,
         siteBpn: String?,
         taskEntryBpnMapping: TaskEntryBpnMapping
@@ -293,7 +293,7 @@ class TaskStepBuildService(
     }
 
     private fun createLogisticAddress(
-        addressDto: LogisticAddressDto,
+        addressDto: LogisticAddress,
         legalEntityBpn: String,
         siteBpn: String?,
         taskEntryBpnMapping: TaskEntryBpnMapping
@@ -312,7 +312,7 @@ class TaskStepBuildService(
 
     private fun updateLogisticAddress(
         bpnA: String,
-        addressDto: LogisticAddressDto
+        addressDto: LogisticAddress
     ): AddressUpsertResponse {
         val addressUpdateRequest = AddressPartnerUpdateRequest(
             bpna = bpnA,
@@ -323,25 +323,25 @@ class TaskStepBuildService(
         return AddressUpsertResponse(result.entities.firstOrNull()?.bpna, result.errors)
     }
 
-    private fun toPoolDto(legalEntity: LegalEntityDto) =
+    private fun toPoolDto(legalEntity: LegalEntity) =
         with(legalEntity) {
             LegalEntityPoolDto(
                 legalName = legalName ?: throw BpdmValidationException(CleaningError.LEGAL_NAME_IS_NULL.message),
                 legalShortName = legalShortName,
                 legalForm = legalForm,
-                identifiers = identifiers.map { LegalEntityIdentifierDto(it.value, it.type, it.issuingBody) },
-                states = states.map { LegalEntityStateDto(it.validFrom, it.validTo, it.type) },
-                classifications = classifications.map { LegalEntityClassificationDto(it.type, it.code, it.value) },
+                identifiers = identifiers.map { LegalEntityIdentifier(it.value, it.type, it.issuingBody) },
+                states = states.map { LegalEntityState(it.validFrom, it.validTo, it.type) },
+                classifications = classifications.map { LegalEntityClassification(it.type, it.code, it.value) },
                 confidenceCriteria = confidenceCriteria?.let { toPoolDto(it) }
                     ?: throw BpdmValidationException(CleaningError.LEGAL_ENTITY_CONFIDENCE_CRITERIA_MISSING.message),
             )
         }
 
-    private fun toPoolDto(site: SiteDto) =
+    private fun toPoolDto(site: Site) =
         with(site) {
             SitePoolDto(
                 name = name ?: throw BpdmValidationException(CleaningError.SITE_NAME_MISSING.message),
-                states = states.map { SiteStateDto(it.validFrom, it.validTo, it.type) },
+                states = states.map { SiteState(it.validFrom, it.validTo, it.type) },
                 mainAddress = mainAddress?.let { toPoolDto(it) } ?: throw BpdmValidationException(CleaningError.MAINE_ADDRESS_IS_NULL.message),
                 confidenceCriteria = confidenceCriteria?.let { toPoolDto(it) }
                     ?: throw BpdmValidationException(CleaningError.SITE_CONFIDENCE_CRITERIA_MISSING.message)
@@ -349,12 +349,12 @@ class TaskStepBuildService(
         }
 
 
-    private fun toPoolDto(logisticAddress: LogisticAddressDto) =
+    private fun toPoolDto(logisticAddress: LogisticAddress) =
         with(logisticAddress) {
             LogisticAddressPoolDto(
                 name = name,
-                states = states.map { AddressStateDto(it.validFrom, it.validTo, it.type) },
-                identifiers = identifiers.map { AddressIdentifierDto(it.value, it.type) },
+                states = states.map { AddressState(it.validFrom, it.validTo, it.type) },
+                identifiers = identifiers.map { AddressIdentifier(it.value, it.type) },
                 physicalPostalAddress = physicalPostalAddress?.let { toPoolDto(it) }
                     ?: throw BpdmValidationException(CleaningError.PHYSICAL_ADDRESS_IS_NULL.message),
                 alternativePostalAddress = alternativePostalAddress?.let { toPoolDto(it) },
@@ -373,10 +373,10 @@ class TaskStepBuildService(
             )
         }
 
-    private fun toPoolDto(physicalPostalAddressDto: PhysicalPostalAddressDto) =
+    private fun toPoolDto(physicalPostalAddressDto: PhysicalPostalAddress) =
         with(physicalPostalAddressDto) {
             PhysicalPostalAddressPoolDto(
-                geographicCoordinates = with(geographicCoordinates) { this?.let { GeoCoordinateDto(longitude, latitude, altitude) } },
+                geographicCoordinates = with(geographicCoordinates) { this?.let { GeoCoordinate(longitude, latitude, altitude) } },
                 country = country ?: throw BpdmValidationException(CleaningError.PHYSICAL_ADDRESS_COUNTRY_MISSING.message),
                 administrativeAreaLevel1 = administrativeAreaLevel1,
                 administrativeAreaLevel2 = administrativeAreaLevel2,
@@ -391,7 +391,7 @@ class TaskStepBuildService(
                 door = door,
                 street = with(street) {
                     this?.let {
-                        StreetDto(
+                        Street(
                             name,
                             houseNumber,
                             houseNumberSupplement,
@@ -407,10 +407,10 @@ class TaskStepBuildService(
             )
         }
 
-    private fun toPoolDto(alternativeAddress: AlternativePostalAddressDto) =
+    private fun toPoolDto(alternativeAddress: AlternativePostalAddress) =
         with(alternativeAddress) {
             AlternativePostalAddressPoolDto(
-                geographicCoordinates = with(geographicCoordinates) { this?.let { GeoCoordinateDto(longitude, latitude, altitude) } },
+                geographicCoordinates = with(geographicCoordinates) { this?.let { GeoCoordinate(longitude, latitude, altitude) } },
                 country = country ?: throw BpdmValidationException(CleaningError.ALTERNATIVE_ADDRESS_COUNTRY_MISSING.message),
                 administrativeAreaLevel1 = administrativeAreaLevel1,
                 postalCode = postalCode,
@@ -423,7 +423,7 @@ class TaskStepBuildService(
             )
         }
 
-    private fun toPoolDto(confidenceCriteria: ConfidenceCriteriaDto) =
+    private fun toPoolDto(confidenceCriteria: ConfidenceCriteria) =
         with(confidenceCriteria) {
             ConfidenceCriteriaPoolDto(
                 sharedByOwner,
@@ -436,7 +436,7 @@ class TaskStepBuildService(
         }
 
     private fun toBpnReference(bpn: String?) =
-        bpn?.let { BpnReferenceDto(bpn, BpnReferenceType.Bpn) }
+        bpn?.let { BpnReference(bpn, BpnReferenceType.Bpn) }
 
     data class LegalEntityUpsertResponse(
         val legalEntityBpn: String?,

@@ -23,9 +23,9 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
-import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerbose
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteBpnSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseResponse
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
@@ -40,7 +40,7 @@ class SiteService(
 ) {
     private val logger = KotlinLogging.logger { }
 
-    fun findByPartnerBpn(bpn: String, pageIndex: Int, pageSize: Int): PageDto<SiteVerboseDto> {
+    fun findByPartnerBpn(bpn: String, pageIndex: Int, pageSize: Int): PageDto<SiteVerbose> {
         logger.debug { "Executing findByPartnerBpn() with parameters $bpn // $pageIndex // $pageSize" }
         if (!legalEntityRepository.existsByBpn(bpn)) {
             throw BpdmNotFoundException("Business Partner", bpn)
@@ -51,7 +51,7 @@ class SiteService(
         return page.toDto(page.content.map { it.toDto() })
     }
 
-    fun findByPartnerBpns(siteSearchRequest: SiteBpnSearchRequest, paginationRequest: PaginationRequest): PageDto<SiteWithMainAddressVerboseDto> {
+    fun findByPartnerBpns(siteSearchRequest: SiteBpnSearchRequest, paginationRequest: PaginationRequest): PageDto<SiteWithMainAddressVerboseResponse> {
         logger.debug { "Executing findByPartnerBpns() with parameters $siteSearchRequest // $paginationRequest" }
         val partners =
             if (siteSearchRequest.legalEntities.isNotEmpty()) legalEntityRepository.findDistinctByBpnIn(siteSearchRequest.legalEntities) else emptyList()
@@ -61,7 +61,7 @@ class SiteService(
         return sitePage.toDto(sitePage.content.map { it.toPoolDto() })
     }
 
-    fun findByBpn(bpn: String): SiteWithMainAddressVerboseDto {
+    fun findByBpn(bpn: String): SiteWithMainAddressVerboseResponse {
         logger.debug { "Executing findByBpn() with parameters $bpn " }
         val site = siteRepository.findByBpn(bpn) ?: throw BpdmNotFoundException("Site", bpn)
         return site.toPoolDto()

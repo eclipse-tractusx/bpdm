@@ -24,7 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
-import org.eclipse.tractusx.bpdm.pool.api.model.ConfidenceCriteriaDto
+import org.eclipse.tractusx.bpdm.pool.api.model.ConfidenceCriteria
 import org.eclipse.tractusx.bpdm.pool.entity.ConfidenceCriteriaDb
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
@@ -67,7 +67,7 @@ class BusinessPartnerEquivalenceMapper {
             identifiers = logisticAddress.identifiers.map { IdentifierEquivalenceDto(it.value, it.type.technicalKey) }.toSortedSet(compareBy { it.value }),
             physicalPostalAddress = with(logisticAddress.physicalPostalAddress) {
                 PhysicalAddressEquivalenceDto(
-                    geographicCoordinates = with(geographicCoordinates) { this?.let { GeoCoordinateDto(longitude, latitude, altitude) } },
+                    geographicCoordinates = with(geographicCoordinates) { this?.let { GeoCoordinate(longitude, latitude, altitude) } },
                     country = country,
                     administrativeAreaLevel1 = administrativeAreaLevel1?.regionCode,
                     administrativeAreaLevel2 = administrativeAreaLevel2,
@@ -100,7 +100,7 @@ class BusinessPartnerEquivalenceMapper {
             alternativePostalAddress = with(logisticAddress.alternativePostalAddress) {
                 this?.let {
                     AlternativeEquivalenceDto(
-                        geographicCoordinates = geographicCoordinates?.let { with(geographicCoordinates) { GeoCoordinateDto(longitude, latitude, altitude) } },
+                        geographicCoordinates = geographicCoordinates?.let { with(geographicCoordinates) { GeoCoordinate(longitude, latitude, altitude) } },
                         country = country,
                         administrativeAreaLevel1 = administrativeAreaLevel1?.regionCode,
                         postalCode = postCode,
@@ -114,8 +114,8 @@ class BusinessPartnerEquivalenceMapper {
             confidenceCriteria = toEquivalenceDto(logisticAddress.confidenceCriteria)
         )
 
-    private fun toEquivalenceDto(confidenceCriteriaDto: ConfidenceCriteriaDto) =
-        with(confidenceCriteriaDto) {
+    private fun toEquivalenceDto(confidenceCriteria: ConfidenceCriteria) =
+        with(confidenceCriteria) {
             ConfidenceCriteriaEquivalenceDto(
                 sharedByOwner,
                 checkedByExternalDataSource,
@@ -147,14 +147,14 @@ class BusinessPartnerEquivalenceMapper {
         override val classifications: SortedSet<ClassificationEquivalenceDto>,
         override val confidenceCriteria: ConfidenceCriteriaEquivalenceDto?,
         val legalAddress: LogisticAddressEquivalenceDto?
-    ) : IBaseLegalEntityDto
+    ) : IBaseLegalEntity
 
     data class SiteEquivalenceDto(
         override val name: String?,
         override val states: Collection<StateEquivalenceDto>,
         override val confidenceCriteria: ConfidenceCriteriaEquivalenceDto?,
         val mainAddress: LogisticAddressEquivalenceDto
-    ) : IBaseSiteDto
+    ) : IBaseSite
 
     data class LogisticAddressEquivalenceDto(
         val name: String?,
@@ -163,12 +163,12 @@ class BusinessPartnerEquivalenceMapper {
         override val physicalPostalAddress: PhysicalAddressEquivalenceDto?,
         override val alternativePostalAddress: AlternativeEquivalenceDto?,
         override val confidenceCriteria: ConfidenceCriteriaEquivalenceDto?
-    ) : IBaseLogisticAddressDto
+    ) : IBaseLogisticAddress
 
     data class IdentifierEquivalenceDto(
         override val value: String,
         override val type: String,
-    ) : IAddressIdentifierDto, ILegalEntityIdentifierDto {
+    ) : IAddressIdentifier, ILegalEntityIdentifier {
         override val issuingBody: String? = null
     }
 
@@ -176,16 +176,16 @@ class BusinessPartnerEquivalenceMapper {
         override val validFrom: LocalDateTime?,
         override val validTo: LocalDateTime?,
         override val type: BusinessStateType,
-    ) : IAddressStateDto, ILegalEntityStateDto, ISiteStateDto
+    ) : IAddressState, ILegalEntityState, ISiteState
 
     data class ClassificationEquivalenceDto(
         override val code: String?,
         override val value: String?,
         override val type: ClassificationType
-    ) : ILegalEntityClassificationDto
+    ) : ILegalEntityClassification
 
     data class PhysicalAddressEquivalenceDto(
-        override val geographicCoordinates: GeoCoordinateDto?,
+        override val geographicCoordinates: GeoCoordinate?,
         override val country: CountryCode?,
         override val administrativeAreaLevel1: String?,
         override val administrativeAreaLevel2: String?,
@@ -199,10 +199,10 @@ class BusinessPartnerEquivalenceMapper {
         override val building: String?,
         override val floor: String?,
         override val door: String?
-    ) : IBasePhysicalPostalAddressDto
+    ) : IBasePhysicalPostalAddress
 
     data class AlternativeEquivalenceDto(
-        override val geographicCoordinates: GeoCoordinateDto?,
+        override val geographicCoordinates: GeoCoordinate?,
         override val country: CountryCode?,
         override val administrativeAreaLevel1: String?,
         override val postalCode: String?,
@@ -210,7 +210,7 @@ class BusinessPartnerEquivalenceMapper {
         override val deliveryServiceType: DeliveryServiceType?,
         override val deliveryServiceQualifier: String?,
         override val deliveryServiceNumber: String?
-    ) : IBaseAlternativePostalAddressDto
+    ) : IBaseAlternativePostalAddress
 
     data class StreetEquivalenceDto(
         override val name: String?,
@@ -222,7 +222,7 @@ class BusinessPartnerEquivalenceMapper {
         override val additionalNamePrefix: String?,
         override val nameSuffix: String?,
         override val additionalNameSuffix: String?
-    ) : IStreetDetailedDto
+    ) : IStreetDetailed
 
     data class ConfidenceCriteriaEquivalenceDto(
         override val sharedByOwner: Boolean?,
@@ -231,5 +231,5 @@ class BusinessPartnerEquivalenceMapper {
         override val lastConfidenceCheckAt: LocalDateTime?,
         override val nextConfidenceCheckAt: LocalDateTime?,
         override val confidenceLevel: Int?
-    ) : IConfidenceCriteriaDto
+    ) : IConfidenceCriteria
 }

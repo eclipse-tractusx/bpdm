@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.test.testdata.gate
 import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
-import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
+import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinate
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
@@ -32,27 +32,27 @@ import java.time.LocalDateTime
 object BusinessPartnerGenericCommonValues {
 
     //Business Partner with two entries in every collection
-    val businessPartner1 = BusinessPartnerGenericDto(
+    val businessPartner1 = BusinessPartnerGeneric(
         nameParts = listOf("part-cleaned-1", "name-cleaned-2"),
         identifiers = listOf(
-            BusinessPartnerIdentifierDto(
+            BusinessPartnerIdentifier(
                 type = "identifier-type-1-cleaned",
                 value = "identifier-value-1-cleaned",
                 issuingBody = "issuingBody-1-cleaned"
             ),
-            BusinessPartnerIdentifierDto(
+            BusinessPartnerIdentifier(
                 type = "identifier-type-2-cleaned",
                 value = "identifier-value-2-cleaned",
                 issuingBody = "issuingBody-2-cleaned"
             ),
         ),
         states = listOf(
-            BusinessPartnerStateDto(
+            BusinessPartnerState(
                 validFrom = LocalDateTime.of(2020, 9, 22, 15, 50),
                 validTo = LocalDateTime.of(2023, 10, 23, 16, 40),
                 type = BusinessStateType.INACTIVE
             ),
-            BusinessPartnerStateDto(
+            BusinessPartnerState(
                 validFrom = LocalDateTime.of(2000, 8, 21, 14, 30),
                 validTo = LocalDateTime.of(2020, 9, 22, 15, 50),
                 type = BusinessStateType.ACTIVE
@@ -69,18 +69,18 @@ object BusinessPartnerGenericCommonValues {
             shortName = "shot-name-cleaned",
             legalForm = "legal-form-cleaned",
             classifications = listOf(
-                BusinessPartnerClassificationDto(
+                BusinessPartnerClassification(
                     type = ClassificationType.NACE,
                     code = "code-1-cleaned",
                     value = "value-1-cleaned"
                 ),
-                BusinessPartnerClassificationDto(
+                BusinessPartnerClassification(
                     type = ClassificationType.NAF,
                     code = "code-2-cleaned",
                     value = "value-2-cleaned"
                 ),
             ),
-            confidenceCriteria = ConfidenceCriteriaDto(
+            confidenceCriteria = ConfidenceCriteria(
                 sharedByOwner = true,
                 checkedByExternalDataSource = true,
                 numberOfBusinessPartners = 7,
@@ -92,7 +92,7 @@ object BusinessPartnerGenericCommonValues {
         site = SiteRepresentation(
             siteBpn = "000000123BBB222",
             name = "Site Name",
-            confidenceCriteria = ConfidenceCriteriaDto(
+            confidenceCriteria = ConfidenceCriteria(
                 sharedByOwner = false,
                 checkedByExternalDataSource = false,
                 numberOfBusinessPartners = 8,
@@ -105,8 +105,8 @@ object BusinessPartnerGenericCommonValues {
             addressBpn = "000000123CCC333",
             name = "Address Name",
             addressType = AddressType.AdditionalAddress,
-            physicalPostalAddress = PhysicalPostalAddressDto(
-                geographicCoordinates = GeoCoordinateDto(0.5f, 0.5f, 0.5f),
+            physicalPostalAddress = PhysicalPostalAddress(
+                geographicCoordinates = GeoCoordinate(0.5f, 0.5f, 0.5f),
                 country = CountryCode.PT,
                 administrativeAreaLevel1 = "PT-PT",
                 administrativeAreaLevel2 = "pt-admin-level-2-cleaned",
@@ -114,7 +114,7 @@ object BusinessPartnerGenericCommonValues {
                 postalCode = "phys-postal-code-cleaned",
                 city = "city",
                 district = "district",
-                street = StreetDto(
+                street = Street(
                     name = "name",
                     houseNumber = "house-number",
                     houseNumberSupplement = "house-number-supplement",
@@ -132,8 +132,8 @@ object BusinessPartnerGenericCommonValues {
                 floor = "floor",
                 door = "door"
             ),
-            alternativePostalAddress = AlternativePostalAddressDto(
-                geographicCoordinates = GeoCoordinateDto(0.6f, 0.6f, 0.6f),
+            alternativePostalAddress = AlternativePostalAddress(
+                geographicCoordinates = GeoCoordinate(0.6f, 0.6f, 0.6f),
                 country = CountryCode.PT,
                 administrativeAreaLevel1 = "PT-PT",
                 postalCode = "postal-code-cleaned",
@@ -142,7 +142,7 @@ object BusinessPartnerGenericCommonValues {
                 deliveryServiceQualifier = "delivery-service-qualifier-cleaned",
                 deliveryServiceType = DeliveryServiceType.PO_BOX
             ),
-            confidenceCriteria = ConfidenceCriteriaDto(
+            confidenceCriteria = ConfidenceCriteria(
                 sharedByOwner = false,
                 checkedByExternalDataSource = true,
                 numberOfBusinessPartners = 4,
@@ -154,17 +154,17 @@ object BusinessPartnerGenericCommonValues {
     )
 
     //Business Partner with single entry in every collection
-    val businessPartner2 = BusinessPartnerGenericDto(
+    val businessPartner2 = BusinessPartnerGeneric(
         nameParts = listOf("name-part-2"),
         identifiers = listOf(
-            BusinessPartnerIdentifierDto(
+            BusinessPartnerIdentifier(
                 type = "identifier-type-2",
                 value = "identifier-value-2",
                 issuingBody = "issuingBody-2"
             )
         ),
         states = listOf(
-            BusinessPartnerStateDto(
+            BusinessPartnerState(
                 validFrom = LocalDateTime.of(1988, 10, 4, 22, 30),
                 validTo = LocalDateTime.of(2023, 1, 1, 10, 10),
                 type = BusinessStateType.ACTIVE
@@ -179,13 +179,13 @@ object BusinessPartnerGenericCommonValues {
             shortName = "shortname-2",
             legalForm = "legal-form-2",
             classifications = listOf(
-                BusinessPartnerClassificationDto(
+                BusinessPartnerClassification(
                     type = ClassificationType.SIC,
                     code = "code-2",
                     value = "value-2"
                 )
             ),
-            confidenceCriteria = ConfidenceCriteriaDto(
+            confidenceCriteria = ConfidenceCriteria(
                 sharedByOwner = true,
                 checkedByExternalDataSource = true,
                 numberOfBusinessPartners = 7,
@@ -197,7 +197,7 @@ object BusinessPartnerGenericCommonValues {
         site = SiteRepresentation(
             siteBpn = "BPNSTEST-2",
             name = "site name 2",
-            confidenceCriteria = ConfidenceCriteriaDto(
+            confidenceCriteria = ConfidenceCriteria(
                 sharedByOwner = true,
                 checkedByExternalDataSource = true,
                 numberOfBusinessPartners = 7,
@@ -210,8 +210,8 @@ object BusinessPartnerGenericCommonValues {
             addressBpn = "BPNATEST-2",
             name = "address name 2",
             addressType = AddressType.LegalAddress,
-            physicalPostalAddress = PhysicalPostalAddressDto(
-                geographicCoordinates = GeoCoordinateDto(0.4f, 0.4f, 0.4f),
+            physicalPostalAddress = PhysicalPostalAddress(
+                geographicCoordinates = GeoCoordinate(0.4f, 0.4f, 0.4f),
                 country = CountryCode.FR,
                 administrativeAreaLevel1 = "FR-ARA",
                 administrativeAreaLevel2 = "fr-admin-level-2",
@@ -219,7 +219,7 @@ object BusinessPartnerGenericCommonValues {
                 postalCode = "phys-postal-code-2",
                 city = "city-2",
                 district = "district-2",
-                street = StreetDto(
+                street = Street(
                     name = "name-2",
                     houseNumber = "house-number-2",
                     houseNumberSupplement = "house-number-supplement-2",
@@ -237,8 +237,8 @@ object BusinessPartnerGenericCommonValues {
                 floor = "floor-2",
                 door = "door-2"
             ),
-            alternativePostalAddress = AlternativePostalAddressDto(
-                geographicCoordinates = GeoCoordinateDto(0.2f, 0.2f, 0.2f),
+            alternativePostalAddress = AlternativePostalAddress(
+                geographicCoordinates = GeoCoordinate(0.2f, 0.2f, 0.2f),
                 country = CountryCode.FR,
                 administrativeAreaLevel1 = "FR-BFC",
                 postalCode = "alt-post-code-2",
@@ -247,7 +247,7 @@ object BusinessPartnerGenericCommonValues {
                 deliveryServiceQualifier = "delivery-service-qualifier-2",
                 deliveryServiceType = DeliveryServiceType.BOITE_POSTALE
             ),
-            confidenceCriteria = ConfidenceCriteriaDto(
+            confidenceCriteria = ConfidenceCriteria(
                 sharedByOwner = true,
                 checkedByExternalDataSource = true,
                 numberOfBusinessPartners = 7,
@@ -260,32 +260,32 @@ object BusinessPartnerGenericCommonValues {
     )
 
 
-    val logisticAddress1 = LogisticAddressDto(
+    val logisticAddress1 = LogisticAddress(
         name = "Address Name 1",
         states = listOf(
-            AddressStateDto(
+            AddressState(
                 validFrom = LocalDateTime.of(1970, 4, 4, 4, 4),
                 validTo = LocalDateTime.of(1975, 5, 5, 5, 5),
                 type = BusinessStateType.ACTIVE
             ),
-            AddressStateDto(
+            AddressState(
                 validFrom = LocalDateTime.of(1975, 5, 5, 5, 5),
                 validTo = null,
                 type = BusinessStateType.INACTIVE
             ),
         ),
         identifiers = listOf(
-            AddressIdentifierDto(
+            AddressIdentifier(
                 value = "Address Identifier Value 1",
                 type = "Address Identifier Type 1"
             ),
-            AddressIdentifierDto(
+            AddressIdentifier(
                 value = "Address Identifier Value 2",
                 type = "Address Identifier Type 2"
             )
         ),
-        physicalPostalAddress = PhysicalPostalAddressDto(
-            geographicCoordinates = GeoCoordinateDto(0.12f, 0.12f, 0.12f),
+        physicalPostalAddress = PhysicalPostalAddress(
+            geographicCoordinates = GeoCoordinate(0.12f, 0.12f, 0.12f),
             country = CountryCode.AD,
             administrativeAreaLevel1 = "AD-07",
             administrativeAreaLevel2 = "Admin-Level 2-1",
@@ -293,7 +293,7 @@ object BusinessPartnerGenericCommonValues {
             postalCode = "Postal Code 1",
             city = "City 1",
             district = "District 1",
-            street = StreetDto(
+            street = Street(
                 name = "Street Name 1",
                 houseNumber = "House Number 1",
                 houseNumberSupplement = "house-number-supplement-1",
@@ -310,8 +310,8 @@ object BusinessPartnerGenericCommonValues {
             floor = "Floor 1",
             door = "Door 1"
         ),
-        alternativePostalAddress = AlternativePostalAddressDto(
-            geographicCoordinates = GeoCoordinateDto(0.23f, 0.23f, 0.23f),
+        alternativePostalAddress = AlternativePostalAddress(
+            geographicCoordinates = GeoCoordinate(0.23f, 0.23f, 0.23f),
             country = CountryCode.AD,
             administrativeAreaLevel1 = "AD-08",
             postalCode = "Postal Code Alt 1",
@@ -320,12 +320,12 @@ object BusinessPartnerGenericCommonValues {
             deliveryServiceQualifier = "Delivery Service Qualifier 1",
             deliveryServiceNumber = "Delivery Service Number 1"
         ),
-        bpnAReference = BpnReferenceDto(
+        bpnAReference = BpnReference(
             referenceType = BpnReferenceType.Bpn,
             referenceValue = "BPNATEST-1"
         ),
         hasChanged = true,
-        confidenceCriteria = ConfidenceCriteriaDto(
+        confidenceCriteria = ConfidenceCriteria(
             sharedByOwner = true,
             checkedByExternalDataSource = true,
             numberOfBusinessPartners = 7,
@@ -335,23 +335,23 @@ object BusinessPartnerGenericCommonValues {
         )
     )
 
-    val logisticAddress2 = LogisticAddressDto(
+    val logisticAddress2 = LogisticAddress(
         name = "Address Name 2",
         states = listOf(
-            AddressStateDto(
+            AddressState(
                 validFrom = LocalDateTime.of(1971, 4, 4, 4, 4),
                 validTo = null,
                 type = BusinessStateType.ACTIVE
             )
         ),
         identifiers = listOf(
-            AddressIdentifierDto(
+            AddressIdentifier(
                 value = "Address Identifier Value 2-1",
                 type = "Address Identifier Type 2-1"
             )
         ),
-        physicalPostalAddress = PhysicalPostalAddressDto(
-            geographicCoordinates = GeoCoordinateDto(0.45f, 0.46f, 0.47f),
+        physicalPostalAddress = PhysicalPostalAddress(
+            geographicCoordinates = GeoCoordinate(0.45f, 0.46f, 0.47f),
             country = CountryCode.AD,
             administrativeAreaLevel1 = "AD-07",
             administrativeAreaLevel2 = "Admin-Level 2-2",
@@ -359,7 +359,7 @@ object BusinessPartnerGenericCommonValues {
             postalCode = "Postal Code 2",
             city = "City 2",
             district = "District 2",
-            street = StreetDto(
+            street = Street(
                 name = "Street Name 2",
                 houseNumber = "House Number 2",
                 houseNumberSupplement = "house-number-supplement-2",
@@ -376,8 +376,8 @@ object BusinessPartnerGenericCommonValues {
             floor = "Floor 2",
             door = "Door 2"
         ),
-        alternativePostalAddress = AlternativePostalAddressDto(
-            geographicCoordinates = GeoCoordinateDto(0.01f, 0.02f, 0.03f),
+        alternativePostalAddress = AlternativePostalAddress(
+            geographicCoordinates = GeoCoordinate(0.01f, 0.02f, 0.03f),
             country = CountryCode.AD,
             administrativeAreaLevel1 = "AD-08",
             postalCode = "Postal Code Alt 2",
@@ -386,12 +386,12 @@ object BusinessPartnerGenericCommonValues {
             deliveryServiceQualifier = "Delivery Service Qualifier 2",
             deliveryServiceNumber = "Delivery Service Number 2"
         ),
-        bpnAReference = BpnReferenceDto(
+        bpnAReference = BpnReference(
             referenceType = BpnReferenceType.BpnRequestIdentifier,
             referenceValue = "BPN_REQUEST_ID_TEST"
         ),
         hasChanged = true,
-        confidenceCriteria = ConfidenceCriteriaDto(
+        confidenceCriteria = ConfidenceCriteria(
             sharedByOwner = false,
             checkedByExternalDataSource = false,
             numberOfBusinessPartners = 2,
@@ -401,16 +401,16 @@ object BusinessPartnerGenericCommonValues {
         )
     )
 
-    val legalEntity1 = LegalEntityDto(
+    val legalEntity1 = LegalEntity(
         legalName = "Legal Entity Name 1",
         legalShortName = "Legal Short Name 1",
         identifiers = listOf(
-            LegalEntityIdentifierDto(
+            LegalEntityIdentifier(
                 value = "Legal Identifier Value 1",
                 type = "Legal Identifier Type 1",
                 issuingBody = "Legal Issuing Body 1"
             ),
-            LegalEntityIdentifierDto(
+            LegalEntityIdentifier(
                 value = "Legal Identifier Value 2",
                 type = "Legal Identifier Type 2",
                 issuingBody = "Legal Issuing Body 2"
@@ -418,36 +418,36 @@ object BusinessPartnerGenericCommonValues {
         ),
         legalForm = "Legal Form 1",
         states = listOf(
-            LegalEntityStateDto(
+            LegalEntityState(
                 validFrom = LocalDateTime.of(1995, 2, 2, 3, 3),
                 validTo = LocalDateTime.of(2000, 3, 3, 4, 4),
                 type = BusinessStateType.ACTIVE
             ),
-            LegalEntityStateDto(
+            LegalEntityState(
                 validFrom = LocalDateTime.of(2000, 3, 3, 4, 4),
                 validTo = null,
                 type = BusinessStateType.INACTIVE
             ),
         ),
         classifications = listOf(
-            LegalEntityClassificationDto(
+            LegalEntityClassification(
                 type = ClassificationType.SIC,
                 code = "Classification Code 1",
                 value = "Classification Value 1"
             ),
-            LegalEntityClassificationDto(
+            LegalEntityClassification(
                 type = ClassificationType.NACE,
                 code = "Classification Code 2",
                 value = "Classification Value 2"
             )
         ),
         legalAddress = logisticAddress1,
-        bpnLReference = BpnReferenceDto(
+        bpnLReference = BpnReference(
             referenceValue = "BPNL1-TEST",
             referenceType = BpnReferenceType.Bpn
         ),
         hasChanged = false,
-        confidenceCriteria = ConfidenceCriteriaDto(
+        confidenceCriteria = ConfidenceCriteria(
             sharedByOwner = false,
             checkedByExternalDataSource = false,
             numberOfBusinessPartners = 2,
@@ -457,11 +457,11 @@ object BusinessPartnerGenericCommonValues {
         )
     )
 
-    val legalEntity2 = LegalEntityDto(
+    val legalEntity2 = LegalEntity(
         legalName = "Legal Entity Name 2",
         legalShortName = "Legal Short Name 2",
         identifiers = listOf(
-            LegalEntityIdentifierDto(
+            LegalEntityIdentifier(
                 value = "Legal Identifier Value 2",
                 type = "Legal Identifier Type 2",
                 issuingBody = "Legal Issuing Body 2"
@@ -469,26 +469,26 @@ object BusinessPartnerGenericCommonValues {
         ),
         legalForm = "Legal Form 2",
         states = listOf(
-            LegalEntityStateDto(
+            LegalEntityState(
                 validFrom = LocalDateTime.of(1900, 5, 5, 5, 5),
                 validTo = null,
                 type = BusinessStateType.ACTIVE
             )
         ),
         classifications = listOf(
-            LegalEntityClassificationDto(
+            LegalEntityClassification(
                 type = ClassificationType.SIC,
                 code = "Classification Code 2",
                 value = "Classification Value 2"
             )
         ),
         legalAddress = logisticAddress2,
-        bpnLReference = BpnReferenceDto(
+        bpnLReference = BpnReference(
             referenceValue = "BPNL-REQUEST_ID_TEST",
             referenceType = BpnReferenceType.BpnRequestIdentifier
         ),
         hasChanged = false,
-        confidenceCriteria = ConfidenceCriteriaDto(
+        confidenceCriteria = ConfidenceCriteria(
             sharedByOwner = false,
             checkedByExternalDataSource = false,
             numberOfBusinessPartners = 2,
@@ -498,27 +498,27 @@ object BusinessPartnerGenericCommonValues {
         )
     )
 
-    val site1 = SiteDto(
+    val site1 = Site(
         name = "Site Name 1",
         states = listOf(
-            SiteStateDto(
+            SiteState(
                 validFrom = LocalDateTime.of(1991, 10, 10, 10, 10),
                 validTo = LocalDateTime.of(2001, 11, 11, 11, 11),
                 type = BusinessStateType.ACTIVE
             ),
-            SiteStateDto(
+            SiteState(
                 validFrom = LocalDateTime.of(2001, 11, 11, 11, 11),
                 validTo = null,
                 type = BusinessStateType.INACTIVE
             )
         ),
         mainAddress = logisticAddress1,
-        bpnSReference = BpnReferenceDto(
+        bpnSReference = BpnReference(
             referenceValue = "BPNS_TEST",
             referenceType = BpnReferenceType.Bpn
         ),
         hasChanged = false,
-        confidenceCriteria = ConfidenceCriteriaDto(
+        confidenceCriteria = ConfidenceCriteria(
             sharedByOwner = false,
             checkedByExternalDataSource = false,
             numberOfBusinessPartners = 2,
@@ -528,22 +528,22 @@ object BusinessPartnerGenericCommonValues {
         )
     )
 
-    val site2 = SiteDto(
+    val site2 = Site(
         name = "Site Name 2",
         states = listOf(
-            SiteStateDto(
+            SiteState(
                 validFrom = LocalDateTime.of(1997, 12, 12, 12, 12),
                 validTo = null,
                 type = BusinessStateType.ACTIVE
             )
         ),
         mainAddress = logisticAddress2,
-        bpnSReference = BpnReferenceDto(
+        bpnSReference = BpnReference(
             referenceValue = "BPNS_REQUEST_ID_TEST",
             referenceType = BpnReferenceType.BpnRequestIdentifier
         ),
         hasChanged = true,
-        confidenceCriteria = ConfidenceCriteriaDto(
+        confidenceCriteria = ConfidenceCriteria(
             sharedByOwner = false,
             checkedByExternalDataSource = false,
             numberOfBusinessPartners = 2,
@@ -553,14 +553,14 @@ object BusinessPartnerGenericCommonValues {
         )
     )
 
-    val businessPartner1Full = BusinessPartnerFullDto(
+    val businessPartner1Full = BusinessPartnerFull(
         generic = businessPartner1,
         legalEntity = legalEntity1,
         site = site1,
         address = logisticAddress1
     )
 
-    val businessPartner2Full = BusinessPartnerFullDto(
+    val businessPartner2Full = BusinessPartnerFull(
         generic = businessPartner2,
         legalEntity = legalEntity2,
         site = site2,

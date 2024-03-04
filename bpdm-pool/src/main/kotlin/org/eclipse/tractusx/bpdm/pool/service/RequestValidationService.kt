@@ -20,19 +20,19 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
-import org.eclipse.tractusx.bpdm.common.dto.IBaseLegalEntityDto
-import org.eclipse.tractusx.bpdm.common.dto.IBaseLogisticAddressDto
+import org.eclipse.tractusx.bpdm.common.dto.IBaseLegalEntity
+import org.eclipse.tractusx.bpdm.common.dto.IBaseLogisticAddress
 import org.eclipse.tractusx.bpdm.common.dto.RequestWithKey
 import org.eclipse.tractusx.bpdm.common.util.findDuplicates
 import org.eclipse.tractusx.bpdm.common.util.mergeMapsWithCollectionInValue
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
-import org.eclipse.tractusx.bpdm.pool.dto.LegalEntityMetadataDto
+import org.eclipse.tractusx.bpdm.pool.dto.LegalEntityMetadata
 import org.eclipse.tractusx.bpdm.pool.repository.*
 import org.eclipse.tractusx.bpdm.pool.service.TaskStepBuildService.CleaningError.LEGAL_ENTITY_IS_NULL
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerFullDto
-import org.eclipse.tractusx.orchestrator.api.model.LogisticAddressDto
-import org.eclipse.tractusx.orchestrator.api.model.TaskStepReservationEntryDto
+import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerFull
+import org.eclipse.tractusx.orchestrator.api.model.LogisticAddress
+import org.eclipse.tractusx.orchestrator.api.model.TaskStepReservationEntry
 import org.springframework.stereotype.Service
 
 @Service
@@ -47,7 +47,7 @@ class RequestValidationService(
 ) {
 
     fun validateTasksFromOrchestrator(
-        taskEntries: List<TaskStepReservationEntryDto>, requestMappings: TaskEntryBpnMapping
+        taskEntries: List<TaskStepReservationEntry>, requestMappings: TaskEntryBpnMapping
     ): Map<RequestWithKey, Collection<ErrorInfo<ErrorCode>>> {
 
         val result = mergeMapsWithCollectionInValue(
@@ -62,17 +62,17 @@ class RequestValidationService(
         }.toMap()
     }
 
-    private fun isSiteUpdate(businessPartner: BusinessPartnerFullDto, requestMappings: TaskEntryBpnMapping) =
+    private fun isSiteUpdate(businessPartner: BusinessPartnerFull, requestMappings: TaskEntryBpnMapping) =
         businessPartner.site != null && requestMappings.hasBpnFor(businessPartner.site?.bpnSReference)
 
-    private fun isLegalEntityUpdate(businessPartner: BusinessPartnerFullDto, requestMappings: TaskEntryBpnMapping) =
+    private fun isLegalEntityUpdate(businessPartner: BusinessPartnerFull, requestMappings: TaskEntryBpnMapping) =
         (requestMappings.hasBpnFor(businessPartner.legalEntity?.bpnLReference))
 
-    private fun isLegalEntityCreate(businessPartner: BusinessPartnerFullDto, requestMappings: TaskEntryBpnMapping) =
+    private fun isLegalEntityCreate(businessPartner: BusinessPartnerFull, requestMappings: TaskEntryBpnMapping) =
         !requestMappings.hasBpnFor(businessPartner.legalEntity?.bpnLReference)
 
     private fun validateLegalEntitiesFromOrchestrator(
-        taskEntries: List<TaskStepReservationEntryDto>,
+        taskEntries: List<TaskStepReservationEntry>,
         requestMappings: TaskEntryBpnMapping
     ): Map<RequestWithKey, Collection<ErrorInfo<ErrorCode>>> {
 
@@ -107,7 +107,7 @@ class RequestValidationService(
     }
 
     private fun validateSitesFromOrchestrator(
-        taskEntries: List<TaskStepReservationEntryDto>,
+        taskEntries: List<TaskStepReservationEntry>,
         requestMappings: TaskEntryBpnMapping
     ): Map<RequestWithKey, Collection<ErrorInfo<ErrorCode>>> {
 
@@ -124,7 +124,7 @@ class RequestValidationService(
     }
 
     private fun validateAddressesFromOrchestrator(
-        taskEntries: List<TaskStepReservationEntryDto>,
+        taskEntries: List<TaskStepReservationEntry>,
         requestMappings: TaskEntryBpnMapping
     ): Map<RequestWithKey, Collection<ErrorInfo<ErrorCode>>> {
 
@@ -162,7 +162,7 @@ class RequestValidationService(
         )
     }
 
-    fun getAddressBridges(task: TaskStepReservationEntryDto, requestMappings: TaskEntryBpnMapping): List<AddressBridge> {
+    fun getAddressBridges(task: TaskStepReservationEntry, requestMappings: TaskEntryBpnMapping): List<AddressBridge> {
 
         val allAddresses: MutableList<AddressBridge> = mutableListOf()
         val businessPartner = task.businessPartner
@@ -181,8 +181,8 @@ class RequestValidationService(
     }
 
     private fun createAddressBridge(
-        address: LogisticAddressDto,
-        task: TaskStepReservationEntryDto,
+        address: LogisticAddress,
+        task: TaskStepReservationEntry,
         requestMappings: TaskEntryBpnMapping
     ) = AddressBridge(
         address = address,
@@ -416,12 +416,12 @@ class RequestValidationService(
     }
 
     inner class ValidateIdentifierLeTypesExists<ERROR : ErrorCode>(
-        leDtos: Collection<IBaseLegalEntityDto>,
+        leDtos: Collection<IBaseLegalEntity>,
         private val errorCode: ERROR
     ) {
 
         private val existingTypes: Set<String> = metadataService.getMetadata(leDtos).toKeys().idTypes
-        fun validate(legalEntity: IBaseLegalEntityDto, entityKey: RequestWithKey): Collection<ErrorInfo<ERROR>> {
+        fun validate(legalEntity: IBaseLegalEntity, entityKey: RequestWithKey): Collection<ErrorInfo<ERROR>> {
             val requestedTypes = legalEntity.identifiers.map { it.type }
             val missingTypes = requestedTypes - existingTypes
 
@@ -436,12 +436,12 @@ class RequestValidationService(
     }
 
     inner class ValidateLegalFormExists<ERROR : ErrorCode>(
-        leDtos: Collection<IBaseLegalEntityDto>,
+        leDtos: Collection<IBaseLegalEntity>,
         private val errorCode: ERROR
     ) {
 
         val existingLegalForms: Set<String> = metadataService.getMetadata(leDtos).toKeys().legalForms
-        fun validate(legalEntity: IBaseLegalEntityDto, entityKey: RequestWithKey): Collection<ErrorInfo<ERROR>> {
+        fun validate(legalEntity: IBaseLegalEntity, entityKey: RequestWithKey): Collection<ErrorInfo<ERROR>> {
             if (legalEntity.legalForm != null) {
                 if (!existingLegalForms.contains(legalEntity.legalForm)) {
                     return listOf(ErrorInfo(errorCode, "Legal Form '${legalEntity.legalForm}' does not exist", entityKey.getRequestKey()))
@@ -452,12 +452,12 @@ class RequestValidationService(
     }
 
     inner class ValidateIdentifierTypesExists<ERROR : ErrorCode>(
-        addressDtos: Collection<IBaseLogisticAddressDto>,
+        addressDtos: Collection<IBaseLogisticAddress>,
         private val errorCode: ERROR
     ) {
         private val existingTypes = metadataService.getIdentifiers(addressDtos).map { it.technicalKey }.toSet()
 
-        fun validate(addressDto: IBaseLogisticAddressDto, entityKey: RequestWithKey): Collection<ErrorInfo<ERROR>> {
+        fun validate(addressDto: IBaseLogisticAddress, entityKey: RequestWithKey): Collection<ErrorInfo<ERROR>> {
             val requestedTypes = addressDto.identifiers.map { it.type }
             val missingTypes = requestedTypes - existingTypes
 
@@ -472,12 +472,12 @@ class RequestValidationService(
     }
 
     inner class ValidateAdministrativeAreaLevel1Exists<ERROR : ErrorCode>(
-        addressDtos: Collection<IBaseLogisticAddressDto>,
+        addressDtos: Collection<IBaseLogisticAddress>,
         private val errorCode: ERROR
     ) {
 
         private val existingRegions = metadataService.getRegions(addressDtos).map { it.regionCode }.toSet()
-        fun validate(address: IBaseLogisticAddressDto, entityKey: RequestWithKey): Collection<ErrorInfo<ERROR>> {
+        fun validate(address: IBaseLogisticAddress, entityKey: RequestWithKey): Collection<ErrorInfo<ERROR>> {
 
             val requestedAdminLevels = listOfNotNull(
                 address.physicalPostalAddress?.administrativeAreaLevel1,
@@ -517,13 +517,13 @@ class RequestValidationService(
 
 
     private inner class ValidateLegalEntityIdentifiersDuplicated<ERROR : ErrorCode>(
-        legalEntityDtos: Collection<IBaseLegalEntityDto>,
+        legalEntityDtos: Collection<IBaseLegalEntity>,
         private val errorCode: ERROR
     ) {
 
         val existingIdentifiers = getLegalEntityDuplicateIdentifierCandidates(legalEntityDtos)
 
-        fun validate(legalEntity: IBaseLegalEntityDto, entityKey: RequestWithKey, bpn: String?): Collection<ErrorInfo<ERROR>> {
+        fun validate(legalEntity: IBaseLegalEntity, entityKey: RequestWithKey, bpn: String?): Collection<ErrorInfo<ERROR>> {
 
             return legalEntity.identifiers.mapNotNull {
                 val identifierPair = IdentifierCandidateKey(type = it.type, value = it.value)
@@ -536,7 +536,7 @@ class RequestValidationService(
             }
         }
 
-        private fun getLegalEntityDuplicateIdentifierCandidates(legalEntityDtos: Collection<IBaseLegalEntityDto>)
+        private fun getLegalEntityDuplicateIdentifierCandidates(legalEntityDtos: Collection<IBaseLegalEntity>)
                 : Map<IdentifierCandidateKey, IdentifierCandidate> {
 
             val identifiers = legalEntityDtos.flatMap { it.identifiers }
@@ -553,13 +553,13 @@ class RequestValidationService(
     }
 
     private inner class ValidateAddressIdentifiersDuplicated<ERROR : ErrorCode>(
-        addressDtos: Collection<IBaseLogisticAddressDto>,
+        addressDtos: Collection<IBaseLogisticAddress>,
         private val errorCode: ERROR
     ) {
 
         val existingIdentifiers = getAddressDuplicateIdentifierCandidates(addressDtos)
 
-        fun validate(address: IBaseLogisticAddressDto, entityKey: RequestWithKey, bpn: String?): Collection<ErrorInfo<ERROR>> {
+        fun validate(address: IBaseLogisticAddress, entityKey: RequestWithKey, bpn: String?): Collection<ErrorInfo<ERROR>> {
 
             return address.identifiers.mapNotNull {
                 val identifierPair = IdentifierCandidateKey(type = it.type, value = it.value)
@@ -572,7 +572,7 @@ class RequestValidationService(
             }
         }
 
-        private fun getAddressDuplicateIdentifierCandidates(addressDtos: Collection<IBaseLogisticAddressDto>)
+        private fun getAddressDuplicateIdentifierCandidates(addressDtos: Collection<IBaseLogisticAddress>)
                 : Map<IdentifierCandidateKey, IdentifierCandidate> {
 
             val identifiers = addressDtos.flatMap { it.identifiers }
@@ -615,7 +615,7 @@ class RequestValidationService(
         }
     }
 
-    private fun LegalEntityMetadataDto.toKeys(): LegalEntityMetadataKeys {
+    private fun LegalEntityMetadata.toKeys(): LegalEntityMetadataKeys {
         return LegalEntityMetadataKeys(
             idTypes = idTypes.map { it.technicalKey }.toSet(),
             legalForms = legalForms.map { it.technicalKey }.toSet()
@@ -639,7 +639,7 @@ class RequestValidationService(
     )
 
     data class LegalEntityBridge(
-        val legalEntity: IBaseLegalEntityDto,
+        val legalEntity: IBaseLegalEntity,
         val request: RequestWithKey,
         val bpnL: String?
     )
@@ -647,7 +647,7 @@ class RequestValidationService(
     data class AddressBridge(
 
         val request: RequestWithKey,
-        val address: IBaseLogisticAddressDto,
+        val address: IBaseLogisticAddress,
         val bpnA: String?
     )
 

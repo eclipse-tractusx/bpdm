@@ -27,8 +27,8 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalFormDto
+import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierType
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalForm
 import org.eclipse.tractusx.bpdm.pool.api.model.QualityLevel
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
 import org.eclipse.tractusx.bpdm.pool.entity.FieldQualityRuleDb
@@ -92,10 +92,10 @@ class MetadataControllerIT @Autowired constructor(
             BusinessPartnerVerboseValues.legalForm3
         )
 
-        private fun postIdentifierType(client: WebTestClient, type: IdentifierTypeDto) =
+        private fun postIdentifierType(client: WebTestClient, type: IdentifierType) =
             postMetadataSameResponseType(client, type, EndpointValues.CATENA_METADATA_IDENTIFIER_TYPE_PATH)
 
-        private fun getIdentifierTypes(client: WebTestClient, page: Int, size: Int): PageDto<IdentifierTypeDto> =
+        private fun getIdentifierTypes(client: WebTestClient, page: Int, size: Int): PageDto<IdentifierType> =
 //            getMetadata<PageResponse<IdentifierTypeDto>>(client, page, size, EndpointValues.CATENA_METADATA_IDENTIFIER_TYPE_PATH)
             client.invokeGetEndpoint(
                 EndpointValues.CATENA_METADATA_IDENTIFIER_TYPE_PATH,
@@ -104,13 +104,13 @@ class MetadataControllerIT @Autowired constructor(
                 Pair(PaginationRequest::size.name, size.toString())
             )
 
-        private fun postIdentifierTypeWithoutExpectation(client: WebTestClient, type: IdentifierTypeDto) =
+        private fun postIdentifierTypeWithoutExpectation(client: WebTestClient, type: IdentifierType) =
             postMetadataWithoutExpectation(client, type, EndpointValues.CATENA_METADATA_IDENTIFIER_TYPE_PATH)
 
         private fun postLegalForm(client: WebTestClient, type: LegalFormRequest) =
-            postMetadata<LegalFormRequest, LegalFormDto>(client, type, EndpointValues.CATENA_METADATA_LEGAL_FORM_PATH)
+            postMetadata<LegalFormRequest, LegalForm>(client, type, EndpointValues.CATENA_METADATA_LEGAL_FORM_PATH)
 
-        private fun getLegalForms(client: WebTestClient, page: Int, size: Int): PageDto<LegalFormDto> =
+        private fun getLegalForms(client: WebTestClient, page: Int, size: Int): PageDto<LegalForm> =
 //            getMetadata<PageResponse<LegalFormResponse>>(client, page, size, EndpointValues.CATENA_METADATA_LEGAL_FORM_PATH)
             client.invokeGetEndpoint(
                 EndpointValues.CATENA_METADATA_LEGAL_FORM_PATH,
@@ -349,7 +349,7 @@ class MetadataControllerIT @Autowired constructor(
             identifierType3.toDto()
         )
 
-        val result = webTestClient.invokeGetEndpoint<PageDto<IdentifierTypeDto>>(
+        val result = webTestClient.invokeGetEndpoint<PageDto<IdentifierType>>(
             EndpointValues.CATENA_METADATA_IDENTIFIER_TYPE_PATH,
             Pair("businessPartnerType", IdentifierBusinessPartnerType.LEGAL_ENTITY.name),
             Pair("country", PL.alpha2)

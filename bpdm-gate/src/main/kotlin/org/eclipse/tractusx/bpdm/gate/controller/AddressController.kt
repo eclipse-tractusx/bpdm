@@ -24,8 +24,8 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.GateAddressApi
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateOutputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateInputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateInputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateOutputResponse
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.service.AddressService
@@ -59,7 +59,7 @@ class AddressController(
 
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_INPUT_AUTHORITY})")
-    override fun getAddressByExternalId(externalId: String): AddressGateInputDto {
+    override fun getAddressByExternalId(externalId: String): AddressGateInputResponse {
 
         return addressService.getAddressByExternalId(externalId)
     }
@@ -68,12 +68,12 @@ class AddressController(
     override fun getAddressesByExternalIds(
         paginationRequest: PaginationRequest,
         externalIds: Collection<String>
-    ): PageDto<AddressGateInputDto> {
+    ): PageDto<AddressGateInputResponse> {
         return addressService.getAddresses(page = paginationRequest.page, size = paginationRequest.size, externalIds = externalIds)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_INPUT_AUTHORITY})")
-    override fun getAddresses(paginationRequest: PaginationRequest): PageDto<AddressGateInputDto> {
+    override fun getAddresses(paginationRequest: PaginationRequest): PageDto<AddressGateInputResponse> {
         return addressService.getAddresses(page = paginationRequest.page, size = paginationRequest.size)
     }
 
@@ -81,7 +81,7 @@ class AddressController(
     override fun getAddressesOutput(
         paginationRequest: PaginationRequest,
         externalIds: Collection<String>?
-    ): PageDto<AddressGateOutputDto> {
+    ): PageDto<AddressGateOutputResponse> {
         return addressService.getAddressesOutput(externalIds = externalIds, page = paginationRequest.page, size = paginationRequest.size)
     }
 

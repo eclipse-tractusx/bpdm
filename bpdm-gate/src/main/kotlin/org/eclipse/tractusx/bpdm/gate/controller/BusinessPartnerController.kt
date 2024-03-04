@@ -24,8 +24,8 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.gate.api.GateBusinessPartnerApi
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputResponse
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.service.BusinessPartnerService
@@ -42,7 +42,7 @@ class BusinessPartnerController(
 ) : GateBusinessPartnerApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_INPUT_AUTHORITY})")
-    override fun upsertBusinessPartnersInput(businessPartners: Collection<BusinessPartnerInputRequest>): ResponseEntity<Collection<BusinessPartnerInputDto>> {
+    override fun upsertBusinessPartnersInput(businessPartners: Collection<BusinessPartnerInputRequest>): ResponseEntity<Collection<BusinessPartnerInputResponse>> {
         if (businessPartners.size > apiConfigProperties.upsertLimit || businessPartners.map { it.externalId }.containsDuplicates()) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
@@ -54,7 +54,7 @@ class BusinessPartnerController(
     override fun getBusinessPartnersInput(
         externalIds: Collection<String>?,
         paginationRequest: PaginationRequest
-    ): PageDto<BusinessPartnerInputDto> {
+    ): PageDto<BusinessPartnerInputResponse> {
         return businessPartnerService.getBusinessPartnersInput(paginationRequest.toPageRequest(), externalIds)
     }
 
@@ -62,7 +62,7 @@ class BusinessPartnerController(
     override fun getBusinessPartnersOutput(
         externalIds: Collection<String>?,
         paginationRequest: PaginationRequest
-    ): PageDto<BusinessPartnerOutputDto> {
+    ): PageDto<BusinessPartnerOutputResponse> {
         return businessPartnerService.getBusinessPartnersOutput(paginationRequest.toPageRequest(), externalIds)
     }
 }

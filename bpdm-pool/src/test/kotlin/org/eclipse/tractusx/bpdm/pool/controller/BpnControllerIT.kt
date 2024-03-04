@@ -23,7 +23,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityIdentifierDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityIdentifier
 import org.eclipse.tractusx.bpdm.pool.api.model.request.IdentifiersSearchRequest
 
 import org.eclipse.tractusx.bpdm.pool.util.TestHelpers
@@ -62,12 +62,12 @@ class BpnControllerIT @Autowired constructor(
         // ensure LE1 and 2 have same identifierType
         val legalEntityCreate1 = with(BusinessPartnerNonVerboseValues.legalEntityCreate1) { copy(
             legalEntity = legalEntity.copy(
-                identifiers = listOf(LegalEntityIdentifierDto(identifierValue1, identifierType, null))
+                identifiers = listOf(LegalEntityIdentifier(identifierValue1, identifierType, null))
             )
         ) }
         val legalEntityCreate2 = with(BusinessPartnerNonVerboseValues.legalEntityCreate2) { copy(
             legalEntity = legalEntity.copy(
-                identifiers = listOf(LegalEntityIdentifierDto(identifierValue2, identifierType, null))
+                identifiers = listOf(LegalEntityIdentifier(identifierValue2, identifierType, null))
             )
         ) }
         val legalEntityCreate3 = BusinessPartnerNonVerboseValues.legalEntityCreate3

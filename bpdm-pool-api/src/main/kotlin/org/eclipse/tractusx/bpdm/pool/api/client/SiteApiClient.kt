@@ -44,23 +44,23 @@ interface SiteApiClient : PoolSiteApi {
     @GetExchange("/{bpns}")
     override fun getSite(
         @PathVariable bpns: String
-    ): SiteWithMainAddressVerboseDto
+    ): SiteWithMainAddressVerboseResponse
 
     @GetExchange
     override fun getSitesPaginated(
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageDto<SiteMatchVerboseDto>
+    ): PageDto<SiteMatchVerboseResponse>
 
     @PostExchange("/main-addresses/search")
     override fun searchMainAddresses(
         @RequestBody bpnS: Collection<String>
-    ): Collection<MainAddressVerboseDto>
+    ): Collection<MainAddressVerboseResponse>
 
     @PostExchange("/search")
     override fun searchSites(
         @RequestBody siteSearchRequest: SiteBpnSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageDto<SiteWithMainAddressVerboseDto>
+    ): PageDto<SiteWithMainAddressVerboseResponse>
 
     @PutExchange
     override fun updateSite(

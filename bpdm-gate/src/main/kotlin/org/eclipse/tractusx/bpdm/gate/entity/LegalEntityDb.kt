@@ -51,7 +51,7 @@ class LegalEntityDb(
     val states: MutableSet<LegalEntityStateDb> = mutableSetOf()
 
     @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val classifications: MutableSet<LegalEntityClassification> = mutableSetOf()
+    val classifications: MutableSet<LegalEntityClassificationDb> = mutableSetOf()
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     @JoinColumn(name = "legal_address_id", nullable = false)

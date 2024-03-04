@@ -127,7 +127,7 @@ class GoldenRecordTaskStateMachineIT @Autowired constructor(
 
         // Can't resolve again!
         assertThatThrownBy {
-            goldenRecordTaskStateMachine.doResolveTaskToError(task, TaskStep.PoolSync, listOf(TaskErrorDto(TaskErrorType.Unspecified, "error")))
+            goldenRecordTaskStateMachine.doResolveTaskToError(task, TaskStep.PoolSync, listOf(TaskError(TaskErrorType.Unspecified, "error")))
         }.isInstanceOf(BpdmIllegalStateException::class.java)
     }
 
@@ -190,8 +190,8 @@ class GoldenRecordTaskStateMachineIT @Autowired constructor(
 
         // resolve with error
         val errors = listOf(
-            TaskErrorDto(TaskErrorType.Unspecified, "Unspecific error"),
-            TaskErrorDto(TaskErrorType.Timeout, "Timeout")
+            TaskError(TaskErrorType.Unspecified, "Unspecific error"),
+            TaskError(TaskErrorType.Timeout, "Timeout")
         )
         goldenRecordTaskStateMachine.doResolveTaskToError(task, TaskStep.Clean, errors)
         assertProcessingStateDto(task.processingState, ResultState.Error, TaskStep.Clean, StepState.Error)
@@ -224,7 +224,7 @@ class GoldenRecordTaskStateMachineIT @Autowired constructor(
     private fun initTask(mode: TaskMode = TaskMode.UpdateFromSharingMember) =
         GoldenRecordTask(
             taskId = TASK_ID,
-            businessPartner = BusinessPartnerFullDto(
+            businessPartner = BusinessPartnerFull(
                 generic = BusinessPartnerGenericCommonValues.businessPartner1
             ),
             processingState = goldenRecordTaskStateMachine.initProcessingState(mode)

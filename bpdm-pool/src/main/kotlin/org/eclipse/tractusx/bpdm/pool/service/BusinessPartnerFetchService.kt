@@ -22,8 +22,8 @@ package org.eclipse.tractusx.bpdm.pool.service
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseResponse
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityIdentifierDb
@@ -49,19 +49,19 @@ class BusinessPartnerFetchService(
     private val logger = KotlinLogging.logger { }
 
     /**
-     * Fetch a business partner by [bpn] and return as [LegalEntityWithLegalAddressVerboseDto]
+     * Fetch a business partner by [bpn] and return as [LegalEntityWithLegalAddressVerboseResponse]
      */
-    fun findLegalEntityIgnoreCase(bpn: String): LegalEntityWithLegalAddressVerboseDto {
+    fun findLegalEntityIgnoreCase(bpn: String): LegalEntityWithLegalAddressVerboseResponse {
         logger.debug { "Executing findLegalEntityIgnoreCase() with parameters $bpn" }
         return findLegalEntityOrThrow(bpn).toLegalEntityWithLegalAddress()
     }
 
 
     /**
-     * Fetch a business partner by [identifierValue] (ignoring case) of [identifierType] and return as [LegalEntityWithLegalAddressVerboseDto]
+     * Fetch a business partner by [identifierValue] (ignoring case) of [identifierType] and return as [LegalEntityWithLegalAddressVerboseResponse]
      */
     @Transactional
-    fun findLegalEntityIgnoreCase(identifierType: String, identifierValue: String): LegalEntityWithLegalAddressVerboseDto {
+    fun findLegalEntityIgnoreCase(identifierType: String, identifierValue: String): LegalEntityWithLegalAddressVerboseResponse {
         logger.debug { "Executing findLegalEntityIgnoreCase() with parameters $identifierType and $identifierValue" }
         return findLegalEntityOrThrow(identifierType, identifierValue).toLegalEntityWithLegalAddress()
     }
@@ -79,7 +79,7 @@ class BusinessPartnerFetchService(
      * Fetch business partners by BPN in [bpns] and map to dtos
      */
     @Transactional
-    fun fetchDtosByBpns(bpns: Collection<String>): Collection<LegalEntityWithLegalAddressVerboseDto> {
+    fun fetchDtosByBpns(bpns: Collection<String>): Collection<LegalEntityWithLegalAddressVerboseResponse> {
         logger.debug { "Executing fetchDtosByBpns() with parameters $bpns " }
         return fetchByBpns(bpns).map { it.toLegalEntityWithLegalAddress() }
     }
@@ -92,7 +92,7 @@ class BusinessPartnerFetchService(
         identifierTypeKey: String,
         businessPartnerType: IdentifierBusinessPartnerType,
         idValues: Collection<String>
-    ): Set<BpnIdentifierMappingDto> {
+    ): Set<BpnIdentifierMappingResponse> {
         logger.debug { "Executing findBpnsByIdentifiers() with parameters $identifierTypeKey // $businessPartnerType and $idValues" }
         val identifierType = findIdentifierTypeOrThrow(identifierTypeKey, businessPartnerType)
         return when (businessPartnerType) {

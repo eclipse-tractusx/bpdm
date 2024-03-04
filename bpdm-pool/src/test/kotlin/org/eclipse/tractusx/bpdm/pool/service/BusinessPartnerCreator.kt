@@ -20,8 +20,8 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import com.neovisionaries.i18n.CountryCode
-import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
-import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
+import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinate
+import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerbose
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
@@ -30,28 +30,28 @@ import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerVerboseValues
 import org.eclipse.tractusx.orchestrator.api.model.*
 import java.time.LocalDateTime
 
-fun minFullBusinessPartner(): BusinessPartnerFullDto {
+fun minFullBusinessPartner(): BusinessPartnerFull {
 
-    return BusinessPartnerFullDto(generic = BusinessPartnerGenericDto())
+    return BusinessPartnerFull(generic = BusinessPartnerGeneric())
 }
 
-fun emptyLegalEntity(): LegalEntityDto {
+fun emptyLegalEntity(): LegalEntity {
 
-    return LegalEntityDto()
+    return LegalEntity()
 }
 
-fun minValidLegalEntity(bpnLReference: BpnReferenceDto, bpnAReference: BpnReferenceDto): LegalEntityDto {
+fun minValidLegalEntity(bpnLReference: BpnReference, bpnAReference: BpnReference): LegalEntity {
 
-    return LegalEntityDto(
+    return LegalEntity(
         bpnLReference = bpnLReference,
         legalName = "legalName_" + bpnLReference.referenceValue,
         legalAddress = minLogisticAddress(bpnAReference = bpnAReference)
     )
 }
 
-fun fullValidLegalEntity(bpnLReference: BpnReferenceDto, bpnAReference: BpnReferenceDto): LegalEntityDto {
+fun fullValidLegalEntity(bpnLReference: BpnReference, bpnAReference: BpnReference): LegalEntity {
 
-    return LegalEntityDto(
+    return LegalEntity(
         bpnLReference = bpnLReference,
         legalName = "legalName_" + bpnLReference.referenceValue,
         legalShortName = "shortName_" + bpnLReference.referenceValue,
@@ -72,44 +72,44 @@ fun fullValidLegalEntity(bpnLReference: BpnReferenceDto, bpnAReference: BpnRefer
     )
 }
 
-fun legalEntityIdentifierDto(name: String, id: Long, type: TypeKeyNameVerboseDto<String>): LegalEntityIdentifierDto {
+fun legalEntityIdentifierDto(name: String, id: Long, type: TypeKeyNameVerbose<String>): LegalEntityIdentifier {
 
-    return LegalEntityIdentifierDto(
+    return LegalEntityIdentifier(
         value = "value_" + name + "_" + id,
         issuingBody = "issuingBody_" + name + "_" + id,
         type = type.technicalKey
     )
 }
 
-fun addressIdentifierDto(name: String, id: Long, type: TypeKeyNameVerboseDto<String>): AddressIdentifierDto {
+fun addressIdentifierDto(name: String, id: Long, type: TypeKeyNameVerbose<String>): AddressIdentifier {
 
-    return AddressIdentifierDto(
+    return AddressIdentifier(
         value = "value_" + name + "_" + id,
         type = type.technicalKey
     )
 }
 
-fun legalEntityState(name: String, id: Long, type: BusinessStateType): LegalEntityStateDto {
+fun legalEntityState(name: String, id: Long, type: BusinessStateType): LegalEntityState {
 
-    return LegalEntityStateDto(
+    return LegalEntityState(
         validFrom = LocalDateTime.now().plusDays(id),
         validTo = LocalDateTime.now().plusDays(id + 2),
         type = type
     )
 }
 
-fun siteState(name: String, id: Long, type: BusinessStateType): SiteStateDto {
+fun siteState(name: String, id: Long, type: BusinessStateType): SiteState {
 
-    return SiteStateDto(
+    return SiteState(
         validFrom = LocalDateTime.now().plusDays(id),
         validTo = LocalDateTime.now().plusDays(id + 2),
         type = type
     )
 }
 
-fun addressState(name: String, id: Long, type: BusinessStateType): AddressStateDto {
+fun addressState(name: String, id: Long, type: BusinessStateType): AddressState {
 
-    return AddressStateDto(
+    return AddressState(
         validFrom = LocalDateTime.now().plusDays(id),
         validTo = LocalDateTime.now().plusDays(id + 2),
         type = type
@@ -117,50 +117,58 @@ fun addressState(name: String, id: Long, type: BusinessStateType): AddressStateD
 }
 
 
-fun classificationDto(name: String, id: Long, type: ClassificationType): LegalEntityClassificationDto {
+fun classificationDto(name: String, id: Long, type: ClassificationType): LegalEntityClassification {
 
-    return LegalEntityClassificationDto(
+    return LegalEntityClassification(
         code = "code_" + name + "_" + id,
         value = "value_" + name + "_" + id,
         type = type
     )
 }
 
-fun minLogisticAddress(bpnAReference: BpnReferenceDto): LogisticAddressDto {
+fun minLogisticAddress(bpnAReference: BpnReference): LogisticAddress {
 
-    return LogisticAddressDto(
+    return LogisticAddress(
         bpnAReference = bpnAReference,
         physicalPostalAddress = minPhysicalPostalAddressDto(bpnAReference)
     )
 }
 
-fun minPhysicalPostalAddressDto(bpnAReference: BpnReferenceDto) = PhysicalPostalAddressDto(
+fun minPhysicalPostalAddressDto(bpnAReference: BpnReference) = PhysicalPostalAddress(
     country = CountryCode.DE,
     city = "City_" + bpnAReference.referenceValue
 )
 
-fun fullLogisticAddressDto(bpnAReference: BpnReferenceDto): LogisticAddressDto {
+fun fullLogisticAddressDto(bpnAReference: BpnReference): LogisticAddress {
 
-    return LogisticAddressDto(
+    return LogisticAddress(
         bpnAReference = bpnAReference,
         name = "name_" + bpnAReference.referenceValue,
         identifiers = listOf(
-            addressIdentifierDto(bpnAReference.referenceValue, 1L, TypeKeyNameVerboseDto(BusinessPartnerNonVerboseValues.addressIdentifierTypeDto1.technicalKey, "")),
-            addressIdentifierDto(bpnAReference.referenceValue, 2L, TypeKeyNameVerboseDto(BusinessPartnerNonVerboseValues.addressIdentifierTypeDto2.technicalKey, ""))
+            addressIdentifierDto(
+                bpnAReference.referenceValue,
+                1L,
+                TypeKeyNameVerbose(BusinessPartnerNonVerboseValues.addressIdentifierType1.technicalKey, "")
+            ),
+            addressIdentifierDto(
+                bpnAReference.referenceValue,
+                2L,
+                TypeKeyNameVerbose(BusinessPartnerNonVerboseValues.addressIdentifierType2.technicalKey, "")
+            )
         ),
         states = listOf(
             addressState(bpnAReference.referenceValue, 1L, BusinessStateType.ACTIVE),
             addressState(bpnAReference.referenceValue, 2L, BusinessStateType.INACTIVE)
         ),
-        physicalPostalAddress = PhysicalPostalAddressDto(
-            geographicCoordinates = GeoCoordinateDto(longitude = 1.1f, latitude = 2.2f, altitude = 3.3f),
+        physicalPostalAddress = PhysicalPostalAddress(
+            geographicCoordinates = GeoCoordinate(longitude = 1.1f, latitude = 2.2f, altitude = 3.3f),
             country = CountryCode.DE,
             administrativeAreaLevel1 = "AD-07",
             administrativeAreaLevel2 = "adminArea2_" + bpnAReference.referenceValue,
             administrativeAreaLevel3 = "adminArea3_" + bpnAReference.referenceValue,
             postalCode = "postalCode_" + bpnAReference.referenceValue,
             city = "city_" + bpnAReference.referenceValue,
-            street = StreetDto(
+            street = Street(
                 name = "name_" + bpnAReference.referenceValue,
                 houseNumber = "houseNumber_" + bpnAReference.referenceValue,
                 milestone = "milestone_" + bpnAReference.referenceValue,
@@ -177,8 +185,8 @@ fun fullLogisticAddressDto(bpnAReference: BpnReferenceDto): LogisticAddressDto {
             floor = "floor_" + bpnAReference.referenceValue,
             door = "door_" + bpnAReference.referenceValue,
         ),
-        alternativePostalAddress = AlternativePostalAddressDto(
-            geographicCoordinates = GeoCoordinateDto(longitude = 12.3f, latitude = 4.56f, altitude = 7.89f),
+        alternativePostalAddress = AlternativePostalAddress(
+            geographicCoordinates = GeoCoordinate(longitude = 12.3f, latitude = 4.56f, altitude = 7.89f),
             country = CountryCode.DE,
             administrativeAreaLevel1 = "DE-BW",
             postalCode = "alternate_postalCode_" + bpnAReference.referenceValue,
@@ -190,18 +198,18 @@ fun fullLogisticAddressDto(bpnAReference: BpnReferenceDto): LogisticAddressDto {
     )
 }
 
-fun minValidSite(bpnSReference: BpnReferenceDto, bpnAReference: BpnReferenceDto): SiteDto {
+fun minValidSite(bpnSReference: BpnReference, bpnAReference: BpnReference): Site {
 
-    return SiteDto(
+    return Site(
         bpnSReference = bpnSReference,
         name = "siteName_" + bpnSReference.referenceValue,
         mainAddress = minLogisticAddress(bpnAReference = bpnAReference)
     )
 }
 
-fun fullValidSite(bpnSReference: BpnReferenceDto, bpnAReference: BpnReferenceDto): SiteDto {
+fun fullValidSite(bpnSReference: BpnReference, bpnAReference: BpnReference): Site {
 
-    return SiteDto(
+    return Site(
         bpnSReference = bpnSReference,
         name = "siteName_" + bpnSReference.referenceValue,
         states = listOf(

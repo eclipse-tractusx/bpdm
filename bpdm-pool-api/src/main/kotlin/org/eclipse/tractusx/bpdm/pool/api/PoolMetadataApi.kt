@@ -59,7 +59,7 @@ interface PoolMetadataApi {
         ]
     )
     @PostMapping("/identifier-types")
-    fun createIdentifierType(@RequestBody identifierType: IdentifierTypeDto): IdentifierTypeDto
+    fun createIdentifierType(@RequestBody identifierType: IdentifierType): IdentifierType
 
     @Operation(
         summary = "Returns all identifier types filtered by business partner type and country.",
@@ -77,7 +77,7 @@ interface PoolMetadataApi {
         @Parameter businessPartnerType: IdentifierBusinessPartnerType,
         @Parameter country: CountryCode?
     ):
-            PageDto<IdentifierTypeDto>
+            PageDto<IdentifierType>
 
 
     @Operation(
@@ -93,7 +93,7 @@ interface PoolMetadataApi {
         ]
     )
     @PostMapping("/legal-forms")
-    fun createLegalForm(@RequestBody type: LegalFormRequest): LegalFormDto
+    fun createLegalForm(@RequestBody type: LegalFormRequest): LegalForm
 
     @Operation(
         summary = "Returns all legal forms",
@@ -106,7 +106,7 @@ interface PoolMetadataApi {
         ]
     )
     @GetMapping("/legal-forms")
-    fun getLegalForms(@ParameterObject paginationRequest: PaginationRequest): PageDto<LegalFormDto>
+    fun getLegalForms(@ParameterObject paginationRequest: PaginationRequest): PageDto<LegalForm>
 
 
     @Operation(
@@ -121,7 +121,7 @@ interface PoolMetadataApi {
         ]
     )
     @GetMapping("/field-quality-rules/")
-    fun getFieldQualityRules(@Parameter(description = "ISO 3166-1 alpha-2 country code") @RequestParam country: CountryCode): ResponseEntity<Collection<FieldQualityRuleDto>>
+    fun getFieldQualityRules(@Parameter(description = "ISO 3166-1 alpha-2 country code") @RequestParam country: CountryCode): ResponseEntity<Collection<FieldQualityRule>>
 
     @Operation(
         summary = "Create new Region",
@@ -136,7 +136,7 @@ interface PoolMetadataApi {
         ]
     )
     @PostMapping("/regions")
-    fun createRegion(@RequestBody type: RegionDto): RegionDto
+    fun createRegion(@RequestBody type: Region): Region
 
     @Operation(
         summary = "Get page of regions",
@@ -150,7 +150,7 @@ interface PoolMetadataApi {
         ]
     )
     @GetMapping("/regions")
-    fun getRegions(@ParameterObject paginationRequest: PaginationRequest): PageDto<RegionDto>
+    fun getRegions(@ParameterObject paginationRequest: PaginationRequest): PageDto<Region>
 
     @Operation(
         summary = "Get page of country subdivisions suitable for the administrativeAreaLevel1 address property",
@@ -163,6 +163,6 @@ interface PoolMetadataApi {
         ]
     )
     @GetMapping("/administrative-areas-level1")
-    fun getAdminAreasLevel1(@ParameterObject paginationRequest: PaginationRequest): PageDto<CountrySubdivisionDto>
+    fun getAdminAreasLevel1(@ParameterObject paginationRequest: PaginationRequest): PageDto<CountrySubdivision>
 
 }

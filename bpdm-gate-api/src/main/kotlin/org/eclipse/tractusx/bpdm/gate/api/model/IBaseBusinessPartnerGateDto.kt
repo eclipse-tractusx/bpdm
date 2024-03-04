@@ -20,10 +20,10 @@
 package org.eclipse.tractusx.bpdm.gate.api.model
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.IBaseBusinessPartnerDto
+import org.eclipse.tractusx.bpdm.common.dto.IBaseBusinessPartner
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
 
-interface IBaseBusinessPartnerGateDto : IBaseBusinessPartnerDto {
+interface IBaseBusinessPartnerGateDto : IBaseBusinessPartner {
 
     @get:Schema(description = CommonDescription.externalId)
     val externalId: String

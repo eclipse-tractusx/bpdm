@@ -25,12 +25,11 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierType
+import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerbose
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerBpnSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.util.*
-
 
 
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
@@ -311,7 +310,7 @@ class AddressControllerIT @Autowired constructor(
     fun `create new addresses and get duplicate error`() {
 
         poolClient.metadata.createIdentifierType(
-            IdentifierTypeDto(
+            IdentifierType(
                 technicalKey = addressIdentifier.type,
                 businessPartnerType = IdentifierBusinessPartnerType.ADDRESS, name = addressIdentifier.value
             )
@@ -351,7 +350,7 @@ class AddressControllerIT @Autowired constructor(
     fun `update address entities and get duplicate identifier error`() {
 
         poolClient.metadata.createIdentifierType(
-            IdentifierTypeDto(
+            IdentifierType(
                 technicalKey = addressIdentifier.type,
                 businessPartnerType = IdentifierBusinessPartnerType.ADDRESS, name = addressIdentifier.value
             )
@@ -532,26 +531,29 @@ class AddressControllerIT @Autowired constructor(
         testHelpers.assertErrorResponse(response.errors.last(), AddressUpdateError.AddressNotFound, secondInvalidBpn)
     }
 
-    private fun assertCreatedAddressesAreEqual(actuals: Collection<AddressPartnerCreateVerboseDto>, expected: Collection<AddressPartnerCreateVerboseDto>) {
+    private fun assertCreatedAddressesAreEqual(
+        actuals: Collection<AddressPartnerCreateVerboseResponse>,
+        expected: Collection<AddressPartnerCreateVerboseResponse>
+    ) {
         actuals.forEach { assertThat(it.address.bpna).matches(testHelpers.bpnAPattern) }
 
         assertHelpers.assertRecursively(actuals)
             .ignoringFields(
-                AddressPartnerCreateVerboseDto::address.name + "." + LogisticAddressVerboseDto::bpna.name,
-                AddressPartnerCreateVerboseDto::address.name + "." + LogisticAddressVerboseDto::bpnLegalEntity.name,
-                AddressPartnerCreateVerboseDto::address.name + "." + LogisticAddressVerboseDto::bpnSite.name
+                AddressPartnerCreateVerboseResponse::address.name + "." + LogisticAddressVerbose::bpna.name,
+                AddressPartnerCreateVerboseResponse::address.name + "." + LogisticAddressVerbose::bpnLegalEntity.name,
+                AddressPartnerCreateVerboseResponse::address.name + "." + LogisticAddressVerbose::bpnSite.name
             )
             .isEqualTo(expected)
     }
 
-    private fun assertAddressesAreEqual(actuals: Collection<LogisticAddressVerboseDto>, expected: Collection<LogisticAddressVerboseDto>) {
+    private fun assertAddressesAreEqual(actuals: Collection<LogisticAddressVerbose>, expected: Collection<LogisticAddressVerbose>) {
         actuals.forEach { assertThat(it.bpna).matches(testHelpers.bpnAPattern) }
 
         assertHelpers.assertRecursively(actuals)
             .ignoringFields(
-                LogisticAddressVerboseDto::bpna.name,
-                LogisticAddressVerboseDto::bpnLegalEntity.name,
-                LogisticAddressVerboseDto::bpnSite.name
+                LogisticAddressVerbose::bpna.name,
+                LogisticAddressVerbose::bpnLegalEntity.name,
+                LogisticAddressVerbose::bpnSite.name
             )
             .isEqualTo(expected)
     }

@@ -78,7 +78,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
             assertThat(stateDto.businessPartnerResult).isNull()
             val processingState = stateDto.processingState
             assertProcessingStateDto(processingState, ResultState.Pending, TaskStep.CleanAndSync, StepState.Queued)
-            assertThat(processingState.errors).isEqualTo(emptyList<TaskErrorDto>())
+            assertThat(processingState.errors).isEqualTo(emptyList<TaskError>())
             assertThat(processingState.createdAt).isEqualTo(processingState.modifiedAt)
         }
 
@@ -146,7 +146,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
             val processingState = stateDto.processingState
             // stepState should have changed to Reserved
             assertProcessingStateDto(processingState, ResultState.Pending, TaskStep.CleanAndSync, StepState.Reserved)
-            assertThat(processingState.errors).isEqualTo(emptyList<TaskErrorDto>())
+            assertThat(processingState.errors).isEqualTo(emptyList<TaskError>())
             assertThat(processingState.modifiedAt).isAfter(processingState.createdAt)
             assertThat(processingState.modifiedAt).isCloseTo(Instant.now(), WITHIN_ALLOWED_TIME_OFFSET)
         }
@@ -196,7 +196,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
 
         // resolve task
         val businessPartnerFull1 = BusinessPartnerGenericCommonValues.businessPartner2Full
-        val resultEntry1 = TaskStepResultEntryDto(
+        val resultEntry1 = TaskStepResultEntry(
             taskId = taskId,
             businessPartner = businessPartnerFull1
         )
@@ -229,7 +229,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
                 )
             }
         )
-        val resultEntry2 = TaskStepResultEntryDto(
+        val resultEntry2 = TaskStepResultEntry(
             taskId = taskId,
             businessPartner = businessPartnerFull2
         )
@@ -263,8 +263,8 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
         val taskId = reserveTasks(TaskStep.CleanAndSync, 1).reservedTasks.single().taskId
 
         // resolve task with error
-        val errorDto = TaskErrorDto(TaskErrorType.Unspecified, "Unfortunate event")
-        val resultEntry = TaskStepResultEntryDto(
+        val errorDto = TaskError(TaskErrorType.Unspecified, "Unfortunate event")
+        val resultEntry = TaskStepResultEntry(
             taskId = taskId,
             errors = listOf(errorDto)
         )
@@ -318,10 +318,10 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
      */
     @Test
     fun `expect exception on posting too many task results`() {
-        val validResultEntry = TaskStepResultEntryDto(
+        val validResultEntry = TaskStepResultEntry(
             taskId = "0",
             businessPartner = null,
-            errors = listOf(TaskErrorDto(type = TaskErrorType.Unspecified, description = "Description"))
+            errors = listOf(TaskError(type = TaskErrorType.Unspecified, description = "Description"))
         )
 
         // Create entries above the upsert limit of 3
@@ -360,7 +360,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
             resolveTasks(
                 TaskStep.CleanAndSync,
                 listOf(
-                    TaskStepResultEntryDto(
+                    TaskStepResultEntry(
                         taskId = "WRONG-ID"
                     )
                 )
@@ -372,7 +372,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
             resolveTasks(
                 TaskStep.CleanAndSync,
                 listOf(
-                    TaskStepResultEntryDto(
+                    TaskStepResultEntry(
                         taskId = tasksIds[0]
                     )
                 )
@@ -384,7 +384,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
             resolveTasks(
                 TaskStep.Clean,
                 listOf(
-                    TaskStepResultEntryDto(
+                    TaskStepResultEntry(
                         taskId = tasksIds[0],
                         businessPartner = BusinessPartnerGenericCommonValues.businessPartner1Full
                     )
@@ -396,7 +396,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
         resolveTasks(
             TaskStep.CleanAndSync,
             listOf(
-                TaskStepResultEntryDto(
+                TaskStepResultEntry(
                     taskId = tasksIds[0],
                     businessPartner = BusinessPartnerGenericCommonValues.businessPartner1Full
                 )
@@ -408,7 +408,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
             resolveTasks(
                 TaskStep.CleanAndSync,
                 listOf(
-                    TaskStepResultEntryDto(
+                    TaskStepResultEntry(
                         taskId = tasksIds[0],
                         businessPartner = BusinessPartnerGenericCommonValues.businessPartner1Full
                     )
@@ -420,9 +420,9 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
         resolveTasks(
             TaskStep.CleanAndSync,
             listOf(
-                TaskStepResultEntryDto(
+                TaskStepResultEntry(
                     tasksIds[1], errors = listOf(
-                        TaskErrorDto(type = TaskErrorType.Unspecified, "ERROR")
+                        TaskError(type = TaskErrorType.Unspecified, "ERROR")
                     )
                 )
             )
@@ -475,7 +475,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
         val taskId = reservedTask.taskId
 
         // resolve with success
-        val cleaningResult = TaskStepResultEntryDto(
+        val cleaningResult = TaskStepResultEntry(
             taskId = taskId,
             businessPartner = reservedTask.businessPartner
         )
@@ -508,10 +508,10 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
         val taskId = reservedTask.taskId
 
         // resolve with error
-        val cleaningResult = TaskStepResultEntryDto(
+        val cleaningResult = TaskStepResultEntry(
             taskId = taskId,
             businessPartner = reservedTask.businessPartner,
-            errors = listOf(TaskErrorDto(TaskErrorType.Unspecified, "Unfortunate event"))
+            errors = listOf(TaskError(TaskErrorType.Unspecified, "Unfortunate event"))
         )
         resolveTasks(TaskStep.Clean, listOf(cleaningResult))
 
@@ -532,11 +532,14 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
         assertThat(foundTasks.size).isZero()
     }
 
-    private fun createTasks(mode: TaskMode = TaskMode.UpdateFromSharingMember, businessPartners: List<BusinessPartnerGenericDto>? = null): TaskCreateResponse =
+    private fun createTasks(mode: TaskMode = TaskMode.UpdateFromSharingMember, businessPartners: List<BusinessPartnerGeneric>? = null): TaskCreateResponse =
         orchestratorClient.goldenRecordTasks.createTasks(
             TaskCreateRequest(
                 mode = mode,
-                businessPartners = businessPartners ?: listOf(BusinessPartnerGenericCommonValues.businessPartner1, BusinessPartnerGenericCommonValues.businessPartner2)
+                businessPartners = businessPartners ?: listOf(
+                    BusinessPartnerGenericCommonValues.businessPartner1,
+                    BusinessPartnerGenericCommonValues.businessPartner2
+                )
             )
         )
 
@@ -548,7 +551,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
             )
         )
 
-    private fun resolveTasks(step: TaskStep, results: List<TaskStepResultEntryDto>) =
+    private fun resolveTasks(step: TaskStep, results: List<TaskStepResultEntry>) =
         orchestratorClient.goldenRecordTasks.resolveStepResults(
             TaskStepResultRequest(step, results)
         )
@@ -558,13 +561,13 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
             TaskStateRequest(taskIds)
         )
 
-    private fun checkStateForAllTasks(taskIds: List<String>, checkFunc: (TaskProcessingStateDto) -> Unit) {
+    private fun checkStateForAllTasks(taskIds: List<String>, checkFunc: (TaskProcessingState) -> Unit) {
         searchTaskStates(taskIds).tasks
             .also { assertThat(it.size).isEqualTo(taskIds.size) }
             .forEach { stateDto -> checkFunc(stateDto.processingState) }
     }
 
-    private fun assertProcessingStateDto(processingStateDto: TaskProcessingStateDto, resultState: ResultState, step: TaskStep, stepState: StepState) {
+    private fun assertProcessingStateDto(processingStateDto: TaskProcessingState, resultState: ResultState, step: TaskStep, stepState: StepState) {
         assertThat(processingStateDto.resultState).isEqualTo(resultState)
         assertThat(processingStateDto.step).isEqualTo(step)
         assertThat(processingStateDto.stepState).isEqualTo(stepState)

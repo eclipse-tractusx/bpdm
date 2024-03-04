@@ -22,9 +22,9 @@ package org.eclipse.tractusx.bpdm.test.testdata.pool
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateVerboseResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateVerboseResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateVerboseResponse
 
 data class LegalEntityStructureRequest(
     val legalEntity: LegalEntityPartnerCreateRequest,
@@ -38,12 +38,12 @@ data class SiteStructureRequest(
 )
 
 data class LegalEntityStructureResponse(
-    val legalEntity: LegalEntityPartnerCreateVerboseDto,
+    val legalEntity: LegalEntityPartnerCreateVerboseResponse,
     val siteStructures: List<SiteStructureResponse> = emptyList(),
-    val addresses: List<AddressPartnerCreateVerboseDto> = emptyList()
+    val addresses: List<AddressPartnerCreateVerboseResponse> = emptyList()
 )
 
 data class SiteStructureResponse(
-    val site: SitePartnerCreateVerboseDto,
-    val addresses: List<AddressPartnerCreateVerboseDto> = emptyList()
+    val site: SitePartnerCreateVerboseResponse,
+    val addresses: List<AddressPartnerCreateVerboseResponse> = emptyList()
 )

@@ -19,10 +19,10 @@
 
 package com.catenax.bpdm.bridge.dummy.dto
 
-import org.eclipse.tractusx.bpdm.gate.api.model.LogisticAddressDto
+import org.eclipse.tractusx.bpdm.gate.api.model.LogisticAddress
 
 data class GateAddressInfo(
-    val address: LogisticAddressDto,
+    val address: LogisticAddress,
     val externalId: String,
     val legalEntityExternalId: String?,
     val siteExternalId: String?,

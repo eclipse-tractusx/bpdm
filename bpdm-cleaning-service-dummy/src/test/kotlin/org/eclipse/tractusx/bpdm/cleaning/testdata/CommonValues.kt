@@ -23,7 +23,7 @@ import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.cleaning.service.*
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
-import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
+import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinate
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.orchestrator.api.model.*
@@ -41,7 +41,7 @@ object CommonValues {
     private val addressName = "Address Name"
     private const val shortName = "ShortName"
     private val identifiers = listOf(
-        BusinessPartnerIdentifierDto(
+        BusinessPartnerIdentifier(
             type = "Type1",
             value = "Value1",
             issuingBody = "IssuingBody1"
@@ -49,22 +49,22 @@ object CommonValues {
     )
     private const val legalForm = "LegalForm"
     private val states = listOf(
-        BusinessPartnerStateDto(
+        BusinessPartnerState(
             validFrom = LocalDateTime.now(),
             validTo = LocalDateTime.now().plusDays(10),
             type = BusinessStateType.ACTIVE
         )
     )
     private val classifications = listOf(
-        BusinessPartnerClassificationDto(
+        BusinessPartnerClassification(
             type = ClassificationType.NACE,
             code = "Code1",
             value = "Value1"
         )
     )
     private val roles = listOf(BusinessPartnerRole.SUPPLIER, BusinessPartnerRole.CUSTOMER)
-    private val physicalPostalAddress = PhysicalPostalAddressDto(
-        geographicCoordinates = GeoCoordinateDto(longitude = 12.34f, latitude = 56.78f),
+    private val physicalPostalAddress = PhysicalPostalAddress(
+        geographicCoordinates = GeoCoordinate(longitude = 12.34f, latitude = 56.78f),
         country = CountryCode.PT,
         administrativeAreaLevel1 = "AdminArea1",
         administrativeAreaLevel2 = "AdminArea2",
@@ -72,7 +72,7 @@ object CommonValues {
         postalCode = "PostalCode",
         city = "City",
         district = "District",
-        street = StreetDto("StreetName", houseNumberSupplement = "House Number Supplement"),
+        street = Street("StreetName", houseNumberSupplement = "House Number Supplement"),
         companyPostalCode = "CompanyPostalCode",
         industrialZone = "IndustrialZone",
         building = "Building",
@@ -80,24 +80,24 @@ object CommonValues {
         door = "Door"
     )
 
-    private val postalAddressForLegalAndSite = PostalAddressDto(
+    private val postalAddressForLegalAndSite = PostalAddress(
         addressType = AddressType.LegalAndSiteMainAddress,
         physicalPostalAddress = physicalPostalAddress
     )
-    private val postalAddressForLegal = PostalAddressDto(
+    private val postalAddressForLegal = PostalAddress(
         addressType = AddressType.LegalAddress,
         physicalPostalAddress = physicalPostalAddress
     )
-    private val postalAddressForSite = PostalAddressDto(
+    private val postalAddressForSite = PostalAddress(
         addressType = AddressType.SiteMainAddress,
         physicalPostalAddress = physicalPostalAddress
     )
-    private val postalAddressForAdditional = PostalAddressDto(
+    private val postalAddressForAdditional = PostalAddress(
         addressType = AddressType.AdditionalAddress,
         physicalPostalAddress = physicalPostalAddress
     )
 
-    private val businessPartnerWithEmptyBpns = BusinessPartnerGenericDto(
+    private val businessPartnerWithEmptyBpns = BusinessPartnerGeneric(
         nameParts = nameParts,
         identifiers = identifiers,
         states = states,
@@ -174,7 +174,7 @@ object CommonValues {
         )
     }
 
-    val expectedLegalEntityDto = LegalEntityDto(
+    val expectedLegalEntityDto = LegalEntity(
         hasChanged = true,
         legalName = nameParts.joinToString(" "),
         legalShortName = shortName,
@@ -185,14 +185,14 @@ object CommonValues {
         confidenceCriteria = dummyConfidenceCriteria
     )
 
-    val expectedSiteDto = SiteDto(
+    val expectedSiteDto = Site(
         hasChanged = true,
         name = siteName,
         states = states.mapNotNull { it.toSiteState() },
         confidenceCriteria = dummyConfidenceCriteria
     )
 
-    val expectedLogisticAddressDto = LogisticAddressDto(
+    val expectedLogisticAddressDto = LogisticAddress(
 
         hasChanged = true,
         name = addressName,

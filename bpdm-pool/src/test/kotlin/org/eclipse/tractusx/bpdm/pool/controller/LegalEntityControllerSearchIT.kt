@@ -23,11 +23,11 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityVerbose
+import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerbose
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchVerboseResponse
 import org.eclipse.tractusx.bpdm.pool.util.TestHelpers
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues
@@ -73,12 +73,12 @@ class LegalEntityControllerSearchIT @Autowired constructor(
         )
     )
 
-    private lateinit var givenPartner1: LegalEntityVerboseDto
-    private lateinit var givenPartner2: LegalEntityVerboseDto
+    private lateinit var givenPartner1: LegalEntityVerbose
+    private lateinit var givenPartner2: LegalEntityVerbose
     private lateinit var legalName1: String
     private lateinit var legalName2: String
-    private lateinit var legalAddress1: LogisticAddressVerboseDto
-    private lateinit var legalAddress2: LogisticAddressVerboseDto
+    private lateinit var legalAddress1: LogisticAddressVerbose
+    private lateinit var legalAddress2: LogisticAddressVerbose
 
     @BeforeEach
     fun beforeEach() {
@@ -104,8 +104,8 @@ class LegalEntityControllerSearchIT @Autowired constructor(
         val expected = PageDto(
             2, 1, 0, 2,
             listOf(
-                LegalEntityMatchVerboseDto(score = 0f, legalEntity = givenPartner1, legalAddress = legalAddress1),
-                LegalEntityMatchVerboseDto(score = 0f, legalEntity = givenPartner2, legalAddress = legalAddress2)
+                LegalEntityMatchVerboseResponse(score = 0f, legalEntity = givenPartner1, legalAddress = legalAddress1),
+                LegalEntityMatchVerboseResponse(score = 0f, legalEntity = givenPartner2, legalAddress = legalAddress2)
             )
         )
 
@@ -124,12 +124,12 @@ class LegalEntityControllerSearchIT @Autowired constructor(
 
         val expectedFirstPage = PageDto(
             2, 2, 0, 1, listOf(
-                LegalEntityMatchVerboseDto(score = 0f, legalEntity = givenPartner1, legalAddress = legalAddress1)
+                LegalEntityMatchVerboseResponse(score = 0f, legalEntity = givenPartner1, legalAddress = legalAddress1)
             )
         )
         val expectedSecondPage = PageDto(
             2, 2, 1, 1, listOf(
-                LegalEntityMatchVerboseDto(score = 0f, legalEntity = givenPartner2, legalAddress = legalAddress2)
+                LegalEntityMatchVerboseResponse(score = 0f, legalEntity = givenPartner2, legalAddress = legalAddress2)
             )
         )
 
@@ -140,7 +140,7 @@ class LegalEntityControllerSearchIT @Autowired constructor(
         assertPageEquals(secondPage, expectedSecondPage)
     }
 
-    private fun searchBusinessPartnerBySiteName(siteName: String, page: Int, size: Int): PageDto<LegalEntityMatchVerboseDto> {
+    private fun searchBusinessPartnerBySiteName(siteName: String, page: Int, size: Int): PageDto<LegalEntityMatchVerboseResponse> {
         val sitePropertiesSearchRequest = SitePropertiesSearchRequest(siteName)
 
         return poolClient.legalEntities.getLegalEntities(
@@ -151,9 +151,9 @@ class LegalEntityControllerSearchIT @Autowired constructor(
 
     }
 
-    private fun assertPageEquals(actual: PageDto<LegalEntityMatchVerboseDto>, expected: PageDto<LegalEntityMatchVerboseDto>) {
+    private fun assertPageEquals(actual: PageDto<LegalEntityMatchVerboseResponse>, expected: PageDto<LegalEntityMatchVerboseResponse>) {
         assertHelpers.assertRecursively(actual)
-            .ignoringFieldsMatchingRegexes(".*${LegalEntityMatchVerboseDto::score.name}")
+            .ignoringFieldsMatchingRegexes(".*${LegalEntityMatchVerboseResponse::score.name}")
             .isEqualTo(expected)
     }
 }

@@ -27,7 +27,7 @@ import java.time.Instant
 data class TaskStepReservationResponse(
 
     @get:ArraySchema(arraySchema = Schema(description = "The reserved tasks with their business partner data to process"))
-    val reservedTasks: List<TaskStepReservationEntryDto>,
+    val reservedTasks: List<TaskStepReservationEntry>,
 
     @get:Schema(description = "The timestamp until the reservation is valid and results are accepted", deprecated = true)
     val timeout: Instant

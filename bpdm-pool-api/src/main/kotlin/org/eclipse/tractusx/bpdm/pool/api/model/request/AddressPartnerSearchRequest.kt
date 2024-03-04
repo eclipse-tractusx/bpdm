@@ -22,7 +22,6 @@ package org.eclipse.tractusx.bpdm.pool.api.model.request
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Schema
 
-// TODO rename to LogisticAddressSearchRequest / adjust
 @Schema(description = "Contains keywords used for searching in address properties")
 data class AddressPartnerSearchRequest(
 

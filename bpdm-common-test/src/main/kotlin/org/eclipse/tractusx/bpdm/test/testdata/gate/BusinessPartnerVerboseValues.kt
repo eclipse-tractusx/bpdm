@@ -23,8 +23,8 @@ import com.neovisionaries.i18n.CountryCode
 import com.neovisionaries.i18n.LanguageCode
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
-import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
-import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
+import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinate
+import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerbose
 import org.eclipse.tractusx.bpdm.common.model.*
 import org.eclipse.tractusx.bpdm.gate.api.model.*
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
@@ -81,116 +81,116 @@ object BusinessPartnerVerboseValues {
     val businessStateType1 = BusinessStateType.ACTIVE
     val businessStateType2 = BusinessStateType.INACTIVE
 
-    val bpState1 = BusinessPartnerStateDto(
+    val bpState1 = BusinessPartnerState(
         validFrom = businessStatusValidFrom1,
         validTo = businessStatusValidUntil1,
         type = BusinessStateType.ACTIVE
     )
 
-    val bpState2 = BusinessPartnerStateDto(
+    val bpState2 = BusinessPartnerState(
         validFrom = businessStatusValidFrom2,
         validTo = businessStatusValidUntil2,
         type = BusinessStateType.INACTIVE
     )
 
-    val bpIdentifier1 = BusinessPartnerIdentifierDto(
+    val bpIdentifier1 = BusinessPartnerIdentifier(
         type = identifierTypeTechnicalKey1,
         value = identifierValue1,
         issuingBody = identifierIssuingBodyName1
     )
 
-    val bpIdentifier2 = BusinessPartnerIdentifierDto(
+    val bpIdentifier2 = BusinessPartnerIdentifier(
         type = identifierTypeTechnicalKey2,
         value = identifierValue2,
         issuingBody = identifierIssuingBodyName2
     )
 
-    val bpIdentifier3 = BusinessPartnerIdentifierDto(
+    val bpIdentifier3 = BusinessPartnerIdentifier(
         type = identifierTypeTechnicalKey3,
         value = identifierValue3,
         issuingBody = null
     )
 
 
-    val country1 = TypeKeyNameVerboseDto(
+    val country1 = TypeKeyNameVerbose(
         technicalKey = CountryCode.DE,
         name = CountryCode.DE.getName()
     )
 
-    val country2 = TypeKeyNameVerboseDto(
+    val country2 = TypeKeyNameVerbose(
         technicalKey = CountryCode.US,
         name = CountryCode.US.getName()
     )
 
-    val bpClassification1 = BusinessPartnerClassificationDto(
+    val bpClassification1 = BusinessPartnerClassification(
         type = ClassificationType.NACE,
         code = "code1",
         value = "Sale of motor vehicles"
     )
 
-    val bpClassification2 = BusinessPartnerClassificationDto(
+    val bpClassification2 = BusinessPartnerClassification(
         type = ClassificationType.NACE,
         code = "code2",
         value = "Data processing, hosting and related activities"
     )
 
-    val bpClassification3 = BusinessPartnerClassificationDto(
+    val bpClassification3 = BusinessPartnerClassification(
         type = ClassificationType.NACE,
         code = "code3",
         value = "Other information service activities"
     )
 
-    val bpClassification4 = BusinessPartnerClassificationDto(
+    val bpClassification4 = BusinessPartnerClassification(
         type = ClassificationType.NACE,
         code = "code4",
         value = "Financial and insurance activities"
     )
 
-    val bpClassificationChina = BusinessPartnerClassificationDto(
+    val bpClassificationChina = BusinessPartnerClassification(
         type = ClassificationType.NACE,
         code = "code3",
         value = "北京市"
     )
 
-    val legalEntityBusinessStatus1 = LegalEntityStateDto(
+    val legalEntityBusinessStatus1 = LegalEntityState(
         description = businessStatusDescription1,
         validFrom = businessStatusValidFrom1,
         validTo = businessStatusValidUntil1,
         type = businessStateType1
     )
 
-    val legalEntityBusinessStatus2 = LegalEntityStateDto(
+    val legalEntityBusinessStatus2 = LegalEntityState(
         description = businessStatusDescription2,
         validFrom = businessStatusValidFrom2,
         validTo = businessStatusValidUntil2,
         type = businessStateType2
     )
 
-    val bpClassification1Dto = LegalEntityClassificationDto(
+    val bpClassification1Dto = LegalEntityClassification(
         type = ClassificationType.NACE,
         code = "code1",
         value = "Sale of motor vehicles"
     )
 
-    val bpClassification2Dto = LegalEntityClassificationDto(
+    val bpClassification2Dto = LegalEntityClassification(
         type = ClassificationType.NACE,
         code = "code2",
         value = "Data processing, hosting and related activities"
     )
 
-    val bpClassification3Dto = LegalEntityClassificationDto(
+    val bpClassification3Dto = LegalEntityClassification(
         type = ClassificationType.NACE,
         code = "code3",
         value = "Other information service activities"
     )
 
-    val bpClassification4Dto = LegalEntityClassificationDto(
+    val bpClassification4Dto = LegalEntityClassification(
         type = ClassificationType.NACE,
         code = "code4",
         value = "Financial and insurance activities"
     )
 
-    val legalEntity1 = LegalEntityDto(
+    val legalEntity1 = LegalEntity(
         legalNameParts = listOf("Business Partner Name"),
         legalShortName = "short1",
         legalForm = "LF1",
@@ -198,7 +198,7 @@ object BusinessPartnerVerboseValues {
         classifications = listOf(bpClassification1Dto, bpClassification2Dto),
     )
 
-    val legalEntity2 = LegalEntityDto(
+    val legalEntity2 = LegalEntity(
         legalNameParts = listOf("Company ABC AG"),
         legalShortName = "short3",
         legalForm = "LF2",
@@ -206,7 +206,7 @@ object BusinessPartnerVerboseValues {
         classifications = listOf(bpClassification3Dto, bpClassification4Dto),
     )
 
-    val legalEntity3 = LegalEntityDto(
+    val legalEntity3 = LegalEntity(
         legalNameParts = listOf("Business Partner Name"),
         legalShortName = "short1",
         legalForm = "LF1",
@@ -214,33 +214,33 @@ object BusinessPartnerVerboseValues {
         classifications = listOf(bpClassification1Dto, bpClassification2Dto),
     )
 
-    val siteBusinessStatus1 = SiteStateDto(
+    val siteBusinessStatus1 = SiteState(
         description = businessStatusDescription1,
         validFrom = businessStatusValidFrom1,
         validTo = businessStatusValidUntil1,
         type = businessStateType1
     )
 
-    val siteBusinessStatus2 = SiteStateDto(
+    val siteBusinessStatus2 = SiteState(
         description = businessStatusDescription2,
         validFrom = businessStatusValidFrom2,
         validTo = businessStatusValidUntil2,
         type = businessStateType2
     )
 
-    val alternativeAddressFull = AlternativePostalAddressDto(
+    val alternativeAddressFull = AlternativePostalAddress(
         country = CountryCode.DE,
         city = "Stuttgart",
         deliveryServiceType = DeliveryServiceType.PO_BOX,
         deliveryServiceQualifier = "DHL",
         deliveryServiceNumber = "1234",
-        geographicCoordinates = GeoCoordinateDto(7.619f, 45.976f, 4478f),
+        geographicCoordinates = GeoCoordinate(7.619f, 45.976f, 4478f),
         postalCode = "70547",
         administrativeAreaLevel1 = "adminAreaLevel1RegionCode_2",
     )
 
-    val postalAddress1 = PhysicalPostalAddressDto(
-        geographicCoordinates = GeoCoordinateDto(13.178f, 48.946f),
+    val postalAddress1 = PhysicalPostalAddress(
+        geographicCoordinates = GeoCoordinate(13.178f, 48.946f),
         country = CountryCode.DE,
         postalCode = "70546 ",
         city = "Stuttgart",
@@ -253,11 +253,11 @@ object BusinessPartnerVerboseValues {
         building = "Bauteil A",
         floor = "Etage 1",
         door = "Door One",
-        street = StreetDto(name = "Mercedesstraße", houseNumber = "", direction = "direction1", houseNumberSupplement = "A"),
+        street = Street(name = "Mercedesstraße", houseNumber = "", direction = "direction1", houseNumberSupplement = "A"),
     )
 
-    val postalAddress2 = PhysicalPostalAddressDto(
-        geographicCoordinates = GeoCoordinateDto(7.619f, 45.976f, 4478f),
+    val postalAddress2 = PhysicalPostalAddress(
+        geographicCoordinates = GeoCoordinate(7.619f, 45.976f, 4478f),
         country = CountryCode.US,
         postalCode = "70547",
         city = "Atlanta",
@@ -270,11 +270,11 @@ object BusinessPartnerVerboseValues {
         building = "Building Two",
         floor = "Floor Two",
         door = "Door Two",
-        street = StreetDto(name = "TODO", houseNumber = "", direction = "direction1", houseNumberSupplement = "B"),
+        street = Street(name = "TODO", houseNumber = "", direction = "direction1", houseNumberSupplement = "B"),
     )
 
-    val postalAddress3 = PhysicalPostalAddressDto(
-        geographicCoordinates = GeoCoordinateDto(13.178f, 48.946f),
+    val postalAddress3 = PhysicalPostalAddress(
+        geographicCoordinates = GeoCoordinate(13.178f, 48.946f),
         country = CountryCode.DE,
         postalCode = "70546 ",
         city = "Stuttgart",
@@ -287,24 +287,24 @@ object BusinessPartnerVerboseValues {
         building = "Bauteil A",
         floor = "Etage 1",
         door = "Door One",
-        street = StreetDto(name = "Mercedesstraße", houseNumber = "", direction = "direction1", houseNumberSupplement = "C"),
+        street = Street(name = "Mercedesstraße", houseNumber = "", direction = "direction1", houseNumberSupplement = "C"),
     )
 
-    val bpPostalAddressInputDtoFull = BusinessPartnerPostalAddressDto(
+    val bpPostalAddressInputDtoFull = BusinessPartnerPostalAddress(
         addressType = AddressType.LegalAddress,
         physicalPostalAddress = postalAddress2,
         alternativePostalAddress = alternativeAddressFull
     )
 
-    val physicalAddress1 = LogisticAddressDto(
+    val physicalAddress1 = LogisticAddress(
         physicalPostalAddress = postalAddress1,
     )
 
-    val physicalAddress2 = LogisticAddressDto(
+    val physicalAddress2 = LogisticAddress(
         physicalPostalAddress = postalAddress2,
     )
 
-    val physicalAddress3 = LogisticAddressDto(
+    val physicalAddress3 = LogisticAddress(
         physicalPostalAddress = postalAddress3,
     )
 
@@ -315,18 +315,18 @@ object BusinessPartnerVerboseValues {
         identifiers = listOf(bpIdentifier1, bpIdentifier2, bpIdentifier3),
         states = listOf(bpState1, bpState2),
         roles = listOf(BusinessPartnerRole.SUPPLIER),
-        legalEntity = LegalEntityRepresentationInputDto(
+        legalEntity = LegalEntityRepresentationInputResponse(
             legalEntityBpn = "BPNL0000000000XY",
             shortName = "short1",
             legalName = "Limited Liability Company Name",
             legalForm = "Limited Liability Company",
             classifications = listOf(bpClassification1, bpClassification2, bpClassification3)
         ),
-        site = SiteRepresentationInputDto(
+        site = SiteRepresentationInputResponse(
             siteBpn = null,
             name = "Site Name"
         ),
-        address = AddressRepresentationInputDto(
+        address = AddressRepresentationInputResponse(
             addressBpn = "BPNA0000000001XY",
             name = "Address Name",
             addressType = AddressType.LegalAddress,
@@ -337,8 +337,8 @@ object BusinessPartnerVerboseValues {
     )
 
     //New Values for Logistic Addresses Tests
-    val postalAddressLogisticAddress1 = PhysicalPostalAddressDto(
-        geographicCoordinates = GeoCoordinateDto(13.178f, 48.946f),
+    val postalAddressLogisticAddress1 = PhysicalPostalAddress(
+        geographicCoordinates = GeoCoordinate(13.178f, 48.946f),
         country = CountryCode.DE,
         postalCode = "70546 ",
         city = "Stuttgart",
@@ -351,11 +351,11 @@ object BusinessPartnerVerboseValues {
         building = "Bauteil A",
         floor = "Etage 1",
         door = "Door One",
-        street = StreetDto(name = "Mercedesstraße", houseNumber = "", direction = "direction1", houseNumberSupplement = "A"),
+        street = Street(name = "Mercedesstraße", houseNumber = "", direction = "direction1", houseNumberSupplement = "A"),
     )
 
-    val postalAddressLogisticAddress2 = PhysicalPostalAddressDto(
-        geographicCoordinates = GeoCoordinateDto(7.619f, 45.976f, 4478f),
+    val postalAddressLogisticAddress2 = PhysicalPostalAddress(
+        geographicCoordinates = GeoCoordinate(7.619f, 45.976f, 4478f),
         country = CountryCode.US,
         postalCode = "70547",
         city = "Atlanta",
@@ -368,20 +368,20 @@ object BusinessPartnerVerboseValues {
         building = "Building Two",
         floor = "Floor Two",
         door = "Door Two",
-        street = StreetDto(name = "TODO", houseNumber = "", direction = "direction1", houseNumberSupplement = "B"),
+        street = Street(name = "TODO", houseNumber = "", direction = "direction1", houseNumberSupplement = "B"),
     )
 
     //New Values for Logistic Address Tests
-    val logisticAddress1 = LogisticAddressDto(
+    val logisticAddress1 = LogisticAddress(
         physicalPostalAddress = postalAddressLogisticAddress1,
     )
 
-    val logisticAddress2 = LogisticAddressDto(
+    val logisticAddress2 = LogisticAddress(
         physicalPostalAddress = postalAddressLogisticAddress2,
     )
 
     //Response values for Site and LegalEntity created Addresses (Input)
-    val addressGateInputResponseLegalEntity1 = AddressGateInputDto(
+    val addressGateInputResponseLegalEntity1 = AddressGateInputResponse(
         address = physicalAddress1.copy(
             nameParts = emptyList(), //listOf(CommonValues.name1),
         ),
@@ -389,7 +389,7 @@ object BusinessPartnerVerboseValues {
         legalEntityExternalId = externalId1,
     )
 
-    val addressGateInputResponseSite1 = AddressGateInputDto(
+    val addressGateInputResponseSite1 = AddressGateInputResponse(
         address = physicalAddress1.copy(
             nameParts = emptyList(), //listOf(CommonValues.nameSite1),
         ),
@@ -397,11 +397,11 @@ object BusinessPartnerVerboseValues {
         siteExternalId = externalIdSite1,
     )
 
-    val logisticAddressGateInputResponse1 = AddressGateInputDto(
+    val logisticAddressGateInputResponse1 = AddressGateInputResponse(
         address = logisticAddress1.copy(
             nameParts = listOf("Business Partner Name"),
             identifiers = listOf(
-                AddressIdentifierDto(identifierValue1, identifierTypeTechnicalKey1)
+                AddressIdentifier(identifierValue1, identifierTypeTechnicalKey1)
             ),
             states = emptyList()
         ),
@@ -409,11 +409,11 @@ object BusinessPartnerVerboseValues {
         legalEntityExternalId = externalId1,
     )
 
-    val logisticAddressGateInputResponse2 = AddressGateInputDto(
+    val logisticAddressGateInputResponse2 = AddressGateInputResponse(
         address = logisticAddress2.copy(
             nameParts = listOf("Company ABC AG"),
             identifiers = listOf(
-                AddressIdentifierDto(identifierValue1, identifierTypeTechnicalKey1)
+                AddressIdentifier(identifierValue1, identifierTypeTechnicalKey1)
             ),
             states = emptyList()
         ),
@@ -422,7 +422,7 @@ object BusinessPartnerVerboseValues {
     )
 
     //Output Response Values
-    val logisticAddressGateOutputResponse1 = AddressGateOutputDto(
+    val logisticAddressGateOutputResponse1 = AddressGateOutputResponse(
         address = logisticAddress1.copy(
             nameParts = listOf("Business Partner Name"),
         ),
@@ -431,7 +431,7 @@ object BusinessPartnerVerboseValues {
         bpna = "BPNA0000000001XY"
     )
 
-    val logisticAddressGateOutputResponse2 = AddressGateOutputDto(
+    val logisticAddressGateOutputResponse2 = AddressGateOutputResponse(
         address = logisticAddress2.copy(
             nameParts = listOf("Company ABC AG"),
         ),
@@ -440,9 +440,9 @@ object BusinessPartnerVerboseValues {
         bpna = "BPNA0000000002XY"
     )
 
-    val legalEntityGateInputResponse1 = LegalEntityGateInputDto(
+    val legalEntityGateInputResponse1 = LegalEntityGateInputResponse(
         legalEntity = legalEntity1,
-        legalAddress = AddressGateInputDto(
+        legalAddress = AddressGateInputResponse(
             address = logisticAddress1,
             externalId = "${externalId1}_legalAddress",
             legalEntityExternalId = externalId1,
@@ -451,9 +451,9 @@ object BusinessPartnerVerboseValues {
         externalId = externalId1,
     )
 
-    val legalEntityGateInputResponse2 = LegalEntityGateInputDto(
+    val legalEntityGateInputResponse2 = LegalEntityGateInputResponse(
         legalEntity = legalEntity2,
-        legalAddress = AddressGateInputDto(
+        legalAddress = AddressGateInputResponse(
             address = logisticAddress2,
             externalId = "${externalId2}_legalAddress",
             legalEntityExternalId = externalId2,
@@ -462,12 +462,12 @@ object BusinessPartnerVerboseValues {
         externalId = externalId2,
     )
 
-    val site1 = SiteGateDto(
+    val site1 = SiteGate(
         nameParts = listOf("Site A"),
         states = listOf(siteBusinessStatus1)
     )
 
-    val site2 = SiteGateDto(
+    val site2 = SiteGate(
         nameParts = listOf("Site B"),
         states = listOf(siteBusinessStatus2)
     )
@@ -477,7 +477,7 @@ object BusinessPartnerVerboseValues {
         legalEntity = legalEntity1,
         externalId = externalId1,
         bpnl = "BPNL0000000000XY",
-        legalAddress = AddressGateOutputDto(
+        legalAddress = AddressGateOutputResponse(
             address = physicalAddress1,
             externalId = "${externalId1}_legalAddress",
             legalEntityExternalId = externalId1,
@@ -491,7 +491,7 @@ object BusinessPartnerVerboseValues {
         legalEntity = legalEntity2,
         externalId = externalId2,
         bpnl = "BPNL0000000001XZ",
-        legalAddress = AddressGateOutputDto(
+        legalAddress = AddressGateOutputResponse(
             address = physicalAddress2,
             externalId = "${externalId2}_legalAddress",
             legalEntityExternalId = externalId2,
@@ -500,10 +500,10 @@ object BusinessPartnerVerboseValues {
         )
     )
 
-    val persistencesiteGateInputResponse1 = SiteGateInputDto(
+    val persistencesiteGateInputResponse1 = SiteGateInputResponse(
         site = site1, externalId = externalIdSite1,
         legalEntityExternalId = externalId1,
-        mainAddress = AddressGateInputDto(
+        mainAddress = AddressGateInputResponse(
             address = physicalAddress1,
             externalId = "${externalIdSite1}_site",
             legalEntityExternalId = null,
@@ -511,10 +511,10 @@ object BusinessPartnerVerboseValues {
         )
     )
 
-    val persistenceSiteGateInputResponse2 = SiteGateInputDto(
+    val persistenceSiteGateInputResponse2 = SiteGateInputResponse(
         site = site2, externalId = externalIdSite2,
         legalEntityExternalId = externalId2,
-        mainAddress = AddressGateInputDto(
+        mainAddress = AddressGateInputResponse(
             address = physicalAddress2,
             externalId = "${externalIdSite2}_site",
             legalEntityExternalId = null,
@@ -526,7 +526,7 @@ object BusinessPartnerVerboseValues {
         site = site1, externalId = externalIdSite1,
         legalEntityExternalId = externalId1,
         bpns = "BPNS0000000001XY",
-        mainAddress = AddressGateOutputDto(
+        mainAddress = AddressGateOutputResponse(
             address = physicalAddress1,
             externalId = "${externalIdSite1}_site",
             legalEntityExternalId = null,
@@ -539,7 +539,7 @@ object BusinessPartnerVerboseValues {
         site = site2, externalId = externalIdSite2,
         legalEntityExternalId = externalId2,
         bpns = "BPNS0000000002XY",
-        mainAddress = AddressGateOutputDto(
+        mainAddress = AddressGateOutputResponse(
             address = physicalAddress2,
             externalId = "${externalIdSite2}_site",
             legalEntityExternalId = null,
@@ -549,11 +549,11 @@ object BusinessPartnerVerboseValues {
     )
 
     //Response values for Site and LegalEntity created Addresses (Output)
-    val addressGateOutputResponseLegalEntity1 = AddressGateOutputDto(
+    val addressGateOutputResponseLegalEntity1 = AddressGateOutputResponse(
         address = physicalAddress1.copy(
             nameParts = emptyList(),
             identifiers = listOf(
-                AddressIdentifierDto(identifierValue1, identifierTypeTechnicalKey1)
+                AddressIdentifier(identifierValue1, identifierTypeTechnicalKey1)
             )
         ),
         externalId = legalEntityAddressId,
@@ -561,11 +561,11 @@ object BusinessPartnerVerboseValues {
         bpna = "BPNA0000000001XY"
     )
 
-    val addressGateOutputResponseSite1 = AddressGateOutputDto(
+    val addressGateOutputResponseSite1 = AddressGateOutputResponse(
         address = physicalAddress1.copy(
             nameParts = emptyList(),
             identifiers = listOf(
-                AddressIdentifierDto(identifierValue1, identifierTypeTechnicalKey1)
+                AddressIdentifier(identifierValue1, identifierTypeTechnicalKey1)
             )
         ),
         externalId = siteAddressId,
@@ -573,7 +573,7 @@ object BusinessPartnerVerboseValues {
         bpna = "BPNA0000000001XY"
     )
 
-    val physicalAddressMinimal = PhysicalPostalAddressDto(
+    val physicalAddressMinimal = PhysicalPostalAddress(
         country = CountryCode.DE,
         city = "Stuttgart",
         geographicCoordinates = null,
@@ -590,7 +590,7 @@ object BusinessPartnerVerboseValues {
         street = null,
     )
 
-    val physicalAddressChina = PhysicalPostalAddressDto(
+    val physicalAddressChina = PhysicalPostalAddress(
         country = CountryCode.CH,
         city = "北京市",
         geographicCoordinates = null,
@@ -616,7 +616,7 @@ object BusinessPartnerVerboseValues {
         ),          // duplicate, but they are eliminated
         states = listOf(bpState2, bpState1),
         roles = listOf(BusinessPartnerRole.CUSTOMER, BusinessPartnerRole.SUPPLIER),
-        legalEntity = LegalEntityRepresentationInputDto(
+        legalEntity = LegalEntityRepresentationInputResponse(
             legalEntityBpn = "BPNL0000000002XY",
             shortName = "short3",
             legalName = "姓名测试",
@@ -625,16 +625,16 @@ object BusinessPartnerVerboseValues {
                 bpClassificationChina, bpClassification3, bpClassificationChina
             )    // duplicate, but they are eliminated
         ),
-        site = SiteRepresentationInputDto(
+        site = SiteRepresentationInputResponse(
             siteBpn = "BPNS0000000003X9",
             name = "Site Name 3"
         ),
-        address = AddressRepresentationInputDto(
+        address = AddressRepresentationInputResponse(
             addressBpn = "BPNA0000000001XY",
             name = "Address Name 3",
             addressType = AddressType.LegalAndSiteMainAddress,
             physicalPostalAddress = physicalAddressChina,
-            alternativePostalAddress = AlternativePostalAddressDto()
+            alternativePostalAddress = AlternativePostalAddress()
         )
     )
 
@@ -647,7 +647,7 @@ object BusinessPartnerVerboseValues {
         ),
         states = listOf(bpState2, bpState1),
         roles = listOf(BusinessPartnerRole.CUSTOMER, BusinessPartnerRole.SUPPLIER),
-        legalEntity = LegalEntityRepresentationInputDto(
+        legalEntity = LegalEntityRepresentationInputResponse(
             legalEntityBpn = "BPNL0000000002XY",
             shortName = "Random Short Name",
             legalName = "Random Name Value",
@@ -656,11 +656,11 @@ object BusinessPartnerVerboseValues {
                 bpClassification1, bpClassification3
             )
         ),
-        site = SiteRepresentationInputDto(
+        site = SiteRepresentationInputResponse(
             siteBpn = "BPNS0000000003X9",
             name = "Site Name 4"
         ),
-        address = AddressRepresentationInputDto(
+        address = AddressRepresentationInputResponse(
             addressBpn = "BPNA0000000001XY",
             name = "Address Name 4",
             addressType = AddressType.LegalAddress,
@@ -678,7 +678,7 @@ object BusinessPartnerVerboseValues {
         ),
         states = listOf(bpState2, bpState1),
         roles = listOf(BusinessPartnerRole.CUSTOMER, BusinessPartnerRole.SUPPLIER),
-        legalEntity = LegalEntityRepresentationInputDto(
+        legalEntity = LegalEntityRepresentationInputResponse(
             legalEntityBpn = "BPNL0000000002XY",
             shortName = "Random Short Name",
             legalName = "Random Name Value",
@@ -687,11 +687,11 @@ object BusinessPartnerVerboseValues {
                 bpClassification1, bpClassification3
             )
         ),
-        site = SiteRepresentationInputDto(
+        site = SiteRepresentationInputResponse(
             siteBpn = "BPNS0000000003X9",
             name = "Site Name 5"
         ),
-        address = AddressRepresentationInputDto(
+        address = AddressRepresentationInputResponse(
             addressBpn = "BPNA0000000001XY",
             name = "Address Name 5",
             addressType = AddressType.LegalAddress,
@@ -700,28 +700,28 @@ object BusinessPartnerVerboseValues {
         )
     )
 
-    val bpOutputDtoCleaned = BusinessPartnerOutputDto(
+    val bpOutputDtoCleaned = BusinessPartnerOutputResponse(
         externalId = externalId4,
         nameParts = listOf("part-cleaned-1", "name-cleaned-2"),
         identifiers = listOf(
-            BusinessPartnerIdentifierDto(
+            BusinessPartnerIdentifier(
                 type = "identifier-type-1-cleaned",
                 value = "identifier-value-1-cleaned",
                 issuingBody = "issuingBody-1-cleaned"
             ),
-            BusinessPartnerIdentifierDto(
+            BusinessPartnerIdentifier(
                 type = "identifier-type-2-cleaned",
                 value = "identifier-value-2-cleaned",
                 issuingBody = "issuingBody-2-cleaned"
             ),
         ),
         states = listOf(
-            BusinessPartnerStateDto(
+            BusinessPartnerState(
                 validFrom = LocalDateTime.of(2020, 9, 22, 15, 50),
                 validTo = LocalDateTime.of(2023, 10, 23, 16, 40),
                 type = BusinessStateType.INACTIVE
             ),
-            BusinessPartnerStateDto(
+            BusinessPartnerState(
                 validFrom = LocalDateTime.of(2000, 8, 21, 14, 30),
                 validTo = LocalDateTime.of(2020, 9, 22, 15, 50),
                 type = BusinessStateType.ACTIVE
@@ -731,24 +731,24 @@ object BusinessPartnerVerboseValues {
             BusinessPartnerRole.CUSTOMER,
             BusinessPartnerRole.SUPPLIER
         ),
-        legalEntity = LegalEntityRepresentationOutputDto(
+        legalEntity = LegalEntityRepresentationOutputResponse(
             legalEntityBpn = "000000123AAA123",
             shortName = "shot-name-cleaned",
             legalName = "legal-name-cleaned",
             legalForm = "legal-form-cleaned",
             classifications = listOf(
-                BusinessPartnerClassificationDto(
+                BusinessPartnerClassification(
                     type = ClassificationType.NACE,
                     code = "code-1-cleaned",
                     value = "value-1-cleaned"
                 ),
-                BusinessPartnerClassificationDto(
+                BusinessPartnerClassification(
                     type = ClassificationType.NAF,
                     code = "code-2-cleaned",
                     value = "value-2-cleaned"
                 ),
             ),
-            confidenceCriteria = ConfidenceCriteriaDto(
+            confidenceCriteria = ConfidenceCriteria(
                 sharedByOwner = true,
                 checkedByExternalDataSource = true,
                 numberOfBusinessPartners = 7,
@@ -757,10 +757,10 @@ object BusinessPartnerVerboseValues {
                 confidenceLevel = 1
             )
         ),
-        site = SiteRepresentationOutputDto(
+        site = SiteRepresentationOutputResponse(
             siteBpn = "000000123BBB222",
             name = "Site Name",
-            confidenceCriteria = ConfidenceCriteriaDto(
+            confidenceCriteria = ConfidenceCriteria(
                 sharedByOwner = false,
                 checkedByExternalDataSource = false,
                 numberOfBusinessPartners = 8,
@@ -769,12 +769,12 @@ object BusinessPartnerVerboseValues {
                 confidenceLevel = 2
             )
         ),
-        address = AddressComponentOutputDto(
+        address = AddressComponentOutputResponse(
             addressBpn = "000000123CCC333",
             name = "Address Name",
             addressType = AddressType.AdditionalAddress,
-            physicalPostalAddress = PhysicalPostalAddressDto(
-                geographicCoordinates = GeoCoordinateDto(0.5f, 0.5f, 0.5f),
+            physicalPostalAddress = PhysicalPostalAddress(
+                geographicCoordinates = GeoCoordinate(0.5f, 0.5f, 0.5f),
                 country = CountryCode.PT,
                 administrativeAreaLevel1 = "PT-PT",
                 administrativeAreaLevel2 = "pt-admin-level-2-cleaned",
@@ -782,7 +782,7 @@ object BusinessPartnerVerboseValues {
                 postalCode = "phys-postal-code-cleaned",
                 city = "city",
                 district = "district",
-                street = StreetDto(
+                street = Street(
                     name = "name",
                     houseNumber = "house-number",
                     houseNumberSupplement = "house-number-supplement",
@@ -800,8 +800,8 @@ object BusinessPartnerVerboseValues {
                 floor = "floor",
                 door = "door"
             ),
-            alternativePostalAddress = AlternativePostalAddressDto(
-                geographicCoordinates = GeoCoordinateDto(0.6f, 0.6f, 0.6f),
+            alternativePostalAddress = AlternativePostalAddress(
+                geographicCoordinates = GeoCoordinate(0.6f, 0.6f, 0.6f),
                 country = CountryCode.PT,
                 administrativeAreaLevel1 = "PT-PT",
                 postalCode = "postal-code-cleaned",
@@ -810,7 +810,7 @@ object BusinessPartnerVerboseValues {
                 deliveryServiceQualifier = "delivery-service-qualifier-cleaned",
                 deliveryServiceType = DeliveryServiceType.PO_BOX
             ),
-            confidenceCriteria = ConfidenceCriteriaDto(
+            confidenceCriteria = ConfidenceCriteria(
                 sharedByOwner = false,
                 checkedByExternalDataSource = true,
                 numberOfBusinessPartners = 4,
