@@ -52,6 +52,8 @@ data class LogisticAddressVerboseDto(
     @get:Schema(name = "isMainAddress", description = LogisticAddressDescription.isMainAddress)
     val isMainAddress: Boolean = false,
 
+    val isCatenaXMemberData: Boolean = false,
+
     @get:Schema(description = CommonDescription.createdAt)
     val createdAt: Instant,
 
