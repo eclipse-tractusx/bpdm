@@ -58,14 +58,6 @@ jobs:
       dockerfilePath: ./docker/gate
       push: ${{ github.event_name != 'pull_request' }}
 
-  build-docker-bridge-dummy:
-    uses: ./.github/workflows/build-docker.yaml
-    secrets: inherit
-    with:
-      imageName: bpdm-bridge-dummy
-      dockerfilePath: ./docker/bridge-dummy
-      push: ${{ github.event_name != 'pull_request' }}
-
   build-docker-cleaning-service:
     uses: ./.github/workflows/build-docker.yaml
     secrets: inherit
