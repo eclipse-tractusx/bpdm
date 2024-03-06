@@ -23,7 +23,6 @@ import org.eclipse.tractusx.bpdm.common.service.ParameterObjectArgumentResolver
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.support.WebClientAdapter
 import org.springframework.web.service.invoker.HttpServiceProxyFactory
-import java.time.Duration
 
 /**
  * In a Spring configuration a bean of this class is instantiated passing a webClientProvider which configures the web client with e.g. OIDC configuration.
@@ -36,10 +35,9 @@ class OrchestrationApiClientImpl(
 ) : OrchestrationApiClient {
 
     private val httpServiceProxyFactory: HttpServiceProxyFactory by lazy {
-        HttpServiceProxyFactory
-            .builder(WebClientAdapter.forClient(webClientProvider()))
+        HttpServiceProxyFactory.builder()
+            .exchangeAdapter(WebClientAdapter.create(webClientProvider()))
             .customArgumentResolver(ParameterObjectArgumentResolver())
-            .blockTimeout(Duration.ofSeconds(30))
             .build()
     }
 

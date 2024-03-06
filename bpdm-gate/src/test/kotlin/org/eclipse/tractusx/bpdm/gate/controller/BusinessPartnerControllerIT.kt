@@ -76,8 +76,8 @@ class BusinessPartnerControllerIT @Autowired constructor(
     val goldenRecordTaskService: GoldenRecordTaskService
 ) {
     companion object {
-        const val ORCHESTRATOR_CREATE_TASKS_URL = "/api/golden-record-tasks"
-        const val ORCHESTRATOR_SEARCH_TASK_STATES_URL = "/api/golden-record-tasks/state/search"
+        const val ORCHESTRATOR_CREATE_TASKS_URL = "/golden-record-tasks"
+        const val ORCHESTRATOR_SEARCH_TASK_STATES_URL = "/golden-record-tasks/state/search"
         const val POOL_API_SEARCH_CHANGE_LOG_URL = "/business-partners/changelog/search"
 
         @JvmField

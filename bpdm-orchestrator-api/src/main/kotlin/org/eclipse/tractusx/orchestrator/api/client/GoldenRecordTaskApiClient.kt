@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
 
-@HttpExchange("/api/golden-record-tasks")
+@HttpExchange("/golden-record-tasks")
 interface GoldenRecordTaskApiClient : GoldenRecordTaskApi {
 
     @PostExchange

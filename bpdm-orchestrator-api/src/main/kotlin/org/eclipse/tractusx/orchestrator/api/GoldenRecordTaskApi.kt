@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 const val TagClient = "Task Client"
 const val TagWorker = "Task Worker"
 
-@RequestMapping("/api/golden-record-tasks", produces = [MediaType.APPLICATION_JSON_VALUE])
+@RequestMapping("/golden-record-tasks", produces = [MediaType.APPLICATION_JSON_VALUE])
 interface GoldenRecordTaskApi {
 
     @Operation(
