@@ -24,6 +24,7 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.util.CommonApiPathNames
@@ -45,7 +46,7 @@ import org.springframework.web.bind.annotation.*
 interface PoolAddressApi {
 
     companion object{
-        const val ADDRESS_PATH = "/api/catena/addresses"
+        const val ADDRESS_PATH = "addresses"
         const val PATHVAR_BPNA = "bpna"
         const val SUBPATH_BPNA = "/{$PATHVAR_BPNA}"
     }
@@ -62,6 +63,7 @@ interface PoolAddressApi {
             ApiResponse(responseCode = "400", description = "On malformed search or pagination request", content = [Content()])
         ]
     )
+    @Tag(name = ApiTags.ADDRESS_NAME, description = ApiTags.ADDRESS_DESCRIPTION)
     @GetMapping
     fun getAddresses(
         @ParameterObject addressSearchRequest: AddressPartnerSearchRequest,
@@ -79,6 +81,7 @@ interface PoolAddressApi {
             ApiResponse(responseCode = "404", description = "No address found under specified BPNA", content = [Content()])
         ]
     )
+    @Tag(name = ApiTags.ADDRESS_NAME, description = ApiTags.ADDRESS_DESCRIPTION)
     @GetMapping(SUBPATH_BPNA)
     fun getAddress(
         @Parameter(description = "BPNA value") @PathVariable(PATHVAR_BPNA) bpna: String
@@ -94,6 +97,7 @@ interface PoolAddressApi {
             ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()])
         ]
     )
+    @Tag(name = ApiTags.ADDRESS_NAME, description = ApiTags.ADDRESS_DESCRIPTION)
     @PostMapping(CommonApiPathNames.SUBPATH_SEARCH)
     fun searchAddresses(
         @RequestBody addressSearchRequest: AddressPartnerBpnSearchRequest,
@@ -113,6 +117,7 @@ interface PoolAddressApi {
             ApiResponse(responseCode = "400", description = "On malformed requests", content = [Content()])
         ]
     )
+    @Tag(name = ApiTags.ADDRESS_NAME, description = ApiTags.ADDRESS_DESCRIPTION)
     @PostMapping
     fun createAddresses(
         @RequestBody
@@ -130,6 +135,7 @@ interface PoolAddressApi {
             ApiResponse(responseCode = "400", description = "On malformed requests", content = [Content()])
         ]
     )
+    @Tag(name = ApiTags.ADDRESS_NAME, description = ApiTags.ADDRESS_DESCRIPTION)
     @PutMapping
     fun updateAddresses(
         @RequestBody

@@ -32,6 +32,4 @@ interface PoolApiClient {
     val metadata: MetadataApiClient
 
     val sites: SiteApiClient
-
-    val saas: SaasApiClient
 }

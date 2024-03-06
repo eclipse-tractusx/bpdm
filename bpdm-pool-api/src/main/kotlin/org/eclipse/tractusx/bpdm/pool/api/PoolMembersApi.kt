@@ -44,8 +44,6 @@ interface PoolMembersApi {
 
     companion object{
         const val MEMBERS_PATH = "members"
-        const val MEMBERS_TAG = "Catena-X Members"
-        const val MEMBERS_DESCRIPTION = "Query business partner data of Catena-X members"
 
         const val LEGAL_ENTITIES_SEARCH_PATH = "/legal-entities${CommonApiPathNames.SUBPATH_SEARCH}"
         const val SITES_SEARCH_PATH = "/sites${CommonApiPathNames.SUBPATH_SEARCH}"
@@ -53,28 +51,28 @@ interface PoolMembersApi {
         const val CHANGELOG_SEARCH_PATH = "/changelog/search"
     }
 
-    @Tag(name = MEMBERS_TAG, description = MEMBERS_DESCRIPTION)
+    @Tag(name = ApiTags.LEGAL_ENTITIES_NAME, description = ApiTags.LEGAL_ENTITIES_DESCRIPTION)
     @PostMapping(LEGAL_ENTITIES_SEARCH_PATH)
     fun searchLegalEntities(
         @RequestBody searchRequest: LegalEntitySearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageDto<LegalEntityWithLegalAddressVerboseDto>
 
-    @Tag(name = MEMBERS_TAG, description = MEMBERS_DESCRIPTION)
+    @Tag(name = ApiTags.SITE_NAME, description = ApiTags.SITE_DESCRIPTION)
     @PostMapping(SITES_SEARCH_PATH)
     fun searchSites(
         @RequestBody searchRequest: SiteSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageDto<SiteWithMainAddressVerboseDto>
 
-    @Tag(name = MEMBERS_TAG, description = MEMBERS_DESCRIPTION)
+    @Tag(name = ApiTags.ADDRESS_NAME, description = ApiTags.ADDRESS_DESCRIPTION)
     @PostMapping(ADDRESSES_SEARCH_PATH)
     fun searchAddresses(
         @RequestBody searchRequest: AddressSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageDto<LogisticAddressVerboseDto>
 
-    @Tag(name = MEMBERS_TAG, description = MEMBERS_DESCRIPTION)
+    @Tag(name = ApiTags.CHANGELOG_NAME, description = ApiTags.CHANGELOG_DESCRIPTION)
     @PostMapping(CHANGELOG_SEARCH_PATH)
     fun searchChangelogEntries(
         @RequestBody changelogSearchRequest: ChangelogSearchRequest,

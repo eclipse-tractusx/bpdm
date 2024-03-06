@@ -19,29 +19,25 @@
 
 package org.eclipse.tractusx.bpdm.pool.api
 
-import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.responses.ApiResponse
-import io.swagger.v3.oas.annotations.responses.ApiResponses
-import org.springframework.http.MediaType
-import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestMapping
+object ApiTags {
 
-@RequestMapping("/api/catena", produces = [MediaType.APPLICATION_JSON_VALUE])
-interface PoolDocumentationApi {
-    companion object {
-        const val SUBPATH_MERMAID = "/mermaid/"
+    const val LEGAL_ENTITIES_NAME = "Legal Entity Controller"
+    const val LEGAL_ENTITIES_DESCRIPTION = "Read, create and update business partner of type legal entity"
 
-    }
+    const val SITE_NAME = "Site Controller"
+    const val SITE_DESCRIPTION ="Read, create and update business partner of type site"
 
-    @Operation(
-        summary = "Get mermaid class diagramm for the pool JPA model",
-    )
-    @ApiResponses(
-        value = [
-            ApiResponse(responseCode = "200", description = "Entity model as mermaid diagramm"),
-        ]
-    )
-    @GetMapping(SUBPATH_MERMAID, produces = [MediaType.TEXT_PLAIN_VALUE])
-    fun getMermaidPoolPersistence(): ResponseEntity<String>
+    const val ADDRESS_NAME = "Address Controller"
+    const val ADDRESS_DESCRIPTION = "Read, create and update business partner of type address"
+
+    const val METADATA_NAME = "Metadata Controller"
+    const val METADATA_DESCRIPTION = "Read and create supporting data that is referencable in business partner data"
+
+    const val CHANGELOG_NAME = "Changelog Controller"
+    const val CHANGELOG_DESCRIPTION = "Read change events of business partner data"
+
+    const val BPN_NAME = "Bpn Controller"
+    const val BPN_DESCRIPTION = "Support functionality for BPN operations"
+
+
 }

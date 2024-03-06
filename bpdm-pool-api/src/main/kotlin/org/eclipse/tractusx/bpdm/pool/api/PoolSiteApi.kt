@@ -25,6 +25,7 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteBpnSearchRequest
@@ -35,7 +36,7 @@ import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
 
-@RequestMapping("/api/catena/sites", produces = [MediaType.APPLICATION_JSON_VALUE])
+@RequestMapping("sites", produces = [MediaType.APPLICATION_JSON_VALUE])
 interface PoolSiteApi {
 
 
@@ -49,6 +50,7 @@ interface PoolSiteApi {
             ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()]),
         ]
     )
+    @Tag(name = ApiTags.SITE_NAME, description = ApiTags.SITE_DESCRIPTION)
     @PostMapping("/main-addresses/search", produces = ["application/json"])
     fun searchMainAddresses(
         @RequestBody
@@ -66,6 +68,7 @@ interface PoolSiteApi {
             ApiResponse(responseCode = "404", description = "No site found under specified BPNS", content = [Content()])
         ]
     )
+    @Tag(name = ApiTags.SITE_NAME, description = ApiTags.SITE_DESCRIPTION)
     @GetMapping("/{bpns}")
     fun getSite(
         @Parameter(description = "BPNS value") @PathVariable bpns: String
@@ -81,6 +84,7 @@ interface PoolSiteApi {
             ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()])
         ]
     )
+    @Tag(name = ApiTags.SITE_NAME, description = ApiTags.SITE_DESCRIPTION)
     @PostMapping("/search")
     fun searchSites(
         @RequestBody siteSearchRequest: SiteBpnSearchRequest,
@@ -99,6 +103,7 @@ interface PoolSiteApi {
             ApiResponse(responseCode = "400", description = "On malformed requests", content = [Content()])
         ]
     )
+    @Tag(name = ApiTags.SITE_NAME, description = ApiTags.SITE_DESCRIPTION)
     @PostMapping
     fun createSite(
         @RequestBody
@@ -116,6 +121,7 @@ interface PoolSiteApi {
             ApiResponse(responseCode = "400", description = "On malformed requests", content = [Content()])
         ]
     )
+    @Tag(name = ApiTags.SITE_NAME, description = ApiTags.SITE_DESCRIPTION)
     @PutMapping
     fun updateSite(
         @RequestBody
@@ -132,6 +138,7 @@ interface PoolSiteApi {
             ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()])
         ]
     )
+    @Tag(name = ApiTags.SITE_NAME, description = ApiTags.SITE_DESCRIPTION)
     @GetMapping
     fun getSitesPaginated(
         @ParameterObject paginationRequest: PaginationRequest

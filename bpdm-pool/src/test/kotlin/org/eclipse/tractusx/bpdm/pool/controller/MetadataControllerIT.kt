@@ -25,7 +25,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
+import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalFormDto
@@ -37,7 +37,10 @@ import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDetailDb
 import org.eclipse.tractusx.bpdm.pool.repository.FieldQualityRuleRepository
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
 import org.eclipse.tractusx.bpdm.pool.service.toDto
-import org.eclipse.tractusx.bpdm.pool.util.*
+import org.eclipse.tractusx.bpdm.pool.util.EndpointValues
+import org.eclipse.tractusx.bpdm.pool.util.TestHelpers
+import org.eclipse.tractusx.bpdm.pool.util.invokeGetEndpoint
+import org.eclipse.tractusx.bpdm.pool.util.invokePostEndpoint
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerVerboseValues
@@ -71,7 +74,7 @@ class MetadataControllerIT @Autowired constructor(
     private val webTestClient: WebTestClient,
     private val identifierTypeRepository: IdentifierTypeRepository,
     private val fieldQualityRuleRepository: FieldQualityRuleRepository,
-    val poolClient: PoolClientImpl
+    val poolClient: PoolApiClient
 ) {
     companion object {
 
