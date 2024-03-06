@@ -34,7 +34,7 @@ import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
 
-@RequestMapping("/api/catena/sharing-state", produces = [MediaType.APPLICATION_JSON_VALUE])
+@RequestMapping("/sharing-state", produces = [MediaType.APPLICATION_JSON_VALUE])
 interface GateSharingStateApi {
 
     @Operation(
