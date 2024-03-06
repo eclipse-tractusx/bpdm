@@ -42,9 +42,6 @@ interface MetadataApiClient: PoolMetadataApi {
     @PostExchange("/legal-forms")
     override fun createLegalForm(@RequestBody type: LegalFormRequest): LegalFormDto
 
-    @PostExchange("/regions")
-    override fun createRegion(@RequestBody type: RegionDto): RegionDto
-
     @GetExchange("/administrative-areas-level1")
     override fun getAdminAreasLevel1(@ParameterObject paginationRequest: PaginationRequest): PageDto<CountrySubdivisionDto>
 
@@ -60,8 +57,4 @@ interface MetadataApiClient: PoolMetadataApi {
 
     @GetExchange("/legal-forms")
     override fun getLegalForms(paginationRequest: PaginationRequest): PageDto<LegalFormDto>
-
-
-    @GetExchange("/regions")
-    override fun getRegions(paginationRequest: PaginationRequest): PageDto<RegionDto>
 }

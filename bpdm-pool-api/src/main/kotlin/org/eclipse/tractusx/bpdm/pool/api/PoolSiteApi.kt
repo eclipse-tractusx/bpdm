@@ -31,31 +31,16 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteBpnSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.*
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteMatchVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerUpdateResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
 
 @RequestMapping("sites", produces = [MediaType.APPLICATION_JSON_VALUE])
 interface PoolSiteApi {
-
-
-    @Operation(
-        summary = "Search for sites' main addresses",
-        description = "Search main addresses of site business partners by BPNS"
-    )
-    @ApiResponses(
-        value = [
-            ApiResponse(responseCode = "200", description = "The found main addresses"),
-            ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()]),
-        ]
-    )
-    @Tag(name = ApiTags.SITE_NAME, description = ApiTags.SITE_DESCRIPTION)
-    @PostMapping("/main-addresses/search", produces = ["application/json"])
-    fun searchMainAddresses(
-        @RequestBody
-        bpnS: Collection<String>
-    ): Collection<MainAddressVerboseDto>
 
     @Operation(
         summary = "Returns a site by its BPNS",

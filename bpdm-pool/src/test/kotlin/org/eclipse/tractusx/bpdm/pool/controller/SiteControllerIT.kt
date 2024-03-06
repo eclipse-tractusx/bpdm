@@ -31,7 +31,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteBpnSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
-import org.eclipse.tractusx.bpdm.pool.util.*
+import org.eclipse.tractusx.bpdm.pool.util.TestHelpers
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerVerboseValues
@@ -474,62 +474,6 @@ class SiteControllerIT @Autowired constructor(
         // 1 error
         assertThat(response.errorCount).isEqualTo(1)
         testHelpers.assertErrorResponse(response.errors.first(), SiteUpdateError.SiteNotFound, "NONEXISTENT")
-    }
-
-    /**
-     * Given sites
-     * When asking for main addresses by site BPNs
-     * Then main addresses of sites returned
-     */
-    @Test
-    fun `find main addresses by BPNS`() {
-        val givenStructure = testHelpers.createBusinessPartnerStructure(
-            listOf(
-                LegalEntityStructureRequest(
-                    legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate1,
-                    siteStructures = listOf(SiteStructureRequest(BusinessPartnerNonVerboseValues.siteCreate1))
-                ),
-                LegalEntityStructureRequest(
-                    legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate2,
-                    siteStructures = listOf(SiteStructureRequest(BusinessPartnerNonVerboseValues.siteCreate2), SiteStructureRequest(BusinessPartnerNonVerboseValues.siteCreate3))
-                )
-            )
-        )
-
-        val expected = givenStructure.flatMap { it.siteStructures }.map { it.site.mainAddress }
-
-        val toSearch = expected.map { it.bpnSite!! }
-
-        val response = poolClient.sites.searchMainAddresses(toSearch)
-        assertHelpers.assertRecursively(response).isEqualTo(expected)
-    }
-
-    /**
-     * Given sites
-     * When asking for main addresses with non-existent BPNs
-     * Then only main addresses of sites with existing BPNs returned
-     */
-    @Test
-    fun `find main address, ignore invalid BPNS`() {
-        val givenStructure = testHelpers.createBusinessPartnerStructure(
-            listOf(
-                LegalEntityStructureRequest(
-                    legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate1,
-                    siteStructures = listOf(SiteStructureRequest(BusinessPartnerNonVerboseValues.siteCreate1))
-                ),
-                LegalEntityStructureRequest(
-                    legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate2,
-                    siteStructures = listOf(SiteStructureRequest(BusinessPartnerNonVerboseValues.siteCreate2), SiteStructureRequest(BusinessPartnerNonVerboseValues.siteCreate3))
-                )
-            )
-        )
-
-        val expected = givenStructure.flatMap { it.siteStructures }.map { it.site.mainAddress }
-
-        val toSearch = expected.map { it.bpnSite!! }.plus("NON-EXISTENT")
-
-        val response = poolClient.sites.searchMainAddresses(toSearch)
-        assertHelpers.assertRecursively(response).isEqualTo(expected)
     }
 
     @Test

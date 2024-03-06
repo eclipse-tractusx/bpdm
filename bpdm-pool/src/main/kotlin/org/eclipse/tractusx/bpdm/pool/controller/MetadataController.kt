@@ -72,14 +72,4 @@ class MetadataController(
         return metadataService.getCountrySubdivisions(paginationRequest)
     }
 
-    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
-    override fun getRegions(paginationRequest: PaginationRequest): PageDto<RegionDto> {
-        return metadataService.getRegions(paginationRequest)
-    }
-
-    @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_METADATA})")
-    override fun createRegion(type: RegionDto): RegionDto {
-        return metadataService.createRegion(type)
-    }
-
 }

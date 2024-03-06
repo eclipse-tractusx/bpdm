@@ -29,7 +29,10 @@ import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.*
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerUpdateResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PathVariable
@@ -72,20 +75,10 @@ interface LegalEntityApiClient : PoolLegalEntityApi {
         @ParameterObject paginationRequest: PaginationRequest
     ): PageDto<SiteVerboseDto>
 
-    @PostExchange("/legal-addresses/search")
-    override fun searchLegalAddresses(
-        @RequestBody bpnLs: Collection<String>
-    ): Collection<LegalAddressVerboseDto>
-
     @PostExchange("/search")
     override fun searchLegalEntitys(
         @RequestBody bpnLs: Collection<String>
     ): ResponseEntity<Collection<LegalEntityWithLegalAddressVerboseDto>>
-
-    @PostExchange("/{bpnl}/confirm-up-to-date")
-    override fun setLegalEntityCurrentness(
-        @PathVariable bpnl: String
-    )
 
     @PutExchange
     override fun updateBusinessPartners(
