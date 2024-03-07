@@ -21,7 +21,6 @@ package org.eclipse.tractusx.bpdm.gate.api
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
-import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import jakarta.validation.Valid
@@ -64,21 +63,4 @@ interface GateSharingStateApi {
     )
     @PostMapping("/ready")
     fun postSharingStateReady(@RequestBody request: PostSharingStateReadyRequest)
-
-
-
-    @Operation(
-        summary = "Creates or updates a sharing state of a business partner",
-        deprecated = true
-    )
-    @ApiResponses(
-        value = [
-            ApiResponse(responseCode = "204", description = "Operation completed successfully"),
-            ApiResponse(responseCode = "400", description = "Invalid data (e.g. external ID)", content = [Content()])
-        ]
-    )
-    @PutMapping
-    fun upsertSharingState(@RequestBody request: SharingStateDto)
-
-
 }
