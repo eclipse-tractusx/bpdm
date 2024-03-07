@@ -24,7 +24,6 @@ The BPDM solution contains the following applications:
 - [Orchestrator](bpdm-orchestrator): Facilitates business partner data between Gate, Pool and external cleaning services
 - [Cleaning Service Dummy](bpdm-cleaning-service-dummy): A dummy implementation of a cleaning service, responsible for processing business partner data and
   turning it one step closer to a Golden Record
-- [Bridge Dummy](bpdm-bridge-dummy): A legacy dummy implementation directly exchanging business partners between Gate and Pool
 
 Subfolders for BPDM applications are easily recognizable by the `bpdm` prefix.
 

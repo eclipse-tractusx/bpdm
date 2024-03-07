@@ -127,39 +127,6 @@ jobs:
         with:
           sarif_file: "trivy-results3.sarif"
 
-  analyze-product-bpdm-bridge-dummy:
-    runs-on: ubuntu-latest
-    permissions:
-      actions: read
-      contents: read
-      security-events: write
-      packages: read
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Run Trivy vulnerability scanner
-        if: always()
-        uses: aquasecurity/trivy-action@master
-        with:
-          # Path to Docker image
-          image-ref: "docker.io/tractusx/bpdm-bridge-dummy:latest-alpha"
-          format: "sarif"
-          output: "trivy-results4.sarif"
-          exit-code: "1"
-          severity: "CRITICAL,HIGH"
-          timeout: 15m
-        env:
-          TRIVY_USERNAME: ${{ github.actor }}
-          TRIVY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload Trivy scan results to GitHub Security tab
-        if: always()
-        uses: github/codeql-action/upload-sarif@v2
-        with:
-          sarif_file: "trivy-results4.sarif"
-
   analyze-product-bpdm-cleaning-service-dummy:
     runs-on: ubuntu-latest
     permissions:
