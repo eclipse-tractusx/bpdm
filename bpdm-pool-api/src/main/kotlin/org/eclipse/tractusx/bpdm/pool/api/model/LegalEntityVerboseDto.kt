@@ -55,6 +55,8 @@ data class LegalEntityVerboseDto(
 
     override val confidenceCriteria: ConfidenceCriteriaDto,
 
+    val isCatenaXMemberData: Boolean = false,
+
     @get:Schema(description = CommonDescription.createdAt)
     val createdAt: Instant,
 
