@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import org.assertj.core.api.Assertions
+import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.ILegalEntityStateDto
 import org.eclipse.tractusx.bpdm.common.dto.ISiteStateDto
 import org.eclipse.tractusx.bpdm.pool.api.model.*
@@ -47,7 +48,7 @@ fun compareLegalEntity(verboseRequest: LegalEntityWithLegalAddressVerboseDto, le
 
     val verboseLegalAddress = verboseRequest.legalAddress
     Assertions.assertThat(verboseLegalAddress.bpnLegalEntity).isEqualTo(legalEntity?.bpnLReference?.referenceValue)
-    Assertions.assertThat(verboseLegalAddress.isLegalAddress).isTrue()
+    Assertions.assertThat(verboseLegalAddress.addressType == AddressType.LegalAddress || verboseLegalAddress.addressType == AddressType.LegalAndSiteMainAddress ).isTrue()
     compareLogisticAddress(verboseLegalAddress, legalEntity?.legalAddress)
 }
 
@@ -62,7 +63,7 @@ fun compareSite(verboseRequest: SiteWithMainAddressVerboseDto, site: SiteDto?) {
     val verboseMainAddress = verboseRequest.mainAddress
     Assertions.assertThat(verboseMainAddress.bpnSite).isEqualTo(site?.bpnSReference?.referenceValue)
     val mainAddress = site?.mainAddress
-    Assertions.assertThat(verboseMainAddress.isMainAddress).isTrue()
+    Assertions.assertThat(verboseMainAddress.addressType == AddressType.SiteMainAddress || verboseMainAddress.addressType == AddressType.LegalAndSiteMainAddress).isTrue()
     compareLogisticAddress(verboseMainAddress, mainAddress)
 }
 

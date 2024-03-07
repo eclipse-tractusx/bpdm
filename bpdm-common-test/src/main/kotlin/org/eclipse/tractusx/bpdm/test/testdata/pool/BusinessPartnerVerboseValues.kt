@@ -289,7 +289,6 @@ object BusinessPartnerVerboseValues {
         site = site1,
         mainAddress = addressPartner1.copy(
             bpnSite = site1.bpns,
-            isMainAddress = true,
             addressType = AddressType.SiteMainAddress
         ),
         index = "1"
@@ -299,7 +298,6 @@ object BusinessPartnerVerboseValues {
         site = site2,
         mainAddress = addressPartner2.copy(
             bpnSite = site2.bpns,
-            isMainAddress = true,
             addressType = AddressType.SiteMainAddress
         ),
         index = "2"
@@ -309,7 +307,6 @@ object BusinessPartnerVerboseValues {
         site = site3,
         mainAddress = addressPartner3.copy(
             bpnSite = site3.bpns,
-            isMainAddress = true,
             addressType = AddressType.SiteMainAddress
         ),
         index = "3"
@@ -444,7 +441,6 @@ object BusinessPartnerVerboseValues {
         ),
         legalAddress = addressPartner1.copy(
             bpnLegalEntity = legalEntity1.legalEntity.bpnl,
-            isLegalAddress = true,
             addressType = AddressType.LegalAddress
         ),
         index = "1"
@@ -464,7 +460,6 @@ object BusinessPartnerVerboseValues {
         ),
         legalAddress = addressPartner2.copy(
             bpnLegalEntity = legalEntity2.legalEntity.bpnl,
-            isLegalAddress = true,
             addressType = AddressType.LegalAddress
         ),
         index = "2"
@@ -484,7 +479,6 @@ object BusinessPartnerVerboseValues {
         ),
         legalAddress = addressPartner3.copy(
             bpnLegalEntity = legalEntity3.legalEntity.bpnl,
-            isLegalAddress = true,
             addressType = AddressType.LegalAddress
         ),
         index = "3"
@@ -507,7 +501,6 @@ object BusinessPartnerVerboseValues {
         ),
         legalAddress = addressPartner1.copy(
             bpnLegalEntity = legalEntity1.legalEntity.bpnl,
-            isLegalAddress = true
         ),
         index = "1"
     )

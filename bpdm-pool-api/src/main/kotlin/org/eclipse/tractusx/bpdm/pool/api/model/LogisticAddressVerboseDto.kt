@@ -43,14 +43,8 @@ data class LogisticAddressVerboseDto(
     @get:Schema(description = LogisticAddressDescription.bpnLegalEntity)
     val bpnLegalEntity: String?,
 
-    @get:Schema(name = "isLegalAddress", description = LogisticAddressDescription.isLegalAddress)
-    val isLegalAddress: Boolean = false,
-
     @get:Schema(description = LogisticAddressDescription.bpnSite)
     val bpnSite: String?,
-
-    @get:Schema(name = "isMainAddress", description = LogisticAddressDescription.isMainAddress)
-    val isMainAddress: Boolean = false,
 
     val isCatenaXMemberData: Boolean = false,
 
