@@ -24,7 +24,7 @@ import java.time.LocalDateTime
 interface IConfidenceCriteriaDto {
     val sharedByOwner: Boolean?
     val checkedByExternalDataSource: Boolean?
-    val numberOfBusinessPartners: Int?
+    val numberOfSharingMembers: Int?
     val lastConfidenceCheckAt: LocalDateTime?
     val nextConfidenceCheckAt: LocalDateTime?
     val confidenceLevel: Int?

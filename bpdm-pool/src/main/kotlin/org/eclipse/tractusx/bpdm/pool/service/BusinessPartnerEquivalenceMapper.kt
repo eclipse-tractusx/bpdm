@@ -118,7 +118,7 @@ class BusinessPartnerEquivalenceMapper {
             ConfidenceCriteriaEquivalenceDto(
                 sharedByOwner,
                 checkedByExternalDataSource,
-                numberOfBusinessPartners,
+                numberOfSharingMembers,
                 lastConfidenceCheckAt,
                 nextConfidenceCheckAt,
                 confidenceLevel
@@ -225,7 +225,7 @@ class BusinessPartnerEquivalenceMapper {
     data class ConfidenceCriteriaEquivalenceDto(
         override val sharedByOwner: Boolean?,
         override val checkedByExternalDataSource: Boolean?,
-        override val numberOfBusinessPartners: Int?,
+        override val numberOfSharingMembers: Int?,
         override val lastConfidenceCheckAt: LocalDateTime?,
         override val nextConfidenceCheckAt: LocalDateTime?,
         override val confidenceLevel: Int?

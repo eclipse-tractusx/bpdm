@@ -361,7 +361,7 @@ class TaskStepBuildService(
                         ConfidenceCriteriaPoolDto(
                             sharedByOwner,
                             checkedByExternalDataSource,
-                            numberOfBusinessPartners,
+                            numberOfSharingMembers,
                             lastConfidenceCheckAt,
                             nextConfidenceCheckAt,
                             confidenceLevel
@@ -426,7 +426,7 @@ class TaskStepBuildService(
             ConfidenceCriteriaPoolDto(
                 sharedByOwner,
                 checkedByExternalDataSource,
-                numberOfBusinessPartners,
+                numberOfSharingMembers,
                 lastConfidenceCheckAt,
                 nextConfidenceCheckAt,
                 confidenceLevel

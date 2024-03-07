@@ -146,7 +146,7 @@ class OrchestratorMappings(
         ConfidenceCriteriaDto(
             sharedByOwner = entity.sharedByOwner,
             checkedByExternalDataSource = entity.checkedByExternalDataSource,
-            numberOfBusinessPartners = entity.numberOfBusinessPartners,
+            numberOfSharingMembers = entity.numberOfBusinessPartners,
             lastConfidenceCheckAt = entity.lastConfidenceCheckAt,
             nextConfidenceCheckAt = entity.nextConfidenceCheckAt,
             confidenceLevel = entity.confidenceLevel
@@ -250,7 +250,7 @@ class OrchestratorMappings(
         ConfidenceCriteriaDb(
             sharedByOwner = dto.sharedByOwner,
             checkedByExternalDataSource = dto.checkedByExternalDataSource,
-            numberOfBusinessPartners = dto.numberOfBusinessPartners,
+            numberOfBusinessPartners = dto.numberOfSharingMembers,
             lastConfidenceCheckAt = dto.lastConfidenceCheckAt,
             nextConfidenceCheckAt = dto.nextConfidenceCheckAt,
             confidenceLevel = dto.confidenceLevel

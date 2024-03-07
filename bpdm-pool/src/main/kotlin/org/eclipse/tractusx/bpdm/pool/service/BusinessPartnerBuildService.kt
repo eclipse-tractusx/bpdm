@@ -670,7 +670,7 @@ class BusinessPartnerBuildService(
             ConfidenceCriteriaDb(
                 sharedByOwner = confidenceCriteria.sharedByOwner!!,
                 checkedByExternalDataSource = confidenceCriteria.checkedByExternalDataSource!!,
-                numberOfBusinessPartners = confidenceCriteria.numberOfBusinessPartners!!,
+                numberOfBusinessPartners = confidenceCriteria.numberOfSharingMembers!!,
                 lastConfidenceCheckAt = confidenceCriteria.lastConfidenceCheckAt!!,
                 nextConfidenceCheckAt = confidenceCriteria.nextConfidenceCheckAt!!,
                 confidenceLevel = confidenceCriteria.confidenceLevel!!
