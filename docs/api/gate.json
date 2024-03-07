@@ -3,7 +3,7 @@
   "info": {
     "title": "Business Partner Data Management Gate",
     "description": "A gate for a member to share business partner data with CatenaX",
-    "version": "5.0.0-SNAPSHOT"
+    "version": "6.0.0-SNAPSHOT"
   },
   "servers": [
     {
@@ -12,7 +12,414 @@
     }
   ],
   "paths": {
-    "/api/catena/sharing-state": {
+    "/input/business-partners": {
+      "put": {
+        "tags": [
+          "business-partner-controller"
+        ],
+        "summary": "Create or update business partner with given external ID",
+        "description": "Create or update generic business partner. Updates instead of creating a new business partner if an already existing external ID is used. The same external ID may not occur more than once in a single request. For a single request, the maximum number of business partners in the request is limited to 100 entries.",
+        "operationId": "upsertBusinessPartnersInput",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/BusinessPartnerInputRequest"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Business partner were successfully updated or created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BusinessPartnerInputDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "On malformed legal entity request"
+          }
+        }
+      }
+    },
+    "/sharing-state/ready": {
+      "post": {
+        "tags": [
+          "sharing-state-controller"
+        ],
+        "summary": "Sets the given business partners into ready to be shared state",
+        "description": "The business partners to set the ready state for are identified by their external-id. Only business partners in an initial or error state can be set to ready. If any given business partner could not be set into ready state for any reason (for example, it has not been found or it is in the wrong state) the whole request fails (all or nothing approach).",
+        "operationId": "postSharingStateReady",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostSharingStateReadyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "All business partners put in ready to be shared state"
+          },
+          "400": {
+            "description": "Business partners can't be put into ready state (e.g. external-ID not found, wrong sharing state)"
+          }
+        }
+      }
+    },
+    "/output/changelog/search": {
+      "post": {
+        "tags": [
+          "changelog-controller"
+        ],
+        "summary": "Returns changelog entries for changes to the business partner output stage",
+        "description": "Returns changelog entries as of a specified timestamp from the output stage, optionally filtered by timestamp, an array of external IDs and a business partner type.",
+        "operationId": "getOutputChangelog",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Number of page to get results from",
+            "required": false,
+            "schema": {
+              "minimum": 0,
+              "type": "string",
+              "default": "0"
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Size of each page",
+            "required": false,
+            "schema": {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "string",
+              "default": "10"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangelogSearchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "The changelog entries for the specified parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageChangeLogDtoChangelogGateDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "On malformed pagination request"
+          }
+        }
+      }
+    },
+    "/output/business-partners/search": {
+      "post": {
+        "tags": [
+          "business-partner-controller"
+        ],
+        "summary": "Search business partners by an array of external IDs from the output stage",
+        "description": "Get page of business partners output data filtered by a collection of external IDs. An empty external ID list will return a paginated list of all business partners.",
+        "operationId": "getBusinessPartnersOutput",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Number of page to get results from",
+            "required": false,
+            "schema": {
+              "minimum": 0,
+              "type": "string",
+              "default": "0"
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Size of each page",
+            "required": false,
+            "schema": {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "string",
+              "default": "10"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The requested page of business partners",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageDtoBusinessPartnerOutputDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "On malformed pagination request"
+          }
+        }
+      }
+    },
+    "/input/changelog/search": {
+      "post": {
+        "tags": [
+          "changelog-controller"
+        ],
+        "summary": "Returns changelog entries for changes to the business partner input stage",
+        "description": "Returns changelog entries as of a specified timestamp from the input stage, optionally filtered by timestamp, an array of external IDs and a business partner type.",
+        "operationId": "getInputChangelog",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Number of page to get results from",
+            "required": false,
+            "schema": {
+              "minimum": 0,
+              "type": "string",
+              "default": "0"
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Size of each page",
+            "required": false,
+            "schema": {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "string",
+              "default": "10"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangelogSearchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "The changelog entries for the specified parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageChangeLogDtoChangelogGateDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "On malformed pagination request"
+          }
+        }
+      }
+    },
+    "/input/business-partners/search": {
+      "post": {
+        "tags": [
+          "business-partner-controller"
+        ],
+        "summary": "Search business partner by external ID. An empty external ID list returns a paginated list of all business partners.",
+        "description": "Get page of business partners filtered by a collection of external IDs.",
+        "operationId": "getBusinessPartnersInput",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Number of page to get results from",
+            "required": false,
+            "schema": {
+              "minimum": 0,
+              "type": "string",
+              "default": "0"
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Size of each page",
+            "required": false,
+            "schema": {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "string",
+              "default": "10"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The requested page of busines partners",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageDtoBusinessPartnerInputDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "On malformed pagination request"
+          }
+        }
+      }
+    },
+    "/stats/{stage}/address-types": {
+      "get": {
+        "tags": [
+          "stats-controller"
+        ],
+        "operationId": "countAddressTypes",
+        "parameters": [
+          {
+            "name": "stage",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "Input",
+                "Output"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatsAddressTypesResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stats/stages": {
+      "get": {
+        "tags": [
+          "stats-controller"
+        ],
+        "operationId": "countPartnersPerStage",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatsStagesResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stats/sharing-states": {
+      "get": {
+        "tags": [
+          "stats-controller"
+        ],
+        "operationId": "countPartnersBySharingState",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatsSharingStatesResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stats/confidence-criteria": {
+      "get": {
+        "tags": [
+          "stats-controller"
+        ],
+        "operationId": "getConfidenceCriteriaStats",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatsConfidenceCriteriaResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sharing-state": {
       "get": {
         "tags": [
           "sharing-state-controller"
@@ -83,1331 +490,6 @@
             }
           }
         }
-      },
-      "put": {
-        "tags": [
-          "sharing-state-controller"
-        ],
-        "summary": "Creates or updates a sharing state of a business partner",
-        "operationId": "upsertSharingState",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SharingStateDto"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "204": {
-            "description": "Operation completed successfully"
-          },
-          "400": {
-            "description": "Invalid data (e.g. external ID)"
-          }
-        },
-        "deprecated": true
-      },
-      "post": {
-        "tags": [
-          "sharing-state-controller"
-        ],
-        "summary": "Sets the given business partners into ready to be shared state",
-        "description": "The business partners to set the ready state for are identified by their external-id. Only business partners in an initial or error state can be set to ready. If any given business partner could not be set into ready state for any reason (for example, it has not been found or it is in the wrong state) the whole request fails (all or nothing approach).",
-        "operationId": "postSharingStateReady",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PostSharingStateReadyRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "204": {
-            "description": "All business partners put in ready to be shared state"
-          },
-          "404": {
-            "description": "Business partners can't be put into ready state (e.g. external-ID not found, wrong sharing state)"
-          }
-        }
-      }
-    },
-    "/api/catena/output/sites": {
-      "put": {
-        "tags": [
-          "site-controller"
-        ],
-        "summary": "Creates or updates an existing site in the output stage",
-        "description": "Create or update sites (Output). Updates instead of creating a new site if an already existing external ID is used. The same external ID may not occur more than once in a single request. For a single request, the maximum number of sites in the request is limited to 100 entries.",
-        "operationId": "upsertSitesOutput",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/SiteGateOutputRequest"
-                }
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Sites were successfully updated or created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Unit"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "On malformed site request"
-          }
-        },
-        "deprecated": true
-      }
-    },
-    "/api/catena/output/legal-entities": {
-      "put": {
-        "tags": [
-          "legal-entity-controller"
-        ],
-        "summary": "Creates or updates an existing legal entity in the output stage",
-        "description": "Create or update legal entities (Output). Updates instead of creating a new legal entity if an already existing external ID is used. The same external ID may not occur more than once in a single request. For a single request, the maximum number of legal entities in the request is limited to 100 entries.",
-        "operationId": "upsertLegalEntitiesOutput",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/LegalEntityGateOutputRequest"
-                }
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Legal entities were successfully updated or created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Unit"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "On malformed legal entity request"
-          }
-        },
-        "deprecated": true
-      }
-    },
-    "/api/catena/output/addresses": {
-      "put": {
-        "tags": [
-          "address-controller"
-        ],
-        "summary": "Creates or updates an existing address in the output stage",
-        "description": "Create or update addresses (Output). Updates instead of creating a new address if an already existing external ID is used. The same external ID may not occur more than once in a single request. For a single request, the maximum number of addresses in the request is limited to 100 entries.",
-        "operationId": "upsertAddressesOutput",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/AddressGateOutputRequest"
-                }
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Addresses were successfully updated or created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Unit"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "On malformed address request"
-          }
-        },
-        "deprecated": true
-      }
-    },
-    "/api/catena/input/sites": {
-      "get": {
-        "tags": [
-          "site-controller"
-        ],
-        "summary": "Returns sites from the input stage",
-        "description": "Returns page of sites from the input stage.",
-        "operationId": "getSites",
-        "parameters": [
-          {
-            "name": "page",
-            "in": "query",
-            "description": "Number of page to get results from",
-            "required": false,
-            "schema": {
-              "minimum": 0,
-              "type": "string",
-              "default": "0"
-            }
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "description": "Size of each page",
-            "required": false,
-            "schema": {
-              "maximum": 100,
-              "minimum": 0,
-              "type": "string",
-              "default": "10"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The requested page of sites",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PageDtoSiteGateInputDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "On malformed pagination request"
-          }
-        },
-        "deprecated": true
-      },
-      "put": {
-        "tags": [
-          "site-controller"
-        ],
-        "summary": "Creates or updates an existing site in the input stage",
-        "description": "Create or update sites. Updates instead of creating a new site if an already existing external ID is used. The same external ID may not occur more than once in a single request. For a single request, the maximum number of sites in the request is limited to 100 entries.",
-        "operationId": "upsertSites",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/SiteGateInputRequest"
-                }
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Sites were successfully updated or created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Unit"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "On malformed site request"
-          }
-        },
-        "deprecated": true
-      }
-    },
-    "/api/catena/input/legal-entities": {
-      "get": {
-        "tags": [
-          "legal-entity-controller"
-        ],
-        "summary": "Returns legal entities from the input stage",
-        "description": "Returns page of legal entities from the input stage.",
-        "operationId": "getLegalEntities",
-        "parameters": [
-          {
-            "name": "page",
-            "in": "query",
-            "description": "Number of page to get results from",
-            "required": false,
-            "schema": {
-              "minimum": 0,
-              "type": "string",
-              "default": "0"
-            }
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "description": "Size of each page",
-            "required": false,
-            "schema": {
-              "maximum": 100,
-              "minimum": 0,
-              "type": "string",
-              "default": "10"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The requested page of legal entities",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PageDtoLegalEntityGateInputDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "On malformed pagination request"
-          }
-        },
-        "deprecated": true
-      },
-      "put": {
-        "tags": [
-          "legal-entity-controller"
-        ],
-        "summary": "Creates or updates an existing legal entity in the input stage",
-        "description": "Create or update legal entities. Updates instead of creating a new legal entity if an already existing external ID is used. The same external ID may not occur more than once in a single request. For a single request, the maximum number of legal entities in the request is limited to 100 entries.",
-        "operationId": "upsertLegalEntities",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/LegalEntityGateInputRequest"
-                }
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Legal entities were successfully updated or created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Unit"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "On malformed legal entity request"
-          }
-        },
-        "deprecated": true
-      }
-    },
-    "/api/catena/input/business-partners": {
-      "put": {
-        "tags": [
-          "business-partner-controller"
-        ],
-        "summary": "Create or update business partner with given external ID",
-        "description": "Create or update generic business partner. Updates instead of creating a new business partner if an already existing external ID is used. The same external ID may not occur more than once in a single request. For a single request, the maximum number of business partners in the request is limited to 100 entries.",
-        "operationId": "upsertBusinessPartnersInput",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/BusinessPartnerInputRequest"
-                }
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Business partner were successfully updated or created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/BusinessPartnerInputDto"
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "On malformed legal entity request"
-          }
-        }
-      }
-    },
-    "/api/catena/input/addresses": {
-      "get": {
-        "tags": [
-          "address-controller"
-        ],
-        "summary": "Returns addresses from the input stage",
-        "description": "Returns page of addresses from the input stage.",
-        "operationId": "getAddresses",
-        "parameters": [
-          {
-            "name": "page",
-            "in": "query",
-            "description": "Number of page to get results from",
-            "required": false,
-            "schema": {
-              "minimum": 0,
-              "type": "string",
-              "default": "0"
-            }
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "description": "Size of each page",
-            "required": false,
-            "schema": {
-              "maximum": 100,
-              "minimum": 0,
-              "type": "string",
-              "default": "10"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The requested page of addresses",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PageDtoAddressGateInputDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "On malformed pagination request"
-          }
-        },
-        "deprecated": true
-      },
-      "put": {
-        "tags": [
-          "address-controller"
-        ],
-        "summary": "Creates or updates an existing address in the input stage",
-        "description": "Create or update addresses. Updates instead of creating a new address if an already existing external ID is used. The same external ID may not occur more than once in a single request. For a single request, the maximum number of addresses in the request is limited to 100 entries.",
-        "operationId": "upsertAddresses",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/AddressGateInputRequest"
-                }
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Addresses were successfully updated or created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Unit"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "On malformed address request"
-          }
-        },
-        "deprecated": true
-      }
-    },
-    "/api/catena/output/sites/search": {
-      "post": {
-        "tags": [
-          "site-controller"
-        ],
-        "summary": "Returns sites by an array of external IDs from the output stage",
-        "description": "Get page of sites from the output stage. Can optionally be filtered by external IDs.",
-        "operationId": "getSitesOutput",
-        "parameters": [
-          {
-            "name": "page",
-            "in": "query",
-            "description": "Number of page to get results from",
-            "required": false,
-            "schema": {
-              "minimum": 0,
-              "type": "string",
-              "default": "0"
-            }
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "description": "Size of each page",
-            "required": false,
-            "schema": {
-              "maximum": 100,
-              "minimum": 0,
-              "type": "string",
-              "default": "10"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "The requested page of sites",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PageDtoSiteGateOutputResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "On malformed pagination request"
-          }
-        },
-        "deprecated": true
-      }
-    },
-    "/api/catena/output/legal-entities/search": {
-      "post": {
-        "tags": [
-          "legal-entity-controller"
-        ],
-        "summary": "Returns legal entities by an array of external IDs from the output stage",
-        "description": "Get page of legal entities from the output stage. Can optionally be filtered by external IDs.",
-        "operationId": "getLegalEntitiesOutput",
-        "parameters": [
-          {
-            "name": "page",
-            "in": "query",
-            "description": "Number of page to get results from",
-            "required": false,
-            "schema": {
-              "minimum": 0,
-              "type": "string",
-              "default": "0"
-            }
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "description": "Size of each page",
-            "required": false,
-            "schema": {
-              "maximum": 100,
-              "minimum": 0,
-              "type": "string",
-              "default": "10"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "The requested page of legal entities",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PageDtoLegalEntityGateOutputResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "On malformed pagination request"
-          }
-        },
-        "deprecated": true
-      }
-    },
-    "/api/catena/output/changelog/search": {
-      "post": {
-        "tags": [
-          "changelog-controller"
-        ],
-        "summary": "Returns changelog entries for changes to the business partner output stage",
-        "description": "Returns changelog entries as of a specified timestamp from the output stage, optionally filtered by timestamp, an array of external IDs and a business partner type.",
-        "operationId": "getOutputChangelog",
-        "parameters": [
-          {
-            "name": "page",
-            "in": "query",
-            "description": "Number of page to get results from",
-            "required": false,
-            "schema": {
-              "minimum": 0,
-              "type": "string",
-              "default": "0"
-            }
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "description": "Size of each page",
-            "required": false,
-            "schema": {
-              "maximum": 100,
-              "minimum": 0,
-              "type": "string",
-              "default": "10"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ChangelogSearchRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "The changelog entries for the specified parameters",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PageChangeLogDtoChangelogGateDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "On malformed pagination request"
-          }
-        }
-      }
-    },
-    "/api/catena/output/business-partners/search": {
-      "post": {
-        "tags": [
-          "business-partner-controller"
-        ],
-        "summary": "Search business partners by an array of external IDs from the output stage",
-        "description": "Get page of business partners output data filtered by a collection of external IDs. An empty external ID list will return a paginated list of all business partners.",
-        "operationId": "getBusinessPartnersOutput",
-        "parameters": [
-          {
-            "name": "page",
-            "in": "query",
-            "description": "Number of page to get results from",
-            "required": false,
-            "schema": {
-              "minimum": 0,
-              "type": "string",
-              "default": "0"
-            }
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "description": "Size of each page",
-            "required": false,
-            "schema": {
-              "maximum": 100,
-              "minimum": 0,
-              "type": "string",
-              "default": "10"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "The requested page of business partners",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PageDtoBusinessPartnerOutputDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "On malformed pagination request"
-          }
-        }
-      }
-    },
-    "/api/catena/output/addresses/search": {
-      "post": {
-        "tags": [
-          "address-controller"
-        ],
-        "summary": "Returns addresses by an array of external IDs from the output stage",
-        "description": "Get page of addresses from the output stage. Can optionally be filtered by external IDs.",
-        "operationId": "getAddressesOutput",
-        "parameters": [
-          {
-            "name": "page",
-            "in": "query",
-            "description": "Number of page to get results from",
-            "required": false,
-            "schema": {
-              "minimum": 0,
-              "type": "string",
-              "default": "0"
-            }
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "description": "Size of each page",
-            "required": false,
-            "schema": {
-              "maximum": 100,
-              "minimum": 0,
-              "type": "string",
-              "default": "10"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "The requested page of addresses",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PageDtoAddressGateOutputDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "On malformed pagination request"
-          }
-        },
-        "deprecated": true
-      }
-    },
-    "/api/catena/input/sites/search": {
-      "post": {
-        "tags": [
-          "site-controller"
-        ],
-        "summary": "Returns sites by an array of external IDs from the input stage",
-        "description": "Returns page of sites from the input stage. Can optionally be filtered by external IDs.",
-        "operationId": "getSitesByExternalIds",
-        "parameters": [
-          {
-            "name": "page",
-            "in": "query",
-            "description": "Number of page to get results from",
-            "required": false,
-            "schema": {
-              "minimum": 0,
-              "type": "string",
-              "default": "0"
-            }
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "description": "Size of each page",
-            "required": false,
-            "schema": {
-              "maximum": 100,
-              "minimum": 0,
-              "type": "string",
-              "default": "10"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "The requested page of sites",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PageDtoSiteGateInputDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "On malformed pagination request"
-          }
-        },
-        "deprecated": true
-      }
-    },
-    "/api/catena/input/legal-entities/search": {
-      "post": {
-        "tags": [
-          "legal-entity-controller"
-        ],
-        "summary": "Returns legal entities by an array of external IDs from the input stage",
-        "description": "Returns page of legal entities from the input stage. Can optionally be filtered by external IDs.",
-        "operationId": "getLegalEntitiesByExternalIds",
-        "parameters": [
-          {
-            "name": "page",
-            "in": "query",
-            "description": "Number of page to get results from",
-            "required": false,
-            "schema": {
-              "minimum": 0,
-              "type": "string",
-              "default": "0"
-            }
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "description": "Size of each page",
-            "required": false,
-            "schema": {
-              "maximum": 100,
-              "minimum": 0,
-              "type": "string",
-              "default": "10"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "The requested page of legal-entities",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PageDtoLegalEntityGateInputDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "On malformed pagination request"
-          }
-        },
-        "deprecated": true
-      }
-    },
-    "/api/catena/input/changelog/search": {
-      "post": {
-        "tags": [
-          "changelog-controller"
-        ],
-        "summary": "Returns changelog entries for changes to the business partner input stage",
-        "description": "Returns changelog entries as of a specified timestamp from the input stage, optionally filtered by timestamp, an array of external IDs and a business partner type.",
-        "operationId": "getInputChangelog",
-        "parameters": [
-          {
-            "name": "page",
-            "in": "query",
-            "description": "Number of page to get results from",
-            "required": false,
-            "schema": {
-              "minimum": 0,
-              "type": "string",
-              "default": "0"
-            }
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "description": "Size of each page",
-            "required": false,
-            "schema": {
-              "maximum": 100,
-              "minimum": 0,
-              "type": "string",
-              "default": "10"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ChangelogSearchRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "The changelog entries for the specified parameters",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PageChangeLogDtoChangelogGateDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "On malformed pagination request"
-          }
-        }
-      }
-    },
-    "/api/catena/input/business-partners/search": {
-      "post": {
-        "tags": [
-          "business-partner-controller"
-        ],
-        "summary": "Search business partner by external ID. An empty external ID list returns a paginated list of all business partners.",
-        "description": "Get page of business partners filtered by a collection of external IDs.",
-        "operationId": "getBusinessPartnersInput",
-        "parameters": [
-          {
-            "name": "page",
-            "in": "query",
-            "description": "Number of page to get results from",
-            "required": false,
-            "schema": {
-              "minimum": 0,
-              "type": "string",
-              "default": "0"
-            }
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "description": "Size of each page",
-            "required": false,
-            "schema": {
-              "maximum": 100,
-              "minimum": 0,
-              "type": "string",
-              "default": "10"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "The requested page of busines partners",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PageDtoBusinessPartnerInputDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "On malformed pagination request"
-          }
-        }
-      }
-    },
-    "/api/catena/input/addresses/search": {
-      "post": {
-        "tags": [
-          "address-controller"
-        ],
-        "summary": "Returns addresses by an array of external IDs from the input stage",
-        "description": "Returns page of addresses from the input stage. Can optionally be filtered by external IDs.",
-        "operationId": "getAddressesByExternalIds",
-        "parameters": [
-          {
-            "name": "page",
-            "in": "query",
-            "description": "Number of page to get results from",
-            "required": false,
-            "schema": {
-              "minimum": 0,
-              "type": "string",
-              "default": "0"
-            }
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "description": "Size of each page",
-            "required": false,
-            "schema": {
-              "maximum": 100,
-              "minimum": 0,
-              "type": "string",
-              "default": "10"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "The requested page of addresses",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PageDtoAddressGateInputDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "On malformed pagination request"
-          }
-        },
-        "deprecated": true
-      }
-    },
-    "/api/catena/stats/{stage}/address-types": {
-      "get": {
-        "tags": [
-          "stats-controller"
-        ],
-        "operationId": "countAddressTypes",
-        "parameters": [
-          {
-            "name": "stage",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "Input",
-                "Output"
-              ]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StatsAddressTypesResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/catena/stats/stages": {
-      "get": {
-        "tags": [
-          "stats-controller"
-        ],
-        "operationId": "countPartnersPerStage",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StatsStagesResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/catena/stats/sharing-states": {
-      "get": {
-        "tags": [
-          "stats-controller"
-        ],
-        "operationId": "countPartnersBySharingState",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StatsSharingStatesResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/catena/stats/confidence-criteria": {
-      "get": {
-        "tags": [
-          "stats-controller"
-        ],
-        "operationId": "getConfidenceCriteriaStats",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StatsConfidenceCriteriaResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/catena/mermaid/": {
-      "get": {
-        "tags": [
-          "gate-documentation-controller"
-        ],
-        "summary": "Get mermaid class diagramm for the gate JPA model",
-        "operationId": "getMermaidGatePersistence",
-        "responses": {
-          "200": {
-            "description": "Entity model as mermaid diagramm",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/catena/input/sites/{externalId}": {
-      "get": {
-        "tags": [
-          "site-controller"
-        ],
-        "summary": "Returns site by external ID from the input stage",
-        "description": "Returns site by external ID from the input stage.",
-        "operationId": "getSiteByExternalId",
-        "parameters": [
-          {
-            "name": "externalId",
-            "in": "path",
-            "description": "External ID",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Found site with external ID",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SiteGateInputDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "No site found under specified external ID"
-          }
-        },
-        "deprecated": true
-      }
-    },
-    "/api/catena/input/legal-entities/{externalId}": {
-      "get": {
-        "tags": [
-          "legal-entity-controller"
-        ],
-        "summary": "Returns legal entity by external ID from the input stage",
-        "description": "Returns legal entity by external ID from the input stage.",
-        "operationId": "getLegalEntityByExternalId",
-        "parameters": [
-          {
-            "name": "externalId",
-            "in": "path",
-            "description": "External ID",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Found legal entity with external ID",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LegalEntityGateInputDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "No legal entity found under specified external ID"
-          }
-        },
-        "deprecated": true
-      }
-    },
-    "/api/catena/input/addresses/{externalId}": {
-      "get": {
-        "tags": [
-          "address-controller"
-        ],
-        "summary": "Returns address by external ID from the input stage",
-        "description": "Returns address by external ID from the input stage.",
-        "operationId": "getAddressByExternalId",
-        "parameters": [
-          {
-            "name": "externalId",
-            "in": "path",
-            "description": "External ID",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Found address with external ID",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AddressGateInputDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "No address found under specified external ID"
-          }
-        },
-        "deprecated": true
       }
     }
   },
@@ -1415,7 +497,11 @@
     "schemas": {
       "AddressComponentOutputDto": {
         "required": [
-          "bpnA"
+          "addressBpn",
+          "alternativePostalAddress",
+          "bpnA",
+          "confidenceCriteria",
+          "physicalPostalAddress"
         ],
         "type": "object",
         "properties": {
@@ -1449,326 +535,11 @@
         },
         "description": "Address properties of business partner output data"
       },
-      "AddressGateInputDto": {
-        "type": "object",
-        "properties": {
-          "nameParts": {
-            "type": "array",
-            "description": "The list of name parts of the address to accommodate the different number of name fields in different systems. This is not according to official registers but according to the name the sharing member chooses.",
-            "items": {
-              "type": "string"
-            }
-          },
-          "states": {
-            "type": "array",
-            "description": "The list of (temporary) states of the address.",
-            "items": {
-              "$ref": "#/components/schemas/AddressStateDto"
-            }
-          },
-          "identifiers": {
-            "type": "array",
-            "description": "The list of identifiers of the address.",
-            "items": {
-              "$ref": "#/components/schemas/AddressIdentifierDto"
-            }
-          },
-          "physicalPostalAddress": {
-            "$ref": "#/components/schemas/PhysicalPostalAddressDto"
-          },
-          "alternativePostalAddress": {
-            "$ref": "#/components/schemas/AlternativePostalAddressDto"
-          },
-          "roles": {
-            "type": "array",
-            "description": "Roles this business partner takes in relation to the sharing member.",
-            "items": {
-              "type": "string",
-              "enum": [
-                "SUPPLIER",
-                "CUSTOMER",
-                "ONE_TIME_SUPPLIER",
-                "ONE_TIME_CUSTOMER"
-              ]
-            }
-          },
-          "confidenceCriteria": {
-            "$ref": "#/components/schemas/ConfidenceCriteriaDto"
-          },
-          "externalId": {
-            "type": "string",
-            "description": "The identifier which uniquely identifies (in the internal system landscape of the sharing member) the business partner."
-          },
-          "legalEntityExternalId": {
-            "type": "string",
-            "description": "The identifier which uniquely identifies (in the internal system landscape of the sharing member) the business partner, representing the legal entity, that owns the address."
-          },
-          "siteExternalId": {
-            "type": "string",
-            "description": "The identifier which uniquely identifies (in the internal system landscape of the sharing member) the business partner, representing the site, that the address belongs to."
-          }
-        },
-        "description": "In general, an address is a collection of information to describe a physical location, using a street name with a house number and/or a post office box as reference. In addition, an address consists of several postal attributes, such as country, region (state), county, township, city, district, or postal code, which help deliver mail.In Catena-X, an address is a type of business partner representing the legal address of a legal entity, and/or the main address of a site, or any additional address of a legal entity or site (such as different gates).An address is owned by a legal entity. Thus, exactly one legal entity is assigned to an address. An address can belong to a site. Thus, one or no site is assigned to an address. An address is uniquely identified by the BPNA."
-      },
-      "AddressGateInputRequest": {
-        "type": "object",
-        "properties": {
-          "nameParts": {
-            "type": "array",
-            "description": "The list of name parts of the address to accommodate the different number of name fields in different systems. This is not according to official registers but according to the name the sharing member chooses.",
-            "items": {
-              "type": "string"
-            }
-          },
-          "states": {
-            "type": "array",
-            "description": "The list of (temporary) states of the address.",
-            "items": {
-              "$ref": "#/components/schemas/AddressStateDto"
-            }
-          },
-          "identifiers": {
-            "type": "array",
-            "description": "The list of identifiers of the address.",
-            "items": {
-              "$ref": "#/components/schemas/AddressIdentifierDto"
-            }
-          },
-          "physicalPostalAddress": {
-            "$ref": "#/components/schemas/PhysicalPostalAddressDto"
-          },
-          "alternativePostalAddress": {
-            "$ref": "#/components/schemas/AlternativePostalAddressDto"
-          },
-          "roles": {
-            "type": "array",
-            "description": "Roles this business partner takes in relation to the sharing member.",
-            "items": {
-              "type": "string",
-              "enum": [
-                "SUPPLIER",
-                "CUSTOMER",
-                "ONE_TIME_SUPPLIER",
-                "ONE_TIME_CUSTOMER"
-              ]
-            }
-          },
-          "confidenceCriteria": {
-            "$ref": "#/components/schemas/ConfidenceCriteriaDto"
-          },
-          "externalId": {
-            "type": "string",
-            "description": "The identifier which uniquely identifies (in the internal system landscape of the sharing member) the business partner."
-          },
-          "legalEntityExternalId": {
-            "type": "string",
-            "description": "The identifier which uniquely identifies (in the internal system landscape of the sharing member) the business partner, representing the legal entity, that owns the address."
-          },
-          "siteExternalId": {
-            "type": "string",
-            "description": "The identifier which uniquely identifies (in the internal system landscape of the sharing member) the business partner, representing the site, that the address belongs to."
-          }
-        },
-        "description": "Request for creating/updating a business partner record of type address. In general, an address is a collection of information to describe a physical location, using a street name with a house number and/or a post office box as reference. In addition, an address consists of several postal attributes, such as country, region (state), county, township, city, district, or postal code, which help deliver mail.In Catena-X, an address is a type of business partner representing the legal address of a legal entity, and/or the main address of a site, or any additional address of a legal entity or site (such as different gates).An address is owned by a legal entity. Thus, exactly one legal entity is assigned to an address. An address can belong to a site. Thus, one or no site is assigned to an address. An address is uniquely identified by the BPNA."
-      },
-      "AddressGateOutputChildRequest": {
-        "type": "object",
-        "properties": {
-          "nameParts": {
-            "type": "array",
-            "description": "The list of name parts of the address to accommodate the different number of name fields in different systems. This is not according to official registers but according to the name the sharing member chooses.",
-            "items": {
-              "type": "string"
-            }
-          },
-          "states": {
-            "type": "array",
-            "description": "The list of (temporary) states of the address.",
-            "items": {
-              "$ref": "#/components/schemas/AddressStateDto"
-            }
-          },
-          "identifiers": {
-            "type": "array",
-            "description": "The list of identifiers of the address.",
-            "items": {
-              "$ref": "#/components/schemas/AddressIdentifierDto"
-            }
-          },
-          "physicalPostalAddress": {
-            "$ref": "#/components/schemas/PhysicalPostalAddressDto"
-          },
-          "alternativePostalAddress": {
-            "$ref": "#/components/schemas/AlternativePostalAddressDto"
-          },
-          "roles": {
-            "type": "array",
-            "description": "Roles this business partner takes in relation to the sharing member.",
-            "items": {
-              "type": "string",
-              "enum": [
-                "SUPPLIER",
-                "CUSTOMER",
-                "ONE_TIME_SUPPLIER",
-                "ONE_TIME_CUSTOMER"
-              ]
-            }
-          },
-          "confidenceCriteria": {
-            "$ref": "#/components/schemas/ConfidenceCriteriaDto"
-          },
-          "bpn": {
-            "type": "string",
-            "description": "A BPNA represents and uniquely identifies an address, which can be the legal address of a legal entity, and/or the main address of a site, or any additional address of a legal entity or site (such as different gates). It is important to note that only the BPNL must be used to uniquely identify a legal entity. Even in the case that the BPNA represents the legal address of the legal entity, it shall not be used to uniquely identify the legal entity."
-          }
-        },
-        "description": "In general, an address is a collection of information to describe a physical location, using a street name with a house number and/or a post office box as reference. In addition, an address consists of several postal attributes, such as country, region (state), county, township, city, district, or postal code, which help deliver mail.In Catena-X, an address is a type of business partner representing the legal address of a legal entity, and/or the main address of a site, or any additional address of a legal entity or site (such as different gates).An address is owned by a legal entity. Thus, exactly one legal entity is assigned to an address. An address can belong to a site. Thus, one or no site is assigned to an address. An address is uniquely identified by the BPNA."
-      },
-      "AddressGateOutputDto": {
-        "type": "object",
-        "properties": {
-          "nameParts": {
-            "type": "array",
-            "description": "The list of name parts of the address to accommodate the different number of name fields in different systems. This is not according to official registers but according to the name the sharing member chooses.",
-            "items": {
-              "type": "string"
-            }
-          },
-          "states": {
-            "type": "array",
-            "description": "The list of (temporary) states of the address.",
-            "items": {
-              "$ref": "#/components/schemas/AddressStateDto"
-            }
-          },
-          "identifiers": {
-            "type": "array",
-            "description": "The list of identifiers of the address.",
-            "items": {
-              "$ref": "#/components/schemas/AddressIdentifierDto"
-            }
-          },
-          "physicalPostalAddress": {
-            "$ref": "#/components/schemas/PhysicalPostalAddressDto"
-          },
-          "alternativePostalAddress": {
-            "$ref": "#/components/schemas/AlternativePostalAddressDto"
-          },
-          "roles": {
-            "type": "array",
-            "description": "Roles this business partner takes in relation to the sharing member.",
-            "items": {
-              "type": "string",
-              "enum": [
-                "SUPPLIER",
-                "CUSTOMER",
-                "ONE_TIME_SUPPLIER",
-                "ONE_TIME_CUSTOMER"
-              ]
-            }
-          },
-          "confidenceCriteria": {
-            "$ref": "#/components/schemas/ConfidenceCriteriaDto"
-          },
-          "externalId": {
-            "type": "string",
-            "description": "The identifier which uniquely identifies (in the internal system landscape of the sharing member) the business partner."
-          },
-          "legalEntityExternalId": {
-            "type": "string",
-            "description": "The identifier which uniquely identifies (in the internal system landscape of the sharing member) the business partner, representing the legal entity, that owns the address."
-          },
-          "siteExternalId": {
-            "type": "string",
-            "description": "The identifier which uniquely identifies (in the internal system landscape of the sharing member) the business partner, representing the site, that the address belongs to."
-          },
-          "bpna": {
-            "type": "string",
-            "description": "A BPNA represents and uniquely identifies an address, which can be the legal address of a legal entity, and/or the main address of a site, or any additional address of a legal entity or site (such as different gates). It is important to note that only the BPNL must be used to uniquely identify a legal entity. Even in the case that the BPNA represents the legal address of the legal entity, it shall not be used to uniquely identify the legal entity."
-          }
-        },
-        "description": "In general, an address is a collection of information to describe a physical location, using a street name with a house number and/or a post office box as reference. In addition, an address consists of several postal attributes, such as country, region (state), county, township, city, district, or postal code, which help deliver mail.In Catena-X, an address is a type of business partner representing the legal address of a legal entity, and/or the main address of a site, or any additional address of a legal entity or site (such as different gates).An address is owned by a legal entity. Thus, exactly one legal entity is assigned to an address. An address can belong to a site. Thus, one or no site is assigned to an address. An address is uniquely identified by the BPNA."
-      },
-      "AddressGateOutputRequest": {
-        "type": "object",
-        "properties": {
-          "nameParts": {
-            "type": "array",
-            "description": "The list of name parts of the address to accommodate the different number of name fields in different systems. This is not according to official registers but according to the name the sharing member chooses.",
-            "items": {
-              "type": "string"
-            }
-          },
-          "states": {
-            "type": "array",
-            "description": "The list of (temporary) states of the address.",
-            "items": {
-              "$ref": "#/components/schemas/AddressStateDto"
-            }
-          },
-          "identifiers": {
-            "type": "array",
-            "description": "The list of identifiers of the address.",
-            "items": {
-              "$ref": "#/components/schemas/AddressIdentifierDto"
-            }
-          },
-          "physicalPostalAddress": {
-            "$ref": "#/components/schemas/PhysicalPostalAddressDto"
-          },
-          "alternativePostalAddress": {
-            "$ref": "#/components/schemas/AlternativePostalAddressDto"
-          },
-          "roles": {
-            "type": "array",
-            "description": "Roles this business partner takes in relation to the sharing member.",
-            "items": {
-              "type": "string",
-              "enum": [
-                "SUPPLIER",
-                "CUSTOMER",
-                "ONE_TIME_SUPPLIER",
-                "ONE_TIME_CUSTOMER"
-              ]
-            }
-          },
-          "confidenceCriteria": {
-            "$ref": "#/components/schemas/ConfidenceCriteriaDto"
-          },
-          "externalId": {
-            "type": "string",
-            "description": "The identifier which uniquely identifies (in the internal system landscape of the sharing member) the business partner."
-          },
-          "legalEntityExternalId": {
-            "type": "string",
-            "description": "The identifier which uniquely identifies (in the internal system landscape of the sharing member) the business partner, representing the legal entity, that owns the address."
-          },
-          "siteExternalId": {
-            "type": "string",
-            "description": "The identifier which uniquely identifies (in the internal system landscape of the sharing member) the business partner, representing the site, that the address belongs to."
-          },
-          "bpn": {
-            "type": "string",
-            "description": "A BPNA represents and uniquely identifies an address, which can be the legal address of a legal entity, and/or the main address of a site, or any additional address of a legal entity or site (such as different gates). It is important to note that only the BPNL must be used to uniquely identify a legal entity. Even in the case that the BPNA represents the legal address of the legal entity, it shall not be used to uniquely identify the legal entity."
-          }
-        },
-        "description": "Request for creating/updating a business partner record of type address. In general, an address is a collection of information to describe a physical location, using a street name with a house number and/or a post office box as reference. In addition, an address consists of several postal attributes, such as country, region (state), county, township, city, district, or postal code, which help deliver mail.In Catena-X, an address is a type of business partner representing the legal address of a legal entity, and/or the main address of a site, or any additional address of a legal entity or site (such as different gates).An address is owned by a legal entity. Thus, exactly one legal entity is assigned to an address. An address can belong to a site. Thus, one or no site is assigned to an address. An address is uniquely identified by the BPNA."
-      },
-      "AddressIdentifierDto": {
-        "type": "object",
-        "properties": {
-          "value": {
-            "type": "string",
-            "description": "The value of the identifier like \"0847976000005\"."
-          },
-          "type": {
-            "type": "string",
-            "description": "The type of the identifier."
-          }
-        },
-        "description": "An address identifier (uniquely) identifies the address, such as the Global Location Number (GLN)."
-      },
       "AddressRepresentationInputDto": {
+        "required": [
+          "alternativePostalAddress",
+          "physicalPostalAddress"
+        ],
         "type": "object",
         "properties": {
           "addressBpn": {
@@ -1797,33 +568,6 @@
           }
         },
         "description": "The address, on which the business partner provides a view. "
-      },
-      "AddressStateDto": {
-        "type": "object",
-        "properties": {
-          "description": {
-            "type": "string"
-          },
-          "validFrom": {
-            "type": "string",
-            "description": "The date from which the state is valid.",
-            "format": "date-time"
-          },
-          "validTo": {
-            "type": "string",
-            "description": "The date until the state is valid.",
-            "format": "date-time"
-          },
-          "type": {
-            "type": "string",
-            "description": "One of the state types: active, inactive.",
-            "enum": [
-              "ACTIVE",
-              "INACTIVE"
-            ]
-          }
-        },
-        "description": "An address state indicates if the address is active or inactive. This does not describe the relation between a sharing member and a business partner and whether they have active business, but it describes whether the business partner is still operating at that address."
       },
       "AlternativePostalAddressDto": {
         "type": "object",
@@ -2141,29 +885,6 @@
         },
         "description": "An alternative postal address describes an alternative way of delivery for example if the goods are to be picked up somewhere else."
       },
-      "BusinessPartnerClassificationDto": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string",
-            "description": "Type of classification.",
-            "enum": [
-              "NACE",
-              "NAF",
-              "NAICS",
-              "SIC"
-            ]
-          },
-          "code": {
-            "type": "string",
-            "description": "The identifier of the class belonging to the classification."
-          },
-          "value": {
-            "type": "string",
-            "description": "The name of the class belonging to the classification."
-          }
-        }
-      },
       "BusinessPartnerIdentifierDto": {
         "type": "object",
         "properties": {
@@ -2183,10 +904,20 @@
       },
       "BusinessPartnerInputDto": {
         "required": [
+          "address",
           "bpnA",
           "bpnL",
+          "createdAt",
           "externalId",
-          "postalAddress"
+          "identifiers",
+          "isOwnCompanyData",
+          "legalEntity",
+          "nameParts",
+          "postalAddress",
+          "roles",
+          "site",
+          "states",
+          "updatedAt"
         ],
         "type": "object",
         "properties": {
@@ -2227,6 +958,10 @@
                 "ONE_TIME_CUSTOMER"
               ]
             }
+          },
+          "isOwnCompanyData": {
+            "type": "boolean",
+            "description": "Indicates whether the sharing member claims (in the initial upload) the business partner to belong to the company data of the sharing member."
           },
           "legalEntity": {
             "$ref": "#/components/schemas/LegalEntityRepresentationInputDto"
@@ -2246,17 +981,21 @@
             "type": "string",
             "description": "The date when the data record has been last updated.",
             "format": "date-time"
-          },
-          "ownCompanyData": {
-            "type": "boolean",
-            "description": "Indicates whether the sharing member claims (in the initial upload) the business partner to belong to the company data of the sharing member."
           }
         },
         "description": "Generic business partner with external id"
       },
       "BusinessPartnerInputRequest": {
         "required": [
-          "externalId"
+          "address",
+          "externalId",
+          "identifiers",
+          "isOwnCompanyData",
+          "legalEntity",
+          "nameParts",
+          "roles",
+          "site",
+          "states"
         ],
         "type": "object",
         "properties": {
@@ -2297,6 +1036,10 @@
                 "ONE_TIME_CUSTOMER"
               ]
             }
+          },
+          "isOwnCompanyData": {
+            "type": "boolean",
+            "description": "Indicates whether the sharing member claims (in the initial upload) the business partner to belong to the company data of the sharing member."
           },
           "legalEntity": {
             "$ref": "#/components/schemas/LegalEntityRepresentationInputDto"
@@ -2306,17 +1049,22 @@
           },
           "address": {
             "$ref": "#/components/schemas/AddressRepresentationInputDto"
-          },
-          "ownCompanyData": {
-            "type": "boolean",
-            "description": "Indicates whether the sharing member claims (in the initial upload) the business partner to belong to the company data of the sharing member."
           }
         },
         "description": "Generic business partner with external id"
       },
       "BusinessPartnerOutputDto": {
         "required": [
-          "externalId"
+          "address",
+          "createdAt",
+          "externalId",
+          "identifiers",
+          "isOwnCompanyData",
+          "legalEntity",
+          "nameParts",
+          "roles",
+          "states",
+          "updatedAt"
         ],
         "type": "object",
         "properties": {
@@ -2357,6 +1105,10 @@
                 "ONE_TIME_CUSTOMER"
               ]
             }
+          },
+          "isOwnCompanyData": {
+            "type": "boolean",
+            "description": "Indicates whether the sharing member claims (in the initial upload) the business partner to belong to the company data of the sharing member."
           },
           "legalEntity": {
             "$ref": "#/components/schemas/LegalEntityRepresentationOutputDto"
@@ -2376,10 +1128,6 @@
             "type": "string",
             "description": "The date when the data record has been last updated.",
             "format": "date-time"
-          },
-          "ownCompanyData": {
-            "type": "boolean",
-            "description": "Indicates whether the sharing member claims (in the initial upload) the business partner to belong to the company data of the sharing member."
           }
         },
         "description": "Generic business partner output with external id"
@@ -2408,6 +1156,11 @@
         }
       },
       "ChangelogGateDto": {
+        "required": [
+          "changelogType",
+          "externalId",
+          "timestamp"
+        ],
         "type": "object",
         "properties": {
           "externalId": {
@@ -2474,6 +1227,14 @@
         }
       },
       "ConfidenceCriteriaDto": {
+        "required": [
+          "checkedByExternalDataSource",
+          "confidenceLevel",
+          "lastConfidenceCheckAt",
+          "nextConfidenceCheckAt",
+          "numberOfSharingMembers",
+          "sharedByOwner"
+        ],
         "type": "object",
         "properties": {
           "sharedByOwner": {
@@ -2482,7 +1243,7 @@
           "checkedByExternalDataSource": {
             "type": "boolean"
           },
-          "numberOfBusinessPartners": {
+          "numberOfSharingMembers": {
             "type": "integer",
             "format": "int32"
           },
@@ -2502,6 +1263,10 @@
       },
       "ErrorInfoChangeLogOutputError": {
         "title": "ErrorInfo",
+        "required": [
+          "errorCode",
+          "message"
+        ],
         "type": "object",
         "properties": {
           "errorCode": {
@@ -2523,6 +1288,10 @@
         "description": "Holds information about failures"
       },
       "GeoCoordinateDto": {
+        "required": [
+          "latitude",
+          "longitude"
+        ],
         "type": "object",
         "properties": {
           "longitude": {
@@ -2543,331 +1312,6 @@
         },
         "description": "The exact location of the physical postal address in latitude, longitude, and altitude."
       },
-      "LegalEntityClassificationDto": {
-        "required": [
-          "type"
-        ],
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string",
-            "description": "Type of classification.",
-            "enum": [
-              "NACE",
-              "NAF",
-              "NAICS",
-              "SIC"
-            ]
-          },
-          "code": {
-            "type": "string",
-            "description": "The identifier of the class belonging to the classification."
-          },
-          "value": {
-            "type": "string",
-            "description": "The name of the class belonging to the classification."
-          }
-        },
-        "description": "A legal entity classification is an assignment of the legal entity to an industry. It does not necessarily have to be the only industry the company is active in (see large companies operating in different industries). Multiple assignments to several industries are possible per classification type."
-      },
-      "LegalEntityGateInputDto": {
-        "required": [
-          "externalId"
-        ],
-        "type": "object",
-        "properties": {
-          "legalNameParts": {
-            "type": "array",
-            "description": "The list of name parts of the legal entity to accommodate the different number of name fields in different systems.",
-            "items": {
-              "type": "string"
-            }
-          },
-          "identifiers": {
-            "type": "array",
-            "description": "The list of identifiers of the legal entity.",
-            "items": {
-              "$ref": "#/components/schemas/LegalEntityIdentifierDto"
-            }
-          },
-          "legalShortName": {
-            "type": "string",
-            "description": "The abbreviated name of the legal entity."
-          },
-          "legalForm": {
-            "type": "string",
-            "description": "The legal form of the legal entity."
-          },
-          "states": {
-            "type": "array",
-            "description": "The list of (temporary) states of the legal entity.",
-            "items": {
-              "$ref": "#/components/schemas/LegalEntityStateDto"
-            }
-          },
-          "classifications": {
-            "type": "array",
-            "description": "The list of classifications of the legal entity, such as a specific industry.",
-            "items": {
-              "$ref": "#/components/schemas/LegalEntityClassificationDto"
-            }
-          },
-          "roles": {
-            "type": "array",
-            "description": "Roles this business partner takes in relation to the sharing member.",
-            "items": {
-              "type": "string",
-              "enum": [
-                "SUPPLIER",
-                "CUSTOMER",
-                "ONE_TIME_SUPPLIER",
-                "ONE_TIME_CUSTOMER"
-              ]
-            }
-          },
-          "confidenceCriteria": {
-            "$ref": "#/components/schemas/ConfidenceCriteriaDto"
-          },
-          "legalAddress": {
-            "$ref": "#/components/schemas/AddressGateInputDto"
-          },
-          "externalId": {
-            "type": "string",
-            "description": "The identifier which uniquely identifies (in the internal system landscape of the sharing member) the business partner."
-          }
-        },
-        "description": "In general, a legal entity is a juridical person that has legal rights and duties related to contracts, agreements, and obligations. The term especially applies to any kind of organization (such as an enterprise or company, university, association, etc.) established under the law applicable to a country.In Catena-X, a legal entity is a type of business partner representing a legally registered organization with its official registration information, such as legal name (including legal form, if registered), legal address and tax number.A legal entity has exactly one legal address, but it is possible to specify additional addresses that a legal entity owns. Thus, at least one address is assigned to a legal entity. A legal entity can own sites. Thus, many or no sites are assigned to a legal entity. A legal entity is uniquely identified by the BPNL."
-      },
-      "LegalEntityGateInputRequest": {
-        "required": [
-          "externalId"
-        ],
-        "type": "object",
-        "properties": {
-          "legalNameParts": {
-            "type": "array",
-            "description": "The list of name parts of the legal entity to accommodate the different number of name fields in different systems.",
-            "items": {
-              "type": "string"
-            }
-          },
-          "identifiers": {
-            "type": "array",
-            "description": "The list of identifiers of the legal entity.",
-            "items": {
-              "$ref": "#/components/schemas/LegalEntityIdentifierDto"
-            }
-          },
-          "legalShortName": {
-            "type": "string",
-            "description": "The abbreviated name of the legal entity."
-          },
-          "legalForm": {
-            "type": "string",
-            "description": "The legal form of the legal entity."
-          },
-          "states": {
-            "type": "array",
-            "description": "The list of (temporary) states of the legal entity.",
-            "items": {
-              "$ref": "#/components/schemas/LegalEntityStateDto"
-            }
-          },
-          "classifications": {
-            "type": "array",
-            "description": "The list of classifications of the legal entity, such as a specific industry.",
-            "items": {
-              "$ref": "#/components/schemas/LegalEntityClassificationDto"
-            }
-          },
-          "roles": {
-            "type": "array",
-            "description": "Roles this business partner takes in relation to the sharing member.",
-            "items": {
-              "type": "string",
-              "enum": [
-                "SUPPLIER",
-                "CUSTOMER",
-                "ONE_TIME_SUPPLIER",
-                "ONE_TIME_CUSTOMER"
-              ]
-            }
-          },
-          "confidenceCriteria": {
-            "$ref": "#/components/schemas/ConfidenceCriteriaDto"
-          },
-          "legalAddress": {
-            "$ref": "#/components/schemas/LogisticAddressDto"
-          },
-          "externalId": {
-            "type": "string",
-            "description": "The identifier which uniquely identifies (in the internal system landscape of the sharing member) the business partner."
-          }
-        },
-        "description": "Request for creating/updating a business partner record of type legal entity. In general, a legal entity is a juridical person that has legal rights and duties related to contracts, agreements, and obligations. The term especially applies to any kind of organization (such as an enterprise or company, university, association, etc.) established under the law applicable to a country.In Catena-X, a legal entity is a type of business partner representing a legally registered organization with its official registration information, such as legal name (including legal form, if registered), legal address and tax number.A legal entity has exactly one legal address, but it is possible to specify additional addresses that a legal entity owns. Thus, at least one address is assigned to a legal entity. A legal entity can own sites. Thus, many or no sites are assigned to a legal entity. A legal entity is uniquely identified by the BPNL."
-      },
-      "LegalEntityGateOutputRequest": {
-        "required": [
-          "externalId"
-        ],
-        "type": "object",
-        "properties": {
-          "legalNameParts": {
-            "type": "array",
-            "description": "The list of name parts of the legal entity to accommodate the different number of name fields in different systems.",
-            "items": {
-              "type": "string"
-            }
-          },
-          "identifiers": {
-            "type": "array",
-            "description": "The list of identifiers of the legal entity.",
-            "items": {
-              "$ref": "#/components/schemas/LegalEntityIdentifierDto"
-            }
-          },
-          "legalShortName": {
-            "type": "string",
-            "description": "The abbreviated name of the legal entity."
-          },
-          "legalForm": {
-            "type": "string",
-            "description": "The legal form of the legal entity."
-          },
-          "states": {
-            "type": "array",
-            "description": "The list of (temporary) states of the legal entity.",
-            "items": {
-              "$ref": "#/components/schemas/LegalEntityStateDto"
-            }
-          },
-          "classifications": {
-            "type": "array",
-            "description": "The list of classifications of the legal entity, such as a specific industry.",
-            "items": {
-              "$ref": "#/components/schemas/LegalEntityClassificationDto"
-            }
-          },
-          "roles": {
-            "type": "array",
-            "description": "Roles this business partner takes in relation to the sharing member.",
-            "items": {
-              "type": "string",
-              "enum": [
-                "SUPPLIER",
-                "CUSTOMER",
-                "ONE_TIME_SUPPLIER",
-                "ONE_TIME_CUSTOMER"
-              ]
-            }
-          },
-          "confidenceCriteria": {
-            "$ref": "#/components/schemas/ConfidenceCriteriaDto"
-          },
-          "legalAddress": {
-            "$ref": "#/components/schemas/AddressGateOutputChildRequest"
-          },
-          "externalId": {
-            "type": "string",
-            "description": "The identifier which uniquely identifies (in the internal system landscape of the sharing member) the business partner."
-          },
-          "bpn": {
-            "type": "string",
-            "description": "A BPNL represents and uniquely identifies a legal entity, which is defined by its legal name (including legal form, if registered), legal address and tax number."
-          }
-        },
-        "description": "Request for creating/updating a business partner record of type legal entity. In general, a legal entity is a juridical person that has legal rights and duties related to contracts, agreements, and obligations. The term especially applies to any kind of organization (such as an enterprise or company, university, association, etc.) established under the law applicable to a country.In Catena-X, a legal entity is a type of business partner representing a legally registered organization with its official registration information, such as legal name (including legal form, if registered), legal address and tax number.A legal entity has exactly one legal address, but it is possible to specify additional addresses that a legal entity owns. Thus, at least one address is assigned to a legal entity. A legal entity can own sites. Thus, many or no sites are assigned to a legal entity. A legal entity is uniquely identified by the BPNL."
-      },
-      "LegalEntityGateOutputResponse": {
-        "required": [
-          "externalId"
-        ],
-        "type": "object",
-        "properties": {
-          "legalNameParts": {
-            "type": "array",
-            "description": "The list of name parts of the legal entity to accommodate the different number of name fields in different systems.",
-            "items": {
-              "type": "string"
-            }
-          },
-          "identifiers": {
-            "type": "array",
-            "description": "The list of identifiers of the legal entity.",
-            "items": {
-              "$ref": "#/components/schemas/LegalEntityIdentifierDto"
-            }
-          },
-          "legalShortName": {
-            "type": "string",
-            "description": "The abbreviated name of the legal entity."
-          },
-          "legalForm": {
-            "type": "string",
-            "description": "The legal form of the legal entity."
-          },
-          "states": {
-            "type": "array",
-            "description": "The list of (temporary) states of the legal entity.",
-            "items": {
-              "$ref": "#/components/schemas/LegalEntityStateDto"
-            }
-          },
-          "classifications": {
-            "type": "array",
-            "description": "The list of classifications of the legal entity, such as a specific industry.",
-            "items": {
-              "$ref": "#/components/schemas/LegalEntityClassificationDto"
-            }
-          },
-          "roles": {
-            "type": "array",
-            "description": "Roles this business partner takes in relation to the sharing member.",
-            "items": {
-              "type": "string",
-              "enum": [
-                "SUPPLIER",
-                "CUSTOMER",
-                "ONE_TIME_SUPPLIER",
-                "ONE_TIME_CUSTOMER"
-              ]
-            }
-          },
-          "confidenceCriteria": {
-            "$ref": "#/components/schemas/ConfidenceCriteriaDto"
-          },
-          "legalAddress": {
-            "$ref": "#/components/schemas/AddressGateOutputDto"
-          },
-          "externalId": {
-            "type": "string",
-            "description": "The identifier which uniquely identifies (in the internal system landscape of the sharing member) the business partner."
-          },
-          "bpnl": {
-            "type": "string",
-            "description": "A BPNL represents and uniquely identifies a legal entity, which is defined by its legal name (including legal form, if registered), legal address and tax number."
-          }
-        },
-        "description": "In general, a legal entity is a juridical person that has legal rights and duties related to contracts, agreements, and obligations. The term especially applies to any kind of organization (such as an enterprise or company, university, association, etc.) established under the law applicable to a country.In Catena-X, a legal entity is a type of business partner representing a legally registered organization with its official registration information, such as legal name (including legal form, if registered), legal address and tax number.A legal entity has exactly one legal address, but it is possible to specify additional addresses that a legal entity owns. Thus, at least one address is assigned to a legal entity. A legal entity can own sites. Thus, many or no sites are assigned to a legal entity. A legal entity is uniquely identified by the BPNL."
-      },
-      "LegalEntityIdentifierDto": {
-        "type": "object",
-        "properties": {
-          "value": {
-            "type": "string",
-            "description": "The value of the identifier like \"DE123465789\"."
-          },
-          "type": {
-            "type": "string",
-            "description": "The type of the identifier."
-          },
-          "issuingBody": {
-            "type": "string",
-            "description": "The name of the official register, where the identifier is registered. For example, a Handelsregisternummer in Germany is only valid with its corresponding Handelsregister."
-          }
-        },
-        "description": "A legal entity identifier (uniquely) identifies the legal entity, such as the German Handelsregisternummer, a VAT number, etc."
-      },
       "LegalEntityRepresentationInputDto": {
         "type": "object",
         "properties": {
@@ -2886,20 +1330,15 @@
           "legalForm": {
             "type": "string",
             "description": "The legal form of the legal entity, on which the business partner provides a view."
-          },
-          "classifications": {
-            "type": "array",
-            "description": "The list of classifications of the business partner, such as a specific industry. Sorted and duplicates removed by the service.",
-            "items": {
-              "$ref": "#/components/schemas/BusinessPartnerClassificationDto"
-            }
           }
         },
         "description": "The legal entity, on which the business partner provides a view."
       },
       "LegalEntityRepresentationOutputDto": {
         "required": [
-          "bpnL"
+          "bpnL",
+          "confidenceCriteria",
+          "legalEntityBpn"
         ],
         "type": "object",
         "properties": {
@@ -2919,96 +1358,22 @@
             "type": "string",
             "description": "The legal form of the legal entity, on which the business partner provides a view."
           },
-          "classifications": {
-            "type": "array",
-            "description": "The list of classifications of the business partner, such as a specific industry. Sorted and duplicates removed by the service.",
-            "items": {
-              "$ref": "#/components/schemas/BusinessPartnerClassificationDto"
-            }
-          },
           "confidenceCriteria": {
             "$ref": "#/components/schemas/ConfidenceCriteriaDto"
           }
         },
         "description": "Legal Entity properties of business partner output data"
       },
-      "LegalEntityStateDto": {
-        "type": "object",
-        "properties": {
-          "description": {
-            "type": "string"
-          },
-          "validFrom": {
-            "type": "string",
-            "description": "The date from which the state is valid.",
-            "format": "date-time"
-          },
-          "validTo": {
-            "type": "string",
-            "description": "The date until the state is valid.",
-            "format": "date-time"
-          },
-          "type": {
-            "type": "string",
-            "description": "One of the state types: active, inactive.",
-            "enum": [
-              "ACTIVE",
-              "INACTIVE"
-            ]
-          }
-        },
-        "description": "A legal entity state indicates if the legal entity is active or inactive. This does not describe the relation between a sharing member and a business partner and whether they have active business, but it describes whether the legal entity is still operating."
-      },
-      "LogisticAddressDto": {
-        "type": "object",
-        "properties": {
-          "nameParts": {
-            "type": "array",
-            "description": "The list of name parts of the address to accommodate the different number of name fields in different systems. This is not according to official registers but according to the name the sharing member chooses.",
-            "items": {
-              "type": "string"
-            }
-          },
-          "states": {
-            "type": "array",
-            "description": "The list of (temporary) states of the address.",
-            "items": {
-              "$ref": "#/components/schemas/AddressStateDto"
-            }
-          },
-          "identifiers": {
-            "type": "array",
-            "description": "The list of identifiers of the address.",
-            "items": {
-              "$ref": "#/components/schemas/AddressIdentifierDto"
-            }
-          },
-          "physicalPostalAddress": {
-            "$ref": "#/components/schemas/PhysicalPostalAddressDto"
-          },
-          "alternativePostalAddress": {
-            "$ref": "#/components/schemas/AlternativePostalAddressDto"
-          },
-          "roles": {
-            "type": "array",
-            "description": "Roles this business partner takes in relation to the sharing member.",
-            "items": {
-              "type": "string",
-              "enum": [
-                "SUPPLIER",
-                "CUSTOMER",
-                "ONE_TIME_SUPPLIER",
-                "ONE_TIME_CUSTOMER"
-              ]
-            }
-          },
-          "confidenceCriteria": {
-            "$ref": "#/components/schemas/ConfidenceCriteriaDto"
-          }
-        },
-        "description": "In general, an address is a collection of information to describe a physical location, using a street name with a house number and/or a post office box as reference. In addition, an address consists of several postal attributes, such as country, region (state), county, township, city, district, or postal code, which help deliver mail.In Catena-X, an address is a type of business partner representing the legal address of a legal entity, and/or the main address of a site, or any additional address of a legal entity or site (such as different gates).An address is owned by a legal entity. Thus, exactly one legal entity is assigned to an address. An address can belong to a site. Thus, one or no site is assigned to an address. An address is uniquely identified by the BPNA."
-      },
       "PageChangeLogDtoChangelogGateDto": {
+        "required": [
+          "content",
+          "contentSize",
+          "errors",
+          "invalidEntries",
+          "page",
+          "totalElements",
+          "totalPages"
+        ],
         "type": "object",
         "properties": {
           "totalElements": {
@@ -3053,73 +1418,14 @@
         },
         "description": "Paginated collection of results"
       },
-      "PageDtoAddressGateInputDto": {
-        "type": "object",
-        "properties": {
-          "totalElements": {
-            "type": "integer",
-            "description": "Total number of all results in all pages",
-            "format": "int64"
-          },
-          "totalPages": {
-            "type": "integer",
-            "description": "Total number pages",
-            "format": "int32"
-          },
-          "page": {
-            "type": "integer",
-            "description": "Current page number",
-            "format": "int32"
-          },
-          "contentSize": {
-            "type": "integer",
-            "description": "Number of results in the page",
-            "format": "int32"
-          },
-          "content": {
-            "type": "array",
-            "description": "Collection of results in the page",
-            "items": {
-              "$ref": "#/components/schemas/AddressGateInputDto"
-            }
-          }
-        },
-        "description": "Paginated collection of results"
-      },
-      "PageDtoAddressGateOutputDto": {
-        "type": "object",
-        "properties": {
-          "totalElements": {
-            "type": "integer",
-            "description": "Total number of all results in all pages",
-            "format": "int64"
-          },
-          "totalPages": {
-            "type": "integer",
-            "description": "Total number pages",
-            "format": "int32"
-          },
-          "page": {
-            "type": "integer",
-            "description": "Current page number",
-            "format": "int32"
-          },
-          "contentSize": {
-            "type": "integer",
-            "description": "Number of results in the page",
-            "format": "int32"
-          },
-          "content": {
-            "type": "array",
-            "description": "Collection of results in the page",
-            "items": {
-              "$ref": "#/components/schemas/AddressGateOutputDto"
-            }
-          }
-        },
-        "description": "Paginated collection of results"
-      },
       "PageDtoBusinessPartnerInputDto": {
+        "required": [
+          "content",
+          "contentSize",
+          "page",
+          "totalElements",
+          "totalPages"
+        ],
         "type": "object",
         "properties": {
           "totalElements": {
@@ -3153,6 +1459,13 @@
         "description": "Paginated collection of results"
       },
       "PageDtoBusinessPartnerOutputDto": {
+        "required": [
+          "content",
+          "contentSize",
+          "page",
+          "totalElements",
+          "totalPages"
+        ],
         "type": "object",
         "properties": {
           "totalElements": {
@@ -3185,73 +1498,14 @@
         },
         "description": "Paginated collection of results"
       },
-      "PageDtoLegalEntityGateInputDto": {
-        "type": "object",
-        "properties": {
-          "totalElements": {
-            "type": "integer",
-            "description": "Total number of all results in all pages",
-            "format": "int64"
-          },
-          "totalPages": {
-            "type": "integer",
-            "description": "Total number pages",
-            "format": "int32"
-          },
-          "page": {
-            "type": "integer",
-            "description": "Current page number",
-            "format": "int32"
-          },
-          "contentSize": {
-            "type": "integer",
-            "description": "Number of results in the page",
-            "format": "int32"
-          },
-          "content": {
-            "type": "array",
-            "description": "Collection of results in the page",
-            "items": {
-              "$ref": "#/components/schemas/LegalEntityGateInputDto"
-            }
-          }
-        },
-        "description": "Paginated collection of results"
-      },
-      "PageDtoLegalEntityGateOutputResponse": {
-        "type": "object",
-        "properties": {
-          "totalElements": {
-            "type": "integer",
-            "description": "Total number of all results in all pages",
-            "format": "int64"
-          },
-          "totalPages": {
-            "type": "integer",
-            "description": "Total number pages",
-            "format": "int32"
-          },
-          "page": {
-            "type": "integer",
-            "description": "Current page number",
-            "format": "int32"
-          },
-          "contentSize": {
-            "type": "integer",
-            "description": "Number of results in the page",
-            "format": "int32"
-          },
-          "content": {
-            "type": "array",
-            "description": "Collection of results in the page",
-            "items": {
-              "$ref": "#/components/schemas/LegalEntityGateOutputResponse"
-            }
-          }
-        },
-        "description": "Paginated collection of results"
-      },
       "PageDtoSharingStateDto": {
+        "required": [
+          "content",
+          "contentSize",
+          "page",
+          "totalElements",
+          "totalPages"
+        ],
         "type": "object",
         "properties": {
           "totalElements": {
@@ -3279,72 +1533,6 @@
             "description": "Collection of results in the page",
             "items": {
               "$ref": "#/components/schemas/SharingStateDto"
-            }
-          }
-        },
-        "description": "Paginated collection of results"
-      },
-      "PageDtoSiteGateInputDto": {
-        "type": "object",
-        "properties": {
-          "totalElements": {
-            "type": "integer",
-            "description": "Total number of all results in all pages",
-            "format": "int64"
-          },
-          "totalPages": {
-            "type": "integer",
-            "description": "Total number pages",
-            "format": "int32"
-          },
-          "page": {
-            "type": "integer",
-            "description": "Current page number",
-            "format": "int32"
-          },
-          "contentSize": {
-            "type": "integer",
-            "description": "Number of results in the page",
-            "format": "int32"
-          },
-          "content": {
-            "type": "array",
-            "description": "Collection of results in the page",
-            "items": {
-              "$ref": "#/components/schemas/SiteGateInputDto"
-            }
-          }
-        },
-        "description": "Paginated collection of results"
-      },
-      "PageDtoSiteGateOutputResponse": {
-        "type": "object",
-        "properties": {
-          "totalElements": {
-            "type": "integer",
-            "description": "Total number of all results in all pages",
-            "format": "int64"
-          },
-          "totalPages": {
-            "type": "integer",
-            "description": "Total number pages",
-            "format": "int32"
-          },
-          "page": {
-            "type": "integer",
-            "description": "Current page number",
-            "format": "int32"
-          },
-          "contentSize": {
-            "type": "integer",
-            "description": "Number of results in the page",
-            "format": "int32"
-          },
-          "content": {
-            "type": "array",
-            "description": "Collection of results in the page",
-            "items": {
-              "$ref": "#/components/schemas/SiteGateOutputResponse"
             }
           }
         },
@@ -3685,6 +1873,9 @@
         "description": "A physical postal address describes the physical location of an office, warehouse, gate, etc."
       },
       "PostSharingStateReadyRequest": {
+        "required": [
+          "externalIds"
+        ],
         "type": "object",
         "properties": {
           "externalIds": {
@@ -3697,6 +1888,11 @@
         "description": "Request for setting business partners into ready to be shared to golden record state"
       },
       "SharingStateDto": {
+        "required": [
+          "businessPartnerType",
+          "externalId",
+          "sharingStateType"
+        ],
         "type": "object",
         "properties": {
           "businessPartnerType": {
@@ -3754,190 +1950,6 @@
         },
         "description": "A sharing state entry shows the progress in the sharing process and is updated each time the progress for a business partner changes. The business partner is identified by a combination of external ID and business partner type."
       },
-      "SiteGateInputDto": {
-        "type": "object",
-        "properties": {
-          "nameParts": {
-            "type": "array",
-            "description": "The list of name parts of the site to accommodate the different number of name fields in different systems. This is not according to official registers but according to the name the owner chooses.",
-            "items": {
-              "type": "string"
-            }
-          },
-          "states": {
-            "type": "array",
-            "description": "The list of the (temporary) states of the site.",
-            "items": {
-              "$ref": "#/components/schemas/SiteStateDto"
-            }
-          },
-          "roles": {
-            "type": "array",
-            "description": "Roles this business partner takes in relation to the sharing member.",
-            "items": {
-              "type": "string",
-              "enum": [
-                "SUPPLIER",
-                "CUSTOMER",
-                "ONE_TIME_SUPPLIER",
-                "ONE_TIME_CUSTOMER"
-              ]
-            }
-          },
-          "mainAddress": {
-            "$ref": "#/components/schemas/AddressGateInputDto"
-          },
-          "externalId": {
-            "type": "string",
-            "description": "The identifier which uniquely identifies (in the internal system landscape of the sharing member) the business partner."
-          },
-          "legalEntityExternalId": {
-            "type": "string",
-            "description": "The identifier which uniquely identifies (in the internal system landscape of the sharing member) the business partner owning the site."
-          }
-        },
-        "description": "In general, a site is a delimited geographical area in which an organization (such as an enterprise or company, university, association, etc.) conducts business. In Catena-X, a site is a type of business partner representing a physical location or area owned by a legal entity, where a production plant, a warehouse, or an office building is located. A site is owned by a legal entity. Thus, exactly one legal entity is assigned to a site. A site has exactly one main address, but it is possible to specify additional addresses (such as different gates), that belong to a site. Thus, at least one address is assigned to a site. A site can only be uploaded and modified by the owner (the legal entity), because only the owner knows which addresses belong to which site. A site is uniquely identified by the BPNS."
-      },
-      "SiteGateInputRequest": {
-        "type": "object",
-        "properties": {
-          "nameParts": {
-            "type": "array",
-            "description": "The list of name parts of the site to accommodate the different number of name fields in different systems. This is not according to official registers but according to the name the owner chooses.",
-            "items": {
-              "type": "string"
-            }
-          },
-          "states": {
-            "type": "array",
-            "description": "The list of the (temporary) states of the site.",
-            "items": {
-              "$ref": "#/components/schemas/SiteStateDto"
-            }
-          },
-          "roles": {
-            "type": "array",
-            "description": "Roles this business partner takes in relation to the sharing member.",
-            "items": {
-              "type": "string",
-              "enum": [
-                "SUPPLIER",
-                "CUSTOMER",
-                "ONE_TIME_SUPPLIER",
-                "ONE_TIME_CUSTOMER"
-              ]
-            }
-          },
-          "mainAddress": {
-            "$ref": "#/components/schemas/LogisticAddressDto"
-          },
-          "externalId": {
-            "type": "string",
-            "description": "The identifier which uniquely identifies (in the internal system landscape of the sharing member) the business partner."
-          },
-          "legalEntityExternalId": {
-            "type": "string",
-            "description": "The identifier which uniquely identifies (in the internal system landscape of the sharing member) the business partner owning the site."
-          }
-        },
-        "description": "Request for creating/updating a business partner record of type site. In general, a site is a delimited geographical area in which an organization (such as an enterprise or company, university, association, etc.) conducts business. In Catena-X, a site is a type of business partner representing a physical location or area owned by a legal entity, where a production plant, a warehouse, or an office building is located. A site is owned by a legal entity. Thus, exactly one legal entity is assigned to a site. A site has exactly one main address, but it is possible to specify additional addresses (such as different gates), that belong to a site. Thus, at least one address is assigned to a site. A site can only be uploaded and modified by the owner (the legal entity), because only the owner knows which addresses belong to which site. A site is uniquely identified by the BPNS."
-      },
-      "SiteGateOutputRequest": {
-        "type": "object",
-        "properties": {
-          "nameParts": {
-            "type": "array",
-            "description": "The list of name parts of the site to accommodate the different number of name fields in different systems. This is not according to official registers but according to the name the owner chooses.",
-            "items": {
-              "type": "string"
-            }
-          },
-          "states": {
-            "type": "array",
-            "description": "The list of the (temporary) states of the site.",
-            "items": {
-              "$ref": "#/components/schemas/SiteStateDto"
-            }
-          },
-          "roles": {
-            "type": "array",
-            "description": "Roles this business partner takes in relation to the sharing member.",
-            "items": {
-              "type": "string",
-              "enum": [
-                "SUPPLIER",
-                "CUSTOMER",
-                "ONE_TIME_SUPPLIER",
-                "ONE_TIME_CUSTOMER"
-              ]
-            }
-          },
-          "mainAddress": {
-            "$ref": "#/components/schemas/AddressGateOutputChildRequest"
-          },
-          "externalId": {
-            "type": "string",
-            "description": "The identifier which uniquely identifies (in the internal system landscape of the sharing member) the business partner."
-          },
-          "legalEntityExternalId": {
-            "type": "string",
-            "description": "The identifier which uniquely identifies (in the internal system landscape of the sharing member) the business partner owning the site."
-          },
-          "bpn": {
-            "type": "string",
-            "description": "A BPNS represents and uniquely identifies a site, which is where for example a production plant, a warehouse, or an office building is located."
-          }
-        },
-        "description": "Request for creating/updating a business partner record of type site. In general, a site is a delimited geographical area in which an organization (such as an enterprise or company, university, association, etc.) conducts business. In Catena-X, a site is a type of business partner representing a physical location or area owned by a legal entity, where a production plant, a warehouse, or an office building is located. A site is owned by a legal entity. Thus, exactly one legal entity is assigned to a site. A site has exactly one main address, but it is possible to specify additional addresses (such as different gates), that belong to a site. Thus, at least one address is assigned to a site. A site can only be uploaded and modified by the owner (the legal entity), because only the owner knows which addresses belong to which site. A site is uniquely identified by the BPNS."
-      },
-      "SiteGateOutputResponse": {
-        "type": "object",
-        "properties": {
-          "nameParts": {
-            "type": "array",
-            "description": "The list of name parts of the site to accommodate the different number of name fields in different systems. This is not according to official registers but according to the name the owner chooses.",
-            "items": {
-              "type": "string"
-            }
-          },
-          "states": {
-            "type": "array",
-            "description": "The list of the (temporary) states of the site.",
-            "items": {
-              "$ref": "#/components/schemas/SiteStateDto"
-            }
-          },
-          "roles": {
-            "type": "array",
-            "description": "Roles this business partner takes in relation to the sharing member.",
-            "items": {
-              "type": "string",
-              "enum": [
-                "SUPPLIER",
-                "CUSTOMER",
-                "ONE_TIME_SUPPLIER",
-                "ONE_TIME_CUSTOMER"
-              ]
-            }
-          },
-          "mainAddress": {
-            "$ref": "#/components/schemas/AddressGateOutputDto"
-          },
-          "externalId": {
-            "type": "string",
-            "description": "The identifier which uniquely identifies (in the internal system landscape of the sharing member) the business partner."
-          },
-          "legalEntityExternalId": {
-            "type": "string",
-            "description": "The identifier which uniquely identifies (in the internal system landscape of the sharing member) the business partner owning the site."
-          },
-          "bpns": {
-            "type": "string",
-            "description": "A BPNS represents and uniquely identifies a site, which is where for example a production plant, a warehouse, or an office building is located."
-          }
-        },
-        "description": "In general, a site is a delimited geographical area in which an organization (such as an enterprise or company, university, association, etc.) conducts business. In Catena-X, a site is a type of business partner representing a physical location or area owned by a legal entity, where a production plant, a warehouse, or an office building is located. A site is owned by a legal entity. Thus, exactly one legal entity is assigned to a site. A site has exactly one main address, but it is possible to specify additional addresses (such as different gates), that belong to a site. Thus, at least one address is assigned to a site. A site can only be uploaded and modified by the owner (the legal entity), because only the owner knows which addresses belong to which site. A site is uniquely identified by the BPNS."
-      },
       "SiteRepresentationInputDto": {
         "type": "object",
         "properties": {
@@ -3953,6 +1965,10 @@
         "description": "The site, on which the business partner provides a view."
       },
       "SiteRepresentationOutputDto": {
+        "required": [
+          "confidenceCriteria",
+          "siteBpn"
+        ],
         "type": "object",
         "properties": {
           "siteBpn": {
@@ -3969,34 +1985,13 @@
         },
         "description": "Site properties of business partner output data"
       },
-      "SiteStateDto": {
-        "type": "object",
-        "properties": {
-          "description": {
-            "type": "string"
-          },
-          "validFrom": {
-            "type": "string",
-            "description": "The date from which the state is valid.",
-            "format": "date-time"
-          },
-          "validTo": {
-            "type": "string",
-            "description": "The date until the state is valid.",
-            "format": "date-time"
-          },
-          "type": {
-            "type": "string",
-            "description": "One of the state types: active, inactive.",
-            "enum": [
-              "ACTIVE",
-              "INACTIVE"
-            ]
-          }
-        },
-        "description": "A site state indicates if the site is active or inactive. This does not describe the relation between a sharing member and a business partner and whether they have active business, but it describes whether the site is still operating."
-      },
       "StatsAddressTypesResponse": {
+        "required": [
+          "additionalTotal",
+          "legalAndSiteTotal",
+          "legalTotal",
+          "siteTotal"
+        ],
         "type": "object",
         "properties": {
           "legalAndSiteTotal": {
@@ -4018,6 +2013,13 @@
         }
       },
       "StatsConfidenceCriteriaResponse": {
+        "required": [
+          "checkedByExternalDataSourceTotal",
+          "confidenceLevelAverage",
+          "numberOfBusinessPartnersAverage",
+          "sharedByOwnerTotal",
+          "uniqueTotal"
+        ],
         "type": "object",
         "properties": {
           "numberOfBusinessPartnersAverage": {
@@ -4043,6 +2045,13 @@
         }
       },
       "StatsSharingStatesResponse": {
+        "required": [
+          "errorTotal",
+          "initialTotal",
+          "pendingTotal",
+          "readyTotal",
+          "successTotal"
+        ],
         "type": "object",
         "properties": {
           "initialTotal": {
@@ -4068,6 +2077,10 @@
         }
       },
       "StatsStagesResponse": {
+        "required": [
+          "inputTotal",
+          "outputTotal"
+        ],
         "type": "object",
         "properties": {
           "inputTotal": {
@@ -4120,9 +2133,6 @@
           }
         },
         "description": "The street of the physical postal address, synonyms: road, avenue, lane, boulevard, highway"
-      },
-      "Unit": {
-        "type": "object"
       }
     }
   }
