@@ -27,7 +27,6 @@ import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
 import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerClassificationDto
@@ -40,7 +39,6 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
 import org.eclipse.tractusx.bpdm.gate.service.GoldenRecordTaskService
-import org.eclipse.tractusx.bpdm.gate.util.*
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryVerboseDto
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
@@ -49,7 +47,6 @@ import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerNonVerboseVal
 import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerVerboseValues
 import org.eclipse.tractusx.bpdm.test.util.AssertHelpers
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
-
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -79,9 +76,9 @@ class BusinessPartnerControllerIT @Autowired constructor(
     val goldenRecordTaskService: GoldenRecordTaskService
 ) {
     companion object {
-        const val ORCHESTRATOR_CREATE_TASKS_URL = "/api/golden-record-tasks"
-        const val ORCHESTRATOR_SEARCH_TASK_STATES_URL = "/api/golden-record-tasks/state/search"
-        const val POOL_API_SEARCH_CHANGE_LOG_URL = "/api/catena/business-partners/changelog/search"
+        const val ORCHESTRATOR_CREATE_TASKS_URL = "/golden-record-tasks"
+        const val ORCHESTRATOR_SEARCH_TASK_STATES_URL = "/golden-record-tasks/state/search"
+        const val POOL_API_SEARCH_CHANGE_LOG_URL = "/business-partners/changelog/search"
 
         @JvmField
         @RegisterExtension

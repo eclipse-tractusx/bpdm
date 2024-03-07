@@ -25,6 +25,7 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.*
@@ -35,7 +36,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 
-@RequestMapping("/api/catena", produces = [MediaType.APPLICATION_JSON_VALUE])
+@RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
 interface PoolMetadataApi {
 
     companion object DescriptionObject {
@@ -58,6 +59,7 @@ interface PoolMetadataApi {
             ApiResponse(responseCode = "409", description = "Identifier type with specified technical key already exists", content = [Content()])
         ]
     )
+    @Tag(name = ApiTags.METADATA_NAME, description = ApiTags.METADATA_DESCRIPTION)
     @PostMapping("/identifier-types")
     fun createIdentifierType(@RequestBody identifierType: IdentifierTypeDto): IdentifierTypeDto
 
@@ -71,6 +73,7 @@ interface PoolMetadataApi {
             ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()])
         ]
     )
+    @Tag(name = ApiTags.METADATA_NAME, description = ApiTags.METADATA_DESCRIPTION)
     @GetMapping("/identifier-types")
     fun getIdentifierTypes(
         @ParameterObject paginationRequest: PaginationRequest,
@@ -92,6 +95,7 @@ interface PoolMetadataApi {
             ApiResponse(responseCode = "409", description = "Legal form with specified technical key already exists", content = [Content()])
         ]
     )
+    @Tag(name = ApiTags.METADATA_NAME, description = ApiTags.METADATA_DESCRIPTION)
     @PostMapping("/legal-forms")
     fun createLegalForm(@RequestBody type: LegalFormRequest): LegalFormDto
 
@@ -105,6 +109,7 @@ interface PoolMetadataApi {
             ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()])
         ]
     )
+    @Tag(name = ApiTags.METADATA_NAME, description = ApiTags.METADATA_DESCRIPTION)
     @GetMapping("/legal-forms")
     fun getLegalForms(@ParameterObject paginationRequest: PaginationRequest): PageDto<LegalFormDto>
 
@@ -120,6 +125,7 @@ interface PoolMetadataApi {
             ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()])
         ]
     )
+    @Tag(name = ApiTags.METADATA_NAME, description = ApiTags.METADATA_DESCRIPTION)
     @GetMapping("/field-quality-rules/")
     fun getFieldQualityRules(@Parameter(description = "ISO 3166-1 alpha-2 country code") @RequestParam country: CountryCode): ResponseEntity<Collection<FieldQualityRuleDto>>
 
@@ -135,6 +141,7 @@ interface PoolMetadataApi {
 
         ]
     )
+    @Tag(name = ApiTags.METADATA_NAME, description = ApiTags.METADATA_DESCRIPTION)
     @PostMapping("/regions")
     fun createRegion(@RequestBody type: RegionDto): RegionDto
 
@@ -149,6 +156,7 @@ interface PoolMetadataApi {
             ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()])
         ]
     )
+    @Tag(name = ApiTags.METADATA_NAME, description = ApiTags.METADATA_DESCRIPTION)
     @GetMapping("/regions")
     fun getRegions(@ParameterObject paginationRequest: PaginationRequest): PageDto<RegionDto>
 
@@ -162,6 +170,7 @@ interface PoolMetadataApi {
             ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()])
         ]
     )
+    @Tag(name = ApiTags.METADATA_NAME, description = ApiTags.METADATA_DESCRIPTION)
     @GetMapping("/administrative-areas-level1")
     fun getAdminAreasLevel1(@ParameterObject paginationRequest: PaginationRequest): PageDto<CountrySubdivisionDto>
 

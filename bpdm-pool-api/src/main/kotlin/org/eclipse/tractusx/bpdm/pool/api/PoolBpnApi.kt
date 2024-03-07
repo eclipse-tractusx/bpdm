@@ -24,6 +24,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.eclipse.tractusx.bpdm.common.util.CommonApiPathNames
 import org.eclipse.tractusx.bpdm.pool.api.PoolBpnApi.Companion.BPN_PATH
 import org.eclipse.tractusx.bpdm.pool.api.model.request.IdentifiersSearchRequest
@@ -38,7 +39,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 interface PoolBpnApi {
 
     companion object{
-        const val BPN_PATH = "/api/catena/bpn"
+        const val BPN_PATH = "bpn"
     }
 
     @Operation(
@@ -58,6 +59,7 @@ interface PoolBpnApi {
             ApiResponse(responseCode = "404", description = "Specified identifier type not found", content = [Content()])
         ]
     )
+    @Tag(name = ApiTags.BPN_NAME, description = ApiTags.BPN_DESCRIPTION)
     @PostMapping(CommonApiPathNames.SUBPATH_SEARCH)
     fun findBpnsByIdentifiers(@RequestBody request: IdentifiersSearchRequest): ResponseEntity<Set<BpnIdentifierMappingDto>>
 }

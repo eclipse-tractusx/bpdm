@@ -40,7 +40,7 @@ import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
 import org.springframework.web.service.annotation.PutExchange
 
-@HttpExchange("/api/catena/legal-entities")
+@HttpExchange("/legal-entities")
 interface LegalEntityApiClient : PoolLegalEntityApi {
     @PostExchange
     override fun createBusinessPartners(

@@ -37,7 +37,7 @@ import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
 import org.springframework.web.service.annotation.PutExchange
 
-@HttpExchange("/api/catena")
+@HttpExchange
 interface LegalEntityApiClient : GateLegalEntityApi {
     @GetExchange("/input/legal-entities")
     override fun getLegalEntities(

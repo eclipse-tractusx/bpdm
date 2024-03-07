@@ -20,9 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.util
 
 object EndpointValues {
-
-    const val GATE_API_PATH = "/api/catena"
-    const val GATE_API_INPUT_PATH = "${GATE_API_PATH}/input"
+    const val GATE_API_INPUT_PATH = "/input"
     const val GATE_API_INPUT_LEGAL_ENTITIES_PATH = "${GATE_API_INPUT_PATH}/legal-entities"
 
 

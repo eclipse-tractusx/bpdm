@@ -35,7 +35,7 @@ import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
 import org.springframework.web.service.annotation.PutExchange
 
-@HttpExchange("/api/catena/sharing-state")
+@HttpExchange("/sharing-state")
 interface SharingStateApiClient : GateSharingStateApi {
     @GetExchange
     override fun getSharingStates(

@@ -33,7 +33,7 @@ import org.springframework.web.service.annotation.GetExchange
 import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
 
-@HttpExchange("/api/catena")
+@HttpExchange
 interface MetadataApiClient: PoolMetadataApi {
 
     @PostExchange("/identifier-types")

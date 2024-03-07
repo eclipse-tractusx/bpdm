@@ -59,7 +59,7 @@ class SyncStateIT @Autowired constructor(
 ) {
 
     companion object {
-        const val GATE_GET_INPUT_CHANGELOG_PATH = "/api/catena/input/changelog/search"
+        const val GATE_GET_INPUT_CHANGELOG_PATH = "/input/changelog/search"
 
         @JvmField
         @RegisterExtension

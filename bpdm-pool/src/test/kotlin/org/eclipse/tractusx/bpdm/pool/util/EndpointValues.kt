@@ -21,11 +21,9 @@ package org.eclipse.tractusx.bpdm.pool.util
 
 object EndpointValues {
 
-    const val CATENA_PATH = "/api/catena"
+    const val CATENA_LEGAL_ENTITY_PATH = "/legal-entities"
 
-    const val CATENA_LEGAL_ENTITY_PATH = "$CATENA_PATH/legal-entities"
-
-    const val CATENA_METADATA_IDENTIFIER_TYPE_PATH = "$CATENA_PATH/identifier-types"
-    const val CATENA_METADATA_LEGAL_FORM_PATH = "$CATENA_PATH/legal-forms"
+    const val CATENA_METADATA_IDENTIFIER_TYPE_PATH = "/identifier-types"
+    const val CATENA_METADATA_LEGAL_FORM_PATH = "/legal-forms"
 
 }
