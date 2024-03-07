@@ -3,12 +3,18 @@
   "info": {
     "title": "Business Partner Data Management Pool",
     "description": "Service that manages and shares business partner data with other CatenaX services",
-    "version": "5.0.0-SNAPSHOT"
+    "version": "6.0.0-SNAPSHOT"
   },
   "servers": [
     {
       "url": "http://localhost:8080",
       "description": "Generated server url"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Catena-X Members",
+      "description": "Query business partner data of Catena-X members"
     }
   ],
   "paths": {
@@ -396,6 +402,226 @@
         }
       }
     },
+    "/members/sites/search": {
+      "post": {
+        "tags": [
+          "Catena-X Members"
+        ],
+        "operationId": "searchSites",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Number of page to get results from",
+            "required": false,
+            "schema": {
+              "minimum": 0,
+              "type": "string",
+              "default": "0"
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Size of each page",
+            "required": false,
+            "schema": {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "string",
+              "default": "10"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SiteSearchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageDtoSiteWithMainAddressVerboseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/members/legal-entities/search": {
+      "post": {
+        "tags": [
+          "Catena-X Members"
+        ],
+        "operationId": "searchLegalEntities",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Number of page to get results from",
+            "required": false,
+            "schema": {
+              "minimum": 0,
+              "type": "string",
+              "default": "0"
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Size of each page",
+            "required": false,
+            "schema": {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "string",
+              "default": "10"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LegalEntitySearchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageDtoLegalEntityWithLegalAddressVerboseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/members/changelog/search": {
+      "post": {
+        "tags": [
+          "Catena-X Members"
+        ],
+        "operationId": "searchChangelogEntries",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Number of page to get results from",
+            "required": false,
+            "schema": {
+              "minimum": 0,
+              "type": "string",
+              "default": "0"
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Size of each page",
+            "required": false,
+            "schema": {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "string",
+              "default": "10"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangelogSearchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageDtoChangelogEntryVerboseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/members/addresses/search": {
+      "post": {
+        "tags": [
+          "Catena-X Members"
+        ],
+        "operationId": "searchAddresses",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Number of page to get results from",
+            "required": false,
+            "schema": {
+              "minimum": 0,
+              "type": "string",
+              "default": "0"
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Size of each page",
+            "required": false,
+            "schema": {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "string",
+              "default": "10"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddressSearchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageDtoLogisticAddressVerboseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/catena/sites/search": {
       "post": {
         "tags": [
@@ -403,7 +629,7 @@
         ],
         "summary": "Returns sites by an array of BPNS and/or an array of corresponding BPNL",
         "description": "Search business partners of type site by their BPNSs or by the BPNLs of their parent legal entities",
-        "operationId": "searchSites",
+        "operationId": "searchSites_1",
         "parameters": [
           {
             "name": "page",
@@ -1274,7 +1500,7 @@
         ],
         "summary": "Returns addresses by an array of BPNA and/or an array of corresponding BPNS and/or an array of corresponding BPNL.",
         "description": "Search business partners of type address by their BPNA or their parents' BPNL or BPNS.",
-        "operationId": "searchAddresses",
+        "operationId": "searchAddresses_1",
         "parameters": [
           {
             "name": "page",
@@ -1966,6 +2192,10 @@
   "components": {
     "schemas": {
       "AddressIdentifierDto": {
+        "required": [
+          "type",
+          "value"
+        ],
         "type": "object",
         "properties": {
           "value": {
@@ -1980,6 +2210,10 @@
         "description": "An address identifier (uniquely) identifies the address, such as the Global Location Number (GLN)."
       },
       "AddressIdentifierVerboseDto": {
+        "required": [
+          "type",
+          "value"
+        ],
         "type": "object",
         "properties": {
           "value": {
@@ -1993,6 +2227,10 @@
         "description": "An address identifier (uniquely) identifies the address, such as the Global Location Number (GLN)."
       },
       "AddressMatchVerboseDto": {
+        "required": [
+          "address",
+          "score"
+        ],
         "type": "object",
         "properties": {
           "score": {
@@ -2007,30 +2245,48 @@
         "description": "Match for a business partner record of type address. In general, an address is a collection of information to describe a physical location, using a street name with a house number and/or a post office box as reference. In addition, an address consists of several postal attributes, such as country, region (state), county, township, city, district, or postal code, which help deliver mail.In Catena-X, an address is a type of business partner representing the legal address of a legal entity, and/or the main address of a site, or any additional address of a legal entity or site (such as different gates).An address is owned by a legal entity. Thus, exactly one legal entity is assigned to an address. An address can belong to a site. Thus, one or no site is assigned to an address. An address is uniquely identified by the BPNA."
       },
       "AddressPartnerBpnSearchRequest": {
+        "required": [
+          "addresses",
+          "legalEntities",
+          "sites"
+        ],
         "type": "object",
         "properties": {
           "legalEntities": {
             "type": "array",
+            "description": "Filter by Business Partner Numbers of legal entities which are at that address",
             "items": {
-              "type": "string"
+              "type": "string",
+              "description": "Filter by Business Partner Numbers of legal entities which are at that address"
             }
           },
           "sites": {
             "type": "array",
+            "description": "Filter by Business Partner Numbers of sites which are at that address",
             "items": {
-              "type": "string"
+              "type": "string",
+              "description": "Filter by Business Partner Numbers of sites which are at that address"
             }
           },
           "addresses": {
             "type": "array",
+            "description": "Filter by BPNA of addresses",
             "items": {
-              "type": "string"
+              "type": "string",
+              "description": "Filter by BPNA of addresses"
             }
           }
         },
         "description": "Request for searching business partners of type address by parent BPNs"
       },
       "AddressPartnerCreateRequest": {
+        "required": [
+          "bpnParent",
+          "confidenceCriteria",
+          "identifiers",
+          "physicalPostalAddress",
+          "states"
+        ],
         "type": "object",
         "properties": {
           "name": {
@@ -2061,10 +2317,12 @@
             "$ref": "#/components/schemas/ConfidenceCriteriaDto"
           },
           "bpnParent": {
-            "type": "string"
+            "type": "string",
+            "description": "BPNL of the legal entity or BPNS of the site this address belongs to."
           },
           "index": {
-            "type": "string"
+            "type": "string",
+            "description": "User defined index to conveniently match this entry to the corresponding entry in the response."
           },
           "requestKey": {
             "type": "string"
@@ -2073,6 +2331,12 @@
         "description": "Request for creating new business partner record of type address. In general, an address is a collection of information to describe a physical location, using a street name with a house number and/or a post office box as reference. In addition, an address consists of several postal attributes, such as country, region (state), county, township, city, district, or postal code, which help deliver mail.In Catena-X, an address is a type of business partner representing the legal address of a legal entity, and/or the main address of a site, or any additional address of a legal entity or site (such as different gates).An address is owned by a legal entity. Thus, exactly one legal entity is assigned to an address. An address can belong to a site. Thus, one or no site is assigned to an address. An address is uniquely identified by the BPNA."
       },
       "AddressPartnerCreateResponseWrapper": {
+        "required": [
+          "entities",
+          "entityCount",
+          "errorCount",
+          "errors"
+        ],
         "type": "object",
         "properties": {
           "entities": {
@@ -2099,6 +2363,17 @@
         "description": "Holds information about successfully and failed entities after the creating/updating of several objects"
       },
       "AddressPartnerCreateVerboseDto": {
+        "required": [
+          "bpna",
+          "confidenceCriteria",
+          "createdAt",
+          "identifiers",
+          "isLegalAddress",
+          "isMainAddress",
+          "physicalPostalAddress",
+          "states",
+          "updatedAt"
+        ],
         "type": "object",
         "properties": {
           "bpna": {
@@ -2133,9 +2408,17 @@
             "type": "string",
             "description": "The BPNL of the legal entity owning the address."
           },
+          "isLegalAddress": {
+            "type": "boolean",
+            "description": "Indicates if the address is the legal address to a legal entity."
+          },
           "bpnSite": {
             "type": "string",
             "description": "The BPNS of the site the address belongs to."
+          },
+          "isMainAddress": {
+            "type": "boolean",
+            "description": "Indicates if the address is the main address to a site. This is where typically the main entrance or the reception is located, or where the mail is delivered to."
           },
           "createdAt": {
             "type": "string",
@@ -2150,25 +2433,37 @@
           "confidenceCriteria": {
             "$ref": "#/components/schemas/ConfidenceCriteriaDto"
           },
-          "isLegalAddress": {
-            "type": "boolean",
-            "description": "Indicates if the address is the legal address to a legal entity."
-          },
-          "isMainAddress": {
-            "type": "boolean",
-            "description": "Indicates if the address is the main address to a site. This is where typically the main entrance or the reception is located, or where the mail is delivered to."
+          "addressType": {
+            "type": "string",
+            "description": "Indicates the address type, the legal address to a legal entity or the main address to a site, an additional address, or both legal and site address.The site main address is where typically the main entrance or the reception is located, or where the mail is delivered to.",
+            "enum": [
+              "LegalAndSiteMainAddress",
+              "LegalAddress",
+              "SiteMainAddress",
+              "AdditionalAddress"
+            ]
           },
           "index": {
-            "type": "string"
+            "type": "string",
+            "description": "User defined index to conveniently match this entry to the corresponding entry in the response."
           }
         },
         "description": "Created business partner of type address. In general, an address is a collection of information to describe a physical location, using a street name with a house number and/or a post office box as reference. In addition, an address consists of several postal attributes, such as country, region (state), county, township, city, district, or postal code, which help deliver mail.In Catena-X, an address is a type of business partner representing the legal address of a legal entity, and/or the main address of a site, or any additional address of a legal entity or site (such as different gates).An address is owned by a legal entity. Thus, exactly one legal entity is assigned to an address. An address can belong to a site. Thus, one or no site is assigned to an address. An address is uniquely identified by the BPNA."
       },
       "AddressPartnerUpdateRequest": {
+        "required": [
+          "bpna",
+          "confidenceCriteria",
+          "identifiers",
+          "physicalPostalAddress",
+          "requestKey",
+          "states"
+        ],
         "type": "object",
         "properties": {
           "bpna": {
-            "type": "string"
+            "type": "string",
+            "description": "A BPNA represents and uniquely identifies an address, which can be the legal address of a legal entity, and/or the main address of a site, or any additional address of a legal entity or site (such as different gates). It is important to note that only the BPNL must be used to uniquely identify a legal entity. Even in the case that the BPNA represents the legal address of the legal entity, it shall not be used to uniquely identify the legal entity."
           },
           "name": {
             "type": "string",
@@ -2204,6 +2499,12 @@
         "description": "Request for updating a business partner record of type address. In general, an address is a collection of information to describe a physical location, using a street name with a house number and/or a post office box as reference. In addition, an address consists of several postal attributes, such as country, region (state), county, township, city, district, or postal code, which help deliver mail.In Catena-X, an address is a type of business partner representing the legal address of a legal entity, and/or the main address of a site, or any additional address of a legal entity or site (such as different gates).An address is owned by a legal entity. Thus, exactly one legal entity is assigned to an address. An address can belong to a site. Thus, one or no site is assigned to an address. An address is uniquely identified by the BPNA."
       },
       "AddressPartnerUpdateResponseWrapper": {
+        "required": [
+          "entities",
+          "entityCount",
+          "errorCount",
+          "errors"
+        ],
         "type": "object",
         "properties": {
           "entities": {
@@ -2229,7 +2530,41 @@
         },
         "description": "Holds information about successfully and failed entities after the creating/updating of several objects"
       },
+      "AddressSearchRequest": {
+        "required": [
+          "addressBpns",
+          "legalEntityBpns",
+          "siteBpns"
+        ],
+        "type": "object",
+        "properties": {
+          "addressBpns": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "legalEntityBpns": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "siteBpns": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
       "AddressStateDto": {
+        "required": [
+          "type"
+        ],
         "type": "object",
         "properties": {
           "validFrom": {
@@ -2254,6 +2589,9 @@
         "description": "An address state indicates if the address is active or inactive. This does not describe the relation between a sharing member and a business partner and whether they have active business, but it describes whether the business partner is still operating at that address."
       },
       "AddressStateVerboseDto": {
+        "required": [
+          "type"
+        ],
         "type": "object",
         "properties": {
           "validFrom": {
@@ -2595,10 +2933,22 @@
         "description": "An alternative postal address describes an alternative way of delivery for example if the goods are to be picked up somewhere else."
       },
       "AlternativePostalAddressVerboseDto": {
+        "required": [
+          "city",
+          "country",
+          "deliveryServiceNumber",
+          "deliveryServiceType"
+        ],
         "type": "object",
         "properties": {
           "geographicCoordinates": {
             "$ref": "#/components/schemas/GeoCoordinateDto"
+          },
+          "country": {
+            "$ref": "#/components/schemas/TypeKeyNameVerboseDtoCountryCode"
+          },
+          "administrativeAreaLevel1": {
+            "$ref": "#/components/schemas/RegionDto"
           },
           "postalCode": {
             "type": "string",
@@ -2624,29 +2974,35 @@
           "deliveryServiceNumber": {
             "type": "string",
             "description": "The number indicating the delivery service endpoint of the alternative postal address to which the delivery is to be delivered, such as a P.O. box number or a private bag number."
-          },
-          "country": {
-            "$ref": "#/components/schemas/TypeKeyNameVerboseDtoCountryCode"
-          },
-          "administrativeAreaLevel1": {
-            "$ref": "#/components/schemas/RegionDto"
           }
         },
         "description": "An alternative postal address describes an alternative way of delivery for example if the goods are to be picked up somewhere else."
       },
       "BpnIdentifierMappingDto": {
+        "required": [
+          "bpn",
+          "idValue"
+        ],
         "type": "object",
         "properties": {
           "idValue": {
-            "type": "string"
+            "type": "string",
+            "description": "Value of the identifier"
           },
           "bpn": {
-            "type": "string"
+            "type": "string",
+            "description": "Business Partner Number"
           }
         },
         "description": "Mapping of Business Partner Number to identifier value"
       },
       "ChangelogEntryVerboseDto": {
+        "required": [
+          "bpn",
+          "businessPartnerType",
+          "changelogType",
+          "timestamp"
+        ],
         "type": "object",
         "properties": {
           "bpn": {
@@ -2714,6 +3070,14 @@
         "description": "Request for searching and filtering the business partner changelog"
       },
       "ConfidenceCriteriaDto": {
+        "required": [
+          "checkedByExternalDataSource",
+          "confidenceLevel",
+          "lastConfidenceCheckAt",
+          "nextConfidenceCheckAt",
+          "numberOfBusinessPartners",
+          "sharedByOwner"
+        ],
         "type": "object",
         "properties": {
           "sharedByOwner": {
@@ -2741,6 +3105,11 @@
         }
       },
       "CountrySubdivisionDto": {
+        "required": [
+          "code",
+          "countryCode",
+          "name"
+        ],
         "type": "object",
         "properties": {
           "countryCode": {
@@ -3034,6 +3403,10 @@
       },
       "ErrorInfoAddressCreateError": {
         "title": "ErrorInfo",
+        "required": [
+          "errorCode",
+          "message"
+        ],
         "type": "object",
         "properties": {
           "errorCode": {
@@ -3049,16 +3422,22 @@
             ]
           },
           "message": {
-            "type": "string"
+            "type": "string",
+            "description": "Error message that explains the error"
           },
           "entityKey": {
-            "type": "string"
+            "type": "string",
+            "description": "Key of the entity that failed from the request object: index or BPN"
           }
         },
         "description": "Holds information about failures when creating or updating an entity"
       },
       "ErrorInfoAddressUpdateError": {
         "title": "ErrorInfo",
+        "required": [
+          "errorCode",
+          "message"
+        ],
         "type": "object",
         "properties": {
           "errorCode": {
@@ -3072,16 +3451,22 @@
             ]
           },
           "message": {
-            "type": "string"
+            "type": "string",
+            "description": "Error message that explains the error"
           },
           "entityKey": {
-            "type": "string"
+            "type": "string",
+            "description": "Key of the entity that failed from the request object: index or BPN"
           }
         },
         "description": "Holds information about failures when creating or updating an entity"
       },
       "ErrorInfoLegalEntityCreateError": {
         "title": "ErrorInfo",
+        "required": [
+          "errorCode",
+          "message"
+        ],
         "type": "object",
         "properties": {
           "errorCode": {
@@ -3093,20 +3478,27 @@
               "LegalEntityIdentifierNotFound",
               "LegalAddressRegionNotFound",
               "LegalAddressIdentifierNotFound",
-              "LegalAddressDuplicateIdentifier"
+              "LegalAddressDuplicateIdentifier",
+              "LegalEntityErrorMapping"
             ]
           },
           "message": {
-            "type": "string"
+            "type": "string",
+            "description": "Error message that explains the error"
           },
           "entityKey": {
-            "type": "string"
+            "type": "string",
+            "description": "Key of the entity that failed from the request object: index or BPN"
           }
         },
         "description": "Holds information about failures when creating or updating an entity"
       },
       "ErrorInfoLegalEntityUpdateError": {
         "title": "ErrorInfo",
+        "required": [
+          "errorCode",
+          "message"
+        ],
         "type": "object",
         "properties": {
           "errorCode": {
@@ -3119,20 +3511,27 @@
               "LegalEntityIdentifierNotFound",
               "LegalAddressRegionNotFound",
               "LegalAddressIdentifierNotFound",
-              "LegalAddressDuplicateIdentifier"
+              "LegalAddressDuplicateIdentifier",
+              "LegalEntityErrorMapping"
             ]
           },
           "message": {
-            "type": "string"
+            "type": "string",
+            "description": "Error message that explains the error"
           },
           "entityKey": {
-            "type": "string"
+            "type": "string",
+            "description": "Key of the entity that failed from the request object: index or BPN"
           }
         },
         "description": "Holds information about failures when creating or updating an entity"
       },
       "ErrorInfoSiteCreateError": {
         "title": "ErrorInfo",
+        "required": [
+          "errorCode",
+          "message"
+        ],
         "type": "object",
         "properties": {
           "errorCode": {
@@ -3146,16 +3545,22 @@
             ]
           },
           "message": {
-            "type": "string"
+            "type": "string",
+            "description": "Error message that explains the error"
           },
           "entityKey": {
-            "type": "string"
+            "type": "string",
+            "description": "Key of the entity that failed from the request object: index or BPN"
           }
         },
         "description": "Holds information about failures when creating or updating an entity"
       },
       "ErrorInfoSiteUpdateError": {
         "title": "ErrorInfo",
+        "required": [
+          "errorCode",
+          "message"
+        ],
         "type": "object",
         "properties": {
           "errorCode": {
@@ -3169,15 +3574,22 @@
             ]
           },
           "message": {
-            "type": "string"
+            "type": "string",
+            "description": "Error message that explains the error"
           },
           "entityKey": {
-            "type": "string"
+            "type": "string",
+            "description": "Key of the entity that failed from the request object: index or BPN"
           }
         },
         "description": "Holds information about failures when creating or updating an entity"
       },
       "FieldQualityRuleDto": {
+        "required": [
+          "country",
+          "fieldPath",
+          "qualityLevel"
+        ],
         "type": "object",
         "properties": {
           "fieldPath": {
@@ -3479,6 +3891,10 @@
         "description": "Rule for the quality level of an entity field "
       },
       "GeoCoordinateDto": {
+        "required": [
+          "latitude",
+          "longitude"
+        ],
         "type": "object",
         "properties": {
           "longitude": {
@@ -3500,6 +3916,9 @@
         "description": "The exact location of the physical postal address in latitude, longitude, and altitude."
       },
       "IdentifierTypeDetailDto": {
+        "required": [
+          "mandatory"
+        ],
         "type": "object",
         "properties": {
           "country": {
@@ -3788,6 +4207,12 @@
         "description": "Information for which countries an identifier type is valid and mandatory."
       },
       "IdentifierTypeDto": {
+        "required": [
+          "businessPartnerType",
+          "details",
+          "name",
+          "technicalKey"
+        ],
         "type": "object",
         "properties": {
           "technicalKey": {
@@ -3817,6 +4242,11 @@
         "description": "An identifier type defines the name or category of an identifier, such as the German Handelsregisternummer, VAT number, Global Location Number (GLN), etc. The identifier type is valid for a business partner type."
       },
       "IdentifiersSearchRequest": {
+        "required": [
+          "businessPartnerType",
+          "idType",
+          "idValues"
+        ],
         "type": "object",
         "properties": {
           "businessPartnerType": {
@@ -3828,18 +4258,27 @@
             ]
           },
           "idType": {
-            "type": "string"
+            "type": "string",
+            "description": "Technical key of the type to which the identifiers belongs to"
           },
           "idValues": {
             "type": "array",
+            "description": "Values of the identifiers",
             "items": {
-              "type": "string"
+              "type": "string",
+              "description": "Values of the identifiers"
             }
           }
         },
         "description": "Contains identifiers to search legal entities by"
       },
       "LegalAddressVerboseDto": {
+        "required": [
+          "bpnLegalEntity",
+          "createdAt",
+          "physicalPostalAddress",
+          "updatedAt"
+        ],
         "type": "object",
         "properties": {
           "physicalPostalAddress": {
@@ -3849,14 +4288,17 @@
             "$ref": "#/components/schemas/AlternativePostalAddressVerboseDto"
           },
           "bpnLegalEntity": {
-            "type": "string"
+            "type": "string",
+            "description": "BPN of the related legal entity"
           },
           "createdAt": {
             "type": "string",
+            "description": "The timestamp the business partner data was created",
             "format": "date-time"
           },
           "updatedAt": {
             "type": "string",
+            "description": "The timestamp the business partner data was last updated",
             "format": "date-time"
           }
         },
@@ -3890,6 +4332,9 @@
         "description": "A legal entity classification is an assignment of the legal entity to an industry. It does not necessarily have to be the only industry the company is active in (see large companies operating in different industries). Multiple assignments to several industries are possible per classification type."
       },
       "LegalEntityClassificationVerboseDto": {
+        "required": [
+          "type"
+        ],
         "type": "object",
         "properties": {
           "value": {
@@ -3907,6 +4352,10 @@
         "description": "A legal entity classification is an assignment of the legal entity to an industry. It does not necessarily have to be the only industry the company is active in (see large companies operating in different industries). Multiple assignments to several industries are possible per classification type."
       },
       "LegalEntityIdentifierDto": {
+        "required": [
+          "type",
+          "value"
+        ],
         "type": "object",
         "properties": {
           "value": {
@@ -3925,23 +4374,41 @@
         "description": "A legal entity identifier (uniquely) identifies the legal entity, such as the German Handelsregisternummer, a VAT number, etc."
       },
       "LegalEntityIdentifierVerboseDto": {
+        "required": [
+          "type",
+          "value"
+        ],
         "type": "object",
         "properties": {
           "value": {
             "type": "string",
             "description": "The value of the identifier like \"DE123465789\"."
           },
+          "type": {
+            "$ref": "#/components/schemas/TypeKeyNameVerboseDtoString"
+          },
           "issuingBody": {
             "type": "string",
             "description": "The name of the official register, where the identifier is registered. For example, a Handelsregisternummer in Germany is only valid with its corresponding Handelsregister."
-          },
-          "type": {
-            "$ref": "#/components/schemas/TypeKeyNameVerboseDtoString"
           }
         },
         "description": "A legal entity identifier (uniquely) identifies the legal entity, such as the German Handelsregisternummer, a VAT number, etc."
       },
       "LegalEntityMatchVerboseDto": {
+        "required": [
+          "bpnl",
+          "classifications",
+          "confidenceCriteria",
+          "createdAt",
+          "currentness",
+          "identifiers",
+          "legalAddress",
+          "legalName",
+          "relations",
+          "score",
+          "states",
+          "updatedAt"
+        ],
         "type": "object",
         "properties": {
           "score": {
@@ -3960,6 +4427,9 @@
           "legalShortName": {
             "type": "string",
             "description": "The abbreviated name of the legal entity."
+          },
+          "legalForm": {
+            "$ref": "#/components/schemas/LegalFormDto"
           },
           "identifiers": {
             "type": "array",
@@ -4007,9 +4477,6 @@
             "description": "The date when the data record has been last updated.",
             "format": "date-time"
           },
-          "legalForm": {
-            "$ref": "#/components/schemas/LegalFormDto"
-          },
           "legalAddress": {
             "$ref": "#/components/schemas/LogisticAddressVerboseDto"
           }
@@ -4017,6 +4484,14 @@
         "description": "Match with score for a business partner record of type legal entity. In general, a legal entity is a juridical person that has legal rights and duties related to contracts, agreements, and obligations. The term especially applies to any kind of organization (such as an enterprise or company, university, association, etc.) established under the law applicable to a country.In Catena-X, a legal entity is a type of business partner representing a legally registered organization with its official registration information, such as legal name (including legal form, if registered), legal address and tax number.A legal entity has exactly one legal address, but it is possible to specify additional addresses that a legal entity owns. Thus, at least one address is assigned to a legal entity. A legal entity can own sites. Thus, many or no sites are assigned to a legal entity. A legal entity is uniquely identified by the BPNL."
       },
       "LegalEntityPartnerCreateRequest": {
+        "required": [
+          "classifications",
+          "confidenceCriteria",
+          "identifiers",
+          "legalAddress",
+          "legalName",
+          "states"
+        ],
         "type": "object",
         "properties": {
           "legalName": {
@@ -4069,6 +4544,12 @@
         "description": "Request for creating new business partner record of type legal entity. In general, a legal entity is a juridical person that has legal rights and duties related to contracts, agreements, and obligations. The term especially applies to any kind of organization (such as an enterprise or company, university, association, etc.) established under the law applicable to a country.In Catena-X, a legal entity is a type of business partner representing a legally registered organization with its official registration information, such as legal name (including legal form, if registered), legal address and tax number.A legal entity has exactly one legal address, but it is possible to specify additional addresses that a legal entity owns. Thus, at least one address is assigned to a legal entity. A legal entity can own sites. Thus, many or no sites are assigned to a legal entity. A legal entity is uniquely identified by the BPNL."
       },
       "LegalEntityPartnerCreateResponseWrapper": {
+        "required": [
+          "entities",
+          "entityCount",
+          "errorCount",
+          "errors"
+        ],
         "type": "object",
         "properties": {
           "entities": {
@@ -4095,6 +4576,19 @@
         "description": "Holds information about successfully and failed entities after the creating/updating of several objects"
       },
       "LegalEntityPartnerCreateVerboseDto": {
+        "required": [
+          "bpnl",
+          "classifications",
+          "confidenceCriteria",
+          "createdAt",
+          "currentness",
+          "identifiers",
+          "legalAddress",
+          "legalName",
+          "relations",
+          "states",
+          "updatedAt"
+        ],
         "type": "object",
         "properties": {
           "bpnl": {
@@ -4108,6 +4602,9 @@
           "legalShortName": {
             "type": "string",
             "description": "The abbreviated name of the legal entity."
+          },
+          "legalForm": {
+            "$ref": "#/components/schemas/LegalFormDto"
           },
           "identifiers": {
             "type": "array",
@@ -4155,9 +4652,6 @@
             "description": "The date when the data record has been last updated.",
             "format": "date-time"
           },
-          "legalForm": {
-            "$ref": "#/components/schemas/LegalFormDto"
-          },
           "legalAddress": {
             "$ref": "#/components/schemas/LogisticAddressVerboseDto"
           },
@@ -4169,6 +4663,16 @@
         "description": "Created/updated business partner of type legal entity. In general, a legal entity is a juridical person that has legal rights and duties related to contracts, agreements, and obligations. The term especially applies to any kind of organization (such as an enterprise or company, university, association, etc.) established under the law applicable to a country.In Catena-X, a legal entity is a type of business partner representing a legally registered organization with its official registration information, such as legal name (including legal form, if registered), legal address and tax number.A legal entity has exactly one legal address, but it is possible to specify additional addresses that a legal entity owns. Thus, at least one address is assigned to a legal entity. A legal entity can own sites. Thus, many or no sites are assigned to a legal entity. A legal entity is uniquely identified by the BPNL."
       },
       "LegalEntityPartnerUpdateRequest": {
+        "required": [
+          "bpnl",
+          "classifications",
+          "confidenceCriteria",
+          "identifiers",
+          "legalAddress",
+          "legalName",
+          "requestKey",
+          "states"
+        ],
         "type": "object",
         "properties": {
           "bpnl": {
@@ -4221,6 +4725,12 @@
         "description": "Request for updating a business partner record of type legal entity. In general, a legal entity is a juridical person that has legal rights and duties related to contracts, agreements, and obligations. The term especially applies to any kind of organization (such as an enterprise or company, university, association, etc.) established under the law applicable to a country.In Catena-X, a legal entity is a type of business partner representing a legally registered organization with its official registration information, such as legal name (including legal form, if registered), legal address and tax number.A legal entity has exactly one legal address, but it is possible to specify additional addresses that a legal entity owns. Thus, at least one address is assigned to a legal entity. A legal entity can own sites. Thus, many or no sites are assigned to a legal entity. A legal entity is uniquely identified by the BPNL."
       },
       "LegalEntityPartnerUpdateResponseWrapper": {
+        "required": [
+          "entities",
+          "entityCount",
+          "errorCount",
+          "errors"
+        ],
         "type": "object",
         "properties": {
           "entities": {
@@ -4246,7 +4756,27 @@
         },
         "description": "Holds information about successfully and failed entities after the creating/updating of several objects"
       },
+      "LegalEntitySearchRequest": {
+        "required": [
+          "bpnLs"
+        ],
+        "type": "object",
+        "properties": {
+          "bpnLs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "legalName": {
+            "type": "string"
+          }
+        }
+      },
       "LegalEntityStateDto": {
+        "required": [
+          "type"
+        ],
         "type": "object",
         "properties": {
           "validFrom": {
@@ -4271,6 +4801,9 @@
         "description": "A legal entity state indicates if the legal entity is active or inactive. This does not describe the relation between a sharing member and a business partner and whether they have active business, but it describes whether the legal entity is still operating."
       },
       "LegalEntityStateVerboseDto": {
+        "required": [
+          "type"
+        ],
         "type": "object",
         "properties": {
           "validFrom": {
@@ -4290,6 +4823,19 @@
         "description": "A legal entity state indicates if the legal entity is active or inactive. This does not describe the relation between a sharing member and a business partner and whether they have active business, but it describes whether the legal entity is still operating."
       },
       "LegalEntityWithLegalAddressVerboseDto": {
+        "required": [
+          "bpnl",
+          "classifications",
+          "confidenceCriteria",
+          "createdAt",
+          "currentness",
+          "identifiers",
+          "legalAddress",
+          "legalName",
+          "relations",
+          "states",
+          "updatedAt"
+        ],
         "type": "object",
         "properties": {
           "bpnl": {
@@ -4303,6 +4849,9 @@
           "legalShortName": {
             "type": "string",
             "description": "The abbreviated name of the legal entity."
+          },
+          "legalForm": {
+            "$ref": "#/components/schemas/LegalFormDto"
           },
           "identifiers": {
             "type": "array",
@@ -4350,9 +4899,6 @@
             "description": "The date when the data record has been last updated.",
             "format": "date-time"
           },
-          "legalForm": {
-            "$ref": "#/components/schemas/LegalFormDto"
-          },
           "legalAddress": {
             "$ref": "#/components/schemas/LogisticAddressVerboseDto"
           }
@@ -4360,6 +4906,10 @@
         "description": "In general, a legal entity is a juridical person that has legal rights and duties related to contracts, agreements, and obligations. The term especially applies to any kind of organization (such as an enterprise or company, university, association, etc.) established under the law applicable to a country.In Catena-X, a legal entity is a type of business partner representing a legally registered organization with its official registration information, such as legal name (including legal form, if registered), legal address and tax number.A legal entity has exactly one legal address, but it is possible to specify additional addresses that a legal entity owns. Thus, at least one address is assigned to a legal entity. A legal entity can own sites. Thus, many or no sites are assigned to a legal entity. A legal entity is uniquely identified by the BPNL."
       },
       "LegalFormDto": {
+        "required": [
+          "name",
+          "technicalKey"
+        ],
         "type": "object",
         "properties": {
           "technicalKey": {
@@ -4378,21 +4928,34 @@
         "description": "A legal form is a mandatory corporate legal framework by which companies can conduct business, charitable or other permissible activities."
       },
       "LegalFormRequest": {
+        "required": [
+          "name",
+          "technicalKey"
+        ],
         "type": "object",
         "properties": {
           "technicalKey": {
-            "type": "string"
+            "type": "string",
+            "description": "Unique key to be used for reference"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "Full name of the legal form"
           },
           "abbreviation": {
-            "type": "string"
+            "type": "string",
+            "description": "Abbreviation of the legal form name"
           }
         },
         "description": "New legal form record to be referenced by business partners"
       },
       "LogisticAddressDto": {
+        "required": [
+          "confidenceCriteria",
+          "identifiers",
+          "physicalPostalAddress",
+          "states"
+        ],
         "type": "object",
         "properties": {
           "name": {
@@ -4426,6 +4989,17 @@
         "description": "In general, an address is a collection of information to describe a physical location, using a street name with a house number and/or a post office box as reference. In addition, an address consists of several postal attributes, such as country, region (state), county, township, city, district, or postal code, which help deliver mail.In Catena-X, an address is a type of business partner representing the legal address of a legal entity, and/or the main address of a site, or any additional address of a legal entity or site (such as different gates).An address is owned by a legal entity. Thus, exactly one legal entity is assigned to an address. An address can belong to a site. Thus, one or no site is assigned to an address. An address is uniquely identified by the BPNA."
       },
       "LogisticAddressVerboseDto": {
+        "required": [
+          "bpna",
+          "confidenceCriteria",
+          "createdAt",
+          "identifiers",
+          "isLegalAddress",
+          "isMainAddress",
+          "physicalPostalAddress",
+          "states",
+          "updatedAt"
+        ],
         "type": "object",
         "properties": {
           "bpna": {
@@ -4460,9 +5034,17 @@
             "type": "string",
             "description": "The BPNL of the legal entity owning the address."
           },
+          "isLegalAddress": {
+            "type": "boolean",
+            "description": "Indicates if the address is the legal address to a legal entity."
+          },
           "bpnSite": {
             "type": "string",
             "description": "The BPNS of the site the address belongs to."
+          },
+          "isMainAddress": {
+            "type": "boolean",
+            "description": "Indicates if the address is the main address to a site. This is where typically the main entrance or the reception is located, or where the mail is delivered to."
           },
           "createdAt": {
             "type": "string",
@@ -4477,18 +5059,26 @@
           "confidenceCriteria": {
             "$ref": "#/components/schemas/ConfidenceCriteriaDto"
           },
-          "isLegalAddress": {
-            "type": "boolean",
-            "description": "Indicates if the address is the legal address to a legal entity."
-          },
-          "isMainAddress": {
-            "type": "boolean",
-            "description": "Indicates if the address is the main address to a site. This is where typically the main entrance or the reception is located, or where the mail is delivered to."
+          "addressType": {
+            "type": "string",
+            "description": "Indicates the address type, the legal address to a legal entity or the main address to a site, an additional address, or both legal and site address.The site main address is where typically the main entrance or the reception is located, or where the mail is delivered to.",
+            "enum": [
+              "LegalAndSiteMainAddress",
+              "LegalAddress",
+              "SiteMainAddress",
+              "AdditionalAddress"
+            ]
           }
         },
         "description": "In general, an address is a collection of information to describe a physical location, using a street name with a house number and/or a post office box as reference. In addition, an address consists of several postal attributes, such as country, region (state), county, township, city, district, or postal code, which help deliver mail.In Catena-X, an address is a type of business partner representing the legal address of a legal entity, and/or the main address of a site, or any additional address of a legal entity or site (such as different gates).An address is owned by a legal entity. Thus, exactly one legal entity is assigned to an address. An address can belong to a site. Thus, one or no site is assigned to an address. An address is uniquely identified by the BPNA."
       },
       "MainAddressResponse": {
+        "required": [
+          "bpnSite",
+          "createdAt",
+          "physicalPostalAddress",
+          "updatedAt"
+        ],
         "type": "object",
         "properties": {
           "physicalPostalAddress": {
@@ -4498,20 +5088,30 @@
             "$ref": "#/components/schemas/AlternativePostalAddressVerboseDto"
           },
           "bpnSite": {
-            "type": "string"
+            "type": "string",
+            "description": "BPN of the related site"
           },
           "createdAt": {
             "type": "string",
+            "description": "The timestamp the business partner data was created",
             "format": "date-time"
           },
           "updatedAt": {
             "type": "string",
+            "description": "The timestamp the business partner data was last updated",
             "format": "date-time"
           }
         },
         "description": "Main address for site"
       },
       "PageDtoAddressMatchVerboseDto": {
+        "required": [
+          "content",
+          "contentSize",
+          "page",
+          "totalElements",
+          "totalPages"
+        ],
         "type": "object",
         "properties": {
           "totalElements": {
@@ -4545,6 +5145,13 @@
         "description": "Paginated collection of results"
       },
       "PageDtoChangelogEntryVerboseDto": {
+        "required": [
+          "content",
+          "contentSize",
+          "page",
+          "totalElements",
+          "totalPages"
+        ],
         "type": "object",
         "properties": {
           "totalElements": {
@@ -4578,6 +5185,13 @@
         "description": "Paginated collection of results"
       },
       "PageDtoCountrySubdivisionDto": {
+        "required": [
+          "content",
+          "contentSize",
+          "page",
+          "totalElements",
+          "totalPages"
+        ],
         "type": "object",
         "properties": {
           "totalElements": {
@@ -4611,6 +5225,13 @@
         "description": "Paginated collection of results"
       },
       "PageDtoIdentifierTypeDto": {
+        "required": [
+          "content",
+          "contentSize",
+          "page",
+          "totalElements",
+          "totalPages"
+        ],
         "type": "object",
         "properties": {
           "totalElements": {
@@ -4644,6 +5265,13 @@
         "description": "Paginated collection of results"
       },
       "PageDtoLegalEntityMatchVerboseDto": {
+        "required": [
+          "content",
+          "contentSize",
+          "page",
+          "totalElements",
+          "totalPages"
+        ],
         "type": "object",
         "properties": {
           "totalElements": {
@@ -4676,7 +5304,54 @@
         },
         "description": "Paginated collection of results"
       },
+      "PageDtoLegalEntityWithLegalAddressVerboseDto": {
+        "required": [
+          "content",
+          "contentSize",
+          "page",
+          "totalElements",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "totalElements": {
+            "type": "integer",
+            "description": "Total number of all results in all pages",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Total number pages",
+            "format": "int32"
+          },
+          "page": {
+            "type": "integer",
+            "description": "Current page number",
+            "format": "int32"
+          },
+          "contentSize": {
+            "type": "integer",
+            "description": "Number of results in the page",
+            "format": "int32"
+          },
+          "content": {
+            "type": "array",
+            "description": "Collection of results in the page",
+            "items": {
+              "$ref": "#/components/schemas/LegalEntityWithLegalAddressVerboseDto"
+            }
+          }
+        },
+        "description": "Paginated collection of results"
+      },
       "PageDtoLegalFormDto": {
+        "required": [
+          "content",
+          "contentSize",
+          "page",
+          "totalElements",
+          "totalPages"
+        ],
         "type": "object",
         "properties": {
           "totalElements": {
@@ -4710,6 +5385,13 @@
         "description": "Paginated collection of results"
       },
       "PageDtoLogisticAddressVerboseDto": {
+        "required": [
+          "content",
+          "contentSize",
+          "page",
+          "totalElements",
+          "totalPages"
+        ],
         "type": "object",
         "properties": {
           "totalElements": {
@@ -4743,6 +5425,13 @@
         "description": "Paginated collection of results"
       },
       "PageDtoRegionDto": {
+        "required": [
+          "content",
+          "contentSize",
+          "page",
+          "totalElements",
+          "totalPages"
+        ],
         "type": "object",
         "properties": {
           "totalElements": {
@@ -4776,6 +5465,13 @@
         "description": "Paginated collection of results"
       },
       "PageDtoSiteMatchVerboseDto": {
+        "required": [
+          "content",
+          "contentSize",
+          "page",
+          "totalElements",
+          "totalPages"
+        ],
         "type": "object",
         "properties": {
           "totalElements": {
@@ -4809,6 +5505,13 @@
         "description": "Paginated collection of results"
       },
       "PageDtoSiteVerboseDto": {
+        "required": [
+          "content",
+          "contentSize",
+          "page",
+          "totalElements",
+          "totalPages"
+        ],
         "type": "object",
         "properties": {
           "totalElements": {
@@ -4842,6 +5545,13 @@
         "description": "Paginated collection of results"
       },
       "PageDtoSiteWithMainAddressVerboseDto": {
+        "required": [
+          "content",
+          "contentSize",
+          "page",
+          "totalElements",
+          "totalPages"
+        ],
         "type": "object",
         "properties": {
           "totalElements": {
@@ -4875,6 +5585,10 @@
         "description": "Paginated collection of results"
       },
       "PhysicalPostalAddressDto": {
+        "required": [
+          "city",
+          "country"
+        ],
         "type": "object",
         "properties": {
           "geographicCoordinates": {
@@ -5209,10 +5923,20 @@
         "description": "A physical postal address describes the physical location of an office, warehouse, gate, etc."
       },
       "PhysicalPostalAddressVerboseDto": {
+        "required": [
+          "city",
+          "country"
+        ],
         "type": "object",
         "properties": {
           "geographicCoordinates": {
             "$ref": "#/components/schemas/GeoCoordinateDto"
+          },
+          "country": {
+            "$ref": "#/components/schemas/TypeKeyNameVerboseDtoCountryCode"
+          },
+          "administrativeAreaLevel1": {
+            "$ref": "#/components/schemas/RegionDto"
           },
           "administrativeAreaLevel2": {
             "type": "string",
@@ -5256,17 +5980,16 @@
           "door": {
             "type": "string",
             "description": "The number of a door in the building on the respective floor addressed by the physical postal address, synonyms: room, suite."
-          },
-          "country": {
-            "$ref": "#/components/schemas/TypeKeyNameVerboseDtoCountryCode"
-          },
-          "administrativeAreaLevel1": {
-            "$ref": "#/components/schemas/RegionDto"
           }
         },
         "description": "A physical postal address describes the physical location of an office, warehouse, gate, etc."
       },
       "RegionDto": {
+        "required": [
+          "countryCode",
+          "regionCode",
+          "regionName"
+        ],
         "type": "object",
         "properties": {
           "countryCode": {
@@ -5559,6 +6282,11 @@
         "description": "Region within a country"
       },
       "RelationVerboseDto": {
+        "required": [
+          "endBpnl",
+          "startBpnl",
+          "type"
+        ],
         "type": "object",
         "properties": {
           "type": {
@@ -5586,23 +6314,35 @@
         "description": "Directed relation between two business partners"
       },
       "SiteBpnSearchRequest": {
+        "required": [
+          "legalEntities",
+          "sites"
+        ],
         "type": "object",
         "properties": {
           "legalEntities": {
             "type": "array",
+            "description": "Filter sites that should belong to legal entities (specified by BPNL)",
             "items": {
-              "type": "string"
+              "type": "string",
+              "description": "Filter sites that should belong to legal entities (specified by BPNL)"
             }
           },
           "sites": {
             "type": "array",
+            "description": "Filter sites by BPNS of sites",
             "items": {
-              "type": "string"
+              "type": "string",
+              "description": "Filter sites by BPNS of sites"
             }
           }
         }
       },
       "SiteMatchVerboseDto": {
+        "required": [
+          "mainAddress",
+          "site"
+        ],
         "type": "object",
         "properties": {
           "mainAddress": {
@@ -5615,6 +6355,13 @@
         "description": "Match for a business partner record of type site. In general, a site is a delimited geographical area in which an organization (such as an enterprise or company, university, association, etc.) conducts business. In Catena-X, a site is a type of business partner representing a physical location or area owned by a legal entity, where a production plant, a warehouse, or an office building is located. A site is owned by a legal entity. Thus, exactly one legal entity is assigned to a site. A site has exactly one main address, but it is possible to specify additional addresses (such as different gates), that belong to a site. Thus, at least one address is assigned to a site. A site can only be uploaded and modified by the owner (the legal entity), because only the owner knows which addresses belong to which site. A site is uniquely identified by the BPNS."
       },
       "SitePartnerCreateRequest": {
+        "required": [
+          "bpnlParent",
+          "confidenceCriteria",
+          "mainAddress",
+          "name",
+          "states"
+        ],
         "type": "object",
         "properties": {
           "name": {
@@ -5635,10 +6382,12 @@
             "$ref": "#/components/schemas/ConfidenceCriteriaDto"
           },
           "bpnlParent": {
-            "type": "string"
+            "type": "string",
+            "description": "The BPNL of the legal entity owning the site."
           },
           "index": {
-            "type": "string"
+            "type": "string",
+            "description": "User defined index to conveniently match this entry to the corresponding entry in the response."
           },
           "requestKey": {
             "type": "string"
@@ -5647,6 +6396,12 @@
         "description": "Request for creating new business partner record of type site. In general, a site is a delimited geographical area in which an organization (such as an enterprise or company, university, association, etc.) conducts business. In Catena-X, a site is a type of business partner representing a physical location or area owned by a legal entity, where a production plant, a warehouse, or an office building is located. A site is owned by a legal entity. Thus, exactly one legal entity is assigned to a site. A site has exactly one main address, but it is possible to specify additional addresses (such as different gates), that belong to a site. Thus, at least one address is assigned to a site. A site can only be uploaded and modified by the owner (the legal entity), because only the owner knows which addresses belong to which site. A site is uniquely identified by the BPNS."
       },
       "SitePartnerCreateResponseWrapper": {
+        "required": [
+          "entities",
+          "entityCount",
+          "errorCount",
+          "errors"
+        ],
         "type": "object",
         "properties": {
           "entities": {
@@ -5673,6 +6428,16 @@
         "description": "Holds information about successfully and failed entities after the creating/updating of several objects"
       },
       "SitePartnerCreateVerboseDto": {
+        "required": [
+          "bpnLegalEntity",
+          "bpns",
+          "confidenceCriteria",
+          "createdAt",
+          "mainAddress",
+          "name",
+          "states",
+          "updatedAt"
+        ],
         "type": "object",
         "properties": {
           "bpns": {
@@ -5718,10 +6483,19 @@
         "description": "Created/updated business partner of type site. In general, a site is a delimited geographical area in which an organization (such as an enterprise or company, university, association, etc.) conducts business. In Catena-X, a site is a type of business partner representing a physical location or area owned by a legal entity, where a production plant, a warehouse, or an office building is located. A site is owned by a legal entity. Thus, exactly one legal entity is assigned to a site. A site has exactly one main address, but it is possible to specify additional addresses (such as different gates), that belong to a site. Thus, at least one address is assigned to a site. A site can only be uploaded and modified by the owner (the legal entity), because only the owner knows which addresses belong to which site. A site is uniquely identified by the BPNS."
       },
       "SitePartnerUpdateRequest": {
+        "required": [
+          "bpns",
+          "confidenceCriteria",
+          "mainAddress",
+          "name",
+          "requestKey",
+          "states"
+        ],
         "type": "object",
         "properties": {
           "bpns": {
-            "type": "string"
+            "type": "string",
+            "description": "A BPNS represents and uniquely identifies a site, which is where for example a production plant, a warehouse, or an office building is located."
           },
           "name": {
             "type": "string",
@@ -5747,6 +6521,12 @@
         "description": "Request for updating a business partner record of type site. In general, a site is a delimited geographical area in which an organization (such as an enterprise or company, university, association, etc.) conducts business. In Catena-X, a site is a type of business partner representing a physical location or area owned by a legal entity, where a production plant, a warehouse, or an office building is located. A site is owned by a legal entity. Thus, exactly one legal entity is assigned to a site. A site has exactly one main address, but it is possible to specify additional addresses (such as different gates), that belong to a site. Thus, at least one address is assigned to a site. A site can only be uploaded and modified by the owner (the legal entity), because only the owner knows which addresses belong to which site. A site is uniquely identified by the BPNS."
       },
       "SitePartnerUpdateResponseWrapper": {
+        "required": [
+          "entities",
+          "entityCount",
+          "errorCount",
+          "errors"
+        ],
         "type": "object",
         "properties": {
           "entities": {
@@ -5772,7 +6552,34 @@
         },
         "description": "Holds information about successfully and failed entities after the creating/updating of several objects"
       },
+      "SiteSearchRequest": {
+        "required": [
+          "legalEntityBpns",
+          "siteBpns"
+        ],
+        "type": "object",
+        "properties": {
+          "siteBpns": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "legalEntityBpns": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
       "SiteStateDto": {
+        "required": [
+          "type"
+        ],
         "type": "object",
         "properties": {
           "validFrom": {
@@ -5797,6 +6604,9 @@
         "description": "A site state indicates if the site is active or inactive. This does not describe the relation between a sharing member and a business partner and whether they have active business, but it describes whether the site is still operating."
       },
       "SiteStateVerboseDto": {
+        "required": [
+          "type"
+        ],
         "type": "object",
         "properties": {
           "validFrom": {
@@ -5816,6 +6626,15 @@
         "description": "A site state indicates if the site is active or inactive. This does not describe the relation between a sharing member and a business partner and whether they have active business, but it describes whether the site is still operating."
       },
       "SiteVerboseDto": {
+        "required": [
+          "bpnLegalEntity",
+          "bpns",
+          "confidenceCriteria",
+          "createdAt",
+          "name",
+          "states",
+          "updatedAt"
+        ],
         "type": "object",
         "properties": {
           "bpns": {
@@ -5854,6 +6673,16 @@
         "description": "In general, a site is a delimited geographical area in which an organization (such as an enterprise or company, university, association, etc.) conducts business. In Catena-X, a site is a type of business partner representing a physical location or area owned by a legal entity, where a production plant, a warehouse, or an office building is located. A site is owned by a legal entity. Thus, exactly one legal entity is assigned to a site. A site has exactly one main address, but it is possible to specify additional addresses (such as different gates), that belong to a site. Thus, at least one address is assigned to a site. A site can only be uploaded and modified by the owner (the legal entity), because only the owner knows which addresses belong to which site. A site is uniquely identified by the BPNS."
       },
       "SiteWithMainAddressVerboseDto": {
+        "required": [
+          "bpnLegalEntity",
+          "bpns",
+          "confidenceCriteria",
+          "createdAt",
+          "mainAddress",
+          "name",
+          "states",
+          "updatedAt"
+        ],
         "type": "object",
         "properties": {
           "bpns": {
@@ -5936,6 +6765,10 @@
         "description": "The street of the physical postal address, synonyms: road, avenue, lane, boulevard, highway"
       },
       "TypeKeyNameVerboseDtoBusinessStateType": {
+        "required": [
+          "name",
+          "technicalKey"
+        ],
         "type": "object",
         "properties": {
           "technicalKey": {
@@ -5954,6 +6787,10 @@
         "description": "Named type uniquely identified by its technical key"
       },
       "TypeKeyNameVerboseDtoClassificationType": {
+        "required": [
+          "name",
+          "technicalKey"
+        ],
         "type": "object",
         "properties": {
           "technicalKey": {
@@ -5974,6 +6811,10 @@
         "description": "Named type uniquely identified by its technical key"
       },
       "TypeKeyNameVerboseDtoCountryCode": {
+        "required": [
+          "name",
+          "technicalKey"
+        ],
         "type": "object",
         "properties": {
           "technicalKey": {
@@ -6262,6 +7103,10 @@
         "description": "Named type uniquely identified by its technical key"
       },
       "TypeKeyNameVerboseDtoRelationType": {
+        "required": [
+          "name",
+          "technicalKey"
+        ],
         "type": "object",
         "properties": {
           "technicalKey": {
@@ -6280,6 +7125,10 @@
         "description": "Named type uniquely identified by its technical key"
       },
       "TypeKeyNameVerboseDtoString": {
+        "required": [
+          "name",
+          "technicalKey"
+        ],
         "type": "object",
         "properties": {
           "technicalKey": {
