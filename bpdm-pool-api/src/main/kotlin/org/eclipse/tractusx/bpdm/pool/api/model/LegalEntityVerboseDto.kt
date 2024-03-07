@@ -45,7 +45,6 @@ data class LegalEntityVerboseDto(
 
     override val identifiers: Collection<LegalEntityIdentifierVerboseDto> = emptyList(),
     override val states: Collection<LegalEntityStateVerboseDto> = emptyList(),
-    override val classifications: Collection<LegalEntityClassificationVerboseDto> = emptyList(),
 
     @get:ArraySchema(arraySchema = Schema(description = LegalEntityDescription.relations))
     val relations: Collection<RelationVerboseDto> = emptyList(),

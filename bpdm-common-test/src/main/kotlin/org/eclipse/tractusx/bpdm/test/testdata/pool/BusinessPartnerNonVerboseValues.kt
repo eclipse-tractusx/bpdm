@@ -244,7 +244,6 @@ object BusinessPartnerNonVerboseValues {
             legalForm = BusinessPartnerVerboseValues.legalForm1.technicalKey,
             identifiers = listOf(identifier1),
             states = listOf(leStatus1),
-            classifications = listOf(classification1, classification2),
             confidenceCriteria = BusinessPartnerVerboseValues.legalEntity1.legalEntity.confidenceCriteria
         ),
         legalAddress = logisticAddress1,
@@ -258,7 +257,6 @@ object BusinessPartnerNonVerboseValues {
             legalForm = BusinessPartnerVerboseValues.legalForm2.technicalKey,
             identifiers = listOf(identifier2),
             states = listOf(leStatus2),
-            classifications = listOf(classification3, classification4),
             confidenceCriteria = BusinessPartnerVerboseValues.legalEntity2.legalEntity.confidenceCriteria
         ),
         legalAddress = logisticAddress2,
@@ -272,7 +270,6 @@ object BusinessPartnerNonVerboseValues {
             legalForm = BusinessPartnerVerboseValues.legalForm3.technicalKey,
             identifiers = listOf(identifier3),
             states = listOf(leStatus3),
-            classifications = listOf(classification5),
             confidenceCriteria = BusinessPartnerVerboseValues.legalEntity3.legalEntity.confidenceCriteria
         ),
         legalAddress = logisticAddress3,
@@ -286,7 +283,6 @@ object BusinessPartnerNonVerboseValues {
             legalForm = BusinessPartnerVerboseValues.legalForm1.technicalKey,
             identifiers = listOf(identifier1, identifier2),
             states = listOf(leStatus1),
-            classifications = listOf(classification1, classification2),
             confidenceCriteria = BusinessPartnerVerboseValues.legalEntity1.legalEntity.confidenceCriteria
         ),
         legalAddress = logisticAddress1,

@@ -209,7 +209,6 @@ fun LegalEntityGateInputRequest.toLegalEntity(datatype: StageType): LegalEntityD
     )
 
     legalEntity.states.addAll(this.legalEntity.states.map { toEntityState(it, legalEntity) })
-    legalEntity.classifications.addAll(this.legalEntity.classifications.map { toEntityClassification(it, legalEntity) })
     legalEntity.nameParts.addAll(this.legalEntity.legalNameParts.map { toNameParts(it, null, null, legalEntity) })
     legalEntity.roles.addAll(this.legalEntity.roles.distinct().map { toRoles(it, legalEntity, null, null) })
     legalEntity.identifiers.addAll(this.legalEntity.identifiers.map { toEntityIdentifiers(it, legalEntity) })
@@ -236,7 +235,6 @@ fun LegalEntityGateOutputRequest.toLegalEntity(datatype: StageType): LegalEntity
     )
 
     legalEntity.states.addAll(this.legalEntity.states.map { toEntityState(it, legalEntity) })
-    legalEntity.classifications.addAll(this.legalEntity.classifications.map { toEntityClassification(it, legalEntity) })
     legalEntity.nameParts.addAll(this.legalEntity.legalNameParts.map { toNameParts(it, null, null, legalEntity) })
     legalEntity.roles.addAll(this.legalEntity.roles.distinct().map { toRoles(it, legalEntity, null, null) })
     legalEntity.identifiers.addAll(this.legalEntity.identifiers.map { toEntityIdentifiers(it, legalEntity) })
@@ -361,7 +359,6 @@ fun LegalEntityDb.toLegalEntityDto(): LegalEntityDto {
         legalForm = legalForm,
         legalShortName = shortName,
         states = mapToLegalEntityStateDto(states),
-        classifications = mapToLegalEntityClassificationsDto(classifications),
         identifiers = mapToLegalEntityIdentifiersDto(identifiers),
         roles = roles.map { it.roleName },
     )

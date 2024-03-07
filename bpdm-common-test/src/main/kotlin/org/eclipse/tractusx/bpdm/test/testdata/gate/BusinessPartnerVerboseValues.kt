@@ -195,7 +195,6 @@ object BusinessPartnerVerboseValues {
         legalShortName = "short1",
         legalForm = "LF1",
         states = listOf(legalEntityBusinessStatus1),
-        classifications = listOf(bpClassification1Dto, bpClassification2Dto),
     )
 
     val legalEntity2 = LegalEntityDto(
@@ -203,7 +202,6 @@ object BusinessPartnerVerboseValues {
         legalShortName = "short3",
         legalForm = "LF2",
         states = listOf(legalEntityBusinessStatus2),
-        classifications = listOf(bpClassification3Dto, bpClassification4Dto),
     )
 
     val legalEntity3 = LegalEntityDto(
@@ -211,7 +209,6 @@ object BusinessPartnerVerboseValues {
         legalShortName = "short1",
         legalForm = "LF1",
         states = listOf(legalEntityBusinessStatus1),
-        classifications = listOf(bpClassification1Dto, bpClassification2Dto),
     )
 
     val siteBusinessStatus1 = SiteStateDto(
@@ -319,8 +316,7 @@ object BusinessPartnerVerboseValues {
             legalEntityBpn = "BPNL0000000000XY",
             shortName = "short1",
             legalName = "Limited Liability Company Name",
-            legalForm = "Limited Liability Company",
-            classifications = listOf(bpClassification1, bpClassification2, bpClassification3)
+            legalForm = "Limited Liability Company"
         ),
         site = SiteRepresentationInputDto(
             siteBpn = null,
@@ -620,10 +616,7 @@ object BusinessPartnerVerboseValues {
             legalEntityBpn = "BPNL0000000002XY",
             shortName = "short3",
             legalName = "姓名测试",
-            legalForm = "股份有限",
-            classifications = listOf(
-                bpClassificationChina, bpClassification3, bpClassificationChina
-            )    // duplicate, but they are eliminated
+            legalForm = "股份有限"
         ),
         site = SiteRepresentationInputDto(
             siteBpn = "BPNS0000000003X9",
@@ -652,9 +645,6 @@ object BusinessPartnerVerboseValues {
             shortName = "Random Short Name",
             legalName = "Random Name Value",
             legalForm = "Random Form Value",
-            classifications = listOf(
-                bpClassification1, bpClassification3
-            )
         ),
         site = SiteRepresentationInputDto(
             siteBpn = "BPNS0000000003X9",
@@ -682,10 +672,7 @@ object BusinessPartnerVerboseValues {
             legalEntityBpn = "BPNL0000000002XY",
             shortName = "Random Short Name",
             legalName = "Random Name Value",
-            legalForm = "Random Form Value",
-            classifications = listOf(
-                bpClassification1, bpClassification3
-            )
+            legalForm = "Random Form Value"
         ),
         site = SiteRepresentationInputDto(
             siteBpn = "BPNS0000000003X9",
@@ -736,18 +723,6 @@ object BusinessPartnerVerboseValues {
             shortName = "shot-name-cleaned",
             legalName = "legal-name-cleaned",
             legalForm = "legal-form-cleaned",
-            classifications = listOf(
-                BusinessPartnerClassificationDto(
-                    type = ClassificationType.NACE,
-                    code = "code-1-cleaned",
-                    value = "value-1-cleaned"
-                ),
-                BusinessPartnerClassificationDto(
-                    type = ClassificationType.NAF,
-                    code = "code-2-cleaned",
-                    value = "value-2-cleaned"
-                ),
-            ),
             confidenceCriteria = ConfidenceCriteriaDto(
                 sharedByOwner = true,
                 checkedByExternalDataSource = true,

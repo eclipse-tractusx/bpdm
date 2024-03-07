@@ -55,7 +55,6 @@ data class LegalEntityRepresentationInputDto(
     override val legalName: String? = null,
     override val shortName: String? = null,
     override val legalForm: String? = null,
-    override val classifications: Collection<BusinessPartnerClassificationDto> = emptyList()
 ) : IBaseLegalEntityRepresentation
 
 data class SiteRepresentationInputDto(

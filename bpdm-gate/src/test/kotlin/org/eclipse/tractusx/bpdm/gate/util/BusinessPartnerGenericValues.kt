@@ -24,7 +24,6 @@ import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
-import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.orchestrator.api.model.*
 import java.time.LocalDateTime
@@ -68,18 +67,6 @@ object BusinessPartnerGenericValues {
             legalName = "legal-name-cleaned",
             shortName = "shot-name-cleaned",
             legalForm = "legal-form-cleaned",
-            classifications = listOf(
-                BusinessPartnerClassificationDto(
-                    type = ClassificationType.NACE,
-                    code = "code-1-cleaned",
-                    value = "value-1-cleaned"
-                ),
-                BusinessPartnerClassificationDto(
-                    type = ClassificationType.NAF,
-                    code = "code-2-cleaned",
-                    value = "value-2-cleaned"
-                ),
-            ),
             confidenceCriteria = ConfidenceCriteriaDto(
                 sharedByOwner = true,
                 checkedByExternalDataSource = true,

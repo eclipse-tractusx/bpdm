@@ -43,7 +43,6 @@ fun compareLegalEntity(verboseRequest: LegalEntityWithLegalAddressVerboseDto, le
     Assertions.assertThat(verboseLegalEntity.legalShortName).isEqualTo(legalEntity?.legalShortName)
     Assertions.assertThat(verboseLegalEntity.legalFormVerbose?.technicalKey).isEqualTo(legalEntity?.legalForm)
     compareStates(verboseLegalEntity.states, legalEntity?.states)
-    compareClassifications(verboseLegalEntity.classifications, legalEntity?.classifications)
     compareIdentifiers(verboseLegalEntity.identifiers, legalEntity?.identifiers)
 
     val verboseLegalAddress = verboseRequest.legalAddress

@@ -55,7 +55,6 @@ class OrchestratorMappings(
         legalName = entity.legalName,
         shortName = entity.shortName,
         legalForm = entity.legalForm,
-        classifications = entity.classifications.map { toClassificationDto(it) },
         confidenceCriteria = entity.legalEntityConfidence?.let { toConfidenceCriteria(it) }
     )
 
@@ -170,7 +169,6 @@ class OrchestratorMappings(
         addressName = dto.address.name,
         legalForm = dto.legalEntity.legalForm,
         states = dto.states.mapNotNull { toState(it) }.toSortedSet(),
-        classifications = dto.legalEntity.classifications.map { toClassification(it) }.toSortedSet(),
         roles = dto.roles.toSortedSet(),
         postalAddress = toPostalAddress(dto.address),
         bpnL = dto.legalEntity.legalEntityBpn,

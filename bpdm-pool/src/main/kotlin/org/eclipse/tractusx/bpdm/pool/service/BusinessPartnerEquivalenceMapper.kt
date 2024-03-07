@@ -44,7 +44,6 @@ class BusinessPartnerEquivalenceMapper {
                 legalShortName = legalName.shortName,
                 identifiers = identifiers.map { IdentifierEquivalenceDto(it.value, it.type.technicalKey) }.toSortedSet(compareBy { it.value }),
                 states = states.map { StateEquivalenceDto(it.validFrom, it.validTo, it.type) }.toSortedSet(compareBy { it.validFrom }),
-                classifications = classifications.map { ClassificationEquivalenceDto(it.code, it.value, it.type) }.toSortedSet(compareBy { it.value }),
                 confidenceCriteria = toEquivalenceDto(confidenceCriteria),
                 legalAddress = toEquivalenceDto(legalEntity.legalAddress)
             )
@@ -144,7 +143,6 @@ class BusinessPartnerEquivalenceMapper {
         override val legalShortName: String?,
         override val identifiers: SortedSet<IdentifierEquivalenceDto>,
         override val states: SortedSet<StateEquivalenceDto>,
-        override val classifications: SortedSet<ClassificationEquivalenceDto>,
         override val confidenceCriteria: ConfidenceCriteriaEquivalenceDto?,
         val legalAddress: LogisticAddressEquivalenceDto?
     ) : IBaseLegalEntityDto

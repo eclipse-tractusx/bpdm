@@ -20,7 +20,10 @@
 package org.eclipse.tractusx.bpdm.cleaning.testdata
 
 import com.neovisionaries.i18n.CountryCode
-import org.eclipse.tractusx.bpdm.cleaning.service.*
+import org.eclipse.tractusx.bpdm.cleaning.service.dummyConfidenceCriteria
+import org.eclipse.tractusx.bpdm.cleaning.service.toLegalEntityIdentifierDto
+import org.eclipse.tractusx.bpdm.cleaning.service.toLegalEntityState
+import org.eclipse.tractusx.bpdm.cleaning.service.toSiteState
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
@@ -106,7 +109,6 @@ object CommonValues {
         legalEntity = LegalEntityRepresentation(
             shortName = shortName,
             legalForm = legalForm,
-            classifications = classifications,
             confidenceCriteria = dummyConfidenceCriteria
         ),
         site = SiteRepresentation(name = siteName),
@@ -181,7 +183,6 @@ object CommonValues {
         identifiers = identifiers.mapNotNull { it.toLegalEntityIdentifierDto() },
         legalForm = legalForm,
         states = states.mapNotNull { it.toLegalEntityState() },
-        classifications = classifications.map { it.toLegalEntityClassificationDto() },
         confidenceCriteria = dummyConfidenceCriteria
     )
 

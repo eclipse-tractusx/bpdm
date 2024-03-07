@@ -1294,10 +1294,6 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
                 legalEntityState(bpnLReference.referenceValue, 1L, BusinessStateType.ACTIVE),
                 legalEntityState(bpnLReference.referenceValue, 2L, BusinessStateType.INACTIVE)
             ),
-            classifications = listOf(
-                classificationDto(bpnLReference.referenceValue, 1L, ClassificationType.NACE),
-                classificationDto(bpnLReference.referenceValue, 2L, ClassificationType.NAICS)
-            ),
             legalAddress = fullLogisticAddressDto(bpnAReference),
             confidenceCriteria = fullConfidenceCriteria()
         )
@@ -1472,7 +1468,6 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         assertThat(verboseLegalEntity.legalShortName).isEqualTo(legalEntity?.legalShortName)
         assertThat(verboseLegalEntity.legalFormVerbose?.technicalKey).isEqualTo(legalEntity?.legalForm)
         compareStates(verboseLegalEntity.states, legalEntity?.states)
-        compareClassifications(verboseLegalEntity.classifications, legalEntity?.classifications)
         compareIdentifiers(verboseLegalEntity.identifiers, legalEntity?.identifiers)
 
         val verboseLegalAddress = verboseRequest.legalAddress

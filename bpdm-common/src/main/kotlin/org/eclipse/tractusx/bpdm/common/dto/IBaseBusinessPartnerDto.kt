@@ -60,9 +60,6 @@ interface IBaseLegalEntityRepresentation {
 
     @get:Schema(description = "The legal form of the legal entity, on which the business partner provides a view.")
     val legalForm: String?
-
-    @get:ArraySchema(arraySchema = Schema(description = "The list of classifications of the business partner, such as a specific industry. Sorted and duplicates removed by the service."))
-    val classifications: Collection<IBusinessPartnerClassificationDto>
 }
 
 @Schema(description = "A site representation adds context information to the site, on which the business partner provides a view. Additionally, it contains some of the information from the assigned site.")

@@ -307,7 +307,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
             states = request.states.toSortedSet(stateDtoComparator),
             roles = request.roles.toSortedSet(),
             isOwnCompanyData = request.isOwnCompanyData,
-            legalEntity = request.legalEntity.copy(classifications = request.legalEntity.classifications.toSortedSet(classificationDtoComparator)),
+            legalEntity = request.legalEntity,
             site = request.site,
             address = request.address,
             createdAt = Instant.now(),
