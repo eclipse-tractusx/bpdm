@@ -64,10 +64,6 @@ fun fullValidLegalEntity(bpnLReference: BpnReferenceDto, bpnAReference: BpnRefer
             legalEntityState(bpnLReference.referenceValue, 1L, BusinessStateType.ACTIVE),
             legalEntityState(bpnLReference.referenceValue, 2L, BusinessStateType.INACTIVE)
         ),
-        classifications = listOf(
-            classificationDto(bpnLReference.referenceValue, 1L, ClassificationType.NACE),
-            classificationDto(bpnLReference.referenceValue, 2L, ClassificationType.NAICS)
-        ),
         legalAddress = fullLogisticAddressDto(bpnAReference)
     )
 }

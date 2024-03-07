@@ -606,7 +606,6 @@ class BusinessPartnerBuildService(
 
             legalEntity.identifiers.replace(legalEntityDto.identifiers.map { toLegalEntityIdentifier(it, metadataMap.idTypes, legalEntity) })
             legalEntity.states.replace(legalEntityDto.states.map { toLegalEntityState(it, legalEntity) })
-            legalEntity.classifications.replace(legalEntityDto.classifications.map { toLegalEntityClassification(it, legalEntity) }.toSet())
             legalEntity.confidenceCriteria = createConfidenceCriteria(legalEntityDto.confidenceCriteria)
         }
 

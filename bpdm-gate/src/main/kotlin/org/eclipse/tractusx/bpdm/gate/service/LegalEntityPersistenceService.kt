@@ -104,7 +104,6 @@ class LegalEntityPersistenceService(
         legalEntity.shortName = legalEntityDto.legalShortName
 
         legalEntity.states.replace(legalEntityDto.states.map { toEntityState(it, legalEntity) })
-        legalEntity.classifications.replace(legalEntityDto.classifications.map { toEntityClassification(it, legalEntity) })
         legalEntity.nameParts.replace(legalEntityDto.legalNameParts.map { toNameParts(it, null, null, legalEntity) })
         legalEntity.identifiers.replace(legalEntityDto.identifiers.map { toEntityIdentifiers(it, legalEntity) })
         legalEntity.roles.replace(legalEntityDto.roles.distinct().map { toRoles(it, legalEntity, null, null) })
@@ -187,7 +186,6 @@ class LegalEntityPersistenceService(
         legalEntity.shortName = legalEntityDto.legalShortName
 
         legalEntity.states.replace(legalEntityDto.states.map { toEntityState(it, legalEntity) })
-        legalEntity.classifications.replace(legalEntityDto.classifications.map { toEntityClassification(it, legalEntity) })
         legalEntity.nameParts.replace(legalEntityDto.legalNameParts.map { toNameParts(it, null, null, legalEntity) })
         legalEntity.identifiers.replace(legalEntityDto.identifiers.map { toEntityIdentifiers(it, legalEntity) })
         legalEntity.roles.replace(legalEntityDto.roles.distinct().map { toRoles(it, legalEntity, null, null) })

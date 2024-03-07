@@ -23,7 +23,6 @@ import jakarta.transaction.Transactional
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto
 import org.eclipse.tractusx.bpdm.pool.api.model.AddressStateDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityClassificationDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityIdentifierDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityStateDto
 import org.eclipse.tractusx.bpdm.pool.api.model.SiteStateDto
@@ -331,7 +330,6 @@ class TaskStepBuildService(
                 legalForm = legalForm,
                 identifiers = identifiers.map { LegalEntityIdentifierDto(it.value, it.type, it.issuingBody) },
                 states = states.map { LegalEntityStateDto(it.validFrom, it.validTo, it.type) },
-                classifications = classifications.map { LegalEntityClassificationDto(it.type, it.code, it.value) },
                 confidenceCriteria = confidenceCriteria?.let { toPoolDto(it) }
                     ?: throw BpdmValidationException(CleaningError.LEGAL_ENTITY_CONFIDENCE_CRITERIA_MISSING.message),
             )

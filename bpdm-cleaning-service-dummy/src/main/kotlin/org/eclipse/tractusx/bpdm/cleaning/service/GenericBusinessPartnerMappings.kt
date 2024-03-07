@@ -43,7 +43,6 @@ fun BusinessPartnerGenericDto.toLegalEntityDto(bpnReferenceDto: BpnReferenceDto,
         identifiers = identifiers.mapNotNull { it.toLegalEntityIdentifierDto() },
         legalForm = legalEntity.legalForm,
         states = states.mapNotNull { it.toLegalEntityState() },
-        classifications = legalEntity.classifications.map { it.toLegalEntityClassificationDto() },
         legalAddress = legalAddress,
         confidenceCriteria = dummyConfidenceCriteria
     )

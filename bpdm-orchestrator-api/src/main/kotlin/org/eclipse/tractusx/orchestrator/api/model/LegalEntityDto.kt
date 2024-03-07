@@ -42,8 +42,6 @@ data class LegalEntityDto(
 
     override val states: Collection<LegalEntityStateDto> = emptyList(),
 
-    override val classifications: Collection<LegalEntityClassificationDto> = emptyList(),
-
     val legalAddress: LogisticAddressDto? = null,
 
     override val confidenceCriteria: ConfidenceCriteriaDto? = null

@@ -24,7 +24,6 @@ import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
-import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.orchestrator.api.model.*
 import java.time.LocalDateTime
@@ -68,18 +67,6 @@ object BusinessPartnerGenericCommonValues {
             legalName = "legal-name-cleaned",
             shortName = "shot-name-cleaned",
             legalForm = "legal-form-cleaned",
-            classifications = listOf(
-                BusinessPartnerClassificationDto(
-                    type = ClassificationType.NACE,
-                    code = "code-1-cleaned",
-                    value = "value-1-cleaned"
-                ),
-                BusinessPartnerClassificationDto(
-                    type = ClassificationType.NAF,
-                    code = "code-2-cleaned",
-                    value = "value-2-cleaned"
-                ),
-            ),
             confidenceCriteria = ConfidenceCriteriaDto(
                 sharedByOwner = true,
                 checkedByExternalDataSource = true,
@@ -178,13 +165,6 @@ object BusinessPartnerGenericCommonValues {
             legalName = "legal-name-2",
             shortName = "shortname-2",
             legalForm = "legal-form-2",
-            classifications = listOf(
-                BusinessPartnerClassificationDto(
-                    type = ClassificationType.SIC,
-                    code = "code-2",
-                    value = "value-2"
-                )
-            ),
             confidenceCriteria = ConfidenceCriteriaDto(
                 sharedByOwner = true,
                 checkedByExternalDataSource = true,
@@ -429,18 +409,6 @@ object BusinessPartnerGenericCommonValues {
                 type = BusinessStateType.INACTIVE
             ),
         ),
-        classifications = listOf(
-            LegalEntityClassificationDto(
-                type = ClassificationType.SIC,
-                code = "Classification Code 1",
-                value = "Classification Value 1"
-            ),
-            LegalEntityClassificationDto(
-                type = ClassificationType.NACE,
-                code = "Classification Code 2",
-                value = "Classification Value 2"
-            )
-        ),
         legalAddress = logisticAddress1,
         bpnLReference = BpnReferenceDto(
             referenceValue = "BPNL1-TEST",
@@ -473,13 +441,6 @@ object BusinessPartnerGenericCommonValues {
                 validFrom = LocalDateTime.of(1900, 5, 5, 5, 5),
                 validTo = null,
                 type = BusinessStateType.ACTIVE
-            )
-        ),
-        classifications = listOf(
-            LegalEntityClassificationDto(
-                type = ClassificationType.SIC,
-                code = "Classification Code 2",
-                value = "Classification Value 2"
             )
         ),
         legalAddress = logisticAddress2,

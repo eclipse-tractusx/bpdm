@@ -77,7 +77,6 @@ class BusinessPartnerMappings {
             roles = dto.roles.toSortedSet(),
             identifiers = dto.identifiers.mapNotNull(::toIdentifier).toSortedSet(),
             states = dto.states.mapNotNull(::toState).toSortedSet(),
-            classifications = dto.legalEntity.classifications.mapNotNull(::toClassification).toSortedSet(),
             shortName = dto.legalEntity.shortName,
             legalName = dto.legalEntity.legalName,
             siteName = dto.site.name,
@@ -99,8 +98,7 @@ class BusinessPartnerMappings {
             legalEntityBpn = entity.bpnL,
             legalName = entity.legalName,
             shortName = entity.shortName,
-            legalForm = entity.legalForm,
-            classifications = entity.classifications.map(::toClassificationDto)
+            legalForm = entity.legalForm
         )
     }
 
@@ -132,7 +130,6 @@ class BusinessPartnerMappings {
             legalName = entity.legalName,
             shortName = entity.shortName,
             legalForm = entity.legalForm,
-            classifications = entity.classifications.map(::toClassificationDto),
             confidenceCriteria = entity.legalEntityConfidence?.let { toConfidenceDto(it) } ?: throw BpdmInvalidPartnerException(
                 entity.externalId,
                 "Missing address confidence criteria"

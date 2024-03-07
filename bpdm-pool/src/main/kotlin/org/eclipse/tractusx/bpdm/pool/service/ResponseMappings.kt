@@ -65,7 +65,6 @@ fun LegalEntityDb.toDto(): LegalEntityVerboseDto {
         legalFormVerbose = legalForm?.toDto(),
         identifiers = identifiers.map { it.toDto() },
         states = states.map { it.toDto() },
-        classifications = classifications.map { it.toDto() },
         relations = startNodeRelations.plus(endNodeRelations).map { it.toDto() },
         currentness = currentness,
         confidenceCriteria = confidenceCriteria.toDto(),
