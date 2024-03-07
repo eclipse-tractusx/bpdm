@@ -3,7 +3,7 @@
   "info": {
     "title": "Business Partner Data Management Orchestrator",
     "description": "Orchestrator component acts as a passive component and offers for each processing steps individual endpoints",
-    "version": "4.1.0"
+    "version": "6.0.0-SNAPSHOT"
   },
   "servers": [
     {
@@ -12,7 +12,7 @@
     }
   ],
   "paths": {
-    "/api/golden-record-tasks": {
+    "/golden-record-tasks": {
       "post": {
         "tags": [
           "Task Client"
@@ -47,7 +47,7 @@
         }
       }
     },
-    "/api/golden-record-tasks/step-results": {
+    "/golden-record-tasks/step-results": {
       "post": {
         "tags": [
           "Task Worker"
@@ -75,7 +75,7 @@
         }
       }
     },
-    "/api/golden-record-tasks/step-reservations": {
+    "/golden-record-tasks/step-reservations": {
       "post": {
         "tags": [
           "Task Worker"
@@ -110,7 +110,7 @@
         }
       }
     },
-    "/api/golden-record-tasks/state/search": {
+    "/golden-record-tasks/state/search": {
       "post": {
         "tags": [
           "Task Client"
@@ -149,6 +149,10 @@
   "components": {
     "schemas": {
       "AddressIdentifierDto": {
+        "required": [
+          "type",
+          "value"
+        ],
         "type": "object",
         "properties": {
           "value": {
@@ -161,13 +165,45 @@
           }
         }
       },
-      "AddressStateDto": {
+      "AddressRepresentation": {
         "type": "object",
         "properties": {
-          "description": {
+          "addressBpn": {
             "type": "string",
-            "description": "The description from the original source indicating the state of the address."
+            "description": "The BPNA of the address, on which the business partner provides a view."
           },
+          "name": {
+            "type": "string",
+            "description": "The name of the address, on which the business partner provides a view. This is not according to official registers but according to the name the sharing members agree on, such as the name of a gate or any other additional names that designate the address in common parlance."
+          },
+          "addressType": {
+            "type": "string",
+            "description": "One of the address types: Legal Address, Site Main Address, Legal and Site Main Address, Additional Address. ",
+            "enum": [
+              "LegalAndSiteMainAddress",
+              "LegalAddress",
+              "SiteMainAddress",
+              "AdditionalAddress"
+            ]
+          },
+          "physicalPostalAddress": {
+            "$ref": "#/components/schemas/PhysicalPostalAddressDto"
+          },
+          "alternativePostalAddress": {
+            "$ref": "#/components/schemas/AlternativePostalAddressDto"
+          },
+          "confidenceCriteria": {
+            "$ref": "#/components/schemas/ConfidenceCriteriaDto"
+          }
+        },
+        "description": "The address, on which the business partner provides a view. "
+      },
+      "AddressStateDto": {
+        "required": [
+          "type"
+        ],
+        "type": "object",
+        "properties": {
           "validFrom": {
             "type": "string",
             "description": "The date from which the state is valid.",
@@ -502,9 +538,13 @@
             "description": "The number indicating the delivery service endpoint of the alternative postal address to which the delivery is to be delivered, such as a P.O. box number or a private bag number."
           }
         },
-        "description": "The alternative postal address of the address, for example if the goods are to be picked up somewhere else."
+        "description": "The alternative postal address of the address, on which the business partner provides a view, for example if the goods are to be picked up somewhere else."
       },
       "BpnReferenceDto": {
+        "required": [
+          "referenceType",
+          "referenceValue"
+        ],
         "type": "object",
         "properties": {
           "referenceValue": {
@@ -544,6 +584,15 @@
         "description": "Business partner data in full representation, consisting of generic data as well as its L/S/A representation."
       },
       "BusinessPartnerGenericDto": {
+        "required": [
+          "address",
+          "identifiers",
+          "legalEntity",
+          "nameParts",
+          "roles",
+          "site",
+          "states"
+        ],
         "type": "object",
         "properties": {
           "nameParts": {
@@ -553,23 +602,12 @@
               "type": "string"
             }
           },
-          "shortName": {
-            "type": "string",
-            "description": "Abbreviated name or shorthand."
-          },
           "identifiers": {
             "type": "array",
             "description": "The list of identifiers of the business partner. Sorted and duplicates removed by the service.",
             "items": {
               "$ref": "#/components/schemas/BusinessPartnerIdentifierDto"
             }
-          },
-          "legalName": {
-            "type": "string"
-          },
-          "legalForm": {
-            "type": "string",
-            "description": "Technical key of the legal form."
           },
           "states": {
             "type": "array",
@@ -578,50 +616,36 @@
               "$ref": "#/components/schemas/BusinessPartnerStateDto"
             }
           },
-          "classifications": {
-            "type": "array",
-            "description": "The list of classifications of the business partner, such as a specific industry. Sorted and duplicates removed by the service.",
-            "items": {
-              "$ref": "#/components/schemas/ClassificationDto"
-            }
-          },
           "roles": {
             "type": "array",
-            "description": "Roles this business partner takes in relation to the sharing member. Sorted and duplicates removed by the service.",
+            "description": "One or more of the roles, the business partner assumes with respect to the sharing member: Supplier, Customer. Sorted and duplicates removed by the service.",
             "items": {
               "type": "string",
               "enum": [
                 "SUPPLIER",
-                "CUSTOMER"
+                "CUSTOMER",
+                "ONE_TIME_SUPPLIER",
+                "ONE_TIME_CUSTOMER"
               ]
             }
           },
-          "postalAddress": {
-            "$ref": "#/components/schemas/PostalAddressDto"
+          "legalEntity": {
+            "$ref": "#/components/schemas/LegalEntityRepresentation"
           },
-          "legalEntityBpn": {
-            "type": "string",
-            "description": "BPNL of the golden record legal entity this business partner refers to"
+          "site": {
+            "$ref": "#/components/schemas/SiteRepresentation"
           },
-          "siteBpn": {
-            "type": "string",
-            "description": "BPNS of the golden record site this business partner refers to"
-          },
-          "addressBpn": {
-            "type": "string",
-            "description": "BPNA of the golden record address this business partner refers to"
+          "address": {
+            "$ref": "#/components/schemas/AddressRepresentation"
           },
           "ownerBpnL": {
             "type": "string",
             "description": "The BPNL of the company sharing and claiming this business partner as its own"
           }
-        }
+        },
+        "description": "Generic business partner with external id"
       },
       "BusinessPartnerIdentifierDto": {
-        "required": [
-          "type",
-          "value"
-        ],
         "type": "object",
         "properties": {
           "type": {
@@ -636,13 +660,9 @@
             "type": "string",
             "description": "Body which issued the identifier"
           }
-        },
-        "description": "Identifier record for a business partner"
+        }
       },
       "BusinessPartnerStateDto": {
-        "required": [
-          "type"
-        ],
         "type": "object",
         "properties": {
           "validFrom": {
@@ -662,39 +682,49 @@
               "ACTIVE",
               "INACTIVE"
             ]
-          },
-          "description": {
-            "type": "string",
-            "description": "Denotation of the status."
           }
-        },
-        "description": "A legal entity state indicates if the legal entity is active or inactive. This does not describe the relation between a sharing member and a business partner and whether they have active business, but it describes whether the legal entity is still operating."
+        }
       },
-      "ClassificationDto": {
+      "ConfidenceCriteriaDto": {
+        "required": [
+          "checkedByExternalDataSource",
+          "confidenceLevel",
+          "lastConfidenceCheckAt",
+          "nextConfidenceCheckAt",
+          "numberOfSharingMembers",
+          "sharedByOwner"
+        ],
         "type": "object",
         "properties": {
-          "type": {
-            "type": "string",
-            "description": "Type of classification.",
-            "enum": [
-              "NACE",
-              "NAF",
-              "NAICS",
-              "SIC"
-            ]
+          "sharedByOwner": {
+            "type": "boolean"
           },
-          "code": {
-            "type": "string",
-            "description": "The identifier of the class belonging to the classification."
+          "checkedByExternalDataSource": {
+            "type": "boolean"
           },
-          "value": {
+          "numberOfSharingMembers": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "lastConfidenceCheckAt": {
             "type": "string",
-            "description": "The name of the class belonging to the classification."
+            "format": "date-time"
+          },
+          "nextConfidenceCheckAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "confidenceLevel": {
+            "type": "integer",
+            "format": "int32"
           }
-        },
-        "description": "A legal entity classification is an assignment of the legal entity to an industry. It does not necessarily have to be the only industry the company is active in (see large companies operating in different industries). Multiple assignments to several industries are possible per classification type."
+        }
       },
       "GeoCoordinateDto": {
+        "required": [
+          "latitude",
+          "longitude"
+        ],
         "type": "object",
         "properties": {
           "longitude": {
@@ -716,6 +746,10 @@
         "description": "The exact location of the physical postal address in latitude, longitude, and altitude."
       },
       "LegalEntityDto": {
+        "required": [
+          "identifiers",
+          "states"
+        ],
         "type": "object",
         "properties": {
           "bpnLReference": {
@@ -748,23 +782,23 @@
             "type": "array",
             "description": "The list of (temporary) states of the legal entity.",
             "items": {
-              "$ref": "#/components/schemas/LegalEntityState"
-            }
-          },
-          "classifications": {
-            "type": "array",
-            "description": "The list of classifications of the legal entity, such as a specific industry.",
-            "items": {
-              "$ref": "#/components/schemas/ClassificationDto"
+              "$ref": "#/components/schemas/LegalEntityStateDto"
             }
           },
           "legalAddress": {
             "$ref": "#/components/schemas/LogisticAddressDto"
+          },
+          "confidenceCriteria": {
+            "$ref": "#/components/schemas/ConfidenceCriteriaDto"
           }
         },
         "description": "The legal entity part of this business partner data"
       },
       "LegalEntityIdentifierDto": {
+        "required": [
+          "type",
+          "value"
+        ],
         "type": "object",
         "properties": {
           "value": {
@@ -781,13 +815,37 @@
           }
         }
       },
-      "LegalEntityState": {
+      "LegalEntityRepresentation": {
         "type": "object",
         "properties": {
-          "description": {
+          "legalEntityBpn": {
             "type": "string",
-            "description": "The description from the original source indicating the state of the legal entity, such as from the German Handelsregister."
+            "description": "The BPNL of the legal entity, on which the business partner provides a view."
           },
+          "legalName": {
+            "type": "string",
+            "description": "The name of the legal entity, on which the business partner provides a view, according to official registers."
+          },
+          "shortName": {
+            "type": "string",
+            "description": "The abbreviated name of the legal entity, on which the business partner provides a view."
+          },
+          "legalForm": {
+            "type": "string",
+            "description": "The legal form of the legal entity, on which the business partner provides a view."
+          },
+          "confidenceCriteria": {
+            "$ref": "#/components/schemas/ConfidenceCriteriaDto"
+          }
+        },
+        "description": "The legal entity, on which the business partner provides a view."
+      },
+      "LegalEntityStateDto": {
+        "required": [
+          "type"
+        ],
+        "type": "object",
+        "properties": {
           "validFrom": {
             "type": "string",
             "description": "The date from which the state is valid.",
@@ -809,6 +867,10 @@
         }
       },
       "LogisticAddressDto": {
+        "required": [
+          "identifiers",
+          "states"
+        ],
         "type": "object",
         "properties": {
           "bpnAReference": {
@@ -841,6 +903,9 @@
           },
           "alternativePostalAddress": {
             "$ref": "#/components/schemas/AlternativePostalAddressDto"
+          },
+          "confidenceCriteria": {
+            "$ref": "#/components/schemas/ConfidenceCriteriaDto"
           }
         },
         "description": "The address part of this business partner data"
@@ -1177,31 +1242,12 @@
             "description": "The number of a door in the building on the respective floor addressed by the physical postal address, synonyms: room, suite."
           }
         },
-        "description": "The physical postal address of the address, such as an office, warehouse, gate, etc."
-      },
-      "PostalAddressDto": {
-        "type": "object",
-        "properties": {
-          "addressType": {
-            "type": "string",
-            "description": "Type of the address",
-            "enum": [
-              "LegalAndSiteMainAddress",
-              "LegalAddress",
-              "SiteMainAddress",
-              "AdditionalAddress"
-            ]
-          },
-          "physicalPostalAddress": {
-            "$ref": "#/components/schemas/PhysicalPostalAddressDto"
-          },
-          "alternativePostalAddress": {
-            "$ref": "#/components/schemas/AlternativePostalAddressDto"
-          }
-        },
-        "description": "Address of the official seat of this business partner."
+        "description": "The physical postal address of the address, on which the business partner provides a view, such as an office, warehouse, gate, etc."
       },
       "SiteDto": {
+        "required": [
+          "states"
+        ],
         "type": "object",
         "properties": {
           "bpnSReference": {
@@ -1224,17 +1270,36 @@
           },
           "mainAddress": {
             "$ref": "#/components/schemas/LogisticAddressDto"
+          },
+          "confidenceCriteria": {
+            "$ref": "#/components/schemas/ConfidenceCriteriaDto"
           }
         },
         "description": "The site part of this business partner data"
       },
-      "SiteStateDto": {
+      "SiteRepresentation": {
         "type": "object",
         "properties": {
-          "description": {
+          "siteBpn": {
             "type": "string",
-            "description": "The description from the original source indicating the state of the site."
+            "description": "The BPNS of the site, on which the business partner provides a view."
           },
+          "name": {
+            "type": "string",
+            "description": "The name of the site, on which the business partner provides a view. This is not according to official registers but according to the name the owner chooses."
+          },
+          "confidenceCriteria": {
+            "$ref": "#/components/schemas/ConfidenceCriteriaDto"
+          }
+        },
+        "description": "The site, on which the business partner provides a view."
+      },
+      "SiteStateDto": {
+        "required": [
+          "type"
+        ],
+        "type": "object",
+        "properties": {
           "validFrom": {
             "type": "string",
             "description": "The date from which the state is valid.",
@@ -1265,6 +1330,9 @@
           "houseNumber": {
             "type": "string",
             "description": "The number representing the exact location of a building within the street."
+          },
+          "houseNumberSupplement": {
+            "type": "string"
           },
           "milestone": {
             "type": "string",
@@ -1313,6 +1381,7 @@
       },
       "TaskCreateRequest": {
         "required": [
+          "businessPartners",
           "mode"
         ],
         "type": "object",
@@ -1336,6 +1405,9 @@
         "description": "Request object to specify for which business partner data tasks should be created and in which mode"
       },
       "TaskCreateResponse": {
+        "required": [
+          "createdTasks"
+        ],
         "type": "object",
         "properties": {
           "createdTasks": {
@@ -1376,7 +1448,8 @@
           "modifiedAt",
           "resultState",
           "step",
-          "stepState"
+          "stepState",
+          "timeout"
         ],
         "type": "object",
         "properties": {
@@ -1428,12 +1501,16 @@
           "timeout": {
             "type": "string",
             "description": "The timestamp until the task is removed from the Orchestrator",
-            "format": "date-time"
+            "format": "date-time",
+            "deprecated": true
           }
         },
         "description": "Contains detailed information about the current processing state of a golden record task"
       },
       "TaskStateRequest": {
+        "required": [
+          "taskIds"
+        ],
         "type": "object",
         "properties": {
           "taskIds": {
@@ -1446,6 +1523,9 @@
         "description": "Request object for giving a list of task identifiers to search for the state of tasks"
       },
       "TaskStateResponse": {
+        "required": [
+          "tasks"
+        ],
         "type": "object",
         "properties": {
           "tasks": {
@@ -1458,6 +1538,10 @@
         "description": "Response object for giving a list of task states"
       },
       "TaskStepReservationEntryDto": {
+        "required": [
+          "businessPartner",
+          "taskId"
+        ],
         "type": "object",
         "properties": {
           "taskId": {
@@ -1466,6 +1550,9 @@
           },
           "businessPartner": {
             "$ref": "#/components/schemas/BusinessPartnerFullDto"
+          },
+          "requestKey": {
+            "type": "string"
           }
         },
         "description": "Task reservation entry"
@@ -1495,6 +1582,10 @@
         "description": "Request object for reserving a number of tasks waiting in a step queue."
       },
       "TaskStepReservationResponse": {
+        "required": [
+          "reservedTasks",
+          "timeout"
+        ],
         "type": "object",
         "properties": {
           "reservedTasks": {
@@ -1507,13 +1598,15 @@
           "timeout": {
             "type": "string",
             "description": "The timestamp until the reservation is valid and results are accepted",
-            "format": "date-time"
+            "format": "date-time",
+            "deprecated": true
           }
         },
         "description": "Response object for giving a list of reserved tasks"
       },
       "TaskStepResultEntryDto": {
         "required": [
+          "errors",
           "taskId"
         ],
         "type": "object",
@@ -1537,6 +1630,7 @@
       },
       "TaskStepResultRequest": {
         "required": [
+          "results",
           "step"
         ],
         "type": "object",

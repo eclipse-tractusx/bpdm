@@ -13,15 +13,35 @@
   ],
   "tags": [
     {
-      "name": "Catena-X Members",
-      "description": "Query business partner data of Catena-X members"
+      "name": "Changelog Controller",
+      "description": "Read change events of business partner data"
+    },
+    {
+      "name": "Legal Entity Controller",
+      "description": "Read, create and update business partner of type legal entity"
+    },
+    {
+      "name": "Metadata Controller",
+      "description": "Read and create supporting data that is referencable in business partner data"
+    },
+    {
+      "name": "Site Controller",
+      "description": "Read, create and update business partner of type site"
+    },
+    {
+      "name": "Bpn Controller",
+      "description": "Support functionality for BPN operations"
+    },
+    {
+      "name": "Address Controller",
+      "description": "Read, create and update business partner of type address"
     }
   ],
   "paths": {
-    "/api/catena/sites": {
+    "/sites": {
       "get": {
         "tags": [
-          "site-controller"
+          "Site Controller"
         ],
         "summary": "Get page of sites matching the pagination search criteria",
         "description": "This endpoint retrieves all existing business partners of type sites.",
@@ -69,7 +89,7 @@
       },
       "put": {
         "tags": [
-          "site-controller"
+          "Site Controller"
         ],
         "summary": "Updates an existing site",
         "description": "Update existing business partner records of type site referenced via BPNS. The endpoint expects to receive the full updated record, including values that didn't change.",
@@ -105,7 +125,7 @@
       },
       "post": {
         "tags": [
-          "site-controller"
+          "Site Controller"
         ],
         "summary": "Creates a new site",
         "description": "Create new business partners of type site by specifying the BPNL of the legal entity each site belongs to. If the legal entitiy cannot be found, the record is ignored.For matching purposes, on each record you can specify your own index value which will reappear in the corresponding record of the response.",
@@ -140,10 +160,10 @@
         }
       }
     },
-    "/api/catena/legal-entities": {
+    "/legal-entities": {
       "get": {
         "tags": [
-          "legal-entity-controller"
+          "Legal Entity Controller"
         ],
         "summary": "Returns legal entities by different search parameters",
         "description": "This endpoint tries to find matches among all existing business partners of type legal entity, filtering out partners which entirely do not match and ranking the remaining partners according to the accuracy of the match. The match of a partner is better the higher its relevancy score. ",
@@ -200,7 +220,7 @@
       },
       "put": {
         "tags": [
-          "legal-entity-controller"
+          "Legal Entity Controller"
         ],
         "summary": "Updates an existing legal entity",
         "description": "Update existing business partner records of type legal entity referenced via BPNL. The endpoint expects to receive the full updated record, including values that didn't change.",
@@ -236,7 +256,7 @@
       },
       "post": {
         "tags": [
-          "legal-entity-controller"
+          "Legal Entity Controller"
         ],
         "summary": "Creates a new legal entity",
         "description": "Create new business partners of type legal entity. The given additional identifiers of a record need to be unique, otherwise they are ignored. For matching purposes, on each record you can specify your own index value which will reappear in the corresponding record of the response.",
@@ -271,10 +291,10 @@
         }
       }
     },
-    "/api/catena/addresses": {
+    "/addresses": {
       "get": {
         "tags": [
-          "address-controller"
+          "Address Controller"
         ],
         "summary": "Returns addresses by different search parameters",
         "description": "This endpoint tries to find matches among all existing business partners of type address, filtering out partners which entirely do not match and ranking the remaining partners according to the accuracy of the match. The match of a partner is better the higher its relevancy score. ",
@@ -331,7 +351,7 @@
       },
       "put": {
         "tags": [
-          "address-controller"
+          "Address Controller"
         ],
         "summary": "Updates an existing address",
         "description": "Update existing business partner records of type address referenced via BPNA. The endpoint expects to receive the full updated record, including values that didn't change.",
@@ -367,7 +387,7 @@
       },
       "post": {
         "tags": [
-          "address-controller"
+          "Address Controller"
         ],
         "summary": "Creates a new address",
         "description": "Create new business partners of type address by specifying the BPN of the parent each address belongs to. A parent can be either a site or legal entity business partner. If the parent cannot be found, the record is ignored.For matching purposes, on each record you can specify your own index value which will reappear in the corresponding record of the response.",
@@ -402,12 +422,72 @@
         }
       }
     },
+    "/sites/search": {
+      "post": {
+        "tags": [
+          "Site Controller"
+        ],
+        "summary": "Returns sites by an array of BPNS and/or an array of corresponding BPNL",
+        "description": "Search business partners of type site by their BPNSs or by the BPNLs of their parent legal entities",
+        "operationId": "searchSites",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Number of page to get results from",
+            "required": false,
+            "schema": {
+              "minimum": 0,
+              "type": "string",
+              "default": "0"
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Size of each page",
+            "required": false,
+            "schema": {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "string",
+              "default": "10"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SiteBpnSearchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Found sites that belong to specified legal entites",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageDtoSiteWithMainAddressVerboseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "On malformed request parameters"
+          }
+        }
+      }
+    },
     "/members/sites/search": {
       "post": {
         "tags": [
-          "Catena-X Members"
+          "Site Controller"
         ],
-        "operationId": "searchSites",
+        "operationId": "searchSites_1",
         "parameters": [
           {
             "name": "page",
@@ -460,7 +540,7 @@
     "/members/legal-entities/search": {
       "post": {
         "tags": [
-          "Catena-X Members"
+          "Legal Entity Controller"
         ],
         "operationId": "searchLegalEntities",
         "parameters": [
@@ -515,7 +595,7 @@
     "/members/changelog/search": {
       "post": {
         "tags": [
-          "Catena-X Members"
+          "Changelog Controller"
         ],
         "operationId": "searchChangelogEntries",
         "parameters": [
@@ -570,7 +650,7 @@
     "/members/addresses/search": {
       "post": {
         "tags": [
-          "Catena-X Members"
+          "Address Controller"
         ],
         "operationId": "searchAddresses",
         "parameters": [
@@ -622,196 +702,10 @@
         }
       }
     },
-    "/api/catena/sites/search": {
-      "post": {
-        "tags": [
-          "site-controller"
-        ],
-        "summary": "Returns sites by an array of BPNS and/or an array of corresponding BPNL",
-        "description": "Search business partners of type site by their BPNSs or by the BPNLs of their parent legal entities",
-        "operationId": "searchSites_1",
-        "parameters": [
-          {
-            "name": "page",
-            "in": "query",
-            "description": "Number of page to get results from",
-            "required": false,
-            "schema": {
-              "minimum": 0,
-              "type": "string",
-              "default": "0"
-            }
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "description": "Size of each page",
-            "required": false,
-            "schema": {
-              "maximum": 100,
-              "minimum": 0,
-              "type": "string",
-              "default": "10"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SiteBpnSearchRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Found sites that belong to specified legal entites",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PageDtoSiteWithMainAddressVerboseDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "On malformed request parameters"
-          }
-        }
-      }
-    },
-    "/api/catena/sites/main-addresses/search": {
-      "post": {
-        "tags": [
-          "site-controller"
-        ],
-        "summary": "Search for sites' main addresses",
-        "description": "Search main addresses of site business partners by BPNS",
-        "operationId": "searchMainAddresses",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "The found main addresses",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MainAddressResponse"
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "On malformed request parameters"
-          }
-        }
-      }
-    },
-    "/api/catena/regions": {
+    "/legal-forms": {
       "get": {
         "tags": [
-          "metadata-controller"
-        ],
-        "summary": "Get page of regions",
-        "description": "Lists all currently known regions in a paginated result",
-        "operationId": "getRegions",
-        "parameters": [
-          {
-            "name": "page",
-            "in": "query",
-            "description": "Number of page to get results from",
-            "required": false,
-            "schema": {
-              "minimum": 0,
-              "type": "string",
-              "default": "0"
-            }
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "description": "Size of each page",
-            "required": false,
-            "schema": {
-              "maximum": 100,
-              "minimum": 0,
-              "type": "string",
-              "default": "10"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Page of existing regions, may be empty",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PageDtoRegionDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "On malformed request parameters"
-          }
-        },
-        "deprecated": true
-      },
-      "post": {
-        "tags": [
-          "metadata-controller"
-        ],
-        "summary": "Create new Region",
-        "description": "Create a new region which can be referenced by business partner records.",
-        "operationId": "createRegion",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RegionDto"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "New region successfully created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RegionDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "On malformed request parameters"
-          }
-        },
-        "deprecated": true
-      }
-    },
-    "/api/catena/legal-forms": {
-      "get": {
-        "tags": [
-          "metadata-controller"
+          "Metadata Controller"
         ],
         "summary": "Returns all legal forms",
         "description": "Lists all currently known legal forms in a paginated result",
@@ -859,7 +753,7 @@
       },
       "post": {
         "tags": [
-          "metadata-controller"
+          "Metadata Controller"
         ],
         "summary": "Creates a new legal form",
         "description": "Create a new legal form which can be referenced by business partner records. The actual name of the legal form is free to choose and doesn't need to be unique. The technical key can be freely chosen but needs to be unique for the businessPartnerType as it is used as reference by the business partner records. A recommendation for technical keys: They should be short, descriptive and use a restricted common character set in order to ensure compatibility with older systems.",
@@ -894,42 +788,10 @@
         }
       }
     },
-    "/api/catena/legal-entities/{bpnl}/confirm-up-to-date": {
+    "/legal-entities/search": {
       "post": {
         "tags": [
-          "legal-entity-controller"
-        ],
-        "summary": "Confirms that the data of a legal entity business partner is still up to date.",
-        "description": "Confirms that the data of a business partner is still up to date by saving the current timestamp at the time this POST-request is made as this business partner's \"currentness\". Ignores case of bpnl.",
-        "operationId": "setLegalEntityCurrentness",
-        "parameters": [
-          {
-            "name": "bpnl",
-            "in": "path",
-            "description": "BPNL value",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Business partner's \"currentness\" successfully updated"
-          },
-          "400": {
-            "description": "On malformed request parameters"
-          },
-          "404": {
-            "description": "No business partner found for specified bpnl"
-          }
-        }
-      }
-    },
-    "/api/catena/legal-entities/search": {
-      "post": {
-        "tags": [
-          "legal-entity-controller"
+          "Legal Entity Controller"
         ],
         "summary": "Returns legal entities by an array of BPNL",
         "description": "Search legal entity partners by their BPNLs. The response can contain less results than the number of BPNLs that were requested, if some of the BPNLs did not exist. For a single request, the maximum number of BPNLs to search for is limited to ${bpdm.bpn.search-request-limit} entries.",
@@ -967,51 +829,10 @@
         }
       }
     },
-    "/api/catena/legal-entities/legal-addresses/search": {
-      "post": {
-        "tags": [
-          "legal-entity-controller"
-        ],
-        "summary": "Search Legal Addresses",
-        "description": "Search legal addresses of legal entities by BPNL",
-        "operationId": "searchLegalAddresses",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "The found legal addresses",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/LegalAddressVerboseDto"
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "On malformed request parameters"
-          }
-        }
-      }
-    },
-    "/api/catena/identifier-types": {
+    "/identifier-types": {
       "get": {
         "tags": [
-          "metadata-controller"
+          "Metadata Controller"
         ],
         "summary": "Returns all identifier types filtered by business partner type and country.",
         "description": "Lists all matching identifier types including validity details in a paginated result",
@@ -1354,7 +1175,7 @@
       },
       "post": {
         "tags": [
-          "metadata-controller"
+          "Metadata Controller"
         ],
         "summary": "Creates a new identifier type",
         "description": "Create a new identifier type (including validity details) which can be referenced by business partner records. Identifier types such as BPN or VAT determine with which kind of values a business partner can be identified with. The actual name of the identifier type is free to choose and doesn't need to be unique. The technical key can be freely chosen but needs to be unique for the businessPartnerType as it is used as reference by the business partner records. A recommendation for technical keys: They should be short, descriptive and use a restricted common character set in order to ensure compatibility with older systems.",
@@ -1389,10 +1210,10 @@
         }
       }
     },
-    "/api/catena/business-partners/changelog/search": {
+    "/business-partners/changelog/search": {
       "post": {
         "tags": [
-          "changelog-controller"
+          "Changelog Controller"
         ],
         "summary": "Returns changelog entries as of a specified timestamp, optionally filtered by a list of BPNL/S/A, or business partner types",
         "operationId": "getChangelogEntries",
@@ -1451,10 +1272,10 @@
         }
       }
     },
-    "/api/catena/bpn/search": {
+    "/bpn/search": {
       "post": {
         "tags": [
-          "bpn-controller"
+          "Bpn Controller"
         ],
         "summary": "Returns a list of identifier mappings of an identifier to a BPNL/A/S, specified by a business partner type, identifier type and identifier values",
         "description": "Find business partner numbers by identifiers. The response can contain less results than the number of identifier values that were requested, if some of the identifiers did not exist. For a single request, the maximum number of identifier values to search for is limited to ${bpdm.bpn.search-request-limit} entries.",
@@ -1493,10 +1314,10 @@
         }
       }
     },
-    "/api/catena/addresses/search": {
+    "/addresses/search": {
       "post": {
         "tags": [
-          "address-controller"
+          "Address Controller"
         ],
         "summary": "Returns addresses by an array of BPNA and/or an array of corresponding BPNS and/or an array of corresponding BPNL.",
         "description": "Search business partners of type address by their BPNA or their parents' BPNL or BPNS.",
@@ -1553,10 +1374,10 @@
         }
       }
     },
-    "/api/catena/sites/{bpns}": {
+    "/sites/{bpns}": {
       "get": {
         "tags": [
-          "site-controller"
+          "Site Controller"
         ],
         "summary": "Returns a site by its BPNS",
         "description": "Get business partners of type site by BPNS ignoring case.",
@@ -1592,31 +1413,10 @@
         }
       }
     },
-    "/api/catena/mermaid/": {
+    "/legal-entities/{idValue}": {
       "get": {
         "tags": [
-          "pool-documentation-controller"
-        ],
-        "summary": "Get mermaid class diagramm for the pool JPA model",
-        "operationId": "getMermaidPoolPersistence",
-        "responses": {
-          "200": {
-            "description": "Entity model as mermaid diagramm",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/catena/legal-entities/{idValue}": {
-      "get": {
-        "tags": [
-          "legal-entity-controller"
+          "Legal Entity Controller"
         ],
         "summary": "Returns a legal entity by identifier, like BPN, DUNS or EU VAT ID, specified by the identifier type",
         "description": "This endpoint tries to find a business partner by the specified identifier. The identifier value is case insensitively compared but needs to be given exactly. By default the value given is interpreted as a BPN. By specifying the technical key of another identifier typethe value is matched against the identifiers of that given type.",
@@ -1662,10 +1462,10 @@
         }
       }
     },
-    "/api/catena/legal-entities/{bpnl}/sites": {
+    "/legal-entities/{bpnl}/sites": {
       "get": {
         "tags": [
-          "legal-entity-controller"
+          "Legal Entity Controller"
         ],
         "summary": "Returns all sites of a legal entity with a specific BPNL",
         "description": "Get business partners of type site belonging to a business partner of type legal entity, identified by the business partner's bpnl ignoring case.",
@@ -1724,10 +1524,10 @@
         }
       }
     },
-    "/api/catena/legal-entities/{bpnl}/addresses": {
+    "/legal-entities/{bpnl}/addresses": {
       "get": {
         "tags": [
-          "legal-entity-controller"
+          "Legal Entity Controller"
         ],
         "summary": "Returns all addresses of a legal entity with a specific BPNL",
         "description": "Get business partners of type address belonging to a business partner of type legal entity, identified by the business partner's BPNL ignoring case.",
@@ -1786,10 +1586,10 @@
         }
       }
     },
-    "/api/catena/field-quality-rules/": {
+    "/field-quality-rules/": {
       "get": {
         "tags": [
-          "metadata-controller"
+          "Metadata Controller"
         ],
         "summary": "Get all field quality rules filtered by country (specified by its ISO 3166-1 alpha-2 country code)",
         "description": "List the country specific data rules for entity fields.All fields that are not in this list are considered to be forbidden.",
@@ -2099,10 +1899,10 @@
         }
       }
     },
-    "/api/catena/administrative-areas-level1": {
+    "/administrative-areas-level1": {
       "get": {
         "tags": [
-          "metadata-controller"
+          "Metadata Controller"
         ],
         "summary": "Get page of country subdivisions suitable for the administrativeAreaLevel1 address property",
         "description": "Lists all currently known country subdivisions according to ISO 3166-2 in a paginated result",
@@ -2149,10 +1949,10 @@
         }
       }
     },
-    "/api/catena/addresses/{bpna}": {
+    "/addresses/{bpna}": {
       "get": {
         "tags": [
-          "address-controller"
+          "Address Controller"
         ],
         "summary": "Returns an address by its BPNA",
         "description": "Get business partners of type address by BPNA ignoring case.",
@@ -2368,8 +2168,7 @@
           "confidenceCriteria",
           "createdAt",
           "identifiers",
-          "isLegalAddress",
-          "isMainAddress",
+          "isCatenaXMemberData",
           "physicalPostalAddress",
           "states",
           "updatedAt"
@@ -2408,17 +2207,12 @@
             "type": "string",
             "description": "The BPNL of the legal entity owning the address."
           },
-          "isLegalAddress": {
-            "type": "boolean",
-            "description": "Indicates if the address is the legal address to a legal entity."
-          },
           "bpnSite": {
             "type": "string",
             "description": "The BPNS of the site the address belongs to."
           },
-          "isMainAddress": {
-            "type": "boolean",
-            "description": "Indicates if the address is the main address to a site. This is where typically the main entrance or the reception is located, or where the mail is delivered to."
+          "isCatenaXMemberData": {
+            "type": "boolean"
           },
           "createdAt": {
             "type": "string",
@@ -3075,7 +2869,7 @@
           "confidenceLevel",
           "lastConfidenceCheckAt",
           "nextConfidenceCheckAt",
-          "numberOfBusinessPartners",
+          "numberOfSharingMembers",
           "sharedByOwner"
         ],
         "type": "object",
@@ -3086,7 +2880,7 @@
           "checkedByExternalDataSource": {
             "type": "boolean"
           },
-          "numberOfBusinessPartners": {
+          "numberOfSharingMembers": {
             "type": "integer",
             "format": "int32"
           },
@@ -4272,85 +4066,6 @@
         },
         "description": "Contains identifiers to search legal entities by"
       },
-      "LegalAddressVerboseDto": {
-        "required": [
-          "bpnLegalEntity",
-          "createdAt",
-          "physicalPostalAddress",
-          "updatedAt"
-        ],
-        "type": "object",
-        "properties": {
-          "physicalPostalAddress": {
-            "$ref": "#/components/schemas/PhysicalPostalAddressVerboseDto"
-          },
-          "alternativePostalAddress": {
-            "$ref": "#/components/schemas/AlternativePostalAddressVerboseDto"
-          },
-          "bpnLegalEntity": {
-            "type": "string",
-            "description": "BPN of the related legal entity"
-          },
-          "createdAt": {
-            "type": "string",
-            "description": "The timestamp the business partner data was created",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "description": "The timestamp the business partner data was last updated",
-            "format": "date-time"
-          }
-        },
-        "description": "Legal address for legal entity"
-      },
-      "LegalEntityClassificationDto": {
-        "required": [
-          "type"
-        ],
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string",
-            "description": "Type of classification.",
-            "enum": [
-              "NACE",
-              "NAF",
-              "NAICS",
-              "SIC"
-            ]
-          },
-          "code": {
-            "type": "string",
-            "description": "The identifier of the class belonging to the classification."
-          },
-          "value": {
-            "type": "string",
-            "description": "The name of the class belonging to the classification."
-          }
-        },
-        "description": "A legal entity classification is an assignment of the legal entity to an industry. It does not necessarily have to be the only industry the company is active in (see large companies operating in different industries). Multiple assignments to several industries are possible per classification type."
-      },
-      "LegalEntityClassificationVerboseDto": {
-        "required": [
-          "type"
-        ],
-        "type": "object",
-        "properties": {
-          "value": {
-            "type": "string",
-            "description": "The name of the class belonging to the classification."
-          },
-          "code": {
-            "type": "string",
-            "description": "The identifier of the class belonging to the classification."
-          },
-          "type": {
-            "$ref": "#/components/schemas/TypeKeyNameVerboseDtoClassificationType"
-          }
-        },
-        "description": "A legal entity classification is an assignment of the legal entity to an industry. It does not necessarily have to be the only industry the company is active in (see large companies operating in different industries). Multiple assignments to several industries are possible per classification type."
-      },
       "LegalEntityIdentifierDto": {
         "required": [
           "type",
@@ -4397,11 +4112,11 @@
       "LegalEntityMatchVerboseDto": {
         "required": [
           "bpnl",
-          "classifications",
           "confidenceCriteria",
           "createdAt",
           "currentness",
           "identifiers",
+          "isCatenaXMemberData",
           "legalAddress",
           "legalName",
           "relations",
@@ -4445,13 +4160,6 @@
               "$ref": "#/components/schemas/LegalEntityStateVerboseDto"
             }
           },
-          "classifications": {
-            "type": "array",
-            "description": "The list of classifications of the legal entity, such as a specific industry.",
-            "items": {
-              "$ref": "#/components/schemas/LegalEntityClassificationVerboseDto"
-            }
-          },
           "relations": {
             "type": "array",
             "description": "Relations to other business partners.",
@@ -4466,6 +4174,9 @@
           },
           "confidenceCriteria": {
             "$ref": "#/components/schemas/ConfidenceCriteriaDto"
+          },
+          "isCatenaXMemberData": {
+            "type": "boolean"
           },
           "createdAt": {
             "type": "string",
@@ -4485,7 +4196,6 @@
       },
       "LegalEntityPartnerCreateRequest": {
         "required": [
-          "classifications",
           "confidenceCriteria",
           "identifiers",
           "legalAddress",
@@ -4518,13 +4228,6 @@
             "description": "The list of (temporary) states of the legal entity.",
             "items": {
               "$ref": "#/components/schemas/LegalEntityStateDto"
-            }
-          },
-          "classifications": {
-            "type": "array",
-            "description": "The list of classifications of the legal entity, such as a specific industry.",
-            "items": {
-              "$ref": "#/components/schemas/LegalEntityClassificationDto"
             }
           },
           "confidenceCriteria": {
@@ -4578,11 +4281,11 @@
       "LegalEntityPartnerCreateVerboseDto": {
         "required": [
           "bpnl",
-          "classifications",
           "confidenceCriteria",
           "createdAt",
           "currentness",
           "identifiers",
+          "isCatenaXMemberData",
           "legalAddress",
           "legalName",
           "relations",
@@ -4620,13 +4323,6 @@
               "$ref": "#/components/schemas/LegalEntityStateVerboseDto"
             }
           },
-          "classifications": {
-            "type": "array",
-            "description": "The list of classifications of the legal entity, such as a specific industry.",
-            "items": {
-              "$ref": "#/components/schemas/LegalEntityClassificationVerboseDto"
-            }
-          },
           "relations": {
             "type": "array",
             "description": "Relations to other business partners.",
@@ -4641,6 +4337,9 @@
           },
           "confidenceCriteria": {
             "$ref": "#/components/schemas/ConfidenceCriteriaDto"
+          },
+          "isCatenaXMemberData": {
+            "type": "boolean"
           },
           "createdAt": {
             "type": "string",
@@ -4665,7 +4364,6 @@
       "LegalEntityPartnerUpdateRequest": {
         "required": [
           "bpnl",
-          "classifications",
           "confidenceCriteria",
           "identifiers",
           "legalAddress",
@@ -4703,13 +4401,6 @@
             "description": "The list of (temporary) states of the legal entity.",
             "items": {
               "$ref": "#/components/schemas/LegalEntityStateDto"
-            }
-          },
-          "classifications": {
-            "type": "array",
-            "description": "The list of classifications of the legal entity, such as a specific industry.",
-            "items": {
-              "$ref": "#/components/schemas/LegalEntityClassificationDto"
             }
           },
           "confidenceCriteria": {
@@ -4825,11 +4516,11 @@
       "LegalEntityWithLegalAddressVerboseDto": {
         "required": [
           "bpnl",
-          "classifications",
           "confidenceCriteria",
           "createdAt",
           "currentness",
           "identifiers",
+          "isCatenaXMemberData",
           "legalAddress",
           "legalName",
           "relations",
@@ -4867,13 +4558,6 @@
               "$ref": "#/components/schemas/LegalEntityStateVerboseDto"
             }
           },
-          "classifications": {
-            "type": "array",
-            "description": "The list of classifications of the legal entity, such as a specific industry.",
-            "items": {
-              "$ref": "#/components/schemas/LegalEntityClassificationVerboseDto"
-            }
-          },
           "relations": {
             "type": "array",
             "description": "Relations to other business partners.",
@@ -4888,6 +4572,9 @@
           },
           "confidenceCriteria": {
             "$ref": "#/components/schemas/ConfidenceCriteriaDto"
+          },
+          "isCatenaXMemberData": {
+            "type": "boolean"
           },
           "createdAt": {
             "type": "string",
@@ -4994,8 +4681,7 @@
           "confidenceCriteria",
           "createdAt",
           "identifiers",
-          "isLegalAddress",
-          "isMainAddress",
+          "isCatenaXMemberData",
           "physicalPostalAddress",
           "states",
           "updatedAt"
@@ -5034,17 +4720,12 @@
             "type": "string",
             "description": "The BPNL of the legal entity owning the address."
           },
-          "isLegalAddress": {
-            "type": "boolean",
-            "description": "Indicates if the address is the legal address to a legal entity."
-          },
           "bpnSite": {
             "type": "string",
             "description": "The BPNS of the site the address belongs to."
           },
-          "isMainAddress": {
-            "type": "boolean",
-            "description": "Indicates if the address is the main address to a site. This is where typically the main entrance or the reception is located, or where the mail is delivered to."
+          "isCatenaXMemberData": {
+            "type": "boolean"
           },
           "createdAt": {
             "type": "string",
@@ -5071,38 +4752,6 @@
           }
         },
         "description": "In general, an address is a collection of information to describe a physical location, using a street name with a house number and/or a post office box as reference. In addition, an address consists of several postal attributes, such as country, region (state), county, township, city, district, or postal code, which help deliver mail.In Catena-X, an address is a type of business partner representing the legal address of a legal entity, and/or the main address of a site, or any additional address of a legal entity or site (such as different gates).An address is owned by a legal entity. Thus, exactly one legal entity is assigned to an address. An address can belong to a site. Thus, one or no site is assigned to an address. An address is uniquely identified by the BPNA."
-      },
-      "MainAddressResponse": {
-        "required": [
-          "bpnSite",
-          "createdAt",
-          "physicalPostalAddress",
-          "updatedAt"
-        ],
-        "type": "object",
-        "properties": {
-          "physicalPostalAddress": {
-            "$ref": "#/components/schemas/PhysicalPostalAddressVerboseDto"
-          },
-          "alternativePostalAddress": {
-            "$ref": "#/components/schemas/AlternativePostalAddressVerboseDto"
-          },
-          "bpnSite": {
-            "type": "string",
-            "description": "BPN of the related site"
-          },
-          "createdAt": {
-            "type": "string",
-            "description": "The timestamp the business partner data was created",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "description": "The timestamp the business partner data was last updated",
-            "format": "date-time"
-          }
-        },
-        "description": "Main address for site"
       },
       "PageDtoAddressMatchVerboseDto": {
         "required": [
@@ -5419,46 +5068,6 @@
             "description": "Collection of results in the page",
             "items": {
               "$ref": "#/components/schemas/LogisticAddressVerboseDto"
-            }
-          }
-        },
-        "description": "Paginated collection of results"
-      },
-      "PageDtoRegionDto": {
-        "required": [
-          "content",
-          "contentSize",
-          "page",
-          "totalElements",
-          "totalPages"
-        ],
-        "type": "object",
-        "properties": {
-          "totalElements": {
-            "type": "integer",
-            "description": "Total number of all results in all pages",
-            "format": "int64"
-          },
-          "totalPages": {
-            "type": "integer",
-            "description": "Total number pages",
-            "format": "int32"
-          },
-          "page": {
-            "type": "integer",
-            "description": "Current page number",
-            "format": "int32"
-          },
-          "contentSize": {
-            "type": "integer",
-            "description": "Number of results in the page",
-            "format": "int32"
-          },
-          "content": {
-            "type": "array",
-            "description": "Collection of results in the page",
-            "items": {
-              "$ref": "#/components/schemas/RegionDto"
             }
           }
         },
@@ -6433,6 +6042,7 @@
           "bpns",
           "confidenceCriteria",
           "createdAt",
+          "isCatenaXMemberData",
           "mainAddress",
           "name",
           "states",
@@ -6454,6 +6064,9 @@
             "items": {
               "$ref": "#/components/schemas/SiteStateVerboseDto"
             }
+          },
+          "isCatenaXMemberData": {
+            "type": "boolean"
           },
           "bpnLegalEntity": {
             "type": "string",
@@ -6631,6 +6244,7 @@
           "bpns",
           "confidenceCriteria",
           "createdAt",
+          "isCatenaXMemberData",
           "name",
           "states",
           "updatedAt"
@@ -6651,6 +6265,9 @@
             "items": {
               "$ref": "#/components/schemas/SiteStateVerboseDto"
             }
+          },
+          "isCatenaXMemberData": {
+            "type": "boolean"
           },
           "bpnLegalEntity": {
             "type": "string",
@@ -6678,6 +6295,7 @@
           "bpns",
           "confidenceCriteria",
           "createdAt",
+          "isCatenaXMemberData",
           "mainAddress",
           "name",
           "states",
@@ -6699,6 +6317,9 @@
             "items": {
               "$ref": "#/components/schemas/SiteStateVerboseDto"
             }
+          },
+          "isCatenaXMemberData": {
+            "type": "boolean"
           },
           "bpnLegalEntity": {
             "type": "string",
@@ -6777,30 +6398,6 @@
             "enum": [
               "ACTIVE",
               "INACTIVE"
-            ]
-          },
-          "name": {
-            "type": "string",
-            "description": "Name or denotation of this type"
-          }
-        },
-        "description": "Named type uniquely identified by its technical key"
-      },
-      "TypeKeyNameVerboseDtoClassificationType": {
-        "required": [
-          "name",
-          "technicalKey"
-        ],
-        "type": "object",
-        "properties": {
-          "technicalKey": {
-            "type": "string",
-            "description": "Unique key of this type for reference",
-            "enum": [
-              "NACE",
-              "NAF",
-              "NAICS",
-              "SIC"
             ]
           },
           "name": {
