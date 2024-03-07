@@ -726,7 +726,7 @@ object BusinessPartnerVerboseValues {
             confidenceCriteria = ConfidenceCriteriaDto(
                 sharedByOwner = true,
                 checkedByExternalDataSource = true,
-                numberOfBusinessPartners = 7,
+                numberOfSharingMembers = 7,
                 lastConfidenceCheckAt = LocalDateTime.of(2022, 4, 3, 2, 1),
                 nextConfidenceCheckAt = LocalDateTime.of(2026, 4, 3, 2, 1),
                 confidenceLevel = 1
@@ -738,7 +738,7 @@ object BusinessPartnerVerboseValues {
             confidenceCriteria = ConfidenceCriteriaDto(
                 sharedByOwner = false,
                 checkedByExternalDataSource = false,
-                numberOfBusinessPartners = 8,
+                numberOfSharingMembers = 8,
                 lastConfidenceCheckAt = LocalDateTime.of(2023, 4, 3, 2, 1),
                 nextConfidenceCheckAt = LocalDateTime.of(2024, 4, 3, 2, 1),
                 confidenceLevel = 2
@@ -788,7 +788,7 @@ object BusinessPartnerVerboseValues {
             confidenceCriteria = ConfidenceCriteriaDto(
                 sharedByOwner = false,
                 checkedByExternalDataSource = true,
-                numberOfBusinessPartners = 4,
+                numberOfSharingMembers = 4,
                 lastConfidenceCheckAt = LocalDateTime.of(2020, 4, 3, 2, 1),
                 nextConfidenceCheckAt = LocalDateTime.of(2028, 4, 3, 2, 1),
                 confidenceLevel = 5

@@ -175,7 +175,7 @@ class BusinessPartnerMappings {
         ConfidenceCriteriaDto(
             sharedByOwner = entity.sharedByOwner,
             checkedByExternalDataSource = entity.checkedByExternalDataSource,
-            numberOfBusinessPartners = entity.numberOfBusinessPartners,
+            numberOfSharingMembers = entity.numberOfBusinessPartners,
             lastConfidenceCheckAt = entity.lastConfidenceCheckAt,
             nextConfidenceCheckAt = entity.nextConfidenceCheckAt,
             confidenceLevel = entity.confidenceLevel

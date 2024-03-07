@@ -1446,7 +1446,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
     fun fullConfidenceCriteria() =
         ConfidenceCriteriaDto(
             sharedByOwner = true,
-            numberOfBusinessPartners = 1,
+            numberOfSharingMembers = 1,
             checkedByExternalDataSource = true,
             lastConfidenceCheckAt = LocalDateTime.now(),
             nextConfidenceCheckAt = LocalDateTime.now().plusDays(1),

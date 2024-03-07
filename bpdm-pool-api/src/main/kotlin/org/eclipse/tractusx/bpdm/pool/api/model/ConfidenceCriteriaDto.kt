@@ -25,7 +25,7 @@ import java.time.LocalDateTime
 data class ConfidenceCriteriaDto(
     override val sharedByOwner: Boolean,
     override val checkedByExternalDataSource: Boolean,
-    override val numberOfBusinessPartners: Int,
+    override val numberOfSharingMembers: Int,
     override val lastConfidenceCheckAt: LocalDateTime,
     override val nextConfidenceCheckAt: LocalDateTime,
     override val confidenceLevel: Int

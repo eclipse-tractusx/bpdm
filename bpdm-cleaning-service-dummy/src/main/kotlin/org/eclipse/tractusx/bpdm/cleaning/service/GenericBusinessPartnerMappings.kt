@@ -27,7 +27,7 @@ import java.time.LocalDateTime
 
 val dummyConfidenceCriteria = ConfidenceCriteriaDto(
     sharedByOwner = false,
-    numberOfBusinessPartners = 1,
+    numberOfSharingMembers = 1,
     checkedByExternalDataSource = false,
     lastConfidenceCheckAt = LocalDateTime.now(),
     nextConfidenceCheckAt = LocalDateTime.now().plusDays(5),

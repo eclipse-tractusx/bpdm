@@ -102,7 +102,7 @@ object BusinessPartnerVerboseValues {
     private val confidenceCriteria1 = ConfidenceCriteriaDto(
         sharedByOwner = true,
         checkedByExternalDataSource = true,
-        numberOfBusinessPartners = 1,
+        numberOfSharingMembers = 1,
         lastConfidenceCheckAt = LocalDateTime.of(2023, 10, 10, 10, 10, 10),
         nextConfidenceCheckAt = LocalDateTime.of(2024, 10, 10, 10, 10, 10),
         confidenceLevel = 10
@@ -111,7 +111,7 @@ object BusinessPartnerVerboseValues {
     private val confidenceCriteria2 = ConfidenceCriteriaDto(
         sharedByOwner = false,
         checkedByExternalDataSource = false,
-        numberOfBusinessPartners = 3,
+        numberOfSharingMembers = 3,
         lastConfidenceCheckAt = LocalDateTime.of(2022, 10, 10, 10, 10, 10),
         nextConfidenceCheckAt = LocalDateTime.of(2025, 10, 10, 10, 10, 10),
         confidenceLevel = 6
@@ -120,7 +120,7 @@ object BusinessPartnerVerboseValues {
     private val confidenceCriteria3 = ConfidenceCriteriaDto(
         sharedByOwner = true,
         checkedByExternalDataSource = false,
-        numberOfBusinessPartners = 10,
+        numberOfSharingMembers = 10,
         lastConfidenceCheckAt = LocalDateTime.of(2021, 10, 10, 10, 10, 10),
         nextConfidenceCheckAt = LocalDateTime.of(2026, 10, 10, 10, 10, 10),
         confidenceLevel = 3
