@@ -51,10 +51,4 @@ class SharingStateController(
     override fun postSharingStateReady(request: PostSharingStateReadyRequest) {
         sharingStateService.setReady(request.externalIds)
     }
-
-    @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_OUTPUT_AUTHORITY})")
-    override fun upsertSharingState(request: SharingStateDto) {
-        logger.info { "upsertSharingState() called with $request" }
-        sharingStateService.upsertSharingState(request)
-    }
 }

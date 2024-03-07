@@ -43,12 +43,6 @@ class GateClientImpl(
 
     override val businessParters by lazy { createClient<BusinessPartnerApiClient>() }
 
-    override val addresses by lazy { createClient<AddressApiClient>() }
-
-    override val legalEntities by lazy { createClient<LegalEntityApiClient>() }
-
-    override val sites by lazy { createClient<SiteApiClient>() }
-
     override val changelog by lazy { createClient<ChangelogApiClient>() }
 
     override val sharingState by lazy { createClient<SharingStateApiClient>() }

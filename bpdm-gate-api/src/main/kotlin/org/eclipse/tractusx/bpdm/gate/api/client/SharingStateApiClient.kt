@@ -33,7 +33,6 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.service.annotation.GetExchange
 import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
-import org.springframework.web.service.annotation.PutExchange
 
 @HttpExchange("/sharing-state")
 interface SharingStateApiClient : GateSharingStateApi {
@@ -46,8 +45,5 @@ interface SharingStateApiClient : GateSharingStateApi {
 
     @PostExchange("/ready")
     override fun postSharingStateReady(@RequestBody request: PostSharingStateReadyRequest)
-
-    @PutExchange
-    override fun upsertSharingState(@RequestBody request: SharingStateDto)
 
 }

@@ -23,12 +23,6 @@ interface GateClient {
 
     val businessParters: BusinessPartnerApiClient
 
-    val addresses: AddressApiClient
-
-    val legalEntities: LegalEntityApiClient
-
-    val sites: SiteApiClient
-
     val changelog: ChangelogApiClient
 
     val sharingState: SharingStateApiClient
