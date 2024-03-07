@@ -27,9 +27,9 @@ import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
-import org.eclipse.tractusx.bpdm.pool.util.*
+import org.eclipse.tractusx.bpdm.pool.util.EndpointValues
+import org.eclipse.tractusx.bpdm.pool.util.TestHelpers
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
-
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues.addressIdentifier
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues.addressIdentifier1
@@ -41,7 +41,6 @@ import org.eclipse.tractusx.bpdm.test.util.AssertHelpers
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.eclipse.tractusx.bpdm.test.util.PoolDataHelpers
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -450,34 +449,6 @@ class LegalEntityControllerIT @Autowired constructor(
     }
 
     /**
-     * Given several legal entity with multiple identifiers
-     * When updating values of legal entity via BPN
-     * Then legal entity updated with the values
-     */
-    @Disabled("Fix insert with same identifiers")
-    @Test
-    fun `update existing legal entities multiple identifier`() {
-        val given = listOf(BusinessPartnerNonVerboseValues.legalEntityCreateMultipleIdentifier, BusinessPartnerNonVerboseValues.legalEntityCreate2, BusinessPartnerNonVerboseValues.legalEntityCreate3)
-
-        val createResponses = poolClient.legalEntities.createBusinessPartners(given)
-            .entities
-
-        val createResponse = createResponses.filter { response ->
-            response.index.equals(BusinessPartnerNonVerboseValues.legalEntityCreateMultipleIdentifier.index)
-        }[0]
-
-        val givenBpnL = createResponse.legalEntity.bpnl
-
-        val toUpdate = BusinessPartnerNonVerboseValues.legalEntityUpdateMultipleIdentifier.copy(
-            bpnl = givenBpnL,
-            legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreateMultipleIdentifier.legalEntity.copy(legalShortName = "ChangedShortNam"),
-        )
-        val response = poolClient.legalEntities.updateBusinessPartners(listOf(toUpdate))
-
-        assertThat(response.errorCount).isEqualTo(0)
-    }
-
-    /**
      * Given legal entities
      * When trying to update via non-existent BPN
      * Then don't update
@@ -520,63 +491,6 @@ class LegalEntityControllerIT @Autowired constructor(
         // 1 error
         assertThat(response.errorCount).isEqualTo(1)
         testHelpers.assertErrorResponse(response.errors.first(), LegalEntityUpdateError.LegalEntityNotFound, "NONEXISTENT")
-    }
-
-    /**
-     * Given legal addresses of legal entities
-     * When asking for legal addresses via BPNs of those legal entities
-     * Then get those legal addresses
-     */
-    @Test
-    fun `find legal addresses by BPN`() {
-        val givenStructures = listOf(
-            LegalEntityStructureRequest(BusinessPartnerNonVerboseValues.legalEntityCreate1),
-            LegalEntityStructureRequest(BusinessPartnerNonVerboseValues.legalEntityCreate2),
-            LegalEntityStructureRequest(BusinessPartnerNonVerboseValues.legalEntityCreate3)
-        )
-        val givenLegalEntities = testHelpers.createBusinessPartnerStructure(givenStructures).map { it.legalEntity }
-
-        val expected = givenLegalEntities
-            .map { toLegalAddressResponse(it.legalAddress) }
-
-        val bpnsToSearch = givenLegalEntities.map { it.legalEntity.bpnl }
-        val response = poolClient.legalEntities.searchLegalAddresses(bpnsToSearch)
-
-        assertThat(response)
-            .usingRecursiveComparison()
-            .ignoringCollectionOrder()
-            .ignoringAllOverriddenEquals()
-            .ignoringFieldsOfTypes(Instant::class.java)
-            .isEqualTo(expected)
-    }
-
-    /**
-     * Given legal entities
-     * When asking for legal address with wrong and correct BPNLs
-     * Then only get legal addresses with correct BPNLs
-     */
-    @Test
-    fun `only find legal addresses with matching BPNLs`() {
-        val givenStructures = listOf(
-            LegalEntityStructureRequest(BusinessPartnerNonVerboseValues.legalEntityCreate1),
-            LegalEntityStructureRequest(BusinessPartnerNonVerboseValues.legalEntityCreate2),
-            LegalEntityStructureRequest(BusinessPartnerNonVerboseValues.legalEntityCreate3)
-        )
-        val givenLegalEntities = testHelpers.createBusinessPartnerStructure(givenStructures).map { it.legalEntity }
-
-        val expected = givenLegalEntities
-            .map { toLegalAddressResponse(it.legalAddress) }
-            .take(2)
-
-        val bpnsToSearch = expected.map { it.bpnLegalEntity }.plus("NONEXISTENT")
-        val response = poolClient.legalEntities.searchLegalAddresses(bpnsToSearch)
-
-        assertThat(response)
-            .usingRecursiveComparison()
-            .ignoringCollectionOrder()
-            .ignoringAllOverriddenEquals()
-            .ignoringFieldsOfTypes(Instant::class.java)
-            .isEqualTo(expected)
     }
 
     /**
@@ -750,40 +664,6 @@ class LegalEntityControllerIT @Autowired constructor(
             .ignoringAllOverriddenEquals()
             .ignoringFieldsOfTypes(Instant::class.java)
             .isEqualTo(expected)
-    }
-
-    /**
-     * Given business partner
-     * When updating currentness of an imported business partner
-     * Then currentness timestamp is updated
-     */
-    @Test
-    fun `set business partner currentness`() {
-        val given = listOf(BusinessPartnerNonVerboseValues.legalEntityCreate1)
-        val bpnL = poolClient.legalEntities.createBusinessPartners(given)
-            .entities.single().legalEntity.bpnl
-        val initialCurrentness = retrieveCurrentness(bpnL)
-        val instantBeforeCurrentnessUpdate = Instant.now()
-
-        assertThat(initialCurrentness).isBeforeOrEqualTo(instantBeforeCurrentnessUpdate)
-
-        poolClient.legalEntities.setLegalEntityCurrentness(bpnL)
-
-
-        val updatedCurrentness = poolClient.legalEntities.getLegalEntity(bpnL).legalEntity.currentness
-        assertThat(updatedCurrentness).isBetween(instantBeforeCurrentnessUpdate, Instant.now())
-    }
-
-    /**
-     * Given business partners imported
-     * When trying to update currentness using a nonexistent bpn
-     * Then a "not found" response is sent
-     */
-    @Test
-    fun `set business partner currentness using nonexistent bpn`() {
-
-        testHelpers.`set business partner currentness using nonexistent bpn`("NONEXISTENT_BPN")
-
     }
 
     fun assertThatCreatedLegalEntitiesEqual(actuals: Collection<LegalEntityPartnerCreateVerboseDto>, expected: Collection<LegalEntityPartnerCreateVerboseDto>) {

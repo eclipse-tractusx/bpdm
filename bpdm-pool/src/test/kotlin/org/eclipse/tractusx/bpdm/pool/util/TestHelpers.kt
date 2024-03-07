@@ -135,15 +135,6 @@ class TestHelpers(
         }
     }
 
-    fun `set business partner currentness using nonexistent bpn`(bpn: String) {
-        try {
-            val result = poolClient.legalEntities.setLegalEntityCurrentness(bpn)
-            assertThrows<WebClientResponseException> { result }
-        } catch (e: WebClientResponseException) {
-            Assert.assertEquals(HttpStatus.NOT_FOUND, e.statusCode)
-        }
-    }
-
     fun `get site by bpn-s, not found`(bpn: String) {
         try {
             val result = poolClient.sites.getSite(bpn)

@@ -28,7 +28,10 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.BusinessPartnerSearchReq
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.*
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerUpdateResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.pool.config.ControllerConfigProperties
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
@@ -68,11 +71,6 @@ class LegalEntityController(
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
-    override fun setLegalEntityCurrentness(bpnl: String) {
-        businessPartnerBuildService.setBusinessPartnerCurrentness(bpnl.uppercase())
-    }
-
-    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun searchLegalEntitys(
         bpnLs: Collection<String>
     ): ResponseEntity<Collection<LegalEntityWithLegalAddressVerboseDto>> {
@@ -96,13 +94,6 @@ class LegalEntityController(
         paginationRequest: PaginationRequest
     ): PageDto<LogisticAddressVerboseDto> {
         return addressService.findByPartnerBpn(bpnl.uppercase(), paginationRequest.page, paginationRequest.size)
-    }
-
-    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
-    override fun searchLegalAddresses(
-        bpnLs: Collection<String>
-    ): Collection<LegalAddressVerboseDto> {
-        return addressService.findLegalAddresses(bpnLs)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")

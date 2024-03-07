@@ -34,7 +34,10 @@ import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.*
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerUpdateResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -88,24 +91,6 @@ interface PoolLegalEntityApi {
         @Parameter(description = "Type of identifier to use, defaults to BPN when omitted", schema = Schema(defaultValue = "BPN"))
         @RequestParam idType: String? = "BPN"
     ): LegalEntityWithLegalAddressVerboseDto
-
-    @Operation(
-        summary = "Confirms that the data of a legal entity business partner is still up to date.",
-        description = "Confirms that the data of a business partner is still up to date " +
-                "by saving the current timestamp at the time this POST-request is made as this business partner's \"currentness\". Ignores case of bpnl."
-    )
-    @ApiResponses(
-        value = [
-            ApiResponse(responseCode = "200", description = "Business partner's \"currentness\" successfully updated"),
-            ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()]),
-            ApiResponse(responseCode = "404", description = "No business partner found for specified bpnl", content = [Content()])
-        ]
-    )
-    @Tag(name = ApiTags.LEGAL_ENTITIES_NAME, description = ApiTags.LEGAL_ENTITIES_DESCRIPTION)
-    @PostMapping("/{bpnl}/confirm-up-to-date")
-    fun setLegalEntityCurrentness(
-        @Parameter(description = "BPNL value") @PathVariable bpnl: String
-    )
 
     @Operation(
         summary = "Returns legal entities by an array of BPNL",
@@ -164,23 +149,6 @@ interface PoolLegalEntityApi {
         @Parameter(description = "BPNL value") @PathVariable bpnl: String,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageDto<LogisticAddressVerboseDto>
-
-    @Operation(
-        summary = "Search Legal Addresses",
-        description = "Search legal addresses of legal entities by BPNL"
-    )
-    @ApiResponses(
-        value = [
-            ApiResponse(responseCode = "200", description = "The found legal addresses"),
-            ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()]),
-        ]
-    )
-    @Tag(name = ApiTags.LEGAL_ENTITIES_NAME, description = ApiTags.LEGAL_ENTITIES_DESCRIPTION)
-    @PostMapping("/legal-addresses/search")
-    fun searchLegalAddresses(
-        @RequestBody
-        bpnLs: Collection<String>
-    ): Collection<LegalAddressVerboseDto>
 
     @Operation(
         summary = "Creates a new legal entity",

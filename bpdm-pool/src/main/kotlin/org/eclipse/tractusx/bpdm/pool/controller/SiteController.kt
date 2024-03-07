@@ -25,7 +25,10 @@ import org.eclipse.tractusx.bpdm.pool.api.PoolSiteApi
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteBpnSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.*
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteMatchVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerUpdateResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.service.AddressService
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
@@ -41,13 +44,6 @@ class SiteController(
     private val addressService: AddressService,
     val searchService: SearchService,
 ) : PoolSiteApi {
-
-    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
-    override fun searchMainAddresses(
-        bpnS: Collection<String>
-    ): Collection<MainAddressVerboseDto> {
-        return addressService.findMainAddresses(bpnS)
-    }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun getSite(

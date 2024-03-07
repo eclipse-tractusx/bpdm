@@ -130,37 +130,6 @@ interface PoolMetadataApi {
     fun getFieldQualityRules(@Parameter(description = "ISO 3166-1 alpha-2 country code") @RequestParam country: CountryCode): ResponseEntity<Collection<FieldQualityRuleDto>>
 
     @Operation(
-        summary = "Create new Region",
-        description = "Create a new region which can be referenced by business partner records.",
-        deprecated = true
-    )
-    @ApiResponses(
-        value = [
-            ApiResponse(responseCode = "200", description = "New region successfully created"),
-            ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()]),
-
-        ]
-    )
-    @Tag(name = ApiTags.METADATA_NAME, description = ApiTags.METADATA_DESCRIPTION)
-    @PostMapping("/regions")
-    fun createRegion(@RequestBody type: RegionDto): RegionDto
-
-    @Operation(
-        summary = "Get page of regions",
-        description = "Lists all currently known regions in a paginated result",
-        deprecated = true
-    )
-    @ApiResponses(
-        value = [
-            ApiResponse(responseCode = "200", description = "Page of existing regions, may be empty"),
-            ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()])
-        ]
-    )
-    @Tag(name = ApiTags.METADATA_NAME, description = ApiTags.METADATA_DESCRIPTION)
-    @GetMapping("/regions")
-    fun getRegions(@ParameterObject paginationRequest: PaginationRequest): PageDto<RegionDto>
-
-    @Operation(
         summary = "Get page of country subdivisions suitable for the administrativeAreaLevel1 address property",
         description = "Lists all currently known country subdivisions according to ISO 3166-2 in a paginated result"
     )

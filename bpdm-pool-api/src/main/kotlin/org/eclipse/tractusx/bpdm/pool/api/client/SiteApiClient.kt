@@ -25,7 +25,10 @@ import org.eclipse.tractusx.bpdm.pool.api.PoolSiteApi
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteBpnSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.*
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteMatchVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerUpdateResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestBody
@@ -50,11 +53,6 @@ interface SiteApiClient : PoolSiteApi {
     override fun getSitesPaginated(
         @ParameterObject paginationRequest: PaginationRequest
     ): PageDto<SiteMatchVerboseDto>
-
-    @PostExchange("/main-addresses/search")
-    override fun searchMainAddresses(
-        @RequestBody bpnS: Collection<String>
-    ): Collection<MainAddressVerboseDto>
 
     @PostExchange("/search")
     override fun searchSites(
