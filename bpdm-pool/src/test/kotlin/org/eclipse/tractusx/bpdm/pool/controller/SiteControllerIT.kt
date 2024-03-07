@@ -123,7 +123,6 @@ class SiteControllerIT @Autowired constructor(
         val expectedSiteWithReference1 = SiteWithMainAddressVerboseDto(
             site = BusinessPartnerVerboseValues.site1.copy(bpnLegalEntity = bpnL),
             mainAddress = BusinessPartnerVerboseValues.addressPartner1.copy(
-                isMainAddress = true,
                 addressType = AddressType.SiteMainAddress,
                 bpnSite = BusinessPartnerVerboseValues.site1.bpns
             )
@@ -131,7 +130,6 @@ class SiteControllerIT @Autowired constructor(
         val expectedSiteWithReference2 = SiteWithMainAddressVerboseDto(
             site = BusinessPartnerVerboseValues.site2.copy(bpnLegalEntity = bpnL),
             mainAddress = BusinessPartnerVerboseValues.addressPartner2.copy(
-                isMainAddress = true,
                 addressType = AddressType.SiteMainAddress,
                 bpnSite = BusinessPartnerVerboseValues.site2.bpns
             )
@@ -178,7 +176,6 @@ class SiteControllerIT @Autowired constructor(
             SiteWithMainAddressVerboseDto(
                 site = BusinessPartnerVerboseValues.site1.copy(bpnLegalEntity = bpnL1),
                 mainAddress = BusinessPartnerVerboseValues.addressPartner1.copy(
-                    isMainAddress = true,
                     addressType = AddressType.SiteMainAddress,
                     bpnSite = BusinessPartnerVerboseValues.site1.bpns
                 )
@@ -187,7 +184,6 @@ class SiteControllerIT @Autowired constructor(
             SiteWithMainAddressVerboseDto(
                 site = BusinessPartnerVerboseValues.site2.copy(bpnLegalEntity = bpnL1),
                 mainAddress = BusinessPartnerVerboseValues.addressPartner2.copy(
-                    isMainAddress = true,
                     addressType = AddressType.SiteMainAddress,
                     bpnSite = BusinessPartnerVerboseValues.site2.bpns
                 )
@@ -196,7 +192,6 @@ class SiteControllerIT @Autowired constructor(
             SiteWithMainAddressVerboseDto(
                 site = BusinessPartnerVerboseValues.site3.copy(bpnLegalEntity = bpnL2),
                 mainAddress = BusinessPartnerVerboseValues.addressPartner3.copy(
-                    isMainAddress = true,
                     addressType = AddressType.SiteMainAddress,
                     bpnSite = BusinessPartnerVerboseValues.site3.bpns
                 )
@@ -495,7 +490,6 @@ class SiteControllerIT @Autowired constructor(
 
         val legalAddress1: LogisticAddressVerboseDto =
             BusinessPartnerVerboseValues.addressPartner1.copy(
-                isMainAddress = true,
                 addressType = AddressType.SiteMainAddress,
                 bpnSite = BusinessPartnerVerboseValues.site1.bpns,
                 bpna = "BPNA0000000001YN"
@@ -504,7 +498,6 @@ class SiteControllerIT @Autowired constructor(
 
         val legalAddress2: LogisticAddressVerboseDto =
             BusinessPartnerVerboseValues.addressPartner2.copy(
-                isMainAddress = true,
                 addressType = AddressType.SiteMainAddress,
                 bpnSite = BusinessPartnerVerboseValues.site2.bpns,
                 bpna = "BPNA0000000002XY"

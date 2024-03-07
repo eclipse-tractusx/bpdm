@@ -21,10 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.service
 
 import com.neovisionaries.i18n.CountryCode
 import org.assertj.core.api.Assertions.assertThat
-import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
-import org.eclipse.tractusx.bpdm.common.dto.ILegalEntityStateDto
-import org.eclipse.tractusx.bpdm.common.dto.ISiteStateDto
-import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
+import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
@@ -35,7 +32,6 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAdd
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.service.TaskStepBuildService.CleaningError
-
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues.addressIdentifierTypeDto1
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues.addressIdentifierTypeDto2
@@ -187,14 +183,12 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
 
         val createdLegalEntity = poolClient.legalEntities.getLegalEntity(createResult[0].businessPartner?.legalEntity?.bpnLReference?.referenceValue!!)
         assertThat(createdLegalEntity.legalAddress.bpnLegalEntity).isEqualTo(createdLegalEntity.legalEntity.bpnl)
-        assertThat(createdLegalEntity.legalAddress.isLegalAddress).isTrue()
-        assertThat(createdLegalEntity.legalAddress.isMainAddress).isFalse()
+        assertThat(createdLegalEntity.legalAddress.addressType == AddressType.LegalAddress).isTrue()
         assertThat(createResult[0].businessPartner?.generic?.legalEntity?.legalEntityBpn).isEqualTo(createdLegalEntity.legalEntity.bpnl)
         compareLegalEntity(createdLegalEntity, createResult[0].businessPartner?.legalEntity)
         val createdAdditionalAddress = poolClient.addresses.getAddress(createResult[0].businessPartner?.address?.bpnAReference?.referenceValue!!)
         assertThat(createdAdditionalAddress.bpnLegalEntity).isEqualTo(createdLegalEntity.legalEntity.bpnl)
-        assertThat(createdAdditionalAddress.isLegalAddress).isFalse()
-        assertThat(createdAdditionalAddress.isMainAddress).isFalse()
+        assertThat(createdAdditionalAddress.addressType == AddressType.AdditionalAddress).isTrue()
     }
 
     @Test
@@ -738,8 +732,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         compareLogisticAddress(createdAdditionalAddress, createResult[0].businessPartner?.address)
         assertThat(createdAdditionalAddress.bpnLegalEntity).isNull()
         assertThat(createdAdditionalAddress.bpnSite).isEqualTo(createResult[0].businessPartner?.site?.bpnSReference?.referenceValue)
-        assertThat(createdAdditionalAddress.isLegalAddress).isFalse()
-        assertThat(createdAdditionalAddress.isMainAddress).isFalse()
+        assertThat(createdAdditionalAddress.addressType == AddressType.AdditionalAddress).isTrue()
     }
 
 
@@ -1080,9 +1073,8 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         val createdAdditionalAddress = poolClient.addresses.getAddress(createResult[0].businessPartner?.address?.bpnAReference?.referenceValue!!)
         assertThat(createResult[0].taskId).isEqualTo("TASK_1")
         assertThat(createResult[0].errors).hasSize(0)
-        assertThat(createdLeAddress.isLegalAddress).isTrue()
-        assertThat(createdAdditionalAddress.isMainAddress).isFalse()
-        assertThat(createdAdditionalAddress.isLegalAddress).isFalse()
+        assertThat(createdLeAddress.addressType == AddressType.LegalAddress).isTrue()
+        assertThat(createdAdditionalAddress.addressType == AddressType.AdditionalAddress).isTrue()
         compareLogisticAddress(createdAdditionalAddress, createResult[0].businessPartner?.address)
     }
 
@@ -1472,7 +1464,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
 
         val verboseLegalAddress = verboseRequest.legalAddress
         assertThat(verboseLegalAddress.bpnLegalEntity).isEqualTo(legalEntity?.bpnLReference?.referenceValue)
-        assertThat(verboseLegalAddress.isLegalAddress).isTrue()
+        assertThat(verboseLegalAddress.addressType == AddressType.LegalAddress).isTrue()
         compareLogisticAddress(verboseLegalAddress, legalEntity?.legalAddress)
     }
 
@@ -1487,7 +1479,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         val verboseMainAddress = verboseRequest.mainAddress
         assertThat(verboseMainAddress.bpnSite).isEqualTo(site?.bpnSReference?.referenceValue)
         val mainAddress = site?.mainAddress
-        assertThat(verboseMainAddress.isMainAddress).isTrue()
+        assertThat(verboseMainAddress.addressType == AddressType.SiteMainAddress).isTrue()
         compareLogisticAddress(verboseMainAddress, mainAddress)
     }
 

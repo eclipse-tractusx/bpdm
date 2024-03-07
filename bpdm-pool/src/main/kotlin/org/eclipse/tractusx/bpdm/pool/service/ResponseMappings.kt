@@ -110,9 +110,7 @@ fun LogisticAddressDb.toDto(): LogisticAddressVerboseDto {
     return LogisticAddressVerboseDto(
         bpna = bpn,
         bpnLegalEntity = legalEntity?.bpn,
-        isLegalAddress = legalEntity?.legalAddress == this,
         bpnSite = site?.bpn,
-        isMainAddress = site?.mainAddress == this,
         createdAt = createdAt,
         updatedAt = updatedAt,
         name = name,
