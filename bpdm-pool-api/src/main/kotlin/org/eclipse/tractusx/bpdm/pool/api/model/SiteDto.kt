@@ -32,5 +32,4 @@ data class SiteDto(
     val mainAddress: LogisticAddressDto,
 
     override val confidenceCriteria: ConfidenceCriteriaDto
-
 ) : IBaseSiteDto

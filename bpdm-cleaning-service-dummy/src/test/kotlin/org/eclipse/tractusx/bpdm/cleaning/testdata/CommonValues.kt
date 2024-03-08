@@ -183,6 +183,7 @@ object CommonValues {
         identifiers = identifiers.mapNotNull { it.toLegalEntityIdentifierDto() },
         legalForm = legalForm,
         states = states.mapNotNull { it.toLegalEntityState() },
+        isCatenaXMemberData = true,
         confidenceCriteria = dummyConfidenceCriteria
     )
 

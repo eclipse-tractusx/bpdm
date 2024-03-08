@@ -85,7 +85,7 @@ class LegalEntityController(
         bpnl: String,
         paginationRequest: PaginationRequest
     ): PageDto<SiteVerboseDto> {
-        return siteService.findByPartnerBpn(bpnl.uppercase(), paginationRequest.page, paginationRequest.size)
+        return siteService.findByParentBpn(bpnl.uppercase(), paginationRequest.page, paginationRequest.size)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")

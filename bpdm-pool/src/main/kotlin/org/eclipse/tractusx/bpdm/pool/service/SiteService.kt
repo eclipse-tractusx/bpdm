@@ -40,24 +40,23 @@ class SiteService(
 ) {
     private val logger = KotlinLogging.logger { }
 
-    fun findByPartnerBpn(bpn: String, pageIndex: Int, pageSize: Int): PageDto<SiteVerboseDto> {
+    fun findByParentBpn(bpn: String, pageIndex: Int, pageSize: Int): PageDto<SiteVerboseDto> {
         logger.debug { "Executing findByPartnerBpn() with parameters $bpn // $pageIndex // $pageSize" }
-        if (!legalEntityRepository.existsByBpn(bpn)) {
-            throw BpdmNotFoundException("Business Partner", bpn)
-        }
+        val legalEntity = legalEntityRepository.findByBpn(bpn) ?: throw BpdmNotFoundException("Business Partner", bpn)
 
-        val page = siteRepository.findByLegalEntityBpn(bpn, PageRequest.of(pageIndex, pageSize))
+        val page = siteRepository.findByLegalEntity(legalEntity, PageRequest.of(pageIndex, pageSize))
         fetchSiteDependencies(page.toSet())
         return page.toDto(page.content.map { it.toDto() })
     }
 
     fun findByPartnerBpns(siteSearchRequest: SiteBpnSearchRequest, paginationRequest: PaginationRequest): PageDto<SiteWithMainAddressVerboseDto> {
         logger.debug { "Executing findByPartnerBpns() with parameters $siteSearchRequest // $paginationRequest" }
-        val partners =
+        val parents =
             if (siteSearchRequest.legalEntities.isNotEmpty()) legalEntityRepository.findDistinctByBpnIn(siteSearchRequest.legalEntities) else emptyList()
         val sitePage =
-            siteRepository.findByLegalEntityInOrBpnIn(partners, siteSearchRequest.sites, PageRequest.of(paginationRequest.page, paginationRequest.size))
+            siteRepository.findByLegalEntityInOrBpnIn(parents, siteSearchRequest.sites, PageRequest.of(paginationRequest.page, paginationRequest.size))
         fetchSiteDependencies(sitePage.toSet())
+
         return sitePage.toDto(sitePage.content.map { it.toPoolDto() })
     }
 

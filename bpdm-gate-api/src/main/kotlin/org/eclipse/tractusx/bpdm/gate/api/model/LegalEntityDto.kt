@@ -40,6 +40,8 @@ data class LegalEntityDto(
     @get:ArraySchema(arraySchema = Schema(description = CommonDescription.roles))
     val roles: Collection<BusinessPartnerRole> = emptyList(),
 
-    override val confidenceCriteria: ConfidenceCriteriaDto? = null
+    override val confidenceCriteria: ConfidenceCriteriaDto? = null,
+
+    override val isCatenaXMemberData: Boolean
 
 ) : IBaseLegalEntityDto

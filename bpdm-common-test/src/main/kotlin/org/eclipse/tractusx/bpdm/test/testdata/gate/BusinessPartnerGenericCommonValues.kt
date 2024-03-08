@@ -422,7 +422,8 @@ object BusinessPartnerGenericCommonValues {
             lastConfidenceCheckAt = LocalDateTime.of(2023, 5, 6, 7, 8),
             nextConfidenceCheckAt = LocalDateTime.of(2026, 5, 6, 7, 8),
             confidenceLevel = 3
-        )
+        ),
+        isCatenaXMemberData = false
     )
 
     val legalEntity2 = LegalEntityDto(
@@ -456,7 +457,8 @@ object BusinessPartnerGenericCommonValues {
             lastConfidenceCheckAt = LocalDateTime.of(2023, 5, 6, 7, 8),
             nextConfidenceCheckAt = LocalDateTime.of(2026, 5, 6, 7, 8),
             confidenceLevel = 4
-        )
+        ),
+        isCatenaXMemberData = false
     )
 
     val site1 = SiteDto(

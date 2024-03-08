@@ -46,7 +46,8 @@ data class LogisticAddressVerboseDto(
     @get:Schema(description = LogisticAddressDescription.bpnSite)
     val bpnSite: String?,
 
-    val isCatenaXMemberData: Boolean = false,
+    @get:Schema(description = "Indicates whether the address is owned and thus provided by a Catena-X Member.")
+    val isCatenaXMemberData: Boolean,
 
     @get:Schema(description = CommonDescription.createdAt)
     val createdAt: Instant,

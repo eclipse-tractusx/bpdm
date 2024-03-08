@@ -1258,7 +1258,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
 
     fun emptyLegalEntity(): LegalEntityDto {
 
-        return LegalEntityDto()
+        return LegalEntityDto(isCatenaXMemberData = false)
     }
 
     fun minValidLegalEntity(bpnLReference: BpnReferenceDto, bpnAReference: BpnReferenceDto): LegalEntityDto {
@@ -1267,6 +1267,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
             bpnLReference = bpnLReference,
             legalName = "legalName_" + bpnLReference.referenceValue,
             legalAddress = minLogisticAddress(bpnAReference = bpnAReference),
+            isCatenaXMemberData = false,
             confidenceCriteria = fullConfidenceCriteria()
         )
     }
@@ -1287,6 +1288,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
                 legalEntityState(bpnLReference.referenceValue, 2L, BusinessStateType.INACTIVE)
             ),
             legalAddress = fullLogisticAddressDto(bpnAReference),
+            isCatenaXMemberData = false,
             confidenceCriteria = fullConfidenceCriteria()
         )
     }
