@@ -28,7 +28,8 @@ data class PermissionConfigProperties(
     val readPartner: String = "read_partner",
     val writePartner: String = "write_partner",
     val readMetaData: String = "read_meta_data",
-    val writeMetaData: String = "write_meta_data"
+    val writeMetaData: String = "write_meta_data",
+    val readMemberPartner: String = "read_member_partner"
 ) {
     companion object {
         const val PREFIX = "bpdm.security.permissions"
@@ -41,6 +42,7 @@ data class PermissionConfigProperties(
         const val WRITE_PARTNER = "@${BEAN_QUALIFIER}.getWritePartner()"
         const val READ_METADATA = "@${BEAN_QUALIFIER}.getReadMetaData()"
         const val WRITE_METADATA = "@${BEAN_QUALIFIER}.getWriteMetaData()"
+        const val READ_MEMBER_PARTNER = "@${BEAN_QUALIFIER}.getReadMemberPartner()"
     }
 }
 

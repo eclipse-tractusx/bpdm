@@ -42,7 +42,7 @@ class SiteService(
 
     fun findByParentBpn(bpn: String, pageIndex: Int, pageSize: Int): PageDto<SiteVerboseDto> {
         logger.debug { "Executing findByPartnerBpn() with parameters $bpn // $pageIndex // $pageSize" }
-        val legalEntity = legalEntityRepository.findByBpn(bpn) ?: throw BpdmNotFoundException("Business Partner", bpn)
+        val legalEntity = legalEntityRepository.findByBpnIgnoreCase(bpn) ?: throw BpdmNotFoundException("Business Partner", bpn)
 
         val page = siteRepository.findByLegalEntity(legalEntity, PageRequest.of(pageIndex, pageSize))
         fetchSiteDependencies(page.toSet())

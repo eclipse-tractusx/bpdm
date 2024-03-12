@@ -33,14 +33,12 @@ import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntitySearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerUpdateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
-import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RequestMapping("legal-entities", produces = [MediaType.APPLICATION_JSON_VALUE])
@@ -49,8 +47,7 @@ interface PoolLegalEntityApi {
     @Operation(
         summary = "Returns legal entities by different search parameters",
         description = "This endpoint tries to find matches among all existing business partners of type legal entity, " +
-                "filtering out partners which entirely do not match and ranking the remaining partners according to the accuracy of the match. " +
-                "The match of a partner is better the higher its relevancy score. "
+                "filtering out partners which entirely do not match and ranking the remaining partners according to the accuracy of the match. "
     )
     @ApiResponses(
         value = [
@@ -61,9 +58,9 @@ interface PoolLegalEntityApi {
     @Tag(name = ApiTags.LEGAL_ENTITIES_NAME, description = ApiTags.LEGAL_ENTITIES_DESCRIPTION)
     @GetMapping
     fun getLegalEntities(
-        @ParameterObject bpSearchRequest: LegalEntityPropertiesSearchRequest,
+        @ParameterObject searchRequest: LegalEntitySearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageDto<LegalEntityMatchVerboseDto>
+    ): PageDto<LegalEntityWithLegalAddressVerboseDto>
 
     @Operation(
         summary = "Returns a legal entity by identifier, like BPN, DUNS or EU VAT ID, specified by the identifier type",
@@ -93,7 +90,7 @@ interface PoolLegalEntityApi {
     ): LegalEntityWithLegalAddressVerboseDto
 
     @Operation(
-        summary = "Returns legal entities by an array of BPNL",
+        summary = "Returns legal entities by different search parameters",
         description = "Search legal entity partners by their BPNLs. " +
                 "The response can contain less results than the number of BPNLs that were requested, if some of the BPNLs did not exist. " +
                 "For a single request, the maximum number of BPNLs to search for is limited to \${bpdm.bpn.search-request-limit} entries."
@@ -110,9 +107,10 @@ interface PoolLegalEntityApi {
     )
     @Tag(name = ApiTags.LEGAL_ENTITIES_NAME, description = ApiTags.LEGAL_ENTITIES_DESCRIPTION)
     @PostMapping("/search")
-    fun searchLegalEntitys(
-        @RequestBody bpnLs: Collection<String>
-    ): ResponseEntity<Collection<LegalEntityWithLegalAddressVerboseDto>>
+    fun postLegalEntitySearch(
+        @RequestBody searchRequest: LegalEntitySearchRequest,
+        @ParameterObject paginationRequest: PaginationRequest
+    ): PageDto<LegalEntityWithLegalAddressVerboseDto>
 
     @Operation(
         summary = "Returns all sites of a legal entity with a specific BPNL",

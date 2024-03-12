@@ -332,6 +332,7 @@ class TaskStepBuildService(
                 states = states.map { LegalEntityStateDto(it.validFrom, it.validTo, it.type) },
                 confidenceCriteria = confidenceCriteria?.let { toPoolDto(it) }
                     ?: throw BpdmValidationException(CleaningError.LEGAL_ENTITY_CONFIDENCE_CRITERIA_MISSING.message),
+                isCatenaXMemberData = isCatenaXMemberData
             )
         }
 

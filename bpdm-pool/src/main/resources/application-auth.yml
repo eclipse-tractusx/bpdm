@@ -38,12 +38,15 @@ bpdm:
     permissions:
       # Name of the permission to read business partners
       readPartner: read_partner
-      # Name of the permissions to upsert business partners
+      # Name of the permission to upsert business partners
       writePartner: write_partner
+      # Name of the permission to read business partners that belong to a Catena-X member
+      readMemberPartner: read_member_partner
       # Name of the permission to read metadata
       readMetaData: read_meta_data
       # Name of the permission to create new metadata
       writeMetaData: write_meta_data
+
 #
 # From here on are framework and dependency configuration
 # More information about those properties can be taken from the respective documentation of Spring or the dependency

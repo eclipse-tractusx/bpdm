@@ -34,6 +34,11 @@ fun <S, T> Page<S>.toDto(dtoContent: Collection<T>): PageDto<T> {
     return PageDto(this.totalElements, this.totalPages, this.number, this.numberOfElements, dtoContent)
 }
 
+fun <S, T> Page<S>.toDto(map: (S) -> T): PageDto<T> {
+    return PageDto(totalElements, totalPages, number, numberOfElements, content.map { map(it) })
+}
+
+
 fun LegalEntityDb.toMatchDto(score: Float): LegalEntityMatchVerboseDto {
     return LegalEntityMatchVerboseDto(
         score = score,

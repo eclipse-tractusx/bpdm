@@ -20,12 +20,14 @@
 package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.assertj.core.api.Assertions.assertThat
+import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntitySearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.util.EndpointValues
 import org.eclipse.tractusx.bpdm.pool.util.TestHelpers
@@ -511,8 +513,8 @@ class LegalEntityControllerIT @Autowired constructor(
             .map { it.legalEntity }
             .take(2) // only search for a subset of the existing legal entities
 
-        val bpnsToSearch = expected.map { it.bpnl }
-        val response = poolClient.legalEntities.searchLegalEntitys(bpnsToSearch).body?.map { it.legalEntity }
+        val bpnsToSearch = LegalEntitySearchRequest(bpnLs = expected.map { it.bpnl })
+        val response = poolClient.legalEntities.postLegalEntitySearch(bpnsToSearch, PaginationRequest()).content.map { it.legalEntity }
 
         assertThat(response)
             .usingRecursiveComparison()
@@ -655,8 +657,8 @@ class LegalEntityControllerIT @Autowired constructor(
             .map { it.legalEntity }
             .take(2) // only search for a subset of the existing legal entities
 
-        val bpnsToSearch = expected.map { it.bpnl }.plus("NONEXISTENT") // also search for nonexistent BPN
-        val response = poolClient.legalEntities.searchLegalEntitys(bpnsToSearch).body?.map { it.legalEntity }
+        val bpnsToSearch = LegalEntitySearchRequest(bpnLs = expected.map { it.bpnl }.plus("NONEXISTENT")) // also search for nonexistent BPN
+        val response = poolClient.legalEntities.postLegalEntitySearch(bpnsToSearch, PaginationRequest()).content.map { it.legalEntity }
 
         assertThat(response)
             .usingRecursiveComparison()

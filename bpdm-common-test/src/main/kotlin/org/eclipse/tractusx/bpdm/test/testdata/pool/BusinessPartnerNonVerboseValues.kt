@@ -244,7 +244,8 @@ object BusinessPartnerNonVerboseValues {
             legalForm = BusinessPartnerVerboseValues.legalForm1.technicalKey,
             identifiers = listOf(identifier1),
             states = listOf(leStatus1),
-            confidenceCriteria = BusinessPartnerVerboseValues.legalEntity1.legalEntity.confidenceCriteria
+            confidenceCriteria = BusinessPartnerVerboseValues.legalEntity1.legalEntity.confidenceCriteria,
+            isCatenaXMemberData = false
         ),
         legalAddress = logisticAddress1,
         index = BusinessPartnerVerboseValues.legalEntityUpsert1.index
@@ -257,7 +258,8 @@ object BusinessPartnerNonVerboseValues {
             legalForm = BusinessPartnerVerboseValues.legalForm2.technicalKey,
             identifiers = listOf(identifier2),
             states = listOf(leStatus2),
-            confidenceCriteria = BusinessPartnerVerboseValues.legalEntity2.legalEntity.confidenceCriteria
+            confidenceCriteria = BusinessPartnerVerboseValues.legalEntity2.legalEntity.confidenceCriteria,
+            isCatenaXMemberData = false
         ),
         legalAddress = logisticAddress2,
         index = BusinessPartnerVerboseValues.legalEntityUpsert2.index
@@ -270,7 +272,8 @@ object BusinessPartnerNonVerboseValues {
             legalForm = BusinessPartnerVerboseValues.legalForm3.technicalKey,
             identifiers = listOf(identifier3),
             states = listOf(leStatus3),
-            confidenceCriteria = BusinessPartnerVerboseValues.legalEntity3.legalEntity.confidenceCriteria
+            confidenceCriteria = BusinessPartnerVerboseValues.legalEntity3.legalEntity.confidenceCriteria,
+            isCatenaXMemberData = false
         ),
         legalAddress = logisticAddress3,
         index = BusinessPartnerVerboseValues.legalEntityUpsert3.index
@@ -283,7 +286,8 @@ object BusinessPartnerNonVerboseValues {
             legalForm = BusinessPartnerVerboseValues.legalForm1.technicalKey,
             identifiers = listOf(identifier1, identifier2),
             states = listOf(leStatus1),
-            confidenceCriteria = BusinessPartnerVerboseValues.legalEntity1.legalEntity.confidenceCriteria
+            confidenceCriteria = BusinessPartnerVerboseValues.legalEntity1.legalEntity.confidenceCriteria,
+            isCatenaXMemberData = false
         ),
         legalAddress = logisticAddress1,
         index = BusinessPartnerVerboseValues.legalEntityUpsertMultipleIdentifier.index

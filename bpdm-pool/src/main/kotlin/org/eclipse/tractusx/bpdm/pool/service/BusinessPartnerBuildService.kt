@@ -21,7 +21,6 @@ package org.eclipse.tractusx.bpdm.pool.service
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.*
-import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
@@ -340,14 +339,6 @@ class BusinessPartnerBuildService(
         return AddressPartnerUpdateResponseWrapper(addressResponses, errors)
     }
 
-    @Transactional
-    fun setBusinessPartnerCurrentness(bpn: String) {
-        logger.info { "Updating currentness of business partner $bpn" }
-        val partner = legalEntityRepository.findByBpn(bpn) ?: throw BpdmNotFoundException("Business Partner", bpn)
-        partner.currentness = createCurrentnessTimestamp()
-        legalEntityRepository.save(partner)
-    }
-
     private fun createAddressesForLegalEntity(
         validRequests: Collection<AddressPartnerCreateRequest>,
         metadataMap: AddressMetadataMapping
@@ -608,6 +599,7 @@ class BusinessPartnerBuildService(
             legalEntity.identifiers.replace(legalEntityDto.identifiers.map { toLegalEntityIdentifier(it, metadataMap.idTypes, legalEntity) })
             legalEntity.states.replace(legalEntityDto.states.map { toLegalEntityState(it, legalEntity) })
             legalEntity.confidenceCriteria = createConfidenceCriteria(legalEntityDto.confidenceCriteria)
+            legalEntity.isCatenaXMemberData = legalEntityDto.isCatenaXMemberData
         }
 
         fun createPhysicalAddress(physicalAddress: IBasePhysicalPostalAddressDto, regions: Map<String, RegionDb>): PhysicalPostalAddressDb {

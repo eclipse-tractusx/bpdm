@@ -30,25 +30,43 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
+import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerFetchService
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-class MemberController : PoolMembersApi {
+class MemberController(
+    private val businessPartnerFetchService: BusinessPartnerFetchService
+) : PoolMembersApi {
+
+
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_MEMBER_PARTNER})")
     override fun searchLegalEntities(
         searchRequest: LegalEntitySearchRequest,
         paginationRequest: PaginationRequest
     ): PageDto<LegalEntityWithLegalAddressVerboseDto> {
-        TODO("Not yet implemented")
+        return businessPartnerFetchService.searchLegalEntities(
+            BusinessPartnerFetchService.LegalEntitySearchRequest(
+                bpnLs = searchRequest.bpnLs,
+                legalName = searchRequest.legalName,
+                isCatenaXMemberData = true
+            ),
+            paginationRequest
+        )
     }
 
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_MEMBER_PARTNER})")
     override fun searchSites(searchRequest: SiteSearchRequest, paginationRequest: PaginationRequest): PageDto<SiteWithMainAddressVerboseDto> {
         TODO("Not yet implemented")
     }
 
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_MEMBER_PARTNER})")
     override fun searchAddresses(searchRequest: AddressSearchRequest, paginationRequest: PaginationRequest): PageDto<LogisticAddressVerboseDto> {
         TODO("Not yet implemented")
     }
 
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_MEMBER_PARTNER})")
     override fun searchChangelogEntries(
         changelogSearchRequest: ChangelogSearchRequest,
         paginationRequest: PaginationRequest
