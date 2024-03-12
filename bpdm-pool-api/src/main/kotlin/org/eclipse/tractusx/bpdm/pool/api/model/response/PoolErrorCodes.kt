@@ -35,6 +35,7 @@ enum class LegalEntityCreateError : ErrorCode {
     LegalAddressRegionNotFound,
     LegalAddressIdentifierNotFound,
     LegalAddressDuplicateIdentifier,
+    LegalEntityErrorMapping
 }
 
 @Schema(description = "LegalEntityUpdateError")
@@ -45,7 +46,9 @@ enum class LegalEntityUpdateError : ErrorCode {
     LegalEntityIdentifierNotFound,
     LegalAddressRegionNotFound,
     LegalAddressIdentifierNotFound,
-    LegalAddressDuplicateIdentifier
+    LegalAddressDuplicateIdentifier,
+    LegalEntityErrorMapping
+
 }
 
 @Schema(description = "SiteCreateError")

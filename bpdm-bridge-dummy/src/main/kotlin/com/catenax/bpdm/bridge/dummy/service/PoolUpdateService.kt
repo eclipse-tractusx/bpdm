@@ -22,6 +22,7 @@ package com.catenax.bpdm.bridge.dummy.service
 import com.catenax.bpdm.bridge.dummy.dto.*
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressDto
@@ -40,30 +41,69 @@ class PoolUpdateService(
     private val logger = KotlinLogging.logger { }
 
     fun createLegalEntitiesInPool(entriesToCreate: Collection<GateLegalEntityInfo>): LegalEntityPartnerCreateResponseWrapper {
-        val createRequests = entriesToCreate.map {
-            LegalEntityPartnerCreateRequest(
-                legalEntity = gateToPoolLegalEntity(it.legalEntity),
-                legalAddress = gateToPoolLogisticAddress(it.legalAddress.address),
-                index = it.externalId
-            )
+        val errorListException = mutableListOf<ErrorInfo<LegalEntityCreateError>>()
+        val createRequests = mutableListOf<LegalEntityPartnerCreateRequest>()
+
+        entriesToCreate.forEach {
+            try {
+                createRequests.add( LegalEntityPartnerCreateRequest(
+                    legalEntity = gateToPoolLegalEntity(it.legalEntity),
+                    legalAddress = gateToPoolLogisticAddress(it.legalAddress.address),
+                    index = it.externalId)
+                )
+            }catch (e: BpdmNullMappingException){
+                val errorMapped = mapError(it, e.message!!,LegalEntityCreateError.LegalEntityErrorMapping)
+                errorListException.add(errorMapped)
+            }
         }
 
-        return poolClient.legalEntities.createBusinessPartners(createRequests)
-            .also { logger.info { "Pool accepted ${it.entityCount} new legal entities, ${it.errorCount} were refused" } }
+        val result = poolClient.legalEntities.createBusinessPartners(createRequests)
+        val createdResult = result.copy(errors = result.errors + errorListException)
+        logger.info { "Pool accepted ${createdResult.entityCount} new legal entities, ${createdResult.errorCount} were refused" }
+
+        return createdResult
     }
 
     fun updateLegalEntitiesInPool(entriesToUpdate: Collection<GateLegalEntityInfo>): LegalEntityPartnerUpdateResponseWrapper {
-        val updateRequests = entriesToUpdate.map {
-            LegalEntityPartnerUpdateRequest(
-                legalEntity = gateToPoolLegalEntity(it.legalEntity),
-                legalAddress = gateToPoolLogisticAddress(it.legalAddress.address),
-                bpnl = it.bpn!!
-            )
+        val errorListException = mutableListOf<ErrorInfo<LegalEntityUpdateError>>()
+        val updateRequests = mutableListOf<LegalEntityPartnerUpdateRequest>()
+
+        entriesToUpdate.forEach {
+            try {
+                updateRequests.add(
+                    LegalEntityPartnerUpdateRequest(
+                        legalEntity = gateToPoolLegalEntity(it.legalEntity),
+                        legalAddress = gateToPoolLogisticAddress(it.legalAddress.address),
+                        bpnl = it.bpn!!
+                    )
+                )
+            } catch (e: BpdmNullMappingException) {
+                val errorMapped = mapError(it, e.message!!,LegalEntityUpdateError.LegalEntityErrorMapping)
+                errorListException.add(errorMapped)
+            }
         }
 
-        return poolClient.legalEntities.updateBusinessPartners(updateRequests)
-            .also { logger.info { "Pool accepted ${it.entityCount} updated legal entities, ${it.errorCount} were refused" } }
+        val result = poolClient.legalEntities.updateBusinessPartners(updateRequests)
+        val updatedResult = result.copy(errors = result.errors + errorListException)
+        logger.info { "Pool accepted ${updatedResult.entityCount} updated legal entities, ${updatedResult.errorCount} were refused" }
+
+        return updatedResult
     }
+
+    private fun <T : ErrorCode> mapError(
+        record: GateLegalEntityInfo,
+        message: String,
+        errorCode: T
+    ): ErrorInfo<T> {
+        logger.info { "Error processing ${record.externalId}" }
+        logger.error { "Error message: $message" }
+        return ErrorInfo(
+            errorCode,
+            "Error on mapping legal entity with bpn ${record.bpn} and externalId ${record.externalId}: $message".take(250),
+            record.externalId
+        )
+    }
+
 
     fun createSitesInPool(entriesToCreate: Collection<GateSiteInfo>): SitePartnerCreateResponseWrapper {
         val leParentBpnByExternalId = entriesToCreate
