@@ -43,7 +43,10 @@ class LegalEntityDb(
     var currentness: Instant,
 
     @Embedded
-    var confidenceCriteria: ConfidenceCriteriaDb
+    var confidenceCriteria: ConfidenceCriteriaDb,
+
+    @Column(name = "is_catena_member", nullable = false)
+    var isCatenaXMemberData: Boolean
 
 ) : BaseEntity() {
     @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)

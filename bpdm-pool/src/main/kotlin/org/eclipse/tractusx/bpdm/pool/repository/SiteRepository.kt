@@ -34,8 +34,7 @@ interface SiteRepository : PagingAndSortingRepository<SiteDb, Long>, CrudReposit
     @Query("SELECT DISTINCT p FROM SiteDb p LEFT JOIN FETCH p.states WHERE p IN :partners")
     fun joinStates(partners: Set<SiteDb>): Set<SiteDb>
 
-    @Query("SELECT s FROM SiteDb s join s.legalEntity p where p.bpn=:bpn")
-    fun findByLegalEntityBpn(bpn: String, pageable: Pageable): Page<SiteDb>
+    fun findByLegalEntity(legalEntity: LegalEntityDb, pageable: Pageable): Page<SiteDb>
 
     fun findByLegalEntityInOrBpnIn(partners: Collection<LegalEntityDb>, bpns: Collection<String>, pageable: Pageable): Page<SiteDb>
 

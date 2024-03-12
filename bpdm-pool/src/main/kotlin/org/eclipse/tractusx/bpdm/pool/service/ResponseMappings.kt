@@ -68,6 +68,7 @@ fun LegalEntityDb.toDto(): LegalEntityVerboseDto {
         relations = startNodeRelations.plus(endNodeRelations).map { it.toDto() },
         currentness = currentness,
         confidenceCriteria = confidenceCriteria.toDto(),
+        isCatenaXMemberData = isCatenaXMemberData,
         createdAt = createdAt,
         updatedAt = updatedAt,
     )
@@ -119,6 +120,7 @@ fun LogisticAddressDb.toDto(): LogisticAddressVerboseDto {
         physicalPostalAddress = physicalPostalAddress.toDto(),
         alternativePostalAddress = alternativePostalAddress?.toDto(),
         confidenceCriteria = confidenceCriteria.toDto(),
+        isCatenaXMemberData = legalEntity?.isCatenaXMemberData ?: site?.legalEntity?.isCatenaXMemberData ?: false,
         addressType = getAddressType(this)
     )
 }
@@ -222,6 +224,7 @@ fun SiteDb.toDto(): SiteVerboseDto {
         states = states.map { it.toDto() },
         bpnLegalEntity = legalEntity.bpn,
         confidenceCriteria = confidenceCriteria.toDto(),
+        isCatenaXMemberData = legalEntity.isCatenaXMemberData,
         createdAt = createdAt,
         updatedAt = updatedAt,
     )
@@ -236,6 +239,7 @@ fun SiteDb.toPoolDto(): SiteWithMainAddressVerboseDto {
             states = states.map { it.toDto() },
             bpnLegalEntity = legalEntity.bpn,
             confidenceCriteria = confidenceCriteria.toDto(),
+            isCatenaXMemberData = legalEntity.isCatenaXMemberData,
             createdAt = createdAt,
             updatedAt = updatedAt,
         ),

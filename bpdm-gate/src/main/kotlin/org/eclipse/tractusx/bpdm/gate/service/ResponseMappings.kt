@@ -360,6 +360,7 @@ fun LegalEntityDb.toLegalEntityDto(): LegalEntityDto {
         legalShortName = shortName,
         states = mapToLegalEntityStateDto(states),
         identifiers = mapToLegalEntityIdentifiersDto(identifiers),
+        isCatenaXMemberData = false,
         roles = roles.map { it.roleName },
     )
 }

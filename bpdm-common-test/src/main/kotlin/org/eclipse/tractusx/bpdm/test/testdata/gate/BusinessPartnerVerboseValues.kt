@@ -195,6 +195,7 @@ object BusinessPartnerVerboseValues {
         legalShortName = "short1",
         legalForm = "LF1",
         states = listOf(legalEntityBusinessStatus1),
+        isCatenaXMemberData = false
     )
 
     val legalEntity2 = LegalEntityDto(
@@ -202,6 +203,7 @@ object BusinessPartnerVerboseValues {
         legalShortName = "short3",
         legalForm = "LF2",
         states = listOf(legalEntityBusinessStatus2),
+        isCatenaXMemberData = false
     )
 
     val legalEntity3 = LegalEntityDto(
@@ -209,6 +211,7 @@ object BusinessPartnerVerboseValues {
         legalShortName = "short1",
         legalForm = "LF1",
         states = listOf(legalEntityBusinessStatus1),
+        isCatenaXMemberData = false
     )
 
     val siteBusinessStatus1 = SiteStateDto(

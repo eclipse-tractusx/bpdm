@@ -587,7 +587,8 @@ class BusinessPartnerBuildService(
                 legalName = legalName,
                 legalForm = legalForm,
                 currentness = Instant.now().truncatedTo(ChronoUnit.MICROS),
-                confidenceCriteria = createConfidenceCriteria(legalEntityDto.confidenceCriteria)
+                confidenceCriteria = createConfidenceCriteria(legalEntityDto.confidenceCriteria),
+                isCatenaXMemberData = legalEntityDto.isCatenaXMemberData
             )
             updateLegalEntity(newLegalEntity, legalEntityDto, metadataMap)
 

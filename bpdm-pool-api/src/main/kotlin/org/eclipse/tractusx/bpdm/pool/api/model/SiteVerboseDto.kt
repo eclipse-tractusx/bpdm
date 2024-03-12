@@ -34,7 +34,8 @@ data class SiteVerboseDto(
     override val name: String,
     override val states: Collection<SiteStateVerboseDto> = emptyList(),
 
-    val isCatenaXMemberData: Boolean = false,
+    @get:Schema(description = "Indicates whether the site is owned and thus provided by a Catena-X Member.")
+    val isCatenaXMemberData: Boolean,
 
     @get:Schema(description = SiteDescription.bpnLegalEntity)
     val bpnLegalEntity: String,

@@ -45,6 +45,7 @@ class BusinessPartnerEquivalenceMapper {
                 identifiers = identifiers.map { IdentifierEquivalenceDto(it.value, it.type.technicalKey) }.toSortedSet(compareBy { it.value }),
                 states = states.map { StateEquivalenceDto(it.validFrom, it.validTo, it.type) }.toSortedSet(compareBy { it.validFrom }),
                 confidenceCriteria = toEquivalenceDto(confidenceCriteria),
+                isCatenaXMemberData = isCatenaXMemberData,
                 legalAddress = toEquivalenceDto(legalEntity.legalAddress)
             )
         }
@@ -144,7 +145,8 @@ class BusinessPartnerEquivalenceMapper {
         override val identifiers: SortedSet<IdentifierEquivalenceDto>,
         override val states: SortedSet<StateEquivalenceDto>,
         override val confidenceCriteria: ConfidenceCriteriaEquivalenceDto?,
-        val legalAddress: LogisticAddressEquivalenceDto?
+        val legalAddress: LogisticAddressEquivalenceDto?,
+        override val isCatenaXMemberData: Boolean
     ) : IBaseLegalEntityDto
 
     data class SiteEquivalenceDto(

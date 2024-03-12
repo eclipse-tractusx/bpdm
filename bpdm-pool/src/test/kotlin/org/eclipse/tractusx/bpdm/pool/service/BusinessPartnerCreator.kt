@@ -37,7 +37,7 @@ fun minFullBusinessPartner(): BusinessPartnerFullDto {
 
 fun emptyLegalEntity(): LegalEntityDto {
 
-    return LegalEntityDto()
+    return LegalEntityDto(isCatenaXMemberData = false)
 }
 
 fun minValidLegalEntity(bpnLReference: BpnReferenceDto, bpnAReference: BpnReferenceDto): LegalEntityDto {
@@ -45,6 +45,7 @@ fun minValidLegalEntity(bpnLReference: BpnReferenceDto, bpnAReference: BpnRefere
     return LegalEntityDto(
         bpnLReference = bpnLReference,
         legalName = "legalName_" + bpnLReference.referenceValue,
+        isCatenaXMemberData = false,
         legalAddress = minLogisticAddress(bpnAReference = bpnAReference)
     )
 }
@@ -64,6 +65,7 @@ fun fullValidLegalEntity(bpnLReference: BpnReferenceDto, bpnAReference: BpnRefer
             legalEntityState(bpnLReference.referenceValue, 1L, BusinessStateType.ACTIVE),
             legalEntityState(bpnLReference.referenceValue, 2L, BusinessStateType.INACTIVE)
         ),
+        isCatenaXMemberData = false,
         legalAddress = fullLogisticAddressDto(bpnAReference)
     )
 }

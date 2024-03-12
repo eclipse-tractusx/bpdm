@@ -44,6 +44,7 @@ fun BusinessPartnerGenericDto.toLegalEntityDto(bpnReferenceDto: BpnReferenceDto,
         legalForm = legalEntity.legalForm,
         states = states.mapNotNull { it.toLegalEntityState() },
         legalAddress = legalAddress,
+        isCatenaXMemberData = ownerBpnL != null,
         confidenceCriteria = dummyConfidenceCriteria
     )
 }
