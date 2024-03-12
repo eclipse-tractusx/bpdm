@@ -99,8 +99,8 @@ class PoolUpdateService(
         logger.error { "Error message: $message" }
         return ErrorInfo(
             errorCode,
-            "Error on mapping '${record.legalEntity}' with bpn ${record.bpn} and externalId ${record.externalId}",
-            record.bpn
+            "Error on mapping legal entity with bpn ${record.bpn} and externalId ${record.externalId}: $message".take(250),
+            record.externalId
         )
     }
 
