@@ -28,10 +28,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteBpnSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteMatchVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerUpdateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
@@ -71,8 +70,8 @@ interface PoolSiteApi {
     )
     @Tag(name = ApiTags.SITE_NAME, description = ApiTags.SITE_DESCRIPTION)
     @PostMapping("/search")
-    fun searchSites(
-        @RequestBody siteSearchRequest: SiteBpnSearchRequest,
+    fun postSiteSearch(
+        @RequestBody searchRequest: SiteSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageDto<SiteWithMainAddressVerboseDto>
 
@@ -125,7 +124,8 @@ interface PoolSiteApi {
     )
     @Tag(name = ApiTags.SITE_NAME, description = ApiTags.SITE_DESCRIPTION)
     @GetMapping
-    fun getSitesPaginated(
+    fun getSites(
+        @ParameterObject searchRequest: SiteSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageDto<SiteMatchVerboseDto>
+    ): PageDto<SiteWithMainAddressVerboseDto>
 }
