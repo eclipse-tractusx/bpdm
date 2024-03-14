@@ -30,11 +30,9 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.util.CommonApiPathNames
 import org.eclipse.tractusx.bpdm.pool.api.PoolAddressApi.Companion.ADDRESS_PATH
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerBpnSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerUpdateResponseWrapper
 import org.springdoc.core.annotations.ParameterObject
@@ -66,9 +64,9 @@ interface PoolAddressApi {
     @Tag(name = ApiTags.ADDRESS_NAME, description = ApiTags.ADDRESS_DESCRIPTION)
     @GetMapping
     fun getAddresses(
-        @ParameterObject addressSearchRequest: AddressPartnerSearchRequest,
+        @ParameterObject addressSearchRequest: AddressSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageDto<AddressMatchVerboseDto>
+    ): PageDto<LogisticAddressVerboseDto>
 
     @Operation(
         summary = "Returns an address by its BPNA",
@@ -100,7 +98,7 @@ interface PoolAddressApi {
     @Tag(name = ApiTags.ADDRESS_NAME, description = ApiTags.ADDRESS_DESCRIPTION)
     @PostMapping(CommonApiPathNames.SUBPATH_SEARCH)
     fun searchAddresses(
-        @RequestBody addressSearchRequest: AddressPartnerBpnSearchRequest,
+        @RequestBody searchRequest: AddressSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageDto<LogisticAddressVerboseDto>
 

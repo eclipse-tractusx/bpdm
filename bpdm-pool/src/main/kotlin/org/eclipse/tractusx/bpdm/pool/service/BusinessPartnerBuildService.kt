@@ -76,7 +76,7 @@ class BusinessPartnerBuildService(
         val requestsByLegalEntities = validRequests
             .mapIndexed { bpnIndex, request ->
                 val legalEntity = createLegalEntity(request.legalEntity, bpnLs[bpnIndex], legalEntityMetadataMap)
-                val legalAddress = createLogisticAddress(request.legalAddress, bpnAs[bpnIndex], legalEntity, addressMetadataMap)
+                val legalAddress = createLogisticAddress(request.legalAddress, bpnAs[bpnIndex], legalEntity, null, addressMetadataMap)
                 legalEntity.legalAddress = legalAddress
                 Pair(legalEntity, request)
             }
@@ -150,7 +150,7 @@ class BusinessPartnerBuildService(
 
         fun createSiteWithMainAddress(bpnIndex: Int, request: SitePartnerCreateRequest) =
             createSite(request.site, bpnSs[bpnIndex], legalEntitiesByBpn[request.bpnlParent]!!)
-                .apply { mainAddress = createLogisticAddress(request.site.mainAddress, bpnAs[bpnIndex], this, addressMetadataMap) }
+                .apply { mainAddress = createLogisticAddress(request.site.mainAddress, bpnAs[bpnIndex], this.legalEntity, this, addressMetadataMap) }
                 .let { site -> Pair(site, request) }
 
         val requestsBySites = validRequests
@@ -352,7 +352,7 @@ class BusinessPartnerBuildService(
         val addressesWithIndex = validRequests
             .mapIndexed { i, request ->
                 val legalEntity = parentLegalEntitiesByBpn[request.bpnParent]!!
-                val address = createLogisticAddress(request.address, bpnAs[i], legalEntity, metadataMap)
+                val address = createLogisticAddress(request.address, bpnAs[i], legalEntity, null, metadataMap)
                 Pair(address, request.index)
             }
 
@@ -373,7 +373,7 @@ class BusinessPartnerBuildService(
         val addressesWithIndex = validRequests
             .mapIndexed { i, request ->
                 val site = siteParentsByBpn[request.bpnParent]!!
-                val address = createLogisticAddress(request.address, bpnAs[i], site, metadataMap)
+                val address = createLogisticAddress(request.address, bpnAs[i], site.legalEntity, site, metadataMap)
                 Pair(address, request.index)
             }
 
@@ -388,17 +388,13 @@ class BusinessPartnerBuildService(
         dto: LogisticAddressDto,
         bpn: String,
         legalEntity: LegalEntityDb,
+        site: SiteDb?,
         metadataMap: AddressMetadataMapping
     ) = createLogisticAddressInternal(dto, bpn, metadataMap)
-        .also { it.legalEntity = legalEntity }
-
-    private fun createLogisticAddress(
-        dto: LogisticAddressDto,
-        bpn: String,
-        site: SiteDb,
-        metadataMap: AddressMetadataMapping
-    ) = createLogisticAddressInternal(dto, bpn, metadataMap)
-        .also { it.site = site }
+        .apply {
+            this.legalEntity = legalEntity
+            this.site = site
+        }
 
     private fun createLogisticAddressInternal(
         dto: LogisticAddressDto,

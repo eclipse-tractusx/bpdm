@@ -31,6 +31,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryVerboseDt
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
+import org.eclipse.tractusx.bpdm.pool.service.AddressService
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerFetchService
 import org.eclipse.tractusx.bpdm.pool.service.SiteService
 import org.springframework.security.access.prepost.PreAuthorize
@@ -39,7 +40,8 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class MemberController(
     private val businessPartnerFetchService: BusinessPartnerFetchService,
-    private val siteService: SiteService
+    private val siteService: SiteService,
+    private val addressService: AddressService
 ) : PoolMembersApi {
 
 
@@ -73,7 +75,16 @@ class MemberController(
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_MEMBER_PARTNER})")
     override fun searchAddresses(searchRequest: AddressSearchRequest, paginationRequest: PaginationRequest): PageDto<LogisticAddressVerboseDto> {
-        TODO("Not yet implemented")
+        return addressService.searchAddresses(
+            AddressService.AddressSearchRequest(
+                addressBpns = searchRequest.addressBpns,
+                siteBpns = searchRequest.siteBpns,
+                legalEntityBpns = searchRequest.legalEntityBpns,
+                name = searchRequest.name,
+                isCatenaXMemberData = true
+            ),
+            paginationRequest
+        )
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_MEMBER_PARTNER})")

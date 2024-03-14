@@ -24,12 +24,10 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressSearchRequest
 import org.eclipse.tractusx.bpdm.pool.util.TestHelpers
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues
-
 import org.eclipse.tractusx.bpdm.test.testdata.pool.LegalEntityStructureRequest
 import org.eclipse.tractusx.bpdm.test.testdata.pool.SiteStructureRequest
 import org.eclipse.tractusx.bpdm.test.util.AssertHelpers
@@ -108,17 +106,15 @@ class AddressControllerSearchIT @Autowired constructor(
     fun `search address via name`() {
         val expected = PageDto(
             1, 1, 0, 1, listOf(
-                AddressMatchVerboseDto(0f, givenAddress1)
+                givenAddress1
             )
         )
 
 
-        val addressSearchRequest = AddressPartnerSearchRequest()
-        addressSearchRequest.name = BusinessPartnerNonVerboseValues.addressPartnerCreate4.address.name
-
+        val addressSearchRequest = AddressSearchRequest(name = BusinessPartnerNonVerboseValues.addressPartnerCreate4.address.name)
         val pageResponse = poolClient.addresses.getAddresses(addressSearchRequest, PaginationRequest())
 
-        assertPageEquals(pageResponse, expected)
+        assertHelpers.assertRecursively(pageResponse).isEqualTo(expected)
     }
 
     /**
@@ -129,22 +125,13 @@ class AddressControllerSearchIT @Autowired constructor(
     @Test
     fun `search address via name not found`() {
         val expected = PageDto(
-            0, 0, 0, 0, emptyList<AddressMatchVerboseDto>()
+            0, 0, 0, 0, emptyList<LogisticAddressVerboseDto>()
         )
 
-
-        val addressSearchRequest = AddressPartnerSearchRequest()
-        addressSearchRequest.name = "NONEXISTENT"
-
+        val addressSearchRequest = AddressSearchRequest(name =  "NONEXISTENT")
         val pageResponse = poolClient.addresses.getAddresses(addressSearchRequest, PaginationRequest())
 
-        assertPageEquals(pageResponse, expected)
+        assertHelpers.assertRecursively(pageResponse).isEqualTo(expected)
     }
 
-
-    private fun assertPageEquals(actual: PageDto<AddressMatchVerboseDto>, expected: PageDto<AddressMatchVerboseDto>) {
-        assertHelpers.assertRecursively(actual)
-            .ignoringFieldsMatchingRegexes(".*${AddressMatchVerboseDto::score.name}")
-            .isEqualTo(expected)
-    }
 }

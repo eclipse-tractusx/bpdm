@@ -24,14 +24,59 @@ import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.data.jpa.domain.Specification
+import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.data.jpa.repository.Query
-import org.springframework.data.repository.CrudRepository
-import org.springframework.data.repository.PagingAndSortingRepository
 
-interface LogisticAddressRepository : PagingAndSortingRepository<LogisticAddressDb, Long>, CrudRepository<LogisticAddressDb, Long> {
+interface LogisticAddressRepository : JpaRepository<LogisticAddressDb, Long>, JpaSpecificationExecutor<LogisticAddressDb> {
+
+    companion object {
+        fun byBpns(bpns: Collection<String>?) =
+            Specification<LogisticAddressDb> { root, _, _ ->
+                bpns?.filter { it.isNotBlank() }?.takeIf { it.isNotEmpty() }?.let {
+                    root.get<String>(LogisticAddressDb::bpn.name).`in`(bpns)
+                }
+            }
+
+        fun bySiteBpns(bpns: Collection<String>?) =
+            Specification<LogisticAddressDb> { root, _, _ ->
+                bpns?.filter { it.isNotBlank() }?.takeIf { it.isNotEmpty() }?.let {
+                    root.get<LegalEntityDb>(LogisticAddressDb::site.name).get<String>(SiteDb::bpn.name).`in`(bpns)
+                }
+            }
+
+        fun byLegalEntityBpns(bpns: Collection<String>?) =
+            Specification<LogisticAddressDb> { root, _, _ ->
+                bpns?.filter { it.isNotBlank() }?.takeIf { it.isNotEmpty() }?.let {
+                    root.get<LegalEntityDb>(LogisticAddressDb::legalEntity.name).get<String>(LegalEntityDb::bpn.name).`in`(bpns)
+                }
+            }
+
+        fun byName(name: String?) =
+            Specification<LogisticAddressDb> { root, _, builder ->
+                name?.takeIf { it.isNotBlank() }?.let {
+                    builder.like(root.get(LogisticAddressDb::name.name), name)
+                }
+            }
+
+        fun byIsMember(isCatenaXMemberData: Boolean?) =
+            Specification<LogisticAddressDb> { root, _, builder ->
+                isCatenaXMemberData?.let {
+                    builder.equal(
+                        root.get<LegalEntityDb>(LogisticAddressDb::legalEntity.name)
+                            .get<Boolean>(LegalEntityDb::isCatenaXMemberData.name),
+                        isCatenaXMemberData
+                    )
+                }
+            }
+    }
+
     fun findByBpn(bpn: String): LogisticAddressDb?
 
     fun findDistinctByBpnIn(bpns: Collection<String>): Set<LogisticAddressDb>
+
+    fun findByLegalEntityAndSiteIsNull(legalEntityDb: LegalEntityDb, pageable: Pageable): Page<LogisticAddressDb>
 
     @Query("SELECT a FROM LogisticAddressDb a join a.legalEntity p where p.bpn=:bpn")
     fun findByLegalEntityBpn(bpn: String, pageable: Pageable): Page<LogisticAddressDb>

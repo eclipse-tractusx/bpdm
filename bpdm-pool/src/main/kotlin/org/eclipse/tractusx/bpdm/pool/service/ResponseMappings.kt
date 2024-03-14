@@ -115,7 +115,7 @@ fun AddressStateDb.toDto(): AddressStateVerboseDto {
 fun LogisticAddressDb.toDto(): LogisticAddressVerboseDto {
     return LogisticAddressVerboseDto(
         bpna = bpn,
-        bpnLegalEntity = legalEntity?.bpn,
+        bpnLegalEntity = legalEntity.takeIf { site == null }?.bpn,
         bpnSite = site?.bpn,
         createdAt = createdAt,
         updatedAt = updatedAt,

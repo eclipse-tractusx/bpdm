@@ -99,7 +99,7 @@ class LegalEntityController(
         bpnl: String,
         paginationRequest: PaginationRequest
     ): PageDto<LogisticAddressVerboseDto> {
-        return addressService.findByPartnerBpn(bpnl.uppercase(), paginationRequest.page, paginationRequest.size)
+        return addressService.findNonSiteAddressesOfLegalEntity(bpnl.uppercase(), paginationRequest.page, paginationRequest.size)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")
