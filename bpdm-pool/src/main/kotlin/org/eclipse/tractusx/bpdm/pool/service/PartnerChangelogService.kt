@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
+import jakarta.persistence.EntityManager
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
@@ -28,6 +29,7 @@ import org.eclipse.tractusx.bpdm.pool.entity.PartnerChangelogEntryDb
 import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository
 import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository.Specs.byBpnsIn
 import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository.Specs.byBusinessPartnerTypesIn
+import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository.Specs.byIsMember
 import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository.Specs.byUpdatedGreaterThan
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
@@ -46,6 +48,7 @@ import java.time.Instant
 @Service
 class PartnerChangelogService(
     private val partnerChangelogEntryRepository: PartnerChangelogEntryRepository,
+    private val entityManager: EntityManager
 ) {
     private val logger = KotlinLogging.logger { }
 
@@ -73,13 +76,13 @@ class PartnerChangelogService(
         bpns: Set<String>?,
         businessPartnerTypes: Set<BusinessPartnerType>?,
         fromTime: Instant?,
+        isCatenaXMemberData: Boolean?,
         pageIndex: Int,
         pageSize: Int
     ): PageDto<ChangelogEntryVerboseDto> {
-        val spec = Specification.allOf(byBpnsIn(bpns), byBusinessPartnerTypesIn(businessPartnerTypes), byUpdatedGreaterThan(fromTime))
-        val pageRequest = PageRequest.of(pageIndex, pageSize, Sort.by(PartnerChangelogEntryDb::updatedAt.name).ascending())
-        val page = partnerChangelogEntryRepository.findAll(spec, pageRequest)
-        return page.toDto(page.content.map { it.toDto() })
+        val spec = Specification.allOf(byBpnsIn(bpns), byBusinessPartnerTypesIn(businessPartnerTypes), byUpdatedGreaterThan(fromTime), byIsMember(isCatenaXMemberData))
+
+        return partnerChangelogEntryRepository.findAll(spec, PageRequest.of(pageIndex, pageSize, Sort.by(PartnerChangelogEntryDb::updatedAt.name))).toDto { it.toDto() }
     }
 
     private fun ChangelogEntryCreateRequest.toEntity(): PartnerChangelogEntryDb {

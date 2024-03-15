@@ -30,9 +30,12 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.config.ControllerConfigProperties
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
+import org.eclipse.tractusx.bpdm.pool.exception.BpdmRequestSizeException
 import org.eclipse.tractusx.bpdm.pool.service.AddressService
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerFetchService
+import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
 import org.eclipse.tractusx.bpdm.pool.service.SiteService
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
@@ -41,7 +44,9 @@ import org.springframework.web.bind.annotation.RestController
 class MemberController(
     private val businessPartnerFetchService: BusinessPartnerFetchService,
     private val siteService: SiteService,
-    private val addressService: AddressService
+    private val addressService: AddressService,
+    private val changelogService: PartnerChangelogService,
+    private val controllerConfigProperties: ControllerConfigProperties
 ) : PoolMembersApi {
 
 
@@ -92,7 +97,20 @@ class MemberController(
         changelogSearchRequest: ChangelogSearchRequest,
         paginationRequest: PaginationRequest
     ): PageDto<ChangelogEntryVerboseDto> {
-        TODO("Not yet implemented")
+        changelogSearchRequest.bpns?.let { bpns ->
+            if (bpns.size > controllerConfigProperties.searchRequestLimit) {
+                throw BpdmRequestSizeException(bpns.size, controllerConfigProperties.searchRequestLimit)
+            }
+        }
+
+        return changelogService.getChangeLogEntries(
+            bpns = changelogSearchRequest.bpns,
+            businessPartnerTypes = changelogSearchRequest.businessPartnerTypes,
+            fromTime = changelogSearchRequest.timestampAfter,
+            isCatenaXMemberData = true,
+            pageIndex = paginationRequest.page,
+            pageSize = paginationRequest.size
+        )
     }
 
 }
