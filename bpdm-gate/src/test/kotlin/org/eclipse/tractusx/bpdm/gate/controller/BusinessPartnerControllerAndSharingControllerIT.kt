@@ -19,14 +19,15 @@
 
 package org.eclipse.tractusx.bpdm.gate.controller
 
+
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
-import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
 import org.eclipse.tractusx.bpdm.gate.service.GoldenRecordTaskService
 import org.eclipse.tractusx.bpdm.gate.util.MockAndAssertUtils
@@ -36,32 +37,31 @@ import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerNonVerboseVal
 import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerVerboseValues
 import org.eclipse.tractusx.bpdm.test.util.AssertHelpers
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.http.HttpStatus
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
-import org.springframework.web.reactive.function.client.WebClientResponseException
+
 
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-    properties = ["bpdm.api.upsert-limit=3"]
+    properties = ["bpdm.api.upsert-limit=3","bpdm.tasks.creation.fromSharingMember.starts-as-ready=false"]
 )
 @ActiveProfiles("test")
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
-class BusinessPartnerControllerIT @Autowired constructor(
+class BusinessPartnerControllerAndSharingControllerIT @Autowired constructor(
     val testHelpers: DbTestHelpers,
     val assertHelpers: AssertHelpers,
     val gateClient: GateClient,
     val goldenRecordTaskService: GoldenRecordTaskService,
     val mockAndAssertUtils: MockAndAssertUtils
 ) {
+
 
     companion object {
 
@@ -89,29 +89,6 @@ class BusinessPartnerControllerIT @Autowired constructor(
         poolWireMockServer.resetAll()
         this.mockAndAssertUtils.mockOrchestratorApi(gateWireMockServer)
     }
-
-    @Test
-    fun `insert minimal business partner`() {
-
-        val upsertRequests = listOf(BusinessPartnerNonVerboseValues.bpInputRequestMinimal)
-        val upsertResponses = gateClient.businessParters.upsertBusinessPartnersInput(upsertRequests).body!!
-        this.mockAndAssertUtils.assertUpsertResponsesMatchRequests(upsertResponses, upsertRequests)
-
-        this.mockAndAssertUtils.assertBusinessPartnersUpsertedCorrectly(upsertResponses)
-    }
-
-    @Test
-    fun `insert three business partners`() {
-        val upsertRequests = listOf(
-            BusinessPartnerNonVerboseValues.bpInputRequestFull,
-            BusinessPartnerNonVerboseValues.bpInputRequestMinimal,
-            BusinessPartnerNonVerboseValues.bpInputRequestChina
-        )
-        val upsertResponses = gateClient.businessParters.upsertBusinessPartnersInput(upsertRequests).body!!
-
-        this.mockAndAssertUtils.assertBusinessPartnersUpsertedCorrectly(upsertResponses)
-    }
-
     @Test
     fun `insert three business partners and check sharing state is pending and has taskid`() {
         val upsertRequests = listOf(
@@ -166,120 +143,6 @@ class BusinessPartnerControllerIT @Autowired constructor(
         assertHelpers.assertRecursively(upsertSharingStateResponses).isEqualTo(upsertSharingStatesRequests)
 
     }
-
-
-    @Test
-    fun `insert and then update business partner`() {
-
-        val insertRequests = listOf(BusinessPartnerNonVerboseValues.bpInputRequestMinimal)
-        val externalId = insertRequests.first().externalId
-        val insertResponses = gateClient.businessParters.upsertBusinessPartnersInput(insertRequests).body!!
-        this.mockAndAssertUtils.assertUpsertResponsesMatchRequests(insertResponses, insertRequests)
-
-        val searchResponse1Page = gateClient.businessParters.getBusinessPartnersInput(null)
-        assertHelpers.assertRecursively(searchResponse1Page.content).isEqualTo(insertResponses)
-
-        val updateRequests = listOf(
-            BusinessPartnerNonVerboseValues.bpInputRequestFull.copy(externalId = externalId)
-        )
-        val updateResponses = gateClient.businessParters.upsertBusinessPartnersInput(updateRequests).body!!
-        this.mockAndAssertUtils.assertUpsertResponsesMatchRequests(updateResponses, updateRequests)
-
-        val searchResponse2Page = gateClient.businessParters.getBusinessPartnersInput(null)
-        assertHelpers.assertRecursively(searchResponse2Page.content).isEqualTo(updateResponses)
-    }
-
-    @Test
-    fun `insert too many business partners`() {
-        // limit is 3
-        val upsertRequests = listOf(
-            BusinessPartnerNonVerboseValues.bpInputRequestFull,
-            BusinessPartnerNonVerboseValues.bpInputRequestMinimal,
-            BusinessPartnerNonVerboseValues.bpInputRequestMinimal.copy(externalId = BusinessPartnerVerboseValues.externalId3),
-            BusinessPartnerNonVerboseValues.bpInputRequestMinimal.copy(externalId = BusinessPartnerVerboseValues.externalId4)
-        )
-        try {
-            gateClient.businessParters.upsertBusinessPartnersInput(upsertRequests)
-        } catch (e: WebClientResponseException) {
-            assertEquals(HttpStatus.BAD_REQUEST, e.statusCode)
-        }
-    }
-
-    @Test
-    fun `insert duplicate business partners`() {
-        val upsertRequests = listOf(
-            BusinessPartnerNonVerboseValues.bpInputRequestFull.copy(externalId = BusinessPartnerVerboseValues.externalId3),
-            BusinessPartnerNonVerboseValues.bpInputRequestMinimal.copy(externalId = BusinessPartnerVerboseValues.externalId3)
-        )
-        try {
-            gateClient.businessParters.upsertBusinessPartnersInput(upsertRequests)
-        } catch (e: WebClientResponseException) {
-            assertEquals(HttpStatus.BAD_REQUEST, e.statusCode)
-        }
-    }
-
-    @Test
-    fun `query business partners by externalId`() {
-        val upsertRequests = listOf(
-            BusinessPartnerNonVerboseValues.bpInputRequestFull.fastCopy(externalId = BusinessPartnerVerboseValues.externalId1, shortName = "1"),
-            BusinessPartnerNonVerboseValues.bpInputRequestMinimal.fastCopy(externalId = BusinessPartnerVerboseValues.externalId2, shortName = "2"),
-            BusinessPartnerNonVerboseValues.bpInputRequestMinimal.fastCopy(externalId = BusinessPartnerVerboseValues.externalId3, shortName = "3")
-        )
-        gateClient.businessParters.upsertBusinessPartnersInput(upsertRequests)
-
-        val searchResponsePage =
-            gateClient.businessParters.getBusinessPartnersInput(listOf(BusinessPartnerVerboseValues.externalId1, BusinessPartnerVerboseValues.externalId3))
-        this.mockAndAssertUtils.assertUpsertResponsesMatchRequests(searchResponsePage.content, listOf(upsertRequests[0], upsertRequests[2]))
-    }
-
-    @Test
-    fun `query business partners by missing externalId`() {
-        val upsertRequests = listOf(
-            BusinessPartnerNonVerboseValues.bpInputRequestFull.fastCopy(externalId = BusinessPartnerVerboseValues.externalId1, shortName = "1"),
-            BusinessPartnerNonVerboseValues.bpInputRequestMinimal.fastCopy(externalId = BusinessPartnerVerboseValues.externalId2, shortName = "2"),
-            BusinessPartnerNonVerboseValues.bpInputRequestMinimal.fastCopy(externalId = BusinessPartnerVerboseValues.externalId3, shortName = "3")
-        )
-        gateClient.businessParters.upsertBusinessPartnersInput(upsertRequests)
-
-        // missing externalIds are just ignored in the response
-        val searchResponsePage =
-            gateClient.businessParters.getBusinessPartnersInput(listOf(BusinessPartnerVerboseValues.externalId2, BusinessPartnerVerboseValues.externalId4))
-        this.mockAndAssertUtils.assertUpsertResponsesMatchRequests(searchResponsePage.content, listOf(upsertRequests[1]))
-    }
-
-    @Test
-    fun `query business partners using paging`() {
-        val upsertRequests = listOf(
-            BusinessPartnerNonVerboseValues.bpInputRequestFull.fastCopy(
-                externalId = BusinessPartnerNonVerboseValues.bpInputRequestFull.externalId,
-                shortName = "1"
-            ),
-            BusinessPartnerNonVerboseValues.bpInputRequestMinimal.fastCopy(externalId = BusinessPartnerVerboseValues.externalId2, shortName = "2"),
-            BusinessPartnerNonVerboseValues.bpInputRequestMinimal.fastCopy(externalId = BusinessPartnerVerboseValues.externalId3, shortName = "3")
-        )
-        gateClient.businessParters.upsertBusinessPartnersInput(upsertRequests)
-
-        // missing externalIds are just ignored in the response
-        val searchResponsePage0 = gateClient.businessParters.getBusinessPartnersInput(null, PaginationRequest(0, 2))
-        assertEquals(3, searchResponsePage0.totalElements)
-        assertEquals(2, searchResponsePage0.totalPages)
-        this.mockAndAssertUtils.assertUpsertResponsesMatchRequests(searchResponsePage0.content, listOf(upsertRequests[0], upsertRequests[1]))
-
-        val searchResponsePage1 = gateClient.businessParters.getBusinessPartnersInput(null, PaginationRequest(1, 2))
-        assertEquals(3, searchResponsePage1.totalElements)
-        assertEquals(2, searchResponsePage1.totalPages)
-        this.mockAndAssertUtils.assertUpsertResponsesMatchRequests(searchResponsePage1.content, listOf(upsertRequests[2]))
-
-        val searchResponsePage2 = gateClient.businessParters.getBusinessPartnersInput(null, PaginationRequest(2, 2))
-        assertEquals(3, searchResponsePage2.totalElements)
-        assertEquals(2, searchResponsePage2.totalPages)
-        assertEquals(0, searchResponsePage2.content.size)
-    }
-
-
-
-
-
 
     @Test
     fun `insert one business partners and finalize cleaning task without error`() {
@@ -468,11 +331,12 @@ class BusinessPartnerControllerIT @Autowired constructor(
             .isEqualTo(upsertSharingStatesRequests)
     }
 
-    private fun upsertBusinessPartnersAndShare(partners: List<BusinessPartnerInputRequest>) {
+    fun upsertBusinessPartnersAndShare(partners: List<BusinessPartnerInputRequest>) {
         gateClient.businessParters.upsertBusinessPartnersInput(partners)
+        gateClient.sharingState.postSharingStateReady(PostSharingStateReadyRequest(partners.map { it.externalId }))
         goldenRecordTaskService.createTasksForReadyBusinessPartners()
     }
-    private fun BusinessPartnerInputRequest.fastCopy(externalId: String, shortName: String) =
-        copy(externalId = externalId, legalEntity = legalEntity.copy(shortName = shortName))
+
+
 
 }

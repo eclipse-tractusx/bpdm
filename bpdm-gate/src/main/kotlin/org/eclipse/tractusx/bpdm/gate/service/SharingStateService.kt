@@ -240,7 +240,7 @@ class SharingStateService(
                 ?: SharingStateDb(
                     externalId,
                     businessPartnerType = businessPartnerType,
-                    sharingStateType = SharingStateType.Initial,
+                    sharingStateType = SharingStateType.Ready,
                     sharingErrorCode = null,
                     sharingErrorMessage = null,
                     bpn = null,

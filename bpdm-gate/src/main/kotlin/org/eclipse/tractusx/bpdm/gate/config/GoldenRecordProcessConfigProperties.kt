@@ -37,7 +37,7 @@ data class GoldenRecordTaskConfigProperties(
     )
 
     data class CreationTaskProperties(
-        val startsAsReady: Boolean = false,
+        val startsAsReady: Boolean = true,
         val batchSize: Int = 100,
         val cron: String = "-",
     )

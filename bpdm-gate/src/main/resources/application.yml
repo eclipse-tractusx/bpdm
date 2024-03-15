@@ -39,7 +39,7 @@ bpdm:
             fromSharingMember:
                 # If true, new business partner input data will be directly ready to be shared
                 # If false, new business partner input data need to be manually set to ready
-                starts-as-ready: false
+                starts-as-ready: true
                 # When and how often the Gate checks for new business partner data to be shared
                 cron: '-'
                 # Up to how many golden record tasks can be created when checking
