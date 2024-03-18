@@ -1,6 +1,6 @@
 # Operator View
 
-Here you can find documentation about running, configuring and installing the BPDM services.
+Here you can find documentation about running, configuring and installing the BPDM services. Ensure you have at least 10 GB of free space before starting the installation.
 
 ## Running a BPDM application
 
@@ -15,7 +15,7 @@ Each BPDM application is a SpringBoot Kotlin software project managed by Maven.
 To run the application first you need to install it from the parent pom. For that go to the root folder and then there are two options to run the project:
 
 1. `mvn clean install -DskipTests` - This will install all the dependencies without need for test execution.
-2. Install missing docker images used by the bridge-dummy tests `docker compose -f docker-compose.build.yml build`. After that run `mvn clean install`.
+2. Install missing docker images used by the bridge-dummy tests `docker compose -f docker-compose.yml build`. After that run `mvn clean install`.
 
 After installation, go to the subfolder of the application you would like to run and use the following command: `mvn spring-boot:run`
 
