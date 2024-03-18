@@ -29,7 +29,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteBpnSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.util.TestHelpers
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
@@ -117,8 +117,8 @@ class SiteControllerIT @Autowired constructor(
         val bpnS2 = createdStructures[0].siteStructures[1].site.site.bpns
         val bpnL = createdStructures[0].legalEntity.legalEntity.bpnl
 
-        val siteSearchRequest = SiteBpnSearchRequest(emptyList(), listOf(bpnS1, bpnS2))
-        val searchResult = poolClient.sites.searchSites(siteSearchRequest, PaginationRequest())
+        val siteSearchRequest = SiteSearchRequest(siteBpns = listOf(bpnS1, bpnS2))
+        val searchResult = poolClient.sites.postSiteSearch(siteSearchRequest, PaginationRequest())
 
         val expectedSiteWithReference1 = SiteWithMainAddressVerboseDto(
             site = BusinessPartnerVerboseValues.site1.copy(bpnLegalEntity = bpnL),
@@ -169,8 +169,8 @@ class SiteControllerIT @Autowired constructor(
         val bpnL1 = createdStructures[0].legalEntity.legalEntity.bpnl
         val bpnL2 = createdStructures[1].legalEntity.legalEntity.bpnl
 
-        val siteSearchRequest = SiteBpnSearchRequest(listOf(bpnL1, bpnL2))
-        val searchResult = poolClient.sites.searchSites(siteSearchRequest, PaginationRequest())
+        val siteSearchRequest = SiteSearchRequest(legalEntityBpns =   listOf(bpnL1, bpnL2))
+        val searchResult = poolClient.sites.postSiteSearch(siteSearchRequest, PaginationRequest())
 
         val expectedSiteWithReference1 =
             SiteWithMainAddressVerboseDto(
@@ -511,7 +511,7 @@ class SiteControllerIT @Autowired constructor(
             )
         )
 
-        val firstPage = poolClient.sites.getSitesPaginated(paginationRequest = PaginationRequest(0, 10))
+        val firstPage = poolClient.sites.getSites(SiteSearchRequest(), PaginationRequest(0, 10))
 
         assertHelpers.assertRecursively(firstPage).ignoringFieldsOfTypes(Instant::class.java).isEqualTo(expectedFirstPage)
 

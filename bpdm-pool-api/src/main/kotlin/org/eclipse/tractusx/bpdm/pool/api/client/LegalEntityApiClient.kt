@@ -28,13 +28,11 @@ import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntitySearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerUpdateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.springdoc.core.annotations.ParameterObject
-import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
@@ -58,9 +56,9 @@ interface LegalEntityApiClient : PoolLegalEntityApi {
 
     @GetExchange
     override fun getLegalEntities(
-        @ParameterObject bpSearchRequest: LegalEntityPropertiesSearchRequest,
+        @ParameterObject searchRequest: LegalEntitySearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageDto<LegalEntityMatchVerboseDto>
+    ): PageDto<LegalEntityWithLegalAddressVerboseDto>
 
     @GetExchange("/{idValue}")
     override fun getLegalEntity(
@@ -76,9 +74,10 @@ interface LegalEntityApiClient : PoolLegalEntityApi {
     ): PageDto<SiteVerboseDto>
 
     @PostExchange("/search")
-    override fun searchLegalEntitys(
-        @RequestBody bpnLs: Collection<String>
-    ): ResponseEntity<Collection<LegalEntityWithLegalAddressVerboseDto>>
+    override fun postLegalEntitySearch(
+        @RequestBody searchRequest: LegalEntitySearchRequest,
+        @ParameterObject paginationRequest: PaginationRequest
+    ): PageDto<LegalEntityWithLegalAddressVerboseDto>
 
     @PutExchange
     override fun updateBusinessPartners(

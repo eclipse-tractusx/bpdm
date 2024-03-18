@@ -60,7 +60,7 @@ interface PoolMembersApi {
 
     @Tag(name = ApiTags.SITE_NAME, description = ApiTags.SITE_DESCRIPTION)
     @PostMapping(SITES_SEARCH_PATH)
-    fun searchSites(
+    fun postSiteSearch(
         @RequestBody searchRequest: SiteSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageDto<SiteWithMainAddressVerboseDto>

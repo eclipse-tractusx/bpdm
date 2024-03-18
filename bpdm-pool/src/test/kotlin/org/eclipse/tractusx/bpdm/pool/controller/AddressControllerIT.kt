@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.controller
 
+
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
@@ -27,12 +28,9 @@ import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerBpnSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.util.*
-
-
-
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues.addressIdentifier
@@ -42,7 +40,6 @@ import org.eclipse.tractusx.bpdm.test.testdata.pool.SiteStructureRequest
 import org.eclipse.tractusx.bpdm.test.util.AssertHelpers
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.eclipse.tractusx.bpdm.test.util.PoolDataHelpers
-
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -139,7 +136,7 @@ class AddressControllerIT @Autowired constructor(
         val bpnA1 = createdStructures[0].addresses[0].address.bpna
         val bpnA2 = createdStructures[0].addresses[1].address.bpna
 
-        val searchRequest = AddressPartnerBpnSearchRequest(addresses = listOf(bpnA1, bpnA2))
+        val searchRequest = AddressSearchRequest(addressBpns = listOf(bpnA1, bpnA2))
         val searchResult =
             poolClient.addresses.searchAddresses(searchRequest, PaginationRequest())
 
@@ -173,7 +170,7 @@ class AddressControllerIT @Autowired constructor(
 
         val bpnL2 = createdStructures[1].legalEntity.legalEntity.bpnl
 
-        val searchRequest = AddressPartnerBpnSearchRequest(legalEntities = listOf(bpnL2))
+        val searchRequest = AddressSearchRequest(legalEntityBpns = listOf(bpnL2))
         val searchResult = poolClient.addresses.searchAddresses(searchRequest, PaginationRequest())
 
         val expected = listOf(
@@ -218,7 +215,7 @@ class AddressControllerIT @Autowired constructor(
         val bpnS2 = createdStructures[1].siteStructures[0].site.site.bpns
 
         // search for site1 -> main address and 2 regular addresses
-        AddressPartnerBpnSearchRequest(sites = listOf(bpnS1))
+        AddressSearchRequest(siteBpns = listOf(bpnS1))
             .let { poolClient.addresses.searchAddresses(it, PaginationRequest()) }
             .let {
                 assertAddressesAreEqual(
@@ -231,7 +228,7 @@ class AddressControllerIT @Autowired constructor(
             }
 
         // search for site2 -> main address and 1 regular address
-        AddressPartnerBpnSearchRequest(sites = listOf(bpnS2))       // search for site2
+        AddressSearchRequest(siteBpns = listOf(bpnS2))       // search for site2
             .let { poolClient.addresses.searchAddresses(it, PaginationRequest()) }
             .let {
                 assertAddressesAreEqual(
@@ -243,7 +240,7 @@ class AddressControllerIT @Autowired constructor(
             }
 
         // search for site1 and site2 -> 2 main addresses and 3 regular addresses
-        AddressPartnerBpnSearchRequest(sites = listOf(bpnS2, bpnS1))    // search for site1 and site2
+        AddressSearchRequest(siteBpns = listOf(bpnS2, bpnS1))    // search for site1 and site2
             .let { poolClient.addresses.searchAddresses(it, PaginationRequest()) }
             .let {
                 assertAddressesAreEqual(

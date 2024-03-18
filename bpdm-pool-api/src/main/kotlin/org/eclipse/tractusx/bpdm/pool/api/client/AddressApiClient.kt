@@ -19,17 +19,14 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.client
 
-import jakarta.validation.Valid
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.util.CommonApiPathNames
 import org.eclipse.tractusx.bpdm.pool.api.PoolAddressApi
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerBpnSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerUpdateResponseWrapper
 import org.springdoc.core.annotations.ParameterObject
@@ -45,17 +42,17 @@ interface AddressApiClient: PoolAddressApi {
 
     @GetExchange
     override fun getAddresses(
-        @ParameterObject addressSearchRequest: AddressPartnerSearchRequest,
-        @ParameterObject @Valid paginationRequest: PaginationRequest
-    ): PageDto<AddressMatchVerboseDto>
+        @ParameterObject addressSearchRequest: AddressSearchRequest,
+        @ParameterObject paginationRequest: PaginationRequest
+    ): PageDto<LogisticAddressVerboseDto>
 
     @GetExchange(PoolAddressApi.SUBPATH_BPNA)
     override fun getAddress(@PathVariable(PoolAddressApi.PATHVAR_BPNA) bpna: String): LogisticAddressVerboseDto
 
     @PostExchange(CommonApiPathNames.SUBPATH_SEARCH)
     override fun searchAddresses(
-        @RequestBody addressSearchRequest: AddressPartnerBpnSearchRequest,
-        @ParameterObject @Valid paginationRequest: PaginationRequest
+        @RequestBody searchRequest: AddressSearchRequest,
+        @ParameterObject paginationRequest: PaginationRequest
     ): PageDto<LogisticAddressVerboseDto>
 
     @PostExchange

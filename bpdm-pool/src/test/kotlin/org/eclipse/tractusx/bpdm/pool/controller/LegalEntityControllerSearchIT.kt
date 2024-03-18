@@ -25,9 +25,8 @@ import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntitySearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.util.TestHelpers
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues
@@ -66,7 +65,7 @@ class LegalEntityControllerSearchIT @Autowired constructor(
         )
     )
     private val partnerStructure2 = LegalEntityStructureRequest(
-        legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate2,
+        legalEntity = with(BusinessPartnerNonVerboseValues.legalEntityCreate2){ copy(legalEntity = legalEntity.copy(legalName = BusinessPartnerNonVerboseValues.legalEntityCreate1.legalEntity.legalName) )},
         siteStructures = listOf(
             SiteStructureRequest(BusinessPartnerNonVerboseValues.siteCreate2),
             SiteStructureRequest(BusinessPartnerNonVerboseValues.siteCreate1) //same site here to attain multiple results when needed
@@ -94,8 +93,8 @@ class LegalEntityControllerSearchIT @Autowired constructor(
     }
 
     /**
-     * Given partners with same siteName
-     * When searching by site name and requesting page with multiple items
+     * Given partners with same legal name
+     * When searching by legal name and requesting page with multiple items
      * Then response contains correct pagination values
      */
     @Test
@@ -104,14 +103,14 @@ class LegalEntityControllerSearchIT @Autowired constructor(
         val expected = PageDto(
             2, 1, 0, 2,
             listOf(
-                LegalEntityMatchVerboseDto(score = 0f, legalEntity = givenPartner1, legalAddress = legalAddress1),
-                LegalEntityMatchVerboseDto(score = 0f, legalEntity = givenPartner2, legalAddress = legalAddress2)
+                LegalEntityWithLegalAddressVerboseDto(legalEntity = givenPartner1, legalAddress = legalAddress1),
+                LegalEntityWithLegalAddressVerboseDto(legalEntity = givenPartner2, legalAddress = legalAddress2)
             )
         )
 
-        val pageResponse = searchBusinessPartnerBySiteName(BusinessPartnerNonVerboseValues.siteCreate1.site.name, page = 0, size = 100)
+        val pageResponse = searchBusinessPartnerByLegalName(givenPartner1.legalName, page = 0, size = 100)
 
-        assertPageEquals(pageResponse, expected)
+        assertHelpers.assertRecursively(pageResponse).isEqualTo(expected)
     }
 
     /**
@@ -124,36 +123,23 @@ class LegalEntityControllerSearchIT @Autowired constructor(
 
         val expectedFirstPage = PageDto(
             2, 2, 0, 1, listOf(
-                LegalEntityMatchVerboseDto(score = 0f, legalEntity = givenPartner1, legalAddress = legalAddress1)
+                LegalEntityWithLegalAddressVerboseDto(legalEntity = givenPartner1, legalAddress = legalAddress1)
             )
         )
         val expectedSecondPage = PageDto(
             2, 2, 1, 1, listOf(
-                LegalEntityMatchVerboseDto(score = 0f, legalEntity = givenPartner2, legalAddress = legalAddress2)
+                LegalEntityWithLegalAddressVerboseDto(legalEntity = givenPartner2, legalAddress = legalAddress2)
             )
         )
 
-        val firstPage = searchBusinessPartnerBySiteName(BusinessPartnerNonVerboseValues.siteCreate1.site.name, page = 0, size = 1)
-        val secondPage = searchBusinessPartnerBySiteName(BusinessPartnerNonVerboseValues.siteCreate1.site.name, page = 1, size = 1)
+        val firstPage = searchBusinessPartnerByLegalName(givenPartner1.legalName, page = 0, size = 1)
+        val secondPage = searchBusinessPartnerByLegalName(givenPartner2.legalName, page = 1, size = 1)
 
-        assertPageEquals(firstPage, expectedFirstPage)
-        assertPageEquals(secondPage, expectedSecondPage)
+        assertHelpers.assertRecursively(firstPage).isEqualTo(expectedFirstPage)
+        assertHelpers.assertRecursively(secondPage).isEqualTo(expectedSecondPage)
     }
 
-    private fun searchBusinessPartnerBySiteName(siteName: String, page: Int, size: Int): PageDto<LegalEntityMatchVerboseDto> {
-        val sitePropertiesSearchRequest = SitePropertiesSearchRequest(siteName)
-
-        return poolClient.legalEntities.getLegalEntities(
-            LegalEntityPropertiesSearchRequest.EmptySearchRequest,
-            PaginationRequest(page, size)
-        )
-
-
-    }
-
-    private fun assertPageEquals(actual: PageDto<LegalEntityMatchVerboseDto>, expected: PageDto<LegalEntityMatchVerboseDto>) {
-        assertHelpers.assertRecursively(actual)
-            .ignoringFieldsMatchingRegexes(".*${LegalEntityMatchVerboseDto::score.name}")
-            .isEqualTo(expected)
+    private fun searchBusinessPartnerByLegalName(legalName: String, page: Int, size: Int): PageDto<LegalEntityWithLegalAddressVerboseDto> {
+        return poolClient.legalEntities.getLegalEntities(LegalEntitySearchRequest(legalName = legalName), PaginationRequest(page, size))
     }
 }

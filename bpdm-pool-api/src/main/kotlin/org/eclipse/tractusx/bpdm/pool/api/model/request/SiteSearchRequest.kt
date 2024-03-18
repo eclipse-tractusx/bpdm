@@ -22,5 +22,5 @@ package org.eclipse.tractusx.bpdm.pool.api.model.request
 data class SiteSearchRequest(
     val siteBpns: List<String> = emptyList(),
     val legalEntityBpns: List<String> = emptyList(),
-    val name: String?
+    val name: String? = null
 )

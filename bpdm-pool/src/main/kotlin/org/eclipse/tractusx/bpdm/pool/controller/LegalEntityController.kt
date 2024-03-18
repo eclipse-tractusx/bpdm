@@ -24,20 +24,19 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.PoolLegalEntityApi
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.request.BusinessPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntitySearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerUpdateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
-import org.eclipse.tractusx.bpdm.pool.config.ControllerConfigProperties
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
-import org.eclipse.tractusx.bpdm.pool.service.*
-import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
+import org.eclipse.tractusx.bpdm.pool.service.AddressService
+import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
+import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerFetchService
+import org.eclipse.tractusx.bpdm.pool.service.SiteService
+import org.springdoc.core.annotations.ParameterObject
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
@@ -45,20 +44,22 @@ import org.springframework.web.bind.annotation.RestController
 class LegalEntityController(
     val businessPartnerFetchService: BusinessPartnerFetchService,
     val businessPartnerBuildService: BusinessPartnerBuildService,
-    val searchService: SearchService,
     val bpnConfigProperties: BpnConfigProperties,
-    val controllerConfigProperties: ControllerConfigProperties,
     val siteService: SiteService,
     val addressService: AddressService
 ) : PoolLegalEntityApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun getLegalEntities(
-        bpSearchRequest: LegalEntityPropertiesSearchRequest,
-        paginationRequest: PaginationRequest
-    ): PageDto<LegalEntityMatchVerboseDto> {
-        return searchService.searchLegalEntities(
-            BusinessPartnerSearchRequest(bpSearchRequest),
+        @ParameterObject searchRequest: LegalEntitySearchRequest,
+        @ParameterObject paginationRequest: PaginationRequest
+    ): PageDto<LegalEntityWithLegalAddressVerboseDto> {
+        return businessPartnerFetchService.searchLegalEntities(
+            BusinessPartnerFetchService.LegalEntitySearchRequest(
+                bpnLs = searchRequest.bpnLs,
+                legalName = searchRequest.legalName,
+                isCatenaXMemberData = null
+            ),
             paginationRequest
         )
     }
@@ -71,13 +72,18 @@ class LegalEntityController(
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
-    override fun searchLegalEntitys(
-        bpnLs: Collection<String>
-    ): ResponseEntity<Collection<LegalEntityWithLegalAddressVerboseDto>> {
-        if (bpnLs.size > controllerConfigProperties.searchRequestLimit) {
-            return ResponseEntity(HttpStatus.BAD_REQUEST)
-        }
-        return ResponseEntity(businessPartnerFetchService.fetchDtosByBpns(bpnLs), HttpStatus.OK)
+    override fun postLegalEntitySearch(
+        searchRequest: LegalEntitySearchRequest,
+        paginationRequest: PaginationRequest
+    ): PageDto<LegalEntityWithLegalAddressVerboseDto> {
+        return businessPartnerFetchService.searchLegalEntities(
+            BusinessPartnerFetchService.LegalEntitySearchRequest(
+                searchRequest.bpnLs,
+                searchRequest.legalName,
+                isCatenaXMemberData = null
+            ),
+            paginationRequest
+        )
     }
 
 
@@ -93,7 +99,7 @@ class LegalEntityController(
         bpnl: String,
         paginationRequest: PaginationRequest
     ): PageDto<LogisticAddressVerboseDto> {
-        return addressService.findByPartnerBpn(bpnl.uppercase(), paginationRequest.page, paginationRequest.size)
+        return addressService.findNonSiteAddressesOfLegalEntity(bpnl.uppercase(), paginationRequest.page, paginationRequest.size)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")

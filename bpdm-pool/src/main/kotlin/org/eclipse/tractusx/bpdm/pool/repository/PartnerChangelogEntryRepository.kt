@@ -20,7 +20,10 @@
 package org.eclipse.tractusx.bpdm.pool.repository
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
+import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.PartnerChangelogEntryDb
+import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.Specification
@@ -63,6 +66,49 @@ interface PartnerChangelogEntryRepository : JpaRepository<PartnerChangelogEntryD
                         root.get<String>(PartnerChangelogEntryDb::businessPartnerType.name).`in`(businessPartnerTypes)
                     else
                         null
+                }
+            }
+
+        fun byIsMember(isCatenaXMemberData: Boolean?) =
+            Specification<PartnerChangelogEntryDb> { root, query, builder ->
+                isCatenaXMemberData?.let {
+
+                    val legalEntitySubquery = query.subquery(PartnerChangelogEntryDb::class.java)
+                    val changelogSubRoot = legalEntitySubquery.from(PartnerChangelogEntryDb::class.java)
+                    val legalEntitySubRoot = legalEntitySubquery.from(LegalEntityDb::class.java)
+                    legalEntitySubquery.select(changelogSubRoot)
+                    legalEntitySubquery.where( builder.and(
+                        builder.equal(legalEntitySubRoot.get<Boolean>(LegalEntityDb::isCatenaXMemberData.name), isCatenaXMemberData),
+                        builder.equal(changelogSubRoot.get<String>("bpn"), legalEntitySubRoot.get<String>("bpn")),
+                    ))
+
+                    val siteSubquery = query.subquery(PartnerChangelogEntryDb::class.java)
+                    val chSiteSubRoot = siteSubquery.from(PartnerChangelogEntryDb::class.java)
+                    val lSiteSubRoot = siteSubquery.from(LegalEntityDb::class.java)
+                    val sSiteSubRoot = siteSubquery.from(SiteDb::class.java)
+                    siteSubquery.select(chSiteSubRoot)
+                    siteSubquery.where( builder.and(
+                        builder.equal(lSiteSubRoot.get<Boolean>(LegalEntityDb::isCatenaXMemberData.name), isCatenaXMemberData),
+                        builder.equal(chSiteSubRoot.get<String>("bpn"), sSiteSubRoot.get<String>("bpn")),
+                        builder.equal(sSiteSubRoot.get<LegalEntityDb>(SiteDb::legalEntity.name), lSiteSubRoot),
+                    ))
+
+                    val addressSubquery = query.subquery(PartnerChangelogEntryDb::class.java)
+                    val chAddressSubRoot = addressSubquery.from(PartnerChangelogEntryDb::class.java)
+                    val lAddressSubRoot = addressSubquery.from(LegalEntityDb::class.java)
+                    val sAddressSubRoot = addressSubquery.from(LogisticAddressDb::class.java)
+                    addressSubquery.select(chAddressSubRoot)
+                    addressSubquery.where( builder.and(
+                        builder.equal(lAddressSubRoot.get<Boolean>(LegalEntityDb::isCatenaXMemberData.name), isCatenaXMemberData),
+                        builder.equal(chAddressSubRoot.get<String>("bpn"), sAddressSubRoot.get<String>("bpn")),
+                        builder.equal(sAddressSubRoot.get<LegalEntityDb>(LogisticAddressDb::legalEntity.name), lAddressSubRoot),
+                    ))
+
+                    builder.or(
+                        root.`in`(legalEntitySubquery),
+                        root.`in`(siteSubquery),
+                        root.`in`(addressSubquery)
+                    )
                 }
             }
     }

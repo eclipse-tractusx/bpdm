@@ -34,6 +34,6 @@ data class LegalEntityDto(
     override val identifiers: Collection<LegalEntityIdentifierDto> = emptyList(),
     override val states: Collection<LegalEntityStateDto> = emptyList(),
     override val confidenceCriteria: ConfidenceCriteriaDto,
-    override val isCatenaXMemberData: Boolean = false
+    override val isCatenaXMemberData: Boolean
 
 ) : IBaseLegalEntityDto

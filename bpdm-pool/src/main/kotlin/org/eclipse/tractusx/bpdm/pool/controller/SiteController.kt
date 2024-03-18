@@ -22,17 +22,14 @@ package org.eclipse.tractusx.bpdm.pool.controller
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.PoolSiteApi
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteBpnSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteMatchVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerUpdateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
-import org.eclipse.tractusx.bpdm.pool.service.AddressService
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
-import org.eclipse.tractusx.bpdm.pool.service.SearchService
 import org.eclipse.tractusx.bpdm.pool.service.SiteService
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
@@ -40,9 +37,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class SiteController(
     private val siteService: SiteService,
-    private val businessPartnerBuildService: BusinessPartnerBuildService,
-    private val addressService: AddressService,
-    val searchService: SearchService,
+    private val businessPartnerBuildService: BusinessPartnerBuildService
 ) : PoolSiteApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
@@ -53,11 +48,19 @@ class SiteController(
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
-    override fun searchSites(
-        siteSearchRequest: SiteBpnSearchRequest,
+    override fun postSiteSearch(
+        searchRequest: SiteSearchRequest,
         paginationRequest: PaginationRequest
     ): PageDto<SiteWithMainAddressVerboseDto> {
-        return siteService.findByPartnerBpns(siteSearchRequest, paginationRequest)
+        return siteService.searchSites(
+            SiteService.SiteSearchRequest(
+                siteBpns = searchRequest.siteBpns,
+                legalEntityBpns = searchRequest.legalEntityBpns,
+                name = searchRequest.name,
+                isCatenaXMemberData = null
+            ),
+            paginationRequest
+        )
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")
@@ -75,9 +78,10 @@ class SiteController(
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
-    override fun getSitesPaginated(
+    override fun getSites(
+        searchRequest: SiteSearchRequest,
         paginationRequest: PaginationRequest
-    ): PageDto<SiteMatchVerboseDto> {
-        return searchService.searchSites(paginationRequest)
+    ): PageDto<SiteWithMainAddressVerboseDto> {
+        return postSiteSearch(searchRequest, paginationRequest)
     }
 }

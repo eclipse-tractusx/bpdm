@@ -21,7 +21,6 @@ package org.eclipse.tractusx.bpdm.pool.service
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.*
-import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
@@ -77,7 +76,7 @@ class BusinessPartnerBuildService(
         val requestsByLegalEntities = validRequests
             .mapIndexed { bpnIndex, request ->
                 val legalEntity = createLegalEntity(request.legalEntity, bpnLs[bpnIndex], legalEntityMetadataMap)
-                val legalAddress = createLogisticAddress(request.legalAddress, bpnAs[bpnIndex], legalEntity, addressMetadataMap)
+                val legalAddress = createLogisticAddress(request.legalAddress, bpnAs[bpnIndex], legalEntity, null, addressMetadataMap)
                 legalEntity.legalAddress = legalAddress
                 Pair(legalEntity, request)
             }
@@ -151,7 +150,7 @@ class BusinessPartnerBuildService(
 
         fun createSiteWithMainAddress(bpnIndex: Int, request: SitePartnerCreateRequest) =
             createSite(request.site, bpnSs[bpnIndex], legalEntitiesByBpn[request.bpnlParent]!!)
-                .apply { mainAddress = createLogisticAddress(request.site.mainAddress, bpnAs[bpnIndex], this, addressMetadataMap) }
+                .apply { mainAddress = createLogisticAddress(request.site.mainAddress, bpnAs[bpnIndex], this.legalEntity, this, addressMetadataMap) }
                 .let { site -> Pair(site, request) }
 
         val requestsBySites = validRequests
@@ -340,14 +339,6 @@ class BusinessPartnerBuildService(
         return AddressPartnerUpdateResponseWrapper(addressResponses, errors)
     }
 
-    @Transactional
-    fun setBusinessPartnerCurrentness(bpn: String) {
-        logger.info { "Updating currentness of business partner $bpn" }
-        val partner = legalEntityRepository.findByBpn(bpn) ?: throw BpdmNotFoundException("Business Partner", bpn)
-        partner.currentness = createCurrentnessTimestamp()
-        legalEntityRepository.save(partner)
-    }
-
     private fun createAddressesForLegalEntity(
         validRequests: Collection<AddressPartnerCreateRequest>,
         metadataMap: AddressMetadataMapping
@@ -361,7 +352,7 @@ class BusinessPartnerBuildService(
         val addressesWithIndex = validRequests
             .mapIndexed { i, request ->
                 val legalEntity = parentLegalEntitiesByBpn[request.bpnParent]!!
-                val address = createLogisticAddress(request.address, bpnAs[i], legalEntity, metadataMap)
+                val address = createLogisticAddress(request.address, bpnAs[i], legalEntity, null, metadataMap)
                 Pair(address, request.index)
             }
 
@@ -382,7 +373,7 @@ class BusinessPartnerBuildService(
         val addressesWithIndex = validRequests
             .mapIndexed { i, request ->
                 val site = siteParentsByBpn[request.bpnParent]!!
-                val address = createLogisticAddress(request.address, bpnAs[i], site, metadataMap)
+                val address = createLogisticAddress(request.address, bpnAs[i], site.legalEntity, site, metadataMap)
                 Pair(address, request.index)
             }
 
@@ -397,17 +388,13 @@ class BusinessPartnerBuildService(
         dto: LogisticAddressDto,
         bpn: String,
         legalEntity: LegalEntityDb,
+        site: SiteDb?,
         metadataMap: AddressMetadataMapping
     ) = createLogisticAddressInternal(dto, bpn, metadataMap)
-        .also { it.legalEntity = legalEntity }
-
-    private fun createLogisticAddress(
-        dto: LogisticAddressDto,
-        bpn: String,
-        site: SiteDb,
-        metadataMap: AddressMetadataMapping
-    ) = createLogisticAddressInternal(dto, bpn, metadataMap)
-        .also { it.site = site }
+        .apply {
+            this.legalEntity = legalEntity
+            this.site = site
+        }
 
     private fun createLogisticAddressInternal(
         dto: LogisticAddressDto,
@@ -608,6 +595,7 @@ class BusinessPartnerBuildService(
             legalEntity.identifiers.replace(legalEntityDto.identifiers.map { toLegalEntityIdentifier(it, metadataMap.idTypes, legalEntity) })
             legalEntity.states.replace(legalEntityDto.states.map { toLegalEntityState(it, legalEntity) })
             legalEntity.confidenceCriteria = createConfidenceCriteria(legalEntityDto.confidenceCriteria)
+            legalEntity.isCatenaXMemberData = legalEntityDto.isCatenaXMemberData
         }
 
         fun createPhysicalAddress(physicalAddress: IBasePhysicalPostalAddressDto, regions: Map<String, RegionDb>): PhysicalPostalAddressDb {

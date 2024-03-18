@@ -20,6 +20,8 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.dto.PageDto
+import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingDto
@@ -31,6 +33,8 @@ import org.eclipse.tractusx.bpdm.pool.repository.AddressIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -47,6 +51,22 @@ class BusinessPartnerFetchService(
 ) {
 
     private val logger = KotlinLogging.logger { }
+
+    /**
+     * Search legal entities per page for [searchRequest] and [paginationRequest]
+     */
+    @Transactional
+    fun searchLegalEntities(searchRequest: LegalEntitySearchRequest, paginationRequest: PaginationRequest): PageDto<LegalEntityWithLegalAddressVerboseDto>{
+        val spec = Specification.allOf(
+            LegalEntityRepository.byBpns(searchRequest.bpnLs),
+            LegalEntityRepository.byLegalName(searchRequest.legalName),
+            LegalEntityRepository.byIsMember(searchRequest.isCatenaXMemberData)
+        )
+
+        val legalEntityPage = legalEntityRepository.findAll(spec, PageRequest.of(paginationRequest.page, paginationRequest.size))
+
+        return legalEntityPage.toDto(LegalEntityDb::toLegalEntityWithLegalAddress)
+    }
 
     /**
      * Fetch a business partner by [bpn] and return as [LegalEntityWithLegalAddressVerboseDto]
@@ -132,7 +152,7 @@ class BusinessPartnerFetchService(
 
 
     private fun findLegalEntityOrThrow(bpn: String): LegalEntityDb {
-        return legalEntityRepository.findByBpn(bpn) ?: throw BpdmNotFoundException(LegalEntityDb::class.simpleName!!, bpn)
+        return legalEntityRepository.findByBpnIgnoreCase(bpn) ?: throw BpdmNotFoundException(LegalEntityDb::class.simpleName!!, bpn)
     }
 
     fun findLegalEntityOrThrow(identifierTypeKey: String, identifierValue: String): LegalEntityDb {
@@ -144,5 +164,12 @@ class BusinessPartnerFetchService(
     private fun findIdentifierTypeOrThrow(identifierTypeKey: String, businessPartnerType: IdentifierBusinessPartnerType) =
         identifierTypeRepository.findByBusinessPartnerTypeAndTechnicalKey(businessPartnerType, identifierTypeKey)
             ?: throw BpdmNotFoundException(IdentifierTypeDb::class, "$identifierTypeKey/$businessPartnerType")
+
+
+    data class LegalEntitySearchRequest(
+        val bpnLs: List<String>?,
+        val legalName: String?,
+        val isCatenaXMemberData: Boolean?
+    )
 
 }

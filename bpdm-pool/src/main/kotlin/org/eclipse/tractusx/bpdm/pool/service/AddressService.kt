@@ -19,20 +19,18 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
-import jakarta.transaction.Transactional
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
+import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerBpnSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.MainAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
 
 @Service
@@ -43,13 +41,32 @@ class AddressService(
 ) {
     private val logger = KotlinLogging.logger { }
 
-    fun findByPartnerBpn(bpn: String, pageIndex: Int, pageSize: Int): PageDto<LogisticAddressVerboseDto> {
-        logger.debug { "Executing findByPartnerBpn() with parameters $bpn // $pageIndex // $pageSize" }
-        if (!legalEntityRepository.existsByBpn(bpn)) {
-            throw BpdmNotFoundException("Business Partner", bpn)
-        }
+    /**
+     * Search addresses per page for [searchRequest] and [paginationRequest]
+     */
+    @org.springframework.transaction.annotation.Transactional
+    fun searchAddresses(searchRequest: AddressSearchRequest, paginationRequest: PaginationRequest): PageDto<LogisticAddressVerboseDto>{
 
-        val page = logisticAddressRepository.findByLegalEntityBpn(bpn, PageRequest.of(pageIndex, pageSize))
+        val spec = Specification.allOf(
+            LogisticAddressRepository.byBpns(searchRequest.addressBpns),
+            LogisticAddressRepository.bySiteBpns(searchRequest.siteBpns),
+            LogisticAddressRepository.byLegalEntityBpns(searchRequest.legalEntityBpns),
+            LogisticAddressRepository.byName(searchRequest.name),
+            LogisticAddressRepository.byIsMember(searchRequest.isCatenaXMemberData)
+        )
+        val addressPage = logisticAddressRepository.findAll(spec, paginationRequest.toPageRequest())
+
+        return addressPage.toDto { it.toDto() }
+    }
+
+    /**
+     * Find Addresses which directly belong to a Legal Entity
+     */
+    fun findNonSiteAddressesOfLegalEntity(bpnl: String, pageIndex: Int, pageSize: Int): PageDto<LogisticAddressVerboseDto> {
+        logger.debug { "Executing findByPartnerBpn() with parameters $bpnl // $pageIndex // $pageSize" }
+        val legalEntity = legalEntityRepository.findByBpnIgnoreCase(bpnl) ?:  throw BpdmNotFoundException("Business Partner", bpnl)
+
+        val page = logisticAddressRepository.findByLegalEntityAndSiteIsNull(legalEntity, PageRequest.of(pageIndex, pageSize))
         fetchLogisticAddressDependencies(page.map { it }.toSet())
         return page.toDto(page.content.map { it.toDto() })
     }
@@ -58,44 +75,6 @@ class AddressService(
         logger.debug { "Executing findByBpn() with parameters $bpn" }
         val address = logisticAddressRepository.findByBpn(bpn) ?: throw BpdmNotFoundException("Address", bpn)
         return address.toDto()
-    }
-
-    @Transactional
-    fun findByPartnerAndSiteBpns(
-        searchRequest: AddressPartnerBpnSearchRequest,
-        paginationRequest: PaginationRequest
-    ): PageDto<LogisticAddressVerboseDto> {
-        logger.debug { "Executing findByPartnerAndSiteBpns() with parameters $searchRequest and $paginationRequest" }
-
-        val partners = if (searchRequest.legalEntities.isNotEmpty()) legalEntityRepository.findDistinctByBpnIn(searchRequest.legalEntities) else emptyList()
-        val sites = if (searchRequest.sites.isNotEmpty()) siteRepository.findDistinctByBpnIn(searchRequest.sites) else emptyList()
-
-        val addressPage = logisticAddressRepository.findByLegalEntityInOrSiteInOrBpnIn(
-            legalEntities = partners,
-            sites = sites,
-            bpns = searchRequest.addresses,
-            pageable = PageRequest.of(paginationRequest.page, paginationRequest.size)
-        )
-        fetchLogisticAddressDependencies(addressPage.map { it }.toSet())
-        return addressPage.toDto(addressPage.content.map { it.toDto() })
-    }
-
-    fun findLegalAddresses(bpnLs: Collection<String>): Collection<LegalAddressVerboseDto> {
-        logger.debug { "Executing findLegalAddresses() with parameters $bpnLs" }
-        val legalEntities = legalEntityRepository.findDistinctByBpnIn(bpnLs)
-        legalEntityRepository.joinLegalAddresses(legalEntities)
-        val addresses = legalEntities.map { it.legalAddress }
-        fetchLogisticAddressDependencies(addresses.toSet())
-        return addresses.map { it.toLegalAddressResponse() }
-    }
-
-    fun findMainAddresses(bpnS: Collection<String>): Collection<MainAddressVerboseDto> {
-        logger.debug { "Executing findMainAddresses() with parameters $bpnS" }
-        val sites = siteRepository.findDistinctByBpnIn(bpnS)
-        siteRepository.joinAddresses(sites)
-        val addresses = sites.map { it.mainAddress }
-        fetchLogisticAddressDependencies(addresses.toSet())
-        return addresses.map { it.toMainAddressResponse() }
     }
 
     fun fetchLogisticAddressDependencies(addresses: Set<LogisticAddressDb>): Set<LogisticAddressDb> {
@@ -107,4 +86,12 @@ class AddressService(
 
         return addresses
     }
+
+    data class AddressSearchRequest(
+        val addressBpns: List<String>?,
+        val siteBpns: List<String>?,
+        val legalEntityBpns: List<String>?,
+        val name: String?,
+        val isCatenaXMemberData: Boolean?
+    )
 }

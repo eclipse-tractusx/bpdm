@@ -23,5 +23,5 @@ data class AddressSearchRequest(
     val addressBpns: List<String> = emptyList(),
     val legalEntityBpns: List<String> = emptyList(),
     val siteBpns: List<String> = emptyList(),
-    val name: String?
+    val name: String? = null
 )

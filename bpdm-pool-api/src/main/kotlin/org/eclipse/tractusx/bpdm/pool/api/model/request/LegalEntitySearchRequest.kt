@@ -21,5 +21,5 @@ package org.eclipse.tractusx.bpdm.pool.api.model.request
 
 data class LegalEntitySearchRequest(
     val bpnLs: List<String> = emptyList(),
-    val legalName: String?
+    val legalName: String? = null
 )

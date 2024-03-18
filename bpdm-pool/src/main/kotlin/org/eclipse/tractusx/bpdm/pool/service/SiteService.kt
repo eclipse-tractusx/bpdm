@@ -24,13 +24,14 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteBpnSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class SiteService(
@@ -40,24 +41,33 @@ class SiteService(
 ) {
     private val logger = KotlinLogging.logger { }
 
+    /**
+     * Search sites per page for [searchRequest] and [paginationRequest]
+     */
+    @Transactional
+    fun searchSites(searchRequest: SiteSearchRequest, paginationRequest: PaginationRequest): PageDto<SiteWithMainAddressVerboseDto>{
+        logger.debug { "Executing site search with request: $searchRequest" }
+        val spec = Specification.allOf(
+            SiteRepository.byBpns(searchRequest.siteBpns),
+            SiteRepository.byParentBpns(searchRequest.legalEntityBpns),
+            SiteRepository.byName(searchRequest.name),
+            SiteRepository.byIsMember(searchRequest.isCatenaXMemberData)
+        )
+
+        val sitePage = siteRepository.findAll(spec, PageRequest.of(paginationRequest.page, paginationRequest.size))
+
+        fetchSiteDependencies(sitePage.toSet())
+
+        return sitePage.toDto(SiteDb::toPoolDto)
+    }
+
     fun findByParentBpn(bpn: String, pageIndex: Int, pageSize: Int): PageDto<SiteVerboseDto> {
         logger.debug { "Executing findByPartnerBpn() with parameters $bpn // $pageIndex // $pageSize" }
-        val legalEntity = legalEntityRepository.findByBpn(bpn) ?: throw BpdmNotFoundException("Business Partner", bpn)
+        val legalEntity = legalEntityRepository.findByBpnIgnoreCase(bpn) ?: throw BpdmNotFoundException("Business Partner", bpn)
 
         val page = siteRepository.findByLegalEntity(legalEntity, PageRequest.of(pageIndex, pageSize))
         fetchSiteDependencies(page.toSet())
         return page.toDto(page.content.map { it.toDto() })
-    }
-
-    fun findByPartnerBpns(siteSearchRequest: SiteBpnSearchRequest, paginationRequest: PaginationRequest): PageDto<SiteWithMainAddressVerboseDto> {
-        logger.debug { "Executing findByPartnerBpns() with parameters $siteSearchRequest // $paginationRequest" }
-        val parents =
-            if (siteSearchRequest.legalEntities.isNotEmpty()) legalEntityRepository.findDistinctByBpnIn(siteSearchRequest.legalEntities) else emptyList()
-        val sitePage =
-            siteRepository.findByLegalEntityInOrBpnIn(parents, siteSearchRequest.sites, PageRequest.of(paginationRequest.page, paginationRequest.size))
-        fetchSiteDependencies(sitePage.toSet())
-
-        return sitePage.toDto(sitePage.content.map { it.toPoolDto() })
     }
 
     fun findByBpn(bpn: String): SiteWithMainAddressVerboseDto {
@@ -81,5 +91,12 @@ class SiteService(
 
         return sites
     }
+
+    data class SiteSearchRequest(
+        val siteBpns: List<String>?,
+        val legalEntityBpns: List<String>?,
+        val name: String?,
+        val isCatenaXMemberData: Boolean?
+    )
 
 }

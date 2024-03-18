@@ -23,34 +23,26 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.PoolAddressApi
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerBpnSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerUpdateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.service.AddressService
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
-import org.eclipse.tractusx.bpdm.pool.service.SearchService
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class AddressController(
     private val addressService: AddressService,
-    private val businessPartnerBuildService: BusinessPartnerBuildService,
-    private val searchService: SearchService
+    private val businessPartnerBuildService: BusinessPartnerBuildService
 ) : PoolAddressApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
-    override fun getAddresses(
-        addressSearchRequest: AddressPartnerSearchRequest,
-        paginationRequest: PaginationRequest
-    ): PageDto<AddressMatchVerboseDto> {
-
-        return searchService.searchAddresses(addressSearchRequest, paginationRequest)
+    override fun getAddresses(addressSearchRequest: AddressSearchRequest, paginationRequest: PaginationRequest): PageDto<LogisticAddressVerboseDto> {
+        return searchAddresses(addressSearchRequest, paginationRequest)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
@@ -62,10 +54,19 @@ class AddressController(
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun searchAddresses(
-        addressSearchRequest: AddressPartnerBpnSearchRequest,
+        searchRequest: AddressSearchRequest,
         paginationRequest: PaginationRequest
     ): PageDto<LogisticAddressVerboseDto> {
-        return addressService.findByPartnerAndSiteBpns(addressSearchRequest, paginationRequest)
+        return addressService.searchAddresses(
+            AddressService.AddressSearchRequest(
+                addressBpns = searchRequest.addressBpns,
+                siteBpns = searchRequest.siteBpns,
+                legalEntityBpns = searchRequest.legalEntityBpns,
+                name = searchRequest.name,
+                isCatenaXMemberData = null
+            ),
+            paginationRequest
+        )
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")

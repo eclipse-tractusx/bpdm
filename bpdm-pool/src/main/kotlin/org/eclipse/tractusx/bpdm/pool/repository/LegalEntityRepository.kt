@@ -21,21 +21,44 @@ package org.eclipse.tractusx.bpdm.pool.repository
 
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
+import org.eclipse.tractusx.bpdm.pool.entity.NameDb
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.data.jpa.domain.Specification
+import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.data.jpa.repository.Query
-import org.springframework.data.repository.CrudRepository
-import org.springframework.data.repository.PagingAndSortingRepository
-import java.time.Instant
 
-interface LegalEntityRepository : PagingAndSortingRepository<LegalEntityDb, Long>, CrudRepository<LegalEntityDb, Long> {
-    fun findByBpn(bpn: String): LegalEntityDb?
+interface LegalEntityRepository : JpaRepository<LegalEntityDb, Long>, JpaSpecificationExecutor<LegalEntityDb> {
+
+    companion object {
+        fun byBpns(bpns: Collection<String>?) =
+            Specification<LegalEntityDb> { root, _, _ ->
+                bpns?.filter { it.isNotBlank() }?.takeIf { it.isNotEmpty() }?.let {
+                    root.get<String>(LegalEntityDb::bpn.name).`in`(bpns)
+                }
+            }
+
+        fun byLegalName(legalName: String?) =
+            Specification<LegalEntityDb> { root, _, builder ->
+                legalName?.takeIf { it.isNotBlank() }?.let {
+                    builder.like(root.get<NameDb>(LegalEntityDb::legalName.name).get(NameDb::value.name), legalName)
+                }
+            }
+
+        fun byIsMember(isCatenaXMemberData: Boolean?) =
+            Specification<LegalEntityDb> { root, _, builder ->
+                isCatenaXMemberData?.let {
+                    builder.equal(root.get<Boolean>(LegalEntityDb::isCatenaXMemberData.name), isCatenaXMemberData)
+                }
+            }
+    }
+
+    fun findByBpnIgnoreCase(bpn: String): LegalEntityDb?
 
     fun existsByBpn(bpn: String): Boolean
 
     fun findDistinctByBpnIn(bpns: Collection<String>): Set<LegalEntityDb>
-
-    fun findByUpdatedAtAfter(updatedAt: Instant, pageable: Pageable): Page<LegalEntityDb>
 
     @Query("SELECT p FROM LegalEntityDb p WHERE LOWER(p.legalName.value) LIKE :value ORDER BY LENGTH(p.legalName.value)")
     fun findByLegalNameValue(value: String, pageable: Pageable): Page<LegalEntityDb>

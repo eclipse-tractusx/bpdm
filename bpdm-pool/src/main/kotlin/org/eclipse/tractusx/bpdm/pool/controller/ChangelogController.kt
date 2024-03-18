@@ -50,11 +50,12 @@ class ChangelogController(
         }
 
         return partnerChangelogService.getChangeLogEntries(
-            changelogSearchRequest.bpns,
-            changelogSearchRequest.businessPartnerTypes,
-            changelogSearchRequest.timestampAfter,
-            paginationRequest.page,
-            paginationRequest.size
+            bpns = changelogSearchRequest.bpns,
+            businessPartnerTypes = changelogSearchRequest.businessPartnerTypes,
+            fromTime = changelogSearchRequest.timestampAfter,
+            isCatenaXMemberData = null,
+            pageIndex = paginationRequest.page,
+            pageSize = paginationRequest.size
         )
     }
 }
