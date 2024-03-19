@@ -85,8 +85,8 @@ class SitePersistenceService(
     //Creates Changelog For both Site and Logistic Address when they are created or updated
     private fun saveChangelog(externalId: String, changelogType: ChangelogType, stage: StageType) {
         val mainAddressExternalId = getMainAddressExternalIdForSiteExternalId(externalId)
-        changelogRepository.save(ChangelogEntryDb(mainAddressExternalId, BusinessPartnerType.ADDRESS, changelogType, stage))
-        changelogRepository.save(ChangelogEntryDb(externalId, BusinessPartnerType.SITE, changelogType, stage))
+        changelogRepository.save(ChangelogEntryDb(mainAddressExternalId, BusinessPartnerType.ADDRESS, changelogType = changelogType, stage = stage))
+        changelogRepository.save(ChangelogEntryDb(externalId, BusinessPartnerType.SITE, changelogType = changelogType, stage = stage))
     }
 
     private fun getAddressRecord(externalId: String, datatype: StageType): LogisticAddressDb {

@@ -164,7 +164,7 @@ class AddressPersistenceService(
     }
 
     private fun saveChangelog(externalId: String, changelogType: ChangelogType, stage: StageType) {
-        changelogRepository.save(ChangelogEntryDb(externalId, BusinessPartnerType.ADDRESS, changelogType, stage))
+        changelogRepository.save(ChangelogEntryDb(externalId = externalId, businessPartnerType = BusinessPartnerType.ADDRESS, changelogType =  changelogType, stage = stage))
     }
 
 }

@@ -101,7 +101,7 @@ class GoldenRecordTaskService(
         val sharingStatesWithoutTasks = sharingStates.filter { it.taskId !in tasks.map { task -> task.taskId } }
 
         val businessPartnersToUpsert = taskStatesByResult[ResultState.Success]?.map { (task, sharingState) ->
-            orchestratorMappings.toBusinessPartner(task.businessPartnerResult!!, sharingState.externalId)
+            orchestratorMappings.toBusinessPartner(task.businessPartnerResult!!, sharingState.externalId,sharingState.associatedOwnerBpnl)
         } ?: emptyList()
         businessPartnerService.upsertBusinessPartnersOutputFromCandidates(businessPartnersToUpsert)
 

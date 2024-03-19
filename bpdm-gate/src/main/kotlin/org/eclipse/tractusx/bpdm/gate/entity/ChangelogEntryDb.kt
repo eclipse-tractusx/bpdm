@@ -36,6 +36,9 @@ class ChangelogEntryDb(
     @Column(name = "business_partner_type", nullable = false, updatable = false)
     val businessPartnerType: BusinessPartnerType,
 
+    @Column(name = "associated_owner_bpnl", nullable = true)
+    var associatedOwnerBpnl: String? = null,
+
     @Enumerated(EnumType.STRING)
     @Column(name = "changelog_type", nullable = false, updatable = false)
     val changelogType: ChangelogType,

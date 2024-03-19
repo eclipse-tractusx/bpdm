@@ -35,9 +35,9 @@ interface BusinessPartnerRepository : JpaRepository<BusinessPartnerDb, Long>, Cr
 
     fun findByStageAndExternalIdIn(stage: StageType, externalId: Collection<String>): Set<BusinessPartnerDb>
 
-    fun findByStageAndExternalIdIn(stage: StageType, externalId: Collection<String>, pageable: Pageable): Page<BusinessPartnerDb>
+    fun findByStageAndAssociatedOwnerBpnlAndExternalIdIn(stage: StageType,associatedOwnerBpnl: String?, externalId: Collection<String>, pageable: Pageable): Page<BusinessPartnerDb>
 
-    fun findByStage(stage: StageType, pageable: Pageable): Page<BusinessPartnerDb>
+    fun findByStageAndAssociatedOwnerBpnl(stage: StageType,associatedOwnerBpnl: String?, pageable: Pageable): Page<BusinessPartnerDb>
 
     @Query("SELECT e FROM BusinessPartnerDb e WHERE e.stage = :stage AND (e.bpnL IN :bpnL OR e.bpnS IN :bpnS OR e.bpnA IN :bpnA)")
     fun findByStageAndBpnLInOrBpnSInOrBpnAIn(

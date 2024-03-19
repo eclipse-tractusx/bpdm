@@ -53,9 +53,18 @@ interface SharingStateRepository : PagingAndSortingRepository<SharingStateDb, Lo
                     builder.equal(root.get<BusinessPartnerType>(SharingStateDb::businessPartnerType.name), businessPartnerType)
                 }
             }
+
+
+        fun byAssociatedOwnerBpnl(associatedOwnerBpnl: String?) =
+            Specification<SharingStateDb> { root, _, builder ->
+                associatedOwnerBpnl?.takeIf { it.isNotBlank() }?.let {
+                    builder.like(root.get(SharingStateDb::associatedOwnerBpnl.name), associatedOwnerBpnl)
+                }
+            }
+
     }
 
-    fun findByExternalIdInAndBusinessPartnerType(externalId: Collection<String>, businessPartnerType: BusinessPartnerType): Collection<SharingStateDb>
+    fun findByExternalIdInAndBusinessPartnerTypeAndAssociatedOwnerBpnl(externalId: Collection<String>, businessPartnerType: BusinessPartnerType,associatedOwnerBpnl: String?): Collection<SharingStateDb>
 
     fun findBySharingStateType(sharingStateType: SharingStateType): Set<SharingStateDb>
 
