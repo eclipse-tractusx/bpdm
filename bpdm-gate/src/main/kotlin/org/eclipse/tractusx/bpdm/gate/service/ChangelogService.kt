@@ -27,10 +27,12 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogDto
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
+import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byAssociatedOwnerBpnl
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byBusinessPartnerTypes
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byCreatedAtGreaterThan
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byExternalIdsIn
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byStage
+import org.eclipse.tractusx.bpdm.gate.util.getCurrentUserBpn
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
@@ -58,7 +60,8 @@ class ChangelogService(private val changelogRepository: ChangelogRepository) {
             byExternalIdsIn(externalIds = nonNullExternalIds),
             byCreatedAtGreaterThan(createdAt = createdAt),
             byBusinessPartnerTypes(businessPartnerTypes),
-            byStage(stage)
+            byStage(stage),
+            byAssociatedOwnerBpnl(getCurrentUserBpn())
         )
 
         val pageable = PageRequest.of(page, pageSize)
@@ -79,6 +82,7 @@ class ChangelogService(private val changelogRepository: ChangelogRepository) {
         }
 
 
+
         return PageChangeLogDto(
             page = page, totalElements = pageDto.totalElements,
             totalPages = pageDto.totalPages,
@@ -88,5 +92,7 @@ class ChangelogService(private val changelogRepository: ChangelogRepository) {
             errors = errorList
         )
     }
+
+
 
 }
