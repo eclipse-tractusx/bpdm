@@ -284,7 +284,6 @@ class MockAndAssertUtils @Autowired constructor(
         Assertions.assertThat(sharingStateResponse.content).isEqualTo(
             upsertedBusinessPartners.map {
                 SharingStateDto(
-                    businessPartnerType = BusinessPartnerType.GENERIC,
                     externalId = it.externalId,
                     sharingStateType = SharingStateType.Ready
                 )
