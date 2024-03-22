@@ -88,8 +88,8 @@ class LegalEntityPersistenceService(
     //Creates Changelog for both Legal Entity and Logistic Address when they are created or updated
     private fun saveChangelog(externalId: String, changelogType: ChangelogType, stage: StageType) {
         val legalAddressExternalId = getLegalAddressExternalIdForLegalEntityExternalId(externalId)
-        changelogRepository.save(ChangelogEntryDb(legalAddressExternalId, BusinessPartnerType.ADDRESS, changelogType, stage))
-        changelogRepository.save(ChangelogEntryDb(externalId, BusinessPartnerType.LEGAL_ENTITY, changelogType, stage))
+        changelogRepository.save(ChangelogEntryDb(legalAddressExternalId, BusinessPartnerType.ADDRESS, changelogType = changelogType, stage = stage))
+        changelogRepository.save(ChangelogEntryDb(externalId, BusinessPartnerType.LEGAL_ENTITY,changelogType= changelogType, stage = stage))
     }
 
     private fun updateLegalEntity(

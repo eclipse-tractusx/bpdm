@@ -75,6 +75,14 @@ interface ChangelogRepository : JpaRepository<ChangelogEntryDb, Long>, JpaSpecif
                     builder.equal(root.get<StageType>(ChangelogEntryDb::stage.name), stage)
                 }
             }
+
+        fun byAssociatedOwnerBpnl(associatedOwnerBpnl: String?) =
+            Specification<ChangelogEntryDb> { root, _, builder ->
+                associatedOwnerBpnl?.takeIf { it.isNotBlank() }?.let {
+                    builder.like(root.get(ChangelogEntryDb::associatedOwnerBpnl.name), associatedOwnerBpnl)
+                }
+            }
+
     }
 
     @Query("select distinct u.externalId from ChangelogEntryDb u where u.externalId in :externalIdList")

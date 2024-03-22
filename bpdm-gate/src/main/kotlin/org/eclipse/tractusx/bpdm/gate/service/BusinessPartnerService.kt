@@ -37,6 +37,7 @@ import org.eclipse.tractusx.bpdm.gate.exception.BpdmMissingStageException
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
+import org.eclipse.tractusx.bpdm.gate.util.getCurrentUserBpn
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerGenericDto
 import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRequest
@@ -89,10 +90,12 @@ class BusinessPartnerService(
 
         val partners = resolutionResults.map { it.businessPartner }
         sharingStateService.setInitial(partners.map { SharingStateService.SharingStateIdentifierDto(it.externalId, BusinessPartnerType.GENERIC) })
-        partners.map {
 
+        partners.map {
+            it.associatedOwnerBpnl = getCurrentUserBpn()
             logger.info { "Business Partner ${it.bpnA ?: it.bpnS ?: it.bpnL} was created or updated" }
         }
+
         return businessPartnerRepository.saveAll(partners)
     }
 
@@ -121,10 +124,12 @@ class BusinessPartnerService(
 
     private fun getBusinessPartners(pageRequest: PageRequest, externalIds: Collection<String>?, stage: StageType): Page<BusinessPartnerDb> {
         return when {
-            externalIds.isNullOrEmpty() -> businessPartnerRepository.findByStage(stage, pageRequest)
-            else -> businessPartnerRepository.findByStageAndExternalIdIn(stage, externalIds, pageRequest)
+            externalIds.isNullOrEmpty() -> businessPartnerRepository.findByStageAndAssociatedOwnerBpnl(stage, associatedOwnerBpnl = getCurrentUserBpn(),pageRequest)
+            else -> businessPartnerRepository.findByStageAndAssociatedOwnerBpnlAndExternalIdIn(stage, associatedOwnerBpnl = getCurrentUserBpn(),externalIds, pageRequest)
         }
     }
+
+
 
     private fun saveChangelog(resolutionResults: Collection<ResolutionResult>) {
         resolutionResults.forEach { result ->
@@ -136,7 +141,7 @@ class BusinessPartnerService(
     }
 
     private fun saveChangelog(partner: BusinessPartnerDb, changelogType: ChangelogType) {
-        changelogRepository.save(ChangelogEntryDb(partner.externalId, BusinessPartnerType.GENERIC, changelogType, partner.stage))
+        changelogRepository.save(ChangelogEntryDb(externalId = partner.externalId, businessPartnerType = BusinessPartnerType.GENERIC,changelogType = changelogType, stage =  partner.stage, associatedOwnerBpnl = getCurrentUserBpn()))
     }
 
     private fun assertInputStageExists(externalIds: Collection<String>) {
@@ -161,7 +166,7 @@ class BusinessPartnerService(
         val externalIds = entities.map { it.externalId }
         val persistedBusinessPartnerMap = businessPartnerRepository.findByStageAndExternalIdIn(stage, externalIds).associateBy { it.externalId }
         val sharingStatesMap =
-            sharingStateRepository.findByExternalIdInAndBusinessPartnerType(externalIds, BusinessPartnerType.GENERIC).associateBy { it.externalId }
+            sharingStateRepository.findByExternalIdInAndBusinessPartnerTypeAndAssociatedOwnerBpnl(externalIds, BusinessPartnerType.GENERIC,getCurrentUserBpn()).associateBy { it.externalId }
 
         return entities.filter { entity ->
             val matchingBusinessPartner = persistedBusinessPartnerMap[entity.externalId]

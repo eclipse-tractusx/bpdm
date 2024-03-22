@@ -87,12 +87,9 @@ logging:
     level:
       # On default show only logs from INFO and above
         root: INFO
-        org:
-            eclipse:
-                tractusx:
-                    bpdm:
-                      # Logs from this application's package should be DEBUG and above
-                        gate: DEBUG
+      # Logs from this application's package should be DEBUG and above
+        org.eclipse.tractusx.bpdm.gate: DEBUG
+
 management:
     endpoint:
         health:

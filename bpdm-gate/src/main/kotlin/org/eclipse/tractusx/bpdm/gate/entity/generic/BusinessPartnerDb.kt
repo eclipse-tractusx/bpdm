@@ -74,6 +74,9 @@ class BusinessPartnerDb(
     @Column(name = "is_own_company_data", nullable = false)
     var isOwnCompanyData: Boolean = false,
 
+    @Column(name = "associated_owner_bpnl", nullable = true)
+    var associatedOwnerBpnl: String? = null,
+
     @Column(name = "bpnl")
     var bpnL: String? = null,
 

@@ -33,8 +33,10 @@ import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidStateException
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidStateRequestException
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmMissingPartnerException
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
+import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository.Specs.byAssociatedOwnerBpnl
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository.Specs.byBusinessPartnerType
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository.Specs.byExternalIdsIn
+import org.eclipse.tractusx.bpdm.gate.util.getCurrentUserBpn
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
@@ -94,7 +96,7 @@ class SharingStateService(
         logger.info { "findSharingStates() called with $paginationRequest // $businessPartnerType and $externalIds" }
 
         val pageRequest = PageRequest.of(paginationRequest.page, paginationRequest.size)
-        val spec = Specification.allOf(byExternalIdsIn(externalIds), byBusinessPartnerType(businessPartnerType))
+        val spec = Specification.allOf(byExternalIdsIn(externalIds), byBusinessPartnerType(businessPartnerType),byAssociatedOwnerBpnl(getCurrentUserBpn()))
         val sharingStatePage = stateRepository.findAll(spec, pageRequest)
 
         return sharingStatePage.toPageDto {
@@ -115,6 +117,8 @@ class SharingStateService(
         val sharingStates = getOrCreate(sharingStateIds)
         return sharingStates.map { setInitial(it) }
     }
+
+
 
     fun setSuccess(successRequests: List<SuccessRequest>): List<SharingStateDb> {
         val sharingStates = getOrCreate(successRequests.map { it.sharingStateId })
@@ -139,7 +143,7 @@ class SharingStateService(
     }
 
     fun setReady(externalIds: List<String>): List<SharingStateDb> {
-        val existingSharingStates = stateRepository.findByExternalIdInAndBusinessPartnerType(externalIds, BusinessPartnerType.GENERIC)
+        val existingSharingStates = stateRepository.findByExternalIdInAndBusinessPartnerTypeAndAssociatedOwnerBpnl(externalIds, BusinessPartnerType.GENERIC,getCurrentUserBpn())
         val existingIds = existingSharingStates.map { it.externalId }.toSet()
         val missingIds = externalIds.minus(existingIds)
 
@@ -169,6 +173,7 @@ class SharingStateService(
         sharingState.sharingErrorMessage = null
         sharingState.sharingProcessStarted = null
         sharingState.taskId = null
+        sharingState.associatedOwnerBpnl = getCurrentUserBpn()
 
         return stateRepository.save(sharingState)
     }
@@ -232,7 +237,7 @@ class SharingStateService(
 
 
     private fun getOrCreate(externalIds: List<String>, businessPartnerType: BusinessPartnerType): List<SharingStateDb> {
-        val sharingStates = stateRepository.findByExternalIdInAndBusinessPartnerType(externalIds, businessPartnerType)
+        val sharingStates = stateRepository.findByExternalIdInAndBusinessPartnerTypeAndAssociatedOwnerBpnl(externalIds, businessPartnerType,getCurrentUserBpn())
         val sharingStatesByExternalId = sharingStates.associateBy { it.externalId }
 
         return externalIds.map { externalId ->

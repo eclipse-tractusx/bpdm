@@ -159,7 +159,7 @@ class OrchestratorMappings(
     }
 
     //Mapping BusinessPartnerGenericDto from to BusinessPartner
-    fun toBusinessPartner(dto: BusinessPartnerGenericDto, externalId: String) = BusinessPartnerDb(
+    fun toBusinessPartner(dto: BusinessPartnerGenericDto, externalId: String, associatedOwnerBpnl: String?) = BusinessPartnerDb(
         externalId = externalId,
         nameParts = dto.nameParts.toMutableList(),
         shortName = dto.legalEntity.shortName,
@@ -178,6 +178,7 @@ class OrchestratorMappings(
         legalEntityConfidence = dto.legalEntity.confidenceCriteria?.let { toConfidenceCriteria(it) },
         siteConfidence = dto.site.confidenceCriteria?.let { toConfidenceCriteria(it) },
         addressConfidence = dto.address.confidenceCriteria?.let { toConfidenceCriteria(it) },
+        associatedOwnerBpnl = associatedOwnerBpnl
     )
 
     private fun toIdentifier(dto: BusinessPartnerIdentifierDto) =
