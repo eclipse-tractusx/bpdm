@@ -28,6 +28,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.PoolMetadataApi.DescriptionObject.METADATA_PATH
 import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
 import org.springdoc.core.annotations.ParameterObject
@@ -36,10 +37,12 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 
-@RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
+@RequestMapping(METADATA_PATH, produces = [MediaType.APPLICATION_JSON_VALUE])
 interface PoolMetadataApi {
 
     companion object DescriptionObject {
+        const val METADATA_PATH = ApiCommons.BASE_PATH
+
         const val technicalKeyDisclaimer =
             "The technical key can be freely chosen but needs to be unique for the businessPartnerType as it is used as reference by the business partner records. " +
                     "A recommendation for technical keys: They should be short, descriptive and " +
@@ -59,7 +62,7 @@ interface PoolMetadataApi {
             ApiResponse(responseCode = "409", description = "Identifier type with specified technical key already exists", content = [Content()])
         ]
     )
-    @Tag(name = ApiTags.METADATA_NAME, description = ApiTags.METADATA_DESCRIPTION)
+    @Tag(name = ApiCommons.METADATA_NAME, description = ApiCommons.METADATA_DESCRIPTION)
     @PostMapping("/identifier-types")
     fun createIdentifierType(@RequestBody identifierType: IdentifierTypeDto): IdentifierTypeDto
 
@@ -73,7 +76,7 @@ interface PoolMetadataApi {
             ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()])
         ]
     )
-    @Tag(name = ApiTags.METADATA_NAME, description = ApiTags.METADATA_DESCRIPTION)
+    @Tag(name = ApiCommons.METADATA_NAME, description = ApiCommons.METADATA_DESCRIPTION)
     @GetMapping("/identifier-types")
     fun getIdentifierTypes(
         @ParameterObject paginationRequest: PaginationRequest,
@@ -95,7 +98,7 @@ interface PoolMetadataApi {
             ApiResponse(responseCode = "409", description = "Legal form with specified technical key already exists", content = [Content()])
         ]
     )
-    @Tag(name = ApiTags.METADATA_NAME, description = ApiTags.METADATA_DESCRIPTION)
+    @Tag(name = ApiCommons.METADATA_NAME, description = ApiCommons.METADATA_DESCRIPTION)
     @PostMapping("/legal-forms")
     fun createLegalForm(@RequestBody type: LegalFormRequest): LegalFormDto
 
@@ -109,7 +112,7 @@ interface PoolMetadataApi {
             ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()])
         ]
     )
-    @Tag(name = ApiTags.METADATA_NAME, description = ApiTags.METADATA_DESCRIPTION)
+    @Tag(name = ApiCommons.METADATA_NAME, description = ApiCommons.METADATA_DESCRIPTION)
     @GetMapping("/legal-forms")
     fun getLegalForms(@ParameterObject paginationRequest: PaginationRequest): PageDto<LegalFormDto>
 
@@ -125,7 +128,7 @@ interface PoolMetadataApi {
             ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()])
         ]
     )
-    @Tag(name = ApiTags.METADATA_NAME, description = ApiTags.METADATA_DESCRIPTION)
+    @Tag(name = ApiCommons.METADATA_NAME, description = ApiCommons.METADATA_DESCRIPTION)
     @GetMapping("/field-quality-rules/")
     fun getFieldQualityRules(@Parameter(description = "ISO 3166-1 alpha-2 country code") @RequestParam country: CountryCode): ResponseEntity<Collection<FieldQualityRuleDto>>
 
@@ -139,7 +142,7 @@ interface PoolMetadataApi {
             ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()])
         ]
     )
-    @Tag(name = ApiTags.METADATA_NAME, description = ApiTags.METADATA_DESCRIPTION)
+    @Tag(name = ApiCommons.METADATA_NAME, description = ApiCommons.METADATA_DESCRIPTION)
     @GetMapping("/administrative-areas-level1")
     fun getAdminAreasLevel1(@ParameterObject paginationRequest: PaginationRequest): PageDto<CountrySubdivisionDto>
 

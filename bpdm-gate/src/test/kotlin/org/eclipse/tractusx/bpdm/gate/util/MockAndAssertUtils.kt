@@ -34,11 +34,13 @@ import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequ
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
+import org.eclipse.tractusx.bpdm.pool.api.PoolChangelogApi
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryVerboseDto
 import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerGenericCommonValues
 import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerVerboseValues
 import org.eclipse.tractusx.bpdm.test.util.AssertHelpers
+import org.eclipse.tractusx.orchestrator.api.GoldenRecordTaskApi
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
@@ -51,9 +53,9 @@ class MockAndAssertUtils @Autowired constructor(
     val assertHelpers: AssertHelpers
 ) {
 
-    val ORCHESTRATOR_CREATE_TASKS_URL = "/golden-record-tasks"
-    val ORCHESTRATOR_SEARCH_TASK_STATES_URL = "/golden-record-tasks/state/search"
-    val POOL_API_SEARCH_CHANGE_LOG_URL = "/business-partners/changelog/search"
+    val ORCHESTRATOR_CREATE_TASKS_URL = "/${GoldenRecordTaskApi.TASKS_PATH}"
+    val ORCHESTRATOR_SEARCH_TASK_STATES_URL = "/${GoldenRecordTaskApi.TASKS_PATH}/state/search"
+    val POOL_API_SEARCH_CHANGE_LOG_URL = "/${PoolChangelogApi.CHANGELOG_PATH}/search"
 
     fun mockOrchestratorApi(gateWireMockServer: WireMockExtension) {
         val taskCreateResponse =

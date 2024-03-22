@@ -23,6 +23,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.common.model.StageType
+import org.eclipse.tractusx.bpdm.gate.api.StatsApi.Companion.STATS_PATH
 import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsAddressTypesResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsConfidenceCriteriaResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsSharingStatesResponse
@@ -32,8 +33,12 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 
-@RequestMapping("/stats", produces = [MediaType.APPLICATION_JSON_VALUE])
+@RequestMapping(STATS_PATH, produces = [MediaType.APPLICATION_JSON_VALUE])
 interface StatsApi {
+
+    companion object{
+        const val STATS_PATH = "${ApiCommons.BASE_PATH}/stats"
+    }
 
     @Operation
     @ApiResponses(
