@@ -39,7 +39,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 @RequestMapping(CHANGELOG_PATH, produces = [MediaType.APPLICATION_JSON_VALUE])
 interface PoolChangelogApi {
     companion object {
-        const val CHANGELOG_PATH = "business-partners/changelog"
+        const val CHANGELOG_PATH = "${ApiCommons.BASE_PATH}/business-partners/changelog"
         const val SUBPATH_SEARCH = "/search"
     }
 
@@ -53,7 +53,7 @@ interface PoolChangelogApi {
             ApiResponse(responseCode = "404", description = "No business partner found for specified bpn", content = [Content()])
         ]
     )
-    @Tag(name = ApiTags.CHANGELOG_NAME, description = ApiTags.CHANGELOG_DESCRIPTION)
+    @Tag(name = ApiCommons.CHANGELOG_NAME, description = ApiCommons.CHANGELOG_DESCRIPTION)
     @PostMapping(SUBPATH_SEARCH)
     fun getChangelogEntries(
         @RequestBody changelogSearchRequest: ChangelogSearchRequest,

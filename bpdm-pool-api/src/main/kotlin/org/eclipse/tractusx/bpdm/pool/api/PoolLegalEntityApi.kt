@@ -29,6 +29,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.PoolLegalEntityApi.Companion.LEGAL_ENTITY_PATH
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateRequest
@@ -41,8 +42,12 @@ import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
 
-@RequestMapping("legal-entities", produces = [MediaType.APPLICATION_JSON_VALUE])
+@RequestMapping(LEGAL_ENTITY_PATH, produces = [MediaType.APPLICATION_JSON_VALUE])
 interface PoolLegalEntityApi {
+
+    companion object{
+        const val LEGAL_ENTITY_PATH = "${ApiCommons.BASE_PATH}/legal-entities"
+    }
 
     @Operation(
         summary = "Returns legal entities by different search parameters",
@@ -55,7 +60,7 @@ interface PoolLegalEntityApi {
             ApiResponse(responseCode = "400", description = "On malformed search or pagination request", content = [Content()])
         ]
     )
-    @Tag(name = ApiTags.LEGAL_ENTITIES_NAME, description = ApiTags.LEGAL_ENTITIES_DESCRIPTION)
+    @Tag(name = ApiCommons.LEGAL_ENTITIES_NAME, description = ApiCommons.LEGAL_ENTITIES_DESCRIPTION)
     @GetMapping
     fun getLegalEntities(
         @ParameterObject searchRequest: LegalEntitySearchRequest,
@@ -81,10 +86,10 @@ interface PoolLegalEntityApi {
             )
         ]
     )
-    @Tag(name = ApiTags.LEGAL_ENTITIES_NAME, description = ApiTags.LEGAL_ENTITIES_DESCRIPTION)
+    @Tag(name = ApiCommons.LEGAL_ENTITIES_NAME, description = ApiCommons.LEGAL_ENTITIES_DESCRIPTION)
     @GetMapping("/{idValue}")
     fun getLegalEntity(
-        @Parameter(description = "Identifier value") @PathVariable idValue: String,
+        @Parameter(description = "Identifier value") @PathVariable("idValue") idValue: String,
         @Parameter(description = "Type of identifier to use, defaults to BPN when omitted", schema = Schema(defaultValue = "BPN"))
         @RequestParam idType: String? = "BPN"
     ): LegalEntityWithLegalAddressVerboseDto
@@ -105,7 +110,7 @@ interface PoolLegalEntityApi {
             )
         ]
     )
-    @Tag(name = ApiTags.LEGAL_ENTITIES_NAME, description = ApiTags.LEGAL_ENTITIES_DESCRIPTION)
+    @Tag(name = ApiCommons.LEGAL_ENTITIES_NAME, description = ApiCommons.LEGAL_ENTITIES_DESCRIPTION)
     @PostMapping("/search")
     fun postLegalEntitySearch(
         @RequestBody searchRequest: LegalEntitySearchRequest,
@@ -123,7 +128,7 @@ interface PoolLegalEntityApi {
             ApiResponse(responseCode = "404", description = "No business partner found for specified bpnl", content = [Content()])
         ]
     )
-    @Tag(name = ApiTags.LEGAL_ENTITIES_NAME, description = ApiTags.LEGAL_ENTITIES_DESCRIPTION)
+    @Tag(name = ApiCommons.LEGAL_ENTITIES_NAME, description = ApiCommons.LEGAL_ENTITIES_DESCRIPTION)
     @GetMapping("/{bpnl}/sites")
     fun getSites(
         @Parameter(description = "BPNL value") @PathVariable bpnl: String,
@@ -141,7 +146,7 @@ interface PoolLegalEntityApi {
             ApiResponse(responseCode = "404", description = "No business partner found for specified BPNL", content = [Content()])
         ]
     )
-    @Tag(name = ApiTags.LEGAL_ENTITIES_NAME, description = ApiTags.LEGAL_ENTITIES_DESCRIPTION)
+    @Tag(name = ApiCommons.LEGAL_ENTITIES_NAME, description = ApiCommons.LEGAL_ENTITIES_DESCRIPTION)
     @GetMapping("/{bpnl}/addresses")
     fun getAddresses(
         @Parameter(description = "BPNL value") @PathVariable bpnl: String,
@@ -160,7 +165,7 @@ interface PoolLegalEntityApi {
             ApiResponse(responseCode = "400", description = "On malformed requests", content = [Content()]),
         ]
     )
-    @Tag(name = ApiTags.LEGAL_ENTITIES_NAME, description = ApiTags.LEGAL_ENTITIES_DESCRIPTION)
+    @Tag(name = ApiCommons.LEGAL_ENTITIES_NAME, description = ApiCommons.LEGAL_ENTITIES_DESCRIPTION)
     @PostMapping
     fun createBusinessPartners(
         @RequestBody
@@ -179,7 +184,7 @@ interface PoolLegalEntityApi {
             ApiResponse(responseCode = "400", description = "On malformed requests", content = [Content()]),
         ]
     )
-    @Tag(name = ApiTags.LEGAL_ENTITIES_NAME, description = ApiTags.LEGAL_ENTITIES_DESCRIPTION)
+    @Tag(name = ApiCommons.LEGAL_ENTITIES_NAME, description = ApiCommons.LEGAL_ENTITIES_DESCRIPTION)
     @PutMapping
     fun updateBusinessPartners(
         @RequestBody
