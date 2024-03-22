@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.gate.entity
 
 import jakarta.persistence.*
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
@@ -38,10 +37,6 @@ class SharingStateDb(
     var associatedOwnerBpnl: String? = null,
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "business_partner_type", nullable = false)
-    var businessPartnerType: BusinessPartnerType,
-
-    @Enumerated(EnumType.STRING)
     @Column(name = "sharing_state_type", nullable = false)
     var sharingStateType: SharingStateType,
 
@@ -51,9 +46,6 @@ class SharingStateDb(
 
     @Column(name = "sharing_error_message", nullable = true)
     var sharingErrorMessage: String? = null,
-
-    @Column(name = "bpn", nullable = true)
-    var bpn: String? = null,
 
     @Column(name = "sharing_process_started", nullable = true)
     var sharingProcessStarted: LocalDateTime? = null,
