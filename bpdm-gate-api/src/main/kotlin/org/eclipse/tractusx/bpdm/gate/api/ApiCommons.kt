@@ -17,16 +17,8 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.util
+package org.eclipse.tractusx.bpdm.gate.api
 
-import org.eclipse.tractusx.bpdm.pool.api.PoolLegalEntityApi
-import org.eclipse.tractusx.bpdm.pool.api.PoolMetadataApi
-
-object EndpointValues {
-
-    const val CATENA_LEGAL_ENTITY_PATH = PoolLegalEntityApi.LEGAL_ENTITY_PATH
-
-    const val CATENA_METADATA_IDENTIFIER_TYPE_PATH = "${PoolMetadataApi.METADATA_PATH}/identifier-types"
-    const val CATENA_METADATA_LEGAL_FORM_PATH = "${PoolMetadataApi.METADATA_PATH}/legal-forms"
-
+object ApiCommons {
+    const val BASE_PATH = "v6"
 }

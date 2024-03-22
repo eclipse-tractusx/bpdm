@@ -43,7 +43,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 interface PoolMembersApi {
 
     companion object{
-        const val MEMBERS_PATH = "members"
+        const val MEMBERS_PATH = "${ApiCommons.BASE_PATH}/members"
 
         const val LEGAL_ENTITIES_SEARCH_PATH = "/legal-entities${CommonApiPathNames.SUBPATH_SEARCH}"
         const val SITES_SEARCH_PATH = "/sites${CommonApiPathNames.SUBPATH_SEARCH}"
@@ -51,28 +51,28 @@ interface PoolMembersApi {
         const val CHANGELOG_SEARCH_PATH = "/changelog/search"
     }
 
-    @Tag(name = ApiTags.LEGAL_ENTITIES_NAME, description = ApiTags.LEGAL_ENTITIES_DESCRIPTION)
+    @Tag(name = ApiCommons.LEGAL_ENTITIES_NAME, description = ApiCommons.LEGAL_ENTITIES_DESCRIPTION)
     @PostMapping(LEGAL_ENTITIES_SEARCH_PATH)
     fun searchLegalEntities(
         @RequestBody searchRequest: LegalEntitySearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageDto<LegalEntityWithLegalAddressVerboseDto>
 
-    @Tag(name = ApiTags.SITE_NAME, description = ApiTags.SITE_DESCRIPTION)
+    @Tag(name = ApiCommons.SITE_NAME, description = ApiCommons.SITE_DESCRIPTION)
     @PostMapping(SITES_SEARCH_PATH)
     fun postSiteSearch(
         @RequestBody searchRequest: SiteSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageDto<SiteWithMainAddressVerboseDto>
 
-    @Tag(name = ApiTags.ADDRESS_NAME, description = ApiTags.ADDRESS_DESCRIPTION)
+    @Tag(name = ApiCommons.ADDRESS_NAME, description = ApiCommons.ADDRESS_DESCRIPTION)
     @PostMapping(ADDRESSES_SEARCH_PATH)
     fun searchAddresses(
         @RequestBody searchRequest: AddressSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageDto<LogisticAddressVerboseDto>
 
-    @Tag(name = ApiTags.CHANGELOG_NAME, description = ApiTags.CHANGELOG_DESCRIPTION)
+    @Tag(name = ApiCommons.CHANGELOG_NAME, description = ApiCommons.CHANGELOG_DESCRIPTION)
     @PostMapping(CHANGELOG_SEARCH_PATH)
     fun searchChangelogEntries(
         @RequestBody changelogSearchRequest: ChangelogSearchRequest,

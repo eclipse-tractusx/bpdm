@@ -27,14 +27,19 @@ import jakarta.validation.Valid
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.gate.api.GateSharingStateApi.Companion.SHARING_STATE_PATH
 import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
 
-@RequestMapping("/sharing-state", produces = [MediaType.APPLICATION_JSON_VALUE])
+@RequestMapping(SHARING_STATE_PATH, produces = [MediaType.APPLICATION_JSON_VALUE])
 interface GateSharingStateApi {
+
+    companion object{
+        const val SHARING_STATE_PATH = "${ApiCommons.BASE_PATH}/sharing-state"
+    }
 
     @Operation(
         summary = "Returns sharing states of business partners, optionally filtered by a business partner type and an array of external IDs"
