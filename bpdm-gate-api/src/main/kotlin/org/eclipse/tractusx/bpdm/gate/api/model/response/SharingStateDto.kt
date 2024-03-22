@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.gate.api.model.response
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import java.time.LocalDateTime
@@ -31,9 +30,6 @@ import java.time.LocalDateTime
             "of external ID and business partner type."
 )
 data class SharingStateDto(
-
-    @get:Schema(description = "One of the types of business partners for which the sharing state entry was created.")
-    val businessPartnerType: BusinessPartnerType,
 
     @get:Schema(description = "The external identifier of the business partner for which the sharing state entry was created.")
     val externalId: String,
@@ -46,12 +42,6 @@ data class SharingStateDto(
 
     @get:Schema(description = "The error message in case the current sharing state type is \"error\".")
     val sharingErrorMessage: String? = null,
-
-    @get:Schema(
-        description = "The business partner number associated to the combination of external identifier and business partner type " +
-                "in case the sharing state type is “success”. Can be either a BPNL, BPNS or BPNA."
-    )
-    val bpn: String? = null,
 
     @get:Schema(description = "The date and time when the sharing process was started.")
     val sharingProcessStarted: LocalDateTime? = null,

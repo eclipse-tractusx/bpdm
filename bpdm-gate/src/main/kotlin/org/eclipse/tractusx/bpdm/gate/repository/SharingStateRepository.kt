@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.gate.repository
 
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.springframework.data.domain.Page
@@ -44,16 +43,6 @@ interface SharingStateRepository : PagingAndSortingRepository<SharingStateDb, Lo
                 }
             }
 
-        /**
-         * Restrict to entries with the given businessPartnerType; ignore if null
-         */
-        fun byBusinessPartnerType(businessPartnerType: BusinessPartnerType?) =
-            Specification<SharingStateDb> { root, _, builder ->
-                businessPartnerType?.let {
-                    builder.equal(root.get<BusinessPartnerType>(SharingStateDb::businessPartnerType.name), businessPartnerType)
-                }
-            }
-
 
         fun byAssociatedOwnerBpnl(associatedOwnerBpnl: String?) =
             Specification<SharingStateDb> { root, _, builder ->
@@ -64,9 +53,7 @@ interface SharingStateRepository : PagingAndSortingRepository<SharingStateDb, Lo
 
     }
 
-    fun findByExternalIdInAndBusinessPartnerTypeAndAssociatedOwnerBpnl(externalId: Collection<String>, businessPartnerType: BusinessPartnerType,associatedOwnerBpnl: String?): Collection<SharingStateDb>
-
-    fun findBySharingStateType(sharingStateType: SharingStateType): Set<SharingStateDb>
+    fun findByExternalIdInAndAssociatedOwnerBpnl(externalId: Collection<String>,associatedOwnerBpnl: String?): Collection<SharingStateDb>
 
     fun findBySharingStateType(sharingStateType: SharingStateType, pageable: Pageable): Page<SharingStateDb>
 

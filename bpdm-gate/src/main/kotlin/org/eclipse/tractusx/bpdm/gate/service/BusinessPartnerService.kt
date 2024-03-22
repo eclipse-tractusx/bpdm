@@ -89,7 +89,7 @@ class BusinessPartnerService(
         saveChangelog(resolutionResults)
 
         val partners = resolutionResults.map { it.businessPartner }
-        sharingStateService.setInitial(partners.map { SharingStateService.SharingStateIdentifierDto(it.externalId, BusinessPartnerType.GENERIC) })
+        sharingStateService.setInitial(partners.map { it.externalId })
 
         partners.map {
             it.associatedOwnerBpnl = getCurrentUserBpn()
@@ -112,10 +112,7 @@ class BusinessPartnerService(
         val changedPartners = resolutionResults.map { it.businessPartner }
 
         val successRequests = entityCandidates.map {
-            SharingStateService.SuccessRequest(
-                SharingStateService.SharingStateIdentifierDto(it.externalId, BusinessPartnerType.GENERIC),
-                it.bpnA!!
-            )
+            SharingStateService.SuccessRequest(it.externalId)
         }
         sharingStateService.setSuccess(successRequests)
 
@@ -166,7 +163,7 @@ class BusinessPartnerService(
         val externalIds = entities.map { it.externalId }
         val persistedBusinessPartnerMap = businessPartnerRepository.findByStageAndExternalIdIn(stage, externalIds).associateBy { it.externalId }
         val sharingStatesMap =
-            sharingStateRepository.findByExternalIdInAndBusinessPartnerTypeAndAssociatedOwnerBpnl(externalIds, BusinessPartnerType.GENERIC,getCurrentUserBpn()).associateBy { it.externalId }
+            sharingStateRepository.findByExternalIdInAndAssociatedOwnerBpnl(externalIds,getCurrentUserBpn()).associateBy { it.externalId }
 
         return entities.filter { entity ->
             val matchingBusinessPartner = persistedBusinessPartnerMap[entity.externalId]

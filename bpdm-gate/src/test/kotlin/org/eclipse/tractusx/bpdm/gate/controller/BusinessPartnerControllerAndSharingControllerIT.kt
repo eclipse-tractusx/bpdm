@@ -32,7 +32,6 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
 import org.eclipse.tractusx.bpdm.gate.service.GoldenRecordTaskService
 import org.eclipse.tractusx.bpdm.gate.util.MockAndAssertUtils
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
-import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerGenericCommonValues
 import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerNonVerboseValues
 import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerVerboseValues
 import org.eclipse.tractusx.bpdm.test.util.AssertHelpers
@@ -106,32 +105,26 @@ class BusinessPartnerControllerAndSharingControllerIT @Autowired constructor(
 
         val upsertSharingStatesRequests = listOf(
             SharingStateDto(
-                businessPartnerType = BusinessPartnerType.GENERIC,
                 externalId = externalId1,
                 sharingStateType = SharingStateType.Pending,
                 sharingErrorCode = null,
                 sharingErrorMessage = null,
-                bpn = null,
                 sharingProcessStarted = null,
                 taskId = "0"
             ),
             SharingStateDto(
-                businessPartnerType = BusinessPartnerType.GENERIC,
                 externalId = externalId2,
                 sharingStateType = SharingStateType.Pending,
                 sharingErrorCode = null,
                 sharingErrorMessage = null,
-                bpn = null,
                 sharingProcessStarted = null,
                 taskId = "1"
             ),
             SharingStateDto(
-                businessPartnerType = BusinessPartnerType.GENERIC,
                 externalId = externalId3,
                 sharingStateType = SharingStateType.Pending,
                 sharingErrorCode = null,
                 sharingErrorMessage = null,
-                bpn = null,
                 sharingProcessStarted = null,
                 taskId = "2"
             )
@@ -163,22 +156,18 @@ class BusinessPartnerControllerAndSharingControllerIT @Autowired constructor(
 
         val createdSharingState = listOf(
             SharingStateDto(
-                businessPartnerType = BusinessPartnerType.GENERIC,
                 externalId = externalId4,
                 sharingStateType = SharingStateType.Pending,
                 sharingErrorCode = null,
                 sharingErrorMessage = null,
-                bpn = null,
                 sharingProcessStarted = null,
                 taskId = "0"
             ),
             SharingStateDto(
-                businessPartnerType = BusinessPartnerType.GENERIC,
                 externalId = externalId5,
                 sharingStateType = SharingStateType.Pending,
                 sharingErrorCode = null,
                 sharingErrorMessage = null,
-                bpn = null,
                 sharingProcessStarted = null,
                 taskId = "1"
             )
@@ -197,22 +186,18 @@ class BusinessPartnerControllerAndSharingControllerIT @Autowired constructor(
 
         val cleanedSharingState = listOf(
             SharingStateDto(
-                businessPartnerType = BusinessPartnerType.GENERIC,
                 externalId = externalId4,
                 sharingStateType = SharingStateType.Success,
                 sharingErrorCode = null,
                 sharingErrorMessage = null,
-                bpn = BusinessPartnerGenericCommonValues.businessPartner1.address.addressBpn,
                 sharingProcessStarted = null,
                 taskId = "0"
             ),
             SharingStateDto(
-                businessPartnerType = BusinessPartnerType.GENERIC,
                 externalId = externalId5,
                 sharingStateType = SharingStateType.Error,
                 sharingErrorCode = BusinessPartnerSharingError.SharingProcessError,
                 sharingErrorMessage = "Major Error // Minor Error",
-                bpn = null,
                 sharingProcessStarted = null,
                 taskId = "1"
             )
@@ -244,12 +229,10 @@ class BusinessPartnerControllerAndSharingControllerIT @Autowired constructor(
 
         val createdSharingState = listOf(
             SharingStateDto(
-                businessPartnerType = BusinessPartnerType.GENERIC,
                 externalId = externalId3,
                 sharingStateType = SharingStateType.Pending,
                 sharingErrorCode = null,
                 sharingErrorMessage = null,
-                bpn = null,
                 sharingProcessStarted = null,
                 taskId = "2"
             )
@@ -268,12 +251,10 @@ class BusinessPartnerControllerAndSharingControllerIT @Autowired constructor(
 
         val cleanedSharingState = listOf(
             SharingStateDto(
-                businessPartnerType = BusinessPartnerType.GENERIC,
                 externalId = externalId3,
                 sharingStateType = SharingStateType.Error,
                 sharingErrorCode = BusinessPartnerSharingError.MissingTaskID,
                 sharingErrorMessage = "Missing Task in Orchestrator",
-                bpn = null,
                 sharingProcessStarted = null,
                 taskId = "2"
             )
@@ -309,12 +290,10 @@ class BusinessPartnerControllerAndSharingControllerIT @Autowired constructor(
 
         val upsertSharingStatesRequests = listOf(
             SharingStateDto(
-                businessPartnerType = BusinessPartnerType.GENERIC,
                 externalId = externalId4,
                 sharingStateType = SharingStateType.Pending,
                 sharingErrorCode = null,
                 sharingErrorMessage = null,
-                bpn = "000000123CCC333",
                 sharingProcessStarted = null,
                 taskId = "0"
             )
