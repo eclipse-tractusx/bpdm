@@ -19,28 +19,29 @@
 
 package org.eclipse.tractusx.bpdm.pool.config
 
-
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
-import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext
+import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolDataHelper
+import org.eclipse.tractusx.bpdm.test.testdata.pool.TestMetadataKeys
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.web.reactive.function.client.WebClient
-
 
 @Configuration
-class PoolClientConfig {
-    @Bean
-    fun poolClient(webServerAppCtxt: ServletWebServerApplicationContext): PoolClientImpl {
-        return PoolClientImpl { WebClient.create("http://localhost:${webServerAppCtxt.webServer.port}") }
-    }
+class TestdataConfig {
 
     /**
-     * Better to expose the API instead of the implementation. Anyway, currently made it backwards compatible
-     * ToDo: exchange the implementation with the API in the test classes
+     * We create [PoolDataHelper] here with standard metadata to create test data environments from
+     * For more specialized environments you could also not autowire it and  instead create the [PoolDataHelper] in the test class itself
      */
     @Bean
-    fun poolApiClient(poolClient: PoolClientImpl): PoolApiClient {
-        return poolClient
+    fun poolDataHelper(poolClient: PoolApiClient): PoolDataHelper {
+        return PoolDataHelper(
+            metadataToCreate = TestMetadataKeys(
+                legalFormKeys = listOf("LF1", "LF2", "LF3"),
+                legalEntityIdentifierTypeKeys = listOf("LID1", "LID2", "LID3", "LID4", "LID5", "LID6", "LID7", "LID8"),
+                addressIdentifierTypeKeys = listOf("AID1", "AID2", "AID3", "AID4", "AID5", "AID6", "AID7", "AID8")
+            ),
+            poolClient
+        )
     }
+
 }
