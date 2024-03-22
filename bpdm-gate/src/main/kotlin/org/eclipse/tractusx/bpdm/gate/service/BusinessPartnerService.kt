@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
@@ -138,7 +137,7 @@ class BusinessPartnerService(
     }
 
     private fun saveChangelog(partner: BusinessPartnerDb, changelogType: ChangelogType) {
-        changelogRepository.save(ChangelogEntryDb(externalId = partner.externalId, businessPartnerType = BusinessPartnerType.GENERIC,changelogType = changelogType, stage =  partner.stage, associatedOwnerBpnl = getCurrentUserBpn()))
+        changelogRepository.save(ChangelogEntryDb(externalId = partner.externalId,changelogType = changelogType, stage =  partner.stage, associatedOwnerBpnl = getCurrentUserBpn()))
     }
 
     private fun assertInputStageExists(externalIds: Collection<String>) {

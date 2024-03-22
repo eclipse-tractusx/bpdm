@@ -1,0 +1,2 @@
+ALTER TABLE changelog_entries
+DROP COLUMN business_partner_type;

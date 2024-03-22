@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.gate.entity
 
 import jakarta.persistence.*
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
@@ -31,10 +30,6 @@ class ChangelogEntryDb(
 
     @Column(name = "external_id", nullable = false, updatable = false)
     val externalId: String,
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "business_partner_type", nullable = false, updatable = false)
-    val businessPartnerType: BusinessPartnerType,
 
     @Column(name = "associated_owner_bpnl", nullable = true)
     var associatedOwnerBpnl: String? = null,

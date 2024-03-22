@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.gate.api.model.response
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.ChangelogDescription
 import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
 import java.time.Instant
@@ -30,9 +29,6 @@ data class ChangelogGateDto(
 
     @get:Schema(description = ChangelogDescription.externalId)
     val externalId: String,
-
-    @get:Schema(description = ChangelogDescription.businessPartnerType)
-    val businessPartnerType: BusinessPartnerType?,
 
     @get:Schema(description = ChangelogDescription.timestamp)
     val timestamp: Instant,
