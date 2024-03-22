@@ -89,13 +89,13 @@ class OAuthSecurityConfig(
         http.cors {}
         http.sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
         http.authorizeHttpRequests {
-            it.requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.OPTIONS, "/api/**")).permitAll()
+            it.requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.OPTIONS, "/**")).permitAll()
             it.requestMatchers(AntPathRequestMatcher.antMatcher("/")).permitAll() // forwards to swagger
             it.requestMatchers(AntPathRequestMatcher.antMatcher("/docs/api-docs/**")).permitAll()
             it.requestMatchers(AntPathRequestMatcher.antMatcher("/ui/swagger-ui/**")).permitAll()
             it.requestMatchers(AntPathRequestMatcher.antMatcher("/actuator/health/**")).permitAll()
             it.requestMatchers(AntPathRequestMatcher.antMatcher("/error")).permitAll()
-            it.requestMatchers(AntPathRequestMatcher.antMatcher("/api/**")).authenticated()
+            it.requestMatchers(AntPathRequestMatcher.antMatcher("/**")).authenticated()
         }
         http.oauth2ResourceServer {
             it.jwt { jwt ->
