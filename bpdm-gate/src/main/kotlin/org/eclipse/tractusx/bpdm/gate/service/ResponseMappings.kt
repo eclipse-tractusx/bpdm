@@ -79,7 +79,6 @@ private fun StreetDb.toStreetDto(): StreetDto {
 fun ChangelogEntryDb.toGateDto(): ChangelogGateDto {
     return ChangelogGateDto(
         externalId = externalId,
-        businessPartnerType = businessPartnerType,
         timestamp = createdAt,
         changelogType = changelogType
     )

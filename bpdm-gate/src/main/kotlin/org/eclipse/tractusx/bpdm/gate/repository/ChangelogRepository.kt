@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.gate.repository
 
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntryDb
 import org.springframework.data.jpa.domain.Specification
@@ -53,19 +52,6 @@ interface ChangelogRepository : JpaRepository<ChangelogEntryDb, Long>, JpaSpecif
             Specification<ChangelogEntryDb> { root, _, builder ->
                 createdAt?.let {
                     builder.greaterThanOrEqualTo(root.get(ChangelogEntryDb::createdAt.name), createdAt)
-                }
-            }
-
-        /**
-         * Restrict to entries for the BusinessPartnerType; ignore if empty
-         */
-        fun byBusinessPartnerTypes(businessPartnerTypes: Set<BusinessPartnerType>?) =
-            Specification<ChangelogEntryDb> { root, _, builder ->
-                businessPartnerTypes?.let {
-                    if (businessPartnerTypes.isNotEmpty())
-                        root.get<String>(ChangelogEntryDb::businessPartnerType.name).`in`(businessPartnerTypes)
-                    else
-                        null
                 }
             }
 
