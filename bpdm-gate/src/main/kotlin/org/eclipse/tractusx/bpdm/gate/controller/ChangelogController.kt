@@ -43,7 +43,6 @@ class ChangelogController(
     ): PageChangeLogDto<ChangelogGateDto> {
         return changelogService.getChangeLogEntries(
             searchRequest.externalIds,
-            searchRequest.businessPartnerTypes,
             searchRequest.timestampAfter,
             StageType.Input,
             paginationRequest.page,
@@ -58,7 +57,6 @@ class ChangelogController(
     ): PageChangeLogDto<ChangelogGateDto> {
         return changelogService.getChangeLogEntries(
             searchRequest.externalIds,
-            searchRequest.businessPartnerTypes,
             searchRequest.timestampAfter,
             StageType.Output,
             paginationRequest.page,
