@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component
 
 
 @Component
-class PoolDataHelpers(val poolClient:PoolApiClient? ) {
+class PoolDataHelpers(val poolClient: PoolApiClient?) {
 
 
 
@@ -46,5 +46,4 @@ class PoolDataHelpers(val poolClient:PoolApiClient? ) {
         poolClient!!.metadata.createIdentifierType(BusinessPartnerNonVerboseValues.addressIdentifierTypeDto3)
 
     }
-
 }

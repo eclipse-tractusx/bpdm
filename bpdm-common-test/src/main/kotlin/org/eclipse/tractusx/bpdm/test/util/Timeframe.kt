@@ -17,21 +17,11 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.client
+package org.eclipse.tractusx.bpdm.test.util
 
-interface PoolApiClient {
+import java.time.Instant
 
-    val addresses: AddressApiClient
-
-    val bpns: BpnApiClient
-
-    val changelogs: ChangeLogApiClient
-
-    val legalEntities: LegalEntityApiClient
-
-    val metadata: MetadataApiClient
-
-    val sites: SiteApiClient
-
-    val members: MembersApiClient
-}
+data class Timeframe(
+    val startTime: Instant,
+    val endTime: Instant
+)

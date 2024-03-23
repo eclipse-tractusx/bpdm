@@ -19,28 +19,26 @@
 
 package org.eclipse.tractusx.bpdm.pool.config
 
-
-import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
-import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext
+import org.eclipse.tractusx.bpdm.test.util.InstantSecondsComparator
+import org.eclipse.tractusx.bpdm.test.util.LocalDatetimeSecondsComparator
+import org.eclipse.tractusx.bpdm.test.util.PoolAssertHelper
+import org.eclipse.tractusx.bpdm.test.util.StringIgnoreComparator
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.web.reactive.function.client.WebClient
-
 
 @Configuration
-class PoolClientConfig {
-    @Bean
-    fun poolClient(webServerAppCtxt: ServletWebServerApplicationContext): PoolClientImpl {
-        return PoolClientImpl { WebClient.create("http://localhost:${webServerAppCtxt.webServer.port}") }
-    }
+class AssertConfig {
 
     /**
-     * Better to expose the API instead of the implementation. Anyway, currently made it backwards compatible
-     * ToDo: exchange the implementation with the API in the test classes
+     * Convenience Config to provide an assert helper for all test classes
      */
     @Bean
-    fun poolApiClient(poolClient: PoolClientImpl): PoolApiClient {
-        return poolClient
+    fun poolAssertHelper(): PoolAssertHelper {
+        val instantSecondsComparator = InstantSecondsComparator()
+        val localDatetimeSecondsComparator = LocalDatetimeSecondsComparator(instantSecondsComparator)
+        val stringIgnoreComparator = StringIgnoreComparator()
+
+        return PoolAssertHelper(instantSecondsComparator, localDatetimeSecondsComparator, stringIgnoreComparator)
     }
+
 }

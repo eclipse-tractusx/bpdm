@@ -53,6 +53,8 @@ class PoolClientImpl(
 
     override val sites by lazy { createClient<SiteApiClient>() }
 
+    override val members by lazy { createClient<MembersApiClient>() }
+
     private inline fun <reified T> createClient() =
         httpServiceProxyFactory.createClient(T::class.java)
 }
