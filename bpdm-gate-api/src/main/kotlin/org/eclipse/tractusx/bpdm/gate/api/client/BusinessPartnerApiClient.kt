@@ -33,7 +33,7 @@ import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
 import org.springframework.web.service.annotation.PutExchange
 
-@HttpExchange
+@HttpExchange(GateBusinessPartnerApi.BUSINESS_PARTNER_PATH)
 interface BusinessPartnerApiClient : GateBusinessPartnerApi {
     @PutExchange("/input/business-partners")
     override fun upsertBusinessPartnersInput(

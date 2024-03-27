@@ -25,5 +25,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 data class AppInfoProperties(
     val name: String = "BPDM",
     val description: String = "",
-    val version: String = ""
+    val version: String = "",
+    val url: String = ""
 )

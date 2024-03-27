@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
 
-@HttpExchange
+@HttpExchange(GateChangelogApi.CHANGELOG_PATH)
 interface ChangelogApiClient : GateChangelogApi {
     @PostExchange("/input/changelog/search")
     override fun getInputChangelog(

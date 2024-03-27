@@ -25,6 +25,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import jakarta.validation.Valid
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.gate.api.GateChangelogApi.Companion.CHANGELOG_PATH
 import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogDto
@@ -34,8 +35,12 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 
-@RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
+@RequestMapping(CHANGELOG_PATH, produces = [MediaType.APPLICATION_JSON_VALUE])
 interface GateChangelogApi {
+
+    companion object{
+        const val CHANGELOG_PATH = ApiCommons.BASE_PATH
+    }
 
     @Operation(
         summary = "Returns changelog entries for changes to the business partner input stage",
