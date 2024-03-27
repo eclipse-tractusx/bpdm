@@ -23,8 +23,9 @@ import io.swagger.v3.oas.models.Components
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.info.Info
 import io.swagger.v3.oas.models.security.*
+import io.swagger.v3.oas.models.servers.Server
 import mu.KotlinLogging
-import org.springdoc.core.customizers.OpenApiCustomizer
+import org.eclipse.tractusx.bpdm.common.util.OpenApiCustomizerFactory
 import org.springdoc.core.models.GroupedOpenApi
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -32,31 +33,42 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 class OpenApiConfig(
-    val securityProperties: SecurityConfigProperties,
-    val infoProperties: AppInfoProperties
+    private val securityProperties: SecurityConfigProperties,
+    private val infoProperties: AppInfoProperties
 ) {
     private val logger = KotlinLogging.logger { }
 
     @Bean
     fun customOpenAPI(): OpenAPI? {
         return OpenAPI().info(Info().title(infoProperties.name).description(infoProperties.description).version(infoProperties.version))
+            .apply { if(infoProperties.url.isNotBlank()) addServersItem(Server().url(infoProperties.url)) }
             .also { if (securityProperties.enabled) it.withSecurity() }
     }
 
     @Bean
-    fun openApiDefinition(): GroupedOpenApi {
+    fun openApiDefinition(openApiCustomizerFactory: OpenApiCustomizerFactory): GroupedOpenApi {
         return GroupedOpenApi.builder()
             .group("docs")
             .pathsToMatch("/**")
             .displayName("Docs")
-            .addOpenApiCustomizer(sortSchemaCustomiser())
+            .addOpenApiCustomizer(openApiCustomizerFactory.sortSchemaCustomiser())
             .build()
     }
 
-    fun sortSchemaCustomiser(): OpenApiCustomizer {
-        return OpenApiCustomizer { openApi: OpenAPI ->
-            openApi.components(with(openApi.components) { schemas(schemas?.values?.sortedBy { it.name }?.associateBy { it.name }) })
-        }
+    @Bean
+    fun version6Group(openApiCustomizerFactory: OpenApiCustomizerFactory): GroupedOpenApi {
+        return GroupedOpenApi.builder()
+            .group("v6")
+            .pathsToMatch("/v6/**")
+            .displayName("V6")
+            .addOpenApiCustomizer(openApiCustomizerFactory.sortSchemaCustomiser())
+            .addOpenApiCustomizer(openApiCustomizerFactory.versionApiCustomizer("v6"))
+            .build()
+    }
+
+    @Bean
+    fun openApiCustomizerFactory(): OpenApiCustomizerFactory{
+        return OpenApiCustomizerFactory()
     }
 
     private fun OpenAPI.withSecurity(): OpenAPI {
