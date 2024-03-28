@@ -22,14 +22,14 @@ apiVersion: v2
 type: application
 name: bpdm-pool
 appVersion: "6.0.0-alpha.0"
-version: 7.0.0-alpha.0
+version: 7.0.0-alpha.1
 description: A Helm chart for deploying the BPDM pool service
 home: https://eclipse-tractusx.github.io/docs/kits/Business%20Partner%20Kit/Adoption%20View
 sources:
   - https://github.com/eclipse-tractusx/bpdm
 dependencies:
   - name: postgresql
-    version: 11.9.13
+    version: 12.12.10
     repository: https://charts.bitnami.com/bitnami
     alias: postgres
     condition: postgres.enabled
