@@ -43,6 +43,7 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
@@ -246,7 +247,8 @@ internal class BusinessPartnerIT @Autowired constructor(
         return StateDb(
             type = BusinessStateType.ACTIVE,
             validFrom = LocalDateTime.now(),
-            validTo = LocalDateTime.now().plusDays(365)
+            validTo = LocalDateTime.now().plusDays(365),
+            businessPartnerTyp = BusinessPartnerType.GENERIC
         )
     }
 

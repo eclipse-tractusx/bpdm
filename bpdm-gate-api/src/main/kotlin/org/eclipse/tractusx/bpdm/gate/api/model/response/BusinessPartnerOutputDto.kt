@@ -58,7 +58,8 @@ data class LegalEntityRepresentationOutputDto(
     override val legalName: String? = null,
     override val shortName: String? = null,
     override val legalForm: String? = null,
-    val confidenceCriteria: ConfidenceCriteriaDto
+    val confidenceCriteria: ConfidenceCriteriaDto,
+    override val states: Collection<BusinessPartnerStateDto> = emptyList()
 ) : IBaseLegalEntityRepresentation
 
 @Schema(
@@ -67,7 +68,8 @@ data class LegalEntityRepresentationOutputDto(
 data class SiteRepresentationOutputDto(
     override val siteBpn: String,
     override val name: String? = null,
-    val confidenceCriteria: ConfidenceCriteriaDto
+    val confidenceCriteria: ConfidenceCriteriaDto,
+    override val states: Collection<BusinessPartnerStateDto> = emptyList()
 ) : IBaseSiteRepresentation
 
 @Schema(
@@ -80,5 +82,6 @@ data class AddressComponentOutputDto(
     override val addressType: AddressType?,
     override val physicalPostalAddress: PhysicalPostalAddressDto = PhysicalPostalAddressDto(),
     override val alternativePostalAddress: AlternativePostalAddressDto = AlternativePostalAddressDto(),
-    val confidenceCriteria: ConfidenceCriteriaDto
+    val confidenceCriteria: ConfidenceCriteriaDto,
+    override val states: Collection<BusinessPartnerStateDto> = emptyList()
 ) : IBaseAddressRepresentation
