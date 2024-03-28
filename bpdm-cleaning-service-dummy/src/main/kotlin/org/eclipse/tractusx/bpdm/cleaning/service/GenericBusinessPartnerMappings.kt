@@ -42,7 +42,7 @@ fun BusinessPartnerGenericDto.toLegalEntityDto(bpnReferenceDto: BpnReferenceDto,
         legalShortName = legalEntity.shortName,
         identifiers = identifiers.mapNotNull { it.toLegalEntityIdentifierDto() },
         legalForm = legalEntity.legalForm,
-        states = states.mapNotNull { it.toLegalEntityState() },
+        states = states.mapNotNull { it.toLegalEntityState() }.plus(legalEntity.states.mapNotNull { it.toLegalEntityState() }),
         legalAddress = legalAddress,
         isCatenaXMemberData = ownerBpnL != null,
         confidenceCriteria = dummyConfidenceCriteria
@@ -74,6 +74,11 @@ fun BusinessPartnerStateDto.toSiteState(): SiteStateDto? {
     return type?.let { SiteStateDto(validFrom, validTo, it) }
 }
 
+fun BusinessPartnerStateDto.toAddressState(): AddressStateDto? {
+
+    return type?.let { AddressStateDto(validFrom, validTo, it) }
+}
+
 fun BusinessPartnerGenericDto.toLogisticAddressDto(bpnReferenceDto: BpnReferenceDto):
         LogisticAddressDto {
 
@@ -81,7 +86,7 @@ fun BusinessPartnerGenericDto.toLogisticAddressDto(bpnReferenceDto: BpnReference
         bpnAReference = bpnReferenceDto,
         hasChanged = address.addressType == AddressType.AdditionalAddress,
         name = address.name,
-        states = emptyList(),
+        states = address.states.mapNotNull { it.toAddressState() },
         identifiers = emptyList(),
         physicalPostalAddress = address.physicalPostalAddress,
         alternativePostalAddress = address.alternativePostalAddress,
@@ -95,7 +100,7 @@ fun BusinessPartnerGenericDto.toSiteDto(bpnReferenceDto: BpnReferenceDto, siteAd
         bpnSReference = bpnReferenceDto,
         hasChanged = address.addressType in setOf(AddressType.SiteMainAddress, AddressType.LegalAndSiteMainAddress),
         name = site.name,
-        states = states.mapNotNull { it.toSiteState() },
+        states = site.states.mapNotNull { it.toSiteState() },
         mainAddress = siteAddressReference,
         confidenceCriteria = dummyConfidenceCriteria
     )

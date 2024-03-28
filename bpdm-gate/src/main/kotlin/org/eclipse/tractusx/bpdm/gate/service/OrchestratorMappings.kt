@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
@@ -55,13 +56,15 @@ class OrchestratorMappings(
         legalName = entity.legalName,
         shortName = entity.shortName,
         legalForm = entity.legalForm,
-        confidenceCriteria = entity.legalEntityConfidence?.let { toConfidenceCriteria(it) }
+        confidenceCriteria = entity.legalEntityConfidence?.let { toConfidenceCriteria(it) },
+        states = entity.states.filter { it.businessPartnerTyp == BusinessPartnerType.LEGAL_ENTITY }.map(::toStateDto)
     )
 
     private fun toSiteComponentDto(entity: BusinessPartnerDb) = SiteRepresentation(
         siteBpn = entity.bpnS,
         name = entity.siteName,
-        confidenceCriteria = entity.siteConfidence?.let { toConfidenceCriteria(it) }
+        confidenceCriteria = entity.siteConfidence?.let { toConfidenceCriteria(it) },
+        states = entity.states.filter { it.businessPartnerTyp == BusinessPartnerType.SITE }.map(::toStateDto)
     )
 
     private fun toAddressComponentDto(entity: BusinessPartnerDb) = AddressRepresentation(
@@ -70,7 +73,8 @@ class OrchestratorMappings(
         addressType = entity.postalAddress.addressType,
         physicalPostalAddress = entity.postalAddress.physicalPostalAddress?.let(::toPhysicalPostalAddressDto),
         alternativePostalAddress = entity.postalAddress.alternativePostalAddress?.let(this::toAlternativePostalAddressDto),
-        confidenceCriteria = entity.addressConfidence?.let { toConfidenceCriteria(it) }
+        confidenceCriteria = entity.addressConfidence?.let { toConfidenceCriteria(it) },
+        states = entity.states.filter { it.businessPartnerTyp == BusinessPartnerType.ADDRESS }.map(::toStateDto)
     )
 
     private fun toClassificationDto(entity: ClassificationDb) =
@@ -168,7 +172,11 @@ class OrchestratorMappings(
         siteName = dto.site.name,
         addressName = dto.address.name,
         legalForm = dto.legalEntity.legalForm,
-        states = dto.states.mapNotNull { toState(it) }.toSortedSet(),
+        states = dto.states.mapNotNull { toState(it, BusinessPartnerType.GENERIC) }
+            .plus(dto.legalEntity.states.mapNotNull{ toState(it, BusinessPartnerType.LEGAL_ENTITY) })
+            .plus(dto.site.states.mapNotNull{ toState(it, BusinessPartnerType.SITE) })
+            .plus(dto.address.states.mapNotNull{ toState(it, BusinessPartnerType.ADDRESS) })
+            .toSortedSet(),
         roles = dto.roles.toSortedSet(),
         postalAddress = toPostalAddress(dto.address),
         bpnL = dto.legalEntity.legalEntityBpn,
@@ -188,8 +196,8 @@ class OrchestratorMappings(
             }
         }
 
-    private fun toState(dto: BusinessPartnerStateDto) =
-        dto.type?.let { StateDb(type = it, validFrom = dto.validFrom, validTo = dto.validTo) }
+    private fun toState(dto: BusinessPartnerStateDto, businessPartnerType: BusinessPartnerType) =
+        dto.type?.let { StateDb(type = it, validFrom = dto.validFrom, validTo = dto.validTo, businessPartnerTyp =  businessPartnerType) }
 
     private fun toClassification(dto: BusinessPartnerClassificationDto) =
         ClassificationDb(type = dto.type, code = dto.code, value = dto.value)
