@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
 import org.eclipse.tractusx.bpdm.common.model.StageType
@@ -76,7 +77,11 @@ class BusinessPartnerMappings {
             nameParts = dto.nameParts.toMutableList(),
             roles = dto.roles.toSortedSet(),
             identifiers = dto.identifiers.mapNotNull(::toIdentifier).toSortedSet(),
-            states = dto.states.mapNotNull(::toState).toSortedSet(),
+            states = dto.states.asSequence().mapNotNull{toState(it, BusinessPartnerType.GENERIC)}
+                .plus(dto.legalEntity.states.mapNotNull { toState(it, BusinessPartnerType.LEGAL_ENTITY) })
+                .plus(dto.site.states.mapNotNull { toState(it, BusinessPartnerType.SITE) })
+                .plus(dto.address.states.mapNotNull { toState(it, BusinessPartnerType.ADDRESS) })
+                .toSortedSet(),
             shortName = dto.legalEntity.shortName,
             legalName = dto.legalEntity.legalName,
             siteName = dto.site.name,
@@ -98,14 +103,16 @@ class BusinessPartnerMappings {
             legalEntityBpn = entity.bpnL,
             legalName = entity.legalName,
             shortName = entity.shortName,
-            legalForm = entity.legalForm
+            legalForm = entity.legalForm,
+            states = toStateDtos(entity.states, BusinessPartnerType.LEGAL_ENTITY)
         )
     }
 
     private fun toSiteComponentInputDto(entity: BusinessPartnerDb): SiteRepresentationInputDto {
         return SiteRepresentationInputDto(
             siteBpn = entity.bpnS,
-            name = entity.siteName
+            name = entity.siteName,
+            states = toStateDtos(entity.states, BusinessPartnerType.SITE)
         )
     }
 
@@ -115,7 +122,8 @@ class BusinessPartnerMappings {
             name = entity.addressName,
             addressType = entity.postalAddress.addressType,
             physicalPostalAddress = entity.postalAddress.physicalPostalAddress?.toPhysicalPostalAddress() ?: PhysicalPostalAddressDto(),
-            alternativePostalAddress = entity.postalAddress.alternativePostalAddress?.toAlternativePostalAddressDto() ?: AlternativePostalAddressDto()
+            alternativePostalAddress = entity.postalAddress.alternativePostalAddress?.toAlternativePostalAddressDto() ?: AlternativePostalAddressDto(),
+            states = toStateDtos(entity.states, BusinessPartnerType.ADDRESS)
         )
     }
 
@@ -133,7 +141,8 @@ class BusinessPartnerMappings {
             confidenceCriteria = entity.legalEntityConfidence?.let { toConfidenceDto(it) } ?: throw BpdmInvalidPartnerException(
                 entity.externalId,
                 "Missing address confidence criteria"
-            )
+            ),
+            states = toStateDtos(entity.states, BusinessPartnerType.LEGAL_ENTITY)
         )
     }
 
@@ -147,7 +156,8 @@ class BusinessPartnerMappings {
                     confidenceCriteria = entity.siteConfidence?.let { toConfidenceDto(it) } ?: throw BpdmInvalidPartnerException(
                         entity.externalId,
                         "Missing site confidence criteria"
-                    )
+                    ),
+                    states = toStateDtos(entity.states, BusinessPartnerType.SITE)
                 )
             }
     }
@@ -167,7 +177,8 @@ class BusinessPartnerMappings {
             confidenceCriteria = entity.addressConfidence?.let { toConfidenceDto(it) } ?: throw BpdmInvalidPartnerException(
                 entity.externalId,
                 "Missing legal entity confidence criteria"
-            )
+            ),
+            states = toStateDtos(entity.states, BusinessPartnerType.ADDRESS)
         )
     }
 
@@ -279,11 +290,14 @@ class BusinessPartnerMappings {
             }
         }
 
+    private fun toStateDtos(entities: Collection<StateDb>, businessPartnerType: BusinessPartnerType) =
+        entities.filter { it.businessPartnerTyp == businessPartnerType }.map(::toStateDto)
+
     private fun toStateDto(entity: StateDb) =
         BusinessPartnerStateDto(type = entity.type, validFrom = entity.validFrom, validTo = entity.validTo)
 
-    private fun toState(dto: BusinessPartnerStateDto) =
-        dto.type?.let { StateDb(type = it, validFrom = dto.validFrom, validTo = dto.validTo) }
+    private fun toState(dto: BusinessPartnerStateDto, businessPartnerType: BusinessPartnerType) =
+        dto.type?.let { StateDb(type = it, validFrom = dto.validFrom, validTo = dto.validTo, businessPartnerTyp = businessPartnerType) }
 
     private fun toClassificationDto(entity: ClassificationDb) =
         BusinessPartnerClassificationDto(type = entity.type, code = entity.code, value = entity.value)

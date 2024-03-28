@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
@@ -30,11 +29,9 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
 import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidStateException
-import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidStateRequestException
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmMissingPartnerException
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository.Specs.byAssociatedOwnerBpnl
-import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository.Specs.byBusinessPartnerType
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository.Specs.byExternalIdsIn
 import org.eclipse.tractusx.bpdm.gate.util.getCurrentUserBpn
 import org.springframework.data.domain.PageRequest
@@ -42,9 +39,6 @@ import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
-const val ERROR_MISSING_CODE = "Request for Error state but no error code specified."
-const val ERROR_MISSING_BPN = "Request for Success state but no BPN specified."
-const val ERROR_MISSING_TASK = "Request for Pending state but no task-id specified."
 
 @Service
 class SharingStateService(
@@ -54,66 +48,30 @@ class SharingStateService(
 
     private val logger = KotlinLogging.logger { }
 
-    /**
-     * Upsert fixed sharing state based on given DTO
-     */
-    fun upsertSharingState(request: SharingStateDto) {
-        logger.info { "Executing upsertSharingState() with parameters $request" }
-        val sharingState = getOrCreate(request.externalId, request.businessPartnerType)
-
-        when (request.sharingStateType) {
-            SharingStateType.Pending -> setPending(
-                sharingState,
-                request.taskId ?: throw BpdmInvalidStateRequestException(ERROR_MISSING_TASK),
-                startTimeOverwrite = request.sharingProcessStarted
-            )
-
-            SharingStateType.Success -> setSuccess(
-                sharingState = sharingState,
-                bpn = request.bpn ?: throw BpdmInvalidStateRequestException(ERROR_MISSING_BPN),
-                startTimeOverwrite = request.sharingProcessStarted
-            )
-
-            SharingStateType.Error -> setError(
-                sharingState = sharingState,
-                sharingErrorCode = request.sharingErrorCode ?: throw BpdmInvalidStateRequestException(ERROR_MISSING_CODE),
-                sharingErrorMessage = request.sharingErrorMessage,
-                startTimeOverwrite = request.sharingProcessStarted
-            )
-
-            SharingStateType.Initial -> setInitial(sharingState)
-
-            SharingStateType.Ready -> setReady(sharingState)
-        }
-    }
-
     fun findSharingStates(
         paginationRequest: PaginationRequest,
-        businessPartnerType: BusinessPartnerType?,
         externalIds: Collection<String>?
     ): PageDto<SharingStateDto> {
 
-        logger.info { "findSharingStates() called with $paginationRequest // $businessPartnerType and $externalIds" }
+        logger.info { "findSharingStates() called with $paginationRequest // $externalIds" }
 
         val pageRequest = PageRequest.of(paginationRequest.page, paginationRequest.size)
-        val spec = Specification.allOf(byExternalIdsIn(externalIds), byBusinessPartnerType(businessPartnerType),byAssociatedOwnerBpnl(getCurrentUserBpn()))
+        val spec = Specification.allOf(byExternalIdsIn(externalIds), byAssociatedOwnerBpnl(getCurrentUserBpn()))
         val sharingStatePage = stateRepository.findAll(spec, pageRequest)
 
         return sharingStatePage.toPageDto {
             SharingStateDto(
                 externalId = it.externalId,
-                businessPartnerType = it.businessPartnerType,
                 sharingStateType = it.sharingStateType,
                 sharingErrorCode = it.sharingErrorCode,
                 sharingErrorMessage = it.sharingErrorMessage,
-                bpn = it.bpn,
                 sharingProcessStarted = it.sharingProcessStarted,
                 taskId = it.taskId
             )
         }
     }
 
-    fun setInitial(sharingStateIds: List<SharingStateIdentifierDto>): List<SharingStateDb> {
+    fun setInitial(sharingStateIds: List<String>): List<SharingStateDb> {
         val sharingStates = getOrCreate(sharingStateIds)
         return sharingStates.map { setInitial(it) }
     }
@@ -121,21 +79,21 @@ class SharingStateService(
 
 
     fun setSuccess(successRequests: List<SuccessRequest>): List<SharingStateDb> {
-        val sharingStates = getOrCreate(successRequests.map { it.sharingStateId })
+        val sharingStates = getOrCreate(successRequests.map { it.externalId })
         return sharingStates
             .zip(successRequests)
-            .map { (sharingState, request) -> setSuccess(sharingState, request.bpn, request.startTimeOverwrite) }
+            .map { (sharingState, request) -> setSuccess(sharingState, request.startTimeOverwrite) }
     }
 
     fun setPending(pendingRequests: List<PendingRequest>): List<SharingStateDb> {
-        val sharingStates = getOrCreate(pendingRequests.map { it.sharingStateId })
+        val sharingStates = getOrCreate(pendingRequests.map { it.externalId })
         return sharingStates
             .zip(pendingRequests)
             .map { (sharingState, request) -> setPending(sharingState, request.taskId, request.startTimeOverwrite) }
     }
 
     fun setError(errorRequests: List<ErrorRequest>): List<SharingStateDb> {
-        val sharingStates = getOrCreate(errorRequests.map { it.sharingStateId })
+        val sharingStates = getOrCreate(errorRequests.map { it.externalId })
 
         return sharingStates
             .zip(errorRequests)
@@ -143,7 +101,7 @@ class SharingStateService(
     }
 
     fun setReady(externalIds: List<String>): List<SharingStateDb> {
-        val existingSharingStates = stateRepository.findByExternalIdInAndBusinessPartnerTypeAndAssociatedOwnerBpnl(externalIds, BusinessPartnerType.GENERIC,getCurrentUserBpn())
+        val existingSharingStates = stateRepository.findByExternalIdInAndAssociatedOwnerBpnl(externalIds, getCurrentUserBpn())
         val existingIds = existingSharingStates.map { it.externalId }.toSet()
         val missingIds = externalIds.minus(existingIds)
 
@@ -178,12 +136,11 @@ class SharingStateService(
         return stateRepository.save(sharingState)
     }
 
-    private fun setSuccess(sharingState: SharingStateDb, bpn: String, startTimeOverwrite: LocalDateTime? = null): SharingStateDb {
+    private fun setSuccess(sharingState: SharingStateDb, startTimeOverwrite: LocalDateTime? = null): SharingStateDb {
 
         sharingState.sharingStateType = SharingStateType.Success
         sharingState.sharingErrorCode = null
         sharingState.sharingErrorMessage = null
-        sharingState.bpn = bpn
         sharingState.sharingProcessStarted = startTimeOverwrite ?: sharingState.sharingProcessStarted ?: LocalDateTime.now()
 
         return stateRepository.save(sharingState)
@@ -226,58 +183,35 @@ class SharingStateService(
     }
 
 
-    private fun getOrCreate(sharingStateIdentifiers: List<SharingStateIdentifierDto>): List<SharingStateDb> {
-        val identifiersByType = sharingStateIdentifiers.groupBy { it.businessPartnerType }
-
-        val sharingStates = identifiersByType.flatMap { entry -> getOrCreate(entry.value.map { it.externalId }, entry.key) }
-        val sharingStatesByExternalId = sharingStates.associateBy { it.externalId }
-
-        return sharingStateIdentifiers.map { sharingStatesByExternalId[it.externalId]!! }
-    }
-
-
-    private fun getOrCreate(externalIds: List<String>, businessPartnerType: BusinessPartnerType): List<SharingStateDb> {
-        val sharingStates = stateRepository.findByExternalIdInAndBusinessPartnerTypeAndAssociatedOwnerBpnl(externalIds, businessPartnerType,getCurrentUserBpn())
+    private fun getOrCreate(externalIds: List<String>): List<SharingStateDb> {
+        val sharingStates = stateRepository.findByExternalIdInAndAssociatedOwnerBpnl(externalIds, getCurrentUserBpn())
         val sharingStatesByExternalId = sharingStates.associateBy { it.externalId }
 
         return externalIds.map { externalId ->
             sharingStatesByExternalId[externalId]
                 ?: SharingStateDb(
                     externalId,
-                    businessPartnerType = businessPartnerType,
                     sharingStateType = SharingStateType.Ready,
                     sharingErrorCode = null,
                     sharingErrorMessage = null,
-                    bpn = null,
                     sharingProcessStarted = null
                 )
         }
     }
 
-
-    private fun getOrCreate(externalId: String, businessPartnerType: BusinessPartnerType): SharingStateDb {
-        return getOrCreate(listOf(externalId), businessPartnerType).single()
-    }
-
-    data class SharingStateIdentifierDto(
-        val externalId: String,
-        val businessPartnerType: BusinessPartnerType
-    )
-
     data class PendingRequest(
-        val sharingStateId: SharingStateIdentifierDto,
+        val externalId: String,
         val taskId: String,
         val startTimeOverwrite: LocalDateTime? = null
     )
 
     data class SuccessRequest(
-        val sharingStateId: SharingStateIdentifierDto,
-        val bpn: String,
+        val externalId: String,
         val startTimeOverwrite: LocalDateTime? = null
     )
 
     data class ErrorRequest(
-        val sharingStateId: SharingStateIdentifierDto,
+        val externalId: String,
         val errorCode: BusinessPartnerSharingError,
         val errorMessage: String?,
         val startTimeOverwrite: LocalDateTime? = null

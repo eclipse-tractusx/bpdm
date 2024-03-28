@@ -43,7 +43,7 @@ class SharingStateController(
         businessPartnerType: BusinessPartnerType?,
         externalIds: Collection<String>?
     ): PageDto<SharingStateDto> {
-        return sharingStateService.findSharingStates(paginationRequest, businessPartnerType, externalIds)
+        return sharingStateService.findSharingStates(paginationRequest, externalIds)
     }
 
 

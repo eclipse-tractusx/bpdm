@@ -55,11 +55,13 @@ data class LegalEntityRepresentationInputDto(
     override val legalName: String? = null,
     override val shortName: String? = null,
     override val legalForm: String? = null,
+    override val states: Collection<BusinessPartnerStateDto> = emptyList(),
 ) : IBaseLegalEntityRepresentation
 
 data class SiteRepresentationInputDto(
     override val siteBpn: String? = null,
-    override val name: String? = null
+    override val name: String? = null,
+    override val states: Collection<BusinessPartnerStateDto> = emptyList()
 ) : IBaseSiteRepresentation
 
 data class AddressRepresentationInputDto(
@@ -68,4 +70,5 @@ data class AddressRepresentationInputDto(
     override val addressType: AddressType? = null,
     override val physicalPostalAddress: PhysicalPostalAddressDto = PhysicalPostalAddressDto(),
     override val alternativePostalAddress: AlternativePostalAddressDto = AlternativePostalAddressDto(),
+    override val states: Collection<BusinessPartnerStateDto> = emptyList(),
 ) : IBaseAddressRepresentation

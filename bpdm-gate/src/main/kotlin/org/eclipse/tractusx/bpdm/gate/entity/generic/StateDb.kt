@@ -23,6 +23,7 @@ import jakarta.persistence.Column
 import jakarta.persistence.Embeddable
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import java.time.LocalDateTime
 
@@ -37,7 +38,11 @@ data class StateDb(
 
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
-    var type: BusinessStateType
+    var type: BusinessStateType,
+
+    @Column(name = "businessPartnerType", nullable = false)
+    @Enumerated(EnumType.STRING)
+    var businessPartnerTyp: BusinessPartnerType
 
 ) : Comparable<StateDb> {
 
@@ -46,5 +51,6 @@ data class StateDb(
         compareBy(nullsFirst(), StateDb::validFrom)       // here null means MIN
             .thenBy(nullsLast(), StateDb::validTo)        // here null means MAX
             .thenBy(StateDb::type)
+            .thenBy( StateDb::businessPartnerTyp  )
             .compare(this, other)
 }

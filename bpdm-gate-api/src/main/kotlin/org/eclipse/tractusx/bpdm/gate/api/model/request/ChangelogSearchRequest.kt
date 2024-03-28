@@ -21,7 +21,6 @@ package org.eclipse.tractusx.bpdm.gate.api.model.request
 
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import java.time.Instant
 
 data class ChangelogSearchRequest(
@@ -33,8 +32,5 @@ data class ChangelogSearchRequest(
     val timestampAfter: Instant? = null,
 
     @get:ArraySchema(arraySchema = Schema(description = "Only for business partners with the given array of external IDs. Ignored if empty."))
-    val externalIds: Set<String>? = emptySet(),
-
-    @get:ArraySchema(arraySchema = Schema(description = "Only for business partners with the given array of business partner types. Ignored if empty."))
-    val businessPartnerTypes: Set<BusinessPartnerType>? = emptySet()
+    val externalIds: Set<String>? = emptySet()
 )

@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
@@ -89,7 +88,7 @@ class BusinessPartnerService(
         saveChangelog(resolutionResults)
 
         val partners = resolutionResults.map { it.businessPartner }
-        sharingStateService.setInitial(partners.map { SharingStateService.SharingStateIdentifierDto(it.externalId, BusinessPartnerType.GENERIC) })
+        sharingStateService.setInitial(partners.map { it.externalId })
 
         partners.map {
             it.associatedOwnerBpnl = getCurrentUserBpn()
@@ -112,10 +111,7 @@ class BusinessPartnerService(
         val changedPartners = resolutionResults.map { it.businessPartner }
 
         val successRequests = entityCandidates.map {
-            SharingStateService.SuccessRequest(
-                SharingStateService.SharingStateIdentifierDto(it.externalId, BusinessPartnerType.GENERIC),
-                it.bpnA!!
-            )
+            SharingStateService.SuccessRequest(it.externalId)
         }
         sharingStateService.setSuccess(successRequests)
 
@@ -141,7 +137,7 @@ class BusinessPartnerService(
     }
 
     private fun saveChangelog(partner: BusinessPartnerDb, changelogType: ChangelogType) {
-        changelogRepository.save(ChangelogEntryDb(externalId = partner.externalId, businessPartnerType = BusinessPartnerType.GENERIC,changelogType = changelogType, stage =  partner.stage, associatedOwnerBpnl = getCurrentUserBpn()))
+        changelogRepository.save(ChangelogEntryDb(externalId = partner.externalId,changelogType = changelogType, stage =  partner.stage, associatedOwnerBpnl = getCurrentUserBpn()))
     }
 
     private fun assertInputStageExists(externalIds: Collection<String>) {
@@ -166,7 +162,7 @@ class BusinessPartnerService(
         val externalIds = entities.map { it.externalId }
         val persistedBusinessPartnerMap = businessPartnerRepository.findByStageAndExternalIdIn(stage, externalIds).associateBy { it.externalId }
         val sharingStatesMap =
-            sharingStateRepository.findByExternalIdInAndBusinessPartnerTypeAndAssociatedOwnerBpnl(externalIds, BusinessPartnerType.GENERIC,getCurrentUserBpn()).associateBy { it.externalId }
+            sharingStateRepository.findByExternalIdInAndAssociatedOwnerBpnl(externalIds,getCurrentUserBpn()).associateBy { it.externalId }
 
         return entities.filter { entity ->
             val matchingBusinessPartner = persistedBusinessPartnerMap[entity.externalId]
