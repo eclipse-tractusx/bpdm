@@ -53,7 +53,7 @@ dependencies:
     alias: bpdm-orchestrator
     condition: bpdm-orchestrator.enabled
   - name: postgresql
-    version: 11.9.13
+    version: 12.12.10
     repository: https://charts.bitnami.com/bitnami
     alias: postgres
     condition: postgres.enabled
