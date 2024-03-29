@@ -31,12 +31,11 @@ If release name contains chart name it will be used as a full name.
 */}}
 {{- define "bpdm.fullname" -}}
 {{- if .Values.fullnameOverride }}
-{{- $name := .Values.fullnameOverride }}
+  {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else if .Values.nameOverride }}
-{{- $name := .Values.nameOverride }}
+    {{- include "bpdm.toReleaseName" (list . .Values.nameOverride)  -}}
 {{- else }}
-{{- $name := .Chart.Name }}
-{{- include "bpdm.toReleaseName" (list . $name)  -}}
+    {{- include "bpdm.toReleaseName" (list . .Chart.Name)  -}}
 {{- end }}
 {{- end }}
 

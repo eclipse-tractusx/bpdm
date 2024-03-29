@@ -29,7 +29,7 @@ sources:
   - https://github.com/eclipse-tractusx/bpdm
 dependencies:
   - name: bpdm-common
-    version: 1.0.0
+    version: 1.0.1
     repository: "file://../bpdm-common"
 maintainers:
   - name: Nico Koprowski

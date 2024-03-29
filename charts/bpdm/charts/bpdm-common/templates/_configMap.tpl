@@ -37,7 +37,7 @@ data:
 {{- $ := .context -}}
 {{- $defaultTemplate := .defaultValues | default "bpdm-common.empty"  -}}
 {{- $defaultValues := fromYaml (include $defaultTemplate $) | default (dict )  -}}
-{{- $override := $.Values.applicationConfig | default (dict ) -}}
-{{- $finalValues := merge $defaultValues $override -}}
+{{- $override := .context.Values.applicationConfig | default (dict ) -}}
+{{- $finalValues := mergeOverwrite $defaultValues $override -}}
 {{- include "bpdm-common.configMap.tpl" (dict "context" $ "override" $finalValues) -}}
 {{- end -}}
