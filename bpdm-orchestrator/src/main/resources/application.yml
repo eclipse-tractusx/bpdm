@@ -24,6 +24,11 @@ bpdm:
   version: '@project.version@'
   # Description of this application (shown in Swagger) (on default set by maven resource filtering)
   description: '@project.description@'
+  # The url from which this API is reachable
+  # Will appear as server item in the OpenAPI document
+  # Will also be used by Swagger as base-url to perform requests against
+  # If empty Swagger will generate the OpenAPI server url when accessing the Swagger page
+  url:
   security:
     # API will not be secured per default
     enabled: false
