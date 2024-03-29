@@ -28,11 +28,6 @@ bpdm-pool:
   postgres:
     enabled: false
 
-bpdm-bridge-dummy:
-  enabled: true
-  postgres:
-    enabled: false
-
 bpdm-cleaning-service-dummy:
   enabled: true
   postgres:
