@@ -70,10 +70,8 @@ class GoldenRecordTaskService(
         val pendingRequests = partners.zip(createdTasks)
             .map { (partner, task) ->
                 SharingStateService.PendingRequest(
-                    SharingStateService.SharingStateIdentifierDto(
-                        partner.externalId,
-                        BusinessPartnerType.GENERIC
-                    ), task.taskId
+                    partner.externalId,
+                    task.taskId
                 )
             }
 
@@ -107,7 +105,7 @@ class GoldenRecordTaskService(
 
         val errorRequests = (taskStatesByResult[ResultState.Error]?.map { (task, sharingState) ->
             SharingStateService.ErrorRequest(
-                SharingStateService.SharingStateIdentifierDto(sharingState.externalId, sharingState.businessPartnerType),
+                sharingState.externalId,
                 BusinessPartnerSharingError.SharingProcessError,
                 if (task.processingState.errors.isNotEmpty()) task.processingState.errors.joinToString(" // ") { it.description }.take(255) else null
             )
@@ -115,7 +113,7 @@ class GoldenRecordTaskService(
 
         errorRequests.addAll(sharingStatesWithoutTasks.map { sharingState ->
             SharingStateService.ErrorRequest(
-                SharingStateService.SharingStateIdentifierDto(sharingState.externalId, sharingState.businessPartnerType),
+                sharingState.externalId,
                 BusinessPartnerSharingError.MissingTaskID,
                 errorMessage = "Missing Task in Orchestrator"
             )
@@ -156,10 +154,8 @@ class GoldenRecordTaskService(
         val pendingRequests = gateOutputEntries.zip(tasks)
             .map { (partner, task) ->
                 SharingStateService.PendingRequest(
-                    SharingStateService.SharingStateIdentifierDto(
-                        partner.externalId,
-                        partner.parentType ?: BusinessPartnerType.GENERIC
-                    ), task.taskId
+                    partner.externalId,
+                    task.taskId
                 )
             }
         sharingStateService.setPending(pendingRequests)
