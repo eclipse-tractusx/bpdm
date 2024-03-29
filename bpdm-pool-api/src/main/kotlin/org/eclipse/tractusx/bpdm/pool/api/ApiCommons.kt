@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.api
 
 object ApiCommons {
 
-    const val BASE_PATH = "v6"
+    const val BASE_PATH = "/v6"
 
     const val LEGAL_ENTITIES_NAME = "Legal Entity Controller"
     const val LEGAL_ENTITIES_DESCRIPTION = "Read, create and update business partner of type legal entity"

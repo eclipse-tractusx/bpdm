@@ -20,5 +20,5 @@
 package org.eclipse.tractusx.bpdm.gate.api
 
 object ApiCommons {
-    const val BASE_PATH = "v6"
+    const val BASE_PATH = "/v6"
 }

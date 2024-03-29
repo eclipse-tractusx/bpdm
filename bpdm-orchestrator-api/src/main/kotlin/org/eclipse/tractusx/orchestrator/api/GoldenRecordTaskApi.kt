@@ -38,7 +38,7 @@ const val TagWorker = "Task Worker"
 interface GoldenRecordTaskApi {
 
     companion object{
-        const val TASKS_PATH = "v6/golden-record-tasks"
+        const val TASKS_PATH = "/v6/golden-record-tasks"
     }
 
     @Operation(
