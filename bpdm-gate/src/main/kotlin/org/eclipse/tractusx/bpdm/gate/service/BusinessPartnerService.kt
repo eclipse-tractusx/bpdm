@@ -238,6 +238,9 @@ class BusinessPartnerService(
             bpnA = fromPartner.bpnA
             parentId = fromPartner.parentId
             parentType = fromPartner.parentType
+            legalEntityConfidence = fromPartner.legalEntityConfidence
+            siteConfidence = fromPartner.siteConfidence
+            addressConfidence = fromPartner.addressConfidence
 
             nameParts.replace(fromPartner.nameParts)
             roles.replace(fromPartner.roles)
