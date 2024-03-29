@@ -31,14 +31,24 @@ If release name contains chart name it will be used as a full name.
 */}}
 {{- define "bpdm.fullname" -}}
 {{- if .Values.fullnameOverride }}
-{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
+{{- $name := .Values.fullnameOverride }}
+{{- else if .Values.nameOverride }}
+{{- $name := .Values.nameOverride }}
 {{- else }}
-{{- $name := default .Chart.Name .Values.nameOverride }}
-{{- if contains $name .Release.Name }}
-{{- .Release.Name | trunc 63 | trimSuffix "-" }}
-{{- else }}
-{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" }}
+{{- $name := .Chart.Name }}
+{{- include "bpdm.toReleaseName" (list . $name)  -}}
 {{- end }}
+{{- end }}
+
+{{- define "bpdm.toReleaseName" -}}
+{{- $top := first . }}
+{{- $name := index . 1 }}
+{{- if contains $name $top.Release.Name }}
+{{- $top.Release.Name | trunc 63 | trimSuffix "-" }}
+{{- else if hasPrefix $top.Release.Name $name  }}
+{{- $name | trunc 63 | trimSuffix "-" }}
+{{- else }}
+{{- printf "%s-%s" $top.Release.Name $name | trunc 63 | trimSuffix "-" }}
 {{- end }}
 {{- end }}
 
@@ -83,7 +93,6 @@ Determine postgres service/host name to connect to
         {{- include "includeWithPostgresContext" (list $ "postgresql.primary.fullname") }}
 {{- end }}}
 
-
 {{/*
 Invoke include on given definition with postgresql dependency context
 Usage: include "includeWithPostgresContext" (list $ "your_include_function_here")
@@ -91,5 +100,36 @@ Usage: include "includeWithPostgresContext" (list $ "your_include_function_here"
 {{- define "includeWithPostgresContext" -}}
 {{- $ := index . 0 }}
 {{- $function := index . 1 }}
-{{- include $function (dict "Values" $.Values.postgres "Chart" (dict "Name" "postgres") "Release" $.Release) }}
+{{- include $function (dict "Values" $.Values.postgres "Chart" (dict "Name" "postgres") "Release" $.Release "global" $.global) }}
 {{- end }}
+
+{{- /*
+Merges three templates one after another in the following order:
+valuesOverride -overrides-> (defaultOverride -overrides-> baseTemplate)
+
+Usage: include "bpdm-common.threeWayMerge" ("context" $ "baseTemplate" "templateName" "defaultOverride" "templateName" "valuesOverride" "templateName")
+*/}}
+{{- define "bpdm-common.threeWayMerge" -}}
+    {{- if .defaultOverride -}}
+        {{- $ := .context -}}
+        {{- $baseTemplateDict := fromYaml (include .baseTemplate $) | default (dict ) -}}
+        {{- $defaultOverrideDict := fromYaml (include .defaultOverride $) | default (dict )  -}}
+        {{- $valuesOverrideDict:= fromYaml (include .valuesOverride $) | default (dict )  -}}
+        {{- $intermediateDict := merge $defaultOverrideDict $baseTemplateDict  -}}
+        {{- $finalDict :=  merge $valuesOverrideDict $intermediateDict -}}
+        {{- toYaml $finalDict -}}
+    {{- else -}}
+        {{- include "bpdm-common.merge" (dict "context" .context "baseTemplate" .baseTemplate "override" .valuesOverride) }}
+    {{- end -}}
+{{- end -}}
+
+{{- define "bpdm-common.merge" -}}
+    {{- $ := .context -}}
+    {{- $baseTemplateDict := fromYaml (include .baseTemplate $) | default (dict ) -}}
+    {{- $overrideDict := fromYaml (include .override $) | default (dict )  -}}
+    {{- $finalDict :=  merge $overrideDict $baseTemplateDict -}}
+    {{- toYaml $finalDict -}}
+{{- end -}}
+
+{{- define "bpdm-common.empty" -}}
+{{- end -}}

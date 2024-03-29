@@ -18,25 +18,14 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################################
 
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{include "bpdm.fullname" .}}
-  labels:
-    {{- include "bpdm.labels" . | nindent 4 }}
-data:
-  deployment.yml: |-
-    # Place for putting standard deployment configuration
-    # which can be overwritten by external.yml
-    bpdm:
-      datasource:
-        host: {{ include "bpdm.postgresDependency" . }}
-      pool:
-        base-url: http://{{ include "bpdm.toReleaseName" (list . "bpdm-pool") }}
-      gate:
-        base-url: http://{{ include "bpdm.toReleaseName" (list . "bpdm-gate") }}
-  external.yml: |-
-    # External properties for overwriting application config
-    {{- if .Values.applicationConfig }}
-    {{- .Values.applicationConfig | toYaml | nindent 4 }}
-    {{- end }}
+{{ include "bpdm-common.configMap" (dict "context" $ "defaultValues" "bpdm-bridge-dummy.configmapDefaults") -}}
+{{- define "bpdm-bridge-dummy.configmapDefaults" -}}
+bpdm:
+  datasource:
+    host: {{ include "bpdm.postgresDependency" . }}
+  client:
+    gate:
+      base-url: http://{{ include "bpdm.toReleaseName" (list . "bpdm-gate") }}
+    pool:
+      base-url: http://{{ include "bpdm.toReleaseName" (list . "bpdm-pool") }}
+{{- end -}}
