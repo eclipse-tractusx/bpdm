@@ -111,7 +111,7 @@ object CommonValues {
             legalForm = legalForm,
             confidenceCriteria = dummyConfidenceCriteria
         ),
-        site = SiteRepresentation(name = siteName),
+        site = SiteRepresentation(name = siteName, states = states),
         address = AddressRepresentation(name = addressName)
     )
 
