@@ -21,15 +21,15 @@
 apiVersion: v2
 type: application
 name: bpdm-orchestrator
-appVersion: "5.0.1"
-version: 2.0.4
+appVersion: "6.0.0-alpha.0"
+version: 3.0.0-alpha.0
 description: A Helm chart for deploying the BPDM Orchestrator service
 home: https://eclipse-tractusx.github.io/docs/kits/Business%20Partner%20Kit/Adoption%20View
 sources:
   - https://github.com/eclipse-tractusx/bpdm
 dependencies:
   - name: bpdm-common
-    version: 1.0.0
+    version: 1.0.1
     repository: "file://../bpdm-common"
 maintainers:
   - name: Nico Koprowski
