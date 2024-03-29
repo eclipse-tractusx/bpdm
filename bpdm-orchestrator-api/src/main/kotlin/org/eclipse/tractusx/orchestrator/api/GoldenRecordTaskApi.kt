@@ -24,6 +24,7 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
+import org.eclipse.tractusx.orchestrator.api.GoldenRecordTaskApi.Companion.TASKS_PATH
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PostMapping
@@ -33,8 +34,12 @@ import org.springframework.web.bind.annotation.RequestMapping
 const val TagClient = "Task Client"
 const val TagWorker = "Task Worker"
 
-@RequestMapping("/golden-record-tasks", produces = [MediaType.APPLICATION_JSON_VALUE])
+@RequestMapping(TASKS_PATH, produces = [MediaType.APPLICATION_JSON_VALUE])
 interface GoldenRecordTaskApi {
+
+    companion object{
+        const val TASKS_PATH = "v6/golden-record-tasks"
+    }
 
     @Operation(
         summary = "Create new golden record tasks for given business partner data",

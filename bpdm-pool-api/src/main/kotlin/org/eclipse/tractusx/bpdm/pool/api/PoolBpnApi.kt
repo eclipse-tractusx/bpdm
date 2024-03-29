@@ -39,7 +39,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 interface PoolBpnApi {
 
     companion object{
-        const val BPN_PATH = "bpn"
+        const val BPN_PATH = "${ApiCommons.BASE_PATH}/bpn"
     }
 
     @Operation(
@@ -59,7 +59,7 @@ interface PoolBpnApi {
             ApiResponse(responseCode = "404", description = "Specified identifier type not found", content = [Content()])
         ]
     )
-    @Tag(name = ApiTags.BPN_NAME, description = ApiTags.BPN_DESCRIPTION)
+    @Tag(name = ApiCommons.BPN_NAME, description = ApiCommons.BPN_DESCRIPTION)
     @PostMapping(CommonApiPathNames.SUBPATH_SEARCH)
     fun findBpnsByIdentifiers(@RequestBody request: IdentifiersSearchRequest): ResponseEntity<Set<BpnIdentifierMappingDto>>
 }

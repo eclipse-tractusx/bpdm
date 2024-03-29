@@ -36,7 +36,7 @@ import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
 import org.springframework.web.service.annotation.PutExchange
 
-@HttpExchange("/sites")
+@HttpExchange(PoolSiteApi.SITE_PATH)
 interface SiteApiClient : PoolSiteApi {
     @PostExchange
     override fun createSite(

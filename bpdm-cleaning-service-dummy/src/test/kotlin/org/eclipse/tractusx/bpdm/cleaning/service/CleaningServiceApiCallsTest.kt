@@ -26,6 +26,7 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.eclipse.tractusx.bpdm.cleaning.testdata.CommonValues.businessPartnerWithBpnA
 import org.eclipse.tractusx.bpdm.cleaning.testdata.CommonValues.fixedTaskId
+import org.eclipse.tractusx.orchestrator.api.GoldenRecordTaskApi
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -48,8 +49,8 @@ class CleaningServiceApiCallsTest @Autowired constructor(
 ) {
 
     companion object {
-        const val ORCHESTRATOR_RESERVE_TASKS_URL = "/golden-record-tasks/step-reservations"
-        const val ORCHESTRATOR_RESOLVE_TASKS_URL = "/golden-record-tasks/step-results"
+        const val ORCHESTRATOR_RESERVE_TASKS_URL = "/${GoldenRecordTaskApi.TASKS_PATH}/step-reservations"
+        const val ORCHESTRATOR_RESOLVE_TASKS_URL = "/${GoldenRecordTaskApi.TASKS_PATH}/step-results"
 
         @JvmField
         @RegisterExtension
