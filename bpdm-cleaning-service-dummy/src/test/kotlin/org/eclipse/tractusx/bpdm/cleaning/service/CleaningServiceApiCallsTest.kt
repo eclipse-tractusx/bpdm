@@ -49,8 +49,8 @@ class CleaningServiceApiCallsTest @Autowired constructor(
 ) {
 
     companion object {
-        const val ORCHESTRATOR_RESERVE_TASKS_URL = "/${GoldenRecordTaskApi.TASKS_PATH}/step-reservations"
-        const val ORCHESTRATOR_RESOLVE_TASKS_URL = "/${GoldenRecordTaskApi.TASKS_PATH}/step-results"
+        const val ORCHESTRATOR_RESERVE_TASKS_URL = "${GoldenRecordTaskApi.TASKS_PATH}/step-reservations"
+        const val ORCHESTRATOR_RESOLVE_TASKS_URL = "${GoldenRecordTaskApi.TASKS_PATH}/step-results"
 
         @JvmField
         @RegisterExtension

@@ -53,9 +53,9 @@ class MockAndAssertUtils @Autowired constructor(
     val assertHelpers: AssertHelpers
 ) {
 
-    val ORCHESTRATOR_CREATE_TASKS_URL = "/${GoldenRecordTaskApi.TASKS_PATH}"
-    val ORCHESTRATOR_SEARCH_TASK_STATES_URL = "/${GoldenRecordTaskApi.TASKS_PATH}/state/search"
-    val POOL_API_SEARCH_CHANGE_LOG_URL = "/${PoolChangelogApi.CHANGELOG_PATH}/search"
+    val ORCHESTRATOR_CREATE_TASKS_URL = GoldenRecordTaskApi.TASKS_PATH
+    val ORCHESTRATOR_SEARCH_TASK_STATES_URL = "${GoldenRecordTaskApi.TASKS_PATH}/state/search"
+    val POOL_API_SEARCH_CHANGE_LOG_URL = "${PoolChangelogApi.CHANGELOG_PATH}/search"
 
     fun mockOrchestratorApi(gateWireMockServer: WireMockExtension) {
         val taskCreateResponse =
