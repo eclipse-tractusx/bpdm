@@ -42,7 +42,6 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.RecursiveComparisonAssert
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.exception.ChangeLogOutputError
@@ -103,7 +102,7 @@ internal class ChangeLogControllerIT @Autowired constructor(
 
         assertRecursively(searchResult.content)
             .ignoringFieldsMatchingRegexes(".*${ChangelogGateDto::timestamp.name}")
-            .isEqualTo(listOf(ChangelogGateDto(BusinessPartnerNonVerboseValues.bpInputRequestFull.externalId, BusinessPartnerType.GENERIC, instant, ChangelogType.CREATE)))
+            .isEqualTo(listOf(ChangelogGateDto(BusinessPartnerNonVerboseValues.bpInputRequestFull.externalId, instant, ChangelogType.CREATE)))
     }
 
 
@@ -155,64 +154,7 @@ internal class ChangeLogControllerIT @Autowired constructor(
         val searchResult = gateClient.changelog.getInputChangelog(PaginationRequest(), searchRequest)
 
         assertRecursively(searchResult.content).ignoringFieldsMatchingRegexes(".*${ChangelogGateDto::timestamp.name}")
-            .isEqualTo(listOf(ChangelogGateDto(BusinessPartnerVerboseValues.bpInputRequestFull.externalId, BusinessPartnerType.GENERIC, instant, ChangelogType.CREATE)))
-    }
-
-    /**
-     * Given a businessPartnerType a changeLog exists in database
-     * When getting changeLog by businessPartnerType
-     * Then changeLog mapped to the catena data model should be returned
-     */
-    @Test
-    fun `get changeLog by businessPartnerType`() {
-
-        val searchRequest = ChangelogSearchRequest(businessPartnerTypes = setOf(BusinessPartnerType.GENERIC))
-
-        val searchResult = gateClient.changelog.getInputChangelog(PaginationRequest(), searchRequest)
-
-        assertRecursively(searchResult.content).ignoringFieldsMatchingRegexes(".*${ChangelogGateDto::timestamp.name}")
-            .isEqualTo(
-                listOf(
-                    ChangelogGateDto(BusinessPartnerNonVerboseValues.bpInputRequestFull.externalId, BusinessPartnerType.GENERIC, instant, ChangelogType.CREATE),
-                    ChangelogGateDto(BusinessPartnerNonVerboseValues.bpInputRequestChina.externalId, BusinessPartnerType.GENERIC, instant, ChangelogType.CREATE)
-                )
-            )
-    }
-
-    /**
-     * Given businessPartnerType does not exist in database
-     * When getting changeLog by businessPartnerType
-     * Then changeLog mapped to the catena data model should not be returned
-     */
-
-    @Test
-    fun `get changeLog by businessPartnerType not found`() {
-        val searchRequest = ChangelogSearchRequest(businessPartnerTypes = setOf(BusinessPartnerType.ADDRESS))
-
-        val searchResult = gateClient.changelog.getInputChangelog(PaginationRequest(), searchRequest)
-
-        assertRecursively(searchResult.content)
-            .isEqualTo(emptyList<ChangelogEntryDb>())
-    }
-
-    /**
-     * Given businessPartnerType and timestamp a changeLog exist in database
-     * When getting changeLog by businessPartnerType and timestamp
-     * Then changeLog mapped to the catena data model should be returned
-     */
-    @Test
-    fun `get changeLog by businessPartnerType and timeStamp`() {
-        val searchRequest = ChangelogSearchRequest(businessPartnerTypes = setOf(BusinessPartnerType.GENERIC), timestampAfter = instant)
-
-        val searchResult = gateClient.changelog.getInputChangelog(PaginationRequest(), searchRequest)
-
-        assertRecursively(searchResult.content).ignoringFieldsMatchingRegexes(".*${ChangelogGateDto::timestamp.name}")
-            .isEqualTo(
-                listOf(
-                    ChangelogGateDto(BusinessPartnerNonVerboseValues.bpInputRequestFull.externalId, BusinessPartnerType.GENERIC, instant, ChangelogType.CREATE),
-                    ChangelogGateDto(BusinessPartnerNonVerboseValues.bpInputRequestChina.externalId, BusinessPartnerType.GENERIC, instant, ChangelogType.CREATE)
-                )
-            )
+            .isEqualTo(listOf(ChangelogGateDto(BusinessPartnerVerboseValues.bpInputRequestFull.externalId, instant, ChangelogType.CREATE)))
     }
 
     /**
@@ -223,15 +165,15 @@ internal class ChangeLogControllerIT @Autowired constructor(
     @Test
     fun `get changeLog from timeStamp`() {
 
-        val searchRequest = ChangelogSearchRequest(businessPartnerTypes = emptySet(), timestampAfter = instant)
+        val searchRequest = ChangelogSearchRequest(timestampAfter = instant)
 
         val searchResult = gateClient.changelog.getInputChangelog(paginationRequest = PaginationRequest(), searchRequest)
 
         assertRecursively(searchResult.content).ignoringFieldsMatchingRegexes(".*${ChangelogGateDto::timestamp.name}")
             .isEqualTo(
                 listOf(
-                    ChangelogGateDto(BusinessPartnerNonVerboseValues.bpInputRequestFull.externalId, BusinessPartnerType.GENERIC, instant, ChangelogType.CREATE),
-                    ChangelogGateDto(BusinessPartnerNonVerboseValues.bpInputRequestChina.externalId, BusinessPartnerType.GENERIC, instant, ChangelogType.CREATE)
+                    ChangelogGateDto(BusinessPartnerNonVerboseValues.bpInputRequestFull.externalId, instant, ChangelogType.CREATE),
+                    ChangelogGateDto(BusinessPartnerNonVerboseValues.bpInputRequestChina.externalId, instant, ChangelogType.CREATE)
                 )
             )
     }

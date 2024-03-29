@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.exception.ChangeLogOutputError
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
@@ -28,7 +28,6 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogDto
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byAssociatedOwnerBpnl
-import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byBusinessPartnerTypes
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byCreatedAtGreaterThan
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byExternalIdsIn
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byStage
@@ -45,21 +44,19 @@ class ChangelogService(private val changelogRepository: ChangelogRepository) {
 
     fun getChangeLogEntries(
         externalIds: Set<String>?,
-        businessPartnerTypes: Set<BusinessPartnerType>?,
         createdAt: Instant?,
         stage: StageType?,
         page: Int,
         pageSize: Int
     ): PageChangeLogDto<ChangelogGateDto> {
 
-        logger.debug { "Executing getChangeLogEntries() with parameters $externalIds // $businessPartnerTypes // $stage // $createdAt" }
+        logger.debug { "Executing getChangeLogEntries() with parameters $externalIds  // $stage // $createdAt" }
 
         val nonNullExternalIds = externalIds ?: emptySet()
 
         val spec = Specification.allOf(
             byExternalIdsIn(externalIds = nonNullExternalIds),
             byCreatedAtGreaterThan(createdAt = createdAt),
-            byBusinessPartnerTypes(businessPartnerTypes),
             byStage(stage),
             byAssociatedOwnerBpnl(getCurrentUserBpn())
         )
