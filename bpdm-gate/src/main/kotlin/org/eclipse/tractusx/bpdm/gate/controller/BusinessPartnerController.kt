@@ -41,7 +41,7 @@ class BusinessPartnerController(
     val apiConfigProperties: ApiConfigProperties
 ) : GateBusinessPartnerApi {
 
-    @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_INPUT_AUTHORITY})")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_INPUT_PARTNER})")
     override fun upsertBusinessPartnersInput(businessPartners: Collection<BusinessPartnerInputRequest>): ResponseEntity<Collection<BusinessPartnerInputDto>> {
         if (businessPartners.size > apiConfigProperties.upsertLimit || businessPartners.map { it.externalId }.containsDuplicates()) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
@@ -50,7 +50,7 @@ class BusinessPartnerController(
         return ResponseEntity.ok(result)
     }
 
-    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_INPUT_AUTHORITY})")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_INPUT_PARTNER})")
     override fun getBusinessPartnersInput(
         externalIds: Collection<String>?,
         paginationRequest: PaginationRequest
@@ -58,7 +58,7 @@ class BusinessPartnerController(
         return businessPartnerService.getBusinessPartnersInput(paginationRequest.toPageRequest(), externalIds)
     }
 
-    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_OUTPUT_AUTHORITY})")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_OUTPUT_PARTNER})")
     override fun getBusinessPartnersOutput(
         externalIds: Collection<String>?,
         paginationRequest: PaginationRequest

@@ -92,7 +92,7 @@ class MemberController(
         )
     }
 
-    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_MEMBER_PARTNER})")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_MEMBER_CHANGELOG})")
     override fun searchChangelogEntries(
         changelogSearchRequest: ChangelogSearchRequest,
         paginationRequest: PaginationRequest

@@ -35,22 +35,22 @@ class StatsController(
     private val statsService: StatsService
 ) : StatsApi {
 
-    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_INPUT_AUTHORITY})")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_STATS})")
     override fun countPartnersBySharingState(): StatsSharingStatesResponse {
         return statsService.countSharingStates()
     }
 
-    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_INPUT_AUTHORITY})")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_STATS})")
     override fun countPartnersPerStage(): StatsStagesResponse {
         return statsService.countBusinessPartnersPerStage()
     }
 
-    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_INPUT_AUTHORITY})")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_STATS})")
     override fun countAddressTypes(stage: StageType): StatsAddressTypesResponse {
         return statsService.countAddressTypes(stage)
     }
 
-    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_INPUT_AUTHORITY})")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_STATS})")
     override fun getConfidenceCriteriaStats(): StatsConfidenceCriteriaResponse {
         return statsService.getConfidenceCriteriaStats()
     }

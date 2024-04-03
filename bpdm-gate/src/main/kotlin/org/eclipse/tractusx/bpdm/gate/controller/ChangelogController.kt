@@ -37,7 +37,7 @@ class ChangelogController(
     private val changelogService: ChangelogService
 ) : GateChangelogApi {
 
-    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_INPUT_AUTHORITY})")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_INPUT_CHANGELOG})")
     override fun getInputChangelog(
         paginationRequest: PaginationRequest, searchRequest: ChangelogSearchRequest
     ): PageChangeLogDto<ChangelogGateDto> {
@@ -50,7 +50,7 @@ class ChangelogController(
         )
     }
 
-    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_OUTPUT_AUTHORITY})")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_OUTPUT_CHANGELOG})")
     override fun getOutputChangelog(
         paginationRequest: PaginationRequest,
         searchRequest: ChangelogSearchRequest

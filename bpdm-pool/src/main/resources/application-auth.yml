@@ -28,9 +28,9 @@ bpdm:
     # URL to the auth endpoint of the Keycloak server
     auth-url: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}/protocol/openid-connect/auth
     # This application's resource or client. Used for finding permissions in the given Bearer token
-    client-id: BPDM_POOL
+    client-id: BPDM-POOL
     # The keycloak realm to consider
-    realm: master
+    realm: CX-Central
     # URL to the token refresh endpoint of the Keycloak server
     refresh-url: ${bpdm.security.token-url}
     # URL to the token validation endpoint of the Keycloak server
@@ -41,11 +41,15 @@ bpdm:
       # Name of the permission to upsert business partners
       writePartner: write_partner
       # Name of the permission to read business partners that belong to a Catena-X member
-      readMemberPartner: read_member_partner
+      readMemberPartner: read_partner_member
       # Name of the permission to read metadata
-      readMetaData: read_meta_data
+      readMetaData: read_metadata
       # Name of the permission to create new metadata
-      writeMetaData: write_meta_data
+      writeMetaData: write_metadata
+      # Name of the permission to read changelog entries from business partners
+      readChangelog: read_changelog
+      # Name of the permission to read changelog entries from Catena-X member business partners
+      readMemberChangelog: read_changelog_member
 
 #
 # From here on are framework and dependency configuration

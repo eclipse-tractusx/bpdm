@@ -37,7 +37,7 @@ class ChangelogController(
     private val controllerConfigProperties: ControllerConfigProperties
 ) : PoolChangelogApi {
 
-    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_CHANGELOG})")
     override fun getChangelogEntries(
         changelogSearchRequest: ChangelogSearchRequest,
         paginationRequest: PaginationRequest

@@ -37,7 +37,7 @@ class SharingStateController(
 ) : GateSharingStateApi {
     private val logger = KotlinLogging.logger { }
 
-    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_INPUT_AUTHORITY})")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_SHARING_STATE})")
     override fun getSharingStates(
         paginationRequest: PaginationRequest,
         businessPartnerType: BusinessPartnerType?,
@@ -47,7 +47,7 @@ class SharingStateController(
     }
 
 
-    @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_INPUT_AUTHORITY})")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_SHARING_STATE})")
     override fun postSharingStateReady(request: PostSharingStateReadyRequest) {
         sharingStateService.setReady(request.externalIds)
     }
