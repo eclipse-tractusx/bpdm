@@ -290,36 +290,14 @@ That means if the business partner data contains an additional address, the resu
 ## Access BPDM over EDC
 
 This section details how a sharing member EDC can access an EDC exposing the BPDM API as assets. Before you can access the assets make sure that the BPDM EDC
-has been configured to provide assets for your company's BPN (see [Operator View](../OPERATOR_VIEW.md)).
-This [POSTMAN collection](postman/EDC_BPDM_Usage.postman_collection.json) gives example requests for communicating with a deployed BPDM EDC over a sharing
+has been configured to provide assets for your company's BPN (see [Operator View](OPERATOR_VIEW.md)).
+This [POSTMAN collection](postman/EDC BPDM Consumer.postman_collection.json) gives example requests for communicating with a deployed BPDM EDC over a sharing
 member EDC.
-In general, in order to access API endpoints you need to accept the contract of the corresponding asset first, then require a temporary access token for the
-asset and finally send that access token over your own EDC to the BPDM EDC in order to receive the endpoint's response. The following list details these steps:
-
-1. Retrieve asset information you want to access:
-   Your own EDC offers endpoints to query the BPDM EDC's catalogue of assets. There you can find a list of assets, their IDs and descriptions. Also, you find
-   information under which contract this asset is offered to be made available to you. The following steps require the respective asset and contract ID to
-   proceed.
-
-2. Start a negotiation for the asset:
-   When you have selected an asset you need to accept its contract. You will typically access the asset over your BPN. This request is asynchronous. You can
-   check the request status over the respective GET method with the negotiation ID you received from starting the contract negotiation request. Once the
-   negotiation is done and accepted, you will receive an agreement ID in the GET response. You can use this agreement ID together with the asset ID to
-   request access tokens for future data transfers. Please be aware that the negotiation agreement is typically temporary and needs to be renewed
-   periodically.
-
-3. Start an access token transfer:
-   Once you have an agreement ID for accessing one or more assets you can now request to receive data access tokens. When requesting a token you need to provide
-   a URL to your service which should receive that token. Please be aware that the transfer request is asynchronous: The sharing member EDC will request a token
-   from the BPDM EDC and then send this token directly to the backend service whose URL you provided. You neither receive this token as a direct response to the
-   request
-   nor is there any way to inquire the token from the EDC after the fact.
-
-4. Invoke the BPDM API endpoint:
-   With the EDC's data access token you can now access the actual BPDM API endpoint. The gate EDC provides a URL that acts as a proxy for this
-   purpose. You send a request to that URL with the data access token in the headers and attach query parameters as well as body in the same way you would
-   invoke BPDM API endpoint directly. The gate EDC's URL can be invoked with the method's GET, POST and PUT. Use the method that matches original BPDM
-   API endpoint the accessed asset covers. The response equals the original BPDM API endpoint response.
+In the collection you will see how you can negotiate for a BPDM data offer.
+Offers are separated into purposes (defined in the BPDM framework agreement) on why you want to access the BPDM API.
+First, you need to select the offer based on your purpose.
+Afterward you can negotiate for a contract agreement in order to get access to the data.
+The final result of that negotiation will be a transfer token with which you can navigate the BPDM APIs over the BPDM EDC's public API (which acts as a proxy).
 
 ## NOTICE
 
