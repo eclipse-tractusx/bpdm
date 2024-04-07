@@ -1,15 +1,14 @@
-FROM maven:3.8.7-eclipse-temurin-17 AS build
+FROM maven:3.9-eclipse-temurin-21 AS build
 ENV HOME=/home/app
 COPY . $HOME
 WORKDIR $HOME
 RUN --mount=type=cache,target=/root/.m2 mvn -B -U clean package -pl bpdm-pool -am -DskipTests
 
-FROM eclipse-temurin:17-jre-alpine
+FROM eclipse-temurin:21-jre-alpine
 # Adding wget for the health check
 RUN apk --no-cache add wget
 ENV HOME=/home/app
 COPY --from=build $HOME/bpdm-pool/target/bpdm-pool.jar /usr/local/lib/bpdm/app.jar
-RUN apk update && apk upgrade --no-cache libssl3 libcrypto3
 ARG USERNAME=bpdm
 ARG USERID=10001
 ARG GID=10001
