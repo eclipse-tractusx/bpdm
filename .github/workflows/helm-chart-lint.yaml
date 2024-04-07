@@ -32,7 +32,12 @@ on:
       upgrade_from:
         description: 'chart version to upgrade from'
         # chart version from 3.1 release as default
-        default: '3.1.2'
+        default: '4.0.4'
+        required: false
+        type: string
+      helm_version:
+        description: 'helm version to test (default = latest)'
+        default: 'latest'
         required: false
         type: string
 
@@ -56,7 +61,7 @@ jobs:
       - name: Set up Helm
         uses: azure/setup-helm@v3
         with:
-          version: v3.9.3
+          version: ${{ github.event.inputs.helm_version || 'latest' }}
 
       - uses: actions/setup-python@v4
         with:
@@ -73,10 +78,21 @@ jobs:
             echo "changed=true" >> $GITHUB_OUTPUT
           fi
 
+      - name: Create Chart-Testing Config
+        run: |
+          cat <<EOF > .chart-testing-config.yaml
+          validate-maintainers: false
+          chart-repos:
+            - bitnami=https://charts.bitnami.com/bitnami
+          EOF
+          echo "cat .chart-testing-config.yaml"
+          cat .chart-testing-config.yaml
+
+
       - name: Run chart-testing (lint)
-        run: ct lint --target-branch ${{ github.event.repository.default_branch }} --config charts/config/chart-testing-config.yaml
+        run: ct lint --target-branch ${{ github.event.repository.default_branch }} --config .chart-testing-config.yaml
       - name: Run chart-testing (install)
-        run: ct install --charts charts/bpdm --config charts/config/chart-testing-config.yaml
+        run: ct install --charts charts/bpdm --config .chart-testing-config.yaml
         if: github.event_name != 'pull_request' || steps.list-changed.outputs.changed == 'true'
 
         # Upgrade the released chart version with the locally available chart
@@ -85,7 +101,7 @@ jobs:
         run: |
           helm repo add bitnami https://charts.bitnami.com/bitnami
           helm repo add tractusx-dev https://eclipse-tractusx.github.io/charts/dev
-          helm install bpdm-test tractusx-dev/bpdm --version ${{ github.event.inputs.upgrade_from || '3.1.2' }}
+          helm install bpdm-test tractusx-dev/bpdm --version ${{ github.event.inputs.upgrade_from || '4.0.4' }}
           helm dependency update charts/bpdm
           helm upgrade bpdm-test charts/bpdm
         if: github.event_name != 'pull_request' || steps.list-changed.outputs.changed == 'true'
