@@ -4,7 +4,7 @@ Here you can find documentation on how to access and integrate BPDM APIs.
 The main user groups for BPDM are sharing members, cleaning service providers and VAS providers.
 
 This document contains explanations for different use cases for these user groups.
-Accompanied by these explanations is a [Postman collection](postman/BPDM%20Tests.postman_collection.json) showcasing these use cases.
+Accompanied by these explanations is a [Postman collection](../postman/BPDM%20Tests.postman_collection.json) showcasing these use cases.
 Please mind that the requests in this Postman collection are not meant to be executed for automated tests but rather serve as documentation.
 
 ## Sharing Member View
@@ -104,7 +104,7 @@ A VAS provider uses golden records to provide an value-added service to the Cate
 ## Access BPDM over EDC
 
 This section details how a sharing member EDC can access an EDC exposing the BPDM API as assets. Before you can access the assets make sure that the BPDM EDC
-has been configured to provide assets for your company's BPN (see [Operator View](OPERATOR_VIEW.md)).
+has been configured to provide assets for your company's BPN (see [Operator View](../OPERATOR_VIEW.md)).
 This [POSTMAN collection](postman/EDC_BPDM_Usage.postman_collection.json) gives example requests for communicating with a deployed BPDM EDC over a sharing
 member EDC.
 In general, in order to access API endpoints you need to accept the contract of the corresponding asset first, then require a temporary access token for the
