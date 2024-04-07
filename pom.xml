@@ -49,8 +49,8 @@
     </modules>
 
     <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <kotlin.version>1.9.22</kotlin.version>
         <springdoc.version>2.3.0</springdoc.version>
         <neo.version>1.29</neo.version>
