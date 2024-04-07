@@ -19,11 +19,13 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
+import com.neovisionaries.i18n.CountryCode
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.dto.AddressType
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
-import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
+import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
 import org.eclipse.tractusx.bpdm.common.model.StageType
-import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.AlternativePostalAddressDb
 import org.eclipse.tractusx.bpdm.gate.entity.GeographicCoordinateDb
@@ -31,7 +33,10 @@ import org.eclipse.tractusx.bpdm.gate.entity.PhysicalPostalAddressDb
 import org.eclipse.tractusx.bpdm.gate.entity.StreetDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.*
 import org.eclipse.tractusx.orchestrator.api.model.*
+import org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType
 import org.springframework.stereotype.Service
+import java.time.ZoneOffset
+import java.util.SortedSet
 
 @Service
 class OrchestratorMappings(
@@ -39,187 +44,231 @@ class OrchestratorMappings(
 ) {
     private val logger = KotlinLogging.logger { }
 
-    fun toBusinessPartnerGenericDto(entity: BusinessPartnerDb) = BusinessPartnerGenericDto(
-        nameParts = entity.nameParts,
-        identifiers = entity.identifiers.map { toIdentifierDto(it) },
-        states = entity.states.map { toStateDto(it) },
-        roles = entity.roles,
-        ownerBpnL = getOwnerBpnL(entity),
-        legalEntity = toLegalEntityComponentDto(entity),
-        site = toSiteComponentDto(entity),
-        address = toAddressComponentDto(entity)
+    fun toOrchestratorDto(entity: BusinessPartnerDb): BusinessPartner {
+        val postalAddress = toPostalAddress(entity)
 
-    )
-
-    private fun toLegalEntityComponentDto(entity: BusinessPartnerDb) = LegalEntityRepresentation(
-        legalEntityBpn = entity.bpnL,
-        legalName = entity.legalName,
-        shortName = entity.shortName,
-        legalForm = entity.legalForm,
-        confidenceCriteria = entity.legalEntityConfidence?.let { toConfidenceCriteria(it) },
-        states = entity.states.filter { it.businessPartnerTyp == BusinessPartnerType.LEGAL_ENTITY }.map(::toStateDto)
-    )
-
-    private fun toSiteComponentDto(entity: BusinessPartnerDb) = SiteRepresentation(
-        siteBpn = entity.bpnS,
-        name = entity.siteName,
-        confidenceCriteria = entity.siteConfidence?.let { toConfidenceCriteria(it) },
-        states = entity.states.filter { it.businessPartnerTyp == BusinessPartnerType.SITE }.map(::toStateDto)
-    )
-
-    private fun toAddressComponentDto(entity: BusinessPartnerDb) = AddressRepresentation(
-        addressBpn = entity.bpnA,
-        name = entity.addressName,
-        addressType = entity.postalAddress.addressType,
-        physicalPostalAddress = entity.postalAddress.physicalPostalAddress?.let(::toPhysicalPostalAddressDto),
-        alternativePostalAddress = entity.postalAddress.alternativePostalAddress?.let(this::toAlternativePostalAddressDto),
-        confidenceCriteria = entity.addressConfidence?.let { toConfidenceCriteria(it) },
-        states = entity.states.filter { it.businessPartnerTyp == BusinessPartnerType.ADDRESS }.map(::toStateDto)
-    )
-
-    private fun toClassificationDto(entity: ClassificationDb) =
-        BusinessPartnerClassificationDto(type = entity.type, code = entity.code, value = entity.value)
-
-    private fun toPostalAddressDto(entity: PostalAddressDb) =
-        PostalAddressDto(
-            addressType = entity.addressType,
-            physicalPostalAddress = entity.physicalPostalAddress?.let(::toPhysicalPostalAddressDto),
-            alternativePostalAddress = entity.alternativePostalAddress?.let(this::toAlternativePostalAddressDto)
+        return BusinessPartner(
+            nameParts = emptyList(),
+            uncategorized = UncategorizedProperties(
+                nameParts = entity.nameParts,
+                identifiers = entity.identifiers.map { Identifier(it.value, it.type, it.issuingBody) },
+                states = entity.states.filter { it.businessPartnerTyp == BusinessPartnerType.GENERIC }.map { toState(it) },
+                address = postalAddress.takeIf { entity.postalAddress.addressType == null }
+            ),
+            owningCompany = getOwnerBpnL(entity),
+            legalEntity = LegalEntity(
+                bpnReference = toBpnReference(entity.bpnL),
+                legalName = entity.legalName,
+                legalForm = entity.legalForm,
+                legalShortName = entity.shortName,
+                identifiers = emptyList(),
+                states = entity.states.filter { it.businessPartnerTyp == BusinessPartnerType.LEGAL_ENTITY }.map { toState(it) },
+                confidenceCriteria = toConfidenceCriteria(entity.legalEntityConfidence),
+                isCatenaXMemberData = null,
+                hasChanged = true,
+                legalAddress = postalAddress.takeIf { entity.postalAddress.addressType == AddressType.LegalAddress || entity.postalAddress.addressType == AddressType.LegalAndSiteMainAddress } ?: PostalAddress.empty
+            ),
+            site = Site(
+                bpnReference = toBpnReference(entity.bpnS),
+                siteName = entity.siteName,
+                states = entity.states.filter { it.businessPartnerTyp == BusinessPartnerType.SITE }.map { toState(it) },
+                confidenceCriteria = toConfidenceCriteria(entity.siteConfidence),
+                hasChanged = true,
+                siteMainAddress = postalAddress.takeIf { entity.postalAddress.addressType == AddressType.SiteMainAddress }
+            ).takeIf { entity.bpnS != null || entity.siteName != null },
+            additionalAddress = postalAddress.takeIf { entity.postalAddress.addressType == AddressType.AdditionalAddress }
         )
+    }
 
-    private fun toPhysicalPostalAddressDto(entity: PhysicalPostalAddressDb) =
-        PhysicalPostalAddressDto(
-            geographicCoordinates = entity.geographicCoordinates?.let(::toGeoCoordinateDto),
-            country = entity.country,
-            administrativeAreaLevel1 = entity.administrativeAreaLevel1,
-            administrativeAreaLevel2 = entity.administrativeAreaLevel2,
-            administrativeAreaLevel3 = entity.administrativeAreaLevel3,
-            postalCode = entity.postalCode,
-            city = entity.city,
-            district = entity.district,
-            street = entity.street?.let(::toStreetDto),
-            companyPostalCode = entity.companyPostalCode,
-            industrialZone = entity.industrialZone,
-            building = entity.building,
-            floor = entity.floor,
-            door = entity.door
+    private fun toPostalAddress(entity: BusinessPartnerDb): PostalAddress {
+        return PostalAddress(
+            bpnReference = toBpnReference(entity.bpnA),
+            addressName = entity.addressName,
+            identifiers = emptyList(),
+            states = entity.states.filter { it.businessPartnerTyp == BusinessPartnerType.ADDRESS }.map { toState(it) },
+            confidenceCriteria = toConfidenceCriteria(entity.addressConfidence),
+            physicalAddress = entity.postalAddress.physicalPostalAddress?.let {
+                with(it) {
+                    PhysicalAddress(
+                        geographicCoordinates = toGeographicCoordinates(geographicCoordinates),
+                        country = country?.alpha2,
+                        administrativeAreaLevel1 = administrativeAreaLevel1,
+                        administrativeAreaLevel2 = administrativeAreaLevel2,
+                        administrativeAreaLevel3 = administrativeAreaLevel3,
+                        postalCode = postalCode,
+                        city = city,
+                        district = district,
+                        street = street?.let {
+                            with(it) {
+                                Street(
+                                    name = name,
+                                    houseNumber = houseNumber,
+                                    houseNumberSupplement = houseNumberSupplement,
+                                    milestone = milestone,
+                                    direction = direction,
+                                    namePrefix = namePrefix,
+                                    additionalNamePrefix = additionalNamePrefix,
+                                    nameSuffix = nameSuffix,
+                                    additionalNameSuffix = additionalNameSuffix
+                                )
+                            }
+                        } ?: Street.empty,
+                        companyPostalCode = companyPostalCode,
+                        industrialZone = industrialZone,
+                        building = building,
+                        floor = floor,
+                        door = door
+                    )
+                }
+            } ?: PhysicalAddress.empty,
+            alternativeAddress = entity.postalAddress.alternativePostalAddress?.let {
+                with(it) {
+                    AlternativeAddress(
+                        geographicCoordinates = toGeographicCoordinates(geographicCoordinates),
+                        country = country?.alpha2,
+                        administrativeAreaLevel1,
+                        postalCode,
+                        city,
+                        deliveryServiceType,
+                        deliveryServiceQualifier,
+                        deliveryServiceNumber
+                    )
+                }
+            } ?: AlternativeAddress.empty,
+            hasChanged = null
         )
+    }
 
-    private fun toAlternativePostalAddressDto(entity: AlternativePostalAddressDb): AlternativePostalAddressDto =
-        AlternativePostalAddressDto(
-            geographicCoordinates = entity.geographicCoordinates?.let(::toGeoCoordinateDto),
-            country = entity.country,
-            administrativeAreaLevel1 = entity.administrativeAreaLevel1,
-            postalCode = entity.postalCode,
-            city = entity.city,
-            deliveryServiceType = entity.deliveryServiceType,
-            deliveryServiceQualifier = entity.deliveryServiceQualifier,
-            deliveryServiceNumber = entity.deliveryServiceNumber
-        )
 
-    private fun toStreetDto(entity: StreetDb) =
-        StreetDto(
-            name = entity.name,
-            houseNumber = entity.houseNumber,
-            houseNumberSupplement = entity.houseNumberSupplement,
-            milestone = entity.milestone,
-            direction = entity.direction,
-            namePrefix = entity.namePrefix,
-            additionalNamePrefix = entity.additionalNamePrefix,
-            nameSuffix = entity.nameSuffix,
-            additionalNameSuffix = entity.additionalNameSuffix
-        )
+    private fun toGeographicCoordinates(geoCoordinate: GeographicCoordinateDb?): GeoCoordinate {
+        return geoCoordinate?.let { with(it) {
+                GeoCoordinate(longitude, latitude, altitude)
+            }
+        } ?: GeoCoordinate.empty
+    }
 
-    private fun toStateDto(entity: StateDb) =
-        BusinessPartnerStateDto(type = entity.type, validFrom = entity.validFrom, validTo = entity.validTo)
 
-    private fun toIdentifierDto(entity: IdentifierDb) =
-        BusinessPartnerIdentifierDto(type = entity.type, value = entity.value, issuingBody = entity.issuingBody)
+    private fun toConfidenceCriteria(confidenceCriteria: ConfidenceCriteriaDb?): ConfidenceCriteria {
+        return confidenceCriteria?.let {
+            with(it){
+                ConfidenceCriteria(
+                    sharedByOwner,
+                    checkedByExternalDataSource,
+                    numberOfBusinessPartners,
+                    lastConfidenceCheckAt.toInstant(ZoneOffset.UTC),
+                    nextConfidenceCheckAt.toInstant(ZoneOffset.UTC),
+                    confidenceLevel
+                )
+            }
+        } ?: ConfidenceCriteria.empty
+    }
 
-    private fun toGeoCoordinateDto(entity: GeographicCoordinateDb) =
-        GeoCoordinateDto(latitude = entity.latitude, longitude = entity.longitude, altitude = entity.altitude)
+    private fun toState(state: StateDb): BusinessState {
+        return  BusinessState(state.validFrom?.toInstant(ZoneOffset.UTC), state.validTo?.toInstant(ZoneOffset.UTC), state.type)
+    }
+
+    private fun toBpnReference(value: String?) =
+        value?.let {
+            BpnReference(
+                referenceValue = value,
+                desiredBpn = null,
+                referenceType = BpnReferenceType.Bpn
+            )
+        } ?: BpnReference.empty
 
     private fun getOwnerBpnL(entity: BusinessPartnerDb): String? {
-        return if (entity.isOwnCompanyData) bpnConfigProperties.ownerBpnL else {
+        return if(entity.associatedOwnerBpnl != null){
+            entity.associatedOwnerBpnl
+        }else if (entity.isOwnCompanyData) {
+            bpnConfigProperties.ownerBpnL
+        }
+        else {
             logger.warn { "Owner BPNL property is not configured" }
             null
         }
     }
 
-    private fun toConfidenceCriteria(entity: ConfidenceCriteriaDb) =
-        ConfidenceCriteriaDto(
-            sharedByOwner = entity.sharedByOwner,
-            checkedByExternalDataSource = entity.checkedByExternalDataSource,
-            numberOfSharingMembers = entity.numberOfBusinessPartners,
-            lastConfidenceCheckAt = entity.lastConfidenceCheckAt,
-            nextConfidenceCheckAt = entity.nextConfidenceCheckAt,
-            confidenceLevel = entity.confidenceLevel
-        )
 
-    fun toSharingStateType(resultState: ResultState) = when (resultState) {
-        ResultState.Pending -> SharingStateType.Pending
-        ResultState.Success -> SharingStateType.Success
-        ResultState.Error -> SharingStateType.Error
+    //Mapping from orchestrator model to entity
+    fun toBusinessPartner(dto: BusinessPartner, externalId: String, associatedOwnerBpnl: String?, roles: SortedSet<BusinessPartnerRole>): BusinessPartnerDb{
+        val addressType = when(dto.type){
+            GoldenRecordType.LegalEntity -> AddressType.LegalAddress
+            GoldenRecordType.Site -> if(dto.site!!.siteMainIsLegalAddress) AddressType.LegalAndSiteMainAddress else AddressType.SiteMainAddress
+            GoldenRecordType.Address -> AddressType.AdditionalAddress
+            null -> throw BpdmNullMappingException(BusinessPartner::class, BusinessPartnerDb::class, BusinessPartner::type)
+        }
+
+        val postalAddress = when(addressType){
+            AddressType.LegalAndSiteMainAddress -> dto.legalEntity.legalAddress
+            AddressType.LegalAddress -> dto.legalEntity.legalAddress
+            AddressType.SiteMainAddress -> dto.site!!.siteMainAddress!!
+            AddressType.AdditionalAddress -> dto.additionalAddress!!
+        }
+
+        return with(dto) {
+            BusinessPartnerDb(
+                externalId = externalId,
+                nameParts = uncategorized.nameParts.toMutableList(),
+                shortName = legalEntity.legalShortName,
+                identifiers = uncategorized.identifiers
+                    .plus(legalEntity.identifiers)
+                    .plus(postalAddress.identifiers)
+                    .mapNotNull { toIdentifier(it) }.toSortedSet(),
+                legalName = legalEntity.legalName,
+                siteName = site?.siteName,
+                addressName = postalAddress.addressName,
+                legalForm = legalEntity.legalForm,
+                states = uncategorized.states.asSequence().mapNotNull { toState(it, BusinessPartnerType.GENERIC) }
+                    .plus(legalEntity.states.mapNotNull{ toState(it, BusinessPartnerType.LEGAL_ENTITY) })
+                    .plus(site?.states?.mapNotNull{ toState(it, BusinessPartnerType.SITE) } ?: emptyList())
+                    .plus(postalAddress.states.mapNotNull{ toState(it, BusinessPartnerType.ADDRESS)} )
+                    .toSortedSet(),
+                roles = roles,
+                postalAddress = PostalAddressDb(
+                    addressType = addressType,
+                    physicalPostalAddress = toPhysicalPostalAddress(postalAddress.physicalAddress),
+                    alternativePostalAddress = postalAddress.alternativeAddress?.let(::toAlternativePostalAddress)
+                ),
+                bpnL = legalEntity.bpnReference.referenceValue!!,
+                bpnS = site?.bpnReference?.referenceValue,
+                bpnA = postalAddress.bpnReference.referenceValue!!,
+                stage = StageType.Output,
+                legalEntityConfidence = legalEntity.confidenceCriteria?.let { toConfidenceCriteria(it) },
+                siteConfidence = site?.confidenceCriteria?.let { toConfidenceCriteria(it) },
+                addressConfidence = postalAddress.confidenceCriteria?.let { toConfidenceCriteria(it) },
+                associatedOwnerBpnl = associatedOwnerBpnl
+            )
+        }
     }
 
-    //Mapping BusinessPartnerGenericDto from to BusinessPartner
-    fun toBusinessPartner(dto: BusinessPartnerGenericDto, externalId: String, associatedOwnerBpnl: String?) = BusinessPartnerDb(
-        externalId = externalId,
-        nameParts = dto.nameParts.toMutableList(),
-        shortName = dto.legalEntity.shortName,
-        identifiers = dto.identifiers.mapNotNull { toIdentifier(it) }.toSortedSet(),
-        legalName = dto.legalEntity.legalName,
-        siteName = dto.site.name,
-        addressName = dto.address.name,
-        legalForm = dto.legalEntity.legalForm,
-        states = dto.states.mapNotNull { toState(it, BusinessPartnerType.GENERIC) }
-            .plus(dto.legalEntity.states.mapNotNull{ toState(it, BusinessPartnerType.LEGAL_ENTITY) })
-            .plus(dto.site.states.mapNotNull{ toState(it, BusinessPartnerType.SITE) })
-            .plus(dto.address.states.mapNotNull{ toState(it, BusinessPartnerType.ADDRESS) })
-            .toSortedSet(),
-        roles = dto.roles.toSortedSet(),
-        postalAddress = toPostalAddress(dto.address),
-        bpnL = dto.legalEntity.legalEntityBpn,
-        bpnS = dto.site.siteBpn,
-        bpnA = dto.address.addressBpn,
-        stage = StageType.Output,
-        legalEntityConfidence = dto.legalEntity.confidenceCriteria?.let { toConfidenceCriteria(it) },
-        siteConfidence = dto.site.confidenceCriteria?.let { toConfidenceCriteria(it) },
-        addressConfidence = dto.address.confidenceCriteria?.let { toConfidenceCriteria(it) },
-        associatedOwnerBpnl = associatedOwnerBpnl
-    )
 
-    private fun toIdentifier(dto: BusinessPartnerIdentifierDto) =
+    private fun toIdentifier(dto: Identifier) =
         dto.type?.let { type ->
             dto.value?.let { value ->
                 IdentifierDb(type = type, value = value, issuingBody = dto.issuingBody)
             }
         }
 
-    private fun toState(dto: BusinessPartnerStateDto, businessPartnerType: BusinessPartnerType) =
-        dto.type?.let { StateDb(type = it, validFrom = dto.validFrom, validTo = dto.validTo, businessPartnerTyp =  businessPartnerType) }
+    private fun toState(dto: BusinessState, businessPartnerType: BusinessPartnerType) =
+        dto.type?.let { StateDb(
+            type = it,
+            validFrom = dto.validFrom?.atZone(ZoneOffset.UTC)?.toLocalDateTime(),
+            validTo = dto.validTo?.atZone(ZoneOffset.UTC)?.toLocalDateTime(),
+            businessPartnerTyp =  businessPartnerType)
+        }
 
-    private fun toClassification(dto: BusinessPartnerClassificationDto) =
-        ClassificationDb(type = dto.type, code = dto.code, value = dto.value)
 
-    private fun toPostalAddress(dto: AddressRepresentation) =
-        PostalAddressDb(
-            addressType = dto.addressType,
-            physicalPostalAddress = dto.physicalPostalAddress?.let(::toPhysicalPostalAddress),
-            alternativePostalAddress = dto.alternativePostalAddress?.let(this::toAlternativePostalAddress)
-        )
-
-    private fun toPhysicalPostalAddress(dto: PhysicalPostalAddressDto) =
+    private fun toPhysicalPostalAddress(dto: PhysicalAddress) =
         PhysicalPostalAddressDb(
-            geographicCoordinates = dto.geographicCoordinates?.let(::toGeographicCoordinate),
-            country = dto.country,
+            geographicCoordinates = toGeographicCoordinate(dto.geographicCoordinates),
+            country = CountryCode.getByAlpha2Code(dto.country),
             administrativeAreaLevel1 = dto.administrativeAreaLevel1,
             administrativeAreaLevel2 = dto.administrativeAreaLevel2,
             administrativeAreaLevel3 = dto.administrativeAreaLevel3,
             postalCode = dto.postalCode,
             city = dto.city,
             district = dto.district,
-            street = dto.street?.let(::toStreet),
+            street = toStreet(dto.street),
             companyPostalCode = dto.companyPostalCode,
             industrialZone = dto.industrialZone,
             building = dto.building,
@@ -227,10 +276,10 @@ class OrchestratorMappings(
             door = dto.door
         )
 
-    private fun toAlternativePostalAddress(dto: AlternativePostalAddressDto) =
+    private fun toAlternativePostalAddress(dto: AlternativeAddress) =
         AlternativePostalAddressDb(
-            geographicCoordinates = dto.geographicCoordinates?.let(::toGeographicCoordinate),
-            country = dto.country,
+            geographicCoordinates = toGeographicCoordinate(dto.geographicCoordinates),
+            country = CountryCode.getByAlpha2Code(dto.country),
             administrativeAreaLevel1 = dto.administrativeAreaLevel1,
             postalCode = dto.postalCode,
             city = dto.city,
@@ -239,7 +288,7 @@ class OrchestratorMappings(
             deliveryServiceNumber = dto.deliveryServiceNumber
         )
 
-    private fun toStreet(dto: StreetDto) =
+    private fun toStreet(dto: Street) =
         StreetDb(
             name = dto.name,
             houseNumber = dto.houseNumber,
@@ -252,16 +301,20 @@ class OrchestratorMappings(
             additionalNameSuffix = dto.additionalNameSuffix
         )
 
-    private fun toGeographicCoordinate(dto: GeoCoordinateDto) =
-        GeographicCoordinateDb(latitude = dto.latitude, longitude = dto.longitude, altitude = dto.altitude)
+    private fun toGeographicCoordinate(dto: GeoCoordinate) =
+        dto.latitude?.let { lat ->
+            dto.longitude?.let {  lon ->
+                GeographicCoordinateDb(latitude = lat, longitude = lon, altitude = dto.altitude)
+            }
+        }
 
-    private fun toConfidenceCriteria(dto: ConfidenceCriteriaDto) =
+    private fun toConfidenceCriteria(dto: ConfidenceCriteria) =
         ConfidenceCriteriaDb(
-            sharedByOwner = dto.sharedByOwner,
-            checkedByExternalDataSource = dto.checkedByExternalDataSource,
-            numberOfBusinessPartners = dto.numberOfSharingMembers,
-            lastConfidenceCheckAt = dto.lastConfidenceCheckAt,
-            nextConfidenceCheckAt = dto.nextConfidenceCheckAt,
-            confidenceLevel = dto.confidenceLevel
+            sharedByOwner = dto.sharedByOwner!!,
+            checkedByExternalDataSource = dto.checkedByExternalDataSource!!,
+            numberOfBusinessPartners = dto.numberOfSharingMembers!!,
+            lastConfidenceCheckAt = dto.lastConfidenceCheckAt!!.atZone(ZoneOffset.UTC).toLocalDateTime(),
+            nextConfidenceCheckAt = dto.nextConfidenceCheckAt!!.atZone(ZoneOffset.UTC).toLocalDateTime(),
+            confidenceLevel = dto.confidenceLevel!!
         )
 }

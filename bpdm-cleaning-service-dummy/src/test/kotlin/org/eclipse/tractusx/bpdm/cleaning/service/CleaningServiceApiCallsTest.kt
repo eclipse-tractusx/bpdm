@@ -21,14 +21,16 @@ package org.eclipse.tractusx.bpdm.cleaning.service
 
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
+import com.github.tomakehurst.wiremock.admin.model.ServeEventQuery
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
+import com.github.tomakehurst.wiremock.stubbing.StubMapping
+import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.cleaning.config.OrchestratorConfigProperties
-import org.eclipse.tractusx.bpdm.cleaning.testdata.CommonValues.businessPartnerWithBpnA
-import org.eclipse.tractusx.bpdm.cleaning.testdata.CommonValues.fixedTaskId
+import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.*
 import org.eclipse.tractusx.orchestrator.api.GoldenRecordTaskApi
-import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -36,6 +38,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import java.time.Instant
@@ -44,10 +47,10 @@ import java.time.Instant
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
     properties = ["${OrchestratorConfigProperties.PREFIX}.security-enabled=false"]
 )
+@ActiveProfiles("test")
 class CleaningServiceApiCallsTest @Autowired constructor(
     val cleaningServiceDummy: CleaningServiceDummy,
-    val jacksonObjectMapper: ObjectMapper,
-    val orchestrationApiClient: OrchestrationApiClient
+    val jacksonObjectMapper: ObjectMapper
 ) {
 
     companion object {
@@ -68,66 +71,328 @@ class CleaningServiceApiCallsTest @Autowired constructor(
         }
     }
 
+    val fixedTaskId = "1"
+    val businessPartnerFactory = BusinessPartnerTestDataFactory()
+    val defaultBpnRequest = BpnReference("IGNORED", null, BpnReferenceType.BpnRequestIdentifier)
+
     @BeforeEach
     fun beforeEach() {
         orchestratorMockApi.resetAll()
-        this.mockOrchestratorResolveApi()
-        this.mockOrchestratorReserveApi()
     }
 
-
     @Test
-    fun `pollForCleaningTasks should reserve and resolve tasks from orchestrator`() {
+    fun `Additional Address with Site without BPNs`() {
+        //Mock Orchestrator responses
+        val mockedBusinessPartner = businessPartnerFactory.createFullBusinessPartner("test")
+            .copyWithBpnReferences(BpnReference.empty)
+            .copyWithLegalAddress(PostalAddress.empty)
+            .copyWithSiteMainAddress(PostalAddress.empty)
+
+        val resolveMapping = mockOrchestratorResolveApi()
+        mockOrchestratorReserveApi(mockedBusinessPartner)
+
+        //Create expectations
+        val expectedResponse = createResultRequest(
+            mockedBusinessPartner
+                .copyWithBpnReferences(defaultBpnRequest)
+                .copyWithLegalAddress(mockedBusinessPartner.uncategorized.address!!)
+                .copyWithSiteMainAddress(mockedBusinessPartner.uncategorized.address!!)
+                .copyWithConfidenceCriteria(cleaningServiceDummy.dummyConfidenceCriteria)
+                .copyWithHasChanged(false, false, true)
+        )
+
         // Call the method under test
-        cleaningServiceDummy.pollForCleaningTasks()
+        cleaningServiceDummy.pollForCleanAndSyncTasks()
+        val actualResponse = getResolveResult(resolveMapping)
 
-        // Verify that the reserve API was called once (using WireMock)
-        orchestratorMockApi.verify(postRequestedFor(urlEqualTo(ORCHESTRATOR_RESERVE_TASKS_URL)).withRequestBody(matchingJsonPath("$.amount", equalTo("10"))))
-
-        // Verify that the resolve API was called once (using WireMock)
-        orchestratorMockApi.verify(postRequestedFor(urlEqualTo(ORCHESTRATOR_RESOLVE_TASKS_URL)))
+        assertIsEqualIgnoreReferenceValue(actualResponse, expectedResponse)
     }
 
     @Test
-    fun `reserveTasksForStep should return expected response`() {
-        val expectedResponse = jacksonObjectMapper.writeValueAsString(createSampleTaskStepReservationResponse(businessPartnerWithBpnA))
+    fun `Additional Address with Site with BPNs`() {
+        //Mock Orchestrator responses
+        val mockedBusinessPartner = businessPartnerFactory.createFullBusinessPartner("test")
+            .copyWithLegalAddress(PostalAddress.empty)
+            .copyWithSiteMainAddress(PostalAddress.empty)
 
-        val result = orchestrationApiClient.goldenRecordTasks.reserveTasksForStep(
-            TaskStepReservationRequest(amount = 10, TaskStep.Clean)
+        val resolveMapping = mockOrchestratorResolveApi()
+        mockOrchestratorReserveApi(mockedBusinessPartner)
+
+        //Create expectations
+        val expectedResponse = createResultRequest(
+            mockedBusinessPartner
+                .copyWithLegalAddress(mockedBusinessPartner.uncategorized.address!!)
+                .copyWithSiteMainAddress(mockedBusinessPartner.uncategorized.address!!)
+                .copyWithConfidenceCriteria(cleaningServiceDummy.dummyConfidenceCriteria)
+                .copyWithHasChanged(false, false, true)
         )
 
-        // Assert the expected result
-        val expectedResult = jacksonObjectMapper.readValue(expectedResponse, result::class.java) // Convert the expected JSON response to your DTO
-        assertEquals(expectedResult, result)
+        // Call the method under test
+        cleaningServiceDummy.pollForCleanAndSyncTasks()
+        val actualResponse = getResolveResult(resolveMapping)
 
-        orchestrationApiClient.goldenRecordTasks.resolveStepResults(
-            TaskStepResultRequest(TaskStep.Clean, emptyList())
+        assertThat(actualResponse).usingRecursiveComparison().isEqualTo(expectedResponse)
+    }
+
+    @Test
+    fun `Additional Address without Site without BPNs`() {
+        //Mock Orchestrator responses
+        val mockedBusinessPartner = businessPartnerFactory.createFullBusinessPartner("test")
+            .copyWithBpnReferences(BpnReference.empty)
+            .copyWithLegalAddress(PostalAddress.empty)
+            .copy(site = null)
+
+        val resolveMapping = mockOrchestratorResolveApi()
+        mockOrchestratorReserveApi(mockedBusinessPartner)
+
+        //Create expectations
+        val expectedResponse = createResultRequest(
+            mockedBusinessPartner
+                .copyWithBpnReferences(defaultBpnRequest)
+                .copyWithLegalAddress(mockedBusinessPartner.uncategorized.address!!)
+                .copyWithConfidenceCriteria(cleaningServiceDummy.dummyConfidenceCriteria)
+                .copyWithHasChanged(false, false, true)
         )
+
+        // Call the method under test
+        cleaningServiceDummy.pollForCleanAndSyncTasks()
+        val actualResponse = getResolveResult(resolveMapping)
+
+        assertIsEqualIgnoreReferenceValue(actualResponse, expectedResponse)
+    }
+
+    @Test
+    fun `Additional Address without Site with BPNs`() {
+        //Mock Orchestrator responses
+        val mockedBusinessPartner = businessPartnerFactory.createFullBusinessPartner("test")
+            .copyWithLegalAddress(PostalAddress.empty)
+            .copy(site = null)
+
+        val resolveMapping = mockOrchestratorResolveApi()
+        mockOrchestratorReserveApi(mockedBusinessPartner)
+
+        //Create expectations
+        val expectedResponse = createResultRequest(
+            mockedBusinessPartner
+                .copyWithLegalAddress(mockedBusinessPartner.uncategorized.address!!)
+                .copyWithConfidenceCriteria(cleaningServiceDummy.dummyConfidenceCriteria)
+                .copyWithHasChanged(false, false, true)
+        )
+
+        // Call the method under test
+        cleaningServiceDummy.pollForCleanAndSyncTasks()
+        val actualResponse = getResolveResult(resolveMapping)
+
+        assertThat(actualResponse).usingRecursiveComparison().isEqualTo(expectedResponse)
+    }
+
+    @Test
+    fun `Site with Own Main Address and without BPNs`() {
+        //Mock Orchestrator responses
+        val mockedBusinessPartner = businessPartnerFactory.createFullBusinessPartner("test")
+            .copyWithBpnReferences(BpnReference.empty)
+            .copyWithLegalAddress(PostalAddress.empty)
+            .copy(additionalAddress = null)
+
+        val resolveMapping = mockOrchestratorResolveApi()
+        mockOrchestratorReserveApi(mockedBusinessPartner)
+
+        //Create expectations
+        val expectedResponse = createResultRequest(
+            mockedBusinessPartner
+                .copyWithBpnReferences(defaultBpnRequest)
+                .copyWithLegalAddress(mockedBusinessPartner.uncategorized.address!!)
+                .copyWithConfidenceCriteria(cleaningServiceDummy.dummyConfidenceCriteria)
+                .copyWithHasChanged(false, true, false)
+        )
+
+        // Call the method under test
+        cleaningServiceDummy.pollForCleanAndSyncTasks()
+        val actualResponse = getResolveResult(resolveMapping)
+
+        assertIsEqualIgnoreReferenceValue(actualResponse, expectedResponse)
+    }
+
+    @Test
+    fun `Site With Own Main Address and BPNs`() {
+        //Mock Orchestrator responses
+        val mockedBusinessPartner = businessPartnerFactory.createFullBusinessPartner("test")
+            .copyWithLegalAddress(PostalAddress.empty)
+            .copy(additionalAddress = null)
+
+        val resolveMapping = mockOrchestratorResolveApi()
+        mockOrchestratorReserveApi(mockedBusinessPartner)
+
+        //Create expectations
+        val expectedResponse = createResultRequest(
+            mockedBusinessPartner
+                .copyWithLegalAddress(mockedBusinessPartner.uncategorized.address!!)
+                .copyWithConfidenceCriteria(cleaningServiceDummy.dummyConfidenceCriteria)
+                .copyWithHasChanged(false, true, false)
+        )
+
+        // Call the method under test
+        cleaningServiceDummy.pollForCleanAndSyncTasks()
+        val actualResponse = getResolveResult(resolveMapping)
+
+        assertThat(actualResponse).usingRecursiveComparison().isEqualTo(expectedResponse)
+    }
+
+    @Test
+    fun `Site With Legal Address As Main Address And Without BPNs`() {
+        //Mock Orchestrator responses
+        val mockedBusinessPartner = businessPartnerFactory.createFullBusinessPartner("test")
+            .copyWithBpnReferences(BpnReference.empty)
+            .copyWithSiteMainAddress(null)
+            .copy(additionalAddress = null)
+
+        val resolveMapping = mockOrchestratorResolveApi()
+        mockOrchestratorReserveApi(mockedBusinessPartner)
+
+        //Create expectations
+        val expectedResponse = createResultRequest(
+            mockedBusinessPartner
+                .copyWithBpnReferences(defaultBpnRequest)
+                .copyWithConfidenceCriteria(cleaningServiceDummy.dummyConfidenceCriteria)
+                .copyWithHasChanged(false, true, false)
+        )
+
+        // Call the method under test
+        cleaningServiceDummy.pollForCleanAndSyncTasks()
+        val actualResponse = getResolveResult(resolveMapping)
+
+        assertIsEqualIgnoreReferenceValue(actualResponse, expectedResponse)
+    }
+
+    @Test
+    fun `Site With Legal Address As Main Address And With BPNs`() {
+        //Mock Orchestrator responses
+        val mockedBusinessPartner = businessPartnerFactory.createFullBusinessPartner("test")
+            .copyWithSiteMainAddress(null)
+            .copy(additionalAddress = null)
+
+        val resolveMapping = mockOrchestratorResolveApi()
+        mockOrchestratorReserveApi(mockedBusinessPartner)
+
+        //Create expectations
+        val expectedResponse = createResultRequest(
+            mockedBusinessPartner
+                .copyWithConfidenceCriteria(cleaningServiceDummy.dummyConfidenceCriteria)
+                .copyWithHasChanged(false, true, false)
+        )
+
+        // Call the method under test
+        cleaningServiceDummy.pollForCleanAndSyncTasks()
+        val actualResponse = getResolveResult(resolveMapping)
+
+        assertThat(actualResponse).usingRecursiveComparison().isEqualTo(expectedResponse)
+    }
+
+    @Test
+    fun `Legal Entity without BPNs`() {
+        //Mock Orchestrator responses
+        val mockedBusinessPartner = businessPartnerFactory.createFullBusinessPartner("test")
+            .copyWithBpnReferences(BpnReference.empty)
+            .copyWithLegalAddress(PostalAddress.empty)
+            .copy(site = null, additionalAddress = null)
+
+        val resolveMapping = mockOrchestratorResolveApi()
+        mockOrchestratorReserveApi(mockedBusinessPartner)
+
+        //Create expectations
+        val expectedResponse = createResultRequest(
+            mockedBusinessPartner
+                .copyWithBpnReferences(defaultBpnRequest)
+                .copyWithLegalAddress(mockedBusinessPartner.uncategorized.address!!)
+                .copyWithConfidenceCriteria(cleaningServiceDummy.dummyConfidenceCriteria)
+                .copyWithHasChanged(true, false, false)
+        )
+
+        // Call the method under test
+        cleaningServiceDummy.pollForCleanAndSyncTasks()
+        val actualResponse = getResolveResult(resolveMapping)
+
+        assertIsEqualIgnoreReferenceValue(actualResponse, expectedResponse)
+    }
+
+    @Test
+    fun `Legal Entity with BPNs`() {
+        //Mock Orchestrator responses
+        val mockedBusinessPartner = businessPartnerFactory.createFullBusinessPartner("test")
+            .copyWithLegalAddress(PostalAddress.empty)
+            .copy(site = null, additionalAddress = null)
+
+        val resolveMapping = mockOrchestratorResolveApi()
+        mockOrchestratorReserveApi(mockedBusinessPartner)
+
+        //Create expectations
+        val expectedResponse = createResultRequest(
+            mockedBusinessPartner
+                .copyWithLegalAddress(mockedBusinessPartner.uncategorized.address!!)
+                .copyWithConfidenceCriteria(cleaningServiceDummy.dummyConfidenceCriteria)
+                .copyWithHasChanged(true, false, false)
+        )
+
+        // Call the method under test
+        cleaningServiceDummy.pollForCleanAndSyncTasks()
+        val actualResponse = getResolveResult(resolveMapping)
+
+        assertThat(actualResponse).usingRecursiveComparison().isEqualTo(expectedResponse)
     }
 
 
-    fun mockOrchestratorReserveApi() {
+
+    fun mockOrchestratorReserveApi(businessPartner: BusinessPartner): StubMapping {
         // Orchestrator reserve
-        orchestratorMockApi.stubFor(
+        return orchestratorMockApi.stubFor(
             post(urlPathEqualTo(ORCHESTRATOR_RESERVE_TASKS_URL))
                 .willReturn(
-                    okJson(jacksonObjectMapper.writeValueAsString(createSampleTaskStepReservationResponse(businessPartnerWithBpnA)))
+                    okJson(jacksonObjectMapper.writeValueAsString(createSampleTaskStepReservationResponse(businessPartner)))
                 )
         )
     }
 
-    fun mockOrchestratorResolveApi() {
+    fun mockOrchestratorResolveApi(): StubMapping {
         // Orchestrator resolve
-        orchestratorMockApi.stubFor(
+        return orchestratorMockApi.stubFor(
             post(urlPathEqualTo(ORCHESTRATOR_RESOLVE_TASKS_URL))
                 .willReturn(aResponse().withStatus(200))
         )
     }
 
     // Helper method to create a sample TaskStepReservationResponse
-    private fun createSampleTaskStepReservationResponse(businessPartnerGenericDto: BusinessPartnerGenericDto): TaskStepReservationResponse {
-        val fullDto = BusinessPartnerFullDto(businessPartnerGenericDto)
-        return TaskStepReservationResponse(listOf(TaskStepReservationEntryDto(fixedTaskId, fullDto)), Instant.MIN)
+    private fun createSampleTaskStepReservationResponse(businessPartner: BusinessPartner): TaskStepReservationResponse {
+        return TaskStepReservationResponse(listOf(TaskStepReservationEntryDto(fixedTaskId, businessPartner)), Instant.MIN)
     }
+
+
+    private fun getResolveResult(stubMapping: StubMapping): TaskStepResultRequest{
+        val serveEvents = orchestratorMockApi.getServeEvents(ServeEventQuery.forStubMapping(stubMapping)).requests
+        assertEquals(serveEvents.size, 1)
+        val actualRequest = serveEvents.first()!!.request
+        return jacksonObjectMapper.readValue<TaskStepResultRequest>(actualRequest.body)
+    }
+
+    private fun assertIsEqualIgnoreReferenceValue(actual: TaskStepResultRequest, expected: TaskStepResultRequest){
+        assertThat(actual)
+            .usingRecursiveComparison()
+            .ignoringFieldsMatchingRegexes(
+                ".*.${BpnReference::referenceValue.name}"
+            )
+            .isEqualTo(expected)
+    }
+
+    private fun createResultRequest(expectedBusinessPartner: BusinessPartner): TaskStepResultRequest {
+        return TaskStepResultRequest(
+            TaskStep.CleanAndSync, listOf(
+                TaskStepResultEntryDto(
+                    fixedTaskId,
+                    expectedBusinessPartner,
+                    emptyList()
+                )
+            )
+        )
+    }
+
 
 }

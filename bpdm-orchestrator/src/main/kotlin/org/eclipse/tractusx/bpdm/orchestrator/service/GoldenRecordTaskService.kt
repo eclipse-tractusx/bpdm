@@ -26,6 +26,7 @@ import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmTaskNotFoundExceptio
 import org.eclipse.tractusx.bpdm.orchestrator.model.GoldenRecordTask
 import org.eclipse.tractusx.bpdm.orchestrator.model.TaskProcessingState
 import org.eclipse.tractusx.orchestrator.api.model.*
+import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.time.Instant
@@ -141,24 +142,18 @@ class GoldenRecordTaskService(
 
     private fun initTask(
         createRequest: TaskCreateRequest,
-        businessPartnerGeneric: BusinessPartnerGenericDto
+        businessPartner: BusinessPartner
     ) = GoldenRecordTask(
         taskId = UUID.randomUUID().toString(),
-        businessPartner = BusinessPartnerFullDto(
-            generic = businessPartnerGeneric
-        ),
+        businessPartner = businessPartner,
         processingState = goldenRecordTaskStateMachine.initProcessingState(createRequest.mode)
     )
 
     private fun toTaskClientStateDto(task: GoldenRecordTask): TaskClientStateDto {
-        val businessPartnerResult = when (task.processingState.resultState) {
-            ResultState.Success -> task.businessPartner.generic
-            else -> null
-        }
         return TaskClientStateDto(
             taskId = task.taskId,
             processingState = toTaskProcessingStateDto(task.processingState),
-            businessPartnerResult = businessPartnerResult
+            businessPartnerResult = task.businessPartner
         )
     }
 

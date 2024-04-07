@@ -86,10 +86,6 @@ server:
   # Change default port to avoid clash with other BPDM applications
   port: 8085
 spring:
-  profiles:
-    group:
-      # BPDM common shortcut to remove all authentication configuration
-      no-auth: no-api-auth
   security:
     oauth2:
       resourceserver:

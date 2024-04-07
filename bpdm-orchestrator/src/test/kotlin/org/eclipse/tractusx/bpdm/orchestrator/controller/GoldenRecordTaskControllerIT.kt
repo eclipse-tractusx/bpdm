@@ -24,9 +24,10 @@ import org.assertj.core.api.ThrowableAssert
 import org.assertj.core.data.TemporalUnitOffset
 import org.eclipse.tractusx.bpdm.orchestrator.config.TaskConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.service.GoldenRecordTaskStorage
-import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerGenericCommonValues
+import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.BusinessPartnerTestDataFactory
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.*
+import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -54,6 +55,10 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
     val goldenRecordTaskStorage: GoldenRecordTaskStorage
 ) {
 
+    private val testDataFactory = BusinessPartnerTestDataFactory()
+    private val defaultBusinessPartner1 = testDataFactory.createFullBusinessPartner("BP1")
+    private val defaultBusinessPartner2 = testDataFactory.createFullBusinessPartner("BP2")
+
     @BeforeEach
     fun cleanUp() {
         goldenRecordTaskStorage.clear()
@@ -76,7 +81,6 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
         assertThat(createdTasks[0].taskId).isNotEqualTo(createdTasks[1].taskId)
 
         createdTasks.forEach { stateDto ->
-            assertThat(stateDto.businessPartnerResult).isNull()
             val processingState = stateDto.processingState
             assertProcessingStateDto(processingState, ResultState.Pending, TaskStep.CleanAndSync, StepState.Queued)
             assertThat(processingState.errors).isEqualTo(emptyList<TaskErrorDto>())
@@ -129,11 +133,8 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
         assertThat(reservedTasks.map { it.taskId }).isEqualTo(createdTasks.map { it.taskId })
 
         // ...and with the correct business partner information
-        assertThat(reservedTasks[0].businessPartner.generic).isEqualTo(BusinessPartnerGenericCommonValues.businessPartner1)
-        assertThat(reservedTasks[1].businessPartner.generic).isEqualTo(BusinessPartnerGenericCommonValues.businessPartner2)
-        assertThat(reservedTasks[1].businessPartner.legalEntity).isNull()
-        assertThat(reservedTasks[1].businessPartner.site).isNull()
-        assertThat(reservedTasks[1].businessPartner.address).isNull()
+        assertThat(reservedTasks[0].businessPartner).isEqualTo(defaultBusinessPartner1)
+        assertThat(reservedTasks[1].businessPartner).isEqualTo(defaultBusinessPartner2)
 
         // trying to reserve more tasks returns no additional entries
         val reservationResponse2 = reserveTasks(TaskStep.CleanAndSync)
@@ -143,7 +144,6 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
         val statesResponse = searchTaskStates(reservedTasks.map { it.taskId })
         assertThat(statesResponse.tasks.size).isEqualTo(2)
         statesResponse.tasks.forEach { stateDto ->
-            assertThat(stateDto.businessPartnerResult).isNull()
             val processingState = stateDto.processingState
             // stepState should have changed to Reserved
             assertProcessingStateDto(processingState, ResultState.Pending, TaskStep.CleanAndSync, StepState.Reserved)
@@ -187,7 +187,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
         // reserve task for step==CleanAndSync
         val reservedTasks1 = reserveTasks(TaskStep.CleanAndSync, 1).reservedTasks
         val taskId = reservedTasks1.single().taskId
-        assertThat(reservedTasks1[0].businessPartner.generic).isEqualTo(BusinessPartnerGenericCommonValues.businessPartner1)
+        assertThat(reservedTasks1[0].businessPartner).isEqualTo(defaultBusinessPartner1)
 
         // now in stepState==Reserved
         assertProcessingStateDto(
@@ -196,10 +196,10 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
         )
 
         // resolve task
-        val businessPartnerFull1 = BusinessPartnerGenericCommonValues.businessPartner2Full
+        val businessPartnerResolved1 = testDataFactory.createFullBusinessPartner("Resolved BP1")
         val resultEntry1 = TaskStepResultEntryDto(
             taskId = taskId,
-            businessPartner = businessPartnerFull1
+            businessPartner = businessPartnerResolved1
         )
         resolveTasks(TaskStep.CleanAndSync, listOf(resultEntry1))
 
@@ -212,7 +212,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
         // reserve task for step==PoolSync
         val reservedTasks2 = reserveTasks(TaskStep.PoolSync, 3).reservedTasks
         assertThat(reservedTasks2.size).isEqualTo(1)
-        assertThat(reservedTasks2.single().businessPartner).isEqualTo(businessPartnerFull1)
+        assertThat(reservedTasks2.single().businessPartner).isEqualTo(businessPartnerResolved1)
 
         // now in stepState==Queued
         val stateDto = searchTaskStates(listOf(taskId)).tasks.single()
@@ -220,19 +220,12 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
             stateDto.processingState,
             ResultState.Pending, TaskStep.PoolSync, StepState.Reserved
         )
-        assertThat(stateDto.businessPartnerResult).isNull()
 
         // resolve task again
-        val businessPartnerFull2 = businessPartnerFull1.copy(
-            generic = with(businessPartnerFull1.generic) {
-                copy(
-                    legalEntity = legalEntity.copy(legalEntityBpn = "BPNL-test")
-                )
-            }
-        )
+        val businessPartnerResolved2 = with(businessPartnerResolved1){ copy(legalEntity = with(legalEntity){ copy(bpnReference = bpnReference.copy(referenceValue = "BPNL-test" )) }) }
         val resultEntry2 = TaskStepResultEntryDto(
             taskId = taskId,
-            businessPartner = businessPartnerFull2
+            businessPartner = businessPartnerResolved2
         )
         resolveTasks(TaskStep.PoolSync, listOf(resultEntry2))
 
@@ -243,7 +236,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
             ResultState.Success, TaskStep.PoolSync, StepState.Success
         )
         // check returned BP
-        assertThat(finalStateDto.businessPartnerResult).isEqualTo(businessPartnerFull2.generic)
+        assertThat(finalStateDto.businessPartnerResult).isEqualTo(businessPartnerResolved2)
     }
 
     /**
@@ -267,6 +260,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
         val errorDto = TaskErrorDto(TaskErrorType.Unspecified, "Unfortunate event")
         val resultEntry = TaskStepResultEntryDto(
             taskId = taskId,
+            businessPartner = defaultBusinessPartner1,
             errors = listOf(errorDto)
         )
         resolveTasks(TaskStep.CleanAndSync, listOf(resultEntry))
@@ -277,7 +271,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
             stateDto.processingState,
             ResultState.Error, TaskStep.CleanAndSync, StepState.Error
         )
-        assertThat(stateDto.businessPartnerResult).isNull()
+
         // expect error in response
         assertThat(stateDto.processingState.errors.single()).isEqualTo(errorDto)
     }
@@ -290,10 +284,10 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
     fun `expect exception on requesting too many cleaning tasks`() {
         // Create entries above the upsert limit of 3
         val businessPartners = listOf(
-            BusinessPartnerGenericCommonValues.businessPartner1,
-            BusinessPartnerGenericCommonValues.businessPartner1,
-            BusinessPartnerGenericCommonValues.businessPartner1,
-            BusinessPartnerGenericCommonValues.businessPartner1
+            testDataFactory.createFullBusinessPartner("BP1"),
+            testDataFactory.createFullBusinessPartner("BP2"),
+            testDataFactory.createFullBusinessPartner("BP3"),
+            testDataFactory.createFullBusinessPartner("BP4")
         )
 
         assertBadRequestException {
@@ -321,7 +315,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
     fun `expect exception on posting too many task results`() {
         val validResultEntry = TaskStepResultEntryDto(
             taskId = "0",
-            businessPartner = null,
+            businessPartner = defaultBusinessPartner1,
             errors = listOf(TaskErrorDto(type = TaskErrorType.Unspecified, description = "Description"))
         )
 
@@ -362,19 +356,8 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
                 TaskStep.CleanAndSync,
                 listOf(
                     TaskStepResultEntryDto(
-                        taskId = "WRONG-ID"
-                    )
-                )
-            )
-        }
-
-        // post correct task id but empty content
-        assertBadRequestException {
-            resolveTasks(
-                TaskStep.CleanAndSync,
-                listOf(
-                    TaskStepResultEntryDto(
-                        taskId = tasksIds[0]
+                        taskId = "WRONG-ID",
+                        businessPartner = defaultBusinessPartner1
                     )
                 )
             )
@@ -387,7 +370,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
                 listOf(
                     TaskStepResultEntryDto(
                         taskId = tasksIds[0],
-                        businessPartner = BusinessPartnerGenericCommonValues.businessPartner1Full
+                        businessPartner = defaultBusinessPartner1
                     )
                 )
             )
@@ -399,7 +382,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
             listOf(
                 TaskStepResultEntryDto(
                     taskId = tasksIds[0],
-                    businessPartner = BusinessPartnerGenericCommonValues.businessPartner1Full
+                    businessPartner = defaultBusinessPartner1
                 )
             )
         )
@@ -411,7 +394,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
                 listOf(
                     TaskStepResultEntryDto(
                         taskId = tasksIds[0],
-                        businessPartner = BusinessPartnerGenericCommonValues.businessPartner1Full
+                        businessPartner = defaultBusinessPartner1
                     )
                 )
             )
@@ -422,8 +405,10 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
             TaskStep.CleanAndSync,
             listOf(
                 TaskStepResultEntryDto(
-                    tasksIds[1], errors = listOf(
-                        TaskErrorDto(type = TaskErrorType.Unspecified, "ERROR")
+                    tasksIds[1],
+                    businessPartner = defaultBusinessPartner1,
+                    errors = listOf(
+                        TaskErrorDto(type = TaskErrorType.Unspecified, description = "ERROR")
                     )
                 )
             )
@@ -469,7 +454,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
     @Test
     fun `wait for task retention timeout after success`() {
         // create single task in UpdateFromPool mode (only one step)
-        createTasks(TaskMode.UpdateFromPool, listOf(BusinessPartnerGenericCommonValues.businessPartner1))
+        createTasks(TaskMode.UpdateFromPool, listOf(defaultBusinessPartner1))
 
         // reserve task
         val reservedTask = reserveTasks(TaskStep.Clean).reservedTasks.single()
@@ -502,7 +487,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
     @Test
     fun `wait for task retention timeout after error`() {
         // create single task in UpdateFromPool mode (only one step)
-        createTasks(TaskMode.UpdateFromPool, listOf(BusinessPartnerGenericCommonValues.businessPartner1))
+        createTasks(TaskMode.UpdateFromPool, listOf(defaultBusinessPartner1))
 
         // reserve task
         val reservedTask = reserveTasks(TaskStep.Clean).reservedTasks.single()
@@ -533,11 +518,11 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
         assertThat(foundTasks.size).isZero()
     }
 
-    private fun createTasks(mode: TaskMode = TaskMode.UpdateFromSharingMember, businessPartners: List<BusinessPartnerGenericDto>? = null): TaskCreateResponse =
+    private fun createTasks(mode: TaskMode = TaskMode.UpdateFromSharingMember, businessPartners: List<BusinessPartner>? = null): TaskCreateResponse =
         orchestratorClient.goldenRecordTasks.createTasks(
             TaskCreateRequest(
                 mode = mode,
-                businessPartners = businessPartners ?: listOf(BusinessPartnerGenericCommonValues.businessPartner1, BusinessPartnerGenericCommonValues.businessPartner2)
+                businessPartners = businessPartners ?: listOf(defaultBusinessPartner1, defaultBusinessPartner2)
             )
         )
 

@@ -27,7 +27,7 @@ import org.eclipse.tractusx.bpdm.orchestrator.config.TaskConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmIllegalStateException
 import org.eclipse.tractusx.bpdm.orchestrator.model.GoldenRecordTask
 import org.eclipse.tractusx.bpdm.orchestrator.model.TaskProcessingState
-import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerGenericCommonValues
+import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.BusinessPartnerTestDataFactory
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -49,6 +49,10 @@ class GoldenRecordTaskStateMachineIT @Autowired constructor(
     val goldenRecordTaskStateMachine: GoldenRecordTaskStateMachine,
     val taskConfigProperties: TaskConfigProperties
 ) {
+
+    private val testDataFactory = BusinessPartnerTestDataFactory()
+
+    private val businessPartnerFull = testDataFactory.createFullBusinessPartner("full")
 
     /**
      * WHEN creating an initial TaskProcessingState
@@ -94,12 +98,12 @@ class GoldenRecordTaskStateMachineIT @Autowired constructor(
         }.isInstanceOf(BpdmIllegalStateException::class.java)
 
         // 1st resolve
-        goldenRecordTaskStateMachine.doResolveTaskToSuccess(task, TaskStep.CleanAndSync, BusinessPartnerGenericCommonValues.businessPartner1Full)
+        goldenRecordTaskStateMachine.doResolveTaskToSuccess(task, TaskStep.CleanAndSync, businessPartnerFull)
         assertProcessingStateDto(task.processingState, ResultState.Pending, TaskStep.PoolSync, StepState.Queued)
 
         // Can't resolve again!
         assertThatThrownBy {
-            goldenRecordTaskStateMachine.doResolveTaskToSuccess(task, TaskStep.CleanAndSync, BusinessPartnerGenericCommonValues.businessPartner1Full)
+            goldenRecordTaskStateMachine.doResolveTaskToSuccess(task, TaskStep.CleanAndSync, businessPartnerFull)
         }.isInstanceOf(BpdmIllegalStateException::class.java)
 
         // 2nd reserve
@@ -108,14 +112,14 @@ class GoldenRecordTaskStateMachineIT @Autowired constructor(
 
         // Can't resolve with wrong step (CleanAndSync)!
         assertThatThrownBy {
-            goldenRecordTaskStateMachine.doResolveTaskToSuccess(task, TaskStep.CleanAndSync, BusinessPartnerGenericCommonValues.businessPartner1Full)
+            goldenRecordTaskStateMachine.doResolveTaskToSuccess(task, TaskStep.CleanAndSync, businessPartnerFull)
         }.isInstanceOf(BpdmIllegalStateException::class.java)
 
         // taskPendingTimeout is still the same
         assertThat(task.processingState.taskPendingTimeout).isEqualTo(taskPendingTimeout)
 
         // 2nd and final resolve
-        goldenRecordTaskStateMachine.doResolveTaskToSuccess(task, TaskStep.PoolSync, BusinessPartnerGenericCommonValues.businessPartner1Full)
+        goldenRecordTaskStateMachine.doResolveTaskToSuccess(task, TaskStep.PoolSync, businessPartnerFull)
         assertProcessingStateDto(task.processingState, ResultState.Success, TaskStep.PoolSync, StepState.Success)
 
         // taskRetentionTimeout has been set; taskPendingTimeout has been reset
@@ -157,7 +161,7 @@ class GoldenRecordTaskStateMachineIT @Autowired constructor(
         Thread.sleep(10)
 
         // resolve
-        goldenRecordTaskStateMachine.doResolveTaskToSuccess(task, TaskStep.Clean, BusinessPartnerGenericCommonValues.businessPartner1Full)
+        goldenRecordTaskStateMachine.doResolveTaskToSuccess(task, TaskStep.Clean, businessPartnerFull)
         assertProcessingStateDto(task.processingState, ResultState.Success, TaskStep.Clean, StepState.Success)
         val modified2 = task.processingState.taskModifiedAt
         assertThat(modified2).isAfter(modified1)
@@ -211,7 +215,7 @@ class GoldenRecordTaskStateMachineIT @Autowired constructor(
 
         // Can't resolve now!
         assertThatThrownBy {
-            goldenRecordTaskStateMachine.doResolveTaskToSuccess(task, TaskStep.Clean, BusinessPartnerGenericCommonValues.businessPartner1Full)
+            goldenRecordTaskStateMachine.doResolveTaskToSuccess(task, TaskStep.Clean, businessPartnerFull)
         }.isInstanceOf(BpdmIllegalStateException::class.java)
     }
 
@@ -224,9 +228,7 @@ class GoldenRecordTaskStateMachineIT @Autowired constructor(
     private fun initTask(mode: TaskMode = TaskMode.UpdateFromSharingMember) =
         GoldenRecordTask(
             taskId = TASK_ID,
-            businessPartner = BusinessPartnerFullDto(
-                generic = BusinessPartnerGenericCommonValues.businessPartner1
-            ),
+            businessPartner = businessPartnerFull,
             processingState = goldenRecordTaskStateMachine.initProcessingState(mode)
         )
 }

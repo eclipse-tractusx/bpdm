@@ -28,7 +28,7 @@ data class TaskClientStateDto(
     @get:Schema(required = true)
     val taskId: String,
 
-    val businessPartnerResult: BusinessPartnerGenericDto?,
+    val businessPartnerResult: BusinessPartner,
 
     @get:Schema(required = true)
     val processingState: TaskProcessingStateDto

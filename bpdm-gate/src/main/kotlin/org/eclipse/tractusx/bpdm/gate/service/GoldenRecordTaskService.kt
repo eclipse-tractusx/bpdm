@@ -34,6 +34,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.*
+import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -63,7 +64,7 @@ class GoldenRecordTaskService(
 
         val partners = businessPartnerRepository.findByStageAndExternalIdIn(StageType.Input, foundStates.map { it.externalId })
 
-        val orchestratorBusinessPartnersDto = partners.map { orchestratorMappings.toBusinessPartnerGenericDto(it) }
+        val orchestratorBusinessPartnersDto = partners.map { orchestratorMappings.toOrchestratorDto(it) }
 
         val createdTasks = createGoldenRecordTasks(TaskMode.UpdateFromSharingMember, orchestratorBusinessPartnersDto)
 
@@ -96,10 +97,13 @@ class GoldenRecordTaskService(
             .map { Pair(it, sharingStateMap[it.taskId]!!) }
             .groupBy { (task, _) -> task.processingState.resultState }
 
+        val businessPartnerInput = taskStatesByResult[ResultState.Success]?.let { businessPartnerRepository.findByStageAndExternalIdIn(StageType.Input, it.map { (_, sharingState) -> sharingState.externalId }) } ?: emptyList()
+        val inputByExternalId = businessPartnerInput.associateBy { it.externalId }
+
         val sharingStatesWithoutTasks = sharingStates.filter { it.taskId !in tasks.map { task -> task.taskId } }
 
         val businessPartnersToUpsert = taskStatesByResult[ResultState.Success]?.map { (task, sharingState) ->
-            orchestratorMappings.toBusinessPartner(task.businessPartnerResult!!, sharingState.externalId,sharingState.associatedOwnerBpnl)
+            orchestratorMappings.toBusinessPartner(task.businessPartnerResult, sharingState.externalId, sharingState.associatedOwnerBpnl, inputByExternalId[sharingState.externalId]?.roles?.toSortedSet() ?: sortedSetOf() )
         } ?: emptyList()
         businessPartnerService.upsertBusinessPartnersOutputFromCandidates(businessPartnersToUpsert)
 
@@ -146,7 +150,7 @@ class GoldenRecordTaskService(
         val gateOutputEntries = businessPartnerRepository.findByStageAndBpnLInOrBpnSInOrBpnAIn(StageType.Output, bpnL, bpnS, bpnA)
 
         val businessPartnerGenericDtoList = gateOutputEntries.map { bp ->
-            orchestratorMappings.toBusinessPartnerGenericDto(bp)
+            orchestratorMappings.toOrchestratorDto(bp)
         }
 
         val tasks = createGoldenRecordTasks(TaskMode.UpdateFromPool, businessPartnerGenericDtoList)
@@ -168,7 +172,7 @@ class GoldenRecordTaskService(
         logger.info { "Created ${tasks.size} new golden record tasks from pool updates" }
     }
 
-    private fun createGoldenRecordTasks(mode: TaskMode, orchestratorBusinessPartnersDto: List<BusinessPartnerGenericDto>): List<TaskClientStateDto> {
+    private fun createGoldenRecordTasks(mode: TaskMode, orchestratorBusinessPartnersDto: List<BusinessPartner>): List<TaskClientStateDto> {
         if (orchestratorBusinessPartnersDto.isEmpty())
             return emptyList()
 
