@@ -92,12 +92,12 @@ These property files count to the operation views documentation.
 ## Installation via Docker
 
 Each BPDM application has an exemplary Dockerfile that can be used to install the BPDM application in a container.
-Please refer to the [README](../README.md#container-images) for more information.
+Please refer to the [README](../../README.md#container-images) for more information.
 
 ## Installation via Helm
 
 This repository contains Helm files for deploying BPDM Applications to a Kubernetes environment.
-See the [BPDM Chart](../charts/bpdm) for details.
+See the [BPDM Chart](../../charts/bpdm) for details.
 
 ## Post-Run Configuration
 
@@ -113,7 +113,7 @@ If a technical key does not exist in the respective metadata the Pool rejects th
 Administrative level 1 areas follows the ISO 3166-2 norm and is filled by default.
 Such metadata does not need to be added by the operator.
 
-The [use case Postman collection](postman/BPDM Tests.postman_collection.json) shows which metadata can be added and how that is done.
+The [use case Postman collection](../postman/BPDM%20Tests.postman_collection.json) shows which metadata can be added and how that is done.
 Refer to use cases for Operators(O):
 
 - CL: Shows how to add available legal forms
@@ -134,7 +134,7 @@ For deploying an EDC please consult the documentation on the [EDC repository](ht
 The general idea of configuring data offers for BPDM is to assets which grant access to a portion of the BPDM APIs.
 Which API resources are accessible over an asset is determined by the purposes defined in the BPDM framework agreement.
 For some purposes you may need to access business partner output data from the BPDM Gate for example but won't have access to the input data.
-Blueprints for such assets are documented in this [POSTMAN collection](postman/EDC Provider Setup.postman_collection.json).
+Blueprints for such assets are documented in this [POSTMAN collection](../postman/EDC Provider Setup.postman_collection.json).
 Accompanying the asset definitions are Policy and Contract Definition blueprints.
 Except for a general Access Policy those blueprints are grouped by purpose.
 
