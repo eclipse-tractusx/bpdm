@@ -55,6 +55,15 @@ Furthermore, apart from the release workflows there also exists code scanning wo
 
 This README is just the gateway to more detailed documentation files that may be found in the [docs](docs) folder
 
+## Docker Notice
+
+Below you can find information to the used Docker images in this application:
+
+* [BPDM Pool](docker/pool/DOCKER_NOTICE.md)
+* [BPDM Gate](docker/gate/DOCKER_NOTICE.md)
+* [BPDM Orchestrator](docker/orchestrator/DOCKER_NOTICE.md)
+* [BPDM Cleaning Service Dummy](docker/cleaning-service-dummy/DOCKER_NOTICE.md)
+
 ## NOTICE
 
 This work is licensed under the [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0).
