@@ -25,10 +25,14 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 
 @ConfigurationProperties(prefix = PREFIX)
 data class PermissionConfigProperties(
-    val readInput: String = "read_input",
-    val writeInput: String = "write_input",
-    val readOutput: String = "read_output",
-    val writeOutput: String = "write_output"
+    val readInputPartner: String = "read_input_partner",
+    val writeInputPartner: String = "write_input_partner",
+    val readOutputPartner: String = "read_output_partner",
+    val readInputChangelog: String = "read_input_changelog",
+    val readOutputChangelog: String = "read_output_changelog",
+    val readSharingState: String = "read_sharing_state",
+    val writeSharingState: String = "write_sharing_state",
+    val readStats: String = "read_stats"
 ) {
     companion object {
         const val PREFIX = "bpdm.security.permissions"
@@ -37,9 +41,13 @@ data class PermissionConfigProperties(
         private const val QUALIFIED_NAME = "org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties"
         private const val BEAN_QUALIFIER = "'$PREFIX-$QUALIFIED_NAME'"
 
-        const val READ_INPUT_AUTHORITY = "@$BEAN_QUALIFIER.getReadInput()"
-        const val WRITE_INPUT_AUTHORITY = "@$BEAN_QUALIFIER.getWriteInput()"
-        const val READ_OUTPUT_AUTHORITY = "@$BEAN_QUALIFIER.getReadOutput()"
-        const val WRITE_OUTPUT_AUTHORITY = "@$BEAN_QUALIFIER.getWriteOutput()"
+        const val READ_INPUT_PARTNER = "@$BEAN_QUALIFIER.getReadInputPartner()"
+        const val WRITE_INPUT_PARTNER = "@$BEAN_QUALIFIER.getWriteInputPartner()"
+        const val READ_OUTPUT_PARTNER = "@$BEAN_QUALIFIER.getReadOutputPartner()"
+        const val READ_INPUT_CHANGELOG = "@$BEAN_QUALIFIER.getReadInputChangelog()"
+        const val READ_OUTPUT_CHANGELOG = "@$BEAN_QUALIFIER.getReadOutputChangelog()"
+        const val READ_SHARING_STATE = "@$BEAN_QUALIFIER.getReadSharingState()"
+        const val WRITE_SHARING_STATE = "@$BEAN_QUALIFIER.getWriteSharingState()"
+        const val READ_STATS = "@$BEAN_QUALIFIER.getReadStats()"
     }
 }

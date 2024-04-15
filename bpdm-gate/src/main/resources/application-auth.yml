@@ -28,22 +28,30 @@ bpdm:
     # URL to the auth endpoint of the Keycloak server
     auth-url: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}/protocol/openid-connect/auth
     # This application's resource or client. Used for finding permissions in the given Bearer token
-    client-id: BPDM_GATE
+    client-id: BPDM-GATE
     # The keycloak realm to consider
-    realm: master
+    realm: CX-Central
     # URL to the token refresh endpoint of the Keycloak server
     refresh-url: ${bpdm.security.token-url}
     # URL to the token validation endpoint of the Keycloak server
     token-url: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}/protocol/openid-connect/token
     permissions:
       # Name of the permission to read business partner input data
-      readInput: read_input
+      readInputPartner: read_input_partner
       # Name of the permission to upsert input business partner input data
-      writeInput: write_input
+      writeInputPartner: write_input_partner
       # Name of the permission to read business partner output data
-      readOutput: read_output
-      # Name of the permission to upsert business partner output data
-      writeOutput: write_input
+      readOutputPartner: read_output_partner
+      # Name of the permission to read changelog entries for business partner input data
+      readInputChangelog: read_input_changelog
+      # Name of the permission to read changelog entries for business partner output data
+      readOutputChangelog: read_output_changelog
+      # Name of the permission to read business partner sharing states
+      readSharingState: read_sharing_state
+      # Name of the permission to change business partner sharing states
+      writeSharingState: write_sharing_state
+      # Name of the permission to read business partner statistics
+      read_stats: read_stats
 #
 # From here on are framework and dependency configuration
 # More information about those properties can be taken from the respective documentation of Spring or the dependency
