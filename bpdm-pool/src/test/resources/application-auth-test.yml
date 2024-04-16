@@ -19,10 +19,10 @@
 
 bpdm:
   client:
-    orchestrator:
+    self:
       # Name of the Spring oauth2 client registration entry for connecting to the Orchestrator
       # This registration will be used to configure this application's webclients that want to access the Orchestrator
-      oauth2-client-registration: orchestrator-client
+      oauth2-client-registration: self-client
       # Whether to enable oauth2 authentication when connecting to the Orchestrator
       security-enabled: true
 #
@@ -36,16 +36,16 @@ spring:
         provider:
           # Create an oauth2 provider for the pool and infer token issuing uri from the security properties
           # If auth profile is not set use equivalent defaults
-          orchestrator-oauth2-provider:
+          self-oauth2-provider:
             issuer-uri: ${bpdm.security.auth-server-url:http://localhost:8180}/realms/${bpdm.security.realm:master}
         registration:
           # Register oauth2 client information on how to acquire a token for the Orchestrator
-          orchestrator-client:
+          self-client:
             # The orchestrator client should use client credentials mechanism to request a token from the provider
             authorization-grant-type: client_credentials
             # Use a default client id for the client credentials request
-            client-id: GATE-ORCHESTRATOR-TASK_CREATOR
+            client-id:
             # No secret on default (please update credentials for production)
             client-secret:
             # Use the specified provider above to infer the issuing token uri
-            provider: orchestrator-oauth2-provider
+            provider: self-oauth2-provider

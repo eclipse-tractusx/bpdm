@@ -63,7 +63,7 @@ spring:
             # The pool client should use client credentials mechanism to request a token from the provider
             authorization-grant-type: client_credentials
             # Use a default client id for the client credentials request
-            client-id: BPDM_POOL_CLIENT
+            client-id: GATE-POOL-SHARING_MEMBER
             # No secret on default (please update credentials for production)
             client-secret:
             # Use the specified provider above to infer the issuing token uri

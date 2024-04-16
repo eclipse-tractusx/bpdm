@@ -50,11 +50,11 @@ interface MetadataApiClient: PoolMetadataApi {
 
     @GetExchange("/identifier-types")
     override fun getIdentifierTypes(
-        paginationRequest: PaginationRequest,
+        @ParameterObject paginationRequest: PaginationRequest,
         @RequestParam businessPartnerType: IdentifierBusinessPartnerType,
         @RequestParam country: CountryCode?
     ): PageDto<IdentifierTypeDto>
 
     @GetExchange("/legal-forms")
-    override fun getLegalForms(paginationRequest: PaginationRequest): PageDto<LegalFormDto>
+    override fun getLegalForms(@ParameterObject paginationRequest: PaginationRequest): PageDto<LegalFormDto>
 }

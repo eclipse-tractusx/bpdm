@@ -17,9 +17,11 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################################
 
+
+
 logging:
   level:
-    root: INFO
+    root: DEBUG
 
 spring:
   datasource:
