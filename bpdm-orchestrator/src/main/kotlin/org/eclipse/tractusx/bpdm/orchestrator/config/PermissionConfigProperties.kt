@@ -27,8 +27,17 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 @ConfigurationProperties(prefix = PREFIX)
 data class PermissionConfigProperties(
     val createTask: String = "create_task",
-    val viewTask: String = "view_task",
-    val processTask: ProcessTaskProperties = ProcessTaskProperties()
+    val readTask: String = "read_task",
+    val reservations: TaskStepProperties = TaskStepProperties(
+        clean = "create_reservation_clean",
+        cleanAndSync = "create_reservation_cleanAndSync",
+        poolSync = "create_reservation_poolSync"
+    ),
+    val results: TaskStepProperties = TaskStepProperties(
+        clean = "create_result_clean",
+        cleanAndSync = "create_result_cleanAndSync",
+        poolSync = "create_result_poolSync"
+    )
 ) {
     companion object {
         const val PREFIX = "bpdm.security.permissions"
@@ -38,28 +47,35 @@ data class PermissionConfigProperties(
         private const val BEAN_QUALIFIER = "'$PREFIX-$QUALIFIED_NAME'"
 
         const val CREATE_TASK = "@$BEAN_QUALIFIER.getCreateTask()"
-        const val VIEW_TASK = "@$BEAN_QUALIFIER.getViewTask()"
-        const val GET_PROCESS_TASK = "@$BEAN_QUALIFIER.getProcessTask"
+        const val VIEW_TASK = "@$BEAN_QUALIFIER.getReadTask()"
+        const val INVOKE_CREATE_RESERVATION = "@$BEAN_QUALIFIER.createReservation"
+        const val INVOKE_CREATE_RESULT = "@$BEAN_QUALIFIER.createResult"
     }
 
     @Suppress("unused")
-    fun getProcessTask(step: TaskStep): String {
+    fun createReservation(step: TaskStep): String{
+        return fetchStepPermission(step, reservations)
+    }
+
+    @Suppress("unused")
+    fun createResult(step: TaskStep): String{
+        return fetchStepPermission(step, results)
+    }
+
+
+    private fun fetchStepPermission(step: TaskStep, stepProperties: TaskStepProperties): String{
         return when (step) {
-            TaskStep.CleanAndSync -> processTask.cleanAndSync
-            TaskStep.PoolSync -> processTask.poolSync
-            TaskStep.Clean -> processTask.clean
+            TaskStep.CleanAndSync -> stepProperties.cleanAndSync
+            TaskStep.PoolSync -> stepProperties.poolSync
+            TaskStep.Clean -> stepProperties.clean
         }
     }
 
-    data class ProcessTaskProperties(
-        val clean: String = toDefaultValue(TaskStep.Clean),
-        val cleanAndSync: String = toDefaultValue(TaskStep.CleanAndSync),
-        val poolSync: String = toDefaultValue(TaskStep.PoolSync)
-    ) {
-        companion object {
-            fun toDefaultValue(step: TaskStep) = "process_task_step_${step.name}"
-        }
-    }
+    data class TaskStepProperties(
+        val clean: String,
+        val cleanAndSync: String,
+        val poolSync: String
+    )
 }
 
 
