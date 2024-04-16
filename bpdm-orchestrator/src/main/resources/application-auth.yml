@@ -28,7 +28,7 @@ bpdm:
     # URL to the auth endpoint of the Keycloak server
     auth-url: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}/protocol/openid-connect/auth
     # This application's resource or client. Used for finding permissions in the given Bearer token
-    client-id: BPDM_GATE
+    client-id: BPDM-ORCHESTRATOR
     # The keycloak realm to consider
     realm: master
     # URL to the token refresh endpoint of the Keycloak server
@@ -36,17 +36,31 @@ bpdm:
     # URL to the token validation endpoint of the Keycloak server
     token-url: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}/protocol/openid-connect/token
     permissions:
-      # Name of permission for creating new tasks
-      createTask: create_task
-      # Name of permission for view status of tasks
-      viewTask: view_task
-      processTask:
-        # Name of permission to reserve and post results for tasks in state 'Clean'
-        clean: process_task_clean
-        # Name of permission to reserve and post results for tasks in state 'CleanAndSync'
-        cleanAndSync: process_task_cleanAndSync
-        # Name of permission to reserve and post results for tasks in state 'PoolSync'
-        poolSync: process_task_poolSync
+      task:
+        # Name of permission to create golden record tasks
+        create: create_task
+        # Name of permission to read task status and overall results
+        read: read_task
+      reservation:
+        clean:
+          # Name of permission to create reservations for tasks in step 'Clean'
+          create: create_reservation_clean
+        cleanAndSync:
+          # Name of permission to create reservations for tasks in step 'CleanAndSync'
+          create: create_reservation_cleanAndSync
+        poolSync:
+          # Name of permission to create reservations for tasks in step 'PoolSync'
+          create: create_reservation_poolSync
+      result:
+        clean:
+          # Name of permission to post results for tasks in step 'Clean'
+          create: create_result_clean
+        cleanAndSync:
+          # Name of permission to post results for tasks in step 'CleanAndSync'
+          create: create_result_cleanAndSync
+        poolSync:
+          # Name of permission to post results for tasks in step 'PoolSync'
+          create: create_result_poolSync
 #
 # From here on are framework and dependency configuration
 # More information about those properties can be taken from the respective documentation of Spring or the dependency
