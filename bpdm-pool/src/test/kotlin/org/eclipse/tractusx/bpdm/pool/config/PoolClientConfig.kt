@@ -20,8 +20,9 @@
 package org.eclipse.tractusx.bpdm.pool.config
 
 
-import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
+import org.eclipse.tractusx.bpdm.test.config.SelfClientConfigProperties
+import org.eclipse.tractusx.bpdm.test.util.BpdmOAuth2ClientFactory
 import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -29,18 +30,19 @@ import org.springframework.web.reactive.function.client.WebClient
 
 
 @Configuration
-class PoolClientConfig {
-    @Bean
-    fun poolClient(webServerAppCtxt: ServletWebServerApplicationContext): PoolClientImpl {
-        return PoolClientImpl { WebClient.create("http://localhost:${webServerAppCtxt.webServer.port}") }
-    }
+class PoolClientConfig(
+    private val selfClientConfigProperties: SelfClientConfigProperties
+){
 
-    /**
-     * Better to expose the API instead of the implementation. Anyway, currently made it backwards compatible
-     * ToDo: exchange the implementation with the API in the test classes
-     */
     @Bean
-    fun poolApiClient(poolClient: PoolClientImpl): PoolApiClient {
-        return poolClient
+    fun authorizedPoolClient(webServerAppCtxt: ServletWebServerApplicationContext,
+                   bpdmOAuth2ClientFactory: BpdmOAuth2ClientFactory?)
+    : PoolClientImpl {
+        return PoolClientImpl {
+            val baseUrl = "http://localhost:${webServerAppCtxt.webServer.port}"
+            val client = bpdmOAuth2ClientFactory?.createClient(baseUrl, selfClientConfigProperties.oauth2ClientRegistration)
+                ?: WebClient.create("http://localhost:${webServerAppCtxt.webServer.port}")
+            client
+        }
     }
 }

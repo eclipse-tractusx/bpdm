@@ -19,6 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.orchestrator.config
 
+import org.eclipse.tractusx.bpdm.test.config.SelfClientConfigProperties
+import org.eclipse.tractusx.bpdm.test.util.BpdmOAuth2ClientFactory
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClientImpl
 import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext
@@ -27,10 +29,19 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.web.reactive.function.client.WebClient
 
 @Configuration
-class OrchestratorClientConfig {
+class OrchestratorClientConfig(
+    private val selfClientConfigProperties: SelfClientConfigProperties
+) {
     @Bean
-    fun orchestratorClient(webServerAppCtxt: ServletWebServerApplicationContext): OrchestrationApiClient {
-        return OrchestrationApiClientImpl { WebClient.create("http://localhost:${webServerAppCtxt.webServer.port}") }
+    fun orchestratorClient(
+        webServerAppCtxt: ServletWebServerApplicationContext,
+        oAuth2ClientFactory: BpdmOAuth2ClientFactory?
+    ): OrchestrationApiClient {
+        return OrchestrationApiClientImpl {
+            val baseUrl = "http://localhost:${webServerAppCtxt.webServer.port}"
+            oAuth2ClientFactory?.createClient(baseUrl, selfClientConfigProperties.oauth2ClientRegistration)
+                ?: WebClient.create(baseUrl)
+        }
     }
 
 }

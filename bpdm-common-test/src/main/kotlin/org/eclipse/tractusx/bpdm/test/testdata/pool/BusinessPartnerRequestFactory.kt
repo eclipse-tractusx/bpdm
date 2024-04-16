@@ -24,9 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.bpdm.pool.api.model.*
-import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import kotlin.random.Random
@@ -51,57 +49,83 @@ class BusinessPartnerRequestFactory(
     ): LegalEntityPartnerCreateRequest {
         val longSeed = seed.hashCode().toLong()
         val random = Random(longSeed)
-        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, 365241780471), random.nextInt(0, 999999999), ZoneOffset.UTC)
 
         return LegalEntityPartnerCreateRequest(
-            legalEntity = LegalEntityDto(
-                legalName = "Legal Name $seed",
-                legalShortName = "Legal Short Name $seed",
-                legalForm = availableLegalForms.random(random),
-                identifiers = listOf(availableLegalEntityIdentifiers.random(random), availableLegalEntityIdentifiers.random(random))
-                    .mapIndexed { index, idKey -> LegalEntityIdentifierDto("$idKey Value $seed $index", idKey, "$idKey Issuing Body $seed") },
-                states = listOf(
-                    LegalEntityStateDto(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
-                    LegalEntityStateDto(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
-                ),
-                confidenceCriteria = ConfidenceCriteriaDto(
-                    sharedByOwner = true,
-                    checkedByExternalDataSource = false,
-                    numberOfSharingMembers = 1,
-                    lastConfidenceCheckAt = timeStamp,
-                    nextConfidenceCheckAt = timeStamp.plusDays(7),
-                    confidenceLevel = 5
-                ),
-                isCatenaXMemberData = isCatenaXMemberData
-            ),
+            legalEntity = createLegalEntityDto(seed, random, isCatenaXMemberData),
             legalAddress = createAddressDto(seed, random),
             index = seed
         )
     }
 
-    fun createSiteRequest(seed: String, bpnlParent: String): SitePartnerCreateRequest {
+    fun createLegalEntityUpdateRequest(seed: String, bpnl: String): LegalEntityPartnerUpdateRequest {
         val longSeed = seed.hashCode().toLong()
         val random = Random(longSeed)
+
+        return LegalEntityPartnerUpdateRequest(
+            bpnl = bpnl,
+            legalEntity = createLegalEntityDto(seed, random),
+            legalAddress = createAddressDto(seed, random)
+        )
+    }
+
+    fun createLegalEntityDto(seed: String, random: Random =  Random(seed.hashCode().toLong()),  isCatenaXMemberData: Boolean = true): LegalEntityDto {
         val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, 365241780471), random.nextInt(0, 999999999), ZoneOffset.UTC)
 
+        return LegalEntityDto(
+            legalName = "Legal Name $seed",
+            legalShortName = "Legal Short Name $seed",
+            legalForm = availableLegalForms.randomOrNull(random),
+            identifiers = listOf(availableLegalEntityIdentifiers.randomOrNull(random), availableLegalEntityIdentifiers.randomOrNull(random))
+                .mapNotNull{ it }
+                .mapIndexed { index, idKey -> LegalEntityIdentifierDto("$idKey Value $seed $index", idKey, "$idKey Issuing Body $seed") },
+            states = listOf(
+                LegalEntityStateDto(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
+                LegalEntityStateDto(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
+            ),
+            confidenceCriteria = ConfidenceCriteriaDto(
+                sharedByOwner = true,
+                checkedByExternalDataSource = false,
+                numberOfSharingMembers = 1,
+                lastConfidenceCheckAt = timeStamp,
+                nextConfidenceCheckAt = timeStamp.plusDays(7),
+                confidenceLevel = 5
+            ),
+            isCatenaXMemberData = isCatenaXMemberData
+        )
+    }
+
+    fun createSiteRequest(seed: String, bpnlParent: String): SitePartnerCreateRequest {
         return SitePartnerCreateRequest(
             bpnlParent = bpnlParent,
             index = seed,
-            site = SiteDto(
-                name = "Site Name $seed",
-                states = listOf(
-                    SiteStateDto(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
-                    SiteStateDto(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
-                ),
-                mainAddress = createAddressDto(seed, random),
-                confidenceCriteria = ConfidenceCriteriaDto(
-                    sharedByOwner = true,
-                    checkedByExternalDataSource = false,
-                    numberOfSharingMembers = 2,
-                    lastConfidenceCheckAt = timeStamp.plusDays(10),
-                    nextConfidenceCheckAt = timeStamp.plusDays(20),
-                    confidenceLevel = 4
-                )
+            site = createSiteDto(seed)
+        )
+    }
+
+    fun createSiteUpdateRequest(seed: String, bpns: String): SitePartnerUpdateRequest {
+        return SitePartnerUpdateRequest(
+            bpns = bpns,
+            site = createSiteDto(seed)
+        )
+    }
+
+    fun createSiteDto(seed: String, random: Random = Random(seed.hashCode().toLong())): SiteDto{
+        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, 365241780471), random.nextInt(0, 999999999), ZoneOffset.UTC)
+
+        return SiteDto(
+            name = "Site Name $seed",
+            states = listOf(
+                SiteStateDto(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
+                SiteStateDto(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
+            ),
+            mainAddress = createAddressDto(seed, random),
+            confidenceCriteria = ConfidenceCriteriaDto(
+                sharedByOwner = true,
+                checkedByExternalDataSource = false,
+                numberOfSharingMembers = 2,
+                lastConfidenceCheckAt = timeStamp.plusDays(10),
+                nextConfidenceCheckAt = timeStamp.plusDays(20),
+                confidenceLevel = 4
             )
         )
     }
@@ -117,7 +141,11 @@ class BusinessPartnerRequestFactory(
         )
     }
 
-    private fun createAddressDto(seed: String, random: Random): LogisticAddressDto {
+    fun createAddressUpdateRequest(seed: String, bpna: String): AddressPartnerUpdateRequest {
+        return AddressPartnerUpdateRequest(bpna, createAddressDto(seed))
+    }
+
+    fun createAddressDto(seed: String, random: Random = Random(seed.hashCode().toLong())): LogisticAddressDto {
         val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, 365241780471), random.nextInt(0, 999999999), ZoneOffset.UTC)
         return LogisticAddressDto(
             name = "Address Name $seed",
@@ -125,12 +153,13 @@ class BusinessPartnerRequestFactory(
                 AddressStateDto(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
                 AddressStateDto(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
             ),
-            identifiers = listOf(availableAddressIdentifiers.random(random), availableAddressIdentifiers.random(random))
+            identifiers = listOf(availableAddressIdentifiers.randomOrNull(random), availableAddressIdentifiers.randomOrNull(random))
+                .mapNotNull { it }
                 .mapIndexed { index, idKey -> AddressIdentifierDto("$idKey Value $seed $index", idKey) },
             physicalPostalAddress = PhysicalPostalAddressDto(
                 geographicCoordinates = GeoCoordinateDto(longitude = random.nextFloat(), latitude = random.nextFloat(), altitude = random.nextFloat()),
                 country = CountryCode.entries.random(random),
-                administrativeAreaLevel1 = availableAdminAreas.random(random),
+                administrativeAreaLevel1 = availableAdminAreas.randomOrNull(random),
                 administrativeAreaLevel2 = "Admin Level 2 $seed",
                 administrativeAreaLevel3 = "Admin Level 3 $seed",
                 postalCode = "Postal Code $seed",
@@ -156,7 +185,7 @@ class BusinessPartnerRequestFactory(
             alternativePostalAddress = AlternativePostalAddressDto(
                 geographicCoordinates = GeoCoordinateDto(longitude = random.nextFloat(), latitude = random.nextFloat(), altitude = random.nextFloat()),
                 country = CountryCode.entries.random(random),
-                administrativeAreaLevel1 = availableAdminAreas.random(random),
+                administrativeAreaLevel1 = availableAdminAreas.randomOrNull(random),
                 postalCode = "Postal Code $seed",
                 city = "City $seed",
                 deliveryServiceNumber = "Delivery Service Number $seed",
