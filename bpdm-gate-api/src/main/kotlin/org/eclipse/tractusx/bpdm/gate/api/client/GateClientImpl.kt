@@ -47,6 +47,8 @@ class GateClientImpl(
 
     override val sharingState by lazy { createClient<SharingStateApiClient>() }
 
+    override val stats  by lazy { createClient<StatsApiClient>() }
+
     private inline fun <reified T> createClient() =
         httpServiceProxyFactory.createClient(T::class.java)
 }
