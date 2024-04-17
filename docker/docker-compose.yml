@@ -20,13 +20,11 @@
 
 # Can be used to start required services in order to run bpdm with profile `local` for development purposes
 services:
+
   postgres:
-    image: postgres:14.2
+    image: postgres:15.4
     container_name: bpdm-postgres
     environment:
-      POSTGRES_USER: bpdm
-      POSTGRES_PASSWORD:
-      POSTGRES_DB: bpdm
       POSTGRES_HOST_AUTH_METHOD: trust
     healthcheck:
       test: [ 'CMD-SHELL', 'pg_isready -U bpdm' ]
@@ -36,7 +34,25 @@ services:
     ports:
       - "5432:5432"
     volumes:
+      - ./postgres/:/docker-entrypoint-initdb.d/:ro
       - bpdm-postgres-data:/var/lib/postgresql/data
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:22.0.5
+    container_name: bpdm-keycloak
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://bpdm-postgres:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    command: start-dev --import-realm
+    ports:
+        - "8180:8080"
+    depends_on:
+      - postgres
+    volumes:
+      - ../bpdm-common-test/src/main/resources/keycloak/CX-Central.json:/opt/keycloak/data/import/CX-Central.json:ro
 
 volumes:
   bpdm-postgres-data:
