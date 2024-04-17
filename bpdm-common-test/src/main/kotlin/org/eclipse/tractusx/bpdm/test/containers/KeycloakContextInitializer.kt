@@ -28,7 +28,7 @@ import org.springframework.context.ConfigurableApplicationContext
 
 class KeyCloakInitializer: ApplicationContextInitializer<ConfigurableApplicationContext>{
     companion object{
-        val keycloakContainer: KeycloakContainer = KeycloakContainer("quay.io/keycloak/keycloak:22.0.5")
+        val keycloakContainer: KeycloakContainer = KeycloakContainer("quay.io/keycloak/keycloak:23.0")
             .withRealmImportFile("keycloak/CX-Central.json")
 
         const val REALM =  "CX-Central"
