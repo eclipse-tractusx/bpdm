@@ -28,4 +28,4 @@ target
 application-developer.properties
 application-developer.yml
 *.drawio.svg.bkp
-
+/docker/compose/**/.env

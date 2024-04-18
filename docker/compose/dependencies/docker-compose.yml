@@ -34,25 +34,25 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./postgres/:/docker-entrypoint-initdb.d/:ro
+      - ./postgres-init.sh:/docker-entrypoint-initdb.d/postgres-init.sh:ro
       - bpdm-postgres-data:/var/lib/postgresql/data
 
   keycloak:
     image: quay.io/keycloak/keycloak:23.0
     container_name: bpdm-keycloak
     environment:
-      KC_DB: postgres
-      KC_DB_URL: jdbc:postgresql://bpdm-postgres:5432/keycloak
-      KC_DB_USERNAME: keycloak
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
+      - KC_DB=postgres
+      - KC_DB_URL=jdbc:postgresql://bpdm-postgres:5432/keycloak
+      - KC_DB_USERNAME=keycloak
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
     command: start-dev --import-realm
     ports:
         - "8180:8080"
     depends_on:
       - postgres
     volumes:
-      - ../bpdm-common-test/src/main/resources/keycloak/CX-Central.json:/opt/keycloak/data/import/CX-Central.json:ro
+      - ../../../bpdm-common-test/src/main/resources/keycloak/CX-Central.json:/opt/keycloak/data/import/CX-Central.json:ro
 
 volumes:
   bpdm-postgres-data:
