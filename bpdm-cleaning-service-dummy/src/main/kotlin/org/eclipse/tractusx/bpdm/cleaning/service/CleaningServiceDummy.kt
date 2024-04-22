@@ -110,21 +110,25 @@ class CleaningServiceDummy(
         addressType: AddressType,
         genericPartner: BusinessPartnerGenericDto
     ): LegalEntityDto {
-        val legalAddressBpnReference = generateBpnRequestIdentifier(genericPartner.createLegalAddressReferenceValue())
+        val legalAddressBpnReference = genericPartner.legalEntity.legalEntityBpn?.let { BpnReferenceDto(it, BpnReferenceType.Bpn) }
+            ?: generateBpnRequestIdentifier(genericPartner.createLegalAddressReferenceValue())
         val legalAddress = addressPartner.copy(bpnAReference = legalAddressBpnReference)
 
-        val legalEntityBpnReference = generateBpnRequestIdentifier(genericPartner.createLegalEntityReferenceValue())
+        val legalEntityBpnReference = genericPartner.legalEntity.legalEntityBpn?.let { BpnReferenceDto(it, BpnReferenceType.Bpn) }
+            ?: generateBpnRequestIdentifier(genericPartner.createLegalEntityReferenceValue())
         return genericPartner.toLegalEntityDto(legalEntityBpnReference, legalAddress)
 
     }
 
     fun createAddressRepresentation(genericPartner: BusinessPartnerGenericDto): LogisticAddressDto {
-        val bpnReferenceDto = generateBpnRequestIdentifier(genericPartner.createAdditionalAddressReferenceValue())
+        val bpnReferenceDto = genericPartner.address.addressBpn?.let { BpnReferenceDto(it, BpnReferenceType.Bpn) }
+            ?: generateBpnRequestIdentifier(genericPartner.createAdditionalAddressReferenceValue())
         return genericPartner.toLogisticAddressDto(bpnReferenceDto)
     }
 
     fun createSiteRepresentation(genericPartner: BusinessPartnerGenericDto, siteAddressReference: LogisticAddressDto): SiteDto {
-        val bpnReferenceDto = generateBpnRequestIdentifier(genericPartner.createSiteReferenceValue())
+        val bpnReferenceDto = genericPartner.site.siteBpn?.let { BpnReferenceDto(it, BpnReferenceType.Bpn) }
+            ?: generateBpnRequestIdentifier(genericPartner.createSiteReferenceValue())
         return genericPartner.toSiteDto(bpnReferenceDto, siteAddressReference)
     }
 
