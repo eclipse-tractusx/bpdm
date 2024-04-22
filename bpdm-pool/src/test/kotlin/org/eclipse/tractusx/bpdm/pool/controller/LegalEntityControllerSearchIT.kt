@@ -48,7 +48,7 @@ import org.springframework.test.context.ContextConfiguration
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class]
 )
-@ActiveProfiles(value = ["test"])
+@ActiveProfiles("test-no-auth")
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class LegalEntityControllerSearchIT @Autowired constructor(
     val dbTestHelpers: DbTestHelpers,

@@ -51,7 +51,7 @@ import org.springframework.test.context.DynamicPropertySource
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
     properties = ["bpdm.api.upsert-limit=3","bpdm.tasks.creation.fromSharingMember.starts-as-ready=false"]
 )
-@ActiveProfiles("test")
+@ActiveProfiles("test-no-auth")
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class BusinessPartnerControllerAndSharingControllerIT @Autowired constructor(
     val testHelpers: DbTestHelpers,

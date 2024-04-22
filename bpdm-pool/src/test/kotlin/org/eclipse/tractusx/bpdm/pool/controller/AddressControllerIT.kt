@@ -47,8 +47,11 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class])
-@ActiveProfiles("test")
+@SpringBootTest(
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+    classes = [Application::class, TestHelpers::class]
+)
+@ActiveProfiles("test-no-auth")
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class AddressControllerIT @Autowired constructor(
     val testHelpers: TestHelpers,

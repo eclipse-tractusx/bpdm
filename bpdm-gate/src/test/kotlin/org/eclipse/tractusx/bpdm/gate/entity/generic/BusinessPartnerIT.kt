@@ -69,7 +69,7 @@ import org.springframework.test.context.ContextConfiguration
 import java.time.LocalDateTime
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
+@ActiveProfiles("test-no-auth")
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 internal class BusinessPartnerIT @Autowired constructor(
     val testHelpers: DbTestHelpers,

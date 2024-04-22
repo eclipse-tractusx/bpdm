@@ -68,7 +68,7 @@ import java.util.function.BiPredicate
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class]
 )
-@ActiveProfiles("test")
+@ActiveProfiles("test-no-auth")
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class TaskStepFetchAndReserveServiceTest @Autowired constructor(
     val cleaningStepService: TaskStepFetchAndReserveService,

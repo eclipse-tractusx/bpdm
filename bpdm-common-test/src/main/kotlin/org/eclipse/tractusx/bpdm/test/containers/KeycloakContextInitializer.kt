@@ -57,12 +57,10 @@ abstract class SelfClientInitializer:  ApplicationContextInitializer<Configurabl
 
         TestPropertyValues.of(
             "${SelfClientConfigProperties.PREFIX}.security-enabled=true",
-            "${SelfClientConfigProperties.PREFIX}.oauth2-client-registration=self-client",
-            "spring.security.oauth2.client.provider.self-provider.issuer-uri=${authServerUrl}/realms/$realm",
-            "spring.security.oauth2.client.registration.self-client.authorization-grant-type=client_credentials",
-            "spring.security.oauth2.client.registration.self-client.client-id=$clientId",
-            "spring.security.oauth2.client.registration.self-client.client-secret=$clientSecret",
-            "spring.security.oauth2.client.registration.self-client.provider=self-provider",
+            "${SelfClientConfigProperties.PREFIX}.provider.issuer-uri=${authServerUrl}/realms/$realm",
+            "${SelfClientConfigProperties.PREFIX}.registration.authorization-grant-type=client_credentials",
+            "${SelfClientConfigProperties.PREFIX}.registration.client-id=$clientId",
+            "${SelfClientConfigProperties.PREFIX}.registration.client-secret=$clientSecret"
         ).applyTo(applicationContext)
     }
 }

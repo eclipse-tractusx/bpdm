@@ -27,11 +27,9 @@ import org.eclipse.tractusx.bpdm.test.util.AuthExpectationType
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class])
-@ActiveProfiles("auth")
 @ContextConfiguration(initializers = [
     KeyCloakInitializer::class,
     AuthTaskProcessorCleanAndSyncIT.SelfClientAsTaskProcessorCleanAndSyncInitializer::class

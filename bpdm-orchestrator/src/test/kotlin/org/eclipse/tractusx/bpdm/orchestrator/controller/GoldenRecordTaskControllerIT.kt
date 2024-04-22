@@ -41,6 +41,7 @@ val WITHIN_ALLOWED_TIME_OFFSET: TemporalUnitOffset = within(1, ChronoUnit.SECOND
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
     properties = [
+        "bpdm.security.enabled=false",
         "bpdm.api.upsert-limit=3",
         "bpdm.task.timeoutCheckCron=* * * * * ?",       // check every sec
         "bpdm.task.taskPendingTimeout=3s",

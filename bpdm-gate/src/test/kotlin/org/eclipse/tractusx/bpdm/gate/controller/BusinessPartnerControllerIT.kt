@@ -52,7 +52,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
     properties = ["bpdm.api.upsert-limit=3"]
 )
-@ActiveProfiles("test")
+@ActiveProfiles("test-no-auth")
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class BusinessPartnerControllerIT @Autowired constructor(
     val testHelpers: DbTestHelpers,
