@@ -55,7 +55,7 @@ import java.time.Instant
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class]
 )
-@ActiveProfiles("test")
+@ActiveProfiles("test-no-auth")
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class LegalEntityControllerIT @Autowired constructor(
     val testHelpers: TestHelpers,

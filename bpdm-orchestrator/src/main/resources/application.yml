@@ -24,20 +24,13 @@ bpdm:
   version: '@project.version@'
   # Description of this application (shown in Swagger) (on default set by maven resource filtering)
   description: '@project.description@'
-  # The url from which this API is reachable
-  # Will appear as server item in the OpenAPI document
-  # Will also be used by Swagger as base-url to perform requests against
-  # If empty Swagger will generate the OpenAPI server url when accessing the Swagger page
-  url:
-  security:
-    # API will not be secured per default
-    enabled: false
-  api:
-    # The maximum amount of business partner entries that can be upserted over the API
-    upsert-limit: 100
+  # BPDM application specific logging configuration
   logging:
     # Default username logged if no user could be authenticated in the request
     unknown-user: Anonymous
+  api:
+    # The maximum amount of business partner entries that can be upserted over the API
+    upsert-limit: 100
   task:
     # When and how often tasks should be checked for timeout
     timeoutCheckCron: 10 0/5 * * * ?
@@ -45,13 +38,65 @@ bpdm:
     taskPendingTimeout: 3d
     # How long finished tasks are retained
     taskRetentionTimeout: 30d
-#
-# From here on are framework and dependency configuration
-# More information about those properties can be taken from the respective documentation of Spring or the dependency
-#
+  security:
+    # Allowed origins for CORS
+    cors-origins: '*'
+    # Whether endpoints should be authenticated/authorized
+    enabled: true
+    # Base-URL including protocol of the Keycloak server
+    auth-server-url: http://localhost:8180
+    # URL to the auth endpoint of the Keycloak server
+    auth-url: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}/protocol/openid-connect/auth
+    # This application's resource or client. Used for finding permissions in the given Bearer token
+    client-id: BPDM-ORCHESTRATOR
+    # The keycloak realm to consider
+    realm: CX-Central
+    # URL to the token refresh endpoint of the Keycloak server
+    refresh-url: ${bpdm.security.token-url}
+    # URL to the token validation endpoint of the Keycloak server
+    token-url: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}/protocol/openid-connect/token
+    permissions:
+      task:
+        # Name of permission to create golden record tasks
+        create: create_task
+        # Name of permission to read task status and overall results
+        read: read_task
+      reservation:
+        clean:
+          # Name of permission to create reservations for tasks in step 'Clean'
+          create: create_reservation_clean
+        cleanAndSync:
+          # Name of permission to create reservations for tasks in step 'CleanAndSync'
+          create: create_reservation_cleanAndSync
+        poolSync:
+          # Name of permission to create reservations for tasks in step 'PoolSync'
+          create: create_reservation_poolSync
+      result:
+        clean:
+          # Name of permission to post results for tasks in step 'Clean'
+          create: create_result_clean
+        cleanAndSync:
+          # Name of permission to post results for tasks in step 'CleanAndSync'
+          create: create_result_cleanAndSync
+        poolSync:
+          # Name of permission to post results for tasks in step 'PoolSync'
+          create: create_result_poolSync
+
 server:
   # Change default port to avoid clash with other BPDM applications
   port: 8085
+spring:
+  profiles:
+    group:
+      # BPDM common shortcut to remove all authentication configuration
+      no-auth: no-api-auth
+  security:
+    oauth2:
+      resourceserver:
+        # Infer the uris for token validation from the application's security properties
+        jwt:
+          issuer-uri: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}
+          jwk-set-uri: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}/protocol/openid-connect/certs
 logging:
   pattern:
     # Use BPDM custom log pattern
@@ -62,9 +107,8 @@ logging:
     org:
       eclipse:
         tractusx:
-          bpdm:
-            # Logs from this application's package should be DEBUG and above
-            orchestrator: DEBUG
+          # Logs from the BPDM applications should be DEBUG and above
+          bpdm: DEBUG
 management:
   endpoint:
     health:
@@ -82,7 +126,7 @@ springdoc:
   api-docs:
     # Generate Open-API document
     enabled: true
-    # Set custom path for the document
+    # The path of the Open-API document
     path: /docs/api-docs
   swagger-ui:
     # Swagger UI should not be available at its default URL (instead on location defined in path)
@@ -91,3 +135,4 @@ springdoc:
     path: /ui/swagger-ui
     # Show validation specific information for properties (pattern, minimum, maximum, etc...)
     show-common-extensions: true
+

@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.cleaning.service
 
+import org.eclipse.tractusx.bpdm.cleaning.config.OrchestratorConfigProperties
 import org.eclipse.tractusx.bpdm.cleaning.testdata.CommonValues.businessPartnerWithBpnA
 import org.eclipse.tractusx.bpdm.cleaning.testdata.CommonValues.businessPartnerWithBpnLAndBpnAAndLegalAddressType
 import org.eclipse.tractusx.bpdm.cleaning.testdata.CommonValues.businessPartnerWithBpnSAndBpnAAndLegalAndSiteMainAddressType
@@ -29,16 +30,16 @@ import org.eclipse.tractusx.bpdm.cleaning.testdata.CommonValues.expectedLogistic
 import org.eclipse.tractusx.bpdm.cleaning.testdata.CommonValues.expectedSiteDto
 import org.eclipse.tractusx.bpdm.test.util.AssertHelpers
 import org.eclipse.tractusx.orchestrator.api.model.*
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
 import java.time.Instant
 import java.util.*
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
+@SpringBootTest(
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+    properties = ["${OrchestratorConfigProperties.PREFIX}.security-enabled=false"]
+)
 class CleaningServiceDummyTest @Autowired constructor(
     val cleaningServiceDummy: CleaningServiceDummy,
     val assertHelpers: AssertHelpers

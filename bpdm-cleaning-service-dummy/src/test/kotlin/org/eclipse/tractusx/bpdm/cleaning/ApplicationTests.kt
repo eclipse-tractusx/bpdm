@@ -19,12 +19,14 @@
 
 package org.eclipse.tractusx.bpdm.cleaning
 
+import org.eclipse.tractusx.bpdm.cleaning.config.OrchestratorConfigProperties
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
+@SpringBootTest(
+	webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+	properties = ["${OrchestratorConfigProperties.PREFIX}.security-enabled=false"]
+)
 class ApplicationTests {
 
 	@Test

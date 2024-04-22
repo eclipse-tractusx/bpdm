@@ -64,7 +64,7 @@ import org.springframework.test.context.ContextConfiguration
 import java.time.Instant
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
+@ActiveProfiles("test-no-auth")
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 internal class ChangeLogControllerIT @Autowired constructor(
     val gateClient: GateClient,

@@ -1,0 +1,8 @@
+bpdm:
+  security:
+    enabled: false
+  client:
+    self:
+      security-enabled: false
+    orchestrator:
+      security-enabled: false

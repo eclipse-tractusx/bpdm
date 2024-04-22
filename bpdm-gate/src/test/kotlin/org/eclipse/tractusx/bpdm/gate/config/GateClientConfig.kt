@@ -19,28 +19,25 @@
 
 package org.eclipse.tractusx.bpdm.gate.config
 
+import org.eclipse.tractusx.bpdm.common.util.BpdmWebClientProvider
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClientImpl
 import org.eclipse.tractusx.bpdm.test.config.SelfClientConfigProperties
-import org.eclipse.tractusx.bpdm.test.util.BpdmOAuth2ClientFactory
 import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.web.reactive.function.client.WebClient
 
 @Configuration
-class GateClientConfig(
-    private val selfClientConfigProperties: SelfClientConfigProperties
-) {
+class GateClientConfig{
 
     @Bean
     fun gateClient(webServerAppCtxt: ServletWebServerApplicationContext,
-                   bpdmOAuth2ClientFactory: BpdmOAuth2ClientFactory?
+                   bpdmWebClientProvider: BpdmWebClientProvider,
+                   properties: SelfClientConfigProperties
                    ): GateClient {
         return GateClientImpl {
             val baseUrl = "http://localhost:${webServerAppCtxt.webServer.port}"
-            bpdmOAuth2ClientFactory?.createClient(baseUrl, selfClientConfigProperties.oauth2ClientRegistration)
-                ?: WebClient.create(baseUrl)
+            bpdmWebClientProvider.builder(properties.copy(baseUrl = baseUrl)).build()
         }
     }
 

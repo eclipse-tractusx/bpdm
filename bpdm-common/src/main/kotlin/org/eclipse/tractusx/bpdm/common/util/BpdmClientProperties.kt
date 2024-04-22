@@ -19,17 +19,17 @@
 
 package org.eclipse.tractusx.bpdm.common.util
 
-interface ClientConfigurationProperties : HasEnablingProperty {
-    val baseUrl: String
-    val securityEnabled: Boolean
-    val oauth2ClientRegistration: String?
+import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties
 
-    override val enabled get() = securityEnabled
-
-    companion object {
+interface BpdmClientProperties {
+    companion object{
         const val PREFIX = "bpdm.client"
     }
+
+    val baseUrl: String
+    val securityEnabled: Boolean
+    val registration: OAuth2ClientProperties.Registration
+    val provider: OAuth2ClientProperties.Provider
+
+    fun getId(): String
 }
-
-
-

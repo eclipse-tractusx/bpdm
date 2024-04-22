@@ -19,16 +19,15 @@
 
 package org.eclipse.tractusx.bpdm.gate.config
 
+import org.eclipse.tractusx.bpdm.common.util.BpdmClientProperties
 import org.eclipse.tractusx.bpdm.common.util.BpdmWebClientProvider
 import org.eclipse.tractusx.bpdm.common.util.ClientConfigurationProperties
-import org.eclipse.tractusx.bpdm.common.util.ConditionalOnBoundProperty
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
+import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
 
 
 @ConfigurationProperties(prefix = PoolClientConfigurationProperties.PREFIX)
@@ -36,31 +35,22 @@ data class PoolClientConfigurationProperties(
     override val baseUrl: String = "http://localhost:8080",
     val searchChangelogPageSize: Int = 100,
     override val securityEnabled: Boolean = false,
-    override val oauth2ClientRegistration: String = "pool-client"
-) : ClientConfigurationProperties {
+    override val registration: OAuth2ClientProperties.Registration,
+    override val provider: OAuth2ClientProperties.Provider
+) : BpdmClientProperties {
     companion object {
         const val PREFIX = "${ClientConfigurationProperties.PREFIX}.pool"
     }
 
-    override val enabled = securityEnabled
+    override fun getId() = PREFIX
 }
 
 @Configuration
-class PoolClientConfiguration(
-    poolConfigProperties: PoolClientConfigurationProperties,
-) : BpdmWebClientProvider(
-    poolConfigProperties
-) {
-    @Bean
-    @ConditionalOnBoundProperty(PoolClientConfigurationProperties.PREFIX, PoolClientConfigurationProperties::class, true)
-    fun authorizedPoolClient(
-        clientRegistrationRepository: ClientRegistrationRepository,
-        oAuth2AuthorizedClientService: OAuth2AuthorizedClientService
-    ): PoolApiClient = PoolClientImpl { provideAuthorizedClient(clientRegistrationRepository, oAuth2AuthorizedClientService) }
+class PoolClientConfiguration{
 
     @Bean
-    @ConditionalOnBoundProperty(PoolClientConfigurationProperties.PREFIX, PoolClientConfigurationProperties::class, false)
-    fun unauthorizedPoolClient(): PoolApiClient =
-        PoolClientImpl { provideUnauthorizedClient() }
+    fun poolClient(webClientProvider: BpdmWebClientProvider, properties: PoolClientConfigurationProperties): PoolApiClient{
+     return PoolClientImpl { webClientProvider.builder(properties).build() }
+    }
 }
 

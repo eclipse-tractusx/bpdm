@@ -21,51 +21,37 @@ package org.eclipse.tractusx.bpdm.common.util
 
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
-import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProviderBuilder
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
 import org.springframework.security.oauth2.client.web.reactive.function.client.ServletOAuth2AuthorizedClientExchangeFilterFunction
 import org.springframework.web.reactive.function.client.WebClient
-import java.util.function.Consumer
 
 
-open class BpdmWebClientProvider(
-    val clientProperties: ClientConfigurationProperties
-) {
-    fun provideAuthorizedClient(clientRegistrationRepository: ClientRegistrationRepository, oAuth2AuthorizedClientService: OAuth2AuthorizedClientService) =
-        webClientBuilder()
-            .apply(oauth2Configuration(clientRegistrationRepository, oAuth2AuthorizedClientService, clientProperties.oauth2ClientRegistration))
-            .build()
+interface BpdmWebClientProvider{
+    fun builder(properties: BpdmClientProperties): WebClient.Builder
+}
 
-    fun provideUnauthorizedClient() =
-        webClientBuilder().build()
+class BpdmOAuth2WebClientProvider(
+    private val bpdmWebClientProvider: BpdmWebClientProvider,
+    private val authorizedClientManager: OAuth2AuthorizedClientManager
+): BpdmWebClientProvider{
 
-    protected fun webClientBuilder() =
-        WebClient.builder()
-            .baseUrl(clientProperties.baseUrl)
+    override fun builder(properties: BpdmClientProperties): WebClient.Builder{
+        return if(properties.securityEnabled) {
+            val oAuth2ExchangeFilter = ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager)
+            oAuth2ExchangeFilter.setDefaultClientRegistrationId(properties.getId())
+            oAuth2ExchangeFilter.setDefaultOAuth2AuthorizedClient(true)
+
+            bpdmWebClientProvider.builder(properties).apply(oAuth2ExchangeFilter.oauth2Configuration())
+        }else{
+            bpdmWebClientProvider.builder(properties)
+        }
+    }
+}
+
+class BpdmUnauthorizedWebClientProvider: BpdmWebClientProvider{
+    override fun builder(properties: BpdmClientProperties): WebClient.Builder{
+        return WebClient.builder()
+            .baseUrl(properties.baseUrl)
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-
-    protected fun oauth2Configuration(
-        clientRegistrationRepository: ClientRegistrationRepository,
-        authorizedClientService: OAuth2AuthorizedClientService,
-        clientRegistrationId: String
-    ): Consumer<WebClient.Builder> {
-        val authorizedClientManager = authorizedClientManager(clientRegistrationRepository, authorizedClientService)
-        val oauth = ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager)
-        oauth.setDefaultClientRegistrationId(clientRegistrationId)
-        return oauth.oauth2Configuration()
     }
-
-    protected fun authorizedClientManager(
-        clientRegistrationRepository: ClientRegistrationRepository,
-        authorizedClientService: OAuth2AuthorizedClientService
-    ): OAuth2AuthorizedClientManager {
-        val authorizedClientProvider = OAuth2AuthorizedClientProviderBuilder.builder().clientCredentials().build()
-        val authorizedClientManager = AuthorizedClientServiceOAuth2AuthorizedClientManager(clientRegistrationRepository, authorizedClientService)
-        authorizedClientManager.setAuthorizedClientProvider(authorizedClientProvider)
-        return authorizedClientManager
-    }
-
 }

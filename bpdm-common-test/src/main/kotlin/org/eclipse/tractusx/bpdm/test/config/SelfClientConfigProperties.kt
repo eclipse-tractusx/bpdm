@@ -19,39 +19,21 @@
 
 package org.eclipse.tractusx.bpdm.test.config
 
+import org.eclipse.tractusx.bpdm.common.util.BpdmClientProperties
 import org.eclipse.tractusx.bpdm.common.util.ClientConfigurationProperties
-import org.eclipse.tractusx.bpdm.common.util.ConditionalOnBoundProperty
-import org.eclipse.tractusx.bpdm.common.util.HasEnablingProperty
-import org.eclipse.tractusx.bpdm.test.util.BpdmOAuth2ClientFactory
+import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties
 import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
-
 
 @ConfigurationProperties(prefix = SelfClientConfigProperties.PREFIX)
 data class SelfClientConfigProperties(
-    val securityEnabled: Boolean = false,
-    val oauth2ClientRegistration: String = "self-client"
-) : HasEnablingProperty {
+    override val securityEnabled: Boolean = false,
+    override val baseUrl: String = "",
+    override val registration: OAuth2ClientProperties.Registration = OAuth2ClientProperties.Registration(),
+    override val provider: OAuth2ClientProperties.Provider = OAuth2ClientProperties.Provider()
+) :BpdmClientProperties {
     companion object {
         const val PREFIX = "${ClientConfigurationProperties.PREFIX}.self"
     }
 
-    override val enabled: Boolean
-        get() = securityEnabled
-}
-
-@Configuration
-class SelfClientConfiguration{
-
-    @Bean
-    @ConditionalOnBoundProperty(SelfClientConfigProperties.PREFIX, SelfClientConfigProperties::class, true)
-    fun createAuth2ClientFactory(clientRegistrationRepository: ClientRegistrationRepository,
-                                 oAuth2AuthorizedClientService: OAuth2AuthorizedClientService
-    ): BpdmOAuth2ClientFactory{
-        return BpdmOAuth2ClientFactory(clientRegistrationRepository, oAuth2AuthorizedClientService)
-    }
-
+    override fun getId(): String = PREFIX
 }

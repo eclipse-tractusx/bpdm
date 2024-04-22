@@ -66,16 +66,55 @@ bpdm:
     orchestrator:
       # The base-url of the Orchestrator-API
       base-url: http://localhost:8085/
-      # Connect to the Orchestrator-API without authenticating on default (use orchestrator-auth profile to activate)
-      security-enabled: false
+      # Whether to enable oauth2 authentication when connecting to the Orchestrator
+      security-enabled: true
+      provider:
+        # Create an oauth2 provider for the orchestrator connection and infer token issuing uri from the security properties
+        issuer-uri: ${bpdm.security.auth-server-url:http://localhost:8180}/realms/${bpdm.security.realm:master}
+      registration:
+        # The orchestrator client should use client credentials mechanism to request a token from the provider
+        authorization-grant-type: client_credentials
+        # Use a default client id for the client credentials request
+        client-id: POOL-ORCHESTRATOR-TASK-PROCESSOR
+        # Please provide a secret here
+        client-secret: ${BPDM_POOL_ORCH_CLIENT_SECRET}
   tasks:
     # When and how often the Pool should poll for golden record tasks in the orchestrator
-    cron: '-'
+    cron: '*/30 * * * * *'
     # Up to how many tasks can be requested at the same time
     batchSize: 100
   security:
-    # API will not be secured per default
-    enabled: false
+    # Allowed origins for CORS
+    cors-origins: '*'
+    # Whether endpoints should be authenticated/authorized
+    enabled: true
+    # Base-URL including protocol of the Keycloak server
+    auth-server-url: http://localhost:8180
+    # URL to the auth endpoint of the Keycloak server
+    auth-url: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}/protocol/openid-connect/auth
+    # This application's resource or client. Used for finding permissions in the given Bearer token
+    client-id: BPDM-POOL
+    # The keycloak realm to consider
+    realm: CX-Central
+    # URL to the token refresh endpoint of the Keycloak server
+    refresh-url: ${bpdm.security.token-url}
+    # URL to the token validation endpoint of the Keycloak server
+    token-url: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}/protocol/openid-connect/token
+    permissions:
+      # Name of the permission to read business partners
+      readPartner: read_partner
+      # Name of the permission to upsert business partners
+      writePartner: write_partner
+      # Name of the permission to read business partners that belong to a Catena-X member
+      readMemberPartner: read_partner_member
+      # Name of the permission to read metadata
+      readMetaData: read_metadata
+      # Name of the permission to create new metadata
+      writeMetaData: write_metadata
+      # Name of the permission to read changelog entries from business partners
+      readChangelog: read_changelog
+      # Name of the permission to read changelog entries from Catena-X member business partners
+      readMemberChangelog: read_changelog_member
   datasource:
     # Host name of the used datasource
     host: localhost
@@ -112,6 +151,17 @@ management:
       # Include readiness state in health response (ready to accept traffic)
       enabled: true
 spring:
+  profiles:
+    group:
+      # BPDM common shortcut to remove all authentication configuration
+      no-auth: no-api-auth, no-orchestrator-auth
+  security:
+    oauth2:
+      resourceserver:
+        # Infer the uris for token validation from the application's security properties
+        jwt:
+          issuer-uri: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}
+          jwk-set-uri: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}/protocol/openid-connect/certs
   datasource:
     # We use postgres as datasource
     driverClassName: org.postgresql.Driver

@@ -17,27 +17,43 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################################
 
-# BPDM application specific configuration
+#BPDM application specific configuration
 bpdm:
   # Name of this application (shown in Swagger) (on default set by maven resource filtering)
-    name: '@project.name@'
+  name: '@project.name@'
   # Version of this application (shown in Swagger) (on default set by maven resource filtering)
-    version: '@project.version@'
+  version: '@project.version@'
   # Description of this application (shown in Swagger) (on default set by maven resource filtering)
-    description: '@project.description@'
-  # Client connection configuration
-    client:
-      # Orchestrator connection configuration
-        orchestrator:
-          # The base-url of the Orchestrator-API
-          base-url: http://localhost:8085/
+  description: '@project.description@'
   # BPDM application specific logging configuration
-    logging:
-      # Default username logged if no user could be authenticated in the request
-      unknown-user: Anonymous
-    cleaningService:
-      # When and how often the cleaning service should poll for golden record tasks in the orchestrator
-      pollingCron: '-'
+  logging:
+    # Default username logged if no user could be authenticated in the request
+    unknown-user: Anonymous
+  # Client connection configuration
+  client:
+    # Orchestrator connection configuration
+    orchestrator:
+      # The base-url of the Orchestrator-API
+      base-url: http://localhost:8085/
+      # Whether to enable oauth2 authentication when connecting to the Orchestrator
+      security-enabled: true
+      provider:
+        # Create an oauth2 provider for the orchestrator and set default token issuer uri
+        issuer-uri: http://localhost:8180/realms/CX-Central
+      registration:
+        # The orchestrator client should use client credentials mechanism to request a token from the provider
+        authorization-grant-type: client_credentials
+        # Use a default client id for the client credentials request
+        client-id: DUMMY-ORCHESTRATOR-TASK_PROCESSOR
+        # Please provide client secret here
+        client-secret: ${BPDM_DUMMY_ORCH_CLIENT_SECRET}
+
+  cleaningService:
+    # When and how often the cleaning service should poll for golden record tasks in the orchestrator
+    pollingCron: "*/30 * * * * *"
+  security:
+    # Disable security as there is no API to secure
+    enabled: false
 #
 # From here on are framework and dependency configuration
 # More information about those properties can be taken from the respective documentation of Spring or the dependency
@@ -45,6 +61,11 @@ bpdm:
 server:
   # The port this application runs on
   port: 8084
+spring:
+  profiles:
+    group:
+      # BPDM common shortcut to remove all authentication configuration
+      no-auth: no-orchestrator-auth
 logging:
   pattern:
     # Use BPDM custom log pattern
@@ -55,9 +76,8 @@ logging:
     org:
       eclipse:
         tractusx:
-          bpdm:
-            # Logs from this application's package should be DEBUG and above
-            cleaning: DEBUG
+          # Logs from the BPDM applications should be DEBUG and above
+          bpdm: DEBUG
 management:
   endpoint:
     health:
@@ -84,4 +104,3 @@ springdoc:
     path: /ui/swagger-ui
     # Show validation specific information for properties (pattern, minimum, maximum, etc...)
     show-common-extensions: true
-

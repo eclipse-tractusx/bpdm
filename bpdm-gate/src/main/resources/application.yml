@@ -20,64 +20,114 @@
 # BPDM application specific configuration
 bpdm:
   # Name of this application (shown in Swagger) (on default set by maven resource filtering)
-    name: '@project.name@'
+  name: '@project.name@'
   # Version of this application (shown in Swagger) (on default set by maven resource filtering)
-    version: '@project.version@'
+  version: '@project.version@'
   # Description of this application (shown in Swagger) (on default set by maven resource filtering)
-    description: '@project.description@'
+  description: '@project.description@'
   # The url from which this API is reachable
   # Will appear as server item in the OpenAPI document
   # Will also be used by Swagger as base-url to perform requests against
   # If empty Swagger will generate the OpenAPI server url when accessing the Swagger page
-    url:
-    bpn:
-      # Specify the BPNL of the owner of this Gate here
-      # If set, the BPNL will be attached to business partner data a sharing member claim as their own
-      # This way the golden record process knows who claims the business partner
-      # Additionally, if set and security is enabled all incoming tokens need to have a "BPN" claim with the matching BPNL or otherwise they will not be authorized
-        owner-bpn-l:
-    api:
-      # The maximum amount of business partner entries a sharing member can upsert per request
-        upsert-limit: 100
-    tasks:
-        creation:
-            fromSharingMember:
-                # If true, new business partner input data will be directly ready to be shared
-                # If false, new business partner input data need to be manually set to ready
-                starts-as-ready: true
-                # When and how often the Gate checks for new business partner data to be shared
-                cron: '-'
-                # Up to how many golden record tasks can be created when checking
-                batchSize: 100
-            fromPool:
-                # When and how often the Gate checks for golden record updates from the Pool
-                batchSize: 100
-                # Up to how many golden record tasks can be created when checking
-                cron: '-'
-        check:
-            batchSize: 100
-            cron: '-'
-
-    # Connection to the pool and orchestrator  [No auth on default]
-    client:
-        orchestrator:
-          # The base-url of the Orchestrator-API
-            base-url: http://localhost:8085
-          # Connect to the Orchestrator-API without authenticating on default (use orchestrator-auth profile to activate)
-            security-enabled: false
-        pool:
-          # The base-url of the Pool-API
-            base-url: http://localhost:8080
-          # Connect to the Pool-API without authenticating on default (use orchestrator-auth profile to activate)
-            security-enabled: false
-    security:
-      # API will not be secured per default
-        enabled: false
-    datasource:
-      # Host name of the used datasource
-        host: localhost
-      # The database schema to use for this application
-        schema: bpdmgate
+  url:
+  bpn:
+    # Specify the BPNL of the owner of this Gate here
+    # If set, the BPNL will be attached to business partner data a sharing member claim as their own
+    # This way the golden record process knows who claims the business partner
+    # Additionally, if set and security is enabled all incoming tokens need to have a "BPN" claim with the matching BPNL or otherwise they will not be authorized
+    owner-bpn-l:
+  api:
+    # The maximum amount of business partner entries a sharing member can upsert per request
+    upsert-limit: 100
+  tasks:
+    creation:
+      fromSharingMember:
+        # If true, new business partner input data will be directly ready to be shared
+        # If false, new business partner input data need to be manually set to ready
+        starts-as-ready: true
+        # When and how often the Gate checks for new business partner data to be shared
+        cron: '*/30 * * * * *'
+        # Up to how many golden record tasks can be created when checking
+        batchSize: 100
+      fromPool:
+        # When and how often the Gate checks for golden record updates from the Pool
+        batchSize: 100
+        # Up to how many golden record tasks can be created when checking
+        cron: '*/30 * * * * *'
+    check:
+      batchSize: 100
+      cron: '*/30 * * * * *'
+  # Connection to the pool and orchestrator
+  client:
+    orchestrator:
+      # The base-url of the Orchestrator-API
+      base-url: http://localhost:8085
+      # Whether to enable oauth2 authentication when connecting to the Orchestrator
+      security-enabled: true
+      provider:
+        # Create an oauth2 provider for the orchestrator connection and infer token issuing uri from the security properties
+        issuer-uri: ${bpdm.security.auth-server-url:http://localhost:8180}/realms/${bpdm.security.realm:master}
+      registration:
+        # The orchestrator client should use client credentials mechanism to request a token from the provider
+        authorization-grant-type: client_credentials
+        # Use a default client id for the client credentials request
+        client-id: GATE-ORCHESTRATOR-TASK_CREATOR
+        # Please provide secret here
+        client-secret: ${BPDM_GATE_ORCH_CLIENT_SECRET}
+    pool:
+      # The base-url of the Pool-API
+      base-url: http://localhost:8080
+      # Whether to enable oauth2 authentication when connecting to the Pool
+      security-enabled: true
+      provider:
+        # Create an oauth2 provider for the pool connection and infer token issuing uri from the security properties
+        issuer-uri: ${bpdm.security.auth-server-url:http://localhost:8180}/realms/${bpdm.security.realm:master}
+      registration:
+        # The pool client should use client credentials mechanism to request a token from the provider
+        authorization-grant-type: client_credentials
+        # Use a default client id for the client credentials request
+        client-id: GATE-POOL-SHARING_MEMBER
+        # No secret on default (please update credentials for production)
+        client-secret: ${BPDM_GATE_POOL_CLIENT_SECRET}
+  security:
+    # Allowed origins for CORS
+    cors-origins: '*'
+    # Whether endpoints should be authenticated/authorized
+    enabled: true
+    # Base-URL including protocol of the Keycloak server
+    auth-server-url: http://localhost:8180
+    # URL to the auth endpoint of the Keycloak server
+    auth-url: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}/protocol/openid-connect/auth
+    # This application's resource or client. Used for finding permissions in the given Bearer token
+    client-id: BPDM-GATE
+    # The keycloak realm to consider
+    realm: CX-Central
+    # URL to the token refresh endpoint of the Keycloak server
+    refresh-url: ${bpdm.security.token-url}
+    # URL to the token validation endpoint of the Keycloak server
+    token-url: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}/protocol/openid-connect/token
+    permissions:
+      # Name of the permission to read business partner input data
+      readInputPartner: read_input_partner
+      # Name of the permission to upsert input business partner input data
+      writeInputPartner: write_input_partner
+      # Name of the permission to read business partner output data
+      readOutputPartner: read_output_partner
+      # Name of the permission to read changelog entries for business partner input data
+      readInputChangelog: read_input_changelog
+      # Name of the permission to read changelog entries for business partner output data
+      readOutputChangelog: read_output_changelog
+      # Name of the permission to read business partner sharing states
+      readSharingState: read_sharing_state
+      # Name of the permission to change business partner sharing states
+      writeSharingState: write_sharing_state
+      # Name of the permission to read business partner statistics
+      read_stats: read_stats
+  datasource:
+    # Host name of the used datasource
+    host: localhost
+    # The database schema to use for this application
+    schema: bpdmgate
 #
 # From here on are framework and dependency configuration
 # More information about those properties can be taken from the respective documentation of Spring or the dependency
@@ -109,7 +159,18 @@ management:
           # Include readiness state in health response (ready to accept traffic)
             enabled: true
 spring:
-    datasource:
+  profiles:
+    group:
+      # BPDM common shortcut to remove all authentication configuration
+      no-auth: no-api-auth, no-orchestrator-auth, no-pool-auth
+  security:
+    oauth2:
+      resourceserver:
+        # Infer the uris for token validation from the application's security properties
+        jwt:
+          issuer-uri: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}
+          jwk-set-uri: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}/protocol/openid-connect/certs
+  datasource:
       # We use postgres as datasource
         driverClassName: org.postgresql.Driver
       # No password on default (Change for production)
@@ -118,24 +179,24 @@ spring:
         url: jdbc:postgresql://${bpdm.datasource.host}:5432/bpdm
       # Default username for BPDM applications
         username: bpdm
-    flyway:
-      # Activate flyway for automatic database migration
-        enabled: true
-      # Apply migrations to this application's default schema
-        schemas: ${bpdm.datasource.schema}
-    jpa:
-      # JPA should speak Postgresql
-        database-platform: org.hibernate.dialect.PostgreSQLDialect
-        properties:
-          # We use hibernate as JPA implementation
-            hibernate:
-              # Hibernate should assume the default schema of this application on default
-              default_schema: ${bpdm.datasource.schema}
-              # Send updates and inserts out in batches to decrease network connections to the database
-              jdbc:
-                batch_size: 16
-                order_inserts: true
-                order_updates: true
+  flyway:
+    # Activate flyway for automatic database migration
+      enabled: true
+    # Apply migrations to this application's default schema
+      schemas: ${bpdm.datasource.schema}
+  jpa:
+    # JPA should speak Postgresql
+      database-platform: org.hibernate.dialect.PostgreSQLDialect
+      properties:
+        # We use hibernate as JPA implementation
+          hibernate:
+            # Hibernate should assume the default schema of this application on default
+            default_schema: ${bpdm.datasource.schema}
+            # Send updates and inserts out in batches to decrease network connections to the database
+            jdbc:
+              batch_size: 16
+              order_inserts: true
+              order_updates: true
 springdoc:
     api-docs:
       # Generate Open-API document

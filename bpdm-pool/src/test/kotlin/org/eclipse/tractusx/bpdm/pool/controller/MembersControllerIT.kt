@@ -33,12 +33,14 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class]
 )
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
+@ActiveProfiles("test-no-auth")
 class MembersControllerIT @Autowired constructor(
     //Client for performing Pool API operations that exceed creating business partner data
     private val poolClient: PoolApiClient,

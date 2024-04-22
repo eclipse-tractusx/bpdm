@@ -20,29 +20,26 @@
 package org.eclipse.tractusx.bpdm.pool.config
 
 
+import org.eclipse.tractusx.bpdm.common.util.BpdmWebClientProvider
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.test.config.SelfClientConfigProperties
-import org.eclipse.tractusx.bpdm.test.util.BpdmOAuth2ClientFactory
 import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.web.reactive.function.client.WebClient
 
 
 @Configuration
-class PoolClientConfig(
-    private val selfClientConfigProperties: SelfClientConfigProperties
-){
+class PoolClientConfig{
 
     @Bean
-    fun authorizedPoolClient(webServerAppCtxt: ServletWebServerApplicationContext,
-                   bpdmOAuth2ClientFactory: BpdmOAuth2ClientFactory?)
-    : PoolClientImpl {
+    fun poolClient(
+        webServerAppCtxt: ServletWebServerApplicationContext,
+        selfClientConfigProperties: SelfClientConfigProperties,
+        webClientProvider: BpdmWebClientProvider
+    ): PoolClientImpl {
         return PoolClientImpl {
-            val baseUrl = "http://localhost:${webServerAppCtxt.webServer.port}"
-            val client = bpdmOAuth2ClientFactory?.createClient(baseUrl, selfClientConfigProperties.oauth2ClientRegistration)
-                ?: WebClient.create("http://localhost:${webServerAppCtxt.webServer.port}")
-            client
+            val properties = selfClientConfigProperties.copy(baseUrl = "http://localhost:${webServerAppCtxt.webServer.port}")
+            webClientProvider.builder(properties).build()
         }
     }
 }
