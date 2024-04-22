@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.service
 
 import jakarta.transaction.Transactional
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
+import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto
 import org.eclipse.tractusx.bpdm.pool.api.model.AddressStateDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityIdentifierDto
@@ -49,7 +50,10 @@ import org.eclipse.tractusx.bpdm.pool.api.model.SiteDto as SitePoolDto
 
 @Service
 class TaskStepBuildService(
-    private val businessPartnerBuildService: BusinessPartnerBuildService
+    private val businessPartnerBuildService: BusinessPartnerBuildService,
+    private val businessPartnerFetchService: BusinessPartnerFetchService,
+    private val siteService: SiteService,
+    private val addressService: AddressService
 ) {
 
     enum class CleaningError(val message: String) {
@@ -83,7 +87,10 @@ class TaskStepBuildService(
     fun upsertBusinessPartner(taskEntry: TaskStepReservationEntryDto, taskEntryBpnMapping: TaskEntryBpnMapping): TaskStepResultEntryDto {
         val businessPartnerDto = taskEntry.businessPartner
 
-        val legalEntityResult = upsertLegalEntity(businessPartnerDto.legalEntity, taskEntryBpnMapping)
+        val legalEntityResult = upsertLegalEntity(
+            businessPartnerDto.legalEntity,
+            taskEntryBpnMapping)
+
 
         val siteResult = if (legalEntityResult.errors.isEmpty() && businessPartnerDto.site != null) {
             upsertSite(
@@ -97,7 +104,12 @@ class TaskStepBuildService(
         }
 
         val addressResult = if (legalEntityResult.errors.isEmpty() && siteResult?.errors?.isEmpty() != false && businessPartnerDto.address != null)
-            upsertLogisticAddress(businessPartnerDto.address, legalEntityResult.legalEntityBpn!!, siteResult?.siteBpn, taskEntryBpnMapping)
+            upsertLogisticAddress(
+                businessPartnerDto.address,
+                legalEntityResult.legalEntityBpn!!,
+                siteResult?.siteBpn,
+                taskEntryBpnMapping
+                )
         else
             null
 
@@ -160,7 +172,13 @@ class TaskStepBuildService(
         val bpn = taskEntryBpnMapping.getBpn(bpnLReference)
         val bpnWithError = if (bpn == null) {
             createLegalEntity(legalEntityDto, taskEntryBpnMapping)
-        } else {
+        } else if(legalEntityDto.hasChanged == false) {
+            businessPartnerFetchService.fetchByBpns(listOf(bpn))
+                .firstOrNull()
+                ?.let { LegalEntityUpsertResponse(it.bpn, it.legalAddress.bpn, emptyList()) } ?:
+                throw BpdmValidationException(CleaningError.LEGAL_ADDRESS_IS_NULL.message)
+        }
+        else{
             updateLegalEntity(bpn, legalEntityDto)
         }
 
@@ -217,7 +235,13 @@ class TaskStepBuildService(
 
         val upsertSite = if (bpn == null) {
             createSite(siteDto, legalEntityBpn, legalAddressReference, taskEntryBpnMapping)
-        } else {
+        } else if(siteDto.hasChanged == false){
+            siteService.searchSites(SiteService.SiteSearchRequest(siteBpns = listOf(bpn), null, null, null), PaginationRequest(0, 1))
+                .content.firstOrNull()
+                ?.let { SiteUpsertResponse(it.site.bpns, it.mainAddress.bpna, emptyList()) }
+                ?: throw BpdmValidationException(CleaningError.MAINE_ADDRESS_IS_NULL.message)
+        }
+        else {
             updateSite(bpn, siteDto)
         }
         return upsertSite
@@ -284,7 +308,13 @@ class TaskStepBuildService(
 
         val upsertAddress = if (bpn == null) {
             createLogisticAddress(addressDto, legalEntityBpn, siteBpn, taskEntryBpnMapping)
-        } else {
+        } else if(addressDto.hasChanged == false){
+            addressService.searchAddresses(AddressService.AddressSearchRequest(addressBpns = listOf(bpn), null, null, null, null), PaginationRequest(0, 1))
+                .content.firstOrNull()
+                ?.let { AddressUpsertResponse(it.bpna, emptyList()) }
+                ?: throw BpdmValidationException(CleaningError.PHYSICAL_ADDRESS_IS_NULL.message)
+        }
+        else {
             updateLogisticAddress(bpn, addressDto)
         }
 
