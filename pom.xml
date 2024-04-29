@@ -55,7 +55,7 @@
         <springdoc.version>2.3.0</springdoc.version>
         <neo.version>1.29</neo.version>
         <kotlinlogging.version>3.0.5</kotlinlogging.version>
-        <wiremock.version>2.35.1</wiremock.version>
+        <wiremock.version>2.35.2</wiremock.version>
         <springmockk.version>4.0.2</springmockk.version>
         <assertj.version>3.24.2</assertj.version>
         <spring-boot.version>3.0.4</spring-boot.version>
