@@ -29,5 +29,5 @@ data class TaskCreateRequest(
     val mode: TaskMode,
 
     @get:ArraySchema(arraySchema = Schema(description = "The list of business partner data to be processed"))
-    val businessPartners: List<BusinessPartnerGenericDto>
+    val businessPartners: List<BusinessPartner>
 )

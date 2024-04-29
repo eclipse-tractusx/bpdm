@@ -151,10 +151,6 @@ management:
       # Include readiness state in health response (ready to accept traffic)
       enabled: true
 spring:
-  profiles:
-    group:
-      # BPDM common shortcut to remove all authentication configuration
-      no-auth: no-api-auth, no-orchestrator-auth
   security:
     oauth2:
       resourceserver:

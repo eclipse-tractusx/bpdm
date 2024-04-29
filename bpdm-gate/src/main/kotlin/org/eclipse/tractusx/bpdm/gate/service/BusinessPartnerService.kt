@@ -38,7 +38,6 @@ import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.eclipse.tractusx.bpdm.gate.util.getCurrentUserBpn
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerGenericDto
 import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRequest
 import org.eclipse.tractusx.orchestrator.api.model.TaskCreateResponse
 import org.eclipse.tractusx.orchestrator.api.model.TaskMode
@@ -280,14 +279,5 @@ class BusinessPartnerService(
             physicalPostalAddress = fromPostalAddress.physicalPostalAddress
             alternativePostalAddress = fromPostalAddress.alternativePostalAddress
         }
-
-
-    private fun createGoldenRecordTasks(mode: TaskMode, orchestratorBusinessPartnersDto: List<BusinessPartnerGenericDto>): TaskCreateResponse {
-        return orchestrationApiClient.goldenRecordTasks.createTasks(
-            TaskCreateRequest(
-                mode, orchestratorBusinessPartnersDto
-            )
-        )
-    }
 
 }

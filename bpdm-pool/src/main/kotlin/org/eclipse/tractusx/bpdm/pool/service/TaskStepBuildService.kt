@@ -19,27 +19,25 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
+import com.neovisionaries.i18n.CountryCode
 import jakarta.transaction.Transactional
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto
 import org.eclipse.tractusx.bpdm.pool.api.model.AddressStateDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityIdentifierDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityStateDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressDto
+import org.eclipse.tractusx.bpdm.pool.api.model.SiteDto
 import org.eclipse.tractusx.bpdm.pool.api.model.SiteStateDto
 import org.eclipse.tractusx.bpdm.pool.api.model.StreetDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorCode
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.orchestrator.api.model.*
-import org.eclipse.tractusx.orchestrator.api.model.AlternativePostalAddressDto
-import org.eclipse.tractusx.orchestrator.api.model.ConfidenceCriteriaDto
-import org.eclipse.tractusx.orchestrator.api.model.LegalEntityDto
-import org.eclipse.tractusx.orchestrator.api.model.LogisticAddressDto
-import org.eclipse.tractusx.orchestrator.api.model.PhysicalPostalAddressDto
-import org.eclipse.tractusx.orchestrator.api.model.SiteDto
 import org.springframework.stereotype.Service
+import java.time.Instant
+import java.time.ZoneOffset
 import org.eclipse.tractusx.bpdm.pool.api.model.AlternativePostalAddressDto as AlternativePostalAddressPoolDto
 import org.eclipse.tractusx.bpdm.pool.api.model.ConfidenceCriteriaDto as ConfidenceCriteriaPoolDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityDto as LegalEntityPoolDto
@@ -87,326 +85,288 @@ class TaskStepBuildService(
     fun upsertBusinessPartner(taskEntry: TaskStepReservationEntryDto, taskEntryBpnMapping: TaskEntryBpnMapping): TaskStepResultEntryDto {
         val businessPartnerDto = taskEntry.businessPartner
 
-        val legalEntityResult = upsertLegalEntity(
-            businessPartnerDto.legalEntity,
-            taskEntryBpnMapping)
+        val legalEntityBpns = upsertLegalEntity(businessPartnerDto, taskEntryBpnMapping)
+        val siteBpns = businessPartnerDto.site?.let { upsertSite(businessPartnerDto, legalEntityBpns.legalEntityBpn, taskEntryBpnMapping) }
+        val addressBpn = businessPartnerDto.additionalAddress?.let { upsertAdditionalAddress(businessPartnerDto, legalEntityBpns.legalEntityBpn, siteBpns?.siteBpn, taskEntryBpnMapping) }
 
-
-        val siteResult = if (legalEntityResult.errors.isEmpty() && businessPartnerDto.site != null) {
-            upsertSite(
-                businessPartnerDto.site,
-                legalEntityResult.legalEntityBpn!!,
-                businessPartnerDto.legalEntity?.legalAddress?.bpnAReference,
-                taskEntryBpnMapping
-            )
-        } else {
-            null
-        }
-
-        val addressResult = if (legalEntityResult.errors.isEmpty() && siteResult?.errors?.isEmpty() != false && businessPartnerDto.address != null)
-            upsertLogisticAddress(
-                businessPartnerDto.address,
-                legalEntityResult.legalEntityBpn!!,
-                siteResult?.siteBpn,
-                taskEntryBpnMapping
-                )
-        else
-            null
-
-        val taskErrors = legalEntityResult.errors
-            .plus(siteResult?.errors ?: emptyList())
-            .plus(addressResult?.errors ?: emptyList())
-            .map { TaskErrorDto(TaskErrorType.Unspecified, it.message) }
-
-        val bpna = addressResult?.addressBpn ?: siteResult?.mainAddressBpn ?: legalEntityResult.legalAddressBpn
-        val genericWithBpn = with(businessPartnerDto.generic) {
+        val businessPartnerWithBpns = with(businessPartnerDto){
             copy(
-                legalEntity = this.legalEntity.copy(legalEntityBpn = legalEntityResult.legalEntityBpn),
-                site = this.site.copy(siteBpn = siteResult?.siteBpn),
-                address = this.address.copy(addressBpn = bpna)
+                legalEntity = legalEntity.copy(
+                    bpnReference = toBpnReference(legalEntityBpns.legalEntityBpn),
+                    legalAddress = legalEntity.legalAddress.copy(
+                        bpnReference = toBpnReference(legalEntityBpns.legalAddressBpn)
+                    )
+                ),
+                site = siteBpns?.let { site?.copy(
+                    bpnReference = toBpnReference(siteBpns.siteBpn),
+                    siteMainAddress = site!!.siteMainAddress?.copy(bpnReference = toBpnReference(siteBpns.mainAddressBpn))
+                ) },
+                additionalAddress = addressBpn?.let { additionalAddress?.copy(bpnReference = toBpnReference(addressBpn)) }
             )
-        }
-
-        val legalEntityWithBpn = with(businessPartnerDto.legalEntity) {
-            this?.let {
-                copy(
-                    bpnLReference = toBpnReference(legalEntityResult.legalEntityBpn),
-                    legalAddress = legalAddress!!.copy(bpnAReference = toBpnReference(legalEntityResult.legalAddressBpn))
-                )
-            }
-        }
-
-        val siteWithBpn = with(businessPartnerDto.site) {
-            this?.let {
-                copy(
-                    bpnSReference = toBpnReference(siteResult?.siteBpn),
-                    mainAddress = mainAddress!!.copy(bpnAReference = toBpnReference(siteResult?.mainAddressBpn))
-            )
-            }
-        }
-
-        val addressWithBpn = with(businessPartnerDto.address) {
-            this?.let {
-                copy(bpnAReference = toBpnReference(addressResult?.addressBpn))
-            }
         }
 
         return TaskStepResultEntryDto(
             taskId = taskEntry.taskId,
-            businessPartner = BusinessPartnerFullDto(
-                generic = genericWithBpn,
-                legalEntity = legalEntityWithBpn,
-                site = siteWithBpn,
-                address = addressWithBpn
-            ),
-            errors = taskErrors
+            businessPartner = businessPartnerWithBpns,
+            errors = emptyList()
         )
     }
 
 
     fun upsertLegalEntity(
-        legalEntityDto: LegalEntityDto?, taskEntryBpnMapping: TaskEntryBpnMapping
+        businessPartner: BusinessPartner, taskEntryBpnMapping: TaskEntryBpnMapping
     ): LegalEntityUpsertResponse {
-        val bpnLReference = legalEntityDto?.bpnLReference ?: throw BpdmValidationException(CleaningError.LEGAL_ENTITY_IS_NULL.message)
+        val legalEntity = businessPartner.legalEntity
+        val legalAddress = legalEntity.legalAddress
+        val bpnLReference = legalEntity.bpnReference
+        val bpnL = taskEntryBpnMapping.getBpn(bpnLReference)
 
-        val bpn = taskEntryBpnMapping.getBpn(bpnLReference)
-        val bpnWithError = if (bpn == null) {
-            createLegalEntity(legalEntityDto, taskEntryBpnMapping)
-        } else if(legalEntityDto.hasChanged == false) {
-            businessPartnerFetchService.fetchByBpns(listOf(bpn))
+        val poolLegalEntity = toPoolDto(legalEntity)
+        val poolLegalAddress = toPoolDto(legalAddress)
+
+        val bpnResults = if (bpnL == null) {
+            createLegalEntity(poolLegalEntity, poolLegalAddress)
+        } else if(legalEntity.hasChanged == false) {
+            businessPartnerFetchService.fetchByBpns(listOf(bpnL))
                 .firstOrNull()
-                ?.let { LegalEntityUpsertResponse(it.bpn, it.legalAddress.bpn, emptyList()) } ?:
-                throw BpdmValidationException(CleaningError.LEGAL_ADDRESS_IS_NULL.message)
+                ?.let { LegalEntityUpsertResponse(it.bpn, it.legalAddress.bpn) } ?:
+                throw BpdmValidationException("Legal entity with specified BPNL ${bpnL} not found")
         }
         else{
-            updateLegalEntity(bpn, legalEntityDto)
+            updateLegalEntity(bpnL, poolLegalEntity, poolLegalAddress)
         }
 
-        return bpnWithError
+        taskEntryBpnMapping.addMapping(bpnLReference, bpnResults.legalEntityBpn)
+        taskEntryBpnMapping.addMapping(legalAddress.bpnReference, bpnResults.legalAddressBpn)
+
+        return bpnResults
     }
 
-    private fun createLegalEntity(
-        legalEntityDto: LegalEntityDto, taskEntryBpnMapping: TaskEntryBpnMapping
-    ): LegalEntityUpsertResponse {
-        val legalAddress = legalEntityDto.legalAddress ?: throw BpdmValidationException(CleaningError.LEGAL_ADDRESS_IS_NULL.message)
-        val bpnAReference =
-            legalEntityDto.legalAddress?.bpnAReference ?: throw BpdmValidationException(CleaningError.LEGAL_ADDRESS_BPN_REFERENCE_MISSING.message)
+    private fun createLegalEntity(legalEntityDto: LegalEntityPoolDto, legalAddressDto: LogisticAddressPoolDto): LegalEntityUpsertResponse {
 
         val createRequest = LegalEntityPartnerCreateRequest(
-            legalEntity = toPoolDto(legalEntityDto),
-            legalAddress = toPoolDto(legalAddress),
+            legalEntity = legalEntityDto,
+            legalAddress = legalAddressDto,
             index = ""
         )
         val result = businessPartnerBuildService.createLegalEntities(listOf(createRequest))
-        val legalEntityResult = result.entities.firstOrNull()
-        val bpnL = legalEntityResult?.legalEntity?.bpnl
-        val legalAddressBpnA = legalEntityResult?.legalAddress?.bpna
+        if(result.errors.isNotEmpty())
+            throw BpdmValidationException("Errors on creating Legal Entity: ${result.errors.joinToString()}")
 
-        bpnL?.run { taskEntryBpnMapping.addMapping(legalEntityDto.bpnLReference!!, bpnL) }
-        legalAddressBpnA?.run { taskEntryBpnMapping.addMapping(bpnAReference, legalAddressBpnA) }
+        val legalEntityResult = result.entities.firstOrNull() ?: throw BpdmValidationException("Unknown error when trying to create legal entity")
 
-        return LegalEntityUpsertResponse(bpnL, legalAddressBpnA, result.errors)
+        val bpnL = legalEntityResult.legalEntity.bpnl
+        val legalAddressBpnA = legalEntityResult.legalAddress.bpna
+
+        return LegalEntityUpsertResponse(bpnL, legalAddressBpnA)
     }
 
     private fun updateLegalEntity(
         bpnL: String,
-        legalEntityDto: LegalEntityDto
+        legalEntityDto: LegalEntityDto,
+        legalAddressDto: LogisticAddressDto
     ): LegalEntityUpsertResponse {
-        val legalAddress = legalEntityDto.legalAddress ?: throw BpdmValidationException(CleaningError.LEGAL_ADDRESS_IS_NULL.message)
-
         val updateRequest = LegalEntityPartnerUpdateRequest(
             bpnl = bpnL,
-            legalEntity = toPoolDto(legalEntityDto),
-            legalAddress = toPoolDto(legalAddress)
+            legalEntity = legalEntityDto,
+            legalAddress = legalAddressDto
         )
         val result = businessPartnerBuildService.updateLegalEntities(listOf(updateRequest))
-        val legalEntityResult = result.entities.firstOrNull()
-        return LegalEntityUpsertResponse(legalEntityResult?.legalEntity?.bpnl, legalEntityResult?.legalAddress?.bpna, result.errors)
+        if(result.errors.isNotEmpty())
+            throw BpdmValidationException("Errors on updating Legal Entity: ${result.errors.joinToString()}")
+
+        val legalEntityResult = result.entities.firstOrNull() ?: throw BpdmValidationException("Unknown error when trying to update legal entity")
+
+        return LegalEntityUpsertResponse(legalEntityResult.legalEntity.bpnl, legalEntityResult.legalAddress.bpna)
     }
 
     private fun upsertSite(
-        siteDto: SiteDto?,
+        businessPartner: BusinessPartner,
         legalEntityBpn: String,
-        legalAddressReference: BpnReferenceDto?,
         taskEntryBpnMapping: TaskEntryBpnMapping
     ): SiteUpsertResponse {
-        val bpnSReference = siteDto?.bpnSReference ?: throw BpdmValidationException(CleaningError.BPNS_IS_NULL.message)
-        val bpn = taskEntryBpnMapping.getBpn(bpnSReference)
+        val site = businessPartner.site
+        val siteMainAddress = site?.siteMainAddress ?: businessPartner.legalEntity.legalAddress
 
-        val upsertSite = if (bpn == null) {
-            createSite(siteDto, legalEntityBpn, legalAddressReference, taskEntryBpnMapping)
-        } else if(siteDto.hasChanged == false){
-            siteService.searchSites(SiteService.SiteSearchRequest(siteBpns = listOf(bpn), null, null, null), PaginationRequest(0, 1))
+        val bpnSReference = site?.bpnReference ?: throw BpdmValidationException(CleaningError.BPNS_IS_NULL.message)
+        val bpnS = taskEntryBpnMapping.getBpn(bpnSReference)
+
+        val poolSite = toPoolDto(site, siteMainAddress)
+
+        val bpnResults = if (bpnS == null) {
+            createSite(poolSite, legalEntityBpn, site.siteMainAddress == null)
+        } else if(site.hasChanged == false){
+            siteService.searchSites(SiteService.SiteSearchRequest(siteBpns = listOf(bpnS), null, null, null), PaginationRequest(0, 1))
                 .content.firstOrNull()
-                ?.let { SiteUpsertResponse(it.site.bpns, it.mainAddress.bpna, emptyList()) }
+                ?.let { SiteUpsertResponse(it.site.bpns, it.mainAddress.bpna) }
                 ?: throw BpdmValidationException(CleaningError.MAINE_ADDRESS_IS_NULL.message)
         }
         else {
-            updateSite(bpn, siteDto)
+            updateSite(bpnS, poolSite)
         }
-        return upsertSite
+
+        taskEntryBpnMapping.addMapping(bpnSReference, bpnResults.siteBpn)
+        taskEntryBpnMapping.addMapping(siteMainAddress.bpnReference, bpnResults.mainAddressBpn)
+
+        return bpnResults
     }
 
     private fun createSite(
-        siteDto: SiteDto,
+        poolSite: SiteDto,
         legalEntityBpn: String,
-        legalAddressReference: BpnReferenceDto?,
-        taskEntryBpnMapping: TaskEntryBpnMapping
+        isSiteMainAndLegalAddress: Boolean
     ): SiteUpsertResponse {
-        val mainAddressReference = siteDto.mainAddress?.bpnAReference ?: throw BpdmValidationException(CleaningError.MAIN_ADDRESS_BPN_REFERENCE_MISSING.message)
 
-        val result = if (mainAddressReference.referenceValue == legalAddressReference?.referenceValue) {
+        val result = if(isSiteMainAndLegalAddress){
             val createRequest = BusinessPartnerBuildService.SiteCreateRequestWithLegalAddressAsMain(
-                name = siteDto.name ?: throw BpdmValidationException(CleaningError.SITE_NAME_MISSING.message),
-                states = siteDto.states.map { SiteStateDto(it.validFrom, it.validTo, it.type) },
-                confidenceCriteria = siteDto.confidenceCriteria?.let { toPoolDto(it) }
-                    ?: throw BpdmValidationException(CleaningError.SITE_CONFIDENCE_CRITERIA_MISSING.message),
+                name = poolSite.name,
+                states = poolSite.states,
+                confidenceCriteria = poolSite.confidenceCriteria,
                 bpnLParent = legalEntityBpn
             )
             businessPartnerBuildService.createSitesWithLegalAddressAsMain(listOf(createRequest))
-        } else {
+        }else{
             val createRequest = SitePartnerCreateRequest(
                 bpnlParent = legalEntityBpn,
-                site = toPoolDto(siteDto),
+                site = poolSite,
                 index = ""
             )
             businessPartnerBuildService.createSitesWithMainAddress(listOf(createRequest))
         }
 
-        val siteResult = result.entities.firstOrNull()
-        val bpnS = siteResult?.site?.bpns
-        val mainAddressBpnA = siteResult?.mainAddress?.bpna
+        if(result.errors.isNotEmpty())
+            throw BpdmValidationException("Errors on creating Site: ${result.errors.joinToString()}")
 
-        bpnS?.run { taskEntryBpnMapping.addMapping(siteDto.bpnSReference!!, bpnS) }
-        mainAddressBpnA?.run { taskEntryBpnMapping.addMapping(mainAddressReference, mainAddressBpnA) }
+        val siteResult = result.entities.firstOrNull() ?: throw BpdmValidationException("Unknown error when trying to creating site")
 
-        return SiteUpsertResponse(bpnS, mainAddressBpnA, result.errors)
+        return SiteUpsertResponse(siteResult.site.bpns, siteResult.mainAddress.bpna)
     }
 
     private fun updateSite(
         bpnS: String,
-        siteDto: SiteDto
+        poolSite: SiteDto,
     ): SiteUpsertResponse {
         val updateRequest = SitePartnerUpdateRequest(
             bpns = bpnS,
-            site = toPoolDto(siteDto)
+            site = poolSite
         )
         val result = businessPartnerBuildService.updateSites(listOf(updateRequest))
-        val siteResult = result.entities.firstOrNull()
+        if(result.errors.isNotEmpty())
+            throw BpdmValidationException("Errors on updating Site: ${result.errors.joinToString()}")
 
-        return SiteUpsertResponse(siteResult?.site?.bpns, siteResult?.mainAddress?.bpna, result.errors)
+        val siteResult = result.entities.firstOrNull() ?: throw BpdmValidationException("Unknown error when trying to updating site")
+
+        return SiteUpsertResponse(siteResult.site.bpns, siteResult.mainAddress.bpna)
     }
 
-    private fun upsertLogisticAddress(
-        addressDto: LogisticAddressDto?,
+    private fun upsertAdditionalAddress(
+        businessPartner: BusinessPartner,
         legalEntityBpn: String,
         siteBpn: String?,
         taskEntryBpnMapping: TaskEntryBpnMapping
-    ): AddressUpsertResponse {
-        val bpnAReference = addressDto?.bpnAReference ?: throw BpdmValidationException(CleaningError.BPNA_IS_NULL.message)
-        val bpn = taskEntryBpnMapping.getBpn(bpnAReference)
+    ): String {
+        val postalAddress = businessPartner.additionalAddress
 
-        val upsertAddress = if (bpn == null) {
-            createLogisticAddress(addressDto, legalEntityBpn, siteBpn, taskEntryBpnMapping)
-        } else if(addressDto.hasChanged == false){
-            addressService.searchAddresses(AddressService.AddressSearchRequest(addressBpns = listOf(bpn), null, null, null, null), PaginationRequest(0, 1))
-                .content.firstOrNull()
-                ?.let { AddressUpsertResponse(it.bpna, emptyList()) }
-                ?: throw BpdmValidationException(CleaningError.PHYSICAL_ADDRESS_IS_NULL.message)
+        val bpnAReference = postalAddress?.bpnReference ?: throw BpdmValidationException(CleaningError.BPNA_IS_NULL.message)
+        val bpnA = taskEntryBpnMapping.getBpn(bpnAReference)
+
+        val poolAddress = toPoolDto(postalAddress)
+
+        val addressBpn = if (bpnA == null) {
+            createLogisticAddress(poolAddress, legalEntityBpn, siteBpn)
+        } else if(postalAddress.hasChanged == false){
+            addressService.searchAddresses(AddressService.AddressSearchRequest(addressBpns = listOf(bpnA), null, null, null, null), PaginationRequest(0, 1))
+                        .content.firstOrNull()?.bpna
+                ?: throw BpdmValidationException(CleaningError.BPNA_IS_NULL.message)
         }
         else {
-            updateLogisticAddress(bpn, addressDto)
+            updateLogisticAddress(bpnA, poolAddress)
         }
 
-        return upsertAddress
+        taskEntryBpnMapping.addMapping(bpnAReference, addressBpn)
+
+        return addressBpn
     }
 
     private fun createLogisticAddress(
-        addressDto: LogisticAddressDto,
+        poolAddress: LogisticAddressDto,
         legalEntityBpn: String,
-        siteBpn: String?,
-        taskEntryBpnMapping: TaskEntryBpnMapping
-    ): AddressUpsertResponse {
+        siteBpn: String?
+    ): String {
         val addressCreateRequest = AddressPartnerCreateRequest(
             bpnParent = siteBpn ?: legalEntityBpn,
             index = "",
-            address = toPoolDto(addressDto)
+            address = poolAddress
         )
         val result = businessPartnerBuildService.createAddresses(listOf(addressCreateRequest))
-        val bpna = result.entities.firstOrNull()?.address?.bpna
-        bpna?.run { taskEntryBpnMapping.addMapping(addressDto.bpnAReference!!, bpna) }
 
-        return AddressUpsertResponse(bpna, result.errors)
+        if(result.errors.isNotEmpty())
+            throw BpdmValidationException("Errors on creating Address: ${result.errors.joinToString()}")
+
+        val addressResult = result.entities.firstOrNull() ?: throw BpdmValidationException("Unknown error when trying to creating address")
+
+        return addressResult.address.bpna
     }
 
     private fun updateLogisticAddress(
         bpnA: String,
-        addressDto: LogisticAddressDto
-    ): AddressUpsertResponse {
+        poolAddress: LogisticAddressDto,
+    ): String {
         val addressUpdateRequest = AddressPartnerUpdateRequest(
             bpna = bpnA,
-            address = toPoolDto(addressDto)
+            address =  poolAddress
         )
         val result = businessPartnerBuildService.updateAddresses(listOf(addressUpdateRequest))
 
-        return AddressUpsertResponse(result.entities.firstOrNull()?.bpna, result.errors)
+        if(result.errors.isNotEmpty())
+            throw BpdmValidationException("Errors on updating Address: ${result.errors.joinToString()}")
+
+        val addressResult = result.entities.firstOrNull() ?: throw BpdmValidationException("Unknown error when trying to updating address")
+
+        return addressResult.bpna
     }
 
-    private fun toPoolDto(legalEntity: LegalEntityDto) =
+    private fun toPoolDto(legalEntity: LegalEntity) =
         with(legalEntity) {
             LegalEntityPoolDto(
                 legalName = legalName ?: throw BpdmValidationException(CleaningError.LEGAL_NAME_IS_NULL.message),
                 legalShortName = legalShortName,
                 legalForm = legalForm,
-                identifiers = identifiers.map { LegalEntityIdentifierDto(it.value, it.type, it.issuingBody) },
-                states = states.map { LegalEntityStateDto(it.validFrom, it.validTo, it.type) },
-                confidenceCriteria = confidenceCriteria?.let { toPoolDto(it) }
-                    ?: throw BpdmValidationException(CleaningError.LEGAL_ENTITY_CONFIDENCE_CRITERIA_MISSING.message),
-                isCatenaXMemberData = isCatenaXMemberData
+                identifiers = identifiers.map { assertNotNull(it).let { LegalEntityIdentifierDto(it.value!!, it.type!!, it.issuingBody) } },
+                states = states.map { assertNotNull(it).let { LegalEntityStateDto(it.validFrom.toLocalDateTime(), it.validTo.toLocalDateTime(), it.type!!) }   },
+                confidenceCriteria = toPoolDto(confidenceCriteria, CleaningError.LEGAL_ENTITY_CONFIDENCE_CRITERIA_MISSING),
+                isCatenaXMemberData = isCatenaXMemberData ?: false
             )
         }
 
-    private fun toPoolDto(site: SiteDto) =
+    private fun toPoolDto(site: Site, siteMainAddress: PostalAddress) =
         with(site) {
             SitePoolDto(
-                name = name ?: throw BpdmValidationException(CleaningError.SITE_NAME_MISSING.message),
-                states = states.map { SiteStateDto(it.validFrom, it.validTo, it.type) },
-                mainAddress = mainAddress?.let { toPoolDto(it) } ?: throw BpdmValidationException(CleaningError.MAINE_ADDRESS_IS_NULL.message),
-                confidenceCriteria = confidenceCriteria?.let { toPoolDto(it) }
-                    ?: throw BpdmValidationException(CleaningError.SITE_CONFIDENCE_CRITERIA_MISSING.message)
+                name = site.siteName ?: throw BpdmValidationException(CleaningError.SITE_NAME_MISSING.message),
+                states = states.map { assertNotNull(it).let { SiteStateDto(it.validFrom.toLocalDateTime(), it.validTo.toLocalDateTime(), it.type!!) }},
+                mainAddress = toPoolDto(siteMainAddress),
+                confidenceCriteria = toPoolDto(confidenceCriteria, CleaningError.SITE_CONFIDENCE_CRITERIA_MISSING)
             )
         }
 
 
-    private fun toPoolDto(logisticAddress: LogisticAddressDto) =
+    private fun toPoolDto(logisticAddress: PostalAddress) =
         with(logisticAddress) {
             LogisticAddressPoolDto(
-                name = name,
-                states = states.map { AddressStateDto(it.validFrom, it.validTo, it.type) },
-                identifiers = identifiers.map { AddressIdentifierDto(it.value, it.type) },
-                physicalPostalAddress = physicalPostalAddress?.let { toPoolDto(it) }
-                    ?: throw BpdmValidationException(CleaningError.PHYSICAL_ADDRESS_IS_NULL.message),
-                alternativePostalAddress = alternativePostalAddress?.let { toPoolDto(it) },
-                confidenceCriteria = with(confidenceCriteria) {
-                    this?.let {
-                        ConfidenceCriteriaPoolDto(
-                            sharedByOwner,
-                            checkedByExternalDataSource,
-                            numberOfSharingMembers,
-                            lastConfidenceCheckAt,
-                            nextConfidenceCheckAt,
-                            confidenceLevel
-                        )
-                    }
-                } ?: throw BpdmValidationException(CleaningError.ADDRESS_CONFIDENCE_CRITERIA_MISSING.message)
+                name = addressName,
+                states = states.map { assertNotNull(it).let {  AddressStateDto(it.validFrom.toLocalDateTime(), it.validTo.toLocalDateTime(), it.type!!)} },
+                identifiers = identifiers.map { assertNotNull(it).let { AddressIdentifierDto(it.value!!, it.type!!) } },
+                physicalPostalAddress = toPoolDto(physicalAddress),
+                alternativePostalAddress = alternativeAddress?.let { toPoolDto(it) },
+                confidenceCriteria = toPoolDto(confidenceCriteria, CleaningError.ADDRESS_CONFIDENCE_CRITERIA_MISSING)
             )
         }
 
-    private fun toPoolDto(physicalPostalAddressDto: PhysicalPostalAddressDto) =
+    private fun toPoolDto(physicalPostalAddressDto: PhysicalAddress) =
         with(physicalPostalAddressDto) {
             PhysicalPostalAddressPoolDto(
-                geographicCoordinates = with(geographicCoordinates) { this?.let { GeoCoordinateDto(longitude, latitude, altitude) } },
-                country = country ?: throw BpdmValidationException(CleaningError.PHYSICAL_ADDRESS_COUNTRY_MISSING.message),
+                geographicCoordinates = with(geographicCoordinates) { longitude?.let { lon -> latitude?.let { lat ->  GeoCoordinateDto(lon, lat, altitude) } } },
+                country =  country?.let { toCountryCode(it) } ?: throw BpdmValidationException(CleaningError.PHYSICAL_ADDRESS_COUNTRY_MISSING.message),
                 administrativeAreaLevel1 = administrativeAreaLevel1,
                 administrativeAreaLevel2 = administrativeAreaLevel2,
                 administrativeAreaLevel3 = administrativeAreaLevel3,
@@ -419,7 +379,6 @@ class TaskStepBuildService(
                 floor = floor,
                 door = door,
                 street = with(street) {
-                    this?.let {
                         StreetDto(
                             name,
                             houseNumber,
@@ -431,16 +390,15 @@ class TaskStepBuildService(
                             nameSuffix,
                             additionalNameSuffix
                         )
-                    }
                 }
             )
         }
 
-    private fun toPoolDto(alternativeAddress: AlternativePostalAddressDto) =
+    private fun toPoolDto(alternativeAddress: AlternativeAddress) =
         with(alternativeAddress) {
             AlternativePostalAddressPoolDto(
-                geographicCoordinates = with(geographicCoordinates) { this?.let { GeoCoordinateDto(longitude, latitude, altitude) } },
-                country = country ?: throw BpdmValidationException(CleaningError.ALTERNATIVE_ADDRESS_COUNTRY_MISSING.message),
+                geographicCoordinates = with(geographicCoordinates) { longitude?.let { lon -> latitude?.let { lat ->  GeoCoordinateDto(lon, lat, altitude) } } },
+                country = country?.let { toCountryCode(it) } ?: throw BpdmValidationException(CleaningError.ALTERNATIVE_ADDRESS_COUNTRY_MISSING.message),
                 administrativeAreaLevel1 = administrativeAreaLevel1,
                 postalCode = postalCode,
                 city = city ?: throw BpdmValidationException(CleaningError.ALTERNATIVE_ADDRESS_CITY_MISSING.message),
@@ -452,35 +410,51 @@ class TaskStepBuildService(
             )
         }
 
-    private fun toPoolDto(confidenceCriteria: ConfidenceCriteriaDto) =
+    private fun toPoolDto(confidenceCriteria: ConfidenceCriteria, cleaningError: CleaningError) =
         with(confidenceCriteria) {
             ConfidenceCriteriaPoolDto(
-                sharedByOwner,
-                checkedByExternalDataSource,
-                numberOfSharingMembers,
-                lastConfidenceCheckAt,
-                nextConfidenceCheckAt,
-                confidenceLevel
+                sharedByOwner ?:  throw BpdmValidationException(cleaningError.message),
+                checkedByExternalDataSource ?:  throw BpdmValidationException(cleaningError.message),
+                numberOfSharingMembers ?:  throw BpdmValidationException(cleaningError.message),
+                lastConfidenceCheckAt?.atZone(ZoneOffset.UTC)?.toLocalDateTime() ?:  throw BpdmValidationException(cleaningError.message),
+                nextConfidenceCheckAt?.atZone(ZoneOffset.UTC)?.toLocalDateTime() ?:  throw BpdmValidationException(cleaningError.message),
+                confidenceLevel ?:  throw BpdmValidationException(cleaningError.message)
             )
         }
 
-    private fun toBpnReference(bpn: String?) =
-        bpn?.let { BpnReferenceDto(bpn, BpnReferenceType.Bpn) }
+
+    private fun assertNotNull(identifier: Identifier): Identifier {
+        identifier.value ?: throw BpdmValidationException("Identifier value is null")
+        identifier.type ?: throw BpdmValidationException("Identifier type is null")
+
+        return identifier
+    }
+
+    private fun assertNotNull(state: BusinessState): BusinessState {
+        state.type ?: throw BpdmValidationException("Business Partner state type is null")
+        return state
+    }
+
+    private fun toBpnReference(bpn: String) = BpnReference(bpn, null, BpnReferenceType.Bpn)
+
+    private fun Instant?.toLocalDateTime() =
+        this?.atZone(ZoneOffset.UTC)?.toLocalDateTime()
+
+    private fun toCountryCode(code: String): CountryCode{
+        try{
+            return CountryCode.getByAlpha2Code(code)
+        }catch (e: IllegalArgumentException){
+            throw BpdmValidationException("Country Code not recognized")
+        }
+    }
 
     data class LegalEntityUpsertResponse(
-        val legalEntityBpn: String?,
-        val legalAddressBpn: String?,
-        val errors: Collection<ErrorInfo<ErrorCode>>
+        val legalEntityBpn: String,
+        val legalAddressBpn: String
     )
 
     data class SiteUpsertResponse(
-        val siteBpn: String?,
-        val mainAddressBpn: String?,
-        val errors: Collection<ErrorInfo<ErrorCode>>
-    )
-
-    data class AddressUpsertResponse(
-        val addressBpn: String?,
-        val errors: Collection<ErrorInfo<ErrorCode>>
+        val siteBpn: String,
+        val mainAddressBpn: String
     )
 }

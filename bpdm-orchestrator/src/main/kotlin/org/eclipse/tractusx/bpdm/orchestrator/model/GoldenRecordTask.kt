@@ -19,10 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.orchestrator.model
 
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerFullDto
+import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
 
 data class GoldenRecordTask(
     val taskId: String,
-    var businessPartner: BusinessPartnerFullDto,
+    var businessPartner: BusinessPartner,
     val processingState: TaskProcessingState
 )

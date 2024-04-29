@@ -29,9 +29,9 @@ data class TaskStepReservationEntryDto(
     val taskId: String,
 
     @get:Schema(description = "The business partner data to process")
-    val businessPartner: BusinessPartnerFullDto
+    val businessPartner: BusinessPartner
 ) : RequestWithKey {
-    override fun getRequestKey(): String? {
+    override fun getRequestKey(): String {
         return taskId
     }
 }

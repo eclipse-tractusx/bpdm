@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmIllegalStateExceptio
 import org.eclipse.tractusx.bpdm.orchestrator.model.GoldenRecordTask
 import org.eclipse.tractusx.bpdm.orchestrator.model.TaskProcessingState
 import org.eclipse.tractusx.orchestrator.api.model.*
+import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
 import org.springframework.stereotype.Service
 import java.time.Instant
 
@@ -70,7 +71,7 @@ class GoldenRecordTaskStateMachine(
         state.taskModifiedAt = now
     }
 
-    fun doResolveTaskToSuccess(task: GoldenRecordTask, step: TaskStep, resultBusinessPartner: BusinessPartnerFullDto) {
+    fun doResolveTaskToSuccess(task: GoldenRecordTask, step: TaskStep, resultBusinessPartner: BusinessPartner) {
         logger.debug { "Executing doResolveTaskToSuccess() with parameters $task // $step and $resultBusinessPartner" }
         val state = task.processingState
         val now = Instant.now()

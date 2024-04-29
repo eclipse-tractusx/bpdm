@@ -61,11 +61,6 @@ bpdm:
 server:
   # The port this application runs on
   port: 8084
-spring:
-  profiles:
-    group:
-      # BPDM common shortcut to remove all authentication configuration
-      no-auth: no-orchestrator-auth
 logging:
   pattern:
     # Use BPDM custom log pattern

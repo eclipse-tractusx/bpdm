@@ -20,3 +20,9 @@
 bpdm:
   bpn:
     owner-bpn-l: BPNL000000000010
+  tasks:
+    creation:
+      fromSharingMember:
+        cron: '-'
+    check:
+      cron: '-'

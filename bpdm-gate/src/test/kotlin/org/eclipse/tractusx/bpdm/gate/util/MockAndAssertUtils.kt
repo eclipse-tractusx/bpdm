@@ -63,7 +63,7 @@ class MockAndAssertUtils @Autowired constructor(
                 listOf(
                     TaskClientStateDto(
                         taskId = "0",
-                        businessPartnerResult = null,
+                        businessPartnerResult = BusinessPartnerGenericCommonValues.businessPartner1,
                         processingState = TaskProcessingStateDto(
                             resultState = ResultState.Pending,
                             step = TaskStep.CleanAndSync,
@@ -76,7 +76,7 @@ class MockAndAssertUtils @Autowired constructor(
                     ),
                     TaskClientStateDto(
                         taskId = "1",
-                        businessPartnerResult = null,
+                        businessPartnerResult = BusinessPartnerGenericCommonValues.businessPartner1,
                         processingState = TaskProcessingStateDto(
                             resultState = ResultState.Pending,
                             step = TaskStep.CleanAndSync,
@@ -89,7 +89,7 @@ class MockAndAssertUtils @Autowired constructor(
                     ),
                     TaskClientStateDto(
                         taskId = "2",
-                        businessPartnerResult = null,
+                        businessPartnerResult = BusinessPartnerGenericCommonValues.businessPartner1,
                         processingState = TaskProcessingStateDto(
                             resultState = ResultState.Pending,
                             step = TaskStep.CleanAndSync,
@@ -102,7 +102,7 @@ class MockAndAssertUtils @Autowired constructor(
                     ),
                     TaskClientStateDto(
                         taskId = "3",
-                        businessPartnerResult = null,
+                        businessPartnerResult = BusinessPartnerGenericCommonValues.businessPartner1,
                         processingState = TaskProcessingStateDto(
                             resultState = ResultState.Pending,
                             step = TaskStep.CleanAndSync,
@@ -144,7 +144,7 @@ class MockAndAssertUtils @Autowired constructor(
                     ),
                     TaskClientStateDto(
                         taskId = "1",
-                        businessPartnerResult = null,
+                        businessPartnerResult = BusinessPartnerGenericCommonValues.businessPartner1,
                         processingState = TaskProcessingStateDto(
                             resultState = ResultState.Error,
                             step = TaskStep.CleanAndSync,

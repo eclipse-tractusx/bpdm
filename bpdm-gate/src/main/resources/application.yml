@@ -50,10 +50,10 @@ bpdm:
         # Up to how many golden record tasks can be created when checking
         batchSize: 100
       fromPool:
-        # When and how often the Gate checks for golden record updates from the Pool
-        batchSize: 100
         # Up to how many golden record tasks can be created when checking
-        cron: '*/30 * * * * *'
+        batchSize: 100
+        # When and how often the Gate checks for golden record updates from the Pool
+        cron: '-'
     check:
       batchSize: 100
       cron: '*/30 * * * * *'
@@ -159,10 +159,6 @@ management:
           # Include readiness state in health response (ready to accept traffic)
             enabled: true
 spring:
-  profiles:
-    group:
-      # BPDM common shortcut to remove all authentication configuration
-      no-auth: no-api-auth, no-orchestrator-auth, no-pool-auth
   security:
     oauth2:
       resourceserver:

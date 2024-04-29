@@ -17,14 +17,17 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.orchestrator.api.model
+package org.eclipse.tractusx.bpdm.test.config
 
-import org.eclipse.tractusx.bpdm.common.dto.IBusinessPartnerIdentifierDto
+import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.BusinessPartnerTestDataFactory
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
 
-data class BusinessPartnerIdentifierDto(
+@Configuration
+class OrchestratorTestDataConfiguration {
 
-    override val type: String?,
-    override val value: String?,
-    override val issuingBody: String?
+    @Bean
+    fun orchestratorTestdataFactory(): BusinessPartnerTestDataFactory =
+        BusinessPartnerTestDataFactory()
 
-) : IBusinessPartnerIdentifierDto
+}

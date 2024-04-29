@@ -114,6 +114,10 @@ class BusinessPartnerBuildService(
         val createdSites = requests.zip(bpnSs).map { (siteRequest, bpnS) ->
             val legalEntityParent =
                 legalEntitiesByBpn[siteRequest.bpnLParent] ?: throw BpdmValidationException("Parent ${siteRequest.bpnLParent} not found for site to create")
+
+            if(legalEntityParent.legalAddress.site != null)
+                throw BpdmValidationException("Can't create site for legal entity ${siteRequest.bpnLParent} with legal address as site main address: Legal address already belongs to site ${legalEntityParent.legalAddress.site!!.bpn}")
+
             createSite(siteRequest, bpnS, legalEntityParent)
                 .apply { mainAddress = legalEntityParent.legalAddress }
                 .apply { mainAddress.site = this }
