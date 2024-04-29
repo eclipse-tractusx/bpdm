@@ -76,7 +76,7 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
       - name: Build and push
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v5
         with:
           context: .
           # Build image for verification purposes on every trigger event. Only push if event is not a PR
