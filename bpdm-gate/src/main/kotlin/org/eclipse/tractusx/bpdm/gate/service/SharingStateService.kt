@@ -33,7 +33,6 @@ import org.eclipse.tractusx.bpdm.gate.exception.BpdmMissingPartnerException
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository.Specs.byAssociatedOwnerBpnl
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository.Specs.byExternalIdsIn
-import org.eclipse.tractusx.bpdm.gate.util.getCurrentUserBpn
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
@@ -50,13 +49,14 @@ class SharingStateService(
 
     fun findSharingStates(
         paginationRequest: PaginationRequest,
-        externalIds: Collection<String>?
+        externalIds: Collection<String>?,
+        ownerBpnl: String?
     ): PageDto<SharingStateDto> {
 
         logger.info { "findSharingStates() called with $paginationRequest // $externalIds" }
 
         val pageRequest = PageRequest.of(paginationRequest.page, paginationRequest.size)
-        val spec = Specification.allOf(byExternalIdsIn(externalIds), byAssociatedOwnerBpnl(getCurrentUserBpn()))
+        val spec = Specification.allOf(byExternalIdsIn(externalIds), byAssociatedOwnerBpnl(ownerBpnl))
         val sharingStatePage = stateRepository.findAll(spec, pageRequest)
 
         return sharingStatePage.toPageDto {
@@ -71,37 +71,37 @@ class SharingStateService(
         }
     }
 
-    fun setInitial(sharingStateIds: List<String>): List<SharingStateDb> {
-        val sharingStates = getOrCreate(sharingStateIds)
+    fun setInitial(sharingStateIds: List<String>, ownerBpnl: String?): List<SharingStateDb> {
+        val sharingStates = getOrCreate(sharingStateIds, ownerBpnl)
         return sharingStates.map { setInitial(it) }
     }
 
 
 
-    fun setSuccess(successRequests: List<SuccessRequest>): List<SharingStateDb> {
-        val sharingStates = getOrCreate(successRequests.map { it.externalId })
+    fun setSuccess(successRequests: List<SuccessRequest>, ownerBpnl: String?): List<SharingStateDb> {
+        val sharingStates = getOrCreate(successRequests.map { it.externalId }, ownerBpnl)
         return sharingStates
             .zip(successRequests)
             .map { (sharingState, request) -> setSuccess(sharingState, request.startTimeOverwrite) }
     }
 
-    fun setPending(pendingRequests: List<PendingRequest>): List<SharingStateDb> {
-        val sharingStates = getOrCreate(pendingRequests.map { it.externalId })
+    fun setPending(pendingRequests: List<PendingRequest>, ownerBpnl: String?): List<SharingStateDb> {
+        val sharingStates = getOrCreate(pendingRequests.map { it.externalId }, ownerBpnl)
         return sharingStates
             .zip(pendingRequests)
             .map { (sharingState, request) -> setPending(sharingState, request.taskId, request.startTimeOverwrite) }
     }
 
-    fun setError(errorRequests: List<ErrorRequest>): List<SharingStateDb> {
-        val sharingStates = getOrCreate(errorRequests.map { it.externalId })
+    fun setError(errorRequests: List<ErrorRequest>, ownerBpnl: String?): List<SharingStateDb> {
+        val sharingStates = getOrCreate(errorRequests.map { it.externalId }, ownerBpnl)
 
         return sharingStates
             .zip(errorRequests)
             .map { (sharingState, request) -> setError(sharingState, request.errorCode, request.errorMessage, request.startTimeOverwrite) }
     }
 
-    fun setReady(externalIds: List<String>): List<SharingStateDb> {
-        val existingSharingStates = stateRepository.findByExternalIdInAndAssociatedOwnerBpnl(externalIds, getCurrentUserBpn())
+    fun setReady(externalIds: List<String>, ownerBpnl: String?): List<SharingStateDb> {
+        val existingSharingStates = stateRepository.findByExternalIdInAndAssociatedOwnerBpnl(externalIds, ownerBpnl)
         val existingIds = existingSharingStates.map { it.externalId }.toSet()
         val missingIds = externalIds.minus(existingIds)
 
@@ -131,7 +131,6 @@ class SharingStateService(
         sharingState.sharingErrorMessage = null
         sharingState.sharingProcessStarted = null
         sharingState.taskId = null
-        sharingState.associatedOwnerBpnl = getCurrentUserBpn()
 
         return stateRepository.save(sharingState)
     }
@@ -183,8 +182,8 @@ class SharingStateService(
     }
 
 
-    private fun getOrCreate(externalIds: List<String>): List<SharingStateDb> {
-        val sharingStates = stateRepository.findByExternalIdInAndAssociatedOwnerBpnl(externalIds, getCurrentUserBpn())
+    private fun getOrCreate(externalIds: List<String>, ownerBpnl: String?): List<SharingStateDb> {
+        val sharingStates = stateRepository.findByExternalIdInAndAssociatedOwnerBpnl(externalIds, ownerBpnl)
         val sharingStatesByExternalId = sharingStates.associateBy { it.externalId }
 
         return externalIds.map { externalId ->
@@ -194,7 +193,8 @@ class SharingStateService(
                     sharingStateType = SharingStateType.Ready,
                     sharingErrorCode = null,
                     sharingErrorMessage = null,
-                    sharingProcessStarted = null
+                    sharingProcessStarted = null,
+                    associatedOwnerBpnl = ownerBpnl
                 )
         }
     }

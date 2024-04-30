@@ -77,16 +77,6 @@ class OrchestratorMappings(
         states = entity.states.filter { it.businessPartnerTyp == BusinessPartnerType.ADDRESS }.map(::toStateDto)
     )
 
-    private fun toClassificationDto(entity: ClassificationDb) =
-        BusinessPartnerClassificationDto(type = entity.type, code = entity.code, value = entity.value)
-
-    private fun toPostalAddressDto(entity: PostalAddressDb) =
-        PostalAddressDto(
-            addressType = entity.addressType,
-            physicalPostalAddress = entity.physicalPostalAddress?.let(::toPhysicalPostalAddressDto),
-            alternativePostalAddress = entity.alternativePostalAddress?.let(this::toAlternativePostalAddressDto)
-        )
-
     private fun toPhysicalPostalAddressDto(entity: PhysicalPostalAddressDb) =
         PhysicalPostalAddressDto(
             geographicCoordinates = entity.geographicCoordinates?.let(::toGeoCoordinateDto),

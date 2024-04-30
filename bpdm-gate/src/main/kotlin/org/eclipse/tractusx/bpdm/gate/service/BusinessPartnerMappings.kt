@@ -70,7 +70,7 @@ class BusinessPartnerMappings {
         )
     }
 
-    fun toBusinessPartnerInput(dto: BusinessPartnerInputRequest): BusinessPartnerDb {
+    fun toBusinessPartnerInput(dto: BusinessPartnerInputRequest, ownerBpnl: String?): BusinessPartnerDb {
         return BusinessPartnerDb(
             stage = StageType.Input,
             externalId = dto.externalId,
@@ -94,7 +94,8 @@ class BusinessPartnerMappings {
             postalAddress = toPostalAddress(dto.address),
             legalEntityConfidence = null,
             siteConfidence = null,
-            addressConfidence = null
+            addressConfidence = null,
+            associatedOwnerBpnl = ownerBpnl
         )
     }
 
@@ -298,12 +299,6 @@ class BusinessPartnerMappings {
 
     private fun toState(dto: BusinessPartnerStateDto, businessPartnerType: BusinessPartnerType) =
         dto.type?.let { StateDb(type = it, validFrom = dto.validFrom, validTo = dto.validTo, businessPartnerTyp = businessPartnerType) }
-
-    private fun toClassificationDto(entity: ClassificationDb) =
-        BusinessPartnerClassificationDto(type = entity.type, code = entity.code, value = entity.value)
-
-    private fun toClassification(dto: BusinessPartnerClassificationDto) =
-        dto.type?.let { ClassificationDb(type = it, code = dto.code, value = dto.value) }
 
     private fun toGeoCoordinateDto(entity: GeographicCoordinateDb) =
         GeoCoordinateDto(latitude = entity.latitude, longitude = entity.longitude, altitude = entity.altitude)

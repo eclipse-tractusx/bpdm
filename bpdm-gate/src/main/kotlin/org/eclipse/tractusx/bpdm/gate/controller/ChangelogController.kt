@@ -27,6 +27,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogDto
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.service.ChangelogService
+import org.eclipse.tractusx.bpdm.gate.util.getCurrentUserBpn
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.RestController
@@ -43,6 +44,7 @@ class ChangelogController(
     ): PageChangeLogDto<ChangelogGateDto> {
         return changelogService.getChangeLogEntries(
             searchRequest.externalIds,
+            getCurrentUserBpn(),
             searchRequest.timestampAfter,
             StageType.Input,
             paginationRequest.page,
@@ -57,6 +59,7 @@ class ChangelogController(
     ): PageChangeLogDto<ChangelogGateDto> {
         return changelogService.getChangeLogEntries(
             searchRequest.externalIds,
+            getCurrentUserBpn(),
             searchRequest.timestampAfter,
             StageType.Output,
             paginationRequest.page,
