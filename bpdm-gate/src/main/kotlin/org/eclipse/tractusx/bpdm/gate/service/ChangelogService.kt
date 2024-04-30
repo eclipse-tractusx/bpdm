@@ -44,6 +44,7 @@ class ChangelogService(private val changelogRepository: ChangelogRepository) {
 
     fun getChangeLogEntries(
         externalIds: Set<String>?,
+        ownerBpnl: String?,
         createdAt: Instant?,
         stage: StageType?,
         page: Int,
@@ -58,12 +59,12 @@ class ChangelogService(private val changelogRepository: ChangelogRepository) {
             byExternalIdsIn(externalIds = nonNullExternalIds),
             byCreatedAtGreaterThan(createdAt = createdAt),
             byStage(stage),
-            byAssociatedOwnerBpnl(getCurrentUserBpn())
+            byAssociatedOwnerBpnl(ownerBpnl)
         )
 
         val pageable = PageRequest.of(page, pageSize)
         val pageResponse = changelogRepository.findAll(spec, pageable)
-        val setDistinctList = changelogRepository.findExternalIdsInListDistinct(nonNullExternalIds)
+        val setDistinctList = changelogRepository.findDistinctByExternalIdInAndAssociatedOwnerBpnl(nonNullExternalIds, ownerBpnl).map { it.externalId }
 
 
         val pageDto = pageResponse.map {

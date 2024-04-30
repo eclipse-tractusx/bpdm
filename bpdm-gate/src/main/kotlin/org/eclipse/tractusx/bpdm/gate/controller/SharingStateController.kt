@@ -28,6 +28,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyReq
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.service.SharingStateService
+import org.eclipse.tractusx.bpdm.gate.util.getCurrentUserBpn
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
@@ -43,12 +44,12 @@ class SharingStateController(
         businessPartnerType: BusinessPartnerType?,
         externalIds: Collection<String>?
     ): PageDto<SharingStateDto> {
-        return sharingStateService.findSharingStates(paginationRequest, externalIds)
+        return sharingStateService.findSharingStates(paginationRequest, externalIds,  getCurrentUserBpn())
     }
 
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_SHARING_STATE})")
     override fun postSharingStateReady(request: PostSharingStateReadyRequest) {
-        sharingStateService.setReady(request.externalIds)
+        sharingStateService.setReady(request.externalIds,  getCurrentUserBpn())
     }
 }
