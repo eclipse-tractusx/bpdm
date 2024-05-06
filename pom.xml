@@ -57,7 +57,7 @@
         <kotlinlogging.version>3.0.5</kotlinlogging.version>
         <wiremock.version>2.35.2</wiremock.version>
         <springmockk.version>4.0.2</springmockk.version>
-        <assertj.version>3.25.3</assertj.version>
+        <assertj.version>3.24.2</assertj.version>
         <spring-boot.version>3.0.4</spring-boot.version>
         <sonar.organization>catenax-ng</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
