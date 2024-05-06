@@ -46,9 +46,10 @@ interface SharingStateRepository : PagingAndSortingRepository<SharingStateDb, Lo
 
         fun byAssociatedOwnerBpnl(associatedOwnerBpnl: String?) =
             Specification<SharingStateDb> { root, _, builder ->
-                associatedOwnerBpnl?.takeIf { it.isNotBlank() }?.let {
-                    builder.like(root.get(SharingStateDb::associatedOwnerBpnl.name), associatedOwnerBpnl)
-                }
+                associatedOwnerBpnl?.let {
+                    builder.equal(root.get<String?>(SharingStateDb::associatedOwnerBpnl.name), associatedOwnerBpnl)
+                } ?: builder.isNull(root.get<String?>(SharingStateDb::associatedOwnerBpnl.name))
+
             }
 
     }

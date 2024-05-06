@@ -26,6 +26,7 @@ import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
+import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.entity.SyncTypeDb
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
@@ -62,23 +63,26 @@ class GoldenRecordTaskService(
 
         logger.debug { "Found ${foundStates.size} business partners in ready state" }
 
-        val partners = businessPartnerRepository.findByStageAndExternalIdIn(StageType.Input, foundStates.map { it.externalId })
+        foundStates.groupBy { it.associatedOwnerBpnl }.forEach{ (ownerBpnl, states) ->
 
-        val orchestratorBusinessPartnersDto = partners.map { orchestratorMappings.toOrchestratorDto(it) }
+            val partners = businessPartnerRepository.findByStageAndAssociatedOwnerBpnlAndExternalIdIn(StageType.Input, ownerBpnl, states.map { it.externalId }, Pageable.unpaged() ).content
 
-        val createdTasks = createGoldenRecordTasks(TaskMode.UpdateFromSharingMember, orchestratorBusinessPartnersDto)
+            val orchestratorBusinessPartnersDto = partners.map { orchestratorMappings.toOrchestratorDto(it) }
 
-        val pendingRequests = partners.zip(createdTasks)
-            .map { (partner, task) ->
-                SharingStateService.PendingRequest(
-                    partner.externalId,
-                    task.taskId
-                )
-            }
+            val createdTasks = createGoldenRecordTasks(TaskMode.UpdateFromSharingMember, orchestratorBusinessPartnersDto)
 
-        sharingStateService.setPending(pendingRequests)
+            val pendingRequests = partners.zip(createdTasks)
+                .map { (partner, task) ->
+                    SharingStateService.PendingRequest(
+                        partner.externalId,
+                        task.taskId
+                    )
+                }
 
-        logger.info { "Created ${createdTasks.size} new golden record tasks from ready business partners" }
+            sharingStateService.setPending(pendingRequests, ownerBpnl)
+
+            logger.info { "Created ${createdTasks.size} new golden record tasks from ready business partners for owner $ownerBpnl" }
+        }
     }
 
     @Transactional
@@ -91,41 +95,11 @@ class GoldenRecordTaskService(
         logger.debug { "Found ${sharingStates.size} business partners in pending state" }
 
         val tasks = orchestrationApiClient.goldenRecordTasks.searchTaskStates(TaskStateRequest(sharingStates.map { it.taskId!! })).tasks
-        val sharingStateMap = sharingStates.associateBy { it.taskId }
 
-        val taskStatesByResult = tasks
-            .map { Pair(it, sharingStateMap[it.taskId]!!) }
-            .groupBy { (task, _) -> task.processingState.resultState }
 
-        val businessPartnerInput = taskStatesByResult[ResultState.Success]?.let { businessPartnerRepository.findByStageAndExternalIdIn(StageType.Input, it.map { (_, sharingState) -> sharingState.externalId }) } ?: emptyList()
-        val inputByExternalId = businessPartnerInput.associateBy { it.externalId }
-
-        val sharingStatesWithoutTasks = sharingStates.filter { it.taskId !in tasks.map { task -> task.taskId } }
-
-        val businessPartnersToUpsert = taskStatesByResult[ResultState.Success]?.map { (task, sharingState) ->
-            orchestratorMappings.toBusinessPartner(task.businessPartnerResult, sharingState.externalId, sharingState.associatedOwnerBpnl, inputByExternalId[sharingState.externalId]?.roles?.toSortedSet() ?: sortedSetOf() )
-        } ?: emptyList()
-        businessPartnerService.upsertBusinessPartnersOutputFromCandidates(businessPartnersToUpsert)
-
-        val errorRequests = (taskStatesByResult[ResultState.Error]?.map { (task, sharingState) ->
-            SharingStateService.ErrorRequest(
-                sharingState.externalId,
-                BusinessPartnerSharingError.SharingProcessError,
-                if (task.processingState.errors.isNotEmpty()) task.processingState.errors.joinToString(" // ") { it.description }.take(255) else null
-            )
-        } ?: emptyList()).toMutableList()
-
-        errorRequests.addAll(sharingStatesWithoutTasks.map { sharingState ->
-            SharingStateService.ErrorRequest(
-                sharingState.externalId,
-                BusinessPartnerSharingError.MissingTaskID,
-                errorMessage = "Missing Task in Orchestrator"
-            )
-        })
-
-        sharingStateService.setError(errorRequests)
-
-        logger.info { "Resolved ${businessPartnersToUpsert.size} tasks as successful and ${errorRequests.size} as errors" }
+        sharingStates.groupBy { it.associatedOwnerBpnl }.forEach{ (ownerBpnl, states) ->
+            resolvePendingTasksForOwner(tasks, states, ownerBpnl)
+        }
     }
 
     @Transactional
@@ -162,7 +136,7 @@ class GoldenRecordTaskService(
                     task.taskId
                 )
             }
-        sharingStateService.setPending(pendingRequests)
+        sharingStateService.setPending(pendingRequests, null)
 
         if (poolUpdatedEntries.isNotEmpty()) {
             syncRecordService.setSynchronizationStart(SyncTypeDb.POOL_TO_GATE_OUTPUT)
@@ -177,5 +151,43 @@ class GoldenRecordTaskService(
             return emptyList()
 
         return orchestrationApiClient.goldenRecordTasks.createTasks(TaskCreateRequest(mode, orchestratorBusinessPartnersDto)).createdTasks
+    }
+
+    private fun resolvePendingTasksForOwner(tasks: List<TaskClientStateDto>, sharingStates: List<SharingStateDb>, ownerBpnl: String?){
+        val sharingStateMap = sharingStates.associateBy { it.taskId }
+
+        val taskStatesByResult = tasks
+            .mapNotNull { task -> sharingStateMap[task.taskId]?.let { state -> Pair(task, state)  } }
+            .groupBy { (task, _) -> task.processingState.resultState }
+
+        val businessPartnerInputs = businessPartnerRepository.findByStageAndAssociatedOwnerBpnlAndExternalIdIn(StageType.Input, ownerBpnl, sharingStates.map { it.externalId }, Pageable.unpaged())
+        val inputsByExternalId = businessPartnerInputs.associateBy { it.externalId }
+
+        val businessPartnersToUpsert = taskStatesByResult[ResultState.Success]?.map { (task, sharingState) ->
+            val roles = inputsByExternalId[sharingState.externalId]?.roles?.toSortedSet() ?: sortedSetOf()
+            orchestratorMappings.toBusinessPartner(task.businessPartnerResult, sharingState.externalId, sharingState.associatedOwnerBpnl, roles)
+        } ?: emptyList()
+        businessPartnerService.upsertBusinessPartnersOutputFromCandidates(businessPartnersToUpsert, ownerBpnl)
+
+        val errorRequests = (taskStatesByResult[ResultState.Error]?.map { (task, sharingState) ->
+            SharingStateService.ErrorRequest(
+                sharingState.externalId,
+                BusinessPartnerSharingError.SharingProcessError,
+                if (task.processingState.errors.isNotEmpty()) task.processingState.errors.joinToString(" // ") { it.description }.take(255) else null
+            )
+        } ?: emptyList()).toMutableList()
+
+        val sharingStatesWithoutTasks = sharingStates.filter { it.taskId !in tasks.map { task -> task.taskId } }
+        errorRequests.addAll(sharingStatesWithoutTasks.map { sharingState ->
+            SharingStateService.ErrorRequest(
+                sharingState.externalId,
+                BusinessPartnerSharingError.MissingTaskID,
+                errorMessage = "Missing Task in Orchestrator"
+            )
+        })
+
+        sharingStateService.setError(errorRequests, ownerBpnl)
+
+        logger.info { "Resolved ${businessPartnersToUpsert.size} tasks as successful and ${errorRequests.size} as errors for owner $ownerBpnl" }
     }
 }

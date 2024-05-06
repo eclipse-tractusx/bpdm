@@ -30,6 +30,7 @@ import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.service.BusinessPartnerService
 import org.eclipse.tractusx.bpdm.gate.util.containsDuplicates
+import org.eclipse.tractusx.bpdm.gate.util.getCurrentUserBpn
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
@@ -46,7 +47,7 @@ class BusinessPartnerController(
         if (businessPartners.size > apiConfigProperties.upsertLimit || businessPartners.map { it.externalId }.containsDuplicates()) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
-        val result = businessPartnerService.upsertBusinessPartnersInput(businessPartners.toList())
+        val result = businessPartnerService.upsertBusinessPartnersInput(businessPartners.toList(), getCurrentUserBpn())
         return ResponseEntity.ok(result)
     }
 
@@ -55,7 +56,7 @@ class BusinessPartnerController(
         externalIds: Collection<String>?,
         paginationRequest: PaginationRequest
     ): PageDto<BusinessPartnerInputDto> {
-        return businessPartnerService.getBusinessPartnersInput(paginationRequest.toPageRequest(), externalIds)
+        return businessPartnerService.getBusinessPartnersInput(paginationRequest.toPageRequest(), externalIds,  getCurrentUserBpn())
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_OUTPUT_PARTNER})")
@@ -63,6 +64,6 @@ class BusinessPartnerController(
         externalIds: Collection<String>?,
         paginationRequest: PaginationRequest
     ): PageDto<BusinessPartnerOutputDto> {
-        return businessPartnerService.getBusinessPartnersOutput(paginationRequest.toPageRequest(), externalIds)
+        return businessPartnerService.getBusinessPartnersOutput(paginationRequest.toPageRequest(), externalIds,  getCurrentUserBpn())
     }
 }

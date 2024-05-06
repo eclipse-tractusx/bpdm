@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.repository
 
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntryDb
+import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
@@ -64,15 +65,15 @@ interface ChangelogRepository : JpaRepository<ChangelogEntryDb, Long>, JpaSpecif
 
         fun byAssociatedOwnerBpnl(associatedOwnerBpnl: String?) =
             Specification<ChangelogEntryDb> { root, _, builder ->
-                associatedOwnerBpnl?.takeIf { it.isNotBlank() }?.let {
-                    builder.like(root.get(ChangelogEntryDb::associatedOwnerBpnl.name), associatedOwnerBpnl)
-                }
+                associatedOwnerBpnl?.let {
+                    builder.equal(root.get<String?>(ChangelogEntryDb::associatedOwnerBpnl.name), associatedOwnerBpnl)
+                } ?: builder.isNull(root.get<String?>(ChangelogEntryDb::associatedOwnerBpnl.name))
+
             }
 
     }
 
-    @Query("select distinct u.externalId from ChangelogEntryDb u where u.externalId in :externalIdList")
-    fun findExternalIdsInListDistinct(externalIdList: Collection<String>): Set<String>
+    fun findDistinctByExternalIdInAndAssociatedOwnerBpnl(externalIdList: Collection<String>, ownerBpnl: String?): Set<ChangelogEntryDb>
 
 
 }
