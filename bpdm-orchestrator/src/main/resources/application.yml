@@ -56,31 +56,24 @@ bpdm:
     # URL to the token validation endpoint of the Keycloak server
     token-url: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}/protocol/openid-connect/token
     permissions:
-      task:
-        # Name of permission to create golden record tasks
-        create: create_task
-        # Name of permission to read task status and overall results
-        read: read_task
+      # Name of permission to create golden record tasks
+      createTask: create_task
+      # Name of permission to read task status and overall results
+      readTask: read_task
       reservation:
-        clean:
           # Name of permission to create reservations for tasks in step 'Clean'
-          create: create_reservation_clean
-        cleanAndSync:
+          clean: create_reservation_clean
           # Name of permission to create reservations for tasks in step 'CleanAndSync'
-          create: create_reservation_cleanAndSync
-        poolSync:
+          cleanAndSync: create_reservation_cleanAndSync
           # Name of permission to create reservations for tasks in step 'PoolSync'
-          create: create_reservation_poolSync
+          poolSync: create_reservation_poolSync
       result:
-        clean:
           # Name of permission to post results for tasks in step 'Clean'
-          create: create_result_clean
-        cleanAndSync:
+          clean: create_result_clean
           # Name of permission to post results for tasks in step 'CleanAndSync'
-          create: create_result_cleanAndSync
-        poolSync:
+          cleanAndSync: create_result_cleanAndSync
           # Name of permission to post results for tasks in step 'PoolSync'
-          create: create_result_poolSync
+          poolSync: create_result_poolSync
 
 server:
   # Change default port to avoid clash with other BPDM applications

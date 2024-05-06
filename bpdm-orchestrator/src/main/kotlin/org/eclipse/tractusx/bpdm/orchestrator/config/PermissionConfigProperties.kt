@@ -28,12 +28,12 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 data class PermissionConfigProperties(
     val createTask: String = "create_task",
     val readTask: String = "read_task",
-    val reservations: TaskStepProperties = TaskStepProperties(
+    val reservation: TaskStepProperties = TaskStepProperties(
         clean = "create_reservation_clean",
         cleanAndSync = "create_reservation_cleanAndSync",
         poolSync = "create_reservation_poolSync"
     ),
-    val results: TaskStepProperties = TaskStepProperties(
+    val result: TaskStepProperties = TaskStepProperties(
         clean = "create_result_clean",
         cleanAndSync = "create_result_cleanAndSync",
         poolSync = "create_result_poolSync"
@@ -54,12 +54,12 @@ data class PermissionConfigProperties(
 
     @Suppress("unused")
     fun createReservation(step: TaskStep): String{
-        return fetchStepPermission(step, reservations)
+        return fetchStepPermission(step, reservation)
     }
 
     @Suppress("unused")
     fun createResult(step: TaskStep): String{
-        return fetchStepPermission(step, results)
+        return fetchStepPermission(step, result)
     }
 
 
