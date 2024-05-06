@@ -250,10 +250,10 @@ class AddressControllerIT @Autowired constructor(
                     it.content, listOf(
                         // site1
                         BusinessPartnerVerboseValues.addressPartner1.copy(addressType = AddressType.SiteMainAddress),
+                        BusinessPartnerVerboseValues.addressPartner2.copy(addressType = AddressType.SiteMainAddress),
                         BusinessPartnerVerboseValues.addressPartner1,
                         BusinessPartnerVerboseValues.addressPartner2,
                         // site2
-                        BusinessPartnerVerboseValues.addressPartner2.copy(addressType = AddressType.SiteMainAddress),
                         BusinessPartnerVerboseValues.addressPartner3,
                     )
                 )
@@ -547,13 +547,14 @@ class AddressControllerIT @Autowired constructor(
     private fun assertAddressesAreEqual(actuals: Collection<LogisticAddressVerboseDto>, expected: Collection<LogisticAddressVerboseDto>) {
         actuals.forEach { assertThat(it.bpna).matches(testHelpers.bpnAPattern) }
 
-        assertHelpers.assertRecursively(actuals)
-            .ignoringFields(
-                LogisticAddressVerboseDto::bpna.name,
-                LogisticAddressVerboseDto::bpnLegalEntity.name,
-                LogisticAddressVerboseDto::bpnSite.name
-            )
-            .isEqualTo(expected)
+            assertHelpers.assertRecursively(actuals)
+                .ignoringFields(
+                    LogisticAddressVerboseDto::bpna.name,
+                    LogisticAddressVerboseDto::bpnLegalEntity.name,
+                    LogisticAddressVerboseDto::bpnSite.name
+                )
+                .isEqualTo(expected)
+
     }
 
     private fun requestAddress(bpnAddress: String) = poolClient.addresses.getAddress(bpnAddress)
