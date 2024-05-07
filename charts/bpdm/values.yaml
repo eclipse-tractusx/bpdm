@@ -22,26 +22,100 @@ bpdm-gate:
   enabled: true
   postgres:
     enabled: false
+    fullnameOverride: bpdm-postgres
+  applicationConfig:
+    bpdm:
+      security:
+        auth-server-url: http://bpdm-keycloak
 
 bpdm-pool:
   enabled: true
   postgres:
     enabled: false
+    fullnameOverride: bpdm-postgres
+  applicationConfig:
+    bpdm:
+      security:
+        auth-server-url: http://bpdm-keycloak
 
 bpdm-cleaning-service-dummy:
   enabled: true
   postgres:
     enabled: false
+    fullnameOverride: bpdm-postgres
+  applicationConfig:
+    bpdm:
+      client:
+        orchestrator:
+          provider:
+            issuer-uri: http://bpdm-keycloak/realms/CX-Central
 
 bpdm-orchestrator:
   enabled: true
   postgres:
     enabled: false
+    fullnameOverride: bpdm-postgres
+  applicationConfig:
+    bpdm:
+      security:
+        auth-server-url: http://bpdm-keycloak
 
 postgres:
   enabled: true
+  fullnameOverride: bpdm-postgres
   auth:
     database: bpdm
     username: bpdm
     # Change for production
     password: bpdm
+
+keycloak:
+  enabled: true
+  fullnameOverride: "bpdm-keycloak"
+  postgresql:
+    enabled: false
+  externalDatabase:
+    host: bpdm-postgres
+    user: bpdm
+    password: bpdm
+    database: bpdm
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 512Mi
+  # Configuration values for initializing the CX-Central realm
+  # Only affects first time keycloak setup (no migration on a later change)
+  cxCentral:
+    # Initial secrets for the realm
+    # If empty random secret will be assigned
+    # Please change all given secrets for production
+    clientSecrets:
+      pool:
+      gate:
+      orchestrator:
+      poolOrchestrator:
+      gateOrchestrator:
+      gatePool:
+      cleaningDummyOrchestrator:
+  auth:
+    adminUser: admin
+    # Change for production
+    adminPassword: admin
+  production: false
+  extraEnvVars:
+    - name: KEYCLOAK_EXTRA_ARGS
+      value: "--import-realm"
+  extraVolumes:
+    - name: import
+      secret:
+        secretName: bpdm-keycloak-realm
+        items:
+          - key: "Cx-Central.json"
+            path: "Cx-Central.json"
+  extraVolumeMounts:
+    - name: import
+      mountPath: "/opt/bitnami/keycloak/data/import"
+      readOnly: true
