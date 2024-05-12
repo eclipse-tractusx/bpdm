@@ -131,24 +131,12 @@ This section details how to configure an EDC that provides access to the BPDM AP
 This documentation assumes that you already have running BPDM and EDC deployments.
 For deploying an EDC please consult the documentation on the [EDC repository](https://github.com/eclipse-tractusx/tractusx-edc).
 
-The general idea for using the EDC as a provider for BPDM data is to expose the BPDM Gate Endpoints each as an EDC asset.
-A new asset needs to be created for each company and endpoint. As an example you can refer to the
-provided [POSTMAN collection](postman/EDC_BPDM_Setup.postman_collection.json).
-The collection shows examples on how to create endpoints as assets, a company policy and contract definition.
-
-1. Asset Creation:
-   In the BPDM view an EDC asset is a company-scoped endpoint address. Next to the id and description, the asset should have a company id property which is
-   handy to quickly identify bundles of assets in case your EDC wants to expose assets for several BPDM Gate APIs at once. In addition to the address the asset
-   should contain information on how the EDC can
-   authenticate against the BPDM API. Finally, some endpoints may expect query parameters and/or bodies to be provided when accessing the asset. As a result,
-   the assets should contain which of these additional resources are allowed as well as the actual method type of the endpoint.
-
-2. Policy Creation:
-   For each company that should be allowed to access the BPDM Gate the EDC needs to contain a policy that requires a consuming EDC to have the company's BPN.
-
-3. Contract Definition Creation:
-   For each company the EDC should have a contract definition assigning the company's access policy to the company's assets. The company's assets are identified
-   by the ids of the assets.
+The general idea of configuring data offers for BPDM is to assets which grant access to a portion of the BPDM APIs.
+Which API resources are accessible over an asset is determined by the purposes defined in the BPDM framework agreement.
+For some purposes you may need to access business partner output data from the BPDM Gate for example but won't have access to the input data.
+Blueprints for such assets are documented in this [POSTMAN collection](postman/EDC Provider Setup.postman_collection.json).
+Accompanying the asset definitions are Policy and Contract Definition blueprints.
+Except for a general Access Policy those blueprints are grouped by purpose.
 
 After all assets, policies and contract definitions are configured a sharing company's EDC now can query its available assets and the contract under which they
 are exposed.
