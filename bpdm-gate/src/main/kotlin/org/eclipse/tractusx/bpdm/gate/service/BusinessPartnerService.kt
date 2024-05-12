@@ -74,7 +74,8 @@ class BusinessPartnerService(
 
     fun upsertBusinessPartnersOutputFromCandidates(entityCandidates: List<BusinessPartnerDb>, ownerBpnl: String?): List<BusinessPartnerDb> {
         logger.debug { "Upsert output from candidates $entityCandidates" }
-        return OwnerContext(ownerBpnl).upsertBusinessPartnersOutputFromCandidates(entityCandidates)
+        val candidateSet = entityCandidates.groupBy { it.externalId }.map { group -> group.value.last() }
+        return OwnerContext(ownerBpnl).upsertBusinessPartnersOutputFromCandidates(candidateSet)
     }
 
     inner class OwnerContext(
@@ -154,7 +155,7 @@ class BusinessPartnerService(
         }
 
         private fun assertInputStageExists(externalIds: Collection<String>) {
-            val existingExternalIds = businessPartnerRepository.findByStageAndExternalIdIn(StageType.Input, externalIds)
+            val existingExternalIds = businessPartnerRepository.findByStageAndAssociatedOwnerBpnlAndExternalIdIn(StageType.Input, ownerBpnl, externalIds, Pageable.unpaged())
                 .map { it.externalId }
                 .toSet()
 
