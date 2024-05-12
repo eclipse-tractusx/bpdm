@@ -86,20 +86,6 @@ keycloak:
     requests:
       cpu: 100m
       memory: 512Mi
-  # Configuration values for initializing the CX-Central realm
-  # Only affects first time keycloak setup (no migration on a later change)
-  cxCentral:
-    # Initial secrets for the realm
-    # If empty random secret will be assigned
-    # Please change all given secrets for production
-    clientSecrets:
-      pool:
-      gate:
-      orchestrator:
-      poolOrchestrator:
-      gateOrchestrator:
-      gatePool:
-      cleaningDummyOrchestrator:
   auth:
     adminUser: admin
     # Change for production
