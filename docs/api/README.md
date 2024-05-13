@@ -291,7 +291,7 @@ That means if the business partner data contains an additional address, the resu
 
 This section details how a sharing member EDC can access an EDC exposing the BPDM API as assets. Before you can access the assets make sure that the BPDM EDC
 has been configured to provide assets for your company's BPN (see [Operator View](OPERATOR_VIEW.md)).
-This [POSTMAN collection](postman/EDC BPDM Consumer.postman_collection.json) gives example requests for communicating with a deployed BPDM EDC over a sharing
+This [POSTMAN collection](../postman/EDC BPDM Consumer.postman_collection.json) gives example requests for communicating with a deployed BPDM EDC over a sharing
 member EDC.
 In the collection you will see how you can negotiate for a BPDM data offer.
 Offers are separated into purposes (defined in the BPDM framework agreement) on why you want to access the BPDM API.

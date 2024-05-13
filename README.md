@@ -7,7 +7,7 @@ This repository is part of the overarching Eclipse Tractus-X project.
 BPDM is an acronym for business partner data management.
 This project serves two main purposes:
 
-1. Provide services for for querying and sharing business partner information
+1. Provide services for querying and sharing business partner information
 2. Establish an infrastructure for realising the Golden Record process which turns business partner information from sharing members to Golden Records, that is
    cleaned and enriched business partner data uniquely identified by a business partner number (BPN)
 
@@ -31,7 +31,7 @@ Subfolders for BPDM applications are easily recognizable by the `bpdm` prefix.
 
 Installation instructions for the BPDM services can be found in the following places:
 
-1. [Local Installation](docs/OPERATOR_VIEW.md): Details how to install and configure the BPDM services on a host machine.
+1. [Local Installation](docs/admin/README.md): Details how to install and configure the BPDM services on a host machine.
 2. [Helm Installation](charts/bpdm/README.md): Explains how to use given Helm Charts to install the BPDM services on a kubernetes environment.
 
 ## GitHub Workflows
