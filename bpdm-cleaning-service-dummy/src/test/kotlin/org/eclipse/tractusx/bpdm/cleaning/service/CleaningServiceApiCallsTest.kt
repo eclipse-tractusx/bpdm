@@ -74,6 +74,7 @@ class CleaningServiceApiCallsTest @Autowired constructor(
     val fixedTaskId = "1"
     val businessPartnerFactory = BusinessPartnerTestDataFactory()
     val defaultBpnRequest = BpnReference("IGNORED", null, BpnReferenceType.BpnRequestIdentifier)
+    val expectedConfidenceCriteria = cleaningServiceDummy.dummyConfidenceCriteria.copy(sharedByOwner = true)
 
     @BeforeEach
     fun beforeEach() {
@@ -97,8 +98,9 @@ class CleaningServiceApiCallsTest @Autowired constructor(
                 .copyWithBpnReferences(defaultBpnRequest)
                 .copyWithLegalAddress(mockedBusinessPartner.uncategorized.address!!)
                 .copyWithSiteMainAddress(mockedBusinessPartner.uncategorized.address!!)
-                .copyWithConfidenceCriteria(cleaningServiceDummy.dummyConfidenceCriteria)
+                .copyWithConfidenceCriteria(expectedConfidenceCriteria)
                 .copyWithHasChanged(false, false, true)
+                .copyAsCxMemberData()
         )
 
         // Call the method under test
@@ -123,8 +125,9 @@ class CleaningServiceApiCallsTest @Autowired constructor(
             mockedBusinessPartner
                 .copyWithLegalAddress(mockedBusinessPartner.uncategorized.address!!)
                 .copyWithSiteMainAddress(mockedBusinessPartner.uncategorized.address!!)
-                .copyWithConfidenceCriteria(cleaningServiceDummy.dummyConfidenceCriteria)
+                .copyWithConfidenceCriteria(expectedConfidenceCriteria)
                 .copyWithHasChanged(false, false, true)
+                .copyAsCxMemberData()
         )
 
         // Call the method under test
@@ -150,8 +153,9 @@ class CleaningServiceApiCallsTest @Autowired constructor(
             mockedBusinessPartner
                 .copyWithBpnReferences(defaultBpnRequest)
                 .copyWithLegalAddress(mockedBusinessPartner.uncategorized.address!!)
-                .copyWithConfidenceCriteria(cleaningServiceDummy.dummyConfidenceCriteria)
+                .copyWithConfidenceCriteria(expectedConfidenceCriteria)
                 .copyWithHasChanged(false, false, true)
+                .copyAsCxMemberData()
         )
 
         // Call the method under test
@@ -175,8 +179,9 @@ class CleaningServiceApiCallsTest @Autowired constructor(
         val expectedResponse = createResultRequest(
             mockedBusinessPartner
                 .copyWithLegalAddress(mockedBusinessPartner.uncategorized.address!!)
-                .copyWithConfidenceCriteria(cleaningServiceDummy.dummyConfidenceCriteria)
+                .copyWithConfidenceCriteria(expectedConfidenceCriteria)
                 .copyWithHasChanged(false, false, true)
+                .copyAsCxMemberData()
         )
 
         // Call the method under test
@@ -202,8 +207,9 @@ class CleaningServiceApiCallsTest @Autowired constructor(
             mockedBusinessPartner
                 .copyWithBpnReferences(defaultBpnRequest)
                 .copyWithLegalAddress(mockedBusinessPartner.uncategorized.address!!)
-                .copyWithConfidenceCriteria(cleaningServiceDummy.dummyConfidenceCriteria)
+                .copyWithConfidenceCriteria(expectedConfidenceCriteria)
                 .copyWithHasChanged(false, true, false)
+                .copyAsCxMemberData()
         )
 
         // Call the method under test
@@ -227,8 +233,9 @@ class CleaningServiceApiCallsTest @Autowired constructor(
         val expectedResponse = createResultRequest(
             mockedBusinessPartner
                 .copyWithLegalAddress(mockedBusinessPartner.uncategorized.address!!)
-                .copyWithConfidenceCriteria(cleaningServiceDummy.dummyConfidenceCriteria)
+                .copyWithConfidenceCriteria(expectedConfidenceCriteria)
                 .copyWithHasChanged(false, true, false)
+                .copyAsCxMemberData()
         )
 
         // Call the method under test
@@ -253,8 +260,9 @@ class CleaningServiceApiCallsTest @Autowired constructor(
         val expectedResponse = createResultRequest(
             mockedBusinessPartner
                 .copyWithBpnReferences(defaultBpnRequest)
-                .copyWithConfidenceCriteria(cleaningServiceDummy.dummyConfidenceCriteria)
+                .copyWithConfidenceCriteria(expectedConfidenceCriteria)
                 .copyWithHasChanged(false, true, false)
+                .copyAsCxMemberData()
         )
 
         // Call the method under test
@@ -277,8 +285,9 @@ class CleaningServiceApiCallsTest @Autowired constructor(
         //Create expectations
         val expectedResponse = createResultRequest(
             mockedBusinessPartner
-                .copyWithConfidenceCriteria(cleaningServiceDummy.dummyConfidenceCriteria)
+                .copyWithConfidenceCriteria(expectedConfidenceCriteria)
                 .copyWithHasChanged(false, true, false)
+                .copyAsCxMemberData()
         )
 
         // Call the method under test
@@ -304,8 +313,9 @@ class CleaningServiceApiCallsTest @Autowired constructor(
             mockedBusinessPartner
                 .copyWithBpnReferences(defaultBpnRequest)
                 .copyWithLegalAddress(mockedBusinessPartner.uncategorized.address!!)
-                .copyWithConfidenceCriteria(cleaningServiceDummy.dummyConfidenceCriteria)
+                .copyWithConfidenceCriteria(expectedConfidenceCriteria)
                 .copyWithHasChanged(true, false, false)
+                .copyAsCxMemberData()
         )
 
         // Call the method under test
@@ -329,8 +339,9 @@ class CleaningServiceApiCallsTest @Autowired constructor(
         val expectedResponse = createResultRequest(
             mockedBusinessPartner
                 .copyWithLegalAddress(mockedBusinessPartner.uncategorized.address!!)
-                .copyWithConfidenceCriteria(cleaningServiceDummy.dummyConfidenceCriteria)
+                .copyWithConfidenceCriteria(expectedConfidenceCriteria)
                 .copyWithHasChanged(true, false, false)
+                .copyAsCxMemberData()
         )
 
         // Call the method under test

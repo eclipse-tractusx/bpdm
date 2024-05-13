@@ -80,20 +80,21 @@ class CleaningServiceDummy(
 
     fun processCleaningTask(reservedTask: TaskStepReservationEntryDto): TaskStepResultEntryDto {
         val businessPartner = reservedTask.businessPartner
+        val sharedByOwner = businessPartner.owningCompany?.isNotBlank() ?: false
 
         val cleanedBusinessPartner = BusinessPartner(
             nameParts = businessPartner.nameParts,
             uncategorized = businessPartner.uncategorized,
             owningCompany = businessPartner.owningCompany,
-            legalEntity = cleanLegalEntity(businessPartner),
-            site = cleanSite(businessPartner),
-            additionalAddress =  cleanAdditionalAddress(businessPartner)
+            legalEntity = cleanLegalEntity(businessPartner, sharedByOwner),
+            site = cleanSite(businessPartner, sharedByOwner),
+            additionalAddress =  cleanAdditionalAddress(businessPartner, sharedByOwner)
         )
 
         return TaskStepResultEntryDto(reservedTask.taskId, cleanedBusinessPartner)
     }
 
-    private fun cleanLegalEntity(businessPartner: BusinessPartner): LegalEntity {
+    private fun cleanLegalEntity(businessPartner: BusinessPartner, sharedByOwner: Boolean): LegalEntity {
         val addressToClean = businessPartner.legalEntity.legalAddress.takeIf { it != PostalAddress.empty }
             ?: businessPartner.uncategorized.address
             ?: businessPartner.site?.siteMainAddress
@@ -106,14 +107,15 @@ class CleaningServiceDummy(
                     legalName = legalName ?: businessPartner.uncategorized.nameParts.joinToString(""),
                     identifiers = identifiers.takeIf { it.isNotEmpty() } ?: businessPartner.uncategorized.identifiers,
                     states = states.takeIf { it.isNotEmpty() } ?: businessPartner.uncategorized.states,
-                    confidenceCriteria = dummyConfidenceCriteria,
+                    confidenceCriteria = dummyConfidenceCriteria.copy(sharedByOwner = sharedByOwner),
                     hasChanged = businessPartner.type == GoldenRecordType.LegalEntity,
-                    legalAddress = cleanAddress(addressToClean, businessPartner.createLegalAddressReferenceValue(), true),
+                    isCatenaXMemberData = sharedByOwner,
+                    legalAddress = cleanAddress(addressToClean, businessPartner.createLegalAddressReferenceValue(), true, sharedByOwner),
                 )
             }
     }
 
-    private fun cleanSite(businessPartner: BusinessPartner): Site?{
+    private fun cleanSite(businessPartner: BusinessPartner, sharedByOwner: Boolean): Site?{
         return businessPartner.site?.let { site ->
 
             val addressToClean = if(site.siteMainIsLegalAddress){
@@ -128,29 +130,31 @@ class CleaningServiceDummy(
             with(site){
                 copy(
                     bpnReference = bpnReference.toRequestIfNotBpn(businessPartner.createSiteReferenceValue()),
-                    confidenceCriteria = dummyConfidenceCriteria,
+                    confidenceCriteria = dummyConfidenceCriteria.copy(sharedByOwner = sharedByOwner),
                     hasChanged = businessPartner.type == GoldenRecordType.Site,
-                    siteMainAddress = addressToClean?.let { cleanAddress(addressToClean, businessPartner.createSiteMainAddressReferenceValue(), true) }
+                    siteMainAddress = addressToClean?.let { cleanAddress(addressToClean, businessPartner.createSiteMainAddressReferenceValue(), true, sharedByOwner) }
                 )
             }
         }
     }
 
-    private fun cleanAdditionalAddress(businessPartner: BusinessPartner): PostalAddress? {
+    private fun cleanAdditionalAddress(businessPartner: BusinessPartner, sharedByOwner: Boolean): PostalAddress? {
         return businessPartner.additionalAddress?.let {
             cleanAddress(
                 it,
                 businessPartner.createAdditionalAddressReferenceValue(),
-                businessPartner.type == GoldenRecordType.Address)
+                businessPartner.type == GoldenRecordType.Address,
+                sharedByOwner
+            )
         }
     }
 
 
-    private fun cleanAddress(addressToClean: PostalAddress, requestId: String, hasChanged: Boolean): PostalAddress {
+    private fun cleanAddress(addressToClean: PostalAddress, requestId: String, hasChanged: Boolean, sharedByOwner: Boolean): PostalAddress {
         return addressToClean.copy(
                 bpnReference =  addressToClean.bpnReference.toRequestIfNotBpn(requestId),
                 hasChanged = hasChanged,
-                confidenceCriteria = dummyConfidenceCriteria
+                confidenceCriteria = dummyConfidenceCriteria.copy(sharedByOwner = sharedByOwner)
             )
     }
 
