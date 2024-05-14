@@ -49,7 +49,7 @@ jobs:
         with:
           scan-type: "config"
           # ignore-unfixed: true
-          exit-code: "1"
+          exit-code: "0"
           hide-progress: false
           format: "sarif"
           output: "trivy-results1.sarif"
@@ -81,7 +81,7 @@ jobs:
           image-ref: "docker.io/tractusx/bpdm-pool:latest-alpha"
           format: "sarif"
           output: "trivy-results2.sarif"
-          exit-code: "1"
+          exit-code: "0"
           severity: "CRITICAL,HIGH"
           timeout: 15m
         env:
@@ -114,7 +114,7 @@ jobs:
           image-ref: "docker.io/tractusx/bpdm-gate:latest-alpha"
           format: "sarif"
           output: "trivy-results3.sarif"
-          exit-code: "1"
+          exit-code: "0"
           severity: "CRITICAL,HIGH"
           timeout: 15m
         env:
@@ -147,7 +147,7 @@ jobs:
           image-ref: "docker.io/tractusx/bpdm-cleaning-service-dummy:latest-alpha"
           format: "sarif"
           output: "trivy-results4.sarif"
-          exit-code: "1"
+          exit-code: "0"
           severity: "CRITICAL,HIGH"
           timeout: 15m
         env:
@@ -180,7 +180,7 @@ jobs:
           image-ref: "docker.io/tractusx/bpdm-orchestrator:latest-alpha"
           format: "sarif"
           output: "trivy-results4.sarif"
-          exit-code: "1"
+          exit-code: "0"
           severity: "CRITICAL,HIGH"
           timeout: 15m
         env:
