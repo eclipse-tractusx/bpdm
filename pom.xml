@@ -150,6 +150,13 @@
                 <artifactId>snakeyaml</artifactId>
                 <version>2.2</version>
             </dependency>
+            <!-- Override jwt library version used by spring framework due to security issue -->
+            <dependency>
+                <groupId>com.nimbusds</groupId>
+                <artifactId>nimbus-jose-jwt</artifactId>
+                <version>9.37.2</version>
+            </dependency>
+
             <!-- Kotlin wrapper for slf4j (Logging)-->
             <dependency>
                 <groupId>io.github.microutils</groupId>
