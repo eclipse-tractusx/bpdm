@@ -4,15 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
-## [5.0.0] - tbd
+## [5.0.0] -  2024-05-15
 
-### Breaking
+### Major Breaking
 
 - Postgres Chart dependency version from 14 to 15: When using the Postgres deployment managed by the BPDM Chart please mind to migrate your data as this update is not backwards compatible
 
 ### Added
 
 - Keycloak dependency loading a default Cx-Central realm
+- BPDM common library chart containing utility template functionality
 
 ### Changed
 
@@ -21,6 +22,8 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 - update BPDM Orchestrator Chart to version 3.0.0
 - update BPDM Cleaning Service Dummy Chart to version 3.0.0
 - update BPDM Bridge Chart to version 3.0.0
+- support BPDM application version 6.0.0 (Please consult the app's release and changelog for the result impact)
+- Postgresql dependency now has a fullnameOverride on default
 
 ### Removed
 

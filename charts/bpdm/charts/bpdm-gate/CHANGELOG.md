@@ -6,14 +6,17 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
 ## [6.0.0] - tbd
 
-### Breaking
+### Major Breaking
 
 - Postgres Chart dependency version from 14 to 15: When using the Postgres deployment managed by the BPDM Chart please mind to migrate your data as this update is not backwards compatible.
 
+### Added
+
+- BPDM common library chart dependency containing utility template functionality
 
 ### Changed
 
-- update app version to 6.0.0
+- update to BPDM application version 6.0.0 (Please consult the app's release and changelog for the result impact)
 
 ## [5.0.4] - 2024-03-29
 
