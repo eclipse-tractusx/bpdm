@@ -28,6 +28,7 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
+import java.time.Instant
 
 
 @Repository
@@ -49,6 +50,10 @@ interface BusinessPartnerRepository : JpaRepository<BusinessPartnerDb, Long>, Cr
 
     @Query("SELECT b.stage as stage, COUNT(b.stage) as count FROM BusinessPartnerDb AS b GROUP BY b.stage")
     fun countPerStages(): List<PartnersPerStageCount>
+
+    fun findByStageAndBpnLIn(stage: StageType, bpnL: Collection<String>): Set<BusinessPartnerDb>
+    fun findByStageAndBpnSIn(stage: StageType, bpnS: Collection<String>): Set<BusinessPartnerDb>
+    fun findByStageAndBpnAIn(stage: StageType, bpnA: Collection<String>): Set<BusinessPartnerDb>
 
     interface PartnersPerStageCount {
         val stage: StageType

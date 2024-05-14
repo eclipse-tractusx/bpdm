@@ -24,5 +24,7 @@ bpdm:
     creation:
       fromSharingMember:
         cron: '-'
+      fromPool:
+        cron: '_'
     check:
       cron: '-'

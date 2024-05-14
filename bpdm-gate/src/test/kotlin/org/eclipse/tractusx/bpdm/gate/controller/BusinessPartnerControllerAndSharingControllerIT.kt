@@ -268,48 +268,6 @@ class BusinessPartnerControllerAndSharingControllerIT @Autowired constructor(
 
     }
 
-    @Test
-    fun `insert one business partners and request cleaning task for bpn update`() {
-
-        this.mockAndAssertUtils.mockPoolApiGetChangeLogs(poolWireMockServer)
-        this.mockAndAssertUtils.mockOrchestratorApiCleanedResponseSizeOne(gateWireMockServer)
-
-        val outputBusinessPartners = listOf(
-            BusinessPartnerVerboseValues.bpOutputDtoCleaned
-        )
-        val upsertRequests = listOf(
-            BusinessPartnerNonVerboseValues.bpInputRequestCleaned
-        )
-        upsertBusinessPartnersAndShare(upsertRequests)
-
-        val externalId4 = BusinessPartnerNonVerboseValues.bpInputRequestCleaned.externalId
-
-        goldenRecordTaskService.resolvePendingTasks()
-
-        goldenRecordTaskService.createTasksForGoldenRecordUpdates()
-
-        val upsertSharingStatesRequests = listOf(
-            SharingStateDto(
-                externalId = externalId4,
-                sharingStateType = SharingStateType.Pending,
-                sharingErrorCode = null,
-                sharingErrorMessage = null,
-                sharingProcessStarted = null,
-                taskId = "0"
-            )
-        )
-        val externalIds = listOf(externalId4)
-        val upsertSharingStateResponses = this.mockAndAssertUtils.readSharingStates(BusinessPartnerType.GENERIC, externalIds)
-
-        //Assert that Cleaned Golden Record is persisted in the Output correctly
-        val searchResponsePage = gateClient.businessParters.getBusinessPartnersOutput(listOf(externalId4))
-        this.mockAndAssertUtils.assertUpsertOutputResponsesMatchRequests(searchResponsePage.content, outputBusinessPartners)
-
-        //Assert that sharing state are created
-        assertHelpers.assertRecursively(upsertSharingStateResponses).ignoringFieldsMatchingRegexes(".*${SharingStateDto::sharingProcessStarted.name}")
-            .isEqualTo(upsertSharingStatesRequests)
-    }
-
     fun upsertBusinessPartnersAndShare(partners: List<BusinessPartnerInputRequest>) {
         gateClient.businessParters.upsertBusinessPartnersInput(partners)
         gateClient.sharingState.postSharingStateReady(PostSharingStateReadyRequest(partners.map { it.externalId }))

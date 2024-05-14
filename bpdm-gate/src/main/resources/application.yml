@@ -53,7 +53,7 @@ bpdm:
         # Up to how many golden record tasks can be created when checking
         batchSize: 100
         # When and how often the Gate checks for golden record updates from the Pool
-        cron: '-'
+        cron: '*/30 * * * * *'
     check:
       batchSize: 100
       cron: '*/30 * * * * *'

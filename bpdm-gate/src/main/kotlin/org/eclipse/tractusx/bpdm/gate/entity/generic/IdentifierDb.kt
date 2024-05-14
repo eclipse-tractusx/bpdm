@@ -21,6 +21,9 @@ package org.eclipse.tractusx.bpdm.gate.entity.generic
 
 import jakarta.persistence.Column
 import jakarta.persistence.Embeddable
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 
 
 @Embeddable
@@ -33,7 +36,11 @@ data class IdentifierDb(
     var value: String,
 
     @Column(name = "issuing_body")
-    var issuingBody: String?
+    var issuingBody: String?,
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "business_partner_type", nullable = false)
+    var businessPartnerType: BusinessPartnerType
 
 ) : Comparable<IdentifierDb> {
 
@@ -41,6 +48,7 @@ data class IdentifierDb(
     override fun compareTo(other: IdentifierDb) = compareBy(
         IdentifierDb::type,
         IdentifierDb::value,
-        IdentifierDb::issuingBody
+        IdentifierDb::issuingBody,
+        IdentifierDb::businessPartnerType
     ).compare(this, other)
 }

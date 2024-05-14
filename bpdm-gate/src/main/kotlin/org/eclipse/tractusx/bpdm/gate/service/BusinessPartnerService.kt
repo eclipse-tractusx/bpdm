@@ -36,6 +36,8 @@ import org.eclipse.tractusx.bpdm.gate.exception.BpdmMissingStageException
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
+import org.eclipse.tractusx.bpdm.gate.util.BusinessPartnerComparisonUtil
+import org.eclipse.tractusx.bpdm.gate.util.BusinessPartnerCopyUtil
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRequest
 import org.eclipse.tractusx.orchestrator.api.model.TaskCreateResponse
@@ -53,6 +55,8 @@ class BusinessPartnerService(
     private val sharingStateService: SharingStateService,
     private val changelogRepository: ChangelogRepository,
     private val sharingStateRepository: SharingStateRepository,
+    private val copyUtil: BusinessPartnerCopyUtil,
+    private val compareUtil: BusinessPartnerComparisonUtil
 ) {
     private val logger = KotlinLogging.logger { }
 
@@ -182,36 +186,8 @@ class BusinessPartnerService(
                 val matchingBusinessPartner = persistedBusinessPartnerMap[entity.externalId]
                 val hasErrorSharingState = sharingStatesMap[entity.externalId]?.sharingStateType == SharingStateType.Error
 
-                matchingBusinessPartner?.let { hasChanges(entity, it) } ?: true || hasErrorSharingState //If there are difference return true, else returns false
+                matchingBusinessPartner?.let { compareUtil.hasChanges(entity, it) } ?: true || hasErrorSharingState //If there are difference return true, else returns false
             }
-        }
-
-        private fun hasChanges(entity: BusinessPartnerDb, persistedBP: BusinessPartnerDb): Boolean {
-
-            return entity.nameParts != persistedBP.nameParts ||
-                    entity.roles != persistedBP.roles ||
-                    entity.shortName != persistedBP.shortName ||
-                    entity.legalName != persistedBP.legalName ||
-                    entity.siteName != persistedBP.siteName ||
-                    entity.addressName != persistedBP.addressName ||
-                    entity.legalForm != persistedBP.legalForm ||
-                    entity.isOwnCompanyData != persistedBP.isOwnCompanyData ||
-                    entity.bpnL != persistedBP.bpnL ||
-                    entity.bpnS != persistedBP.bpnS ||
-                    entity.bpnA != persistedBP.bpnA ||
-                    entity.stage != persistedBP.stage ||
-                    entity.parentId != persistedBP.parentId ||
-                    entity.parentType != persistedBP.parentType ||
-                    entity.identifiers != persistedBP.identifiers ||
-                    entity.states != persistedBP.states ||
-                    entity.classifications != persistedBP.classifications ||
-                    postalAddressHasChanges(entity.postalAddress, persistedBP.postalAddress)
-        }
-
-        private fun postalAddressHasChanges(entityPostalAddress: PostalAddressDb, persistedPostalAddress: PostalAddressDb): Boolean {
-            return (entityPostalAddress.addressType != persistedPostalAddress.addressType) ||
-                    (entityPostalAddress.alternativePostalAddress != persistedPostalAddress.alternativePostalAddress) ||
-                    (entityPostalAddress.physicalPostalAddress != persistedPostalAddress.physicalPostalAddress)
         }
 
         /**
@@ -227,69 +203,11 @@ class BusinessPartnerService(
             return entityCandidates.map { candidate ->
                 val existingEntity = existingPartnersByExternalId[candidate.externalId]
                 if (existingEntity != null)
-                    ResolutionResult(copyValues(candidate, existingEntity), true)
+                    ResolutionResult(copyUtil.copyValues(candidate, existingEntity), true)
                 else
                     ResolutionResult(candidate, false)
             }
         }
-
-        private fun copyValues(fromPartner: BusinessPartnerDb, toPartner: BusinessPartnerDb): BusinessPartnerDb {
-            return toPartner.apply {
-                stage = fromPartner.stage
-                shortName = fromPartner.shortName
-                legalName = fromPartner.legalName
-                siteName = fromPartner.siteName
-                addressName = fromPartner.addressName
-                legalForm = fromPartner.legalForm
-                isOwnCompanyData = fromPartner.isOwnCompanyData
-                bpnL = fromPartner.bpnL
-                bpnS = fromPartner.bpnS
-                bpnA = fromPartner.bpnA
-                parentId = fromPartner.parentId
-                parentType = fromPartner.parentType
-                legalEntityConfidence = fromPartner.legalEntityConfidence
-                siteConfidence = fromPartner.siteConfidence
-                addressConfidence = fromPartner.addressConfidence
-
-                nameParts.replace(fromPartner.nameParts)
-                roles.replace(fromPartner.roles)
-
-                states.copyAndSync(fromPartner.states, ::copyValues)
-                classifications.copyAndSync(fromPartner.classifications, ::copyValues)
-                identifiers.copyAndSync(fromPartner.identifiers, ::copyValues)
-
-                copyValues(fromPartner.postalAddress, postalAddress)
-            }
-        }
-
-        private fun copyValues(fromState: StateDb, toState: StateDb) =
-            toState.apply {
-                validFrom = fromState.validFrom
-                validTo = fromState.validTo
-                type = fromState.type
-            }
-
-        private fun copyValues(fromClassification: ClassificationDb, toClassification: ClassificationDb) =
-            toClassification.apply {
-                value = fromClassification.value
-                type = fromClassification.type
-                code = fromClassification.code
-            }
-
-        private fun copyValues(fromIdentifier: IdentifierDb, toIdentifier: IdentifierDb) =
-            toIdentifier.apply {
-                type = fromIdentifier.type
-                value = fromIdentifier.value
-                issuingBody = fromIdentifier.issuingBody
-            }
-
-        private fun copyValues(fromPostalAddress: PostalAddressDb, toPostalAddress: PostalAddressDb) =
-            toPostalAddress.apply {
-                addressType = fromPostalAddress.addressType
-                physicalPostalAddress = fromPostalAddress.physicalPostalAddress
-                alternativePostalAddress = fromPostalAddress.alternativePostalAddress
-            }
-
 
     }
 
