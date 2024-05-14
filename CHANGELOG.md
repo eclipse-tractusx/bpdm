@@ -4,7 +4,52 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
+For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/CHANGELOG.md) of the charts directly.
+
 ## [6.0.0] - [tbd]
+
+### Removed
+
+- BPDM Bridge (The Cleaning Dummy Service and Orchestrator are the successor applications to simulate a dummy golden record process)
+- BPDM Gate: Removed all Legal Entity, Site and Address endpoints (The generic business partner endpoint is their successor)
+- BPDM Gate: Removed legal entity classifications form business partner
+- BPDM Gate: Removed business partner type from API models and filters
+- BPDM Gate: Removed BPN from the sharing state (BPNs can be viewed in the output data of the business partner)
+- APIs: Removed the static prefixes 'api/catena' from all API endpoint paths
+- BPDM Pool: Removed the flags for `is legal address` and `is site main address` from the logistic address (since it is now expressed by the address type)
+
+### Added
+
+- BPDM Gate: Configuration to prevent the uploaded business partner input data to immediately enter the golden record process. 
+In this configuration the business partner data needs to be sent to the golden record process manually over the new state/ready API endpoint.
+Default configuration remains automatically sharing.
+- BPDM Gate: Limited multi-tenancy support. Business partners are now separated by owner-BPNL.
+The owner is determined from the 'bpn' claim in the token.
+This means users of a Gate can only see and edit their own business partner data.
+- BPDM Pool: New API endpoints to query business partner data which belongs to Catena-X members only
+- APIs: Added a major version number to all API endpoint paths indicating the current version of the BPDM APIs.
+In the future we will use version numbers in the URL to differentiate between all currently supported major versions of the API
+- BPDM Gate Client: Now supports the stats endpoints of the BPDM API
+
+### Changed
+
+- Confidence Criteria: Corrected field name for number of sharing members (formerly number of business partners)
+- BPDM Cleaning Service Dummy: Now determines business partner data to be Catena-X member data if it is claimed to be owned
+- BPDM Cleaning Service Dummy: Fix ignoring BPNs coming from the sharing member
+- BPDM Gate: Fix not correctly updating confidence values it receives from the golden record process
+- BPDM Gate: Fix not correctly updating business partner output data from golden record updates in the Pool.
+- JAVA version to 21
+- BPDM API Permissions: Overhaul of the permissions needed to access the BPDM API endpoints.
+Permissions are now more fine-granular and differentiate more clearly between read or write.
+For more details consult the Arc42, API documentation and properties files of the respective applications.
+- BPDM App Configuration: Now all applications are secured (authenticated and authorized) by default.
+You can still deactivate security in the BPDM apps for testing or development purposes though.
+- BPDM Pool: Fix Pool trying to update golden records which the golden record process indicated to have no changes
+- BPDM Orchestrator: The business partner data for golden record process tasks has been completely overhauled.
+Now business partner data is clearly divided into `uncategorized`, `legal entity`, `site` and `additonal address` data.
+This model is less verbose and contains less duplicate data.
+Additionally, both Pool and Gate can write and read from it making it unnecessary for a cleaning service to provide the data in two different models.
+
 
 
 ## [5.0.0] - [2024-02-10]
