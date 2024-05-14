@@ -88,3 +88,8 @@ fun BusinessPartner.copyWithBpnRequests() =
         site = site?.copy(bpnReference = site!!.bpnReference.copy(referenceType = BpnReferenceType.BpnRequestIdentifier)),
         additionalAddress = additionalAddress?.copy(bpnReference = additionalAddress!!.bpnReference.copy(referenceType = BpnReferenceType.BpnRequestIdentifier))
     )
+
+fun BusinessPartner.copyAsCxMemberData() =
+    copy(
+        legalEntity = legalEntity.copy(isCatenaXMemberData = true)
+    )
