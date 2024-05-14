@@ -76,7 +76,7 @@ class BusinessPartnerMappings {
             externalId = dto.externalId,
             nameParts = dto.nameParts.toMutableList(),
             roles = dto.roles.toSortedSet(),
-            identifiers = dto.identifiers.mapNotNull(::toIdentifier).toSortedSet(),
+            identifiers = dto.identifiers.mapNotNull{toIdentifier(it, BusinessPartnerType.GENERIC)}.toSortedSet(),
             states = dto.states.asSequence().mapNotNull{toState(it, BusinessPartnerType.GENERIC)}
                 .plus(dto.legalEntity.states.mapNotNull { toState(it, BusinessPartnerType.LEGAL_ENTITY) })
                 .plus(dto.site.states.mapNotNull { toState(it, BusinessPartnerType.SITE) })
@@ -284,10 +284,10 @@ class BusinessPartnerMappings {
     private fun toIdentifierDto(entity: IdentifierDb) =
         BusinessPartnerIdentifierDto(type = entity.type, value = entity.value, issuingBody = entity.issuingBody)
 
-    private fun toIdentifier(dto: BusinessPartnerIdentifierDto) =
+    private fun toIdentifier(dto: BusinessPartnerIdentifierDto, businessPartnerType: BusinessPartnerType) =
         dto.type?.let { type ->
             dto.value?.let { value ->
-                IdentifierDb(type = type, value = value, issuingBody = dto.issuingBody)
+                IdentifierDb(type = type, value = value, issuingBody = dto.issuingBody, businessPartnerType)
             }
         }
 

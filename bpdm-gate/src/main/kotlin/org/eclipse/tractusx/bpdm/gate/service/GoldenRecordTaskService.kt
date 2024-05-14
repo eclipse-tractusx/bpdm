@@ -48,9 +48,7 @@ class GoldenRecordTaskService(
     private val businessPartnerService: BusinessPartnerService,
     private val orchestratorMappings: OrchestratorMappings,
     private val orchestrationApiClient: OrchestrationApiClient,
-    private val properties: GoldenRecordTaskConfigProperties,
-    private val syncRecordService: SyncRecordService,
-    private val poolClient: PoolApiClient
+    private val properties: GoldenRecordTaskConfigProperties
 ) {
     private val logger = KotlinLogging.logger { }
 
@@ -100,50 +98,6 @@ class GoldenRecordTaskService(
         sharingStates.groupBy { it.associatedOwnerBpnl }.forEach{ (ownerBpnl, states) ->
             resolvePendingTasksForOwner(tasks, states, ownerBpnl)
         }
-    }
-
-    @Transactional
-    fun createTasksForGoldenRecordUpdates() {
-        logger.info { "Started scheduled task to create golden record tasks from Pool updates" }
-
-        val syncRecord = syncRecordService.getOrCreateRecord(SyncTypeDb.POOL_TO_GATE_OUTPUT)
-
-        val pageRequest = PaginationRequest(0, properties.creation.fromPool.batchSize)
-        val changelogSearchRequest = ChangelogSearchRequest(syncRecord.finishedAt)
-        val poolChangelogEntries = poolClient.changelogs.getChangelogEntries(changelogSearchRequest, pageRequest)
-
-        val poolUpdatedEntries = poolChangelogEntries.content.filter { it.changelogType == ChangelogType.UPDATE }
-
-        val bpnA =
-            poolUpdatedEntries.filter { it.businessPartnerType == BusinessPartnerType.ADDRESS }.map { it.bpn }
-        val bpnL = poolUpdatedEntries.filter { it.businessPartnerType == BusinessPartnerType.LEGAL_ENTITY }
-            .map { it.bpn }
-        val bpnS =
-            poolUpdatedEntries.filter { it.businessPartnerType == BusinessPartnerType.SITE }.map { it.bpn }
-
-        val gateOutputEntries = businessPartnerRepository.findByStageAndBpnLInOrBpnSInOrBpnAIn(StageType.Output, bpnL, bpnS, bpnA)
-
-        val businessPartnerGenericDtoList = gateOutputEntries.map { bp ->
-            orchestratorMappings.toOrchestratorDto(bp)
-        }
-
-        val tasks = createGoldenRecordTasks(TaskMode.UpdateFromPool, businessPartnerGenericDtoList)
-
-        val pendingRequests = gateOutputEntries.zip(tasks)
-            .map { (partner, task) ->
-                SharingStateService.PendingRequest(
-                    partner.externalId,
-                    task.taskId
-                )
-            }
-        sharingStateService.setPending(pendingRequests, null)
-
-        if (poolUpdatedEntries.isNotEmpty()) {
-            syncRecordService.setSynchronizationStart(SyncTypeDb.POOL_TO_GATE_OUTPUT)
-            syncRecordService.setSynchronizationSuccess(SyncTypeDb.POOL_TO_GATE_OUTPUT, poolUpdatedEntries.last().timestamp)
-        }
-
-        logger.info { "Created ${tasks.size} new golden record tasks from pool updates" }
     }
 
     private fun createGoldenRecordTasks(mode: TaskMode, orchestratorBusinessPartnersDto: List<BusinessPartner>): List<TaskClientStateDto> {

@@ -30,15 +30,15 @@ import java.time.LocalDateTime
 @Table(name = "confidence_criteria")
 class ConfidenceCriteriaDb(
     @Column(name = "shared_by_owner", nullable = false)
-    val sharedByOwner: Boolean,
+    var sharedByOwner: Boolean,
     @Column(name = "checked_by_external_data_source", nullable = false)
-    val checkedByExternalDataSource: Boolean,
+    var checkedByExternalDataSource: Boolean,
     @Column(name = "number_of_business_partners", nullable = false)
-    val numberOfBusinessPartners: Int,
+    var numberOfBusinessPartners: Int,
     @Column(name = "last_confidence_check_at", nullable = false)
-    val lastConfidenceCheckAt: LocalDateTime,
+    var lastConfidenceCheckAt: LocalDateTime,
     @Column(name = "next_confidence_check_at", nullable = false)
-    val nextConfidenceCheckAt: LocalDateTime,
+    var nextConfidenceCheckAt: LocalDateTime,
     @Column(name = "confidence_level", nullable = false)
-    val confidenceLevel: Int,
+    var confidenceLevel: Int,
 ) : BaseEntity()

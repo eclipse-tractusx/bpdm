@@ -51,7 +51,7 @@ class OrchestratorMappings(
             nameParts = emptyList(),
             uncategorized = UncategorizedProperties(
                 nameParts = entity.nameParts,
-                identifiers = entity.identifiers.map { Identifier(it.value, it.type, it.issuingBody) },
+                identifiers = entity.identifiers.filter { it.businessPartnerType == BusinessPartnerType.GENERIC }.map { Identifier(it.value, it.type, it.issuingBody) },
                 states = entity.states.filter { it.businessPartnerTyp == BusinessPartnerType.GENERIC }.map { toState(it) },
                 address = postalAddress.takeIf { entity.postalAddress.addressType == null }
             ),
@@ -61,7 +61,7 @@ class OrchestratorMappings(
                 legalName = entity.legalName,
                 legalForm = entity.legalForm,
                 legalShortName = entity.shortName,
-                identifiers = emptyList(),
+                identifiers = entity.identifiers.filter { it.businessPartnerType == BusinessPartnerType.LEGAL_ENTITY }.map { Identifier(it.value, it.type, it.issuingBody) },
                 states = entity.states.filter { it.businessPartnerTyp == BusinessPartnerType.LEGAL_ENTITY }.map { toState(it) },
                 confidenceCriteria = toConfidenceCriteria(entity.legalEntityConfidence),
                 isCatenaXMemberData = null,
@@ -84,7 +84,7 @@ class OrchestratorMappings(
         return PostalAddress(
             bpnReference = toBpnReference(entity.bpnA),
             addressName = entity.addressName,
-            identifiers = emptyList(),
+            identifiers = entity.identifiers.filter { it.businessPartnerType == BusinessPartnerType.ADDRESS }.map { Identifier(it.value, it.type, it.issuingBody) },
             states = entity.states.filter { it.businessPartnerTyp == BusinessPartnerType.ADDRESS }.map { toState(it) },
             confidenceCriteria = toConfidenceCriteria(entity.addressConfidence),
             physicalAddress = entity.postalAddress.physicalPostalAddress?.let {
@@ -210,10 +210,10 @@ class OrchestratorMappings(
                 externalId = externalId,
                 nameParts = uncategorized.nameParts.toMutableList(),
                 shortName = legalEntity.legalShortName,
-                identifiers = uncategorized.identifiers
-                    .plus(legalEntity.identifiers)
-                    .plus(postalAddress.identifiers)
-                    .mapNotNull { toIdentifier(it) }.toSortedSet(),
+                identifiers = uncategorized.identifiers.mapNotNull { toIdentifier(it, BusinessPartnerType.GENERIC) }
+                    .plus(legalEntity.identifiers.mapNotNull { toIdentifier(it, BusinessPartnerType.LEGAL_ENTITY) })
+                    .plus(postalAddress.identifiers.mapNotNull { toIdentifier(it, BusinessPartnerType.ADDRESS) })
+                    .toSortedSet(),
                 legalName = legalEntity.legalName,
                 siteName = site?.siteName,
                 addressName = postalAddress.addressName,
@@ -233,19 +233,19 @@ class OrchestratorMappings(
                 bpnS = site?.bpnReference?.referenceValue,
                 bpnA = postalAddress.bpnReference.referenceValue!!,
                 stage = StageType.Output,
-                legalEntityConfidence = legalEntity.confidenceCriteria?.let { toConfidenceCriteria(it) },
-                siteConfidence = site?.confidenceCriteria?.let { toConfidenceCriteria(it) },
-                addressConfidence = postalAddress.confidenceCriteria?.let { toConfidenceCriteria(it) },
+                legalEntityConfidence = toConfidenceCriteria(legalEntity.confidenceCriteria),
+                siteConfidence = site?.let { toConfidenceCriteria(it.confidenceCriteria) },
+                addressConfidence = toConfidenceCriteria(postalAddress.confidenceCriteria),
                 associatedOwnerBpnl = associatedOwnerBpnl
             )
         }
     }
 
 
-    private fun toIdentifier(dto: Identifier) =
+    private fun toIdentifier(dto: Identifier, businessPartnerType: BusinessPartnerType) =
         dto.type?.let { type ->
             dto.value?.let { value ->
-                IdentifierDb(type = type, value = value, issuingBody = dto.issuingBody)
+                IdentifierDb(type = type, value = value, issuingBody = dto.issuingBody, businessPartnerType = businessPartnerType)
             }
         }
 

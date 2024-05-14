@@ -239,7 +239,8 @@ internal class BusinessPartnerIT @Autowired constructor(
         return IdentifierDb(
             value = "1234567890",
             type = "Passport",
-            issuingBody = "Government of XYZ"
+            issuingBody = "Government of XYZ",
+            businessPartnerType = BusinessPartnerType.GENERIC
         )
     }
 
