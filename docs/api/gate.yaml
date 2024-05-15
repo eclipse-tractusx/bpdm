@@ -2,12 +2,12 @@ openapi: 3.0.1
 info:
   title: Business Partner Data Management Gate
   description: A gate for a member to share business partner data with CatenaX
-  version: 6.0.0-SNAPSHOT
+  version: 6.0.0
 servers:
   - url: http://localhost:8081
     description: Generated server url
 paths:
-  /input/business-partners:
+  /v6/input/business-partners:
     put:
       tags:
         - business-partner-controller
@@ -33,7 +33,7 @@ paths:
                   $ref: '#/components/schemas/BusinessPartnerInputDto'
         '400':
           description: On malformed legal entity request
-  /sharing-state/ready:
+  /v6/sharing-state/ready:
     post:
       tags:
         - sharing-state-controller
@@ -51,7 +51,7 @@ paths:
           description: All business partners put in ready to be shared state
         '400':
           description: Business partners can't be put into ready state (e.g. external-ID not found, wrong sharing state)
-  /output/changelog/search:
+  /v6/output/changelog/search:
     post:
       tags:
         - changelog-controller
@@ -91,7 +91,7 @@ paths:
                 $ref: '#/components/schemas/PageChangeLogDtoChangelogGateDto'
         '400':
           description: On malformed pagination request
-  /output/business-partners/search:
+  /v6/output/business-partners/search:
     post:
       tags:
         - business-partner-controller
@@ -132,7 +132,7 @@ paths:
                 $ref: '#/components/schemas/PageDtoBusinessPartnerOutputDto'
         '400':
           description: On malformed pagination request
-  /input/changelog/search:
+  /v6/input/changelog/search:
     post:
       tags:
         - changelog-controller
@@ -172,7 +172,7 @@ paths:
                 $ref: '#/components/schemas/PageChangeLogDtoChangelogGateDto'
         '400':
           description: On malformed pagination request
-  /input/business-partners/search:
+  /v6/input/business-partners/search:
     post:
       tags:
         - business-partner-controller
@@ -213,7 +213,7 @@ paths:
                 $ref: '#/components/schemas/PageDtoBusinessPartnerInputDto'
         '400':
           description: On malformed pagination request
-  /stats/{stage}/address-types:
+  /v6/stats/{stage}/address-types:
     get:
       tags:
         - stats-controller
@@ -234,7 +234,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StatsAddressTypesResponse'
-  /stats/stages:
+  /v6/stats/stages:
     get:
       tags:
         - stats-controller
@@ -246,7 +246,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StatsStagesResponse'
-  /stats/sharing-states:
+  /v6/stats/sharing-states:
     get:
       tags:
         - stats-controller
@@ -258,7 +258,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StatsSharingStatesResponse'
-  /stats/confidence-criteria:
+  /v6/stats/confidence-criteria:
     get:
       tags:
         - stats-controller
@@ -270,7 +270,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StatsConfidenceCriteriaResponse'
-  /sharing-state:
+  /v6/sharing-state:
     get:
       tags:
         - sharing-state-controller
@@ -329,6 +329,7 @@ components:
         - bpnA
         - confidenceCriteria
         - physicalPostalAddress
+        - states
       type: object
       properties:
         addressBpn:
@@ -351,11 +352,16 @@ components:
           $ref: '#/components/schemas/AlternativePostalAddressDto'
         confidenceCriteria:
           $ref: '#/components/schemas/ConfidenceCriteriaDto'
+        states:
+          type: array
+          items:
+            $ref: '#/components/schemas/BusinessPartnerStateDto'
       description: Address properties of business partner output data
     AddressRepresentationInputDto:
       required:
         - alternativePostalAddress
         - physicalPostalAddress
+        - states
       type: object
       properties:
         addressBpn:
@@ -376,6 +382,10 @@ components:
           $ref: '#/components/schemas/PhysicalPostalAddressDto'
         alternativePostalAddress:
           $ref: '#/components/schemas/AlternativePostalAddressDto'
+        states:
+          type: array
+          items:
+            $ref: '#/components/schemas/BusinessPartnerStateDto'
       description: 'The address, on which the business partner provides a view. '
     AlternativePostalAddressDto:
       type: object
@@ -895,14 +905,6 @@ components:
         externalId:
           type: string
           description: The external identifier of the business partner for which the changelog entry was created.
-        businessPartnerType:
-          type: string
-          description: 'One of the types of business partners for which the changelog entry was created: legal entity, site, address.'
-          enum:
-            - LEGAL_ENTITY
-            - SITE
-            - ADDRESS
-            - GENERIC
         timestamp:
           type: string
           description: The date and time when the changelog entry was created.
@@ -928,17 +930,6 @@ components:
           description: Only for business partners with the given array of external IDs. Ignored if empty.
           items:
             type: string
-        businessPartnerTypes:
-          uniqueItems: true
-          type: array
-          description: Only for business partners with the given array of business partner types. Ignored if empty.
-          items:
-            type: string
-            enum:
-              - LEGAL_ENTITY
-              - SITE
-              - ADDRESS
-              - GENERIC
     ConfidenceCriteriaDto:
       required:
         - checkedByExternalDataSource
@@ -1004,6 +995,8 @@ components:
           format: float
       description: The exact location of the physical postal address in latitude, longitude, and altitude.
     LegalEntityRepresentationInputDto:
+      required:
+        - states
       type: object
       properties:
         legalEntityBpn:
@@ -1018,12 +1011,17 @@ components:
         legalForm:
           type: string
           description: The legal form of the legal entity, on which the business partner provides a view.
+        states:
+          type: array
+          items:
+            $ref: '#/components/schemas/BusinessPartnerStateDto'
       description: The legal entity, on which the business partner provides a view.
     LegalEntityRepresentationOutputDto:
       required:
         - bpnL
         - confidenceCriteria
         - legalEntityBpn
+        - states
       type: object
       properties:
         legalEntityBpn:
@@ -1040,6 +1038,10 @@ components:
           description: The legal form of the legal entity, on which the business partner provides a view.
         confidenceCriteria:
           $ref: '#/components/schemas/ConfidenceCriteriaDto'
+        states:
+          type: array
+          items:
+            $ref: '#/components/schemas/BusinessPartnerStateDto'
       description: Legal Entity properties of business partner output data
     PageChangeLogDtoChangelogGateDto:
       required:
@@ -1505,19 +1507,10 @@ components:
       description: Request for setting business partners into ready to be shared to golden record state
     SharingStateDto:
       required:
-        - businessPartnerType
         - externalId
         - sharingStateType
       type: object
       properties:
-        businessPartnerType:
-          type: string
-          description: One of the types of business partners for which the sharing state entry was created.
-          enum:
-            - LEGAL_ENTITY
-            - SITE
-            - ADDRESS
-            - GENERIC
         externalId:
           type: string
           description: The external identifier of the business partner for which the sharing state entry was created.
@@ -1541,9 +1534,6 @@ components:
         sharingErrorMessage:
           type: string
           description: The error message in case the current sharing state type is "error".
-        bpn:
-          type: string
-          description: The business partner number associated to the combination of external identifier and business partner type in case the sharing state type is “success”. Can be either a BPNL, BPNS or BPNA.
         sharingProcessStarted:
           type: string
           description: The date and time when the sharing process was started.
@@ -1553,6 +1543,8 @@ components:
           description: The orchestrator task identifier that was created
       description: A sharing state entry shows the progress in the sharing process and is updated each time the progress for a business partner changes. The business partner is identified by a combination of external ID and business partner type.
     SiteRepresentationInputDto:
+      required:
+        - states
       type: object
       properties:
         siteBpn:
@@ -1561,11 +1553,16 @@ components:
         name:
           type: string
           description: The name of the site, on which the business partner provides a view. This is not according to official registers but according to the name the owner chooses.
+        states:
+          type: array
+          items:
+            $ref: '#/components/schemas/BusinessPartnerStateDto'
       description: The site, on which the business partner provides a view.
     SiteRepresentationOutputDto:
       required:
         - confidenceCriteria
         - siteBpn
+        - states
       type: object
       properties:
         siteBpn:
@@ -1576,6 +1573,10 @@ components:
           description: The name of the site, on which the business partner provides a view. This is not according to official registers but according to the name the owner chooses.
         confidenceCriteria:
           $ref: '#/components/schemas/ConfidenceCriteriaDto'
+        states:
+          type: array
+          items:
+            $ref: '#/components/schemas/BusinessPartnerStateDto'
       description: Site properties of business partner output data
     StatsAddressTypesResponse:
       required:

@@ -3,7 +3,7 @@
   "info": {
     "title": "Business Partner Data Management Gate",
     "description": "A gate for a member to share business partner data with CatenaX",
-    "version": "6.0.0-SNAPSHOT"
+    "version": "6.0.0"
   },
   "servers": [
     {
@@ -12,7 +12,7 @@
     }
   ],
   "paths": {
-    "/input/business-partners": {
+    "/v6/input/business-partners": {
       "put": {
         "tags": [
           "business-partner-controller"
@@ -53,7 +53,7 @@
         }
       }
     },
-    "/sharing-state/ready": {
+    "/v6/sharing-state/ready": {
       "post": {
         "tags": [
           "sharing-state-controller"
@@ -81,7 +81,7 @@
         }
       }
     },
-    "/output/changelog/search": {
+    "/v6/output/changelog/search": {
       "post": {
         "tags": [
           "changelog-controller"
@@ -141,7 +141,7 @@
         }
       }
     },
-    "/output/business-partners/search": {
+    "/v6/output/business-partners/search": {
       "post": {
         "tags": [
           "business-partner-controller"
@@ -203,7 +203,7 @@
         }
       }
     },
-    "/input/changelog/search": {
+    "/v6/input/changelog/search": {
       "post": {
         "tags": [
           "changelog-controller"
@@ -263,7 +263,7 @@
         }
       }
     },
-    "/input/business-partners/search": {
+    "/v6/input/business-partners/search": {
       "post": {
         "tags": [
           "business-partner-controller"
@@ -325,7 +325,7 @@
         }
       }
     },
-    "/stats/{stage}/address-types": {
+    "/v6/stats/{stage}/address-types": {
       "get": {
         "tags": [
           "stats-controller"
@@ -359,7 +359,7 @@
         }
       }
     },
-    "/stats/stages": {
+    "/v6/stats/stages": {
       "get": {
         "tags": [
           "stats-controller"
@@ -379,7 +379,7 @@
         }
       }
     },
-    "/stats/sharing-states": {
+    "/v6/stats/sharing-states": {
       "get": {
         "tags": [
           "stats-controller"
@@ -399,7 +399,7 @@
         }
       }
     },
-    "/stats/confidence-criteria": {
+    "/v6/stats/confidence-criteria": {
       "get": {
         "tags": [
           "stats-controller"
@@ -419,7 +419,7 @@
         }
       }
     },
-    "/sharing-state": {
+    "/v6/sharing-state": {
       "get": {
         "tags": [
           "sharing-state-controller"
@@ -501,7 +501,8 @@
           "alternativePostalAddress",
           "bpnA",
           "confidenceCriteria",
-          "physicalPostalAddress"
+          "physicalPostalAddress",
+          "states"
         ],
         "type": "object",
         "properties": {
@@ -531,6 +532,12 @@
           },
           "confidenceCriteria": {
             "$ref": "#/components/schemas/ConfidenceCriteriaDto"
+          },
+          "states": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BusinessPartnerStateDto"
+            }
           }
         },
         "description": "Address properties of business partner output data"
@@ -538,7 +545,8 @@
       "AddressRepresentationInputDto": {
         "required": [
           "alternativePostalAddress",
-          "physicalPostalAddress"
+          "physicalPostalAddress",
+          "states"
         ],
         "type": "object",
         "properties": {
@@ -565,6 +573,12 @@
           },
           "alternativePostalAddress": {
             "$ref": "#/components/schemas/AlternativePostalAddressDto"
+          },
+          "states": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BusinessPartnerStateDto"
+            }
           }
         },
         "description": "The address, on which the business partner provides a view. "
@@ -1167,16 +1181,6 @@
             "type": "string",
             "description": "The external identifier of the business partner for which the changelog entry was created."
           },
-          "businessPartnerType": {
-            "type": "string",
-            "description": "One of the types of business partners for which the changelog entry was created: legal entity, site, address.",
-            "enum": [
-              "LEGAL_ENTITY",
-              "SITE",
-              "ADDRESS",
-              "GENERIC"
-            ]
-          },
           "timestamp": {
             "type": "string",
             "description": "The date and time when the changelog entry was created.",
@@ -1208,20 +1212,6 @@
             "description": "Only for business partners with the given array of external IDs. Ignored if empty.",
             "items": {
               "type": "string"
-            }
-          },
-          "businessPartnerTypes": {
-            "uniqueItems": true,
-            "type": "array",
-            "description": "Only for business partners with the given array of business partner types. Ignored if empty.",
-            "items": {
-              "type": "string",
-              "enum": [
-                "LEGAL_ENTITY",
-                "SITE",
-                "ADDRESS",
-                "GENERIC"
-              ]
             }
           }
         }
@@ -1313,6 +1303,9 @@
         "description": "The exact location of the physical postal address in latitude, longitude, and altitude."
       },
       "LegalEntityRepresentationInputDto": {
+        "required": [
+          "states"
+        ],
         "type": "object",
         "properties": {
           "legalEntityBpn": {
@@ -1330,6 +1323,12 @@
           "legalForm": {
             "type": "string",
             "description": "The legal form of the legal entity, on which the business partner provides a view."
+          },
+          "states": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BusinessPartnerStateDto"
+            }
           }
         },
         "description": "The legal entity, on which the business partner provides a view."
@@ -1338,7 +1337,8 @@
         "required": [
           "bpnL",
           "confidenceCriteria",
-          "legalEntityBpn"
+          "legalEntityBpn",
+          "states"
         ],
         "type": "object",
         "properties": {
@@ -1360,6 +1360,12 @@
           },
           "confidenceCriteria": {
             "$ref": "#/components/schemas/ConfidenceCriteriaDto"
+          },
+          "states": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BusinessPartnerStateDto"
+            }
           }
         },
         "description": "Legal Entity properties of business partner output data"
@@ -1889,22 +1895,11 @@
       },
       "SharingStateDto": {
         "required": [
-          "businessPartnerType",
           "externalId",
           "sharingStateType"
         ],
         "type": "object",
         "properties": {
-          "businessPartnerType": {
-            "type": "string",
-            "description": "One of the types of business partners for which the sharing state entry was created.",
-            "enum": [
-              "LEGAL_ENTITY",
-              "SITE",
-              "ADDRESS",
-              "GENERIC"
-            ]
-          },
           "externalId": {
             "type": "string",
             "description": "The external identifier of the business partner for which the sharing state entry was created."
@@ -1934,10 +1929,6 @@
             "type": "string",
             "description": "The error message in case the current sharing state type is \"error\"."
           },
-          "bpn": {
-            "type": "string",
-            "description": "The business partner number associated to the combination of external identifier and business partner type in case the sharing state type is “success”. Can be either a BPNL, BPNS or BPNA."
-          },
           "sharingProcessStarted": {
             "type": "string",
             "description": "The date and time when the sharing process was started.",
@@ -1951,6 +1942,9 @@
         "description": "A sharing state entry shows the progress in the sharing process and is updated each time the progress for a business partner changes. The business partner is identified by a combination of external ID and business partner type."
       },
       "SiteRepresentationInputDto": {
+        "required": [
+          "states"
+        ],
         "type": "object",
         "properties": {
           "siteBpn": {
@@ -1960,6 +1954,12 @@
           "name": {
             "type": "string",
             "description": "The name of the site, on which the business partner provides a view. This is not according to official registers but according to the name the owner chooses."
+          },
+          "states": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BusinessPartnerStateDto"
+            }
           }
         },
         "description": "The site, on which the business partner provides a view."
@@ -1967,7 +1967,8 @@
       "SiteRepresentationOutputDto": {
         "required": [
           "confidenceCriteria",
-          "siteBpn"
+          "siteBpn",
+          "states"
         ],
         "type": "object",
         "properties": {
@@ -1981,6 +1982,12 @@
           },
           "confidenceCriteria": {
             "$ref": "#/components/schemas/ConfidenceCriteriaDto"
+          },
+          "states": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BusinessPartnerStateDto"
+            }
           }
         },
         "description": "Site properties of business partner output data"
