@@ -37,7 +37,7 @@ In this scenario a third party service provider offers a value added services th
 
 > No EDC is needed for presenting the visualization via a web frontend to the customer.
 
-![External web application that only visualizes data based on gate data](../assets/edc_usage_1_1.drawio.svg)
+![External web application that only visualizes data based on gate data](assets/edc_usage_1_1.drawio.svg)
 
 ## Scenario 1.2: Internal web application that only visualizes data based on gate data and/or pool data
 
@@ -51,7 +51,7 @@ In this scenario the operating environment itself operates a web application tha
 > No EDC is needed for presenting the visualization via a web frontend to the customer.
  
 
-![Internal web app that only visualizes data based on gate data](../assets/edc_usage_1_2.drawio.svg)
+![Internal web app that only visualizes data based on gate data](assets/edc_usage_1_2.drawio.svg)
 
 ## Scenario 2.1: External web application/service that provides enriched data based on gate data and/or pool data
 
@@ -66,7 +66,7 @@ In this scenario a third party service provider offers a value added services th
 
 > EDC enabled communication is needed between the value-added-service backend and the customer system.
 
-![External web application that only visualizes data based on gate data](../assets/edc_usage_2_1.drawio.svg)
+![External web application that only visualizes data based on gate data](assets/edc_usage_2_1.drawio.svg)
 
 ## Scenario 2.2: Internal web application/service that provides enriched data based on gate data and/or pool data
 
@@ -82,7 +82,7 @@ In this scenario the operating environment itself operates a backend service or 
 > No EDC enabled communication is needed between the bpdm pool and the backend service that processes the data.
 
 
-![Internal web application/service that provides enriched data based on gate data and/or pool data](../assets/edc_usage_2_2.drawio.svg)
+![Internal web application/service that provides enriched data based on gate data and/or pool data](assets/edc_usage_2_2.drawio.svg)
 
 
 ## More Information
