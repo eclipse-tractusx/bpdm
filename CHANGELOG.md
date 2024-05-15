@@ -6,7 +6,7 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
 For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/CHANGELOG.md) of the charts directly.
 
-## [6.0.0] - [tbd]
+## [6.0.0] - [2024-05-15]
 
 ### Removed
 
