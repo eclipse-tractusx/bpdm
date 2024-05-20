@@ -153,7 +153,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
             )
         )
 
-        val upsertSharingStateResponses = this.mockAndAssertUtils.readSharingStates(BusinessPartnerType.GENERIC, externalIds)
+        val upsertSharingStateResponses = this.mockAndAssertUtils.readSharingStates(externalIds)
 
 
         assertHelpers.assertRecursively(upsertSharingStateResponses).isEqualTo(upsertSharingStatesRequests)
@@ -312,7 +312,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
 
         //Firstly verifies if the Sharing States was created for new Business Partners
         val externalIds = listOf(externalId4, externalId5)
-        val upsertSharingStateResponses = this.mockAndAssertUtils.readSharingStates(BusinessPartnerType.GENERIC, externalIds)
+        val upsertSharingStateResponses = this.mockAndAssertUtils.readSharingStates(externalIds)
         assertHelpers
             .assertRecursively(upsertSharingStateResponses)
             .ignoringFieldsMatchingRegexes(".*${SharingStateDto::sharingProcessStarted.name}")
@@ -341,7 +341,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
         )
 
         //Check for both Sharing State changes (Error and Success)
-        val readCleanedSharingState = this.mockAndAssertUtils.readSharingStates(BusinessPartnerType.GENERIC, externalIds)
+        val readCleanedSharingState = this.mockAndAssertUtils.readSharingStates(externalIds)
         assertHelpers.assertRecursively(readCleanedSharingState)
             .ignoringFieldsMatchingRegexes(".*${SharingStateDto::sharingProcessStarted.name}")
             .isEqualTo(cleanedSharingState)
@@ -377,7 +377,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
 
         //Firstly verifies if the Sharing States was created for new Business Partner
         val externalIds = listOf(externalId3)
-        val upsertSharingStateResponses = this.mockAndAssertUtils.readSharingStates(BusinessPartnerType.GENERIC, externalIds)
+        val upsertSharingStateResponses = this.mockAndAssertUtils.readSharingStates(externalIds)
         assertHelpers
             .assertRecursively(upsertSharingStateResponses)
             .ignoringFieldsMatchingRegexes(".*${SharingStateDto::sharingProcessStarted.name}")
@@ -398,7 +398,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
         )
 
         //Check for Sharing State
-        val readCleanedSharingState = this.mockAndAssertUtils.readSharingStates(BusinessPartnerType.GENERIC, externalIds)
+        val readCleanedSharingState = this.mockAndAssertUtils.readSharingStates(externalIds)
         assertHelpers.assertRecursively(readCleanedSharingState)
             .ignoringFieldsMatchingRegexes(".*${SharingStateDto::sharingProcessStarted.name}")
             .isEqualTo(cleanedSharingState)

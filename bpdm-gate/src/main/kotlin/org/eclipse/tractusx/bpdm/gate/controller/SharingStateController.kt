@@ -41,7 +41,6 @@ class SharingStateController(
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_SHARING_STATE})")
     override fun getSharingStates(
         paginationRequest: PaginationRequest,
-        businessPartnerType: BusinessPartnerType?,
         externalIds: Collection<String>?
     ): PageDto<SharingStateDto> {
         return sharingStateService.findSharingStates(paginationRequest, externalIds,  getCurrentUserBpn())

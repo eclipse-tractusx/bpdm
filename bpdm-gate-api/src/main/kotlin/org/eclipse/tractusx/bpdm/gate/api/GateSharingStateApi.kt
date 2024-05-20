@@ -52,7 +52,6 @@ interface GateSharingStateApi {
     @GetMapping
     fun getSharingStates(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
-        @Parameter(description = "Business partner type") @RequestParam(required = false) businessPartnerType: BusinessPartnerType?,
         @Parameter(description = "External IDs") @RequestParam(required = false) externalIds: Collection<String>?
     ): PageDto<SharingStateDto>
 
