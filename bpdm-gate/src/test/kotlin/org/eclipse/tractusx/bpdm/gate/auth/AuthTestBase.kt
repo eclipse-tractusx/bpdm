@@ -63,7 +63,7 @@ abstract class AuthTestBase(
 
     @Test
     fun `GET Sharing State`() {
-        authAssertions.assert(authExpectations.sharingState.getSharingState) { gateClient.sharingState.getSharingStates(PaginationRequest(), null, null) }
+        authAssertions.assert(authExpectations.sharingState.getSharingState) { gateClient.sharingState.getSharingStates(PaginationRequest(), null) }
     }
 
     @Test

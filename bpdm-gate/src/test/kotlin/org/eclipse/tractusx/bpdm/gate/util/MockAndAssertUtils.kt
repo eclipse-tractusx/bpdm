@@ -229,9 +229,9 @@ class MockAndAssertUtils @Autowired constructor(
         )
     }
 
-    fun readSharingStates(businessPartnerType: BusinessPartnerType?, externalIds: Collection<String>?): Collection<SharingStateDto> {
+    fun readSharingStates(externalIds: Collection<String>?): Collection<SharingStateDto> {
 
-        return gateClient.sharingState.getSharingStates(PaginationRequest(), businessPartnerType, externalIds).content
+        return gateClient.sharingState.getSharingStates(PaginationRequest(), externalIds).content
     }
 
     fun assertUpsertOutputResponsesMatchRequests(responses: Collection<BusinessPartnerOutputDto>, requests: List<BusinessPartnerOutputDto>) {
@@ -281,7 +281,7 @@ class MockAndAssertUtils @Autowired constructor(
         org.junit.jupiter.api.Assertions.assertEquals(upsertedBusinessPartners.size.toLong(), searchResponsePage.totalElements)
         assertHelpers.assertRecursively(searchResponsePage.content).isEqualTo(upsertedBusinessPartners)
 
-        val sharingStateResponse = gateClient.sharingState.getSharingStates(PaginationRequest(), businessPartnerType = null, externalIds = null)
+        val sharingStateResponse = gateClient.sharingState.getSharingStates(PaginationRequest(), externalIds = null)
         org.junit.jupiter.api.Assertions.assertEquals(upsertedBusinessPartners.size.toLong(), sharingStateResponse.totalElements)
         Assertions.assertThat(sharingStateResponse.content).isEqualTo(
             upsertedBusinessPartners.map {
