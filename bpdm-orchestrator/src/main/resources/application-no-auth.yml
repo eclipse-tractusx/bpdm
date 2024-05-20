@@ -1,0 +1,4 @@
+bpdm:
+  security:
+    # Disable authentication on the application's own API
+    enabled: false

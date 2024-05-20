@@ -1,0 +1,8 @@
+bpdm:
+  security:
+    # Disable authentication on the application's own API
+    enabled: false
+  client:
+    orchestrator:
+      # Disable trying to authenticate to an OAuth2 resource server when accessing the Orchestrator
+      security-enabled: false
