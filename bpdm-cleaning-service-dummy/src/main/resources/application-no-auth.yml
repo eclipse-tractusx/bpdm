@@ -1,0 +1,5 @@
+bpdm:
+  client:
+    orchestrator:
+      # Disable trying to authenticate to an OAuth2 resource server when accessing the Orchestrator
+      security-enabled: false
