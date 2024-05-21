@@ -81,7 +81,7 @@ data class AddressComponentOutputDto(
     override val name: String? = null,
     override val addressType: AddressType?,
     override val physicalPostalAddress: PhysicalPostalAddressDto = PhysicalPostalAddressDto(),
-    override val alternativePostalAddress: AlternativePostalAddressDto = AlternativePostalAddressDto(),
+    override val alternativePostalAddress: AlternativePostalAddressDto? = null,
     val confidenceCriteria: ConfidenceCriteriaDto,
     override val states: Collection<BusinessPartnerStateDto> = emptyList()
 ) : IBaseAddressRepresentation

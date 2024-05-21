@@ -123,7 +123,7 @@ class BusinessPartnerMappings {
             name = entity.addressName,
             addressType = entity.postalAddress.addressType,
             physicalPostalAddress = entity.postalAddress.physicalPostalAddress?.toPhysicalPostalAddress() ?: PhysicalPostalAddressDto(),
-            alternativePostalAddress = entity.postalAddress.alternativePostalAddress?.toAlternativePostalAddressDto() ?: AlternativePostalAddressDto(),
+            alternativePostalAddress = entity.postalAddress.alternativePostalAddress?.toAlternativePostalAddressDto(),
             states = toStateDtos(entity.states, BusinessPartnerType.ADDRESS)
         )
     }
