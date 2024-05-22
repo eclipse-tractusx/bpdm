@@ -22,7 +22,7 @@ apiVersion: v2
 name: bpdm
 type: application
 description: A Helm chart for Kubernetes that deploys the BPDM applications
-version: 5.0.1-alpha.0
+version: 5.0.1-alpha.1
 appVersion: "6.0.0"
 home: https://github.com/eclipse-tractusx/bpdm
 sources:

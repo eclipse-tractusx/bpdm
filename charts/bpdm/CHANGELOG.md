@@ -9,6 +9,7 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 ### Changed
 
 - Default pull policy from 'Always' to 'IfNotPresent'
+- Fixes BPDM applications not connecting with each other when authenticated
 
 ## [5.0.0] - 2024-05-15
 

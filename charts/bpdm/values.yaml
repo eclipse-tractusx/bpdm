@@ -27,6 +27,15 @@ bpdm-gate:
     bpdm:
       security:
         auth-server-url: http://bpdm-keycloak
+  applicationSecrets:
+    bpdm:
+      client:
+        orchestrator:
+          registration:
+            client-secret: &gateOrchSecret gate_orch_client_secret
+        pool:
+          registration:
+            client-secret: &gatePoolSecret gate_pool_client_secret
 
 bpdm-pool:
   enabled: true
@@ -37,28 +46,35 @@ bpdm-pool:
     bpdm:
       security:
         auth-server-url: http://bpdm-keycloak
+  applicationSecrets:
+    bpdm:
+      client:
+        orchestrator:
+          registration:
+            client-secret: &poolOrchSecret pool_orch_client_secret
 
 bpdm-cleaning-service-dummy:
   enabled: true
-  postgres:
-    enabled: false
-    fullnameOverride: bpdm-postgres
   applicationConfig:
     bpdm:
       client:
         orchestrator:
           provider:
             issuer-uri: http://bpdm-keycloak/realms/CX-Central
+  applicationSecrets:
+    bpdm:
+      client:
+        orchestrator:
+          registration:
+            client-secret: &dummyOrchSecret dummy_orch_client_secret
 
 bpdm-orchestrator:
   enabled: true
-  postgres:
-    enabled: false
-    fullnameOverride: bpdm-postgres
   applicationConfig:
     bpdm:
       security:
         auth-server-url: http://bpdm-keycloak
+
 
 postgres:
   enabled: true
@@ -72,6 +88,13 @@ postgres:
 keycloak:
   enabled: true
   fullnameOverride: "bpdm-keycloak"
+  bpdm:
+    realm:
+      clientSecrets:
+        cleaningDummyOrchestrator: *dummyOrchSecret
+        poolOrchestrator: *poolOrchSecret
+        gateOrchestrator: *gateOrchSecret
+        gatePool: *gatePoolSecret
   postgresql:
     enabled: false
   externalDatabase:
@@ -90,6 +113,15 @@ keycloak:
     adminUser: admin
     # Change for production
     adminPassword: admin
+  livenessProbe:
+    initialDelaySeconds: 0
+  readinessProbe:
+    initialDelaySeconds: 0
+  startupProbe:
+    enabled: true
+    initialDelaySeconds: 60
+    failureThreshold: 40
+    periodSeconds: 30
   production: false
   extraEnvVars:
     - name: KEYCLOAK_EXTRA_ARGS

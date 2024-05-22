@@ -51,7 +51,7 @@ securityContext:
 
 service:
   type: ClusterIP
-  port: 8080
+  port: 80
   targetPort: 8084
 
 autoscaling:
@@ -60,10 +60,10 @@ autoscaling:
 resources:
   limits:
     cpu: 500m
-    memory: 512Mi
+    memory: 1Gi
   requests:
     cpu: 100m
-    memory: 512Mi
+    memory: 1Gi
 
 nodeSelector: {}
 
@@ -106,8 +106,10 @@ startupProbe:
     port: 8084
     scheme: HTTP
   initialDelaySeconds: 60
-  failureThreshold: 20
-  periodSeconds: 15
+  failureThreshold: 40
+  periodSeconds: 30
+  timeoutSeconds: 1
+  successThreshold: 1
 
 
 # Used to overwrite the default property values of the application configuration
