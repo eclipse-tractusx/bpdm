@@ -69,6 +69,6 @@ data class AddressRepresentationInputDto(
     override val name: String? = null,
     override val addressType: AddressType? = null,
     override val physicalPostalAddress: PhysicalPostalAddressDto = PhysicalPostalAddressDto(),
-    override val alternativePostalAddress: AlternativePostalAddressDto = AlternativePostalAddressDto(),
+    override val alternativePostalAddress: AlternativePostalAddressDto? = null,
     override val states: Collection<BusinessPartnerStateDto> = emptyList(),
 ) : IBaseAddressRepresentation
