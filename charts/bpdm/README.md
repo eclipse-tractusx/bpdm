@@ -1,72 +1,92 @@
-# BPDM Helm Chart
+# bpdm
 
-This Helm Chart deploys the BPDM services to a Kubernetes environment.
+![Version: 5.0.1-alpha.2](https://img.shields.io/badge/Version-5.0.1--alpha.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 6.0.0](https://img.shields.io/badge/AppVersion-6.0.0-informational?style=flat-square)
 
-## Prerequisites
+A Helm chart for Kubernetes that deploys the BPDM applications
 
-* [Kubernetes Cluster](https://kubernetes.io/)
-* [Helm](https://helm.sh/docs/)
+**Homepage:** <https://github.com/eclipse-tractusx/bpdm>
 
-In an existing Kubernetes cluster the application can be deployed with the following command:
+## Maintainers
 
-```bash
-helm install release_name ./charts/bpdm --namespace your_namespace
-```
+| Name | Email | Url |
+| ---- | ------ | --- |
+| Nico Koprowski |  |  |
+| Fabio D. Mota |  |  |
 
-This will install a new release of the BPDM in the given namespace.
-On default values this release deploys the latest image tagged as `main` from the repository's GitHub Container Registry.
-The application is run on default profile without authorization.
-Additionally, the Helm deployment contains a PostgreSQL database and Opensearch instance which the BPDM Pool connects to.
+## Source Code
 
-On the default values deployment no further action is needed to make the BPDM deployment run.
-However, per default, ingress as well as authentication for endpoints are disabled.
+* <https://github.com/eclipse-tractusx/bpdm>
 
-By giving your own values file you can configure the Helm deployment of the BPDM freely:
+## Requirements
 
-```bash
-helm install release_name ./charts/bpdm --namespace your_namespace -f ./path/to/your/values.yaml
-```
+| Repository | Name | Version |
+|------------|------|---------|
+| file://./charts/bpdm-cleaning-service-dummy | bpdm-cleaning-service-dummy(bpdm-cleaning-service-dummy) | 3.0.1-alpha.1 |
+| file://./charts/bpdm-common | bpdm-common | 1.0.1 |
+| file://./charts/bpdm-gate | bpdm-gate(bpdm-gate) | 6.0.1-alpha.1 |
+| file://./charts/bpdm-orchestrator | bpdm-orchestrator(bpdm-orchestrator) | 3.0.1-alpha.1 |
+| file://./charts/bpdm-pool | bpdm-pool(bpdm-pool) | 7.0.1-alpha.1 |
+| https://charts.bitnami.com/bitnami | keycloak(keycloak) | 19.3.0 |
+| https://charts.bitnami.com/bitnami | postgres(postgresql) | 12.12.10 |
 
-In the following sections you can have a look at the most important configuration options.
+## Values
 
-## Image Tag
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| bpdm-cleaning-service-dummy.applicationConfig.bpdm.client.orchestrator.provider.issuer-uri | string | `"http://bpdm-keycloak/realms/CX-Central"` |  |
+| bpdm-cleaning-service-dummy.applicationSecrets.bpdm.client.orchestrator.registration.client-secret | string | `"dummy_orch_client_secret"` |  |
+| bpdm-cleaning-service-dummy.enabled | bool | `true` |  |
+| bpdm-gate.applicationConfig.bpdm.security.auth-server-url | string | `"http://bpdm-keycloak"` |  |
+| bpdm-gate.applicationSecrets.bpdm.client.orchestrator.registration.client-secret | string | `"gate_orch_client_secret"` |  |
+| bpdm-gate.applicationSecrets.bpdm.client.pool.registration.client-secret | string | `"gate_pool_client_secret"` |  |
+| bpdm-gate.enabled | bool | `true` |  |
+| bpdm-gate.postgres.enabled | bool | `false` |  |
+| bpdm-gate.postgres.fullnameOverride | string | `"bpdm-postgres"` |  |
+| bpdm-orchestrator.applicationConfig.bpdm.security.auth-server-url | string | `"http://bpdm-keycloak"` |  |
+| bpdm-orchestrator.enabled | bool | `true` |  |
+| bpdm-pool.applicationConfig.bpdm.security.auth-server-url | string | `"http://bpdm-keycloak"` |  |
+| bpdm-pool.applicationSecrets.bpdm.client.orchestrator.registration.client-secret | string | `"pool_orch_client_secret"` |  |
+| bpdm-pool.enabled | bool | `true` |  |
+| bpdm-pool.postgres.enabled | bool | `false` |  |
+| bpdm-pool.postgres.fullnameOverride | string | `"bpdm-postgres"` |  |
+| keycloak.auth.adminPassword | string | `"admin"` |  |
+| keycloak.auth.adminUser | string | `"admin"` |  |
+| keycloak.bpdm.realm.clientSecrets.cleaningDummyOrchestrator | string | `"dummy_orch_client_secret"` |  |
+| keycloak.bpdm.realm.clientSecrets.gateOrchestrator | string | `"gate_orch_client_secret"` |  |
+| keycloak.bpdm.realm.clientSecrets.gatePool | string | `"gate_pool_client_secret"` |  |
+| keycloak.bpdm.realm.clientSecrets.poolOrchestrator | string | `"pool_orch_client_secret"` |  |
+| keycloak.enabled | bool | `true` |  |
+| keycloak.externalDatabase.database | string | `"bpdm"` |  |
+| keycloak.externalDatabase.host | string | `"bpdm-postgres"` |  |
+| keycloak.externalDatabase.password | string | `"bpdm"` |  |
+| keycloak.externalDatabase.user | string | `"bpdm"` |  |
+| keycloak.extraEnvVars[0].name | string | `"KEYCLOAK_EXTRA_ARGS"` |  |
+| keycloak.extraEnvVars[0].value | string | `"--import-realm"` |  |
+| keycloak.extraVolumeMounts[0].mountPath | string | `"/opt/bitnami/keycloak/data/import"` |  |
+| keycloak.extraVolumeMounts[0].name | string | `"import"` |  |
+| keycloak.extraVolumeMounts[0].readOnly | bool | `true` |  |
+| keycloak.extraVolumes[0].name | string | `"import"` |  |
+| keycloak.extraVolumes[0].secret.items[0].key | string | `"Cx-Central.json"` |  |
+| keycloak.extraVolumes[0].secret.items[0].path | string | `"Cx-Central.json"` |  |
+| keycloak.extraVolumes[0].secret.secretName | string | `"bpdm-keycloak-realm"` |  |
+| keycloak.fullnameOverride | string | `"bpdm-keycloak"` |  |
+| keycloak.livenessProbe.initialDelaySeconds | int | `0` |  |
+| keycloak.postgresql.enabled | bool | `false` |  |
+| keycloak.production | bool | `false` |  |
+| keycloak.readinessProbe.initialDelaySeconds | int | `0` |  |
+| keycloak.resources.limits.cpu | string | `"500m"` |  |
+| keycloak.resources.limits.memory | string | `"512Mi"` |  |
+| keycloak.resources.requests.cpu | string | `"100m"` |  |
+| keycloak.resources.requests.memory | string | `"512Mi"` |  |
+| keycloak.startupProbe.enabled | bool | `true` |  |
+| keycloak.startupProbe.failureThreshold | int | `40` |  |
+| keycloak.startupProbe.initialDelaySeconds | int | `60` |  |
+| keycloak.startupProbe.periodSeconds | int | `30` |  |
+| postgres.auth.database | string | `"bpdm"` |  |
+| postgres.auth.password | string | `"bpdm"` |  |
+| postgres.auth.username | string | `"bpdm"` |  |
+| postgres.enabled | bool | `true` |  |
+| postgres.fullnameOverride | string | `"bpdm-postgres"` |  |
 
-Per default, the Helm deployment references a certain BPDM release version where the newest Helm release points to the newest version.
-This is a stable tag pointing to a fixed release version of the BPDM.
-For your deployment you might want to follow the latest application releases instead.
-
-In your values file you can overwrite the default tag:
-
-```yaml
-image:
-  tag: "latest"
-```
-
-## Helm Dependencies
-
-On default, the Helm deployment also contains a PostgreSQL deployment.
-You can configure these deployments in your value file as well.
-For this, consider the documentation of the correspondent dependency [PostgreSQL](https://artifacthub.io/packages/helm/bitnami/postgresql/11.9.13).
-In case you want to use an already deployed database instance you can also disable the respective dependency and overwrite the default host
-address in the `applicationConfig`:
-
-```yaml
-applicationConfig:
-  spring:
-    datasource:
-      url: jdbc:postgresql://remote.host.net:5432/bpdm
-postgres:
-  enabled: false
-```
-
-## Notice
-
-This work is licensed under the [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0).
-
-- SPDX-License-Identifier: Apache-2.0
-- SPDX-FileCopyrightText: 2023,2023 ZF Friedrichshafen AG
-- SPDX-FileCopyrightText: 2023,2023 Bayerische Motoren Werke Aktiengesellschaft (BMW AG)
-- SPDX-FileCopyrightText: 2023,2023 Mercedes Benz Group
-- SPDX-FileCopyrightText: 2023,2023 Schaeffler AG
-- SPDX-FileCopyrightText: 2023,2023 Contributors to the Eclipse Foundation
-- Source URL: https://github.com/eclipse-tractusx/bpdm
+----------------------------------------------
+Autogenerated from chart metadata using [helm-docs v1.13.1](https://github.com/norwoodj/helm-docs/releases/v1.13.1)
