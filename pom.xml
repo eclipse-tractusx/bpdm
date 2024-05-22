@@ -65,7 +65,7 @@
         <sonar.moduleKey>${project.groupId}:${project.artifactId}</sonar.moduleKey>
         <sonar.version>3.11.0.3922</sonar.version>
         <jacoco.version>0.8.12</jacoco.version>
-        <testcontainers.version>1.19.7</testcontainers.version>
+        <testcontainers.version>1.19.8</testcontainers.version>
         <io.projectreactor.netty>1.1.18</io.projectreactor.netty>
     </properties>
 
