@@ -48,7 +48,7 @@ interface SiteRepository : JpaRepository<SiteDb, Long>, JpaSpecificationExecutor
         fun byName(name: String?) =
             Specification<SiteDb> { root, _, builder ->
                 name?.takeIf { it.isNotBlank() }?.let {
-                    builder.like(root.get(SiteDb::name.name), name)
+                    builder.like(builder.lower(root.get(SiteDb::name.name)), "%${name.lowercase()}%")
                 }
             }
 

@@ -42,7 +42,7 @@ interface LegalEntityRepository : JpaRepository<LegalEntityDb, Long>, JpaSpecifi
         fun byLegalName(legalName: String?) =
             Specification<LegalEntityDb> { root, _, builder ->
                 legalName?.takeIf { it.isNotBlank() }?.let {
-                    builder.like(root.get<NameDb>(LegalEntityDb::legalName.name).get(NameDb::value.name), legalName)
+                    builder.like(builder.lower(root.get<NameDb>(LegalEntityDb::legalName.name).get(NameDb::value.name)), "%${legalName.lowercase()}%")
                 }
             }
 

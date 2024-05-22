@@ -56,7 +56,7 @@ interface LogisticAddressRepository : JpaRepository<LogisticAddressDb, Long>, Jp
         fun byName(name: String?) =
             Specification<LogisticAddressDb> { root, _, builder ->
                 name?.takeIf { it.isNotBlank() }?.let {
-                    builder.like(root.get(LogisticAddressDb::name.name), name)
+                    builder.like(builder.lower(root.get(LogisticAddressDb::name.name)), "%${name.lowercase()}%")
                 }
             }
 
