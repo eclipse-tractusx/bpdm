@@ -29,10 +29,12 @@ Subfolders for BPDM applications are easily recognizable by the `bpdm` prefix.
 
 ## Installation
 
-Installation instructions for the BPDM services can be found in the following places:
+Please consult the [INSTALL](INSTALL.md) documentation file for in-depth installation instructions.
 
-1. [Local Installation](docs/admin/README.md): Details how to install and configure the BPDM services on a host machine.
-2. [Helm Installation](charts/bpdm/README.md): Explains how to use given Helm Charts to install the BPDM services on a kubernetes environment.
+## Usage
+
+BPDM is an application environment designed to be interacted with over APIs.
+Therefore, please consult the [api](docs/api/README.md) documentation for getting to know how to use BPDM.
 
 ## GitHub Workflows
 
