@@ -3,6 +3,56 @@ entries:
   bpdm:
   - apiVersion: v2
     appVersion: 6.0.0
+    created: "2024-05-24T09:57:00.211224899Z"
+    dependencies:
+    - alias: bpdm-gate
+      condition: bpdm-gate.enabled
+      name: bpdm-gate
+      repository: file://./charts/bpdm-gate
+      version: 6.0.1-alpha.1
+    - alias: bpdm-pool
+      condition: bpdm-pool.enabled
+      name: bpdm-pool
+      repository: file://./charts/bpdm-pool
+      version: 7.0.1-alpha.1
+    - alias: bpdm-cleaning-service-dummy
+      condition: bpdm-cleaning-service-dummy.enabled
+      name: bpdm-cleaning-service-dummy
+      repository: file://./charts/bpdm-cleaning-service-dummy
+      version: 3.0.1-alpha.1
+    - alias: bpdm-orchestrator
+      condition: bpdm-orchestrator.enabled
+      name: bpdm-orchestrator
+      repository: file://./charts/bpdm-orchestrator
+      version: 3.0.1-alpha.1
+    - name: bpdm-common
+      repository: file://./charts/bpdm-common
+      version: 1.0.1
+    - alias: postgres
+      condition: postgres.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 12.12.10
+    - alias: keycloak
+      condition: keycloak.enabled
+      name: keycloak
+      repository: https://charts.bitnami.com/bitnami
+      version: 19.3.0
+    description: A Helm chart for Kubernetes that deploys the BPDM applications
+    digest: 67c3ba839b8202845b44038d91439007287506edb23a6961739e8fd2ea9babb4
+    home: https://github.com/eclipse-tractusx/bpdm
+    maintainers:
+    - name: Nico Koprowski
+    - name: Fabio D. Mota
+    name: bpdm
+    sources:
+    - https://github.com/eclipse-tractusx/bpdm
+    type: application
+    urls:
+    - https://github.com/eclipse-tractusx/bpdm/releases/download/bpdm-5.0.1-alpha.2/bpdm-5.0.1-alpha.2.tgz
+    version: 5.0.1-alpha.2
+  - apiVersion: v2
+    appVersion: 6.0.0
     created: "2024-05-22T14:33:00.139014284Z"
     dependencies:
     - alias: bpdm-gate
@@ -3010,4 +3060,4 @@ entries:
     urls:
     - https://github.com/eclipse-tractusx/bpdm/releases/download/bpdm-pool-4.0.0/bpdm-pool-4.0.0.tgz
     version: 4.0.0
-generated: "2024-05-22T14:33:00.139491144Z"
+generated: "2024-05-24T09:57:00.212527116Z"
