@@ -1,133 +1,98 @@
-# BPDM Pool Helm Chart
+# bpdm-pool
 
-This Helm Chart deploys the BPDM Pool service to a Kubernetes environment.
+![Version: 7.0.1-alpha.1](https://img.shields.io/badge/Version-7.0.1--alpha.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 6.0.0](https://img.shields.io/badge/AppVersion-6.0.0-informational?style=flat-square)
 
-## Prerequisites
+A Helm chart for deploying the BPDM pool service
 
-* [Kubernetes Cluster](https://kubernetes.io/)
-* [Helm](https://helm.sh/docs/)
+**Homepage:** <https://eclipse-tractusx.github.io/docs/kits/Business%20Partner%20Kit/Adoption%20View>
 
-In an existing Kubernetes cluster the application can be deployed with the following command:
+## Maintainers
 
-```bash
-helm install release_name ./charts/bpdm-pool --namespace your_namespace
-```
+| Name | Email | Url |
+| ---- | ------ | --- |
+| Nico Koprowski |  |  |
+| Fabio D. Mota |  |  |
 
-This will install a new release of the BPDM Pool in the given namespace.
-On default values this release deploys the latest image tagged as `main` from the repository's GitHub Container Registry.
-The application is run on default profile (without authorization).
-Additionally, the Helm deployment contains a PostgreSQL database and Opensearch instance which the BPDM Pool connects to.
+## Source Code
 
-On the default values deployment no further action is needed to make the BPDM Pool deployment run.
-However, per default, ingress as well as authentication for endpoints are disabled.
+* <https://github.com/eclipse-tractusx/bpdm>
 
-By giving your own values file you can configure the Helm deployment of the BPDM Pool freely:
+## Requirements
 
-```bash
-helm install release_name ./charts/bpdm-pool --namespace your_namespace -f ./path/to/your/values.yaml
-```
+| Repository | Name | Version |
+|------------|------|---------|
+| file://../bpdm-common | bpdm-common | 1.0.1 |
+| https://charts.bitnami.com/bitnami | postgres(postgresql) | 12.12.10 |
 
-In the following sections you can have a look at the most important configuration options.
+## Values
 
-## Image Tag
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.labelSelector.matchExpressions[0].key | string | `"app.kubernetes.io/name"` |  |
+| affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.labelSelector.matchExpressions[0].operator | string | `"DoesNotExist"` |  |
+| affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.topologyKey | string | `"kubernetes.io/hostname"` |  |
+| affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].weight | int | `100` |  |
+| applicationConfig.bpdm.client.orchestrator.base-url | string | `nil` |  |
+| applicationConfig.bpdm.datasource.host | string | `nil` |  |
+| applicationSecrets.spring.dataSource.password | string | `"bpdm"` |  |
+| autoscaling.enabled | bool | `false` |  |
+| fullnameOverride | string | `nil` |  |
+| image.pullPolicy | string | `"IfNotPresent"` |  |
+| image.registry | string | `"docker.io"` |  |
+| image.repository | string | `"tractusx/bpdm-pool"` |  |
+| image.tag | string | `""` |  |
+| imagePullSecrets | list | `[]` |  |
+| ingress.annotations | object | `{}` |  |
+| ingress.enabled | bool | `false` |  |
+| ingress.hosts | list | `[]` |  |
+| ingress.tls | list | `[]` |  |
+| livenessProbe.failureThreshold | int | `5` |  |
+| livenessProbe.httpGet.path | string | `"/actuator/health/liveness"` |  |
+| livenessProbe.httpGet.port | int | `8080` |  |
+| livenessProbe.httpGet.scheme | string | `"HTTP"` |  |
+| livenessProbe.initialDelaySeconds | int | `120` |  |
+| livenessProbe.periodSeconds | int | `10` |  |
+| livenessProbe.successThreshold | int | `1` |  |
+| livenessProbe.timeoutSeconds | int | `1` |  |
+| nameOverride | string | `nil` |  |
+| nodeSelector | object | `{}` |  |
+| podAnnotations | object | `{}` |  |
+| postgres.auth.database | string | `"bpdm"` |  |
+| postgres.auth.password | string | `"bpdm"` |  |
+| postgres.auth.username | string | `"bpdm"` |  |
+| postgres.enabled | bool | `true` |  |
+| readinessProbe.failureThreshold | int | `3` |  |
+| readinessProbe.httpGet.path | string | `"/actuator/health/readiness"` |  |
+| readinessProbe.httpGet.port | int | `8080` |  |
+| readinessProbe.httpGet.scheme | string | `"HTTP"` |  |
+| readinessProbe.initialDelaySeconds | int | `5` |  |
+| readinessProbe.periodSeconds | int | `5` |  |
+| readinessProbe.successThreshold | int | `1` |  |
+| readinessProbe.timeoutSeconds | int | `1` |  |
+| replicaCount | int | `1` |  |
+| resources.limits.cpu | string | `"1000m"` |  |
+| resources.limits.memory | string | `"1Gi"` |  |
+| resources.requests.cpu | string | `"300m"` |  |
+| resources.requests.memory | string | `"1Gi"` |  |
+| securityContext.allowPrivilegeEscalation | bool | `false` |  |
+| securityContext.capabilities.drop[0] | string | `"ALL"` |  |
+| securityContext.readOnlyRootFilesystem | bool | `true` |  |
+| securityContext.runAsGroup | int | `10001` |  |
+| securityContext.runAsNonRoot | bool | `true` |  |
+| securityContext.runAsUser | int | `10001` |  |
+| service.port | int | `80` |  |
+| service.targetPort | int | `8080` |  |
+| service.type | string | `"ClusterIP"` |  |
+| springProfiles | list | `[]` |  |
+| startupProbe.failureThreshold | int | `40` |  |
+| startupProbe.httpGet.path | string | `"/actuator/health/readiness"` |  |
+| startupProbe.httpGet.port | int | `8080` |  |
+| startupProbe.httpGet.scheme | string | `"HTTP"` |  |
+| startupProbe.initialDelaySeconds | int | `60` |  |
+| startupProbe.periodSeconds | int | `30` |  |
+| startupProbe.successThreshold | int | `1` |  |
+| startupProbe.timeoutSeconds | int | `1` |  |
+| tolerations | list | `[]` |  |
 
-Per default, the Helm deployment references a certain BPDM Pool release version where the newest Helm release points to the newest Pool version.
-This is a stable tag pointing to a fixed release version of the BPDM Pool.
-For your deployment you might want to follow the latest application releases instead.
-
-In your values file you can overwrite the default tag:
-
-```yaml
-image:
-  tag: "latest"
-```
-
-## Profiles
-
-You can also activate Spring profiles in which the BPDM Pool should be run.
-In case you want to run the Pool with authorization enabled you can write the following:
-
-```yaml
-springProfiles:
-  - auth
-```
-
-## Ingress
-
-You can specify your own ingress configuration for the Helm deployment to make the BPDM Pool available over Ingress.
-Note that you need to have the appropriate Ingress controller installed in your cluster first.
-For example, consider a Kubernetes cluster with an [Ingress-Nginx](https://kubernetes.github.io/ingress-nginx/) installed.
-An Ingress configuration for the Pool deployment could look like this:
-
-```yaml
-ingress:
-  enabled: true
-  annotations:
-    kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
-  hosts:
-    - host: business-partners.your-domain.net
-      paths:
-        - path: /pool
-          pathType: Prefix
-```
-
-## Pool Configuration
-
-The Helm deployment comes with the ability to configure the BPDM Pool application directly over the values file.
-This way you are able to overwrite any configuration property of the `application.properties` and `application-auth.properties` files.
-Consider that you would need to turn on `auth`  profile first before overwriting any property in the corresponding properties file could take effect.
-Overwriting configuration properties can be useful to connect to a remote service:
-
-```yaml
-applicationConfig:
-  bpdm:
-    security:
-      auth-server-url: https://remote.keycloak.domain.com
-      realm: CUSTOM_REALM
-      client-id: POOL_CLIENT
-```
-
-In this example above a Pool with authenticated activated connects to a remote Keycloak instance and uses its custom realm and resource.
-
-Entries in the "applicationConfig" value are written directly to a configMap that is part of the Helm deployment.
-This can be a problem if you want to overwrite configuration properties with secrets.
-Therefore, you can specify secret configuration values in a different Helm value `applicationSecrets`.
-Content of this value is written in a Kubernetes secret instead.
-If you want to specify a custom database password for example:
-
-```yaml
-applicationSecrets:
-  spring:
-    datasource:
-      password: your_database_secret
-```
-
-## Helm Dependencies
-
-On default, the Helm deployment also contains a PostgreSQL.
-You can configure the deployment in your value file as well.
-For this, consider the documentation of the correspondent dependency [PostgreSQL](https://artifacthub.io/packages/helm/bitnami/postgresql/11.9.13).
-In case you want to use an already deployed database instance you can also disable the respective dependency and overwrite the default host
-address in the `applicationConfig`:
-
-```yaml
-applicationConfig:
-  spring:
-    datasource:
-      url: jdbc:postgresql://remote.host.net:5432/bpdm
-postgres:
-  enabled: false
-```
-
-## Notice
-
-This work is licensed under the [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0).
-
-- SPDX-License-Identifier: Apache-2.0
-- SPDX-FileCopyrightText: 2023,2023 ZF Friedrichshafen AG
-- SPDX-FileCopyrightText: 2023,2023 Bayerische Motoren Werke Aktiengesellschaft (BMW AG)
-- SPDX-FileCopyrightText: 2023,2023 Mercedes Benz Group
-- SPDX-FileCopyrightText: 2023,2023 Schaeffler AG
-- SPDX-FileCopyrightText: 2023,2023 Contributors to the Eclipse Foundation
-- Source URL: https://github.com/eclipse-tractusx/bpdm
+----------------------------------------------
+Autogenerated from chart metadata using [helm-docs v1.13.1](https://github.com/norwoodj/helm-docs/releases/v1.13.1)

@@ -9,6 +9,7 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 ### Changed
 
 - Default pull policy from 'Always' to 'IfNotPresent'
+- Added documentation for default values in the README
 
 ## [7.0.0] - 2024-05-15
 

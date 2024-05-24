@@ -1,96 +1,93 @@
-# BPDM Orchestrator Helm Chart
+# bpdm-orchestrator
 
-This Helm Chart deploys the BPDM service to a Kubernetes environment.
+![Version: 3.0.1-alpha.1](https://img.shields.io/badge/Version-3.0.1--alpha.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 6.0.0](https://img.shields.io/badge/AppVersion-6.0.0-informational?style=flat-square)
 
-## Prerequisites
+A Helm chart for deploying the BPDM Orchestrator service
 
-* [Kubernetes Cluster](https://kubernetes.io)
-* [Helm](https://helm.sh/docs/)
+**Homepage:** <https://eclipse-tractusx.github.io/docs/kits/Business%20Partner%20Kit/Adoption%20View>
 
-In an existing Kubernetes cluster the application can be deployed with the following command:
+## Maintainers
 
-```bash
-helm install release_name ./charts/bpdm-orchestrator --namespace your_namespace -f /path/to/my_release-values.yaml
-```
+| Name | Email | Url |
+| ---- | ------ | --- |
+| Nico Koprowski |  |  |
+| Fabio D. Mota |  |  |
 
-This will install a new release of the BPDM Orchestrator Service in the given namespace.
-On default values this release deploys the latest image tagged as `main` from the repository's GitHub Container Registry.
+## Source Code
 
-By giving your own values file you can configure the Helm deployment of the BPDM Orchestrator Service freely.
-In the following sections you can have a look at the most important configuration options.
+* <https://github.com/eclipse-tractusx/bpdm>
 
-## Image Tag
+## Requirements
 
-Per default, the Helm deployment references the latest BPDM Orchestrator Service release tagged as `main`.
-This tag follows the latest version of the Orchestrator Service and contains the newest features and bug fixes.
-You might want to switch to a more stable release tag instead for your deployment.
-In your values file you can overwrite the default tag:
+| Repository | Name | Version |
+|------------|------|---------|
+| file://../bpdm-common | bpdm-common | 1.0.1 |
 
-```yaml
-image:
-  tag: "latest"
-```
+## Values
 
-## Profiles
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.labelSelector.matchExpressions[0].key | string | `"app.kubernetes.io/name"` |  |
+| affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.labelSelector.matchExpressions[0].operator | string | `"DoesNotExist"` |  |
+| affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.topologyKey | string | `"kubernetes.io/hostname"` |  |
+| affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].weight | int | `100` |  |
+| applicationConfig | string | `nil` |  |
+| applicationSecrets | string | `nil` |  |
+| autoscaling.enabled | bool | `false` |  |
+| fullnameOverride | string | `nil` |  |
+| image.pullPolicy | string | `"IfNotPresent"` |  |
+| image.registry | string | `"docker.io"` |  |
+| image.repository | string | `"tractusx/bpdm-orchestrator"` |  |
+| image.tag | string | `""` |  |
+| imagePullSecrets | list | `[]` |  |
+| ingress.annotations | object | `{}` |  |
+| ingress.enabled | bool | `false` |  |
+| ingress.hosts | list | `[]` |  |
+| ingress.tls | list | `[]` |  |
+| livenessProbe.failureThreshold | int | `3` |  |
+| livenessProbe.httpGet.path | string | `"/actuator/health/liveness"` |  |
+| livenessProbe.httpGet.port | int | `8085` |  |
+| livenessProbe.httpGet.scheme | string | `"HTTP"` |  |
+| livenessProbe.initialDelaySeconds | int | `5` |  |
+| livenessProbe.periodSeconds | int | `5` |  |
+| livenessProbe.successThreshold | int | `1` |  |
+| livenessProbe.timeoutSeconds | int | `1` |  |
+| nameOverride | string | `nil` |  |
+| nodeSelector | object | `{}` |  |
+| podAnnotations | object | `{}` |  |
+| readinessProbe.failureThreshold | int | `3` |  |
+| readinessProbe.httpGet.path | string | `"/actuator/health/readiness"` |  |
+| readinessProbe.httpGet.port | int | `8085` |  |
+| readinessProbe.httpGet.scheme | string | `"HTTP"` |  |
+| readinessProbe.initialDelaySeconds | int | `5` |  |
+| readinessProbe.periodSeconds | int | `5` |  |
+| readinessProbe.successThreshold | int | `1` |  |
+| readinessProbe.timeoutSeconds | int | `1` |  |
+| replicaCount | int | `1` |  |
+| resources.limits.cpu | string | `"500m"` |  |
+| resources.limits.memory | string | `"1Gi"` |  |
+| resources.requests.cpu | string | `"100m"` |  |
+| resources.requests.memory | string | `"1Gi"` |  |
+| securityContext.allowPrivilegeEscalation | bool | `false` |  |
+| securityContext.capabilities.drop[0] | string | `"ALL"` |  |
+| securityContext.readOnlyRootFilesystem | bool | `true` |  |
+| securityContext.runAsGroup | int | `10001` |  |
+| securityContext.runAsNonRoot | bool | `true` |  |
+| securityContext.runAsUser | int | `10001` |  |
+| securityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
+| service.port | int | `80` |  |
+| service.targetPort | int | `8085` |  |
+| service.type | string | `"ClusterIP"` |  |
+| springProfiles | list | `[]` |  |
+| startupProbe.failureThreshold | int | `40` |  |
+| startupProbe.httpGet.path | string | `"/actuator/health/readiness"` |  |
+| startupProbe.httpGet.port | int | `8085` |  |
+| startupProbe.httpGet.scheme | string | `"HTTP"` |  |
+| startupProbe.initialDelaySeconds | int | `60` |  |
+| startupProbe.periodSeconds | int | `30` |  |
+| startupProbe.successThreshold | int | `1` |  |
+| startupProbe.timeoutSeconds | int | `1` |  |
+| tolerations | list | `[]` |  |
 
-You can also activate Spring profiles in which the BPDM Orchestrator Service should be run.
-In case you want to run the Orchestrator Service with authorization enabled you can write the following:
-
-```yaml
-springProfiles:
-  - auth
-```
-
-## Ingress
-
-You can specify your own ingress configuration for the Helm deployment to make the BPDM Orchestrator Service available over Ingress.
-Note that you need to have the appropriate Ingress controller installed in your cluster first.
-For example, consider a Kubernetes cluster with an [Ingress-Nginx](https://kubernetes.github.io/ingress-nginx/) installed.
-An Ingress configuration for the Orchestrator Service deployment could somehow look like this:
-
-```yaml
-ingress:
-  enabled: true
-  annotations:
-    kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
-  hosts:
-    - host: business-partners.your-domain.net
-      paths:
-        - path: /orchestrator
-          pathType: Prefix
-```
-
-## Orchestrator Service Configuration
-
-For the default deployment you already need to overwrite the configuration properties of the application.
-The Helm deployment comes with the ability to configure the BPDM Orchestrator Service application directly over the values file.
-This way you are able to overwrite any configuration property of the `application.properties` and `application-auth.properties` files.
-Consider that you would need to turn on `auth` profile first before overwriting any property in the corresponding properties file could take
-effect.
-
-Entries in the "applicationConfig" value are written directly to a configMap that is part of the Helm deployment.
-This can be a problem if you want to overwrite configuration properties with secrets.
-Therefore, you can specify secret configuration values in a different Helm value `applicationSecrets`.
-Content of this value is written in a Kubernetes secret instead.
-If you want to specify a keycloak client secret for example:
-
-```yaml
-applicationSecrets:
-  bpdm:
-    security:
-      credentials:
-        secret: your_client_secret
-```
-
-## Notice
-
-This work is licensed under the [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0).
-
-- SPDX-License-Identifier: Apache-2.0
-- SPDX-FileCopyrightText: 2023,2023 ZF Friedrichshafen AG
-- SPDX-FileCopyrightText: 2023,2023 Bayerische Motoren Werke Aktiengesellschaft (BMW AG)
-- SPDX-FileCopyrightText: 2023,2023 Mercedes Benz Group
-- SPDX-FileCopyrightText: 2023,2023 Schaeffler AG
-- SPDX-FileCopyrightText: 2023,2023 Contributors to the Eclipse Foundation
-- Source URL: https://github.com/eclipse-tractusx/bpdm
+----------------------------------------------
+Autogenerated from chart metadata using [helm-docs v1.13.1](https://github.com/norwoodj/helm-docs/releases/v1.13.1)
