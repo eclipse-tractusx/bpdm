@@ -1,6 +1,6 @@
 # bpdm
 
-![Version: 5.0.1-alpha.2](https://img.shields.io/badge/Version-5.0.1--alpha.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 6.0.0](https://img.shields.io/badge/AppVersion-6.0.0-informational?style=flat-square)
+![Version: 5.0.1](https://img.shields.io/badge/Version-5.0.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 6.0.1](https://img.shields.io/badge/AppVersion-6.0.1-informational?style=flat-square)
 
 A Helm chart for Kubernetes that deploys the BPDM applications
 
@@ -21,11 +21,11 @@ A Helm chart for Kubernetes that deploys the BPDM applications
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://./charts/bpdm-cleaning-service-dummy | bpdm-cleaning-service-dummy(bpdm-cleaning-service-dummy) | 3.0.1-alpha.1 |
+| file://./charts/bpdm-cleaning-service-dummy | bpdm-cleaning-service-dummy(bpdm-cleaning-service-dummy) | 3.0.1 |
 | file://./charts/bpdm-common | bpdm-common | 1.0.1 |
-| file://./charts/bpdm-gate | bpdm-gate(bpdm-gate) | 6.0.1-alpha.1 |
-| file://./charts/bpdm-orchestrator | bpdm-orchestrator(bpdm-orchestrator) | 3.0.1-alpha.1 |
-| file://./charts/bpdm-pool | bpdm-pool(bpdm-pool) | 7.0.1-alpha.1 |
+| file://./charts/bpdm-gate | bpdm-gate(bpdm-gate) | 6.0.1 |
+| file://./charts/bpdm-orchestrator | bpdm-orchestrator(bpdm-orchestrator) | 3.0.1 |
+| file://./charts/bpdm-pool | bpdm-pool(bpdm-pool) | 7.0.1 |
 | https://charts.bitnami.com/bitnami | keycloak(keycloak) | 19.3.0 |
 | https://charts.bitnami.com/bitnami | postgres(postgresql) | 12.12.10 |
 

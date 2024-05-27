@@ -4,10 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
-## [5.0.1] - tbd
+## [5.0.1] -  2024-05-27
 
 ### Changed
 
+- Increase appversion to 6.0.1
 - Default pull policy from 'Always' to 'IfNotPresent'
 - Fixes BPDM applications not connecting with each other when authenticated
 - update BPDM Pool Chart to version 7.0.1
