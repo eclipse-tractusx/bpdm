@@ -6,6 +6,19 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
 For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/CHANGELOG.md) of the charts directly.
 
+## [6.0.1] - [2024-05-27]
+
+### Removed
+
+- BPDM Gate: Remove unused business partner type filter in query parameters from sharing state endpoint (Does not affect behaviour of API)
+- Apps: Add no-auth profile to all BPDM applications. This introduced a shortcut to run an application without any authentication configuration for its API and clients
+
+### Changed
+
+- BPDM Gate: Now correctly sending NULL values for alternative addresses to the golden record process
+- BPDM Pool: Name search for business partners now case-insensitive and delivers results on partial matches
+- BPDM Pool: Now validate and reject data in golden record tasks only if it is needed for processing (Unchanged business partners are now ignored)
+
 ## [6.0.0] - [2024-05-15]
 
 ### Removed
