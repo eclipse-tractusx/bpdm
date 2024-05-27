@@ -33,12 +33,10 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDt
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 
-@RequestMapping(BUSINESS_PARTNER_PATH, produces = [MediaType.APPLICATION_JSON_VALUE])
+@RequestMapping(BUSINESS_PARTNER_PATH, produces = [MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE])
 interface GateBusinessPartnerApi {
 
     companion object{
@@ -94,5 +92,23 @@ interface GateBusinessPartnerApi {
         @RequestBody externalIds: Collection<String>? = null,
         @ParameterObject @Valid paginationRequest: PaginationRequest = PaginationRequest()
     ): PageDto<BusinessPartnerOutputDto>
+
+    @Operation(
+        summary = "Create or update business partners from uploaded CSV file",
+        description = "Create or update generic business partners. " +
+                "Updates instead of creating a new business partner if an already existing external ID is used. " +
+                "The same external ID may not occur more than once in a single request. " +
+                "For file upload request, the maximum number of business partners in file limited to \${bpdm.api.upsert-limit} entries.",
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Business partners were successfully updated or created"),
+            ApiResponse(responseCode = "400", description = "On malformed legal entity request", content = [Content()]),
+        ]
+    )
+    @PostMapping("/input/business-partners/uploadCsv", consumes = ["multipart/form-data"])
+    fun uploadCsvFile(
+        @RequestPart("file") file: MultipartFile
+    ): ResponseEntity<Collection<BusinessPartnerInputDto>>
 
 }

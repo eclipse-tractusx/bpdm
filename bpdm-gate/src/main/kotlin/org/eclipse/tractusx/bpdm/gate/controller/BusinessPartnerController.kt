@@ -29,17 +29,20 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDt
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.service.BusinessPartnerService
+import org.eclipse.tractusx.bpdm.gate.service.FileUploadService
 import org.eclipse.tractusx.bpdm.gate.util.containsDuplicates
 import org.eclipse.tractusx.bpdm.gate.util.getCurrentUserBpn
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.multipart.MultipartFile
 
 @RestController
 class BusinessPartnerController(
     val businessPartnerService: BusinessPartnerService,
-    val apiConfigProperties: ApiConfigProperties
+    val apiConfigProperties: ApiConfigProperties,
+    val fileUploadService: FileUploadService
 ) : GateBusinessPartnerApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_INPUT_PARTNER})")
@@ -66,4 +69,22 @@ class BusinessPartnerController(
     ): PageDto<BusinessPartnerOutputDto> {
         return businessPartnerService.getBusinessPartnersOutput(paginationRequest.toPageRequest(), externalIds,  getCurrentUserBpn())
     }
+
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_INPUT_PARTNER})")
+    override fun uploadCsvFile(
+        file: MultipartFile
+    ): ResponseEntity<Collection<BusinessPartnerInputDto>> {
+        return try {
+            if (file.isEmpty) {
+                ResponseEntity(HttpStatus.BAD_REQUEST)
+            } else if (!file.contentType.equals("text/csv", ignoreCase = true)) {
+                ResponseEntity(HttpStatus.BAD_REQUEST)
+            } else {
+                fileUploadService.processFile(file, getCurrentUserBpn())
+            }
+        } catch (e: Exception) {
+            ResponseEntity(HttpStatus.BAD_REQUEST)
+        }
+    }
+
 }

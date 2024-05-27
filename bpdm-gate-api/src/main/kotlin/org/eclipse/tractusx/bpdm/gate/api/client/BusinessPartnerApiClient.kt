@@ -29,6 +29,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDt
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
 import org.springframework.web.service.annotation.PutExchange
@@ -51,4 +52,10 @@ interface BusinessPartnerApiClient : GateBusinessPartnerApi {
         @RequestBody externalIds: Collection<String>?,
         @ParameterObject @Valid paginationRequest: PaginationRequest
     ): PageDto<BusinessPartnerOutputDto>
+
+    @PostExchange("/uploadCsv")
+    override fun uploadCsvFile(
+        file: MultipartFile
+    ): ResponseEntity<Collection<BusinessPartnerInputDto>>
+
 }
