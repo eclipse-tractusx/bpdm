@@ -17,20 +17,20 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################################
 
-name: "KICS"
-
+name: "Perform KICS Scan"
 on:
   push:
     branches:
       - main
-      - rc/**
+      - 'release/**'
   schedule:
     - cron: "0 0 * * *"
   workflow_dispatch:
-
+  pull_request:
+    branches:
+      - main
 jobs:
-  analyze:
-    name: Analyze
+  scan:
     runs-on: ubuntu-latest
     permissions:
       actions: read
@@ -43,26 +43,14 @@ jobs:
       - name: KICS scan
         uses: checkmarx/kics-github-action@master
         with:
-          # Scanning directory .
           path: "./charts"
-          # Exclude paths from scan by providing the paths as comma separated list
-          # exclude_paths: "postgres-init.yaml,templates/sharedidp.yaml"
-          # Exclude queries by providing the query / rule ID as comma separated list
-          # exclude_queries: "b9c83569-459b-4110-8f79-6305aa33cb37"
-          # Fail on HIGH severity results
           fail_on: high
-          # Disable secrets detection - we use GitGuardian
           disable_secrets: true
-          # When provided with a directory on output_path
-          # it will generate the specified reports file named 'results.{extension}'
-          # in this example it will generate:
-          # - results-dir/results.json and results-dir/results.sarif
           output_path: kicsResults/
           output_formats: "json,sarif"
 
-      # Upload findings to GitHub Advanced Security Dashboard
       - name: Upload SARIF file for GitHub Advanced Security Dashboard
-        if: always()
+        if: github.event_name != 'pull_request'
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: kicsResults/results.sarif
