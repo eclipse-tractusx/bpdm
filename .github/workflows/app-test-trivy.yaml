@@ -1,0 +1,63 @@
+################################################################################
+# Copyright (c) 2021,2024 Contributors to the Eclipse Foundation
+#
+# See the NOTICE file(s) distributed with this work for additional
+# information regarding copyright ownership.
+#
+# This program and the accompanying materials are made available under the
+# terms of the Apache License, Version 2.0 which is available at
+# https://www.apache.org/licenses/LICENSE-2.0.
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+# SPDX-License-Identifier: Apache-2.0
+################################################################################
+
+name: Perform Trivy Scan on App
+on:
+  workflow_dispatch:
+    inputs:
+      app:
+        description: 'The name of the BPDM app to scan'
+        type: choice
+        required: true
+        options:
+          - pool
+          - gate
+          - orchestrator
+          - cleaning-service-dummy
+  workflow_call:
+    inputs:
+      app:
+        description: 'The name of the BPDM app to scan'
+        type: string
+        required: true
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build App Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/${{ inputs.app }}/Dockerfile
+          tags: bpdm-${{ inputs.app }}:test
+          load: true
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.18.0
+        with:
+          image-ref: "bpdm-${{ inputs.app }}:test"
+          exit-code: "1"
+          severity: "CRITICAL,HIGH"
+          timeout: 15m
