@@ -1,0 +1,61 @@
+################################################################################
+# Copyright (c) 2021,2024 Contributors to the Eclipse Foundation
+#
+# See the NOTICE file(s) distributed with this work for additional
+# information regarding copyright ownership.
+#
+# This program and the accompanying materials are made available under the
+# terms of the Apache License, Version 2.0 which is available at
+# https://www.apache.org/licenses/LICENSE-2.0.
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+# SPDX-License-Identifier: Apache-2.0
+################################################################################
+
+name: Deploy - Docker image
+
+on:
+  push:
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Extract Maven Project Version
+        id: pomVersion
+        run: |
+          POM_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' -B --non-recursive exec:exec)
+          echo "version=$POM_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Parse semantic version from string
+        id: semVer
+        uses: release-kit/semver@v2
+        with:
+          string: 'v${{ steps.pomVersion.outputs.version }}'
+
+      - name: Create Docker Tags
+        id: dockerTags
+        run: |
+          SUFFIX="${{ steps.semVer.outputs.prerelease == 'SNAPSHOT' && '-SNAPSHOT' || '' }}"
+          LATEST="latest$SUFFIX"
+          MAJOR="${{ steps.semVer.outputs.major }}"
+          MINOR="${MAJOR}.${{ steps.semVer.outputs.minor }}"
+          PATCH="${MINOR}.${{ steps.semVer.outputs.patch }}"
+          MAJOR_VER="${MAJOR}${SUFFIX}"
+          MINOR_VER="${MINOR}${SUFFIX}"
+          PATCH_VER="${PATCH}${SUFFIX}"
+          echo "tags=${LATEST},${MAJOR_VER},${MINOR_VER},${PATCH_VER}" >> $GITHUB_OUTPUT
+
+      - name: Echo all
+        run: echo "${{ steps.dockerTags.outputs.tags }}"
