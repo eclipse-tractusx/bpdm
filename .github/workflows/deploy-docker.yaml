@@ -17,9 +17,18 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################################
 
-name: Build - Docker image (SemVer)
-
+name: Deploy - Docker Image
 on:
+  workflow_dispatch:
+    inputs:
+      imageName:
+        required: true
+        type: string
+        description: Name the built image should get
+      dockerfilePath:
+        required: true
+        type: string
+        description: Path to where the Dockerfile to build is
   workflow_call:
     inputs:
       imageName:
@@ -30,11 +39,6 @@ on:
         required: true
         type: string
         description: Path to where the Dockerfile to build is
-      push:
-        required: true
-        type: boolean
-        description: Whether to also push created image or just build it
-
 
 env:
   IMAGE_NAMESPACE: "tractusx"
@@ -43,56 +47,64 @@ env:
 jobs:
   docker:
     runs-on: ubuntu-latest
-    permissions:
-      packages: write
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Create SemVer or ref tags dependent of trigger event
-      - name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v5
+      - uses: dorny/paths-filter@v3
+        id: changes
         with:
-          images: |
-            ${{ env.IMAGE_NAMESPACE }}/${{ env.IMAGE_NAME }}
-          # Automatically prepare image tags; See action docs for more examples.
-          # semver patter will generate tags like these for example :1 :1.2 :1.2.3
-          tags: |
-            type=ref,event=branch
-            type=ref,event=pr
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=raw,value=latest-alpha,enable={{is_default_branch}}
+          filters: |
+            apps:
+              - 'pom.xml'
+              - 'bpdm-**'
+
+      - name: Extract Maven Project Version
+        if: steps.changes.outputs.apps == 'true'
+        id: pomVersion
+        run: |
+          POM_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' -B --non-recursive exec:exec)
+          echo "version=$POM_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Parse semantic version from string
+        if: steps.changes.outputs.apps == 'true'
+        id: semVer
+        uses: release-kit/semver@v2
+        with:
+          string: 'v${{ steps.pomVersion.outputs.version }}'
+
+      - name: Create Docker Tags
+        id: dockerTags
+        run: |
+          SUFFIX="${{ steps.semVer.outputs.prerelease == 'SNAPSHOT' && '-SNAPSHOT' || '' }}"
+          LATEST="latest$SUFFIX"
+          MAJOR="${{ steps.semVer.outputs.major }}"
+          MINOR="${MAJOR}.${{ steps.semVer.outputs.minor }}"
+          PATCH="${MINOR}.${{ steps.semVer.outputs.patch }}"
+          MAJOR_VER="${MAJOR}${SUFFIX}"
+          MINOR_VER="${MINOR}${SUFFIX}"
+          PATCH_VER="${PATCH}${SUFFIX}"
+          echo "tags=${LATEST},${MAJOR_VER},${MINOR_VER},${PATCH_VER}" >> $GITHUB_OUTPUT
 
       - name: DockerHub login
-        if:  inputs.push
         uses: docker/login-action@v3
         with:
-          # Use existing DockerHub credentials present as secrets
           username: ${{ secrets.DOCKER_HUB_USER }}
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
       - name: Build and push
+        if: steps.changes.outputs.apps == 'true'
         uses: docker/build-push-action@v5
         with:
           context: .
-          # Build image for verification purposes on every trigger event. Only push if event is not a PR
-          push: ${{ inputs.push }}
+          push: true
           file: ${{ inputs.dockerfilePath }}/Dockerfile
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.dockerTags.outputs.tags }}
 
-      # https://github.com/peter-evans/dockerhub-description
-      # Important step to push image description to DockerHub
       - name: Update Docker Hub description
-        if: inputs.push
+        if: steps.changes.outputs.apps == 'true'
         uses: peter-evans/dockerhub-description@v4
         with:
-        # readme-filepath defaults to toplevel README.md, Only necessary if you have a dedicated file with your 'Notice for docker images'
-        # readme-filepath: path/to/dedicated/notice-for-docker-image.md
           username: ${{ secrets.DOCKER_HUB_USER }}
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
           repository: ${{ env.IMAGE_NAMESPACE }}/${{ env.IMAGE_NAME }}

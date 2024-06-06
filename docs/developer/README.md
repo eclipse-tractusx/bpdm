@@ -40,42 +40,64 @@ Check the [Eclipse Dash License Tool documentation](https://github.com/eclipse/d
 
 ```mermaid
 ---
-title: BPDM Branching Strategy
+title: BPDM Branching Strategy (App Tags)
 ---
-gitGraph
+gitGraph TB:
+    commit tag: "v1.0.0-alpha.0"
+    branch "app-feature A"
+    branch "app-feature B"
+    checkout "app-feature A"
     commit
     commit
-    branch "release/1.0.x"
-    checkout "release/1.0.x"
-    commit id: "ver(1.0.0)" tag: "1.0.0"
+    checkout "main"
+    merge "app-feature A" tag:  "v1.0.0-alpha.1"
+    checkout "app-feature B"
+    commit
+    checkout "main"
+    merge "app-feature B" tag: "v1.0.0"
+    branch "chart-feature C"
+    commit
+    checkout "main"
+    merge "chart-feature C"
+    branch "app-feature D"
+    commit
+    checkout "main"
+    merge "app-feature D" tag: "v1.0.1-alpha.0"
+    branch "app-feature E"
+    commit
+    checkout "main"
+    merge "app-feature E" tag: "v1.1.0-alpha.0"
+```
 
-    checkout main
-    commit id: "ver(0.1.0-SNAPSHOT)"
-    commit id: "fix(A)"
-    commit
-    checkout "release/1.0.x"
-    branch "fix/1.0.x/A"
-    cherry-pick id: "fix(A)"
-    checkout "release/1.0.x"
-    merge "fix/1.0.x/A"
-
-    checkout "release/1.0.x"
-    commit id: "ver(1.0.1)" tag: "1.0.1"
-    checkout main
+```mermaid
+---
+title: BPDM Branching Strategy (Chart Tags)
+---
+gitGraph TB:
+    commit tag: "bpdm-1.0.0-alpha.0"
+    branch "app-feature A"
+    branch "app-feature B"
+    checkout "app-feature A"
     commit
     commit
-    branch "release/1.1.x"
-    checkout "release/1.1.x"
-    commit id: "ver(1.1.0)" tag: "1.1.0"
-    checkout main
-    commit id: "ver(1.2.0-SNAPSHOT)"
+    checkout "main"
+    merge "app-feature A" tag:  "bpdm-1.0.0-alpha.1"
+    checkout "app-feature B"
     commit
-    commit id: "ver(2.0.0-SNAPSHOT)"
-    branch "feat(B)"
-    commit id: "feat(B)"
-    checkout main
-    branch "fix/C"
-    commit id: "fix(C)"
+    checkout "main"
+    merge "app-feature B" tag: "bpdm-1.0.0"
+    branch "chart-feature C"
+    commit
+    checkout "main"
+    merge "chart-feature C" tag: "bpdm-1.0.1"
+    branch "app-feature D"
+    commit
+    checkout "main"
+    merge "app-feature D" tag: "bpdm-1.0.1-alpha.0"
+    branch "app-feature E"
+    commit
+    checkout "main"
+    merge "app-feature E" tag: "bpdm-1.1.0-alpha.0"
 ```
 
 ## NOTICE
