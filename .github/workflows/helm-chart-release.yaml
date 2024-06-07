@@ -22,16 +22,12 @@ name: Release Charts
 on:
   workflow_dispatch:
   push:
-    # prevent unnecessary GH action runs for files outside of charts folder
     paths:
       - 'charts/**'
     branches:
       - main
-
 jobs:
   release:
-    # depending on default permission settings for your org (contents being read-only or read-write for workloads), you will have to add permissions
-    # see: https://docs.github.com/en/actions/security-guides/automatic-token-authentication#modifying-the-permissions-for-the-github_token
     permissions:
       contents: write
     runs-on: ubuntu-latest
@@ -41,17 +37,28 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Check for Release Version
+        id: checkRelease
+        run: |
+          CHART_VERSION=$(grep 'version:' ./charts/bpdm/Chart.yaml | head -n1 | awk '{ print $2}')
+          SNAPSHOT=$(echo $CHART_VERSION | grep 'SNAPSHOT')
+          if test -z $SNAPSHOT; then IS_RELEASE=true; else IS_RELEASE=false fi
+          echo "isRelease=$IS_RELEASE" >> GITHUB_OUTPUT
+
       - name: Configure Git
+        if: steps.checkRelease.outputs.isRelease == 'true'
         run: |
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
       - name: Install Helm
+        if:  steps.checkRelease.outputs.isRelease == 'true'
         uses: azure/setup-helm@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run chart-releaser
+        if:  steps.checkRelease.outputs.isRelease == 'true'
         uses: helm/chart-releaser-action@v1.6.0
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
