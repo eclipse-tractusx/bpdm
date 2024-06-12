@@ -28,6 +28,9 @@ import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyReq
 import org.eclipse.tractusx.bpdm.test.util.AuthAssertionHelper
 import org.eclipse.tractusx.bpdm.test.util.AuthExpectationType
 import org.junit.jupiter.api.Test
+import org.springframework.mock.web.MockMultipartFile
+import java.nio.file.Files
+import java.nio.file.Paths
 
 abstract class AuthTestBase(
     private val gateClient: GateClient,
@@ -91,13 +94,21 @@ abstract class AuthTestBase(
         authAssertions.assert(authExpectations.stats.getConfidenceCriteria) { gateClient.stats.getConfidenceCriteriaStats() }
     }
 
+    @Test
+    fun `POST Partner Input`() {
+        val bytes = Files.readAllBytes(Paths.get("src/test/resources/testData/valid_partner_data.csv"))
+        val uploadedFile = MockMultipartFile("valid_partner_data.csv", "valid_partner_data.csv", "text/csv", bytes)
+        authAssertions.assert(authExpectations.uploadPartner.postInput) { gateClient.partnerUpload.uploadPartnerCsvFile(uploadedFile) }
+    }
+
 }
 
 data class GateAuthExpectations(
     val businessPartner: BusinessPartnerAuthExpectations,
     val changelog: ChangelogAuthExpectations,
     val sharingState: SharingStateAuthExpectations,
-    val stats: StatsAuthExpectations
+    val stats: StatsAuthExpectations,
+    val uploadPartner: UploadPartnerAuthExpections
 )
 
 data class BusinessPartnerAuthExpectations(
@@ -123,3 +134,6 @@ data class StatsAuthExpectations(
     val getConfidenceCriteria: AuthExpectationType
 )
 
+data class UploadPartnerAuthExpections(
+    val postInput: AuthExpectationType
+)

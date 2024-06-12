@@ -17,19 +17,20 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.api.client
+package org.eclipse.tractusx.bpdm.gate.api.model.response
 
-import org.eclipse.tractusx.bpdm.gate.api.StatsApi
+import io.swagger.v3.oas.annotations.media.Schema
+import org.springframework.http.HttpStatus
+import java.time.Instant
 
-interface GateClient {
-
-    val businessParters: BusinessPartnerApiClient
-
-    val changelog: ChangelogApiClient
-
-    val sharingState: SharingStateApiClient
-
-    val stats: StatsApiClient
-
-    val partnerUpload: PartnerUploadApiClient
-}
+@Schema(description = "Error response for invalid partner upload")
+class PartnerUploadErrorResponse(
+    @Schema(description = "Timestamp of the error occurrence")
+    val timestamp: Instant,
+    @Schema(description = "HTTP status of the error response")
+    val status: HttpStatus,
+    @Schema(description = "List of error messages")
+    val error: List<String>,
+    @Schema(description = "Request path where the error occurred")
+    val path: String
+)

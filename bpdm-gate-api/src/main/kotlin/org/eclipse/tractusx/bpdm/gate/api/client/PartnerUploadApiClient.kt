@@ -19,17 +19,25 @@
 
 package org.eclipse.tractusx.bpdm.gate.api.client
 
-import org.eclipse.tractusx.bpdm.gate.api.StatsApi
+import org.eclipse.tractusx.bpdm.gate.api.GatePartnerUploadApi
+import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
+import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.RequestPart
+import org.springframework.web.multipart.MultipartFile
+import org.springframework.web.service.annotation.HttpExchange
+import org.springframework.web.service.annotation.PostExchange
 
-interface GateClient {
+@HttpExchange(GatePartnerUploadApi.BUSINESS_PARTNER_PATH)
+interface PartnerUploadApiClient : GatePartnerUploadApi {
 
-    val businessParters: BusinessPartnerApiClient
+    @PostExchange(
+        url = "/input/partner-upload-process",
+        contentType = MediaType.MULTIPART_FORM_DATA_VALUE,
+        accept = ["application/json"]
+    )
+    override fun uploadPartnerCsvFile(
+        @RequestPart("file") file: MultipartFile
+    ): ResponseEntity<Collection<BusinessPartnerInputDto>>
 
-    val changelog: ChangelogApiClient
-
-    val sharingState: SharingStateApiClient
-
-    val stats: StatsApiClient
-
-    val partnerUpload: PartnerUploadApiClient
 }

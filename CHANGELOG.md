@@ -6,6 +6,12 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
 For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/CHANGELOG.md) of the charts directly.
 
+## [6.1.0] - [tbd]
+
+### Added
+
+- BPDM Gate: Post endpoint to upload business partner input data using csv file.(#700)
+
 ## [6.0.1] - [2024-05-27]
 
 ### Removed

@@ -378,6 +378,14 @@
         "clientRole" : true,
         "containerId" : "0562ecfa-f17b-4d32-86cc-061f7da34b6b",
         "attributes" : { }
+      }, {
+        "id" : "e3ca0b50-95c7-43d5-baf6-359d87fc272a",
+        "name" : "upload_input_partner",
+        "description" : "Upload access to business partner input data",
+        "composite" : false,
+        "clientRole" : true,
+        "containerId" : "0562ecfa-f17b-4d32-86cc-061f7da34b6b",
+        "attributes" : {}
       } ],
       "account-console" : [ ],
       "EDC-GATE-OUTPUT-CONSUMER" : [ ],
@@ -551,7 +559,7 @@
         "attributes" : { },
         "realmRoles" : [ ],
         "clientRoles" : {
-          "BPDM-GATE" : [ "write_sharing_state", "read_output_partner", "read_input_changelog", "read_stats", "read_output_changelog", "write_input_partner", "read_sharing_state", "read_input_partner" ]
+          "BPDM-GATE" : [ "write_sharing_state", "read_output_partner", "read_input_changelog", "read_stats", "read_output_changelog", "write_input_partner", "read_sharing_state", "read_input_partner", "upload_input_partner" ]
         },
         "subGroups" : [ ]
       }, {
@@ -571,7 +579,7 @@
         "attributes" : { },
         "realmRoles" : [ ],
         "clientRoles" : {
-          "BPDM-GATE" : [ "write_sharing_state", "read_input_changelog", "read_stats", "write_input_partner", "read_sharing_state", "read_input_partner" ]
+          "BPDM-GATE" : [ "write_sharing_state", "read_input_changelog", "read_stats", "write_input_partner", "read_sharing_state", "read_input_partner", "upload_input_partner" ]
         },
         "subGroups" : [ ]
       }, {

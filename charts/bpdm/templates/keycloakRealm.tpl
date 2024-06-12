@@ -385,6 +385,13 @@ roles:
         clientRole: true
         containerId: 0562ecfa-f17b-4d32-86cc-061f7da34b6b
         attributes: {}
+      - id: e3ca0b50-95c7-43d5-baf6-359d87fc272a
+        name: upload_input_partner
+        description: Upload access to business partner input data
+        composite: false
+        clientRole: true
+        containerId: 0562ecfa-f17b-4d32-86cc-061f7da34b6b
+        attributes: {}
     account-console: []
     EDC-GATE-OUTPUT-CONSUMER: []
     broker:
@@ -549,6 +556,7 @@ groups:
                 - write_input_partner
                 - read_sharing_state
                 - read_input_partner
+                - upload_input_partner
             subGroups: []
           - id: d0cbde40-4896-4484-bff4-8666d2ad1a14
             name: Input Consumer
@@ -575,6 +583,7 @@ groups:
                 - write_input_partner
                 - read_sharing_state
                 - read_input_partner
+                - upload_input_partner
             subGroups: []
           - id: a66cad54-3ff3-4673-88ea-304892073e13
             name: Output Consumer
