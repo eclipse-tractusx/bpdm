@@ -41,6 +41,18 @@ import java.time.ZoneOffset
  */
 object BusinessPartnerVerboseValues {
 
+    val firstBpnL = "BPNL000000000065"
+    val secondBpnL = "BPNL00000000015G"
+    val thirdBpnl = "BPNL00000000024R"
+
+    val firstBpnA = "BPNA00000000009W"
+    val secondBpnA = "BPNA000000000197"
+    val thirdBpnA = "BPNA00000000028I"
+
+    val firstBpnS = "BPNS0000000000WN"
+    val secondBpnS = "BPNS0000000001VY"
+    val thirdBpnS = "BPNS0000000002V9"
+
     private val createdTime1 = LocalDateTime.of(2020, 1, 1, 1, 1)
     val language0 = TypeKeyNameVerboseDto(LanguageCode.undefined, LanguageCode.undefined.getName())
     val language1 = TypeKeyNameVerboseDto(LanguageCode.en, LanguageCode.en.getName())
@@ -208,7 +220,7 @@ object BusinessPartnerVerboseValues {
     )
 
     val addressPartner1 = LogisticAddressVerboseDto(
-        bpna = "BPNA000000000001",
+        bpna = firstBpnA,
         physicalPostalAddress = address1,
         bpnLegalEntity = null,
         bpnSite = null,
@@ -220,7 +232,7 @@ object BusinessPartnerVerboseValues {
     )
 
     val addressPartner2 = LogisticAddressVerboseDto(
-        bpna = "BPNA0000000001YN",
+        bpna = secondBpnA,
         physicalPostalAddress = address2,
         bpnLegalEntity = null,
         bpnSite = null,
@@ -232,7 +244,7 @@ object BusinessPartnerVerboseValues {
     )
 
     val addressPartner3 = LogisticAddressVerboseDto(
-        bpna = "BPNA0000000002XY",
+        bpna = thirdBpnA,
         physicalPostalAddress = address3,
         bpnLegalEntity = null,
         bpnSite = null,
@@ -259,10 +271,10 @@ object BusinessPartnerVerboseValues {
     )
 
     val site1 = SiteVerboseDto(
-        bpns = "BPNS000000000001",
+        bpns = firstBpnS,
         name = "Stammwerk A",
         states = listOf(siteStatus1),
-        bpnLegalEntity = "BPNL000000000001",
+        bpnLegalEntity = firstBpnL,
         confidenceCriteria = confidenceCriteria1,
         isCatenaXMemberData = false,
         createdAt = Instant.now(),
@@ -270,10 +282,10 @@ object BusinessPartnerVerboseValues {
     )
 
     val site2 = SiteVerboseDto(
-        bpns = "BPNS0000000001YN",
+        bpns = secondBpnS,
         name = "Halle B1",
         states = listOf(siteStatus2),
-        bpnLegalEntity = "BPNL0000000001YN",
+        bpnLegalEntity = secondBpnL,
         confidenceCriteria = confidenceCriteria2,
         isCatenaXMemberData = false,
         createdAt = Instant.now(),
@@ -281,10 +293,10 @@ object BusinessPartnerVerboseValues {
     )
 
     val site3 = SiteVerboseDto(
-        bpns = "BPNS0000000002XY",
+        bpns = thirdBpnS,
         name = "主厂房 C",
         states = listOf(siteStatus3),
-        bpnLegalEntity = "BPNL0000000002XY",
+        bpnLegalEntity = thirdBpnl,
         confidenceCriteria = confidenceCriteria3,
         isCatenaXMemberData = false,
         createdAt = Instant.now(),
@@ -321,7 +333,7 @@ object BusinessPartnerVerboseValues {
 
     val legalEntity1 = LegalEntityWithLegalAddressVerboseDto(
         LegalEntityVerboseDto(
-            bpnl = "BPNL000000000001",
+            bpnl = firstBpnL,
             legalName = "Business Partner Name",
             legalFormVerbose = legalForm1,
             identifiers = listOf(identifier1),
@@ -333,7 +345,7 @@ object BusinessPartnerVerboseValues {
             updatedAt = Instant.now(),
         ),
         legalAddress = LogisticAddressVerboseDto(
-            bpna = "BPNA000000000001",
+            bpna = firstBpnA,
             physicalPostalAddress = PhysicalPostalAddressVerboseDto(
                 geographicCoordinates = null,
                 countryVerbose = country1,
@@ -361,7 +373,7 @@ object BusinessPartnerVerboseValues {
 
     val legalEntity2 = LegalEntityWithLegalAddressVerboseDto(
         LegalEntityVerboseDto(
-            bpnl = "BPNL0000000001YN",
+            bpnl = secondBpnL,
             legalName = "Another Organisation Corp",
             legalFormVerbose = legalForm2,
             identifiers = listOf(identifier2),
@@ -373,7 +385,7 @@ object BusinessPartnerVerboseValues {
             updatedAt = Instant.now(),
         ),
         legalAddress = LogisticAddressVerboseDto(
-            bpna = "BPNA000000000001",
+            bpna = firstBpnA,
             physicalPostalAddress = PhysicalPostalAddressVerboseDto(
                 geographicCoordinates = null,
                 countryVerbose = country2,
@@ -401,7 +413,7 @@ object BusinessPartnerVerboseValues {
 
     val legalEntity3 = LegalEntityWithLegalAddressVerboseDto(
         LegalEntityVerboseDto(
-            bpnl = "BPNL0000000002XY",
+            bpnl = thirdBpnl,
             legalName = "好公司  合伙制企业",
             legalFormVerbose = legalForm3,
             identifiers = listOf(identifier3),
@@ -413,7 +425,7 @@ object BusinessPartnerVerboseValues {
             updatedAt = Instant.now(),
         ),
         legalAddress = LogisticAddressVerboseDto(
-            bpna = "BPNA000000000001",
+            bpna = firstBpnA,
             physicalPostalAddress = PhysicalPostalAddressVerboseDto(
                 geographicCoordinates = null,
                 countryVerbose = country3,
@@ -441,7 +453,7 @@ object BusinessPartnerVerboseValues {
 
     val legalEntityUpsert1 = LegalEntityPartnerCreateVerboseDto(
         legalEntity = LegalEntityVerboseDto(
-            bpnl = "BPNL000000000001",
+            bpnl = firstBpnL,
             legalName = "Business Partner Name",
             legalFormVerbose = legalForm1,
             identifiers = listOf(LegalEntityIdentifierVerboseDto("ID-XYZ", identifierType1, "Agency X")),
@@ -461,7 +473,7 @@ object BusinessPartnerVerboseValues {
 
     val legalEntityUpsert2 = LegalEntityPartnerCreateVerboseDto(
         legalEntity = LegalEntityVerboseDto(
-            bpnl = "BPNL0000000001YN",
+            bpnl = secondBpnL,
             legalName = "Another Organisation Corp",
             legalFormVerbose = legalForm2,
             identifiers = listOf(LegalEntityIdentifierVerboseDto("Another ID Value", identifierType2, "Body Y")),
@@ -481,7 +493,7 @@ object BusinessPartnerVerboseValues {
 
     val legalEntityUpsert3 = LegalEntityPartnerCreateVerboseDto(
         legalEntity = LegalEntityVerboseDto(
-            bpnl = "BPNL0000000002XY",
+            bpnl = thirdBpnl,
             legalName = "好公司  合伙制企业",
             legalFormVerbose = legalForm3,
             identifiers = listOf(LegalEntityIdentifierVerboseDto("An ID Value", identifierType3, "Official Z")),
@@ -501,7 +513,7 @@ object BusinessPartnerVerboseValues {
 
     val legalEntityUpsertMultipleIdentifier = LegalEntityPartnerCreateVerboseDto(
         legalEntity = LegalEntityVerboseDto(
-            bpnl = "BPNL000000000001",
+            bpnl = firstBpnL,
             legalName = "Business Partner Name",
             legalFormVerbose = legalForm1,
             identifiers = listOf(
