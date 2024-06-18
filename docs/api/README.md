@@ -1,5 +1,35 @@
 # API Documentation
 
+<!-- TOC -->
+* [API Documentation](#api-documentation)
+  * [Pool API](#pool-api)
+      * [Authorization](#authorization)
+  * [Gate API](#gate-api)
+      * [Business Partner](#business-partner)
+      * [Address Type](#address-type)
+      * [Stages](#stages)
+      * [Sharing State](#sharing-state)
+      * [Changelog](#changelog)
+      * [Additional information](#additional-information)
+    * [Authorization](#authorization-1)
+    * [Sharing a new business partner](#sharing-a-new-business-partner)
+      * [Sharing a Business Partner With Site Information](#sharing-a-business-partner-with-site-information)
+    * [Update a Business Partner](#update-a-business-partner)
+    * [Dummy Golden Record Process Restrictions](#dummy-golden-record-process-restrictions)
+      * [Categorization](#categorization)
+      * [Cleaning Data](#cleaning-data)
+      * [Duplication Check](#duplication-check)
+      * [Data Provisioning](#data-provisioning)
+      * [High-Level Input Output Examples](#high-level-input-output-examples)
+      * [High Level Golden Record Examples](#high-level-golden-record-examples)
+  * [Orchestrator API](#orchestrator-api)
+      * [Tasks](#tasks)
+      * [Processing Steps](#processing-steps)
+      * [Clean And Sync Step](#clean-and-sync-step)
+  * [Access BPDM over EDC](#access-bpdm-over-edc)
+  * [NOTICE](#notice)
+<!-- TOC -->
+
 Here you can find documentation on how to access and integrate BPDM APIs.
 The main user groups for BPDM are sharing members, golden record processing service providers and VAS providers.
 
@@ -167,6 +197,7 @@ However, if the provided data is too few or of too bad quality the business part
 Querying the sharing state of the business partner will reveal the current state in the golden record process.
 Here, the sharing member can also see whether and why the business partner has been rejected.
 
+
 #### Sharing a Business Partner With Site Information
 
 Postman collection request ID: S.CPS
@@ -253,6 +284,444 @@ If a site or legal entity parent have to be created, the dummy service uses the 
 Likewise, if a legal entity parent has to be created for a site the legal address information is taken from the site main address.
 
 - Confidence Criteria: The dummy golden record service fills all confidence criteria with static dummy values.
+
+
+#### High-Level Input Output Examples
+
+```mermaid
+---
+title: Share Unknown Business Partner Data
+---
+classDiagram
+  direction LR
+  class Input{
+    ExternalId: Own-ID
+    Name Parts: [Company AG, Main Office]
+    Physical Country: DE
+    Physical City: Berlin
+    Physical Postcode: 12435
+    Street Name: Main Street
+    Street Number: 123
+  }
+
+  class Output{
+    ExternalId: Own-ID
+    Legal Entity Bpn: BPNL000000000001
+    Address Bpn: BPNA000000000001
+    Name Parts: [Company AG, Main Office]
+    Legal Name: Company AG Main Office
+    Address Type: Legal Address
+    Physical Country: DE
+    Physical City: Berlin
+    Physical Postcode: 12435
+    Street Name: Main Street
+    Street Number: 123
+    Legal Entity Confidence: ...
+    Site Confidence: ...
+    Address Confidence: ...
+  }
+
+  Input --> Output
+```
+
+```mermaid
+---
+title: Share Legal Entity
+---
+classDiagram
+  direction LR
+    class Input{
+         ExternalId: Own-ID
+         Legal Name: Company AG
+         Address Type: Legal Address
+         Physical Country: DE
+         Physical City: Berlin
+         Physical Postcode: 12435
+         Street Name: Main Street
+         Street Number: 123
+    }
+   
+   class Output{
+         ExternalId: Own-ID
+         Legal Entity Bpn: BPNL000000000001
+         Address Bpn: BPNA000000000001
+         Legal Name: Company AG
+         Address Type: Legal Address
+         Physical Country: DE
+         Physical City: Berlin
+         Physical Postcode: 12435
+         Street Name: Main Street
+         Street Number: 123
+         Legal Entity Confidence: ...
+         Address Confidence: ...
+   }
+
+    Input --> Output
+```
+
+```mermaid
+---
+title: Share Site
+---
+classDiagram
+  direction LR
+    class Input{
+         ExternalId: Own-ID
+         Legal Entity Bpn: BPNL000000000001
+         Site Name: Main Site
+         Address Type: Site Main Address
+         Physical Country: DE
+         Physical City: Berlin
+         Physical Postcode: 12435
+         Street Name: Main Street
+         Street Number: 123
+         IsOwnCompanyData: true
+    }
+   
+   class Output{
+         ExternalId: Own-ID
+         Legal Name: Company AG
+         Legal Entity Bpn: BPNL000000000001
+         Site Bpn: BPNS000000000001
+         Address Bpn: BPNA000000000001
+         Address Type: Site Main Address
+         Physical Country: DE
+         Physical City: Berlin
+         Physical Postcode: 12435
+         Street Name: Main Street
+         Street Number: 123
+         Legal Entity Confidence: ...
+         Site Confidence: ...
+         Address Confidence: ...
+         IsOwnCompanyData: true
+   }
+
+    Input --> Output
+``` 
+```mermaid
+---
+title: Share Additional Address of Legal Entity
+---
+classDiagram
+  direction LR
+    class Input{
+         ExternalId: Own-ID
+         Legal Entity Bpn: BPNL000000000001
+         Address Name: Gate 1
+         Address Type: Additional Address
+         Physical Country: DE
+         Physical City: Berlin
+         Physical Postcode: 12435
+         Street Name: Main Street
+         Street Number: 123
+    }
+   
+   class Output{
+         ExternalId: Own-ID
+         Legal Entity Bpn: BPNL000000000001
+         Address Bpn: BPNA000000000001
+         Legal Name: Company AG
+         Address Name: Gate 1
+         Address Type: Additional Address
+         Physical Country: DE
+         Physical City: Berlin
+         Physical Postcode: 12435
+         Street Name: Main Street
+         Street Number: 123
+         Legal Entity Confidence: ...
+         Address Confidence: ...
+   }
+
+    Input --> Output
+```
+
+```mermaid
+---
+title: Share Additional Address of Site
+---
+classDiagram
+  direction LR
+    class Input{
+         ExternalId: Own-ID
+         Legal Entity Bpn: BPNL000000000001
+         Site Bpn: BPNS000000000001
+         Address Name: Gate 1
+         Address Type: Additional Address
+         Physical Country: DE
+         Physical City: Berlin
+         Physical Postcode: 12435
+         Street Name: Main Street
+         Street Number: 123
+         IsOwnCompanyData: true
+    }
+   
+   class Output{
+         ExternalId: Own-ID
+         Legal Entity Bpn: BPNL000000000001
+         Site Bpn: BPNS000000000001
+         Address Bpn: BPNA000000000001
+         Legal Name: Company AG
+         Site Name: Main Site
+        Address Name: Gate 1
+         Address Type: Additional Address
+         Physical Country: DE
+         Physical City: Berlin
+         Physical Postcode: 12435
+         Street Name: Main Street
+         Street Number: 123
+         Legal Entity Confidence: ...
+         Site Confidence: ...
+         Address Confidence: ...
+         IsOwnCompanyData: true
+   }
+
+    Input --> Output
+```
+
+#### High Level Golden Record Examples
+
+```mermaid
+---
+title: Share Unknown Business Partner
+---
+classDiagram
+ direction LR
+
+    class Input{
+        ExternalId: Own-ID
+        Name Parts: [Company AG, Main Office]
+        Physical Country: DE
+        Physical City: Berlin
+        Physical Postcode: 12435
+        Street Name: Main Street
+        Street Number: 123
+    }
+   
+    class LegalEntity["Legal Entity"]{
+        BPNL: BPNL000000000001
+        Legal Name: Company AG Main Office
+        Legal Address Physical Country: DE
+        Legal Address Physical City: Berlin
+        Legal Address Physical Postcode: 12435
+        Legal Address Street Name: Main Street
+        Legal Address Street Number: 123
+        Legal Entity Confidence: ...
+        Legal Address Confidence: ...
+    }
+
+    Input --> LegalEntity
+```
+
+```mermaid
+---
+title: Share Legal Entity
+---
+classDiagram
+ direction LR
+
+    class Input{
+         ExternalId: Own-ID
+         Legal Name: Company AG
+         Address Type: Legal Address
+         Physical Country: DE
+         Physical City: Berlin
+         Physical Postcode: 12435
+         Street Name: Main Street
+         Street Number: 123
+    }
+   
+    class LegalEntity["Legal Entity"]{
+        BPNL: BPNL000000000001
+        Legal Name: Company AG Main Office
+        Legal Address Physical Country: DE
+        Legal Address Physical City: Berlin
+        Legal Address Physical Postcode: 12435
+        Legal Address Street Name: Main Street
+        Legal Address Street Number: 123
+        Legal Entity Confidence: ...
+        Legal Address Confidence: ...
+    }
+
+    Input --> LegalEntity
+```
+
+```mermaid
+---
+title: Share Site
+---
+classDiagram
+ direction LR
+
+    class Input{
+         ExternalId: Own-ID
+         Legal Entity Bpn: BPNL000000000001
+         Site Name: Main Site
+         Address Type: Site Main Address
+         Physical Country: DE
+         Physical City: Berlin
+         Physical Postcode: 12435
+         Street Name: Main Street
+         Street Number: 123
+         IsOwnCompanyData: true
+    }
+   
+    class Site{
+        BPNS: BPNS000000000001
+        Site Name: Main Site
+        Main Address Physical Country: DE
+        Main Address Physical City: Berlin
+        Main Address Physical Postcode: 12435
+        Main Address Street Name: Main Street
+        Main Address Street Number: 123
+        Site Confidence: ...
+        Main Address Confidence: ...
+    }
+
+    class LegalEntity["Legal Entity"]{
+        BPNL: BPNL000000000001
+    }
+
+    Input --> Site
+    Site --> LegalEntity: belongs to
+```
+
+
+```mermaid
+---
+title: Share Additional Address Of Site
+---
+classDiagram
+  direction LR
+    class Input{
+         ExternalId: Own-ID
+         Legal Entity Bpn: BPNL000000000001
+         Site Bpn: BPNS000000000001
+         Address Name: Gate 1
+         Address Type: Additional Address
+         Physical Country: DE
+         Physical City: Berlin
+         Physical Postcode: 12435
+         Street Name: Main Street
+         Street Number: 123
+    }
+   
+    class AdditionalAddress["Additional Address"]{
+        BPNA: BPNA000000000001
+        Name: Gate 1
+        Physical Country: DE
+        Physical City: Berlin
+        Physical Postcode: 12435
+        Street Name: Main Street
+        Street Number: 123
+        Confidence: ...
+    }
+
+    class LegalEntity["Legal Entity"]{
+        BPNL: BPNL000000000001
+    }
+
+    class Site{
+        BPNS: BPNS000000000001
+    }
+
+    Input --> AdditionalAddress
+    AdditionalAddress --> Site: belongs to
+    Site --> LegalEntity: belongs to
+```
+
+```mermaid
+---
+title: Share Additional Address Of Legal Entity
+---
+classDiagram
+ direction LR
+
+    class Input{
+         ExternalId: Own-ID
+         Legal Entity Bpn: BPNL000000000001
+         Address Name: Gate 1
+         Address Type: Additional Address
+         Physical Country: DE
+         Physical City: Berlin
+         Physical Postcode: 12435
+         Street Name: Main Street
+         Street Number: 123
+    }
+   
+    class AdditionalAddress["Additional Address"]{
+        BPNA: BPNA000000000001
+        Name: Gate 1
+        Physical Country: DE
+        Physical City: Berlin
+        Physical Postcode: 12435
+        Street Name: Main Street
+        Street Number: 123
+        Confidence: ...
+    }
+
+    class LegalEntity["Legal Entity"]{
+        BPNL: BPNL000000000001
+    }
+
+    Input --> AdditionalAddress
+    AdditionalAddress --> LegalEntity: belongs to
+```
+
+```mermaid
+classDiagram
+  direction LR
+    class Input{
+         ExternalId: Own-ID
+         Legal Entity Name: Company AG
+         Site Name: Main Site
+         Address Name: Gate 1
+         Address Type: Additional Address
+         Physical Country: DE
+         Physical City: Berlin
+         Physical Postcode: 12435
+         Street Name: Main Street
+         Street Number: 123
+    }
+   
+    class AdditionalAddress["Additional Address"]{
+        BPNA: BPNA000000000001
+        Name: Gate 1
+        Physical Country: DE
+        Physical City: Berlin
+        Physical Postcode: 12435
+        Street Name: Main Street
+        Street Number: 123
+        Confidence: ...
+    }
+
+    class LegalEntity["Legal Entity"]{
+        BPNL: BPNL000000000001
+        Legal Name: Company AG Main Office
+        Legal Address Physical Country: DE
+        Legal Address Physical City: Berlin
+        Legal Address Physical Postcode: 12435
+        Legal Address Street Name: Main Street
+        Legal Address Street Number: 123
+        Legal Entity Confidence: ...
+        Legal Address Confidence: ...
+    }
+
+    class Site{
+        BPNS: BPNS000000000001
+        Site Name: Main Site
+        Main Address Physical Country: DE
+        Main Address Physical City: Berlin
+        Main Address Physical Postcode: 12435
+        Main Address Street Name: Main Street
+        Main Address Street Number: 123
+        Site Confidence: ...
+        Main Address Confidence: ...
+    }
+
+    Input --> AdditionalAddress
+    AdditionalAddress --> Site: belongs to
+    Site --> LegalEntity: belongs to
+```
 
 ## Orchestrator API
 
