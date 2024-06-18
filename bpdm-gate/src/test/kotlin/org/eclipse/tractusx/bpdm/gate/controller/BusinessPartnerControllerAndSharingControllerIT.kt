@@ -22,14 +22,14 @@ package org.eclipse.tractusx.bpdm.gate.controller
 
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
-import org.eclipse.tractusx.bpdm.gate.service.GoldenRecordTaskService
+import org.eclipse.tractusx.bpdm.gate.service.TaskCreationService
+import org.eclipse.tractusx.bpdm.gate.service.TaskResolutionService
 import org.eclipse.tractusx.bpdm.gate.util.MockAndAssertUtils
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerNonVerboseValues
@@ -57,7 +57,8 @@ class BusinessPartnerControllerAndSharingControllerIT @Autowired constructor(
     val testHelpers: DbTestHelpers,
     val assertHelpers: AssertHelpers,
     val gateClient: GateClient,
-    val goldenRecordTaskService: GoldenRecordTaskService,
+    val taskCreationService: TaskCreationService,
+    val taskResolutionService: TaskResolutionService,
     val mockAndAssertUtils: MockAndAssertUtils
 ) {
 
@@ -182,7 +183,7 @@ class BusinessPartnerControllerAndSharingControllerIT @Autowired constructor(
             .isEqualTo(createdSharingState)
 
         // Call Finish Cleaning Method
-        goldenRecordTaskService.resolvePendingTasks()
+        taskResolutionService.resolveTasks()
 
         val cleanedSharingState = listOf(
             SharingStateDto(
@@ -247,7 +248,7 @@ class BusinessPartnerControllerAndSharingControllerIT @Autowired constructor(
             .isEqualTo(createdSharingState)
 
         // Call Finish Cleaning Method
-        goldenRecordTaskService.resolvePendingTasks()
+        taskResolutionService.resolveTasks()
 
         val cleanedSharingState = listOf(
             SharingStateDto(
@@ -271,7 +272,7 @@ class BusinessPartnerControllerAndSharingControllerIT @Autowired constructor(
     fun upsertBusinessPartnersAndShare(partners: List<BusinessPartnerInputRequest>) {
         gateClient.businessParters.upsertBusinessPartnersInput(partners)
         gateClient.sharingState.postSharingStateReady(PostSharingStateReadyRequest(partners.map { it.externalId }))
-        goldenRecordTaskService.createTasksForReadyBusinessPartners()
+        taskCreationService.createTasksForReadyBusinessPartners()
     }
 
 

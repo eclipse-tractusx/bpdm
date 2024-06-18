@@ -17,29 +17,9 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.entity
+package org.eclipse.tractusx.bpdm.gate.exception
 
-import jakarta.persistence.*
-import org.eclipse.tractusx.bpdm.common.model.BaseEntity
-import org.eclipse.tractusx.bpdm.common.model.StageType
-import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
-
-@Entity
-@Table(name = "changelog_entries")
-class ChangelogEntryDb(
-
-    @Column(name = "external_id", nullable = false, updatable = false)
-    val externalId: String,
-
-    @Column(name = "tenant_bpnl", nullable = true)
-    var tenantBpnl: String? = null,
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "changelog_type", nullable = false, updatable = false)
-    val changelogType: ChangelogType,
-
-    @Column(name = "data_type")
-    @Enumerated(EnumType.STRING)
-    var stage: StageType
-
-) : BaseEntity()
+class BpdmMissingSharingStateException(
+    externalId: String,
+    tenantBpnl: String?
+) : RuntimeException("Sharing state with external-id '$externalId' in tenant '$tenantBpnl' is missing.")

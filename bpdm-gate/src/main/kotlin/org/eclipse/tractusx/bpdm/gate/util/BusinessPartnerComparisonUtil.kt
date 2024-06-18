@@ -40,8 +40,6 @@ class BusinessPartnerComparisonUtil {
                 entity.bpnS != persistedBP.bpnS ||
                 entity.bpnA != persistedBP.bpnA ||
                 entity.stage != persistedBP.stage ||
-                entity.parentId != persistedBP.parentId ||
-                entity.parentType != persistedBP.parentType ||
                 entity.identifiers != persistedBP.identifiers ||
                 entity.states != persistedBP.states ||
                 entity.classifications != persistedBP.classifications ||

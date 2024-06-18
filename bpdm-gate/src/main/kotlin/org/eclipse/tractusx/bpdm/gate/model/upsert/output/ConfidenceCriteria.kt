@@ -17,13 +17,15 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.model
+package org.eclipse.tractusx.bpdm.gate.model.upsert.output
 
-import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
-import org.eclipse.tractusx.bpdm.gate.api.model.response.ErrorInfo
+import java.time.LocalDateTime
 
-data class SharingStatusEvaluationResult(
-    val validExternalIds: Collection<String>,
-    val pendingExternalIds: Collection<String>,
-    val errors: Collection<ErrorInfo<BusinessPartnerSharingError>>
+data class ConfidenceCriteria(
+    val sharedByOwner: Boolean,
+    val checkedByExternalDataSource: Boolean,
+    val numberOfSharingMembers: Int,
+    val lastConfidenceCheckAt: LocalDateTime,
+    val nextConfidenceCheckAt: LocalDateTime,
+    val confidenceLevel: Int
 )

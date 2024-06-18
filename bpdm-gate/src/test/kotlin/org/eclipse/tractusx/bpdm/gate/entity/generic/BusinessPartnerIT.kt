@@ -48,10 +48,9 @@ import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.bpdm.common.model.StageType
-import org.eclipse.tractusx.bpdm.gate.entity.AlternativePostalAddressDb
-import org.eclipse.tractusx.bpdm.gate.entity.GeographicCoordinateDb
-import org.eclipse.tractusx.bpdm.gate.entity.PhysicalPostalAddressDb
-import org.eclipse.tractusx.bpdm.gate.entity.StreetDb
+import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
+import org.eclipse.tractusx.bpdm.gate.entity.*
+import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.PostalAddressRepository
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
@@ -77,6 +76,9 @@ internal class BusinessPartnerIT @Autowired constructor(
 ) {
 
     @Autowired
+    lateinit var sharingStateRepository: SharingStateRepository
+
+    @Autowired
     lateinit var businessPartnerRepository: BusinessPartnerRepository
 
     @Autowired
@@ -98,7 +100,10 @@ internal class BusinessPartnerIT @Autowired constructor(
 
     @Test
     fun `test save BusinessPartner`() {
-        val businessPartner = createBusinessPartner()
+        val sharingState = createSharingState()
+        sharingStateRepository.save(sharingState)
+
+        val businessPartner = createBusinessPartner(sharingState)
 
         val savedEntity = businessPartnerRepository.save(businessPartner)
         val foundEntity = businessPartnerRepository.findById(savedEntity.id).get()
@@ -152,12 +157,20 @@ internal class BusinessPartnerIT @Autowired constructor(
         assertEquals("Berlin", foundAlternativePostalAddress?.city)
     }
 
+    private fun createSharingState(): SharingStateDb {
+        return SharingStateDb(
+            externalId = "testExternalId",
+            sharingErrorCode = null,
+            sharingStateType = SharingStateType.Initial
+        )
+    }
 
-    private fun createBusinessPartner(): BusinessPartnerDb {
+
+    private fun createBusinessPartner(sharingState: SharingStateDb): BusinessPartnerDb {
         val postalAddress = createPostalAddress()
 
         return BusinessPartnerDb(
-            externalId = "testExternalId",
+            sharingState = sharingState,
             nameParts = mutableListOf("testNameParts", "testNameParts2", "testNameParts3", "testNameParts4", "testNameParts5"),
             shortName = "testShortName",
             legalName = "testLegalName",
@@ -174,8 +187,6 @@ internal class BusinessPartnerIT @Autowired constructor(
             states = sortedSetOf(createState()),
             classifications = sortedSetOf(createClassification()),
             stage = StageType.Input,
-            parentId = null,
-            parentType = null,
             legalEntityConfidence = null,
             addressConfidence = null,
             siteConfidence = null

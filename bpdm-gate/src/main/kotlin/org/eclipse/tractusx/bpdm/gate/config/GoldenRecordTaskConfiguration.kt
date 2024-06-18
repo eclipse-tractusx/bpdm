@@ -20,8 +20,9 @@
 package org.eclipse.tractusx.bpdm.gate.config
 
 import jakarta.annotation.PostConstruct
-import org.eclipse.tractusx.bpdm.gate.service.GoldenRecordTaskService
 import org.eclipse.tractusx.bpdm.gate.service.GoldenRecordUpdateService
+import org.eclipse.tractusx.bpdm.gate.service.TaskCreationService
+import org.eclipse.tractusx.bpdm.gate.service.TaskResolutionService
 import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.TaskScheduler
 import org.springframework.scheduling.support.CronTrigger
@@ -30,14 +31,15 @@ import org.springframework.scheduling.support.CronTrigger
 class GoldenRecordTaskConfiguration(
     private val configProperties: GoldenRecordTaskConfigProperties,
     private val taskScheduler: TaskScheduler,
-    private val taskService: GoldenRecordTaskService,
+    private val taskCreationService: TaskCreationService,
+    private val taskResolutionService: TaskResolutionService,
     private val updateService: GoldenRecordUpdateService
 ) {
 
     @PostConstruct
     fun scheduleGoldenRecordTasks() {
         taskScheduler.scheduleIfEnabled(
-            { taskService.createTasksForReadyBusinessPartners() },
+            { taskCreationService.createTasksForReadyBusinessPartners() },
             configProperties.creation.fromSharingMember.cron
         )
 
@@ -47,7 +49,7 @@ class GoldenRecordTaskConfiguration(
         )
 
         taskScheduler.scheduleIfEnabled(
-            { taskService.resolvePendingTasks() },
+            { taskResolutionService.resolveTasks() },
             configProperties.check.cron
         )
     }

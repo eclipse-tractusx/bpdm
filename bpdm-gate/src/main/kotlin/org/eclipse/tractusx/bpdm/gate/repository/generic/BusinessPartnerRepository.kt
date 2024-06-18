@@ -20,33 +20,52 @@
 package org.eclipse.tractusx.bpdm.gate.repository.generic
 
 import org.eclipse.tractusx.bpdm.common.model.StageType
+import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.Pageable
-import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.domain.Specification
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
-import org.springframework.data.repository.query.Param
+import org.springframework.data.repository.PagingAndSortingRepository
 import org.springframework.stereotype.Repository
-import java.time.Instant
 
 
 @Repository
-interface BusinessPartnerRepository : JpaRepository<BusinessPartnerDb, Long>, CrudRepository<BusinessPartnerDb, Long> {
+interface BusinessPartnerRepository : PagingAndSortingRepository<BusinessPartnerDb, Long>, CrudRepository<BusinessPartnerDb, Long>,
+    JpaSpecificationExecutor<BusinessPartnerDb> {
 
-    fun findByStageAndExternalIdIn(stage: StageType, externalId: Collection<String>): Set<BusinessPartnerDb>
+    object Specs {
+        /**
+         * Restrict to entries with any one of the given externalIds; ignore if null
+         */
+        fun byExternalIdsIn(externalIds: Collection<String>?) =
+            Specification<BusinessPartnerDb> { root, _, _ ->
+                externalIds?.takeIf { it.isNotEmpty() }?.let {
+                    root
+                        .get<SharingStateDb>(BusinessPartnerDb::sharingState.name)
+                        .get<String>(SharingStateDb::externalId.name).`in`(externalIds)
+                }
+            }
 
-    fun findByStageAndAssociatedOwnerBpnlAndExternalIdIn(stage: StageType,associatedOwnerBpnl: String?, externalId: Collection<String>, pageable: Pageable): Page<BusinessPartnerDb>
 
-    fun findByStageAndAssociatedOwnerBpnl(stage: StageType,associatedOwnerBpnl: String?, pageable: Pageable): Page<BusinessPartnerDb>
+        fun byTenantBpnl(tenantBpnl: String?) =
+            Specification<BusinessPartnerDb> { root, _, builder ->
+                val path = root.get<SharingStateDb>(BusinessPartnerDb::sharingState.name).get<String?>(SharingStateDb::tenantBpnl.name)
+                tenantBpnl?.let {
+                    builder.equal(path, tenantBpnl)
+                } ?: builder.isNull(path)
 
-    @Query("SELECT e FROM BusinessPartnerDb e WHERE e.stage = :stage AND (e.bpnL IN :bpnL OR e.bpnS IN :bpnS OR e.bpnA IN :bpnA)")
-    fun findByStageAndBpnLInOrBpnSInOrBpnAIn(
-        @Param("stage") stage: StageType?,
-        @Param("bpnL") bpnLList: List<String?>?,
-        @Param("bpnS") bpnSList: List<String?>?,
-        @Param("bpnA") bpnAList: List<String?>?
-    ): Set<BusinessPartnerDb>
+            }
+
+        fun byStage(stage: StageType) =
+            Specification<BusinessPartnerDb> { root, _, builder ->
+                val path = root.get<StageType>(BusinessPartnerDb::stage.name)
+                builder.equal(path, stage)
+            }
+
+    }
+
+    fun findBySharingStateInAndStage(sharingStates: Collection<SharingStateDb>, stage: StageType): Set<BusinessPartnerDb>
 
     @Query("SELECT b.stage as stage, COUNT(b.stage) as count FROM BusinessPartnerDb AS b GROUP BY b.stage")
     fun countPerStages(): List<PartnersPerStageCount>

@@ -27,10 +27,7 @@ import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.model.*
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.*
-import org.eclipse.tractusx.bpdm.gate.entity.AlternativePostalAddressDb
-import org.eclipse.tractusx.bpdm.gate.entity.GeographicCoordinateDb
-import org.eclipse.tractusx.bpdm.gate.entity.PhysicalPostalAddressDb
-import org.eclipse.tractusx.bpdm.gate.entity.StreetDb
+import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.eclipse.tractusx.bpdm.gate.entity.generic.*
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidPartnerException
 import org.springframework.stereotype.Service
@@ -40,7 +37,7 @@ class BusinessPartnerMappings {
 
     fun toBusinessPartnerInputDto(entity: BusinessPartnerDb): BusinessPartnerInputDto {
         return BusinessPartnerInputDto(
-            externalId = entity.externalId,
+            externalId = entity.sharingState.externalId,
             nameParts = entity.nameParts,
             identifiers = entity.identifiers.map(::toIdentifierDto),
             states = entity.states.map(::toStateDto),
@@ -56,7 +53,7 @@ class BusinessPartnerMappings {
 
     fun toBusinessPartnerOutputDto(entity: BusinessPartnerDb): BusinessPartnerOutputDto {
         return BusinessPartnerOutputDto(
-            externalId = entity.externalId,
+            externalId = entity.sharingState.externalId,
             nameParts = entity.nameParts,
             identifiers = entity.identifiers.map(::toIdentifierDto),
             states = entity.states.map(::toStateDto),
@@ -70,10 +67,9 @@ class BusinessPartnerMappings {
         )
     }
 
-    fun toBusinessPartnerInput(dto: BusinessPartnerInputRequest, ownerBpnl: String?): BusinessPartnerDb {
+    fun toBusinessPartnerInput(dto: BusinessPartnerInputRequest, sharingState: SharingStateDb): BusinessPartnerDb {
         return BusinessPartnerDb(
             stage = StageType.Input,
-            externalId = dto.externalId,
             nameParts = dto.nameParts.toMutableList(),
             roles = dto.roles.toSortedSet(),
             identifiers = dto.identifiers.mapNotNull{toIdentifier(it, BusinessPartnerType.GENERIC)}.toSortedSet(),
@@ -95,7 +91,7 @@ class BusinessPartnerMappings {
             legalEntityConfidence = null,
             siteConfidence = null,
             addressConfidence = null,
-            associatedOwnerBpnl = ownerBpnl
+            sharingState = sharingState
         )
     }
 
@@ -134,13 +130,13 @@ class BusinessPartnerMappings {
                 BusinessPartnerDb::class,
                 BusinessPartnerOutputDto::class,
                 BusinessPartnerDb::bpnL,
-                entity.externalId
+                entity.sharingState.externalId
             ),
             legalName = entity.legalName,
             shortName = entity.shortName,
             legalForm = entity.legalForm,
             confidenceCriteria = entity.legalEntityConfidence?.let { toConfidenceDto(it) } ?: throw BpdmInvalidPartnerException(
-                entity.externalId,
+                entity.sharingState.externalId,
                 "Missing address confidence criteria"
             ),
             states = toStateDtos(entity.states, BusinessPartnerType.LEGAL_ENTITY)
@@ -155,7 +151,7 @@ class BusinessPartnerMappings {
                     siteBpn = entity.bpnS!!,
                     name = entity.siteName,
                     confidenceCriteria = entity.siteConfidence?.let { toConfidenceDto(it) } ?: throw BpdmInvalidPartnerException(
-                        entity.externalId,
+                        entity.sharingState.externalId,
                         "Missing site confidence criteria"
                     ),
                     states = toStateDtos(entity.states, BusinessPartnerType.SITE)
@@ -169,14 +165,14 @@ class BusinessPartnerMappings {
                 BusinessPartnerDb::class,
                 BusinessPartnerOutputDto::class,
                 BusinessPartnerDb::bpnA,
-                entity.externalId
+                entity.sharingState.externalId
             ),
             entity.addressName,
             addressType = entity.postalAddress.addressType,
             physicalPostalAddress = entity.postalAddress.physicalPostalAddress?.toPhysicalPostalAddress() ?: PhysicalPostalAddressDto(),
             alternativePostalAddress = entity.postalAddress.alternativePostalAddress?.toAlternativePostalAddressDto() ?: AlternativePostalAddressDto(),
             confidenceCriteria = entity.addressConfidence?.let { toConfidenceDto(it) } ?: throw BpdmInvalidPartnerException(
-                entity.externalId,
+                entity.sharingState.externalId,
                 "Missing legal entity confidence criteria"
             ),
             states = toStateDtos(entity.states, BusinessPartnerType.ADDRESS)
@@ -228,19 +224,6 @@ class BusinessPartnerMappings {
             door = dto.door
         )
 
-
-    private fun toAlternativePostalAddressDto(entity: AlternativePostalAddressDb) =
-        AlternativePostalAddressDto(
-            geographicCoordinates = entity.geographicCoordinates?.let(::toGeoCoordinateDto),
-            country = entity.country,
-            administrativeAreaLevel1 = entity.administrativeAreaLevel1,
-            postalCode = entity.postalCode,
-            city = entity.city,
-            deliveryServiceType = entity.deliveryServiceType,
-            deliveryServiceQualifier = entity.deliveryServiceQualifier,
-            deliveryServiceNumber = entity.deliveryServiceNumber
-        )
-
     private fun toAlternativePostalAddress(dto: AlternativePostalAddressDto) =
         AlternativePostalAddressDb(
             geographicCoordinates = dto.geographicCoordinates?.let(::toGeographicCoordinate),
@@ -251,20 +234,6 @@ class BusinessPartnerMappings {
             deliveryServiceType = dto.deliveryServiceType,
             deliveryServiceQualifier = dto.deliveryServiceQualifier,
             deliveryServiceNumber = dto.deliveryServiceNumber
-        )
-
-
-    private fun toStreetDto(entity: StreetDb) =
-        StreetDto(
-            name = entity.name,
-            houseNumber = entity.houseNumber,
-            houseNumberSupplement = entity.houseNumberSupplement,
-            milestone = entity.milestone,
-            direction = entity.direction,
-            namePrefix = entity.namePrefix,
-            additionalNamePrefix = entity.additionalNamePrefix,
-            nameSuffix = entity.nameSuffix,
-            additionalNameSuffix = entity.additionalNameSuffix
         )
 
 
@@ -299,9 +268,6 @@ class BusinessPartnerMappings {
 
     private fun toState(dto: BusinessPartnerStateDto, businessPartnerType: BusinessPartnerType) =
         dto.type?.let { StateDb(type = it, validFrom = dto.validFrom, validTo = dto.validTo, businessPartnerTyp = businessPartnerType) }
-
-    private fun toGeoCoordinateDto(entity: GeographicCoordinateDb) =
-        GeoCoordinateDto(latitude = entity.latitude, longitude = entity.longitude, altitude = entity.altitude)
 
     private fun toGeographicCoordinate(dto: GeoCoordinateDto) =
         GeographicCoordinateDb(latitude = dto.latitude, longitude = dto.longitude, altitude = dto.altitude)

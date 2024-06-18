@@ -39,8 +39,6 @@ class BusinessPartnerCopyUtil {
             bpnL = fromPartner.bpnL
             bpnS = fromPartner.bpnS
             bpnA = fromPartner.bpnA
-            parentId = fromPartner.parentId
-            parentType = fromPartner.parentType
             legalEntityConfidence = fromPartner.legalEntityConfidence
             siteConfidence = fromPartner.siteConfidence
             addressConfidence = fromPartner.addressConfidence

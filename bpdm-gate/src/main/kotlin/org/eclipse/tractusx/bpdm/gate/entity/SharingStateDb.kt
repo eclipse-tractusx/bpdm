@@ -33,8 +33,8 @@ class SharingStateDb(
     @Column(name = "external_id", nullable = false)
     var externalId: String,
 
-    @Column(name = "associated_owner_bpnl", nullable = true)
-    var associatedOwnerBpnl: String? = null,
+    @Column(name = "tenant_bpnl", nullable = true)
+    var tenantBpnl: String? = null,
 
     @Enumerated(EnumType.STRING)
     @Column(name = "sharing_state_type", nullable = false)
