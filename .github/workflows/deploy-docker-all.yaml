@@ -17,55 +17,40 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################################
 
-name: Build All - Docker images (SemVer)
+name: Deploy - All Docker Images
 on:
+  workflow_dispatch:
   push:
-    # only execute when source specific files or workflows change
     paths:
-      - pom.xml
-      - bpdm-pool/**
-      - bpdm-gate/**
-      - bpdm-common/**
-      - bpdm-gate-api/**
-      - bpdm-bridge-dummy/**
-      - bpdm-cleaning-service-dummy/**
-      - bpdm-orchestrator/**
-      - .github/workflows/**
-    tags:
-      - 'v*.*.*'
-      - 'v*.*.*-*'
+      - 'pom.xml'
+      - 'bpdm-**'
     branches:
       - main
-      - rc/**
 jobs:
   build-docker-pool:
-    uses: ./.github/workflows/build-docker.yaml
+    uses: ./.github/workflows/deploy-docker.yaml
     secrets: inherit
     with:
       imageName: bpdm-pool
       dockerfilePath: ./docker/pool
-      push: ${{ github.event_name != 'pull_request' }}
 
   build-docker-gate:
-    uses: ./.github/workflows/build-docker.yaml
+    uses: ./.github/workflows/deploy-docker.yaml
     secrets: inherit
     with:
       imageName: bpdm-gate
       dockerfilePath: ./docker/gate
-      push: ${{ github.event_name != 'pull_request' }}
 
   build-docker-cleaning-service:
-    uses: ./.github/workflows/build-docker.yaml
+    uses: ./.github/workflows/deploy-docker.yaml
     secrets: inherit
     with:
       imageName: bpdm-cleaning-service-dummy
       dockerfilePath: ./docker/cleaning-service-dummy
-      push: ${{ github.event_name != 'pull_request' }}
 
   build-docker-orchestrator:
-    uses: ./.github/workflows/build-docker.yaml
+    uses: ./.github/workflows/deploy-docker.yaml
     secrets: inherit
     with:
       imageName: bpdm-orchestrator
       dockerfilePath: ./docker/orchestrator
-      push: ${{ github.event_name != 'pull_request' }}
