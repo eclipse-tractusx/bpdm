@@ -2,6 +2,21 @@
 
 Documentation here concerns developers who want to contribute to this repository.
 
+## Apps and Charts
+
+The CICD pipeline tests new code contributions by deploying them in the current version of the BPDM chart.
+In this way we can perform system tests in an environment that get close to actual productive environments as possible.
+As a result, the BPDM charts always should be up-to-date with the newest code contributions.
+If a breaking change of an app feature would lead to incompatibility with the current charts, the charts need to be updated.
+You can say that changing the chart accordingly is also part of any app feature or fix. This has the following advantages and disadvantages.
+
+Advantages:
+- The whole code base is always up-to-date and compatible with each other
+- Allows for more sophisticated testing leading to lower errors on the main branch
+
+Disadvantages:
+- Changes in the apps have direct impact on the charts (Leading to potentially bigger and more complicated pull requests)
+
 ## License Check
 
 Licenses of all maven dependencies need to be approved by eclipse.
