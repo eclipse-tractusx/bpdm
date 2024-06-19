@@ -51,23 +51,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - uses: dorny/paths-filter@v3
-        id: changes
-        with:
-          filters: |
-            apps:
-              - 'pom.xml'
-              - 'bpdm-**'
-
       - name: Extract Maven Project Version
-        if: steps.changes.outputs.apps == 'true'
         id: pomVersion
         run: |
           POM_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' -B --non-recursive exec:exec)
           echo "version=$POM_VERSION" >> $GITHUB_OUTPUT
 
       - name: Parse semantic version from string
-        if: steps.changes.outputs.apps == 'true'
         id: semVer
         uses: release-kit/semver@v2
         with:
@@ -76,15 +66,16 @@ jobs:
       - name: Create Docker Tags
         id: dockerTags
         run: |
+          FULL_IMAGE_NAME="${{ env.IMAGE_NAMESPACE }}/${{ env.IMAGE_NAME }}"
           SUFFIX="${{ steps.semVer.outputs.prerelease == 'SNAPSHOT' && '-SNAPSHOT' || '' }}"
-          LATEST="latest$SUFFIX"
           MAJOR="${{ steps.semVer.outputs.major }}"
           MINOR="${MAJOR}.${{ steps.semVer.outputs.minor }}"
           PATCH="${MINOR}.${{ steps.semVer.outputs.patch }}"
-          MAJOR_VER="${MAJOR}${SUFFIX}"
-          MINOR_VER="${MINOR}${SUFFIX}"
-          PATCH_VER="${PATCH}${SUFFIX}"
-          echo "tags=${LATEST},${MAJOR_VER},${MINOR_VER},${PATCH_VER}" >> $GITHUB_OUTPUT
+          LATEST_TAG="${FULL_IMAGE_NAME}:latest${SUFFIX}"
+          MAJOR_TAG="${FULL_IMAGE_NAME}:${MAJOR}${SUFFIX}"
+          MINOR_TAG="${FULL_IMAGE_NAME}:${MINOR}${SUFFIX}"
+          PATCH_TAG="${FULL_IMAGE_NAME}:${PATCH}${SUFFIX}"
+          echo "tags=${LATEST_TAG},${MAJOR_TAG},${MINOR_TAG},${PATCH_TAG}" >> $GITHUB_OUTPUT
 
       - name: DockerHub login
         uses: docker/login-action@v3
@@ -93,7 +84,6 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
       - name: Build and push
-        if: steps.changes.outputs.apps == 'true'
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -102,7 +92,6 @@ jobs:
           tags: ${{ steps.dockerTags.outputs.tags }}
 
       - name: Update Docker Hub description
-        if: steps.changes.outputs.apps == 'true'
         uses: peter-evans/dockerhub-description@v4
         with:
           username: ${{ secrets.DOCKER_HUB_USER }}
