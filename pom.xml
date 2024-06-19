@@ -27,7 +27,7 @@
     <artifactId>bpdm-parent</artifactId>
     <name>Business Partner Data Management Parent</name>
     <description>Parent pom of Business Partner Data Management</description>
-    <version>6.0.1</version>
+    <version>6.0.2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <parent>
