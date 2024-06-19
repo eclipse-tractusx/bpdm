@@ -547,14 +547,13 @@ class AddressControllerIT @Autowired constructor(
     private fun assertAddressesAreEqual(actuals: Collection<LogisticAddressVerboseDto>, expected: Collection<LogisticAddressVerboseDto>) {
         actuals.forEach { assertThat(it.bpna).matches(testHelpers.bpnAPattern) }
 
-            assertHelpers.assertRecursively(actuals)
-                .ignoringFields(
+        assertHelpers.assertRecursively(actuals).ignoringFields(
                     LogisticAddressVerboseDto::bpna.name,
                     LogisticAddressVerboseDto::bpnLegalEntity.name,
-                    LogisticAddressVerboseDto::bpnSite.name
-                )
-                .isEqualTo(expected)
-
+            LogisticAddressVerboseDto::bpnSite.name,
+            LogisticAddressVerboseDto::createdAt.name,
+            LogisticAddressVerboseDto::updatedAt.name
+        ).isEqualTo(expected)
     }
 
     private fun requestAddress(bpnAddress: String) = poolClient.addresses.getAddress(bpnAddress)
