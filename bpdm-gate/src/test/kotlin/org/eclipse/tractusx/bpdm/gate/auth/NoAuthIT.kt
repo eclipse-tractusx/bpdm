@@ -59,6 +59,9 @@ class NoAuthIT @Autowired constructor(
             getStage = AuthExpectationType.Unauthorized,
             getAddressType = AuthExpectationType.Unauthorized,
             getConfidenceCriteria = AuthExpectationType.Unauthorized
+        ),
+        uploadPartner = UploadPartnerAuthExpections(
+            postInput = AuthExpectationType.Unauthorized
         )
     )
 )

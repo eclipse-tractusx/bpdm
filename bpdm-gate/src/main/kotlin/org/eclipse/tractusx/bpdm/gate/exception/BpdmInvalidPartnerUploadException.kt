@@ -17,19 +17,8 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.api.client
+package org.eclipse.tractusx.bpdm.gate.exception
 
-import org.eclipse.tractusx.bpdm.gate.api.StatsApi
-
-interface GateClient {
-
-    val businessParters: BusinessPartnerApiClient
-
-    val changelog: ChangelogApiClient
-
-    val sharingState: SharingStateApiClient
-
-    val stats: StatsApiClient
-
-    val partnerUpload: PartnerUploadApiClient
-}
+class BpdmInvalidPartnerUploadException(
+    val errors: List<String>
+) : RuntimeException()

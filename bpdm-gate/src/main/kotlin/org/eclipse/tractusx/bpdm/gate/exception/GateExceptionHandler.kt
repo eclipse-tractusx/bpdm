@@ -20,7 +20,25 @@
 package org.eclipse.tractusx.bpdm.gate.exception
 
 import org.eclipse.tractusx.bpdm.common.exception.BpdmExceptionHandler
+import org.eclipse.tractusx.bpdm.gate.api.model.response.PartnerUploadErrorResponse
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ControllerAdvice
+import org.springframework.web.bind.annotation.ExceptionHandler
+import org.springframework.web.context.request.WebRequest
+import java.time.Instant
 
 @ControllerAdvice
-class GateExceptionHandler : BpdmExceptionHandler()
+class GateExceptionHandler : BpdmExceptionHandler() {
+
+    @ExceptionHandler(BpdmInvalidPartnerUploadException::class)
+    fun handleInvalidPartnerUploadException(ex:BpdmInvalidPartnerUploadException, request: WebRequest): ResponseEntity<PartnerUploadErrorResponse> {
+        val errorResponse = PartnerUploadErrorResponse(
+            timestamp = Instant.now(),
+            status = HttpStatus.BAD_REQUEST,
+            error = ex.errors,
+            path = request.getDescription(false)
+        )
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse)
+    }
+}

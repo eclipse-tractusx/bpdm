@@ -61,6 +61,9 @@ class AuthInputManagerIT @Autowired constructor(
             getStage = AuthExpectationType.Authorized,
             getAddressType = AuthExpectationType.Authorized,
             getConfidenceCriteria = AuthExpectationType.Authorized
+        ),
+        uploadPartner = UploadPartnerAuthExpections(
+            postInput = AuthExpectationType.Authorized
         )
     )
 ) {

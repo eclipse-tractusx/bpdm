@@ -123,6 +123,8 @@ bpdm:
       writeSharingState: write_sharing_state
       # Name of the permission to read business partner statistics
       read_stats: read_stats
+      # Name of the permission to upload business partner entries for business partner input data
+      uploadInputPartner: upload_input_partner
   datasource:
     # Host name of the used datasource
     host: localhost
@@ -193,6 +195,10 @@ spring:
               batch_size: 16
               order_inserts: true
               order_updates: true
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
 springdoc:
     api-docs:
       # Generate Open-API document
@@ -206,6 +212,7 @@ springdoc:
         path: /ui/swagger-ui
       # Show validation specific information for properties (pattern, minimum, maximum, etc...)
         show-common-extensions: true
+
 
 
 

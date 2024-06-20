@@ -32,7 +32,8 @@ data class PermissionConfigProperties(
     val readOutputChangelog: String = "read_output_changelog",
     val readSharingState: String = "read_sharing_state",
     val writeSharingState: String = "write_sharing_state",
-    val readStats: String = "read_stats"
+    val readStats: String = "read_stats",
+    val uploadInputPartner: String = "upload_input_partner"
 ) {
     companion object {
         const val PREFIX = "bpdm.security.permissions"
@@ -49,5 +50,6 @@ data class PermissionConfigProperties(
         const val READ_SHARING_STATE = "@$BEAN_QUALIFIER.getReadSharingState()"
         const val WRITE_SHARING_STATE = "@$BEAN_QUALIFIER.getWriteSharingState()"
         const val READ_STATS = "@$BEAN_QUALIFIER.getReadStats()"
+        const val UPLOAD_INPUT_PARTNER = "@$BEAN_QUALIFIER.getUploadInputPartner()"
     }
 }
