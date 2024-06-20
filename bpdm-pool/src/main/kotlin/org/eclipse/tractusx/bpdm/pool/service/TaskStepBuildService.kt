@@ -23,15 +23,7 @@ import com.neovisionaries.i18n.CountryCode
 import jakarta.transaction.Transactional
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto
-import org.eclipse.tractusx.bpdm.pool.api.model.AddressStateDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityIdentifierDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityStateDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressDto
-import org.eclipse.tractusx.bpdm.pool.api.model.SiteDto
-import org.eclipse.tractusx.bpdm.pool.api.model.SiteStateDto
-import org.eclipse.tractusx.bpdm.pool.api.model.StreetDto
+import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.orchestrator.api.model.*
@@ -177,8 +169,8 @@ class TaskStepBuildService(
 
     private fun updateLegalEntity(
         bpnL: String,
-        legalEntityDto: LegalEntityDto,
-        legalAddressDto: LogisticAddressDto
+        legalEntityDto: LegalEntityPoolDto,
+        legalAddressDto: LogisticAddressPoolDto
     ): LegalEntityBpns {
         val updateRequest = LegalEntityPartnerUpdateRequest(
             bpnl = bpnL,
@@ -245,7 +237,7 @@ class TaskStepBuildService(
     }
 
     private fun createSite(
-        poolSite: SiteDto,
+        poolSite: SitePoolDto,
         legalEntityBpn: String,
         isSiteMainAndLegalAddress: Boolean
     ): SiteBpns {
@@ -277,7 +269,7 @@ class TaskStepBuildService(
 
     private fun updateSite(
         bpnS: String,
-        poolSite: SiteDto,
+        poolSite: SitePoolDto,
     ): SiteBpns {
         val updateRequest = SitePartnerUpdateRequest(
             bpns = bpnS,
@@ -339,7 +331,7 @@ class TaskStepBuildService(
     }
 
     private fun createLogisticAddress(
-        poolAddress: LogisticAddressDto,
+        poolAddress: LogisticAddressPoolDto,
         legalEntityBpn: String,
         siteBpn: String?
     ): String {
@@ -360,7 +352,7 @@ class TaskStepBuildService(
 
     private fun updateLogisticAddress(
         bpnA: String,
-        poolAddress: LogisticAddressDto,
+        poolAddress: LogisticAddressPoolDto,
     ): String {
         val addressUpdateRequest = AddressPartnerUpdateRequest(
             bpna = bpnA,
@@ -440,7 +432,8 @@ class TaskStepBuildService(
                             nameSuffix,
                             additionalNameSuffix
                         )
-                }
+                },
+                taxJurisdictionCode = taxJurisdictionCode
             )
         }
 

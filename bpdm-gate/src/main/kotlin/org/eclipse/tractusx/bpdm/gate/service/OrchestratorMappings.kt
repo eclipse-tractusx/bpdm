@@ -116,7 +116,8 @@ class OrchestratorMappings(
                         industrialZone = industrialZone,
                         building = building,
                         floor = floor,
-                        door = door
+                        door = door,
+                        taxJurisdictionCode = taxJurisdictionCode
                     )
                 }
             } ?: PhysicalAddress.empty,
@@ -272,7 +273,8 @@ class OrchestratorMappings(
             industrialZone = dto.industrialZone,
             building = dto.building,
             floor = dto.floor,
-            door = dto.door
+            door = dto.door,
+            taxJurisdictionCode = dto.taxJurisdictionCode
         )
 
     private fun toAlternativePostalAddress(dto: AlternativeAddress) =

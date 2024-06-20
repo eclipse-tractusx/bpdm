@@ -180,7 +180,8 @@ class BusinessPartnerRequestFactory(
                 industrialZone = "Industrial Zone $seed",
                 building = "Building $seed",
                 floor = "Floor $seed",
-                door = "Door $seed"
+                door = "Door $seed",
+                taxJurisdictionCode = "Tax Jurisdiction Code $seed"
             ),
             alternativePostalAddress = AlternativePostalAddressDto(
                 geographicCoordinates = GeoCoordinateDto(longitude = random.nextFloat(), latitude = random.nextFloat(), altitude = random.nextFloat()),

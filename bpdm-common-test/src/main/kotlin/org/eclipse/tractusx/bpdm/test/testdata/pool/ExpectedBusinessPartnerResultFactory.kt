@@ -264,7 +264,18 @@ class ExpectedBusinessPartnerResultFactory(
                 geographicCoordinates = geographicCoordinates,
                 countryVerbose = TypeKeyNameVerboseDto(country, country.getName()),
                 administrativeAreaLevel1Verbose = administrativeAreaLevel1?.let { mapToExpectedResult(it) },
-                administrativeAreaLevel2, administrativeAreaLevel3, postalCode, city, district, street, companyPostalCode, industrialZone, building, floor, door
+                administrativeAreaLevel2,
+                administrativeAreaLevel3,
+                postalCode,
+                city,
+                district,
+                street,
+                companyPostalCode,
+                industrialZone,
+                building,
+                floor,
+                door,
+                taxJurisdictionCode
             )
         }
     }

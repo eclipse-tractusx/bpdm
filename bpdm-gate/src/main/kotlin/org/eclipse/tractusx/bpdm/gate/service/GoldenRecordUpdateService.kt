@@ -218,7 +218,8 @@ class GoldenRecordUpdateService(
             building = building,
             floor = floor,
             door = door,
-            street = street?.toUpsertData()
+            street = street?.toUpsertData(),
+            taxJurisdictionCode = taxJurisdictionCode
         )
     }
 
@@ -345,7 +346,8 @@ class GoldenRecordUpdateService(
             industrialZone = industrialZone,
             building = building,
             floor = floor,
-            door = door
+            door = door,
+            taxJurisdictionCode = taxJurisdictionCode
         )
 
     private fun StreetDto.toEntity() =

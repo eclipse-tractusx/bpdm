@@ -634,7 +634,8 @@ class BusinessPartnerBuildService(
                 industrialZone = physicalAddress.industrialZone,
                 building = physicalAddress.building,
                 floor = physicalAddress.floor,
-                door = physicalAddress.door
+                door = physicalAddress.door,
+                taxJurisdictionCode = physicalAddress.taxJurisdictionCode
             )
         }
 

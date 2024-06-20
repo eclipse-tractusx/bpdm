@@ -116,13 +116,15 @@ data class PhysicalAddress(
     val industrialZone: String?,
     val building: String?,
     val floor: String?,
-    val door: String?
+    val door: String?,
+    val taxJurisdictionCode: String?
 ){
     companion object {
         val empty: PhysicalAddress = PhysicalAddress(
             GeoCoordinate.empty, null, null, null,
             null, null, null, null, Street.empty, null, null,
-            null, null, null )
+            null, null, null, null
+        )
     }
 }
 

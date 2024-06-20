@@ -127,4 +127,9 @@ class PhysicalPostalAddressDb(
     @Column(name = "phy_door")
     val door: String? = null,
 
-    )
+    /**
+     * The tax jurisdiction code defines the tax authority to which taxes must be paid
+     */
+    @Column(name = "phy_tax_jurisdiction")
+    val taxJurisdictionCode: String? = null
+)

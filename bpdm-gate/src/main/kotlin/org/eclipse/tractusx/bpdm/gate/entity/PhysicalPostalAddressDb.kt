@@ -113,5 +113,11 @@ data class PhysicalPostalAddressDb(
      * Describes the door/room/suite on the respective floor the delivery shall take place
      */
     @Column(name = "phy_door")
-    val door: String?
+    val door: String?,
+
+    /**
+     * The tax jurisdiction code defines the tax authority to which taxes must be paid
+     */
+    @Column(name = "phy_tax_jurisdiction")
+    val taxJurisdictionCode: String? = null
 )
