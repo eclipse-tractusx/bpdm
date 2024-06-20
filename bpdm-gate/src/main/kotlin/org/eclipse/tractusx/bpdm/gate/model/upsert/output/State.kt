@@ -17,29 +17,15 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.entity
+package org.eclipse.tractusx.bpdm.gate.model.upsert.output
 
-import jakarta.persistence.*
-import org.eclipse.tractusx.bpdm.common.model.BaseEntity
-import org.eclipse.tractusx.bpdm.common.model.StageType
-import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
+import java.time.LocalDateTime
 
-@Entity
-@Table(name = "changelog_entries")
-class ChangelogEntryDb(
-
-    @Column(name = "external_id", nullable = false, updatable = false)
-    val externalId: String,
-
-    @Column(name = "tenant_bpnl", nullable = true)
-    var tenantBpnl: String? = null,
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "changelog_type", nullable = false, updatable = false)
-    val changelogType: ChangelogType,
-
-    @Column(name = "data_type")
-    @Enumerated(EnumType.STRING)
-    var stage: StageType
-
-) : BaseEntity()
+data class State(
+    val validFrom: LocalDateTime?,
+    val validTo: LocalDateTime?,
+    val type: BusinessStateType,
+    val businessPartnerType: BusinessPartnerType
+)

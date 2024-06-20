@@ -25,17 +25,17 @@ import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
-import org.eclipse.tractusx.bpdm.gate.service.GoldenRecordTaskService
+import org.eclipse.tractusx.bpdm.gate.service.TaskCreationService
 import org.eclipse.tractusx.bpdm.gate.util.MockAndAssertUtils
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerNonVerboseValues
 import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerVerboseValues
 import org.eclipse.tractusx.bpdm.test.util.AssertHelpers
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -58,7 +58,7 @@ class PartnerUploadControllerIT @Autowired constructor(
     val testHelpers: DbTestHelpers,
     val assertHelpers: AssertHelpers,
     val gateClient: GateClient,
-    val goldenRecordTaskService: GoldenRecordTaskService,
+    val taskCreationService: TaskCreationService,
     val mockAndAssertUtils: MockAndAssertUtils
 ){
 
@@ -183,7 +183,7 @@ class PartnerUploadControllerIT @Autowired constructor(
 
     private fun uploadBusinessPartnerRecordAndShare(file: MockMultipartFile) {
         gateClient.partnerUpload.uploadPartnerCsvFile(file)
-        goldenRecordTaskService.createTasksForReadyBusinessPartners()
+        taskCreationService.createTasksForReadyBusinessPartners()
     }
 
     private fun BusinessPartnerInputRequest.fastCopy(externalId: String, shortName: String) =

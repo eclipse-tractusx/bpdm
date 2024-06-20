@@ -20,18 +20,16 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
-
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.exception.ChangeLogOutputError
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogDto
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
-import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byAssociatedOwnerBpnl
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byCreatedAtGreaterThan
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byExternalIdsIn
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byStage
-import org.eclipse.tractusx.bpdm.gate.util.getCurrentUserBpn
+import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byTenantBpnl
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
@@ -44,7 +42,7 @@ class ChangelogService(private val changelogRepository: ChangelogRepository) {
 
     fun getChangeLogEntries(
         externalIds: Set<String>?,
-        ownerBpnl: String?,
+        tenantBpnl: String?,
         createdAt: Instant?,
         stage: StageType?,
         page: Int,
@@ -59,12 +57,12 @@ class ChangelogService(private val changelogRepository: ChangelogRepository) {
             byExternalIdsIn(externalIds = nonNullExternalIds),
             byCreatedAtGreaterThan(createdAt = createdAt),
             byStage(stage),
-            byAssociatedOwnerBpnl(ownerBpnl)
+            byTenantBpnl(tenantBpnl)
         )
 
         val pageable = PageRequest.of(page, pageSize)
         val pageResponse = changelogRepository.findAll(spec, pageable)
-        val setDistinctList = changelogRepository.findDistinctByExternalIdInAndAssociatedOwnerBpnl(nonNullExternalIds, ownerBpnl).map { it.externalId }
+        val setDistinctList = changelogRepository.findDistinctByExternalIdInAndTenantBpnl(nonNullExternalIds, tenantBpnl).map { it.externalId }
 
 
         val pageDto = pageResponse.map {

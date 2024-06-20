@@ -31,8 +31,8 @@ import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidStateException
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmMissingPartnerException
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
-import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository.Specs.byAssociatedOwnerBpnl
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository.Specs.byExternalIdsIn
+import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository.Specs.byTenantBpnl
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
@@ -56,7 +56,7 @@ class SharingStateService(
         logger.info { "findSharingStates() called with $paginationRequest // $externalIds" }
 
         val pageRequest = PageRequest.of(paginationRequest.page, paginationRequest.size)
-        val spec = Specification.allOf(byExternalIdsIn(externalIds), byAssociatedOwnerBpnl(ownerBpnl))
+        val spec = Specification.allOf(byExternalIdsIn(externalIds), byTenantBpnl(ownerBpnl))
         val sharingStatePage = stateRepository.findAll(spec, pageRequest)
 
         return sharingStatePage.toPageDto {
@@ -71,37 +71,12 @@ class SharingStateService(
         }
     }
 
-    fun setInitial(sharingStateIds: List<String>, ownerBpnl: String?): List<SharingStateDb> {
-        val sharingStates = getOrCreate(sharingStateIds, ownerBpnl)
-        return sharingStates.map { setInitial(it) }
-    }
-
-
-
-    fun setSuccess(successRequests: List<SuccessRequest>, ownerBpnl: String?): List<SharingStateDb> {
-        val sharingStates = getOrCreate(successRequests.map { it.externalId }, ownerBpnl)
-        return sharingStates
-            .zip(successRequests)
-            .map { (sharingState, request) -> setSuccess(sharingState, request.startTimeOverwrite) }
-    }
-
-    fun setPending(pendingRequests: List<PendingRequest>, ownerBpnl: String?): List<SharingStateDb> {
-        val sharingStates = getOrCreate(pendingRequests.map { it.externalId }, ownerBpnl)
-        return sharingStates
-            .zip(pendingRequests)
-            .map { (sharingState, request) -> setPending(sharingState, request.taskId, request.startTimeOverwrite) }
-    }
-
-    fun setError(errorRequests: List<ErrorRequest>, ownerBpnl: String?): List<SharingStateDb> {
-        val sharingStates = getOrCreate(errorRequests.map { it.externalId }, ownerBpnl)
-
-        return sharingStates
-            .zip(errorRequests)
-            .map { (sharingState, request) -> setError(sharingState, request.errorCode, request.errorMessage, request.startTimeOverwrite) }
+    fun getOrCreateStates(sharingStateIds: List<String>, ownerBpnl: String?): List<SharingStateDb> {
+        return getOrCreate(sharingStateIds, ownerBpnl)
     }
 
     fun setReady(externalIds: List<String>, ownerBpnl: String?): List<SharingStateDb> {
-        val existingSharingStates = stateRepository.findByExternalIdInAndAssociatedOwnerBpnl(externalIds, ownerBpnl)
+        val existingSharingStates = stateRepository.findByExternalIdInAndTenantBpnl(externalIds, ownerBpnl)
         val existingIds = existingSharingStates.map { it.externalId }.toSet()
         val missingIds = externalIds.minus(existingIds)
 
@@ -120,7 +95,7 @@ class SharingStateService(
         return correctStates.map { setReady(it) }
     }
 
-    private fun setInitial(sharingState: SharingStateDb): SharingStateDb {
+    fun setInitial(sharingState: SharingStateDb): SharingStateDb {
         sharingState.sharingStateType =
                 //If new business partner data should be immediately ready to be shared our initial state is ready instead
             if (goldenRecordTaskConfigProperties.creation.fromSharingMember.startsAsReady)
@@ -135,7 +110,7 @@ class SharingStateService(
         return stateRepository.save(sharingState)
     }
 
-    private fun setSuccess(sharingState: SharingStateDb, startTimeOverwrite: LocalDateTime? = null): SharingStateDb {
+    fun setSuccess(sharingState: SharingStateDb, startTimeOverwrite: LocalDateTime? = null): SharingStateDb {
 
         sharingState.sharingStateType = SharingStateType.Success
         sharingState.sharingErrorCode = null
@@ -145,7 +120,7 @@ class SharingStateService(
         return stateRepository.save(sharingState)
     }
 
-    private fun setPending(sharingState: SharingStateDb, taskId: String, startTimeOverwrite: LocalDateTime? = null): SharingStateDb {
+    fun setPending(sharingState: SharingStateDb, taskId: String, startTimeOverwrite: LocalDateTime? = null): SharingStateDb {
         sharingState.sharingStateType = SharingStateType.Pending
         sharingState.sharingErrorCode = null
         sharingState.sharingErrorMessage = null
@@ -155,7 +130,7 @@ class SharingStateService(
         return stateRepository.save(sharingState)
     }
 
-    private fun setError(
+    fun setError(
         sharingState: SharingStateDb,
         sharingErrorCode: BusinessPartnerSharingError,
         sharingErrorMessage: String? = null,
@@ -183,18 +158,20 @@ class SharingStateService(
 
 
     private fun getOrCreate(externalIds: List<String>, ownerBpnl: String?): List<SharingStateDb> {
-        val sharingStates = stateRepository.findByExternalIdInAndAssociatedOwnerBpnl(externalIds, ownerBpnl)
+        val sharingStates = stateRepository.findByExternalIdInAndTenantBpnl(externalIds, ownerBpnl)
         val sharingStatesByExternalId = sharingStates.associateBy { it.externalId }
 
         return externalIds.map { externalId ->
             sharingStatesByExternalId[externalId]
-                ?: SharingStateDb(
-                    externalId,
-                    sharingStateType = SharingStateType.Ready,
-                    sharingErrorCode = null,
-                    sharingErrorMessage = null,
-                    sharingProcessStarted = null,
-                    associatedOwnerBpnl = ownerBpnl
+                ?: setInitial(
+                    SharingStateDb(
+                        externalId,
+                        sharingStateType = SharingStateType.Ready,
+                        sharingErrorCode = null,
+                        sharingErrorMessage = null,
+                        sharingProcessStarted = null,
+                        tenantBpnl = ownerBpnl
+                    )
                 )
         }
     }

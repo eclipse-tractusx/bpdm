@@ -25,18 +25,17 @@ import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
-import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
-import org.eclipse.tractusx.bpdm.gate.entity.AlternativePostalAddressDb
 import org.eclipse.tractusx.bpdm.gate.entity.GeographicCoordinateDb
-import org.eclipse.tractusx.bpdm.gate.entity.PhysicalPostalAddressDb
-import org.eclipse.tractusx.bpdm.gate.entity.StreetDb
-import org.eclipse.tractusx.bpdm.gate.entity.generic.*
+import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
+import org.eclipse.tractusx.bpdm.gate.entity.generic.ConfidenceCriteriaDb
+import org.eclipse.tractusx.bpdm.gate.entity.generic.StateDb
+import org.eclipse.tractusx.bpdm.gate.model.upsert.output.OutputUpsertData
+import org.eclipse.tractusx.bpdm.gate.model.upsert.output.PhysicalPostalAddress
+import org.eclipse.tractusx.bpdm.gate.model.upsert.output.State
 import org.eclipse.tractusx.orchestrator.api.model.*
-import org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType
 import org.springframework.stereotype.Service
 import java.time.ZoneOffset
-import java.util.SortedSet
 
 @Service
 class OrchestratorMappings(
@@ -177,8 +176,8 @@ class OrchestratorMappings(
         } ?: BpnReference.empty
 
     private fun getOwnerBpnL(entity: BusinessPartnerDb): String? {
-        return if(entity.associatedOwnerBpnl != null){
-            entity.associatedOwnerBpnl
+        return if (entity.sharingState.tenantBpnl != null) {
+            entity.sharingState.tenantBpnl
         }else if (entity.isOwnCompanyData) {
             bpnConfigProperties.ownerBpnL
         }
@@ -189,8 +188,7 @@ class OrchestratorMappings(
     }
 
 
-    //Mapping from orchestrator model to entity
-    fun toBusinessPartner(dto: BusinessPartner, externalId: String, associatedOwnerBpnl: String?, roles: SortedSet<BusinessPartnerRole>): BusinessPartnerDb{
+    fun toOutputUpsertData(dto: BusinessPartner, roles: List<BusinessPartnerRole>, tenantBpnl: String?): OutputUpsertData {
         val addressType = when(dto.type){
             GoldenRecordType.LegalEntity -> AddressType.LegalAddress
             GoldenRecordType.Site -> if(dto.site!!.siteMainIsLegalAddress) AddressType.LegalAndSiteMainAddress else AddressType.SiteMainAddress
@@ -206,37 +204,31 @@ class OrchestratorMappings(
         }
 
         return with(dto) {
-            BusinessPartnerDb(
-                externalId = externalId,
+            OutputUpsertData(
                 nameParts = uncategorized.nameParts.toMutableList(),
                 shortName = legalEntity.legalShortName,
                 identifiers = uncategorized.identifiers.mapNotNull { toIdentifier(it, BusinessPartnerType.GENERIC) }
                     .plus(legalEntity.identifiers.mapNotNull { toIdentifier(it, BusinessPartnerType.LEGAL_ENTITY) })
-                    .plus(postalAddress.identifiers.mapNotNull { toIdentifier(it, BusinessPartnerType.ADDRESS) })
-                    .toSortedSet(),
-                legalName = legalEntity.legalName,
+                    .plus(postalAddress.identifiers.mapNotNull { toIdentifier(it, BusinessPartnerType.ADDRESS) }),
+                legalName = legalEntity.legalName ?: throw BpdmNullMappingException(BusinessPartner::class, OutputUpsertData::class, LegalEntity::legalName),
                 siteName = site?.siteName,
                 addressName = postalAddress.addressName,
                 legalForm = legalEntity.legalForm,
-                states = uncategorized.states.asSequence().mapNotNull { toState(it, BusinessPartnerType.GENERIC) }
+                states = uncategorized.states.mapNotNull { toState(it, BusinessPartnerType.GENERIC) }
                     .plus(legalEntity.states.mapNotNull{ toState(it, BusinessPartnerType.LEGAL_ENTITY) })
                     .plus(site?.states?.mapNotNull{ toState(it, BusinessPartnerType.SITE) } ?: emptyList())
-                    .plus(postalAddress.states.mapNotNull{ toState(it, BusinessPartnerType.ADDRESS)} )
-                    .toSortedSet(),
-                roles = roles,
-                postalAddress = PostalAddressDb(
-                    addressType = addressType,
-                    physicalPostalAddress = toPhysicalPostalAddress(postalAddress.physicalAddress),
-                    alternativePostalAddress = postalAddress.alternativeAddress?.let(::toAlternativePostalAddress)
-                ),
-                bpnL = legalEntity.bpnReference.referenceValue!!,
-                bpnS = site?.bpnReference?.referenceValue,
-                bpnA = postalAddress.bpnReference.referenceValue!!,
-                stage = StageType.Output,
+                    .plus(postalAddress.states.mapNotNull { toState(it, BusinessPartnerType.ADDRESS) }),
+                roles = roles.toSortedSet(),
+                addressType = addressType,
+                physicalPostalAddress = toPhysicalPostalAddress(postalAddress.physicalAddress),
+                alternativePostalAddress = postalAddress.alternativeAddress?.let(::toAlternativePostalAddress),
+                legalEntityBpn = legalEntity.bpnReference.referenceValue!!,
+                siteBpn = site?.bpnReference?.referenceValue,
+                addressBpn = postalAddress.bpnReference.referenceValue!!,
                 legalEntityConfidence = toConfidenceCriteria(legalEntity.confidenceCriteria),
                 siteConfidence = site?.let { toConfidenceCriteria(it.confidenceCriteria) },
                 addressConfidence = toConfidenceCriteria(postalAddress.confidenceCriteria),
-                associatedOwnerBpnl = associatedOwnerBpnl
+                isOwnCompanyData = if (tenantBpnl != null && owningCompany != null) tenantBpnl == owningCompany else false
             )
         }
     }
@@ -245,28 +237,35 @@ class OrchestratorMappings(
     private fun toIdentifier(dto: Identifier, businessPartnerType: BusinessPartnerType) =
         dto.type?.let { type ->
             dto.value?.let { value ->
-                IdentifierDb(type = type, value = value, issuingBody = dto.issuingBody, businessPartnerType = businessPartnerType)
+                org.eclipse.tractusx.bpdm.gate.model.upsert.output.Identifier(
+                    type = type,
+                    value = value,
+                    issuingBody = dto.issuingBody,
+                    businessPartnerType = businessPartnerType
+                )
             }
         }
 
     private fun toState(dto: BusinessState, businessPartnerType: BusinessPartnerType) =
-        dto.type?.let { StateDb(
+        dto.type?.let {
+            State(
             type = it,
             validFrom = dto.validFrom?.atZone(ZoneOffset.UTC)?.toLocalDateTime(),
             validTo = dto.validTo?.atZone(ZoneOffset.UTC)?.toLocalDateTime(),
-            businessPartnerTyp =  businessPartnerType)
+                businessPartnerType = businessPartnerType
+            )
         }
 
 
     private fun toPhysicalPostalAddress(dto: PhysicalAddress) =
-        PhysicalPostalAddressDb(
+        PhysicalPostalAddress(
             geographicCoordinates = toGeographicCoordinate(dto.geographicCoordinates),
             country = CountryCode.getByAlpha2Code(dto.country),
             administrativeAreaLevel1 = dto.administrativeAreaLevel1,
             administrativeAreaLevel2 = dto.administrativeAreaLevel2,
             administrativeAreaLevel3 = dto.administrativeAreaLevel3,
             postalCode = dto.postalCode,
-            city = dto.city,
+            city = dto.city ?: throw BpdmNullMappingException(BusinessPartner::class, OutputUpsertData::class, PhysicalAddress::city),
             district = dto.district,
             street = toStreet(dto.street),
             companyPostalCode = dto.companyPostalCode,
@@ -277,19 +276,27 @@ class OrchestratorMappings(
         )
 
     private fun toAlternativePostalAddress(dto: AlternativeAddress) =
-        AlternativePostalAddressDb(
+        org.eclipse.tractusx.bpdm.gate.model.upsert.output.AlternativeAddress(
             geographicCoordinates = toGeographicCoordinate(dto.geographicCoordinates),
             country = CountryCode.getByAlpha2Code(dto.country),
             administrativeAreaLevel1 = dto.administrativeAreaLevel1,
             postalCode = dto.postalCode,
-            city = dto.city,
-            deliveryServiceType = dto.deliveryServiceType,
+            city = dto.city ?: throw BpdmNullMappingException(BusinessPartner::class, OutputUpsertData::class, AlternativeAddress::city),
+            deliveryServiceType = dto.deliveryServiceType ?: throw BpdmNullMappingException(
+                BusinessPartner::class,
+                OutputUpsertData::class,
+                AlternativeAddress::deliveryServiceType
+            ),
             deliveryServiceQualifier = dto.deliveryServiceQualifier,
-            deliveryServiceNumber = dto.deliveryServiceNumber
+            deliveryServiceNumber = dto.deliveryServiceNumber ?: throw BpdmNullMappingException(
+                BusinessPartner::class,
+                OutputUpsertData::class,
+                AlternativeAddress::deliveryServiceNumber
+            )
         )
 
     private fun toStreet(dto: Street) =
-        StreetDb(
+        org.eclipse.tractusx.bpdm.gate.model.upsert.output.Street(
             name = dto.name,
             houseNumber = dto.houseNumber,
             houseNumberSupplement = dto.houseNumberSupplement,
@@ -304,15 +311,15 @@ class OrchestratorMappings(
     private fun toGeographicCoordinate(dto: GeoCoordinate) =
         dto.latitude?.let { lat ->
             dto.longitude?.let {  lon ->
-                GeographicCoordinateDb(latitude = lat, longitude = lon, altitude = dto.altitude)
+                org.eclipse.tractusx.bpdm.gate.model.upsert.output.GeoCoordinate(latitude = lat, longitude = lon, altitude = dto.altitude)
             }
         }
 
     private fun toConfidenceCriteria(dto: ConfidenceCriteria) =
-        ConfidenceCriteriaDb(
+        org.eclipse.tractusx.bpdm.gate.model.upsert.output.ConfidenceCriteria(
             sharedByOwner = dto.sharedByOwner!!,
             checkedByExternalDataSource = dto.checkedByExternalDataSource!!,
-            numberOfBusinessPartners = dto.numberOfSharingMembers!!,
+            numberOfSharingMembers = dto.numberOfSharingMembers!!,
             lastConfidenceCheckAt = dto.lastConfidenceCheckAt!!.atZone(ZoneOffset.UTC).toLocalDateTime(),
             nextConfidenceCheckAt = dto.nextConfidenceCheckAt!!.atZone(ZoneOffset.UTC).toLocalDateTime(),
             confidenceLevel = dto.confidenceLevel!!

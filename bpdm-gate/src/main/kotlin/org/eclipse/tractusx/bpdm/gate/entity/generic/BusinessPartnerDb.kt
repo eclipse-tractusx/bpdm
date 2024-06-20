@@ -21,17 +21,18 @@ package org.eclipse.tractusx.bpdm.gate.entity.generic
 
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 import org.eclipse.tractusx.bpdm.common.model.StageType
+import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import java.util.*
 
 @Entity
 @Table(name = "business_partners")
 class BusinessPartnerDb(
 
-    @Column(name = "external_id")
-    var externalId: String,
+    @ManyToOne
+    @JoinColumn(name = "sharing_state_id", nullable = false)
+    var sharingState: SharingStateDb,
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "business_partners_name_parts", joinColumns = [JoinColumn(name = "business_partner_id")])
@@ -74,9 +75,6 @@ class BusinessPartnerDb(
     @Column(name = "is_own_company_data", nullable = false)
     var isOwnCompanyData: Boolean = false,
 
-    @Column(name = "associated_owner_bpnl", nullable = true)
-    var associatedOwnerBpnl: String? = null,
-
     @Column(name = "bpnl")
     var bpnL: String? = null,
 
@@ -94,13 +92,6 @@ class BusinessPartnerDb(
     @Enumerated(EnumType.STRING)
     var stage: StageType,
 
-    @Column(name = "parent_id")
-    var parentId: String? = null,
-
-    @Column(name = "parent_type")
-    @Enumerated(EnumType.STRING)
-    var parentType: BusinessPartnerType? = null,
-
     @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "legal_entity_confidence_id", unique = true)
     var legalEntityConfidence: ConfidenceCriteriaDb?,
@@ -113,5 +104,18 @@ class BusinessPartnerDb(
     @JoinColumn(name = "address_confidence_id", unique = true)
     var addressConfidence: ConfidenceCriteriaDb?,
 
-    ) : BaseEntity()
+    ) : BaseEntity() {
+
+    companion object {
+        fun createEmpty(sharingState: SharingStateDb, stage: StageType) =
+            BusinessPartnerDb(
+                sharingState = sharingState,
+                stage = stage,
+                postalAddress = PostalAddressDb(),
+                legalEntityConfidence = null,
+                siteConfidence = null,
+                addressConfidence = null
+            )
+    }
+}
 

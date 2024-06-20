@@ -19,21 +19,17 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
-import com.nimbusds.oauth2.sdk.id.Identifier
-import jakarta.persistence.Column
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.IBaseStateDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
+import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
 import org.eclipse.tractusx.bpdm.common.model.StageType
-import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.eclipse.tractusx.bpdm.gate.entity.generic.*
-import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
+import org.eclipse.tractusx.bpdm.gate.model.upsert.output.*
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
-import org.eclipse.tractusx.bpdm.gate.util.BusinessPartnerComparisonUtil
 import org.eclipse.tractusx.bpdm.gate.util.BusinessPartnerCopyUtil
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.*
@@ -43,7 +39,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntitySearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteSearchRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDateTime
+import kotlin.reflect.KProperty
 
 @Service
 class GoldenRecordUpdateService(
@@ -51,9 +47,8 @@ class GoldenRecordUpdateService(
     private val syncRecordService: SyncRecordService,
     private val taskConfigProperties: GoldenRecordTaskConfigProperties,
     private val businessPartnerRepository: BusinessPartnerRepository,
-    private val changelogRepository: ChangelogRepository,
     private val copyUtil: BusinessPartnerCopyUtil,
-    private val compareUtil: BusinessPartnerComparisonUtil
+    private val businessPartnerService: BusinessPartnerService
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -75,79 +70,58 @@ class GoldenRecordUpdateService(
 
         logger.debug { "Found ${changedBpnLs.size} BPNL, ${changedBpnSs.size} BPNS and ${changedBpnAs.size} BPNA entries." }
 
-        updateLegalEntities(changedBpnLs)
-        updateSites(changedBpnSs)
-        updateAddresses(changedBpnAs)
+        val updatedLegalEntities = updateLegalEntities(changedBpnLs).size
+        val updatedSites = updateSites(changedBpnSs).size
+        val updatedAddresses = updateAddresses(changedBpnAs).size
 
         syncRecordService.setSynchronizationSuccess(SyncTypeDb.POOL_TO_GATE_OUTPUT)
+
+        logger.debug { "Updated '$updatedLegalEntities' legal entities, '$updatedSites' sites and '$updatedAddresses' addresses." }
     }
 
-    private fun updateLegalEntities(changedBpnLs: Collection<String>){
+    private fun updateLegalEntities(changedBpnLs: Collection<String>): List<BusinessPartnerService.UpsertResult> {
         val businessPartnersToUpdate = businessPartnerRepository.findByStageAndBpnLIn(StageType.Output, changedBpnLs)
-
-        logger.debug { "Found ${businessPartnersToUpdate.size} business partners with matching BPNL to update." }
 
         val bpnLsToQuery = businessPartnersToUpdate.mapNotNull { it.bpnL }
 
         val searchRequest = LegalEntitySearchRequest(bpnLs = bpnLsToQuery)
         val legalEntities = if(searchRequest.bpnLs.isNotEmpty())
-                poolClient.legalEntities.getLegalEntities(searchRequest, PaginationRequest(size = searchRequest.bpnLs.size)).content
-            else
-                emptyList()
+            poolClient.legalEntities.getLegalEntities(searchRequest, PaginationRequest(size = searchRequest.bpnLs.size)).content.map { it.legalEntity }
+        else
+            emptyList()
 
+        val legalEntitiesByBpn = legalEntities.associateBy { it.bpnl }
 
-        val legalEntitiesByBpn = legalEntities.associateBy { it.legalEntity.bpnl }
-
-        val updatedPartners = businessPartnersToUpdate.mapNotNull { partner ->
-            legalEntitiesByBpn[partner.bpnL]?.legalEntity?.let { legalEntity -> partner.apply { update(partner, legalEntity) } }
+        return businessPartnersToUpdate.mapNotNull { output ->
+            val legalEntity = legalEntitiesByBpn[output.bpnL!!] ?: return@mapNotNull null
+            val upsertData = legalEntity.toUpsertData(output)
+            businessPartnerService.updateBusinessPartnerOutput(output, upsertData)
         }
-
-        logger.debug { "Updating ${updatedPartners.size} business partners from legal entities" }
-
-        val changedPartners = filterChanged(updatedPartners)
-
-        businessPartnerRepository.saveAll(changedPartners)
-
-        val changelogs = changedPartners.map { ChangelogEntryDb(it.externalId, it.associatedOwnerBpnl, ChangelogType.UPDATE, StageType.Output) }
-        changelogRepository.saveAll(changelogs)
-
-        logger.debug { "Actual values changed of ${changedPartners.size} business partners from legal entities" }
     }
 
-    private fun updateSites(changedSiteBpns: Collection<String>){
+    private fun updateSites(changedSiteBpns: Collection<String>): List<BusinessPartnerService.UpsertResult> {
         val businessPartnersToUpdate = businessPartnerRepository.findByStageAndBpnSIn(StageType.Output, changedSiteBpns)
 
         logger.debug { "Found ${businessPartnersToUpdate.size} business partners with matching BPNS to update." }
 
         val siteBpnsToQuery = businessPartnersToUpdate.mapNotNull { it.bpnS }
-
         val searchRequest = SiteSearchRequest(siteBpns = siteBpnsToQuery)
         val sites = if(searchRequest.siteBpns.isNotEmpty())
-            poolClient.sites.getSites(searchRequest, PaginationRequest(size = searchRequest.siteBpns.size)).content
+            poolClient.sites.getSites(searchRequest, PaginationRequest(size = searchRequest.siteBpns.size)).content.map { it.site }
         else
             emptyList()
 
-        val sitesByBpn = sites.associateBy { it.site.bpns }
+        val sitesByBpn = sites.associateBy { it.bpns }
 
 
-        val updatedPartners = businessPartnersToUpdate.mapNotNull { partner ->
-            sitesByBpn[partner.bpnS]?.site?.let { site -> partner.apply { update(partner, site) } }
+        return businessPartnersToUpdate.mapNotNull { output ->
+            val site = sitesByBpn[output.bpnS!!] ?: return@mapNotNull null
+            val upsertData = site.toUpsertData(output)
+            businessPartnerService.updateBusinessPartnerOutput(output, upsertData)
         }
-
-        logger.debug { "Updating ${updatedPartners.size} business partners from sites" }
-
-
-        val changedPartners = filterChanged(updatedPartners)
-
-        businessPartnerRepository.saveAll(changedPartners)
-
-        val changelogs = changedPartners.map { ChangelogEntryDb(it.externalId, it.associatedOwnerBpnl, ChangelogType.UPDATE, StageType.Output) }
-        changelogRepository.saveAll(changelogs)
-
-        logger.debug { "Actual values changed of ${changedPartners.size} business partners from sites" }
     }
 
-    private fun updateAddresses(changedAddressBpns: Collection<String>){
+    private fun updateAddresses(changedAddressBpns: Collection<String>): List<BusinessPartnerService.UpsertResult> {
         val businessPartnersToUpdate = businessPartnerRepository.findByStageAndBpnAIn(StageType.Output, changedAddressBpns)
 
         logger.debug { "Found ${businessPartnersToUpdate.size} business partners with matching BPNA to update." }
@@ -162,20 +136,132 @@ class GoldenRecordUpdateService(
 
         val addressesByBpn = addresses.associateBy { it.bpna }
 
-        val updatedPartners = businessPartnersToUpdate.mapNotNull { partner ->
-            addressesByBpn[partner.bpnA]?.let { address -> partner.apply { update(partner, address) } }
+        return businessPartnersToUpdate.mapNotNull { output ->
+            val address = addressesByBpn[output.bpnA!!] ?: return@mapNotNull null
+            val upsertData = address.toUpsertData(output)
+            businessPartnerService.updateBusinessPartnerOutput(output, upsertData)
         }
+    }
 
-        logger.debug { "Updating ${updatedPartners.size} business partners from logistic addresses" }
+    private fun LegalEntityVerboseDto.toUpsertData(existingOutput: BusinessPartnerDb): OutputUpsertData {
+        val copy = BusinessPartnerDb.createEmpty(existingOutput.sharingState, existingOutput.stage)
+        copyUtil.copyValues(existingOutput, copy)
+        update(copy, this)
 
-        val changedPartners = filterChanged(updatedPartners)
+        return copy.toUpsertData()
+    }
 
-        businessPartnerRepository.saveAll(changedPartners)
+    private fun SiteVerboseDto.toUpsertData(existingOutput: BusinessPartnerDb): OutputUpsertData {
+        val copy = BusinessPartnerDb.createEmpty(existingOutput.sharingState, existingOutput.stage)
+        copyUtil.copyValues(existingOutput, copy)
+        update(copy, this)
 
-        val changelogs = changedPartners.map { ChangelogEntryDb(it.externalId, it.associatedOwnerBpnl, ChangelogType.UPDATE, StageType.Output) }
-        changelogRepository.saveAll(changelogs)
+        return copy.toUpsertData()
+    }
 
-        logger.debug { "Actual values changed of ${changedPartners.size} business partners from logistic addresses" }
+    private fun LogisticAddressVerboseDto.toUpsertData(existingOutput: BusinessPartnerDb): OutputUpsertData {
+        val copy = BusinessPartnerDb.createEmpty(existingOutput.sharingState, existingOutput.stage)
+        copyUtil.copyValues(existingOutput, copy)
+        update(copy, this)
+
+        return copy.toUpsertData()
+    }
+
+
+    private fun BusinessPartnerDb.toUpsertData(): OutputUpsertData {
+        return OutputUpsertData(
+            nameParts = nameParts,
+            identifiers = identifiers.map { it.toUpsertData() },
+            states = states.map { it.toUpsertData() },
+            roles = roles.toList(),
+            isOwnCompanyData = isOwnCompanyData,
+            legalEntityBpn = bpnL ?: throw createMappingException(BusinessPartnerDb::bpnL, id),
+            siteBpn = bpnS,
+            addressBpn = bpnA ?: throw createMappingException(BusinessPartnerDb::bpnA, id),
+            legalName = legalName ?: throw createMappingException(BusinessPartnerDb::legalName, id),
+            legalForm = legalForm,
+            shortName = shortName,
+            siteName = siteName,
+            addressName = addressName,
+            addressType = postalAddress.addressType ?: throw createMappingException(PostalAddressDb::addressType, id),
+            physicalPostalAddress = postalAddress.physicalPostalAddress?.toUpsertData() ?: throw createMappingException(
+                PostalAddressDb::physicalPostalAddress,
+                id
+            ),
+            alternativePostalAddress = postalAddress.alternativePostalAddress?.toUpsertData(),
+            legalEntityConfidence = legalEntityConfidence?.toUpsertData() ?: throw createMappingException(BusinessPartnerDb::legalEntityConfidence, id),
+            siteConfidence = siteConfidence?.toUpsertData(),
+            addressConfidence = addressConfidence?.toUpsertData() ?: throw createMappingException(BusinessPartnerDb::addressConfidence, id),
+        )
+    }
+
+    private fun IdentifierDb.toUpsertData(): Identifier {
+        return Identifier(type, value, issuingBody, businessPartnerType)
+    }
+
+    private fun StateDb.toUpsertData(): State {
+        return State(validFrom = validFrom, validTo = validTo, type = type, businessPartnerType = businessPartnerTyp)
+    }
+
+    private fun PhysicalPostalAddressDb.toUpsertData(): PhysicalPostalAddress {
+        return PhysicalPostalAddress(
+            geographicCoordinates = geographicCoordinates?.toUpsertData(),
+            country = country ?: throw createMappingException(PhysicalPostalAddress::country),
+            postalCode = postalCode,
+            city = city ?: throw createMappingException(PhysicalPostalAddress::city),
+            administrativeAreaLevel1 = administrativeAreaLevel1,
+            administrativeAreaLevel2 = administrativeAreaLevel2,
+            administrativeAreaLevel3 = administrativeAreaLevel3,
+            district = district,
+            companyPostalCode = companyPostalCode,
+            industrialZone = industrialZone,
+            building = building,
+            floor = floor,
+            door = door,
+            street = street?.toUpsertData()
+        )
+    }
+
+    private fun StreetDb.toUpsertData(): Street {
+        return Street(
+            name = name,
+            houseNumber = houseNumber,
+            houseNumberSupplement = houseNumberSupplement,
+            milestone = milestone,
+            direction = direction,
+            namePrefix = namePrefix,
+            additionalNamePrefix = additionalNamePrefix,
+            nameSuffix = nameSuffix,
+            additionalNameSuffix = additionalNameSuffix
+        )
+    }
+
+    private fun AlternativePostalAddressDb.toUpsertData(): AlternativeAddress {
+        return AlternativeAddress(
+            geographicCoordinates = geographicCoordinates?.toUpsertData(),
+            country = country ?: throw createMappingException(AlternativePostalAddressDb::country),
+            administrativeAreaLevel1 = administrativeAreaLevel1,
+            postalCode = postalCode,
+            city = city ?: throw createMappingException(AlternativePostalAddressDb::city),
+            deliveryServiceType = deliveryServiceType ?: throw createMappingException(AlternativePostalAddressDb::deliveryServiceType),
+            deliveryServiceQualifier = deliveryServiceQualifier,
+            deliveryServiceNumber = deliveryServiceNumber ?: throw createMappingException(AlternativePostalAddressDb::deliveryServiceNumber)
+        )
+    }
+
+    private fun ConfidenceCriteriaDb.toUpsertData(): ConfidenceCriteria {
+        return ConfidenceCriteria(
+            sharedByOwner = sharedByOwner,
+            checkedByExternalDataSource = checkedByExternalDataSource,
+            numberOfSharingMembers = numberOfBusinessPartners,
+            lastConfidenceCheckAt = lastConfidenceCheckAt,
+            nextConfidenceCheckAt = nextConfidenceCheckAt,
+            confidenceLevel = confidenceLevel
+        )
+    }
+
+    private fun GeographicCoordinateDb.toUpsertData(): GeoCoordinate {
+        return GeoCoordinate(longitude, latitude, altitude)
     }
 
     private fun update(businessPartner: BusinessPartnerDb, legalEntity: LegalEntityVerboseDto){
@@ -287,20 +373,8 @@ class GoldenRecordUpdateService(
             deliveryServiceNumber = deliveryServiceNumber
         )
 
-    private fun emptyBusinessPartner(externalId: String) =
-        BusinessPartnerDb(
-            externalId = externalId,
-            stage = StageType.Output,
-            legalEntityConfidence = null,
-            siteConfidence = null,
-            addressConfidence = null,
-            postalAddress = PostalAddressDb()
-        )
-
-    private fun filterChanged(partners: Collection<BusinessPartnerDb>): Collection<BusinessPartnerDb>{
-        return partners.associateWith { partner -> emptyBusinessPartner(partner.externalId).apply { copyUtil.copyValues( partner, this) }  }
-            .filter { (partner, copy) -> compareUtil.hasChanges(partner, copy) }
-            .keys
+    private fun createMappingException(property: KProperty<*>, entityId: Long? = null): BpdmNullMappingException {
+        return BpdmNullMappingException(BusinessPartnerDb::class, OutputUpsertData::class, property, entityId.toString())
     }
 
 }

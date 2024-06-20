@@ -44,17 +44,17 @@ interface SharingStateRepository : PagingAndSortingRepository<SharingStateDb, Lo
             }
 
 
-        fun byAssociatedOwnerBpnl(associatedOwnerBpnl: String?) =
+        fun byTenantBpnl(associatedOwnerBpnl: String?) =
             Specification<SharingStateDb> { root, _, builder ->
                 associatedOwnerBpnl?.let {
-                    builder.equal(root.get<String?>(SharingStateDb::associatedOwnerBpnl.name), associatedOwnerBpnl)
-                } ?: builder.isNull(root.get<String?>(SharingStateDb::associatedOwnerBpnl.name))
+                    builder.equal(root.get<String?>(SharingStateDb::tenantBpnl.name), associatedOwnerBpnl)
+                } ?: builder.isNull(root.get<String?>(SharingStateDb::tenantBpnl.name))
 
             }
 
     }
 
-    fun findByExternalIdInAndAssociatedOwnerBpnl(externalId: Collection<String>,associatedOwnerBpnl: String?): Collection<SharingStateDb>
+    fun findByExternalIdInAndTenantBpnl(externalId: Collection<String>, tenantBpnl: String?): Collection<SharingStateDb>
 
     fun findBySharingStateType(sharingStateType: SharingStateType, pageable: Pageable): Page<SharingStateDb>
 

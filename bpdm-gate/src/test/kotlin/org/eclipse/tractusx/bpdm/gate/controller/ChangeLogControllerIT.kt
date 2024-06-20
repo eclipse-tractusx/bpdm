@@ -38,8 +38,6 @@
 
 package org.eclipse.tractusx.bpdm.gate.controller
 
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration
-import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.RecursiveComparisonAssert
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
@@ -50,13 +48,12 @@ import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntryDb
-import org.eclipse.tractusx.bpdm.gate.util.PostgreSQLContextInitializer
+import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerNonVerboseValues
 import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerVerboseValues
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
@@ -70,21 +67,12 @@ internal class ChangeLogControllerIT @Autowired constructor(
     val gateClient: GateClient,
     private val testHelpers: DbTestHelpers,
 ) {
-    companion object {
-        @RegisterExtension
-        private val wireMockServer: WireMockExtension = WireMockExtension.newInstance()
-            .options(WireMockConfiguration.wireMockConfig().dynamicPort())
-            .build()
-
-    }
-
 
     val instant = Instant.now()
 
     @BeforeEach
     fun beforeEach() {
         testHelpers.truncateDbTables()
-        wireMockServer.resetAll()
         createChangeLogs()
     }
 
