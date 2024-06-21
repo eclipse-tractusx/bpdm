@@ -61,7 +61,8 @@ class NoAuthIT @Autowired constructor(
             getConfidenceCriteria = AuthExpectationType.Unauthorized
         ),
         uploadPartner = UploadPartnerAuthExpections(
-            postInput = AuthExpectationType.Unauthorized
+            postInput = AuthExpectationType.Unauthorized,
+            getInputTemplate = AuthExpectationType.Unauthorized
         )
     )
 )

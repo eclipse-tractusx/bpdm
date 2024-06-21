@@ -21,10 +21,12 @@ package org.eclipse.tractusx.bpdm.gate.api.client
 
 import org.eclipse.tractusx.bpdm.gate.api.GatePartnerUploadApi
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
+import org.springframework.core.io.ByteArrayResource
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.multipart.MultipartFile
+import org.springframework.web.service.annotation.GetExchange
 import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
 
@@ -39,5 +41,10 @@ interface PartnerUploadApiClient : GatePartnerUploadApi {
     override fun uploadPartnerCsvFile(
         @RequestPart("file") file: MultipartFile
     ): ResponseEntity<Collection<BusinessPartnerInputDto>>
+
+    @GetExchange(
+        url = "/input/partner-upload-template",
+    )
+    override fun getPartnerCsvTemplate(): ResponseEntity<ByteArrayResource>
 
 }

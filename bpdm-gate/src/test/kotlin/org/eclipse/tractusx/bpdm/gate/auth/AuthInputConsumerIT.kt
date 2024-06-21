@@ -63,7 +63,8 @@ class AuthInputConsumerIT @Autowired constructor(
             getConfidenceCriteria = AuthExpectationType.Authorized
         ),
         uploadPartner = UploadPartnerAuthExpections(
-            postInput = AuthExpectationType.Forbidden
+            postInput = AuthExpectationType.Forbidden,
+            getInputTemplate = AuthExpectationType.Forbidden
         )
     )
 ) {

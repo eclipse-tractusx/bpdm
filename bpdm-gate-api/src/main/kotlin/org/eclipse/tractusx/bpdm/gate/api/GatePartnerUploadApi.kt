@@ -27,8 +27,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.gate.api.GateBusinessPartnerApi.Companion.BUSINESS_PARTNER_PATH
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PartnerUploadErrorResponse
+import org.springframework.core.io.ByteArrayResource
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestPart
@@ -62,5 +64,18 @@ interface GatePartnerUploadApi {
     fun uploadPartnerCsvFile(
         @RequestPart("file") file: MultipartFile
     ): ResponseEntity<Collection<BusinessPartnerInputDto>>
+
+    @Operation(
+        summary = "Get CSV template with headers in file",
+        description = "Create empty CSV file template including headers." +
+                "Generated CSV file can later be used for uploading business partner data."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "CSV file template generated successfully")
+        ]
+    )
+    @GetMapping("/input/partner-upload-template")
+    fun getPartnerCsvTemplate(): ResponseEntity<ByteArrayResource>
 
 }

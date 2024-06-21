@@ -26,7 +26,10 @@ import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.service.BusinessPartnerService
 import org.eclipse.tractusx.bpdm.gate.service.PartnerUploadService
 import org.eclipse.tractusx.bpdm.gate.util.getCurrentUserBpn
+import org.springframework.core.io.ByteArrayResource
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
@@ -48,6 +51,15 @@ class PartnerUploadController(
             !file.contentType.equals("text/csv", ignoreCase = true) -> ResponseEntity(HttpStatus.BAD_REQUEST)
             else -> partnerUploadService.processFile(file, getCurrentUserBpn())
         }
+    }
+
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.UPLOAD_INPUT_PARTNER})")
+    override fun getPartnerCsvTemplate(): ResponseEntity<ByteArrayResource> {
+        val resource = partnerUploadService.generatePartnerCsvTemplate()
+        return ResponseEntity.ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=partner-upload-template.csv")
+            .contentType(MediaType.parseMediaType("text/csv"))
+            .body(resource)
     }
 
 }
