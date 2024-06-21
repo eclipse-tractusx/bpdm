@@ -63,7 +63,8 @@ class AuthInputManagerIT @Autowired constructor(
             getConfidenceCriteria = AuthExpectationType.Authorized
         ),
         uploadPartner = UploadPartnerAuthExpections(
-            postInput = AuthExpectationType.Authorized
+            postInput = AuthExpectationType.Authorized,
+            getInputTemplate = AuthExpectationType.Authorized
         )
     )
 ) {

@@ -157,6 +157,35 @@ class PartnerUploadControllerIT @Autowired constructor(
         this.mockAndAssertUtils.assertUpsertResponsesMatchRequests(searchResponsePage, expectedResponse)
     }
 
+    @Test
+    fun testGetCsvTemplateAndUploadWithExistingRecords() {
+        // Fetch the CSV template
+        val templateResponse = gateClient.partnerUpload.getPartnerCsvTemplate().body!!
+        val templateBytes = templateResponse.inputStream.readAllBytes()
+        val templateCsv = String(templateBytes)
+
+        // Read the existing records from an existing test data file
+        val existingTestRecordsPath = Paths.get("src/test/resources/testData/valid_partner_data.csv")
+        val existingTestRecords = Files.readString(existingTestRecordsPath)
+
+        // Combine the header from the template with the existing records
+        val combinedCsv = templateCsv + existingTestRecords.lines().drop(1).joinToString("\n")
+
+        // Upload the combined CSV file
+        val combinedFile = MockMultipartFile("combined_partner_data.csv", "combined_partner_data.csv", "text/csv", combinedCsv.toByteArray())
+        val uploadResponse = gateClient.partnerUpload.uploadPartnerCsvFile(combinedFile).body!!
+
+        // Perform assertions
+        val expectedResponse = listOf(
+            BusinessPartnerVerboseValues.bpInputRequestFull,
+            BusinessPartnerNonVerboseValues.bpInputRequestFull.fastCopy(externalId = BusinessPartnerVerboseValues.externalId2, shortName = "2")
+        )
+
+        val searchResponsePage = gateClient.businessParters.getBusinessPartnersInput(listOf(BusinessPartnerVerboseValues.externalId1, BusinessPartnerVerboseValues.externalId2)).content
+        this.mockAndAssertUtils.assertUpsertResponsesMatchRequests(uploadResponse, expectedResponse)
+        this.mockAndAssertUtils.assertUpsertResponsesMatchRequests(searchResponsePage, expectedResponse)
+    }
+
 
     private fun testFileUpload(filePath: String, expectedStatus: HttpStatus) {
         val bytes = Files.readAllBytes(Paths.get(filePath))

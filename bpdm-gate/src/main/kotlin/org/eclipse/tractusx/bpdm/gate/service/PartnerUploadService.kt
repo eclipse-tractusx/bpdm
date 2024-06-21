@@ -19,13 +19,18 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
+import com.opencsv.CSVWriter
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
+import org.eclipse.tractusx.bpdm.gate.model.PartnerUploadFileHeader
 import org.eclipse.tractusx.bpdm.gate.model.PartnerUploadFileRow
 import org.eclipse.tractusx.bpdm.gate.util.PartnerFileUtil
+import org.springframework.core.io.ByteArrayResource
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
+import java.io.ByteArrayOutputStream
+import java.io.OutputStreamWriter
 
 @Service
 class PartnerUploadService(
@@ -39,6 +44,26 @@ class PartnerUploadService(
         val businessPartnerDtos = PartnerFileUtil.validateAndMapToBusinessPartnerInputRequests(csvData)
         val result = businessPartnerService.upsertBusinessPartnersInput(businessPartnerDtos, ownerBpnl)
         return ResponseEntity.ok(result)
+    }
+
+    fun generatePartnerCsvTemplate(): ByteArrayResource {
+        val headers = PartnerUploadFileHeader::class.java.declaredFields
+            .asSequence()
+            .filter { it.name != "INSTANCE" && it.type == String::class.java }
+            .map { it.get(null) as String }
+            .toList()
+            .toTypedArray()
+
+        // Use ByteArrayOutputStream with CSVWriter to create CSV content
+        val outputStream = ByteArrayOutputStream().apply {
+            OutputStreamWriter(this).use { writer ->
+                CSVWriter(writer).use { csvWriter ->
+                    csvWriter.writeNext(headers)
+                }
+            }
+        }
+
+        return ByteArrayResource(outputStream.toByteArray())
     }
 
 }

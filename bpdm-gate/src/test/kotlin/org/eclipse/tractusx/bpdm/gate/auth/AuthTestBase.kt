@@ -101,6 +101,11 @@ abstract class AuthTestBase(
         authAssertions.assert(authExpectations.uploadPartner.postInput) { gateClient.partnerUpload.uploadPartnerCsvFile(uploadedFile) }
     }
 
+    @Test
+    fun `GET Partner Upload Template`() {
+        authAssertions.assert(authExpectations.uploadPartner.getInputTemplate) { gateClient.partnerUpload.getPartnerCsvTemplate() }
+    }
+
 }
 
 data class GateAuthExpectations(
@@ -135,5 +140,6 @@ data class StatsAuthExpectations(
 )
 
 data class UploadPartnerAuthExpections(
-    val postInput: AuthExpectationType
+    val postInput: AuthExpectationType,
+    val getInputTemplate: AuthExpectationType
 )
