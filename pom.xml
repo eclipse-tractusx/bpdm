@@ -63,7 +63,7 @@
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.projectKey>product-bpdm</sonar.projectKey>
         <sonar.moduleKey>${project.groupId}:${project.artifactId}</sonar.moduleKey>
-        <sonar.version>3.11.0.3922</sonar.version>
+        <sonar.version>4.0.0.4121</sonar.version>
         <jacoco.version>0.8.12</jacoco.version>
         <testcontainers.version>1.19.8</testcontainers.version>
         <io.projectreactor.netty>1.1.20</io.projectreactor.netty>
