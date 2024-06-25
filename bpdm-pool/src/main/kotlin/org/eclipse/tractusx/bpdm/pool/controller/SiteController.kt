@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.controller
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.PoolSiteApi
+import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteCreateRequestWithLegalAddressAsMain
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteSearchRequest
@@ -83,5 +84,12 @@ class SiteController(
         paginationRequest: PaginationRequest
     ): PageDto<SiteWithMainAddressVerboseDto> {
         return postSiteSearch(searchRequest, paginationRequest)
+    }
+
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")
+    override fun createSiteWithLegalReference(
+        request: Collection<SiteCreateRequestWithLegalAddressAsMain>
+    ): SitePartnerCreateResponseWrapper {
+        return businessPartnerBuildService.createSitesWithLegalAddressAsMain(request)
     }
 }

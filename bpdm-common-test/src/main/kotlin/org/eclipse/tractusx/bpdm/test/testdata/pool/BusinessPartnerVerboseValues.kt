@@ -315,11 +315,29 @@ object BusinessPartnerVerboseValues {
         index = "1"
     )
 
+    val createSiteLegalReference1 = SitePartnerCreateVerboseDto(
+        site = site1,
+        mainAddress = addressPartner1.copy(
+            bpnSite = site1.bpns,
+            addressType = AddressType.LegalAndSiteMainAddress
+        ),
+        index = "1"
+    )
+
     val siteUpsert2 = SitePartnerCreateVerboseDto(
         site = site2,
         mainAddress = addressPartner2.copy(
             bpnSite = site2.bpns,
             addressType = AddressType.SiteMainAddress
+        ),
+        index = "2"
+    )
+
+    val createSiteLegalReference2 = SitePartnerCreateVerboseDto(
+        site = site2,
+        mainAddress = addressPartner2.copy(
+            bpnSite = site2.bpns,
+            addressType = AddressType.LegalAndSiteMainAddress
         ),
         index = "2"
     )

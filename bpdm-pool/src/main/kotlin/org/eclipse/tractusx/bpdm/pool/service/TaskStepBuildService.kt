@@ -243,7 +243,7 @@ class TaskStepBuildService(
     ): SiteBpns {
 
         val result = if(isSiteMainAndLegalAddress){
-            val createRequest = BusinessPartnerBuildService.SiteCreateRequestWithLegalAddressAsMain(
+            val createRequest = SiteCreateRequestWithLegalAddressAsMain(
                 name = poolSite.name,
                 states = poolSite.states,
                 confidenceCriteria = poolSite.confidenceCriteria,
