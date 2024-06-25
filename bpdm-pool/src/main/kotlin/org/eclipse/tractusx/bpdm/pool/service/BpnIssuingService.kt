@@ -92,7 +92,7 @@ class BpnIssuingService(
 
     private fun createBpn(number: Long, bpnChar: Char): String {
         val code = toBpnCode(number)
-        val checksum = calculateChecksum(code)
+        val checksum = calculateChecksum(bpnConfigProperties.id + bpnChar + code)
 
         return "${bpnConfigProperties.id}$bpnChar$code$checksum"
     }
