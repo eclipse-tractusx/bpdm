@@ -123,11 +123,11 @@ class BusinessPartnerBuildService(
                 .apply { mainAddress.site = this }
         }
 
+        siteRepository.saveAll(createdSites)
+
         changelogService.createChangelogEntries(createdSites.map {
             ChangelogEntryCreateRequest(it.bpn, ChangelogType.CREATE, BusinessPartnerType.SITE)
         })
-
-        siteRepository.saveAll(createdSites)
 
         val siteResponse = createdSites.mapIndexed { index, site -> site.toUpsertDto(index.toString()) }
 
@@ -459,13 +459,6 @@ class BusinessPartnerBuildService(
         val idTypes: Map<String, IdentifierTypeDb>,
         val regions: Map<String, RegionDb>
     )
-
-    data class SiteCreateRequestWithLegalAddressAsMain(
-        override val name: String,
-        override val states: Collection<SiteStateDto>,
-        override val confidenceCriteria: ConfidenceCriteriaDto,
-        val bpnLParent: String
-    ) : IBaseSiteDto
 
     companion object {
 
