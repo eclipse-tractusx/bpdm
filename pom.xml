@@ -27,7 +27,7 @@
     <artifactId>bpdm-parent</artifactId>
     <name>Business Partner Data Management Parent</name>
     <description>Parent pom of Business Partner Data Management</description>
-    <version>6.1.0-SNAPSHOT</version>
+    <version>${revision}</version>
     <packaging>pom</packaging>
 
     <parent>
@@ -49,25 +49,12 @@
     </modules>
 
     <properties>
+        <revision>6.1.0-SNAPSHOT</revision>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
+        <spring-boot.version>3.2.5</spring-boot.version>
         <kotlin.version>1.9.24</kotlin.version>
         <springdoc.version>2.5.0</springdoc.version>
-        <neo.version>1.29</neo.version>
-        <kotlinlogging.version>3.0.5</kotlinlogging.version>
-        <wiremock.version>2.35.2</wiremock.version>
-        <springmockk.version>4.0.2</springmockk.version>
-        <assertj.version>3.24.2</assertj.version>
-        <spring-boot.version>3.0.4</spring-boot.version>
-        <sonar.organization>catenax-ng</sonar.organization>
-        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-        <sonar.projectKey>product-bpdm</sonar.projectKey>
-        <sonar.moduleKey>${project.groupId}:${project.artifactId}</sonar.moduleKey>
-        <sonar.version>3.11.0.3922</sonar.version>
-        <jacoco.version>0.8.12</jacoco.version>
-        <testcontainers.version>1.19.8</testcontainers.version>
-        <io.projectreactor.netty>1.1.20</io.projectreactor.netty>
-        <opencsv.version>5.9</opencsv.version>
     </properties>
 
     <pluginRepositories>
@@ -132,7 +119,7 @@
             <dependency>
                 <groupId>com.neovisionaries</groupId>
                 <artifactId>nv-i18n</artifactId>
-                <version>${neo.version}</version>
+                <version>1.29</version>
             </dependency>
             <!-- OpenAPI 3 auto API documentation library for Spring Boot -->
             <dependency>
@@ -145,56 +132,49 @@
                 <artifactId>springdoc-openapi-starter-common</artifactId>
                 <version>${springdoc.version}</version>
             </dependency>
-            <!-- Override snakeyaml version used by transitive dependencies due to security issue -->
-            <dependency>
-                <groupId>org.yaml</groupId>
-                <artifactId>snakeyaml</artifactId>
-                <version>2.2</version>
-            </dependency>
-            <!-- Override jwt library version used by spring framework due to security issue -->
-            <dependency>
-                <groupId>com.nimbusds</groupId>
-                <artifactId>nimbus-jose-jwt</artifactId>
-                <version>9.37.2</version>
-            </dependency>
-
             <!-- Kotlin wrapper for slf4j (Logging)-->
             <dependency>
                 <groupId>io.github.microutils</groupId>
                 <artifactId>kotlin-logging-jvm</artifactId>
-                <version>${kotlinlogging.version}</version>
+                <version>3.0.5</version>
+            </dependency>
+            <!-- Used for simple CSV operations -->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-csv</artifactId>
+                <version>1.11.0</version>
             </dependency>
 
             <!-- Test -->
             <dependency>
                 <groupId>com.github.tomakehurst</groupId>
                 <artifactId>wiremock-jre8-standalone</artifactId>
-                <version>${wiremock.version}</version>
+                <version>2.35.2</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>com.ninja-squad</groupId>
                 <artifactId>springmockk</artifactId>
-                <version>${springmockk.version}</version>
+                <version>4.0.2</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
-                <version>${assertj.version}</version>
+                <version>3.24.2</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.testcontainers</groupId>
                 <artifactId>testcontainers-bom</artifactId>
-                <version>${testcontainers.version}</version>
+                <version>1.19.8</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>io.projectreactor.netty</groupId>
                 <artifactId>reactor-netty-http</artifactId>
-                <version>${io.projectreactor.netty}</version>
+                <version>1.1.20</version>
             </dependency>
             <dependency>
                 <groupId>com.github.dasniko</groupId>
@@ -207,7 +187,7 @@
             <dependency>
                 <groupId>com.opencsv</groupId>
                 <artifactId>opencsv</artifactId>
-                <version>${opencsv.version}</version>
+                <version>5.9</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -293,55 +273,52 @@
                         </execution>
                     </executions>
                 </plugin>
-                <plugin>
-                    <groupId>org.eclipse.dash</groupId>
-                    <artifactId>license-tool-plugin</artifactId>
-                    <version>1.1.0</version>
-                    <executions>
-                        <execution>
-                            <id>license-check</id>
-                            <goals>
-                                <goal>license-check</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                    <configuration>
-                        <projectId>automotive.tractusx</projectId>
-                        <summary>DEPENDENCIES</summary>
-                        <includeScope>test</includeScope>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.sonarsource.scanner.maven</groupId>
-                    <artifactId>sonar-maven-plugin</artifactId>
-                    <version>${sonar.version}</version>
-                </plugin>
-                <!-- Creates test coverage report -->
-                <plugin>
-                    <groupId>org.jacoco</groupId>
-                    <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>${jacoco.version}</version>
-                    <executions>
-                        <execution>
-                            <id>prepare-agent</id>
-                            <goals>
-                                <goal>prepare-agent</goal>
-                            </goals>
-                        </execution>
-                        <execution>
-                            <id>report</id>
-                            <goals>
-                                <goal>report</goal>
-                            </goals>
-                            <configuration>
-                                <formats>
-                                    <format>XML</format>
-                                </formats>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
             </plugins>
         </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <version>1.1.0</version>
+                <configuration>
+                    <updatePomFile>true</updatePomFile>
+                    <flattenMode>resolveCiFriendliesOnly</flattenMode>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>flatten</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>flatten</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>flatten.clean</id>
+                        <phase>clean</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.eclipse.dash</groupId>
+                <artifactId>license-tool-plugin</artifactId>
+                <version>1.1.0</version>
+                <executions>
+                    <execution>
+                        <id>license-check</id>
+                        <goals>
+                            <goal>license-check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <projectId>automotive.tractusx</projectId>
+                    <summary>DEPENDENCIES</summary>
+                    <includeScope>test</includeScope>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
 </project>
