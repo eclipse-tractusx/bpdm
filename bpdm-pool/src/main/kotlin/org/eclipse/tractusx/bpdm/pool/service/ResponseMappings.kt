@@ -165,7 +165,8 @@ fun PhysicalPostalAddressDb.toDto(): PhysicalPostalAddressVerboseDto {
         building = building,
         floor = floor,
         door = door,
-        street = street?.toDto()
+        street = street?.toDto(),
+        taxJurisdictionCode = taxJurisdictionCode
     )
 }
 

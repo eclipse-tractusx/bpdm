@@ -69,4 +69,7 @@ interface IBasePhysicalPostalAddressDto {
 
     @get:Schema(description = PostalAddressDescription.door)
     val door: String?
+
+    @get:Schema(description = PostalAddressDescription.taxJurisdictionCode)
+    val taxJurisdictionCode: String?
 }

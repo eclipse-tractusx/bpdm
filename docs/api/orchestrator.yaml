@@ -2,10 +2,13 @@ openapi: 3.0.1
 info:
   title: Business Partner Data Management Orchestrator
   description: Orchestrator component acts as a passive component and offers for each processing steps individual endpoints
-  version: 6.0.0
+  version: 6.1.0-SNAPSHOT
 servers:
   - url: http://localhost:8085
     description: Generated server url
+security:
+  - open_id_scheme: []
+  - bearer_scheme: []
 paths:
   /v6/golden-record-tasks:
     post:
@@ -293,6 +296,8 @@ components:
         floor:
           type: string
         door:
+          type: string
+        taxJurisdictionCode:
           type: string
     PostalAddress:
       required:
@@ -605,3 +610,19 @@ components:
             $ref: '#/components/schemas/BusinessState'
         address:
           $ref: '#/components/schemas/PostalAddress'
+  securitySchemes:
+    open_id_scheme:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: http://localhost:8180/realms/CX-Central/protocol/openid-connect/token
+          scopes: {}
+        authorizationCode:
+          authorizationUrl: http://localhost:8180/realms/CX-Central/protocol/openid-connect/auth
+          tokenUrl: http://localhost:8180/realms/CX-Central/protocol/openid-connect/token
+          refreshUrl: http://localhost:8180/realms/CX-Central/protocol/openid-connect/token
+          scopes: {}
+    bearer_scheme:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

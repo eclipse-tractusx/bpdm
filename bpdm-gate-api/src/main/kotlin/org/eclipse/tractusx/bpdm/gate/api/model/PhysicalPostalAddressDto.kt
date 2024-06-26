@@ -44,6 +44,7 @@ data class PhysicalPostalAddressDto(
     override val industrialZone: String? = null,
     override val building: String? = null,
     override val floor: String? = null,
-    override val door: String? = null
+    override val door: String? = null,
+    override val taxJurisdictionCode: String? = null
 
 ) : IBasePhysicalPostalAddressDto

@@ -2,10 +2,13 @@ openapi: 3.0.1
 info:
   title: Business Partner Data Management Pool
   description: Service that manages and shares business partner data with other CatenaX services
-  version: 6.0.0
+  version: 6.1.0-SNAPSHOT
 servers:
   - url: http://localhost:8080
     description: Generated server url
+security:
+  - open_id_scheme: []
+  - bearer_scheme: []
 tags:
   - name: Changelog Controller
     description: Read change events of business partner data
@@ -1628,10 +1631,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ErrorInfoAddressCreateError'
-        entityCount:
+        errorCount:
           type: integer
           format: int32
-        errorCount:
+        entityCount:
           type: integer
           format: int32
       description: Holds information about successfully and failed entities after the creating/updating of several objects
@@ -1749,10 +1752,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ErrorInfoAddressUpdateError'
-        entityCount:
+        errorCount:
           type: integer
           format: int32
-        errorCount:
+        entityCount:
           type: integer
           format: int32
       description: Holds information about successfully and failed entities after the creating/updating of several objects
@@ -3421,10 +3424,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ErrorInfoLegalEntityCreateError'
-        entityCount:
+        errorCount:
           type: integer
           format: int32
-        errorCount:
+        entityCount:
           type: integer
           format: int32
       description: Holds information about successfully and failed entities after the creating/updating of several objects
@@ -3552,10 +3555,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ErrorInfoLegalEntityUpdateError'
-        entityCount:
+        errorCount:
           type: integer
           format: int32
-        errorCount:
+        entityCount:
           type: integer
           format: int32
       description: Holds information about successfully and failed entities after the creating/updating of several objects
@@ -4354,6 +4357,9 @@ components:
         door:
           type: string
           description: 'The number of a door in the building on the respective floor addressed by the physical postal address, synonyms: room, suite.'
+        taxJurisdictionCode:
+          type: string
+          description: Tax jurisdiction codes are used to identify the specific jurisdiction(s) that a company belong to, particularly in bureaucratic processes such as tax returns and IRS forms.
       description: A physical postal address describes the physical location of an office, warehouse, gate, etc.
     PhysicalPostalAddressVerboseDto:
       required:
@@ -4399,6 +4405,9 @@ components:
         door:
           type: string
           description: 'The number of a door in the building on the respective floor addressed by the physical postal address, synonyms: room, suite.'
+        taxJurisdictionCode:
+          type: string
+          description: Tax jurisdiction codes are used to identify the specific jurisdiction(s) that a company belong to, particularly in bureaucratic processes such as tax returns and IRS forms.
       description: A physical postal address describes the physical location of an office, warehouse, gate, etc.
     RegionDto:
       required:
@@ -4760,10 +4769,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ErrorInfoSiteCreateError'
-        entityCount:
+        errorCount:
           type: integer
           format: int32
-        errorCount:
+        entityCount:
           type: integer
           format: int32
       description: Holds information about successfully and failed entities after the creating/updating of several objects
@@ -4857,10 +4866,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ErrorInfoSiteUpdateError'
-        entityCount:
+        errorCount:
           type: integer
           format: int32
-        errorCount:
+        entityCount:
           type: integer
           format: int32
       description: Holds information about successfully and failed entities after the creating/updating of several objects
@@ -5360,3 +5369,19 @@ components:
           type: string
           description: Name or denotation of this type
       description: Named type uniquely identified by its technical key
+  securitySchemes:
+    open_id_scheme:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: http://localhost:8180/realms/CX-Central/protocol/openid-connect/token
+          scopes: {}
+        authorizationCode:
+          authorizationUrl: http://localhost:8180/realms/CX-Central/protocol/openid-connect/auth
+          tokenUrl: http://localhost:8180/realms/CX-Central/protocol/openid-connect/token
+          refreshUrl: http://localhost:8180/realms/CX-Central/protocol/openid-connect/token
+          scopes: {}
+    bearer_scheme:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

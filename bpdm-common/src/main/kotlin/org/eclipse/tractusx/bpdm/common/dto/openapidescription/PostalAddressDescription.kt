@@ -50,4 +50,7 @@ object PostalAddressDescription {
             "is assigned multiple times in some cities."
     const val deliveryServiceNumber = "The number indicating the delivery service endpoint of the alternative postal address to which the delivery is " +
             "to be delivered, such as a P.O. box number or a private bag number."
+
+    const val taxJurisdictionCode =
+        "Tax jurisdiction codes are used to identify the specific jurisdiction(s) that a company belong to, particularly in bureaucratic processes such as tax returns and IRS forms."
 }

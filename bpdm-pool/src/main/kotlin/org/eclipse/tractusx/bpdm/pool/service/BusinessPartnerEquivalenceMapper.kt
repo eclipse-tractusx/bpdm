@@ -94,7 +94,8 @@ class BusinessPartnerEquivalenceMapper {
                                 additionalNameSuffix
                             )
                         }
-                    }
+                    },
+                    taxJurisdictionCode = taxJurisdictionCode
                 )
             },
             alternativePostalAddress = with(logisticAddress.alternativePostalAddress) {
@@ -198,7 +199,8 @@ class BusinessPartnerEquivalenceMapper {
         override val industrialZone: String?,
         override val building: String?,
         override val floor: String?,
-        override val door: String?
+        override val door: String?,
+        override val taxJurisdictionCode: String?
     ) : IBasePhysicalPostalAddressDto
 
     data class AlternativeEquivalenceDto(

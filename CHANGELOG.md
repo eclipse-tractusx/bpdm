@@ -12,6 +12,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 
 - BPDM Gate: Post endpoint to upload business partner input data using csv file.(#700)
 - BPDM Gate: GET endpoint to download the csv file template for business partner upload. (#700)
+- Apps: Tax Jurisdiction Code to the physical address of a business partner (#955)
 
 ## [6.0.1] - [2024-05-27]
 
