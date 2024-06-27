@@ -2626,7 +2626,7 @@
         "id.token.claim" : "false",
         "lightweight.claim" : "false",
         "access.token.claim" : "true",
-        "claim.name" : "BPN",
+        "claim.name" : "bpn",
         "jsonType.label" : "String"
       }
     } ]
