@@ -39,10 +39,10 @@ class PartnerUploadService(
 
     private val logger = KotlinLogging.logger { }
 
-    fun processFile(file: MultipartFile, ownerBpnl: String?): ResponseEntity<Collection<BusinessPartnerInputDto>> {
+    fun processFile(file: MultipartFile, tenantBpnl: String?): ResponseEntity<Collection<BusinessPartnerInputDto>> {
         val csvData: List<PartnerUploadFileRow> = PartnerFileUtil.parseCsv(file)
-        val businessPartnerDtos = PartnerFileUtil.validateAndMapToBusinessPartnerInputRequests(csvData)
-        val result = businessPartnerService.upsertBusinessPartnersInput(businessPartnerDtos, ownerBpnl)
+        val businessPartnerDtos = PartnerFileUtil.validateAndMapToBusinessPartnerInputRequests(csvData, tenantBpnl)
+        val result = businessPartnerService.upsertBusinessPartnersInput(businessPartnerDtos, tenantBpnl)
         return ResponseEntity.ok(result)
     }
 

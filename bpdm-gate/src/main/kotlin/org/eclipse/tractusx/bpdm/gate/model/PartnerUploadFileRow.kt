@@ -91,27 +91,6 @@ data class PartnerUploadFileRow(
     @CsvBindByName(column = PartnerUploadFileHeader.IS_OWN_COMPANY_DATA)
     val isOwnCompanyData: String? = null,
 
-    @CsvBindByName(column = PartnerUploadFileHeader.LEGAL_ENTITY_BPN)
-    val legalEntityBpn: String? = null,
-
-    @CsvBindByName(column = PartnerUploadFileHeader.LEGAL_ENTITY_NAME)
-    val legalEntityName: String? = null,
-
-    @CsvBindByName(column = PartnerUploadFileHeader.LEGAL_ENTITY_SHORT_NAME)
-    val legalEntityShortName: String? = null,
-
-    @CsvBindByName(column = PartnerUploadFileHeader.LEGAL_ENTITY_LEGAL_FORM)
-    val legalEntityLegalForm: String? = null,
-
-    @CsvBindByName(column = PartnerUploadFileHeader.LEGAL_ENTITY_STATES_VALID_FROM)
-    val legalEntityStatesValidFrom: String? = null,
-
-    @CsvBindByName(column = PartnerUploadFileHeader.LEGAL_ENTITY_STATES_VALID_TO)
-    val legalEntityStatesValidTo: String? = null,
-
-    @CsvBindByName(column = PartnerUploadFileHeader.LEGAL_ENTITY_STATES_TYPE)
-    val legalEntityStatesType: String? = null,
-
     @CsvBindByName(column = PartnerUploadFileHeader.SITE_BPN)
     val siteBpn: String? = null,
 

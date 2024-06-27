@@ -24,6 +24,7 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityRepresentationInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
 import org.eclipse.tractusx.bpdm.gate.service.TaskCreationService
 import org.eclipse.tractusx.bpdm.gate.util.MockAndAssertUtils
@@ -145,11 +146,21 @@ class PartnerUploadControllerIT @Autowired constructor(
         val bytes = Files.readAllBytes(Paths.get("src/test/resources/testData/valid_partner_data.csv"))
         val uploadedFile = MockMultipartFile("valid_partner_data.csv", "valid_partner_data.csv", "text/csv", bytes)
 
+        // Only Site and Address expected to be updated from upload partner process.
+        val expectedSiteAndAddressPartner = BusinessPartnerVerboseValues.bpInputRequestFull.copy(
+            legalEntity = LegalEntityRepresentationInputDto(
+                legalEntityBpn = null,
+                legalName = null,
+                shortName = null,
+                legalForm = null,
+                states = emptyList()
+            )
+        )
         // Upload the CSV file
         val uploadResponse = gateClient.partnerUpload.uploadPartnerCsvFile(uploadedFile).body!!
         val expectedResponse = listOf(
-            BusinessPartnerVerboseValues.bpInputRequestFull,
-            BusinessPartnerNonVerboseValues.bpInputRequestFull.fastCopy(externalId = BusinessPartnerVerboseValues.externalId2, shortName = "2")
+            expectedSiteAndAddressPartner,
+            expectedSiteAndAddressPartner.fastCopy(externalId = BusinessPartnerVerboseValues.externalId2, siteName = "Site Name 2")
         )
 
         val searchResponsePage = gateClient.businessParters.getBusinessPartnersInput(listOf(BusinessPartnerVerboseValues.externalId1, BusinessPartnerVerboseValues.externalId2)).content
@@ -175,10 +186,20 @@ class PartnerUploadControllerIT @Autowired constructor(
         val combinedFile = MockMultipartFile("combined_partner_data.csv", "combined_partner_data.csv", "text/csv", combinedCsv.toByteArray())
         val uploadResponse = gateClient.partnerUpload.uploadPartnerCsvFile(combinedFile).body!!
 
+        val expectedSiteAndAddressPartner = BusinessPartnerVerboseValues.bpInputRequestFull.copy(
+            legalEntity = LegalEntityRepresentationInputDto(
+                legalEntityBpn = null,
+                legalName = null,
+                shortName = null,
+                legalForm = null,
+                states = emptyList()
+            )
+        )
+
         // Perform assertions
         val expectedResponse = listOf(
-            BusinessPartnerVerboseValues.bpInputRequestFull,
-            BusinessPartnerNonVerboseValues.bpInputRequestFull.fastCopy(externalId = BusinessPartnerVerboseValues.externalId2, shortName = "2")
+            expectedSiteAndAddressPartner,
+            expectedSiteAndAddressPartner.fastCopy(externalId = BusinessPartnerVerboseValues.externalId2, siteName = "Site Name 2")
         )
 
         val searchResponsePage = gateClient.businessParters.getBusinessPartnersInput(listOf(BusinessPartnerVerboseValues.externalId1, BusinessPartnerVerboseValues.externalId2)).content
@@ -215,7 +236,7 @@ class PartnerUploadControllerIT @Autowired constructor(
         taskCreationService.createTasksForReadyBusinessPartners()
     }
 
-    private fun BusinessPartnerInputRequest.fastCopy(externalId: String, shortName: String) =
-        copy(externalId = externalId, legalEntity = legalEntity.copy(shortName = shortName))
+    private fun BusinessPartnerInputRequest.fastCopy(externalId: String, siteName: String) =
+        copy(externalId = externalId, site = site.copy(name = siteName))
 
 }
