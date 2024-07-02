@@ -332,6 +332,20 @@ object BusinessPartnerNonVerboseValues {
         bpnlParent = legalEntityUpdate1.bpnl
     )
 
+    val siteLegalReferenceUpsert1=SiteCreateRequestWithLegalAddressAsMain(
+        name = BusinessPartnerVerboseValues.siteUpsert1.site.name,
+        bpnLParent = legalEntityUpdate1.bpnl,
+        confidenceCriteria = BusinessPartnerVerboseValues.site1.confidenceCriteria,
+        states = listOf(siteStatus1)
+    )
+
+    val siteLegalReferenceUpsert2=SiteCreateRequestWithLegalAddressAsMain(
+        name = BusinessPartnerVerboseValues.siteUpsert2.site.name,
+        bpnLParent = legalEntityUpdate2.bpnl,
+        confidenceCriteria = BusinessPartnerVerboseValues.site2.confidenceCriteria,
+        states = listOf(siteStatus2)
+    )
+
     val siteCreate2 = SitePartnerCreateRequest(
         site = SiteDto(
             name = BusinessPartnerVerboseValues.siteUpsert2.site.name,

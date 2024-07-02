@@ -29,6 +29,7 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.PoolSiteApi.Companion.SITE_PATH
+import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteCreateRequestWithLegalAddressAsMain
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteSearchRequest
@@ -133,4 +134,20 @@ interface PoolSiteApi {
         @ParameterObject searchRequest: SiteSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageDto<SiteWithMainAddressVerboseDto>
+
+    @Operation(
+        summary = "Get page of sites matching the pagination search criteria",
+        description = "This endpoint retrieves all existing business partners of type sites."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Page of business partners matching the search criteria, may be empty"),
+            ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()])
+        ]
+    )
+    @Tag(name = ApiCommons.SITE_NAME, description = ApiCommons.SITE_DESCRIPTION)
+    @PostMapping("/legal/reference")
+    fun createSiteWithLegalReference(
+        @RequestBody request: Collection<SiteCreateRequestWithLegalAddressAsMain>
+    ): SitePartnerCreateResponseWrapper
 }
