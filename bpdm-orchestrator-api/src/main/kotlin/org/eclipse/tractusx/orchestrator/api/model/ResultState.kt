@@ -34,6 +34,5 @@ enum class ResultState {
     BpnlChanged,
     UnclearEntity,
     UnknownSpecialCharacters,
-    MatchBasedOnProvidedNameOrIdentifier,
-    None
+    MatchBasedOnProvidedNameOrIdentifier
 }
