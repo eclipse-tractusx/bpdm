@@ -19,7 +19,27 @@
 
 package org.eclipse.tractusx.orchestrator.api.model
 
+import io.swagger.v3.oas.annotations.media.Schema
+
 enum class TaskErrorType {
     Timeout,
-    Unspecified
+    Unspecified,
+
+    @Schema(description = "The provided record contains natural person information. ")
+    NaturalPersonError,
+
+    @Schema(description = "The provided record can not be matched to a legal entity or an address.")
+    BpnErrorNotFound,
+
+    @Schema(description = "The provided record can not link to a clear legal entity.")
+    BpnErrorTooManyOptions,
+
+    @Schema(description = "The provided record does not fulfill mandatory validation rules. ")
+    MandatoryFieldValidationFailed,
+
+    @Schema(description = "The provided record is part of a country that is not allowed to be processed by the GR process (example: Brazil).")
+    BlacklistCountryPresent,
+
+    @Schema(description = "The provided record contains unalloyed special characters. ")
+    UnknownSpecialCharacters
 }

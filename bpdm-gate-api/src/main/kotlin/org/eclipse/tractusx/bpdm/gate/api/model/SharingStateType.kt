@@ -24,5 +24,18 @@ enum class SharingStateType {
     Success,
     Error,
     Initial,
-    Ready
+    Ready,
+    NaturalPersonError,
+    BpnErrorMissingParent,
+    BpnErrorNotFound,
+    BpnErrorTooManyOptions,
+    MandatoryFieldValidationFailed,
+    BlacklistCountryPresent,
+    InvalidSpecialCharacters,
+    MandatoryFieldMissing,
+    BpnlChanged,
+    UnclearEntity,
+    UnknownSpecialCharacters,
+    MatchBasedOnProvidedNameOrIdentifier,
+    None
 }
