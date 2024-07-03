@@ -6,6 +6,13 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
 For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/CHANGELOG.md) of the charts directly.
 
+## [6.0.2] - [2024-07-03]
+
+### Changed
+
+- BPDM Gate: Now sends alternative addresses which are NULL correctly to the Orchestrator
+- BPDM Pool: Changed Checksum generation algorithm: Now checksum includes the BPN with prefix
+
 ## [6.0.1] - [2024-05-27]
 
 ### Removed
