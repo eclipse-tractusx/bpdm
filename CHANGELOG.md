@@ -18,6 +18,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM System Test: End-to-end test CI/CD workflow setup for golden record process. ([#1155](https://github.com/eclipse-tractusx/bpdm/issues/1155))
 - Apps : Enhanced dependency readiness checks with a scheduler to verify connections to required services every 30 seconds and during startup for Pool, Cleaning Service Dummy, and Gate service. ([#1161](https://github.com/eclipse-tractusx/bpdm/issues/1161))
 - BPDM Gate: Add consistency check with the golden record Pool making sure that referenced BPNs are still existing ([#1130](https://github.com/eclipse-tractusx/bpdm/issues/1130))
+- BPDM Gate: Add externalTimestamp to prevent old request overwrite newer request 
 
 ### Changed
 
@@ -114,15 +115,15 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 
 ### Added
 
-- BPDM Gate: Configuration to prevent the uploaded business partner input data to immediately enter the golden record process. 
-In this configuration the business partner data needs to be sent to the golden record process manually over the new state/ready API endpoint.
-Default configuration remains automatically sharing.
+- BPDM Gate: Configuration to prevent the uploaded business partner input data to immediately enter the golden record process.
+  In this configuration the business partner data needs to be sent to the golden record process manually over the new state/ready API endpoint.
+  Default configuration remains automatically sharing.
 - BPDM Gate: Limited multi-tenancy support. Business partners are now separated by owner-BPNL.
-The owner is determined from the 'bpn' claim in the token.
-This means users of a Gate can only see and edit their own business partner data.
+  The owner is determined from the 'bpn' claim in the token.
+  This means users of a Gate can only see and edit their own business partner data.
 - BPDM Pool: New API endpoints to query business partner data which belongs to Catena-X members only
 - APIs: Added a major version number to all API endpoint paths indicating the current version of the BPDM APIs.
-In the future we will use version numbers in the URL to differentiate between all currently supported major versions of the API
+  In the future we will use version numbers in the URL to differentiate between all currently supported major versions of the API
 - BPDM Gate Client: Now supports the stats endpoints of the BPDM API
 
 ### Changed
@@ -134,15 +135,15 @@ In the future we will use version numbers in the URL to differentiate between al
 - BPDM Gate: Fix not correctly updating business partner output data from golden record updates in the Pool.
 - JAVA version to 21
 - BPDM API Permissions: Overhaul of the permissions needed to access the BPDM API endpoints.
-Permissions are now more fine-granular and differentiate more clearly between read or write.
-For more details consult the Arc42, API documentation and properties files of the respective applications.
+  Permissions are now more fine-granular and differentiate more clearly between read or write.
+  For more details consult the Arc42, API documentation and properties files of the respective applications.
 - BPDM App Configuration: Now all applications are secured (authenticated and authorized) by default.
-You can still deactivate security in the BPDM apps for testing or development purposes though.
+  You can still deactivate security in the BPDM apps for testing or development purposes though.
 - BPDM Pool: Fix Pool trying to update golden records which the golden record process indicated to have no changes
 - BPDM Orchestrator: The business partner data for golden record process tasks has been completely overhauled.
-Now business partner data is clearly divided into `uncategorized`, `legal entity`, `site` and `additonal address` data.
-This model is less verbose and contains less duplicate data.
-Additionally, both Pool and Gate can write and read from it making it unnecessary for a cleaning service to provide the data in two different models.
+  Now business partner data is clearly divided into `uncategorized`, `legal entity`, `site` and `additonal address` data.
+  This model is less verbose and contains less duplicate data.
+  Additionally, both Pool and Gate can write and read from it making it unnecessary for a cleaning service to provide the data in two different models.
 
 
 
@@ -190,7 +191,7 @@ Additionally, both Pool and Gate can write and read from it making it unnecessar
 - BPDM Gate: New business partner type 'GENERIC' for changelog
 - BPDM Gate: New business partner type 'GENERIC' for sharing state
 - Workflows: Trivy now targets the latest alpha Docker image instead of the latest release version
-- Apps: Increase projectreactor.netty version to fix Trivy vulnerability 
+- Apps: Increase projectreactor.netty version to fix Trivy vulnerability
 
 
 ## [4.0.1] - 2023-08-28
@@ -228,8 +229,8 @@ Please create a back-up of your business partner data before updating.
 - BPDM: Umbrella Chart with BPDM Bridge Dummy.
 
 ### Fixed
-  - BPDM: Deprecated endpoints for retrieving business partners in legacy format.
-  - Endpoint for retrieving changelog entries has now improved filtering (breaking API change)
+- BPDM: Deprecated endpoints for retrieving business partners in legacy format.
+- Endpoint for retrieving changelog entries has now improved filtering (breaking API change)
 
 ## [3.2.2] - 2023-05-12
 
@@ -273,7 +274,7 @@ Please create a back-up of your business partner data before updating.
 
 ### Fixed
 
-- BPDM Gate: For a business partner with a child relation, this relation could be returned as parent relation erroneously. 
+- BPDM Gate: For a business partner with a child relation, this relation could be returned as parent relation erroneously.
 - BPDM Gate: When a business partner with a child relation was updated, this relation was erroneously deleted, rendering the previous child invalid.
 
 ## [3.0.3] - 2023-02-23

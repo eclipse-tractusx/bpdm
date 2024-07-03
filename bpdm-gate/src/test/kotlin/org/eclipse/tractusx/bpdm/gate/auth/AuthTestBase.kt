@@ -49,7 +49,7 @@ abstract class AuthTestBase(
     @Test
     fun `PUT Partner Input`() {
         authAssertions.assert(authExpectations.businessPartner.putInput) { gateClient.businessParters.upsertBusinessPartnersInput(listOf(
-            BusinessPartnerInputRequest("externalId")
+            BusinessPartnerInputRequest("externalId", externalSequenceTimestamp = null)
         )) }
     }
 

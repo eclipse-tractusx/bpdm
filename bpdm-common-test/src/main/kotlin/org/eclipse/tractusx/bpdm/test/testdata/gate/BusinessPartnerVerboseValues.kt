@@ -72,6 +72,10 @@ object BusinessPartnerVerboseValues {
     const val businessStatusDescription1 = "Active"
     const val businessStatusDescription2 = "Insolvent"
 
+    val externalSequenceTimestamp1 = Instant.now().minusSeconds(5)
+    val externalSequenceTimestamp2 = Instant.now()
+    val externalSequenceTimestamp3 = Instant.now().plusSeconds(5)
+
     val businessStatusValidFrom1 = LocalDateTime.of(2020, 1, 1, 0, 0)
     val businessStatusValidFrom2 = LocalDateTime.of(2019, 1, 1, 0, 0)
 
@@ -331,7 +335,8 @@ object BusinessPartnerVerboseValues {
             addressType = AddressType.LegalAddress,
             physicalPostalAddress = postalAddress2,
             alternativePostalAddress = alternativeAddressFull
-        )
+        ),
+        externalSequenceTimestamp = null
 
     )
 
@@ -358,7 +363,8 @@ object BusinessPartnerVerboseValues {
             addressType = AddressType.SiteMainAddress,
             physicalPostalAddress = postalAddress2,
             alternativePostalAddress = alternativeAddressFull
-        )
+        ),
+        externalSequenceTimestamp = null
     )
 
     //New Values for Logistic Addresses Tests
@@ -376,7 +382,7 @@ object BusinessPartnerVerboseValues {
         building = "Bauteil A",
         floor = "Etage 1",
         door = "Door One",
-        street = StreetDto(name = "Mercedesstraße", houseNumber = "", direction = "direction1", houseNumberSupplement = "A"),
+        street = StreetDto(name = "Mercedesstraße", houseNumber = "", direction = "direction1", houseNumberSupplement = "A")
     )
 
     val postalAddressLogisticAddress2 = PhysicalPostalAddressDto(
@@ -393,7 +399,7 @@ object BusinessPartnerVerboseValues {
         building = "Building Two",
         floor = "Floor Two",
         door = "Door Two",
-        street = StreetDto(name = "TODO", houseNumber = "", direction = "direction1", houseNumberSupplement = "B"),
+        street = StreetDto(name = "TODO", houseNumber = "", direction = "direction1", houseNumberSupplement = "B")
     )
 
     //New Values for Logistic Address Tests
@@ -657,7 +663,8 @@ object BusinessPartnerVerboseValues {
             addressType = AddressType.LegalAndSiteMainAddress,
             physicalPostalAddress = physicalAddressChina,
             alternativePostalAddress = AlternativePostalAddressDto()
-        )
+        ),
+        externalSequenceTimestamp = null
     )
 
     val bpInputRequestCleaned = BusinessPartnerInputRequest(
@@ -685,7 +692,8 @@ object BusinessPartnerVerboseValues {
             addressType = AddressType.LegalAddress,
             physicalPostalAddress = postalAddress2,
             alternativePostalAddress = alternativeAddressFull
-        )
+        ),
+        externalSequenceTimestamp = null
     )
 
     val bpInputRequestError = BusinessPartnerInputRequest(
@@ -713,7 +721,8 @@ object BusinessPartnerVerboseValues {
             addressType = AddressType.LegalAddress,
             physicalPostalAddress = postalAddress2,
             alternativePostalAddress = alternativeAddressFull
-        )
+        ),
+        externalSequenceTimestamp = null
     )
 
     val bpOutputDtoCleaned = BusinessPartnerOutputDto(
@@ -827,6 +836,60 @@ object BusinessPartnerVerboseValues {
         isOwnCompanyData = false,
         createdAt = Instant.now(),
         updatedAt = Instant.now()
+    )
+
+    val bpInputRequestWithExternalSequenceTimestamp1 = BusinessPartnerInputRequest(
+        externalId = externalId1,
+        legalEntity = LegalEntityRepresentationInputDto(
+            legalEntityBpn = "BPNL0000000000XY",
+            shortName = "short",
+            legalName = "Limited Liability Company Name",
+            legalForm = "Limited Liability Company"
+        ),
+        address = AddressRepresentationInputDto(
+            addressBpn = "BPNA0000000001XY",
+            name = "Address Name",
+            addressType = null,
+            physicalPostalAddress = physicalAddressMinimal
+        ),
+        externalSequenceTimestamp = externalSequenceTimestamp1
+
+    )
+
+    val bpInputRequestWithExternalSequenceTimestamp2 = BusinessPartnerInputRequest(
+        externalId = externalId1,
+        legalEntity = LegalEntityRepresentationInputDto(
+            legalEntityBpn = "BPNL0000000000XY",
+            shortName = "short1",
+            legalName = "Limited Liability Company Name",
+            legalForm = "Limited Liability Company"
+        ),
+        address = AddressRepresentationInputDto(
+            addressBpn = "BPNA0000000001XY",
+            name = "Address Name",
+            addressType = null,
+            physicalPostalAddress = physicalAddressMinimal
+        ),
+        externalSequenceTimestamp = externalSequenceTimestamp2
+
+    )
+
+    val bpInputRequestWithExternalSequenceTimestamp3 = BusinessPartnerInputRequest(
+        externalId = externalId1,
+        legalEntity = LegalEntityRepresentationInputDto(
+            legalEntityBpn = "BPNL0000000000XY",
+            shortName = "short2",
+            legalName = "Limited Liability Company Name",
+            legalForm = "Limited Liability Company"
+        ),
+        address = AddressRepresentationInputDto(
+            addressBpn = "BPNA0000000001XY",
+            name = "Another address Name",
+            addressType = null,
+            physicalPostalAddress = physicalAddressMinimal
+        ),
+        externalSequenceTimestamp = externalSequenceTimestamp3
+
     )
 
     val now = Instant.now()
