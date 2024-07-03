@@ -21,8 +21,8 @@
 apiVersion: v2
 type: application
 name: bpdm-cleaning-service-dummy
-appVersion: "6.0.1"
-version: 3.0.1
+appVersion: "6.0.2"
+version: 3.0.2
 description: A Helm chart for deploying the BPDM cleaning service
 home: https://eclipse-tractusx.github.io/docs/kits/Business%20Partner%20Kit/Adoption%20View
 sources:
