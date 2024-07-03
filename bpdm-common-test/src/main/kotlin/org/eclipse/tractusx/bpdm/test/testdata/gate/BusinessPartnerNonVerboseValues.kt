@@ -36,7 +36,8 @@ object BusinessPartnerNonVerboseValues {
 
     val bpInputRequestMinimal = BusinessPartnerInputRequest(
         externalId = BusinessPartnerVerboseValues.externalId2,
-        address = bpPostalAddressInputDtoMinimal
+        address = bpPostalAddressInputDtoMinimal,
+        currentness = null
     )
 
     val bpInputRequestFull = BusinessPartnerVerboseValues.bpInputRequestFull

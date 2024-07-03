@@ -31,6 +31,7 @@ import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.eclipse.tractusx.bpdm.gate.entity.generic.*
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidPartnerException
 import org.springframework.stereotype.Service
+import java.sql.Timestamp
 
 @Service
 class BusinessPartnerMappings {
@@ -88,6 +89,11 @@ class BusinessPartnerMappings {
             bpnS = dto.site.siteBpn,
             bpnA = dto.address.addressBpn,
             postalAddress = toPostalAddress(dto.address),
+            currentness = try{
+                Timestamp.valueOf(dto.currentness)
+            }catch (e:Exception) {
+                null
+            },
             legalEntityConfidence = null,
             siteConfidence = null,
             addressConfidence = null,
