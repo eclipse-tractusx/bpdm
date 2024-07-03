@@ -128,12 +128,17 @@ class BusinessPartnerService(
         val partnerToUpsert = existingPartner ?: BusinessPartnerDb.createEmpty(upsertData.sharingState, upsertData.stage)
 
         val hasChanges = changeType == ChangelogType.CREATE || compareUtil.hasChanges(upsertData, partnerToUpsert)
+        val shouldUpdate = when {
+            upsertData.externalSequenceTimestamp == null -> true
+            existingPartner?.externalSequenceTimestamp == null -> true
+            else -> upsertData.externalSequenceTimestamp!!.isAfter(existingPartner.externalSequenceTimestamp)
+        }
 
-        if (hasChanges) {
-            changelogRepository.save(ChangelogEntryDb(sharingState.externalId, sharingState.tenantBpnl, changeType, stage))
+        if (hasChanges && shouldUpdate) {
+                changelogRepository.save(ChangelogEntryDb(sharingState.externalId, sharingState.tenantBpnl, changeType, stage))
 
-            copyUtil.copyValues(upsertData, partnerToUpsert)
-            businessPartnerRepository.save(partnerToUpsert)
+                copyUtil.copyValues(upsertData, partnerToUpsert)
+                businessPartnerRepository.save(partnerToUpsert)
         }
 
         return UpsertResult(hasChanges, changeType, partnerToUpsert)

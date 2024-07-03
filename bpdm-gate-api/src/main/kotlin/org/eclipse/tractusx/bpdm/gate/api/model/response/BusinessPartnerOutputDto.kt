@@ -40,6 +40,7 @@ data class BusinessPartnerOutputDto(
     override val legalEntity: LegalEntityRepresentationOutputDto,
     override val site: SiteRepresentationOutputDto?,
     override val address: AddressComponentOutputDto,
+    override val externalSequenceTimestamp: Instant? = null,
 
     @get:Schema(description = CommonDescription.createdAt)
     val createdAt: Instant,

@@ -41,6 +41,7 @@ data class BusinessPartnerInputDto(
     override val legalEntity: LegalEntityRepresentationInputDto = LegalEntityRepresentationInputDto(),
     override val site: SiteRepresentationInputDto = SiteRepresentationInputDto(),
     override val address: AddressRepresentationInputDto = AddressRepresentationInputDto(),
+    override val externalSequenceTimestamp:Instant? = null,
 
     @get:Schema(description = CommonDescription.createdAt)
     val createdAt: Instant,
