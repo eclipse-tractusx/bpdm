@@ -1,0 +1,2 @@
+ALTER TABLE business_partners
+ADD COLUMN external_sequence_timestamp TIMESTAMP WITHOUT TIME ZONE NULL
