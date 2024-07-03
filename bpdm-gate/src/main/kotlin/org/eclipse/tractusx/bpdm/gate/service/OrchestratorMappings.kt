@@ -33,10 +33,9 @@ import org.eclipse.tractusx.bpdm.gate.entity.PhysicalPostalAddressDb
 import org.eclipse.tractusx.bpdm.gate.entity.StreetDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.*
 import org.eclipse.tractusx.orchestrator.api.model.*
-import org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType
 import org.springframework.stereotype.Service
 import java.time.ZoneOffset
-import java.util.SortedSet
+import java.util.*
 
 @Service
 class OrchestratorMappings(
@@ -134,7 +133,7 @@ class OrchestratorMappings(
                         deliveryServiceNumber
                     )
                 }
-            } ?: AlternativeAddress.empty,
+            },
             hasChanged = null
         )
     }
