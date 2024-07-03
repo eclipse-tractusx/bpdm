@@ -14,6 +14,15 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM Gate: GET endpoint to download the csv file template for business partner upload. (#700)
 - Apps: Tax Jurisdiction Code to the physical address of a business partner (#955)
 
+
+## [6.0.2] - [2024-07-03]
+
+### Changed
+
+- BPDM Gate: Now sends alternative addresses which are NULL correctly to the Orchestrator
+- BPDM Pool: Changed Checksum generation algorithm: Now checksum includes the BPN with prefix
+
+
 ## [6.0.1] - [2024-05-27]
 
 ### Removed
