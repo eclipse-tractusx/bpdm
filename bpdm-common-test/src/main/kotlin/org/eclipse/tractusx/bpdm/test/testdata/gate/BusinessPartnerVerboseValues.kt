@@ -72,6 +72,10 @@ object BusinessPartnerVerboseValues {
     const val businessStatusDescription1 = "Active"
     const val businessStatusDescription2 = "Insolvent"
 
+    val currentness1 = "2024-06-28 11:59:00"
+    val currentness2 = "2024-06-28 12:00:00"
+    val currentness3 = "2024-06-28 12:01:00"
+
     val businessStatusValidFrom1 = LocalDateTime.of(2020, 1, 1, 0, 0)
     val businessStatusValidFrom2 = LocalDateTime.of(2019, 1, 1, 0, 0)
 
@@ -331,7 +335,8 @@ object BusinessPartnerVerboseValues {
             addressType = AddressType.LegalAddress,
             physicalPostalAddress = postalAddress2,
             alternativePostalAddress = alternativeAddressFull
-        )
+        ),
+        currentness = null
 
     )
 
@@ -631,7 +636,8 @@ object BusinessPartnerVerboseValues {
             addressType = AddressType.LegalAndSiteMainAddress,
             physicalPostalAddress = physicalAddressChina,
             alternativePostalAddress = AlternativePostalAddressDto()
-        )
+        ),
+        currentness = null
     )
 
     val bpInputRequestCleaned = BusinessPartnerInputRequest(
@@ -659,7 +665,8 @@ object BusinessPartnerVerboseValues {
             addressType = AddressType.LegalAddress,
             physicalPostalAddress = postalAddress2,
             alternativePostalAddress = alternativeAddressFull
-        )
+        ),
+        currentness = null
     )
 
     val bpInputRequestError = BusinessPartnerInputRequest(
@@ -687,7 +694,8 @@ object BusinessPartnerVerboseValues {
             addressType = AddressType.LegalAddress,
             physicalPostalAddress = postalAddress2,
             alternativePostalAddress = alternativeAddressFull
-        )
+        ),
+        currentness = null
     )
 
     val bpOutputDtoCleaned = BusinessPartnerOutputDto(
@@ -800,6 +808,60 @@ object BusinessPartnerVerboseValues {
         isOwnCompanyData = false,
         createdAt = Instant.now(),
         updatedAt = Instant.now()
+    )
+
+    val bpInputRequestWithCurrentness1 = BusinessPartnerInputRequest(
+        externalId = externalId1,
+        legalEntity = LegalEntityRepresentationInputDto(
+            legalEntityBpn = "BPNL0000000000XY",
+            shortName = "short",
+            legalName = "Limited Liability Company Name",
+            legalForm = "Limited Liability Company"
+        ),
+        address = AddressRepresentationInputDto(
+            addressBpn = "BPNA0000000001XY",
+            name = "Address Name",
+            addressType = null,
+            physicalPostalAddress = physicalAddressMinimal
+        ),
+        currentness = currentness1
+
+    )
+
+    val bpInputRequestWithCurrentness2 = BusinessPartnerInputRequest(
+        externalId = externalId1,
+        legalEntity = LegalEntityRepresentationInputDto(
+            legalEntityBpn = "BPNL0000000000XY",
+            shortName = "short1",
+            legalName = "Limited Liability Company Name",
+            legalForm = "Limited Liability Company"
+        ),
+        address = AddressRepresentationInputDto(
+            addressBpn = "BPNA0000000001XY",
+            name = "Address Name",
+            addressType = null,
+            physicalPostalAddress = physicalAddressMinimal
+        ),
+        currentness = currentness2
+
+    )
+
+    val bpInputRequestWithCurrentness3 = BusinessPartnerInputRequest(
+        externalId = externalId1,
+        legalEntity = LegalEntityRepresentationInputDto(
+            legalEntityBpn = "BPNL0000000000XY",
+            shortName = "short2",
+            legalName = "Limited Liability Company Name",
+            legalForm = "Limited Liability Company"
+        ),
+        address = AddressRepresentationInputDto(
+            addressBpn = "BPNA0000000001XY",
+            name = "Another address Name",
+            addressType = null,
+            physicalPostalAddress = physicalAddressMinimal
+        ),
+        currentness = currentness3
+
     )
 
     val now = Instant.now()

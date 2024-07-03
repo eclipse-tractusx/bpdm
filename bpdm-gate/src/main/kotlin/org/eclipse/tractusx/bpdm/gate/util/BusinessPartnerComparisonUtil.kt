@@ -43,6 +43,7 @@ class BusinessPartnerComparisonUtil {
                 entity.identifiers != persistedBP.identifiers ||
                 entity.states != persistedBP.states ||
                 entity.classifications != persistedBP.classifications ||
+                entity.currentness != persistedBP.currentness ||
                 postalAddressHasChanges(entity.postalAddress, persistedBP.postalAddress)
     }
 

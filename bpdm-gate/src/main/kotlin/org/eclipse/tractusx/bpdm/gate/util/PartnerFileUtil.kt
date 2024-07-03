@@ -91,7 +91,9 @@ object PartnerFileUtil {
                     isOwnCompanyData = row.isOwnCompanyData?.toBoolean() ?: false,
                     legalEntity = row.toLegalEntityRepresentationInputDto(formatter, errors, index),
                     site = row.toSiteRepresentationInputDto(formatter, errors, index),
-                    address = row.toAddressRepresentationInputDto(formatter, errors, index)
+                    address = row.toAddressRepresentationInputDto(formatter, errors, index),
+                    currentness = null
+
                 )
             } catch (e: Exception) {
                 errors.add("Row ${index + 1} has error: ${e.message}")

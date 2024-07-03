@@ -1,0 +1,2 @@
+ALTER TABLE business_partners
+ADD COLUMN currentness TIMESTAMP WITHOUT TIME ZONE NULL
