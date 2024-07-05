@@ -14,6 +14,10 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM Gate: GET endpoint to download the csv file template for business partner upload. (#700)
 - Apps: Tax Jurisdiction Code to the physical address of a business partner (#955)
 
+### Changed:
+
+- BPDM Gate: Fix sending business partner data to the golden record service even when they have no changes
+
 
 ## [6.0.2] - [2024-07-03]
 
