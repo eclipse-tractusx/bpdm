@@ -134,7 +134,7 @@ class OrchestratorMappings(
                         deliveryServiceNumber
                     )
                 }
-            } ?: AlternativeAddress.empty,
+            },
             hasChanged = null
         )
     }
