@@ -17,6 +17,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 ### Changed:
 
 - BPDM Gate: Fix sending business partner data to the golden record service even when they have no changes
+- BPDM Gate: Fix sharing states sometimes taking the wrong task id from the orchestrator
 
 
 ## [6.0.2] - [2024-07-03]

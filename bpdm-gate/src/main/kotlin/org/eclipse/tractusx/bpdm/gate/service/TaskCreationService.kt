@@ -58,8 +58,8 @@ class TaskCreationService(
         val orchestratorBusinessPartnersDto = foundPartners.map { orchestratorMappings.toOrchestratorDto(it) }
         val createdTasks = createGoldenRecordTasks(TaskMode.UpdateFromSharingMember, orchestratorBusinessPartnersDto)
 
-        foundStates.zip(createdTasks).forEach { (state, task) ->
-            sharingStateService.setPending(state, task.taskId)
+        foundPartners.zip(createdTasks).forEach { (partner, task) ->
+            sharingStateService.setPending(partner.sharingState, task.taskId)
         }
 
         logger.info { "Created ${createdTasks.size} new golden record tasks from ready business partners" }
