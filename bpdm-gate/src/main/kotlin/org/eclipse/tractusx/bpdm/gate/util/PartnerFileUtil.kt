@@ -68,7 +68,7 @@ object PartnerFileUtil {
      * @return A list of BusinessPartnerInputRequest objects derived from the valid CSV rows.
      * @throws BpdmInvalidPartnerUploadException if any validation errors are encountered during processing.
      */
-    fun validateAndMapToBusinessPartnerInputRequests(csvData: List<PartnerUploadFileRow>): List<BusinessPartnerInputRequest> {
+    fun validateAndMapToBusinessPartnerInputRequests(csvData: List<PartnerUploadFileRow>, tenantBpnl: String?): List<BusinessPartnerInputRequest> {
         val formatter = DateTimeFormatter.ISO_DATE_TIME
         val validator: Validator = Validation.buildDefaultValidatorFactory().validator
         val errors = mutableListOf<String>()
@@ -89,7 +89,8 @@ object PartnerFileUtil {
                     ),
                     roles = row.roles.toEnumList(BusinessPartnerRole::valueOf, errors, index + 1, PartnerUploadFileHeader.ROLES),
                     isOwnCompanyData = row.isOwnCompanyData?.toBoolean() ?: false,
-                    legalEntity = row.toLegalEntityRepresentationInputDto(formatter, errors, index),
+                    // Legal entity's business partner number is nothing but tenant's partner number who is performing business partner upload action
+                    legalEntity = LegalEntityRepresentationInputDto(legalEntityBpn = tenantBpnl?.takeIf { it.isNotEmpty() }),
                     site = row.toSiteRepresentationInputDto(formatter, errors, index),
                     address = row.toAddressRepresentationInputDto(formatter, errors, index)
                 )
@@ -177,27 +178,6 @@ object PartnerFileUtil {
             validFrom = validFrom?.let { parseDate(it, formatter, errors, rowIndex + 1, "states$index.validFrom") },
             validTo = validTo?.let { parseDate(it, formatter, errors, rowIndex + 1, "states$index.validTo") },
             type = type?.let { parseEnum(it, BusinessStateType::valueOf, errors, rowIndex + 1, "states$index.type") }
-        )
-    }
-
-    private fun PartnerUploadFileRow.toLegalEntityRepresentationInputDto(
-        formatter: DateTimeFormatter,
-        errors: MutableList<String>,
-        rowIndex: Int
-    ): LegalEntityRepresentationInputDto {
-        return LegalEntityRepresentationInputDto(
-            legalEntityBpn = legalEntityBpn?.takeIf { it.isNotEmpty() },
-            legalName = legalEntityName?.takeIf { it.isNotEmpty() },
-            shortName = legalEntityShortName?.takeIf { it.isNotEmpty() },
-            legalForm = legalEntityLegalForm?.takeIf { it.isNotEmpty() },
-            states = listOfNotNull(
-                if (!legalEntityStatesValidFrom.isNullOrEmpty() && !legalEntityStatesValidTo.isNullOrEmpty() && !legalEntityStatesType.isNullOrEmpty())
-                    BusinessPartnerStateDto(
-                        validFrom = parseDate(legalEntityStatesValidFrom, formatter, errors, rowIndex + 1, PartnerUploadFileHeader.LEGAL_ENTITY_STATES_VALID_FROM),
-                        validTo = parseDate(legalEntityStatesValidTo, formatter, errors, rowIndex + 1, PartnerUploadFileHeader.LEGAL_ENTITY_STATES_VALID_TO),
-                        type = parseEnum(legalEntityStatesType, BusinessStateType::valueOf, errors, rowIndex + 1, PartnerUploadFileHeader.LEGAL_ENTITY_STATES_TYPE)
-                    ) else null
-            )
         )
     }
 
