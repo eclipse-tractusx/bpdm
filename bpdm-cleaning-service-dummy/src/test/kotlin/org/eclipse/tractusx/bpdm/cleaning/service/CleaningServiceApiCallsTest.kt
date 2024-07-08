@@ -42,6 +42,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import java.time.Instant
+import java.util.*
 
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
@@ -373,7 +374,7 @@ class CleaningServiceApiCallsTest @Autowired constructor(
 
     // Helper method to create a sample TaskStepReservationResponse
     private fun createSampleTaskStepReservationResponse(businessPartner: BusinessPartner): TaskStepReservationResponse {
-        return TaskStepReservationResponse(listOf(TaskStepReservationEntryDto(fixedTaskId, businessPartner)), Instant.MIN)
+        return TaskStepReservationResponse(listOf(TaskStepReservationEntryDto(fixedTaskId, UUID.randomUUID().toString(), businessPartner)), Instant.MIN)
     }
 
 

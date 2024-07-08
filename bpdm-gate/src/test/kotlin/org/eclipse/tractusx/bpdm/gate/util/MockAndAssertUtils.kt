@@ -64,6 +64,7 @@ class MockAndAssertUtils @Autowired constructor(
                     TaskClientStateDto(
                         taskId = "0",
                         businessPartnerResult = BusinessPartnerGenericCommonValues.businessPartner1,
+                        recordId = "e3a05ebc-ff59-4d09-bd58-da31d6245701",
                         processingState = TaskProcessingStateDto(
                             resultState = ResultState.Pending,
                             step = TaskStep.CleanAndSync,
@@ -77,6 +78,7 @@ class MockAndAssertUtils @Autowired constructor(
                     TaskClientStateDto(
                         taskId = "1",
                         businessPartnerResult = BusinessPartnerGenericCommonValues.businessPartner1,
+                        recordId = "f05574ff-4ddd-4360-821a-923203711f85",
                         processingState = TaskProcessingStateDto(
                             resultState = ResultState.Pending,
                             step = TaskStep.CleanAndSync,
@@ -90,6 +92,7 @@ class MockAndAssertUtils @Autowired constructor(
                     TaskClientStateDto(
                         taskId = "2",
                         businessPartnerResult = BusinessPartnerGenericCommonValues.businessPartner1,
+                        recordId = "8c03850d-d772-4a2e-9845-65211231b38c",
                         processingState = TaskProcessingStateDto(
                             resultState = ResultState.Pending,
                             step = TaskStep.CleanAndSync,
@@ -103,6 +106,7 @@ class MockAndAssertUtils @Autowired constructor(
                     TaskClientStateDto(
                         taskId = "3",
                         businessPartnerResult = BusinessPartnerGenericCommonValues.businessPartner1,
+                        recordId = "6bebb1aa-935d-467a-afd4-7e8623420a18",
                         processingState = TaskProcessingStateDto(
                             resultState = ResultState.Pending,
                             step = TaskStep.CleanAndSync,
@@ -132,6 +136,7 @@ class MockAndAssertUtils @Autowired constructor(
                     TaskClientStateDto(
                         taskId = "0",
                         businessPartnerResult = BusinessPartnerGenericCommonValues.businessPartner1,
+                        recordId = "e3a05ebc-ff59-4d09-bd58-da31d6245701",
                         processingState = TaskProcessingStateDto(
                             resultState = ResultState.Success,
                             step = TaskStep.CleanAndSync,
@@ -145,6 +150,7 @@ class MockAndAssertUtils @Autowired constructor(
                     TaskClientStateDto(
                         taskId = "1",
                         businessPartnerResult = BusinessPartnerGenericCommonValues.businessPartner1,
+                        recordId = "f05574ff-4ddd-4360-821a-923203711f85",
                         processingState = TaskProcessingStateDto(
                             resultState = ResultState.Error,
                             step = TaskStep.CleanAndSync,
@@ -172,7 +178,10 @@ class MockAndAssertUtils @Autowired constructor(
         val taskStateResponse = TaskStateResponse(
             listOf(
                 TaskClientStateDto(
-                    taskId = "0", businessPartnerResult = BusinessPartnerGenericCommonValues.businessPartner1, processingState = TaskProcessingStateDto(
+                    taskId = "0",
+                    businessPartnerResult = BusinessPartnerGenericCommonValues.businessPartner1,
+                    recordId = "e3a05ebc-ff59-4d09-bd58-da31d6245701",
+                    processingState = TaskProcessingStateDto(
                         resultState = ResultState.Success,
                         step = TaskStep.CleanAndSync,
                         stepState = StepState.Queued,

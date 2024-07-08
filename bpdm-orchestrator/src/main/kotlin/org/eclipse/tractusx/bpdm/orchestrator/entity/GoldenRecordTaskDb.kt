@@ -52,6 +52,10 @@ class GoldenRecordTaskDb(
     @Column(nullable = false, name = "UPDATED_AT")
     @Convert(converter = DbTimestampConverter::class)
     var updatedAt: DbTimestamp = createdAt,
+    @ManyToOne
+    @JoinColumn(name = "gate_record_id", nullable = false, foreignKey = ForeignKey(name = "fk_tasks_gate_records"))
+    var gateRecord: GateRecordDb,
+
     @Embedded
     val processingState: ProcessingState,
     @Embedded

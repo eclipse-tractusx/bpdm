@@ -17,17 +17,14 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.orchestrator.api.model
 
-import io.swagger.v3.oas.annotations.media.ArraySchema
-import io.swagger.v3.oas.annotations.media.Schema
+package org.eclipse.tractusx.bpdm.orchestrator.repository
 
-@Schema(description = "Request object to specify for which business partner data tasks should be created and in which mode")
-data class TaskCreateRequest(
+import org.eclipse.tractusx.bpdm.orchestrator.entity.GateRecordDb
+import org.springframework.data.repository.CrudRepository
+import java.util.*
 
-    @get:Schema(required = true, description = "The mode affecting which processing steps the business partner goes through")
-    val mode: TaskMode,
+interface GateRecordRepository: CrudRepository<GateRecordDb, Long> {
 
-    @get:ArraySchema(arraySchema = Schema(description = "The list of tasks to create"))
-    val requests: List<TaskCreateRequestEntry>
-)
+    fun findByPrivateIdIn(privateUuids: Set<UUID>): Set<GateRecordDb>
+}

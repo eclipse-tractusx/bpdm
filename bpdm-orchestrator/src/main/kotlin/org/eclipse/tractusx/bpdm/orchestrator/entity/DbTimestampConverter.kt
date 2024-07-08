@@ -30,7 +30,6 @@ class DbTimestampConverter: AttributeConverter<DbTimestamp, Timestamp> {
     }
 
     override fun convertToEntityAttribute(p0: Timestamp?): DbTimestamp? {
-      return p0?.let { DbTimestamp(p0.toInstant()) }
+        return p0?.let { DbTimestamp(p0.toInstant()) }
     }
-
 }
