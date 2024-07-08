@@ -164,6 +164,12 @@
                 <artifactId>kotlin-logging-jvm</artifactId>
                 <version>${kotlinlogging.version}</version>
             </dependency>
+            <!-- Increase dependency version to mitigate high vulnerability -->
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-core</artifactId>
+                <version>10.1.25</version>
+            </dependency>
 
             <!-- Test -->
             <dependency>
