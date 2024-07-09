@@ -20,120 +20,138 @@
 package org.eclipse.tractusx.bpdm.orchestrator.service
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.orchestrator.config.TaskConfigProperties
+import org.eclipse.tractusx.bpdm.orchestrator.entity.DbTimestamp
+import org.eclipse.tractusx.bpdm.orchestrator.entity.GoldenRecordTaskDb
+import org.eclipse.tractusx.bpdm.orchestrator.entity.TaskErrorDb
+import org.eclipse.tractusx.bpdm.orchestrator.entity.toTimestamp
 import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmIllegalStateException
-import org.eclipse.tractusx.bpdm.orchestrator.model.GoldenRecordTask
-import org.eclipse.tractusx.bpdm.orchestrator.model.TaskProcessingState
+import org.eclipse.tractusx.bpdm.orchestrator.repository.GoldenRecordTaskRepository
 import org.eclipse.tractusx.orchestrator.api.model.*
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
 import org.springframework.stereotype.Service
 import java.time.Instant
 
 @Service
 class GoldenRecordTaskStateMachine(
-    private val taskConfigProperties: TaskConfigProperties
+    private val taskConfigProperties: TaskConfigProperties,
+    private val taskRepository: GoldenRecordTaskRepository,
+    private val requestMapper: RequestMapper
 ) {
 
     private val logger = KotlinLogging.logger { }
 
-    fun initProcessingState(mode: TaskMode): TaskProcessingState {
-        logger.debug { "Executing initProcessingState() with parameters $mode" }
-        val now = Instant.now()
+    fun initTask(mode: TaskMode, initBusinessPartner: BusinessPartner): GoldenRecordTaskDb {
+        logger.debug { "Executing initProcessingState() with parameters mode: $mode and business partner data: $initBusinessPartner" }
 
         val initialStep = getInitialStep(mode)
-
-        return TaskProcessingState(
+        val initProcessingState = GoldenRecordTaskDb.ProcessingState(
             mode = mode,
             resultState = ResultState.Pending,
-
             step = initialStep,
+            errors = mutableListOf(),
             stepState = StepState.Queued,
-
-            taskCreatedAt = now,
-            taskModifiedAt = now,
-
-            taskPendingTimeout = now.plus(taskConfigProperties.taskPendingTimeout),
-            taskRetentionTimeout = null
+            pendingTimeout =  Instant.now().plus(taskConfigProperties.taskPendingTimeout).toTimestamp(),
+            retentionTimeout = null
         )
+
+        val initialTask = GoldenRecordTaskDb(
+            processingState = initProcessingState,
+            businessPartner = requestMapper.toBusinessPartner(initBusinessPartner)
+        )
+
+        return taskRepository.save(initialTask)
     }
 
-    fun doReserve(task: GoldenRecordTask) {
+    fun doReserve(task: GoldenRecordTaskDb): GoldenRecordTaskDb {
         logger.debug { "Executing doReserve() with parameters $task" }
         val state = task.processingState
-        val now = Instant.now()
 
         if (state.resultState != ResultState.Pending || state.stepState != StepState.Queued) {
-            throw BpdmIllegalStateException(task.taskId, state)
+            throw BpdmIllegalStateException(task.uuid, state)
         }
 
         // reserved for current step
-        state.stepState = StepState.Reserved
-        state.taskModifiedAt = now
+        task.processingState.stepState = StepState.Reserved
+        task.updatedAt = DbTimestamp(Instant.now())
+
+        return taskRepository.save(task)
     }
 
-    fun doResolveTaskToSuccess(task: GoldenRecordTask, step: TaskStep, resultBusinessPartner: BusinessPartner) {
+    fun resolveTaskStepToSuccess(
+        task: GoldenRecordTaskDb,
+        step: TaskStep,
+        resultBusinessPartner: BusinessPartner
+    ): GoldenRecordTaskDb {
         logger.debug { "Executing doResolveTaskToSuccess() with parameters $task // $step and $resultBusinessPartner" }
         val state = task.processingState
-        val now = Instant.now()
 
         if (state.resultState != ResultState.Pending || state.stepState != StepState.Reserved || state.step != step) {
-            throw BpdmIllegalStateException(task.taskId, state)
+            throw BpdmIllegalStateException(task.uuid, state)
         }
 
         val nextStep = getNextStep(state.mode, state.step)
 
         if (nextStep != null) {
             // still steps left to process -> queued for next step
-            state.step = nextStep
-            state.stepState = StepState.Queued
-            state.taskModifiedAt = now
+            task.processingState.toStep(nextStep)
         } else {
             // last step finished -> set resultState and stepState to success
-            resolveStateToSuccess(state)
+            task.processingState.toSuccess()
         }
 
-        task.businessPartner = resultBusinessPartner
+        task.updateBusinessPartner(requestMapper.toBusinessPartner(resultBusinessPartner))
+        task.updatedAt =  DbTimestamp(Instant.now())
+
+        return taskRepository.save(task)
     }
 
-    fun doResolveTaskToError(task: GoldenRecordTask, step: TaskStep, errors: List<TaskErrorDto>) {
+    fun doResolveTaskToError(task: GoldenRecordTaskDb, step: TaskStep, errors: List<TaskErrorDto>): GoldenRecordTaskDb {
         logger.debug { "Executing doResolveTaskToError() with parameters $task // $step and $errors" }
         val state = task.processingState
 
         if (state.resultState != ResultState.Pending || state.stepState != StepState.Reserved || state.step != step) {
-            throw BpdmIllegalStateException(task.taskId, state)
+            throw BpdmIllegalStateException(task.uuid, state)
         }
+        task.processingState.toError(errors.map { requestMapper.toTaskError(it) })
+        task.updatedAt =  DbTimestamp(Instant.now())
 
-        resolveStateToError(state, errors)
+        return taskRepository.save(task)
     }
 
-    fun doResolveTaskToTimeout(task: GoldenRecordTask) {
+    fun doResolveTaskToTimeout(task: GoldenRecordTaskDb): GoldenRecordTaskDb {
         val state = task.processingState
 
         if (state.resultState != ResultState.Pending) {
-            throw BpdmIllegalStateException(task.taskId, state)
+            throw BpdmIllegalStateException(task.uuid, state)
         }
 
-        val errors = listOf(TaskErrorDto(TaskErrorType.Timeout, "Timeout reached"))
-        resolveStateToError(state, errors)
+        val errors = listOf(TaskErrorDb(TaskErrorType.Timeout, "Timeout reached"))
+        task.processingState.toError(errors)
+        task.updatedAt = DbTimestamp(Instant.now())
+
+        return taskRepository.save(task)
     }
 
-    private fun resolveStateToSuccess(state: TaskProcessingState) {
-        val now = Instant.now()
-        state.resultState = ResultState.Success
-        state.stepState = StepState.Success
-        state.taskModifiedAt = now
-        state.taskPendingTimeout = null
-        state.taskRetentionTimeout = now.plus(taskConfigProperties.taskRetentionTimeout)
+    private fun GoldenRecordTaskDb.ProcessingState.toStep(nextStep: TaskStep) {
+        step = nextStep
+        stepState = StepState.Queued
     }
 
-    private fun resolveStateToError(state: TaskProcessingState, errors: List<TaskErrorDto>) {
-        val now = Instant.now()
-        state.resultState = ResultState.Error
-        state.errors = errors
-        state.stepState = StepState.Error
-        state.taskModifiedAt = now
-        state.taskPendingTimeout = null
-        state.taskRetentionTimeout = now.plus(taskConfigProperties.taskRetentionTimeout)
+    private fun GoldenRecordTaskDb.ProcessingState.toSuccess() {
+            resultState = ResultState.Success
+            stepState = StepState.Success
+            pendingTimeout = null
+            retentionTimeout = Instant.now().plus(taskConfigProperties.taskRetentionTimeout).toTimestamp()
+
+    }
+
+    private fun GoldenRecordTaskDb.ProcessingState.toError(newErrors: List<TaskErrorDb>) {
+            resultState = ResultState.Error
+            stepState = StepState.Error
+            errors.replace(newErrors)
+            pendingTimeout = null
+            retentionTimeout = Instant.now().plus(taskConfigProperties.taskRetentionTimeout).toTimestamp()
     }
 
     private fun getInitialStep(mode: TaskMode): TaskStep {

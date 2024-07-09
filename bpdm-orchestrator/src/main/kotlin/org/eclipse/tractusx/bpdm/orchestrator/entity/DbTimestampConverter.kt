@@ -17,16 +17,20 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.exception
+package org.eclipse.tractusx.bpdm.orchestrator.entity
 
-import org.eclipse.tractusx.bpdm.orchestrator.entity.GoldenRecordTaskDb
-import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.ResponseStatus
-import java.util.*
+import jakarta.persistence.AttributeConverter
+import jakarta.persistence.Converter
+import java.sql.Timestamp
 
+@Converter
+class DbTimestampConverter: AttributeConverter<DbTimestamp, Timestamp> {
+    override fun convertToDatabaseColumn(p0: DbTimestamp?): Timestamp? {
+        return p0?.let { Timestamp.from(it.instant) }
+    }
 
-@ResponseStatus(HttpStatus.BAD_REQUEST)
-class BpdmIllegalStateException(
-    taskId: UUID,
-    state: GoldenRecordTaskDb.ProcessingState
-) : RuntimeException("Task with ID '$taskId' is in illegal state for transition: resultState=${state.resultState}, step=${state.step}, stepState=${state.stepState}")
+    override fun convertToEntityAttribute(p0: Timestamp?): DbTimestamp? {
+      return p0?.let { DbTimestamp(p0.toInstant()) }
+    }
+
+}

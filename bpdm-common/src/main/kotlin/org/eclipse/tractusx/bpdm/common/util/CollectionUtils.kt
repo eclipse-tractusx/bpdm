@@ -24,6 +24,11 @@ fun <T> MutableCollection<T>.replace(elements: Collection<T>) {
     addAll(elements)
 }
 
+fun <K, V> MutableMap<K, V>.replace(map: Map<K, V>) {
+    clear()
+    putAll(map)
+}
+
 
 /**
  * Copy overlapping elements by index from [elements] to [this] collection by applying the [copyFunction].

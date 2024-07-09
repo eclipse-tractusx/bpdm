@@ -23,16 +23,17 @@ import org.assertj.core.api.Assertions.*
 import org.assertj.core.api.ThrowableAssert
 import org.assertj.core.data.TemporalUnitOffset
 import org.eclipse.tractusx.bpdm.orchestrator.config.TaskConfigProperties
-import org.eclipse.tractusx.bpdm.orchestrator.service.GoldenRecordTaskStorage
+import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.BusinessPartnerTestDataFactory
+import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.*
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
+import org.springframework.test.context.ContextConfiguration
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -49,10 +50,11 @@ val WITHIN_ALLOWED_TIME_OFFSET: TemporalUnitOffset = within(1, ChronoUnit.SECOND
         "bpdm.task.taskRetentionTimeout=5s"
     ]
 )
+@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class GoldenRecordTaskControllerIT @Autowired constructor(
-    val orchestratorClient: OrchestrationApiClient,
-    val taskConfigProperties: TaskConfigProperties,
-    val goldenRecordTaskStorage: GoldenRecordTaskStorage
+    private val orchestratorClient: OrchestrationApiClient,
+    private val taskConfigProperties: TaskConfigProperties,
+    private val dbTestHelpers: DbTestHelpers
 ) {
 
     private val testDataFactory = BusinessPartnerTestDataFactory()
@@ -61,7 +63,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
 
     @BeforeEach
     fun cleanUp() {
-        goldenRecordTaskStorage.clear()
+        dbTestHelpers.truncateDbTables()
     }
 
     /**
@@ -84,7 +86,6 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
             val processingState = stateDto.processingState
             assertProcessingStateDto(processingState, ResultState.Pending, TaskStep.CleanAndSync, StepState.Queued)
             assertThat(processingState.errors).isEqualTo(emptyList<TaskErrorDto>())
-            assertThat(processingState.createdAt).isEqualTo(processingState.modifiedAt)
         }
 
         // check if response is consistent with searchTaskStates response

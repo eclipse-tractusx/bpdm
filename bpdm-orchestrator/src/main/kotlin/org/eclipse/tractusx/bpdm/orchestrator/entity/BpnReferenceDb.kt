@@ -17,16 +17,30 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.exception
+package org.eclipse.tractusx.bpdm.orchestrator.entity
 
-import org.eclipse.tractusx.bpdm.orchestrator.entity.GoldenRecordTaskDb
-import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.ResponseStatus
-import java.util.*
+import jakarta.persistence.Column
+import jakarta.persistence.Embeddable
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
+import org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType
 
-
-@ResponseStatus(HttpStatus.BAD_REQUEST)
-class BpdmIllegalStateException(
-    taskId: UUID,
-    state: GoldenRecordTaskDb.ProcessingState
-) : RuntimeException("Task with ID '$taskId' is in illegal state for transition: resultState=${state.resultState}, step=${state.step}, stepState=${state.stepState}")
+@Embeddable
+data class BpnReferenceDb(
+    @Column(name = "value")
+    val referenceValue: String?,
+    @Column(name = "desired_bpn")
+    val desiredBpn: String?,
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type")
+    val referenceType: BpnReferenceType?
+) {
+    enum class Scope {
+        LegalEntity,
+        Site,
+        LegalAddress,
+        SiteMainAddress,
+        AdditionalAddress,
+        UncategorizedAddress
+    }
+}

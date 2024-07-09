@@ -17,12 +17,31 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.model
+package org.eclipse.tractusx.bpdm.orchestrator.entity
 
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
+import jakarta.persistence.Column
+import jakarta.persistence.Embeddable
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
 
-data class GoldenRecordTask(
-    val taskId: String,
-    var businessPartner: BusinessPartner,
-    val processingState: TaskProcessingState
-)
+@Embeddable
+data class IdentifierDb(
+    @Column(name = "value")
+    val value: String?,
+    @Column(name = "type")
+    val type: String?,
+    @Column(name = "issuing_body")
+    val issuingBody: String?,
+    @Enumerated(EnumType.STRING)
+    @Column(name = "scope", nullable = false)
+    val scope: Scope
+) {
+    enum class Scope {
+        LegalEntity,
+        LegalAddress,
+        Uncategorized,
+        SiteMainAddress,
+        AdditionalAddress,
+        UncategorizedAddress
+    }
+}

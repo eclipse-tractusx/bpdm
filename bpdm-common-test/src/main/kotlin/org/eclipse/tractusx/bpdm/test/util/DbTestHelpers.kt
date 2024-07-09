@@ -37,6 +37,7 @@ class DbTestHelpers(private val entityManagerFactory: EntityManagerFactory?) {
         truncateDbTablesFromSchema("bpdm")
         truncateDbTablesFromSchema("bpdmgate")
         truncateDbTablesFromSchema("bpdm-bridge-dummy")
+        truncateDbTablesFromSchema("bpdm-orchestrator")
     }
 
     private fun truncateDbTablesFromSchema(dbSchemaName: String) {

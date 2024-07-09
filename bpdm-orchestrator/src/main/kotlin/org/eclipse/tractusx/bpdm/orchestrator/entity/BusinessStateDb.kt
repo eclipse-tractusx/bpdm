@@ -17,24 +17,33 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.model
+package org.eclipse.tractusx.bpdm.orchestrator.entity
 
-import org.eclipse.tractusx.orchestrator.api.model.*
-import java.time.Instant
+import jakarta.persistence.*
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 
-data class TaskProcessingState(
-    val mode: TaskMode,
-    var resultState: ResultState,
-    var errors: List<TaskErrorDto> = emptyList(),
-
-    var step: TaskStep,
-    var stepState: StepState,
-
-    val taskCreatedAt: Instant,
-    var taskModifiedAt: Instant,
-
-    // only used while in resultState==pending
-    var taskPendingTimeout: Instant?,
-    // only used while in final resultState (!=pending)
-    var taskRetentionTimeout: Instant?
-)
+@Embeddable
+data class BusinessStateDb(
+    @Convert(converter = DbTimestampConverter::class)
+    @Column(name = "valid_from")
+    val validFrom: DbTimestamp?,
+    @Convert(converter = DbTimestampConverter::class)
+    @Column(name = "valid_to")
+    val validTo: DbTimestamp?,
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type")
+    val type: BusinessStateType?,
+    @Enumerated(EnumType.STRING)
+    @Column(name = "scope", nullable = false)
+    val scope: Scope
+) {
+    enum class Scope {
+        LegalEntity,
+        Site,
+        Uncategorized,
+        LegalAddress,
+        SiteMainAddress,
+        AdditionalAddress,
+        UncategorizedAddress
+    }
+}

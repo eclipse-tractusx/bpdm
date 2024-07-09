@@ -19,12 +19,15 @@
 
 package org.eclipse.tractusx.bpdm.orchestrator
 
+import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.ContextConfiguration
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
+@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class ApplicationTests {
 
     @Test

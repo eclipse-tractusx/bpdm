@@ -70,11 +70,13 @@ bpdm-cleaning-service-dummy:
 
 bpdm-orchestrator:
   enabled: true
+  postgres:
+    enabled: false
+    fullnameOverride: bpdm-postgres
   applicationConfig:
     bpdm:
       security:
         auth-server-url: http://bpdm-keycloak
-
 
 postgres:
   enabled: true
