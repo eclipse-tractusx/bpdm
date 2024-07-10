@@ -43,6 +43,24 @@ maven/mavencentral/commons-codec/commons-codec/1.17.1, Apache-2.0 AND (Apache-2.
 maven/mavencentral/commons-collections/commons-collections/3.2.2, Apache-2.0, approved, #15185
 maven/mavencentral/commons-io/commons-io/2.17.0, Apache-2.0, approved, #16198
 maven/mavencentral/commons-logging/commons-logging/1.2, Apache-2.0, approved, CQ10162
+maven/mavencentral/io.cucumber/ci-environment/10.0.1, MIT, approved, #15218
+maven/mavencentral/io.cucumber/cucumber-core/7.18.1, MIT AND (Apache-2.0 AND MIT), approved, #15146
+maven/mavencentral/io.cucumber/cucumber-expressions/17.1.0, MIT, approved, #14271
+maven/mavencentral/io.cucumber/cucumber-gherkin-messages/7.18.1, MIT, approved, clearlydefined
+maven/mavencentral/io.cucumber/cucumber-gherkin/7.18.1, MIT, approved, clearlydefined
+maven/mavencentral/io.cucumber/cucumber-java/7.18.1, MIT, approved, clearlydefined
+maven/mavencentral/io.cucumber/cucumber-junit/7.18.1, MIT, approved, clearlydefined
+maven/mavencentral/io.cucumber/cucumber-plugin/7.18.1, MIT, approved, clearlydefined
+maven/mavencentral/io.cucumber/cucumber-spring/7.18.1, MIT, approved, clearlydefined
+maven/mavencentral/io.cucumber/datatable/7.18.1, Apache-2.0, approved, #15145
+maven/mavencentral/io.cucumber/docstring/7.18.1, MIT, approved, clearlydefined
+maven/mavencentral/io.cucumber/gherkin/28.0.0, MIT, approved, #14276
+maven/mavencentral/io.cucumber/html-formatter/21.4.1, MIT, restricted, clearlydefined
+maven/mavencentral/io.cucumber/junit-xml-formatter/0.5.0, MIT, approved, clearlydefined
+maven/mavencentral/io.cucumber/messages/24.1.0, MIT, approved, #14274
+maven/mavencentral/io.cucumber/query/12.2.0, MIT, approved, clearlydefined
+maven/mavencentral/io.cucumber/tag-expressions/6.1.0, MIT AND (BSD-3-Clause AND MIT) AND BSD-3-Clause, approved, #14277
+maven/mavencentral/io.cucumber/testng-xml-formatter/0.2.0, MIT, approved, clearlydefined
 maven/mavencentral/io.github.microutils/kotlin-logging-jvm/3.0.5, Apache-2.0, approved, clearlydefined
 maven/mavencentral/io.micrometer/micrometer-commons/1.14.1, Apache-2.0 AND (Apache-2.0 AND MIT), approved, #17272
 maven/mavencentral/io.micrometer/micrometer-core/1.14.1, Apache-2.0 AND (Apache-2.0 AND MIT), approved, #17271

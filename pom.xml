@@ -46,6 +46,7 @@
         <module>bpdm-cleaning-service-dummy</module>
         <module>bpdm-orchestrator</module>
         <module>bpdm-orchestrator-api</module>
+        <module>bpdm-system-tester</module>
     </modules>
 
     <properties>
@@ -57,6 +58,7 @@
         <kotlin.compiler.apiVersion>2.1</kotlin.compiler.apiVersion>
         <spring-boot.version>3.2.5</spring-boot.version>
         <kotlin.version>2.1.0</kotlin.version>
+        <kotlin.coroutines.version>1.8.1</kotlin.coroutines.version>
         <springdoc.version>2.7.0</springdoc.version>
         <nv-i18n.version>1.29</nv-i18n.version>
         <kotlin-logging.version>3.0.5</kotlin-logging.version>
