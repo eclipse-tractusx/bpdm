@@ -65,7 +65,7 @@ ingress:
 
 resources:
   limits:
-    cpu: 500m
+    cpu: 1000m
     memory: 1Gi
   requests:
     cpu: 100m
@@ -86,12 +86,14 @@ affinity:
                 operator: DoesNotExist
           topologyKey: kubernetes.io/hostname
 
+startupDelaySeconds: 90
+
 livenessProbe:
   httpGet:
     path: "/actuator/health/liveness"
     port: 8085
     scheme: HTTP
-  failureThreshold: 3
+  failureThreshold: 5
   initialDelaySeconds: 5
   periodSeconds: 5
   successThreshold: 1
@@ -101,7 +103,7 @@ readinessProbe:
     path: "/actuator/health/readiness"
     port: 8085
     scheme: HTTP
-  failureThreshold: 3
+  failureThreshold: 5
   initialDelaySeconds: 5
   periodSeconds: 5
   successThreshold: 1
@@ -111,9 +113,9 @@ startupProbe:
     path: "/actuator/health/readiness"
     port: 8085
     scheme: HTTP
-  initialDelaySeconds: 60
+  initialDelaySeconds: 30
   failureThreshold: 40
-  periodSeconds: 30
+  periodSeconds: 5
   timeoutSeconds: 1
   successThreshold: 1
 
