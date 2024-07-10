@@ -21,5 +21,12 @@ package org.eclipse.tractusx.orchestrator.api.model
 
 enum class TaskErrorType {
     Timeout,
-    Unspecified
+    Unspecified,
+
+    NaturalPersonError,
+    BpnErrorMissingParent,
+    BpnErrorNotFound,
+    BpnErrorTooManyOptions,
+    MandatoryFieldValidationFailed,
+    BlacklistCountryPresent
 }
