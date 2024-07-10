@@ -802,7 +802,9 @@ object BusinessPartnerVerboseValues {
                 industrialZone = "industrial-zone",
                 building = "building",
                 floor = "floor",
-                door = "door"
+                door = "door",
+                taxJurisdictionCode = "123"
+
             ),
             alternativePostalAddress = AlternativePostalAddressDto(
                 geographicCoordinates = GeoCoordinateDto(0.6, 0.6, 0.6),

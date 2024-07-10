@@ -46,6 +46,7 @@
         <module>bpdm-cleaning-service-dummy</module>
         <module>bpdm-orchestrator</module>
         <module>bpdm-orchestrator-api</module>
+        <module>bpdm-system-tester</module>
     </modules>
 
     <properties>
