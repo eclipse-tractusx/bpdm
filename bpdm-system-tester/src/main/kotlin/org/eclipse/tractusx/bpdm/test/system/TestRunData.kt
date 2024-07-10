@@ -17,26 +17,10 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.config
+package org.eclipse.tractusx.bpdm.test.system
 
-import mu.KotlinLogging
-import org.springdoc.core.properties.SwaggerUiConfigProperties
-import org.springframework.context.annotation.Configuration
-import org.springframework.web.servlet.config.annotation.ViewControllerRegistry
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
+import java.time.Instant
 
-
-@Configuration
-class LandingPageConfig(
-    val swaggerProperties: SwaggerUiConfigProperties?
-) : WebMvcConfigurer{
-
-    private val logger = KotlinLogging.logger { }
-
-    override fun addViewControllers(registry: ViewControllerRegistry) {
-        if(swaggerProperties == null) return
-        val redirectUri = swaggerProperties!!.path
-        logger.info { "Set landing page to path '$redirectUri'" }
-        registry.addRedirectViewController("/", redirectUri)
-    }
-}
+data class TestRunData (
+    val testTime: Instant
+)

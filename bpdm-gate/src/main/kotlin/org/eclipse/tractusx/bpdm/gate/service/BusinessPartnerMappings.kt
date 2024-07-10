@@ -56,7 +56,8 @@ class BusinessPartnerMappings {
             externalId = entity.sharingState.externalId,
             nameParts = entity.nameParts,
             identifiers = entity.identifiers.map(::toIdentifierDto),
-            states = entity.states.map(::toStateDto),
+            // ToDo: States need to be filtered to Generic only
+            states = toStateDtos(entity.states, BusinessPartnerType.GENERIC),
             roles = entity.roles,
             isOwnCompanyData = entity.isOwnCompanyData,
             legalEntity = toLegalEntityComponentOutputDto(entity),

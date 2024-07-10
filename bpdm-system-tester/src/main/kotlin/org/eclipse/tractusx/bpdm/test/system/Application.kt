@@ -1,0 +1,69 @@
+/*******************************************************************************
+ * Copyright (c) 2021,2024 Contributors to the Eclipse Foundation
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Apache License, Version 2.0 which is available at
+ * https://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ ******************************************************************************/
+
+package org.eclipse.tractusx.bpdm.test.system
+
+import io.cucumber.junit.Cucumber
+import io.cucumber.junit.CucumberOptions
+import io.cucumber.spring.CucumberContextConfiguration
+import org.junit.internal.TextListener
+import org.junit.runner.JUnitCore
+import org.junit.runner.RunWith
+import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan
+import org.springframework.boot.test.context.SpringBootTest
+
+
+/*******************************************************************************
+ * Copyright (c) 2021,2024 Contributors to the Eclipse Foundation
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Apache License, Version 2.0 which is available at
+ * https://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ ******************************************************************************/
+
+@RunWith(Cucumber::class)
+@CucumberOptions(features = ["bpdm-system-tester/src/main/resources"])
+class CucumberTestRunConfiguration
+
+@CucumberContextConfiguration
+@SpringBootTest
+class SpringTestRunConfiguration
+
+@SpringBootApplication(exclude=[DataSourceAutoConfiguration::class])
+@ConfigurationPropertiesScan
+class SpringApplicationConfiguration
+
+fun main(args: Array<String>) {
+    val engine = JUnitCore()
+    engine.addListener(TextListener(System.out))
+    engine.run(CucumberTestRunConfiguration::class.java)
+}
