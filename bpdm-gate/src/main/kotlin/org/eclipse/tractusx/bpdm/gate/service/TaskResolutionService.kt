@@ -86,67 +86,6 @@ class TaskResolutionService(
                 BusinessPartnerSharingError.SharingProcessError,
                 if (task.processingState.errors.isNotEmpty()) task.processingState.errors.joinToString(" // ") { it.description }.take(255) else null
             )
-            ResultState.NaturalPersonError -> RequestCreationResult.error(
-                sharingState,
-                BusinessPartnerSharingError.NaturalPersonError,
-                if (task.processingState.errors.isNotEmpty()) task.processingState.errors.joinToString(" // ") { it.description }.take(255) else null
-            )
-            ResultState.BpnErrorMissingParent -> RequestCreationResult.error(
-                sharingState,
-                BusinessPartnerSharingError.BpnErrorMissingParent,
-                if (task.processingState.errors.isNotEmpty()) task.processingState.errors.joinToString(" // ") { it.description }.take(255) else null
-            )
-            ResultState.BpnErrorNotFound -> RequestCreationResult.error(
-                sharingState,
-                BusinessPartnerSharingError.BpnErrorNotFound,
-                if (task.processingState.errors.isNotEmpty()) task.processingState.errors.joinToString(" // ") { it.description }.take(255) else null
-            )
-            ResultState.BpnErrorTooManyOptions -> RequestCreationResult.error(
-                sharingState,
-                BusinessPartnerSharingError.BpnErrorTooManyOptions,
-                if (task.processingState.errors.isNotEmpty()) task.processingState.errors.joinToString(" // ") { it.description }.take(255) else null
-            )
-            ResultState.MandatoryFieldValidationFailed -> RequestCreationResult.error(
-                sharingState,
-                BusinessPartnerSharingError.MandatoryFieldValidationFailed,
-                if (task.processingState.errors.isNotEmpty()) task.processingState.errors.joinToString(" // ") { it.description }.take(255) else null
-            )
-            ResultState.BlacklistCountryPresent -> RequestCreationResult.error(
-                sharingState,
-                BusinessPartnerSharingError.BlacklistCountryPresent,
-                if (task.processingState.errors.isNotEmpty()) task.processingState.errors.joinToString(" // ") { it.description }.take(255) else null
-            )
-            ResultState.InvalidSpecialCharacters -> RequestCreationResult.error(
-                sharingState,
-                BusinessPartnerSharingError.InvalidSpecialCharacters,
-                if (task.processingState.errors.isNotEmpty()) task.processingState.errors.joinToString(" // ") { it.description }.take(255) else null
-            )
-            ResultState.MandatoryFieldMissing -> RequestCreationResult.error(
-                sharingState,
-                BusinessPartnerSharingError.MandatoryFieldMissing,
-                if (task.processingState.errors.isNotEmpty()) task.processingState.errors.joinToString(" // ") { it.description }.take(255) else null
-            )
-            ResultState.BpnlChanged -> RequestCreationResult.error(
-                sharingState,
-                BusinessPartnerSharingError.BpnlChanged,
-                if (task.processingState.errors.isNotEmpty()) task.processingState.errors.joinToString(" // ") { it.description }.take(255) else null
-            )
-            ResultState.UnclearEntity -> RequestCreationResult.error(
-                sharingState,
-                BusinessPartnerSharingError.UnclearEntity,
-                if (task.processingState.errors.isNotEmpty()) task.processingState.errors.joinToString(" // ") { it.description }.take(255) else null
-            )
-            ResultState.UnknownSpecialCharacters -> RequestCreationResult.error(
-                sharingState,
-                BusinessPartnerSharingError.UnknownSpecialCharacters,
-                if (task.processingState.errors.isNotEmpty()) task.processingState.errors.joinToString(" // ") { it.description }.take(255) else null
-            )
-            ResultState.MatchBasedOnProvidedNameOrIdentifier -> RequestCreationResult.error(
-                sharingState,
-                BusinessPartnerSharingError.MatchBasedOnProvidedNameOrIdentifier,
-                if (task.processingState.errors.isNotEmpty()) task.processingState.errors.joinToString(" // ") { it.description }.take(255) else null
-            )
-
         }
     }
 

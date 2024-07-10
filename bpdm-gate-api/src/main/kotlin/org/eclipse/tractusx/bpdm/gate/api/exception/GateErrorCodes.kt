@@ -30,18 +30,13 @@ enum class BusinessPartnerSharingError : ErrorCode {
     SharingTimeout,
     BpnNotInPool,
     MissingTaskID,
+
     NaturalPersonError,
     BpnErrorMissingParent,
     BpnErrorNotFound,
     BpnErrorTooManyOptions,
     MandatoryFieldValidationFailed,
-    BlacklistCountryPresent,
-    InvalidSpecialCharacters,
-    MandatoryFieldMissing,
-    BpnlChanged,
-    UnclearEntity,
-    UnknownSpecialCharacters,
-    MatchBasedOnProvidedNameOrIdentifier
+    BlacklistCountryPresent
 }
 
 enum class ChangeLogOutputError : ErrorCode {

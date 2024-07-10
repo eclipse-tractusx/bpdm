@@ -22,17 +22,5 @@ package org.eclipse.tractusx.orchestrator.api.model
 enum class ResultState {
     Pending,
     Success,
-    Error,
-    NaturalPersonError,
-    BpnErrorMissingParent,
-    BpnErrorNotFound,
-    BpnErrorTooManyOptions,
-    MandatoryFieldValidationFailed,
-    BlacklistCountryPresent,
-    InvalidSpecialCharacters,
-    MandatoryFieldMissing,
-    BpnlChanged,
-    UnclearEntity,
-    UnknownSpecialCharacters,
-    MatchBasedOnProvidedNameOrIdentifier
+    Error
 }
