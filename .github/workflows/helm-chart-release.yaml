@@ -42,7 +42,10 @@ jobs:
         run: |
           CHART_VERSION=$(grep 'version:' ./charts/bpdm/Chart.yaml | head -n1 | awk '{ print $2}')
           SNAPSHOT=$(echo $CHART_VERSION | grep 'SNAPSHOT')
-          if test -z $SNAPSHOT; then IS_RELEASE=true; else IS_RELEASE=false fi
+          if [[ -z "$SNAPSHOT" ]]; then 
+          IS_RELEASE=true; else 
+          IS_RELEASE=false 
+          fi
           echo "isRelease=$IS_RELEASE" >> $GITHUB_OUTPUT
 
       - name: Configure Git
