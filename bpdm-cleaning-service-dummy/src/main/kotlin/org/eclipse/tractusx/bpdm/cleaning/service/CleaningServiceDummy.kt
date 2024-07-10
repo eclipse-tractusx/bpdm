@@ -85,7 +85,8 @@ class CleaningServiceDummy(
 
         val cleanedBusinessPartner = BusinessPartner(
             nameParts = businessPartner.nameParts,
-            uncategorized = businessPartner.uncategorized,
+            // ToDo: Identifiers are taken as legal identifiers and should be removed from uncategorized collection
+            uncategorized = businessPartner.uncategorized.copy(identifiers = emptyList()),
             owningCompany = businessPartner.owningCompany,
             legalEntity = cleanLegalEntity(businessPartner, sharedByOwner),
             site = cleanSite(businessPartner, sharedByOwner),
