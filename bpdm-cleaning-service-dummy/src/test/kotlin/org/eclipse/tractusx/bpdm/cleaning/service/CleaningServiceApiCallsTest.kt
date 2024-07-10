@@ -100,6 +100,11 @@ class CleaningServiceApiCallsTest @Autowired constructor(
             .copyWithBpnReferences(BpnReference.empty)
             .copyWithLegalAddress(PostalAddress.empty)
             .copyWithSiteMainAddress(PostalAddress.empty)
+            .copy(
+                uncategorized = businessPartnerFactory.createFullBusinessPartner("test").uncategorized.copy(
+                    identifiers = emptyList() // Assign empty list to uncategorized identifiers
+                )
+            )
 
         val resolveMapping = mockOrchestratorResolveApi()
         mockOrchestratorReserveApi(mockedBusinessPartner)
@@ -128,6 +133,11 @@ class CleaningServiceApiCallsTest @Autowired constructor(
         val mockedBusinessPartner = businessPartnerFactory.createFullBusinessPartner("test")
             .copyWithLegalAddress(PostalAddress.empty)
             .copyWithSiteMainAddress(PostalAddress.empty)
+            .copy(
+                uncategorized = businessPartnerFactory.createFullBusinessPartner("test").uncategorized.copy(
+                    identifiers = emptyList() // Assign empty list to uncategorized identifiers
+                )
+            )
 
         val resolveMapping = mockOrchestratorResolveApi()
         mockOrchestratorReserveApi(mockedBusinessPartner)
@@ -156,6 +166,11 @@ class CleaningServiceApiCallsTest @Autowired constructor(
             .copyWithBpnReferences(BpnReference.empty)
             .copyWithLegalAddress(PostalAddress.empty)
             .copy(site = null)
+            .copy(
+                uncategorized = businessPartnerFactory.createFullBusinessPartner("test").uncategorized.copy(
+                    identifiers = emptyList() // Assign empty list to uncategorized identifiers
+                )
+            )
 
         val resolveMapping = mockOrchestratorResolveApi()
         mockOrchestratorReserveApi(mockedBusinessPartner)
@@ -183,6 +198,11 @@ class CleaningServiceApiCallsTest @Autowired constructor(
         val mockedBusinessPartner = businessPartnerFactory.createFullBusinessPartner("test")
             .copyWithLegalAddress(PostalAddress.empty)
             .copy(site = null)
+            .copy(
+                uncategorized = businessPartnerFactory.createFullBusinessPartner("test").uncategorized.copy(
+                    identifiers = emptyList() // Assign empty list to uncategorized identifiers
+                )
+            )
 
         val resolveMapping = mockOrchestratorResolveApi()
         mockOrchestratorReserveApi(mockedBusinessPartner)
@@ -210,6 +230,11 @@ class CleaningServiceApiCallsTest @Autowired constructor(
             .copyWithBpnReferences(BpnReference.empty)
             .copyWithLegalAddress(PostalAddress.empty)
             .copy(additionalAddress = null)
+            .copy(
+                uncategorized = businessPartnerFactory.createFullBusinessPartner("test").uncategorized.copy(
+                    identifiers = emptyList() // Assign empty list to uncategorized identifiers
+                )
+            )
 
         val resolveMapping = mockOrchestratorResolveApi()
         mockOrchestratorReserveApi(mockedBusinessPartner)
@@ -237,6 +262,11 @@ class CleaningServiceApiCallsTest @Autowired constructor(
         val mockedBusinessPartner = businessPartnerFactory.createFullBusinessPartner("test")
             .copyWithLegalAddress(PostalAddress.empty)
             .copy(additionalAddress = null)
+            .copy(
+                uncategorized = businessPartnerFactory.createFullBusinessPartner("test").uncategorized.copy(
+                    identifiers = emptyList() // Assign empty list to uncategorized identifiers
+                )
+            )
 
         val resolveMapping = mockOrchestratorResolveApi()
         mockOrchestratorReserveApi(mockedBusinessPartner)
@@ -264,6 +294,11 @@ class CleaningServiceApiCallsTest @Autowired constructor(
             .copyWithBpnReferences(BpnReference.empty)
             .copyWithSiteMainAddress(null)
             .copy(additionalAddress = null)
+            .copy(
+                uncategorized = businessPartnerFactory.createFullBusinessPartner("test").uncategorized.copy(
+                    identifiers = emptyList() // Assign empty list to uncategorized identifiers
+                )
+            )
 
         val resolveMapping = mockOrchestratorResolveApi()
         mockOrchestratorReserveApi(mockedBusinessPartner)
@@ -290,6 +325,11 @@ class CleaningServiceApiCallsTest @Autowired constructor(
         val mockedBusinessPartner = businessPartnerFactory.createFullBusinessPartner("test")
             .copyWithSiteMainAddress(null)
             .copy(additionalAddress = null)
+            .copy(
+                uncategorized = businessPartnerFactory.createFullBusinessPartner("test").uncategorized.copy(
+                    identifiers = emptyList() // Assign empty list to uncategorized identifiers
+                )
+            )
 
         val resolveMapping = mockOrchestratorResolveApi()
         mockOrchestratorReserveApi(mockedBusinessPartner)
@@ -316,6 +356,11 @@ class CleaningServiceApiCallsTest @Autowired constructor(
             .copyWithBpnReferences(BpnReference.empty)
             .copyWithLegalAddress(PostalAddress.empty)
             .copy(site = null, additionalAddress = null)
+            .copy(
+                uncategorized = businessPartnerFactory.createFullBusinessPartner("test").uncategorized.copy(
+                    identifiers = emptyList() // Assign empty list to uncategorized identifiers
+                )
+            )
 
         val resolveMapping = mockOrchestratorResolveApi()
         mockOrchestratorReserveApi(mockedBusinessPartner)
@@ -343,6 +388,11 @@ class CleaningServiceApiCallsTest @Autowired constructor(
         val mockedBusinessPartner = businessPartnerFactory.createFullBusinessPartner("test")
             .copyWithLegalAddress(PostalAddress.empty)
             .copy(site = null, additionalAddress = null)
+            .copy(
+                uncategorized = businessPartnerFactory.createFullBusinessPartner("test").uncategorized.copy(
+                    identifiers = emptyList() // Assign empty list to uncategorized identifiers
+                )
+            )
 
         val resolveMapping = mockOrchestratorResolveApi()
         mockOrchestratorReserveApi(mockedBusinessPartner)
