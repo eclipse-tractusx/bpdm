@@ -17,16 +17,24 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.exception
+package org.eclipse.tractusx.bpdm.orchestrator.entity
 
-import org.eclipse.tractusx.bpdm.orchestrator.entity.GoldenRecordTaskDb
-import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.ResponseStatus
-import java.util.*
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 
+/**
+ * This helper type makes sure that all timestamps on the entities are actually truncated to microseconds (same as in the database)
+ *
+ * This makes sure that timestamps in entities and database are always equal even before the entity is persisted in the database
+ */
+class DbTimestamp(instant: Instant){
+    private val truncatedInstant = instant.truncatedTo(ChronoUnit.MICROS)
 
-@ResponseStatus(HttpStatus.BAD_REQUEST)
-class BpdmIllegalStateException(
-    taskId: UUID,
-    state: GoldenRecordTaskDb.ProcessingState
-) : RuntimeException("Task with ID '$taskId' is in illegal state for transition: resultState=${state.resultState}, step=${state.step}, stepState=${state.stepState}")
+    val instant get(): Instant = truncatedInstant
+
+    companion object{
+        fun now(): DbTimestamp = Instant.now().toTimestamp()
+    }
+}
+
+fun Instant.toTimestamp(): DbTimestamp = DbTimestamp(this)
