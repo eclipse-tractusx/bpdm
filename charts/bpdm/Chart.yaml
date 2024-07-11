@@ -36,25 +36,20 @@ dependencies:
     version: 6.1.0-SNAPSHOT
     alias: bpdm-gate
     condition: bpdm-gate.enabled
-    repository: "file://./charts/bpdm-gate"
   - name: bpdm-pool
     version: 7.1.0-SNAPSHOT
     alias: bpdm-pool
     condition: bpdm-pool.enabled
-    repository: "file://./charts/bpdm-pool"
   - name: bpdm-cleaning-service-dummy
     version: 3.1.0-SNAPSHOT
     alias: bpdm-cleaning-service-dummy
     condition: bpdm-cleaning-service-dummy.enabled
-    repository: "file://./charts/bpdm-cleaning-service-dummy"
   - name: bpdm-orchestrator
     version: 3.1.0-SNAPSHOT
     alias: bpdm-orchestrator
     condition: bpdm-orchestrator.enabled
-    repository: "file://./charts/bpdm-orchestrator"
   - name: bpdm-common
     version: 1.0.1
-    repository: "file://./charts/bpdm-common"
   - name: postgresql
     version: 12.12.10
     repository: https://charts.bitnami.com/bitnami

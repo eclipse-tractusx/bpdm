@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
+## [3.1.0] - tbd
+
+### Changed
+
+- Increase appversion to 6.1.0
+- Increased range of CPU request and limit
+- Reduced initial delay of startup probe
+- Value for delaying startup of application container.
+  This decreases crashes when waiting for Keycloak and Postgres dependencies to be up.
+
 ## [3.0.1] - 2024-05-27
 
 ### Changed

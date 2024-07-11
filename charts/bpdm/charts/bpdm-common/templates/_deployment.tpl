@@ -80,6 +80,10 @@ spec:
               readOnly: true
             - mountPath: /tmp
               name: cache
+      initContainers:
+        - name: startup-delay
+          image: busybox:1.28
+          command: ['sh', '-c', "sleep {{ $.Values.startupDelaySeconds }}"]
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

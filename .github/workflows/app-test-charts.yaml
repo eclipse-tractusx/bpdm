@@ -59,6 +59,7 @@ on:
     paths:
       - 'pom.xml'
       - 'bpdm-**'
+      - 'charts/**'
   push:
     branches:
       - main
