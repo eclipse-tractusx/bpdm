@@ -38,8 +38,8 @@ class GoldenRecordTaskController(
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.CREATE_TASK})")
     override fun createTasks(createRequest: TaskCreateRequest): TaskCreateResponse {
-        if (createRequest.businessPartners.size > apiConfigProperties.upsertLimit)
-            throw BpdmUpsertLimitException(createRequest.businessPartners.size, apiConfigProperties.upsertLimit)
+        if (createRequest.requests.size > apiConfigProperties.upsertLimit)
+            throw BpdmUpsertLimitException(createRequest.requests.size, apiConfigProperties.upsertLimit)
 
         return goldenRecordTaskService.createTasks(createRequest)
     }

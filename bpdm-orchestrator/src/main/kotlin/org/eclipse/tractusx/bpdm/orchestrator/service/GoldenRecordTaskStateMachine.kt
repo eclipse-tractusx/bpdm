@@ -22,10 +22,7 @@ package org.eclipse.tractusx.bpdm.orchestrator.service
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.orchestrator.config.TaskConfigProperties
-import org.eclipse.tractusx.bpdm.orchestrator.entity.DbTimestamp
-import org.eclipse.tractusx.bpdm.orchestrator.entity.GoldenRecordTaskDb
-import org.eclipse.tractusx.bpdm.orchestrator.entity.TaskErrorDb
-import org.eclipse.tractusx.bpdm.orchestrator.entity.toTimestamp
+import org.eclipse.tractusx.bpdm.orchestrator.entity.*
 import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmIllegalStateException
 import org.eclipse.tractusx.bpdm.orchestrator.repository.GoldenRecordTaskRepository
 import org.eclipse.tractusx.orchestrator.api.model.*
@@ -41,7 +38,7 @@ class GoldenRecordTaskStateMachine(
 
     private val logger = KotlinLogging.logger { }
 
-    fun initTask(mode: TaskMode, initBusinessPartner: BusinessPartner): GoldenRecordTaskDb {
+    fun initTask(mode: TaskMode, initBusinessPartner: BusinessPartner, record: GateRecordDb): GoldenRecordTaskDb {
         logger.debug { "Executing initProcessingState() with parameters mode: $mode and business partner data: $initBusinessPartner" }
 
         val initialStep = getInitialStep(mode)
@@ -56,6 +53,7 @@ class GoldenRecordTaskStateMachine(
         )
 
         val initialTask = GoldenRecordTaskDb(
+            gateRecord = record,
             processingState = initProcessingState,
             businessPartner = requestMapper.toBusinessPartner(initBusinessPartner)
         )

@@ -146,6 +146,7 @@ create table business_partner_states (
 );
 
 create table golden_record_tasks (
+  gate_record_id bigint not null,
   is_cx_member boolean,
   legal_entity_has_changed boolean,
   site_exists boolean not null,
@@ -180,6 +181,16 @@ create table task_errors (
   type varchar(255) not null check (type in ('Timeout', 'Unspecified'))
 );
 
+create table gate_records (
+    id bigint not null,
+    created_at TIMESTAMP not null,
+    updated_at TIMESTAMP not null,
+    private_id uuid not null unique,
+    public_id uuid not null unique,
+    primary key(id)
+);
+
+
 create index index_tasks_uuid on golden_record_tasks (uuid);
 
 create index index_tasks_step_step_state on golden_record_tasks (task_step, task_step_state);
@@ -187,6 +198,11 @@ create index index_tasks_step_step_state on golden_record_tasks (task_step, task
 create index index_tasks_pending_timeout on golden_record_tasks (task_pending_timeout);
 
 create index index_tasks_retention_timeout on golden_record_tasks (task_retention_timeout);
+
+alter table
+  if exists golden_record_tasks
+add
+  constraint fk_tasks_gate_records foreign key (gate_record_id) references gate_records;
 
 alter table
   if exists business_partner_addresses

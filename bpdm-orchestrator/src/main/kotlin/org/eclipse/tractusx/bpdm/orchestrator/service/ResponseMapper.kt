@@ -32,6 +32,7 @@ class ResponseMapper {
         with(task) {
             TaskClientStateDto(
                 taskId = task.uuid.toString(),
+                recordId = task.gateRecord.privateId.toString(),
                 businessPartnerResult = toBusinessPartnerResult(businessPartner),
                 processingState = toProcessingState(task, timeout)
             )

@@ -21,13 +21,16 @@ package org.eclipse.tractusx.bpdm.pool.service
 
 import com.neovisionaries.i18n.CountryCode
 import org.assertj.core.api.Assertions.assertThat
-import org.eclipse.tractusx.bpdm.common.dto.*
+import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.service.TaskStepBuildService.CleaningError
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
-import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.*
+import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.BusinessPartnerTestDataFactory
+import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.copyWithBpnRequests
+import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.copyWithLegalEntityIdentifiers
+import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.copyWithSiteMainAddress
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolDataHelper
 import org.eclipse.tractusx.bpdm.test.testdata.pool.TestDataEnvironment
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
@@ -42,6 +45,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import java.time.Instant
 import java.time.temporal.ChronoUnit
+import java.util.*
 
 
 @SpringBootTest(
@@ -744,6 +748,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         return listOf(
             TaskStepReservationEntryDto(
                 taskId = taskId,
+                recordId = UUID.randomUUID().toString(),
                 businessPartner = businessPartner
             )
         )
@@ -754,6 +759,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         return businessPartners.map {
             TaskStepReservationEntryDto(
                 taskId = it.legalEntity.bpnReference.referenceValue!!,
+                recordId = UUID.randomUUID().toString(),
                 businessPartner = it
             )
         }

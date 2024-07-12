@@ -17,17 +17,13 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.orchestrator.api.model
+package org.eclipse.tractusx.bpdm.orchestrator.exception
 
-import io.swagger.v3.oas.annotations.media.ArraySchema
-import io.swagger.v3.oas.annotations.media.Schema
+import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.ResponseStatus
+import java.util.*
 
-@Schema(description = "Request object to specify for which business partner data tasks should be created and in which mode")
-data class TaskCreateRequest(
-
-    @get:Schema(required = true, description = "The mode affecting which processing steps the business partner goes through")
-    val mode: TaskMode,
-
-    @get:ArraySchema(arraySchema = Schema(description = "The list of tasks to create"))
-    val requests: List<TaskCreateRequestEntry>
-)
+@ResponseStatus(HttpStatus.BAD_REQUEST)
+class BpdmRecordNotFoundException (
+    recordIds: List<UUID>
+): RuntimeException("The following gate records are not registered: ${recordIds.joinToString()}")

@@ -21,9 +21,12 @@ package org.eclipse.tractusx.bpdm.orchestrator.service
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.orchestrator.config.TaskConfigProperties
+import org.eclipse.tractusx.bpdm.orchestrator.entity.GateRecordDb
 import org.eclipse.tractusx.bpdm.orchestrator.entity.DbTimestamp
 import org.eclipse.tractusx.bpdm.orchestrator.entity.GoldenRecordTaskDb
+import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmRecordNotFoundException
 import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmTaskNotFoundException
+import org.eclipse.tractusx.bpdm.orchestrator.repository.GateRecordRepository
 import org.eclipse.tractusx.bpdm.orchestrator.repository.GoldenRecordTaskRepository
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.data.domain.Pageable
@@ -38,7 +41,8 @@ class GoldenRecordTaskService(
     private val goldenRecordTaskStateMachine: GoldenRecordTaskStateMachine,
     private val taskConfigProperties: TaskConfigProperties,
     private val responseMapper: ResponseMapper,
-    private val taskRepository: GoldenRecordTaskRepository
+    private val taskRepository: GoldenRecordTaskRepository,
+    private val gateRecordRepository: GateRecordRepository
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -47,8 +51,10 @@ class GoldenRecordTaskService(
     fun createTasks(createRequest: TaskCreateRequest): TaskCreateResponse {
         logger.debug { "Creation of new golden record tasks: executing createTasks() with parameters $createRequest" }
 
-        return createRequest.businessPartners
-            .map { businessPartnerData -> goldenRecordTaskStateMachine.initTask(createRequest.mode, businessPartnerData) }
+        val gateRecords = getOrCreateGateRecords(createRequest.requests)
+
+        return createRequest.requests.zip(gateRecords)
+            .map { (request, record) -> goldenRecordTaskStateMachine.initTask(createRequest.mode, request.businessPartner, record) }
             .map { task -> responseMapper.toClientState(task, calculateTaskRetentionTimeout(task)) }
             .let { TaskCreateResponse(createdTasks = it) }
     }
@@ -72,7 +78,7 @@ class GoldenRecordTaskService(
         val pendingTimeout = reservedTasks.minOfOrNull { calculateTaskPendingTimeout(it) } ?: now
 
         return reservedTasks
-            .map { task -> TaskStepReservationEntryDto(task.uuid.toString(), responseMapper.toBusinessPartnerResult(task.businessPartner)) }
+            .map { task -> TaskStepReservationEntryDto(task.uuid.toString(), task.gateRecord.publicId.toString(), responseMapper.toBusinessPartnerResult(task.businessPartner)) }
             .let { reservations -> TaskStepReservationResponse(reservations, pendingTimeout) }
     }
 
@@ -147,4 +153,21 @@ class GoldenRecordTaskService(
         } catch (e: IllegalArgumentException) {
             throw BpdmTaskNotFoundException(uuidString)
         }
+
+    private fun getOrCreateGateRecords(requests: List<TaskCreateRequestEntry>): List<GateRecordDb>{
+        val privateIds = requests.map { request -> request.recordId?.let { toUUID(it) }}
+        val notNullPrivateIds = privateIds.filterNotNull()
+
+        val foundRecords = gateRecordRepository.findByPrivateIdIn(notNullPrivateIds.toSet())
+        val foundRecordsByPrivateId = foundRecords.associateBy { it.privateId }
+        val requestedNotFoundRecords = notNullPrivateIds.minus(foundRecordsByPrivateId.keys)
+
+        if(requestedNotFoundRecords.isNotEmpty())
+            throw BpdmRecordNotFoundException(requestedNotFoundRecords)
+
+       return privateIds.map { privateId ->
+            val gateRecord = privateId?.let { foundRecordsByPrivateId[it] } ?: GateRecordDb(publicId = UUID.randomUUID(), privateId = UUID.randomUUID())
+            gateRecordRepository.save(gateRecord)
+        }
+    }
 }

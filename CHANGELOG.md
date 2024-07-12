@@ -14,6 +14,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM Gate: GET endpoint to download the csv file template for business partner upload. (#700)
 - Apps: Tax Jurisdiction Code to the physical address of a business partner (#955)
 - BPDM Orchestrator: Tasks will now be persisted
+- BPDM Orchestrator: Tasks now come with a gate record identifier. This makes it possible for cleaning services to match tasks for the same Gate record 
 
 ### Changed:
 

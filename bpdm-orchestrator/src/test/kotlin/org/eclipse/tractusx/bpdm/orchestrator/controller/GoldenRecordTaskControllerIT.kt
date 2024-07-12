@@ -37,6 +37,7 @@ import org.springframework.test.context.ContextConfiguration
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import java.time.Instant
 import java.time.temporal.ChronoUnit
+import java.util.*
 
 val WITHIN_ALLOWED_TIME_OFFSET: TemporalUnitOffset = within(1, ChronoUnit.SECONDS)
 
@@ -76,7 +77,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
     @Test
     fun `request cleaning task`() {
         // create tasks and check response
-        val createdTasks = createTasks().createdTasks
+        val createdTasks = createTasksWithoutRecordId().createdTasks
 
         assertThat(createdTasks.size).isEqualTo(2)
 
@@ -101,7 +102,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
     @Test
     fun `request cleaning task in alternative mode`() {
         // create tasks and check response
-        val createdTasks = createTasks(TaskMode.UpdateFromPool).createdTasks
+        val createdTasks = createTasksWithoutRecordId(TaskMode.UpdateFromPool).createdTasks
 
         assertThat(createdTasks.size).isEqualTo(2)
         val processingState = createdTasks[0].processingState
@@ -122,7 +123,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
     @Test
     fun `request reservation`() {
         // create tasks
-        val createdTasks = createTasks(TaskMode.UpdateFromSharingMember).createdTasks
+        val createdTasks = createTasksWithoutRecordId(TaskMode.UpdateFromSharingMember).createdTasks
         assertThat(createdTasks.size).isEqualTo(2)
 
         // reserve tasks
@@ -162,7 +163,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
     @Test
     fun `request reservation for wrong step`() {
         // create tasks
-        createTasks(TaskMode.UpdateFromPool)
+        createTasksWithoutRecordId(TaskMode.UpdateFromPool)
 
         // try reservation for wrong step
         val reservedTasks = reserveTasks(TaskStep.CleanAndSync).reservedTasks
@@ -183,7 +184,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
     @Test
     fun `post cleaning results for all steps`() {
         // create tasks
-        createTasks()
+        createTasksWithoutRecordId()
 
         // reserve task for step==CleanAndSync
         val reservedTasks1 = reserveTasks(TaskStep.CleanAndSync, 1).reservedTasks
@@ -252,7 +253,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
     @Test
     fun `post cleaning result with error`() {
         // create tasks
-        createTasks()
+        createTasksWithoutRecordId()
 
         // reserve task for step==CleanAndSync
         val taskId = reserveTasks(TaskStep.CleanAndSync, 1).reservedTasks.single().taskId
@@ -292,7 +293,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
         )
 
         assertBadRequestException {
-            createTasks(businessPartners = businessPartners)
+            createTasksWithoutRecordId(businessPartners = businessPartners)
         }
     }
 
@@ -345,7 +346,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
     @Test
     fun `expect exceptions on posting inconsistent task results`() {
         // create tasks
-        createTasks()
+        createTasksWithoutRecordId()
 
         // reserve tasks
         val tasksIds = reserveTasks(TaskStep.CleanAndSync).reservedTasks.map { it.taskId }
@@ -419,7 +420,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
     @Test
     fun `wait for task pending and retention timeout`() {
         // create tasks
-        val createdTasks = createTasks().createdTasks
+        val createdTasks = createTasksWithoutRecordId().createdTasks
         val taskIds = createdTasks.map { it.taskId }
 
         // check for state Pending
@@ -455,7 +456,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
     @Test
     fun `wait for task retention timeout after success`() {
         // create single task in UpdateFromPool mode (only one step)
-        createTasks(TaskMode.UpdateFromPool, listOf(defaultBusinessPartner1))
+        createTasksWithoutRecordId(TaskMode.UpdateFromPool, listOf(defaultBusinessPartner1))
 
         // reserve task
         val reservedTask = reserveTasks(TaskStep.Clean).reservedTasks.single()
@@ -488,7 +489,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
     @Test
     fun `wait for task retention timeout after error`() {
         // create single task in UpdateFromPool mode (only one step)
-        createTasks(TaskMode.UpdateFromPool, listOf(defaultBusinessPartner1))
+        createTasksWithoutRecordId(TaskMode.UpdateFromPool, listOf(defaultBusinessPartner1))
 
         // reserve task
         val reservedTask = reserveTasks(TaskStep.Clean).reservedTasks.single()
@@ -519,13 +520,42 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
         assertThat(foundTasks.size).isZero()
     }
 
-    private fun createTasks(mode: TaskMode = TaskMode.UpdateFromSharingMember, businessPartners: List<BusinessPartner>? = null): TaskCreateResponse =
-        orchestratorClient.goldenRecordTasks.createTasks(
-            TaskCreateRequest(
-                mode = mode,
-                businessPartners = businessPartners ?: listOf(defaultBusinessPartner1, defaultBusinessPartner2)
-            )
-        )
+    @Test
+    fun `create task for existing gate record`(){
+        //Create records by creating tasks first
+        val existingRecordIds = createTasksWithoutRecordId().createdTasks.map { it.recordId }
+
+        val requestsWithRecords = listOf(defaultBusinessPartner1, defaultBusinessPartner2)
+            .zip(existingRecordIds)
+            .map { (bp, recordId) -> TaskCreateRequestEntry(recordId, bp) }
+
+        requestsWithRecords.forEach { assertThat(it.recordId).isNotNull() }
+
+        val tasksWithRecords = orchestratorClient.goldenRecordTasks.createTasks(TaskCreateRequest(TaskMode.UpdateFromSharingMember, requestsWithRecords)).createdTasks
+
+        tasksWithRecords.zip(existingRecordIds).forEach { (actualTask, expectedRecordId) -> assertThat(actualTask.recordId).isEqualTo(expectedRecordId) }
+    }
+
+    @Test
+    fun `expect exception on creating task for non-existing gate record`(){
+        val unknownRecordId = UUID.randomUUID()
+
+        val requestWithUnknownRecord = TaskCreateRequestEntry(unknownRecordId.toString(), defaultBusinessPartner1)
+
+        assertBadRequestException{
+            createTasks(entries = listOf(requestWithUnknownRecord))
+        }
+    }
+
+    private fun createTasks(mode: TaskMode = TaskMode.UpdateFromSharingMember,
+                            entries: List<TaskCreateRequestEntry>? = null
+    ): TaskCreateResponse{
+        val resolvedEntries = entries ?: listOf(defaultBusinessPartner1, defaultBusinessPartner2).map { bp -> TaskCreateRequestEntry(null, bp) }
+        return orchestratorClient.goldenRecordTasks.createTasks(TaskCreateRequest(mode = mode, requests = resolvedEntries))
+    }
+
+    private fun createTasksWithoutRecordId(mode: TaskMode = TaskMode.UpdateFromSharingMember, businessPartners: List<BusinessPartner>? = null): TaskCreateResponse =
+        createTasks(mode, (businessPartners ?: listOf(defaultBusinessPartner1, defaultBusinessPartner2)).map{ bp -> TaskCreateRequestEntry(null, bp) })
 
     private fun reserveTasks(step: TaskStep, amount: Int = 3) =
         orchestratorClient.goldenRecordTasks.reserveTasksForStep(

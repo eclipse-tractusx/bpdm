@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import java.time.LocalDateTime
+import java.util.*
 
 
 @Entity
@@ -35,6 +36,9 @@ class SharingStateDb(
 
     @Column(name = "tenant_bpnl", nullable = true)
     var tenantBpnl: String? = null,
+
+    @Column(name = "orchestrator_record_id", nullable = true, unique = true)
+    var orchestratorRecordId: UUID?,
 
     @Enumerated(EnumType.STRING)
     @Column(name = "sharing_state_type", nullable = false)

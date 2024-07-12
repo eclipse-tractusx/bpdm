@@ -26,13 +26,14 @@ import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
 import org.eclipse.tractusx.orchestrator.api.model.TaskClientStateDto
 import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRequest
+import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRequestEntry
 import org.eclipse.tractusx.orchestrator.api.model.TaskMode
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.util.*
 
 @Service
 class TaskCreationService(
@@ -55,17 +56,18 @@ class TaskCreationService(
         logger.debug { "Found ${foundStates.size} business partners in ready state" }
 
         val foundPartners = businessPartnerRepository.findBySharingStateInAndStage(foundStates, StageType.Input)
-        val orchestratorBusinessPartnersDto = foundPartners.map { orchestratorMappings.toOrchestratorDto(it) }
+        val orchestratorBusinessPartnersDto = foundPartners.map { orchestratorMappings.toCreateRequest(it) }
         val createdTasks = createGoldenRecordTasks(TaskMode.UpdateFromSharingMember, orchestratorBusinessPartnersDto)
 
         foundPartners.zip(createdTasks).forEach { (partner, task) ->
+            if(partner.sharingState.orchestratorRecordId == null) partner.sharingState.orchestratorRecordId = UUID.fromString(task.recordId)
             sharingStateService.setPending(partner.sharingState, task.taskId)
         }
 
         logger.info { "Created ${createdTasks.size} new golden record tasks from ready business partners" }
     }
 
-    private fun createGoldenRecordTasks(mode: TaskMode, orchestratorBusinessPartnersDto: List<BusinessPartner>): List<TaskClientStateDto> {
+    private fun createGoldenRecordTasks(mode: TaskMode, orchestratorBusinessPartnersDto: List<TaskCreateRequestEntry>): List<TaskClientStateDto> {
         if (orchestratorBusinessPartnersDto.isEmpty())
             return emptyList()
 
