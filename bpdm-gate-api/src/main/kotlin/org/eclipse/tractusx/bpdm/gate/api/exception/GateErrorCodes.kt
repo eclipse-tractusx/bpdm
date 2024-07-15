@@ -19,6 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.gate.api.exception
 
+import io.swagger.v3.oas.annotations.media.Schema
+
 /**
  * For every combination of possible errors a separate enum class is defined extending this marker interface.
  * We need separate enum classes in order to get the correct error codes for each endpoint in the Swagger schema.
@@ -31,12 +33,23 @@ enum class BusinessPartnerSharingError : ErrorCode {
     BpnNotInPool,
     MissingTaskID,
 
+    @Schema(description = "The provided record contains natural person information. ")
     NaturalPersonError,
-    BpnErrorMissingParent,
+
+    @Schema(description = "The provided record can not be matched to a legal entity or an address.")
     BpnErrorNotFound,
+
+    @Schema(description = "The provided record can not link to a clear legal entity.")
     BpnErrorTooManyOptions,
+
+    @Schema(description = "The provided record does not fulfill mandatory validation rules. ")
     MandatoryFieldValidationFailed,
-    BlacklistCountryPresent
+
+    @Schema(description = "The provided record is part of a country that is not allowed to be processed by the GR process (example: Brazil).")
+    BlacklistCountryPresent,
+
+    @Schema(description = "The provided record contains unalloyed special characters. ")
+    UnknownSpecialCharacters
 }
 
 enum class ChangeLogOutputError : ErrorCode {
