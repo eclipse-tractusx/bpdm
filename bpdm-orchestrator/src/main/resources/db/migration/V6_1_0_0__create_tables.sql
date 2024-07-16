@@ -178,7 +178,7 @@ create table golden_record_tasks (
 create table task_errors (
   task_id bigint not null,
   description varchar(255) not null,
-  type varchar(255) not null check (type in ('Timeout', 'Unspecified'))
+  type varchar(255) not null check (type in ('Timeout', 'Unspecified', 'NaturalPersonError', 'BpnErrorNotFound', 'BpnErrorTooManyOptions','MandatoryFieldValidationFailed', 'BlacklistCountryPresent', 'UnknownSpecialCharacters'))
 );
 
 create table gate_records (
