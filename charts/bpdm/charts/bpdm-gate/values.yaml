@@ -118,17 +118,6 @@ startupProbe:
 
 # Used to overwrite the default property values of the application configuration
 applicationConfig:
-  bpdm:
-    datasource:
-      # If empty sets kubernetes postgres service with same release name
-      host:
-    client:
-      pool:
-        # If empty sets kubernetes BPDM Pool service with same release name
-        base-url:
-      orchestrator:
-        # If empty sets kubernetes BPDM Orchestrator service with same release name
-        base-url:
 
 # Used to overwrite the secret property values of the application configuration
 applicationSecrets:
