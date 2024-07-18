@@ -45,7 +45,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run Trivy vulnerability scanner in repo mode
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@0.22.0
         with:
           scan-type: "config"
           # ignore-unfixed: true
@@ -78,7 +78,7 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           # Path to Docker image
-          image-ref: "docker.io/tractusx/bpdm-pool:latest-alpha"
+          image-ref: "docker.io/tractusx/bpdm-pool:latest"
           format: "sarif"
           output: "trivy-results2.sarif"
           exit-code: "0"
@@ -108,10 +108,10 @@ jobs:
 
       - name: Run Trivy vulnerability scanner
         if: always()
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@0.22.0
         with:
           # Path to Docker image
-          image-ref: "docker.io/tractusx/bpdm-gate:latest-alpha"
+          image-ref: "docker.io/tractusx/bpdm-gate:latest"
           format: "sarif"
           output: "trivy-results3.sarif"
           exit-code: "0"
@@ -141,10 +141,10 @@ jobs:
 
       - name: Run Trivy vulnerability scanner
         if: always()
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@0.22.0
         with:
           # Path to Docker image
-          image-ref: "docker.io/tractusx/bpdm-cleaning-service-dummy:latest-alpha"
+          image-ref: "docker.io/tractusx/bpdm-cleaning-service-dummy:latest"
           format: "sarif"
           output: "trivy-results4.sarif"
           exit-code: "0"
@@ -174,10 +174,10 @@ jobs:
 
       - name: Run Trivy vulnerability scanner
         if: always()
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@0.22.0
         with:
           # Path to Docker image
-          image-ref: "docker.io/tractusx/bpdm-orchestrator:latest-alpha"
+          image-ref: "docker.io/tractusx/bpdm-orchestrator:latest"
           format: "sarif"
           output: "trivy-results4.sarif"
           exit-code: "0"
