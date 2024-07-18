@@ -19,6 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.gate.api.exception
 
+import io.swagger.v3.oas.annotations.media.Schema
+
 /**
  * For every combination of possible errors a separate enum class is defined extending this marker interface.
  * We need separate enum classes in order to get the correct error codes for each endpoint in the Swagger schema.
@@ -30,6 +32,12 @@ enum class BusinessPartnerSharingError : ErrorCode {
     SharingTimeout,
     BpnNotInPool,
     MissingTaskID,
+    NaturalPersonError,
+    BpnErrorNotFound,
+    BpnErrorTooManyOptions,
+    MandatoryFieldValidationFailed,
+    BlacklistCountryPresent,
+    UnknownSpecialCharacters
 }
 
 enum class ChangeLogOutputError : ErrorCode {

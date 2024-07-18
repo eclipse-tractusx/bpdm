@@ -38,6 +38,7 @@ import org.eclipse.tractusx.orchestrator.api.model.ResultState
 import org.eclipse.tractusx.orchestrator.api.model.TaskClientStateDto
 import org.eclipse.tractusx.orchestrator.api.model.TaskResultStateSearchRequest
 import org.eclipse.tractusx.orchestrator.api.model.TaskStateRequest
+import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -171,11 +172,22 @@ class TaskResolutionChunkService(
         return when (task.processingState.resultState) {
             ResultState.Pending -> RequestCreationResult(sharingState, null, null, null)
             ResultState.Success -> createUpsertRequestForSuccessfulTask(sharingState, task, input)
-            ResultState.Error -> RequestCreationResult.error(
-                sharingState,
-                BusinessPartnerSharingError.SharingProcessError,
-                if (task.processingState.errors.isNotEmpty()) task.processingState.errors.joinToString(" // ") { it.description }.take(255) else null
-            )
+            ResultState.Error -> handleTaskErrorResult(sharingState, task)
+        }
+    }
+
+    private fun handleTaskErrorResult( sharingState: SharingStateDb, task: TaskClientStateDto): RequestCreationResult {
+        val errorDescription = task.processingState.errors.joinToString(" // ") { it.description }.take(255).ifEmpty { null }
+
+        return when (task.processingState.errors.firstOrNull()?.type) {
+            TaskErrorType.Timeout -> RequestCreationResult.error(sharingState, BusinessPartnerSharingError.SharingTimeout, errorDescription)
+            TaskErrorType.NaturalPersonError -> RequestCreationResult.error(sharingState, BusinessPartnerSharingError.NaturalPersonError, errorDescription)
+            TaskErrorType.BpnErrorNotFound -> RequestCreationResult.error(sharingState, BusinessPartnerSharingError.BpnErrorNotFound, errorDescription)
+            TaskErrorType.BpnErrorTooManyOptions -> RequestCreationResult.error(sharingState, BusinessPartnerSharingError.BpnErrorTooManyOptions, errorDescription)
+            TaskErrorType.MandatoryFieldValidationFailed -> RequestCreationResult.error(sharingState, BusinessPartnerSharingError.MandatoryFieldValidationFailed, errorDescription)
+            TaskErrorType.BlacklistCountryPresent -> RequestCreationResult.error(sharingState, BusinessPartnerSharingError.BlacklistCountryPresent, errorDescription)
+            TaskErrorType.UnknownSpecialCharacters -> RequestCreationResult.error(sharingState, BusinessPartnerSharingError.UnknownSpecialCharacters, errorDescription)
+            else -> RequestCreationResult.error(sharingState, BusinessPartnerSharingError.SharingProcessError, errorDescription )
         }
     }
 

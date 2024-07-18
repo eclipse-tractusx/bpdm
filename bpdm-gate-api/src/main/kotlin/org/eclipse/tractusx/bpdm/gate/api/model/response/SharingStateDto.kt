@@ -27,8 +27,7 @@ import java.time.LocalDateTime
 @Schema(
     description = "A sharing state entry shows the progress in the sharing process and is updated each time the " +
             "progress for a business partner changes. The business partner is identified by a combination " +
-            "of external ID and business partner type."
-)
+            "of external ID and business partner type.\n")
 data class SharingStateDto(
 
     @get:Schema(description = "The external identifier of the business partner for which the sharing state entry was created.")
@@ -37,7 +36,13 @@ data class SharingStateDto(
     @get:Schema(description = "One of the sharing state types of the current sharing state.")
     val sharingStateType: SharingStateType = SharingStateType.Initial,
 
-    @get:Schema(description = "One of the sharing error codes in case the current sharing state type is \"error\".")
+    @get:Schema(description = "One of the sharing error codes in case the current sharing state type is \"error\". \n" +
+            "* `NaturalPersonError`: The provided record contains natural person information.\n" +
+            "* `BpnErrorNotFound`: The provided record can not be matched to a legal entity or an address.\n" +
+            "* `BpnErrorTooManyOptions`: The provided record can not link to a clear legal entity.\n" +
+            "* `MandatoryFieldValidationFailed`: The provided record does not fulfill mandatory validation rules.\n" +
+            "* `BlacklistCountryPresent`: The provided record is part of a country that is not allowed to be processed by the GR process (example: Brazil).\n" +
+            "* `UnknownSpecialCharacters`: The provided record contains unallowed special characters.")
     val sharingErrorCode: BusinessPartnerSharingError? = null,
 
     @get:Schema(description = "The error message in case the current sharing state type is \"error\".")

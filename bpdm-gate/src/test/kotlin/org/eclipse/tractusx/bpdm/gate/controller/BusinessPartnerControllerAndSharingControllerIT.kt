@@ -199,7 +199,7 @@ class BusinessPartnerControllerAndSharingControllerIT @Autowired constructor(
             SharingStateDto(
                 externalId = externalId5,
                 sharingStateType = SharingStateType.Error,
-                sharingErrorCode = BusinessPartnerSharingError.SharingProcessError,
+                sharingErrorCode = BusinessPartnerSharingError.SharingTimeout,
                 sharingErrorMessage = "Major Error // Minor Error",
                 sharingProcessStarted = null,
                 taskId = "1"

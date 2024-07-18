@@ -650,6 +650,12 @@ components:
           enum:
             - Timeout
             - Unspecified
+            - NaturalPersonError
+            - BpnErrorNotFound
+            - BpnErrorTooManyOptions
+            - MandatoryFieldValidationFailed
+            - BlacklistCountryPresent
+            - UnknownSpecialCharacters
         description:
           type: string
           description: The free text, detailed description of the error
