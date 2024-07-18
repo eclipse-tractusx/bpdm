@@ -27,13 +27,13 @@
     <artifactId>bpdm-parent</artifactId>
     <name>Business Partner Data Management Parent</name>
     <description>Parent pom of Business Partner Data Management</description>
-    <version>6.1.0</version>
+    <version>${revision}</version>
     <packaging>pom</packaging>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.5</version>
+        <version>3.3.1</version>
     </parent>
 
     <modules>
@@ -49,25 +49,24 @@
     </modules>
 
     <properties>
+        <revision>6.1.1-SNAPSHOT</revision>
+        <java.version>21</java.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
+        <spring-boot.version>3.2.5</spring-boot.version>
         <kotlin.version>1.9.24</kotlin.version>
         <springdoc.version>2.5.0</springdoc.version>
-        <neo.version>1.29</neo.version>
-        <kotlinlogging.version>3.0.5</kotlinlogging.version>
+        <nv-i18n.version>1.29</nv-i18n.version>
+        <kotlin-logging.version>3.0.5</kotlin-logging.version>
+        <common-csv.version>1.11.0</common-csv.version>
         <wiremock.version>2.35.2</wiremock.version>
         <springmockk.version>4.0.2</springmockk.version>
-        <assertj.version>3.24.2</assertj.version>
-        <spring-boot.version>3.0.4</spring-boot.version>
-        <sonar.organization>catenax-ng</sonar.organization>
-        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-        <sonar.projectKey>product-bpdm</sonar.projectKey>
-        <sonar.moduleKey>${project.groupId}:${project.artifactId}</sonar.moduleKey>
-        <sonar.version>3.11.0.3922</sonar.version>
-        <jacoco.version>0.8.12</jacoco.version>
-        <testcontainers.version>1.19.8</testcontainers.version>
-        <io.projectreactor.netty>1.1.20</io.projectreactor.netty>
         <opencsv.version>5.9</opencsv.version>
+        <testcontainers-bom.version>1.19.8</testcontainers-bom.version>
+        <testcontainers-keycloak.version>3.2.0</testcontainers-keycloak.version>
+        <flatten-maven.version>1.1.0</flatten-maven.version>
+        <license-tool.version>1.1.0</license-tool.version>
+        <assertj.version>3.24.2</assertj.version>
     </properties>
 
     <pluginRepositories>
@@ -132,7 +131,7 @@
             <dependency>
                 <groupId>com.neovisionaries</groupId>
                 <artifactId>nv-i18n</artifactId>
-                <version>${neo.version}</version>
+                <version>${nv-i18n.version}</version>
             </dependency>
             <!-- OpenAPI 3 auto API documentation library for Spring Boot -->
             <dependency>
@@ -145,30 +144,23 @@
                 <artifactId>springdoc-openapi-starter-common</artifactId>
                 <version>${springdoc.version}</version>
             </dependency>
-            <!-- Override snakeyaml version used by transitive dependencies due to security issue -->
-            <dependency>
-                <groupId>org.yaml</groupId>
-                <artifactId>snakeyaml</artifactId>
-                <version>2.2</version>
-            </dependency>
-            <!-- Override jwt library version used by spring framework due to security issue -->
-            <dependency>
-                <groupId>com.nimbusds</groupId>
-                <artifactId>nimbus-jose-jwt</artifactId>
-                <version>9.37.2</version>
-            </dependency>
-
             <!-- Kotlin wrapper for slf4j (Logging)-->
             <dependency>
                 <groupId>io.github.microutils</groupId>
                 <artifactId>kotlin-logging-jvm</artifactId>
-                <version>${kotlinlogging.version}</version>
+                <version>${kotlin-logging.version}</version>
             </dependency>
-            <!-- Increase dependency version to mitigate high vulnerability -->
+            <!-- Used for simple CSV operations -->
             <dependency>
-                <groupId>org.apache.tomcat.embed</groupId>
-                <artifactId>tomcat-embed-core</artifactId>
-                <version>10.1.25</version>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-csv</artifactId>
+                <version>${common-csv.version}</version>
+            </dependency>
+            <!-- opencsv for reading and writing CSV -->
+            <dependency>
+                <groupId>com.opencsv</groupId>
+                <artifactId>opencsv</artifactId>
+                <version>${opencsv.version}</version>
             </dependency>
 
             <!-- Test -->
@@ -185,35 +177,17 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>org.assertj</groupId>
-                <artifactId>assertj-core</artifactId>
-                <version>${assertj.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
                 <groupId>org.testcontainers</groupId>
                 <artifactId>testcontainers-bom</artifactId>
-                <version>${testcontainers.version}</version>
+                <version>${testcontainers-bom.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
-                <groupId>io.projectreactor.netty</groupId>
-                <artifactId>reactor-netty-http</artifactId>
-                <version>${io.projectreactor.netty}</version>
-            </dependency>
-            <dependency>
                 <groupId>com.github.dasniko</groupId>
                 <artifactId>testcontainers-keycloak</artifactId>
-                <version>3.2.0</version>
+                <version>${testcontainers-keycloak.version}</version>
                 <scope>test</scope>
-            </dependency>
-
-            <!-- opencsv for reading and writing CSV -->
-            <dependency>
-                <groupId>com.opencsv</groupId>
-                <artifactId>opencsv</artifactId>
-                <version>${opencsv.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -226,7 +200,6 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>3.2.5</version>
                     <executions>
                         <execution>
                             <id>integration-test</id>
@@ -249,7 +222,7 @@
                             <plugin>spring</plugin>
                             <plugin>jpa</plugin>
                         </compilerPlugins>
-                        <jvmTarget>17</jvmTarget>
+                        <jvmTarget>21</jvmTarget>
                     </configuration>
                     <dependencies>
                         <dependency>
@@ -299,55 +272,52 @@
                         </execution>
                     </executions>
                 </plugin>
-                <plugin>
-                    <groupId>org.eclipse.dash</groupId>
-                    <artifactId>license-tool-plugin</artifactId>
-                    <version>1.1.0</version>
-                    <executions>
-                        <execution>
-                            <id>license-check</id>
-                            <goals>
-                                <goal>license-check</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                    <configuration>
-                        <projectId>automotive.tractusx</projectId>
-                        <summary>DEPENDENCIES</summary>
-                        <includeScope>test</includeScope>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.sonarsource.scanner.maven</groupId>
-                    <artifactId>sonar-maven-plugin</artifactId>
-                    <version>${sonar.version}</version>
-                </plugin>
-                <!-- Creates test coverage report -->
-                <plugin>
-                    <groupId>org.jacoco</groupId>
-                    <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>${jacoco.version}</version>
-                    <executions>
-                        <execution>
-                            <id>prepare-agent</id>
-                            <goals>
-                                <goal>prepare-agent</goal>
-                            </goals>
-                        </execution>
-                        <execution>
-                            <id>report</id>
-                            <goals>
-                                <goal>report</goal>
-                            </goals>
-                            <configuration>
-                                <formats>
-                                    <format>XML</format>
-                                </formats>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
             </plugins>
         </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <version>${flatten-maven.version}</version>
+                <configuration>
+                    <updatePomFile>true</updatePomFile>
+                    <flattenMode>resolveCiFriendliesOnly</flattenMode>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>flatten</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>flatten</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>flatten.clean</id>
+                        <phase>clean</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.eclipse.dash</groupId>
+                <artifactId>license-tool-plugin</artifactId>
+                <version>${license-tool.version}</version>
+                <executions>
+                    <execution>
+                        <id>license-check</id>
+                        <goals>
+                            <goal>license-check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <projectId>automotive.tractusx</projectId>
+                    <summary>DEPENDENCIES</summary>
+                    <includeScope>test</includeScope>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
 </project>

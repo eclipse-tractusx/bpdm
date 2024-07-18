@@ -21,8 +21,8 @@
 apiVersion: v2
 type: application
 name: bpdm-gate
-appVersion: "6.1.0"
-version: 6.1.0
+appVersion: "6.1.1-SNAPSHOT"
+version: 6.1.1-SNAPSHOT
 description: A Helm chart for deploying the BPDM gate service
 home: https://eclipse-tractusx.github.io/docs/kits/Business%20Partner%20Kit/Adoption%20View
 sources:

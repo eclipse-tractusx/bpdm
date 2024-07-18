@@ -31,7 +31,7 @@
     <parent>
         <groupId>org.eclipse.tractusx</groupId>
         <artifactId>bpdm-parent</artifactId>
-        <version>6.1.0</version>
+        <version>${revision}</version>
     </parent>
 
     <properties>
@@ -51,7 +51,10 @@
             <groupId>com.fasterxml.jackson.module</groupId>
             <artifactId>jackson-module-kotlin</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

@@ -31,7 +31,7 @@
     <parent>
         <groupId>org.eclipse.tractusx</groupId>
         <artifactId>bpdm-parent</artifactId>
-        <version>6.1.0</version>
+        <version>${revision}</version>
     </parent>
 
     <dependencies>
@@ -107,6 +107,10 @@
             <artifactId>flyway-core</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-database-postgresql</artifactId>
+        </dependency>
+        <dependency>
             <groupId>io.github.microutils</groupId>
             <artifactId>kotlin-logging-jvm</artifactId>
         </dependency>
@@ -151,11 +155,6 @@
             <groupId>org.testcontainers</groupId>
             <artifactId>postgresql</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-csv</artifactId>
-            <version>1.11.0</version>
         </dependency>
     </dependencies>
 
