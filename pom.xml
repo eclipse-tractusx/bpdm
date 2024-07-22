@@ -64,7 +64,7 @@
         <opencsv.version>5.9</opencsv.version>
         <testcontainers-bom.version>1.19.8</testcontainers-bom.version>
         <testcontainers-keycloak.version>3.2.0</testcontainers-keycloak.version>
-        <flatten-maven.version>1.1.0</flatten-maven.version>
+        <flatten-maven.version>1.6.0</flatten-maven.version>
         <license-tool.version>1.1.0</license-tool.version>
         <assertj.version>3.24.2</assertj.version>
     </properties>
