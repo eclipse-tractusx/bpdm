@@ -24,7 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
-import java.sql.Timestamp
+import java.time.Instant
 import java.util.*
 
 @Entity
@@ -106,7 +106,7 @@ class BusinessPartnerDb(
     var addressConfidence: ConfidenceCriteriaDb?,
 
     @Column(name = "currentness")
-    var currentness: Timestamp? = null,
+    var currentness: Instant? = null,
 
     ) : BaseEntity() {
 

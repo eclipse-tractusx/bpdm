@@ -21,6 +21,10 @@ package org.eclipse.tractusx.bpdm.gate.util
 
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 fun <T> List<T>.containsDuplicates(): Boolean = size != distinct().size
 
@@ -35,4 +39,10 @@ fun getCurrentUserBpn(): String? {
         return authentication.tokenAttributes["bpn"] as String? ?: null
     }
     return null;
+}
+
+fun getTimestampToInstant(dateTimeString: String?): Instant {
+    val inputFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+    val ldt = LocalDateTime.parse(dateTimeString, inputFormat)
+    return ldt.atZone(ZoneId.systemDefault()).toInstant()
 }
