@@ -40,7 +40,7 @@ interface IdentifierTypeRepository :
         fun byCountry(countryCode: CountryCode?) =
             countryCode?.let {
                 Specification<IdentifierTypeDb> { root, query, builder ->
-                    val subquery = query.subquery(IdentifierTypeDetailDb::class.java)
+                    val subquery = query!!.subquery(IdentifierTypeDetailDb::class.java)
                     val subRoot = subquery.from(subquery.resultType)
 
                     // Check if an IdentifierTypeDetail exists for the IdentifierType where the countryCode is null or equal to given countryCode
