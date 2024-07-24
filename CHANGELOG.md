@@ -10,24 +10,24 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 
 ### Added
 
-- BPDM Gate: Post endpoint to upload business partner input data using csv file.(#700)
-- BPDM Gate: GET endpoint to download the csv file template for business partner upload. (#700)
-- Apps: Tax Jurisdiction Code to the physical address of a business partner (#955)
-- BPDM Orchestrator: Tasks will now be persisted
-- BPDM Orchestrator: Tasks now come with a gate record identifier. This makes it possible for cleaning services to match tasks for the same Gate record 
+- BPDM Gate: Post endpoint to upload business partner input data using csv file.([#700](https://github.com/eclipse-tractusx/sig-release/issues/700))
+- BPDM Gate: GET endpoint to download the csv file template for business partner upload. ([#700](https://github.com/eclipse-tractusx/sig-release/issues/700))
+- Apps: Tax Jurisdiction Code to the physical address of a business partner ([#955](https://github.com/eclipse-tractusx/bpdm/issues/955))
+- BPDM Orchestrator: Tasks will now be persisted ([#722](https://github.com/eclipse-tractusx/sig-release/issues/722))
+- BPDM Orchestrator: Tasks now come with a gate record identifier. This makes it possible for cleaning services to match tasks for the same Gate record ([#711](https://github.com/eclipse-tractusx/sig-release/issues/711)) 
 
 ### Changed:
 
-- BPDM Gate: Fix sending business partner data to the golden record service even when they have no changes
-- BPDM Gate: Fix sharing states sometimes taking the wrong task id from the orchestrator
+- BPDM Gate: Fix sending business partner data to the golden record service even when they have no changes ([#988](https://github.com/eclipse-tractusx/bpdm/pull/988))
+- BPDM Gate: Fix sharing states sometimes taking the wrong task id from the orchestrator ([#989](https://github.com/eclipse-tractusx/bpdm/pull/989))
 
 
 ## [6.0.2] - [2024-07-03]
 
 ### Changed
 
-- BPDM Gate: Now sends alternative addresses which are NULL correctly to the Orchestrator
-- BPDM Pool: Changed Checksum generation algorithm: Now checksum includes the BPN with prefix
+- BPDM Gate: Now sends alternative addresses which are NULL correctly to the Orchestrator ([#801](https://github.com/eclipse-tractusx/portal-backend/issues/801))
+- BPDM Pool: Changed Checksum generation algorithm: Now checksum includes the BPN with prefix ([#699](https://github.com/eclipse-tractusx/sig-release/issues/699))
 
 
 ## [6.0.1] - [2024-05-27]
