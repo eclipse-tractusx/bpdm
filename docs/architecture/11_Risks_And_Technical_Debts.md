@@ -204,6 +204,48 @@ bpdm-cleaning-service-dummy:
             client-secret: "*****"
 ```
 
+#### Long-term mitigation
+
+Note that the mitigating BPDM configuration above has a major drawback.
+All systems directly integrating into the BPDM components need to be absolutely trusted as they receive write privileges on the pool.
+
+The long-term resolution is to align the BPDM authorization concept with the Central-IDP configuration.
+A proposal for this has already been submitted [here](https://github.com/eclipse-tractusx/portal-iam/issues/154).
+
+Another step in this direction is also using the Central-IDP as a dependency directly for the BPDM Helm charts as proposed [here](https://github.com/eclipse-tractusx/bpdm/issues/994).
+
+### Partner Network shows all golden records
+
+Currently, the Portal's Partner Network page shows all business partners even though the intention is to only show Catena-X members.
+
+#### Mitigation
+
+In order to resolve this issue a different endpoint needs to be integrated: `POST v6/members/legal-entities/search`
+
+Additionally, Central-IDP and the Portal need to make sure that the Portal users with the portal role `Cx-User` receive only the BPDM role `Pool Cx Member` as described in the [roles and rights concept](08_Crosscutting_Concepts.md#authentication--autorization).
+
+### Managing own company data error
+
+When trying to manage own company data on the Portal's UI we are currently experiencing an error for being unauthorized.
+
+This renders the Portal user with the role `Service Manager` unable to manage their own data.
+
+#### Mitigation
+
+The Portal can mitigate this issue by making sure that the portal user with role `Service Manager` obtains the role `Gate Admin` with permissions as defined in the [roles and rights concept](08_Crosscutting_Concepts.md#authentication--autorization).
+
+### Exposed technical users
+
+Through the Portal's marketplace service and subscription process the subscribing company receive access to the created BPDM technical users.
+This leads to the danger of companies bypassing the EDC offers and directly accessing the BPDM APIs.
+
+Since this behaviour of creating technical users is an ingrained feature of the Portal there is no quick resolution to that mismatch.
+
+#### Mitigation
+
+As a mitigation the BPDM provider who is also the operator of the Central-IDP can decide to not use the automatic tehcnical user creation process of the Portal.
+As a result, when BPDM services are requested the operator needs to create technical users directly in the Central-IDP.
+These hidden technical users can then be used to configure [EDC assets](../../INSTALL.md#edc-installation).
 
 ## NOTICE
 
