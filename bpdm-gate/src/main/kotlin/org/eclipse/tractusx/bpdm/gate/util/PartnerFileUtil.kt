@@ -92,7 +92,9 @@ object PartnerFileUtil {
                     // Legal entity's business partner number is nothing but tenant's partner number who is performing business partner upload action
                     legalEntity = LegalEntityRepresentationInputDto(legalEntityBpn = tenantBpnl?.takeIf { it.isNotEmpty() }),
                     site = row.toSiteRepresentationInputDto(formatter, errors, index),
-                    address = row.toAddressRepresentationInputDto(formatter, errors, index)
+                    address = row.toAddressRepresentationInputDto(formatter, errors, index),
+                    currentness = null
+
                 )
             } catch (e: Exception) {
                 errors.add("Row ${index + 1} has error: ${e.message}")

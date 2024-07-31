@@ -42,6 +42,7 @@ class BusinessPartnerCopyUtil {
             legalEntityConfidence = fromPartner.legalEntityConfidence
             siteConfidence = fromPartner.siteConfidence
             addressConfidence = fromPartner.addressConfidence
+            currentness = fromPartner.currentness
 
             nameParts.replace(fromPartner.nameParts)
             roles.replace(fromPartner.roles)
