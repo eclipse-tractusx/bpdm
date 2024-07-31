@@ -229,7 +229,7 @@ Orchestrator Permissions:
 | BPDM Permission Group         |  Portal Role |
 |--|--|
 | Gate Admin    |  Service Manager    |
-| Pool Catena-X Member    |  CX User   |
+| Pool Cx Member    |  CX User   |
 
 #### Technical Users:
 
