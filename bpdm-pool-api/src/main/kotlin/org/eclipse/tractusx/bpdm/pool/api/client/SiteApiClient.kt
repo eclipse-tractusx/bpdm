@@ -66,7 +66,7 @@ interface SiteApiClient : PoolSiteApi {
         @RequestBody requests: Collection<SitePartnerUpdateRequest>
     ): SitePartnerUpdateResponseWrapper
 
-    @PostExchange("/legal/reference")
+    @PostExchange("/legal-address")
     override fun createSiteWithLegalReference(
         @RequestBody request: Collection<SiteCreateRequestWithLegalAddressAsMain>
     ): SitePartnerCreateResponseWrapper

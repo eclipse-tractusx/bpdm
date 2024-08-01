@@ -136,17 +136,18 @@ interface PoolSiteApi {
     ): PageDto<SiteWithMainAddressVerboseDto>
 
     @Operation(
-        summary = "Get page of sites matching the pagination search criteria",
-        description = "This endpoint retrieves all existing business partners of type sites."
+        summary = "Create a new site with legal entity reference",
+        description = "Create a business partner site with the given legal entity reference. " +
+                "It will designate the address information as both legal and site main address."
     )
     @ApiResponses(
         value = [
-            ApiResponse(responseCode = "200", description = "Page of business partners matching the search criteria, may be empty"),
+            ApiResponse(responseCode = "200", description = "New sites request was processed successfully, possible errors are returned"),
             ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()])
         ]
     )
     @Tag(name = ApiCommons.SITE_NAME, description = ApiCommons.SITE_DESCRIPTION)
-    @PostMapping("/legal/reference")
+    @PostMapping("/legal-address")
     fun createSiteWithLegalReference(
         @RequestBody request: Collection<SiteCreateRequestWithLegalAddressAsMain>
     ): SitePartnerCreateResponseWrapper
