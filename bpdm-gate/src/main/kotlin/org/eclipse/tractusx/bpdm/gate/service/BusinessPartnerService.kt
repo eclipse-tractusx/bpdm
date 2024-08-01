@@ -126,7 +126,7 @@ class BusinessPartnerService(
         val changeType = if (existingPartner == null) ChangelogType.CREATE else ChangelogType.UPDATE
         val partnerToUpsert = existingPartner ?: BusinessPartnerDb.createEmpty(upsertData.sharingState, upsertData.stage)
 
-        val hasChanges = compareUtil.hasChanges(upsertData, partnerToUpsert)
+        val hasChanges = changeType == ChangelogType.CREATE || compareUtil.hasChanges(upsertData, partnerToUpsert)
 
         if (hasChanges) {
             changelogRepository.save(ChangelogEntryDb(sharingState.externalId, sharingState.tenantBpnl, changeType, stage))
