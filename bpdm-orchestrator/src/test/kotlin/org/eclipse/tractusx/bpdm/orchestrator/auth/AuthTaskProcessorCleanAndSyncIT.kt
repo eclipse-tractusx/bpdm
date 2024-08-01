@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.orchestrator.auth
 
 import org.eclipse.tractusx.bpdm.orchestrator.Application
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
+import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.containers.SelfClientInitializer
 import org.eclipse.tractusx.bpdm.test.util.AuthAssertionHelper
 import org.eclipse.tractusx.bpdm.test.util.AuthExpectationType
@@ -31,6 +32,7 @@ import org.springframework.test.context.ContextConfiguration
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class])
 @ContextConfiguration(initializers = [
+    PostgreSQLContextInitializer::class,
     KeyCloakInitializer::class,
     AuthTaskProcessorCleanAndSyncIT.SelfClientAsTaskProcessorCleanAndSyncInitializer::class
 ])

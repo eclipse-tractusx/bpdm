@@ -57,7 +57,8 @@ object BusinessPartnerGenericCommonValues {
             industrialZone = "industrial-zone",
             building = "building",
             floor = "floor",
-            door = "door"
+            door = "door",
+            taxJurisdictionCode = "123"
         ),
         alternativeAddress = AlternativeAddress(
             geographicCoordinates = GeoCoordinate(0.6f, 0.6f, 0.6f),

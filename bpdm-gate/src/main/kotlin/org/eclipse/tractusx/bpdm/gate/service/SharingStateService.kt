@@ -167,6 +167,7 @@ class SharingStateService(
                     SharingStateDb(
                         externalId,
                         sharingStateType = SharingStateType.Ready,
+                        orchestratorRecordId = null,
                         sharingErrorCode = null,
                         sharingErrorMessage = null,
                         sharingProcessStarted = null,

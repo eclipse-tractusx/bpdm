@@ -28,6 +28,9 @@ data class TaskClientStateDto(
     @get:Schema(required = true)
     val taskId: String,
 
+    @get:Schema(required = true, description = "The identifier of the gate record for which this task has been created")
+    val recordId: String,
+
     val businessPartnerResult: BusinessPartner,
 
     @get:Schema(required = true)

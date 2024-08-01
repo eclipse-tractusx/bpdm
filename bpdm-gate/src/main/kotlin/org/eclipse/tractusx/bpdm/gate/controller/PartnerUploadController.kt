@@ -21,9 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.controller
 
 import org.eclipse.tractusx.bpdm.gate.api.GatePartnerUploadApi
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
-import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
-import org.eclipse.tractusx.bpdm.gate.service.BusinessPartnerService
 import org.eclipse.tractusx.bpdm.gate.service.PartnerUploadService
 import org.eclipse.tractusx.bpdm.gate.util.getCurrentUserBpn
 import org.springframework.core.io.ByteArrayResource
@@ -37,8 +35,6 @@ import org.springframework.web.multipart.MultipartFile
 
 @RestController
 class PartnerUploadController(
-    val businessPartnerService: BusinessPartnerService,
-    val apiConfigProperties: ApiConfigProperties,
     val partnerUploadService: PartnerUploadService
 ) : GatePartnerUploadApi {
 

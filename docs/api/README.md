@@ -756,6 +756,316 @@ As a result for this step the golden record process expects the following:
 That means if the business partner data contains an additional address, the result should also contain the possible site parent and the legal entity parent information
 
 
+### Mapping of Gate to Orchestrator Business Partner Data
+
+```mermaid
+---
+title: Share Unknown Business Partner Data Without Site
+---
+classDiagram
+  direction LR
+  class Input["Gate Input"]{
+    Name Parts: A
+    Identifiers: B
+    States: C
+    Legal Entity Properties: D
+    Site Properties: NULL
+    Address Properties: F
+    Is Own Company Data: G
+  }
+
+  class BusinessPartner["Business Partner"]{
+      Name Parts: EMPTY
+      Owning Company: G
+      Site: NULL
+      Additional Address: NULL
+  }
+  
+  class Uncategorized{
+      Name Parts: A
+      Identifiers: B
+      States: C
+      Address: F
+  }
+  
+  class LegalEntity{
+      Legal Name: D
+      Legal Short Name: D
+      Legalform: D
+      Identifiers: EMPTY
+      States: D
+      Legal Address: EMPTY
+  }
+
+  Input ..> BusinessPartner
+  BusinessPartner --> Uncategorized
+  BusinessPartner --> LegalEntity: D
+```
+
+```mermaid
+---
+title: Share Legal Address Without Site
+---
+classDiagram
+  direction LR
+  class Input["Gate Input"]{
+    Name Parts: A
+    Identifiers: B
+    States: C
+    Legal Entity Properties: D
+    Site Properties: NULL
+    Address Properties: F
+    Is Own Company Data: G
+  }
+
+  class BusinessPartner["Business Partner"]{
+      Name Parts: EMPTY
+      Owning Company: G
+      Site: NULL
+      Additional Address: NULL
+  }
+  
+  class Uncategorized{
+      Name Parts: A
+      Identifiers: B
+      States: C
+      Address: NULL
+  }
+  
+  class LegalEntity{
+      Legal Name: D
+      Legal Short Name: D
+      Legalform: D
+      Identifiers: EMPTY
+      States: D
+      Legal Address: F
+  }
+
+  Input ..> BusinessPartner
+  BusinessPartner --> Uncategorized
+  BusinessPartner --> LegalEntity: D
+```
+
+```mermaid
+---
+title: Share Site Main Address
+---
+classDiagram
+  direction LR
+  class Input["Gate Input"]{
+    Name Parts: A
+    Identifiers: B
+    States: C
+    Legal Entity Properties: D
+    Site Properties: E
+    Address Properties: F
+    Is Own Company Data: G
+  }
+
+  class BusinessPartner["Business Partner"]{
+      Name Parts: EMPTY
+      Owning Company: G
+      Additional Address: NULL
+  }
+  
+  class Uncategorized{
+      Name Parts: A
+      Identifiers: B
+      States: C
+      Address: NULL
+  }
+  
+  class LegalEntity{
+      BPN Reference: D
+      Legal Name: D
+      Legal Short Name: D
+      Legalform: D
+      Identifiers: EMPTY
+      States: D
+      Legal Address: NULL
+  }
+  
+  class Site{
+      BPN Reference: E
+      Site Name: E
+      Identifiers: E
+      States: E
+      Site Main Address: F
+  }
+
+  Input ..> BusinessPartner
+  BusinessPartner --> Uncategorized
+  BusinessPartner --> LegalEntity: D
+  BusinessPartner --> Site: E
+```
+
+```mermaid
+---
+title: Share Legal And Site Main Address
+---
+classDiagram
+  direction LR
+  class Input["Gate Input"]{
+    Name Parts: A
+    Identifiers: B
+    States: C
+    Legal Entity Properties: D
+    Site Properties: E
+    Address Properties: F
+    Is Own Company Data: G
+  }
+
+  class BusinessPartner["Business Partner"]{
+      Name Parts: EMPTY
+      Owning Company: G
+      Additional Address: NULL
+  }
+  
+  class Uncategorized{
+      Name Parts: A
+      Identifiers: B
+      States: C
+      Address: NULL
+  }
+  
+  class LegalEntity{
+      BPN Reference: D
+      Legal Name: D
+      Legal Short Name: D
+      Legalform: D
+      Identifiers: EMPTY
+      States: D
+      Legal Address: F
+  }
+  
+  class Site{
+      BPN Reference: E
+      Site Name: E
+      Identifiers: EMPTY
+      States: E
+      Site Main Address: NULL
+  }
+
+  Input ..> BusinessPartner
+  BusinessPartner --> Uncategorized
+  BusinessPartner --> LegalEntity: D
+  BusinessPartner --> Site: E
+```
+
+```mermaid
+---
+title: Share Additional Address Of Site
+---
+classDiagram
+  direction LR
+  class Input["Gate Input"]{
+    Name Parts: A
+    Identifiers: B
+    States: C
+    Legal Entity Properties: D
+    Site Properties: E
+    Address Properties: F
+    Is Own Company Data: G
+  }
+
+  class BusinessPartner["Business Partner"]{
+      Name Parts: EMPTY
+      Owning Company: G
+  }
+  
+  class Uncategorized{
+      Name Parts: A
+      Identifiers: B
+      States: C
+      Address: NULL
+  }
+  
+  class LegalEntity{
+      BPN Reference: D
+      Legal Name: D
+      Legal Short Name: D
+      Legalform: D
+      Identifiers: EMPTY
+      States: D
+      Legal Address: EMPTY
+  }
+  
+  class Site{
+      BPN Reference: E
+      Site Name: E
+      Identifiers: EMPTY
+      States: E
+      Site Main Address: NULL
+  }
+  
+  class AdditionalAddress{
+      BPN Reference: F
+      Identifiers: EMPTY
+      States: F
+      Physical Address: F
+      Alternative Address: F
+  }
+
+  Input ..> BusinessPartner
+  BusinessPartner --> Uncategorized
+  BusinessPartner --> LegalEntity: D
+  BusinessPartner --> Site: E
+  BusinessPartner --> AdditionalAddress: F
+```
+
+```mermaid
+---
+title: Share Additional Address Of Legal Entity
+---
+classDiagram
+  direction LR
+  class Input["Gate Input"]{
+    Name Parts: A
+    Identifiers: B
+    States: C
+    Legal Entity Properties: D
+    Site Properties: NULL
+    Address Properties: F
+    Is Own Company Data: G
+  }
+
+  class BusinessPartner["Business Partner"]{
+      Name Parts: EMPTY
+      Owning Company: G
+      Site: NULL
+  }
+  
+  class Uncategorized{
+      Name Parts: A
+      Identifiers: B
+      States: C
+      Address: NULL
+  }
+  
+  class LegalEntity{
+      BPN Reference: D
+      Legal Name: D
+      Legal Short Name: D
+      Legalform: D
+      Identifiers: EMPTY
+      States: D
+      Legal Address: EMPTY
+  }
+  
+  class AdditionalAddress{
+      BPN Reference: F
+      Identifiers: EMPTY
+      States: F
+      Physical Address: F
+      Alternative Address: F
+  }
+
+  Input ..> BusinessPartner
+  BusinessPartner --> Uncategorized
+  BusinessPartner --> LegalEntity: D
+  BusinessPartner --> AdditionalAddress: F
+```
+
 ## Access BPDM over EDC
 
 This section details how a sharing member EDC can access an EDC exposing the BPDM API as assets. Before you can access the assets make sure that the BPDM EDC
@@ -767,6 +1077,7 @@ Offers are separated into purposes (defined in the BPDM framework agreement) on 
 First, you need to select the offer based on your purpose.
 Afterward you can negotiate for a contract agreement in order to get access to the data.
 The final result of that negotiation will be a transfer token with which you can navigate the BPDM APIs over the BPDM EDC's public API (which acts as a proxy).
+
 
 ## NOTICE
 

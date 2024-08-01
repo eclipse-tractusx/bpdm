@@ -161,6 +161,7 @@ internal class BusinessPartnerIT @Autowired constructor(
         return SharingStateDb(
             externalId = "testExternalId",
             sharingErrorCode = null,
+            orchestratorRecordId = null,
             sharingStateType = SharingStateType.Initial
         )
     }

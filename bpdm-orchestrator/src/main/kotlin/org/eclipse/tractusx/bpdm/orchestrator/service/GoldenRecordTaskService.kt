@@ -21,74 +21,77 @@ package org.eclipse.tractusx.bpdm.orchestrator.service
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.orchestrator.config.TaskConfigProperties
-import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmEmptyResultException
+import org.eclipse.tractusx.bpdm.orchestrator.entity.GateRecordDb
+import org.eclipse.tractusx.bpdm.orchestrator.entity.DbTimestamp
+import org.eclipse.tractusx.bpdm.orchestrator.entity.GoldenRecordTaskDb
+import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmRecordNotFoundException
 import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmTaskNotFoundException
-import org.eclipse.tractusx.bpdm.orchestrator.model.GoldenRecordTask
-import org.eclipse.tractusx.bpdm.orchestrator.model.TaskProcessingState
+import org.eclipse.tractusx.bpdm.orchestrator.repository.GateRecordRepository
+import org.eclipse.tractusx.bpdm.orchestrator.repository.GoldenRecordTaskRepository
 import org.eclipse.tractusx.orchestrator.api.model.*
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
+import org.springframework.data.domain.Pageable
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
 import java.util.*
 
 @Service
 class GoldenRecordTaskService(
-    private val taskStorage: GoldenRecordTaskStorage,
     private val goldenRecordTaskStateMachine: GoldenRecordTaskStateMachine,
-    private val taskConfigProperties: TaskConfigProperties
+    private val taskConfigProperties: TaskConfigProperties,
+    private val responseMapper: ResponseMapper,
+    private val taskRepository: GoldenRecordTaskRepository,
+    private val gateRecordRepository: GateRecordRepository
 ) {
 
     private val logger = KotlinLogging.logger { }
 
-    @Synchronized
+    @Transactional
     fun createTasks(createRequest: TaskCreateRequest): TaskCreateResponse {
         logger.debug { "Creation of new golden record tasks: executing createTasks() with parameters $createRequest" }
-        return createRequest.businessPartners
-            .map { businessPartnerGeneric -> taskStorage.addTask(initTask(createRequest, businessPartnerGeneric)) }
-            .map(::toTaskClientStateDto)
+
+        val gateRecords = getOrCreateGateRecords(createRequest.requests)
+
+        return createRequest.requests.zip(gateRecords)
+            .map { (request, record) -> goldenRecordTaskStateMachine.initTask(createRequest.mode, request.businessPartner, record) }
+            .map { task -> responseMapper.toClientState(task, calculateTaskRetentionTimeout(task)) }
             .let { TaskCreateResponse(createdTasks = it) }
     }
 
-    @Synchronized
     fun searchTaskStates(stateRequest: TaskStateRequest): TaskStateResponse {
         logger.debug { "Search for the state of golden record task: executing searchTaskStates() with parameters $stateRequest" }
-        return stateRequest.taskIds
-            .mapNotNull { taskId -> taskStorage.getTask(taskId) }       // skip missing tasks
-            .map(::toTaskClientStateDto)
+
+        return stateRequest.taskIds.map { toUUID(it) }
+            .let { uuids -> taskRepository.findByUuidIn(uuids.toSet()) }
+            .map { task -> responseMapper.toClientState(task, calculateTaskRetentionTimeout(task)) }
             .let { TaskStateResponse(tasks = it) }
     }
 
-    @Synchronized
+    @Transactional
     fun reserveTasksForStep(reservationRequest: TaskStepReservationRequest): TaskStepReservationResponse {
         logger.debug { "Reservation of next golden record tasks: executing reserveTasksForStep() with parameters $reservationRequest" }
         val now = Instant.now()
 
-        val tasks = taskStorage.getQueuedTasksByStep(reservationRequest.step, reservationRequest.amount)
-        tasks.forEach { task -> goldenRecordTaskStateMachine.doReserve(task) }
+        val foundTasks = taskRepository.findByStepAndStepState(reservationRequest.step, StepState.Queued, Pageable.ofSize(reservationRequest.amount)).content
+        val reservedTasks = foundTasks.map { task -> goldenRecordTaskStateMachine.doReserve(task) }
+        val pendingTimeout = reservedTasks.minOfOrNull { calculateTaskPendingTimeout(it) } ?: now
 
-        val pendingTimeout = tasks.minOfOrNull { calculateTaskPendingTimeout(it.processingState) } ?: now
-
-        val taskEntries = tasks.map { task ->
-            TaskStepReservationEntryDto(
-                taskId = task.taskId,
-                businessPartner = task.businessPartner
-            )
-        }
-
-        return TaskStepReservationResponse(
-            reservedTasks = taskEntries,
-            // property is deprecated
-            timeout = pendingTimeout
-        )
+        return reservedTasks
+            .map { task -> TaskStepReservationEntryDto(task.uuid.toString(), task.gateRecord.publicId.toString(), responseMapper.toBusinessPartnerResult(task.businessPartner)) }
+            .let { reservations -> TaskStepReservationResponse(reservations, pendingTimeout) }
     }
 
-    @Synchronized
+    @Transactional
     fun resolveStepResults(resultRequest: TaskStepResultRequest) {
         logger.debug { "Step results for reserved golden record tasks: executing resolveStepResults() with parameters $resultRequest" }
+        val uuids = resultRequest.results.map { toUUID(it.taskId) }
+        val foundTasks = taskRepository.findByUuidIn(uuids.toSet())
+        val foundTasksByUuid = foundTasks.associateBy { it.uuid.toString() }
+
         resultRequest.results
             .forEach { resultEntry ->
-                val task = taskStorage.getTask(resultEntry.taskId)
+                val task = foundTasksByUuid[resultEntry.taskId]
                     ?: throw BpdmTaskNotFoundException(resultEntry.taskId)
                 val step = resultRequest.step
                 val errors = resultEntry.errors
@@ -96,16 +99,14 @@ class GoldenRecordTaskService(
 
                 if (errors.isNotEmpty()) {
                     goldenRecordTaskStateMachine.doResolveTaskToError(task, step, errors)
-                } else if (resultBusinessPartner != null) {
-                    goldenRecordTaskStateMachine.doResolveTaskToSuccess(task, step, resultBusinessPartner)
                 } else {
-                    throw BpdmEmptyResultException(resultEntry.taskId)
+                    goldenRecordTaskStateMachine.resolveTaskStepToSuccess(task, step, resultBusinessPartner)
                 }
             }
     }
 
     @Scheduled(cron = "\${bpdm.task.timeoutCheckCron}")
-    @Synchronized
+    @Transactional
     fun checkForTimeouts() {
         try {
             logger.debug { "Checking for timeouts" }
@@ -117,62 +118,56 @@ class GoldenRecordTaskService(
     }
 
     private fun checkForPendingTimeouts() {
-        taskStorage.getTasksWithPendingTimeoutBefore(Instant.now())
+        taskRepository.findByProcessingStatePendingTimeoutBefore(DbTimestamp.now())
             .forEach {
                 try {
-                    logger.info { "Setting timeout for task ${it.taskId} after reaching pending timeout" }
+                    logger.info { "Setting timeout for task ${it.uuid} after reaching pending timeout" }
                     goldenRecordTaskStateMachine.doResolveTaskToTimeout(it)
                 } catch (err: RuntimeException) {
-                    logger.error(err) { "Error handling pending timeout for task ${it.taskId}" }
+                    logger.error(err) { "Error handling pending timeout for task ${it.uuid}" }
                 }
             }
     }
 
     private fun checkForRetentionTimeouts() {
-        taskStorage.getTasksWithRetentionTimeoutBefore(Instant.now())
+        taskRepository.findByProcessingStateRetentionTimeoutBefore(DbTimestamp.now())
             .forEach {
                 try {
-                    logger.info { "Removing task ${it.taskId} after reaching retention timeout" }
-                    taskStorage.removeTask(it.taskId)
+                    logger.info { "Removing task ${it.uuid} after reaching retention timeout" }
+                    taskRepository.delete(it)
                 } catch (err: RuntimeException) {
-                    logger.error(err) { "Error handling retention timeout for task ${it.taskId}" }
+                    logger.error(err) { "Error handling retention timeout for task ${it.uuid}" }
                 }
             }
     }
 
-    private fun initTask(
-        createRequest: TaskCreateRequest,
-        businessPartner: BusinessPartner
-    ) = GoldenRecordTask(
-        taskId = UUID.randomUUID().toString(),
-        businessPartner = businessPartner,
-        processingState = goldenRecordTaskStateMachine.initProcessingState(createRequest.mode)
-    )
+    private fun calculateTaskPendingTimeout(task: GoldenRecordTaskDb) =
+        task.createdAt.instant.plus(taskConfigProperties.taskPendingTimeout)
 
-    private fun toTaskClientStateDto(task: GoldenRecordTask): TaskClientStateDto {
-        return TaskClientStateDto(
-            taskId = task.taskId,
-            processingState = toTaskProcessingStateDto(task.processingState),
-            businessPartnerResult = task.businessPartner
-        )
+    private fun calculateTaskRetentionTimeout(task: GoldenRecordTaskDb) =
+        task.createdAt.instant.plus(taskConfigProperties.taskRetentionTimeout)
+
+    private fun toUUID(uuidString: String) =
+        try {
+            UUID.fromString(uuidString)
+        } catch (e: IllegalArgumentException) {
+            throw BpdmTaskNotFoundException(uuidString)
+        }
+
+    private fun getOrCreateGateRecords(requests: List<TaskCreateRequestEntry>): List<GateRecordDb>{
+        val privateIds = requests.map { request -> request.recordId?.let { toUUID(it) }}
+        val notNullPrivateIds = privateIds.filterNotNull()
+
+        val foundRecords = gateRecordRepository.findByPrivateIdIn(notNullPrivateIds.toSet())
+        val foundRecordsByPrivateId = foundRecords.associateBy { it.privateId }
+        val requestedNotFoundRecords = notNullPrivateIds.minus(foundRecordsByPrivateId.keys)
+
+        if(requestedNotFoundRecords.isNotEmpty())
+            throw BpdmRecordNotFoundException(requestedNotFoundRecords)
+
+       return privateIds.map { privateId ->
+            val gateRecord = privateId?.let { foundRecordsByPrivateId[it] } ?: GateRecordDb(publicId = UUID.randomUUID(), privateId = UUID.randomUUID())
+            gateRecordRepository.save(gateRecord)
+        }
     }
-
-    private fun toTaskProcessingStateDto(processingState: TaskProcessingState): TaskProcessingStateDto {
-        return TaskProcessingStateDto(
-            resultState = processingState.resultState,
-            step = processingState.step,
-            stepState = processingState.stepState,
-            errors = processingState.errors,
-            createdAt = processingState.taskCreatedAt,
-            modifiedAt = processingState.taskModifiedAt,
-            // property is deprecated
-            timeout = calculateTaskRetentionTimeout(processingState)
-        )
-    }
-
-    private fun calculateTaskPendingTimeout(processingState: TaskProcessingState) =
-        processingState.taskCreatedAt.plus(taskConfigProperties.taskPendingTimeout)
-
-    private fun calculateTaskRetentionTimeout(processingState: TaskProcessingState) =
-        processingState.taskCreatedAt.plus(taskConfigProperties.taskRetentionTimeout)
 }

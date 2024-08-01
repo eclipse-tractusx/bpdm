@@ -66,7 +66,7 @@ resources:
     cpu: 1000m
     memory: 1Gi
   requests:
-    cpu: 200m
+    cpu: 100m
     memory: 1Gi
 
 nodeSelector: {}
@@ -84,12 +84,14 @@ affinity:
                 operator: DoesNotExist
           topologyKey: kubernetes.io/hostname
 
+startupDelaySeconds: 90
+
 livenessProbe:
   httpGet:
     path: "/actuator/health/liveness"
     port: 8081
     scheme: HTTP
-  failureThreshold: 3
+  failureThreshold: 5
   initialDelaySeconds: 5
   periodSeconds: 5
   successThreshold: 1
@@ -99,7 +101,7 @@ readinessProbe:
     path: "/actuator/health/readiness"
     port: 8081
     scheme: HTTP
-  failureThreshold: 3
+  failureThreshold: 5
   initialDelaySeconds: 5
   periodSeconds: 5
   successThreshold: 1
@@ -109,9 +111,9 @@ startupProbe:
     path: "/actuator/health/readiness"
     port: 8081
     scheme: HTTP
-  initialDelaySeconds: 60
+  initialDelaySeconds: 30
   failureThreshold: 40
-  periodSeconds: 30
+  periodSeconds: 5
   timeoutSeconds: 1
   successThreshold: 1
 

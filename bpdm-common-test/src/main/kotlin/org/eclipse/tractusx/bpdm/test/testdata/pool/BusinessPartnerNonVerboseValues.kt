@@ -175,6 +175,7 @@ object BusinessPartnerNonVerboseValues {
         floor = BusinessPartnerVerboseValues.address1.floor,
         door = BusinessPartnerVerboseValues.address1.door,
         street = BusinessPartnerVerboseValues.address1.street,
+        taxJurisdictionCode = BusinessPartnerVerboseValues.address1.taxJurisdictionCode
     )
 
     private val postalAddress2 = PhysicalPostalAddressDto(
@@ -192,6 +193,7 @@ object BusinessPartnerNonVerboseValues {
         floor = BusinessPartnerVerboseValues.address2.floor,
         door = BusinessPartnerVerboseValues.address2.door,
         street = BusinessPartnerVerboseValues.address2.street,
+        taxJurisdictionCode = BusinessPartnerVerboseValues.address2.taxJurisdictionCode
     )
 
     private val postalAddress3 = PhysicalPostalAddressDto(
@@ -209,6 +211,7 @@ object BusinessPartnerNonVerboseValues {
         floor = BusinessPartnerVerboseValues.address3.floor,
         door = BusinessPartnerVerboseValues.address3.door,
         street = BusinessPartnerVerboseValues.address3.street,
+        taxJurisdictionCode = BusinessPartnerVerboseValues.address3.taxJurisdictionCode
     )
 
     val logisticAddress1 = LogisticAddressDto(

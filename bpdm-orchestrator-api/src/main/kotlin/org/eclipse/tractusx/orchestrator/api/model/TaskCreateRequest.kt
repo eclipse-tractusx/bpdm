@@ -28,6 +28,6 @@ data class TaskCreateRequest(
     @get:Schema(required = true, description = "The mode affecting which processing steps the business partner goes through")
     val mode: TaskMode,
 
-    @get:ArraySchema(arraySchema = Schema(description = "The list of business partner data to be processed"))
-    val businessPartners: List<BusinessPartner>
+    @get:ArraySchema(arraySchema = Schema(description = "The list of tasks to create"))
+    val requests: List<TaskCreateRequestEntry>
 )

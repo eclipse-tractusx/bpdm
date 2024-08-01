@@ -74,7 +74,11 @@ bpdm:
           cleanAndSync: create_result_cleanAndSync
           # Name of permission to post results for tasks in step 'PoolSync'
           poolSync: create_result_poolSync
-
+  datasource:
+    # Host name of the used datasource
+    host: localhost
+    # The database schema to use for this application
+    schema: bpdm-orchestrator
 server:
   # Change default port to avoid clash with other BPDM applications
   port: 8085
@@ -86,6 +90,28 @@ spring:
         jwt:
           issuer-uri: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}
           jwk-set-uri: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}/protocol/openid-connect/certs
+  datasource:
+    # We use postgres as datasource
+    driverClassName: org.postgresql.Driver
+    # No password on default (Change for production)
+    password: ''
+    # Connect to postgres database over jdbc protocol
+    url: jdbc:postgresql://${bpdm.datasource.host}:5432/bpdm
+    # Default username for BPDM applications
+    username: bpdm
+  flyway:
+    # Activate flyway for automatic database migration
+    enabled: true
+    # Apply migrations to this application's default schema
+    schemas: ${bpdm.datasource.schema}
+  jpa:
+    properties:
+      # We use hibernate as JPA implementation
+      hibernate:
+        # Hibernate should assume the default schema of this application on default
+        default_schema: ${bpdm.datasource.schema}
+        create_empty_composites:
+          enabled: true
 logging:
   pattern:
     # Use BPDM custom log pattern

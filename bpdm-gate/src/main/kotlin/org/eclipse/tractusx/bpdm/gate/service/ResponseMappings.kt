@@ -54,7 +54,8 @@ fun PhysicalPostalAddressDb.toPhysicalPostalAddress(): PhysicalPostalAddressDto 
         building = building,
         floor = floor,
         door = door,
-        street = street?.toStreetDto()
+        street = street?.toStreetDto(),
+        taxJurisdictionCode = taxJurisdictionCode
     )
 
 fun GeographicCoordinateDb.toGeographicCoordinateDto(): GeoCoordinateDto {

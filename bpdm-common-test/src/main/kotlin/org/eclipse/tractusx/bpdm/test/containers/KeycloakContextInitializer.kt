@@ -32,6 +32,7 @@ class KeyCloakInitializer: ApplicationContextInitializer<ConfigurableApplication
             .withRealmImportFile("keycloak/CX-Central.json")
 
         const val REALM =  "CX-Central"
+        const val TENANT_BPNL = "BPNL000000000010"
     }
 
     override fun initialize(applicationContext: ConfigurableApplicationContext) {

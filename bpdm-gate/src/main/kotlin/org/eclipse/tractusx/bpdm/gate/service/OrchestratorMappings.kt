@@ -43,6 +43,13 @@ class OrchestratorMappings(
 ) {
     private val logger = KotlinLogging.logger { }
 
+    fun toCreateRequest(entity: BusinessPartnerDb): TaskCreateRequestEntry{
+        return TaskCreateRequestEntry(
+            recordId = entity.sharingState.orchestratorRecordId?.toString(),
+            businessPartner = toOrchestratorDto(entity)
+        )
+    }
+
     fun toOrchestratorDto(entity: BusinessPartnerDb): BusinessPartner {
         val postalAddress = toPostalAddress(entity)
 
@@ -116,7 +123,8 @@ class OrchestratorMappings(
                         industrialZone = industrialZone,
                         building = building,
                         floor = floor,
-                        door = door
+                        door = door,
+                        taxJurisdictionCode = taxJurisdictionCode
                     )
                 }
             } ?: PhysicalAddress.empty,
@@ -133,7 +141,7 @@ class OrchestratorMappings(
                         deliveryServiceNumber
                     )
                 }
-            } ?: AlternativeAddress.empty,
+            },
             hasChanged = null
         )
     }
@@ -272,7 +280,8 @@ class OrchestratorMappings(
             industrialZone = dto.industrialZone,
             building = dto.building,
             floor = dto.floor,
-            door = dto.door
+            door = dto.door,
+            taxJurisdictionCode = dto.taxJurisdictionCode
         )
 
     private fun toAlternativePostalAddress(dto: AlternativeAddress) =

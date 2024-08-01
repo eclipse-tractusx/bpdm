@@ -149,8 +149,12 @@ fun compareStates(statesVerbose: Collection<LegalEntityStateVerboseDto>,  states
 
 fun isEqualToIgnoringMilliseconds(): BiPredicate<LocalDateTime?, Instant?> {
     return BiPredicate<LocalDateTime?, Instant?> { d1, d2 ->
-        (d1 == null && d2 == null)
-                || d1.toInstant(ZoneOffset.UTC).truncatedTo(ChronoUnit.SECONDS).equals(d2.truncatedTo(ChronoUnit.SECONDS))
+         (d1 == null && d2 == null)
+                 || d1?.let { notNullD1 ->
+                     d2?.let { notNullD2 ->
+                         notNullD1.toInstant(ZoneOffset.UTC).truncatedTo(ChronoUnit.SECONDS).equals(notNullD2.truncatedTo(ChronoUnit.SECONDS))
+                     }
+                 } ?: false
     }
 }
 

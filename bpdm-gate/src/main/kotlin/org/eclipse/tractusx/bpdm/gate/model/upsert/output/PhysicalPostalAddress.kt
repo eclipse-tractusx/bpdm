@@ -35,5 +35,6 @@ data class PhysicalPostalAddress(
     val industrialZone: String?,
     val building: String?,
     val floor: String?,
-    val door: String?
+    val door: String?,
+    val taxJurisdictionCode: String?
 )

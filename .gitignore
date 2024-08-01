@@ -19,13 +19,13 @@ target
 #local database data
 /db
 #Helm dependencies
-/charts/bpdm/Chart.lock
-/charts/bpdm/charts/Chart.lock
-/charts/bpdm/charts/bpdm-gate/Chart.lock
-/charts/bpdm/charts/bpdm-pool/Chart.lock
+/charts/bpdm/**/Chart.lock
 /charts/bpdm/charts/**/*.tgz
 #Developer application properties
 application-developer.properties
 application-developer.yml
 *.drawio.svg.bkp
 /docker/compose/**/.env
+.flattened-pom.xml
+#Mac
+**/.DS_Store

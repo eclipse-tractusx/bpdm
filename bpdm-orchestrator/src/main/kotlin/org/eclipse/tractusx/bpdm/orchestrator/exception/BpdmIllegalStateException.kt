@@ -19,13 +19,14 @@
 
 package org.eclipse.tractusx.bpdm.orchestrator.exception
 
-import org.eclipse.tractusx.bpdm.orchestrator.model.TaskProcessingState
+import org.eclipse.tractusx.bpdm.orchestrator.entity.GoldenRecordTaskDb
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ResponseStatus
+import java.util.*
 
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 class BpdmIllegalStateException(
-    taskId: String,
-    state: TaskProcessingState
+    taskId: UUID,
+    state: GoldenRecordTaskDb.ProcessingState
 ) : RuntimeException("Task with ID '$taskId' is in illegal state for transition: resultState=${state.resultState}, step=${state.step}, stepState=${state.stepState}")

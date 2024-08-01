@@ -221,7 +221,8 @@ class BusinessPartnerMappings {
             industrialZone = dto.industrialZone,
             building = dto.building,
             floor = dto.floor,
-            door = dto.door
+            door = dto.door,
+            taxJurisdictionCode = dto.taxJurisdictionCode
         )
 
     private fun toAlternativePostalAddress(dto: AlternativePostalAddressDto) =

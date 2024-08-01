@@ -81,8 +81,11 @@ class BusinessPartnerService(
             val updatedData = businessPartnerMappings.toBusinessPartnerInput(request, sharingState)
             val existingInput = existingInputsByExternalId[request.externalId]
 
-            sharingStateService.setInitial(sharingState)
-            upsertFromEntity(existingInput, updatedData).takeIf { it.hadChanges }?.businessPartner
+
+            upsertFromEntity(existingInput, updatedData)
+                .takeIf { it.hadChanges }
+                ?.also { sharingStateService.setInitial(sharingState) }
+                ?.businessPartner
         }
 
         return updatedEntities.map(businessPartnerMappings::toBusinessPartnerInputDto)

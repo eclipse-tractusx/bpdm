@@ -28,6 +28,9 @@ data class TaskStepReservationEntryDto(
     @get:Schema(description = "The identifier of the reserved task")
     val taskId: String,
 
+    @get:Schema(description = "The identifier of the gate record for which this task has been created")
+    val recordId: String,
+
     @get:Schema(description = "The business partner data to process")
     val businessPartner: BusinessPartner
 ) : RequestWithKey {

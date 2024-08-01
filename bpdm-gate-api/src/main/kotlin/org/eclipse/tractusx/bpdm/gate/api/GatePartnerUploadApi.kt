@@ -47,8 +47,7 @@ interface GatePartnerUploadApi {
         summary = "Create or update business partners from uploaded CSV file",
         description = "Create or update generic business partners. " +
                 "Updates instead of creating a new business partner if an already existing external ID is used. " +
-                "The same external ID may not occur more than once in a single request. " +
-                "For file upload request, the maximum number of business partners in file limited to \${bpdm.api.upsert-limit} entries.",
+                "The same external ID may not occur more than once in a requested file. "
     )
     @ApiResponses(
         value = [

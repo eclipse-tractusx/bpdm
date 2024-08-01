@@ -132,7 +132,8 @@ class BusinessPartnerTestDataFactory(
                 industrialZone = "Industrial Zone $seed",
                 building = "Building $seed",
                 floor = "Floor $seed",
-                door = "Door $seed"
+                door = "Door $seed",
+                taxJurisdictionCode = "123"
             ),
             alternativeAddress = AlternativeAddress(
                 geographicCoordinates = GeoCoordinate(longitude = random.nextFloat(), latitude = random.nextFloat(), altitude = random.nextFloat()),

@@ -183,30 +183,6 @@ As a reference of what can be changed have a look at the respective application 
 - [BPDM Orchestrator](bpdm-orchestrator/src/main/resources/application.yml)
 - [BPDM Cleaning Service Dummy](bpdm-cleaning-service-dummy/src/main/resources/application.yml)
 
-
-## EDC Installation
-
-This section shows how to make your BPDM Gate and Pool APIs available over an EDC.
-This documentation assumes that you already have running BPDM and EDC deployments.
-For deploying an EDC please consult the documentation on the [EDC repository](https://github.com/eclipse-tractusx/tractusx-edc).
-
-### Requirements
-
-* Running BPDM applications
-* Running EDC (0.7.0 supported)
-
-### Installation
-
-The general idea of configuring data offers for BPDM is to assets which grant access to a portion of the BPDM APIs.
-Which API resources are accessible over an asset is determined by the purposes defined in the BPDM framework agreement.
-For some purposes you may need to access business partner output data from the BPDM Gate for example but won't have access to the input data.
-Blueprints for such assets are documented in this [POSTMAN collection](../postman/EDC Provider Setup.postman_collection.json).
-Accompanying the asset definitions are Policy and Contract Definition blueprints.
-Except for a general Access Policy those blueprints are grouped by purpose.
-
-After all assets, policies and contract definitions are configured a sharing company's EDC now can query its available assets and the contract under which they
-are exposed.
-
 ## Post-Run Configuration
 
 For the most part BPDM applications don't need to be further configured after they started.
@@ -221,7 +197,7 @@ If a technical key does not exist in the respective metadata the Pool rejects th
 Administrative level 1 areas follows the ISO 3166-2 norm and is filled by default.
 Such metadata does not need to be added by the operator.
 
-The [use case Postman collection](../postman/BPDM%20Tests.postman_collection.json) shows which metadata can be added and how that is done.
+The [use case Postman collection](docs/postman/BPDM%20Tests.postman_collection.json) shows which metadata can be added and how that is done.
 Refer to use cases for Operators(O):
 
 - CL: Shows how to add available legal forms
@@ -231,6 +207,298 @@ Refer to use cases for Operators(O):
 Please note that in the current implementation there are no endpoints to delete metadata.
 Deletions would need to be done directly in the database.
 
+
+## EDC Installation
+
+This section shows how to make your BPDM Gate and Pool APIs available over an EDC.
+This documentation assumes that you already have running BPDM and EDC deployments.
+For deploying an EDC please consult the documentation on the [EDC repository](https://github.com/eclipse-tractusx/tractusx-edc).
+
+### Requirements
+
+* Running BPDM applications
+* Running EDC (0.7.3 supported)
+
+### Installation
+
+The general idea of configuring data offers for BPDM is to assets which grant access to a portion of the BPDM APIs.
+Which API resources are accessible over an asset is determined by the purposes defined in the BPDM framework agreement.
+For some purposes you may need to access business partner output data from the BPDM Gate for example but won't have access to the input data.
+Blueprints for such assets are documented in this [POSTMAN collection](docs/postman/EDC%20Provider%20Setup.postman_collection.json).
+Accompanying the asset definitions are Policy and Contract Definition blueprints.
+Except for a general Access Policy those blueprints are grouped by purpose.
+
+After all assets, policies and contract definitions are configured a sharing company's EDC now can query its available assets and the contract under which they
+are exposed.
+
+### Creating Offers
+
+Following are specific instructions on how to create offers to expose the BPDM APIs over EDC.
+Note that the instructions reference definitions taken from the previously references Postman collection.
+
+#### ReadAccessPoolForCatenaXMember
+
+This offer allows a company to access the Pool for reading golden record data of all Catena-X members.
+
+1. Create a policy of type `HasBusinessPartnerNumber` for the company's BPNL (if it not yet exists)
+2. Create a policy of type `AcceptPurpose` with usage purpose for the pool (if not yet exists)
+3. Create a technical user with role `Pool Cx Member` and the company's BPN identity
+4. Create a `ReadAccessPoolForCatenaXMember` asset with the created technical user for client credentials
+5. Create a contract definition `ReadAccessPoolForCatenaXMember` referencing the created asset
+
+
+#### FullAccessGateInputForSharingMember
+
+This offer allows a company to access a Gate API for uploading business partner data and sending it to the golden record process.
+
+1. Create a policy of type `HasBusinessPartnerNumber` for the company's BPNL (if it not already exists)
+2. Create a policy of type `AcceptPurpose` with upload usage purpose for the gate (if it not already exists)
+3. Create a technical user with role `Gate Input Manager` and the company's BPN identity
+4. Create a `FullAccessGateInputForSharingMember` asset with the created technical user for client credentials
+5. Create a contract definition `FullAccessGateInputForSharingMember` referencing the created asset
+
+#### ReadAccessGateInputForSharingMember
+
+This offer allows a company to access a Gate API for reading business partner data that has been uploaded by the company.
+This offer explicitly does **not** grant access to read the golden record output for the uploaded business partner data.
+
+1. Create a policy of type `HasBusinessPartnerNumber` for the company's BPNL (if it not already exists)
+2. Create a policy of type `AcceptPurpose` with download usage purpose for the gate (if it not already exists)
+3. Create a technical user with role `Gate Input Consumer` and the company's BPN identity
+4. Create a `ReadAccessGateInputForSharingMember` asset with the created technical user for client credentials
+5. Create a contract definition `ReadAccessGateInputForSharingMember` referencing the created asset
+
+#### ReadAccessGateOutputForSharingMember
+
+This offer allows a company to access a Gate API for reading the golden record output of business partner data previously shared to the golden record process.
+This offer does **not** grant access to the uploaded business partner input data the golden record output is based on.
+
+1. Create a policy of type `HasBusinessPartnerNumber` for the company's BPNL (if it not already exists)
+2. Create a policy of type `AcceptPurpose` with download usage purpose for the gate (if it not already exists)
+3. Create a technical user with role `Gate Output Consumer` and the company's BPN identity
+4. Create a `ReadAccessGateOutputForSharingMember` asset with the created technical user for client credentials
+5. Create a contract definition `ReadAccessGateOutputForSharingMember` referencing the created asset
+
+
+## Portal Configuration
+
+This section explains how BPDM needs to operated on the [Tractus-X Portal](https://github.com/eclipse-tractusx/portal).
+
+At the moment we assume that the Catena-X operator is also the golden record process provider.
+This means the operator has the Admin role on the Portal.
+
+The following instructions assume you are using the BPDM helm chart to deploy the BPDM services.
+
+#### Deploy the initial golden record process components
+
+1. Disable the own Keycloak dependency
+2. Set the authentication server to [Central-IDP](https://github.com/eclipse-tractusx/portal-iam)
+3. Provide the client credentials of pre-existing Central-IDP technical users to the BPDM components to establish communication between the components
+4. Overwrite the standard client-ids to match the one in Central-IDP
+5. Overwrite the BPDM Orchestrator default permission names to be compatible with the Central-IDP (see [technical debts](docs/architecture/11_Risks_And_Technical_Debts.md))
+6. Expose the Pool over ingress on context path `pool` to make it available to the Portal
+7. Expose the Portal Gate over ingress on context path `companies/test-company` to make it available to the Portal
+8. Configure the Gate to **not automatically** share newly uploaded business partner data to the golden record process
+9. Configure the Gate to have **no** owner as it needs to be used by multiple companies to manage their own sites and addresses
+
+```yaml
+# Helm Values Overwrite
+
+keycloak:
+  enabled: false
+
+bpdm-pool:
+  ingress:
+    enabled: true
+    annotations:
+      nginx.ingress.kubernetes.io/rewrite-target: "/$2"
+      nginx.ingress.kubernetes.io/use-regex: "true"
+      nginx.ingress.kubernetes.io/x-forwarded-prefix: "/pool"
+    hosts:
+      - host: "bpdm-host-name"
+        paths:
+          - path: "/pool(/|$)(.*)"
+            pathType: "ImplementationSpecific"
+  applicationConfig:
+    server:
+    # App should take the x-forward-header-prefix into account for Swagger-UI and redirects to work correctly
+    forward-headers-strategy: "FRAMEWORK"
+    bpdm:
+      security:
+        auth-server-url: "http://central-idp-host-name/auth"
+        client-id: "Cl7-CX-BPDM"
+      client:
+        orchestrator:
+          registration:
+            client-id: "sa-cl7-cx-5"
+  applicationSecrets:
+    bpdm:
+      client:
+        orchestrator:
+          registration:
+            client-secret: "*****"
+
+bpdm-gate:
+  ingress:
+    enabled: true
+    annotations:
+        nginx.ingress.kubernetes.io/rewrite-target: "/$2"
+        nginx.ingress.kubernetes.io/use-regex: "true"
+        nginx.ingress.kubernetes.io/x-forwarded-prefix: "/companies/test-company"
+    hosts:
+        - host: "bpdm-host-name"
+          paths:
+            - path: "/companies/test-company(/|$)(.*)"
+              pathType: "ImplementationSpecific"
+  applicationConfig:
+    server:
+    # App should take the x-forward-header-prefix into account for Swagger-UI and redirects to work correctly
+    forward-headers-strategy: "FRAMEWORK"
+    bpdm:
+      bpn:
+        owner-bpn-l:
+      tasks:
+        creation:
+          fromSharingMember:
+            starts-as-ready: false
+      security:
+        auth-server-url: "http://central-idp-host-name/auth"
+        client-id: "Cl16-CX-BPDMGate"
+      client:
+        orchestrator:
+          registration:
+            client-id: "sa-cl7-cx-5"
+        pool:
+          registration:
+            client-id: "sa-cl7-cx-5"
+  applicationSecrets:
+    bpdm:
+      client:
+        orchestrator:
+          registration:
+            client-secret: "*****"
+        pool:
+          registration:
+            client-secret: "*****"
+
+bpdm-orchestrator:
+  applicationConfig:
+    bpdm:
+      security:
+        auth-server-url: "http://central-idp-host-name/auth"
+        client-id: "Cl7-CX-BPDM"
+        permissions:
+          createTask: "write_partner"
+          readTask: "write_partner"
+          reservation:
+            clean: "write_partner"
+            cleanAndSync: "write_partner"
+            poolSync: "write_partner"
+          result:
+            clean: "write_partner"
+            cleanAndSync: "write_partner"
+            poolSync: "write_partner"
+
+bpdm-cleaning-service-dummy:
+  applicationConfig:
+    bpdm:
+      client:
+        orchestrator:
+          provider:
+            issuer-uri: "https://central-idp-host-name/auth/realms/CX-Central"
+          registration:
+            client-id: "sa-cl7-cx-5"
+  applicationSecrets:
+    bpdm:
+      client:
+        orchestrator:
+          registration:
+            client-secret: "*****"
+```
+
+#### Create BPDM marketplace services
+
+For giving companies access to the golden record process and/or Pool the operator needs to create appropriate EDC offers.
+The EDC offers should provide access to the Pool API and Gate API.
+Companies should not access the APIs directly over technical users but rather use the EDC offers.
+
+The most important pre-requisite for creating such EDC offers are technical users which have the correct roles and BPN identities.
+The Portal supports creating such technical users by creating marketplace services that companies can subscribe to.
+After the company subscribed to a service a technical user will be created automatically by the Portal containing the BPN identity of the subscribing company and the roles defined in the marketplace service.
+
+For BPDM the operator needs to create 3 services:
+
+1. Business Partner Members Pool Service: Access to the Catena-X member golden records
+2. Sharing Member Upload Service: Upload company business partner data and share it to the golden record process
+3. Sharing Member Download Service: Download golden records for previously shared business partner data
+
+When creating the service, the operator needs to specify with which role the technical user should be initialized after a company subscribes to it:
+
+1. Business Partner Members Pool Service: Pool Cx Member
+2. Sharing Member Upload Service: Gate Input Manager
+3. Sharing Member Download Service: Gate Output Consumer
+
+#### Manage BPDM service subscriptions
+
+When a company subscribes to a BPDM service the operator needs to perform the following tasks:
+
+1. Create a new Gate deployment (if it is a sharing member service)
+2. [Create an EDC](#edc-installation) offer based on the service using the created technical user
+
+If a new Gate has to be deployed it needs to integrate into the existing BPDM components:
+
+1. Disable all components except the Gate to only deploy a new Gate instance
+2. Make sure that the Gate is accessible to your EDC (either by ingress or internal host name)
+3. Set the subscribing company's BPNL as the owner of that Gate
+4. Optionally configure whether uploaded business partner data should be automatically shared to the golden record process according to the subscribing companies wishes
+5. Set the Gate's Orchestrator and Pool client base-urls so that the Gate can find the existing components
+
+```yaml
+# Helm Values Overwrite
+
+keycloak:
+  enabled: false
+
+bpdm-pool:
+  enabled: false
+
+bpdm-gate:
+  applicationConfig:
+    bpdm:
+      bpn:
+        owner-bpn-l: BPNLXXXXXXXXXXXX
+      tasks:
+        creation:
+          fromSharingMember:
+            starts-as-ready: false/true
+      security:
+        auth-server-url: "http://central-idp-host-name/auth"
+        client-id: "Cl16-CX-BPDMGate"
+      client:
+        orchestrator:
+          base-url: "orchestrator-api-url"
+          registration:
+            client-id: "sa-cl7-cx-5"
+        pool:
+          base-url: "pool-api-url"
+          registration:
+            client-id: "sa-cl7-cx-5"
+  applicationSecrets:
+    bpdm:
+      client:
+        orchestrator:
+          registration:
+            client-secret: "*****"
+        pool:
+          registration:
+            client-secret: "*****"
+
+bpdm-orchestrator:
+  enabled: false
+
+bpdm-cleaning-service-dummy:
+  enabled: false
+```
 
 ## NOTICE
 

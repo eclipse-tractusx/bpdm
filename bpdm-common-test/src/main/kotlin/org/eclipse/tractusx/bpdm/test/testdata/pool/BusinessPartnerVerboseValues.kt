@@ -163,6 +163,7 @@ object BusinessPartnerVerboseValues {
             additionalNameSuffix = "add name suffix 1",
             additionalNamePrefix = "add name prefix 1"
         ),
+        taxJurisdictionCode = "123"
     )
 
     val address2 = PhysicalPostalAddressVerboseDto(
@@ -189,7 +190,8 @@ object BusinessPartnerVerboseValues {
             namePrefix = "name prefix 2",
             additionalNameSuffix = "add name suffix 2",
             additionalNamePrefix = "add name prefix 2"
-        )
+        ),
+        taxJurisdictionCode = "456"
     )
 
     val address3 = PhysicalPostalAddressVerboseDto(
@@ -217,6 +219,7 @@ object BusinessPartnerVerboseValues {
             additionalNameSuffix = "add name suffix 3",
             additionalNamePrefix = "add name prefix 3"
         ),
+        taxJurisdictionCode = "789"
     )
 
     val addressPartner1 = LogisticAddressVerboseDto(
@@ -379,6 +382,7 @@ object BusinessPartnerVerboseValues {
                 floor = null,
                 door = null,
                 street = null,
+                taxJurisdictionCode = null
             ),
             bpnLegalEntity = null,
             bpnSite = null,
@@ -419,6 +423,7 @@ object BusinessPartnerVerboseValues {
                 floor = null,
                 door = null,
                 street = null,
+                taxJurisdictionCode = null
             ),
             bpnLegalEntity = null,
             bpnSite = null,
@@ -459,6 +464,7 @@ object BusinessPartnerVerboseValues {
                 floor = null,
                 door = null,
                 street = null,
+                taxJurisdictionCode = null
             ),
             bpnLegalEntity = null,
             bpnSite = null,

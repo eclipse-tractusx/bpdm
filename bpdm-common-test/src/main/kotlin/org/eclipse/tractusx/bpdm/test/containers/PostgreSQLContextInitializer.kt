@@ -30,7 +30,7 @@ import org.testcontainers.containers.PostgreSQLContainer
  */
 class PostgreSQLContextInitializer : ApplicationContextInitializer<ConfigurableApplicationContext> {
     companion object {
-        val postgreSQLContainer = PostgreSQLContainer("postgres:13.2")
+        val postgreSQLContainer = PostgreSQLContainer("postgres:15.4")
             .withAccessToHost(true)
             .withNetwork(Network.SHARED)
     }
