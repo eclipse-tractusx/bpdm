@@ -33,11 +33,44 @@ import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.ResultState
 import org.eclipse.tractusx.orchestrator.api.model.TaskClientStateDto
 import org.eclipse.tractusx.orchestrator.api.model.TaskStateRequest
-import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
-class TaskResolutionService(
+class TaskResolutionBatchService(
+    private val taskResolutionService: TaskResolutionChunkService
+){
+    private val logger = KotlinLogging.logger { }
+
+    fun resolveTasks(){
+        logger.info { "Start batch process for resolving pending tasks..." }
+
+        var pageToQuery = 0
+        var totalSuccesses = 0
+        var totalErrors = 0
+        var totalUnresolved = 0
+        do{
+
+            val stats = taskResolutionService.resolveTasks(pageToQuery)
+
+            if(stats.unresolved == stats.foundTasks)
+                pageToQuery++
+            else
+                pageToQuery = 0
+
+            totalSuccesses += stats.resolvedAsSuccess
+            totalErrors += stats.resolvedAsError
+            totalUnresolved += stats.unresolved
+
+        }while (stats.foundTasks != 0)
+
+        logger.debug { "Total Resolved $totalSuccesses tasks as successful, $totalErrors as errors and $totalUnresolved still unresolved" }
+    }
+}
+
+@Service
+class TaskResolutionChunkService(
     private val sharingStateRepository: SharingStateRepository,
     private val sharingStateService: SharingStateService,
     private val businessPartnerRepository: BusinessPartnerRepository,
@@ -49,8 +82,11 @@ class TaskResolutionService(
 
     private val logger = KotlinLogging.logger { }
 
-    fun resolveTasks() {
-        val pageRequest = Pageable.ofSize(taskProperties.check.batchSize)
+    @Transactional
+    fun resolveTasks(pageToQuery: Int): ResolutionStats {
+        logger.info { "Start next chunk for resolving pending tasks..." }
+
+        val pageRequest = PageRequest.of(pageToQuery, taskProperties.check.batchSize)
         val sharingStates = sharingStateRepository.findBySharingStateTypeAndTaskIdNotNull(SharingStateType.Pending, pageRequest).content
 
         val tasks = orchestrationApiClient.goldenRecordTasks.searchTaskStates(TaskStateRequest(sharingStates.map { it.taskId!! })).tasks
@@ -70,7 +106,9 @@ class TaskResolutionService(
         resolveAsUpserts(successes)
         resolveAsErrors(errors)
 
-        logger.info { "Resolved ${successes.size} tasks as successful, ${errors.size} as errors and ${unresolved.size} still unresolved" }
+        logger.debug { "Resolved ${successes.size} tasks as successful, ${errors.size} as errors and ${unresolved.size} still unresolved" }
+
+        return ResolutionStats(successes.size, errors.size, unresolved.size)
     }
 
     private fun tryCreateUpsertRequest(sharingState: SharingStateDb, task: TaskClientStateDto?, input: BusinessPartnerDb?): RequestCreationResult {
@@ -136,6 +174,14 @@ class TaskResolutionService(
             fun success(sharingState: SharingStateDb, request: OutputUpsertData) =
                 RequestCreationResult(sharingState, request, null, null)
         }
+    }
+
+    data class ResolutionStats(
+        val resolvedAsSuccess: Int,
+        val resolvedAsError: Int,
+        val unresolved: Int
+    ){
+        val foundTasks = resolvedAsSuccess + resolvedAsError + unresolved
     }
 
 }

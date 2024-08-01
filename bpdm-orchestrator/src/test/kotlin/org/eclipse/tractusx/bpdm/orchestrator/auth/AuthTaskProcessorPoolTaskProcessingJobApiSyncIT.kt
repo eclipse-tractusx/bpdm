@@ -34,9 +34,9 @@ import org.springframework.test.context.ContextConfiguration
 @ContextConfiguration(initializers = [
     PostgreSQLContextInitializer::class,
     KeyCloakInitializer::class,
-    AuthTaskProcessorPoolSyncIT.SelfClientAsTaskProcessorPoolSyncInitializer::class
+    AuthTaskProcessorPoolTaskProcessingJobApiSyncIT.SelfClientAsTaskProcessorPoolSyncInitializer::class
 ])
-class AuthTaskProcessorPoolSyncIT @Autowired constructor(
+class AuthTaskProcessorPoolTaskProcessingJobApiSyncIT @Autowired constructor(
     orchestratorClient: OrchestrationApiClient,
     authAssertionHelper: AuthAssertionHelper
 ): AuthTestBase(

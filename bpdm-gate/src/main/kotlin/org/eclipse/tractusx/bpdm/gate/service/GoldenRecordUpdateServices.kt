@@ -42,7 +42,31 @@ import org.springframework.transaction.annotation.Transactional
 import kotlin.reflect.KProperty
 
 @Service
-class GoldenRecordUpdateService(
+class GoldenRecordUpdateBatchService(
+    private val goldenRecordUpdateService: GoldenRecordUpdateChunkService
+){
+    private val logger = KotlinLogging.logger { }
+
+    fun updateOutputOnGoldenRecordChange(){
+        logger.info { "Update Business Partner Output based on Golden Record Updates from the Pool..." }
+
+        var totalLegalEntitiesUpdated = 0
+        var totalSitesUpdated = 0
+        var totalAddressesUpdated = 0
+        do {
+            val stats = goldenRecordUpdateService.updateFromNextChunk()
+
+            totalLegalEntitiesUpdated += stats.updatedLegalEntities
+            totalSitesUpdated += stats.updatedSites
+            totalAddressesUpdated += stats.updatedAddresses
+        }while (stats.foundChangelogEntries != 0)
+
+        logger.debug { "In total updated '$totalLegalEntitiesUpdated' legal entities, '$totalSitesUpdated' sites and '$totalAddressesUpdated' addresses." }
+    }
+}
+
+@Service
+class GoldenRecordUpdateChunkService(
     private val poolClient: PoolApiClient,
     private val syncRecordService: SyncRecordService,
     private val taskConfigProperties: GoldenRecordTaskConfigProperties,
@@ -54,8 +78,8 @@ class GoldenRecordUpdateService(
     private val logger = KotlinLogging.logger { }
 
     @Transactional
-    fun updateOutputOnGoldenRecordChange(){
-        logger.info { "Update Business Partner Output based on Golden Record Updates from the Pool..." }
+    fun updateFromNextChunk(): UpdateStats{
+        logger.info { "Update next chunk of Business Partner Output based on Golden Record Updates from the Pool..." }
 
         val syncRecord = syncRecordService.setSynchronizationStart(SyncTypeDb.POOL_TO_GATE_OUTPUT)
 
@@ -77,7 +101,11 @@ class GoldenRecordUpdateService(
         syncRecordService.setSynchronizationSuccess(SyncTypeDb.POOL_TO_GATE_OUTPUT)
 
         logger.debug { "Updated '$updatedLegalEntities' legal entities, '$updatedSites' sites and '$updatedAddresses' addresses." }
+
+        return UpdateStats(poolChangelogEntries.content.size, updatedLegalEntities, updatedSites, updatedAddresses)
     }
+
+
 
     private fun updateLegalEntities(changedBpnLs: Collection<String>): List<BusinessPartnerService.UpsertResult> {
         val businessPartnersToUpdate = businessPartnerRepository.findByStageAndBpnLIn(StageType.Output, changedBpnLs)
@@ -379,4 +407,10 @@ class GoldenRecordUpdateService(
         return BpdmNullMappingException(BusinessPartnerDb::class, OutputUpsertData::class, property, entityId.toString())
     }
 
+    data class UpdateStats(
+        val foundChangelogEntries: Int,
+        val updatedLegalEntities: Int,
+        val updatedSites: Int,
+        val updatedAddresses: Int
+    )
 }

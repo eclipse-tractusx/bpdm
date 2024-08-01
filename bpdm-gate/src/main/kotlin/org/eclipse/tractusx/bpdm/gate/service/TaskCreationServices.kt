@@ -36,7 +36,28 @@ import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
 @Service
-class TaskCreationService(
+class TaskCreationBatchService(
+    private val taskCreationService: TaskCreationChunkService
+){
+    private val logger = KotlinLogging.logger { }
+
+
+    fun createTasksForReadyBusinessPartners(){
+        logger.info { "Started scheduled task to create golden record tasks from ready business partners" }
+
+        var totalCreatedTasks = 0
+        do {
+            val createdTasks = taskCreationService.createTasksForReadyBusinessPartners()
+            totalCreatedTasks += createdTasks
+        }while (createdTasks != 0)
+
+        logger.debug { "Total created $totalCreatedTasks new golden record tasks from ready business partners" }
+
+    }
+}
+
+@Service
+class TaskCreationChunkService(
     private val sharingStateRepository: SharingStateRepository,
     private val sharingStateService: SharingStateService,
     private val businessPartnerRepository: BusinessPartnerRepository,
@@ -47,8 +68,8 @@ class TaskCreationService(
     private val logger = KotlinLogging.logger { }
 
     @Transactional
-    fun createTasksForReadyBusinessPartners() {
-        logger.info { "Started scheduled task to create golden record tasks from ready business partners" }
+    fun createTasksForReadyBusinessPartners(): Int {
+        logger.info { "Create next chunk of golden record tasks from ready business partners" }
 
         val pageRequest = Pageable.ofSize(properties.creation.fromSharingMember.batchSize)
         val foundStates = sharingStateRepository.findBySharingStateType(SharingStateType.Ready, pageRequest).content
@@ -64,7 +85,7 @@ class TaskCreationService(
             sharingStateService.setPending(partner.sharingState, task.taskId)
         }
 
-        logger.info { "Created ${createdTasks.size} new golden record tasks from ready business partners" }
+        return createdTasks.size
     }
 
     private fun createGoldenRecordTasks(mode: TaskMode, orchestratorBusinessPartnersDto: List<TaskCreateRequestEntry>): List<TaskClientStateDto> {
