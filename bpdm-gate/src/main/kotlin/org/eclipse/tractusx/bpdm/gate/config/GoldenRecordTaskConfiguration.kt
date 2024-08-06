@@ -20,9 +20,9 @@
 package org.eclipse.tractusx.bpdm.gate.config
 
 import jakarta.annotation.PostConstruct
-import org.eclipse.tractusx.bpdm.gate.service.GoldenRecordUpdateService
-import org.eclipse.tractusx.bpdm.gate.service.TaskCreationService
-import org.eclipse.tractusx.bpdm.gate.service.TaskResolutionService
+import org.eclipse.tractusx.bpdm.gate.service.GoldenRecordUpdateBatchService
+import org.eclipse.tractusx.bpdm.gate.service.TaskCreationBatchService
+import org.eclipse.tractusx.bpdm.gate.service.TaskResolutionBatchService
 import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.TaskScheduler
 import org.springframework.scheduling.support.CronTrigger
@@ -31,9 +31,9 @@ import org.springframework.scheduling.support.CronTrigger
 class GoldenRecordTaskConfiguration(
     private val configProperties: GoldenRecordTaskConfigProperties,
     private val taskScheduler: TaskScheduler,
-    private val taskCreationService: TaskCreationService,
-    private val taskResolutionService: TaskResolutionService,
-    private val updateService: GoldenRecordUpdateService
+    private val taskCreationService: TaskCreationBatchService,
+    private val taskResolutionService: TaskResolutionBatchService,
+    private val updateService: GoldenRecordUpdateBatchService
 ) {
 
     @PostConstruct

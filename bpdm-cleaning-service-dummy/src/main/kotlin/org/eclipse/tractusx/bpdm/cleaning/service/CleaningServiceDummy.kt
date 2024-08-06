@@ -24,7 +24,6 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.cleaning.util.toUUID
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.*
-import org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.time.Instant
@@ -57,22 +56,23 @@ class CleaningServiceDummy(
         try {
             logger.info { "Starting polling for cleaning tasks from Orchestrator... TaskStep ${step.name}" }
 
-            val cleaningRequest = orchestrationApiClient.goldenRecordTasks
-                .reserveTasksForStep(TaskStepReservationRequest(amount = 10, step))
+            do{
+                val cleaningRequest = orchestrationApiClient.goldenRecordTasks
+                    .reserveTasksForStep(TaskStepReservationRequest(amount = 10, step))
 
-            val cleaningTasks = cleaningRequest.reservedTasks
+                val cleaningTasks = cleaningRequest.reservedTasks
 
-            logger.info { "${cleaningTasks.size} tasks found for cleaning. Proceeding with cleaning..." }
+                logger.info { "${cleaningTasks.size} tasks found for cleaning. Proceeding with cleaning..." }
 
-            if (cleaningTasks.isNotEmpty()) {
-                val cleaningResults = cleaningTasks.map { reservedTask ->
-                    processCleaningTask(reservedTask)
+                if (cleaningTasks.isNotEmpty()) {
+                    val cleaningResults = cleaningTasks.map { reservedTask ->
+                        processCleaningTask(reservedTask)
+                    }
+
+                    orchestrationApiClient.goldenRecordTasks.resolveStepResults(TaskStepResultRequest(step, cleaningResults))
+                    logger.info { "Cleaning tasks processing completed for this iteration." }
                 }
-
-                orchestrationApiClient.goldenRecordTasks.resolveStepResults(TaskStepResultRequest(step, cleaningResults))
-                logger.info { "Cleaning tasks processing completed for this iteration." }
-            }
-
+            }while (cleaningRequest.reservedTasks.isNotEmpty())
         } catch (e: Exception) {
             logger.error(e) { "Error while processing cleaning task" }
         }

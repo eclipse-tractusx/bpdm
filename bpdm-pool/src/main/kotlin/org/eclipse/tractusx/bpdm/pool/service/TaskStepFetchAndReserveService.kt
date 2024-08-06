@@ -20,9 +20,6 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.RequestWithKey
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorCode
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.config.GoldenRecordTaskConfigProperties
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
@@ -30,21 +27,41 @@ import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+
+@Service
+class TaskReservationBatchService(
+    private val taskStepFetchAndReserveService: TaskStepFetchAndReserveService
+){
+    private val logger = KotlinLogging.logger { }
+
+    @Scheduled(cron = "#{${GoldenRecordTaskConfigProperties.GET_CRON}}", zone = "UTC")
+    fun process(){
+        logger.info { "Starting polling for cleaning tasks from Orchestrator..." }
+
+        var totalTasksProcessed = 0
+        do{
+            val tasksProcessed = taskStepFetchAndReserveService.fetchAndReserve()
+            totalTasksProcessed += tasksProcessed
+        }while (tasksProcessed != 0)
+
+        logger.info { "Total of $totalTasksProcessed processed" }
+    }
+}
 
 @Service
 class TaskStepFetchAndReserveService(
     private val orchestrationClient: OrchestrationApiClient,
     private val taskStepBuildService: TaskStepBuildService,
-    private val requestValidationService: RequestValidationService,
     private val bpnRequestIdentifierRepository: BpnRequestIdentifierRepository,
     private val goldenRecordTaskConfigProperties: GoldenRecordTaskConfigProperties
 ) {
     private val logger = KotlinLogging.logger { }
 
-    @Scheduled(cron = "#{${GoldenRecordTaskConfigProperties.GET_CRON}}", zone = "UTC")
-    fun fetchAndReserve() {
+    @Transactional
+    fun fetchAndReserve(): Int {
         try {
-            logger.info { "Starting polling for cleaning tasks from Orchestrator..." }
+            logger.info { "Reserving next chunk of cleaning tasks from Orchestrator..." }
             val reservationRequest = TaskStepReservationRequest(step = TaskStep.PoolSync, amount = goldenRecordTaskConfigProperties.batchSize)
             val taskStepReservation = orchestrationClient.goldenRecordTasks.reserveTasksForStep(reservationRequest = reservationRequest)
 
@@ -55,8 +72,11 @@ class TaskStepFetchAndReserveService(
                 orchestrationClient.goldenRecordTasks.resolveStepResults(TaskStepResultRequest(step = TaskStep.PoolSync, results = taskResults))
             }
             logger.info { "Cleaning tasks processing completed for this iteration." }
+
+            return taskStepReservation.reservedTasks.size
         } catch (ex: Throwable) {
             logger.error(ex) { "Error while processing cleaning task" }
+            return 0
         }
     }
 

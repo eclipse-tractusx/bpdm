@@ -28,8 +28,8 @@ import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
-import org.eclipse.tractusx.bpdm.gate.service.TaskCreationService
-import org.eclipse.tractusx.bpdm.gate.service.TaskResolutionService
+import org.eclipse.tractusx.bpdm.gate.service.TaskCreationChunkService
+import org.eclipse.tractusx.bpdm.gate.service.TaskResolutionChunkService
 import org.eclipse.tractusx.bpdm.gate.util.MockAndAssertUtils
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerNonVerboseValues
@@ -57,8 +57,8 @@ class BusinessPartnerControllerAndSharingControllerIT @Autowired constructor(
     val testHelpers: DbTestHelpers,
     val assertHelpers: AssertHelpers,
     val gateClient: GateClient,
-    val taskCreationService: TaskCreationService,
-    val taskResolutionService: TaskResolutionService,
+    val taskCreationService: TaskCreationChunkService,
+    val taskResolutionService: TaskResolutionChunkService,
     val mockAndAssertUtils: MockAndAssertUtils
 ) {
 
@@ -85,7 +85,7 @@ class BusinessPartnerControllerAndSharingControllerIT @Autowired constructor(
     @BeforeEach
     fun beforeEach() {
         testHelpers.truncateDbTables()
-        gateWireMockServer.resetAll();
+        gateWireMockServer.resetAll()
         poolWireMockServer.resetAll()
         this.mockAndAssertUtils.mockOrchestratorApi(gateWireMockServer)
     }
@@ -183,7 +183,7 @@ class BusinessPartnerControllerAndSharingControllerIT @Autowired constructor(
             .isEqualTo(createdSharingState)
 
         // Call Finish Cleaning Method
-        taskResolutionService.resolveTasks()
+        taskResolutionService.resolveTasks(0)
 
         val cleanedSharingState = listOf(
             SharingStateDto(
@@ -248,7 +248,7 @@ class BusinessPartnerControllerAndSharingControllerIT @Autowired constructor(
             .isEqualTo(createdSharingState)
 
         // Call Finish Cleaning Method
-        taskResolutionService.resolveTasks()
+        taskResolutionService.resolveTasks(0)
 
         val cleanedSharingState = listOf(
             SharingStateDto(
