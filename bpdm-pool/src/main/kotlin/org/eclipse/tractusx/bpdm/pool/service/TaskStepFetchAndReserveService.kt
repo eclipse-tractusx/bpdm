@@ -69,7 +69,21 @@ class TaskStepFetchAndReserveService(
 
             if (taskStepReservation.reservedTasks.isNotEmpty()) {
                 val taskResults = upsertGoldenRecordIntoPool(taskStepReservation.reservedTasks)
-                orchestrationClient.goldenRecordTasks.resolveStepResults(TaskStepResultRequest(step = TaskStep.PoolSync, results = taskResults))
+
+                //Limit the length of errors so for the Orchestrator to not reject it
+                val resultsWithSafeErrors = taskResults.map { result ->
+                    result.copy(errors = result.errors.map { error ->
+                        error.copy(description = error.description.take(250))
+                    })
+                }
+                try{
+                    orchestrationClient.goldenRecordTasks.resolveStepResults(TaskStepResultRequest(step = TaskStep.PoolSync, results = resultsWithSafeErrors))
+                }catch (e: Throwable){
+                    logger.error { "Some unexpected problem on the orchestrator side. Try to resolve the current tasks with generic exceptions to at least get them out of the reserved state" }
+                    val genericErrorResults = resultsWithSafeErrors.map { TaskStepResultEntryDto(it.taskId, BusinessPartner.empty, listOf(TaskErrorDto(TaskErrorType.Unspecified, "Unknown exception when communicating with the golden record process"))) }
+                    orchestrationClient.goldenRecordTasks.resolveStepResults(TaskStepResultRequest(step = TaskStep.PoolSync, results = genericErrorResults ))
+                }
+
             }
             logger.info { "Cleaning tasks processing completed for this iteration." }
 
