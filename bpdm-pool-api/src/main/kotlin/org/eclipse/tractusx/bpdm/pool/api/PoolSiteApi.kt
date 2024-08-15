@@ -29,6 +29,7 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.PoolSiteApi.Companion.SITE_PATH
+import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteCreateRequestWithLegalAddressAsMain
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteSearchRequest
@@ -133,4 +134,21 @@ interface PoolSiteApi {
         @ParameterObject searchRequest: SiteSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageDto<SiteWithMainAddressVerboseDto>
+
+    @Operation(
+        summary = "Create a new site with legal entity reference",
+        description = "Create a business partner site with the given legal entity reference. " +
+                "It will designate the address information as both legal and site main address."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "New sites request was processed successfully, possible errors are returned"),
+            ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()])
+        ]
+    )
+    @Tag(name = ApiCommons.SITE_NAME, description = ApiCommons.SITE_DESCRIPTION)
+    @PostMapping("/legal-main-sites")
+    fun createSiteWithLegalReference(
+        @RequestBody request: Collection<SiteCreateRequestWithLegalAddressAsMain>
+    ): SitePartnerCreateResponseWrapper
 }

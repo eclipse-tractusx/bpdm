@@ -234,6 +234,27 @@ class SiteControllerIT @Autowired constructor(
         assertThat(response.errorCount).isEqualTo(0)
     }
 
+    @Test
+    fun `create new site with legal entity referece`(){
+        val givenLegalEntities =
+            poolClient.legalEntities.createBusinessPartners(listOf(BusinessPartnerNonVerboseValues.legalEntityCreate1,
+                BusinessPartnerNonVerboseValues.legalEntityCreate2)).entities
+
+        val bpnL1 = givenLegalEntities.first().legalEntity.bpnl
+        val bpnL2 = givenLegalEntities.last().legalEntity.bpnl
+        val expected= listOf(BusinessPartnerVerboseValues.createSiteLegalReference1,
+            BusinessPartnerVerboseValues.createSiteLegalReference2)
+
+        val toCreate = listOf(
+            BusinessPartnerNonVerboseValues.siteLegalReferenceUpsert1.copy(bpnLParent = bpnL1),
+            BusinessPartnerNonVerboseValues.siteLegalReferenceUpsert2.copy(bpnLParent = bpnL2)
+        )
+
+        val response=poolClient.sites.createSiteWithLegalReference(toCreate)
+        assertThatCreatedSitesEqual(response.entities, expected)
+        assertThat(response.errorCount).isEqualTo(0)
+    }
+
 
     /**
      * Given no legal entities

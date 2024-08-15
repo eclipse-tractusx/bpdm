@@ -130,6 +130,27 @@ class BusinessPartnerRequestFactory(
         )
     }
 
+    fun createSiteWithLegalReference(seed: String, bpnL: String, random: Random = Random(seed.hashCode().toLong())):SiteCreateRequestWithLegalAddressAsMain{
+        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, 365241780471), random.nextInt(0, 999999999), ZoneOffset.UTC)
+
+        return SiteCreateRequestWithLegalAddressAsMain(
+            name = "Site Name $seed",
+            bpnLParent = bpnL,
+            states = listOf(
+                SiteStateDto(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
+                SiteStateDto(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
+            ),
+            confidenceCriteria = ConfidenceCriteriaDto(
+                sharedByOwner = true,
+                checkedByExternalDataSource = false,
+                numberOfSharingMembers = 2,
+                lastConfidenceCheckAt = timeStamp.plusDays(10),
+                nextConfidenceCheckAt = timeStamp.plusDays(20),
+                confidenceLevel = 4
+            )
+        )
+    }
+
     fun createAddressRequest(seed: String, bpnParent: String): AddressPartnerCreateRequest {
         val longSeed = seed.hashCode().toLong()
         val random = Random(longSeed)
