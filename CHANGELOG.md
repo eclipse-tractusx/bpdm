@@ -14,6 +14,8 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 
 ### Changed
 
+- BPDM Gate: Fix possible out of memory exception when handling large golden record process requests
+
 - BPDM Pool: Fix not resolving golden record tasks on exceptions
 
 ## [6.1.0] - [2024-07-15]
