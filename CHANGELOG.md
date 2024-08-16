@@ -10,8 +10,11 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 
 ### Added
 
--BPDM Pool: Post endpoint to create a site for LegalAndSiteMainAddress addressType.([#739](https://github.com/eclipse-tractusx/sig-release/issues/739))
+- BPDM Pool: Post endpoint to create a site for LegalAndSiteMainAddress addressType.([#739](https://github.com/eclipse-tractusx/sig-release/issues/739))
 
+### Changed
+
+- BPDM Pool: Fix not resolving golden record tasks on exceptions
 
 ## [6.1.0] - [2024-07-15]
 

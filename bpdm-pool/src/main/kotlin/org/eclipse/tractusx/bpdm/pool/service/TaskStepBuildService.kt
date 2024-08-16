@@ -26,6 +26,7 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
+import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.stereotype.Service
 import java.time.Instant
@@ -43,7 +44,8 @@ class TaskStepBuildService(
     private val businessPartnerBuildService: BusinessPartnerBuildService,
     private val businessPartnerFetchService: BusinessPartnerFetchService,
     private val siteService: SiteService,
-    private val addressService: AddressService
+    private val addressService: AddressService,
+    private val bpnRequestIdentifierRepository: BpnRequestIdentifierRepository
 ) {
 
     enum class CleaningError(val message: String) {
@@ -74,7 +76,8 @@ class TaskStepBuildService(
     }
 
     @Transactional
-    fun upsertBusinessPartner(taskEntry: TaskStepReservationEntryDto, taskEntryBpnMapping: TaskEntryBpnMapping): TaskStepResultEntryDto {
+    fun upsertBusinessPartner(taskEntry: TaskStepReservationEntryDto): TaskStepResultEntryDto {
+        val taskEntryBpnMapping = TaskEntryBpnMapping(listOf(taskEntry), bpnRequestIdentifierRepository)
         val businessPartnerDto = taskEntry.businessPartner
 
         val legalEntityBpns = processLegalEntity(businessPartnerDto, taskEntryBpnMapping)
@@ -97,6 +100,7 @@ class TaskStepBuildService(
             )
         }
 
+        taskEntryBpnMapping.writeCreatedMappingsToDb(bpnRequestIdentifierRepository)
         return TaskStepResultEntryDto(
             taskId = taskEntry.taskId,
             businessPartner = businessPartnerWithBpns,

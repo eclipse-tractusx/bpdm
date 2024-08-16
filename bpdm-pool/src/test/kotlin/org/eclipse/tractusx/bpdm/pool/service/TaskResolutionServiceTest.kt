@@ -53,8 +53,8 @@ import java.util.*
 )
 @ActiveProfiles("test-no-auth")
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
-class TaskStepFetchAndReserveServiceTest @Autowired constructor(
-    val cleaningStepService: TaskStepFetchAndReserveService,
+class TaskResolutionServiceTest @Autowired constructor(
+    val cleaningStepService: TaskResolutionService,
     val bpnRequestIdentifierRepository: BpnRequestIdentifierRepository,
     val poolClient: PoolApiClient,
     val dbTestHelpers: DbTestHelpers,
