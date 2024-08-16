@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
+import jakarta.persistence.EntityManager
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
@@ -39,7 +40,8 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class TaskResolutionBatchService(
-    private val taskResolutionService: TaskResolutionChunkService
+    private val taskResolutionService: TaskResolutionChunkService,
+    private val entityManager: EntityManager
 ){
     private val logger = KotlinLogging.logger { }
 
@@ -63,6 +65,7 @@ class TaskResolutionBatchService(
             totalErrors += stats.resolvedAsError
             totalUnresolved += stats.unresolved
 
+            entityManager.clear()
         }while (stats.foundTasks != 0)
 
         logger.debug { "Total Resolved $totalSuccesses tasks as successful, $totalErrors as errors and $totalUnresolved still unresolved" }

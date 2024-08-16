@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
+import jakarta.persistence.EntityManager
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
@@ -37,7 +38,8 @@ import java.util.*
 
 @Service
 class TaskCreationBatchService(
-    private val taskCreationService: TaskCreationChunkService
+    private val taskCreationService: TaskCreationChunkService,
+    private val entityManager: EntityManager
 ){
     private val logger = KotlinLogging.logger { }
 
@@ -49,6 +51,8 @@ class TaskCreationBatchService(
         do {
             val createdTasks = taskCreationService.createTasksForReadyBusinessPartners()
             totalCreatedTasks += createdTasks
+
+            entityManager.clear()
         }while (createdTasks != 0)
 
         logger.debug { "Total created $totalCreatedTasks new golden record tasks from ready business partners" }
