@@ -48,14 +48,14 @@ bpdm:
         # When and how often the Gate checks for new business partner data to be shared
         cron: '*/30 * * * * *'
         # Up to how many golden record tasks can be created when checking
-        batchSize: 100
+        batchSize: 20
       fromPool:
         # Up to how many golden record tasks can be created when checking
-        batchSize: 100
+        batchSize: 20
         # When and how often the Gate checks for golden record updates from the Pool
         cron: '*/30 * * * * *'
     check:
-      batchSize: 100
+      batchSize: 20
       cron: '*/30 * * * * *'
   # Connection to the pool and orchestrator
   client:

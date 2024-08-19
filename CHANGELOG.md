@@ -20,6 +20,10 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 
 - BPDM Gate: Fixed Gate not resending business partner data to the golden record process on error sharing state when member sends the exact same business partner again
 
+### Changed
+
+- BPDM Pool & Gate: Reduce standard batch size for golden record task processing ([#1032](https://github.com/eclipse-tractusx/bpdm/pull/1032))
+
 ## [6.1.0] - [2024-07-15]
 
 ### Added
