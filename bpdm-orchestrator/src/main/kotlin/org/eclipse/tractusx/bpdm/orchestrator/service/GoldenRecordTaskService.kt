@@ -53,6 +53,7 @@ class GoldenRecordTaskService(
         logger.debug { "Creation of new golden record tasks: executing createTasks() with parameters $createRequest" }
 
         val gateRecords = getOrCreateGateRecords(createRequest.requests)
+        gateRecords.forEach { abortOutdatedTasks(it) }
 
         return createRequest.requests.zip(gateRecords)
             .map { (request, record) -> goldenRecordTaskStateMachine.initTask(createRequest.mode, request.businessPartner, record) }
@@ -74,7 +75,7 @@ class GoldenRecordTaskService(
         logger.debug { "Reservation of next golden record tasks: executing reserveTasksForStep() with parameters $reservationRequest" }
         val now = Instant.now()
 
-        val foundTasks = taskRepository.findByStepAndStepState(reservationRequest.step, StepState.Queued, Pageable.ofSize(reservationRequest.amount)).content
+        val foundTasks = taskRepository.findByStepAndStepState(reservationRequest.step, GoldenRecordTaskDb.StepState.Queued, Pageable.ofSize(reservationRequest.amount)).content
         val reservedTasks = foundTasks.map { task -> goldenRecordTaskStateMachine.doReserve(task) }
         val pendingTimeout = reservedTasks.minOfOrNull { calculateTaskPendingTimeout(it) } ?: now
 
@@ -97,17 +98,16 @@ class GoldenRecordTaskService(
         val foundTasksByUuid = foundTasks.associateBy { it.uuid.toString() }
 
         resultRequest.results
-            .forEach { resultEntry ->
-                val task = foundTasksByUuid[resultEntry.taskId]
-                    ?: throw BpdmTaskNotFoundException(resultEntry.taskId)
+            .map { resultEntry -> Pair(foundTasksByUuid[resultEntry.taskId] ?: throw BpdmTaskNotFoundException(resultEntry.taskId), resultEntry) }
+            .filterNot { (task, _) -> task.processingState.resultState == GoldenRecordTaskDb.ResultState.Aborted }
+            .forEach { (task, resultEntry) ->
                 val step = resultRequest.step
                 val errors = resultEntry.errors
                 val resultBusinessPartner = resultEntry.businessPartner
 
-                if (errors.isNotEmpty()) {
-                    goldenRecordTaskStateMachine.doResolveTaskToError(task, step, errors)
-                } else {
-                    goldenRecordTaskStateMachine.resolveTaskStepToSuccess(task, step, resultBusinessPartner)
+                when{
+                    errors.isNotEmpty() -> goldenRecordTaskStateMachine.doResolveTaskToError(task, step, errors)
+                    else ->  goldenRecordTaskStateMachine.resolveTaskStepToSuccess(task, step, resultBusinessPartner)
                 }
             }
     }
@@ -185,6 +185,11 @@ class GoldenRecordTaskService(
             val gateRecord = privateId?.let { foundRecordsByPrivateId[it] } ?: GateRecordDb(publicId = UUID.randomUUID(), privateId = UUID.randomUUID())
             gateRecordRepository.save(gateRecord)
         }
+    }
+
+    private fun abortOutdatedTasks(record: GateRecordDb){
+        return taskRepository.findTasksByGateRecordAndProcessingStateResultState(record, GoldenRecordTaskDb.ResultState.Pending)
+            .forEach { task -> goldenRecordTaskStateMachine.doAbortTask(task) }
     }
 }
 

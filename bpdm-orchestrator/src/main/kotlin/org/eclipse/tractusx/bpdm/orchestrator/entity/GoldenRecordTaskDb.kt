@@ -180,6 +180,21 @@ class GoldenRecordTaskDb(
         @Column(name = "site_has_changed")
         var siteHasChanged: Boolean?
     )
+
+    enum class ResultState{
+        Pending,
+        Success,
+        Error,
+        Aborted
+    }
+
+    enum class StepState{
+        Queued,
+        Reserved,
+        Success,
+        Error,
+        Aborted
+    }
 }
 
 

@@ -15,10 +15,9 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 ### Changed
 
 - BPDM Gate: Fix possible out of memory exception when handling large golden record process requests
-
 - BPDM Pool: Fix not resolving golden record tasks on exceptions
-
 - BPDM Gate: Fixed Gate not resending business partner data to the golden record process on error sharing state when member sends the exact same business partner again
+- BPDM Orchestrator: Now aborts tasks that are outdated (that is when a Gate will send newer business partner data for the same record to the golden record process)
 
 - BPDM Pool & Gate: Reduce standard batch size for golden record task processing ([#1032](https://github.com/eclipse-tractusx/bpdm/pull/1032))
 
