@@ -34,6 +34,15 @@ data class IdentifierTypeDto(
     @get:Schema(description = IdentifierTypeDescription.name)
     val name: String,
 
+    @get:Schema(description = IdentifierTypeDescription.abbreviation)
+    val abbreviation: String?,
+
+    @get:Schema(description = IdentifierTypeDescription.transliteratedName)
+    val transliteratedName: String?,
+
+    @get:Schema(description = IdentifierTypeDescription.transliteratedAbbreviation)
+    val transliteratedAbbreviation: String?,
+
     @get:Schema(description = IdentifierTypeDescription.details)
     val details: Collection<IdentifierTypeDetailDto> = listOf()
 )

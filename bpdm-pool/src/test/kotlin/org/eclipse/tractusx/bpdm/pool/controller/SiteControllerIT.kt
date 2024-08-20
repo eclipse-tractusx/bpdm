@@ -266,7 +266,11 @@ class SiteControllerIT @Autowired constructor(
         poolClient.metadata.createIdentifierType(
             IdentifierTypeDto(
                 technicalKey = BusinessPartnerNonVerboseValues.addressIdentifier.type,
-                businessPartnerType = IdentifierBusinessPartnerType.ADDRESS, name = BusinessPartnerNonVerboseValues.addressIdentifier.value
+                businessPartnerType = IdentifierBusinessPartnerType.ADDRESS,
+                name = BusinessPartnerNonVerboseValues.addressIdentifier.value,
+                abbreviation = BusinessPartnerVerboseValues.identifierTypeAbbreviation1,
+                transliteratedName = BusinessPartnerVerboseValues.identifierTypeTransliteratedName1,
+                transliteratedAbbreviation = BusinessPartnerVerboseValues.identifierTypeTransliteratedAbbreviation1
             )
         )
 
@@ -321,7 +325,11 @@ class SiteControllerIT @Autowired constructor(
         poolClient.metadata.createIdentifierType(
             IdentifierTypeDto(
                 technicalKey = BusinessPartnerNonVerboseValues.addressIdentifier.type,
-                businessPartnerType = IdentifierBusinessPartnerType.ADDRESS, name = BusinessPartnerNonVerboseValues.addressIdentifier.value
+                businessPartnerType = IdentifierBusinessPartnerType.ADDRESS,
+                name = BusinessPartnerNonVerboseValues.addressIdentifier.value,
+                abbreviation = BusinessPartnerVerboseValues.identifierTypeAbbreviation1,
+                transliteratedName = BusinessPartnerVerboseValues.identifierTypeTransliteratedName1,
+                transliteratedAbbreviation = BusinessPartnerVerboseValues.identifierTypeTransliteratedAbbreviation1
             )
         )
 

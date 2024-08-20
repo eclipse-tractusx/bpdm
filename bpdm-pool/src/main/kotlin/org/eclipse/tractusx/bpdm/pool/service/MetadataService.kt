@@ -63,7 +63,10 @@ class MetadataService(
         val entity = IdentifierTypeDb(
             technicalKey = type.technicalKey,
             businessPartnerType = type.businessPartnerType,
-            name = type.name
+            name = type.name,
+            abbreviation = type.abbreviation,
+            transliteratedName = type.transliteratedName,
+            transliteratedAbbreviation = type.transliteratedAbbreviation
         )
         entity.details.addAll(
             type.details.map { IdentifierTypeDetailDb(entity, it.country, it.mandatory) }.toSet()

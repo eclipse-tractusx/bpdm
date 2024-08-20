@@ -29,21 +29,21 @@ object BusinessPartnerNonVerboseValues {
     val identifierType3 = BusinessPartnerVerboseValues.identifierType3
 
     val identifierTypeDto1 =
-        IdentifierTypeDto(BusinessPartnerVerboseValues.identifierType1.technicalKey, IdentifierBusinessPartnerType.LEGAL_ENTITY, BusinessPartnerVerboseValues.identifierType1.name)
+        IdentifierTypeDto(BusinessPartnerVerboseValues.identifierType1.technicalKey, IdentifierBusinessPartnerType.LEGAL_ENTITY, BusinessPartnerVerboseValues.identifierType1.name, BusinessPartnerVerboseValues.identifierTypeAbbreviation1, BusinessPartnerVerboseValues.identifierTypeTransliteratedName1, BusinessPartnerVerboseValues.identifierTypeTransliteratedAbbreviation1)
     val identifierTypeDto2 =
-        IdentifierTypeDto(BusinessPartnerVerboseValues.identifierType2.technicalKey, IdentifierBusinessPartnerType.LEGAL_ENTITY, BusinessPartnerVerboseValues.identifierType2.name)
+        IdentifierTypeDto(BusinessPartnerVerboseValues.identifierType2.technicalKey, IdentifierBusinessPartnerType.LEGAL_ENTITY, BusinessPartnerVerboseValues.identifierType2.name, BusinessPartnerVerboseValues.identifierTypeAbbreviation2, BusinessPartnerVerboseValues.identifierTypeTransliteratedName2, BusinessPartnerVerboseValues.identifierTypeTransliteratedAbbreviation2)
     val identifierTypeDto3 =
-        IdentifierTypeDto(BusinessPartnerVerboseValues.identifierType3.technicalKey, IdentifierBusinessPartnerType.LEGAL_ENTITY, BusinessPartnerVerboseValues.identifierType3.name)
+        IdentifierTypeDto(BusinessPartnerVerboseValues.identifierType3.technicalKey, IdentifierBusinessPartnerType.LEGAL_ENTITY, BusinessPartnerVerboseValues.identifierType3.name, BusinessPartnerVerboseValues.identifierTypeAbbreviation3, BusinessPartnerVerboseValues.identifierTypeTransliteratedName3, BusinessPartnerVerboseValues.identifierTypeTransliteratedAbbreviation3)
     val identifierTypeDto4 =
-        IdentifierTypeDto(BusinessPartnerVerboseValues.identifierType4.technicalKey, IdentifierBusinessPartnerType.LEGAL_ENTITY, BusinessPartnerVerboseValues.identifierType4.name)
+        IdentifierTypeDto(BusinessPartnerVerboseValues.identifierType4.technicalKey, IdentifierBusinessPartnerType.LEGAL_ENTITY, BusinessPartnerVerboseValues.identifierType4.name, BusinessPartnerVerboseValues.identifierTypeAbbreviation4, BusinessPartnerVerboseValues.identifierTypeTransliteratedName4, BusinessPartnerVerboseValues.identifierTypeTransliteratedAbbreviation4)
 
 
     val addressIdentifierTypeDto1 =
-        IdentifierTypeDto("ADDR_KEY_ONE", IdentifierBusinessPartnerType.ADDRESS, "IdentNameOne")
+        IdentifierTypeDto("ADDR_KEY_ONE", IdentifierBusinessPartnerType.ADDRESS, "IdentNameOne", BusinessPartnerVerboseValues.identifierTypeAbbreviation1, BusinessPartnerVerboseValues.identifierTypeTransliteratedName1, BusinessPartnerVerboseValues.identifierTypeTransliteratedAbbreviation1)
     val addressIdentifierTypeDto2 =
-        IdentifierTypeDto("ADDR_KEY_TWO", IdentifierBusinessPartnerType.ADDRESS, "IdentNameTwo")
+        IdentifierTypeDto("ADDR_KEY_TWO", IdentifierBusinessPartnerType.ADDRESS, "IdentNameTwo", BusinessPartnerVerboseValues.identifierTypeAbbreviation2, BusinessPartnerVerboseValues.identifierTypeTransliteratedName2, BusinessPartnerVerboseValues.identifierTypeTransliteratedAbbreviation2)
     val addressIdentifierTypeDto3 =
-        IdentifierTypeDto("ADDR_KEY_THREE", IdentifierBusinessPartnerType.ADDRESS, "IdentNameThree")
+        IdentifierTypeDto("ADDR_KEY_THREE", IdentifierBusinessPartnerType.ADDRESS, "IdentNameThree", BusinessPartnerVerboseValues.identifierTypeAbbreviation3, BusinessPartnerVerboseValues.identifierTypeTransliteratedName3, BusinessPartnerVerboseValues.identifierTypeTransliteratedAbbreviation3)
 
 
     val identifier1 = LegalEntityIdentifierDto(
