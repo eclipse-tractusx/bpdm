@@ -39,7 +39,7 @@ interface GoldenRecordTaskRepository : CrudRepository<GoldenRecordTaskDb, Long>,
     @Query("SELECT task from GoldenRecordTaskDb task WHERE task.processingState.step = :step AND task.processingState.stepState = :stepState")
     fun findByStepAndStepState(step: TaskStep, stepState: StepState, pageable: Pageable): Page<GoldenRecordTaskDb>
 
-    fun findByProcessingStatePendingTimeoutBefore(time: DbTimestamp): Set<GoldenRecordTaskDb>
+    fun findByProcessingStatePendingTimeoutBefore(time: DbTimestamp, pageable: Pageable): Page<GoldenRecordTaskDb>
 
-    fun findByProcessingStateRetentionTimeoutBefore(time: DbTimestamp): Set<GoldenRecordTaskDb>
+    fun findByProcessingStateRetentionTimeoutBefore(time: DbTimestamp, pageable: Pageable): Page<GoldenRecordTaskDb>
 }
