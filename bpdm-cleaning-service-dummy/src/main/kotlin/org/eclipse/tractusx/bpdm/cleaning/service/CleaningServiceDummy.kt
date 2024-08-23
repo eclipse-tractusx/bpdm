@@ -28,6 +28,7 @@ import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.time.temporal.ChronoUnit
+import java.util.*
 
 @Service
 class CleaningServiceDummy(
@@ -101,16 +102,19 @@ class CleaningServiceDummy(
             ?: businessPartner.additionalAddress
             ?: PostalAddress.empty
 
+        val legalAddressBpnReference =  addressToClean.bpnReference
+            .toRequestIfNotBpn(businessPartner.legalEntityReference(), businessPartner.siteReference(), businessPartner.legalAddressReference())
+
         return with(businessPartner.legalEntity){
                 copy(
-                    bpnReference = bpnReference.toRequestIfNotBpn(businessPartner.createLegalEntityReferenceValue()),
+                    bpnReference = bpnReference.toRequestIfNotBpn(businessPartner.legalEntityReference()),
                     legalName = legalName ?: businessPartner.uncategorized.nameParts.joinToString(""),
                     identifiers = identifiers.takeIf { it.isNotEmpty() } ?: businessPartner.uncategorized.identifiers,
                     states = states.takeIf { it.isNotEmpty() } ?: businessPartner.uncategorized.states,
                     confidenceCriteria = dummyConfidenceCriteria.copy(sharedByOwner = sharedByOwner),
                     hasChanged = businessPartner.type == GoldenRecordType.LegalEntity,
                     isCatenaXMemberData = sharedByOwner,
-                    legalAddress = cleanAddress(addressToClean, businessPartner.createLegalAddressReferenceValue(), true, sharedByOwner),
+                    legalAddress = cleanAddress(addressToClean, legalAddressBpnReference, true, sharedByOwner),
                 )
             }
     }
@@ -127,12 +131,15 @@ class CleaningServiceDummy(
                     ?: PostalAddress.empty
             }
 
+            val siteMainBpnReference = addressToClean?.bpnReference
+                ?.toRequestIfNotBpn(businessPartner.legalAddressReference(), businessPartner.siteReference(), businessPartner.siteMainAddressReference())
+
             with(site){
                 copy(
-                    bpnReference = bpnReference.toRequestIfNotBpn(businessPartner.createSiteReferenceValue()),
+                    bpnReference = bpnReference.toRequestIfNotBpn(businessPartner.legalEntityReference(), businessPartner.siteReference()),
                     confidenceCriteria = dummyConfidenceCriteria.copy(sharedByOwner = sharedByOwner),
                     hasChanged = businessPartner.type == GoldenRecordType.Site,
-                    siteMainAddress = addressToClean?.let { cleanAddress(addressToClean, businessPartner.createSiteMainAddressReferenceValue(), true, sharedByOwner) }
+                    siteMainAddress = addressToClean?.let { cleanAddress(addressToClean, siteMainBpnReference!!, true, sharedByOwner) }
                 )
             }
         }
@@ -142,7 +149,7 @@ class CleaningServiceDummy(
         return businessPartner.additionalAddress?.let {
             cleanAddress(
                 it,
-                businessPartner.createAdditionalAddressReferenceValue(),
+                it.bpnReference.toRequestIfNotBpn(businessPartner.legalEntityReference(), businessPartner.siteReference(), businessPartner.addressReference()),
                 businessPartner.type == GoldenRecordType.Address,
                 sharedByOwner
             )
@@ -150,38 +157,40 @@ class CleaningServiceDummy(
     }
 
 
-    private fun cleanAddress(addressToClean: PostalAddress, requestId: String, hasChanged: Boolean, sharedByOwner: Boolean): PostalAddress {
+    private fun cleanAddress(addressToClean: PostalAddress, bpnReference: BpnReference, hasChanged: Boolean, sharedByOwner: Boolean): PostalAddress {
         return addressToClean.copy(
-                bpnReference =  addressToClean.bpnReference.toRequestIfNotBpn(requestId),
+                bpnReference =  bpnReference,
                 hasChanged = hasChanged,
                 confidenceCriteria = dummyConfidenceCriteria.copy(sharedByOwner = sharedByOwner)
             )
     }
 
-    private fun BusinessPartner.createLegalEntityReferenceValue() =
-        "LEGAL_ENTITY" + (legalEntity.legalName ?: nameParts.joinToString(" "))
+    private fun BusinessPartner.legalEntityReference() =
+        "LEGAL_ENTITY${legalEntity.legalName ?: namePartsName()}".toUUID()
 
-    private fun BusinessPartner.createSiteReferenceValue() =
-        "SITE" + createLegalEntityReferenceValue() + (site?.siteName ?: "")
+    private fun BusinessPartner.siteReference() = "S_${site?.siteName ?: namePartsName()}".toUUID()
 
-    private fun BusinessPartner.createSiteMainAddressReferenceValue() =
-        "SITE_MAIN_ADDRESS" + createSiteReferenceValue()
+    private fun BusinessPartner.addressReference() = "A_${additionalAddress?.addressName ?: namePartsName()}".toUUID()
 
-    private fun BusinessPartner.createLegalAddressReferenceValue() =
-        "LEGAL_ADDRESS" + createLegalEntityReferenceValue()
+    private fun BusinessPartner.namePartsName() = uncategorized.nameParts.joinToString(" ")
 
+    private fun BusinessPartner.legalAddressReference() = "LEGAL_ADDRESS".toUUID()
 
-    private fun BusinessPartner.createAdditionalAddressReferenceValue() =
-        "ADDITIONAL_ADDRESS" + (additionalAddress?.addressName ?: "") +  createSiteReferenceValue()
-
-    private fun generateBpnRequestIdentifier(fromString: String) =
-        BpnReference(fromString.toUUID().toString(), null, BpnReferenceType.BpnRequestIdentifier)
+    private fun BusinessPartner.siteMainAddressReference() = "SITE_MAIN_ADDRESS".toUUID()
 
 
-    private fun BpnReference.toRequestIfNotBpn(requestId: String) =
+    private fun generateBpnRequestIdentifier(legalEntityReference: UUID, siteReference: UUID? = null, addressReference: UUID? = null): BpnReference{
+        val siteReferenceString = siteReference?.let { "${siteReference}_" } ?: ""
+        val addressReferenceString = addressReference?.let { "${addressReference}_" } ?: ""
+        return BpnReference( addressReferenceString + siteReferenceString + legalEntityReference.toString(), null, BpnReferenceType.BpnRequestIdentifier)
+    }
+
+
+
+    private fun BpnReference.toRequestIfNotBpn(legalEntityReference: UUID, siteReference: UUID? = null, additionalAddressReference: UUID? = null) =
         if(referenceType == BpnReferenceType.Bpn)
             this
         else
-            generateBpnRequestIdentifier(requestId)
+            generateBpnRequestIdentifier(legalEntityReference, siteReference, additionalAddressReference)
 
 }
