@@ -21,18 +21,22 @@ package org.eclipse.tractusx.bpdm.gate.service
 
 import jakarta.persistence.EntityManager
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
+import org.eclipse.tractusx.bpdm.gate.entity.SyncTypeDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.OutputUpsertData
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
+import org.eclipse.tractusx.bpdm.gate.repository.SyncRecordRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.ResultState
 import org.eclipse.tractusx.orchestrator.api.model.TaskClientStateDto
+import org.eclipse.tractusx.orchestrator.api.model.TaskResultStateSearchRequest
 import org.eclipse.tractusx.orchestrator.api.model.TaskStateRequest
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
@@ -48,27 +52,39 @@ class TaskResolutionBatchService(
     fun resolveTasks(){
         logger.info { "Start batch process for resolving pending tasks..." }
 
-        var pageToQuery = 0
         var totalSuccesses = 0
         var totalErrors = 0
         var totalUnresolved = 0
         do{
 
-            val stats = taskResolutionService.resolveTasks(pageToQuery)
+            val results = taskResolutionService.resolveTasks()
 
-            if(stats.unresolved == stats.foundTasks)
-                pageToQuery++
-            else
-                pageToQuery = 0
-
-            totalSuccesses += stats.resolvedAsSuccess
-            totalErrors += stats.resolvedAsError
-            totalUnresolved += stats.unresolved
+            totalSuccesses += results.resolvedAsSuccess
+            totalErrors += results.resolvedAsError
+            totalUnresolved += results.unresolved
 
             entityManager.clear()
-        }while (stats.foundTasks != 0)
+        }while (results.hasNextPage)
 
         logger.debug { "Total Resolved $totalSuccesses tasks as successful, $totalErrors as errors and $totalUnresolved still unresolved" }
+    }
+
+    fun healthCheck(){
+        logger.info { "Start process Task Health Check..." }
+
+        var totalTaskMissing = 0
+        var totalProcessed = 0
+        var pageToQuery = 0
+        do{
+            val result = taskResolutionService.healthCheck(pageToQuery)
+            totalProcessed += result.processed
+            totalTaskMissing += result.missing
+            pageToQuery++
+
+            entityManager.clear()
+        }while (result.hasNextPage)
+
+        logger.info { "Finished process Task Health Check: Processed $totalProcessed tasks with unhealthy $totalTaskMissing tasks" }
     }
 }
 
@@ -80,25 +96,52 @@ class TaskResolutionChunkService(
     private val taskProperties: GoldenRecordTaskConfigProperties,
     private val orchestrationApiClient: OrchestrationApiClient,
     private val businessPartnerService: BusinessPartnerService,
-    private val orchestratorMappings: OrchestratorMappings
+    private val orchestratorMappings: OrchestratorMappings,
+    private val synchRecordService: SyncRecordService,
+    private val syncRecordRepository: SyncRecordRepository
 ) {
 
     private val logger = KotlinLogging.logger { }
 
     @Transactional
-    fun resolveTasks(pageToQuery: Int): ResolutionStats {
-        logger.info { "Start next chunk for resolving pending tasks..." }
+    fun healthCheck(pageToQuery: Int): HealthCheckResult{
+        val pendingSharingStatePage = sharingStateRepository.findBySharingStateType(SharingStateType.Pending, PageRequest.of(pageToQuery, taskProperties.healthCheck.batchSize))
+        val pendingSharingStates = pendingSharingStatePage.content
+        val pendingTaskIds = pendingSharingStates.map {  it.taskId.toString() }
 
-        val pageRequest = PageRequest.of(pageToQuery, taskProperties.check.batchSize)
-        val sharingStates = sharingStateRepository.findBySharingStateTypeAndTaskIdNotNull(SharingStateType.Pending, pageRequest).content
+        val resultStates = orchestrationApiClient.goldenRecordTasks.searchTaskResultStates(TaskResultStateSearchRequest(pendingTaskIds)).resultStates
 
-        val tasks = orchestrationApiClient.goldenRecordTasks.searchTaskStates(TaskStateRequest(sharingStates.map { it.taskId!! })).tasks
+        val sharingStatesMissingTask = pendingSharingStates.zip(resultStates)
+            .filter { (_, resultState) -> resultState == null }
+            .map { (sharingState, _) -> sharingState }
+
+        sharingStatesMissingTask.forEach { sharingStateService.setError(it, BusinessPartnerSharingError.MissingTaskID, "Missing Task in Orchestrator") }
+
+        return HealthCheckResult(pendingSharingStates.size, sharingStatesMissingTask.size, pendingSharingStatePage.hasNext())
+    }
+
+
+    @Transactional
+    fun resolveTasks(): ResolutionStats {
+
+        val syncRecord = synchRecordService.getOrCreateRecord(SyncTypeDb.ORCHESTRATOR_FINISHED_TASKS)
+
+        val events = orchestrationApiClient.finishedTaskEvents.getEvents(syncRecord.fromTime, PaginationRequest(0, 1000))
+        val finishedTaskIds = events.content.map { it.taskId }.toSet()
+
+        val foundSharingStates = sharingStateRepository.findByTaskIdIn(finishedTaskIds)
+        val pendingSharingStates = foundSharingStates.filter { it.sharingStateType == SharingStateType.Pending }
+
+        val tasks = foundSharingStates.chunked(taskProperties.check.batchSize){ chunkedSharingStates ->
+            orchestrationApiClient.goldenRecordTasks.searchTaskStates(TaskStateRequest(chunkedSharingStates.map { TaskStateRequest.Entry(taskId = it.taskId.toString(), recordId = it.orchestratorRecordId.toString()) })).tasks
+        }.flatten()
+
         val tasksById = tasks.associateBy { it.taskId }
 
-        val inputs = businessPartnerRepository.findBySharingStateInAndStage(sharingStates, StageType.Input)
+        val inputs = businessPartnerRepository.findBySharingStateInAndStage(pendingSharingStates, StageType.Input)
         val inputsByExternalId = inputs.associateBy { it.sharingState.externalId }
 
-        val mappingResults = sharingStates.map { sharingState ->
+        val mappingResults = pendingSharingStates.map { sharingState ->
             tryCreateUpsertRequest(sharingState, tasksById[sharingState.taskId], inputsByExternalId[sharingState.externalId])
         }
 
@@ -109,9 +152,15 @@ class TaskResolutionChunkService(
         resolveAsUpserts(successes)
         resolveAsErrors(errors)
 
+        events.content.lastOrNull()?.let { latestEvent ->
+            syncRecord.fromTime = latestEvent.timestamp
+            syncRecordRepository.save(syncRecord)
+        }
+
+
         logger.debug { "Resolved ${successes.size} tasks as successful, ${errors.size} as errors and ${unresolved.size} still unresolved" }
 
-        return ResolutionStats(successes.size, errors.size, unresolved.size)
+        return ResolutionStats(successes.size, errors.size, unresolved.size, events.totalPages > 1)
     }
 
     private fun tryCreateUpsertRequest(sharingState: SharingStateDb, task: TaskClientStateDto?, input: BusinessPartnerDb?): RequestCreationResult {
@@ -182,9 +231,14 @@ class TaskResolutionChunkService(
     data class ResolutionStats(
         val resolvedAsSuccess: Int,
         val resolvedAsError: Int,
-        val unresolved: Int
-    ){
-        val foundTasks = resolvedAsSuccess + resolvedAsError + unresolved
-    }
+        val unresolved: Int,
+        val hasNextPage: Boolean
+    )
+
+    data class HealthCheckResult(
+        val processed: Int,
+        val missing: Int,
+        val hasNextPage: Boolean
+    )
 
 }

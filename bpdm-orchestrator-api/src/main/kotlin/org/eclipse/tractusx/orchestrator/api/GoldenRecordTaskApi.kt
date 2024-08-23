@@ -80,6 +80,23 @@ interface GoldenRecordTaskApi {
     fun searchTaskStates(@RequestBody stateRequest: TaskStateRequest): TaskStateResponse
 
     @Operation(
+        summary = "Search for result states by giving a list of task IDs",
+        description = ""
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "The list of corresponding result states in the same order as has been received. A null indicates that a task could not be found."
+            ),
+            ApiResponse(responseCode = "400", description = "On malformed task search requests", content = [Content()]),
+        ]
+    )
+    @Tag(name = TagClient)
+    @PostMapping("/result-state/search")
+    fun searchTaskResultStates(@RequestBody stateRequest: TaskResultStateSearchRequest): TaskResultStateSearchResponse
+
+    @Operation(
         summary = "Reserve the next golden record tasks waiting in the given step queue",
         description = "Reserve up to a given number of golden record tasks in the given step queue. " +
                 "The response entries contain the business partner data to process which consists of the generic and L/S/A data. " +

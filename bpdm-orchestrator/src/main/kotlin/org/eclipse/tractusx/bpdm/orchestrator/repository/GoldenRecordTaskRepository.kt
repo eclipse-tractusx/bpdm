@@ -41,6 +41,8 @@ interface GoldenRecordTaskRepository : CrudRepository<GoldenRecordTaskDb, Long>,
 
     fun findByProcessingStatePendingTimeoutBefore(time: DbTimestamp, pageable: Pageable): Page<GoldenRecordTaskDb>
 
+    fun findByProcessingStateResultStateInAndUpdatedAtAfter(resultStates: Set<GoldenRecordTaskDb.ResultState>, fromTime: DbTimestamp, pageable: Pageable): Page<GoldenRecordTaskDb>
+
     fun findByProcessingStateRetentionTimeoutBefore(time: DbTimestamp, pageable: Pageable): Page<GoldenRecordTaskDb>
 
     fun findTasksByGateRecordAndProcessingStateResultState(record: GateRecordDb, resultState: GoldenRecordTaskDb.ResultState) : Set<GoldenRecordTaskDb>

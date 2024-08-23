@@ -32,7 +32,8 @@ import java.util.*
         Index(name = "index_tasks_uuid", columnList = "uuid"),
         Index(name = "index_tasks_step_step_state", columnList = "task_step,task_step_state"),
         Index(name = "index_tasks_pending_timeout", columnList = "task_pending_timeout"),
-        Index(name = "index_tasks_retention_timeout", columnList = "task_retention_timeout")
+        Index(name = "index_tasks_retention_timeout", columnList = "task_retention_timeout"),
+        Index(name = "index_tasks_result_state_and_updated_at", columnList = "task_result_state, updated_at")
     ]
 )
 class GoldenRecordTaskDb(
@@ -45,11 +46,11 @@ class GoldenRecordTaskDb(
     @Column(name = "uuid", nullable = false, updatable = false, unique = true, columnDefinition = "uuid")
     val uuid: UUID = UUID.randomUUID(),
 
-    @Column(updatable = false, nullable = false, name = "CREATED_AT")
+    @Column(updatable = false, nullable = false, name = "created_at")
     @Convert(converter = DbTimestampConverter::class)
     var createdAt: DbTimestamp = DbTimestamp(Instant.now()),
 
-    @Column(nullable = false, name = "UPDATED_AT")
+    @Column(nullable = false, name = "updated_at")
     @Convert(converter = DbTimestampConverter::class)
     var updatedAt: DbTimestamp = createdAt,
     @ManyToOne

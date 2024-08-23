@@ -17,11 +17,8 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.orchestrator.api.client
+package org.eclipse.tractusx.orchestrator.api.model
 
-interface OrchestrationApiClient {
-
-    val goldenRecordTasks: GoldenRecordTaskApiClient
-
-    val finishedTaskEvents: FinishedTaskEventApiClient
-}
+data class TaskResultStateSearchResponse(
+    val resultStates: List<ResultState?>
+)

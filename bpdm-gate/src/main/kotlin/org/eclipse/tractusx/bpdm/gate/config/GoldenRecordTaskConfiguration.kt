@@ -52,6 +52,11 @@ class GoldenRecordTaskConfiguration(
             { taskResolutionService.resolveTasks() },
             configProperties.check.cron
         )
+
+        taskScheduler.scheduleIfEnabled(
+            { taskResolutionService.healthCheck() },
+            configProperties.healthCheck.cron
+        )
     }
 
     private fun TaskScheduler.scheduleIfEnabled(task: Runnable, cronExpression: String) {

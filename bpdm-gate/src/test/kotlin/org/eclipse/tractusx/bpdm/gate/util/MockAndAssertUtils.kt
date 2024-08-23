@@ -40,6 +40,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryVerboseDt
 import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerGenericCommonValues
 import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerVerboseValues
 import org.eclipse.tractusx.bpdm.test.util.AssertHelpers
+import org.eclipse.tractusx.orchestrator.api.FinishedTaskEventApi
 import org.eclipse.tractusx.orchestrator.api.GoldenRecordTaskApi
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.beans.factory.annotation.Autowired
@@ -55,6 +56,7 @@ class MockAndAssertUtils @Autowired constructor(
 
     val ORCHESTRATOR_CREATE_TASKS_URL = GoldenRecordTaskApi.TASKS_PATH
     val ORCHESTRATOR_SEARCH_TASK_STATES_URL = "${GoldenRecordTaskApi.TASKS_PATH}/state/search"
+    val ORCHESTRATOR_SEARCH_TASK_RESULT_STATES_URL = "${GoldenRecordTaskApi.TASKS_PATH}/result-state/search"
     val POOL_API_SEARCH_CHANGE_LOG_URL = "${PoolChangelogApi.CHANGELOG_PATH}/search"
 
     fun mockOrchestratorApi(gateWireMockServer: WireMockExtension) {
@@ -172,6 +174,29 @@ class MockAndAssertUtils @Autowired constructor(
                 WireMock.okJson(objectMapper.writeValueAsString(taskStateResponse))
             )
         )
+
+        gateWireMockServer.stubFor(
+            WireMock.get(WireMock.urlPathEqualTo(FinishedTaskEventApi.FINISHED_TASK_EVENT_PATH)).willReturn(
+                WireMock.okJson(objectMapper.writeValueAsString(
+                    FinishedTaskEventsResponse(2, 1, 0, 2, content =
+                        listOf(
+                            FinishedTaskEventsResponse.Event(Instant.now(), ResultState.Success, "0"),
+                            FinishedTaskEventsResponse.Event(Instant.now(), ResultState.Error, "1")
+                        )
+                    )
+                ))
+            )
+        )
+
+
+    }
+
+    fun mockOrchestratorApiResultStates(gateWireMockServer: WireMockExtension, resultStates: List<ResultState?>){
+        gateWireMockServer.stubFor(
+            WireMock.post(WireMock.urlPathEqualTo(ORCHESTRATOR_SEARCH_TASK_RESULT_STATES_URL)).willReturn(
+                WireMock.okJson(objectMapper.writeValueAsString(TaskResultStateSearchResponse( resultStates = resultStates )))
+            )
+        )
     }
 
     fun mockOrchestratorApiCleanedResponseSizeOne(gateWireMockServer: WireMockExtension) {
@@ -198,6 +223,18 @@ class MockAndAssertUtils @Autowired constructor(
                 .willReturn(
                     WireMock.okJson(objectMapper.writeValueAsString(taskStateResponse))
                 )
+        )
+
+        gateWireMockServer.stubFor(
+            WireMock.get(WireMock.urlPathEqualTo(FinishedTaskEventApi.FINISHED_TASK_EVENT_PATH)).willReturn(
+                WireMock.okJson(objectMapper.writeValueAsString(
+                    FinishedTaskEventsResponse(1, 1, 0, 1, content =
+                    listOf(
+                        FinishedTaskEventsResponse.Event(Instant.now(), ResultState.Success, "0")
+                    )
+                    )
+                ))
+            )
         )
     }
 

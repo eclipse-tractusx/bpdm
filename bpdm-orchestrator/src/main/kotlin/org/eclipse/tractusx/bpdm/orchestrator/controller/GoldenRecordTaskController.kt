@@ -66,4 +66,9 @@ class GoldenRecordTaskController(
         return goldenRecordTaskService.searchTaskStates(stateRequest)
     }
 
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.VIEW_TASK})")
+    override fun searchTaskResultStates(stateRequest: TaskResultStateSearchRequest): TaskResultStateSearchResponse {
+        return goldenRecordTaskService.searchTaskResultStates(stateRequest)
+    }
+
 }
