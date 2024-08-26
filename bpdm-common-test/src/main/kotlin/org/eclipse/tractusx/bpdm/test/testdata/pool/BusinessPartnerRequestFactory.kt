@@ -178,7 +178,7 @@ class BusinessPartnerRequestFactory(
                 .mapNotNull { it }
                 .mapIndexed { index, idKey -> AddressIdentifierDto("$idKey Value $seed $index", idKey) },
             physicalPostalAddress = PhysicalPostalAddressDto(
-                geographicCoordinates = GeoCoordinateDto(longitude = random.nextFloat(), latitude = random.nextFloat(), altitude = random.nextFloat()),
+                geographicCoordinates = GeoCoordinateDto(longitude = random.nextDouble(), latitude = random.nextDouble(), altitude = random.nextDouble()),
                 country = CountryCode.entries.random(random),
                 administrativeAreaLevel1 = availableAdminAreas.randomOrNull(random),
                 administrativeAreaLevel2 = "Admin Level 2 $seed",
@@ -205,7 +205,7 @@ class BusinessPartnerRequestFactory(
                 taxJurisdictionCode = "Tax Jurisdiction Code $seed"
             ),
             alternativePostalAddress = AlternativePostalAddressDto(
-                geographicCoordinates = GeoCoordinateDto(longitude = random.nextFloat(), latitude = random.nextFloat(), altitude = random.nextFloat()),
+                geographicCoordinates = GeoCoordinateDto(longitude = random.nextDouble(), latitude = random.nextDouble(), altitude = random.nextDouble()),
                 country = CountryCode.entries.random(random),
                 administrativeAreaLevel1 = availableAdminAreas.randomOrNull(random),
                 postalCode = "Postal Code $seed",

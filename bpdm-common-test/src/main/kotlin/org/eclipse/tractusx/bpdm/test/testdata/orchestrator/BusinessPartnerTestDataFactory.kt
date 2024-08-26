@@ -109,7 +109,7 @@ class BusinessPartnerTestDataFactory(
             states = createStates(seed, 5, random),
             confidenceCriteria = createConfidenceCriteria(random),
             physicalAddress = PhysicalAddress(
-                geographicCoordinates = GeoCoordinate(longitude = random.nextFloat(), latitude = random.nextFloat(), altitude = random.nextFloat()),
+                geographicCoordinates = GeoCoordinate(longitude = random.nextDouble(), latitude = random.nextDouble(), altitude = random.nextDouble()),
                 country = CountryCode.entries.toTypedArray().random(random).alpha2,
                 administrativeAreaLevel1 = metadata?.adminAreas?.random(random) ?: "Admin Level 1 $seed",
                 administrativeAreaLevel2 = "Admin Level 2 $seed",
@@ -136,7 +136,7 @@ class BusinessPartnerTestDataFactory(
                 taxJurisdictionCode = "123"
             ),
             alternativeAddress = AlternativeAddress(
-                geographicCoordinates = GeoCoordinate(longitude = random.nextFloat(), latitude = random.nextFloat(), altitude = random.nextFloat()),
+                geographicCoordinates = GeoCoordinate(longitude = random.nextDouble(), latitude = random.nextDouble(), altitude = random.nextDouble()),
                 country = CountryCode.entries.toTypedArray().random(random).alpha2,
                 administrativeAreaLevel1 =  metadata?.adminAreas?.random(random) ?: "Alt Admin Level 1 $seed",
                 postalCode = "Alt Postal Code $seed",

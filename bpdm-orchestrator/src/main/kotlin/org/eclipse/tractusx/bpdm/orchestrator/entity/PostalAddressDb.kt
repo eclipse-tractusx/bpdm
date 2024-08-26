@@ -132,11 +132,11 @@ data class PostalAddressDb(
     @Embeddable
     data class GeoCoordinate(
         @Column(name = "longitude")
-        val longitude: Float?,
+        val longitude: Double?,
         @Column(name = "latitude")
-        val latitude: Float?,
+        val latitude: Double?,
         @Column(name = "altitude")
-        val altitude: Float?
+        val altitude: Double?
     )
 
     @Embeddable

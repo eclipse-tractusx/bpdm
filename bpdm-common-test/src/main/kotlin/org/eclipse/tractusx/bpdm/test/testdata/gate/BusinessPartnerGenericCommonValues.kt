@@ -33,7 +33,7 @@ object BusinessPartnerGenericCommonValues {
         hasChanged = true,
         addressName = "Address Name",
         physicalAddress = PhysicalAddress(
-            geographicCoordinates = GeoCoordinate(0.5f, 0.5f, 0.5f),
+            geographicCoordinates = GeoCoordinate(0.5, 0.5, 0.5),
             country = CountryCode.PT.alpha2,
             administrativeAreaLevel1 = "PT-PT",
             administrativeAreaLevel2 = "pt-admin-level-2-cleaned",
@@ -61,7 +61,7 @@ object BusinessPartnerGenericCommonValues {
             taxJurisdictionCode = "123"
         ),
         alternativeAddress = AlternativeAddress(
-            geographicCoordinates = GeoCoordinate(0.6f, 0.6f, 0.6f),
+            geographicCoordinates = GeoCoordinate(0.6, 0.6, 0.6),
             country = CountryCode.PT.alpha2,
             administrativeAreaLevel1 = "PT-PT",
             postalCode = "postal-code-cleaned",
