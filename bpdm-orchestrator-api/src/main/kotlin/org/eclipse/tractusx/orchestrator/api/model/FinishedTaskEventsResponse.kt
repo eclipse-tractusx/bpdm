@@ -17,11 +17,22 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.orchestrator.api.client
+package org.eclipse.tractusx.orchestrator.api.model
 
-interface OrchestrationApiClient {
+import org.eclipse.tractusx.bpdm.common.dto.IPageDto
+import java.time.Instant
 
-    val goldenRecordTasks: GoldenRecordTaskApiClient
+data class FinishedTaskEventsResponse(
+    override val totalElements: Long,
+    override val totalPages: Int,
+    override val page: Int,
+    override val contentSize: Int,
+    override val content: Collection<Event>
+): IPageDto<FinishedTaskEventsResponse.Event>{
 
-    val finishedTaskEvents: FinishedTaskEventApiClient
+    data class Event(
+        val timestamp: Instant,
+        val resultState: ResultState,
+        val taskId: String
+    )
 }

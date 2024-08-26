@@ -11,6 +11,8 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 ### Added
 
 - BPDM Pool: Post endpoint to create a site for LegalAndSiteMainAddress addressType.([#739](https://github.com/eclipse-tractusx/sig-release/issues/739))
+- BPDM Orchestrator: Endpoint for checking the result state of given tasks
+- BPDM Orchestrator: Endpoint for getting event log for finished tasks
 - BPDM Pool: Enhanced data model for IdentifierTypes by adding three new fields/attributes: abbreviation, transliteratedName, and transliteratedAbbreviation.([#605](https://github.com/eclipse-tractusx/sig-release/issues/605))
 
 ### Changed
@@ -18,6 +20,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM Gate: Fix possible out of memory exception when handling large golden record process requests
 - BPDM Pool: Fix not resolving golden record tasks on exceptions
 - BPDM Gate: Fixed Gate not resending business partner data to the golden record process on error sharing state when member sends the exact same business partner again
+- BPDM Orchestrator: Search task endpoint now requires the private record ID for each task. This means only the task creator is able to fetch the task state
 - BPDM Orchestrator: Now aborts tasks that are outdated (that is when a Gate will send newer business partner data for the same record to the golden record process)
 - BPDM Pool & Gate: Reduce standard batch size for golden record task processing ([#1032](https://github.com/eclipse-tractusx/bpdm/pull/1032))
 - BPDM Orchestrator: Fix possible out-of-memory exception during the execution of large volumes of tasks ([#1029](https://github.com/eclipse-tractusx/bpdm/pull/1029))

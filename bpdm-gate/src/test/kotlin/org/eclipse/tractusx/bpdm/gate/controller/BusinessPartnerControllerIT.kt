@@ -35,6 +35,7 @@ import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerNonVerboseVal
 import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerVerboseValues
 import org.eclipse.tractusx.bpdm.test.util.AssertHelpers
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
+import org.eclipse.tractusx.orchestrator.api.model.ResultState
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -320,7 +321,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
             .isEqualTo(createdSharingState)
 
         // Call Finish Cleaning Method
-        taskResolutionService.resolveTasks(0)
+        taskResolutionService.resolveTasks()
 
         val cleanedSharingState = listOf(
             SharingStateDto(
@@ -356,6 +357,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
     @Test
     fun `insert one business partners but task is missing in orchestrator`() {
         this.mockAndAssertUtils.mockOrchestratorApiCleaned(gateWireMockServer)
+        this.mockAndAssertUtils.mockOrchestratorApiResultStates(gateWireMockServer, listOf(ResultState.Pending, ResultState.Pending, null))
         val upsertRequests = listOf(
             BusinessPartnerNonVerboseValues.bpInputRequestCleaned,
             BusinessPartnerNonVerboseValues.bpInputRequestError,
@@ -384,8 +386,9 @@ class BusinessPartnerControllerIT @Autowired constructor(
             .ignoringFieldsMatchingRegexes(".*${SharingStateDto::sharingProcessStarted.name}")
             .isEqualTo(createdSharingState)
 
-        // Call Finish Cleaning Method
-        taskResolutionService.resolveTasks(0)
+
+        // Call Health Check
+        taskResolutionService.healthCheck(0)
 
         val cleanedSharingState = listOf(
             SharingStateDto(

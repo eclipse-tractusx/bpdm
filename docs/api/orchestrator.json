@@ -3,7 +3,7 @@
   "info": {
     "title": "Business Partner Data Management Orchestrator",
     "description": "Orchestrator component acts as a passive component and offers for each processing steps individual endpoints",
-    "version": "6.1.1-SNAPSHOT"
+    "version": "6.2.0-SNAPSHOT"
   },
   "servers": [
     {
@@ -141,6 +141,99 @@
           },
           "400": {
             "description": "On malformed task search requests"
+          }
+        }
+      }
+    },
+    "/v6/golden-record-tasks/result-state/search": {
+      "post": {
+        "tags": [
+          "Task Client"
+        ],
+        "summary": "Search for result states by giving a list of task IDs",
+        "operationId": "searchTaskResultStates",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaskResultStateSearchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "The list of corresponding result states in the same order as has been received. A null indicates that a task could not be found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskResultStateSearchResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "On malformed task search requests"
+          }
+        }
+      }
+    },
+    "/v6/golden-record-tasks/finished-events": {
+      "get": {
+        "tags": [
+          "Task Client"
+        ],
+        "summary": "Get event log of golden record tasks that have finished processing",
+        "description": "The event log contains all events of when golden record tasks finish processing. These events are helpful for the task creator to check whether created tasks have finished processing. A paginated list of events that happened after a given time is returned. ",
+        "operationId": "getEvents",
+        "parameters": [
+          {
+            "name": "timestamp",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Number of page to get results from",
+            "required": false,
+            "schema": {
+              "minimum": 0,
+              "type": "string",
+              "default": "0"
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Size of each page",
+            "required": false,
+            "schema": {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "string",
+              "default": "10"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The paginated events after the given timestamp",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FinishedTaskEventsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "On malformed requests"
           }
         }
       }
@@ -315,6 +408,86 @@
           }
         },
         "description": "Contains information to evaluate how good or verified the information in the attached business partner data is. This information will be directly written in the matched golden record's confidence criteria."
+      },
+      "Entry": {
+        "required": [
+          "recordId",
+          "taskId"
+        ],
+        "type": "object",
+        "properties": {
+          "taskId": {
+            "type": "string"
+          },
+          "recordId": {
+            "type": "string"
+          }
+        }
+      },
+      "Event": {
+        "required": [
+          "resultState",
+          "taskId",
+          "timestamp"
+        ],
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "resultState": {
+            "type": "string",
+            "enum": [
+              "Pending",
+              "Success",
+              "Error"
+            ]
+          },
+          "taskId": {
+            "type": "string"
+          }
+        },
+        "description": "Collection of results in the page"
+      },
+      "FinishedTaskEventsResponse": {
+        "required": [
+          "content",
+          "contentSize",
+          "page",
+          "totalElements",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "totalElements": {
+            "type": "integer",
+            "description": "Total number of all results in all pages",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Total number pages",
+            "format": "int32"
+          },
+          "page": {
+            "type": "integer",
+            "description": "Current page number",
+            "format": "int32"
+          },
+          "contentSize": {
+            "type": "integer",
+            "description": "Number of results in the page",
+            "format": "int32"
+          },
+          "content": {
+            "type": "array",
+            "description": "Collection of results in the page",
+            "items": {
+              "$ref": "#/components/schemas/Event"
+            }
+          }
+        }
       },
       "GeoCoordinate": {
         "type": "object",
@@ -799,7 +972,7 @@
         },
         "description": "Contains detailed information about the current processing state of a golden record task"
       },
-      "TaskStateRequest": {
+      "TaskResultStateSearchRequest": {
         "required": [
           "taskIds"
         ],
@@ -809,6 +982,39 @@
             "type": "array",
             "items": {
               "type": "string"
+            }
+          }
+        }
+      },
+      "TaskResultStateSearchResponse": {
+        "required": [
+          "resultStates"
+        ],
+        "type": "object",
+        "properties": {
+          "resultStates": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "Pending",
+                "Success",
+                "Error"
+              ]
+            }
+          }
+        }
+      },
+      "TaskStateRequest": {
+        "required": [
+          "entries"
+        ],
+        "type": "object",
+        "properties": {
+          "entries": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Entry"
             }
           }
         },

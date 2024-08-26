@@ -61,11 +61,25 @@ class GoldenRecordTaskService(
             .let { TaskCreateResponse(createdTasks = it) }
     }
 
+    fun searchTaskResultStates(stateRequest: TaskResultStateSearchRequest): TaskResultStateSearchResponse{
+        logger.debug { "Search for ${stateRequest.taskIds.size} task result states" }
+
+        val uuidsToSearch = stateRequest.taskIds.map { UUID.fromString(it) }.toSet()
+        val tasksByUuid  = taskRepository.findByUuidIn(uuidsToSearch).associateBy { it.uuid }
+
+        return TaskResultStateSearchResponse(uuidsToSearch
+            .map { tasksByUuid[it]?.processingState?.resultState }
+            .map { it?.let { responseMapper.toResultState(it) }
+            })
+    }
+
     fun searchTaskStates(stateRequest: TaskStateRequest): TaskStateResponse {
         logger.debug { "Search for the state of golden record task: executing searchTaskStates() with parameters $stateRequest" }
+        val requestsByTaskId = stateRequest.entries.associateBy { it.taskId }
 
-        return stateRequest.taskIds.map { toUUID(it) }
+        return stateRequest.entries.map { toUUID(it.taskId) }
             .let { uuids -> taskRepository.findByUuidIn(uuids.toSet()) }
+            .filter { task -> requestsByTaskId[task.uuid.toString()]?.recordId == task.gateRecord.privateId.toString() }
             .map { task -> responseMapper.toClientState(task, calculateTaskRetentionTimeout(task)) }
             .let { TaskStateResponse(tasks = it) }
     }

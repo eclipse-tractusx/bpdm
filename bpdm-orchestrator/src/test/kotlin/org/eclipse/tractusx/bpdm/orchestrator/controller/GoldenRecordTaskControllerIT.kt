@@ -91,7 +91,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
         }
 
         // check if response is consistent with searchTaskStates response
-        val statesResponse = searchTaskStates(createdTasks.map { it.taskId })
+        val statesResponse = searchTaskStates(createdTasks.map { it.toTaskSearchIdentity() })
         assertThat(statesResponse.tasks).isEqualTo(createdTasks)
     }
 
@@ -144,7 +144,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
         assertThat(reservationResponse2.reservedTasks.size).isEqualTo(0)
 
         // check searchTaskStates response
-        val statesResponse = searchTaskStates(reservedTasks.map { it.taskId })
+        val statesResponse = createdTasks.searchTaskStates(reservedTasks.map { it.taskId })
         assertThat(statesResponse.tasks.size).isEqualTo(2)
         statesResponse.tasks.forEach { stateDto ->
             val processingState = stateDto.processingState
@@ -185,7 +185,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
     @Test
     fun `post cleaning results for all steps`() {
         // create tasks
-        createTasksWithoutRecordId()
+        val createdTasks = createTasksWithoutRecordId().createdTasks
 
         // reserve task for step==CleanAndSync
         val reservedTasks1 = reserveTasks(TaskStep.CleanAndSync, 1).reservedTasks
@@ -194,7 +194,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
 
         // now in stepState==Reserved
         assertProcessingStateDto(
-            searchTaskStates(listOf(taskId)).tasks.single().processingState,
+            createdTasks.searchTaskStates(reservedTasks1.map { it.taskId }).tasks.single().processingState,
             ResultState.Pending, TaskStep.CleanAndSync, StepState.Reserved
         )
 
@@ -208,7 +208,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
 
         // now in next step and stepState==Queued
         assertProcessingStateDto(
-            searchTaskStates(listOf(taskId)).tasks.single().processingState,
+            createdTasks.searchTaskStates(reservedTasks1.map { it.taskId }).tasks.single().processingState,
             ResultState.Pending, TaskStep.PoolSync, StepState.Queued
         )
 
@@ -218,7 +218,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
         assertThat(reservedTasks2.single().businessPartner).isEqualTo(businessPartnerResolved1)
 
         // now in stepState==Queued
-        val stateDto = searchTaskStates(listOf(taskId)).tasks.single()
+        val stateDto = createdTasks.searchTaskStates(listOf(taskId)).tasks.single()
         assertProcessingStateDto(
             stateDto.processingState,
             ResultState.Pending, TaskStep.PoolSync, StepState.Reserved
@@ -233,7 +233,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
         resolveTasks(TaskStep.PoolSync, listOf(resultEntry2))
 
         // final step -> now in stepState==Success
-        val finalStateDto = searchTaskStates(listOf(taskId)).tasks.single()
+        val finalStateDto = createdTasks.searchTaskStates(listOf(taskId)).tasks.single()
         assertProcessingStateDto(
             finalStateDto.processingState,
             ResultState.Success, TaskStep.PoolSync, StepState.Success
@@ -254,7 +254,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
     @Test
     fun `post cleaning result with error`() {
         // create tasks
-        createTasksWithoutRecordId()
+        val createdTasks = createTasksWithoutRecordId().createdTasks
 
         // reserve task for step==CleanAndSync
         val taskId = reserveTasks(TaskStep.CleanAndSync, 1).reservedTasks.single().taskId
@@ -269,7 +269,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
         resolveTasks(TaskStep.CleanAndSync, listOf(resultEntry))
 
         // now in error state
-        val stateDto = searchTaskStates(listOf(taskId)).tasks.single()
+        val stateDto = createdTasks.searchTaskStates(listOf(taskId)).tasks.single()
         assertProcessingStateDto(
             stateDto.processingState,
             ResultState.Error, TaskStep.CleanAndSync, StepState.Error
@@ -422,7 +422,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
     fun `wait for task pending and retention timeout`() {
         // create tasks
         val createdTasks = createTasksWithoutRecordId().createdTasks
-        val taskIds = createdTasks.map { it.taskId }
+        val taskIds = createdTasks.map { it.toTaskSearchIdentity() }
 
         // check for state Pending
         checkStateForAllTasks(taskIds) {
@@ -457,11 +457,12 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
     @Test
     fun `wait for task retention timeout after success`() {
         // create single task in UpdateFromPool mode (only one step)
-        createTasksWithoutRecordId(TaskMode.UpdateFromPool, listOf(defaultBusinessPartner1))
+        val createdTasks =createTasksWithoutRecordId(TaskMode.UpdateFromPool, listOf(defaultBusinessPartner1)).createdTasks
 
         // reserve task
         val reservedTask = reserveTasks(TaskStep.Clean).reservedTasks.single()
         val taskId = reservedTask.taskId
+        val searchIdentity = reservedTask.toTaskSearchIdentity(createdTasks)
 
         // resolve with success
         val cleaningResult = TaskStepResultEntryDto(
@@ -471,30 +472,31 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
         resolveTasks(TaskStep.Clean, listOf(cleaningResult))
 
         // should be in state Success now
-        checkStateForAllTasks(listOf(taskId)) {
+        checkStateForAllTasks(listOf(searchIdentity)) {
             assertThat(it.resultState).isEqualTo(ResultState.Success)
         }
 
         // wait for 1/2 retention time -> should still be in state Success
         Thread.sleep(taskConfigProperties.taskRetentionTimeout.dividedBy(2).toMillis())
-        checkStateForAllTasks(listOf(taskId)) {
+        checkStateForAllTasks(listOf(searchIdentity)) {
             assertThat(it.resultState).isEqualTo(ResultState.Success)
         }
 
         // wait for 1/2 retention time -> should still be removed
         Thread.sleep(taskConfigProperties.taskRetentionTimeout.dividedBy(2).plusSeconds(1).toMillis())
-        val foundTasks = searchTaskStates(listOf(taskId)).tasks
+        val foundTasks = createdTasks.searchTaskStates(listOf(taskId)).tasks
         assertThat(foundTasks.size).isZero()
     }
 
     @Test
     fun `wait for task retention timeout after error`() {
         // create single task in UpdateFromPool mode (only one step)
-        createTasksWithoutRecordId(TaskMode.UpdateFromPool, listOf(defaultBusinessPartner1))
+        val createdTasks = createTasksWithoutRecordId(TaskMode.UpdateFromPool, listOf(defaultBusinessPartner1)).createdTasks
 
         // reserve task
         val reservedTask = reserveTasks(TaskStep.Clean).reservedTasks.single()
         val taskId = reservedTask.taskId
+        val searchIdentity = reservedTask.toTaskSearchIdentity(createdTasks)
 
         // resolve with error
         val cleaningResult = TaskStepResultEntryDto(
@@ -505,19 +507,19 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
         resolveTasks(TaskStep.Clean, listOf(cleaningResult))
 
         // should be in state Success now
-        checkStateForAllTasks(listOf(taskId)) {
+        checkStateForAllTasks(listOf(searchIdentity)) {
             assertThat(it.resultState).isEqualTo(ResultState.Error)
         }
 
         // wait for 1/2 retention time -> should still be in state Success
         Thread.sleep(taskConfigProperties.taskRetentionTimeout.dividedBy(2).toMillis())
-        checkStateForAllTasks(listOf(taskId)) {
+        checkStateForAllTasks(listOf(searchIdentity)) {
             assertThat(it.resultState).isEqualTo(ResultState.Error)
         }
 
         // wait for 1/2 retention time -> should still be removed
         Thread.sleep(taskConfigProperties.taskRetentionTimeout.dividedBy(2).plusSeconds(1).toMillis())
-        val foundTasks = searchTaskStates(listOf(taskId)).tasks
+        val foundTasks = searchTaskStates(listOf(searchIdentity)).tasks
         assertThat(foundTasks.size).isZero()
     }
 
@@ -551,7 +553,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
     @Test
     fun `abort task when outdated`(){
         val createdTasks  = createTasks(entries = listOf(defaultBusinessPartner1, defaultBusinessPartner2).map { TaskCreateRequestEntry(null, it) }).createdTasks
-        val createdTaskIds = createdTasks.map { it.taskId }
+        val createdTaskIds = createdTasks.map { it.toTaskSearchIdentity() }
         val createdRecordIds = createdTasks.map { it.recordId }
 
         //Create newer tasks for the given records
@@ -606,12 +608,12 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
             TaskStepResultRequest(step, results)
         )
 
-    private fun searchTaskStates(taskIds: List<String>) =
+    private fun searchTaskStates(taskIds: List<TaskStateRequest.Entry>) =
         orchestratorClient.goldenRecordTasks.searchTaskStates(
             TaskStateRequest(taskIds)
         )
 
-    private fun checkStateForAllTasks(taskIds: List<String>, checkFunc: (TaskProcessingStateDto) -> Unit) {
+    private fun checkStateForAllTasks(taskIds: List<TaskStateRequest.Entry>, checkFunc: (TaskProcessingStateDto) -> Unit) {
         searchTaskStates(taskIds).tasks
             .also { assertThat(it.size).isEqualTo(taskIds.size) }
             .forEach { stateDto -> checkFunc(stateDto.processingState) }
@@ -629,4 +631,19 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
                 assertThat(it.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
             }
     }
+
+    private fun TaskClientStateDto.toTaskSearchIdentity() = TaskStateRequest.Entry(taskId, recordId)
+
+    private fun TaskStepReservationEntryDto.toTaskSearchIdentity(createdTasks: List<TaskClientStateDto>) =
+        TaskStateRequest.Entry(taskId, createdTasks.find { it.taskId == taskId }!!.recordId)
+
+    private fun List<TaskClientStateDto>.searchTaskStates(taskIds: List<String>) =
+        this.searchTaskStates(taskIds.toSet())
+
+    private fun List<TaskClientStateDto>.searchTaskStates(taskIds: Set<String>) =
+            this.filter { taskIds.contains(it.taskId) }
+                .map { it.toTaskSearchIdentity() }
+                .let { searchTaskStates(it) }
+
+
 }

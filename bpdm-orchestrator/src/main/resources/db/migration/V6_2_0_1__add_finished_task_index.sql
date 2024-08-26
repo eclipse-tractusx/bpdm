@@ -1,0 +1,1 @@
+create index index_tasks_result_state_and_updated_at on golden_record_tasks (task_result_state, updated_at);
