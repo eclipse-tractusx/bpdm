@@ -68,6 +68,22 @@ object BusinessPartnerVerboseValues {
     val identifierType3 = TypeKeyNameVerboseDto("VAT_FR", "VAT France")
     val identifierType4 = TypeKeyNameVerboseDto("VAT_NL", "VAT Netherlands")
 
+    val identifierTypeAbbreviation1 = "abbreviation1"
+    val identifierTypeAbbreviation2 = "abbreviation2"
+    val identifierTypeAbbreviation3 = "abbreviation3"
+    val identifierTypeAbbreviation4 = "abbreviation4"
+
+    val identifierTypeTransliteratedName1 = "transliteratedName1"
+    val identifierTypeTransliteratedName2 = "transliteratedName2"
+    val identifierTypeTransliteratedName3 = "transliteratedName3"
+    val identifierTypeTransliteratedName4 = "transliteratedName4"
+
+    val identifierTypeTransliteratedAbbreviation1 = "transliteratedAbbreviation1"
+    val identifierTypeTransliteratedAbbreviation2 = "transliteratedAbbreviation2"
+    val identifierTypeTransliteratedAbbreviation3 = "transliteratedAbbreviation3"
+    val identifierTypeTransliteratedAbbreviation4 = "transliteratedAbbreviation4"
+
+
     val identifier1 =
         LegalEntityIdentifierVerboseDto("ID-XYZ", identifierType1, "Agency X")
     val identifier2 =

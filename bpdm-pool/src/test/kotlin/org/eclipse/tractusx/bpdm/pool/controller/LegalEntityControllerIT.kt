@@ -168,7 +168,11 @@ class LegalEntityControllerIT @Autowired constructor(
         poolClient.metadata.createIdentifierType(
             IdentifierTypeDto(
                 technicalKey = addressIdentifier.type,
-                businessPartnerType = IdentifierBusinessPartnerType.ADDRESS, name = addressIdentifier.value
+                businessPartnerType = IdentifierBusinessPartnerType.ADDRESS,
+                name = addressIdentifier.value,
+                abbreviation = BusinessPartnerVerboseValues.identifierTypeAbbreviation1,
+                transliteratedName = BusinessPartnerVerboseValues.identifierTypeTransliteratedName1,
+                transliteratedAbbreviation = BusinessPartnerVerboseValues.identifierTypeTransliteratedAbbreviation1
             )
         )
 
@@ -388,7 +392,11 @@ class LegalEntityControllerIT @Autowired constructor(
         poolClient.metadata.createIdentifierType(
             IdentifierTypeDto(
                 technicalKey = addressIdentifier.type,
-                businessPartnerType = IdentifierBusinessPartnerType.ADDRESS, name = addressIdentifier.value
+                businessPartnerType = IdentifierBusinessPartnerType.ADDRESS,
+                name = addressIdentifier.value,
+                abbreviation = BusinessPartnerVerboseValues.identifierTypeAbbreviation1,
+                transliteratedName = BusinessPartnerVerboseValues.identifierTypeTransliteratedName1,
+                transliteratedAbbreviation = BusinessPartnerVerboseValues.identifierTypeTransliteratedAbbreviation1
             )
         )
 
