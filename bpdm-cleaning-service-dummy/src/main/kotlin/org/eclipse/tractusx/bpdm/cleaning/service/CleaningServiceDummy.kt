@@ -108,7 +108,7 @@ class CleaningServiceDummy(
         return with(businessPartner.legalEntity){
                 copy(
                     bpnReference = bpnReference.toRequestIfNotBpn(businessPartner.legalEntityReference()),
-                    legalName = legalName ?: businessPartner.uncategorized.nameParts.joinToString(""),
+                    legalName = legalName ?: businessPartner.uncategorized.nameParts.joinToString(" "),
                     identifiers = identifiers.takeIf { it.isNotEmpty() } ?: businessPartner.uncategorized.identifiers,
                     states = states.takeIf { it.isNotEmpty() } ?: businessPartner.uncategorized.states,
                     confidenceCriteria = dummyConfidenceCriteria.copy(sharedByOwner = sharedByOwner),
