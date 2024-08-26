@@ -41,9 +41,9 @@ class ResponseMapper {
     fun toProcessingState(task: GoldenRecordTaskDb, timeout: Instant) =
         with(task.processingState) {
             TaskProcessingStateDto(
-                resultState = resultState,
+                resultState = toResultState(resultState),
                 step = step,
-                stepState = stepState,
+                stepState = toStepState(stepState),
                 errors = errors.map { toTaskError(it) },
                 createdAt = task.createdAt.instant,
                 modifiedAt = task.updatedAt.instant,
@@ -218,6 +218,23 @@ class ResponseMapper {
                 nameSuffix = nameSuffix,
                 additionalNameSuffix = additionalNameSuffix
             )
+        }
+
+    fun toResultState(resultState: GoldenRecordTaskDb.ResultState) =
+        when(resultState){
+            GoldenRecordTaskDb.ResultState.Pending -> ResultState.Pending
+            GoldenRecordTaskDb.ResultState.Success ->  ResultState.Success
+            GoldenRecordTaskDb.ResultState.Error ->  ResultState.Error
+            GoldenRecordTaskDb.ResultState.Aborted ->  ResultState.Error
+        }
+
+    fun toStepState(stepState: GoldenRecordTaskDb.StepState) =
+        when(stepState){
+            GoldenRecordTaskDb.StepState.Queued -> StepState.Queued
+            GoldenRecordTaskDb.StepState.Reserved -> StepState.Reserved
+            GoldenRecordTaskDb.StepState.Success -> StepState.Success
+            GoldenRecordTaskDb.StepState.Error -> StepState.Error
+            GoldenRecordTaskDb.StepState.Aborted -> StepState.Error
         }
 
 }

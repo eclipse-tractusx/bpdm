@@ -30,6 +30,7 @@ import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
@@ -544,6 +545,41 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
 
         assertBadRequestException{
             createTasks(entries = listOf(requestWithUnknownRecord))
+        }
+    }
+
+    @Test
+    fun `abort task when outdated`(){
+        val createdTasks  = createTasks(entries = listOf(defaultBusinessPartner1, defaultBusinessPartner2).map { TaskCreateRequestEntry(null, it) }).createdTasks
+        val createdTaskIds = createdTasks.map { it.taskId }
+        val createdRecordIds = createdTasks.map { it.recordId }
+
+        //Create newer tasks for the given records
+        createTasks(entries = createdRecordIds
+            .zip(listOf(defaultBusinessPartner1, defaultBusinessPartner2))
+            .map { (recordId, bp) -> TaskCreateRequestEntry(recordId, bp) }
+        ).createdTasks
+
+        val olderTasks = searchTaskStates(createdTaskIds).tasks
+
+        olderTasks.forEach { assertThat(it.processingState.resultState).isEqualTo(ResultState.Error) }
+    }
+
+    @Test
+    fun `aborted task throws no error when trying to resolve`(){
+        val createdTasks  = createTasks(entries = listOf(defaultBusinessPartner1, defaultBusinessPartner2).map { TaskCreateRequestEntry(null, it) }).createdTasks
+        val createdRecordIds = createdTasks.map { it.recordId }
+
+        val reservedTasks = reserveTasks(TaskStep.CleanAndSync, amount = 2).reservedTasks
+
+        //Create newer tasks for the given records
+        createTasks(entries = createdRecordIds
+            .zip(listOf(defaultBusinessPartner1, defaultBusinessPartner2))
+            .map { (recordId, bp) -> TaskCreateRequestEntry(recordId, bp) }
+        ).createdTasks
+
+        assertDoesNotThrow {
+            resolveTasks(TaskStep.CleanAndSync, reservedTasks.map { TaskStepResultEntryDto(it.taskId, it.businessPartner) })
         }
     }
 
