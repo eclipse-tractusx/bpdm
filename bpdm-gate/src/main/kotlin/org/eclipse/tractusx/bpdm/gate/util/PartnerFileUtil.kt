@@ -211,9 +211,9 @@ object PartnerFileUtil {
             addressType = addressType?.let { parseEnum(it, AddressType::valueOf, errors, rowIndex + 1, PartnerUploadFileHeader.ADDRESS_TYPE) },
             physicalPostalAddress = PhysicalPostalAddressDto(
                 geographicCoordinates = GeoCoordinateDto(
-                    longitude = physicalPostalAddressLongitude?.toFloatOrNull() ?: 0f,
-                    latitude = physicalPostalAddressLatitude?.toFloatOrNull() ?: 0f,
-                    altitude = physicalPostalAddressAltitude?.toFloatOrNull() ?: 0f
+                    longitude = physicalPostalAddressLongitude?.toDoubleOrNull() ?: 0.0,
+                    latitude = physicalPostalAddressLatitude?.toDoubleOrNull() ?: 0.0,
+                    altitude = physicalPostalAddressAltitude?.toDoubleOrNull() ?: 0.0
                 ),
                 country = physicalPostalAddressCountry?.let { parseEnum(it, CountryCode::valueOf, errors, rowIndex + 1, PartnerUploadFileHeader.PHYSICAL_POSTAL_ADDRESS_COUNTRY) },
                 administrativeAreaLevel1 = physicalPostalAddressAdminArea1?.takeIf { it.isNotEmpty() },
@@ -241,9 +241,9 @@ object PartnerFileUtil {
             ),
             alternativePostalAddress = AlternativePostalAddressDto(
                 geographicCoordinates = GeoCoordinateDto(
-                    longitude = alternativePostalAddressLongitude?.toFloatOrNull() ?: 0f,
-                    latitude = alternativePostalAddressLatitude?.toFloatOrNull() ?: 0f,
-                    altitude = alternativePostalAddressAltitude?.toFloatOrNull() ?: 0f
+                    longitude = alternativePostalAddressLongitude?.toDoubleOrNull() ?: 0.0,
+                    latitude = alternativePostalAddressLatitude?.toDoubleOrNull() ?: 0.0,
+                    altitude = alternativePostalAddressAltitude?.toDoubleOrNull() ?: 0.0
                 ),
                 country = alternativePostalAddressCountry?.let { parseEnum(it, CountryCode::valueOf, errors, rowIndex + 1, PartnerUploadFileHeader.ALTERNATIVE_POSTAL_ADDRESS_COUNTRY) },
                 administrativeAreaLevel1 = alternativePostalAddressAdminArea1?.takeIf { it.isNotEmpty() },

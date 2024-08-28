@@ -26,6 +26,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM Orchestrator: Fix possible out-of-memory exception during the execution of large volumes of tasks ([#1029](https://github.com/eclipse-tractusx/bpdm/pull/1029))
 - BPDM Cleaning Service Dummy: Add whitespaces between name parts when creating legal name from them
 - BPDM Cleaning Service Dummy: Improve duplication check to better distinguish between incoming business partners
+- Apps: Updated double precision data type for Geographic-data([#978](https://github.com/eclipse-tractusx/bpdm/issues/978))
 
 ## [6.1.0] - [2024-07-15]
 
