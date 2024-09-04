@@ -27,6 +27,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM Cleaning Service Dummy: Add whitespaces between name parts when creating legal name from them
 - BPDM Cleaning Service Dummy: Improve duplication check to better distinguish between incoming business partners
 - Apps: Updated double precision data type for Geographic-data([#978](https://github.com/eclipse-tractusx/bpdm/issues/978))
+- BPDM Gate: Improved error response by adding external id details and reduced csv columns by removing support for uncategorized fields in csv file for partner upload process([#700](https://github.com/eclipse-tractusx/sig-release/issues/700))
 
 ## [6.1.0] - [2024-07-15]
 

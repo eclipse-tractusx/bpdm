@@ -25,7 +25,6 @@ import jakarta.validation.Validation
 import jakarta.validation.Validator
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
@@ -79,23 +78,20 @@ object PartnerFileUtil {
                 validateRow(row, index, validator, errors, externalIdSet)
                 BusinessPartnerInputRequest(
                     externalId = row.externalId.orEmpty(),
-                    nameParts = listOfNotNull(row.nameParts1, row.nameParts2, row.nameParts3, row.nameParts4).filter { it.isNotEmpty() },
+                    nameParts = emptyList(),
                     identifiers = listOfNotNull(
                         row.toIdentifierDto(1), row.toIdentifierDto(2), row.toIdentifierDto(3)
                     ),
-                    states = listOfNotNull(
-                        row.toStateDto(1, formatter, errors, index),
-                        row.toStateDto(2, formatter, errors, index)
-                    ),
-                    roles = row.roles.toEnumList(BusinessPartnerRole::valueOf, errors, index + 1, PartnerUploadFileHeader.ROLES),
-                    isOwnCompanyData = row.isOwnCompanyData?.toBoolean() ?: false,
+                    states = emptyList(),
+                    roles = emptyList(),
+                    isOwnCompanyData = true,
                     // Legal entity's business partner number is nothing but tenant's partner number who is performing business partner upload action
                     legalEntity = LegalEntityRepresentationInputDto(legalEntityBpn = tenantBpnl?.takeIf { it.isNotEmpty() }),
-                    site = row.toSiteRepresentationInputDto(formatter, errors, index),
-                    address = row.toAddressRepresentationInputDto(formatter, errors, index)
+                    site = row.toSiteRepresentationInputDto(formatter, errors, index, row.externalId.orEmpty()),
+                    address = row.toAddressRepresentationInputDto(formatter, errors, index, row.externalId.orEmpty())
                 )
             } catch (e: Exception) {
-                errors.add("Row ${index + 1} has error: ${e.message}")
+                errors.add("Row - ${index + 2}, External ID - ${row.externalId.orEmpty()} has error: ${e.message}")
                 null
             }
         }
@@ -115,16 +111,16 @@ object PartnerFileUtil {
         externalIdSet: MutableSet<String?>
     ) {
         val violations = validator.validate(row)
-        logger.debug { "Validating row ${index + 1}: $row" }
+        logger.debug { "Validating Row ${index + 2}: $row" }
         if (violations.isNotEmpty()) {
             val violationMessages = violations.joinToString("; ") { it.message }
-            errors.add("Row ${index + 1} has error: $violationMessages")
+            errors.add("Row - ${index + 2}, External ID - ${row.externalId.orEmpty()} has error: $violationMessages")
         }
 
         if (row.externalId.isNullOrBlank()) {
-            errors.add("Row ${index + 1} has error: Column 'externalId' is null or blank.")
+            errors.add("Row - ${index + 2} has error: Column 'externalId' is missing and can not be empty or blank.")
         } else if (!externalIdSet.add(row.externalId)) {
-            errors.add("Row ${index + 1} has error: Column 'externalId' already exists.")
+            errors.add("Row - ${index + 2}, External ID - ${row.externalId} has error: Column 'externalId' already exists.")
         }
     }
 
@@ -152,39 +148,11 @@ object PartnerFileUtil {
         else BusinessPartnerIdentifierDto(type, value, issuingBody)
     }
 
-    private fun PartnerUploadFileRow.toStateDto(
-        index: Int,
-        formatter: DateTimeFormatter,
-        errors: MutableList<String>,
-        rowIndex: Int
-    ): BusinessPartnerStateDto? {
-        val validFrom = when (index) {
-            1 -> statesValidFrom1
-            2 -> statesValidFrom2
-            else -> null
-        }
-        val validTo = when (index) {
-            1 -> statesValidTo1
-            2 -> statesValidTo2
-            else -> null
-        }
-        val type = when (index) {
-            1 -> statesType1
-            2 -> statesType2
-            else -> null
-        }
-        if (validFrom.isNullOrEmpty() && validTo.isNullOrEmpty() && type.isNullOrEmpty()) return null
-        return BusinessPartnerStateDto(
-            validFrom = validFrom?.let { parseDate(it, formatter, errors, rowIndex + 1, "states$index.validFrom") },
-            validTo = validTo?.let { parseDate(it, formatter, errors, rowIndex + 1, "states$index.validTo") },
-            type = type?.let { parseEnum(it, BusinessStateType::valueOf, errors, rowIndex + 1, "states$index.type") }
-        )
-    }
-
     private fun PartnerUploadFileRow.toSiteRepresentationInputDto(
         formatter: DateTimeFormatter,
         errors: MutableList<String>,
-        rowIndex: Int
+        rowIndex: Int,
+        externalId: String
     ): SiteRepresentationInputDto {
         return SiteRepresentationInputDto(
             siteBpn = siteBpn?.takeIf { it.isNotEmpty() },
@@ -192,9 +160,9 @@ object PartnerFileUtil {
             states = listOfNotNull(
                 if (!siteStatesValidFrom.isNullOrEmpty() && !siteStatesValidTo.isNullOrEmpty() && !siteStatesType.isNullOrEmpty())
                     BusinessPartnerStateDto(
-                        validFrom = parseDate(siteStatesValidFrom, formatter, errors, rowIndex + 1, PartnerUploadFileHeader.SITE_STATES_VALID_FROM),
-                        validTo = parseDate(siteStatesValidTo, formatter, errors, rowIndex + 1, PartnerUploadFileHeader.SITE_STATES_VALID_TO),
-                        type = parseEnum(siteStatesType, BusinessStateType::valueOf, errors, rowIndex + 1, PartnerUploadFileHeader.SITE_STATES_TYPE)
+                        validFrom = parseDate(siteStatesValidFrom, formatter, errors, rowIndex + 2, externalId, PartnerUploadFileHeader.SITE_STATES_VALID_FROM),
+                        validTo = parseDate(siteStatesValidTo, formatter, errors, rowIndex + 2, externalId, PartnerUploadFileHeader.SITE_STATES_VALID_TO),
+                        type = parseEnum(siteStatesType, BusinessStateType::valueOf, errors, rowIndex + 2, externalId, PartnerUploadFileHeader.SITE_STATES_TYPE)
                     ) else null
             )
         )
@@ -203,19 +171,28 @@ object PartnerFileUtil {
     private fun PartnerUploadFileRow.toAddressRepresentationInputDto(
         formatter: DateTimeFormatter,
         errors: MutableList<String>,
-        rowIndex: Int
+        rowIndex: Int,
+        externalId: String
     ): AddressRepresentationInputDto {
+        val validAddressTypes = setOf(AddressType.SiteMainAddress, AddressType.AdditionalAddress)
+
         return AddressRepresentationInputDto(
             addressBpn = addressBpn?.takeIf { it.isNotEmpty() },
             name = addressName?.takeIf { it.isNotEmpty() },
-            addressType = addressType?.let { parseEnum(it, AddressType::valueOf, errors, rowIndex + 1, PartnerUploadFileHeader.ADDRESS_TYPE) },
+            addressType = addressType?.let {
+                val parsedAddressType = parseEnum(it, AddressType::valueOf, errors, rowIndex + 2, externalId, PartnerUploadFileHeader.ADDRESS_TYPE)
+                if (parsedAddressType !in validAddressTypes) {
+                    errors.add("Row - ${rowIndex + 2}, External ID - $externalId has error: Invalid address type. Only 'SiteMainAddress' and 'AdditionalAddress' are allowed.")
+                }
+                parsedAddressType
+            },
             physicalPostalAddress = PhysicalPostalAddressDto(
                 geographicCoordinates = GeoCoordinateDto(
                     longitude = physicalPostalAddressLongitude?.toDoubleOrNull() ?: 0.0,
                     latitude = physicalPostalAddressLatitude?.toDoubleOrNull() ?: 0.0,
                     altitude = physicalPostalAddressAltitude?.toDoubleOrNull() ?: 0.0
                 ),
-                country = physicalPostalAddressCountry?.let { parseEnum(it, CountryCode::valueOf, errors, rowIndex + 1, PartnerUploadFileHeader.PHYSICAL_POSTAL_ADDRESS_COUNTRY) },
+                country = physicalPostalAddressCountry?.let { parseEnum(it, CountryCode::valueOf, errors, rowIndex + 2, externalId, PartnerUploadFileHeader.PHYSICAL_POSTAL_ADDRESS_COUNTRY) },
                 administrativeAreaLevel1 = physicalPostalAddressAdminArea1?.takeIf { it.isNotEmpty() },
                 administrativeAreaLevel2 = physicalPostalAddressAdminArea2?.takeIf { it.isNotEmpty() },
                 administrativeAreaLevel3 = physicalPostalAddressAdminArea3?.takeIf { it.isNotEmpty() },
@@ -245,16 +222,17 @@ object PartnerFileUtil {
                     latitude = alternativePostalAddressLatitude?.toDoubleOrNull() ?: 0.0,
                     altitude = alternativePostalAddressAltitude?.toDoubleOrNull() ?: 0.0
                 ),
-                country = alternativePostalAddressCountry?.let { parseEnum(it, CountryCode::valueOf, errors, rowIndex + 1, PartnerUploadFileHeader.ALTERNATIVE_POSTAL_ADDRESS_COUNTRY) },
+                country = alternativePostalAddressCountry?.takeIf { it.isNotBlank() }?.let { parseEnum(it, CountryCode::valueOf, errors, rowIndex + 2, externalId, PartnerUploadFileHeader.ALTERNATIVE_POSTAL_ADDRESS_COUNTRY) },
                 administrativeAreaLevel1 = alternativePostalAddressAdminArea1?.takeIf { it.isNotEmpty() },
                 postalCode = alternativePostalAddressPostalCode?.takeIf { it.isNotEmpty() },
                 city = alternativePostalAddressCity?.takeIf { it.isNotEmpty() },
-                deliveryServiceType = alternativePostalAddressDeliveryServiceType?.let {
+                deliveryServiceType = alternativePostalAddressDeliveryServiceType?.takeIf { it.isNotBlank() }?.let {
                     parseEnum(
                         it,
                         DeliveryServiceType::valueOf,
                         errors,
-                        rowIndex + 1,
+                        rowIndex + 2,
+                        externalId,
                         PartnerUploadFileHeader.ALTERNATIVE_POSTAL_ADDRESS_DELIVERY_SERVICE_TYPE
                     )
                 },
@@ -264,38 +242,29 @@ object PartnerFileUtil {
             states = listOfNotNull(
                 if (!addressStatesValidFrom.isNullOrEmpty() && !addressStatesValidTo.isNullOrEmpty() && !addressStatesType.isNullOrEmpty())
                     BusinessPartnerStateDto(
-                        validFrom = parseDate(addressStatesValidFrom, formatter, errors, rowIndex + 1, PartnerUploadFileHeader.ADDRESS_STATES_VALID_FROM),
-                        validTo = parseDate(addressStatesValidTo, formatter, errors, rowIndex + 1, PartnerUploadFileHeader.ADDRESS_STATES_VALID_TO),
-                        type = parseEnum(addressStatesType, BusinessStateType::valueOf, errors, rowIndex + 1, PartnerUploadFileHeader.ADDRESS_STATES_TYPE)
+                        validFrom = parseDate(addressStatesValidFrom, formatter, errors, rowIndex + 2, externalId, PartnerUploadFileHeader.ADDRESS_STATES_VALID_FROM),
+                        validTo = parseDate(addressStatesValidTo, formatter, errors, rowIndex + 2, externalId, PartnerUploadFileHeader.ADDRESS_STATES_VALID_TO),
+                        type = parseEnum(addressStatesType, BusinessStateType::valueOf, errors, rowIndex + 2, externalId, PartnerUploadFileHeader.ADDRESS_STATES_TYPE)
                     ) else null
             )
         )
     }
 
-    private fun parseDate(dateString: String?, formatter: DateTimeFormatter, errors: MutableList<String>, rowIndex: Int, fieldName: String): LocalDateTime? {
+    private fun parseDate(dateString: String?, formatter: DateTimeFormatter, errors: MutableList<String>, rowIndex: Int, externalId: String, fieldName: String): LocalDateTime? {
         return try {
             dateString?.let { LocalDateTime.parse(it, formatter) }
         } catch (e: DateTimeParseException) {
-            errors.add("Row $rowIndex has error: Invalid date format in field '$fieldName'.")
+            errors.add("Row - $rowIndex, External ID - $externalId has error: Invalid date format in field '$fieldName'.")
             null
         }
     }
 
-    private fun <T : Enum<T>> parseEnum(value: String?, enumValueOf: (String) -> T, errors: MutableList<String>, rowIndex: Int, fieldName: String): T? {
+    private fun <T : Enum<T>> parseEnum(value: String?, enumValueOf: (String) -> T, errors: MutableList<String>, rowIndex: Int, externalId: String, fieldName: String): T? {
         return try {
             value?.let { enumValueOf(it) }
         } catch (e: IllegalArgumentException) {
-            errors.add("Row $rowIndex has error: Invalid enum value in field '$fieldName'.")
+            errors.add("Row - $rowIndex, External ID - $externalId has error: Invalid enum value in field '$fieldName'.")
             null
-        }
-    }
-
-    private fun <T : Enum<T>> String?.toEnumList(enumValueOf: (String) -> T, errors: MutableList<String>, rowIndex: Int, fieldName: String): List<T> {
-        return try {
-            this?.split(",")?.map { enumValueOf(it.trim()) } ?: emptyList()
-        } catch (e: IllegalArgumentException) {
-            errors.add("Row $rowIndex has error: Invalid enum value in field '$fieldName'.")
-            emptyList()
         }
     }
 

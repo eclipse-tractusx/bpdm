@@ -335,6 +335,32 @@ object BusinessPartnerVerboseValues {
 
     )
 
+    val bpUploadRequestFull = BusinessPartnerInputRequest(
+        externalId = externalId1,
+        nameParts = emptyList(),
+        isOwnCompanyData = true,
+        identifiers = listOf(bpIdentifier1, bpIdentifier2, bpIdentifier3),
+        states = emptyList(),
+        roles = emptyList(),
+        legalEntity = LegalEntityRepresentationInputDto(
+            legalEntityBpn = "BPNL0000000000XY",
+            shortName = "short1",
+            legalName = "Limited Liability Company Name",
+            legalForm = "Limited Liability Company"
+        ),
+        site = SiteRepresentationInputDto(
+            siteBpn = null,
+            name = "Site Name"
+        ),
+        address = AddressRepresentationInputDto(
+            addressBpn = "BPNA0000000001XY",
+            name = "Address Name",
+            addressType = AddressType.SiteMainAddress,
+            physicalPostalAddress = postalAddress2,
+            alternativePostalAddress = alternativeAddressFull
+        )
+    )
+
     //New Values for Logistic Addresses Tests
     val postalAddressLogisticAddress1 = PhysicalPostalAddressDto(
         geographicCoordinates = GeoCoordinateDto(13.178, 48.946),
