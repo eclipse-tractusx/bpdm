@@ -43,6 +43,10 @@ class GateOutputFactory(
         confidenceLevel = 0
     )
 
+    fun createOutput(fromSeed: String, externalId: String = fromSeed): BusinessPartnerOutputDto{
+        return createOutput(gateInputTestDataFactory.createFullValid(fromSeed, externalId))
+    }
+
     fun createOutput(
         fromInput: BusinessPartnerInputRequest
     ): BusinessPartnerOutputDto{

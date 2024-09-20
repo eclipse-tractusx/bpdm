@@ -40,12 +40,15 @@ class GateInputFactory(
     private val testMetadata: TestMetadata,
     private val testRunData: TestRunData
 ) {
-
     val genericFullValidWithSiteWithoutAnyBpn = createAllFieldsFilled("genericFullValidWithSiteWithoutAnyBpn")
         { it.withoutAnyBpn().withAddressType(null) }
 
     fun createAllFieldsFilled(seed: String, transform: (BusinessPartnerInputRequest) -> BusinessPartnerInputRequest = {it}): InputTestData {
         return InputTestData(seed, transform(SeededTestDataCreator(seed).createAllFieldsFilled()))
+    }
+
+    fun createFullValid(seed: String, externalId: String = seed): BusinessPartnerInputRequest {
+        return SeededTestDataCreator(seed).createAllFieldsFilled().copy(externalId = testRunData.toExternalId(externalId))
     }
 
     inner class SeededTestDataCreator(

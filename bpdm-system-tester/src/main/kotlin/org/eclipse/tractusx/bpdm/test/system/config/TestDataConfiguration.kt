@@ -19,12 +19,14 @@
 
 package org.eclipse.tractusx.bpdm.test.system.config
 
+import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
 import org.eclipse.tractusx.bpdm.test.system.utils.GateInputFactory
 import org.eclipse.tractusx.bpdm.test.system.utils.GateOutputFactory
+import org.eclipse.tractusx.bpdm.test.system.utils.StepUtils
 import org.eclipse.tractusx.bpdm.test.system.utils.TestMetadata
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -93,5 +95,10 @@ class TestDataConfiguration {
     @Bean
     fun testRunData(): TestRunData {
         return TestRunData(Instant.now())
+    }
+
+    @Bean
+    fun stepUtils(testRunData: TestRunData, gateClient: GateClient): StepUtils{
+        return StepUtils(gateClient)
     }
 }

@@ -23,4 +23,6 @@ import java.time.Instant
 
 data class TestRunData (
     val testTime: Instant
-)
+){
+    fun toExternalId(seed: String): String = "${seed}_$testTime"
+}
