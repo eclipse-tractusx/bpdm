@@ -110,7 +110,7 @@ class CleaningServiceDummy(
                     bpnReference = bpnReference.toRequestIfNotBpn(businessPartner.legalEntityReference()),
                     legalName = legalName ?: businessPartner.uncategorized.nameParts.takeIf { it.isNotEmpty() }?.joinToString(" "),
                     identifiers = identifiers.takeIf { it.isNotEmpty() } ?: businessPartner.uncategorized.identifiers,
-                    states = states.takeIf { it.isNotEmpty() } ?: businessPartner.uncategorized.states,
+                    states = states,
                     confidenceCriteria = dummyConfidenceCriteria.copy(sharedByOwner = sharedByOwner),
                     hasChanged = businessPartner.type == GoldenRecordType.LegalEntity,
                     isCatenaXMemberData = sharedByOwner,

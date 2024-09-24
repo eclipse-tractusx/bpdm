@@ -40,7 +40,7 @@ class BusinessPartnerMappings {
             externalId = entity.sharingState.externalId,
             nameParts = entity.nameParts,
             identifiers = entity.identifiers.map(::toIdentifierDto),
-            states = entity.states.map(::toStateDto),
+            states = entity.states.filter { it.businessPartnerTyp == BusinessPartnerType.GENERIC }.map(::toStateDto),
             roles = entity.roles,
             isOwnCompanyData = entity.isOwnCompanyData,
             legalEntity = toLegalEntityComponentInputDto(entity),
