@@ -55,16 +55,16 @@
         <maven.compiler.target>21</maven.compiler.target>
         <spring-boot.version>3.2.5</spring-boot.version>
         <kotlin.version>1.9.24</kotlin.version>
-        <springdoc.version>2.5.0</springdoc.version>
+        <springdoc.version>2.6.0</springdoc.version>
         <nv-i18n.version>1.29</nv-i18n.version>
         <kotlin-logging.version>3.0.5</kotlin-logging.version>
         <common-csv.version>1.11.0</common-csv.version>
         <wiremock.version>2.35.2</wiremock.version>
         <springmockk.version>4.0.2</springmockk.version>
         <opencsv.version>5.9</opencsv.version>
-        <testcontainers-bom.version>1.19.8</testcontainers-bom.version>
+        <testcontainers-bom.version>1.20.0</testcontainers-bom.version>
         <testcontainers-keycloak.version>3.2.0</testcontainers-keycloak.version>
-        <flatten-maven.version>1.1.0</flatten-maven.version>
+        <flatten-maven.version>1.6.0</flatten-maven.version>
         <license-tool.version>1.1.0</license-tool.version>
         <assertj.version>3.24.2</assertj.version>
     </properties>
