@@ -32,6 +32,6 @@ interface IBaseBusinessPartnerGateDto : IBaseBusinessPartnerDto {
     val isOwnCompanyData: Boolean
 
     @get:Schema(description = "The timestamp indicates the last time point of change from the user side")
-    val currentness: String?
+    val externalSequenceTimestamp: String?
 }
 

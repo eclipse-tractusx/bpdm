@@ -72,9 +72,9 @@ object BusinessPartnerVerboseValues {
     const val businessStatusDescription1 = "Active"
     const val businessStatusDescription2 = "Insolvent"
 
-    val currentness1 = "2024-06-28 11:59:00"
-    val currentness2 = "2024-06-28 12:00:00"
-    val currentness3 = "2024-06-28 12:01:00"
+    val externalSequenceTimestamp1 = "2024-06-28 11:59:00"
+    val externalSequenceTimestamp2 = "2024-06-28 12:00:00"
+    val externalSequenceTimestamp3 = "2024-06-28 12:01:00"
 
     val businessStatusValidFrom1 = LocalDateTime.of(2020, 1, 1, 0, 0)
     val businessStatusValidFrom2 = LocalDateTime.of(2019, 1, 1, 0, 0)
@@ -336,7 +336,7 @@ object BusinessPartnerVerboseValues {
             physicalPostalAddress = postalAddress2,
             alternativePostalAddress = alternativeAddressFull
         ),
-        currentness = null
+        externalSequenceTimestamp = null
 
     )
 
@@ -637,7 +637,7 @@ object BusinessPartnerVerboseValues {
             physicalPostalAddress = physicalAddressChina,
             alternativePostalAddress = AlternativePostalAddressDto()
         ),
-        currentness = null
+        externalSequenceTimestamp = null
     )
 
     val bpInputRequestCleaned = BusinessPartnerInputRequest(
@@ -666,7 +666,7 @@ object BusinessPartnerVerboseValues {
             physicalPostalAddress = postalAddress2,
             alternativePostalAddress = alternativeAddressFull
         ),
-        currentness = null
+        externalSequenceTimestamp = null
     )
 
     val bpInputRequestError = BusinessPartnerInputRequest(
@@ -695,7 +695,7 @@ object BusinessPartnerVerboseValues {
             physicalPostalAddress = postalAddress2,
             alternativePostalAddress = alternativeAddressFull
         ),
-        currentness = null
+        externalSequenceTimestamp = null
     )
 
     val bpOutputDtoCleaned = BusinessPartnerOutputDto(
@@ -810,7 +810,7 @@ object BusinessPartnerVerboseValues {
         updatedAt = Instant.now()
     )
 
-    val bpInputRequestWithCurrentness1 = BusinessPartnerInputRequest(
+    val bpInputRequestWithExternalSequenceTimestamp1 = BusinessPartnerInputRequest(
         externalId = externalId1,
         legalEntity = LegalEntityRepresentationInputDto(
             legalEntityBpn = "BPNL0000000000XY",
@@ -824,11 +824,11 @@ object BusinessPartnerVerboseValues {
             addressType = null,
             physicalPostalAddress = physicalAddressMinimal
         ),
-        currentness = currentness1
+        externalSequenceTimestamp = externalSequenceTimestamp1
 
     )
 
-    val bpInputRequestWithCurrentness2 = BusinessPartnerInputRequest(
+    val bpInputRequestWithExternalSequenceTimestamp2 = BusinessPartnerInputRequest(
         externalId = externalId1,
         legalEntity = LegalEntityRepresentationInputDto(
             legalEntityBpn = "BPNL0000000000XY",
@@ -842,11 +842,11 @@ object BusinessPartnerVerboseValues {
             addressType = null,
             physicalPostalAddress = physicalAddressMinimal
         ),
-        currentness = currentness2
+        externalSequenceTimestamp = externalSequenceTimestamp2
 
     )
 
-    val bpInputRequestWithCurrentness3 = BusinessPartnerInputRequest(
+    val bpInputRequestWithExternalSequenceTimestamp3 = BusinessPartnerInputRequest(
         externalId = externalId1,
         legalEntity = LegalEntityRepresentationInputDto(
             legalEntityBpn = "BPNL0000000000XY",
@@ -860,7 +860,7 @@ object BusinessPartnerVerboseValues {
             addressType = null,
             physicalPostalAddress = physicalAddressMinimal
         ),
-        currentness = currentness3
+        externalSequenceTimestamp = externalSequenceTimestamp3
 
     )
 

@@ -93,7 +93,7 @@ object PartnerFileUtil {
                     legalEntity = LegalEntityRepresentationInputDto(legalEntityBpn = tenantBpnl?.takeIf { it.isNotEmpty() }),
                     site = row.toSiteRepresentationInputDto(formatter, errors, index),
                     address = row.toAddressRepresentationInputDto(formatter, errors, index),
-                    currentness = null
+                    externalSequenceTimestamp = null
 
                 )
             } catch (e: Exception) {

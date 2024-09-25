@@ -90,7 +90,7 @@ class BusinessPartnerMappings {
             bpnA = dto.address.addressBpn,
             postalAddress = toPostalAddress(dto.address),
             currentness = try {
-                getTimestampToInstant(dto.currentness)
+                getTimestampToInstant(dto.externalSequenceTimestamp)
             } catch (e: Exception) {
                 null
             },
