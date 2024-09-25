@@ -59,6 +59,7 @@ class BusinessPartnerCopyUtil {
             validFrom = fromState.validFrom
             validTo = fromState.validTo
             type = fromState.type
+            businessPartnerTyp = fromState.businessPartnerTyp
         }
 
     private fun copyValues(fromClassification: ClassificationDb, toClassification: ClassificationDb) =
@@ -73,6 +74,7 @@ class BusinessPartnerCopyUtil {
             type = fromIdentifier.type
             value = fromIdentifier.value
             issuingBody = fromIdentifier.issuingBody
+            businessPartnerType = fromIdentifier.businessPartnerType
         }
 
     private fun copyValues(fromPostalAddress: PostalAddressDb, toPostalAddress: PostalAddressDb) =
