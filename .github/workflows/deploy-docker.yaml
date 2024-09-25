@@ -67,7 +67,7 @@ jobs:
         id: dockerTags
         run: |
           FULL_IMAGE_NAME="${{ env.IMAGE_NAMESPACE }}/${{ env.IMAGE_NAME }}"
-          SUFFIX="${{ steps.semVer.outputs.prerelease == 'SNAPSHOT' && '-SNAPSHOT' || '' }}"
+          SUFFIX="${{ steps.semVer.outputs.prerelease &&  '-' || '' }}${{ steps.semVer.outputs.prerelease }}"
           MAJOR="${{ steps.semVer.outputs.major }}"
           MINOR="${MAJOR}.${{ steps.semVer.outputs.minor }}"
           PATCH="${MINOR}.${{ steps.semVer.outputs.patch }}"
@@ -75,7 +75,17 @@ jobs:
           MAJOR_TAG="${FULL_IMAGE_NAME}:${MAJOR}${SUFFIX}"
           MINOR_TAG="${FULL_IMAGE_NAME}:${MINOR}${SUFFIX}"
           PATCH_TAG="${FULL_IMAGE_NAME}:${PATCH}${SUFFIX}"
-          echo "tags=${LATEST_TAG},${MAJOR_TAG},${MINOR_TAG},${PATCH_TAG}" >> $GITHUB_OUTPUT
+          if ${{ steps.semVer.outputs.prerelease == 'SNAPSHOT' &&  true || false }}; then 
+            ALL_TAGS="${LATEST_TAG},${PATCH_TAG}" 
+          else 
+             if ${{ steps.semVer.outputs.prerelease &&  true || false }}; then
+               ALL_TAGS="${PATCH_TAG}" 
+             else
+               ALL_TAGS="${LATEST_TAG},${MAJOR_TAG},${MINOR_TAG},${PATCH_TAG}"
+             fi
+          fi
+          echo "tags=${ALL_TAGS}" >> $GITHUB_OUTPUT
+          echo "tags=${ALL_TAGS}"
 
       - name: DockerHub login
         uses: docker/login-action@v3

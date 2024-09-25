@@ -84,7 +84,13 @@ class PoolDataHelper(
         val longSeed = seed.hashCode().toLong()
         val random = Random(longSeed)
         return IdentifierTypeDto(
-            seed, type, "Identifier Name $seed", listOf(
+            technicalKey = seed,
+            businessPartnerType = type,
+            name = "Identifier Name $seed",
+            abbreviation = "Identifier Abbreviation $seed",
+            transliteratedName = "Identifier Transliterated Name $seed",
+            transliteratedAbbreviation = "Identifier Transliterated Abbreviation $seed",
+            listOf(
                 IdentifierTypeDetailDto(country = CountryCode.entries.random(random), false),
                 IdentifierTypeDetailDto(country = CountryCode.entries.random(random), false)
             )

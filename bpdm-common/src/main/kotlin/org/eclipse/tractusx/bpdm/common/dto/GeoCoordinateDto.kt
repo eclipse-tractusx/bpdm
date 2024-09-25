@@ -26,11 +26,11 @@ import org.eclipse.tractusx.bpdm.common.dto.openapidescription.PostalAddressDesc
 data class GeoCoordinateDto(
 
     @get:Schema(description = "Longitude coordinate")
-    val longitude: Float,
+    val longitude: Double,
 
     @get:Schema(description = "Latitude coordinate")
-    val latitude: Float,
+    val latitude: Double,
     
     @get:Schema(description = "Altitude, if applicable")
-    val altitude: Float? = null
+    val altitude: Double? = null
 )

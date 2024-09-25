@@ -21,9 +21,9 @@ package org.eclipse.tractusx.bpdm.pool.service
 
 import org.eclipse.tractusx.bpdm.pool.entity.BpnRequestIdentifierMappingDb
 import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
+import org.eclipse.tractusx.orchestrator.api.model.BpnReference
 import org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType
 import org.eclipse.tractusx.orchestrator.api.model.TaskStepReservationEntryDto
-import org.eclipse.tractusx.orchestrator.api.model.BpnReference
 
 class TaskEntryBpnMapping(taskEntries: List<TaskStepReservationEntryDto>, bpnRequestIdentifierRepository: BpnRequestIdentifierRepository) {
 
@@ -41,9 +41,10 @@ class TaskEntryBpnMapping(taskEntries: List<TaskStepReservationEntryDto>, bpnReq
                 taskEntries.mapNotNull { it.businessPartner.site?.bpnReference } +
                 taskEntries.mapNotNull { it.businessPartner.site?.siteMainAddress?.bpnReference } +
                 taskEntries.mapNotNull { it.businessPartner.additionalAddress?.bpnReference }
-                    .filter { it.referenceValue == null || it.referenceType == null }
 
-        val usedRequestIdentifiers: Collection<String> = references
+        val filledReferences = references.filter { it.referenceValue != null && it.referenceType != null }
+
+        val usedRequestIdentifiers: Collection<String> = filledReferences
             .filter { it.referenceType == BpnReferenceType.BpnRequestIdentifier }
             .map { it.referenceValue!! }
 

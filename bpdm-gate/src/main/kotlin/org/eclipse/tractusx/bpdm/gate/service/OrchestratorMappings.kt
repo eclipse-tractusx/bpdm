@@ -184,15 +184,15 @@ class OrchestratorMappings(
         } ?: BpnReference.empty
 
     private fun getOwnerBpnL(entity: BusinessPartnerDb): String? {
-        return if (entity.sharingState.tenantBpnl != null) {
-            entity.sharingState.tenantBpnl
-        }else if (entity.isOwnCompanyData) {
-            bpnConfigProperties.ownerBpnL
-        }
-        else {
-            logger.warn { "Owner BPNL property is not configured" }
-            null
-        }
+        //only determine owner BPNL if it is own company data
+        if(!entity.isOwnCompanyData) return null
+
+        return entity.sharingState.tenantBpnl
+                ?: bpnConfigProperties.ownerBpnL.takeIf { it.isNotBlank() }
+                ?: run {
+                    logger.warn { "Owner BPNL can't be determined for owned company data" }
+                    null
+                }
     }
 
 

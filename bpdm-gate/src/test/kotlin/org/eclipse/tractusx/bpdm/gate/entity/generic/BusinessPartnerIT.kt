@@ -132,8 +132,8 @@ internal class BusinessPartnerIT @Autowired constructor(
         assertEquals(savedAddress.id, foundAddress.id)
         assertEquals(AddressType.LegalAddress, foundAddress.addressType)
 
-        assertEquals(10.0f, foundPhysicalPostalAddress?.geographicCoordinates?.altitude)
-        assertEquals(52.0f, foundPhysicalPostalAddress?.geographicCoordinates?.latitude)
+        assertEquals(10.0, foundPhysicalPostalAddress?.geographicCoordinates?.altitude)
+        assertEquals(52.0, foundPhysicalPostalAddress?.geographicCoordinates?.latitude)
         assertEquals("Berlin", foundPhysicalPostalAddress?.city)
     }
 
@@ -152,8 +152,8 @@ internal class BusinessPartnerIT @Autowired constructor(
         assertEquals(savedAddress.id, foundAddress.id)
         assertEquals(AddressType.LegalAddress, foundAddress.addressType)
 
-        assertEquals(15.0f, foundAlternativePostalAddress?.geographicCoordinates?.altitude)
-        assertEquals(52.5f, foundAlternativePostalAddress?.geographicCoordinates?.latitude)
+        assertEquals(15.0, foundAlternativePostalAddress?.geographicCoordinates?.altitude)
+        assertEquals(52.5, foundAlternativePostalAddress?.geographicCoordinates?.latitude)
         assertEquals("Berlin", foundAlternativePostalAddress?.city)
     }
 
@@ -205,9 +205,9 @@ internal class BusinessPartnerIT @Autowired constructor(
     private fun createPhysicalPostalAddress() =
         PhysicalPostalAddressDb(
             geographicCoordinates = GeographicCoordinateDb(
-                altitude = 10.0f,
-                latitude = 52.0f,
-                longitude = 13.0f
+                altitude = 10.0,
+                latitude = 52.0,
+                longitude = 13.0
             ),
             country = CountryCode.DE,
             administrativeAreaLevel1 = "adminlevel1",
@@ -233,9 +233,9 @@ internal class BusinessPartnerIT @Autowired constructor(
     private fun createAlternativePostalAddress() =
         AlternativePostalAddressDb(
             geographicCoordinates = GeographicCoordinateDb(
-                altitude = 15.0f,
-                latitude = 52.5f,
-                longitude = 13.5f
+                altitude = 15.0,
+                latitude = 52.5,
+                longitude = 13.5
             ),
             country = CountryCode.DE,
             administrativeAreaLevel1 = "level1",

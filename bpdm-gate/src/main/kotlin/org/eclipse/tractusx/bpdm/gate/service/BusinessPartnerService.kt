@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
+import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
@@ -83,7 +84,7 @@ class BusinessPartnerService(
 
 
             upsertFromEntity(existingInput, updatedData)
-                .takeIf { it.hadChanges }
+                .takeIf { it.hadChanges || sharingState.sharingStateType == SharingStateType.Error }
                 ?.also { sharingStateService.setInitial(sharingState) }
                 ?.businessPartner
         }
@@ -126,7 +127,8 @@ class BusinessPartnerService(
         val changeType = if (existingPartner == null) ChangelogType.CREATE else ChangelogType.UPDATE
         val partnerToUpsert = existingPartner ?: BusinessPartnerDb.createEmpty(upsertData.sharingState, upsertData.stage)
 
-        val hasChanges = compareUtil.hasChanges(upsertData, partnerToUpsert)
+
+        val hasChanges = changeType == ChangelogType.CREATE || compareUtil.hasChanges(upsertData, partnerToUpsert)
         val shouldUpdate = when {
             upsertData.currentness == null -> true
             existingPartner?.currentness == null -> true

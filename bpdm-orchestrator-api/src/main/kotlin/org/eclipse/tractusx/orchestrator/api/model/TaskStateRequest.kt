@@ -24,5 +24,10 @@ import io.swagger.v3.oas.annotations.media.Schema
 @Schema(description = "Request object for giving a list of task identifiers to search for the state of tasks")
 data class TaskStateRequest(
 
-    val taskIds: List<String>
-)
+    val entries: List<Entry>
+){
+    data class Entry(
+        val taskId: String,
+        val recordId: String
+    )
+}

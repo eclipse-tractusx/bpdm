@@ -26,6 +26,7 @@ import com.github.tomakehurst.wiremock.admin.model.ServeEventQuery
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
+import com.github.tomakehurst.wiremock.stubbing.Scenario
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.cleaning.config.OrchestratorConfigProperties
@@ -58,6 +59,9 @@ class CleaningServiceApiCallsTest @Autowired constructor(
         const val ORCHESTRATOR_RESERVE_TASKS_URL = "${GoldenRecordTaskApi.TASKS_PATH}/step-reservations"
         const val ORCHESTRATOR_RESOLVE_TASKS_URL = "${GoldenRecordTaskApi.TASKS_PATH}/step-results"
 
+        const val RESERVATION_SCENARIO = "Reservation"
+        const val RESERVED_STATE = "Reserved"
+
         @JvmField
         @RegisterExtension
         val orchestratorMockApi: WireMockExtension = WireMockExtension.newInstance()
@@ -80,6 +84,13 @@ class CleaningServiceApiCallsTest @Autowired constructor(
     @BeforeEach
     fun beforeEach() {
         orchestratorMockApi.resetAll()
+
+        orchestratorMockApi.stubFor(
+            post(urlPathEqualTo(ORCHESTRATOR_RESERVE_TASKS_URL))
+                .inScenario(RESERVATION_SCENARIO)
+                .whenScenarioStateIs(RESERVED_STATE)
+                .willReturn(okJson(jacksonObjectMapper.writeValueAsString(TaskStepReservationResponse(emptyList(), Instant.now()))))
+        )
     }
 
     @Test
@@ -358,6 +369,9 @@ class CleaningServiceApiCallsTest @Autowired constructor(
         // Orchestrator reserve
         return orchestratorMockApi.stubFor(
             post(urlPathEqualTo(ORCHESTRATOR_RESERVE_TASKS_URL))
+                .inScenario(RESERVATION_SCENARIO)
+                .whenScenarioStateIs(Scenario.STARTED)
+                .willSetStateTo(RESERVED_STATE)
                 .willReturn(
                     okJson(jacksonObjectMapper.writeValueAsString(createSampleTaskStepReservationResponse(businessPartner)))
                 )

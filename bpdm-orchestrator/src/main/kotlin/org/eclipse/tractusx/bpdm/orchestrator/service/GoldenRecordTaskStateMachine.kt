@@ -44,10 +44,10 @@ class GoldenRecordTaskStateMachine(
         val initialStep = getInitialStep(mode)
         val initProcessingState = GoldenRecordTaskDb.ProcessingState(
             mode = mode,
-            resultState = ResultState.Pending,
+            resultState = GoldenRecordTaskDb.ResultState.Pending,
             step = initialStep,
             errors = mutableListOf(),
-            stepState = StepState.Queued,
+            stepState = GoldenRecordTaskDb.StepState.Queued,
             pendingTimeout =  Instant.now().plus(taskConfigProperties.taskPendingTimeout).toTimestamp(),
             retentionTimeout = null
         )
@@ -65,12 +65,12 @@ class GoldenRecordTaskStateMachine(
         logger.debug { "Executing doReserve() with parameters $task" }
         val state = task.processingState
 
-        if (state.resultState != ResultState.Pending || state.stepState != StepState.Queued) {
+        if (state.resultState != GoldenRecordTaskDb.ResultState.Pending || state.stepState != GoldenRecordTaskDb.StepState.Queued) {
             throw BpdmIllegalStateException(task.uuid, state)
         }
 
         // reserved for current step
-        task.processingState.stepState = StepState.Reserved
+        task.processingState.stepState = GoldenRecordTaskDb.StepState.Reserved
         task.updatedAt = DbTimestamp(Instant.now())
 
         return taskRepository.save(task)
@@ -84,7 +84,7 @@ class GoldenRecordTaskStateMachine(
         logger.debug { "Executing doResolveTaskToSuccess() with parameters $task // $step and $resultBusinessPartner" }
         val state = task.processingState
 
-        if (state.resultState != ResultState.Pending || state.stepState != StepState.Reserved || state.step != step) {
+        if (isResolvableForStep(state, step)) {
             throw BpdmIllegalStateException(task.uuid, state)
         }
 
@@ -108,9 +108,10 @@ class GoldenRecordTaskStateMachine(
         logger.debug { "Executing doResolveTaskToError() with parameters $task // $step and $errors" }
         val state = task.processingState
 
-        if (state.resultState != ResultState.Pending || state.stepState != StepState.Reserved || state.step != step) {
+        if (isResolvableForStep(state, step)) {
             throw BpdmIllegalStateException(task.uuid, state)
         }
+
         task.processingState.toError(errors.map { requestMapper.toTaskError(it) })
         task.updatedAt =  DbTimestamp(Instant.now())
 
@@ -120,7 +121,7 @@ class GoldenRecordTaskStateMachine(
     fun doResolveTaskToTimeout(task: GoldenRecordTaskDb): GoldenRecordTaskDb {
         val state = task.processingState
 
-        if (state.resultState != ResultState.Pending) {
+        if (state.resultState != GoldenRecordTaskDb.ResultState.Pending) {
             throw BpdmIllegalStateException(task.uuid, state)
         }
 
@@ -131,25 +132,42 @@ class GoldenRecordTaskStateMachine(
         return taskRepository.save(task)
     }
 
+    fun doAbortTask(task: GoldenRecordTaskDb): GoldenRecordTaskDb{
+        if(task.processingState.resultState != GoldenRecordTaskDb.ResultState.Pending)
+            throw BpdmIllegalStateException(task.uuid, task.processingState)
+
+        task.processingState.toAborted()
+        task.updatedAt = DbTimestamp(Instant.now())
+
+        return taskRepository.save(task)
+    }
+
     private fun GoldenRecordTaskDb.ProcessingState.toStep(nextStep: TaskStep) {
         step = nextStep
-        stepState = StepState.Queued
+        stepState = GoldenRecordTaskDb.StepState.Queued
     }
 
     private fun GoldenRecordTaskDb.ProcessingState.toSuccess() {
-            resultState = ResultState.Success
-            stepState = StepState.Success
+            resultState = GoldenRecordTaskDb.ResultState.Success
+            stepState = GoldenRecordTaskDb.StepState.Success
             pendingTimeout = null
             retentionTimeout = Instant.now().plus(taskConfigProperties.taskRetentionTimeout).toTimestamp()
 
     }
 
     private fun GoldenRecordTaskDb.ProcessingState.toError(newErrors: List<TaskErrorDb>) {
-            resultState = ResultState.Error
-            stepState = StepState.Error
+            resultState = GoldenRecordTaskDb.ResultState.Error
+            stepState = GoldenRecordTaskDb.StepState.Error
             errors.replace(newErrors)
             pendingTimeout = null
             retentionTimeout = Instant.now().plus(taskConfigProperties.taskRetentionTimeout).toTimestamp()
+    }
+
+    private fun GoldenRecordTaskDb.ProcessingState.toAborted() {
+        resultState = GoldenRecordTaskDb.ResultState.Aborted
+        stepState = GoldenRecordTaskDb.StepState.Aborted
+        pendingTimeout = null
+        retentionTimeout = Instant.now().plus(taskConfigProperties.taskRetentionTimeout).toTimestamp()
     }
 
     private fun getInitialStep(mode: TaskMode): TaskStep {
@@ -168,4 +186,10 @@ class GoldenRecordTaskStateMachine(
             TaskMode.UpdateFromSharingMember -> listOf(TaskStep.CleanAndSync, TaskStep.PoolSync)
             TaskMode.UpdateFromPool -> listOf(TaskStep.Clean)
         }
+
+    private fun isResolvableForStep(state: GoldenRecordTaskDb.ProcessingState, step: TaskStep): Boolean{
+        return state.resultState != GoldenRecordTaskDb.ResultState.Pending
+                || state.stepState != GoldenRecordTaskDb.StepState.Reserved
+                || state.step != step
+    }
 }

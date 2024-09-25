@@ -92,7 +92,7 @@ fun IdentifierTypeDb.toTypeKeyNameDto(): TypeKeyNameVerboseDto<String> {
 }
 
 fun IdentifierTypeDb.toDto(): IdentifierTypeDto {
-    return IdentifierTypeDto(technicalKey, businessPartnerType, name,
+    return IdentifierTypeDto(technicalKey, businessPartnerType, name, abbreviation, transliteratedName, transliteratedAbbreviation,
         details.map { IdentifierTypeDetailDto(it.countryCode, it.mandatory) })
 }
 

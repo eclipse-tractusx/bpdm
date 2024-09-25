@@ -238,13 +238,13 @@ object BusinessPartnerVerboseValues {
         deliveryServiceType = DeliveryServiceType.PO_BOX,
         deliveryServiceQualifier = "DHL",
         deliveryServiceNumber = "1234",
-        geographicCoordinates = GeoCoordinateDto(7.619f, 45.976f, 4478f),
+        geographicCoordinates = GeoCoordinateDto(7.619, 45.976, 4478.0),
         postalCode = "70547",
         administrativeAreaLevel1 = "adminAreaLevel1RegionCode_2",
     )
 
     val postalAddress1 = PhysicalPostalAddressDto(
-        geographicCoordinates = GeoCoordinateDto(13.178f, 48.946f),
+        geographicCoordinates = GeoCoordinateDto(13.178, 48.946),
         country = CountryCode.DE,
         postalCode = "70546 ",
         city = "Stuttgart",
@@ -261,7 +261,7 @@ object BusinessPartnerVerboseValues {
     )
 
     val postalAddress2 = PhysicalPostalAddressDto(
-        geographicCoordinates = GeoCoordinateDto(7.619f, 45.976f, 4478f),
+        geographicCoordinates = GeoCoordinateDto(7.619, 45.976, 4478.0),
         country = CountryCode.US,
         postalCode = "70547",
         city = "Atlanta",
@@ -278,7 +278,7 @@ object BusinessPartnerVerboseValues {
     )
 
     val postalAddress3 = PhysicalPostalAddressDto(
-        geographicCoordinates = GeoCoordinateDto(13.178f, 48.946f),
+        geographicCoordinates = GeoCoordinateDto(13.178, 48.946),
         country = CountryCode.DE,
         postalCode = "70546 ",
         city = "Stuttgart",
@@ -340,9 +340,35 @@ object BusinessPartnerVerboseValues {
 
     )
 
+    val bpUploadRequestFull = BusinessPartnerInputRequest(
+        externalId = externalId1,
+        nameParts = emptyList(),
+        isOwnCompanyData = true,
+        identifiers = listOf(bpIdentifier1, bpIdentifier2, bpIdentifier3),
+        states = emptyList(),
+        roles = emptyList(),
+        legalEntity = LegalEntityRepresentationInputDto(
+            legalEntityBpn = "BPNL0000000000XY",
+            shortName = "short1",
+            legalName = "Limited Liability Company Name",
+            legalForm = "Limited Liability Company"
+        ),
+        site = SiteRepresentationInputDto(
+            siteBpn = null,
+            name = "Site Name"
+        ),
+        address = AddressRepresentationInputDto(
+            addressBpn = "BPNA0000000001XY",
+            name = "Address Name",
+            addressType = AddressType.SiteMainAddress,
+            physicalPostalAddress = postalAddress2,
+            alternativePostalAddress = alternativeAddressFull
+        )
+    )
+
     //New Values for Logistic Addresses Tests
     val postalAddressLogisticAddress1 = PhysicalPostalAddressDto(
-        geographicCoordinates = GeoCoordinateDto(13.178f, 48.946f),
+        geographicCoordinates = GeoCoordinateDto(13.178, 48.946),
         country = CountryCode.DE,
         postalCode = "70546 ",
         city = "Stuttgart",
@@ -359,7 +385,7 @@ object BusinessPartnerVerboseValues {
     )
 
     val postalAddressLogisticAddress2 = PhysicalPostalAddressDto(
-        geographicCoordinates = GeoCoordinateDto(7.619f, 45.976f, 4478f),
+        geographicCoordinates = GeoCoordinateDto(7.619, 45.976, 4478.0),
         country = CountryCode.US,
         postalCode = "70547",
         city = "Atlanta",
@@ -760,7 +786,7 @@ object BusinessPartnerVerboseValues {
             name = "Address Name",
             addressType = AddressType.AdditionalAddress,
             physicalPostalAddress = PhysicalPostalAddressDto(
-                geographicCoordinates = GeoCoordinateDto(0.5f, 0.5f, 0.5f),
+                geographicCoordinates = GeoCoordinateDto(0.5, 0.5, 0.5),
                 country = CountryCode.PT,
                 administrativeAreaLevel1 = "PT-PT",
                 administrativeAreaLevel2 = "pt-admin-level-2-cleaned",
@@ -784,10 +810,11 @@ object BusinessPartnerVerboseValues {
                 industrialZone = "industrial-zone",
                 building = "building",
                 floor = "floor",
-                door = "door"
+                door = "door",
+                taxJurisdictionCode = "123"
             ),
             alternativePostalAddress = AlternativePostalAddressDto(
-                geographicCoordinates = GeoCoordinateDto(0.6f, 0.6f, 0.6f),
+                geographicCoordinates = GeoCoordinateDto(0.6, 0.6, 0.6),
                 country = CountryCode.PT,
                 administrativeAreaLevel1 = "PT-PT",
                 postalCode = "postal-code-cleaned",

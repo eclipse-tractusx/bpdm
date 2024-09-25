@@ -86,7 +86,7 @@ class PartnerUploadControllerIT @Autowired constructor(
         val uploadedFile = MockMultipartFile("valid_partner_data.csv", "valid_partner_data.csv", "text/csv", bytes)
 
         // Only Site and Address expected to be updated from upload partner process.
-        val expectedSiteAndAddressPartner = BusinessPartnerVerboseValues.bpInputRequestFull.copy(
+        val expectedSiteAndAddressPartner = BusinessPartnerVerboseValues.bpUploadRequestFull.copy(
             legalEntity = LegalEntityRepresentationInputDto(
                 legalEntityBpn = KeyCloakInitializer.TENANT_BPNL,
                 legalName = null,
@@ -130,7 +130,7 @@ class PartnerUploadControllerIT @Autowired constructor(
         val combinedFile = MockMultipartFile("combined_partner_data.csv", "combined_partner_data.csv", "text/csv", combinedCsv.toByteArray())
         val uploadResponse = gateClient.partnerUpload.uploadPartnerCsvFile(combinedFile).body!!
 
-        val expectedSiteAndAddressPartner = BusinessPartnerVerboseValues.bpInputRequestFull.copy(
+        val expectedSiteAndAddressPartner = BusinessPartnerVerboseValues.bpUploadRequestFull.copy(
             legalEntity = LegalEntityRepresentationInputDto(
                 legalEntityBpn = KeyCloakInitializer.TENANT_BPNL,
                 legalName = null,

@@ -25,9 +25,9 @@ import jakarta.persistence.Embeddable
 @Embeddable
 data class GeographicCoordinateDb(
     @Column(name = "latitude")
-    val latitude: Float,
+    val latitude: Double,
     @Column(name = "longitude")
-    val longitude: Float,
+    val longitude: Double,
     @Column(name = "altitude")
-    val altitude: Float?,
+    val altitude: Double?,
 )

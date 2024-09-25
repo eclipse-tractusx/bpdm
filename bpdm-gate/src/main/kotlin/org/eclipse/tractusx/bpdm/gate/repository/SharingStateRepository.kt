@@ -63,6 +63,8 @@ interface SharingStateRepository : PagingAndSortingRepository<SharingStateDb, Lo
     @Query("SELECT s.sharingStateType as type, COUNT(s.sharingStateType) as count FROM SharingStateDb AS s GROUP BY s.sharingStateType")
     fun countSharingStateTypes(): List<SharingStateTypeCount>
 
+    fun findByTaskIdIn(taskIds: Set<String>): Set<SharingStateDb>
+
     interface SharingStateTypeCount {
         val type: SharingStateType
         val count: Int

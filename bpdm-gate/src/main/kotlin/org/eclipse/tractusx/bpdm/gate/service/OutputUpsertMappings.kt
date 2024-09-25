@@ -79,7 +79,8 @@ class OutputUpsertMappings {
             industrialZone = industrialZone,
             building = building,
             floor = floor,
-            door = door
+            door = door,
+            taxJurisdictionCode = taxJurisdictionCode
         )
 
     private fun AlternativeAddress.toEntity() =

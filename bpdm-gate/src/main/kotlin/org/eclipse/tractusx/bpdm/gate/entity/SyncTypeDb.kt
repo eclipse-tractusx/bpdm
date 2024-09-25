@@ -20,5 +20,6 @@
 package org.eclipse.tractusx.bpdm.gate.entity
 
 enum class SyncTypeDb {
-    POOL_TO_GATE_OUTPUT
+    POOL_TO_GATE_OUTPUT,
+    ORCHESTRATOR_FINISHED_TASKS
 }

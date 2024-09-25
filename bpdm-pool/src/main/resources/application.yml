@@ -82,7 +82,7 @@ bpdm:
     # When and how often the Pool should poll for golden record tasks in the orchestrator
     cron: '*/30 * * * * *'
     # Up to how many tasks can be requested at the same time
-    batchSize: 100
+    batchSize: 20
   security:
     # Allowed origins for CORS
     cors-origins: '*'

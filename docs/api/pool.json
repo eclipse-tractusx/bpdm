@@ -3,7 +3,7 @@
   "info": {
     "title": "Business Partner Data Management Pool",
     "description": "Service that manages and shares business partner data with other CatenaX services",
-    "version": "6.1.0-SNAPSHOT"
+    "version": "6.2.0-SNAPSHOT"
   },
   "servers": [
     {
@@ -558,6 +558,44 @@
           },
           "400": {
             "description": "On malformed request parameters"
+          }
+        }
+      }
+    },
+    "/v6/sites/legal-main-sites": {
+      "post": {
+        "tags": [
+          "Site Controller"
+        ],
+        "summary": "Create a new site with legal entity reference",
+        "description": "Create a business partner site with the given legal entity reference. It will designate the address information as both legal and site main address.",
+        "operationId": "createSiteWithLegalReference",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/SiteCreateRequestWithLegalAddressAsMain"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "New sites request was processed successfully, possible errors are returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SitePartnerCreateResponseWrapper"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "On malformed pagination request"
           }
         }
       }
@@ -2127,41 +2165,10 @@
       },
       "AddressPartnerCreateRequest": {
         "required": [
-          "bpnParent",
-          "confidenceCriteria",
-          "identifiers",
-          "physicalPostalAddress",
-          "states"
+          "bpnParent"
         ],
         "type": "object",
         "properties": {
-          "name": {
-            "type": "string",
-            "description": "The name of the address. This is not according to official registers but according to the name the sharing member chooses."
-          },
-          "states": {
-            "type": "array",
-            "description": "The list of (temporary) states of the address.",
-            "items": {
-              "$ref": "#/components/schemas/AddressStateDto"
-            }
-          },
-          "identifiers": {
-            "type": "array",
-            "description": "The list of identifiers of the address.",
-            "items": {
-              "$ref": "#/components/schemas/AddressIdentifierDto"
-            }
-          },
-          "physicalPostalAddress": {
-            "$ref": "#/components/schemas/PhysicalPostalAddressDto"
-          },
-          "alternativePostalAddress": {
-            "$ref": "#/components/schemas/AlternativePostalAddressDto"
-          },
-          "confidenceCriteria": {
-            "$ref": "#/components/schemas/ConfidenceCriteriaDto"
-          },
           "bpnParent": {
             "type": "string",
             "description": "BPNL of the legal entity or BPNS of the site this address belongs to."
@@ -2197,11 +2204,11 @@
               "$ref": "#/components/schemas/ErrorInfoAddressCreateError"
             }
           },
-          "errorCount": {
+          "entityCount": {
             "type": "integer",
             "format": "int32"
           },
-          "entityCount": {
+          "errorCount": {
             "type": "integer",
             "format": "int32"
           }
@@ -2209,81 +2216,8 @@
         "description": "Holds information about successfully and failed entities after the creating/updating of several objects"
       },
       "AddressPartnerCreateVerboseDto": {
-        "required": [
-          "bpna",
-          "confidenceCriteria",
-          "createdAt",
-          "identifiers",
-          "isCatenaXMemberData",
-          "physicalPostalAddress",
-          "states",
-          "updatedAt"
-        ],
         "type": "object",
         "properties": {
-          "bpna": {
-            "type": "string",
-            "description": "A BPNA represents and uniquely identifies an address, which can be the legal address of a legal entity, and/or the main address of a site, or any additional address of a legal entity or site (such as different gates). It is important to note that only the BPNL must be used to uniquely identify a legal entity. Even in the case that the BPNA represents the legal address of the legal entity, it shall not be used to uniquely identify the legal entity."
-          },
-          "name": {
-            "type": "string",
-            "description": "The name of the address. This is not according to official registers but according to the name the sharing member chooses."
-          },
-          "states": {
-            "type": "array",
-            "description": "The list of (temporary) states of the address.",
-            "items": {
-              "$ref": "#/components/schemas/AddressStateVerboseDto"
-            }
-          },
-          "identifiers": {
-            "type": "array",
-            "description": "The list of identifiers of the address.",
-            "items": {
-              "$ref": "#/components/schemas/AddressIdentifierVerboseDto"
-            }
-          },
-          "physicalPostalAddress": {
-            "$ref": "#/components/schemas/PhysicalPostalAddressVerboseDto"
-          },
-          "alternativePostalAddress": {
-            "$ref": "#/components/schemas/AlternativePostalAddressVerboseDto"
-          },
-          "bpnLegalEntity": {
-            "type": "string",
-            "description": "The BPNL of the legal entity owning the address."
-          },
-          "bpnSite": {
-            "type": "string",
-            "description": "The BPNS of the site the address belongs to."
-          },
-          "isCatenaXMemberData": {
-            "type": "boolean",
-            "description": "Indicates whether the address is owned and thus provided by a Catena-X Member."
-          },
-          "createdAt": {
-            "type": "string",
-            "description": "The date when the data record has been created.",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "description": "The date when the data record has been last updated.",
-            "format": "date-time"
-          },
-          "confidenceCriteria": {
-            "$ref": "#/components/schemas/ConfidenceCriteriaDto"
-          },
-          "addressType": {
-            "type": "string",
-            "description": "Indicates the address type, the legal address to a legal entity or the main address to a site, an additional address, or both legal and site address.The site main address is where typically the main entrance or the reception is located, or where the mail is delivered to.",
-            "enum": [
-              "LegalAndSiteMainAddress",
-              "LegalAddress",
-              "SiteMainAddress",
-              "AdditionalAddress"
-            ]
-          },
           "index": {
             "type": "string",
             "description": "User defined index to conveniently match this entry to the corresponding entry in the response."
@@ -2294,44 +2228,13 @@
       "AddressPartnerUpdateRequest": {
         "required": [
           "bpna",
-          "confidenceCriteria",
-          "identifiers",
-          "physicalPostalAddress",
-          "requestKey",
-          "states"
+          "requestKey"
         ],
         "type": "object",
         "properties": {
           "bpna": {
             "type": "string",
             "description": "A BPNA represents and uniquely identifies an address, which can be the legal address of a legal entity, and/or the main address of a site, or any additional address of a legal entity or site (such as different gates). It is important to note that only the BPNL must be used to uniquely identify a legal entity. Even in the case that the BPNA represents the legal address of the legal entity, it shall not be used to uniquely identify the legal entity."
-          },
-          "name": {
-            "type": "string",
-            "description": "The name of the address. This is not according to official registers but according to the name the sharing member chooses."
-          },
-          "states": {
-            "type": "array",
-            "description": "The list of (temporary) states of the address.",
-            "items": {
-              "$ref": "#/components/schemas/AddressStateDto"
-            }
-          },
-          "identifiers": {
-            "type": "array",
-            "description": "The list of identifiers of the address.",
-            "items": {
-              "$ref": "#/components/schemas/AddressIdentifierDto"
-            }
-          },
-          "physicalPostalAddress": {
-            "$ref": "#/components/schemas/PhysicalPostalAddressDto"
-          },
-          "alternativePostalAddress": {
-            "$ref": "#/components/schemas/AlternativePostalAddressDto"
-          },
-          "confidenceCriteria": {
-            "$ref": "#/components/schemas/ConfidenceCriteriaDto"
           },
           "requestKey": {
             "type": "string"
@@ -2360,11 +2263,11 @@
               "$ref": "#/components/schemas/ErrorInfoAddressUpdateError"
             }
           },
-          "errorCount": {
+          "entityCount": {
             "type": "integer",
             "format": "int32"
           },
-          "entityCount": {
+          "errorCount": {
             "type": "integer",
             "format": "int32"
           }
@@ -4072,6 +3975,18 @@
             "type": "string",
             "description": "The name of the identifier type."
           },
+          "abbreviation": {
+            "type": "string",
+            "description": "The local short form of the identifier type used in particular country."
+          },
+          "transliteratedName": {
+            "type": "string",
+            "description": "The transliterated (Latinized) form of the name."
+          },
+          "transliteratedAbbreviation": {
+            "type": "string",
+            "description": "The transliterated (Latinized) form of the abbreviation."
+          },
           "details": {
             "type": "array",
             "description": "Validity details.",
@@ -4113,93 +4028,12 @@
         },
         "description": "Contains identifiers to search legal entities by"
       },
-      "LegalEntityIdentifierDto": {
-        "required": [
-          "type",
-          "value"
-        ],
-        "type": "object",
-        "properties": {
-          "value": {
-            "type": "string",
-            "description": "The value of the identifier like \"DE123465789\"."
-          },
-          "type": {
-            "type": "string",
-            "description": "The type of the identifier."
-          },
-          "issuingBody": {
-            "type": "string",
-            "description": "The name of the official register, where the identifier is registered. For example, a Handelsregisternummer in Germany is only valid with its corresponding Handelsregister."
-          }
-        },
-        "description": "A legal entity identifier (uniquely) identifies the legal entity, such as the German Handelsregisternummer, a VAT number, etc."
-      },
-      "LegalEntityIdentifierVerboseDto": {
-        "required": [
-          "type",
-          "value"
-        ],
-        "type": "object",
-        "properties": {
-          "value": {
-            "type": "string",
-            "description": "The value of the identifier like \"DE123465789\"."
-          },
-          "type": {
-            "$ref": "#/components/schemas/TypeKeyNameVerboseDtoString"
-          },
-          "issuingBody": {
-            "type": "string",
-            "description": "The name of the official register, where the identifier is registered. For example, a Handelsregisternummer in Germany is only valid with its corresponding Handelsregister."
-          }
-        },
-        "description": "A legal entity identifier (uniquely) identifies the legal entity, such as the German Handelsregisternummer, a VAT number, etc."
-      },
       "LegalEntityPartnerCreateRequest": {
         "required": [
-          "confidenceCriteria",
-          "identifiers",
-          "isCatenaXMemberData",
-          "legalAddress",
-          "legalName",
-          "states"
+          "legalAddress"
         ],
         "type": "object",
         "properties": {
-          "legalName": {
-            "type": "string",
-            "description": "The name of the legal entity according to official registers."
-          },
-          "legalShortName": {
-            "type": "string",
-            "description": "The abbreviated name of the legal entity."
-          },
-          "legalForm": {
-            "type": "string",
-            "description": "The legal form of the legal entity."
-          },
-          "identifiers": {
-            "type": "array",
-            "description": "The list of identifiers of the legal entity.",
-            "items": {
-              "$ref": "#/components/schemas/LegalEntityIdentifierDto"
-            }
-          },
-          "states": {
-            "type": "array",
-            "description": "The list of (temporary) states of the legal entity.",
-            "items": {
-              "$ref": "#/components/schemas/LegalEntityStateDto"
-            }
-          },
-          "confidenceCriteria": {
-            "$ref": "#/components/schemas/ConfidenceCriteriaDto"
-          },
-          "isCatenaXMemberData": {
-            "type": "boolean",
-            "description": "Indicates whether the legal entity is owned and thus provided by a Catena-X Member."
-          },
           "legalAddress": {
             "$ref": "#/components/schemas/LogisticAddressDto"
           },
@@ -4234,11 +4068,11 @@
               "$ref": "#/components/schemas/ErrorInfoLegalEntityCreateError"
             }
           },
-          "errorCount": {
+          "entityCount": {
             "type": "integer",
             "format": "int32"
           },
-          "entityCount": {
+          "errorCount": {
             "type": "integer",
             "format": "int32"
           }
@@ -4247,78 +4081,10 @@
       },
       "LegalEntityPartnerCreateVerboseDto": {
         "required": [
-          "bpnl",
-          "confidenceCriteria",
-          "createdAt",
-          "currentness",
-          "identifiers",
-          "isCatenaXMemberData",
-          "legalAddress",
-          "legalName",
-          "relations",
-          "states",
-          "updatedAt"
+          "legalAddress"
         ],
         "type": "object",
         "properties": {
-          "bpnl": {
-            "type": "string",
-            "description": "A BPNL represents and uniquely identifies a legal entity, which is defined by its legal name (including legal form, if registered), legal address and tax number."
-          },
-          "legalName": {
-            "type": "string",
-            "description": "The name of the legal entity according to official registers."
-          },
-          "legalShortName": {
-            "type": "string",
-            "description": "The abbreviated name of the legal entity."
-          },
-          "legalForm": {
-            "$ref": "#/components/schemas/LegalFormDto"
-          },
-          "identifiers": {
-            "type": "array",
-            "description": "The list of identifiers of the legal entity.",
-            "items": {
-              "$ref": "#/components/schemas/LegalEntityIdentifierVerboseDto"
-            }
-          },
-          "states": {
-            "type": "array",
-            "description": "The list of (temporary) states of the legal entity.",
-            "items": {
-              "$ref": "#/components/schemas/LegalEntityStateVerboseDto"
-            }
-          },
-          "relations": {
-            "type": "array",
-            "description": "Relations to other business partners.",
-            "items": {
-              "$ref": "#/components/schemas/RelationVerboseDto"
-            }
-          },
-          "currentness": {
-            "type": "string",
-            "description": "The date the business partner data was last indicated to be still current.",
-            "format": "date-time"
-          },
-          "confidenceCriteria": {
-            "$ref": "#/components/schemas/ConfidenceCriteriaDto"
-          },
-          "isCatenaXMemberData": {
-            "type": "boolean",
-            "description": "Indicates whether the legal entity is owned and thus provided by a Catena-X Member."
-          },
-          "createdAt": {
-            "type": "string",
-            "description": "The date when the data record has been created.",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "description": "The date when the data record has been last updated.",
-            "format": "date-time"
-          },
           "legalAddress": {
             "$ref": "#/components/schemas/LogisticAddressVerboseDto"
           },
@@ -4332,52 +4098,14 @@
       "LegalEntityPartnerUpdateRequest": {
         "required": [
           "bpnl",
-          "confidenceCriteria",
-          "identifiers",
-          "isCatenaXMemberData",
           "legalAddress",
-          "legalName",
-          "requestKey",
-          "states"
+          "requestKey"
         ],
         "type": "object",
         "properties": {
           "bpnl": {
             "type": "string",
             "description": "A BPNL represents and uniquely identifies a legal entity, which is defined by its legal name (including legal form, if registered), legal address and tax number."
-          },
-          "legalName": {
-            "type": "string",
-            "description": "The name of the legal entity according to official registers."
-          },
-          "legalShortName": {
-            "type": "string",
-            "description": "The abbreviated name of the legal entity."
-          },
-          "legalForm": {
-            "type": "string",
-            "description": "The legal form of the legal entity."
-          },
-          "identifiers": {
-            "type": "array",
-            "description": "The list of identifiers of the legal entity.",
-            "items": {
-              "$ref": "#/components/schemas/LegalEntityIdentifierDto"
-            }
-          },
-          "states": {
-            "type": "array",
-            "description": "The list of (temporary) states of the legal entity.",
-            "items": {
-              "$ref": "#/components/schemas/LegalEntityStateDto"
-            }
-          },
-          "confidenceCriteria": {
-            "$ref": "#/components/schemas/ConfidenceCriteriaDto"
-          },
-          "isCatenaXMemberData": {
-            "type": "boolean",
-            "description": "Indicates whether the legal entity is owned and thus provided by a Catena-X Member."
           },
           "legalAddress": {
             "$ref": "#/components/schemas/LogisticAddressDto"
@@ -4409,11 +4137,11 @@
               "$ref": "#/components/schemas/ErrorInfoLegalEntityUpdateError"
             }
           },
-          "errorCount": {
+          "entityCount": {
             "type": "integer",
             "format": "int32"
           },
-          "entityCount": {
+          "errorCount": {
             "type": "integer",
             "format": "int32"
           }
@@ -4437,129 +4165,12 @@
           }
         }
       },
-      "LegalEntityStateDto": {
-        "required": [
-          "type"
-        ],
-        "type": "object",
-        "properties": {
-          "validFrom": {
-            "type": "string",
-            "description": "The date from which the state is valid.",
-            "format": "date-time"
-          },
-          "validTo": {
-            "type": "string",
-            "description": "The date until the state is valid.",
-            "format": "date-time"
-          },
-          "type": {
-            "type": "string",
-            "description": "One of the state types: active, inactive.",
-            "enum": [
-              "ACTIVE",
-              "INACTIVE"
-            ]
-          }
-        },
-        "description": "A legal entity state indicates if the legal entity is active or inactive. This does not describe the relation between a sharing member and a business partner and whether they have active business, but it describes whether the legal entity is still operating."
-      },
-      "LegalEntityStateVerboseDto": {
-        "required": [
-          "type"
-        ],
-        "type": "object",
-        "properties": {
-          "validFrom": {
-            "type": "string",
-            "description": "The date from which the state is valid.",
-            "format": "date-time"
-          },
-          "validTo": {
-            "type": "string",
-            "description": "The date until the state is valid.",
-            "format": "date-time"
-          },
-          "type": {
-            "$ref": "#/components/schemas/TypeKeyNameVerboseDtoBusinessStateType"
-          }
-        },
-        "description": "A legal entity state indicates if the legal entity is active or inactive. This does not describe the relation between a sharing member and a business partner and whether they have active business, but it describes whether the legal entity is still operating."
-      },
       "LegalEntityWithLegalAddressVerboseDto": {
         "required": [
-          "bpnl",
-          "confidenceCriteria",
-          "createdAt",
-          "currentness",
-          "identifiers",
-          "isCatenaXMemberData",
-          "legalAddress",
-          "legalName",
-          "relations",
-          "states",
-          "updatedAt"
+          "legalAddress"
         ],
         "type": "object",
         "properties": {
-          "bpnl": {
-            "type": "string",
-            "description": "A BPNL represents and uniquely identifies a legal entity, which is defined by its legal name (including legal form, if registered), legal address and tax number."
-          },
-          "legalName": {
-            "type": "string",
-            "description": "The name of the legal entity according to official registers."
-          },
-          "legalShortName": {
-            "type": "string",
-            "description": "The abbreviated name of the legal entity."
-          },
-          "legalForm": {
-            "$ref": "#/components/schemas/LegalFormDto"
-          },
-          "identifiers": {
-            "type": "array",
-            "description": "The list of identifiers of the legal entity.",
-            "items": {
-              "$ref": "#/components/schemas/LegalEntityIdentifierVerboseDto"
-            }
-          },
-          "states": {
-            "type": "array",
-            "description": "The list of (temporary) states of the legal entity.",
-            "items": {
-              "$ref": "#/components/schemas/LegalEntityStateVerboseDto"
-            }
-          },
-          "relations": {
-            "type": "array",
-            "description": "Relations to other business partners.",
-            "items": {
-              "$ref": "#/components/schemas/RelationVerboseDto"
-            }
-          },
-          "currentness": {
-            "type": "string",
-            "description": "The date the business partner data was last indicated to be still current.",
-            "format": "date-time"
-          },
-          "confidenceCriteria": {
-            "$ref": "#/components/schemas/ConfidenceCriteriaDto"
-          },
-          "isCatenaXMemberData": {
-            "type": "boolean",
-            "description": "Indicates whether the legal entity is owned and thus provided by a Catena-X Member."
-          },
-          "createdAt": {
-            "type": "string",
-            "description": "The date when the data record has been created.",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "description": "The date when the data record has been last updated.",
-            "format": "date-time"
-          },
           "legalAddress": {
             "$ref": "#/components/schemas/LogisticAddressVerboseDto"
           }
@@ -5753,43 +5364,10 @@
         },
         "description": "Region within a country"
       },
-      "RelationVerboseDto": {
+      "SiteCreateRequestWithLegalAddressAsMain": {
         "required": [
-          "endBpnl",
-          "startBpnl",
-          "type"
-        ],
-        "type": "object",
-        "properties": {
-          "type": {
-            "$ref": "#/components/schemas/TypeKeyNameVerboseDtoRelationType"
-          },
-          "startBpnl": {
-            "type": "string",
-            "description": "BPN of partner which is the source of the relation"
-          },
-          "endBpnl": {
-            "type": "string",
-            "description": "BPN of partner which is the target of the relation"
-          },
-          "validFrom": {
-            "type": "string",
-            "description": "Time when the relation started",
-            "format": "date-time"
-          },
-          "validTo": {
-            "type": "string",
-            "description": "Time when the relation ended",
-            "format": "date-time"
-          }
-        },
-        "description": "Directed relation between two business partners"
-      },
-      "SitePartnerCreateRequest": {
-        "required": [
-          "bpnlParent",
+          "bpnLParent",
           "confidenceCriteria",
-          "mainAddress",
           "name",
           "states"
         ],
@@ -5806,12 +5384,20 @@
               "$ref": "#/components/schemas/SiteStateDto"
             }
           },
-          "mainAddress": {
-            "$ref": "#/components/schemas/LogisticAddressDto"
-          },
           "confidenceCriteria": {
             "$ref": "#/components/schemas/ConfidenceCriteriaDto"
           },
+          "bpnLParent": {
+            "type": "string"
+          }
+        }
+      },
+      "SitePartnerCreateRequest": {
+        "required": [
+          "bpnlParent"
+        ],
+        "type": "object",
+        "properties": {
           "bpnlParent": {
             "type": "string",
             "description": "The BPNL of the legal entity owning the site."
@@ -5847,11 +5433,11 @@
               "$ref": "#/components/schemas/ErrorInfoSiteCreateError"
             }
           },
-          "errorCount": {
+          "entityCount": {
             "type": "integer",
             "format": "int32"
           },
-          "entityCount": {
+          "errorCount": {
             "type": "integer",
             "format": "int32"
           }
@@ -5860,54 +5446,10 @@
       },
       "SitePartnerCreateVerboseDto": {
         "required": [
-          "bpnLegalEntity",
-          "bpns",
-          "confidenceCriteria",
-          "createdAt",
-          "isCatenaXMemberData",
-          "mainAddress",
-          "name",
-          "states",
-          "updatedAt"
+          "mainAddress"
         ],
         "type": "object",
         "properties": {
-          "bpns": {
-            "type": "string",
-            "description": "A BPNS represents and uniquely identifies a site, which is where for example a production plant, a warehouse, or an office building is located."
-          },
-          "name": {
-            "type": "string",
-            "description": "The name of the site. This is not according to official registers but according to the name the owner chooses."
-          },
-          "states": {
-            "type": "array",
-            "description": "The list of the (temporary) states of the site.",
-            "items": {
-              "$ref": "#/components/schemas/SiteStateVerboseDto"
-            }
-          },
-          "isCatenaXMemberData": {
-            "type": "boolean",
-            "description": "Indicates whether the site is owned and thus provided by a Catena-X Member."
-          },
-          "bpnLegalEntity": {
-            "type": "string",
-            "description": "The BPNL of the legal entity owning the site."
-          },
-          "createdAt": {
-            "type": "string",
-            "description": "The date when the data record has been created.",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "description": "The date when the data record has been last updated.",
-            "format": "date-time"
-          },
-          "confidenceCriteria": {
-            "$ref": "#/components/schemas/ConfidenceCriteriaDto"
-          },
           "mainAddress": {
             "$ref": "#/components/schemas/LogisticAddressVerboseDto"
           },
@@ -5921,34 +5463,13 @@
       "SitePartnerUpdateRequest": {
         "required": [
           "bpns",
-          "confidenceCriteria",
-          "mainAddress",
-          "name",
-          "requestKey",
-          "states"
+          "requestKey"
         ],
         "type": "object",
         "properties": {
           "bpns": {
             "type": "string",
             "description": "A BPNS represents and uniquely identifies a site, which is where for example a production plant, a warehouse, or an office building is located."
-          },
-          "name": {
-            "type": "string",
-            "description": "The name of the site. This is not according to official registers but according to the name the owner chooses."
-          },
-          "states": {
-            "type": "array",
-            "description": "The list of the (temporary) states of the site.",
-            "items": {
-              "$ref": "#/components/schemas/SiteStateDto"
-            }
-          },
-          "mainAddress": {
-            "$ref": "#/components/schemas/LogisticAddressDto"
-          },
-          "confidenceCriteria": {
-            "$ref": "#/components/schemas/ConfidenceCriteriaDto"
           },
           "requestKey": {
             "type": "string"
@@ -5977,11 +5498,11 @@
               "$ref": "#/components/schemas/ErrorInfoSiteUpdateError"
             }
           },
-          "errorCount": {
+          "entityCount": {
             "type": "integer",
             "format": "int32"
           },
-          "entityCount": {
+          "errorCount": {
             "type": "integer",
             "format": "int32"
           }
@@ -6115,54 +5636,10 @@
       },
       "SiteWithMainAddressVerboseDto": {
         "required": [
-          "bpnLegalEntity",
-          "bpns",
-          "confidenceCriteria",
-          "createdAt",
-          "isCatenaXMemberData",
-          "mainAddress",
-          "name",
-          "states",
-          "updatedAt"
+          "mainAddress"
         ],
         "type": "object",
         "properties": {
-          "bpns": {
-            "type": "string",
-            "description": "A BPNS represents and uniquely identifies a site, which is where for example a production plant, a warehouse, or an office building is located."
-          },
-          "name": {
-            "type": "string",
-            "description": "The name of the site. This is not according to official registers but according to the name the owner chooses."
-          },
-          "states": {
-            "type": "array",
-            "description": "The list of the (temporary) states of the site.",
-            "items": {
-              "$ref": "#/components/schemas/SiteStateVerboseDto"
-            }
-          },
-          "isCatenaXMemberData": {
-            "type": "boolean",
-            "description": "Indicates whether the site is owned and thus provided by a Catena-X Member."
-          },
-          "bpnLegalEntity": {
-            "type": "string",
-            "description": "The BPNL of the legal entity owning the site."
-          },
-          "createdAt": {
-            "type": "string",
-            "description": "The date when the data record has been created.",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "description": "The date when the data record has been last updated.",
-            "format": "date-time"
-          },
-          "confidenceCriteria": {
-            "$ref": "#/components/schemas/ConfidenceCriteriaDto"
-          },
           "mainAddress": {
             "$ref": "#/components/schemas/LogisticAddressVerboseDto"
           }
@@ -6524,28 +6001,6 @@
         },
         "description": "Named type uniquely identified by its technical key"
       },
-      "TypeKeyNameVerboseDtoRelationType": {
-        "required": [
-          "name",
-          "technicalKey"
-        ],
-        "type": "object",
-        "properties": {
-          "technicalKey": {
-            "type": "string",
-            "description": "Unique key of this type for reference",
-            "enum": [
-              "CX_LEGAL_SUCCESSOR_OF",
-              "CX_LEGAL_PREDECESSOR_OF"
-            ]
-          },
-          "name": {
-            "type": "string",
-            "description": "Name or denotation of this type"
-          }
-        },
-        "description": "Named type uniquely identified by its technical key"
-      },
       "TypeKeyNameVerboseDtoString": {
         "required": [
           "name",
@@ -6570,8 +6025,7 @@
         "type": "oauth2",
         "flows": {
           "clientCredentials": {
-            "tokenUrl": "http://localhost:8180/realms/CX-Central/protocol/openid-connect/token",
-            "scopes": {}
+            "tokenUrl": "http://localhost:8180/realms/CX-Central/protocol/openid-connect/token"
           },
           "authorizationCode": {
             "authorizationUrl": "http://localhost:8180/realms/CX-Central/protocol/openid-connect/auth",

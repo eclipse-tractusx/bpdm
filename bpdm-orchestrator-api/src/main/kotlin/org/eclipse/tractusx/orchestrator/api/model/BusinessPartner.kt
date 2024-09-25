@@ -219,9 +219,9 @@ data class AlternativeAddress(
 
 @Schema(description = PostalAddressDescription.headerGeoCoordinates)
 data class GeoCoordinate(
-    val longitude: Float?,
-    val latitude: Float?,
-    val altitude: Float?
+    val longitude: Double?,
+    val latitude: Double?,
+    val altitude: Double?
 ){
     companion object{
         val empty: GeoCoordinate = GeoCoordinate(null, null, null)

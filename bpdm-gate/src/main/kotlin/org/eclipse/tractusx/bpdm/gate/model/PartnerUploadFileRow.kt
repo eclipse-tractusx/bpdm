@@ -25,20 +25,7 @@ import jakarta.validation.constraints.NotEmpty
 data class PartnerUploadFileRow(
 
     @CsvBindByName(column = PartnerUploadFileHeader.EXTERNAL_ID)
-    @field:NotEmpty(message = "Column 'externalId' is missing and can not be empty")
     val externalId: String? = null,
-
-    @CsvBindByName(column = PartnerUploadFileHeader.NAME_PARTS_1)
-    val nameParts1: String? = null,
-
-    @CsvBindByName(column = PartnerUploadFileHeader.NAME_PARTS_2)
-    val nameParts2: String? = null,
-
-    @CsvBindByName(column = PartnerUploadFileHeader.NAME_PARTS_3)
-    val nameParts3: String? = null,
-
-    @CsvBindByName(column = PartnerUploadFileHeader.NAME_PARTS_4)
-    val nameParts4: String? = null,
 
     @CsvBindByName(column = PartnerUploadFileHeader.IDENTIFIERS_TYPE_1)
     val identifiersType1: String? = null,
@@ -66,30 +53,6 @@ data class PartnerUploadFileRow(
 
     @CsvBindByName(column = PartnerUploadFileHeader.IDENTIFIERS_ISSUING_BODY_3)
     val identifiersIssuingBody3: String? = null,
-
-    @CsvBindByName(column = PartnerUploadFileHeader.STATES_VALID_FROM_1)
-    val statesValidFrom1: String? = null,
-
-    @CsvBindByName(column = PartnerUploadFileHeader.STATES_VALID_TO_1)
-    val statesValidTo1: String? = null,
-
-    @CsvBindByName(column = PartnerUploadFileHeader.STATES_TYPE_1)
-    val statesType1: String? = null,
-
-    @CsvBindByName(column = PartnerUploadFileHeader.STATES_VALID_FROM_2)
-    val statesValidFrom2: String? = null,
-
-    @CsvBindByName(column = PartnerUploadFileHeader.STATES_VALID_TO_2)
-    val statesValidTo2: String? = null,
-
-    @CsvBindByName(column = PartnerUploadFileHeader.STATES_TYPE_2)
-    val statesType2: String? = null,
-
-    @CsvBindByName(column = PartnerUploadFileHeader.ROLES)
-    val roles: String? = null,
-
-    @CsvBindByName(column = PartnerUploadFileHeader.IS_OWN_COMPANY_DATA)
-    val isOwnCompanyData: String? = null,
 
     @CsvBindByName(column = PartnerUploadFileHeader.SITE_BPN)
     val siteBpn: String? = null,

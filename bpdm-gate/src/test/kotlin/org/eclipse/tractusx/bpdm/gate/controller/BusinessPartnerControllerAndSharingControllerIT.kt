@@ -28,14 +28,15 @@ import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
-import org.eclipse.tractusx.bpdm.gate.service.TaskCreationService
-import org.eclipse.tractusx.bpdm.gate.service.TaskResolutionService
+import org.eclipse.tractusx.bpdm.gate.service.TaskCreationChunkService
+import org.eclipse.tractusx.bpdm.gate.service.TaskResolutionChunkService
 import org.eclipse.tractusx.bpdm.gate.util.MockAndAssertUtils
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerNonVerboseValues
 import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerVerboseValues
 import org.eclipse.tractusx.bpdm.test.util.AssertHelpers
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
+import org.eclipse.tractusx.orchestrator.api.model.ResultState
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -57,8 +58,8 @@ class BusinessPartnerControllerAndSharingControllerIT @Autowired constructor(
     val testHelpers: DbTestHelpers,
     val assertHelpers: AssertHelpers,
     val gateClient: GateClient,
-    val taskCreationService: TaskCreationService,
-    val taskResolutionService: TaskResolutionService,
+    val taskCreationService: TaskCreationChunkService,
+    val taskResolutionService: TaskResolutionChunkService,
     val mockAndAssertUtils: MockAndAssertUtils
 ) {
 
@@ -85,7 +86,7 @@ class BusinessPartnerControllerAndSharingControllerIT @Autowired constructor(
     @BeforeEach
     fun beforeEach() {
         testHelpers.truncateDbTables()
-        gateWireMockServer.resetAll();
+        gateWireMockServer.resetAll()
         poolWireMockServer.resetAll()
         this.mockAndAssertUtils.mockOrchestratorApi(gateWireMockServer)
     }
@@ -219,6 +220,7 @@ class BusinessPartnerControllerAndSharingControllerIT @Autowired constructor(
     @Test
     fun `insert one business partners but task is missing in orchestrator`() {
         this.mockAndAssertUtils.mockOrchestratorApiCleaned(gateWireMockServer)
+        this.mockAndAssertUtils.mockOrchestratorApiResultStates(gateWireMockServer, listOf(ResultState.Pending, ResultState.Pending, null))
         val upsertRequests = listOf(
             BusinessPartnerNonVerboseValues.bpInputRequestCleaned,
             BusinessPartnerNonVerboseValues.bpInputRequestError,
@@ -248,7 +250,7 @@ class BusinessPartnerControllerAndSharingControllerIT @Autowired constructor(
             .isEqualTo(createdSharingState)
 
         // Call Finish Cleaning Method
-        taskResolutionService.resolveTasks()
+        taskResolutionService.healthCheck(0)
 
         val cleanedSharingState = listOf(
             SharingStateDto(

@@ -72,8 +72,7 @@ interface PartnerChangelogEntryRepository : JpaRepository<PartnerChangelogEntryD
         fun byIsMember(isCatenaXMemberData: Boolean?) =
             Specification<PartnerChangelogEntryDb> { root, query, builder ->
                 isCatenaXMemberData?.let {
-
-                    val legalEntitySubquery = query.subquery(PartnerChangelogEntryDb::class.java)
+                    val legalEntitySubquery = query!!.subquery(PartnerChangelogEntryDb::class.java)
                     val changelogSubRoot = legalEntitySubquery.from(PartnerChangelogEntryDb::class.java)
                     val legalEntitySubRoot = legalEntitySubquery.from(LegalEntityDb::class.java)
                     legalEntitySubquery.select(changelogSubRoot)

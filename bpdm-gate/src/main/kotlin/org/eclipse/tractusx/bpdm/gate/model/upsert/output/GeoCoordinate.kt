@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.model.upsert.output
 
 data class GeoCoordinate(
-    val longitude: Float,
-    val latitude: Float,
-    val altitude: Float?
+    val longitude: Double,
+    val latitude: Double,
+    val altitude: Double?
 )

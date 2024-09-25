@@ -42,6 +42,15 @@ class IdentifierTypeDb(
     @Column(name = "name", nullable = false)
     val name: String,
 
+    @Column(name = "abbreviation")
+    val abbreviation: String? = null,
+
+    @Column(name = "transliterated_name")
+    val transliteratedName: String? = null,
+
+    @Column(name = "transliterated_abbreviation")
+    val transliteratedAbbreviation: String? = null
+
     ) : BaseEntity() {
     @OneToMany(mappedBy = "identifierType", cascade = [CascadeType.ALL], orphanRemoval = true)
     val details: MutableSet<IdentifierTypeDetailDb> = mutableSetOf()

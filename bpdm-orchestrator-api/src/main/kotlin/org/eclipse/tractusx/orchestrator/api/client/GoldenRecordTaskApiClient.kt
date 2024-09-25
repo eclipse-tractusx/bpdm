@@ -47,4 +47,9 @@ interface GoldenRecordTaskApiClient : GoldenRecordTaskApi {
     override fun searchTaskStates(
         @RequestBody stateRequest: TaskStateRequest
     ): TaskStateResponse
+
+    @PostExchange("/result-state/search")
+    override fun searchTaskResultStates(
+        @RequestBody stateRequest: TaskResultStateSearchRequest
+    ): TaskResultStateSearchResponse
 }

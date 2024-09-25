@@ -22,4 +22,6 @@ package org.eclipse.tractusx.orchestrator.api.client
 interface OrchestrationApiClient {
 
     val goldenRecordTasks: GoldenRecordTaskApiClient
+
+    val finishedTaskEvents: FinishedTaskEventApiClient
 }

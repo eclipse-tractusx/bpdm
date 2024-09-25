@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.api.client
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.PoolSiteApi
+import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteCreateRequestWithLegalAddressAsMain
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteSearchRequest
@@ -65,5 +66,9 @@ interface SiteApiClient : PoolSiteApi {
         @RequestBody requests: Collection<SitePartnerUpdateRequest>
     ): SitePartnerUpdateResponseWrapper
 
+    @PostExchange("/legal-main-sites")
+    override fun createSiteWithLegalReference(
+        @RequestBody request: Collection<SiteCreateRequestWithLegalAddressAsMain>
+    ): SitePartnerCreateResponseWrapper
 
 }

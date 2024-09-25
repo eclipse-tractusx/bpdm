@@ -24,7 +24,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 @ConfigurationProperties(prefix = "bpdm.tasks")
 data class GoldenRecordTaskConfigProperties(
     val creation: CreationProperties = CreationProperties(),
-    val check: TaskProcessProperties = TaskProcessProperties()
+    val check: TaskProcessProperties = TaskProcessProperties(),
+    val healthCheck: TaskProcessProperties = TaskProcessProperties()
 ) {
     data class CreationProperties(
         val fromSharingMember: CreationTaskProperties = CreationTaskProperties(),
@@ -32,13 +33,13 @@ data class GoldenRecordTaskConfigProperties(
     )
 
     data class TaskProcessProperties(
-        val batchSize: Int = 100,
+        val batchSize: Int = 20,
         val cron: String = "-",
     )
 
     data class CreationTaskProperties(
         val startsAsReady: Boolean = true,
-        val batchSize: Int = 100,
+        val batchSize: Int = 20,
         val cron: String = "-",
     )
 }

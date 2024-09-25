@@ -6,28 +6,53 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
 For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/CHANGELOG.md) of the charts directly.
 
+## [6.2.0] - tbd
+
+### Added
+
+- BPDM Pool: Post endpoint to create a site for LegalAndSiteMainAddress addressType.([#739](https://github.com/eclipse-tractusx/sig-release/issues/739))
+- BPDM Orchestrator: Endpoint for checking the result state of given tasks
+- BPDM Orchestrator: Endpoint for getting event log for finished tasks
+- BPDM Pool: Enhanced data model for IdentifierTypes by adding three new fields/attributes: abbreviation, transliteratedName, and transliteratedAbbreviation.([#605](https://github.com/eclipse-tractusx/sig-release/issues/605))
+
+### Changed
+
+- BPDM Gate: Fix possible out of memory exception when handling large golden record process requests
+- BPDM Pool: Fix not resolving golden record tasks on exceptions
+- BPDM Gate: Fixed Gate not resending business partner data to the golden record process on error sharing state when member sends the exact same business partner again
+- BPDM Orchestrator: Search task endpoint now requires the private record ID for each task. This means only the task creator is able to fetch the task state
+- BPDM Orchestrator: Now aborts tasks that are outdated (that is when a Gate will send newer business partner data for the same record to the golden record process)
+- BPDM Pool & Gate: Reduce standard batch size for golden record task processing ([#1032](https://github.com/eclipse-tractusx/bpdm/pull/1032))
+- BPDM Orchestrator: Fix possible out-of-memory exception during the execution of large volumes of tasks ([#1029](https://github.com/eclipse-tractusx/bpdm/pull/1029))
+- BPDM Cleaning Service Dummy: Add whitespaces between name parts when creating legal name from them
+- BPDM Cleaning Service Dummy: Improve duplication check to better distinguish between incoming business partners
+- Apps: Updated double precision data type for Geographic-data([#978](https://github.com/eclipse-tractusx/bpdm/issues/978))
+- BPDM Gate: Improved error response by adding external id details and reduced csv columns by removing support for uncategorized fields in csv file for partner upload process([#700](https://github.com/eclipse-tractusx/sig-release/issues/700))
+- BPDM Cleaning Service Dummy: Added a null check for name parts to ensure proper whitespace handling when constructing the legal name from them.
+- BPDM Gate: Enabled Tax Jurisdiction code to save it to the Output.
+
 ## [6.1.0] - [2024-07-15]
 
 ### Added
 
-- BPDM Gate: Post endpoint to upload business partner input data using csv file.(#700)
-- BPDM Gate: GET endpoint to download the csv file template for business partner upload. (#700)
-- Apps: Tax Jurisdiction Code to the physical address of a business partner (#955)
-- BPDM Orchestrator: Tasks will now be persisted
-- BPDM Orchestrator: Tasks now come with a gate record identifier. This makes it possible for cleaning services to match tasks for the same Gate record 
+- BPDM Gate: Post endpoint to upload business partner input data using csv file.([#700](https://github.com/eclipse-tractusx/sig-release/issues/700))
+- BPDM Gate: GET endpoint to download the csv file template for business partner upload. ([#700](https://github.com/eclipse-tractusx/sig-release/issues/700))
+- Apps: Tax Jurisdiction Code to the physical address of a business partner ([#955](https://github.com/eclipse-tractusx/bpdm/issues/955))
+- BPDM Orchestrator: Tasks will now be persisted ([#722](https://github.com/eclipse-tractusx/sig-release/issues/722))
+- BPDM Orchestrator: Tasks now come with a gate record identifier. This makes it possible for cleaning services to match tasks for the same Gate record ([#711](https://github.com/eclipse-tractusx/sig-release/issues/711)) 
 
 ### Changed:
 
-- BPDM Gate: Fix sending business partner data to the golden record service even when they have no changes
-- BPDM Gate: Fix sharing states sometimes taking the wrong task id from the orchestrator
+- BPDM Gate: Fix sending business partner data to the golden record service even when they have no changes ([#988](https://github.com/eclipse-tractusx/bpdm/pull/988))
+- BPDM Gate: Fix sharing states sometimes taking the wrong task id from the orchestrator ([#989](https://github.com/eclipse-tractusx/bpdm/pull/989))
 
 
 ## [6.0.2] - [2024-07-03]
 
 ### Changed
 
-- BPDM Gate: Now sends alternative addresses which are NULL correctly to the Orchestrator
-- BPDM Pool: Changed Checksum generation algorithm: Now checksum includes the BPN with prefix
+- BPDM Gate: Now sends alternative addresses which are NULL correctly to the Orchestrator ([#801](https://github.com/eclipse-tractusx/portal-backend/issues/801))
+- BPDM Pool: Changed Checksum generation algorithm: Now checksum includes the BPN with prefix ([#699](https://github.com/eclipse-tractusx/sig-release/issues/699))
 
 
 ## [6.0.1] - [2024-05-27]
