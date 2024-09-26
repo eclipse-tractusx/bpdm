@@ -36,6 +36,11 @@ dependencies:
     repository: https://charts.bitnami.com/bitnami
     alias: postgres
     condition: postgres.enabled
+  - name: centralidp
+    version: 3.0.1
+    repository: https://eclipse-tractusx.github.io/charts/dev
+    alias: centralidp
+    condition: centralidp.enabled
 maintainers:
   - name: Nico Koprowski
   - name: Fabio D. Mota

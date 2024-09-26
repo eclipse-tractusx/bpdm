@@ -28,4 +28,6 @@ bpdm:
       base-url: http://{{ include "bpdm.toReleaseName" (list . "bpdm-pool") }}
     orchestrator:
       base-url: http://{{ include "bpdm.toReleaseName" (list . "bpdm-orchestrator") }}
+  security:
+    auth-server-url: http://{{ include "bpdm.centralidpDependency" . }}/auth
 {{- end -}}

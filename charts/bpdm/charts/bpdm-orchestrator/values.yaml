@@ -122,10 +122,7 @@ startupProbe:
 
 # Used to overwrite the default property values of the application configuration
 applicationConfig:
-  bpdm:
-    datasource:
-      # If empty sets kubernetes postgres service with same release name
-      host:
+
 # Used to overwrite the secret property values of the application configuration
 applicationSecrets:
   spring:
@@ -139,6 +136,9 @@ postgres:
     database: bpdm
     username: bpdm
     password: *postgresPass
+
+centralidp:
+  enabled: true
 
 
 

@@ -44,9 +44,9 @@ bpdm:
         # The orchestrator client should use client credentials mechanism to request a token from the provider
         authorization-grant-type: client_credentials
         # Use a default client id for the client credentials request
-        client-id: DUMMY-ORCHESTRATOR-TASK_PROCESSOR
+        client-id: sa-cl25-cx-1
         # Please provide client secret here
-        client-secret: ${BPDM_DUMMY_ORCH_CLIENT_SECRET}
+        client-secret: "**********"
 
   cleaningService:
     # When and how often the cleaning service should poll for golden record tasks in the orchestrator

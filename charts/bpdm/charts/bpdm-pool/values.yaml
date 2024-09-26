@@ -120,14 +120,6 @@ startupProbe:
   successThreshold: 1
 
 applicationConfig:
-  bpdm:
-    datasource:
-      # If empty sets kubernetes postgres service with same release name
-      host:
-    client:
-      orchestrator:
-        # If empty sets kubernetes BPDM Orchestrator service with same release name
-        base-url:
 
 applicationSecrets:
   spring:
@@ -142,3 +134,5 @@ postgres:
     username: bpdm
     password: *postgresPass
 
+centralidp:
+  enabled: true

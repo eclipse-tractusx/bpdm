@@ -22,10 +22,10 @@ package org.eclipse.tractusx.bpdm.gate.controller
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityRepresentationInputDto
-import org.eclipse.tractusx.bpdm.gate.auth.AuthAdminIT
 import org.eclipse.tractusx.bpdm.gate.util.MockAndAssertUtils
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
+import org.eclipse.tractusx.bpdm.test.containers.SelfClientInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerVerboseValues
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -50,7 +50,7 @@ import java.nio.file.Paths
     initializers = [
         PostgreSQLContextInitializer::class,
         KeyCloakInitializer::class,
-        AuthAdminIT.SelfClientAsAdminInitializer::class
+        SelfClientAsPartnerUploaderInitializer::class
     ]
 )
 class PartnerUploadControllerIT @Autowired constructor(
@@ -184,3 +184,9 @@ class PartnerUploadControllerIT @Autowired constructor(
         copy(externalId = externalId, site = site.copy(name = siteName))
 
 }
+
+class SelfClientAsPartnerUploaderInitializer : SelfClientInitializer() {
+    override val clientId: String
+        get() = "sa-cl7-cx-5"
+}
+

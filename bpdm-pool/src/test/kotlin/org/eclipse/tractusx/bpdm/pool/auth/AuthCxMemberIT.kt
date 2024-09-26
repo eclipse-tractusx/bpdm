@@ -21,9 +21,9 @@ package org.eclipse.tractusx.bpdm.pool.auth
 
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
+import org.eclipse.tractusx.bpdm.test.containers.CreateNewSelfClientInitializer
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
-import org.eclipse.tractusx.bpdm.test.containers.SelfClientInitializer
 import org.eclipse.tractusx.bpdm.test.util.AuthExpectationType
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -81,7 +81,10 @@ AuthCxMemberIT @Autowired constructor(
     bpnAuthExpectation = AuthExpectationType.Forbidden
 )
 
-class SelfClientAsCxMemberInitializer : SelfClientInitializer() {
+class SelfClientAsCxMemberInitializer : CreateNewSelfClientInitializer() {
     override val clientId: String
         get() = "EDC-POOL-READ-MEMBER"
+
+    override val roleName: String
+        get() = "BPDM Pool Consumer"
 }

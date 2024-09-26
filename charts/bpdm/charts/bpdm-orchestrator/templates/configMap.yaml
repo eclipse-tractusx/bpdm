@@ -23,4 +23,6 @@
 bpdm:
   datasource:
     host: {{ include "bpdm.postgresDependency" . }}
+  security:
+    auth-server-url: http://{{ include "bpdm.centralidpDependency" . }}/auth
 {{- end -}}

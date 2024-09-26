@@ -102,6 +102,23 @@ Usage: include "includeWithPostgresContext" (list $ "your_include_function_here"
 {{- include $function (dict "Values" $.Values.postgres "Chart" (dict "Name" "postgres") "Release" $.Release "global" $.global) }}
 {{- end }}
 
+{/*
+Determine centralidp service/host name to connect to
+*/}}
+{{- define "bpdm.centralidpDependency" -}}
+        {{- include "includeWithCentralidpContext" (list $ "centralidp.fullname") }}
+{{- end }}}
+
+{{/*
+Invoke include on given definition with centralidp dependency context
+Usage: include "includeWithCentralidpContext" (list $ "your_include_function_here")
+*/}}
+{{- define "includeWithCentralidpContext" -}}
+{{- $ := index . 0 }}
+{{- $function := index . 1 }}
+{{- include $function (dict "Values" $.Values.centralidp "Chart" (dict "Name" "centralidp") "Release" $.Release "global" $.global) }}
+{{- end }}
+
 {{- /*
 Merges three templates one after another in the following order:
 valuesOverride -overrides-> (defaultOverride -overrides-> baseTemplate)
@@ -114,8 +131,7 @@ Usage: include "bpdm-common.threeWayMerge" ("context" $ "baseTemplate" "template
         {{- $baseTemplateDict := fromYaml (include .baseTemplate $) | default (dict ) -}}
         {{- $defaultOverrideDict := fromYaml (include .defaultOverride $) | default (dict )  -}}
         {{- $valuesOverrideDict:= fromYaml (include .valuesOverride $) | default (dict )  -}}
-        {{- $intermediateDict := merge $defaultOverrideDict $baseTemplateDict  -}}
-        {{- $finalDict :=  merge $valuesOverrideDict $intermediateDict -}}
+        {{- $finalDict :=  merge $valuesOverrideDict $defaultOverrideDict $baseTemplateDict -}}
         {{- toYaml $finalDict -}}
     {{- else -}}
         {{- include "bpdm-common.merge" (dict "context" .context "baseTemplate" .baseTemplate "override" .valuesOverride) }}

@@ -64,6 +64,6 @@ class AuthTaskProcessorPoolTaskProcessingJobApiSyncIT @Autowired constructor(
 
     class SelfClientAsTaskProcessorPoolSyncInitializer : SelfClientInitializer() {
         override val clientId: String
-            get() = "POOL-ORCHESTRATOR-TASK-PROCESSOR"
+            get() = "sa-cl25-cx-2"
     }
 }

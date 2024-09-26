@@ -20,9 +20,9 @@
 package org.eclipse.tractusx.bpdm.orchestrator.auth
 
 import org.eclipse.tractusx.bpdm.orchestrator.Application
+import org.eclipse.tractusx.bpdm.test.containers.CreateNewSelfClientInitializer
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
-import org.eclipse.tractusx.bpdm.test.containers.SelfClientInitializer
 import org.eclipse.tractusx.bpdm.test.util.AuthAssertionHelper
 import org.eclipse.tractusx.bpdm.test.util.AuthExpectationType
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
@@ -62,8 +62,11 @@ class AuthAdminIT @Autowired constructor(
     )
 ){
 
-    class SelfClientAsAdminInitializer : SelfClientInitializer() {
+    class SelfClientAsAdminInitializer : CreateNewSelfClientInitializer() {
         override val clientId: String
-            get() = "BPDM-ORCHESTRATOR"
+            get() = "BPDM_ADMIN_SA"
+
+        override val roleName: String
+            get() = "BPDM Orchestrator Admin"
     }
 }

@@ -52,8 +52,8 @@ class AuthTaskProcessorCleanIT @Autowired constructor(
             postResult = AuthExpectationType.Authorized
         ),
         stepCleanAndSync = TaskStepAuthExpectations(
-            postReservation = AuthExpectationType.Forbidden,
-            postResult = AuthExpectationType.Forbidden
+            postReservation = AuthExpectationType.Authorized,
+            postResult = AuthExpectationType.Authorized
         ),
         stepPoolSync = TaskStepAuthExpectations(
             postReservation = AuthExpectationType.Forbidden,
@@ -64,6 +64,6 @@ class AuthTaskProcessorCleanIT @Autowired constructor(
 
     class SelfClientAsTaskProcessorCleanInitializer : SelfClientInitializer() {
         override val clientId: String
-            get() = "CLEANER-ORCHESTRATOR-TASK-PROCESSOR"
+            get() = "sa-cl25-cx-1"
     }
 }

@@ -22,17 +22,22 @@ package org.eclipse.tractusx.bpdm.test.containers
 import dasniko.testcontainers.keycloak.KeycloakContainer
 import org.eclipse.tractusx.bpdm.test.config.SelfClientConfigProperties
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer.Companion.keycloakContainer
+import org.keycloak.representations.idm.ClientRepresentation
 import org.springframework.boot.test.util.TestPropertyValues
 import org.springframework.context.ApplicationContextInitializer
 import org.springframework.context.ConfigurableApplicationContext
 
+/**
+ * Setup and configuration of Keycloak to be used by the system under test
+ */
 class KeyCloakInitializer: ApplicationContextInitializer<ConfigurableApplicationContext>{
     companion object{
         val keycloakContainer: KeycloakContainer = KeycloakContainer("quay.io/keycloak/keycloak:23.0")
             .withRealmImportFile("keycloak/CX-Central.json")
 
         const val REALM =  "CX-Central"
-        const val TENANT_BPNL = "BPNL000000000010"
+        const val TENANT_BPNL = "BPNL00000003CRHK"
+        const val ROLE_MANAGEMENT_CLIENT = "technical_roles_management"
     }
 
     override fun initialize(applicationContext: ConfigurableApplicationContext) {
@@ -45,6 +50,11 @@ class KeyCloakInitializer: ApplicationContextInitializer<ConfigurableApplication
     }
 }
 
+/**
+ * Configures the tests to use the given Keycloak client for authentication with the API under test
+ *
+ * Requires a Keycloak configuration and the client to be existing already in Keycloak
+ */
 abstract class SelfClientInitializer:  ApplicationContextInitializer<ConfigurableApplicationContext>{
 
     abstract val clientId: String
@@ -53,8 +63,8 @@ abstract class SelfClientInitializer:  ApplicationContextInitializer<Configurabl
         val realm = applicationContext.environment.getProperty("bpdm.security.realm")
         val authServerUrl = applicationContext.environment.getProperty("bpdm.security.auth-server-url")
 
-        val client = keycloakContainer.keycloakAdminClient
-        val clientSecret = client.realm(realm).clients().findByClientId(clientId).first().secret
+        val adminClient = keycloakContainer.keycloakAdminClient
+        val clientSecret = adminClient.realm(realm).clients().findByClientId(clientId).first().secret
 
         TestPropertyValues.of(
             "${SelfClientConfigProperties.PREFIX}.security-enabled=true",
@@ -64,4 +74,49 @@ abstract class SelfClientInitializer:  ApplicationContextInitializer<Configurabl
             "${SelfClientConfigProperties.PREFIX}.registration.client-secret=$clientSecret"
         ).applyTo(applicationContext)
     }
+}
+
+/**
+ * Creates a new Keycloak client with a given role available in the [KeyCloakInitializer.ROLE_MANAGEMENT_CLIENT]
+ * and configures the tests to use that created client for authentication with the API under test
+ *
+ * Requires a Keycloak configuration
+ */
+abstract class CreateNewSelfClientInitializer: SelfClientInitializer(){
+
+    abstract val roleName: String
+
+    override fun initialize(applicationContext: ConfigurableApplicationContext) {
+
+        val adminClient = keycloakContainer.keycloakAdminClient
+        val realm = adminClient.realm(KeyCloakInitializer.REALM)
+        val clients = realm.clients()
+
+        val roleManagementClientUuid = clients.findByClientId(KeyCloakInitializer.ROLE_MANAGEMENT_CLIENT).first().id
+        val roleManagementClient =  clients.get(roleManagementClientUuid)
+        val role = roleManagementClient.roles().list().find { it.name == roleName }
+
+        clientId.let { clientToCreate ->
+            clients.create(ClientRepresentation().apply {
+                this.clientId = clientToCreate
+                this.isServiceAccountsEnabled = true
+            })
+        }
+
+        val createdClientUuid = clients.findByClientId(clientId).first().id
+
+        val newServiceAccount = clients
+            .get(createdClientUuid)
+            .serviceAccountUser
+
+        realm.users()
+            .get(newServiceAccount.id)
+            .roles()
+            .clientLevel(roleManagementClient.toRepresentation().id)
+            .add(listOf(role))
+
+
+        super.initialize(applicationContext)
+    }
+
 }
