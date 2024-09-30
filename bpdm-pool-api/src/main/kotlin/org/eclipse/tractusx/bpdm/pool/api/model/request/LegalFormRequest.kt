@@ -19,6 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.model.request
 
+import com.neovisionaries.i18n.CountryCode
+import com.neovisionaries.i18n.LanguageCode
 import io.swagger.v3.oas.annotations.media.Schema
 
 @Schema(name = "LegalFormRequest", description = "New legal form record to be referenced by business partners")
@@ -29,6 +31,24 @@ data class LegalFormRequest(
     @Schema(description = "Full name of the legal form")
     val name: String,
 
-    @Schema(description = "Abbreviation of the legal form name")
+    @Schema(description = "Transliterated name of the legal form")
+    val transliteratedName: String?,
+
+    @Schema(description = "Comma separed list of abbreviations of the legal form name")
     val abbreviation: String?,
+
+    @Schema(description = "Transliterated abbreviations of the legal form abbreviations")
+    val transliteratedAbbreviations: String?,
+
+    @Schema(description = "The country to which this legal form belongs to")
+    val country: CountryCode?,
+
+    @Schema(description = "The language of the legal form's name")
+    val language: LanguageCode?,
+
+    @Schema(description = "The administrative area level 1 this legal form belongs to")
+    val administrativeAreaLevel1: String?,
+
+    @Schema(description = "Whether this legal form is considered as active according to GLEIF")
+    val isActive: Boolean
 )

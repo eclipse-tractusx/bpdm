@@ -31,11 +31,6 @@ class PoolDataHelpers(val poolClient: PoolApiClient?) {
 
     fun createPoolMetadata() {
 
-        poolClient!!.metadata.createLegalForm(BusinessPartnerNonVerboseValues.legalForm1)
-        poolClient!!.metadata.createLegalForm(BusinessPartnerNonVerboseValues.legalForm2)
-        poolClient!!.metadata.createLegalForm(BusinessPartnerNonVerboseValues.legalForm3)
-
-
         poolClient!!.metadata.createIdentifierType(BusinessPartnerNonVerboseValues.identifierTypeDto1)
         poolClient!!.metadata.createIdentifierType(BusinessPartnerNonVerboseValues.identifierTypeDto2)
         poolClient!!.metadata.createIdentifierType(BusinessPartnerNonVerboseValues.identifierTypeDto3)

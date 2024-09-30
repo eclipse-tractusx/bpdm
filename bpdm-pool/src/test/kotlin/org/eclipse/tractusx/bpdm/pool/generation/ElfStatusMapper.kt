@@ -17,34 +17,30 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.model
+package org.eclipse.tractusx.bpdm.pool.generation
 
-import com.neovisionaries.i18n.CountryCode
-import com.neovisionaries.i18n.LanguageCode
-import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalFormDescription
+import org.eclipse.tractusx.bpdm.common.mapping.BpdmStringMapper
+import org.eclipse.tractusx.bpdm.common.mapping.MappingResult
+import org.eclipse.tractusx.bpdm.common.mapping.ValidationContext
+import org.eclipse.tractusx.bpdm.common.mapping.ValidationError
 
-@Schema(description = LegalFormDescription.header)
-data class LegalFormDto(
 
-    @get:Schema(description = LegalFormDescription.technicalKey)
-    val technicalKey: String,
+class ElfStatusMapper: BpdmStringMapper<Boolean> {
+    companion object{
+        const val ERROR_CODE = "NoElfStatus"
+    }
 
-    @get:Schema(description = LegalFormDescription.name)
-    val name: String,
+    override fun map(valueToMap: String, context: ValidationContext): MappingResult<Boolean> {
+        return MappingResult.errorOnNull(
+            when(valueToMap){
+                "ACTV" -> true
+                "INAC" -> false
+                else -> null
+            }
+        ){
+            listOf(ValidationError(ERROR_CODE, "Is not a valid ELF status", valueToMap, context))
+        }
+    }
 
-    val transliteratedName: String?,
 
-    @get:Schema(description = LegalFormDescription.abbreviation)
-    val abbreviation: String? = null,
-
-    val country: CountryCode?,
-
-    val language: LanguageCode?,
-
-    val administrativeAreaLevel1: String?,
-
-    val transliteratedAbbreviations: String?,
-
-    val isActive: Boolean
-)
+}

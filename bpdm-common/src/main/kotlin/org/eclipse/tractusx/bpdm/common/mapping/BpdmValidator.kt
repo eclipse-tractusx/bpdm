@@ -17,34 +17,29 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.model
+package org.eclipse.tractusx.bpdm.common.mapping
 
-import com.neovisionaries.i18n.CountryCode
-import com.neovisionaries.i18n.LanguageCode
-import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalFormDescription
+/**
+ * Offers base logic to validate values
+ */
+interface BpdmValidator<T> {
 
-@Schema(description = LegalFormDescription.header)
-data class LegalFormDto(
+    /**
+     * The list of [BpdmValidation] that will be applied to values given to this validator
+     */
+    val validations: List<BpdmValidation<T>>
 
-    @get:Schema(description = LegalFormDescription.technicalKey)
-    val technicalKey: String,
+    /**
+     * Validate given [value] within given [context] and return any found [ValidationError] in a list
+     */
+    fun validate(value: T, context: ValidationContext = ValidationContext.NoContext): List<ValidationError>{
+        return validations.mapNotNull { it.validate(value, context) }
+    }
 
-    @get:Schema(description = LegalFormDescription.name)
-    val name: String,
-
-    val transliteratedName: String?,
-
-    @get:Schema(description = LegalFormDescription.abbreviation)
-    val abbreviation: String? = null,
-
-    val country: CountryCode?,
-
-    val language: LanguageCode?,
-
-    val administrativeAreaLevel1: String?,
-
-    val transliteratedAbbreviations: String?,
-
-    val isActive: Boolean
-)
+    /**
+     * Validate given [value] and throw exception if any error is found
+     */
+    fun assert(value: T){
+        require(validate(value).isEmpty())
+    }
+}

@@ -83,17 +83,35 @@ object BusinessPartnerNonVerboseValues {
     val legalForm1 = LegalFormRequest(
         technicalKey = BusinessPartnerVerboseValues.legalForm1.technicalKey,
         name = BusinessPartnerVerboseValues.legalForm1.name,
+        transliteratedName = BusinessPartnerVerboseValues.legalForm1.transliteratedName,
         abbreviation = BusinessPartnerVerboseValues.legalForm1.abbreviation,
+        transliteratedAbbreviations = BusinessPartnerVerboseValues.legalForm1.transliteratedAbbreviations,
+        country = BusinessPartnerVerboseValues.legalForm1.country,
+        language = BusinessPartnerVerboseValues.legalForm1.language,
+        administrativeAreaLevel1 = BusinessPartnerVerboseValues.legalForm1.administrativeAreaLevel1,
+        isActive = BusinessPartnerVerboseValues.legalForm1.isActive
     )
     val legalForm2 = LegalFormRequest(
         technicalKey = BusinessPartnerVerboseValues.legalForm2.technicalKey,
         name = BusinessPartnerVerboseValues.legalForm2.name,
+        transliteratedName = BusinessPartnerVerboseValues.legalForm2.transliteratedName,
         abbreviation = BusinessPartnerVerboseValues.legalForm2.abbreviation,
+        transliteratedAbbreviations = BusinessPartnerVerboseValues.legalForm2.transliteratedAbbreviations,
+        country = BusinessPartnerVerboseValues.legalForm2.country,
+        language = BusinessPartnerVerboseValues.legalForm2.language,
+        administrativeAreaLevel1 = BusinessPartnerVerboseValues.legalForm2.administrativeAreaLevel1,
+        isActive = BusinessPartnerVerboseValues.legalForm2.isActive
     )
     val legalForm3 = LegalFormRequest(
         technicalKey = BusinessPartnerVerboseValues.legalForm3.technicalKey,
         name = BusinessPartnerVerboseValues.legalForm3.name,
+        transliteratedName = BusinessPartnerVerboseValues.legalForm3.transliteratedName,
         abbreviation = BusinessPartnerVerboseValues.legalForm3.abbreviation,
+        transliteratedAbbreviations = BusinessPartnerVerboseValues.legalForm3.transliteratedAbbreviations,
+        country = BusinessPartnerVerboseValues.legalForm3.country,
+        language = BusinessPartnerVerboseValues.legalForm3.language,
+        administrativeAreaLevel1 = BusinessPartnerVerboseValues.legalForm3.administrativeAreaLevel1,
+        isActive = BusinessPartnerVerboseValues.legalForm3.isActive
     )
 
     private val leStatus1 = LegalEntityStateDto(

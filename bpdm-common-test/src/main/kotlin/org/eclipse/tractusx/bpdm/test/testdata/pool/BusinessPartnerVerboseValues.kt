@@ -92,19 +92,38 @@ object BusinessPartnerVerboseValues {
         LegalEntityIdentifierVerboseDto("An ID Value", identifierType3, "Official Z")
 
     val legalForm1 = LegalFormDto(
-        technicalKey = "LF1",
+        technicalKey = "EI4J",
         name = "Limited Liability Company",
-        abbreviation = "LLC",
+        abbreviation = "LLC;L.L.C.",
+        transliteratedName = "Limited Liability Company",
+        country = CountryCode.US,
+        language = LanguageCode.en,
+        administrativeAreaLevel1 = "US-CA",
+        transliteratedAbbreviations = null,
+        isActive = true,
+
     )
     val legalForm2 = LegalFormDto(
-        technicalKey = "LF2",
-        name = "Gemeinschaft mit beschränkter Haftung",
+        technicalKey = "2HBR",
+        name = "Gesellschaft mit beschränkter Haftung",
         abbreviation = "GmbH",
+        transliteratedName = "Gesellschaft mit beschränkter Haftung",
+        country = CountryCode.DE,
+        language = LanguageCode.de,
+        administrativeAreaLevel1 = null,
+        transliteratedAbbreviations = null,
+        isActive = true
     )
     val legalForm3 = LegalFormDto(
-        technicalKey = "LF3",
-        name = "股份有限公司",
-        abbreviation = "股份有限",
+        technicalKey = "2M6Y",
+        name = "基金会",
+        abbreviation = null,
+        transliteratedName = "ji jin hui",
+        country = CountryCode.CN,
+        language = LanguageCode.zh,
+        administrativeAreaLevel1 = null,
+        transliteratedAbbreviations = null,
+        isActive = true
     )
 
     val statusType1 = TypeKeyNameVerboseDto(BusinessStateType.ACTIVE, BusinessStateType.ACTIVE.getTypeName())

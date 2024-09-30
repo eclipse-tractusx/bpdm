@@ -23,7 +23,6 @@ import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.*
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
 import org.eclipse.tractusx.bpdm.test.util.Timeframe
 import java.time.Instant
 import kotlin.random.Random
@@ -42,9 +41,9 @@ class PoolDataHelper(
 ) {
 
     fun createTestDataEnvironment(): TestDataEnvironment {
-        val legalForms = metadataToCreate.legalFormKeys.map { poolClient.metadata.createLegalForm(createLegalFormRequest(it)) }
         val legalEntityIdentifierTypes = metadataToCreate.legalEntityIdentifierTypeKeys.map { poolClient.metadata.createIdentifierType(createIdentifierType(it, IdentifierBusinessPartnerType.LEGAL_ENTITY)) }
         val addressIdentifierTypes = metadataToCreate.addressIdentifierTypeKeys.map { poolClient.metadata.createIdentifierType(createIdentifierType(it, IdentifierBusinessPartnerType.ADDRESS)) }
+        val legalForms = poolClient.metadata.getLegalForms(PaginationRequest()).content.toList()
         val adminAreas = poolClient.metadata.getAdminAreasLevel1(PaginationRequest()).content.toList()
 
         val testMetadata = TestMetadata(legalForms, legalEntityIdentifierTypes, addressIdentifierTypes, adminAreas)
@@ -96,10 +95,6 @@ class PoolDataHelper(
             )
         )
     }
-
-    private fun createLegalFormRequest(seed: String): LegalFormRequest {
-        return LegalFormRequest(seed, "Legal Form Name $seed", "Legal Form Abbreviation $seed")
-    }
 }
 
 data class HierarchyCreationResponse(
@@ -121,7 +116,6 @@ data class TestMetadata(
 )
 
 data class TestMetadataKeys(
-    val legalFormKeys: List<String>,
     val legalEntityIdentifierTypeKeys: List<String>,
     val addressIdentifierTypeKeys: List<String>
 )

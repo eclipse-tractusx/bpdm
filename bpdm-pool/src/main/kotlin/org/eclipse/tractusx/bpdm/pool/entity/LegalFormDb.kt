@@ -19,9 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.entity
 
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.Table
+import com.neovisionaries.i18n.CountryCode
+import com.neovisionaries.i18n.LanguageCode
+import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 
 @Entity
@@ -33,7 +33,28 @@ class LegalFormDb(
     @Column(name = "name", nullable = false)
     val name: String,
 
+    @Column(name = "transliterated_name", nullable = false)
+    val transliteratedName: String?,
+
     @Column(name = "abbreviation")
-    val abbreviation: String?
+    val abbreviation: String?,
+
+    @Column(name = "transliterated_abbreviations")
+    val transliteratedAbbreviations: String?,
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "country_code")
+    val countryCode: CountryCode?,
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "language_code")
+    val languageCode: LanguageCode?,
+
+    @ManyToOne
+    @JoinColumn(name = "region_id")
+    val administrativeArea: RegionDb?,
+
+    @Column(name = "is_active")
+    val isActive: Boolean
 
 ) : BaseEntity()

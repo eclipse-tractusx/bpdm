@@ -53,6 +53,14 @@ See [DEPENDENCIES](DEPENDENCIES) file.
 - File Location: [IP2LOCATION-ISO3166-2.CSV](bpdm-pool/src/main/resources/regions/IP2LOCATION-ISO3166-2.CSV)
 - Source URL: https://www.ip2location.com
 
+### Legal Forms
+
+- Description: CSV file content for ISO-20275
+- SPDX-License-Identifier: [CC0-1.0](LICENSES/CC0-1.0.txt)
+- File Location: [2023-09-28-elf-code-list-v1.5.csv](bpdm-pool/src/main/resources/legalforms/2023-09-28-elf-code-list-v1.5.csv)
+- Source URL: https://www.gleif.org/de/about-lei/code-lists/iso-20275-entity-legal-forms-code-list
+- License Information URL: https://www.gleif.org/en/about/open-data
+
 ## Cryptography
 
 Content may contain encryption software. The country in which you are currently

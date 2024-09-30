@@ -17,34 +17,21 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.model
+package org.eclipse.tractusx.bpdm.pool.generation
 
-import com.neovisionaries.i18n.CountryCode
-import com.neovisionaries.i18n.LanguageCode
-import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalFormDescription
+import org.eclipse.tractusx.bpdm.common.mapping.BpdmStringMapper
+import org.eclipse.tractusx.bpdm.common.mapping.CommonValidationErrorCodes
+import org.eclipse.tractusx.bpdm.common.mapping.MappingResult
+import org.eclipse.tractusx.bpdm.common.mapping.ValidationContext
+import org.eclipse.tractusx.bpdm.pool.entity.RegionDb
+import org.eclipse.tractusx.bpdm.pool.repository.RegionRepository
 
-@Schema(description = LegalFormDescription.header)
-data class LegalFormDto(
-
-    @get:Schema(description = LegalFormDescription.technicalKey)
-    val technicalKey: String,
-
-    @get:Schema(description = LegalFormDescription.name)
-    val name: String,
-
-    val transliteratedName: String?,
-
-    @get:Schema(description = LegalFormDescription.abbreviation)
-    val abbreviation: String? = null,
-
-    val country: CountryCode?,
-
-    val language: LanguageCode?,
-
-    val administrativeAreaLevel1: String?,
-
-    val transliteratedAbbreviations: String?,
-
-    val isActive: Boolean
-)
+class AdminAreaMapper(
+    private val regionRepository: RegionRepository
+): BpdmStringMapper<RegionDb> {
+    override fun map(valueToMap: String, context: ValidationContext): MappingResult<RegionDb> {
+       return MappingResult.errorOnNull(regionRepository.findByRegionCodeIn(setOf(valueToMap)).firstOrNull()){
+           listOf(CommonValidationErrorCodes.ISO31662.toValidationError(valueToMap, context))
+       }
+    }
+}

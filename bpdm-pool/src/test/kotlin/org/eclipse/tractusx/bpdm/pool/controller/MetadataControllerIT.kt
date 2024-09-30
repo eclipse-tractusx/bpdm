@@ -47,6 +47,7 @@ import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerVerboseValues
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -82,17 +83,6 @@ class MetadataControllerIT @Autowired constructor(
             BusinessPartnerNonVerboseValues.identifierTypeDto1,
             BusinessPartnerNonVerboseValues.identifierTypeDto2,
             BusinessPartnerNonVerboseValues.identifierTypeDto3
-        )
-
-        private val legalFormRequests = listOf(
-            BusinessPartnerNonVerboseValues.legalForm1,
-            BusinessPartnerNonVerboseValues.legalForm2,
-            BusinessPartnerNonVerboseValues.legalForm3
-        )
-        private val legalFormExpected = listOf(
-            BusinessPartnerVerboseValues.legalForm1,
-            BusinessPartnerVerboseValues.legalForm2,
-            BusinessPartnerVerboseValues.legalForm3
         )
 
         private fun postIdentifierType(client: WebTestClient, type: IdentifierTypeDto) =
@@ -146,11 +136,6 @@ class MetadataControllerIT @Autowired constructor(
                     BusinessPartnerNonVerboseValues.identifierTypeDto1,
                     BusinessPartnerNonVerboseValues.identifierTypeDto1,
                     ::postIdentifierType
-                ),
-                Arguments.of(
-                    BusinessPartnerNonVerboseValues.legalForm1,
-                    BusinessPartnerVerboseValues.legalForm1,
-                    ::postLegalForm
                 )
             )
 
@@ -162,12 +147,6 @@ class MetadataControllerIT @Autowired constructor(
                     BusinessPartnerNonVerboseValues.identifierTypeDto1,
                     ::postIdentifierTypeWithoutExpectation,
                     ::getIdentifierTypes
-                ),
-                Arguments.of(
-                    BusinessPartnerNonVerboseValues.legalForm1,
-                    BusinessPartnerVerboseValues.legalForm1,
-                    ::postLegalFormWithoutExpectation,
-                    ::getLegalForms
                 )
             )
 
@@ -179,12 +158,6 @@ class MetadataControllerIT @Autowired constructor(
                     identifierTypeDtos,
                     ::postIdentifierType,
                     ::getIdentifierTypes
-                ),
-                Arguments.of(
-                    legalFormRequests,
-                    legalFormExpected,
-                    ::postLegalForm,
-                    ::getLegalForms
                 )
             )
     }
@@ -210,6 +183,18 @@ class MetadataControllerIT @Autowired constructor(
     }
 
     /**
+     * When creating new legalForm
+     * Then created legalForm returned
+     */
+    @Test
+    fun createLegalForm() {
+        val technicalKey = "CREATE_TEST_UNIQUE"
+        val createdLegalForm = poolClient.metadata.createLegalForm(BusinessPartnerNonVerboseValues.legalForm1.copy(technicalKey = technicalKey))
+
+        assertThat(createdLegalForm).isEqualTo(BusinessPartnerVerboseValues.legalForm1.copy(technicalKey = technicalKey))
+    }
+
+    /**
      * Given metadata with technical key
      * When trying to create new metadata with that technical key
      * Then metadata is not created and error returned
@@ -228,6 +213,19 @@ class MetadataControllerIT @Autowired constructor(
     }
 
     /**
+     * Given legalForm with technical key
+     * When trying to create new legalForm with that technical key
+     * Then legalForm is not created and error returned
+     */
+    @Test
+    fun createLegalform_Conflict() {
+        val legalFormToCreate = BusinessPartnerNonVerboseValues.legalForm2.copy(technicalKey = "CONFLICT_TEST_UNIQUE")
+        poolClient.metadata.createLegalForm(legalFormToCreate)
+        //Expect Error when posting legal form with same technical key
+        assertThrows<Throwable>{ poolClient.metadata.createLegalForm(legalFormToCreate) }
+    }
+
+    /**
      * Given metadata
      * When asking for metadata entries
      * Then that metadata returned
@@ -241,6 +239,19 @@ class MetadataControllerIT @Autowired constructor(
         val expectedPage = PageDto(expected.size.toLong(), 1, 0, expected.size, expected)
 
         assertThat(returnedPage).usingRecursiveComparison().ignoringCollectionOrder().isEqualTo(expectedPage)
+    }
+
+    /**
+     * Given legalForms
+     * When asking for a page of legalForms
+     * Then a full page of legalForms is returned
+     */
+    @Test
+    fun getLegalForm_FullPage() {
+        val paginationRequest = PaginationRequest()
+        val returnedLegalForms = poolClient.metadata.getLegalForms(paginationRequest)
+
+        assertThat(returnedLegalForms.content.size).isEqualTo(paginationRequest.size)
     }
 
     /**

@@ -17,34 +17,10 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.model
+package org.eclipse.tractusx.bpdm.common.mapping
 
-import com.neovisionaries.i18n.CountryCode
-import com.neovisionaries.i18n.LanguageCode
-import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalFormDescription
-
-@Schema(description = LegalFormDescription.header)
-data class LegalFormDto(
-
-    @get:Schema(description = LegalFormDescription.technicalKey)
-    val technicalKey: String,
-
-    @get:Schema(description = LegalFormDescription.name)
-    val name: String,
-
-    val transliteratedName: String?,
-
-    @get:Schema(description = LegalFormDescription.abbreviation)
-    val abbreviation: String? = null,
-
-    val country: CountryCode?,
-
-    val language: LanguageCode?,
-
-    val administrativeAreaLevel1: String?,
-
-    val transliteratedAbbreviations: String?,
-
-    val isActive: Boolean
-)
+interface HasMappingResult<T> {
+    val errors: List<ValidationError>
+    val isSuccess: Boolean
+    val successfulResult: T?
+}
