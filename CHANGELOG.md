@@ -30,6 +30,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM Gate: Improved error response by adding external id details and reduced csv columns by removing support for uncategorized fields in csv file for partner upload process([#700](https://github.com/eclipse-tractusx/sig-release/issues/700))
 - BPDM Cleaning Service Dummy: Added a null check for name parts to ensure proper whitespace handling when constructing the legal name from them.
 - BPDM Gate: Enabled Tax Jurisdiction code to save it to the Output.
+- BPDM Cleaning Service Dummy: Removed assignment of uncategorized states while performing cleaning legal entity process.
 
 ## [6.1.0] - [2024-07-15]
 
