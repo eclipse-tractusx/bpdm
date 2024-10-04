@@ -31,6 +31,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM Cleaning Service Dummy: Added a null check for name parts to ensure proper whitespace handling when constructing the legal name from them.
 - BPDM Gate: Enabled Tax Jurisdiction code to save it to the Output.
 - BPDM Cleaning Service Dummy: Removed assignment of uncategorized states while performing cleaning legal entity process.
+- BPDM Gate: Fixed construction logic for states and identifiers by enabling business partner type 
 
 ## [6.1.0] - [2024-07-15]
 
