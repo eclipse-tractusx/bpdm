@@ -187,5 +187,5 @@ jobs:
           helm repo add tractusx-dev https://eclipse-tractusx.github.io/charts/dev
           helm install bpdm-test tractusx-dev/bpdm ${{ github.event.inputs.upgrade_from && '--version github.event.inputs.upgrade_from' || '' }}
           helm dependency update charts/bpdm
-          helm upgrade bpdm-test charts/bpdm
+          helm upgrade --set centralidp.keycloak.postgresql.auth.postgresPassword=test --set centralidp.keycloak.postgresql.auth.password=test --set centralidp.keycloak.postgresql.auth.replicationPassword=test  bpdm-test charts/bpdm
 

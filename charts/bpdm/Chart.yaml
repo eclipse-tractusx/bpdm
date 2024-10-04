@@ -55,8 +55,8 @@ dependencies:
     repository: https://charts.bitnami.com/bitnami
     alias: postgres
     condition: postgres.enabled
-  - name: keycloak
-    version: 19.3.0
-    repository: https://charts.bitnami.com/bitnami
-    alias: keycloak
-    condition: keycloak.enabled
+  - name: centralidp
+    version: 3.0.1
+    repository: https://eclipse-tractusx.github.io/charts/dev
+    alias: centralidp
+    condition: centralidp.enabled

@@ -116,13 +116,10 @@ startupProbe:
 
 # Used to overwrite the default property values of the application configuration
 applicationConfig:
-  bpdm:
-    client:
-      orchestrator:
-        # If empty sets kubernetes BPDM Orchestrator service with same release name
-        base-url:
 
 # Used to overwrite the secret property values of the application configuration
 applicationSecrets:
 
 
+centralidp:
+  enabled: true

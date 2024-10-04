@@ -75,9 +75,9 @@ bpdm:
         # The orchestrator client should use client credentials mechanism to request a token from the provider
         authorization-grant-type: client_credentials
         # Use a default client id for the client credentials request
-        client-id: POOL-ORCHESTRATOR-TASK-PROCESSOR
+        client-id: sa-cl25-cx-2
         # Please provide a secret here
-        client-secret: ${BPDM_POOL_ORCH_CLIENT_SECRET}
+        client-secret: "**********"
   tasks:
     # When and how often the Pool should poll for golden record tasks in the orchestrator
     cron: '*/30 * * * * *'
@@ -93,7 +93,7 @@ bpdm:
     # URL to the auth endpoint of the Keycloak server
     auth-url: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}/protocol/openid-connect/auth
     # This application's resource or client. Used for finding permissions in the given Bearer token
-    client-id: BPDM-POOL
+    client-id: Cl7-CX-BPDM
     # The keycloak realm to consider
     realm: CX-Central
     # URL to the token refresh endpoint of the Keycloak server

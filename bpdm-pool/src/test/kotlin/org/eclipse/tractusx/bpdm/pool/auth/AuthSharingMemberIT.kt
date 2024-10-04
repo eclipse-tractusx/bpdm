@@ -35,8 +35,7 @@ import org.springframework.test.context.ContextConfiguration
     KeyCloakInitializer::class,
     SelfClientAsSharingMemberInitializer::class
 ])
-class
-AuthSharingMemberIT @Autowired constructor(
+class AuthSharingMemberIT @Autowired constructor(
     poolApiClient: PoolApiClient,
 ): AuthTestBase(
     poolApiClient,
@@ -72,16 +71,16 @@ AuthSharingMemberIT @Autowired constructor(
         getFieldQualityRules = AuthExpectationType.Authorized
     ),
     MembersAuthExpectations(
-        postAddressSearch = AuthExpectationType.Authorized,
-        postSiteSearch = AuthExpectationType.Authorized,
-        postLegalEntitySearch = AuthExpectationType.Authorized,
-        postChangelogSearch = AuthExpectationType.Authorized
+        postAddressSearch = AuthExpectationType.Forbidden,
+        postSiteSearch = AuthExpectationType.Forbidden,
+        postLegalEntitySearch = AuthExpectationType.Forbidden,
+        postChangelogSearch = AuthExpectationType.Forbidden
     ),
-    changelogAuthExpectation = AuthExpectationType.Authorized,
+    changelogAuthExpectation = AuthExpectationType.Forbidden,
     bpnAuthExpectation = AuthExpectationType.Forbidden
 )
 
 class SelfClientAsSharingMemberInitializer : SelfClientInitializer() {
     override val clientId: String
-        get() = "GATE-POOL-SHARING_MEMBER"
+        get() = "sa-cl7-cx-1"
 }

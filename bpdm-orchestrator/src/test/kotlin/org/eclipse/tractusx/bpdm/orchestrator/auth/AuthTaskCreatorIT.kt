@@ -64,6 +64,6 @@ class AuthTaskCreatorIT @Autowired constructor(
 
     class SelfClientAsTaskCreatorInitializer : SelfClientInitializer() {
         override val clientId: String
-            get() = "GATE-ORCHESTRATOR-TASK_CREATOR"
+            get() = "sa-cl25-cx-3"
     }
 }

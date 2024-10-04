@@ -21,9 +21,9 @@ package org.eclipse.tractusx.bpdm.gate.auth
 
 import org.eclipse.tractusx.bpdm.gate.Application
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
+import org.eclipse.tractusx.bpdm.test.containers.CreateNewSelfClientInitializer
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
-import org.eclipse.tractusx.bpdm.test.containers.SelfClientInitializer
 import org.eclipse.tractusx.bpdm.test.util.AuthAssertionHelper
 import org.eclipse.tractusx.bpdm.test.util.AuthExpectationType
 import org.springframework.beans.factory.annotation.Autowired
@@ -69,9 +69,12 @@ class AuthInputManagerIT @Autowired constructor(
     )
 ) {
 
-    class SelfClientAsInputManagerInitializer : SelfClientInitializer() {
+    class SelfClientAsInputManagerInitializer : CreateNewSelfClientInitializer() {
         override val clientId: String
             get() = "EDC-GATE-INPUT-MANAGER"
+
+        override val roleName: String
+            get() = "BPDM Sharing Input Manager"
     }
 }
 

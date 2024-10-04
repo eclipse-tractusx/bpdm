@@ -24,5 +24,7 @@ bpdm:
   client:
     orchestrator:
       base-url: http://{{ include "bpdm.toReleaseName" (list . "bpdm-orchestrator") }}
+      provider:
+        issuer-uri: http://{{ include "bpdm.centralidpDependency" . }}/auth/realms/CX-Central
 {{- end -}}
 
