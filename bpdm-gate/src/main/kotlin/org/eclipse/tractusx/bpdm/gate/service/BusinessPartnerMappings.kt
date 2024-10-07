@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 
+import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
@@ -55,7 +56,15 @@ class BusinessPartnerMappings {
         return BusinessPartnerOutputDto(
             externalId = entity.sharingState.externalId,
             nameParts = entity.nameParts,
-            identifiers = entity.identifiers.map(::toIdentifierDto),
+            identifiers = entity.postalAddress.addressType?.let { addressType ->
+                entity.identifiers
+                    .filter { it.businessPartnerType == when (addressType) {
+                        AddressType.LegalAndSiteMainAddress, AddressType.LegalAddress -> BusinessPartnerType.LEGAL_ENTITY
+                        AddressType.AdditionalAddress -> BusinessPartnerType.ADDRESS
+                        AddressType.SiteMainAddress -> return@let emptyList() // No identifiers for SiteMainAddress
+                    } }
+                    .map(::toIdentifierDto)
+            }?: emptyList(),
             states = entity.states.map(::toStateDto),
             roles = entity.roles,
             isOwnCompanyData = entity.isOwnCompanyData,

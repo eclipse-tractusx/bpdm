@@ -143,8 +143,9 @@ class BusinessPartnerControllerAndSharingControllerIT @Autowired constructor(
     fun `insert one business partners and finalize cleaning task without error`() {
         this.mockAndAssertUtils.mockOrchestratorApiCleaned(gateWireMockServer)
 
+        // Expect outputBusinessPartner without identifiers as there are not Address identifier provided.
         val outputBusinessPartners = listOf(
-            BusinessPartnerVerboseValues.bpOutputDtoCleaned
+            BusinessPartnerVerboseValues.bpOutputDtoCleaned.copy(identifiers = emptyList())
         )
 
         val upsertRequests = listOf(
