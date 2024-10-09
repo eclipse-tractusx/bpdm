@@ -72,6 +72,10 @@ object BusinessPartnerVerboseValues {
     const val businessStatusDescription1 = "Active"
     const val businessStatusDescription2 = "Insolvent"
 
+    val externalSequenceTimestamp1 = "2024-06-28 11:59:00"
+    val externalSequenceTimestamp2 = "2024-06-28 12:00:00"
+    val externalSequenceTimestamp3 = "2024-06-28 12:01:00"
+
     val businessStatusValidFrom1 = LocalDateTime.of(2020, 1, 1, 0, 0)
     val businessStatusValidFrom2 = LocalDateTime.of(2019, 1, 1, 0, 0)
 
@@ -331,7 +335,8 @@ object BusinessPartnerVerboseValues {
             addressType = AddressType.LegalAddress,
             physicalPostalAddress = postalAddress2,
             alternativePostalAddress = alternativeAddressFull
-        )
+        ),
+        externalSequenceTimestamp = null
 
     )
 
@@ -657,7 +662,8 @@ object BusinessPartnerVerboseValues {
             addressType = AddressType.LegalAndSiteMainAddress,
             physicalPostalAddress = physicalAddressChina,
             alternativePostalAddress = AlternativePostalAddressDto()
-        )
+        ),
+        externalSequenceTimestamp = null
     )
 
     val bpInputRequestCleaned = BusinessPartnerInputRequest(
@@ -685,7 +691,8 @@ object BusinessPartnerVerboseValues {
             addressType = AddressType.LegalAddress,
             physicalPostalAddress = postalAddress2,
             alternativePostalAddress = alternativeAddressFull
-        )
+        ),
+        externalSequenceTimestamp = null
     )
 
     val bpInputRequestError = BusinessPartnerInputRequest(
@@ -713,7 +720,8 @@ object BusinessPartnerVerboseValues {
             addressType = AddressType.LegalAddress,
             physicalPostalAddress = postalAddress2,
             alternativePostalAddress = alternativeAddressFull
-        )
+        ),
+        externalSequenceTimestamp = null
     )
 
     val bpOutputDtoCleaned = BusinessPartnerOutputDto(
@@ -827,6 +835,60 @@ object BusinessPartnerVerboseValues {
         isOwnCompanyData = false,
         createdAt = Instant.now(),
         updatedAt = Instant.now()
+    )
+
+    val bpInputRequestWithExternalSequenceTimestamp1 = BusinessPartnerInputRequest(
+        externalId = externalId1,
+        legalEntity = LegalEntityRepresentationInputDto(
+            legalEntityBpn = "BPNL0000000000XY",
+            shortName = "short",
+            legalName = "Limited Liability Company Name",
+            legalForm = "Limited Liability Company"
+        ),
+        address = AddressRepresentationInputDto(
+            addressBpn = "BPNA0000000001XY",
+            name = "Address Name",
+            addressType = null,
+            physicalPostalAddress = physicalAddressMinimal
+        ),
+        externalSequenceTimestamp = externalSequenceTimestamp1
+
+    )
+
+    val bpInputRequestWithExternalSequenceTimestamp2 = BusinessPartnerInputRequest(
+        externalId = externalId1,
+        legalEntity = LegalEntityRepresentationInputDto(
+            legalEntityBpn = "BPNL0000000000XY",
+            shortName = "short1",
+            legalName = "Limited Liability Company Name",
+            legalForm = "Limited Liability Company"
+        ),
+        address = AddressRepresentationInputDto(
+            addressBpn = "BPNA0000000001XY",
+            name = "Address Name",
+            addressType = null,
+            physicalPostalAddress = physicalAddressMinimal
+        ),
+        externalSequenceTimestamp = externalSequenceTimestamp2
+
+    )
+
+    val bpInputRequestWithExternalSequenceTimestamp3 = BusinessPartnerInputRequest(
+        externalId = externalId1,
+        legalEntity = LegalEntityRepresentationInputDto(
+            legalEntityBpn = "BPNL0000000000XY",
+            shortName = "short2",
+            legalName = "Limited Liability Company Name",
+            legalForm = "Limited Liability Company"
+        ),
+        address = AddressRepresentationInputDto(
+            addressBpn = "BPNA0000000001XY",
+            name = "Another address Name",
+            addressType = null,
+            physicalPostalAddress = physicalAddressMinimal
+        ),
+        externalSequenceTimestamp = externalSequenceTimestamp3
+
     )
 
     val now = Instant.now()

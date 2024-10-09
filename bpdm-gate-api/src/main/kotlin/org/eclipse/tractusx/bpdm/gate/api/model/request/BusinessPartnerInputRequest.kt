@@ -42,6 +42,7 @@ data class BusinessPartnerInputRequest(
     override val isOwnCompanyData: Boolean = false,
     override val legalEntity: LegalEntityRepresentationInputDto = LegalEntityRepresentationInputDto(),
     override val site: SiteRepresentationInputDto = SiteRepresentationInputDto(),
-    override val address: AddressRepresentationInputDto = AddressRepresentationInputDto()
+    override val address: AddressRepresentationInputDto = AddressRepresentationInputDto(),
+    override val externalSequenceTimestamp: String?
 
 ) : IBaseBusinessPartnerGateDto
