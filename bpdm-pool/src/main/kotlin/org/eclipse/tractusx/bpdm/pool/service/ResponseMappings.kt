@@ -97,7 +97,17 @@ fun IdentifierTypeDb.toDto(): IdentifierTypeDto {
 }
 
 fun LegalFormDb.toDto(): LegalFormDto {
-    return LegalFormDto(technicalKey, name, abbreviation)
+    return LegalFormDto(
+        technicalKey = technicalKey,
+        name = name,
+        transliteratedName = transliteratedName,
+        abbreviation = abbreviation,
+        transliteratedAbbreviations = transliteratedAbbreviations,
+        country = countryCode,
+        language = languageCode,
+        administrativeAreaLevel1 = administrativeArea?.regionCode,
+        isActive = isActive
+    )
 }
 
 fun LegalEntityStateDb.toDto(): LegalEntityStateVerboseDto {

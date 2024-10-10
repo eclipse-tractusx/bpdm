@@ -17,34 +17,19 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.model
+package org.eclipse.tractusx.bpdm.common.mapping
 
 import com.neovisionaries.i18n.CountryCode
-import com.neovisionaries.i18n.LanguageCode
-import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalFormDescription
+import org.springframework.stereotype.Component
 
-@Schema(description = LegalFormDescription.header)
-data class LegalFormDto(
+@Component
+class BpdmCountryCodeMapper: BpdmStringMapper<CountryCode> {
 
-    @get:Schema(description = LegalFormDescription.technicalKey)
-    val technicalKey: String,
+    private val entriesByName = CountryCode.entries.associateBy { it.name }
 
-    @get:Schema(description = LegalFormDescription.name)
-    val name: String,
-
-    val transliteratedName: String?,
-
-    @get:Schema(description = LegalFormDescription.abbreviation)
-    val abbreviation: String? = null,
-
-    val country: CountryCode?,
-
-    val language: LanguageCode?,
-
-    val administrativeAreaLevel1: String?,
-
-    val transliteratedAbbreviations: String?,
-
-    val isActive: Boolean
-)
+    override fun map(valueToMap: String, context: ValidationContext): MappingResult<CountryCode> {
+        return MappingResult.errorOnNull(entriesByName[valueToMap]){
+            listOf(CommonValidationErrorCodes.ISO31661.toValidationError(valueToMap, context))
+        }
+    }
+}

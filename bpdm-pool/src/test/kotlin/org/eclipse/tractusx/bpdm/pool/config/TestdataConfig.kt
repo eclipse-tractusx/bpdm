@@ -36,7 +36,6 @@ class TestdataConfig {
     fun poolDataHelper(poolClient: PoolApiClient): PoolDataHelper {
         return PoolDataHelper(
             metadataToCreate = TestMetadataKeys(
-                legalFormKeys = listOf("LF1", "LF2", "LF3"),
                 legalEntityIdentifierTypeKeys = listOf("LID1", "LID2", "LID3", "LID4", "LID5", "LID6", "LID7", "LID8"),
                 addressIdentifierTypeKeys = listOf("AID1", "AID2", "AID3", "AID4", "AID5", "AID6", "AID7", "AID8")
             ),

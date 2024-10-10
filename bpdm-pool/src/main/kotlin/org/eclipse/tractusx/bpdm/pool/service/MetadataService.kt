@@ -94,10 +94,18 @@ class MetadataService(
 
         logger.info { "Create new Legal-Form with key ${request.technicalKey} and name ${request.name}" }
 
+        val region = request.administrativeAreaLevel1?.let { regionRepository.findByRegionCodeIn(setOf(it)) }?.firstOrNull()
+
         val legalForm = LegalFormDb(
             technicalKey = request.technicalKey,
             name = request.name,
-            abbreviation = request.abbreviation
+            transliteratedName = request.transliteratedName,
+            abbreviation = request.abbreviation,
+            transliteratedAbbreviations = request.transliteratedAbbreviations,
+            countryCode = request.country,
+            languageCode = request.language,
+            administrativeArea = region,
+            isActive = request.isActive
         )
 
         return legalFormRepository.save(legalForm).toDto()

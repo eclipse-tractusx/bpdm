@@ -17,34 +17,21 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.model
+package org.eclipse.tractusx.bpdm.common.mapping.types
 
-import com.neovisionaries.i18n.CountryCode
-import com.neovisionaries.i18n.LanguageCode
-import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalFormDescription
+import org.eclipse.tractusx.bpdm.common.mapping.BpdmExceedLengthValidation
+import org.eclipse.tractusx.bpdm.common.mapping.BpdmFilledLimitedStringMapper
+import org.eclipse.tractusx.bpdm.common.mapping.CommonValidationErrorCodes
 
-@Schema(description = LegalFormDescription.header)
-data class LegalFormDto(
+const val SHORT_STRING_LENGTH = 100
 
-    @get:Schema(description = LegalFormDescription.technicalKey)
-    val technicalKey: String,
+@JvmInline
+value class FilledShortString(val value: String) {
+    init { assert(value) }
 
-    @get:Schema(description = LegalFormDescription.name)
-    val name: String,
-
-    val transliteratedName: String?,
-
-    @get:Schema(description = LegalFormDescription.abbreviation)
-    val abbreviation: String? = null,
-
-    val country: CountryCode?,
-
-    val language: LanguageCode?,
-
-    val administrativeAreaLevel1: String?,
-
-    val transliteratedAbbreviations: String?,
-
-    val isActive: Boolean
-)
+    companion object: BpdmFilledLimitedStringMapper<FilledShortString>(
+        BpdmExceedLengthValidation(SHORT_STRING_LENGTH, CommonValidationErrorCodes.ExceedsShortLength)
+    ){
+        override fun transform(value: String) = FilledShortString(value)
+    }
+}

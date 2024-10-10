@@ -17,34 +17,24 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.model
+package org.eclipse.tractusx.bpdm.common.mapping.types
 
-import com.neovisionaries.i18n.CountryCode
-import com.neovisionaries.i18n.LanguageCode
-import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalFormDescription
+import org.eclipse.tractusx.bpdm.common.mapping.BpdmExceedLengthValidation
+import org.eclipse.tractusx.bpdm.common.mapping.BpdmFilledLimitedStringMapper
+import org.eclipse.tractusx.bpdm.common.mapping.CommonValidationErrorCodes
 
-@Schema(description = LegalFormDescription.header)
-data class LegalFormDto(
+const val TINY_STRING_LENGTH = 10
 
-    @get:Schema(description = LegalFormDescription.technicalKey)
-    val technicalKey: String,
+/**
+ * A non-empty String limited to the length of [TINY_STRING_LENGTH]
+ */
+@JvmInline
+value class FilledTinyString(val value: String) {
+    init { assert(value) }
 
-    @get:Schema(description = LegalFormDescription.name)
-    val name: String,
-
-    val transliteratedName: String?,
-
-    @get:Schema(description = LegalFormDescription.abbreviation)
-    val abbreviation: String? = null,
-
-    val country: CountryCode?,
-
-    val language: LanguageCode?,
-
-    val administrativeAreaLevel1: String?,
-
-    val transliteratedAbbreviations: String?,
-
-    val isActive: Boolean
-)
+    companion object: BpdmFilledLimitedStringMapper<FilledTinyString>(
+        BpdmExceedLengthValidation(TINY_STRING_LENGTH, CommonValidationErrorCodes.ExceedsTinyLength)
+    ){
+        override fun transform(value: String) = FilledTinyString(value)
+    }
+}

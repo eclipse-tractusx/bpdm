@@ -17,34 +17,21 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.model
+package org.eclipse.tractusx.bpdm.common.mapping
 
-import com.neovisionaries.i18n.CountryCode
-import com.neovisionaries.i18n.LanguageCode
-import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalFormDescription
+abstract class BpdmFilledLimitedStringMapper<TO_TYPE>(
+    private val limitedLengthValidation: BpdmValidation<String>
+): BpdmStringMapper<TO_TYPE>, BpdmValidateAndMapMapper<String, TO_TYPE>  {
 
-@Schema(description = LegalFormDescription.header)
-data class LegalFormDto(
+    private val isBlankValidation =   object: BpdmValidation<String>{
+        override fun validate(value: String, context: ValidationContext): ValidationError? {
+            return if(value.isBlank()) CommonValidationErrorCodes.IsBlank.toValidationError(value, context) else null
+        }
+    }
 
-    @get:Schema(description = LegalFormDescription.technicalKey)
-    val technicalKey: String,
-
-    @get:Schema(description = LegalFormDescription.name)
-    val name: String,
-
-    val transliteratedName: String?,
-
-    @get:Schema(description = LegalFormDescription.abbreviation)
-    val abbreviation: String? = null,
-
-    val country: CountryCode?,
-
-    val language: LanguageCode?,
-
-    val administrativeAreaLevel1: String?,
-
-    val transliteratedAbbreviations: String?,
-
-    val isActive: Boolean
-)
+    override val validations: List<BpdmValidation<String>>
+        get() = listOf(
+            isBlankValidation,
+            limitedLengthValidation
+        )
+}

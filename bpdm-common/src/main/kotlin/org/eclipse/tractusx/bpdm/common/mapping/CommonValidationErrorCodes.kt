@@ -17,34 +17,22 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.model
+package org.eclipse.tractusx.bpdm.common.mapping
 
-import com.neovisionaries.i18n.CountryCode
-import com.neovisionaries.i18n.LanguageCode
-import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalFormDescription
+import org.eclipse.tractusx.bpdm.common.mapping.types.*
 
-@Schema(description = LegalFormDescription.header)
-data class LegalFormDto(
+enum class CommonValidationErrorCodes(val description: String) {
+    IsNull("Is Null"),
+    IsBlank("Is blank"),
+    ExceedsTinyLength("Exceeds maximum length of $TINY_STRING_LENGTH"),
+    ExceedsShortLength("Exceeds maximum length of $SHORT_STRING_LENGTH"),
+    ExceedsMediumLength("Exceeds maximum length of $MEDIUM_STRING_LENGTH"),
+    ExceedsLongLength("Exceeds maximum length of $LONG_STRING_LENGTH"),
+    ExceedsHugeLength("Exceeds maximum length of $HUGE_STRING_LENGTH"),
+    ISO31661("Not ISO 3166-1 conform"),
+    ISO31662("Not ISO 3166-2 conform"),
+    ISO6391("Not ISO 639-1 conform");
 
-    @get:Schema(description = LegalFormDescription.technicalKey)
-    val technicalKey: String,
-
-    @get:Schema(description = LegalFormDescription.name)
-    val name: String,
-
-    val transliteratedName: String?,
-
-    @get:Schema(description = LegalFormDescription.abbreviation)
-    val abbreviation: String? = null,
-
-    val country: CountryCode?,
-
-    val language: LanguageCode?,
-
-    val administrativeAreaLevel1: String?,
-
-    val transliteratedAbbreviations: String?,
-
-    val isActive: Boolean
-)
+    fun toValidationError(value: String?, context: ValidationContext) =
+        ValidationError(name, description, value, context)
+}

@@ -142,7 +142,7 @@ abstract class AuthTestBase(
 
     @Test
     fun `POST Legal Form`(){
-        authAssertions.assert(metadataAuthExpectations.postLegalForm) { poolApiClient.metadata.createLegalForm(LegalFormRequest("LF", "", null)) }
+        authAssertions.assert(metadataAuthExpectations.postLegalForm) { poolApiClient.metadata.createLegalForm(LegalFormRequest("LF", "", null, null, null, null, null, null, false)) }
     }
 
     @Test
