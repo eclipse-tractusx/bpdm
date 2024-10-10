@@ -9,3 +9,6 @@ bpdm:
         # Use a default client id for the client credentials request
         client-id: BPDM-POOL
         # Please provide a secret here
+
+cucumber:
+  glue: "org.eclipse.tractusx.bpdm.test.system.stepdefinations"

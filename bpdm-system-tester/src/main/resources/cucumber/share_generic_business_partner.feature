@@ -9,12 +9,12 @@ Feature: Share Valid Generic Business Partner without BPNs
         Then the sharing member receives output "CC_SHG_WAT" with external-ID "CC_SHG_WAT" with address type "LegalAndSiteMainAddress"
 
     Scenario: Share With Address Type
-        When the sharing member uploads full valid input "CC_SHG_WAT" with external-ID "CC_SHG_WAT" with address type "<inputAddressType>"
-        Then the sharing member receives output "CC_SHG_WAT" with external-ID "CC_SHG_WAT" with address type "<outputAddressType>"
+        When the sharing member uploads full valid input "CC_SHG_WAT" with external-ID "<externalId>" with address type "<inputAddressType>"
+        Then the sharing member receives output "CC_SHG_WAT" with external-ID "<externalId>" with address type "<outputAddressType>"
 
         Examples:
-          | inputAddressType           | outputAddressType          |
-          | LegalAndSiteMainAddress    | LegalAndSiteMainAddress    |
-          | LegalAddress               | LegalAndSiteMainAddress    |
-          | SiteMainAddress            | SiteMainAddress            |
-          | AdditionalAddress          | AdditionalAddress          |
+          | externalId | inputAddressType           | outputAddressType          |
+          | CC_SHG_WAT_1 | LegalAndSiteMainAddress    | LegalAndSiteMainAddress    |
+          | CC_SHG_WAT_2 | LegalAddress               | LegalAndSiteMainAddress    |
+          | CC_SHG_WAT_3 | SiteMainAddress            | SiteMainAddress            |
+          | CC_SHG_WAT_4 | AdditionalAddress          | AdditionalAddress          |

@@ -22,8 +22,6 @@ package org.eclipse.tractusx.bpdm.test.system
 import io.cucumber.junit.Cucumber
 import io.cucumber.junit.CucumberOptions
 import io.cucumber.spring.CucumberContextConfiguration
-import org.junit.internal.TextListener
-import org.junit.runner.JUnitCore
 import org.junit.runner.RunWith
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
@@ -31,7 +29,7 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.boot.test.context.SpringBootTest
 
 @RunWith(Cucumber::class)
-@CucumberOptions(features = ["bpdm-system-tester/src/main/resources"])
+@CucumberOptions(features = ["bpdm-system-tester/src/main/resources"], glue = ["org.eclipse.tractusx.bpdm.test.system.stepdefinations"])
 class CucumberTestRunConfiguration
 
 @CucumberContextConfiguration
@@ -43,7 +41,5 @@ class SpringTestRunConfiguration
 class SpringApplicationConfiguration
 
 fun main(args: Array<String>) {
-    val engine = JUnitCore()
-    engine.addListener(TextListener(System.out))
-    engine.run(CucumberTestRunConfiguration::class.java)
+    io.cucumber.core.cli.Main.main(*args)
 }
