@@ -19,15 +19,19 @@
 
 package org.eclipse.tractusx.bpdm.orchestrator.entity
 
-import jakarta.persistence.*
+import jakarta.persistence.Column
+import jakarta.persistence.Embeddable
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
+import org.hibernate.annotations.Type
 
 @Embeddable
 data class BusinessStateDb(
-    @Convert(converter = DbTimestampConverter::class)
+    @Type(value = DbTimestampConverter::class)
     @Column(name = "valid_from")
     val validFrom: DbTimestamp?,
-    @Convert(converter = DbTimestampConverter::class)
+    @Type(value = DbTimestampConverter::class)
     @Column(name = "valid_to")
     val validTo: DbTimestamp?,
     @Enumerated(EnumType.STRING)

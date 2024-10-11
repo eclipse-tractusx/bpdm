@@ -110,6 +110,11 @@ spring:
       hibernate:
         # Hibernate should assume the default schema of this application on default
         default_schema: ${bpdm.datasource.schema}
+        jdbc:
+          batch_size: 100
+          order_inserts: true
+          order_updates: true
+          batch_versioned_data: true
         create_empty_composites:
           enabled: true
 logging:

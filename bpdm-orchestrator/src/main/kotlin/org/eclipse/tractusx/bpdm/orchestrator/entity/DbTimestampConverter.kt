@@ -19,17 +19,56 @@
 
 package org.eclipse.tractusx.bpdm.orchestrator.entity
 
-import jakarta.persistence.AttributeConverter
-import jakarta.persistence.Converter
+import org.hibernate.engine.spi.SharedSessionContractImplementor
+import org.hibernate.usertype.UserType
+import java.io.Serializable
+import java.sql.PreparedStatement
+import java.sql.ResultSet
 import java.sql.Timestamp
+import java.sql.Types
 
-@Converter
-class DbTimestampConverter: AttributeConverter<DbTimestamp, Timestamp> {
-    override fun convertToDatabaseColumn(p0: DbTimestamp?): Timestamp? {
-        return p0?.let { Timestamp.from(it.instant) }
+class DbTimestampConverter: UserType<DbTimestamp> {
+
+    override fun equals(p0: DbTimestamp?, p1: DbTimestamp?): Boolean {
+        return p0?.instant == p1?.instant
     }
 
-    override fun convertToEntityAttribute(p0: Timestamp?): DbTimestamp? {
-        return p0?.let { DbTimestamp(p0.toInstant()) }
+    override fun hashCode(p0: DbTimestamp?): Int {
+        return p0?.instant.hashCode()
+    }
+
+    override fun getSqlType(): Int {
+        return Types.TIMESTAMP
+    }
+
+    override fun returnedClass(): Class<DbTimestamp> {
+        return DbTimestamp::class.java
+    }
+
+    override fun nullSafeGet(resultSet: ResultSet, position: Int, p2: SharedSessionContractImplementor?, p3: Any?): DbTimestamp? {
+        return resultSet.getTimestamp(position)?.let { DbTimestamp(it.toInstant()) }
+    }
+
+    override fun isMutable(): Boolean {
+        return false
+    }
+
+    override fun assemble(p0: Serializable?, p1: Any?): DbTimestamp? {
+        return p0?.let { p0 as DbTimestamp  }
+    }
+
+    override fun disassemble(p0: DbTimestamp?): Serializable? {
+        return p0
+    }
+
+    override fun deepCopy(p0: DbTimestamp?): DbTimestamp? {
+       return p0?.let { DbTimestamp(it.instant) }
+    }
+
+    override fun nullSafeSet(preparedStatement: PreparedStatement, timeStamp: DbTimestamp?, index: Int, p3: SharedSessionContractImplementor?) {
+        if(timeStamp == null) preparedStatement.setNull(index, Types.TIMESTAMP)
+        else{
+            preparedStatement.setTimestamp(index, Timestamp.from(timeStamp.instant))
+        }
     }
 }

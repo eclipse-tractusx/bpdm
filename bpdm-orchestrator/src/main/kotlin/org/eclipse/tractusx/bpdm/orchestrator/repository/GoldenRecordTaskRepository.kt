@@ -36,6 +36,30 @@ interface GoldenRecordTaskRepository : CrudRepository<GoldenRecordTaskDb, Long>,
 
     fun findByUuidIn(uuids: Set<UUID>): Set<GoldenRecordTaskDb>
 
+    @Query("SELECT DISTINCT task FROM GoldenRecordTaskDb task LEFT JOIN FETCH task.gateRecord WHERE task IN :tasks")
+    fun fetchGateRecords(tasks: Set<GoldenRecordTaskDb>): Set<GoldenRecordTaskDb>
+
+    @Query("SELECT DISTINCT task FROM GoldenRecordTaskDb task LEFT JOIN FETCH task.processingState.errors WHERE task IN :tasks")
+    fun fetchProcessingErrors(tasks: Set<GoldenRecordTaskDb>): Set<GoldenRecordTaskDb>
+
+    @Query("SELECT DISTINCT task FROM GoldenRecordTaskDb task LEFT JOIN FETCH task.businessPartner.nameParts WHERE task IN :tasks")
+    fun fetchNameParts(tasks: Set<GoldenRecordTaskDb>): Set<GoldenRecordTaskDb>
+
+    @Query("SELECT DISTINCT task FROM GoldenRecordTaskDb task LEFT JOIN FETCH task.businessPartner.identifiers WHERE task IN :tasks")
+    fun fetchIdentifiers(tasks: Set<GoldenRecordTaskDb>): Set<GoldenRecordTaskDb>
+
+    @Query("SELECT DISTINCT task FROM GoldenRecordTaskDb task LEFT JOIN FETCH task.businessPartner.businessStates WHERE task IN :tasks")
+    fun fetchBusinessStates(tasks: Set<GoldenRecordTaskDb>): Set<GoldenRecordTaskDb>
+
+    @Query("SELECT DISTINCT task FROM GoldenRecordTaskDb task LEFT JOIN FETCH task.businessPartner.confidences WHERE task IN :tasks")
+    fun fetchConfidences(tasks: Set<GoldenRecordTaskDb>): Set<GoldenRecordTaskDb>
+
+    @Query("SELECT DISTINCT task FROM GoldenRecordTaskDb task LEFT JOIN FETCH task.businessPartner.addresses WHERE task IN :tasks")
+    fun fetchAddresses(tasks: Set<GoldenRecordTaskDb>): Set<GoldenRecordTaskDb>
+
+    @Query("SELECT DISTINCT task FROM GoldenRecordTaskDb task LEFT JOIN FETCH task.businessPartner.bpnReferences WHERE task IN :tasks")
+    fun fetchBpnReferences(tasks: Set<GoldenRecordTaskDb>): Set<GoldenRecordTaskDb>
+
     @Query("SELECT task from GoldenRecordTaskDb task WHERE task.processingState.step = :step AND task.processingState.stepState = :stepState")
     fun findByStepAndStepState(step: TaskStep, stepState: GoldenRecordTaskDb.StepState, pageable: Pageable): Page<GoldenRecordTaskDb>
 
@@ -45,5 +69,16 @@ interface GoldenRecordTaskRepository : CrudRepository<GoldenRecordTaskDb, Long>,
 
     fun findByProcessingStateRetentionTimeoutBefore(time: DbTimestamp, pageable: Pageable): Page<GoldenRecordTaskDb>
 
-    fun findTasksByGateRecordAndProcessingStateResultState(record: GateRecordDb, resultState: GoldenRecordTaskDb.ResultState) : Set<GoldenRecordTaskDb>
+    fun findTasksByGateRecordInAndProcessingStateResultState(records: Set<GateRecordDb>, resultState: GoldenRecordTaskDb.ResultState) : Set<GoldenRecordTaskDb>
+}
+
+fun GoldenRecordTaskRepository.fetchBusinessPartnerData(tasks: Set<GoldenRecordTaskDb>){
+    fetchGateRecords(tasks)
+    fetchProcessingErrors(tasks)
+    fetchNameParts(tasks)
+    fetchIdentifiers(tasks)
+    fetchBusinessStates(tasks)
+    fetchConfidences(tasks)
+    fetchAddresses(tasks)
+    fetchBpnReferences(tasks)
 }
