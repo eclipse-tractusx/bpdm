@@ -19,6 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.common.mapping
 
+import org.eclipse.tractusx.bpdm.common.exception.BpdmValidationErrorException
+
 /**
  * Holds the non-null result of a mapping to type [T]
  *
@@ -69,7 +71,8 @@ data class MappingResult<T>(
      * On a successful mapping return the resulting value otherwise throw an exception
      */
     override val successfulResult by lazy {
-        require(isSuccess)
+        if(!isSuccess) throw BpdmValidationErrorException(errors)
+
         optionalResult!!
     }
 

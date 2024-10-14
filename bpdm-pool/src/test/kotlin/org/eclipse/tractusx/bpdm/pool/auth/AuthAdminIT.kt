@@ -76,6 +76,10 @@ class AuthAdminIT @Autowired constructor(
         postLegalEntitySearch = AuthExpectationType.Authorized,
         postChangelogSearch = AuthExpectationType.Authorized
     ),
+    CxMembershipsAuthExpectations(
+        getMemberships = AuthExpectationType.Authorized,
+        putMemberships = AuthExpectationType.Authorized
+    ),
     changelogAuthExpectation = AuthExpectationType.Authorized,
     bpnAuthExpectation = AuthExpectationType.Authorized
 )

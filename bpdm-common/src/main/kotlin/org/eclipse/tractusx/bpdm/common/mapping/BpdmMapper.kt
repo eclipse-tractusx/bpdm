@@ -19,6 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.common.mapping
 
+import org.eclipse.tractusx.bpdm.common.mapping.ValidationContext.Companion.onIndex
+
 /**
  * Offers base logic to validate and map from one type to another
  */
@@ -31,12 +33,19 @@ interface BpdmMapper<FROM_TYPE, TO_TYPE> {
      */
     fun map(valueToMap: FROM_TYPE, context: ValidationContext = ValidationContext.NoContext): MappingResult<TO_TYPE>
 
+    fun map(listToMap: List<FROM_TYPE>, context: ValidationContext = ValidationContext.NoContext): MappingResult<List<TO_TYPE>>{
+        val entryResults = listToMap.mapIndexed { index, entry -> map(entry, context.onIndex(index)) }
+        val entryErrors = entryResults.flatMap { it.errors }
+        return MappingResult.invalidOnError(entryErrors){ entryResults.map { it.successfulResult } }
+    }
 
     /**
      * Check whether a non-null [valueToMap] of the [FROM_TYPE] should be treated as a valid null mapping result
      *
      */
     fun checkTreatAsNull(valueToMap: FROM_TYPE) = false
+
+    fun checkTreatAsNull(listToMap: List<FROM_TYPE>) = false
 
     /**
      * Try to map given nullable [valueToMap] within the given [context] whereby null is an acceptable value
@@ -46,7 +55,14 @@ interface BpdmMapper<FROM_TYPE, TO_TYPE> {
     fun mapValidNull(valueToMap: FROM_TYPE?, context: ValidationContext = ValidationContext.NoContext): NullableMappingResult<TO_TYPE>{
         return valueToMap
             ?.let { if(checkTreatAsNull(it)) null else it }
-            ?.let {  NullableMappingResult.fromResult(map(it)) }
+            ?.let {  NullableMappingResult.fromResult(map(it, context)) }
+            ?: NullableMappingResult.ofValidNull()
+    }
+
+    fun mapValidNull(listToMap: List<FROM_TYPE>?, context: ValidationContext = ValidationContext.NoContext): NullableMappingResult<List<TO_TYPE>>{
+        return listToMap
+            ?.let { if(checkTreatAsNull(it)) null else it }
+            ?.let { NullableMappingResult.fromResult(map(it, context)) }
             ?: NullableMappingResult.ofValidNull()
     }
 
@@ -56,7 +72,11 @@ interface BpdmMapper<FROM_TYPE, TO_TYPE> {
      *  Return a [NullableMappingResult] containing either the result or validation errors
      */
     fun mapInvalidNull(valueToMap: FROM_TYPE?, context: ValidationContext = ValidationContext.NoContext): MappingResult<TO_TYPE>{
-        return valueToMap?.let { map(it) } ?: MappingResult.ofInvalidNull()
+        return valueToMap?.let { map(it, context) } ?: MappingResult.ofInvalidNull()
+    }
+
+    fun mapInvalidNull(listToMap: List<FROM_TYPE>?, context: ValidationContext = ValidationContext.NoContext): MappingResult<List<TO_TYPE>>{
+        return listToMap?.let { map(it, context) } ?: MappingResult.ofInvalidNull()
     }
 
 }

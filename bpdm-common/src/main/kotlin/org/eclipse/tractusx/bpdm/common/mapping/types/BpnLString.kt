@@ -17,17 +17,19 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.exception
+package org.eclipse.tractusx.bpdm.common.mapping.types
 
-import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.ResponseStatus
-import kotlin.reflect.KClass
+import org.eclipse.tractusx.bpdm.common.mapping.BpdmValidateAndMapStringMapper
+import org.eclipse.tractusx.bpdm.common.mapping.BpnValidation
 
-@ResponseStatus(HttpStatus.NOT_FOUND)
-open class BpdmMultipleNotFoundException(
-    objectType: String,
-    val identifiers: Collection<String>
-) : RuntimeException("$objectType with following identifiers not found: ${identifiers.joinToString()}") {
-    constructor(objectType: KClass<*>, identifiers: Collection<String>) :
-            this(objectType.simpleName ?: objectType.toString(), identifiers)
+@JvmInline
+value class BpnLString(val value: String) {
+
+    init { assert(value) }
+
+    companion object: BpdmValidateAndMapStringMapper<BpnLString>{
+        override fun transform(value: String) = BpnLString(value)
+
+        override val validations = listOf(BpnValidation.bpnLValidation)
+    }
 }

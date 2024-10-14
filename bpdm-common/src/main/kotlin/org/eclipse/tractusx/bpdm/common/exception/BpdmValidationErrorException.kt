@@ -19,15 +19,12 @@
 
 package org.eclipse.tractusx.bpdm.common.exception
 
+import org.eclipse.tractusx.bpdm.common.mapping.ValidationError
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ResponseStatus
-import kotlin.reflect.KClass
 
-@ResponseStatus(HttpStatus.NOT_FOUND)
-open class BpdmMultipleNotFoundException(
-    objectType: String,
-    val identifiers: Collection<String>
-) : RuntimeException("$objectType with following identifiers not found: ${identifiers.joinToString()}") {
-    constructor(objectType: KClass<*>, identifiers: Collection<String>) :
-            this(objectType.simpleName ?: objectType.toString(), identifiers)
-}
+
+@ResponseStatus(HttpStatus.BAD_REQUEST)
+class BpdmValidationErrorException(
+    val validationErrors: List<ValidationError>
+): RuntimeException(validationErrors.joinToString())

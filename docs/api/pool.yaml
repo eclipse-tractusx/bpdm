@@ -214,6 +214,56 @@ paths:
                 $ref: '#/components/schemas/LegalEntityPartnerCreateResponseWrapper'
         '400':
           description: On malformed requests
+  /v6/cx-memberships:
+    get:
+      tags:
+        - cx-membership-controller
+      operationId: get
+      parameters:
+        - name: bpnLs
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - name: page
+          in: query
+          description: Number of page to get results from
+          required: false
+          schema:
+            minimum: 0
+            type: string
+            default: '0'
+        - name: size
+          in: query
+          description: Size of each page
+          required: false
+          schema:
+            maximum: 100
+            minimum: 0
+            type: string
+            default: '10'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageDtoCxMembershipDto'
+    put:
+      tags:
+        - cx-membership-controller
+      operationId: put
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CxMembershipUpdateRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
   /v6/addresses:
     get:
       tags:
@@ -1632,10 +1682,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ErrorInfoAddressCreateError'
-        entityCount:
+        errorCount:
           type: integer
           format: int32
-        errorCount:
+        entityCount:
           type: integer
           format: int32
       description: Holds information about successfully and failed entities after the creating/updating of several objects
@@ -1674,10 +1724,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ErrorInfoAddressUpdateError'
-        entityCount:
+        errorCount:
           type: integer
           format: int32
-        errorCount:
+        entityCount:
           type: integer
           format: int32
       description: Holds information about successfully and failed entities after the creating/updating of several objects
@@ -2466,6 +2516,25 @@ components:
           type: string
           description: The name of the country subdivision according to ISO 3166-2
       description: Country subdivision
+    CxMembershipDto:
+      required:
+        - bpnL
+        - isCatenaXMember
+      type: object
+      properties:
+        bpnL:
+          type: string
+        isCatenaXMember:
+          type: boolean
+    CxMembershipUpdateRequest:
+      required:
+        - memberships
+      type: object
+      properties:
+        memberships:
+          type: array
+          items:
+            $ref: '#/components/schemas/CxMembershipDto'
     ErrorInfoAddressCreateError:
       title: ErrorInfo
       required:
@@ -2913,15 +2982,15 @@ components:
         longitude:
           type: number
           description: Longitude coordinate
-          format: float
+          format: double
         latitude:
           type: number
           description: Latitude coordinate
-          format: float
+          format: double
         altitude:
           type: number
           description: Altitude, if applicable
-          format: float
+          format: double
       description: The exact location of the physical postal address in latitude, longitude, and altitude.
     IdentifierTypeDetailDto:
       required:
@@ -3295,10 +3364,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ErrorInfoLegalEntityCreateError'
-        entityCount:
+        errorCount:
           type: integer
           format: int32
-        errorCount:
+        entityCount:
           type: integer
           format: int32
       description: Holds information about successfully and failed entities after the creating/updating of several objects
@@ -3344,10 +3413,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ErrorInfoLegalEntityUpdateError'
-        entityCount:
+        errorCount:
           type: integer
           format: int32
-        errorCount:
+        entityCount:
           type: integer
           format: int32
       description: Holds information about successfully and failed entities after the creating/updating of several objects
@@ -3372,6 +3441,7 @@ components:
       description: In general, a legal entity is a juridical person that has legal rights and duties related to contracts, agreements, and obligations. The term especially applies to any kind of organization (such as an enterprise or company, university, association, etc.) established under the law applicable to a country.In Catena-X, a legal entity is a type of business partner representing a legally registered organization with its official registration information, such as legal name (including legal form, if registered), legal address and tax number.A legal entity has exactly one legal address, but it is possible to specify additional addresses that a legal entity owns. Thus, at least one address is assigned to a legal entity. A legal entity can own sites. Thus, many or no sites are assigned to a legal entity. A legal entity is uniquely identified by the BPNL.
     LegalFormDto:
       required:
+        - isActive
         - name
         - technicalKey
       type: object
@@ -3382,12 +3452,484 @@ components:
         name:
           type: string
           description: The name of legal form according to ISO 20275.
+        transliteratedName:
+          type: string
         abbreviation:
           type: string
           description: The abbreviated name of the legal form, such as AG for German Aktiengesellschaft.
+        country:
+          type: string
+          enum:
+            - UNDEFINED
+            - AC
+            - AD
+            - AE
+            - AF
+            - AG
+            - AI
+            - AL
+            - AM
+            - AN
+            - AO
+            - AQ
+            - AR
+            - AS
+            - AT
+            - AU
+            - AW
+            - AX
+            - AZ
+            - BA
+            - BB
+            - BD
+            - BE
+            - BF
+            - BG
+            - BH
+            - BI
+            - BJ
+            - BL
+            - BM
+            - BN
+            - BO
+            - BQ
+            - BR
+            - BS
+            - BT
+            - BU
+            - BV
+            - BW
+            - BY
+            - BZ
+            - CA
+            - CC
+            - CD
+            - CF
+            - CG
+            - CH
+            - CI
+            - CK
+            - CL
+            - CM
+            - CN
+            - CO
+            - CP
+            - CR
+            - CS
+            - CU
+            - CV
+            - CW
+            - CX
+            - CY
+            - CZ
+            - DE
+            - DG
+            - DJ
+            - DK
+            - DM
+            - DO
+            - DZ
+            - EA
+            - EC
+            - EE
+            - EG
+            - EH
+            - ER
+            - ES
+            - ET
+            - EU
+            - EZ
+            - FI
+            - FJ
+            - FK
+            - FM
+            - FO
+            - FR
+            - FX
+            - GA
+            - GB
+            - GD
+            - GE
+            - GF
+            - GG
+            - GH
+            - GI
+            - GL
+            - GM
+            - GN
+            - GP
+            - GQ
+            - GR
+            - GS
+            - GT
+            - GU
+            - GW
+            - GY
+            - HK
+            - HM
+            - HN
+            - HR
+            - HT
+            - HU
+            - IC
+            - ID
+            - IE
+            - IL
+            - IM
+            - IN
+            - IO
+            - IQ
+            - IR
+            - IS
+            - IT
+            - JE
+            - JM
+            - JO
+            - JP
+            - KE
+            - KG
+            - KH
+            - KI
+            - KM
+            - KN
+            - KP
+            - KR
+            - KW
+            - KY
+            - KZ
+            - LA
+            - LB
+            - LC
+            - LI
+            - LK
+            - LR
+            - LS
+            - LT
+            - LU
+            - LV
+            - LY
+            - MA
+            - MC
+            - MD
+            - ME
+            - MF
+            - MG
+            - MH
+            - MK
+            - ML
+            - MM
+            - MN
+            - MO
+            - MP
+            - MQ
+            - MR
+            - MS
+            - MT
+            - MU
+            - MV
+            - MW
+            - MX
+            - MY
+            - MZ
+            - NA
+            - NC
+            - NE
+            - NF
+            - NG
+            - NI
+            - NL
+            - 'NO'
+            - NP
+            - NR
+            - NT
+            - NU
+            - NZ
+            - OM
+            - PA
+            - PE
+            - PF
+            - PG
+            - PH
+            - PK
+            - PL
+            - PM
+            - PN
+            - PR
+            - PS
+            - PT
+            - PW
+            - PY
+            - QA
+            - RE
+            - RO
+            - RS
+            - RU
+            - RW
+            - SA
+            - SB
+            - SC
+            - SD
+            - SE
+            - SF
+            - SG
+            - SH
+            - SI
+            - SJ
+            - SK
+            - SL
+            - SM
+            - SN
+            - SO
+            - SR
+            - SS
+            - ST
+            - SU
+            - SV
+            - SX
+            - SY
+            - SZ
+            - TA
+            - TC
+            - TD
+            - TF
+            - TG
+            - TH
+            - TJ
+            - TK
+            - TL
+            - TM
+            - TN
+            - TO
+            - TP
+            - TR
+            - TT
+            - TV
+            - TW
+            - TZ
+            - UA
+            - UG
+            - UK
+            - UM
+            - US
+            - UY
+            - UZ
+            - VA
+            - VC
+            - VE
+            - VG
+            - VI
+            - VN
+            - VU
+            - WF
+            - WS
+            - XI
+            - XU
+            - XK
+            - YE
+            - YT
+            - YU
+            - ZA
+            - ZM
+            - ZR
+            - ZW
+        language:
+          type: string
+          enum:
+            - undefined
+            - aa
+            - ab
+            - ae
+            - af
+            - ak
+            - am
+            - an
+            - ar
+            - as
+            - av
+            - ay
+            - az
+            - ba
+            - be
+            - bg
+            - bh
+            - bi
+            - bm
+            - bn
+            - bo
+            - br
+            - bs
+            - ca
+            - ce
+            - ch
+            - co
+            - cr
+            - cs
+            - cu
+            - cv
+            - cy
+            - da
+            - de
+            - dv
+            - dz
+            - ee
+            - el
+            - en
+            - eo
+            - es
+            - et
+            - eu
+            - fa
+            - ff
+            - fi
+            - fj
+            - fo
+            - fr
+            - fy
+            - ga
+            - gd
+            - gl
+            - gn
+            - gu
+            - gv
+            - ha
+            - he
+            - hi
+            - ho
+            - hr
+            - ht
+            - hu
+            - hy
+            - hz
+            - ia
+            - id
+            - ie
+            - ig
+            - ii
+            - ik
+            - io
+            - is
+            - it
+            - iu
+            - ja
+            - jv
+            - ka
+            - kg
+            - ki
+            - kj
+            - kk
+            - kl
+            - km
+            - kn
+            - ko
+            - kr
+            - ks
+            - ku
+            - kv
+            - kw
+            - ky
+            - la
+            - lb
+            - lg
+            - li
+            - ln
+            - lo
+            - lt
+            - lu
+            - lv
+            - mg
+            - mh
+            - mi
+            - mk
+            - ml
+            - mn
+            - mr
+            - ms
+            - mt
+            - my
+            - na
+            - nb
+            - nd
+            - ne
+            - ng
+            - nl
+            - nn
+            - 'no'
+            - nr
+            - nv
+            - ny
+            - oc
+            - oj
+            - om
+            - or
+            - os
+            - pa
+            - pi
+            - pl
+            - ps
+            - pt
+            - qu
+            - rm
+            - rn
+            - ro
+            - ru
+            - rw
+            - sa
+            - sc
+            - sd
+            - se
+            - sg
+            - si
+            - sk
+            - sl
+            - sm
+            - sn
+            - so
+            - sq
+            - sr
+            - ss
+            - st
+            - su
+            - sv
+            - sw
+            - ta
+            - te
+            - tg
+            - th
+            - ti
+            - tk
+            - tl
+            - tn
+            - to
+            - tr
+            - ts
+            - tt
+            - tw
+            - ty
+            - ug
+            - uk
+            - ur
+            - uz
+            - ve
+            - vi
+            - vo
+            - wa
+            - wo
+            - xh
+            - yi
+            - yo
+            - za
+            - zh
+            - zu
+        administrativeAreaLevel1:
+          type: string
+        transliteratedAbbreviations:
+          type: string
+        isActive:
+          type: boolean
       description: A legal form is a mandatory corporate legal framework by which companies can conduct business, charitable or other permissible activities.
     LegalFormRequest:
       required:
+        - isActive
         - name
         - technicalKey
       type: object
@@ -3398,9 +3940,486 @@ components:
         name:
           type: string
           description: Full name of the legal form
+        transliteratedName:
+          type: string
+          description: Transliterated name of the legal form
         abbreviation:
           type: string
-          description: Abbreviation of the legal form name
+          description: Comma separed list of abbreviations of the legal form name
+        transliteratedAbbreviations:
+          type: string
+          description: Transliterated abbreviations of the legal form abbreviations
+        country:
+          type: string
+          description: The country to which this legal form belongs to
+          enum:
+            - UNDEFINED
+            - AC
+            - AD
+            - AE
+            - AF
+            - AG
+            - AI
+            - AL
+            - AM
+            - AN
+            - AO
+            - AQ
+            - AR
+            - AS
+            - AT
+            - AU
+            - AW
+            - AX
+            - AZ
+            - BA
+            - BB
+            - BD
+            - BE
+            - BF
+            - BG
+            - BH
+            - BI
+            - BJ
+            - BL
+            - BM
+            - BN
+            - BO
+            - BQ
+            - BR
+            - BS
+            - BT
+            - BU
+            - BV
+            - BW
+            - BY
+            - BZ
+            - CA
+            - CC
+            - CD
+            - CF
+            - CG
+            - CH
+            - CI
+            - CK
+            - CL
+            - CM
+            - CN
+            - CO
+            - CP
+            - CR
+            - CS
+            - CU
+            - CV
+            - CW
+            - CX
+            - CY
+            - CZ
+            - DE
+            - DG
+            - DJ
+            - DK
+            - DM
+            - DO
+            - DZ
+            - EA
+            - EC
+            - EE
+            - EG
+            - EH
+            - ER
+            - ES
+            - ET
+            - EU
+            - EZ
+            - FI
+            - FJ
+            - FK
+            - FM
+            - FO
+            - FR
+            - FX
+            - GA
+            - GB
+            - GD
+            - GE
+            - GF
+            - GG
+            - GH
+            - GI
+            - GL
+            - GM
+            - GN
+            - GP
+            - GQ
+            - GR
+            - GS
+            - GT
+            - GU
+            - GW
+            - GY
+            - HK
+            - HM
+            - HN
+            - HR
+            - HT
+            - HU
+            - IC
+            - ID
+            - IE
+            - IL
+            - IM
+            - IN
+            - IO
+            - IQ
+            - IR
+            - IS
+            - IT
+            - JE
+            - JM
+            - JO
+            - JP
+            - KE
+            - KG
+            - KH
+            - KI
+            - KM
+            - KN
+            - KP
+            - KR
+            - KW
+            - KY
+            - KZ
+            - LA
+            - LB
+            - LC
+            - LI
+            - LK
+            - LR
+            - LS
+            - LT
+            - LU
+            - LV
+            - LY
+            - MA
+            - MC
+            - MD
+            - ME
+            - MF
+            - MG
+            - MH
+            - MK
+            - ML
+            - MM
+            - MN
+            - MO
+            - MP
+            - MQ
+            - MR
+            - MS
+            - MT
+            - MU
+            - MV
+            - MW
+            - MX
+            - MY
+            - MZ
+            - NA
+            - NC
+            - NE
+            - NF
+            - NG
+            - NI
+            - NL
+            - 'NO'
+            - NP
+            - NR
+            - NT
+            - NU
+            - NZ
+            - OM
+            - PA
+            - PE
+            - PF
+            - PG
+            - PH
+            - PK
+            - PL
+            - PM
+            - PN
+            - PR
+            - PS
+            - PT
+            - PW
+            - PY
+            - QA
+            - RE
+            - RO
+            - RS
+            - RU
+            - RW
+            - SA
+            - SB
+            - SC
+            - SD
+            - SE
+            - SF
+            - SG
+            - SH
+            - SI
+            - SJ
+            - SK
+            - SL
+            - SM
+            - SN
+            - SO
+            - SR
+            - SS
+            - ST
+            - SU
+            - SV
+            - SX
+            - SY
+            - SZ
+            - TA
+            - TC
+            - TD
+            - TF
+            - TG
+            - TH
+            - TJ
+            - TK
+            - TL
+            - TM
+            - TN
+            - TO
+            - TP
+            - TR
+            - TT
+            - TV
+            - TW
+            - TZ
+            - UA
+            - UG
+            - UK
+            - UM
+            - US
+            - UY
+            - UZ
+            - VA
+            - VC
+            - VE
+            - VG
+            - VI
+            - VN
+            - VU
+            - WF
+            - WS
+            - XI
+            - XU
+            - XK
+            - YE
+            - YT
+            - YU
+            - ZA
+            - ZM
+            - ZR
+            - ZW
+        language:
+          type: string
+          description: The language of the legal form's name
+          enum:
+            - undefined
+            - aa
+            - ab
+            - ae
+            - af
+            - ak
+            - am
+            - an
+            - ar
+            - as
+            - av
+            - ay
+            - az
+            - ba
+            - be
+            - bg
+            - bh
+            - bi
+            - bm
+            - bn
+            - bo
+            - br
+            - bs
+            - ca
+            - ce
+            - ch
+            - co
+            - cr
+            - cs
+            - cu
+            - cv
+            - cy
+            - da
+            - de
+            - dv
+            - dz
+            - ee
+            - el
+            - en
+            - eo
+            - es
+            - et
+            - eu
+            - fa
+            - ff
+            - fi
+            - fj
+            - fo
+            - fr
+            - fy
+            - ga
+            - gd
+            - gl
+            - gn
+            - gu
+            - gv
+            - ha
+            - he
+            - hi
+            - ho
+            - hr
+            - ht
+            - hu
+            - hy
+            - hz
+            - ia
+            - id
+            - ie
+            - ig
+            - ii
+            - ik
+            - io
+            - is
+            - it
+            - iu
+            - ja
+            - jv
+            - ka
+            - kg
+            - ki
+            - kj
+            - kk
+            - kl
+            - km
+            - kn
+            - ko
+            - kr
+            - ks
+            - ku
+            - kv
+            - kw
+            - ky
+            - la
+            - lb
+            - lg
+            - li
+            - ln
+            - lo
+            - lt
+            - lu
+            - lv
+            - mg
+            - mh
+            - mi
+            - mk
+            - ml
+            - mn
+            - mr
+            - ms
+            - mt
+            - my
+            - na
+            - nb
+            - nd
+            - ne
+            - ng
+            - nl
+            - nn
+            - 'no'
+            - nr
+            - nv
+            - ny
+            - oc
+            - oj
+            - om
+            - or
+            - os
+            - pa
+            - pi
+            - pl
+            - ps
+            - pt
+            - qu
+            - rm
+            - rn
+            - ro
+            - ru
+            - rw
+            - sa
+            - sc
+            - sd
+            - se
+            - sg
+            - si
+            - sk
+            - sl
+            - sm
+            - sn
+            - so
+            - sq
+            - sr
+            - ss
+            - st
+            - su
+            - sv
+            - sw
+            - ta
+            - te
+            - tg
+            - th
+            - ti
+            - tk
+            - tl
+            - tn
+            - to
+            - tr
+            - ts
+            - tt
+            - tw
+            - ty
+            - ug
+            - uk
+            - ur
+            - uz
+            - ve
+            - vi
+            - vo
+            - wa
+            - wo
+            - xh
+            - yi
+            - yo
+            - za
+            - zh
+            - zu
+        administrativeAreaLevel1:
+          type: string
+          description: The administrative area level 1 this legal form belongs to
+        isActive:
+          type: boolean
+          description: Whether this legal form is considered as active according to GLEIF
       description: New legal form record to be referenced by business partners
     LogisticAddressDto:
       required:
@@ -3551,6 +4570,37 @@ components:
           description: Collection of results in the page
           items:
             $ref: '#/components/schemas/CountrySubdivisionDto'
+      description: Paginated collection of results
+    PageDtoCxMembershipDto:
+      required:
+        - content
+        - contentSize
+        - page
+        - totalElements
+        - totalPages
+      type: object
+      properties:
+        totalElements:
+          type: integer
+          description: Total number of all results in all pages
+          format: int64
+        totalPages:
+          type: integer
+          description: Total number pages
+          format: int32
+        page:
+          type: integer
+          description: Current page number
+          format: int32
+        contentSize:
+          type: integer
+          description: Number of results in the page
+          format: int32
+        content:
+          type: array
+          description: Collection of results in the page
+          items:
+            $ref: '#/components/schemas/CxMembershipDto'
       description: Paginated collection of results
     PageDtoIdentifierTypeDto:
       required:
@@ -4449,10 +5499,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ErrorInfoSiteCreateError'
-        entityCount:
+        errorCount:
           type: integer
           format: int32
-        errorCount:
+        entityCount:
           type: integer
           format: int32
       description: Holds information about successfully and failed entities after the creating/updating of several objects
@@ -4495,10 +5545,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ErrorInfoSiteUpdateError'
-        entityCount:
+        errorCount:
           type: integer
           format: int32
-        errorCount:
+        entityCount:
           type: integer
           format: int32
       description: Holds information about successfully and failed entities after the creating/updating of several objects
@@ -4953,6 +6003,7 @@ components:
       flows:
         clientCredentials:
           tokenUrl: http://localhost:8180/realms/CX-Central/protocol/openid-connect/token
+          scopes: {}
         authorizationCode:
           authorizationUrl: http://localhost:8180/realms/CX-Central/protocol/openid-connect/auth
           tokenUrl: http://localhost:8180/realms/CX-Central/protocol/openid-connect/token

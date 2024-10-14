@@ -23,4 +23,4 @@ import org.eclipse.tractusx.bpdm.common.exception.BpdmExceptionHandler
 import org.springframework.web.bind.annotation.ControllerAdvice
 
 @ControllerAdvice
-class PoolExceptionHandler : BpdmExceptionHandler()
+class PoolExceptionHandler: BpdmExceptionHandler()

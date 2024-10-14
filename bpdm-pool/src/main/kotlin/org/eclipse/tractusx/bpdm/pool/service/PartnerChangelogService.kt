@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
-import jakarta.persistence.EntityManager
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
@@ -47,16 +46,19 @@ import java.time.Instant
  */
 @Service
 class PartnerChangelogService(
-    private val partnerChangelogEntryRepository: PartnerChangelogEntryRepository,
-    private val entityManager: EntityManager
+    private val partnerChangelogEntryRepository: PartnerChangelogEntryRepository
 ) {
     private val logger = KotlinLogging.logger { }
 
     @Transactional
     fun createChangelogEntries(changelogEntries: Collection<ChangelogEntryCreateRequest>): List<PartnerChangelogEntryDb> {
         logger.debug { "Create ${changelogEntries.size} new change log entries" }
-        val entities = changelogEntries.map { it.toEntity() }
-        return partnerChangelogEntryRepository.saveAll(entities)
+        return changelogEntries.map { createChangelogEntry(it) }
+    }
+
+    fun createChangelogEntry(request: ChangelogEntryCreateRequest): PartnerChangelogEntryDb{
+        logger.debug { "Create ${request.changelogType} changelog entry for ${request.bpn}" }
+        return partnerChangelogEntryRepository.save(request.toEntity())
     }
 
     fun getChangelogEntriesCreatedAfter(

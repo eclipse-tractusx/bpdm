@@ -139,7 +139,7 @@ class TaskResolutionServiceTest @Autowired constructor(
         val bpnMappings = bpnRequestIdentifierRepository.findDistinctByRequestIdentifierIn(listOf(leRefValue, leAddressRefValue))
         assertThat(bpnMappings.size).isEqualTo(2)
 
-        val createdLegalEntity = poolClient.legalEntities.getLegalEntity(createResult[0].businessPartner.legalEntity.bpnReference?.referenceValue!!)
+        val createdLegalEntity = poolClient.legalEntities.getLegalEntity(createResult[0].businessPartner.legalEntity.bpnReference.referenceValue!!)
         assertThat(createdLegalEntity.legalAddress.bpnLegalEntity).isNotNull()
         assertThat(createResult[0].businessPartner.legalEntity.bpnReference.referenceValue).isEqualTo(createdLegalEntity.legalEntity.bpnl)
         compareLegalEntity(createdLegalEntity, createResult[0].businessPartner.legalEntity)
@@ -169,6 +169,35 @@ class TaskResolutionServiceTest @Autowired constructor(
         assertThat(createdLegalEntity.legalAddress.addressType == AddressType.LegalAddress).isTrue()
         assertThat(createResult[0].businessPartner.legalEntity.bpnReference.referenceValue).isEqualTo(createdLegalEntity.legalEntity.bpnl)
         compareLegalEntity(createdLegalEntity, createResult[0].businessPartner.legalEntity)
+        val createdAdditionalAddress = poolClient.addresses.getAddress(createResult[0].businessPartner.additionalAddress?.bpnReference?.referenceValue!!)
+        assertThat(createdAdditionalAddress.bpnLegalEntity).isEqualTo(createdLegalEntity.legalEntity.bpnl)
+        assertThat(createdAdditionalAddress.addressType == AddressType.AdditionalAddress).isTrue()
+    }
+
+    @Test
+    fun `create legal entity with isCatenaXMemberData null`() {
+
+        val leRefValue = "123"
+        val leAddressRefValue = "222"
+        val additionalAddressRefValue = "333"
+        val createLegalEntityRequest = orchTestDataFactory.createFullBusinessPartner("test")
+            .withLegalReferences(leRefValue.toBpnRequest(), leAddressRefValue.toBpnRequest())
+            .withAdditionalAddressReference(additionalAddressRefValue.toBpnRequest())
+            .withCxMembership(null)
+            .copy(site = null)
+
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createLegalEntityRequest)
+        assertThat(createResult[0].taskId).isEqualTo("TASK_1")
+        assertThat(createResult[0].errors.size).isEqualTo(0)
+
+        val bpnMappings = bpnRequestIdentifierRepository.findDistinctByRequestIdentifierIn(listOf(leRefValue, leAddressRefValue, additionalAddressRefValue))
+        assertThat(bpnMappings.size).isEqualTo(3)
+
+        val createdLegalEntity = poolClient.legalEntities.getLegalEntity(createResult[0].businessPartner.legalEntity.bpnReference.referenceValue!!)
+        assertThat(createdLegalEntity.legalAddress.bpnLegalEntity).isEqualTo(createdLegalEntity.legalEntity.bpnl)
+        assertThat(createdLegalEntity.legalAddress.addressType == AddressType.LegalAddress).isTrue()
+        assertThat(createResult[0].businessPartner.legalEntity.bpnReference.referenceValue).isEqualTo(createdLegalEntity.legalEntity.bpnl)
+        compareLegalEntity(createdLegalEntity, createResult[0].businessPartner.legalEntity.copy(isCatenaXMemberData = false))
         val createdAdditionalAddress = poolClient.addresses.getAddress(createResult[0].businessPartner.additionalAddress?.bpnReference?.referenceValue!!)
         assertThat(createdAdditionalAddress.bpnLegalEntity).isEqualTo(createdLegalEntity.legalEntity.bpnl)
         assertThat(createdAdditionalAddress.addressType == AddressType.AdditionalAddress).isTrue()
@@ -402,6 +431,64 @@ class TaskResolutionServiceTest @Autowired constructor(
     }
 
     @Test
+    fun `update Cx-Member legal entity without isCatenaXMemberData set`() {
+
+        val leRefValue = "123"
+        val leAddressRefValue = "222"
+        val createLegalEntityRequest = orchTestDataFactory.createFullBusinessPartner("create")
+            .withLegalReferences(leRefValue.toBpnRequest(), leAddressRefValue.toBpnRequest())
+            .withCxMembership(true)
+            .copy(site = null, additionalAddress = null)
+
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createLegalEntityRequest)
+        assertThat(createResult[0].taskId).isEqualTo("TASK_1")
+        assertThat(createResult[0].errors.size).isEqualTo(0)
+
+        val createdLegalEntity = createResult.first().businessPartner.legalEntity
+        val updateLegalEntityRequest = orchTestDataFactory.createFullBusinessPartner("update")
+            .withLegalReferences(createdLegalEntity.bpnReference, createdLegalEntity.legalAddress.bpnReference)
+            .withCxMembership(null)
+            .copy(site = null, additionalAddress = null)
+
+        val updateResult = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = updateLegalEntityRequest)
+        assertThat(updateResult[0].taskId).isEqualTo("TASK_2")
+        assertThat(updateResult[0].errors.size).isEqualTo(0)
+
+        val updatedLegalEntity = poolClient.legalEntities.getLegalEntity(updateResult[0].businessPartner.legalEntity.bpnReference.referenceValue!!)
+        assertThat(updatedLegalEntity.legalEntity.legalName).isEqualTo(updateLegalEntityRequest.legalEntity.legalName)
+        compareLegalEntity(updatedLegalEntity, updateResult[0].businessPartner.legalEntity.copy(isCatenaXMemberData = createLegalEntityRequest.legalEntity.isCatenaXMemberData))
+    }
+
+    @Test
+    fun `update Cx-Non-Member legal entity without isCatenaXMemberData set`() {
+
+        val leRefValue = "123"
+        val leAddressRefValue = "222"
+        val createLegalEntityRequest = orchTestDataFactory.createFullBusinessPartner("create")
+            .withLegalReferences(leRefValue.toBpnRequest(), leAddressRefValue.toBpnRequest())
+            .withCxMembership(false)
+            .copy(site = null, additionalAddress = null)
+
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createLegalEntityRequest)
+        assertThat(createResult[0].taskId).isEqualTo("TASK_1")
+        assertThat(createResult[0].errors.size).isEqualTo(0)
+
+        val createdLegalEntity = createResult.first().businessPartner.legalEntity
+        val updateLegalEntityRequest = orchTestDataFactory.createFullBusinessPartner("update")
+            .withLegalReferences(createdLegalEntity.bpnReference, createdLegalEntity.legalAddress.bpnReference)
+            .withCxMembership(null)
+            .copy(site = null, additionalAddress = null)
+
+        val updateResult = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = updateLegalEntityRequest)
+        assertThat(updateResult[0].taskId).isEqualTo("TASK_2")
+        assertThat(updateResult[0].errors.size).isEqualTo(0)
+
+        val updatedLegalEntity = poolClient.legalEntities.getLegalEntity(updateResult[0].businessPartner.legalEntity.bpnReference.referenceValue!!)
+        assertThat(updatedLegalEntity.legalEntity.legalName).isEqualTo(updateLegalEntityRequest.legalEntity.legalName)
+        compareLegalEntity(updatedLegalEntity, updateResult[0].businessPartner.legalEntity.copy(isCatenaXMemberData = createLegalEntityRequest.legalEntity.isCatenaXMemberData))
+    }
+
+    @Test
     fun `update legal entity with all fields by BpnRequestIdentifier`() {
 
         val leRefValue = "123"
@@ -467,7 +554,7 @@ class TaskResolutionServiceTest @Autowired constructor(
             copy(legalEntity = legalEntity.copy(legalForm = "Invalid Form"))
         }.withLegalReferences(legalEntityRequest.toBpnRequest(), legalAddressRequest.toBpnRequest())
 
-        val updateResult = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = updateLegalEntityRequest!!)
+        val updateResult = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = updateLegalEntityRequest)
         assertThat(updateResult[0].taskId).isEqualTo("TASK_2")
         assertThat(updateResult[0].errors.size).isEqualTo(1)
         assertThat(updateResult[0].errors[0].type).isEqualTo(TaskErrorType.Unspecified)
@@ -649,7 +736,7 @@ class TaskResolutionServiceTest @Autowired constructor(
             )
         }
 
-        val updateResult = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = updateSiteRequest!!)
+        val updateResult = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = updateSiteRequest)
         assertThat(updateResult[0].taskId).isEqualTo("TASK_2")
         assertThat(updateResult[0].errors).isNotEmpty
     }
@@ -789,6 +876,10 @@ class TaskResolutionServiceTest @Autowired constructor(
                 )
             )
         )
+    }
+
+    fun BusinessPartner.withCxMembership(isCatenaXMemberData: Boolean?): BusinessPartner{
+        return copy(legalEntity = legalEntity.copy(isCatenaXMemberData = isCatenaXMemberData))
     }
 
     private fun minValidLegalEntity(): BusinessPartner {
