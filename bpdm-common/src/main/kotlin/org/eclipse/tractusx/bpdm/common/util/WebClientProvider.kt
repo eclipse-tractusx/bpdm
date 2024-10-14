@@ -52,6 +52,7 @@ class BpdmUnauthorizedWebClientProvider: BpdmWebClientProvider{
     override fun builder(properties: BpdmClientProperties): WebClient.Builder{
         return WebClient.builder()
             .baseUrl(properties.baseUrl)
+            .codecs { codecs -> codecs.defaultCodecs().maxInMemorySize(10 * 1024 * 1024) }
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
     }
 }

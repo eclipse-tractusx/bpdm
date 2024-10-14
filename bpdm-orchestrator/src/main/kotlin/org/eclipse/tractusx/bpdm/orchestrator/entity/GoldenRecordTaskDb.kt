@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.orchestrator.entity
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.orchestrator.api.model.*
-import java.time.Instant
+import org.hibernate.annotations.Type
 import java.util.*
 
 @Entity
@@ -47,12 +47,12 @@ class GoldenRecordTaskDb(
     val uuid: UUID = UUID.randomUUID(),
 
     @Column(updatable = false, nullable = false, name = "created_at")
-    @Convert(converter = DbTimestampConverter::class)
-    var createdAt: DbTimestamp = DbTimestamp(Instant.now()),
+    @Type(value = DbTimestampConverter::class)
+    var createdAt: DbTimestamp,
 
     @Column(nullable = false, name = "updated_at")
-    @Convert(converter = DbTimestampConverter::class)
-    var updatedAt: DbTimestamp = createdAt,
+    @Type(value = DbTimestampConverter::class)
+    var updatedAt: DbTimestamp,
     @ManyToOne
     @JoinColumn(name = "gate_record_id", nullable = false, foreignKey = ForeignKey(name = "fk_tasks_gate_records"))
     var gateRecord: GateRecordDb,
@@ -95,8 +95,12 @@ class GoldenRecordTaskDb(
         @Enumerated(EnumType.STRING)
         @Column(name = "task_result_state", nullable = false)
         var resultState: ResultState,
-        @ElementCollection
-        @CollectionTable(name = "task_errors", joinColumns = [JoinColumn(name = "task_id", foreignKey = ForeignKey(name = "fk_errors_tasks"))])
+        @ElementCollection(fetch = FetchType.LAZY)
+        @CollectionTable(
+            name = "task_errors",
+            joinColumns = [JoinColumn(name = "task_id", foreignKey = ForeignKey(name = "fk_errors_tasks"))],
+            indexes = [Index(name = "index_task_errors_task_id", columnList = "task_id", unique = true)]
+        )
         val errors: MutableList<TaskErrorDb>,
         @Enumerated(EnumType.STRING)
         @Column(name = "task_step", nullable = false)
@@ -104,62 +108,68 @@ class GoldenRecordTaskDb(
         @Enumerated(EnumType.STRING)
         @Column(name = "task_step_state", nullable = false)
         var stepState: StepState,
-        @Convert(converter = DbTimestampConverter::class)
+        @Type(value = DbTimestampConverter::class)
         @Column(name = "task_pending_timeout")
         var pendingTimeout: DbTimestamp?,
-        @Convert(converter = DbTimestampConverter::class)
+        @Type(value = DbTimestampConverter::class)
         @Column(name = "task_retention_timeout")
         var retentionTimeout: DbTimestamp?
     )
 
     @Embeddable
     class BusinessPartner(
-        @ElementCollection(fetch = FetchType.EAGER)
+        @ElementCollection(fetch = FetchType.LAZY)
         @OrderColumn(name = "index", nullable = false)
         @CollectionTable(
             name = "business_partner_name_parts",
-            joinColumns = [JoinColumn(name = "task_id", foreignKey = ForeignKey(name = "fk_name_parts_tasks"))]
+            joinColumns = [JoinColumn(name = "task_id", foreignKey = ForeignKey(name = "fk_name_parts_tasks"))],
+            indexes = [Index(name = "index_name_parts_task_id", columnList = "task_id", unique = true)]
         )
         val nameParts: MutableList<NamePartDb>,
-        @ElementCollection(fetch = FetchType.EAGER)
+        @ElementCollection(fetch = FetchType.LAZY)
         @OrderColumn(name = "index", nullable = false)
         @CollectionTable(
             name = "business_partner_identifiers",
-            joinColumns = [JoinColumn(name = "task_id", foreignKey = ForeignKey(name = "fk_identifiers_tasks"))]
+            joinColumns = [JoinColumn(name = "task_id", foreignKey = ForeignKey(name = "fk_identifiers_tasks"))],
+            indexes = [Index(name = "index_identifiers_task_id", columnList = "task_id", unique = true)]
         )
         val identifiers: MutableList<IdentifierDb>,
-        @ElementCollection(fetch = FetchType.EAGER)
+        @ElementCollection(fetch = FetchType.LAZY)
         @OrderColumn(name = "index", nullable = false)
         @CollectionTable(
             name = "business_partner_states",
-            joinColumns = [JoinColumn(name = "task_id", foreignKey = ForeignKey(name = "fk_states_tasks"))]
+            joinColumns = [JoinColumn(name = "task_id", foreignKey = ForeignKey(name = "fk_states_tasks"))],
+            indexes = [Index(name = "index_business_states_task_id", columnList = "task_id", unique = true)]
         )
         val businessStates: MutableList<BusinessStateDb>,
-        @ElementCollection(fetch = FetchType.EAGER)
+        @ElementCollection(fetch = FetchType.LAZY)
         @MapKeyColumn(name = "scope")
         @MapKeyEnumerated(EnumType.STRING)
         @CollectionTable(
             name = "business_partner_confidences",
             joinColumns = [JoinColumn(name = "task_id", foreignKey = ForeignKey(name = "fk_confidences_tasks"))],
-            uniqueConstraints = [UniqueConstraint(name = "uc_business_partner_confidences_task_scope", columnNames = ["task_id", "scope"])]
+            uniqueConstraints = [UniqueConstraint(name = "uc_business_partner_confidences_task_scope", columnNames = ["task_id", "scope"])],
+            indexes = [Index(name = "index_confidences_task_id", columnList = "task_id", unique = true)]
         )
         val confidences: MutableMap<ConfidenceCriteriaDb.Scope, ConfidenceCriteriaDb>,
-        @ElementCollection(fetch = FetchType.EAGER)
+        @ElementCollection(fetch = FetchType.LAZY)
         @MapKeyColumn(name = "scope")
         @MapKeyEnumerated(EnumType.STRING)
         @CollectionTable(
             name = "business_partner_addresses",
             joinColumns = [JoinColumn(name = "task_id", foreignKey = ForeignKey(name = "fk_addresses_tasks"))],
-            uniqueConstraints = [UniqueConstraint(name = "uc_business_partner_addresses_task_scope", columnNames = ["task_id", "scope"])]
+            uniqueConstraints = [UniqueConstraint(name = "uc_business_partner_addresses_task_scope", columnNames = ["task_id", "scope"])],
+            indexes = [Index(name = "index_addresses_task_id", columnList = "task_id", unique = true)]
         )
         val addresses: MutableMap<PostalAddressDb.Scope, PostalAddressDb>,
-        @ElementCollection(fetch = FetchType.EAGER)
+        @ElementCollection(fetch = FetchType.LAZY)
         @MapKeyColumn(name = "scope")
         @MapKeyEnumerated(EnumType.STRING)
         @CollectionTable(
             name = "business_partner_bpn_references",
             joinColumns = [JoinColumn(name = "task_id", foreignKey = ForeignKey(name = "fk_bpn_references_tasks"))],
-            uniqueConstraints = [UniqueConstraint(name = "uc_business_partner_bpn_references_task_scope", columnNames = ["task_id", "scope"])]
+            uniqueConstraints = [UniqueConstraint(name = "uc_business_partner_bpn_references_task_scope", columnNames = ["task_id", "scope"])],
+            indexes = [Index(name = "index_bpn_references_task_id", columnList = "task_id", unique = true)]
         )
         val bpnReferences: MutableMap<BpnReferenceDb.Scope, BpnReferenceDb>,
         @Column(name = "legal_name")

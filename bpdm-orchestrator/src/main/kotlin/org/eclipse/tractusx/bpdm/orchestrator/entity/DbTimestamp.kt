@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.orchestrator.entity
 
+import java.io.Serializable
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
@@ -27,13 +28,32 @@ import java.time.temporal.ChronoUnit
  *
  * This makes sure that timestamps in entities and database are always equal even before the entity is persisted in the database
  */
-class DbTimestamp(instant: Instant){
+class DbTimestamp(instant: Instant): Serializable{
+
+
     private val truncatedInstant = instant.truncatedTo(ChronoUnit.MICROS)
 
     val instant get(): Instant = truncatedInstant
 
     companion object{
         fun now(): DbTimestamp = Instant.now().toTimestamp()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as DbTimestamp
+
+        return truncatedInstant == other.truncatedInstant
+    }
+
+    override fun hashCode(): Int {
+        return truncatedInstant?.hashCode() ?: 0
+    }
+
+    override fun toString(): String {
+        return "DbTimestamp(truncatedInstant=$truncatedInstant)"
     }
 }
 

@@ -20,8 +20,8 @@
 package org.eclipse.tractusx.bpdm.orchestrator.entity
 
 import jakarta.persistence.Column
-import jakarta.persistence.Convert
 import jakarta.persistence.Embeddable
+import org.hibernate.annotations.Type
 
 @Embeddable
 data class ConfidenceCriteriaDb(
@@ -31,10 +31,10 @@ data class ConfidenceCriteriaDb(
     val checkedByExternalDataSource: Boolean?,
     @Column(name = "number_of_sharing_members")
     val numberOfSharingMembers: Int?,
-    @Convert(converter = DbTimestampConverter::class)
+    @Type(value = DbTimestampConverter::class)
     @Column(name = "last_confidence_check")
     val lastConfidenceCheckAt: DbTimestamp?,
-    @Convert(converter = DbTimestampConverter::class)
+    @Type(value = DbTimestampConverter::class)
     @Column(name = "next_confidence_check")
     val nextConfidenceCheckAt: DbTimestamp?,
     @Column(name = "confidence_level")

@@ -28,6 +28,7 @@ import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmRecordNotFoundExcept
 import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmTaskNotFoundException
 import org.eclipse.tractusx.bpdm.orchestrator.repository.GateRecordRepository
 import org.eclipse.tractusx.bpdm.orchestrator.repository.GoldenRecordTaskRepository
+import org.eclipse.tractusx.bpdm.orchestrator.repository.fetchBusinessPartnerData
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
@@ -43,7 +44,7 @@ class GoldenRecordTaskService(
     private val taskConfigProperties: TaskConfigProperties,
     private val responseMapper: ResponseMapper,
     private val taskRepository: GoldenRecordTaskRepository,
-    private val gateRecordRepository: GateRecordRepository
+    private val gateRecordRepository: GateRecordRepository,
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -53,7 +54,7 @@ class GoldenRecordTaskService(
         logger.debug { "Creation of new golden record tasks: executing createTasks() with parameters $createRequest" }
 
         val gateRecords = getOrCreateGateRecords(createRequest.requests)
-        gateRecords.forEach { abortOutdatedTasks(it) }
+        abortOutdatedTasks(gateRecords.toSet())
 
         return createRequest.requests.zip(gateRecords)
             .map { (request, record) -> goldenRecordTaskStateMachine.initTask(createRequest.mode, request.businessPartner, record) }
@@ -79,6 +80,7 @@ class GoldenRecordTaskService(
 
         return stateRequest.entries.map { toUUID(it.taskId) }
             .let { uuids -> taskRepository.findByUuidIn(uuids.toSet()) }
+            .also { tasks -> taskRepository.fetchBusinessPartnerData(tasks) }
             .filter { task -> requestsByTaskId[task.uuid.toString()]?.recordId == task.gateRecord.privateId.toString() }
             .map { task -> responseMapper.toClientState(task, calculateTaskRetentionTimeout(task)) }
             .let { TaskStateResponse(tasks = it) }
@@ -89,8 +91,10 @@ class GoldenRecordTaskService(
         logger.debug { "Reservation of next golden record tasks: executing reserveTasksForStep() with parameters $reservationRequest" }
         val now = Instant.now()
 
-        val foundTasks = taskRepository.findByStepAndStepState(reservationRequest.step, GoldenRecordTaskDb.StepState.Queued, Pageable.ofSize(reservationRequest.amount)).content
-        val reservedTasks = foundTasks.map { task -> goldenRecordTaskStateMachine.doReserve(task) }
+        val foundTasks = taskRepository.findByStepAndStepState(reservationRequest.step, GoldenRecordTaskDb.StepState.Queued, Pageable.ofSize(reservationRequest.amount))
+            .content.toSet()
+            .also { taskRepository.fetchBusinessPartnerData(it) }
+        val reservedTasks = foundTasks.map { goldenRecordTaskStateMachine.doReserve(it) }
         val pendingTimeout = reservedTasks.minOfOrNull { calculateTaskPendingTimeout(it) } ?: now
 
         return reservedTasks
@@ -108,7 +112,7 @@ class GoldenRecordTaskService(
     fun resolveStepResults(resultRequest: TaskStepResultRequest) {
         logger.debug { "Step results for reserved golden record tasks: executing resolveStepResults() with parameters $resultRequest" }
         val uuids = resultRequest.results.map { toUUID(it.taskId) }
-        val foundTasks = taskRepository.findByUuidIn(uuids.toSet())
+        val foundTasks = taskRepository.findByUuidIn(uuids.toSet()).also { taskRepository.fetchBusinessPartnerData(it) }
         val foundTasksByUuid = foundTasks.associateBy { it.uuid.toString() }
 
         resultRequest.results
@@ -201,8 +205,8 @@ class GoldenRecordTaskService(
         }
     }
 
-    private fun abortOutdatedTasks(record: GateRecordDb){
-        return taskRepository.findTasksByGateRecordAndProcessingStateResultState(record, GoldenRecordTaskDb.ResultState.Pending)
+    private fun abortOutdatedTasks(records: Set<GateRecordDb>){
+        return taskRepository.findTasksByGateRecordInAndProcessingStateResultState(records, GoldenRecordTaskDb.ResultState.Pending)
             .forEach { task -> goldenRecordTaskStateMachine.doAbortTask(task) }
     }
 }

@@ -52,11 +52,15 @@ class GoldenRecordTaskStateMachine(
             retentionTimeout = null
         )
 
-        val initialTask = GoldenRecordTaskDb(
-            gateRecord = record,
-            processingState = initProcessingState,
-            businessPartner = requestMapper.toBusinessPartner(initBusinessPartner)
-        )
+        val initialTask = DbTimestamp.now().let { nowTime ->
+            GoldenRecordTaskDb(
+                gateRecord = record,
+                processingState = initProcessingState,
+                businessPartner = requestMapper.toBusinessPartner(initBusinessPartner),
+                createdAt = nowTime,
+                updatedAt = nowTime
+            )
+        }
 
         return taskRepository.save(initialTask)
     }
