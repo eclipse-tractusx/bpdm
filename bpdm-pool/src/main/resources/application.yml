@@ -83,6 +83,7 @@ bpdm:
     cron: '*/30 * * * * *'
     # Up to how many tasks can be requested at the same time
     batchSize: 20
+    step: "PoolSync"
   security:
     # Allowed origins for CORS
     cors-origins: '*'

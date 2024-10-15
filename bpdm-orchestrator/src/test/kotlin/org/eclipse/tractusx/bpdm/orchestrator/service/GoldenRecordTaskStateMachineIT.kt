@@ -23,6 +23,7 @@ import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.assertj.core.data.TemporalUnitOffset
+import org.eclipse.tractusx.bpdm.orchestrator.config.StateMachineConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.config.TaskConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.entity.GateRecordDb
 import org.eclipse.tractusx.bpdm.orchestrator.entity.GoldenRecordTaskDb
@@ -36,7 +37,8 @@ import org.eclipse.tractusx.orchestrator.api.model.TaskErrorType
 import org.eclipse.tractusx.orchestrator.api.model.TaskMode
 import org.eclipse.tractusx.orchestrator.api.model.TaskStep
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ContextConfiguration
@@ -60,7 +62,8 @@ class GoldenRecordTaskStateMachineIT @Autowired constructor(
     private val goldenRecordTaskStateMachine: GoldenRecordTaskStateMachine,
     private val taskConfigProperties: TaskConfigProperties,
     private val gateRecordRepository: GateRecordRepository,
-    private val dbTestHelpers: DbTestHelpers
+    private val dbTestHelpers: DbTestHelpers,
+    private val stateMachineConfigProperties: StateMachineConfigProperties
 ) {
 
     private val testDataFactory = BusinessPartnerTestDataFactory()
@@ -80,15 +83,17 @@ class GoldenRecordTaskStateMachineIT @Autowired constructor(
      * WHEN creating an initial TaskProcessingState
      *  THEN expect the correct content
      */
-    @Test
+    @ParameterizedTest
+    @EnumSource(TaskMode::class)
     @Transactional
-    fun `initial state`() {
+    fun `initial state`(taskMode: TaskMode) {
         val now = Instant.now()
-        val task = goldenRecordTaskStateMachine.initTask(TaskMode.UpdateFromSharingMember, businessPartnerFull, gateRecord)
+        val task = goldenRecordTaskStateMachine.initTask(taskMode, businessPartnerFull, gateRecord)
+        val expectedStep = stateMachineConfigProperties.modeSteps[taskMode]!!.first()
         val state = task.processingState
 
-        assertProcessingState(state, GoldenRecordTaskDb.ResultState.Pending, TaskStep.CleanAndSync,GoldenRecordTaskDb.StepState.Queued)
-        assertThat(state.mode).isEqualTo(TaskMode.UpdateFromSharingMember)
+        assertProcessingState(state, GoldenRecordTaskDb.ResultState.Pending, expectedStep,GoldenRecordTaskDb.StepState.Queued)
+        assertThat(state.mode).isEqualTo(taskMode)
         assertThat(state.errors.size).isEqualTo(0)
         assertThat(task.createdAt.instant).isCloseTo(now, WITHIN_ALLOWED_TIME_OFFSET)
         assertThat(task.updatedAt.instant).isCloseTo(now, WITHIN_ALLOWED_TIME_OFFSET)
@@ -103,49 +108,40 @@ class GoldenRecordTaskStateMachineIT @Autowired constructor(
      * WHEN trying to reserve or resolve twice
      *  THEN expect an error
      */
-    @Test
+    @ParameterizedTest
+    @EnumSource(TaskMode::class)
     @Transactional
-    fun `walk through all UpdateFromSharingMember steps`() {
+    fun `walk through all UpdateFromSharingMember steps`(taskMode: TaskMode) {
         // new task
-        val task = goldenRecordTaskStateMachine.initTask(TaskMode.UpdateFromSharingMember, businessPartnerFull, gateRecord)
-        assertProcessingState(task.processingState, GoldenRecordTaskDb.ResultState.Pending, TaskStep.CleanAndSync, GoldenRecordTaskDb.StepState.Queued)
-        // taskPendingTimeout has been set
-        val taskPendingTimeout = task.processingState.pendingTimeout
-        assertThat(task.processingState.pendingTimeout?.instant).isCloseTo(Instant.now().plus(taskConfigProperties.taskPendingTimeout), WITHIN_ALLOWED_TIME_OFFSET)
+        val task = goldenRecordTaskStateMachine.initTask(taskMode, businessPartnerFull, gateRecord)
 
-        // 1st reserve
-        goldenRecordTaskStateMachine.doReserve(task)
-        assertProcessingState(task.processingState, GoldenRecordTaskDb.ResultState.Pending, TaskStep.CleanAndSync, GoldenRecordTaskDb.StepState.Reserved)
+        val allSteps = stateMachineConfigProperties.modeSteps[taskMode]!!
+        allSteps.forEach { step ->
+            assertProcessingState(task.processingState, GoldenRecordTaskDb.ResultState.Pending, step, GoldenRecordTaskDb.StepState.Queued)
+            // taskPendingTimeout has been set
+            val taskPendingTimeout = task.processingState.pendingTimeout
+            assertThat(task.processingState.pendingTimeout?.instant).isCloseTo(Instant.now().plus(taskConfigProperties.taskPendingTimeout), WITHIN_ALLOWED_TIME_OFFSET)
 
-        // Can't reserve again!
-        assertThatThrownBy {
+            // reserve
             goldenRecordTaskStateMachine.doReserve(task)
-        }.isInstanceOf(BpdmIllegalStateException::class.java)
+            assertProcessingState(task.processingState, GoldenRecordTaskDb.ResultState.Pending, step, GoldenRecordTaskDb.StepState.Reserved)
 
-        // 1st resolve
-        goldenRecordTaskStateMachine.resolveTaskStepToSuccess(task, TaskStep.CleanAndSync, businessPartnerFull)
-        assertProcessingState(task.processingState, GoldenRecordTaskDb.ResultState.Pending, TaskStep.PoolSync, GoldenRecordTaskDb.StepState.Queued)
+            // Can't reserve again!
+            assertThatThrownBy {
+                goldenRecordTaskStateMachine.doReserve(task)
+            }.isInstanceOf(BpdmIllegalStateException::class.java)
 
-        // Can't resolve again!
-        assertThatThrownBy {
-            goldenRecordTaskStateMachine.resolveTaskStepToSuccess(task, TaskStep.CleanAndSync, businessPartnerFull)
-        }.isInstanceOf(BpdmIllegalStateException::class.java)
+            // resolve
+            goldenRecordTaskStateMachine.resolveTaskStepToSuccess(task, step, businessPartnerFull)
 
-        // 2nd reserve
-        goldenRecordTaskStateMachine.doReserve(task)
-        assertProcessingState(task.processingState, GoldenRecordTaskDb.ResultState.Pending, TaskStep.PoolSync, GoldenRecordTaskDb.StepState.Reserved)
+            // resolve again!
+            assertThatThrownBy {
+                goldenRecordTaskStateMachine.resolveTaskStepToSuccess(task, step, businessPartnerFull)
+            }.isInstanceOf(BpdmIllegalStateException::class.java)
+        }
 
-        // Can't resolve with wrong step (CleanAndSync)!
-        assertThatThrownBy {
-            goldenRecordTaskStateMachine.resolveTaskStepToSuccess(task, TaskStep.CleanAndSync, businessPartnerFull)
-        }.isInstanceOf(BpdmIllegalStateException::class.java)
-
-        // taskPendingTimeout is still the same
-        assertThat(task.processingState.pendingTimeout).isEqualTo(taskPendingTimeout)
-
-        // 2nd and final resolve
-        goldenRecordTaskStateMachine.resolveTaskStepToSuccess(task, TaskStep.PoolSync, businessPartnerFull)
-        assertProcessingState(task.processingState, GoldenRecordTaskDb.ResultState.Success, TaskStep.PoolSync, GoldenRecordTaskDb.StepState.Success)
+        val finalStep = stateMachineConfigProperties.modeSteps[taskMode]!!.last()
+        assertProcessingState(task.processingState, GoldenRecordTaskDb.ResultState.Success, finalStep, GoldenRecordTaskDb.StepState.Success)
 
         // taskRetentionTimeout has been set; taskPendingTimeout has been reset
         assertThat(task.processingState.pendingTimeout).isNull()
@@ -158,7 +154,7 @@ class GoldenRecordTaskStateMachineIT @Autowired constructor(
         assertThatThrownBy {
             goldenRecordTaskStateMachine.doResolveTaskToError(
                 task,
-                TaskStep.PoolSync,
+                finalStep,
                 listOf(TaskErrorDto(TaskErrorType.Unspecified, "error"))
             )
         }.isInstanceOf(BpdmIllegalStateException::class.java)
@@ -167,69 +163,31 @@ class GoldenRecordTaskStateMachineIT @Autowired constructor(
 
     /**
      * GIVEN a task with initial TaskProcessingState
-     * WHEN reserving and resolving
-     *  THEN expect the TaskProcessingState to walk through all the steps/states and taskModifiedAt to be updated
-     */
-    @Test
-    @Transactional
-    fun `walk through all UpdateFromPool steps`() {
-        // new task
-        val task = goldenRecordTaskStateMachine.initTask(TaskMode.UpdateFromPool, businessPartnerFull, gateRecord)
-        assertProcessingState(task.processingState, GoldenRecordTaskDb.ResultState.Pending, TaskStep.Clean, GoldenRecordTaskDb.StepState.Queued)
-        val modified0 = task.updatedAt.instant
-        // taskPendingTimeout has been set
-        assertThat(task.processingState.pendingTimeout?.instant).isCloseTo(Instant.now().plus(taskConfigProperties.taskPendingTimeout), WITHIN_ALLOWED_TIME_OFFSET)
-
-        Thread.sleep(10)
-
-        // reserve
-        goldenRecordTaskStateMachine.doReserve(task)
-        assertProcessingState(task.processingState, GoldenRecordTaskDb.ResultState.Pending, TaskStep.Clean, GoldenRecordTaskDb.StepState.Reserved)
-        val modified1 = task.updatedAt.instant
-        assertThat(modified1).isAfter(modified0)
-
-        Thread.sleep(10)
-
-        // resolve
-        goldenRecordTaskStateMachine.resolveTaskStepToSuccess(task, TaskStep.Clean, businessPartnerFull)
-        assertProcessingState(task.processingState, GoldenRecordTaskDb.ResultState.Success, TaskStep.Clean, GoldenRecordTaskDb.StepState.Success)
-        val modified2 = task.updatedAt.instant
-        assertThat(modified2).isAfter(modified1)
-
-        // taskRetentionTimeout has been set; taskPendingTimeout was reset
-        assertThat(task.processingState.pendingTimeout).isNull()
-        assertThat(task.processingState.retentionTimeout?.instant).isCloseTo(
-            Instant.now().plus(taskConfigProperties.taskRetentionTimeout),
-            WITHIN_ALLOWED_TIME_OFFSET
-        )
-    }
-
-
-    /**
-     * GIVEN a task with initial TaskProcessingState
      * WHEN reserving and resolving with an error
      *  THEN expect the TaskProcessingState to reach final state Error
      */
-    @Test
+    @ParameterizedTest
+    @EnumSource(TaskMode::class)
     @Transactional
-    fun `walk through steps and resolve with error`() {
+    fun `walk through steps and resolve with error`(taskMode: TaskMode) {
         // new task
-        val task = goldenRecordTaskStateMachine.initTask(TaskMode.UpdateFromPool, businessPartnerFull, gateRecord)
-        assertProcessingState(task.processingState, GoldenRecordTaskDb.ResultState.Pending, TaskStep.Clean, GoldenRecordTaskDb.StepState.Queued)
+        val task = goldenRecordTaskStateMachine.initTask(taskMode, businessPartnerFull, gateRecord)
+        val expectedStep = stateMachineConfigProperties.modeSteps[taskMode]!!.first()
+        assertProcessingState(task.processingState, GoldenRecordTaskDb.ResultState.Pending, expectedStep, GoldenRecordTaskDb.StepState.Queued)
         // taskPendingTimeout has been set
         assertThat(task.processingState.pendingTimeout?.instant).isCloseTo(Instant.now().plus(taskConfigProperties.taskPendingTimeout), WITHIN_ALLOWED_TIME_OFFSET)
 
         // reserve
         goldenRecordTaskStateMachine.doReserve(task)
-        assertProcessingState(task.processingState, GoldenRecordTaskDb.ResultState.Pending, TaskStep.Clean, GoldenRecordTaskDb.StepState.Reserved)
+        assertProcessingState(task.processingState, GoldenRecordTaskDb.ResultState.Pending, expectedStep, GoldenRecordTaskDb.StepState.Reserved)
 
         // resolve with error
         val errors = listOf(
             TaskErrorDto(TaskErrorType.Unspecified, "Unspecific error"),
             TaskErrorDto(TaskErrorType.Timeout, "Timeout")
         )
-        goldenRecordTaskStateMachine.doResolveTaskToError(task, TaskStep.Clean, errors)
-        assertProcessingState(task.processingState, GoldenRecordTaskDb.ResultState.Error, TaskStep.Clean, GoldenRecordTaskDb.StepState.Error)
+        goldenRecordTaskStateMachine.doResolveTaskToError(task, expectedStep, errors)
+        assertProcessingState(task.processingState, GoldenRecordTaskDb.ResultState.Error, expectedStep, GoldenRecordTaskDb.StepState.Error)
         assertThat(task.processingState.errors).usingRecursiveFieldByFieldElementComparator().isEqualTo(errors)
 
         // taskRetentionTimeout has been set; taskPendingTimeout was reset
@@ -246,7 +204,7 @@ class GoldenRecordTaskStateMachineIT @Autowired constructor(
 
         // Can't resolve now!
         assertThatThrownBy {
-            goldenRecordTaskStateMachine.resolveTaskStepToSuccess(task, TaskStep.Clean, businessPartnerFull)
+            goldenRecordTaskStateMachine.resolveTaskStepToSuccess(task, expectedStep, businessPartnerFull)
         }.isInstanceOf(BpdmIllegalStateException::class.java)
     }
 

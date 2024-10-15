@@ -26,6 +26,7 @@ import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.util.AuthAssertionHelper
 import org.eclipse.tractusx.bpdm.test.util.AuthExpectationType
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
+import org.eclipse.tractusx.orchestrator.api.model.TaskStep
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ContextConfiguration
@@ -47,18 +48,8 @@ class AuthAdminIT @Autowired constructor(
             postTask = AuthExpectationType.Authorized,
             postStateSearch = AuthExpectationType.Authorized
         ),
-        stepClean = TaskStepAuthExpectations(
-            postReservation = AuthExpectationType.Authorized,
-            postResult = AuthExpectationType.Authorized
-        ),
-        stepCleanAndSync = TaskStepAuthExpectations(
-            postReservation = AuthExpectationType.Authorized,
-            postResult = AuthExpectationType.Authorized
-        ),
-        stepPoolSync = TaskStepAuthExpectations(
-            postReservation = AuthExpectationType.Authorized,
-            postResult = AuthExpectationType.Authorized
-        )
+        steps = TaskStep.entries
+            .associateWith { TaskStepAuthExpectations(postReservation = AuthExpectationType.Authorized, postResult = AuthExpectationType.Authorized) }
     )
 ){
 

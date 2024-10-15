@@ -28,54 +28,19 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 data class PermissionConfigProperties(
     val createTask: String = "create_task",
     val readTask: String = "read_task",
-    val reservation: TaskStepProperties = TaskStepProperties(
-        clean = "create_reservation_clean",
-        cleanAndSync = "create_reservation_cleanAndSync",
-        poolSync = "create_reservation_poolSync"
-    ),
-    val result: TaskStepProperties = TaskStepProperties(
-        clean = "create_result_clean",
-        cleanAndSync = "create_result_cleanAndSync",
-        poolSync = "create_result_poolSync"
-    )
+    val reservation:  Map<TaskStep, String> = TaskStep.entries.associateWith { "create_reservation_${it.name}" },
+    val result:  Map<TaskStep, String> = TaskStep.entries.associateWith { "create_result_${it.name}" }
 ) {
     companion object {
         const val PREFIX = "bpdm.security.permissions"
 
-        //Keep the fully qualified name up to data here
+        //Keep the fully qualified name up to date here
         private const val QUALIFIED_NAME = "org.eclipse.tractusx.bpdm.orchestrator.config.PermissionConfigProperties"
         private const val BEAN_QUALIFIER = "'$PREFIX-$QUALIFIED_NAME'"
 
         const val CREATE_TASK = "@$BEAN_QUALIFIER.getCreateTask()"
         const val VIEW_TASK = "@$BEAN_QUALIFIER.getReadTask()"
-        const val INVOKE_CREATE_RESERVATION = "@$BEAN_QUALIFIER.createReservation"
-        const val INVOKE_CREATE_RESULT = "@$BEAN_QUALIFIER.createResult"
     }
-
-    @Suppress("unused")
-    fun createReservation(step: TaskStep): String{
-        return fetchStepPermission(step, reservation)
-    }
-
-    @Suppress("unused")
-    fun createResult(step: TaskStep): String{
-        return fetchStepPermission(step, result)
-    }
-
-
-    private fun fetchStepPermission(step: TaskStep, stepProperties: TaskStepProperties): String{
-        return when (step) {
-            TaskStep.CleanAndSync -> stepProperties.cleanAndSync
-            TaskStep.PoolSync -> stepProperties.poolSync
-            TaskStep.Clean -> stepProperties.clean
-        }
-    }
-
-    data class TaskStepProperties(
-        val clean: String,
-        val cleanAndSync: String,
-        val poolSync: String
-    )
 }
 
 

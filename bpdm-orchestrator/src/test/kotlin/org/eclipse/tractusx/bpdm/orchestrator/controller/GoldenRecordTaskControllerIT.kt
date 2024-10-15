@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.orchestrator.controller
 import org.assertj.core.api.Assertions.*
 import org.assertj.core.api.ThrowableAssert
 import org.assertj.core.data.TemporalUnitOffset
+import org.eclipse.tractusx.bpdm.orchestrator.config.StateMachineConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.config.TaskConfigProperties
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.BusinessPartnerTestDataFactory
@@ -29,8 +30,9 @@ import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
@@ -56,7 +58,8 @@ val WITHIN_ALLOWED_TIME_OFFSET: TemporalUnitOffset = within(1, ChronoUnit.SECOND
 class GoldenRecordTaskControllerIT @Autowired constructor(
     private val orchestratorClient: OrchestrationApiClient,
     private val taskConfigProperties: TaskConfigProperties,
-    private val dbTestHelpers: DbTestHelpers
+    private val dbTestHelpers: DbTestHelpers,
+    private val stateMachineConfigProperties: StateMachineConfigProperties
 ) {
 
     private val testDataFactory = BusinessPartnerTestDataFactory()
@@ -70,15 +73,17 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
 
     /**
      * GIVEN no tasks
-     * WHEN creating some tasks in UpdateFromSharingMember mode
-     *  THEN expect create response contains correct processingState with step==CleanAndSync
+     * WHEN creating some tasks in task mode
+     *  THEN expect create response contains correct processingState with step
      * WHEN checking state
      *  THEN expect same state as in create response
      */
-    @Test
-    fun `request cleaning task`() {
+    @ParameterizedTest
+    @EnumSource(TaskMode::class)
+    fun `request cleaning task`(taskMode: TaskMode) {
         // create tasks and check response
-        val createdTasks = createTasksWithoutRecordId().createdTasks
+        val createdTasks = createTasksWithoutRecordId(mode = taskMode).createdTasks
+        val expectedStep = stateMachineConfigProperties.modeSteps[taskMode]!!.first()
 
         assertThat(createdTasks.size).isEqualTo(2)
 
@@ -86,49 +91,36 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
 
         createdTasks.forEach { stateDto ->
             val processingState = stateDto.processingState
-            assertProcessingStateDto(processingState, ResultState.Pending, TaskStep.CleanAndSync, StepState.Queued)
+            assertProcessingStateDto(processingState, ResultState.Pending, expectedStep, StepState.Queued)
             assertThat(processingState.errors).isEqualTo(emptyList<TaskErrorDto>())
         }
 
         // check if response is consistent with searchTaskStates response
         val statesResponse = searchTaskStates(createdTasks.map { it.toTaskSearchIdentity() })
-        assertThat(statesResponse.tasks).isEqualTo(createdTasks)
+        assertThat(statesResponse.tasks).usingRecursiveComparison().ignoringCollectionOrder().isEqualTo(createdTasks)
     }
 
-    /**
-     * GIVEN no tasks
-     * WHEN creating some tasks in UpdateFromPool mode
-     *  THEN expect create response contains correct processingState with step==Clean
-     */
-    @Test
-    fun `request cleaning task in alternative mode`() {
-        // create tasks and check response
-        val createdTasks = createTasksWithoutRecordId(TaskMode.UpdateFromPool).createdTasks
-
-        assertThat(createdTasks.size).isEqualTo(2)
-        val processingState = createdTasks[0].processingState
-
-        // Mode "UpdateFromPool" should trigger "Clean" step
-        assertProcessingStateDto(processingState, ResultState.Pending, TaskStep.Clean, StepState.Queued)
-    }
 
     /**
-     * GIVEN some tasks were created in UpdateFromSharingMember mode
-     * WHEN reserving some tasks in step CleanAndSync
+     * GIVEN some tasks were created
+     * WHEN reserving some tasks in first step
      *  THEN expect reservation returns the correct number of entries containing the correct business partner information
      * WHEN trying to reserve more tasks
      *  THEN expect no additional results
      * WHEN checking state
      *  THEN expect correct stepState (Reserved)
      */
-    @Test
-    fun `request reservation`() {
+    @ParameterizedTest
+    @EnumSource(TaskMode::class)
+    fun `request reservation`(taskMode: TaskMode) {
         // create tasks
-        val createdTasks = createTasksWithoutRecordId(TaskMode.UpdateFromSharingMember).createdTasks
+        val createdTasks = createTasksWithoutRecordId(taskMode).createdTasks
         assertThat(createdTasks.size).isEqualTo(2)
 
+        val expectedStep = stateMachineConfigProperties.modeSteps[taskMode]!!.first()
+
         // reserve tasks
-        val reservationResponse1 = reserveTasks(TaskStep.CleanAndSync)
+        val reservationResponse1 = reserveTasks(expectedStep)
         val reservedTasks = reservationResponse1.reservedTasks
 
         // expect the correct number of entries with the correct timeout
@@ -140,7 +132,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
         assertThat(reservedTasks[1].businessPartner).isEqualTo(defaultBusinessPartner2)
 
         // trying to reserve more tasks returns no additional entries
-        val reservationResponse2 = reserveTasks(TaskStep.CleanAndSync)
+        val reservationResponse2 = reserveTasks(expectedStep)
         assertThat(reservationResponse2.reservedTasks.size).isEqualTo(0)
 
         // check searchTaskStates response
@@ -149,7 +141,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
         statesResponse.tasks.forEach { stateDto ->
             val processingState = stateDto.processingState
             // stepState should have changed to Reserved
-            assertProcessingStateDto(processingState, ResultState.Pending, TaskStep.CleanAndSync, StepState.Reserved)
+            assertProcessingStateDto(processingState, ResultState.Pending, expectedStep, StepState.Reserved)
             assertThat(processingState.errors).isEqualTo(emptyList<TaskErrorDto>())
             assertThat(processingState.modifiedAt).isAfter(processingState.createdAt)
             assertThat(processingState.modifiedAt).isCloseTo(Instant.now(), WITHIN_ALLOWED_TIME_OFFSET)
@@ -157,107 +149,95 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
     }
 
     /**
-     * GIVEN some tasks were created in UpdateFromPool mode
-     * WHEN reserving some tasks in step CleanAndSync
+     * GIVEN some tasks were created
+     * WHEN reserving some tasks in wrong step
      *  THEN expect reservation returns no results
      */
-    @Test
-    fun `request reservation for wrong step`() {
+    @ParameterizedTest
+    @EnumSource(TaskMode::class)
+    fun `request reservation for wrong step`(taskMode: TaskMode) {
         // create tasks
-        createTasksWithoutRecordId(TaskMode.UpdateFromPool)
+        createTasksWithoutRecordId(taskMode)
 
         // try reservation for wrong step
-        val reservedTasks = reserveTasks(TaskStep.CleanAndSync).reservedTasks
+        val wrongStep = TaskStep.entries.find { it != stateMachineConfigProperties.modeSteps[taskMode]!!.first() }!!
+        val reservedTasks = reserveTasks(wrongStep).reservedTasks
         assertThat(reservedTasks.size).isEqualTo(0)
     }
 
     /**
      * GIVEN some tasks were created
-     * WHEN reserving one task in step CleanAndSync
+     * WHEN reserving one task in correct step
      *  THEN expect first task and state to switch to stepState==Reserved
      * WHEN resolving this task
-     *  THEN expect state to switch to step==PoolSync and stepState==Queued
-     * WHEN reserving this task in step PoolSync
-     *  THEN expect state to switch to stepState==Reserved
-     * WHEN resolving this task
+     *  THEN expect state to switch to next step and stepState==Queued
+     * WHEN repeating reserving and resolving through all steps
      *  THEN expect state to switch to resultState==Success and stepState==Success and correct business partner data
      */
-    @Test
-    fun `post cleaning results for all steps`() {
+    @ParameterizedTest
+    @EnumSource(TaskMode::class)
+    fun `post cleaning results for all steps`(taskMode: TaskMode) {
+        val allSteps = stateMachineConfigProperties.modeSteps[taskMode]!!
+
         // create tasks
-        val createdTasks = createTasksWithoutRecordId().createdTasks
+        val createdTasks = createTasksWithoutRecordId(mode = taskMode, businessPartners = listOf(defaultBusinessPartner1)).createdTasks
+        val taskId = createdTasks.single().taskId
 
-        // reserve task for step==CleanAndSync
-        val reservedTasks1 = reserveTasks(TaskStep.CleanAndSync, 1).reservedTasks
-        val taskId = reservedTasks1.single().taskId
-        assertThat(reservedTasks1[0].businessPartner).isEqualTo(defaultBusinessPartner1)
+        var expectedBusinessPartner = createdTasks.single().businessPartnerResult
+        allSteps.forEach { step ->
+            assertProcessingStateDto(
+                createdTasks.searchTaskStates(listOf(taskId)).tasks.single().processingState,
+                ResultState.Pending, step, StepState.Queued
+            )
 
-        // now in stepState==Reserved
-        assertProcessingStateDto(
-            createdTasks.searchTaskStates(reservedTasks1.map { it.taskId }).tasks.single().processingState,
-            ResultState.Pending, TaskStep.CleanAndSync, StepState.Reserved
-        )
+            val reservedTask = reserveTasks(step, 1).reservedTasks.single()
+            assertThat(reservedTask.businessPartner).isEqualTo(expectedBusinessPartner)
 
-        // resolve task
-        val businessPartnerResolved1 = testDataFactory.createFullBusinessPartner("Resolved BP1")
-        val resultEntry1 = TaskStepResultEntryDto(
-            taskId = taskId,
-            businessPartner = businessPartnerResolved1
-        )
-        resolveTasks(TaskStep.CleanAndSync, listOf(resultEntry1))
+            // now in stepState==Reserved
+            assertProcessingStateDto(
+                createdTasks.searchTaskStates(listOf( reservedTask.taskId)).tasks.single().processingState,
+                ResultState.Pending, step, StepState.Reserved
+            )
 
-        // now in next step and stepState==Queued
-        assertProcessingStateDto(
-            createdTasks.searchTaskStates(reservedTasks1.map { it.taskId }).tasks.single().processingState,
-            ResultState.Pending, TaskStep.PoolSync, StepState.Queued
-        )
+            // resolve task
+            val businessPartnerResolved = testDataFactory.createFullBusinessPartner("Resolved BP")
+            val resultEntry = TaskStepResultEntryDto(
+                taskId = reservedTask.taskId,
+                businessPartner = businessPartnerResolved
+            )
+            resolveTasks(step, listOf(resultEntry))
 
-        // reserve task for step==PoolSync
-        val reservedTasks2 = reserveTasks(TaskStep.PoolSync, 3).reservedTasks
-        assertThat(reservedTasks2.size).isEqualTo(1)
-        assertThat(reservedTasks2.single().businessPartner).isEqualTo(businessPartnerResolved1)
-
-        // now in stepState==Queued
-        val stateDto = createdTasks.searchTaskStates(listOf(taskId)).tasks.single()
-        assertProcessingStateDto(
-            stateDto.processingState,
-            ResultState.Pending, TaskStep.PoolSync, StepState.Reserved
-        )
-
-        // resolve task again
-        val businessPartnerResolved2 = with(businessPartnerResolved1){ copy(legalEntity = with(legalEntity){ copy(bpnReference = bpnReference.copy(referenceValue = "BPNL-test" )) }) }
-        val resultEntry2 = TaskStepResultEntryDto(
-            taskId = taskId,
-            businessPartner = businessPartnerResolved2
-        )
-        resolveTasks(TaskStep.PoolSync, listOf(resultEntry2))
+            expectedBusinessPartner = businessPartnerResolved
+        }
 
         // final step -> now in stepState==Success
         val finalStateDto = createdTasks.searchTaskStates(listOf(taskId)).tasks.single()
         assertProcessingStateDto(
             finalStateDto.processingState,
-            ResultState.Success, TaskStep.PoolSync, StepState.Success
+            ResultState.Success, stateMachineConfigProperties.modeSteps[taskMode]!!.last(), StepState.Success
         )
         // check returned BP
-        assertThat(finalStateDto.businessPartnerResult).isEqualTo(businessPartnerResolved2)
+        assertThat(finalStateDto.businessPartnerResult).isEqualTo(expectedBusinessPartner)
     }
 
     /**
      * GIVEN some tasks were created and reserved
      * WHEN resolving this task an error
      *  THEN expect state to switch to resultState==Error and stepState==Error
-     * WHEN reserving this task in step PoolSync
+     * WHEN reserving this task
      *  THEN expect state to switch to stepState==Reserved
      * WHEN resolving this task
      *  THEN expect state to switch to resultState==Success and stepState==Success and correct business partner data
      */
-    @Test
-    fun `post cleaning result with error`() {
+    @ParameterizedTest
+    @EnumSource(TaskMode::class)
+    fun `post cleaning result with error`(taskMode: TaskMode) {
         // create tasks
-        val createdTasks = createTasksWithoutRecordId().createdTasks
+        val createdTasks = createTasksWithoutRecordId(taskMode).createdTasks
+        val firstStep = stateMachineConfigProperties.modeSteps[taskMode]!!.first()
 
-        // reserve task for step==CleanAndSync
-        val taskId = reserveTasks(TaskStep.CleanAndSync, 1).reservedTasks.single().taskId
+        // reserve task
+        val taskId = reserveTasks(firstStep, 1).reservedTasks.single().taskId
 
         // resolve task with error
         val errorDto = TaskErrorDto(TaskErrorType.Unspecified, "Unfortunate event")
@@ -266,13 +246,13 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
             businessPartner = defaultBusinessPartner1,
             errors = listOf(errorDto)
         )
-        resolveTasks(TaskStep.CleanAndSync, listOf(resultEntry))
+        resolveTasks(firstStep, listOf(resultEntry))
 
         // now in error state
         val stateDto = createdTasks.searchTaskStates(listOf(taskId)).tasks.single()
         assertProcessingStateDto(
             stateDto.processingState,
-            ResultState.Error, TaskStep.CleanAndSync, StepState.Error
+            ResultState.Error, firstStep, StepState.Error
         )
 
         // expect error in response
@@ -283,8 +263,9 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
      * WHEN requesting cleaning of too many business partners (over the upsert limit)
      * THEN throw exception
      */
-    @Test
-    fun `expect exception on requesting too many cleaning tasks`() {
+    @ParameterizedTest
+    @EnumSource(TaskMode::class)
+    fun `expect exception on requesting too many cleaning tasks`(taskMode: TaskMode) {
         // Create entries above the upsert limit of 3
         val businessPartners = listOf(
             testDataFactory.createFullBusinessPartner("BP1"),
@@ -294,7 +275,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
         )
 
         assertBadRequestException {
-            createTasksWithoutRecordId(businessPartners = businessPartners)
+            createTasksWithoutRecordId(mode = taskMode, businessPartners = businessPartners)
         }
     }
 
@@ -302,11 +283,12 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
      * WHEN reserving too many cleaning tasks (over the upsert limit)
      * THEN throw exception
      */
-    @Test
-    fun `expect exception on requesting too many reservations`() {
+    @ParameterizedTest
+    @EnumSource(TaskStep::class)
+    fun `expect exception on requesting too many reservations`(step: TaskStep) {
         // Create entries above the upsert limit of 3
         assertBadRequestException {
-            reserveTasks(TaskStep.CleanAndSync, 200)
+            reserveTasks(step, 200)
         }
     }
 
@@ -314,8 +296,9 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
      * WHEN posting too many cleaning results (over the upsert limit)
      * THEN throw exception
      */
-    @Test
-    fun `expect exception on posting too many task results`() {
+    @ParameterizedTest
+    @EnumSource(TaskStep::class)
+    fun `expect exception on posting too many task results`(step: TaskStep) {
         val validResultEntry = TaskStepResultEntryDto(
             taskId = "0",
             businessPartner = defaultBusinessPartner1,
@@ -331,7 +314,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
         )
 
         assertBadRequestException {
-            resolveTasks(TaskStep.CleanAndSync, resultEntries)
+            resolveTasks(step, resultEntries)
         }
     }
 
@@ -344,19 +327,21 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
      * WHEN trying to resolve a task twice
      *  THEN expect a BAD_REQUEST
      */
-    @Test
-    fun `expect exceptions on posting inconsistent task results`() {
+    @ParameterizedTest
+    @EnumSource(TaskMode::class)
+    fun `expect exceptions on posting inconsistent task results`(taskMode: TaskMode) {
         // create tasks
-        createTasksWithoutRecordId()
+        createTasksWithoutRecordId(taskMode)
+        val firstStep = stateMachineConfigProperties.modeSteps[taskMode]!!.first()
 
         // reserve tasks
-        val tasksIds = reserveTasks(TaskStep.CleanAndSync).reservedTasks.map { it.taskId }
+        val tasksIds = reserveTasks(firstStep).reservedTasks.map { it.taskId }
         assertThat(tasksIds.size).isEqualTo(2)
 
         // post wrong task ids
         assertBadRequestException {
             resolveTasks(
-                TaskStep.CleanAndSync,
+                firstStep,
                 listOf(
                     TaskStepResultEntryDto(
                         taskId = "WRONG-ID",
@@ -366,10 +351,11 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
             )
         }
 
-        // post correct task id but wrong step (Clean)
+        // post correct task id but wrong step
+        val wrongStep = TaskStep.entries.find{ it != firstStep}!!
         assertBadRequestException {
             resolveTasks(
-                TaskStep.Clean,
+                wrongStep,
                 listOf(
                     TaskStepResultEntryDto(
                         taskId = tasksIds[0],
@@ -381,7 +367,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
 
         // post correct task id with business partner content
         resolveTasks(
-            TaskStep.CleanAndSync,
+            firstStep,
             listOf(
                 TaskStepResultEntryDto(
                     taskId = tasksIds[0],
@@ -393,7 +379,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
         // post task twice
         assertBadRequestException {
             resolveTasks(
-                TaskStep.CleanAndSync,
+                firstStep,
                 listOf(
                     TaskStepResultEntryDto(
                         taskId = tasksIds[0],
@@ -405,7 +391,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
 
         // post correct task id with error content
         resolveTasks(
-            TaskStep.CleanAndSync,
+            firstStep,
             listOf(
                 TaskStepResultEntryDto(
                     tasksIds[1],
@@ -418,10 +404,11 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
         )
     }
 
-    @Test
-    fun `wait for task pending and retention timeout`() {
+    @ParameterizedTest
+    @EnumSource(TaskMode::class)
+    fun `wait for task pending and retention timeout`(taskMode: TaskMode) {
         // create tasks
-        val createdTasks = createTasksWithoutRecordId().createdTasks
+        val createdTasks = createTasksWithoutRecordId(taskMode).createdTasks
         val taskIds = createdTasks.map { it.toTaskSearchIdentity() }
 
         // check for state Pending
@@ -454,32 +441,34 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
         assertThat(foundTasks.size).isZero()
     }
 
-    @Test
-    fun `wait for task retention timeout after success`() {
+    @ParameterizedTest
+    @EnumSource(TaskMode::class)
+    fun `wait for task retention timeout after success`(taskMode: TaskMode) {
         // create single task in UpdateFromPool mode (only one step)
-        val createdTasks =createTasksWithoutRecordId(TaskMode.UpdateFromPool, listOf(defaultBusinessPartner1)).createdTasks
+        val createdTasks = createTasksWithoutRecordId(taskMode, listOf(defaultBusinessPartner1)).createdTasks
+        val createdTask = createdTasks.single()
+        val taskId = createdTask.taskId
 
-        // reserve task
-        val reservedTask = reserveTasks(TaskStep.Clean).reservedTasks.single()
-        val taskId = reservedTask.taskId
-        val searchIdentity = reservedTask.toTaskSearchIdentity(createdTasks)
-
-        // resolve with success
-        val cleaningResult = TaskStepResultEntryDto(
-            taskId = taskId,
-            businessPartner = reservedTask.businessPartner
-        )
-        resolveTasks(TaskStep.Clean, listOf(cleaningResult))
+        val allSteps = stateMachineConfigProperties.modeSteps[taskMode]!!
+        allSteps.forEach { step ->
+            reserveTasks(step).reservedTasks.single()
+            // resolve with success
+            val cleaningResult = TaskStepResultEntryDto(
+                taskId = taskId,
+                businessPartner = createdTask.businessPartnerResult
+            )
+            resolveTasks(step, listOf(cleaningResult))
+        }
 
         // should be in state Success now
-        checkStateForAllTasks(listOf(searchIdentity)) {
-            assertThat(it.resultState).isEqualTo(ResultState.Success)
+        createdTasks.searchTaskStates(listOf(taskId)).tasks.forEach {
+            assertThat(it.processingState.resultState).isEqualTo(ResultState.Success)
         }
 
         // wait for 1/2 retention time -> should still be in state Success
         Thread.sleep(taskConfigProperties.taskRetentionTimeout.dividedBy(2).toMillis())
-        checkStateForAllTasks(listOf(searchIdentity)) {
-            assertThat(it.resultState).isEqualTo(ResultState.Success)
+        createdTasks.searchTaskStates(listOf(taskId)).tasks.forEach {
+            assertThat(it.processingState.resultState).isEqualTo(ResultState.Success)
         }
 
         // wait for 1/2 retention time -> should still be removed
@@ -488,13 +477,15 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
         assertThat(foundTasks.size).isZero()
     }
 
-    @Test
-    fun `wait for task retention timeout after error`() {
-        // create single task in UpdateFromPool mode (only one step)
-        val createdTasks = createTasksWithoutRecordId(TaskMode.UpdateFromPool, listOf(defaultBusinessPartner1)).createdTasks
+    @ParameterizedTest
+    @EnumSource(TaskMode::class)
+    fun `wait for task retention timeout after error`(taskMode: TaskMode) {
+        // create single task
+        val createdTasks = createTasksWithoutRecordId(taskMode, listOf(defaultBusinessPartner1)).createdTasks
+        val firstStep = stateMachineConfigProperties.modeSteps[taskMode]!!.first()
 
         // reserve task
-        val reservedTask = reserveTasks(TaskStep.Clean).reservedTasks.single()
+        val reservedTask = reserveTasks(firstStep).reservedTasks.single()
         val taskId = reservedTask.taskId
         val searchIdentity = reservedTask.toTaskSearchIdentity(createdTasks)
 
@@ -504,7 +495,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
             businessPartner = reservedTask.businessPartner,
             errors = listOf(TaskErrorDto(TaskErrorType.Unspecified, "Unfortunate event"))
         )
-        resolveTasks(TaskStep.Clean, listOf(cleaningResult))
+        resolveTasks(firstStep, listOf(cleaningResult))
 
         // should be in state Success now
         checkStateForAllTasks(listOf(searchIdentity)) {
@@ -523,10 +514,11 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
         assertThat(foundTasks.size).isZero()
     }
 
-    @Test
-    fun `create task for existing gate record`(){
+    @ParameterizedTest
+    @EnumSource(TaskMode::class)
+    fun `create task for existing gate record`(taskMode: TaskMode){
         //Create records by creating tasks first
-        val existingRecordIds = createTasksWithoutRecordId().createdTasks.map { it.recordId }
+        val existingRecordIds = createTasksWithoutRecordId(taskMode).createdTasks.map { it.recordId }
 
         val requestsWithRecords = listOf(defaultBusinessPartner1, defaultBusinessPartner2)
             .zip(existingRecordIds)
@@ -534,30 +526,32 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
 
         requestsWithRecords.forEach { assertThat(it.recordId).isNotNull() }
 
-        val tasksWithRecords = orchestratorClient.goldenRecordTasks.createTasks(TaskCreateRequest(TaskMode.UpdateFromSharingMember, requestsWithRecords)).createdTasks
+        val tasksWithRecords = orchestratorClient.goldenRecordTasks.createTasks(TaskCreateRequest(taskMode, requestsWithRecords)).createdTasks
 
         tasksWithRecords.zip(existingRecordIds).forEach { (actualTask, expectedRecordId) -> assertThat(actualTask.recordId).isEqualTo(expectedRecordId) }
     }
 
-    @Test
-    fun `expect exception on creating task for non-existing gate record`(){
+    @ParameterizedTest
+    @EnumSource(TaskMode::class)
+    fun `expect exception on creating task for non-existing gate record`(taskMode: TaskMode){
         val unknownRecordId = UUID.randomUUID()
 
         val requestWithUnknownRecord = TaskCreateRequestEntry(unknownRecordId.toString(), defaultBusinessPartner1)
 
         assertBadRequestException{
-            createTasks(entries = listOf(requestWithUnknownRecord))
+            createTasks(mode = taskMode, entries = listOf(requestWithUnknownRecord))
         }
     }
 
-    @Test
-    fun `abort task when outdated`(){
-        val createdTasks  = createTasks(entries = listOf(defaultBusinessPartner1, defaultBusinessPartner2).map { TaskCreateRequestEntry(null, it) }).createdTasks
+    @ParameterizedTest
+    @EnumSource(TaskMode::class)
+    fun `abort task when outdated`(taskMode: TaskMode){
+        val createdTasks  = createTasks(mode = taskMode, entries = listOf(defaultBusinessPartner1, defaultBusinessPartner2).map { TaskCreateRequestEntry(null, it) }).createdTasks
         val createdTaskIds = createdTasks.map { it.toTaskSearchIdentity() }
         val createdRecordIds = createdTasks.map { it.recordId }
 
         //Create newer tasks for the given records
-        createTasks(entries = createdRecordIds
+        createTasks(mode = taskMode, entries = createdRecordIds
             .zip(listOf(defaultBusinessPartner1, defaultBusinessPartner2))
             .map { (recordId, bp) -> TaskCreateRequestEntry(recordId, bp) }
         ).createdTasks
@@ -567,32 +561,34 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
         olderTasks.forEach { assertThat(it.processingState.resultState).isEqualTo(ResultState.Error) }
     }
 
-    @Test
-    fun `aborted task throws no error when trying to resolve`(){
-        val createdTasks  = createTasks(entries = listOf(defaultBusinessPartner1, defaultBusinessPartner2).map { TaskCreateRequestEntry(null, it) }).createdTasks
+    @ParameterizedTest
+    @EnumSource(TaskMode::class)
+    fun `aborted task throws no error when trying to resolve`(taskMode: TaskMode){
+        val createdTasks  = createTasks(mode = taskMode, entries = listOf(defaultBusinessPartner1, defaultBusinessPartner2).map { TaskCreateRequestEntry(null, it) }).createdTasks
         val createdRecordIds = createdTasks.map { it.recordId }
+        val firstStep = stateMachineConfigProperties.modeSteps[taskMode]!!.first()
 
-        val reservedTasks = reserveTasks(TaskStep.CleanAndSync, amount = 2).reservedTasks
+        val reservedTasks = reserveTasks(firstStep, amount = 2).reservedTasks
 
         //Create newer tasks for the given records
-        createTasks(entries = createdRecordIds
+        createTasks(mode = taskMode, entries = createdRecordIds
             .zip(listOf(defaultBusinessPartner1, defaultBusinessPartner2))
             .map { (recordId, bp) -> TaskCreateRequestEntry(recordId, bp) }
         ).createdTasks
 
         assertDoesNotThrow {
-            resolveTasks(TaskStep.CleanAndSync, reservedTasks.map { TaskStepResultEntryDto(it.taskId, it.businessPartner) })
+            resolveTasks(firstStep, reservedTasks.map { TaskStepResultEntryDto(it.taskId, it.businessPartner) })
         }
     }
 
-    private fun createTasks(mode: TaskMode = TaskMode.UpdateFromSharingMember,
+    private fun createTasks(mode: TaskMode,
                             entries: List<TaskCreateRequestEntry>? = null
     ): TaskCreateResponse{
         val resolvedEntries = entries ?: listOf(defaultBusinessPartner1, defaultBusinessPartner2).map { bp -> TaskCreateRequestEntry(null, bp) }
         return orchestratorClient.goldenRecordTasks.createTasks(TaskCreateRequest(mode = mode, requests = resolvedEntries))
     }
 
-    private fun createTasksWithoutRecordId(mode: TaskMode = TaskMode.UpdateFromSharingMember, businessPartners: List<BusinessPartner>? = null): TaskCreateResponse =
+    private fun createTasksWithoutRecordId(mode: TaskMode, businessPartners: List<BusinessPartner>? = null): TaskCreateResponse =
         createTasks(mode, (businessPartners ?: listOf(defaultBusinessPartner1, defaultBusinessPartner2)).map{ bp -> TaskCreateRequestEntry(null, bp) })
 
     private fun reserveTasks(step: TaskStep, amount: Int = 3) =

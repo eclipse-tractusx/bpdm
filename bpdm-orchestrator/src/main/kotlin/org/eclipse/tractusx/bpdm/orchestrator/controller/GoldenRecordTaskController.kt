@@ -44,7 +44,7 @@ class GoldenRecordTaskController(
         return goldenRecordTaskService.createTasks(createRequest)
     }
 
-    @PreAuthorize("hasAuthority(${PermissionConfigProperties.INVOKE_CREATE_RESERVATION}(#reservationRequest.step))")
+    @PreAuthorize("@stepSecurityService.assertHasReservationAuthority(authentication, #reservationRequest.step)")
     override fun reserveTasksForStep(reservationRequest: TaskStepReservationRequest): TaskStepReservationResponse {
         if (reservationRequest.amount > apiConfigProperties.upsertLimit)
             throw BpdmUpsertLimitException(reservationRequest.amount, apiConfigProperties.upsertLimit)
@@ -52,7 +52,7 @@ class GoldenRecordTaskController(
         return goldenRecordTaskService.reserveTasksForStep(reservationRequest)
     }
 
-    @PreAuthorize("hasAuthority(${PermissionConfigProperties.INVOKE_CREATE_RESULT}(#resultRequest.step))")
+    @PreAuthorize("@stepSecurityService.assertHasResultAuthority(authentication, #resultRequest.step)")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     override fun resolveStepResults(resultRequest: TaskStepResultRequest) {
         if (resultRequest.results.size > apiConfigProperties.upsertLimit)

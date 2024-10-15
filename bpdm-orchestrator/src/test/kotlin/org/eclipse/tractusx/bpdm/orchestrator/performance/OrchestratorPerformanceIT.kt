@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.orchestrator.performance
 
+import org.eclipse.tractusx.bpdm.orchestrator.config.StateMachineConfigProperties
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.BusinessPartnerTestDataFactory
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
@@ -41,10 +42,13 @@ import java.util.*
 )
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class OrchestratorPerformanceIT@Autowired constructor(
-    private val orchestratorClient: OrchestrationApiClient
+    private val orchestratorClient: OrchestrationApiClient,
+    private val stateMachineConfigProperties: StateMachineConfigProperties
 ) {
 
     private val testDataFactory = BusinessPartnerTestDataFactory()
+    private val taskMode = stateMachineConfigProperties.modeSteps.keys.first()
+    private val step = stateMachineConfigProperties.modeSteps[taskMode]!!.first()
 
     @ParameterizedTest
     @ValueSource(ints = [100])
@@ -103,7 +107,7 @@ class OrchestratorPerformanceIT@Autowired constructor(
     private fun createNewRecordTasks(size: Int): List<TaskStateRequest.Entry>{
         return (1 .. size)
             .map { TaskCreateRequestEntry(null, testDataFactory.createFullBusinessPartner("BP$it")) }
-            .let { TaskCreateRequest(mode = TaskMode.UpdateFromSharingMember, requests = it) }
+            .let { TaskCreateRequest(mode = taskMode, requests = it) }
             .let {  orchestratorClient.goldenRecordTasks.createTasks(it).createdTasks }
             .map { TaskStateRequest.Entry(it.taskId, it.recordId) }
     }
@@ -111,7 +115,7 @@ class OrchestratorPerformanceIT@Autowired constructor(
     private fun updateRecords(recordIds: List<String>): List<TaskStateRequest.Entry>{
         return recordIds
             .map { TaskCreateRequestEntry(it, testDataFactory.createFullBusinessPartner(it)) }
-            .let { TaskCreateRequest(mode = TaskMode.UpdateFromSharingMember, requests = it) }
+            .let { TaskCreateRequest(mode = taskMode, requests = it) }
             .let {  orchestratorClient.goldenRecordTasks.createTasks(it).createdTasks }
             .map { TaskStateRequest.Entry(it.taskId, it.recordId) }
     }
@@ -121,7 +125,7 @@ class OrchestratorPerformanceIT@Autowired constructor(
     }
 
     private fun reserveTasks(size: Int): List<String>{
-        return TaskStepReservationRequest(size, TaskStep.CleanAndSync)
+        return TaskStepReservationRequest(size, step)
             .let { orchestratorClient.goldenRecordTasks.reserveTasksForStep(it).reservedTasks }
             .map { it.taskId }
     }
@@ -129,7 +133,7 @@ class OrchestratorPerformanceIT@Autowired constructor(
     private fun resolveTasks(taskIds: List<String>){
         taskIds
             .map { TaskStepResultEntryDto(it, testDataFactory.createFullBusinessPartner("Resolved $it")) }
-            .run { orchestratorClient.goldenRecordTasks.resolveStepResults(TaskStepResultRequest(TaskStep.CleanAndSync, this)) }
+            .run { orchestratorClient.goldenRecordTasks.resolveStepResults(TaskStepResultRequest(step, this)) }
     }
 
     data class PerformanceResult(
