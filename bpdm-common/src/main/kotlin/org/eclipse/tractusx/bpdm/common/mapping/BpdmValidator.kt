@@ -19,6 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.common.mapping
 
+import org.eclipse.tractusx.bpdm.common.exception.BpdmValidationErrorException
+import org.eclipse.tractusx.bpdm.common.mapping.ValidationContext.Companion.onIndex
+
 /**
  * Offers base logic to validate values
  */
@@ -39,7 +42,13 @@ interface BpdmValidator<T> {
     /**
      * Validate given [value] and throw exception if any error is found
      */
-    fun assert(value: T){
-        require(validate(value).isEmpty())
+    fun assert(value: T, context: ValidationContext = ValidationContext.NoContext){
+        val errors = validate(value, context)
+        if(errors.isNotEmpty()) throw BpdmValidationErrorException(errors)
+    }
+
+    fun assert(listOfValues: List<T>, context: ValidationContext = ValidationContext.NoContext){
+        val errors  = listOfValues.flatMapIndexed { index, value -> validate(value, context.onIndex(index)) }
+        if(errors.isNotEmpty()) throw BpdmValidationErrorException(errors)
     }
 }

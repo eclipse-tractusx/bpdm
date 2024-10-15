@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.common.mapping
 
 abstract class BpdmFilledLimitedStringMapper<TO_TYPE>(
     private val limitedLengthValidation: BpdmValidation<String>
-): BpdmStringMapper<TO_TYPE>, BpdmValidateAndMapMapper<String, TO_TYPE>  {
+): BpdmValidateAndMapStringMapper<TO_TYPE> {
 
     private val isBlankValidation =   object: BpdmValidation<String>{
         override fun validate(value: String, context: ValidationContext): ValidationError? {

@@ -31,7 +31,8 @@ enum class CommonValidationErrorCodes(val description: String) {
     ExceedsHugeLength("Exceeds maximum length of $HUGE_STRING_LENGTH"),
     ISO31661("Not ISO 3166-1 conform"),
     ISO31662("Not ISO 3166-2 conform"),
-    ISO6391("Not ISO 639-1 conform");
+    ISO6391("Not ISO 639-1 conform"),
+    BpnL("Is not a BPNL");
 
     fun toValidationError(value: String?, context: ValidationContext) =
         ValidationError(name, description, value, context)

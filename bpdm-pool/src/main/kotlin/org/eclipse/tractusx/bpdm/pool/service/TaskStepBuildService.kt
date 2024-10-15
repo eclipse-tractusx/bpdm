@@ -90,7 +90,8 @@ class TaskStepBuildService(
                     bpnReference = toBpnReference(legalEntityBpns.legalEntityBpn),
                     legalAddress = legalEntity.legalAddress.copy(
                         bpnReference = toBpnReference(legalEntityBpns.legalAddressBpn)
-                    )
+                    ),
+                    isCatenaXMemberData = legalEntityBpns.isCatenaXMember
                 ),
                 site = siteBpns?.let { site?.copy(
                     bpnReference = toBpnReference(siteBpns.siteBpn),
@@ -115,14 +116,20 @@ class TaskStepBuildService(
         val bpnLReference = legalEntity.bpnReference
         val bpnL = taskEntryBpnMapping.getBpn(bpnLReference)
 
+        val existingLegalEntityInformation by lazy {
+            businessPartnerFetchService.fetchByBpns(listOf(bpnL!!))
+                .firstOrNull()
+                ?.let { LegalEntityBpns(it.bpn, it.legalAddress.bpn, it.isCatenaXMemberData) } ?:
+            throw BpdmValidationException("Legal entity with specified BPNL $bpnL not found")
+        }
+
+        val isCatenaXMember = legalEntity.isCatenaXMemberData ?: if(bpnL != null) existingLegalEntityInformation.isCatenaXMember else false
+
         val bpnResults = if(bpnL != null && legalEntity.hasChanged == false){
             //No need to upsert, just fetch the information
-            businessPartnerFetchService.fetchByBpns(listOf(bpnL))
-                .firstOrNull()
-                ?.let { LegalEntityBpns(it.bpn, it.legalAddress.bpn) } ?:
-            throw BpdmValidationException("Legal entity with specified BPNL $bpnL not found")
+            existingLegalEntityInformation
         }else{
-            upsertLegalEntity(legalEntity, taskEntryBpnMapping)
+            upsertLegalEntity(legalEntity.copy(isCatenaXMemberData = isCatenaXMember), taskEntryBpnMapping)
         }
 
         return bpnResults
@@ -168,7 +175,7 @@ class TaskStepBuildService(
         val bpnL = legalEntityResult.legalEntity.bpnl
         val legalAddressBpnA = legalEntityResult.legalAddress.bpna
 
-        return LegalEntityBpns(bpnL, legalAddressBpnA)
+        return LegalEntityBpns(bpnL, legalAddressBpnA, legalEntityResult.legalEntity.isCatenaXMemberData)
     }
 
     private fun updateLegalEntity(
@@ -187,7 +194,7 @@ class TaskStepBuildService(
 
         val legalEntityResult = result.entities.firstOrNull() ?: throw BpdmValidationException("Unknown error when trying to update legal entity")
 
-        return LegalEntityBpns(legalEntityResult.legalEntity.bpnl, legalEntityResult.legalAddress.bpna)
+        return LegalEntityBpns(legalEntityResult.legalEntity.bpnl, legalEntityResult.legalAddress.bpna, legalEntityResult.legalEntity.isCatenaXMemberData)
     }
 
     private fun processSite(
@@ -497,7 +504,8 @@ class TaskStepBuildService(
 
     data class LegalEntityBpns(
         val legalEntityBpn: String,
-        val legalAddressBpn: String
+        val legalAddressBpn: String,
+        val isCatenaXMember: Boolean
     )
 
     data class SiteBpns(

@@ -76,6 +76,10 @@ class AuthSharingMemberIT @Autowired constructor(
         postLegalEntitySearch = AuthExpectationType.Forbidden,
         postChangelogSearch = AuthExpectationType.Forbidden
     ),
+    CxMembershipsAuthExpectations(
+        getMemberships = AuthExpectationType.Forbidden,
+        putMemberships = AuthExpectationType.Forbidden
+    ),
     changelogAuthExpectation = AuthExpectationType.Forbidden,
     bpnAuthExpectation = AuthExpectationType.Forbidden
 )

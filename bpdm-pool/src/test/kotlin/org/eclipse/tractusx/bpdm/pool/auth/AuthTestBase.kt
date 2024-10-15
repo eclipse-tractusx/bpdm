@@ -38,6 +38,7 @@ abstract class AuthTestBase(
     private val legalEntityAuthExpectations: LegalEntityAuthExpectations,
     private val metadataAuthExpectations: MetadataAuthExpectations,
     private val membersAuthExpectations: MembersAuthExpectations,
+    private val membershipAuthExpectations: CxMembershipsAuthExpectations,
     private val changelogAuthExpectation: AuthExpectationType,
     private val bpnAuthExpectation: AuthExpectationType
 ) {
@@ -194,6 +195,16 @@ abstract class AuthTestBase(
     fun `POST Bpn Search`(){
         authAssertions.assert(bpnAuthExpectation) { poolApiClient.bpns.findBpnsByIdentifiers(IdentifiersSearchRequest(IdentifierBusinessPartnerType.ADDRESS, "ID", emptyList())) }
     }
+
+    @Test
+    fun `GET CX Memberships`(){
+        authAssertions.assert(membershipAuthExpectations.getMemberships) { poolApiClient.memberships.get(CxMembershipSearchRequest(), PaginationRequest()) }
+    }
+
+    @Test
+    fun `PUT CX Memberships`(){
+        authAssertions.assert(membershipAuthExpectations.putMemberships) { poolApiClient.memberships.put(CxMembershipUpdateRequest(listOf())) }
+    }
 }
 
 
@@ -237,5 +248,10 @@ data class MembersAuthExpectations(
     val postSiteSearch: AuthExpectationType,
     val postLegalEntitySearch: AuthExpectationType,
     val postChangelogSearch: AuthExpectationType
+)
+
+data class CxMembershipsAuthExpectations(
+    val getMemberships: AuthExpectationType,
+    val putMemberships: AuthExpectationType
 )
 

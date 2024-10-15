@@ -77,6 +77,10 @@ AuthCxMemberIT @Autowired constructor(
         postLegalEntitySearch = AuthExpectationType.Authorized,
         postChangelogSearch = AuthExpectationType.Authorized
     ),
+    CxMembershipsAuthExpectations(
+        getMemberships = AuthExpectationType.Forbidden,
+        putMemberships = AuthExpectationType.Forbidden
+    ),
     changelogAuthExpectation = AuthExpectationType.Forbidden,
     bpnAuthExpectation = AuthExpectationType.Forbidden
 )

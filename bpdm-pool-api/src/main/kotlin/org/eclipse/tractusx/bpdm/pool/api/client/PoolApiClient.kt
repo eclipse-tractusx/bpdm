@@ -34,4 +34,6 @@ interface PoolApiClient {
     val sites: SiteApiClient
 
     val members: MembersApiClient
+
+    val memberships: CxMembershipApiClient
 }

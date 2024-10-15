@@ -23,17 +23,16 @@ import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 
 data class ValidationContext(
-    val classType: KClass<*>?,
+    val classType: String,
     val objectId: String,
-    val propertyPath: List<KProperty<*>>,
+    val propertyPath: List<String>
 ) {
     companion object {
-        val NoContext = ValidationContext(null, "", emptyList())
+        val NoContext = ValidationContext("", "", emptyList())
 
-        fun fromRoot(classType: KClass<*>?, objectId: String) = ValidationContext(classType, objectId, emptyList())
+        fun fromRoot(classType: KClass<*>?, objectId: String, vararg path: KProperty<*>) = ValidationContext(classType?.simpleName ?: "", objectId, path.map { it.name })
 
-        fun ValidationContext.onProperty(property: KProperty<*>) = copy(propertyPath = propertyPath + property)
+        fun ValidationContext.onProperty(property: KProperty<*>) = copy(propertyPath = propertyPath + property.name)
+        fun ValidationContext.onIndex(index: Int) = copy(propertyPath = propertyPath + "Index $index")
     }
-
-    val prefix = "Class ${classType?.simpleName} with Id $objectId on property ${propertyPath.joinToString()}: "
 }

@@ -14,6 +14,8 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM Orchestrator: Endpoint for checking the result state of given tasks
 - BPDM Orchestrator: Endpoint for getting event log for finished tasks
 - BPDM Pool: Enhanced data model for IdentifierTypes by adding three new fields/attributes: abbreviation, transliteratedName, and transliteratedAbbreviation.([#605](https://github.com/eclipse-tractusx/sig-release/issues/605))
+- BPDM Pool: Add CX endpoints for searching and updating the CX membership information of legal entities.([#1069](https://github.com/eclipse-tractusx/bpdm/issues/1069))
+
 
 ### Changed
 
@@ -33,6 +35,8 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM Cleaning Service Dummy: Removed assignment of uncategorized states while performing cleaning legal entity process.
 - BPDM Gate: Fixed construction logic for states and identifiers by enabling business partner type
 - BPDM Gate: Fixed logic for identifiers to retrieve only generic type on output business partner
+- BPDM Gate: Fixed construction logic for states and identifiers by enabling business partner type 
+- BPDM Pool: When processing golden record tasks the Pool now ignores isCatenaXMemberData field if it is set to null. ([#1069](https://github.com/eclipse-tractusx/bpdm/issues/1069))
 
 ## [6.1.0] - [2024-07-15]
 

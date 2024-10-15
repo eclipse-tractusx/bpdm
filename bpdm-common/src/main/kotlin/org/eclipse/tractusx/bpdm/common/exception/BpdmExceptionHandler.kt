@@ -32,7 +32,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import kotlin.reflect.full.findAnnotations
 
 
-open class BpdmExceptionHandler : ResponseEntityExceptionHandler() {
+open class BpdmExceptionHandler: ResponseEntityExceptionHandler() {
 
     private val kotlinLogger = KotlinLogging.logger { }
 
@@ -47,11 +47,33 @@ open class BpdmExceptionHandler : ResponseEntityExceptionHandler() {
         return handleExceptionInternal(ex, body, headers, status, request)
     }
 
-    @ExceptionHandler(value = [Exception::class])
-    protected fun logException(
+    @ExceptionHandler(value = [BpdmMultipleNotFoundException::class])
+    protected fun handleMultipleObjectsNotFound(
         ex: Exception, request: WebRequest
     ): ResponseEntity<Any>? {
         logException(ex)
+
+        val body = createProblemDetail(ex, HttpStatusCode.valueOf(404), ex.toString(), null, null, request)
+        return handleExceptionInternal(ex, body, HttpHeaders(), HttpStatusCode.valueOf(404), request)
+    }
+
+    @ExceptionHandler(value = [BpdmValidationErrorException::class])
+    protected fun handleValidationErrors(
+        ex: Exception, request: WebRequest
+    ): ResponseEntity<Any>? {
+        val typedEx = ex as BpdmValidationErrorException
+        val errorMessage = typedEx.validationErrors.joinToString(" ") { "Error Code ${it.validationErrorCode}: '${it.errorDetails}' on value '${it.erroneousValue}' at ${it.context.propertyPath.joinToString(".")}." }
+        val body = createProblemDetail(ex, HttpStatusCode.valueOf(400), errorMessage, null, null, request)
+        return handleExceptionInternal(ex, body, HttpHeaders(), HttpStatusCode.valueOf(400), request)
+    }
+
+
+    @ExceptionHandler(value = [Exception::class])
+    protected fun handleGenericException(
+        ex: Exception, request: WebRequest
+    ): ResponseEntity<Any>? {
+        logException(ex)
+
         return handleException(ex, request)
     }
 
