@@ -67,12 +67,5 @@
             </plugin>
         </plugins>
     </build>
-    <distributionManagement>
-        <repository>
-            <id>github</id>
-            <name>GitHub CatenaX-NG Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/eclipse-tractusx/bpdm</url>
-        </repository>
-    </distributionManagement>
 
 </project>
