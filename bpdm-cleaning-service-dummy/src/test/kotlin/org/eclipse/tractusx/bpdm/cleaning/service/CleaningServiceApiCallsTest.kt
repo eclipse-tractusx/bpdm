@@ -29,6 +29,7 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import com.github.tomakehurst.wiremock.stubbing.Scenario
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import org.assertj.core.api.Assertions.assertThat
+import org.eclipse.tractusx.bpdm.cleaning.config.CleaningServiceConfigProperties
 import org.eclipse.tractusx.bpdm.cleaning.config.OrchestratorConfigProperties
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.*
 import org.eclipse.tractusx.orchestrator.api.GoldenRecordTaskApi
@@ -51,8 +52,9 @@ import java.util.*
 )
 @ActiveProfiles("test")
 class CleaningServiceApiCallsTest @Autowired constructor(
-    val cleaningServiceDummy: CleaningServiceDummy,
-    val jacksonObjectMapper: ObjectMapper
+    private val cleaningServiceDummy: CleaningServiceDummy,
+    private val jacksonObjectMapper: ObjectMapper,
+    private val cleaningServiceConfigProperties: CleaningServiceConfigProperties
 ) {
 
     companion object {
@@ -410,7 +412,7 @@ class CleaningServiceApiCallsTest @Autowired constructor(
 
     private fun createResultRequest(expectedBusinessPartner: BusinessPartner): TaskStepResultRequest {
         return TaskStepResultRequest(
-            TaskStep.CleanAndSync, listOf(
+            cleaningServiceConfigProperties.step, listOf(
                 TaskStepResultEntryDto(
                     fixedTaskId,
                     expectedBusinessPartner,

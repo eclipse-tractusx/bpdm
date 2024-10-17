@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.cleaning.service
 
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.cleaning.config.CleaningServiceConfigProperties
 import org.eclipse.tractusx.bpdm.cleaning.util.toUUID
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.*
@@ -33,7 +34,7 @@ import java.util.*
 @Service
 class CleaningServiceDummy(
     private val orchestrationApiClient: OrchestrationApiClient,
-
+    private val cleaningServiceConfigProperties: CleaningServiceConfigProperties
     ) {
 
     private val logger = KotlinLogging.logger { }
@@ -49,7 +50,7 @@ class CleaningServiceDummy(
 
     @Scheduled(cron = "\${bpdm.cleaningService.pollingCron:-}", zone = "UTC")
     fun pollForCleanAndSyncTasks() {
-        processPollingTasks(TaskStep.CleanAndSync)
+        processPollingTasks(cleaningServiceConfigProperties.step)
     }
 
 

@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.orchestrator.service
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.util.replace
+import org.eclipse.tractusx.bpdm.orchestrator.config.StateMachineConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.config.TaskConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.entity.*
 import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmIllegalStateException
@@ -33,7 +34,8 @@ import java.time.Instant
 class GoldenRecordTaskStateMachine(
     private val taskConfigProperties: TaskConfigProperties,
     private val taskRepository: GoldenRecordTaskRepository,
-    private val requestMapper: RequestMapper
+    private val requestMapper: RequestMapper,
+    private val stateMachineConfigProperties: StateMachineConfigProperties
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -175,21 +177,15 @@ class GoldenRecordTaskStateMachine(
     }
 
     private fun getInitialStep(mode: TaskMode): TaskStep {
-        return getStepsForMode(mode).first()
+        return stateMachineConfigProperties.modeSteps[mode]!!.first()
     }
 
     private fun getNextStep(mode: TaskMode, currentStep: TaskStep): TaskStep? {
-        return getStepsForMode(mode)
+        return stateMachineConfigProperties.modeSteps[mode]!!
             .dropWhile { it != currentStep }        // drop steps before currentStep
             .drop(1)                             // then drop currentStep
             .firstOrNull()                          // return next step
     }
-
-    private fun getStepsForMode(mode: TaskMode): List<TaskStep> =
-        when (mode) {
-            TaskMode.UpdateFromSharingMember -> listOf(TaskStep.CleanAndSync, TaskStep.PoolSync)
-            TaskMode.UpdateFromPool -> listOf(TaskStep.Clean)
-        }
 
     private fun isResolvableForStep(state: GoldenRecordTaskDb.ProcessingState, step: TaskStep): Boolean{
         return state.resultState != GoldenRecordTaskDb.ResultState.Pending

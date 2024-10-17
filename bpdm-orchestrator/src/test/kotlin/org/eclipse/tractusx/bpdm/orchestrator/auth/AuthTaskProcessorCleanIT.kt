@@ -26,6 +26,7 @@ import org.eclipse.tractusx.bpdm.test.containers.SelfClientInitializer
 import org.eclipse.tractusx.bpdm.test.util.AuthAssertionHelper
 import org.eclipse.tractusx.bpdm.test.util.AuthExpectationType
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
+import org.eclipse.tractusx.orchestrator.api.model.TaskStep
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ContextConfiguration
@@ -47,18 +48,13 @@ class AuthTaskProcessorCleanIT @Autowired constructor(
             postTask = AuthExpectationType.Forbidden,
             postStateSearch = AuthExpectationType.Forbidden
         ),
-        stepClean = TaskStepAuthExpectations(
-            postReservation = AuthExpectationType.Authorized,
-            postResult = AuthExpectationType.Authorized
-        ),
-        stepCleanAndSync = TaskStepAuthExpectations(
-            postReservation = AuthExpectationType.Authorized,
-            postResult = AuthExpectationType.Authorized
-        ),
-        stepPoolSync = TaskStepAuthExpectations(
-            postReservation = AuthExpectationType.Forbidden,
-            postResult = AuthExpectationType.Forbidden
-        )
+        steps = TaskStep.entries.associateWith { step ->
+            when(step){
+                TaskStep.Clean -> AuthExpectationType.Authorized
+                TaskStep.CleanAndSync -> AuthExpectationType.Authorized
+                else -> AuthExpectationType.Forbidden
+            }
+        }.mapValues {  TaskStepAuthExpectations(postReservation = it.value, postResult = it.value) }
     )
 ){
 

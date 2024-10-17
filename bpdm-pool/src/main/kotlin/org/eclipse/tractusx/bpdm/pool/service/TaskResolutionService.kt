@@ -57,7 +57,7 @@ class TaskBatchResolutionService(
     fun reserveAndResolve(){
         var totalTasksProcessed = 0
         do{
-            val reservationRequest = TaskStepReservationRequest(step = TaskStep.PoolSync, amount = goldenRecordTaskConfigProperties.batchSize)
+            val reservationRequest = TaskStepReservationRequest(step = goldenRecordTaskConfigProperties.step, amount = goldenRecordTaskConfigProperties.batchSize)
             val taskStepReservation = orchestrationClient.goldenRecordTasks.reserveTasksForStep(reservationRequest = reservationRequest)
 
             val successfullyResolved = try{
@@ -90,7 +90,7 @@ class TaskBatchResolutionService(
             val task = goldenRecordTaskRepository.findFirstByLastCheckedBefore(scheduleTime)?.let { task ->
                 if(!task.isResolved){
                     try{
-                        orchestrationClient.goldenRecordTasks.resolveStepResults(TaskStepResultRequest(TaskStep.PoolSync, listOf(resultTemplate.copy(taskId = task.taskId))))
+                        orchestrationClient.goldenRecordTasks.resolveStepResults(TaskStepResultRequest(goldenRecordTaskConfigProperties.step, listOf(resultTemplate.copy(taskId = task.taskId))))
                         task.isResolved = true
                         resolvedTasks++
                     }catch (e: WebClientResponseException.BadRequest){
@@ -134,6 +134,7 @@ class TaskResolutionService(
     private val orchestrationClient: OrchestrationApiClient,
     private val taskStepBuildService: TaskStepBuildService,
     private val bpnRequestIdentifierRepository: BpnRequestIdentifierRepository,
+    private val goldenRecordTaskConfigProperties: GoldenRecordTaskConfigProperties,
     private val entityManager: EntityManager
 ) {
     private val logger = KotlinLogging.logger { }
@@ -150,7 +151,7 @@ class TaskResolutionService(
                         error.copy(description = error.description.take(250))
                     })
                 }
-                orchestrationClient.goldenRecordTasks.resolveStepResults(TaskStepResultRequest(step = TaskStep.PoolSync, results = resultsWithSafeErrors))
+                orchestrationClient.goldenRecordTasks.resolveStepResults(TaskStepResultRequest(step = goldenRecordTaskConfigProperties.step, results = resultsWithSafeErrors))
             }
             logger.info { "Cleaning tasks processing completed for this iteration." }
     }

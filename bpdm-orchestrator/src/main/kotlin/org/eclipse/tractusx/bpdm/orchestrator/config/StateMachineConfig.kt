@@ -17,23 +17,25 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.config
+package org.eclipse.tractusx.bpdm.orchestrator.config
 
-import org.eclipse.tractusx.bpdm.pool.config.GoldenRecordTaskConfigProperties.Companion.PREFIX
+import org.eclipse.tractusx.orchestrator.api.model.TaskMode
 import org.eclipse.tractusx.orchestrator.api.model.TaskStep
-import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
 
-@ConfigurationProperties(PREFIX)
-data class GoldenRecordTaskConfigProperties(
-    val cron: String = "-",
-    val batchSize: Int = 100,
-    val step: TaskStep
-) {
-    companion object {
-        const val PREFIX = "bpdm.tasks"
-        private const val QUALIFIED_NAME = "org.eclipse.tractusx.bpdm.pool.config.GoldenRecordTaskConfigProperties"
-        private const val BEAN_QUALIFIER = "'$PREFIX-$QUALIFIED_NAME'"
+@Configuration
+class StateMachineConfig {
 
-        const val GET_CRON = "@$BEAN_QUALIFIER.getCron()"
+    @Bean
+    fun stateMachineConfigProperties(): StateMachineConfigProperties{
+        return StateMachineConfigProperties(
+            TaskMode.entries.associate { taskMode ->
+                when (taskMode) {
+                    TaskMode.UpdateFromSharingMember -> listOf(TaskStep.CleanAndSync, TaskStep.PoolSync)
+                    TaskMode.UpdateFromPool -> listOf(TaskStep.Clean)
+                }.let { Pair(taskMode, it) }
+            }
+        )
     }
 }

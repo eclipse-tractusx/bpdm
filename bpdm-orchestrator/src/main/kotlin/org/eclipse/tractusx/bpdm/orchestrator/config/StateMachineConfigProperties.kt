@@ -17,23 +17,11 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.config
+package org.eclipse.tractusx.bpdm.orchestrator.config
 
-import org.eclipse.tractusx.bpdm.pool.config.GoldenRecordTaskConfigProperties.Companion.PREFIX
+import org.eclipse.tractusx.orchestrator.api.model.TaskMode
 import org.eclipse.tractusx.orchestrator.api.model.TaskStep
-import org.springframework.boot.context.properties.ConfigurationProperties
 
-@ConfigurationProperties(PREFIX)
-data class GoldenRecordTaskConfigProperties(
-    val cron: String = "-",
-    val batchSize: Int = 100,
-    val step: TaskStep
-) {
-    companion object {
-        const val PREFIX = "bpdm.tasks"
-        private const val QUALIFIED_NAME = "org.eclipse.tractusx.bpdm.pool.config.GoldenRecordTaskConfigProperties"
-        private const val BEAN_QUALIFIER = "'$PREFIX-$QUALIFIED_NAME'"
-
-        const val GET_CRON = "@$BEAN_QUALIFIER.getCron()"
-    }
-}
+data class StateMachineConfigProperties(
+    val modeSteps: Map<TaskMode, List<TaskStep>>
+)

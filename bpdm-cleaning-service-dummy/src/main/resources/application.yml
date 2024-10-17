@@ -47,6 +47,8 @@ bpdm:
         client-id: sa-cl25-cx-1
         # Please provide client secret here
         client-secret: "**********"
+  golden-record-process:
+    step: CleanAndSync
 
   cleaningService:
     # When and how often the cleaning service should poll for golden record tasks in the orchestrator

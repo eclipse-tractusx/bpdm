@@ -63,8 +63,6 @@ bpdm:
       reservation:
           # Name of permission to create reservations for tasks in step 'Clean'
           clean: create_reservation_clean
-          # Name of permission to create reservations for tasks in step 'CleanAndSync'
-          cleanAndSync: create_reservation_cleanAndSync
           # Name of permission to create reservations for tasks in step 'PoolSync'
           poolSync: create_reservation_poolSync
       result:

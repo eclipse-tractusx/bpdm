@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.orchestrator.auth
 
+import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.test.util.AuthAssertionHelper
 import org.eclipse.tractusx.bpdm.test.util.AuthExpectationType
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
@@ -32,7 +33,7 @@ abstract class AuthTestBase(
 ) {
     @Test
     fun `POST Golden Record Task`() {
-        val payload = TaskCreateRequest(TaskMode.UpdateFromSharingMember, listOf())
+        val payload = TaskCreateRequest(TaskMode.entries.first(), listOf())
         authAssertions.assert(orchAuthExpectations.tasks.postTask) { orchestratorClient.goldenRecordTasks.createTasks(payload) }
     }
 
@@ -43,46 +44,30 @@ abstract class AuthTestBase(
     }
 
     @Test
-    fun `POST Task Step 'Clean' Reservation`() {
-        val payload = TaskStepReservationRequest(step = TaskStep.Clean)
-        authAssertions.assert(orchAuthExpectations.stepClean.postReservation) { orchestratorClient.goldenRecordTasks.reserveTasksForStep(payload) }
-    }
+    fun `POST Task Step Reservation`() {
+        TaskStep.entries.forEach { step ->
+            val authExpectations = orchAuthExpectations.steps[step]
+            assertThat(authExpectations).isNotNull
+
+            val payload = TaskStepReservationRequest(step = step)
+            authAssertions.assert(authExpectations!!.postReservation) { orchestratorClient.goldenRecordTasks.reserveTasksForStep(payload) }
+        }
+     }
 
     @Test
-    fun `POST Task Step 'Clean' Result`() {
-        val payload = TaskStepResultRequest(TaskStep.Clean, listOf())
-        authAssertions.assert(orchAuthExpectations.stepClean.postResult) { orchestratorClient.goldenRecordTasks.resolveStepResults(payload) }
-    }
+    fun `POST Task Step Result`() {
+        TaskStep.entries.forEach { step ->
+            val authExpectations = orchAuthExpectations.steps[step]
+            assertThat(authExpectations).isNotNull
 
-    @Test
-    fun `POST Task Step 'CleanAndSync' Reservation`() {
-        val payload = TaskStepReservationRequest(step = TaskStep.CleanAndSync)
-        authAssertions.assert(orchAuthExpectations.stepCleanAndSync.postReservation) { orchestratorClient.goldenRecordTasks.reserveTasksForStep(payload) }
-    }
-
-    @Test
-    fun `POST Task Step 'CleanAndSync' Result`() {
-        val payload = TaskStepResultRequest(TaskStep.CleanAndSync, listOf())
-        authAssertions.assert(orchAuthExpectations.stepCleanAndSync.postResult) { orchestratorClient.goldenRecordTasks.resolveStepResults(payload) }
-    }
-
-    @Test
-    fun `POST Task Step 'Pool' Reservation`() {
-        val payload = TaskStepReservationRequest(step = TaskStep.PoolSync)
-        authAssertions.assert(orchAuthExpectations.stepPoolSync.postReservation) { orchestratorClient.goldenRecordTasks.reserveTasksForStep(payload) }
-    }
-
-    @Test
-    fun `POST Task Step 'Pool' Result`() {
-        val payload = TaskStepResultRequest(TaskStep.PoolSync, listOf())
-        authAssertions.assert(orchAuthExpectations.stepPoolSync.postResult) { orchestratorClient.goldenRecordTasks.resolveStepResults(payload) }
+            val payload = TaskStepResultRequest(step, listOf())
+            authAssertions.assert(authExpectations!!.postResult) { orchestratorClient.goldenRecordTasks.resolveStepResults(payload) }
+        }
     }
 
     data class OrchestratorAuthExpectations(
         val tasks: TaskAuthExpectations,
-        val stepClean: TaskStepAuthExpectations,
-        val stepCleanAndSync: TaskStepAuthExpectations,
-        val stepPoolSync: TaskStepAuthExpectations
+        val steps: Map<TaskStep, TaskStepAuthExpectations>
     )
 
     data class TaskAuthExpectations(

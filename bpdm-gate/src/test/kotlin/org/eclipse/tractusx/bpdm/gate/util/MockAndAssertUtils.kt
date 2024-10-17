@@ -59,6 +59,8 @@ class MockAndAssertUtils @Autowired constructor(
     val ORCHESTRATOR_SEARCH_TASK_RESULT_STATES_URL = "${GoldenRecordTaskApi.TASKS_PATH}/result-state/search"
     val POOL_API_SEARCH_CHANGE_LOG_URL = "${PoolChangelogApi.CHANGELOG_PATH}/search"
 
+    val taskStep = TaskStep.entries.first()
+
     fun mockOrchestratorApi(gateWireMockServer: WireMockExtension) {
         val taskCreateResponse =
             TaskCreateResponse(
@@ -69,7 +71,7 @@ class MockAndAssertUtils @Autowired constructor(
                         recordId = "e3a05ebc-ff59-4d09-bd58-da31d6245701",
                         processingState = TaskProcessingStateDto(
                             resultState = ResultState.Pending,
-                            step = TaskStep.CleanAndSync,
+                            step = taskStep,
                             stepState = StepState.Queued,
                             errors = emptyList(),
                             createdAt = Instant.now(),
@@ -83,7 +85,7 @@ class MockAndAssertUtils @Autowired constructor(
                         recordId = "f05574ff-4ddd-4360-821a-923203711f85",
                         processingState = TaskProcessingStateDto(
                             resultState = ResultState.Pending,
-                            step = TaskStep.CleanAndSync,
+                            step = taskStep,
                             stepState = StepState.Queued,
                             errors = emptyList(),
                             createdAt = Instant.now(),
@@ -97,7 +99,7 @@ class MockAndAssertUtils @Autowired constructor(
                         recordId = "8c03850d-d772-4a2e-9845-65211231b38c",
                         processingState = TaskProcessingStateDto(
                             resultState = ResultState.Pending,
-                            step = TaskStep.CleanAndSync,
+                            step = taskStep,
                             stepState = StepState.Queued,
                             errors = emptyList(),
                             createdAt = Instant.now(),
@@ -111,7 +113,7 @@ class MockAndAssertUtils @Autowired constructor(
                         recordId = "6bebb1aa-935d-467a-afd4-7e8623420a18",
                         processingState = TaskProcessingStateDto(
                             resultState = ResultState.Pending,
-                            step = TaskStep.CleanAndSync,
+                            step = taskStep,
                             stepState = StepState.Queued,
                             errors = emptyList(),
                             createdAt = Instant.now(),
@@ -141,7 +143,7 @@ class MockAndAssertUtils @Autowired constructor(
                         recordId = "e3a05ebc-ff59-4d09-bd58-da31d6245701",
                         processingState = TaskProcessingStateDto(
                             resultState = ResultState.Success,
-                            step = TaskStep.CleanAndSync,
+                            step = taskStep,
                             stepState = StepState.Queued,
                             errors = emptyList(),
                             createdAt = Instant.now(),
@@ -155,7 +157,7 @@ class MockAndAssertUtils @Autowired constructor(
                         recordId = "f05574ff-4ddd-4360-821a-923203711f85",
                         processingState = TaskProcessingStateDto(
                             resultState = ResultState.Error,
-                            step = TaskStep.CleanAndSync,
+                            step = taskStep,
                             stepState = StepState.Queued,
                             errors = listOf(
                                 TaskErrorDto(TaskErrorType.Timeout, "Major Error"),
@@ -208,7 +210,7 @@ class MockAndAssertUtils @Autowired constructor(
                     recordId = "e3a05ebc-ff59-4d09-bd58-da31d6245701",
                     processingState = TaskProcessingStateDto(
                         resultState = ResultState.Success,
-                        step = TaskStep.CleanAndSync,
+                        step = taskStep,
                         stepState = StepState.Queued,
                         errors = emptyList(),
                         createdAt = Instant.now(),

@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.util.AuthAssertionHelper
 import org.eclipse.tractusx.bpdm.test.util.AuthExpectationType
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
+import org.eclipse.tractusx.orchestrator.api.model.TaskStep
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ContextConfiguration
@@ -45,17 +46,7 @@ class NoAuthIT @Autowired constructor(
             postTask = AuthExpectationType.Unauthorized,
             postStateSearch = AuthExpectationType.Unauthorized
         ),
-        stepClean = TaskStepAuthExpectations(
-            postReservation = AuthExpectationType.Unauthorized,
-            postResult = AuthExpectationType.Unauthorized
-        ),
-        stepCleanAndSync = TaskStepAuthExpectations(
-            postReservation = AuthExpectationType.Unauthorized,
-            postResult = AuthExpectationType.Unauthorized
-        ),
-        stepPoolSync = TaskStepAuthExpectations(
-            postReservation = AuthExpectationType.Unauthorized,
-            postResult = AuthExpectationType.Unauthorized
-        )
+        steps = TaskStep.entries
+            .associateWith { TaskStepAuthExpectations(postReservation = AuthExpectationType.Unauthorized, postResult = AuthExpectationType.Unauthorized) }
     )
 )
