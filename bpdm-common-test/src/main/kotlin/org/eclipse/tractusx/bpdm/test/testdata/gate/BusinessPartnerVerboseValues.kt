@@ -381,7 +381,7 @@ object BusinessPartnerVerboseValues {
         building = "Bauteil A",
         floor = "Etage 1",
         door = "Door One",
-        street = StreetDto(name = "Mercedesstraße", houseNumber = "", direction = "direction1", houseNumberSupplement = "A"),
+        street = StreetDto(name = "Mercedesstraße", houseNumber = "", direction = "direction1", houseNumberSupplement = "A")
     )
 
     val postalAddressLogisticAddress2 = PhysicalPostalAddressDto(
@@ -398,7 +398,7 @@ object BusinessPartnerVerboseValues {
         building = "Building Two",
         floor = "Floor Two",
         door = "Door Two",
-        street = StreetDto(name = "TODO", houseNumber = "", direction = "direction1", houseNumberSupplement = "B"),
+        street = StreetDto(name = "TODO", houseNumber = "", direction = "direction1", houseNumberSupplement = "B")
     )
 
     //New Values for Logistic Address Tests
