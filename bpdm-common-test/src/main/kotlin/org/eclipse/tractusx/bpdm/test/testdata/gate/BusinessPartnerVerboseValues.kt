@@ -363,7 +363,8 @@ object BusinessPartnerVerboseValues {
             addressType = AddressType.SiteMainAddress,
             physicalPostalAddress = postalAddress2,
             alternativePostalAddress = alternativeAddressFull
-        )
+        ),
+        externalSequenceTimestamp = null
     )
 
     //New Values for Logistic Addresses Tests
