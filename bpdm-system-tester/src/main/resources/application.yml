@@ -1,0 +1,11 @@
+bpdm:
+  client:
+    pool:
+      enabled: false
+      provider:
+        issuer-uri: ${bpdm.security.auth-server-url:http://localhost:8180}/realms/${bpdm.security.realm:master}
+      registration:
+        authorization-grant-type: client_credentials
+        # Use a default client id for the client credentials request
+        client-id: BPDM-POOL
+        # Please provide a secret here
