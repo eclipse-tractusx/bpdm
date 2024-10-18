@@ -65,7 +65,7 @@ class BusinessPartnerMappings {
                     } }
                     .map(::toIdentifierDto)
             }?: emptyList(),
-            states = entity.states.map(::toStateDto),
+            states = toStateDtos(entity.states, BusinessPartnerType.GENERIC),
             roles = entity.roles,
             isOwnCompanyData = entity.isOwnCompanyData,
             legalEntity = toLegalEntityComponentOutputDto(entity),
