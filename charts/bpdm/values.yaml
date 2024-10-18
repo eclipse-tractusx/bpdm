@@ -20,40 +20,53 @@
 
 bpdm-gate:
   enabled: true
+  applicationConfig:
+    bpdm:
+      datasource:
+        host: bpdm-postgres
+      security:
+        auth-server-url: "http://bpdm-centralidp/auth"
   postgres:
     enabled: false
-    fullnameOverride: bpdm-postgres
   centralidp:
     enabled: false
-    keycloak:
-      nameOverride: bpdm-centralidp
 
 bpdm-pool:
   enabled: true
+  applicationConfig:
+    bpdm:
+      datasource:
+        host: bpdm-postgres
+      security:
+        auth-server-url: "http://bpdm-centralidp/auth"
   postgres:
     enabled: false
-    fullnameOverride: bpdm-postgres
   centralidp:
     enabled: false
-    keycloak:
-      nameOverride: bpdm-centralidp
 
 bpdm-cleaning-service-dummy:
   enabled: true
+  applicationConfig:
+    bpdm:
+      client:
+        orchestrator:
+          provider:
+            issuer-uri: "http://bpdm-centralidp/auth/realms/CX-Central"
   centralidp:
     enabled: false
-    keycloak:
-      nameOverride: bpdm-centralidp
 
 bpdm-orchestrator:
   enabled: true
+  applicationConfig:
+    bpdm:
+      datasource:
+        host: bpdm-postgres
+      security:
+        auth-server-url: "http://bpdm-centralidp/auth"
   postgres:
     enabled: false
-    fullnameOverride: bpdm-postgres
   centralidp:
     enabled: false
-    keycloak:
-      nameOverride: bpdm-centralidp
 
 postgres:
   enabled: true
@@ -67,7 +80,7 @@ postgres:
 centralidp:
   enabled: true
   keycloak:
-    nameOverride: bpdm-centralidp
+    fullnameOverride: bpdm-centralidp
     initContainers:
       - name: import
         image: docker.io/tractusx/portal-iam:3018805f77913926061af13bb5b35cbb98835c6e
