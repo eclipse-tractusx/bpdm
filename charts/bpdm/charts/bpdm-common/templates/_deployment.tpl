@@ -83,6 +83,15 @@ spec:
       initContainers:
         - name: startup-delay
           image: busybox:1.28
+          securityContext:
+              allowPrivilegeEscalation: false
+              runAsNonRoot: true
+              readOnlyRootFilesystem: true
+              runAsUser: 10001
+              runAsGroup: 10001
+              capabilities:
+                drop:
+                  - ALL
           command: ['sh', '-c', "sleep {{ $.Values.startupDelaySeconds }}"]
       {{- with .Values.nodeSelector }}
       nodeSelector:

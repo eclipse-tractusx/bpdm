@@ -21,8 +21,8 @@
 apiVersion: v2
 type: application
 name: bpdm-gate
-appVersion: "6.2.0-rc2"
-version: 6.2.0-rc2
+appVersion: "6.2.0-SNAPSHOT"
+version: 6.2.0-SNAPSHOT
 description: A Helm chart for deploying the BPDM gate service
 home: https://eclipse-tractusx.github.io/docs/kits/Business%20Partner%20Kit/Adoption%20View
 sources:
@@ -34,7 +34,7 @@ dependencies:
     alias: postgres
     condition: postgres.enabled
   - name: bpdm-common
-    version: 1.0.1
+    version: 1.0.2
     repository: "file://../bpdm-common"
   - name: centralidp
     version: 3.0.1
