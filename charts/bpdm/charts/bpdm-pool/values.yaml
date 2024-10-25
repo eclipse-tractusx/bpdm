@@ -128,7 +128,7 @@ applicationSecrets:
       password: &postgresPass  bpdm
 
 postgres:
-  enabled: true
+  enabled: false
   auth:
     database: bpdm
     username: bpdm
