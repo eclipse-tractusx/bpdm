@@ -324,8 +324,6 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
      *  THEN expect a BAD_REQUEST
      * WHEN trying to resolve a task with empty content
      *  THEN expect a BAD_REQUEST
-     * WHEN trying to resolve a task twice
-     *  THEN expect a BAD_REQUEST
      */
     @ParameterizedTest
     @EnumSource(TaskMode::class)
@@ -375,19 +373,6 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
                 )
             )
         )
-
-        // post task twice
-        assertBadRequestException {
-            resolveTasks(
-                firstStep,
-                listOf(
-                    TaskStepResultEntryDto(
-                        taskId = tasksIds[0],
-                        businessPartner = defaultBusinessPartner1
-                    )
-                )
-            )
-        }
 
         // post correct task id with error content
         resolveTasks(
@@ -580,6 +565,58 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
             resolveTasks(firstStep, reservedTasks.map { TaskStepResultEntryDto(it.taskId, it.businessPartner) })
         }
     }
+
+    @ParameterizedTest
+    @EnumSource(TaskMode::class)
+    fun `ignore resolution for already resolved steps`(taskMode: TaskMode){
+        val allSteps = stateMachineConfigProperties.modeSteps[taskMode]!!
+
+        // create tasks
+        val createdTasks = createTasksWithoutRecordId(mode = taskMode, businessPartners = listOf(defaultBusinessPartner1, defaultBusinessPartner2)).createdTasks
+
+        var expectedBusinessPartners = createdTasks.map { it.businessPartnerResult }
+        allSteps.forEach { step ->
+            val reservedTasks = reserveTasks(step, 2).reservedTasks
+
+            val resolvedBusinessPartners = reservedTasks.map {
+                TaskStepResultEntryDto(
+                    taskId = it.taskId,
+                    businessPartner =  testDataFactory.createFullBusinessPartner("${it.taskId} $step Resolved")
+                )
+            }
+            resolveTasks(step, resolvedBusinessPartners)
+            expectedBusinessPartners = resolvedBusinessPartners.map { it.businessPartner }
+
+            val stepsSoFar = stateMachineConfigProperties.modeSteps[taskMode]!!.takeWhile { it != step } + step
+            stepsSoFar.forEach { previousStep ->
+                // accept and ignore resolving already resolved tasks
+                reservedTasks.map {
+                    TaskStepResultEntryDto(
+                        taskId = it.taskId,
+                        businessPartner =  testDataFactory.createFullBusinessPartner("${it.taskId} $previousStep Resolved Again")
+                    )
+                }
+                resolveTasks(step, resolvedBusinessPartners)
+            }
+        }
+
+        // final step -> now in stepState==Success
+        val finalTaskStates = createdTasks.searchTaskStates(createdTasks.map { it.taskId }).tasks
+        finalTaskStates.forEach { task ->
+            assertProcessingStateDto(
+                task.processingState,
+                ResultState.Success, stateMachineConfigProperties.modeSteps[taskMode]!!.last(), StepState.Success
+            )
+        }
+        // check returned BP
+        assertThat(finalTaskStates.map { it.businessPartnerResult })
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .isEqualTo(expectedBusinessPartners)
+
+
+    }
+
 
     private fun createTasks(mode: TaskMode,
                             entries: List<TaskCreateRequestEntry>? = null
