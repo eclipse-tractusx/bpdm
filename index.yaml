@@ -2,6 +2,56 @@ apiVersion: v1
 entries:
   bpdm:
   - apiVersion: v2
+    appVersion: 6.2.0-rc3
+    created: "2024-10-25T05:58:13.370719359Z"
+    dependencies:
+    - alias: bpdm-gate
+      condition: bpdm-gate.enabled
+      name: bpdm-gate
+      repository: ""
+      version: 6.2.0-rc3
+    - alias: bpdm-pool
+      condition: bpdm-pool.enabled
+      name: bpdm-pool
+      repository: ""
+      version: 7.2.0-rc3
+    - alias: bpdm-cleaning-service-dummy
+      condition: bpdm-cleaning-service-dummy.enabled
+      name: bpdm-cleaning-service-dummy
+      repository: ""
+      version: 3.2.0-rc3
+    - alias: bpdm-orchestrator
+      condition: bpdm-orchestrator.enabled
+      name: bpdm-orchestrator
+      repository: ""
+      version: 3.2.0-rc3
+    - name: bpdm-common
+      repository: ""
+      version: 1.0.2
+    - alias: postgres
+      condition: postgres.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 12.12.10
+    - alias: centralidp
+      condition: centralidp.enabled
+      name: centralidp
+      repository: https://eclipse-tractusx.github.io/charts/dev
+      version: 3.0.1
+    description: A Helm chart for Kubernetes that deploys the BPDM applications
+    digest: fc83156598124dd5bcb8cd845d7a356356948a5af909e83fed1e769fd9407ce5
+    home: https://github.com/eclipse-tractusx/bpdm
+    maintainers:
+    - name: Nico Koprowski
+    - name: Fabio D. Mota
+    name: bpdm
+    sources:
+    - https://github.com/eclipse-tractusx/bpdm
+    type: application
+    urls:
+    - https://github.com/eclipse-tractusx/bpdm/releases/download/bpdm-5.2.0-rc3/bpdm-5.2.0-rc3.tgz
+    version: 5.2.0-rc3
+  - apiVersion: v2
     appVersion: 6.2.0-rc2
     created: "2024-10-17T08:59:35.235024651Z"
     dependencies:
@@ -3360,4 +3410,4 @@ entries:
     urls:
     - https://github.com/eclipse-tractusx/bpdm/releases/download/bpdm-pool-4.0.0/bpdm-pool-4.0.0.tgz
     version: 4.0.0
-generated: "2024-10-17T08:59:35.235382801Z"
+generated: "2024-10-25T05:58:13.371059961Z"
