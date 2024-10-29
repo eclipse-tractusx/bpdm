@@ -37,7 +37,8 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM Gate: Fixed logic for identifiers to retrieve only generic type on output business partner
 - BPDM Gate: Fixed construction logic for states and identifiers by enabling business partner type 
 - BPDM Pool: When processing golden record tasks the Pool now ignores isCatenaXMemberData field if it is set to null. ([#1069](https://github.com/eclipse-tractusx/bpdm/issues/1069))
-- BPDM Gate: Fixed gate output logic to provide states based on business partner type.  
+- BPDM Gate: Fixed gate output logic to provide states based on business partner type.
+- BPDM Cleaning Service Dummy: Removed assignment of uncategorized identifier while performing cleaning task process.  
 
 ## [6.1.0] - [2024-07-15]
 
