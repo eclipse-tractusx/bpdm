@@ -65,7 +65,15 @@ class BusinessPartnerMappings {
                     } }
                     .map(::toIdentifierDto)
             }?: emptyList(),
-            states = entity.states.map(::toStateDto),
+            states = entity.postalAddress.addressType?.let { addressType ->
+                entity.states
+                    .filter { it.businessPartnerTyp == when (addressType) {
+                        AddressType.LegalAndSiteMainAddress, AddressType.LegalAddress -> BusinessPartnerType.LEGAL_ENTITY
+                        AddressType.AdditionalAddress -> BusinessPartnerType.ADDRESS
+                        AddressType.SiteMainAddress -> BusinessPartnerType.SITE
+                    } }
+                    .map(::toStateDto)
+            }?: emptyList(),
             roles = entity.roles,
             isOwnCompanyData = entity.isOwnCompanyData,
             legalEntity = toLegalEntityComponentOutputDto(entity),
