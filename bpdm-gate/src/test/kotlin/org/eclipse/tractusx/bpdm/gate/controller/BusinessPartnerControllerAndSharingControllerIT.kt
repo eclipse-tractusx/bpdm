@@ -145,7 +145,7 @@ class BusinessPartnerControllerAndSharingControllerIT @Autowired constructor(
 
         // Expect outputBusinessPartner without identifiers as there are not Address identifier provided.
         val outputBusinessPartners = listOf(
-            BusinessPartnerVerboseValues.bpOutputDtoCleaned.copy(identifiers = emptyList())
+            BusinessPartnerVerboseValues.bpOutputDtoCleaned.copy(identifiers = emptyList(), states = emptyList()),
         )
 
         val upsertRequests = listOf(
