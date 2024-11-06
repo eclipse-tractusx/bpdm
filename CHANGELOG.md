@@ -11,34 +11,34 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 ### Added
 
 - BPDM Pool: Post endpoint to create a site for LegalAndSiteMainAddress addressType.([#739](https://github.com/eclipse-tractusx/sig-release/issues/739))
-- BPDM Orchestrator: Endpoint for checking the result state of given tasks
-- BPDM Orchestrator: Endpoint for getting event log for finished tasks
+- BPDM Orchestrator: Endpoint for checking the result state of given tasks([#1039](https://github.com/eclipse-tractusx/bpdm/pull/1039))
+- BPDM Orchestrator: Endpoint for getting event log for finished tasks([#1039](https://github.com/eclipse-tractusx/bpdm/pull/1039))
 - BPDM Pool: Enhanced data model for IdentifierTypes by adding three new fields/attributes: abbreviation, transliteratedName, and transliteratedAbbreviation.([#605](https://github.com/eclipse-tractusx/sig-release/issues/605))
 - BPDM Pool: Add CX endpoints for searching and updating the CX membership information of legal entities.([#1069](https://github.com/eclipse-tractusx/bpdm/issues/1069))
 
 
 ### Changed
 
-- BPDM Gate: Fix possible out of memory exception when handling large golden record process requests
-- BPDM Pool: Fix not resolving golden record tasks on exceptions
-- BPDM Gate: Fixed Gate not resending business partner data to the golden record process on error sharing state when member sends the exact same business partner again
-- BPDM Orchestrator: Search task endpoint now requires the private record ID for each task. This means only the task creator is able to fetch the task state
-- BPDM Orchestrator: Now aborts tasks that are outdated (that is when a Gate will send newer business partner data for the same record to the golden record process)
+- BPDM Gate: Fix possible out of memory exception when handling large golden record process requests([#1034](https://github.com/eclipse-tractusx/bpdm/pull/1034))
+- BPDM Pool: Fix not resolving golden record tasks on exceptions([#1033](https://github.com/eclipse-tractusx/bpdm/pull/1033))
+- BPDM Gate: Fixed Gate not resending business partner data to the golden record process on error sharing state when member sends the exact same business partner again([#1035](https://github.com/eclipse-tractusx/bpdm/pull/1035))
+- BPDM Orchestrator: Search task endpoint now requires the private record ID for each task. This means only the task creator is able to fetch the task state([#1039](https://github.com/eclipse-tractusx/bpdm/pull/1039))
+- BPDM Orchestrator: Now aborts tasks that are outdated (that is when a Gate will send newer business partner data for the same record to the golden record process)([#1036](https://github.com/eclipse-tractusx/bpdm/pull/1036))
 - BPDM Pool & Gate: Reduce standard batch size for golden record task processing ([#1032](https://github.com/eclipse-tractusx/bpdm/pull/1032))
 - BPDM Orchestrator: Fix possible out-of-memory exception during the execution of large volumes of tasks ([#1029](https://github.com/eclipse-tractusx/bpdm/pull/1029))
-- BPDM Cleaning Service Dummy: Add whitespaces between name parts when creating legal name from them
-- BPDM Cleaning Service Dummy: Improve duplication check to better distinguish between incoming business partners
+- BPDM Cleaning Service Dummy: Add whitespaces between name parts when creating legal name from them ([#1041](https://github.com/eclipse-tractusx/bpdm/pull/1041))
+- BPDM Cleaning Service Dummy: Improve duplication check to better distinguish between incoming business partners ([#1040](https://github.com/eclipse-tractusx/bpdm/pull/1040))
 - Apps: Updated double precision data type for Geographic-data([#978](https://github.com/eclipse-tractusx/bpdm/issues/978))
 - BPDM Gate: Improved error response by adding external id details and reduced csv columns by removing support for uncategorized fields in csv file for partner upload process([#700](https://github.com/eclipse-tractusx/sig-release/issues/700))
-- BPDM Cleaning Service Dummy: Added a null check for name parts to ensure proper whitespace handling when constructing the legal name from them.
-- BPDM Gate: Enabled Tax Jurisdiction code to save it to the Output.
-- BPDM Cleaning Service Dummy: Removed assignment of uncategorized states while performing cleaning legal entity process.
-- BPDM Gate: Fixed construction logic for states and identifiers by enabling business partner type
-- BPDM Gate: Fixed logic for identifiers to retrieve only generic type on output business partner
-- BPDM Gate: Fixed construction logic for states and identifiers by enabling business partner type 
+- BPDM Cleaning Service Dummy: Added a null check for name parts to ensure proper whitespace handling when constructing the legal name from them. ([#1059](https://github.com/eclipse-tractusx/bpdm/pull/1059))
+- BPDM Gate: Enabled Tax Jurisdiction code to save it to the Output. ([#1058](https://github.com/eclipse-tractusx/bpdm/pull/1058))
+- BPDM Cleaning Service Dummy: Removed assignment of uncategorized states while performing cleaning legal entity process. ([#1061](https://github.com/eclipse-tractusx/bpdm/pull/1061))
+- BPDM Gate: Fixed construction logic for states and identifiers by enabling business partner type ([#1067](https://github.com/eclipse-tractusx/bpdm/pull/1067))
+- BPDM Gate: Fixed logic for identifiers to retrieve only generic type on output business partner ([#1067](https://github.com/eclipse-tractusx/bpdm/pull/1067))
+- BPDM Gate: Fixed construction logic for states and identifiers by enabling business partner type ([#1067](https://github.com/eclipse-tractusx/bpdm/pull/1067))
 - BPDM Pool: When processing golden record tasks the Pool now ignores isCatenaXMemberData field if it is set to null. ([#1069](https://github.com/eclipse-tractusx/bpdm/issues/1069))
-- BPDM Gate: Fixed gate output logic to provide states based on business partner type.
-- BPDM Cleaning Service Dummy: Removed assignment of uncategorized identifier while performing cleaning task process.  
+- BPDM Gate: Fixed gate output logic to provide states based on business partner type. ([#1097](https://github.com/eclipse-tractusx/bpdm/pull/1097))
+- BPDM Cleaning Service Dummy: Removed assignment of uncategorized identifier while performing cleaning task process. ([#1098](https://github.com/eclipse-tractusx/bpdm/pull/1098))  
 
 ## [6.1.0] - [2024-07-15]
 
