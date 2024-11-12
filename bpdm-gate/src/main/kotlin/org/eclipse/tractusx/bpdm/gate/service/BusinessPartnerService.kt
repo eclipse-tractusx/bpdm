@@ -97,10 +97,10 @@ class BusinessPartnerService(
         logger.debug { "Executing upsertBusinessPartnersOutput() with parameters $requests" }
 
         val existingOutputs = businessPartnerRepository.findBySharingStateInAndStage(requests.map { it.sharingState }, StageType.Output)
-        val existingOutputsByExternalId = existingOutputs.associateBy { it.sharingState.externalId }
+        val existingOutputsBySharingStateId = existingOutputs.associateBy { it.sharingState.id }
 
         val updatedEntities = requests.map { request ->
-            val existingOutput = existingOutputsByExternalId[request.sharingState.externalId]
+            val existingOutput = existingOutputsBySharingStateId[request.sharingState.id]
             val updatedData = outputUpsertMappings.toEntity(request.upsertData, request.sharingState)
 
             upsertFromEntity(existingOutput, updatedData)
