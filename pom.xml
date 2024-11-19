@@ -162,6 +162,12 @@
                 <artifactId>opencsv</artifactId>
                 <version>${opencsv.version}</version>
             </dependency>
+            <!-- overwrite with newer version to fix vulnerability  -->
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-common</artifactId>
+                <version>4.1.115.Final</version>
+            </dependency>
 
             <!-- Test -->
             <dependency>

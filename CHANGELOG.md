@@ -39,6 +39,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM Pool: When processing golden record tasks the Pool now ignores isCatenaXMemberData field if it is set to null. ([#1069](https://github.com/eclipse-tractusx/bpdm/issues/1069))
 - BPDM Gate: Fixed gate output logic to provide states based on business partner type. ([#1097](https://github.com/eclipse-tractusx/bpdm/pull/1097))
 - BPDM Cleaning Service Dummy: Removed assignment of uncategorized identifier while performing cleaning task process. ([#1098](https://github.com/eclipse-tractusx/bpdm/pull/1098))  
+- BPDM: Fix denial of service attack vulnerability CVE-2024-47535 ([#1112](https://github.com/eclipse-tractusx/bpdm/issues/1112))
 
 ## [6.1.0] - [2024-07-15]
 
