@@ -54,7 +54,7 @@ class LegalFormDb(
     @JoinColumn(name = "region_id")
     val administrativeArea: RegionDb?,
 
-    @Column(name = "is_active")
+    @Column(name = "is_active", nullable = false)
     val isActive: Boolean
 
 ) : BaseEntity()
