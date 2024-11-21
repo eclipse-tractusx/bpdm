@@ -22,8 +22,8 @@ apiVersion: v2
 name: bpdm
 type: application
 description: A Helm chart for Kubernetes that deploys the BPDM applications
-version: 5.2.0-SNAPSHOT
-appVersion: "6.2.0-SNAPSHOT"
+version: 5.2.0-rc5
+appVersion: "6.2.0-rc5"
 home: https://github.com/eclipse-tractusx/bpdm
 sources:
   - https://github.com/eclipse-tractusx/bpdm
@@ -33,19 +33,19 @@ maintainers:
 
 dependencies:
   - name: bpdm-gate
-    version: 6.2.0-SNAPSHOT
+    version: 6.2.0-rc5
     alias: bpdm-gate
     condition: bpdm-gate.enabled
   - name: bpdm-pool
-    version: 7.2.0-SNAPSHOT
+    version: 7.2.0-rc5
     alias: bpdm-pool
     condition: bpdm-pool.enabled
   - name: bpdm-cleaning-service-dummy
-    version: 3.2.0-SNAPSHOT
+    version: 3.2.0-rc5
     alias: bpdm-cleaning-service-dummy
     condition: bpdm-cleaning-service-dummy.enabled
   - name: bpdm-orchestrator
-    version: 3.2.0-SNAPSHOT
+    version: 3.2.0-rc5
     alias: bpdm-orchestrator
     condition: bpdm-orchestrator.enabled
   - name: bpdm-common
