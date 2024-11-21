@@ -29,7 +29,7 @@ data class OutputUpsertData(
     val roles: Collection<BusinessPartnerRole>,
     val isOwnCompanyData: Boolean,
     val legalEntityBpn: String,
-    val legalName: String,
+    val legalName: String?,
     val shortName: String?,
     val legalForm: String?,
     val siteBpn: String?,
