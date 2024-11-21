@@ -218,7 +218,7 @@ class OrchestratorMappings(
                 identifiers = uncategorized.identifiers.mapNotNull { toIdentifier(it, BusinessPartnerType.GENERIC) }
                     .plus(legalEntity.identifiers.mapNotNull { toIdentifier(it, BusinessPartnerType.LEGAL_ENTITY) })
                     .plus(postalAddress.identifiers.mapNotNull { toIdentifier(it, BusinessPartnerType.ADDRESS) }),
-                legalName = legalEntity.legalName ?: throw BpdmNullMappingException(BusinessPartner::class, OutputUpsertData::class, LegalEntity::legalName),
+                legalName = legalEntity.legalName,
                 siteName = site?.siteName,
                 addressName = postalAddress.addressName,
                 legalForm = legalEntity.legalForm,
