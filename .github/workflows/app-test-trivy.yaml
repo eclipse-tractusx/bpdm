@@ -17,28 +17,20 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################################
 
-name: Perform Trivy Scan on App
+name: 'Perform Trivy Scan on All Apps'
 on:
   workflow_dispatch:
-    inputs:
-      app:
-        description: 'The name of the BPDM app to scan'
-        type: choice
-        required: true
-        options:
-          - pool
-          - gate
-          - orchestrator
-          - cleaning-service-dummy
   workflow_call:
-    inputs:
-      app:
-        description: 'The name of the BPDM app to scan'
-        type: string
-        required: true
+  pull_request:
+    branches:
+      - main
+      - 'release/**'
 jobs:
-  scan:
+  scan-image:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        app: [pool, gate, orchestrator, cleaning-service-dummy]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -50,14 +42,14 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: docker/${{ inputs.app }}/Dockerfile
-          tags: bpdm-${{ inputs.app }}:test
+          file: docker/${{ matrix.app }}/Dockerfile
+          tags: bpdm-${{ matrix.app }}:test
           load: true
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@0.29.0
         with:
-          image-ref: "bpdm-${{ inputs.app }}:test"
+          image-ref: "bpdm-${{ matrix.app }}:test"
           exit-code: "1"
           severity: "CRITICAL,HIGH"
           timeout: 15m
