@@ -593,7 +593,7 @@ components:
           type: string
           description: The identifier of the gate record for which this task has been created
         businessPartnerResult:
-          $ref: '#/components/schemas/BusinessPartner'
+          $ref: '#/components/schemas/AnnotatedBusinessPartner'
         processingState:
           $ref: '#/components/schemas/TaskProcessingStateDto'
       description: The golden record task's processing state together with optional business partner data in case processing is done
@@ -625,6 +625,8 @@ components:
           description: The unique identifier for this record which was previously issued by the Orchestrator
         businessPartner:
           $ref: '#/components/schemas/BusinessPartner'
+        annotations:
+          $ref: '#/components/schemas/BusinessPartnerAnnotationCreateRequest'
     TaskCreateResponse:
       required:
         - createdTasks
@@ -760,7 +762,7 @@ components:
           type: string
           description: The identifier of the gate record for which this task has been created
         businessPartner:
-          $ref: '#/components/schemas/BusinessPartner'
+          $ref: '#/components/schemas/AnnotatedBusinessPartner'
         requestKey:
           type: string
       description: Task reservation entry
@@ -816,6 +818,8 @@ components:
           description: Errors that occurred during processing of this task
           items:
             $ref: '#/components/schemas/TaskErrorDto'
+        annotations:
+          $ref: '#/components/schemas/BusinessPartnerAnnotationCreateRequest'
       description: A step result for a golden record task
     TaskStepResultRequest:
       required:
@@ -861,3 +865,338 @@ components:
         address:
           $ref: '#/components/schemas/PostalAddress'
       description: Business partner data that has not yet or can not be categorized
+
+    AnnotationEntry:
+      type: object
+      properties:
+        annotationType:
+          type: string
+          enum:
+            - Comment
+            - Approval
+            - Rejection
+            - RefinementSource
+        source:
+          type: string
+        comment:
+          type: string
+        step:
+          type: string
+        timestamp:
+          type: string
+          pattern: date-time
+    AnnotationHistory:
+      type: array
+      items:
+        $ref: "#/components/schemas/AnnotationEntry"
+    BaseAddressAnnotation:
+      type: object
+      properties:
+        geographicCoordinates:
+          $ref: '#/components/schemas/AnnotationHistory'
+        country:
+          $ref: '#/components/schemas/AnnotationHistory'
+        administrativeAreaLevel1:
+          $ref: '#/components/schemas/AnnotationHistory'
+        city:
+          $ref: '#/components/schemas/AnnotationHistory'
+        postalCode:
+          $ref: '#/components/schemas/AnnotationHistory'
+    PhysicalAddressAnnotation:
+      allOf:
+        - $ref: '#/components/schemas/BaseAddressAnnotation'
+        - type: object
+          properties:
+            administrativeAreaLevel2:
+              $ref: '#/components/schemas/AnnotationHistory'
+            administrativeAreaLevel3:
+              $ref: '#/components/schemas/AnnotationHistory'
+            district:
+              $ref: '#/components/schemas/AnnotationHistory'
+            street:
+              $ref: '#/components/schemas/AnnotationHistory'
+            companyPostalCode:
+              $ref: '#/components/schemas/AnnotationHistory'
+            industrialZone:
+              $ref: '#/components/schemas/AnnotationHistory'
+            building:
+              $ref: '#/components/schemas/AnnotationHistory'
+            floor:
+              $ref: '#/components/schemas/AnnotationHistory'
+            door:
+              $ref: '#/components/schemas/AnnotationHistory'
+            taxJurisdictionCode:
+              $ref: '#/components/schemas/AnnotationHistory'
+    AlternativeAddressAnnotation:
+      allOf:
+        - $ref: '#/components/schemas/BaseAddressAnnotation'
+        - type: object
+          properties:
+            deliveryServiceType:
+              $ref: '#/components/schemas/AnnotationHistory'
+            deliveryServiceQualifier:
+              $ref: '#/components/schemas/AnnotationHistory'
+            deliveryServiceNumber:
+              $ref: '#/components/schemas/AnnotationHistory'
+    ConfidenceCriteriaAnnotation:
+      type: object
+      properties:
+        sharedByOwner:
+          $ref: '#/components/schemas/AnnotationHistory'
+        checkedByExternalDataSource:
+          $ref: '#/components/schemas/AnnotationHistory'
+        numberOfSharingMembers:
+          $ref: '#/components/schemas/AnnotationHistory'
+        lastConfidenceCheckAt:
+          $ref: '#/components/schemas/AnnotationHistory'
+        nextConfidenceCheckAt:
+          $ref: '#/components/schemas/AnnotationHistory'
+        confidenceLevel:
+          $ref: '#/components/schemas/AnnotationHistory'
+    PostalAddressAnnotation:
+      type: object
+      properties:
+        bpnA:
+          $ref: '#/components/schemas/AnnotationHistory'
+        name:
+          $ref: '#/components/schemas/AnnotationHistory'
+        addressType:
+          $ref: '#/components/schemas/AnnotationHistory'
+        legalEntityBpn:
+          $ref: '#/components/schemas/AnnotationHistory'
+        siteBpn:
+          $ref: '#/components/schemas/AnnotationHistory'
+        states:
+          type: array
+          items:
+            $ref: "#/components/schemas/AnnotationHistory"
+        identifiers:
+          type: array
+          items:
+            $ref: '#/components/schemas/AnnotationHistory'
+        physicalPostalAddress:
+          $ref: '#/components/schemas/PhysicalAddressAnnotation'
+        alternativePostalAddress:
+          $ref: '#/components/schemas/AlternativeAddressAnnotation'
+        isCatenaXMemberData:
+          $ref: '#/components/schemas/AnnotationHistory'
+        confidenceCriteria:
+          $ref: '#/components/schemas/ConfidenceCriteriaAnnotation'
+    SiteAnnotation:
+      type: object
+      properties:
+        bpns:
+          $ref: '#/components/schemas/AnnotationHistory'
+        name:
+          $ref: '#/components/schemas/AnnotationHistory'
+        states:
+          type: array
+          items:
+            $ref: '#/components/schemas/AnnotationHistory'
+        isCatenaXMemberData:
+          $ref: '#/components/schemas/AnnotationHistory'
+        bpnLegalEntity:
+          $ref: '#/components/schemas/AnnotationHistory'
+        confidenceCriteria:
+          $ref: '#/components/schemas/ConfidenceCriteriaAnnotation'
+        siteMainAddress:
+          $ref: '#/components/schemas/PostalAddressAnnotation'
+    LegalEntityAnnotation:
+      type: object
+      properties:
+        bpnL:
+          $ref: '#/components/schemas/AnnotationHistory'
+        legalName:
+          $ref: '#/components/schemas/AnnotationHistory'
+        legalShortName:
+          $ref: '#/components/schemas/AnnotationHistory'
+        legalForm:
+          $ref: '#/components/schemas/AnnotationHistory'
+        identifiers:
+          type: array
+          items:
+            $ref: '#/components/schemas/AnnotationHistory'
+        states:
+          type: array
+          items:
+            $ref: '#/components/schemas/AnnotationHistory'
+        confidenceCriteria:
+          $ref: '#/components/schemas/ConfidenceCriteriaAnnotation'
+        isCatenaXMemberData:
+          $ref: '#/components/schemas/AnnotationHistory'
+        legalAddress:
+          $ref: '#/components/schemas/PostalAddressAnnotation'
+    BusinessPartnerAnnotation:
+      type: object
+      properties:
+        legalEntity:
+          $ref: '#/components/schemas/LegalEntityAnnotation'
+        site:
+          $ref: '#/components/schemas/SiteAnnotation'
+        additionalAddress:
+          $ref: '#/components/schemas/PostalAddressAnnotation'
+
+    AnnotatedBusinessPartner:
+      allOf:
+        - $ref: '#/components/schemas/BusinessPartner'
+        - type: object
+          properties:
+            annotations:
+              $ref: '#/components/schemas/BusinessPartnerAnnotation'
+
+    AnnotationCreateRequest:
+      type: object
+      properties:
+        annotationType:
+          type: string
+          enum:
+            - Comment
+            - Approval
+            - Rejection
+            - RefinementSource
+        source:
+          type: string
+        comment:
+          type: string
+    BaseAddressAnnotationCreateRequest:
+      type: object
+      properties:
+        geographicCoordinates:
+          $ref: '#/components/schemas/AnnotationCreateRequest'
+        country:
+          $ref: '#/components/schemas/AnnotationCreateRequest'
+        administrativeAreaLevel1:
+          $ref: '#/components/schemas/AnnotationCreateRequest'
+        city:
+          $ref: '#/components/schemas/AnnotationCreateRequest'
+        postalCode:
+          $ref: '#/components/schemas/AnnotationCreateRequest'
+    PhysicalAddressAnnotationCreateRequest:
+      allOf:
+        - $ref: '#/components/schemas/BaseAddressAnnotationCreateRequest'
+        - type: object
+          properties:
+            administrativeAreaLevel2:
+              $ref: '#/components/schemas/AnnotationCreateRequest'
+            administrativeAreaLevel3:
+              $ref: '#/components/schemas/AnnotationCreateRequest'
+            district:
+              $ref: '#/components/schemas/AnnotationCreateRequest'
+            street:
+              $ref: '#/components/schemas/AnnotationCreateRequest'
+            companyPostalCode:
+              $ref: '#/components/schemas/AnnotationCreateRequest'
+            industrialZone:
+              $ref: '#/components/schemas/AnnotationCreateRequest'
+            building:
+              $ref: '#/components/schemas/AnnotationCreateRequest'
+            floor:
+              $ref: '#/components/schemas/AnnotationCreateRequest'
+            door:
+              $ref: '#/components/schemas/AnnotationCreateRequest'
+            taxJurisdictionCode:
+              $ref: '#/components/schemas/AnnotationCreateRequest'
+    AlternativeAddressAnnotationCreateRequest:
+      allOf:
+        - $ref: '#/components/schemas/BaseAddressAnnotationCreateRequest'
+        - type: object
+          properties:
+            deliveryServiceType:
+              $ref: '#/components/schemas/AnnotationCreateRequest'
+            deliveryServiceQualifier:
+              $ref: '#/components/schemas/AnnotationCreateRequest'
+            deliveryServiceNumber:
+              $ref: '#/components/schemas/AnnotationCreateRequest'
+    ConfidenceCriteriaAnnotationCreateRequest:
+      type: object
+      properties:
+        sharedByOwner:
+          $ref: '#/components/schemas/AnnotationCreateRequest'
+        checkedByExternalDataSource:
+          $ref: '#/components/schemas/AnnotationCreateRequest'
+        numberOfSharingMembers:
+          $ref: '#/components/schemas/AnnotationCreateRequest'
+        lastConfidenceCheckAt:
+          $ref: '#/components/schemas/AnnotationCreateRequest'
+        nextConfidenceCheckAt:
+          $ref: '#/components/schemas/AnnotationCreateRequest'
+        confidenceLevel:
+          $ref: '#/components/schemas/AnnotationCreateRequest'
+    PostalAddressAnnotationCreateRequest:
+      type: object
+      properties:
+        bpnA:
+          $ref: '#/components/schemas/AnnotationCreateRequest'
+        name:
+          $ref: '#/components/schemas/AnnotationCreateRequest'
+        addressType:
+          $ref: '#/components/schemas/AnnotationCreateRequest'
+        legalEntityBpn:
+          $ref: '#/components/schemas/AnnotationCreateRequest'
+        siteBpn:
+          $ref: '#/components/schemas/AnnotationCreateRequest'
+        states:
+          type: array
+          items:
+            $ref: "#/components/schemas/AnnotationCreateRequest"
+        identifiers:
+          type: array
+          items:
+            $ref: '#/components/schemas/AnnotationCreateRequest'
+        physicalPostalAddress:
+          $ref: '#/components/schemas/PhysicalAddressAnnotationCreateRequest'
+        alternativePostalAddress:
+          $ref: '#/components/schemas/AlternativeAddressAnnotationCreateRequest'
+        isCatenaXMemberData:
+          $ref: '#/components/schemas/AnnotationCreateRequest'
+        confidenceCriteria:
+          $ref: '#/components/schemas/ConfidenceCriteriaAnnotationCreateRequest'
+    SiteAnnotationCreateRequest:
+      type: object
+      properties:
+        bpns:
+          $ref: '#/components/schemas/AnnotationCreateRequest'
+        name:
+          $ref: '#/components/schemas/AnnotationCreateRequest'
+        states:
+          type: array
+          items:
+            $ref: '#/components/schemas/AnnotationCreateRequest'
+        confidenceCriteria:
+          $ref: '#/components/schemas/AnnotationCreateRequest'
+        siteMainAddress:
+          $ref: '#/components/schemas/PostalAddressAnnotationCreateRequest'
+    LegalEntityAnnotationCreateRequest:
+      type: object
+      properties:
+        bpnL:
+          $ref: '#/components/schemas/AnnotationCreateRequest'
+        legalName:
+          $ref: '#/components/schemas/AnnotationCreateRequest'
+        legalShortName:
+          $ref: '#/components/schemas/AnnotationCreateRequest'
+        legalForm:
+          $ref: '#/components/schemas/AnnotationCreateRequest'
+        identifiers:
+          type: array
+          items:
+            $ref: '#/components/schemas/AnnotationCreateRequest'
+        states:
+          type: array
+          items:
+            $ref: '#/components/schemas/AnnotationCreateRequest'
+        confidenceCriteria:
+          $ref: '#/components/schemas/ConfidenceCriteriaAnnotationCreateRequest'
+        isCatenaXMemberData:
+          $ref: '#/components/schemas/AnnotationCreateRequest'
+        legalAddress:
+          $ref: '#/components/schemas/PostalAddressAnnotation'
+    BusinessPartnerAnnotationCreateRequest:
+      type: object
+      properties:
+        legalEntity:
+          $ref: '#/components/schemas/LegalEntityAnnotationCreateRequest'
+        site:
+          $ref: '#/components/schemas/SiteAnnotationCreateRequest'
+        additionalAddress:
+          $ref: '#/components/schemas/PostalAddressAnnotationCreateRequest'
