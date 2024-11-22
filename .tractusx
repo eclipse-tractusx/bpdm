@@ -4,3 +4,7 @@ repositories:
   - name: "BPDM"
     usage: "Mono-Repository for the Business Partner Data Management services"
     url: "https://github.com/eclipse-tractusx/bpdm"
+openApiSpecs:
+- "https://raw.githubusercontent.com/eclipse-tractusx/bpdm/refs/heads/release/6.2.x/docs/api/gate.yaml"
+- "https://raw.githubusercontent.com/eclipse-tractusx/bpdm/refs/heads/release/6.2.x/docs/api/orchestrator.yaml"
+- "https://raw.githubusercontent.com/eclipse-tractusx/bpdm/refs/heads/release/6.2.x/docs/api/pool.yaml"
