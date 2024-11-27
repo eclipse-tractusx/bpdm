@@ -1,6 +1,6 @@
 # bpdm
 
-![Version: 5.0.1](https://img.shields.io/badge/Version-5.0.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 6.0.1](https://img.shields.io/badge/AppVersion-6.0.1-informational?style=flat-square)
+![Version: 5.2.0](https://img.shields.io/badge/Version-5.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 6.2.0-rc5](https://img.shields.io/badge/AppVersion-6.2.0--rc5-informational?style=flat-square)
 
 A Helm chart for Kubernetes that deploys the BPDM applications
 
@@ -11,7 +11,7 @@ A Helm chart for Kubernetes that deploys the BPDM applications
 | Name | Email | Url |
 | ---- | ------ | --- |
 | Nico Koprowski |  |  |
-| Fabio D. Mota |  |  |
+| Sujit Karne |  |  |
 
 ## Source Code
 
@@ -21,67 +21,48 @@ A Helm chart for Kubernetes that deploys the BPDM applications
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://./charts/bpdm-cleaning-service-dummy | bpdm-cleaning-service-dummy(bpdm-cleaning-service-dummy) | 3.0.1 |
-| file://./charts/bpdm-common | bpdm-common | 1.0.1 |
-| file://./charts/bpdm-gate | bpdm-gate(bpdm-gate) | 6.0.1 |
-| file://./charts/bpdm-orchestrator | bpdm-orchestrator(bpdm-orchestrator) | 3.0.1 |
-| file://./charts/bpdm-pool | bpdm-pool(bpdm-pool) | 7.0.1 |
-| https://charts.bitnami.com/bitnami | keycloak(keycloak) | 19.3.0 |
+|  | bpdm-cleaning-service-dummy(bpdm-cleaning-service-dummy) | 3.2.0 |
+|  | bpdm-common | 1.0.2 |
+|  | bpdm-gate(bpdm-gate) | 6.2.0 |
+|  | bpdm-orchestrator(bpdm-orchestrator) | 3.2.0 |
+|  | bpdm-pool(bpdm-pool) | 7.2.0 |
 | https://charts.bitnami.com/bitnami | postgres(postgresql) | 12.12.10 |
+| https://eclipse-tractusx.github.io/charts/dev | centralidp(centralidp) | 3.0.1 |
 
 ## Values
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| bpdm-cleaning-service-dummy.applicationConfig.bpdm.client.orchestrator.provider.issuer-uri | string | `"http://bpdm-keycloak/realms/CX-Central"` |  |
-| bpdm-cleaning-service-dummy.applicationSecrets.bpdm.client.orchestrator.registration.client-secret | string | `"dummy_orch_client_secret"` |  |
+| bpdm-cleaning-service-dummy.applicationConfig.bpdm.client.orchestrator.provider.issuer-uri | string | `"http://bpdm-centralidp/auth/realms/CX-Central"` |  |
+| bpdm-cleaning-service-dummy.centralidp.enabled | bool | `false` |  |
 | bpdm-cleaning-service-dummy.enabled | bool | `true` |  |
-| bpdm-gate.applicationConfig.bpdm.security.auth-server-url | string | `"http://bpdm-keycloak"` |  |
-| bpdm-gate.applicationSecrets.bpdm.client.orchestrator.registration.client-secret | string | `"gate_orch_client_secret"` |  |
-| bpdm-gate.applicationSecrets.bpdm.client.pool.registration.client-secret | string | `"gate_pool_client_secret"` |  |
+| bpdm-gate.applicationConfig.bpdm.datasource.host | string | `"bpdm-postgres"` |  |
+| bpdm-gate.applicationConfig.bpdm.security.auth-server-url | string | `"http://bpdm-centralidp/auth"` |  |
+| bpdm-gate.centralidp.enabled | bool | `false` |  |
 | bpdm-gate.enabled | bool | `true` |  |
 | bpdm-gate.postgres.enabled | bool | `false` |  |
-| bpdm-gate.postgres.fullnameOverride | string | `"bpdm-postgres"` |  |
-| bpdm-orchestrator.applicationConfig.bpdm.security.auth-server-url | string | `"http://bpdm-keycloak"` |  |
+| bpdm-orchestrator.applicationConfig.bpdm.datasource.host | string | `"bpdm-postgres"` |  |
+| bpdm-orchestrator.applicationConfig.bpdm.security.auth-server-url | string | `"http://bpdm-centralidp/auth"` |  |
+| bpdm-orchestrator.centralidp.enabled | bool | `false` |  |
 | bpdm-orchestrator.enabled | bool | `true` |  |
-| bpdm-pool.applicationConfig.bpdm.security.auth-server-url | string | `"http://bpdm-keycloak"` |  |
-| bpdm-pool.applicationSecrets.bpdm.client.orchestrator.registration.client-secret | string | `"pool_orch_client_secret"` |  |
+| bpdm-orchestrator.postgres.enabled | bool | `false` |  |
+| bpdm-pool.applicationConfig.bpdm.datasource.host | string | `"bpdm-postgres"` |  |
+| bpdm-pool.applicationConfig.bpdm.security.auth-server-url | string | `"http://bpdm-centralidp/auth"` |  |
+| bpdm-pool.centralidp.enabled | bool | `false` |  |
 | bpdm-pool.enabled | bool | `true` |  |
 | bpdm-pool.postgres.enabled | bool | `false` |  |
-| bpdm-pool.postgres.fullnameOverride | string | `"bpdm-postgres"` |  |
-| keycloak.auth.adminPassword | string | `"admin"` |  |
-| keycloak.auth.adminUser | string | `"admin"` |  |
-| keycloak.bpdm.realm.clientSecrets.cleaningDummyOrchestrator | string | `"dummy_orch_client_secret"` |  |
-| keycloak.bpdm.realm.clientSecrets.gateOrchestrator | string | `"gate_orch_client_secret"` |  |
-| keycloak.bpdm.realm.clientSecrets.gatePool | string | `"gate_pool_client_secret"` |  |
-| keycloak.bpdm.realm.clientSecrets.poolOrchestrator | string | `"pool_orch_client_secret"` |  |
-| keycloak.enabled | bool | `true` |  |
-| keycloak.externalDatabase.database | string | `"bpdm"` |  |
-| keycloak.externalDatabase.host | string | `"bpdm-postgres"` |  |
-| keycloak.externalDatabase.password | string | `"bpdm"` |  |
-| keycloak.externalDatabase.user | string | `"bpdm"` |  |
-| keycloak.extraEnvVars[0].name | string | `"KEYCLOAK_EXTRA_ARGS"` |  |
-| keycloak.extraEnvVars[0].value | string | `"--import-realm"` |  |
-| keycloak.extraVolumeMounts[0].mountPath | string | `"/opt/bitnami/keycloak/data/import"` |  |
-| keycloak.extraVolumeMounts[0].name | string | `"import"` |  |
-| keycloak.extraVolumeMounts[0].readOnly | bool | `true` |  |
-| keycloak.extraVolumes[0].name | string | `"import"` |  |
-| keycloak.extraVolumes[0].secret.items[0].key | string | `"Cx-Central.json"` |  |
-| keycloak.extraVolumes[0].secret.items[0].path | string | `"Cx-Central.json"` |  |
-| keycloak.extraVolumes[0].secret.secretName | string | `"bpdm-keycloak-realm"` |  |
-| keycloak.fullnameOverride | string | `"bpdm-keycloak"` |  |
-| keycloak.livenessProbe.initialDelaySeconds | int | `0` |  |
-| keycloak.postgresql.enabled | bool | `false` |  |
-| keycloak.production | bool | `false` |  |
-| keycloak.readinessProbe.initialDelaySeconds | int | `0` |  |
-| keycloak.resources.limits.cpu | string | `"500m"` |  |
-| keycloak.resources.limits.memory | string | `"512Mi"` |  |
-| keycloak.resources.requests.cpu | string | `"100m"` |  |
-| keycloak.resources.requests.memory | string | `"512Mi"` |  |
-| keycloak.startupProbe.enabled | bool | `true` |  |
-| keycloak.startupProbe.failureThreshold | int | `40` |  |
-| keycloak.startupProbe.initialDelaySeconds | int | `60` |  |
-| keycloak.startupProbe.periodSeconds | int | `30` |  |
+| centralidp.enabled | bool | `true` |  |
+| centralidp.keycloak.fullnameOverride | string | `"bpdm-centralidp"` |  |
+| centralidp.keycloak.initContainers[0].args[0] | string | `"-c"` |  |
+| centralidp.keycloak.initContainers[0].args[1] | string | `"echo \"Copying themes...\"\ncp -R /import/themes/catenax-central/* /themes\necho \"Copying realms...\"\ncp -R /import/catenax-central/realms/* /realms\n"` |  |
+| centralidp.keycloak.initContainers[0].command[0] | string | `"sh"` |  |
+| centralidp.keycloak.initContainers[0].image | string | `"docker.io/tractusx/portal-iam:3018805f77913926061af13bb5b35cbb98835c6e"` |  |
+| centralidp.keycloak.initContainers[0].imagePullPolicy | string | `"IfNotPresent"` |  |
+| centralidp.keycloak.initContainers[0].name | string | `"import"` |  |
+| centralidp.keycloak.initContainers[0].volumeMounts[0].mountPath | string | `"/themes"` |  |
+| centralidp.keycloak.initContainers[0].volumeMounts[0].name | string | `"themes"` |  |
+| centralidp.keycloak.initContainers[0].volumeMounts[1].mountPath | string | `"/realms"` |  |
+| centralidp.keycloak.initContainers[0].volumeMounts[1].name | string | `"realms"` |  |
 | postgres.auth.database | string | `"bpdm"` |  |
 | postgres.auth.password | string | `"bpdm"` |  |
 | postgres.auth.username | string | `"bpdm"` |  |
@@ -89,4 +70,4 @@ A Helm chart for Kubernetes that deploys the BPDM applications
 | postgres.fullnameOverride | string | `"bpdm-postgres"` |  |
 
 ----------------------------------------------
-Autogenerated from chart metadata using [helm-docs v1.13.1](https://github.com/norwoodj/helm-docs/releases/v1.13.1)
+Autogenerated from chart metadata using [helm-docs v1.14.2](https://github.com/norwoodj/helm-docs/releases/v1.14.2)

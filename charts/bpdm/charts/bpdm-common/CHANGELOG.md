@@ -4,7 +4,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
-## [1.0.0] - tbd
+## [1.0.2] - 2024-10-25
+
+### Changed
+
+- Add template to infer Central-IDP service names [#994](https://github.com/eclipse-tractusx/bpdm/issues/994)
+- Add missing security context to startupDelay init containers in BPDM deployments [#1089](https://github.com/eclipse-tractusx/bpdm/pull/1089)
+
+## [1.0.1] - 2024-07-10
+
+### Changed
+
+- add configurable startup delay to deployment
+
+## [1.0.0] - 2024-03-24
 
 ### Added
 

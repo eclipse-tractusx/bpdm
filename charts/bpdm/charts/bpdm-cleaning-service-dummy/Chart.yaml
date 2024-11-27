@@ -22,7 +22,7 @@ apiVersion: v2
 type: application
 name: bpdm-cleaning-service-dummy
 appVersion: "6.2.0-rc5"
-version: 3.2.0-rc5
+version: 3.2.0-SNAPSHOT
 description: A Helm chart for deploying the BPDM cleaning service
 home: https://eclipse-tractusx.github.io/docs/kits/Business%20Partner%20Kit/Adoption%20View
 sources:
@@ -38,4 +38,4 @@ dependencies:
     condition: centralidp.enabled
 maintainers:
   - name: Nico Koprowski
-  - name: Fabio D. Mota
+  - name: Sujit Karne
