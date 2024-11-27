@@ -4,11 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
-## [5.1.0] -  tbd
+## [5.2.0] -  tbd
 
 ### Changed
 
-- Increase appversion to 6.1.1
+- Increase appversion to 6.2.0
+- update BPDM Pool Chart to version 7.2.0
+- update BPDM Gate Chart to version 6.2.0
+- update BPDM Orchestrator Chart to version 3.2.0
+- update BPDM Cleaning Service Dummy Chart to version 3.2.0
+- update BPDM Bridge Chart to version 3.2.0
+- Replace Keycloak dependency with Central-IDP dependency [#994](https://github.com/eclipse-tractusx/bpdm/issues/994)
+- Fix bug on disabling Postgres and Central-IDP dependencies. Dependencies are now directly referenced by fullnameOverrides [#1086](https://github.com/eclipse-tractusx/bpdm/issues/1086)
+- Add missing security context to startupDelay init containers in BPDM deployments [#1089](https://github.com/eclipse-tractusx/bpdm/pull/1089)
 
 ## [5.1.0] -  2024-07-15
 
