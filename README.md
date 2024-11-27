@@ -36,23 +36,6 @@ Please consult the [INSTALL](INSTALL.md) documentation file for in-depth install
 BPDM is an application environment designed to be interacted with over APIs.
 Therefore, please consult the [api](docs/api/README.md) documentation for getting to know how to use BPDM.
 
-## GitHub Workflows
-
-For releasing new Docker images of the BPDM Pool and Gate we use GitHub Actions/Workflows, by convention found in the `.github/workflows` folder.
-On pushing to the main branch or creating a new Git tag the applications are containerized and pushed to the repository's GitHub Container Registry.
-The containerization of the applications is based on the Dockerfiles found in the root folders of the Pool and Gate modules.
-Released images are tagged according to the main branch or Git tag name.
-
-In addition to the release of the applications' Docker images, there is also a workflow to release a corresponding Helm chart on Git tag creation.
-Helm charts are released via the [helm/chart-releaser-action](https://github.com/helm/chart-releaser-action) and are stored in the `gh-pages` branch of the
-repository.
-
-Furthermore, apart from the release workflows there also exists code scanning workflows for quality assurance:
-
-1. Before any release of Docker images GitHub executes unit and integration tests.
-2. Periodically, workflows execute a KICS and Trivy scan to ensure quality standards of the Docker images and Helm charts.
-3. For a more thorough security check the packaged applications are send to a VeraCode scan, which happens periodically and after a push to main
-
 ## Documentation
 
 This README is just the gateway to more detailed documentation files that may be found in the [docs](docs) folder
