@@ -113,6 +113,22 @@ In order to do so, the following changes are required:
 4. Optionally: Adapt the step permissions in the [application properties](../../bpdm-orchestrator/src/main/resources/application.yml) for documentation purposes or for overriding the generated standard permission names
 5. Optionally: Adapt the [task worker authentication tests](../../bpdm-orchestrator/src/test/kotlin/org/eclipse/tractusx/bpdm/orchestrator/auth) for testing the new step permission configuration
 
+## GitHub Workflows
+
+We employ Github workflows for continuous integration and deployment.
+By convention the workflows can be found under in the [standard Github workflows folder](../../.github/workflows).
+
+On each pull request the workflows perform checks to test the application behaviour and conventions.
+This includes but is not limited to version checks, Maven tests, Chart deployment tests and static code scanning.
+
+On merging with the main branch the BPDM apps and Charts are deployed based on the current version:
+
+1. Release and release candidate version: Deploy the BPDM containers to Dockerhub and release Helm Chart
+2. Snapshot version: Deploy the BPDM containers on Dockerhub as latest SNAPSHOTs
+
+For the release of the Helm Charts we use the [helm/chart-releaser-action](https://github.com/helm/chart-releaser-action).
+Therefore, a Helm Chart repository is stored on the `gh-pages` branch of the repository indexing the released Charts.
+
 ## NOTICE
 
 This work is licensed under the [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0).
