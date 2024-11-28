@@ -155,6 +155,8 @@
                 <directory>${project.basedir}/src/main/resources</directory>
                 <includes>
                     <include>*.properties</include>
+                    <include>application.yml</include>
+                    <include>application-*.yml</include>
                 </includes>
             </resource>
             <resource>
@@ -162,7 +164,18 @@
                 <directory>${project.basedir}/src/main/resources</directory>
                 <excludes>
                     <exclude>*.properties</exclude>
+                    <exclude>application.yml</exclude>
+                    <exclude>application-*.yml</exclude>
                 </excludes>
+            </resource>
+            <resource>
+                <directory>${project.basedir}/..</directory>
+                <includes>
+                    <include>LICENSE</include>
+                    <include>NOTICE.md</include>
+                    <include>DEPENDENCIES</include>
+                </includes>
+                <targetPath>META-INF/</targetPath>
             </resource>
         </resources>
 
