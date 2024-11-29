@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
+## [5.3.0] -  tbd
+
+### Changed
+
+- Increase appversion to 6.3.0
+- update BPDM Pool Chart to version 7.3.0
+- update BPDM Gate Chart to version 6.3.0
+- update BPDM Orchestrator Chart to version 3.3.0
+- update BPDM Cleaning Service Dummy Chart to version 3.3.0
+- update BPDM Bridge Chart to version 3.3.0
+
 ## [5.2.0] -  2024-11-28
 
 ### Changed
