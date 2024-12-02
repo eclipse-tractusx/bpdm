@@ -8,6 +8,13 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 
 ## [6.3.0] - tbd
 
+### Added
+
+
+### Changed
+
+- BPDM Gate: Fetched and updated legal name of legal entity from pool while performing partner upload process via CSV([#1141](https://github.com/eclipse-tractusx/bpdm/issues/1141))
+
 
 ## [6.2.0] - 2024-11-28
 

@@ -19,10 +19,23 @@
 
 package org.eclipse.tractusx.bpdm.gate.controller
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.github.tomakehurst.wiremock.client.WireMock
+import com.github.tomakehurst.wiremock.client.WireMock.okJson
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration
+import com.github.tomakehurst.wiremock.junit5.WireMockExtension
+import com.neovisionaries.i18n.CountryCode
+import org.eclipse.tractusx.bpdm.common.dto.PageDto
+import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityRepresentationInputDto
 import org.eclipse.tractusx.bpdm.gate.util.MockAndAssertUtils
+import org.eclipse.tractusx.bpdm.pool.api.model.ConfidenceCriteriaDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.PhysicalPostalAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.containers.SelfClientInitializer
@@ -32,15 +45,20 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
 import org.springframework.mock.web.MockMultipartFile
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
+import org.springframework.test.context.DynamicPropertyRegistry
+import org.springframework.test.context.DynamicPropertySource
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import java.nio.file.Files
 import java.nio.file.Paths
+import java.time.Instant
+import java.time.LocalDateTime
 
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
@@ -56,12 +74,32 @@ import java.nio.file.Paths
 class PartnerUploadControllerIT @Autowired constructor(
     val testHelpers: DbTestHelpers,
     val gateClient: GateClient,
+    val jacksonObjectMapper: ObjectMapper,
     val mockAndAssertUtils: MockAndAssertUtils
 ) {
+
+    companion object {
+
+        const val TENANT_BPNL = KeyCloakInitializer.TENANT_BPNL
+        const val MOCKED_LEGAL_NAME = "Mocked Legal Name"
+
+        @JvmField
+        @RegisterExtension
+        val poolWireMockApi: WireMockExtension = WireMockExtension.newInstance().options(WireMockConfiguration.wireMockConfig().dynamicPort()).build()
+
+        @JvmStatic
+        @DynamicPropertySource
+        fun properties(registry: DynamicPropertyRegistry) {
+            registry.add("bpdm.client.pool.base-url") { poolWireMockApi.baseUrl() }
+        }
+
+    }
 
     @BeforeEach
     fun beforeEach() {
         testHelpers.truncateDbTables()
+        poolWireMockApi.resetAll()
+        poolMockGetLegalEntitiesApi(TENANT_BPNL, MOCKED_LEGAL_NAME)
     }
 
     @Test
@@ -88,8 +126,8 @@ class PartnerUploadControllerIT @Autowired constructor(
         // Only Site and Address expected to be updated from upload partner process.
         val expectedSiteAndAddressPartner = BusinessPartnerVerboseValues.bpUploadRequestFull.copy(
             legalEntity = LegalEntityRepresentationInputDto(
-                legalEntityBpn = KeyCloakInitializer.TENANT_BPNL,
-                legalName = null,
+                legalEntityBpn = TENANT_BPNL,
+                legalName = MOCKED_LEGAL_NAME,
                 shortName = null,
                 legalForm = null,
                 states = emptyList()
@@ -132,8 +170,8 @@ class PartnerUploadControllerIT @Autowired constructor(
 
         val expectedSiteAndAddressPartner = BusinessPartnerVerboseValues.bpUploadRequestFull.copy(
             legalEntity = LegalEntityRepresentationInputDto(
-                legalEntityBpn = KeyCloakInitializer.TENANT_BPNL,
-                legalName = null,
+                legalEntityBpn = TENANT_BPNL,
+                legalName = MOCKED_LEGAL_NAME,
                 shortName = null,
                 legalForm = null,
                 states = emptyList()
@@ -154,6 +192,81 @@ class PartnerUploadControllerIT @Autowired constructor(
         ).content
         this.mockAndAssertUtils.assertUpsertResponsesMatchRequests(uploadResponse, expectedResponse)
         this.mockAndAssertUtils.assertUpsertResponsesMatchRequests(searchResponsePage, expectedResponse)
+    }
+
+    fun poolMockGetLegalEntitiesApi(tenantBpnl: String, legalName: String) {
+        val legalEntity1 = LegalEntityVerboseDto(
+            bpnl = tenantBpnl,
+            legalName = legalName,
+            legalShortName = null,
+            legalFormVerbose = null,
+            identifiers = emptyList(),
+            states = emptyList(),
+            relations = emptyList(),
+            currentness = Instant.now(),
+            confidenceCriteria = ConfidenceCriteriaDto(
+                sharedByOwner = true,
+                checkedByExternalDataSource = true,
+                numberOfSharingMembers = 0,
+                lastConfidenceCheckAt = LocalDateTime.of(2023, 10, 10, 10, 10, 10),
+                nextConfidenceCheckAt = LocalDateTime.of(2024, 10, 10, 10, 10, 10),
+                confidenceLevel = 0
+            ),
+            isCatenaXMemberData = false,
+            createdAt = Instant.now(),
+            updatedAt = Instant.now()
+        )
+
+        val legalAddress1 = LogisticAddressVerboseDto(
+            bpna = "BPNA00000000009W",
+            physicalPostalAddress = PhysicalPostalAddressVerboseDto(
+                geographicCoordinates = null,
+                countryVerbose = TypeKeyNameVerboseDto(CountryCode.DE, CountryCode.DE.getName()),
+                postalCode = null,
+                city = "Stuttgart",
+                administrativeAreaLevel1Verbose = null,
+                administrativeAreaLevel2 = null,
+                administrativeAreaLevel3 = null,
+                district = null,
+                companyPostalCode = null,
+                industrialZone = null,
+                building = null,
+                floor = null,
+                door = null,
+                street = null,
+                taxJurisdictionCode = null
+            ),
+            bpnLegalEntity = null,
+            bpnSite = null,
+            confidenceCriteria = ConfidenceCriteriaDto(
+                sharedByOwner = true,
+                checkedByExternalDataSource = true,
+                numberOfSharingMembers = 0,
+                lastConfidenceCheckAt = LocalDateTime.of(2023, 10, 10, 10, 10, 10),
+                nextConfidenceCheckAt = LocalDateTime.of(2024, 10, 10, 10, 10, 10),
+                confidenceLevel = 0
+            ),
+            isCatenaXMemberData = false,
+            createdAt = Instant.now(),
+            updatedAt = Instant.now()
+        )
+
+        val responseBody = PageDto(
+            1, 1, 0, 1,
+            listOf(
+                LegalEntityWithLegalAddressVerboseDto(legalEntity = legalEntity1, legalAddress = legalAddress1)
+            )
+        )
+
+        poolWireMockApi.stubFor(
+            WireMock.get(WireMock.urlPathEqualTo("/v6/legal-entities"))
+                .withQueryParam("bpnLs", WireMock.equalTo(tenantBpnl))
+                .withQueryParam("page", WireMock.equalTo("0"))
+                .withQueryParam("size", WireMock.equalTo("1"))
+                .willReturn(
+                    okJson(jacksonObjectMapper.writeValueAsString(responseBody))
+                )
+        )
     }
 
 

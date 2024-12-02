@@ -67,7 +67,7 @@ object PartnerFileUtil {
      * @return A list of BusinessPartnerInputRequest objects derived from the valid CSV rows.
      * @throws BpdmInvalidPartnerUploadException if any validation errors are encountered during processing.
      */
-    fun validateAndMapToBusinessPartnerInputRequests(csvData: List<PartnerUploadFileRow>, tenantBpnl: String?): List<BusinessPartnerInputRequest> {
+    fun validateAndMapToBusinessPartnerInputRequests(csvData: List<PartnerUploadFileRow>, tenantBpnl: String?, legalName: String): List<BusinessPartnerInputRequest> {
         val formatter = DateTimeFormatter.ISO_DATE_TIME
         val validator: Validator = Validation.buildDefaultValidatorFactory().validator
         val errors = mutableListOf<String>()
@@ -85,8 +85,10 @@ object PartnerFileUtil {
                     states = emptyList(),
                     roles = emptyList(),
                     isOwnCompanyData = true,
-                    // Legal entity's business partner number is nothing but tenant's partner number who is performing business partner upload action
-                    legalEntity = LegalEntityRepresentationInputDto(legalEntityBpn = tenantBpnl?.takeIf { it.isNotEmpty() }),
+                    legalEntity = LegalEntityRepresentationInputDto(
+                        legalEntityBpn = tenantBpnl?.takeIf { it.isNotEmpty() },
+                        legalName = legalName
+                    ),
                     site = row.toSiteRepresentationInputDto(formatter, errors, index, row.externalId.orEmpty()),
                     address = row.toAddressRepresentationInputDto(formatter, errors, index, row.externalId.orEmpty())
                 )
