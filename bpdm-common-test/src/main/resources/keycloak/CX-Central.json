@@ -1283,7 +1283,8 @@
                 "read_changelog",
                 "read_changelog_member",
                 "write_partner",
-                "read_metadata"
+                "read_metadata",
+                "read_partner_member"
               ],
               "Cl5-CX-Custodian": [
                 "add_wallet",
@@ -1605,6 +1606,15 @@
           "attributes": {}
         },
         {
+          "id": "426a1cf1-46a0-484e-b2d6-436bb23a5df8",
+          "name": "read_partner_member_owned",
+          "description": "Allow read access to all business partners that are owned by Catena-X members",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "04cd6d38-674f-4588-980a-8f120bddcc44",
+          "attributes": {}
+        },
+        {
           "id": "682935a7-cd27-4bb3-b369-78d248e6a558",
           "name": "read_partner",
           "description": "",
@@ -1796,6 +1806,7 @@
                 "read_metadata",
                 "read_changelog",
                 "read_partner_member",
+                "read_partner_member_owned",
                 "write_metadata",
                 "read_changelog_member",
                 "write_partner",
@@ -1837,6 +1848,23 @@
                 "read_metadata",
                 "read_changelog_member",
                 "read_partner_member"
+              ]
+            }
+          },
+          "clientRole": true,
+          "containerId": "6df310ed-500e-43d5-b510-fa4668e939ee",
+          "attributes": {}
+        },
+        {
+          "id": "f024abdd-a80e-49bf-8add-e7a45fb609a4",
+          "name": "BPDM Pool Use Case Provider",
+          "description": "Role for Catena-X use case providers needing access to extended Cx member data",
+          "composite": true,
+          "composites": {
+            "client": {
+              "Cl7-CX-BPDM": [
+                "read_metadata",
+                "read_partner_member_owned"
               ]
             }
           },

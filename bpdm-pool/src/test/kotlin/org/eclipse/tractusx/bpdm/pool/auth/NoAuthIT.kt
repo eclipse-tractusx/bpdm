@@ -74,6 +74,11 @@ class NoAuthIT @Autowired constructor(
         postLegalEntitySearch = AuthExpectationType.Unauthorized,
         postChangelogSearch = AuthExpectationType.Unauthorized
     ),
+    MembersOwnedAuthExpectations(
+        postAddressSearch = AuthExpectationType.Unauthorized,
+        postSiteSearch = AuthExpectationType.Unauthorized,
+        postLegalEntitySearch = AuthExpectationType.Unauthorized
+    ),
     CxMembershipsAuthExpectations(
         getMemberships = AuthExpectationType.Unauthorized,
         putMemberships = AuthExpectationType.Unauthorized

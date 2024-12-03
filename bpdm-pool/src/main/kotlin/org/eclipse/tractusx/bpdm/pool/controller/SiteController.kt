@@ -58,7 +58,8 @@ class SiteController(
                 siteBpns = searchRequest.siteBpns,
                 legalEntityBpns = searchRequest.legalEntityBpns,
                 name = searchRequest.name,
-                isCatenaXMemberData = null
+                isCatenaXMemberData = null,
+                isMemberOwnedData = null
             ),
             paginationRequest
         )
