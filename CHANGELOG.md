@@ -8,6 +8,11 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 
 ## [6.3.0] - tbd
 
+### Added
+
+- BPDM Pool: Endpoints for retrieving member-owned business partner data.
+Member-owned business partner data includes business partners from non-member legal entities that are owned by Catena-X members 
+([#1088](https://github.com/eclipse-tractusx/bpdm/issues/1088))
 
 ## [6.2.0] - 2024-11-28
 

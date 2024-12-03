@@ -55,6 +55,8 @@ class PoolClientImpl(
 
     override val members by lazy { createClient<MembersApiClient>() }
 
+    override val memberOwned by lazy { createClient<MemberOwnedApiClient>() }
+
     override val memberships by lazy { createClient<CxMembershipApiClient>() }
 
     private inline fun <reified T> createClient() =

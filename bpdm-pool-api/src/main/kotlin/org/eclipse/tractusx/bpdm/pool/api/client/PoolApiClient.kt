@@ -35,5 +35,7 @@ interface PoolApiClient {
 
     val members: MembersApiClient
 
+    val memberOwned: MemberOwnedApiClient
+
     val memberships: CxMembershipApiClient
 }

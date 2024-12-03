@@ -21,36 +21,28 @@ package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.PoolMembersApi
+import org.eclipse.tractusx.bpdm.pool.api.PoolMemberOwnedApi
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntitySearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.config.ControllerConfigProperties
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
-import org.eclipse.tractusx.bpdm.pool.exception.BpdmRequestSizeException
 import org.eclipse.tractusx.bpdm.pool.service.AddressService
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerFetchService
-import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
 import org.eclipse.tractusx.bpdm.pool.service.SiteService
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-class MemberController(
+class MemberOwnedController(
     private val businessPartnerFetchService: BusinessPartnerFetchService,
     private val siteService: SiteService,
-    private val addressService: AddressService,
-    private val changelogService: PartnerChangelogService,
-    private val controllerConfigProperties: ControllerConfigProperties
-) : PoolMembersApi {
+    private val addressService: AddressService
+): PoolMemberOwnedApi {
 
-
-    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_MEMBER_PARTNER})")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_MEMBER_OWNED_PARTNER})")
     override fun searchLegalEntities(
         searchRequest: LegalEntitySearchRequest,
         paginationRequest: PaginationRequest
@@ -59,28 +51,28 @@ class MemberController(
             BusinessPartnerFetchService.LegalEntitySearchRequest(
                 bpnLs = searchRequest.bpnLs,
                 legalName = searchRequest.legalName,
-                isCatenaXMemberData = true,
-                isMemberOwnedData = null
+                isCatenaXMemberData = null,
+                isMemberOwnedData = true
             ),
             paginationRequest
         )
     }
 
-    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_MEMBER_PARTNER})")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_MEMBER_OWNED_PARTNER})")
     override fun postSiteSearch(searchRequest: SiteSearchRequest, paginationRequest: PaginationRequest): PageDto<SiteWithMainAddressVerboseDto> {
         return siteService.searchSites(
             SiteService.SiteSearchRequest(
                 siteBpns =  searchRequest.siteBpns,
                 legalEntityBpns = searchRequest.legalEntityBpns,
                 name = searchRequest.name,
-                isCatenaXMemberData = true,
-                isMemberOwnedData = null
+                isCatenaXMemberData = null,
+                isMemberOwnedData = true
             ),
             paginationRequest
         )
     }
 
-    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_MEMBER_PARTNER})")
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_MEMBER_OWNED_PARTNER})")
     override fun searchAddresses(searchRequest: AddressSearchRequest, paginationRequest: PaginationRequest): PageDto<LogisticAddressVerboseDto> {
         return addressService.searchAddresses(
             AddressService.AddressSearchRequest(
@@ -88,32 +80,10 @@ class MemberController(
                 siteBpns = searchRequest.siteBpns,
                 legalEntityBpns = searchRequest.legalEntityBpns,
                 name = searchRequest.name,
-                isCatenaXMemberData = true,
-                isMemberOwnedData = null
+                isCatenaXMemberData = null,
+                isMemberOwnedData = true
             ),
             paginationRequest
         )
     }
-
-    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_MEMBER_CHANGELOG})")
-    override fun searchChangelogEntries(
-        changelogSearchRequest: ChangelogSearchRequest,
-        paginationRequest: PaginationRequest
-    ): PageDto<ChangelogEntryVerboseDto> {
-        changelogSearchRequest.bpns?.let { bpns ->
-            if (bpns.size > controllerConfigProperties.searchRequestLimit) {
-                throw BpdmRequestSizeException(bpns.size, controllerConfigProperties.searchRequestLimit)
-            }
-        }
-
-        return changelogService.getChangeLogEntries(
-            bpns = changelogSearchRequest.bpns,
-            businessPartnerTypes = changelogSearchRequest.businessPartnerTypes,
-            fromTime = changelogSearchRequest.timestampAfter,
-            isCatenaXMemberData = true,
-            pageIndex = paginationRequest.page,
-            pageSize = paginationRequest.size
-        )
-    }
-
 }

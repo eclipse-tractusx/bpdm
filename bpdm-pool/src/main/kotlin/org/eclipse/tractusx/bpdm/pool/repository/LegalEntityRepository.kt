@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.repository
 
+import org.eclipse.tractusx.bpdm.pool.entity.ConfidenceCriteriaDb
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.NameDb
@@ -52,11 +53,20 @@ interface LegalEntityRepository : JpaRepository<LegalEntityDb, Long>, JpaSpecifi
                     builder.equal(root.get<Boolean>(LegalEntityDb::isCatenaXMemberData.name), isCatenaXMemberData)
                 }
             }
+
+        fun byIsMemberOwned(isSharedByOwner: Boolean?) =
+            Specification<LegalEntityDb> { root, _, builder ->
+                isSharedByOwner?.let {
+                    val propertyPath = root
+                        .get<ConfidenceCriteriaDb>(LegalEntityDb::confidenceCriteria.name)
+                        .get<Boolean>(ConfidenceCriteriaDb::sharedByOwner.name)
+
+                    builder.equal(propertyPath, isSharedByOwner)
+                }
+            }
     }
 
     fun findByBpnIgnoreCase(bpn: String): LegalEntityDb?
-
-    fun existsByBpn(bpn: String): Boolean
 
     fun findDistinctByBpnIn(bpns: Collection<String>): Set<LegalEntityDb>
 
