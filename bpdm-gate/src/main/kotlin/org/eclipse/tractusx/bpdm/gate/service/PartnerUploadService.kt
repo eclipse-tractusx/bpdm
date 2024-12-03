@@ -21,10 +21,13 @@ package org.eclipse.tractusx.bpdm.gate.service
 
 import com.opencsv.CSVWriter
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.model.PartnerUploadFileHeader
 import org.eclipse.tractusx.bpdm.gate.model.PartnerUploadFileRow
 import org.eclipse.tractusx.bpdm.gate.util.PartnerFileUtil
+import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
+import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntitySearchRequest
 import org.springframework.core.io.ByteArrayResource
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
@@ -34,15 +37,25 @@ import java.io.OutputStreamWriter
 
 @Service
 class PartnerUploadService(
-    private val businessPartnerService: BusinessPartnerService
+    private val businessPartnerService: BusinessPartnerService,
+    private val poolApiClient: PoolApiClient
 ) {
 
     private val logger = KotlinLogging.logger { }
 
     fun processFile(file: MultipartFile, tenantBpnl: String?): ResponseEntity<Collection<BusinessPartnerInputDto>> {
         validateTenantBpnl(tenantBpnl)
+        val legalName = poolApiClient.legalEntities
+            .getLegalEntities(
+                LegalEntitySearchRequest(listOf(tenantBpnl!!)),
+                PaginationRequest(page = 0, size = 1)
+            ).content.also { entities ->
+                require(entities.isNotEmpty()) { "No legal entities found for tenantBpnl: $tenantBpnl" }
+                require(entities.size == 1) { "Multiple legal entities found for tenantBpnl: $tenantBpnl" }
+            }
+            .first().legalEntity.legalName
         val csvData: List<PartnerUploadFileRow> = PartnerFileUtil.parseCsv(file)
-        val businessPartnerDtos = PartnerFileUtil.validateAndMapToBusinessPartnerInputRequests(csvData, tenantBpnl)
+        val businessPartnerDtos = PartnerFileUtil.validateAndMapToBusinessPartnerInputRequests(csvData, tenantBpnl, legalName)
         val result = businessPartnerService.upsertBusinessPartnersInput(businessPartnerDtos, tenantBpnl)
         return ResponseEntity.ok(result)
     }
