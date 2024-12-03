@@ -81,21 +81,3 @@ centralidp:
   enabled: true
   keycloak:
     fullnameOverride: bpdm-centralidp
-    initContainers:
-      - name: import
-        image: docker.io/tractusx/portal-iam:3018805f77913926061af13bb5b35cbb98835c6e
-        imagePullPolicy: IfNotPresent
-        command:
-          - sh
-        args:
-          - -c
-          - |
-            echo "Copying themes..."
-            cp -R /import/themes/catenax-central/* /themes
-            echo "Copying realms..."
-            cp -R /import/catenax-central/realms/* /realms
-        volumeMounts:
-          - name: themes
-            mountPath: "/themes"
-          - name: realms
-            mountPath: "/realms"
