@@ -25,19 +25,27 @@ import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityIdentifierDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.IdentifiersSearchRequest
-
+import org.eclipse.tractusx.bpdm.pool.entity.BpnRequestIdentifierMappingDb
+import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.util.TestHelpers
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues
+import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerVerboseValues
 import org.eclipse.tractusx.bpdm.test.testdata.pool.LegalEntityStructureRequest
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.eclipse.tractusx.bpdm.test.util.PoolDataHelpers
+import org.junit.Assert
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.http.HttpStatus
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
+import org.springframework.web.reactive.function.client.WebClientResponseException
+import java.util.*
 
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class],
@@ -48,6 +56,7 @@ import org.springframework.test.context.ContextConfiguration
 class BpnControllerIT @Autowired constructor(
     val testHelpers: TestHelpers,
     val poolClient: PoolClientImpl,
+    val bpnRequestIdentifierRepository: BpnRequestIdentifierRepository,
     val dbTestHelpers: DbTestHelpers,
     val poolDataHelpers: PoolDataHelpers,
 ) {
@@ -79,6 +88,23 @@ class BpnControllerIT @Autowired constructor(
                 LegalEntityStructureRequest(legalEntity = legalEntityCreate1),
                 LegalEntityStructureRequest(legalEntity = legalEntityCreate2),
                 LegalEntityStructureRequest(legalEntity = legalEntityCreate3),
+            )
+        )
+
+        bpnRequestIdentifierRepository.saveAll(
+            mutableListOf(
+                BpnRequestIdentifierMappingDb(
+                    BusinessPartnerVerboseValues.bpnLRequestMapping.requestedIdentifier,
+                    BusinessPartnerVerboseValues.bpnLRequestMapping.bpn
+                ),
+                BpnRequestIdentifierMappingDb(
+                    BusinessPartnerVerboseValues.bpnSRequestMapping.requestedIdentifier,
+                    BusinessPartnerVerboseValues.bpnSRequestMapping.bpn
+                ),
+                BpnRequestIdentifierMappingDb(
+                    BusinessPartnerVerboseValues.bpnARequestMapping.requestedIdentifier,
+                    BusinessPartnerVerboseValues.bpnARequestMapping.bpn
+                )
             )
         )
     }
@@ -137,5 +163,47 @@ class BpnControllerIT @Autowired constructor(
             IdentifiersSearchRequest(IdentifierBusinessPartnerType.LEGAL_ENTITY, "NONEXISTENT_IDENTIFIER_TYPE", listOf(identifierValue1))
 
         testHelpers.`find bpns by nonexistent identifier type`(identifiersSearchRequest)
+    }
+
+    /**
+     * Fetch the BPNL/S/A based on the provided request identifier
+     */
+    @Test
+    fun `find bpn by requested identifier`() {
+        val requestedIdentifiers = setOf(
+            BusinessPartnerVerboseValues.bpnLRequestMapping.requestedIdentifier,
+            BusinessPartnerVerboseValues.bpnSRequestMapping.requestedIdentifier,
+        )
+        val response = poolClient.bpns.findBpnByRequestedIdentifiers(requestedIdentifiers)
+        response.body?.let { Assertions.assertEquals(requestedIdentifiers.size, it.size) }
+    }
+
+    /**
+     * Find BPN based on the requested identifiers but with the set more than the search limit.
+     */
+    @Test
+    fun `find bpn by requested identifier with extended search limit`() {
+        val requestedIdentifiers = setOf(
+            BusinessPartnerVerboseValues.bpnLRequestMapping.requestedIdentifier,
+            BusinessPartnerVerboseValues.bpnSRequestMapping.requestedIdentifier,
+            BusinessPartnerVerboseValues.bpnARequestMapping.requestedIdentifier,
+        )
+        try {
+            val result = poolClient.bpns.findBpnByRequestedIdentifiers(requestedIdentifiers)
+            assertThrows<WebClientResponseException> { result }
+        } catch (e: WebClientResponseException) {
+            Assert.assertEquals(HttpStatus.BAD_REQUEST, e.statusCode)
+        }
+    }
+
+    /**
+     * Fetch the BPNL/S/A based on the invalid request identifier
+     */
+    @Test
+    fun `find bpn by invalid requested identifier`() {
+        val requestedIdentifiers = setOf(UUID.randomUUID().toString())
+        val response = poolClient.bpns.findBpnByRequestedIdentifiers(requestedIdentifiers)
+        response.body?.let { Assertions.assertNotEquals(requestedIdentifiers.size, it.size) }
+        response.body?.let { Assertions.assertTrue(it.isEmpty()) }
     }
 }

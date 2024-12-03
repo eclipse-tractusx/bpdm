@@ -27,13 +27,11 @@ import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.service.toDto
 import org.eclipse.tractusx.bpdm.pool.api.model.*
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
+import java.util.UUID
 
 /**
  * Test values for response DTOs
@@ -67,6 +65,10 @@ object BusinessPartnerVerboseValues {
     val identifierType2 = TypeKeyNameVerboseDto("VAT_US", "VAT USA")
     val identifierType3 = TypeKeyNameVerboseDto("VAT_FR", "VAT France")
     val identifierType4 = TypeKeyNameVerboseDto("VAT_NL", "VAT Netherlands")
+
+    val bpnLRequestMapping = BpnRequestIdentifierMappingDto(UUID.randomUUID().toString(), bpn = secondBpnL)
+    val bpnSRequestMapping = BpnRequestIdentifierMappingDto(UUID.randomUUID().toString(), bpn = secondBpnS)
+    val bpnARequestMapping = BpnRequestIdentifierMappingDto(UUID.randomUUID().toString(), bpn = secondBpnA)
 
     val identifierTypeAbbreviation1 = "abbreviation1"
     val identifierTypeAbbreviation2 = "abbreviation2"
