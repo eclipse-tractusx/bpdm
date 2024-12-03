@@ -209,7 +209,7 @@ class TaskStepBuildService(
 
         val bpnResults = if(bpnS != null && site.hasChanged == false){
             //No need to upsert, just fetch the information
-            siteService.searchSites(SiteService.SiteSearchRequest(siteBpns = listOf(bpnS), null, null, null), PaginationRequest(0, 1))
+            siteService.searchSites(SiteService.SiteSearchRequest(siteBpns = listOf(bpnS), null, null, null, null), PaginationRequest(0, 1))
                 .content.firstOrNull()
                 ?.let { SiteBpns(it.site.bpns, it.mainAddress.bpna) }
                 ?: throw BpdmValidationException(CleaningError.MAINE_ADDRESS_IS_NULL.message)
@@ -308,7 +308,7 @@ class TaskStepBuildService(
 
         val addressBpn = if(bpnA != null && additionalAddress.hasChanged == false){
             // No need to upsert just fetch the data
-            addressService.searchAddresses(AddressService.AddressSearchRequest(addressBpns = listOf(bpnA), null, null, null, null), PaginationRequest(0, 1))
+            addressService.searchAddresses(AddressService.AddressSearchRequest(addressBpns = listOf(bpnA), null, null, null, null, null), PaginationRequest(0, 1))
                 .content.firstOrNull()?.bpna
                 ?: throw BpdmValidationException(CleaningError.BPNA_IS_NULL.message)
         }else{

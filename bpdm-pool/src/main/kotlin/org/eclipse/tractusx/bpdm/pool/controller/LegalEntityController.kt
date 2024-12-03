@@ -58,7 +58,8 @@ class LegalEntityController(
             BusinessPartnerFetchService.LegalEntitySearchRequest(
                 bpnLs = searchRequest.bpnLs,
                 legalName = searchRequest.legalName,
-                isCatenaXMemberData = null
+                isCatenaXMemberData = null,
+                isMemberOwnedData = null
             ),
             paginationRequest
         )
@@ -80,7 +81,8 @@ class LegalEntityController(
             BusinessPartnerFetchService.LegalEntitySearchRequest(
                 searchRequest.bpnLs,
                 searchRequest.legalName,
-                isCatenaXMemberData = null
+                isCatenaXMemberData = null,
+                isMemberOwnedData = null
             ),
             paginationRequest
         )

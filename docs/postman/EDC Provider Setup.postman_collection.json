@@ -547,6 +547,96 @@
 							"response": []
 						}
 					]
+				},
+				{
+					"name": "Pool Use Case Consumer Read Access",
+					"item": [
+						{
+							"name": "Create Asset",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"if(pm.collectionVariables.get(\"GENERATE_UUIDS\").toLocaleLowerCase() == \"true\"){",
+											"    var uuid = require('uuid');",
+											"    pm.collectionVariables.set(\"ASSET_POOL_CX_MEMBER_OWNED_READ\", uuid.v4())",
+											"}"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"@context\": {\n        \"@vocab\": \"https://w3id.org/edc/v0.0.1/ns/\",\n        \"dct\": \"https://purl.org/dc/terms/\",\n        \"cx-taxo\": \"https://w3id.org/catenax/taxonomy/\",\n        \"cx-common\": \"https://w3id.org/catenax/ontology/common/\"\n    },\n    \"@type\": \"Asset\", \n    \"@id\": \"{{ASSET_POOL_UCC_READ}}\", \n    \"properties\": { \n        \"dct:type\":  \"cx-taxo:BPDMPool\",\n        \"dct:subject\": \"cx-taxo:ReadAccessPoolForUseCaseConsumer\",\n        \"dct:description\": \"Grants the Catena-X Use Case consumer read access to the Pool API. This can be used to read legal entity, site, address, legal form, identifier type and administrative area level 1 data. The accessible business partner data encompasses data which is is owned by the Catena-X members, including data from non-member legal entities which are owned by Catena-X members.\",\n        \"cx-common:version\": \"6.0\"\n    },\n    \"dataAddress\": {\n        \"@type\": \"DataAddress\",\n        \"type\": \"HttpData\",\n        \"baseUrl\": \"{{POOL_API}}/v6\",\n        \"oauth2:tokenUrl\": \"{{TOKEN_URL}}\",\n        \"oauth2:clientId\": \"{{CLIENT_ID_POOL_UCC_READ}}\",\n        \"oauth2:clientSecretKey\": \"{{CLIENT_SECRET_PATH_POOL_UCC_READ_CLIENT}}\", \n        \"proxyMethod\": \"true\",\n        \"proxyPath\": \"true\",\n        \"proxyQueryParams\": \"true\",\n        \"proxyBody\": \"true\"\n    }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{PROVIDER_EDC_MANAGEMENT_API}}/v3/assets",
+									"host": [
+										"{{PROVIDER_EDC_MANAGEMENT_API}}"
+									],
+									"path": [
+										"v3",
+										"assets"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Contract Definition Copy",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"if(pm.collectionVariables.get(\"GENERATE_UUIDS\").toLocaleLowerCase() == \"true\"){",
+											"    var uuid = require('uuid');",
+											"    pm.collectionVariables.set(\"CONTRACT_POOL_CX_MEMBER_OWNED_READ\", uuid.v4())",
+											"}",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"@context\": {\n        \"@vocab\": \"https://w3id.org/edc/v0.0.1/ns/\",\n        \"dct\": \"https://purl.org/dc/terms/\",\n        \"cx-common\": \"https://w3id.org/catenax/ontology/common/\"\n    },\n    \"@id\": \"{{CONTRACT_POOL_UCC_READ}}\",\n    \"@type\": \"ContractDefinition\",\n    \"accessPolicyId\": \"{{POLICY_BUSINESS_PARTNER_NUMBER}}\",\n    \"contractPolicyId\": \"{{POLICY_ACCEPT_PURPOSE_POOL}}\",\n    \"assetsSelector\": {\n        \"@type\": \"CriterionDto\",\n        \"operandLeft\": \"https://w3id.org/edc/v0.0.1/ns/id\",\n        \"operator\": \"in\",\n        \"operandRight\": [\n            \"{{ASSET_POOL_UCC_READ}}\"\n        ]\n    },\n    \"privateProperties\": {\n        \"BusinessPartnerNumber\": \"{{CONSUMER_BPNL}}\",\n        \"dct:type\": \"ReadAccessPoolForUseCaseConsumer\",\n        \"cx-common:version\": \"6.0\"\n    }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{PROVIDER_EDC_MANAGEMENT_API}}/v3/contractdefinitions",
+									"host": [
+										"{{PROVIDER_EDC_MANAGEMENT_API}}"
+									],
+									"path": [
+										"v3",
+										"contractdefinitions"
+									]
+								}
+							},
+							"response": []
+						}
+					]
 				}
 			]
 		}
@@ -638,6 +728,11 @@
 			"type": "string"
 		},
 		{
+			"key": "CLIENT_ID_POOL_UCC_READ",
+			"value": "CLIENT_5_ID",
+			"type": "string"
+		},
+		{
 			"key": "CLIENT_SECRET_PATH_POOL_CX_MEMBER_READ_CLIENT",
 			"value": "vault/path/client/1/secret",
 			"type": "string"
@@ -654,7 +749,12 @@
 		},
 		{
 			"key": "CLIENT_SECRET_PATH_GATE_SHARING_MEMBER_READ_OUTPUT",
-			"value": "vault/path/client/3/secret",
+			"value": "vault/path/client/4/secret",
+			"type": "string"
+		},
+		{
+			"key": "CLIENT_SECRET_PATH_POOL_UCC_READ_CLIENT",
+			"value": "vault/path/client/5/secret",
 			"type": "string"
 		},
 		{
@@ -713,6 +813,16 @@
 		{
 			"key": "CONTRACT_GATE_SHARING_MEMBER_READ_OUTPUT",
 			"value": ""
+		},
+		{
+			"key": "ASSET_POOL_UCC_READ",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "CONTRACT_POOL_UCC_READ",
+			"value": "",
+			"type": "string"
 		}
 	]
 }

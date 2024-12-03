@@ -243,6 +243,64 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "Select Pool Use Case Consumer Read Access",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"var responseJson = pm.response.json();",
+											"var offerId = responseJson[\"dcat:dataset\"][\"odrl:hasPolicy\"][\"@id\"];",
+											"var assetId = responseJson[\"dcat:dataset\"][\"id\"];",
+											"pm.collectionVariables.set(\"OFFER\", offerId);",
+											"pm.collectionVariables.set(\"SELECTED_ASSET\", assetId)",
+											"pm.collectionVariables.set(\"SELECTED_PURPOSE\", \"cx.bpdm.pool:1\")"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"@context\": {\r\n        \"@vocab\": \"https://w3id.org/edc/v0.0.1/ns/\"\r\n    },\r\n    \"@type\": \"CatalogRequest\",\r\n    \"counterPartyAddress\": \"{{PROVIDER_EDC_DATASPACE_API}}\",\r\n    \"counterPartyId\": \"{{PROVIDER_BPNL}}\",\r\n    \"protocol\": \"dataspace-protocol-http\",\r\n    \"querySpec\": {\r\n        \"offset\": 0,\r\n        \"limit\": 1,\r\n        \"filterExpression\": [\r\n            {\r\n                \"operandLeft\": \"https://purl.org/dc/terms/subject\",\r\n                \"operator\": \"=\",\r\n                \"operandRight\": \"cx-taxo:ReadAccessPoolForUseCaseProvider\"\r\n            },\r\n            {\r\n                \"operandLeft\": \"https://w3id.org/catenax/ontology/common/version\",\r\n                \"operator\": \"=\",\r\n                \"operandRight\": \"6.0\"\r\n            }\r\n        ]\r\n    }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{CONSUMER_EDC_MANAGEMENT_API}}/v3/catalog/request",
+									"host": [
+										"{{CONSUMER_EDC_MANAGEMENT_API}}"
+									],
+									"path": [
+										"v3",
+										"catalog",
+										"request"
+									]
+								}
+							},
+							"response": []
 						}
 					]
 				},
@@ -1600,6 +1658,1534 @@
 							],
 							"path": [
 								"members",
+								"addresses",
+								"search"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0",
+									"description": "Number of page to get results from"
+								},
+								{
+									"key": "size",
+									"value": "10",
+									"description": "Size of each page"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "No Filter",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/members/addresses/search?page=0&size=10",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"members",
+										"addresses",
+										"search"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0",
+											"description": "Number of page to get results from"
+										},
+										{
+											"key": "size",
+											"value": "10",
+											"description": "Size of each page"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"content\": [\n    {\n      \"bpna\": \"<string>\",\n      \"confidenceCriteria\": {\n        \"checkedByExternalDataSource\": \"<boolean>\",\n        \"confidenceLevel\": \"<integer>\",\n        \"lastConfidenceCheckAt\": \"<dateTime>\",\n        \"nextConfidenceCheckAt\": \"<dateTime>\",\n        \"numberOfSharingMembers\": \"<integer>\",\n        \"sharedByOwner\": \"<boolean>\"\n      },\n      \"createdAt\": \"<dateTime>\",\n      \"identifiers\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"<string>\"\n          },\n          \"value\": \"<string>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"<string>\"\n          },\n          \"value\": \"<string>\"\n        }\n      ],\n      \"isCatenaXMemberData\": \"<boolean>\",\n      \"physicalPostalAddress\": {\n        \"city\": \"<string>\",\n        \"country\": {\n          \"name\": \"<string>\",\n          \"technicalKey\": \"RE\"\n        },\n        \"geographicCoordinates\": {\n          \"latitude\": \"<float>\",\n          \"longitude\": \"<float>\",\n          \"altitude\": \"<float>\"\n        },\n        \"administrativeAreaLevel1\": {\n          \"countryCode\": \"VG\",\n          \"regionCode\": \"<string>\",\n          \"regionName\": \"<string>\"\n        },\n        \"administrativeAreaLevel2\": \"<string>\",\n        \"administrativeAreaLevel3\": \"<string>\",\n        \"postalCode\": \"<string>\",\n        \"district\": \"<string>\",\n        \"street\": {\n          \"name\": \"<string>\",\n          \"houseNumber\": \"<string>\",\n          \"houseNumberSupplement\": \"<string>\",\n          \"milestone\": \"<string>\",\n          \"direction\": \"<string>\",\n          \"namePrefix\": \"<string>\",\n          \"additionalNamePrefix\": \"<string>\",\n          \"nameSuffix\": \"<string>\",\n          \"additionalNameSuffix\": \"<string>\"\n        },\n        \"companyPostalCode\": \"<string>\",\n        \"industrialZone\": \"<string>\",\n        \"building\": \"<string>\",\n        \"floor\": \"<string>\",\n        \"door\": \"<string>\"\n      },\n      \"states\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"INACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"INACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        }\n      ],\n      \"updatedAt\": \"<dateTime>\",\n      \"name\": \"<string>\",\n      \"alternativePostalAddress\": {\n        \"city\": \"<string>\",\n        \"country\": {\n          \"name\": \"<string>\",\n          \"technicalKey\": \"YT\"\n        },\n        \"deliveryServiceNumber\": \"<string>\",\n        \"deliveryServiceType\": \"PO_BOX\",\n        \"geographicCoordinates\": {\n          \"latitude\": \"<float>\",\n          \"longitude\": \"<float>\",\n          \"altitude\": \"<float>\"\n        },\n        \"administrativeAreaLevel1\": {\n          \"countryCode\": \"SK\",\n          \"regionCode\": \"<string>\",\n          \"regionName\": \"<string>\"\n        },\n        \"postalCode\": \"<string>\",\n        \"deliveryServiceQualifier\": \"<string>\"\n      },\n      \"bpnLegalEntity\": \"<string>\",\n      \"bpnSite\": \"<string>\",\n      \"addressType\": \"LegalAndSiteMainAddress\"\n    },\n    {\n      \"bpna\": \"<string>\",\n      \"confidenceCriteria\": {\n        \"checkedByExternalDataSource\": \"<boolean>\",\n        \"confidenceLevel\": \"<integer>\",\n        \"lastConfidenceCheckAt\": \"<dateTime>\",\n        \"nextConfidenceCheckAt\": \"<dateTime>\",\n        \"numberOfSharingMembers\": \"<integer>\",\n        \"sharedByOwner\": \"<boolean>\"\n      },\n      \"createdAt\": \"<dateTime>\",\n      \"identifiers\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"<string>\"\n          },\n          \"value\": \"<string>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"<string>\"\n          },\n          \"value\": \"<string>\"\n        }\n      ],\n      \"isCatenaXMemberData\": \"<boolean>\",\n      \"physicalPostalAddress\": {\n        \"city\": \"<string>\",\n        \"country\": {\n          \"name\": \"<string>\",\n          \"technicalKey\": \"ZR\"\n        },\n        \"geographicCoordinates\": {\n          \"latitude\": \"<float>\",\n          \"longitude\": \"<float>\",\n          \"altitude\": \"<float>\"\n        },\n        \"administrativeAreaLevel1\": {\n          \"countryCode\": \"CH\",\n          \"regionCode\": \"<string>\",\n          \"regionName\": \"<string>\"\n        },\n        \"administrativeAreaLevel2\": \"<string>\",\n        \"administrativeAreaLevel3\": \"<string>\",\n        \"postalCode\": \"<string>\",\n        \"district\": \"<string>\",\n        \"street\": {\n          \"name\": \"<string>\",\n          \"houseNumber\": \"<string>\",\n          \"houseNumberSupplement\": \"<string>\",\n          \"milestone\": \"<string>\",\n          \"direction\": \"<string>\",\n          \"namePrefix\": \"<string>\",\n          \"additionalNamePrefix\": \"<string>\",\n          \"nameSuffix\": \"<string>\",\n          \"additionalNameSuffix\": \"<string>\"\n        },\n        \"companyPostalCode\": \"<string>\",\n        \"industrialZone\": \"<string>\",\n        \"building\": \"<string>\",\n        \"floor\": \"<string>\",\n        \"door\": \"<string>\"\n      },\n      \"states\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"ACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"ACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        }\n      ],\n      \"updatedAt\": \"<dateTime>\",\n      \"name\": \"<string>\",\n      \"alternativePostalAddress\": {\n        \"city\": \"<string>\",\n        \"country\": {\n          \"name\": \"<string>\",\n          \"technicalKey\": \"SR\"\n        },\n        \"deliveryServiceNumber\": \"<string>\",\n        \"deliveryServiceType\": \"PO_BOX\",\n        \"geographicCoordinates\": {\n          \"latitude\": \"<float>\",\n          \"longitude\": \"<float>\",\n          \"altitude\": \"<float>\"\n        },\n        \"administrativeAreaLevel1\": {\n          \"countryCode\": \"SO\",\n          \"regionCode\": \"<string>\",\n          \"regionName\": \"<string>\"\n        },\n        \"postalCode\": \"<string>\",\n        \"deliveryServiceQualifier\": \"<string>\"\n      },\n      \"bpnLegalEntity\": \"<string>\",\n      \"bpnSite\": \"<string>\",\n      \"addressType\": \"LegalAddress\"\n    }\n  ],\n  \"contentSize\": \"<integer>\",\n  \"page\": \"<integer>\",\n  \"totalElements\": \"<long>\",\n  \"totalPages\": \"<integer>\"\n}"
+						},
+						{
+							"name": "Legal Entity BPN Filter",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"legalEntityBpns\": [\n        \"BPNL0000000012F2\",\n        \"BPNL00000000052O\"\n    ]\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/members/addresses/search?page=0&size=10",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"members",
+										"addresses",
+										"search"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0",
+											"description": "Number of page to get results from"
+										},
+										{
+											"key": "size",
+											"value": "10",
+											"description": "Size of each page"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"content\": [\n    {\n      \"bpna\": \"<string>\",\n      \"confidenceCriteria\": {\n        \"checkedByExternalDataSource\": \"<boolean>\",\n        \"confidenceLevel\": \"<integer>\",\n        \"lastConfidenceCheckAt\": \"<dateTime>\",\n        \"nextConfidenceCheckAt\": \"<dateTime>\",\n        \"numberOfSharingMembers\": \"<integer>\",\n        \"sharedByOwner\": \"<boolean>\"\n      },\n      \"createdAt\": \"<dateTime>\",\n      \"identifiers\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"<string>\"\n          },\n          \"value\": \"<string>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"<string>\"\n          },\n          \"value\": \"<string>\"\n        }\n      ],\n      \"isCatenaXMemberData\": \"<boolean>\",\n      \"physicalPostalAddress\": {\n        \"city\": \"<string>\",\n        \"country\": {\n          \"name\": \"<string>\",\n          \"technicalKey\": \"RE\"\n        },\n        \"geographicCoordinates\": {\n          \"latitude\": \"<float>\",\n          \"longitude\": \"<float>\",\n          \"altitude\": \"<float>\"\n        },\n        \"administrativeAreaLevel1\": {\n          \"countryCode\": \"VG\",\n          \"regionCode\": \"<string>\",\n          \"regionName\": \"<string>\"\n        },\n        \"administrativeAreaLevel2\": \"<string>\",\n        \"administrativeAreaLevel3\": \"<string>\",\n        \"postalCode\": \"<string>\",\n        \"district\": \"<string>\",\n        \"street\": {\n          \"name\": \"<string>\",\n          \"houseNumber\": \"<string>\",\n          \"houseNumberSupplement\": \"<string>\",\n          \"milestone\": \"<string>\",\n          \"direction\": \"<string>\",\n          \"namePrefix\": \"<string>\",\n          \"additionalNamePrefix\": \"<string>\",\n          \"nameSuffix\": \"<string>\",\n          \"additionalNameSuffix\": \"<string>\"\n        },\n        \"companyPostalCode\": \"<string>\",\n        \"industrialZone\": \"<string>\",\n        \"building\": \"<string>\",\n        \"floor\": \"<string>\",\n        \"door\": \"<string>\"\n      },\n      \"states\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"INACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"INACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        }\n      ],\n      \"updatedAt\": \"<dateTime>\",\n      \"name\": \"<string>\",\n      \"alternativePostalAddress\": {\n        \"city\": \"<string>\",\n        \"country\": {\n          \"name\": \"<string>\",\n          \"technicalKey\": \"YT\"\n        },\n        \"deliveryServiceNumber\": \"<string>\",\n        \"deliveryServiceType\": \"PO_BOX\",\n        \"geographicCoordinates\": {\n          \"latitude\": \"<float>\",\n          \"longitude\": \"<float>\",\n          \"altitude\": \"<float>\"\n        },\n        \"administrativeAreaLevel1\": {\n          \"countryCode\": \"SK\",\n          \"regionCode\": \"<string>\",\n          \"regionName\": \"<string>\"\n        },\n        \"postalCode\": \"<string>\",\n        \"deliveryServiceQualifier\": \"<string>\"\n      },\n      \"bpnLegalEntity\": \"<string>\",\n      \"bpnSite\": \"<string>\",\n      \"addressType\": \"LegalAndSiteMainAddress\"\n    },\n    {\n      \"bpna\": \"<string>\",\n      \"confidenceCriteria\": {\n        \"checkedByExternalDataSource\": \"<boolean>\",\n        \"confidenceLevel\": \"<integer>\",\n        \"lastConfidenceCheckAt\": \"<dateTime>\",\n        \"nextConfidenceCheckAt\": \"<dateTime>\",\n        \"numberOfSharingMembers\": \"<integer>\",\n        \"sharedByOwner\": \"<boolean>\"\n      },\n      \"createdAt\": \"<dateTime>\",\n      \"identifiers\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"<string>\"\n          },\n          \"value\": \"<string>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"<string>\"\n          },\n          \"value\": \"<string>\"\n        }\n      ],\n      \"isCatenaXMemberData\": \"<boolean>\",\n      \"physicalPostalAddress\": {\n        \"city\": \"<string>\",\n        \"country\": {\n          \"name\": \"<string>\",\n          \"technicalKey\": \"ZR\"\n        },\n        \"geographicCoordinates\": {\n          \"latitude\": \"<float>\",\n          \"longitude\": \"<float>\",\n          \"altitude\": \"<float>\"\n        },\n        \"administrativeAreaLevel1\": {\n          \"countryCode\": \"CH\",\n          \"regionCode\": \"<string>\",\n          \"regionName\": \"<string>\"\n        },\n        \"administrativeAreaLevel2\": \"<string>\",\n        \"administrativeAreaLevel3\": \"<string>\",\n        \"postalCode\": \"<string>\",\n        \"district\": \"<string>\",\n        \"street\": {\n          \"name\": \"<string>\",\n          \"houseNumber\": \"<string>\",\n          \"houseNumberSupplement\": \"<string>\",\n          \"milestone\": \"<string>\",\n          \"direction\": \"<string>\",\n          \"namePrefix\": \"<string>\",\n          \"additionalNamePrefix\": \"<string>\",\n          \"nameSuffix\": \"<string>\",\n          \"additionalNameSuffix\": \"<string>\"\n        },\n        \"companyPostalCode\": \"<string>\",\n        \"industrialZone\": \"<string>\",\n        \"building\": \"<string>\",\n        \"floor\": \"<string>\",\n        \"door\": \"<string>\"\n      },\n      \"states\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"ACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"ACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        }\n      ],\n      \"updatedAt\": \"<dateTime>\",\n      \"name\": \"<string>\",\n      \"alternativePostalAddress\": {\n        \"city\": \"<string>\",\n        \"country\": {\n          \"name\": \"<string>\",\n          \"technicalKey\": \"SR\"\n        },\n        \"deliveryServiceNumber\": \"<string>\",\n        \"deliveryServiceType\": \"PO_BOX\",\n        \"geographicCoordinates\": {\n          \"latitude\": \"<float>\",\n          \"longitude\": \"<float>\",\n          \"altitude\": \"<float>\"\n        },\n        \"administrativeAreaLevel1\": {\n          \"countryCode\": \"SO\",\n          \"regionCode\": \"<string>\",\n          \"regionName\": \"<string>\"\n        },\n        \"postalCode\": \"<string>\",\n        \"deliveryServiceQualifier\": \"<string>\"\n      },\n      \"bpnLegalEntity\": \"<string>\",\n      \"bpnSite\": \"<string>\",\n      \"addressType\": \"LegalAddress\"\n    }\n  ],\n  \"contentSize\": \"<integer>\",\n  \"page\": \"<integer>\",\n  \"totalElements\": \"<long>\",\n  \"totalPages\": \"<integer>\"\n}"
+						},
+						{
+							"name": "Site BPN Filter",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"siteBpns\": [\n        \"BPNS0000000000WN\",\n        \"BPNS0000000002V9\"\n    ]\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/members/addresses/search?page=0&size=10",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"members",
+										"addresses",
+										"search"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0",
+											"description": "Number of page to get results from"
+										},
+										{
+											"key": "size",
+											"value": "10",
+											"description": "Size of each page"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"content\": [\n    {\n      \"bpna\": \"<string>\",\n      \"confidenceCriteria\": {\n        \"checkedByExternalDataSource\": \"<boolean>\",\n        \"confidenceLevel\": \"<integer>\",\n        \"lastConfidenceCheckAt\": \"<dateTime>\",\n        \"nextConfidenceCheckAt\": \"<dateTime>\",\n        \"numberOfSharingMembers\": \"<integer>\",\n        \"sharedByOwner\": \"<boolean>\"\n      },\n      \"createdAt\": \"<dateTime>\",\n      \"identifiers\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"<string>\"\n          },\n          \"value\": \"<string>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"<string>\"\n          },\n          \"value\": \"<string>\"\n        }\n      ],\n      \"isCatenaXMemberData\": \"<boolean>\",\n      \"physicalPostalAddress\": {\n        \"city\": \"<string>\",\n        \"country\": {\n          \"name\": \"<string>\",\n          \"technicalKey\": \"RE\"\n        },\n        \"geographicCoordinates\": {\n          \"latitude\": \"<float>\",\n          \"longitude\": \"<float>\",\n          \"altitude\": \"<float>\"\n        },\n        \"administrativeAreaLevel1\": {\n          \"countryCode\": \"VG\",\n          \"regionCode\": \"<string>\",\n          \"regionName\": \"<string>\"\n        },\n        \"administrativeAreaLevel2\": \"<string>\",\n        \"administrativeAreaLevel3\": \"<string>\",\n        \"postalCode\": \"<string>\",\n        \"district\": \"<string>\",\n        \"street\": {\n          \"name\": \"<string>\",\n          \"houseNumber\": \"<string>\",\n          \"houseNumberSupplement\": \"<string>\",\n          \"milestone\": \"<string>\",\n          \"direction\": \"<string>\",\n          \"namePrefix\": \"<string>\",\n          \"additionalNamePrefix\": \"<string>\",\n          \"nameSuffix\": \"<string>\",\n          \"additionalNameSuffix\": \"<string>\"\n        },\n        \"companyPostalCode\": \"<string>\",\n        \"industrialZone\": \"<string>\",\n        \"building\": \"<string>\",\n        \"floor\": \"<string>\",\n        \"door\": \"<string>\"\n      },\n      \"states\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"INACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"INACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        }\n      ],\n      \"updatedAt\": \"<dateTime>\",\n      \"name\": \"<string>\",\n      \"alternativePostalAddress\": {\n        \"city\": \"<string>\",\n        \"country\": {\n          \"name\": \"<string>\",\n          \"technicalKey\": \"YT\"\n        },\n        \"deliveryServiceNumber\": \"<string>\",\n        \"deliveryServiceType\": \"PO_BOX\",\n        \"geographicCoordinates\": {\n          \"latitude\": \"<float>\",\n          \"longitude\": \"<float>\",\n          \"altitude\": \"<float>\"\n        },\n        \"administrativeAreaLevel1\": {\n          \"countryCode\": \"SK\",\n          \"regionCode\": \"<string>\",\n          \"regionName\": \"<string>\"\n        },\n        \"postalCode\": \"<string>\",\n        \"deliveryServiceQualifier\": \"<string>\"\n      },\n      \"bpnLegalEntity\": \"<string>\",\n      \"bpnSite\": \"<string>\",\n      \"addressType\": \"LegalAndSiteMainAddress\"\n    },\n    {\n      \"bpna\": \"<string>\",\n      \"confidenceCriteria\": {\n        \"checkedByExternalDataSource\": \"<boolean>\",\n        \"confidenceLevel\": \"<integer>\",\n        \"lastConfidenceCheckAt\": \"<dateTime>\",\n        \"nextConfidenceCheckAt\": \"<dateTime>\",\n        \"numberOfSharingMembers\": \"<integer>\",\n        \"sharedByOwner\": \"<boolean>\"\n      },\n      \"createdAt\": \"<dateTime>\",\n      \"identifiers\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"<string>\"\n          },\n          \"value\": \"<string>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"<string>\"\n          },\n          \"value\": \"<string>\"\n        }\n      ],\n      \"isCatenaXMemberData\": \"<boolean>\",\n      \"physicalPostalAddress\": {\n        \"city\": \"<string>\",\n        \"country\": {\n          \"name\": \"<string>\",\n          \"technicalKey\": \"ZR\"\n        },\n        \"geographicCoordinates\": {\n          \"latitude\": \"<float>\",\n          \"longitude\": \"<float>\",\n          \"altitude\": \"<float>\"\n        },\n        \"administrativeAreaLevel1\": {\n          \"countryCode\": \"CH\",\n          \"regionCode\": \"<string>\",\n          \"regionName\": \"<string>\"\n        },\n        \"administrativeAreaLevel2\": \"<string>\",\n        \"administrativeAreaLevel3\": \"<string>\",\n        \"postalCode\": \"<string>\",\n        \"district\": \"<string>\",\n        \"street\": {\n          \"name\": \"<string>\",\n          \"houseNumber\": \"<string>\",\n          \"houseNumberSupplement\": \"<string>\",\n          \"milestone\": \"<string>\",\n          \"direction\": \"<string>\",\n          \"namePrefix\": \"<string>\",\n          \"additionalNamePrefix\": \"<string>\",\n          \"nameSuffix\": \"<string>\",\n          \"additionalNameSuffix\": \"<string>\"\n        },\n        \"companyPostalCode\": \"<string>\",\n        \"industrialZone\": \"<string>\",\n        \"building\": \"<string>\",\n        \"floor\": \"<string>\",\n        \"door\": \"<string>\"\n      },\n      \"states\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"ACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"ACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        }\n      ],\n      \"updatedAt\": \"<dateTime>\",\n      \"name\": \"<string>\",\n      \"alternativePostalAddress\": {\n        \"city\": \"<string>\",\n        \"country\": {\n          \"name\": \"<string>\",\n          \"technicalKey\": \"SR\"\n        },\n        \"deliveryServiceNumber\": \"<string>\",\n        \"deliveryServiceType\": \"PO_BOX\",\n        \"geographicCoordinates\": {\n          \"latitude\": \"<float>\",\n          \"longitude\": \"<float>\",\n          \"altitude\": \"<float>\"\n        },\n        \"administrativeAreaLevel1\": {\n          \"countryCode\": \"SO\",\n          \"regionCode\": \"<string>\",\n          \"regionName\": \"<string>\"\n        },\n        \"postalCode\": \"<string>\",\n        \"deliveryServiceQualifier\": \"<string>\"\n      },\n      \"bpnLegalEntity\": \"<string>\",\n      \"bpnSite\": \"<string>\",\n      \"addressType\": \"LegalAddress\"\n    }\n  ],\n  \"contentSize\": \"<integer>\",\n  \"page\": \"<integer>\",\n  \"totalElements\": \"<long>\",\n  \"totalPages\": \"<integer>\"\n}"
+						},
+						{
+							"name": "BPNA Filter",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"addressBpns\": [\n        \"BPNA0000000014HF\",\n        \"BPNA0000000015GQ\"\n    ]\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/members/addresses/search?page=0&size=10",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"members",
+										"addresses",
+										"search"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0",
+											"description": "Number of page to get results from"
+										},
+										{
+											"key": "size",
+											"value": "10",
+											"description": "Size of each page"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"content\": [\n    {\n      \"bpna\": \"<string>\",\n      \"confidenceCriteria\": {\n        \"checkedByExternalDataSource\": \"<boolean>\",\n        \"confidenceLevel\": \"<integer>\",\n        \"lastConfidenceCheckAt\": \"<dateTime>\",\n        \"nextConfidenceCheckAt\": \"<dateTime>\",\n        \"numberOfSharingMembers\": \"<integer>\",\n        \"sharedByOwner\": \"<boolean>\"\n      },\n      \"createdAt\": \"<dateTime>\",\n      \"identifiers\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"<string>\"\n          },\n          \"value\": \"<string>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"<string>\"\n          },\n          \"value\": \"<string>\"\n        }\n      ],\n      \"isCatenaXMemberData\": \"<boolean>\",\n      \"physicalPostalAddress\": {\n        \"city\": \"<string>\",\n        \"country\": {\n          \"name\": \"<string>\",\n          \"technicalKey\": \"RE\"\n        },\n        \"geographicCoordinates\": {\n          \"latitude\": \"<float>\",\n          \"longitude\": \"<float>\",\n          \"altitude\": \"<float>\"\n        },\n        \"administrativeAreaLevel1\": {\n          \"countryCode\": \"VG\",\n          \"regionCode\": \"<string>\",\n          \"regionName\": \"<string>\"\n        },\n        \"administrativeAreaLevel2\": \"<string>\",\n        \"administrativeAreaLevel3\": \"<string>\",\n        \"postalCode\": \"<string>\",\n        \"district\": \"<string>\",\n        \"street\": {\n          \"name\": \"<string>\",\n          \"houseNumber\": \"<string>\",\n          \"houseNumberSupplement\": \"<string>\",\n          \"milestone\": \"<string>\",\n          \"direction\": \"<string>\",\n          \"namePrefix\": \"<string>\",\n          \"additionalNamePrefix\": \"<string>\",\n          \"nameSuffix\": \"<string>\",\n          \"additionalNameSuffix\": \"<string>\"\n        },\n        \"companyPostalCode\": \"<string>\",\n        \"industrialZone\": \"<string>\",\n        \"building\": \"<string>\",\n        \"floor\": \"<string>\",\n        \"door\": \"<string>\"\n      },\n      \"states\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"INACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"INACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        }\n      ],\n      \"updatedAt\": \"<dateTime>\",\n      \"name\": \"<string>\",\n      \"alternativePostalAddress\": {\n        \"city\": \"<string>\",\n        \"country\": {\n          \"name\": \"<string>\",\n          \"technicalKey\": \"YT\"\n        },\n        \"deliveryServiceNumber\": \"<string>\",\n        \"deliveryServiceType\": \"PO_BOX\",\n        \"geographicCoordinates\": {\n          \"latitude\": \"<float>\",\n          \"longitude\": \"<float>\",\n          \"altitude\": \"<float>\"\n        },\n        \"administrativeAreaLevel1\": {\n          \"countryCode\": \"SK\",\n          \"regionCode\": \"<string>\",\n          \"regionName\": \"<string>\"\n        },\n        \"postalCode\": \"<string>\",\n        \"deliveryServiceQualifier\": \"<string>\"\n      },\n      \"bpnLegalEntity\": \"<string>\",\n      \"bpnSite\": \"<string>\",\n      \"addressType\": \"LegalAndSiteMainAddress\"\n    },\n    {\n      \"bpna\": \"<string>\",\n      \"confidenceCriteria\": {\n        \"checkedByExternalDataSource\": \"<boolean>\",\n        \"confidenceLevel\": \"<integer>\",\n        \"lastConfidenceCheckAt\": \"<dateTime>\",\n        \"nextConfidenceCheckAt\": \"<dateTime>\",\n        \"numberOfSharingMembers\": \"<integer>\",\n        \"sharedByOwner\": \"<boolean>\"\n      },\n      \"createdAt\": \"<dateTime>\",\n      \"identifiers\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"<string>\"\n          },\n          \"value\": \"<string>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"<string>\"\n          },\n          \"value\": \"<string>\"\n        }\n      ],\n      \"isCatenaXMemberData\": \"<boolean>\",\n      \"physicalPostalAddress\": {\n        \"city\": \"<string>\",\n        \"country\": {\n          \"name\": \"<string>\",\n          \"technicalKey\": \"ZR\"\n        },\n        \"geographicCoordinates\": {\n          \"latitude\": \"<float>\",\n          \"longitude\": \"<float>\",\n          \"altitude\": \"<float>\"\n        },\n        \"administrativeAreaLevel1\": {\n          \"countryCode\": \"CH\",\n          \"regionCode\": \"<string>\",\n          \"regionName\": \"<string>\"\n        },\n        \"administrativeAreaLevel2\": \"<string>\",\n        \"administrativeAreaLevel3\": \"<string>\",\n        \"postalCode\": \"<string>\",\n        \"district\": \"<string>\",\n        \"street\": {\n          \"name\": \"<string>\",\n          \"houseNumber\": \"<string>\",\n          \"houseNumberSupplement\": \"<string>\",\n          \"milestone\": \"<string>\",\n          \"direction\": \"<string>\",\n          \"namePrefix\": \"<string>\",\n          \"additionalNamePrefix\": \"<string>\",\n          \"nameSuffix\": \"<string>\",\n          \"additionalNameSuffix\": \"<string>\"\n        },\n        \"companyPostalCode\": \"<string>\",\n        \"industrialZone\": \"<string>\",\n        \"building\": \"<string>\",\n        \"floor\": \"<string>\",\n        \"door\": \"<string>\"\n      },\n      \"states\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"ACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"ACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        }\n      ],\n      \"updatedAt\": \"<dateTime>\",\n      \"name\": \"<string>\",\n      \"alternativePostalAddress\": {\n        \"city\": \"<string>\",\n        \"country\": {\n          \"name\": \"<string>\",\n          \"technicalKey\": \"SR\"\n        },\n        \"deliveryServiceNumber\": \"<string>\",\n        \"deliveryServiceType\": \"PO_BOX\",\n        \"geographicCoordinates\": {\n          \"latitude\": \"<float>\",\n          \"longitude\": \"<float>\",\n          \"altitude\": \"<float>\"\n        },\n        \"administrativeAreaLevel1\": {\n          \"countryCode\": \"SO\",\n          \"regionCode\": \"<string>\",\n          \"regionName\": \"<string>\"\n        },\n        \"postalCode\": \"<string>\",\n        \"deliveryServiceQualifier\": \"<string>\"\n      },\n      \"bpnLegalEntity\": \"<string>\",\n      \"bpnSite\": \"<string>\",\n      \"addressType\": \"LegalAddress\"\n    }\n  ],\n  \"contentSize\": \"<integer>\",\n  \"page\": \"<integer>\",\n  \"totalElements\": \"<long>\",\n  \"totalPages\": \"<integer>\"\n}"
+						},
+						{
+							"name": "Name Search",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n   \"name\": \"address\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/members/addresses/search?page=0&size=10",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"members",
+										"addresses",
+										"search"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0",
+											"description": "Number of page to get results from"
+										},
+										{
+											"key": "size",
+											"value": "10",
+											"description": "Size of each page"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"content\": [\n    {\n      \"bpna\": \"<string>\",\n      \"confidenceCriteria\": {\n        \"checkedByExternalDataSource\": \"<boolean>\",\n        \"confidenceLevel\": \"<integer>\",\n        \"lastConfidenceCheckAt\": \"<dateTime>\",\n        \"nextConfidenceCheckAt\": \"<dateTime>\",\n        \"numberOfSharingMembers\": \"<integer>\",\n        \"sharedByOwner\": \"<boolean>\"\n      },\n      \"createdAt\": \"<dateTime>\",\n      \"identifiers\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"<string>\"\n          },\n          \"value\": \"<string>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"<string>\"\n          },\n          \"value\": \"<string>\"\n        }\n      ],\n      \"isCatenaXMemberData\": \"<boolean>\",\n      \"physicalPostalAddress\": {\n        \"city\": \"<string>\",\n        \"country\": {\n          \"name\": \"<string>\",\n          \"technicalKey\": \"RE\"\n        },\n        \"geographicCoordinates\": {\n          \"latitude\": \"<float>\",\n          \"longitude\": \"<float>\",\n          \"altitude\": \"<float>\"\n        },\n        \"administrativeAreaLevel1\": {\n          \"countryCode\": \"VG\",\n          \"regionCode\": \"<string>\",\n          \"regionName\": \"<string>\"\n        },\n        \"administrativeAreaLevel2\": \"<string>\",\n        \"administrativeAreaLevel3\": \"<string>\",\n        \"postalCode\": \"<string>\",\n        \"district\": \"<string>\",\n        \"street\": {\n          \"name\": \"<string>\",\n          \"houseNumber\": \"<string>\",\n          \"houseNumberSupplement\": \"<string>\",\n          \"milestone\": \"<string>\",\n          \"direction\": \"<string>\",\n          \"namePrefix\": \"<string>\",\n          \"additionalNamePrefix\": \"<string>\",\n          \"nameSuffix\": \"<string>\",\n          \"additionalNameSuffix\": \"<string>\"\n        },\n        \"companyPostalCode\": \"<string>\",\n        \"industrialZone\": \"<string>\",\n        \"building\": \"<string>\",\n        \"floor\": \"<string>\",\n        \"door\": \"<string>\"\n      },\n      \"states\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"INACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"INACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        }\n      ],\n      \"updatedAt\": \"<dateTime>\",\n      \"name\": \"<string>\",\n      \"alternativePostalAddress\": {\n        \"city\": \"<string>\",\n        \"country\": {\n          \"name\": \"<string>\",\n          \"technicalKey\": \"YT\"\n        },\n        \"deliveryServiceNumber\": \"<string>\",\n        \"deliveryServiceType\": \"PO_BOX\",\n        \"geographicCoordinates\": {\n          \"latitude\": \"<float>\",\n          \"longitude\": \"<float>\",\n          \"altitude\": \"<float>\"\n        },\n        \"administrativeAreaLevel1\": {\n          \"countryCode\": \"SK\",\n          \"regionCode\": \"<string>\",\n          \"regionName\": \"<string>\"\n        },\n        \"postalCode\": \"<string>\",\n        \"deliveryServiceQualifier\": \"<string>\"\n      },\n      \"bpnLegalEntity\": \"<string>\",\n      \"bpnSite\": \"<string>\",\n      \"addressType\": \"LegalAndSiteMainAddress\"\n    },\n    {\n      \"bpna\": \"<string>\",\n      \"confidenceCriteria\": {\n        \"checkedByExternalDataSource\": \"<boolean>\",\n        \"confidenceLevel\": \"<integer>\",\n        \"lastConfidenceCheckAt\": \"<dateTime>\",\n        \"nextConfidenceCheckAt\": \"<dateTime>\",\n        \"numberOfSharingMembers\": \"<integer>\",\n        \"sharedByOwner\": \"<boolean>\"\n      },\n      \"createdAt\": \"<dateTime>\",\n      \"identifiers\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"<string>\"\n          },\n          \"value\": \"<string>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"<string>\"\n          },\n          \"value\": \"<string>\"\n        }\n      ],\n      \"isCatenaXMemberData\": \"<boolean>\",\n      \"physicalPostalAddress\": {\n        \"city\": \"<string>\",\n        \"country\": {\n          \"name\": \"<string>\",\n          \"technicalKey\": \"ZR\"\n        },\n        \"geographicCoordinates\": {\n          \"latitude\": \"<float>\",\n          \"longitude\": \"<float>\",\n          \"altitude\": \"<float>\"\n        },\n        \"administrativeAreaLevel1\": {\n          \"countryCode\": \"CH\",\n          \"regionCode\": \"<string>\",\n          \"regionName\": \"<string>\"\n        },\n        \"administrativeAreaLevel2\": \"<string>\",\n        \"administrativeAreaLevel3\": \"<string>\",\n        \"postalCode\": \"<string>\",\n        \"district\": \"<string>\",\n        \"street\": {\n          \"name\": \"<string>\",\n          \"houseNumber\": \"<string>\",\n          \"houseNumberSupplement\": \"<string>\",\n          \"milestone\": \"<string>\",\n          \"direction\": \"<string>\",\n          \"namePrefix\": \"<string>\",\n          \"additionalNamePrefix\": \"<string>\",\n          \"nameSuffix\": \"<string>\",\n          \"additionalNameSuffix\": \"<string>\"\n        },\n        \"companyPostalCode\": \"<string>\",\n        \"industrialZone\": \"<string>\",\n        \"building\": \"<string>\",\n        \"floor\": \"<string>\",\n        \"door\": \"<string>\"\n      },\n      \"states\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"ACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"ACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        }\n      ],\n      \"updatedAt\": \"<dateTime>\",\n      \"name\": \"<string>\",\n      \"alternativePostalAddress\": {\n        \"city\": \"<string>\",\n        \"country\": {\n          \"name\": \"<string>\",\n          \"technicalKey\": \"SR\"\n        },\n        \"deliveryServiceNumber\": \"<string>\",\n        \"deliveryServiceType\": \"PO_BOX\",\n        \"geographicCoordinates\": {\n          \"latitude\": \"<float>\",\n          \"longitude\": \"<float>\",\n          \"altitude\": \"<float>\"\n        },\n        \"administrativeAreaLevel1\": {\n          \"countryCode\": \"SO\",\n          \"regionCode\": \"<string>\",\n          \"regionName\": \"<string>\"\n        },\n        \"postalCode\": \"<string>\",\n        \"deliveryServiceQualifier\": \"<string>\"\n      },\n      \"bpnLegalEntity\": \"<string>\",\n      \"bpnSite\": \"<string>\",\n      \"addressType\": \"LegalAddress\"\n    }\n  ],\n  \"contentSize\": \"<integer>\",\n  \"page\": \"<integer>\",\n  \"totalElements\": \"<long>\",\n  \"totalPages\": \"<integer>\"\n}"
+						},
+						{
+							"name": "All Filters",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"legalEntityBpns\": [\n        \"BPNL0000000012F2\",\n        \"BPNL00000000052O\"\n    ],\n    \"siteBpns\": [\n        \"BPNS000000000COB\",\n        \"BPNS0000000009QE\"\n    ],\n    \"addressBpns\": [\n        \"BPNA000000007679\",\n        \"BPNA000000007956\"\n    ],\n   \"name\": \"address\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/members/addresses/search?page=0&size=10",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"members",
+										"addresses",
+										"search"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0",
+											"description": "Number of page to get results from"
+										},
+										{
+											"key": "size",
+											"value": "10",
+											"description": "Size of each page"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"content\": [\n    {\n      \"bpna\": \"<string>\",\n      \"confidenceCriteria\": {\n        \"checkedByExternalDataSource\": \"<boolean>\",\n        \"confidenceLevel\": \"<integer>\",\n        \"lastConfidenceCheckAt\": \"<dateTime>\",\n        \"nextConfidenceCheckAt\": \"<dateTime>\",\n        \"numberOfSharingMembers\": \"<integer>\",\n        \"sharedByOwner\": \"<boolean>\"\n      },\n      \"createdAt\": \"<dateTime>\",\n      \"identifiers\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"<string>\"\n          },\n          \"value\": \"<string>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"<string>\"\n          },\n          \"value\": \"<string>\"\n        }\n      ],\n      \"isCatenaXMemberData\": \"<boolean>\",\n      \"physicalPostalAddress\": {\n        \"city\": \"<string>\",\n        \"country\": {\n          \"name\": \"<string>\",\n          \"technicalKey\": \"RE\"\n        },\n        \"geographicCoordinates\": {\n          \"latitude\": \"<float>\",\n          \"longitude\": \"<float>\",\n          \"altitude\": \"<float>\"\n        },\n        \"administrativeAreaLevel1\": {\n          \"countryCode\": \"VG\",\n          \"regionCode\": \"<string>\",\n          \"regionName\": \"<string>\"\n        },\n        \"administrativeAreaLevel2\": \"<string>\",\n        \"administrativeAreaLevel3\": \"<string>\",\n        \"postalCode\": \"<string>\",\n        \"district\": \"<string>\",\n        \"street\": {\n          \"name\": \"<string>\",\n          \"houseNumber\": \"<string>\",\n          \"houseNumberSupplement\": \"<string>\",\n          \"milestone\": \"<string>\",\n          \"direction\": \"<string>\",\n          \"namePrefix\": \"<string>\",\n          \"additionalNamePrefix\": \"<string>\",\n          \"nameSuffix\": \"<string>\",\n          \"additionalNameSuffix\": \"<string>\"\n        },\n        \"companyPostalCode\": \"<string>\",\n        \"industrialZone\": \"<string>\",\n        \"building\": \"<string>\",\n        \"floor\": \"<string>\",\n        \"door\": \"<string>\"\n      },\n      \"states\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"INACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"INACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        }\n      ],\n      \"updatedAt\": \"<dateTime>\",\n      \"name\": \"<string>\",\n      \"alternativePostalAddress\": {\n        \"city\": \"<string>\",\n        \"country\": {\n          \"name\": \"<string>\",\n          \"technicalKey\": \"YT\"\n        },\n        \"deliveryServiceNumber\": \"<string>\",\n        \"deliveryServiceType\": \"PO_BOX\",\n        \"geographicCoordinates\": {\n          \"latitude\": \"<float>\",\n          \"longitude\": \"<float>\",\n          \"altitude\": \"<float>\"\n        },\n        \"administrativeAreaLevel1\": {\n          \"countryCode\": \"SK\",\n          \"regionCode\": \"<string>\",\n          \"regionName\": \"<string>\"\n        },\n        \"postalCode\": \"<string>\",\n        \"deliveryServiceQualifier\": \"<string>\"\n      },\n      \"bpnLegalEntity\": \"<string>\",\n      \"bpnSite\": \"<string>\",\n      \"addressType\": \"LegalAndSiteMainAddress\"\n    },\n    {\n      \"bpna\": \"<string>\",\n      \"confidenceCriteria\": {\n        \"checkedByExternalDataSource\": \"<boolean>\",\n        \"confidenceLevel\": \"<integer>\",\n        \"lastConfidenceCheckAt\": \"<dateTime>\",\n        \"nextConfidenceCheckAt\": \"<dateTime>\",\n        \"numberOfSharingMembers\": \"<integer>\",\n        \"sharedByOwner\": \"<boolean>\"\n      },\n      \"createdAt\": \"<dateTime>\",\n      \"identifiers\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"<string>\"\n          },\n          \"value\": \"<string>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"<string>\"\n          },\n          \"value\": \"<string>\"\n        }\n      ],\n      \"isCatenaXMemberData\": \"<boolean>\",\n      \"physicalPostalAddress\": {\n        \"city\": \"<string>\",\n        \"country\": {\n          \"name\": \"<string>\",\n          \"technicalKey\": \"ZR\"\n        },\n        \"geographicCoordinates\": {\n          \"latitude\": \"<float>\",\n          \"longitude\": \"<float>\",\n          \"altitude\": \"<float>\"\n        },\n        \"administrativeAreaLevel1\": {\n          \"countryCode\": \"CH\",\n          \"regionCode\": \"<string>\",\n          \"regionName\": \"<string>\"\n        },\n        \"administrativeAreaLevel2\": \"<string>\",\n        \"administrativeAreaLevel3\": \"<string>\",\n        \"postalCode\": \"<string>\",\n        \"district\": \"<string>\",\n        \"street\": {\n          \"name\": \"<string>\",\n          \"houseNumber\": \"<string>\",\n          \"houseNumberSupplement\": \"<string>\",\n          \"milestone\": \"<string>\",\n          \"direction\": \"<string>\",\n          \"namePrefix\": \"<string>\",\n          \"additionalNamePrefix\": \"<string>\",\n          \"nameSuffix\": \"<string>\",\n          \"additionalNameSuffix\": \"<string>\"\n        },\n        \"companyPostalCode\": \"<string>\",\n        \"industrialZone\": \"<string>\",\n        \"building\": \"<string>\",\n        \"floor\": \"<string>\",\n        \"door\": \"<string>\"\n      },\n      \"states\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"ACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"ACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        }\n      ],\n      \"updatedAt\": \"<dateTime>\",\n      \"name\": \"<string>\",\n      \"alternativePostalAddress\": {\n        \"city\": \"<string>\",\n        \"country\": {\n          \"name\": \"<string>\",\n          \"technicalKey\": \"SR\"\n        },\n        \"deliveryServiceNumber\": \"<string>\",\n        \"deliveryServiceType\": \"PO_BOX\",\n        \"geographicCoordinates\": {\n          \"latitude\": \"<float>\",\n          \"longitude\": \"<float>\",\n          \"altitude\": \"<float>\"\n        },\n        \"administrativeAreaLevel1\": {\n          \"countryCode\": \"SO\",\n          \"regionCode\": \"<string>\",\n          \"regionName\": \"<string>\"\n        },\n        \"postalCode\": \"<string>\",\n        \"deliveryServiceQualifier\": \"<string>\"\n      },\n      \"bpnLegalEntity\": \"<string>\",\n      \"bpnSite\": \"<string>\",\n      \"addressType\": \"LegalAddress\"\n    }\n  ],\n  \"contentSize\": \"<integer>\",\n  \"page\": \"<integer>\",\n  \"totalElements\": \"<long>\",\n  \"totalPages\": \"<integer>\"\n}"
+						}
+					]
+				},
+				{
+					"name": "/legal-forms",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/legal-forms?page=0&size=10",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"legal-forms"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0",
+									"description": "Number of page to get results from"
+								},
+								{
+									"key": "size",
+									"value": "10",
+									"description": "Size of each page"
+								}
+							]
+						},
+						"description": "Lists all currently known legal forms in a paginated result"
+					},
+					"response": [
+						{
+							"name": "Page of existing legal forms, may be empty",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/legal-forms?page=0&size=100",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"legal-forms"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0",
+											"description": "Number of page to get results from"
+										},
+										{
+											"key": "size",
+											"value": "100",
+											"description": "Size of each page"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"content\": [\n    {\n      \"name\": \"<string>\",\n      \"technicalKey\": \"<string>\",\n      \"abbreviation\": \"<string>\"\n    },\n    {\n      \"name\": \"<string>\",\n      \"technicalKey\": \"<string>\",\n      \"abbreviation\": \"<string>\"\n    }\n  ],\n  \"contentSize\": \"<integer>\",\n  \"page\": \"<integer>\",\n  \"totalElements\": \"<long>\",\n  \"totalPages\": \"<integer>\"\n}"
+						}
+					]
+				},
+				{
+					"name": "/identifier-types",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/identifier-types?page=0&size=10&businessPartnerType=LEGAL_ENTITY&country=FJ",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"identifier-types"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0",
+									"description": "Number of page to get results from"
+								},
+								{
+									"key": "size",
+									"value": "10",
+									"description": "Size of each page"
+								},
+								{
+									"key": "businessPartnerType",
+									"value": "LEGAL_ENTITY",
+									"description": "(Required) "
+								},
+								{
+									"key": "country",
+									"value": "FJ"
+								}
+							]
+						},
+						"description": "Lists all matching identifier types including validity details in a paginated result"
+					},
+					"response": [
+						{
+							"name": "Legal Entity",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/identifier-types?page=0&size=10&businessPartnerType=LEGAL_ENTITY",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"identifier-types"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0",
+											"description": "Number of page to get results from"
+										},
+										{
+											"key": "size",
+											"value": "10",
+											"description": "Size of each page"
+										},
+										{
+											"key": "businessPartnerType",
+											"value": "LEGAL_ENTITY",
+											"description": "(Required) "
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"content\": [\n    {\n      \"businessPartnerType\": \"LEGAL_ENTITY\",\n      \"details\": [\n        {\n          \"mandatory\": \"<boolean>\",\n          \"country\": \"SA\"\n        },\n        {\n          \"mandatory\": \"<boolean>\",\n          \"country\": \"MX\"\n        }\n      ],\n      \"name\": \"<string>\",\n      \"technicalKey\": \"<string>\"\n    },\n    {\n      \"businessPartnerType\": \"ADDRESS\",\n      \"details\": [\n        {\n          \"mandatory\": \"<boolean>\",\n          \"country\": \"GN\"\n        },\n        {\n          \"mandatory\": \"<boolean>\",\n          \"country\": \"LR\"\n        }\n      ],\n      \"name\": \"<string>\",\n      \"technicalKey\": \"<string>\"\n    }\n  ],\n  \"contentSize\": \"<integer>\",\n  \"page\": \"<integer>\",\n  \"totalElements\": \"<long>\",\n  \"totalPages\": \"<integer>\"\n}"
+						},
+						{
+							"name": "Address",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/identifier-types?page=0&size=10&businessPartnerType=ADDRESS",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"identifier-types"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0",
+											"description": "Number of page to get results from"
+										},
+										{
+											"key": "size",
+											"value": "10",
+											"description": "Size of each page"
+										},
+										{
+											"key": "businessPartnerType",
+											"value": "ADDRESS",
+											"description": "(Required) "
+										},
+										{
+											"key": "country",
+											"value": "FJ",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"content\": [\n    {\n      \"businessPartnerType\": \"LEGAL_ENTITY\",\n      \"details\": [\n        {\n          \"mandatory\": \"<boolean>\",\n          \"country\": \"SA\"\n        },\n        {\n          \"mandatory\": \"<boolean>\",\n          \"country\": \"MX\"\n        }\n      ],\n      \"name\": \"<string>\",\n      \"technicalKey\": \"<string>\"\n    },\n    {\n      \"businessPartnerType\": \"ADDRESS\",\n      \"details\": [\n        {\n          \"mandatory\": \"<boolean>\",\n          \"country\": \"GN\"\n        },\n        {\n          \"mandatory\": \"<boolean>\",\n          \"country\": \"LR\"\n        }\n      ],\n      \"name\": \"<string>\",\n      \"technicalKey\": \"<string>\"\n    }\n  ],\n  \"contentSize\": \"<integer>\",\n  \"page\": \"<integer>\",\n  \"totalElements\": \"<long>\",\n  \"totalPages\": \"<integer>\"\n}"
+						},
+						{
+							"name": "Country",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/identifier-types?page=0&size=10&businessPartnerType=LEGAL_ENTITY&country=DE",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"identifier-types"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0",
+											"description": "Number of page to get results from"
+										},
+										{
+											"key": "size",
+											"value": "10",
+											"description": "Size of each page"
+										},
+										{
+											"key": "businessPartnerType",
+											"value": "LEGAL_ENTITY",
+											"description": "(Required) "
+										},
+										{
+											"key": "country",
+											"value": "DE"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"content\": [\n    {\n      \"businessPartnerType\": \"LEGAL_ENTITY\",\n      \"details\": [\n        {\n          \"mandatory\": \"<boolean>\",\n          \"country\": \"SA\"\n        },\n        {\n          \"mandatory\": \"<boolean>\",\n          \"country\": \"MX\"\n        }\n      ],\n      \"name\": \"<string>\",\n      \"technicalKey\": \"<string>\"\n    },\n    {\n      \"businessPartnerType\": \"ADDRESS\",\n      \"details\": [\n        {\n          \"mandatory\": \"<boolean>\",\n          \"country\": \"GN\"\n        },\n        {\n          \"mandatory\": \"<boolean>\",\n          \"country\": \"LR\"\n        }\n      ],\n      \"name\": \"<string>\",\n      \"technicalKey\": \"<string>\"\n    }\n  ],\n  \"contentSize\": \"<integer>\",\n  \"page\": \"<integer>\",\n  \"totalElements\": \"<long>\",\n  \"totalPages\": \"<integer>\"\n}"
+						}
+					]
+				},
+				{
+					"name": "/field-quality-rules/",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/field-quality-rules/?country=FJ",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"field-quality-rules",
+								""
+							],
+							"query": [
+								{
+									"key": "country",
+									"value": "FJ",
+									"description": "(Required) ISO 3166-1 alpha-2 country code"
+								}
+							]
+						},
+						"description": "List the country specific data rules for entity fields.All fields that are not in this list are considered to be forbidden."
+					},
+					"response": [
+						{
+							"name": "Germany",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/field-quality-rules/?country=DE",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"field-quality-rules",
+										""
+									],
+									"query": [
+										{
+											"key": "country",
+											"value": "DE",
+											"description": "(Required) ISO 3166-1 alpha-2 country code"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "[\n  {\n    \"country\": \"PS\",\n    \"fieldPath\": \"<string>\",\n    \"qualityLevel\": \"MANDATORY\",\n    \"schemaName\": \"<string>\"\n  },\n  {\n    \"country\": \"IL\",\n    \"fieldPath\": \"<string>\",\n    \"qualityLevel\": \"FORBIDDEN\",\n    \"schemaName\": \"<string>\"\n  }\n]"
+						}
+					]
+				},
+				{
+					"name": "/administrative-areas-level1",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/administrative-areas-level1?page=0&size=10",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"administrative-areas-level1"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0",
+									"description": "Number of page to get results from"
+								},
+								{
+									"key": "size",
+									"value": "10",
+									"description": "Size of each page"
+								}
+							]
+						},
+						"description": "Lists all currently known country subdivisions according to ISO 3166-2 in a paginated result"
+					},
+					"response": [
+						{
+							"name": "Page of existing country subdivisions, may be empty",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/administrative-areas-level1?page=0&size=100",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"administrative-areas-level1"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0",
+											"description": "Number of page to get results from"
+										},
+										{
+											"key": "size",
+											"value": "100",
+											"description": "Size of each page"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"content\": [\n    {\n      \"code\": \"<string>\",\n      \"countryCode\": \"BL\",\n      \"name\": \"<string>\"\n    },\n    {\n      \"code\": \"<string>\",\n      \"countryCode\": \"BV\",\n      \"name\": \"<string>\"\n    }\n  ],\n  \"contentSize\": \"<integer>\",\n  \"page\": \"<integer>\",\n  \"totalElements\": \"<long>\",\n  \"totalPages\": \"<integer>\"\n}"
+						}
+					]
+				}
+			],
+			"auth": {
+				"type": "apikey",
+				"apikey": [
+					{
+						"key": "value",
+						"value": "{{TRANSFER_TOKEN}}",
+						"type": "string"
+					},
+					{
+						"key": "key",
+						"value": "Authorization",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Pool Use Case Consumer Read",
+			"item": [
+				{
+					"name": "/member-owned/legal-entities/search",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"bpnLs\": [\n        \"<string>\",\n        \"<string>\"\n    ],\n    \"legalName\": \"<string>\"\n}",
+							"options": {
+								"raw": {
+									"headerFamily": "json",
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/member-owned/legal-entities/search?page=0&size=10",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"member-owned",
+								"legal-entities",
+								"search"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0",
+									"description": "Number of page to get results from"
+								},
+								{
+									"key": "size",
+									"value": "10",
+									"description": "Size of each page"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "No Filter",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/members/legal-entities/search?page=0&size=10",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"members",
+										"legal-entities",
+										"search"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0",
+											"description": "Number of page to get results from"
+										},
+										{
+											"key": "size",
+											"value": "10",
+											"description": "Size of each page"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"content\": [\n    {\n      \"bpnl\": \"<string>\",\n      \"confidenceCriteria\": {\n        \"checkedByExternalDataSource\": \"<boolean>\",\n        \"confidenceLevel\": \"<integer>\",\n        \"lastConfidenceCheckAt\": \"<dateTime>\",\n        \"nextConfidenceCheckAt\": \"<dateTime>\",\n        \"numberOfSharingMembers\": \"<integer>\",\n        \"sharedByOwner\": \"<boolean>\"\n      },\n      \"createdAt\": \"<dateTime>\",\n      \"currentness\": \"<dateTime>\",\n      \"identifiers\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"<string>\"\n          },\n          \"value\": \"<string>\",\n          \"issuingBody\": \"<string>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"<string>\"\n          },\n          \"value\": \"<string>\",\n          \"issuingBody\": \"<string>\"\n        }\n      ],\n      \"isCatenaXMemberData\": \"<boolean>\",\n      \"legalAddress\": {\n        \"bpna\": \"<string>\",\n        \"confidenceCriteria\": {\n          \"checkedByExternalDataSource\": \"<boolean>\",\n          \"confidenceLevel\": \"<integer>\",\n          \"lastConfidenceCheckAt\": \"<dateTime>\",\n          \"nextConfidenceCheckAt\": \"<dateTime>\",\n          \"numberOfSharingMembers\": \"<integer>\",\n          \"sharedByOwner\": \"<boolean>\"\n        },\n        \"createdAt\": \"<dateTime>\",\n        \"identifiers\": [\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"<string>\"\n            },\n            \"value\": \"<string>\"\n          },\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"<string>\"\n            },\n            \"value\": \"<string>\"\n          }\n        ],\n        \"isCatenaXMemberData\": \"<boolean>\",\n        \"physicalPostalAddress\": {\n          \"city\": \"<string>\",\n          \"country\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"AT\"\n          },\n          \"geographicCoordinates\": {\n            \"latitude\": \"<float>\",\n            \"longitude\": \"<float>\",\n            \"altitude\": \"<float>\"\n          },\n          \"administrativeAreaLevel1\": {\n            \"countryCode\": \"KH\",\n            \"regionCode\": \"<string>\",\n            \"regionName\": \"<string>\"\n          },\n          \"administrativeAreaLevel2\": \"<string>\",\n          \"administrativeAreaLevel3\": \"<string>\",\n          \"postalCode\": \"<string>\",\n          \"district\": \"<string>\",\n          \"street\": {\n            \"name\": \"<string>\",\n            \"houseNumber\": \"<string>\",\n            \"houseNumberSupplement\": \"<string>\",\n            \"milestone\": \"<string>\",\n            \"direction\": \"<string>\",\n            \"namePrefix\": \"<string>\",\n            \"additionalNamePrefix\": \"<string>\",\n            \"nameSuffix\": \"<string>\",\n            \"additionalNameSuffix\": \"<string>\"\n          },\n          \"companyPostalCode\": \"<string>\",\n          \"industrialZone\": \"<string>\",\n          \"building\": \"<string>\",\n          \"floor\": \"<string>\",\n          \"door\": \"<string>\"\n        },\n        \"states\": [\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"INACTIVE\"\n            },\n            \"validFrom\": \"<dateTime>\",\n            \"validTo\": \"<dateTime>\"\n          },\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"ACTIVE\"\n            },\n            \"validFrom\": \"<dateTime>\",\n            \"validTo\": \"<dateTime>\"\n          }\n        ],\n        \"updatedAt\": \"<dateTime>\",\n        \"name\": \"<string>\",\n        \"alternativePostalAddress\": {\n          \"city\": \"<string>\",\n          \"country\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"RW\"\n          },\n          \"deliveryServiceNumber\": \"<string>\",\n          \"deliveryServiceType\": \"PO_BOX\",\n          \"geographicCoordinates\": {\n            \"latitude\": \"<float>\",\n            \"longitude\": \"<float>\",\n            \"altitude\": \"<float>\"\n          },\n          \"administrativeAreaLevel1\": {\n            \"countryCode\": \"QA\",\n            \"regionCode\": \"<string>\",\n            \"regionName\": \"<string>\"\n          },\n          \"postalCode\": \"<string>\",\n          \"deliveryServiceQualifier\": \"<string>\"\n        },\n        \"bpnLegalEntity\": \"<string>\",\n        \"bpnSite\": \"<string>\",\n        \"addressType\": \"LegalAddress\"\n      },\n      \"legalName\": \"<string>\",\n      \"relations\": [\n        {\n          \"endBpnl\": \"<string>\",\n          \"startBpnl\": \"<string>\",\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"CX_LEGAL_PREDECESSOR_OF\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        },\n        {\n          \"endBpnl\": \"<string>\",\n          \"startBpnl\": \"<string>\",\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"CX_LEGAL_PREDECESSOR_OF\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        }\n      ],\n      \"states\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"ACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"INACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        }\n      ],\n      \"updatedAt\": \"<dateTime>\",\n      \"legalShortName\": \"<string>\",\n      \"legalForm\": {\n        \"name\": \"<string>\",\n        \"technicalKey\": \"<string>\",\n        \"abbreviation\": \"<string>\"\n      }\n    },\n    {\n      \"bpnl\": \"<string>\",\n      \"confidenceCriteria\": {\n        \"checkedByExternalDataSource\": \"<boolean>\",\n        \"confidenceLevel\": \"<integer>\",\n        \"lastConfidenceCheckAt\": \"<dateTime>\",\n        \"nextConfidenceCheckAt\": \"<dateTime>\",\n        \"numberOfSharingMembers\": \"<integer>\",\n        \"sharedByOwner\": \"<boolean>\"\n      },\n      \"createdAt\": \"<dateTime>\",\n      \"currentness\": \"<dateTime>\",\n      \"identifiers\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"<string>\"\n          },\n          \"value\": \"<string>\",\n          \"issuingBody\": \"<string>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"<string>\"\n          },\n          \"value\": \"<string>\",\n          \"issuingBody\": \"<string>\"\n        }\n      ],\n      \"isCatenaXMemberData\": \"<boolean>\",\n      \"legalAddress\": {\n        \"bpna\": \"<string>\",\n        \"confidenceCriteria\": {\n          \"checkedByExternalDataSource\": \"<boolean>\",\n          \"confidenceLevel\": \"<integer>\",\n          \"lastConfidenceCheckAt\": \"<dateTime>\",\n          \"nextConfidenceCheckAt\": \"<dateTime>\",\n          \"numberOfSharingMembers\": \"<integer>\",\n          \"sharedByOwner\": \"<boolean>\"\n        },\n        \"createdAt\": \"<dateTime>\",\n        \"identifiers\": [\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"<string>\"\n            },\n            \"value\": \"<string>\"\n          },\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"<string>\"\n            },\n            \"value\": \"<string>\"\n          }\n        ],\n        \"isCatenaXMemberData\": \"<boolean>\",\n        \"physicalPostalAddress\": {\n          \"city\": \"<string>\",\n          \"country\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"UM\"\n          },\n          \"geographicCoordinates\": {\n            \"latitude\": \"<float>\",\n            \"longitude\": \"<float>\",\n            \"altitude\": \"<float>\"\n          },\n          \"administrativeAreaLevel1\": {\n            \"countryCode\": \"JE\",\n            \"regionCode\": \"<string>\",\n            \"regionName\": \"<string>\"\n          },\n          \"administrativeAreaLevel2\": \"<string>\",\n          \"administrativeAreaLevel3\": \"<string>\",\n          \"postalCode\": \"<string>\",\n          \"district\": \"<string>\",\n          \"street\": {\n            \"name\": \"<string>\",\n            \"houseNumber\": \"<string>\",\n            \"houseNumberSupplement\": \"<string>\",\n            \"milestone\": \"<string>\",\n            \"direction\": \"<string>\",\n            \"namePrefix\": \"<string>\",\n            \"additionalNamePrefix\": \"<string>\",\n            \"nameSuffix\": \"<string>\",\n            \"additionalNameSuffix\": \"<string>\"\n          },\n          \"companyPostalCode\": \"<string>\",\n          \"industrialZone\": \"<string>\",\n          \"building\": \"<string>\",\n          \"floor\": \"<string>\",\n          \"door\": \"<string>\"\n        },\n        \"states\": [\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"ACTIVE\"\n            },\n            \"validFrom\": \"<dateTime>\",\n            \"validTo\": \"<dateTime>\"\n          },\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"ACTIVE\"\n            },\n            \"validFrom\": \"<dateTime>\",\n            \"validTo\": \"<dateTime>\"\n          }\n        ],\n        \"updatedAt\": \"<dateTime>\",\n        \"name\": \"<string>\",\n        \"alternativePostalAddress\": {\n          \"city\": \"<string>\",\n          \"country\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"GP\"\n          },\n          \"deliveryServiceNumber\": \"<string>\",\n          \"deliveryServiceType\": \"PO_BOX\",\n          \"geographicCoordinates\": {\n            \"latitude\": \"<float>\",\n            \"longitude\": \"<float>\",\n            \"altitude\": \"<float>\"\n          },\n          \"administrativeAreaLevel1\": {\n            \"countryCode\": \"PT\",\n            \"regionCode\": \"<string>\",\n            \"regionName\": \"<string>\"\n          },\n          \"postalCode\": \"<string>\",\n          \"deliveryServiceQualifier\": \"<string>\"\n        },\n        \"bpnLegalEntity\": \"<string>\",\n        \"bpnSite\": \"<string>\",\n        \"addressType\": \"LegalAndSiteMainAddress\"\n      },\n      \"legalName\": \"<string>\",\n      \"relations\": [\n        {\n          \"endBpnl\": \"<string>\",\n          \"startBpnl\": \"<string>\",\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"CX_LEGAL_SUCCESSOR_OF\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        },\n        {\n          \"endBpnl\": \"<string>\",\n          \"startBpnl\": \"<string>\",\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"CX_LEGAL_PREDECESSOR_OF\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        }\n      ],\n      \"states\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"INACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"ACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        }\n      ],\n      \"updatedAt\": \"<dateTime>\",\n      \"legalShortName\": \"<string>\",\n      \"legalForm\": {\n        \"name\": \"<string>\",\n        \"technicalKey\": \"<string>\",\n        \"abbreviation\": \"<string>\"\n      }\n    }\n  ],\n  \"contentSize\": \"<integer>\",\n  \"page\": \"<integer>\",\n  \"totalElements\": \"<long>\",\n  \"totalPages\": \"<integer>\"\n}"
+						},
+						{
+							"name": "BPN Filter",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"bpnLs\": [\n        \"BPNL000000000065\",\n        \"BPNL00000000015G\"\n    ]\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/members/legal-entities/search?page=0&size=10",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"members",
+										"legal-entities",
+										"search"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0",
+											"description": "Number of page to get results from"
+										},
+										{
+											"key": "size",
+											"value": "10",
+											"description": "Size of each page"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"content\": [\n    {\n      \"bpnl\": \"<string>\",\n      \"confidenceCriteria\": {\n        \"checkedByExternalDataSource\": \"<boolean>\",\n        \"confidenceLevel\": \"<integer>\",\n        \"lastConfidenceCheckAt\": \"<dateTime>\",\n        \"nextConfidenceCheckAt\": \"<dateTime>\",\n        \"numberOfSharingMembers\": \"<integer>\",\n        \"sharedByOwner\": \"<boolean>\"\n      },\n      \"createdAt\": \"<dateTime>\",\n      \"currentness\": \"<dateTime>\",\n      \"identifiers\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"<string>\"\n          },\n          \"value\": \"<string>\",\n          \"issuingBody\": \"<string>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"<string>\"\n          },\n          \"value\": \"<string>\",\n          \"issuingBody\": \"<string>\"\n        }\n      ],\n      \"isCatenaXMemberData\": \"<boolean>\",\n      \"legalAddress\": {\n        \"bpna\": \"<string>\",\n        \"confidenceCriteria\": {\n          \"checkedByExternalDataSource\": \"<boolean>\",\n          \"confidenceLevel\": \"<integer>\",\n          \"lastConfidenceCheckAt\": \"<dateTime>\",\n          \"nextConfidenceCheckAt\": \"<dateTime>\",\n          \"numberOfSharingMembers\": \"<integer>\",\n          \"sharedByOwner\": \"<boolean>\"\n        },\n        \"createdAt\": \"<dateTime>\",\n        \"identifiers\": [\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"<string>\"\n            },\n            \"value\": \"<string>\"\n          },\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"<string>\"\n            },\n            \"value\": \"<string>\"\n          }\n        ],\n        \"isCatenaXMemberData\": \"<boolean>\",\n        \"physicalPostalAddress\": {\n          \"city\": \"<string>\",\n          \"country\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"AT\"\n          },\n          \"geographicCoordinates\": {\n            \"latitude\": \"<float>\",\n            \"longitude\": \"<float>\",\n            \"altitude\": \"<float>\"\n          },\n          \"administrativeAreaLevel1\": {\n            \"countryCode\": \"KH\",\n            \"regionCode\": \"<string>\",\n            \"regionName\": \"<string>\"\n          },\n          \"administrativeAreaLevel2\": \"<string>\",\n          \"administrativeAreaLevel3\": \"<string>\",\n          \"postalCode\": \"<string>\",\n          \"district\": \"<string>\",\n          \"street\": {\n            \"name\": \"<string>\",\n            \"houseNumber\": \"<string>\",\n            \"houseNumberSupplement\": \"<string>\",\n            \"milestone\": \"<string>\",\n            \"direction\": \"<string>\",\n            \"namePrefix\": \"<string>\",\n            \"additionalNamePrefix\": \"<string>\",\n            \"nameSuffix\": \"<string>\",\n            \"additionalNameSuffix\": \"<string>\"\n          },\n          \"companyPostalCode\": \"<string>\",\n          \"industrialZone\": \"<string>\",\n          \"building\": \"<string>\",\n          \"floor\": \"<string>\",\n          \"door\": \"<string>\"\n        },\n        \"states\": [\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"INACTIVE\"\n            },\n            \"validFrom\": \"<dateTime>\",\n            \"validTo\": \"<dateTime>\"\n          },\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"ACTIVE\"\n            },\n            \"validFrom\": \"<dateTime>\",\n            \"validTo\": \"<dateTime>\"\n          }\n        ],\n        \"updatedAt\": \"<dateTime>\",\n        \"name\": \"<string>\",\n        \"alternativePostalAddress\": {\n          \"city\": \"<string>\",\n          \"country\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"RW\"\n          },\n          \"deliveryServiceNumber\": \"<string>\",\n          \"deliveryServiceType\": \"PO_BOX\",\n          \"geographicCoordinates\": {\n            \"latitude\": \"<float>\",\n            \"longitude\": \"<float>\",\n            \"altitude\": \"<float>\"\n          },\n          \"administrativeAreaLevel1\": {\n            \"countryCode\": \"QA\",\n            \"regionCode\": \"<string>\",\n            \"regionName\": \"<string>\"\n          },\n          \"postalCode\": \"<string>\",\n          \"deliveryServiceQualifier\": \"<string>\"\n        },\n        \"bpnLegalEntity\": \"<string>\",\n        \"bpnSite\": \"<string>\",\n        \"addressType\": \"LegalAddress\"\n      },\n      \"legalName\": \"<string>\",\n      \"relations\": [\n        {\n          \"endBpnl\": \"<string>\",\n          \"startBpnl\": \"<string>\",\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"CX_LEGAL_PREDECESSOR_OF\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        },\n        {\n          \"endBpnl\": \"<string>\",\n          \"startBpnl\": \"<string>\",\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"CX_LEGAL_PREDECESSOR_OF\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        }\n      ],\n      \"states\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"ACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"INACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        }\n      ],\n      \"updatedAt\": \"<dateTime>\",\n      \"legalShortName\": \"<string>\",\n      \"legalForm\": {\n        \"name\": \"<string>\",\n        \"technicalKey\": \"<string>\",\n        \"abbreviation\": \"<string>\"\n      }\n    },\n    {\n      \"bpnl\": \"<string>\",\n      \"confidenceCriteria\": {\n        \"checkedByExternalDataSource\": \"<boolean>\",\n        \"confidenceLevel\": \"<integer>\",\n        \"lastConfidenceCheckAt\": \"<dateTime>\",\n        \"nextConfidenceCheckAt\": \"<dateTime>\",\n        \"numberOfSharingMembers\": \"<integer>\",\n        \"sharedByOwner\": \"<boolean>\"\n      },\n      \"createdAt\": \"<dateTime>\",\n      \"currentness\": \"<dateTime>\",\n      \"identifiers\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"<string>\"\n          },\n          \"value\": \"<string>\",\n          \"issuingBody\": \"<string>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"<string>\"\n          },\n          \"value\": \"<string>\",\n          \"issuingBody\": \"<string>\"\n        }\n      ],\n      \"isCatenaXMemberData\": \"<boolean>\",\n      \"legalAddress\": {\n        \"bpna\": \"<string>\",\n        \"confidenceCriteria\": {\n          \"checkedByExternalDataSource\": \"<boolean>\",\n          \"confidenceLevel\": \"<integer>\",\n          \"lastConfidenceCheckAt\": \"<dateTime>\",\n          \"nextConfidenceCheckAt\": \"<dateTime>\",\n          \"numberOfSharingMembers\": \"<integer>\",\n          \"sharedByOwner\": \"<boolean>\"\n        },\n        \"createdAt\": \"<dateTime>\",\n        \"identifiers\": [\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"<string>\"\n            },\n            \"value\": \"<string>\"\n          },\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"<string>\"\n            },\n            \"value\": \"<string>\"\n          }\n        ],\n        \"isCatenaXMemberData\": \"<boolean>\",\n        \"physicalPostalAddress\": {\n          \"city\": \"<string>\",\n          \"country\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"UM\"\n          },\n          \"geographicCoordinates\": {\n            \"latitude\": \"<float>\",\n            \"longitude\": \"<float>\",\n            \"altitude\": \"<float>\"\n          },\n          \"administrativeAreaLevel1\": {\n            \"countryCode\": \"JE\",\n            \"regionCode\": \"<string>\",\n            \"regionName\": \"<string>\"\n          },\n          \"administrativeAreaLevel2\": \"<string>\",\n          \"administrativeAreaLevel3\": \"<string>\",\n          \"postalCode\": \"<string>\",\n          \"district\": \"<string>\",\n          \"street\": {\n            \"name\": \"<string>\",\n            \"houseNumber\": \"<string>\",\n            \"houseNumberSupplement\": \"<string>\",\n            \"milestone\": \"<string>\",\n            \"direction\": \"<string>\",\n            \"namePrefix\": \"<string>\",\n            \"additionalNamePrefix\": \"<string>\",\n            \"nameSuffix\": \"<string>\",\n            \"additionalNameSuffix\": \"<string>\"\n          },\n          \"companyPostalCode\": \"<string>\",\n          \"industrialZone\": \"<string>\",\n          \"building\": \"<string>\",\n          \"floor\": \"<string>\",\n          \"door\": \"<string>\"\n        },\n        \"states\": [\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"ACTIVE\"\n            },\n            \"validFrom\": \"<dateTime>\",\n            \"validTo\": \"<dateTime>\"\n          },\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"ACTIVE\"\n            },\n            \"validFrom\": \"<dateTime>\",\n            \"validTo\": \"<dateTime>\"\n          }\n        ],\n        \"updatedAt\": \"<dateTime>\",\n        \"name\": \"<string>\",\n        \"alternativePostalAddress\": {\n          \"city\": \"<string>\",\n          \"country\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"GP\"\n          },\n          \"deliveryServiceNumber\": \"<string>\",\n          \"deliveryServiceType\": \"PO_BOX\",\n          \"geographicCoordinates\": {\n            \"latitude\": \"<float>\",\n            \"longitude\": \"<float>\",\n            \"altitude\": \"<float>\"\n          },\n          \"administrativeAreaLevel1\": {\n            \"countryCode\": \"PT\",\n            \"regionCode\": \"<string>\",\n            \"regionName\": \"<string>\"\n          },\n          \"postalCode\": \"<string>\",\n          \"deliveryServiceQualifier\": \"<string>\"\n        },\n        \"bpnLegalEntity\": \"<string>\",\n        \"bpnSite\": \"<string>\",\n        \"addressType\": \"LegalAndSiteMainAddress\"\n      },\n      \"legalName\": \"<string>\",\n      \"relations\": [\n        {\n          \"endBpnl\": \"<string>\",\n          \"startBpnl\": \"<string>\",\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"CX_LEGAL_SUCCESSOR_OF\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        },\n        {\n          \"endBpnl\": \"<string>\",\n          \"startBpnl\": \"<string>\",\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"CX_LEGAL_PREDECESSOR_OF\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        }\n      ],\n      \"states\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"INACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"ACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        }\n      ],\n      \"updatedAt\": \"<dateTime>\",\n      \"legalShortName\": \"<string>\",\n      \"legalForm\": {\n        \"name\": \"<string>\",\n        \"technicalKey\": \"<string>\",\n        \"abbreviation\": \"<string>\"\n      }\n    }\n  ],\n  \"contentSize\": \"<integer>\",\n  \"page\": \"<integer>\",\n  \"totalElements\": \"<long>\",\n  \"totalPages\": \"<integer>\"\n}"
+						},
+						{
+							"name": "Legal Name Search",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"legalName\": \"testmanage\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/members/legal-entities/search?page=0&size=10",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"members",
+										"legal-entities",
+										"search"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0",
+											"description": "Number of page to get results from"
+										},
+										{
+											"key": "size",
+											"value": "10",
+											"description": "Size of each page"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"content\": [\n    {\n      \"bpnl\": \"<string>\",\n      \"confidenceCriteria\": {\n        \"checkedByExternalDataSource\": \"<boolean>\",\n        \"confidenceLevel\": \"<integer>\",\n        \"lastConfidenceCheckAt\": \"<dateTime>\",\n        \"nextConfidenceCheckAt\": \"<dateTime>\",\n        \"numberOfSharingMembers\": \"<integer>\",\n        \"sharedByOwner\": \"<boolean>\"\n      },\n      \"createdAt\": \"<dateTime>\",\n      \"currentness\": \"<dateTime>\",\n      \"identifiers\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"<string>\"\n          },\n          \"value\": \"<string>\",\n          \"issuingBody\": \"<string>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"<string>\"\n          },\n          \"value\": \"<string>\",\n          \"issuingBody\": \"<string>\"\n        }\n      ],\n      \"isCatenaXMemberData\": \"<boolean>\",\n      \"legalAddress\": {\n        \"bpna\": \"<string>\",\n        \"confidenceCriteria\": {\n          \"checkedByExternalDataSource\": \"<boolean>\",\n          \"confidenceLevel\": \"<integer>\",\n          \"lastConfidenceCheckAt\": \"<dateTime>\",\n          \"nextConfidenceCheckAt\": \"<dateTime>\",\n          \"numberOfSharingMembers\": \"<integer>\",\n          \"sharedByOwner\": \"<boolean>\"\n        },\n        \"createdAt\": \"<dateTime>\",\n        \"identifiers\": [\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"<string>\"\n            },\n            \"value\": \"<string>\"\n          },\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"<string>\"\n            },\n            \"value\": \"<string>\"\n          }\n        ],\n        \"isCatenaXMemberData\": \"<boolean>\",\n        \"physicalPostalAddress\": {\n          \"city\": \"<string>\",\n          \"country\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"AT\"\n          },\n          \"geographicCoordinates\": {\n            \"latitude\": \"<float>\",\n            \"longitude\": \"<float>\",\n            \"altitude\": \"<float>\"\n          },\n          \"administrativeAreaLevel1\": {\n            \"countryCode\": \"KH\",\n            \"regionCode\": \"<string>\",\n            \"regionName\": \"<string>\"\n          },\n          \"administrativeAreaLevel2\": \"<string>\",\n          \"administrativeAreaLevel3\": \"<string>\",\n          \"postalCode\": \"<string>\",\n          \"district\": \"<string>\",\n          \"street\": {\n            \"name\": \"<string>\",\n            \"houseNumber\": \"<string>\",\n            \"houseNumberSupplement\": \"<string>\",\n            \"milestone\": \"<string>\",\n            \"direction\": \"<string>\",\n            \"namePrefix\": \"<string>\",\n            \"additionalNamePrefix\": \"<string>\",\n            \"nameSuffix\": \"<string>\",\n            \"additionalNameSuffix\": \"<string>\"\n          },\n          \"companyPostalCode\": \"<string>\",\n          \"industrialZone\": \"<string>\",\n          \"building\": \"<string>\",\n          \"floor\": \"<string>\",\n          \"door\": \"<string>\"\n        },\n        \"states\": [\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"INACTIVE\"\n            },\n            \"validFrom\": \"<dateTime>\",\n            \"validTo\": \"<dateTime>\"\n          },\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"ACTIVE\"\n            },\n            \"validFrom\": \"<dateTime>\",\n            \"validTo\": \"<dateTime>\"\n          }\n        ],\n        \"updatedAt\": \"<dateTime>\",\n        \"name\": \"<string>\",\n        \"alternativePostalAddress\": {\n          \"city\": \"<string>\",\n          \"country\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"RW\"\n          },\n          \"deliveryServiceNumber\": \"<string>\",\n          \"deliveryServiceType\": \"PO_BOX\",\n          \"geographicCoordinates\": {\n            \"latitude\": \"<float>\",\n            \"longitude\": \"<float>\",\n            \"altitude\": \"<float>\"\n          },\n          \"administrativeAreaLevel1\": {\n            \"countryCode\": \"QA\",\n            \"regionCode\": \"<string>\",\n            \"regionName\": \"<string>\"\n          },\n          \"postalCode\": \"<string>\",\n          \"deliveryServiceQualifier\": \"<string>\"\n        },\n        \"bpnLegalEntity\": \"<string>\",\n        \"bpnSite\": \"<string>\",\n        \"addressType\": \"LegalAddress\"\n      },\n      \"legalName\": \"<string>\",\n      \"relations\": [\n        {\n          \"endBpnl\": \"<string>\",\n          \"startBpnl\": \"<string>\",\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"CX_LEGAL_PREDECESSOR_OF\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        },\n        {\n          \"endBpnl\": \"<string>\",\n          \"startBpnl\": \"<string>\",\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"CX_LEGAL_PREDECESSOR_OF\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        }\n      ],\n      \"states\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"ACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"INACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        }\n      ],\n      \"updatedAt\": \"<dateTime>\",\n      \"legalShortName\": \"<string>\",\n      \"legalForm\": {\n        \"name\": \"<string>\",\n        \"technicalKey\": \"<string>\",\n        \"abbreviation\": \"<string>\"\n      }\n    },\n    {\n      \"bpnl\": \"<string>\",\n      \"confidenceCriteria\": {\n        \"checkedByExternalDataSource\": \"<boolean>\",\n        \"confidenceLevel\": \"<integer>\",\n        \"lastConfidenceCheckAt\": \"<dateTime>\",\n        \"nextConfidenceCheckAt\": \"<dateTime>\",\n        \"numberOfSharingMembers\": \"<integer>\",\n        \"sharedByOwner\": \"<boolean>\"\n      },\n      \"createdAt\": \"<dateTime>\",\n      \"currentness\": \"<dateTime>\",\n      \"identifiers\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"<string>\"\n          },\n          \"value\": \"<string>\",\n          \"issuingBody\": \"<string>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"<string>\"\n          },\n          \"value\": \"<string>\",\n          \"issuingBody\": \"<string>\"\n        }\n      ],\n      \"isCatenaXMemberData\": \"<boolean>\",\n      \"legalAddress\": {\n        \"bpna\": \"<string>\",\n        \"confidenceCriteria\": {\n          \"checkedByExternalDataSource\": \"<boolean>\",\n          \"confidenceLevel\": \"<integer>\",\n          \"lastConfidenceCheckAt\": \"<dateTime>\",\n          \"nextConfidenceCheckAt\": \"<dateTime>\",\n          \"numberOfSharingMembers\": \"<integer>\",\n          \"sharedByOwner\": \"<boolean>\"\n        },\n        \"createdAt\": \"<dateTime>\",\n        \"identifiers\": [\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"<string>\"\n            },\n            \"value\": \"<string>\"\n          },\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"<string>\"\n            },\n            \"value\": \"<string>\"\n          }\n        ],\n        \"isCatenaXMemberData\": \"<boolean>\",\n        \"physicalPostalAddress\": {\n          \"city\": \"<string>\",\n          \"country\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"UM\"\n          },\n          \"geographicCoordinates\": {\n            \"latitude\": \"<float>\",\n            \"longitude\": \"<float>\",\n            \"altitude\": \"<float>\"\n          },\n          \"administrativeAreaLevel1\": {\n            \"countryCode\": \"JE\",\n            \"regionCode\": \"<string>\",\n            \"regionName\": \"<string>\"\n          },\n          \"administrativeAreaLevel2\": \"<string>\",\n          \"administrativeAreaLevel3\": \"<string>\",\n          \"postalCode\": \"<string>\",\n          \"district\": \"<string>\",\n          \"street\": {\n            \"name\": \"<string>\",\n            \"houseNumber\": \"<string>\",\n            \"houseNumberSupplement\": \"<string>\",\n            \"milestone\": \"<string>\",\n            \"direction\": \"<string>\",\n            \"namePrefix\": \"<string>\",\n            \"additionalNamePrefix\": \"<string>\",\n            \"nameSuffix\": \"<string>\",\n            \"additionalNameSuffix\": \"<string>\"\n          },\n          \"companyPostalCode\": \"<string>\",\n          \"industrialZone\": \"<string>\",\n          \"building\": \"<string>\",\n          \"floor\": \"<string>\",\n          \"door\": \"<string>\"\n        },\n        \"states\": [\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"ACTIVE\"\n            },\n            \"validFrom\": \"<dateTime>\",\n            \"validTo\": \"<dateTime>\"\n          },\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"ACTIVE\"\n            },\n            \"validFrom\": \"<dateTime>\",\n            \"validTo\": \"<dateTime>\"\n          }\n        ],\n        \"updatedAt\": \"<dateTime>\",\n        \"name\": \"<string>\",\n        \"alternativePostalAddress\": {\n          \"city\": \"<string>\",\n          \"country\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"GP\"\n          },\n          \"deliveryServiceNumber\": \"<string>\",\n          \"deliveryServiceType\": \"PO_BOX\",\n          \"geographicCoordinates\": {\n            \"latitude\": \"<float>\",\n            \"longitude\": \"<float>\",\n            \"altitude\": \"<float>\"\n          },\n          \"administrativeAreaLevel1\": {\n            \"countryCode\": \"PT\",\n            \"regionCode\": \"<string>\",\n            \"regionName\": \"<string>\"\n          },\n          \"postalCode\": \"<string>\",\n          \"deliveryServiceQualifier\": \"<string>\"\n        },\n        \"bpnLegalEntity\": \"<string>\",\n        \"bpnSite\": \"<string>\",\n        \"addressType\": \"LegalAndSiteMainAddress\"\n      },\n      \"legalName\": \"<string>\",\n      \"relations\": [\n        {\n          \"endBpnl\": \"<string>\",\n          \"startBpnl\": \"<string>\",\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"CX_LEGAL_SUCCESSOR_OF\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        },\n        {\n          \"endBpnl\": \"<string>\",\n          \"startBpnl\": \"<string>\",\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"CX_LEGAL_PREDECESSOR_OF\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        }\n      ],\n      \"states\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"INACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"ACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        }\n      ],\n      \"updatedAt\": \"<dateTime>\",\n      \"legalShortName\": \"<string>\",\n      \"legalForm\": {\n        \"name\": \"<string>\",\n        \"technicalKey\": \"<string>\",\n        \"abbreviation\": \"<string>\"\n      }\n    }\n  ],\n  \"contentSize\": \"<integer>\",\n  \"page\": \"<integer>\",\n  \"totalElements\": \"<long>\",\n  \"totalPages\": \"<integer>\"\n}"
+						},
+						{
+							"name": "All Filters",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"bpnLs\": [\n        \"BPNL000000000065\",\n        \"BPNL00000000015G\"\n    ],\n    \"legalName\": \"testmanage\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/members/legal-entities/search?page=0&size=10",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"members",
+										"legal-entities",
+										"search"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0",
+											"description": "Number of page to get results from"
+										},
+										{
+											"key": "size",
+											"value": "10",
+											"description": "Size of each page"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"content\": [\n    {\n      \"bpnl\": \"<string>\",\n      \"confidenceCriteria\": {\n        \"checkedByExternalDataSource\": \"<boolean>\",\n        \"confidenceLevel\": \"<integer>\",\n        \"lastConfidenceCheckAt\": \"<dateTime>\",\n        \"nextConfidenceCheckAt\": \"<dateTime>\",\n        \"numberOfSharingMembers\": \"<integer>\",\n        \"sharedByOwner\": \"<boolean>\"\n      },\n      \"createdAt\": \"<dateTime>\",\n      \"currentness\": \"<dateTime>\",\n      \"identifiers\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"<string>\"\n          },\n          \"value\": \"<string>\",\n          \"issuingBody\": \"<string>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"<string>\"\n          },\n          \"value\": \"<string>\",\n          \"issuingBody\": \"<string>\"\n        }\n      ],\n      \"isCatenaXMemberData\": \"<boolean>\",\n      \"legalAddress\": {\n        \"bpna\": \"<string>\",\n        \"confidenceCriteria\": {\n          \"checkedByExternalDataSource\": \"<boolean>\",\n          \"confidenceLevel\": \"<integer>\",\n          \"lastConfidenceCheckAt\": \"<dateTime>\",\n          \"nextConfidenceCheckAt\": \"<dateTime>\",\n          \"numberOfSharingMembers\": \"<integer>\",\n          \"sharedByOwner\": \"<boolean>\"\n        },\n        \"createdAt\": \"<dateTime>\",\n        \"identifiers\": [\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"<string>\"\n            },\n            \"value\": \"<string>\"\n          },\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"<string>\"\n            },\n            \"value\": \"<string>\"\n          }\n        ],\n        \"isCatenaXMemberData\": \"<boolean>\",\n        \"physicalPostalAddress\": {\n          \"city\": \"<string>\",\n          \"country\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"AT\"\n          },\n          \"geographicCoordinates\": {\n            \"latitude\": \"<float>\",\n            \"longitude\": \"<float>\",\n            \"altitude\": \"<float>\"\n          },\n          \"administrativeAreaLevel1\": {\n            \"countryCode\": \"KH\",\n            \"regionCode\": \"<string>\",\n            \"regionName\": \"<string>\"\n          },\n          \"administrativeAreaLevel2\": \"<string>\",\n          \"administrativeAreaLevel3\": \"<string>\",\n          \"postalCode\": \"<string>\",\n          \"district\": \"<string>\",\n          \"street\": {\n            \"name\": \"<string>\",\n            \"houseNumber\": \"<string>\",\n            \"houseNumberSupplement\": \"<string>\",\n            \"milestone\": \"<string>\",\n            \"direction\": \"<string>\",\n            \"namePrefix\": \"<string>\",\n            \"additionalNamePrefix\": \"<string>\",\n            \"nameSuffix\": \"<string>\",\n            \"additionalNameSuffix\": \"<string>\"\n          },\n          \"companyPostalCode\": \"<string>\",\n          \"industrialZone\": \"<string>\",\n          \"building\": \"<string>\",\n          \"floor\": \"<string>\",\n          \"door\": \"<string>\"\n        },\n        \"states\": [\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"INACTIVE\"\n            },\n            \"validFrom\": \"<dateTime>\",\n            \"validTo\": \"<dateTime>\"\n          },\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"ACTIVE\"\n            },\n            \"validFrom\": \"<dateTime>\",\n            \"validTo\": \"<dateTime>\"\n          }\n        ],\n        \"updatedAt\": \"<dateTime>\",\n        \"name\": \"<string>\",\n        \"alternativePostalAddress\": {\n          \"city\": \"<string>\",\n          \"country\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"RW\"\n          },\n          \"deliveryServiceNumber\": \"<string>\",\n          \"deliveryServiceType\": \"PO_BOX\",\n          \"geographicCoordinates\": {\n            \"latitude\": \"<float>\",\n            \"longitude\": \"<float>\",\n            \"altitude\": \"<float>\"\n          },\n          \"administrativeAreaLevel1\": {\n            \"countryCode\": \"QA\",\n            \"regionCode\": \"<string>\",\n            \"regionName\": \"<string>\"\n          },\n          \"postalCode\": \"<string>\",\n          \"deliveryServiceQualifier\": \"<string>\"\n        },\n        \"bpnLegalEntity\": \"<string>\",\n        \"bpnSite\": \"<string>\",\n        \"addressType\": \"LegalAddress\"\n      },\n      \"legalName\": \"<string>\",\n      \"relations\": [\n        {\n          \"endBpnl\": \"<string>\",\n          \"startBpnl\": \"<string>\",\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"CX_LEGAL_PREDECESSOR_OF\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        },\n        {\n          \"endBpnl\": \"<string>\",\n          \"startBpnl\": \"<string>\",\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"CX_LEGAL_PREDECESSOR_OF\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        }\n      ],\n      \"states\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"ACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"INACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        }\n      ],\n      \"updatedAt\": \"<dateTime>\",\n      \"legalShortName\": \"<string>\",\n      \"legalForm\": {\n        \"name\": \"<string>\",\n        \"technicalKey\": \"<string>\",\n        \"abbreviation\": \"<string>\"\n      }\n    },\n    {\n      \"bpnl\": \"<string>\",\n      \"confidenceCriteria\": {\n        \"checkedByExternalDataSource\": \"<boolean>\",\n        \"confidenceLevel\": \"<integer>\",\n        \"lastConfidenceCheckAt\": \"<dateTime>\",\n        \"nextConfidenceCheckAt\": \"<dateTime>\",\n        \"numberOfSharingMembers\": \"<integer>\",\n        \"sharedByOwner\": \"<boolean>\"\n      },\n      \"createdAt\": \"<dateTime>\",\n      \"currentness\": \"<dateTime>\",\n      \"identifiers\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"<string>\"\n          },\n          \"value\": \"<string>\",\n          \"issuingBody\": \"<string>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"<string>\"\n          },\n          \"value\": \"<string>\",\n          \"issuingBody\": \"<string>\"\n        }\n      ],\n      \"isCatenaXMemberData\": \"<boolean>\",\n      \"legalAddress\": {\n        \"bpna\": \"<string>\",\n        \"confidenceCriteria\": {\n          \"checkedByExternalDataSource\": \"<boolean>\",\n          \"confidenceLevel\": \"<integer>\",\n          \"lastConfidenceCheckAt\": \"<dateTime>\",\n          \"nextConfidenceCheckAt\": \"<dateTime>\",\n          \"numberOfSharingMembers\": \"<integer>\",\n          \"sharedByOwner\": \"<boolean>\"\n        },\n        \"createdAt\": \"<dateTime>\",\n        \"identifiers\": [\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"<string>\"\n            },\n            \"value\": \"<string>\"\n          },\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"<string>\"\n            },\n            \"value\": \"<string>\"\n          }\n        ],\n        \"isCatenaXMemberData\": \"<boolean>\",\n        \"physicalPostalAddress\": {\n          \"city\": \"<string>\",\n          \"country\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"UM\"\n          },\n          \"geographicCoordinates\": {\n            \"latitude\": \"<float>\",\n            \"longitude\": \"<float>\",\n            \"altitude\": \"<float>\"\n          },\n          \"administrativeAreaLevel1\": {\n            \"countryCode\": \"JE\",\n            \"regionCode\": \"<string>\",\n            \"regionName\": \"<string>\"\n          },\n          \"administrativeAreaLevel2\": \"<string>\",\n          \"administrativeAreaLevel3\": \"<string>\",\n          \"postalCode\": \"<string>\",\n          \"district\": \"<string>\",\n          \"street\": {\n            \"name\": \"<string>\",\n            \"houseNumber\": \"<string>\",\n            \"houseNumberSupplement\": \"<string>\",\n            \"milestone\": \"<string>\",\n            \"direction\": \"<string>\",\n            \"namePrefix\": \"<string>\",\n            \"additionalNamePrefix\": \"<string>\",\n            \"nameSuffix\": \"<string>\",\n            \"additionalNameSuffix\": \"<string>\"\n          },\n          \"companyPostalCode\": \"<string>\",\n          \"industrialZone\": \"<string>\",\n          \"building\": \"<string>\",\n          \"floor\": \"<string>\",\n          \"door\": \"<string>\"\n        },\n        \"states\": [\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"ACTIVE\"\n            },\n            \"validFrom\": \"<dateTime>\",\n            \"validTo\": \"<dateTime>\"\n          },\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"ACTIVE\"\n            },\n            \"validFrom\": \"<dateTime>\",\n            \"validTo\": \"<dateTime>\"\n          }\n        ],\n        \"updatedAt\": \"<dateTime>\",\n        \"name\": \"<string>\",\n        \"alternativePostalAddress\": {\n          \"city\": \"<string>\",\n          \"country\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"GP\"\n          },\n          \"deliveryServiceNumber\": \"<string>\",\n          \"deliveryServiceType\": \"PO_BOX\",\n          \"geographicCoordinates\": {\n            \"latitude\": \"<float>\",\n            \"longitude\": \"<float>\",\n            \"altitude\": \"<float>\"\n          },\n          \"administrativeAreaLevel1\": {\n            \"countryCode\": \"PT\",\n            \"regionCode\": \"<string>\",\n            \"regionName\": \"<string>\"\n          },\n          \"postalCode\": \"<string>\",\n          \"deliveryServiceQualifier\": \"<string>\"\n        },\n        \"bpnLegalEntity\": \"<string>\",\n        \"bpnSite\": \"<string>\",\n        \"addressType\": \"LegalAndSiteMainAddress\"\n      },\n      \"legalName\": \"<string>\",\n      \"relations\": [\n        {\n          \"endBpnl\": \"<string>\",\n          \"startBpnl\": \"<string>\",\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"CX_LEGAL_SUCCESSOR_OF\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        },\n        {\n          \"endBpnl\": \"<string>\",\n          \"startBpnl\": \"<string>\",\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"CX_LEGAL_PREDECESSOR_OF\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        }\n      ],\n      \"states\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"INACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"ACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        }\n      ],\n      \"updatedAt\": \"<dateTime>\",\n      \"legalShortName\": \"<string>\",\n      \"legalForm\": {\n        \"name\": \"<string>\",\n        \"technicalKey\": \"<string>\",\n        \"abbreviation\": \"<string>\"\n      }\n    }\n  ],\n  \"contentSize\": \"<integer>\",\n  \"page\": \"<integer>\",\n  \"totalElements\": \"<long>\",\n  \"totalPages\": \"<integer>\"\n}"
+						}
+					]
+				},
+				{
+					"name": "/member-owned/sites/search",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"legalEntityBpns\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"siteBpns\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"name\": \"<string>\"\n}",
+							"options": {
+								"raw": {
+									"headerFamily": "json",
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/member-owned/sites/search?page=0&size=10",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"member-owned",
+								"sites",
+								"search"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0",
+									"description": "Number of page to get results from"
+								},
+								{
+									"key": "size",
+									"value": "10",
+									"description": "Size of each page"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "No Filter",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/members/sites/search?page=0&size=10",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"members",
+										"sites",
+										"search"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0",
+											"description": "Number of page to get results from"
+										},
+										{
+											"key": "size",
+											"value": "10",
+											"description": "Size of each page"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"content\": [\n    {\n      \"bpnLegalEntity\": \"<string>\",\n      \"bpns\": \"<string>\",\n      \"confidenceCriteria\": {\n        \"checkedByExternalDataSource\": \"<boolean>\",\n        \"confidenceLevel\": \"<integer>\",\n        \"lastConfidenceCheckAt\": \"<dateTime>\",\n        \"nextConfidenceCheckAt\": \"<dateTime>\",\n        \"numberOfSharingMembers\": \"<integer>\",\n        \"sharedByOwner\": \"<boolean>\"\n      },\n      \"createdAt\": \"<dateTime>\",\n      \"isCatenaXMemberData\": \"<boolean>\",\n      \"mainAddress\": {\n        \"bpna\": \"<string>\",\n        \"confidenceCriteria\": {\n          \"checkedByExternalDataSource\": \"<boolean>\",\n          \"confidenceLevel\": \"<integer>\",\n          \"lastConfidenceCheckAt\": \"<dateTime>\",\n          \"nextConfidenceCheckAt\": \"<dateTime>\",\n          \"numberOfSharingMembers\": \"<integer>\",\n          \"sharedByOwner\": \"<boolean>\"\n        },\n        \"createdAt\": \"<dateTime>\",\n        \"identifiers\": [\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"<string>\"\n            },\n            \"value\": \"<string>\"\n          },\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"<string>\"\n            },\n            \"value\": \"<string>\"\n          }\n        ],\n        \"isCatenaXMemberData\": \"<boolean>\",\n        \"physicalPostalAddress\": {\n          \"city\": \"<string>\",\n          \"country\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"KY\"\n          },\n          \"geographicCoordinates\": {\n            \"latitude\": \"<float>\",\n            \"longitude\": \"<float>\",\n            \"altitude\": \"<float>\"\n          },\n          \"administrativeAreaLevel1\": {\n            \"countryCode\": \"IL\",\n            \"regionCode\": \"<string>\",\n            \"regionName\": \"<string>\"\n          },\n          \"administrativeAreaLevel2\": \"<string>\",\n          \"administrativeAreaLevel3\": \"<string>\",\n          \"postalCode\": \"<string>\",\n          \"district\": \"<string>\",\n          \"street\": {\n            \"name\": \"<string>\",\n            \"houseNumber\": \"<string>\",\n            \"houseNumberSupplement\": \"<string>\",\n            \"milestone\": \"<string>\",\n            \"direction\": \"<string>\",\n            \"namePrefix\": \"<string>\",\n            \"additionalNamePrefix\": \"<string>\",\n            \"nameSuffix\": \"<string>\",\n            \"additionalNameSuffix\": \"<string>\"\n          },\n          \"companyPostalCode\": \"<string>\",\n          \"industrialZone\": \"<string>\",\n          \"building\": \"<string>\",\n          \"floor\": \"<string>\",\n          \"door\": \"<string>\"\n        },\n        \"states\": [\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"INACTIVE\"\n            },\n            \"validFrom\": \"<dateTime>\",\n            \"validTo\": \"<dateTime>\"\n          },\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"INACTIVE\"\n            },\n            \"validFrom\": \"<dateTime>\",\n            \"validTo\": \"<dateTime>\"\n          }\n        ],\n        \"updatedAt\": \"<dateTime>\",\n        \"name\": \"<string>\",\n        \"alternativePostalAddress\": {\n          \"city\": \"<string>\",\n          \"country\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"AI\"\n          },\n          \"deliveryServiceNumber\": \"<string>\",\n          \"deliveryServiceType\": \"PRIVATE_BAG\",\n          \"geographicCoordinates\": {\n            \"latitude\": \"<float>\",\n            \"longitude\": \"<float>\",\n            \"altitude\": \"<float>\"\n          },\n          \"administrativeAreaLevel1\": {\n            \"countryCode\": \"XU\",\n            \"regionCode\": \"<string>\",\n            \"regionName\": \"<string>\"\n          },\n          \"postalCode\": \"<string>\",\n          \"deliveryServiceQualifier\": \"<string>\"\n        },\n        \"bpnLegalEntity\": \"<string>\",\n        \"bpnSite\": \"<string>\",\n        \"addressType\": \"LegalAndSiteMainAddress\"\n      },\n      \"name\": \"<string>\",\n      \"states\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"ACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"INACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        }\n      ],\n      \"updatedAt\": \"<dateTime>\"\n    },\n    {\n      \"bpnLegalEntity\": \"<string>\",\n      \"bpns\": \"<string>\",\n      \"confidenceCriteria\": {\n        \"checkedByExternalDataSource\": \"<boolean>\",\n        \"confidenceLevel\": \"<integer>\",\n        \"lastConfidenceCheckAt\": \"<dateTime>\",\n        \"nextConfidenceCheckAt\": \"<dateTime>\",\n        \"numberOfSharingMembers\": \"<integer>\",\n        \"sharedByOwner\": \"<boolean>\"\n      },\n      \"createdAt\": \"<dateTime>\",\n      \"isCatenaXMemberData\": \"<boolean>\",\n      \"mainAddress\": {\n        \"bpna\": \"<string>\",\n        \"confidenceCriteria\": {\n          \"checkedByExternalDataSource\": \"<boolean>\",\n          \"confidenceLevel\": \"<integer>\",\n          \"lastConfidenceCheckAt\": \"<dateTime>\",\n          \"nextConfidenceCheckAt\": \"<dateTime>\",\n          \"numberOfSharingMembers\": \"<integer>\",\n          \"sharedByOwner\": \"<boolean>\"\n        },\n        \"createdAt\": \"<dateTime>\",\n        \"identifiers\": [\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"<string>\"\n            },\n            \"value\": \"<string>\"\n          },\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"<string>\"\n            },\n            \"value\": \"<string>\"\n          }\n        ],\n        \"isCatenaXMemberData\": \"<boolean>\",\n        \"physicalPostalAddress\": {\n          \"city\": \"<string>\",\n          \"country\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"LB\"\n          },\n          \"geographicCoordinates\": {\n            \"latitude\": \"<float>\",\n            \"longitude\": \"<float>\",\n            \"altitude\": \"<float>\"\n          },\n          \"administrativeAreaLevel1\": {\n            \"countryCode\": \"PH\",\n            \"regionCode\": \"<string>\",\n            \"regionName\": \"<string>\"\n          },\n          \"administrativeAreaLevel2\": \"<string>\",\n          \"administrativeAreaLevel3\": \"<string>\",\n          \"postalCode\": \"<string>\",\n          \"district\": \"<string>\",\n          \"street\": {\n            \"name\": \"<string>\",\n            \"houseNumber\": \"<string>\",\n            \"houseNumberSupplement\": \"<string>\",\n            \"milestone\": \"<string>\",\n            \"direction\": \"<string>\",\n            \"namePrefix\": \"<string>\",\n            \"additionalNamePrefix\": \"<string>\",\n            \"nameSuffix\": \"<string>\",\n            \"additionalNameSuffix\": \"<string>\"\n          },\n          \"companyPostalCode\": \"<string>\",\n          \"industrialZone\": \"<string>\",\n          \"building\": \"<string>\",\n          \"floor\": \"<string>\",\n          \"door\": \"<string>\"\n        },\n        \"states\": [\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"ACTIVE\"\n            },\n            \"validFrom\": \"<dateTime>\",\n            \"validTo\": \"<dateTime>\"\n          },\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"INACTIVE\"\n            },\n            \"validFrom\": \"<dateTime>\",\n            \"validTo\": \"<dateTime>\"\n          }\n        ],\n        \"updatedAt\": \"<dateTime>\",\n        \"name\": \"<string>\",\n        \"alternativePostalAddress\": {\n          \"city\": \"<string>\",\n          \"country\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"PS\"\n          },\n          \"deliveryServiceNumber\": \"<string>\",\n          \"deliveryServiceType\": \"PO_BOX\",\n          \"geographicCoordinates\": {\n            \"latitude\": \"<float>\",\n            \"longitude\": \"<float>\",\n            \"altitude\": \"<float>\"\n          },\n          \"administrativeAreaLevel1\": {\n            \"countryCode\": \"AT\",\n            \"regionCode\": \"<string>\",\n            \"regionName\": \"<string>\"\n          },\n          \"postalCode\": \"<string>\",\n          \"deliveryServiceQualifier\": \"<string>\"\n        },\n        \"bpnLegalEntity\": \"<string>\",\n        \"bpnSite\": \"<string>\",\n        \"addressType\": \"LegalAddress\"\n      },\n      \"name\": \"<string>\",\n      \"states\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"INACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"ACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        }\n      ],\n      \"updatedAt\": \"<dateTime>\"\n    }\n  ],\n  \"contentSize\": \"<integer>\",\n  \"page\": \"<integer>\",\n  \"totalElements\": \"<long>\",\n  \"totalPages\": \"<integer>\"\n}"
+						},
+						{
+							"name": "Legal Entity BPN Filter",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"legalEntityBpns\": [\n        \"BPNL0000000012F2\",\n        \"BPNL00000000052O\"\n    ]\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/members/sites/search?page=0&size=10",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"members",
+										"sites",
+										"search"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0",
+											"description": "Number of page to get results from"
+										},
+										{
+											"key": "size",
+											"value": "10",
+											"description": "Size of each page"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"content\": [\n    {\n      \"bpnLegalEntity\": \"<string>\",\n      \"bpns\": \"<string>\",\n      \"confidenceCriteria\": {\n        \"checkedByExternalDataSource\": \"<boolean>\",\n        \"confidenceLevel\": \"<integer>\",\n        \"lastConfidenceCheckAt\": \"<dateTime>\",\n        \"nextConfidenceCheckAt\": \"<dateTime>\",\n        \"numberOfSharingMembers\": \"<integer>\",\n        \"sharedByOwner\": \"<boolean>\"\n      },\n      \"createdAt\": \"<dateTime>\",\n      \"isCatenaXMemberData\": \"<boolean>\",\n      \"mainAddress\": {\n        \"bpna\": \"<string>\",\n        \"confidenceCriteria\": {\n          \"checkedByExternalDataSource\": \"<boolean>\",\n          \"confidenceLevel\": \"<integer>\",\n          \"lastConfidenceCheckAt\": \"<dateTime>\",\n          \"nextConfidenceCheckAt\": \"<dateTime>\",\n          \"numberOfSharingMembers\": \"<integer>\",\n          \"sharedByOwner\": \"<boolean>\"\n        },\n        \"createdAt\": \"<dateTime>\",\n        \"identifiers\": [\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"<string>\"\n            },\n            \"value\": \"<string>\"\n          },\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"<string>\"\n            },\n            \"value\": \"<string>\"\n          }\n        ],\n        \"isCatenaXMemberData\": \"<boolean>\",\n        \"physicalPostalAddress\": {\n          \"city\": \"<string>\",\n          \"country\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"KY\"\n          },\n          \"geographicCoordinates\": {\n            \"latitude\": \"<float>\",\n            \"longitude\": \"<float>\",\n            \"altitude\": \"<float>\"\n          },\n          \"administrativeAreaLevel1\": {\n            \"countryCode\": \"IL\",\n            \"regionCode\": \"<string>\",\n            \"regionName\": \"<string>\"\n          },\n          \"administrativeAreaLevel2\": \"<string>\",\n          \"administrativeAreaLevel3\": \"<string>\",\n          \"postalCode\": \"<string>\",\n          \"district\": \"<string>\",\n          \"street\": {\n            \"name\": \"<string>\",\n            \"houseNumber\": \"<string>\",\n            \"houseNumberSupplement\": \"<string>\",\n            \"milestone\": \"<string>\",\n            \"direction\": \"<string>\",\n            \"namePrefix\": \"<string>\",\n            \"additionalNamePrefix\": \"<string>\",\n            \"nameSuffix\": \"<string>\",\n            \"additionalNameSuffix\": \"<string>\"\n          },\n          \"companyPostalCode\": \"<string>\",\n          \"industrialZone\": \"<string>\",\n          \"building\": \"<string>\",\n          \"floor\": \"<string>\",\n          \"door\": \"<string>\"\n        },\n        \"states\": [\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"INACTIVE\"\n            },\n            \"validFrom\": \"<dateTime>\",\n            \"validTo\": \"<dateTime>\"\n          },\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"INACTIVE\"\n            },\n            \"validFrom\": \"<dateTime>\",\n            \"validTo\": \"<dateTime>\"\n          }\n        ],\n        \"updatedAt\": \"<dateTime>\",\n        \"name\": \"<string>\",\n        \"alternativePostalAddress\": {\n          \"city\": \"<string>\",\n          \"country\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"AI\"\n          },\n          \"deliveryServiceNumber\": \"<string>\",\n          \"deliveryServiceType\": \"PRIVATE_BAG\",\n          \"geographicCoordinates\": {\n            \"latitude\": \"<float>\",\n            \"longitude\": \"<float>\",\n            \"altitude\": \"<float>\"\n          },\n          \"administrativeAreaLevel1\": {\n            \"countryCode\": \"XU\",\n            \"regionCode\": \"<string>\",\n            \"regionName\": \"<string>\"\n          },\n          \"postalCode\": \"<string>\",\n          \"deliveryServiceQualifier\": \"<string>\"\n        },\n        \"bpnLegalEntity\": \"<string>\",\n        \"bpnSite\": \"<string>\",\n        \"addressType\": \"LegalAndSiteMainAddress\"\n      },\n      \"name\": \"<string>\",\n      \"states\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"ACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"INACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        }\n      ],\n      \"updatedAt\": \"<dateTime>\"\n    },\n    {\n      \"bpnLegalEntity\": \"<string>\",\n      \"bpns\": \"<string>\",\n      \"confidenceCriteria\": {\n        \"checkedByExternalDataSource\": \"<boolean>\",\n        \"confidenceLevel\": \"<integer>\",\n        \"lastConfidenceCheckAt\": \"<dateTime>\",\n        \"nextConfidenceCheckAt\": \"<dateTime>\",\n        \"numberOfSharingMembers\": \"<integer>\",\n        \"sharedByOwner\": \"<boolean>\"\n      },\n      \"createdAt\": \"<dateTime>\",\n      \"isCatenaXMemberData\": \"<boolean>\",\n      \"mainAddress\": {\n        \"bpna\": \"<string>\",\n        \"confidenceCriteria\": {\n          \"checkedByExternalDataSource\": \"<boolean>\",\n          \"confidenceLevel\": \"<integer>\",\n          \"lastConfidenceCheckAt\": \"<dateTime>\",\n          \"nextConfidenceCheckAt\": \"<dateTime>\",\n          \"numberOfSharingMembers\": \"<integer>\",\n          \"sharedByOwner\": \"<boolean>\"\n        },\n        \"createdAt\": \"<dateTime>\",\n        \"identifiers\": [\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"<string>\"\n            },\n            \"value\": \"<string>\"\n          },\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"<string>\"\n            },\n            \"value\": \"<string>\"\n          }\n        ],\n        \"isCatenaXMemberData\": \"<boolean>\",\n        \"physicalPostalAddress\": {\n          \"city\": \"<string>\",\n          \"country\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"LB\"\n          },\n          \"geographicCoordinates\": {\n            \"latitude\": \"<float>\",\n            \"longitude\": \"<float>\",\n            \"altitude\": \"<float>\"\n          },\n          \"administrativeAreaLevel1\": {\n            \"countryCode\": \"PH\",\n            \"regionCode\": \"<string>\",\n            \"regionName\": \"<string>\"\n          },\n          \"administrativeAreaLevel2\": \"<string>\",\n          \"administrativeAreaLevel3\": \"<string>\",\n          \"postalCode\": \"<string>\",\n          \"district\": \"<string>\",\n          \"street\": {\n            \"name\": \"<string>\",\n            \"houseNumber\": \"<string>\",\n            \"houseNumberSupplement\": \"<string>\",\n            \"milestone\": \"<string>\",\n            \"direction\": \"<string>\",\n            \"namePrefix\": \"<string>\",\n            \"additionalNamePrefix\": \"<string>\",\n            \"nameSuffix\": \"<string>\",\n            \"additionalNameSuffix\": \"<string>\"\n          },\n          \"companyPostalCode\": \"<string>\",\n          \"industrialZone\": \"<string>\",\n          \"building\": \"<string>\",\n          \"floor\": \"<string>\",\n          \"door\": \"<string>\"\n        },\n        \"states\": [\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"ACTIVE\"\n            },\n            \"validFrom\": \"<dateTime>\",\n            \"validTo\": \"<dateTime>\"\n          },\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"INACTIVE\"\n            },\n            \"validFrom\": \"<dateTime>\",\n            \"validTo\": \"<dateTime>\"\n          }\n        ],\n        \"updatedAt\": \"<dateTime>\",\n        \"name\": \"<string>\",\n        \"alternativePostalAddress\": {\n          \"city\": \"<string>\",\n          \"country\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"PS\"\n          },\n          \"deliveryServiceNumber\": \"<string>\",\n          \"deliveryServiceType\": \"PO_BOX\",\n          \"geographicCoordinates\": {\n            \"latitude\": \"<float>\",\n            \"longitude\": \"<float>\",\n            \"altitude\": \"<float>\"\n          },\n          \"administrativeAreaLevel1\": {\n            \"countryCode\": \"AT\",\n            \"regionCode\": \"<string>\",\n            \"regionName\": \"<string>\"\n          },\n          \"postalCode\": \"<string>\",\n          \"deliveryServiceQualifier\": \"<string>\"\n        },\n        \"bpnLegalEntity\": \"<string>\",\n        \"bpnSite\": \"<string>\",\n        \"addressType\": \"LegalAddress\"\n      },\n      \"name\": \"<string>\",\n      \"states\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"INACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"ACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        }\n      ],\n      \"updatedAt\": \"<dateTime>\"\n    }\n  ],\n  \"contentSize\": \"<integer>\",\n  \"page\": \"<integer>\",\n  \"totalElements\": \"<long>\",\n  \"totalPages\": \"<integer>\"\n}"
+						},
+						{
+							"name": "BPNS Filter",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"siteBpns\": [\n        \"BPNS0000000000WN\",\n        \"BPNS0000000002V9\"\n    ]\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/members/sites/search?page=0&size=10",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"members",
+										"sites",
+										"search"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0",
+											"description": "Number of page to get results from"
+										},
+										{
+											"key": "size",
+											"value": "10",
+											"description": "Size of each page"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"content\": [\n    {\n      \"bpnLegalEntity\": \"<string>\",\n      \"bpns\": \"<string>\",\n      \"confidenceCriteria\": {\n        \"checkedByExternalDataSource\": \"<boolean>\",\n        \"confidenceLevel\": \"<integer>\",\n        \"lastConfidenceCheckAt\": \"<dateTime>\",\n        \"nextConfidenceCheckAt\": \"<dateTime>\",\n        \"numberOfSharingMembers\": \"<integer>\",\n        \"sharedByOwner\": \"<boolean>\"\n      },\n      \"createdAt\": \"<dateTime>\",\n      \"isCatenaXMemberData\": \"<boolean>\",\n      \"mainAddress\": {\n        \"bpna\": \"<string>\",\n        \"confidenceCriteria\": {\n          \"checkedByExternalDataSource\": \"<boolean>\",\n          \"confidenceLevel\": \"<integer>\",\n          \"lastConfidenceCheckAt\": \"<dateTime>\",\n          \"nextConfidenceCheckAt\": \"<dateTime>\",\n          \"numberOfSharingMembers\": \"<integer>\",\n          \"sharedByOwner\": \"<boolean>\"\n        },\n        \"createdAt\": \"<dateTime>\",\n        \"identifiers\": [\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"<string>\"\n            },\n            \"value\": \"<string>\"\n          },\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"<string>\"\n            },\n            \"value\": \"<string>\"\n          }\n        ],\n        \"isCatenaXMemberData\": \"<boolean>\",\n        \"physicalPostalAddress\": {\n          \"city\": \"<string>\",\n          \"country\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"KY\"\n          },\n          \"geographicCoordinates\": {\n            \"latitude\": \"<float>\",\n            \"longitude\": \"<float>\",\n            \"altitude\": \"<float>\"\n          },\n          \"administrativeAreaLevel1\": {\n            \"countryCode\": \"IL\",\n            \"regionCode\": \"<string>\",\n            \"regionName\": \"<string>\"\n          },\n          \"administrativeAreaLevel2\": \"<string>\",\n          \"administrativeAreaLevel3\": \"<string>\",\n          \"postalCode\": \"<string>\",\n          \"district\": \"<string>\",\n          \"street\": {\n            \"name\": \"<string>\",\n            \"houseNumber\": \"<string>\",\n            \"houseNumberSupplement\": \"<string>\",\n            \"milestone\": \"<string>\",\n            \"direction\": \"<string>\",\n            \"namePrefix\": \"<string>\",\n            \"additionalNamePrefix\": \"<string>\",\n            \"nameSuffix\": \"<string>\",\n            \"additionalNameSuffix\": \"<string>\"\n          },\n          \"companyPostalCode\": \"<string>\",\n          \"industrialZone\": \"<string>\",\n          \"building\": \"<string>\",\n          \"floor\": \"<string>\",\n          \"door\": \"<string>\"\n        },\n        \"states\": [\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"INACTIVE\"\n            },\n            \"validFrom\": \"<dateTime>\",\n            \"validTo\": \"<dateTime>\"\n          },\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"INACTIVE\"\n            },\n            \"validFrom\": \"<dateTime>\",\n            \"validTo\": \"<dateTime>\"\n          }\n        ],\n        \"updatedAt\": \"<dateTime>\",\n        \"name\": \"<string>\",\n        \"alternativePostalAddress\": {\n          \"city\": \"<string>\",\n          \"country\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"AI\"\n          },\n          \"deliveryServiceNumber\": \"<string>\",\n          \"deliveryServiceType\": \"PRIVATE_BAG\",\n          \"geographicCoordinates\": {\n            \"latitude\": \"<float>\",\n            \"longitude\": \"<float>\",\n            \"altitude\": \"<float>\"\n          },\n          \"administrativeAreaLevel1\": {\n            \"countryCode\": \"XU\",\n            \"regionCode\": \"<string>\",\n            \"regionName\": \"<string>\"\n          },\n          \"postalCode\": \"<string>\",\n          \"deliveryServiceQualifier\": \"<string>\"\n        },\n        \"bpnLegalEntity\": \"<string>\",\n        \"bpnSite\": \"<string>\",\n        \"addressType\": \"LegalAndSiteMainAddress\"\n      },\n      \"name\": \"<string>\",\n      \"states\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"ACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"INACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        }\n      ],\n      \"updatedAt\": \"<dateTime>\"\n    },\n    {\n      \"bpnLegalEntity\": \"<string>\",\n      \"bpns\": \"<string>\",\n      \"confidenceCriteria\": {\n        \"checkedByExternalDataSource\": \"<boolean>\",\n        \"confidenceLevel\": \"<integer>\",\n        \"lastConfidenceCheckAt\": \"<dateTime>\",\n        \"nextConfidenceCheckAt\": \"<dateTime>\",\n        \"numberOfSharingMembers\": \"<integer>\",\n        \"sharedByOwner\": \"<boolean>\"\n      },\n      \"createdAt\": \"<dateTime>\",\n      \"isCatenaXMemberData\": \"<boolean>\",\n      \"mainAddress\": {\n        \"bpna\": \"<string>\",\n        \"confidenceCriteria\": {\n          \"checkedByExternalDataSource\": \"<boolean>\",\n          \"confidenceLevel\": \"<integer>\",\n          \"lastConfidenceCheckAt\": \"<dateTime>\",\n          \"nextConfidenceCheckAt\": \"<dateTime>\",\n          \"numberOfSharingMembers\": \"<integer>\",\n          \"sharedByOwner\": \"<boolean>\"\n        },\n        \"createdAt\": \"<dateTime>\",\n        \"identifiers\": [\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"<string>\"\n            },\n            \"value\": \"<string>\"\n          },\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"<string>\"\n            },\n            \"value\": \"<string>\"\n          }\n        ],\n        \"isCatenaXMemberData\": \"<boolean>\",\n        \"physicalPostalAddress\": {\n          \"city\": \"<string>\",\n          \"country\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"LB\"\n          },\n          \"geographicCoordinates\": {\n            \"latitude\": \"<float>\",\n            \"longitude\": \"<float>\",\n            \"altitude\": \"<float>\"\n          },\n          \"administrativeAreaLevel1\": {\n            \"countryCode\": \"PH\",\n            \"regionCode\": \"<string>\",\n            \"regionName\": \"<string>\"\n          },\n          \"administrativeAreaLevel2\": \"<string>\",\n          \"administrativeAreaLevel3\": \"<string>\",\n          \"postalCode\": \"<string>\",\n          \"district\": \"<string>\",\n          \"street\": {\n            \"name\": \"<string>\",\n            \"houseNumber\": \"<string>\",\n            \"houseNumberSupplement\": \"<string>\",\n            \"milestone\": \"<string>\",\n            \"direction\": \"<string>\",\n            \"namePrefix\": \"<string>\",\n            \"additionalNamePrefix\": \"<string>\",\n            \"nameSuffix\": \"<string>\",\n            \"additionalNameSuffix\": \"<string>\"\n          },\n          \"companyPostalCode\": \"<string>\",\n          \"industrialZone\": \"<string>\",\n          \"building\": \"<string>\",\n          \"floor\": \"<string>\",\n          \"door\": \"<string>\"\n        },\n        \"states\": [\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"ACTIVE\"\n            },\n            \"validFrom\": \"<dateTime>\",\n            \"validTo\": \"<dateTime>\"\n          },\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"INACTIVE\"\n            },\n            \"validFrom\": \"<dateTime>\",\n            \"validTo\": \"<dateTime>\"\n          }\n        ],\n        \"updatedAt\": \"<dateTime>\",\n        \"name\": \"<string>\",\n        \"alternativePostalAddress\": {\n          \"city\": \"<string>\",\n          \"country\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"PS\"\n          },\n          \"deliveryServiceNumber\": \"<string>\",\n          \"deliveryServiceType\": \"PO_BOX\",\n          \"geographicCoordinates\": {\n            \"latitude\": \"<float>\",\n            \"longitude\": \"<float>\",\n            \"altitude\": \"<float>\"\n          },\n          \"administrativeAreaLevel1\": {\n            \"countryCode\": \"AT\",\n            \"regionCode\": \"<string>\",\n            \"regionName\": \"<string>\"\n          },\n          \"postalCode\": \"<string>\",\n          \"deliveryServiceQualifier\": \"<string>\"\n        },\n        \"bpnLegalEntity\": \"<string>\",\n        \"bpnSite\": \"<string>\",\n        \"addressType\": \"LegalAddress\"\n      },\n      \"name\": \"<string>\",\n      \"states\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"INACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"ACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        }\n      ],\n      \"updatedAt\": \"<dateTime>\"\n    }\n  ],\n  \"contentSize\": \"<integer>\",\n  \"page\": \"<integer>\",\n  \"totalElements\": \"<long>\",\n  \"totalPages\": \"<integer>\"\n}"
+						},
+						{
+							"name": "Name Search",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n     \"name\": \"site\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/members/sites/search?page=0&size=10",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"members",
+										"sites",
+										"search"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0",
+											"description": "Number of page to get results from"
+										},
+										{
+											"key": "size",
+											"value": "10",
+											"description": "Size of each page"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"content\": [\n    {\n      \"bpnLegalEntity\": \"<string>\",\n      \"bpns\": \"<string>\",\n      \"confidenceCriteria\": {\n        \"checkedByExternalDataSource\": \"<boolean>\",\n        \"confidenceLevel\": \"<integer>\",\n        \"lastConfidenceCheckAt\": \"<dateTime>\",\n        \"nextConfidenceCheckAt\": \"<dateTime>\",\n        \"numberOfSharingMembers\": \"<integer>\",\n        \"sharedByOwner\": \"<boolean>\"\n      },\n      \"createdAt\": \"<dateTime>\",\n      \"isCatenaXMemberData\": \"<boolean>\",\n      \"mainAddress\": {\n        \"bpna\": \"<string>\",\n        \"confidenceCriteria\": {\n          \"checkedByExternalDataSource\": \"<boolean>\",\n          \"confidenceLevel\": \"<integer>\",\n          \"lastConfidenceCheckAt\": \"<dateTime>\",\n          \"nextConfidenceCheckAt\": \"<dateTime>\",\n          \"numberOfSharingMembers\": \"<integer>\",\n          \"sharedByOwner\": \"<boolean>\"\n        },\n        \"createdAt\": \"<dateTime>\",\n        \"identifiers\": [\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"<string>\"\n            },\n            \"value\": \"<string>\"\n          },\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"<string>\"\n            },\n            \"value\": \"<string>\"\n          }\n        ],\n        \"isCatenaXMemberData\": \"<boolean>\",\n        \"physicalPostalAddress\": {\n          \"city\": \"<string>\",\n          \"country\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"KY\"\n          },\n          \"geographicCoordinates\": {\n            \"latitude\": \"<float>\",\n            \"longitude\": \"<float>\",\n            \"altitude\": \"<float>\"\n          },\n          \"administrativeAreaLevel1\": {\n            \"countryCode\": \"IL\",\n            \"regionCode\": \"<string>\",\n            \"regionName\": \"<string>\"\n          },\n          \"administrativeAreaLevel2\": \"<string>\",\n          \"administrativeAreaLevel3\": \"<string>\",\n          \"postalCode\": \"<string>\",\n          \"district\": \"<string>\",\n          \"street\": {\n            \"name\": \"<string>\",\n            \"houseNumber\": \"<string>\",\n            \"houseNumberSupplement\": \"<string>\",\n            \"milestone\": \"<string>\",\n            \"direction\": \"<string>\",\n            \"namePrefix\": \"<string>\",\n            \"additionalNamePrefix\": \"<string>\",\n            \"nameSuffix\": \"<string>\",\n            \"additionalNameSuffix\": \"<string>\"\n          },\n          \"companyPostalCode\": \"<string>\",\n          \"industrialZone\": \"<string>\",\n          \"building\": \"<string>\",\n          \"floor\": \"<string>\",\n          \"door\": \"<string>\"\n        },\n        \"states\": [\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"INACTIVE\"\n            },\n            \"validFrom\": \"<dateTime>\",\n            \"validTo\": \"<dateTime>\"\n          },\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"INACTIVE\"\n            },\n            \"validFrom\": \"<dateTime>\",\n            \"validTo\": \"<dateTime>\"\n          }\n        ],\n        \"updatedAt\": \"<dateTime>\",\n        \"name\": \"<string>\",\n        \"alternativePostalAddress\": {\n          \"city\": \"<string>\",\n          \"country\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"AI\"\n          },\n          \"deliveryServiceNumber\": \"<string>\",\n          \"deliveryServiceType\": \"PRIVATE_BAG\",\n          \"geographicCoordinates\": {\n            \"latitude\": \"<float>\",\n            \"longitude\": \"<float>\",\n            \"altitude\": \"<float>\"\n          },\n          \"administrativeAreaLevel1\": {\n            \"countryCode\": \"XU\",\n            \"regionCode\": \"<string>\",\n            \"regionName\": \"<string>\"\n          },\n          \"postalCode\": \"<string>\",\n          \"deliveryServiceQualifier\": \"<string>\"\n        },\n        \"bpnLegalEntity\": \"<string>\",\n        \"bpnSite\": \"<string>\",\n        \"addressType\": \"LegalAndSiteMainAddress\"\n      },\n      \"name\": \"<string>\",\n      \"states\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"ACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"INACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        }\n      ],\n      \"updatedAt\": \"<dateTime>\"\n    },\n    {\n      \"bpnLegalEntity\": \"<string>\",\n      \"bpns\": \"<string>\",\n      \"confidenceCriteria\": {\n        \"checkedByExternalDataSource\": \"<boolean>\",\n        \"confidenceLevel\": \"<integer>\",\n        \"lastConfidenceCheckAt\": \"<dateTime>\",\n        \"nextConfidenceCheckAt\": \"<dateTime>\",\n        \"numberOfSharingMembers\": \"<integer>\",\n        \"sharedByOwner\": \"<boolean>\"\n      },\n      \"createdAt\": \"<dateTime>\",\n      \"isCatenaXMemberData\": \"<boolean>\",\n      \"mainAddress\": {\n        \"bpna\": \"<string>\",\n        \"confidenceCriteria\": {\n          \"checkedByExternalDataSource\": \"<boolean>\",\n          \"confidenceLevel\": \"<integer>\",\n          \"lastConfidenceCheckAt\": \"<dateTime>\",\n          \"nextConfidenceCheckAt\": \"<dateTime>\",\n          \"numberOfSharingMembers\": \"<integer>\",\n          \"sharedByOwner\": \"<boolean>\"\n        },\n        \"createdAt\": \"<dateTime>\",\n        \"identifiers\": [\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"<string>\"\n            },\n            \"value\": \"<string>\"\n          },\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"<string>\"\n            },\n            \"value\": \"<string>\"\n          }\n        ],\n        \"isCatenaXMemberData\": \"<boolean>\",\n        \"physicalPostalAddress\": {\n          \"city\": \"<string>\",\n          \"country\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"LB\"\n          },\n          \"geographicCoordinates\": {\n            \"latitude\": \"<float>\",\n            \"longitude\": \"<float>\",\n            \"altitude\": \"<float>\"\n          },\n          \"administrativeAreaLevel1\": {\n            \"countryCode\": \"PH\",\n            \"regionCode\": \"<string>\",\n            \"regionName\": \"<string>\"\n          },\n          \"administrativeAreaLevel2\": \"<string>\",\n          \"administrativeAreaLevel3\": \"<string>\",\n          \"postalCode\": \"<string>\",\n          \"district\": \"<string>\",\n          \"street\": {\n            \"name\": \"<string>\",\n            \"houseNumber\": \"<string>\",\n            \"houseNumberSupplement\": \"<string>\",\n            \"milestone\": \"<string>\",\n            \"direction\": \"<string>\",\n            \"namePrefix\": \"<string>\",\n            \"additionalNamePrefix\": \"<string>\",\n            \"nameSuffix\": \"<string>\",\n            \"additionalNameSuffix\": \"<string>\"\n          },\n          \"companyPostalCode\": \"<string>\",\n          \"industrialZone\": \"<string>\",\n          \"building\": \"<string>\",\n          \"floor\": \"<string>\",\n          \"door\": \"<string>\"\n        },\n        \"states\": [\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"ACTIVE\"\n            },\n            \"validFrom\": \"<dateTime>\",\n            \"validTo\": \"<dateTime>\"\n          },\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"INACTIVE\"\n            },\n            \"validFrom\": \"<dateTime>\",\n            \"validTo\": \"<dateTime>\"\n          }\n        ],\n        \"updatedAt\": \"<dateTime>\",\n        \"name\": \"<string>\",\n        \"alternativePostalAddress\": {\n          \"city\": \"<string>\",\n          \"country\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"PS\"\n          },\n          \"deliveryServiceNumber\": \"<string>\",\n          \"deliveryServiceType\": \"PO_BOX\",\n          \"geographicCoordinates\": {\n            \"latitude\": \"<float>\",\n            \"longitude\": \"<float>\",\n            \"altitude\": \"<float>\"\n          },\n          \"administrativeAreaLevel1\": {\n            \"countryCode\": \"AT\",\n            \"regionCode\": \"<string>\",\n            \"regionName\": \"<string>\"\n          },\n          \"postalCode\": \"<string>\",\n          \"deliveryServiceQualifier\": \"<string>\"\n        },\n        \"bpnLegalEntity\": \"<string>\",\n        \"bpnSite\": \"<string>\",\n        \"addressType\": \"LegalAddress\"\n      },\n      \"name\": \"<string>\",\n      \"states\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"INACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"ACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        }\n      ],\n      \"updatedAt\": \"<dateTime>\"\n    }\n  ],\n  \"contentSize\": \"<integer>\",\n  \"page\": \"<integer>\",\n  \"totalElements\": \"<long>\",\n  \"totalPages\": \"<integer>\"\n}"
+						},
+						{
+							"name": "All Filters",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"legalEntityBpns\": [\n        \"BPNL0000000012F2\"\n    ],\n    \"siteBpns\": [\n        \"BPNS0000000000WN\",\n        \"BPNS0000000002V9\"\n    ],\n    \"name\": \"site\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/members/sites/search?page=0&size=10",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"members",
+										"sites",
+										"search"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0",
+											"description": "Number of page to get results from"
+										},
+										{
+											"key": "size",
+											"value": "10",
+											"description": "Size of each page"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"content\": [\n    {\n      \"bpnLegalEntity\": \"<string>\",\n      \"bpns\": \"<string>\",\n      \"confidenceCriteria\": {\n        \"checkedByExternalDataSource\": \"<boolean>\",\n        \"confidenceLevel\": \"<integer>\",\n        \"lastConfidenceCheckAt\": \"<dateTime>\",\n        \"nextConfidenceCheckAt\": \"<dateTime>\",\n        \"numberOfSharingMembers\": \"<integer>\",\n        \"sharedByOwner\": \"<boolean>\"\n      },\n      \"createdAt\": \"<dateTime>\",\n      \"isCatenaXMemberData\": \"<boolean>\",\n      \"mainAddress\": {\n        \"bpna\": \"<string>\",\n        \"confidenceCriteria\": {\n          \"checkedByExternalDataSource\": \"<boolean>\",\n          \"confidenceLevel\": \"<integer>\",\n          \"lastConfidenceCheckAt\": \"<dateTime>\",\n          \"nextConfidenceCheckAt\": \"<dateTime>\",\n          \"numberOfSharingMembers\": \"<integer>\",\n          \"sharedByOwner\": \"<boolean>\"\n        },\n        \"createdAt\": \"<dateTime>\",\n        \"identifiers\": [\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"<string>\"\n            },\n            \"value\": \"<string>\"\n          },\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"<string>\"\n            },\n            \"value\": \"<string>\"\n          }\n        ],\n        \"isCatenaXMemberData\": \"<boolean>\",\n        \"physicalPostalAddress\": {\n          \"city\": \"<string>\",\n          \"country\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"KY\"\n          },\n          \"geographicCoordinates\": {\n            \"latitude\": \"<float>\",\n            \"longitude\": \"<float>\",\n            \"altitude\": \"<float>\"\n          },\n          \"administrativeAreaLevel1\": {\n            \"countryCode\": \"IL\",\n            \"regionCode\": \"<string>\",\n            \"regionName\": \"<string>\"\n          },\n          \"administrativeAreaLevel2\": \"<string>\",\n          \"administrativeAreaLevel3\": \"<string>\",\n          \"postalCode\": \"<string>\",\n          \"district\": \"<string>\",\n          \"street\": {\n            \"name\": \"<string>\",\n            \"houseNumber\": \"<string>\",\n            \"houseNumberSupplement\": \"<string>\",\n            \"milestone\": \"<string>\",\n            \"direction\": \"<string>\",\n            \"namePrefix\": \"<string>\",\n            \"additionalNamePrefix\": \"<string>\",\n            \"nameSuffix\": \"<string>\",\n            \"additionalNameSuffix\": \"<string>\"\n          },\n          \"companyPostalCode\": \"<string>\",\n          \"industrialZone\": \"<string>\",\n          \"building\": \"<string>\",\n          \"floor\": \"<string>\",\n          \"door\": \"<string>\"\n        },\n        \"states\": [\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"INACTIVE\"\n            },\n            \"validFrom\": \"<dateTime>\",\n            \"validTo\": \"<dateTime>\"\n          },\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"INACTIVE\"\n            },\n            \"validFrom\": \"<dateTime>\",\n            \"validTo\": \"<dateTime>\"\n          }\n        ],\n        \"updatedAt\": \"<dateTime>\",\n        \"name\": \"<string>\",\n        \"alternativePostalAddress\": {\n          \"city\": \"<string>\",\n          \"country\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"AI\"\n          },\n          \"deliveryServiceNumber\": \"<string>\",\n          \"deliveryServiceType\": \"PRIVATE_BAG\",\n          \"geographicCoordinates\": {\n            \"latitude\": \"<float>\",\n            \"longitude\": \"<float>\",\n            \"altitude\": \"<float>\"\n          },\n          \"administrativeAreaLevel1\": {\n            \"countryCode\": \"XU\",\n            \"regionCode\": \"<string>\",\n            \"regionName\": \"<string>\"\n          },\n          \"postalCode\": \"<string>\",\n          \"deliveryServiceQualifier\": \"<string>\"\n        },\n        \"bpnLegalEntity\": \"<string>\",\n        \"bpnSite\": \"<string>\",\n        \"addressType\": \"LegalAndSiteMainAddress\"\n      },\n      \"name\": \"<string>\",\n      \"states\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"ACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"INACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        }\n      ],\n      \"updatedAt\": \"<dateTime>\"\n    },\n    {\n      \"bpnLegalEntity\": \"<string>\",\n      \"bpns\": \"<string>\",\n      \"confidenceCriteria\": {\n        \"checkedByExternalDataSource\": \"<boolean>\",\n        \"confidenceLevel\": \"<integer>\",\n        \"lastConfidenceCheckAt\": \"<dateTime>\",\n        \"nextConfidenceCheckAt\": \"<dateTime>\",\n        \"numberOfSharingMembers\": \"<integer>\",\n        \"sharedByOwner\": \"<boolean>\"\n      },\n      \"createdAt\": \"<dateTime>\",\n      \"isCatenaXMemberData\": \"<boolean>\",\n      \"mainAddress\": {\n        \"bpna\": \"<string>\",\n        \"confidenceCriteria\": {\n          \"checkedByExternalDataSource\": \"<boolean>\",\n          \"confidenceLevel\": \"<integer>\",\n          \"lastConfidenceCheckAt\": \"<dateTime>\",\n          \"nextConfidenceCheckAt\": \"<dateTime>\",\n          \"numberOfSharingMembers\": \"<integer>\",\n          \"sharedByOwner\": \"<boolean>\"\n        },\n        \"createdAt\": \"<dateTime>\",\n        \"identifiers\": [\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"<string>\"\n            },\n            \"value\": \"<string>\"\n          },\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"<string>\"\n            },\n            \"value\": \"<string>\"\n          }\n        ],\n        \"isCatenaXMemberData\": \"<boolean>\",\n        \"physicalPostalAddress\": {\n          \"city\": \"<string>\",\n          \"country\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"LB\"\n          },\n          \"geographicCoordinates\": {\n            \"latitude\": \"<float>\",\n            \"longitude\": \"<float>\",\n            \"altitude\": \"<float>\"\n          },\n          \"administrativeAreaLevel1\": {\n            \"countryCode\": \"PH\",\n            \"regionCode\": \"<string>\",\n            \"regionName\": \"<string>\"\n          },\n          \"administrativeAreaLevel2\": \"<string>\",\n          \"administrativeAreaLevel3\": \"<string>\",\n          \"postalCode\": \"<string>\",\n          \"district\": \"<string>\",\n          \"street\": {\n            \"name\": \"<string>\",\n            \"houseNumber\": \"<string>\",\n            \"houseNumberSupplement\": \"<string>\",\n            \"milestone\": \"<string>\",\n            \"direction\": \"<string>\",\n            \"namePrefix\": \"<string>\",\n            \"additionalNamePrefix\": \"<string>\",\n            \"nameSuffix\": \"<string>\",\n            \"additionalNameSuffix\": \"<string>\"\n          },\n          \"companyPostalCode\": \"<string>\",\n          \"industrialZone\": \"<string>\",\n          \"building\": \"<string>\",\n          \"floor\": \"<string>\",\n          \"door\": \"<string>\"\n        },\n        \"states\": [\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"ACTIVE\"\n            },\n            \"validFrom\": \"<dateTime>\",\n            \"validTo\": \"<dateTime>\"\n          },\n          {\n            \"type\": {\n              \"name\": \"<string>\",\n              \"technicalKey\": \"INACTIVE\"\n            },\n            \"validFrom\": \"<dateTime>\",\n            \"validTo\": \"<dateTime>\"\n          }\n        ],\n        \"updatedAt\": \"<dateTime>\",\n        \"name\": \"<string>\",\n        \"alternativePostalAddress\": {\n          \"city\": \"<string>\",\n          \"country\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"PS\"\n          },\n          \"deliveryServiceNumber\": \"<string>\",\n          \"deliveryServiceType\": \"PO_BOX\",\n          \"geographicCoordinates\": {\n            \"latitude\": \"<float>\",\n            \"longitude\": \"<float>\",\n            \"altitude\": \"<float>\"\n          },\n          \"administrativeAreaLevel1\": {\n            \"countryCode\": \"AT\",\n            \"regionCode\": \"<string>\",\n            \"regionName\": \"<string>\"\n          },\n          \"postalCode\": \"<string>\",\n          \"deliveryServiceQualifier\": \"<string>\"\n        },\n        \"bpnLegalEntity\": \"<string>\",\n        \"bpnSite\": \"<string>\",\n        \"addressType\": \"LegalAddress\"\n      },\n      \"name\": \"<string>\",\n      \"states\": [\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"INACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        },\n        {\n          \"type\": {\n            \"name\": \"<string>\",\n            \"technicalKey\": \"ACTIVE\"\n          },\n          \"validFrom\": \"<dateTime>\",\n          \"validTo\": \"<dateTime>\"\n        }\n      ],\n      \"updatedAt\": \"<dateTime>\"\n    }\n  ],\n  \"contentSize\": \"<integer>\",\n  \"page\": \"<integer>\",\n  \"totalElements\": \"<long>\",\n  \"totalPages\": \"<integer>\"\n}"
+						}
+					]
+				},
+				{
+					"name": "/member-owned/addresses/search",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"addressBpns\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"legalEntityBpns\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"siteBpns\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"name\": \"<string>\"\n}",
+							"options": {
+								"raw": {
+									"headerFamily": "json",
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/member-owned/addresses/search?page=0&size=10",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"member-owned",
 								"addresses",
 								"search"
 							],

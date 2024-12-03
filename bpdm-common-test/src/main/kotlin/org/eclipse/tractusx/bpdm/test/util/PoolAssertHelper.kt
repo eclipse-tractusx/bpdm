@@ -105,7 +105,7 @@ class PoolAssertHelper(
         creationTimeframe: Timeframe,
         updateTimeframe: Timeframe = creationTimeframe
     ) {
-        Assertions.assertThat(actual.first())
+        Assertions.assertThat(actual)
             .usingRecursiveComparison()
             .ignoringCollectionOrder()
             .ignoringAllOverriddenEquals()
@@ -117,7 +117,7 @@ class PoolAssertHelper(
             .withComparatorForType(instantSecondsComparator, Instant::class.java)
             .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
             .withComparatorForType(stringIgnoreComparator, String::class.java)
-            .isEqualTo(expected.first())
+            .isEqualTo(expected)
 
         actual.forEach { Assertions.assertThat(it.createdAt).isBetween(creationTimeframe.startTime, creationTimeframe.endTime) }
         actual.forEach { Assertions.assertThat(it.updatedAt).isBetween(updateTimeframe.startTime, updateTimeframe.endTime) }

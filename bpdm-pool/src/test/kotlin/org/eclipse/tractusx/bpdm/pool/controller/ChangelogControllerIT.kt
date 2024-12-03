@@ -48,7 +48,7 @@ import java.time.Instant
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class],
     properties = ["bpdm.controller.search-request-limit=2"]
 )
-@ActiveProfiles("test-no-auth")
+@ActiveProfiles("test-no-auth", "test-scheduling-disabled")
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class ChangelogControllerIT @Autowired constructor(
     val testHelpers: TestHelpers,

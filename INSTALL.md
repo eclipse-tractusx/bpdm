@@ -335,6 +335,18 @@ This offer does **not** grant access to the uploaded business partner input data
 4. Create a `ReadAccessGateOutputForSharingMember` asset with the created technical user for client credentials
 5. Create a contract definition `ReadAccessGateOutputForSharingMember` referencing the created asset
 
+#### ReadAccessPoolForUseCaseConsumer
+
+This offer allows a company to access the Pool for reading golden record data owned by Catena-X members.
+In contrast to the offer `ReadAccessPoolForCatenaXMember` this also includes business partner data from non-member legal entities which are owned by Catena-X members.
+Since, typically, Catena-X use cases require site information of the whole company including subsidiaries this offer is primarily created for use case providers.
+
+1. Create a policy of type `HasBusinessPartnerNumber` for the company's BPNL (if it not yet exists)
+2. Create a policy of type `AcceptPurpose` with usage purpose for the pool (if not yet exists)
+3. Create a technical user with role `BPDM Pool Use Case Consumer` and the company's BPN identity
+4. Create a `ReadAccessPoolForUseCaseConsumer` asset with the created technical user for client credentials
+5. Create a contract definition `ReadAccessPoolForUseCaseConsumer` referencing the created asset
+
 
 ## Portal Configuration
 

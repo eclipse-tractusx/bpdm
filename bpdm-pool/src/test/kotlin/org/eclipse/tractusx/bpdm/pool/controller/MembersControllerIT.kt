@@ -76,12 +76,12 @@ class MembersControllerIT @Autowired constructor(
         //First specify which business partners should be created
         //Use the test environment's request factory for easy creation
         val membersToCreate = listOf(
-            createLegalEntity("Member 1"),
-            createLegalEntity("Member 2")
+            createMember("Member 1"),
+            createMember("Member 2")
         )
         val nonMembersToCreate = listOf(
-            createLegalEntity("Non-Member 1", isCatenaXMemberData = false),
-            createLegalEntity("Non-Member 2", isCatenaXMemberData = false)
+            createMemberOwned("Non-Member 1"),
+            createNonMember("Non-Member 2")
         )
         //Use the Data Helper to create the specified business partner in the database
         //The Data Helper will also give you back the requests with resolved BPNs
@@ -100,13 +100,13 @@ class MembersControllerIT @Autowired constructor(
     fun `only return Catena-X member sites`() {
         val membersToCreate = listOf(
             //Use hierarchies to easily specify legal entities with sites and addresses in a quick way
-            createLegalEntity("Member 1").with(createSite("Site 1")),
-            createLegalEntity("Member 2").with(createSite("Site 2"))
+            createMember("Member 1").with(createSite("Site 1")),
+            createMember("Member 2").with(createSite("Site 2"))
         )
 
         val nonMembersToCreate = listOf(
-            createLegalEntity("Member 3", false).with(createSite("Site 3")),
-            createLegalEntity("Member 4", false).with(createSite("Site 4"))
+            createMemberOwned("Member 3").with(createSite("Site 3")),
+            createNonMember("Member 4").with(createSite("Site 4"))
         )
         //It helps to separate creating business partners by whether they are expected in the result
         dataHelper.createBusinessPartnerHierarchies(nonMembersToCreate)
@@ -122,13 +122,15 @@ class MembersControllerIT @Autowired constructor(
     @Test
     fun `only return Catena-X member addresses`() {
         val membersToCreate = listOf(
-            createLegalEntity("Member 1").with(createAddress("Add Address 1"))
+            createMember("Member 1").with(createAddress("Add Address 1"))
                 .with(createSite("Site 1").with(createAddress("Add Address 2")))
         )
 
         val nonMembersToCreate = listOf(
-            createLegalEntity("Member 2", false).with(createAddress("Add Address 3"))
-                .with(createSite("Site 2").with(createAddress("Add Address 4")))
+            createNonMember("Member 2").with(createAddress("Add Address 3"))
+                .with(createSite("Site 2").with(createAddress("Add Address 4"))),
+            createMemberOwned("Member 3").with(createAddress("Add Address 5"))
+                .with(createSite("Site 3").with(createAddress("Add Address 6")))
         )
 
         dataHelper.createBusinessPartnerHierarchies(nonMembersToCreate)
@@ -141,10 +143,90 @@ class MembersControllerIT @Autowired constructor(
         assertHelper.assertAddressResponse(actualResponse, expected, creationResponse.creationTimeframe)
     }
 
-    //Simple shortcut functions for the test class which makes reading the business partner to create easier
-    fun createLegalEntity(seed: String, isCatenaXMemberData: Boolean = true) =
-        LegalEntityHierarchy(testDataEnvironment.requestFactory.createLegalEntityRequest(seed, isCatenaXMemberData))
+    @Test
+    fun `only return Catena-X member owned legal entities`() {
+        val memberOwnedToCreate = listOf(
+            createMember("Member 1"),
+            createMember("Member 2"),
+            createMemberOwned("Member Owned 1"),
+            createMemberOwned("Member Owned 2")
+        )
+        val nonMembersToCreate = listOf(
+            createNonMember("Non-Member 1"),
+            createNonMember("Non-Member 2")
+        )
+        dataHelper.createBusinessPartnerHierarchies(nonMembersToCreate)
+        val createdResponse = dataHelper.createBusinessPartnerHierarchies(memberOwnedToCreate)
+        val expected = createdResponse.hierarchiesWithBpns.getAllLegalEntities().map { testDataEnvironment.expectFactory.mapToExpectedLegalEntity(it) }
 
-    fun createSite(seed: String) = SiteHierarchy(testDataEnvironment.requestFactory.createSiteRequest(seed, ""))
-    fun createAddress(seed: String) = testDataEnvironment.requestFactory.createAddressRequest(seed, "")
+        val actualResponse = poolClient.memberOwned.searchLegalEntities(LegalEntitySearchRequest(), PaginationRequest()).content
+
+        assertHelper.assertLegalEntityResponse(actualResponse, expected, createdResponse.creationTimeframe)
+    }
+
+    @Test
+    fun `only return Catena-X member owned sites`() {
+        val memberOwnedToCreate = listOf(
+            createMember("Member 1").with(createSite("Site 1")),
+            createMember("Member 2").with(createSite("Site 2")),
+            createMemberOwned("Member Owned 1").with(createSite("Site 3")),
+            createMemberOwned("Member Owned 2").with(createSite("Site 4"))
+        )
+
+        val nonMembersToCreate = listOf(
+            createNonMember("Non-Member 1").with(createSite("Site 5")),
+            createNonMember("Non-Member 2").with(createSite("Site 6"))
+        )
+        dataHelper.createBusinessPartnerHierarchies(nonMembersToCreate)
+        val creationResponse = dataHelper.createBusinessPartnerHierarchies(memberOwnedToCreate)
+
+        val expected = creationResponse.hierarchiesWithBpns.flatMap { testDataEnvironment.expectFactory.mapToExpectedSites(it) }
+
+        val actualResponse = poolClient.memberOwned.postSiteSearch(SiteSearchRequest(), PaginationRequest()).content
+
+        assertHelper.assertSiteResponse(actualResponse, expected, creationResponse.creationTimeframe)
+    }
+
+    @Test
+    fun `only return Catena-X member owned addresses`() {
+        val membersToCreate = listOf(
+            createMember("Member").with(createAddress("Add Address 1"))
+                .with(createSite("Site 1").with(createAddress("Add Address 2"))),
+            createMemberOwned("Member Owned").with(createAddress("Add Address 3"))
+                .with(createSite("Site 2").with(createAddress("Add Address 4")))
+
+        )
+
+        val nonMembersToCreate = listOf(
+            createNonMember("Non-Member").with(createAddress("Add Address 5"))
+                .with(createSite("Site 3").with(createAddress("Add Address 6")))
+        )
+
+        dataHelper.createBusinessPartnerHierarchies(nonMembersToCreate)
+        val creationResponse = dataHelper.createBusinessPartnerHierarchies(membersToCreate)
+
+        val expected = creationResponse.hierarchiesWithBpns.flatMap { testDataEnvironment.expectFactory.mapToExpectedAddresses(it) }
+
+        val actualResponse = poolClient.memberOwned.searchAddresses(AddressSearchRequest(), PaginationRequest()).content
+
+        assertHelper.assertAddressResponse(actualResponse, expected, creationResponse.creationTimeframe)
+    }
+
+    //Is a Catena-X member
+    private fun createMember(seed: String) = createLegalEntity(seed, isCatenaXMember = true, isSharedByOwner = true)
+    //Not a member but owned by a member
+    private fun createMemberOwned(seed: String) = createLegalEntity(seed, isCatenaXMember = false, isSharedByOwner = true)
+    //Not a member and not owned by a member
+    private fun createNonMember(seed: String) = createLegalEntity(seed, isCatenaXMember = false, isSharedByOwner = false)
+
+    //Simple shortcut functions for the test class which makes reading the business partner to create easier
+    private fun createLegalEntity(seed: String, isCatenaXMember: Boolean, isSharedByOwner: Boolean) =
+        LegalEntityHierarchy(
+            with(testDataEnvironment.requestFactory.createLegalEntityRequest(seed, isCatenaXMember)){
+                copy(legalEntity.copy(confidenceCriteria = legalEntity.confidenceCriteria.copy(sharedByOwner = isSharedByOwner)))
+            }
+        )
+
+    private fun createSite(seed: String) = SiteHierarchy(testDataEnvironment.requestFactory.createSiteRequest(seed, ""))
+    private fun createAddress(seed: String) = testDataEnvironment.requestFactory.createAddressRequest(seed, "")
 }

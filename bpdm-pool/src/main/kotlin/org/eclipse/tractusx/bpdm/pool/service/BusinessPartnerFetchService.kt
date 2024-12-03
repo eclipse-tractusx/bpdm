@@ -60,7 +60,8 @@ class BusinessPartnerFetchService(
         val spec = Specification.allOf(
             LegalEntityRepository.byBpns(searchRequest.bpnLs),
             LegalEntityRepository.byLegalName(searchRequest.legalName),
-            LegalEntityRepository.byIsMember(searchRequest.isCatenaXMemberData)
+            LegalEntityRepository.byIsMember(searchRequest.isCatenaXMemberData),
+            LegalEntityRepository.byIsMemberOwned(searchRequest.isMemberOwnedData)
         )
 
         val legalEntityPage = legalEntityRepository.findAll(spec, PageRequest.of(paginationRequest.page, paginationRequest.size))
@@ -169,7 +170,8 @@ class BusinessPartnerFetchService(
     data class LegalEntitySearchRequest(
         val bpnLs: List<String>?,
         val legalName: String?,
-        val isCatenaXMemberData: Boolean?
+        val isCatenaXMemberData: Boolean?,
+        val isMemberOwnedData: Boolean?
     )
 
 }

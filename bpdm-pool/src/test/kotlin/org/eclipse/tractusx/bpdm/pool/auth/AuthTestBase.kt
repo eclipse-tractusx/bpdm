@@ -38,6 +38,7 @@ abstract class AuthTestBase(
     private val legalEntityAuthExpectations: LegalEntityAuthExpectations,
     private val metadataAuthExpectations: MetadataAuthExpectations,
     private val membersAuthExpectations: MembersAuthExpectations,
+    private val membersOwnedAuthExpectations: MembersOwnedAuthExpectations,
     private val membershipAuthExpectations: CxMembershipsAuthExpectations,
     private val changelogAuthExpectation: AuthExpectationType,
     private val bpnAuthExpectation: AuthExpectationType
@@ -205,6 +206,21 @@ abstract class AuthTestBase(
     fun `PUT CX Memberships`(){
         authAssertions.assert(membershipAuthExpectations.putMemberships) { poolApiClient.memberships.put(CxMembershipUpdateRequest(listOf())) }
     }
+
+    @Test
+    fun `POST Member Owned Address Search`(){
+        authAssertions.assert(membersOwnedAuthExpectations.postAddressSearch) { poolApiClient.memberOwned.searchAddresses(AddressSearchRequest(), PaginationRequest()) }
+    }
+
+    @Test
+    fun `POST Member Owned Site Search`(){
+        authAssertions.assert(membersOwnedAuthExpectations.postSiteSearch) { poolApiClient.memberOwned.postSiteSearch(SiteSearchRequest(), PaginationRequest()) }
+    }
+
+    @Test
+    fun `POST Member Owned Legal Entity Search`(){
+        authAssertions.assert(membersOwnedAuthExpectations.postLegalEntitySearch) { poolApiClient.memberOwned.searchLegalEntities(LegalEntitySearchRequest(), PaginationRequest()) }
+    }
 }
 
 
@@ -248,6 +264,12 @@ data class MembersAuthExpectations(
     val postSiteSearch: AuthExpectationType,
     val postLegalEntitySearch: AuthExpectationType,
     val postChangelogSearch: AuthExpectationType
+)
+
+data class MembersOwnedAuthExpectations(
+    val postAddressSearch: AuthExpectationType,
+    val postSiteSearch: AuthExpectationType,
+    val postLegalEntitySearch: AuthExpectationType
 )
 
 data class CxMembershipsAuthExpectations(

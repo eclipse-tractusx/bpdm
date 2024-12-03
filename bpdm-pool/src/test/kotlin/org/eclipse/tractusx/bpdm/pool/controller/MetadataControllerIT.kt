@@ -68,7 +68,7 @@ private typealias GetFunction = (client: WebTestClient, page: Int, size: Int) ->
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class]
 )
-@ActiveProfiles("test-no-auth")
+@ActiveProfiles("test-no-auth", "test-scheduling-disabled")
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class MetadataControllerIT @Autowired constructor(
     private val dbTestHelpers: DbTestHelpers,

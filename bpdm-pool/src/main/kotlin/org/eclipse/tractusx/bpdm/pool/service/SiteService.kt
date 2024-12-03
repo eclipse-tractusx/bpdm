@@ -51,7 +51,8 @@ class SiteService(
             SiteRepository.byBpns(searchRequest.siteBpns),
             SiteRepository.byParentBpns(searchRequest.legalEntityBpns),
             SiteRepository.byName(searchRequest.name),
-            SiteRepository.byIsMember(searchRequest.isCatenaXMemberData)
+            SiteRepository.byIsMember(searchRequest.isCatenaXMemberData),
+            SiteRepository.byIsMemberOwned(searchRequest.isMemberOwnedData),
         )
 
         val sitePage = siteRepository.findAll(spec, PageRequest.of(paginationRequest.page, paginationRequest.size))
@@ -96,7 +97,8 @@ class SiteService(
         val siteBpns: List<String>?,
         val legalEntityBpns: List<String>?,
         val name: String?,
-        val isCatenaXMemberData: Boolean?
+        val isCatenaXMemberData: Boolean?,
+        val isMemberOwnedData: Boolean?
     )
 
 }

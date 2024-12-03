@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.repository
 
+import org.eclipse.tractusx.bpdm.pool.entity.ConfidenceCriteriaDb
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.springframework.data.domain.Page
@@ -56,6 +57,18 @@ interface SiteRepository : JpaRepository<SiteDb, Long>, JpaSpecificationExecutor
             Specification<SiteDb> { root, _, builder ->
                 isCatenaXMemberData?.let {
                     builder.equal(root.get<LegalEntityDb>(SiteDb::legalEntity.name).get<Boolean>(LegalEntityDb::isCatenaXMemberData.name), isCatenaXMemberData)
+                }
+            }
+
+        fun byIsMemberOwned(isMemberOwned: Boolean?) =
+            Specification<SiteDb> { root, _, builder ->
+                isMemberOwned?.let {
+                    val propertyPath = root
+                        .get<LegalEntityDb>(SiteDb::legalEntity.name)
+                        .get<ConfidenceCriteriaDb>(LegalEntityDb::confidenceCriteria.name)
+                        .get<Boolean>(ConfidenceCriteriaDb::sharedByOwner.name)
+
+                    builder.equal(propertyPath, isMemberOwned)
                 }
             }
     }

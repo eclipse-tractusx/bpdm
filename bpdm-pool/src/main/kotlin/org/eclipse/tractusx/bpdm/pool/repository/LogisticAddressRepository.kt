@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.repository
 
+import org.eclipse.tractusx.bpdm.pool.entity.ConfidenceCriteriaDb
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
@@ -68,6 +69,18 @@ interface LogisticAddressRepository : JpaRepository<LogisticAddressDb, Long>, Jp
                             .get<Boolean>(LegalEntityDb::isCatenaXMemberData.name),
                         isCatenaXMemberData
                     )
+                }
+            }
+
+        fun byIsMemberOwned(isMemberOwned: Boolean?) =
+            Specification<LogisticAddressDb> { root, _, builder ->
+                isMemberOwned?.let {
+                    val propertyPath = root
+                        .get<LegalEntityDb>(LogisticAddressDb::legalEntity.name)
+                        .get<ConfidenceCriteriaDb>(LegalEntityDb::confidenceCriteria.name)
+                        .get<Boolean>(ConfidenceCriteriaDb::sharedByOwner.name)
+
+                    builder.equal(propertyPath, isMemberOwned)
                 }
             }
     }

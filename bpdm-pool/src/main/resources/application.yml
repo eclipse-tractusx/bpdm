@@ -106,8 +106,10 @@ bpdm:
       readPartner: read_partner
       # Name of the permission to upsert business partners
       writePartner: write_partner
-      # Name of the permission to read business partners that belong to a Catena-X member
+      # Name of the permission to read business partners that are Catena-X member data
       readMemberPartner: read_partner_member
+      # Name of the permission to read all business partners that are owned by Catena-X members
+      readMemberOwnedPartner: read_partner_member_owned
       # Name of the permission to read metadata
       readMetaData: read_metadata
       # Name of the permission to create new metadata
@@ -116,6 +118,7 @@ bpdm:
       readChangelog: read_changelog
       # Name of the permission to read changelog entries from Catena-X member business partners
       readMemberChangelog: read_changelog_member
+
   datasource:
     # Host name of the used datasource
     host: localhost

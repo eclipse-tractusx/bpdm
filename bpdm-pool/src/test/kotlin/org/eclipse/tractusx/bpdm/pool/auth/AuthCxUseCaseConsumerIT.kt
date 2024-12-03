@@ -21,9 +21,9 @@ package org.eclipse.tractusx.bpdm.pool.auth
 
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
+import org.eclipse.tractusx.bpdm.test.containers.CreateNewSelfClientInitializer
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
-import org.eclipse.tractusx.bpdm.test.containers.SelfClientInitializer
 import org.eclipse.tractusx.bpdm.test.util.AuthExpectationType
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -33,9 +33,10 @@ import org.springframework.test.context.ContextConfiguration
 @ContextConfiguration(initializers = [
     PostgreSQLContextInitializer::class,
     KeyCloakInitializer::class,
-    SelfClientAsSharingMemberInitializer::class
+    SelfClientAsCxUseCaseProviderInitializer::class
 ])
-class AuthSharingMemberIT @Autowired constructor(
+class
+AuthCxUseCaseConsumerIT @Autowired constructor(
     poolApiClient: PoolApiClient,
 ): AuthTestBase(
     poolApiClient,
@@ -77,9 +78,9 @@ class AuthSharingMemberIT @Autowired constructor(
         postChangelogSearch = AuthExpectationType.Forbidden
     ),
     MembersOwnedAuthExpectations(
-        postAddressSearch = AuthExpectationType.Forbidden,
-        postSiteSearch = AuthExpectationType.Forbidden,
-        postLegalEntitySearch = AuthExpectationType.Forbidden
+        postAddressSearch = AuthExpectationType.Authorized,
+        postSiteSearch = AuthExpectationType.Authorized,
+        postLegalEntitySearch = AuthExpectationType.Authorized
     ),
     CxMembershipsAuthExpectations(
         getMemberships = AuthExpectationType.Forbidden,
@@ -89,7 +90,10 @@ class AuthSharingMemberIT @Autowired constructor(
     bpnAuthExpectation = AuthExpectationType.Forbidden
 )
 
-class SelfClientAsSharingMemberInitializer : SelfClientInitializer() {
+class SelfClientAsCxUseCaseProviderInitializer : CreateNewSelfClientInitializer() {
     override val clientId: String
-        get() = "sa-cl7-cx-1"
+        get() = "EDC-USE-CASE-CONSUMER"
+
+    override val roleName: String
+        get() = "BPDM Pool Use Case Consumer"
 }

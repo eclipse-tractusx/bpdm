@@ -46,11 +46,12 @@ We defined the following relevant permission groups in BPDM:
 5. Pool Admin: Read, create and update golden records as well as meta data in the Pool
 6. Pool Cx Member: Read golden records that belong to Catena-X members from the Pool
 7. Pool Sharing Member: Read golden records of Catena-X members and the overall changelog
-8. Orchestrator Admin: Full access to Golden Record Tasks
-9. Orchestrator Task Creator: Create Golden Record Tasks, view task results and status
-10. Orchestrator Clean And Sync Task Processor: Reserve and resolve Golden Record Tasks in step 'Clean And Sync'
-11. Orchestrator Clean Task Processor: Reserve and resolve Golden Record Tasks in step 'Clean'
-12. Orchestrator Pool Task Processor: Reserve and resolve Golden Record Tasks in step 'Pool'
+8. Pool Use Case Consumer:  Read golden records owned by Catena-X members from the Pool (including member-owned non-member legal entity business partner data)
+9. Orchestrator Admin: Full access to Golden Record Tasks
+10. Orchestrator Task Creator: Create Golden Record Tasks, view task results and status
+11. Orchestrator Clean And Sync Task Processor: Reserve and resolve Golden Record Tasks in step 'Clean And Sync'
+12. Orchestrator Clean Task Processor: Reserve and resolve Golden Record Tasks in step 'Clean'
+13. Orchestrator Pool Task Processor: Reserve and resolve Golden Record Tasks in step 'Pool'
 
 #### Permissions
 
@@ -69,6 +70,7 @@ We defined the following relevant permission groups in BPDM:
             <li>read_partner</li>
             <li>write_partner</li>
             <li>read_partner_member</li>
+            <li>read_partner_member_owned</li>
             <li>read_changelog</li>
             <li>read_changelog_member</li>
             <li>read_metadata</li>
@@ -158,6 +160,7 @@ Pool Permissions:
       <th>Admin</th>
       <th>Cx Member</th>
       <th>Sharing Member</th>
+      <th>Use Case Consumer</th>
     </tr>
     <tr>
       <td>
@@ -172,11 +175,17 @@ Pool Permissions:
       </td>
       <td>
         <ul>
-            <li>read_partner_member</li>
-            <li>read_changelog_member</li>
+            <li>read_partner</li>
             <li>read_metadata</li>
             <li>read_changelog</li>
         </ul>
+      </td>
+      <td>
+        <ul>
+            <li>read_partner_member_owned</li>
+            <li>read_metadata</li>
+        </ul>
+      </td>
     </tr>
   </tbody>
 </table>
@@ -226,10 +235,10 @@ Orchestrator Permissions:
 
 #### Mapping to Portal user roles for all companies (for all Catena-X members):
 
-| BPDM Permission Group         |  Portal Role |
-|--|--|
-| Gate Admin    |  Service Manager    |
-| Pool Cx Member    |  CX User   |
+| BPDM Permission Group | Portal Role     |
+|-----------------------|-----------------|
+| Gate Admin            | Service Manager |
+| Pool Cx Member        | CX User         |
 
 #### Technical Users:
 
@@ -243,6 +252,7 @@ For BPDM service:
 - Pool Admin
 - Pool Cx Member
 - Pool Sharing Member
+- Pool Use Case Consumer
 
 For VAS:
 

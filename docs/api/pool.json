@@ -897,6 +897,186 @@
         }
       }
     },
+    "/v6/member-owned/sites/search": {
+      "post": {
+        "tags": [
+          "Site Controller"
+        ],
+        "summary": "Search sites that are owned by Catena-X members",
+        "description": "This endpoint tries to find matches among business partners of type site which are owned by Catena-X members. Partners which entirely do not match are filtered out and the remaining partners are ranked according to the accuracy of the match. In contrast to the `members/sites` endpoint this endpoint also returns sites of non-member legal entities which are owned by Catena-X members.",
+        "operationId": "postSiteSearch_2",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Number of page to get results from",
+            "required": false,
+            "schema": {
+              "minimum": 0,
+              "type": "string",
+              "default": "0"
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Size of each page",
+            "required": false,
+            "schema": {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "string",
+              "default": "10"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SiteSearchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Page of business partners matching the search criteria, may be empty",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageDtoSiteWithMainAddressVerboseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "On malformed search or pagination request"
+          }
+        }
+      }
+    },
+    "/v6/member-owned/legal-entities/search": {
+      "post": {
+        "tags": [
+          "Legal Entity Controller"
+        ],
+        "summary": "Search legal entities that are owned by Catena-X members",
+        "description": "This endpoint tries to find matches among business partners of type legal entity which are owned by Catena-X members. Partners which entirely do not match are filtered out and the remaining partners are ranked according to the accuracy of the match. In contrast to the `members/legal-entities` endpoint this endpoint also returns non-member legal entities that are owned by Catena-X members.",
+        "operationId": "searchLegalEntities_1",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Number of page to get results from",
+            "required": false,
+            "schema": {
+              "minimum": 0,
+              "type": "string",
+              "default": "0"
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Size of each page",
+            "required": false,
+            "schema": {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "string",
+              "default": "10"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LegalEntitySearchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Page of business partners matching the search criteria, may be empty",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageDtoLegalEntityWithLegalAddressVerboseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "On malformed search or pagination request"
+          }
+        }
+      }
+    },
+    "/v6/member-owned/addresses/search": {
+      "post": {
+        "tags": [
+          "Address Controller"
+        ],
+        "summary": "Search logistic addresses that are owned by Catena-X members",
+        "description": "This endpoint tries to find matches among business partners of type address which are owned by Catena-X members. Partners which entirely do not match are filtered out and the remaining partners are ranked according to the accuracy of the match. In contrast to the `members/addresses` endpoint this endpoint also returns addresses of non-member legal entities which are owned by Catena-X members.",
+        "operationId": "searchAddresses_1",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Number of page to get results from",
+            "required": false,
+            "schema": {
+              "minimum": 0,
+              "type": "string",
+              "default": "0"
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Size of each page",
+            "required": false,
+            "schema": {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "string",
+              "default": "10"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddressSearchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Page of business partners matching the search criteria, may be empty",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageDtoLogisticAddressVerboseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "On malformed search or pagination request"
+          }
+        }
+      }
+    },
     "/v6/legal-forms": {
       "get": {
         "tags": [
@@ -1535,7 +1715,7 @@
         ],
         "summary": "Returns addresses by an array of BPNA and/or an array of corresponding BPNS and/or an array of corresponding BPNL.",
         "description": "Search business partners of type address by their BPNA or their parents' BPNL or BPNS.",
-        "operationId": "searchAddresses_1",
+        "operationId": "searchAddresses_2",
         "parameters": [
           {
             "name": "page",
@@ -7137,8 +7317,7 @@
         "type": "oauth2",
         "flows": {
           "clientCredentials": {
-            "tokenUrl": "http://localhost:8180/realms/CX-Central/protocol/openid-connect/token",
-            "scopes": {}
+            "tokenUrl": "http://localhost:8180/realms/CX-Central/protocol/openid-connect/token"
           },
           "authorizationCode": {
             "authorizationUrl": "http://localhost:8180/realms/CX-Central/protocol/openid-connect/auth",
