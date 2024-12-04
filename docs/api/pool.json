@@ -1528,6 +1528,42 @@
         }
       }
     },
+    "/v6/bpn/request-ids/search": {
+      "post": {
+        "tags": [
+          "Bpn Controller"
+        ],
+        "summary": "Return BPNL/S/A based on the requested identifiers",
+        "description": "Find business partner numbers by requested-identifiers.",
+        "operationId": "findBpnByRequestedIdentifiers",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BpnRequestIdentifierSearchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Found bpn to based on the requested identifiers",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "uniqueItems": true,
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BpnRequestIdentifierMappingDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v6/addresses/search": {
       "post": {
         "tags": [
@@ -2816,6 +2852,42 @@
           }
         },
         "description": "Mapping of Business Partner Number to identifier value"
+      },
+      "BpnRequestIdentifierMappingDto": {
+        "required": [
+          "bpn",
+          "requestedIdentifier"
+        ],
+        "type": "object",
+        "properties": {
+          "requestedIdentifier": {
+            "type": "string",
+            "description": "Value of the requested-identifier"
+          },
+          "bpn": {
+            "type": "string",
+            "description": "Business Partner Number"
+          }
+        },
+        "description": "Mapping of Business Partner Number to requested-identifier value"
+      },
+      "BpnRequestIdentifierSearchRequest": {
+        "required": [
+          "requestedIdentifiers"
+        ],
+        "type": "object",
+        "properties": {
+          "requestedIdentifiers": {
+            "uniqueItems": true,
+            "type": "array",
+            "description": "Value of the requested-identifier",
+            "items": {
+              "type": "string",
+              "description": "Value of the requested-identifier"
+            }
+          }
+        },
+        "description": "Mapping of Business Partner Number to requested-identifier value"
       },
       "ChangelogEntryVerboseDto": {
         "required": [

@@ -25,18 +25,17 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnRequestIdentifierMappingDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityIdentifierDb
-import org.eclipse.tractusx.bpdm.pool.repository.AddressIdentifierRepository
-import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
-import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityIdentifierRepository
-import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
+import org.eclipse.tractusx.bpdm.pool.repository.*
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.util.stream.Collectors
 
 /**
  * Service for fetching business partner records from the database
@@ -45,6 +44,7 @@ import org.springframework.transaction.annotation.Transactional
 class BusinessPartnerFetchService(
     private val legalEntityRepository: LegalEntityRepository,
     private val identifierTypeRepository: IdentifierTypeRepository,
+    private val bpnRequestIdentifierRepository: BpnRequestIdentifierRepository,
     private val legalEntityIdentifierRepository: LegalEntityIdentifierRepository,
     private val addressIdentifierRepository: AddressIdentifierRepository,
     private val addressService: AddressService
@@ -119,6 +119,21 @@ class BusinessPartnerFetchService(
             IdentifierBusinessPartnerType.LEGAL_ENTITY -> legalEntityIdentifierRepository.findBpnsByIdentifierTypeAndValues(identifierType, idValues)
             IdentifierBusinessPartnerType.ADDRESS -> addressIdentifierRepository.findBpnsByIdentifierTypeAndValues(identifierType, idValues)
         }
+    }
+
+    /**
+     * Find bpn based on request-identifier value
+     */
+    @Transactional
+    fun findBpnByRequestedIdentifiers(request: Set<String>): Set<BpnRequestIdentifierMappingDto> {
+        logger.debug { "Executing findBpnByRequestedIdentifiers() with parameters $request" }
+        if (request.isEmpty()) {
+            return emptySet()
+        }
+        var bpnRequestIdentifierMapping = bpnRequestIdentifierRepository.findDistinctByRequestIdentifierIn(request)
+        return bpnRequestIdentifierMapping.stream()
+            .map { BpnRequestIdentifierMappingDto(it.requestIdentifier, it.bpn) }
+            .collect(Collectors.toSet())
     }
 
     fun fetchDependenciesWithLegalAddress(partners: Set<LegalEntityDb>): Set<LegalEntityDb> {

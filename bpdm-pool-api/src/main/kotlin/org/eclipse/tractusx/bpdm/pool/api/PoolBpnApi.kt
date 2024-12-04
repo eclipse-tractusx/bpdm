@@ -27,8 +27,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.eclipse.tractusx.bpdm.common.util.CommonApiPathNames
 import org.eclipse.tractusx.bpdm.pool.api.PoolBpnApi.Companion.BPN_PATH
+import org.eclipse.tractusx.bpdm.pool.api.model.request.BpnRequestIdentifierSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.IdentifiersSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnRequestIdentifierMappingDto
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
@@ -62,4 +64,17 @@ interface PoolBpnApi {
     @Tag(name = ApiCommons.BPN_NAME, description = ApiCommons.BPN_DESCRIPTION)
     @PostMapping(CommonApiPathNames.SUBPATH_SEARCH)
     fun findBpnsByIdentifiers(@RequestBody request: IdentifiersSearchRequest): ResponseEntity<Set<BpnIdentifierMappingDto>>
+
+    @Operation(
+        summary = "Return BPNL/S/A based on the requested identifiers",
+        description = "Find business partner numbers by requested-identifiers."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Found bpn to based on the requested identifiers"),
+        ]
+    )
+    @Tag(name = ApiCommons.BPN_NAME, description = ApiCommons.BPN_DESCRIPTION)
+    @PostMapping("/request-ids/search")
+    fun findBpnByRequestedIdentifiers(@RequestBody request: BpnRequestIdentifierSearchRequest): ResponseEntity<Set<BpnRequestIdentifierMappingDto>>
 }
