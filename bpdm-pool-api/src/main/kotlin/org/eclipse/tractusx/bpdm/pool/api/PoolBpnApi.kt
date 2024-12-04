@@ -27,6 +27,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.eclipse.tractusx.bpdm.common.util.CommonApiPathNames
 import org.eclipse.tractusx.bpdm.pool.api.PoolBpnApi.Companion.BPN_PATH
+import org.eclipse.tractusx.bpdm.pool.api.model.request.BpnRequestIdentifierSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.IdentifiersSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnRequestIdentifierMappingDto
@@ -74,6 +75,6 @@ interface PoolBpnApi {
         ]
     )
     @Tag(name = ApiCommons.BPN_NAME, description = ApiCommons.BPN_DESCRIPTION)
-    @PostMapping("/request-ids")
-    fun findBpnByRequestedIdentifiers(@RequestBody request: Set<String>): ResponseEntity<Set<BpnRequestIdentifierMappingDto>>
+    @PostMapping("/request-ids/search")
+    fun findBpnByRequestedIdentifiers(@RequestBody request: BpnRequestIdentifierSearchRequest): ResponseEntity<Set<BpnRequestIdentifierMappingDto>>
 }

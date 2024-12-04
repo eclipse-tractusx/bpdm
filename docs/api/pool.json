@@ -1528,7 +1528,7 @@
         }
       }
     },
-    "/v6/bpn/request-ids": {
+    "/v6/bpn/request-ids/search": {
       "post": {
         "tags": [
           "Bpn Controller"
@@ -1540,11 +1540,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "uniqueItems": true,
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
+                "$ref": "#/components/schemas/BpnRequestIdentifierSearchRequest"
               }
             }
           },
@@ -2871,6 +2867,24 @@
           "bpn": {
             "type": "string",
             "description": "Business Partner Number"
+          }
+        },
+        "description": "Mapping of Business Partner Number to requested-identifier value"
+      },
+      "BpnRequestIdentifierSearchRequest": {
+        "required": [
+          "requestedIdentifiers"
+        ],
+        "type": "object",
+        "properties": {
+          "requestedIdentifiers": {
+            "uniqueItems": true,
+            "type": "array",
+            "description": "Value of the requested-identifier",
+            "items": {
+              "type": "string",
+              "description": "Value of the requested-identifier"
+            }
           }
         },
         "description": "Mapping of Business Partner Number to requested-identifier value"

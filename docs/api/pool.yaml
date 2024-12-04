@@ -1087,7 +1087,7 @@ paths:
           description: On malformed request parameters or if number of requested bpns exceeds limit
         '404':
           description: Specified identifier type not found
-  /v6/bpn/request-ids:
+  /v6/bpn/request-ids/search:
     post:
       tags:
         - Bpn Controller
@@ -1098,10 +1098,7 @@ paths:
         content:
           application/json:
             schema:
-              uniqueItems: true
-              type: array
-              items:
-                type: string
+              $ref: '#/components/schemas/BpnRequestIdentifierSearchRequest'
         required: true
       responses:
         '200':
@@ -2182,6 +2179,19 @@ components:
         bpn:
           type: string
           description: Business Partner Number
+      description: Mapping of Business Partner Number to requested-identifier value
+    BpnRequestIdentifierSearchRequest:
+      required:
+        - requestedIdentifiers
+      type: object
+      properties:
+        requestedIdentifiers:
+          uniqueItems: true
+          type: array
+          description: Value of the requested-identifier
+          items:
+            type: string
+            description: Value of the requested-identifier
       description: Mapping of Business Partner Number to requested-identifier value
     ChangelogEntryVerboseDto:
       required:

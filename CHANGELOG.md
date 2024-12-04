@@ -10,6 +10,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 
 ### Added
 
+- BPDM Pool: Post endpoint to fetch the BPNL/S/A based on the requested identifiers.([#1052](https://github.com/eclipse-tractusx/bpdm/issues/1052))
 
 ### Changed
 

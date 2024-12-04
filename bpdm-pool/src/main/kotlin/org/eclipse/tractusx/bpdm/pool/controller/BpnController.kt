@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.eclipse.tractusx.bpdm.pool.api.PoolBpnApi
+import org.eclipse.tractusx.bpdm.pool.api.model.request.BpnRequestIdentifierSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.IdentifiersSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnRequestIdentifierMappingDto
@@ -48,11 +49,11 @@ class BpnController(
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
-    override fun findBpnByRequestedIdentifiers(@RequestBody request: Set<String>): ResponseEntity<Set<BpnRequestIdentifierMappingDto>> {
-        if (request.size > controllerConfigProperties.searchRequestLimit) {
+    override fun findBpnByRequestedIdentifiers(@RequestBody request: BpnRequestIdentifierSearchRequest): ResponseEntity<Set<BpnRequestIdentifierMappingDto>> {
+        if (request.requestedIdentifiers.size > controllerConfigProperties.searchRequestLimit) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
-        val bpnIdentifierMappings = businessPartnerFetchService.findBpnByRequestedIdentifiers(request)
+        val bpnIdentifierMappings = businessPartnerFetchService.findBpnByRequestedIdentifiers(request.requestedIdentifiers)
         return ResponseEntity(bpnIdentifierMappings, HttpStatus.OK)
     }
 }
