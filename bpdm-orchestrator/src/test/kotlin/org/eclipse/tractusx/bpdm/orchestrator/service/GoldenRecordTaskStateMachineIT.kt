@@ -105,8 +105,6 @@ class GoldenRecordTaskStateMachineIT @Autowired constructor(
      * GIVEN a task with initial TaskProcessingState
      * WHEN reserving and resolving
      *  THEN expect the TaskProcessingState to walk through all the steps/states until final state Success
-     * WHEN trying to reserve or resolve twice
-     *  THEN expect an error
      */
     @ParameterizedTest
     @EnumSource(TaskMode::class)
@@ -134,10 +132,8 @@ class GoldenRecordTaskStateMachineIT @Autowired constructor(
             // resolve
             goldenRecordTaskStateMachine.resolveTaskStepToSuccess(task, step, businessPartnerFull)
 
-            // resolve again!
-            assertThatThrownBy {
-                goldenRecordTaskStateMachine.resolveTaskStepToSuccess(task, step, businessPartnerFull)
-            }.isInstanceOf(BpdmIllegalStateException::class.java)
+            // resolve again ignored
+            goldenRecordTaskStateMachine.resolveTaskStepToSuccess(task, step, businessPartnerFull)
         }
 
         val finalStep = stateMachineConfigProperties.modeSteps[taskMode]!!.last()
@@ -150,14 +146,12 @@ class GoldenRecordTaskStateMachineIT @Autowired constructor(
             WITHIN_ALLOWED_TIME_OFFSET
         )
 
-        // Can't resolve again!
-        assertThatThrownBy {
-            goldenRecordTaskStateMachine.doResolveTaskToError(
-                task,
-                finalStep,
-                listOf(TaskErrorDto(TaskErrorType.Unspecified, "error"))
-            )
-        }.isInstanceOf(BpdmIllegalStateException::class.java)
+        // Second resolve ignored
+        goldenRecordTaskStateMachine.doResolveTaskToError(
+            task,
+            finalStep,
+            listOf(TaskErrorDto(TaskErrorType.Unspecified, "error"))
+        )
     }
 
 
@@ -202,10 +196,8 @@ class GoldenRecordTaskStateMachineIT @Autowired constructor(
             goldenRecordTaskStateMachine.doReserve(task)
         }.isInstanceOf(BpdmIllegalStateException::class.java)
 
-        // Can't resolve now!
-        assertThatThrownBy {
-            goldenRecordTaskStateMachine.resolveTaskStepToSuccess(task, expectedStep, businessPartnerFull)
-        }.isInstanceOf(BpdmIllegalStateException::class.java)
+        // Resolve again ignored
+        goldenRecordTaskStateMachine.resolveTaskStepToSuccess(task, expectedStep, businessPartnerFull)
     }
 
     private fun assertProcessingState(processingState: GoldenRecordTaskDb.ProcessingState,
