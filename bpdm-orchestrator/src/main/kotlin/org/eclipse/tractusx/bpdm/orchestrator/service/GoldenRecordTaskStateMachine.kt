@@ -90,8 +90,14 @@ class GoldenRecordTaskStateMachine(
         logger.debug { "Executing doResolveTaskToSuccess() with parameters $task // $step and $resultBusinessPartner" }
         val state = task.processingState
 
-        if (isResolvableForStep(state, step)) {
-            throw BpdmIllegalStateException(task.uuid, state)
+        if (!isResolvableForStep(state, step)) {
+            if(hasAlreadyResolvedStep(state, step))
+            {
+                logger.debug { "Task ${task.uuid} has already been processed for step $step. Result is ignored" }
+                return task
+            }else{
+                throw BpdmIllegalStateException(task.uuid, state)
+            }
         }
 
         val nextStep = getNextStep(state.mode, state.step)
@@ -114,8 +120,14 @@ class GoldenRecordTaskStateMachine(
         logger.debug { "Executing doResolveTaskToError() with parameters $task // $step and $errors" }
         val state = task.processingState
 
-        if (isResolvableForStep(state, step)) {
-            throw BpdmIllegalStateException(task.uuid, state)
+        if (!isResolvableForStep(state, step)) {
+            if(hasAlreadyResolvedStep(state, step))
+            {
+                logger.debug { "Task ${task.uuid} has already been processed for step $step. Result is ignored" }
+                return task
+            }else{
+                throw BpdmIllegalStateException(task.uuid, state)
+            }
         }
 
         task.processingState.toError(errors.map { requestMapper.toTaskError(it) })
@@ -187,9 +199,21 @@ class GoldenRecordTaskStateMachine(
             .firstOrNull()                          // return next step
     }
 
-    private fun isResolvableForStep(state: GoldenRecordTaskDb.ProcessingState, step: TaskStep): Boolean{
-        return state.resultState != GoldenRecordTaskDb.ResultState.Pending
-                || state.stepState != GoldenRecordTaskDb.StepState.Reserved
-                || state.step != step
+    private fun hasAlreadyResolvedStep(state: GoldenRecordTaskDb.ProcessingState, step: TaskStep): Boolean{
+        if(state.step == step) return state.stepState != GoldenRecordTaskDb.StepState.Reserved
+        return isStepBefore(step, state.step, state.mode)
     }
+
+    private fun isStepBefore(stepBefore: TaskStep, stepAfter: TaskStep, mode: TaskMode): Boolean{
+        val modeSteps = stateMachineConfigProperties.modeSteps[mode]!!
+        return modeSteps.contains(stepBefore) && modeSteps.indexOf(stepBefore) <= modeSteps.indexOf(stepAfter)
+    }
+
+    private fun isResolvableForStep(state: GoldenRecordTaskDb.ProcessingState, step: TaskStep): Boolean{
+        return state.resultState == GoldenRecordTaskDb.ResultState.Pending
+                && state.stepState == GoldenRecordTaskDb.StepState.Reserved
+                && state.step == step
+    }
+
+
 }
