@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityIdentifierDto
+import org.eclipse.tractusx.bpdm.pool.api.model.request.BpnRequestIdentifierSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.IdentifiersSearchRequest
 import org.eclipse.tractusx.bpdm.pool.entity.BpnRequestIdentifierMappingDb
 import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
@@ -174,7 +175,7 @@ class BpnControllerIT @Autowired constructor(
             BusinessPartnerVerboseValues.bpnLRequestMapping.requestedIdentifier,
             BusinessPartnerVerboseValues.bpnSRequestMapping.requestedIdentifier,
         )
-        val response = poolClient.bpns.findBpnByRequestedIdentifiers(requestedIdentifiers)
+        val response = poolClient.bpns.findBpnByRequestedIdentifiers(BpnRequestIdentifierSearchRequest(requestedIdentifiers))
         response.body?.let { Assertions.assertEquals(requestedIdentifiers.size, it.size) }
     }
 
@@ -189,7 +190,7 @@ class BpnControllerIT @Autowired constructor(
             BusinessPartnerVerboseValues.bpnARequestMapping.requestedIdentifier,
         )
         try {
-            val result = poolClient.bpns.findBpnByRequestedIdentifiers(requestedIdentifiers)
+            val result = poolClient.bpns.findBpnByRequestedIdentifiers(BpnRequestIdentifierSearchRequest(requestedIdentifiers))
             assertThrows<WebClientResponseException> { result }
         } catch (e: WebClientResponseException) {
             Assert.assertEquals(HttpStatus.BAD_REQUEST, e.statusCode)
@@ -202,7 +203,7 @@ class BpnControllerIT @Autowired constructor(
     @Test
     fun `find bpn by invalid requested identifier`() {
         val requestedIdentifiers = setOf(UUID.randomUUID().toString())
-        val response = poolClient.bpns.findBpnByRequestedIdentifiers(requestedIdentifiers)
+        val response = poolClient.bpns.findBpnByRequestedIdentifiers(BpnRequestIdentifierSearchRequest(requestedIdentifiers))
         response.body?.let { Assertions.assertNotEquals(requestedIdentifiers.size, it.size) }
         response.body?.let { Assertions.assertTrue(it.isEmpty()) }
     }
