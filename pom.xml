@@ -58,6 +58,7 @@
         <kotlin.compiler.apiVersion>2.1</kotlin.compiler.apiVersion>
         <spring-boot.version>3.2.5</spring-boot.version>
         <kotlin.version>2.1.0</kotlin.version>
+        <kotlin.coroutines.version>1.8.1</kotlin.coroutines.version>
         <springdoc.version>2.6.0</springdoc.version>
         <nv-i18n.version>1.29</nv-i18n.version>
         <kotlin-logging.version>3.0.5</kotlin-logging.version>
@@ -129,6 +130,11 @@
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-reflect</artifactId>
                 <version>${kotlin.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jetbrains.kotlinx</groupId>
+                <artifactId>kotlinx-coroutines-core</artifactId>
+                <version>${kotlin.coroutines.version}</version>
             </dependency>
             <!-- Contains country and language codes per ISO 3166-1 alpha-2 and ISO 639-1 -->
             <dependency>
@@ -247,25 +253,6 @@
                     </dependencies>
                     <executions>
                         <execution>
-                            <id>kapt</id>
-                            <goals>
-                                <goal>kapt</goal>
-                            </goals>
-                            <configuration>
-                                <sourceDirs>
-                                    <sourceDir>src/main/kotlin</sourceDir>
-                                </sourceDirs>
-                                <!-- Excluded spring-boot-configuration-processor from the actual build -->
-                                <annotationProcessorPaths>
-                                    <annotationProcessorPath>
-                                        <groupId>org.springframework.boot</groupId>
-                                        <artifactId>spring-boot-configuration-processor</artifactId>
-                                        <version>${spring-boot.version}</version>
-                                    </annotationProcessorPath>
-                                </annotationProcessorPaths>
-                            </configuration>
-                        </execution>
-                        <execution>
                             <id>compile</id>
                             <phase>compile</phase>
                             <goals>
@@ -274,8 +261,6 @@
                             <configuration>
                                 <sourceDirs>
                                     <source>src/main/kotlin</source>
-                                    <source>target/generated-sources/kapt/compile</source>
-                                    <source>target/generated-sources/kaptKotlin</source>
                                 </sourceDirs>
                             </configuration>
                         </execution>
