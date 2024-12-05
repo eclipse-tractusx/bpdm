@@ -38,48 +38,12 @@ class TestDataConfiguration {
     @Bean
     fun testMetadata(poolClient: PoolApiClient): TestMetadata {
         val testMetadata = TestMetadata(
-            identifierTypes = listOf("id1", "id2"),
-            legalForms = listOf("legalform1", "legalform2"),
+            identifierTypes = listOf("EU_VAT_ID_DE", "DUNS_ID"),
+            legalForms = listOf("SCE1", "SGST"),
             adminAreas = listOf("DE-BW", "DE-BY")
         )
 
-        testMetadata.identifierTypes.forEach { technicalKey ->
-            createIdentifierType(poolClient, technicalKey, IdentifierBusinessPartnerType.LEGAL_ENTITY)
-            createIdentifierType(poolClient, technicalKey, IdentifierBusinessPartnerType.ADDRESS)
-        }
-
-        testMetadata.legalForms.forEach { technicalKey ->
-            createLegalForm(poolClient, technicalKey)
-        }
-
         return testMetadata
-    }
-
-    private fun createIdentifierType(
-        poolClient: PoolApiClient,
-        technicalKey: String,
-        partnerType: IdentifierBusinessPartnerType
-    ) {
-        runCatching {
-            poolClient.metadata.createIdentifierType(
-                IdentifierTypeDto(
-                    technicalKey,
-                    partnerType,
-                    technicalKey,
-                    null, null, null
-                )
-            )
-        }.onFailure {
-            // Log or handle failure if needed
-        }
-    }
-
-    private fun createLegalForm(poolClient: PoolApiClient, technicalKey: String) {
-        runCatching {
-            poolClient.metadata.createLegalForm(LegalFormRequest(technicalKey, technicalKey, null, null, null, null, null, null, true))
-        }.onFailure {
-            // Log or handle failure if needed
-        }
     }
 
     @Bean
