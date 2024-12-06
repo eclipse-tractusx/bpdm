@@ -57,7 +57,7 @@
         <kotlin.compiler.apiVersion>2.1</kotlin.compiler.apiVersion>
         <spring-boot.version>3.2.5</spring-boot.version>
         <kotlin.version>2.1.0</kotlin.version>
-        <springdoc.version>2.6.0</springdoc.version>
+        <springdoc.version>2.7.0</springdoc.version>
         <nv-i18n.version>1.29</nv-i18n.version>
         <kotlin-logging.version>3.0.5</kotlin-logging.version>
         <common-csv.version>1.12.0</common-csv.version>
