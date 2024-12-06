@@ -26,7 +26,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
-import org.eclipse.tractusx.bpdm.test.system.SpringTestRunConfiguration
 import org.eclipse.tractusx.bpdm.test.system.config.TestRunData
 import org.eclipse.tractusx.bpdm.test.system.utils.*
 

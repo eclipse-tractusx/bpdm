@@ -20,26 +20,22 @@
 package org.eclipse.tractusx.bpdm.test.system
 
 import io.cucumber.junit.Cucumber
-import io.cucumber.junit.CucumberOptions
-import io.cucumber.spring.CucumberContextConfiguration
 import org.junit.runner.RunWith
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan
-import org.springframework.boot.test.context.SpringBootTest
 
 @RunWith(Cucumber::class)
-@CucumberOptions(features = ["bpdm-system-tester/src/main/resources"], glue = ["org.eclipse.tractusx.bpdm.test.system.stepdefinations"])
 class CucumberTestRunConfiguration
-
-@CucumberContextConfiguration
-@SpringBootTest
-class SpringTestRunConfiguration
 
 @SpringBootApplication(exclude=[DataSourceAutoConfiguration::class])
 @ConfigurationPropertiesScan
 class SpringApplicationConfiguration
 
 fun main(args: Array<String>) {
-    io.cucumber.core.cli.Main.main(*args)
+    //use parallel execution default if not overwritten
+    //can't use cucumber.properties for this as the properties parser currently does not support it
+    //see https://github.com/cucumber/cucumber-jvm/issues/2833
+    val cucumberArgs =  if(!args.contains("--threads")) args.plus(listOf("--threads", "16")) else args
+    io.cucumber.core.cli.Main.main(*cucumberArgs)
 }
