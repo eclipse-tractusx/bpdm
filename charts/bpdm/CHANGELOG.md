@@ -14,6 +14,7 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 - update BPDM Orchestrator Chart to version 3.3.0
 - update BPDM Cleaning Service Dummy Chart to version 3.3.0
 - update BPDM Bridge Chart to version 3.3.0
+- update Central-IDP dependency to 4.0.0 [#1145](https://github.com/eclipse-tractusx/bpdm/pull/1145)
 
 ## [5.2.0] -  2024-11-28
 

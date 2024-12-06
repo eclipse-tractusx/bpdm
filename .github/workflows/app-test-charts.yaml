@@ -178,14 +178,62 @@ jobs:
           EOF
           echo "cat .chart-testing-config.yaml"
           cat .chart-testing-config.yaml
+
       - name: Run chart-testing (install)
         run: ct install --charts charts/bpdm --config .chart-testing-config.yaml
+
+      - name: Create Test Upgrade Values
+        run: |
+          cat <<EOF > charts/bpdm/ci/test-upgrade-values.yaml
+          bpdm-pool:
+            image:
+              registry: kind-registry:5000
+              repository: bpdm-pool
+              tag: test
+          bpdm-gate:
+            image:
+              registry: kind-registry:5000
+              repository: bpdm-gate
+              tag: test
+          bpdm-orchestrator:
+            image:
+              registry: kind-registry:5000
+              repository: bpdm-orchestrator
+              tag: test
+          bpdm-cleaning-service-dummy:
+            image:
+              registry: kind-registry:5000
+              repository: bpdm-cleaning-service-dummy
+              tag: test
+          centralidp:
+            keycloak:
+              auth:
+                adminPassword: password
+              replicaCount: 1
+              postgresql:
+                auth:
+                  # -- Non-root user password.
+                  password: password
+                  # -- Root user password.
+                  postgresPassword: password
+                architecture: standalone
+            secrets:
+              postgresql:
+                auth:
+                  existingSecret:
+                    postgrespassword: password
+                    password: password
+            realmSeeding:
+              enabled: false
+          EOF
+          echo "cat charts/bpdm/ci/test-upgrade-values.yaml"
+          cat charts/bpdm/ci/test-upgrade-values.yaml
 
       - name: Run helm upgrade
         run: |
           helm repo add bitnami https://charts.bitnami.com/bitnami
           helm repo add tractusx-dev https://eclipse-tractusx.github.io/charts/dev
-          helm install bpdm-test tractusx-dev/bpdm ${{ github.event.inputs.upgrade_from && '--version github.event.inputs.upgrade_from' || '' }}
+          helm install -f charts/bpdm/ci/test-upgrade-values.yaml  bpdm-test tractusx-dev/bpdm ${{ github.event.inputs.upgrade_from && '--version github.event.inputs.upgrade_from' || '' }}
           helm dependency update charts/bpdm
-          helm upgrade --set centralidp.keycloak.postgresql.auth.postgresPassword=test --set centralidp.keycloak.postgresql.auth.password=test --set centralidp.keycloak.postgresql.auth.replicationPassword=test  bpdm-test charts/bpdm
+          helm upgrade -f charts/bpdm/ci/test-upgrade-values.yaml  bpdm-test charts/bpdm
 
