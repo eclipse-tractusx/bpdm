@@ -53,6 +53,8 @@
         <java.version>21</java.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
+        <kotlin.compiler.languageVersion>2.1</kotlin.compiler.languageVersion>
+        <kotlin.compiler.apiVersion>2.1</kotlin.compiler.apiVersion>
         <spring-boot.version>3.2.5</spring-boot.version>
         <kotlin.version>2.1.0</kotlin.version>
         <springdoc.version>2.6.0</springdoc.version>
