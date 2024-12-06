@@ -1676,6 +1676,12 @@ components:
             - SharingTimeout
             - BpnNotInPool
             - MissingTaskID
+            - NaturalPersonError
+            - BpnErrorNotFound
+            - BpnErrorTooManyOptions
+            - MandatoryFieldValidationFailed
+            - BlacklistCountryPresent
+            - UnknownSpecialCharacters
         sharingErrorMessage:
           type: string
           description: The error message in case the current sharing state type is "error".
