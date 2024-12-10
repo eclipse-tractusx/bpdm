@@ -1,4 +1,4 @@
-Feature: Share Valid Generic Business Partner without BPNs
+Feature: Share own company business partner data without BPNs
   Scenario: Update Without Address Type
     Given output "CC_SHG_UWAT_1" with external-ID "CC_SHG_UWAT"
     When the sharing member uploads full valid input "CC_SHG_UWAT_2" with external-ID "CC_SHG_UWAT" without address type

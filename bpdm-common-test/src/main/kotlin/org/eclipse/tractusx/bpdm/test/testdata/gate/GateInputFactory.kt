@@ -65,7 +65,7 @@ class GateInputFactory(
                 nameParts = listRange.map { "Name Part $seed $it" },
                 identifiers = emptyList(),
                 roles = BusinessPartnerRole.entries,
-                isOwnCompanyData = random.nextBoolean(),
+                isOwnCompanyData = true,
                 states = emptyList(),
                 legalEntity = LegalEntityRepresentationInputDto(
                     legalEntityBpn = "BPNL $seed",

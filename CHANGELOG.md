@@ -15,6 +15,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM System Test: Tester module which performs automated end-to-end tests on an existing golden record process.([#1070](https://github.com/eclipse-tractusx/bpdm/pull/1070))
 - BPDM Gate & Pool: Update linkage from AdditionalAddress to SiteMainAddress and LegalAddress to LegalAndSiteMainAddress.([#1121](https://github.com/eclipse-tractusx/bpdm/issues/1121))
 - BPDM Gate: Add endpoints for managing business partner relations ([#1027](https://github.com/eclipse-tractusx/bpdm/issues/1027))
+- BPDM System Test: End-to-end test CI/CD workflow setup for golden record process. ([#1155](https://github.com/eclipse-tractusx/bpdm/issues/1155))
 
 ### Changed
 

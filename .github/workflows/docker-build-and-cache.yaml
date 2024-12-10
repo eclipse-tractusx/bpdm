@@ -30,6 +30,7 @@ on:
           - gate
           - orchestrator
           - cleaning-service-dummy
+          - system-tester
   workflow_call:
     inputs:
       app:

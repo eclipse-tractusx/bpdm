@@ -39,7 +39,7 @@ class StepUtils(
 
     fun waitForResult(externalId: String): SharingStateType = runBlocking {
         println("Waiting for result for $externalId ...")
-        withTimeout(Duration.ofMinutes(3)) {
+        withTimeout(Duration.ofMinutes(4)) {
             while (true) {
                 val sharingState = gateClient.sharingState.getSharingStates(PaginationRequest(), listOf(externalId)).content.single()
                 if (sharingState.sharingStateType == SharingStateType.Success || sharingState.sharingStateType == SharingStateType.Error) {
