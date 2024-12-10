@@ -30,6 +30,7 @@ import java.util.*
     name = "golden_record_tasks",
     indexes = [
         Index(name = "index_tasks_uuid", columnList = "uuid"),
+        Index(name = "index_origin_id", columnList = "origin_id"),
         Index(name = "index_tasks_step_step_state", columnList = "task_step,task_step_state"),
         Index(name = "index_tasks_pending_timeout", columnList = "task_pending_timeout"),
         Index(name = "index_tasks_retention_timeout", columnList = "task_retention_timeout"),
@@ -60,7 +61,14 @@ class GoldenRecordTaskDb(
     @Embedded
     val processingState: ProcessingState,
     @Embedded
-    val businessPartner: BusinessPartner
+    val businessPartner: BusinessPartner,
+
+    @Column(name = "origin_id")
+    val originId: String,
+
+    @Column(name = "priority")
+    @Enumerated(EnumType.ORDINAL)
+    var priority: PriorityEnum
 ) {
     fun updateBusinessPartner(newBusinessPartnerData: BusinessPartner){
         with(newBusinessPartnerData){

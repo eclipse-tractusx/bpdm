@@ -23,9 +23,11 @@ import jakarta.annotation.PostConstruct
 import org.eclipse.tractusx.bpdm.gate.service.GoldenRecordUpdateBatchService
 import org.eclipse.tractusx.bpdm.gate.service.TaskCreationBatchService
 import org.eclipse.tractusx.bpdm.gate.service.TaskResolutionBatchService
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.TaskScheduler
 import org.springframework.scheduling.support.CronTrigger
+import org.springframework.util.StringUtils
 
 @Configuration
 class GoldenRecordTaskConfiguration(
@@ -33,11 +35,17 @@ class GoldenRecordTaskConfiguration(
     private val taskScheduler: TaskScheduler,
     private val taskCreationService: TaskCreationBatchService,
     private val taskResolutionService: TaskResolutionBatchService,
-    private val updateService: GoldenRecordUpdateBatchService
+    private val updateService: GoldenRecordUpdateBatchService,
+    @Value("\${bpdm.origin-id}")
+    private val originId: String
 ) {
 
     @PostConstruct
     fun scheduleGoldenRecordTasks() {
+        if (!StringUtils.hasText(originId)){
+            throw RuntimeException("Provide OriginatorId for the Gate.")
+        }
+
         taskScheduler.scheduleIfEnabled(
             { taskCreationService.createTasksForReadyBusinessPartners() },
             configProperties.creation.fromSharingMember.cron

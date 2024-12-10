@@ -22,6 +22,8 @@ package org.eclipse.tractusx.bpdm.orchestrator.controller
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.orchestrator.config.StateMachineConfigProperties
+import org.eclipse.tractusx.bpdm.orchestrator.entity.OriginRegistrarDb
+import org.eclipse.tractusx.bpdm.orchestrator.repository.OriginRegistrarRepository
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.BusinessPartnerTestDataFactory
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
@@ -46,17 +48,20 @@ import java.time.Instant
 class GoldenRecordTaskEventControllerIT @Autowired constructor(
     private val orchestratorClient: OrchestrationApiClient,
     private val dbTestHelpers: DbTestHelpers,
-    private val stateMachineConfigProperties: StateMachineConfigProperties
+    private val stateMachineConfigProperties: StateMachineConfigProperties,
+    private val originRegistrarRepository: OriginRegistrarRepository
 ){
 
     private val testDataFactory = BusinessPartnerTestDataFactory()
     private val defaultBusinessPartner1 = testDataFactory.createFullBusinessPartner("BP1")
     private val defaultBusinessPartner2 = testDataFactory.createFullBusinessPartner("BP2")
+    private val originId = "test-origin"
 
 
     @BeforeEach
     fun cleanUp() {
         dbTestHelpers.truncateDbTables()
+        originRegistrarRepository.save(OriginRegistrarDb(originId = originId, name = "test", priority = PriorityEnum.Low, threshold = 20))
     }
 
     /*
@@ -83,7 +88,8 @@ class GoldenRecordTaskEventControllerIT @Autowired constructor(
                 TaskCreateRequestEntry(null, defaultBusinessPartner1),
                 TaskCreateRequestEntry(null, defaultBusinessPartner2)
 
-            )
+            ),
+            originId
         )).createdTasks
 
 
@@ -182,7 +188,7 @@ class GoldenRecordTaskEventControllerIT @Autowired constructor(
 
     fun createFinishedTasks(count: Int, taskMode: TaskMode): List<String>{
         val createdTasks = orchestratorClient.goldenRecordTasks.createTasks(TaskCreateRequest(taskMode,
-            (1 .. count).map { TaskCreateRequestEntry(null, testDataFactory.createFullBusinessPartner(it.toString())) })
+            (1 .. count).map { TaskCreateRequestEntry(null, testDataFactory.createFullBusinessPartner(it.toString())) }, originId)
         ).createdTasks
 
         val allSteps = stateMachineConfigProperties.modeSteps[taskMode]!!

@@ -20,24 +20,12 @@
 package org.eclipse.tractusx.orchestrator.api.model
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.RequestWithKey
 
-@Schema(description = "Task reservation entry")
-data class TaskStepReservationEntryDto(
-
-    @get:Schema(description = "The identifier of the reserved task")
-    val taskId: String,
-
-    @get:Schema(description = "The identifier of the gate record for which this task has been created")
-    val recordId: String,
-
-    @get:Schema(description = "The business partner data to process")
-    val businessPartner: BusinessPartner,
-
-    @get:Schema(description = "The priority for the record")
-    val priority: PriorityEnum
-) : RequestWithKey {
-    override fun getRequestKey(): String {
-        return taskId
-    }
+@Schema(description = "Response object for register priority of the gates.")
+data class UpsertOriginResponse(
+    val originId: String,
+    val name: String,
+    val priority: PriorityEnum,
+    val threshold: Long,
+){
 }

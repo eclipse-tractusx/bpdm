@@ -31,9 +31,11 @@ abstract class AuthTestBase(
     private val authAssertions: AuthAssertionHelper,
     private val orchAuthExpectations: OrchestratorAuthExpectations
 ) {
+
+    private val originId = "test-origin"
     @Test
     fun `POST Golden Record Task`() {
-        val payload = TaskCreateRequest(TaskMode.entries.first(), listOf())
+        val payload = TaskCreateRequest(TaskMode.entries.first(), listOf(), originId)
         authAssertions.assert(orchAuthExpectations.tasks.postTask) { orchestratorClient.goldenRecordTasks.createTasks(payload) }
     }
 

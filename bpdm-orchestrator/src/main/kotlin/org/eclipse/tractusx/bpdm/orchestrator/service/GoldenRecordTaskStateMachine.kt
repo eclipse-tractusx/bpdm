@@ -34,13 +34,14 @@ import java.time.Instant
 class GoldenRecordTaskStateMachine(
     private val taskConfigProperties: TaskConfigProperties,
     private val taskRepository: GoldenRecordTaskRepository,
+    private val originRegistrarService: OriginRegistrarService,
     private val requestMapper: RequestMapper,
     private val stateMachineConfigProperties: StateMachineConfigProperties
 ) {
 
     private val logger = KotlinLogging.logger { }
 
-    fun initTask(mode: TaskMode, initBusinessPartner: BusinessPartner, record: GateRecordDb): GoldenRecordTaskDb {
+    fun initTask(mode: TaskMode, initBusinessPartner: BusinessPartner, record: GateRecordDb, originId: String): GoldenRecordTaskDb {
         logger.debug { "Executing initProcessingState() with parameters mode: $mode and business partner data: $initBusinessPartner" }
 
         val initialStep = getInitialStep(mode)
@@ -60,10 +61,11 @@ class GoldenRecordTaskStateMachine(
                 processingState = initProcessingState,
                 businessPartner = requestMapper.toBusinessPartner(initBusinessPartner),
                 createdAt = nowTime,
-                updatedAt = nowTime
+                updatedAt = nowTime,
+                originId = originId,
+                priority = originRegistrarService.getPriority(originId)
             )
         }
-
         return taskRepository.save(initialTask)
     }
 

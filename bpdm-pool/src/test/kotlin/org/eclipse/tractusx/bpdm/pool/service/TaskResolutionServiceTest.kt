@@ -836,7 +836,8 @@ class TaskResolutionServiceTest @Autowired constructor(
             TaskStepReservationEntryDto(
                 taskId = taskId,
                 recordId = UUID.randomUUID().toString(),
-                businessPartner = businessPartner
+                businessPartner = businessPartner,
+                priority = PriorityEnum.High
             )
         )
     }
@@ -847,7 +848,8 @@ class TaskResolutionServiceTest @Autowired constructor(
             TaskStepReservationEntryDto(
                 taskId = it.legalEntity.bpnReference.referenceValue!!,
                 recordId = UUID.randomUUID().toString(),
-                businessPartner = it
+                businessPartner = it,
+                priority = PriorityEnum.High
             )
         }
 
