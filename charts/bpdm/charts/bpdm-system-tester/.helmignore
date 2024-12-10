@@ -17,32 +17,29 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################################
 
-name: 'Build and Cache All Docker Images'
-on:
-  workflow_dispatch:
-  workflow_call:
-jobs:
-  build-pool:
-    uses: ./.github/workflows/docker-build-and-cache.yaml
-    with:
-      app: pool
-
-  build-gate:
-    uses: ./.github/workflows/docker-build-and-cache.yaml
-    with:
-      app: gate
-
-  build-orchestrator:
-    uses: ./.github/workflows/docker-build-and-cache.yaml
-    with:
-      app: orchestrator
-
-  build-cleaning-service-dummy:
-    uses: ./.github/workflows/docker-build-and-cache.yaml
-    with:
-      app: cleaning-service-dummy
-
-  build-system-tester:
-    uses: ./.github/workflows/docker-build-and-cache.yaml
-    with:
-      app: system-tester
+# Patterns to ignore when building packages.
+# This supports shell glob matching, relative path matching, and
+# negation (prefixed with !). Only one pattern per line.
+.DS_Store
+# Common VCS dirs
+.git/
+.gitignore
+.bzr/
+.bzrignore
+.hg/
+.hgignore
+.svn/
+# Common backup files
+*.swp
+*.bak
+*.tmp
+*.orig
+*~
+# Various IDEs
+.project
+.idea/
+*.tmproj
+.vscode/
+# Accept only values.yaml
+values-*.yaml
+values-*.yml

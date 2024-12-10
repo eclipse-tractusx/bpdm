@@ -81,3 +81,16 @@ centralidp:
   enabled: true
   keycloak:
     fullnameOverride: bpdm-centralidp
+
+bpdm-system-tester:
+  enabled: true
+  applicationConfig:
+    bpdm:
+      datasource:
+        host: bpdm-postgres
+      security:
+        auth-server-url: "http://bpdm-centralidp/auth"
+  postgres:
+    enabled: false
+  centralidp:
+    enabled: false

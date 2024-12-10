@@ -1,3 +1,4 @@
+---
 ################################################################################
 # Copyright (c) 2021,2024 Contributors to the Eclipse Foundation
 #
@@ -17,32 +18,19 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################################
 
-name: 'Build and Cache All Docker Images'
-on:
-  workflow_dispatch:
-  workflow_call:
-jobs:
-  build-pool:
-    uses: ./.github/workflows/docker-build-and-cache.yaml
-    with:
-      app: pool
-
-  build-gate:
-    uses: ./.github/workflows/docker-build-and-cache.yaml
-    with:
-      app: gate
-
-  build-orchestrator:
-    uses: ./.github/workflows/docker-build-and-cache.yaml
-    with:
-      app: orchestrator
-
-  build-cleaning-service-dummy:
-    uses: ./.github/workflows/docker-build-and-cache.yaml
-    with:
-      app: cleaning-service-dummy
-
-  build-system-tester:
-    uses: ./.github/workflows/docker-build-and-cache.yaml
-    with:
-      app: system-tester
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "bpdm-system-tester.fullname" . }}-test-connection"
+  labels:
+    {{- include "bpdm-system-tester.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "100"
+spec:
+  containers:
+    - name: java-test
+      image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+      command: ['java']
+      args: ['-jar app.jar']
+  restartPolicy: Never

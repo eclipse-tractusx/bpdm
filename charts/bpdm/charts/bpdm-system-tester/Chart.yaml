@@ -19,37 +19,14 @@
 ################################################################################
 
 apiVersion: v2
-name: bpdm
-type: application
-description: A Helm chart for Kubernetes that deploys the BPDM applications
-version: 5.3.0-SNAPSHOT
+name: bpdm-system-tester
 appVersion: "6.3.0-SNAPSHOT"
-home: https://github.com/eclipse-tractusx/bpdm
-sources:
-  - https://github.com/eclipse-tractusx/bpdm
-maintainers:
-  - name: Nico Koprowski
-  - name: Sujit Karne
-
+version: 1.0.0-SNAPSHOT
+description: A Helm chart for deploying the BPDM System tester service
 dependencies:
-  - name: bpdm-gate
-    version: 6.3.0-SNAPSHOT
-    alias: bpdm-gate
-    condition: bpdm-gate.enabled
-  - name: bpdm-pool
-    version: 7.3.0-SNAPSHOT
-    alias: bpdm-pool
-    condition: bpdm-pool.enabled
-  - name: bpdm-cleaning-service-dummy
-    version: 3.3.0-SNAPSHOT
-    alias: bpdm-cleaning-service-dummy
-    condition: bpdm-cleaning-service-dummy.enabled
-  - name: bpdm-orchestrator
-    version: 3.3.0-SNAPSHOT
-    alias: bpdm-orchestrator
-    condition: bpdm-orchestrator.enabled
   - name: bpdm-common
     version: 1.0.2
+    repository: "file://../bpdm-common"
   - name: postgresql
     version: 12.12.10
     repository: https://charts.bitnami.com/bitnami
@@ -60,7 +37,6 @@ dependencies:
     repository: https://eclipse-tractusx.github.io/charts/dev
     alias: centralidp
     condition: centralidp.enabled
-  - name: bpdm-system-tester
-    version: 1.0.0-SNAPSHOT
-    alias: bpdm-system-tester
-    condition: bpdm-system-tester.enabled
+maintainers:
+  - name: Nico Koprowski
+  - name: Sujit Karne
