@@ -24,4 +24,6 @@ interface OrchestrationApiClient {
     val goldenRecordTasks: GoldenRecordTaskApiClient
 
     val finishedTaskEvents: FinishedTaskEventApiClient
+
+    val originRegistrar: OriginatorRegistrarApiClient
 }

@@ -31,6 +31,7 @@ import org.eclipse.tractusx.orchestrator.api.model.TaskClientStateDto
 import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRequest
 import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRequestEntry
 import org.eclipse.tractusx.orchestrator.api.model.TaskMode
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -67,7 +68,9 @@ class TaskCreationChunkService(
     private val businessPartnerRepository: BusinessPartnerRepository,
     private val orchestratorMappings: OrchestratorMappings,
     private val orchestrationApiClient: OrchestrationApiClient,
-    private val properties: GoldenRecordTaskConfigProperties
+    private val properties: GoldenRecordTaskConfigProperties,
+    @Value("\${bpdm.origin-id}")
+    private val originId: String
 ) {
     private val logger = KotlinLogging.logger { }
 
@@ -96,6 +99,6 @@ class TaskCreationChunkService(
         if (orchestratorBusinessPartnersDto.isEmpty())
             return emptyList()
 
-        return orchestrationApiClient.goldenRecordTasks.createTasks(TaskCreateRequest(mode, orchestratorBusinessPartnersDto)).createdTasks
+        return orchestrationApiClient.goldenRecordTasks.createTasks(TaskCreateRequest(mode, orchestratorBusinessPartnersDto, originId)).createdTasks
     }
 }
