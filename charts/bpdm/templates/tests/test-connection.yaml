@@ -27,7 +27,7 @@ metadata:
 spec:
   containers:
     - name: java-test
-      image: "{{ .Values.tests.registry }}/{{ .Values.tests.repository }}:{{ .Values.tests.tag | default .Chart.AppVersion }}"
+      image: "{{ .Values.tests.image.registry }}/{{ .Values.tests.image.repository }}:{{ .Values.tests.image.tag | default .Chart.AppVersion }}"
       env:
         - name: SPRING_CONFIG_IMPORT
           value: "/etc/conf/secrets.yml"

@@ -83,7 +83,6 @@ centralidp:
     fullnameOverride: bpdm-centralidp
 
 tests:
-  enabled: true
   applicationConfig:
     bpdm:
       client:
