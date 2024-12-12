@@ -45,7 +45,7 @@ services:
       - KC_DB_URL=jdbc:postgresql://bpdm-postgres:5432/keycloak
       - KC_DB_USERNAME=keycloak
       - KEYCLOAK_ADMIN=admin
-      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
+      - KEYCLOAK_ADMIN_PASSWORD=admin
     command: start-dev --import-realm
     ports:
         - "8180:8080"

@@ -178,7 +178,7 @@ jobs:
               registry: kind-registry:5000
               repository: bpdm-cleaning-service-dummy
               tag: test
-          bpdm-system-tester:
+          tests:
             image:
               registry: kind-registry:5000
               repository: bpdm-system-tester
@@ -222,7 +222,7 @@ jobs:
               registry: kind-registry:5000
               repository: bpdm-cleaning-service-dummy
               tag: test
-          bpdm-system-tester:
+          tests:
             image:
               registry: kind-registry:5000
               repository: bpdm-system-tester

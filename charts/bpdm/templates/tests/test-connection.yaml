@@ -18,4 +18,27 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################################
 
-{{ include "bpdm-common.deployment" . -}}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "bpdm.fullname" . }}-test"
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: java-test
+      image: "{{ .Values.tests.registry }}/{{ .Values.tests.repository }}:{{ .Values.tests.tag | default .Chart.AppVersion }}"
+      env:
+        - name: SPRING_CONFIG_IMPORT
+          value: "/etc/conf/secrets.yml"
+      volumeMounts:
+        - mountPath: /etc/conf
+          name: config
+          readOnly: true
+  volumes:
+    - name: config
+      projected:
+        sources:
+          - secret:
+              name: "{{include "bpdm.fullname" .}}-test"
+  restartPolicy: Never

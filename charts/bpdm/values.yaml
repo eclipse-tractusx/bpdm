@@ -82,15 +82,20 @@ centralidp:
   keycloak:
     fullnameOverride: bpdm-centralidp
 
-bpdm-system-tester:
+tests:
   enabled: true
   applicationConfig:
     bpdm:
-      datasource:
-        host: bpdm-postgres
-      security:
-        auth-server-url: "http://bpdm-centralidp/auth"
-  postgres:
-    enabled: false
-  centralidp:
-    enabled: false
+      client:
+        gate:
+          provider:
+            issuer-uri: http://bpdm-centralidp/auth/realms/CX-Central
+        pool:
+          provider:
+            issuer-uri: http://bpdm-centralidp/auth/realms/CX-Central
+  image:
+    registry: docker.io
+    repository: tractusx/bpdm-system-tester
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: ""

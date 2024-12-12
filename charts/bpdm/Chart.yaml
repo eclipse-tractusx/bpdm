@@ -60,7 +60,3 @@ dependencies:
     repository: https://eclipse-tractusx.github.io/charts/dev
     alias: centralidp
     condition: centralidp.enabled
-  - name: bpdm-system-tester
-    version: 1.0.0-SNAPSHOT
-    alias: bpdm-system-tester
-    condition: bpdm-system-tester.enabled

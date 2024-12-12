@@ -81,6 +81,7 @@ class ShareGenericNoBpnStepDefs(
 
     private fun uploadInput(seed: String, externalId: String, addressType: AddressType?){
         val inputRequest =  gateInputDataFactory.createFullValid(seed, externalId).withAddressType(addressType).withoutAnyBpn()
+        inputRequest.copy(isOwnCompanyData = false)
         gateClient.businessParters.upsertBusinessPartnersInput(listOf(inputRequest))
     }
 
