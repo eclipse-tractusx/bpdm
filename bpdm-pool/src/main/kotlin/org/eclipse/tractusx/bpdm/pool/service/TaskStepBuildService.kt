@@ -21,10 +21,12 @@ package org.eclipse.tractusx.bpdm.pool.service
 
 import com.neovisionaries.i18n.CountryCode
 import jakarta.transaction.Transactional
+import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
+import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.orchestrator.api.model.*
@@ -213,10 +215,58 @@ class TaskStepBuildService(
                 .content.firstOrNull()
                 ?.let { SiteBpns(it.site.bpns, it.mainAddress.bpna) }
                 ?: throw BpdmValidationException(CleaningError.MAINE_ADDRESS_IS_NULL.message)
-        }else {
-            upsertSite(site, businessPartner, legalEntityBpn, taskEntryBpnMapping)
+        } else {
+            var bpnA = taskEntryBpnMapping.getBpn(site.siteMainAddress?.bpnReference)
+            if (bpnA == null) {
+                upsertSite(site, businessPartner, legalEntityBpn, taskEntryBpnMapping)
+            } else {
+                updateAddressLinkage(bpnA, site, businessPartner, legalEntityBpn, taskEntryBpnMapping)
+            }
         }
 
+        return bpnResults
+    }
+
+    private fun updateAddressLinkage(
+        bpnA: String,
+        site: Site,
+        businessPartner: BusinessPartner,
+        legalEntityBpn: String,
+        taskEntryBpnMapping: TaskEntryBpnMapping
+    ): SiteBpns {
+        var address = addressService.findAddressByBpn(bpnA)
+        return if (address == null) {
+            upsertSite(site, businessPartner, legalEntityBpn, taskEntryBpnMapping)
+        } else {
+            if (getAddressType(address) == AddressType.AdditionalAddress) {
+                createSiteFromAdditionalAddress(site, businessPartner, address, legalEntityBpn, taskEntryBpnMapping)
+            } else {
+                upsertSite(site, businessPartner, legalEntityBpn, taskEntryBpnMapping)
+            }
+        }
+    }
+
+    private fun createSiteFromAdditionalAddress(
+        site: Site,
+        businessPartner: BusinessPartner,
+        additionalAddress: LogisticAddressDb,
+        legalEntityBpn: String,
+        taskEntryBpnMapping: TaskEntryBpnMapping
+    ): SiteBpns {
+        val siteMainAddress = if (site.siteMainIsLegalAddress) businessPartner.legalEntity.legalAddress else site.siteMainAddress
+            ?: throw BpdmValidationException(CleaningError.MAINE_ADDRESS_IS_NULL.message)
+        val bpnSReference = site.bpnReference
+        val poolSite = toPoolDto(site, siteMainAddress)
+        val createRequest = SitePartnerCreateRequest(
+            bpnlParent = legalEntityBpn,
+            site = poolSite,
+            index = ""
+        )
+        var result = businessPartnerBuildService.createSiteMainAddressFromAdditionalAddress(listOf(createRequest), additionalAddress)
+        val siteResult = result.entities.firstOrNull() ?: throw BpdmValidationException("Unknown error when trying to creating site")
+        var bpnResults = SiteBpns(siteResult.site.bpns, siteResult.mainAddress.bpna)
+        taskEntryBpnMapping.addMapping(bpnSReference, bpnResults.siteBpn)
+        taskEntryBpnMapping.addMapping(siteMainAddress.bpnReference, bpnResults.mainAddressBpn)
         return bpnResults
     }
 
