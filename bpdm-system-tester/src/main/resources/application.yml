@@ -2,6 +2,8 @@ bpdm:
   client:
     pool:
       securityEnabled: true
+      # The base-url of the Pool-API
+      base-url: http://localhost:8080
       provider:
         issuer-uri: http://localhost:8180/realms/CX-Central
       registration:
@@ -12,6 +14,8 @@ bpdm:
         client-secret: "**********"
     gate:
       securityEnabled: true
+      # The base-url of the Pool-API
+      base-url: http://localhost:8081
       provider:
         issuer-uri: http://localhost:8180/realms/CX-Central
       registration:

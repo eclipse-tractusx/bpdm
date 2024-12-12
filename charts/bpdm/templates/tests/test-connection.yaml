@@ -30,7 +30,7 @@ spec:
       image: "{{ .Values.tests.image.registry }}/{{ .Values.tests.image.repository }}:{{ .Values.tests.image.tag | default .Chart.AppVersion }}"
       env:
         - name: SPRING_CONFIG_IMPORT
-          value: "/etc/conf/secrets.yml"
+          value: "/etc/conf/defaultSecrets.yml,/etc/conf/secrets.yml"
       volumeMounts:
         - mountPath: /etc/conf
           name: config
