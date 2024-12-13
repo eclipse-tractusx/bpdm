@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.api.model
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.IBaseBusinessPartnerDto
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
+import java.time.Instant
 
 interface IBaseBusinessPartnerGateDto : IBaseBusinessPartnerDto {
 
@@ -30,5 +31,8 @@ interface IBaseBusinessPartnerGateDto : IBaseBusinessPartnerDto {
 
     @get:Schema(description = "Indicates whether the sharing member claims (in the initial upload) the business partner to belong to the company data of the sharing member.")
     val isOwnCompanyData: Boolean
+
+    @get:Schema(description = "The timestamp indicates the last time point of change from the user side")
+    val externalSequenceTimestamp: Instant?
 }
 
