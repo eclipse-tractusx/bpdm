@@ -64,6 +64,9 @@ bpdm:
       batchSize: 1000
       # How often the golden record tasks should be checked for being healthy
       cron: '0 0 0 * * *'
+    dependencyCheck:
+      # How often the golden record connection dependencies should be checked for being healthy
+      cron: '*/30 * * * * *'
 
   # Connection to the pool and orchestrator
   client:
@@ -162,6 +165,7 @@ logging:
 management:
     endpoint:
         health:
+            show-details: always
             probes:
               # Enable actuator health endpoints for probing
                 enabled: true

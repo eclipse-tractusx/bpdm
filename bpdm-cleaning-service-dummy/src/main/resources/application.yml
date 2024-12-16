@@ -49,6 +49,9 @@ bpdm:
         client-secret: "**********"
   golden-record-process:
     step: CleanAndSync
+    dependencyCheck:
+       # How often the golden record connection dependencies should be checked for being healthy
+      cron: '*/30 * * * * *'
 
   cleaningService:
     # When and how often the cleaning service should poll for golden record tasks in the orchestrator
@@ -78,6 +81,7 @@ logging:
 management:
   endpoint:
     health:
+      show-details: always
       probes:
         # Enable actuator health endpoints for probing
         enabled: true

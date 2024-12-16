@@ -17,22 +17,26 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.cleaning.config
+package org.eclipse.tractusx.bpdm.gate.service
 
-import org.eclipse.tractusx.bpdm.cleaning.config.CleaningServiceConfigProperties.Companion.PREFIX
-import org.eclipse.tractusx.orchestrator.api.model.TaskStep
-import org.springframework.boot.context.properties.ConfigurationProperties
+import org.eclipse.tractusx.bpdm.gate.util.OrchestratorHealthIndicator
+import org.eclipse.tractusx.bpdm.gate.util.PoolHealthIndicator
+import org.springframework.boot.actuate.health.Status
+import org.springframework.stereotype.Service
 
-@ConfigurationProperties(prefix = PREFIX)
-class CleaningServiceConfigProperties (
-    val step: TaskStep,
-    val dependencyCheck: DependencyCheckConfig
-){
-    companion object{
-        const val PREFIX = "bpdm.golden-record-process"
+@Service
+class DependencyHealthService(
+    private val poolHealthIndicator: PoolHealthIndicator,
+    private val orchestratorHealthIndicator: OrchestratorHealthIndicator
+) {
+
+    fun checkAllDependencies(): Map<String, String> {
+        val poolHealth = if (poolHealthIndicator.health().status == Status.UP) "Healthy" else "Down"
+        val orchestratorHealth = if (orchestratorHealthIndicator.health().status == Status.UP) "Healthy" else "Down"
+
+        return mapOf(
+            "Pool Service" to poolHealth,
+            "Orchestrator Service" to orchestratorHealth
+        )
     }
-
-    data class DependencyCheckConfig(
-        val cron: String = "-"
-    )
 }
