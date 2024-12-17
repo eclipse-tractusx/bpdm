@@ -304,7 +304,7 @@ fun ConfidenceCriteriaDb.toDto(): ConfidenceCriteriaDto =
         confidenceLevel
     )
 
-private fun getAddressType(logisticAddress: LogisticAddressDb): AddressType {
+fun getAddressType(logisticAddress: LogisticAddressDb): AddressType {
     return when {
         logisticAddress.legalEntity?.legalAddress == logisticAddress &&
                 logisticAddress.site?.mainAddress == logisticAddress -> AddressType.LegalAndSiteMainAddress

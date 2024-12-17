@@ -136,6 +136,31 @@ class BusinessPartnerBuildService(
     }
 
     @Transactional
+    fun createSiteMainAddressFromAdditionalAddress(
+        requests: Collection<SitePartnerCreateRequest>,
+        address: LogisticAddressDb
+    ): SitePartnerCreateResponseWrapper {
+        val errorsByRequest = requestValidationService.validateSitesToCreateFromController(requests)
+        val errors = errorsByRequest.flatMap { it.value }
+        val validRequests = requests.filterNot { errorsByRequest.containsKey(it) }
+        val validMainAddresses = validRequests.map { it.site.mainAddress }
+        val addressMetadataMap = metadataService.getMetadata(validMainAddresses).toMapping()
+        val legalEntities = legalEntityRepository.findDistinctByBpnIn(validRequests.map { it.bpnlParent })
+        val legalEntitiesByBpn = legalEntities.associateBy { it.bpn }
+        val bpnSs = bpnIssuingService.issueSiteBpns(validRequests.size)
+        fun createSiteWithMainAddress(bpnIndex: Int, request: SitePartnerCreateRequest) =
+            createSite(request.site, bpnSs[bpnIndex], legalEntitiesByBpn[request.bpnlParent]!!)
+                .apply {
+                    mainAddress = createLogisticAddress(address, request.site.mainAddress, address.bpn, this.legalEntity, this, addressMetadataMap)
+                }.let { site -> Pair(site, request) }
+        val requestsBySites = validRequests
+            .mapIndexed { i, request -> createSiteWithMainAddress(i, request) }
+            .toMap()
+        val siteResponse = createChangeLogAndSaveSiteInformation(requestsBySites).map { it.toUpsertDto(requestsBySites[it]!!.index) }
+        return SitePartnerCreateResponseWrapper(siteResponse, errors)
+    }
+
+    @Transactional
     fun createSitesWithMainAddress(requests: Collection<SitePartnerCreateRequest>): SitePartnerCreateResponseWrapper {
         logger.info { "Create ${requests.size} new sites" }
 
@@ -161,6 +186,12 @@ class BusinessPartnerBuildService(
             .mapIndexed { i, request -> createSiteWithMainAddress(i, request) }
             .toMap()
 
+        val siteResponse = createChangeLogAndSaveSiteInformation(requestsBySites).map { it.toUpsertDto(requestsBySites[it]!!.index) }
+
+        return SitePartnerCreateResponseWrapper(siteResponse, errors)
+    }
+
+    private fun createChangeLogAndSaveSiteInformation(requestsBySites: Map<SiteDb, SitePartnerCreateRequest>): Set<SiteDb> {
         val sites = requestsBySites.keys
 
         changelogService.createChangelogEntries(sites.map {
@@ -177,10 +208,7 @@ class BusinessPartnerBuildService(
         }
 
         siteRepository.saveAll(sites)
-
-        val siteResponse = sites.map { it.toUpsertDto(requestsBySites[it]!!.index) }
-
-        return SitePartnerCreateResponseWrapper(siteResponse, errors)
+        return sites
     }
 
     @Transactional
@@ -417,6 +445,36 @@ class BusinessPartnerBuildService(
 
         updateLogisticAddress(address, dto, metadataMap)
 
+        return address
+    }
+
+    private fun createLogisticAddress(
+        address: LogisticAddressDb,
+        dto: LogisticAddressDto,
+        bpn: String,
+        legalEntity: LegalEntityDb,
+        site: SiteDb?,
+        metadataMap: AddressMetadataMapping
+    ) = updateLogisticAddressInternal(address, dto, bpn, metadataMap)
+        .apply {
+            this.legalEntity = legalEntity
+            this.site = site
+        }
+
+    private fun updateLogisticAddressInternal(
+        address: LogisticAddressDb,
+        dto: LogisticAddressDto,
+        bpn: String,
+        metadataMap: AddressMetadataMapping
+    ): LogisticAddressDb {
+        address.bpn = bpn
+        address.legalEntity = null
+        address.site = null
+        address.physicalPostalAddress = createPhysicalAddress(dto.physicalPostalAddress, metadataMap.regions)
+        address.alternativePostalAddress = dto.alternativePostalAddress?.let { createAlternativeAddress(it, metadataMap.regions) }
+        address.name = dto.name
+        address.confidenceCriteria = createConfidenceCriteria(dto.confidenceCriteria)
+        updateLogisticAddress(address, dto, metadataMap)
         return address
     }
 

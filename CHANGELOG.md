@@ -13,6 +13,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM Pool: Post endpoint to fetch the BPNL/S/A based on the requested identifiers.([#1052](https://github.com/eclipse-tractusx/bpdm/issues/1052))
 - BPDM Gate & Orchestrator: Enhance the error handling mechanism for the orchestrator and gate components by extending the list of available error codes.([#1003](https://github.com/eclipse-tractusx/bpdm/pull/1003#pullrequestreview-2477395867))
 - BPDM System Test: Tester module which performs automated end-to-end tests on an existing golden record process.([#1070](https://github.com/eclipse-tractusx/bpdm/pull/1070))
+- BPDM Gate & Pool: Update linkage from AdditionalAddress to SiteMainAddress and LegalAddress to LegalAndSiteMainAddress.([#1121](https://github.com/eclipse-tractusx/bpdm/issues/1121))
 
 ### Changed
 
