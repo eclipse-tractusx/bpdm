@@ -55,7 +55,7 @@ maven/mavencentral/io.cucumber/cucumber-spring/7.18.1, MIT, approved, clearlydef
 maven/mavencentral/io.cucumber/datatable/7.18.1, Apache-2.0, approved, #15145
 maven/mavencentral/io.cucumber/docstring/7.18.1, MIT, approved, clearlydefined
 maven/mavencentral/io.cucumber/gherkin/28.0.0, MIT, approved, #14276
-maven/mavencentral/io.cucumber/html-formatter/21.4.1, MIT, restricted, clearlydefined
+maven/mavencentral/io.cucumber/html-formatter/21.4.1, Apache-2.0 AND MIT, approved, #17770
 maven/mavencentral/io.cucumber/junit-xml-formatter/0.5.0, MIT, approved, clearlydefined
 maven/mavencentral/io.cucumber/messages/24.1.0, MIT, approved, #14274
 maven/mavencentral/io.cucumber/query/12.2.0, MIT, approved, clearlydefined
@@ -150,7 +150,7 @@ maven/mavencentral/org.glassfish.jaxb/jaxb-xjc/4.0.5, BSD-3-Clause, approved, ee
 maven/mavencentral/org.glassfish.jaxb/txw2/4.0.5, BSD-3-Clause, approved, ee4j.jaxb-impl
 maven/mavencentral/org.glassfish.jaxb/xsom/4.0.5, BSD-3-Clause, approved, ee4j.jaxb-impl
 maven/mavencentral/org.hamcrest/hamcrest-core/2.2, BSD-3-Clause, approved, clearlydefined
-maven/mavencentral/org.hamcrest/hamcrest/2.2, None, restricted, #17677
+maven/mavencentral/org.hamcrest/hamcrest/2.2, BSD-3-Clause, approved, #17677
 maven/mavencentral/org.hdrhistogram/HdrHistogram/2.2.2, BSD-2-Clause AND CC0-1.0 AND CC0-1.0, approved, #14828
 maven/mavencentral/org.hibernate.common/hibernate-commons-annotations/7.0.3.Final, Apache-2.0, approved, clearlydefined
 maven/mavencentral/org.hibernate.orm/hibernate-core/6.6.2.Final, (EPL-2.0 OR BSD-3-Clause) AND LGPL-2.1-or-later AND MIT, approved, #17553
