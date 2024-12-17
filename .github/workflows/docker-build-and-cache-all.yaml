@@ -41,3 +41,8 @@ jobs:
     uses: ./.github/workflows/docker-build-and-cache.yaml
     with:
       app: cleaning-service-dummy
+
+  build-system-tester:
+    uses: ./.github/workflows/docker-build-and-cache.yaml
+    with:
+      app: system-tester

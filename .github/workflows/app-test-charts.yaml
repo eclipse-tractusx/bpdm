@@ -118,6 +118,12 @@ jobs:
           name: bpdm-cleaning-service-dummy-docker
           path: /tmp
 
+      - name: Download System Tester Image
+        uses: actions/download-artifact@v4
+        with:
+          name: bpdm-system-tester-docker
+          path: /tmp
+
       - name: Push Pool Image to Kind
         run: |
           docker load --input /tmp/bpdm-pool.tar
@@ -142,6 +148,12 @@ jobs:
           docker image tag bpdm-cleaning-service-dummy:test kind-registry:5000/bpdm-cleaning-service-dummy:test
           docker push kind-registry:5000/bpdm-cleaning-service-dummy:test
 
+      - name: Push System Tester Image to Kind
+        run: |
+          docker load --input /tmp/bpdm-system-tester.tar
+          docker image tag bpdm-system-tester:test kind-registry:5000/bpdm-system-tester:test
+          docker push kind-registry:5000/bpdm-system-tester:test
+
       - name: Create Test Values
         run: |
           mkdir charts/bpdm/ci
@@ -165,6 +177,11 @@ jobs:
             image:
               registry: kind-registry:5000
               repository: bpdm-cleaning-service-dummy
+              tag: test
+          tests:
+            image:
+              registry: kind-registry:5000
+              repository: bpdm-system-tester
               tag: test
           EOF
           echo "cat charts/bpdm/ci/test-values.yaml"
@@ -204,6 +221,11 @@ jobs:
             image:
               registry: kind-registry:5000
               repository: bpdm-cleaning-service-dummy
+              tag: test
+          tests:
+            image:
+              registry: kind-registry:5000
+              repository: bpdm-system-tester
               tag: test
           centralidp:
             keycloak:

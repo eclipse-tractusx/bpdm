@@ -1,3 +1,4 @@
+---
 ################################################################################
 # Copyright (c) 2021,2024 Contributors to the Eclipse Foundation
 #
@@ -17,6 +18,27 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################################
 
-psql -U postgres -c "CREATE USER bpdm" -c "CREATE DATABASE bpdm" -c "GRANT ALL PRIVILEGES ON DATABASE bpdm TO bpdm"
-psql -U postgres -c "CREATE USER keycloak" -c "CREATE DATABASE keycloak"  -c "GRANT ALL PRIVILEGES ON DATABASE keycloak TO keycloak"
-psql -U postgres -d keycloak -c "GRANT ALL PRIVILEGES ON SCHEMA public TO keycloak"
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "bpdm.fullname" . }}-test"
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: java-test
+      image: "{{ .Values.tests.image.registry }}/{{ .Values.tests.image.repository }}:{{ .Values.tests.image.tag | default .Chart.AppVersion }}"
+      env:
+        - name: SPRING_CONFIG_IMPORT
+          value: "/etc/conf/defaultSecrets.yml,/etc/conf/secrets.yml"
+      volumeMounts:
+        - mountPath: /etc/conf
+          name: config
+          readOnly: true
+  volumes:
+    - name: config
+      projected:
+        sources:
+          - secret:
+              name: "{{include "bpdm.fullname" .}}-test"
+  restartPolicy: Never
