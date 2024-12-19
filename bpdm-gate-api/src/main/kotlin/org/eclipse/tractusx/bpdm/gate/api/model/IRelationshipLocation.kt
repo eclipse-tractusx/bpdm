@@ -17,12 +17,12 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.test.system.config
+package org.eclipse.tractusx.bpdm.gate.api.model
 
-import java.time.Instant
+import org.eclipse.tractusx.bpdm.common.model.StageType
 
-data class TestRunData (
-    val testTime: Instant
-){
-    fun toExternalId(seed: String): String = "${seed}_$testTime"
+interface IRelationshipLocation {
+    val externalId: String?
+    val tenantBpnL: String?
+    val stageType: StageType?
 }

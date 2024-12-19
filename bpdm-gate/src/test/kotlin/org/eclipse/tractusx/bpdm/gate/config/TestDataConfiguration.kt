@@ -17,9 +17,31 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.exception
+package org.eclipse.tractusx.bpdm.gate.config
 
-open class BpdmMissingSharingStateException(
-    externalId: String,
-    tenantBpnl: String?
-) : RuntimeException("Sharing state with external-id '$externalId' in tenant '$tenantBpnl' is missing.")
+import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
+import org.eclipse.tractusx.bpdm.test.testdata.gate.GateInputFactory
+import org.eclipse.tractusx.bpdm.test.testdata.gate.TestMetadata
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+
+@Configuration
+class TestDataConfiguration {
+
+    @Bean
+    fun testMetadata(poolClient: PoolApiClient): TestMetadata {
+        val testMetadata = TestMetadata(
+            identifierTypes = listOf("EU_VAT_ID_DE", "DUNS_ID"),
+            legalForms = listOf("SCE1", "SGST"),
+            adminAreas = listOf("DE-BW", "DE-BY")
+        )
+
+        return testMetadata
+    }
+
+    @Bean
+    fun gateTestDataFactory(testMetadata: TestMetadata): GateInputFactory {
+        return GateInputFactory(testMetadata, null)
+    }
+
+}

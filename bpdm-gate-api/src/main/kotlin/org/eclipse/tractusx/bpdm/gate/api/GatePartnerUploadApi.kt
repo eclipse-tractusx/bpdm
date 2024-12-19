@@ -26,7 +26,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.gate.api.GateBusinessPartnerApi.Companion.BUSINESS_PARTNER_PATH
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.PartnerUploadErrorResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.GateErrorResponse
 import org.springframework.core.io.ByteArrayResource
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -55,7 +55,7 @@ interface GatePartnerUploadApi {
             ApiResponse(responseCode = "400", description = "On malformed Business partner upload request",
                 content = [Content(
                     mediaType = "application/json",
-                    schema = Schema(implementation = PartnerUploadErrorResponse::class)
+                    schema = Schema(implementation = GateErrorResponse::class)
                 )]),
         ]
     )
