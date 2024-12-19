@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.exception
 
 import org.eclipse.tractusx.bpdm.common.exception.BpdmExceptionHandler
-import org.eclipse.tractusx.bpdm.gate.api.model.response.PartnerUploadErrorResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.GateErrorResponse
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ControllerAdvice
@@ -32,13 +32,51 @@ import java.time.Instant
 class GateExceptionHandler : BpdmExceptionHandler() {
 
     @ExceptionHandler(BpdmInvalidPartnerUploadException::class)
-    fun handleInvalidPartnerUploadException(ex:BpdmInvalidPartnerUploadException, request: WebRequest): ResponseEntity<PartnerUploadErrorResponse> {
-        val errorResponse = PartnerUploadErrorResponse(
+    fun handleInvalidPartnerUploadException(ex:BpdmInvalidPartnerUploadException, request: WebRequest): ResponseEntity<GateErrorResponse> {
+        val errorResponse = createResponse(ex.errors, request)
+        return ResponseEntity.status(errorResponse.status).body(errorResponse)
+    }
+
+    @ExceptionHandler(BpdmInvalidRelationConstraintsException::class)
+    fun handleInvalidRelationConstraintsException(ex: BpdmInvalidRelationConstraintsException, request: WebRequest): ResponseEntity<GateErrorResponse> {
+        val errorResponse = createResponse(ex.errors, request)
+        return ResponseEntity.status(errorResponse.status).body(errorResponse)
+    }
+
+    @ExceptionHandler(BpdmRelationAlreadyExistsException::class)
+    fun handleMissingRelationshipException(ex: BpdmRelationAlreadyExistsException, request: WebRequest): ResponseEntity<GateErrorResponse> {
+        val errorResponse = createResponse(ex.message ?: "", request, HttpStatus.CONFLICT)
+        return ResponseEntity.status(errorResponse.status).body(errorResponse)
+    }
+
+    @ExceptionHandler(
+        BpdmRelationTargetNotFoundException::class,
+        BpdmRelationTargetNotFoundException::class,
+        BpdmRelationSourceNotFoundException::class,
+        BpdmMissingSharingStateException::class,
+        BpdmTenantResolutionException::class,
+        BpdmMissingRelationException::class,
+        BpdmInvalidTenantBpnlException::class
+    )
+    fun handleGenericBadRequestException(ex: RuntimeException, request: WebRequest): ResponseEntity<GateErrorResponse>{
+        val errorResponse = createResponse(ex, request)
+        return ResponseEntity.status(errorResponse.status).body(errorResponse)
+    }
+
+    private fun createResponse(exception: RuntimeException, request: WebRequest, status: HttpStatus = HttpStatus.BAD_REQUEST): GateErrorResponse{
+        return createResponse(listOf(exception.message ?: ""), request, status)
+    }
+
+    private fun createResponse(error: String, request: WebRequest, status: HttpStatus = HttpStatus.BAD_REQUEST): GateErrorResponse{
+        return createResponse(listOf(error), request, status)
+    }
+
+    private fun createResponse(errors: List<String>, request: WebRequest, status: HttpStatus = HttpStatus.BAD_REQUEST): GateErrorResponse{
+        return GateErrorResponse(
             timestamp = Instant.now(),
-            status = HttpStatus.BAD_REQUEST,
-            error = ex.errors,
+            status = status,
+            error = errors,
             path = request.getDescription(false)
         )
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse)
     }
 }

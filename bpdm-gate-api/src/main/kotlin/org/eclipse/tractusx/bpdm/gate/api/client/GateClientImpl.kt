@@ -51,6 +51,8 @@ class GateClientImpl(
 
     override val partnerUpload by lazy { createClient<PartnerUploadApiClient>() }
 
+    override val relation: RelationApiClient by lazy { createClient<RelationApiClient>() }
+
     private inline fun <reified T> createClient() =
         httpServiceProxyFactory.createClient(T::class.java)
 }

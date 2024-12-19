@@ -17,9 +17,20 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.exception
+package org.eclipse.tractusx.bpdm.gate.api.model.response
 
-open class BpdmMissingSharingStateException(
-    externalId: String,
-    tenantBpnl: String?
-) : RuntimeException("Sharing state with external-id '$externalId' in tenant '$tenantBpnl' is missing.")
+import io.swagger.v3.oas.annotations.media.Schema
+import org.springframework.http.HttpStatus
+import java.time.Instant
+
+@Schema(description = "Error response for invalid partner upload")
+class GateErrorResponse(
+    @Schema(description = "Timestamp of the error occurrence")
+    val timestamp: Instant,
+    @Schema(description = "HTTP status of the error response")
+    val status: HttpStatus,
+    @Schema(description = "List of error messages")
+    val error: List<String>,
+    @Schema(description = "Request path where the error occurred")
+    val path: String
+)
