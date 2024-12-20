@@ -17,9 +17,23 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.exception
+package org.eclipse.tractusx.bpdm.gate.service
 
-open class BpdmMissingSharingStateException(
-    externalId: String,
-    tenantBpnl: String?
-) : RuntimeException("Sharing state with external-id '$externalId' in tenant '$tenantBpnl' is missing.")
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
+
+interface IRelationConstraintProvider {
+
+    fun getConstraints(relationType: RelationType): RelationTypeConstraints
+
+    data class RelationTypeConstraints(
+        val selfRelateAllowed: Boolean,
+        val sourceMustBeOwnCompanyData: Boolean,
+        val targetMustBeOwnCompanyData: Boolean,
+        val sourceAllowedTypes: Set<BusinessPartnerType>,
+        val targetAllowedTypes: Set<BusinessPartnerType>,
+        val sourceCanBeTarget: Boolean,
+        val multipleSourcesAllowed: Boolean,
+        val multipleTargetsAllowed: Boolean
+    )
+}

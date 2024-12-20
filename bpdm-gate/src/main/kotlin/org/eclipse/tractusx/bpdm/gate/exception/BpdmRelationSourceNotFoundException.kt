@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.exception
 
-open class BpdmMissingSharingStateException(
+class BpdmRelationSourceNotFoundException(
     externalId: String,
-    tenantBpnl: String?
-) : RuntimeException("Sharing state with external-id '$externalId' in tenant '$tenantBpnl' is missing.")
+    tenantBpnL: String
+) : BpdmMissingSharingStateException(externalId, tenantBpnL)

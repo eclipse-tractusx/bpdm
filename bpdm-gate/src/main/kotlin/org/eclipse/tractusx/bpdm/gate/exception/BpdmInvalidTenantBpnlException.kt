@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.gate.exception
 
-open class BpdmMissingSharingStateException(
-    externalId: String,
-    tenantBpnl: String?
-) : RuntimeException("Sharing state with external-id '$externalId' in tenant '$tenantBpnl' is missing.")
+class BpdmInvalidTenantBpnlException(
+    invalidTenantBpnL: String
+): RuntimeException("The provided tenant BPNL `$invalidTenantBpnL` is invalid as its not a correct BPNL.")

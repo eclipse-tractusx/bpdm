@@ -25,6 +25,6 @@ import org.springframework.web.bind.annotation.ResponseStatus
 
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
-class BpdmValidationErrorException(
+open class BpdmValidationErrorException(
     val validationErrors: List<ValidationError>
 ): RuntimeException(validationErrors.joinToString())

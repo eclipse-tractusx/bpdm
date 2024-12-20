@@ -65,6 +65,12 @@ class AuthInputManagerIT @Autowired constructor(
         uploadPartner = UploadPartnerAuthExpections(
             postInput = AuthExpectationType.Authorized,
             getInputTemplate = AuthExpectationType.Authorized
+        ),
+        relation = RelationAuthExpectations(
+            get = AuthExpectationType.Authorized,
+            post = AuthExpectationType.Authorized,
+            put = AuthExpectationType.Authorized,
+            delete = AuthExpectationType.Authorized,
         )
     )
 ) {

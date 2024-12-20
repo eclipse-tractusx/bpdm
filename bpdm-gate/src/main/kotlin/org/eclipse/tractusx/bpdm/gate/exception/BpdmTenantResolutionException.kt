@@ -19,7 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.gate.exception
 
-open class BpdmMissingSharingStateException(
-    externalId: String,
-    tenantBpnl: String?
-) : RuntimeException("Sharing state with external-id '$externalId' in tenant '$tenantBpnl' is missing.")
+import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.ResponseStatus
+
+@ResponseStatus(HttpStatus.BAD_REQUEST)
+class BpdmTenantResolutionException :RuntimeException("Could not determine tenant from request.")
