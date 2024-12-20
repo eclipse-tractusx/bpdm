@@ -17,9 +17,12 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.exception
+package org.eclipse.tractusx.bpdm.gate.api.model
 
-open class BpdmMissingSharingStateException(
-    externalId: String,
-    tenantBpnl: String?
-) : RuntimeException("Sharing state with external-id '$externalId' in tenant '$tenantBpnl' is missing.")
+interface IRelationDto {
+    val tenantBpnL: String?
+    val externalId: String?
+    val relationType: RelationType?
+    val businessPartnerSourceExternalId: String?
+    val businessPartnerTargetExternalId: String?
+}

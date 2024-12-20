@@ -55,11 +55,14 @@ import java.util.stream.Collectors
 class CustomJwtAuthenticationConverter(private val resourceId: String, private val requiredBpn: String = "") : Converter<Jwt, AbstractAuthenticationToken> {
     private val defaultGrantedAuthoritiesConverter = JwtGrantedAuthoritiesConverter()
     override fun convert(source: Jwt): AbstractAuthenticationToken {
-        val authorities: Collection<GrantedAuthority> =
-            defaultGrantedAuthoritiesConverter.convert(source)!!.plus(extractResourceRoles(source, resourceId, requiredBpn)).toSet()
-
         val bpn = source.claims["bpn"] as String? ?: ""
         val tokenAttributes = mutableMapOf<String, Any>("bpn" to bpn)
+
+        val authorities: Collection<GrantedAuthority> =
+            defaultGrantedAuthoritiesConverter.convert(source)!!
+                .plus(extractResourceRoles(source, resourceId, requiredBpn))
+                .let { if(bpn.isNotBlank()) it.plus(SimpleGrantedAuthority(bpn)) else it }
+                .toSet()
 
         return JwtAuthenticationToken(source, authorities, tokenAttributes.toString())
     }

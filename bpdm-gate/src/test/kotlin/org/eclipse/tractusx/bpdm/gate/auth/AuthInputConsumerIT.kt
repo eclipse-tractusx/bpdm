@@ -65,6 +65,12 @@ class AuthInputConsumerIT @Autowired constructor(
         uploadPartner = UploadPartnerAuthExpections(
             postInput = AuthExpectationType.Forbidden,
             getInputTemplate = AuthExpectationType.Forbidden
+        ),
+        relation = RelationAuthExpectations(
+            get = AuthExpectationType.Authorized,
+            post = AuthExpectationType.Forbidden,
+            put = AuthExpectationType.Forbidden,
+            delete = AuthExpectationType.Forbidden,
         )
     )
 ) {

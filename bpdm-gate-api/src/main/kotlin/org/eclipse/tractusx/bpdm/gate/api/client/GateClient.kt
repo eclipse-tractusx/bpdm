@@ -19,8 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.gate.api.client
 
-import org.eclipse.tractusx.bpdm.gate.api.StatsApi
-
 interface GateClient {
 
     val businessParters: BusinessPartnerApiClient
@@ -32,4 +30,6 @@ interface GateClient {
     val stats: StatsApiClient
 
     val partnerUpload: PartnerUploadApiClient
+
+    val relation: RelationApiClient
 }
