@@ -90,7 +90,8 @@ object PartnerFileUtil {
                         legalName = legalName
                     ),
                     site = row.toSiteRepresentationInputDto(formatter, errors, index, row.externalId.orEmpty()),
-                    address = row.toAddressRepresentationInputDto(formatter, errors, index, row.externalId.orEmpty())
+                    address = row.toAddressRepresentationInputDto(formatter, errors, index, row.externalId.orEmpty()),
+                    externalSequenceTimestamp = null
                 )
             } catch (e: Exception) {
                 errors.add("Row - ${index + 2}, External ID - ${row.externalId.orEmpty()} has error: ${e.message}")

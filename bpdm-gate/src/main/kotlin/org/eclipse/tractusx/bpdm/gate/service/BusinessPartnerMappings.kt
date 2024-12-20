@@ -105,6 +105,7 @@ class BusinessPartnerMappings {
             bpnS = dto.site.siteBpn,
             bpnA = dto.address.addressBpn,
             postalAddress = toPostalAddress(dto.address),
+            externalSequenceTimestamp = dto.externalSequenceTimestamp,
             legalEntityConfidence = null,
             siteConfidence = null,
             addressConfidence = null,
