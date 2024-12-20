@@ -17,20 +17,19 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.api.model.response
+package org.eclipse.tractusx.bpdm.gate.exception
 
-import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.gate.service.IRelationService
 import org.springframework.http.HttpStatus
-import java.time.Instant
+import org.springframework.web.bind.annotation.ResponseStatus
 
-@Schema(description = "Error response for invalid partner upload")
-class PartnerUploadErrorResponse(
-    @Schema(description = "Timestamp of the error occurrence")
-    val timestamp: Instant,
-    @Schema(description = "HTTP status of the error response")
-    val status: HttpStatus,
-    @Schema(description = "List of error messages")
-    val error: List<String>,
-    @Schema(description = "Request path where the error occurred")
-    val path: String
-)
+@ResponseStatus(HttpStatus.BAD_REQUEST)
+class BpdmInvalidRelationConstraintsException(
+    val errors: List<String>
+) : RuntimeException("The following errors have been discovered when validating business partner relationships: ${errors.joinToString(System.lineSeparator())}"){
+
+    companion object{
+        fun fromConstraintErrors(errors: List<IRelationService.ConstraintError>) =
+            BpdmInvalidRelationConstraintsException(errors.map { "Constraint for relation '${it.externalId}' is violated by value '${it.erroneousValue}': ${it.message}"})
+    }
+}
