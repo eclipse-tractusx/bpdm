@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.orchestrator.repository
 import org.eclipse.tractusx.bpdm.orchestrator.entity.DbTimestamp
 import org.eclipse.tractusx.bpdm.orchestrator.entity.GateRecordDb
 import org.eclipse.tractusx.bpdm.orchestrator.entity.GoldenRecordTaskDb
+import org.eclipse.tractusx.orchestrator.api.model.PriorityEnum
 import org.eclipse.tractusx.orchestrator.api.model.TaskStep
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -33,6 +34,8 @@ import java.util.*
 
 @Repository
 interface GoldenRecordTaskRepository : CrudRepository<GoldenRecordTaskDb, Long>, PagingAndSortingRepository<GoldenRecordTaskDb, Long> {
+
+    fun countByOriginIdAndProcessingStateResultStateAndPriorityAndCreatedAtAfter(originId: String, resultState: GoldenRecordTaskDb.ResultState, priority: PriorityEnum, currentDate: DbTimestamp): Long
 
     fun findByUuidIn(uuids: Set<UUID>): Set<GoldenRecordTaskDb>
 
@@ -60,7 +63,7 @@ interface GoldenRecordTaskRepository : CrudRepository<GoldenRecordTaskDb, Long>,
     @Query("SELECT DISTINCT task FROM GoldenRecordTaskDb task LEFT JOIN FETCH task.businessPartner.bpnReferences WHERE task IN :tasks")
     fun fetchBpnReferences(tasks: Set<GoldenRecordTaskDb>): Set<GoldenRecordTaskDb>
 
-    @Query("SELECT task from GoldenRecordTaskDb task WHERE task.processingState.step = :step AND task.processingState.stepState = :stepState")
+    @Query("SELECT task from GoldenRecordTaskDb task WHERE task.processingState.step = :step AND task.processingState.stepState = :stepState ORDER BY task.priority ASC")
     fun findByStepAndStepState(step: TaskStep, stepState: GoldenRecordTaskDb.StepState, pageable: Pageable): Page<GoldenRecordTaskDb>
 
     fun findByProcessingStatePendingTimeoutBefore(time: DbTimestamp, pageable: Pageable): Page<GoldenRecordTaskDb>

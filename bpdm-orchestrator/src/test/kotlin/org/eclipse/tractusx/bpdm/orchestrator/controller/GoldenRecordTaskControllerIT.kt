@@ -24,11 +24,15 @@ import org.assertj.core.api.ThrowableAssert
 import org.assertj.core.data.TemporalUnitOffset
 import org.eclipse.tractusx.bpdm.orchestrator.config.StateMachineConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.config.TaskConfigProperties
+import org.eclipse.tractusx.bpdm.orchestrator.entity.OriginRegistrarDb
+import org.eclipse.tractusx.bpdm.orchestrator.repository.GoldenRecordTaskRepository
+import org.eclipse.tractusx.bpdm.orchestrator.repository.OriginRegistrarRepository
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.BusinessPartnerTestDataFactory
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.*
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.params.ParameterizedTest
@@ -41,6 +45,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.*
+import java.util.stream.Collectors
 
 val WITHIN_ALLOWED_TIME_OFFSET: TemporalUnitOffset = within(1, ChronoUnit.SECONDS)
 
@@ -59,16 +64,21 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
     private val orchestratorClient: OrchestrationApiClient,
     private val taskConfigProperties: TaskConfigProperties,
     private val dbTestHelpers: DbTestHelpers,
-    private val stateMachineConfigProperties: StateMachineConfigProperties
+    private val stateMachineConfigProperties: StateMachineConfigProperties,
+    private val originRegistrarRepository: OriginRegistrarRepository,
+    private val goldenRecordTaskRepository: GoldenRecordTaskRepository
 ) {
 
     private val testDataFactory = BusinessPartnerTestDataFactory()
     private val defaultBusinessPartner1 = testDataFactory.createFullBusinessPartner("BP1")
     private val defaultBusinessPartner2 = testDataFactory.createFullBusinessPartner("BP2")
+    private val originId = "test-origin"
 
     @BeforeEach
     fun cleanUp() {
         dbTestHelpers.truncateDbTables()
+        originRegistrarRepository.deleteAll()
+        originRegistrarRepository.save(OriginRegistrarDb(originId = originId, name = "test", priority = PriorityEnum.High, threshold = 1))
     }
 
     /**
@@ -511,9 +521,13 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
 
         requestsWithRecords.forEach { assertThat(it.recordId).isNotNull() }
 
-        val tasksWithRecords = orchestratorClient.goldenRecordTasks.createTasks(TaskCreateRequest(taskMode, requestsWithRecords)).createdTasks
+        val tasksWithRecords = orchestratorClient.goldenRecordTasks.createTasks(TaskCreateRequest(taskMode, requestsWithRecords, originId)).createdTasks
 
         tasksWithRecords.zip(existingRecordIds).forEach { (actualTask, expectedRecordId) -> assertThat(actualTask.recordId).isEqualTo(expectedRecordId) }
+
+        var goldenRecordTaskDb = goldenRecordTaskRepository.findByUuidIn(tasksWithRecords.filter { it.processingState.resultState==ResultState.Pending }.map { UUID.fromString(it.taskId) }.toSet())
+
+        Assertions.assertSame(1, goldenRecordTaskDb.filter { it.priority == PriorityEnum.High }.count())
     }
 
     @ParameterizedTest
@@ -622,7 +636,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
                             entries: List<TaskCreateRequestEntry>? = null
     ): TaskCreateResponse{
         val resolvedEntries = entries ?: listOf(defaultBusinessPartner1, defaultBusinessPartner2).map { bp -> TaskCreateRequestEntry(null, bp) }
-        return orchestratorClient.goldenRecordTasks.createTasks(TaskCreateRequest(mode = mode, requests = resolvedEntries))
+        return orchestratorClient.goldenRecordTasks.createTasks(TaskCreateRequest(mode = mode, requests = resolvedEntries, originId = originId))
     }
 
     private fun createTasksWithoutRecordId(mode: TaskMode, businessPartners: List<BusinessPartner>? = null): TaskCreateResponse =
