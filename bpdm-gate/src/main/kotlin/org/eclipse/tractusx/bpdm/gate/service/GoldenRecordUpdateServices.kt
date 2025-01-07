@@ -39,6 +39,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntitySearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteSearchRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 import kotlin.reflect.KProperty
 
 @Service
@@ -190,9 +191,7 @@ class GoldenRecordUpdateChunkService(
     private fun LogisticAddressVerboseDto.toUpsertData(existingOutput: BusinessPartnerDb): OutputUpsertData {
         val copy = BusinessPartnerDb.createEmpty(existingOutput.sharingState, existingOutput.stage)
         copyUtil.copyValues(existingOutput, copy)
-        update(copy, this)
-
-        return copy.toUpsertData()
+        return update(copy, this)
     }
 
 
@@ -307,13 +306,34 @@ class GoldenRecordUpdateChunkService(
         businessPartner.siteConfidence?.let { update(it,  site.confidenceCriteria) }
     }
 
-    private fun update(businessPartner: BusinessPartnerDb, address: LogisticAddressVerboseDto){
+    private fun update(businessPartner: BusinessPartnerDb, address: LogisticAddressVerboseDto) : OutputUpsertData{
         updateIdentifiers(businessPartner.identifiers, address.identifiers.map(::toEntity), BusinessPartnerType.ADDRESS)
         updateStates(businessPartner.states, address.states, BusinessPartnerType.ADDRESS)
         businessPartner.addressName = address.name
         businessPartner.postalAddress.physicalPostalAddress = address.physicalPostalAddress.toEntity()
         businessPartner.postalAddress.alternativePostalAddress = address.alternativePostalAddress?.toEntity()
         businessPartner.addressConfidence?.let { update(it,  address.confidenceCriteria) }
+
+        //Below code will be used when,
+        //When addressType has been changed from LegalAddress to LegalAndSiteMainAddress
+        //When addressType has been changed from AdditionalAddress to SiteMainAddress
+        if (address.bpnSite != null && businessPartner.bpnS == null) {
+            businessPartner.bpnS = address.bpnSite
+            val searchRequest = SiteSearchRequest(siteBpns = listOf(address.bpnSite!!))
+            val sites = if(searchRequest.siteBpns.isNotEmpty())
+                poolClient.sites.getSites(searchRequest, PaginationRequest(size = searchRequest.siteBpns.size)).content.map { it.site }
+            else
+                emptyList()
+            //as addressType has been updated, so there is no siteConfidence criteria.
+            //fill the fake confidence to prevent the error which will update in further steps.
+            businessPartner.siteConfidence = ConfidenceCriteriaDb(false,false,0, LocalDateTime.now(), LocalDateTime.now(),0)
+            val sitesByBpn = sites.associateBy { it.bpns }
+            val site = sitesByBpn[businessPartner.bpnS!!]
+            val upsertData = site!!.toUpsertData(businessPartner)
+            return upsertData
+        }
+
+        return businessPartner.toUpsertData()
     }
 
     private fun update(entity: ConfidenceCriteriaDb, poolDto: ConfidenceCriteriaDto){
