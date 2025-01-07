@@ -141,6 +141,7 @@ logging:
 management:
   endpoint:
     health:
+      show-details: always
       probes:
         # Enable actuator health endpoints for probing
         enabled: true

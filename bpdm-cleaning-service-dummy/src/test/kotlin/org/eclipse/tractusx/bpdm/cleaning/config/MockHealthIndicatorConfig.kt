@@ -19,20 +19,20 @@
 
 package org.eclipse.tractusx.bpdm.cleaning.config
 
-import org.eclipse.tractusx.bpdm.cleaning.config.CleaningServiceConfigProperties.Companion.PREFIX
-import org.eclipse.tractusx.orchestrator.api.model.TaskStep
-import org.springframework.boot.context.properties.ConfigurationProperties
+import io.mockk.every
+import io.mockk.mockk
+import org.eclipse.tractusx.bpdm.cleaning.util.OrchestratorHealthIndicator
+import org.springframework.boot.actuate.health.Health
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
 
-@ConfigurationProperties(prefix = PREFIX)
-class CleaningServiceConfigProperties (
-    val step: TaskStep,
-    val dependencyCheck: DependencyCheckConfig
-){
-    companion object{
-        const val PREFIX = "bpdm.golden-record-process"
+@Configuration
+class MockHealthIndicatorConfig {
+
+    @Bean
+    fun orchestratorHealthIndicator(): OrchestratorHealthIndicator {
+        return mockk<OrchestratorHealthIndicator> {
+            every { health() } returns Health.up().build()
+        }
     }
-
-    data class DependencyCheckConfig(
-        val cron: String = "-"
-    )
 }
