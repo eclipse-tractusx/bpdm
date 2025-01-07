@@ -81,3 +81,20 @@ centralidp:
   enabled: true
   keycloak:
     fullnameOverride: bpdm-centralidp
+
+tests:
+  applicationConfig:
+    bpdm:
+      client:
+        gate:
+          provider:
+            issuer-uri: http://bpdm-centralidp/auth/realms/CX-Central
+        pool:
+          provider:
+            issuer-uri: http://bpdm-centralidp/auth/realms/CX-Central
+  image:
+    registry: docker.io
+    repository: tractusx/bpdm-system-tester
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: ""
