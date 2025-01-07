@@ -44,18 +44,18 @@ maven/mavencentral/commons-collections/commons-collections/3.2.2, Apache-2.0, ap
 maven/mavencentral/commons-io/commons-io/2.17.0, Apache-2.0, approved, #16198
 maven/mavencentral/commons-logging/commons-logging/1.2, Apache-2.0, approved, CQ10162
 maven/mavencentral/io.cucumber/ci-environment/10.0.1, MIT, approved, #15218
-maven/mavencentral/io.cucumber/cucumber-core/7.18.1, MIT AND (Apache-2.0 AND MIT), approved, #15146
+maven/mavencentral/io.cucumber/cucumber-core/7.20.1, Apache-2.0, restricted, clearlydefined
 maven/mavencentral/io.cucumber/cucumber-expressions/17.1.0, MIT, approved, #14271
-maven/mavencentral/io.cucumber/cucumber-gherkin-messages/7.18.1, MIT, approved, clearlydefined
-maven/mavencentral/io.cucumber/cucumber-gherkin/7.18.1, MIT, approved, clearlydefined
-maven/mavencentral/io.cucumber/cucumber-java/7.18.1, MIT, approved, clearlydefined
-maven/mavencentral/io.cucumber/cucumber-junit/7.18.1, MIT, approved, clearlydefined
-maven/mavencentral/io.cucumber/cucumber-plugin/7.18.1, MIT, approved, clearlydefined
-maven/mavencentral/io.cucumber/cucumber-spring/7.18.1, MIT, approved, clearlydefined
-maven/mavencentral/io.cucumber/datatable/7.18.1, Apache-2.0, approved, #15145
-maven/mavencentral/io.cucumber/docstring/7.18.1, MIT, approved, clearlydefined
+maven/mavencentral/io.cucumber/cucumber-gherkin-messages/7.20.1, , restricted, clearlydefined
+maven/mavencentral/io.cucumber/cucumber-gherkin/7.20.1, MIT, approved, clearlydefined
+maven/mavencentral/io.cucumber/cucumber-java/7.20.1, MIT, approved, clearlydefined
+maven/mavencentral/io.cucumber/cucumber-junit/7.20.1, , restricted, clearlydefined
+maven/mavencentral/io.cucumber/cucumber-plugin/7.20.1, MIT, approved, clearlydefined
+maven/mavencentral/io.cucumber/cucumber-spring/7.20.1, MIT, approved, clearlydefined
+maven/mavencentral/io.cucumber/datatable/7.20.1, Apache-2.0 AND MIT, approved, clearlydefined
+maven/mavencentral/io.cucumber/docstring/7.20.1, , restricted, clearlydefined
 maven/mavencentral/io.cucumber/gherkin/28.0.0, MIT, approved, #14276
-maven/mavencentral/io.cucumber/html-formatter/21.4.1, Apache-2.0 AND MIT, approved, #17770
+maven/mavencentral/io.cucumber/html-formatter/21.7.0, MIT, restricted, clearlydefined
 maven/mavencentral/io.cucumber/junit-xml-formatter/0.5.0, MIT, approved, clearlydefined
 maven/mavencentral/io.cucumber/messages/24.1.0, MIT, approved, #14274
 maven/mavencentral/io.cucumber/query/12.2.0, MIT, approved, clearlydefined
@@ -154,7 +154,7 @@ maven/mavencentral/org.hamcrest/hamcrest/2.2, BSD-3-Clause, approved, #17677
 maven/mavencentral/org.hdrhistogram/HdrHistogram/2.2.2, BSD-2-Clause AND CC0-1.0 AND CC0-1.0, approved, #14828
 maven/mavencentral/org.hibernate.common/hibernate-commons-annotations/7.0.3.Final, Apache-2.0, approved, clearlydefined
 maven/mavencentral/org.hibernate.orm/hibernate-core/6.6.4.Final, (EPL-2.0 OR BSD-3-Clause) AND LGPL-2.1-or-later AND MIT, approved, #17553
-maven/mavencentral/org.hibernate.validator/hibernate-validator/8.0.2.Final, Apache-2.0 AND (Apache-2.0 AND CC-PDDC), restricted, #18198
+maven/mavencentral/org.hibernate.validator/hibernate-validator/8.0.2.Final, Apache-2.0 AND CC-PDDC, approved, #18198
 maven/mavencentral/org.jboss.logging/jboss-logging/3.6.1.Final, Apache-2.0, approved, clearlydefined
 maven/mavencentral/org.jboss.resteasy/resteasy-client-api/6.2.4.Final, Apache-2.0, approved, #10223
 maven/mavencentral/org.jboss.resteasy/resteasy-client/6.2.4.Final, Apache-2.0, approved, clearlydefined
