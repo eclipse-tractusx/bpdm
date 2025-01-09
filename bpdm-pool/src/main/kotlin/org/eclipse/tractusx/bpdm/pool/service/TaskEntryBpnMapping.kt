@@ -47,6 +47,7 @@ class TaskEntryBpnMapping(taskEntries: List<TaskStepReservationEntryDto>, bpnReq
         val usedRequestIdentifiers: Collection<String> = filledReferences
             .filter { it.referenceType == BpnReferenceType.BpnRequestIdentifier }
             .map { it.referenceValue!! }
+            .distinct()
 
         val mappings = bpnRequestIdentifierRepository.findDistinctByRequestIdentifierIn(usedRequestIdentifiers)
         val bpnByRequestIdentifier = mappings.associate { it.requestIdentifier to it.bpn }
@@ -64,21 +65,17 @@ class TaskEntryBpnMapping(taskEntries: List<TaskStepReservationEntryDto>, bpnReq
         }
     }
 
-    fun hasBpnFor(bpnReference: BpnReference?): Boolean {
-
-        return bpnReference != null && (bpnReference.referenceType == BpnReferenceType.Bpn
-                ||  (bpnReference.referenceType == BpnReferenceType.BpnRequestIdentifier
-                && bpnByRequestIdentifier.containsKey(bpnReference.referenceValue)))
-    }
-
-
     fun addMapping(bpnReference: BpnReference, bpn: String) {
-        bpnReference.takeIf { it.referenceType == BpnReferenceType.BpnRequestIdentifier}
-            ?.referenceValue?.takeIf { it.isNotEmpty() }
-            ?.let {
-                createdBpnByRequestIdentifier[it] = bpn
-                bpnByRequestIdentifier[it] = bpn
-            }
+        if(
+            bpnReference.referenceType == BpnReferenceType.BpnRequestIdentifier
+            && !bpnReference.referenceValue.isNullOrEmpty()
+            && !bpnByRequestIdentifier.containsKey(bpnReference.referenceValue)
+            )
+        {
+            createdBpnByRequestIdentifier[bpnReference.referenceValue!!] = bpn
+            bpnByRequestIdentifier[bpnReference.referenceValue!!] = bpn
+        }
+
     }
 
     fun writeCreatedMappingsToDb(bpnRequestIdentifierRepository: BpnRequestIdentifierRepository) {
