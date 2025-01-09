@@ -54,8 +54,8 @@ class ChangelogControllerIT @Autowired constructor(
     val testHelpers: TestHelpers,
     val poolClient: PoolClientImpl,
     val dbTestHelpers: DbTestHelpers,
-    val assertHelpers: AssertHelpers,
     val poolDataHelpers: PoolDataHelpers,
+    val assertHelpers: AssertHelpers
 ) {
 
     @BeforeEach
