@@ -21,8 +21,10 @@ package org.eclipse.tractusx.bpdm.test.containers
 
 import dasniko.testcontainers.keycloak.KeycloakContainer
 import org.eclipse.tractusx.bpdm.test.config.SelfClientConfigProperties
+import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer.Companion.TENANT_BPNL
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer.Companion.keycloakContainer
 import org.keycloak.representations.idm.ClientRepresentation
+import org.keycloak.representations.idm.ProtocolMapperRepresentation
 import org.springframework.boot.test.util.TestPropertyValues
 import org.springframework.context.ApplicationContextInitializer
 import org.springframework.context.ConfigurableApplicationContext
@@ -105,16 +107,41 @@ abstract class CreateNewSelfClientInitializer: SelfClientInitializer(){
 
         val createdClientUuid = clients.findByClientId(clientId).first().id
 
+
+        val newProtocolMapper = ProtocolMapperRepresentation().apply {
+            name = "BPN"
+            protocol = "openid-connect"
+            protocolMapper = "oidc-usermodel-attribute-mapper"
+            config = mapOf(
+                "introspection.token.claim" to "true",
+                "userinfo.token.claim" to "true",
+                "user.attribute" to "bpn",
+                "id.token.claim" to "true",
+                "access.token.claim" to "true",
+                "claim.name" to "bpn",
+                "jsonType.label" to "String"
+            )
+        }
+        clients
+            .get(createdClientUuid)
+            .protocolMappers
+            .createMapper(newProtocolMapper)
+
         val newServiceAccount = clients
             .get(createdClientUuid)
             .serviceAccountUser
+
+        newServiceAccount.attributes = mutableMapOf(Pair("bpn", listOf(TENANT_BPNL)))
+
+        realm.users()
+            .get(newServiceAccount.id)
+            .update(newServiceAccount)
 
         realm.users()
             .get(newServiceAccount.id)
             .roles()
             .clientLevel(roleManagementClient.toRepresentation().id)
             .add(listOf(role))
-
 
         super.initialize(applicationContext)
     }

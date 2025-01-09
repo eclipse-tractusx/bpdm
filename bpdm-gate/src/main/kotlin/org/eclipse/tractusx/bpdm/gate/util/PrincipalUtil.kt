@@ -17,9 +17,25 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.exception
+package org.eclipse.tractusx.bpdm.gate.util
 
-open class BpdmMissingSharingStateException(
-    externalId: String,
-    tenantBpnl: String?
-) : RuntimeException("Sharing state with external-id '$externalId' in tenant '$tenantBpnl' is missing.")
+import org.eclipse.tractusx.bpdm.common.mapping.types.BpnLString
+import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
+import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidTenantBpnlException
+import org.eclipse.tractusx.bpdm.gate.exception.BpdmTenantResolutionException
+import org.springframework.stereotype.Component
+
+@Component
+class PrincipalUtil(
+    private val  bpnConfigProperties: BpnConfigProperties
+) {
+    fun resolveTenantBpnl(): BpnLString {
+        val tenantBpnlString =  getTenantBnlFromContext() ?: throw BpdmTenantResolutionException()
+        return BpnLString.map(tenantBpnlString).successfulResultOrNull  ?: throw BpdmInvalidTenantBpnlException(tenantBpnlString)
+    }
+
+    fun getTenantBnlFromContext(): String? {
+        return getCurrentUserBpn() ?: bpnConfigProperties.ownerBpnL.takeIf { it.isNotBlank() }
+    }
+}
+
