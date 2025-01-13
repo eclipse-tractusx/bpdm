@@ -60,6 +60,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM Pool: Fix error querying legal forms when non-gleif legacy legal forms are present in the database ([#1107](https://github.com/eclipse-tractusx/bpdm/issues/1107))
 - BPDM: Fix denial of service attack vulnerability CVE-2024-47535 ([#1112](https://github.com/eclipse-tractusx/bpdm/issues/1112))
 - BPDM Gate: Fix error on writing golden record task result missing legal name into output stage. Result is now correctly written. ([#1115](https://github.com/eclipse-tractusx/bpdm/issues/1115))
+- BPDM Pool: Fix resolved tasks by providing business partner data based on the database state. Returned result is now consistent. ([#1158](https://github.com/eclipse-tractusx/bpdm/issues/1158))
 
 ## [6.1.0] - [2024-07-15]
 

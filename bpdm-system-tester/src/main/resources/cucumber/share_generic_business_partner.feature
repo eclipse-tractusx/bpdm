@@ -16,7 +16,7 @@ Feature: Share own company business partner data without BPNs
       | externalId   | inputAddressType           | outputAddressType          |
       | CC_SHG_WAT_1 | LegalAndSiteMainAddress    | LegalAndSiteMainAddress    |
       | CC_SHG_WAT_2 | LegalAddress               | LegalAndSiteMainAddress    |
-      | CC_SHG_WAT_3 | SiteMainAddress            | SiteMainAddress            |
+      | CC_SHG_WAT_3 | SiteMainAddress            | LegalAndSiteMainAddress    |
       | CC_SHG_WAT_4 | AdditionalAddress          | AdditionalAddress          |
 
   Scenario Outline: Share With Missing or Invalid data
