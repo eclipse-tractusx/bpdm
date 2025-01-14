@@ -48,8 +48,6 @@ spec:
       {{- end }}
       # @url: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/#use-the-default-service-account-to-access-the-api-server
       automountServiceAccountToken: false
-      securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -84,14 +82,7 @@ spec:
         - name: startup-delay
           image: busybox:1.28
           securityContext:
-            allowPrivilegeEscalation: false
-            runAsNonRoot: true
-            readOnlyRootFilesystem: true
-            runAsUser: 10001
-            runAsGroup: 10001
-            capabilities:
-              drop:
-                - ALL
+            {{- toYaml .Values.securityContext | nindent 12 }}
           command: ['sh', '-c', "sleep {{ $.Values.startupDelaySeconds }}"]
       {{- with .Values.nodeSelector }}
       nodeSelector:
