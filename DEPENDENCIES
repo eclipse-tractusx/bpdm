@@ -196,9 +196,9 @@ maven/mavencentral/org.rnorth.duct-tape/duct-tape/1.0.8, MIT, approved, clearlyd
 maven/mavencentral/org.skyscreamer/jsonassert/1.5.3, Apache-2.0, approved, clearlydefined
 maven/mavencentral/org.slf4j/jul-to-slf4j/2.0.16, MIT, approved, #7698
 maven/mavencentral/org.slf4j/slf4j-api/2.0.16, MIT, approved, #5915
-maven/mavencentral/org.springdoc/springdoc-openapi-starter-common/2.8.1, Apache-2.0, approved, #18209
-maven/mavencentral/org.springdoc/springdoc-openapi-starter-webmvc-api/2.8.1, Apache-2.0, approved, #18210
-maven/mavencentral/org.springdoc/springdoc-openapi-starter-webmvc-ui/2.8.1, Apache-2.0, approved, #18211
+maven/mavencentral/org.springdoc/springdoc-openapi-starter-common/2.8.3, Apache-2.0, approved, #18209
+maven/mavencentral/org.springdoc/springdoc-openapi-starter-webmvc-api/2.8.3, Apache-2.0, approved, #18210
+maven/mavencentral/org.springdoc/springdoc-openapi-starter-webmvc-ui/2.8.3, Apache-2.0, approved, #18211
 maven/mavencentral/org.springframework.boot/spring-boot-actuator-autoconfigure/3.4.1, Apache-2.0, approved, #17576
 maven/mavencentral/org.springframework.boot/spring-boot-actuator/3.4.1, Apache-2.0, approved, #17574
 maven/mavencentral/org.springframework.boot/spring-boot-autoconfigure/3.4.1, Apache-2.0, approved, #17570
