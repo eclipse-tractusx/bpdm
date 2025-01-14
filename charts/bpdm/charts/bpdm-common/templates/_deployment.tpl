@@ -83,6 +83,13 @@ spec:
           image: busybox:1.28
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
+          resources:
+            limits:
+              cpu: 10m
+              memory: 100Mi
+            requests:
+               cpu: 10m
+               memory: 100Mi
           command: ['sh', '-c', "sleep {{ $.Values.startupDelaySeconds }}"]
       {{- with .Values.nodeSelector }}
       nodeSelector:

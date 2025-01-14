@@ -9,6 +9,7 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 - Increase appversion to 6.3.0
 - update Central-IDP dependency to 4.0.0 [#1145](https://github.com/eclipse-tractusx/bpdm/pull/1145)
 - Add missing seccomp profile [#1152](https://github.com/eclipse-tractusx/bpdm/issues/1152)
+- Add missing resource limits to the initcontainer [##1154](https://github.com/eclipse-tractusx/bpdm/issues/1154)
 
 ## [7.2.0] - 2024-11-28
 
