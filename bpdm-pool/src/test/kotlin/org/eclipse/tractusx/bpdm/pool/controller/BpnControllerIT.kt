@@ -57,9 +57,9 @@ import java.util.*
 class BpnControllerIT @Autowired constructor(
     val testHelpers: TestHelpers,
     val poolClient: PoolClientImpl,
-    val bpnRequestIdentifierRepository: BpnRequestIdentifierRepository,
     val dbTestHelpers: DbTestHelpers,
     val poolDataHelpers: PoolDataHelpers,
+    val bpnRequestIdentifierRepository: BpnRequestIdentifierRepository
 ) {
 
     val identifierType = BusinessPartnerNonVerboseValues.legalEntityCreate1.legalEntity.identifiers.first().type
