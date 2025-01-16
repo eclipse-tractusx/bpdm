@@ -61,6 +61,274 @@
         }
       }
     },
+    "/v6/input/business-partner-relations": {
+      "get": {
+        "tags": [
+          "relation-controller"
+        ],
+        "summary": "Find business partner input relations",
+        "description": "Find paginated list of business partner relations from the input stage. There are various filter criteria available. All filters are 'AND' filters.",
+        "operationId": "get",
+        "parameters": [
+          {
+            "name": "tenantBpnL",
+            "in": "query",
+            "description": "The BPNL of the tenant to search in. If not given, the system attempts to infer the tenant from the authentication.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "The BPNL of the tenant to search in. If not given, the system attempts to infer the tenant from the authentication."
+            }
+          },
+          {
+            "name": "externalIds",
+            "in": "query",
+            "description": "Only show relations with the given external identifiers",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "description": "Only show relations with the given external identifiers",
+              "items": {
+                "type": "string",
+                "description": "Only show relations with the given external identifiers"
+              }
+            }
+          },
+          {
+            "name": "relationType",
+            "in": "query",
+            "description": "Only show relations of the given type",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Only show relations of the given type",
+              "enum": [
+                "IsManagedBy"
+              ]
+            }
+          },
+          {
+            "name": "businessPartnerSourceExternalIds",
+            "in": "query",
+            "description": "Only show relations which have the given business partners as sources",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "description": "Only show relations which have the given business partners as sources",
+              "items": {
+                "type": "string",
+                "description": "Only show relations which have the given business partners as sources"
+              }
+            }
+          },
+          {
+            "name": "businessPartnerTargetExternalIds",
+            "in": "query",
+            "description": "Only show relations which have the given business partners as targets",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "description": "Only show relations which have the given business partners as targets",
+              "items": {
+                "type": "string",
+                "description": "Only show relations which have the given business partners as targets"
+              }
+            }
+          },
+          {
+            "name": "updatedAtFrom",
+            "in": "query",
+            "description": "Only show relations which have been modified after the given time stamp",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Only show relations which have been modified after the given time stamp",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Number of page to get results from",
+            "required": false,
+            "schema": {
+              "minimum": 0,
+              "type": "string"
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Size of each page",
+            "required": false,
+            "schema": {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A paginated list of business partner relations for the input stage",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageDtoRelationDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "relation-controller"
+        ],
+        "summary": "Update a business partner input relation",
+        "description": "Update an existing business partner relation on the input stage. By using a request parameter it is also possible to create a relation if the relation with the given external identifier does not exist. ",
+        "operationId": "put",
+        "parameters": [
+          {
+            "name": "createIfNotExist",
+            "in": "query",
+            "description": "If true a business partner relation will be created even if a relation could not be found under the given external identifier.",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "If true a business partner relation will be created even if a relation could not be found under the given external identifier."
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RelationPutRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "The given business partner relation has been updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelationDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "On wrong or insufficient user provided data like references to non-existent business partners or relations that violate the relation constraints. ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GateErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "relation-controller"
+        ],
+        "summary": "Create a new business partner input relation",
+        "description": "Create a new relation between two business partner entries on the input stage. The external identifier is optional and a new one will be automatically created if not given. A given external identifier has to be unique.",
+        "operationId": "post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RelationPostRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "The created business partner input relation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelationDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "If the business partner could not be created based on wrong or insufficient data provided such as non-existent business partners or violated relation constraints. ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GateErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "If a relation with the given external identifier already exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GateErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "relation-controller"
+        ],
+        "summary": "Delete an existing business partner relation",
+        "description": "Delete a relation between two business partners on the input stage.",
+        "operationId": "delete",
+        "parameters": [
+          {
+            "name": "tenantBpnL",
+            "in": "query",
+            "description": "The BPNL of the tenant to search in. If not given, the system attempts to infer the tenant from the authentication.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "The BPNL of the tenant to search in. If not given, the system attempts to infer the tenant from the authentication."
+            }
+          },
+          {
+            "name": "externalId",
+            "in": "query",
+            "description": "The external identifier of the business partner relation to delete",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The external identifier of the business partner relation to delete"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The specified relation has been deleted."
+          },
+          "400": {
+            "description": "On specifying a relation that does not exist. ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GateErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v6/sharing-state/ready": {
       "post": {
         "tags": [
@@ -105,8 +373,7 @@
             "required": false,
             "schema": {
               "minimum": 0,
-              "type": "string",
-              "default": "0"
+              "type": "string"
             }
           },
           {
@@ -117,8 +384,7 @@
             "schema": {
               "maximum": 100,
               "minimum": 0,
-              "type": "string",
-              "default": "10"
+              "type": "string"
             }
           }
         ],
@@ -165,8 +431,7 @@
             "required": false,
             "schema": {
               "minimum": 0,
-              "type": "string",
-              "default": "0"
+              "type": "string"
             }
           },
           {
@@ -177,8 +442,7 @@
             "schema": {
               "maximum": 100,
               "minimum": 0,
-              "type": "string",
-              "default": "10"
+              "type": "string"
             }
           }
         ],
@@ -264,7 +528,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PartnerUploadErrorResponse"
+                  "$ref": "#/components/schemas/GateErrorResponse"
                 }
               }
             }
@@ -288,8 +552,7 @@
             "required": false,
             "schema": {
               "minimum": 0,
-              "type": "string",
-              "default": "0"
+              "type": "string"
             }
           },
           {
@@ -300,8 +563,7 @@
             "schema": {
               "maximum": 100,
               "minimum": 0,
-              "type": "string",
-              "default": "10"
+              "type": "string"
             }
           }
         ],
@@ -348,8 +610,7 @@
             "required": false,
             "schema": {
               "minimum": 0,
-              "type": "string",
-              "default": "0"
+              "type": "string"
             }
           },
           {
@@ -360,8 +621,7 @@
             "schema": {
               "maximum": 100,
               "minimum": 0,
-              "type": "string",
-              "default": "10"
+              "type": "string"
             }
           }
         ],
@@ -503,8 +763,7 @@
             "required": false,
             "schema": {
               "minimum": 0,
-              "type": "string",
-              "default": "0"
+              "type": "string"
             }
           },
           {
@@ -515,8 +774,7 @@
             "schema": {
               "maximum": 100,
               "minimum": 0,
-              "type": "string",
-              "default": "10"
+              "type": "string"
             }
           },
           {
@@ -1358,6 +1616,110 @@
         },
         "description": "Holds information about failures"
       },
+      "GateErrorResponse": {
+        "required": [
+          "error",
+          "path",
+          "status",
+          "timestamp"
+        ],
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "description": "Timestamp of the error occurrence",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string",
+            "description": "HTTP status of the error response",
+            "enum": [
+              "100 CONTINUE",
+              "101 SWITCHING_PROTOCOLS",
+              "102 PROCESSING",
+              "103 EARLY_HINTS",
+              "103 CHECKPOINT",
+              "200 OK",
+              "201 CREATED",
+              "202 ACCEPTED",
+              "203 NON_AUTHORITATIVE_INFORMATION",
+              "204 NO_CONTENT",
+              "205 RESET_CONTENT",
+              "206 PARTIAL_CONTENT",
+              "207 MULTI_STATUS",
+              "208 ALREADY_REPORTED",
+              "226 IM_USED",
+              "300 MULTIPLE_CHOICES",
+              "301 MOVED_PERMANENTLY",
+              "302 FOUND",
+              "302 MOVED_TEMPORARILY",
+              "303 SEE_OTHER",
+              "304 NOT_MODIFIED",
+              "305 USE_PROXY",
+              "307 TEMPORARY_REDIRECT",
+              "308 PERMANENT_REDIRECT",
+              "400 BAD_REQUEST",
+              "401 UNAUTHORIZED",
+              "402 PAYMENT_REQUIRED",
+              "403 FORBIDDEN",
+              "404 NOT_FOUND",
+              "405 METHOD_NOT_ALLOWED",
+              "406 NOT_ACCEPTABLE",
+              "407 PROXY_AUTHENTICATION_REQUIRED",
+              "408 REQUEST_TIMEOUT",
+              "409 CONFLICT",
+              "410 GONE",
+              "411 LENGTH_REQUIRED",
+              "412 PRECONDITION_FAILED",
+              "413 PAYLOAD_TOO_LARGE",
+              "413 REQUEST_ENTITY_TOO_LARGE",
+              "414 URI_TOO_LONG",
+              "414 REQUEST_URI_TOO_LONG",
+              "415 UNSUPPORTED_MEDIA_TYPE",
+              "416 REQUESTED_RANGE_NOT_SATISFIABLE",
+              "417 EXPECTATION_FAILED",
+              "418 I_AM_A_TEAPOT",
+              "419 INSUFFICIENT_SPACE_ON_RESOURCE",
+              "420 METHOD_FAILURE",
+              "421 DESTINATION_LOCKED",
+              "422 UNPROCESSABLE_ENTITY",
+              "423 LOCKED",
+              "424 FAILED_DEPENDENCY",
+              "425 TOO_EARLY",
+              "426 UPGRADE_REQUIRED",
+              "428 PRECONDITION_REQUIRED",
+              "429 TOO_MANY_REQUESTS",
+              "431 REQUEST_HEADER_FIELDS_TOO_LARGE",
+              "451 UNAVAILABLE_FOR_LEGAL_REASONS",
+              "500 INTERNAL_SERVER_ERROR",
+              "501 NOT_IMPLEMENTED",
+              "502 BAD_GATEWAY",
+              "503 SERVICE_UNAVAILABLE",
+              "504 GATEWAY_TIMEOUT",
+              "505 HTTP_VERSION_NOT_SUPPORTED",
+              "506 VARIANT_ALSO_NEGOTIATES",
+              "507 INSUFFICIENT_STORAGE",
+              "508 LOOP_DETECTED",
+              "509 BANDWIDTH_LIMIT_EXCEEDED",
+              "510 NOT_EXTENDED",
+              "511 NETWORK_AUTHENTICATION_REQUIRED"
+            ]
+          },
+          "error": {
+            "type": "array",
+            "description": "List of error messages",
+            "items": {
+              "type": "string",
+              "description": "List of error messages"
+            }
+          },
+          "path": {
+            "type": "string",
+            "description": "Request path where the error occurred"
+          }
+        },
+        "description": "Error response for invalid partner upload"
+      },
       "GeoCoordinateDto": {
         "required": [
           "latitude",
@@ -1585,6 +1947,46 @@
         },
         "description": "Paginated collection of results"
       },
+      "PageDtoRelationDto": {
+        "required": [
+          "content",
+          "contentSize",
+          "page",
+          "totalElements",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "totalElements": {
+            "type": "integer",
+            "description": "Total number of all results in all pages",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Total number pages",
+            "format": "int32"
+          },
+          "page": {
+            "type": "integer",
+            "description": "Current page number",
+            "format": "int32"
+          },
+          "contentSize": {
+            "type": "integer",
+            "description": "Number of results in the page",
+            "format": "int32"
+          },
+          "content": {
+            "type": "array",
+            "description": "Collection of results in the page",
+            "items": {
+              "$ref": "#/components/schemas/RelationDto"
+            }
+          }
+        },
+        "description": "Paginated collection of results"
+      },
       "PageDtoSharingStateDto": {
         "required": [
           "content",
@@ -1624,110 +2026,6 @@
           }
         },
         "description": "Paginated collection of results"
-      },
-      "PartnerUploadErrorResponse": {
-        "required": [
-          "error",
-          "path",
-          "status",
-          "timestamp"
-        ],
-        "type": "object",
-        "properties": {
-          "timestamp": {
-            "type": "string",
-            "description": "Timestamp of the error occurrence",
-            "format": "date-time"
-          },
-          "status": {
-            "type": "string",
-            "description": "HTTP status of the error response",
-            "enum": [
-              "100 CONTINUE",
-              "101 SWITCHING_PROTOCOLS",
-              "102 PROCESSING",
-              "103 EARLY_HINTS",
-              "103 CHECKPOINT",
-              "200 OK",
-              "201 CREATED",
-              "202 ACCEPTED",
-              "203 NON_AUTHORITATIVE_INFORMATION",
-              "204 NO_CONTENT",
-              "205 RESET_CONTENT",
-              "206 PARTIAL_CONTENT",
-              "207 MULTI_STATUS",
-              "208 ALREADY_REPORTED",
-              "226 IM_USED",
-              "300 MULTIPLE_CHOICES",
-              "301 MOVED_PERMANENTLY",
-              "302 FOUND",
-              "302 MOVED_TEMPORARILY",
-              "303 SEE_OTHER",
-              "304 NOT_MODIFIED",
-              "305 USE_PROXY",
-              "307 TEMPORARY_REDIRECT",
-              "308 PERMANENT_REDIRECT",
-              "400 BAD_REQUEST",
-              "401 UNAUTHORIZED",
-              "402 PAYMENT_REQUIRED",
-              "403 FORBIDDEN",
-              "404 NOT_FOUND",
-              "405 METHOD_NOT_ALLOWED",
-              "406 NOT_ACCEPTABLE",
-              "407 PROXY_AUTHENTICATION_REQUIRED",
-              "408 REQUEST_TIMEOUT",
-              "409 CONFLICT",
-              "410 GONE",
-              "411 LENGTH_REQUIRED",
-              "412 PRECONDITION_FAILED",
-              "413 PAYLOAD_TOO_LARGE",
-              "413 REQUEST_ENTITY_TOO_LARGE",
-              "414 URI_TOO_LONG",
-              "414 REQUEST_URI_TOO_LONG",
-              "415 UNSUPPORTED_MEDIA_TYPE",
-              "416 REQUESTED_RANGE_NOT_SATISFIABLE",
-              "417 EXPECTATION_FAILED",
-              "418 I_AM_A_TEAPOT",
-              "419 INSUFFICIENT_SPACE_ON_RESOURCE",
-              "420 METHOD_FAILURE",
-              "421 DESTINATION_LOCKED",
-              "422 UNPROCESSABLE_ENTITY",
-              "423 LOCKED",
-              "424 FAILED_DEPENDENCY",
-              "425 TOO_EARLY",
-              "426 UPGRADE_REQUIRED",
-              "428 PRECONDITION_REQUIRED",
-              "429 TOO_MANY_REQUESTS",
-              "431 REQUEST_HEADER_FIELDS_TOO_LARGE",
-              "451 UNAVAILABLE_FOR_LEGAL_REASONS",
-              "500 INTERNAL_SERVER_ERROR",
-              "501 NOT_IMPLEMENTED",
-              "502 BAD_GATEWAY",
-              "503 SERVICE_UNAVAILABLE",
-              "504 GATEWAY_TIMEOUT",
-              "505 HTTP_VERSION_NOT_SUPPORTED",
-              "506 VARIANT_ALSO_NEGOTIATES",
-              "507 INSUFFICIENT_STORAGE",
-              "508 LOOP_DETECTED",
-              "509 BANDWIDTH_LIMIT_EXCEEDED",
-              "510 NOT_EXTENDED",
-              "511 NETWORK_AUTHENTICATION_REQUIRED"
-            ]
-          },
-          "error": {
-            "type": "array",
-            "description": "List of error messages",
-            "items": {
-              "type": "string",
-              "description": "List of error messages"
-            }
-          },
-          "path": {
-            "type": "string",
-            "description": "Request path where the error occurred"
-          }
-        },
-        "description": "Error response for invalid partner upload"
       },
       "PhysicalPostalAddressDto": {
         "type": "object",
@@ -2082,6 +2380,122 @@
         },
         "description": "Request for setting business partners into ready to be shared to golden record state"
       },
+      "RelationDto": {
+        "required": [
+          "businessPartnerSourceExternalId",
+          "businessPartnerTargetExternalId",
+          "createdAt",
+          "externalId",
+          "relationType",
+          "updatedAt"
+        ],
+        "type": "object",
+        "properties": {
+          "externalId": {
+            "type": "string",
+            "description": "The identifier with which to reference this relation"
+          },
+          "relationType": {
+            "type": "string",
+            "description": "The type of relation between the business partners",
+            "enum": [
+              "IsManagedBy"
+            ]
+          },
+          "businessPartnerSourceExternalId": {
+            "type": "string",
+            "description": "The business partner from which the relation emerges (the source)"
+          },
+          "businessPartnerTargetExternalId": {
+            "type": "string",
+            "description": "The business partner to which this relation goes (the target)"
+          },
+          "tenantBpnL": {
+            "type": "string",
+            "description": "The BPNL of the tenant this relation belongs to"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "The time when this relation was last modified",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "The time when this relation was created",
+            "format": "date-time"
+          }
+        },
+        "description": "A relation from one business partner (the source) to another business partner (the target). "
+      },
+      "RelationPostRequest": {
+        "required": [
+          "businessPartnerSourceExternalId",
+          "businessPartnerTargetExternalId",
+          "relationType"
+        ],
+        "type": "object",
+        "properties": {
+          "tenantBpnL": {
+            "type": "string",
+            "description": "The BPNL of the tenant to post in. If not given, the system attempts to infer the tenant from the authentication."
+          },
+          "externalId": {
+            "type": "string",
+            "description": "The identifier under which the relation will be referenced. If not given a unique identifier will be automatically assigned by the system. A given external identifier needs be unique."
+          },
+          "relationType": {
+            "type": "string",
+            "description": "The type of relation that should be created",
+            "enum": [
+              "IsManagedBy"
+            ]
+          },
+          "businessPartnerSourceExternalId": {
+            "type": "string",
+            "description": "The external identifier of the business partner from which the relation should emerge (the source)"
+          },
+          "businessPartnerTargetExternalId": {
+            "type": "string",
+            "description": "The external identifier of the business partner to which the relation should point (the target)"
+          }
+        },
+        "description": "A request to create a new relation between two business partners"
+      },
+      "RelationPutRequest": {
+        "required": [
+          "businessPartnerSourceExternalId",
+          "businessPartnerTargetExternalId",
+          "externalId",
+          "relationType"
+        ],
+        "type": "object",
+        "properties": {
+          "tenantBpnL": {
+            "type": "string",
+            "description": "The BPNL of the tenant in which to update. If not given, the system attempts to infer the tenant from the authentication."
+          },
+          "externalId": {
+            "type": "string",
+            "description": "The external identifier of the business partner relation to update"
+          },
+          "relationType": {
+            "type": "string",
+            "description": "The type the relation should be",
+            "enum": [
+              "IsManagedBy"
+            ]
+          },
+          "businessPartnerSourceExternalId": {
+            "type": "string",
+            "description": "The external identifier of the business partner from which the relation should emerge (the source)"
+          },
+          "businessPartnerTargetExternalId": {
+            "type": "string",
+            "description": "The external identifier of the business partner to which the relation should point (the target)"
+          }
+        },
+        "description": "A request to update the content of the given business partner relation"
+      },
       "SharingStateDto": {
         "required": [
           "externalId",
@@ -2106,12 +2520,18 @@
           },
           "sharingErrorCode": {
             "type": "string",
-            "description": "One of the sharing error codes in case the current sharing state type is \"error\".",
+            "description": "One of the sharing error codes in case the current sharing state type is \"error\". \n* `NaturalPersonError`: The provided record contains natural person information.\n* `BpnErrorNotFound`: The provided record can not be matched to a legal entity or an address.\n* `BpnErrorTooManyOptions`: The provided record can not link to a clear legal entity.\n* `MandatoryFieldValidationFailed`: The provided record does not fulfill mandatory validation rules.\n* `BlacklistCountryPresent`: The provided record is part of a country that is not allowed to be processed by the GR process (example: Brazil).\n* `UnknownSpecialCharacters`: The provided record contains unallowed special characters.",
             "enum": [
               "SharingProcessError",
               "SharingTimeout",
               "BpnNotInPool",
-              "MissingTaskID"
+              "MissingTaskID",
+              "NaturalPersonError",
+              "BpnErrorNotFound",
+              "BpnErrorTooManyOptions",
+              "MandatoryFieldValidationFailed",
+              "BlacklistCountryPresent",
+              "UnknownSpecialCharacters"
             ]
           },
           "sharingErrorMessage": {
@@ -2128,7 +2548,7 @@
             "description": "The orchestrator task identifier that was created"
           }
         },
-        "description": "A sharing state entry shows the progress in the sharing process and is updated each time the progress for a business partner changes. The business partner is identified by a combination of external ID and business partner type."
+        "description": "A sharing state entry shows the progress in the sharing process and is updated each time the progress for a business partner changes. The business partner is identified by a combination of external ID and business partner type.\n"
       },
       "SiteRepresentationInputDto": {
         "required": [

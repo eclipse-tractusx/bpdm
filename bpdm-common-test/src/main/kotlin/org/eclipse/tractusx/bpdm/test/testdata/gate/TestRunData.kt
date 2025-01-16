@@ -17,9 +17,12 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.exception
+package org.eclipse.tractusx.bpdm.test.testdata.gate
 
-open class BpdmMissingSharingStateException(
-    externalId: String,
-    tenantBpnl: String?
-) : RuntimeException("Sharing state with external-id '$externalId' in tenant '$tenantBpnl' is missing.")
+import java.time.Instant
+
+data class TestRunData (
+    val testTime: Instant
+){
+    fun toExternalId(seed: String): String = "${seed}_$testTime"
+}

@@ -17,12 +17,9 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.test.system.config
+package org.eclipse.tractusx.bpdm.gate.exception
 
-import java.time.Instant
-
-data class TestRunData (
-    val testTime: Instant
-){
-    fun toExternalId(seed: String): String = "${seed}_$testTime"
-}
+class BpdmRelationTargetNotFoundException(
+    externalId: String,
+    tenantBpnL: String
+) : BpdmMissingSharingStateException(externalId, tenantBpnL)

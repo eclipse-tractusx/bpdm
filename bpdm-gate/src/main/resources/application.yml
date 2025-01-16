@@ -133,6 +133,10 @@ bpdm:
       read_stats: read_stats
       # Name of the permission to upload business partner entries for business partner input data
       uploadInputPartner: write_input_partner
+      # Name of the permission to read business partner relations
+      readInputRelation: read_input_partner
+      # Name of the permission to update or create business partner relations
+      writeInputRelation: write_input_partner
   datasource:
     # Host name of the used datasource
     host: localhost

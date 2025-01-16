@@ -21,10 +21,11 @@ package org.eclipse.tractusx.bpdm.test.system.config
 
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.test.system.utils.GateInputFactory
 import org.eclipse.tractusx.bpdm.test.system.utils.GateOutputFactory
 import org.eclipse.tractusx.bpdm.test.system.utils.StepUtils
-import org.eclipse.tractusx.bpdm.test.system.utils.TestMetadata
+import org.eclipse.tractusx.bpdm.test.testdata.gate.GateInputFactory
+import org.eclipse.tractusx.bpdm.test.testdata.gate.TestMetadata
+import org.eclipse.tractusx.bpdm.test.testdata.gate.TestRunData
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import java.time.Instant

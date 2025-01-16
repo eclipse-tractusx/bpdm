@@ -26,6 +26,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressComponentOutputD
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityRepresentationOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteRepresentationOutputDto
+import org.eclipse.tractusx.bpdm.test.testdata.gate.GateInputFactory
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit

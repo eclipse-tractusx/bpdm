@@ -26,8 +26,13 @@ import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
-import org.eclipse.tractusx.bpdm.test.system.config.TestRunData
-import org.eclipse.tractusx.bpdm.test.system.utils.*
+import org.eclipse.tractusx.bpdm.test.system.utils.GateOutputFactory
+import org.eclipse.tractusx.bpdm.test.system.utils.StepUtils
+import org.eclipse.tractusx.bpdm.test.system.utils.withAddressType
+import org.eclipse.tractusx.bpdm.test.testdata.gate.GateInputFactory
+import org.eclipse.tractusx.bpdm.test.testdata.gate.TestRunData
+import org.eclipse.tractusx.bpdm.test.testdata.gate.withAddressType
+import org.eclipse.tractusx.bpdm.test.testdata.gate.withoutAnyBpn
 
 class ShareGenericNoBpnStepDefs(
     private val gateInputDataFactory: GateInputFactory,
