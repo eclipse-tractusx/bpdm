@@ -29,7 +29,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
-@ConfigurationProperties(prefix = PoolClientConfigurationProperties.PREFIX)
+@ConfigurationProperties(prefix = GateClientConfigProperties.PREFIX)
 data class GateClientConfigProperties(
     override val baseUrl: String = "http://localhost:8081",
     val searchChangelogPageSize: Int = 100,

@@ -1,13 +1,29 @@
 bpdm:
   client:
     pool:
-      enabled: false
+      securityEnabled: true
+      # The base-url of the Pool-API
+      base-url: http://localhost:8080
       provider:
-        issuer-uri: ${bpdm.security.auth-server-url:http://localhost:8180}/realms/${bpdm.security.realm:master}
+        issuer-uri: http://localhost:8180/realms/CX-Central
       registration:
         authorization-grant-type: client_credentials
         # Use a default client id for the client credentials request
-        client-id: BPDM-POOL
+        client-id: sa-cl7-cx-7
         # Please provide a secret here
+        client-secret: "**********"
+    gate:
+      securityEnabled: true
+      # The base-url of the Pool-API
+      base-url: http://localhost:8081
+      provider:
+        issuer-uri: http://localhost:8180/realms/CX-Central
+      registration:
+        authorization-grant-type: client_credentials
+        # Use a default client id for the client credentials request
+        client-id: sa-cl7-cx-7
+        # Please provide secret here
+        client-secret: "**********"
+
 cucumber:
   glue: "org.eclipse.tractusx.bpdm.test.system.stepdefinations"
