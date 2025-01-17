@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.cleaning.util
 
+import org.eclipse.tractusx.bpdm.cleaning.service.CleaningServiceDummy
 import org.springframework.boot.actuate.health.Status
 import org.springframework.boot.context.event.ApplicationReadyEvent
 import org.springframework.context.ApplicationListener
@@ -26,14 +27,15 @@ import org.springframework.stereotype.Component
 
 @Component
 class CleaningServiceStartupListner(
-    private val orchestratorHealthIndicator: OrchestratorHealthIndicator
+    private val cleaningServiceDummy: CleaningServiceDummy
 ) : ApplicationListener<ApplicationReadyEvent> {
 
     override fun onApplicationEvent(event: ApplicationReadyEvent) {
-        val orchestratorHealth = orchestratorHealthIndicator.health().status
-
-        if (orchestratorHealth != Status.UP) {
-            throw IllegalStateException("Dependencies not ready: Orchestrator: $orchestratorHealth")
+        try{
+            cleaningServiceDummy.pollForCleanAndSyncTasks()
+        }catch (ex: Throwable)
+        {
+            throw IllegalStateException("Could not clean tasks: ${ex.message}")
         }
     }
 

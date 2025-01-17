@@ -21,26 +21,25 @@ package org.eclipse.tractusx.bpdm.pool.util
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.pool.service.DependencyHealthService
+import org.eclipse.tractusx.bpdm.pool.service.TaskBatchResolutionService
 import org.springframework.boot.context.event.ApplicationReadyEvent
+import org.springframework.boot.context.event.ApplicationStartedEvent
 import org.springframework.context.ApplicationListener
 import org.springframework.stereotype.Component
 
 @Component
 class PoolServiceStartupListner(
-    private val dependencyHealthService: DependencyHealthService
-) : ApplicationListener<ApplicationReadyEvent> {
+    private val dependencyHealthService: DependencyHealthService,
+    private val taskBatchResolutionService: TaskBatchResolutionService
+) : ApplicationListener<ApplicationStartedEvent> {
 
     private val logger = KotlinLogging.logger { }
 
-    override fun onApplicationEvent(event: ApplicationReadyEvent) {
-        val healthStatus = dependencyHealthService.checkAllDependencies()
-        val unhealthyDependencies = healthStatus.filter { it.value == "Down" }
-
-        if (unhealthyDependencies.isNotEmpty()) {
-            logger.error("Startup failed. Dependencies not ready: ${unhealthyDependencies.map { "${it.key}: ${it.value}" }.joinToString(", ")}")
-            throw IllegalStateException("Dependencies not ready: ${unhealthyDependencies.map { "${it.key}: ${it.value}" }.joinToString(", ")}")
-        } else {
-            logger.info("All dependencies are healthy on startup: ${healthStatus.map { "${it.key}: ${it.value}" }.joinToString(", ")}")
+    override fun onApplicationEvent(event: ApplicationStartedEvent) {
+        try{
+            taskBatchResolutionService.processTasks()
+        }catch (ex: Throwable){
+            throw IllegalStateException("Could not resolve tasks: ${ex.message}")
         }
     }
 
