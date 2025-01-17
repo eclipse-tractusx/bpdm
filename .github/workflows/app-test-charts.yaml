@@ -60,6 +60,8 @@ on:
       - 'pom.xml'
       - 'bpdm-**'
       - 'charts/**'
+      - '.github/workflows/app-test-charts.yaml'
+      - 'docker/**'
   push:
     branches:
       - main
@@ -163,21 +165,25 @@ jobs:
               registry: kind-registry:5000
               repository: bpdm-pool
               tag: test
+            startupDelaySeconds: 120
           bpdm-gate:
             image:
               registry: kind-registry:5000
               repository: bpdm-gate
               tag: test
+            startupDelaySeconds: 120
           bpdm-orchestrator:
             image:
               registry: kind-registry:5000
               repository: bpdm-orchestrator
               tag: test
+            startupDelaySeconds: 120
           bpdm-cleaning-service-dummy:
             image:
               registry: kind-registry:5000
               repository: bpdm-cleaning-service-dummy
               tag: test
+            startupDelaySeconds: 120
           tests:
             image:
               registry: kind-registry:5000
