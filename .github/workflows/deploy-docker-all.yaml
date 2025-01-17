@@ -54,3 +54,10 @@ jobs:
     with:
       imageName: bpdm-orchestrator
       dockerfilePath: ./docker/orchestrator
+
+  build-docker-system-tester:
+    uses: ./.github/workflows/deploy-docker.yaml
+    secrets: inherit
+    with:
+      imageName: bpdm-system-tester
+      dockerfilePath: ./docker/system-tester
