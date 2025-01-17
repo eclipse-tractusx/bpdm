@@ -19,28 +19,28 @@
 
 package org.eclipse.tractusx.bpdm.gate.config
 
-import org.springframework.boot.context.properties.ConfigurationProperties
+import io.mockk.every
+import io.mockk.mockk
+import org.eclipse.tractusx.bpdm.gate.util.OrchestratorHealthIndicator
+import org.eclipse.tractusx.bpdm.gate.util.PoolHealthIndicator
+import org.springframework.boot.actuate.health.Health
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
 
-@ConfigurationProperties(prefix = "bpdm.tasks")
-data class GoldenRecordTaskConfigProperties(
-    val creation: CreationProperties = CreationProperties(),
-    val check: TaskProcessProperties = TaskProcessProperties(),
-    val healthCheck: TaskProcessProperties = TaskProcessProperties(),
-    val dependencyCheck: TaskProcessProperties = TaskProcessProperties()
-) {
-    data class CreationProperties(
-        val fromSharingMember: CreationTaskProperties = CreationTaskProperties(),
-        val fromPool: TaskProcessProperties = TaskProcessProperties()
-    )
+@Configuration
+class MockHealthIndicatorConfig {
 
-    data class TaskProcessProperties(
-        val batchSize: Int = 20,
-        val cron: String = "-",
-    )
+    @Bean
+    fun poolHealthIndicator(): PoolHealthIndicator {
+        return mockk<PoolHealthIndicator> {
+            every { health() } returns Health.up().build()
+        }
+    }
 
-    data class CreationTaskProperties(
-        val startsAsReady: Boolean = true,
-        val batchSize: Int = 20,
-        val cron: String = "-",
-    )
+    @Bean
+    fun orchestratorHealthIndicator(): OrchestratorHealthIndicator {
+        return mockk<OrchestratorHealthIndicator> {
+            every { health() } returns Health.up().build()
+        }
+    }
 }
