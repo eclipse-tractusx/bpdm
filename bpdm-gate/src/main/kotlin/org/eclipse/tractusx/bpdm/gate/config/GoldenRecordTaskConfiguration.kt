@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.config
 
 import jakarta.annotation.PostConstruct
+import org.eclipse.tractusx.bpdm.gate.service.GoldenRecordConsistencyService
 import org.eclipse.tractusx.bpdm.gate.service.GoldenRecordUpdateBatchService
 import org.eclipse.tractusx.bpdm.gate.service.TaskCreationBatchService
 import org.eclipse.tractusx.bpdm.gate.service.TaskResolutionBatchService
@@ -33,7 +34,8 @@ class GoldenRecordTaskConfiguration(
     private val taskScheduler: TaskScheduler,
     private val taskCreationService: TaskCreationBatchService,
     private val taskResolutionService: TaskResolutionBatchService,
-    private val updateService: GoldenRecordUpdateBatchService
+    private val updateService: GoldenRecordUpdateBatchService,
+    private val goldenRecordConsistencyService: GoldenRecordConsistencyService
 ) {
 
     @PostConstruct
@@ -56,6 +58,11 @@ class GoldenRecordTaskConfiguration(
         taskScheduler.scheduleIfEnabled(
             { taskResolutionService.healthCheck() },
             configProperties.healthCheck.cron
+        )
+
+        taskScheduler.scheduleIfEnabled(
+            { goldenRecordConsistencyService.check() },
+            configProperties.consistencyCheck.cron
         )
     }
 

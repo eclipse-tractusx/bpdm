@@ -67,6 +67,11 @@ bpdm:
     dependencyCheck:
       # How often the golden record connection dependencies should be checked for being healthy
       cron: '*/30 * * * * *'
+    consistencyCheck:
+      # How many business partners should be checked for consistency at one
+      batchSize: 20
+      # How often referenced BPNs should be checked for consistency with the golden record pool
+      cron: '0 0 0 * * *'
 
   # Connection to the pool and orchestrator
   client:
