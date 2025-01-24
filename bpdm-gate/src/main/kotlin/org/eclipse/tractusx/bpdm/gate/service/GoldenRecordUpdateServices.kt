@@ -25,10 +25,12 @@ import org.eclipse.tractusx.bpdm.common.dto.IBaseStateDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
 import org.eclipse.tractusx.bpdm.common.model.StageType
+import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.eclipse.tractusx.bpdm.gate.entity.generic.*
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.*
+import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.eclipse.tractusx.bpdm.gate.util.BusinessPartnerCopyUtil
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
@@ -37,6 +39,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntitySearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteSearchRequest
+import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -73,7 +76,9 @@ class GoldenRecordUpdateChunkService(
     private val taskConfigProperties: GoldenRecordTaskConfigProperties,
     private val businessPartnerRepository: BusinessPartnerRepository,
     private val copyUtil: BusinessPartnerCopyUtil,
-    private val businessPartnerService: BusinessPartnerService
+    private val businessPartnerService: BusinessPartnerService,
+    private val sharingStateRepository: SharingStateRepository,
+    private val sharingStateService: SharingStateService
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -106,11 +111,20 @@ class GoldenRecordUpdateChunkService(
         return UpdateStats(poolChangelogEntries.content.size, updatedLegalEntities, updatedSites, updatedAddresses)
     }
 
+    fun updateAgainstPool(businessPartners: List<BusinessPartnerDb>){
+        updateLegalEntitiesByReference(businessPartners).size
+        updateSitesByReference(businessPartners.filter { it.bpnS != null }).size
+        updateAddressesByReference(businessPartners).size
+    }
 
 
     private fun updateLegalEntities(changedBpnLs: Collection<String>): List<BusinessPartnerService.UpsertResult> {
-        val businessPartnersToUpdate = businessPartnerRepository.findByStageAndBpnLIn(StageType.Output, changedBpnLs)
+        val referencingBusinessPartners = businessPartnerRepository.findByStageAndBpnLIn(StageType.Output, changedBpnLs)
+        val businessPartnersToUpdate = referencingBusinessPartners.filter { it.sharingState.sharingStateType == SharingStateType.Success }
+        return updateLegalEntitiesByReference(businessPartnersToUpdate)
+    }
 
+    private fun updateLegalEntitiesByReference(businessPartnersToUpdate: Collection<BusinessPartnerDb>): List<BusinessPartnerService.UpsertResult>{
         val bpnLsToQuery = businessPartnersToUpdate.mapNotNull { it.bpnL }
 
         val searchRequest = LegalEntitySearchRequest(bpnLs = bpnLsToQuery)
@@ -129,8 +143,12 @@ class GoldenRecordUpdateChunkService(
     }
 
     private fun updateSites(changedSiteBpns: Collection<String>): List<BusinessPartnerService.UpsertResult> {
-        val businessPartnersToUpdate = businessPartnerRepository.findByStageAndBpnSIn(StageType.Output, changedSiteBpns)
+        val referencingBusinessPartners = businessPartnerRepository.findByStageAndBpnSIn(StageType.Output, changedSiteBpns)
+        val businessPartnersToUpdate = referencingBusinessPartners.filter { it.sharingState.sharingStateType == SharingStateType.Success }
+        return updateSitesByReference(businessPartnersToUpdate)
+    }
 
+    private fun updateSitesByReference(businessPartnersToUpdate: Collection<BusinessPartnerDb>): List<BusinessPartnerService.UpsertResult> {
         logger.debug { "Found ${businessPartnersToUpdate.size} business partners with matching BPNS to update." }
 
         val siteBpnsToQuery = businessPartnersToUpdate.mapNotNull { it.bpnS }
@@ -151,8 +169,12 @@ class GoldenRecordUpdateChunkService(
     }
 
     private fun updateAddresses(changedAddressBpns: Collection<String>): List<BusinessPartnerService.UpsertResult> {
-        val businessPartnersToUpdate = businessPartnerRepository.findByStageAndBpnAIn(StageType.Output, changedAddressBpns)
+        val referencingBusinessPartners = businessPartnerRepository.findByStageAndBpnAIn(StageType.Output, changedAddressBpns)
+        val businessPartnersToUpdate = referencingBusinessPartners.filter { it.sharingState.sharingStateType == SharingStateType.Success }
+        return updateAddressesByReference(businessPartnersToUpdate)
+    }
 
+    private fun updateAddressesByReference(businessPartnersToUpdate: Collection<BusinessPartnerDb>): List<BusinessPartnerService.UpsertResult> {
         logger.debug { "Found ${businessPartnersToUpdate.size} business partners with matching BPNA to update." }
 
         val addressBpnsToQuery = businessPartnersToUpdate.mapNotNull { it.bpnA }
@@ -218,7 +240,7 @@ class GoldenRecordUpdateChunkService(
             alternativePostalAddress = postalAddress.alternativePostalAddress?.toUpsertData(),
             legalEntityConfidence = legalEntityConfidence?.toUpsertData() ?: throw createMappingException(BusinessPartnerDb::legalEntityConfidence, id),
             siteConfidence = siteConfidence?.toUpsertData(),
-            addressConfidence = addressConfidence?.toUpsertData() ?: throw createMappingException(BusinessPartnerDb::addressConfidence, id),
+            addressConfidence = addressConfidence?.toUpsertData() ?: throw createMappingException(BusinessPartnerDb::addressConfidence, id)
         )
     }
 
@@ -296,6 +318,7 @@ class GoldenRecordUpdateChunkService(
         updateIdentifiers(businessPartner.identifiers, legalEntity.identifiers.map(::toEntity), BusinessPartnerType.LEGAL_ENTITY)
         updateStates(businessPartner.states, legalEntity.states, BusinessPartnerType.LEGAL_ENTITY)
         businessPartner.legalName = legalEntity.legalName
+        businessPartner.shortName = legalEntity.legalShortName
         businessPartner.legalForm = legalEntity.legalForm
         businessPartner.legalEntityConfidence?.let { update(it,  legalEntity.confidenceCriteria) }
     }
