@@ -38,6 +38,8 @@ podAnnotations: {}
 springProfiles: []
 
 securityContext:
+  seccompProfile:
+    type: RuntimeDefault
   allowPrivilegeEscalation: false
   runAsNonRoot: true
   readOnlyRootFilesystem: true
