@@ -77,6 +77,7 @@ class CleaningServiceDummy(
             }while (cleaningRequest.reservedTasks.isNotEmpty())
         } catch (e: Exception) {
             logger.error(e) { "Error while processing cleaning task" }
+            throw e
         }
     }
 
