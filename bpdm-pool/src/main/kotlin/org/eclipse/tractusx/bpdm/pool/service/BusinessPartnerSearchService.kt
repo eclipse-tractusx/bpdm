@@ -106,7 +106,7 @@ class BusinessPartnerSearchService(
             totalPages = legalEntityPage.totalPages,
             page = paginationRequest.page,
             content = legalEntityPage.content.mapIndexed { index, legalEntity ->
-                val score = legalEntityPage.totalElements - paginationRequest.page * paginationRequest.size - index
+                val score = legalEntityPage.totalElements - paginationRequest.page.toLong() * paginationRequest.size.toLong() - index
                 Pair(score.toFloat(), legalEntity)
             },
             contentSize = legalEntityPage.content.size
@@ -163,7 +163,7 @@ class BusinessPartnerSearchService(
             totalPages = addressPage.totalPages,
             page = paginationRequest.page,
             content = addressPage.content.mapIndexed { index, address ->
-                val score = addressPage.totalElements - paginationRequest.page * paginationRequest.size - index
+                val score = addressPage.totalElements - paginationRequest.page.toLong() * paginationRequest.size.toLong() - index
                 Pair(score.toFloat(), address)
             },
             contentSize = addressPage.content.size

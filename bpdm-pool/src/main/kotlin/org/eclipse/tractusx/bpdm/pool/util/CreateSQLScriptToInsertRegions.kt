@@ -32,7 +32,7 @@ class CreateSQLScriptToInsertRegions {
     fun readCsv(inputStream: InputStream): List<RegionDb> =
         CSVFormat.Builder.create(CSVFormat.DEFAULT).apply {
             setIgnoreSurroundingSpaces(true)
-        }.build().parse(inputStream.reader())
+        }.get().parse(inputStream.reader())
             .drop(1) // Dropping the header
             .map {
                 RegionDb(
