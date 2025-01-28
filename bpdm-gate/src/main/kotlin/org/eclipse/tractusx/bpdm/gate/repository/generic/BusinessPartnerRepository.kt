@@ -20,8 +20,11 @@
 package org.eclipse.tractusx.bpdm.gate.repository.generic
 
 import org.eclipse.tractusx.bpdm.common.model.StageType
+import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.data.jpa.repository.Query
@@ -66,6 +69,7 @@ interface BusinessPartnerRepository : PagingAndSortingRepository<BusinessPartner
     }
 
     fun findBySharingStateInAndStage(sharingStates: Collection<SharingStateDb>, stage: StageType): Set<BusinessPartnerDb>
+    fun findByStageAndSharingStateSharingStateType(stage: StageType, sharingStateType: SharingStateType, pageable: Pageable): Page<BusinessPartnerDb>
 
     @Query("SELECT b.stage as stage, COUNT(b.stage) as count FROM BusinessPartnerDb AS b GROUP BY b.stage")
     fun countPerStages(): List<PartnersPerStageCount>
