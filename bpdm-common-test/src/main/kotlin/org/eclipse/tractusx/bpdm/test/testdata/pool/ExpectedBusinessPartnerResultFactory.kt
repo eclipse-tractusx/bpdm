@@ -116,7 +116,7 @@ class ExpectedBusinessPartnerResultFactory(
             mainAddress = mapToExpectedResult(
                 givenRequest.site.mainAddress,
                 givenBpnA,
-                null,
+                givenRequest.bpnlParent,
                 givenBpnS,
                 AddressType.SiteMainAddress,
                 isCatenaXMemberData,
@@ -164,7 +164,7 @@ class ExpectedBusinessPartnerResultFactory(
         return mapToExpectedResult(
             givenRequest = givenRequest.site.mainAddress,
             givenBpnA = givenBpnA,
-            bpnLegalEntity = null,
+            bpnLegalEntity = givenRequest.bpnlParent,
             bpnSite = bpnSite,
             addressType = AddressType.SiteMainAddress,
             isCatenaXMemberData = isCatenaXMemberData,
