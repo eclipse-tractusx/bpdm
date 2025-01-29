@@ -271,6 +271,35 @@ class BusinessPartnerControllerIT @Autowired constructor(
         assertEquals(0, searchResponsePage2.content.size)
     }
 
+    @Test
+    fun `insert a late arrival request with minimal business partner and the record won't be updated`() {
+
+        val firstUpsertRequest = listOf(BusinessPartnerVerboseValues.bpInputRequestWithExternalSequenceTimestamp2) //12:00
+        gateClient.businessParters.upsertBusinessPartnersInput(firstUpsertRequest).body!!
+
+        val beforeFirstUpsertRequest = listOf(BusinessPartnerVerboseValues.bpInputRequestWithExternalSequenceTimestamp1) // 11:59
+        gateClient.businessParters.upsertBusinessPartnersInput(beforeFirstUpsertRequest).body!!
+
+        val searchResponsePage = gateClient.businessParters.getBusinessPartnersInput(
+            listOf(BusinessPartnerVerboseValues.externalId1))
+
+        this.mockAndAssertUtils.assertUpsertResponsesMatchRequests(searchResponsePage.content, firstUpsertRequest)
+    }
+
+    @Test
+    fun `upsert a new request with later externalSequenceTimestamp timestamp and the record updated`() {
+
+        val firstUpsertRequest = listOf(BusinessPartnerVerboseValues.bpInputRequestWithExternalSequenceTimestamp2) //12:00
+        gateClient.businessParters.upsertBusinessPartnersInput(firstUpsertRequest).body!!
+
+        val laterUpsertRequest = listOf(BusinessPartnerVerboseValues.bpInputRequestWithExternalSequenceTimestamp3) // 12:01
+        gateClient.businessParters.upsertBusinessPartnersInput(laterUpsertRequest).body!!
+
+        val searchResponsePage = gateClient.businessParters.getBusinessPartnersInput(
+            listOf(BusinessPartnerVerboseValues.externalId1))
+
+        this.mockAndAssertUtils.assertUpsertResponsesMatchRequests(searchResponsePage.content, laterUpsertRequest)
+    }
 
 
 

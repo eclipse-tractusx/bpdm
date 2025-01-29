@@ -87,7 +87,7 @@ class BusinessPartnerService(
 
 
             upsertFromEntity(existingInput, updatedData)
-                .takeIf { it.hadChanges || sharingState.sharingStateType == SharingStateType.Error }
+                .takeIf {  it.shouldUpdate && (it.hadChanges || sharingState.sharingStateType == SharingStateType.Error) }
                 ?.also { sharingStateService.setInitial(sharingState) }
                 ?.businessPartner
         }
@@ -136,15 +136,20 @@ class BusinessPartnerService(
         val partnerToUpsert = existingPartner ?: BusinessPartnerDb.createEmpty(upsertData.sharingState, upsertData.stage)
 
         val hasChanges = changeType == ChangelogType.CREATE || compareUtil.hasChanges(upsertData, partnerToUpsert)
-
-        if (hasChanges) {
-            changelogRepository.save(ChangelogEntryDb(sharingState.externalId, sharingState.tenantBpnl, changeType, stage))
-
-            copyUtil.copyValues(upsertData, partnerToUpsert)
-            businessPartnerRepository.save(partnerToUpsert)
+        val shouldUpdate = when {
+            upsertData.externalSequenceTimestamp == null -> true
+            existingPartner?.externalSequenceTimestamp == null -> true
+            else -> upsertData.externalSequenceTimestamp!!.isAfter(existingPartner.externalSequenceTimestamp)
         }
 
-        return UpsertResult(hasChanges, changeType, partnerToUpsert)
+        if (hasChanges && shouldUpdate) {
+                changelogRepository.save(ChangelogEntryDb(sharingState.externalId, sharingState.tenantBpnl, changeType, stage))
+
+                copyUtil.copyValues(upsertData, partnerToUpsert)
+                businessPartnerRepository.save(partnerToUpsert)
+        }
+
+        return UpsertResult(hasChanges, shouldUpdate, changeType, partnerToUpsert)
     }
 
     private fun getBusinessPartners(
@@ -164,6 +169,7 @@ class BusinessPartnerService(
 
     data class UpsertResult(
         val hadChanges: Boolean,
+        val shouldUpdate: Boolean,
         val type: ChangelogType,
         val businessPartner: BusinessPartnerDb
     )
