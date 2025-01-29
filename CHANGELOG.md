@@ -25,6 +25,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM Gate: Fetched and updated legal name of legal entity from pool while performing partner upload process via CSV([#1141](https://github.com/eclipse-tractusx/bpdm/issues/1141))
 - BPDM Orchestrator: When trying to resolve tasks for a step that have has been resolved before, the request is ignored. A HTTP OK instead of a BadRequest will be returned ([#1092](https://github.com/eclipse-tractusx/bpdm/issues/1092))
 - BPDM Pool: Remove duplicate BPN request identifier mapping entries and prevent the creation of new duplicates ([#1159](https://github.com/eclipse-tractusx/bpdm/issues/1159))
+- BPDM Gate: Fix the Gate not updating business partner output data when it receives already outdated output ([#1185](https://github.com/eclipse-tractusx/bpdm/issues/1185))
 
 ## [6.2.0] - 2024-11-28
 
