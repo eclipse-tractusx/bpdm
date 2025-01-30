@@ -618,7 +618,7 @@ class TaskResolutionServiceTest @Autowired constructor(
         assertThat(createResult[0].errors).hasSize(0)
         assertThat(createdLeAddress.name).isEqualTo(createSiteRequest.legalEntity.legalAddress.addressName)
         compareLogisticAddress(createdAdditionalAddress, createResult[0].businessPartner.additionalAddress)
-        assertThat(createdAdditionalAddress.bpnLegalEntity).isNull()
+        assertThat(createdAdditionalAddress.bpnLegalEntity).isEqualTo(createResult[0].businessPartner.legalEntity.bpnReference.referenceValue)
         assertThat(createdAdditionalAddress.bpnSite).isEqualTo(createResult[0].businessPartner.site?.bpnReference?.referenceValue)
         assertThat(createdAdditionalAddress.addressType == AddressType.AdditionalAddress).isTrue()
     }

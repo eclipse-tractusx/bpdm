@@ -124,6 +124,7 @@ class SiteControllerIT @Autowired constructor(
             site = BusinessPartnerVerboseValues.site1.copy(bpnLegalEntity = bpnL),
             mainAddress = BusinessPartnerVerboseValues.addressPartner1.copy(
                 addressType = AddressType.SiteMainAddress,
+                bpnLegalEntity = bpnL,
                 bpnSite = BusinessPartnerVerboseValues.site1.bpns
             )
         )
@@ -131,6 +132,7 @@ class SiteControllerIT @Autowired constructor(
             site = BusinessPartnerVerboseValues.site2.copy(bpnLegalEntity = bpnL),
             mainAddress = BusinessPartnerVerboseValues.addressPartner2.copy(
                 addressType = AddressType.SiteMainAddress,
+                bpnLegalEntity = bpnL,
                 bpnSite = BusinessPartnerVerboseValues.site2.bpns
             )
         )
@@ -177,6 +179,7 @@ class SiteControllerIT @Autowired constructor(
                 site = BusinessPartnerVerboseValues.site1.copy(bpnLegalEntity = bpnL1),
                 mainAddress = BusinessPartnerVerboseValues.addressPartner1.copy(
                     addressType = AddressType.SiteMainAddress,
+                    bpnLegalEntity = bpnL1,
                     bpnSite = BusinessPartnerVerboseValues.site1.bpns
                 )
             )
@@ -185,6 +188,7 @@ class SiteControllerIT @Autowired constructor(
                 site = BusinessPartnerVerboseValues.site2.copy(bpnLegalEntity = bpnL1),
                 mainAddress = BusinessPartnerVerboseValues.addressPartner2.copy(
                     addressType = AddressType.SiteMainAddress,
+                    bpnLegalEntity = bpnL1,
                     bpnSite = BusinessPartnerVerboseValues.site2.bpns
                 )
             )
@@ -193,6 +197,7 @@ class SiteControllerIT @Autowired constructor(
                 site = BusinessPartnerVerboseValues.site3.copy(bpnLegalEntity = bpnL2),
                 mainAddress = BusinessPartnerVerboseValues.addressPartner3.copy(
                     addressType = AddressType.SiteMainAddress,
+                    bpnLegalEntity = bpnL2,
                     bpnSite = BusinessPartnerVerboseValues.site3.bpns
                 )
             )
@@ -520,6 +525,7 @@ class SiteControllerIT @Autowired constructor(
         val legalAddress1: LogisticAddressVerboseDto =
             BusinessPartnerVerboseValues.addressPartner1.copy(
                 addressType = AddressType.SiteMainAddress,
+                bpnLegalEntity = bpnL1,
                 bpnSite = BusinessPartnerVerboseValues.site1.bpns,
                 bpna = BusinessPartnerVerboseValues.secondBpnA
             )
@@ -528,6 +534,7 @@ class SiteControllerIT @Autowired constructor(
         val legalAddress2: LogisticAddressVerboseDto =
             BusinessPartnerVerboseValues.addressPartner2.copy(
                 addressType = AddressType.SiteMainAddress,
+                bpnLegalEntity = bpnL1,
                 bpnSite = BusinessPartnerVerboseValues.site2.bpns,
                 bpna = BusinessPartnerVerboseValues.thirdBpnA
             )
@@ -555,6 +562,7 @@ class SiteControllerIT @Autowired constructor(
                 SitePartnerCreateVerboseDto::site.name + "." + SiteVerboseDto::bpnLegalEntity.name,
                 SitePartnerCreateVerboseDto::mainAddress.name + "." + LogisticAddressVerboseDto::bpna.name,
                 SitePartnerCreateVerboseDto::mainAddress.name + "." + LogisticAddressVerboseDto::bpnSite.name,
+                SitePartnerCreateVerboseDto::mainAddress.name + "." + LogisticAddressVerboseDto::bpnLegalEntity.name,
                 SitePartnerCreateVerboseDto::index.name
             )
             .isEqualTo(expected)
