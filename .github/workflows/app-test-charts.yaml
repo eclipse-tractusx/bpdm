@@ -23,7 +23,7 @@ on:
     inputs:
       node_image:
         description: 'kindest/node image for k8s kind cluster'
-        default: 'kindest/node:v1.31.2'
+        default: 'kindest/node:v1.32.1'
         required: false
         type: string
       upgrade_from:
@@ -39,8 +39,7 @@ on:
     inputs:
       node_image:
         description: 'kindest/node image for k8s kind cluster'
-        # k8s version from 3.1 release as default
-        default: 'kindest/node:v1.31.2'
+        default: 'kindest/node:v1.32.1'
         required: false
         type: string
       upgrade_from:
@@ -81,7 +80,7 @@ jobs:
         uses: container-tools/kind-action@v2
         with:
           version: v0.20.0
-          node_image: ${{ github.event.inputs.node_image || 'kindest/node:v1.31.2' }}
+          node_image: ${{ github.event.inputs.node_image || 'kindest/node:v1.32.1' }}
 
       - name: Set up Helm
         uses: azure/setup-helm@v4
