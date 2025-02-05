@@ -45,23 +45,23 @@ maven/mavencentral/commons-io/commons-io/2.18.0, Apache-2.0, approved, #17366
 maven/mavencentral/commons-logging/commons-logging/1.2, Apache-2.0, approved, CQ10162
 maven/mavencentral/commons-logging/commons-logging/1.3.4, Apache-2.0, approved, #11783
 maven/mavencentral/io.cucumber/ci-environment/10.0.1, MIT, approved, #15218
-maven/mavencentral/io.cucumber/cucumber-core/7.21.0, , restricted, clearlydefined
-maven/mavencentral/io.cucumber/cucumber-expressions/18.0.1, MIT, approved, clearlydefined
-maven/mavencentral/io.cucumber/cucumber-gherkin-messages/7.21.0, , restricted, clearlydefined
-maven/mavencentral/io.cucumber/cucumber-gherkin/7.21.0, , restricted, clearlydefined
-maven/mavencentral/io.cucumber/cucumber-java/7.21.0, , restricted, clearlydefined
-maven/mavencentral/io.cucumber/cucumber-junit/7.21.0, , restricted, clearlydefined
-maven/mavencentral/io.cucumber/cucumber-plugin/7.21.0, , restricted, clearlydefined
-maven/mavencentral/io.cucumber/cucumber-spring/7.21.0, , restricted, clearlydefined
-maven/mavencentral/io.cucumber/datatable/7.21.0, , restricted, clearlydefined
-maven/mavencentral/io.cucumber/docstring/7.21.0, , restricted, clearlydefined
-maven/mavencentral/io.cucumber/gherkin/31.0.0, , restricted, clearlydefined
-maven/mavencentral/io.cucumber/html-formatter/21.9.0, , restricted, clearlydefined
-maven/mavencentral/io.cucumber/junit-xml-formatter/0.7.1, , restricted, clearlydefined
-maven/mavencentral/io.cucumber/messages/27.2.0, , restricted, clearlydefined
-maven/mavencentral/io.cucumber/query/13.2.0, , restricted, clearlydefined
+maven/mavencentral/io.cucumber/cucumber-core/7.21.0, MIT AND (Apache-2.0 AND MIT), approved, #19276
+maven/mavencentral/io.cucumber/cucumber-expressions/18.0.1, MIT, approved, #19277
+maven/mavencentral/io.cucumber/cucumber-gherkin-messages/7.21.0, MIT, approved, #19279
+maven/mavencentral/io.cucumber/cucumber-gherkin/7.21.0, MIT, approved, #19280
+maven/mavencentral/io.cucumber/cucumber-java/7.21.0, MIT, approved, #19281
+maven/mavencentral/io.cucumber/cucumber-junit/7.21.0, MIT, approved, #19282
+maven/mavencentral/io.cucumber/cucumber-plugin/7.21.0, MIT, approved, #19283
+maven/mavencentral/io.cucumber/cucumber-spring/7.21.0, MIT, approved, #19284
+maven/mavencentral/io.cucumber/datatable/7.21.0, MIT, approved, #19285
+maven/mavencentral/io.cucumber/docstring/7.21.0, MIT, approved, #19286
+maven/mavencentral/io.cucumber/gherkin/31.0.0, MIT, approved, #19287
+maven/mavencentral/io.cucumber/html-formatter/21.9.0, Apache-2.0 AND MIT, approved, #19288
+maven/mavencentral/io.cucumber/junit-xml-formatter/0.7.1, MIT, approved, #19289
+maven/mavencentral/io.cucumber/messages/27.2.0, MIT, approved, #19290
+maven/mavencentral/io.cucumber/query/13.2.0, MIT, approved, #19291
 maven/mavencentral/io.cucumber/tag-expressions/6.1.2, MIT AND (BSD-3-Clause AND MIT) AND BSD-3-Clause, approved, #14277
-maven/mavencentral/io.cucumber/testng-xml-formatter/0.3.1, , restricted, clearlydefined
+maven/mavencentral/io.cucumber/testng-xml-formatter/0.3.1, MIT, approved, #19292
 maven/mavencentral/io.github.microutils/kotlin-logging-jvm/3.0.5, Apache-2.0, approved, clearlydefined
 maven/mavencentral/io.micrometer/micrometer-commons/1.14.3, Apache-2.0 AND (Apache-2.0 AND MIT), approved, #17272
 maven/mavencentral/io.micrometer/micrometer-core/1.14.3, Apache-2.0 AND (Apache-2.0 AND MIT), approved, #17271
