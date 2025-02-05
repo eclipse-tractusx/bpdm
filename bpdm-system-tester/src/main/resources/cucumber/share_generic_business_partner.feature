@@ -5,18 +5,18 @@ Feature: Share own company business partner data without BPNs
     Then the sharing member receives output "CC_SHG_UWAT_2" with external-ID "CC_SHG_UWAT" with address type "LegalAndSiteMainAddress"
 
   Scenario: Share Without Address Type
-    When the sharing member uploads full valid input "CC_SHG_WAT" with external-ID "CC_SHG_WAT" without address type
-    Then the sharing member receives output "CC_SHG_WAT" with external-ID "CC_SHG_WAT" with address type "LegalAndSiteMainAddress"
+    When the sharing member uploads full valid input "CC_SHG_WAT_0" with external-ID "CC_SHG_WAT_0" without address type
+    Then the sharing member receives output "CC_SHG_WAT_0" with external-ID "CC_SHG_WAT_0" with address type "LegalAndSiteMainAddress"
 
   Scenario Outline: Share With Address Type
-    When the sharing member uploads full valid input "CC_SHG_WAT" with external-ID "<externalId>" with address type "<inputAddressType>"
-    Then the sharing member receives output "CC_SHG_WAT" with external-ID "<externalId>" with address type "<outputAddressType>"
+    When the sharing member uploads full valid input "<externalId>" with external-ID "<externalId>" with address type "<inputAddressType>"
+    Then the sharing member receives output "<externalId>" with external-ID "<externalId>" with address type "<outputAddressType>"
 
     Examples:
       | externalId   | inputAddressType           | outputAddressType          |
       | CC_SHG_WAT_1 | LegalAndSiteMainAddress    | LegalAndSiteMainAddress    |
       | CC_SHG_WAT_2 | LegalAddress               | LegalAndSiteMainAddress    |
-      | CC_SHG_WAT_3 | SiteMainAddress            | LegalAndSiteMainAddress    |
+      | CC_SHG_WAT_3 | SiteMainAddress            | SiteMainAddress            |
       | CC_SHG_WAT_4 | AdditionalAddress          | AdditionalAddress          |
 
   Scenario Outline: Share With Missing or Invalid data
