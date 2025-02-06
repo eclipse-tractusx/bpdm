@@ -87,10 +87,15 @@ class TaskStepBuildService(
         val siteResult = processSite(businessPartnerDto, legalEntityResult.bpnReference.referenceValue!!, taskEntryBpnMapping)
         val addressResult = processAdditionalAddress(businessPartnerDto, legalEntityResult.bpnReference.referenceValue!!, siteResult?.bpnReference?.referenceValue, taskEntryBpnMapping)
 
+        //We do this for one special case:
+        //Legal Entity has not changed but site has changed and the main address is legal address
+        //In this case we want to return the most up-to-date address which is stored in the siteResult
+        val isLegalAndSiteMainAddress =  siteResult?.siteMainAddress?.bpnReference == legalEntityResult.legalAddress.bpnReference
+
         val businessPartnerResult = with(businessPartnerDto){
             copy(
-                legalEntity = legalEntityResult,
-                site = siteResult,
+                legalEntity = if(isLegalAndSiteMainAddress) legalEntityResult.copy(legalAddress = siteResult!!.siteMainAddress!!) else legalEntityResult,
+                site = if(isLegalAndSiteMainAddress) siteResult?.copy(siteMainAddress = null) else siteResult,
                 additionalAddress = addressResult
             )
         }

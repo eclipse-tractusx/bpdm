@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
-import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.stereotype.Service
@@ -53,7 +52,10 @@ class TaskResolutionMapper {
                 states = states.map { BusinessState(it.validFrom?.toInstant(ZoneOffset.UTC), it.validTo?.toInstant(ZoneOffset.UTC), it.type) },
                 confidenceCriteria = toTaskResult(confidenceCriteria),
                 hasChanged = hasChanged,
-                siteMainAddress = siteMainAddress.takeIf { it.addressType == AddressType.SiteMainAddress }?.let { toTaskResult(it, hasChanged) }
+                //Normally this should be null if the site main address is also the legal address
+                //However, due to synchronization issues we will pass the address here
+                // and perform that last step to set this to null later on after we use this site main address to override the legal entities legal address
+                siteMainAddress = toTaskResult(siteMainAddress, hasChanged)
             )
         }
     }
