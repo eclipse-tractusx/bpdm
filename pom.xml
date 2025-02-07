@@ -50,7 +50,7 @@
     </modules>
 
     <properties>
-        <revision>6.3.0-SNAPSHOT</revision>
+        <revision>6.3.0-rc1</revision>
         <java.version>21</java.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
