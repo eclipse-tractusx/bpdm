@@ -440,7 +440,7 @@ class CleaningServiceApiCallsTest @Autowired constructor(
 
     // Helper method to create a sample TaskStepReservationResponse
     private fun createSampleTaskStepReservationResponse(businessPartner: BusinessPartner): TaskStepReservationResponse {
-        return TaskStepReservationResponse(listOf(TaskStepReservationEntryDto(fixedTaskId, UUID.randomUUID().toString(), businessPartner)), Instant.MIN)
+        return TaskStepReservationResponse(listOf(TaskStepReservationEntryDto(fixedTaskId, UUID.randomUUID().toString(), businessPartner, PriorityEnum.High)), Instant.MIN)
     }
 
 

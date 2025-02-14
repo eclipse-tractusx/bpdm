@@ -150,6 +150,7 @@ bpdm:
     host: localhost
     # The database schema to use for this application
     schema: bpdmgate
+  origin-id: default-origin
 #
 # From here on are framework and dependency configuration
 # More information about those properties can be taken from the respective documentation of Spring or the dependency
