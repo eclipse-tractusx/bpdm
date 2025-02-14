@@ -23,7 +23,7 @@ on:
     inputs:
       node_image:
         description: 'kindest/node image for k8s kind cluster'
-        default: 'kindest/node:v1.31.2'
+        default: 'kindest/node:v1.32.1'
         required: false
         type: string
       upgrade_from:
@@ -39,8 +39,7 @@ on:
     inputs:
       node_image:
         description: 'kindest/node image for k8s kind cluster'
-        # k8s version from 3.1 release as default
-        default: 'kindest/node:v1.31.2'
+        default: 'kindest/node:v1.32.1'
         required: false
         type: string
       upgrade_from:
@@ -60,6 +59,8 @@ on:
       - 'pom.xml'
       - 'bpdm-**'
       - 'charts/**'
+      - '.github/workflows/app-test-charts.yaml'
+      - 'docker/**'
   push:
     branches:
       - main
@@ -79,7 +80,7 @@ jobs:
         uses: container-tools/kind-action@v2
         with:
           version: v0.20.0
-          node_image: ${{ github.event.inputs.node_image || 'kindest/node:v1.31.2' }}
+          node_image: ${{ github.event.inputs.node_image || 'kindest/node:v1.32.1' }}
 
       - name: Set up Helm
         uses: azure/setup-helm@v4
@@ -92,7 +93,7 @@ jobs:
           check-latest: true
 
       - name: Set up chart-testing
-        uses: helm/chart-testing-action@v2.6.1
+        uses: helm/chart-testing-action@v2.7.0
 
       - name: Download Pool Image
         uses: actions/download-artifact@v4
@@ -116,6 +117,12 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: bpdm-cleaning-service-dummy-docker
+          path: /tmp
+
+      - name: Download System Tester Image
+        uses: actions/download-artifact@v4
+        with:
+          name: bpdm-system-tester-docker
           path: /tmp
 
       - name: Push Pool Image to Kind
@@ -142,6 +149,12 @@ jobs:
           docker image tag bpdm-cleaning-service-dummy:test kind-registry:5000/bpdm-cleaning-service-dummy:test
           docker push kind-registry:5000/bpdm-cleaning-service-dummy:test
 
+      - name: Push System Tester Image to Kind
+        run: |
+          docker load --input /tmp/bpdm-system-tester.tar
+          docker image tag bpdm-system-tester:test kind-registry:5000/bpdm-system-tester:test
+          docker push kind-registry:5000/bpdm-system-tester:test
+
       - name: Create Test Values
         run: |
           mkdir charts/bpdm/ci
@@ -151,20 +164,29 @@ jobs:
               registry: kind-registry:5000
               repository: bpdm-pool
               tag: test
+            startupDelaySeconds: 120
           bpdm-gate:
             image:
               registry: kind-registry:5000
               repository: bpdm-gate
               tag: test
+            startupDelaySeconds: 120
           bpdm-orchestrator:
             image:
               registry: kind-registry:5000
               repository: bpdm-orchestrator
               tag: test
+            startupDelaySeconds: 120
           bpdm-cleaning-service-dummy:
             image:
               registry: kind-registry:5000
               repository: bpdm-cleaning-service-dummy
+              tag: test
+            startupDelaySeconds: 120
+          tests:
+            image:
+              registry: kind-registry:5000
+              repository: bpdm-system-tester
               tag: test
           EOF
           echo "cat charts/bpdm/ci/test-values.yaml"
@@ -204,6 +226,11 @@ jobs:
             image:
               registry: kind-registry:5000
               repository: bpdm-cleaning-service-dummy
+              tag: test
+          tests:
+            image:
+              registry: kind-registry:5000
+              repository: bpdm-system-tester
               tag: test
           centralidp:
             keycloak:

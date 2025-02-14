@@ -26,6 +26,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressComponentOutputD
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityRepresentationOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteRepresentationOutputDto
+import org.eclipse.tractusx.bpdm.test.testdata.gate.GateInputFactory
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
@@ -34,7 +35,7 @@ class GateOutputFactory(
     private val gateInputTestDataFactory: GateInputFactory
 ) {
 
-    private val dummyConfidence = ConfidenceCriteriaDto(
+    val dummyConfidence = ConfidenceCriteriaDto(
         sharedByOwner = false,
         numberOfSharingMembers = 1,
         checkedByExternalDataSource = false,
@@ -93,3 +94,9 @@ class GateOutputFactory(
 }
 
 fun BusinessPartnerOutputDto.withAddressType(addressType: AddressType) = copy(address = address.copy(addressType = addressType))
+
+fun BusinessPartnerOutputDto.withSharedByOwner(sharedByOwner: Boolean) = copy(
+    legalEntity = legalEntity.copy(confidenceCriteria = legalEntity.confidenceCriteria.copy(sharedByOwner = sharedByOwner)),
+    site = site?.copy(confidenceCriteria = site!!.confidenceCriteria.copy(sharedByOwner = sharedByOwner)),
+    address = address.copy(confidenceCriteria = address.confidenceCriteria.copy(sharedByOwner = sharedByOwner))
+)

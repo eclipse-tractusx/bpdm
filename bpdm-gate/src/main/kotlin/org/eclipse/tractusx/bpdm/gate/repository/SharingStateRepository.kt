@@ -55,10 +55,10 @@ interface SharingStateRepository : PagingAndSortingRepository<SharingStateDb, Lo
     }
 
     fun findByExternalIdInAndTenantBpnl(externalId: Collection<String>, tenantBpnl: String?): Collection<SharingStateDb>
+    fun findByExternalIdAndTenantBpnl(externalId: String, tenantBpnl: String?): Collection<SharingStateDb>
+
 
     fun findBySharingStateType(sharingStateType: SharingStateType, pageable: Pageable): Page<SharingStateDb>
-
-    fun findBySharingStateTypeAndTaskIdNotNull(sharingStateType: SharingStateType, pageable: Pageable): Page<SharingStateDb>
 
     @Query("SELECT s.sharingStateType as type, COUNT(s.sharingStateType) as count FROM SharingStateDb AS s GROUP BY s.sharingStateType")
     fun countSharingStateTypes(): List<SharingStateTypeCount>

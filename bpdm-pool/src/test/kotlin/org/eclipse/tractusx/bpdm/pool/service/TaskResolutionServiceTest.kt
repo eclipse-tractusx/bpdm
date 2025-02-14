@@ -618,7 +618,7 @@ class TaskResolutionServiceTest @Autowired constructor(
         assertThat(createResult[0].errors).hasSize(0)
         assertThat(createdLeAddress.name).isEqualTo(createSiteRequest.legalEntity.legalAddress.addressName)
         compareLogisticAddress(createdAdditionalAddress, createResult[0].businessPartner.additionalAddress)
-        assertThat(createdAdditionalAddress.bpnLegalEntity).isNull()
+        assertThat(createdAdditionalAddress.bpnLegalEntity).isEqualTo(createResult[0].businessPartner.legalEntity.bpnReference.referenceValue)
         assertThat(createdAdditionalAddress.bpnSite).isEqualTo(createResult[0].businessPartner.site?.bpnReference?.referenceValue)
         assertThat(createdAdditionalAddress.addressType == AddressType.AdditionalAddress).isTrue()
     }
@@ -941,4 +941,52 @@ class TaskResolutionServiceTest @Autowired constructor(
             nextConfidenceCheckAt = Instant.now().plus(1, ChronoUnit.DAYS),
             confidenceLevel = 10
         )
+
+    @Test
+    fun `update additional address to site main address`(){
+        val leRefValue = "123"
+        val siteRefValue = "1234"
+        val leAddressRefValue = "222"
+        val addressRefValue = "333"
+        val createLegalEntityRequest = orchTestDataFactory.createFullBusinessPartner("test")
+            .withLegalReferences(leRefValue.toBpnRequest(), leAddressRefValue.toBpnRequest())
+            .withAdditionalAddressReference(addressRefValue.toBpnRequest())
+            .copy(site = null)
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createLegalEntityRequest)
+        val bpna = createResult[0].businessPartner.additionalAddress?.bpnReference?.referenceValue!!
+        val createdAdditionalAddress = poolClient.addresses.getAddress(bpna)
+        assertThat(createdAdditionalAddress.addressType == AddressType.AdditionalAddress).isTrue()
+        val updateLinkageRequest = orchTestDataFactory.createFullBusinessPartner("test")
+            .withLegalReferences(leRefValue.toBpnRequest(), leAddressRefValue.toBpnRequest())
+            .withSiteReferences(siteRefValue.toBpnRequest(), addressRefValue.toBpnRequest())
+            .copy(additionalAddress = null)
+        upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = updateLinkageRequest)
+        val createdAddress = poolClient.addresses.getAddress(bpna)
+        assertThat(createdAddress.addressType == AddressType.AdditionalAddress).isFalse()
+        assertThat(createdAddress.addressType == AddressType.SiteMainAddress).isTrue()
+    }
+
+    @Test
+    fun `update legal address to legal and site main address`(){
+        val leRefValue = "123"
+        val siteRefValue = "123_site"
+        val leAddressRefValue = "222"
+        val createLegalEntityRequest = orchTestDataFactory.createFullBusinessPartner("test")
+            .withLegalReferences(leRefValue.toBpnRequest(), leAddressRefValue.toBpnRequest())
+            .copy(site = null, additionalAddress = null)
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createLegalEntityRequest)
+        val bpnL = createResult[0].businessPartner.legalEntity.bpnReference.referenceValue!!
+        val createdLegalEntity = poolClient.legalEntities.getLegalEntity(bpnL)
+        assertThat(createdLegalEntity.legalAddress.bpnLegalEntity).isNotNull()
+        assertThat(createResult[0].businessPartner.legalEntity.bpnReference.referenceValue).isEqualTo(createdLegalEntity.legalEntity.bpnl)
+        compareLegalEntity(createdLegalEntity, createResult[0].businessPartner.legalEntity)
+        //Convert addressType from LegalAddress to LegalAndSiteMainAddress
+        var site = Site(siteRefValue.toBpnRequest(), "site", listOf(), fullConfidenceCriteria(), false, null)
+        val updateLinkageRequest = orchTestDataFactory.createFullBusinessPartner("test")
+            .withLegalReferences(leRefValue.toBpnRequest(), leAddressRefValue.toBpnRequest())
+            .copy(site = site, additionalAddress = null)
+        upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = updateLinkageRequest)
+        val updatedLegalEntity = poolClient.legalEntities.getLegalEntity(bpnL)
+        assertThat(updatedLegalEntity.legalAddress.addressType == AddressType.LegalAndSiteMainAddress).isTrue()
+    }
 }

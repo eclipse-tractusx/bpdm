@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.test.system.utils
+package org.eclipse.tractusx.bpdm.test.testdata.gate
 
 import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
@@ -30,7 +30,6 @@ import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequ
 import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressRepresentationInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityRepresentationInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteRepresentationInputDto
-import org.eclipse.tractusx.bpdm.test.system.config.TestRunData
 import java.time.Duration
 import java.time.Instant
 import java.time.ZoneOffset
@@ -38,7 +37,7 @@ import kotlin.random.Random
 
 class GateInputFactory(
     private val testMetadata: TestMetadata,
-    private val testRunData: TestRunData
+    private val testRunData: TestRunData?
 ) {
     val genericFullValidWithSiteWithoutAnyBpn = createAllFieldsFilled("genericFullValidWithSiteWithoutAnyBpn")
     { it.withoutAnyBpn().withAddressType(null) }
@@ -48,7 +47,7 @@ class GateInputFactory(
     }
 
     fun createFullValid(seed: String, externalId: String = seed): BusinessPartnerInputRequest {
-        return SeededTestDataCreator(seed).createAllFieldsFilled().copy(externalId = testRunData.toExternalId(externalId))
+        return SeededTestDataCreator(seed).createAllFieldsFilled().copy(externalId = testRunData?.toExternalId(externalId) ?: externalId)
     }
 
     inner class SeededTestDataCreator(
@@ -62,11 +61,11 @@ class GateInputFactory(
         fun createAllFieldsFilled(): BusinessPartnerInputRequest{
 
             return BusinessPartnerInputRequest(
-                externalId = "${seed}_${testRunData.testTime}",
+                externalId = testRunData?.let { "${seed}_${testRunData.testTime}" } ?: seed ,
                 nameParts = listRange.map { "Name Part $seed $it" },
                 identifiers = emptyList(),
                 roles = BusinessPartnerRole.entries,
-                isOwnCompanyData = random.nextBoolean(),
+                isOwnCompanyData = true,
                 states = emptyList(),
                 legalEntity = LegalEntityRepresentationInputDto(
                     legalEntityBpn = "BPNL $seed",

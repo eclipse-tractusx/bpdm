@@ -22,9 +22,8 @@ package org.eclipse.tractusx.bpdm.gate.auth
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
-import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangelogSearchRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
+import org.eclipse.tractusx.bpdm.gate.api.model.request.*
 import org.eclipse.tractusx.bpdm.test.util.AuthAssertionHelper
 import org.eclipse.tractusx.bpdm.test.util.AuthExpectationType
 import org.junit.jupiter.api.Test
@@ -50,7 +49,7 @@ abstract class AuthTestBase(
     @Test
     fun `PUT Partner Input`() {
         authAssertions.assert(authExpectations.businessPartner.putInput) { gateClient.businessParters.upsertBusinessPartnersInput(listOf(
-            BusinessPartnerInputRequest("externalId")
+            BusinessPartnerInputRequest("externalId", externalSequenceTimestamp = null)
         )) }
     }
 
@@ -106,6 +105,26 @@ abstract class AuthTestBase(
         authAssertions.assert(authExpectations.uploadPartner.getInputTemplate) { gateClient.partnerUpload.getPartnerCsvTemplate() }
     }
 
+    @Test
+    fun `GET Relations`() {
+        authAssertions.assert(authExpectations.relation.get) { gateClient.relation.get() }
+    }
+
+    @Test
+    fun `POST Relations`() {
+        authAssertions.assert(authExpectations.relation.post) { gateClient.relation.post(RelationPostRequest(null, RelationType.IsManagedBy, "", "")) }
+    }
+
+    @Test
+    fun `PUT Relations`() {
+        authAssertions.assert(authExpectations.relation.put) { gateClient.relation.put(true, RelationPutRequest("", RelationType.IsManagedBy, "", "")) }
+    }
+
+    @Test
+    fun `DELETE Relations`() {
+        authAssertions.assert(authExpectations.relation.delete) { gateClient.relation.delete( "") }
+    }
+
 }
 
 data class GateAuthExpectations(
@@ -113,7 +132,8 @@ data class GateAuthExpectations(
     val changelog: ChangelogAuthExpectations,
     val sharingState: SharingStateAuthExpectations,
     val stats: StatsAuthExpectations,
-    val uploadPartner: UploadPartnerAuthExpections
+    val uploadPartner: UploadPartnerAuthExpections,
+    val relation: RelationAuthExpectations
 )
 
 data class BusinessPartnerAuthExpectations(
@@ -142,4 +162,11 @@ data class StatsAuthExpectations(
 data class UploadPartnerAuthExpections(
     val postInput: AuthExpectationType,
     val getInputTemplate: AuthExpectationType
+)
+
+data class RelationAuthExpectations(
+    val get: AuthExpectationType,
+    val post: AuthExpectationType,
+    val put: AuthExpectationType,
+    val delete: AuthExpectationType
 )

@@ -271,88 +271,34 @@ class BusinessPartnerControllerIT @Autowired constructor(
         assertEquals(0, searchResponsePage2.content.size)
     }
 
+    @Test
+    fun `insert a late arrival request with minimal business partner and the record won't be updated`() {
 
+        val firstUpsertRequest = listOf(BusinessPartnerVerboseValues.bpInputRequestWithExternalSequenceTimestamp2) //12:00
+        gateClient.businessParters.upsertBusinessPartnersInput(firstUpsertRequest).body!!
 
+        val beforeFirstUpsertRequest = listOf(BusinessPartnerVerboseValues.bpInputRequestWithExternalSequenceTimestamp1) // 11:59
+        gateClient.businessParters.upsertBusinessPartnersInput(beforeFirstUpsertRequest).body!!
 
+        val searchResponsePage = gateClient.businessParters.getBusinessPartnersInput(
+            listOf(BusinessPartnerVerboseValues.externalId1))
 
+        this.mockAndAssertUtils.assertUpsertResponsesMatchRequests(searchResponsePage.content, firstUpsertRequest)
+    }
 
     @Test
-    fun `insert one business partners and finalize cleaning task without error`() {
-        this.mockAndAssertUtils.mockOrchestratorApiCleaned(gateWireMockServer)
+    fun `upsert a new request with later externalSequenceTimestamp timestamp and the record updated`() {
 
-        // Expect outputBusinessPartner without identifiers and states as there are no Address identifier and states provided.
-        val outputBusinessPartners = listOf(
-            BusinessPartnerVerboseValues.bpOutputDtoCleaned.copy(identifiers = emptyList(), states = emptyList())
-        )
+        val firstUpsertRequest = listOf(BusinessPartnerVerboseValues.bpInputRequestWithExternalSequenceTimestamp2) //12:00
+        gateClient.businessParters.upsertBusinessPartnersInput(firstUpsertRequest).body!!
 
-        val upsertRequests = listOf(
-            BusinessPartnerNonVerboseValues.bpInputRequestCleaned,
-            BusinessPartnerNonVerboseValues.bpInputRequestError
-        )
-        upsertBusinessPartnersAndShare(upsertRequests)
+        val laterUpsertRequest = listOf(BusinessPartnerVerboseValues.bpInputRequestWithExternalSequenceTimestamp3) // 12:01
+        gateClient.businessParters.upsertBusinessPartnersInput(laterUpsertRequest).body!!
 
-        val externalId4 = BusinessPartnerNonVerboseValues.bpInputRequestCleaned.externalId
-        val externalId5 = BusinessPartnerNonVerboseValues.bpInputRequestError.externalId
+        val searchResponsePage = gateClient.businessParters.getBusinessPartnersInput(
+            listOf(BusinessPartnerVerboseValues.externalId1))
 
-        val createdSharingState = listOf(
-            SharingStateDto(
-                externalId = externalId4,
-                sharingStateType = SharingStateType.Pending,
-                sharingErrorCode = null,
-                sharingErrorMessage = null,
-                sharingProcessStarted = null,
-                taskId = "0"
-            ),
-            SharingStateDto(
-                externalId = externalId5,
-                sharingStateType = SharingStateType.Pending,
-                sharingErrorCode = null,
-                sharingErrorMessage = null,
-                sharingProcessStarted = null,
-                taskId = "1"
-            )
-        )
-
-        //Firstly verifies if the Sharing States was created for new Business Partners
-        val externalIds = listOf(externalId4, externalId5)
-        val upsertSharingStateResponses = this.mockAndAssertUtils.readSharingStates(externalIds)
-        assertHelpers
-            .assertRecursively(upsertSharingStateResponses)
-            .ignoringFieldsMatchingRegexes(".*${SharingStateDto::sharingProcessStarted.name}")
-            .isEqualTo(createdSharingState)
-
-        // Call Finish Cleaning Method
-        taskResolutionService.resolveTasks()
-
-        val cleanedSharingState = listOf(
-            SharingStateDto(
-                externalId = externalId4,
-                sharingStateType = SharingStateType.Success,
-                sharingErrorCode = null,
-                sharingErrorMessage = null,
-                sharingProcessStarted = null,
-                taskId = "0"
-            ),
-            SharingStateDto(
-                externalId = externalId5,
-                sharingStateType = SharingStateType.Error,
-                sharingErrorCode = BusinessPartnerSharingError.SharingTimeout,
-                sharingErrorMessage = "Major Error // Minor Error",
-                sharingProcessStarted = null,
-                taskId = "1"
-            )
-        )
-
-        //Check for both Sharing State changes (Error and Success)
-        val readCleanedSharingState = this.mockAndAssertUtils.readSharingStates(externalIds)
-        assertHelpers.assertRecursively(readCleanedSharingState)
-            .ignoringFieldsMatchingRegexes(".*${SharingStateDto::sharingProcessStarted.name}")
-            .isEqualTo(cleanedSharingState)
-
-        //Assert that Cleaned Golden Record is persisted in the Output correctly
-        val searchResponsePage = gateClient.businessParters.getBusinessPartnersOutput(listOf(externalId4))
-        this.mockAndAssertUtils.assertUpsertOutputResponsesMatchRequests(searchResponsePage.content, outputBusinessPartners)
-
+        this.mockAndAssertUtils.assertUpsertResponsesMatchRequests(searchResponsePage.content, laterUpsertRequest)
     }
 
     @Test

@@ -17,20 +17,24 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.api.model.response
+package org.eclipse.tractusx.bpdm.cleaning.util
 
-import io.swagger.v3.oas.annotations.media.Schema
-import org.springframework.http.HttpStatus
-import java.time.Instant
+import org.springframework.boot.actuate.health.Status
+import org.springframework.boot.context.event.ApplicationReadyEvent
+import org.springframework.context.ApplicationListener
+import org.springframework.stereotype.Component
 
-@Schema(description = "Error response for invalid partner upload")
-class PartnerUploadErrorResponse(
-    @Schema(description = "Timestamp of the error occurrence")
-    val timestamp: Instant,
-    @Schema(description = "HTTP status of the error response")
-    val status: HttpStatus,
-    @Schema(description = "List of error messages")
-    val error: List<String>,
-    @Schema(description = "Request path where the error occurred")
-    val path: String
-)
+@Component
+class CleaningServiceStartupListner(
+    private val orchestratorHealthIndicator: OrchestratorHealthIndicator
+) : ApplicationListener<ApplicationReadyEvent> {
+
+    override fun onApplicationEvent(event: ApplicationReadyEvent) {
+        val orchestratorHealth = orchestratorHealthIndicator.health().status
+
+        if (orchestratorHealth != Status.UP) {
+            throw IllegalStateException("Dependencies not ready: Orchestrator: $orchestratorHealth")
+        }
+    }
+
+}

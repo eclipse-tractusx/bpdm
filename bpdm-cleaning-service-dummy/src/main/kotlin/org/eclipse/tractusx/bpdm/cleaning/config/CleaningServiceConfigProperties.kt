@@ -25,9 +25,14 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 
 @ConfigurationProperties(prefix = PREFIX)
 class CleaningServiceConfigProperties (
-    val step: TaskStep
+    val step: TaskStep,
+    val dependencyCheck: DependencyCheckConfig
 ){
     companion object{
         const val PREFIX = "bpdm.golden-record-process"
     }
+
+    data class DependencyCheckConfig(
+        val cron: String = "-"
+    )
 }

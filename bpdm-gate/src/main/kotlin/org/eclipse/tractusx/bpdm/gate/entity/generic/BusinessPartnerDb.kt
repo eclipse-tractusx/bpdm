@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
+import java.time.Instant
 import java.util.*
 
 @Entity
@@ -103,6 +104,9 @@ class BusinessPartnerDb(
     @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "address_confidence_id", unique = true)
     var addressConfidence: ConfidenceCriteriaDb?,
+
+    @Column(name = "external_sequence_timestamp")
+    var externalSequenceTimestamp: Instant? = null,
 
     ) : BaseEntity() {
 

@@ -13,12 +13,22 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM Pool: Post endpoint to fetch the BPNL/S/A based on the requested identifiers.([#1052](https://github.com/eclipse-tractusx/bpdm/issues/1052))
 - BPDM Gate & Orchestrator: Enhance the error handling mechanism for the orchestrator and gate components by extending the list of available error codes.([#1003](https://github.com/eclipse-tractusx/bpdm/pull/1003#pullrequestreview-2477395867))
 - BPDM System Test: Tester module which performs automated end-to-end tests on an existing golden record process.([#1070](https://github.com/eclipse-tractusx/bpdm/pull/1070))
+- BPDM Gate & Pool: Update linkage from AdditionalAddress to SiteMainAddress and LegalAddress to LegalAndSiteMainAddress.([#1121](https://github.com/eclipse-tractusx/bpdm/issues/1121))
+- BPDM Gate: Add endpoints for managing business partner relations ([#1027](https://github.com/eclipse-tractusx/bpdm/issues/1027))
+- BPDM System Test: End-to-end test CI/CD workflow setup for golden record process. ([#1155](https://github.com/eclipse-tractusx/bpdm/issues/1155))
+- Apps : Enhanced dependency readiness checks with a scheduler to verify connections to required services every 30 seconds and during startup for Pool, Cleaning Service Dummy, and Gate service. ([#1161](https://github.com/eclipse-tractusx/bpdm/issues/1161))
+- BPDM Gate: Add consistency check with the golden record Pool making sure that referenced BPNs are still existing ([#1130](https://github.com/eclipse-tractusx/bpdm/issues/1130))
+- BPDM Gate: Add externalTimestamp to prevent old request overwrite newer request ([#986](https://github.com/eclipse-tractusx/bpdm/pull/986))
 
 ### Changed
 
 - BPDM Gate: Fetched and updated legal name of legal entity from pool while performing partner upload process via CSV([#1141](https://github.com/eclipse-tractusx/bpdm/issues/1141))
 - BPDM Orchestrator: When trying to resolve tasks for a step that have has been resolved before, the request is ignored. A HTTP OK instead of a BadRequest will be returned ([#1092](https://github.com/eclipse-tractusx/bpdm/issues/1092))
-
+- BPDM Pool: Remove duplicate BPN request identifier mapping entries and prevent the creation of new duplicates ([#1159](https://github.com/eclipse-tractusx/bpdm/issues/1159))
+- BPDM Gate: Fix the Gate not updating business partner output data when it receives already outdated output ([#1185](https://github.com/eclipse-tractusx/bpdm/issues/1185))
+- BPDM Pool: Fix resolved tasks by providing business partner data based on the database state. Returned result is now consistent. ([#1158](https://github.com/eclipse-tractusx/bpdm/issues/1158))
+- BPDM Pool: Fix missing legal entity (BPNL) associated to address in response while performing entity search ([#1191](https://github.com/eclipse-tractusx/bpdm/issues/1191))
+- BPDM Pool: Fix not returning the most-up-to-date legal and site main address when it has been modified by an update to the site ([#1209](https://github.com/eclipse-tractusx/bpdm/issues/1209))
 
 ## [6.2.0] - 2024-11-28
 

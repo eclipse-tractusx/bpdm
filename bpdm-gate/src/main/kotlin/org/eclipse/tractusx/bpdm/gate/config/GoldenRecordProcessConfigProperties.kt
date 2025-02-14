@@ -25,7 +25,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 data class GoldenRecordTaskConfigProperties(
     val creation: CreationProperties = CreationProperties(),
     val check: TaskProcessProperties = TaskProcessProperties(),
-    val healthCheck: TaskProcessProperties = TaskProcessProperties()
+    val healthCheck: TaskProcessProperties = TaskProcessProperties(),
+    val dependencyCheck: TaskProcessProperties = TaskProcessProperties(),
+    val consistencyCheck: TaskProcessProperties = TaskProcessProperties()
 ) {
     data class CreationProperties(
         val fromSharingMember: CreationTaskProperties = CreationTaskProperties(),

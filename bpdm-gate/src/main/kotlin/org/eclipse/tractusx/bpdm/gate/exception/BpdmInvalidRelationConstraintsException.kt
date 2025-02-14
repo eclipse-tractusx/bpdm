@@ -17,12 +17,19 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.test.system.config
+package org.eclipse.tractusx.bpdm.gate.exception
 
-import java.time.Instant
+import org.eclipse.tractusx.bpdm.gate.service.IRelationService
+import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.ResponseStatus
 
-data class TestRunData (
-    val testTime: Instant
-){
-    fun toExternalId(seed: String): String = "${seed}_$testTime"
+@ResponseStatus(HttpStatus.BAD_REQUEST)
+class BpdmInvalidRelationConstraintsException(
+    val errors: List<String>
+) : RuntimeException("The following errors have been discovered when validating business partner relationships: ${errors.joinToString(System.lineSeparator())}"){
+
+    companion object{
+        fun fromConstraintErrors(errors: List<IRelationService.ConstraintError>) =
+            BpdmInvalidRelationConstraintsException(errors.map { "Constraint for relation '${it.externalId}' is violated by value '${it.erroneousValue}': ${it.message}"})
+    }
 }

@@ -26,8 +26,14 @@ import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
-import org.eclipse.tractusx.bpdm.test.system.config.TestRunData
-import org.eclipse.tractusx.bpdm.test.system.utils.*
+import org.eclipse.tractusx.bpdm.test.system.utils.GateOutputFactory
+import org.eclipse.tractusx.bpdm.test.system.utils.StepUtils
+import org.eclipse.tractusx.bpdm.test.system.utils.withAddressType
+import org.eclipse.tractusx.bpdm.test.system.utils.withSharedByOwner
+import org.eclipse.tractusx.bpdm.test.testdata.gate.GateInputFactory
+import org.eclipse.tractusx.bpdm.test.testdata.gate.TestRunData
+import org.eclipse.tractusx.bpdm.test.testdata.gate.withAddressType
+import org.eclipse.tractusx.bpdm.test.testdata.gate.withoutAnyBpn
 
 class ShareGenericNoBpnStepDefs(
     private val gateInputDataFactory: GateInputFactory,
@@ -57,8 +63,8 @@ class ShareGenericNoBpnStepDefs(
     fun `then the sharing member receives output seed with modifier`(seed: String, externalId: String, addressType: String) {
         val expectedOutput = gateOutputFactory.createOutput(seed, externalId)
             .withAddressType(AddressType.valueOf(addressType))
-            // On no auth config we can't get own company data to true
-            .copy(isOwnCompanyData = false)
+            .withSharedByOwner(true)
+            .copy(isOwnCompanyData = true)
 
         stepUtils.waitForResult(expectedOutput.externalId)
 
@@ -81,6 +87,7 @@ class ShareGenericNoBpnStepDefs(
 
     private fun uploadInput(seed: String, externalId: String, addressType: AddressType?){
         val inputRequest =  gateInputDataFactory.createFullValid(seed, externalId).withAddressType(addressType).withoutAnyBpn()
+        //inputRequest.copy(isOwnCompanyData = true)
         gateClient.businessParters.upsertBusinessPartnersInput(listOf(inputRequest))
     }
 

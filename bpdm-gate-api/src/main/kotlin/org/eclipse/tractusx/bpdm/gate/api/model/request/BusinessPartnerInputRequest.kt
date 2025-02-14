@@ -27,6 +27,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.IBaseBusinessPartnerGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressRepresentationInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityRepresentationInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteRepresentationInputDto
+import java.time.Instant
 
 @Schema(
     description = "Generic business partner with external id",
@@ -42,6 +43,7 @@ data class BusinessPartnerInputRequest(
     override val isOwnCompanyData: Boolean = false,
     override val legalEntity: LegalEntityRepresentationInputDto = LegalEntityRepresentationInputDto(),
     override val site: SiteRepresentationInputDto = SiteRepresentationInputDto(),
-    override val address: AddressRepresentationInputDto = AddressRepresentationInputDto()
+    override val address: AddressRepresentationInputDto = AddressRepresentationInputDto(),
+    override val externalSequenceTimestamp: Instant? = null
 
 ) : IBaseBusinessPartnerGateDto

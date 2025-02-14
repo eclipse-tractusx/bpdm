@@ -72,8 +72,7 @@ class AddressService(
     }
 
     fun findByBpn(bpn: String): LogisticAddressVerboseDto {
-        logger.debug { "Executing findByBpn() with parameters $bpn" }
-        val address = logisticAddressRepository.findByBpn(bpn) ?: throw BpdmNotFoundException("Address", bpn)
+        val address = findAddressByBpn(bpn) ?: throw BpdmNotFoundException("Address", bpn)
         return address.toDto()
     }
 
@@ -94,4 +93,9 @@ class AddressService(
         val name: String?,
         val isCatenaXMemberData: Boolean?
     )
+
+    fun findAddressByBpn(bpn: String): LogisticAddressDb? {
+        logger.debug { "Executing findAddressByBpn() with parameters $bpn" }
+        return logisticAddressRepository.findByBpn(bpn)
+    }
 }

@@ -14,7 +14,7 @@
     <packaging>jar</packaging>
 
     <properties>
-        <cucumber.version>7.18.1</cucumber.version>
+        <cucumber.version>7.21.0</cucumber.version>
     </properties>
 
     <dependencies>
@@ -68,7 +68,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>bpdm-common-test</artifactId>
-            <scope>test</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

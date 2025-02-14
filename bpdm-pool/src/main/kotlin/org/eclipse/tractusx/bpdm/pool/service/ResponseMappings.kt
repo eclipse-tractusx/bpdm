@@ -125,7 +125,7 @@ fun AddressStateDb.toDto(): AddressStateVerboseDto {
 fun LogisticAddressDb.toDto(): LogisticAddressVerboseDto {
     return LogisticAddressVerboseDto(
         bpna = bpn,
-        bpnLegalEntity = legalEntity.takeIf { site == null }?.bpn,
+        bpnLegalEntity = legalEntity?.bpn,
         bpnSite = site?.bpn,
         createdAt = createdAt,
         updatedAt = updatedAt,
@@ -304,7 +304,7 @@ fun ConfidenceCriteriaDb.toDto(): ConfidenceCriteriaDto =
         confidenceLevel
     )
 
-private fun getAddressType(logisticAddress: LogisticAddressDb): AddressType {
+fun getAddressType(logisticAddress: LogisticAddressDb): AddressType {
     return when {
         logisticAddress.legalEntity?.legalAddress == logisticAddress &&
                 logisticAddress.site?.mainAddress == logisticAddress -> AddressType.LegalAndSiteMainAddress
