@@ -21,8 +21,8 @@
 apiVersion: v2
 type: application
 name: bpdm-pool
-appVersion: "6.3.0-rc1"
-version: 7.3.0-rc1
+appVersion: "6.3.0-SNAPSHOT"
+version: 7.3.0-SNAPSHOT
 description: A Helm chart for deploying the BPDM pool service
 home: https://eclipse-tractusx.github.io/docs/kits/Business%20Partner%20Kit/Adoption%20View
 sources:
@@ -34,7 +34,7 @@ dependencies:
     alias: postgres
     condition: postgres.enabled
   - name: bpdm-common
-    version: 1.0.3-rc1
+    version: 1.0.3-SNAPSHOT
     repository: "file://../bpdm-common"
   - name: centralidp
     version: 4.0.0
