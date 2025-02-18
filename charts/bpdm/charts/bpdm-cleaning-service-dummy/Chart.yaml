@@ -21,15 +21,15 @@
 apiVersion: v2
 type: application
 name: bpdm-cleaning-service-dummy
-appVersion: "6.3.0-SNAPSHOT"
-version: 3.3.0-SNAPSHOT
+appVersion: "6.3.0-rc2"
+version: 3.3.0-rc2
 description: A Helm chart for deploying the BPDM cleaning service
 home: https://eclipse-tractusx.github.io/docs/kits/Business%20Partner%20Kit/Adoption%20View
 sources:
   - https://github.com/eclipse-tractusx/bpdm
 dependencies:
   - name: bpdm-common
-    version: 1.0.3-SNAPSHOT
+    version: 1.0.3-rc2
     repository: "file://../bpdm-common"
   - name: centralidp
     version: 4.0.0
