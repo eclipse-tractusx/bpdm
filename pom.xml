@@ -71,6 +71,7 @@
         <flatten-maven.version>1.6.0</flatten-maven.version>
         <license-tool.version>1.1.0</license-tool.version>
         <assertj.version>3.24.2</assertj.version>
+        <json-smart.version>2.5.2</json-smart.version>
     </properties>
 
     <pluginRepositories>
@@ -171,6 +172,12 @@
                 <groupId>io.netty</groupId>
                 <artifactId>netty-common</artifactId>
                 <version>4.1.117.Final</version>
+            </dependency>
+            <!-- overwrite with newer version to fix vulnerability  -->
+            <dependency>
+                <groupId>net.minidev</groupId>
+                <artifactId>json-smart</artifactId>
+                <version>${json-smart.version}</version>
             </dependency>
 
             <!-- Test -->
