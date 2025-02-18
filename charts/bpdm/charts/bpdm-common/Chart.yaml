@@ -21,7 +21,7 @@
 apiVersion: v2
 type: library
 name: bpdm-common
-version: 1.0.3-rc1
+version: 1.0.3-SNAPSHOT
 description: A library Helm Chart for other BPDM Charts
 home: https://eclipse-tractusx.github.io/docs/kits/Business%20Partner%20Kit/Adoption%20View
 sources:
