@@ -67,9 +67,9 @@ class CleaningServiceDummy(
                 logger.info { "${cleaningTasks.size} tasks found for cleaning. Proceeding with cleaning..." }
 
                 if (cleaningTasks.isNotEmpty()) {
-                    val cleaningResults = cleaningTasks.map { reservedTask ->
-                        processCleaningTask(reservedTask)
-                    }
+                    val cleaningResults = cleaningTasks
+                        .sortedBy { reservedTask-> reservedTask.priority }
+                        .map { reservedTask -> processCleaningTask(reservedTask) }
 
                     orchestrationApiClient.goldenRecordTasks.resolveStepResults(TaskStepResultRequest(step, cleaningResults))
                     logger.info { "Cleaning tasks processing completed for this iteration." }
