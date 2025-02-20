@@ -29,6 +29,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM Pool: Fix resolved tasks by providing business partner data based on the database state. Returned result is now consistent. ([#1158](https://github.com/eclipse-tractusx/bpdm/issues/1158))
 - BPDM Pool: Fix missing legal entity (BPNL) associated to address in response while performing entity search ([#1191](https://github.com/eclipse-tractusx/bpdm/issues/1191))
 - BPDM Pool: Fix not returning the most-up-to-date legal and site main address when it has been modified by an update to the site ([#1209](https://github.com/eclipse-tractusx/bpdm/issues/1209))
+- BPDM Pool: Add check for correct LSA parent hierarchy when consuming golden record tasks ([#1230](https://github.com/eclipse-tractusx/bpdm/issues/1230))
 
 ## [6.2.0] - 2024-11-28
 
