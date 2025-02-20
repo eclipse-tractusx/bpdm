@@ -29,6 +29,8 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
+import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
+import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.stereotype.Service
 import java.time.Instant
@@ -48,7 +50,9 @@ class TaskStepBuildService(
     private val siteService: SiteService,
     private val addressService: AddressService,
     private val bpnRequestIdentifierRepository: BpnRequestIdentifierRepository,
-    private val taskResolutionMapper: TaskResolutionMapper
+    private val taskResolutionMapper: TaskResolutionMapper,
+    private val logisticAddressRepository: LogisticAddressRepository,
+    private val siteRepository: SiteRepository
 ) {
 
     enum class CleaningError(val message: String) {
@@ -76,12 +80,17 @@ class TaskStepBuildService(
         LEGAL_ENTITY_CONFIDENCE_CRITERIA_MISSING("Legal Entity has no confidence criteria"),
         MAIN_ADDRESS_BPN_REFERENCE_MISSING("The BpnA Reference of the site main address is missing"),
         LEGAL_ADDRESS_BPN_REFERENCE_MISSING("The BpnA Reference of the legal address is missing"),
+        SITE_WRONG_LEGAL_ENTITY_REFERENCE("The legal entity is not the parent of the site"),
+        ADDITIONAL_ADDRESS_WRONG_SITE_REFERENCE("The site is not the parent of the additional address"),
+        ADDITIONAL_ADDRESS_WRONG_LEGAL_ENTITY_REFERENCE("The legal entity is not the parent of the additional address")
     }
 
     @Transactional
     fun upsertBusinessPartner(taskEntry: TaskStepReservationEntryDto): TaskStepResultEntryDto {
         val taskEntryBpnMapping = TaskEntryBpnMapping(listOf(taskEntry), bpnRequestIdentifierRepository)
         val businessPartnerDto = taskEntry.businessPartner
+
+        assertParentsConsistent(businessPartnerDto, taskEntryBpnMapping)
 
         val legalEntityResult = processLegalEntity(businessPartnerDto, taskEntryBpnMapping)
         val siteResult = processSite(businessPartnerDto, legalEntityResult.bpnReference.referenceValue!!, taskEntryBpnMapping)
@@ -543,5 +552,36 @@ class TaskStepBuildService(
         }catch (e: IllegalArgumentException){
             throw BpdmValidationException("Country Code not recognized")
         }
+    }
+
+    private fun assertParentsConsistent(businessPartner: BusinessPartner, taskEntryBpnMapping: TaskEntryBpnMapping){
+        val addressBpn = businessPartner.additionalAddress?.bpnReference?.let { taskEntryBpnMapping.getBpn(it) }
+        val siteBpn = businessPartner.site?.bpnReference?.let { taskEntryBpnMapping.getBpn(it) }
+        val legalEntityBpn = taskEntryBpnMapping.getBpn(businessPartner.legalEntity.bpnReference)
+
+        if(siteBpn != null){
+            val foundSite = siteRepository.findByBpn(siteBpn)
+            if(foundSite != null){
+                if(foundSite.legalEntity.bpn != legalEntityBpn){
+                    throw BpdmValidationException(CleaningError.SITE_WRONG_LEGAL_ENTITY_REFERENCE.message)
+                }
+            }
+        }
+
+        if(addressBpn != null){
+            val foundAddress = logisticAddressRepository.findByBpn(addressBpn)
+            if(foundAddress != null){
+                if(foundAddress.legalEntity!!.bpn != legalEntityBpn){
+                    throw BpdmValidationException(CleaningError.ADDITIONAL_ADDRESS_WRONG_LEGAL_ENTITY_REFERENCE.message)
+                }
+                if(foundAddress.site != null){
+                    if(foundAddress.site!!.bpn != siteBpn){
+                        throw BpdmValidationException(CleaningError.ADDITIONAL_ADDRESS_WRONG_SITE_REFERENCE.message)
+                    }
+                }
+            }
+        }
+
+
     }
 }
