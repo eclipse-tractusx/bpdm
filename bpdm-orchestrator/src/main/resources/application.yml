@@ -141,6 +141,8 @@ management:
       # Include readiness state in health response (ready to accept traffic)
       enabled: true
 springdoc:
+  # Api document should be in pretty JSON
+  writer-with-default-pretty-printer: true
   api-docs:
     # Generate Open-API document
     enabled: true
