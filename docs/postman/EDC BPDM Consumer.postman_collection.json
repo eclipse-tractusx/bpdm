@@ -49,7 +49,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"@context\": {\r\n        \"@vocab\": \"https://w3id.org/edc/v0.0.1/ns/\"\r\n    },\r\n    \"@type\": \"CatalogRequest\",\r\n    \"counterPartyAddress\": \"{{PROVIDER_EDC_DATASPACE_API}}\",\r\n    \"counterPartyId\": \"{{PROVIDER_BPNL}}\",\r\n    \"protocol\": \"dataspace-protocol-http\",\r\n    \"querySpec\": {\r\n        \"offset\": 0,\r\n        \"limit\": 1,\r\n        \"filterExpression\": [\r\n            {\r\n                \"operandLeft\": \"https://purl.org/dc/terms/subject\",\r\n                \"operator\": \"=\",\r\n                \"operandRight\": \"cx-taxo:ReadAccessPoolForCatenaXMember\"\r\n            },\r\n            {\r\n                \"operandLeft\": \"https://w3id.org/catenax/ontology/common/version\",\r\n                \"operator\": \"=\",\r\n                \"operandRight\": \"6.0\"\r\n            }\r\n        ]\r\n    }\r\n}",
+									"raw": "{\r\n    \"@context\": {\r\n        \"@vocab\": \"https://w3id.org/edc/v0.0.1/ns/\"\r\n    },\r\n    \"@type\": \"CatalogRequest\",\r\n    \"counterPartyAddress\": \"{{PROVIDER_EDC_DATASPACE_API}}\",\r\n    \"counterPartyId\": \"{{PROVIDER_BPNL}}\",\r\n    \"protocol\": \"dataspace-protocol-http\",\r\n    \"querySpec\": {\r\n        \"offset\": 0,\r\n        \"limit\": 1,\r\n        \"filterExpression\": [\r\n            {\r\n                \"operandLeft\": \"https://purl.org/dc/terms/subject\",\r\n                \"operator\": \"=\",\r\n                \"operandRight\": \"cx-taxo:ReadAccessPoolForCatenaXMember\"\r\n            },\r\n            {\r\n                \"operandLeft\": \"https://w3id.org/catenax/ontology/common/version\",\r\n                \"operator\": \"=\",\r\n                \"operandRight\": \"6.0\"\r\n            },\r\n            {\r\n                \"operandLeft\": \"https://w3id.org/edc/v0.0.1/ns/BusinessPartnerNumber\",\r\n                \"operator\": \"=\",\r\n                \"operandRight\": \"{{CONSUMER_BPNL}}\"\r\n            }\r\n        ]\r\n    }\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -107,7 +107,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"@context\": {\r\n        \"@vocab\": \"https://w3id.org/edc/v0.0.1/ns/\"\r\n    },\r\n    \"@type\": \"CatalogRequest\",\r\n    \"counterPartyAddress\": \"{{PROVIDER_EDC_DATASPACE_API}}\",\r\n    \"counterPartyId\": \"{{PROVIDER_BPNL}}\",\r\n    \"protocol\": \"dataspace-protocol-http\",\r\n    \"querySpec\": {\r\n        \"offset\": 0,\r\n        \"limit\": 1,\r\n        \"filterExpression\": [\r\n            {\r\n                \"operandLeft\": \"https://purl.org/dc/terms/subject\",\r\n                \"operator\": \"=\",\r\n                \"operandRight\": \"cx-taxo:FullAccessGateInputForSharingMember\"\r\n            },\r\n            {\r\n                \"operandLeft\": \"https://w3id.org/catenax/ontology/common/version\",\r\n                \"operator\": \"=\",\r\n                \"operandRight\": \"6.0\"\r\n            },\r\n            {\r\n                \"operandLeft\": \"https://w3id.org/edc/v0.0.1/ns/BusinessPartnerNumber\",\r\n                \"operator\": \"=\",\r\n                \"operandRight\": \"{{CONSUMER_BPNL}}\"\r\n            }\r\n        ]\r\n    }\r\n}",
+									"raw": "{\r\n    \"@context\": {\r\n        \"@vocab\": \"https://w3id.org/edc/v0.0.1/ns/\"\r\n    },\r\n    \"@type\": \"CatalogRequest\",\r\n    \"counterPartyAddress\": \"{{PROVIDER_EDC_DATASPACE_API}}\",\r\n    \"counterPartyId\": \"{{PROVIDER_BPNL}}\",\r\n    \"protocol\": \"dataspace-protocol-http\",\r\n    \"querySpec\": {\r\n        \"offset\": 0,\r\n        \"limit\": 10,\r\n        \"filterExpression\": [\r\n            {\r\n                \"operandLeft\": \"https://purl.org/dc/terms/subject\",\r\n                \"operator\": \"=\",\r\n                \"operandRight\": \"cx-taxo:FullAccessGateInputForSharingMember\"\r\n            },\r\n            {\r\n                \"operandLeft\": \"https://w3id.org/catenax/ontology/common/version\",\r\n                \"operator\": \"=\",\r\n                \"operandRight\": \"6.0\"\r\n            },\r\n            {\r\n                \"operandLeft\": \"https://w3id.org/edc/v0.0.1/ns/BusinessPartnerNumber\",\r\n                \"operator\": \"=\",\r\n                \"operandRight\": \"{{CONSUMER_BPNL}}\"\r\n            }\r\n        ]\r\n    }\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -3665,6 +3665,585 @@
 							]
 						}
 					]
+				},
+				{
+					"name": "relation-controller",
+					"item": [
+						{
+							"name": "/input/business-partner-relations",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/v6/input/business-partner-relations?externalIds=<string>&externalIds=<string>&relationType=<string>&businessPartnerSourceExternalIds=<string>&businessPartnerSourceExternalIds=<string>&businessPartnerTargetExternalIds=<string>&businessPartnerTargetExternalIds=<string>&updatedAtFrom=<dateTime>&page=<string>&size=<string>",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"v6",
+										"input",
+										"business-partner-relations"
+									],
+									"query": [
+										{
+											"key": "externalIds",
+											"value": "<string>",
+											"description": "Only show relations with the given external identifiers"
+										},
+										{
+											"key": "externalIds",
+											"value": "<string>",
+											"description": "Only show relations with the given external identifiers"
+										},
+										{
+											"key": "relationType",
+											"value": "<string>",
+											"description": "Only show relations of the given type"
+										},
+										{
+											"key": "businessPartnerSourceExternalIds",
+											"value": "<string>",
+											"description": "Only show relations which have the given business partners as sources"
+										},
+										{
+											"key": "businessPartnerSourceExternalIds",
+											"value": "<string>",
+											"description": "Only show relations which have the given business partners as sources"
+										},
+										{
+											"key": "businessPartnerTargetExternalIds",
+											"value": "<string>",
+											"description": "Only show relations which have the given business partners as targets"
+										},
+										{
+											"key": "businessPartnerTargetExternalIds",
+											"value": "<string>",
+											"description": "Only show relations which have the given business partners as targets"
+										},
+										{
+											"key": "updatedAtFrom",
+											"value": "<dateTime>",
+											"description": "Only show relations which have been modified after the given time stamp"
+										},
+										{
+											"key": "page",
+											"value": "<string>",
+											"description": "Number of page to get results from"
+										},
+										{
+											"key": "size",
+											"value": "<string>",
+											"description": "Size of each page"
+										}
+									]
+								},
+								"description": "Find paginated list of business partner relations from the input stage. There are various filter criteria available. All filters are 'AND' filters."
+							},
+							"response": [
+								{
+									"name": "A paginated list of business partner relations for the input stage",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/v6/input/business-partner-relations?externalIds=<string>&externalIds=<string>&relationType=<string>&businessPartnerSourceExternalIds=<string>&businessPartnerSourceExternalIds=<string>&businessPartnerTargetExternalIds=<string>&businessPartnerTargetExternalIds=<string>&updatedAtFrom=<dateTime>&page=<string>&size=<string>",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"v6",
+												"input",
+												"business-partner-relations"
+											],
+											"query": [
+												{
+													"key": "externalIds",
+													"value": "<string>"
+												},
+												{
+													"key": "externalIds",
+													"value": "<string>"
+												},
+												{
+													"key": "relationType",
+													"value": "<string>"
+												},
+												{
+													"key": "businessPartnerSourceExternalIds",
+													"value": "<string>"
+												},
+												{
+													"key": "businessPartnerSourceExternalIds",
+													"value": "<string>"
+												},
+												{
+													"key": "businessPartnerTargetExternalIds",
+													"value": "<string>"
+												},
+												{
+													"key": "businessPartnerTargetExternalIds",
+													"value": "<string>"
+												},
+												{
+													"key": "updatedAtFrom",
+													"value": "<dateTime>"
+												},
+												{
+													"key": "page",
+													"value": "<string>"
+												},
+												{
+													"key": "size",
+													"value": "<string>"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "{\n  \"content\": [\n    {\n      \"businessPartnerSourceExternalId\": \"<string>\",\n      \"businessPartnerTargetExternalId\": \"<string>\",\n      \"createdAt\": \"<dateTime>\",\n      \"externalId\": \"<string>\",\n      \"relationType\": \"<string>\",\n      \"updatedAt\": \"<dateTime>\"\n    },\n    {\n      \"businessPartnerSourceExternalId\": \"<string>\",\n      \"businessPartnerTargetExternalId\": \"<string>\",\n      \"createdAt\": \"<dateTime>\",\n      \"externalId\": \"<string>\",\n      \"relationType\": \"<string>\",\n      \"updatedAt\": \"<dateTime>\"\n    }\n  ],\n  \"contentSize\": \"<integer>\",\n  \"page\": \"<integer>\",\n  \"totalElements\": \"<long>\",\n  \"totalPages\": \"<integer>\"\n}"
+								}
+							]
+						},
+						{
+							"name": "/input/business-partner-relations",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"businessPartnerSourceExternalId\": \"<string>\",\n  \"businessPartnerTargetExternalId\": \"<string>\",\n  \"externalId\": \"<string>\",\n  \"relationType\": \"<string>\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/v6/input/business-partner-relations?createIfNotExist=<boolean>",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"v6",
+										"input",
+										"business-partner-relations"
+									],
+									"query": [
+										{
+											"key": "createIfNotExist",
+											"value": "<boolean>",
+											"description": "If true a business partner relation will be created even if a relation could not be found under the given external identifier."
+										}
+									]
+								},
+								"description": "Update an existing business partner relation on the input stage. By using a request parameter it is also possible to create a relation if the relation with the given external identifier does not exist. "
+							},
+							"response": [
+								{
+									"name": "The given business partner relation has been updated.",
+									"originalRequest": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"businessPartnerSourceExternalId\": \"<string>\",\n  \"businessPartnerTargetExternalId\": \"<string>\",\n  \"externalId\": \"<string>\",\n  \"relationType\": \"<string>\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/v6/input/business-partner-relations?createIfNotExist=<boolean>",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"v6",
+												"input",
+												"business-partner-relations"
+											],
+											"query": [
+												{
+													"key": "createIfNotExist",
+													"value": "<boolean>"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "{\n  \"businessPartnerSourceExternalId\": \"<string>\",\n  \"businessPartnerTargetExternalId\": \"<string>\",\n  \"createdAt\": \"<dateTime>\",\n  \"externalId\": \"<string>\",\n  \"relationType\": \"<string>\",\n  \"updatedAt\": \"<dateTime>\"\n}"
+								},
+								{
+									"name": "On wrong or insufficient user provided data like references to non-existent business partners or relations that violate the relation constraints. ",
+									"originalRequest": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"businessPartnerSourceExternalId\": \"<string>\",\n  \"businessPartnerTargetExternalId\": \"<string>\",\n  \"externalId\": \"<string>\",\n  \"relationType\": \"<string>\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/v6/input/business-partner-relations?createIfNotExist=<boolean>",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"v6",
+												"input",
+												"business-partner-relations"
+											],
+											"query": [
+												{
+													"key": "createIfNotExist",
+													"value": "<boolean>"
+												}
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "{\n  \"error\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"path\": \"<string>\",\n  \"status\": \"<string>\",\n  \"timestamp\": \"<dateTime>\"\n}"
+								}
+							]
+						},
+						{
+							"name": "/input/business-partner-relations",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"businessPartnerSourceExternalId\": \"<string>\",\n  \"businessPartnerTargetExternalId\": \"<string>\",\n  \"relationType\": \"<string>\",\n  \"externalId\": \"<string>\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/v6/input/business-partner-relations",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"v6",
+										"input",
+										"business-partner-relations"
+									]
+								},
+								"description": "Create a new relation between two business partner entries on the input stage. The external identifier is optional and a new one will be automatically created if not given. A given external identifier has to be unique."
+							},
+							"response": [
+								{
+									"name": "The created business partner input relation",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"businessPartnerSourceExternalId\": \"<string>\",\n  \"businessPartnerTargetExternalId\": \"<string>\",\n  \"relationType\": \"<string>\",\n  \"externalId\": \"<string>\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/v6/input/business-partner-relations",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"v6",
+												"input",
+												"business-partner-relations"
+											]
+										}
+									},
+									"status": "Created",
+									"code": 201,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "{\n  \"businessPartnerSourceExternalId\": \"<string>\",\n  \"businessPartnerTargetExternalId\": \"<string>\",\n  \"createdAt\": \"<dateTime>\",\n  \"externalId\": \"<string>\",\n  \"relationType\": \"<string>\",\n  \"updatedAt\": \"<dateTime>\"\n}"
+								},
+								{
+									"name": "If the business partner could not be created based on wrong or insufficient data provided such as non-existent business partners or violated relation constraints. ",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"businessPartnerSourceExternalId\": \"<string>\",\n  \"businessPartnerTargetExternalId\": \"<string>\",\n  \"relationType\": \"<string>\",\n  \"externalId\": \"<string>\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/v6/input/business-partner-relations",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"v6",
+												"input",
+												"business-partner-relations"
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "{\n  \"error\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"path\": \"<string>\",\n  \"status\": \"<string>\",\n  \"timestamp\": \"<dateTime>\"\n}"
+								},
+								{
+									"name": "If a relation with the given external identifier already exists",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"businessPartnerSourceExternalId\": \"<string>\",\n  \"businessPartnerTargetExternalId\": \"<string>\",\n  \"relationType\": \"<string>\",\n  \"externalId\": \"<string>\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/v6/input/business-partner-relations",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"v6",
+												"input",
+												"business-partner-relations"
+											]
+										}
+									},
+									"status": "Conflict",
+									"code": 409,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "{\n  \"error\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"path\": \"<string>\",\n  \"status\": \"<string>\",\n  \"timestamp\": \"<dateTime>\"\n}"
+								}
+							]
+						},
+						{
+							"name": "/input/business-partner-relations",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/v6/input/business-partner-relations?externalId=<string>",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"v6",
+										"input",
+										"business-partner-relations"
+									],
+									"query": [
+										{
+											"key": "externalId",
+											"value": "<string>",
+											"description": "(Required) The external identifier of the business partner relation to delete"
+										}
+									]
+								},
+								"description": "Delete a relation between two business partners on the input stage."
+							},
+							"response": [
+								{
+									"name": "The specified relation has been deleted.",
+									"originalRequest": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/v6/input/business-partner-relations?externalId=<string>",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"v6",
+												"input",
+												"business-partner-relations"
+											],
+											"query": [
+												{
+													"key": "externalId",
+													"value": "<string>"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "text",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "text/plain"
+										}
+									],
+									"cookie": [],
+									"body": ""
+								},
+								{
+									"name": "On specifying a relation that does not exist. ",
+									"originalRequest": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/v6/input/business-partner-relations?externalId=<string>",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"v6",
+												"input",
+												"business-partner-relations"
+											],
+											"query": [
+												{
+													"key": "externalId",
+													"value": "<string>"
+												}
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "{\n  \"error\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"path\": \"<string>\",\n  \"status\": \"<string>\",\n  \"timestamp\": \"<dateTime>\"\n}"
+								}
+							]
+						}
+					]
 				}
 			],
 			"auth": {
@@ -4520,6 +5099,165 @@
 									],
 									"cookie": [],
 									"body": "{\n  \"checkedByExternalDataSourceTotal\": \"<long>\",\n  \"confidenceLevelAverage\": \"<float>\",\n  \"numberOfBusinessPartnersAverage\": \"<float>\",\n  \"sharedByOwnerTotal\": \"<long>\",\n  \"uniqueTotal\": \"<long>\"\n}"
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "relation-controller",
+					"item": [
+						{
+							"name": "/input/business-partner-relations",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/v6/input/business-partner-relations?externalIds=<string>&externalIds=<string>&relationType=<string>&businessPartnerSourceExternalIds=<string>&businessPartnerSourceExternalIds=<string>&businessPartnerTargetExternalIds=<string>&businessPartnerTargetExternalIds=<string>&updatedAtFrom=<dateTime>&page=<string>&size=<string>",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"v6",
+										"input",
+										"business-partner-relations"
+									],
+									"query": [
+										{
+											"key": "externalIds",
+											"value": "<string>",
+											"description": "Only show relations with the given external identifiers"
+										},
+										{
+											"key": "externalIds",
+											"value": "<string>",
+											"description": "Only show relations with the given external identifiers"
+										},
+										{
+											"key": "relationType",
+											"value": "<string>",
+											"description": "Only show relations of the given type"
+										},
+										{
+											"key": "businessPartnerSourceExternalIds",
+											"value": "<string>",
+											"description": "Only show relations which have the given business partners as sources"
+										},
+										{
+											"key": "businessPartnerSourceExternalIds",
+											"value": "<string>",
+											"description": "Only show relations which have the given business partners as sources"
+										},
+										{
+											"key": "businessPartnerTargetExternalIds",
+											"value": "<string>",
+											"description": "Only show relations which have the given business partners as targets"
+										},
+										{
+											"key": "businessPartnerTargetExternalIds",
+											"value": "<string>",
+											"description": "Only show relations which have the given business partners as targets"
+										},
+										{
+											"key": "updatedAtFrom",
+											"value": "<dateTime>",
+											"description": "Only show relations which have been modified after the given time stamp"
+										},
+										{
+											"key": "page",
+											"value": "<string>",
+											"description": "Number of page to get results from"
+										},
+										{
+											"key": "size",
+											"value": "<string>",
+											"description": "Size of each page"
+										}
+									]
+								},
+								"description": "Find paginated list of business partner relations from the input stage. There are various filter criteria available. All filters are 'AND' filters."
+							},
+							"response": [
+								{
+									"name": "A paginated list of business partner relations for the input stage",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/v6/input/business-partner-relations?externalIds=<string>&externalIds=<string>&relationType=<string>&businessPartnerSourceExternalIds=<string>&businessPartnerSourceExternalIds=<string>&businessPartnerTargetExternalIds=<string>&businessPartnerTargetExternalIds=<string>&updatedAtFrom=<dateTime>&page=<string>&size=<string>",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"v6",
+												"input",
+												"business-partner-relations"
+											],
+											"query": [
+												{
+													"key": "externalIds",
+													"value": "<string>"
+												},
+												{
+													"key": "externalIds",
+													"value": "<string>"
+												},
+												{
+													"key": "relationType",
+													"value": "<string>"
+												},
+												{
+													"key": "businessPartnerSourceExternalIds",
+													"value": "<string>"
+												},
+												{
+													"key": "businessPartnerSourceExternalIds",
+													"value": "<string>"
+												},
+												{
+													"key": "businessPartnerTargetExternalIds",
+													"value": "<string>"
+												},
+												{
+													"key": "businessPartnerTargetExternalIds",
+													"value": "<string>"
+												},
+												{
+													"key": "updatedAtFrom",
+													"value": "<dateTime>"
+												},
+												{
+													"key": "page",
+													"value": "<string>"
+												},
+												{
+													"key": "size",
+													"value": "<string>"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "{\n  \"content\": [\n    {\n      \"businessPartnerSourceExternalId\": \"<string>\",\n      \"businessPartnerTargetExternalId\": \"<string>\",\n      \"createdAt\": \"<dateTime>\",\n      \"externalId\": \"<string>\",\n      \"relationType\": \"<string>\",\n      \"updatedAt\": \"<dateTime>\"\n    },\n    {\n      \"businessPartnerSourceExternalId\": \"<string>\",\n      \"businessPartnerTargetExternalId\": \"<string>\",\n      \"createdAt\": \"<dateTime>\",\n      \"externalId\": \"<string>\",\n      \"relationType\": \"<string>\",\n      \"updatedAt\": \"<dateTime>\"\n    }\n  ],\n  \"contentSize\": \"<integer>\",\n  \"page\": \"<integer>\",\n  \"totalElements\": \"<long>\",\n  \"totalPages\": \"<integer>\"\n}"
 								}
 							]
 						}

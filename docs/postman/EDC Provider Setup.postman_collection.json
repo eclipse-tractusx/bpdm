@@ -618,8 +618,13 @@
 			"type": "string"
 		},
 		{
+			"key": "CONSUMER_NAME",
+			"value": "consumer-name",
+			"type": "string"
+		},
+		{
 			"key": "CLIENT_ID_POOL_CX_MEMBER_READ",
-			"value": "CLIENT_1_ID",
+			"value": "CLIENT_2_ID",
 			"type": "string"
 		},
 		{
@@ -654,7 +659,7 @@
 		},
 		{
 			"key": "CLIENT_SECRET_PATH_GATE_SHARING_MEMBER_READ_OUTPUT",
-			"value": "vault/path/client/3/secret",
+			"value": "vault/path/client/4/secret",
 			"type": "string"
 		},
 		{
