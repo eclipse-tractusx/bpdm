@@ -1,1227 +1,1054 @@
 {
-  "openapi": "3.0.1",
-  "info": {
-    "title": "Business Partner Data Management Orchestrator",
-    "description": "Orchestrator component acts as a passive component and offers for each processing steps individual endpoints",
-    "version": "6.3.0-SNAPSHOT"
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "Business Partner Data Management Orchestrator",
+    "description" : "Orchestrator component acts as a passive component and offers for each processing steps individual endpoints",
+    "version" : "6.3.0-SNAPSHOT"
   },
-  "servers": [
-    {
-      "url": "http://localhost:8085",
-      "description": "Generated server url"
-    }
-  ],
-  "security": [
-    {
-      "open_id_scheme": []
-    },
-    {
-      "bearer_scheme": []
-    }
-  ],
-  "paths": {
-    "/v6/golden-record-tasks": {
-      "post": {
-        "tags": [
-          "Task Client"
-        ],
-        "summary": "Create new golden record tasks for given business partner data",
-        "description": "Create golden record tasks for given business partner data in given mode. The mode decides through which processing steps the given business partner data will go through. The response contains the states of the created tasks in the order of given business partner data.If there is an error in the request no tasks are created (all or nothing). For a single request, the maximum number of business partners in the request is limited to 100 entries.",
-        "operationId": "createTasks",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/TaskCreateRequest"
+  "servers" : [ {
+    "url" : "http://localhost:8085",
+    "description" : "Generated server url"
+  } ],
+  "security" : [ {
+    "open_id_scheme" : [ ]
+  }, {
+    "bearer_scheme" : [ ]
+  } ],
+  "paths" : {
+    "/v6/golden-record-tasks" : {
+      "post" : {
+        "tags" : [ "Task Client" ],
+        "summary" : "Create new golden record tasks for given business partner data",
+        "description" : "Create golden record tasks for given business partner data in given mode. The mode decides through which processing steps the given business partner data will go through. The response contains the states of the created tasks in the order of given business partner data.If there is an error in the request no tasks are created (all or nothing). For a single request, the maximum number of business partners in the request is limited to 100 entries.",
+        "operationId" : "createTasks",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/TaskCreateRequest"
               }
             }
           },
-          "required": true
+          "required" : true
         },
-        "responses": {
-          "200": {
-            "description": "The states of successfully created tasks including the task identifier for tracking purposes.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TaskCreateResponse"
+        "responses" : {
+          "200" : {
+            "description" : "The states of successfully created tasks including the task identifier for tracking purposes.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/TaskCreateResponse"
                 }
               }
             }
           },
-          "400": {
-            "description": "On malformed task create requests or reaching upsert limit"
+          "400" : {
+            "description" : "On malformed task create requests or reaching upsert limit"
           }
         }
       }
     },
-    "/v6/golden-record-tasks/step-results": {
-      "post": {
-        "tags": [
-          "Task Worker"
-        ],
-        "summary": "Post step results for reserved golden record tasks in the given step queue",
-        "description": "Post business partner step results for the given tasks in the given step queue. In order to post a result for a task it needs to be reserved first, has to currently be in the given step queue and the time limit is not exceeded. The number of results you can post at a time does not need to match the original number of reserved tasks. Results are accepted via strategy 'all or nothing'. For a single request, the maximum number of postable results is limited to 100.",
-        "operationId": "resolveStepResults",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/TaskStepResultRequest"
+    "/v6/golden-record-tasks/step-results" : {
+      "post" : {
+        "tags" : [ "Task Worker" ],
+        "summary" : "Post step results for reserved golden record tasks in the given step queue",
+        "description" : "Post business partner step results for the given tasks in the given step queue. In order to post a result for a task it needs to be reserved first, has to currently be in the given step queue and the time limit is not exceeded. The number of results you can post at a time does not need to match the original number of reserved tasks. Results are accepted via strategy 'all or nothing'. For a single request, the maximum number of postable results is limited to 100.",
+        "operationId" : "resolveStepResults",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/TaskStepResultRequest"
               }
             }
           },
-          "required": true
+          "required" : true
         },
-        "responses": {
-          "204": {
-            "description": "If the results could be processed"
+        "responses" : {
+          "204" : {
+            "description" : "If the results could be processed"
           },
-          "400": {
-            "description": "On malformed requests, reaching upsert limit or posting results for tasks which are missing or in the wrong step queue"
+          "400" : {
+            "description" : "On malformed requests, reaching upsert limit or posting results for tasks which are missing or in the wrong step queue"
           }
         }
       }
     },
-    "/v6/golden-record-tasks/step-reservations": {
-      "post": {
-        "tags": [
-          "Task Worker"
-        ],
-        "summary": "Reserve the next golden record tasks waiting in the given step queue",
-        "description": "Reserve up to a given number of golden record tasks in the given step queue. The response entries contain the business partner data to process which consists of the generic and L/S/A data. The reservation has a time limit which is returned. For a single request, the maximum number of reservable tasks is limited to 100.",
-        "operationId": "reserveTasksForStep",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/TaskStepReservationRequest"
+    "/v6/golden-record-tasks/step-reservations" : {
+      "post" : {
+        "tags" : [ "Task Worker" ],
+        "summary" : "Reserve the next golden record tasks waiting in the given step queue",
+        "description" : "Reserve up to a given number of golden record tasks in the given step queue. The response entries contain the business partner data to process which consists of the generic and L/S/A data. The reservation has a time limit which is returned. For a single request, the maximum number of reservable tasks is limited to 100.",
+        "operationId" : "reserveTasksForStep",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/TaskStepReservationRequest"
               }
             }
           },
-          "required": true
+          "required" : true
         },
-        "responses": {
-          "200": {
-            "description": "The reserved tasks with their business partner data to process.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TaskStepReservationResponse"
+        "responses" : {
+          "200" : {
+            "description" : "The reserved tasks with their business partner data to process.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/TaskStepReservationResponse"
                 }
               }
             }
           },
-          "400": {
-            "description": "On malformed task create requests or reaching upsert limit"
+          "400" : {
+            "description" : "On malformed task create requests or reaching upsert limit"
           }
         }
       }
     },
-    "/v6/golden-record-tasks/state/search": {
-      "post": {
-        "tags": [
-          "Task Client"
-        ],
-        "summary": "Search for the state of golden record tasks by task identifiers",
-        "description": "Returns the state of golden record tasks based on the provided task identifiers. Unknown task identifiers are ignored.",
-        "operationId": "searchTaskStates",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/TaskStateRequest"
+    "/v6/golden-record-tasks/state/search" : {
+      "post" : {
+        "tags" : [ "Task Client" ],
+        "summary" : "Search for the state of golden record tasks by task identifiers",
+        "description" : "Returns the state of golden record tasks based on the provided task identifiers. Unknown task identifiers are ignored.",
+        "operationId" : "searchTaskStates",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/TaskStateRequest"
               }
             }
           },
-          "required": true
+          "required" : true
         },
-        "responses": {
-          "200": {
-            "description": "The state of the tasks for the provided task identifiers.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TaskStateResponse"
+        "responses" : {
+          "200" : {
+            "description" : "The state of the tasks for the provided task identifiers.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/TaskStateResponse"
                 }
               }
             }
           },
-          "400": {
-            "description": "On malformed task search requests"
+          "400" : {
+            "description" : "On malformed task search requests"
           }
         }
       }
     },
-    "/v6/golden-record-tasks/result-state/search": {
-      "post": {
-        "tags": [
-          "Task Client"
-        ],
-        "summary": "Search for result states by giving a list of task IDs",
-        "operationId": "searchTaskResultStates",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/TaskResultStateSearchRequest"
+    "/v6/golden-record-tasks/result-state/search" : {
+      "post" : {
+        "tags" : [ "Task Client" ],
+        "summary" : "Search for result states by giving a list of task IDs",
+        "operationId" : "searchTaskResultStates",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/TaskResultStateSearchRequest"
               }
             }
           },
-          "required": true
+          "required" : true
         },
-        "responses": {
-          "200": {
-            "description": "The list of corresponding result states in the same order as has been received. A null indicates that a task could not be found.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TaskResultStateSearchResponse"
+        "responses" : {
+          "200" : {
+            "description" : "The list of corresponding result states in the same order as has been received. A null indicates that a task could not be found.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/TaskResultStateSearchResponse"
                 }
               }
             }
           },
-          "400": {
-            "description": "On malformed task search requests"
+          "400" : {
+            "description" : "On malformed task search requests"
           }
         }
       }
     },
-    "/v6/golden-record-tasks/finished-events": {
-      "get": {
-        "tags": [
-          "Task Client"
-        ],
-        "summary": "Get event log of golden record tasks that have finished processing",
-        "description": "The event log contains all events of when golden record tasks finish processing. These events are helpful for the task creator to check whether created tasks have finished processing. A paginated list of events that happened after a given time is returned. ",
-        "operationId": "getEvents",
-        "parameters": [
-          {
-            "name": "timestamp",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "date-time"
-            }
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "description": "Number of page to get results from",
-            "required": false,
-            "schema": {
-              "minimum": 0,
-              "type": "string",
-              "default": "0"
-            }
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "description": "Size of each page",
-            "required": false,
-            "schema": {
-              "maximum": 100,
-              "minimum": 0,
-              "type": "string",
-              "default": "10"
-            }
+    "/v6/golden-record-tasks/finished-events" : {
+      "get" : {
+        "tags" : [ "Task Client" ],
+        "summary" : "Get event log of golden record tasks that have finished processing",
+        "description" : "The event log contains all events of when golden record tasks finish processing. These events are helpful for the task creator to check whether created tasks have finished processing. A paginated list of events that happened after a given time is returned. ",
+        "operationId" : "getEvents",
+        "parameters" : [ {
+          "name" : "timestamp",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date-time"
           }
-        ],
-        "responses": {
-          "200": {
-            "description": "The paginated events after the given timestamp",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/FinishedTaskEventsResponse"
+        }, {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Number of page to get results from",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Size of each page",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "maximum" : 100,
+            "minimum" : 0
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "The paginated events after the given timestamp",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/FinishedTaskEventsResponse"
                 }
               }
             }
           },
-          "400": {
-            "description": "On malformed requests"
+          "400" : {
+            "description" : "On malformed requests"
           }
         }
       }
     }
   },
-  "components": {
-    "schemas": {
-      "AlternativeAddress": {
-        "required": [
-          "geographicCoordinates"
-        ],
-        "type": "object",
-        "properties": {
-          "geographicCoordinates": {
-            "$ref": "#/components/schemas/GeoCoordinate"
+  "components" : {
+    "schemas" : {
+      "AlternativeAddress" : {
+        "type" : "object",
+        "description" : "An alternative postal address describes an alternative way of delivery for example if the goods are to be picked up somewhere else.",
+        "properties" : {
+          "geographicCoordinates" : {
+            "$ref" : "#/components/schemas/GeoCoordinate"
           },
-          "country": {
-            "type": "string",
-            "description": "The 2-digit country code of the physical postal address according to ISO 3166-1."
+          "country" : {
+            "type" : "string",
+            "description" : "The 2-digit country code of the physical postal address according to ISO 3166-1."
           },
-          "administrativeAreaLevel1": {
-            "type": "string",
-            "description": "The 2-digit country subdivision code according to ISO 3166-2, such as a region within a country."
+          "administrativeAreaLevel1" : {
+            "type" : "string",
+            "description" : "The 2-digit country subdivision code according to ISO 3166-2, such as a region within a country."
           },
-          "postalCode": {
-            "type": "string",
-            "description": "The alphanumeric identifier (sometimes including spaces or punctuation) of the physical postal address for the purpose of sorting mail, synonyms:postcode, post code, PIN or ZIP code."
+          "postalCode" : {
+            "type" : "string",
+            "description" : "The alphanumeric identifier (sometimes including spaces or punctuation) of the physical postal address for the purpose of sorting mail, synonyms:postcode, post code, PIN or ZIP code."
           },
-          "city": {
-            "type": "string",
-            "description": "The name of the city of the physical postal address, synonyms: town, village, municipality."
+          "city" : {
+            "type" : "string",
+            "description" : "The name of the city of the physical postal address, synonyms: town, village, municipality."
           },
-          "deliveryServiceType": {
-            "type": "string",
-            "description": "One of the alternative postal address types: P.O. box, private bag, boite postale.",
-            "enum": [
-              "PO_BOX",
-              "PRIVATE_BAG",
-              "BOITE_POSTALE"
-            ]
+          "deliveryServiceType" : {
+            "type" : "string",
+            "description" : "One of the alternative postal address types: P.O. box, private bag, boite postale.",
+            "enum" : [ "PO_BOX", "PRIVATE_BAG", "BOITE_POSTALE" ]
           },
-          "deliveryServiceQualifier": {
-            "type": "string",
-            "description": "The qualifier uniquely identifying the delivery service endpoint of the alternative postal address in conjunction with the delivery service number. In some countries for example, entering a P.O. box number, postal code and city is not sufficient to uniquely identify a P.O. box, because the same P.O. box number is assigned multiple times in some cities."
+          "deliveryServiceQualifier" : {
+            "type" : "string",
+            "description" : "The qualifier uniquely identifying the delivery service endpoint of the alternative postal address in conjunction with the delivery service number. In some countries for example, entering a P.O. box number, postal code and city is not sufficient to uniquely identify a P.O. box, because the same P.O. box number is assigned multiple times in some cities."
           },
-          "deliveryServiceNumber": {
-            "type": "string",
-            "description": "The number indicating the delivery service endpoint of the alternative postal address to which the delivery is to be delivered, such as a P.O. box number or a private bag number."
+          "deliveryServiceNumber" : {
+            "type" : "string",
+            "description" : "The number indicating the delivery service endpoint of the alternative postal address to which the delivery is to be delivered, such as a P.O. box number or a private bag number."
           }
         },
-        "description": "An alternative postal address describes an alternative way of delivery for example if the goods are to be picked up somewhere else."
+        "required" : [ "geographicCoordinates" ]
       },
-      "BpnReference": {
-        "type": "object",
-        "properties": {
-          "referenceValue": {
-            "type": "string",
-            "description": "The value of the reference, either an existing BPN or a BPN request identifier (which is freely chosen by the duplication check provider)"
+      "BpnReference" : {
+        "type" : "object",
+        "description" : "A reference to a BPN for the corresponding business partner data. Either this reference contains an existing BPN or a BPN request identifier. The golden record process makes sure that the each unique BPN request identifier is associated to a unique BPN. For a new BPN request identifier the golden record process creates a new BPN (and golden record) and associates it with the BPN request identifier. Known BPN request identifiers are resolved to the BPN and the corresponding golden record is updated with the business partner data. This makes it possible for duplication check services to reference unique business partners by their own BPN request identifiers instead of needing to rely on BPNs for identification.",
+        "properties" : {
+          "referenceValue" : {
+            "type" : "string",
+            "description" : "The value of the reference, either an existing BPN or a BPN request identifier (which is freely chosen by the duplication check provider)"
           },
-          "desiredBpn": {
-            "type": "string",
-            "description": "The desired BPN when a new golden record has to be created for this business partner data.Requires a BPN request identifier that is not associated with an existing BPN. At this moment the golden record process does not support creating desired BPNs and ignores this field. "
+          "desiredBpn" : {
+            "type" : "string",
+            "description" : "The desired BPN when a new golden record has to be created for this business partner data.Requires a BPN request identifier that is not associated with an existing BPN. At this moment the golden record process does not support creating desired BPNs and ignores this field. "
           },
-          "referenceType": {
-            "type": "string",
-            "description": "Whether this reference is a BPN or BPN request identifier",
-            "enum": [
-              "Bpn",
-              "BpnRequestIdentifier"
-            ]
-          }
-        },
-        "description": "A reference to a BPN for the corresponding business partner data. Either this reference contains an existing BPN or a BPN request identifier. The golden record process makes sure that the each unique BPN request identifier is associated to a unique BPN. For a new BPN request identifier the golden record process creates a new BPN (and golden record) and associates it with the BPN request identifier. Known BPN request identifiers are resolved to the BPN and the corresponding golden record is updated with the business partner data. This makes it possible for duplication check services to reference unique business partners by their own BPN request identifiers instead of needing to rely on BPNs for identification."
-      },
-      "BusinessPartner": {
-        "required": [
-          "legalEntity",
-          "nameParts",
-          "uncategorized"
-        ],
-        "type": "object",
-        "properties": {
-          "nameParts": {
-            "type": "array",
-            "description": "Fully categorized and cleaned name parts based on the uncategorized name parts provided",
-            "items": {
-              "$ref": "#/components/schemas/NamePart"
-            }
-          },
-          "owningCompany": {
-            "type": "string",
-            "description": "The BPNL of the legal entity to which this business partner data belongs to"
-          },
-          "uncategorized": {
-            "$ref": "#/components/schemas/UncategorizedProperties"
-          },
-          "legalEntity": {
-            "$ref": "#/components/schemas/LegalEntity"
-          },
-          "site": {
-            "$ref": "#/components/schemas/Site"
-          },
-          "additionalAddress": {
-            "$ref": "#/components/schemas/PostalAddress"
-          },
-          "type": {
-            "type": "string",
-            "description": "The recognized golden record type this business partner data contains.\n* `Legal Entity`: The business partner data only contains legal entity and legal address information.\n* `Site`: The business partner data contains site, site main address and its parent legal entity information.\n* `Additional Address`: The business partner data contains an additional address, (optional) parent site and parent legal entity information.\n* `Null`: No clear type determined, undecided. The golden record process will not create golden record from this business partner data.",
-            "enum": [
-              "LegalEntity",
-              "Site",
-              "Address"
-            ]
-          }
-        },
-        "description": "Generic business partner data for golden record processing. Typically a sharing member shares incomplete and/or uncategorized business partner data to the golden record process. The golden record process categorizes and completes the data in order to create and update the resulting golden records. The golden records are found in the legalEntity, site and additionalAddress fields. The business partner data needs to contain the full golden record parent relationship. This means, if an additional address is specified in the business partner data, also its legal entity and also its site parent (if a site exists) needs to be specified. "
-      },
-      "BusinessState": {
-        "type": "object",
-        "properties": {
-          "validFrom": {
-            "type": "string",
-            "description": "Date since when the status is/was valid.",
-            "format": "date-time"
-          },
-          "validTo": {
-            "type": "string",
-            "description": "Date until the status was valid, if applicable.",
-            "format": "date-time"
-          },
-          "type": {
-            "type": "string",
-            "description": "The type of this specified status.",
-            "enum": [
-              "ACTIVE",
-              "INACTIVE"
-            ]
-          }
-        },
-        "description": "The business state information for the corresponding business partner"
-      },
-      "ConfidenceCriteria": {
-        "type": "object",
-        "properties": {
-          "sharedByOwner": {
-            "type": "boolean",
-            "description": "Whether the business partner data is shared by the actual owner"
-          },
-          "checkedByExternalDataSource": {
-            "type": "boolean",
-            "description": "The corresponding business partner data has been verified by an external data source, like an official register"
-          },
-          "numberOfSharingMembers": {
-            "type": "integer",
-            "description": "How many sharing members have already shared the matched golden record",
-            "format": "int32"
-          },
-          "lastConfidenceCheckAt": {
-            "type": "string",
-            "description": "Last time the confidence values have been checked (and updated if needed)",
-            "format": "date-time"
-          },
-          "nextConfidenceCheckAt": {
-            "type": "string",
-            "description": "Next time the confidence values should be checked",
-            "format": "date-time"
-          },
-          "confidenceLevel": {
-            "type": "integer",
-            "description": "The overall confidence level of the matched golden record",
-            "format": "int32"
-          }
-        },
-        "description": "Contains information to evaluate how good or verified the information in the attached business partner data is. This information will be directly written in the matched golden record's confidence criteria."
-      },
-      "Entry": {
-        "required": [
-          "recordId",
-          "taskId"
-        ],
-        "type": "object",
-        "properties": {
-          "taskId": {
-            "type": "string"
-          },
-          "recordId": {
-            "type": "string"
+          "referenceType" : {
+            "type" : "string",
+            "description" : "Whether this reference is a BPN or BPN request identifier",
+            "enum" : [ "Bpn", "BpnRequestIdentifier" ]
           }
         }
       },
-      "Event": {
-        "required": [
-          "resultState",
-          "taskId",
-          "timestamp"
-        ],
-        "type": "object",
-        "properties": {
-          "timestamp": {
-            "type": "string",
-            "format": "date-time"
+      "BusinessPartner" : {
+        "type" : "object",
+        "description" : "Generic business partner data for golden record processing. Typically a sharing member shares incomplete and/or uncategorized business partner data to the golden record process. The golden record process categorizes and completes the data in order to create and update the resulting golden records. The golden records are found in the legalEntity, site and additionalAddress fields. The business partner data needs to contain the full golden record parent relationship. This means, if an additional address is specified in the business partner data, also its legal entity and also its site parent (if a site exists) needs to be specified. ",
+        "properties" : {
+          "nameParts" : {
+            "type" : "array",
+            "description" : "Fully categorized and cleaned name parts based on the uncategorized name parts provided",
+            "items" : {
+              "$ref" : "#/components/schemas/NamePart"
+            }
           },
-          "resultState": {
-            "type": "string",
-            "enum": [
-              "Pending",
-              "Success",
-              "Error"
-            ]
+          "owningCompany" : {
+            "type" : "string",
+            "description" : "The BPNL of the legal entity to which this business partner data belongs to"
           },
-          "taskId": {
-            "type": "string"
+          "uncategorized" : {
+            "$ref" : "#/components/schemas/UncategorizedProperties"
+          },
+          "legalEntity" : {
+            "$ref" : "#/components/schemas/LegalEntity"
+          },
+          "site" : {
+            "$ref" : "#/components/schemas/Site"
+          },
+          "additionalAddress" : {
+            "$ref" : "#/components/schemas/PostalAddress"
+          },
+          "type" : {
+            "type" : "string",
+            "description" : "The recognized golden record type this business partner data contains.\n* `Legal Entity`: The business partner data only contains legal entity and legal address information.\n* `Site`: The business partner data contains site, site main address and its parent legal entity information.\n* `Additional Address`: The business partner data contains an additional address, (optional) parent site and parent legal entity information.\n* `Null`: No clear type determined, undecided. The golden record process will not create golden record from this business partner data.",
+            "enum" : [ "LegalEntity", "Site", "Address" ]
           }
         },
-        "description": "Collection of results in the page"
+        "required" : [ "legalEntity", "nameParts", "uncategorized" ]
       },
-      "FinishedTaskEventsResponse": {
-        "required": [
-          "content",
-          "contentSize",
-          "page",
-          "totalElements",
-          "totalPages"
-        ],
-        "type": "object",
-        "properties": {
-          "totalElements": {
-            "type": "integer",
-            "description": "Total number of all results in all pages",
-            "format": "int64"
+      "BusinessState" : {
+        "type" : "object",
+        "description" : "The business state information for the corresponding business partner",
+        "properties" : {
+          "validFrom" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "Date since when the status is/was valid."
           },
-          "totalPages": {
-            "type": "integer",
-            "description": "Total number pages",
-            "format": "int32"
+          "validTo" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "Date until the status was valid, if applicable."
           },
-          "page": {
-            "type": "integer",
-            "description": "Current page number",
-            "format": "int32"
-          },
-          "contentSize": {
-            "type": "integer",
-            "description": "Number of results in the page",
-            "format": "int32"
-          },
-          "content": {
-            "type": "array",
-            "description": "Collection of results in the page",
-            "items": {
-              "$ref": "#/components/schemas/Event"
-            }
+          "type" : {
+            "type" : "string",
+            "description" : "The type of this specified status.",
+            "enum" : [ "ACTIVE", "INACTIVE" ]
           }
         }
       },
-      "GeoCoordinate": {
-        "type": "object",
-        "properties": {
-          "longitude": {
-            "type": "number",
-            "format": "double"
+      "ConfidenceCriteria" : {
+        "type" : "object",
+        "description" : "Contains information to evaluate how good or verified the information in the attached business partner data is. This information will be directly written in the matched golden record's confidence criteria.",
+        "properties" : {
+          "sharedByOwner" : {
+            "type" : "boolean",
+            "description" : "Whether the business partner data is shared by the actual owner"
           },
-          "latitude": {
-            "type": "number",
-            "format": "double"
+          "checkedByExternalDataSource" : {
+            "type" : "boolean",
+            "description" : "The corresponding business partner data has been verified by an external data source, like an official register"
           },
-          "altitude": {
-            "type": "number",
-            "format": "double"
-          }
-        },
-        "description": "The exact location of the physical postal address in latitude, longitude, and altitude."
-      },
-      "Identifier": {
-        "type": "object",
-        "properties": {
-          "value": {
-            "type": "string",
-            "description": "Value of the identifier"
+          "numberOfSharingMembers" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "How many sharing members have already shared the matched golden record"
           },
-          "type": {
-            "type": "string",
-            "description": "The type of identifier"
+          "lastConfidenceCheckAt" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "Last time the confidence values have been checked (and updated if needed)"
           },
-          "issuingBody": {
-            "type": "string",
-            "description": "The organisation that issued this identifier"
-          }
-        },
-        "description": "The additional identifiers of this business partner (excluding the BPN)"
-      },
-      "LegalEntity": {
-        "required": [
-          "bpnReference",
-          "confidenceCriteria",
-          "identifiers",
-          "legalAddress",
-          "states"
-        ],
-        "type": "object",
-        "properties": {
-          "bpnReference": {
-            "$ref": "#/components/schemas/BpnReference"
+          "nextConfidenceCheckAt" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "Next time the confidence values should be checked"
           },
-          "legalName": {
-            "type": "string",
-            "description": "The legal name of this legal entity according to official registers"
-          },
-          "legalShortName": {
-            "type": "string",
-            "description": "The abbreviated name of this legal entity, if it exists"
-          },
-          "legalForm": {
-            "type": "string",
-            "description": "The legal form of this legal entity"
-          },
-          "identifiers": {
-            "type": "array",
-            "description": "Identifiers for this legal entity (in addition to the BPNL)",
-            "items": {
-              "$ref": "#/components/schemas/Identifier"
-            }
-          },
-          "states": {
-            "type": "array",
-            "description": "The business state history of this legal entity",
-            "items": {
-              "$ref": "#/components/schemas/BusinessState"
-            }
-          },
-          "confidenceCriteria": {
-            "$ref": "#/components/schemas/ConfidenceCriteria"
-          },
-          "isCatenaXMemberData": {
-            "type": "boolean",
-            "description": "Whether this legal entity is part of the Catena-X network"
-          },
-          "hasChanged": {
-            "type": "boolean",
-            "description": "Whether this legal entity information differs from its golden record counterpart in the Pool. +The Pool will not update the legal entity if it is set to false. However, if this legal entity constitutes a new legal entity golden record, it is still created independent of this flag."
-          },
-          "legalAddress": {
-            "$ref": "#/components/schemas/PostalAddress"
-          }
-        },
-        "description": "Legal entity information for this business partner data. Every business partner either is a legal entity or belongs to a legal entity.There, a legal entity property is not allowed to be 'null'. "
-      },
-      "NamePart": {
-        "required": [
-          "name",
-          "type"
-        ],
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "The name part value"
-          },
-          "type": {
-            "type": "string",
-            "description": "NamePartType:\n* `LegalName` - Value is part of the legal entities' legal name\n* `ShortName` - Value is part of the legal entities' short name\n* `LegalForm` - Value is part of the legal entities' legal form name\n* `SiteName` - Value is part of the site's name\n* `AddressName` - Value is part of the address name\n",
-            "enum": [
-              "LegalName",
-              "ShortName",
-              "LegalForm",
-              "SiteName",
-              "AddressName"
-            ]
-          }
-        },
-        "description": "A categorized name part for this business partner data"
-      },
-      "PhysicalAddress": {
-        "required": [
-          "geographicCoordinates",
-          "street"
-        ],
-        "type": "object",
-        "properties": {
-          "geographicCoordinates": {
-            "$ref": "#/components/schemas/GeoCoordinate"
-          },
-          "country": {
-            "type": "string",
-            "description": "The 2-digit country code of the physical postal address according to ISO 3166-1."
-          },
-          "administrativeAreaLevel1": {
-            "type": "string",
-            "description": "The 2-digit country subdivision code according to ISO 3166-2, such as a region within a country."
-          },
-          "administrativeAreaLevel2": {
-            "type": "string",
-            "description": "The name of the locally regulated secondary country subdivision of the physical postal address, such as county within a country."
-          },
-          "administrativeAreaLevel3": {
-            "type": "string",
-            "description": "The name of the locally regulated tertiary country subdivision of the physical address, such as townships within a country."
-          },
-          "postalCode": {
-            "type": "string",
-            "description": "The alphanumeric identifier (sometimes including spaces or punctuation) of the physical postal address for the purpose of sorting mail, synonyms:postcode, post code, PIN or ZIP code."
-          },
-          "city": {
-            "type": "string",
-            "description": "The name of the city of the physical postal address, synonyms: town, village, municipality."
-          },
-          "district": {
-            "type": "string",
-            "description": "The name of the district of the physical postal address which divides the city in several smaller areas."
-          },
-          "street": {
-            "$ref": "#/components/schemas/Street"
-          },
-          "companyPostalCode": {
-            "type": "string",
-            "description": "The company postal code of the physical postal address, which is sometimes required for large companies."
-          },
-          "industrialZone": {
-            "type": "string",
-            "description": "The industrial zone of the physical postal address, designating an area for industrial development, synonym: industrial area."
-          },
-          "building": {
-            "type": "string",
-            "description": "The alphanumeric identifier of the building addressed by the physical postal address."
-          },
-          "floor": {
-            "type": "string",
-            "description": "The number of a floor in the building addressed by the physical postal address, synonym: level."
-          },
-          "door": {
-            "type": "string",
-            "description": "The number of a door in the building on the respective floor addressed by the physical postal address, synonyms: room, suite."
-          },
-          "taxJurisdictionCode": {
-            "type": "string",
-            "description": "Tax jurisdiction codes are used to identify the specific jurisdiction(s) that a company belong to, particularly in bureaucratic processes such as tax returns and IRS forms."
-          }
-        },
-        "description": "A physical postal address describes the physical location of an office, warehouse, gate, etc."
-      },
-      "PostalAddress": {
-        "required": [
-          "bpnReference",
-          "confidenceCriteria",
-          "identifiers",
-          "physicalAddress",
-          "states"
-        ],
-        "type": "object",
-        "properties": {
-          "bpnReference": {
-            "$ref": "#/components/schemas/BpnReference"
-          },
-          "addressName": {
-            "type": "string",
-            "description": "The name of this address"
-          },
-          "identifiers": {
-            "type": "array",
-            "description": "Identifiers for this address (in addition to the BPNA)",
-            "items": {
-              "$ref": "#/components/schemas/Identifier"
-            }
-          },
-          "states": {
-            "type": "array",
-            "description": "The business state history of this address",
-            "items": {
-              "$ref": "#/components/schemas/BusinessState"
-            }
-          },
-          "confidenceCriteria": {
-            "$ref": "#/components/schemas/ConfidenceCriteria"
-          },
-          "physicalAddress": {
-            "$ref": "#/components/schemas/PhysicalAddress"
-          },
-          "alternativeAddress": {
-            "$ref": "#/components/schemas/AlternativeAddress"
-          },
-          "hasChanged": {
-            "type": "boolean",
-            "description": "Whether this address information differs from its golden record counterpart in the Pool.Currently deprecated and ignored by the golden record creation and update process.",
-            "deprecated": true
-          }
-        },
-        "description": "Address information of this business partner data. The address can be either a legal, site main and/or additional address. This can also refer to address information which is unknown to which type it belongs to."
-      },
-      "Site": {
-        "required": [
-          "bpnReference",
-          "confidenceCriteria",
-          "siteMainIsLegalAddress",
-          "states"
-        ],
-        "type": "object",
-        "properties": {
-          "bpnReference": {
-            "$ref": "#/components/schemas/BpnReference"
-          },
-          "siteName": {
-            "type": "string",
-            "description": "The name of this site"
-          },
-          "states": {
-            "type": "array",
-            "description": "The business state history of this site",
-            "items": {
-              "$ref": "#/components/schemas/BusinessState"
-            }
-          },
-          "confidenceCriteria": {
-            "$ref": "#/components/schemas/ConfidenceCriteria"
-          },
-          "hasChanged": {
-            "type": "boolean",
-            "description": "Whether this site information differs from its golden record counterpart in the Pool. +The Pool will not update the site if it is set to false. However, if this site constitutes a new site golden record, it is still created independent of this flag."
-          },
-          "siteMainAddress": {
-            "$ref": "#/components/schemas/PostalAddress"
-          },
-          "siteMainIsLegalAddress": {
-            "type": "boolean",
-            "description": "This site's main address is the legal address of the legal entity. The address information therefore is stored in the legal address."
-          }
-        },
-        "description": "Site information for this business partner data. A site of 'null' means the business partner data has no site."
-      },
-      "Street": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "The name of the street."
-          },
-          "houseNumber": {
-            "type": "string",
-            "description": "The number representing the exact location of a building within the street."
-          },
-          "houseNumberSupplement": {
-            "type": "string",
-            "description": "The supplement to the house number"
-          },
-          "milestone": {
-            "type": "string",
-            "description": "The number representing the exact location of an addressed object within a street without house numbers, such as within long roads."
-          },
-          "direction": {
-            "type": "string",
-            "description": "The cardinal direction describing where the exit to the location of the addressed object on large highways / motorways is located, such as Highway 101 South."
-          },
-          "namePrefix": {
-            "type": "string",
-            "description": "The street related information, which is usually printed before the official street name on an address label."
-          },
-          "additionalNamePrefix": {
-            "type": "string",
-            "description": "The additional street related information, which is usually printed before the official street name on an address label."
-          },
-          "nameSuffix": {
-            "type": "string",
-            "description": "The street related information, which is usually printed after the official street name on an address label."
-          },
-          "additionalNameSuffix": {
-            "type": "string",
-            "description": "The additional street related information, which is usually printed after the official street name on an address label."
-          }
-        },
-        "description": "The street of the physical postal address, synonyms: road, avenue, lane, boulevard, highway"
-      },
-      "TaskClientStateDto": {
-        "required": [
-          "businessPartnerResult",
-          "processingState",
-          "recordId",
-          "taskId"
-        ],
-        "type": "object",
-        "properties": {
-          "taskId": {
-            "type": "string"
-          },
-          "recordId": {
-            "type": "string",
-            "description": "The identifier of the gate record for which this task has been created"
-          },
-          "businessPartnerResult": {
-            "$ref": "#/components/schemas/BusinessPartner"
-          },
-          "processingState": {
-            "$ref": "#/components/schemas/TaskProcessingStateDto"
-          }
-        },
-        "description": "The golden record task's processing state together with optional business partner data in case processing is done"
-      },
-      "TaskCreateRequest": {
-        "required": [
-          "mode",
-          "requests"
-        ],
-        "type": "object",
-        "properties": {
-          "mode": {
-            "type": "string",
-            "description": "The mode affecting which processing steps the business partner goes through",
-            "enum": [
-              "UpdateFromSharingMember",
-              "UpdateFromPool"
-            ]
-          },
-          "requests": {
-            "type": "array",
-            "description": "The list of tasks to create",
-            "items": {
-              "$ref": "#/components/schemas/TaskCreateRequestEntry"
-            }
-          }
-        },
-        "description": "Request object to specify for which business partner data tasks should be created and in which mode"
-      },
-      "TaskCreateRequestEntry": {
-        "required": [
-          "businessPartner"
-        ],
-        "type": "object",
-        "properties": {
-          "recordId": {
-            "type": "string",
-            "description": "The unique identifier for this record which was previously issued by the Orchestrator"
-          },
-          "businessPartner": {
-            "$ref": "#/components/schemas/BusinessPartner"
+          "confidenceLevel" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "The overall confidence level of the matched golden record"
           }
         }
       },
-      "TaskCreateResponse": {
-        "required": [
-          "createdTasks"
-        ],
-        "type": "object",
-        "properties": {
-          "createdTasks": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/TaskClientStateDto"
+      "Entry" : {
+        "type" : "object",
+        "properties" : {
+          "taskId" : {
+            "type" : "string"
+          },
+          "recordId" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "recordId", "taskId" ]
+      },
+      "Event" : {
+        "type" : "object",
+        "properties" : {
+          "timestamp" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "resultState" : {
+            "type" : "string",
+            "enum" : [ "Pending", "Success", "Error" ]
+          },
+          "taskId" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "resultState", "taskId", "timestamp" ]
+      },
+      "FinishedTaskEventsResponse" : {
+        "type" : "object",
+        "properties" : {
+          "totalElements" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "Total number of all results in all pages"
+          },
+          "totalPages" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Total number pages"
+          },
+          "page" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Current page number"
+          },
+          "contentSize" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Number of results in the page"
+          },
+          "content" : {
+            "type" : "array",
+            "description" : "Collection of results in the page",
+            "items" : {
+              "$ref" : "#/components/schemas/Event"
             }
           }
         },
-        "description": "Response object for giving a list of created tasks"
+        "required" : [ "content", "contentSize", "page", "totalElements", "totalPages" ]
       },
-      "TaskErrorDto": {
-        "required": [
-          "description",
-          "type"
-        ],
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string",
-            "description": "The type of error that occurred",
-            "enum": [
-              "Timeout",
-              "Unspecified"
-            ]
+      "GeoCoordinate" : {
+        "type" : "object",
+        "description" : "The exact location of the physical postal address in latitude, longitude, and altitude.",
+        "properties" : {
+          "longitude" : {
+            "type" : "number",
+            "format" : "double"
           },
-          "description": {
-            "type": "string",
-            "description": "The free text, detailed description of the error"
-          }
-        },
-        "description": "Describes an error that happened during processing of a task"
-      },
-      "TaskProcessingStateDto": {
-        "required": [
-          "createdAt",
-          "errors",
-          "modifiedAt",
-          "resultState",
-          "step",
-          "stepState",
-          "timeout"
-        ],
-        "type": "object",
-        "properties": {
-          "resultState": {
-            "type": "string",
-            "description": "The processing result of the task, can also still be pending",
-            "enum": [
-              "Pending",
-              "Success",
-              "Error"
-            ]
+          "latitude" : {
+            "type" : "number",
+            "format" : "double"
           },
-          "step": {
-            "type": "string",
-            "description": "The last step this task has entered",
-            "enum": [
-              "CleanAndSync",
-              "PoolSync",
-              "Clean"
-            ]
-          },
-          "stepState": {
-            "type": "string",
-            "description": "Whether the task is queued or already reserved for the latest step",
-            "enum": [
-              "Queued",
-              "Reserved",
-              "Success",
-              "Error"
-            ]
-          },
-          "errors": {
-            "type": "array",
-            "description": "The actual errors that happened during processing if the task has an error result state. The errors refer to the latest step.",
-            "items": {
-              "$ref": "#/components/schemas/TaskErrorDto"
-            }
-          },
-          "createdAt": {
-            "type": "string",
-            "description": "When the task has been created",
-            "format": "date-time"
-          },
-          "modifiedAt": {
-            "type": "string",
-            "description": "When the task has last been modified",
-            "format": "date-time"
-          },
-          "timeout": {
-            "type": "string",
-            "description": "The timestamp until the task is removed from the Orchestrator",
-            "format": "date-time",
-            "deprecated": true
-          }
-        },
-        "description": "Contains detailed information about the current processing state of a golden record task"
-      },
-      "TaskResultStateSearchRequest": {
-        "required": [
-          "taskIds"
-        ],
-        "type": "object",
-        "properties": {
-          "taskIds": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+          "altitude" : {
+            "type" : "number",
+            "format" : "double"
           }
         }
       },
-      "TaskResultStateSearchResponse": {
-        "required": [
-          "resultStates"
-        ],
-        "type": "object",
-        "properties": {
-          "resultStates": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "enum": [
-                "Pending",
-                "Success",
-                "Error"
-              ]
-            }
+      "Identifier" : {
+        "type" : "object",
+        "description" : "The additional identifiers of this business partner (excluding the BPN)",
+        "properties" : {
+          "value" : {
+            "type" : "string",
+            "description" : "Value of the identifier"
+          },
+          "type" : {
+            "type" : "string",
+            "description" : "The type of identifier"
+          },
+          "issuingBody" : {
+            "type" : "string",
+            "description" : "The organisation that issued this identifier"
           }
         }
       },
-      "TaskStateRequest": {
-        "required": [
-          "entries"
-        ],
-        "type": "object",
-        "properties": {
-          "entries": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Entry"
+      "LegalEntity" : {
+        "type" : "object",
+        "description" : "Legal entity information for this business partner data. Every business partner either is a legal entity or belongs to a legal entity.There, a legal entity property is not allowed to be 'null'. ",
+        "properties" : {
+          "bpnReference" : {
+            "$ref" : "#/components/schemas/BpnReference"
+          },
+          "legalName" : {
+            "type" : "string",
+            "description" : "The legal name of this legal entity according to official registers"
+          },
+          "legalShortName" : {
+            "type" : "string",
+            "description" : "The abbreviated name of this legal entity, if it exists"
+          },
+          "legalForm" : {
+            "type" : "string",
+            "description" : "The legal form of this legal entity"
+          },
+          "identifiers" : {
+            "type" : "array",
+            "description" : "Identifiers for this legal entity (in addition to the BPNL)",
+            "items" : {
+              "$ref" : "#/components/schemas/Identifier"
             }
+          },
+          "states" : {
+            "type" : "array",
+            "description" : "The business state history of this legal entity",
+            "items" : {
+              "$ref" : "#/components/schemas/BusinessState"
+            }
+          },
+          "confidenceCriteria" : {
+            "$ref" : "#/components/schemas/ConfidenceCriteria"
+          },
+          "isCatenaXMemberData" : {
+            "type" : "boolean",
+            "description" : "Whether this legal entity is part of the Catena-X network"
+          },
+          "hasChanged" : {
+            "type" : "boolean",
+            "description" : "Whether this legal entity information differs from its golden record counterpart in the Pool. +The Pool will not update the legal entity if it is set to false. However, if this legal entity constitutes a new legal entity golden record, it is still created independent of this flag."
+          },
+          "legalAddress" : {
+            "$ref" : "#/components/schemas/PostalAddress"
           }
         },
-        "description": "Request object for giving a list of task identifiers to search for the state of tasks"
+        "required" : [ "bpnReference", "confidenceCriteria", "identifiers", "legalAddress", "states" ]
       },
-      "TaskStateResponse": {
-        "required": [
-          "tasks"
-        ],
-        "type": "object",
-        "properties": {
-          "tasks": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/TaskClientStateDto"
-            }
+      "NamePart" : {
+        "type" : "object",
+        "description" : "A categorized name part for this business partner data",
+        "properties" : {
+          "name" : {
+            "type" : "string",
+            "description" : "The name part value"
+          },
+          "type" : {
+            "type" : "string",
+            "description" : "NamePartType:\n* `LegalName` - Value is part of the legal entities' legal name\n* `ShortName` - Value is part of the legal entities' short name\n* `LegalForm` - Value is part of the legal entities' legal form name\n* `SiteName` - Value is part of the site's name\n* `AddressName` - Value is part of the address name\n",
+            "enum" : [ "LegalName", "ShortName", "LegalForm", "SiteName", "AddressName" ]
           }
         },
-        "description": "Response object for giving a list of task states"
+        "required" : [ "name", "type" ]
       },
-      "TaskStepReservationEntryDto": {
-        "required": [
-          "businessPartner",
-          "recordId",
-          "requestKey",
-          "taskId"
-        ],
-        "type": "object",
-        "properties": {
-          "taskId": {
-            "type": "string",
-            "description": "The identifier of the reserved task"
+      "PhysicalAddress" : {
+        "type" : "object",
+        "description" : "A physical postal address describes the physical location of an office, warehouse, gate, etc.",
+        "properties" : {
+          "geographicCoordinates" : {
+            "$ref" : "#/components/schemas/GeoCoordinate"
           },
-          "recordId": {
-            "type": "string",
-            "description": "The identifier of the gate record for which this task has been created"
+          "country" : {
+            "type" : "string",
+            "description" : "The 2-digit country code of the physical postal address according to ISO 3166-1."
           },
-          "businessPartner": {
-            "$ref": "#/components/schemas/BusinessPartner"
+          "administrativeAreaLevel1" : {
+            "type" : "string",
+            "description" : "The 2-digit country subdivision code according to ISO 3166-2, such as a region within a country."
           },
-          "requestKey": {
-            "type": "string"
+          "administrativeAreaLevel2" : {
+            "type" : "string",
+            "description" : "The name of the locally regulated secondary country subdivision of the physical postal address, such as county within a country."
+          },
+          "administrativeAreaLevel3" : {
+            "type" : "string",
+            "description" : "The name of the locally regulated tertiary country subdivision of the physical address, such as townships within a country."
+          },
+          "postalCode" : {
+            "type" : "string",
+            "description" : "The alphanumeric identifier (sometimes including spaces or punctuation) of the physical postal address for the purpose of sorting mail, synonyms:postcode, post code, PIN or ZIP code."
+          },
+          "city" : {
+            "type" : "string",
+            "description" : "The name of the city of the physical postal address, synonyms: town, village, municipality."
+          },
+          "district" : {
+            "type" : "string",
+            "description" : "The name of the district of the physical postal address which divides the city in several smaller areas."
+          },
+          "street" : {
+            "$ref" : "#/components/schemas/Street"
+          },
+          "companyPostalCode" : {
+            "type" : "string",
+            "description" : "The company postal code of the physical postal address, which is sometimes required for large companies."
+          },
+          "industrialZone" : {
+            "type" : "string",
+            "description" : "The industrial zone of the physical postal address, designating an area for industrial development, synonym: industrial area."
+          },
+          "building" : {
+            "type" : "string",
+            "description" : "The alphanumeric identifier of the building addressed by the physical postal address."
+          },
+          "floor" : {
+            "type" : "string",
+            "description" : "The number of a floor in the building addressed by the physical postal address, synonym: level."
+          },
+          "door" : {
+            "type" : "string",
+            "description" : "The number of a door in the building on the respective floor addressed by the physical postal address, synonyms: room, suite."
+          },
+          "taxJurisdictionCode" : {
+            "type" : "string",
+            "description" : "Tax jurisdiction codes are used to identify the specific jurisdiction(s) that a company belong to, particularly in bureaucratic processes such as tax returns and IRS forms."
           }
         },
-        "description": "Task reservation entry"
+        "required" : [ "geographicCoordinates", "street" ]
       },
-      "TaskStepReservationRequest": {
-        "required": [
-          "amount",
-          "step"
-        ],
-        "type": "object",
-        "properties": {
-          "amount": {
-            "type": "integer",
-            "description": "The maximum number of tasks to reserve. Can be fewer if queue is not full enough.",
-            "format": "int32"
+      "PostalAddress" : {
+        "type" : "object",
+        "description" : "Address information of this business partner data. The address can be either a legal, site main and/or additional address. This can also refer to address information which is unknown to which type it belongs to.",
+        "properties" : {
+          "bpnReference" : {
+            "$ref" : "#/components/schemas/BpnReference"
           },
-          "step": {
-            "type": "string",
-            "description": "The step queue to reserve from",
-            "enum": [
-              "CleanAndSync",
-              "PoolSync",
-              "Clean"
-            ]
+          "addressName" : {
+            "type" : "string",
+            "description" : "The name of this address"
+          },
+          "identifiers" : {
+            "type" : "array",
+            "description" : "Identifiers for this address (in addition to the BPNA)",
+            "items" : {
+              "$ref" : "#/components/schemas/Identifier"
+            }
+          },
+          "states" : {
+            "type" : "array",
+            "description" : "The business state history of this address",
+            "items" : {
+              "$ref" : "#/components/schemas/BusinessState"
+            }
+          },
+          "confidenceCriteria" : {
+            "$ref" : "#/components/schemas/ConfidenceCriteria"
+          },
+          "physicalAddress" : {
+            "$ref" : "#/components/schemas/PhysicalAddress"
+          },
+          "alternativeAddress" : {
+            "$ref" : "#/components/schemas/AlternativeAddress"
+          },
+          "hasChanged" : {
+            "type" : "boolean",
+            "deprecated" : true,
+            "description" : "Whether this address information differs from its golden record counterpart in the Pool.Currently deprecated and ignored by the golden record creation and update process."
           }
         },
-        "description": "Request object for reserving a number of tasks waiting in a step queue."
+        "required" : [ "bpnReference", "confidenceCriteria", "identifiers", "physicalAddress", "states" ]
       },
-      "TaskStepReservationResponse": {
-        "required": [
-          "reservedTasks",
-          "timeout"
-        ],
-        "type": "object",
-        "properties": {
-          "reservedTasks": {
-            "type": "array",
-            "description": "The reserved tasks with their business partner data to process",
-            "items": {
-              "$ref": "#/components/schemas/TaskStepReservationEntryDto"
+      "Site" : {
+        "type" : "object",
+        "description" : "Site information for this business partner data. A site of 'null' means the business partner data has no site.",
+        "properties" : {
+          "bpnReference" : {
+            "$ref" : "#/components/schemas/BpnReference"
+          },
+          "siteName" : {
+            "type" : "string",
+            "description" : "The name of this site"
+          },
+          "states" : {
+            "type" : "array",
+            "description" : "The business state history of this site",
+            "items" : {
+              "$ref" : "#/components/schemas/BusinessState"
             }
           },
-          "timeout": {
-            "type": "string",
-            "description": "The timestamp until the reservation is valid and results are accepted",
-            "format": "date-time",
-            "deprecated": true
+          "confidenceCriteria" : {
+            "$ref" : "#/components/schemas/ConfidenceCriteria"
+          },
+          "hasChanged" : {
+            "type" : "boolean",
+            "description" : "Whether this site information differs from its golden record counterpart in the Pool. +The Pool will not update the site if it is set to false. However, if this site constitutes a new site golden record, it is still created independent of this flag."
+          },
+          "siteMainAddress" : {
+            "$ref" : "#/components/schemas/PostalAddress"
+          },
+          "siteMainIsLegalAddress" : {
+            "type" : "boolean",
+            "description" : "This site's main address is the legal address of the legal entity. The address information therefore is stored in the legal address."
           }
         },
-        "description": "Response object for giving a list of reserved tasks"
+        "required" : [ "bpnReference", "confidenceCriteria", "siteMainIsLegalAddress", "states" ]
       },
-      "TaskStepResultEntryDto": {
-        "required": [
-          "businessPartner",
-          "errors",
-          "taskId"
-        ],
-        "type": "object",
-        "properties": {
-          "taskId": {
-            "type": "string",
-            "description": "The identifier of the task for which this is a result"
+      "Street" : {
+        "type" : "object",
+        "description" : "The street of the physical postal address, synonyms: road, avenue, lane, boulevard, highway",
+        "properties" : {
+          "name" : {
+            "type" : "string",
+            "description" : "The name of the street."
           },
-          "businessPartner": {
-            "$ref": "#/components/schemas/BusinessPartner"
+          "houseNumber" : {
+            "type" : "string",
+            "description" : "The number representing the exact location of a building within the street."
           },
-          "errors": {
-            "type": "array",
-            "description": "Errors that occurred during processing of this task",
-            "items": {
-              "$ref": "#/components/schemas/TaskErrorDto"
-            }
+          "houseNumberSupplement" : {
+            "type" : "string",
+            "description" : "The supplement to the house number"
+          },
+          "milestone" : {
+            "type" : "string",
+            "description" : "The number representing the exact location of an addressed object within a street without house numbers, such as within long roads."
+          },
+          "direction" : {
+            "type" : "string",
+            "description" : "The cardinal direction describing where the exit to the location of the addressed object on large highways / motorways is located, such as Highway 101 South."
+          },
+          "namePrefix" : {
+            "type" : "string",
+            "description" : "The street related information, which is usually printed before the official street name on an address label."
+          },
+          "additionalNamePrefix" : {
+            "type" : "string",
+            "description" : "The additional street related information, which is usually printed before the official street name on an address label."
+          },
+          "nameSuffix" : {
+            "type" : "string",
+            "description" : "The street related information, which is usually printed after the official street name on an address label."
+          },
+          "additionalNameSuffix" : {
+            "type" : "string",
+            "description" : "The additional street related information, which is usually printed after the official street name on an address label."
           }
-        },
-        "description": "A step result for a golden record task"
+        }
       },
-      "TaskStepResultRequest": {
-        "required": [
-          "results",
-          "step"
-        ],
-        "type": "object",
-        "properties": {
-          "step": {
-            "type": "string",
-            "description": "The step queue containing the tasks for which results are posted",
-            "enum": [
-              "CleanAndSync",
-              "PoolSync",
-              "Clean"
-            ]
+      "TaskClientStateDto" : {
+        "type" : "object",
+        "description" : "The golden record task's processing state together with optional business partner data in case processing is done",
+        "properties" : {
+          "taskId" : {
+            "type" : "string"
           },
-          "results": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/TaskStepResultEntryDto"
-            }
+          "recordId" : {
+            "type" : "string",
+            "description" : "The identifier of the gate record for which this task has been created"
+          },
+          "businessPartnerResult" : {
+            "$ref" : "#/components/schemas/BusinessPartner"
+          },
+          "processingState" : {
+            "$ref" : "#/components/schemas/TaskProcessingStateDto"
           }
         },
-        "description": "Request object for posting step results of previously reserved tasks"
+        "required" : [ "businessPartnerResult", "processingState", "recordId", "taskId" ]
       },
-      "UncategorizedProperties": {
-        "required": [
-          "identifiers",
-          "nameParts",
-          "states"
-        ],
-        "type": "object",
-        "properties": {
-          "nameParts": {
-            "type": "array",
-            "description": "The plain uncategorized name of the business partner how it appears in the sharing member system",
-            "items": {
-              "type": "string",
-              "description": "The plain uncategorized name of the business partner how it appears in the sharing member system"
-            }
+      "TaskCreateRequest" : {
+        "type" : "object",
+        "description" : "Request object to specify for which business partner data tasks should be created and in which mode",
+        "properties" : {
+          "mode" : {
+            "type" : "string",
+            "description" : "The mode affecting which processing steps the business partner goes through",
+            "enum" : [ "UpdateFromSharingMember", "UpdateFromPool" ]
           },
-          "identifiers": {
-            "type": "array",
-            "description": "Identifiers for which it is unknown whether they belong to the legal entity, site or any address",
-            "items": {
-              "$ref": "#/components/schemas/Identifier"
+          "requests" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TaskCreateRequestEntry"
             }
-          },
-          "states": {
-            "type": "array",
-            "description": "Business states for which it is unknown whether they belong to the legal entity, site or any address",
-            "items": {
-              "$ref": "#/components/schemas/BusinessState"
-            }
-          },
-          "address": {
-            "$ref": "#/components/schemas/PostalAddress"
           }
         },
-        "description": "Business partner data that has not yet or can not be categorized"
+        "required" : [ "mode", "requests" ]
+      },
+      "TaskCreateRequestEntry" : {
+        "type" : "object",
+        "properties" : {
+          "recordId" : {
+            "type" : "string",
+            "description" : "The unique identifier for this record which was previously issued by the Orchestrator"
+          },
+          "businessPartner" : {
+            "$ref" : "#/components/schemas/BusinessPartner",
+            "description" : "The business partner data to be processed"
+          }
+        },
+        "required" : [ "businessPartner" ]
+      },
+      "TaskCreateResponse" : {
+        "type" : "object",
+        "description" : "Response object for giving a list of created tasks",
+        "properties" : {
+          "createdTasks" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TaskClientStateDto"
+            }
+          }
+        },
+        "required" : [ "createdTasks" ]
+      },
+      "TaskErrorDto" : {
+        "type" : "object",
+        "description" : "Describes an error that happened during processing of a task \n",
+        "properties" : {
+          "type" : {
+            "type" : "string",
+            "description" : "The type of error that occurred. \n* `NaturalPersonError`: The provided record contains natural person information.\n* `BpnErrorNotFound`: The provided record can not be matched to a legal entity or an address.\n* `BpnErrorTooManyOptions`: The provided record can not link to a clear legal entity.\n* `MandatoryFieldValidationFailed`: The provided record does not fulfill mandatory validation rules.\n* `BlacklistCountryPresent`: The provided record is part of a country that is not allowed to be processed by the GR process (example: Brazil).\n* `UnknownSpecialCharacters`: The provided record contains unallowed special characters.\n",
+            "enum" : [ "Timeout", "Unspecified", "NaturalPersonError", "BpnErrorNotFound", "BpnErrorTooManyOptions", "MandatoryFieldValidationFailed", "BlacklistCountryPresent", "UnknownSpecialCharacters" ]
+          },
+          "description" : {
+            "type" : "string",
+            "description" : "The free text, detailed description of the error"
+          }
+        },
+        "required" : [ "description", "type" ]
+      },
+      "TaskProcessingStateDto" : {
+        "type" : "object",
+        "description" : "Contains detailed information about the current processing state of a golden record task",
+        "properties" : {
+          "resultState" : {
+            "type" : "string",
+            "description" : "The processing result of the task, can also still be pending",
+            "enum" : [ "Pending", "Success", "Error" ]
+          },
+          "step" : {
+            "type" : "string",
+            "description" : "The last step this task has entered",
+            "enum" : [ "CleanAndSync", "PoolSync", "Clean" ]
+          },
+          "stepState" : {
+            "type" : "string",
+            "description" : "Whether the task is queued or already reserved for the latest step",
+            "enum" : [ "Queued", "Reserved", "Success", "Error" ]
+          },
+          "errors" : {
+            "type" : "array",
+            "description" : "The actual errors that happened during processing if the task has an error result state. The errors refer to the latest step.",
+            "items" : {
+              "$ref" : "#/components/schemas/TaskErrorDto"
+            }
+          },
+          "createdAt" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "When the task has been created"
+          },
+          "modifiedAt" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "When the task has last been modified"
+          },
+          "timeout" : {
+            "type" : "string",
+            "format" : "date-time",
+            "deprecated" : true,
+            "description" : "The timestamp until the task is removed from the Orchestrator"
+          }
+        },
+        "required" : [ "createdAt", "errors", "modifiedAt", "resultState", "step", "stepState", "timeout" ]
+      },
+      "TaskResultStateSearchRequest" : {
+        "type" : "object",
+        "properties" : {
+          "taskIds" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        },
+        "required" : [ "taskIds" ]
+      },
+      "TaskResultStateSearchResponse" : {
+        "type" : "object",
+        "properties" : {
+          "resultStates" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "enum" : [ "Pending", "Success", "Error" ]
+            }
+          }
+        },
+        "required" : [ "resultStates" ]
+      },
+      "TaskStateRequest" : {
+        "type" : "object",
+        "description" : "Request object for giving a list of task identifiers to search for the state of tasks",
+        "properties" : {
+          "entries" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/Entry"
+            }
+          }
+        },
+        "required" : [ "entries" ]
+      },
+      "TaskStateResponse" : {
+        "type" : "object",
+        "description" : "Response object for giving a list of task states",
+        "properties" : {
+          "tasks" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TaskClientStateDto"
+            }
+          }
+        },
+        "required" : [ "tasks" ]
+      },
+      "TaskStepReservationEntryDto" : {
+        "type" : "object",
+        "description" : "Task reservation entry",
+        "properties" : {
+          "taskId" : {
+            "type" : "string",
+            "description" : "The identifier of the reserved task"
+          },
+          "recordId" : {
+            "type" : "string",
+            "description" : "The identifier of the gate record for which this task has been created"
+          },
+          "businessPartner" : {
+            "$ref" : "#/components/schemas/BusinessPartner",
+            "description" : "The business partner data to process"
+          },
+          "requestKey" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "businessPartner", "recordId", "requestKey", "taskId" ]
+      },
+      "TaskStepReservationRequest" : {
+        "type" : "object",
+        "description" : "Request object for reserving a number of tasks waiting in a step queue.",
+        "properties" : {
+          "amount" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "The maximum number of tasks to reserve. Can be fewer if queue is not full enough."
+          },
+          "step" : {
+            "type" : "string",
+            "description" : "The step queue to reserve from",
+            "enum" : [ "CleanAndSync", "PoolSync", "Clean" ]
+          }
+        },
+        "required" : [ "amount", "step" ]
+      },
+      "TaskStepReservationResponse" : {
+        "type" : "object",
+        "description" : "Response object for giving a list of reserved tasks",
+        "properties" : {
+          "reservedTasks" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TaskStepReservationEntryDto"
+            }
+          },
+          "timeout" : {
+            "type" : "string",
+            "format" : "date-time",
+            "deprecated" : true,
+            "description" : "The timestamp until the reservation is valid and results are accepted"
+          }
+        },
+        "required" : [ "reservedTasks", "timeout" ]
+      },
+      "TaskStepResultEntryDto" : {
+        "type" : "object",
+        "description" : "A step result for a golden record task",
+        "properties" : {
+          "taskId" : {
+            "type" : "string",
+            "description" : "The identifier of the task for which this is a result"
+          },
+          "businessPartner" : {
+            "$ref" : "#/components/schemas/BusinessPartner",
+            "description" : "The actual result in form of business partner data. Maybe null if an error occurred during processing of this task."
+          },
+          "errors" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TaskErrorDto"
+            }
+          }
+        },
+        "required" : [ "businessPartner", "errors", "taskId" ]
+      },
+      "TaskStepResultRequest" : {
+        "type" : "object",
+        "description" : "Request object for posting step results of previously reserved tasks",
+        "properties" : {
+          "step" : {
+            "type" : "string",
+            "description" : "The step queue containing the tasks for which results are posted",
+            "enum" : [ "CleanAndSync", "PoolSync", "Clean" ]
+          },
+          "results" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TaskStepResultEntryDto"
+            }
+          }
+        },
+        "required" : [ "results", "step" ]
+      },
+      "UncategorizedProperties" : {
+        "type" : "object",
+        "description" : "Business partner data that has not yet or can not be categorized",
+        "properties" : {
+          "nameParts" : {
+            "type" : "array",
+            "description" : "The plain uncategorized name of the business partner how it appears in the sharing member system",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "identifiers" : {
+            "type" : "array",
+            "description" : "Identifiers for which it is unknown whether they belong to the legal entity, site or any address",
+            "items" : {
+              "$ref" : "#/components/schemas/Identifier"
+            }
+          },
+          "states" : {
+            "type" : "array",
+            "description" : "Business states for which it is unknown whether they belong to the legal entity, site or any address",
+            "items" : {
+              "$ref" : "#/components/schemas/BusinessState"
+            }
+          },
+          "address" : {
+            "$ref" : "#/components/schemas/PostalAddress",
+            "description" : "Address information for which it is unknown whether they belong to the legal, site main or additional address"
+          }
+        },
+        "required" : [ "identifiers", "nameParts", "states" ]
       }
     },
-    "securitySchemes": {
-      "open_id_scheme": {
-        "type": "oauth2",
-        "flows": {
-          "clientCredentials": {
-            "tokenUrl": "http://localhost:8180/realms/CX-Central/protocol/openid-connect/token"
+    "securitySchemes" : {
+      "open_id_scheme" : {
+        "type" : "oauth2",
+        "flows" : {
+          "clientCredentials" : {
+            "tokenUrl" : "http://localhost:8180/realms/CX-Central/protocol/openid-connect/token",
+            "scopes" : { }
           },
-          "authorizationCode": {
-            "authorizationUrl": "http://localhost:8180/realms/CX-Central/protocol/openid-connect/auth",
-            "tokenUrl": "http://localhost:8180/realms/CX-Central/protocol/openid-connect/token",
-            "refreshUrl": "http://localhost:8180/realms/CX-Central/protocol/openid-connect/token",
-            "scopes": {}
+          "authorizationCode" : {
+            "authorizationUrl" : "http://localhost:8180/realms/CX-Central/protocol/openid-connect/auth",
+            "tokenUrl" : "http://localhost:8180/realms/CX-Central/protocol/openid-connect/token",
+            "refreshUrl" : "http://localhost:8180/realms/CX-Central/protocol/openid-connect/token",
+            "scopes" : { }
           }
         }
       },
-      "bearer_scheme": {
-        "type": "http",
-        "scheme": "bearer",
-        "bearerFormat": "JWT"
+      "bearer_scheme" : {
+        "type" : "http",
+        "scheme" : "bearer",
+        "bearerFormat" : "JWT"
       }
     }
   }
