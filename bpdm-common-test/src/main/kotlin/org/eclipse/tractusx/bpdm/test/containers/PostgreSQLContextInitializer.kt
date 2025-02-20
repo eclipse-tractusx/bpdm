@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.test.containers
 
+import mu.KotlinLogging
 import org.springframework.boot.test.util.TestPropertyValues
 import org.springframework.context.ApplicationContextInitializer
 import org.springframework.context.ConfigurableApplicationContext
@@ -35,11 +36,19 @@ class PostgreSQLContextInitializer : ApplicationContextInitializer<ConfigurableA
             .withNetwork(Network.SHARED)
     }
 
+    private val logger = KotlinLogging.logger { }
+
     override fun initialize(applicationContext: ConfigurableApplicationContext) {
         val postgresAlias = applicationContext.environment.getProperty("bpdm.datasource.alias")
         postgreSQLContainer.withNetworkAliases(postgresAlias)
 
         postgreSQLContainer.start()
+        // It may take up a few seconds for the exposed port of the container to become reachable on colima container runtime environment
+        // This waiting solves the issue mentioned here (https://github.com/abiosoft/colima/issues/71)
+        logger.info { "Waiting for exposed ports to be reachable..." }
+        Thread.sleep(3000)
+        logger.info { "Exposed ports should be reachable now." }
+
         TestPropertyValues.of(
             "spring.datasource.url=${postgreSQLContainer.jdbcUrl}",
             "spring.datasource.username=${postgreSQLContainer.username}",
