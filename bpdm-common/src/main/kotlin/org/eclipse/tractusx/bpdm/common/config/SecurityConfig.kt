@@ -92,6 +92,7 @@ class OAuthSecurityConfig(
             it.requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.OPTIONS, "/**")).permitAll()
             it.requestMatchers(AntPathRequestMatcher.antMatcher("/")).permitAll() // forwards to swagger
             it.requestMatchers(AntPathRequestMatcher.antMatcher("/docs/api-docs/**")).permitAll()
+            it.requestMatchers(AntPathRequestMatcher.antMatcher("/docs/api-docs.yaml/**")).permitAll()
             it.requestMatchers(AntPathRequestMatcher.antMatcher("/ui/swagger-ui/**")).permitAll()
             it.requestMatchers(AntPathRequestMatcher.antMatcher("/actuator/health/**")).permitAll()
             it.requestMatchers(AntPathRequestMatcher.antMatcher("/error")).permitAll()

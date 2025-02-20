@@ -31,6 +31,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM Pool: Fix not returning the most-up-to-date legal and site main address when it has been modified by an update to the site ([#1209](https://github.com/eclipse-tractusx/bpdm/issues/1209))
 - BPDM Pool: Add check for correct LSA parent hierarchy when consuming golden record tasks ([#1230](https://github.com/eclipse-tractusx/bpdm/issues/1230))
 - BPDM Apps: Fix Open-API specification not having scopes property in clientCredentials flow ([#1234](https://github.com/eclipse-tractusx/bpdm/issues/1234))
+- BPDM Apps: Fix access rights for the Open-API documents in YAML format ([#1237](https://github.com/eclipse-tractusx/bpdm/issues/1237))
 
 ## [6.2.0] - 2024-11-28
 
