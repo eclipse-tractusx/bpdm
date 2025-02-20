@@ -1,6 +1,6 @@
 # bpdm-orchestrator
 
-![Version: 3.2.0](https://img.shields.io/badge/Version-3.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 6.2.0-rc5](https://img.shields.io/badge/AppVersion-6.2.0--rc5-informational?style=flat-square)
+![Version: 3.3.0-rc3](https://img.shields.io/badge/Version-3.3.0--rc3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 6.3.0-rc3](https://img.shields.io/badge/AppVersion-6.3.0--rc3-informational?style=flat-square)
 
 A Helm chart for deploying the BPDM Orchestrator service
 
@@ -21,9 +21,9 @@ A Helm chart for deploying the BPDM Orchestrator service
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://../bpdm-common | bpdm-common | 1.0.2 |
+| file://../bpdm-common | bpdm-common | 1.0.3-rc3 |
 | https://charts.bitnami.com/bitnami | postgres(postgresql) | 12.12.10 |
-| https://eclipse-tractusx.github.io/charts/dev | centralidp(centralidp) | 3.0.1 |
+| https://eclipse-tractusx.github.io/charts/dev | centralidp(centralidp) | 4.0.0 |
 
 ## Values
 
