@@ -3,7 +3,7 @@
   "info" : {
     "title" : "Business Partner Data Management Pool",
     "description" : "Service that manages and shares business partner data with other CatenaX services",
-    "version" : "6.3.0-rc3"
+    "version" : "6.3.0-rc4"
   },
   "servers" : [ {
     "url" : "http://localhost:8080",
