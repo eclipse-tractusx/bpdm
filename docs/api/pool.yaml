@@ -6148,29 +6148,31 @@ components:
       - regionName
     RelationVerboseDto:
       type: object
-      description: Directed relation between two business partners
+      description: A relation from one business partner (the source) to another business partner (the target).
       properties:
         type:
-          $ref: "#/components/schemas/TypeKeyNameVerboseDtoRelationType"
-          description: Type of relation like predecessor or ownership relation
-        startBpnl:
           type: string
-          description: BPN of partner which is the source of the relation
-        endBpnl:
+          description: The type of relation between the business partners
+          enum:
+          - IsManagedBy
+        businessPartnerSourceBpnl:
           type: string
-          description: BPN of partner which is the target of the relation
-        validFrom:
+          description: BPN of partner from which the relation emerges (the source)
+        businessPartnerTargetBpnl:
           type: string
-          format: date-time
-          description: Time when the relation started
-        validTo:
+          description: BPN of partner to which this relation goes (the target)
+        createdAt:
           type: string
           format: date-time
-          description: Time when the relation ended
+          description: The time when this relation was created
+        updatedAt:
+          type: string
+          format: date-time
+          description: The time when this relation was last modified
       required:
-      - endBpnl
-      - startBpnl
       - type
+      - businessPartnerSourceBpnl
+      - businessPartnerTargetBpnl
     SiteCreateRequestWithLegalAddressAsMain:
       type: object
       properties:
@@ -6892,22 +6894,6 @@ components:
           - ZM
           - ZR
           - ZW
-        name:
-          type: string
-          description: Name or denotation of this type
-      required:
-      - name
-      - technicalKey
-    TypeKeyNameVerboseDtoRelationType:
-      type: object
-      description: Named type uniquely identified by its technical key
-      properties:
-        technicalKey:
-          type: string
-          description: Unique key of this type for reference
-          enum:
-          - CX_LEGAL_SUCCESSOR_OF
-          - CX_LEGAL_PREDECESSOR_OF
         name:
           type: string
           description: Name or denotation of this type
