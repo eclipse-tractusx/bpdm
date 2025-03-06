@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
-## [7.3.0] - tbd
+## [7.3.0] - 2025-03-06
 
 - Increase appversion to 6.3.0
 - update Central-IDP dependency to 4.0.0 [#1145](https://github.com/eclipse-tractusx/bpdm/pull/1145)
