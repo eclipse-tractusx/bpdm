@@ -33,7 +33,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.2</version>
+        <version>3.4.3</version>
     </parent>
 
     <modules>
@@ -71,7 +71,6 @@
         <flatten-maven.version>1.6.0</flatten-maven.version>
         <license-tool.version>1.1.0</license-tool.version>
         <assertj.version>3.24.2</assertj.version>
-        <json-smart.version>2.5.2</json-smart.version>
     </properties>
 
     <pluginRepositories>
@@ -167,25 +166,6 @@
                 <artifactId>opencsv</artifactId>
                 <version>${opencsv.version}</version>
             </dependency>
-            <!-- overwrite with newer version to fix vulnerability  -->
-            <dependency>
-                <groupId>io.netty</groupId>
-                <artifactId>netty-common</artifactId>
-                <version>4.1.118.Final</version>
-            </dependency>
-            <!-- overwrite with newer version to fix vulnerability  -->
-            <dependency>
-                <groupId>io.netty</groupId>
-                <artifactId>netty-handler</artifactId>
-                <version>4.1.118.Final</version>
-            </dependency>
-            <!-- overwrite with newer version to fix vulnerability  -->
-            <dependency>
-                <groupId>net.minidev</groupId>
-                <artifactId>json-smart</artifactId>
-                <version>${json-smart.version}</version>
-            </dependency>
-
 
             <!-- Test -->
             <dependency>
