@@ -129,12 +129,18 @@ class ExpectedBusinessPartnerResultFactory(
     fun mapToExpectedAddresses(
         hierarchy: LegalEntityHierarchy
     ): List<LogisticAddressVerboseDto> {
-        return listOf(mapToExpectedAddress(hierarchy.legalEntity))
-            .plus(hierarchy.getAllSites().map { mapToExpectedAddress(it, hierarchy.legalEntity.legalEntity.isCatenaXMemberData) })
-            .plus(hierarchy.getAllAddresses().map { mapToExpectedAddress(it, hierarchy.legalEntity.legalEntity.isCatenaXMemberData) })
+        val isCxMember = hierarchy.legalEntity.legalEntity.isCatenaXMemberData
+        val legalEntityAdditionalAddresses = hierarchy.addresses
+        val siteAdditionalAddressesWithBpnl = hierarchy.siteHierarchy
+            .flatMap{ siteHierarchy -> siteHierarchy.addresses.map { Pair(it, siteHierarchy.site.bpnlParent) } }
+
+        return listOf(mapLegalEntityToExpectedLegalAddress(hierarchy.legalEntity))
+            .plus(hierarchy.getAllSites().map { mapSiteToExpectedSiteMainAddress(it, isCxMember) })
+            .plus(legalEntityAdditionalAddresses.map { mapToExpectedAdditionalAddress(it,isCxMember) })
+            .plus(siteAdditionalAddressesWithBpnl.map { (additionalAddress, bpnl) -> mapToExpectedAdditionalAddress(additionalAddress, isCxMember, bpnLegalEntityOverwrite = bpnl) })
     }
 
-    fun mapToExpectedAddress(
+    fun mapLegalEntityToExpectedLegalAddress(
         givenRequest: LegalEntityPartnerCreateRequest,
         givenBpnA: String = StringIgnoreComparator.IGNORE_STRING,
         bpnLegalEntity: String = StringIgnoreComparator.IGNORE_STRING,
@@ -153,7 +159,7 @@ class ExpectedBusinessPartnerResultFactory(
         )
     }
 
-    fun mapToExpectedAddress(
+    fun mapSiteToExpectedSiteMainAddress(
         givenRequest: SitePartnerCreateRequest,
         isCatenaXMemberData: Boolean,
         givenBpnA: String = StringIgnoreComparator.IGNORE_STRING,
@@ -173,17 +179,18 @@ class ExpectedBusinessPartnerResultFactory(
         )
     }
 
-    fun mapToExpectedAddress(
+    fun mapToExpectedAdditionalAddress(
         givenRequest: AddressPartnerCreateRequest,
         isCatenaXMemberData: Boolean,
         givenBpnA: String = StringIgnoreComparator.IGNORE_STRING,
+        bpnLegalEntityOverwrite: String? = null,
         createdAt: Instant = Instant.MIN,
         updatedAt: Instant = createdAt
     ): LogisticAddressVerboseDto {
         return mapToExpectedResult(
             givenRequest = givenRequest.address,
             givenBpnA = givenBpnA,
-            bpnLegalEntity = givenRequest.bpnParent.takeIf { it.startsWith("BPNL") },
+            bpnLegalEntity = bpnLegalEntityOverwrite ?: givenRequest.bpnParent.takeIf { it.startsWith("BPNL") },
             bpnSite = givenRequest.bpnParent.takeIf { it.startsWith("BPNS") },
             addressType = AddressType.AdditionalAddress,
             isCatenaXMemberData = isCatenaXMemberData,
