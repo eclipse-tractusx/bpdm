@@ -171,7 +171,7 @@
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-common</artifactId>
-                <version>4.1.118.Final</version>
+                <version>4.1.119.Final</version>
             </dependency>
             <!-- overwrite with newer version to fix vulnerability  -->
             <dependency>
