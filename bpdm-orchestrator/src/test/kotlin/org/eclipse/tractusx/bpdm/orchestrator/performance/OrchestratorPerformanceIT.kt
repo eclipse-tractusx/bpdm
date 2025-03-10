@@ -49,6 +49,7 @@ class OrchestratorPerformanceIT@Autowired constructor(
     private val testDataFactory = BusinessPartnerTestDataFactory()
     private val taskMode = stateMachineConfigProperties.modeSteps.keys.first()
     private val step = stateMachineConfigProperties.modeSteps[taskMode]!!.first()
+    private val originId = "test-origin"
 
     @ParameterizedTest
     @ValueSource(ints = [100])
@@ -107,7 +108,7 @@ class OrchestratorPerformanceIT@Autowired constructor(
     private fun createNewRecordTasks(size: Int): List<TaskStateRequest.Entry>{
         return (1 .. size)
             .map { TaskCreateRequestEntry(null, testDataFactory.createFullBusinessPartner("BP$it")) }
-            .let { TaskCreateRequest(mode = taskMode, requests = it) }
+            .let { TaskCreateRequest(mode = taskMode, requests = it, originId = originId) }
             .let {  orchestratorClient.goldenRecordTasks.createTasks(it).createdTasks }
             .map { TaskStateRequest.Entry(it.taskId, it.recordId) }
     }
@@ -115,7 +116,7 @@ class OrchestratorPerformanceIT@Autowired constructor(
     private fun updateRecords(recordIds: List<String>): List<TaskStateRequest.Entry>{
         return recordIds
             .map { TaskCreateRequestEntry(it, testDataFactory.createFullBusinessPartner(it)) }
-            .let { TaskCreateRequest(mode = taskMode, requests = it) }
+            .let { TaskCreateRequest(mode = taskMode, requests = it, originId = originId) }
             .let {  orchestratorClient.goldenRecordTasks.createTasks(it).createdTasks }
             .map { TaskStateRequest.Entry(it.taskId, it.recordId) }
     }
