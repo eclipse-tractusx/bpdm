@@ -188,6 +188,8 @@ spring:
         order_inserts: true
         order_updates: true
 springdoc:
+  # Api document should be in pretty JSON
+  writer-with-default-pretty-printer: true
   api-docs:
     # Generate Open-API document
     enabled: true

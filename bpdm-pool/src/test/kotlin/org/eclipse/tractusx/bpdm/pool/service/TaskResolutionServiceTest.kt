@@ -824,6 +824,68 @@ class TaskResolutionServiceTest @Autowired constructor(
         assertThat(updateResults.filter { it.errors.isNotEmpty() }).hasSize(0)
     }
 
+    @Test
+    fun `error on site update with wrong legal entity parent`() {
+        val siteCreateRequest = orchTestDataFactory.createSiteBusinessPartner("SITE_ON_LE1").copyWithBpnRequests()
+        upsertGoldenRecordIntoPool(
+            taskId = "TASK_1",
+            businessPartner = siteCreateRequest
+        )
+
+        val updateWithWrongLegalEntity = upsertGoldenRecordIntoPool(
+            taskId = "TASK_2",
+            businessPartner = orchTestDataFactory.createSiteBusinessPartner("SITE_ON_LE2").withSiteReferences(
+                siteCreateRequest.site!!.bpnReference,
+                siteCreateRequest.site!!.siteMainAddress!!.bpnReference
+            )
+        )
+
+        assertThat(updateWithWrongLegalEntity[0].taskId).isEqualTo("TASK_2")
+        assertThat(updateWithWrongLegalEntity[0].errors).hasSize(1)
+        assertThat(updateWithWrongLegalEntity[0].errors[0].description).isEqualTo(CleaningError.SITE_WRONG_LEGAL_ENTITY_REFERENCE.message)
+    }
+
+    @Test
+    fun `error on additional address update with wrong legal entity parent`() {
+        val addressCreateRequest = orchTestDataFactory.createFullBusinessPartner("ADDRESS_ON_LE1").copyWithBpnRequests()
+        upsertGoldenRecordIntoPool(
+            taskId = "TASK_1",
+            businessPartner = addressCreateRequest
+        )
+
+        val updateWithWrongLegalEntity = upsertGoldenRecordIntoPool(
+            taskId = "TASK_2",
+            businessPartner = orchTestDataFactory.createFullBusinessPartner("ADDRESS_ON_LE2").withAdditionalAddressReference(
+                addressCreateRequest.additionalAddress!!.bpnReference
+            )
+        )
+
+        assertThat(updateWithWrongLegalEntity[0].taskId).isEqualTo("TASK_2")
+        assertThat(updateWithWrongLegalEntity[0].errors).hasSize(1)
+        assertThat(updateWithWrongLegalEntity[0].errors[0].description).isEqualTo(CleaningError.ADDITIONAL_ADDRESS_WRONG_LEGAL_ENTITY_REFERENCE.message)
+    }
+
+    @Test
+    fun `error on additional address update with wrong site parent`() {
+        val addressCreateRequest = orchTestDataFactory.createFullBusinessPartner("ADDRESS_ON_SITE1").copyWithBpnRequests()
+        upsertGoldenRecordIntoPool(
+            taskId = "TASK_1",
+            businessPartner = addressCreateRequest
+        )
+
+        val updateWithWrongSite = upsertGoldenRecordIntoPool(
+            taskId = "TASK_2",
+            businessPartner = orchTestDataFactory.createFullBusinessPartner("ADDRESS_ON_SITE2")
+                .withLegalReferences(addressCreateRequest.legalEntity.bpnReference, addressCreateRequest.legalEntity.legalAddress.bpnReference)
+                .withAdditionalAddressReference(addressCreateRequest.additionalAddress!!.bpnReference)
+        )
+
+        assertThat(updateWithWrongSite[0].taskId).isEqualTo("TASK_2")
+        assertThat(updateWithWrongSite[0].errors).hasSize(1)
+        assertThat(updateWithWrongSite[0].errors[0].description).isEqualTo(CleaningError.ADDITIONAL_ADDRESS_WRONG_SITE_REFERENCE.message)
+    }
+
+
     fun upsertGoldenRecordIntoPool(taskId: String, businessPartner: BusinessPartner): List<TaskStepResultEntryDto> {
 
         val taskStep = singleTaskStep(taskId = taskId, businessPartner = businessPartner)

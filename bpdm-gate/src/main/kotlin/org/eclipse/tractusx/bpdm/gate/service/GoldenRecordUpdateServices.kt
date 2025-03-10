@@ -222,7 +222,7 @@ class GoldenRecordUpdateChunkService(
             legalEntityBpn = bpnL ?: throw createMappingException(BusinessPartnerDb::bpnL, id),
             siteBpn = bpnS,
             addressBpn = bpnA ?: throw createMappingException(BusinessPartnerDb::bpnA, id),
-            legalName = legalName ?: throw createMappingException(BusinessPartnerDb::legalName, id),
+            legalName = legalName,
             legalForm = legalForm,
             shortName = shortName,
             siteName = siteName,

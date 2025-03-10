@@ -129,6 +129,19 @@ On merging with the main branch the BPDM apps and Charts are deployed based on t
 For the release of the Helm Charts we use the [helm/chart-releaser-action](https://github.com/helm/chart-releaser-action).
 Therefore, a Helm Chart repository is stored on the `gh-pages` branch of the repository indexing the released Charts.
 
+## Create API Documentation
+
+We use Springdoc and Swagger-UI in order to automatically generate Open-API documents for our BPDM apis.
+If you need to update the api documents in the repository, you can start the applications, go to the Swagger-UI page and fetch the underlying Open-API documents.
+You need to update the documents both in JSON and YAML format.
+Luckily, Swagger-UI supports the creation of both formats quite easily.
+You can obtain the generated Open-API documents from the running apps at these subpaths:
+
+- JSON: /docs/api-docs/docs
+- YAML: /docs/api-docs.yaml/docs
+
+Please use the formatting as-is when updating the corresponding documents in the api documentation folder.
+
 ## NOTICE
 
 This work is licensed under the [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0).

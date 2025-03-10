@@ -47,6 +47,7 @@ class BusinessPartnerMappings {
             legalEntity = toLegalEntityComponentInputDto(entity),
             site = toSiteComponentInputDto(entity),
             address = toAddressComponentInputDto(entity),
+            externalSequenceTimestamp = entity.externalSequenceTimestamp,
             createdAt = entity.createdAt,
             updatedAt = entity.updatedAt
         )
@@ -79,6 +80,7 @@ class BusinessPartnerMappings {
             legalEntity = toLegalEntityComponentOutputDto(entity),
             site = toSiteComponentOutputDto(entity),
             address = toAddressComponentOutputDto(entity),
+            externalSequenceTimestamp = entity.externalSequenceTimestamp,
             createdAt = entity.createdAt,
             updatedAt = entity.updatedAt
         )
