@@ -27,8 +27,12 @@ import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.RelationType
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntitySearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
+import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
+import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
+import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.eclipse.tractusx.bpdm.pool.util.EndpointValues
 import org.eclipse.tractusx.bpdm.pool.util.TestHelpers
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
@@ -64,6 +68,8 @@ class LegalEntityControllerIT @Autowired constructor(
     val dbTestHelpers: DbTestHelpers,
     val assertHelpers: AssertHelpers,
     val poolDataHelpers: PoolDataHelpers,
+    val legalEntityRepository: LegalEntityRepository,
+    val releationRepository: RelationRepository
 ) {
 
     @BeforeEach
@@ -674,6 +680,59 @@ class LegalEntityControllerIT @Autowired constructor(
             .ignoringAllOverriddenEquals()
             .ignoringFieldsOfTypes(Instant::class.java)
             .isEqualTo(expected)
+    }
+
+    /**
+     * Given two legal entities
+     * When creating a relation between them
+     * Then the relation is persisted and can be retrieved
+     */
+    @Test
+    fun `create and fetch relation between two legal entities` () {
+        /*
+        * This test case is created as abstract and had scope to refactor more in future,
+        * when we'll have orchestrator logic confirmed to create and update relations in golden record process.
+        *
+        * */
+
+        // Step 1: Create two legal entities
+        val entity1 = BusinessPartnerNonVerboseValues.legalEntityCreate1
+        val entity2 = BusinessPartnerNonVerboseValues.legalEntityCreate2
+
+        val response = poolClient.legalEntities.createBusinessPartners(listOf(entity1, entity2))
+        assertThat(response.entities.size).isEqualTo(2)
+        val savedEntity1 = response.entities.toList()[0]
+        val savedEntity2 = response.entities.toList()[1]
+
+        // Step 2: Create a relation
+        val relation = RelationDb(
+            type = RelationType.IsAlternativeHeadquarterFor,
+            startNode = legalEntityRepository.findByBpnIgnoreCase(savedEntity1.legalEntity.bpnl)!!,
+            endNode = legalEntityRepository.findByBpnIgnoreCase(savedEntity2.legalEntity.bpnl)!!,
+            isActive = true
+        )
+
+        releationRepository.save(relation);
+
+        // Step 3: Retrieve and assert the relation exists
+        val savedRelation = releationRepository.findAll()
+
+        assertThat(savedRelation).isNotNull
+        assertThat(savedRelation.first().type).isEqualTo(RelationType.IsAlternativeHeadquarterFor)
+        assertThat(savedRelation.first().startNode.bpn).isEqualTo(savedEntity1.legalEntity.bpnl)
+        assertThat(savedRelation.first().endNode.bpn).isEqualTo(savedEntity2.legalEntity.bpnl)
+        assertThat(savedRelation.first().isActive).isTrue()
+
+        //Step 4: Retrieve legal entity with the relation exists
+        val bpnToFind = changeCase(savedEntity1.legalEntity.bpnl)
+        val responseLegalEntity = poolClient.legalEntities.getLegalEntity(bpnToFind).legalEntity
+        assertThat(responseLegalEntity.relations).isNotNull
+        assertThat(responseLegalEntity.relations.first().type).isEqualTo(savedRelation.first().type)
+        assertThat(responseLegalEntity.relations.first().businessPartnerSourceBpnl).isEqualTo(savedRelation.first().startNode.bpn)
+        assertThat(responseLegalEntity.relations.first().businessPartnerTargetBpnl).isEqualTo(savedRelation.first().endNode.bpn)
+        assertThat(responseLegalEntity.relations.first().isActive).isEqualTo(savedRelation.first().isActive)
+
+
     }
 
     fun assertThatCreatedLegalEntitiesEqual(actuals: Collection<LegalEntityPartnerCreateVerboseDto>, expected: Collection<LegalEntityPartnerCreateVerboseDto>) {

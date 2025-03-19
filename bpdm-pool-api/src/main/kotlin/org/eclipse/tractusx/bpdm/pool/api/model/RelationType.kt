@@ -17,35 +17,8 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.entity
+package org.eclipse.tractusx.bpdm.pool.api.model
 
-import jakarta.persistence.*
-import org.eclipse.tractusx.bpdm.common.model.BaseEntity
-import org.eclipse.tractusx.bpdm.pool.api.model.RelationType
-
-@Entity
-@Table(
-    name = "relations",
-    indexes = [
-        Index(columnList = "start_node_id"),
-        Index(columnList = "end_node_id")
-    ]
-)
-class RelationDb(
-    @Column(name = "type", nullable = false)
-    @Enumerated(EnumType.STRING)
-    val type: RelationType,
-
-    @ManyToOne
-    @JoinColumn(name = "start_node_id", nullable = false)
-    val startNode: LegalEntityDb,
-
-    @ManyToOne
-    @JoinColumn(name = "end_node_id", nullable = false)
-    val endNode: LegalEntityDb,
-
-    @Column(name = "is_active", nullable = false)
-    val isActive: Boolean
-
-) : BaseEntity()
-
+enum class RelationType {
+    IsAlternativeHeadquarterFor
+}

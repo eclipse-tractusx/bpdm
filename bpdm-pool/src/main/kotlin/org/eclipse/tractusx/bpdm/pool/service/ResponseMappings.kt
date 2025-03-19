@@ -274,11 +274,10 @@ fun LegalEntityClassificationDb.toDto(): LegalEntityClassificationVerboseDto {
 
 fun RelationDb.toDto(): RelationVerboseDto {
     return RelationVerboseDto(
-        type = type.toDto(),
-        startBpnl = startNode.bpn,
-        endBpnl = endNode.bpn,
-        validFrom = validFrom,
-        validTo = validTo
+        type = type,
+        businessPartnerSourceBpnl = startNode.bpn,
+        businessPartnerTargetBpnl = endNode.bpn,
+        isActive = isActive
     )
 }
 

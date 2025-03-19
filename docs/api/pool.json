@@ -1596,11 +1596,11 @@
               "$ref" : "#/components/schemas/ErrorInfoAddressCreateError"
             }
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -1733,11 +1733,11 @@
               "$ref" : "#/components/schemas/ErrorInfoAddressUpdateError"
             }
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -2417,11 +2417,11 @@
               "$ref" : "#/components/schemas/ErrorInfoLegalEntityCreateError"
             }
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -2564,11 +2564,11 @@
               "$ref" : "#/components/schemas/ErrorInfoLegalEntityUpdateError"
             }
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -3345,29 +3345,24 @@
         "description" : "Directed relation between two business partners",
         "properties" : {
           "type" : {
-            "$ref" : "#/components/schemas/TypeKeyNameVerboseDtoRelationType",
-            "description" : "Type of relation like predecessor or ownership relation"
-          },
-          "startBpnl" : {
             "type" : "string",
-            "description" : "BPN of partner which is the source of the relation"
+            "description" : "The type of relation between the Legal Entities",
+            "enum" : [ "IsAlternativeHeadquarterFor" ]
           },
-          "endBpnl" : {
+          "businessPartnerSourceBpnl" : {
             "type" : "string",
-            "description" : "BPN of partner which is the target of the relation"
+            "description" : "BPN of partner from which the relation emerges (the source)"
           },
-          "validFrom" : {
+          "businessPartnerTargetBpnl" : {
             "type" : "string",
-            "format" : "date-time",
-            "description" : "Time when the relation started"
+            "description" : "BPN of partner to which this relation goes (the target)"
           },
-          "validTo" : {
-            "type" : "string",
-            "format" : "date-time",
-            "description" : "Time when the relation ended"
+          "isActive" : {
+            "type" : "boolean",
+            "description" : "Status of the relation"
           }
         },
-        "required" : [ "endBpnl", "startBpnl", "type" ]
+        "required" : [ "businessPartnerSourceBpnl", "businessPartnerTargetBpnl", "isActive", "type" ]
       },
       "SiteCreateRequestWithLegalAddressAsMain" : {
         "type" : "object",
@@ -3441,11 +3436,11 @@
               "$ref" : "#/components/schemas/ErrorInfoSiteCreateError"
             }
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -3548,11 +3543,11 @@
               "$ref" : "#/components/schemas/ErrorInfoSiteUpdateError"
             }
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -3776,22 +3771,6 @@
             "type" : "string",
             "description" : "Unique key of this type for reference",
             "enum" : [ "UNDEFINED", "AC", "AD", "AE", "AF", "AG", "AI", "AL", "AM", "AN", "AO", "AQ", "AR", "AS", "AT", "AU", "AW", "AX", "AZ", "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO", "BQ", "BR", "BS", "BT", "BU", "BV", "BW", "BY", "BZ", "CA", "CC", "CD", "CF", "CG", "CH", "CI", "CK", "CL", "CM", "CN", "CO", "CP", "CR", "CS", "CU", "CV", "CW", "CX", "CY", "CZ", "DE", "DG", "DJ", "DK", "DM", "DO", "DZ", "EA", "EC", "EE", "EG", "EH", "ER", "ES", "ET", "EU", "EZ", "FI", "FJ", "FK", "FM", "FO", "FR", "FX", "GA", "GB", "GD", "GE", "GF", "GG", "GH", "GI", "GL", "GM", "GN", "GP", "GQ", "GR", "GS", "GT", "GU", "GW", "GY", "HK", "HM", "HN", "HR", "HT", "HU", "IC", "ID", "IE", "IL", "IM", "IN", "IO", "IQ", "IR", "IS", "IT", "JE", "JM", "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN", "KP", "KR", "KW", "KY", "KZ", "LA", "LB", "LC", "LI", "LK", "LR", "LS", "LT", "LU", "LV", "LY", "MA", "MC", "MD", "ME", "MF", "MG", "MH", "MK", "ML", "MM", "MN", "MO", "MP", "MQ", "MR", "MS", "MT", "MU", "MV", "MW", "MX", "MY", "MZ", "NA", "NC", "NE", "NF", "NG", "NI", "NL", "NO", "NP", "NR", "NT", "NU", "NZ", "OM", "PA", "PE", "PF", "PG", "PH", "PK", "PL", "PM", "PN", "PR", "PS", "PT", "PW", "PY", "QA", "RE", "RO", "RS", "RU", "RW", "SA", "SB", "SC", "SD", "SE", "SF", "SG", "SH", "SI", "SJ", "SK", "SL", "SM", "SN", "SO", "SR", "SS", "ST", "SU", "SV", "SX", "SY", "SZ", "TA", "TC", "TD", "TF", "TG", "TH", "TJ", "TK", "TL", "TM", "TN", "TO", "TP", "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "UK", "UM", "US", "UY", "UZ", "VA", "VC", "VE", "VG", "VI", "VN", "VU", "WF", "WS", "XI", "XU", "XK", "YE", "YT", "YU", "ZA", "ZM", "ZR", "ZW" ]
-          },
-          "name" : {
-            "type" : "string",
-            "description" : "Name or denotation of this type"
-          }
-        },
-        "required" : [ "name", "technicalKey" ]
-      },
-      "TypeKeyNameVerboseDtoRelationType" : {
-        "type" : "object",
-        "description" : "Named type uniquely identified by its technical key",
-        "properties" : {
-          "technicalKey" : {
-            "type" : "string",
-            "description" : "Unique key of this type for reference",
-            "enum" : [ "CX_LEGAL_SUCCESSOR_OF", "CX_LEGAL_PREDECESSOR_OF" ]
           },
           "name" : {
             "type" : "string",
