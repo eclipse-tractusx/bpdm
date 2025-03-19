@@ -41,93 +41,6 @@ paths:
         "400":
           description: On malformed legal entity request
   /v6/input/business-partner-relations:
-    get:
-      tags:
-      - relation-controller
-      summary: Find business partner input relations
-      description: Find paginated list of business partner relations from the input
-        stage. There are various filter criteria available. All filters are 'AND'
-        filters.
-      operationId: get
-      parameters:
-      - name: externalIds
-        in: query
-        description: Only show relations with the given external identifiers
-        required: false
-        schema:
-          type: array
-          description: Only show relations with the given external identifiers
-          items:
-            type: string
-            description: Only show relations with the given external identifiers
-      - name: relationType
-        in: query
-        description: Only show relations of the given type
-        required: false
-        schema:
-          type: string
-          description: Only show relations of the given type
-          enum:
-          - IsManagedBy
-      - name: businessPartnerSourceExternalIds
-        in: query
-        description: Only show relations which have the given business partners as
-          sources
-        required: false
-        schema:
-          type: array
-          description: Only show relations which have the given business partners
-            as sources
-          items:
-            type: string
-            description: Only show relations which have the given business partners
-              as sources
-      - name: businessPartnerTargetExternalIds
-        in: query
-        description: Only show relations which have the given business partners as
-          targets
-        required: false
-        schema:
-          type: array
-          description: Only show relations which have the given business partners
-            as targets
-          items:
-            type: string
-            description: Only show relations which have the given business partners
-              as targets
-      - name: updatedAtFrom
-        in: query
-        description: Only show relations which have been modified after the given
-          time stamp
-        required: false
-        schema:
-          type: string
-          format: date-time
-          description: Only show relations which have been modified after the given
-            time stamp
-      - name: page
-        in: query
-        description: Number of page to get results from
-        required: false
-        schema:
-          type: string
-          minimum: 0
-      - name: size
-        in: query
-        description: Size of each page
-        required: false
-        schema:
-          type: string
-          maximum: 100
-          minimum: 0
-      responses:
-        "200":
-          description: A paginated list of business partner relations for the input
-            stage
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/PageDtoRelationDto"
     put:
       tags:
       - relation-controller
@@ -158,70 +71,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RelationDto"
+                $ref: "#/components/schemas/RelationPutResponse"
         "400":
           description: 'On wrong or insufficient user provided data like references
             to non-existent business partners or relations that violate the relation
             constraints. '
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/GateErrorResponse"
-    post:
-      tags:
-      - relation-controller
-      summary: Create a new business partner input relation
-      description: Create a new relation between two business partner entries on the
-        input stage. The external identifier is optional and a new one will be automatically
-        created if not given. A given external identifier has to be unique.
-      operationId: post
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/RelationPostRequest"
-        required: true
-      responses:
-        "201":
-          description: The created business partner input relation
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/RelationDto"
-        "400":
-          description: 'If the business partner could not be created based on wrong
-            or insufficient data provided such as non-existent business partners or
-            violated relation constraints. '
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/GateErrorResponse"
-        "409":
-          description: If a relation with the given external identifier already exists
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/GateErrorResponse"
-    delete:
-      tags:
-      - relation-controller
-      summary: Delete an existing business partner relation
-      description: Delete a relation between two business partners on the input stage.
-      operationId: delete
-      parameters:
-      - name: externalId
-        in: query
-        description: The external identifier of the business partner relation to delete
-        required: true
-        schema:
-          type: string
-          description: The external identifier of the business partner relation to
-            delete
-      responses:
-        "200":
-          description: The specified relation has been deleted.
-        "400":
-          description: 'On specifying a relation that does not exist. '
           content:
             application/json:
               schema:
@@ -454,6 +308,44 @@ paths:
                 $ref: "#/components/schemas/PageDtoBusinessPartnerInputDto"
         "400":
           description: On malformed pagination request
+  /v6/input/business-partner-relations/search:
+    post:
+      tags:
+      - relation-controller
+      summary: Find business partner input relations
+      description: Find paginated list of business partner relations from the input
+        stage. There are various filter criteria available. All filters are 'AND'
+        filters.
+      operationId: postSearch
+      parameters:
+      - name: page
+        in: query
+        description: Number of page to get results from
+        required: false
+        schema:
+          type: string
+          minimum: 0
+      - name: size
+        in: query
+        description: Size of each page
+        required: false
+        schema:
+          type: string
+          maximum: 100
+          minimum: 0
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RelationSearchRequest"
+      responses:
+        "200":
+          description: A paginated list of business partner relations for the input
+            stage
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PageDtoRelationDto"
   /v6/stats/{stage}/address-types:
     get:
       tags:
@@ -2001,33 +1893,7 @@ components:
       - externalId
       - relationType
       - updatedAt
-    RelationPostRequest:
-      type: object
-      description: A request to create a new relation between two business partners
-      properties:
-        externalId:
-          type: string
-          description: The identifier under which the relation will be referenced.
-            If not given a unique identifier will be automatically assigned by the
-            system. A given external identifier needs be unique.
-        relationType:
-          type: string
-          description: The type of relation that should be created
-          enum:
-          - IsManagedBy
-        businessPartnerSourceExternalId:
-          type: string
-          description: The external identifier of the business partner from which
-            the relation should emerge (the source)
-        businessPartnerTargetExternalId:
-          type: string
-          description: The external identifier of the business partner to which the
-            relation should point (the target)
-      required:
-      - businessPartnerSourceExternalId
-      - businessPartnerTargetExternalId
-      - relationType
-    RelationPutRequest:
+    RelationPutEntry:
       type: object
       description: A request to update the content of the given business partner relation
       properties:
@@ -2053,6 +1919,57 @@ components:
       - businessPartnerTargetExternalId
       - externalId
       - relationType
+    RelationPutRequest:
+      type: object
+      description: A request to upsert the contents of the given relations
+      properties:
+        relations:
+          type: array
+          items:
+            $ref: "#/components/schemas/RelationPutEntry"
+      required:
+      - relations
+    RelationPutResponse:
+      type: object
+      properties:
+        upsertedRelations:
+          type: array
+          items:
+            $ref: "#/components/schemas/RelationDto"
+      required:
+      - upsertedRelations
+    RelationSearchRequest:
+      type: object
+      description: Request payload containing search parameters for business partner
+        relations
+      properties:
+        externalIds:
+          type: array
+          description: Only show relations with the given external identifiers
+          items:
+            type: string
+        relationType:
+          type: string
+          description: Only show relations of the given type
+          enum:
+          - IsManagedBy
+        businessPartnerSourceExternalIds:
+          type: array
+          description: Only show relations which have the given business partners
+            as sources
+          items:
+            type: string
+        businessPartnerTargetExternalIds:
+          type: array
+          description: Only show relations which have the given business partners
+            as targets
+          items:
+            type: string
+        updatedAtFrom:
+          type: string
+          format: date-time
+          description: Only show relations which have been modified after the given
+            time stamp
     SharingStateDto:
       type: object
       description: |

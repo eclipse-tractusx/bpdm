@@ -23,13 +23,11 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.gate.api.model.IRelationDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
 
-@Schema(description = "A request to create a new relation between two business partners")
-data class RelationPostRequest(
-    @Schema(description = "The identifier under which the relation will be referenced. " +
-            "If not given a unique identifier will be automatically assigned by the system. " +
-            "A given external identifier needs be unique.")
-    override val externalId: String? = null,
-    @Schema(description = "The type of relation that should be created")
+@Schema(description = "A request to update the content of the given business partner relation")
+data class RelationPutEntry(
+    @Schema(description = "The external identifier of the business partner relation to update")
+    override val externalId: String,
+    @Schema(description = "The type the relation should be")
     override val relationType: RelationType,
     @Schema(description = "The external identifier of the business partner from which the relation should emerge (the source)")
     override val businessPartnerSourceExternalId: String,

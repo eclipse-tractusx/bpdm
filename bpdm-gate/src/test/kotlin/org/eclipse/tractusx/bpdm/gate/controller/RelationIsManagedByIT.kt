@@ -25,8 +25,10 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
-import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPostRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationSearchRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.response.RelationPutResponse
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.gate.GateInputFactory
@@ -53,521 +55,13 @@ class RelationIsManagedByIT @Autowired constructor(
     private val testHelpers: DbTestHelpers,
     private val inputFactory: GateInputFactory
 ) {
+
     var testName: String = ""
 
     @BeforeEach
     fun beforeEach(testInfo: TestInfo) {
         testHelpers.truncateDbTables()
         testName = testInfo.displayName
-    }
-
-    @Test
-    fun postRelation(){
-        val legalEntityId1 = "$testName LE 1"
-        val legalEntityId2 = "$testName LE 2"
-
-        gateClient.businessParters.upsertBusinessPartnersInput(listOf(
-            createLegalEntityRequest(legalEntityId1),
-            createLegalEntityRequest(legalEntityId2)
-        ))
-
-        val beforePost = Instant.now()
-        val response = gateClient.relation.post(
-            RelationPostRequest(
-                relationType = RelationType.IsManagedBy,
-                businessPartnerSourceExternalId = legalEntityId1,
-                businessPartnerTargetExternalId = legalEntityId2
-            )
-        )
-        val afterPost = Instant.now()
-
-        val expectation = RelationDto(
-            externalId = "ANY",
-            relationType = RelationType.IsManagedBy,
-            businessPartnerSourceExternalId = legalEntityId1,
-            businessPartnerTargetExternalId = legalEntityId2,
-            updatedAt = Instant.now(),
-            createdAt = Instant.now()
-        )
-
-        assertRelation(response, expectation, Timeframe(beforePost, afterPost))
-    }
-
-    @Test
-    fun postRelationWithLegalAndSiteMainAddresses(){
-        val legalEntityId1 = "$testName LE 1"
-        val legalEntityId2 = "$testName LE 2"
-
-        gateClient.businessParters.upsertBusinessPartnersInput(listOf(
-            createLegalEntityRequest(legalEntityId1).withAddressType(AddressType.LegalAndSiteMainAddress),
-            createLegalEntityRequest(legalEntityId2).withAddressType(AddressType.LegalAndSiteMainAddress)
-        ))
-
-        val beforePost = Instant.now()
-        val response = gateClient.relation.post(
-            RelationPostRequest(
-                relationType = RelationType.IsManagedBy,
-                businessPartnerSourceExternalId = legalEntityId1,
-                businessPartnerTargetExternalId = legalEntityId2
-            )
-        )
-        val afterPost = Instant.now()
-
-        val expectation = RelationDto(
-            externalId = "ANY",
-            relationType = RelationType.IsManagedBy,
-            businessPartnerSourceExternalId = legalEntityId1,
-            businessPartnerTargetExternalId = legalEntityId2,
-            updatedAt = Instant.now(),
-            createdAt = Instant.now()
-        )
-
-        assertRelation(response, expectation, Timeframe(beforePost, afterPost))
-    }
-
-    @Test
-    fun postRelationWithTenant(){
-        val legalEntityId1 = "$testName LE 1"
-        val legalEntityId2 = "$testName LE 2"
-
-        val legalEntities = listOf(
-            createLegalEntityRequest(legalEntityId1),
-            createLegalEntityRequest(legalEntityId2)
-        )
-        gateClient.businessParters.upsertBusinessPartnersInput(legalEntities)
-
-        val beforePost = Instant.now()
-        val response = gateClient.relation.post(
-            RelationPostRequest(
-                relationType = RelationType.IsManagedBy,
-                businessPartnerSourceExternalId = legalEntityId1,
-                businessPartnerTargetExternalId = legalEntityId2
-            )
-        )
-        val afterPost = Instant.now()
-
-        val expectation = RelationDto(
-            externalId = "ANY",
-            relationType = RelationType.IsManagedBy,
-            businessPartnerSourceExternalId = legalEntityId1,
-            businessPartnerTargetExternalId = legalEntityId2,
-            updatedAt = Instant.now(),
-            createdAt = Instant.now()
-        )
-
-        assertRelation(response, expectation, Timeframe(beforePost, afterPost), ignoreExternalId = true)
-    }
-
-    @Test
-    fun postRelationWithExternalId(){
-        val legalEntityId1 = "$testName LE 1"
-        val legalEntityId2 = "$testName LE 2"
-
-        val legalEntities = listOf(
-            createLegalEntityRequest(legalEntityId1),
-            createLegalEntityRequest(legalEntityId2)
-        )
-        gateClient.businessParters.upsertBusinessPartnersInput(legalEntities)
-
-        val relationId = testName
-        val beforePost = Instant.now()
-        val response = gateClient.relation.post(
-            RelationPostRequest(
-                externalId = relationId,
-                relationType = RelationType.IsManagedBy,
-                businessPartnerSourceExternalId = legalEntityId1,
-                businessPartnerTargetExternalId = legalEntityId2
-            )
-        )
-        val afterPost = Instant.now()
-
-        val expectation = RelationDto(
-            externalId = relationId,
-            relationType = RelationType.IsManagedBy,
-            businessPartnerSourceExternalId = legalEntityId1,
-            businessPartnerTargetExternalId = legalEntityId2,
-            updatedAt = Instant.now(),
-            createdAt = Instant.now()
-        )
-
-        assertRelation(response, expectation, Timeframe(beforePost, afterPost), ignoreExternalId = false)
-    }
-
-    @Test
-    fun postRelationWithMultipleSources(){
-        val legalEntityId1 = "$testName LE 1"
-        val legalEntityId2 = "$testName LE 2"
-        val legalEntityId3 = "$testName LE 3"
-        val relationId1 = "$testName Relation 1"
-        val relationId2 = "$testName Relation 2"
-
-        gateClient.businessParters.upsertBusinessPartnersInput( listOf(
-            createLegalEntityRequest(legalEntityId1),
-            createLegalEntityRequest(legalEntityId2),
-            createLegalEntityRequest(legalEntityId3)
-        ))
-        gateClient.relation.post(
-            RelationPostRequest(
-                externalId = relationId1,
-                relationType = RelationType.IsManagedBy,
-                businessPartnerSourceExternalId = legalEntityId2,
-                businessPartnerTargetExternalId = legalEntityId1
-            )
-        )
-
-        val beforePost = Instant.now()
-        val response = gateClient.relation.post(
-            RelationPostRequest(
-                externalId = relationId2,
-                relationType = RelationType.IsManagedBy,
-                businessPartnerSourceExternalId = legalEntityId3,
-                businessPartnerTargetExternalId = legalEntityId1
-            )
-        )
-        val afterPost = Instant.now()
-
-        val expectation = RelationDto(
-            externalId = relationId2,
-            relationType = RelationType.IsManagedBy,
-            businessPartnerSourceExternalId = legalEntityId3,
-            businessPartnerTargetExternalId = legalEntityId1,
-            updatedAt = Instant.now(),
-            createdAt = Instant.now()
-        )
-
-        assertRelation(response, expectation, Timeframe(beforePost, afterPost), ignoreExternalId = false)
-    }
-
-    @Test
-    fun postRelationWithSourceNotOwnCompanyData(){
-        val legalEntityId1 = "$testName LE 1"
-        val legalEntityId2 = "$testName LE 2"
-
-        val legalEntities = listOf(
-            createLegalEntityRequest(legalEntityId1).copy(isOwnCompanyData = false),
-            createLegalEntityRequest(legalEntityId2)
-        )
-        gateClient.businessParters.upsertBusinessPartnersInput(legalEntities)
-
-        Assertions.assertThatExceptionOfType(BadRequest::class.java).isThrownBy {
-            gateClient.relation.post(
-                RelationPostRequest(
-                    externalId = testName,
-                    relationType = RelationType.IsManagedBy,
-                    businessPartnerSourceExternalId = legalEntityId1,
-                    businessPartnerTargetExternalId = legalEntityId2
-                )
-            )
-        }
-    }
-
-    @Test
-    fun postRelationWithTargetNotOwnCompanyData(){
-        val legalEntityId1 = "$testName LE 1"
-        val legalEntityId2 = "$testName LE 2"
-
-        val legalEntities = listOf(
-            createLegalEntityRequest(legalEntityId1),
-            createLegalEntityRequest(legalEntityId2).copy(isOwnCompanyData = false)
-        )
-        gateClient.businessParters.upsertBusinessPartnersInput(legalEntities)
-
-        Assertions.assertThatExceptionOfType(BadRequest::class.java).isThrownBy {
-            gateClient.relation.post(
-                RelationPostRequest(
-                    externalId = testName,
-                    relationType = RelationType.IsManagedBy,
-                    businessPartnerSourceExternalId = legalEntityId1,
-                    businessPartnerTargetExternalId = legalEntityId2
-                )
-            )
-        }
-    }
-
-    @Test
-    fun postRelationWithSourceSite(){
-        val legalEntityId1 = "$testName LE 1"
-        val legalEntityId2 = "$testName LE 2"
-
-        val legalEntities = listOf(
-            createLegalEntityRequest(legalEntityId1).withAddressType(AddressType.SiteMainAddress),
-            createLegalEntityRequest(legalEntityId2)
-        )
-        gateClient.businessParters.upsertBusinessPartnersInput(legalEntities)
-
-        Assertions.assertThatExceptionOfType(BadRequest::class.java).isThrownBy {
-            gateClient.relation.post(
-                RelationPostRequest(
-                    externalId = testName,
-                    relationType = RelationType.IsManagedBy,
-                    businessPartnerSourceExternalId = legalEntityId1,
-                    businessPartnerTargetExternalId = legalEntityId2
-                )
-            )
-        }
-    }
-
-    @Test
-    fun postRelationWithTargetSite(){
-        val legalEntityId1 = "$testName LE 1"
-        val legalEntityId2 = "$testName LE 2"
-
-        val legalEntities = listOf(
-            createLegalEntityRequest(legalEntityId1),
-            createLegalEntityRequest(legalEntityId2).withAddressType(AddressType.SiteMainAddress)
-        )
-        gateClient.businessParters.upsertBusinessPartnersInput(legalEntities)
-
-        Assertions.assertThatExceptionOfType(BadRequest::class.java).isThrownBy {
-            gateClient.relation.post(
-                RelationPostRequest(
-                    externalId = testName,
-                    relationType = RelationType.IsManagedBy,
-                    businessPartnerSourceExternalId = legalEntityId1,
-                    businessPartnerTargetExternalId = legalEntityId2
-                )
-            )
-        }
-    }
-
-    @Test
-    fun postRelationWithSourceAdditionalAddress(){
-        val legalEntityId1 = "$testName LE 1"
-        val legalEntityId2 = "$testName LE 2"
-
-        val legalEntities = listOf(
-            createLegalEntityRequest(legalEntityId1).withAddressType(AddressType.AdditionalAddress),
-            createLegalEntityRequest(legalEntityId2)
-        )
-        gateClient.businessParters.upsertBusinessPartnersInput(legalEntities)
-
-        Assertions.assertThatExceptionOfType(BadRequest::class.java).isThrownBy {
-            gateClient.relation.post(
-                RelationPostRequest(
-                    externalId = testName,
-                    relationType = RelationType.IsManagedBy,
-                    businessPartnerSourceExternalId = legalEntityId1,
-                    businessPartnerTargetExternalId = legalEntityId2
-                )
-            )
-        }
-    }
-
-    @Test
-    fun postRelationWithTargetAdditionalAddress(){
-        val legalEntityId1 = "$testName LE 1"
-        val legalEntityId2 = "$testName LE 2"
-
-        val legalEntities = listOf(
-            createLegalEntityRequest(legalEntityId1),
-            createLegalEntityRequest(legalEntityId2).withAddressType(AddressType.AdditionalAddress)
-        )
-        gateClient.businessParters.upsertBusinessPartnersInput(legalEntities)
-
-        Assertions.assertThatExceptionOfType(BadRequest::class.java).isThrownBy {
-            gateClient.relation.post(
-                RelationPostRequest(
-                    externalId = testName,
-                    relationType = RelationType.IsManagedBy,
-                    businessPartnerSourceExternalId = legalEntityId1,
-                    businessPartnerTargetExternalId = legalEntityId2
-                )
-            )
-        }
-    }
-
-    @Test
-    fun postRelationDuplicateId(){
-        val legalEntityId1 = "$testName LE 1"
-        val legalEntityId2 = "$testName LE 2"
-        val legalEntityId3 = "$testName LE 3"
-        val legalEntityId4 = "$testName LE 4"
-
-        val legalEntities = listOf(
-            createLegalEntityRequest(legalEntityId1),
-            createLegalEntityRequest(legalEntityId2),
-            createLegalEntityRequest(legalEntityId3),
-            createLegalEntityRequest(legalEntityId4)
-        )
-        gateClient.businessParters.upsertBusinessPartnersInput(legalEntities)
-        gateClient.relation.post(
-            RelationPostRequest(
-                externalId = testName,
-                relationType = RelationType.IsManagedBy,
-                businessPartnerSourceExternalId = legalEntityId1,
-                businessPartnerTargetExternalId = legalEntityId2
-            )
-        )
-
-        Assertions.assertThatExceptionOfType(Conflict::class.java).isThrownBy {
-            gateClient.relation.post(
-                RelationPostRequest(
-                    externalId = testName,
-                    relationType = RelationType.IsManagedBy,
-                    businessPartnerSourceExternalId = legalEntityId3,
-                    businessPartnerTargetExternalId = legalEntityId4
-                )
-            )
-        }
-    }
-
-    @Test
-    fun postRelationWithSourceEqualsTarget(){
-        val legalEntityId1 = "$testName LE 1"
-        gateClient.businessParters.upsertBusinessPartnersInput(
-            listOf(
-                createLegalEntityRequest(legalEntityId1)
-            )
-        )
-
-        Assertions.assertThatExceptionOfType(BadRequest::class.java).isThrownBy {
-            gateClient.relation.post(
-                RelationPostRequest(
-                    externalId = testName,
-                    relationType = RelationType.IsManagedBy,
-                    businessPartnerSourceExternalId = legalEntityId1,
-                    businessPartnerTargetExternalId = legalEntityId1
-                )
-            )
-        }
-    }
-
-    @Test
-    fun postRelationWithSourceNotExist(){
-        val legalEntityId1 = "$testName LE 1"
-        gateClient.businessParters.upsertBusinessPartnersInput(
-            listOf(
-                createLegalEntityRequest(legalEntityId1)
-            )
-        )
-
-        Assertions.assertThatExceptionOfType(BadRequest::class.java).isThrownBy {
-            gateClient.relation.post(
-                RelationPostRequest(
-                    externalId = testName,
-                    relationType = RelationType.IsManagedBy,
-                    businessPartnerSourceExternalId = "NOT EXIST",
-                    businessPartnerTargetExternalId = legalEntityId1
-                )
-            )
-        }
-    }
-
-    @Test
-    fun postRelationWithTargetNotExist(){
-        val legalEntityId1 = "$testName LE 1"
-        gateClient.businessParters.upsertBusinessPartnersInput(
-            listOf(
-                createLegalEntityRequest(legalEntityId1)
-            )
-        )
-
-        Assertions.assertThatExceptionOfType(BadRequest::class.java).isThrownBy {
-            gateClient.relation.post(
-                RelationPostRequest(
-                    externalId = testName,
-                    relationType = RelationType.IsManagedBy,
-                    businessPartnerSourceExternalId = legalEntityId1,
-                    businessPartnerTargetExternalId = "NOT EXIST"
-                )
-            )
-        }
-    }
-
-    @Test
-    fun postRelationMultipleTargets(){
-        val legalEntityId1 = "$testName LE 1"
-        val legalEntityId2 = "$testName LE 2"
-        val legalEntityId3 = "$testName LE 3"
-
-        gateClient.businessParters.upsertBusinessPartnersInput(listOf(
-            createLegalEntityRequest(legalEntityId1),
-            createLegalEntityRequest(legalEntityId2),
-            createLegalEntityRequest(legalEntityId3),
-        ))
-        gateClient.relation.post(
-            RelationPostRequest(
-                externalId = "$testName Relation 1",
-                relationType = RelationType.IsManagedBy,
-                businessPartnerSourceExternalId = legalEntityId2,
-                businessPartnerTargetExternalId = legalEntityId1
-            )
-        )
-
-        Assertions.assertThatExceptionOfType(BadRequest::class.java).isThrownBy {
-            gateClient.relation.post(
-                RelationPostRequest(
-                    externalId = "$testName Relation 2",
-                    relationType = RelationType.IsManagedBy,
-                    businessPartnerSourceExternalId = legalEntityId2,
-                    businessPartnerTargetExternalId = legalEntityId3
-                )
-            )
-        }
-    }
-
-    @Test
-    fun postRelationTargetIsAlreadySource(){
-        val legalEntityId1 = "$testName LE 1"
-        val legalEntityId2 = "$testName LE 2"
-        val legalEntityId3 = "$testName LE 3"
-
-        gateClient.businessParters.upsertBusinessPartnersInput(listOf(
-            createLegalEntityRequest(legalEntityId1),
-            createLegalEntityRequest(legalEntityId2),
-            createLegalEntityRequest(legalEntityId3),
-        ))
-        gateClient.relation.post(
-            RelationPostRequest(
-                externalId = "$testName Relation 1",
-                relationType = RelationType.IsManagedBy,
-                businessPartnerSourceExternalId = legalEntityId1,
-                businessPartnerTargetExternalId = legalEntityId2
-            )
-        )
-
-        Assertions.assertThatExceptionOfType(BadRequest::class.java).isThrownBy {
-            gateClient.relation.post(
-                RelationPostRequest(
-                    externalId = "$testName Relation 2",
-                    relationType = RelationType.IsManagedBy,
-                    businessPartnerSourceExternalId = legalEntityId3,
-                    businessPartnerTargetExternalId = legalEntityId1
-                )
-            )
-        }
-    }
-
-    @Test
-    fun postRelationSourceIsAlreadyTarget(){
-        val legalEntityId1 = "$testName LE 1"
-        val legalEntityId2 = "$testName LE 2"
-        val legalEntityId3 = "$testName LE 3"
-
-        gateClient.businessParters.upsertBusinessPartnersInput(listOf(
-            createLegalEntityRequest(legalEntityId1),
-            createLegalEntityRequest(legalEntityId2),
-            createLegalEntityRequest(legalEntityId3),
-        ))
-        gateClient.relation.post(
-            RelationPostRequest(
-                externalId = "$testName Relation 1",
-                relationType = RelationType.IsManagedBy,
-                businessPartnerSourceExternalId = legalEntityId1,
-                businessPartnerTargetExternalId = legalEntityId2
-            )
-        )
-
-        Assertions.assertThatExceptionOfType(BadRequest::class.java).isThrownBy {
-            gateClient.relation.post(
-                RelationPostRequest(
-                    externalId = "$testName Relation 2",
-                    relationType = RelationType.IsManagedBy,
-                    businessPartnerSourceExternalId = legalEntityId2,
-                    businessPartnerTargetExternalId = legalEntityId3
-                )
-            )
-        }
     }
 
     @Test
@@ -586,8 +80,9 @@ class RelationIsManagedByIT @Autowired constructor(
         ))
 
         val beforeCreation = Instant.now()
-        gateClient.relation.post(
-            RelationPostRequest(
+        gateClient.relation.put(
+            createIfNotExist = true,
+            singleUpserRequest(
                 externalId = relationId,
                 relationType = RelationType.IsManagedBy,
                 businessPartnerSourceExternalId = legalEntityId1,
@@ -599,7 +94,7 @@ class RelationIsManagedByIT @Autowired constructor(
         val beforeUpdate = Instant.now()
         val response = gateClient.relation.put(
             createIfNotExist = false,
-            RelationPutRequest(
+            singleUpserRequest(
                 externalId = relationId,
                 relationType = RelationType.IsManagedBy,
                 businessPartnerSourceExternalId = legalEntityId3,
@@ -641,8 +136,9 @@ class RelationIsManagedByIT @Autowired constructor(
         ))
 
         val beforeCreation = Instant.now()
-        gateClient.relation.post(
-            RelationPostRequest(
+        gateClient.relation.put(
+            createIfNotExist = true,
+            singleUpserRequest(
                 externalId = relationId,
                 relationType = RelationType.IsManagedBy,
                 businessPartnerSourceExternalId = legalEntityId1,
@@ -654,7 +150,7 @@ class RelationIsManagedByIT @Autowired constructor(
         val beforeUpdate = Instant.now()
         val response = gateClient.relation.put(
             createIfNotExist = false,
-            RelationPutRequest(
+            singleUpserRequest(
                 externalId = relationId,
                 relationType = RelationType.IsManagedBy,
                 businessPartnerSourceExternalId = legalEntityId3,
@@ -696,8 +192,9 @@ class RelationIsManagedByIT @Autowired constructor(
         ))
 
         val beforeCreation = Instant.now()
-        gateClient.relation.post(
-            RelationPostRequest(
+        gateClient.relation.put(
+            createIfNotExist = true,
+            singleUpserRequest(
                 externalId = relationId,
                 relationType = RelationType.IsManagedBy,
                 businessPartnerSourceExternalId = legalEntityId1,
@@ -709,7 +206,7 @@ class RelationIsManagedByIT @Autowired constructor(
         val beforeUpdate = Instant.now()
         val response = gateClient.relation.put(
             createIfNotExist = false,
-            RelationPutRequest(
+            singleUpserRequest(
                 externalId = relationId,
                 relationType = RelationType.IsManagedBy,
                 businessPartnerSourceExternalId = legalEntityId3,
@@ -752,16 +249,18 @@ class RelationIsManagedByIT @Autowired constructor(
         ))
 
         val beforeCreation = Instant.now()
-        gateClient.relation.post(
-            RelationPostRequest(
+        gateClient.relation.put(
+            createIfNotExist = true,
+            singleUpserRequest(
                 externalId = relationId1,
                 relationType = RelationType.IsManagedBy,
                 businessPartnerSourceExternalId = legalEntityId2,
                 businessPartnerTargetExternalId = legalEntityId1
             )
         )
-        gateClient.relation.post(
-            RelationPostRequest(
+        gateClient.relation.put(
+            createIfNotExist = true,
+            singleUpserRequest(
                 externalId = relationId2,
                 relationType = RelationType.IsManagedBy,
                 businessPartnerSourceExternalId = legalEntityId3,
@@ -773,7 +272,7 @@ class RelationIsManagedByIT @Autowired constructor(
         val beforeUpdate = Instant.now()
         val response = gateClient.relation.put(
             createIfNotExist = false,
-            RelationPutRequest(
+            singleUpserRequest(
                 externalId = relationId2,
                 relationType = RelationType.IsManagedBy,
                 businessPartnerSourceExternalId = legalEntityId4,
@@ -813,7 +312,7 @@ class RelationIsManagedByIT @Autowired constructor(
         Assertions.assertThatExceptionOfType(BadRequest::class.java).isThrownBy {
             gateClient.relation.put(
                 createIfNotExist = false,
-                RelationPutRequest(
+                singleUpserRequest(
                     externalId = testName,
                     relationType = RelationType.IsManagedBy,
                     businessPartnerSourceExternalId = legalEntityId1,
@@ -838,8 +337,9 @@ class RelationIsManagedByIT @Autowired constructor(
             createLegalEntityRequest(legalEntityId4)
         ))
 
-        gateClient.relation.post(
-            RelationPostRequest(
+        gateClient.relation.put(
+            createIfNotExist = true,
+            singleUpserRequest(
                 externalId = relationId,
                 relationType = RelationType.IsManagedBy,
                 businessPartnerSourceExternalId = legalEntityId1,
@@ -850,7 +350,7 @@ class RelationIsManagedByIT @Autowired constructor(
         Assertions.assertThatExceptionOfType(BadRequest::class.java).isThrownBy {
             gateClient.relation.put(
                 createIfNotExist = false,
-                RelationPutRequest(
+                singleUpserRequest(
                     externalId = relationId,
                     relationType = RelationType.IsManagedBy,
                     businessPartnerSourceExternalId = legalEntityId3,
@@ -875,8 +375,9 @@ class RelationIsManagedByIT @Autowired constructor(
             createLegalEntityRequest(legalEntityId4)
         ))
 
-        gateClient.relation.post(
-            RelationPostRequest(
+        gateClient.relation.put(
+            createIfNotExist = true,
+            singleUpserRequest(
                 externalId = relationId,
                 relationType = RelationType.IsManagedBy,
                 businessPartnerSourceExternalId = legalEntityId1,
@@ -887,7 +388,7 @@ class RelationIsManagedByIT @Autowired constructor(
         Assertions.assertThatExceptionOfType(BadRequest::class.java).isThrownBy {
             gateClient.relation.put(
                 createIfNotExist = false,
-                RelationPutRequest(
+                singleUpserRequest(
                     externalId = relationId,
                     relationType = RelationType.IsManagedBy,
                     businessPartnerSourceExternalId = "NOT EXISTS",
@@ -912,8 +413,9 @@ class RelationIsManagedByIT @Autowired constructor(
             createLegalEntityRequest(legalEntityId4)
         ))
 
-        gateClient.relation.post(
-            RelationPostRequest(
+        gateClient.relation.put(
+            createIfNotExist = true,
+            singleUpserRequest(
                 externalId = relationId,
                 relationType = RelationType.IsManagedBy,
                 businessPartnerSourceExternalId = legalEntityId1,
@@ -924,7 +426,7 @@ class RelationIsManagedByIT @Autowired constructor(
         Assertions.assertThatExceptionOfType(BadRequest::class.java).isThrownBy {
             gateClient.relation.put(
                 createIfNotExist = false,
-                RelationPutRequest(
+                singleUpserRequest(
                     externalId = relationId,
                     relationType = RelationType.IsManagedBy,
                     businessPartnerSourceExternalId = legalEntityId3,
@@ -950,16 +452,18 @@ class RelationIsManagedByIT @Autowired constructor(
             createLegalEntityRequest(legalEntityId4)
         ))
 
-        gateClient.relation.post(
-            RelationPostRequest(
+        gateClient.relation.put(
+            createIfNotExist = true,
+            singleUpserRequest(
                 externalId = relationId1,
                 relationType = RelationType.IsManagedBy,
                 businessPartnerSourceExternalId = legalEntityId2,
                 businessPartnerTargetExternalId = legalEntityId1
             )
         )
-        gateClient.relation.post(
-            RelationPostRequest(
+        gateClient.relation.put(
+            createIfNotExist = true,
+            singleUpserRequest(
                 externalId = relationId2,
                 relationType = RelationType.IsManagedBy,
                 businessPartnerSourceExternalId = legalEntityId4,
@@ -970,7 +474,7 @@ class RelationIsManagedByIT @Autowired constructor(
         Assertions.assertThatExceptionOfType(BadRequest::class.java).isThrownBy {
             gateClient.relation.put(
                 createIfNotExist = false,
-                RelationPutRequest(
+                singleUpserRequest(
                     externalId = relationId2,
                     relationType = RelationType.IsManagedBy,
                     businessPartnerSourceExternalId = legalEntityId2,
@@ -996,16 +500,18 @@ class RelationIsManagedByIT @Autowired constructor(
             createLegalEntityRequest(legalEntityId4)
         ))
 
-        gateClient.relation.post(
-            RelationPostRequest(
+        gateClient.relation.put(
+            createIfNotExist = true,
+            singleUpserRequest(
                 externalId = relationId1,
                 relationType = RelationType.IsManagedBy,
                 businessPartnerSourceExternalId = legalEntityId1,
                 businessPartnerTargetExternalId = legalEntityId2
             )
         )
-        gateClient.relation.post(
-            RelationPostRequest(
+        gateClient.relation.put(
+            createIfNotExist = true,
+            singleUpserRequest(
                 externalId = relationId2,
                 relationType = RelationType.IsManagedBy,
                 businessPartnerSourceExternalId = legalEntityId3,
@@ -1016,7 +522,7 @@ class RelationIsManagedByIT @Autowired constructor(
         Assertions.assertThatExceptionOfType(BadRequest::class.java).isThrownBy {
             gateClient.relation.put(
                 createIfNotExist = false,
-                RelationPutRequest(
+                singleUpserRequest(
                     externalId = relationId2,
                     relationType = RelationType.IsManagedBy,
                     businessPartnerSourceExternalId = legalEntityId3,
@@ -1042,16 +548,18 @@ class RelationIsManagedByIT @Autowired constructor(
             createLegalEntityRequest(legalEntityId4)
         ))
 
-        gateClient.relation.post(
-            RelationPostRequest(
+        gateClient.relation.put(
+            createIfNotExist = true,
+            singleUpserRequest(
                 externalId = relationId1,
                 relationType = RelationType.IsManagedBy,
                 businessPartnerSourceExternalId = legalEntityId1,
                 businessPartnerTargetExternalId = legalEntityId2
             )
         )
-        gateClient.relation.post(
-            RelationPostRequest(
+        gateClient.relation.put(
+            createIfNotExist = true,
+            singleUpserRequest(
                 externalId = relationId2,
                 relationType = RelationType.IsManagedBy,
                 businessPartnerSourceExternalId = legalEntityId3,
@@ -1062,7 +570,7 @@ class RelationIsManagedByIT @Autowired constructor(
         Assertions.assertThatExceptionOfType(BadRequest::class.java).isThrownBy {
             gateClient.relation.put(
                 createIfNotExist = false,
-                RelationPutRequest(
+                singleUpserRequest(
                     externalId = relationId2,
                     relationType = RelationType.IsManagedBy,
                     businessPartnerSourceExternalId = legalEntityId2,
@@ -1086,7 +594,7 @@ class RelationIsManagedByIT @Autowired constructor(
         val beforePost = Instant.now()
         val response = gateClient.relation.put(
             createIfNotExist = true,
-            RelationPutRequest(
+            singleUpserRequest(
                 externalId = relationId,
                 relationType = RelationType.IsManagedBy,
                 businessPartnerSourceExternalId = legalEntityId1,
@@ -1121,7 +629,7 @@ class RelationIsManagedByIT @Autowired constructor(
         val beforePost = Instant.now()
         val response = gateClient.relation.put(
             createIfNotExist = true,
-            RelationPutRequest(
+            singleUpserRequest(
                 externalId = relationId,
                 relationType = RelationType.IsManagedBy,
                 businessPartnerSourceExternalId = legalEntityId1,
@@ -1155,8 +663,9 @@ class RelationIsManagedByIT @Autowired constructor(
             createLegalEntityRequest(legalEntityId2),
             createLegalEntityRequest(legalEntityId3)
         ))
-        gateClient.relation.post(
-            RelationPostRequest(
+        gateClient.relation.put(
+            createIfNotExist = true,
+            singleUpserRequest(
                 externalId = relationId1,
                 relationType = RelationType.IsManagedBy,
                 businessPartnerSourceExternalId = legalEntityId2,
@@ -1167,7 +676,7 @@ class RelationIsManagedByIT @Autowired constructor(
         val beforePost = Instant.now()
         val response = gateClient.relation.put(
             createIfNotExist = true,
-            RelationPutRequest(
+            singleUpserRequest(
                 externalId = relationId2,
                 relationType = RelationType.IsManagedBy,
                 businessPartnerSourceExternalId = legalEntityId3,
@@ -1203,8 +712,9 @@ class RelationIsManagedByIT @Autowired constructor(
         )
         gateClient.businessParters.upsertBusinessPartnersInput(legalEntities)
         val beforeCreate = Instant.now()
-        gateClient.relation.post(
-            RelationPostRequest(
+        gateClient.relation.put(
+            createIfNotExist = true,
+            singleUpserRequest(
                 externalId = testName,
                 relationType = RelationType.IsManagedBy,
                 businessPartnerSourceExternalId = legalEntityId1,
@@ -1216,7 +726,7 @@ class RelationIsManagedByIT @Autowired constructor(
         val beforePut = Instant.now()
         val response = gateClient.relation.put(
             createIfNotExist = true,
-            RelationPutRequest(
+            singleUpserRequest(
                 externalId = testName,
                 relationType = RelationType.IsManagedBy,
                 businessPartnerSourceExternalId = legalEntityId3,
@@ -1257,7 +767,7 @@ class RelationIsManagedByIT @Autowired constructor(
         Assertions.assertThatExceptionOfType(BadRequest::class.java).isThrownBy {
             gateClient.relation.put(
                 createIfNotExist = true,
-                RelationPutRequest(
+                singleUpserRequest(
                     externalId = testName,
                     relationType = RelationType.IsManagedBy,
                     businessPartnerSourceExternalId = legalEntityId1,
@@ -1281,7 +791,7 @@ class RelationIsManagedByIT @Autowired constructor(
         Assertions.assertThatExceptionOfType(BadRequest::class.java).isThrownBy {
             gateClient.relation.put(
                 createIfNotExist = true,
-                RelationPutRequest(
+                singleUpserRequest(
                     externalId = testName,
                     relationType = RelationType.IsManagedBy,
                     businessPartnerSourceExternalId = legalEntityId1,
@@ -1305,7 +815,7 @@ class RelationIsManagedByIT @Autowired constructor(
         Assertions.assertThatExceptionOfType(BadRequest::class.java).isThrownBy {
             gateClient.relation.put(
                 createIfNotExist = true,
-                RelationPutRequest(
+                singleUpserRequest(
                     externalId = testName,
                     relationType = RelationType.IsManagedBy,
                     businessPartnerSourceExternalId = legalEntityId1,
@@ -1329,7 +839,7 @@ class RelationIsManagedByIT @Autowired constructor(
         Assertions.assertThatExceptionOfType(BadRequest::class.java).isThrownBy {
             gateClient.relation.put(
                 createIfNotExist = true,
-                RelationPutRequest(
+                singleUpserRequest(
                     externalId = testName,
                     relationType = RelationType.IsManagedBy,
                     businessPartnerSourceExternalId = legalEntityId1,
@@ -1353,7 +863,7 @@ class RelationIsManagedByIT @Autowired constructor(
         Assertions.assertThatExceptionOfType(BadRequest::class.java).isThrownBy {
             gateClient.relation.put(
                 createIfNotExist = true,
-                RelationPutRequest(
+                singleUpserRequest(
                     externalId = testName,
                     relationType = RelationType.IsManagedBy,
                     businessPartnerSourceExternalId = legalEntityId1,
@@ -1377,7 +887,7 @@ class RelationIsManagedByIT @Autowired constructor(
         Assertions.assertThatExceptionOfType(BadRequest::class.java).isThrownBy {
             gateClient.relation.put(
                 createIfNotExist = true,
-                RelationPutRequest(
+                singleUpserRequest(
                     externalId = testName,
                     relationType = RelationType.IsManagedBy,
                     businessPartnerSourceExternalId = legalEntityId1,
@@ -1399,7 +909,7 @@ class RelationIsManagedByIT @Autowired constructor(
         Assertions.assertThatExceptionOfType(BadRequest::class.java).isThrownBy {
             gateClient.relation.put(
                 createIfNotExist = true,
-                RelationPutRequest(
+                singleUpserRequest(
                     externalId = testName,
                     relationType = RelationType.IsManagedBy,
                     businessPartnerSourceExternalId = legalEntityId1,
@@ -1421,7 +931,7 @@ class RelationIsManagedByIT @Autowired constructor(
         Assertions.assertThatExceptionOfType(BadRequest::class.java).isThrownBy {
             gateClient.relation.put(
                 createIfNotExist = true,
-                RelationPutRequest(
+                singleUpserRequest(
                     externalId = testName,
                     relationType = RelationType.IsManagedBy,
                     businessPartnerSourceExternalId = "NOT EXIST",
@@ -1443,7 +953,7 @@ class RelationIsManagedByIT @Autowired constructor(
         Assertions.assertThatExceptionOfType(BadRequest::class.java).isThrownBy {
             gateClient.relation.put(
                 createIfNotExist = true,
-                RelationPutRequest(
+                singleUpserRequest(
                     externalId = testName,
                     relationType = RelationType.IsManagedBy,
                     businessPartnerSourceExternalId = legalEntityId1,
@@ -1466,7 +976,7 @@ class RelationIsManagedByIT @Autowired constructor(
         ))
         gateClient.relation.put(
             createIfNotExist = true,
-            RelationPutRequest(
+            singleUpserRequest(
                 externalId = "$testName Relation 1",
                 relationType = RelationType.IsManagedBy,
                 businessPartnerSourceExternalId = legalEntityId2,
@@ -1475,8 +985,9 @@ class RelationIsManagedByIT @Autowired constructor(
         )
 
         Assertions.assertThatExceptionOfType(BadRequest::class.java).isThrownBy {
-            gateClient.relation.post(
-                RelationPostRequest(
+            gateClient.relation.put(
+                createIfNotExist = true,
+                singleUpserRequest(
                     externalId = "$testName Relation 2",
                     relationType = RelationType.IsManagedBy,
                     businessPartnerSourceExternalId = legalEntityId2,
@@ -1497,8 +1008,9 @@ class RelationIsManagedByIT @Autowired constructor(
             createLegalEntityRequest(legalEntityId2),
             createLegalEntityRequest(legalEntityId3),
         ))
-        gateClient.relation.post(
-            RelationPostRequest(
+        gateClient.relation.put(
+            createIfNotExist = true,
+            singleUpserRequest(
                 externalId = "$testName Relation 1",
                 relationType = RelationType.IsManagedBy,
                 businessPartnerSourceExternalId = legalEntityId1,
@@ -1509,7 +1021,7 @@ class RelationIsManagedByIT @Autowired constructor(
         Assertions.assertThatExceptionOfType(BadRequest::class.java).isThrownBy {
             gateClient.relation.put(
                 createIfNotExist = true,
-                RelationPutRequest(
+                singleUpserRequest(
                     externalId = "$testName Relation 2",
                     relationType = RelationType.IsManagedBy,
                     businessPartnerSourceExternalId = legalEntityId3,
@@ -1530,8 +1042,9 @@ class RelationIsManagedByIT @Autowired constructor(
             createLegalEntityRequest(legalEntityId2),
             createLegalEntityRequest(legalEntityId3),
         ))
-        gateClient.relation.post(
-            RelationPostRequest(
+        gateClient.relation.put(
+            createIfNotExist = true,
+            singleUpserRequest(
                 externalId = "$testName Relation 1",
                 relationType = RelationType.IsManagedBy,
                 businessPartnerSourceExternalId = legalEntityId1,
@@ -1542,90 +1055,13 @@ class RelationIsManagedByIT @Autowired constructor(
         Assertions.assertThatExceptionOfType(BadRequest::class.java).isThrownBy {
             gateClient.relation.put(
                 createIfNotExist = true,
-                RelationPutRequest(
+                singleUpserRequest(
                     externalId = "$testName Relation 2",
                     relationType = RelationType.IsManagedBy,
                     businessPartnerSourceExternalId = legalEntityId2,
                     businessPartnerTargetExternalId = legalEntityId3
                 )
             )
-        }
-    }
-
-    @Test
-    fun deleteRelation(){
-        val legalEntityId1 = "$testName LE 1"
-        val legalEntityId2 = "$testName LE 2"
-        val relationId = "$testName Relation"
-
-        gateClient.businessParters.upsertBusinessPartnersInput(listOf(
-            createLegalEntityRequest(legalEntityId1),
-            createLegalEntityRequest(legalEntityId2)
-        ))
-
-        gateClient.relation.post(
-            RelationPostRequest(
-                externalId = relationId,
-                relationType = RelationType.IsManagedBy,
-                businessPartnerSourceExternalId = legalEntityId1,
-                businessPartnerTargetExternalId = legalEntityId2
-            )
-        )
-
-        gateClient.relation.delete(externalId = relationId)
-
-        val response = gateClient.relation.get(externalIds = listOf(relationId))
-        Assertions.assertThat(response.content).isEmpty()
-    }
-
-    @Test
-    fun deleteRelationWithTenant(){
-        val legalEntityId1 = "$testName LE 1"
-        val legalEntityId2 = "$testName LE 2"
-        val relationId = "$testName Relation"
-
-        gateClient.businessParters.upsertBusinessPartnersInput(listOf(
-            createLegalEntityRequest(legalEntityId1),
-            createLegalEntityRequest(legalEntityId2)
-        ))
-
-        gateClient.relation.post(
-            RelationPostRequest(
-                externalId = relationId,
-                relationType = RelationType.IsManagedBy,
-                businessPartnerSourceExternalId = legalEntityId1,
-                businessPartnerTargetExternalId = legalEntityId2
-            )
-        )
-
-        gateClient.relation.delete(externalId = relationId)
-
-        val response = gateClient.relation.get(externalIds = listOf(relationId))
-        Assertions.assertThat(response.content).isEmpty()
-    }
-
-    @Test
-    fun deleteRelationWithIdNotExists(){
-        val legalEntityId1 = "$testName LE 1"
-        val legalEntityId2 = "$testName LE 2"
-        val relationId = "$testName Relation"
-
-        gateClient.businessParters.upsertBusinessPartnersInput(listOf(
-            createLegalEntityRequest(legalEntityId1),
-            createLegalEntityRequest(legalEntityId2)
-        ))
-
-        gateClient.relation.post(
-            RelationPostRequest(
-                externalId = relationId,
-                relationType = RelationType.IsManagedBy,
-                businessPartnerSourceExternalId = legalEntityId1,
-                businessPartnerTargetExternalId = legalEntityId2
-            )
-        )
-
-        Assertions.assertThatExceptionOfType(BadRequest::class.java).isThrownBy {
-            gateClient.relation.delete(externalId = "NOT EXISTS")
         }
     }
 
@@ -1647,37 +1083,38 @@ class RelationIsManagedByIT @Autowired constructor(
         ))
 
         val beforeCreation = Instant.now()
-        val postResponses = listOf(
-            gateClient.relation.post(
-                RelationPostRequest(
-                    externalId = relationId1,
-                    relationType = RelationType.IsManagedBy,
-                    businessPartnerSourceExternalId = legalEntityId2,
-                    businessPartnerTargetExternalId = legalEntityId1
-                )
-            ),
-            gateClient.relation.post(
-                    RelationPostRequest(
+        val postResponse =  gateClient.relation.put(
+            createIfNotExist = true,
+            RelationPutRequest(
+                relations = listOf(
+                    RelationPutEntry(
+                        externalId = relationId1,
+                        relationType = RelationType.IsManagedBy,
+                        businessPartnerSourceExternalId = legalEntityId2,
+                        businessPartnerTargetExternalId = legalEntityId1
+                    ),
+                    RelationPutEntry(
                         externalId = relationId2,
                         relationType = RelationType.IsManagedBy,
                         businessPartnerSourceExternalId = legalEntityId3,
-                        businessPartnerTargetExternalId = legalEntityId1)
-            ),
-            gateClient.relation.post(
-                    RelationPostRequest(
-                        externalId = relationId3,
-                        relationType = RelationType.IsManagedBy,
-                        businessPartnerSourceExternalId = legalEntityId4,
                         businessPartnerTargetExternalId = legalEntityId1
-                    )
+                    ),
+                RelationPutEntry(
+                    externalId = relationId3,
+                    relationType = RelationType.IsManagedBy,
+                    businessPartnerSourceExternalId = legalEntityId4,
+                    businessPartnerTargetExternalId = legalEntityId1
+                )
+                )
             )
         )
+
         val afterCreation = Instant.now()
 
 
-        val response = gateClient.relation.get()
+        val response = gateClient.relation.postSearch()
 
-        val expectation = PageDto(3, 1, 0, 3, postResponses)
+        val expectation = PageDto(3, 1, 0, 3, postResponse.upsertedRelations)
 
         assertRelationPage(response, expectation, Timeframe(beforeCreation, afterCreation))
     }
@@ -1700,36 +1137,38 @@ class RelationIsManagedByIT @Autowired constructor(
         ))
 
         val beforeCreation = Instant.now()
-        val postResponses = listOf(
-            gateClient.relation.post(
-                RelationPostRequest(
-                    externalId = relationId1,
-                    relationType = RelationType.IsManagedBy,
-                    businessPartnerSourceExternalId = legalEntityId2,
-                    businessPartnerTargetExternalId = legalEntityId1
-                )
-            ),
-            gateClient.relation.post(
-                RelationPostRequest(
-                    externalId = relationId2,
-                    relationType = RelationType.IsManagedBy,
-                    businessPartnerSourceExternalId = legalEntityId3,
-                    businessPartnerTargetExternalId = legalEntityId1)
-            ),
-            gateClient.relation.post(
-                RelationPostRequest(
-                    externalId = relationId3,
-                    relationType = RelationType.IsManagedBy,
-                    businessPartnerSourceExternalId = legalEntityId4,
-                    businessPartnerTargetExternalId = legalEntityId1
+        val postResponse = gateClient.relation.put(
+            createIfNotExist = true,
+            RelationPutRequest(
+                relations = listOf(
+                    RelationPutEntry(
+                        externalId = relationId1,
+                        relationType = RelationType.IsManagedBy,
+                        businessPartnerSourceExternalId = legalEntityId2,
+                        businessPartnerTargetExternalId = legalEntityId1
+                    ),
+                    RelationPutEntry(
+                        externalId = relationId2,
+                        relationType = RelationType.IsManagedBy,
+                        businessPartnerSourceExternalId = legalEntityId3,
+                        businessPartnerTargetExternalId = legalEntityId1
+                    ),
+                    RelationPutEntry(
+                        externalId = relationId3,
+                        relationType = RelationType.IsManagedBy,
+                        businessPartnerSourceExternalId = legalEntityId4,
+                        businessPartnerTargetExternalId = legalEntityId1
+                    )
                 )
             )
         )
+
         val afterCreation = Instant.now()
 
-        val response = gateClient.relation.get(externalIds = listOf(relationId1, relationId2))
+        val response = gateClient.relation.postSearch(RelationSearchRequest(externalIds = listOf(relationId1, relationId2)))
 
-        val expectation = PageDto(2, 1, 0, 2, postResponses.filter { it.externalId in listOf(relationId1, relationId2)  })
+        val expectedRelations = postResponse.upsertedRelations.filter { it.externalId in listOf(relationId1, relationId2) }
+        val expectation = PageDto(2, 1, 0, 2, expectedRelations )
 
         assertRelationPage(response, expectation, Timeframe(beforeCreation, afterCreation))
     }
@@ -1752,36 +1191,37 @@ class RelationIsManagedByIT @Autowired constructor(
         ))
 
         val beforeCreation = Instant.now()
-        val postResponses = listOf(
-            gateClient.relation.post(
-                RelationPostRequest(
-                    externalId = relationId1,
-                    relationType = RelationType.IsManagedBy,
-                    businessPartnerSourceExternalId = legalEntityId2,
-                    businessPartnerTargetExternalId = legalEntityId1
-                )
-            ),
-            gateClient.relation.post(
-                RelationPostRequest(
-                    externalId = relationId2,
-                    relationType = RelationType.IsManagedBy,
-                    businessPartnerSourceExternalId = legalEntityId3,
-                    businessPartnerTargetExternalId = legalEntityId1)
-            ),
-            gateClient.relation.post(
-                RelationPostRequest(
-                    externalId = relationId3,
-                    relationType = RelationType.IsManagedBy,
-                    businessPartnerSourceExternalId = legalEntityId4,
-                    businessPartnerTargetExternalId = legalEntityId1
+        val postResponse = gateClient.relation.put(
+            createIfNotExist = true,
+            RelationPutRequest(
+                relations = listOf(
+                    RelationPutEntry(
+                        externalId = relationId1,
+                        relationType = RelationType.IsManagedBy,
+                        businessPartnerSourceExternalId = legalEntityId2,
+                        businessPartnerTargetExternalId = legalEntityId1
+                    ),
+                    RelationPutEntry(
+                        externalId = relationId2,
+                        relationType = RelationType.IsManagedBy,
+                        businessPartnerSourceExternalId = legalEntityId3,
+                        businessPartnerTargetExternalId = legalEntityId1
+                    ),
+                    RelationPutEntry(
+                        externalId = relationId3,
+                        relationType = RelationType.IsManagedBy,
+                        businessPartnerSourceExternalId = legalEntityId4,
+                        businessPartnerTargetExternalId = legalEntityId1
+                    )
                 )
             )
         )
+
         val afterCreation = Instant.now()
 
-        val response = gateClient.relation.get(relationType = RelationType.IsManagedBy)
+        val response = gateClient.relation.postSearch(RelationSearchRequest(relationType = RelationType.IsManagedBy))
 
-        val expectation = PageDto(3, 1, 0, 3, postResponses)
+        val expectation = PageDto(3, 1, 0, 3, postResponse.upsertedRelations)
 
         assertRelationPage(response, expectation, Timeframe(beforeCreation, afterCreation))
     }
@@ -1809,44 +1249,43 @@ class RelationIsManagedByIT @Autowired constructor(
         ))
 
         val beforeCreation = Instant.now()
-        val postResponses = listOf(
-            gateClient.relation.post(
-                RelationPostRequest(
-                    externalId = relationId1,
-                    relationType = RelationType.IsManagedBy,
-                    businessPartnerSourceExternalId = legalEntityId2,
-                    businessPartnerTargetExternalId = legalEntityId1
-                )
-            ),
-            gateClient.relation.post(
-                RelationPostRequest(
-                    externalId = relationId2,
-                    relationType = RelationType.IsManagedBy,
-                    businessPartnerSourceExternalId = legalEntityId3,
-                    businessPartnerTargetExternalId = legalEntityId1)
-            ),
-            gateClient.relation.post(
-                RelationPostRequest(
-                    externalId = relationId3,
-                    relationType = RelationType.IsManagedBy,
-                    businessPartnerSourceExternalId = legalEntityId4,
-                    businessPartnerTargetExternalId = legalEntityId1
-                )
-            ),
-            gateClient.relation.post(
-                RelationPostRequest(
-                    externalId = relationId4,
-                    relationType = RelationType.IsManagedBy,
-                    businessPartnerSourceExternalId = legalEntityId5,
-                    businessPartnerTargetExternalId = legalEntityId6
+        val postResponse = gateClient.relation.put(
+            createIfNotExist = true,
+            RelationPutRequest(
+                relations = listOf(
+                    RelationPutEntry(
+                        externalId = relationId1,
+                        relationType = RelationType.IsManagedBy,
+                        businessPartnerSourceExternalId = legalEntityId2,
+                        businessPartnerTargetExternalId = legalEntityId1
+                    ),
+                    RelationPutEntry(
+                        externalId = relationId2,
+                        relationType = RelationType.IsManagedBy,
+                        businessPartnerSourceExternalId = legalEntityId3,
+                        businessPartnerTargetExternalId = legalEntityId1
+                    ),
+                    RelationPutEntry(
+                        externalId = relationId3,
+                        relationType = RelationType.IsManagedBy,
+                        businessPartnerSourceExternalId = legalEntityId4,
+                        businessPartnerTargetExternalId = legalEntityId1
+                    ),
+                    RelationPutEntry(
+                        externalId = relationId4,
+                        relationType = RelationType.IsManagedBy,
+                        businessPartnerSourceExternalId = legalEntityId5,
+                        businessPartnerTargetExternalId = legalEntityId6
+                    )
                 )
             )
         )
         val afterCreation = Instant.now()
 
-        val response = gateClient.relation.get(businessPartnerTargetExternalIds = listOf(legalEntityId1))
+        val response = gateClient.relation.postSearch(RelationSearchRequest(businessPartnerTargetExternalIds = listOf(legalEntityId1)))
 
-        val expectation = PageDto(3, 1, 0, 3, postResponses.filter { it.externalId in listOf(relationId1, relationId2, relationId3) })
+        val expectedRelations = postResponse.upsertedRelations.filter { it.externalId in listOf(relationId1, relationId2, relationId3) }
+        val expectation = PageDto(3, 1, 0, 3, expectedRelations )
 
         assertRelationPage(response, expectation, Timeframe(beforeCreation, afterCreation))
     }
@@ -1869,36 +1308,37 @@ class RelationIsManagedByIT @Autowired constructor(
         ))
 
         val beforeCreation = Instant.now()
-        val postResponses = listOf(
-            gateClient.relation.post(
-                RelationPostRequest(
-                    externalId = relationId1,
-                    relationType = RelationType.IsManagedBy,
-                    businessPartnerSourceExternalId = legalEntityId2,
-                    businessPartnerTargetExternalId = legalEntityId1
-                )
-            ),
-            gateClient.relation.post(
-                RelationPostRequest(
-                    externalId = relationId2,
-                    relationType = RelationType.IsManagedBy,
-                    businessPartnerSourceExternalId = legalEntityId3,
-                    businessPartnerTargetExternalId = legalEntityId1)
-            ),
-            gateClient.relation.post(
-                RelationPostRequest(
-                    externalId = relationId3,
-                    relationType = RelationType.IsManagedBy,
-                    businessPartnerSourceExternalId = legalEntityId4,
-                    businessPartnerTargetExternalId = legalEntityId1
+        val postResponse = gateClient.relation.put(
+            createIfNotExist = true,
+            RelationPutRequest(
+                relations = listOf(
+                    RelationPutEntry(
+                        externalId = relationId1,
+                        relationType = RelationType.IsManagedBy,
+                        businessPartnerSourceExternalId = legalEntityId2,
+                        businessPartnerTargetExternalId = legalEntityId1
+                    ),
+                    RelationPutEntry(
+                        externalId = relationId2,
+                        relationType = RelationType.IsManagedBy,
+                        businessPartnerSourceExternalId = legalEntityId3,
+                        businessPartnerTargetExternalId = legalEntityId1
+                    ),
+                    RelationPutEntry(
+                        externalId = relationId3,
+                        relationType = RelationType.IsManagedBy,
+                        businessPartnerSourceExternalId = legalEntityId4,
+                        businessPartnerTargetExternalId = legalEntityId1
+                    )
                 )
             )
         )
         val afterCreation = Instant.now()
 
-        val response = gateClient.relation.get(businessPartnerSourceExternalIds = listOf(legalEntityId2, legalEntityId3))
+        val response = gateClient.relation.postSearch(RelationSearchRequest(businessPartnerSourceExternalIds = listOf(legalEntityId2, legalEntityId3)))
 
-        val expectation = PageDto(2, 1, 0, 2, postResponses.filter { it.externalId in listOf(relationId1, relationId2) })
+        val expectedRelations = postResponse.upsertedRelations.filter { it.externalId in listOf(relationId1, relationId2) }
+        val expectation = PageDto(2, 1, 0, 2, expectedRelations )
 
         assertRelationPage(response, expectation, Timeframe(beforeCreation, afterCreation))
     }
@@ -1920,8 +1360,9 @@ class RelationIsManagedByIT @Autowired constructor(
             createLegalEntityRequest(legalEntityId4)
         ))
 
-        gateClient.relation.post(
-            RelationPostRequest(
+        gateClient.relation.put(
+            createIfNotExist = true,
+            singleUpserRequest(
                 externalId = relationId1,
                 relationType = RelationType.IsManagedBy,
                 businessPartnerSourceExternalId = legalEntityId2,
@@ -1930,28 +1371,30 @@ class RelationIsManagedByIT @Autowired constructor(
         )
 
         val beforeCreation = Instant.now()
-        val postResponses = listOf(
-            gateClient.relation.post(
-                RelationPostRequest(
-                    externalId = relationId2,
-                    relationType = RelationType.IsManagedBy,
-                    businessPartnerSourceExternalId = legalEntityId3,
-                    businessPartnerTargetExternalId = legalEntityId1)
-            ),
-            gateClient.relation.post(
-                RelationPostRequest(
-                    externalId = relationId3,
-                    relationType = RelationType.IsManagedBy,
-                    businessPartnerSourceExternalId = legalEntityId4,
-                    businessPartnerTargetExternalId = legalEntityId1
+        val postResponse = gateClient.relation.put(
+            createIfNotExist = true,
+            RelationPutRequest(
+                relations = listOf(
+                    RelationPutEntry(
+                        externalId = relationId2,
+                        relationType = RelationType.IsManagedBy,
+                        businessPartnerSourceExternalId = legalEntityId3,
+                        businessPartnerTargetExternalId = legalEntityId1
+                    ),
+                    RelationPutEntry(
+                        externalId = relationId3,
+                        relationType = RelationType.IsManagedBy,
+                        businessPartnerSourceExternalId = legalEntityId4,
+                        businessPartnerTargetExternalId = legalEntityId1
+                    )
                 )
             )
         )
         val afterCreation = Instant.now()
 
-        val response = gateClient.relation.get(updatedAtFrom = beforeCreation)
+        val response = gateClient.relation.postSearch(RelationSearchRequest(updatedAtFrom = beforeCreation))
 
-        val expectation = PageDto(2, 1, 0, 2, postResponses)
+        val expectation = PageDto(2, 1, 0, 2, postResponse.upsertedRelations)
 
         assertRelationPage(response, expectation, Timeframe(beforeCreation, afterCreation))
     }
@@ -1973,8 +1416,9 @@ class RelationIsManagedByIT @Autowired constructor(
             createLegalEntityRequest(legalEntityId4)
         ))
 
-        gateClient.relation.post(
-            RelationPostRequest(
+        gateClient.relation.put(
+            createIfNotExist = true,
+            singleUpserRequest(
                 externalId = relationId1,
                 relationType = RelationType.IsManagedBy,
                 businessPartnerSourceExternalId = legalEntityId2,
@@ -1983,34 +1427,39 @@ class RelationIsManagedByIT @Autowired constructor(
         )
 
         val beforeCreation = Instant.now()
-        val postResponses = listOf(
-            gateClient.relation.post(
-                RelationPostRequest(
-                    externalId = relationId2,
-                    relationType = RelationType.IsManagedBy,
-                    businessPartnerSourceExternalId = legalEntityId3,
-                    businessPartnerTargetExternalId = legalEntityId1)
-            ),
-            gateClient.relation.post(
-                RelationPostRequest(
-                    externalId = relationId3,
-                    relationType = RelationType.IsManagedBy,
-                    businessPartnerSourceExternalId = legalEntityId4,
-                    businessPartnerTargetExternalId = legalEntityId1
+        val postResponse = gateClient.relation.put(
+            createIfNotExist = true,
+            RelationPutRequest(
+                relations = listOf(
+                    RelationPutEntry(
+                        externalId = relationId2,
+                        relationType = RelationType.IsManagedBy,
+                        businessPartnerSourceExternalId = legalEntityId3,
+                        businessPartnerTargetExternalId = legalEntityId1
+                    ),
+                    RelationPutEntry(
+                        externalId = relationId3,
+                        relationType = RelationType.IsManagedBy,
+                        businessPartnerSourceExternalId = legalEntityId4,
+                        businessPartnerTargetExternalId = legalEntityId1
+                    )
                 )
             )
         )
         val afterCreation = Instant.now()
 
-        val response = gateClient.relation.get(
-            externalIds = listOf(relationId3),
-            relationType = RelationType.IsManagedBy,
-            businessPartnerSourceExternalIds = listOf(legalEntityId4),
-            businessPartnerTargetExternalIds = listOf(legalEntityId1),
-            updatedAtFrom = beforeCreation
+        val response = gateClient.relation.postSearch(
+            RelationSearchRequest(
+                externalIds = listOf(relationId3),
+                relationType = RelationType.IsManagedBy,
+                businessPartnerSourceExternalIds = listOf(legalEntityId4),
+                businessPartnerTargetExternalIds = listOf(legalEntityId1),
+                updatedAtFrom = beforeCreation
+            )
         )
 
-        val expectation = PageDto(1, 1, 0, 1, postResponses.filter { it.externalId == relationId3 })
+        val expectedRelations = postResponse.upsertedRelations.filter { it.externalId == relationId3 }
+        val expectation = PageDto(1, 1, 0, 1, expectedRelations)
 
         assertRelationPage(response, expectation, Timeframe(beforeCreation, afterCreation))
     }
@@ -2040,6 +1489,16 @@ class RelationIsManagedByIT @Autowired constructor(
 
     }
 
+    private fun assertRelation(
+        actual: RelationPutResponse,
+        expectation: RelationDto,
+        updateTimeframe: Timeframe,
+        createTimeframe: Timeframe = updateTimeframe,
+        ignoreExternalId: Boolean = true
+    ){
+        Assertions.assertThat(actual.upsertedRelations.size).isEqualTo(1)
+        assertRelation(actual.upsertedRelations.single(), expectation, updateTimeframe, createTimeframe, ignoreExternalId)
+    }
 
     private fun assertRelation(
         actual: RelationDto,
@@ -2067,4 +1526,20 @@ class RelationIsManagedByIT @Autowired constructor(
         inputFactory.createAllFieldsFilled(externalId).request
             .withAddressType(AddressType.LegalAddress)
             .copy(isOwnCompanyData = true)
+
+    private fun singleUpserRequest(
+        externalId: String,
+        relationType: RelationType,
+        businessPartnerSourceExternalId: String,
+        businessPartnerTargetExternalId: String
+    ) = RelationPutRequest(
+        listOf(
+            RelationPutEntry(
+                externalId = externalId,
+                relationType = relationType,
+                businessPartnerSourceExternalId = businessPartnerSourceExternalId,
+                businessPartnerTargetExternalId = businessPartnerTargetExternalId
+        )
+        )
+    )
 }

@@ -106,23 +106,13 @@ abstract class AuthTestBase(
     }
 
     @Test
-    fun `GET Relations`() {
-        authAssertions.assert(authExpectations.relation.get) { gateClient.relation.get() }
-    }
-
-    @Test
-    fun `POST Relations`() {
-        authAssertions.assert(authExpectations.relation.post) { gateClient.relation.post(RelationPostRequest(null, RelationType.IsManagedBy, "", "")) }
+    fun `POST SEARCH Relations`() {
+        authAssertions.assert(authExpectations.relation.postSearch) { gateClient.relation.postSearch() }
     }
 
     @Test
     fun `PUT Relations`() {
-        authAssertions.assert(authExpectations.relation.put) { gateClient.relation.put(true, RelationPutRequest("", RelationType.IsManagedBy, "", "")) }
-    }
-
-    @Test
-    fun `DELETE Relations`() {
-        authAssertions.assert(authExpectations.relation.delete) { gateClient.relation.delete( "") }
+        authAssertions.assert(authExpectations.relation.put) { gateClient.relation.put(true, RelationPutRequest(listOf( RelationPutEntry("", RelationType.IsManagedBy, "", "")))) }
     }
 
 }
@@ -165,8 +155,6 @@ data class UploadPartnerAuthExpections(
 )
 
 data class RelationAuthExpectations(
-    val get: AuthExpectationType,
-    val post: AuthExpectationType,
-    val put: AuthExpectationType,
-    val delete: AuthExpectationType
+    val postSearch: AuthExpectationType,
+    val put: AuthExpectationType
 )

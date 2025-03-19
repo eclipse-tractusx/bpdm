@@ -20,8 +20,19 @@
 package org.eclipse.tractusx.bpdm.gate.api.model.request
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
+import java.time.Instant
 
-@Schema(description = "A request to upsert the contents of the given relations")
-data class RelationPutRequest(
-    val relations: List<RelationPutEntry>
+@Schema(description = "Request payload containing search parameters for business partner relations")
+data class RelationSearchRequest(
+    @Schema(description = "Only show relations with the given external identifiers")
+    val externalIds: List<String>? = null,
+    @Schema(description = "Only show relations of the given type")
+    val relationType: RelationType? = null,
+    @Schema(description = "Only show relations which have the given business partners as sources")
+    val businessPartnerSourceExternalIds: List<String>? = null,
+    @Schema(description = "Only show relations which have the given business partners as targets")
+    val businessPartnerTargetExternalIds: List<String>? = null,
+    @Schema(description = "Only show relations which have been modified after the given time stamp")
+    val updatedAtFrom: Instant? = null,
 )

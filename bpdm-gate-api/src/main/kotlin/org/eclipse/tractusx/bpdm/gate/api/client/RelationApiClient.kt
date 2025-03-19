@@ -24,34 +24,25 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.GateRelationApi
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationDto
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
-import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPostRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationSearchRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.response.RelationPutResponse
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.service.annotation.*
-import java.time.Instant
+import org.springframework.web.service.annotation.HttpExchange
+import org.springframework.web.service.annotation.PostExchange
+import org.springframework.web.service.annotation.PutExchange
 
 @HttpExchange(GateRelationApi.RELATIONS_PATH)
 interface RelationApiClient: GateRelationApi {
 
-    @GetExchange
-    override fun get(
-        @RequestParam externalIds: List<String>?,
-        @RequestParam relationType: RelationType?,
-        @RequestParam businessPartnerSourceExternalIds: List<String>?,
-        @RequestParam businessPartnerTargetExternalIds: List<String>?,
-        @RequestParam updatedAtFrom: Instant?,
+    @PostExchange("/search")
+    override fun postSearch(
+        @RequestBody searchRequest: RelationSearchRequest,
         @ParameterObject @Valid paginationRequest: PaginationRequest
     ): PageDto<RelationDto>
 
-    @PostExchange
-    override fun post(@RequestBody requestBody: RelationPostRequest): RelationDto
-
     @PutExchange
-    override fun put(@RequestParam createIfNotExist: Boolean, @RequestBody  requestBody: RelationPutRequest): RelationDto
-
-    @DeleteExchange
-    override fun delete(@RequestParam externalId: String)
+    override fun put(@RequestParam createIfNotExist: Boolean, @RequestBody requestBody: RelationPutRequest): RelationPutResponse
 }

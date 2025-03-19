@@ -29,14 +29,13 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.GateRelationApi.Companion.RELATIONS_PATH
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationDto
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
-import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPostRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.GateErrorResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.RelationPutResponse
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
-import java.time.Instant
 
 @RequestMapping(RELATIONS_PATH, produces = [MediaType.APPLICATION_JSON_VALUE])
 interface GateRelationApi {
@@ -56,46 +55,11 @@ interface GateRelationApi {
             ApiResponse(responseCode = "200", description = "A paginated list of business partner relations for the input stage")
         ]
     )
-    @GetMapping
-    fun get(
-        @Schema(description = "Only show relations with the given external identifiers")
-        @RequestParam externalIds: List<String>? = null,
-        @Schema(description = "Only show relations of the given type")
-        @RequestParam relationType: RelationType? = null,
-        @Schema(description = "Only show relations which have the given business partners as sources")
-        @RequestParam businessPartnerSourceExternalIds: List<String>? = null,
-        @Schema(description = "Only show relations which have the given business partners as targets")
-        @RequestParam businessPartnerTargetExternalIds: List<String>? = null,
-        @Schema(description = "Only show relations which have been modified after the given time stamp")
-        @RequestParam updatedAtFrom: Instant? = null,
+    @PostMapping("/search")
+    fun postSearch(
+        @RequestBody searchRequest: RelationSearchRequest = RelationSearchRequest(),
         @ParameterObject @Valid paginationRequest: PaginationRequest = PaginationRequest()
     ): PageDto<RelationDto>
-
-    @Operation(
-        summary = "Create a new business partner input relation",
-        description = "Create a new relation between two business partner entries on the input stage. " +
-                "The external identifier is optional and a new one will be automatically created if not given. " +
-                "A given external identifier has to be unique."
-    )
-    @ApiResponses(
-        value = [
-            ApiResponse(responseCode = "201", description = "The created business partner input relation"),
-            ApiResponse(responseCode = "400", description = "If the business partner could not be created based on wrong or insufficient data provided such as non-existent business partners or violated relation constraints. ",
-                content = [Content(
-                    mediaType = "application/json",
-                    schema = Schema(implementation = GateErrorResponse::class)
-                )]),
-            ApiResponse(responseCode = "409", description = "If a relation with the given external identifier already exists",
-                content = [Content(
-                    mediaType = "application/json",
-                    schema = Schema(implementation = GateErrorResponse::class)
-                )]),
-        ]
-    )
-    @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE])
-    fun post(
-        @RequestBody requestBody: RelationPostRequest
-    ): RelationDto
 
     @Operation(
         summary = "Update a business partner input relation",
@@ -115,29 +79,8 @@ interface GateRelationApi {
     @PutMapping(consumes = [MediaType.APPLICATION_JSON_VALUE])
     fun put(
         @Schema(description = "If true a business partner relation will be created even if a relation could not be found under the given external identifier.")
-        @RequestParam createIfNotExist: Boolean = false,
+        @RequestParam createIfNotExist: Boolean = true,
         @RequestBody requestBody: RelationPutRequest
-       ): RelationDto
-
-    @Operation(
-        summary = "Delete an existing business partner relation",
-        description = "Delete a relation between two business partners on the input stage."
-    )
-    @ApiResponses(
-        value = [
-            ApiResponse(responseCode = "200", description = "The specified relation has been deleted."),
-            ApiResponse(responseCode = "400", description = "On specifying a relation that does not exist. ",
-                content = [Content(
-                    mediaType = "application/json",
-                    schema = Schema(implementation = GateErrorResponse::class)
-                )])
-        ]
-    )
-    @DeleteMapping
-    fun delete(
-        @Schema(description = "The external identifier of the business partner relation to delete")
-        @RequestParam externalId: String
-    )
-
+       ): RelationPutResponse
 
 }

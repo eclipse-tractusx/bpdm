@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.common.mapping.types.BpnLString
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
+import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
 import java.time.Instant
 
 interface IRelationService {
@@ -40,38 +41,9 @@ interface IRelationService {
         paginationRequest: PaginationRequest
     ): PageDto<RelationDto>
 
-    fun createRelation(
-        tenantBpnL: BpnLString,
-        stageType: StageType,
-        externalId: String?,
-        relationType: RelationType,
-        sourceBusinessPartnerExternalId: String,
-        targetBusinessPartnerExternalId: String
-    ): RelationDto
+    fun upsertRelations(tenantBpnL: BpnLString, stageType: StageType, relations: List<RelationPutEntry>): List<RelationDto>
 
-    fun upsertRelation(
-        tenantBpnL: BpnLString,
-        stageType: StageType,
-        externalId: String,
-        relationType: RelationType,
-        sourceBusinessPartnerExternalId: String,
-        targetBusinessPartnerExternalId: String
-    ): RelationDto
-
-    fun updateRelation(
-        tenantBpnL: BpnLString,
-        stageType: StageType,
-        externalId: String,
-        relationType: RelationType,
-        sourceBusinessPartnerExternalId: String,
-        targetBusinessPartnerExternalId: String
-    ): RelationDto
-
-    fun deleteRelation(
-        tenantBpnL: BpnLString,
-        stageType: StageType,
-        externalId: String
-    )
+    fun updateRelations(tenantBpnL: BpnLString, stageType: StageType, relations: List<RelationPutEntry>): List<RelationDto>
 
     fun checkConstraints(
         tenantBpnL: BpnLString,
