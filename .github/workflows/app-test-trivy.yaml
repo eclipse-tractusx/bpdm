@@ -53,3 +53,4 @@ jobs:
           exit-code: "1"
           severity: "CRITICAL,HIGH"
           timeout: 15m
+          vuln-type: library
