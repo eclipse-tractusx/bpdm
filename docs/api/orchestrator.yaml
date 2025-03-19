@@ -3,18 +3,18 @@ info:
   title: Business Partner Data Management Orchestrator
   description: Orchestrator component acts as a passive component and offers for each
     processing steps individual endpoints
-  version: 6.3.0-rc3
+  version: 7.0.0-SNAPSHOT
 servers:
-- url: http://localhost:8085
-  description: Generated server url
+  - url: http://localhost:8085
+    description: Generated server url
 security:
-- open_id_scheme: []
-- bearer_scheme: []
+  - open_id_scheme: []
+  - bearer_scheme: []
 paths:
   /v6/golden-record-tasks:
     post:
       tags:
-      - Task Client
+        - Task Client
       summary: Create new golden record tasks for given business partner data
       description: "Create golden record tasks for given business partner data in\
         \ given mode. The mode decides through which processing steps the given business\
@@ -40,10 +40,39 @@ paths:
                 $ref: "#/components/schemas/TaskCreateResponse"
         "400":
           description: On malformed task create requests or reaching upsert limit
+  /v6/golden-record-relations-tasks:
+    post:
+      tags:
+        - Task Client
+      summary: Create new golden record relations tasks for given business partner relationship data
+      description: "Create golden record relations tasks for given business partner relationship data \
+        \ in given mode. The mode decides through which processing steps the given business\
+        \ partner relationship data will go through. The response contains the states of the created\
+        \ tasks in the order of given business partner relationship data.If there is an error in\
+        \ the request no tasks are created (all or nothing). For a single request,\
+        \ the maximum number of business partners in the request is limited to 100\
+        \ entries."
+      operationId: createRelationsTasks
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskCreateRelationsRequest"
+        required: true
+      responses:
+        "200":
+          description: The states of successfully created tasks including the task
+            identifier for tracking purposes.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskCreateRelationsResponse"
+        "400":
+          description: On malformed task create requests or reaching upsert limit
   /v6/golden-record-tasks/step-results:
     post:
       tags:
-      - Task Worker
+        - Task Worker
       summary: Post step results for reserved golden record tasks in the given step
         queue
       description: "Post business partner step results for the given tasks in the\
@@ -66,10 +95,36 @@ paths:
         "400":
           description: "On malformed requests, reaching upsert limit or posting results\
             \ for tasks which are missing or in the wrong step queue"
+  /v6/golden-record-relations-tasks/step-results:
+    post:
+      tags:
+        - Task Worker
+      summary: Post step results for reserved golden record relations tasks in the given step
+        queue
+      description: "Post business partner relationship step results for the given tasks in the\
+        \ given step queue. In order to post a result for a task it needs to be reserved\
+        \ first, has to currently be in the given step queue and the time limit is\
+        \ not exceeded. The number of results you can post at a time does not need\
+        \ to match the original number of reserved tasks. Results are accepted via\
+        \ strategy 'all or nothing'. For a single request, the maximum number of postable\
+        \ results is limited to 100."
+      operationId: resolveRelationsStepResults
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskRealtionsStepResultRequest"
+        required: true
+      responses:
+        "204":
+          description: If the results could be processed
+        "400":
+          description: "On malformed requests, reaching upsert limit or posting results\
+            \ for tasks which are missing or in the wrong step queue"
   /v6/golden-record-tasks/step-reservations:
     post:
       tags:
-      - Task Worker
+        - Task Worker
       summary: Reserve the next golden record tasks waiting in the given step queue
       description: "Reserve up to a given number of golden record tasks in the given\
         \ step queue. The response entries contain the business partner data to process\
@@ -92,10 +147,36 @@ paths:
                 $ref: "#/components/schemas/TaskStepReservationResponse"
         "400":
           description: On malformed task create requests or reaching upsert limit
+  /v6/golden-record-relations-tasks/step-reservations:
+    post:
+      tags:
+        - Task Worker
+      summary: Reserve the next golden record tasks waiting in the given step queue
+      description: "Reserve up to a given number of golden record relationship tasks in the given\
+          \ step queue. The response entries contain the business partner data to process\
+          \ which consists of the generic and L/S/A data. The reservation has a time\
+          \ limit which is returned. For a single request, the maximum number of reservable\
+          \ tasks is limited to 100."
+      operationId: reserveRelationsTasksForStep
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RelationsTaskStepReservationRequest"
+        required: true
+      responses:
+        "200":
+          description: The reserved tasks with their business partner data to process.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RelationsTaskStepReservationResponse"
+        "400":
+          description: On malformed task create requests or reaching upsert limit
   /v6/golden-record-tasks/state/search:
     post:
       tags:
-      - Task Client
+        - Task Client
       summary: Search for the state of golden record tasks by task identifiers
       description: Returns the state of golden record tasks based on the provided
         task identifiers. Unknown task identifiers are ignored.
@@ -115,12 +196,57 @@ paths:
                 $ref: "#/components/schemas/TaskStateResponse"
         "400":
           description: On malformed task search requests
+  /v6/golden-record-relations-tasks/state/search:
+    post:
+      tags:
+        - Task Client
+      summary: Search for the state of golden record relations tasks by task identifiers
+      description: Returns the state of golden record relations tasks based on the provided
+        task identifiers. Unknown task identifiers are ignored.
+      operationId: searchRelationsTaskStates
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RelationsTaskStateRequest"
+        required: true
+      responses:
+        "200":
+          description: The state of the tasks for the provided task identifiers.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RelationsTaskStateResponse"
+        "400":
+          description: On malformed task search requests
   /v6/golden-record-tasks/result-state/search:
     post:
       tags:
-      - Task Client
+        - Task Client
       summary: Search for result states by giving a list of task IDs
       operationId: searchTaskResultStates
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskResultStateSearchRequest"
+        required: true
+      responses:
+        "200":
+          description: The list of corresponding result states in the same order as
+            has been received. A null indicates that a task could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskResultStateSearchResponse"
+        "400":
+          description: On malformed task search requests
+  /v6/golden-record-relations-tasks/result-state/search:
+    post:
+      tags:
+        - Task Client
+      summary: Search for result states by giving a list of task IDs
+      operationId: searchRelationsTaskResultStates
       requestBody:
         content:
           application/json:
@@ -140,7 +266,7 @@ paths:
   /v6/golden-record-tasks/finished-events:
     get:
       tags:
-      - Task Client
+        - Task Client
       summary: Get event log of golden record tasks that have finished processing
       description: 'The event log contains all events of when golden record tasks
         finish processing. These events are helpful for the task creator to check
@@ -148,27 +274,27 @@ paths:
         that happened after a given time is returned. '
       operationId: getEvents
       parameters:
-      - name: timestamp
-        in: query
-        required: true
-        schema:
-          type: string
-          format: date-time
-      - name: page
-        in: query
-        description: Number of page to get results from
-        required: false
-        schema:
-          type: string
-          minimum: 0
-      - name: size
-        in: query
-        description: Size of each page
-        required: false
-        schema:
-          type: string
-          maximum: 100
-          minimum: 0
+        - name: timestamp
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: page
+          in: query
+          description: Number of page to get results from
+          required: false
+          schema:
+            type: string
+            minimum: 0
+        - name: size
+          in: query
+          description: Size of each page
+          required: false
+          schema:
+            type: string
+            maximum: 100
+            minimum: 0
       responses:
         "200":
           description: The paginated events after the given timestamp
@@ -209,9 +335,9 @@ components:
           description: "One of the alternative postal address types: P.O. box, private\
             \ bag, boite postale."
           enum:
-          - PO_BOX
-          - PRIVATE_BAG
-          - BOITE_POSTALE
+            - PO_BOX
+            - PRIVATE_BAG
+            - BOITE_POSTALE
         deliveryServiceQualifier:
           type: string
           description: "The qualifier uniquely identifying the delivery service endpoint\
@@ -225,7 +351,7 @@ components:
             \ alternative postal address to which the delivery is to be delivered,\
             \ such as a P.O. box number or a private bag number."
       required:
-      - geographicCoordinates
+        - geographicCoordinates
     BpnReference:
       type: object
       description: A reference to a BPN for the corresponding business partner data.
@@ -254,8 +380,8 @@ components:
           type: string
           description: Whether this reference is a BPN or BPN request identifier
           enum:
-          - Bpn
-          - BpnRequestIdentifier
+            - Bpn
+            - BpnRequestIdentifier
     BusinessPartner:
       type: object
       description: "Generic business partner data for golden record processing. Typically\
@@ -295,13 +421,44 @@ components:
             * `Additional Address`: The business partner data contains an additional address, (optional) parent site and parent legal entity information.
             * `Null`: No clear type determined, undecided. The golden record process will not create golden record from this business partner data.
           enum:
-          - LegalEntity
-          - Site
-          - Address
+            - LegalEntity
+            - Site
+            - Address
       required:
-      - legalEntity
-      - nameParts
-      - uncategorized
+        - legalEntity
+        - nameParts
+        - uncategorized
+    BusinessPartnerRelations:
+      type: object
+      description: 'A relation from one business partner (the source) to another business
+        partner (the target). '
+      properties:
+        relationType:
+          type: string
+          description: The type of relation between the business partners
+          enum:
+            - IsManagedBy
+            - IsAlternativeHeadquarterFor
+        businessPartnerSourceExternalId:
+          type: string
+          description: The business partner from which the relation emerges (the source)
+        businessPartnerTargetExternalId:
+          type: string
+          description: The business partner to which this relation goes (the target)
+        updatedAt:
+          type: string
+          format: date-time
+          description: The time when this relation was last modified
+        createdAt:
+          type: string
+          format: date-time
+          description: The time when this relation was created
+      required:
+        - businessPartnerSourceExternalId
+        - businessPartnerTargetExternalId
+        - createdAt
+        - relationType
+        - updatedAt
     BusinessState:
       type: object
       description: The business state information for the corresponding business partner
@@ -318,8 +475,8 @@ components:
           type: string
           description: The type of this specified status.
           enum:
-          - ACTIVE
-          - INACTIVE
+            - ACTIVE
+            - INACTIVE
     ConfidenceCriteria:
       type: object
       description: Contains information to evaluate how good or verified the information
@@ -359,8 +516,8 @@ components:
         recordId:
           type: string
       required:
-      - recordId
-      - taskId
+        - recordId
+        - taskId
     Event:
       type: object
       properties:
@@ -370,15 +527,15 @@ components:
         resultState:
           type: string
           enum:
-          - Pending
-          - Success
-          - Error
+            - Pending
+            - Success
+            - Error
         taskId:
           type: string
       required:
-      - resultState
-      - taskId
-      - timestamp
+        - resultState
+        - taskId
+        - timestamp
     FinishedTaskEventsResponse:
       type: object
       properties:
@@ -404,11 +561,11 @@ components:
           items:
             $ref: "#/components/schemas/Event"
       required:
-      - content
-      - contentSize
-      - page
-      - totalElements
-      - totalPages
+        - content
+        - contentSize
+        - page
+        - totalElements
+        - totalPages
     GeoCoordinate:
       type: object
       description: "The exact location of the physical postal address in latitude,\
@@ -479,11 +636,11 @@ components:
         legalAddress:
           $ref: "#/components/schemas/PostalAddress"
       required:
-      - bpnReference
-      - confidenceCriteria
-      - identifiers
-      - legalAddress
-      - states
+        - bpnReference
+        - confidenceCriteria
+        - identifiers
+        - legalAddress
+        - states
     NamePart:
       type: object
       description: A categorized name part for this business partner data
@@ -501,14 +658,14 @@ components:
             * `SiteName` - Value is part of the site's name
             * `AddressName` - Value is part of the address name
           enum:
-          - LegalName
-          - ShortName
-          - LegalForm
-          - SiteName
-          - AddressName
+            - LegalName
+            - ShortName
+            - LegalForm
+            - SiteName
+            - AddressName
       required:
-      - name
-      - type
+        - name
+        - type
     PhysicalAddress:
       type: object
       description: "A physical postal address describes the physical location of an\
@@ -573,8 +730,8 @@ components:
             \ that a company belong to, particularly in bureaucratic processes such\
             \ as tax returns and IRS forms."
       required:
-      - geographicCoordinates
-      - street
+        - geographicCoordinates
+        - street
     PostalAddress:
       type: object
       description: "Address information of this business partner data. The address\
@@ -609,11 +766,11 @@ components:
             counterpart in the Pool.Currently deprecated and ignored by the golden
             record creation and update process.
       required:
-      - bpnReference
-      - confidenceCriteria
-      - identifiers
-      - physicalAddress
-      - states
+        - bpnReference
+        - confidenceCriteria
+        - identifiers
+        - physicalAddress
+        - states
     Site:
       type: object
       description: Site information for this business partner data. A site of 'null'
@@ -644,10 +801,10 @@ components:
           description: This site's main address is the legal address of the legal
             entity. The address information therefore is stored in the legal address.
       required:
-      - bpnReference
-      - confidenceCriteria
-      - siteMainIsLegalAddress
-      - states
+        - bpnReference
+        - confidenceCriteria
+        - siteMainIsLegalAddress
+        - states
     Street:
       type: object
       description: "The street of the physical postal address, synonyms: road, avenue,\
@@ -704,10 +861,30 @@ components:
         processingState:
           $ref: "#/components/schemas/TaskProcessingStateDto"
       required:
-      - businessPartnerResult
-      - processingState
-      - recordId
-      - taskId
+        - businessPartnerResult
+        - processingState
+        - recordId
+        - taskId
+    TaskClientRelationsStateDto:
+      type: object
+      description: The golden record task's processing state together with optional
+        business partner relationship data in case processing is done
+      properties:
+        taskId:
+          type: string
+        recordId:
+          type: string
+          description: The identifier of the gate record for which this task has been
+            created
+        businessPartnerRelationsResult:
+          $ref: "#/components/schemas/BusinessPartnerRelations"
+        processingState:
+          $ref: "#/components/schemas/TaskProcessingRelationsStateDto"
+      required:
+        - businessPartnerRelationsResult
+        - processingState
+        - recordId
+        - taskId
     TaskCreateRequest:
       type: object
       description: Request object to specify for which business partner data tasks
@@ -718,15 +895,46 @@ components:
           description: The mode affecting which processing steps the business partner
             goes through
           enum:
-          - UpdateFromSharingMember
-          - UpdateFromPool
+            - UpdateFromSharingMember
+            - UpdateFromPool
         requests:
           type: array
           items:
             $ref: "#/components/schemas/TaskCreateRequestEntry"
       required:
-      - mode
-      - requests
+        - mode
+        - requests
+    TaskCreateRelationsRequest:
+      type: object
+      description: Request object to specify for which business partner relationship data tasks
+        should be created and in which mode
+      properties:
+        mode:
+          type: string
+          description: The mode affecting which processing steps the business partner relation
+            goes through
+          enum:
+            - UpdateFromSharingMember
+            - UpdateFromPool
+        requests:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaskCreateRelationsRequestEntry"
+      required:
+        - mode
+        - requests
+    TaskCreateRelationsRequestEntry:
+      type: object
+      properties:
+        recordId:
+          type: string
+          description: The unique identifier for this record which was previously
+            issued by the Orchestrator
+        businessPartnerRelations:
+          $ref: "#/components/schemas/BusinessPartnerRelations"
+          description: The business partner relations data to be processed
+      required:
+        - businessPartner
     TaskCreateRequestEntry:
       type: object
       properties:
@@ -738,7 +946,7 @@ components:
           $ref: "#/components/schemas/BusinessPartner"
           description: The business partner data to be processed
       required:
-      - businessPartner
+        - businessPartner
     TaskCreateResponse:
       type: object
       description: Response object for giving a list of created tasks
@@ -748,7 +956,17 @@ components:
           items:
             $ref: "#/components/schemas/TaskClientStateDto"
       required:
-      - createdTasks
+        - createdTasks
+    TaskCreateRelationsResponse:
+      type: object
+      description: Response object for giving a list of created relations tasks
+      properties:
+        createdTasks:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaskClientRelationsStateDto"
+      required:
+        - createdTasks
     TaskErrorDto:
       type: object
       description: "Describes an error that happened during processing of a task \n"
@@ -765,20 +983,48 @@ components:
             \ by the GR process (example: Brazil).\n* `UnknownSpecialCharacters`:\
             \ The provided record contains unallowed special characters.\n"
           enum:
-          - Timeout
-          - Unspecified
-          - NaturalPersonError
-          - BpnErrorNotFound
-          - BpnErrorTooManyOptions
-          - MandatoryFieldValidationFailed
-          - BlacklistCountryPresent
-          - UnknownSpecialCharacters
+            - Timeout
+            - Unspecified
+            - NaturalPersonError
+            - BpnErrorNotFound
+            - BpnErrorTooManyOptions
+            - MandatoryFieldValidationFailed
+            - BlacklistCountryPresent
+            - UnknownSpecialCharacters
         description:
           type: string
           description: "The free text, detailed description of the error"
       required:
-      - description
-      - type
+        - description
+        - type
+    TaskRelationsErrorDto:
+      type: object
+      description: "Describes an error that happened during processing of a relationship task \n"
+      properties:
+        type:
+          type: string
+          description: "The type of error that occurred. \n* `NaturalPersonError`:\
+            \ The provided record contains natural person information.\n* `BpnErrorNotFound`:\
+            \ The provided record can not be matched to a legal entity or an address.\n\
+            * `BpnErrorTooManyOptions`: The provided record can not link to a clear\
+            \ legal entity.\n* `MandatoryFieldValidationFailed`: The provided record\
+            \ The provided record is part of a country that is not allowed to be processed\
+            \ by the GR process (example: Brazil).\n* `UnknownSpecialCharacters`:\
+            \ The provided record contains unallowed special characters.\n"
+          enum:
+            - Timeout
+            - Unspecified
+            - NaturalPersonError
+            - BpnErrorNotFound
+            - BpnErrorTooManyOptions
+            - MandatoryFieldValidationFailed
+            - UnknownSpecialCharacters
+        description:
+          type: string
+          description: "The free text, detailed description of the error"
+      required:
+        - description
+        - type
     TaskProcessingStateDto:
       type: object
       description: Contains detailed information about the current processing state
@@ -788,25 +1034,25 @@ components:
           type: string
           description: "The processing result of the task, can also still be pending"
           enum:
-          - Pending
-          - Success
-          - Error
+            - Pending
+            - Success
+            - Error
         step:
           type: string
           description: The last step this task has entered
           enum:
-          - CleanAndSync
-          - PoolSync
-          - Clean
+            - CleanAndSync
+            - PoolSync
+            - Clean
         stepState:
           type: string
           description: Whether the task is queued or already reserved for the latest
             step
           enum:
-          - Queued
-          - Reserved
-          - Success
-          - Error
+            - Queued
+            - Reserved
+            - Success
+            - Error
         errors:
           type: array
           description: The actual errors that happened during processing if the task
@@ -827,13 +1073,68 @@ components:
           deprecated: true
           description: The timestamp until the task is removed from the Orchestrator
       required:
-      - createdAt
-      - errors
-      - modifiedAt
-      - resultState
-      - step
-      - stepState
-      - timeout
+        - createdAt
+        - errors
+        - modifiedAt
+        - resultState
+        - step
+        - stepState
+        - timeout
+    TaskProcessingRelationsStateDto:
+      type: object
+      description: Contains detailed information about the current processing state
+        of a golden record relations task
+      properties:
+        resultState:
+          type: string
+          description: "The processing result of the task, can also still be pending"
+          enum:
+            - Pending
+            - Success
+            - Error
+        step:
+          type: string
+          description: The last step this task has entered
+          enum:
+            - CleanAndSync
+            - PoolSync
+            - Clean
+        stepState:
+          type: string
+          description: Whether the task is queued or already reserved for the latest
+            step
+          enum:
+            - Queued
+            - Reserved
+            - Success
+            - Error
+        errors:
+          type: array
+          description: The actual errors that happened during processing if the task
+            has an error result state. The errors refer to the latest step.
+          items:
+            $ref: "#/components/schemas/TaskRelationsErrorDto"
+        createdAt:
+          type: string
+          format: date-time
+          description: When the task has been created
+        modifiedAt:
+          type: string
+          format: date-time
+          description: When the task has last been modified
+        timeout:
+          type: string
+          format: date-time
+          deprecated: true
+          description: The timestamp until the task is removed from the Orchestrator
+      required:
+        - createdAt
+        - errors
+        - modifiedAt
+        - resultState
+        - step
+        - stepState
+        - timeout
     TaskResultStateSearchRequest:
       type: object
       properties:
@@ -842,7 +1143,7 @@ components:
           items:
             type: string
       required:
-      - taskIds
+        - taskIds
     TaskResultStateSearchResponse:
       type: object
       properties:
@@ -851,11 +1152,11 @@ components:
           items:
             type: string
             enum:
-            - Pending
-            - Success
-            - Error
+              - Pending
+              - Success
+              - Error
       required:
-      - resultStates
+        - resultStates
     TaskStateRequest:
       type: object
       description: Request object for giving a list of task identifiers to search
@@ -866,7 +1167,18 @@ components:
           items:
             $ref: "#/components/schemas/Entry"
       required:
-      - entries
+        - entries
+    RelationsTaskStateRequest:
+      type: object
+      description: Request object for giving a list of task identifiers to search
+        for the state of tasks
+      properties:
+        entries:
+          type: array
+          items:
+            $ref: "#/components/schemas/Entry"
+      required:
+        - entries
     TaskStateResponse:
       type: object
       description: Response object for giving a list of task states
@@ -876,7 +1188,17 @@ components:
           items:
             $ref: "#/components/schemas/TaskClientStateDto"
       required:
-      - tasks
+        - tasks
+    RelationsTaskStateResponse:
+      type: object
+      description: Response object for giving a list of relations task states
+      properties:
+        tasks:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaskClientRelationsStateDto"
+      required:
+        - tasks
     TaskStepReservationEntryDto:
       type: object
       description: Task reservation entry
@@ -894,10 +1216,31 @@ components:
         requestKey:
           type: string
       required:
-      - businessPartner
-      - recordId
-      - requestKey
-      - taskId
+        - businessPartner
+        - recordId
+        - requestKey
+        - taskId
+    RelationsTaskStepReservationEntryDto:
+      type: object
+      description: Task reservation entry
+      properties:
+        taskId:
+          type: string
+          description: The identifier of the reserved task
+        recordId:
+          type: string
+          description: The identifier of the gate record for which this task has been
+            created
+        businessPartnerRelations:
+          $ref: "#/components/schemas/BusinessPartnerRelations"
+          description: The business partner data to process
+        requestKey:
+          type: string
+      required:
+        - businessPartnerRelations
+        - recordId
+        - requestKey
+        - taskId
     TaskStepReservationRequest:
       type: object
       description: Request object for reserving a number of tasks waiting in a step
@@ -912,12 +1255,32 @@ components:
           type: string
           description: The step queue to reserve from
           enum:
-          - CleanAndSync
-          - PoolSync
-          - Clean
+            - CleanAndSync
+            - PoolSync
+            - Clean
       required:
-      - amount
-      - step
+        - amount
+        - step
+    RelationsTaskStepReservationRequest:
+      type: object
+      description: Request object for reserving a number of tasks waiting in a step
+        queue.
+      properties:
+        amount:
+          type: integer
+          format: int32
+          description: The maximum number of tasks to reserve. Can be fewer if queue
+            is not full enough.
+        step:
+          type: string
+          description: The step queue to reserve from
+          enum:
+            - CleanAndSync
+            - PoolSync
+            - Clean
+      required:
+        - amount
+        - step
     TaskStepReservationResponse:
       type: object
       description: Response object for giving a list of reserved tasks
@@ -933,8 +1296,25 @@ components:
           description: The timestamp until the reservation is valid and results are
             accepted
       required:
-      - reservedTasks
-      - timeout
+        - reservedTasks
+        - timeout
+    RelationsTaskStepReservationResponse:
+      type: object
+      description: Response object for giving a list of reserved relations tasks
+      properties:
+        reservedTasks:
+          type: array
+          items:
+            $ref: "#/components/schemas/RelationsTaskStepReservationEntryDto"
+        timeout:
+          type: string
+          format: date-time
+          deprecated: true
+          description: The timestamp until the reservation is valid and results are
+            accepted
+      required:
+        - reservedTasks
+        - timeout
     TaskStepResultEntryDto:
       type: object
       description: A step result for a golden record task
@@ -951,9 +1331,28 @@ components:
           items:
             $ref: "#/components/schemas/TaskErrorDto"
       required:
-      - businessPartner
-      - errors
-      - taskId
+        - businessPartner
+        - errors
+        - taskId
+    TaskRelationsStepResultEntryDto:
+      type: object
+      description: A step result for a golden record relationship task
+      properties:
+        taskId:
+          type: string
+          description: The identifier of the task for which this is a result
+        businessPartnerRelations:
+          $ref: "#/components/schemas/BusinessPartnerRelations"
+          description: The actual result in form of business partner data. Maybe null
+            if an error occurred during processing of this task.
+        errors:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaskRelationsErrorDto"
+      required:
+        - businessPartnerRelations
+        - errors
+        - taskId
     TaskStepResultRequest:
       type: object
       description: Request object for posting step results of previously reserved
@@ -963,16 +1362,35 @@ components:
           type: string
           description: The step queue containing the tasks for which results are posted
           enum:
-          - CleanAndSync
-          - PoolSync
-          - Clean
+            - CleanAndSync
+            - PoolSync
+            - Clean
         results:
           type: array
           items:
             $ref: "#/components/schemas/TaskStepResultEntryDto"
       required:
-      - results
-      - step
+        - results
+        - step
+    TaskRealtionsStepResultRequest:
+      type: object
+      description: Request object for posting step results of previously reserved
+        tasks
+      properties:
+        step:
+          type: string
+          description: The step queue containing the tasks for which results are posted
+          enum:
+            - CleanAndSync
+            - PoolSync
+            - Clean
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaskRelationsStepResultEntryDto"
+      required:
+        - results
+        - step
     UncategorizedProperties:
       type: object
       description: Business partner data that has not yet or can not be categorized
@@ -1000,9 +1418,9 @@ components:
           description: "Address information for which it is unknown whether they belong\
             \ to the legal, site main or additional address"
       required:
-      - identifiers
-      - nameParts
-      - states
+        - identifiers
+        - nameParts
+        - states
   securitySchemes:
     open_id_scheme:
       type: oauth2
