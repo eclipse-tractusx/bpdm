@@ -67,8 +67,7 @@ class NoAuthIT @Autowired constructor(
         relation = RelationAuthExpectations(
             get = AuthExpectationType.Unauthorized,
             post = AuthExpectationType.Unauthorized,
-            put = AuthExpectationType.Unauthorized,
-            delete = AuthExpectationType.Unauthorized,
+            put = AuthExpectationType.Unauthorized
         )
     )
 )

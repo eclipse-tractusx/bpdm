@@ -120,11 +120,6 @@ abstract class AuthTestBase(
         authAssertions.assert(authExpectations.relation.put) { gateClient.relation.put(true, RelationPutRequest("", RelationType.IsManagedBy, "", "")) }
     }
 
-    @Test
-    fun `DELETE Relations`() {
-        authAssertions.assert(authExpectations.relation.delete) { gateClient.relation.delete( "") }
-    }
-
 }
 
 data class GateAuthExpectations(
@@ -167,6 +162,5 @@ data class UploadPartnerAuthExpections(
 data class RelationAuthExpectations(
     val get: AuthExpectationType,
     val post: AuthExpectationType,
-    val put: AuthExpectationType,
-    val delete: AuthExpectationType
+    val put: AuthExpectationType
 )

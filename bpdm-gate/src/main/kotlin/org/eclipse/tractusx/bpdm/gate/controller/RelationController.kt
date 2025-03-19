@@ -100,13 +100,4 @@ class RelationController(
             )
         }
     }
-
-    @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_INPUT_RELATION})")
-    override fun delete(externalId: String) {
-        relationshipService.deleteRelation(
-            tenantBpnL = principalUtil.resolveTenantBpnl(),
-            stageType = StageType.Input,
-            externalId = externalId
-        )
-    }
 }

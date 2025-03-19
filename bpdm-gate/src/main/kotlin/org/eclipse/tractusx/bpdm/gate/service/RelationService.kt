@@ -175,12 +175,6 @@ class RelationService(
         return toDto(relationship)
     }
 
-    @Transactional
-    override fun deleteRelation(tenantBpnL: BpnLString, stageType: StageType, externalId: String) {
-        val relationshipToDelete = findRelationshipOrThrow(tenantBpnL = tenantBpnL.value, stageType = stageType, externalId = externalId)
-        relationRepository.delete(relationshipToDelete)
-    }
-
     override fun checkConstraints(
         tenantBpnL: BpnLString,
         stageType: StageType,

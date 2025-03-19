@@ -69,8 +69,7 @@ class AuthOutputConsumerIT @Autowired constructor(
         relation = RelationAuthExpectations(
             get = AuthExpectationType.Forbidden,
             post = AuthExpectationType.Forbidden,
-            put = AuthExpectationType.Forbidden,
-            delete = AuthExpectationType.Forbidden,
+            put = AuthExpectationType.Forbidden
         )
     )
 ) {
