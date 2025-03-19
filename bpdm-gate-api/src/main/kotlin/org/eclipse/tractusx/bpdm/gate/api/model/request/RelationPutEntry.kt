@@ -20,8 +20,17 @@
 package org.eclipse.tractusx.bpdm.gate.api.model.request
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.gate.api.model.IRelationDto
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
 
-@Schema(description = "A request to upsert the contents of the given relations")
-data class RelationPutRequest(
-    val relations: List<RelationPutEntry>
-)
+@Schema(description = "A request to update the content of the given business partner relation")
+data class RelationPutEntry(
+    @Schema(description = "The external identifier of the business partner relation to update")
+    override val externalId: String,
+    @Schema(description = "The type the relation should be")
+    override val relationType: RelationType,
+    @Schema(description = "The external identifier of the business partner from which the relation should emerge (the source)")
+    override val businessPartnerSourceExternalId: String,
+    @Schema(description = "The external identifier of the business partner to which the relation should point (the target)")
+    override val businessPartnerTargetExternalId: String
+): IRelationDto
