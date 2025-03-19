@@ -23,10 +23,7 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
-import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangelogSearchRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.*
 import org.eclipse.tractusx.bpdm.test.util.AuthAssertionHelper
 import org.eclipse.tractusx.bpdm.test.util.AuthExpectationType
 import org.junit.jupiter.api.Test
@@ -115,7 +112,7 @@ abstract class AuthTestBase(
 
     @Test
     fun `PUT Relations`() {
-        authAssertions.assert(authExpectations.relation.put) { gateClient.relation.put(true, RelationPutRequest("", RelationType.IsManagedBy, "", "")) }
+        authAssertions.assert(authExpectations.relation.put) { gateClient.relation.put(true, RelationPutRequest(listOf( RelationPutEntry("", RelationType.IsManagedBy, "", "")))) }
     }
 
 }

@@ -26,6 +26,7 @@ import org.eclipse.tractusx.bpdm.gate.api.GateRelationApi
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationDto
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationSearchRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.response.RelationPutResponse
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
@@ -43,5 +44,5 @@ interface RelationApiClient: GateRelationApi {
     ): PageDto<RelationDto>
 
     @PutExchange
-    override fun put(@RequestParam createIfNotExist: Boolean, @RequestBody  requestBody: RelationPutRequest): RelationDto
+    override fun put(@RequestParam createIfNotExist: Boolean, @RequestBody requestBody: RelationPutRequest): RelationPutResponse
 }

@@ -86,7 +86,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/RelationDto"
+                  "$ref" : "#/components/schemas/RelationPutResponse"
                 }
               }
             }
@@ -1441,7 +1441,7 @@
         },
         "required" : [ "businessPartnerSourceExternalId", "businessPartnerTargetExternalId", "createdAt", "externalId", "relationType", "updatedAt" ]
       },
-      "RelationPutRequest" : {
+      "RelationPutEntry" : {
         "type" : "object",
         "description" : "A request to update the content of the given business partner relation",
         "properties" : {
@@ -1464,6 +1464,31 @@
           }
         },
         "required" : [ "businessPartnerSourceExternalId", "businessPartnerTargetExternalId", "externalId", "relationType" ]
+      },
+      "RelationPutRequest" : {
+        "type" : "object",
+        "description" : "A request to upsert the contents of the given relations",
+        "properties" : {
+          "relations" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/RelationPutEntry"
+            }
+          }
+        },
+        "required" : [ "relations" ]
+      },
+      "RelationPutResponse" : {
+        "type" : "object",
+        "properties" : {
+          "upsertedRelations" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/RelationDto"
+            }
+          }
+        },
+        "required" : [ "upsertedRelations" ]
       },
       "RelationSearchRequest" : {
         "type" : "object",

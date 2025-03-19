@@ -26,15 +26,16 @@ import org.eclipse.tractusx.bpdm.gate.api.GateRelationApi
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationDto
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationSearchRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.response.RelationPutResponse
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
-import org.eclipse.tractusx.bpdm.gate.service.RelationService
+import org.eclipse.tractusx.bpdm.gate.service.IRelationService
 import org.eclipse.tractusx.bpdm.gate.util.PrincipalUtil
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class RelationController(
-    private val relationshipService: RelationService,
+    private val relationshipService: IRelationService,
     private val principalUtil: PrincipalUtil
 ): GateRelationApi {
 
@@ -59,25 +60,21 @@ class RelationController(
     override fun put(
         createIfNotExist: Boolean,
         requestBody: RelationPutRequest
-    ): RelationDto {
-        return if(createIfNotExist){
-            relationshipService.upsertRelation(
+    ): RelationPutResponse {
+        val upsertedRelations = if(createIfNotExist){
+            relationshipService.upsertRelations(
                 tenantBpnL = principalUtil.resolveTenantBpnl(),
                 stageType = StageType.Input,
-                externalId = requestBody.externalId,
-                relationType = requestBody.relationType,
-                sourceBusinessPartnerExternalId = requestBody.businessPartnerSourceExternalId,
-                targetBusinessPartnerExternalId = requestBody.businessPartnerTargetExternalId
+                relations = requestBody.relations
             )
         }else{
-            relationshipService.updateRelation(
+            relationshipService.updateRelations(
                 tenantBpnL = principalUtil.resolveTenantBpnl(),
                 stageType = StageType.Input,
-                externalId = requestBody.externalId,
-                relationType = requestBody.relationType,
-                sourceBusinessPartnerExternalId = requestBody.businessPartnerSourceExternalId,
-                targetBusinessPartnerExternalId = requestBody.businessPartnerTargetExternalId
+                relations = requestBody.relations
             )
         }
+
+        return RelationPutResponse(upsertedRelations)
     }
 }

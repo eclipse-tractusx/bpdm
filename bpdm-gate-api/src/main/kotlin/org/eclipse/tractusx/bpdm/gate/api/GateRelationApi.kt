@@ -32,6 +32,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.RelationDto
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.GateErrorResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.RelationPutResponse
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
@@ -78,8 +79,8 @@ interface GateRelationApi {
     @PutMapping(consumes = [MediaType.APPLICATION_JSON_VALUE])
     fun put(
         @Schema(description = "If true a business partner relation will be created even if a relation could not be found under the given external identifier.")
-        @RequestParam createIfNotExist: Boolean = false,
+        @RequestParam createIfNotExist: Boolean = true,
         @RequestBody requestBody: RelationPutRequest
-       ): RelationDto
+       ): RelationPutResponse
 
 }
