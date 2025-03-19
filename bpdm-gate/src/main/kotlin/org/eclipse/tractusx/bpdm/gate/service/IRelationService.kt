@@ -67,12 +67,6 @@ interface IRelationService {
         targetBusinessPartnerExternalId: String
     ): RelationDto
 
-    fun deleteRelation(
-        tenantBpnL: BpnLString,
-        stageType: StageType,
-        externalId: String
-    )
-
     fun checkConstraints(
         tenantBpnL: BpnLString,
         stageType: StageType,

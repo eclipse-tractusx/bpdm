@@ -119,25 +119,4 @@ interface GateRelationApi {
         @RequestBody requestBody: RelationPutRequest
        ): RelationDto
 
-    @Operation(
-        summary = "Delete an existing business partner relation",
-        description = "Delete a relation between two business partners on the input stage."
-    )
-    @ApiResponses(
-        value = [
-            ApiResponse(responseCode = "200", description = "The specified relation has been deleted."),
-            ApiResponse(responseCode = "400", description = "On specifying a relation that does not exist. ",
-                content = [Content(
-                    mediaType = "application/json",
-                    schema = Schema(implementation = GateErrorResponse::class)
-                )])
-        ]
-    )
-    @DeleteMapping
-    fun delete(
-        @Schema(description = "The external identifier of the business partner relation to delete")
-        @RequestParam externalId: String
-    )
-
-
 }

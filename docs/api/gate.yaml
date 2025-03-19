@@ -202,30 +202,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GateErrorResponse"
-    delete:
-      tags:
-      - relation-controller
-      summary: Delete an existing business partner relation
-      description: Delete a relation between two business partners on the input stage.
-      operationId: delete
-      parameters:
-      - name: externalId
-        in: query
-        description: The external identifier of the business partner relation to delete
-        required: true
-        schema:
-          type: string
-          description: The external identifier of the business partner relation to
-            delete
-      responses:
-        "200":
-          description: The specified relation has been deleted.
-        "400":
-          description: 'On specifying a relation that does not exist. '
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/GateErrorResponse"
   /v6/sharing-state/ready:
     post:
       tags:
