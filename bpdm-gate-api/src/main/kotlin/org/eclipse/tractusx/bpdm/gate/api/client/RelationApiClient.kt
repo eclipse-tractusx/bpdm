@@ -51,7 +51,4 @@ interface RelationApiClient: GateRelationApi {
 
     @PutExchange
     override fun put(@RequestParam createIfNotExist: Boolean, @RequestBody  requestBody: RelationPutRequest): RelationDto
-
-    @DeleteExchange
-    override fun delete(@RequestParam externalId: String)
 }
