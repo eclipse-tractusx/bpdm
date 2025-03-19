@@ -26,6 +26,7 @@ import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationSearchRequest
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.gate.GateInputFactory
@@ -1110,7 +1111,7 @@ class RelationIsManagedByIT @Autowired constructor(
         val afterCreation = Instant.now()
 
 
-        val response = gateClient.relation.get()
+        val response = gateClient.relation.postSearch()
 
         val expectation = PageDto(3, 1, 0, 3, postResponses)
 
@@ -1165,7 +1166,7 @@ class RelationIsManagedByIT @Autowired constructor(
         )
         val afterCreation = Instant.now()
 
-        val response = gateClient.relation.get(externalIds = listOf(relationId1, relationId2))
+        val response = gateClient.relation.postSearch(RelationSearchRequest(externalIds = listOf(relationId1, relationId2)))
 
         val expectation = PageDto(2, 1, 0, 2, postResponses.filter { it.externalId in listOf(relationId1, relationId2)  })
 
@@ -1220,7 +1221,7 @@ class RelationIsManagedByIT @Autowired constructor(
         )
         val afterCreation = Instant.now()
 
-        val response = gateClient.relation.get(relationType = RelationType.IsManagedBy)
+        val response = gateClient.relation.postSearch(RelationSearchRequest(relationType = RelationType.IsManagedBy))
 
         val expectation = PageDto(3, 1, 0, 3, postResponses)
 
@@ -1289,7 +1290,7 @@ class RelationIsManagedByIT @Autowired constructor(
         )
         val afterCreation = Instant.now()
 
-        val response = gateClient.relation.get(businessPartnerTargetExternalIds = listOf(legalEntityId1))
+        val response = gateClient.relation.postSearch(RelationSearchRequest(businessPartnerTargetExternalIds = listOf(legalEntityId1)))
 
         val expectation = PageDto(3, 1, 0, 3, postResponses.filter { it.externalId in listOf(relationId1, relationId2, relationId3) })
 
@@ -1344,7 +1345,7 @@ class RelationIsManagedByIT @Autowired constructor(
         )
         val afterCreation = Instant.now()
 
-        val response = gateClient.relation.get(businessPartnerSourceExternalIds = listOf(legalEntityId2, legalEntityId3))
+        val response = gateClient.relation.postSearch(RelationSearchRequest(businessPartnerSourceExternalIds = listOf(legalEntityId2, legalEntityId3)))
 
         val expectation = PageDto(2, 1, 0, 2, postResponses.filter { it.externalId in listOf(relationId1, relationId2) })
 
@@ -1400,7 +1401,7 @@ class RelationIsManagedByIT @Autowired constructor(
         )
         val afterCreation = Instant.now()
 
-        val response = gateClient.relation.get(updatedAtFrom = beforeCreation)
+        val response = gateClient.relation.postSearch(RelationSearchRequest(updatedAtFrom = beforeCreation))
 
         val expectation = PageDto(2, 1, 0, 2, postResponses)
 
@@ -1456,12 +1457,14 @@ class RelationIsManagedByIT @Autowired constructor(
         )
         val afterCreation = Instant.now()
 
-        val response = gateClient.relation.get(
-            externalIds = listOf(relationId3),
-            relationType = RelationType.IsManagedBy,
-            businessPartnerSourceExternalIds = listOf(legalEntityId4),
-            businessPartnerTargetExternalIds = listOf(legalEntityId1),
-            updatedAtFrom = beforeCreation
+        val response = gateClient.relation.postSearch(
+            RelationSearchRequest(
+                externalIds = listOf(relationId3),
+                relationType = RelationType.IsManagedBy,
+                businessPartnerSourceExternalIds = listOf(legalEntityId4),
+                businessPartnerTargetExternalIds = listOf(legalEntityId1),
+                updatedAtFrom = beforeCreation
+            )
         )
 
         val expectation = PageDto(1, 1, 0, 1, postResponses.filter { it.externalId == relationId3 })
