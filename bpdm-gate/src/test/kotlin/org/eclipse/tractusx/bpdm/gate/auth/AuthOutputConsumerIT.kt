@@ -67,7 +67,7 @@ class AuthOutputConsumerIT @Autowired constructor(
             getInputTemplate = AuthExpectationType.Forbidden
         ),
         relation = RelationAuthExpectations(
-            get = AuthExpectationType.Forbidden,
+            postSearch = AuthExpectationType.Forbidden,
             put = AuthExpectationType.Forbidden
         )
     )
