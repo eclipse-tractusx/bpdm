@@ -25,7 +25,6 @@ import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.GateRelationApi
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
-import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPostRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.service.RelationService
@@ -58,20 +57,6 @@ class RelationController(
            targetBusinessPartnerExternalIds = businessPartnerTargetExternalIds ?: emptyList(),
            updatedAtFrom = updatedAtFrom,
            paginationRequest = paginationRequest
-       )
-    }
-
-    @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_INPUT_RELATION})")
-    override fun post(
-        requestBody: RelationPostRequest
-    ): RelationDto {
-       return relationshipService.createRelation(
-           tenantBpnL = principalUtil.resolveTenantBpnl(),
-           stageType = StageType.Input,
-           externalId = requestBody.externalId,
-           relationType = requestBody.relationType,
-           sourceBusinessPartnerExternalId = requestBody.businessPartnerSourceExternalId,
-           targetBusinessPartnerExternalId = requestBody.businessPartnerTargetExternalId
        )
     }
 

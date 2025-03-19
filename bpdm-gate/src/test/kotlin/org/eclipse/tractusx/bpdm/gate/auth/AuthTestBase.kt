@@ -111,11 +111,6 @@ abstract class AuthTestBase(
     }
 
     @Test
-    fun `POST Relations`() {
-        authAssertions.assert(authExpectations.relation.post) { gateClient.relation.post(RelationPostRequest(null, RelationType.IsManagedBy, "", "")) }
-    }
-
-    @Test
     fun `PUT Relations`() {
         authAssertions.assert(authExpectations.relation.put) { gateClient.relation.put(true, RelationPutRequest("", RelationType.IsManagedBy, "", "")) }
     }
@@ -161,6 +156,5 @@ data class UploadPartnerAuthExpections(
 
 data class RelationAuthExpectations(
     val get: AuthExpectationType,
-    val post: AuthExpectationType,
     val put: AuthExpectationType
 )

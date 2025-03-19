@@ -167,41 +167,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GateErrorResponse"
-    post:
-      tags:
-      - relation-controller
-      summary: Create a new business partner input relation
-      description: Create a new relation between two business partner entries on the
-        input stage. The external identifier is optional and a new one will be automatically
-        created if not given. A given external identifier has to be unique.
-      operationId: post
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/RelationPostRequest"
-        required: true
-      responses:
-        "201":
-          description: The created business partner input relation
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/RelationDto"
-        "400":
-          description: 'If the business partner could not be created based on wrong
-            or insufficient data provided such as non-existent business partners or
-            violated relation constraints. '
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/GateErrorResponse"
-        "409":
-          description: If a relation with the given external identifier already exists
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/GateErrorResponse"
   /v6/sharing-state/ready:
     post:
       tags:
@@ -1977,32 +1942,6 @@ components:
       - externalId
       - relationType
       - updatedAt
-    RelationPostRequest:
-      type: object
-      description: A request to create a new relation between two business partners
-      properties:
-        externalId:
-          type: string
-          description: The identifier under which the relation will be referenced.
-            If not given a unique identifier will be automatically assigned by the
-            system. A given external identifier needs be unique.
-        relationType:
-          type: string
-          description: The type of relation that should be created
-          enum:
-          - IsManagedBy
-        businessPartnerSourceExternalId:
-          type: string
-          description: The external identifier of the business partner from which
-            the relation should emerge (the source)
-        businessPartnerTargetExternalId:
-          type: string
-          description: The external identifier of the business partner to which the
-            relation should point (the target)
-      required:
-      - businessPartnerSourceExternalId
-      - businessPartnerTargetExternalId
-      - relationType
     RelationPutRequest:
       type: object
       description: A request to update the content of the given business partner relation
