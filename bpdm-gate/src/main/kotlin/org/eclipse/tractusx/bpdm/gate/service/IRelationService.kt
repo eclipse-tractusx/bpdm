@@ -39,16 +39,7 @@ interface IRelationService {
         updatedAtFrom: Instant? = null,
         paginationRequest: PaginationRequest
     ): PageDto<RelationDto>
-
-    fun createRelation(
-        tenantBpnL: BpnLString,
-        stageType: StageType,
-        externalId: String?,
-        relationType: RelationType,
-        sourceBusinessPartnerExternalId: String,
-        targetBusinessPartnerExternalId: String
-    ): RelationDto
-
+    
     fun upsertRelation(
         tenantBpnL: BpnLString,
         stageType: StageType,

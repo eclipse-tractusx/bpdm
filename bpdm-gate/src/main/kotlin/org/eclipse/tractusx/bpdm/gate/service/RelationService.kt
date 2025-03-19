@@ -75,7 +75,7 @@ class RelationService(
     }
 
     @Transactional
-    override fun createRelation(
+    fun createRelation(
         tenantBpnL: BpnLString,
         stageType: StageType,
         externalId: String?,

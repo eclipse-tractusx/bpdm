@@ -30,7 +30,6 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.GateRelationApi.Companion.RELATIONS_PATH
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
-import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPostRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.GateErrorResponse
 import org.springdoc.core.annotations.ParameterObject
@@ -70,32 +69,6 @@ interface GateRelationApi {
         @RequestParam updatedAtFrom: Instant? = null,
         @ParameterObject @Valid paginationRequest: PaginationRequest = PaginationRequest()
     ): PageDto<RelationDto>
-
-    @Operation(
-        summary = "Create a new business partner input relation",
-        description = "Create a new relation between two business partner entries on the input stage. " +
-                "The external identifier is optional and a new one will be automatically created if not given. " +
-                "A given external identifier has to be unique."
-    )
-    @ApiResponses(
-        value = [
-            ApiResponse(responseCode = "201", description = "The created business partner input relation"),
-            ApiResponse(responseCode = "400", description = "If the business partner could not be created based on wrong or insufficient data provided such as non-existent business partners or violated relation constraints. ",
-                content = [Content(
-                    mediaType = "application/json",
-                    schema = Schema(implementation = GateErrorResponse::class)
-                )]),
-            ApiResponse(responseCode = "409", description = "If a relation with the given external identifier already exists",
-                content = [Content(
-                    mediaType = "application/json",
-                    schema = Schema(implementation = GateErrorResponse::class)
-                )]),
-        ]
-    )
-    @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE])
-    fun post(
-        @RequestBody requestBody: RelationPostRequest
-    ): RelationDto
 
     @Operation(
         summary = "Update a business partner input relation",
