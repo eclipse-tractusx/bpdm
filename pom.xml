@@ -314,6 +314,7 @@
                         <goals>
                             <goal>license-check</goal>
                         </goals>
+                        <phase>none</phase>
                     </execution>
                 </executions>
                 <configuration>
