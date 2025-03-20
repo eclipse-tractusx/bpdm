@@ -11,7 +11,7 @@ security:
   - open_id_scheme: []
   - bearer_scheme: []
 paths:
-  /v6/golden-record-tasks:
+  /v7/business-partners/golden-record-tasks:
     post:
       tags:
         - Task Client
@@ -40,7 +40,7 @@ paths:
                 $ref: "#/components/schemas/TaskCreateResponse"
         "400":
           description: On malformed task create requests or reaching upsert limit
-  /v6/golden-record-relations-tasks:
+  /v7/relations/golden-record-tasks:
     post:
       tags:
         - Task Client
@@ -69,7 +69,7 @@ paths:
                 $ref: "#/components/schemas/TaskCreateRelationsResponse"
         "400":
           description: On malformed task create requests or reaching upsert limit
-  /v6/golden-record-tasks/step-results:
+  /v7/business-partners/golden-record-tasks/step-results:
     post:
       tags:
         - Task Worker
@@ -95,7 +95,7 @@ paths:
         "400":
           description: "On malformed requests, reaching upsert limit or posting results\
             \ for tasks which are missing or in the wrong step queue"
-  /v6/golden-record-relations-tasks/step-results:
+  /v7/relations/golden-record-tasks/step-results:
     post:
       tags:
         - Task Worker
@@ -121,7 +121,7 @@ paths:
         "400":
           description: "On malformed requests, reaching upsert limit or posting results\
             \ for tasks which are missing or in the wrong step queue"
-  /v6/golden-record-tasks/step-reservations:
+  /v7/business-partners/golden-record-tasks/step-reservations:
     post:
       tags:
         - Task Worker
@@ -147,7 +147,7 @@ paths:
                 $ref: "#/components/schemas/TaskStepReservationResponse"
         "400":
           description: On malformed task create requests or reaching upsert limit
-  /v6/golden-record-relations-tasks/step-reservations:
+  /v7/relations/golden-record-tasks/step-reservations:
     post:
       tags:
         - Task Worker
@@ -173,7 +173,7 @@ paths:
                 $ref: "#/components/schemas/RelationsTaskStepReservationResponse"
         "400":
           description: On malformed task create requests or reaching upsert limit
-  /v6/golden-record-tasks/state/search:
+  /v7/business-partners/golden-record-tasks/state/search:
     post:
       tags:
         - Task Client
@@ -196,7 +196,7 @@ paths:
                 $ref: "#/components/schemas/TaskStateResponse"
         "400":
           description: On malformed task search requests
-  /v6/golden-record-relations-tasks/state/search:
+  /v7/relations/golden-record-tasks/state/search:
     post:
       tags:
         - Task Client
@@ -219,7 +219,7 @@ paths:
                 $ref: "#/components/schemas/RelationsTaskStateResponse"
         "400":
           description: On malformed task search requests
-  /v6/golden-record-tasks/result-state/search:
+  /v7/business-partners/golden-record-tasks/result-state/search:
     post:
       tags:
         - Task Client
@@ -241,7 +241,7 @@ paths:
                 $ref: "#/components/schemas/TaskResultStateSearchResponse"
         "400":
           description: On malformed task search requests
-  /v6/golden-record-relations-tasks/result-state/search:
+  /v7/relations/golden-record-tasks/result-state/search:
     post:
       tags:
         - Task Client
@@ -263,7 +263,7 @@ paths:
                 $ref: "#/components/schemas/TaskResultStateSearchResponse"
         "400":
           description: On malformed task search requests
-  /v6/golden-record-tasks/finished-events:
+  /v7/business-partners/golden-record-tasks/finished-events:
     get:
       tags:
         - Task Client
@@ -273,6 +273,47 @@ paths:
         whether created tasks have finished processing. A paginated list of events
         that happened after a given time is returned. '
       operationId: getEvents
+      parameters:
+        - name: timestamp
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: page
+          in: query
+          description: Number of page to get results from
+          required: false
+          schema:
+            type: string
+            minimum: 0
+        - name: size
+          in: query
+          description: Size of each page
+          required: false
+          schema:
+            type: string
+            maximum: 100
+            minimum: 0
+      responses:
+        "200":
+          description: The paginated events after the given timestamp
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FinishedTaskEventsResponse"
+        "400":
+          description: On malformed requests
+  /v7/relations/golden-record-tasks/finished-events:
+    get:
+      tags:
+        - Task Client
+      summary: Get event log of golden record relations tasks that have finished processing
+      description: 'The event log contains all events of when golden record relations tasks
+        finish processing. These events are helpful for the task creator to check
+        whether created tasks have finished processing. A paginated list of events
+        that happened after a given time is returned. '
+      operationId: getRelationsEvents
       parameters:
         - name: timestamp
           in: query
@@ -437,28 +478,17 @@ components:
           type: string
           description: The type of relation between the business partners
           enum:
-            - IsManagedBy
             - IsAlternativeHeadquarterFor
-        businessPartnerSourceExternalId:
+        businessPartnerSourceBpnl:
           type: string
           description: The business partner from which the relation emerges (the source)
-        businessPartnerTargetExternalId:
+        businessPartnerTargetBpnl:
           type: string
           description: The business partner to which this relation goes (the target)
-        updatedAt:
-          type: string
-          format: date-time
-          description: The time when this relation was last modified
-        createdAt:
-          type: string
-          format: date-time
-          description: The time when this relation was created
       required:
-        - businessPartnerSourceExternalId
-        - businessPartnerTargetExternalId
-        - createdAt
+        - businessPartnerSourceBpnl
+        - businessPartnerTargetBpnlcreatedAt
         - relationType
-        - updatedAt
     BusinessState:
       type: object
       description: The business state information for the corresponding business partner
@@ -1003,22 +1033,10 @@ components:
       properties:
         type:
           type: string
-          description: "The type of error that occurred. \n* `NaturalPersonError`:\
-            \ The provided record contains natural person information.\n* `BpnErrorNotFound`:\
-            \ The provided record can not be matched to a legal entity or an address.\n\
-            * `BpnErrorTooManyOptions`: The provided record can not link to a clear\
-            \ legal entity.\n* `MandatoryFieldValidationFailed`: The provided record\
-            \ The provided record is part of a country that is not allowed to be processed\
-            \ by the GR process (example: Brazil).\n* `UnknownSpecialCharacters`:\
-            \ The provided record contains unallowed special characters.\n"
+          description: "The type of error that occurred."
           enum:
             - Timeout
             - Unspecified
-            - NaturalPersonError
-            - BpnErrorNotFound
-            - BpnErrorTooManyOptions
-            - MandatoryFieldValidationFailed
-            - UnknownSpecialCharacters
         description:
           type: string
           description: "The free text, detailed description of the error"
