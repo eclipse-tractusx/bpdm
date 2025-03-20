@@ -19,11 +19,22 @@
 
 package org.eclipse.tractusx.orchestrator.api.client
 
-interface OrchestrationApiClient {
+import org.eclipse.tractusx.orchestrator.api.GoldenRecordTaskApi
+import org.eclipse.tractusx.orchestrator.api.RelationsGoldenRecordTaskApi
+import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRelationsRequest
+import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRelationsResponse
+import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRequest
+import org.eclipse.tractusx.orchestrator.api.model.TaskCreateResponse
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.service.annotation.HttpExchange
+import org.springframework.web.service.annotation.PostExchange
 
-    val goldenRecordTasks: GoldenRecordTaskApiClient
+@HttpExchange(RelationsGoldenRecordTaskApi.RELATIONS_TASKS_PATH)
+interface RelationsGoldenRecordTaskApiClient: RelationsGoldenRecordTaskApi {
 
-    val finishedTaskEvents: FinishedTaskEventApiClient
+    @PostExchange
+    override fun createTasks(
+        @RequestBody createRequest: TaskCreateRelationsRequest
+    ): TaskCreateRelationsResponse
 
-    val relationsGoldenRecordTasks : RelationsGoldenRecordTaskApiClient
 }
