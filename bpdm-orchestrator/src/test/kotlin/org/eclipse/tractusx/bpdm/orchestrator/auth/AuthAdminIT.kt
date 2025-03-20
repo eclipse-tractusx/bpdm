@@ -46,7 +46,8 @@ class AuthAdminIT @Autowired constructor(
     OrchestratorAuthExpectations(
         tasks = TaskAuthExpectations(
             postTask = AuthExpectationType.Authorized,
-            postStateSearch = AuthExpectationType.Authorized
+            postStateSearch = AuthExpectationType.Authorized,
+            postRelationsTask = AuthExpectationType.Authorized
         ),
         steps = TaskStep.entries
             .associateWith { TaskStepAuthExpectations(postReservation = AuthExpectationType.Authorized, postResult = AuthExpectationType.Authorized) }

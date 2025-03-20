@@ -16,6 +16,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 ### Added
 
 - BPDM Pool: Enhanced logic for legal entity on relation based on relation type IsAlternativeHeadquarterFor.([#1254](https://github.com/eclipse-tractusx/bpdm/issues/1254))
+- BPDM Orchestrator: New POST api endpoint creating golden record tasks for business partner relations. ([#1274](https://github.com/eclipse-tractusx/bpdm/issues/1274)) 
 
 ### Changed
 

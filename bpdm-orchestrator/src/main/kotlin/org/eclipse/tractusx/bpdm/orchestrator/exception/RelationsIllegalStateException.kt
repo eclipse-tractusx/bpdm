@@ -17,13 +17,16 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.orchestrator.api.client
+package org.eclipse.tractusx.bpdm.orchestrator.exception
 
-interface OrchestrationApiClient {
+import org.eclipse.tractusx.bpdm.orchestrator.entity.GoldenRecordTaskDb
+import org.eclipse.tractusx.bpdm.orchestrator.entity.RelationsGoldenRecordTaskDb
+import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.ResponseStatus
+import java.util.*
 
-    val goldenRecordTasks: GoldenRecordTaskApiClient
-
-    val finishedTaskEvents: FinishedTaskEventApiClient
-
-    val relationsGoldenRecordTasks : RelationsGoldenRecordTaskApiClient
-}
+@ResponseStatus(HttpStatus.BAD_REQUEST)
+class RelationsIllegalStateException(
+    taskId: UUID,
+    state: RelationsGoldenRecordTaskDb.ProcessingState
+) : RuntimeException("Task with ID '$taskId' is in illegal state for transition: resultState=${state.resultState}, step=${state.step}, stepState=${state.stepState}")
