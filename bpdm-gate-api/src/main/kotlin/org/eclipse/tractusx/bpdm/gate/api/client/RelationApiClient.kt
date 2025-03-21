@@ -25,7 +25,6 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.GateRelationApi
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
-import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPostRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.web.bind.annotation.RequestBody
@@ -45,9 +44,6 @@ interface RelationApiClient: GateRelationApi {
         @RequestParam updatedAtFrom: Instant?,
         @ParameterObject @Valid paginationRequest: PaginationRequest
     ): PageDto<RelationDto>
-
-    @PostExchange
-    override fun post(@RequestBody requestBody: RelationPostRequest): RelationDto
 
     @PutExchange
     override fun put(@RequestParam createIfNotExist: Boolean, @RequestBody  requestBody: RelationPutRequest): RelationDto

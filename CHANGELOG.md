@@ -11,6 +11,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 ### BREAKING
 
 - Gate: Removed DELETE endpoint for business partner relations [#1264](https://github.com/eclipse-tractusx/bpdm/issues/1264)
+- Gate: Removed POST endpoint for business partner relations [#1264](https://github.com/eclipse-tractusx/bpdm/issues/1264)
 
 ### Added
 
