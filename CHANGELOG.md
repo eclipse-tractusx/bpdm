@@ -14,6 +14,8 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 
 ### Added
 
+- BPDM Pool: Enhanced logic for legal entity on relation based on relation type IsAlternativeHeadquarterFor.([#1254](https://github.com/eclipse-tractusx/bpdm/issues/1254))
+
 ### Changed
 
 ## [6.3.0] - 2025-03-06

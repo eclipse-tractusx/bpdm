@@ -20,25 +20,19 @@
 package org.eclipse.tractusx.bpdm.pool.api.model
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
-import org.eclipse.tractusx.bpdm.common.model.RelationType
-import java.time.LocalDateTime
 
 @Schema(name = "RelationVerboseDto", description = "Directed relation between two business partners")
 data class RelationVerboseDto(
 
-    @get:Schema(description = "Type of relation like predecessor or ownership relation")
-    val type: TypeKeyNameVerboseDto<RelationType>,
+    @get:Schema(description = "The type of relation between the Legal Entities")
+    val type: RelationType,
 
-    @get:Schema(description = "BPN of partner which is the source of the relation")
-    val startBpnl: String,
+    @get:Schema(description = "BPN of partner from which the relation emerges (the source)")
+    val businessPartnerSourceBpnl: String,
 
-    @get:Schema(description = "BPN of partner which is the target of the relation")
-    val endBpnl: String,
+    @get:Schema(description = "BPN of partner to which this relation goes (the target)")
+    val businessPartnerTargetBpnl: String,
 
-    @get:Schema(description = "Time when the relation started")
-    val validFrom: LocalDateTime? = null,
-
-    @get:Schema(description = "Time when the relation ended")
-    val validTo: LocalDateTime? = null
+    @get:Schema(description = "Status of the relation")
+    val isActive: Boolean
 )
