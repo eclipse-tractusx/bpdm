@@ -17,13 +17,17 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.orchestrator.api.client
+package org.eclipse.tractusx.bpdm.orchestrator.repository
 
-interface OrchestrationApiClient {
+import org.eclipse.tractusx.bpdm.orchestrator.entity.GateRecordDb
+import org.eclipse.tractusx.bpdm.orchestrator.entity.RelationsGoldenRecordTaskDb
+import org.springframework.data.repository.CrudRepository
+import org.springframework.data.repository.PagingAndSortingRepository
+import org.springframework.stereotype.Repository
 
-    val goldenRecordTasks: GoldenRecordTaskApiClient
+@Repository
+interface RelationsGoldenRecordTaskRepository : CrudRepository<RelationsGoldenRecordTaskDb, Long>, PagingAndSortingRepository<RelationsGoldenRecordTaskDb, Long> {
 
-    val finishedTaskEvents: FinishedTaskEventApiClient
 
-    val relationsGoldenRecordTasks : RelationsGoldenRecordTaskApiClient
+    fun findTasksByGateRecordInAndProcessingStateResultState(records: Set<GateRecordDb>, resultState: RelationsGoldenRecordTaskDb.ResultState) : Set<RelationsGoldenRecordTaskDb>
 }

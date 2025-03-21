@@ -17,13 +17,19 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.orchestrator.api.client
+package org.eclipse.tractusx.bpdm.orchestrator.entity
 
-interface OrchestrationApiClient {
+import jakarta.persistence.Column
+import jakarta.persistence.Embeddable
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
+import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsErrorType
 
-    val goldenRecordTasks: GoldenRecordTaskApiClient
-
-    val finishedTaskEvents: FinishedTaskEventApiClient
-
-    val relationsGoldenRecordTasks : RelationsGoldenRecordTaskApiClient
-}
+@Embeddable
+data class RelationsTaskErrorDb(
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false)
+    val type: TaskRelationsErrorType,
+    @Column(name = "description", nullable = false)
+    val description: String
+)
