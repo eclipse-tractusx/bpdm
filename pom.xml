@@ -166,6 +166,12 @@
                 <artifactId>opencsv</artifactId>
                 <version>${opencsv.version}</version>
             </dependency>
+            <!-- Overwrite this transitive dependency for fixing vulnerabilities -->
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-crypto</artifactId>
+                <version>6.4.4</version>
+            </dependency>
 
             <!-- Test -->
             <dependency>
