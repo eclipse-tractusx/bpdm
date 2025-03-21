@@ -27,15 +27,14 @@ import org.eclipse.tractusx.bpdm.orchestrator.config.StateMachineConfigPropertie
 import org.eclipse.tractusx.bpdm.orchestrator.config.TaskConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.entity.GateRecordDb
 import org.eclipse.tractusx.bpdm.orchestrator.entity.GoldenRecordTaskDb
+import org.eclipse.tractusx.bpdm.orchestrator.entity.OriginRegistrarDb
 import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmIllegalStateException
 import org.eclipse.tractusx.bpdm.orchestrator.repository.GateRecordRepository
+import org.eclipse.tractusx.bpdm.orchestrator.repository.OriginRegistrarRepository
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.BusinessPartnerTestDataFactory
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
-import org.eclipse.tractusx.orchestrator.api.model.TaskErrorDto
-import org.eclipse.tractusx.orchestrator.api.model.TaskErrorType
-import org.eclipse.tractusx.orchestrator.api.model.TaskMode
-import org.eclipse.tractusx.orchestrator.api.model.TaskStep
+import org.eclipse.tractusx.orchestrator.api.model.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
@@ -63,7 +62,8 @@ class GoldenRecordTaskStateMachineIT @Autowired constructor(
     private val taskConfigProperties: TaskConfigProperties,
     private val gateRecordRepository: GateRecordRepository,
     private val dbTestHelpers: DbTestHelpers,
-    private val stateMachineConfigProperties: StateMachineConfigProperties
+    private val stateMachineConfigProperties: StateMachineConfigProperties,
+    private val originRegistrarRepository: OriginRegistrarRepository
 ) {
 
     private val testDataFactory = BusinessPartnerTestDataFactory()
@@ -72,10 +72,13 @@ class GoldenRecordTaskStateMachineIT @Autowired constructor(
 
     private lateinit var gateRecord: GateRecordDb
 
+    private val originId = "test-origin"
+
     @BeforeEach
     fun cleanUp() {
         dbTestHelpers.truncateDbTables()
         gateRecord = gateRecordRepository.save(GateRecordDb(publicId = UUID.randomUUID(), privateId = UUID.randomUUID()))
+        originRegistrarRepository.save(OriginRegistrarDb(originId = originId, name = "test", priority = PriorityEnum.Low, threshold = 20))
     }
 
 
@@ -88,7 +91,7 @@ class GoldenRecordTaskStateMachineIT @Autowired constructor(
     @Transactional
     fun `initial state`(taskMode: TaskMode) {
         val now = Instant.now()
-        val task = goldenRecordTaskStateMachine.initTask(taskMode, businessPartnerFull, gateRecord)
+        val task = goldenRecordTaskStateMachine.initTask(taskMode, businessPartnerFull, gateRecord, originId)
         val expectedStep = stateMachineConfigProperties.modeSteps[taskMode]!!.first()
         val state = task.processingState
 
@@ -111,7 +114,7 @@ class GoldenRecordTaskStateMachineIT @Autowired constructor(
     @Transactional
     fun `walk through all UpdateFromSharingMember steps`(taskMode: TaskMode) {
         // new task
-        val task = goldenRecordTaskStateMachine.initTask(taskMode, businessPartnerFull, gateRecord)
+        val task = goldenRecordTaskStateMachine.initTask(taskMode, businessPartnerFull, gateRecord, originId)
 
         val allSteps = stateMachineConfigProperties.modeSteps[taskMode]!!
         allSteps.forEach { step ->
@@ -165,7 +168,7 @@ class GoldenRecordTaskStateMachineIT @Autowired constructor(
     @Transactional
     fun `walk through steps and resolve with error`(taskMode: TaskMode) {
         // new task
-        val task = goldenRecordTaskStateMachine.initTask(taskMode, businessPartnerFull, gateRecord)
+        val task = goldenRecordTaskStateMachine.initTask(taskMode, businessPartnerFull, gateRecord, originId)
         val expectedStep = stateMachineConfigProperties.modeSteps[taskMode]!!.first()
         assertProcessingState(task.processingState, GoldenRecordTaskDb.ResultState.Pending, expectedStep, GoldenRecordTaskDb.StepState.Queued)
         // taskPendingTimeout has been set

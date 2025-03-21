@@ -57,7 +57,7 @@ class GoldenRecordTaskService(
         abortOutdatedTasks(gateRecords.toSet())
 
         return createRequest.requests.zip(gateRecords)
-            .map { (request, record) -> goldenRecordTaskStateMachine.initTask(createRequest.mode, request.businessPartner, record) }
+            .map { (request, record) -> goldenRecordTaskStateMachine.initTask(createRequest.mode, request.businessPartner, record, createRequest.originId) }
             .map { task -> responseMapper.toClientState(task, calculateTaskRetentionTimeout(task)) }
             .let { TaskCreateResponse(createdTasks = it) }
     }
@@ -102,7 +102,8 @@ class GoldenRecordTaskService(
                 TaskStepReservationEntryDto(
                     task.uuid.toString(),
                     task.gateRecord.publicId.toString(),
-                    responseMapper.toBusinessPartnerResult(task.businessPartner)
+                    responseMapper.toBusinessPartnerResult(task.businessPartner),
+                    task.priority
                 )
             }
             .let { reservations -> TaskStepReservationResponse(reservations, pendingTimeout) }

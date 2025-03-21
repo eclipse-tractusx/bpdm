@@ -29,5 +29,8 @@ data class TaskCreateRequest(
     val mode: TaskMode,
 
     @get:ArraySchema(arraySchema = Schema(description = "The list of tasks to create"))
-    val requests: List<TaskCreateRequestEntry>
+    val requests: List<TaskCreateRequestEntry>,
+
+    @get:Schema(required = true, description = "Indicates the originator of the record")
+    val originId: String,
 )
