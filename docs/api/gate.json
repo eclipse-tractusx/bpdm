@@ -55,103 +55,6 @@
       }
     },
     "/v6/input/business-partner-relations" : {
-      "get" : {
-        "tags" : [ "relation-controller" ],
-        "summary" : "Find business partner input relations",
-        "description" : "Find paginated list of business partner relations from the input stage. There are various filter criteria available. All filters are 'AND' filters.",
-        "operationId" : "get",
-        "parameters" : [ {
-          "name" : "externalIds",
-          "in" : "query",
-          "description" : "Only show relations with the given external identifiers",
-          "required" : false,
-          "schema" : {
-            "type" : "array",
-            "description" : "Only show relations with the given external identifiers",
-            "items" : {
-              "type" : "string",
-              "description" : "Only show relations with the given external identifiers"
-            }
-          }
-        }, {
-          "name" : "relationType",
-          "in" : "query",
-          "description" : "Only show relations of the given type",
-          "required" : false,
-          "schema" : {
-            "type" : "string",
-            "description" : "Only show relations of the given type",
-            "enum" : [ "IsManagedBy" ]
-          }
-        }, {
-          "name" : "businessPartnerSourceExternalIds",
-          "in" : "query",
-          "description" : "Only show relations which have the given business partners as sources",
-          "required" : false,
-          "schema" : {
-            "type" : "array",
-            "description" : "Only show relations which have the given business partners as sources",
-            "items" : {
-              "type" : "string",
-              "description" : "Only show relations which have the given business partners as sources"
-            }
-          }
-        }, {
-          "name" : "businessPartnerTargetExternalIds",
-          "in" : "query",
-          "description" : "Only show relations which have the given business partners as targets",
-          "required" : false,
-          "schema" : {
-            "type" : "array",
-            "description" : "Only show relations which have the given business partners as targets",
-            "items" : {
-              "type" : "string",
-              "description" : "Only show relations which have the given business partners as targets"
-            }
-          }
-        }, {
-          "name" : "updatedAtFrom",
-          "in" : "query",
-          "description" : "Only show relations which have been modified after the given time stamp",
-          "required" : false,
-          "schema" : {
-            "type" : "string",
-            "format" : "date-time",
-            "description" : "Only show relations which have been modified after the given time stamp"
-          }
-        }, {
-          "name" : "page",
-          "in" : "query",
-          "description" : "Number of page to get results from",
-          "required" : false,
-          "schema" : {
-            "type" : "string",
-            "minimum" : 0
-          }
-        }, {
-          "name" : "size",
-          "in" : "query",
-          "description" : "Size of each page",
-          "required" : false,
-          "schema" : {
-            "type" : "string",
-            "maximum" : 100,
-            "minimum" : 0
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "A paginated list of business partner relations for the input stage",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/PageDtoRelationDto"
-                }
-              }
-            }
-          }
-        }
-      },
       "put" : {
         "tags" : [ "relation-controller" ],
         "summary" : "Update a business partner input relation",
@@ -496,6 +399,55 @@
           },
           "400" : {
             "description" : "On malformed pagination request"
+          }
+        }
+      }
+    },
+    "/v6/input/business-partner-relations/search" : {
+      "post" : {
+        "tags" : [ "relation-controller" ],
+        "summary" : "Find business partner input relations",
+        "description" : "Find paginated list of business partner relations from the input stage. There are various filter criteria available. All filters are 'AND' filters.",
+        "operationId" : "postSearch",
+        "parameters" : [ {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Number of page to get results from",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Size of each page",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "maximum" : 100,
+            "minimum" : 0
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/RelationSearchRequest"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "A paginated list of business partner relations for the input stage",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageDtoRelationDto"
+                }
+              }
+            }
           }
         }
       }
@@ -1512,6 +1464,43 @@
           }
         },
         "required" : [ "businessPartnerSourceExternalId", "businessPartnerTargetExternalId", "externalId", "relationType" ]
+      },
+      "RelationSearchRequest" : {
+        "type" : "object",
+        "description" : "Request payload containing search parameters for business partner relations",
+        "properties" : {
+          "externalIds" : {
+            "type" : "array",
+            "description" : "Only show relations with the given external identifiers",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "relationType" : {
+            "type" : "string",
+            "description" : "Only show relations of the given type",
+            "enum" : [ "IsManagedBy" ]
+          },
+          "businessPartnerSourceExternalIds" : {
+            "type" : "array",
+            "description" : "Only show relations which have the given business partners as sources",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "businessPartnerTargetExternalIds" : {
+            "type" : "array",
+            "description" : "Only show relations which have the given business partners as targets",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "updatedAtFrom" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "Only show relations which have been modified after the given time stamp"
+          }
+        }
       },
       "SharingStateDto" : {
         "type" : "object",
