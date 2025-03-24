@@ -29,8 +29,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.eclipse.tractusx.orchestrator.api.RelationsGoldenRecordTaskApi.Companion.RELATIONS_TASKS_PATH
-import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRelationsRequest
-import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRelationsResponse
+import org.eclipse.tractusx.orchestrator.api.model.*
 
 
 @RequestMapping(RELATIONS_TASKS_PATH, produces = [MediaType.APPLICATION_JSON_VALUE])
@@ -61,4 +60,82 @@ interface RelationsGoldenRecordTaskApi {
     @PostMapping
     fun createTasks(@RequestBody createRequest: TaskCreateRelationsRequest): TaskCreateRelationsResponse
 
+    @Operation(
+        summary = "Search for the state of relations golden record tasks by task identifiers",
+        description = "Returns the state of relations golden record tasks based on the provided task identifiers. Unknown task identifiers are ignored."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "The state of the tasks for the provided task identifiers."
+            ),
+            ApiResponse(responseCode = "400", description = "On malformed task search requests", content = [Content()]),
+        ]
+    )
+    @Tag(name = TagClient)
+    @PostMapping("/state/search")
+    fun searchTaskStates(@RequestBody stateRequest: TaskStateRequest): TaskRelationsStateResponse
+
+    @Operation(
+        summary = "Search for result states by giving a list of task IDs",
+        description = ""
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "The list of corresponding result states in the same order as has been received. A null indicates that a task could not be found."
+            ),
+            ApiResponse(responseCode = "400", description = "On malformed task search requests", content = [Content()]),
+        ]
+    )
+    @Tag(name = TagClient)
+    @PostMapping("/result-state/search")
+    fun searchTaskResultStates(@RequestBody stateRequest: TaskResultStateSearchRequest): TaskResultStateSearchResponse
+
+    @Operation(
+        summary = "Reserve the next relations golden record tasks waiting in the given step queue",
+        description = "Reserve up to a given number of relations golden record tasks in the given step queue. " +
+                "The response entries contain the business partner relations data. " +
+                "The reservation has a time limit which is returned. " +
+                "For a single request, the maximum number of reservable tasks is limited to \${bpdm.api.upsert-limit}."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "The reserved tasks with their business partner relations data to process."
+            ),
+            ApiResponse(responseCode = "400", description = "On malformed task create requests or reaching upsert limit", content = [Content()]),
+        ]
+    )
+    @Tag(name = TagWorker)
+    @PostMapping("/step-reservations")
+    fun reserveTasksForStep(@RequestBody reservationRequest: TaskStepReservationRequest): TaskRelationsStepReservationResponse
+
+    @Operation(
+        summary = "Post step results for reserved relations golden record tasks in the given step queue",
+        description = "Post business partner relations step results for the given tasks in the given step queue. " +
+                "In order to post a result for a task it needs to be reserved first, has to currently be in the given step queue and the time limit is not exceeded. " +
+                "The number of results you can post at a time does not need to match the original number of reserved tasks. " +
+                "Results are accepted via strategy 'all or nothing'. " +
+                "For a single request, the maximum number of postable results is limited to \${bpdm.api.upsert-limit}."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "204",
+                description = "If the results could be processed"
+            ),
+            ApiResponse(
+                responseCode = "400",
+                description = "On malformed requests, reaching upsert limit or posting results for tasks which are missing or in the wrong step queue",
+                content = [Content()]
+            ),
+        ]
+    )
+    @Tag(name = TagWorker)
+    @PostMapping("/step-results")
+    fun resolveStepResults(@RequestBody resultRequest: TaskRelationsStepResultRequest)
 }

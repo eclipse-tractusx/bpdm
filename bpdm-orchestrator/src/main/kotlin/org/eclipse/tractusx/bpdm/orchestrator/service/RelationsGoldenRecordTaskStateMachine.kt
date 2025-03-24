@@ -20,14 +20,13 @@
 package org.eclipse.tractusx.bpdm.orchestrator.service
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.orchestrator.config.StateMachineConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.config.TaskConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.entity.*
 import org.eclipse.tractusx.bpdm.orchestrator.exception.RelationsIllegalStateException
 import org.eclipse.tractusx.bpdm.orchestrator.repository.RelationsGoldenRecordTaskRepository
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
-import org.eclipse.tractusx.orchestrator.api.model.TaskMode
-import org.eclipse.tractusx.orchestrator.api.model.TaskStep
+import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.stereotype.Service
 import java.time.Instant
 
@@ -68,8 +67,19 @@ class RelationsGoldenRecordTaskStateMachine(
         return relationsTaskRepository.save(initialTask)
     }
 
-    private fun getInitialStep(mode: TaskMode): TaskStep {
-        return stateMachineConfigProperties.modeSteps[mode]!!.first()
+    fun doReserve(task: RelationsGoldenRecordTaskDb): RelationsGoldenRecordTaskDb {
+        logger.debug { "Executing doReserve() with parameters $task" }
+        val state = task.processingState
+
+        if (state.resultState != RelationsGoldenRecordTaskDb.ResultState.Pending || state.stepState != RelationsGoldenRecordTaskDb.StepState.Queued) {
+            throw RelationsIllegalStateException(task.uuid, state)
+        }
+
+        // reserved for current step
+        task.processingState.stepState = RelationsGoldenRecordTaskDb.StepState.Reserved
+        task.updatedAt = DbTimestamp(Instant.now())
+
+        return relationsTaskRepository.save(task)
     }
 
     fun doAbortTask(task: RelationsGoldenRecordTaskDb): RelationsGoldenRecordTaskDb{
@@ -82,10 +92,112 @@ class RelationsGoldenRecordTaskStateMachine(
         return relationsTaskRepository.save(task)
     }
 
+    fun doResolveTaskToError(task: RelationsGoldenRecordTaskDb, step: TaskStep, errors: List<TaskRelationsErrorDto>): RelationsGoldenRecordTaskDb {
+        logger.debug { "Executing doResolveTaskToError() with parameters $task // $step and $errors" }
+        val state = task.processingState
+
+        if (!isResolvableForStep(state, step)) {
+            if(hasAlreadyResolvedStep(state, step))
+            {
+                logger.debug { "Task ${task.uuid} has already been processed for step $step. Result is ignored" }
+                return task
+            }else{
+                throw RelationsIllegalStateException(task.uuid, state)
+            }
+        }
+
+        task.processingState.toError(errors.map { relationsRequestMapper.toTaskError(it) })
+        task.updatedAt =  DbTimestamp(Instant.now())
+
+        return relationsTaskRepository.save(task)
+    }
+
+    fun resolveTaskStepToSuccess(
+        task: RelationsGoldenRecordTaskDb,
+        step: TaskStep,
+        resultBusinessPartnerRelaitons: BusinessPartnerRelations
+    ): RelationsGoldenRecordTaskDb {
+        logger.debug { "Executing doResolveTaskToSuccess() with parameters $task // $step and $resultBusinessPartnerRelaitons" }
+        val state = task.processingState
+
+        if (!isResolvableForStep(state, step)) {
+            if(hasAlreadyResolvedStep(state, step))
+            {
+                logger.debug { "Task ${task.uuid} has already been processed for step $step. Result is ignored" }
+                return task
+            }else{
+                throw RelationsIllegalStateException(task.uuid, state)
+            }
+        }
+
+        val nextStep = getNextStep(state.mode, state.step)
+
+        if (nextStep != null) {
+            // still steps left to process -> queued for next step
+            task.processingState.toStep(nextStep)
+        } else {
+            // last step finished -> set resultState and stepState to success
+            task.processingState.toSuccess()
+        }
+
+        task.updateBusinessPartnerRelations(relationsRequestMapper.toBusinessPartnerRelations(resultBusinessPartnerRelaitons))
+        task.updatedAt =  DbTimestamp(Instant.now())
+
+        return relationsTaskRepository.save(task)
+    }
+
+    private fun getInitialStep(mode: TaskMode): TaskStep {
+        return stateMachineConfigProperties.modeSteps[mode]!!.first()
+    }
+
     private fun RelationsGoldenRecordTaskDb.ProcessingState.toAborted() {
         resultState = RelationsGoldenRecordTaskDb.ResultState.Aborted
         stepState = RelationsGoldenRecordTaskDb.StepState.Aborted
         pendingTimeout = null
         retentionTimeout = Instant.now().plus(taskConfigProperties.taskRetentionTimeout).toTimestamp()
+    }
+
+    private fun RelationsGoldenRecordTaskDb.ProcessingState.toError(newErrors: List<RelationsTaskErrorDb>) {
+        resultState = RelationsGoldenRecordTaskDb.ResultState.Error
+        stepState = RelationsGoldenRecordTaskDb.StepState.Error
+        errors.replace(newErrors)
+        pendingTimeout = null
+        retentionTimeout = Instant.now().plus(taskConfigProperties.taskRetentionTimeout).toTimestamp()
+    }
+
+    private fun isResolvableForStep(state: RelationsGoldenRecordTaskDb.ProcessingState, step: TaskStep): Boolean{
+        return state.resultState == RelationsGoldenRecordTaskDb.ResultState.Pending
+                && state.stepState == RelationsGoldenRecordTaskDb.StepState.Reserved
+                && state.step == step
+    }
+
+    private fun hasAlreadyResolvedStep(state: RelationsGoldenRecordTaskDb.ProcessingState, step: TaskStep): Boolean{
+        if(state.step == step) return state.stepState != RelationsGoldenRecordTaskDb.StepState.Reserved
+        return isStepBefore(step, state.step, state.mode)
+    }
+
+    private fun isStepBefore(stepBefore: TaskStep, stepAfter: TaskStep, mode: TaskMode): Boolean{
+        val modeSteps = stateMachineConfigProperties.modeSteps[mode]!!
+        return modeSteps.contains(stepBefore) && modeSteps.indexOf(stepBefore) <= modeSteps.indexOf(stepAfter)
+    }
+
+    private fun getNextStep(mode: TaskMode, currentStep: TaskStep): TaskStep? {
+        return stateMachineConfigProperties.modeSteps[mode]!!
+            .dropWhile { it != currentStep }        // drop steps before currentStep
+            .drop(1)                             // then drop currentStep
+            .firstOrNull()                          // return next step
+    }
+
+    private fun RelationsGoldenRecordTaskDb.ProcessingState.toStep(nextStep: TaskStep) {
+        step = nextStep
+        stepState = RelationsGoldenRecordTaskDb.StepState.Queued
+    }
+
+    private fun RelationsGoldenRecordTaskDb.ProcessingState.toSuccess() {
+        resultState = RelationsGoldenRecordTaskDb.ResultState.Success
+        stepState = RelationsGoldenRecordTaskDb.StepState.Success
+        pendingTimeout = null
+        retentionTimeout = Instant.now().plus(taskConfigProperties.taskRetentionTimeout).toTimestamp()
+
     }
 }

@@ -19,12 +19,8 @@
 
 package org.eclipse.tractusx.orchestrator.api.client
 
-import org.eclipse.tractusx.orchestrator.api.GoldenRecordTaskApi
 import org.eclipse.tractusx.orchestrator.api.RelationsGoldenRecordTaskApi
-import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRelationsRequest
-import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRelationsResponse
-import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRequest
-import org.eclipse.tractusx.orchestrator.api.model.TaskCreateResponse
+import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
@@ -36,5 +32,25 @@ interface RelationsGoldenRecordTaskApiClient: RelationsGoldenRecordTaskApi {
     override fun createTasks(
         @RequestBody createRequest: TaskCreateRelationsRequest
     ): TaskCreateRelationsResponse
+
+    @PostExchange("/state/search")
+    override fun searchTaskStates(
+        @RequestBody stateRequest: TaskStateRequest
+    ): TaskRelationsStateResponse
+
+    @PostExchange("/result-state/search")
+    override fun searchTaskResultStates(
+        @RequestBody stateRequest: TaskResultStateSearchRequest
+    ): TaskResultStateSearchResponse
+
+    @PostExchange("/step-reservations")
+    override fun reserveTasksForStep(
+        @RequestBody reservationRequest: TaskStepReservationRequest
+    ): TaskRelationsStepReservationResponse
+
+    @PostExchange("/step-results")
+    override fun resolveStepResults(
+        @RequestBody resultRequest: TaskRelationsStepResultRequest
+    )
 
 }

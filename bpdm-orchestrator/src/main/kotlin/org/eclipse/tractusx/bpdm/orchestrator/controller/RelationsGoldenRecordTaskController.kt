@@ -24,9 +24,10 @@ import org.eclipse.tractusx.bpdm.orchestrator.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.service.RelationsGoldenRecordTaskService
 import org.eclipse.tractusx.orchestrator.api.RelationsGoldenRecordTaskApi
-import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRelationsRequest
-import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRelationsResponse
+import org.eclipse.tractusx.orchestrator.api.model.*
+import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -41,6 +42,33 @@ class RelationsGoldenRecordTaskController(
             throw BpdmUpsertLimitException(createRequest.requests.size, apiConfigProperties.upsertLimit)
 
         return relationsGoldenRecordTaskService.createTasks(createRequest)
+    }
+
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.VIEW_TASK})")
+    override fun searchTaskStates(stateRequest: TaskStateRequest): TaskRelationsStateResponse {
+        return relationsGoldenRecordTaskService.searchTaskStates(stateRequest)
+    }
+
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.VIEW_TASK})")
+    override fun searchTaskResultStates(stateRequest: TaskResultStateSearchRequest): TaskResultStateSearchResponse {
+        return relationsGoldenRecordTaskService.searchTaskResultStates(stateRequest)
+    }
+
+    @PreAuthorize("@stepSecurityService.assertHasReservationAuthority(authentication, #reservationRequest.step)")
+    override fun reserveTasksForStep(reservationRequest: TaskStepReservationRequest): TaskRelationsStepReservationResponse {
+        if (reservationRequest.amount > apiConfigProperties.upsertLimit)
+            throw BpdmUpsertLimitException(reservationRequest.amount, apiConfigProperties.upsertLimit)
+
+        return relationsGoldenRecordTaskService.reserveTasksForStep(reservationRequest)
+    }
+
+    @PreAuthorize("@stepSecurityService.assertHasResultAuthority(authentication, #resultRequest.step)")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    override fun resolveStepResults(resultRequest: TaskRelationsStepResultRequest) {
+        if (resultRequest.results.size > apiConfigProperties.upsertLimit)
+            throw BpdmUpsertLimitException(resultRequest.results.size, apiConfigProperties.upsertLimit)
+
+        relationsGoldenRecordTaskService.resolveStepResults(resultRequest)
     }
 
 }

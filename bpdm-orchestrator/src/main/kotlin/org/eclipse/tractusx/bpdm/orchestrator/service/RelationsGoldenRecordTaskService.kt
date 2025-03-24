@@ -27,9 +27,12 @@ import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmRecordNotFoundExcept
 import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmTaskNotFoundException
 import org.eclipse.tractusx.bpdm.orchestrator.repository.GateRecordRepository
 import org.eclipse.tractusx.bpdm.orchestrator.repository.RelationsGoldenRecordTaskRepository
+import org.eclipse.tractusx.bpdm.orchestrator.repository.fetchRelationsData
 import org.eclipse.tractusx.orchestrator.api.model.*
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.Instant
 import java.util.*
 
 @Service
@@ -54,6 +57,74 @@ class RelationsGoldenRecordTaskService(
             .map { (request, record) -> relationsGoldenRecordTaskStateMachine.initTask(createRequest.mode, request.businessPartnerRelations, record) }
             .map { task -> relationsResponseMapper.toClientState(task, calculateTaskRetentionTimeout(task)) }
             .let { TaskCreateRelationsResponse(createdTasks = it) }
+    }
+
+    fun searchTaskStates(stateRequest: TaskStateRequest): TaskRelationsStateResponse {
+        logger.debug { "Search for the state of relations golden record task: executing searchTaskStates() with parameters $stateRequest" }
+        val requestsByTaskId = stateRequest.entries.associateBy { it.taskId }
+
+        return stateRequest.entries.map { toUUID(it.taskId) }
+            .let { uuids -> relationsTaskRepository.findByUuidIn(uuids.toSet()) }
+            .also { tasks -> relationsTaskRepository.fetchRelationsData(tasks) }
+            .filter { task -> requestsByTaskId[task.uuid.toString()]?.recordId == task.gateRecord.privateId.toString() }
+            .map { task -> relationsResponseMapper.toClientState(task, calculateTaskRetentionTimeout(task)) }
+            .let { TaskRelationsStateResponse(tasks = it) }
+    }
+
+    fun searchTaskResultStates(stateRequest: TaskResultStateSearchRequest): TaskResultStateSearchResponse{
+        logger.debug { "Search for ${stateRequest.taskIds.size} task result states" }
+
+        val uuidsToSearch = stateRequest.taskIds.map { UUID.fromString(it) }.toSet()
+        val tasksByUuid  = relationsTaskRepository.findByUuidIn(uuidsToSearch).associateBy { it.uuid }
+
+        return TaskResultStateSearchResponse(uuidsToSearch
+            .map { tasksByUuid[it]?.processingState?.resultState }
+            .map { it?.let { relationsResponseMapper.toResultState(it) }
+            })
+    }
+
+    @Transactional
+    fun reserveTasksForStep(reservationRequest: TaskStepReservationRequest): TaskRelationsStepReservationResponse {
+        logger.debug { "Reservation of next relations golden record tasks: executing reserveTasksForStep() with parameters $reservationRequest" }
+        val now = Instant.now()
+
+        val foundTasks = relationsTaskRepository.findByStepAndStepState(reservationRequest.step, RelationsGoldenRecordTaskDb.StepState.Queued, Pageable.ofSize(reservationRequest.amount))
+            .content.toSet()
+            .also { relationsTaskRepository.fetchRelationsData(it) }
+        val reservedTasks = foundTasks.map { relationsGoldenRecordTaskStateMachine.doReserve(it) }
+        val pendingTimeout = reservedTasks.minOfOrNull { calculateTaskPendingTimeout(it) } ?: now
+
+        return reservedTasks
+            .map { task ->
+                TaskRelationsStepReservationEntryDto(
+                    task.uuid.toString(),
+                    task.gateRecord.publicId.toString(),
+                    relationsResponseMapper.toBusinessPartneRelationsResult(task.businessPartnerRelations)
+                )
+            }
+            .let { reservations -> TaskRelationsStepReservationResponse(reservations, pendingTimeout) }
+    }
+
+    @Transactional
+    fun resolveStepResults(resultRequest: TaskRelationsStepResultRequest) {
+        logger.debug { "Step results for reserved relations golden record tasks: executing resolveStepResults() with parameters $resultRequest" }
+        val uuids = resultRequest.results.map { toUUID(it.taskId) }
+        val foundTasks = relationsTaskRepository.findByUuidIn(uuids.toSet()).also { relationsTaskRepository.fetchRelationsData(it) }
+        val foundTasksByUuid = foundTasks.associateBy { it.uuid.toString() }
+
+        resultRequest.results
+            .map { resultEntry -> Pair(foundTasksByUuid[resultEntry.taskId] ?: throw BpdmTaskNotFoundException(resultEntry.taskId), resultEntry) }
+            .filterNot { (task, _) -> task.processingState.resultState == RelationsGoldenRecordTaskDb.ResultState.Aborted }
+            .forEach { (task, resultEntry) ->
+                val step = resultRequest.step
+                val errors = resultEntry.errors
+                val resultBusinessPartnerRelaitons = resultEntry.businessPartnerRelations
+
+                when{
+                    errors.isNotEmpty() -> relationsGoldenRecordTaskStateMachine.doResolveTaskToError(task, step, errors)
+                    else ->  relationsGoldenRecordTaskStateMachine.resolveTaskStepToSuccess(task, step, resultBusinessPartnerRelaitons)
+                }
+            }
     }
 
     private fun getOrCreateGateRecords(requests: List<TaskCreateRelationsRequestEntry>): List<GateRecordDb> {
@@ -87,5 +158,8 @@ class RelationsGoldenRecordTaskService(
 
     private fun calculateTaskRetentionTimeout(task: RelationsGoldenRecordTaskDb) =
         task.createdAt.instant.plus(taskConfigProperties.taskRetentionTimeout)
+
+    private fun calculateTaskPendingTimeout(task: RelationsGoldenRecordTaskDb) =
+        task.createdAt.instant.plus(taskConfigProperties.taskPendingTimeout)
 
 }
