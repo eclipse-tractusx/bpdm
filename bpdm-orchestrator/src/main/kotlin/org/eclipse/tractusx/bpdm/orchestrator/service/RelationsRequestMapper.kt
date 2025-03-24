@@ -17,13 +17,22 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.orchestrator.api.client
+package org.eclipse.tractusx.bpdm.orchestrator.service
 
-interface OrchestrationApiClient {
+import org.eclipse.tractusx.bpdm.orchestrator.entity.RelationsGoldenRecordTaskDb
+import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
+import org.springframework.stereotype.Service
 
-    val goldenRecordTasks: GoldenRecordTaskApiClient
+@Service
+class RelationsRequestMapper {
 
-    val finishedTaskEvents: FinishedTaskEventApiClient
+    fun toBusinessPartnerRelations(businessPartnerRelations: BusinessPartnerRelations) =
+        with(businessPartnerRelations){
+            RelationsGoldenRecordTaskDb.BusinessPartnerRelations(
+                relationType = RelationsGoldenRecordTaskDb.RelationType.valueOf(relationType.name),
+                businessPartnerSourceBpnl = businessPartnerSourceBpnl,
+                businessPartnerTargetBpnl = businessPartnerTargetBpnl
+            )
+        }
 
-    val relationsGoldenRecordTasks : RelationsGoldenRecordTaskApiClient
 }

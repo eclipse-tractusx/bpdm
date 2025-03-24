@@ -17,13 +17,12 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.orchestrator.api.client
+package org.eclipse.tractusx.orchestrator.api.model
 
-interface OrchestrationApiClient {
+import io.swagger.v3.oas.annotations.media.Schema
 
-    val goldenRecordTasks: GoldenRecordTaskApiClient
+@Schema(description = "Response object for giving a list of created tasks")
+data class TaskCreateRelationsResponse(
 
-    val finishedTaskEvents: FinishedTaskEventApiClient
-
-    val relationsGoldenRecordTasks : RelationsGoldenRecordTaskApiClient
-}
+    val createdTasks: List<TaskClientRelationsStateDto>
+)

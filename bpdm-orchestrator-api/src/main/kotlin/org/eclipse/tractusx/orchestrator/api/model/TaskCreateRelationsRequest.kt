@@ -17,13 +17,17 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.orchestrator.api.client
+package org.eclipse.tractusx.orchestrator.api.model
 
-interface OrchestrationApiClient {
+import io.swagger.v3.oas.annotations.media.ArraySchema
+import io.swagger.v3.oas.annotations.media.Schema
 
-    val goldenRecordTasks: GoldenRecordTaskApiClient
+@Schema(description = "Request object to specify for which business partner relationship data tasks should be created and in which mode")
+data class TaskCreateRelationsRequest(
 
-    val finishedTaskEvents: FinishedTaskEventApiClient
+    @get:Schema(required = true, description = "The mode affecting which processing steps the business partner relation goes through")
+    val mode: TaskMode,
 
-    val relationsGoldenRecordTasks : RelationsGoldenRecordTaskApiClient
-}
+    @get:ArraySchema(arraySchema = Schema(description = "The list of tasks to create"))
+    val requests: List<TaskCreateRelationsRequestEntry>
+)

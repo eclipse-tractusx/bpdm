@@ -46,7 +46,8 @@ class AuthTaskProcessorPoolTaskProcessingJobApiSyncIT @Autowired constructor(
     OrchestratorAuthExpectations(
         tasks = TaskAuthExpectations(
             postTask = AuthExpectationType.Forbidden,
-            postStateSearch = AuthExpectationType.Forbidden
+            postStateSearch = AuthExpectationType.Forbidden,
+            postRelationsTask = AuthExpectationType.Forbidden,
         ),
         steps = TaskStep.entries.associateWith { step ->
             when(step){

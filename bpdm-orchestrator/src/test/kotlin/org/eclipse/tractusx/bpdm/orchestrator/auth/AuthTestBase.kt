@@ -65,6 +65,12 @@ abstract class AuthTestBase(
         }
     }
 
+    @Test
+    fun `POST Relations Golden Record Task`() {
+        val payload = TaskCreateRelationsRequest(TaskMode.entries.first(), listOf())
+        authAssertions.assert(orchAuthExpectations.tasks.postRelationsTask) { orchestratorClient.relationsGoldenRecordTasks.createTasks(payload) }
+    }
+
     data class OrchestratorAuthExpectations(
         val tasks: TaskAuthExpectations,
         val steps: Map<TaskStep, TaskStepAuthExpectations>
@@ -73,6 +79,7 @@ abstract class AuthTestBase(
     data class TaskAuthExpectations(
         val postTask: AuthExpectationType,
         val postStateSearch: AuthExpectationType,
+        val postRelationsTask: AuthExpectationType,
     )
 
     data class TaskStepAuthExpectations(
