@@ -67,7 +67,7 @@ class AuthAdminIT @Autowired constructor(
             getInputTemplate = AuthExpectationType.Authorized
         ),
         relation = RelationAuthExpectations(
-            get = AuthExpectationType.Authorized,
+            postSearch = AuthExpectationType.Authorized,
             put = AuthExpectationType.Authorized
         )
     )

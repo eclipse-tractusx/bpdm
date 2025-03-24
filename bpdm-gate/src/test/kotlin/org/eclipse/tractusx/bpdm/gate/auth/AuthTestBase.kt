@@ -23,7 +23,10 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
-import org.eclipse.tractusx.bpdm.gate.api.model.request.*
+import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangelogSearchRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
 import org.eclipse.tractusx.bpdm.test.util.AuthAssertionHelper
 import org.eclipse.tractusx.bpdm.test.util.AuthExpectationType
 import org.junit.jupiter.api.Test
@@ -106,8 +109,8 @@ abstract class AuthTestBase(
     }
 
     @Test
-    fun `GET Relations`() {
-        authAssertions.assert(authExpectations.relation.get) { gateClient.relation.get() }
+    fun `POST SEARCH Relations`() {
+        authAssertions.assert(authExpectations.relation.postSearch) { gateClient.relation.postSearch() }
     }
 
     @Test
@@ -155,6 +158,6 @@ data class UploadPartnerAuthExpections(
 )
 
 data class RelationAuthExpectations(
-    val get: AuthExpectationType,
+    val postSearch: AuthExpectationType,
     val put: AuthExpectationType
 )

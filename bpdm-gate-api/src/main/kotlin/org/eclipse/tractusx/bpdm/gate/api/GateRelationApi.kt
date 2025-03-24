@@ -29,13 +29,12 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.GateRelationApi.Companion.RELATIONS_PATH
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationDto
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.GateErrorResponse
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
-import java.time.Instant
 
 @RequestMapping(RELATIONS_PATH, produces = [MediaType.APPLICATION_JSON_VALUE])
 interface GateRelationApi {
@@ -55,18 +54,9 @@ interface GateRelationApi {
             ApiResponse(responseCode = "200", description = "A paginated list of business partner relations for the input stage")
         ]
     )
-    @GetMapping
-    fun get(
-        @Schema(description = "Only show relations with the given external identifiers")
-        @RequestParam externalIds: List<String>? = null,
-        @Schema(description = "Only show relations of the given type")
-        @RequestParam relationType: RelationType? = null,
-        @Schema(description = "Only show relations which have the given business partners as sources")
-        @RequestParam businessPartnerSourceExternalIds: List<String>? = null,
-        @Schema(description = "Only show relations which have the given business partners as targets")
-        @RequestParam businessPartnerTargetExternalIds: List<String>? = null,
-        @Schema(description = "Only show relations which have been modified after the given time stamp")
-        @RequestParam updatedAtFrom: Instant? = null,
+    @PostMapping("/search")
+    fun postSearch(
+        @RequestBody searchRequest: RelationSearchRequest = RelationSearchRequest(),
         @ParameterObject @Valid paginationRequest: PaginationRequest = PaginationRequest()
     ): PageDto<RelationDto>
 

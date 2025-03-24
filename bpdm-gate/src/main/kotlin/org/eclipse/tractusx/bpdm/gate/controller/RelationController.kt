@@ -24,14 +24,13 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.GateRelationApi
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationDto
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationSearchRequest
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.service.RelationService
 import org.eclipse.tractusx.bpdm.gate.util.PrincipalUtil
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
-import java.time.Instant
 
 @RestController
 class RelationController(
@@ -40,22 +39,18 @@ class RelationController(
 ): GateRelationApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_INPUT_RELATION})")
-    override fun get(
-        externalIds: List<String>?,
-        relationType: RelationType?,
-        businessPartnerSourceExternalIds: List<String>?,
-        businessPartnerTargetExternalIds: List<String>?,
-        updatedAtFrom: Instant?,
+    override fun postSearch(
+        searchRequest: RelationSearchRequest,
         paginationRequest: PaginationRequest
     ): PageDto<RelationDto> {
        return relationshipService.findRelations(
            tenantBpnL = principalUtil.resolveTenantBpnl(),
            stageType = StageType.Input,
-           externalIds = externalIds ?: emptyList(),
-           relationType = relationType,
-           sourceBusinessPartnerExternalIds = businessPartnerSourceExternalIds ?: emptyList(),
-           targetBusinessPartnerExternalIds = businessPartnerTargetExternalIds ?: emptyList(),
-           updatedAtFrom = updatedAtFrom,
+           externalIds = searchRequest.externalIds ?: emptyList(),
+           relationType = searchRequest.relationType,
+           sourceBusinessPartnerExternalIds = searchRequest.businessPartnerSourceExternalIds ?: emptyList(),
+           targetBusinessPartnerExternalIds = searchRequest.businessPartnerTargetExternalIds ?: emptyList(),
+           updatedAtFrom = searchRequest.updatedAtFrom,
            paginationRequest = paginationRequest
        )
     }
