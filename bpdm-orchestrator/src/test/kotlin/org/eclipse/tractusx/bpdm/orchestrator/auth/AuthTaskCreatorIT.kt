@@ -48,6 +48,7 @@ class AuthTaskCreatorIT @Autowired constructor(
             postTask = AuthExpectationType.Authorized,
             postStateSearch = AuthExpectationType.Authorized,
             postRelationsTask = AuthExpectationType.Authorized,
+            postRelationsStateSearch = AuthExpectationType.Authorized
         ),
         steps = TaskStep.entries
             .associateWith { TaskStepAuthExpectations(postReservation = AuthExpectationType.Forbidden, postResult = AuthExpectationType.Forbidden) }

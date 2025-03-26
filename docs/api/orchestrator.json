@@ -15,12 +15,169 @@
     "bearer_scheme" : [ ]
   } ],
   "paths" : {
+    "/v6/relations/golden-record-tasks" : {
+      "post" : {
+        "tags" : [ "Task Client" ],
+        "summary" : "Create new golden record relations tasks for given business partner relationship data",
+        "description" : "Create golden record tasks for given business partner relationship data in given mode. The mode decides through which processing steps the given business partner relationship data will go through. The response contains the states of the created tasks in the order of given business partner relationship data.If there is an error in the request no tasks are created (all or nothing). For a single request, the maximum number of business partners in the request is limited to 100 entries.",
+        "operationId" : "createTasks",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/TaskCreateRelationsRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "The states of successfully created tasks including the task identifier for tracking purposes.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/TaskCreateRelationsResponse"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "On malformed task create requests or reaching upsert limit"
+          }
+        }
+      }
+    },
+    "/v6/relations/golden-record-tasks/step-results" : {
+      "post" : {
+        "tags" : [ "Task Worker" ],
+        "summary" : "Post step results for reserved relations golden record tasks in the given step queue",
+        "description" : "Post business partner relations step results for the given tasks in the given step queue. In order to post a result for a task it needs to be reserved first, has to currently be in the given step queue and the time limit is not exceeded. The number of results you can post at a time does not need to match the original number of reserved tasks. Results are accepted via strategy 'all or nothing'. For a single request, the maximum number of postable results is limited to 100.",
+        "operationId" : "resolveStepResults",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/TaskRelationsStepResultRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "204" : {
+            "description" : "If the results could be processed"
+          },
+          "400" : {
+            "description" : "On malformed requests, reaching upsert limit or posting results for tasks which are missing or in the wrong step queue"
+          }
+        }
+      }
+    },
+    "/v6/relations/golden-record-tasks/step-reservations" : {
+      "post" : {
+        "tags" : [ "Task Worker" ],
+        "summary" : "Reserve the next relations golden record tasks waiting in the given step queue",
+        "description" : "Reserve up to a given number of relations golden record tasks in the given step queue. The response entries contain the business partner relations data. The reservation has a time limit which is returned. For a single request, the maximum number of reservable tasks is limited to 100.",
+        "operationId" : "reserveTasksForStep",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/TaskStepReservationRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "The reserved tasks with their business partner relations data to process.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/TaskRelationsStepReservationResponse"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "On malformed task create requests or reaching upsert limit"
+          }
+        }
+      }
+    },
+    "/v6/relations/golden-record-tasks/state/search" : {
+      "post" : {
+        "tags" : [ "Task Client" ],
+        "summary" : "Search for the state of relations golden record tasks by task identifiers",
+        "description" : "Returns the state of relations golden record tasks based on the provided task identifiers. Unknown task identifiers are ignored.",
+        "operationId" : "searchTaskStates",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/TaskStateRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "The state of the tasks for the provided task identifiers.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/TaskRelationsStateResponse"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "On malformed task search requests"
+          }
+        }
+      }
+    },
+    "/v6/relations/golden-record-tasks/result-state/search" : {
+      "post" : {
+        "tags" : [ "Task Client" ],
+        "summary" : "Search for result states by giving a list of task IDs",
+        "operationId" : "searchTaskResultStates",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/TaskResultStateSearchRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "The list of corresponding result states in the same order as has been received. A null indicates that a task could not be found.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/TaskResultStateSearchResponse"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "On malformed task search requests"
+          }
+        }
+      }
+    },
     "/v6/golden-record-tasks" : {
       "post" : {
         "tags" : [ "Task Client" ],
         "summary" : "Create new golden record tasks for given business partner data",
         "description" : "Create golden record tasks for given business partner data in given mode. The mode decides through which processing steps the given business partner data will go through. The response contains the states of the created tasks in the order of given business partner data.If there is an error in the request no tasks are created (all or nothing). For a single request, the maximum number of business partners in the request is limited to 100 entries.",
-        "operationId" : "createTasks",
+        "operationId" : "createTasks_1",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -53,7 +210,7 @@
         "tags" : [ "Task Worker" ],
         "summary" : "Post step results for reserved golden record tasks in the given step queue",
         "description" : "Post business partner step results for the given tasks in the given step queue. In order to post a result for a task it needs to be reserved first, has to currently be in the given step queue and the time limit is not exceeded. The number of results you can post at a time does not need to match the original number of reserved tasks. Results are accepted via strategy 'all or nothing'. For a single request, the maximum number of postable results is limited to 100.",
-        "operationId" : "resolveStepResults",
+        "operationId" : "resolveStepResults_1",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -79,7 +236,7 @@
         "tags" : [ "Task Worker" ],
         "summary" : "Reserve the next golden record tasks waiting in the given step queue",
         "description" : "Reserve up to a given number of golden record tasks in the given step queue. The response entries contain the business partner data to process which consists of the generic and L/S/A data. The reservation has a time limit which is returned. For a single request, the maximum number of reservable tasks is limited to 100.",
-        "operationId" : "reserveTasksForStep",
+        "operationId" : "reserveTasksForStep_1",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -112,7 +269,7 @@
         "tags" : [ "Task Client" ],
         "summary" : "Search for the state of golden record tasks by task identifiers",
         "description" : "Returns the state of golden record tasks based on the provided task identifiers. Unknown task identifiers are ignored.",
-        "operationId" : "searchTaskStates",
+        "operationId" : "searchTaskStates_1",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -144,7 +301,7 @@
       "post" : {
         "tags" : [ "Task Client" ],
         "summary" : "Search for result states by giving a list of task IDs",
-        "operationId" : "searchTaskResultStates",
+        "operationId" : "searchTaskResultStates_1",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -168,6 +325,57 @@
           },
           "400" : {
             "description" : "On malformed task search requests"
+          }
+        }
+      }
+    },
+    "/v6/relations/golden-record-tasks/finished-events" : {
+      "get" : {
+        "tags" : [ "Task Client" ],
+        "summary" : "Get event log of relations golden record tasks that have finished processing",
+        "description" : "The event log contains all events of when relations golden record tasks finish processing. These events are helpful for the task creator to check whether created tasks have finished processing. A paginated list of events that happened after a given time is returned. ",
+        "operationId" : "getRelationsEvents",
+        "parameters" : [ {
+          "name" : "timestamp",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        }, {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Number of page to get results from",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Size of each page",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "maximum" : 100,
+            "minimum" : 0
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "The paginated events after the given timestamp",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/FinishedTaskEventsResponse"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "On malformed requests"
           }
         }
       }
@@ -318,6 +526,26 @@
           }
         },
         "required" : [ "legalEntity", "nameParts", "uncategorized" ]
+      },
+      "BusinessPartnerRelations" : {
+        "type" : "object",
+        "description" : "The business partner relations data to be processed ",
+        "properties" : {
+          "relationType" : {
+            "type" : "string",
+            "description" : "The type of relation between the business partners",
+            "enum" : [ "IsAlternativeHeadquarterFor" ]
+          },
+          "businessPartnerSourceBpnl" : {
+            "type" : "string",
+            "description" : "The business partner from which the relation emerges (the source)"
+          },
+          "businessPartnerTargetBpnl" : {
+            "type" : "string",
+            "description" : "The business partner to which this relation goes (the target)"
+          }
+        },
+        "required" : [ "businessPartnerSourceBpnl", "businessPartnerTargetBpnl", "relationType" ]
       },
       "BusinessState" : {
         "type" : "object",
@@ -722,6 +950,26 @@
           }
         }
       },
+      "TaskClientRelationsStateDto" : {
+        "type" : "object",
+        "description" : "The golden record task's processing state together with optional business partner relationship data in case processing is done",
+        "properties" : {
+          "taskId" : {
+            "type" : "string"
+          },
+          "recordId" : {
+            "type" : "string",
+            "description" : "The identifier of the gate record for which this task has been created"
+          },
+          "businessPartnerRelationsResult" : {
+            "$ref" : "#/components/schemas/BusinessPartnerRelations"
+          },
+          "processingState" : {
+            "$ref" : "#/components/schemas/TaskProcessingRelationsStateDto"
+          }
+        },
+        "required" : [ "businessPartnerRelationsResult", "processingState", "recordId", "taskId" ]
+      },
       "TaskClientStateDto" : {
         "type" : "object",
         "description" : "The golden record task's processing state together with optional business partner data in case processing is done",
@@ -741,6 +989,51 @@
           }
         },
         "required" : [ "businessPartnerResult", "processingState", "recordId", "taskId" ]
+      },
+      "TaskCreateRelationsRequest" : {
+        "type" : "object",
+        "description" : "Request object to specify for which business partner relationship data tasks should be created and in which mode",
+        "properties" : {
+          "mode" : {
+            "type" : "string",
+            "description" : "The mode affecting which processing steps the business partner relation goes through",
+            "enum" : [ "UpdateFromSharingMember", "UpdateFromPool" ]
+          },
+          "requests" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TaskCreateRelationsRequestEntry"
+            }
+          }
+        },
+        "required" : [ "mode", "requests" ]
+      },
+      "TaskCreateRelationsRequestEntry" : {
+        "type" : "object",
+        "properties" : {
+          "recordId" : {
+            "type" : "string",
+            "description" : "The unique identifier for this record which was previously issued by the Orchestrator"
+          },
+          "businessPartnerRelations" : {
+            "$ref" : "#/components/schemas/BusinessPartnerRelations",
+            "description" : "The business partner relationship data to be processed"
+          }
+        },
+        "required" : [ "businessPartnerRelations" ]
+      },
+      "TaskCreateRelationsResponse" : {
+        "type" : "object",
+        "description" : "Response object for giving a list of created tasks",
+        "properties" : {
+          "createdTasks" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TaskClientRelationsStateDto"
+            }
+          }
+        },
+        "required" : [ "createdTasks" ]
       },
       "TaskCreateRequest" : {
         "type" : "object",
@@ -803,6 +1096,51 @@
         },
         "required" : [ "description", "type" ]
       },
+      "TaskProcessingRelationsStateDto" : {
+        "type" : "object",
+        "description" : "Contains detailed information about the current processing state of a relations golden record task",
+        "properties" : {
+          "resultState" : {
+            "type" : "string",
+            "description" : "The processing result of the task, can also still be pending",
+            "enum" : [ "Pending", "Success", "Error" ]
+          },
+          "step" : {
+            "type" : "string",
+            "description" : "The last step this task has entered",
+            "enum" : [ "CleanAndSync", "PoolSync", "Clean" ]
+          },
+          "stepState" : {
+            "type" : "string",
+            "description" : "Whether the task is queued or already reserved for the latest step",
+            "enum" : [ "Queued", "Reserved", "Success", "Error" ]
+          },
+          "errors" : {
+            "type" : "array",
+            "description" : "The actual errors that happened during processing if the task has an error result state. The errors refer to the latest step.",
+            "items" : {
+              "$ref" : "#/components/schemas/TaskRelationsErrorDto"
+            }
+          },
+          "createdAt" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "When the task has been created"
+          },
+          "modifiedAt" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "When the task has last been modified"
+          },
+          "timeout" : {
+            "type" : "string",
+            "format" : "date-time",
+            "deprecated" : true,
+            "description" : "The timestamp until the task is removed from the Orchestrator"
+          }
+        },
+        "required" : [ "createdAt", "errors", "modifiedAt", "resultState", "step", "stepState", "timeout" ]
+      },
       "TaskProcessingStateDto" : {
         "type" : "object",
         "description" : "Contains detailed information about the current processing state of a golden record task",
@@ -847,6 +1185,115 @@
           }
         },
         "required" : [ "createdAt", "errors", "modifiedAt", "resultState", "step", "stepState", "timeout" ]
+      },
+      "TaskRelationsErrorDto" : {
+        "type" : "object",
+        "description" : "Describes an error that happened during processing of a task \n",
+        "properties" : {
+          "type" : {
+            "type" : "string",
+            "description" : "The type of error that occurred.",
+            "enum" : [ "Timeout", "Unspecified" ]
+          },
+          "description" : {
+            "type" : "string",
+            "description" : "The free text, detailed description of the error"
+          }
+        },
+        "required" : [ "description", "type" ]
+      },
+      "TaskRelationsStateResponse" : {
+        "type" : "object",
+        "description" : "Response object for giving a list of task states",
+        "properties" : {
+          "tasks" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TaskClientRelationsStateDto"
+            }
+          }
+        },
+        "required" : [ "tasks" ]
+      },
+      "TaskRelationsStepReservationEntryDto" : {
+        "type" : "object",
+        "description" : "Task reservation entry",
+        "properties" : {
+          "taskId" : {
+            "type" : "string",
+            "description" : "The identifier of the reserved task"
+          },
+          "recordId" : {
+            "type" : "string",
+            "description" : "The identifier of the gate record for which this task has been created"
+          },
+          "businessPartnerRelations" : {
+            "$ref" : "#/components/schemas/BusinessPartnerRelations",
+            "description" : "The business partner relations data to process"
+          },
+          "requestKey" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "businessPartnerRelations", "recordId", "requestKey", "taskId" ]
+      },
+      "TaskRelationsStepReservationResponse" : {
+        "type" : "object",
+        "description" : "Response object for giving a list of reserved tasks",
+        "properties" : {
+          "reservedTasks" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TaskRelationsStepReservationEntryDto"
+            }
+          },
+          "timeout" : {
+            "type" : "string",
+            "format" : "date-time",
+            "deprecated" : true,
+            "description" : "The timestamp until the reservation is valid and results are accepted"
+          }
+        },
+        "required" : [ "reservedTasks", "timeout" ]
+      },
+      "TaskRelationsStepResultEntryDto" : {
+        "type" : "object",
+        "description" : "A step result for a relations golden record task",
+        "properties" : {
+          "taskId" : {
+            "type" : "string",
+            "description" : "The identifier of the task for which this is a result"
+          },
+          "businessPartnerRelations" : {
+            "$ref" : "#/components/schemas/BusinessPartnerRelations",
+            "description" : "The actual result in form of business partner relations data. Maybe null if an error occurred during processing of this task."
+          },
+          "errors" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TaskRelationsErrorDto"
+            }
+          }
+        },
+        "required" : [ "businessPartnerRelations", "errors", "taskId" ]
+      },
+      "TaskRelationsStepResultRequest" : {
+        "type" : "object",
+        "description" : "Request object for posting step results of previously reserved tasks",
+        "properties" : {
+          "step" : {
+            "type" : "string",
+            "description" : "The step queue containing the tasks for which results are posted",
+            "enum" : [ "CleanAndSync", "PoolSync", "Clean" ]
+          },
+          "results" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TaskRelationsStepResultEntryDto"
+            }
+          }
+        },
+        "required" : [ "results", "step" ]
       },
       "TaskResultStateSearchRequest" : {
         "type" : "object",

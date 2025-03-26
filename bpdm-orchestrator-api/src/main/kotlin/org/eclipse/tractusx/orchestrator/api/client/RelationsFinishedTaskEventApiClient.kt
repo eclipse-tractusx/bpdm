@@ -19,13 +19,18 @@
 
 package org.eclipse.tractusx.orchestrator.api.client
 
-interface OrchestrationApiClient {
+import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.orchestrator.api.RelationsFinishedTaskEventApi
+import org.eclipse.tractusx.orchestrator.api.model.FinishedTaskEventsResponse
+import org.springdoc.core.annotations.ParameterObject
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.service.annotation.GetExchange
+import org.springframework.web.service.annotation.HttpExchange
+import java.time.Instant
 
-    val goldenRecordTasks: GoldenRecordTaskApiClient
+@HttpExchange(RelationsFinishedTaskEventApi.RELATIONS_FINISHED_TASK_EVENT_PATH)
+interface RelationsFinishedTaskEventApiClient : RelationsFinishedTaskEventApi{
 
-    val finishedTaskEvents: FinishedTaskEventApiClient
-
-    val relationsGoldenRecordTasks : RelationsGoldenRecordTaskApiClient
-
-    val relationsFinishedTaskEvents: RelationsFinishedTaskEventApiClient
+    @GetExchange
+    override fun getRelationsEvents(@RequestParam timestamp: Instant, @ParameterObject paginationRequest: PaginationRequest): FinishedTaskEventsResponse
 }

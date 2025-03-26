@@ -47,6 +47,8 @@ class OrchestrationApiClientImpl(
 
     override val relationsGoldenRecordTasks by lazy { createClient<RelationsGoldenRecordTaskApiClient>() }
 
+    override val relationsFinishedTaskEvents by lazy { createClient<RelationsFinishedTaskEventApiClient>() }
+
     private inline fun <reified T> createClient() =
         httpServiceProxyFactory.createClient(T::class.java)
 }

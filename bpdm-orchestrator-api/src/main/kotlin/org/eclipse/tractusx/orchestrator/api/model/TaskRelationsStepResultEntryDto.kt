@@ -17,15 +17,20 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.orchestrator.api.client
+package org.eclipse.tractusx.orchestrator.api.model
 
-interface OrchestrationApiClient {
+import io.swagger.v3.oas.annotations.media.ArraySchema
+import io.swagger.v3.oas.annotations.media.Schema
 
-    val goldenRecordTasks: GoldenRecordTaskApiClient
+@Schema(description = "A step result for a relations golden record task")
+data class TaskRelationsStepResultEntryDto(
 
-    val finishedTaskEvents: FinishedTaskEventApiClient
+    @get:Schema(description = "The identifier of the task for which this is a result", required = true)
+    val taskId: String,
 
-    val relationsGoldenRecordTasks : RelationsGoldenRecordTaskApiClient
+    @get:Schema(description = "The actual result in form of business partner relations data. Maybe null if an error occurred during processing of this task.")
+    val businessPartnerRelations: BusinessPartnerRelations,
 
-    val relationsFinishedTaskEvents: RelationsFinishedTaskEventApiClient
-}
+    @get:ArraySchema(arraySchema = Schema(description = "Errors that occurred during processing of this task"))
+    val errors: List<TaskRelationsErrorDto> = emptyList()
+)

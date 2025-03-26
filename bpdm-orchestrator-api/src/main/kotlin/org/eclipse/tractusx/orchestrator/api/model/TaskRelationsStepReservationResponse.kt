@@ -17,15 +17,17 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.orchestrator.api.client
+package org.eclipse.tractusx.orchestrator.api.model
 
-interface OrchestrationApiClient {
+import io.swagger.v3.oas.annotations.media.ArraySchema
+import io.swagger.v3.oas.annotations.media.Schema
+import java.time.Instant
 
-    val goldenRecordTasks: GoldenRecordTaskApiClient
+@Schema(description = "Response object for giving a list of reserved tasks")
+data class TaskRelationsStepReservationResponse(
+    @get:ArraySchema(arraySchema = Schema(description = "The reserved tasks with their business partner relations data to process"))
+    val reservedTasks: List<TaskRelationsStepReservationEntryDto>,
 
-    val finishedTaskEvents: FinishedTaskEventApiClient
-
-    val relationsGoldenRecordTasks : RelationsGoldenRecordTaskApiClient
-
-    val relationsFinishedTaskEvents: RelationsFinishedTaskEventApiClient
-}
+    @get:Schema(description = "The timestamp until the reservation is valid and results are accepted", deprecated = true)
+    val timeout: Instant
+)

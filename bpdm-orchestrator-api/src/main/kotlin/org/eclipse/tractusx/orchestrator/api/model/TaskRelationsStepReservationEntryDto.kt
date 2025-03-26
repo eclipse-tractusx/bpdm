@@ -17,15 +17,19 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.orchestrator.api.client
+package org.eclipse.tractusx.orchestrator.api.model
 
-interface OrchestrationApiClient {
+import io.swagger.v3.oas.annotations.media.Schema
 
-    val goldenRecordTasks: GoldenRecordTaskApiClient
+@Schema(description = "Task reservation entry")
+data class TaskRelationsStepReservationEntryDto(
 
-    val finishedTaskEvents: FinishedTaskEventApiClient
+    @get:Schema(description = "The identifier of the reserved task")
+    val taskId: String,
 
-    val relationsGoldenRecordTasks : RelationsGoldenRecordTaskApiClient
+    @get:Schema(description = "The identifier of the gate record for which this task has been created")
+    val recordId: String,
 
-    val relationsFinishedTaskEvents: RelationsFinishedTaskEventApiClient
-}
+    @get:Schema(description = "The business partner relations data to process")
+    val businessPartnerRelations: BusinessPartnerRelations
+)

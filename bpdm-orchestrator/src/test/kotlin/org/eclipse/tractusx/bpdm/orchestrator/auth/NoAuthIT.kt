@@ -46,6 +46,7 @@ class NoAuthIT @Autowired constructor(
             postTask = AuthExpectationType.Unauthorized,
             postStateSearch = AuthExpectationType.Unauthorized,
             postRelationsTask = AuthExpectationType.Unauthorized,
+            postRelationsStateSearch = AuthExpectationType.Unauthorized
         ),
         steps = TaskStep.entries
             .associateWith { TaskStepAuthExpectations(postReservation = AuthExpectationType.Unauthorized, postResult = AuthExpectationType.Unauthorized) }
