@@ -1872,6 +1872,7 @@ components:
           description: The type of relation between the business partners
           enum:
           - IsManagedBy
+          - IsAlternativeHeadquarterFor
         businessPartnerSourceExternalId:
           type: string
           description: The business partner from which the relation emerges (the source)
@@ -1906,6 +1907,7 @@ components:
           description: The type the relation should be
           enum:
           - IsManagedBy
+          - IsAlternativeHeadquarterFor
         businessPartnerSourceExternalId:
           type: string
           description: The external identifier of the business partner from which
@@ -1953,6 +1955,7 @@ components:
           description: Only show relations of the given type
           enum:
           - IsManagedBy
+          - IsAlternativeHeadquarterFor
         businessPartnerSourceExternalIds:
           type: array
           description: Only show relations which have the given business partners

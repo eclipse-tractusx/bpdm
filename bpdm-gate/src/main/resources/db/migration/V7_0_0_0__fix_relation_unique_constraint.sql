@@ -1,0 +1,5 @@
+ALTER TABLE business_partner_relations
+DROP CONSTRAINT business_partner_relations_source_sharing_state_id_target_s_key;
+
+ALTER TABLE business_partner_relations
+ADD CONSTRAINT uc_source_target_relation_type UNIQUE(source_sharing_state_id, target_sharing_state_id, relation_type);

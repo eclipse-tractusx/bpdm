@@ -197,6 +197,7 @@ class RelationService(
             businessPartnerSourceExternalId = sourceBusinessPartnerExternalId.also { relationship.source = source },
             businessPartnerTargetExternalId = targetBusinessPartnerExternalId.also { relationship.target = target }
         )
+        relationship.updatedAt = Instant.now()
 
         assertValid(relationship)
 
