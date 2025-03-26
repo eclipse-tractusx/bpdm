@@ -1418,7 +1418,7 @@
           "relationType" : {
             "type" : "string",
             "description" : "The type of relation between the business partners",
-            "enum" : [ "IsManagedBy" ]
+            "enum" : [ "IsManagedBy", "IsAlternativeHeadquarterFor" ]
           },
           "businessPartnerSourceExternalId" : {
             "type" : "string",
@@ -1452,7 +1452,7 @@
           "relationType" : {
             "type" : "string",
             "description" : "The type the relation should be",
-            "enum" : [ "IsManagedBy" ]
+            "enum" : [ "IsManagedBy", "IsAlternativeHeadquarterFor" ]
           },
           "businessPartnerSourceExternalId" : {
             "type" : "string",
@@ -1504,7 +1504,7 @@
           "relationType" : {
             "type" : "string",
             "description" : "Only show relations of the given type",
-            "enum" : [ "IsManagedBy" ]
+            "enum" : [ "IsManagedBy", "IsAlternativeHeadquarterFor" ]
           },
           "businessPartnerSourceExternalIds" : {
             "type" : "array",

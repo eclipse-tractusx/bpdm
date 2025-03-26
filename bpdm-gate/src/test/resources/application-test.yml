@@ -30,3 +30,7 @@ bpdm:
       cron: '-'
     healthCheck:
       cron: '-'
+spring:
+  datasource:
+      hikari:
+        maximum-pool-size: 2

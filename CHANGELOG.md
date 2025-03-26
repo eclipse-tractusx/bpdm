@@ -24,6 +24,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM Orchestrator: New POST api endpoint to reserve relations golden record tasks waiting in the given step queue. ([#1274](https://github.com/eclipse-tractusx/bpdm/issues/1274))
 - BPDM Orchestrator: New POST api endpoint to post step results for reserved relations golden record tasks in the given step queue. ([#1274](https://github.com/eclipse-tractusx/bpdm/issues/1274))
 - BPDM Orchestrator: New GET api endpoint to retrieve event log of relations golden record tasks that have finished processing. ([#1274](https://github.com/eclipse-tractusx/bpdm/issues/1274))
+- BPDM Gate: Added relation type IsAlternativeHeadquarterFor ([1286](https://github.com/eclipse-tractusx/bpdm/issues/1286))
 
 ### Changed
 

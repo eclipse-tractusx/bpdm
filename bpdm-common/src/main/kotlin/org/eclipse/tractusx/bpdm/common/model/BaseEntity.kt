@@ -62,5 +62,5 @@ abstract class BaseEntity(
 
     @Column(nullable = false, name = "UPDATED_AT")
     @UpdateTimestamp
-    val updatedAt: Instant = Instant.now().truncatedTo(ChronoUnit.MICROS)
+    var updatedAt: Instant = Instant.now().truncatedTo(ChronoUnit.MICROS)
 )

@@ -37,9 +37,21 @@ class RelationConstraintProvider: IRelationConstraintProvider {
         multipleTargetsAllowed = false
     )
 
+    private val isAlternativeHeadquarterForConstraints = IRelationConstraintProvider.RelationTypeConstraints(
+        selfRelateAllowed = false,
+        sourceMustBeOwnCompanyData = false,
+        targetMustBeOwnCompanyData = false,
+        sourceAllowedTypes = setOf(BusinessPartnerType.LEGAL_ENTITY),
+        targetAllowedTypes = setOf(BusinessPartnerType.LEGAL_ENTITY),
+        sourceCanBeTarget = true,
+        multipleSourcesAllowed = true,
+        multipleTargetsAllowed = true
+    )
+
     override fun getConstraints(relationType: RelationType): IRelationConstraintProvider.RelationTypeConstraints {
         return when(relationType){
             RelationType.IsManagedBy -> isManagedByConstraints
+            RelationType.IsAlternativeHeadquarterFor -> isAlternativeHeadquarterForConstraints
         }
     }
 

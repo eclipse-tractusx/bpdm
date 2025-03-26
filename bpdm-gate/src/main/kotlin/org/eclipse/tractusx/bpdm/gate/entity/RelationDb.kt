@@ -29,7 +29,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
 @Table(name = "business_partner_relations",
     uniqueConstraints = [
         UniqueConstraint(name = "uc_business_partner_relations_external_id_stage_tenant", columnNames = ["external_id, stage, tenant_bpnl"]),
-        UniqueConstraint(name = "uc_business_partner_relations_source_target", columnNames = ["source_sharing_state_id", "target_sharing_state_id"])
+        UniqueConstraint(name = "uc_source_target_relation_type", columnNames = ["source_sharing_state_id", "target_sharing_state_id, relation_type"])
     ]
 )
 class RelationDb(

@@ -29,10 +29,12 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerIdentifierDto
 import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerStateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationDto
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.RelationPutResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
 import org.eclipse.tractusx.bpdm.pool.api.PoolChangelogApi
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
@@ -40,6 +42,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryVerboseDt
 import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerGenericCommonValues
 import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerVerboseValues
 import org.eclipse.tractusx.bpdm.test.util.AssertHelpers
+import org.eclipse.tractusx.bpdm.test.util.Timeframe
 import org.eclipse.tractusx.orchestrator.api.FinishedTaskEventApi
 import org.eclipse.tractusx.orchestrator.api.GoldenRecordTaskApi
 import org.eclipse.tractusx.orchestrator.api.model.*
@@ -339,5 +342,61 @@ class MockAndAssertUtils @Autowired constructor(
                 )
             }
         )
+    }
+
+    fun assertRelationPage(
+        actual: PageDto<RelationDto>,
+        expectation: PageDto<RelationDto>,
+        updateTimeframe: Timeframe,
+        createTimeframe: Timeframe = updateTimeframe
+    ){
+        Assertions
+            .assertThat(actual)
+            .usingRecursiveComparison()
+            .ignoringFields(PageDto<RelationDto>::content.name)
+            .isEqualTo(expectation)
+
+        Assertions.assertThat(actual.content.size).isEqualTo(expectation.content.size)
+        actual.content.sortedBy { it.externalId }.zip(expectation.content.sortedBy { it.externalId }).forEach { (actualEntry, expectationEntry) ->
+            assertRelation(
+                actual = actualEntry,
+                expectation = expectationEntry,
+                updateTimeframe = updateTimeframe,
+                createTimeframe = createTimeframe, ignoreExternalId = false)
+        }
+    }
+
+    fun assertRelation(
+        actual: RelationPutResponse,
+        expectation: RelationDto,
+        updateTimeframe: Timeframe,
+        createTimeframe: Timeframe = updateTimeframe,
+        ignoreExternalId: Boolean = true
+    ){
+        Assertions.assertThat(actual.upsertedRelations.size).isEqualTo(1)
+        assertRelation(actual.upsertedRelations.single(), expectation, updateTimeframe, createTimeframe, ignoreExternalId)
+    }
+
+    private fun assertRelation(
+        actual: RelationDto,
+        expectation: RelationDto,
+        updateTimeframe: Timeframe,
+        createTimeframe: Timeframe = updateTimeframe,
+        ignoreExternalId: Boolean = true
+    ){
+        Assertions
+            .assertThat(actual)
+            .usingRecursiveComparison()
+            .ignoringFields(
+                RelationDto::externalId.name,
+                RelationDto::updatedAt.name,
+                RelationDto::createdAt.name)
+            .isEqualTo(expectation)
+            .isEqualTo(expectation)
+
+        Assertions.assertThat(actual.externalId).isNotBlank()
+        if(!ignoreExternalId) Assertions.assertThat(actual.externalId).isEqualTo(expectation.externalId)
+        Assertions.assertThat(actual.createdAt).isBetween(createTimeframe.startTime, createTimeframe.endTime)
+        Assertions.assertThat(actual.updatedAt).isBetween(updateTimeframe.startTime, updateTimeframe.endTime)
     }
 }
