@@ -37,15 +37,15 @@ class GateExceptionHandler : BpdmExceptionHandler() {
         return ResponseEntity.status(errorResponse.status).body(errorResponse)
     }
 
-    @ExceptionHandler(BpdmInvalidRelationConstraintsException::class)
-    fun handleInvalidRelationConstraintsException(ex: BpdmInvalidRelationConstraintsException, request: WebRequest): ResponseEntity<GateErrorResponse> {
-        val errorResponse = createResponse(ex.errors, request)
-        return ResponseEntity.status(errorResponse.status).body(errorResponse)
-    }
-
     @ExceptionHandler(BpdmRelationAlreadyExistsException::class)
     fun handleMissingRelationshipException(ex: BpdmRelationAlreadyExistsException, request: WebRequest): ResponseEntity<GateErrorResponse> {
         val errorResponse = createResponse(ex.message ?: "", request, HttpStatus.CONFLICT)
+        return ResponseEntity.status(errorResponse.status).body(errorResponse)
+    }
+
+    @ExceptionHandler(BpdmInvalidRelationException::class)
+    fun handleInvalidRelationException(ex: BpdmInvalidRelationException, request: WebRequest): ResponseEntity<GateErrorResponse> {
+        val errorResponse = createResponse(ex.message ?: "", request, HttpStatus.BAD_REQUEST)
         return ResponseEntity.status(errorResponse.status).body(errorResponse)
     }
 

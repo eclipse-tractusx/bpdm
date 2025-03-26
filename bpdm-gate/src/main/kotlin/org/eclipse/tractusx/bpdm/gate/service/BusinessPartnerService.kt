@@ -21,7 +21,6 @@ package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.common.mapping.types.BpnLString
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
@@ -33,7 +32,6 @@ import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntryDb
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidPartnerException
-import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidRelationConstraintsException
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.OutputUpsertData
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
@@ -53,8 +51,7 @@ class BusinessPartnerService(
     private val changelogRepository: ChangelogRepository,
     private val copyUtil: BusinessPartnerCopyUtil,
     private val compareUtil: BusinessPartnerComparisonUtil,
-    private val outputUpsertMappings: OutputUpsertMappings,
-    private val relationshipService: RelationService
+    private val outputUpsertMappings: OutputUpsertMappings
 ) {
     private val logger = KotlinLogging.logger { }
 
@@ -91,11 +88,6 @@ class BusinessPartnerService(
                 ?.also { sharingStateService.setInitial(sharingState) }
                 ?.businessPartner
         }
-
-        if(tenantBpnl != null)
-            relationshipService.checkConstraints(BpnLString(tenantBpnl), StageType.Input, updatedEntities.map { it.sharingState.externalId })
-                .takeIf { it.isNotEmpty() }
-                ?.let { throw BpdmInvalidRelationConstraintsException.fromConstraintErrors(it) }
 
         return updatedEntities.map(businessPartnerMappings::toBusinessPartnerInputDto)
     }

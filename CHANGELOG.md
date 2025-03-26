@@ -14,6 +14,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - Gate: Removed POST endpoint for business partner relations [#1264](https://github.com/eclipse-tractusx/bpdm/issues/1264)
 - Gate: Replace GET endpoint for business partner relations with a POST search endpoint having the same capabilties [#1264](https://github.com/eclipse-tractusx/bpdm/issues/1264)
 - Gate: Replaced PUT endpoint for business partner relations with a bulk upsert variant [#1264](https://github.com/eclipse-tractusx/bpdm/issues/1264)
+- Gate: Removed constraint checks when upserting business partner relations ([1288](https://github.com/eclipse-tractusx/bpdm/issues/1288))
 
 ### Added
 

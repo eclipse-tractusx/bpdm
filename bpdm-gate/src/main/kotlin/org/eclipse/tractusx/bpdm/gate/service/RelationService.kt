@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import jakarta.transaction.Transactional
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.mapping.types.BpnLString
@@ -34,8 +33,6 @@ import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
 import org.eclipse.tractusx.bpdm.gate.exception.*
 import org.eclipse.tractusx.bpdm.gate.repository.RelationRepository
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
-import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
-import org.eclipse.tractusx.bpdm.gate.service.IRelationService.ConstraintErrorType.*
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
 import java.time.Instant
@@ -44,9 +41,7 @@ import java.util.*
 @Service
 class RelationService(
     private val relationRepository: RelationRepository,
-    private val sharingStateRepository: SharingStateRepository,
-    private val businessPartnerRepository: BusinessPartnerRepository,
-    private val constraintProvider: IRelationConstraintProvider
+    private val sharingStateRepository: SharingStateRepository
 ): IRelationService {
 
     override fun findRelations(
@@ -115,6 +110,9 @@ class RelationService(
         sourceBusinessPartnerExternalId: String,
         targetBusinessPartnerExternalId: String
     ): RelationDto {
+        if(sourceBusinessPartnerExternalId == targetBusinessPartnerExternalId)
+            throw BpdmInvalidRelationException("Source and target should not be the same")
+
         if(externalId != null) relationRepository.findByTenantBpnLAndStageAndExternalId(tenantBpnL.value, stageType, externalId)?.run { throw BpdmRelationAlreadyExistsException(externalId) }
 
         val source = sharingStateRepository.findByExternalIdAndTenantBpnl(sourceBusinessPartnerExternalId, tenantBpnL.value).singleOrNull()
@@ -130,8 +128,6 @@ class RelationService(
             target = target,
             tenantBpnL = tenantBpnL.value,
         )
-
-        assertValid(newRelationship)
 
         relationRepository.save(newRelationship)
 
@@ -189,6 +185,9 @@ class RelationService(
         sourceBusinessPartnerExternalId: String,
         targetBusinessPartnerExternalId: String
     ): RelationDto {
+        if(sourceBusinessPartnerExternalId == targetBusinessPartnerExternalId)
+            throw BpdmInvalidRelationException("Source and target should not be the same")
+
         val source = sharingStateRepository.findByExternalIdAndTenantBpnl(sourceBusinessPartnerExternalId, relationship.tenantBpnL).singleOrNull() ?: throw BpdmRelationSourceNotFoundException(sourceBusinessPartnerExternalId, relationship.tenantBpnL)
         val target = sharingStateRepository.findByExternalIdAndTenantBpnl(targetBusinessPartnerExternalId, relationship.tenantBpnL).singleOrNull() ?:  throw BpdmRelationTargetNotFoundException(targetBusinessPartnerExternalId, relationship.tenantBpnL)
         RelationPutEntry(
@@ -199,24 +198,9 @@ class RelationService(
         )
         relationship.updatedAt = Instant.now()
 
-        assertValid(relationship)
-
         relationRepository.save(relationship)
 
         return toDto(relationship)
-    }
-
-    override fun checkConstraints(
-        tenantBpnL: BpnLString,
-        stageType: StageType,
-        businessPartnerExternalIds: List<String>
-    ): List<IRelationService.ConstraintError> {
-        val sharingStates = sharingStateRepository.findByExternalIdInAndTenantBpnl(businessPartnerExternalIds, tenantBpnL.value).toSet()
-        val sources = relationRepository.findBySourceInAndStage(sharingStates, stageType)
-        val targets = relationRepository.findByTargetInAndStage(sharingStates, stageType)
-
-        val allRelationships = sources.union(targets)
-        return allRelationships.flatMap { check(it) }
     }
 
     private fun toDto(entity: RelationDb): RelationDto{
@@ -230,69 +214,6 @@ class RelationService(
         )
     }
 
-    private fun assertValid(relationship: RelationDb){
-        check(relationship).let { constraintErrors ->
-            if (constraintErrors.isNotEmpty())
-                throw BpdmInvalidRelationConstraintsException.fromConstraintErrors(constraintErrors)
-        }
-    }
-
-    private fun check(relationship: RelationDb): List<IRelationService.ConstraintError> {
-        val validationErrors = mutableListOf <IRelationService.ConstraintError>()
-        val externalId = relationship.externalId
-
-        val constraints = constraintProvider.getConstraints(relationship.relationType)
-
-        if(!constraints.selfRelateAllowed){
-            if(relationship.source == relationship.target) validationErrors.add(SourceEqualsTarget.toError(externalId, relationship.source.externalId))
-        }
-
-        val sourceInput = businessPartnerRepository.findBySharingStateInAndStage(listOf(relationship.source), StageType.Input).single()
-        val targetInput = businessPartnerRepository.findBySharingStateInAndStage(listOf(relationship.target), StageType.Input).single()
-
-
-        if(!constraints.sourceCanBeTarget)
-        {
-            val sourceUsedAsTarget = relationRepository.findByRelationTypeAndTarget(relationship.relationType, relationship.source)
-                .minusElement(relationship).isNotEmpty()
-            if(sourceUsedAsTarget) validationErrors.add(SourceUsedAsTarget.toError(externalId, relationship.source.externalId))
-
-            val targetUsedAsSource = relationRepository.findByRelationTypeAndSource(relationship.relationType, relationship.target)
-                .minusElement(relationship).isNotEmpty()
-            if(targetUsedAsSource) validationErrors.add(TargetUsedAsSource.toError(externalId, relationship.target.externalId))
-        }
-
-        if(!constraints.multipleSourcesAllowed){
-            val targetHasMultipleSources = relationRepository.findByRelationTypeAndTarget(relationship.relationType, relationship.target)
-                .minusElement(relationship).isNotEmpty()
-            if(targetHasMultipleSources) validationErrors.add(TargetMultipleSources.toError(externalId, relationship.target.externalId))
-        }
-
-        if(!constraints.multipleTargetsAllowed){
-            val sourceHasMultipleTargets = relationRepository.findByRelationTypeAndSource(relationship.relationType, relationship.source)
-                .minusElement(relationship).isNotEmpty()
-            if(sourceHasMultipleTargets) validationErrors.add(SourceMultipleTargets.toError(externalId, relationship.source.externalId))
-        }
-
-        if(constraints.sourceMustBeOwnCompanyData){
-            if(!sourceInput.isOwnCompanyData) validationErrors.add(SourceNotOwnCompanyData.toError(externalId, relationship.source.externalId))
-        }
-
-        if(constraints.targetMustBeOwnCompanyData){
-            if(!targetInput.isOwnCompanyData) validationErrors.add(TargetNotOwnCompanyData.toError(externalId, relationship.target.externalId))
-        }
-
-        val sourceBusinessPartnerTypes =  sourceInput.postalAddress.addressType?.businessPartnerTypes ?: listOf(BusinessPartnerType.GENERIC)
-        if(sourceBusinessPartnerTypes.intersect(constraints.sourceAllowedTypes).isEmpty())
-            validationErrors.add(SourceNotAllowedType.toError(externalId, relationship.source.externalId))
-
-        val targetBusinessPartnerTypes =  targetInput.postalAddress.addressType?.businessPartnerTypes ?: listOf(BusinessPartnerType.GENERIC)
-        if(targetBusinessPartnerTypes.intersect(constraints.targetAllowedTypes).isEmpty())
-            validationErrors.add(TargetNotAllowedType.toError(externalId, relationship.target.externalId))
-
-        return validationErrors
-    }
-
     private fun findRelationshipOrThrow(
         tenantBpnL: String,
         stageType: StageType,
@@ -304,7 +225,4 @@ class RelationService(
             externalId = externalId
         ) ?:  throw BpdmMissingRelationException(externalId)
     }
-
-    fun IRelationService.ConstraintErrorType.toError(externalId: String, erroneousValue: String) =
-        IRelationService.ConstraintError(externalId, this, erroneousValue)
 }

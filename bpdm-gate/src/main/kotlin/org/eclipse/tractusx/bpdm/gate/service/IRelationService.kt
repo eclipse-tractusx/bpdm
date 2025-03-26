@@ -44,30 +44,4 @@ interface IRelationService {
     fun upsertRelations(tenantBpnL: BpnLString, stageType: StageType, relations: List<RelationPutEntry>): List<RelationDto>
 
     fun updateRelations(tenantBpnL: BpnLString, stageType: StageType, relations: List<RelationPutEntry>): List<RelationDto>
-
-    fun checkConstraints(
-        tenantBpnL: BpnLString,
-        stageType: StageType,
-        businessPartnerExternalIds: List<String>
-    ): List<ConstraintError>
-
-    data class ConstraintError(
-        val externalId: String,
-        val errorType: ConstraintErrorType,
-        val erroneousValue: String
-    ){
-        val message = errorType.msg
-    }
-
-    enum class ConstraintErrorType(val msg: String){
-        SourceEqualsTarget("Source and target are the same"),
-        SourceNotOwnCompanyData("Source is not own company data"),
-        TargetNotOwnCompanyData("Target is not own company data"),
-        SourceNotAllowedType("Source is not of allowed business partner type"),
-        TargetNotAllowedType("Target is not of allowed business partner type"),
-        SourceUsedAsTarget("Source is already used as target of relationship type"),
-        TargetUsedAsSource("Target is already used as source of relationship type"),
-        TargetMultipleSources("Target has multiple sources"),
-        SourceMultipleTargets("Source has multiple targets"),
-    }
 }
