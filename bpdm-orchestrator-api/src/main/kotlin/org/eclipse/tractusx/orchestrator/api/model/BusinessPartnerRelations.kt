@@ -29,7 +29,15 @@ data class BusinessPartnerRelations(
     val businessPartnerSourceBpnl: String,
     @Schema(description = "The business partner to which this relation goes (the target)")
     val businessPartnerTargetBpnl: String
-)
+) {
+    companion object {
+        val empty = BusinessPartnerRelations(
+            relationType = RelationType.IsAlternativeHeadquarterFor, // or a default type
+            businessPartnerSourceBpnl = "",
+            businessPartnerTargetBpnl = ""
+        )
+    }
+}
 
 enum class RelationType {
     IsAlternativeHeadquarterFor

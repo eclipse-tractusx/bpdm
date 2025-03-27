@@ -19,9 +19,34 @@
 
 package org.eclipse.tractusx.bpdm.pool.repository
 
+import jakarta.persistence.criteria.Predicate
+import org.eclipse.tractusx.bpdm.pool.api.model.RelationType
+import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
+import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 
 interface RelationRepository : JpaRepository<RelationDb, Long>, JpaSpecificationExecutor<RelationDb> {
+
+    companion object {
+        fun byRelation(startNode: LegalEntityDb?, endNode: LegalEntityDb?, type: RelationType?) =
+            Specification<RelationDb> { root, _, builder ->
+                val predicates = mutableListOf<Predicate>()
+
+                startNode?.let {
+                    predicates.add(builder.equal(root.get<LegalEntityDb>(RelationDb::startNode.name), it))
+                }
+
+                endNode?.let {
+                    predicates.add(builder.equal(root.get<LegalEntityDb>(RelationDb::endNode.name), it))
+                }
+
+                type?.let {
+                    predicates.add(builder.equal(root.get<RelationType>(RelationDb::type.name), it))
+                }
+
+                builder.and(*predicates.toTypedArray())
+            }
+    }
 }
