@@ -19,17 +19,5 @@
 
 package org.eclipse.tractusx.bpdm.gate.exception
 
-import org.eclipse.tractusx.bpdm.gate.service.IRelationService
-import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.ResponseStatus
-
-@ResponseStatus(HttpStatus.BAD_REQUEST)
-class BpdmInvalidRelationConstraintsException(
-    val errors: List<String>
-) : RuntimeException("The following errors have been discovered when validating business partner relationships: ${errors.joinToString(System.lineSeparator())}"){
-
-    companion object{
-        fun fromConstraintErrors(errors: List<IRelationService.ConstraintError>) =
-            BpdmInvalidRelationConstraintsException(errors.map { "Constraint for relation '${it.externalId}' is violated by value '${it.erroneousValue}': ${it.message}"})
-    }
+class BpdmInvalidRelationException(message: String): RuntimeException(message) {
 }
