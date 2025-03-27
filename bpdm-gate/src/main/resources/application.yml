@@ -72,6 +72,11 @@ bpdm:
       batchSize: 20
       # How often referenced BPNs should be checked for consistency with the golden record pool
       cron: '0 0 0 * * *'
+    relationCreation:
+      # How many relations should be shared at once
+      batchSize: 20
+      # How often the Gate checks for new business partner relations to be shared
+      cron: '*/30 * * * * *'
 
   # Connection to the pool and orchestrator
   client:

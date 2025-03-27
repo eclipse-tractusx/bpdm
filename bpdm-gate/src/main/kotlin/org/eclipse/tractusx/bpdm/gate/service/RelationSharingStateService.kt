@@ -65,7 +65,7 @@ class RelationSharingStateService(
 
     private fun RelationSharingStateDb.toDto(externalId: String): RelationSharingStateDto{
         return RelationSharingStateDto(
-            externalId, sharingStateType, sharingErrorCode, sharingErrorMessage, updatedAt
+            externalId, sharingStateType, sharingErrorCode, sharingErrorMessage, taskId, updatedAt
         )
     }
 
@@ -74,8 +74,25 @@ class RelationSharingStateService(
             sharingStateType = RelationSharingStateType.Ready,
             sharingErrorCode = null,
             sharingErrorMessage = null,
-            updatedAt = Instant.now()
+            recordId = relation.sharingState?.recordId,
+            taskId = null,
+            updatedAt = Instant.now(),
+            isStaged = false
         ).takeIf { canBeShared(relationType) }
+
+        relationRepository.save(relation)
+    }
+
+    fun setPending(relation: RelationDb, taskId: String, recordId: String){
+        relation.sharingState = RelationSharingStateDb(
+            sharingStateType = RelationSharingStateType.Pending,
+            sharingErrorCode = null,
+            sharingErrorMessage = null,
+            recordId = recordId,
+            taskId = taskId,
+            updatedAt = Instant.now(),
+            isStaged = false
+        )
 
         relationRepository.save(relation)
     }

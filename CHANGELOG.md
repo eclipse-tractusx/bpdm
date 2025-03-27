@@ -27,7 +27,8 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM Orchestrator: New GET api endpoint to retrieve event log of relations golden record tasks that have finished processing. ([#1274](https://github.com/eclipse-tractusx/bpdm/issues/1274))
 - BPDM Gate: Added relation type IsAlternativeHeadquarterFor ([1286](https://github.com/eclipse-tractusx/bpdm/issues/1286))
 - BPDM Pool: Added functionality to consume relation golden record tasks. ([#1279](https://github.com/eclipse-tractusx/bpdm/issues/1279))
-- BPDM Gate: New GET api endpoint to retrieve sharing states for business partner relations ([1277](https://github.com/eclipse-tractusx/bpdm/issues/1277)) 
+- BPDM Gate: New GET api endpoint to retrieve sharing states for business partner relations ([1277](https://github.com/eclipse-tractusx/bpdm/issues/1277))
+- BPDM Gate: Add functionality to create golden record tasks for business partner relations ([1277](https://github.com/eclipse-tractusx/bpdm/issues/1277))
 
 ### Changed
 
