@@ -17,30 +17,8 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.entity
+package org.eclipse.tractusx.bpdm.gate.exception
 
-import jakarta.persistence.*
-import org.eclipse.tractusx.bpdm.common.model.BaseEntity
-import org.eclipse.tractusx.bpdm.gate.entity.RelationDb.Companion.COLUMN_EXTERNAL_ID
-import org.eclipse.tractusx.bpdm.gate.entity.RelationDb.Companion.COLUMN_TENANT
-
-
-@Entity
-@Table(name = "business_partner_relations",
-    uniqueConstraints = [
-        UniqueConstraint(name = "uc_external_id_tenant", columnNames = [COLUMN_EXTERNAL_ID, COLUMN_TENANT])
-    ]
-)
-class RelationDb(
-    @Column(name = COLUMN_EXTERNAL_ID, unique = true, nullable = false)
-    var externalId: String,
-    @Column(name = COLUMN_TENANT, nullable = false)
-    var tenantBpnL: String,
-    @Embedded
-    var sharingState: RelationSharingStateDb?
-) : BaseEntity(){
-    companion object{
-        const val COLUMN_EXTERNAL_ID = "external_id"
-        const val COLUMN_TENANT = "tenant_bpnl"
-    }
+class BpdmMissingRelationSharingStateException(externalId: String, tenantBpnL: String)
+    : RuntimeException("Relation sharing state on tenant '$tenantBpnL' for relation '$externalId' is missing") {
 }

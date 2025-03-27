@@ -19,28 +19,27 @@
 
 package org.eclipse.tractusx.bpdm.gate.entity
 
-import jakarta.persistence.*
-import org.eclipse.tractusx.bpdm.common.model.BaseEntity
-import org.eclipse.tractusx.bpdm.gate.entity.RelationDb.Companion.COLUMN_EXTERNAL_ID
-import org.eclipse.tractusx.bpdm.gate.entity.RelationDb.Companion.COLUMN_TENANT
+import jakarta.persistence.Column
+import jakarta.persistence.Embeddable
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateErrorCode
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateType
+import java.time.Instant
 
+@Embeddable
+data class RelationSharingStateDb (
+    @Enumerated(EnumType.STRING)
+    @Column(name = "sharing_state_type", nullable = true)
+    var sharingStateType: RelationSharingStateType,
 
-@Entity
-@Table(name = "business_partner_relations",
-    uniqueConstraints = [
-        UniqueConstraint(name = "uc_external_id_tenant", columnNames = [COLUMN_EXTERNAL_ID, COLUMN_TENANT])
-    ]
+    @Enumerated(EnumType.STRING)
+    @Column(name = "sharing_error_code", nullable = true)
+    var sharingErrorCode: RelationSharingStateErrorCode?,
+
+    @Column(name = "sharing_error_message", nullable = true)
+    var sharingErrorMessage: String?,
+
+    @Column(name = "sharing_state_updated_at", nullable = true)
+    var updatedAt: Instant
 )
-class RelationDb(
-    @Column(name = COLUMN_EXTERNAL_ID, unique = true, nullable = false)
-    var externalId: String,
-    @Column(name = COLUMN_TENANT, nullable = false)
-    var tenantBpnL: String,
-    @Embedded
-    var sharingState: RelationSharingStateDb?
-) : BaseEntity(){
-    companion object{
-        const val COLUMN_EXTERNAL_ID = "external_id"
-        const val COLUMN_TENANT = "tenant_bpnl"
-    }
-}
