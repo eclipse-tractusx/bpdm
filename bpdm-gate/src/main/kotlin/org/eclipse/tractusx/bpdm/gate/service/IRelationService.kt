@@ -30,7 +30,7 @@ import java.time.Instant
 
 interface IRelationService {
 
-    fun findRelations(
+    fun findStages(
         tenantBpnL: BpnLString,
         stageType: StageType,
         externalIds: List<String> = emptyList(),

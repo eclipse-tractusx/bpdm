@@ -44,7 +44,7 @@ class RelationController(
         searchRequest: RelationSearchRequest,
         paginationRequest: PaginationRequest
     ): PageDto<RelationDto> {
-       return relationshipService.findRelations(
+       return relationshipService.findStages(
            tenantBpnL = principalUtil.resolveTenantBpnl(),
            stageType = StageType.Input,
            externalIds = searchRequest.externalIds ?: emptyList(),

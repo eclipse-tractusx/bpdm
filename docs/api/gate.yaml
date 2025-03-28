@@ -441,6 +441,65 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PageDtoSharingStateDto"
+  /v6/relations/sharing-state:
+    get:
+      tags:
+      - relation-sharing-state-controller
+      summary: Returns sharing states of shared business partner relations which can
+        be optionally filtered
+      operationId: get
+      parameters:
+      - name: externalIds
+        in: query
+        description: Only show sharing states of given external IDs
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: sharingStateTypes
+        in: query
+        description: Only show sharing states of given types
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - Initial
+            - Ready
+            - Pending
+            - Error
+            - Success
+      - name: updatedAfter
+        in: query
+        description: Only show sharing states updated after given time
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: page
+        in: query
+        description: Number of page to get results from
+        required: false
+        schema:
+          type: string
+          minimum: 0
+      - name: size
+        in: query
+        description: Size of each page
+        required: false
+        schema:
+          type: string
+          maximum: 100
+          minimum: 0
+      responses:
+        "200":
+          description: Page of sharing states
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PageDtoRelationSharingStateDto"
   /v6/input/partner-upload-template:
     get:
       tags:
@@ -1481,6 +1540,37 @@ components:
       - page
       - totalElements
       - totalPages
+    PageDtoRelationSharingStateDto:
+      type: object
+      description: Paginated collection of results
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+          description: Total number of all results in all pages
+        totalPages:
+          type: integer
+          format: int32
+          description: Total number pages
+        page:
+          type: integer
+          format: int32
+          description: Current page number
+        contentSize:
+          type: integer
+          format: int32
+          description: Number of results in the page
+        content:
+          type: array
+          description: Collection of results in the page
+          items:
+            $ref: "#/components/schemas/RelationSharingStateDto"
+      required:
+      - content
+      - contentSize
+      - page
+      - totalElements
+      - totalPages
     PageDtoSharingStateDto:
       type: object
       description: Paginated collection of results
@@ -1973,6 +2063,43 @@ components:
           format: date-time
           description: Only show relations which have been modified after the given
             time stamp
+    RelationSharingStateDto:
+      type: object
+      properties:
+        externalId:
+          type: string
+          description: The external identifier of the business partner for which the
+            sharing state entry was created.
+        sharingStateType:
+          type: string
+          description: One of the sharing state types of the current sharing state.
+          enum:
+          - Initial
+          - Ready
+          - Pending
+          - Error
+          - Success
+        sharingErrorCode:
+          type: string
+          description: "One of the sharing error codes in case the current sharing\
+            \ state type is \"error\". \n* `SharingProcessError`: A general error\
+            \ occurred during the sharing process.\n* `SharingTimeout`: The processing\
+            \ took to long to complete.\n"
+          enum:
+          - SharingProcessError
+          - SharingTimeout
+        sharingErrorMessage:
+          type: string
+          description: The error message in case the current sharing state type is
+            "error".
+        updatedAt:
+          type: string
+          format: date-time
+          description: When the sharing state last changed.
+      required:
+      - externalId
+      - sharingStateType
+      - updatedAt
     SharingStateDto:
       type: object
       description: |

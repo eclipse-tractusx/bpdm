@@ -19,64 +19,18 @@
 
 package org.eclipse.tractusx.bpdm.gate.repository
 
-import org.eclipse.tractusx.bpdm.common.model.StageType
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateType
+import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
-import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
+import org.eclipse.tractusx.bpdm.gate.entity.RelationSharingStateDb
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import java.time.Instant
 
 interface RelationRepository: JpaRepository<RelationDb, Long>, JpaSpecificationExecutor<RelationDb> {
+
     object Specs {
-        fun byExternalIds(externalIds: Collection<String>?) =
-            Specification<RelationDb> { root, _, _ ->
-                externalIds?.takeIf { it.isNotEmpty() }?.let {
-                    root.get<String>(RelationDb::externalId.name).`in`(externalIds)
-                }
-            }
-
-        fun byRelationshipType(relationType: RelationType?) =
-            Specification<RelationDb> { root, _, builder ->
-                relationType?.let {
-                    builder.equal(root.get<RelationType>(RelationDb::relationType.name), relationType)
-                }
-            }
-
-        fun bySourceExternalIds(sourceBusinessPartnerExternalIds: List<String>?) =
-            Specification<RelationDb> { root, _, _ ->
-                sourceBusinessPartnerExternalIds?.takeIf { it.isNotEmpty() }?.let {
-                    root
-                        .get<SharingStateDb>(RelationDb::source.name)
-                        .get<String>(SharingStateDb::externalId.name)
-                        .`in`(sourceBusinessPartnerExternalIds)
-                }
-            }
-
-        fun byTargetExternalIds(targetBusinessPartnerExternalIds: List<String>?) =
-            Specification<RelationDb> { root, _, _ ->
-                targetBusinessPartnerExternalIds?.takeIf { it.isNotEmpty() }?.let {
-                    root
-                        .get<SharingStateDb>(RelationDb::target.name)
-                        .get<String>(SharingStateDb::externalId.name)
-                        .`in`(targetBusinessPartnerExternalIds)
-                }
-            }
-
-        fun byUpdatedAfter(updatedAfter: Instant?) =
-            Specification<RelationDb> { root, _, builder ->
-                updatedAfter?.let {
-                    builder.greaterThan(root.get(RelationDb::updatedAt.name), updatedAfter)
-                }
-            }
-
-        fun byStage(stageType: StageType?) =
-            Specification<RelationDb> { root, _, builder ->
-                stageType?.let {
-                    builder.equal(root.get<StageType>(RelationDb::stage.name), stageType)
-                }
-            }
 
         fun byTenantBpnL(tenantBpnL: String?) =
             Specification<RelationDb> { root, _, builder ->
@@ -84,11 +38,45 @@ interface RelationRepository: JpaRepository<RelationDb, Long>, JpaSpecificationE
                     builder.equal(root.get<String>(RelationDb::tenantBpnL.name), tenantBpnL)
                 }
             }
+
+        fun byExternalIds(externalIds: Collection<String>?) =
+            Specification<RelationDb> { root, _, _ ->
+                externalIds?.takeIf { it.isNotEmpty() }?.let {
+                    root
+                        .get<String>(RelationDb::externalId.name)
+                        .`in`(externalIds)
+                }
+            }
+
+        fun bySharingStateUpdatedAfter(updatedAfter: Instant?) =
+            Specification<RelationDb> { root, _, builder ->
+                updatedAfter?.let {
+                    builder.greaterThan(root
+                        .get<RelationSharingStateDb>(RelationDb::sharingState.name)
+                        .get<Instant>(RelationSharingStateDb::updatedAt.name), updatedAfter)
+                }
+            }
+
+        fun bySharingStateTypes(sharingStateTypes: Collection<RelationSharingStateType>?) =
+            Specification<RelationDb> { root, _, builder ->
+                sharingStateTypes?.takeIf{ it.isNotEmpty() }?.let {
+                    root
+                        .get<RelationSharingStateDb>(RelationDb::sharingState.name)
+                        .get<SharingStateType>(RelationSharingStateDb::sharingStateType.name)
+                        .`in`(sharingStateTypes)
+                }
+            }
+
+        fun bySharingStateNotNull() =
+            Specification<RelationDb> { root, _, builder ->
+                    root
+                        .get<RelationSharingStateDb>(RelationDb::sharingState.name)
+                        .get<SharingStateType>(RelationSharingStateDb::sharingStateType.name)
+                        .isNotNull
+            }
+
     }
 
-    fun findByTenantBpnLAndStageAndExternalId(tenantBpnL: String, stageType: StageType, externalId: String): RelationDb?
-    fun findByRelationTypeAndSource(relationType: RelationType, source: SharingStateDb): Set<RelationDb>
-    fun findByRelationTypeAndTarget(relationType: RelationType, target: SharingStateDb): Set<RelationDb>
-    fun findBySourceInAndStage(sources: Set<SharingStateDb>, stageType: StageType): Set<RelationDb>
-    fun findByTargetInAndStage(sources: Set<SharingStateDb>, stageType: StageType): Set<RelationDb>
+
+    fun findByTenantBpnLAndExternalId(tenantBpnL: String,  externalId: String): RelationDb?
 }

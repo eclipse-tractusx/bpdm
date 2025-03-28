@@ -32,4 +32,6 @@ interface GateClient {
     val partnerUpload: PartnerUploadApiClient
 
     val relation: RelationApiClient
+
+    val relationSharingState: RelationSharingStateApiClient
 }
