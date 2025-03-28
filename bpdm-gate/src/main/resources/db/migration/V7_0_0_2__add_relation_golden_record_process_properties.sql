@@ -1,0 +1,3 @@
+ALTER TABLE business_partner_relations
+ADD COLUMN record_id VARCHAR(255) DEFAULT NULL,
+ADD COLUMN task_id VARCHAR(255) DEFAULT NULL;

@@ -23,9 +23,12 @@ import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
 import org.eclipse.tractusx.bpdm.gate.entity.RelationSharingStateDb
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
+import org.springframework.data.jpa.repository.Query
 import java.time.Instant
 
 interface RelationRepository: JpaRepository<RelationDb, Long>, JpaSpecificationExecutor<RelationDb> {
@@ -79,4 +82,7 @@ interface RelationRepository: JpaRepository<RelationDb, Long>, JpaSpecificationE
 
 
     fun findByTenantBpnLAndExternalId(tenantBpnL: String,  externalId: String): RelationDb?
+
+    @Query("SELECT r FROM RelationDb r WHERE r.sharingState.sharingStateType = :sharingStateType AND r.sharingState.isStaged = :isStaged")
+    fun findBySharingStateAndStaged(sharingStateType: RelationSharingStateType, isStaged: Boolean, pageable: Pageable): Page<RelationDb>
 }

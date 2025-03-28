@@ -87,7 +87,7 @@ class SharingStateControllerIT @Autowired constructor(
         val creationTimeframe = createRelation(relationId, RelationType.IsAlternativeHeadquarterFor, legalEntityId1, legalEntityId2)
 
         val expected = PageDto<RelationSharingStateDto>(1, 1, 0, 1,
-            listOf(RelationSharingStateDto(relationId, RelationSharingStateType.Ready, null, null, anyTime))
+            listOf(RelationSharingStateDto(relationId, RelationSharingStateType.Ready, null, null, null, anyTime))
         )
 
         val actual = gateClient.relationSharingState.get(externalIds = listOf(relationId))
@@ -114,7 +114,7 @@ class SharingStateControllerIT @Autowired constructor(
         val updateTimeframe = createRelation(relationId, RelationType.IsAlternativeHeadquarterFor, legalEntityId1, legalEntityId3)
 
         val expected = PageDto<RelationSharingStateDto>(1, 1, 0, 1,
-            listOf(RelationSharingStateDto(relationId, RelationSharingStateType.Ready, null, null, anyTime))
+            listOf(RelationSharingStateDto(relationId, RelationSharingStateType.Ready, null, null, null, anyTime))
         )
 
         val actual = gateClient.relationSharingState.get(externalIds = listOf(relationId))
@@ -139,7 +139,7 @@ class SharingStateControllerIT @Autowired constructor(
         createRelation(relationId, RelationType.IsAlternativeHeadquarterFor, legalEntityId1, legalEntityId2)
 
         val expected = PageDto<RelationSharingStateDto>(1, 1, 0, 1,
-            listOf(RelationSharingStateDto(relationId, RelationSharingStateType.Ready, null, null, anyTime))
+            listOf(RelationSharingStateDto(relationId, RelationSharingStateType.Ready, null, null, null, anyTime))
         )
 
         val actual = gateClient.relationSharingState.get(externalIds = listOf(relationId))
@@ -191,7 +191,7 @@ class SharingStateControllerIT @Autowired constructor(
         )
 
         val expected = PageDto<RelationSharingStateDto>(1, 1, 0, 1,
-            listOf(RelationSharingStateDto(relationId1, RelationSharingStateType.Ready, null, null, anyTime))
+            listOf(RelationSharingStateDto(relationId1, RelationSharingStateType.Ready, null, null, null, anyTime))
         )
 
         val actual = gateClient.relationSharingState.get(externalIds = listOf(relationId1))
@@ -225,7 +225,7 @@ class SharingStateControllerIT @Autowired constructor(
         setSharingState(relationId1, RelationSharingStateType.Pending)
 
         val expected = PageDto<RelationSharingStateDto>(1, 1, 0, 1,
-            listOf(RelationSharingStateDto(relationId1, RelationSharingStateType.Pending, null, null, anyTime))
+            listOf(RelationSharingStateDto(relationId1, RelationSharingStateType.Pending, null, null,  null, anyTime))
         )
 
         val actual = gateClient.relationSharingState.get(sharingStateTypes = listOf(RelationSharingStateType.Pending))
@@ -260,7 +260,7 @@ class SharingStateControllerIT @Autowired constructor(
 
 
         val expected = PageDto<RelationSharingStateDto>(1, 1, 0, 1,
-            listOf(RelationSharingStateDto(relationId1, RelationSharingStateType.Ready, null, null, anyTime))
+            listOf(RelationSharingStateDto(relationId1, RelationSharingStateType.Ready, null, null, null, anyTime))
         )
 
         val actual = gateClient.relationSharingState.get(updatedAfter = updatedTimeframe.startTime)
@@ -309,7 +309,7 @@ class SharingStateControllerIT @Autowired constructor(
         setSharingState(relationId4, RelationSharingStateType.Pending)
 
         val expected = PageDto<RelationSharingStateDto>(1, 1, 0, 1,
-            listOf(RelationSharingStateDto(relationId1, RelationSharingStateType.Pending, null, null, anyTime)))
+            listOf(RelationSharingStateDto(relationId1, RelationSharingStateType.Pending, null, null, null, anyTime)))
 
         val actual = gateClient.relationSharingState.get(
             externalIds = listOf(relationId1, relationId2, relationId3),

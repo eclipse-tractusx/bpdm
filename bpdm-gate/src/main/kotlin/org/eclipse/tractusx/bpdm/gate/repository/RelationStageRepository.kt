@@ -93,4 +93,5 @@ interface RelationStageRepository: JpaRepository<RelationStageDb, Long>, JpaSpec
     }
 
     fun findByRelationAndStage(relationDb: RelationDb, stage: StageType): RelationStageDb?
+    fun findByRelationInAndStage(relations: Set<RelationDb>, stage: StageType): Set<RelationStageDb>
 }

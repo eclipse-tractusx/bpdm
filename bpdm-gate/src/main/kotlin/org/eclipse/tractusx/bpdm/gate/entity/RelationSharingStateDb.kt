@@ -41,5 +41,14 @@ data class RelationSharingStateDb (
     var sharingErrorMessage: String?,
 
     @Column(name = "sharing_state_updated_at", nullable = true)
-    var updatedAt: Instant
+    var updatedAt: Instant,
+
+    @Column(name = "record_id", nullable = true)
+    var recordId: String?,
+
+    @Column(name = "task_id", nullable = true)
+    var taskId: String?,
+
+    @Column(name = "is_staged", nullable = false)
+    var isStaged: Boolean,
 )

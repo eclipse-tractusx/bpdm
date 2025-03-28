@@ -38,5 +38,10 @@ data class RelationSharingStateDto(
     val sharingErrorMessage: String? = null,
 
     @get:Schema(description = "When the sharing state last changed.")
-    val updatedAt: Instant
+    val taskId: String?,
+
+    @get:Schema(description = "The orchestrator task identifier that was created")
+    val updatedAt: Instant,
+
+
 )
