@@ -21,7 +21,6 @@ package org.eclipse.tractusx.bpdm.gate.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.GateRelationApi
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationDto
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
@@ -44,9 +43,8 @@ class RelationController(
         searchRequest: RelationSearchRequest,
         paginationRequest: PaginationRequest
     ): PageDto<RelationDto> {
-       return relationshipService.findStages(
+       return relationshipService.findInputRelations(
            tenantBpnL = principalUtil.resolveTenantBpnl(),
-           stageType = StageType.Input,
            externalIds = searchRequest.externalIds ?: emptyList(),
            relationType = searchRequest.relationType,
            sourceBusinessPartnerExternalIds = searchRequest.businessPartnerSourceExternalIds ?: emptyList(),
@@ -62,15 +60,13 @@ class RelationController(
         requestBody: RelationPutRequest
     ): RelationPutResponse {
         val upsertedRelations = if(createIfNotExist){
-            relationshipService.upsertRelations(
+            relationshipService.upsertInputRelations(
                 tenantBpnL = principalUtil.resolveTenantBpnl(),
-                stageType = StageType.Input,
                 relations = requestBody.relations
             )
         }else{
-            relationshipService.updateRelations(
+            relationshipService.updateInputRelations(
                 tenantBpnL = principalUtil.resolveTenantBpnl(),
-                stageType = StageType.Input,
                 relations = requestBody.relations
             )
         }

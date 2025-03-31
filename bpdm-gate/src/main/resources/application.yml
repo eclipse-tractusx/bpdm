@@ -77,6 +77,11 @@ bpdm:
       batchSize: 20
       # How often the Gate checks for new business partner relations to be shared
       cron: '*/30 * * * * *'
+    relationCheck:
+      # How many relation tasks should be tried to resolve at once
+      batchSize: 20
+      # How often relation tasks should be tried to resolve
+      cron: '*/30 * * * * *'
 
   # Connection to the pool and orchestrator
   client:

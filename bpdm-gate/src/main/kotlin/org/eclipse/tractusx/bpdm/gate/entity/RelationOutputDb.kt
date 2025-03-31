@@ -19,30 +19,22 @@
 
 package org.eclipse.tractusx.bpdm.gate.entity
 
-import jakarta.persistence.*
-import org.eclipse.tractusx.bpdm.common.model.BaseEntity
-import org.eclipse.tractusx.bpdm.gate.entity.RelationDb.Companion.COLUMN_EXTERNAL_ID
-import org.eclipse.tractusx.bpdm.gate.entity.RelationDb.Companion.COLUMN_TENANT
+import jakarta.persistence.Column
+import jakarta.persistence.Embeddable
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
+import java.time.Instant
 
-
-@Entity
-@Table(name = "business_partner_relations",
-    uniqueConstraints = [
-        UniqueConstraint(name = "uc_external_id_tenant", columnNames = [COLUMN_EXTERNAL_ID, COLUMN_TENANT])
-    ]
+@Embeddable
+class RelationOutputDb (
+    @Enumerated(EnumType.STRING)
+    @Column(name = "output_relation_type")
+    var relationType: RelationType,
+    @Column(name = "output_source_bpnl")
+    var sourceBpnL: String,
+    @Column(name = "output_target_bpnl")
+    var targetBpnL: String,
+    @Column(name = "output_updated_at")
+    var updatedAt: Instant,
 )
-class RelationDb(
-    @Column(name = COLUMN_EXTERNAL_ID, unique = true, nullable = false)
-    var externalId: String,
-    @Column(name = COLUMN_TENANT, nullable = false)
-    var tenantBpnL: String,
-    @Embedded
-    var sharingState: RelationSharingStateDb?,
-    @Embedded
-    var output: RelationOutputDb?
-) : BaseEntity(){
-    companion object{
-        const val COLUMN_EXTERNAL_ID = "external_id"
-        const val COLUMN_TENANT = "tenant_bpnl"
-    }
-}

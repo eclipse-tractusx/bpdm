@@ -50,5 +50,5 @@ data class RelationSharingStateDb (
     var taskId: String?,
 
     @Column(name = "is_staged", nullable = false)
-    var isStaged: Boolean,
+    var isStaged: Boolean
 )

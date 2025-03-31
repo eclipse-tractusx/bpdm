@@ -20,47 +20,43 @@
 package org.eclipse.tractusx.bpdm.gate.api
 
 import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.gate.api.GateRelationSharingStateApi.Companion.RELATION_SHARING_STATE_PATH
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateDto
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateType
+import org.eclipse.tractusx.bpdm.gate.api.GateRelationOutputApi.Companion.RELATIONS_OUTPUT_PATH
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationOutputSearchRequest
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
-import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import java.time.Instant
 
-@RequestMapping(RELATION_SHARING_STATE_PATH, produces = [MediaType.APPLICATION_JSON_VALUE])
-interface GateRelationSharingStateApi {
+@RequestMapping(RELATIONS_OUTPUT_PATH, produces = [MediaType.APPLICATION_JSON_VALUE])
+interface GateRelationOutputApi {
 
     companion object{
-        const val RELATION_SHARING_STATE_PATH = "${ApiCommons.BASE_PATH}/relations/sharing-state"
+        const val RELATIONS_OUTPUT_PATH =  "${ApiCommons.BASE_PATH}/output/business-partner-relations"
     }
 
     @Operation(
-        summary = "Returns sharing states of shared business partner relations which can be optionally filtered"
+        summary = "Find business partner output relations",
+        description = "Find paginated list of business partner relations from the output stage. " +
+                "There are various filter criteria available. " +
+                "All filters are 'AND' filters."
     )
     @ApiResponses(
         value = [
-            ApiResponse(responseCode = "200", description = "Page of sharing states")
+            ApiResponse(responseCode = "200", description = "A paginated list of business partner relations for the input stage")
         ]
     )
-    @Tag(name = "sharing-state-controller")
-    @GetMapping
-    fun get(
-        @Parameter(description = "Only show sharing states of given external IDs")
-        @RequestParam(required = false) externalIds: Collection<String>? = null,
-        @Parameter(description = "Only show sharing states of given types")
-        @RequestParam(required = false) sharingStateTypes: Collection<RelationSharingStateType>? = null,
-        @Parameter(description = "Only show sharing states updated after given time")
-        @RequestParam(required = false) updatedAfter: Instant? = null,
+    @Tag(name = "relation-controller")
+    @PostMapping("/search")
+    fun postSearch(
+        @RequestBody searchRequest: RelationOutputSearchRequest = RelationOutputSearchRequest(),
         @ParameterObject @Valid paginationRequest: PaginationRequest = PaginationRequest()
-    ): PageDto<RelationSharingStateDto>
+    ): PageDto<RelationOutputDto>
 }

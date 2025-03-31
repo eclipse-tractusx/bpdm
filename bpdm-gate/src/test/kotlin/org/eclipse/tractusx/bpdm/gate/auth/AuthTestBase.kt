@@ -115,6 +115,16 @@ abstract class AuthTestBase(
         authAssertions.assert(authExpectations.relation.put) { gateClient.relation.put(true, RelationPutRequest(listOf( RelationPutEntry("", RelationType.IsManagedBy, "", "")))) }
     }
 
+    @Test
+    fun `POST SEARCH Relation Outputs`() {
+        authAssertions.assert(authExpectations.relationOutput.postSearch) { gateClient.relationOutput.postSearch() }
+    }
+
+    @Test
+    fun `GET Relation Sharing State`() {
+        authAssertions.assert(authExpectations.relationSharingState.get) { gateClient.relationSharingState.get() }
+    }
+
 }
 
 data class GateAuthExpectations(
@@ -123,7 +133,9 @@ data class GateAuthExpectations(
     val sharingState: SharingStateAuthExpectations,
     val stats: StatsAuthExpectations,
     val uploadPartner: UploadPartnerAuthExpections,
-    val relation: RelationAuthExpectations
+    val relation: RelationAuthExpectations,
+    val relationOutput: RelationOutputAuthExpectations,
+    val relationSharingState: RelationSharingStateExpectations
 )
 
 data class BusinessPartnerAuthExpectations(
@@ -157,4 +169,12 @@ data class UploadPartnerAuthExpections(
 data class RelationAuthExpectations(
     val postSearch: AuthExpectationType,
     val put: AuthExpectationType
+)
+
+data class RelationOutputAuthExpectations(
+    val postSearch: AuthExpectationType
+)
+
+data class RelationSharingStateExpectations(
+    val get: AuthExpectationType
 )
