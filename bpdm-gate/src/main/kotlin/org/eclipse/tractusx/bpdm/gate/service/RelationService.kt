@@ -30,6 +30,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.RelationDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
+import org.eclipse.tractusx.bpdm.gate.api.model.SharableRelationType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
 import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
 import org.eclipse.tractusx.bpdm.gate.entity.RelationOutputDb
@@ -82,7 +83,7 @@ class RelationService(
     override fun findOutputRelations(
         tenantBpnL: BpnLString,
         externalIds: List<String>,
-        relationType: RelationType?,
+        relationType: SharableRelationType?,
         sourceBpnLs: List<String>,
         targetBpnLs: List<String>,
         updatedAtFrom: Instant?,
@@ -155,7 +156,7 @@ class RelationService(
 
     private fun upsertOutput(
         relation: RelationDb,
-        relationType: RelationType,
+        relationType: SharableRelationType,
         sourceBpnL: String,
         targetBpnL: String
     ): RelationDb{

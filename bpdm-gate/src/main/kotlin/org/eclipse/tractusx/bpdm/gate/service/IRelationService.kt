@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.common.mapping.types.BpnLString
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
+import org.eclipse.tractusx.bpdm.gate.api.model.SharableRelationType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
 import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
 import java.time.Instant
@@ -44,7 +45,7 @@ interface IRelationService {
     fun findOutputRelations(
         tenantBpnL: BpnLString,
         externalIds: List<String> = emptyList(),
-        relationType: RelationType? = null,
+        relationType: SharableRelationType? = null,
         sourceBpnLs: List<String> = emptyList(),
         targetBpnLs: List<String> = emptyList(),
         updatedAtFrom: Instant? = null,
@@ -59,7 +60,7 @@ interface IRelationService {
 
     data class RelationUpsertRequest(
         val relation: RelationDb,
-        val relationType: RelationType,
+        val relationType: SharableRelationType,
         val businessPartnerSourceExternalId: String,
         val businessPartnerTargetExternalId: String
     )

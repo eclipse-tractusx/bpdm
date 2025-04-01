@@ -25,6 +25,8 @@ import org.eclipse.tractusx.bpdm.common.dto.IBaseStateDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
 import org.eclipse.tractusx.bpdm.common.model.StageType
+import org.eclipse.tractusx.bpdm.common.util.replace
+import org.eclipse.tractusx.bpdm.gate.api.model.SharableRelationType
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.*
@@ -41,6 +43,8 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteSearchRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
 import kotlin.reflect.KProperty
 
 @Service
@@ -78,6 +82,9 @@ class GoldenRecordUpdateChunkService(
 ) {
 
     private val logger = KotlinLogging.logger { }
+
+    private val placeholderTime = OffsetDateTime.of(2025, 1, 1, 1, 1, 1, 1, ZoneOffset.UTC).toInstant()
+
 
     @Transactional
     fun updateFromNextChunk(): UpdateStats{
@@ -189,12 +196,12 @@ class GoldenRecordUpdateChunkService(
         }
     }
 
-    private fun LegalEntityVerboseDto.toUpsertData(existingOutput: BusinessPartnerDb): OutputUpsertData {
+    private fun LegalEntityVerboseDto.toUpsertData(existingOutput: BusinessPartnerDb): OutputUpsertDataWithRelations {
         val copy = BusinessPartnerDb.createEmpty(existingOutput.sharingState, existingOutput.stage)
         copyUtil.copyValues(existingOutput, copy)
         update(copy, this)
 
-        return copy.toUpsertData()
+        return OutputUpsertDataWithRelations(copy.toUpsertData(), copy.relations.map { it.toUpsertData() }.toSet())
     }
 
     private fun SiteVerboseDto.toUpsertData(existingOutput: BusinessPartnerDb): OutputUpsertData {
@@ -210,7 +217,6 @@ class GoldenRecordUpdateChunkService(
         copyUtil.copyValues(existingOutput, copy)
         return update(copy, this)
     }
-
 
     private fun BusinessPartnerDb.toUpsertData(): OutputUpsertData {
         return OutputUpsertData(
@@ -245,6 +251,10 @@ class GoldenRecordUpdateChunkService(
 
     private fun StateDb.toUpsertData(): State {
         return State(validFrom = validFrom, validTo = validTo, type = type, businessPartnerType = businessPartnerTyp)
+    }
+
+    private fun RelationOutputDb.toUpsertData(): Relation {
+        return Relation(relationType, sourceBpnL, targetBpnL)
     }
 
     private fun PhysicalPostalAddressDb.toUpsertData(): PhysicalPostalAddress {
@@ -316,6 +326,7 @@ class GoldenRecordUpdateChunkService(
         businessPartner.legalForm = legalEntity.legalForm
         businessPartner.shortName = legalEntity.legalShortName
         businessPartner.legalEntityConfidence?.let { update(it,  legalEntity.confidenceCriteria) }
+        businessPartner.relations.replace(legalEntity.relations.map(::toEntity))
     }
 
     private fun update(businessPartner: BusinessPartnerDb, site: SiteVerboseDto){
@@ -440,6 +451,19 @@ class GoldenRecordUpdateChunkService(
             deliveryServiceQualifier = deliveryServiceQualifier,
             deliveryServiceNumber = deliveryServiceNumber
         )
+
+    private fun toEntity(relation: RelationVerboseDto) =
+        RelationOutputDb(
+            relationType = relation.type.toGateModel(),
+            sourceBpnL = relation.businessPartnerSourceBpnl,
+            targetBpnL = relation.businessPartnerTargetBpnl,
+            updatedAt = placeholderTime
+        )
+
+    private fun RelationType.toGateModel() =
+        when(this){
+            RelationType.IsAlternativeHeadquarterFor -> SharableRelationType.IsAlternativeHeadquarterFor
+        }
 
     private fun createMappingException(property: KProperty<*>, entityId: Long? = null): BpdmNullMappingException {
         return BpdmNullMappingException(BusinessPartnerDb::class, OutputUpsertData::class, property, entityId.toString())

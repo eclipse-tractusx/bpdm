@@ -60,7 +60,8 @@ data class LegalEntityRepresentationOutputDto(
     override val shortName: String? = null,
     override val legalForm: String? = null,
     val confidenceCriteria: ConfidenceCriteriaDto,
-    override val states: Collection<BusinessPartnerStateDto> = emptyList()
+    override val states: Collection<BusinessPartnerStateDto> = emptyList(),
+    val relations: Collection<BusinessPartnerOutputRelationDto> = emptyList()
 ) : IBaseLegalEntityRepresentation
 
 @Schema(

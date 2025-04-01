@@ -41,5 +41,5 @@ data class OutputUpsertData(
     val alternativePostalAddress: AlternativeAddress?,
     val legalEntityConfidence: ConfidenceCriteria,
     val siteConfidence: ConfidenceCriteria?,
-    val addressConfidence: ConfidenceCriteria,
+    val addressConfidence: ConfidenceCriteria
 )

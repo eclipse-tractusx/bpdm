@@ -24,6 +24,7 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateErrorCode
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateType
+import org.eclipse.tractusx.bpdm.gate.api.model.SharableRelationType
 import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
 import org.eclipse.tractusx.bpdm.gate.entity.SyncTypeDb
@@ -123,9 +124,9 @@ class RelationTaskResolutionService(
         }.flatten()
     }
 
-    private fun RelationType.toGateModel(): org.eclipse.tractusx.bpdm.gate.api.model.RelationType{
+    private fun RelationType.toGateModel(): SharableRelationType{
         return when(this){
-            RelationType.IsAlternativeHeadquarterFor -> org.eclipse.tractusx.bpdm.gate.api.model.RelationType.IsAlternativeHeadquarterFor
+            RelationType.IsAlternativeHeadquarterFor -> SharableRelationType.IsAlternativeHeadquarterFor
         }
     }
 
