@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.mapping.types.BpnLString
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateErrorCode
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
 import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
@@ -95,6 +96,30 @@ class RelationSharingStateService(
         )
 
         relationRepository.save(relation)
+    }
+
+    fun setSuccess(relation: RelationDb){
+        relation.sharingState = RelationSharingStateDb(
+            sharingStateType = RelationSharingStateType.Success,
+            sharingErrorCode = null,
+            sharingErrorMessage = null,
+            recordId = relation.sharingState?.recordId,
+            taskId = relation.sharingState?.taskId,
+            updatedAt = Instant.now(),
+            isStaged = false
+        )
+    }
+
+    fun setError(relation: RelationDb, errorCode: RelationSharingStateErrorCode, errorMessage: String){
+        relation.sharingState = RelationSharingStateDb(
+            sharingStateType = RelationSharingStateType.Error,
+            sharingErrorCode = errorCode,
+            sharingErrorMessage = errorMessage,
+            recordId = relation.sharingState?.recordId,
+            taskId = relation.sharingState?.taskId,
+            updatedAt = Instant.now(),
+            isStaged = false
+        )
     }
 
     private fun canBeShared(relationType: RelationType): Boolean{

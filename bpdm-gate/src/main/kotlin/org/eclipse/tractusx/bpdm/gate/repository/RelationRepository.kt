@@ -20,8 +20,10 @@
 package org.eclipse.tractusx.bpdm.gate.repository
 
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateType
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
+import org.eclipse.tractusx.bpdm.gate.entity.RelationOutputDb
 import org.eclipse.tractusx.bpdm.gate.entity.RelationSharingStateDb
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -78,6 +80,56 @@ interface RelationRepository: JpaRepository<RelationDb, Long>, JpaSpecificationE
                         .isNotNull
             }
 
+        fun byOutputRelationType(relationType: RelationType?) =
+            relationType?.let {
+                Specification<RelationDb> { root, _, builder ->
+                    val relationTypePath = root
+                        .get<RelationOutputDb>(RelationDb::output.name)
+                        .get<RelationType>(RelationOutputDb::relationType.name)
+
+                    builder.equal(relationTypePath, relationType)
+                }
+            }
+
+        fun byOutputSourceBpnLs(sourceBpnLs: List<String>) =
+            sourceBpnLs.takeIf { it.isNotEmpty() }?.let {
+                Specification<RelationDb> { root, _, builder ->
+                    root
+                        .get<RelationOutputDb>(RelationDb::output.name)
+                        .get<RelationType>(RelationOutputDb::sourceBpnL.name)
+                        .`in`(sourceBpnLs)
+                }
+            }
+
+        fun byOutputTargetBpnLs(targetBpnLs: List<String>) =
+            targetBpnLs.takeIf { it.isNotEmpty() }?.let {
+                Specification<RelationDb> { root, _, builder ->
+                   root
+                        .get<RelationOutputDb>(RelationDb::output.name)
+                        .get<RelationType>(RelationOutputDb::targetBpnL.name)
+                       .`in`(targetBpnLs)
+                }
+            }
+
+        fun byOutputUpdatedAfter(updatedAfter: Instant?) =
+            updatedAfter?.let {
+                Specification<RelationDb> { root, _, builder ->
+                    val updatedAtPath = root
+                        .get<RelationOutputDb>(RelationDb::output.name)
+                        .get<Instant>(RelationOutputDb::updatedAt.name)
+
+                    builder.greaterThan(updatedAtPath, updatedAfter)
+                }
+            }
+
+        fun byOutputIsNotNull() =
+            Specification<RelationDb> { root, _, builder ->
+               root
+                    .get<RelationOutputDb>(RelationDb::output.name)
+                    .get<Instant>(RelationOutputDb::updatedAt.name)
+                    .isNotNull
+            }
+
     }
 
 
@@ -85,4 +137,6 @@ interface RelationRepository: JpaRepository<RelationDb, Long>, JpaSpecificationE
 
     @Query("SELECT r FROM RelationDb r WHERE r.sharingState.sharingStateType = :sharingStateType AND r.sharingState.isStaged = :isStaged")
     fun findBySharingStateAndStaged(sharingStateType: RelationSharingStateType, isStaged: Boolean, pageable: Pageable): Page<RelationDb>
+
+    fun findBySharingStateTaskIdIn(taskIds: Set<String>): Set<RelationDb>
 }

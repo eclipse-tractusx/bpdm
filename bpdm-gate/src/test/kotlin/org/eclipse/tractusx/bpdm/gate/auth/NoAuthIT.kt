@@ -69,6 +69,12 @@ class NoAuthIT @Autowired constructor(
         relation = RelationAuthExpectations(
             postSearch = AuthExpectationType.Unauthorized,
             put = AuthExpectationType.Unauthorized
+        ),
+        relationOutput = RelationOutputAuthExpectations(
+            postSearch = AuthExpectationType.Unauthorized
+        ),
+        relationSharingState = RelationSharingStateExpectations(
+            get = AuthExpectationType.Unauthorized
         )
     )
 )

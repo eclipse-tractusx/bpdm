@@ -32,6 +32,8 @@ bpdm:
       cron: '-'
     relationCreation:
       cron: '-'
+    relationCheck:
+      cron: '-'
 spring:
   datasource:
       hikari:

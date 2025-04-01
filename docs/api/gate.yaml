@@ -186,6 +186,44 @@ paths:
                 $ref: "#/components/schemas/PageDtoBusinessPartnerOutputDto"
         "400":
           description: On malformed pagination request
+  /v6/output/business-partner-relations/search:
+    post:
+      tags:
+      - relation-controller
+      summary: Find business partner output relations
+      description: Find paginated list of business partner relations from the output
+        stage. There are various filter criteria available. All filters are 'AND'
+        filters.
+      operationId: postSearch
+      parameters:
+      - name: page
+        in: query
+        description: Number of page to get results from
+        required: false
+        schema:
+          type: string
+          minimum: 0
+      - name: size
+        in: query
+        description: Size of each page
+        required: false
+        schema:
+          type: string
+          maximum: 100
+          minimum: 0
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RelationOutputSearchRequest"
+      responses:
+        "200":
+          description: A paginated list of business partner relations for the input
+            stage
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PageDtoRelationOutputDto"
   /v6/input/partner-upload-process:
     post:
       tags:
@@ -316,7 +354,7 @@ paths:
       description: Find paginated list of business partner relations from the input
         stage. There are various filter criteria available. All filters are 'AND'
         filters.
-      operationId: postSearch
+      operationId: postSearch_1
       parameters:
       - name: page
         in: query
@@ -444,7 +482,7 @@ paths:
   /v6/relations/sharing-state:
     get:
       tags:
-      - relation-sharing-state-controller
+      - sharing-state-controller
       summary: Returns sharing states of shared business partner relations which can
         be optionally filtered
       operationId: get
@@ -466,7 +504,6 @@ paths:
           items:
             type: string
             enum:
-            - Initial
             - Ready
             - Pending
             - Error
@@ -1540,6 +1577,37 @@ components:
       - page
       - totalElements
       - totalPages
+    PageDtoRelationOutputDto:
+      type: object
+      description: Paginated collection of results
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+          description: Total number of all results in all pages
+        totalPages:
+          type: integer
+          format: int32
+          description: Total number pages
+        page:
+          type: integer
+          format: int32
+          description: Current page number
+        contentSize:
+          type: integer
+          format: int32
+          description: Number of results in the page
+        content:
+          type: array
+          description: Collection of results in the page
+          items:
+            $ref: "#/components/schemas/RelationOutputDto"
+      required:
+      - content
+      - contentSize
+      - page
+      - totalElements
+      - totalPages
     PageDtoRelationSharingStateDto:
       type: object
       description: Paginated collection of results
@@ -1984,6 +2052,62 @@ components:
       - externalId
       - relationType
       - updatedAt
+    RelationOutputDto:
+      type: object
+      properties:
+        externalId:
+          type: string
+        relationType:
+          type: string
+          enum:
+          - IsManagedBy
+          - IsAlternativeHeadquarterFor
+        sourceBpnL:
+          type: string
+        targetBpnL:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+      - externalId
+      - relationType
+      - sourceBpnL
+      - targetBpnL
+      - updatedAt
+    RelationOutputSearchRequest:
+      type: object
+      description: Request payload containing search parameters for business partner
+        output relations
+      properties:
+        externalIds:
+          type: array
+          description: Only show relations with the given external identifiers
+          items:
+            type: string
+        relationType:
+          type: string
+          description: Only show relations of the given type
+          enum:
+          - IsManagedBy
+          - IsAlternativeHeadquarterFor
+        sourceBpnLs:
+          type: array
+          description: Only show relations which have the given business partners
+            as sources
+          items:
+            type: string
+        targetBpnLs:
+          type: array
+          description: Only show relations which have the given business partners
+            as targets
+          items:
+            type: string
+        updatedAtFrom:
+          type: string
+          format: date-time
+          description: Only show relations which have been modified after the given
+            time stamp
     RelationPutEntry:
       type: object
       description: A request to update the content of the given business partner relation
@@ -2074,7 +2198,6 @@ components:
           type: string
           description: One of the sharing state types of the current sharing state.
           enum:
-          - Initial
           - Ready
           - Pending
           - Error
@@ -2092,10 +2215,13 @@ components:
           type: string
           description: The error message in case the current sharing state type is
             "error".
+        taskId:
+          type: string
+          description: When the sharing state last changed.
         updatedAt:
           type: string
           format: date-time
-          description: When the sharing state last changed.
+          description: The orchestrator task identifier that was created
       required:
       - externalId
       - sharingStateType

@@ -22,17 +22,17 @@ package org.eclipse.tractusx.bpdm.gate.service
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.mapping.types.BpnLString
-import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationDto
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
+import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
 import java.time.Instant
 
 interface IRelationService {
 
-    fun findStages(
+    fun findInputRelations(
         tenantBpnL: BpnLString,
-        stageType: StageType,
         externalIds: List<String> = emptyList(),
         relationType: RelationType? = null,
         sourceBusinessPartnerExternalIds: List<String> = emptyList(),
@@ -41,7 +41,26 @@ interface IRelationService {
         paginationRequest: PaginationRequest
     ): PageDto<RelationDto>
 
-    fun upsertRelations(tenantBpnL: BpnLString, stageType: StageType, relations: List<RelationPutEntry>): List<RelationDto>
+    fun findOutputRelations(
+        tenantBpnL: BpnLString,
+        externalIds: List<String> = emptyList(),
+        relationType: RelationType? = null,
+        sourceBpnLs: List<String> = emptyList(),
+        targetBpnLs: List<String> = emptyList(),
+        updatedAtFrom: Instant? = null,
+        paginationRequest: PaginationRequest
+    ): PageDto<RelationOutputDto>
 
-    fun updateRelations(tenantBpnL: BpnLString, stageType: StageType, relations: List<RelationPutEntry>): List<RelationDto>
+    fun upsertInputRelations(tenantBpnL: BpnLString, relations: List<RelationPutEntry>): List<RelationDto>
+
+    fun updateInputRelations(tenantBpnL: BpnLString, relations: List<RelationPutEntry>): List<RelationDto>
+
+    fun upsertOutputRelations(relations: List<RelationUpsertRequest>): List<RelationDb>
+
+    data class RelationUpsertRequest(
+        val relation: RelationDb,
+        val relationType: RelationType,
+        val businessPartnerSourceExternalId: String,
+        val businessPartnerTargetExternalId: String
+    )
 }

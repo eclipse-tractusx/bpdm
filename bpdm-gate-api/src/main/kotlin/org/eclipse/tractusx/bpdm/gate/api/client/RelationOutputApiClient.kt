@@ -19,21 +19,19 @@
 
 package org.eclipse.tractusx.bpdm.gate.api.client
 
-interface GateClient {
+import org.eclipse.tractusx.bpdm.common.dto.PageDto
+import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.gate.api.GateRelationOutputApi
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationOutputSearchRequest
+import org.springdoc.core.annotations.ParameterObject
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.service.annotation.HttpExchange
+import org.springframework.web.service.annotation.PostExchange
 
-    val businessParters: BusinessPartnerApiClient
+@HttpExchange(GateRelationOutputApi.RELATIONS_OUTPUT_PATH)
+interface RelationOutputApiClient: GateRelationOutputApi {
 
-    val changelog: ChangelogApiClient
-
-    val sharingState: SharingStateApiClient
-
-    val stats: StatsApiClient
-
-    val partnerUpload: PartnerUploadApiClient
-
-    val relation: RelationApiClient
-
-    val relationSharingState: RelationSharingStateApiClient
-
-    val relationOutput: RelationOutputApiClient
+    @PostExchange("/search")
+    override fun postSearch(@RequestBody searchRequest: RelationOutputSearchRequest, @ParameterObject paginationRequest: PaginationRequest): PageDto<RelationOutputDto>
 }

@@ -21,37 +21,34 @@ package org.eclipse.tractusx.bpdm.gate.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.gate.api.GateRelationSharingStateApi
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateDto
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateType
+import org.eclipse.tractusx.bpdm.gate.api.GateRelationOutputApi
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationOutputSearchRequest
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
-import org.eclipse.tractusx.bpdm.gate.service.RelationSharingStateService
+import org.eclipse.tractusx.bpdm.gate.service.IRelationService
 import org.eclipse.tractusx.bpdm.gate.util.PrincipalUtil
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
-import java.time.Instant
 
 @RestController
-class RelationSharingStateController(
-    private val relationSharingStateService: RelationSharingStateService,
+class RelationOutputController(
+    private val relationService: IRelationService,
     private val principalUtil: PrincipalUtil
-): GateRelationSharingStateApi {
+): GateRelationOutputApi {
 
-    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_SHARING_STATE})")
-    override fun get(
-        externalIds: Collection<String>?,
-        sharingStateTypes: Collection<RelationSharingStateType>?,
-        updatedAfter: Instant?,
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_OUTPUT_PARTNER})")
+    override fun postSearch(
+        searchRequest: RelationOutputSearchRequest,
         paginationRequest: PaginationRequest
-    ): PageDto<RelationSharingStateDto> {
-        return relationSharingStateService.findSharingStates(
-            principalUtil.resolveTenantBpnl(),
-            externalIds ?: emptyList(),
-            sharingStateTypes ?: emptyList(),
-            updatedAfter,
+    ): PageDto<RelationOutputDto> {
+        return relationService.findOutputRelations(
+            tenantBpnL = principalUtil.resolveTenantBpnl(),
+            externalIds = searchRequest.externalIds ?: emptyList(),
+            relationType = searchRequest.relationType,
+            sourceBpnLs = searchRequest.sourceBpnLs ?: emptyList(),
+            targetBpnLs = searchRequest.targetBpnLs ?:emptyList(),
+            updatedAtFrom = searchRequest.updatedAtFrom,
             paginationRequest
         )
     }
-
-
 }

@@ -17,10 +17,14 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.entity
+package org.eclipse.tractusx.bpdm.gate.api.model
 
-enum class SyncTypeDb {
-    POOL_TO_GATE_OUTPUT,
-    ORCHESTRATOR_FINISHED_TASKS,
-    ORCHESTRATOR_FINISHED_RELATION_TASKS
-}
+import java.time.Instant
+
+data class RelationOutputDto(
+    val externalId: String,
+    val relationType: RelationType,
+    val sourceBpnL: String,
+    val targetBpnL: String,
+    val updatedAt: Instant
+)

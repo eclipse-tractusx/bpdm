@@ -71,6 +71,12 @@ class AuthOutputConsumerIT @Autowired constructor(
         relation = RelationAuthExpectations(
             postSearch = AuthExpectationType.Forbidden,
             put = AuthExpectationType.Forbidden
+        ),
+        relationOutput = RelationOutputAuthExpectations(
+            postSearch = AuthExpectationType.Authorized
+        ),
+        relationSharingState = RelationSharingStateExpectations(
+            get = AuthExpectationType.Authorized
         )
     )
 ) {

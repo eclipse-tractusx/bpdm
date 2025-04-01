@@ -33,7 +33,8 @@ class GoldenRecordTaskConfiguration(
     private val taskResolutionService: TaskResolutionBatchService,
     private val updateService: GoldenRecordUpdateBatchService,
     private val goldenRecordConsistencyService: GoldenRecordConsistencyService,
-    private val relationTaskCreationService: RelationTaskCreationService
+    private val relationTaskCreationService: RelationTaskCreationService,
+    private val relationTaskResolutionService: RelationTaskResolutionService
 ) {
 
     @PostConstruct
@@ -65,6 +66,11 @@ class GoldenRecordTaskConfiguration(
 
         taskScheduler.scheduleIfEnabled(
             { relationTaskCreationService.sendTasks() },
+            configProperties.relationCreation.cron
+        )
+
+        taskScheduler.scheduleIfEnabled(
+            { relationTaskResolutionService.checkResolveTasks() },
             configProperties.relationCreation.cron
         )
     }
