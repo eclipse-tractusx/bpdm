@@ -29,7 +29,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.PoolLegalEntityApi.Companion.LEGAL_ENTITY_PATH
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateRequest
@@ -42,12 +41,8 @@ import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
 
-@RequestMapping(LEGAL_ENTITY_PATH, produces = [MediaType.APPLICATION_JSON_VALUE])
+@RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
 interface PoolLegalEntityApi {
-
-    companion object{
-        const val LEGAL_ENTITY_PATH = "${ApiCommons.BASE_PATH}/legal-entities"
-    }
 
     @Operation(
         summary = "Returns legal entities by different search parameters",
@@ -61,7 +56,7 @@ interface PoolLegalEntityApi {
         ]
     )
     @Tag(name = ApiCommons.LEGAL_ENTITIES_NAME, description = ApiCommons.LEGAL_ENTITIES_DESCRIPTION)
-    @GetMapping
+    @GetMapping(value = [ApiCommons.LEGAL_ENTITY_BASE_PATH_V6, ApiCommons.LEGAL_ENTITY_BASE_PATH_V7])
     fun getLegalEntities(
         @ParameterObject searchRequest: LegalEntitySearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
@@ -87,7 +82,7 @@ interface PoolLegalEntityApi {
         ]
     )
     @Tag(name = ApiCommons.LEGAL_ENTITIES_NAME, description = ApiCommons.LEGAL_ENTITIES_DESCRIPTION)
-    @GetMapping("/{idValue}")
+    @GetMapping(value = ["${ApiCommons.LEGAL_ENTITY_BASE_PATH_V6}/{idValue}", "${ApiCommons.LEGAL_ENTITY_BASE_PATH_V7}/{idValue}"])
     fun getLegalEntity(
         @Parameter(description = "Identifier value") @PathVariable("idValue") idValue: String,
         @Parameter(description = "Type of identifier to use, defaults to BPN when omitted", schema = Schema(defaultValue = "BPN"))
@@ -111,7 +106,7 @@ interface PoolLegalEntityApi {
         ]
     )
     @Tag(name = ApiCommons.LEGAL_ENTITIES_NAME, description = ApiCommons.LEGAL_ENTITIES_DESCRIPTION)
-    @PostMapping("/search")
+    @PostMapping(value = ["${ApiCommons.LEGAL_ENTITY_BASE_PATH_V6}/search", "${ApiCommons.LEGAL_ENTITY_BASE_PATH_V7}/search"])
     fun postLegalEntitySearch(
         @RequestBody searchRequest: LegalEntitySearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
@@ -129,7 +124,7 @@ interface PoolLegalEntityApi {
         ]
     )
     @Tag(name = ApiCommons.LEGAL_ENTITIES_NAME, description = ApiCommons.LEGAL_ENTITIES_DESCRIPTION)
-    @GetMapping("/{bpnl}/sites")
+    @GetMapping(value = ["${ApiCommons.LEGAL_ENTITY_BASE_PATH_V6}/{bpnl}/sites", "${ApiCommons.LEGAL_ENTITY_BASE_PATH_V7}/{bpnl}/sites"])
     fun getSites(
         @Parameter(description = "BPNL value") @PathVariable bpnl: String,
         @ParameterObject paginationRequest: PaginationRequest
@@ -147,7 +142,7 @@ interface PoolLegalEntityApi {
         ]
     )
     @Tag(name = ApiCommons.LEGAL_ENTITIES_NAME, description = ApiCommons.LEGAL_ENTITIES_DESCRIPTION)
-    @GetMapping("/{bpnl}/addresses")
+    @GetMapping(value = ["${ApiCommons.LEGAL_ENTITY_BASE_PATH_V6}/{bpnl}/addresses", "${ApiCommons.LEGAL_ENTITY_BASE_PATH_V7}/{bpnl}/addresses"])
     fun getAddresses(
         @Parameter(description = "BPNL value") @PathVariable bpnl: String,
         @ParameterObject paginationRequest: PaginationRequest
@@ -166,7 +161,7 @@ interface PoolLegalEntityApi {
         ]
     )
     @Tag(name = ApiCommons.LEGAL_ENTITIES_NAME, description = ApiCommons.LEGAL_ENTITIES_DESCRIPTION)
-    @PostMapping
+    @PostMapping(value = [ApiCommons.LEGAL_ENTITY_BASE_PATH_V6, ApiCommons.LEGAL_ENTITY_BASE_PATH_V7])
     fun createBusinessPartners(
         @RequestBody
         businessPartners: Collection<LegalEntityPartnerCreateRequest>
@@ -185,7 +180,7 @@ interface PoolLegalEntityApi {
         ]
     )
     @Tag(name = ApiCommons.LEGAL_ENTITIES_NAME, description = ApiCommons.LEGAL_ENTITIES_DESCRIPTION)
-    @PutMapping
+    @PutMapping(value = [ApiCommons.LEGAL_ENTITY_BASE_PATH_V6, ApiCommons.LEGAL_ENTITY_BASE_PATH_V7])
     fun updateBusinessPartners(
         @RequestBody
         businessPartners: Collection<LegalEntityPartnerUpdateRequest>

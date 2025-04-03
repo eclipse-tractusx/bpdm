@@ -23,6 +23,7 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.ApiCommons
 import org.eclipse.tractusx.bpdm.pool.api.PoolLegalEntityApi
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerboseDto
@@ -41,45 +42,45 @@ import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
 import org.springframework.web.service.annotation.PutExchange
 
-@HttpExchange(PoolLegalEntityApi.LEGAL_ENTITY_PATH)
+@HttpExchange
 interface LegalEntityApiClient : PoolLegalEntityApi {
-    @PostExchange
+    @PostExchange(value = ApiCommons.LEGAL_ENTITY_BASE_PATH_V7)
     override fun createBusinessPartners(
         @RequestBody businessPartners: Collection<LegalEntityPartnerCreateRequest>
     ): LegalEntityPartnerCreateResponseWrapper
 
-    @GetExchange("/{bpnl}/addresses")
+    @GetExchange(value = "${ApiCommons.LEGAL_ENTITY_BASE_PATH_V7}/{bpnl}/addresses")
     override fun getAddresses(
         @PathVariable bpnl: String,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageDto<LogisticAddressVerboseDto>
 
-    @GetExchange
+    @GetExchange(value = ApiCommons.LEGAL_ENTITY_BASE_PATH_V7)
     override fun getLegalEntities(
         @ParameterObject searchRequest: LegalEntitySearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageDto<LegalEntityWithLegalAddressVerboseDto>
 
-    @GetExchange("/{idValue}")
+    @GetExchange(value = "${ApiCommons.LEGAL_ENTITY_BASE_PATH_V7}/{idValue}")
     override fun getLegalEntity(
         @PathVariable idValue: String,
         @Parameter(description = "Type of identifier to use, defaults to BPN when omitted", schema = Schema(defaultValue = "BPN"))
         @RequestParam idType: String?
     ): LegalEntityWithLegalAddressVerboseDto
 
-    @GetExchange("/{bpnl}/sites")
+    @GetExchange(value = "${ApiCommons.LEGAL_ENTITY_BASE_PATH_V7}/{bpnl}/sites")
     override fun getSites(
         @PathVariable bpnl: String,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageDto<SiteVerboseDto>
 
-    @PostExchange("/search")
+    @PostExchange(value = "${ApiCommons.LEGAL_ENTITY_BASE_PATH_V7}/search")
     override fun postLegalEntitySearch(
         @RequestBody searchRequest: LegalEntitySearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageDto<LegalEntityWithLegalAddressVerboseDto>
 
-    @PutExchange
+    @PutExchange(value = ApiCommons.LEGAL_ENTITY_BASE_PATH_V7)
     override fun updateBusinessPartners(
         @RequestBody
         businessPartners: Collection<LegalEntityPartnerUpdateRequest>
