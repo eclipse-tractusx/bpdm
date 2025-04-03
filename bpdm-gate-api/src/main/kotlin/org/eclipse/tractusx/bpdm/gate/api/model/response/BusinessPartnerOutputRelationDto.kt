@@ -17,31 +17,12 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.entity
+package org.eclipse.tractusx.bpdm.gate.api.model.response
 
-import jakarta.persistence.Column
-import jakarta.persistence.Embeddable
-import jakarta.persistence.EnumType
-import jakarta.persistence.Enumerated
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
 import org.eclipse.tractusx.bpdm.gate.api.model.SharableRelationType
-import java.time.Instant
 
-@Embeddable
-data class RelationOutputDb (
-    @Enumerated(EnumType.STRING)
-    @Column(name = "output_relation_type")
-    var relationType: SharableRelationType,
-    @Column(name = "output_source_bpnl")
-    var sourceBpnL: String,
-    @Column(name = "output_target_bpnl")
-    var targetBpnL: String,
-    @Column(name = "output_updated_at")
-    var updatedAt: Instant,
-): Comparable<RelationOutputDb>{
-    override fun compareTo(other: RelationOutputDb) = compareBy(
-        RelationOutputDb::sourceBpnL,
-        RelationOutputDb::targetBpnL,
-        RelationOutputDb::relationType
-    ).compare(this, other)
-}
+data class BusinessPartnerOutputRelationDto(
+    val relationType: SharableRelationType,
+    val sourceBpnL: String,
+    val targetBpnL: String
+)

@@ -23,6 +23,7 @@ import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 import org.eclipse.tractusx.bpdm.common.model.StageType
+import org.eclipse.tractusx.bpdm.gate.entity.RelationOutputDb
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import java.time.Instant
 import java.util.*
@@ -108,6 +109,10 @@ class BusinessPartnerDb(
     @Column(name = "external_sequence_timestamp")
     var externalSequenceTimestamp: Instant? = null,
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "business_partners_output_relations", joinColumns = [JoinColumn(name = "business_partner_id")])
+    var relations: SortedSet<RelationOutputDb> = sortedSetOf()
+
     ) : BaseEntity() {
 
     companion object {
@@ -118,7 +123,8 @@ class BusinessPartnerDb(
                 postalAddress = PostalAddressDb(),
                 legalEntityConfidence = null,
                 siteConfidence = null,
-                addressConfidence = null
+                addressConfidence = null,
+                relations = sortedSetOf()
             )
     }
 }

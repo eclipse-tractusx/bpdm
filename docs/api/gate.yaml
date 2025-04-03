@@ -1171,6 +1171,21 @@ components:
       - roles
       - states
       - updatedAt
+    BusinessPartnerOutputRelationDto:
+      type: object
+      properties:
+        relationType:
+          type: string
+          enum:
+          - IsAlternativeHeadquarterFor
+        sourceBpnL:
+          type: string
+        targetBpnL:
+          type: string
+      required:
+      - relationType
+      - sourceBpnL
+      - targetBpnL
     BusinessPartnerStateDto:
       type: object
       properties:
@@ -1437,10 +1452,15 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/BusinessPartnerStateDto"
+        relations:
+          type: array
+          items:
+            $ref: "#/components/schemas/BusinessPartnerOutputRelationDto"
       required:
       - bpnL
       - confidenceCriteria
       - legalEntityBpn
+      - relations
       - states
     PageChangeLogDtoChangelogGateDto:
       type: object
@@ -2060,7 +2080,6 @@ components:
         relationType:
           type: string
           enum:
-          - IsManagedBy
           - IsAlternativeHeadquarterFor
         sourceBpnL:
           type: string
@@ -2089,7 +2108,6 @@ components:
           type: string
           description: Only show relations of the given type
           enum:
-          - IsManagedBy
           - IsAlternativeHeadquarterFor
         sourceBpnLs:
           type: array

@@ -1050,6 +1050,22 @@
         },
         "required" : [ "address", "createdAt", "externalId", "identifiers", "isOwnCompanyData", "legalEntity", "nameParts", "roles", "states", "updatedAt" ]
       },
+      "BusinessPartnerOutputRelationDto" : {
+        "type" : "object",
+        "properties" : {
+          "relationType" : {
+            "type" : "string",
+            "enum" : [ "IsAlternativeHeadquarterFor" ]
+          },
+          "sourceBpnL" : {
+            "type" : "string"
+          },
+          "targetBpnL" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "relationType", "sourceBpnL", "targetBpnL" ]
+      },
       "BusinessPartnerStateDto" : {
         "type" : "object",
         "properties" : {
@@ -1264,9 +1280,15 @@
             "items" : {
               "$ref" : "#/components/schemas/BusinessPartnerStateDto"
             }
+          },
+          "relations" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/BusinessPartnerOutputRelationDto"
+            }
           }
         },
-        "required" : [ "bpnL", "confidenceCriteria", "legalEntityBpn", "states" ]
+        "required" : [ "bpnL", "confidenceCriteria", "legalEntityBpn", "relations", "states" ]
       },
       "PageChangeLogDtoChangelogGateDto" : {
         "type" : "object",
@@ -1637,7 +1659,7 @@
           },
           "relationType" : {
             "type" : "string",
-            "enum" : [ "IsManagedBy", "IsAlternativeHeadquarterFor" ]
+            "enum" : [ "IsAlternativeHeadquarterFor" ]
           },
           "sourceBpnL" : {
             "type" : "string"
@@ -1666,7 +1688,7 @@
           "relationType" : {
             "type" : "string",
             "description" : "Only show relations of the given type",
-            "enum" : [ "IsManagedBy", "IsAlternativeHeadquarterFor" ]
+            "enum" : [ "IsAlternativeHeadquarterFor" ]
           },
           "sourceBpnLs" : {
             "type" : "array",

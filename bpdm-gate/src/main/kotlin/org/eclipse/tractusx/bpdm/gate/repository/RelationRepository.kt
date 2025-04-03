@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.repository
 
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
+import org.eclipse.tractusx.bpdm.gate.api.model.SharableRelationType
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
 import org.eclipse.tractusx.bpdm.gate.entity.RelationOutputDb
@@ -80,12 +81,12 @@ interface RelationRepository: JpaRepository<RelationDb, Long>, JpaSpecificationE
                         .isNotNull
             }
 
-        fun byOutputRelationType(relationType: RelationType?) =
+        fun byOutputRelationType(relationType: SharableRelationType?) =
             relationType?.let {
                 Specification<RelationDb> { root, _, builder ->
                     val relationTypePath = root
                         .get<RelationOutputDb>(RelationDb::output.name)
-                        .get<RelationType>(RelationOutputDb::relationType.name)
+                        .get<SharableRelationType>(RelationOutputDb::relationType.name)
 
                     builder.equal(relationTypePath, relationType)
                 }

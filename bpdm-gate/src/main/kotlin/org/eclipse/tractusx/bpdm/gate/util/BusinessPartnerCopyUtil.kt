@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.util
 
 import org.eclipse.tractusx.bpdm.common.util.copyAndSync
 import org.eclipse.tractusx.bpdm.common.util.replace
+import org.eclipse.tractusx.bpdm.gate.entity.RelationOutputDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.*
 import org.springframework.stereotype.Component
 
@@ -50,6 +51,7 @@ class BusinessPartnerCopyUtil {
             states.copyAndSync(fromPartner.states, ::copyValues)
             classifications.copyAndSync(fromPartner.classifications, ::copyValues)
             identifiers.copyAndSync(fromPartner.identifiers, ::copyValues)
+            relations.copyAndSync(fromPartner.relations, ::copyValues)
 
             copyValues(fromPartner.postalAddress, postalAddress)
         }
@@ -83,6 +85,14 @@ class BusinessPartnerCopyUtil {
             addressType = fromPostalAddress.addressType
             physicalPostalAddress = fromPostalAddress.physicalPostalAddress
             alternativePostalAddress = fromPostalAddress.alternativePostalAddress
+        }
+
+    private fun copyValues(fromRelation: RelationOutputDb, toRelation: RelationOutputDb) =
+        toRelation.apply {
+            relationType = fromRelation.relationType
+            sourceBpnL = fromRelation.sourceBpnL
+            targetBpnL = fromRelation.targetBpnL
+            updatedAt = fromRelation.updatedAt
         }
 
 }

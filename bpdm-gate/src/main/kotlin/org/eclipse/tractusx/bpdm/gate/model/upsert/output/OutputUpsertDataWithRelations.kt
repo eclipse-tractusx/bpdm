@@ -17,14 +17,9 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.api.model
+package org.eclipse.tractusx.bpdm.gate.model.upsert.output
 
-import java.time.Instant
-
-data class RelationOutputDto(
-    val externalId: String,
-    val relationType: SharableRelationType,
-    val sourceBpnL: String,
-    val targetBpnL: String,
-    val updatedAt: Instant
+data class OutputUpsertDataWithRelations(
+    val businessPartnerUpsertData: OutputUpsertData,
+    val relationUpsertData: Set<Relation>
 )

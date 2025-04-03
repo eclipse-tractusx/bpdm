@@ -30,6 +30,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.RelationOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateErrorCode
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateType
+import org.eclipse.tractusx.bpdm.gate.api.model.SharableRelationType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationOutputSearchRequest
 import org.eclipse.tractusx.bpdm.gate.controller.SelfClientAsPartnerUploaderInitializer
 import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
@@ -147,7 +148,7 @@ class RelationTaskResolutionServiceIT @Autowired constructor(
         relationTaskResolutionService.checkResolveTasks()
 
         val expectedOutput = PageDto<RelationOutputDto>(1, 1, 0, 1, listOf(
-            RelationOutputDto(relationId1, org.eclipse.tractusx.bpdm.gate.api.model.RelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL2, anyTime)
+            RelationOutputDto(relationId1, SharableRelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL2, anyTime)
         ))
         val expectedSharingStates = PageDto<RelationSharingStateDto>(2, 1, 0, 2, listOf(
             RelationSharingStateDto(relationId1, RelationSharingStateType.Success, null, null, taskId1, anyTime),

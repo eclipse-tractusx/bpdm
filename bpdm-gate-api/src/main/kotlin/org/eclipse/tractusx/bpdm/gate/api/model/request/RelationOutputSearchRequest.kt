@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.api.model.request
 
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
+import org.eclipse.tractusx.bpdm.gate.api.model.SharableRelationType
 import java.time.Instant
 
 @Schema(description = "Request payload containing search parameters for business partner output relations")
@@ -28,7 +29,7 @@ data class RelationOutputSearchRequest(
     @Schema(description = "Only show relations with the given external identifiers")
     val externalIds: List<String>? = null,
     @Schema(description = "Only show relations of the given type")
-    val relationType: RelationType? = null,
+    val relationType: SharableRelationType? = null,
     @Schema(description = "Only show relations which have the given business partners as sources")
     val sourceBpnLs: List<String>? = null,
     @Schema(description = "Only show relations which have the given business partners as targets")
