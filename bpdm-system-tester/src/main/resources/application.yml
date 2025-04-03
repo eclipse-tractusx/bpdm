@@ -24,6 +24,18 @@ bpdm:
         client-id: sa-cl7-cx-7
         # Please provide secret here
         client-secret: "**********"
+    orchestrator:
+      securityEnabled: true
+      # The base-url of the Pool-API
+      base-url: http://localhost:8085
+      provider:
+        issuer-uri: http://localhost:8180/realms/CX-Central
+      registration:
+        authorization-grant-type: client_credentials
+        # Use a default client id for the client credentials request
+        client-id: sa-cl25-cx-1
+        # Please provide secret here
+        client-secret: "**********"
 
 cucumber:
   glue: "org.eclipse.tractusx.bpdm.test.system.stepdefinations"
