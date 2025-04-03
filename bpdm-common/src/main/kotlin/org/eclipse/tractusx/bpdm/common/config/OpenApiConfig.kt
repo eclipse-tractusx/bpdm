@@ -67,6 +67,17 @@ class OpenApiConfig(
     }
 
     @Bean
+    fun version7Group(openApiCustomizerFactory: OpenApiCustomizerFactory): GroupedOpenApi {
+        return GroupedOpenApi.builder()
+            .group("v7")
+            .pathsToMatch("/v7/**")
+            .displayName("V7")
+            .addOpenApiCustomizer(openApiCustomizerFactory.sortSchemaCustomiser())
+            .addOpenApiCustomizer(openApiCustomizerFactory.versionApiCustomizer("v7"))
+            .build()
+    }
+
+    @Bean
     fun openApiCustomizerFactory(): OpenApiCustomizerFactory{
         return OpenApiCustomizerFactory()
     }

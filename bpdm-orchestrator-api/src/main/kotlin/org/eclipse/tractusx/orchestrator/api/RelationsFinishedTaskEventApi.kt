@@ -25,8 +25,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.orchestrator.api.RelationsFinishedTaskEventApi.Companion.RELATIONS_FINISHED_TASK_EVENT_PATH
-import org.eclipse.tractusx.orchestrator.api.RelationsGoldenRecordTaskApi.Companion.RELATIONS_TASKS_PATH
 import org.eclipse.tractusx.orchestrator.api.model.FinishedTaskEventsResponse
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
@@ -35,12 +33,8 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import java.time.Instant
 
-@RequestMapping(RELATIONS_FINISHED_TASK_EVENT_PATH, produces = [MediaType.APPLICATION_JSON_VALUE])
+@RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
 interface RelationsFinishedTaskEventApi {
-
-    companion object{
-        const val RELATIONS_FINISHED_TASK_EVENT_PATH = "${RELATIONS_TASKS_PATH}/finished-events"
-    }
 
     @Operation(
         summary = "Get event log of relations golden record tasks that have finished processing",
@@ -58,7 +52,7 @@ interface RelationsFinishedTaskEventApi {
         ]
     )
     @Tag(name = TagClient)
-    @GetMapping
+    @GetMapping(value = ["${ApiCommons.BASE_PATH_V7_RELATIONS}/finished-events"])
     fun getRelationsEvents(@RequestParam timestamp: Instant,
                   @ParameterObject paginationRequest: PaginationRequest
     ): FinishedTaskEventsResponse

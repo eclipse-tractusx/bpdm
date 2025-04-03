@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.orchestrator.api.client
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.orchestrator.api.ApiCommons
 import org.eclipse.tractusx.orchestrator.api.RelationsFinishedTaskEventApi
 import org.eclipse.tractusx.orchestrator.api.model.FinishedTaskEventsResponse
 import org.springdoc.core.annotations.ParameterObject
@@ -28,9 +29,9 @@ import org.springframework.web.service.annotation.GetExchange
 import org.springframework.web.service.annotation.HttpExchange
 import java.time.Instant
 
-@HttpExchange(RelationsFinishedTaskEventApi.RELATIONS_FINISHED_TASK_EVENT_PATH)
+@HttpExchange
 interface RelationsFinishedTaskEventApiClient : RelationsFinishedTaskEventApi{
 
-    @GetExchange
+    @GetExchange(value = "${ApiCommons.BASE_PATH_V7_RELATIONS}/finished-events")
     override fun getRelationsEvents(@RequestParam timestamp: Instant, @ParameterObject paginationRequest: PaginationRequest): FinishedTaskEventsResponse
 }

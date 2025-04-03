@@ -19,36 +19,37 @@
 
 package org.eclipse.tractusx.orchestrator.api.client
 
+import org.eclipse.tractusx.orchestrator.api.ApiCommons
 import org.eclipse.tractusx.orchestrator.api.GoldenRecordTaskApi
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
 
-@HttpExchange(GoldenRecordTaskApi.TASKS_PATH)
+@HttpExchange
 interface GoldenRecordTaskApiClient : GoldenRecordTaskApi {
 
-    @PostExchange
+    @PostExchange(value = ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS)
     override fun createTasks(
         @RequestBody createRequest: TaskCreateRequest
     ): TaskCreateResponse
 
-    @PostExchange("/step-reservations")
+    @PostExchange(value = "${ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS}/step-reservations")
     override fun reserveTasksForStep(
         @RequestBody reservationRequest: TaskStepReservationRequest
     ): TaskStepReservationResponse
 
-    @PostExchange("/step-results")
+    @PostExchange(value = "${ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS}/step-results")
     override fun resolveStepResults(
         @RequestBody resultRequest: TaskStepResultRequest
     )
 
-    @PostExchange("/state/search")
+    @PostExchange(value = "${ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS}/state/search")
     override fun searchTaskStates(
         @RequestBody stateRequest: TaskStateRequest
     ): TaskStateResponse
 
-    @PostExchange("/result-state/search")
+    @PostExchange(value = "${ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS}/result-state/search")
     override fun searchTaskResultStates(
         @RequestBody stateRequest: TaskResultStateSearchRequest
     ): TaskResultStateSearchResponse

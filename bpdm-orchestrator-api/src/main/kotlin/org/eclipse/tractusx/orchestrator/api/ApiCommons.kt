@@ -21,5 +21,7 @@ package org.eclipse.tractusx.orchestrator.api
 
 object ApiCommons {
 
-    const val BASE_PATH = "/v6"
+    const val BASE_PATH_V6 = "/v6/golden-record-tasks"
+    const val BASE_PATH_V7_RELATIONS = "/v7/relations/golden-record-tasks"
+    const val BASE_PATH_V7_BUSINESS_PARTNERS = "/v7/business-partners/golden-record-tasks"
 }

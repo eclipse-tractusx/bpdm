@@ -43,6 +43,7 @@ import org.eclipse.tractusx.bpdm.test.testdata.gate.GateInputFactory
 import org.eclipse.tractusx.bpdm.test.testdata.gate.withAddressType
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.eclipse.tractusx.bpdm.test.util.Timeframe
+import org.eclipse.tractusx.orchestrator.api.ApiCommons
 import org.eclipse.tractusx.orchestrator.api.RelationsGoldenRecordTaskApi
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.junit.jupiter.api.BeforeEach
@@ -126,7 +127,7 @@ class RelationTaskCreationServiceIT @Autowired constructor(
         ))
 
         orchestratorWireMockServer.stubFor(
-            WireMock.post(WireMock.urlPathEqualTo(RelationsGoldenRecordTaskApi.RELATIONS_TASKS_PATH))
+            WireMock.post(WireMock.urlPathEqualTo(ApiCommons.BASE_PATH_V7_RELATIONS))
                 .willReturn(
                     WireMock.okJson(objectMapper.writeValueAsString(orchestratorMockResponse))
                 )

@@ -43,6 +43,7 @@ import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerGenericCommon
 import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerVerboseValues
 import org.eclipse.tractusx.bpdm.test.util.AssertHelpers
 import org.eclipse.tractusx.bpdm.test.util.Timeframe
+import org.eclipse.tractusx.orchestrator.api.ApiCommons
 import org.eclipse.tractusx.orchestrator.api.FinishedTaskEventApi
 import org.eclipse.tractusx.orchestrator.api.GoldenRecordTaskApi
 import org.eclipse.tractusx.orchestrator.api.model.*
@@ -57,9 +58,9 @@ class MockAndAssertUtils @Autowired constructor(
     val assertHelpers: AssertHelpers
 ) {
 
-    val ORCHESTRATOR_CREATE_TASKS_URL = GoldenRecordTaskApi.TASKS_PATH
-    val ORCHESTRATOR_SEARCH_TASK_STATES_URL = "${GoldenRecordTaskApi.TASKS_PATH}/state/search"
-    val ORCHESTRATOR_SEARCH_TASK_RESULT_STATES_URL = "${GoldenRecordTaskApi.TASKS_PATH}/result-state/search"
+    val ORCHESTRATOR_CREATE_TASKS_URL = ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS
+    val ORCHESTRATOR_SEARCH_TASK_STATES_URL = "${ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS}/state/search"
+    val ORCHESTRATOR_SEARCH_TASK_RESULT_STATES_URL = "${ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS}/result-state/search"
     val POOL_API_SEARCH_CHANGE_LOG_URL = "${PoolChangelogApi.CHANGELOG_PATH}/search"
 
     val taskStep = TaskStep.entries.first()
@@ -181,7 +182,7 @@ class MockAndAssertUtils @Autowired constructor(
         )
 
         gateWireMockServer.stubFor(
-            WireMock.get(WireMock.urlPathEqualTo(FinishedTaskEventApi.FINISHED_TASK_EVENT_PATH)).willReturn(
+            WireMock.get(WireMock.urlPathEqualTo("${ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS}/finished-events")).willReturn(
                 WireMock.okJson(objectMapper.writeValueAsString(
                     FinishedTaskEventsResponse(2, 1, 0, 2, content =
                         listOf(
@@ -231,7 +232,7 @@ class MockAndAssertUtils @Autowired constructor(
         )
 
         gateWireMockServer.stubFor(
-            WireMock.get(WireMock.urlPathEqualTo(FinishedTaskEventApi.FINISHED_TASK_EVENT_PATH)).willReturn(
+            WireMock.get(WireMock.urlPathEqualTo("${ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS}/finished-events")).willReturn(
                 WireMock.okJson(objectMapper.writeValueAsString(
                     FinishedTaskEventsResponse(1, 1, 0, 1, content =
                     listOf(
