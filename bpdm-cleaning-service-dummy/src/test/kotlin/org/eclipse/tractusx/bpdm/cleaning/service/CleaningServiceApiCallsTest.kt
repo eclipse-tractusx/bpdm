@@ -32,7 +32,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.cleaning.config.CleaningServiceConfigProperties
 import org.eclipse.tractusx.bpdm.cleaning.config.OrchestratorConfigProperties
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.*
-import org.eclipse.tractusx.orchestrator.api.GoldenRecordTaskApi
+import org.eclipse.tractusx.orchestrator.api.ApiCommons
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -58,8 +58,8 @@ class CleaningServiceApiCallsTest @Autowired constructor(
 ) {
 
     companion object {
-        const val ORCHESTRATOR_RESERVE_TASKS_URL = "${GoldenRecordTaskApi.TASKS_PATH}/step-reservations"
-        const val ORCHESTRATOR_RESOLVE_TASKS_URL = "${GoldenRecordTaskApi.TASKS_PATH}/step-results"
+        const val ORCHESTRATOR_RESERVE_TASKS_URL = "${ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS}/step-reservations"
+        const val ORCHESTRATOR_RESOLVE_TASKS_URL = "${ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS}/step-results"
 
         const val RESERVATION_SCENARIO = "Reservation"
         const val RESERVED_STATE = "Reserved"

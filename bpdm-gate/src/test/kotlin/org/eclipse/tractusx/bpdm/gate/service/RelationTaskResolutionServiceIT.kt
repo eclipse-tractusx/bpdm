@@ -40,8 +40,7 @@ import org.eclipse.tractusx.bpdm.gate.util.PrincipalUtil
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
-import org.eclipse.tractusx.orchestrator.api.RelationsFinishedTaskEventApi.Companion.RELATIONS_FINISHED_TASK_EVENT_PATH
-import org.eclipse.tractusx.orchestrator.api.RelationsGoldenRecordTaskApi.Companion.RELATIONS_TASKS_PATH
+import org.eclipse.tractusx.orchestrator.api.ApiCommons
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -132,14 +131,14 @@ class RelationTaskResolutionServiceIT @Autowired constructor(
         ))
 
         orchestratorWireMockServer.stubFor(
-            WireMock.get(WireMock.urlPathEqualTo(RELATIONS_FINISHED_TASK_EVENT_PATH))
+            WireMock.get(WireMock.urlPathEqualTo("${ApiCommons.BASE_PATH_V7_RELATIONS}/finished-events"))
                 .willReturn(
                     WireMock.okJson(objectMapper.writeValueAsString(orchestratorMockEventResponse))
                 )
         )
 
         orchestratorWireMockServer.stubFor(
-            WireMock.post(WireMock.urlPathEqualTo("$RELATIONS_TASKS_PATH/state/search"))
+            WireMock.post(WireMock.urlPathEqualTo("${ApiCommons.BASE_PATH_V7_RELATIONS}/state/search"))
                 .willReturn(
                     WireMock.okJson(objectMapper.writeValueAsString(orchestratorMockResultResponse))
                 )

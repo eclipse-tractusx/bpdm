@@ -24,7 +24,6 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
-import org.eclipse.tractusx.orchestrator.api.GoldenRecordTaskApi.Companion.TASKS_PATH
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PostMapping
@@ -34,12 +33,8 @@ import org.springframework.web.bind.annotation.RequestMapping
 const val TagClient = "Task Client"
 const val TagWorker = "Task Worker"
 
-@RequestMapping(TASKS_PATH, produces = [MediaType.APPLICATION_JSON_VALUE])
+@RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
 interface GoldenRecordTaskApi {
-
-    companion object{
-        const val TASKS_PATH = "${ApiCommons.BASE_PATH}/golden-record-tasks"
-    }
 
     @Operation(
         summary = "Create new golden record tasks for given business partner data",
@@ -59,7 +54,7 @@ interface GoldenRecordTaskApi {
         ]
     )
     @Tag(name = TagClient)
-    @PostMapping
+    @PostMapping(value = [ApiCommons.BASE_PATH_V6, ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS])
     fun createTasks(@RequestBody createRequest: TaskCreateRequest): TaskCreateResponse
 
     @Operation(
@@ -76,7 +71,7 @@ interface GoldenRecordTaskApi {
         ]
     )
     @Tag(name = TagClient)
-    @PostMapping("/state/search")
+    @PostMapping(value = ["${ApiCommons.BASE_PATH_V6}/state/search", "${ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS}/state/search"])
     fun searchTaskStates(@RequestBody stateRequest: TaskStateRequest): TaskStateResponse
 
     @Operation(
@@ -93,7 +88,7 @@ interface GoldenRecordTaskApi {
         ]
     )
     @Tag(name = TagClient)
-    @PostMapping("/result-state/search")
+    @PostMapping(value = ["${ApiCommons.BASE_PATH_V6}/result-state/search", "${ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS}/result-state/search"])
     fun searchTaskResultStates(@RequestBody stateRequest: TaskResultStateSearchRequest): TaskResultStateSearchResponse
 
     @Operation(
@@ -113,7 +108,7 @@ interface GoldenRecordTaskApi {
         ]
     )
     @Tag(name = TagWorker)
-    @PostMapping("/step-reservations")
+    @PostMapping(value = ["${ApiCommons.BASE_PATH_V6}/step-reservations", "${ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS}/step-reservations"])
     fun reserveTasksForStep(@RequestBody reservationRequest: TaskStepReservationRequest): TaskStepReservationResponse
 
     @Operation(
@@ -138,6 +133,6 @@ interface GoldenRecordTaskApi {
         ]
     )
     @Tag(name = TagWorker)
-    @PostMapping("/step-results")
+    @PostMapping(value = ["${ApiCommons.BASE_PATH_V6}/step-results", "${ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS}/step-results"])
     fun resolveStepResults(@RequestBody resultRequest: TaskStepResultRequest)
 }

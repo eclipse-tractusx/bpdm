@@ -58,8 +58,7 @@ import org.eclipse.tractusx.bpdm.test.testdata.gate.withAddressType
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.BusinessPartnerTestDataFactory
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerVerboseValues
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
-import org.eclipse.tractusx.orchestrator.api.FinishedTaskEventApi
-import org.eclipse.tractusx.orchestrator.api.GoldenRecordTaskApi
+import org.eclipse.tractusx.orchestrator.api.ApiCommons
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -257,14 +256,14 @@ class GoldenRecordUpdateServiceIT @Autowired constructor(
         ))
 
         orchestratorWireMockServer.stubFor(
-            WireMock.get(WireMock.urlPathEqualTo(FinishedTaskEventApi.FINISHED_TASK_EVENT_PATH))
+            WireMock.get(WireMock.urlPathEqualTo("${ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS}/finished-events"))
                 .willReturn(
                     WireMock.okJson(objectMapper.writeValueAsString(orchestratorMockEventResponse))
                 )
         )
 
         orchestratorWireMockServer.stubFor(
-            WireMock.post(WireMock.urlPathEqualTo("${GoldenRecordTaskApi.TASKS_PATH}/state/search"))
+            WireMock.post(WireMock.urlPathEqualTo("${ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS}/state/search"))
                 .willReturn(
                     WireMock.okJson(objectMapper.writeValueAsString(orchestratorMockResultResponse))
                 )
