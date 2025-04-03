@@ -20,7 +20,10 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import jakarta.transaction.Transactional
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.api.model.RelationType
+import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
@@ -33,6 +36,7 @@ import org.springframework.stereotype.Service
 class TaskRelationsStepBuildService(
     private val relationRepository: RelationRepository,
     private val legalEntityRepository: LegalEntityRepository,
+    private val changelogService: PartnerChangelogService
 ) {
 
     @Transactional
@@ -77,6 +81,9 @@ class TaskRelationsStepBuildService(
             )
 
             relationRepository.save(newRelation)
+
+            changelogService.createChangelogEntry(ChangelogEntryCreateRequest(sourceLegalEntity.bpn, ChangelogType.UPDATE, BusinessPartnerType.LEGAL_ENTITY))
+            changelogService.createChangelogEntry(ChangelogEntryCreateRequest(targetLegalEntity.bpn, ChangelogType.UPDATE, BusinessPartnerType.LEGAL_ENTITY))
 
             TaskRelationsStepResultEntryDto(
                 taskId = taskEntry.taskId,
