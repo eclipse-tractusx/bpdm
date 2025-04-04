@@ -108,6 +108,9 @@ tests:
         pool:
           provider:
             issuer-uri: http://bpdm-centralidp/auth/realms/CX-Central
+        orchestrator:
+          provider:
+            issuer-uri: http://bpdm-centralidp/auth/realms/CX-Central
   image:
     registry: docker.io
     repository: tractusx/bpdm-system-tester

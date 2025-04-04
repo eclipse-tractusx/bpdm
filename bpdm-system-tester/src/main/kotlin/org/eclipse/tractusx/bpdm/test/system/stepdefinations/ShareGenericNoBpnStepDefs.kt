@@ -46,7 +46,7 @@ class ShareGenericNoBpnStepDefs(
     @Given("^output \"([^\"]*)\" with external-ID \"([^\"]*)\"$")
     fun `given output seed with externalId`(seed: String, externalId: String) {
         uploadInput(seed, externalId, null)
-        stepUtils.waitForResult(testRunData.toExternalId(externalId))
+        stepUtils.waitForBusinessPartnerResult(testRunData.toExternalId(externalId))
     }
 
     @When("^the sharing member uploads full valid input \"([^\"]*)\" with external-ID \"([^\"]*)\" with address type \"([^\"]*)\"$")
@@ -66,7 +66,7 @@ class ShareGenericNoBpnStepDefs(
             .withSharedByOwner(true)
             .copy(isOwnCompanyData = true)
 
-        stepUtils.waitForResult(expectedOutput.externalId)
+        stepUtils.waitForBusinessPartnerResult(expectedOutput.externalId)
 
         val actualOutput = gateClient.businessParters.getBusinessPartnersOutput(listOf(expectedOutput.externalId), PaginationRequest()).content.single()
 
@@ -80,7 +80,7 @@ class ShareGenericNoBpnStepDefs(
 
     @Then("^the sharing member receives sharing error \"([^\"]*)\" with external-ID \"([^\"]*)\" with error message \"([^\"]*)\"$")
     fun `then the sharing member receives sharing error with error message`(seed: String, externalId: String, errorMessage: String) {
-        stepUtils.waitForResult(testRunData.toExternalId(externalId))
+        stepUtils.waitForBusinessPartnerResult(testRunData.toExternalId(externalId))
         val sharingState = gateClient.sharingState.getSharingStates(PaginationRequest(), listOf(testRunData.toExternalId(externalId))).content.single()
         assertThat(sharingState.sharingErrorMessage).contains(errorMessage)
     }

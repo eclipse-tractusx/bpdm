@@ -26,6 +26,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.ConfidenceCriteriaDto
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressComponentOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
@@ -37,8 +38,8 @@ class StepUtils(
     private val gateClient: GateClient
 ) {
 
-    fun waitForResult(externalId: String): SharingStateType = runBlocking {
-        println("Waiting for result for $externalId ...")
+    fun waitForBusinessPartnerResult(externalId: String): SharingStateType = runBlocking {
+        println("Waiting for business partner result for $externalId ...")
         withTimeout(Duration.ofMinutes(3)) {
             while (true) {
                 val sharingState = gateClient.sharingState.getSharingStates(PaginationRequest(), listOf(externalId)).content.single()
@@ -49,6 +50,45 @@ class StepUtils(
             }
         } as SharingStateType
     }
+
+    fun waitForRelationResult(externalId: String): RelationSharingStateType = runBlocking {
+        println("Waiting for relation result for $externalId ...")
+        withTimeout(Duration.ofMinutes(3)) {
+            while (true) {
+                val sharingState = gateClient.relationSharingState.get(externalIds = listOf(externalId)).content.single()
+                if (sharingState.sharingStateType == RelationSharingStateType.Success || sharingState.sharingStateType == RelationSharingStateType.Error) {
+                    return@withTimeout sharingState.sharingStateType
+                }
+                delay(Duration.ofSeconds(10))
+            }
+        } as RelationSharingStateType
+    }
+
+    fun waitForRelationTask(externalId: String): String = runBlocking {
+        println("Waiting relation getting task assigned for $externalId ...")
+        withTimeout(Duration.ofMinutes(3)) {
+            while (true) {
+                val sharingState = gateClient.relationSharingState.get(externalIds = listOf(externalId)).content.single()
+                if(sharingState.taskId != null)
+                    return@withTimeout sharingState.taskId
+                delay(Duration.ofSeconds(10))
+            }
+        } as String
+    }
+
+    fun waitForOutputRelation(externalId: String): BusinessPartnerOutputDto = runBlocking {
+        println("Waiting business partner getting relation for $externalId ...")
+        withTimeout(Duration.ofMinutes(1)) {
+            while (true) {
+                val businessPartner = gateClient.businessParters.getBusinessPartnersOutput(externalIds = listOf(externalId)).content.single()
+                if(businessPartner.legalEntity.relations.isNotEmpty())
+                    return@withTimeout businessPartner
+                delay(Duration.ofSeconds(10))
+            }
+        } as BusinessPartnerOutputDto
+    }
+
+
 
     fun assertEqualIgnoreBpns(actualOutput: BusinessPartnerOutputDto, expectedOutput: BusinessPartnerOutputDto){
         assertThat(actualOutput)
