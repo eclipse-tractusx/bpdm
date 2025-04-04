@@ -32,7 +32,8 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM Gate: Add functionality to resolve golden record tasks for business partner relations ([1277](https://github.com/eclipse-tractusx/bpdm/issues/1277))
 - BPDM Gate: Add business partner relation output endpoints to Gate API ([1277](https://github.com/eclipse-tractusx/bpdm/issues/1277))
 - BPDM Gate: Add relation information to business partner outputs ([1278](https://github.com/eclipse-tractusx/bpdm/issues/1278))
-- BPDM Orchestrator: Increased api version to v7 with simultaneous support for version v6([#1294](https://github.com/eclipse-tractusx/bpdm/issues/1294)) 
+- BPDM Orchestrator: Increased api version to v7 with simultaneous support for version v6([#1294](https://github.com/eclipse-tractusx/bpdm/issues/1294))
+- BPDM Pool: Increased api version to v7 with simultaneous support for version v6([#1294](https://github.com/eclipse-tractusx/bpdm/issues/1294))
 
 ### Changed
 

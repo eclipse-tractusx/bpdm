@@ -43,9 +43,6 @@ import org.eclipse.tractusx.bpdm.gate.entity.generic.PostalAddressDb
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.eclipse.tractusx.bpdm.gate.util.PrincipalUtil
-import org.eclipse.tractusx.bpdm.pool.api.PoolAddressApi
-import org.eclipse.tractusx.bpdm.pool.api.PoolChangelogApi
-import org.eclipse.tractusx.bpdm.pool.api.PoolLegalEntityApi
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.api.model.RelationType
 import org.eclipse.tractusx.bpdm.pool.api.model.RelationVerboseDto
@@ -144,7 +141,7 @@ class GoldenRecordUpdateServiceIT @Autowired constructor(
         ))
 
         poolWireMockServer.stubFor(
-            WireMock.post(WireMock.urlPathEqualTo(PoolChangelogApi.CHANGELOG_PATH + PoolChangelogApi.SUBPATH_SEARCH))
+            WireMock.post(WireMock.urlPathEqualTo("${org.eclipse.tractusx.bpdm.pool.api.ApiCommons.CHANGELOG_BASE_PATH_V7}/search"))
                 .inScenario("Changelog")
                 .whenScenarioStateIs(Scenario.STARTED)
                 .willSetStateTo("Requested")
@@ -153,7 +150,7 @@ class GoldenRecordUpdateServiceIT @Autowired constructor(
                 )
         )
         poolWireMockServer.stubFor(
-            WireMock.post(WireMock.urlPathEqualTo(PoolChangelogApi.CHANGELOG_PATH + PoolChangelogApi.SUBPATH_SEARCH))
+            WireMock.post(WireMock.urlPathEqualTo("${org.eclipse.tractusx.bpdm.pool.api.ApiCommons.CHANGELOG_BASE_PATH_V7}/search"))
                 .inScenario("Changelog")
                 .whenScenarioStateIs("Requested")
                 .willReturn(
@@ -162,7 +159,7 @@ class GoldenRecordUpdateServiceIT @Autowired constructor(
         )
 
         poolWireMockServer.stubFor(
-            WireMock.get(WireMock.urlPathEqualTo(PoolLegalEntityApi.LEGAL_ENTITY_PATH))
+            WireMock.get(WireMock.urlPathEqualTo(org.eclipse.tractusx.bpdm.pool.api.ApiCommons.LEGAL_ENTITY_BASE_PATH_V7))
                 .willReturn(
                     WireMock.okJson(objectMapper.writeValueAsString(mockedLegalEntityResponse))
                 )
@@ -200,7 +197,7 @@ class GoldenRecordUpdateServiceIT @Autowired constructor(
         ))
 
         poolWireMockServer.stubFor(
-            WireMock.post(WireMock.urlPathEqualTo(PoolChangelogApi.CHANGELOG_PATH + PoolChangelogApi.SUBPATH_SEARCH))
+            WireMock.post(WireMock.urlPathEqualTo("${org.eclipse.tractusx.bpdm.pool.api.ApiCommons.CHANGELOG_BASE_PATH_V7}/search"))
                 .inScenario("Changelog")
                 .whenScenarioStateIs(Scenario.STARTED)
                 .willSetStateTo("Requested")
@@ -209,7 +206,7 @@ class GoldenRecordUpdateServiceIT @Autowired constructor(
                 )
         )
         poolWireMockServer.stubFor(
-            WireMock.post(WireMock.urlPathEqualTo(PoolChangelogApi.CHANGELOG_PATH + PoolChangelogApi.SUBPATH_SEARCH))
+            WireMock.post(WireMock.urlPathEqualTo("${org.eclipse.tractusx.bpdm.pool.api.ApiCommons.CHANGELOG_BASE_PATH_V7}/search"))
                 .inScenario("Changelog")
                 .whenScenarioStateIs("Requested")
                 .willReturn(
@@ -218,7 +215,7 @@ class GoldenRecordUpdateServiceIT @Autowired constructor(
         )
 
         poolWireMockServer.stubFor(
-            WireMock.get(WireMock.urlPathEqualTo(PoolLegalEntityApi.LEGAL_ENTITY_PATH))
+            WireMock.get(WireMock.urlPathEqualTo(org.eclipse.tractusx.bpdm.pool.api.ApiCommons.LEGAL_ENTITY_BASE_PATH_V7))
                 .willReturn(
                     WireMock.okJson(objectMapper.writeValueAsString(mockedLegalEntityResponse))
                 )
@@ -271,13 +268,13 @@ class GoldenRecordUpdateServiceIT @Autowired constructor(
 
         val mockEmptyResponse = PageDto<Any>(0, 0, 0, 0, emptyList<Any>())
         poolWireMockServer.stubFor(
-            WireMock.get(WireMock.urlPathEqualTo(PoolLegalEntityApi.LEGAL_ENTITY_PATH))
+            WireMock.get(WireMock.urlPathEqualTo(org.eclipse.tractusx.bpdm.pool.api.ApiCommons.LEGAL_ENTITY_BASE_PATH_V7))
                 .willReturn(
                     WireMock.okJson(objectMapper.writeValueAsString(mockEmptyResponse))
                 )
         )
         poolWireMockServer.stubFor(
-            WireMock.get(WireMock.urlPathEqualTo(PoolAddressApi.ADDRESS_PATH))
+            WireMock.get(WireMock.urlPathEqualTo(org.eclipse.tractusx.bpdm.pool.api.ApiCommons.ADDRESS_BASE_PATH_V7))
                 .willReturn(
                     WireMock.okJson(objectMapper.writeValueAsString(mockEmptyResponse))
                 )

@@ -34,7 +34,7 @@
     "description" : "Read, create and update business partner of type address"
   } ],
   "paths" : {
-    "/v6/sites" : {
+    "/v7/sites" : {
       "get" : {
         "tags" : [ "Site Controller" ],
         "summary" : "Get page of sites matching the pagination search criteria",
@@ -142,6 +142,144 @@
         "summary" : "Creates a new site",
         "description" : "Create new business partners of type site by specifying the BPNL of the legal entity each site belongs to. If the legal entitiy cannot be found, the record is ignored.For matching purposes, on each record you can specify your own index value which will reappear in the corresponding record of the response.",
         "operationId" : "createSite",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "array",
+                "items" : {
+                  "$ref" : "#/components/schemas/SitePartnerCreateRequest"
+                }
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "New sites request was processed successfully, possible errors are returned",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/SitePartnerCreateResponseWrapper"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "On malformed requests"
+          }
+        }
+      }
+    },
+    "/v6/sites" : {
+      "get" : {
+        "tags" : [ "Site Controller" ],
+        "summary" : "Get page of sites matching the pagination search criteria",
+        "description" : "This endpoint retrieves all existing business partners of type sites.",
+        "operationId" : "getSites_1",
+        "parameters" : [ {
+          "name" : "siteBpns",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "legalEntityBpns",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "name",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Number of page to get results from",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Size of each page",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "maximum" : 100,
+            "minimum" : 0
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Page of business partners matching the search criteria, may be empty",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageDtoSiteWithMainAddressVerboseDto"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "On malformed pagination request"
+          }
+        }
+      },
+      "put" : {
+        "tags" : [ "Site Controller" ],
+        "summary" : "Updates an existing site",
+        "description" : "Update existing business partner records of type site referenced via BPNS. The endpoint expects to receive the full updated record, including values that didn't change.",
+        "operationId" : "updateSite_1",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "array",
+                "items" : {
+                  "$ref" : "#/components/schemas/SitePartnerUpdateRequest"
+                }
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Update sites request was processed successfully, possible errors are returned",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/SitePartnerUpdateResponseWrapper"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "On malformed requests"
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "Site Controller" ],
+        "summary" : "Creates a new site",
+        "description" : "Create new business partners of type site by specifying the BPNL of the legal entity each site belongs to. If the legal entitiy cannot be found, the record is ignored.For matching purposes, on each record you can specify your own index value which will reappear in the corresponding record of the response.",
+        "operationId" : "createSite_1",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -300,7 +438,135 @@
         }
       }
     },
-    "/v6/cx-memberships" : {
+    "/v7/legal-entities" : {
+      "get" : {
+        "tags" : [ "Legal Entity Controller" ],
+        "summary" : "Returns legal entities by different search parameters",
+        "description" : "This endpoint tries to find matches among all existing business partners of type legal entity, filtering out partners which entirely do not match and ranking the remaining partners according to the accuracy of the match. ",
+        "operationId" : "getLegalEntities_1",
+        "parameters" : [ {
+          "name" : "bpnLs",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "legalName",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Number of page to get results from",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Size of each page",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "maximum" : 100,
+            "minimum" : 0
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Page of business partners matching the search criteria, may be empty",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageDtoLegalEntityWithLegalAddressVerboseDto"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "On malformed search or pagination request"
+          }
+        }
+      },
+      "put" : {
+        "tags" : [ "Legal Entity Controller" ],
+        "summary" : "Updates an existing legal entity",
+        "description" : "Update existing business partner records of type legal entity referenced via BPNL. The endpoint expects to receive the full updated record, including values that didn't change.",
+        "operationId" : "updateBusinessPartners_1",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "array",
+                "items" : {
+                  "$ref" : "#/components/schemas/LegalEntityPartnerUpdateRequest"
+                }
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Update legal entities request was processed successfully, possible errors are returned",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/LegalEntityPartnerUpdateResponseWrapper"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "On malformed requests"
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "Legal Entity Controller" ],
+        "summary" : "Creates a new legal entity",
+        "description" : "Create new business partners of type legal entity. The given additional identifiers of a record need to be unique, otherwise they are ignored. For matching purposes, on each record you can specify your own index value which will reappear in the corresponding record of the response.",
+        "operationId" : "createBusinessPartners_1",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "array",
+                "items" : {
+                  "$ref" : "#/components/schemas/LegalEntityPartnerCreateRequest"
+                }
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "New legal entities request was processed successfully, possible errors are returned",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/LegalEntityPartnerCreateResponseWrapper"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "On malformed requests"
+          }
+        }
+      }
+    },
+    "/v7/cx-memberships" : {
       "get" : {
         "tags" : [ "cx-membership-controller" ],
         "operationId" : "get",
@@ -350,6 +616,73 @@
       "put" : {
         "tags" : [ "cx-membership-controller" ],
         "operationId" : "put",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CxMembershipUpdateRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          }
+        }
+      }
+    },
+    "/v6/cx-memberships" : {
+      "get" : {
+        "tags" : [ "cx-membership-controller" ],
+        "operationId" : "get_1",
+        "parameters" : [ {
+          "name" : "bpnLs",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Number of page to get results from",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Size of each page",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "maximum" : 100,
+            "minimum" : 0
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageDtoCxMembershipDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put" : {
+        "tags" : [ "cx-membership-controller" ],
+        "operationId" : "put_1",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -515,12 +848,213 @@
         }
       }
     },
+    "/v7/addresses" : {
+      "get" : {
+        "tags" : [ "Address Controller" ],
+        "summary" : "Returns addresses by different search parameters",
+        "description" : "This endpoint tries to find matches among all existing business partners of type address, filtering out partners which entirely do not match and ranking the remaining partners according to the accuracy of the match. The match of a partner is better the higher its relevancy score. ",
+        "operationId" : "getAddresses_1",
+        "parameters" : [ {
+          "name" : "addressBpns",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "legalEntityBpns",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "siteBpns",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "name",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Number of page to get results from",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Size of each page",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "maximum" : 100,
+            "minimum" : 0
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Page of addresses matching the search criteria, may be empty",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageDtoLogisticAddressVerboseDto"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "On malformed search or pagination request"
+          }
+        }
+      },
+      "put" : {
+        "tags" : [ "Address Controller" ],
+        "summary" : "Updates an existing address",
+        "description" : "Update existing business partner records of type address referenced via BPNA. The endpoint expects to receive the full updated record, including values that didn't change.",
+        "operationId" : "updateAddresses_1",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "array",
+                "items" : {
+                  "$ref" : "#/components/schemas/AddressPartnerUpdateRequest"
+                }
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "The successfully updated records, possible errors are returned",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AddressPartnerUpdateResponseWrapper"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "On malformed requests"
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "Address Controller" ],
+        "summary" : "Creates a new address",
+        "description" : "Create new business partners of type address by specifying the BPN of the parent each address belongs to. A parent can be either a site or legal entity business partner. If the parent cannot be found, the record is ignored.For matching purposes, on each record you can specify your own index value which will reappear in the corresponding record of the response.",
+        "operationId" : "createAddresses_1",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "array",
+                "items" : {
+                  "$ref" : "#/components/schemas/AddressPartnerCreateRequest"
+                }
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "New business partner record successfully created, possible errors are returned",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AddressPartnerCreateResponseWrapper"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "On malformed requests"
+          }
+        }
+      }
+    },
     "/v6/sites/search" : {
       "post" : {
         "tags" : [ "Site Controller" ],
         "summary" : "Returns sites by an array of BPNS and/or an array of corresponding BPNL",
         "description" : "Search business partners of type site by their BPNSs or by the BPNLs of their parent legal entities",
         "operationId" : "postSiteSearch",
+        "parameters" : [ {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Number of page to get results from",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Size of each page",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "maximum" : 100,
+            "minimum" : 0
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SiteSearchRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Found sites that belong to specified legal entites",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageDtoSiteWithMainAddressVerboseDto"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "On malformed request parameters"
+          }
+        }
+      }
+    },
+    "/v7/sites/search" : {
+      "post" : {
+        "tags" : [ "Site Controller" ],
+        "summary" : "Returns sites by an array of BPNS and/or an array of corresponding BPNL",
+        "description" : "Search business partners of type site by their BPNSs or by the BPNLs of their parent legal entities",
+        "operationId" : "postSiteSearch_1",
         "parameters" : [ {
           "name" : "page",
           "in" : "query",
@@ -604,10 +1138,46 @@
         }
       }
     },
-    "/v6/members/sites/search" : {
+    "/v7/sites/legal-main-sites" : {
       "post" : {
         "tags" : [ "Site Controller" ],
-        "operationId" : "postSiteSearch_1",
+        "summary" : "Create a new site with legal entity reference",
+        "description" : "Create a business partner site with the given legal entity reference. It will designate the address information as both legal and site main address.",
+        "operationId" : "createSiteWithLegalReference_1",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "array",
+                "items" : {
+                  "$ref" : "#/components/schemas/SiteCreateRequestWithLegalAddressAsMain"
+                }
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "New sites request was processed successfully, possible errors are returned",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/SitePartnerCreateResponseWrapper"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "On malformed pagination request"
+          }
+        }
+      }
+    },
+    "/v7/members/sites/search" : {
+      "post" : {
+        "tags" : [ "Site Controller" ],
+        "operationId" : "postSiteSearch_2",
         "parameters" : [ {
           "name" : "page",
           "in" : "query",
@@ -652,7 +1222,55 @@
         }
       }
     },
-    "/v6/members/legal-entities/search" : {
+    "/v6/members/sites/search" : {
+      "post" : {
+        "tags" : [ "Site Controller" ],
+        "operationId" : "postSiteSearch_3",
+        "parameters" : [ {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Number of page to get results from",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Size of each page",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "maximum" : 100,
+            "minimum" : 0
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SiteSearchRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageDtoSiteWithMainAddressVerboseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v7/members/legal-entities/search" : {
       "post" : {
         "tags" : [ "Legal Entity Controller" ],
         "operationId" : "searchLegalEntities",
@@ -700,10 +1318,106 @@
         }
       }
     },
-    "/v6/members/changelog/search" : {
+    "/v6/members/legal-entities/search" : {
+      "post" : {
+        "tags" : [ "Legal Entity Controller" ],
+        "operationId" : "searchLegalEntities_1",
+        "parameters" : [ {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Number of page to get results from",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Size of each page",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "maximum" : 100,
+            "minimum" : 0
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/LegalEntitySearchRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageDtoLegalEntityWithLegalAddressVerboseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v7/members/changelog/search" : {
       "post" : {
         "tags" : [ "Changelog Controller" ],
         "operationId" : "searchChangelogEntries",
+        "parameters" : [ {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Number of page to get results from",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Size of each page",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "maximum" : 100,
+            "minimum" : 0
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ChangelogSearchRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageDtoChangelogEntryVerboseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v6/members/changelog/search" : {
+      "post" : {
+        "tags" : [ "Changelog Controller" ],
+        "operationId" : "searchChangelogEntries_1",
         "parameters" : [ {
           "name" : "page",
           "in" : "query",
@@ -752,6 +1466,54 @@
       "post" : {
         "tags" : [ "Address Controller" ],
         "operationId" : "searchAddresses",
+        "parameters" : [ {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Number of page to get results from",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Size of each page",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "maximum" : 100,
+            "minimum" : 0
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/AddressSearchRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageDtoLogisticAddressVerboseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v7/members/addresses/search" : {
+      "post" : {
+        "tags" : [ "Address Controller" ],
+        "operationId" : "searchAddresses_1",
         "parameters" : [ {
           "name" : "page",
           "in" : "query",
@@ -873,6 +1635,83 @@
         }
       }
     },
+    "/v7/legal-forms" : {
+      "get" : {
+        "tags" : [ "Metadata Controller" ],
+        "summary" : "Returns all legal forms",
+        "description" : "Lists all currently known legal forms in a paginated result",
+        "operationId" : "getLegalForms_1",
+        "parameters" : [ {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Number of page to get results from",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Size of each page",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "maximum" : 100,
+            "minimum" : 0
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Page of existing legal forms, may be empty",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageDtoLegalFormDto"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "On malformed request parameters"
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "Metadata Controller" ],
+        "summary" : "Creates a new legal form",
+        "description" : "Create a new legal form which can be referenced by business partner records. The actual name of the legal form is free to choose and doesn't need to be unique. The technical key can be freely chosen but needs to be unique for the businessPartnerType as it is used as reference by the business partner records. A recommendation for technical keys: They should be short, descriptive and use a restricted common character set in order to ensure compatibility with older systems.",
+        "operationId" : "createLegalForm_1",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/LegalFormRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "New legal form successfully created",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/LegalFormDto"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "On malformed request parameters"
+          },
+          "409" : {
+            "description" : "Legal form with specified technical key already exists"
+          }
+        }
+      }
+    },
     "/v6/legal-entities/search" : {
       "post" : {
         "tags" : [ "Legal Entity Controller" ],
@@ -926,7 +1765,60 @@
         }
       }
     },
-    "/v6/identifier-types" : {
+    "/v7/legal-entities/search" : {
+      "post" : {
+        "tags" : [ "Legal Entity Controller" ],
+        "summary" : "Returns legal entities by different search parameters",
+        "description" : "Search legal entity partners by their BPNLs. The response can contain less results than the number of BPNLs that were requested, if some of the BPNLs did not exist. For a single request, the maximum number of BPNLs to search for is limited to ${bpdm.bpn.search-request-limit} entries.",
+        "operationId" : "postLegalEntitySearch_1",
+        "parameters" : [ {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Number of page to get results from",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Size of each page",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "maximum" : 100,
+            "minimum" : 0
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/LegalEntitySearchRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Found legal entites",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageDtoLegalEntityWithLegalAddressVerboseDto"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "On malformed request parameters or if number of requested bpns exceeds limit"
+          }
+        }
+      }
+    },
+    "/v7/identifier-types" : {
       "get" : {
         "tags" : [ "Metadata Controller" ],
         "summary" : "Returns all identifier types filtered by business partner type and country.",
@@ -1020,7 +1912,101 @@
         }
       }
     },
-    "/v6/business-partners/changelog/search" : {
+    "/v6/identifier-types" : {
+      "get" : {
+        "tags" : [ "Metadata Controller" ],
+        "summary" : "Returns all identifier types filtered by business partner type and country.",
+        "description" : "Lists all matching identifier types including validity details in a paginated result",
+        "operationId" : "getIdentifierTypes_1",
+        "parameters" : [ {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Number of page to get results from",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Size of each page",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "maximum" : 100,
+            "minimum" : 0
+          }
+        }, {
+          "name" : "businessPartnerType",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "Specifies if an identifier type is valid for legal entities (L) or addresses (A). Sites (S) are not supported.",
+            "enum" : [ "LEGAL_ENTITY", "ADDRESS" ]
+          }
+        }, {
+          "name" : "country",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "UNDEFINED", "AC", "AD", "AE", "AF", "AG", "AI", "AL", "AM", "AN", "AO", "AQ", "AR", "AS", "AT", "AU", "AW", "AX", "AZ", "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO", "BQ", "BR", "BS", "BT", "BU", "BV", "BW", "BY", "BZ", "CA", "CC", "CD", "CF", "CG", "CH", "CI", "CK", "CL", "CM", "CN", "CO", "CP", "CR", "CS", "CU", "CV", "CW", "CX", "CY", "CZ", "DE", "DG", "DJ", "DK", "DM", "DO", "DZ", "EA", "EC", "EE", "EG", "EH", "ER", "ES", "ET", "EU", "EZ", "FI", "FJ", "FK", "FM", "FO", "FR", "FX", "GA", "GB", "GD", "GE", "GF", "GG", "GH", "GI", "GL", "GM", "GN", "GP", "GQ", "GR", "GS", "GT", "GU", "GW", "GY", "HK", "HM", "HN", "HR", "HT", "HU", "IC", "ID", "IE", "IL", "IM", "IN", "IO", "IQ", "IR", "IS", "IT", "JE", "JM", "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN", "KP", "KR", "KW", "KY", "KZ", "LA", "LB", "LC", "LI", "LK", "LR", "LS", "LT", "LU", "LV", "LY", "MA", "MC", "MD", "ME", "MF", "MG", "MH", "MK", "ML", "MM", "MN", "MO", "MP", "MQ", "MR", "MS", "MT", "MU", "MV", "MW", "MX", "MY", "MZ", "NA", "NC", "NE", "NF", "NG", "NI", "NL", "NO", "NP", "NR", "NT", "NU", "NZ", "OM", "PA", "PE", "PF", "PG", "PH", "PK", "PL", "PM", "PN", "PR", "PS", "PT", "PW", "PY", "QA", "RE", "RO", "RS", "RU", "RW", "SA", "SB", "SC", "SD", "SE", "SF", "SG", "SH", "SI", "SJ", "SK", "SL", "SM", "SN", "SO", "SR", "SS", "ST", "SU", "SV", "SX", "SY", "SZ", "TA", "TC", "TD", "TF", "TG", "TH", "TJ", "TK", "TL", "TM", "TN", "TO", "TP", "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "UK", "UM", "US", "UY", "UZ", "VA", "VC", "VE", "VG", "VI", "VN", "VU", "WF", "WS", "XI", "XU", "XK", "YE", "YT", "YU", "ZA", "ZM", "ZR", "ZW" ]
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Page of existing identifier types, may be empty",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageDtoIdentifierTypeDto"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "On malformed request parameters"
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "Metadata Controller" ],
+        "summary" : "Creates a new identifier type",
+        "description" : "Create a new identifier type (including validity details) which can be referenced by business partner records. Identifier types such as BPN or VAT determine with which kind of values a business partner can be identified with. The actual name of the identifier type is free to choose and doesn't need to be unique. The technical key can be freely chosen but needs to be unique for the businessPartnerType as it is used as reference by the business partner records. A recommendation for technical keys: They should be short, descriptive and use a restricted common character set in order to ensure compatibility with older systems.",
+        "operationId" : "createIdentifierType_1",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/IdentifierTypeDto"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "New identifier type successfully created",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/IdentifierTypeDto"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "On malformed request parameters"
+          },
+          "409" : {
+            "description" : "Identifier type with specified technical key already exists"
+          }
+        }
+      }
+    },
+    "/v7/business-partners/changelog/search" : {
       "post" : {
         "tags" : [ "Changelog Controller" ],
         "summary" : "Returns changelog entries as of a specified timestamp, optionally filtered by a list of BPNL/S/A, or business partner types",
@@ -1075,12 +2061,107 @@
         }
       }
     },
-    "/v6/bpn/search" : {
+    "/v6/business-partners/changelog/search" : {
+      "post" : {
+        "tags" : [ "Changelog Controller" ],
+        "summary" : "Returns changelog entries as of a specified timestamp, optionally filtered by a list of BPNL/S/A, or business partner types",
+        "operationId" : "getChangelogEntries_1",
+        "parameters" : [ {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Number of page to get results from",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Size of each page",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "maximum" : 100,
+            "minimum" : 0
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ChangelogSearchRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "The specified changelog entries",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageDtoChangelogEntryVerboseDto"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "On malformed pagination request"
+          },
+          "404" : {
+            "description" : "No business partner found for specified bpn"
+          }
+        }
+      }
+    },
+    "/v7/bpn/search" : {
       "post" : {
         "tags" : [ "Bpn Controller" ],
         "summary" : "Returns a list of identifier mappings of an identifier to a BPNL/A/S, specified by a business partner type, identifier type and identifier values",
         "description" : "Find business partner numbers by identifiers. The response can contain less results than the number of identifier values that were requested, if some of the identifiers did not exist. For a single request, the maximum number of identifier values to search for is limited to ${bpdm.bpn.search-request-limit} entries.",
         "operationId" : "findBpnsByIdentifiers",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/IdentifiersSearchRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Found bpn to identifier value mappings",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/BpnIdentifierMappingDto"
+                  },
+                  "uniqueItems" : true
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "On malformed request parameters or if number of requested bpns exceeds limit"
+          },
+          "404" : {
+            "description" : "Specified identifier type not found"
+          }
+        }
+      }
+    },
+    "/v6/bpn/search" : {
+      "post" : {
+        "tags" : [ "Bpn Controller" ],
+        "summary" : "Returns a list of identifier mappings of an identifier to a BPNL/A/S, specified by a business partner type, identifier type and identifier values",
+        "description" : "Find business partner numbers by identifiers. The response can contain less results than the number of identifier values that were requested, if some of the identifiers did not exist. For a single request, the maximum number of identifier values to search for is limited to ${bpdm.bpn.search-request-limit} entries.",
+        "operationId" : "findBpnsByIdentifiers_1",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -1149,12 +2230,46 @@
         }
       }
     },
+    "/v7/bpn/request-ids/search" : {
+      "post" : {
+        "tags" : [ "Bpn Controller" ],
+        "summary" : "Return BPNL/S/A based on the requested identifiers",
+        "description" : "Find business partner numbers by requested-identifiers.",
+        "operationId" : "findBpnByRequestedIdentifiers_1",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/BpnRequestIdentifierSearchRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Found bpn to based on the requested identifiers",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/BpnRequestIdentifierMappingDto"
+                  },
+                  "uniqueItems" : true
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v6/addresses/search" : {
       "post" : {
         "tags" : [ "Address Controller" ],
         "summary" : "Returns addresses by an array of BPNA and/or an array of corresponding BPNS and/or an array of corresponding BPNL.",
         "description" : "Search business partners of type address by their BPNA or their parents' BPNL or BPNS.",
-        "operationId" : "searchAddresses_1",
+        "operationId" : "searchAddresses_2",
         "parameters" : [ {
           "name" : "page",
           "in" : "query",
@@ -1202,12 +2317,100 @@
         }
       }
     },
-    "/v6/sites/{bpns}" : {
+    "/v7/addresses/search" : {
+      "post" : {
+        "tags" : [ "Address Controller" ],
+        "summary" : "Returns addresses by an array of BPNA and/or an array of corresponding BPNS and/or an array of corresponding BPNL.",
+        "description" : "Search business partners of type address by their BPNA or their parents' BPNL or BPNS.",
+        "operationId" : "searchAddresses_3",
+        "parameters" : [ {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Number of page to get results from",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Size of each page",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "maximum" : 100,
+            "minimum" : 0
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/AddressSearchRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Found sites for the specified sites and legal entities",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageDtoLogisticAddressVerboseDto"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "On malformed pagination request"
+          }
+        }
+      }
+    },
+    "/v7/sites/{bpns}" : {
       "get" : {
         "tags" : [ "Site Controller" ],
         "summary" : "Returns a site by its BPNS",
         "description" : "Get business partners of type site by BPNS ignoring case.",
         "operationId" : "getSite",
+        "parameters" : [ {
+          "name" : "bpns",
+          "in" : "path",
+          "description" : "BPNS value",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Found site with specified BPNS",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/SiteWithMainAddressVerboseDto"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "On malformed request parameters"
+          },
+          "404" : {
+            "description" : "No site found under specified BPNS"
+          }
+        }
+      }
+    },
+    "/v6/sites/{bpns}" : {
+      "get" : {
+        "tags" : [ "Site Controller" ],
+        "summary" : "Returns a site by its BPNS",
+        "description" : "Get business partners of type site by BPNS ignoring case.",
+        "operationId" : "getSite_1",
         "parameters" : [ {
           "name" : "bpns",
           "in" : "path",
@@ -1280,12 +2483,109 @@
         }
       }
     },
+    "/v7/legal-entities/{idValue}" : {
+      "get" : {
+        "tags" : [ "Legal Entity Controller" ],
+        "summary" : "Returns a legal entity by identifier, like BPN, DUNS or EU VAT ID, specified by the identifier type",
+        "description" : "This endpoint tries to find a business partner by the specified identifier. The identifier value is case insensitively compared but needs to be given exactly. By default the value given is interpreted as a BPN. By specifying the technical key of another identifier typethe value is matched against the identifiers of that given type.",
+        "operationId" : "getLegalEntity_1",
+        "parameters" : [ {
+          "name" : "idValue",
+          "in" : "path",
+          "description" : "Identifier value",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "idType",
+          "in" : "query",
+          "description" : "Type of identifier to use, defaults to BPN when omitted",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Found business partner with specified identifier",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/LegalEntityWithLegalAddressVerboseDto"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "On malformed request parameters"
+          },
+          "404" : {
+            "description" : "No business partner found under specified identifier or specified identifier type not found"
+          }
+        }
+      }
+    },
     "/v6/legal-entities/{bpnl}/sites" : {
       "get" : {
         "tags" : [ "Legal Entity Controller" ],
         "summary" : "Returns all sites of a legal entity with a specific BPNL",
         "description" : "Get business partners of type site belonging to a business partner of type legal entity, identified by the business partner's bpnl ignoring case.",
-        "operationId" : "getSites_1",
+        "operationId" : "getSites_2",
+        "parameters" : [ {
+          "name" : "bpnl",
+          "in" : "path",
+          "description" : "BPNL value",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Number of page to get results from",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Size of each page",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "maximum" : 100,
+            "minimum" : 0
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "The sites for the specified bpnl",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageDtoSiteVerboseDto"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "On malformed pagination request"
+          },
+          "404" : {
+            "description" : "No business partner found for specified bpnl"
+          }
+        }
+      }
+    },
+    "/v7/legal-entities/{bpnl}/sites" : {
+      "get" : {
+        "tags" : [ "Legal Entity Controller" ],
+        "summary" : "Returns all sites of a legal entity with a specific BPNL",
+        "description" : "Get business partners of type site belonging to a business partner of type legal entity, identified by the business partner's bpnl ignoring case.",
+        "operationId" : "getSites_3",
         "parameters" : [ {
           "name" : "bpnl",
           "in" : "path",
@@ -1339,7 +2639,61 @@
         "tags" : [ "Legal Entity Controller" ],
         "summary" : "Returns all addresses of a legal entity with a specific BPNL",
         "description" : "Get business partners of type address belonging to a business partner of type legal entity, identified by the business partner's BPNL ignoring case.",
-        "operationId" : "getAddresses_1",
+        "operationId" : "getAddresses_2",
+        "parameters" : [ {
+          "name" : "bpnl",
+          "in" : "path",
+          "description" : "BPNL value",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Number of page to get results from",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Size of each page",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "maximum" : 100,
+            "minimum" : 0
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "The addresses for the specified BPNL",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageDtoLogisticAddressVerboseDto"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "On malformed pagination request"
+          },
+          "404" : {
+            "description" : "No business partner found for specified BPNL"
+          }
+        }
+      }
+    },
+    "/v7/legal-entities/{bpnl}/addresses" : {
+      "get" : {
+        "tags" : [ "Legal Entity Controller" ],
+        "summary" : "Returns all addresses of a legal entity with a specific BPNL",
+        "description" : "Get business partners of type address belonging to a business partner of type legal entity, identified by the business partner's BPNL ignoring case.",
+        "operationId" : "getAddresses_3",
         "parameters" : [ {
           "name" : "bpnl",
           "in" : "path",
@@ -1424,6 +2778,42 @@
         }
       }
     },
+    "/v7/field-quality-rules/" : {
+      "get" : {
+        "tags" : [ "Metadata Controller" ],
+        "summary" : "Get all field quality rules filtered by country (specified by its ISO 3166-1 alpha-2 country code)",
+        "description" : "List the country specific data rules for entity fields.All fields that are not in this list are considered to be forbidden.",
+        "operationId" : "getFieldQualityRules_1",
+        "parameters" : [ {
+          "name" : "country",
+          "in" : "query",
+          "description" : "ISO 3166-1 alpha-2 country code",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "UNDEFINED", "AC", "AD", "AE", "AF", "AG", "AI", "AL", "AM", "AN", "AO", "AQ", "AR", "AS", "AT", "AU", "AW", "AX", "AZ", "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO", "BQ", "BR", "BS", "BT", "BU", "BV", "BW", "BY", "BZ", "CA", "CC", "CD", "CF", "CG", "CH", "CI", "CK", "CL", "CM", "CN", "CO", "CP", "CR", "CS", "CU", "CV", "CW", "CX", "CY", "CZ", "DE", "DG", "DJ", "DK", "DM", "DO", "DZ", "EA", "EC", "EE", "EG", "EH", "ER", "ES", "ET", "EU", "EZ", "FI", "FJ", "FK", "FM", "FO", "FR", "FX", "GA", "GB", "GD", "GE", "GF", "GG", "GH", "GI", "GL", "GM", "GN", "GP", "GQ", "GR", "GS", "GT", "GU", "GW", "GY", "HK", "HM", "HN", "HR", "HT", "HU", "IC", "ID", "IE", "IL", "IM", "IN", "IO", "IQ", "IR", "IS", "IT", "JE", "JM", "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN", "KP", "KR", "KW", "KY", "KZ", "LA", "LB", "LC", "LI", "LK", "LR", "LS", "LT", "LU", "LV", "LY", "MA", "MC", "MD", "ME", "MF", "MG", "MH", "MK", "ML", "MM", "MN", "MO", "MP", "MQ", "MR", "MS", "MT", "MU", "MV", "MW", "MX", "MY", "MZ", "NA", "NC", "NE", "NF", "NG", "NI", "NL", "NO", "NP", "NR", "NT", "NU", "NZ", "OM", "PA", "PE", "PF", "PG", "PH", "PK", "PL", "PM", "PN", "PR", "PS", "PT", "PW", "PY", "QA", "RE", "RO", "RS", "RU", "RW", "SA", "SB", "SC", "SD", "SE", "SF", "SG", "SH", "SI", "SJ", "SK", "SL", "SM", "SN", "SO", "SR", "SS", "ST", "SU", "SV", "SX", "SY", "SZ", "TA", "TC", "TD", "TF", "TG", "TH", "TJ", "TK", "TL", "TM", "TN", "TO", "TP", "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "UK", "UM", "US", "UY", "UZ", "VA", "VC", "VE", "VG", "VI", "VN", "VU", "WF", "WS", "XI", "XU", "XK", "YE", "YT", "YU", "ZA", "ZM", "ZR", "ZW" ]
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "List of the existing rules for the given country",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/FieldQualityRuleDto"
+                  }
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "On malformed request parameters"
+          }
+        }
+      }
+    },
     "/v6/administrative-areas-level1" : {
       "get" : {
         "tags" : [ "Metadata Controller" ],
@@ -1467,12 +2857,90 @@
         }
       }
     },
+    "/v7/administrative-areas-level1" : {
+      "get" : {
+        "tags" : [ "Metadata Controller" ],
+        "summary" : "Get page of country subdivisions suitable for the administrativeAreaLevel1 address property",
+        "description" : "Lists all currently known country subdivisions according to ISO 3166-2 in a paginated result",
+        "operationId" : "getAdminAreasLevel1_1",
+        "parameters" : [ {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Number of page to get results from",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Size of each page",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "maximum" : 100,
+            "minimum" : 0
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Page of existing country subdivisions, may be empty",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageDtoCountrySubdivisionDto"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "On malformed request parameters"
+          }
+        }
+      }
+    },
     "/v6/addresses/{bpna}" : {
       "get" : {
         "tags" : [ "Address Controller" ],
         "summary" : "Returns an address by its BPNA",
         "description" : "Get business partners of type address by BPNA ignoring case.",
         "operationId" : "getAddress",
+        "parameters" : [ {
+          "name" : "bpna",
+          "in" : "path",
+          "description" : "BPNA value",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Found address with specified BPNA",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/LogisticAddressVerboseDto"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "On malformed request parameters"
+          },
+          "404" : {
+            "description" : "No address found under specified BPNA"
+          }
+        }
+      }
+    },
+    "/v7/addresses/{bpna}" : {
+      "get" : {
+        "tags" : [ "Address Controller" ],
+        "summary" : "Returns an address by its BPNA",
+        "description" : "Get business partners of type address by BPNA ignoring case.",
+        "operationId" : "getAddress_1",
         "parameters" : [ {
           "name" : "bpna",
           "in" : "path",

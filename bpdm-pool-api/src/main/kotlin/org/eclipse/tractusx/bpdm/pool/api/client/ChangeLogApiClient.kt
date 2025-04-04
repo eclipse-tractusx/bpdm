@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.api.client
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.ApiCommons
 import org.eclipse.tractusx.bpdm.pool.api.PoolChangelogApi
 import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryVerboseDto
@@ -29,10 +30,10 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
 
-@HttpExchange(PoolChangelogApi.CHANGELOG_PATH)
+@HttpExchange
 interface ChangeLogApiClient : PoolChangelogApi {
 
-    @PostExchange(PoolChangelogApi.SUBPATH_SEARCH)
+    @PostExchange(value = "${ApiCommons.CHANGELOG_BASE_PATH_V7}/search")
     override fun getChangelogEntries(
         @RequestBody changelogSearchRequest: ChangelogSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest

@@ -28,7 +28,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.PoolSiteApi.Companion.SITE_PATH
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteCreateRequestWithLegalAddressAsMain
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerUpdateRequest
@@ -40,12 +39,8 @@ import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
 
-@RequestMapping(SITE_PATH, produces = [MediaType.APPLICATION_JSON_VALUE])
+@RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
 interface PoolSiteApi {
-
-    companion object{
-        const val SITE_PATH = "${ApiCommons.BASE_PATH}/sites"
-    }
 
     @Operation(
         summary = "Returns a site by its BPNS",
@@ -59,7 +54,7 @@ interface PoolSiteApi {
         ]
     )
     @Tag(name = ApiCommons.SITE_NAME, description = ApiCommons.SITE_DESCRIPTION)
-    @GetMapping("/{bpns}")
+    @GetMapping(value = ["${ApiCommons.SITE_BASE_PATH_V6}/{bpns}", "${ApiCommons.SITE_BASE_PATH_V7}/{bpns}"])
     fun getSite(
         @Parameter(description = "BPNS value") @PathVariable bpns: String
     ): SiteWithMainAddressVerboseDto
@@ -75,7 +70,7 @@ interface PoolSiteApi {
         ]
     )
     @Tag(name = ApiCommons.SITE_NAME, description = ApiCommons.SITE_DESCRIPTION)
-    @PostMapping("/search")
+    @PostMapping(value = ["${ApiCommons.SITE_BASE_PATH_V6}/search", "${ApiCommons.SITE_BASE_PATH_V7}/search"])
     fun postSiteSearch(
         @RequestBody searchRequest: SiteSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
@@ -94,7 +89,7 @@ interface PoolSiteApi {
         ]
     )
     @Tag(name = ApiCommons.SITE_NAME, description = ApiCommons.SITE_DESCRIPTION)
-    @PostMapping
+    @PostMapping(value = [ApiCommons.SITE_BASE_PATH_V6, ApiCommons.SITE_BASE_PATH_V7])
     fun createSite(
         @RequestBody
         requests: Collection<SitePartnerCreateRequest>
@@ -112,7 +107,7 @@ interface PoolSiteApi {
         ]
     )
     @Tag(name = ApiCommons.SITE_NAME, description = ApiCommons.SITE_DESCRIPTION)
-    @PutMapping
+    @PutMapping(value = [ApiCommons.SITE_BASE_PATH_V6, ApiCommons.SITE_BASE_PATH_V7])
     fun updateSite(
         @RequestBody
         requests: Collection<SitePartnerUpdateRequest>
@@ -129,7 +124,7 @@ interface PoolSiteApi {
         ]
     )
     @Tag(name = ApiCommons.SITE_NAME, description = ApiCommons.SITE_DESCRIPTION)
-    @GetMapping
+    @GetMapping(value = [ApiCommons.SITE_BASE_PATH_V6, ApiCommons.SITE_BASE_PATH_V7])
     fun getSites(
         @ParameterObject searchRequest: SiteSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
@@ -147,7 +142,7 @@ interface PoolSiteApi {
         ]
     )
     @Tag(name = ApiCommons.SITE_NAME, description = ApiCommons.SITE_DESCRIPTION)
-    @PostMapping("/legal-main-sites")
+    @PostMapping(value = ["${ApiCommons.SITE_BASE_PATH_V6}/legal-main-sites", "${ApiCommons.SITE_BASE_PATH_V7}/legal-main-sites"])
     fun createSiteWithLegalReference(
         @RequestBody request: Collection<SiteCreateRequestWithLegalAddressAsMain>
     ): SitePartnerCreateResponseWrapper

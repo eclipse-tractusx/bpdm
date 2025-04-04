@@ -27,7 +27,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.PoolChangelogApi.Companion.CHANGELOG_PATH
 import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryVerboseDto
 import org.springdoc.core.annotations.ParameterObject
@@ -36,12 +35,8 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 
-@RequestMapping(CHANGELOG_PATH, produces = [MediaType.APPLICATION_JSON_VALUE])
+@RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
 interface PoolChangelogApi {
-    companion object {
-        const val CHANGELOG_PATH = "${ApiCommons.BASE_PATH}/business-partners/changelog"
-        const val SUBPATH_SEARCH = "/search"
-    }
 
     @Operation(
         summary = "Returns changelog entries as of a specified timestamp, optionally filtered by a list of BPNL/S/A, or business partner types"
@@ -54,7 +49,7 @@ interface PoolChangelogApi {
         ]
     )
     @Tag(name = ApiCommons.CHANGELOG_NAME, description = ApiCommons.CHANGELOG_DESCRIPTION)
-    @PostMapping(SUBPATH_SEARCH)
+    @PostMapping(value = ["${ApiCommons.CHANGELOG_BASE_PATH_V6}/search", "${ApiCommons.CHANGELOG_BASE_PATH_V7}/search"])
     fun getChangelogEntries(
         @RequestBody changelogSearchRequest: ChangelogSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest

@@ -28,7 +28,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.PoolMetadataApi.DescriptionObject.METADATA_PATH
 import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
 import org.springdoc.core.annotations.ParameterObject
@@ -37,12 +36,10 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 
-@RequestMapping(METADATA_PATH, produces = [MediaType.APPLICATION_JSON_VALUE])
+@RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
 interface PoolMetadataApi {
 
     companion object DescriptionObject {
-        const val METADATA_PATH = ApiCommons.BASE_PATH
-
         const val technicalKeyDisclaimer =
             "The technical key can be freely chosen but needs to be unique for the businessPartnerType as it is used as reference by the business partner records. " +
                     "A recommendation for technical keys: They should be short, descriptive and " +
@@ -63,7 +60,7 @@ interface PoolMetadataApi {
         ]
     )
     @Tag(name = ApiCommons.METADATA_NAME, description = ApiCommons.METADATA_DESCRIPTION)
-    @PostMapping("/identifier-types")
+    @PostMapping(value = ["${ApiCommons.BASE_PATH_V6}/identifier-types", "${ApiCommons.BASE_PATH_V7}/identifier-types"])
     fun createIdentifierType(@RequestBody identifierType: IdentifierTypeDto): IdentifierTypeDto
 
     @Operation(
@@ -77,7 +74,7 @@ interface PoolMetadataApi {
         ]
     )
     @Tag(name = ApiCommons.METADATA_NAME, description = ApiCommons.METADATA_DESCRIPTION)
-    @GetMapping("/identifier-types")
+    @GetMapping(value = ["${ApiCommons.BASE_PATH_V6}/identifier-types", "${ApiCommons.BASE_PATH_V7}/identifier-types"])
     fun getIdentifierTypes(
         @ParameterObject paginationRequest: PaginationRequest,
         @Parameter businessPartnerType: IdentifierBusinessPartnerType,
@@ -99,7 +96,7 @@ interface PoolMetadataApi {
         ]
     )
     @Tag(name = ApiCommons.METADATA_NAME, description = ApiCommons.METADATA_DESCRIPTION)
-    @PostMapping("/legal-forms")
+    @PostMapping(value = ["${ApiCommons.BASE_PATH_V6}/legal-forms", "${ApiCommons.BASE_PATH_V7}/legal-forms"])
     fun createLegalForm(@RequestBody type: LegalFormRequest): LegalFormDto
 
     @Operation(
@@ -113,7 +110,7 @@ interface PoolMetadataApi {
         ]
     )
     @Tag(name = ApiCommons.METADATA_NAME, description = ApiCommons.METADATA_DESCRIPTION)
-    @GetMapping("/legal-forms")
+    @GetMapping(value = ["${ApiCommons.BASE_PATH_V6}/legal-forms", "${ApiCommons.BASE_PATH_V7}/legal-forms"])
     fun getLegalForms(@ParameterObject paginationRequest: PaginationRequest): PageDto<LegalFormDto>
 
 
@@ -129,7 +126,7 @@ interface PoolMetadataApi {
         ]
     )
     @Tag(name = ApiCommons.METADATA_NAME, description = ApiCommons.METADATA_DESCRIPTION)
-    @GetMapping("/field-quality-rules/")
+    @GetMapping(value = ["${ApiCommons.BASE_PATH_V6}/field-quality-rules/", "${ApiCommons.BASE_PATH_V7}/field-quality-rules/"])
     fun getFieldQualityRules(@Parameter(description = "ISO 3166-1 alpha-2 country code") @RequestParam country: CountryCode): ResponseEntity<Collection<FieldQualityRuleDto>>
 
     @Operation(
@@ -143,7 +140,7 @@ interface PoolMetadataApi {
         ]
     )
     @Tag(name = ApiCommons.METADATA_NAME, description = ApiCommons.METADATA_DESCRIPTION)
-    @GetMapping("/administrative-areas-level1")
+    @GetMapping(value = ["${ApiCommons.BASE_PATH_V6}/administrative-areas-level1", "${ApiCommons.BASE_PATH_V7}/administrative-areas-level1"])
     fun getAdminAreasLevel1(@ParameterObject paginationRequest: PaginationRequest): PageDto<CountrySubdivisionDto>
 
 }

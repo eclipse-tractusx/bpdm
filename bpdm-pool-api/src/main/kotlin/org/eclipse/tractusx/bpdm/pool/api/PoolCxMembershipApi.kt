@@ -21,7 +21,6 @@ package org.eclipse.tractusx.bpdm.pool.api
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.PoolCxMembershipApi.Companion.MEMBERSHIP_PATH
 import org.eclipse.tractusx.bpdm.pool.api.model.CxMembershipDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.CxMembershipSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.CxMembershipUpdateRequest
@@ -32,20 +31,16 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 
-@RequestMapping(MEMBERSHIP_PATH, produces = [MediaType.APPLICATION_JSON_VALUE])
+@RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
 interface PoolCxMembershipApi {
 
-    companion object{
-        const val MEMBERSHIP_PATH = "${ApiCommons.BASE_PATH}/cx-memberships"
-    }
-
-    @GetMapping
+    @GetMapping(value = [ApiCommons.MEMBERSHIP_BASE_PATH_V6, ApiCommons.MEMBERSHIP_BASE_PATH_V7])
     fun get(
         @ParameterObject searchRequest: CxMembershipSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageDto<CxMembershipDto>
 
 
-    @PutMapping
+    @PutMapping(value = [ApiCommons.MEMBERSHIP_BASE_PATH_V6, ApiCommons.MEMBERSHIP_BASE_PATH_V7])
     fun put(@RequestBody updateRequest: CxMembershipUpdateRequest)
 }

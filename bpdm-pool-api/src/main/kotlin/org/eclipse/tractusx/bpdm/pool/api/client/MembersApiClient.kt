@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.api.client
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.ApiCommons
 import org.eclipse.tractusx.bpdm.pool.api.PoolMembersApi
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressSearchRequest
@@ -35,28 +36,28 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
 
-@HttpExchange(PoolMembersApi.MEMBERS_PATH)
+@HttpExchange
 interface MembersApiClient : PoolMembersApi {
 
-    @PostExchange(PoolMembersApi.LEGAL_ENTITIES_SEARCH_PATH)
+    @PostExchange(value = ApiCommons.MEMBERS_LEGAL_ENTITIES_SEARCH_PATH_V7)
     override fun searchLegalEntities(
         @RequestBody searchRequest: LegalEntitySearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageDto<LegalEntityWithLegalAddressVerboseDto>
 
-    @PostExchange(PoolMembersApi.SITES_SEARCH_PATH)
+    @PostExchange(value = ApiCommons.MEMBERS_SITES_SEARCH_PATH_V7)
     override fun postSiteSearch(
         @RequestBody searchRequest: SiteSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageDto<SiteWithMainAddressVerboseDto>
 
-    @PostExchange(PoolMembersApi.ADDRESSES_SEARCH_PATH)
+    @PostExchange(value = ApiCommons.MEMBERS_ADDRESSES_SEARCH_PATH_V7)
     override fun searchAddresses(
         @RequestBody searchRequest: AddressSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageDto<LogisticAddressVerboseDto>
 
-    @PostExchange(PoolMembersApi.CHANGELOG_SEARCH_PATH)
+    @PostExchange(value = ApiCommons.MEMBERS_CHANGELOG_SEARCH_PATH_V7)
     override fun searchChangelogEntries(
         @RequestBody changelogSearchRequest: ChangelogSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest

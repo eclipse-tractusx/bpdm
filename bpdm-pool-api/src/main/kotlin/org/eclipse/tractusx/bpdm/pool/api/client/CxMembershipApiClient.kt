@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.api.client
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.ApiCommons
 import org.eclipse.tractusx.bpdm.pool.api.PoolCxMembershipApi
 import org.eclipse.tractusx.bpdm.pool.api.model.CxMembershipDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.CxMembershipSearchRequest
@@ -31,13 +32,13 @@ import org.springframework.web.service.annotation.GetExchange
 import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PutExchange
 
-@HttpExchange(PoolCxMembershipApi.MEMBERSHIP_PATH)
+@HttpExchange
 interface CxMembershipApiClient: PoolCxMembershipApi {
 
-    @GetExchange
+    @GetExchange(value = ApiCommons.MEMBERSHIP_BASE_PATH_V7)
     override fun get(@ParameterObject searchRequest: CxMembershipSearchRequest, @ParameterObject paginationRequest: PaginationRequest): PageDto<CxMembershipDto>
 
-    @PutExchange
+    @PutExchange(value = ApiCommons.MEMBERSHIP_BASE_PATH_V7)
     override fun put(@RequestBody updateRequest: CxMembershipUpdateRequest)
 
 }

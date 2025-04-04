@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.api.client
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.ApiCommons
 import org.eclipse.tractusx.bpdm.pool.api.PoolSiteApi
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteCreateRequestWithLegalAddressAsMain
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
@@ -37,36 +38,36 @@ import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
 import org.springframework.web.service.annotation.PutExchange
 
-@HttpExchange(PoolSiteApi.SITE_PATH)
+@HttpExchange
 interface SiteApiClient : PoolSiteApi {
-    @PostExchange
+    @PostExchange(value = ApiCommons.SITE_BASE_PATH_V7)
     override fun createSite(
         @RequestBody requests: Collection<SitePartnerCreateRequest>
     ): SitePartnerCreateResponseWrapper
 
-    @GetExchange("/{bpns}")
+    @GetExchange(value = "${ApiCommons.SITE_BASE_PATH_V7}/{bpns}")
     override fun getSite(
         @PathVariable bpns: String
     ): SiteWithMainAddressVerboseDto
 
-    @GetExchange
+    @GetExchange(value = ApiCommons.SITE_BASE_PATH_V7)
     override fun getSites(
         @ParameterObject searchRequest: SiteSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageDto<SiteWithMainAddressVerboseDto>
 
-    @PostExchange("/search")
+    @PostExchange(value = "${ApiCommons.SITE_BASE_PATH_V7}/search")
     override fun postSiteSearch(
         @RequestBody searchRequest: SiteSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageDto<SiteWithMainAddressVerboseDto>
 
-    @PutExchange
+    @PutExchange(value = ApiCommons.SITE_BASE_PATH_V7)
     override fun updateSite(
         @RequestBody requests: Collection<SitePartnerUpdateRequest>
     ): SitePartnerUpdateResponseWrapper
 
-    @PostExchange("/legal-main-sites")
+    @PostExchange(value = "${ApiCommons.SITE_BASE_PATH_V7}/legal-main-sites")
     override fun createSiteWithLegalReference(
         @RequestBody request: Collection<SiteCreateRequestWithLegalAddressAsMain>
     ): SitePartnerCreateResponseWrapper

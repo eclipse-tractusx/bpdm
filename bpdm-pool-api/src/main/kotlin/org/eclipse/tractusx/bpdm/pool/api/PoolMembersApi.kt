@@ -22,8 +22,6 @@ package org.eclipse.tractusx.bpdm.pool.api
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.util.CommonApiPathNames
-import org.eclipse.tractusx.bpdm.pool.api.PoolMembersApi.Companion.MEMBERS_PATH
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest
@@ -39,41 +37,32 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 
 
-@RequestMapping(MEMBERS_PATH, produces = [MediaType.APPLICATION_JSON_VALUE])
+@RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
 interface PoolMembersApi {
 
-    companion object{
-        const val MEMBERS_PATH = "${ApiCommons.BASE_PATH}/members"
-
-        const val LEGAL_ENTITIES_SEARCH_PATH = "/legal-entities${CommonApiPathNames.SUBPATH_SEARCH}"
-        const val SITES_SEARCH_PATH = "/sites${CommonApiPathNames.SUBPATH_SEARCH}"
-        const val ADDRESSES_SEARCH_PATH = "/addresses${CommonApiPathNames.SUBPATH_SEARCH}"
-        const val CHANGELOG_SEARCH_PATH = "/changelog/search"
-    }
-
     @Tag(name = ApiCommons.LEGAL_ENTITIES_NAME, description = ApiCommons.LEGAL_ENTITIES_DESCRIPTION)
-    @PostMapping(LEGAL_ENTITIES_SEARCH_PATH)
+    @PostMapping(value = [ApiCommons.MEMBERS_LEGAL_ENTITIES_SEARCH_PATH_V6, ApiCommons.MEMBERS_LEGAL_ENTITIES_SEARCH_PATH_V7])
     fun searchLegalEntities(
         @RequestBody searchRequest: LegalEntitySearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageDto<LegalEntityWithLegalAddressVerboseDto>
 
     @Tag(name = ApiCommons.SITE_NAME, description = ApiCommons.SITE_DESCRIPTION)
-    @PostMapping(SITES_SEARCH_PATH)
+    @PostMapping(value = [ApiCommons.MEMBERS_SITES_SEARCH_PATH_V6, ApiCommons.MEMBERS_SITES_SEARCH_PATH_V7])
     fun postSiteSearch(
         @RequestBody searchRequest: SiteSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageDto<SiteWithMainAddressVerboseDto>
 
     @Tag(name = ApiCommons.ADDRESS_NAME, description = ApiCommons.ADDRESS_DESCRIPTION)
-    @PostMapping(ADDRESSES_SEARCH_PATH)
+    @PostMapping(value = [ApiCommons.MEMBERS_ADDRESSES_SEARCH_PATH_V6, ApiCommons.MEMBERS_ADDRESSES_SEARCH_PATH_V7])
     fun searchAddresses(
         @RequestBody searchRequest: AddressSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageDto<LogisticAddressVerboseDto>
 
     @Tag(name = ApiCommons.CHANGELOG_NAME, description = ApiCommons.CHANGELOG_DESCRIPTION)
-    @PostMapping(CHANGELOG_SEARCH_PATH)
+    @PostMapping(value = [ApiCommons.MEMBERS_CHANGELOG_SEARCH_PATH_V6, ApiCommons.MEMBERS_CHANGELOG_SEARCH_PATH_V7])
     fun searchChangelogEntries(
         @RequestBody changelogSearchRequest: ChangelogSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
