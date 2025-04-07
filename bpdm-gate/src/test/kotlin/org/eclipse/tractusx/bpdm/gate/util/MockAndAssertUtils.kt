@@ -36,7 +36,6 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.RelationPutResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
-import org.eclipse.tractusx.bpdm.pool.api.PoolChangelogApi
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryVerboseDto
 import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerGenericCommonValues
@@ -44,8 +43,6 @@ import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerVerboseValues
 import org.eclipse.tractusx.bpdm.test.util.AssertHelpers
 import org.eclipse.tractusx.bpdm.test.util.Timeframe
 import org.eclipse.tractusx.orchestrator.api.ApiCommons
-import org.eclipse.tractusx.orchestrator.api.FinishedTaskEventApi
-import org.eclipse.tractusx.orchestrator.api.GoldenRecordTaskApi
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
@@ -61,7 +58,7 @@ class MockAndAssertUtils @Autowired constructor(
     val ORCHESTRATOR_CREATE_TASKS_URL = ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS
     val ORCHESTRATOR_SEARCH_TASK_STATES_URL = "${ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS}/state/search"
     val ORCHESTRATOR_SEARCH_TASK_RESULT_STATES_URL = "${ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS}/result-state/search"
-    val POOL_API_SEARCH_CHANGE_LOG_URL = "${PoolChangelogApi.CHANGELOG_PATH}/search"
+    val POOL_API_SEARCH_CHANGE_LOG_URL = "${org.eclipse.tractusx.bpdm.pool.api.ApiCommons.CHANGELOG_BASE_PATH_V7}/search"
 
     val taskStep = TaskStep.entries.first()
 

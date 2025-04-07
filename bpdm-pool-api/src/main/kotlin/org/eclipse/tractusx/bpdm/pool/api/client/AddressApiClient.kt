@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.api.client
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.util.CommonApiPathNames
+import org.eclipse.tractusx.bpdm.pool.api.ApiCommons
 import org.eclipse.tractusx.bpdm.pool.api.PoolAddressApi
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
@@ -37,27 +38,27 @@ import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
 import org.springframework.web.service.annotation.PutExchange
 
-@HttpExchange(PoolAddressApi.ADDRESS_PATH)
+@HttpExchange
 interface AddressApiClient: PoolAddressApi {
 
-    @GetExchange
+    @GetExchange(value = ApiCommons.ADDRESS_BASE_PATH_V7)
     override fun getAddresses(
         @ParameterObject addressSearchRequest: AddressSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageDto<LogisticAddressVerboseDto>
 
-    @GetExchange(PoolAddressApi.SUBPATH_BPNA)
-    override fun getAddress(@PathVariable(PoolAddressApi.PATHVAR_BPNA) bpna: String): LogisticAddressVerboseDto
+    @GetExchange(value = "${ApiCommons.ADDRESS_BASE_PATH_V7}/{bpna}")
+    override fun getAddress(@PathVariable bpna: String): LogisticAddressVerboseDto
 
-    @PostExchange(CommonApiPathNames.SUBPATH_SEARCH)
+    @PostExchange(value = "${ApiCommons.ADDRESS_BASE_PATH_V7}${CommonApiPathNames.SUBPATH_SEARCH}")
     override fun searchAddresses(
         @RequestBody searchRequest: AddressSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageDto<LogisticAddressVerboseDto>
 
-    @PostExchange
+    @PostExchange(value = ApiCommons.ADDRESS_BASE_PATH_V7)
     override fun createAddresses(@RequestBody requests: Collection<AddressPartnerCreateRequest>): AddressPartnerCreateResponseWrapper
 
-    @PutExchange
+    @PutExchange(value = ApiCommons.ADDRESS_BASE_PATH_V7)
     override fun updateAddresses(@RequestBody requests: Collection<AddressPartnerUpdateRequest>): AddressPartnerUpdateResponseWrapper
 }

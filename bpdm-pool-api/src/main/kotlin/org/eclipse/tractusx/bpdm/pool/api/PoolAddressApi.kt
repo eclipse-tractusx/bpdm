@@ -28,7 +28,6 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.util.CommonApiPathNames
-import org.eclipse.tractusx.bpdm.pool.api.PoolAddressApi.Companion.ADDRESS_PATH
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerUpdateRequest
@@ -40,14 +39,8 @@ import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
 
 
-@RequestMapping(ADDRESS_PATH, produces = [MediaType.APPLICATION_JSON_VALUE])
+@RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
 interface PoolAddressApi {
-
-    companion object{
-        const val ADDRESS_PATH = "${ApiCommons.BASE_PATH}/addresses"
-        const val PATHVAR_BPNA = "bpna"
-        const val SUBPATH_BPNA = "/{$PATHVAR_BPNA}"
-    }
 
     @Operation(
         summary = "Returns addresses by different search parameters",
@@ -62,7 +55,7 @@ interface PoolAddressApi {
         ]
     )
     @Tag(name = ApiCommons.ADDRESS_NAME, description = ApiCommons.ADDRESS_DESCRIPTION)
-    @GetMapping
+    @GetMapping(value = [ApiCommons.ADDRESS_BASE_PATH_V6, ApiCommons.ADDRESS_BASE_PATH_V7])
     fun getAddresses(
         @ParameterObject addressSearchRequest: AddressSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
@@ -80,9 +73,9 @@ interface PoolAddressApi {
         ]
     )
     @Tag(name = ApiCommons.ADDRESS_NAME, description = ApiCommons.ADDRESS_DESCRIPTION)
-    @GetMapping(SUBPATH_BPNA)
+    @GetMapping(value = ["${ApiCommons.ADDRESS_BASE_PATH_V6}/{bpna}", "${ApiCommons.ADDRESS_BASE_PATH_V7}/{bpna}"])
     fun getAddress(
-        @Parameter(description = "BPNA value") @PathVariable(PATHVAR_BPNA) bpna: String
+        @Parameter(description = "BPNA value") @PathVariable bpna: String
     ): LogisticAddressVerboseDto
 
     @Operation(
@@ -96,7 +89,7 @@ interface PoolAddressApi {
         ]
     )
     @Tag(name = ApiCommons.ADDRESS_NAME, description = ApiCommons.ADDRESS_DESCRIPTION)
-    @PostMapping(CommonApiPathNames.SUBPATH_SEARCH)
+    @PostMapping(value = ["${ApiCommons.ADDRESS_BASE_PATH_V6}${CommonApiPathNames.SUBPATH_SEARCH}", "${ApiCommons.ADDRESS_BASE_PATH_V7}${CommonApiPathNames.SUBPATH_SEARCH}"])
     fun searchAddresses(
         @RequestBody searchRequest: AddressSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
@@ -116,7 +109,7 @@ interface PoolAddressApi {
         ]
     )
     @Tag(name = ApiCommons.ADDRESS_NAME, description = ApiCommons.ADDRESS_DESCRIPTION)
-    @PostMapping
+    @PostMapping(value = [ApiCommons.ADDRESS_BASE_PATH_V6, ApiCommons.ADDRESS_BASE_PATH_V7])
     fun createAddresses(
         @RequestBody
         requests: Collection<AddressPartnerCreateRequest>
@@ -134,7 +127,7 @@ interface PoolAddressApi {
         ]
     )
     @Tag(name = ApiCommons.ADDRESS_NAME, description = ApiCommons.ADDRESS_DESCRIPTION)
-    @PutMapping
+    @PutMapping(value = [ApiCommons.ADDRESS_BASE_PATH_V6, ApiCommons.ADDRESS_BASE_PATH_V7])
     fun updateAddresses(
         @RequestBody
         requests: Collection<AddressPartnerUpdateRequest>

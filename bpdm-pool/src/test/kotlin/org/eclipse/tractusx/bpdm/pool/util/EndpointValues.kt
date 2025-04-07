@@ -19,14 +19,13 @@
 
 package org.eclipse.tractusx.bpdm.pool.util
 
-import org.eclipse.tractusx.bpdm.pool.api.PoolLegalEntityApi
-import org.eclipse.tractusx.bpdm.pool.api.PoolMetadataApi
+import org.eclipse.tractusx.bpdm.pool.api.ApiCommons
 
 object EndpointValues {
 
-    const val CATENA_LEGAL_ENTITY_PATH = PoolLegalEntityApi.LEGAL_ENTITY_PATH
+    const val CATENA_LEGAL_ENTITY_PATH = ApiCommons.LEGAL_ENTITY_BASE_PATH_V7
 
-    const val CATENA_METADATA_IDENTIFIER_TYPE_PATH = "${PoolMetadataApi.METADATA_PATH}/identifier-types"
-    const val CATENA_METADATA_LEGAL_FORM_PATH = "${PoolMetadataApi.METADATA_PATH}/legal-forms"
+    const val CATENA_METADATA_IDENTIFIER_TYPE_PATH = "${ApiCommons.BASE_PATH_V7}/identifier-types"
+    const val CATENA_METADATA_LEGAL_FORM_PATH = "${ApiCommons.BASE_PATH_V7}/legal-forms"
 
 }

@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.api.client
 import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.ApiCommons
 import org.eclipse.tractusx.bpdm.pool.api.PoolMetadataApi
 import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
@@ -33,28 +34,28 @@ import org.springframework.web.service.annotation.GetExchange
 import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
 
-@HttpExchange(PoolMetadataApi.METADATA_PATH)
+@HttpExchange
 interface MetadataApiClient: PoolMetadataApi {
 
-    @PostExchange("/identifier-types")
+    @PostExchange(value = "${ApiCommons.BASE_PATH_V7}/identifier-types")
     override fun createIdentifierType(@RequestBody identifierType: IdentifierTypeDto): IdentifierTypeDto
 
-    @PostExchange("/legal-forms")
+    @PostExchange(value = "${ApiCommons.BASE_PATH_V7}/legal-forms")
     override fun createLegalForm(@RequestBody type: LegalFormRequest): LegalFormDto
 
-    @GetExchange("/administrative-areas-level1")
+    @GetExchange(value = "${ApiCommons.BASE_PATH_V7}/administrative-areas-level1")
     override fun getAdminAreasLevel1(@ParameterObject paginationRequest: PaginationRequest): PageDto<CountrySubdivisionDto>
 
-    @GetExchange("/field-quality-rules/")
+    @GetExchange(value = "${ApiCommons.BASE_PATH_V7}/field-quality-rules/")
     override fun getFieldQualityRules(@RequestParam country: CountryCode): ResponseEntity<Collection<FieldQualityRuleDto>>
 
-    @GetExchange("/identifier-types")
+    @GetExchange(value = "${ApiCommons.BASE_PATH_V7}/identifier-types")
     override fun getIdentifierTypes(
         @ParameterObject paginationRequest: PaginationRequest,
         @RequestParam businessPartnerType: IdentifierBusinessPartnerType,
         @RequestParam country: CountryCode?
     ): PageDto<IdentifierTypeDto>
 
-    @GetExchange("/legal-forms")
+    @GetExchange(value = "${ApiCommons.BASE_PATH_V7}/legal-forms")
     override fun getLegalForms(@ParameterObject paginationRequest: PaginationRequest): PageDto<LegalFormDto>
 }

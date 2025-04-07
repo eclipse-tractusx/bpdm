@@ -31,6 +31,7 @@ import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityRepresentationInputDto
 import org.eclipse.tractusx.bpdm.gate.util.MockAndAssertUtils
+import org.eclipse.tractusx.bpdm.pool.api.ApiCommons
 import org.eclipse.tractusx.bpdm.pool.api.model.ConfidenceCriteriaDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
@@ -259,7 +260,7 @@ class PartnerUploadControllerIT @Autowired constructor(
         )
 
         poolWireMockApi.stubFor(
-            WireMock.get(WireMock.urlPathEqualTo("/v6/legal-entities"))
+            WireMock.get(WireMock.urlPathEqualTo(ApiCommons.LEGAL_ENTITY_BASE_PATH_V7))
                 .withQueryParam("bpnLs", WireMock.equalTo(tenantBpnl))
                 .withQueryParam("page", WireMock.equalTo("0"))
                 .withQueryParam("size", WireMock.equalTo("1"))

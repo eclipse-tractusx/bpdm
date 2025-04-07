@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.api.client
 
 import org.eclipse.tractusx.bpdm.common.util.CommonApiPathNames
+import org.eclipse.tractusx.bpdm.pool.api.ApiCommons
 import org.eclipse.tractusx.bpdm.pool.api.PoolBpnApi
 import org.eclipse.tractusx.bpdm.pool.api.model.request.BpnRequestIdentifierSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.IdentifiersSearchRequest
@@ -30,11 +31,11 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
 
-@HttpExchange(PoolBpnApi.BPN_PATH)
+@HttpExchange
 interface BpnApiClient: PoolBpnApi {
-    @PostExchange(CommonApiPathNames.SUBPATH_SEARCH)
+    @PostExchange(value = "${ApiCommons.BPN_BASE_PATH_V7}${CommonApiPathNames.SUBPATH_SEARCH}")
     override fun findBpnsByIdentifiers(@RequestBody request: IdentifiersSearchRequest): ResponseEntity<Set<BpnIdentifierMappingDto>>
 
-    @PostExchange(value = "/request-ids/search")
+    @PostExchange(value = "${ApiCommons.BPN_BASE_PATH_V7}/request-ids/search")
     override fun findBpnByRequestedIdentifiers(@RequestBody request: BpnRequestIdentifierSearchRequest): ResponseEntity<Set<BpnRequestIdentifierMappingDto>>
 }

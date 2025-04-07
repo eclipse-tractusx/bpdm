@@ -26,7 +26,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.eclipse.tractusx.bpdm.common.util.CommonApiPathNames
-import org.eclipse.tractusx.bpdm.pool.api.PoolBpnApi.Companion.BPN_PATH
 import org.eclipse.tractusx.bpdm.pool.api.model.request.BpnRequestIdentifierSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.IdentifiersSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingDto
@@ -37,12 +36,8 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 
-@RequestMapping(BPN_PATH, produces = [MediaType.APPLICATION_JSON_VALUE])
+@RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
 interface PoolBpnApi {
-
-    companion object{
-        const val BPN_PATH = "${ApiCommons.BASE_PATH}/bpn"
-    }
 
     @Operation(
         summary = "Returns a list of identifier mappings of an identifier to a BPNL/A/S, specified by a business partner type, identifier type and identifier values",
@@ -62,7 +57,7 @@ interface PoolBpnApi {
         ]
     )
     @Tag(name = ApiCommons.BPN_NAME, description = ApiCommons.BPN_DESCRIPTION)
-    @PostMapping(CommonApiPathNames.SUBPATH_SEARCH)
+    @PostMapping(value = ["${ApiCommons.BPN_BASE_PATH_V6}${CommonApiPathNames.SUBPATH_SEARCH}", "${ApiCommons.BPN_BASE_PATH_V7}${CommonApiPathNames.SUBPATH_SEARCH}"])
     fun findBpnsByIdentifiers(@RequestBody request: IdentifiersSearchRequest): ResponseEntity<Set<BpnIdentifierMappingDto>>
 
     @Operation(
@@ -75,6 +70,6 @@ interface PoolBpnApi {
         ]
     )
     @Tag(name = ApiCommons.BPN_NAME, description = ApiCommons.BPN_DESCRIPTION)
-    @PostMapping("/request-ids/search")
+    @PostMapping(value = ["${ApiCommons.BPN_BASE_PATH_V6}/request-ids/search", "${ApiCommons.BPN_BASE_PATH_V7}/request-ids/search"])
     fun findBpnByRequestedIdentifiers(@RequestBody request: BpnRequestIdentifierSearchRequest): ResponseEntity<Set<BpnRequestIdentifierMappingDto>>
 }
