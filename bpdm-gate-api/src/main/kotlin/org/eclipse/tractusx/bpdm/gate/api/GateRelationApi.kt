@@ -27,7 +27,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import jakarta.validation.Valid
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.gate.api.GateRelationApi.Companion.RELATIONS_PATH
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationDto
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationSearchRequest
@@ -37,12 +36,8 @@ import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
 
-@RequestMapping(RELATIONS_PATH, produces = [MediaType.APPLICATION_JSON_VALUE])
+@RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
 interface GateRelationApi {
-
-    companion object{
-        const val RELATIONS_PATH =  "${ApiCommons.BASE_PATH}/input/business-partner-relations"
-    }
 
     @Operation(
         summary = "Find business partner input relations",
@@ -55,7 +50,7 @@ interface GateRelationApi {
             ApiResponse(responseCode = "200", description = "A paginated list of business partner relations for the input stage")
         ]
     )
-    @PostMapping("/search")
+    @PostMapping(value = ["${ApiCommons.RELATIONS_INPUT_PATH_V7}/search"])
     fun postSearch(
         @RequestBody searchRequest: RelationSearchRequest = RelationSearchRequest(),
         @ParameterObject @Valid paginationRequest: PaginationRequest = PaginationRequest()
@@ -76,7 +71,7 @@ interface GateRelationApi {
                 )])
         ]
     )
-    @PutMapping(consumes = [MediaType.APPLICATION_JSON_VALUE])
+    @PutMapping(value = [ApiCommons.RELATIONS_INPUT_PATH_V7], consumes = [MediaType.APPLICATION_JSON_VALUE])
     fun put(
         @Schema(description = "If true a business partner relation will be created even if a relation could not be found under the given external identifier.")
         @RequestParam createIfNotExist: Boolean = true,

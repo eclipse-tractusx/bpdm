@@ -27,7 +27,6 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.gate.api.GateRelationSharingStateApi.Companion.RELATION_SHARING_STATE_PATH
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateType
 import org.springdoc.core.annotations.ParameterObject
@@ -37,12 +36,8 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import java.time.Instant
 
-@RequestMapping(RELATION_SHARING_STATE_PATH, produces = [MediaType.APPLICATION_JSON_VALUE])
+@RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
 interface GateRelationSharingStateApi {
-
-    companion object{
-        const val RELATION_SHARING_STATE_PATH = "${ApiCommons.BASE_PATH}/relations/sharing-state"
-    }
 
     @Operation(
         summary = "Returns sharing states of shared business partner relations which can be optionally filtered"
@@ -53,7 +48,7 @@ interface GateRelationSharingStateApi {
         ]
     )
     @Tag(name = "sharing-state-controller")
-    @GetMapping
+    @GetMapping(value = [ApiCommons.RELATION_SHARING_STATE_PATH_V7])
     fun get(
         @Parameter(description = "Only show sharing states of given external IDs")
         @RequestParam(required = false) externalIds: Collection<String>? = null,

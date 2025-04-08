@@ -24,7 +24,6 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
-import org.eclipse.tractusx.bpdm.gate.api.GateBusinessPartnerApi.Companion.BUSINESS_PARTNER_PATH
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.GateErrorResponse
 import org.springframework.core.io.ByteArrayResource
@@ -36,12 +35,8 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.multipart.MultipartFile
 
-@RequestMapping(BUSINESS_PARTNER_PATH, produces = [MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE])
+@RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE])
 interface GatePartnerUploadApi {
-
-    companion object{
-        const val BUSINESS_PARTNER_PATH = ApiCommons.BASE_PATH
-    }
 
     @Operation(
         summary = "Create or update business partners from uploaded CSV file",
@@ -59,7 +54,7 @@ interface GatePartnerUploadApi {
                 )]),
         ]
     )
-    @PostMapping("/input/partner-upload-process", consumes = ["multipart/form-data"])
+    @PostMapping(value = ["${ApiCommons.BASE_PATH_V6}/input/partner-upload-process", "${ApiCommons.BASE_PATH_V7}/input/partner-upload-process"], consumes = ["multipart/form-data"])
     fun uploadPartnerCsvFile(
         @RequestPart("file") file: MultipartFile
     ): ResponseEntity<Collection<BusinessPartnerInputDto>>
@@ -74,7 +69,7 @@ interface GatePartnerUploadApi {
             ApiResponse(responseCode = "200", description = "CSV file template generated successfully")
         ]
     )
-    @GetMapping("/input/partner-upload-template")
+    @GetMapping(value = ["${ApiCommons.BASE_PATH_V6}/input/partner-upload-template", "${ApiCommons.BASE_PATH_V7}/input/partner-upload-template"])
     fun getPartnerCsvTemplate(): ResponseEntity<ByteArrayResource>
 
 }

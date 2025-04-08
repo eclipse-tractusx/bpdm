@@ -36,10 +36,7 @@ import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
 import org.eclipse.tractusx.bpdm.gate.entity.RelationOutputDb
 import org.eclipse.tractusx.bpdm.gate.entity.RelationStageDb
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
-import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidRelationException
-import org.eclipse.tractusx.bpdm.gate.exception.BpdmMissingRelationException
-import org.eclipse.tractusx.bpdm.gate.exception.BpdmRelationSourceNotFoundException
-import org.eclipse.tractusx.bpdm.gate.exception.BpdmRelationTargetNotFoundException
+import org.eclipse.tractusx.bpdm.gate.exception.*
 import org.eclipse.tractusx.bpdm.gate.repository.RelationRepository
 import org.eclipse.tractusx.bpdm.gate.repository.RelationStageRepository
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
@@ -101,6 +98,29 @@ class RelationService(
 
         return relationRepository.findAll(querySpecs, paginationRequest.toPageRequest())
             .toPageDto { toOutputDto(it) }
+    }
+
+    @Transactional
+    fun createInputRelations(
+        tenantBpnL: BpnLString,
+        externalId: String?,
+        relationType: RelationType,
+        sourceBusinessPartnerExternalId: String,
+        targetBusinessPartnerExternalId: String
+    ): RelationDto {
+        if (externalId != null) {
+            val existingRelationship = relationRepository.findByTenantBpnLAndExternalId(tenantBpnL.value, externalId)
+            if (existingRelationship != null) throw BpdmRelationAlreadyExistsException(externalId)
+        }
+        return toDto(createInputStage(tenantBpnL, externalId, relationType, sourceBusinessPartnerExternalId, targetBusinessPartnerExternalId))
+    }
+
+    @Transactional
+    fun deleteRelation(tenantBpnL: BpnLString, externalId: String) {
+        val relations = relationRepository.findByTenantBpnLAndExternalId(tenantBpnL.value, externalId) ?: throw BpdmMissingRelationException(externalId)
+        val relationStage = relationStageRepository.findByRelationAndStage(relations, stage = StageType.Input) ?: throw BpdmMissingRelationException(externalId)
+        relationStageRepository.delete(relationStage)
+        relationRepository.delete(relations)
     }
 
     @Transactional
