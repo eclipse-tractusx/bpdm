@@ -26,6 +26,7 @@ import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
+import org.springframework.data.jpa.repository.Query
 
 interface RelationRepository : JpaRepository<RelationDb, Long>, JpaSpecificationExecutor<RelationDb> {
 
@@ -49,4 +50,7 @@ interface RelationRepository : JpaRepository<RelationDb, Long>, JpaSpecification
                 builder.and(*predicates.toTypedArray())
             }
     }
+
+    @Query("SELECT r FROM RelationDb r WHERE r.type = :relationType AND (r.startNode = :legalEntity OR r.endNode = :legalEntity)")
+    fun findInSourceOrTarget(relationType: RelationType, legalEntity: LegalEntityDb): Set<RelationDb>
 }

@@ -137,8 +137,8 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         // Step 2: Create a relation request
         val createRelationsRequest = BusinessPartnerRelations(
             relationType = RelationType.IsAlternativeHeadquarterFor,
-            businessPartnerSourceBpnl = savedEntity1.legalEntity.bpnl,
-            businessPartnerTargetBpnl = savedEntity2.legalEntity.bpnl
+            businessPartnerSourceBpnl = savedEntity2.legalEntity.bpnl,
+            businessPartnerTargetBpnl = savedEntity1.legalEntity.bpnl
         )
 
         val result = upsertRelationsGoldenRecordIntoPool(taskId = "TASK_1", businessPartnerRelations = createRelationsRequest)

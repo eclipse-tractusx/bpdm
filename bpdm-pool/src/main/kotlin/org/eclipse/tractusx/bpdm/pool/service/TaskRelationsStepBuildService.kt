@@ -20,28 +20,30 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import jakarta.transaction.Transactional
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.api.model.RelationType
-import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
-import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
+import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
 import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepReservationEntryDto
 import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepResultEntryDto
 import org.springframework.stereotype.Service
+import org.eclipse.tractusx.orchestrator.api.model.RelationType as OrchestratorRelationType
 
 @Service
 class TaskRelationsStepBuildService(
-    private val relationRepository: RelationRepository,
+    private val alternativeHeadquarterRelationService: AlternativeHeadquarterRelationUpsertService,
     private val legalEntityRepository: LegalEntityRepository,
-    private val changelogService: PartnerChangelogService
 ) {
 
     @Transactional
     fun upsertBusinessPartnerRelations(taskEntry: TaskRelationsStepReservationEntryDto): TaskRelationsStepResultEntryDto {
         val relationDto = taskEntry.businessPartnerRelations
+
+        // Prevent self-referencing relations
+        if (relationDto.businessPartnerSourceBpnl == relationDto.businessPartnerTargetBpnl) {
+            throw BpdmValidationException("A legal entity cannot have a relation to itself (BPNL: ${relationDto.businessPartnerSourceBpnl}).")
+        }
 
         // Fetch legal entities by BPNL
         val sourceLegalEntity = legalEntityRepository.findByBpnIgnoreCase(relationDto.businessPartnerSourceBpnl)
@@ -50,46 +52,31 @@ class TaskRelationsStepBuildService(
         val targetLegalEntity = legalEntityRepository.findByBpnIgnoreCase(relationDto.businessPartnerTargetBpnl)
             ?: throw BpdmValidationException("Target legal entity with specified BPNL : ${relationDto.businessPartnerTargetBpnl} not found")
 
-
-        // Prevent self-referencing relations
-        if (sourceLegalEntity == targetLegalEntity) {
-            throw BpdmValidationException("A legal entity cannot have a relation to itself (BPNL: ${relationDto.businessPartnerSourceBpnl}).")
+        val upsertRequest = IRelationUpsertStrategyService.UpsertRequest(sourceLegalEntity, targetLegalEntity)
+        val strategyService : IRelationUpsertStrategyService = when(relationDto.relationType){
+            OrchestratorRelationType.IsAlternativeHeadquarterFor -> alternativeHeadquarterRelationService
         }
 
-        val existingRelation = relationRepository.findOne(
-            RelationRepository.byRelation(
-                startNode = sourceLegalEntity,
-                endNode = targetLegalEntity,
-                type = RelationType.valueOf(relationDto.relationType.name)
-            )
+        val upsertResult = strategyService.upsertRelation(upsertRequest)
+
+        return TaskRelationsStepResultEntryDto(
+            taskId = taskEntry.taskId,
+            errors = emptyList(),
+            businessPartnerRelations = upsertResult.relation.toTaskDto()
         )
+    }
 
-        return if (existingRelation.isPresent) {
-            // Relation already exists, return existing details
-            TaskRelationsStepResultEntryDto(
-                taskId = taskEntry.taskId,
-                errors = emptyList(),
-                businessPartnerRelations = relationDto
-            )
-        } else {
-            // Create new relation
-            val newRelation = RelationDb(
-                type = RelationType.valueOf(relationDto.relationType.name),
-                startNode = sourceLegalEntity,
-                endNode = targetLegalEntity,
-                isActive = true
-            )
+    private fun RelationDb.toTaskDto(): BusinessPartnerRelations{
+        return BusinessPartnerRelations(
+            type.toTaskDto(),
+            startNode.bpn,
+            endNode.bpn
+        )
+    }
 
-            relationRepository.save(newRelation)
-
-            changelogService.createChangelogEntry(ChangelogEntryCreateRequest(sourceLegalEntity.bpn, ChangelogType.UPDATE, BusinessPartnerType.LEGAL_ENTITY))
-            changelogService.createChangelogEntry(ChangelogEntryCreateRequest(targetLegalEntity.bpn, ChangelogType.UPDATE, BusinessPartnerType.LEGAL_ENTITY))
-
-            TaskRelationsStepResultEntryDto(
-                taskId = taskEntry.taskId,
-                errors = emptyList(),
-                businessPartnerRelations = relationDto
-            )
+    private fun RelationType.toTaskDto(): OrchestratorRelationType{
+        return when(this){
+            RelationType.IsAlternativeHeadquarterFor -> OrchestratorRelationType.IsAlternativeHeadquarterFor
         }
     }
 }
