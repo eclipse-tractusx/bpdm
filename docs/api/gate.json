@@ -15,46 +15,7 @@
     "bearer_scheme" : [ ]
   } ],
   "paths" : {
-    "/v6/input/business-partners" : {
-      "put" : {
-        "tags" : [ "business-partner-controller" ],
-        "summary" : "Create or update business partner with given external ID",
-        "description" : "Create or update generic business partner. Updates instead of creating a new business partner if an already existing external ID is used. The same external ID may not occur more than once in a single request. For a single request, the maximum number of business partners in the request is limited to 100 entries.",
-        "operationId" : "upsertBusinessPartnersInput",
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "type" : "array",
-                "items" : {
-                  "$ref" : "#/components/schemas/BusinessPartnerInputRequest"
-                }
-              }
-            }
-          },
-          "required" : true
-        },
-        "responses" : {
-          "200" : {
-            "description" : "Business partner were successfully updated or created",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/BusinessPartnerInputDto"
-                  }
-                }
-              }
-            }
-          },
-          "400" : {
-            "description" : "On malformed legal entity request"
-          }
-        }
-      }
-    },
-    "/v6/input/business-partner-relations" : {
+    "/v7/input/business-partner-relations" : {
       "put" : {
         "tags" : [ "relation-controller" ],
         "summary" : "Update a business partner input relation",
@@ -104,12 +65,495 @@
         }
       }
     },
-    "/v6/sharing-state/ready" : {
+    "/v6/input/business-partners" : {
+      "put" : {
+        "tags" : [ "business-partner-controller" ],
+        "summary" : "Create or update business partner with given external ID",
+        "description" : "Create or update generic business partner. Updates instead of creating a new business partner if an already existing external ID is used. The same external ID may not occur more than once in a single request. For a single request, the maximum number of business partners in the request is limited to 100 entries.",
+        "operationId" : "upsertBusinessPartnersInput",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "array",
+                "items" : {
+                  "$ref" : "#/components/schemas/BusinessPartnerInputRequest"
+                }
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Business partner were successfully updated or created",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/BusinessPartnerInputDto"
+                  }
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "On malformed legal entity request"
+          }
+        }
+      }
+    },
+    "/v7/input/business-partners" : {
+      "put" : {
+        "tags" : [ "business-partner-controller" ],
+        "summary" : "Create or update business partner with given external ID",
+        "description" : "Create or update generic business partner. Updates instead of creating a new business partner if an already existing external ID is used. The same external ID may not occur more than once in a single request. For a single request, the maximum number of business partners in the request is limited to 100 entries.",
+        "operationId" : "upsertBusinessPartnersInput_1",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "array",
+                "items" : {
+                  "$ref" : "#/components/schemas/BusinessPartnerInputRequest"
+                }
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Business partner were successfully updated or created",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/BusinessPartnerInputDto"
+                  }
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "On malformed legal entity request"
+          }
+        }
+      }
+    },
+    "/v6/input/business-partner-relations" : {
+      "get" : {
+        "tags" : [ "relation-controller" ],
+        "summary" : "Find business partner input relations",
+        "description" : "Find paginated list of business partner relations from the input stage. There are various filter criteria available. All filters are 'AND' filters.",
+        "operationId" : "get",
+        "parameters" : [ {
+          "name" : "externalIds",
+          "in" : "query",
+          "description" : "Only show relations with the given external identifiers",
+          "required" : false,
+          "schema" : {
+            "type" : "array",
+            "description" : "Only show relations with the given external identifiers",
+            "items" : {
+              "type" : "string",
+              "description" : "Only show relations with the given external identifiers"
+            }
+          }
+        }, {
+          "name" : "relationType",
+          "in" : "query",
+          "description" : "Only show relations of the given type",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "description" : "Only show relations of the given type",
+            "enum" : [ "IsManagedBy", "IsAlternativeHeadquarterFor" ]
+          }
+        }, {
+          "name" : "businessPartnerSourceExternalIds",
+          "in" : "query",
+          "description" : "Only show relations which have the given business partners as sources",
+          "required" : false,
+          "schema" : {
+            "type" : "array",
+            "description" : "Only show relations which have the given business partners as sources",
+            "items" : {
+              "type" : "string",
+              "description" : "Only show relations which have the given business partners as sources"
+            }
+          }
+        }, {
+          "name" : "businessPartnerTargetExternalIds",
+          "in" : "query",
+          "description" : "Only show relations which have the given business partners as targets",
+          "required" : false,
+          "schema" : {
+            "type" : "array",
+            "description" : "Only show relations which have the given business partners as targets",
+            "items" : {
+              "type" : "string",
+              "description" : "Only show relations which have the given business partners as targets"
+            }
+          }
+        }, {
+          "name" : "updatedAtFrom",
+          "in" : "query",
+          "description" : "Only show relations which have been modified after the given time stamp",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "Only show relations which have been modified after the given time stamp"
+          }
+        }, {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Number of page to get results from",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Size of each page",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "maximum" : 100,
+            "minimum" : 0
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "A paginated list of business partner relations for the input stage",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageDtoRelationDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put" : {
+        "tags" : [ "relation-controller" ],
+        "summary" : "Update a business partner input relation",
+        "description" : "Update an existing business partner relation on the input stage. By using a request parameter it is also possible to create a relation if the relation with the given external identifier does not exist. ",
+        "operationId" : "put_1",
+        "parameters" : [ {
+          "name" : "createIfNotExist",
+          "in" : "query",
+          "description" : "If true a business partner relation will be created even if a relation could not be found under the given external identifier.",
+          "required" : false,
+          "schema" : {
+            "type" : "boolean",
+            "description" : "If true a business partner relation will be created even if a relation could not be found under the given external identifier."
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/RelationPutEntry"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "The given business partner relation has been updated.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/RelationDto"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "On wrong or insufficient user provided data like references to non-existent business partners or relations that violate the relation constraints. ",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/GateErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "relation-controller" ],
+        "summary" : "Create a new business partner input relation",
+        "description" : "Create a new relation between two business partner entries on the input stage. The external identifier is optional and a new one will be automatically created if not given. A given external identifier has to be unique.",
+        "operationId" : "post",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/RelationPostRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "description" : "The created business partner input relation",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/RelationDto"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "If the business partner could not be created based on wrong or insufficient data provided such as non-existent business partners or violated relation constraints. ",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/GateErrorResponse"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "If a relation with the given external identifier already exists",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/GateErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "relation-controller" ],
+        "summary" : "Delete an existing business partner relation",
+        "description" : "Delete a relation between two business partners on the input stage.",
+        "operationId" : "delete",
+        "parameters" : [ {
+          "name" : "externalId",
+          "in" : "query",
+          "description" : "The external identifier of the business partner relation to delete",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "The external identifier of the business partner relation to delete"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "The specified relation has been deleted."
+          },
+          "400" : {
+            "description" : "On specifying a relation that does not exist. ",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/GateErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v7/output/business-partners/search" : {
+      "post" : {
+        "tags" : [ "business-partner-controller" ],
+        "summary" : "Search business partners by an array of external IDs from the output stage",
+        "description" : "Get page of business partners output data filtered by a collection of external IDs. An empty external ID list will return a paginated list of all business partners.",
+        "operationId" : "getBusinessPartnersOutput",
+        "parameters" : [ {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Number of page to get results from",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Size of each page",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "maximum" : 100,
+            "minimum" : 0
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "array",
+                "items" : {
+                  "type" : "string"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "The requested page of business partners",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageDtoBusinessPartnerOutputDto"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "On malformed pagination request"
+          }
+        }
+      }
+    },
+    "/v7/output/business-partner-relations/search" : {
+      "post" : {
+        "tags" : [ "relation-controller" ],
+        "summary" : "Find business partner output relations",
+        "description" : "Find paginated list of business partner relations from the output stage. There are various filter criteria available. All filters are 'AND' filters.",
+        "operationId" : "postSearch",
+        "parameters" : [ {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Number of page to get results from",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Size of each page",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "maximum" : 100,
+            "minimum" : 0
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/RelationOutputSearchRequest"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "A paginated list of business partner relations for the input stage",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageDtoRelationOutputDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v7/input/business-partner-relations/search" : {
+      "post" : {
+        "tags" : [ "relation-controller" ],
+        "summary" : "Find business partner input relations",
+        "description" : "Find paginated list of business partner relations from the input stage. There are various filter criteria available. All filters are 'AND' filters.",
+        "operationId" : "postSearch_1",
+        "parameters" : [ {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Number of page to get results from",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Size of each page",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "maximum" : 100,
+            "minimum" : 0
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/RelationSearchRequest"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "A paginated list of business partner relations for the input stage",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageDtoRelationDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v7/sharing-state/ready" : {
       "post" : {
         "tags" : [ "sharing-state-controller" ],
         "summary" : "Sets the given business partners into ready to be shared state",
         "description" : "The business partners to set the ready state for are identified by their external-id. Only business partners in an initial or error state can be set to ready. If any given business partner could not be set into ready state for any reason (for example, it has not been found or it is in the wrong state) the whole request fails (all or nothing approach).",
         "operationId" : "postSharingStateReady",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/PostSharingStateReadyRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "204" : {
+            "description" : "All business partners put in ready to be shared state"
+          },
+          "400" : {
+            "description" : "Business partners can't be put into ready state (e.g. external-ID not found, wrong sharing state)"
+          }
+        }
+      }
+    },
+    "/v6/sharing-state/ready" : {
+      "post" : {
+        "tags" : [ "sharing-state-controller" ],
+        "summary" : "Sets the given business partners into ready to be shared state",
+        "description" : "The business partners to set the ready state for are identified by their external-id. Only business partners in an initial or error state can be set to ready. If any given business partner could not be set into ready state for any reason (for example, it has not been found or it is in the wrong state) the whole request fails (all or nothing approach).",
+        "operationId" : "postSharingStateReady_1",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -183,12 +627,65 @@
         }
       }
     },
+    "/v7/output/changelog/search" : {
+      "post" : {
+        "tags" : [ "changelog-controller" ],
+        "summary" : "Returns changelog entries for changes to the business partner output stage",
+        "description" : "Returns changelog entries as of a specified timestamp from the output stage, optionally filtered by timestamp, an array of external IDs and a business partner type.",
+        "operationId" : "getOutputChangelog_1",
+        "parameters" : [ {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Number of page to get results from",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Size of each page",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "maximum" : 100,
+            "minimum" : 0
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ChangelogSearchRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "The changelog entries for the specified parameters",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageChangeLogDtoChangelogGateDto"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "On malformed pagination request"
+          }
+        }
+      }
+    },
     "/v6/output/business-partners/search" : {
       "post" : {
         "tags" : [ "business-partner-controller" ],
         "summary" : "Search business partners by an array of external IDs from the output stage",
         "description" : "Get page of business partners output data filtered by a collection of external IDs. An empty external ID list will return a paginated list of all business partners.",
-        "operationId" : "getBusinessPartnersOutput",
+        "operationId" : "getBusinessPartnersOutput_1",
         "parameters" : [ {
           "name" : "page",
           "in" : "query",
@@ -238,48 +735,56 @@
         }
       }
     },
-    "/v6/output/business-partner-relations/search" : {
+    "/v6/input/partner-upload-process" : {
       "post" : {
-        "tags" : [ "relation-controller" ],
-        "summary" : "Find business partner output relations",
-        "description" : "Find paginated list of business partner relations from the output stage. There are various filter criteria available. All filters are 'AND' filters.",
-        "operationId" : "postSearch",
-        "parameters" : [ {
-          "name" : "page",
-          "in" : "query",
-          "description" : "Number of page to get results from",
-          "required" : false,
-          "schema" : {
-            "type" : "string",
-            "minimum" : 0
-          }
-        }, {
-          "name" : "size",
-          "in" : "query",
-          "description" : "Size of each page",
-          "required" : false,
-          "schema" : {
-            "type" : "string",
-            "maximum" : 100,
-            "minimum" : 0
-          }
-        } ],
+        "tags" : [ "partner-upload-controller" ],
+        "summary" : "Create or update business partners from uploaded CSV file",
+        "description" : "Create or update generic business partners. Updates instead of creating a new business partner if an already existing external ID is used. The same external ID may not occur more than once in a requested file. ",
+        "operationId" : "uploadPartnerCsvFile",
         "requestBody" : {
           "content" : {
-            "application/json" : {
+            "multipart/form-data" : {
               "schema" : {
-                "$ref" : "#/components/schemas/RelationOutputSearchRequest"
+                "type" : "object",
+                "properties" : {
+                  "file" : {
+                    "type" : "string",
+                    "format" : "binary"
+                  }
+                },
+                "required" : [ "file" ]
               }
             }
           }
         },
         "responses" : {
           "200" : {
-            "description" : "A paginated list of business partner relations for the input stage",
+            "description" : "Business partners were successfully updated or created",
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/PageDtoRelationOutputDto"
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/BusinessPartnerInputDto"
+                  }
+                }
+              },
+              "multipart/form-data" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/BusinessPartnerInputDto"
+                  }
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "On malformed Business partner upload request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/GateErrorResponse"
                 }
               }
             }
@@ -287,12 +792,12 @@
         }
       }
     },
-    "/v6/input/partner-upload-process" : {
+    "/v7/input/partner-upload-process" : {
       "post" : {
         "tags" : [ "partner-upload-controller" ],
         "summary" : "Create or update business partners from uploaded CSV file",
         "description" : "Create or update generic business partners. Updates instead of creating a new business partner if an already existing external ID is used. The same external ID may not occur more than once in a requested file. ",
-        "operationId" : "uploadPartnerCsvFile",
+        "operationId" : "uploadPartnerCsvFile_1",
         "requestBody" : {
           "content" : {
             "multipart/form-data" : {
@@ -397,6 +902,59 @@
         }
       }
     },
+    "/v7/input/changelog/search" : {
+      "post" : {
+        "tags" : [ "changelog-controller" ],
+        "summary" : "Returns changelog entries for changes to the business partner input stage",
+        "description" : "Returns changelog entries as of a specified timestamp from the input stage, optionally filtered by timestamp, an array of external IDs and a business partner type.",
+        "operationId" : "getInputChangelog_1",
+        "parameters" : [ {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Number of page to get results from",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Size of each page",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "maximum" : 100,
+            "minimum" : 0
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ChangelogSearchRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "The changelog entries for the specified parameters",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageChangeLogDtoChangelogGateDto"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "On malformed pagination request"
+          }
+        }
+      }
+    },
     "/v6/input/business-partners/search" : {
       "post" : {
         "tags" : [ "business-partner-controller" ],
@@ -452,12 +1010,12 @@
         }
       }
     },
-    "/v6/input/business-partner-relations/search" : {
+    "/v7/input/business-partners/search" : {
       "post" : {
-        "tags" : [ "relation-controller" ],
-        "summary" : "Find business partner input relations",
-        "description" : "Find paginated list of business partner relations from the input stage. There are various filter criteria available. All filters are 'AND' filters.",
-        "operationId" : "postSearch_1",
+        "tags" : [ "business-partner-controller" ],
+        "summary" : "Search business partner by external ID. An empty external ID list returns a paginated list of all business partners.",
+        "description" : "Get page of business partners filtered by a collection of external IDs.",
+        "operationId" : "getBusinessPartnersInput_1",
         "parameters" : [ {
           "name" : "page",
           "in" : "query",
@@ -482,161 +1040,36 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/RelationSearchRequest"
+                "type" : "array",
+                "items" : {
+                  "type" : "string"
+                }
               }
             }
           }
         },
         "responses" : {
           "200" : {
-            "description" : "A paginated list of business partner relations for the input stage",
+            "description" : "The requested page of busines partners",
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/PageDtoRelationDto"
+                  "$ref" : "#/components/schemas/PageDtoBusinessPartnerInputDto"
                 }
               }
             }
+          },
+          "400" : {
+            "description" : "On malformed pagination request"
           }
         }
       }
     },
-    "/v6/stats/{stage}/address-types" : {
-      "get" : {
-        "tags" : [ "stats-controller" ],
-        "operationId" : "countAddressTypes",
-        "parameters" : [ {
-          "name" : "stage",
-          "in" : "path",
-          "required" : true,
-          "schema" : {
-            "type" : "string",
-            "enum" : [ "Input", "Output" ]
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/StatsAddressTypesResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v6/stats/stages" : {
-      "get" : {
-        "tags" : [ "stats-controller" ],
-        "operationId" : "countPartnersPerStage",
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/StatsStagesResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v6/stats/sharing-states" : {
-      "get" : {
-        "tags" : [ "stats-controller" ],
-        "operationId" : "countPartnersBySharingState",
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/StatsSharingStatesResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v6/stats/confidence-criteria" : {
-      "get" : {
-        "tags" : [ "stats-controller" ],
-        "operationId" : "getConfidenceCriteriaStats",
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/StatsConfidenceCriteriaResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v6/sharing-state" : {
-      "get" : {
-        "tags" : [ "sharing-state-controller" ],
-        "summary" : "Returns sharing states of business partners, optionally filtered by a business partner type and an array of external IDs",
-        "operationId" : "getSharingStates",
-        "parameters" : [ {
-          "name" : "page",
-          "in" : "query",
-          "description" : "Number of page to get results from",
-          "required" : false,
-          "schema" : {
-            "type" : "string",
-            "minimum" : 0
-          }
-        }, {
-          "name" : "size",
-          "in" : "query",
-          "description" : "Size of each page",
-          "required" : false,
-          "schema" : {
-            "type" : "string",
-            "maximum" : 100,
-            "minimum" : 0
-          }
-        }, {
-          "name" : "externalIds",
-          "in" : "query",
-          "description" : "External IDs",
-          "required" : false,
-          "schema" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "Page of sharing states",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/PageDtoSharingStateDto"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v6/relations/sharing-state" : {
+    "/v7/relations/sharing-state" : {
       "get" : {
         "tags" : [ "sharing-state-controller" ],
         "summary" : "Returns sharing states of shared business partner relations which can be optionally filtered",
-        "operationId" : "get",
+        "operationId" : "get_1",
         "parameters" : [ {
           "name" : "externalIds",
           "in" : "query",
@@ -703,12 +1136,301 @@
         }
       }
     },
+    "/v6/stats/{stage}/address-types" : {
+      "get" : {
+        "tags" : [ "stats-controller" ],
+        "operationId" : "countAddressTypes",
+        "parameters" : [ {
+          "name" : "stage",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "Input", "Output" ]
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/StatsAddressTypesResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v7/stats/{stage}/address-types" : {
+      "get" : {
+        "tags" : [ "stats-controller" ],
+        "operationId" : "countAddressTypes_1",
+        "parameters" : [ {
+          "name" : "stage",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "Input", "Output" ]
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/StatsAddressTypesResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v7/stats/stages" : {
+      "get" : {
+        "tags" : [ "stats-controller" ],
+        "operationId" : "countPartnersPerStage",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/StatsStagesResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v6/stats/stages" : {
+      "get" : {
+        "tags" : [ "stats-controller" ],
+        "operationId" : "countPartnersPerStage_1",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/StatsStagesResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v6/stats/sharing-states" : {
+      "get" : {
+        "tags" : [ "stats-controller" ],
+        "operationId" : "countPartnersBySharingState",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/StatsSharingStatesResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v7/stats/sharing-states" : {
+      "get" : {
+        "tags" : [ "stats-controller" ],
+        "operationId" : "countPartnersBySharingState_1",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/StatsSharingStatesResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v6/stats/confidence-criteria" : {
+      "get" : {
+        "tags" : [ "stats-controller" ],
+        "operationId" : "getConfidenceCriteriaStats",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/StatsConfidenceCriteriaResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v7/stats/confidence-criteria" : {
+      "get" : {
+        "tags" : [ "stats-controller" ],
+        "operationId" : "getConfidenceCriteriaStats_1",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/StatsConfidenceCriteriaResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v7/sharing-state" : {
+      "get" : {
+        "tags" : [ "sharing-state-controller" ],
+        "summary" : "Returns sharing states of business partners, optionally filtered by a business partner type and an array of external IDs",
+        "operationId" : "getSharingStates",
+        "parameters" : [ {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Number of page to get results from",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Size of each page",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "maximum" : 100,
+            "minimum" : 0
+          }
+        }, {
+          "name" : "externalIds",
+          "in" : "query",
+          "description" : "External IDs",
+          "required" : false,
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Page of sharing states",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageDtoSharingStateDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v6/sharing-state" : {
+      "get" : {
+        "tags" : [ "sharing-state-controller" ],
+        "summary" : "Returns sharing states of business partners, optionally filtered by a business partner type and an array of external IDs",
+        "operationId" : "getSharingStates_1",
+        "parameters" : [ {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Number of page to get results from",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Size of each page",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "maximum" : 100,
+            "minimum" : 0
+          }
+        }, {
+          "name" : "externalIds",
+          "in" : "query",
+          "description" : "External IDs",
+          "required" : false,
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Page of sharing states",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageDtoSharingStateDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v6/input/partner-upload-template" : {
       "get" : {
         "tags" : [ "partner-upload-controller" ],
         "summary" : "Get CSV template with headers in file",
         "description" : "Create empty CSV file template including headers.Generated CSV file can later be used for uploading business partner data.",
         "operationId" : "getPartnerCsvTemplate",
+        "responses" : {
+          "200" : {
+            "description" : "CSV file template generated successfully",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "string",
+                  "format" : "binary"
+                }
+              },
+              "multipart/form-data" : {
+                "schema" : {
+                  "type" : "string",
+                  "format" : "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v7/input/partner-upload-template" : {
+      "get" : {
+        "tags" : [ "partner-upload-controller" ],
+        "summary" : "Get CSV template with headers in file",
+        "description" : "Create empty CSV file template including headers.Generated CSV file can later be used for uploading business partner data.",
+        "operationId" : "getPartnerCsvTemplate_1",
         "responses" : {
           "200" : {
             "description" : "CSV file template generated successfully",
@@ -1710,6 +2432,30 @@
             "description" : "Only show relations which have been modified after the given time stamp"
           }
         }
+      },
+      "RelationPostRequest" : {
+        "type" : "object",
+        "description" : "A request to create a new relation between two business partners",
+        "properties" : {
+          "externalId" : {
+            "type" : "string",
+            "description" : "The identifier under which the relation will be referenced. If not given a unique identifier will be automatically assigned by the system. A given external identifier needs be unique."
+          },
+          "relationType" : {
+            "type" : "string",
+            "description" : "The type of relation that should be created",
+            "enum" : [ "IsManagedBy", "IsAlternativeHeadquarterFor" ]
+          },
+          "businessPartnerSourceExternalId" : {
+            "type" : "string",
+            "description" : "The external identifier of the business partner from which the relation should emerge (the source)"
+          },
+          "businessPartnerTargetExternalId" : {
+            "type" : "string",
+            "description" : "The external identifier of the business partner to which the relation should point (the target)"
+          }
+        },
+        "required" : [ "businessPartnerSourceExternalId", "businessPartnerTargetExternalId", "relationType" ]
       },
       "RelationPutEntry" : {
         "type" : "object",

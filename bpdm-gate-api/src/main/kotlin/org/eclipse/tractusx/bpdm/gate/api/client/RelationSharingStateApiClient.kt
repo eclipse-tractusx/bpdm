@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.api.client
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.gate.api.ApiCommons
 import org.eclipse.tractusx.bpdm.gate.api.GateRelationSharingStateApi
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateType
@@ -30,10 +31,10 @@ import org.springframework.web.service.annotation.GetExchange
 import org.springframework.web.service.annotation.HttpExchange
 import java.time.Instant
 
-@HttpExchange(GateRelationSharingStateApi.RELATION_SHARING_STATE_PATH)
+@HttpExchange
 interface RelationSharingStateApiClient: GateRelationSharingStateApi {
 
-    @GetExchange
+    @GetExchange(value = ApiCommons.RELATION_SHARING_STATE_PATH_V7)
     override fun get(
         @RequestParam(required = false) externalIds: Collection<String>?,
         @RequestParam(required = false) sharingStateTypes: Collection<RelationSharingStateType>?,

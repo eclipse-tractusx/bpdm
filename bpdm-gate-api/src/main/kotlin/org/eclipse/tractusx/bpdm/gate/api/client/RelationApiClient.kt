@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.api.client
 import jakarta.validation.Valid
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.gate.api.ApiCommons
 import org.eclipse.tractusx.bpdm.gate.api.GateRelationApi
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationDto
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
@@ -34,15 +35,15 @@ import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
 import org.springframework.web.service.annotation.PutExchange
 
-@HttpExchange(GateRelationApi.RELATIONS_PATH)
+@HttpExchange
 interface RelationApiClient: GateRelationApi {
 
-    @PostExchange("/search")
+    @PostExchange(value = "${ApiCommons.RELATIONS_INPUT_PATH_V7}/search")
     override fun postSearch(
         @RequestBody searchRequest: RelationSearchRequest,
         @ParameterObject @Valid paginationRequest: PaginationRequest
     ): PageDto<RelationDto>
 
-    @PutExchange
+    @PutExchange(value = ApiCommons.RELATIONS_INPUT_PATH_V7)
     override fun put(@RequestParam createIfNotExist: Boolean, @RequestBody requestBody: RelationPutRequest): RelationPutResponse
 }

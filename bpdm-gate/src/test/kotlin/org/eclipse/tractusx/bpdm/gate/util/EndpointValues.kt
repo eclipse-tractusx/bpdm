@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.util
 import org.eclipse.tractusx.bpdm.gate.api.ApiCommons
 
 object EndpointValues {
-    const val GATE_API_INPUT_PATH = "${ApiCommons.BASE_PATH}/input"
+    const val GATE_API_INPUT_PATH = "${ApiCommons.BASE_PATH_V7}/input"
     const val GATE_API_INPUT_LEGAL_ENTITIES_PATH = "${GATE_API_INPUT_PATH}/legal-entities"
 
 

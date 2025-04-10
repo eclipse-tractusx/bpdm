@@ -26,7 +26,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import jakarta.validation.Valid
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.gate.api.GateBusinessPartnerApi.Companion.BUSINESS_PARTNER_PATH
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
@@ -38,12 +37,8 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 
-@RequestMapping(BUSINESS_PARTNER_PATH, produces = [MediaType.APPLICATION_JSON_VALUE])
+@RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
 interface GateBusinessPartnerApi {
-
-    companion object{
-        const val BUSINESS_PARTNER_PATH = ApiCommons.BASE_PATH
-    }
 
     @Operation(
         summary = "Create or update business partner with given external ID",
@@ -58,7 +53,7 @@ interface GateBusinessPartnerApi {
             ApiResponse(responseCode = "400", description = "On malformed legal entity request", content = [Content()]),
         ]
     )
-    @PutMapping("/input/business-partners")
+    @PutMapping(value = ["${ApiCommons.BASE_PATH_V6}/input/business-partners", "${ApiCommons.BASE_PATH_V7}/input/business-partners"])
     fun upsertBusinessPartnersInput(@RequestBody businessPartners: Collection<BusinessPartnerInputRequest>): ResponseEntity<Collection<BusinessPartnerInputDto>>
 
     @Operation(
@@ -71,7 +66,7 @@ interface GateBusinessPartnerApi {
             ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()]),
         ]
     )
-    @PostMapping("/input/business-partners/search")
+    @PostMapping(value = ["${ApiCommons.BASE_PATH_V6}/input/business-partners/search", "${ApiCommons.BASE_PATH_V7}/input/business-partners/search"])
     fun getBusinessPartnersInput(
         @RequestBody externalIds: Collection<String>? = null,
         @ParameterObject @Valid paginationRequest: PaginationRequest = PaginationRequest()
@@ -89,7 +84,7 @@ interface GateBusinessPartnerApi {
             ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()]),
         ]
     )
-    @PostMapping("/output/business-partners/search")
+    @PostMapping(value = ["${ApiCommons.BASE_PATH_V7}/output/business-partners/search"])
     fun getBusinessPartnersOutput(
         @RequestBody externalIds: Collection<String>? = null,
         @ParameterObject @Valid paginationRequest: PaginationRequest = PaginationRequest()

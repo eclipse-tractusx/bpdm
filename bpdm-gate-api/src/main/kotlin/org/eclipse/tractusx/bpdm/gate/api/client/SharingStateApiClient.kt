@@ -24,6 +24,7 @@ import jakarta.validation.Valid
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.gate.api.ApiCommons
 import org.eclipse.tractusx.bpdm.gate.api.GateSharingStateApi
 import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
@@ -34,15 +35,15 @@ import org.springframework.web.service.annotation.GetExchange
 import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
 
-@HttpExchange(GateSharingStateApi.SHARING_STATE_PATH)
+@HttpExchange
 interface SharingStateApiClient : GateSharingStateApi {
-    @GetExchange
+    @GetExchange(value = ApiCommons.SHARING_STATE_PATH_V7)
     override fun getSharingStates(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @Parameter(description = "External IDs") @RequestParam(required = false) externalIds: Collection<String>?
     ): PageDto<SharingStateDto>
 
-    @PostExchange("/ready")
+    @PostExchange(value = "${ApiCommons.SHARING_STATE_PATH_V7}/ready")
     override fun postSharingStateReady(@RequestBody request: PostSharingStateReadyRequest)
 
 }

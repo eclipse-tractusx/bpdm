@@ -17,17 +17,17 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.api
+package org.eclipse.tractusx.bpdm.gate.api.v6
 
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
-import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationOutputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationOutputSearchRequest
+import org.eclipse.tractusx.bpdm.gate.api.ApiCommons
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.BusinessPartnerOutputDto
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PostMapping
@@ -35,23 +35,23 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 
 @RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
-interface GateRelationOutputApi {
+interface GateBusinessPartnerApi {
 
     @Operation(
-        summary = "Find business partner output relations",
-        description = "Find paginated list of business partner relations from the output stage. " +
-                "There are various filter criteria available. " +
-                "All filters are 'AND' filters."
+        summary = "Search business partners by an array of external IDs from the output stage",
+        description = "Get page of business partners output data filtered by a collection of external IDs. " +
+                "An empty external ID list will return a paginated list of all business partners."
     )
     @ApiResponses(
         value = [
-            ApiResponse(responseCode = "200", description = "A paginated list of business partner relations for the input stage")
+            ApiResponse(responseCode = "200", description = "The requested page of business partners"),
+            ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()]),
         ]
     )
-    @Tag(name = "relation-controller")
-    @PostMapping(value = ["${ApiCommons.RELATIONS_OUTPUT_PATH_V7}/search"])
-    fun postSearch(
-        @RequestBody searchRequest: RelationOutputSearchRequest = RelationOutputSearchRequest(),
+    @PostMapping(value = ["${ApiCommons.BASE_PATH_V6}/output/business-partners/search"])
+    fun getBusinessPartnersOutput(
+        @RequestBody externalIds: Collection<String>? = null,
         @ParameterObject @Valid paginationRequest: PaginationRequest = PaginationRequest()
-    ): PageDto<RelationOutputDto>
+    ): PageDto<BusinessPartnerOutputDto>
+
 }

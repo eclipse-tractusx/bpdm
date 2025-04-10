@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.api.client
 
 import jakarta.validation.Valid
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.gate.api.ApiCommons
 import org.eclipse.tractusx.bpdm.gate.api.GateChangelogApi
 import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
@@ -30,15 +31,15 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
 
-@HttpExchange(GateChangelogApi.CHANGELOG_PATH)
+@HttpExchange
 interface ChangelogApiClient : GateChangelogApi {
-    @PostExchange("/input/changelog/search")
+    @PostExchange(value = "${ApiCommons.BASE_PATH_V7}/input/changelog/search")
     override fun getInputChangelog(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @RequestBody searchRequest: ChangelogSearchRequest
     ): PageChangeLogDto<ChangelogGateDto>
 
-    @PostExchange("/output/changelog/search")
+    @PostExchange(value = "${ApiCommons.BASE_PATH_V7}/output/changelog/search")
     override fun getOutputChangelog(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @RequestBody searchRequest: ChangelogSearchRequest

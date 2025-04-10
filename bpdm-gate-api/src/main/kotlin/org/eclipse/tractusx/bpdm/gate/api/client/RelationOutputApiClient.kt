@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.api.client
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.gate.api.ApiCommons
 import org.eclipse.tractusx.bpdm.gate.api.GateRelationOutputApi
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationOutputSearchRequest
@@ -29,9 +30,9 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
 
-@HttpExchange(GateRelationOutputApi.RELATIONS_OUTPUT_PATH)
+@HttpExchange
 interface RelationOutputApiClient: GateRelationOutputApi {
 
-    @PostExchange("/search")
+    @PostExchange(value = "${ApiCommons.RELATIONS_OUTPUT_PATH_V7}/search")
     override fun postSearch(@RequestBody searchRequest: RelationOutputSearchRequest, @ParameterObject paginationRequest: PaginationRequest): PageDto<RelationOutputDto>
 }

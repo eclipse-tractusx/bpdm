@@ -24,22 +24,16 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import jakarta.validation.Valid
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.gate.api.GateSharingStateApi.Companion.SHARING_STATE_PATH
 import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
 
-@RequestMapping(SHARING_STATE_PATH, produces = [MediaType.APPLICATION_JSON_VALUE])
+@RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
 interface GateSharingStateApi {
-
-    companion object{
-        const val SHARING_STATE_PATH = "${ApiCommons.BASE_PATH}/sharing-state"
-    }
 
     @Operation(
         summary = "Returns sharing states of business partners, optionally filtered by a business partner type and an array of external IDs"
@@ -49,7 +43,7 @@ interface GateSharingStateApi {
             ApiResponse(responseCode = "200", description = "Page of sharing states")
         ]
     )
-    @GetMapping
+    @GetMapping(value = [ApiCommons.SHARING_STATE_PATH_V6, ApiCommons.SHARING_STATE_PATH_V7])
     fun getSharingStates(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @Parameter(description = "External IDs") @RequestParam(required = false) externalIds: Collection<String>?
@@ -65,6 +59,6 @@ interface GateSharingStateApi {
             ApiResponse(responseCode = "400", description = "Business partners can't be put into ready state (e.g. external-ID not found, wrong sharing state)")
         ]
     )
-    @PostMapping("/ready")
+    @PostMapping(value = ["${ApiCommons.SHARING_STATE_PATH_V6}/ready", "${ApiCommons.SHARING_STATE_PATH_V7}/ready"])
     fun postSharingStateReady(@RequestBody request: PostSharingStateReadyRequest)
 }
