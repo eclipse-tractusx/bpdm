@@ -28,10 +28,7 @@ import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.ConfidenceCriteriaDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
-import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressComponentOutputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityRepresentationOutputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteRepresentationOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.*
 import java.time.Duration
 
 class StepUtils(
@@ -76,16 +73,16 @@ class StepUtils(
         } as String
     }
 
-    fun waitForOutputRelation(externalId: String): BusinessPartnerOutputDto = runBlocking {
+    fun waitForOutputRelation(externalId: String, expectedRelation: BusinessPartnerOutputRelationDto) = runBlocking {
         println("Waiting business partner getting relation for $externalId ...")
         withTimeout(Duration.ofMinutes(1)) {
             while (true) {
                 val businessPartner = gateClient.businessParters.getBusinessPartnersOutput(externalIds = listOf(externalId)).content.single()
-                if(businessPartner.legalEntity.relations.isNotEmpty())
-                    return@withTimeout businessPartner
+                if(businessPartner.legalEntity.relations.contains(expectedRelation))
+                    return@withTimeout
                 delay(Duration.ofSeconds(10))
             }
-        } as BusinessPartnerOutputDto
+        }
     }
 
 
