@@ -80,7 +80,7 @@ bpdm:
         client-secret: "**********"
   tasks:
     # When and how often the Pool should poll for golden record tasks in the orchestrator
-    cron: '*/30 * * * * *'
+    cron: '10/30 * * * * *'
     # Up to how many tasks can be requested at the same time
     batchSize: 20
     step: "PoolSync"

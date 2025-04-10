@@ -55,7 +55,7 @@ bpdm:
 
   cleaningService:
     # When and how often the cleaning service should poll for golden record tasks in the orchestrator
-    pollingCron: "*/30 * * * * *"
+    pollingCron: "5/30 * * * * *"
   security:
     # Disable security as there is no API to secure
     enabled: false

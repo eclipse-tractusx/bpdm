@@ -46,19 +46,19 @@ bpdm:
         # If false, new business partner input data need to be manually set to ready
         starts-as-ready: true
         # When and how often the Gate checks for new business partner data to be shared
-        cron: '*/30 * * * * *'
+        cron: '0/30 * * * * *'
         # Up to how many golden record tasks can be created at once when checking
         batchSize: 20
       fromPool:
         # Up to how many golden record tasks can be created at once when checking
         batchSize: 20
         # When and how often the Gate checks for golden record updates from the Pool
-        cron: '*/30 * * * * *'
+        cron: '20/30 * * * * *'
     check:
       # How many golden record tasks should be tried to resolve at once
       batchSize: 20
       # How often golden record tasks should be tried to resolve
-      cron: '*/30 * * * * *'
+      cron: '15/30 * * * * *'
     healthCheck:
       # How many golden record tasks should be checked for being healthy at once
       batchSize: 1000
@@ -81,7 +81,7 @@ bpdm:
       # How many relation tasks should be tried to resolve at once
       batchSize: 20
       # How often relation tasks should be tried to resolve
-      cron: '*/30 * * * * *'
+      cron: '15/30 * * * * *'
 
   # Connection to the pool and orchestrator
   client:
