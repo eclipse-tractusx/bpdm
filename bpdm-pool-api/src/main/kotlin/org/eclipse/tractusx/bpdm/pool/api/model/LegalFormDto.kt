@@ -36,7 +36,7 @@ data class LegalFormDto(
     val transliteratedName: String?,
 
     @get:Schema(description = LegalFormDescription.abbreviation)
-    val abbreviation: String? = null,
+    val abbreviations: String? = null,
 
     val country: CountryCode?,
 

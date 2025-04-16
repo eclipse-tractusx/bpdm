@@ -70,7 +70,7 @@ class OrchestratorMappings(
                 identifiers = entity.identifiers.filter { it.businessPartnerType == BusinessPartnerType.LEGAL_ENTITY }.map { Identifier(it.value, it.type, it.issuingBody) },
                 states = entity.states.filter { it.businessPartnerTyp == BusinessPartnerType.LEGAL_ENTITY }.map { toState(it) },
                 confidenceCriteria = toConfidenceCriteria(entity.legalEntityConfidence),
-                isCatenaXMemberData = null,
+                isParticipantData = null,
                 hasChanged = true,
                 legalAddress = postalAddress.takeIf { entity.postalAddress.addressType == AddressType.LegalAddress || entity.postalAddress.addressType == AddressType.LegalAndSiteMainAddress } ?: PostalAddress.empty
             ),

@@ -22,10 +22,10 @@ package org.eclipse.tractusx.bpdm.pool.api.client
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.ApiCommons
-import org.eclipse.tractusx.bpdm.pool.api.PoolCxMembershipApi
-import org.eclipse.tractusx.bpdm.pool.api.model.CxMembershipDto
-import org.eclipse.tractusx.bpdm.pool.api.model.request.CxMembershipSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.CxMembershipUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.api.PoolDataSpaceParticipantsApi
+import org.eclipse.tractusx.bpdm.pool.api.model.DataSpaceParticipantDto
+import org.eclipse.tractusx.bpdm.pool.api.model.request.DataSpaceParticipantSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.DataSpaceParticipantUpdateRequest
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.service.annotation.GetExchange
@@ -33,12 +33,12 @@ import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PutExchange
 
 @HttpExchange
-interface CxMembershipApiClient: PoolCxMembershipApi {
+interface DataSpaceParticipantsApiClient: PoolDataSpaceParticipantsApi {
 
     @GetExchange(value = ApiCommons.MEMBERSHIP_BASE_PATH_V7)
-    override fun get(@ParameterObject searchRequest: CxMembershipSearchRequest, @ParameterObject paginationRequest: PaginationRequest): PageDto<CxMembershipDto>
+    override fun get(@ParameterObject searchRequest: DataSpaceParticipantSearchRequest, @ParameterObject paginationRequest: PaginationRequest): PageDto<DataSpaceParticipantDto>
 
     @PutExchange(value = ApiCommons.MEMBERSHIP_BASE_PATH_V7)
-    override fun put(@RequestBody updateRequest: CxMembershipUpdateRequest)
+    override fun put(@RequestBody updateRequest: DataSpaceParticipantUpdateRequest)
 
 }

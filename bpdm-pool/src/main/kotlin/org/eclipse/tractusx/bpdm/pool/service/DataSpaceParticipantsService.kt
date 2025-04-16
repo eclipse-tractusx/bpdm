@@ -27,9 +27,9 @@ import org.eclipse.tractusx.bpdm.common.mapping.ValidationContext.Companion.from
 import org.eclipse.tractusx.bpdm.common.mapping.types.BpnLString
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
-import org.eclipse.tractusx.bpdm.pool.api.model.CxMembershipDto
-import org.eclipse.tractusx.bpdm.pool.api.model.request.CxMembershipSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.CxMembershipUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.DataSpaceParticipantDto
+import org.eclipse.tractusx.bpdm.pool.api.model.request.DataSpaceParticipantSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.DataSpaceParticipantUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.springframework.data.domain.PageRequest
@@ -38,30 +38,30 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-class CxMembershipService(
+class DataSpaceParticipantsService(
     private val legalEntityRepository: LegalEntityRepository,
     private val changelogService: PartnerChangelogService
 ) {
-    fun searchMemberships(searchRequest: CxMembershipSearchRequest, paginationRequest: PaginationRequest): PageDto<CxMembershipDto>{
-        searchRequest.bpnLs?.let { BpnLString.assert(it, fromRoot(CxMembershipSearchRequest::class, "searchRequest", CxMembershipSearchRequest::bpnLs)) }
+    fun searchMemberships(searchRequest: DataSpaceParticipantSearchRequest, paginationRequest: PaginationRequest): PageDto<DataSpaceParticipantDto>{
+        searchRequest.bpnLs?.let { BpnLString.assert(it, fromRoot(DataSpaceParticipantSearchRequest::class, "searchRequest", DataSpaceParticipantSearchRequest::bpnLs)) }
 
         val spec = Specification.allOf(
             LegalEntityRepository.byBpns(searchRequest.bpnLs),
-            LegalEntityRepository.byIsMember(searchRequest.isCatenaXMember)
+            LegalEntityRepository.byIsMember(searchRequest.isDataSpaceParticipant)
         )
         val legalEntityPage = legalEntityRepository.findAll(spec, PageRequest.of(paginationRequest.page, paginationRequest.size))
 
-        return legalEntityPage.toPageDto { CxMembershipDto(it.bpn, it.isCatenaXMemberData) }
+        return legalEntityPage.toPageDto { DataSpaceParticipantDto(it.bpn, it.isCatenaXMemberData) }
     }
 
     @Transactional
-    fun updateMemberships(updateRequest: CxMembershipUpdateRequest){
+    fun updateMemberships(updateRequest: DataSpaceParticipantUpdateRequest){
         BpnLString.assert(
-            updateRequest.memberships.map { it.bpnL },
-            fromRoot(CxMembershipUpdateRequest::class, "updateRequest", CxMembershipUpdateRequest::memberships, CxMembershipDto::bpnL)
+            updateRequest.participants.map { it.bpnL },
+            fromRoot(DataSpaceParticipantUpdateRequest::class, "updateRequest", DataSpaceParticipantUpdateRequest::participants, DataSpaceParticipantDto::bpnL)
         )
 
-        val updatesByBpnL = updateRequest.memberships.associate { Pair(it.bpnL, it.isCatenaXMember) }
+        val updatesByBpnL = updateRequest.participants.associate { Pair(it.bpnL, it.isDataSpaceParticipant) }
 
         val foundLegalEntities = legalEntityRepository.findDistinctByBpnIn(updatesByBpnL.keys)
 

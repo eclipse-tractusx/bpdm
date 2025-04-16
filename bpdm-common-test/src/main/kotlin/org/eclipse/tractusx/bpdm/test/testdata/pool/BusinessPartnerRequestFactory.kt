@@ -45,13 +45,13 @@ class BusinessPartnerRequestFactory(
 
     fun createLegalEntityRequest(
         seed: String,
-        isCatenaXMemberData: Boolean = true
+        isParticipantData: Boolean = true
     ): LegalEntityPartnerCreateRequest {
         val longSeed = seed.hashCode().toLong()
         val random = Random(longSeed)
 
         return LegalEntityPartnerCreateRequest(
-            legalEntity = createLegalEntityDto(seed, random, isCatenaXMemberData),
+            legalEntity = createLegalEntityDto(seed, random, isParticipantData),
             legalAddress = createAddressDto(seed, random),
             index = seed
         )
@@ -90,7 +90,7 @@ class BusinessPartnerRequestFactory(
                 nextConfidenceCheckAt = timeStamp.plusDays(7),
                 confidenceLevel = 5
             ),
-            isCatenaXMemberData = isCatenaXMemberData
+            isParticipantData = isCatenaXMemberData
         )
     }
 

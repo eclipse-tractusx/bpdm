@@ -88,7 +88,7 @@ class ResponseMapper {
                 identifiers = toIdentifiers(businessPartner, IdentifierDb.Scope.LegalEntity),
                 states = toStates(businessPartner, BusinessStateDb.Scope.LegalEntity),
                 confidenceCriteria = toConfidence(businessPartner, ConfidenceCriteriaDb.Scope.LegalEntity),
-                isCatenaXMemberData = isCatenaXMemberData,
+                isParticipantData = isCatenaXMemberData,
                 hasChanged = legalEntityHasChanged,
                 legalAddress = toPostalAddressOrEmpty(businessPartner, PostalAddressDb.Scope.LegalAddress)!!
             )

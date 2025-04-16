@@ -129,7 +129,7 @@ object BusinessPartnerGenericCommonValues {
             ),
             identifiers = emptyList(),
             states = emptyList(),
-            isCatenaXMemberData = false,
+            isParticipantData = false,
             hasChanged = true,
             legalAddress = address
         ),

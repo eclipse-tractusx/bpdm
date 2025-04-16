@@ -91,5 +91,5 @@ fun BusinessPartner.copyWithBpnRequests() =
 
 fun BusinessPartner.copyAsCxMemberData() =
     copy(
-        legalEntity = legalEntity.copy(isCatenaXMemberData = true)
+        legalEntity = legalEntity.copy(isParticipantData = true)
     )

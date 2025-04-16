@@ -73,7 +73,7 @@ fun LegalEntityDb.toDto(): LegalEntityVerboseDto {
         relations = startNodeRelations.plus(endNodeRelations).map { it.toDto() },
         currentness = currentness,
         confidenceCriteria = confidenceCriteria.toDto(),
-        isCatenaXMemberData = isCatenaXMemberData,
+        isParticipantData = isCatenaXMemberData,
         createdAt = createdAt,
         updatedAt = updatedAt,
     )
@@ -101,7 +101,7 @@ fun LegalFormDb.toDto(): LegalFormDto {
         technicalKey = technicalKey,
         name = name,
         transliteratedName = transliteratedName,
-        abbreviation = abbreviation,
+        abbreviations = abbreviation,
         transliteratedAbbreviations = transliteratedAbbreviations,
         country = countryCode,
         language = languageCode,
@@ -135,7 +135,7 @@ fun LogisticAddressDb.toDto(): LogisticAddressVerboseDto {
         physicalPostalAddress = physicalPostalAddress.toDto(),
         alternativePostalAddress = alternativePostalAddress?.toDto(),
         confidenceCriteria = confidenceCriteria.toDto(),
-        isCatenaXMemberData = legalEntity?.isCatenaXMemberData ?: site?.legalEntity?.isCatenaXMemberData ?: false,
+        isParticipantData = legalEntity?.isCatenaXMemberData ?: site?.legalEntity?.isCatenaXMemberData ?: false,
         addressType = getAddressType(this)
     )
 }
@@ -240,7 +240,7 @@ fun SiteDb.toDto(): SiteVerboseDto {
         states = states.map { it.toDto() },
         bpnLegalEntity = legalEntity.bpn,
         confidenceCriteria = confidenceCriteria.toDto(),
-        isCatenaXMemberData = legalEntity.isCatenaXMemberData,
+        isParticipantData = legalEntity.isCatenaXMemberData,
         createdAt = createdAt,
         updatedAt = updatedAt,
     )
@@ -255,7 +255,7 @@ fun SiteDb.toPoolDto(): SiteWithMainAddressVerboseDto {
             states = states.map { it.toDto() },
             bpnLegalEntity = legalEntity.bpn,
             confidenceCriteria = confidenceCriteria.toDto(),
-            isCatenaXMemberData = legalEntity.isCatenaXMemberData,
+            isParticipantData = legalEntity.isCatenaXMemberData,
             createdAt = createdAt,
             updatedAt = updatedAt,
         ),

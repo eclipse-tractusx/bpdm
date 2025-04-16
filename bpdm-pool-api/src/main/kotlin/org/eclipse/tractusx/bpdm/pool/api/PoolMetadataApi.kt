@@ -60,7 +60,7 @@ interface PoolMetadataApi {
         ]
     )
     @Tag(name = ApiCommons.METADATA_NAME, description = ApiCommons.METADATA_DESCRIPTION)
-    @PostMapping(value = ["${ApiCommons.BASE_PATH_V6}/identifier-types", "${ApiCommons.BASE_PATH_V7}/identifier-types"])
+    @PostMapping(value = ["${ApiCommons.BASE_PATH_V7}/identifier-types"])
     fun createIdentifierType(@RequestBody identifierType: IdentifierTypeDto): IdentifierTypeDto
 
     @Operation(
@@ -74,7 +74,7 @@ interface PoolMetadataApi {
         ]
     )
     @Tag(name = ApiCommons.METADATA_NAME, description = ApiCommons.METADATA_DESCRIPTION)
-    @GetMapping(value = ["${ApiCommons.BASE_PATH_V6}/identifier-types", "${ApiCommons.BASE_PATH_V7}/identifier-types"])
+    @GetMapping(value = ["${ApiCommons.BASE_PATH_V7}/identifier-types"])
     fun getIdentifierTypes(
         @ParameterObject paginationRequest: PaginationRequest,
         @Parameter businessPartnerType: IdentifierBusinessPartnerType,
@@ -96,7 +96,7 @@ interface PoolMetadataApi {
         ]
     )
     @Tag(name = ApiCommons.METADATA_NAME, description = ApiCommons.METADATA_DESCRIPTION)
-    @PostMapping(value = ["${ApiCommons.BASE_PATH_V6}/legal-forms", "${ApiCommons.BASE_PATH_V7}/legal-forms"])
+    @PostMapping(value = ["${ApiCommons.BASE_PATH_V7}/legal-forms"])
     fun createLegalForm(@RequestBody type: LegalFormRequest): LegalFormDto
 
     @Operation(
@@ -110,7 +110,7 @@ interface PoolMetadataApi {
         ]
     )
     @Tag(name = ApiCommons.METADATA_NAME, description = ApiCommons.METADATA_DESCRIPTION)
-    @GetMapping(value = ["${ApiCommons.BASE_PATH_V6}/legal-forms", "${ApiCommons.BASE_PATH_V7}/legal-forms"])
+    @GetMapping(value = ["${ApiCommons.BASE_PATH_V7}/legal-forms"])
     fun getLegalForms(@ParameterObject paginationRequest: PaginationRequest): PageDto<LegalFormDto>
 
 

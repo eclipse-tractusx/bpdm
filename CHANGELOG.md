@@ -15,6 +15,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - Gate: Replace GET endpoint for business partner relations with a POST search endpoint having the same capabilties [#1264](https://github.com/eclipse-tractusx/bpdm/issues/1264)
 - Gate: Replaced PUT endpoint for business partner relations with a bulk upsert variant [#1264](https://github.com/eclipse-tractusx/bpdm/issues/1264)
 - Gate: Removed constraint checks when upserting business partner relations ([1288](https://github.com/eclipse-tractusx/bpdm/issues/1288))
+- App: Renamed api attributes/fields with corresponding 25.06 standards for BPDM Pool, Gate and Orchestrator Services([#1304](https://github.com/eclipse-tractusx/bpdm/issues/1304))
 
 ### Added
 

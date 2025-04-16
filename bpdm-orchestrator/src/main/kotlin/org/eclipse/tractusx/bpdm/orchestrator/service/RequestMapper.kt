@@ -40,7 +40,7 @@ class RequestMapper {
                 siteExists = site != null,
                 siteName = site?.siteName,
                 legalForm = legalEntity.legalForm,
-                isCatenaXMemberData = legalEntity.isCatenaXMemberData,
+                isCatenaXMemberData = legalEntity.isParticipantData,
                 owningCompany = owningCompany,
                 legalEntityHasChanged = legalEntity.hasChanged,
                 siteHasChanged = site?.hasChanged

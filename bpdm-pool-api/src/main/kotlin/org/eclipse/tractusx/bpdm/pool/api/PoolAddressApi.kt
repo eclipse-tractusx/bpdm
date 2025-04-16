@@ -55,7 +55,7 @@ interface PoolAddressApi {
         ]
     )
     @Tag(name = ApiCommons.ADDRESS_NAME, description = ApiCommons.ADDRESS_DESCRIPTION)
-    @GetMapping(value = [ApiCommons.ADDRESS_BASE_PATH_V6, ApiCommons.ADDRESS_BASE_PATH_V7])
+    @GetMapping(value = [ApiCommons.ADDRESS_BASE_PATH_V7])
     fun getAddresses(
         @ParameterObject addressSearchRequest: AddressSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
@@ -73,7 +73,7 @@ interface PoolAddressApi {
         ]
     )
     @Tag(name = ApiCommons.ADDRESS_NAME, description = ApiCommons.ADDRESS_DESCRIPTION)
-    @GetMapping(value = ["${ApiCommons.ADDRESS_BASE_PATH_V6}/{bpna}", "${ApiCommons.ADDRESS_BASE_PATH_V7}/{bpna}"])
+    @GetMapping(value = ["${ApiCommons.ADDRESS_BASE_PATH_V7}/{bpna}"])
     fun getAddress(
         @Parameter(description = "BPNA value") @PathVariable bpna: String
     ): LogisticAddressVerboseDto
@@ -89,7 +89,7 @@ interface PoolAddressApi {
         ]
     )
     @Tag(name = ApiCommons.ADDRESS_NAME, description = ApiCommons.ADDRESS_DESCRIPTION)
-    @PostMapping(value = ["${ApiCommons.ADDRESS_BASE_PATH_V6}${CommonApiPathNames.SUBPATH_SEARCH}", "${ApiCommons.ADDRESS_BASE_PATH_V7}${CommonApiPathNames.SUBPATH_SEARCH}"])
+    @PostMapping(value = ["${ApiCommons.ADDRESS_BASE_PATH_V7}${CommonApiPathNames.SUBPATH_SEARCH}"])
     fun searchAddresses(
         @RequestBody searchRequest: AddressSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
@@ -109,7 +109,7 @@ interface PoolAddressApi {
         ]
     )
     @Tag(name = ApiCommons.ADDRESS_NAME, description = ApiCommons.ADDRESS_DESCRIPTION)
-    @PostMapping(value = [ApiCommons.ADDRESS_BASE_PATH_V6, ApiCommons.ADDRESS_BASE_PATH_V7])
+    @PostMapping(value = [ApiCommons.ADDRESS_BASE_PATH_V7])
     fun createAddresses(
         @RequestBody
         requests: Collection<AddressPartnerCreateRequest>
@@ -127,7 +127,7 @@ interface PoolAddressApi {
         ]
     )
     @Tag(name = ApiCommons.ADDRESS_NAME, description = ApiCommons.ADDRESS_DESCRIPTION)
-    @PutMapping(value = [ApiCommons.ADDRESS_BASE_PATH_V6, ApiCommons.ADDRESS_BASE_PATH_V7])
+    @PutMapping(value = [ApiCommons.ADDRESS_BASE_PATH_V7])
     fun updateAddresses(
         @RequestBody
         requests: Collection<AddressPartnerUpdateRequest>

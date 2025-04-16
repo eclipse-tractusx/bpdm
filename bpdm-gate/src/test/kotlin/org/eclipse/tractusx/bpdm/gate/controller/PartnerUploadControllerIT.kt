@@ -213,7 +213,7 @@ class PartnerUploadControllerIT @Autowired constructor(
                 nextConfidenceCheckAt = LocalDateTime.of(2024, 10, 10, 10, 10, 10),
                 confidenceLevel = 0
             ),
-            isCatenaXMemberData = false,
+            isParticipantData = false,
             createdAt = Instant.now(),
             updatedAt = Instant.now()
         )
@@ -247,7 +247,7 @@ class PartnerUploadControllerIT @Autowired constructor(
                 nextConfidenceCheckAt = LocalDateTime.of(2024, 10, 10, 10, 10, 10),
                 confidenceLevel = 0
             ),
-            isCatenaXMemberData = false,
+            isParticipantData = false,
             createdAt = Instant.now(),
             updatedAt = Instant.now()
         )

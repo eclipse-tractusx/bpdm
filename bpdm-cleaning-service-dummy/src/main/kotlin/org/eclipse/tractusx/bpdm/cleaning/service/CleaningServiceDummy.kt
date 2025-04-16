@@ -115,7 +115,7 @@ class CleaningServiceDummy(
                     states = states,
                     confidenceCriteria = dummyConfidenceCriteria.copy(sharedByOwner = sharedByOwner),
                     hasChanged = businessPartner.type == GoldenRecordType.LegalEntity,
-                    isCatenaXMemberData = sharedByOwner,
+                    isParticipantData = sharedByOwner,
                     legalAddress = cleanAddress(addressToClean, legalAddressBpnReference, true, sharedByOwner),
                 )
             }

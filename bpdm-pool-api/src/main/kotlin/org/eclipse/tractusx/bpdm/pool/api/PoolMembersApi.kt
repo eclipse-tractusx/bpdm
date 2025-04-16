@@ -41,28 +41,28 @@ import org.springframework.web.bind.annotation.RequestMapping
 interface PoolMembersApi {
 
     @Tag(name = ApiCommons.LEGAL_ENTITIES_NAME, description = ApiCommons.LEGAL_ENTITIES_DESCRIPTION)
-    @PostMapping(value = [ApiCommons.MEMBERS_LEGAL_ENTITIES_SEARCH_PATH_V6, ApiCommons.MEMBERS_LEGAL_ENTITIES_SEARCH_PATH_V7])
+    @PostMapping(value = [ApiCommons.MEMBERS_LEGAL_ENTITIES_SEARCH_PATH_V7])
     fun searchLegalEntities(
         @RequestBody searchRequest: LegalEntitySearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageDto<LegalEntityWithLegalAddressVerboseDto>
 
     @Tag(name = ApiCommons.SITE_NAME, description = ApiCommons.SITE_DESCRIPTION)
-    @PostMapping(value = [ApiCommons.MEMBERS_SITES_SEARCH_PATH_V6, ApiCommons.MEMBERS_SITES_SEARCH_PATH_V7])
+    @PostMapping(value = [ApiCommons.MEMBERS_SITES_SEARCH_PATH_V7])
     fun postSiteSearch(
         @RequestBody searchRequest: SiteSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageDto<SiteWithMainAddressVerboseDto>
 
     @Tag(name = ApiCommons.ADDRESS_NAME, description = ApiCommons.ADDRESS_DESCRIPTION)
-    @PostMapping(value = [ApiCommons.MEMBERS_ADDRESSES_SEARCH_PATH_V6, ApiCommons.MEMBERS_ADDRESSES_SEARCH_PATH_V7])
+    @PostMapping(value = [ApiCommons.MEMBERS_ADDRESSES_SEARCH_PATH_V7])
     fun searchAddresses(
         @RequestBody searchRequest: AddressSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageDto<LogisticAddressVerboseDto>
 
     @Tag(name = ApiCommons.CHANGELOG_NAME, description = ApiCommons.CHANGELOG_DESCRIPTION)
-    @PostMapping(value = [ApiCommons.MEMBERS_CHANGELOG_SEARCH_PATH_V6, ApiCommons.MEMBERS_CHANGELOG_SEARCH_PATH_V7])
+    @PostMapping(value = [ApiCommons.MEMBERS_CHANGELOG_SEARCH_PATH_V7])
     fun searchChangelogEntries(
         @RequestBody changelogSearchRequest: ChangelogSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest

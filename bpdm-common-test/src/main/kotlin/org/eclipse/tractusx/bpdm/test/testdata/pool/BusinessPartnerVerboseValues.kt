@@ -96,7 +96,7 @@ object BusinessPartnerVerboseValues {
     val legalForm1 = LegalFormDto(
         technicalKey = "EI4J",
         name = "Limited Liability Company",
-        abbreviation = "LLC;L.L.C.",
+        abbreviations = "LLC;L.L.C.",
         transliteratedName = "Limited Liability Company",
         country = CountryCode.US,
         language = LanguageCode.en,
@@ -108,7 +108,7 @@ object BusinessPartnerVerboseValues {
     val legalForm2 = LegalFormDto(
         technicalKey = "2HBR",
         name = "Gesellschaft mit beschränkter Haftung",
-        abbreviation = "GmbH",
+        abbreviations = "GmbH",
         transliteratedName = "Gesellschaft mit beschränkter Haftung",
         country = CountryCode.DE,
         language = LanguageCode.de,
@@ -119,7 +119,7 @@ object BusinessPartnerVerboseValues {
     val legalForm3 = LegalFormDto(
         technicalKey = "2M6Y",
         name = "基金会",
-        abbreviation = null,
+        abbreviations = null,
         transliteratedName = "ji jin hui",
         country = CountryCode.CN,
         language = LanguageCode.zh,
@@ -268,7 +268,7 @@ object BusinessPartnerVerboseValues {
         createdAt = Instant.now(),
         updatedAt = Instant.now(),
         addressType = AddressType.AdditionalAddress,
-        isCatenaXMemberData = false
+        isParticipantData = false
     )
 
     val addressPartner2 = LogisticAddressVerboseDto(
@@ -280,7 +280,7 @@ object BusinessPartnerVerboseValues {
         createdAt = Instant.now(),
         updatedAt = Instant.now(),
         addressType = AddressType.AdditionalAddress,
-        isCatenaXMemberData = false
+        isParticipantData = false
     )
 
     val addressPartner3 = LogisticAddressVerboseDto(
@@ -292,7 +292,7 @@ object BusinessPartnerVerboseValues {
         createdAt = Instant.now(),
         updatedAt = Instant.now(),
         addressType = AddressType.AdditionalAddress,
-        isCatenaXMemberData = false
+        isParticipantData = false
     )
 
     val addressPartnerCreate1 = AddressPartnerCreateVerboseDto(
@@ -316,7 +316,7 @@ object BusinessPartnerVerboseValues {
         states = listOf(siteStatus1),
         bpnLegalEntity = firstBpnL,
         confidenceCriteria = confidenceCriteria1,
-        isCatenaXMemberData = false,
+        isParticipantData = false,
         createdAt = Instant.now(),
         updatedAt = Instant.now(),
     )
@@ -327,7 +327,7 @@ object BusinessPartnerVerboseValues {
         states = listOf(siteStatus2),
         bpnLegalEntity = secondBpnL,
         confidenceCriteria = confidenceCriteria2,
-        isCatenaXMemberData = false,
+        isParticipantData = false,
         createdAt = Instant.now(),
         updatedAt = Instant.now(),
     )
@@ -338,7 +338,7 @@ object BusinessPartnerVerboseValues {
         states = listOf(siteStatus3),
         bpnLegalEntity = thirdBpnl,
         confidenceCriteria = confidenceCriteria3,
-        isCatenaXMemberData = false,
+        isParticipantData = false,
         createdAt = Instant.now(),
         updatedAt = Instant.now(),
     )
@@ -398,7 +398,7 @@ object BusinessPartnerVerboseValues {
             states = listOf(leStatus1),
             currentness = createdTime1.toInstant(ZoneOffset.UTC),
             confidenceCriteria = confidenceCriteria1,
-            isCatenaXMemberData = false,
+            isParticipantData = false,
             createdAt = Instant.now(),
             updatedAt = Instant.now(),
         ),
@@ -424,7 +424,7 @@ object BusinessPartnerVerboseValues {
             bpnLegalEntity = null,
             bpnSite = null,
             confidenceCriteria = confidenceCriteria1,
-            isCatenaXMemberData = false,
+            isParticipantData = false,
             createdAt = Instant.now(),
             updatedAt = Instant.now()
         )
@@ -439,7 +439,7 @@ object BusinessPartnerVerboseValues {
             states = listOf(leStatus2),
             currentness = createdTime1.toInstant(ZoneOffset.UTC),
             confidenceCriteria = confidenceCriteria2,
-            isCatenaXMemberData = false,
+            isParticipantData = false,
             createdAt = Instant.now(),
             updatedAt = Instant.now(),
         ),
@@ -465,7 +465,7 @@ object BusinessPartnerVerboseValues {
             bpnLegalEntity = null,
             bpnSite = null,
             confidenceCriteria = confidenceCriteria2,
-            isCatenaXMemberData = false,
+            isParticipantData = false,
             createdAt = Instant.now(),
             updatedAt = Instant.now()
         )
@@ -480,7 +480,7 @@ object BusinessPartnerVerboseValues {
             states = listOf(leStatus3),
             currentness = createdTime1.toInstant(ZoneOffset.UTC),
             confidenceCriteria = confidenceCriteria3,
-            isCatenaXMemberData = false,
+            isParticipantData = false,
             createdAt = Instant.now(),
             updatedAt = Instant.now(),
         ),
@@ -506,7 +506,7 @@ object BusinessPartnerVerboseValues {
             bpnLegalEntity = null,
             bpnSite = null,
             confidenceCriteria = confidenceCriteria3,
-            isCatenaXMemberData = false,
+            isParticipantData = false,
             createdAt = Instant.now(),
             updatedAt = Instant.now()
         )
@@ -521,7 +521,7 @@ object BusinessPartnerVerboseValues {
             states = listOf(leStatus1),
             currentness = createdTime1.toInstant(ZoneOffset.UTC),
             confidenceCriteria = confidenceCriteria1,
-            isCatenaXMemberData = false,
+            isParticipantData = false,
             createdAt = Instant.now(),
             updatedAt = Instant.now()
         ),
@@ -541,7 +541,7 @@ object BusinessPartnerVerboseValues {
             states = listOf(leStatus2),
             currentness = createdTime1.toInstant(ZoneOffset.UTC),
             confidenceCriteria = confidenceCriteria2,
-            isCatenaXMemberData = false,
+            isParticipantData = false,
             createdAt = Instant.now(),
             updatedAt = Instant.now()
         ),
@@ -561,7 +561,7 @@ object BusinessPartnerVerboseValues {
             states = listOf(leStatus3),
             currentness = createdTime1.toInstant(ZoneOffset.UTC),
             confidenceCriteria = confidenceCriteria3,
-            isCatenaXMemberData = false,
+            isParticipantData = false,
             createdAt = Instant.now(),
             updatedAt = Instant.now()
         ),
@@ -584,7 +584,7 @@ object BusinessPartnerVerboseValues {
             states = listOf(leStatus1),
             currentness = createdTime1.toInstant(ZoneOffset.UTC),
             confidenceCriteria = confidenceCriteria1,
-            isCatenaXMemberData = false,
+            isParticipantData = false,
             createdAt = Instant.now(),
             updatedAt = Instant.now()
         ),

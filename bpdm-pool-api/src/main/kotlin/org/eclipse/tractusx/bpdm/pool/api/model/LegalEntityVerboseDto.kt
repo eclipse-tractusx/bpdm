@@ -54,7 +54,8 @@ data class LegalEntityVerboseDto(
 
     override val confidenceCriteria: ConfidenceCriteriaDto,
 
-    override val isCatenaXMemberData: Boolean,
+    @get:Schema(description = "Indicates whether the legal entity is owned and thus provided by a Data Space Participant.")
+    val isParticipantData: Boolean,
 
     @get:Schema(description = CommonDescription.createdAt)
     val createdAt: Instant,
@@ -62,7 +63,7 @@ data class LegalEntityVerboseDto(
     @get:Schema(description = CommonDescription.updatedAt)
     val updatedAt: Instant,
 
-) : IBaseLegalEntityDto {
+    ) : IBaseLegalEntityDto {
 
     @get:JsonIgnore
     override val legalForm: String?

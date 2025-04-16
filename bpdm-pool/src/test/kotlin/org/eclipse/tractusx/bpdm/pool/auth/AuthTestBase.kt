@@ -198,12 +198,12 @@ abstract class AuthTestBase(
 
     @Test
     fun `GET CX Memberships`(){
-        authAssertions.assert(membershipAuthExpectations.getMemberships) { poolApiClient.memberships.get(CxMembershipSearchRequest(), PaginationRequest()) }
+        authAssertions.assert(membershipAuthExpectations.getMemberships) { poolApiClient.participants.get(DataSpaceParticipantSearchRequest(), PaginationRequest()) }
     }
 
     @Test
     fun `PUT CX Memberships`(){
-        authAssertions.assert(membershipAuthExpectations.putMemberships) { poolApiClient.memberships.put(CxMembershipUpdateRequest(listOf())) }
+        authAssertions.assert(membershipAuthExpectations.putMemberships) { poolApiClient.participants.put(DataSpaceParticipantUpdateRequest(listOf())) }
     }
 }
 

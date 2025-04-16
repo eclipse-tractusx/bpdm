@@ -21,27 +21,27 @@ package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.PoolCxMembershipApi
-import org.eclipse.tractusx.bpdm.pool.api.model.CxMembershipDto
-import org.eclipse.tractusx.bpdm.pool.api.model.request.CxMembershipSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.CxMembershipUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.api.PoolDataSpaceParticipantsApi
+import org.eclipse.tractusx.bpdm.pool.api.model.DataSpaceParticipantDto
+import org.eclipse.tractusx.bpdm.pool.api.model.request.DataSpaceParticipantSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.DataSpaceParticipantUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
-import org.eclipse.tractusx.bpdm.pool.service.CxMembershipService
+import org.eclipse.tractusx.bpdm.pool.service.DataSpaceParticipantsService
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-class CxMembershipController(
-    private val cxMembershipService: CxMembershipService
-): PoolCxMembershipApi {
+class DataSpaceParticipantsController(
+    private val dataSpaceParticipantsService: DataSpaceParticipantsService
+): PoolDataSpaceParticipantsApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")
-    override fun get(searchRequest: CxMembershipSearchRequest, paginationRequest: PaginationRequest): PageDto<CxMembershipDto> {
-       return cxMembershipService.searchMemberships(searchRequest, paginationRequest)
+    override fun get(searchRequest: DataSpaceParticipantSearchRequest, paginationRequest: PaginationRequest): PageDto<DataSpaceParticipantDto> {
+       return dataSpaceParticipantsService.searchMemberships(searchRequest, paginationRequest)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")
-    override fun put(updateRequest: CxMembershipUpdateRequest) {
-        return cxMembershipService.updateMemberships(updateRequest)
+    override fun put(updateRequest: DataSpaceParticipantUpdateRequest) {
+        return dataSpaceParticipantsService.updateMemberships(updateRequest)
     }
 }

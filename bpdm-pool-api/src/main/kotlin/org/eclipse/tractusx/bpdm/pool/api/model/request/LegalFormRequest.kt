@@ -35,7 +35,7 @@ data class LegalFormRequest(
     val transliteratedName: String?,
 
     @Schema(description = "Comma separed list of abbreviations of the legal form name")
-    val abbreviation: String?,
+    val abbreviations: String?,
 
     @Schema(description = "Transliterated abbreviations of the legal form abbreviations")
     val transliteratedAbbreviations: String?,
