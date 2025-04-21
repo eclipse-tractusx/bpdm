@@ -3064,11 +3064,11 @@
               "$ref" : "#/components/schemas/ErrorInfoAddressCreateError"
             }
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -3201,11 +3201,11 @@
               "$ref" : "#/components/schemas/ErrorInfoAddressUpdateError"
             }
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -3773,6 +3773,19 @@
             "type" : "string",
             "description" : "The transliterated (Latinized) form of the abbreviation."
           },
+          "format" : {
+            "type" : "string",
+            "description" : "The expected format of the identifier values for this type, given as a regular expression"
+          },
+          "categories" : {
+            "type" : "array",
+            "description" : "The broader categories to which the identifier type belongs to",
+            "items" : {
+              "type" : "string",
+              "enum" : [ "VAT", "TIN", "NBR", "IBR", "OTH" ]
+            },
+            "uniqueItems" : true
+          },
           "details" : {
             "type" : "array",
             "description" : "Validity details.",
@@ -3781,7 +3794,7 @@
             }
           }
         },
-        "required" : [ "businessPartnerType", "details", "name", "technicalKey" ]
+        "required" : [ "businessPartnerType", "categories", "details", "name", "technicalKey" ]
       },
       "IdentifiersSearchRequest" : {
         "type" : "object",
@@ -3909,11 +3922,11 @@
               "$ref" : "#/components/schemas/ErrorInfoLegalEntityCreateError"
             }
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -4056,11 +4069,11 @@
               "$ref" : "#/components/schemas/ErrorInfoLegalEntityUpdateError"
             }
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -4962,11 +4975,11 @@
               "$ref" : "#/components/schemas/ErrorInfoSiteCreateError"
             }
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -5069,11 +5082,11 @@
               "$ref" : "#/components/schemas/ErrorInfoSiteUpdateError"
             }
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           }

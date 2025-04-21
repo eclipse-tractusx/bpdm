@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.entity
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
+import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeCategory
 
 @Entity
 @Table(
@@ -49,7 +50,20 @@ class IdentifierTypeDb(
     val transliteratedName: String? = null,
 
     @Column(name = "transliterated_abbreviation")
-    val transliteratedAbbreviation: String? = null
+    val transliteratedAbbreviation: String? = null,
+
+    @Column(name = "format")
+    val format: String? = null,
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Enumerated(EnumType.STRING)
+    @CollectionTable(
+        name = "identifier_type_categories",
+        joinColumns = [JoinColumn(name = "identifier_type_id", foreignKey = ForeignKey(name = "fk_identifier_categories_types"))],
+        uniqueConstraints = [UniqueConstraint(name = "uc_identifier_categories", columnNames = ["identifier_type_id", "category"])],
+    )
+    @Column(name = "category")
+    val categories: MutableSet<IdentifierTypeCategory> = mutableSetOf()
 
     ) : BaseEntity() {
     @OneToMany(mappedBy = "identifierType", cascade = [CascadeType.ALL], orphanRemoval = true)

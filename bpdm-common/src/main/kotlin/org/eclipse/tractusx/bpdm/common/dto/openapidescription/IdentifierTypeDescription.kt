@@ -30,6 +30,8 @@ object IdentifierTypeDescription {
     const val abbreviation = "The local short form of the identifier type used in particular country."
     const val transliteratedName = "The transliterated (Latinized) form of the name."
     const val transliteratedAbbreviation = "The transliterated (Latinized) form of the abbreviation."
+    const val format = "The expected format of the identifier values for this type, given as a regular expression"
+    const val categories = "The broader categories to which the identifier type belongs to"
     const val details = "Validity details."
 
     const val headerDetail = "Information for which countries an identifier type is valid and mandatory."

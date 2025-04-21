@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.api.model
 
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.IdentifierTypeDescription
+import java.util.*
 
 @Schema(description = IdentifierTypeDescription.header)
 data class IdentifierTypeDto(
@@ -42,6 +43,12 @@ data class IdentifierTypeDto(
 
     @get:Schema(description = IdentifierTypeDescription.transliteratedAbbreviation)
     val transliteratedAbbreviation: String?,
+
+    @get:Schema(description = IdentifierTypeDescription.format)
+    val format: String?,
+
+    @get:Schema(description = IdentifierTypeDescription.categories)
+    val categories: SortedSet<IdentifierTypeCategory>,
 
     @get:Schema(description = IdentifierTypeDescription.details)
     val details: Collection<IdentifierTypeDetailDto> = listOf()

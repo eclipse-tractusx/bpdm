@@ -89,6 +89,8 @@ class PoolDataHelper(
             abbreviation = "Identifier Abbreviation $seed",
             transliteratedName = "Identifier Transliterated Name $seed",
             transliteratedAbbreviation = "Identifier Transliterated Abbreviation $seed",
+            format = "Identifier Formart $seed",
+            categories = (1 .. 3).map { IdentifierTypeCategory.entries.random(random) }.toSortedSet(),
             listOf(
                 IdentifierTypeDetailDto(country = CountryCode.entries.random(random), false),
                 IdentifierTypeDetailDto(country = CountryCode.entries.random(random), false)

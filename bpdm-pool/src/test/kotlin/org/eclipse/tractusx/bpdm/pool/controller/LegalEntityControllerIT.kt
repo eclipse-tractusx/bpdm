@@ -23,11 +23,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.RelationType
+import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntitySearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
@@ -178,7 +174,9 @@ class LegalEntityControllerIT @Autowired constructor(
                 name = addressIdentifier.value,
                 abbreviation = BusinessPartnerVerboseValues.identifierTypeAbbreviation1,
                 transliteratedName = BusinessPartnerVerboseValues.identifierTypeTransliteratedName1,
-                transliteratedAbbreviation = BusinessPartnerVerboseValues.identifierTypeTransliteratedAbbreviation1
+                transliteratedAbbreviation = BusinessPartnerVerboseValues.identifierTypeTransliteratedAbbreviation1,
+                format = null,
+                categories = sortedSetOf()
             )
         )
 
@@ -402,7 +400,9 @@ class LegalEntityControllerIT @Autowired constructor(
                 name = addressIdentifier.value,
                 abbreviation = BusinessPartnerVerboseValues.identifierTypeAbbreviation1,
                 transliteratedName = BusinessPartnerVerboseValues.identifierTypeTransliteratedName1,
-                transliteratedAbbreviation = BusinessPartnerVerboseValues.identifierTypeTransliteratedAbbreviation1
+                transliteratedAbbreviation = BusinessPartnerVerboseValues.identifierTypeTransliteratedAbbreviation1,
+                format = null,
+                categories = sortedSetOf()
             )
         )
 
