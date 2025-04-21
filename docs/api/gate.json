@@ -1065,6 +1065,77 @@
         }
       }
     },
+    "/v7/sharing-state" : {
+      "get" : {
+        "tags" : [ "sharing-state-controller" ],
+        "summary" : "Returns sharing states of business partners, optionally filtered by a business partner type and an array of external IDs",
+        "operationId" : "getSharingStates",
+        "parameters" : [ {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Number of page to get results from",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Size of each page",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "maximum" : 100,
+            "minimum" : 0
+          }
+        }, {
+          "name" : "externalIds",
+          "in" : "query",
+          "description" : "External IDs",
+          "required" : false,
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "sharingStateTypes",
+          "in" : "query",
+          "description" : "Only show sharing states of given types",
+          "required" : false,
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "enum" : [ "Pending", "Success", "Error", "Initial", "Ready" ]
+            }
+          }
+        }, {
+          "name" : "updatedAfter",
+          "in" : "query",
+          "description" : "Only show sharing states updated after given time",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Page of sharing states",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageDtoSharingStateDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v7/relations/sharing-state" : {
       "get" : {
         "tags" : [ "sharing-state-controller" ],
@@ -1291,56 +1362,6 @@
               "application/json" : {
                 "schema" : {
                   "$ref" : "#/components/schemas/StatsConfidenceCriteriaResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v7/sharing-state" : {
-      "get" : {
-        "tags" : [ "sharing-state-controller" ],
-        "summary" : "Returns sharing states of business partners, optionally filtered by a business partner type and an array of external IDs",
-        "operationId" : "getSharingStates",
-        "parameters" : [ {
-          "name" : "page",
-          "in" : "query",
-          "description" : "Number of page to get results from",
-          "required" : false,
-          "schema" : {
-            "type" : "string",
-            "minimum" : 0
-          }
-        }, {
-          "name" : "size",
-          "in" : "query",
-          "description" : "Size of each page",
-          "required" : false,
-          "schema" : {
-            "type" : "string",
-            "maximum" : 100,
-            "minimum" : 0
-          }
-        }, {
-          "name" : "externalIds",
-          "in" : "query",
-          "description" : "External IDs",
-          "required" : false,
-          "schema" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "Page of sharing states",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/PageDtoSharingStateDto"
                 }
               }
             }
@@ -2606,9 +2627,14 @@
           "taskId" : {
             "type" : "string",
             "description" : "The orchestrator task identifier that was created"
+          },
+          "updatedAt" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "The time when the sharing state has been last updated"
           }
         },
-        "required" : [ "externalId", "sharingStateType" ]
+        "required" : [ "externalId", "sharingStateType", "updatedAt" ]
       },
       "SiteRepresentationInputDto" : {
         "type" : "object",

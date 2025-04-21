@@ -33,7 +33,6 @@ import org.eclipse.tractusx.bpdm.gate.service.TaskResolutionChunkService
 import org.eclipse.tractusx.bpdm.gate.util.MockAndAssertUtils
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerNonVerboseValues
-import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerVerboseValues
 import org.eclipse.tractusx.bpdm.test.util.AssertHelpers
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.eclipse.tractusx.orchestrator.api.model.ResultState
@@ -46,6 +45,8 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
 
 
 @SpringBootTest(
@@ -62,7 +63,7 @@ class BusinessPartnerControllerAndSharingControllerIT @Autowired constructor(
     val taskResolutionService: TaskResolutionChunkService,
     val mockAndAssertUtils: MockAndAssertUtils
 ) {
-
+    private val anyTime = OffsetDateTime.of(2025, 1, 1, 1, 1, 1, 1, ZoneOffset.UTC).toInstant()
 
     companion object {
 
@@ -112,7 +113,8 @@ class BusinessPartnerControllerAndSharingControllerIT @Autowired constructor(
                 sharingErrorCode = null,
                 sharingErrorMessage = null,
                 sharingProcessStarted = null,
-                taskId = "0"
+                taskId = "0",
+                updatedAt = anyTime
             ),
             SharingStateDto(
                 externalId = externalId2,
@@ -120,7 +122,8 @@ class BusinessPartnerControllerAndSharingControllerIT @Autowired constructor(
                 sharingErrorCode = null,
                 sharingErrorMessage = null,
                 sharingProcessStarted = null,
-                taskId = "1"
+                taskId = "1",
+                updatedAt = anyTime
             ),
             SharingStateDto(
                 externalId = externalId3,
@@ -128,7 +131,8 @@ class BusinessPartnerControllerAndSharingControllerIT @Autowired constructor(
                 sharingErrorCode = null,
                 sharingErrorMessage = null,
                 sharingProcessStarted = null,
-                taskId = "2"
+                taskId = "2",
+                updatedAt = anyTime
             )
         )
 
@@ -159,7 +163,8 @@ class BusinessPartnerControllerAndSharingControllerIT @Autowired constructor(
                 sharingErrorCode = null,
                 sharingErrorMessage = null,
                 sharingProcessStarted = null,
-                taskId = "2"
+                taskId = "2",
+                updatedAt = anyTime
             )
         )
 
@@ -181,7 +186,8 @@ class BusinessPartnerControllerAndSharingControllerIT @Autowired constructor(
                 sharingErrorCode = BusinessPartnerSharingError.MissingTaskID,
                 sharingErrorMessage = "Missing Task in Orchestrator",
                 sharingProcessStarted = null,
-                taskId = "2"
+                taskId = "2",
+                updatedAt = anyTime
             )
         )
 

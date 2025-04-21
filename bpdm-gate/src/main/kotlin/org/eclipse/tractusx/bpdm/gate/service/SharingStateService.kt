@@ -32,10 +32,13 @@ import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidStateException
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmMissingPartnerException
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository.Specs.byExternalIdsIn
+import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository.Specs.bySharingStateTypes
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository.Specs.byTenantBpnl
+import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository.Specs.byUpdatedAfter
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
+import java.time.Instant
 import java.time.LocalDateTime
 
 
@@ -50,13 +53,20 @@ class SharingStateService(
     fun findSharingStates(
         paginationRequest: PaginationRequest,
         externalIds: Collection<String>?,
+        sharingStateTypes: Collection<SharingStateType>?,
+        updatedAfter: Instant?,
         ownerBpnl: String?
     ): PageDto<SharingStateDto> {
 
-        logger.info { "findSharingStates() called with $paginationRequest // $externalIds" }
+        logger.info { "findSharingStates()" }
 
         val pageRequest = PageRequest.of(paginationRequest.page, paginationRequest.size)
-        val spec = Specification.allOf(byExternalIdsIn(externalIds), byTenantBpnl(ownerBpnl))
+        val spec = Specification.allOf(
+            byExternalIdsIn(externalIds),
+            byTenantBpnl(ownerBpnl),
+            bySharingStateTypes(sharingStateTypes),
+            byUpdatedAfter(updatedAfter)
+        )
         val sharingStatePage = stateRepository.findAll(spec, pageRequest)
 
         return sharingStatePage.toPageDto {
@@ -66,7 +76,8 @@ class SharingStateService(
                 sharingErrorCode = it.sharingErrorCode,
                 sharingErrorMessage = it.sharingErrorMessage,
                 sharingProcessStarted = it.sharingProcessStarted,
-                taskId = it.taskId
+                taskId = it.taskId,
+                updatedAt = it.updatedAt
             )
         }
     }

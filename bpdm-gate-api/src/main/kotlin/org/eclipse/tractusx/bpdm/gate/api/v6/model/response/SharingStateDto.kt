@@ -17,20 +17,14 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.api.model.response
+package org.eclipse.tractusx.bpdm.gate.api.v6.model.response
 
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
-import java.time.Instant
 import java.time.LocalDateTime
 
-@Schema(
-    description = "A sharing state entry shows the progress in the sharing process and is updated each time the " +
-            "progress for a business partner changes. The business partner is identified by a combination " +
-            "of external ID and business partner type.\n")
 data class SharingStateDto(
-
     @get:Schema(description = "The external identifier of the business partner for which the sharing state entry was created.")
     val externalId: String,
 
@@ -53,8 +47,5 @@ data class SharingStateDto(
     val sharingProcessStarted: LocalDateTime? = null,
 
     @get:Schema(description = "The orchestrator task identifier that was created")
-    val taskId: String? = null,
-
-    @get:Schema(description = "The time when the sharing state has been last updated")
-    val updatedAt: Instant
+    val taskId: String? = null
 )

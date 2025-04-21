@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.api
+package org.eclipse.tractusx.bpdm.gate.api.v6
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -26,13 +26,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import jakarta.validation.Valid
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
-import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
+import org.eclipse.tractusx.bpdm.gate.api.ApiCommons
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.SharingStateDto
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
-import org.springframework.web.bind.annotation.*
-import java.time.Instant
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 
 @RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
 interface GateSharingStateApi {
@@ -45,27 +45,10 @@ interface GateSharingStateApi {
             ApiResponse(responseCode = "200", description = "Page of sharing states")
         ]
     )
-    @GetMapping(value = [ApiCommons.SHARING_STATE_PATH_V7])
+    @GetMapping(value = [ApiCommons.SHARING_STATE_PATH_V6])
     fun getSharingStates(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @Parameter(description = "External IDs")
-        @RequestParam(required = false) externalIds: Collection<String>?,
-        @Parameter(description = "Only show sharing states of given types")
-        @RequestParam(required = false) sharingStateTypes: Collection<SharingStateType>? = null,
-        @Parameter(description = "Only show sharing states updated after given time")
-        @RequestParam(required = false) updatedAfter: Instant? = null,
+        @RequestParam(required = false) externalIds: Collection<String>?
     ): PageDto<SharingStateDto>
-
-    @Operation(
-        summary = "Sets the given business partners into ready to be shared state",
-        description = "The business partners to set the ready state for are identified by their external-id. Only business partners in an initial or error state can be set to ready. If any given business partner could not be set into ready state for any reason (for example, it has not been found or it is in the wrong state) the whole request fails (all or nothing approach)."
-    )
-    @ApiResponses(
-        value = [
-            ApiResponse(responseCode = "204", description = "All business partners put in ready to be shared state"),
-            ApiResponse(responseCode = "400", description = "Business partners can't be put into ready state (e.g. external-ID not found, wrong sharing state)")
-        ]
-    )
-    @PostMapping(value = ["${ApiCommons.SHARING_STATE_PATH_V6}/ready", "${ApiCommons.SHARING_STATE_PATH_V7}/ready"])
-    fun postSharingStateReady(@RequestBody request: PostSharingStateReadyRequest)
 }

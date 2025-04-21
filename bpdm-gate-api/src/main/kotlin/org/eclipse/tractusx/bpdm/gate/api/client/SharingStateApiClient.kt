@@ -19,13 +19,12 @@
 
 package org.eclipse.tractusx.bpdm.gate.api.client
 
-import io.swagger.v3.oas.annotations.Parameter
 import jakarta.validation.Valid
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.ApiCommons
 import org.eclipse.tractusx.bpdm.gate.api.GateSharingStateApi
+import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
 import org.springdoc.core.annotations.ParameterObject
@@ -34,13 +33,16 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.service.annotation.GetExchange
 import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
+import java.time.Instant
 
 @HttpExchange
 interface SharingStateApiClient : GateSharingStateApi {
     @GetExchange(value = ApiCommons.SHARING_STATE_PATH_V7)
     override fun getSharingStates(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
-        @Parameter(description = "External IDs") @RequestParam(required = false) externalIds: Collection<String>?
+        @RequestParam(required = false) externalIds: Collection<String>?,
+        @RequestParam(required = false) sharingStateTypes: Collection<SharingStateType>?,
+        @RequestParam(required = false) updatedAfter: Instant?,
     ): PageDto<SharingStateDto>
 
     @PostExchange(value = "${ApiCommons.SHARING_STATE_PATH_V7}/ready")
