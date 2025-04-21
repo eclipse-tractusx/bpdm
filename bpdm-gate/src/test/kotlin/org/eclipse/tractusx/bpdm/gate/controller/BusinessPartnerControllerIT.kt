@@ -48,6 +48,8 @@ import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.web.reactive.function.client.WebClientResponseException
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
 
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
@@ -63,6 +65,8 @@ class BusinessPartnerControllerIT @Autowired constructor(
     val taskResolutionService: TaskResolutionChunkService,
     val mockAndAssertUtils: MockAndAssertUtils
 ) {
+
+    private val anyTime = OffsetDateTime.of(2025, 1, 1, 1, 1, 1, 1, ZoneOffset.UTC).toInstant()
 
     companion object {
 
@@ -135,7 +139,8 @@ class BusinessPartnerControllerIT @Autowired constructor(
                 sharingErrorCode = null,
                 sharingErrorMessage = null,
                 sharingProcessStarted = null,
-                taskId = "0"
+                taskId = "0",
+                updatedAt = anyTime
             ),
             SharingStateDto(
                 externalId = externalId2,
@@ -143,7 +148,8 @@ class BusinessPartnerControllerIT @Autowired constructor(
                 sharingErrorCode = null,
                 sharingErrorMessage = null,
                 sharingProcessStarted = null,
-                taskId = "1"
+                taskId = "1",
+                updatedAt = anyTime
             ),
             SharingStateDto(
                 externalId = externalId3,
@@ -151,7 +157,8 @@ class BusinessPartnerControllerIT @Autowired constructor(
                 sharingErrorCode = null,
                 sharingErrorMessage = null,
                 sharingProcessStarted = null,
-                taskId = "2"
+                taskId = "2",
+                updatedAt = anyTime
             )
         )
 
@@ -321,7 +328,8 @@ class BusinessPartnerControllerIT @Autowired constructor(
                 sharingErrorCode = null,
                 sharingErrorMessage = null,
                 sharingProcessStarted = null,
-                taskId = "2"
+                taskId = "2",
+                updatedAt = anyTime
             )
         )
 
@@ -344,7 +352,8 @@ class BusinessPartnerControllerIT @Autowired constructor(
                 sharingErrorCode = BusinessPartnerSharingError.MissingTaskID,
                 sharingErrorMessage = "Missing Task in Orchestrator",
                 sharingProcessStarted = null,
-                taskId = "2"
+                taskId = "2",
+                updatedAt = anyTime
             )
         )
 

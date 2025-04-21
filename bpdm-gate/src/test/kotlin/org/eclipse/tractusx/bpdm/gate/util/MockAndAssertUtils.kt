@@ -332,11 +332,14 @@ class MockAndAssertUtils @Autowired constructor(
 
         val sharingStateResponse = gateClient.sharingState.getSharingStates(PaginationRequest(), externalIds = null)
         org.junit.jupiter.api.Assertions.assertEquals(upsertedBusinessPartners.size.toLong(), sharingStateResponse.totalElements)
-        Assertions.assertThat(sharingStateResponse.content).isEqualTo(
-            upsertedBusinessPartners.map {
+        Assertions.assertThat(sharingStateResponse.content)
+            .usingRecursiveComparison()
+            .ignoringFields(SharingStateDto::updatedAt.name)
+            .isEqualTo(upsertedBusinessPartners.map {
                 SharingStateDto(
                     externalId = it.externalId,
-                    sharingStateType = SharingStateType.Ready
+                    sharingStateType = SharingStateType.Ready,
+                    updatedAt = Instant.now()
                 )
             }
         )

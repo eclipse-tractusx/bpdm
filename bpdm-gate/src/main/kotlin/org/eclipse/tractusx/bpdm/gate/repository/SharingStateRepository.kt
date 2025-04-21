@@ -28,6 +28,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.PagingAndSortingRepository
+import java.time.Instant
 
 interface SharingStateRepository : PagingAndSortingRepository<SharingStateDb, Long>, CrudRepository<SharingStateDb, Long>,
     JpaSpecificationExecutor<SharingStateDb> {
@@ -50,6 +51,23 @@ interface SharingStateRepository : PagingAndSortingRepository<SharingStateDb, Lo
                     builder.equal(root.get<String?>(SharingStateDb::tenantBpnl.name), associatedOwnerBpnl)
                 } ?: builder.isNull(root.get<String?>(SharingStateDb::tenantBpnl.name))
 
+            }
+
+        fun byUpdatedAfter(updatedAfter: Instant?) =
+            Specification<SharingStateDb> { root, _, builder ->
+                updatedAfter?.let {
+                    builder.greaterThan(root
+                        .get<Instant>(SharingStateDb::updatedAt.name), updatedAfter)
+                }
+            }
+
+        fun bySharingStateTypes(sharingStateTypes: Collection<SharingStateType>?) =
+            Specification<SharingStateDb> { root, _, builder ->
+                sharingStateTypes?.takeIf{ it.isNotEmpty() }?.let {
+                    root
+                        .get<SharingStateType>(SharingStateDb::sharingStateType.name)
+                        .`in`(sharingStateTypes)
+                }
             }
 
     }

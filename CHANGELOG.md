@@ -36,6 +36,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM Orchestrator: Increased api version to v7 with simultaneous support for version v6([#1294](https://github.com/eclipse-tractusx/bpdm/issues/1294))
 - BPDM Pool: Increased api version to v7 with simultaneous support for version v6([#1294](https://github.com/eclipse-tractusx/bpdm/issues/1294))
 - BPDM Gate: Increased api version to v7 with simultaneous support for version v6([#1294](https://github.com/eclipse-tractusx/bpdm/issues/1294))
+- BPDM Gate: Add sharing state type and updatedAfter query filters to sharing state GET endpoint ([#1249](https://github.com/eclipse-tractusx/sig-release/issues/1249))
 
 ### Changed
 
