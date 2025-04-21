@@ -203,28 +203,17 @@ class BusinessPartnerRelationStepDefs(
         gateClient.relation.put(true, RelationPutRequest(listOf(relationInputRequest)))
         val taskId = stepUtils.waitForRelationTask(relationExternalId)
 
-        reserveRefinementQueue()
+        testRepository.reserveTasks()
         resolveReservedTask(taskId)
-    }
-
-    /**
-     * Reserve all tasks in queue up to this point in time and store the reserved tasks for later use
-     */
-    private fun reserveRefinementQueue(){
-        var reservedTasks: List<TaskRelationsStepReservationEntryDto> = emptyList()
-        do{
-            reservedTasks = orchestratorClient.relationsGoldenRecordTasks.reserveTasksForStep(TaskStepReservationRequest(100, TaskStep.CleanAndSync)).reservedTasks
-            reservedTasks.forEach { task -> testRepository.reservedTasksById.putIfAbsent(task.taskId, task) }
-        }while (reservedTasks.isNotEmpty())
     }
 
     /**
      * Resolves without changing the relation content
      */
     private fun resolveReservedTask(taskId: String){
-        val reservedTask = testRepository.reservedTasksById[taskId]
+        val reservedTask = testRepository.getReservedTask(taskId)
 
-        val refinementResult = TaskRelationsStepResultEntryDto(reservedTask!!.taskId, reservedTask.businessPartnerRelations, emptyList())
+        val refinementResult = TaskRelationsStepResultEntryDto(reservedTask.taskId, reservedTask.businessPartnerRelations, emptyList())
         orchestratorClient.relationsGoldenRecordTasks.resolveStepResults(TaskRelationsStepResultRequest(TaskStep.CleanAndSync, listOf(refinementResult)))
     }
 

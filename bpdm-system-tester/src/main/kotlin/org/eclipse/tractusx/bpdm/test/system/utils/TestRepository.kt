@@ -19,7 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.test.system.utils
 
+import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepReservationEntryDto
+import org.eclipse.tractusx.orchestrator.api.model.TaskStep
+import org.eclipse.tractusx.orchestrator.api.model.TaskStepReservationRequest
 import org.springframework.stereotype.Component
 import java.util.concurrent.ConcurrentHashMap
 
@@ -27,12 +30,34 @@ import java.util.concurrent.ConcurrentHashMap
  * Shared test context between all scenarios
  */
 @Component
-class TestRepository {
+class TestRepository(
+    private val orchestratorClient: OrchestrationApiClient
+) {
     /**
      * Task-IDs are on-the-fly by the golden record process.
      * Additionally, as a refinement service we can't reserve a specific task for processing from the golden record process.
      * Therefore, we just reserve everything and store it for later use by the Cucumber steps here
      */
-    val reservedTasksById: ConcurrentHashMap<String, TaskRelationsStepReservationEntryDto> = ConcurrentHashMap()
+    private val reservedTasksById: ConcurrentHashMap<String, TaskRelationsStepReservationEntryDto> = ConcurrentHashMap()
 
+    /**
+     * Reserve all tasks in queue up to this point in time and store the reserved tasks for later use
+     *
+     * Reservation of tasks in the orchestrator and storing these tasks needs to be an atomic operation
+     */
+    fun reserveTasks(){
+        synchronized(reservedTasksById) {
+            var reservedTasks: List<TaskRelationsStepReservationEntryDto> = emptyList()
+            do{
+                reservedTasks = orchestratorClient.relationsGoldenRecordTasks.reserveTasksForStep(TaskStepReservationRequest(100, TaskStep.CleanAndSync)).reservedTasks
+                reservedTasks.forEach { task -> reservedTasksById.putIfAbsent(task.taskId, task) }
+            }while (reservedTasks.isNotEmpty())
+        }
+    }
+
+    fun getReservedTask(taskId: String): TaskRelationsStepReservationEntryDto{
+        synchronized(reservedTasksById){
+            return reservedTasksById[taskId]!!
+        }
+    }
 }
