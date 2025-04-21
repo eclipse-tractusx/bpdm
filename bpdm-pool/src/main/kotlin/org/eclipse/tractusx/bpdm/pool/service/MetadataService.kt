@@ -66,8 +66,10 @@ class MetadataService(
             name = type.name,
             abbreviation = type.abbreviation,
             transliteratedName = type.transliteratedName,
-            transliteratedAbbreviation = type.transliteratedAbbreviation
+            transliteratedAbbreviation = type.transliteratedAbbreviation,
+            format = type.format
         )
+        entity.categories.addAll(type.categories)
         entity.details.addAll(
             type.details.map { IdentifierTypeDetailDb(entity, it.country, it.mandatory) }.toSet()
         )

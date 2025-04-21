@@ -29,8 +29,11 @@ import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.*
-import org.eclipse.tractusx.bpdm.pool.util.*
+import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressCreateError
+import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressUpdateError
+import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
+import org.eclipse.tractusx.bpdm.pool.util.TestHelpers
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues.addressIdentifier
@@ -317,7 +320,9 @@ class AddressControllerIT @Autowired constructor(
                 name = addressIdentifier.value,
                 abbreviation = BusinessPartnerVerboseValues.identifierTypeAbbreviation1,
                 transliteratedName = BusinessPartnerVerboseValues.identifierTypeTransliteratedName1,
-                transliteratedAbbreviation = BusinessPartnerVerboseValues.identifierTypeTransliteratedAbbreviation1
+                transliteratedAbbreviation = BusinessPartnerVerboseValues.identifierTypeTransliteratedAbbreviation1,
+                format = null,
+                categories = sortedSetOf()
             )
         )
 
@@ -361,7 +366,9 @@ class AddressControllerIT @Autowired constructor(
                 name = addressIdentifier.value,
                 abbreviation = BusinessPartnerVerboseValues.identifierTypeAbbreviation1,
                 transliteratedName = BusinessPartnerVerboseValues.identifierTypeTransliteratedName1,
-                transliteratedAbbreviation = BusinessPartnerVerboseValues.identifierTypeTransliteratedAbbreviation1
+                transliteratedAbbreviation = BusinessPartnerVerboseValues.identifierTypeTransliteratedAbbreviation1,
+                format = null,
+                categories = sortedSetOf()
             )
         )
 

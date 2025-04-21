@@ -153,7 +153,7 @@ abstract class AuthTestBase(
 
     @Test
     fun `POST Identifier Type`(){
-        authAssertions.assert(metadataAuthExpectations.postIdentifierType) { poolApiClient.metadata.createIdentifierType(IdentifierTypeDto("ID", IdentifierBusinessPartnerType.ADDRESS, "", "", "", "")) }
+        authAssertions.assert(metadataAuthExpectations.postIdentifierType) { poolApiClient.metadata.createIdentifierType(IdentifierTypeDto("ID", IdentifierBusinessPartnerType.ADDRESS, "", "", "", "", null, sortedSetOf())) }
     }
 
     @Test

@@ -275,7 +275,9 @@ class SiteControllerIT @Autowired constructor(
                 name = BusinessPartnerNonVerboseValues.addressIdentifier.value,
                 abbreviation = BusinessPartnerVerboseValues.identifierTypeAbbreviation1,
                 transliteratedName = BusinessPartnerVerboseValues.identifierTypeTransliteratedName1,
-                transliteratedAbbreviation = BusinessPartnerVerboseValues.identifierTypeTransliteratedAbbreviation1
+                transliteratedAbbreviation = BusinessPartnerVerboseValues.identifierTypeTransliteratedAbbreviation1,
+                format = null,
+                categories = sortedSetOf()
             )
         )
 
@@ -334,7 +336,9 @@ class SiteControllerIT @Autowired constructor(
                 name = BusinessPartnerNonVerboseValues.addressIdentifier.value,
                 abbreviation = BusinessPartnerVerboseValues.identifierTypeAbbreviation1,
                 transliteratedName = BusinessPartnerVerboseValues.identifierTypeTransliteratedName1,
-                transliteratedAbbreviation = BusinessPartnerVerboseValues.identifierTypeTransliteratedAbbreviation1
+                transliteratedAbbreviation = BusinessPartnerVerboseValues.identifierTypeTransliteratedAbbreviation1,
+                format = null,
+                categories = sortedSetOf()
             )
         )
 

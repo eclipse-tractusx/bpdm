@@ -31,7 +31,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
-import java.util.UUID
+import java.util.*
 
 /**
  * Test values for response DTOs
@@ -84,6 +84,15 @@ object BusinessPartnerVerboseValues {
     val identifierTypeTransliteratedAbbreviation2 = "transliteratedAbbreviation2"
     val identifierTypeTransliteratedAbbreviation3 = "transliteratedAbbreviation3"
     val identifierTypeTransliteratedAbbreviation4 = "transliteratedAbbreviation4"
+
+    val identifierTypeFormat1 = "format1"
+    val identifierTypeFormat2 = "format2"
+    val identifierTypeFormat3 = "format3"
+
+    val identifierTypeCategories1 = sortedSetOf(IdentifierTypeCategory.VAT)
+    val identifierTypeCategories2 = sortedSetOf(IdentifierTypeCategory.IBR, IdentifierTypeCategory.TIN)
+    val identifierTypeCategories3 = sortedSetOf(IdentifierTypeCategory.OTH)
+
 
 
     val identifier1 =
