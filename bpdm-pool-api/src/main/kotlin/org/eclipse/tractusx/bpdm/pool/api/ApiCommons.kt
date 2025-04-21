@@ -40,10 +40,10 @@ object ApiCommons {
     const val MEMBERS_ADDRESSES_SEARCH_PATH_V6 = "${BASE_PATH_V6}/members/addresses${CommonApiPathNames.SUBPATH_SEARCH}"
     const val MEMBERS_CHANGELOG_SEARCH_PATH_V6 = "${BASE_PATH_V6}/members/changelog${CommonApiPathNames.SUBPATH_SEARCH}"
 
-    const val MEMBERS_LEGAL_ENTITIES_SEARCH_PATH_V7 = "${BASE_PATH_V7}/members/legal-entities${CommonApiPathNames.SUBPATH_SEARCH}"
-    const val MEMBERS_SITES_SEARCH_PATH_V7 = "${BASE_PATH_V7}/members/sites${CommonApiPathNames.SUBPATH_SEARCH}"
-    const val MEMBERS_ADDRESSES_SEARCH_PATH_V7 = "${BASE_PATH_V7}/members/addresses${CommonApiPathNames.SUBPATH_SEARCH}"
-    const val MEMBERS_CHANGELOG_SEARCH_PATH_V7 = "${BASE_PATH_V7}/members/changelog${CommonApiPathNames.SUBPATH_SEARCH}"
+    const val MEMBERS_LEGAL_ENTITIES_SEARCH_PATH_V7 = "${BASE_PATH_V7}/participants/legal-entities${CommonApiPathNames.SUBPATH_SEARCH}"
+    const val MEMBERS_SITES_SEARCH_PATH_V7 = "${BASE_PATH_V7}/participants/sites${CommonApiPathNames.SUBPATH_SEARCH}"
+    const val MEMBERS_ADDRESSES_SEARCH_PATH_V7 = "${BASE_PATH_V7}/participants/addresses${CommonApiPathNames.SUBPATH_SEARCH}"
+    const val MEMBERS_CHANGELOG_SEARCH_PATH_V7 = "${BASE_PATH_V7}/participants/changelog${CommonApiPathNames.SUBPATH_SEARCH}"
 
     const val CHANGELOG_BASE_PATH_V6 = "${BASE_PATH_V6}/business-partners/changelog"
     const val CHANGELOG_BASE_PATH_V7 = "${BASE_PATH_V7}/business-partners/changelog"
@@ -52,7 +52,7 @@ object ApiCommons {
     const val BPN_BASE_PATH_V7 = "${BASE_PATH_V7}/bpn"
 
     const val MEMBERSHIP_BASE_PATH_V6 = "${BASE_PATH_V6}/cx-memberships"
-    const val MEMBERSHIP_BASE_PATH_V7 = "${BASE_PATH_V7}/cx-memberships"
+    const val MEMBERSHIP_BASE_PATH_V7 = "${BASE_PATH_V7}/data-space-participants"
 
     const val LEGAL_ENTITIES_NAME = "Legal Entity Controller"
     const val LEGAL_ENTITIES_DESCRIPTION = "Read, create and update business partner of type legal entity"

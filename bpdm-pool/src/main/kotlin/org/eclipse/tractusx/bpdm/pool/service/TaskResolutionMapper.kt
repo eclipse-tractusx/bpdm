@@ -37,7 +37,7 @@ class TaskResolutionMapper {
                 identifiers = identifiers.map { Identifier(it.value, it.type, it.issuingBody) },
                 states = states.map { BusinessState(it.validFrom?.toInstant(ZoneOffset.UTC), it.validTo?.toInstant(ZoneOffset.UTC), it.type) },
                 confidenceCriteria = toTaskResult(confidenceCriteria),
-                isCatenaXMemberData = legalEntity.isCatenaXMemberData,
+                isParticipantData = legalEntity.isParticipantData,
                 hasChanged = hasChanged,
                 legalAddress = toTaskResult(legalAddress, hasChanged)
             )

@@ -21,9 +21,9 @@ package org.eclipse.tractusx.bpdm.pool.api
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.CxMembershipDto
-import org.eclipse.tractusx.bpdm.pool.api.model.request.CxMembershipSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.CxMembershipUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.DataSpaceParticipantDto
+import org.eclipse.tractusx.bpdm.pool.api.model.request.DataSpaceParticipantSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.DataSpaceParticipantUpdateRequest
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.GetMapping
@@ -32,15 +32,15 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 
 @RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
-interface PoolCxMembershipApi {
+interface PoolDataSpaceParticipantsApi {
 
-    @GetMapping(value = [ApiCommons.MEMBERSHIP_BASE_PATH_V6, ApiCommons.MEMBERSHIP_BASE_PATH_V7])
+    @GetMapping(value = [ApiCommons.MEMBERSHIP_BASE_PATH_V7])
     fun get(
-        @ParameterObject searchRequest: CxMembershipSearchRequest,
+        @ParameterObject searchRequest: DataSpaceParticipantSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageDto<CxMembershipDto>
+    ): PageDto<DataSpaceParticipantDto>
 
 
-    @PutMapping(value = [ApiCommons.MEMBERSHIP_BASE_PATH_V6, ApiCommons.MEMBERSHIP_BASE_PATH_V7])
-    fun put(@RequestBody updateRequest: CxMembershipUpdateRequest)
+    @PutMapping(value = [ApiCommons.MEMBERSHIP_BASE_PATH_V7])
+    fun put(@RequestBody updateRequest: DataSpaceParticipantUpdateRequest)
 }

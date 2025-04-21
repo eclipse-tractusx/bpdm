@@ -630,7 +630,7 @@ class BusinessPartnerBuildService(
                 legalForm = legalForm,
                 currentness = Instant.now().truncatedTo(ChronoUnit.MICROS),
                 confidenceCriteria = createConfidenceCriteria(legalEntityDto.confidenceCriteria),
-                isCatenaXMemberData = legalEntityDto.isCatenaXMemberData
+                isCatenaXMemberData = legalEntityDto.isParticipantData
             )
             updateLegalEntity(newLegalEntity, legalEntityDto, metadataMap)
 
@@ -650,7 +650,7 @@ class BusinessPartnerBuildService(
             legalEntity.identifiers.replace(legalEntityDto.identifiers.map { toLegalEntityIdentifier(it, metadataMap.idTypes, legalEntity) })
             legalEntity.states.replace(legalEntityDto.states.map { toLegalEntityState(it, legalEntity) })
             legalEntity.confidenceCriteria = createConfidenceCriteria(legalEntityDto.confidenceCriteria)
-            legalEntity.isCatenaXMemberData = legalEntityDto.isCatenaXMemberData
+            legalEntity.isCatenaXMemberData = legalEntityDto.isParticipantData
         }
 
         fun createPhysicalAddress(physicalAddress: IBasePhysicalPostalAddressDto, regions: Map<String, RegionDb>): PhysicalPostalAddressDb {

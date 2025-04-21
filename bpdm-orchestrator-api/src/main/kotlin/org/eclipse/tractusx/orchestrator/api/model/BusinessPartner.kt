@@ -311,8 +311,8 @@ data class LegalEntity(
     @Schema(description = "The business state history of this legal entity")
     val states: List<BusinessState>,
     val confidenceCriteria: ConfidenceCriteria,
-    @Schema(description = "Whether this legal entity is part of the Catena-X network")
-    val isCatenaXMemberData: Boolean?,
+    @Schema(description = "Whether this legal entity is part of the Data Space network")
+    val isParticipantData: Boolean?,
     @Schema(description = "Whether this legal entity information differs from its golden record counterpart in the Pool. +" +
             "The Pool will not update the legal entity if it is set to false. " +
             "However, if this legal entity constitutes a new legal entity golden record, it is still created independent of this flag.")
@@ -328,7 +328,7 @@ data class LegalEntity(
             identifiers = emptyList(),
             states = emptyList(),
             confidenceCriteria = ConfidenceCriteria.empty,
-            isCatenaXMemberData = null,
+            isParticipantData = null,
             hasChanged = null,
             legalAddress = PostalAddress.empty
         )

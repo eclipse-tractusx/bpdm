@@ -39,7 +39,4 @@ interface IBaseLegalEntityDto {
     val states: Collection<ILegalEntityStateDto>
 
     val confidenceCriteria: IConfidenceCriteriaDto?
-
-    @get:Schema(description = "Indicates whether the legal entity is owned and thus provided by a Catena-X Member.")
-    val isCatenaXMemberData: Boolean
 }

@@ -147,7 +147,7 @@ class BusinessPartnerEquivalenceMapper {
         override val states: SortedSet<StateEquivalenceDto>,
         override val confidenceCriteria: ConfidenceCriteriaEquivalenceDto?,
         val legalAddress: LogisticAddressEquivalenceDto?,
-        override val isCatenaXMemberData: Boolean
+        val isCatenaXMemberData: Boolean
     ) : IBaseLegalEntityDto
 
     data class SiteEquivalenceDto(

@@ -100,7 +100,7 @@ class MetadataService(
             technicalKey = request.technicalKey,
             name = request.name,
             transliteratedName = request.transliteratedName,
-            abbreviation = request.abbreviation,
+            abbreviation = request.abbreviations,
             transliteratedAbbreviations = request.transliteratedAbbreviations,
             countryCode = request.country,
             languageCode = request.language,

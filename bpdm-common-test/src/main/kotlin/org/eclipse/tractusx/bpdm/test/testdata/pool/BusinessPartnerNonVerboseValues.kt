@@ -84,7 +84,7 @@ object BusinessPartnerNonVerboseValues {
         technicalKey = BusinessPartnerVerboseValues.legalForm1.technicalKey,
         name = BusinessPartnerVerboseValues.legalForm1.name,
         transliteratedName = BusinessPartnerVerboseValues.legalForm1.transliteratedName,
-        abbreviation = BusinessPartnerVerboseValues.legalForm1.abbreviation,
+        abbreviations = BusinessPartnerVerboseValues.legalForm1.abbreviations,
         transliteratedAbbreviations = BusinessPartnerVerboseValues.legalForm1.transliteratedAbbreviations,
         country = BusinessPartnerVerboseValues.legalForm1.country,
         language = BusinessPartnerVerboseValues.legalForm1.language,
@@ -95,7 +95,7 @@ object BusinessPartnerNonVerboseValues {
         technicalKey = BusinessPartnerVerboseValues.legalForm2.technicalKey,
         name = BusinessPartnerVerboseValues.legalForm2.name,
         transliteratedName = BusinessPartnerVerboseValues.legalForm2.transliteratedName,
-        abbreviation = BusinessPartnerVerboseValues.legalForm2.abbreviation,
+        abbreviations = BusinessPartnerVerboseValues.legalForm2.abbreviations,
         transliteratedAbbreviations = BusinessPartnerVerboseValues.legalForm2.transliteratedAbbreviations,
         country = BusinessPartnerVerboseValues.legalForm2.country,
         language = BusinessPartnerVerboseValues.legalForm2.language,
@@ -106,7 +106,7 @@ object BusinessPartnerNonVerboseValues {
         technicalKey = BusinessPartnerVerboseValues.legalForm3.technicalKey,
         name = BusinessPartnerVerboseValues.legalForm3.name,
         transliteratedName = BusinessPartnerVerboseValues.legalForm3.transliteratedName,
-        abbreviation = BusinessPartnerVerboseValues.legalForm3.abbreviation,
+        abbreviations = BusinessPartnerVerboseValues.legalForm3.abbreviations,
         transliteratedAbbreviations = BusinessPartnerVerboseValues.legalForm3.transliteratedAbbreviations,
         country = BusinessPartnerVerboseValues.legalForm3.country,
         language = BusinessPartnerVerboseValues.legalForm3.language,
@@ -266,7 +266,7 @@ object BusinessPartnerNonVerboseValues {
             identifiers = listOf(identifier1),
             states = listOf(leStatus1),
             confidenceCriteria = BusinessPartnerVerboseValues.legalEntity1.legalEntity.confidenceCriteria,
-            isCatenaXMemberData = false
+            isParticipantData = false
         ),
         legalAddress = logisticAddress1,
         index = BusinessPartnerVerboseValues.legalEntityUpsert1.index
@@ -280,7 +280,7 @@ object BusinessPartnerNonVerboseValues {
             identifiers = listOf(identifier2),
             states = listOf(leStatus2),
             confidenceCriteria = BusinessPartnerVerboseValues.legalEntity2.legalEntity.confidenceCriteria,
-            isCatenaXMemberData = false
+            isParticipantData = false
         ),
         legalAddress = logisticAddress2,
         index = BusinessPartnerVerboseValues.legalEntityUpsert2.index
@@ -294,7 +294,7 @@ object BusinessPartnerNonVerboseValues {
             identifiers = listOf(identifier3),
             states = listOf(leStatus3),
             confidenceCriteria = BusinessPartnerVerboseValues.legalEntity3.legalEntity.confidenceCriteria,
-            isCatenaXMemberData = false
+            isParticipantData = false
         ),
         legalAddress = logisticAddress3,
         index = BusinessPartnerVerboseValues.legalEntityUpsert3.index
@@ -308,7 +308,7 @@ object BusinessPartnerNonVerboseValues {
             identifiers = listOf(identifier1, identifier2),
             states = listOf(leStatus1),
             confidenceCriteria = BusinessPartnerVerboseValues.legalEntity1.legalEntity.confidenceCriteria,
-            isCatenaXMemberData = false
+            isParticipantData = false
         ),
         legalAddress = logisticAddress1,
         index = BusinessPartnerVerboseValues.legalEntityUpsertMultipleIdentifier.index

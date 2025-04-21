@@ -54,7 +54,7 @@ interface PoolSiteApi {
         ]
     )
     @Tag(name = ApiCommons.SITE_NAME, description = ApiCommons.SITE_DESCRIPTION)
-    @GetMapping(value = ["${ApiCommons.SITE_BASE_PATH_V6}/{bpns}", "${ApiCommons.SITE_BASE_PATH_V7}/{bpns}"])
+    @GetMapping(value = ["${ApiCommons.SITE_BASE_PATH_V7}/{bpns}"])
     fun getSite(
         @Parameter(description = "BPNS value") @PathVariable bpns: String
     ): SiteWithMainAddressVerboseDto
@@ -70,7 +70,7 @@ interface PoolSiteApi {
         ]
     )
     @Tag(name = ApiCommons.SITE_NAME, description = ApiCommons.SITE_DESCRIPTION)
-    @PostMapping(value = ["${ApiCommons.SITE_BASE_PATH_V6}/search", "${ApiCommons.SITE_BASE_PATH_V7}/search"])
+    @PostMapping(value = ["${ApiCommons.SITE_BASE_PATH_V7}/search"])
     fun postSiteSearch(
         @RequestBody searchRequest: SiteSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
@@ -89,7 +89,7 @@ interface PoolSiteApi {
         ]
     )
     @Tag(name = ApiCommons.SITE_NAME, description = ApiCommons.SITE_DESCRIPTION)
-    @PostMapping(value = [ApiCommons.SITE_BASE_PATH_V6, ApiCommons.SITE_BASE_PATH_V7])
+    @PostMapping(value = [ApiCommons.SITE_BASE_PATH_V7])
     fun createSite(
         @RequestBody
         requests: Collection<SitePartnerCreateRequest>
@@ -107,7 +107,7 @@ interface PoolSiteApi {
         ]
     )
     @Tag(name = ApiCommons.SITE_NAME, description = ApiCommons.SITE_DESCRIPTION)
-    @PutMapping(value = [ApiCommons.SITE_BASE_PATH_V6, ApiCommons.SITE_BASE_PATH_V7])
+    @PutMapping(value = [ApiCommons.SITE_BASE_PATH_V7])
     fun updateSite(
         @RequestBody
         requests: Collection<SitePartnerUpdateRequest>
@@ -124,7 +124,7 @@ interface PoolSiteApi {
         ]
     )
     @Tag(name = ApiCommons.SITE_NAME, description = ApiCommons.SITE_DESCRIPTION)
-    @GetMapping(value = [ApiCommons.SITE_BASE_PATH_V6, ApiCommons.SITE_BASE_PATH_V7])
+    @GetMapping(value = [ApiCommons.SITE_BASE_PATH_V7])
     fun getSites(
         @ParameterObject searchRequest: SiteSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
@@ -142,7 +142,7 @@ interface PoolSiteApi {
         ]
     )
     @Tag(name = ApiCommons.SITE_NAME, description = ApiCommons.SITE_DESCRIPTION)
-    @PostMapping(value = ["${ApiCommons.SITE_BASE_PATH_V6}/legal-main-sites", "${ApiCommons.SITE_BASE_PATH_V7}/legal-main-sites"])
+    @PostMapping(value = ["${ApiCommons.SITE_BASE_PATH_V7}/legal-main-sites"])
     fun createSiteWithLegalReference(
         @RequestBody request: Collection<SiteCreateRequestWithLegalAddressAsMain>
     ): SitePartnerCreateResponseWrapper

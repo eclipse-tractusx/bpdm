@@ -54,7 +54,7 @@ interface GoldenRecordTaskApi {
         ]
     )
     @Tag(name = TagClient)
-    @PostMapping(value = [ApiCommons.BASE_PATH_V6, ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS])
+    @PostMapping(value = [ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS])
     fun createTasks(@RequestBody createRequest: TaskCreateRequest): TaskCreateResponse
 
     @Operation(
@@ -71,7 +71,7 @@ interface GoldenRecordTaskApi {
         ]
     )
     @Tag(name = TagClient)
-    @PostMapping(value = ["${ApiCommons.BASE_PATH_V6}/state/search", "${ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS}/state/search"])
+    @PostMapping(value = ["${ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS}/state/search"])
     fun searchTaskStates(@RequestBody stateRequest: TaskStateRequest): TaskStateResponse
 
     @Operation(
@@ -108,7 +108,7 @@ interface GoldenRecordTaskApi {
         ]
     )
     @Tag(name = TagWorker)
-    @PostMapping(value = ["${ApiCommons.BASE_PATH_V6}/step-reservations", "${ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS}/step-reservations"])
+    @PostMapping(value = ["${ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS}/step-reservations"])
     fun reserveTasksForStep(@RequestBody reservationRequest: TaskStepReservationRequest): TaskStepReservationResponse
 
     @Operation(
@@ -133,6 +133,6 @@ interface GoldenRecordTaskApi {
         ]
     )
     @Tag(name = TagWorker)
-    @PostMapping(value = ["${ApiCommons.BASE_PATH_V6}/step-results", "${ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS}/step-results"])
+    @PostMapping(value = ["${ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS}/step-results"])
     fun resolveStepResults(@RequestBody resultRequest: TaskStepResultRequest)
 }

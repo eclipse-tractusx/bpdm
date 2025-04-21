@@ -56,7 +56,7 @@ interface PoolLegalEntityApi {
         ]
     )
     @Tag(name = ApiCommons.LEGAL_ENTITIES_NAME, description = ApiCommons.LEGAL_ENTITIES_DESCRIPTION)
-    @GetMapping(value = [ApiCommons.LEGAL_ENTITY_BASE_PATH_V6, ApiCommons.LEGAL_ENTITY_BASE_PATH_V7])
+    @GetMapping(value = [ApiCommons.LEGAL_ENTITY_BASE_PATH_V7])
     fun getLegalEntities(
         @ParameterObject searchRequest: LegalEntitySearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
@@ -82,7 +82,7 @@ interface PoolLegalEntityApi {
         ]
     )
     @Tag(name = ApiCommons.LEGAL_ENTITIES_NAME, description = ApiCommons.LEGAL_ENTITIES_DESCRIPTION)
-    @GetMapping(value = ["${ApiCommons.LEGAL_ENTITY_BASE_PATH_V6}/{idValue}", "${ApiCommons.LEGAL_ENTITY_BASE_PATH_V7}/{idValue}"])
+    @GetMapping(value = ["${ApiCommons.LEGAL_ENTITY_BASE_PATH_V7}/{idValue}"])
     fun getLegalEntity(
         @Parameter(description = "Identifier value") @PathVariable("idValue") idValue: String,
         @Parameter(description = "Type of identifier to use, defaults to BPN when omitted", schema = Schema(defaultValue = "BPN"))
@@ -106,7 +106,7 @@ interface PoolLegalEntityApi {
         ]
     )
     @Tag(name = ApiCommons.LEGAL_ENTITIES_NAME, description = ApiCommons.LEGAL_ENTITIES_DESCRIPTION)
-    @PostMapping(value = ["${ApiCommons.LEGAL_ENTITY_BASE_PATH_V6}/search", "${ApiCommons.LEGAL_ENTITY_BASE_PATH_V7}/search"])
+    @PostMapping(value = ["${ApiCommons.LEGAL_ENTITY_BASE_PATH_V7}/search"])
     fun postLegalEntitySearch(
         @RequestBody searchRequest: LegalEntitySearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
@@ -124,7 +124,7 @@ interface PoolLegalEntityApi {
         ]
     )
     @Tag(name = ApiCommons.LEGAL_ENTITIES_NAME, description = ApiCommons.LEGAL_ENTITIES_DESCRIPTION)
-    @GetMapping(value = ["${ApiCommons.LEGAL_ENTITY_BASE_PATH_V6}/{bpnl}/sites", "${ApiCommons.LEGAL_ENTITY_BASE_PATH_V7}/{bpnl}/sites"])
+    @GetMapping(value = ["${ApiCommons.LEGAL_ENTITY_BASE_PATH_V7}/{bpnl}/sites"])
     fun getSites(
         @Parameter(description = "BPNL value") @PathVariable bpnl: String,
         @ParameterObject paginationRequest: PaginationRequest
@@ -142,7 +142,7 @@ interface PoolLegalEntityApi {
         ]
     )
     @Tag(name = ApiCommons.LEGAL_ENTITIES_NAME, description = ApiCommons.LEGAL_ENTITIES_DESCRIPTION)
-    @GetMapping(value = ["${ApiCommons.LEGAL_ENTITY_BASE_PATH_V6}/{bpnl}/addresses", "${ApiCommons.LEGAL_ENTITY_BASE_PATH_V7}/{bpnl}/addresses"])
+    @GetMapping(value = ["${ApiCommons.LEGAL_ENTITY_BASE_PATH_V7}/{bpnl}/addresses"])
     fun getAddresses(
         @Parameter(description = "BPNL value") @PathVariable bpnl: String,
         @ParameterObject paginationRequest: PaginationRequest
@@ -161,7 +161,7 @@ interface PoolLegalEntityApi {
         ]
     )
     @Tag(name = ApiCommons.LEGAL_ENTITIES_NAME, description = ApiCommons.LEGAL_ENTITIES_DESCRIPTION)
-    @PostMapping(value = [ApiCommons.LEGAL_ENTITY_BASE_PATH_V6, ApiCommons.LEGAL_ENTITY_BASE_PATH_V7])
+    @PostMapping(value = [ApiCommons.LEGAL_ENTITY_BASE_PATH_V7])
     fun createBusinessPartners(
         @RequestBody
         businessPartners: Collection<LegalEntityPartnerCreateRequest>
@@ -180,7 +180,7 @@ interface PoolLegalEntityApi {
         ]
     )
     @Tag(name = ApiCommons.LEGAL_ENTITIES_NAME, description = ApiCommons.LEGAL_ENTITIES_DESCRIPTION)
-    @PutMapping(value = [ApiCommons.LEGAL_ENTITY_BASE_PATH_V6, ApiCommons.LEGAL_ENTITY_BASE_PATH_V7])
+    @PutMapping(value = [ApiCommons.LEGAL_ENTITY_BASE_PATH_V7])
     fun updateBusinessPartners(
         @RequestBody
         businessPartners: Collection<LegalEntityPartnerUpdateRequest>

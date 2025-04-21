@@ -17,10 +17,24 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.model.request
+package org.eclipse.tractusx.orchestrator.api.v6.model
 
-import org.eclipse.tractusx.bpdm.pool.api.model.CxMembershipDto
+import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.RequestWithKey
 
-data class CxMembershipUpdateRequest(
-    val memberships: List<CxMembershipDto>
-)
+@Schema(description = "Task reservation entry")
+data class TaskStepReservationEntryDto(
+
+    @get:Schema(description = "The identifier of the reserved task")
+    val taskId: String,
+
+    @get:Schema(description = "The identifier of the gate record for which this task has been created")
+    val recordId: String,
+
+    @get:Schema(description = "The business partner data to process")
+    val businessPartner: BusinessPartner
+) : RequestWithKey {
+    override fun getRequestKey(): String {
+        return taskId
+    }
+}

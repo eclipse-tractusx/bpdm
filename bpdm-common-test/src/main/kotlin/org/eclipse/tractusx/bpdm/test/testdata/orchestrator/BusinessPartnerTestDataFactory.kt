@@ -81,7 +81,7 @@ class BusinessPartnerTestDataFactory(
             identifiers = createIdentifiers(seed, random, metadata?.legalEntityIdentifierTypes),
             states = createStates(seed, random.nextInt(2, 5), random),
             confidenceCriteria = createConfidenceCriteria(random),
-            isCatenaXMemberData = random.nextBoolean(),
+            isParticipantData = random.nextBoolean(),
             hasChanged = true,
             legalAddress = createAddress("Legal Address $seed")
         )

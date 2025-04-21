@@ -17,9 +17,18 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.model.request
+package org.eclipse.tractusx.orchestrator.api.v6.model
 
-data class CxMembershipSearchRequest(
-    val bpnLs: List<String>? = null,
-    val isCatenaXMember: Boolean? = null
+import io.swagger.v3.oas.annotations.media.ArraySchema
+import io.swagger.v3.oas.annotations.media.Schema
+import java.time.Instant
+
+@Schema(description = "Response object for giving a list of reserved tasks")
+data class TaskStepReservationResponse(
+
+    @get:ArraySchema(arraySchema = Schema(description = "The reserved tasks with their business partner data to process"))
+    val reservedTasks: List<TaskStepReservationEntryDto>,
+
+    @get:Schema(description = "The timestamp until the reservation is valid and results are accepted", deprecated = true)
+    val timeout: Instant
 )

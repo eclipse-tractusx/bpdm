@@ -66,7 +66,7 @@ class ExpectedBusinessPartnerResultFactory(
                     relations = emptyList(),
                     currentness = currentness,
                     confidenceCriteria = confidenceCriteria,
-                    isCatenaXMemberData = isCatenaXMemberData,
+                    isParticipantData = isParticipantData,
                     createdAt = legalEntityCreatedAt,
                     updatedAt = legalEntityUpdatedAt
                 )
@@ -77,7 +77,7 @@ class ExpectedBusinessPartnerResultFactory(
                 givenBpnL,
                 null,
                 AddressType.LegalAddress,
-                givenRequest.legalEntity.isCatenaXMemberData,
+                givenRequest.legalEntity.isParticipantData,
                 addressCreatedAt,
                 addressUpdatedAt
             )
@@ -87,7 +87,7 @@ class ExpectedBusinessPartnerResultFactory(
     fun mapToExpectedSites(
         hierarchy: LegalEntityHierarchy
     ): List<SiteWithMainAddressVerboseDto> {
-        return hierarchy.getAllSites().map { mapToExpectedSite(it, hierarchy.legalEntity.legalEntity.isCatenaXMemberData) }
+        return hierarchy.getAllSites().map { mapToExpectedSite(it, hierarchy.legalEntity.legalEntity.isParticipantData) }
     }
 
     fun mapToExpectedSite(
@@ -106,7 +106,7 @@ class ExpectedBusinessPartnerResultFactory(
                     bpns = givenBpnS,
                     name = name,
                     states = states.map { mapToExpectedResult(it) },
-                    isCatenaXMemberData = isCatenaXMemberData,
+                    isParticipantData = isCatenaXMemberData,
                     bpnLegalEntity = givenRequest.bpnlParent,
                     createdAt = siteCreatedAt,
                     updatedAt = siteUpdatedAt,
@@ -129,7 +129,7 @@ class ExpectedBusinessPartnerResultFactory(
     fun mapToExpectedAddresses(
         hierarchy: LegalEntityHierarchy
     ): List<LogisticAddressVerboseDto> {
-        val isCxMember = hierarchy.legalEntity.legalEntity.isCatenaXMemberData
+        val isCxMember = hierarchy.legalEntity.legalEntity.isParticipantData
         val legalEntityAdditionalAddresses = hierarchy.addresses
         val siteAdditionalAddressesWithBpnl = hierarchy.siteHierarchy
             .flatMap{ siteHierarchy -> siteHierarchy.addresses.map { Pair(it, siteHierarchy.site.bpnlParent) } }
@@ -153,7 +153,7 @@ class ExpectedBusinessPartnerResultFactory(
             bpnLegalEntity = bpnLegalEntity,
             bpnSite = null,
             addressType = AddressType.LegalAddress,
-            isCatenaXMemberData = givenRequest.legalEntity.isCatenaXMemberData,
+            isCatenaXMemberData = givenRequest.legalEntity.isParticipantData,
             createdAt = createdAt,
             updatedAt = updatedAt
         )
@@ -219,7 +219,7 @@ class ExpectedBusinessPartnerResultFactory(
                 alternativePostalAddress = alternativePostalAddress?.let { mapToExpectedResult(it) },
                 bpnLegalEntity = bpnLegalEntity,
                 bpnSite = bpnSite,
-                isCatenaXMemberData = isCatenaXMemberData,
+                isParticipantData = isCatenaXMemberData,
                 createdAt = createdAt,
                 updatedAt = updatedAt,
                 confidenceCriteria = confidenceCriteria,

@@ -197,7 +197,7 @@ class TaskResolutionServiceTest @Autowired constructor(
         assertThat(createdLegalEntity.legalAddress.bpnLegalEntity).isEqualTo(createdLegalEntity.legalEntity.bpnl)
         assertThat(createdLegalEntity.legalAddress.addressType == AddressType.LegalAddress).isTrue()
         assertThat(createResult[0].businessPartner.legalEntity.bpnReference.referenceValue).isEqualTo(createdLegalEntity.legalEntity.bpnl)
-        compareLegalEntity(createdLegalEntity, createResult[0].businessPartner.legalEntity.copy(isCatenaXMemberData = false))
+        compareLegalEntity(createdLegalEntity, createResult[0].businessPartner.legalEntity.copy(isParticipantData = false))
         val createdAdditionalAddress = poolClient.addresses.getAddress(createResult[0].businessPartner.additionalAddress?.bpnReference?.referenceValue!!)
         assertThat(createdAdditionalAddress.bpnLegalEntity).isEqualTo(createdLegalEntity.legalEntity.bpnl)
         assertThat(createdAdditionalAddress.addressType == AddressType.AdditionalAddress).isTrue()
@@ -456,7 +456,7 @@ class TaskResolutionServiceTest @Autowired constructor(
 
         val updatedLegalEntity = poolClient.legalEntities.getLegalEntity(updateResult[0].businessPartner.legalEntity.bpnReference.referenceValue!!)
         assertThat(updatedLegalEntity.legalEntity.legalName).isEqualTo(updateLegalEntityRequest.legalEntity.legalName)
-        compareLegalEntity(updatedLegalEntity, updateResult[0].businessPartner.legalEntity.copy(isCatenaXMemberData = createLegalEntityRequest.legalEntity.isCatenaXMemberData))
+        compareLegalEntity(updatedLegalEntity, updateResult[0].businessPartner.legalEntity.copy(isParticipantData = createLegalEntityRequest.legalEntity.isParticipantData))
     }
 
     @Test
@@ -485,7 +485,7 @@ class TaskResolutionServiceTest @Autowired constructor(
 
         val updatedLegalEntity = poolClient.legalEntities.getLegalEntity(updateResult[0].businessPartner.legalEntity.bpnReference.referenceValue!!)
         assertThat(updatedLegalEntity.legalEntity.legalName).isEqualTo(updateLegalEntityRequest.legalEntity.legalName)
-        compareLegalEntity(updatedLegalEntity, updateResult[0].businessPartner.legalEntity.copy(isCatenaXMemberData = createLegalEntityRequest.legalEntity.isCatenaXMemberData))
+        compareLegalEntity(updatedLegalEntity, updateResult[0].businessPartner.legalEntity.copy(isParticipantData = createLegalEntityRequest.legalEntity.isParticipantData))
     }
 
     @Test
@@ -941,7 +941,7 @@ class TaskResolutionServiceTest @Autowired constructor(
     }
 
     fun BusinessPartner.withCxMembership(isCatenaXMemberData: Boolean?): BusinessPartner{
-        return copy(legalEntity = legalEntity.copy(isCatenaXMemberData = isCatenaXMemberData))
+        return copy(legalEntity = legalEntity.copy(isParticipantData = isCatenaXMemberData))
     }
 
     private fun minValidLegalEntity(): BusinessPartner {

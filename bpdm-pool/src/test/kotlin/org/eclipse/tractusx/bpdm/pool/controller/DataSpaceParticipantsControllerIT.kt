@@ -23,9 +23,9 @@ import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.model.CxMembershipDto
-import org.eclipse.tractusx.bpdm.pool.api.model.request.CxMembershipSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.CxMembershipUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.DataSpaceParticipantDto
+import org.eclipse.tractusx.bpdm.pool.api.model.request.DataSpaceParticipantSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.DataSpaceParticipantUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateVerboseDto
 import org.eclipse.tractusx.bpdm.pool.util.TestHelpers
@@ -45,7 +45,7 @@ import org.springframework.test.context.ContextConfiguration
 )
 @ActiveProfiles("test-no-auth", "test-scheduling-disabled")
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
-class CxMembershipControllerIT @Autowired constructor(
+class DataSpaceParticipantsControllerIT @Autowired constructor(
     private val poolClient: PoolApiClient,
     private val dataHelper: PoolDataHelper,
     private val dbTestHelpers: DbTestHelpers
@@ -59,42 +59,42 @@ class CxMembershipControllerIT @Autowired constructor(
     }
 
     @Test
-    fun `get cx memberships without filter`(){
+    fun `get data space participants without filter`(){
         val legalEntityRequests = listOf(
-            testDataEnvironment.requestFactory.createLegalEntityRequest("Member 1", isCatenaXMemberData = true),
-            testDataEnvironment.requestFactory.createLegalEntityRequest("Non-Member 1", isCatenaXMemberData = false),
-            testDataEnvironment.requestFactory.createLegalEntityRequest("Member 2", isCatenaXMemberData = true),
-            testDataEnvironment.requestFactory.createLegalEntityRequest("Non-Member 2", isCatenaXMemberData = false),
+            testDataEnvironment.requestFactory.createLegalEntityRequest("Member 1", isParticipantData = true),
+            testDataEnvironment.requestFactory.createLegalEntityRequest("Non-Member 1", isParticipantData = false),
+            testDataEnvironment.requestFactory.createLegalEntityRequest("Member 2", isParticipantData = true),
+            testDataEnvironment.requestFactory.createLegalEntityRequest("Non-Member 2", isParticipantData = false),
         )
         val givenLegalEntities = poolClient.legalEntities.createBusinessPartners(legalEntityRequests).entities
         val bpnLsToFind = getBpnLs(legalEntityRequests, givenLegalEntities)
 
-        val actualMemberships = poolClient.memberships.get(CxMembershipSearchRequest(), PaginationRequest(size = legalEntityRequests.size)).content
+        val actualMemberships = poolClient.participants.get(DataSpaceParticipantSearchRequest(), PaginationRequest(size = legalEntityRequests.size)).content
 
         val expectedMemberships = legalEntityRequests.zip(bpnLsToFind)
-            .map { (request, bpnL) -> CxMembershipDto(bpnL, request.legalEntity.isCatenaXMemberData) }
+            .map { (request, bpnL) -> DataSpaceParticipantDto(bpnL, request.legalEntity.isParticipantData) }
 
 
         assertThat(actualMemberships).isEqualTo(expectedMemberships)
     }
 
     @Test
-    fun `get cx memberships paginated`(){
+    fun `get data space participants paginated`(){
         val legalEntityRequests = listOf(
-            testDataEnvironment.requestFactory.createLegalEntityRequest("Member 1", isCatenaXMemberData = true),
-            testDataEnvironment.requestFactory.createLegalEntityRequest("Non-Member 1", isCatenaXMemberData = false),
-            testDataEnvironment.requestFactory.createLegalEntityRequest("Member 2", isCatenaXMemberData = true),
-            testDataEnvironment.requestFactory.createLegalEntityRequest("Non-Member 2", isCatenaXMemberData = false),
+            testDataEnvironment.requestFactory.createLegalEntityRequest("Member 1", isParticipantData = true),
+            testDataEnvironment.requestFactory.createLegalEntityRequest("Non-Member 1", isParticipantData = false),
+            testDataEnvironment.requestFactory.createLegalEntityRequest("Member 2", isParticipantData = true),
+            testDataEnvironment.requestFactory.createLegalEntityRequest("Non-Member 2", isParticipantData = false),
         )
         val givenLegalEntities = poolClient.legalEntities.createBusinessPartners(legalEntityRequests).entities
         val bpnLsToFind = getBpnLs(legalEntityRequests, givenLegalEntities)
 
-        val actualMembershipsPage1 = poolClient.memberships.get(CxMembershipSearchRequest(), PaginationRequest(size = 2)).content
-        val actualMembershipsPage2 = poolClient.memberships.get(CxMembershipSearchRequest(), PaginationRequest(page = 1, size = 2)).content
+        val actualMembershipsPage1 = poolClient.participants.get(DataSpaceParticipantSearchRequest(), PaginationRequest(size = 2)).content
+        val actualMembershipsPage2 = poolClient.participants.get(DataSpaceParticipantSearchRequest(), PaginationRequest(page = 1, size = 2)).content
 
 
         val expectedMembershipsTotal =  legalEntityRequests.zip(bpnLsToFind)
-            .map { (request, bpnL) -> CxMembershipDto(bpnL, request.legalEntity.isCatenaXMemberData) }
+            .map { (request, bpnL) -> DataSpaceParticipantDto(bpnL, request.legalEntity.isParticipantData) }
 
         val expectedMembershipsPage1 = expectedMembershipsTotal.take(2)
         val expectedMembershipsPage2 = expectedMembershipsTotal.drop(2).take(2)
@@ -104,141 +104,141 @@ class CxMembershipControllerIT @Autowired constructor(
     }
 
     @Test
-    fun `get cx memberships with BPNL filter`(){
+    fun `get data space participants with BPNL filter`(){
         val legalEntitiesToFind = listOf(
-            testDataEnvironment.requestFactory.createLegalEntityRequest("Member 1", isCatenaXMemberData = true),
-            testDataEnvironment.requestFactory.createLegalEntityRequest("Non-Member 1", isCatenaXMemberData = false)
+            testDataEnvironment.requestFactory.createLegalEntityRequest("Member 1", isParticipantData = true),
+            testDataEnvironment.requestFactory.createLegalEntityRequest("Non-Member 1", isParticipantData = false)
         )
 
         val legalEntitiesToIgnore = listOf(
-            testDataEnvironment.requestFactory.createLegalEntityRequest("Member 2", isCatenaXMemberData = true),
-            testDataEnvironment.requestFactory.createLegalEntityRequest("Non-Member 2", isCatenaXMemberData = false),
+            testDataEnvironment.requestFactory.createLegalEntityRequest("Member 2", isParticipantData = true),
+            testDataEnvironment.requestFactory.createLegalEntityRequest("Non-Member 2", isParticipantData = false),
         )
 
         val givenLegalEntities = poolClient.legalEntities.createBusinessPartners(legalEntitiesToFind + legalEntitiesToIgnore).entities
         val bpnLsToFind = getBpnLs(legalEntitiesToFind, givenLegalEntities)
 
-        val actualMemberships = poolClient.memberships.get(CxMembershipSearchRequest(bpnLsToFind), PaginationRequest()).content
+        val actualMemberships = poolClient.participants.get(DataSpaceParticipantSearchRequest(bpnLsToFind), PaginationRequest()).content
 
         val expectedMemberships = legalEntitiesToFind.zip(bpnLsToFind)
-            .map { (request, bpnL) -> CxMembershipDto(bpnL, request.legalEntity.isCatenaXMemberData) }
+            .map { (request, bpnL) -> DataSpaceParticipantDto(bpnL, request.legalEntity.isParticipantData) }
 
 
         assertThat(actualMemberships).isEqualTo(expectedMemberships)
     }
 
     @Test
-    fun `get cx memberships with membership true filter`(){
+    fun `get data space participants with participants true filter`(){
         val legalEntitiesToFind = listOf(
-            testDataEnvironment.requestFactory.createLegalEntityRequest("Member 1", isCatenaXMemberData = true),
-            testDataEnvironment.requestFactory.createLegalEntityRequest("Member 2", isCatenaXMemberData = true),
+            testDataEnvironment.requestFactory.createLegalEntityRequest("Member 1", isParticipantData = true),
+            testDataEnvironment.requestFactory.createLegalEntityRequest("Member 2", isParticipantData = true),
         )
 
         val legalEntitiesToIgnore = listOf(
-            testDataEnvironment.requestFactory.createLegalEntityRequest("Non-Member 1", isCatenaXMemberData = false),
-            testDataEnvironment.requestFactory.createLegalEntityRequest("Non-Member 2", isCatenaXMemberData = false),
+            testDataEnvironment.requestFactory.createLegalEntityRequest("Non-Member 1", isParticipantData = false),
+            testDataEnvironment.requestFactory.createLegalEntityRequest("Non-Member 2", isParticipantData = false),
         )
 
         val givenLegalEntities = poolClient.legalEntities.createBusinessPartners(legalEntitiesToFind + legalEntitiesToIgnore).entities
         val bpnLsToFind = getBpnLs(legalEntitiesToFind, givenLegalEntities)
 
-        val actualMemberships = poolClient.memberships.get(CxMembershipSearchRequest(isCatenaXMember = true), PaginationRequest()).content
+        val actualMemberships = poolClient.participants.get(DataSpaceParticipantSearchRequest(isDataSpaceParticipant = true), PaginationRequest()).content
 
         val expectedMemberships = legalEntitiesToFind.zip(bpnLsToFind)
-            .map { (request, bpnL) -> CxMembershipDto(bpnL, request.legalEntity.isCatenaXMemberData) }
+            .map { (request, bpnL) -> DataSpaceParticipantDto(bpnL, request.legalEntity.isParticipantData) }
 
 
         assertThat(actualMemberships).isEqualTo(expectedMemberships)
     }
 
     @Test
-    fun `get cx memberships with membership false filter`(){
+    fun `get data space participants with participants false filter`(){
 
         val legalEntitiesToFind = listOf(
-            testDataEnvironment.requestFactory.createLegalEntityRequest("Non-Member 1", isCatenaXMemberData = false),
-            testDataEnvironment.requestFactory.createLegalEntityRequest("Non-Member 2", isCatenaXMemberData = false),
+            testDataEnvironment.requestFactory.createLegalEntityRequest("Non-Member 1", isParticipantData = false),
+            testDataEnvironment.requestFactory.createLegalEntityRequest("Non-Member 2", isParticipantData = false),
         )
 
         val legalEntitiesToIgnore = listOf(
-            testDataEnvironment.requestFactory.createLegalEntityRequest("Member 1", isCatenaXMemberData = true),
-            testDataEnvironment.requestFactory.createLegalEntityRequest("Member 2", isCatenaXMemberData = true),
+            testDataEnvironment.requestFactory.createLegalEntityRequest("Member 1", isParticipantData = true),
+            testDataEnvironment.requestFactory.createLegalEntityRequest("Member 2", isParticipantData = true),
         )
 
         val givenLegalEntities = poolClient.legalEntities.createBusinessPartners(legalEntitiesToFind + legalEntitiesToIgnore).entities
         val bpnLsToFind = getBpnLs(legalEntitiesToFind, givenLegalEntities)
 
-        val actualMemberships = poolClient.memberships.get(CxMembershipSearchRequest(isCatenaXMember = false), PaginationRequest()).content
+        val actualMemberships = poolClient.participants.get(DataSpaceParticipantSearchRequest(isDataSpaceParticipant = false), PaginationRequest()).content
 
         val expectedMemberships = legalEntitiesToFind.zip(bpnLsToFind)
-            .map { (request, bpnL) -> CxMembershipDto(bpnL, request.legalEntity.isCatenaXMemberData) }
+            .map { (request, bpnL) -> DataSpaceParticipantDto(bpnL, request.legalEntity.isParticipantData) }
 
 
         assertThat(actualMemberships).isEqualTo(expectedMemberships)
     }
 
     @Test
-    fun `get cx memberships with BPNLs and membership true filter`(){
+    fun `get data space participants with BPNLs and participants true filter`(){
         val legalEntitiesToFind = listOf(
-            testDataEnvironment.requestFactory.createLegalEntityRequest("Member 1", isCatenaXMemberData = true),
+            testDataEnvironment.requestFactory.createLegalEntityRequest("Member 1", isParticipantData = true),
         )
 
         val legalEntitiesToIgnore = listOf(
-            testDataEnvironment.requestFactory.createLegalEntityRequest("Member 2", isCatenaXMemberData = true),
-            testDataEnvironment.requestFactory.createLegalEntityRequest("Non-Member 1", isCatenaXMemberData = false),
-            testDataEnvironment.requestFactory.createLegalEntityRequest("Non-Member 2", isCatenaXMemberData = false),
+            testDataEnvironment.requestFactory.createLegalEntityRequest("Member 2", isParticipantData = true),
+            testDataEnvironment.requestFactory.createLegalEntityRequest("Non-Member 1", isParticipantData = false),
+            testDataEnvironment.requestFactory.createLegalEntityRequest("Non-Member 2", isParticipantData = false),
         )
 
         val givenLegalEntities = poolClient.legalEntities.createBusinessPartners(legalEntitiesToFind + legalEntitiesToIgnore).entities
         val bpnLsToFind = getBpnLs(legalEntitiesToFind, givenLegalEntities)
 
-        val actualMemberships = poolClient.memberships.get(CxMembershipSearchRequest(bpnLs = bpnLsToFind, isCatenaXMember = true), PaginationRequest()).content
+        val actualMemberships = poolClient.participants.get(DataSpaceParticipantSearchRequest(bpnLs = bpnLsToFind, isDataSpaceParticipant = true), PaginationRequest()).content
 
         val expectedMemberships = legalEntitiesToFind.zip(bpnLsToFind)
-            .map { (request, bpnL) -> CxMembershipDto(bpnL, request.legalEntity.isCatenaXMemberData) }
+            .map { (request, bpnL) -> DataSpaceParticipantDto(bpnL, request.legalEntity.isParticipantData) }
 
 
         assertThat(actualMemberships).isEqualTo(expectedMemberships)
     }
 
     @Test
-    fun `get cx memberships with BPNLs and membership false filter`(){
+    fun `get data space participants with BPNLs and participants false filter`(){
         val legalEntitiesToFind = listOf(
-            testDataEnvironment.requestFactory.createLegalEntityRequest("Non-Member 1", isCatenaXMemberData = false),
+            testDataEnvironment.requestFactory.createLegalEntityRequest("Non-Member 1", isParticipantData = false),
         )
 
         val legalEntitiesToIgnore = listOf(
-            testDataEnvironment.requestFactory.createLegalEntityRequest("Member 2", isCatenaXMemberData = true),
-            testDataEnvironment.requestFactory.createLegalEntityRequest("Member 1", isCatenaXMemberData = true),
-            testDataEnvironment.requestFactory.createLegalEntityRequest("Non-Member 2", isCatenaXMemberData = false),
+            testDataEnvironment.requestFactory.createLegalEntityRequest("Member 2", isParticipantData = true),
+            testDataEnvironment.requestFactory.createLegalEntityRequest("Member 1", isParticipantData = true),
+            testDataEnvironment.requestFactory.createLegalEntityRequest("Non-Member 2", isParticipantData = false),
         )
 
         val givenLegalEntities = poolClient.legalEntities.createBusinessPartners(legalEntitiesToFind + legalEntitiesToIgnore).entities
         val bpnLsToFind = getBpnLs(legalEntitiesToFind, givenLegalEntities)
 
-        val actualMemberships = poolClient.memberships.get(CxMembershipSearchRequest(bpnLs = bpnLsToFind, isCatenaXMember = false), PaginationRequest()).content
+        val actualMemberships = poolClient.participants.get(DataSpaceParticipantSearchRequest(bpnLs = bpnLsToFind, isDataSpaceParticipant = false), PaginationRequest()).content
 
         val expectedMemberships = legalEntitiesToFind.zip(bpnLsToFind)
-            .map { (request, bpnL) -> CxMembershipDto(bpnL, request.legalEntity.isCatenaXMemberData) }
+            .map { (request, bpnL) -> DataSpaceParticipantDto(bpnL, request.legalEntity.isParticipantData) }
 
 
         assertThat(actualMemberships).isEqualTo(expectedMemberships)
     }
 
     @Test
-    fun `update cx memberships`(){
+    fun `update data space participants`(){
         val legalEntityRequests = listOf(
-            testDataEnvironment.requestFactory.createLegalEntityRequest("Member 1", isCatenaXMemberData = true),
-            testDataEnvironment.requestFactory.createLegalEntityRequest("Non-Member 1", isCatenaXMemberData = false),
-            testDataEnvironment.requestFactory.createLegalEntityRequest("Member 2", isCatenaXMemberData = true),
-            testDataEnvironment.requestFactory.createLegalEntityRequest("Non-Member 2", isCatenaXMemberData = false),
+            testDataEnvironment.requestFactory.createLegalEntityRequest("Member 1", isParticipantData = true),
+            testDataEnvironment.requestFactory.createLegalEntityRequest("Non-Member 1", isParticipantData = false),
+            testDataEnvironment.requestFactory.createLegalEntityRequest("Member 2", isParticipantData = true),
+            testDataEnvironment.requestFactory.createLegalEntityRequest("Non-Member 2", isParticipantData = false),
         )
         val givenLegalEntities = poolClient.legalEntities.createBusinessPartners(legalEntityRequests).entities
         val givenBpnLs = getBpnLs(legalEntityRequests, givenLegalEntities)
 
-        val membershipUpdates = legalEntityRequests.zip(givenBpnLs).map { (request, bpnL) -> CxMembershipDto(bpnL, !request.legalEntity.isCatenaXMemberData) }
-        poolClient.memberships.put(CxMembershipUpdateRequest(membershipUpdates))
+        val membershipUpdates = legalEntityRequests.zip(givenBpnLs).map { (request, bpnL) -> DataSpaceParticipantDto(bpnL, !request.legalEntity.isParticipantData) }
+        poolClient.participants.put(DataSpaceParticipantUpdateRequest(membershipUpdates))
 
-        val actualMemberships = poolClient.memberships.get(CxMembershipSearchRequest(), PaginationRequest()).content
+        val actualMemberships = poolClient.participants.get(DataSpaceParticipantSearchRequest(), PaginationRequest()).content
 
         assertThat(actualMemberships).isEqualTo(membershipUpdates)
     }

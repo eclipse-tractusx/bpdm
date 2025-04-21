@@ -131,13 +131,13 @@ class TaskStepBuildService(
             throw BpdmValidationException("Legal entity with specified BPNL $bpnL not found")
         }
 
-        val isCatenaXMember = legalEntity.isCatenaXMemberData ?: if(bpnL != null) existingLegalEntityInformation.isCatenaXMemberData else false
+        val isCatenaXMember = legalEntity.isParticipantData ?: if(bpnL != null) existingLegalEntityInformation.isParticipantData else false
 
         val legalEntityResult = if(bpnL != null && legalEntity.hasChanged == false){
             //No need to upsert, just fetch the information
             existingLegalEntityInformation
         }else{
-            upsertLegalEntity(legalEntity.copy(isCatenaXMemberData = isCatenaXMember), taskEntryBpnMapping)
+            upsertLegalEntity(legalEntity.copy(isParticipantData = isCatenaXMember), taskEntryBpnMapping)
         }
 
         return legalEntityResult
@@ -443,7 +443,7 @@ class TaskStepBuildService(
                 identifiers = identifiers.map { assertNotNull(it).let { LegalEntityIdentifierDto(it.value!!, it.type!!, it.issuingBody) } },
                 states = states.map { assertNotNull(it).let { LegalEntityStateDto(it.validFrom.toLocalDateTime(), it.validTo.toLocalDateTime(), it.type!!) }   },
                 confidenceCriteria = toPoolDto(confidenceCriteria, CleaningError.LEGAL_ENTITY_CONFIDENCE_CRITERIA_MISSING),
-                isCatenaXMemberData = isCatenaXMemberData ?: false
+                isParticipantData = isParticipantData ?: false
             )
         }
 
