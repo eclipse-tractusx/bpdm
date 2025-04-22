@@ -31,7 +31,13 @@ object IdentifierTypeDescription {
     const val transliteratedName = "The transliterated (Latinized) form of the name."
     const val transliteratedAbbreviation = "The transliterated (Latinized) form of the abbreviation."
     const val format = "The expected format of the identifier values for this type, given as a regular expression"
-    const val categories = "The broader categories to which the identifier type belongs to"
+    const val categories = "The broader categories to which the identifier type belongs to:\n" +
+            "* `VAT` - value-added tax registration (so-called value-added tax identification numbers (VAT IDs or VATINs), e.g. EU VAT ID, UID MWST/TVA/IPA)\n" +
+            "* `TIN` - taxpayer identification (so-called taxpayer identification numbers (TINs), e.g. SIREN, NIF)\n" +
+            "* `NBR` - national business registration (e.g. HRB-Nummer, Firmenbuchnummer) for different purposes (e.g. commercial register, trade register), which are not related to tax\n" +
+            "* `IBR` - international business registration (e.g. LEI, EORI) for different purposes (e.g. regulatory reporting, risk management at financial regulatory bodies)\n" +
+            "* `OTH` - other identifier types (e.g. D&B D-U-N-S, GS1 GLN), which are not legally secure"
+
     const val details = "Validity details."
 
     const val headerDetail = "Information for which countries an identifier type is valid and mandatory."
