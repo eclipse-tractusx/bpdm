@@ -3459,10 +3459,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ErrorInfoAddressCreateError"
-        errorCount:
+        entityCount:
           type: integer
           format: int32
-        entityCount:
+        errorCount:
           type: integer
           format: int32
       required:
@@ -3626,10 +3626,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ErrorInfoAddressUpdateError"
-        errorCount:
+        entityCount:
           type: integer
           format: int32
-        entityCount:
+        errorCount:
           type: integer
           format: int32
       required:
@@ -5310,8 +5310,13 @@ components:
             \ given as a regular expression"
         categories:
           type: array
-          description: The broader categories to which the identifier type belongs
-            to
+          description: |-
+            The broader categories to which the identifier type belongs to:
+            * `VAT` - value-added tax registration (so-called value-added tax identification numbers (VAT IDs or VATINs), e.g. EU VAT ID, UID MWST/TVA/IPA)
+            * `TIN` - taxpayer identification (so-called taxpayer identification numbers (TINs), e.g. SIREN, NIF)
+            * `NBR` - national business registration (e.g. HRB-Nummer, Firmenbuchnummer) for different purposes (e.g. commercial register, trade register), which are not related to tax
+            * `IBR` - international business registration (e.g. LEI, EORI) for different purposes (e.g. regulatory reporting, risk management at financial regulatory bodies)
+            * `OTH` - other identifier types (e.g. D&B D-U-N-S, GS1 GLN), which are not legally secure
           items:
             type: string
             enum:
@@ -5462,10 +5467,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ErrorInfoLegalEntityCreateError"
-        errorCount:
+        entityCount:
           type: integer
           format: int32
-        entityCount:
+        errorCount:
           type: integer
           format: int32
       required:
@@ -5626,10 +5631,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ErrorInfoLegalEntityUpdateError"
-        errorCount:
+        entityCount:
           type: integer
           format: int32
-        entityCount:
+        errorCount:
           type: integer
           format: int32
       required:
@@ -7981,10 +7986,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ErrorInfoSiteCreateError"
-        errorCount:
+        entityCount:
           type: integer
           format: int32
-        entityCount:
+        errorCount:
           type: integer
           format: int32
       required:
@@ -8109,10 +8114,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ErrorInfoSiteUpdateError"
-        errorCount:
+        entityCount:
           type: integer
           format: int32
-        entityCount:
+        errorCount:
           type: integer
           format: int32
       required:
