@@ -67,7 +67,7 @@
         <wiremock.version>2.35.2</wiremock.version>
         <springmockk.version>4.0.2</springmockk.version>
         <opencsv.version>5.10</opencsv.version>
-        <testcontainers-bom.version>1.20.6</testcontainers-bom.version>
+        <testcontainers-bom.version>1.21.0</testcontainers-bom.version>
         <testcontainers-keycloak.version>3.2.0</testcontainers-keycloak.version>
         <flatten-maven.version>1.7.0</flatten-maven.version>
         <license-tool.version>1.1.0</license-tool.version>
