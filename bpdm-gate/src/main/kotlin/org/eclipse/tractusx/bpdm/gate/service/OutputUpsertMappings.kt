@@ -24,21 +24,11 @@ import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.eclipse.tractusx.bpdm.gate.entity.generic.*
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.*
 import org.springframework.stereotype.Service
-import java.time.Instant
-import java.util.*
 
 @Service
 class OutputUpsertMappings {
 
-    fun toEntity(upsertData: OutputUpsertDataWithRelations, sharingState: SharingStateDb): BusinessPartnerDb {
-        return toEntity(
-            upsertData = upsertData.businessPartnerUpsertData,
-            sharingState = sharingState,
-            relations = upsertData.relationUpsertData.map { RelationOutputDb(it.relationType, it.sourceBpnL, it.targetBpnL, Instant.now()) }.toSortedSet()
-        )
-    }
-
-    fun toEntity(upsertData: OutputUpsertData, sharingState: SharingStateDb, relations: SortedSet<RelationOutputDb>): BusinessPartnerDb {
+    fun toEntity(upsertData: OutputUpsertData, sharingState: SharingStateDb): BusinessPartnerDb {
         return with(upsertData) {
             BusinessPartnerDb(
                 sharingState = sharingState,
@@ -59,8 +49,7 @@ class OutputUpsertMappings {
                 postalAddress = PostalAddressDb(addressType, physicalPostalAddress.toEntity(), alternativePostalAddress?.toEntity()),
                 legalEntityConfidence = legalEntityConfidence.toEntity(),
                 siteConfidence = siteConfidence?.toEntity(),
-                addressConfidence = addressConfidence.toEntity(),
-                relations = relations.map { RelationOutputDb(it.relationType, it.sourceBpnL, it.targetBpnL, Instant.now()) }.toSortedSet()
+                addressConfidence = addressConfidence.toEntity()
             )
         }
     }

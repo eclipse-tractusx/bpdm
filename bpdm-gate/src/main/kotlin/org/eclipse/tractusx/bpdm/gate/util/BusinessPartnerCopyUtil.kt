@@ -51,7 +51,6 @@ class BusinessPartnerCopyUtil {
             states.copyAndSync(fromPartner.states, ::copyValues)
             classifications.copyAndSync(fromPartner.classifications, ::copyValues)
             identifiers.copyAndSync(fromPartner.identifiers, ::copyValues)
-            relations.copyAndSync(fromPartner.relations, ::copyValues)
 
             copyValues(fromPartner.postalAddress, postalAddress)
         }

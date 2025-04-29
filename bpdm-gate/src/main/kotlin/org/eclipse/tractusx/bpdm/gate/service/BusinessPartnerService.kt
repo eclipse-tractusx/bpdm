@@ -34,7 +34,6 @@ import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidPartnerException
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.OutputUpsertData
-import org.eclipse.tractusx.bpdm.gate.model.upsert.output.OutputUpsertDataWithRelations
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.eclipse.tractusx.bpdm.gate.util.BusinessPartnerComparisonUtil
@@ -102,7 +101,7 @@ class BusinessPartnerService(
 
         val updatedEntities = requests.map { request ->
             val existingOutput = existingOutputsBySharingStateId[request.sharingState.id]
-            val updatedData = outputUpsertMappings.toEntity(request.upsertData, request.sharingState, existingOutput?.relations ?: sortedSetOf())
+            val updatedData = outputUpsertMappings.toEntity(request.upsertData, request.sharingState)
 
             upsertFromEntity(existingOutput, updatedData)
         }
@@ -112,17 +111,6 @@ class BusinessPartnerService(
 
     @Transactional
     fun updateBusinessPartnerOutput(businessPartner: BusinessPartnerDb, upsertData: OutputUpsertData): UpsertResult {
-        logger.debug { "Executing updateBusinessPartnerOutput() with parameters $businessPartner and $upsertData" }
-
-        if (businessPartner.stage != StageType.Output)
-            throw BpdmInvalidPartnerException(businessPartner.id.toString(), "Needs to be in Output stage")
-
-        val updatedData = outputUpsertMappings.toEntity(upsertData, businessPartner.sharingState, businessPartner.relations)
-        return upsertFromEntity(businessPartner, updatedData)
-    }
-
-    @Transactional
-    fun updateBusinessPartnerOutput(businessPartner: BusinessPartnerDb, upsertData: OutputUpsertDataWithRelations): UpsertResult {
         logger.debug { "Executing updateBusinessPartnerOutput() with parameters $businessPartner and $upsertData" }
 
         if (businessPartner.stage != StageType.Output)

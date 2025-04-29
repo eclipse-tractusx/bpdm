@@ -25,7 +25,6 @@ import org.eclipse.tractusx.bpdm.common.dto.IBaseStateDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
 import org.eclipse.tractusx.bpdm.common.model.StageType
-import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.gate.api.model.SharableRelationType
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
@@ -196,12 +195,12 @@ class GoldenRecordUpdateChunkService(
         }
     }
 
-    private fun LegalEntityVerboseDto.toUpsertData(existingOutput: BusinessPartnerDb): OutputUpsertDataWithRelations {
+    private fun LegalEntityVerboseDto.toUpsertData(existingOutput: BusinessPartnerDb): OutputUpsertData {
         val copy = BusinessPartnerDb.createEmpty(existingOutput.sharingState, existingOutput.stage)
         copyUtil.copyValues(existingOutput, copy)
         update(copy, this)
 
-        return OutputUpsertDataWithRelations(copy.toUpsertData(), copy.relations.map { it.toUpsertData() }.toSet())
+        return copy.toUpsertData()
     }
 
     private fun SiteVerboseDto.toUpsertData(existingOutput: BusinessPartnerDb): OutputUpsertData {
@@ -326,7 +325,6 @@ class GoldenRecordUpdateChunkService(
         businessPartner.legalForm = legalEntity.legalForm
         businessPartner.shortName = legalEntity.legalShortName
         businessPartner.legalEntityConfidence?.let { update(it,  legalEntity.confidenceCriteria) }
-        businessPartner.relations.replace(legalEntity.relations.map(::toEntity))
     }
 
     private fun update(businessPartner: BusinessPartnerDb, site: SiteVerboseDto){
