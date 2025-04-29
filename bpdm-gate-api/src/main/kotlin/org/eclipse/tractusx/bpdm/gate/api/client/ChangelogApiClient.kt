@@ -33,13 +33,13 @@ import org.springframework.web.service.annotation.PostExchange
 
 @HttpExchange
 interface ChangelogApiClient : GateChangelogApi {
-    @PostExchange(value = "${ApiCommons.BASE_PATH_V7}/input/changelog/search")
+    @PostExchange(value = "${ApiCommons.BASE_PATH_V7}/input/business-partners/changelog/search")
     override fun getInputChangelog(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @RequestBody searchRequest: ChangelogSearchRequest
     ): PageChangeLogDto<ChangelogGateDto>
 
-    @PostExchange(value = "${ApiCommons.BASE_PATH_V7}/output/changelog/search")
+    @PostExchange(value = "${ApiCommons.BASE_PATH_V7}/output/business-partners/changelog/search")
     override fun getOutputChangelog(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @RequestBody searchRequest: ChangelogSearchRequest

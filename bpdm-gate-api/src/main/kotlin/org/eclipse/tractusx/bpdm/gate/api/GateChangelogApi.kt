@@ -48,7 +48,7 @@ interface GateChangelogApi {
             ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()]),
         ]
     )
-    @PostMapping(value = ["${ApiCommons.BASE_PATH_V6}/input/changelog/search", "${ApiCommons.BASE_PATH_V7}/input/changelog/search"])
+    @PostMapping(value = ["${ApiCommons.BASE_PATH_V6}/input/changelog/search", "${ApiCommons.BASE_PATH_V7}/input/business-partners/changelog/search"])
     fun getInputChangelog(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @RequestBody searchRequest: ChangelogSearchRequest
@@ -65,7 +65,7 @@ interface GateChangelogApi {
             ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()]),
         ]
     )
-    @PostMapping(value = ["${ApiCommons.BASE_PATH_V6}/output/changelog/search", "${ApiCommons.BASE_PATH_V7}/output/changelog/search"])
+    @PostMapping(value = ["${ApiCommons.BASE_PATH_V6}/output/changelog/search", "${ApiCommons.BASE_PATH_V7}/output/business-partners/changelog/search"])
     fun getOutputChangelog(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @RequestBody searchRequest: ChangelogSearchRequest
