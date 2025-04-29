@@ -75,6 +75,10 @@ class NoAuthIT @Autowired constructor(
         ),
         relationSharingState = RelationSharingStateExpectations(
             get = AuthExpectationType.Unauthorized
+        ),
+        relationChangelog = RelationChangelogExpectations(
+            getInput = AuthExpectationType.Unauthorized,
+            getOutput = AuthExpectationType.Unauthorized
         )
     )
 )

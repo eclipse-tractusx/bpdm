@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.repository
 
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntryDb
+import org.eclipse.tractusx.bpdm.gate.entity.GoldenRecordType
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
@@ -67,6 +68,11 @@ interface ChangelogRepository : JpaRepository<ChangelogEntryDb, Long>, JpaSpecif
                     builder.equal(root.get<String?>(ChangelogEntryDb::tenantBpnl.name), tenantBpnl)
                 } ?: builder.isNull(root.get<String?>(ChangelogEntryDb::tenantBpnl.name))
 
+            }
+
+        fun byGoldenRecordType(goldenRecordType: GoldenRecordType) =
+            Specification<ChangelogEntryDb> { root, _, builder ->
+                    builder.equal(root.get<GoldenRecordType>(ChangelogEntryDb::goldenRecordType.name), goldenRecordType)
             }
 
     }

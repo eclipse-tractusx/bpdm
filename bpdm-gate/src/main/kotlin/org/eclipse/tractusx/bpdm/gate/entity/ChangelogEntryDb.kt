@@ -40,6 +40,10 @@ class ChangelogEntryDb(
 
     @Column(name = "data_type")
     @Enumerated(EnumType.STRING)
-    var stage: StageType
+    var stage: StageType,
+
+    @Column(name = "golden_record_type")
+    @Enumerated(EnumType.STRING)
+    var goldenRecordType: GoldenRecordType
 
 ) : BaseEntity()
