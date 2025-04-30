@@ -15,7 +15,7 @@
     "bearer_scheme" : [ ]
   } ],
   "paths" : {
-    "/v7/input/business-partner-relations" : {
+    "/v7/input/relations" : {
       "put" : {
         "tags" : [ "relation-controller" ],
         "summary" : "Update a business partner input relation",
@@ -369,6 +369,55 @@
         }
       }
     },
+    "/v7/output/relations/search" : {
+      "post" : {
+        "tags" : [ "relation-controller" ],
+        "summary" : "Find business partner output relations",
+        "description" : "Find paginated list of business partner relations from the output stage. There are various filter criteria available. All filters are 'AND' filters.",
+        "operationId" : "postSearch",
+        "parameters" : [ {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Number of page to get results from",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Size of each page",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "maximum" : 100,
+            "minimum" : 0
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/RelationOutputSearchRequest"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "A paginated list of business partner relations for the input stage",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageDtoRelationOutputDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v7/output/business-partners/search" : {
       "post" : {
         "tags" : [ "business-partner-controller" ],
@@ -420,156 +469,6 @@
           },
           "400" : {
             "description" : "On malformed pagination request"
-          }
-        }
-      }
-    },
-    "/v7/output/business-partner-relations/search" : {
-      "post" : {
-        "tags" : [ "relation-controller" ],
-        "summary" : "Find business partner output relations",
-        "description" : "Find paginated list of business partner relations from the output stage. There are various filter criteria available. All filters are 'AND' filters.",
-        "operationId" : "postSearch",
-        "parameters" : [ {
-          "name" : "page",
-          "in" : "query",
-          "description" : "Number of page to get results from",
-          "required" : false,
-          "schema" : {
-            "type" : "string",
-            "minimum" : 0
-          }
-        }, {
-          "name" : "size",
-          "in" : "query",
-          "description" : "Size of each page",
-          "required" : false,
-          "schema" : {
-            "type" : "string",
-            "maximum" : 100,
-            "minimum" : 0
-          }
-        } ],
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/RelationOutputSearchRequest"
-              }
-            }
-          }
-        },
-        "responses" : {
-          "200" : {
-            "description" : "A paginated list of business partner relations for the input stage",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/PageDtoRelationOutputDto"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v7/input/business-partner-relations/search" : {
-      "post" : {
-        "tags" : [ "relation-controller" ],
-        "summary" : "Find business partner input relations",
-        "description" : "Find paginated list of business partner relations from the input stage. There are various filter criteria available. All filters are 'AND' filters.",
-        "operationId" : "postSearch_1",
-        "parameters" : [ {
-          "name" : "page",
-          "in" : "query",
-          "description" : "Number of page to get results from",
-          "required" : false,
-          "schema" : {
-            "type" : "string",
-            "minimum" : 0
-          }
-        }, {
-          "name" : "size",
-          "in" : "query",
-          "description" : "Size of each page",
-          "required" : false,
-          "schema" : {
-            "type" : "string",
-            "maximum" : 100,
-            "minimum" : 0
-          }
-        } ],
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/RelationSearchRequest"
-              }
-            }
-          }
-        },
-        "responses" : {
-          "200" : {
-            "description" : "A paginated list of business partner relations for the input stage",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/PageDtoRelationDto"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v7/sharing-state/ready" : {
-      "post" : {
-        "tags" : [ "sharing-state-controller" ],
-        "summary" : "Sets the given business partners into ready to be shared state",
-        "description" : "The business partners to set the ready state for are identified by their external-id. Only business partners in an initial or error state can be set to ready. If any given business partner could not be set into ready state for any reason (for example, it has not been found or it is in the wrong state) the whole request fails (all or nothing approach).",
-        "operationId" : "postSharingStateReady",
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/PostSharingStateReadyRequest"
-              }
-            }
-          },
-          "required" : true
-        },
-        "responses" : {
-          "204" : {
-            "description" : "All business partners put in ready to be shared state"
-          },
-          "400" : {
-            "description" : "Business partners can't be put into ready state (e.g. external-ID not found, wrong sharing state)"
-          }
-        }
-      }
-    },
-    "/v6/sharing-state/ready" : {
-      "post" : {
-        "tags" : [ "sharing-state-controller" ],
-        "summary" : "Sets the given business partners into ready to be shared state",
-        "description" : "The business partners to set the ready state for are identified by their external-id. Only business partners in an initial or error state can be set to ready. If any given business partner could not be set into ready state for any reason (for example, it has not been found or it is in the wrong state) the whole request fails (all or nothing approach).",
-        "operationId" : "postSharingStateReady_1",
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/PostSharingStateReadyRequest"
-              }
-            }
-          },
-          "required" : true
-        },
-        "responses" : {
-          "204" : {
-            "description" : "All business partners put in ready to be shared state"
-          },
-          "400" : {
-            "description" : "Business partners can't be put into ready state (e.g. external-ID not found, wrong sharing state)"
           }
         }
       }
@@ -627,7 +526,7 @@
         }
       }
     },
-    "/v7/output/changelog/search" : {
+    "/v7/output/business-partners/changelog/search" : {
       "post" : {
         "tags" : [ "changelog-controller" ],
         "summary" : "Returns changelog entries for changes to the business partner output stage",
@@ -676,6 +575,213 @@
           },
           "400" : {
             "description" : "On malformed pagination request"
+          }
+        }
+      }
+    },
+    "/v7/input/relations/search" : {
+      "post" : {
+        "tags" : [ "relation-controller" ],
+        "summary" : "Find business partner input relations",
+        "description" : "Find paginated list of business partner relations from the input stage. There are various filter criteria available. All filters are 'AND' filters.",
+        "operationId" : "postSearch_1",
+        "parameters" : [ {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Number of page to get results from",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Size of each page",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "maximum" : 100,
+            "minimum" : 0
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/RelationSearchRequest"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "A paginated list of business partner relations for the input stage",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageDtoRelationDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v7/input/business-partners/changelog/search" : {
+      "post" : {
+        "tags" : [ "changelog-controller" ],
+        "summary" : "Returns changelog entries for changes to the business partner input stage",
+        "description" : "Returns changelog entries as of a specified timestamp from the input stage, optionally filtered by timestamp, an array of external IDs and a business partner type.",
+        "operationId" : "getInputChangelog",
+        "parameters" : [ {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Number of page to get results from",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Size of each page",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "maximum" : 100,
+            "minimum" : 0
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ChangelogSearchRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "The changelog entries for the specified parameters",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageChangeLogDtoChangelogGateDto"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "On malformed pagination request"
+          }
+        }
+      }
+    },
+    "/v6/input/changelog/search" : {
+      "post" : {
+        "tags" : [ "changelog-controller" ],
+        "summary" : "Returns changelog entries for changes to the business partner input stage",
+        "description" : "Returns changelog entries as of a specified timestamp from the input stage, optionally filtered by timestamp, an array of external IDs and a business partner type.",
+        "operationId" : "getInputChangelog_1",
+        "parameters" : [ {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Number of page to get results from",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Size of each page",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "maximum" : 100,
+            "minimum" : 0
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ChangelogSearchRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "The changelog entries for the specified parameters",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageChangeLogDtoChangelogGateDto"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "On malformed pagination request"
+          }
+        }
+      }
+    },
+    "/v7/business-partners/sharing-state/ready" : {
+      "post" : {
+        "tags" : [ "sharing-state-controller" ],
+        "summary" : "Sets the given business partners into ready to be shared state",
+        "description" : "The business partners to set the ready state for are identified by their external-id. Only business partners in an initial or error state can be set to ready. If any given business partner could not be set into ready state for any reason (for example, it has not been found or it is in the wrong state) the whole request fails (all or nothing approach).",
+        "operationId" : "postSharingStateReady",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/PostSharingStateReadyRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "204" : {
+            "description" : "All business partners put in ready to be shared state"
+          },
+          "400" : {
+            "description" : "Business partners can't be put into ready state (e.g. external-ID not found, wrong sharing state)"
+          }
+        }
+      }
+    },
+    "/v6/sharing-state/ready" : {
+      "post" : {
+        "tags" : [ "sharing-state-controller" ],
+        "summary" : "Sets the given business partners into ready to be shared state",
+        "description" : "The business partners to set the ready state for are identified by their external-id. Only business partners in an initial or error state can be set to ready. If any given business partner could not be set into ready state for any reason (for example, it has not been found or it is in the wrong state) the whole request fails (all or nothing approach).",
+        "operationId" : "postSharingStateReady_1",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/PostSharingStateReadyRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "204" : {
+            "description" : "All business partners put in ready to be shared state"
+          },
+          "400" : {
+            "description" : "Business partners can't be put into ready state (e.g. external-ID not found, wrong sharing state)"
           }
         }
       }
@@ -849,112 +955,6 @@
         }
       }
     },
-    "/v6/input/changelog/search" : {
-      "post" : {
-        "tags" : [ "changelog-controller" ],
-        "summary" : "Returns changelog entries for changes to the business partner input stage",
-        "description" : "Returns changelog entries as of a specified timestamp from the input stage, optionally filtered by timestamp, an array of external IDs and a business partner type.",
-        "operationId" : "getInputChangelog",
-        "parameters" : [ {
-          "name" : "page",
-          "in" : "query",
-          "description" : "Number of page to get results from",
-          "required" : false,
-          "schema" : {
-            "type" : "string",
-            "minimum" : 0
-          }
-        }, {
-          "name" : "size",
-          "in" : "query",
-          "description" : "Size of each page",
-          "required" : false,
-          "schema" : {
-            "type" : "string",
-            "maximum" : 100,
-            "minimum" : 0
-          }
-        } ],
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/ChangelogSearchRequest"
-              }
-            }
-          },
-          "required" : true
-        },
-        "responses" : {
-          "200" : {
-            "description" : "The changelog entries for the specified parameters",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/PageChangeLogDtoChangelogGateDto"
-                }
-              }
-            }
-          },
-          "400" : {
-            "description" : "On malformed pagination request"
-          }
-        }
-      }
-    },
-    "/v7/input/changelog/search" : {
-      "post" : {
-        "tags" : [ "changelog-controller" ],
-        "summary" : "Returns changelog entries for changes to the business partner input stage",
-        "description" : "Returns changelog entries as of a specified timestamp from the input stage, optionally filtered by timestamp, an array of external IDs and a business partner type.",
-        "operationId" : "getInputChangelog_1",
-        "parameters" : [ {
-          "name" : "page",
-          "in" : "query",
-          "description" : "Number of page to get results from",
-          "required" : false,
-          "schema" : {
-            "type" : "string",
-            "minimum" : 0
-          }
-        }, {
-          "name" : "size",
-          "in" : "query",
-          "description" : "Size of each page",
-          "required" : false,
-          "schema" : {
-            "type" : "string",
-            "maximum" : 100,
-            "minimum" : 0
-          }
-        } ],
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/ChangelogSearchRequest"
-              }
-            }
-          },
-          "required" : true
-        },
-        "responses" : {
-          "200" : {
-            "description" : "The changelog entries for the specified parameters",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/PageChangeLogDtoChangelogGateDto"
-                }
-              }
-            }
-          },
-          "400" : {
-            "description" : "On malformed pagination request"
-          }
-        }
-      }
-    },
     "/v6/input/business-partners/search" : {
       "post" : {
         "tags" : [ "business-partner-controller" ],
@@ -1065,77 +1065,6 @@
         }
       }
     },
-    "/v7/sharing-state" : {
-      "get" : {
-        "tags" : [ "sharing-state-controller" ],
-        "summary" : "Returns sharing states of business partners, optionally filtered by a business partner type and an array of external IDs",
-        "operationId" : "getSharingStates",
-        "parameters" : [ {
-          "name" : "page",
-          "in" : "query",
-          "description" : "Number of page to get results from",
-          "required" : false,
-          "schema" : {
-            "type" : "string",
-            "minimum" : 0
-          }
-        }, {
-          "name" : "size",
-          "in" : "query",
-          "description" : "Size of each page",
-          "required" : false,
-          "schema" : {
-            "type" : "string",
-            "maximum" : 100,
-            "minimum" : 0
-          }
-        }, {
-          "name" : "externalIds",
-          "in" : "query",
-          "description" : "External IDs",
-          "required" : false,
-          "schema" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
-          }
-        }, {
-          "name" : "sharingStateTypes",
-          "in" : "query",
-          "description" : "Only show sharing states of given types",
-          "required" : false,
-          "schema" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string",
-              "enum" : [ "Pending", "Success", "Error", "Initial", "Ready" ]
-            }
-          }
-        }, {
-          "name" : "updatedAfter",
-          "in" : "query",
-          "description" : "Only show sharing states updated after given time",
-          "required" : false,
-          "schema" : {
-            "type" : "string",
-            "format" : "date-time"
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "Page of sharing states",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/PageDtoSharingStateDto"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/v7/relations/sharing-state" : {
       "get" : {
         "tags" : [ "sharing-state-controller" ],
@@ -1200,6 +1129,77 @@
               "application/json" : {
                 "schema" : {
                   "$ref" : "#/components/schemas/PageDtoRelationSharingStateDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v7/business-partners/sharing-state" : {
+      "get" : {
+        "tags" : [ "sharing-state-controller" ],
+        "summary" : "Returns sharing states of business partners, optionally filtered by a business partner type and an array of external IDs",
+        "operationId" : "getSharingStates",
+        "parameters" : [ {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Number of page to get results from",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Size of each page",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "maximum" : 100,
+            "minimum" : 0
+          }
+        }, {
+          "name" : "externalIds",
+          "in" : "query",
+          "description" : "External IDs",
+          "required" : false,
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "sharingStateTypes",
+          "in" : "query",
+          "description" : "Only show sharing states of given types",
+          "required" : false,
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "enum" : [ "Pending", "Success", "Error", "Initial", "Ready" ]
+            }
+          }
+        }, {
+          "name" : "updatedAfter",
+          "in" : "query",
+          "description" : "Only show sharing states updated after given time",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Page of sharing states",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageDtoSharingStateDto"
                 }
               }
             }

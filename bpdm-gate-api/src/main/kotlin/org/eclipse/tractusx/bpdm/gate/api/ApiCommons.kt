@@ -24,15 +24,15 @@ object ApiCommons {
     const val BASE_PATH_V7 = "/v7"
 
     const val SHARING_STATE_PATH_V6 = "$BASE_PATH_V6/sharing-state"
-    const val SHARING_STATE_PATH_V7 = "$BASE_PATH_V7/sharing-state"
+    const val SHARING_STATE_PATH_V7 = "$BASE_PATH_V7/business-partners/sharing-state"
 
     const val STATS_PATH_V6 = "$BASE_PATH_V6/stats"
     const val STATS_PATH_V7 = "$BASE_PATH_V7/stats"
 
     const val RELATIONS_INPUT_PATH_V6 = "$BASE_PATH_V6/input/business-partner-relations"
-    const val RELATIONS_INPUT_PATH_V7 = "$BASE_PATH_V7/input/business-partner-relations"
+    const val RELATIONS_INPUT_PATH_V7 = "$BASE_PATH_V7/input/relations"
 
-    const val RELATIONS_OUTPUT_PATH_V7 = "$BASE_PATH_V7/output/business-partner-relations"
+    const val RELATIONS_OUTPUT_PATH_V7 = "$BASE_PATH_V7/output/relations"
 
     const val RELATION_SHARING_STATE_PATH_V7 = "$BASE_PATH_V7/relations/sharing-state"
 }
