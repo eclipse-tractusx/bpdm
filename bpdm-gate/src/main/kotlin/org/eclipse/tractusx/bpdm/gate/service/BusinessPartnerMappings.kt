@@ -159,8 +159,7 @@ class BusinessPartnerMappings {
                 entity.sharingState.externalId,
                 "Missing address confidence criteria"
             ),
-            states = toStateDtos(entity.states, BusinessPartnerType.LEGAL_ENTITY),
-            relations = entity.relations.map { BusinessPartnerOutputRelationDto(it.relationType, it.sourceBpnL, it.targetBpnL) }
+            states = toStateDtos(entity.states, BusinessPartnerType.LEGAL_ENTITY)
         )
     }
 

@@ -418,6 +418,59 @@
         }
       }
     },
+    "/v7/output/relations/changelog/search" : {
+      "post" : {
+        "tags" : [ "relation-changelog-controller" ],
+        "summary" : "Returns changelog entries for changes to business partner relations in the output stage",
+        "description" : "Returns business partner relation changelog entries as of a specified timestamp from the output stage, optionally filtered by timestamp and an array of external IDs.",
+        "operationId" : "getOutputChangelog",
+        "parameters" : [ {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Number of page to get results from",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Size of each page",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "maximum" : 100,
+            "minimum" : 0
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ChangelogSearchRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "The changelog entries for the specified parameters",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageChangeLogDtoChangelogGateDto"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "On malformed pagination request"
+          }
+        }
+      }
+    },
     "/v7/output/business-partners/search" : {
       "post" : {
         "tags" : [ "business-partner-controller" ],
@@ -478,7 +531,7 @@
         "tags" : [ "changelog-controller" ],
         "summary" : "Returns changelog entries for changes to the business partner output stage",
         "description" : "Returns changelog entries as of a specified timestamp from the output stage, optionally filtered by timestamp, an array of external IDs and a business partner type.",
-        "operationId" : "getOutputChangelog",
+        "operationId" : "getOutputChangelog_1",
         "parameters" : [ {
           "name" : "page",
           "in" : "query",
@@ -531,7 +584,7 @@
         "tags" : [ "changelog-controller" ],
         "summary" : "Returns changelog entries for changes to the business partner output stage",
         "description" : "Returns changelog entries as of a specified timestamp from the output stage, optionally filtered by timestamp, an array of external IDs and a business partner type.",
-        "operationId" : "getOutputChangelog_1",
+        "operationId" : "getOutputChangelog_2",
         "parameters" : [ {
           "name" : "page",
           "in" : "query",
@@ -628,12 +681,65 @@
         }
       }
     },
+    "/v7/input/relations/changelog/search" : {
+      "post" : {
+        "tags" : [ "relation-changelog-controller" ],
+        "summary" : "Returns changelog entries for changes to business partner relations in the input stage",
+        "description" : "Returns business partner relation changelog entries as of a specified timestamp from the input stage, optionally filtered by timestamp and an array of external IDs.",
+        "operationId" : "getInputChangelog",
+        "parameters" : [ {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Number of page to get results from",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Size of each page",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "maximum" : 100,
+            "minimum" : 0
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ChangelogSearchRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "The changelog entries for the specified parameters",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageChangeLogDtoChangelogGateDto"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "On malformed pagination request"
+          }
+        }
+      }
+    },
     "/v7/input/business-partners/changelog/search" : {
       "post" : {
         "tags" : [ "changelog-controller" ],
         "summary" : "Returns changelog entries for changes to the business partner input stage",
         "description" : "Returns changelog entries as of a specified timestamp from the input stage, optionally filtered by timestamp, an array of external IDs and a business partner type.",
-        "operationId" : "getInputChangelog",
+        "operationId" : "getInputChangelog_1",
         "parameters" : [ {
           "name" : "page",
           "in" : "query",
@@ -686,7 +792,7 @@
         "tags" : [ "changelog-controller" ],
         "summary" : "Returns changelog entries for changes to the business partner input stage",
         "description" : "Returns changelog entries as of a specified timestamp from the input stage, optionally filtered by timestamp, an array of external IDs and a business partner type.",
-        "operationId" : "getInputChangelog_1",
+        "operationId" : "getInputChangelog_2",
         "parameters" : [ {
           "name" : "page",
           "in" : "query",
@@ -1793,22 +1899,6 @@
         },
         "required" : [ "address", "createdAt", "externalId", "identifiers", "isOwnCompanyData", "legalEntity", "nameParts", "roles", "states", "updatedAt" ]
       },
-      "BusinessPartnerOutputRelationDto" : {
-        "type" : "object",
-        "properties" : {
-          "relationType" : {
-            "type" : "string",
-            "enum" : [ "IsAlternativeHeadquarterFor" ]
-          },
-          "sourceBpnL" : {
-            "type" : "string"
-          },
-          "targetBpnL" : {
-            "type" : "string"
-          }
-        },
-        "required" : [ "relationType", "sourceBpnL", "targetBpnL" ]
-      },
       "BusinessPartnerStateDto" : {
         "type" : "object",
         "properties" : {
@@ -2023,15 +2113,9 @@
             "items" : {
               "$ref" : "#/components/schemas/BusinessPartnerStateDto"
             }
-          },
-          "relations" : {
-            "type" : "array",
-            "items" : {
-              "$ref" : "#/components/schemas/BusinessPartnerOutputRelationDto"
-            }
           }
         },
-        "required" : [ "bpnL", "confidenceCriteria", "legalEntityBpn", "relations", "states" ]
+        "required" : [ "bpnL", "confidenceCriteria", "legalEntityBpn", "states" ]
       },
       "PageChangeLogDtoChangelogGateDto" : {
         "type" : "object",

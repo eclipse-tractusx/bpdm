@@ -35,7 +35,6 @@ import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationOutputSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputRelationDto
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.RelationVerboseDto
 import org.eclipse.tractusx.bpdm.test.system.utils.StepUtils
@@ -180,24 +179,6 @@ class BusinessPartnerRelationStepDefs(
             .ignoringFields(RelationOutputDto::updatedAt.name)
             .isEqualTo(expectedRelation)
     }
-
-    /**
-     * Check Gate has business partner output with the specified relation information
-     */
-    @Then("Gate has business partner output with external-ID {string} with relation of type {string}, source {string} and target {string}")
-    fun `then gate has business partner output with relation`(externalId: String, relationTypeString: String, sourceBpnTag: String, targetBpnTag: String) {
-        val externalId = externalId.toScenarioInstance()
-        val sourceBpnTag = sourceBpnTag.toScenarioInstance()
-        val targetBpnTag = targetBpnTag.toScenarioInstance()
-
-        val relationType = SharableRelationType.valueOf(relationTypeString)
-        val sourceBpn = getBpnL(sourceBpnTag)
-        val targetBpn = getBpnL(targetBpnTag)
-        val expectedRelation = BusinessPartnerOutputRelationDto(relationType, sourceBpn, targetBpn)
-
-        stepUtils.waitForOutputRelation(externalId, expectedRelation)
-    }
-
     /**
      * Check Gate has changelog output entry of given type
      */
