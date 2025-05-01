@@ -47,6 +47,7 @@
         <module>bpdm-orchestrator</module>
         <module>bpdm-orchestrator-api</module>
         <module>bpdm-system-tester</module>
+        <module>bpdm-migration-helper</module>
     </modules>
 
     <properties>

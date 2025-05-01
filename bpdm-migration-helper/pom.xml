@@ -1,0 +1,49 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>bpdm-migration-helper</artifactId>
+    <name>BPDM Migration Helper</name>
+    <description>Utility tool for BPDM applications to create SQL migration files from non-SQL source files</description>
+    <version>1.0.0</version>
+
+    <parent>
+        <groupId>org.eclipse.tractusx</groupId>
+        <artifactId>bpdm-parent</artifactId>
+        <version>${revision}</version>
+    </parent>
+
+    <packaging>jar</packaging>
+    <dependencies>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-stdlib-jdk8</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+        </dependency>
+    </dependencies>
+    <build>
+        <sourceDirectory>src/main/kotlin</sourceDirectory>
+        <finalName>bpdm-migration-helper</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-maven-plugin</artifactId>
+                <configuration>
+                    <args>
+                        <arg>-Xjsr305=strict</arg>
+                    </args>
+                    <compilerPlugins>
+                        <plugin>no-arg</plugin>
+                    </compilerPlugins>
+                    <jvmTarget>21</jvmTarget>
+                    <pluginOptions>
+                        <option>no-arg:annotation=org.eclipse.tractusx.bpdm.migration.helper.util.NoArg</option>
+                    </pluginOptions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
