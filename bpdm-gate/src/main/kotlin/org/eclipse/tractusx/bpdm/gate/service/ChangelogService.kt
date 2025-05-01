@@ -25,9 +25,11 @@ import org.eclipse.tractusx.bpdm.gate.api.exception.ChangeLogOutputError
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogDto
+import org.eclipse.tractusx.bpdm.gate.entity.GoldenRecordType
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byCreatedAtGreaterThan
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byExternalIdsIn
+import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byGoldenRecordType
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byStage
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byTenantBpnl
 import org.springframework.data.domain.PageRequest
@@ -45,6 +47,7 @@ class ChangelogService(private val changelogRepository: ChangelogRepository) {
         tenantBpnl: String?,
         createdAt: Instant?,
         stage: StageType?,
+        goldenRecordType: GoldenRecordType,
         page: Int,
         pageSize: Int
     ): PageChangeLogDto<ChangelogGateDto> {
@@ -57,7 +60,8 @@ class ChangelogService(private val changelogRepository: ChangelogRepository) {
             byExternalIdsIn(externalIds = nonNullExternalIds),
             byCreatedAtGreaterThan(createdAt = createdAt),
             byStage(stage),
-            byTenantBpnl(tenantBpnl)
+            byTenantBpnl(tenantBpnl),
+            byGoldenRecordType(goldenRecordType)
         )
 
         val pageable = PageRequest.of(page, pageSize)

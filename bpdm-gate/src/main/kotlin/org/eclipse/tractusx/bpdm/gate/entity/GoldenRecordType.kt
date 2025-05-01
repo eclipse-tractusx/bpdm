@@ -17,25 +17,9 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.api.client
+package org.eclipse.tractusx.bpdm.gate.entity
 
-interface GateClient {
-
-    val businessParters: BusinessPartnerApiClient
-
-    val changelog: ChangelogApiClient
-
-    val sharingState: SharingStateApiClient
-
-    val stats: StatsApiClient
-
-    val partnerUpload: PartnerUploadApiClient
-
-    val relation: RelationApiClient
-
-    val relationSharingState: RelationSharingStateApiClient
-
-    val relationOutput: RelationOutputApiClient
-
-    val relationChangelog: RelationChangelogApiClient
+enum class GoldenRecordType {
+    BusinessPartner,
+    Relation
 }

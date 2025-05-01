@@ -26,17 +26,11 @@ import org.eclipse.tractusx.bpdm.common.mapping.types.BpnLString
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationDto
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationOutputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateType
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
-import org.eclipse.tractusx.bpdm.gate.api.model.SharableRelationType
+import org.eclipse.tractusx.bpdm.gate.api.model.*
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
-import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
-import org.eclipse.tractusx.bpdm.gate.entity.RelationOutputDb
-import org.eclipse.tractusx.bpdm.gate.entity.RelationStageDb
-import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
+import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.eclipse.tractusx.bpdm.gate.exception.*
+import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.eclipse.tractusx.bpdm.gate.repository.RelationRepository
 import org.eclipse.tractusx.bpdm.gate.repository.RelationStageRepository
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
@@ -50,7 +44,8 @@ class RelationService(
     private val relationRepository: RelationRepository,
     private val relationStageRepository: RelationStageRepository,
     private val sharingStateRepository: SharingStateRepository,
-    private val relationSharingStateService: RelationSharingStateService
+    private val relationSharingStateService: RelationSharingStateService,
+    private val changelogRepository: ChangelogRepository
 ): IRelationService {
 
     override fun findInputRelations(
@@ -183,9 +178,11 @@ class RelationService(
         if(sourceBpnL == targetBpnL)
             throw BpdmInvalidRelationException("Source and target should not be the same")
 
+        val changelogType = if(relation.output == null) ChangelogType.CREATE else ChangelogType.UPDATE
         relation.output = RelationOutputDb(relationType, sourceBpnL, targetBpnL, Instant.now())
         relationSharingStateService.setSuccess(relation)
 
+        changelogRepository.save(ChangelogEntryDb(relation.externalId, relation.tenantBpnL, changelogType, StageType.Output, GoldenRecordType.Relation))
         return relationRepository.save(relation)
     }
 
@@ -221,6 +218,7 @@ class RelationService(
         )
 
         relationStageRepository.save(relationStage)
+        changelogRepository.save(ChangelogEntryDb(relation.externalId, tenantBpnL.value, ChangelogType.CREATE, StageType.Input, GoldenRecordType.Relation))
 
         return relationStage
     }
@@ -264,6 +262,7 @@ class RelationService(
             existingStage.updatedAt = Instant.now()
 
             relationStageRepository.save(existingStage)
+            changelogRepository.save(ChangelogEntryDb(relation.externalId, relation.tenantBpnL, ChangelogType.UPDATE, StageType.Input, GoldenRecordType.Relation))
         }
 
         if(hasChanges || isInErrorState){

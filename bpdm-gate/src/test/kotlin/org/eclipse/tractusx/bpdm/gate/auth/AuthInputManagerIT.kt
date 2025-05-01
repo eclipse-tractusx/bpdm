@@ -77,6 +77,10 @@ class AuthInputManagerIT @Autowired constructor(
         ),
         relationSharingState = RelationSharingStateExpectations(
             get = AuthExpectationType.Authorized
+        ),
+        relationChangelog = RelationChangelogExpectations(
+            getInput = AuthExpectationType.Authorized,
+            getOutput = AuthExpectationType.Forbidden
         )
     )
 ) {

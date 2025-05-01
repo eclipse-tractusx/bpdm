@@ -21,34 +21,34 @@ package org.eclipse.tractusx.bpdm.gate.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.model.StageType
-import org.eclipse.tractusx.bpdm.gate.api.GateChangelogApi
+import org.eclipse.tractusx.bpdm.gate.api.GateRelationChangelogApi
 import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogDto
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.GoldenRecordType
 import org.eclipse.tractusx.bpdm.gate.service.ChangelogService
-import org.eclipse.tractusx.bpdm.gate.util.getCurrentUserBpn
+import org.eclipse.tractusx.bpdm.gate.util.PrincipalUtil
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@Validated
-class ChangelogController(
-    private val changelogService: ChangelogService
-) : GateChangelogApi {
+class RelationChangelogController(
+    private val changelogService: ChangelogService,
+    private val principalUtil: PrincipalUtil
+): GateRelationChangelogApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_INPUT_CHANGELOG})")
     override fun getInputChangelog(
-        paginationRequest: PaginationRequest, searchRequest: ChangelogSearchRequest
+        paginationRequest: PaginationRequest,
+        searchRequest: ChangelogSearchRequest
     ): PageChangeLogDto<ChangelogGateDto> {
         return changelogService.getChangeLogEntries(
             searchRequest.externalIds,
-            getCurrentUserBpn(),
+            principalUtil.resolveTenantBpnl().value,
             searchRequest.timestampAfter,
             StageType.Input,
-            GoldenRecordType.BusinessPartner,
+            GoldenRecordType.Relation,
             paginationRequest.page,
             paginationRequest.size
         )
@@ -61,13 +61,12 @@ class ChangelogController(
     ): PageChangeLogDto<ChangelogGateDto> {
         return changelogService.getChangeLogEntries(
             searchRequest.externalIds,
-            getCurrentUserBpn(),
+            principalUtil.resolveTenantBpnl().value,
             searchRequest.timestampAfter,
             StageType.Output,
-            GoldenRecordType.BusinessPartner,
+            GoldenRecordType.Relation,
             paginationRequest.page,
             paginationRequest.size
         )
     }
-
 }

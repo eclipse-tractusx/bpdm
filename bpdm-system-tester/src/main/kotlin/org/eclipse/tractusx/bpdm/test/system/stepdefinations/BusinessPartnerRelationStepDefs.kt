@@ -26,9 +26,12 @@ import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
+import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
+import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.SharableRelationType
+import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationOutputSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
@@ -41,7 +44,9 @@ import org.eclipse.tractusx.bpdm.test.testdata.gate.GateInputFactory
 import org.eclipse.tractusx.bpdm.test.testdata.gate.withAddressType
 import org.eclipse.tractusx.bpdm.test.testdata.gate.withoutAnyBpn
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
-import org.eclipse.tractusx.orchestrator.api.model.*
+import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepResultEntryDto
+import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepResultRequest
+import org.eclipse.tractusx.orchestrator.api.model.TaskStep
 import java.time.Instant
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
@@ -191,6 +196,19 @@ class BusinessPartnerRelationStepDefs(
         val expectedRelation = BusinessPartnerOutputRelationDto(relationType, sourceBpn, targetBpn)
 
         stepUtils.waitForOutputRelation(externalId, expectedRelation)
+    }
+
+    /**
+     * Check Gate has changelog output entry of given type
+     */
+    @Then("Gate has relation changelog entry with external-ID {string} with type {string}")
+    fun `then gate has output changelog entry`(externalId: String, changelogTypeString: String) {
+        val externalId = externalId.toScenarioInstance()
+        val changelogType = ChangelogType.valueOf(changelogTypeString)
+
+        val changelogResponse = gateClient.relationChangelog.getOutputChangelog(PaginationRequest(), ChangelogSearchRequest(externalIds = setOf(externalId)))
+
+        assert(changelogResponse.content.any{ it.changelogType == changelogType })
     }
 
     private fun shareRelation(

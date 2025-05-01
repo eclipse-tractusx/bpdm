@@ -125,6 +125,16 @@ abstract class AuthTestBase(
         authAssertions.assert(authExpectations.relationSharingState.get) { gateClient.relationSharingState.get() }
     }
 
+    @Test
+    fun `GET Relation Changelog Input`() {
+        authAssertions.assert(authExpectations.relationChangelog.getInput) { gateClient.relationChangelog.getInputChangelog(PaginationRequest(), ChangelogSearchRequest()) }
+    }
+
+    @Test
+    fun `GET Relation Changelog Output`() {
+        authAssertions.assert(authExpectations.relationChangelog.getOutput) { gateClient.relationChangelog.getOutputChangelog(PaginationRequest(), ChangelogSearchRequest()) }
+    }
+
 }
 
 data class GateAuthExpectations(
@@ -135,7 +145,8 @@ data class GateAuthExpectations(
     val uploadPartner: UploadPartnerAuthExpections,
     val relation: RelationAuthExpectations,
     val relationOutput: RelationOutputAuthExpectations,
-    val relationSharingState: RelationSharingStateExpectations
+    val relationSharingState: RelationSharingStateExpectations,
+    val relationChangelog: RelationChangelogExpectations
 )
 
 data class BusinessPartnerAuthExpectations(
@@ -177,4 +188,9 @@ data class RelationOutputAuthExpectations(
 
 data class RelationSharingStateExpectations(
     val get: AuthExpectationType
+)
+
+data class RelationChangelogExpectations(
+    val getInput: AuthExpectationType,
+    val getOutput: AuthExpectationType
 )
