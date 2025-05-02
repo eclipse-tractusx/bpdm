@@ -2,6 +2,56 @@ apiVersion: v1
 entries:
   bpdm:
   - apiVersion: v2
+    appVersion: 7.0.0-rc1
+    created: "2025-05-02T07:54:41.876976087Z"
+    dependencies:
+    - alias: bpdm-gate
+      condition: bpdm-gate.enabled
+      name: bpdm-gate
+      repository: ""
+      version: 7.0.0-rc1
+    - alias: bpdm-pool
+      condition: bpdm-pool.enabled
+      name: bpdm-pool
+      repository: ""
+      version: 8.0.0-rc1
+    - alias: bpdm-cleaning-service-dummy
+      condition: bpdm-cleaning-service-dummy.enabled
+      name: bpdm-cleaning-service-dummy
+      repository: ""
+      version: 4.0.0-rc1
+    - alias: bpdm-orchestrator
+      condition: bpdm-orchestrator.enabled
+      name: bpdm-orchestrator
+      repository: ""
+      version: 4.0.0-rc1
+    - name: bpdm-common
+      repository: ""
+      version: 1.0.4-rc1
+    - alias: postgres
+      condition: postgres.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 12.12.10
+    - alias: centralidp
+      condition: centralidp.enabled
+      name: centralidp
+      repository: https://eclipse-tractusx.github.io/charts/dev
+      version: 4.0.1
+    description: A Helm chart for Kubernetes that deploys the BPDM applications
+    digest: 2331727426ba44dc8fa422598f3f33d20cdd8b7d16f168e4b4aec81ae0e443dc
+    home: https://github.com/eclipse-tractusx/bpdm
+    maintainers:
+    - name: Nico Koprowski
+    - name: Sujit Karne
+    name: bpdm
+    sources:
+    - https://github.com/eclipse-tractusx/bpdm
+    type: application
+    urls:
+    - https://github.com/eclipse-tractusx/bpdm/releases/download/bpdm-6.0.0-rc1/bpdm-6.0.0-rc1.tgz
+    version: 6.0.0-rc1
+  - apiVersion: v2
     appVersion: 6.3.0
     created: "2025-03-06T09:17:56.800261096Z"
     dependencies:
@@ -3760,4 +3810,4 @@ entries:
     urls:
     - https://github.com/eclipse-tractusx/bpdm/releases/download/bpdm-pool-4.0.0/bpdm-pool-4.0.0.tgz
     version: 4.0.0
-generated: "2025-03-06T09:17:56.800588532Z"
+generated: "2025-05-02T07:54:41.877345096Z"
