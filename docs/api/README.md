@@ -47,17 +47,17 @@ Have a look at the corresponding [BPDM Pool API standard](https://catenax-ev.git
 
 The BPDM Pool API recognizes two user groups:
 
-1. Catena-X Members who can read golden record member data and the metadata.
+1. Dataspace Participants who can read golden records that belong to dataspace participants and the metadata.
 2. Admins who have full read and write access to the golden record and metadata.
 
 Permissions:
 
-| Resource              | Catena-X Member | Admin |
-|-----------------------|-----------------|-------|
-| Member Golden Records | R               | R & W |
-| Member Changelog      | R               | R     |
-| Metadata              | R               | R & W |
-| Golden Records        | -               | R & W |
+| Resource                             | Dataspace Participant | Admin |
+|--------------------------------------|-----------------------|-------|
+| Dataspace Participant Golden Records | R                     | R & W |
+| Dataspace Participant Changelog      | R                     | R     |
+| Metadata                             | R                     | R & W |
+| Golden Records                       | -                     | R & W |
 
 ### Gate API
 
@@ -79,7 +79,7 @@ An optional BPNS exists if the logistic address also belongs to a site of that l
 #### Address Type
 
 The data in the output stage does not directly say which business partner type has been determined.
-Instead, you will find the determined address type which is slightly accurate than the business partner type.
+Instead, you will find the determined address type which is slightly more accurate than the business partner type.
 If you want to categorize your business partner data into legal entity, site and address you can refer to this explanation:
 
 | Address Type                | Golden Record Type |
@@ -97,13 +97,13 @@ For each legal entity there can only be up to one of such sites.
 
 Business partners have two types of data: input and output data.
 Input data is the version of the business partner how it is shared by the sharing member.
-Output data is the version of the business partner after it has gone through in the golden record process.
+Output data is the version of the business partner after it has gone through the golden record process.
 Sharing members can only update the input data and the golden record process can only update the output data.
 
 #### Sharing State
 
 Each business partner has a sharing state in regard to the golden record process.
-The sharing state indicates whether the business partner input data has not yet been shared, is currently in processing or finished.
+The sharing state indicates whether the business partner input data is currently in processing, has not yet started process or has already finished.
 
 > Initial Sharing State: The BPDM API can be configured to support an additional 'Initial' sharing state.
 > Such a sharing state indicates that the business partner input data has been changed but is not yet marked for sharing.
@@ -126,6 +126,11 @@ The full implementation of the Golden Record Process - which includes duplicatio
 Instead, BPDM offers a dummy golden record processing service that performs rudimentary checks and processing to offer a limited Golden Record Process without relying on an external provider.
 Since the dummy service is very limited when using the BPDM API behind such a dummy golden record process comes with restrictions.
 The next sections deal with how to use the BPDM API as a sharing member with a real golden record process and what to consider with the dummy service.
+
+
+> NOTE: 
+> The dummy cleaning service is at the moment only available for business partners.
+> A golden record process for business partner relations requires an actual refinement service to be integrated.
 
 
 #### Authorization

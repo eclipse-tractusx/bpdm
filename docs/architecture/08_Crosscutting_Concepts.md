@@ -44,8 +44,8 @@ We defined the following relevant permission groups in BPDM:
 3. Gate Input Consumer: Read sharing member business partner input data
 4. Gate Output Consumer: Read sharing member business partner output data
 5. Pool Admin: Read, create and update golden records as well as meta data in the Pool
-6. Pool Cx Member: Read golden records that belong to Catena-X members from the Pool
-7. Pool Sharing Member: Read golden records of Catena-X members and the overall changelog
+6. Pool Dataspace Participant: Read golden records that belong to dataspace participants from the Pool
+7. Pool Sharing Member: Read all golden records from the Pool
 8. Orchestrator Admin: Full access to Golden Record Tasks
 9. Orchestrator Task Creator: Create Golden Record Tasks, view task results and status
 10. Orchestrator Clean And Sync Task Processor: Reserve and resolve Golden Record Tasks in step 'Clean And Sync'
@@ -156,7 +156,7 @@ Pool Permissions:
   <tbody>
     <tr>
       <th>Admin</th>
-      <th>Cx Member</th>
+      <th>Dataspace Participant</th>
       <th>Sharing Member</th>
     </tr>
     <tr>
@@ -226,29 +226,15 @@ Orchestrator Permissions:
 
 #### Mapping to Portal user roles for all companies (for all Catena-X members):
 
-| BPDM Permission Group         |  Portal Role |
-|--|--|
-| Gate Admin    |  Service Manager    |
-| Pool Cx Member    |  CX User   |
+| BPDM Permission Group | Portal Role                   |
+|-----------------------|-------------------------------|
+| Gate Admin            | Business Partner Data Manager |
+| Pool Cx Member        | CX User                       |
 
 #### Technical Users:
 
-The golden record service provider needs to be able to generate technical users for each permission group (1 - 8). The technical users for sharing member roles 1 - 4 should be associated with the sharing member's BPNL (So that resulting tokens will have the sharing member's BPNL for authorization purposes).  Furthermore, there needs to be one technical user option per Pool and Orchestrator permission group.
-
-##### Resulting technical users to be creatable in the Portal:
-
-For BPDM service:
-
-- Gate BPNLX Admin (for each Sharing Member)
-- Pool Admin
-- Pool Cx Member
-- Pool Sharing Member
-
-For VAS:
-
-- Gate BPNLX Consumer: Having both roles 'Gate  BPNLX Input Consumer' and 'Gate BPNLX Output Consumer ' (for each Sharing Member)
-
-Companies which have booked the golden record service should not be able to create any technical users for BPDM. Any such feature to create technical users for companies that are not the golden record service provider should be removed.
+The Portal operator company has rights to create technical users for each BPDM permission group.
+This enables the operator to operate the golden record process components.
 
 #### Demo Configuration
 
@@ -288,11 +274,11 @@ For more details see: https://github.com/eclipse-tractusx/sig-release/issues/565
 
 Communication with BPDM application must be via EDC. The standards for EDC Assets are defined as follows:
 
-* [BPDM Pool API Asset Structure](https://github.com/catenax-eV/product-standardization-prod/blob/main/standards/CX-0012-BusinessPartnerDataPoolAPI/4.0.0/CX-0012-BusinessPartnerDataPoolAPI-v4.0.0.md#223-data-asset-structure)
-* [BPDM Gate API Asset Structure](https://github.com/catenax-eV/product-standardization-prod/blob/main/standards/CX-0074-BusinessPartnerGateAPI/3.0.0/CX-0074-BusinessPartnerGateAPI-v3.0.0.md#223-data-asset-structure)
+* [BPDM Pool API Asset Structure](https://github.com/catenax-eV/product-standardization-prod/blob/main/standards/CX-0012-BusinessPartnerDataPoolAPI/CX-0012-BusinessPartnerDataPoolAPI.md#223-data-asset-structure)
+* [BPDM Gate API Asset Structure](https://github.com/catenax-eV/product-standardization-prod/blob/main/standards/CX-0074-BusinessPartnerGateAPI/CX-0074-BusinessPartnerGateAPI.md#223-data-asset-structure)
 
 
-An example postman collection for Asset definition you can find [here](<../postman/EDC Provider Setup.postman_collection.json>)
+An example postman collection for Asset definition you can find [here](<../postman/EDC%20Provider%20Setup.postman_collection.json>)
 
 #### Verified Credentials
 
@@ -306,7 +292,7 @@ To enable communication for downloading from the pool through EDC, it's essentia
 
 #### Purposes
 
-Additionally each of the purposes need to be checked. You can find them [here](https://github.com/catenax-eV/cx-odrl-profile/blob/main/profile.md#usagepurpose). All purposes beginning with `cx.bpdm.gate` and `cx.bpdm.pool` are relevant.
+Additionally, each of the purposes need to be checked. You can find them [here](https://github.com/catenax-eV/cx-odrl-profile/blob/main/profile.md#usagepurpose). All purposes beginning with `cx.bpdm.gate` and `cx.bpdm.pool` are relevant.
 
 
 ### Keycloak Authentication & Autorization Flow
@@ -332,7 +318,8 @@ sequenceDiagram
 ```
 
 ## Business Partner Data Management Standards
-[bpdm_standards](https://catena-x.net/de/standard-library)
+
+The BPDM APIs follow the [Catena-X standards](https://catena-x.net/de/standard-library).
 
 ## Logging Behavior
 

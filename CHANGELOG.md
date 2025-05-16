@@ -18,6 +18,11 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - App: Renamed api attributes/fields with corresponding 25.06 standards for BPDM Pool, Gate and Orchestrator Services([#1304](https://github.com/eclipse-tractusx/bpdm/issues/1304))
 - Gate: Changed endpoint paths to better differentiate between business partner or relation endpoints ([#1327](https://github.com/eclipse-tractusx/bpdm/issues/1327))
 
+### Known Knowns
+
+- When creating a marketplace app the Portal does not support an internal technical user profile for BPDM permission group [Gate Input Consumer](docs/architecture/08_Crosscutting_Concepts.md).
+Therefore, it is currently not possible to create a marketplace app that enables access to [ReadAccessGateInputForSharingMember offers](INSTALL.md#edc-installation) for external VAT services wanting to access sharing member Gates.
+
 ### Added
 
 - BPDM Pool: Enhanced logic for legal entity on relation based on relation type IsAlternativeHeadquarterFor.([#1254](https://github.com/eclipse-tractusx/bpdm/issues/1254))
