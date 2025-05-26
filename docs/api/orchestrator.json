@@ -3,7 +3,7 @@
   "info" : {
     "title" : "Business Partner Data Management Orchestrator",
     "description" : "Orchestrator component acts as a passive component and offers for each processing steps individual endpoints",
-    "version" : "7.0.0-rc1"
+    "version" : "7.0.0"
   },
   "servers" : [ {
     "url" : "http://localhost:8085",

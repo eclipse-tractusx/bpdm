@@ -1,6 +1,6 @@
 # bpdm-cleaning-service-dummy
 
-![Version: 4.0.0-rc1](https://img.shields.io/badge/Version-4.0.0--rc1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 7.0.0-rc1](https://img.shields.io/badge/AppVersion-7.0.0--rc1-informational?style=flat-square)
+![Version: 4.0.0](https://img.shields.io/badge/Version-4.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 7.0.0](https://img.shields.io/badge/AppVersion-7.0.0-informational?style=flat-square)
 
 A Helm chart for deploying the BPDM cleaning service
 
@@ -21,7 +21,7 @@ A Helm chart for deploying the BPDM cleaning service
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://../bpdm-common | bpdm-common | 1.0.4-rc1 |
+| file://../bpdm-common | bpdm-common | 1.0.4 |
 | https://eclipse-tractusx.github.io/charts/dev | centralidp(centralidp) | 4.0.0 |
 
 ## Values

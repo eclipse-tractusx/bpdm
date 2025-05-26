@@ -3,7 +3,7 @@ info:
   title: Business Partner Data Management Orchestrator
   description: Orchestrator component acts as a passive component and offers for each
     processing steps individual endpoints
-  version: 7.0.0-rc1
+  version: 7.0.0
 servers:
   - url: http://localhost:8085
     description: Generated server url
@@ -516,303 +516,6 @@ paths:
           description: On malformed requests
 components:
   schemas:
-    BusinessPartnerRelations:
-      type: object
-      description: 'The business partner relations data to be processed '
-      properties:
-        relationType:
-          type: string
-          description: The type of relation between the business partners
-          enum:
-            - IsAlternativeHeadquarterFor
-        businessPartnerSourceBpnl:
-          type: string
-          description: The business partner from which the relation emerges (the source)
-        businessPartnerTargetBpnl:
-          type: string
-          description: The business partner to which this relation goes (the target)
-      required:
-        - businessPartnerSourceBpnl
-        - businessPartnerTargetBpnl
-        - relationType
-    TaskCreateRelationsRequest:
-      type: object
-      description: Request object to specify for which business partner relationship
-        data tasks should be created and in which mode
-      properties:
-        mode:
-          type: string
-          description: The mode affecting which processing steps the business partner
-            relation goes through
-          enum:
-            - UpdateFromSharingMember
-            - UpdateFromPool
-        requests:
-          type: array
-          items:
-            $ref: "#/components/schemas/TaskCreateRelationsRequestEntry"
-      required:
-        - mode
-        - requests
-    TaskCreateRelationsRequestEntry:
-      type: object
-      properties:
-        recordId:
-          type: string
-          description: The unique identifier for this record which was previously
-            issued by the Orchestrator
-        businessPartnerRelations:
-          $ref: "#/components/schemas/BusinessPartnerRelations"
-          description: The business partner relationship data to be processed
-      required:
-        - businessPartnerRelations
-    TaskClientRelationsStateDto:
-      type: object
-      description: The golden record task's processing state together with optional
-        business partner relationship data in case processing is done
-      properties:
-        taskId:
-          type: string
-        recordId:
-          type: string
-          description: The identifier of the gate record for which this task has been
-            created
-        businessPartnerRelationsResult:
-          $ref: "#/components/schemas/BusinessPartnerRelations"
-        processingState:
-          $ref: "#/components/schemas/TaskProcessingRelationsStateDto"
-      required:
-        - businessPartnerRelationsResult
-        - processingState
-        - recordId
-        - taskId
-    TaskCreateRelationsResponse:
-      type: object
-      description: Response object for giving a list of created tasks
-      properties:
-        createdTasks:
-          type: array
-          items:
-            $ref: "#/components/schemas/TaskClientRelationsStateDto"
-      required:
-        - createdTasks
-    TaskProcessingRelationsStateDto:
-      type: object
-      description: Contains detailed information about the current processing state
-        of a relations golden record task
-      properties:
-        resultState:
-          type: string
-          description: "The processing result of the task, can also still be pending"
-          enum:
-            - Pending
-            - Success
-            - Error
-        step:
-          type: string
-          description: The last step this task has entered
-          enum:
-            - CleanAndSync
-            - PoolSync
-            - Clean
-        stepState:
-          type: string
-          description: Whether the task is queued or already reserved for the latest
-            step
-          enum:
-            - Queued
-            - Reserved
-            - Success
-            - Error
-        errors:
-          type: array
-          description: The actual errors that happened during processing if the task
-            has an error result state. The errors refer to the latest step.
-          items:
-            $ref: "#/components/schemas/TaskRelationsErrorDto"
-        createdAt:
-          type: string
-          format: date-time
-          description: When the task has been created
-        modifiedAt:
-          type: string
-          format: date-time
-          description: When the task has last been modified
-        timeout:
-          type: string
-          format: date-time
-          deprecated: true
-          description: The timestamp until the task is removed from the Orchestrator
-      required:
-        - createdAt
-        - errors
-        - modifiedAt
-        - resultState
-        - step
-        - stepState
-        - timeout
-    TaskRelationsErrorDto:
-      type: object
-      description: "Describes an error that happened during processing of a task \n"
-      properties:
-        type:
-          type: string
-          description: The type of error that occurred.
-          enum:
-            - Timeout
-            - Unspecified
-        description:
-          type: string
-          description: "The free text, detailed description of the error"
-      required:
-        - description
-        - type
-    TaskRelationsStepResultEntryDto:
-      type: object
-      description: A step result for a relations golden record task
-      properties:
-        taskId:
-          type: string
-          description: The identifier of the task for which this is a result
-        businessPartnerRelations:
-          $ref: "#/components/schemas/BusinessPartnerRelations"
-          description: The actual result in form of business partner relations data.
-            Maybe null if an error occurred during processing of this task.
-        errors:
-          type: array
-          items:
-            $ref: "#/components/schemas/TaskRelationsErrorDto"
-      required:
-        - businessPartnerRelations
-        - errors
-        - taskId
-    TaskRelationsStepResultRequest:
-      type: object
-      description: Request object for posting step results of previously reserved
-        tasks
-      properties:
-        step:
-          type: string
-          description: The step queue containing the tasks for which results are posted
-          enum:
-            - CleanAndSync
-            - PoolSync
-            - Clean
-        results:
-          type: array
-          items:
-            $ref: "#/components/schemas/TaskRelationsStepResultEntryDto"
-      required:
-        - results
-        - step
-    TaskStepReservationRequest:
-      type: object
-      description: Request object for reserving a number of tasks waiting in a step
-        queue.
-      properties:
-        amount:
-          type: integer
-          format: int32
-          description: The maximum number of tasks to reserve. Can be fewer if queue
-            is not full enough.
-        step:
-          type: string
-          description: The step queue to reserve from
-          enum:
-            - CleanAndSync
-            - PoolSync
-            - Clean
-      required:
-        - amount
-        - step
-    TaskRelationsStepReservationEntryDto:
-      type: object
-      description: Task reservation entry
-      properties:
-        taskId:
-          type: string
-          description: The identifier of the reserved task
-        recordId:
-          type: string
-          description: The identifier of the gate record for which this task has been
-            created
-        businessPartnerRelations:
-          $ref: "#/components/schemas/BusinessPartnerRelations"
-          description: The business partner relations data to process
-      required:
-        - businessPartnerRelations
-        - recordId
-        - taskId
-    TaskRelationsStepReservationResponse:
-      type: object
-      description: Response object for giving a list of reserved tasks
-      properties:
-        reservedTasks:
-          type: array
-          items:
-            $ref: "#/components/schemas/TaskRelationsStepReservationEntryDto"
-        timeout:
-          type: string
-          format: date-time
-          deprecated: true
-          description: The timestamp until the reservation is valid and results are
-            accepted
-      required:
-        - reservedTasks
-        - timeout
-    Entry:
-      type: object
-      properties:
-        taskId:
-          type: string
-        recordId:
-          type: string
-      required:
-        - recordId
-        - taskId
-    TaskStateRequest:
-      type: object
-      description: Request object for giving a list of task identifiers to search
-        for the state of tasks
-      properties:
-        entries:
-          type: array
-          items:
-            $ref: "#/components/schemas/Entry"
-      required:
-        - entries
-    TaskRelationsStateResponse:
-      type: object
-      description: Response object for giving a list of task states
-      properties:
-        tasks:
-          type: array
-          items:
-            $ref: "#/components/schemas/TaskClientRelationsStateDto"
-      required:
-        - tasks
-    TaskResultStateSearchRequest:
-      type: object
-      properties:
-        taskIds:
-          type: array
-          items:
-            type: string
-      required:
-        - taskIds
-    TaskResultStateSearchResponse:
-      type: object
-      properties:
-        resultStates:
-          type: array
-          items:
-            type: string
-            enum:
-              - Pending
-              - Success
-              - Error
-      required:
-        - resultStates
     AlternativeAddress:
       type: object
       description: An alternative postal address describes an alternative way of delivery
@@ -935,6 +638,25 @@ components:
         - legalEntity
         - nameParts
         - uncategorized
+    BusinessPartnerRelations:
+      type: object
+      description: 'The business partner relations data to be processed '
+      properties:
+        relationType:
+          type: string
+          description: The type of relation between the business partners
+          enum:
+            - IsAlternativeHeadquarterFor
+        businessPartnerSourceBpnl:
+          type: string
+          description: The business partner from which the relation emerges (the source)
+        businessPartnerTargetBpnl:
+          type: string
+          description: The business partner to which this relation goes (the target)
+      required:
+        - businessPartnerSourceBpnl
+        - businessPartnerTargetBpnl
+        - relationType
     BusinessState:
       type: object
       description: The business state information for the corresponding business partner
@@ -984,6 +706,64 @@ components:
           type: integer
           format: int32
           description: The overall confidence level of the matched golden record
+    Entry:
+      type: object
+      properties:
+        taskId:
+          type: string
+        recordId:
+          type: string
+      required:
+        - recordId
+        - taskId
+    Event:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        resultState:
+          type: string
+          enum:
+            - Pending
+            - Success
+            - Error
+        taskId:
+          type: string
+      required:
+        - resultState
+        - taskId
+        - timestamp
+    FinishedTaskEventsResponse:
+      type: object
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+          description: Total number of all results in all pages
+        totalPages:
+          type: integer
+          format: int32
+          description: Total number pages
+        page:
+          type: integer
+          format: int32
+          description: Current page number
+        contentSize:
+          type: integer
+          format: int32
+          description: Number of results in the page
+        content:
+          type: array
+          description: Collection of results in the page
+          items:
+            $ref: "#/components/schemas/Event"
+      required:
+        - content
+        - contentSize
+        - page
+        - totalElements
+        - totalPages
     GeoCoordinate:
       type: object
       description: "The exact location of the physical postal address in latitude,\
@@ -1263,6 +1043,87 @@ components:
           type: string
           description: "The additional street related information, which is usually\
             \ printed after the official street name on an address label."
+    TaskClientRelationsStateDto:
+      type: object
+      description: The golden record task's processing state together with optional
+        business partner relationship data in case processing is done
+      properties:
+        taskId:
+          type: string
+        recordId:
+          type: string
+          description: The identifier of the gate record for which this task has been
+            created
+        businessPartnerRelationsResult:
+          $ref: "#/components/schemas/BusinessPartnerRelations"
+        processingState:
+          $ref: "#/components/schemas/TaskProcessingRelationsStateDto"
+      required:
+        - businessPartnerRelationsResult
+        - processingState
+        - recordId
+        - taskId
+    TaskClientStateDto:
+      type: object
+      description: The golden record task's processing state together with optional
+        business partner data in case processing is done
+      properties:
+        taskId:
+          type: string
+        recordId:
+          type: string
+          description: The identifier of the gate record for which this task has been
+            created
+        businessPartnerResult:
+          $ref: "#/components/schemas/BusinessPartner"
+        processingState:
+          $ref: "#/components/schemas/TaskProcessingStateDto"
+      required:
+        - businessPartnerResult
+        - processingState
+        - recordId
+        - taskId
+    TaskCreateRelationsRequest:
+      type: object
+      description: Request object to specify for which business partner relationship
+        data tasks should be created and in which mode
+      properties:
+        mode:
+          type: string
+          description: The mode affecting which processing steps the business partner
+            relation goes through
+          enum:
+            - UpdateFromSharingMember
+            - UpdateFromPool
+        requests:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaskCreateRelationsRequestEntry"
+      required:
+        - mode
+        - requests
+    TaskCreateRelationsRequestEntry:
+      type: object
+      properties:
+        recordId:
+          type: string
+          description: The unique identifier for this record which was previously
+            issued by the Orchestrator
+        businessPartnerRelations:
+          $ref: "#/components/schemas/BusinessPartnerRelations"
+          description: The business partner relationship data to be processed
+      required:
+        - businessPartnerRelations
+    TaskCreateRelationsResponse:
+      type: object
+      description: Response object for giving a list of created tasks
+      properties:
+        createdTasks:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaskClientRelationsStateDto"
+      required:
+        - createdTasks
     TaskCreateRequest:
       type: object
       description: Request object to specify for which business partner data tasks
@@ -1294,56 +1155,6 @@ components:
           description: The business partner data to be processed
       required:
         - businessPartner
-    UncategorizedProperties:
-      type: object
-      description: Business partner data that has not yet or can not be categorized
-      properties:
-        nameParts:
-          type: array
-          description: The plain uncategorized name of the business partner how it
-            appears in the sharing member system
-          items:
-            type: string
-        identifiers:
-          type: array
-          description: "Identifiers for which it is unknown whether they belong to\
-            \ the legal entity, site or any address"
-          items:
-            $ref: "#/components/schemas/Identifier"
-        states:
-          type: array
-          description: "Business states for which it is unknown whether they belong\
-            \ to the legal entity, site or any address"
-          items:
-            $ref: "#/components/schemas/BusinessState"
-        address:
-          $ref: "#/components/schemas/PostalAddress"
-          description: "Address information for which it is unknown whether they belong\
-            \ to the legal, site main or additional address"
-      required:
-        - identifiers
-        - nameParts
-        - states
-    TaskClientStateDto:
-      type: object
-      description: The golden record task's processing state together with optional
-        business partner data in case processing is done
-      properties:
-        taskId:
-          type: string
-        recordId:
-          type: string
-          description: The identifier of the gate record for which this task has been
-            created
-        businessPartnerResult:
-          $ref: "#/components/schemas/BusinessPartner"
-        processingState:
-          $ref: "#/components/schemas/TaskProcessingStateDto"
-      required:
-        - businessPartnerResult
-        - processingState
-        - recordId
-        - taskId
     TaskCreateResponse:
       type: object
       description: Response object for giving a list of created tasks
@@ -1384,6 +1195,61 @@ components:
       required:
         - description
         - type
+    TaskProcessingRelationsStateDto:
+      type: object
+      description: Contains detailed information about the current processing state
+        of a relations golden record task
+      properties:
+        resultState:
+          type: string
+          description: "The processing result of the task, can also still be pending"
+          enum:
+            - Pending
+            - Success
+            - Error
+        step:
+          type: string
+          description: The last step this task has entered
+          enum:
+            - CleanAndSync
+            - PoolSync
+            - Clean
+        stepState:
+          type: string
+          description: Whether the task is queued or already reserved for the latest
+            step
+          enum:
+            - Queued
+            - Reserved
+            - Success
+            - Error
+        errors:
+          type: array
+          description: The actual errors that happened during processing if the task
+            has an error result state. The errors refer to the latest step.
+          items:
+            $ref: "#/components/schemas/TaskRelationsErrorDto"
+        createdAt:
+          type: string
+          format: date-time
+          description: When the task has been created
+        modifiedAt:
+          type: string
+          format: date-time
+          description: When the task has last been modified
+        timeout:
+          type: string
+          format: date-time
+          deprecated: true
+          description: The timestamp until the task is removed from the Orchestrator
+      required:
+        - createdAt
+        - errors
+        - modifiedAt
+        - resultState
+        - step
+        - stepState
+        - timeout
     TaskProcessingStateDto:
       type: object
       description: Contains detailed information about the current processing state
@@ -1439,6 +1305,206 @@ components:
         - step
         - stepState
         - timeout
+    TaskRelationsErrorDto:
+      type: object
+      description: "Describes an error that happened during processing of a task \n"
+      properties:
+        type:
+          type: string
+          description: The type of error that occurred.
+          enum:
+            - Timeout
+            - Unspecified
+        description:
+          type: string
+          description: "The free text, detailed description of the error"
+      required:
+        - description
+        - type
+    TaskRelationsStateResponse:
+      type: object
+      description: Response object for giving a list of task states
+      properties:
+        tasks:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaskClientRelationsStateDto"
+      required:
+        - tasks
+    TaskRelationsStepReservationEntryDto:
+      type: object
+      description: Task reservation entry
+      properties:
+        taskId:
+          type: string
+          description: The identifier of the reserved task
+        recordId:
+          type: string
+          description: The identifier of the gate record for which this task has been
+            created
+        businessPartnerRelations:
+          $ref: "#/components/schemas/BusinessPartnerRelations"
+          description: The business partner relations data to process
+      required:
+        - businessPartnerRelations
+        - recordId
+        - taskId
+    TaskRelationsStepReservationResponse:
+      type: object
+      description: Response object for giving a list of reserved tasks
+      properties:
+        reservedTasks:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaskRelationsStepReservationEntryDto"
+        timeout:
+          type: string
+          format: date-time
+          deprecated: true
+          description: The timestamp until the reservation is valid and results are
+            accepted
+      required:
+        - reservedTasks
+        - timeout
+    TaskRelationsStepResultEntryDto:
+      type: object
+      description: A step result for a relations golden record task
+      properties:
+        taskId:
+          type: string
+          description: The identifier of the task for which this is a result
+        businessPartnerRelations:
+          $ref: "#/components/schemas/BusinessPartnerRelations"
+          description: The actual result in form of business partner relations data.
+            Maybe null if an error occurred during processing of this task.
+        errors:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaskRelationsErrorDto"
+      required:
+        - businessPartnerRelations
+        - errors
+        - taskId
+    TaskRelationsStepResultRequest:
+      type: object
+      description: Request object for posting step results of previously reserved
+        tasks
+      properties:
+        step:
+          type: string
+          description: The step queue containing the tasks for which results are posted
+          enum:
+            - CleanAndSync
+            - PoolSync
+            - Clean
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaskRelationsStepResultEntryDto"
+      required:
+        - results
+        - step
+    TaskResultStateSearchRequest:
+      type: object
+      properties:
+        taskIds:
+          type: array
+          items:
+            type: string
+      required:
+        - taskIds
+    TaskResultStateSearchResponse:
+      type: object
+      properties:
+        resultStates:
+          type: array
+          items:
+            type: string
+            enum:
+              - Pending
+              - Success
+              - Error
+      required:
+        - resultStates
+    TaskStateRequest:
+      type: object
+      description: Request object for giving a list of task identifiers to search
+        for the state of tasks
+      properties:
+        entries:
+          type: array
+          items:
+            $ref: "#/components/schemas/Entry"
+      required:
+        - entries
+    TaskStateResponse:
+      type: object
+      description: Response object for giving a list of task states
+      properties:
+        tasks:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaskClientStateDto"
+      required:
+        - tasks
+    TaskStepReservationEntryDto:
+      type: object
+      description: Task reservation entry
+      properties:
+        taskId:
+          type: string
+          description: The identifier of the reserved task
+        recordId:
+          type: string
+          description: The identifier of the gate record for which this task has been
+            created
+        businessPartner:
+          $ref: "#/components/schemas/BusinessPartner"
+          description: The business partner data to process
+        requestKey:
+          type: string
+      required:
+        - businessPartner
+        - recordId
+        - requestKey
+        - taskId
+    TaskStepReservationRequest:
+      type: object
+      description: Request object for reserving a number of tasks waiting in a step
+        queue.
+      properties:
+        amount:
+          type: integer
+          format: int32
+          description: The maximum number of tasks to reserve. Can be fewer if queue
+            is not full enough.
+        step:
+          type: string
+          description: The step queue to reserve from
+          enum:
+            - CleanAndSync
+            - PoolSync
+            - Clean
+      required:
+        - amount
+        - step
+    TaskStepReservationResponse:
+      type: object
+      description: Response object for giving a list of reserved tasks
+      properties:
+        reservedTasks:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaskStepReservationEntryDto"
+        timeout:
+          type: string
+          format: date-time
+          deprecated: true
+          description: The timestamp until the reservation is valid and results are
+            accepted
+      required:
+        - reservedTasks
+        - timeout
     TaskStepResultEntryDto:
       type: object
       description: A step result for a golden record task
@@ -1477,102 +1543,36 @@ components:
       required:
         - results
         - step
-    TaskStepReservationEntryDto:
+    UncategorizedProperties:
       type: object
-      description: Task reservation entry
+      description: Business partner data that has not yet or can not be categorized
       properties:
-        taskId:
-          type: string
-          description: The identifier of the reserved task
-        recordId:
-          type: string
-          description: The identifier of the gate record for which this task has been
-            created
-        businessPartner:
-          $ref: "#/components/schemas/BusinessPartner"
-          description: The business partner data to process
-        requestKey:
-          type: string
-      required:
-        - businessPartner
-        - recordId
-        - requestKey
-        - taskId
-    TaskStepReservationResponse:
-      type: object
-      description: Response object for giving a list of reserved tasks
-      properties:
-        reservedTasks:
+        nameParts:
           type: array
+          description: The plain uncategorized name of the business partner how it
+            appears in the sharing member system
           items:
-            $ref: "#/components/schemas/TaskStepReservationEntryDto"
-        timeout:
-          type: string
-          format: date-time
-          deprecated: true
-          description: The timestamp until the reservation is valid and results are
-            accepted
-      required:
-        - reservedTasks
-        - timeout
-    TaskStateResponse:
-      type: object
-      description: Response object for giving a list of task states
-      properties:
-        tasks:
+            type: string
+        identifiers:
           type: array
+          description: "Identifiers for which it is unknown whether they belong to\
+            \ the legal entity, site or any address"
           items:
-            $ref: "#/components/schemas/TaskClientStateDto"
-      required:
-        - tasks
-    Event:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        resultState:
-          type: string
-          enum:
-            - Pending
-            - Success
-            - Error
-        taskId:
-          type: string
-      required:
-        - resultState
-        - taskId
-        - timestamp
-    FinishedTaskEventsResponse:
-      type: object
-      properties:
-        totalElements:
-          type: integer
-          format: int64
-          description: Total number of all results in all pages
-        totalPages:
-          type: integer
-          format: int32
-          description: Total number pages
-        page:
-          type: integer
-          format: int32
-          description: Current page number
-        contentSize:
-          type: integer
-          format: int32
-          description: Number of results in the page
-        content:
+            $ref: "#/components/schemas/Identifier"
+        states:
           type: array
-          description: Collection of results in the page
+          description: "Business states for which it is unknown whether they belong\
+            \ to the legal entity, site or any address"
           items:
-            $ref: "#/components/schemas/Event"
+            $ref: "#/components/schemas/BusinessState"
+        address:
+          $ref: "#/components/schemas/PostalAddress"
+          description: "Address information for which it is unknown whether they belong\
+            \ to the legal, site main or additional address"
       required:
-        - content
-        - contentSize
-        - page
-        - totalElements
-        - totalPages
+        - identifiers
+        - nameParts
+        - states
   securitySchemes:
     open_id_scheme:
       type: oauth2
