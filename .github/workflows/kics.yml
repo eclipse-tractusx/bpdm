@@ -43,7 +43,7 @@ jobs:
       - name: KICS scan
         uses: checkmarx/kics-github-action@v2
         with:
-          path: "./charts"
+          path: "."
           fail_on: high
           disable_secrets: true
           output_path: kicsResults/
