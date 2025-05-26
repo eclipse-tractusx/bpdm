@@ -3,7 +3,7 @@ info:
   title: Business Partner Data Management Pool
   description: Service that manages and shares business partner data with other CatenaX
     services
-  version: 7.0.0-rc1
+  version: 7.0.0
 servers:
   - url: http://localhost:8080
     description: Generated server url
@@ -3379,6 +3379,285 @@ components:
       required:
         - type
         - value
+    AddressIdentifierVerboseDto:
+      type: object
+      description: "An address identifier (uniquely) identifies the address, such\
+        \ as the Global Location Number (GLN)."
+      properties:
+        value:
+          type: string
+          description: The value of the identifier like "0847976000005".
+        type:
+          $ref: "#/components/schemas/TypeKeyNameVerboseDtoString"
+          description: The type of the identifier.
+      required:
+        - type
+        - value
+    AddressPartnerCreateRequest:
+      type: object
+      description: "Request for creating new business partner record of type address.\
+        \ In general, an address is a collection of information to describe a physical\
+        \ location, using a street name with a house number and/or a post office box\
+        \ as reference. In addition, an address consists of several postal attributes,\
+        \ such as country, region (state), county, township, city, district, or postal\
+        \ code, which help deliver mail.In Catena-X, an address is a type of business\
+        \ partner representing the legal address of a legal entity, and/or the main\
+        \ address of a site, or any additional address of a legal entity or site (such\
+        \ as different gates).An address is owned by a legal entity. Thus, exactly\
+        \ one legal entity is assigned to an address. An address can belong to a site.\
+        \ Thus, one or no site is assigned to an address. An address is uniquely identified\
+        \ by the BPNA."
+      properties:
+        name:
+          type: string
+          description: The name of the address. This is not according to official
+            registers but according to the name the sharing member chooses.
+        states:
+          type: array
+          items:
+            $ref: "#/components/schemas/AddressStateDto"
+        identifiers:
+          type: array
+          items:
+            $ref: "#/components/schemas/AddressIdentifierDto"
+        physicalPostalAddress:
+          $ref: "#/components/schemas/PhysicalPostalAddressDto"
+          description: "The physical postal address of the address, such as an office,\
+            \ warehouse, gate, etc."
+        alternativePostalAddress:
+          $ref: "#/components/schemas/AlternativePostalAddressDto"
+          description: "The alternative postal address of the address, for example\
+            \ if the goods are to be picked up somewhere else."
+        confidenceCriteria:
+          $ref: "#/components/schemas/ConfidenceCriteriaDto"
+        bpnParent:
+          type: string
+          description: BPNL of the legal entity or BPNS of the site this address belongs
+            to.
+        index:
+          type: string
+          description: User defined index to conveniently match this entry to the
+            corresponding entry in the response.
+        requestKey:
+          type: string
+      required:
+        - bpnParent
+        - confidenceCriteria
+        - identifiers
+        - physicalPostalAddress
+        - states
+    AddressPartnerCreateResponseWrapper:
+      type: object
+      description: Holds information about successfully and failed entities after
+        the creating/updating of several objects
+      properties:
+        entities:
+          type: array
+          items:
+            $ref: "#/components/schemas/AddressPartnerCreateVerboseDto"
+        errors:
+          type: array
+          items:
+            $ref: "#/components/schemas/ErrorInfoAddressCreateError"
+        entityCount:
+          type: integer
+          format: int32
+        errorCount:
+          type: integer
+          format: int32
+      required:
+        - entities
+        - entityCount
+        - errorCount
+        - errors
+    AddressPartnerCreateVerboseDto:
+      type: object
+      description: "Created business partner of type address. In general, an address\
+        \ is a collection of information to describe a physical location, using a\
+        \ street name with a house number and/or a post office box as reference. In\
+        \ addition, an address consists of several postal attributes, such as country,\
+        \ region (state), county, township, city, district, or postal code, which\
+        \ help deliver mail.In Catena-X, an address is a type of business partner\
+        \ representing the legal address of a legal entity, and/or the main address\
+        \ of a site, or any additional address of a legal entity or site (such as\
+        \ different gates).An address is owned by a legal entity. Thus, exactly one\
+        \ legal entity is assigned to an address. An address can belong to a site.\
+        \ Thus, one or no site is assigned to an address. An address is uniquely identified\
+        \ by the BPNA."
+      properties:
+        bpna:
+          type: string
+          description: "A BPNA represents and uniquely identifies an address, which\
+            \ can be the legal address of a legal entity, and/or the main address\
+            \ of a site, or any additional address of a legal entity or site (such\
+            \ as different gates). It is important to note that only the BPNL must\
+            \ be used to uniquely identify a legal entity. Even in the case that the\
+            \ BPNA represents the legal address of the legal entity, it shall not\
+            \ be used to uniquely identify the legal entity."
+        name:
+          type: string
+          description: The name of the address. This is not according to official
+            registers but according to the name the sharing member chooses.
+        states:
+          type: array
+          items:
+            $ref: "#/components/schemas/AddressStateVerboseDto"
+        identifiers:
+          type: array
+          items:
+            $ref: "#/components/schemas/AddressIdentifierVerboseDto"
+        physicalPostalAddress:
+          $ref: "#/components/schemas/PhysicalPostalAddressVerboseDto"
+          description: "The physical postal address of the address, such as an office,\
+            \ warehouse, gate, etc."
+        alternativePostalAddress:
+          $ref: "#/components/schemas/AlternativePostalAddressVerboseDto"
+          description: "The alternative postal address of the address, for example\
+            \ if the goods are to be picked up somewhere else."
+        bpnLegalEntity:
+          type: string
+          description: The BPNL of the legal entity owning the address.
+        bpnSite:
+          type: string
+          description: The BPNS of the site the address belongs to.
+        isParticipantData:
+          type: boolean
+          description: Indicates whether the address is owned and thus provided by
+            a Data Space Participant.
+        createdAt:
+          type: string
+          format: date-time
+          description: The date when the data record has been created.
+        updatedAt:
+          type: string
+          format: date-time
+          description: The date when the data record has been last updated.
+        confidenceCriteria:
+          $ref: "#/components/schemas/ConfidenceCriteriaDto"
+        addressType:
+          type: string
+          description: "Indicates the address type, the legal address to a legal entity\
+            \ or the main address to a site, an additional address, or both legal\
+            \ and site address.The site main address is where typically the main entrance\
+            \ or the reception is located, or where the mail is delivered to."
+          enum:
+            - LegalAndSiteMainAddress
+            - LegalAddress
+            - SiteMainAddress
+            - AdditionalAddress
+        index:
+          type: string
+          description: User defined index to conveniently match this entry to the
+            corresponding entry in the response.
+      required:
+        - bpna
+        - confidenceCriteria
+        - createdAt
+        - identifiers
+        - isParticipantData
+        - physicalPostalAddress
+        - states
+        - updatedAt
+    AddressPartnerUpdateRequest:
+      type: object
+      description: "Request for updating a business partner record of type address.\
+        \ In general, an address is a collection of information to describe a physical\
+        \ location, using a street name with a house number and/or a post office box\
+        \ as reference. In addition, an address consists of several postal attributes,\
+        \ such as country, region (state), county, township, city, district, or postal\
+        \ code, which help deliver mail.In Catena-X, an address is a type of business\
+        \ partner representing the legal address of a legal entity, and/or the main\
+        \ address of a site, or any additional address of a legal entity or site (such\
+        \ as different gates).An address is owned by a legal entity. Thus, exactly\
+        \ one legal entity is assigned to an address. An address can belong to a site.\
+        \ Thus, one or no site is assigned to an address. An address is uniquely identified\
+        \ by the BPNA."
+      properties:
+        bpna:
+          type: string
+          description: "A BPNA represents and uniquely identifies an address, which\
+            \ can be the legal address of a legal entity, and/or the main address\
+            \ of a site, or any additional address of a legal entity or site (such\
+            \ as different gates). It is important to note that only the BPNL must\
+            \ be used to uniquely identify a legal entity. Even in the case that the\
+            \ BPNA represents the legal address of the legal entity, it shall not\
+            \ be used to uniquely identify the legal entity."
+        name:
+          type: string
+          description: The name of the address. This is not according to official
+            registers but according to the name the sharing member chooses.
+        states:
+          type: array
+          items:
+            $ref: "#/components/schemas/AddressStateDto"
+        identifiers:
+          type: array
+          items:
+            $ref: "#/components/schemas/AddressIdentifierDto"
+        physicalPostalAddress:
+          $ref: "#/components/schemas/PhysicalPostalAddressDto"
+          description: "The physical postal address of the address, such as an office,\
+            \ warehouse, gate, etc."
+        alternativePostalAddress:
+          $ref: "#/components/schemas/AlternativePostalAddressDto"
+          description: "The alternative postal address of the address, for example\
+            \ if the goods are to be picked up somewhere else."
+        confidenceCriteria:
+          $ref: "#/components/schemas/ConfidenceCriteriaDto"
+        requestKey:
+          type: string
+      required:
+        - bpna
+        - confidenceCriteria
+        - identifiers
+        - physicalPostalAddress
+        - requestKey
+        - states
+    AddressPartnerUpdateResponseWrapper:
+      type: object
+      description: Holds information about successfully and failed entities after
+        the creating/updating of several objects
+      properties:
+        entities:
+          type: array
+          items:
+            $ref: "#/components/schemas/LogisticAddressVerboseDto"
+        errors:
+          type: array
+          items:
+            $ref: "#/components/schemas/ErrorInfoAddressUpdateError"
+        entityCount:
+          type: integer
+          format: int32
+        errorCount:
+          type: integer
+          format: int32
+      required:
+        - entities
+        - entityCount
+        - errorCount
+        - errors
+    AddressSearchRequest:
+      type: object
+      properties:
+        addressBpns:
+          type: array
+          items:
+            type: string
+        legalEntityBpns:
+          type: array
+          items:
+            type: string
+        siteBpns:
+          type: array
+          items:
+            type: string
+        name:
+          type: string
+      required:
+        - addressBpns
+        - legalEntityBpns
+        - siteBpns
     AddressStateDto:
       type: object
       description: "An address state indicates if the address is active or inactive.\
@@ -3400,6 +3679,26 @@ components:
           enum:
             - ACTIVE
             - INACTIVE
+      required:
+        - type
+    AddressStateVerboseDto:
+      type: object
+      description: "An address state indicates if the address is active or inactive.\
+        \ This does not describe the relation between a sharing member and a business\
+        \ partner and whether they have active business, but it describes whether\
+        \ the business partner is still operating at that address."
+      properties:
+        validFrom:
+          type: string
+          format: date-time
+          description: The date from which the state is valid.
+        validTo:
+          type: string
+          format: date-time
+          description: The date until the state is valid.
+        type:
+          $ref: "#/components/schemas/TypeKeyNameVerboseDtoBusinessStateType"
+          description: "One of the state types: active, inactive."
       required:
         - type
     AlternativePostalAddressDto:
@@ -3724,569 +4023,6 @@ components:
         - country
         - deliveryServiceNumber
         - deliveryServiceType
-    ConfidenceCriteriaDto:
-      type: object
-      properties:
-        sharedByOwner:
-          type: boolean
-        checkedByExternalDataSource:
-          type: boolean
-        numberOfSharingMembers:
-          type: integer
-          format: int32
-        lastConfidenceCheckAt:
-          type: string
-          format: date-time
-        nextConfidenceCheckAt:
-          type: string
-          format: date-time
-        confidenceLevel:
-          type: integer
-          format: int32
-      required:
-        - checkedByExternalDataSource
-        - confidenceLevel
-        - lastConfidenceCheckAt
-        - nextConfidenceCheckAt
-        - numberOfSharingMembers
-        - sharedByOwner
-    GeoCoordinateDto:
-      type: object
-      description: "The exact location of the physical postal address in latitude,\
-        \ longitude, and altitude."
-      properties:
-        longitude:
-          type: number
-          format: double
-          description: Longitude coordinate
-        latitude:
-          type: number
-          format: double
-          description: Latitude coordinate
-        altitude:
-          type: number
-          format: double
-          description: "Altitude, if applicable"
-      required:
-        - latitude
-        - longitude
-    LogisticAddressDto:
-      type: object
-      description: "In general, an address is a collection of information to describe\
-        \ a physical location, using a street name with a house number and/or a post\
-        \ office box as reference. In addition, an address consists of several postal\
-        \ attributes, such as country, region (state), county, township, city, district,\
-        \ or postal code, which help deliver mail.In Catena-X, an address is a type\
-        \ of business partner representing the legal address of a legal entity, and/or\
-        \ the main address of a site, or any additional address of a legal entity\
-        \ or site (such as different gates).An address is owned by a legal entity.\
-        \ Thus, exactly one legal entity is assigned to an address. An address can\
-        \ belong to a site. Thus, one or no site is assigned to an address. An address\
-        \ is uniquely identified by the BPNA."
-      properties:
-        name:
-          type: string
-          description: The name of the address. This is not according to official
-            registers but according to the name the sharing member chooses.
-        states:
-          type: array
-          items:
-            $ref: "#/components/schemas/AddressStateDto"
-        identifiers:
-          type: array
-          items:
-            $ref: "#/components/schemas/AddressIdentifierDto"
-        physicalPostalAddress:
-          $ref: "#/components/schemas/PhysicalPostalAddressDto"
-          description: "The physical postal address of the address, such as an office,\
-            \ warehouse, gate, etc."
-        alternativePostalAddress:
-          $ref: "#/components/schemas/AlternativePostalAddressDto"
-          description: "The alternative postal address of the address, for example\
-            \ if the goods are to be picked up somewhere else."
-        confidenceCriteria:
-          $ref: "#/components/schemas/ConfidenceCriteriaDto"
-      required:
-        - confidenceCriteria
-        - identifiers
-        - physicalPostalAddress
-        - states
-    PhysicalPostalAddressDto:
-      type: object
-      description: "A physical postal address describes the physical location of an\
-        \ office, warehouse, gate, etc."
-      properties:
-        geographicCoordinates:
-          $ref: "#/components/schemas/GeoCoordinateDto"
-        country:
-          type: string
-          description: The 2-digit country code of the physical postal address according
-            to ISO 3166-1.
-          enum:
-            - UNDEFINED
-            - AC
-            - AD
-            - AE
-            - AF
-            - AG
-            - AI
-            - AL
-            - AM
-            - AN
-            - AO
-            - AQ
-            - AR
-            - AS
-            - AT
-            - AU
-            - AW
-            - AX
-            - AZ
-            - BA
-            - BB
-            - BD
-            - BE
-            - BF
-            - BG
-            - BH
-            - BI
-            - BJ
-            - BL
-            - BM
-            - BN
-            - BO
-            - BQ
-            - BR
-            - BS
-            - BT
-            - BU
-            - BV
-            - BW
-            - BY
-            - BZ
-            - CA
-            - CC
-            - CD
-            - CF
-            - CG
-            - CH
-            - CI
-            - CK
-            - CL
-            - CM
-            - CN
-            - CO
-            - CP
-            - CR
-            - CS
-            - CU
-            - CV
-            - CW
-            - CX
-            - CY
-            - CZ
-            - DE
-            - DG
-            - DJ
-            - DK
-            - DM
-            - DO
-            - DZ
-            - EA
-            - EC
-            - EE
-            - EG
-            - EH
-            - ER
-            - ES
-            - ET
-            - EU
-            - EZ
-            - FI
-            - FJ
-            - FK
-            - FM
-            - FO
-            - FR
-            - FX
-            - GA
-            - GB
-            - GD
-            - GE
-            - GF
-            - GG
-            - GH
-            - GI
-            - GL
-            - GM
-            - GN
-            - GP
-            - GQ
-            - GR
-            - GS
-            - GT
-            - GU
-            - GW
-            - GY
-            - HK
-            - HM
-            - HN
-            - HR
-            - HT
-            - HU
-            - IC
-            - ID
-            - IE
-            - IL
-            - IM
-            - IN
-            - IO
-            - IQ
-            - IR
-            - IS
-            - IT
-            - JE
-            - JM
-            - JO
-            - JP
-            - KE
-            - KG
-            - KH
-            - KI
-            - KM
-            - KN
-            - KP
-            - KR
-            - KW
-            - KY
-            - KZ
-            - LA
-            - LB
-            - LC
-            - LI
-            - LK
-            - LR
-            - LS
-            - LT
-            - LU
-            - LV
-            - LY
-            - MA
-            - MC
-            - MD
-            - ME
-            - MF
-            - MG
-            - MH
-            - MK
-            - ML
-            - MM
-            - MN
-            - MO
-            - MP
-            - MQ
-            - MR
-            - MS
-            - MT
-            - MU
-            - MV
-            - MW
-            - MX
-            - MY
-            - MZ
-            - NA
-            - NC
-            - NE
-            - NF
-            - NG
-            - NI
-            - NL
-            - "NO"
-            - NP
-            - NR
-            - NT
-            - NU
-            - NZ
-            - OM
-            - PA
-            - PE
-            - PF
-            - PG
-            - PH
-            - PK
-            - PL
-            - PM
-            - PN
-            - PR
-            - PS
-            - PT
-            - PW
-            - PY
-            - QA
-            - RE
-            - RO
-            - RS
-            - RU
-            - RW
-            - SA
-            - SB
-            - SC
-            - SD
-            - SE
-            - SF
-            - SG
-            - SH
-            - SI
-            - SJ
-            - SK
-            - SL
-            - SM
-            - SN
-            - SO
-            - SR
-            - SS
-            - ST
-            - SU
-            - SV
-            - SX
-            - SY
-            - SZ
-            - TA
-            - TC
-            - TD
-            - TF
-            - TG
-            - TH
-            - TJ
-            - TK
-            - TL
-            - TM
-            - TN
-            - TO
-            - TP
-            - TR
-            - TT
-            - TV
-            - TW
-            - TZ
-            - UA
-            - UG
-            - UK
-            - UM
-            - US
-            - UY
-            - UZ
-            - VA
-            - VC
-            - VE
-            - VG
-            - VI
-            - VN
-            - VU
-            - WF
-            - WS
-            - XI
-            - XU
-            - XK
-            - YE
-            - YT
-            - YU
-            - ZA
-            - ZM
-            - ZR
-            - ZW
-        administrativeAreaLevel1:
-          type: string
-          description: "The 2-digit country subdivision code according to ISO 3166-2,\
-            \ such as a region within a country."
-        administrativeAreaLevel2:
-          type: string
-          description: "The name of the locally regulated secondary country subdivision\
-            \ of the physical postal address, such as county within a country."
-        administrativeAreaLevel3:
-          type: string
-          description: "The name of the locally regulated tertiary country subdivision\
-            \ of the physical address, such as townships within a country."
-        postalCode:
-          type: string
-          description: "The alphanumeric identifier (sometimes including spaces or\
-            \ punctuation) of the physical postal address for the purpose of sorting\
-            \ mail, synonyms:postcode, post code, PIN or ZIP code."
-        city:
-          type: string
-          description: "The name of the city of the physical postal address, synonyms:\
-            \ town, village, municipality."
-        district:
-          type: string
-          description: The name of the district of the physical postal address which
-            divides the city in several smaller areas.
-        street:
-          $ref: "#/components/schemas/StreetDto"
-        companyPostalCode:
-          type: string
-          description: "The company postal code of the physical postal address, which\
-            \ is sometimes required for large companies."
-        industrialZone:
-          type: string
-          description: "The industrial zone of the physical postal address, designating\
-            \ an area for industrial development, synonym: industrial area."
-        building:
-          type: string
-          description: The alphanumeric identifier of the building addressed by the
-            physical postal address.
-        floor:
-          type: string
-          description: "The number of a floor in the building addressed by the physical\
-            \ postal address, synonym: level."
-        door:
-          type: string
-          description: "The number of a door in the building on the respective floor\
-            \ addressed by the physical postal address, synonyms: room, suite."
-        taxJurisdictionCode:
-          type: string
-          description: "Tax jurisdiction codes are used to identify the specific jurisdiction(s)\
-            \ that a company belong to, particularly in bureaucratic processes such\
-            \ as tax returns and IRS forms."
-      required:
-        - city
-        - country
-    SitePartnerUpdateRequest:
-      type: object
-      description: "Request for updating a business partner record of type site. In\
-        \ general, a site is a delimited geographical area in which an organization\
-        \ (such as an enterprise or company, university, association, etc.) conducts\
-        \ business. In Catena-X, a site is a type of business partner representing\
-        \ a physical location or area owned by a legal entity, where a production\
-        \ plant, a warehouse, or an office building is located. A site is owned by\
-        \ a legal entity. Thus, exactly one legal entity is assigned to a site. A\
-        \ site has exactly one main address, but it is possible to specify additional\
-        \ addresses (such as different gates), that belong to a site. Thus, at least\
-        \ one address is assigned to a site. A site can only be uploaded and modified\
-        \ by the owner (the legal entity), because only the owner knows which addresses\
-        \ belong to which site. A site is uniquely identified by the BPNS."
-      properties:
-        bpns:
-          type: string
-          description: "A BPNS represents and uniquely identifies a site, which is\
-            \ where for example a production plant, a warehouse, or an office building\
-            \ is located."
-        name:
-          type: string
-          description: The name of the site. This is not according to official registers
-            but according to the name the owner chooses.
-        states:
-          type: array
-          items:
-            $ref: "#/components/schemas/SiteStateDto"
-        mainAddress:
-          $ref: "#/components/schemas/LogisticAddressDto"
-        confidenceCriteria:
-          $ref: "#/components/schemas/ConfidenceCriteriaDto"
-        requestKey:
-          type: string
-      required:
-        - bpns
-        - confidenceCriteria
-        - mainAddress
-        - name
-        - requestKey
-        - states
-    SiteStateDto:
-      type: object
-      description: "A site state indicates if the site is active or inactive. This\
-        \ does not describe the relation between a sharing member and a business partner\
-        \ and whether they have active business, but it describes whether the site\
-        \ is still operating."
-      properties:
-        validFrom:
-          type: string
-          format: date-time
-          description: The date from which the state is valid.
-        validTo:
-          type: string
-          format: date-time
-          description: The date until the state is valid.
-        type:
-          type: string
-          description: "One of the state types: active, inactive."
-          enum:
-            - ACTIVE
-            - INACTIVE
-      required:
-        - type
-    StreetDto:
-      type: object
-      description: "The street of the physical postal address, synonyms: road, avenue,\
-        \ lane, boulevard, highway"
-      properties:
-        name:
-          type: string
-          description: The name of the street.
-        houseNumber:
-          type: string
-          description: The number representing the exact location of a building within
-            the street.
-        houseNumberSupplement:
-          type: string
-        milestone:
-          type: string
-          description: "The number representing the exact location of an addressed\
-            \ object within a street without house numbers, such as within long roads."
-        direction:
-          type: string
-          description: "The cardinal direction describing where the exit to the location\
-            \ of the addressed object on large highways / motorways is located, such\
-            \ as Highway 101 South."
-        namePrefix:
-          type: string
-          description: "The street related information, which is usually printed before\
-            \ the official street name on an address label."
-        additionalNamePrefix:
-          type: string
-          description: "The additional street related information, which is usually\
-            \ printed before the official street name on an address label."
-        nameSuffix:
-          type: string
-          description: "The street related information, which is usually printed after\
-            \ the official street name on an address label."
-        additionalNameSuffix:
-          type: string
-          description: "The additional street related information, which is usually\
-            \ printed after the official street name on an address label."
-    AddressIdentifierVerboseDto:
-      type: object
-      description: "An address identifier (uniquely) identifies the address, such\
-        \ as the Global Location Number (GLN)."
-      properties:
-        value:
-          type: string
-          description: The value of the identifier like "0847976000005".
-        type:
-          $ref: "#/components/schemas/TypeKeyNameVerboseDtoString"
-          description: The type of the identifier.
-      required:
-        - type
-        - value
-    AddressStateVerboseDto:
-      type: object
-      description: "An address state indicates if the address is active or inactive.\
-        \ This does not describe the relation between a sharing member and a business\
-        \ partner and whether they have active business, but it describes whether\
-        \ the business partner is still operating at that address."
-      properties:
-        validFrom:
-          type: string
-          format: date-time
-          description: The date from which the state is valid.
-        validTo:
-          type: string
-          format: date-time
-          description: The date until the state is valid.
-        type:
-          $ref: "#/components/schemas/TypeKeyNameVerboseDtoBusinessStateType"
-          description: "One of the state types: active, inactive."
-      required:
-        - type
     AlternativePostalAddressVerboseDto:
       type: object
       description: An alternative postal address describes an alternative way of delivery
@@ -4336,181 +4072,133 @@ components:
         - country
         - deliveryServiceNumber
         - deliveryServiceType
-    ErrorInfoSiteUpdateError:
+    BpnIdentifierMappingDto:
       type: object
-      description: Holds information about failures when creating or updating an entity
+      description: Mapping of Business Partner Number to identifier value
       properties:
-        errorCode:
+        idValue:
           type: string
-          description: Error code identifying the error
-          enum:
-            - SiteNotFound
-            - MainAddressIdentifierNotFound
-            - MainAddressRegionNotFound
-            - MainAddressDuplicateIdentifier
-        message:
+          description: Value of the identifier
+        bpn:
           type: string
-          description: Error message that explains the error
-        entityKey:
-          type: string
-          description: "Key of the entity that failed from the request object: index\
-            \ or BPN"
+          description: Business Partner Number
       required:
-        - errorCode
-        - message
-      title: ErrorInfo
-    LogisticAddressVerboseDto:
+        - bpn
+        - idValue
+    BpnRequestIdentifierMappingDto:
       type: object
-      description: "In general, an address is a collection of information to describe\
-        \ a physical location, using a street name with a house number and/or a post\
-        \ office box as reference. In addition, an address consists of several postal\
-        \ attributes, such as country, region (state), county, township, city, district,\
-        \ or postal code, which help deliver mail.In Catena-X, an address is a type\
-        \ of business partner representing the legal address of a legal entity, and/or\
-        \ the main address of a site, or any additional address of a legal entity\
-        \ or site (such as different gates).An address is owned by a legal entity.\
-        \ Thus, exactly one legal entity is assigned to an address. An address can\
-        \ belong to a site. Thus, one or no site is assigned to an address. An address\
-        \ is uniquely identified by the BPNA."
+      description: Mapping of Business Partner Number to requested-identifier value
       properties:
-        bpna:
+        requestedIdentifier:
           type: string
-          description: "A BPNA represents and uniquely identifies an address, which\
-            \ can be the legal address of a legal entity, and/or the main address\
-            \ of a site, or any additional address of a legal entity or site (such\
-            \ as different gates). It is important to note that only the BPNL must\
-            \ be used to uniquely identify a legal entity. Even in the case that the\
-            \ BPNA represents the legal address of the legal entity, it shall not\
-            \ be used to uniquely identify the legal entity."
-        name:
+          description: Value of the requested-identifier
+        bpn:
           type: string
-          description: The name of the address. This is not according to official
-            registers but according to the name the sharing member chooses.
-        states:
+          description: Business Partner Number
+      required:
+        - bpn
+        - requestedIdentifier
+    BpnRequestIdentifierSearchRequest:
+      type: object
+      description: Mapping of Business Partner Number to requested-identifier value
+      properties:
+        requestedIdentifiers:
+          type: array
+          description: Value of the requested-identifier
+          items:
+            type: string
+          uniqueItems: true
+      required:
+        - requestedIdentifiers
+    ChangelogEntryVerboseDto:
+      type: object
+      description: "An entry of the changelog, which is created each time a business\
+        \ partner is modified and contains data about the change. The actual new state\
+        \ of the business partner is not included."
+      properties:
+        bpn:
+          type: string
+          description: "The business partner number for which the changelog entry\
+            \ was created. Can be either a BPNL, BPNS or BPNA."
+        businessPartnerType:
+          type: string
+          description: "One of the types of business partners for which the changelog\
+            \ entry was created: legal entity, site, address."
+          enum:
+            - LEGAL_ENTITY
+            - SITE
+            - ADDRESS
+            - GENERIC
+        timestamp:
+          type: string
+          format: date-time
+          description: The date and time when the changelog entry was created.
+        changelogType:
+          type: string
+          description: "One of the actions for which the changelog entry was created:\
+            \ create, update."
+          enum:
+            - CREATE
+            - UPDATE
+      required:
+        - bpn
+        - businessPartnerType
+        - changelogType
+        - timestamp
+    ChangelogSearchRequest:
+      type: object
+      description: Request for searching and filtering the business partner changelog
+      properties:
+        timestampAfter:
+          type: string
+          format: date-time
+          description: Only changelog entries created after this time. Ignored if
+            empty.
+          example: 2023-03-20T10:23:28.194Z
+        bpns:
           type: array
           items:
-            $ref: "#/components/schemas/AddressStateVerboseDto"
-        identifiers:
+            type: string
+          uniqueItems: true
+        businessPartnerTypes:
           type: array
           items:
-            $ref: "#/components/schemas/AddressIdentifierVerboseDto"
-        physicalPostalAddress:
-          $ref: "#/components/schemas/PhysicalPostalAddressVerboseDto"
-          description: "The physical postal address of the address, such as an office,\
-            \ warehouse, gate, etc."
-        alternativePostalAddress:
-          $ref: "#/components/schemas/AlternativePostalAddressVerboseDto"
-          description: "The alternative postal address of the address, for example\
-            \ if the goods are to be picked up somewhere else."
-        bpnLegalEntity:
-          type: string
-          description: The BPNL of the legal entity owning the address.
-        bpnSite:
-          type: string
-          description: The BPNS of the site the address belongs to.
-        isParticipantData:
+            type: string
+            enum:
+              - LEGAL_ENTITY
+              - SITE
+              - ADDRESS
+              - GENERIC
+          uniqueItems: true
+    ConfidenceCriteriaDto:
+      type: object
+      properties:
+        sharedByOwner:
           type: boolean
-          description: Indicates whether the address is owned and thus provided by
-            a Data Space Participant.
-        createdAt:
+        checkedByExternalDataSource:
+          type: boolean
+        numberOfSharingMembers:
+          type: integer
+          format: int32
+        lastConfidenceCheckAt:
           type: string
           format: date-time
-          description: The date when the data record has been created.
-        updatedAt:
+        nextConfidenceCheckAt:
           type: string
           format: date-time
-          description: The date when the data record has been last updated.
-        confidenceCriteria:
-          $ref: "#/components/schemas/ConfidenceCriteriaDto"
-        addressType:
-          type: string
-          description: "Indicates the address type, the legal address to a legal entity\
-            \ or the main address to a site, an additional address, or both legal\
-            \ and site address.The site main address is where typically the main entrance\
-            \ or the reception is located, or where the mail is delivered to."
-          enum:
-            - LegalAndSiteMainAddress
-            - LegalAddress
-            - SiteMainAddress
-            - AdditionalAddress
+        confidenceLevel:
+          type: integer
+          format: int32
       required:
-        - bpna
-        - confidenceCriteria
-        - createdAt
-        - identifiers
-        - isParticipantData
-        - physicalPostalAddress
-        - states
-        - updatedAt
-    PhysicalPostalAddressVerboseDto:
+        - checkedByExternalDataSource
+        - confidenceLevel
+        - lastConfidenceCheckAt
+        - nextConfidenceCheckAt
+        - numberOfSharingMembers
+        - sharedByOwner
+    CountrySubdivisionDto:
       type: object
-      description: "A physical postal address describes the physical location of an\
-        \ office, warehouse, gate, etc."
-      properties:
-        geographicCoordinates:
-          $ref: "#/components/schemas/GeoCoordinateDto"
-        country:
-          $ref: "#/components/schemas/TypeKeyNameVerboseDtoCountryCode"
-          description: The 2-digit country code of the physical postal address according
-            to ISO 3166-1.
-        administrativeAreaLevel1:
-          $ref: "#/components/schemas/RegionDto"
-          description: "The 2-digit country subdivision code according to ISO 3166-2,\
-            \ such as a region within a country."
-        administrativeAreaLevel2:
-          type: string
-          description: "The name of the locally regulated secondary country subdivision\
-            \ of the physical postal address, such as county within a country."
-        administrativeAreaLevel3:
-          type: string
-          description: "The name of the locally regulated tertiary country subdivision\
-            \ of the physical address, such as townships within a country."
-        postalCode:
-          type: string
-          description: "The alphanumeric identifier (sometimes including spaces or\
-            \ punctuation) of the physical postal address for the purpose of sorting\
-            \ mail, synonyms:postcode, post code, PIN or ZIP code."
-        city:
-          type: string
-          description: "The name of the city of the physical postal address, synonyms:\
-            \ town, village, municipality."
-        district:
-          type: string
-          description: The name of the district of the physical postal address which
-            divides the city in several smaller areas.
-        street:
-          $ref: "#/components/schemas/StreetDto"
-        companyPostalCode:
-          type: string
-          description: "The company postal code of the physical postal address, which\
-            \ is sometimes required for large companies."
-        industrialZone:
-          type: string
-          description: "The industrial zone of the physical postal address, designating\
-            \ an area for industrial development, synonym: industrial area."
-        building:
-          type: string
-          description: The alphanumeric identifier of the building addressed by the
-            physical postal address.
-        floor:
-          type: string
-          description: "The number of a floor in the building addressed by the physical\
-            \ postal address, synonym: level."
-        door:
-          type: string
-          description: "The number of a door in the building on the respective floor\
-            \ addressed by the physical postal address, synonyms: room, suite."
-        taxJurisdictionCode:
-          type: string
-          description: "Tax jurisdiction codes are used to identify the specific jurisdiction(s)\
-            \ that a company belong to, particularly in bureaucratic processes such\
-            \ as tax returns and IRS forms."
-      required:
-        - city
-        - country
-    RegionDto:
-      type: object
-      description: Region within a country
+      description: Country subdivision
       properties:
         countryCode:
           type: string
@@ -4788,201 +4476,214 @@ components:
             - ZM
             - ZR
             - ZW
-        regionCode:
+        code:
           type: string
-          description: Abbreviation or shorthand of the area
-        regionName:
+          description: The country subdivision code according to ISO 3166-2
+        name:
           type: string
-          description: Describes the full name of the region within a country according
-            to ISO 3166-214
+          description: The name of the country subdivision according to ISO 3166-2
       required:
+        - code
         - countryCode
-        - regionCode
-        - regionName
-    SitePartnerCreateVerboseDto:
-      type: object
-      description: "Created/updated business partner of type site. In general, a site\
-        \ is a delimited geographical area in which an organization (such as an enterprise\
-        \ or company, university, association, etc.) conducts business. In Catena-X,\
-        \ a site is a type of business partner representing a physical location or\
-        \ area owned by a legal entity, where a production plant, a warehouse, or\
-        \ an office building is located. A site is owned by a legal entity. Thus,\
-        \ exactly one legal entity is assigned to a site. A site has exactly one main\
-        \ address, but it is possible to specify additional addresses (such as different\
-        \ gates), that belong to a site. Thus, at least one address is assigned to\
-        \ a site. A site can only be uploaded and modified by the owner (the legal\
-        \ entity), because only the owner knows which addresses belong to which site.\
-        \ A site is uniquely identified by the BPNS."
-      properties:
-        bpns:
-          type: string
-          description: "A BPNS represents and uniquely identifies a site, which is\
-            \ where for example a production plant, a warehouse, or an office building\
-            \ is located."
-        name:
-          type: string
-          description: The name of the site. This is not according to official registers
-            but according to the name the owner chooses.
-        states:
-          type: array
-          items:
-            $ref: "#/components/schemas/SiteStateVerboseDto"
-        isParticipantData:
-          type: boolean
-          description: Indicates whether the site is owned and thus provided by a
-            Data Space Participant.
-        bpnLegalEntity:
-          type: string
-          description: The BPNL of the legal entity owning the site.
-        createdAt:
-          type: string
-          format: date-time
-          description: The date when the data record has been created.
-        updatedAt:
-          type: string
-          format: date-time
-          description: The date when the data record has been last updated.
-        confidenceCriteria:
-          $ref: "#/components/schemas/ConfidenceCriteriaDto"
-        mainAddress:
-          $ref: "#/components/schemas/LogisticAddressVerboseDto"
-          description: "The address, where typically the main entrance or the reception\
-            \ is located, or where the mail is delivered to."
-        index:
-          type: string
-          description: User defined index to conveniently match this entry to the
-            corresponding entry in the response.
-      required:
-        - bpnLegalEntity
-        - bpns
-        - confidenceCriteria
-        - createdAt
-        - isParticipantData
-        - mainAddress
         - name
-        - states
-        - updatedAt
-    SitePartnerUpdateResponseWrapper:
+    CxMembershipDto:
       type: object
-      description: Holds information about successfully and failed entities after
-        the creating/updating of several objects
       properties:
-        entities:
-          type: array
-          items:
-            $ref: "#/components/schemas/SitePartnerCreateVerboseDto"
-        errors:
-          type: array
-          items:
-            $ref: "#/components/schemas/ErrorInfoSiteUpdateError"
-        entityCount:
-          type: integer
-          format: int32
-        errorCount:
-          type: integer
-          format: int32
-      required:
-        - entities
-        - entityCount
-        - errorCount
-        - errors
-    SiteStateVerboseDto:
-      type: object
-      description: "A site state indicates if the site is active or inactive. This\
-        \ does not describe the relation between a sharing member and a business partner\
-        \ and whether they have active business, but it describes whether the site\
-        \ is still operating."
-      properties:
-        validFrom:
+        bpnL:
           type: string
-          format: date-time
-          description: The date from which the state is valid.
-        validTo:
-          type: string
-          format: date-time
-          description: The date until the state is valid.
-        type:
-          $ref: "#/components/schemas/TypeKeyNameVerboseDtoBusinessStateType"
-          description: "One of the state types: active, inactive."
-      required:
-        - type
-    SiteVerboseDto:
-      type: object
-      description: "In general, a site is a delimited geographical area in which an\
-        \ organization (such as an enterprise or company, university, association,\
-        \ etc.) conducts business. In Catena-X, a site is a type of business partner\
-        \ representing a physical location or area owned by a legal entity, where\
-        \ a production plant, a warehouse, or an office building is located. A site\
-        \ is owned by a legal entity. Thus, exactly one legal entity is assigned to\
-        \ a site. A site has exactly one main address, but it is possible to specify\
-        \ additional addresses (such as different gates), that belong to a site. Thus,\
-        \ at least one address is assigned to a site. A site can only be uploaded\
-        \ and modified by the owner (the legal entity), because only the owner knows\
-        \ which addresses belong to which site. A site is uniquely identified by the\
-        \ BPNS."
-      properties:
-        bpns:
-          type: string
-          description: "A BPNS represents and uniquely identifies a site, which is\
-            \ where for example a production plant, a warehouse, or an office building\
-            \ is located."
-        name:
-          type: string
-          description: The name of the site. This is not according to official registers
-            but according to the name the owner chooses.
-        states:
-          type: array
-          items:
-            $ref: "#/components/schemas/SiteStateVerboseDto"
-        isParticipantData:
+        isCatenaXMember:
           type: boolean
-          description: Indicates whether the site is owned and thus provided by a
-            Data Space Participant.
-        bpnLegalEntity:
-          type: string
-          description: The BPNL of the legal entity owning the site.
-        createdAt:
-          type: string
-          format: date-time
-          description: The date when the data record has been created.
-        updatedAt:
-          type: string
-          format: date-time
-          description: The date when the data record has been last updated.
-        confidenceCriteria:
-          $ref: "#/components/schemas/ConfidenceCriteriaDto"
       required:
-        - bpnLegalEntity
-        - bpns
-        - confidenceCriteria
-        - createdAt
-        - isParticipantData
-        - name
-        - states
-        - updatedAt
-    TypeKeyNameVerboseDtoBusinessStateType:
+        - bpnL
+        - isCatenaXMember
+    CxMembershipUpdateRequest:
       type: object
-      description: Named type uniquely identified by its technical key
       properties:
-        technicalKey:
+        memberships:
+          type: array
+          items:
+            $ref: "#/components/schemas/CxMembershipDto"
+      required:
+        - memberships
+    DataSpaceParticipantDto:
+      type: object
+      properties:
+        bpnL:
           type: string
-          description: Unique key of this type for reference
+        isDataSpaceParticipant:
+          type: boolean
+      required:
+        - bpnL
+        - isDataSpaceParticipant
+    DataSpaceParticipantUpdateRequest:
+      type: object
+      properties:
+        participants:
+          type: array
+          items:
+            $ref: "#/components/schemas/DataSpaceParticipantDto"
+      required:
+        - participants
+    ErrorInfoAddressCreateError:
+      type: object
+      description: Holds information about failures when creating or updating an entity
+      properties:
+        errorCode:
+          type: string
+          description: Error code identifying the error
           enum:
-            - ACTIVE
-            - INACTIVE
-        name:
+            - BpnNotValid
+            - SiteNotFound
+            - LegalEntityNotFound
+            - RegionNotFound
+            - IdentifierNotFound
+            - AddressDuplicateIdentifier
+        message:
           type: string
-          description: Name or denotation of this type
+          description: Error message that explains the error
+        entityKey:
+          type: string
+          description: "Key of the entity that failed from the request object: index\
+            \ or BPN"
       required:
-        - name
-        - technicalKey
-    TypeKeyNameVerboseDtoCountryCode:
+        - errorCode
+        - message
+      title: ErrorInfo
+    ErrorInfoAddressUpdateError:
       type: object
-      description: Named type uniquely identified by its technical key
+      description: Holds information about failures when creating or updating an entity
       properties:
-        technicalKey:
+        errorCode:
           type: string
-          description: Unique key of this type for reference
+          description: Error code identifying the error
+          enum:
+            - AddressNotFound
+            - RegionNotFound
+            - IdentifierNotFound
+            - AddressDuplicateIdentifier
+        message:
+          type: string
+          description: Error message that explains the error
+        entityKey:
+          type: string
+          description: "Key of the entity that failed from the request object: index\
+            \ or BPN"
+      required:
+        - errorCode
+        - message
+      title: ErrorInfo
+    ErrorInfoLegalEntityCreateError:
+      type: object
+      description: Holds information about failures when creating or updating an entity
+      properties:
+        errorCode:
+          type: string
+          description: Error code identifying the error
+          enum:
+            - LegalEntityDuplicateIdentifier
+            - LegalFormNotFound
+            - LegalEntityIdentifierNotFound
+            - LegalAddressRegionNotFound
+            - LegalAddressIdentifierNotFound
+            - LegalAddressDuplicateIdentifier
+            - LegalEntityErrorMapping
+        message:
+          type: string
+          description: Error message that explains the error
+        entityKey:
+          type: string
+          description: "Key of the entity that failed from the request object: index\
+            \ or BPN"
+      required:
+        - errorCode
+        - message
+      title: ErrorInfo
+    ErrorInfoLegalEntityUpdateError:
+      type: object
+      description: Holds information about failures when creating or updating an entity
+      properties:
+        errorCode:
+          type: string
+          description: Error code identifying the error
+          enum:
+            - LegalEntityNotFound
+            - LegalEntityDuplicateIdentifier
+            - LegalFormNotFound
+            - LegalEntityIdentifierNotFound
+            - LegalAddressRegionNotFound
+            - LegalAddressIdentifierNotFound
+            - LegalAddressDuplicateIdentifier
+            - LegalEntityErrorMapping
+        message:
+          type: string
+          description: Error message that explains the error
+        entityKey:
+          type: string
+          description: "Key of the entity that failed from the request object: index\
+            \ or BPN"
+      required:
+        - errorCode
+        - message
+      title: ErrorInfo
+    ErrorInfoSiteCreateError:
+      type: object
+      description: Holds information about failures when creating or updating an entity
+      properties:
+        errorCode:
+          type: string
+          description: Error code identifying the error
+          enum:
+            - LegalEntityNotFound
+            - MainAddressIdentifierNotFound
+            - MainAddressRegionNotFound
+            - MainAddressDuplicateIdentifier
+        message:
+          type: string
+          description: Error message that explains the error
+        entityKey:
+          type: string
+          description: "Key of the entity that failed from the request object: index\
+            \ or BPN"
+      required:
+        - errorCode
+        - message
+      title: ErrorInfo
+    ErrorInfoSiteUpdateError:
+      type: object
+      description: Holds information about failures when creating or updating an entity
+      properties:
+        errorCode:
+          type: string
+          description: Error code identifying the error
+          enum:
+            - SiteNotFound
+            - MainAddressIdentifierNotFound
+            - MainAddressRegionNotFound
+            - MainAddressDuplicateIdentifier
+        message:
+          type: string
+          description: Error message that explains the error
+        entityKey:
+          type: string
+          description: "Key of the entity that failed from the request object: index\
+            \ or BPN"
+      required:
+        - errorCode
+        - message
+      title: ErrorInfo
+    FieldQualityRuleDto:
+      type: object
+      description: 'Rule for the quality level of an entity field '
+      properties:
+        fieldPath:
+          type: string
+          description: Path to the field
+        schemaName:
+          type: string
+          description: Schema name of the entity the field belongs to
+        country:
+          type: string
+          description: Country for wich the rule is valid
           enum:
             - UNDEFINED
             - AC
@@ -5256,25 +4957,409 @@ components:
             - ZM
             - ZR
             - ZW
-        name:
+        qualityLevel:
           type: string
-          description: Name or denotation of this type
+          description: Quality level of the field
+          enum:
+            - MANDATORY
+            - OPTIONAL
+            - FORBIDDEN
       required:
-        - name
-        - technicalKey
-    TypeKeyNameVerboseDtoString:
+        - country
+        - fieldPath
+        - qualityLevel
+    GeoCoordinateDto:
       type: object
-      description: Named type uniquely identified by its technical key
+      description: "The exact location of the physical postal address in latitude,\
+        \ longitude, and altitude."
+      properties:
+        longitude:
+          type: number
+          format: double
+          description: Longitude coordinate
+        latitude:
+          type: number
+          format: double
+          description: Latitude coordinate
+        altitude:
+          type: number
+          format: double
+          description: "Altitude, if applicable"
+      required:
+        - latitude
+        - longitude
+    IdentifierTypeDetailDto:
+      type: object
+      description: Information for which countries an identifier type is valid and
+        mandatory.
+      properties:
+        country:
+          type: string
+          description: 2-digit country code for which this identifier is valid; null
+            for universal identifiers.
+          enum:
+            - UNDEFINED
+            - AC
+            - AD
+            - AE
+            - AF
+            - AG
+            - AI
+            - AL
+            - AM
+            - AN
+            - AO
+            - AQ
+            - AR
+            - AS
+            - AT
+            - AU
+            - AW
+            - AX
+            - AZ
+            - BA
+            - BB
+            - BD
+            - BE
+            - BF
+            - BG
+            - BH
+            - BI
+            - BJ
+            - BL
+            - BM
+            - BN
+            - BO
+            - BQ
+            - BR
+            - BS
+            - BT
+            - BU
+            - BV
+            - BW
+            - BY
+            - BZ
+            - CA
+            - CC
+            - CD
+            - CF
+            - CG
+            - CH
+            - CI
+            - CK
+            - CL
+            - CM
+            - CN
+            - CO
+            - CP
+            - CR
+            - CS
+            - CU
+            - CV
+            - CW
+            - CX
+            - CY
+            - CZ
+            - DE
+            - DG
+            - DJ
+            - DK
+            - DM
+            - DO
+            - DZ
+            - EA
+            - EC
+            - EE
+            - EG
+            - EH
+            - ER
+            - ES
+            - ET
+            - EU
+            - EZ
+            - FI
+            - FJ
+            - FK
+            - FM
+            - FO
+            - FR
+            - FX
+            - GA
+            - GB
+            - GD
+            - GE
+            - GF
+            - GG
+            - GH
+            - GI
+            - GL
+            - GM
+            - GN
+            - GP
+            - GQ
+            - GR
+            - GS
+            - GT
+            - GU
+            - GW
+            - GY
+            - HK
+            - HM
+            - HN
+            - HR
+            - HT
+            - HU
+            - IC
+            - ID
+            - IE
+            - IL
+            - IM
+            - IN
+            - IO
+            - IQ
+            - IR
+            - IS
+            - IT
+            - JE
+            - JM
+            - JO
+            - JP
+            - KE
+            - KG
+            - KH
+            - KI
+            - KM
+            - KN
+            - KP
+            - KR
+            - KW
+            - KY
+            - KZ
+            - LA
+            - LB
+            - LC
+            - LI
+            - LK
+            - LR
+            - LS
+            - LT
+            - LU
+            - LV
+            - LY
+            - MA
+            - MC
+            - MD
+            - ME
+            - MF
+            - MG
+            - MH
+            - MK
+            - ML
+            - MM
+            - MN
+            - MO
+            - MP
+            - MQ
+            - MR
+            - MS
+            - MT
+            - MU
+            - MV
+            - MW
+            - MX
+            - MY
+            - MZ
+            - NA
+            - NC
+            - NE
+            - NF
+            - NG
+            - NI
+            - NL
+            - "NO"
+            - NP
+            - NR
+            - NT
+            - NU
+            - NZ
+            - OM
+            - PA
+            - PE
+            - PF
+            - PG
+            - PH
+            - PK
+            - PL
+            - PM
+            - PN
+            - PR
+            - PS
+            - PT
+            - PW
+            - PY
+            - QA
+            - RE
+            - RO
+            - RS
+            - RU
+            - RW
+            - SA
+            - SB
+            - SC
+            - SD
+            - SE
+            - SF
+            - SG
+            - SH
+            - SI
+            - SJ
+            - SK
+            - SL
+            - SM
+            - SN
+            - SO
+            - SR
+            - SS
+            - ST
+            - SU
+            - SV
+            - SX
+            - SY
+            - SZ
+            - TA
+            - TC
+            - TD
+            - TF
+            - TG
+            - TH
+            - TJ
+            - TK
+            - TL
+            - TM
+            - TN
+            - TO
+            - TP
+            - TR
+            - TT
+            - TV
+            - TW
+            - TZ
+            - UA
+            - UG
+            - UK
+            - UM
+            - US
+            - UY
+            - UZ
+            - VA
+            - VC
+            - VE
+            - VG
+            - VI
+            - VN
+            - VU
+            - WF
+            - WS
+            - XI
+            - XU
+            - XK
+            - YE
+            - YT
+            - YU
+            - ZA
+            - ZM
+            - ZR
+            - ZW
+        mandatory:
+          type: boolean
+          description: True if identifier is mandatory in this country.
+      required:
+        - mandatory
+    IdentifierTypeDto:
+      type: object
+      description: "An identifier type defines the name or category of an identifier,\
+        \ such as the German Handelsregisternummer, VAT number, Global Location Number\
+        \ (GLN), etc. The identifier type is valid for a business partner type."
       properties:
         technicalKey:
           type: string
-          description: Unique key of this type for reference
+          description: The technical identifier (unique in combination with businessPartnerType).
+        businessPartnerType:
+          type: string
+          description: One of the types of business partners for which the identifier
+            type is valid.
+          enum:
+            - LEGAL_ENTITY
+            - ADDRESS
         name:
           type: string
-          description: Name or denotation of this type
+          description: The name of the identifier type.
+        abbreviation:
+          type: string
+          description: The local short form of the identifier type used in particular
+            country.
+        transliteratedName:
+          type: string
+          description: The transliterated (Latinized) form of the name.
+        transliteratedAbbreviation:
+          type: string
+          description: The transliterated (Latinized) form of the abbreviation.
+        format:
+          type: string
+          description: "The expected format of the identifier values for this type,\
+            \ given as a regular expression"
+        categories:
+          type: array
+          description: |-
+            The broader categories to which the identifier type belongs to:
+            * `VAT` - value-added tax registration (so-called value-added tax identification numbers (VAT IDs or VATINs), e.g. EU VAT ID, UID MWST/TVA/IPA)
+            * `TIN` - taxpayer identification (so-called taxpayer identification numbers (TINs), e.g. SIREN, NIF)
+            * `NBR` - national business registration (e.g. HRB-Nummer, Firmenbuchnummer) for different purposes (e.g. commercial register, trade register), which are not related to tax
+            * `IBR` - international business registration (e.g. LEI, EORI) for different purposes (e.g. regulatory reporting, risk management at financial regulatory bodies)
+            * `OTH` - other identifier types (e.g. D&B D-U-N-S, GS1 GLN), which are not legally secure
+          items:
+            type: string
+            enum:
+              - VAT
+              - TIN
+              - NBR
+              - IBR
+              - OTH
+          uniqueItems: true
+        details:
+          type: array
+          description: Validity details.
+          items:
+            $ref: "#/components/schemas/IdentifierTypeDetailDto"
       required:
+        - businessPartnerType
+        - categories
+        - details
         - name
         - technicalKey
+    IdentifiersSearchRequest:
+      type: object
+      description: Contains identifiers to search legal entities by
+      properties:
+        businessPartnerType:
+          type: string
+          description: Legal entities (L) or addresses (A)
+          enum:
+            - LEGAL_ENTITY
+            - ADDRESS
+        idType:
+          type: string
+          description: Technical key of the type to which the identifiers belongs
+            to
+        idValues:
+          type: array
+          description: Values of the identifiers
+          items:
+            type: string
+      required:
+        - businessPartnerType
+        - idType
+        - idValues
     LegalEntityIdentifierDto:
       type: object
       description: "A legal entity identifier (uniquely) identifies the legal entity,\
@@ -5294,27 +5379,41 @@ components:
       required:
         - type
         - value
-    LegalEntityPartnerUpdateRequest:
+    LegalEntityIdentifierVerboseDto:
       type: object
-      description: "Request for updating a business partner record of type legal entity.\
-        \ In general, a legal entity is a juridical person that has legal rights and\
-        \ duties related to contracts, agreements, and obligations. The term especially\
-        \ applies to any kind of organization (such as an enterprise or company, university,\
-        \ association, etc.) established under the law applicable to a country.In\
-        \ Catena-X, a legal entity is a type of business partner representing a legally\
-        \ registered organization with its official registration information, such\
-        \ as legal name (including legal form, if registered), legal address and tax\
-        \ number.A legal entity has exactly one legal address, but it is possible\
+      description: "A legal entity identifier (uniquely) identifies the legal entity,\
+        \ such as the German Handelsregisternummer, a VAT number, etc."
+      properties:
+        value:
+          type: string
+          description: The value of the identifier like "DE123465789".
+        type:
+          $ref: "#/components/schemas/TypeKeyNameVerboseDtoString"
+          description: The type of the identifier.
+        issuingBody:
+          type: string
+          description: "The name of the official register, where the identifier is\
+            \ registered. For example, a Handelsregisternummer in Germany is only\
+            \ valid with its corresponding Handelsregister."
+      required:
+        - type
+        - value
+    LegalEntityPartnerCreateRequest:
+      type: object
+      description: "Request for creating new business partner record of type legal\
+        \ entity. In general, a legal entity is a juridical person that has legal\
+        \ rights and duties related to contracts, agreements, and obligations. The\
+        \ term especially applies to any kind of organization (such as an enterprise\
+        \ or company, university, association, etc.) established under the law applicable\
+        \ to a country.In Catena-X, a legal entity is a type of business partner representing\
+        \ a legally registered organization with its official registration information,\
+        \ such as legal name (including legal form, if registered), legal address\
+        \ and tax number.A legal entity has exactly one legal address, but it is possible\
         \ to specify additional addresses that a legal entity owns. Thus, at least\
         \ one address is assigned to a legal entity. A legal entity can own sites.\
         \ Thus, many or no sites are assigned to a legal entity. A legal entity is\
         \ uniquely identified by the BPNL."
       properties:
-        bpnl:
-          type: string
-          description: "A BPNL represents and uniquely identifies a legal entity,\
-            \ which is defined by its legal name (including legal form, if registered),\
-            \ legal address and tax number."
         legalName:
           type: string
           description: The name of the legal entity according to official registers.
@@ -5342,86 +5441,43 @@ components:
           $ref: "#/components/schemas/LogisticAddressDto"
           description: "The official, legal correspondence address to be provided\
             \ to government and tax authorities and used in all legal or court documents."
+        index:
+          type: string
+          description: User defined index to conveniently match this entry to the
+            corresponding entry in the response.
         requestKey:
           type: string
       required:
-        - bpnl
         - confidenceCriteria
         - identifiers
         - isParticipantData
         - legalAddress
         - legalName
-        - requestKey
         - states
-    LegalEntityStateDto:
+    LegalEntityPartnerCreateResponseWrapper:
       type: object
-      description: "A legal entity state indicates if the legal entity is active or\
-        \ inactive. This does not describe the relation between a sharing member and\
-        \ a business partner and whether they have active business, but it describes\
-        \ whether the legal entity is still operating."
+      description: Holds information about successfully and failed entities after
+        the creating/updating of several objects
       properties:
-        validFrom:
-          type: string
-          format: date-time
-          description: The date from which the state is valid.
-        validTo:
-          type: string
-          format: date-time
-          description: The date until the state is valid.
-        type:
-          type: string
-          description: "One of the state types: active, inactive."
-          enum:
-            - ACTIVE
-            - INACTIVE
+        entities:
+          type: array
+          items:
+            $ref: "#/components/schemas/LegalEntityPartnerCreateVerboseDto"
+        errors:
+          type: array
+          items:
+            $ref: "#/components/schemas/ErrorInfoLegalEntityCreateError"
+        entityCount:
+          type: integer
+          format: int32
+        errorCount:
+          type: integer
+          format: int32
       required:
-        - type
-    ErrorInfoLegalEntityUpdateError:
-      type: object
-      description: Holds information about failures when creating or updating an entity
-      properties:
-        errorCode:
-          type: string
-          description: Error code identifying the error
-          enum:
-            - LegalEntityNotFound
-            - LegalEntityDuplicateIdentifier
-            - LegalFormNotFound
-            - LegalEntityIdentifierNotFound
-            - LegalAddressRegionNotFound
-            - LegalAddressIdentifierNotFound
-            - LegalAddressDuplicateIdentifier
-            - LegalEntityErrorMapping
-        message:
-          type: string
-          description: Error message that explains the error
-        entityKey:
-          type: string
-          description: "Key of the entity that failed from the request object: index\
-            \ or BPN"
-      required:
-        - errorCode
-        - message
-      title: ErrorInfo
-    LegalEntityIdentifierVerboseDto:
-      type: object
-      description: "A legal entity identifier (uniquely) identifies the legal entity,\
-        \ such as the German Handelsregisternummer, a VAT number, etc."
-      properties:
-        value:
-          type: string
-          description: The value of the identifier like "DE123465789".
-        type:
-          $ref: "#/components/schemas/TypeKeyNameVerboseDtoString"
-          description: The type of the identifier.
-        issuingBody:
-          type: string
-          description: "The name of the official register, where the identifier is\
-            \ registered. For example, a Handelsregisternummer in Germany is only\
-            \ valid with its corresponding Handelsregister."
-      required:
-        - type
-        - value
+        - entities
+        - entityCount
+        - errorCount
+        - errors
     LegalEntityPartnerCreateVerboseDto:
       type: object
       description: "Created/updated business partner of type legal entity. In general,\
@@ -5503,6 +5559,65 @@ components:
         - relations
         - states
         - updatedAt
+    LegalEntityPartnerUpdateRequest:
+      type: object
+      description: "Request for updating a business partner record of type legal entity.\
+        \ In general, a legal entity is a juridical person that has legal rights and\
+        \ duties related to contracts, agreements, and obligations. The term especially\
+        \ applies to any kind of organization (such as an enterprise or company, university,\
+        \ association, etc.) established under the law applicable to a country.In\
+        \ Catena-X, a legal entity is a type of business partner representing a legally\
+        \ registered organization with its official registration information, such\
+        \ as legal name (including legal form, if registered), legal address and tax\
+        \ number.A legal entity has exactly one legal address, but it is possible\
+        \ to specify additional addresses that a legal entity owns. Thus, at least\
+        \ one address is assigned to a legal entity. A legal entity can own sites.\
+        \ Thus, many or no sites are assigned to a legal entity. A legal entity is\
+        \ uniquely identified by the BPNL."
+      properties:
+        bpnl:
+          type: string
+          description: "A BPNL represents and uniquely identifies a legal entity,\
+            \ which is defined by its legal name (including legal form, if registered),\
+            \ legal address and tax number."
+        legalName:
+          type: string
+          description: The name of the legal entity according to official registers.
+        legalShortName:
+          type: string
+          description: The abbreviated name of the legal entity.
+        legalForm:
+          type: string
+          description: The legal form of the legal entity.
+        identifiers:
+          type: array
+          items:
+            $ref: "#/components/schemas/LegalEntityIdentifierDto"
+        states:
+          type: array
+          items:
+            $ref: "#/components/schemas/LegalEntityStateDto"
+        confidenceCriteria:
+          $ref: "#/components/schemas/ConfidenceCriteriaDto"
+        isParticipantData:
+          type: boolean
+          description: Indicates whether the legal entity is owned and thus provided
+            by a Data Space Participant.
+        legalAddress:
+          $ref: "#/components/schemas/LogisticAddressDto"
+          description: "The official, legal correspondence address to be provided\
+            \ to government and tax authorities and used in all legal or court documents."
+        requestKey:
+          type: string
+      required:
+        - bpnl
+        - confidenceCriteria
+        - identifiers
+        - isParticipantData
+        - legalAddress
+        - legalName
+        - requestKey
+        - states
     LegalEntityPartnerUpdateResponseWrapper:
       type: object
       description: Holds information about successfully and failed entities after
@@ -5527,6 +5642,40 @@ components:
         - entityCount
         - errorCount
         - errors
+    LegalEntitySearchRequest:
+      type: object
+      properties:
+        bpnLs:
+          type: array
+          items:
+            type: string
+        legalName:
+          type: string
+      required:
+        - bpnLs
+    LegalEntityStateDto:
+      type: object
+      description: "A legal entity state indicates if the legal entity is active or\
+        \ inactive. This does not describe the relation between a sharing member and\
+        \ a business partner and whether they have active business, but it describes\
+        \ whether the legal entity is still operating."
+      properties:
+        validFrom:
+          type: string
+          format: date-time
+          description: The date from which the state is valid.
+        validTo:
+          type: string
+          format: date-time
+          description: The date until the state is valid.
+        type:
+          type: string
+          description: "One of the state types: active, inactive."
+          enum:
+            - ACTIVE
+            - INACTIVE
+      required:
+        - type
     LegalEntityStateVerboseDto:
       type: object
       description: "A legal entity state indicates if the legal entity is active or\
@@ -5547,6 +5696,82 @@ components:
           description: "One of the state types: active, inactive."
       required:
         - type
+    LegalEntityWithLegalAddressVerboseDto:
+      type: object
+      description: "In general, a legal entity is a juridical person that has legal\
+        \ rights and duties related to contracts, agreements, and obligations. The\
+        \ term especially applies to any kind of organization (such as an enterprise\
+        \ or company, university, association, etc.) established under the law applicable\
+        \ to a country.In Catena-X, a legal entity is a type of business partner representing\
+        \ a legally registered organization with its official registration information,\
+        \ such as legal name (including legal form, if registered), legal address\
+        \ and tax number.A legal entity has exactly one legal address, but it is possible\
+        \ to specify additional addresses that a legal entity owns. Thus, at least\
+        \ one address is assigned to a legal entity. A legal entity can own sites.\
+        \ Thus, many or no sites are assigned to a legal entity. A legal entity is\
+        \ uniquely identified by the BPNL."
+      properties:
+        bpnl:
+          type: string
+          description: "A BPNL represents and uniquely identifies a legal entity,\
+            \ which is defined by its legal name (including legal form, if registered),\
+            \ legal address and tax number."
+        legalName:
+          type: string
+          description: The name of the legal entity according to official registers.
+        legalShortName:
+          type: string
+          description: The abbreviated name of the legal entity.
+        legalForm:
+          $ref: "#/components/schemas/LegalFormDto"
+          description: The legal form of the legal entity.
+        identifiers:
+          type: array
+          items:
+            $ref: "#/components/schemas/LegalEntityIdentifierVerboseDto"
+        states:
+          type: array
+          items:
+            $ref: "#/components/schemas/LegalEntityStateVerboseDto"
+        relations:
+          type: array
+          items:
+            $ref: "#/components/schemas/RelationVerboseDto"
+        currentness:
+          type: string
+          format: date-time
+          description: The date the business partner data was last indicated to be
+            still current.
+        confidenceCriteria:
+          $ref: "#/components/schemas/ConfidenceCriteriaDto"
+        isParticipantData:
+          type: boolean
+          description: Indicates whether the legal entity is owned and thus provided
+            by a Data Space Participant.
+        createdAt:
+          type: string
+          format: date-time
+          description: The date when the data record has been created.
+        updatedAt:
+          type: string
+          format: date-time
+          description: The date when the data record has been last updated.
+        legalAddress:
+          $ref: "#/components/schemas/LogisticAddressVerboseDto"
+          description: "The official, legal correspondence address to be provided\
+            \ to government and tax authorities and used in all legal or court documents."
+      required:
+        - bpnl
+        - confidenceCriteria
+        - createdAt
+        - currentness
+        - identifiers
+        - isParticipantData
+        - legalAddress
+        - legalName
+        - relations
+        - states
+        - updatedAt
     LegalFormDto:
       type: object
       description: "A legal form is a mandatory corporate legal framework by which\
@@ -6038,645 +6263,6 @@ components:
         - isActive
         - name
         - technicalKey
-    RelationVerboseDto:
-      type: object
-      description: Directed relation between two business partners
-      properties:
-        type:
-          type: string
-          description: The type of relation between the Legal Entities
-          enum:
-            - IsAlternativeHeadquarterFor
-        businessPartnerSourceBpnl:
-          type: string
-          description: BPN of partner from which the relation emerges (the source)
-        businessPartnerTargetBpnl:
-          type: string
-          description: BPN of partner to which this relation goes (the target)
-        isActive:
-          type: boolean
-          description: Status of the relation
-      required:
-        - businessPartnerSourceBpnl
-        - businessPartnerTargetBpnl
-        - isActive
-        - type
-    DataSpaceParticipantDto:
-      type: object
-      properties:
-        bpnL:
-          type: string
-        isDataSpaceParticipant:
-          type: boolean
-      required:
-        - bpnL
-        - isDataSpaceParticipant
-    DataSpaceParticipantUpdateRequest:
-      type: object
-      properties:
-        participants:
-          type: array
-          items:
-            $ref: "#/components/schemas/DataSpaceParticipantDto"
-      required:
-        - participants
-    AddressPartnerUpdateRequest:
-      type: object
-      description: "Request for updating a business partner record of type address.\
-        \ In general, an address is a collection of information to describe a physical\
-        \ location, using a street name with a house number and/or a post office box\
-        \ as reference. In addition, an address consists of several postal attributes,\
-        \ such as country, region (state), county, township, city, district, or postal\
-        \ code, which help deliver mail.In Catena-X, an address is a type of business\
-        \ partner representing the legal address of a legal entity, and/or the main\
-        \ address of a site, or any additional address of a legal entity or site (such\
-        \ as different gates).An address is owned by a legal entity. Thus, exactly\
-        \ one legal entity is assigned to an address. An address can belong to a site.\
-        \ Thus, one or no site is assigned to an address. An address is uniquely identified\
-        \ by the BPNA."
-      properties:
-        bpna:
-          type: string
-          description: "A BPNA represents and uniquely identifies an address, which\
-            \ can be the legal address of a legal entity, and/or the main address\
-            \ of a site, or any additional address of a legal entity or site (such\
-            \ as different gates). It is important to note that only the BPNL must\
-            \ be used to uniquely identify a legal entity. Even in the case that the\
-            \ BPNA represents the legal address of the legal entity, it shall not\
-            \ be used to uniquely identify the legal entity."
-        name:
-          type: string
-          description: The name of the address. This is not according to official
-            registers but according to the name the sharing member chooses.
-        states:
-          type: array
-          items:
-            $ref: "#/components/schemas/AddressStateDto"
-        identifiers:
-          type: array
-          items:
-            $ref: "#/components/schemas/AddressIdentifierDto"
-        physicalPostalAddress:
-          $ref: "#/components/schemas/PhysicalPostalAddressDto"
-          description: "The physical postal address of the address, such as an office,\
-            \ warehouse, gate, etc."
-        alternativePostalAddress:
-          $ref: "#/components/schemas/AlternativePostalAddressDto"
-          description: "The alternative postal address of the address, for example\
-            \ if the goods are to be picked up somewhere else."
-        confidenceCriteria:
-          $ref: "#/components/schemas/ConfidenceCriteriaDto"
-        requestKey:
-          type: string
-      required:
-        - bpna
-        - confidenceCriteria
-        - identifiers
-        - physicalPostalAddress
-        - requestKey
-        - states
-    AddressPartnerUpdateResponseWrapper:
-      type: object
-      description: Holds information about successfully and failed entities after
-        the creating/updating of several objects
-      properties:
-        entities:
-          type: array
-          items:
-            $ref: "#/components/schemas/LogisticAddressVerboseDto"
-        errors:
-          type: array
-          items:
-            $ref: "#/components/schemas/ErrorInfoAddressUpdateError"
-        entityCount:
-          type: integer
-          format: int32
-        errorCount:
-          type: integer
-          format: int32
-      required:
-        - entities
-        - entityCount
-        - errorCount
-        - errors
-    ErrorInfoAddressUpdateError:
-      type: object
-      description: Holds information about failures when creating or updating an entity
-      properties:
-        errorCode:
-          type: string
-          description: Error code identifying the error
-          enum:
-            - AddressNotFound
-            - RegionNotFound
-            - IdentifierNotFound
-            - AddressDuplicateIdentifier
-        message:
-          type: string
-          description: Error message that explains the error
-        entityKey:
-          type: string
-          description: "Key of the entity that failed from the request object: index\
-            \ or BPN"
-      required:
-        - errorCode
-        - message
-      title: ErrorInfo
-    CxMembershipDto:
-      type: object
-      properties:
-        bpnL:
-          type: string
-        isCatenaXMember:
-          type: boolean
-      required:
-        - bpnL
-        - isCatenaXMember
-    CxMembershipUpdateRequest:
-      type: object
-      properties:
-        memberships:
-          type: array
-          items:
-            $ref: "#/components/schemas/CxMembershipDto"
-      required:
-        - memberships
-    SitePartnerCreateRequest:
-      type: object
-      description: "Request for creating new business partner record of type site.\
-        \ In general, a site is a delimited geographical area in which an organization\
-        \ (such as an enterprise or company, university, association, etc.) conducts\
-        \ business. In Catena-X, a site is a type of business partner representing\
-        \ a physical location or area owned by a legal entity, where a production\
-        \ plant, a warehouse, or an office building is located. A site is owned by\
-        \ a legal entity. Thus, exactly one legal entity is assigned to a site. A\
-        \ site has exactly one main address, but it is possible to specify additional\
-        \ addresses (such as different gates), that belong to a site. Thus, at least\
-        \ one address is assigned to a site. A site can only be uploaded and modified\
-        \ by the owner (the legal entity), because only the owner knows which addresses\
-        \ belong to which site. A site is uniquely identified by the BPNS."
-      properties:
-        name:
-          type: string
-          description: The name of the site. This is not according to official registers
-            but according to the name the owner chooses.
-        states:
-          type: array
-          items:
-            $ref: "#/components/schemas/SiteStateDto"
-        mainAddress:
-          $ref: "#/components/schemas/LogisticAddressDto"
-        confidenceCriteria:
-          $ref: "#/components/schemas/ConfidenceCriteriaDto"
-        bpnlParent:
-          type: string
-          description: The BPNL of the legal entity owning the site.
-        index:
-          type: string
-          description: User defined index to conveniently match this entry to the
-            corresponding entry in the response.
-        requestKey:
-          type: string
-      required:
-        - bpnlParent
-        - confidenceCriteria
-        - mainAddress
-        - name
-        - states
-    ErrorInfoSiteCreateError:
-      type: object
-      description: Holds information about failures when creating or updating an entity
-      properties:
-        errorCode:
-          type: string
-          description: Error code identifying the error
-          enum:
-            - LegalEntityNotFound
-            - MainAddressIdentifierNotFound
-            - MainAddressRegionNotFound
-            - MainAddressDuplicateIdentifier
-        message:
-          type: string
-          description: Error message that explains the error
-        entityKey:
-          type: string
-          description: "Key of the entity that failed from the request object: index\
-            \ or BPN"
-      required:
-        - errorCode
-        - message
-      title: ErrorInfo
-    SitePartnerCreateResponseWrapper:
-      type: object
-      description: Holds information about successfully and failed entities after
-        the creating/updating of several objects
-      properties:
-        entities:
-          type: array
-          items:
-            $ref: "#/components/schemas/SitePartnerCreateVerboseDto"
-        errors:
-          type: array
-          items:
-            $ref: "#/components/schemas/ErrorInfoSiteCreateError"
-        entityCount:
-          type: integer
-          format: int32
-        errorCount:
-          type: integer
-          format: int32
-      required:
-        - entities
-        - entityCount
-        - errorCount
-        - errors
-    SiteSearchRequest:
-      type: object
-      properties:
-        siteBpns:
-          type: array
-          items:
-            type: string
-        legalEntityBpns:
-          type: array
-          items:
-            type: string
-        name:
-          type: string
-      required:
-        - legalEntityBpns
-        - siteBpns
-    PageDtoSiteWithMainAddressVerboseDto:
-      type: object
-      description: Paginated collection of results
-      properties:
-        totalElements:
-          type: integer
-          format: int64
-          description: Total number of all results in all pages
-        totalPages:
-          type: integer
-          format: int32
-          description: Total number pages
-        page:
-          type: integer
-          format: int32
-          description: Current page number
-        contentSize:
-          type: integer
-          format: int32
-          description: Number of results in the page
-        content:
-          type: array
-          description: Collection of results in the page
-          items:
-            $ref: "#/components/schemas/SiteWithMainAddressVerboseDto"
-      required:
-        - content
-        - contentSize
-        - page
-        - totalElements
-        - totalPages
-    SiteWithMainAddressVerboseDto:
-      type: object
-      description: "In general, a site is a delimited geographical area in which an\
-        \ organization (such as an enterprise or company, university, association,\
-        \ etc.) conducts business. In Catena-X, a site is a type of business partner\
-        \ representing a physical location or area owned by a legal entity, where\
-        \ a production plant, a warehouse, or an office building is located. A site\
-        \ is owned by a legal entity. Thus, exactly one legal entity is assigned to\
-        \ a site. A site has exactly one main address, but it is possible to specify\
-        \ additional addresses (such as different gates), that belong to a site. Thus,\
-        \ at least one address is assigned to a site. A site can only be uploaded\
-        \ and modified by the owner (the legal entity), because only the owner knows\
-        \ which addresses belong to which site. A site is uniquely identified by the\
-        \ BPNS."
-      properties:
-        bpns:
-          type: string
-          description: "A BPNS represents and uniquely identifies a site, which is\
-            \ where for example a production plant, a warehouse, or an office building\
-            \ is located."
-        name:
-          type: string
-          description: The name of the site. This is not according to official registers
-            but according to the name the owner chooses.
-        states:
-          type: array
-          items:
-            $ref: "#/components/schemas/SiteStateVerboseDto"
-        isParticipantData:
-          type: boolean
-          description: Indicates whether the site is owned and thus provided by a
-            Data Space Participant.
-        bpnLegalEntity:
-          type: string
-          description: The BPNL of the legal entity owning the site.
-        createdAt:
-          type: string
-          format: date-time
-          description: The date when the data record has been created.
-        updatedAt:
-          type: string
-          format: date-time
-          description: The date when the data record has been last updated.
-        confidenceCriteria:
-          $ref: "#/components/schemas/ConfidenceCriteriaDto"
-        mainAddress:
-          $ref: "#/components/schemas/LogisticAddressVerboseDto"
-          description: "The address, where typically the main entrance or the reception\
-            \ is located, or where the mail is delivered to."
-      required:
-        - bpnLegalEntity
-        - bpns
-        - confidenceCriteria
-        - createdAt
-        - isParticipantData
-        - mainAddress
-        - name
-        - states
-        - updatedAt
-    SiteCreateRequestWithLegalAddressAsMain:
-      type: object
-      properties:
-        name:
-          type: string
-          description: The name of the site. This is not according to official registers
-            but according to the name the owner chooses.
-        states:
-          type: array
-          items:
-            $ref: "#/components/schemas/SiteStateDto"
-        confidenceCriteria:
-          $ref: "#/components/schemas/ConfidenceCriteriaDto"
-        bpnLParent:
-          type: string
-      required:
-        - bpnLParent
-        - confidenceCriteria
-        - name
-        - states
-    LegalEntitySearchRequest:
-      type: object
-      properties:
-        bpnLs:
-          type: array
-          items:
-            type: string
-        legalName:
-          type: string
-      required:
-        - bpnLs
-    LegalEntityWithLegalAddressVerboseDto:
-      type: object
-      description: "In general, a legal entity is a juridical person that has legal\
-        \ rights and duties related to contracts, agreements, and obligations. The\
-        \ term especially applies to any kind of organization (such as an enterprise\
-        \ or company, university, association, etc.) established under the law applicable\
-        \ to a country.In Catena-X, a legal entity is a type of business partner representing\
-        \ a legally registered organization with its official registration information,\
-        \ such as legal name (including legal form, if registered), legal address\
-        \ and tax number.A legal entity has exactly one legal address, but it is possible\
-        \ to specify additional addresses that a legal entity owns. Thus, at least\
-        \ one address is assigned to a legal entity. A legal entity can own sites.\
-        \ Thus, many or no sites are assigned to a legal entity. A legal entity is\
-        \ uniquely identified by the BPNL."
-      properties:
-        bpnl:
-          type: string
-          description: "A BPNL represents and uniquely identifies a legal entity,\
-            \ which is defined by its legal name (including legal form, if registered),\
-            \ legal address and tax number."
-        legalName:
-          type: string
-          description: The name of the legal entity according to official registers.
-        legalShortName:
-          type: string
-          description: The abbreviated name of the legal entity.
-        legalForm:
-          $ref: "#/components/schemas/LegalFormDto"
-          description: The legal form of the legal entity.
-        identifiers:
-          type: array
-          items:
-            $ref: "#/components/schemas/LegalEntityIdentifierVerboseDto"
-        states:
-          type: array
-          items:
-            $ref: "#/components/schemas/LegalEntityStateVerboseDto"
-        relations:
-          type: array
-          items:
-            $ref: "#/components/schemas/RelationVerboseDto"
-        currentness:
-          type: string
-          format: date-time
-          description: The date the business partner data was last indicated to be
-            still current.
-        confidenceCriteria:
-          $ref: "#/components/schemas/ConfidenceCriteriaDto"
-        isParticipantData:
-          type: boolean
-          description: Indicates whether the legal entity is owned and thus provided
-            by a Data Space Participant.
-        createdAt:
-          type: string
-          format: date-time
-          description: The date when the data record has been created.
-        updatedAt:
-          type: string
-          format: date-time
-          description: The date when the data record has been last updated.
-        legalAddress:
-          $ref: "#/components/schemas/LogisticAddressVerboseDto"
-          description: "The official, legal correspondence address to be provided\
-            \ to government and tax authorities and used in all legal or court documents."
-      required:
-        - bpnl
-        - confidenceCriteria
-        - createdAt
-        - currentness
-        - identifiers
-        - isParticipantData
-        - legalAddress
-        - legalName
-        - relations
-        - states
-        - updatedAt
-    PageDtoLegalEntityWithLegalAddressVerboseDto:
-      type: object
-      description: Paginated collection of results
-      properties:
-        totalElements:
-          type: integer
-          format: int64
-          description: Total number of all results in all pages
-        totalPages:
-          type: integer
-          format: int32
-          description: Total number pages
-        page:
-          type: integer
-          format: int32
-          description: Current page number
-        contentSize:
-          type: integer
-          format: int32
-          description: Number of results in the page
-        content:
-          type: array
-          description: Collection of results in the page
-          items:
-            $ref: "#/components/schemas/LegalEntityWithLegalAddressVerboseDto"
-      required:
-        - content
-        - contentSize
-        - page
-        - totalElements
-        - totalPages
-    ChangelogSearchRequest:
-      type: object
-      description: Request for searching and filtering the business partner changelog
-      properties:
-        timestampAfter:
-          type: string
-          format: date-time
-          description: Only changelog entries created after this time. Ignored if
-            empty.
-          example: 2023-03-20T10:23:28.194Z
-        bpns:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        businessPartnerTypes:
-          type: array
-          items:
-            type: string
-            enum:
-              - LEGAL_ENTITY
-              - SITE
-              - ADDRESS
-              - GENERIC
-          uniqueItems: true
-    ChangelogEntryVerboseDto:
-      type: object
-      description: "An entry of the changelog, which is created each time a business\
-        \ partner is modified and contains data about the change. The actual new state\
-        \ of the business partner is not included."
-      properties:
-        bpn:
-          type: string
-          description: "The business partner number for which the changelog entry\
-            \ was created. Can be either a BPNL, BPNS or BPNA."
-        businessPartnerType:
-          type: string
-          description: "One of the types of business partners for which the changelog\
-            \ entry was created: legal entity, site, address."
-          enum:
-            - LEGAL_ENTITY
-            - SITE
-            - ADDRESS
-            - GENERIC
-        timestamp:
-          type: string
-          format: date-time
-          description: The date and time when the changelog entry was created.
-        changelogType:
-          type: string
-          description: "One of the actions for which the changelog entry was created:\
-            \ create, update."
-          enum:
-            - CREATE
-            - UPDATE
-      required:
-        - bpn
-        - businessPartnerType
-        - changelogType
-        - timestamp
-    PageDtoChangelogEntryVerboseDto:
-      type: object
-      description: Paginated collection of results
-      properties:
-        totalElements:
-          type: integer
-          format: int64
-          description: Total number of all results in all pages
-        totalPages:
-          type: integer
-          format: int32
-          description: Total number pages
-        page:
-          type: integer
-          format: int32
-          description: Current page number
-        contentSize:
-          type: integer
-          format: int32
-          description: Number of results in the page
-        content:
-          type: array
-          description: Collection of results in the page
-          items:
-            $ref: "#/components/schemas/ChangelogEntryVerboseDto"
-      required:
-        - content
-        - contentSize
-        - page
-        - totalElements
-        - totalPages
-    AddressSearchRequest:
-      type: object
-      properties:
-        addressBpns:
-          type: array
-          items:
-            type: string
-        legalEntityBpns:
-          type: array
-          items:
-            type: string
-        siteBpns:
-          type: array
-          items:
-            type: string
-        name:
-          type: string
-      required:
-        - addressBpns
-        - legalEntityBpns
-        - siteBpns
-    PageDtoLogisticAddressVerboseDto:
-      type: object
-      description: Paginated collection of results
-      properties:
-        totalElements:
-          type: integer
-          format: int64
-          description: Total number of all results in all pages
-        totalPages:
-          type: integer
-          format: int32
-          description: Total number pages
-        page:
-          type: integer
-          format: int32
-          description: Current page number
-        contentSize:
-          type: integer
-          format: int32
-          description: Number of results in the page
-        content:
-          type: array
-          description: Collection of results in the page
-          items:
-            $ref: "#/components/schemas/LogisticAddressVerboseDto"
-      required:
-        - content
-        - contentSize
-        - page
-        - totalElements
-        - totalPages
     LegalFormRequest:
       type: object
       description: New legal form record to be referenced by business partners
@@ -7172,475 +6758,19 @@ components:
         - isActive
         - name
         - technicalKey
-    LegalEntityPartnerCreateRequest:
+    LogisticAddressDto:
       type: object
-      description: "Request for creating new business partner record of type legal\
-        \ entity. In general, a legal entity is a juridical person that has legal\
-        \ rights and duties related to contracts, agreements, and obligations. The\
-        \ term especially applies to any kind of organization (such as an enterprise\
-        \ or company, university, association, etc.) established under the law applicable\
-        \ to a country.In Catena-X, a legal entity is a type of business partner representing\
-        \ a legally registered organization with its official registration information,\
-        \ such as legal name (including legal form, if registered), legal address\
-        \ and tax number.A legal entity has exactly one legal address, but it is possible\
-        \ to specify additional addresses that a legal entity owns. Thus, at least\
-        \ one address is assigned to a legal entity. A legal entity can own sites.\
-        \ Thus, many or no sites are assigned to a legal entity. A legal entity is\
-        \ uniquely identified by the BPNL."
-      properties:
-        legalName:
-          type: string
-          description: The name of the legal entity according to official registers.
-        legalShortName:
-          type: string
-          description: The abbreviated name of the legal entity.
-        legalForm:
-          type: string
-          description: The legal form of the legal entity.
-        identifiers:
-          type: array
-          items:
-            $ref: "#/components/schemas/LegalEntityIdentifierDto"
-        states:
-          type: array
-          items:
-            $ref: "#/components/schemas/LegalEntityStateDto"
-        confidenceCriteria:
-          $ref: "#/components/schemas/ConfidenceCriteriaDto"
-        isParticipantData:
-          type: boolean
-          description: Indicates whether the legal entity is owned and thus provided
-            by a Data Space Participant.
-        legalAddress:
-          $ref: "#/components/schemas/LogisticAddressDto"
-          description: "The official, legal correspondence address to be provided\
-            \ to government and tax authorities and used in all legal or court documents."
-        index:
-          type: string
-          description: User defined index to conveniently match this entry to the
-            corresponding entry in the response.
-        requestKey:
-          type: string
-      required:
-        - confidenceCriteria
-        - identifiers
-        - isParticipantData
-        - legalAddress
-        - legalName
-        - states
-    ErrorInfoLegalEntityCreateError:
-      type: object
-      description: Holds information about failures when creating or updating an entity
-      properties:
-        errorCode:
-          type: string
-          description: Error code identifying the error
-          enum:
-            - LegalEntityDuplicateIdentifier
-            - LegalFormNotFound
-            - LegalEntityIdentifierNotFound
-            - LegalAddressRegionNotFound
-            - LegalAddressIdentifierNotFound
-            - LegalAddressDuplicateIdentifier
-            - LegalEntityErrorMapping
-        message:
-          type: string
-          description: Error message that explains the error
-        entityKey:
-          type: string
-          description: "Key of the entity that failed from the request object: index\
-            \ or BPN"
-      required:
-        - errorCode
-        - message
-      title: ErrorInfo
-    LegalEntityPartnerCreateResponseWrapper:
-      type: object
-      description: Holds information about successfully and failed entities after
-        the creating/updating of several objects
-      properties:
-        entities:
-          type: array
-          items:
-            $ref: "#/components/schemas/LegalEntityPartnerCreateVerboseDto"
-        errors:
-          type: array
-          items:
-            $ref: "#/components/schemas/ErrorInfoLegalEntityCreateError"
-        entityCount:
-          type: integer
-          format: int32
-        errorCount:
-          type: integer
-          format: int32
-      required:
-        - entities
-        - entityCount
-        - errorCount
-        - errors
-    IdentifierTypeDetailDto:
-      type: object
-      description: Information for which countries an identifier type is valid and
-        mandatory.
-      properties:
-        country:
-          type: string
-          description: 2-digit country code for which this identifier is valid; null
-            for universal identifiers.
-          enum:
-            - UNDEFINED
-            - AC
-            - AD
-            - AE
-            - AF
-            - AG
-            - AI
-            - AL
-            - AM
-            - AN
-            - AO
-            - AQ
-            - AR
-            - AS
-            - AT
-            - AU
-            - AW
-            - AX
-            - AZ
-            - BA
-            - BB
-            - BD
-            - BE
-            - BF
-            - BG
-            - BH
-            - BI
-            - BJ
-            - BL
-            - BM
-            - BN
-            - BO
-            - BQ
-            - BR
-            - BS
-            - BT
-            - BU
-            - BV
-            - BW
-            - BY
-            - BZ
-            - CA
-            - CC
-            - CD
-            - CF
-            - CG
-            - CH
-            - CI
-            - CK
-            - CL
-            - CM
-            - CN
-            - CO
-            - CP
-            - CR
-            - CS
-            - CU
-            - CV
-            - CW
-            - CX
-            - CY
-            - CZ
-            - DE
-            - DG
-            - DJ
-            - DK
-            - DM
-            - DO
-            - DZ
-            - EA
-            - EC
-            - EE
-            - EG
-            - EH
-            - ER
-            - ES
-            - ET
-            - EU
-            - EZ
-            - FI
-            - FJ
-            - FK
-            - FM
-            - FO
-            - FR
-            - FX
-            - GA
-            - GB
-            - GD
-            - GE
-            - GF
-            - GG
-            - GH
-            - GI
-            - GL
-            - GM
-            - GN
-            - GP
-            - GQ
-            - GR
-            - GS
-            - GT
-            - GU
-            - GW
-            - GY
-            - HK
-            - HM
-            - HN
-            - HR
-            - HT
-            - HU
-            - IC
-            - ID
-            - IE
-            - IL
-            - IM
-            - IN
-            - IO
-            - IQ
-            - IR
-            - IS
-            - IT
-            - JE
-            - JM
-            - JO
-            - JP
-            - KE
-            - KG
-            - KH
-            - KI
-            - KM
-            - KN
-            - KP
-            - KR
-            - KW
-            - KY
-            - KZ
-            - LA
-            - LB
-            - LC
-            - LI
-            - LK
-            - LR
-            - LS
-            - LT
-            - LU
-            - LV
-            - LY
-            - MA
-            - MC
-            - MD
-            - ME
-            - MF
-            - MG
-            - MH
-            - MK
-            - ML
-            - MM
-            - MN
-            - MO
-            - MP
-            - MQ
-            - MR
-            - MS
-            - MT
-            - MU
-            - MV
-            - MW
-            - MX
-            - MY
-            - MZ
-            - NA
-            - NC
-            - NE
-            - NF
-            - NG
-            - NI
-            - NL
-            - "NO"
-            - NP
-            - NR
-            - NT
-            - NU
-            - NZ
-            - OM
-            - PA
-            - PE
-            - PF
-            - PG
-            - PH
-            - PK
-            - PL
-            - PM
-            - PN
-            - PR
-            - PS
-            - PT
-            - PW
-            - PY
-            - QA
-            - RE
-            - RO
-            - RS
-            - RU
-            - RW
-            - SA
-            - SB
-            - SC
-            - SD
-            - SE
-            - SF
-            - SG
-            - SH
-            - SI
-            - SJ
-            - SK
-            - SL
-            - SM
-            - SN
-            - SO
-            - SR
-            - SS
-            - ST
-            - SU
-            - SV
-            - SX
-            - SY
-            - SZ
-            - TA
-            - TC
-            - TD
-            - TF
-            - TG
-            - TH
-            - TJ
-            - TK
-            - TL
-            - TM
-            - TN
-            - TO
-            - TP
-            - TR
-            - TT
-            - TV
-            - TW
-            - TZ
-            - UA
-            - UG
-            - UK
-            - UM
-            - US
-            - UY
-            - UZ
-            - VA
-            - VC
-            - VE
-            - VG
-            - VI
-            - VN
-            - VU
-            - WF
-            - WS
-            - XI
-            - XU
-            - XK
-            - YE
-            - YT
-            - YU
-            - ZA
-            - ZM
-            - ZR
-            - ZW
-        mandatory:
-          type: boolean
-          description: True if identifier is mandatory in this country.
-      required:
-        - mandatory
-    IdentifierTypeDto:
-      type: object
-      description: "An identifier type defines the name or category of an identifier,\
-        \ such as the German Handelsregisternummer, VAT number, Global Location Number\
-        \ (GLN), etc. The identifier type is valid for a business partner type."
-      properties:
-        technicalKey:
-          type: string
-          description: The technical identifier (unique in combination with businessPartnerType).
-        businessPartnerType:
-          type: string
-          description: One of the types of business partners for which the identifier
-            type is valid.
-          enum:
-            - LEGAL_ENTITY
-            - ADDRESS
-        name:
-          type: string
-          description: The name of the identifier type.
-        abbreviation:
-          type: string
-          description: The local short form of the identifier type used in particular
-            country.
-        transliteratedName:
-          type: string
-          description: The transliterated (Latinized) form of the name.
-        transliteratedAbbreviation:
-          type: string
-          description: The transliterated (Latinized) form of the abbreviation.
-        format:
-          type: string
-          description: "The expected format of the identifier values for this type,\
-            \ given as a regular expression"
-        categories:
-          type: array
-          description: |-
-            The broader categories to which the identifier type belongs to:
-            * `VAT` - value-added tax registration (so-called value-added tax identification numbers (VAT IDs or VATINs), e.g. EU VAT ID, UID MWST/TVA/IPA)
-            * `TIN` - taxpayer identification (so-called taxpayer identification numbers (TINs), e.g. SIREN, NIF)
-            * `NBR` - national business registration (e.g. HRB-Nummer, Firmenbuchnummer) for different purposes (e.g. commercial register, trade register), which are not related to tax
-            * `IBR` - international business registration (e.g. LEI, EORI) for different purposes (e.g. regulatory reporting, risk management at financial regulatory bodies)
-            * `OTH` - other identifier types (e.g. D&B D-U-N-S, GS1 GLN), which are not legally secure
-          items:
-            type: string
-            enum:
-              - VAT
-              - TIN
-              - NBR
-              - IBR
-              - OTH
-          uniqueItems: true
-        details:
-          type: array
-          description: Validity details.
-          items:
-            $ref: "#/components/schemas/IdentifierTypeDetailDto"
-      required:
-        - businessPartnerType
-        - categories
-        - details
-        - name
-        - technicalKey
-    AddressPartnerCreateRequest:
-      type: object
-      description: "Request for creating new business partner record of type address.\
-        \ In general, an address is a collection of information to describe a physical\
-        \ location, using a street name with a house number and/or a post office box\
-        \ as reference. In addition, an address consists of several postal attributes,\
-        \ such as country, region (state), county, township, city, district, or postal\
-        \ code, which help deliver mail.In Catena-X, an address is a type of business\
-        \ partner representing the legal address of a legal entity, and/or the main\
-        \ address of a site, or any additional address of a legal entity or site (such\
-        \ as different gates).An address is owned by a legal entity. Thus, exactly\
-        \ one legal entity is assigned to an address. An address can belong to a site.\
-        \ Thus, one or no site is assigned to an address. An address is uniquely identified\
-        \ by the BPNA."
+      description: "In general, an address is a collection of information to describe\
+        \ a physical location, using a street name with a house number and/or a post\
+        \ office box as reference. In addition, an address consists of several postal\
+        \ attributes, such as country, region (state), county, township, city, district,\
+        \ or postal code, which help deliver mail.In Catena-X, an address is a type\
+        \ of business partner representing the legal address of a legal entity, and/or\
+        \ the main address of a site, or any additional address of a legal entity\
+        \ or site (such as different gates).An address is owned by a legal entity.\
+        \ Thus, exactly one legal entity is assigned to an address. An address can\
+        \ belong to a site. Thus, one or no site is assigned to an address. An address\
+        \ is uniquely identified by the BPNA."
       properties:
         name:
           type: string
@@ -7664,60 +6794,24 @@ components:
             \ if the goods are to be picked up somewhere else."
         confidenceCriteria:
           $ref: "#/components/schemas/ConfidenceCriteriaDto"
-        bpnParent:
-          type: string
-          description: BPNL of the legal entity or BPNS of the site this address belongs
-            to.
-        index:
-          type: string
-          description: User defined index to conveniently match this entry to the
-            corresponding entry in the response.
-        requestKey:
-          type: string
       required:
-        - bpnParent
         - confidenceCriteria
         - identifiers
         - physicalPostalAddress
         - states
-    AddressPartnerCreateResponseWrapper:
+    LogisticAddressVerboseDto:
       type: object
-      description: Holds information about successfully and failed entities after
-        the creating/updating of several objects
-      properties:
-        entities:
-          type: array
-          items:
-            $ref: "#/components/schemas/AddressPartnerCreateVerboseDto"
-        errors:
-          type: array
-          items:
-            $ref: "#/components/schemas/ErrorInfoAddressCreateError"
-        entityCount:
-          type: integer
-          format: int32
-        errorCount:
-          type: integer
-          format: int32
-      required:
-        - entities
-        - entityCount
-        - errorCount
-        - errors
-    AddressPartnerCreateVerboseDto:
-      type: object
-      description: "Created business partner of type address. In general, an address\
-        \ is a collection of information to describe a physical location, using a\
-        \ street name with a house number and/or a post office box as reference. In\
-        \ addition, an address consists of several postal attributes, such as country,\
-        \ region (state), county, township, city, district, or postal code, which\
-        \ help deliver mail.In Catena-X, an address is a type of business partner\
-        \ representing the legal address of a legal entity, and/or the main address\
-        \ of a site, or any additional address of a legal entity or site (such as\
-        \ different gates).An address is owned by a legal entity. Thus, exactly one\
-        \ legal entity is assigned to an address. An address can belong to a site.\
-        \ Thus, one or no site is assigned to an address. An address is uniquely identified\
-        \ by the BPNA."
+      description: "In general, an address is a collection of information to describe\
+        \ a physical location, using a street name with a house number and/or a post\
+        \ office box as reference. In addition, an address consists of several postal\
+        \ attributes, such as country, region (state), county, township, city, district,\
+        \ or postal code, which help deliver mail.In Catena-X, an address is a type\
+        \ of business partner representing the legal address of a legal entity, and/or\
+        \ the main address of a site, or any additional address of a legal entity\
+        \ or site (such as different gates).An address is owned by a legal entity.\
+        \ Thus, exactly one legal entity is assigned to an address. An address can\
+        \ belong to a site. Thus, one or no site is assigned to an address. An address\
+        \ is uniquely identified by the BPNA."
       properties:
         bpna:
           type: string
@@ -7779,10 +6873,6 @@ components:
             - LegalAddress
             - SiteMainAddress
             - AdditionalAddress
-        index:
-          type: string
-          description: User defined index to conveniently match this entry to the
-            corresponding entry in the response.
       required:
         - bpna
         - confidenceCriteria
@@ -7792,93 +6882,7 @@ components:
         - physicalPostalAddress
         - states
         - updatedAt
-    ErrorInfoAddressCreateError:
-      type: object
-      description: Holds information about failures when creating or updating an entity
-      properties:
-        errorCode:
-          type: string
-          description: Error code identifying the error
-          enum:
-            - BpnNotValid
-            - SiteNotFound
-            - LegalEntityNotFound
-            - RegionNotFound
-            - IdentifierNotFound
-            - AddressDuplicateIdentifier
-        message:
-          type: string
-          description: Error message that explains the error
-        entityKey:
-          type: string
-          description: "Key of the entity that failed from the request object: index\
-            \ or BPN"
-      required:
-        - errorCode
-        - message
-      title: ErrorInfo
-    IdentifiersSearchRequest:
-      type: object
-      description: Contains identifiers to search legal entities by
-      properties:
-        businessPartnerType:
-          type: string
-          description: Legal entities (L) or addresses (A)
-          enum:
-            - LEGAL_ENTITY
-            - ADDRESS
-        idType:
-          type: string
-          description: Technical key of the type to which the identifiers belongs
-            to
-        idValues:
-          type: array
-          description: Values of the identifiers
-          items:
-            type: string
-      required:
-        - businessPartnerType
-        - idType
-        - idValues
-    BpnIdentifierMappingDto:
-      type: object
-      description: Mapping of Business Partner Number to identifier value
-      properties:
-        idValue:
-          type: string
-          description: Value of the identifier
-        bpn:
-          type: string
-          description: Business Partner Number
-      required:
-        - bpn
-        - idValue
-    BpnRequestIdentifierSearchRequest:
-      type: object
-      description: Mapping of Business Partner Number to requested-identifier value
-      properties:
-        requestedIdentifiers:
-          type: array
-          description: Value of the requested-identifier
-          items:
-            type: string
-          uniqueItems: true
-      required:
-        - requestedIdentifiers
-    BpnRequestIdentifierMappingDto:
-      type: object
-      description: Mapping of Business Partner Number to requested-identifier value
-      properties:
-        requestedIdentifier:
-          type: string
-          description: Value of the requested-identifier
-        bpn:
-          type: string
-          description: Business Partner Number
-      required:
-        - bpn
-        - requestedIdentifier
-    PageDtoLegalFormDto:
+    PageDtoChangelogEntryVerboseDto:
       type: object
       description: Paginated collection of results
       properties:
@@ -7902,14 +6906,14 @@ components:
           type: array
           description: Collection of results in the page
           items:
-            $ref: "#/components/schemas/LegalFormDto"
+            $ref: "#/components/schemas/ChangelogEntryVerboseDto"
       required:
         - content
         - contentSize
         - page
         - totalElements
         - totalPages
-    PageDtoSiteVerboseDto:
+    PageDtoCountrySubdivisionDto:
       type: object
       description: Paginated collection of results
       properties:
@@ -7933,14 +6937,14 @@ components:
           type: array
           description: Collection of results in the page
           items:
-            $ref: "#/components/schemas/SiteVerboseDto"
+            $ref: "#/components/schemas/CountrySubdivisionDto"
       required:
         - content
         - contentSize
         - page
         - totalElements
         - totalPages
-    PageDtoIdentifierTypeDto:
+    PageDtoCxMembershipDto:
       type: object
       description: Paginated collection of results
       properties:
@@ -7964,7 +6968,7 @@ components:
           type: array
           description: Collection of results in the page
           items:
-            $ref: "#/components/schemas/IdentifierTypeDto"
+            $ref: "#/components/schemas/CxMembershipDto"
       required:
         - content
         - contentSize
@@ -8002,19 +7006,203 @@ components:
         - page
         - totalElements
         - totalPages
-    FieldQualityRuleDto:
+    PageDtoIdentifierTypeDto:
       type: object
-      description: 'Rule for the quality level of an entity field '
+      description: Paginated collection of results
       properties:
-        fieldPath:
-          type: string
-          description: Path to the field
-        schemaName:
-          type: string
-          description: Schema name of the entity the field belongs to
+        totalElements:
+          type: integer
+          format: int64
+          description: Total number of all results in all pages
+        totalPages:
+          type: integer
+          format: int32
+          description: Total number pages
+        page:
+          type: integer
+          format: int32
+          description: Current page number
+        contentSize:
+          type: integer
+          format: int32
+          description: Number of results in the page
+        content:
+          type: array
+          description: Collection of results in the page
+          items:
+            $ref: "#/components/schemas/IdentifierTypeDto"
+      required:
+        - content
+        - contentSize
+        - page
+        - totalElements
+        - totalPages
+    PageDtoLegalEntityWithLegalAddressVerboseDto:
+      type: object
+      description: Paginated collection of results
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+          description: Total number of all results in all pages
+        totalPages:
+          type: integer
+          format: int32
+          description: Total number pages
+        page:
+          type: integer
+          format: int32
+          description: Current page number
+        contentSize:
+          type: integer
+          format: int32
+          description: Number of results in the page
+        content:
+          type: array
+          description: Collection of results in the page
+          items:
+            $ref: "#/components/schemas/LegalEntityWithLegalAddressVerboseDto"
+      required:
+        - content
+        - contentSize
+        - page
+        - totalElements
+        - totalPages
+    PageDtoLegalFormDto:
+      type: object
+      description: Paginated collection of results
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+          description: Total number of all results in all pages
+        totalPages:
+          type: integer
+          format: int32
+          description: Total number pages
+        page:
+          type: integer
+          format: int32
+          description: Current page number
+        contentSize:
+          type: integer
+          format: int32
+          description: Number of results in the page
+        content:
+          type: array
+          description: Collection of results in the page
+          items:
+            $ref: "#/components/schemas/LegalFormDto"
+      required:
+        - content
+        - contentSize
+        - page
+        - totalElements
+        - totalPages
+    PageDtoLogisticAddressVerboseDto:
+      type: object
+      description: Paginated collection of results
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+          description: Total number of all results in all pages
+        totalPages:
+          type: integer
+          format: int32
+          description: Total number pages
+        page:
+          type: integer
+          format: int32
+          description: Current page number
+        contentSize:
+          type: integer
+          format: int32
+          description: Number of results in the page
+        content:
+          type: array
+          description: Collection of results in the page
+          items:
+            $ref: "#/components/schemas/LogisticAddressVerboseDto"
+      required:
+        - content
+        - contentSize
+        - page
+        - totalElements
+        - totalPages
+    PageDtoSiteVerboseDto:
+      type: object
+      description: Paginated collection of results
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+          description: Total number of all results in all pages
+        totalPages:
+          type: integer
+          format: int32
+          description: Total number pages
+        page:
+          type: integer
+          format: int32
+          description: Current page number
+        contentSize:
+          type: integer
+          format: int32
+          description: Number of results in the page
+        content:
+          type: array
+          description: Collection of results in the page
+          items:
+            $ref: "#/components/schemas/SiteVerboseDto"
+      required:
+        - content
+        - contentSize
+        - page
+        - totalElements
+        - totalPages
+    PageDtoSiteWithMainAddressVerboseDto:
+      type: object
+      description: Paginated collection of results
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+          description: Total number of all results in all pages
+        totalPages:
+          type: integer
+          format: int32
+          description: Total number pages
+        page:
+          type: integer
+          format: int32
+          description: Current page number
+        contentSize:
+          type: integer
+          format: int32
+          description: Number of results in the page
+        content:
+          type: array
+          description: Collection of results in the page
+          items:
+            $ref: "#/components/schemas/SiteWithMainAddressVerboseDto"
+      required:
+        - content
+        - contentSize
+        - page
+        - totalElements
+        - totalPages
+    PhysicalPostalAddressDto:
+      type: object
+      description: "A physical postal address describes the physical location of an\
+        \ office, warehouse, gate, etc."
+      properties:
+        geographicCoordinates:
+          $ref: "#/components/schemas/GeoCoordinateDto"
         country:
           type: string
-          description: Country for wich the rule is valid
+          description: The 2-digit country code of the physical postal address according
+            to ISO 3166-1.
           enum:
             - UNDEFINED
             - AC
@@ -8288,51 +7476,130 @@ components:
             - ZM
             - ZR
             - ZW
-        qualityLevel:
+        administrativeAreaLevel1:
           type: string
-          description: Quality level of the field
-          enum:
-            - MANDATORY
-            - OPTIONAL
-            - FORBIDDEN
+          description: "The 2-digit country subdivision code according to ISO 3166-2,\
+            \ such as a region within a country."
+        administrativeAreaLevel2:
+          type: string
+          description: "The name of the locally regulated secondary country subdivision\
+            \ of the physical postal address, such as county within a country."
+        administrativeAreaLevel3:
+          type: string
+          description: "The name of the locally regulated tertiary country subdivision\
+            \ of the physical address, such as townships within a country."
+        postalCode:
+          type: string
+          description: "The alphanumeric identifier (sometimes including spaces or\
+            \ punctuation) of the physical postal address for the purpose of sorting\
+            \ mail, synonyms:postcode, post code, PIN or ZIP code."
+        city:
+          type: string
+          description: "The name of the city of the physical postal address, synonyms:\
+            \ town, village, municipality."
+        district:
+          type: string
+          description: The name of the district of the physical postal address which
+            divides the city in several smaller areas.
+        street:
+          $ref: "#/components/schemas/StreetDto"
+        companyPostalCode:
+          type: string
+          description: "The company postal code of the physical postal address, which\
+            \ is sometimes required for large companies."
+        industrialZone:
+          type: string
+          description: "The industrial zone of the physical postal address, designating\
+            \ an area for industrial development, synonym: industrial area."
+        building:
+          type: string
+          description: The alphanumeric identifier of the building addressed by the
+            physical postal address.
+        floor:
+          type: string
+          description: "The number of a floor in the building addressed by the physical\
+            \ postal address, synonym: level."
+        door:
+          type: string
+          description: "The number of a door in the building on the respective floor\
+            \ addressed by the physical postal address, synonyms: room, suite."
+        taxJurisdictionCode:
+          type: string
+          description: "Tax jurisdiction codes are used to identify the specific jurisdiction(s)\
+            \ that a company belong to, particularly in bureaucratic processes such\
+            \ as tax returns and IRS forms."
       required:
+        - city
         - country
-        - fieldPath
-        - qualityLevel
-    PageDtoCxMembershipDto:
+    PhysicalPostalAddressVerboseDto:
       type: object
-      description: Paginated collection of results
+      description: "A physical postal address describes the physical location of an\
+        \ office, warehouse, gate, etc."
       properties:
-        totalElements:
-          type: integer
-          format: int64
-          description: Total number of all results in all pages
-        totalPages:
-          type: integer
-          format: int32
-          description: Total number pages
-        page:
-          type: integer
-          format: int32
-          description: Current page number
-        contentSize:
-          type: integer
-          format: int32
-          description: Number of results in the page
-        content:
-          type: array
-          description: Collection of results in the page
-          items:
-            $ref: "#/components/schemas/CxMembershipDto"
+        geographicCoordinates:
+          $ref: "#/components/schemas/GeoCoordinateDto"
+        country:
+          $ref: "#/components/schemas/TypeKeyNameVerboseDtoCountryCode"
+          description: The 2-digit country code of the physical postal address according
+            to ISO 3166-1.
+        administrativeAreaLevel1:
+          $ref: "#/components/schemas/RegionDto"
+          description: "The 2-digit country subdivision code according to ISO 3166-2,\
+            \ such as a region within a country."
+        administrativeAreaLevel2:
+          type: string
+          description: "The name of the locally regulated secondary country subdivision\
+            \ of the physical postal address, such as county within a country."
+        administrativeAreaLevel3:
+          type: string
+          description: "The name of the locally regulated tertiary country subdivision\
+            \ of the physical address, such as townships within a country."
+        postalCode:
+          type: string
+          description: "The alphanumeric identifier (sometimes including spaces or\
+            \ punctuation) of the physical postal address for the purpose of sorting\
+            \ mail, synonyms:postcode, post code, PIN or ZIP code."
+        city:
+          type: string
+          description: "The name of the city of the physical postal address, synonyms:\
+            \ town, village, municipality."
+        district:
+          type: string
+          description: The name of the district of the physical postal address which
+            divides the city in several smaller areas.
+        street:
+          $ref: "#/components/schemas/StreetDto"
+        companyPostalCode:
+          type: string
+          description: "The company postal code of the physical postal address, which\
+            \ is sometimes required for large companies."
+        industrialZone:
+          type: string
+          description: "The industrial zone of the physical postal address, designating\
+            \ an area for industrial development, synonym: industrial area."
+        building:
+          type: string
+          description: The alphanumeric identifier of the building addressed by the
+            physical postal address.
+        floor:
+          type: string
+          description: "The number of a floor in the building addressed by the physical\
+            \ postal address, synonym: level."
+        door:
+          type: string
+          description: "The number of a door in the building on the respective floor\
+            \ addressed by the physical postal address, synonyms: room, suite."
+        taxJurisdictionCode:
+          type: string
+          description: "Tax jurisdiction codes are used to identify the specific jurisdiction(s)\
+            \ that a company belong to, particularly in bureaucratic processes such\
+            \ as tax returns and IRS forms."
       required:
-        - content
-        - contentSize
-        - page
-        - totalElements
-        - totalPages
-    CountrySubdivisionDto:
+        - city
+        - country
+    RegionDto:
       type: object
-      description: Country subdivision
+      description: Region within a country
       properties:
         countryCode:
           type: string
@@ -8610,47 +7877,780 @@ components:
             - ZM
             - ZR
             - ZW
-        code:
+        regionCode:
           type: string
-          description: The country subdivision code according to ISO 3166-2
+          description: Abbreviation or shorthand of the area
+        regionName:
+          type: string
+          description: Describes the full name of the region within a country according
+            to ISO 3166-214
+      required:
+        - countryCode
+        - regionCode
+        - regionName
+    RelationVerboseDto:
+      type: object
+      description: Directed relation between two business partners
+      properties:
+        type:
+          type: string
+          description: The type of relation between the Legal Entities
+          enum:
+            - IsAlternativeHeadquarterFor
+        businessPartnerSourceBpnl:
+          type: string
+          description: BPN of partner from which the relation emerges (the source)
+        businessPartnerTargetBpnl:
+          type: string
+          description: BPN of partner to which this relation goes (the target)
+        isActive:
+          type: boolean
+          description: Status of the relation
+      required:
+        - businessPartnerSourceBpnl
+        - businessPartnerTargetBpnl
+        - isActive
+        - type
+    SiteCreateRequestWithLegalAddressAsMain:
+      type: object
+      properties:
         name:
           type: string
-          description: The name of the country subdivision according to ISO 3166-2
-      required:
-        - code
-        - countryCode
-        - name
-    PageDtoCountrySubdivisionDto:
-      type: object
-      description: Paginated collection of results
-      properties:
-        totalElements:
-          type: integer
-          format: int64
-          description: Total number of all results in all pages
-        totalPages:
-          type: integer
-          format: int32
-          description: Total number pages
-        page:
-          type: integer
-          format: int32
-          description: Current page number
-        contentSize:
-          type: integer
-          format: int32
-          description: Number of results in the page
-        content:
+          description: The name of the site. This is not according to official registers
+            but according to the name the owner chooses.
+        states:
           type: array
-          description: Collection of results in the page
           items:
-            $ref: "#/components/schemas/CountrySubdivisionDto"
+            $ref: "#/components/schemas/SiteStateDto"
+        confidenceCriteria:
+          $ref: "#/components/schemas/ConfidenceCriteriaDto"
+        bpnLParent:
+          type: string
       required:
-        - content
-        - contentSize
-        - page
-        - totalElements
-        - totalPages
+        - bpnLParent
+        - confidenceCriteria
+        - name
+        - states
+    SitePartnerCreateRequest:
+      type: object
+      description: "Request for creating new business partner record of type site.\
+        \ In general, a site is a delimited geographical area in which an organization\
+        \ (such as an enterprise or company, university, association, etc.) conducts\
+        \ business. In Catena-X, a site is a type of business partner representing\
+        \ a physical location or area owned by a legal entity, where a production\
+        \ plant, a warehouse, or an office building is located. A site is owned by\
+        \ a legal entity. Thus, exactly one legal entity is assigned to a site. A\
+        \ site has exactly one main address, but it is possible to specify additional\
+        \ addresses (such as different gates), that belong to a site. Thus, at least\
+        \ one address is assigned to a site. A site can only be uploaded and modified\
+        \ by the owner (the legal entity), because only the owner knows which addresses\
+        \ belong to which site. A site is uniquely identified by the BPNS."
+      properties:
+        name:
+          type: string
+          description: The name of the site. This is not according to official registers
+            but according to the name the owner chooses.
+        states:
+          type: array
+          items:
+            $ref: "#/components/schemas/SiteStateDto"
+        mainAddress:
+          $ref: "#/components/schemas/LogisticAddressDto"
+        confidenceCriteria:
+          $ref: "#/components/schemas/ConfidenceCriteriaDto"
+        bpnlParent:
+          type: string
+          description: The BPNL of the legal entity owning the site.
+        index:
+          type: string
+          description: User defined index to conveniently match this entry to the
+            corresponding entry in the response.
+        requestKey:
+          type: string
+      required:
+        - bpnlParent
+        - confidenceCriteria
+        - mainAddress
+        - name
+        - states
+    SitePartnerCreateResponseWrapper:
+      type: object
+      description: Holds information about successfully and failed entities after
+        the creating/updating of several objects
+      properties:
+        entities:
+          type: array
+          items:
+            $ref: "#/components/schemas/SitePartnerCreateVerboseDto"
+        errors:
+          type: array
+          items:
+            $ref: "#/components/schemas/ErrorInfoSiteCreateError"
+        entityCount:
+          type: integer
+          format: int32
+        errorCount:
+          type: integer
+          format: int32
+      required:
+        - entities
+        - entityCount
+        - errorCount
+        - errors
+    SitePartnerCreateVerboseDto:
+      type: object
+      description: "Created/updated business partner of type site. In general, a site\
+        \ is a delimited geographical area in which an organization (such as an enterprise\
+        \ or company, university, association, etc.) conducts business. In Catena-X,\
+        \ a site is a type of business partner representing a physical location or\
+        \ area owned by a legal entity, where a production plant, a warehouse, or\
+        \ an office building is located. A site is owned by a legal entity. Thus,\
+        \ exactly one legal entity is assigned to a site. A site has exactly one main\
+        \ address, but it is possible to specify additional addresses (such as different\
+        \ gates), that belong to a site. Thus, at least one address is assigned to\
+        \ a site. A site can only be uploaded and modified by the owner (the legal\
+        \ entity), because only the owner knows which addresses belong to which site.\
+        \ A site is uniquely identified by the BPNS."
+      properties:
+        bpns:
+          type: string
+          description: "A BPNS represents and uniquely identifies a site, which is\
+            \ where for example a production plant, a warehouse, or an office building\
+            \ is located."
+        name:
+          type: string
+          description: The name of the site. This is not according to official registers
+            but according to the name the owner chooses.
+        states:
+          type: array
+          items:
+            $ref: "#/components/schemas/SiteStateVerboseDto"
+        isParticipantData:
+          type: boolean
+          description: Indicates whether the site is owned and thus provided by a
+            Data Space Participant.
+        bpnLegalEntity:
+          type: string
+          description: The BPNL of the legal entity owning the site.
+        createdAt:
+          type: string
+          format: date-time
+          description: The date when the data record has been created.
+        updatedAt:
+          type: string
+          format: date-time
+          description: The date when the data record has been last updated.
+        confidenceCriteria:
+          $ref: "#/components/schemas/ConfidenceCriteriaDto"
+        mainAddress:
+          $ref: "#/components/schemas/LogisticAddressVerboseDto"
+          description: "The address, where typically the main entrance or the reception\
+            \ is located, or where the mail is delivered to."
+        index:
+          type: string
+          description: User defined index to conveniently match this entry to the
+            corresponding entry in the response.
+      required:
+        - bpnLegalEntity
+        - bpns
+        - confidenceCriteria
+        - createdAt
+        - isParticipantData
+        - mainAddress
+        - name
+        - states
+        - updatedAt
+    SitePartnerUpdateRequest:
+      type: object
+      description: "Request for updating a business partner record of type site. In\
+        \ general, a site is a delimited geographical area in which an organization\
+        \ (such as an enterprise or company, university, association, etc.) conducts\
+        \ business. In Catena-X, a site is a type of business partner representing\
+        \ a physical location or area owned by a legal entity, where a production\
+        \ plant, a warehouse, or an office building is located. A site is owned by\
+        \ a legal entity. Thus, exactly one legal entity is assigned to a site. A\
+        \ site has exactly one main address, but it is possible to specify additional\
+        \ addresses (such as different gates), that belong to a site. Thus, at least\
+        \ one address is assigned to a site. A site can only be uploaded and modified\
+        \ by the owner (the legal entity), because only the owner knows which addresses\
+        \ belong to which site. A site is uniquely identified by the BPNS."
+      properties:
+        bpns:
+          type: string
+          description: "A BPNS represents and uniquely identifies a site, which is\
+            \ where for example a production plant, a warehouse, or an office building\
+            \ is located."
+        name:
+          type: string
+          description: The name of the site. This is not according to official registers
+            but according to the name the owner chooses.
+        states:
+          type: array
+          items:
+            $ref: "#/components/schemas/SiteStateDto"
+        mainAddress:
+          $ref: "#/components/schemas/LogisticAddressDto"
+        confidenceCriteria:
+          $ref: "#/components/schemas/ConfidenceCriteriaDto"
+        requestKey:
+          type: string
+      required:
+        - bpns
+        - confidenceCriteria
+        - mainAddress
+        - name
+        - requestKey
+        - states
+    SitePartnerUpdateResponseWrapper:
+      type: object
+      description: Holds information about successfully and failed entities after
+        the creating/updating of several objects
+      properties:
+        entities:
+          type: array
+          items:
+            $ref: "#/components/schemas/SitePartnerCreateVerboseDto"
+        errors:
+          type: array
+          items:
+            $ref: "#/components/schemas/ErrorInfoSiteUpdateError"
+        entityCount:
+          type: integer
+          format: int32
+        errorCount:
+          type: integer
+          format: int32
+      required:
+        - entities
+        - entityCount
+        - errorCount
+        - errors
+    SiteSearchRequest:
+      type: object
+      properties:
+        siteBpns:
+          type: array
+          items:
+            type: string
+        legalEntityBpns:
+          type: array
+          items:
+            type: string
+        name:
+          type: string
+      required:
+        - legalEntityBpns
+        - siteBpns
+    SiteStateDto:
+      type: object
+      description: "A site state indicates if the site is active or inactive. This\
+        \ does not describe the relation between a sharing member and a business partner\
+        \ and whether they have active business, but it describes whether the site\
+        \ is still operating."
+      properties:
+        validFrom:
+          type: string
+          format: date-time
+          description: The date from which the state is valid.
+        validTo:
+          type: string
+          format: date-time
+          description: The date until the state is valid.
+        type:
+          type: string
+          description: "One of the state types: active, inactive."
+          enum:
+            - ACTIVE
+            - INACTIVE
+      required:
+        - type
+    SiteStateVerboseDto:
+      type: object
+      description: "A site state indicates if the site is active or inactive. This\
+        \ does not describe the relation between a sharing member and a business partner\
+        \ and whether they have active business, but it describes whether the site\
+        \ is still operating."
+      properties:
+        validFrom:
+          type: string
+          format: date-time
+          description: The date from which the state is valid.
+        validTo:
+          type: string
+          format: date-time
+          description: The date until the state is valid.
+        type:
+          $ref: "#/components/schemas/TypeKeyNameVerboseDtoBusinessStateType"
+          description: "One of the state types: active, inactive."
+      required:
+        - type
+    SiteVerboseDto:
+      type: object
+      description: "In general, a site is a delimited geographical area in which an\
+        \ organization (such as an enterprise or company, university, association,\
+        \ etc.) conducts business. In Catena-X, a site is a type of business partner\
+        \ representing a physical location or area owned by a legal entity, where\
+        \ a production plant, a warehouse, or an office building is located. A site\
+        \ is owned by a legal entity. Thus, exactly one legal entity is assigned to\
+        \ a site. A site has exactly one main address, but it is possible to specify\
+        \ additional addresses (such as different gates), that belong to a site. Thus,\
+        \ at least one address is assigned to a site. A site can only be uploaded\
+        \ and modified by the owner (the legal entity), because only the owner knows\
+        \ which addresses belong to which site. A site is uniquely identified by the\
+        \ BPNS."
+      properties:
+        bpns:
+          type: string
+          description: "A BPNS represents and uniquely identifies a site, which is\
+            \ where for example a production plant, a warehouse, or an office building\
+            \ is located."
+        name:
+          type: string
+          description: The name of the site. This is not according to official registers
+            but according to the name the owner chooses.
+        states:
+          type: array
+          items:
+            $ref: "#/components/schemas/SiteStateVerboseDto"
+        isParticipantData:
+          type: boolean
+          description: Indicates whether the site is owned and thus provided by a
+            Data Space Participant.
+        bpnLegalEntity:
+          type: string
+          description: The BPNL of the legal entity owning the site.
+        createdAt:
+          type: string
+          format: date-time
+          description: The date when the data record has been created.
+        updatedAt:
+          type: string
+          format: date-time
+          description: The date when the data record has been last updated.
+        confidenceCriteria:
+          $ref: "#/components/schemas/ConfidenceCriteriaDto"
+      required:
+        - bpnLegalEntity
+        - bpns
+        - confidenceCriteria
+        - createdAt
+        - isParticipantData
+        - name
+        - states
+        - updatedAt
+    SiteWithMainAddressVerboseDto:
+      type: object
+      description: "In general, a site is a delimited geographical area in which an\
+        \ organization (such as an enterprise or company, university, association,\
+        \ etc.) conducts business. In Catena-X, a site is a type of business partner\
+        \ representing a physical location or area owned by a legal entity, where\
+        \ a production plant, a warehouse, or an office building is located. A site\
+        \ is owned by a legal entity. Thus, exactly one legal entity is assigned to\
+        \ a site. A site has exactly one main address, but it is possible to specify\
+        \ additional addresses (such as different gates), that belong to a site. Thus,\
+        \ at least one address is assigned to a site. A site can only be uploaded\
+        \ and modified by the owner (the legal entity), because only the owner knows\
+        \ which addresses belong to which site. A site is uniquely identified by the\
+        \ BPNS."
+      properties:
+        bpns:
+          type: string
+          description: "A BPNS represents and uniquely identifies a site, which is\
+            \ where for example a production plant, a warehouse, or an office building\
+            \ is located."
+        name:
+          type: string
+          description: The name of the site. This is not according to official registers
+            but according to the name the owner chooses.
+        states:
+          type: array
+          items:
+            $ref: "#/components/schemas/SiteStateVerboseDto"
+        isParticipantData:
+          type: boolean
+          description: Indicates whether the site is owned and thus provided by a
+            Data Space Participant.
+        bpnLegalEntity:
+          type: string
+          description: The BPNL of the legal entity owning the site.
+        createdAt:
+          type: string
+          format: date-time
+          description: The date when the data record has been created.
+        updatedAt:
+          type: string
+          format: date-time
+          description: The date when the data record has been last updated.
+        confidenceCriteria:
+          $ref: "#/components/schemas/ConfidenceCriteriaDto"
+        mainAddress:
+          $ref: "#/components/schemas/LogisticAddressVerboseDto"
+          description: "The address, where typically the main entrance or the reception\
+            \ is located, or where the mail is delivered to."
+      required:
+        - bpnLegalEntity
+        - bpns
+        - confidenceCriteria
+        - createdAt
+        - isParticipantData
+        - mainAddress
+        - name
+        - states
+        - updatedAt
+    StreetDto:
+      type: object
+      description: "The street of the physical postal address, synonyms: road, avenue,\
+        \ lane, boulevard, highway"
+      properties:
+        name:
+          type: string
+          description: The name of the street.
+        houseNumber:
+          type: string
+          description: The number representing the exact location of a building within
+            the street.
+        houseNumberSupplement:
+          type: string
+        milestone:
+          type: string
+          description: "The number representing the exact location of an addressed\
+            \ object within a street without house numbers, such as within long roads."
+        direction:
+          type: string
+          description: "The cardinal direction describing where the exit to the location\
+            \ of the addressed object on large highways / motorways is located, such\
+            \ as Highway 101 South."
+        namePrefix:
+          type: string
+          description: "The street related information, which is usually printed before\
+            \ the official street name on an address label."
+        additionalNamePrefix:
+          type: string
+          description: "The additional street related information, which is usually\
+            \ printed before the official street name on an address label."
+        nameSuffix:
+          type: string
+          description: "The street related information, which is usually printed after\
+            \ the official street name on an address label."
+        additionalNameSuffix:
+          type: string
+          description: "The additional street related information, which is usually\
+            \ printed after the official street name on an address label."
+    TypeKeyNameVerboseDtoBusinessStateType:
+      type: object
+      description: Named type uniquely identified by its technical key
+      properties:
+        technicalKey:
+          type: string
+          description: Unique key of this type for reference
+          enum:
+            - ACTIVE
+            - INACTIVE
+        name:
+          type: string
+          description: Name or denotation of this type
+      required:
+        - name
+        - technicalKey
+    TypeKeyNameVerboseDtoCountryCode:
+      type: object
+      description: Named type uniquely identified by its technical key
+      properties:
+        technicalKey:
+          type: string
+          description: Unique key of this type for reference
+          enum:
+            - UNDEFINED
+            - AC
+            - AD
+            - AE
+            - AF
+            - AG
+            - AI
+            - AL
+            - AM
+            - AN
+            - AO
+            - AQ
+            - AR
+            - AS
+            - AT
+            - AU
+            - AW
+            - AX
+            - AZ
+            - BA
+            - BB
+            - BD
+            - BE
+            - BF
+            - BG
+            - BH
+            - BI
+            - BJ
+            - BL
+            - BM
+            - BN
+            - BO
+            - BQ
+            - BR
+            - BS
+            - BT
+            - BU
+            - BV
+            - BW
+            - BY
+            - BZ
+            - CA
+            - CC
+            - CD
+            - CF
+            - CG
+            - CH
+            - CI
+            - CK
+            - CL
+            - CM
+            - CN
+            - CO
+            - CP
+            - CR
+            - CS
+            - CU
+            - CV
+            - CW
+            - CX
+            - CY
+            - CZ
+            - DE
+            - DG
+            - DJ
+            - DK
+            - DM
+            - DO
+            - DZ
+            - EA
+            - EC
+            - EE
+            - EG
+            - EH
+            - ER
+            - ES
+            - ET
+            - EU
+            - EZ
+            - FI
+            - FJ
+            - FK
+            - FM
+            - FO
+            - FR
+            - FX
+            - GA
+            - GB
+            - GD
+            - GE
+            - GF
+            - GG
+            - GH
+            - GI
+            - GL
+            - GM
+            - GN
+            - GP
+            - GQ
+            - GR
+            - GS
+            - GT
+            - GU
+            - GW
+            - GY
+            - HK
+            - HM
+            - HN
+            - HR
+            - HT
+            - HU
+            - IC
+            - ID
+            - IE
+            - IL
+            - IM
+            - IN
+            - IO
+            - IQ
+            - IR
+            - IS
+            - IT
+            - JE
+            - JM
+            - JO
+            - JP
+            - KE
+            - KG
+            - KH
+            - KI
+            - KM
+            - KN
+            - KP
+            - KR
+            - KW
+            - KY
+            - KZ
+            - LA
+            - LB
+            - LC
+            - LI
+            - LK
+            - LR
+            - LS
+            - LT
+            - LU
+            - LV
+            - LY
+            - MA
+            - MC
+            - MD
+            - ME
+            - MF
+            - MG
+            - MH
+            - MK
+            - ML
+            - MM
+            - MN
+            - MO
+            - MP
+            - MQ
+            - MR
+            - MS
+            - MT
+            - MU
+            - MV
+            - MW
+            - MX
+            - MY
+            - MZ
+            - NA
+            - NC
+            - NE
+            - NF
+            - NG
+            - NI
+            - NL
+            - "NO"
+            - NP
+            - NR
+            - NT
+            - NU
+            - NZ
+            - OM
+            - PA
+            - PE
+            - PF
+            - PG
+            - PH
+            - PK
+            - PL
+            - PM
+            - PN
+            - PR
+            - PS
+            - PT
+            - PW
+            - PY
+            - QA
+            - RE
+            - RO
+            - RS
+            - RU
+            - RW
+            - SA
+            - SB
+            - SC
+            - SD
+            - SE
+            - SF
+            - SG
+            - SH
+            - SI
+            - SJ
+            - SK
+            - SL
+            - SM
+            - SN
+            - SO
+            - SR
+            - SS
+            - ST
+            - SU
+            - SV
+            - SX
+            - SY
+            - SZ
+            - TA
+            - TC
+            - TD
+            - TF
+            - TG
+            - TH
+            - TJ
+            - TK
+            - TL
+            - TM
+            - TN
+            - TO
+            - TP
+            - TR
+            - TT
+            - TV
+            - TW
+            - TZ
+            - UA
+            - UG
+            - UK
+            - UM
+            - US
+            - UY
+            - UZ
+            - VA
+            - VC
+            - VE
+            - VG
+            - VI
+            - VN
+            - VU
+            - WF
+            - WS
+            - XI
+            - XU
+            - XK
+            - YE
+            - YT
+            - YU
+            - ZA
+            - ZM
+            - ZR
+            - ZW
+        name:
+          type: string
+          description: Name or denotation of this type
+      required:
+        - name
+        - technicalKey
+    TypeKeyNameVerboseDtoString:
+      type: object
+      description: Named type uniquely identified by its technical key
+      properties:
+        technicalKey:
+          type: string
+          description: Unique key of this type for reference
+        name:
+          type: string
+          description: Name or denotation of this type
+      required:
+        - name
+        - technicalKey
   securitySchemes:
     open_id_scheme:
       type: oauth2
