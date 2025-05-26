@@ -30,7 +30,8 @@ on:
     branches:
       - main
 jobs:
-  scan:
+  analyze:
+    name: Analyze
     runs-on: ubuntu-latest
     permissions:
       actions: read
