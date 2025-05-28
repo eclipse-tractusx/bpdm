@@ -1,6 +1,6 @@
 # bpdm
 
-![Version: 6.0.0](https://img.shields.io/badge/Version-6.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 7.0.0](https://img.shields.io/badge/AppVersion-7.0.0-informational?style=flat-square)
+![Version: 6.1.0-SNAPSHOT](https://img.shields.io/badge/Version-6.1.0--SNAPSHOT-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 7.1.0-SNAPSHOT](https://img.shields.io/badge/AppVersion-7.1.0--SNAPSHOT-informational?style=flat-square)
 
 A Helm chart for Kubernetes that deploys the BPDM applications
 
@@ -21,11 +21,11 @@ A Helm chart for Kubernetes that deploys the BPDM applications
 
 | Repository | Name | Version |
 |------------|------|---------|
-|  | bpdm-cleaning-service-dummy(bpdm-cleaning-service-dummy) | 4.0.0 |
+|  | bpdm-cleaning-service-dummy(bpdm-cleaning-service-dummy) | 4.1.0-SNAPSHOT |
 |  | bpdm-common | 1.0.4 |
-|  | bpdm-gate(bpdm-gate) | 7.0.0 |
-|  | bpdm-orchestrator(bpdm-orchestrator) | 4.0.0 |
-|  | bpdm-pool(bpdm-pool) | 8.0.0 |
+|  | bpdm-gate(bpdm-gate) | 7.1.0-SNAPSHOT |
+|  | bpdm-orchestrator(bpdm-orchestrator) | 4.1.0-SNAPSHOT |
+|  | bpdm-pool(bpdm-pool) | 8.1.0-SNAPSHOT |
 | https://charts.bitnami.com/bitnami | postgres(postgresql) | 12.12.10 |
 | https://eclipse-tractusx.github.io/charts/dev | centralidp(centralidp) | 4.0.1 |
 
