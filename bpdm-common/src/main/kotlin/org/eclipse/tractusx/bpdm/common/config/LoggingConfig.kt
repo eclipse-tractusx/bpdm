@@ -34,6 +34,7 @@ import java.util.*
 class UserLoggingFilter(
     private val logConfigProperties: LogConfigProperties
 ) : OncePerRequestFilter() {
+
     override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, filterChain: FilterChain) {
         val userName = request.userPrincipal?.name ?: logConfigProperties.unknownUser
         val escapedUserName = HtmlUtils.htmlEscape(userName)
@@ -68,8 +69,11 @@ class RequestLoggingFilter : OncePerRequestFilter() {
  */
 @Component
 class MdcTaskDecorator : TaskDecorator {
+
+    private val emptyContext = HashMap<String, String>()
+
     override fun decorate(runnable: Runnable): Runnable {
-        val mdcCopy = MDC.getCopyOfContextMap()
+        val mdcCopy = MDC.getCopyOfContextMap() ?: emptyContext
 
         return Runnable {
             withLoggingContext(mdcCopy) {
