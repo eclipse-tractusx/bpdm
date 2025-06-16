@@ -38,27 +38,34 @@ Therefore, please consult the [api](docs/api/README.md) documentation for gettin
 
 ## Documentation
 
-This README is just the gateway to more detailed documentation files that may be found in the [docs](docs) folder
+This README is just the gateway to more detailed documentation files that may be found in the [docs](docs) folder.
+
+Also, each of the BPDM applications has its own README file, which can be found in the respective subfolder:
+
+- [BPDM Pool](bpdm-pool/README.md)
+- [BPDM Gate](bpdm-gate/README.md)
+- [BPDM Orchestrator](bpdm-orchestrator/README.md)
+- [BPDM Cleaning Service Dummy](bpdm-cleaning-service-dummy/README.md)
 
 ## Docker Notice
 
 Below you can find information to the used Docker images in this application:
 
-* [BPDM Pool](docker/pool/DOCKER_NOTICE.md)
-* [BPDM Gate](docker/gate/DOCKER_NOTICE.md)
-* [BPDM Orchestrator](docker/orchestrator/DOCKER_NOTICE.md)
-* [BPDM Cleaning Service Dummy](docker/cleaning-service-dummy/DOCKER_NOTICE.md)
+- [BPDM Pool](docker/pool/DOCKER_NOTICE.md)
+- [BPDM Gate](docker/gate/DOCKER_NOTICE.md)
+- [BPDM Orchestrator](docker/orchestrator/DOCKER_NOTICE.md)
+- [BPDM Cleaning Service Dummy](docker/cleaning-service-dummy/DOCKER_NOTICE.md)
 
 ## NOTICE
 
 This work is licensed under the [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0).
 
 - SPDX-License-Identifier: Apache-2.0
-- SPDX-FileCopyrightText: 2023,2024 ZF Friedrichshafen AG
-- SPDX-FileCopyrightText: 2023,2024 SAP SE
-- SPDX-FileCopyrightText: 2023,2024 Bayerische Motoren Werke Aktiengesellschaft (BMW AG)
-- SPDX-FileCopyrightText: 2023,2024 Mercedes Benz Group
-- SPDX-FileCopyrightText: 2023,2024 Robert Bosch GmbH
-- SPDX-FileCopyrightText: 2023,2024 Schaeffler AG
-- SPDX-FileCopyrightText: 2023,2024 Contributors to the Eclipse Foundation
-- Source URL: https://github.com/eclipse-tractusx/bpdm
+- SPDX-FileCopyrightText: 2023,2024,2025 ZF Friedrichshafen AG
+- SPDX-FileCopyrightText: 2023,2024,2025 SAP SE
+- SPDX-FileCopyrightText: 2023,2024,2025 Bayerische Motoren Werke Aktiengesellschaft (BMW AG)
+- SPDX-FileCopyrightText: 2023,2024,2025 Mercedes Benz Group
+- SPDX-FileCopyrightText: 2023,2024,2025 Robert Bosch GmbH
+- SPDX-FileCopyrightText: 2023,2024,2025 Schaeffler AG
+- SPDX-FileCopyrightText: 2023,2024,2025 Contributors to the Eclipse Foundation
+- Source URL: <https://github.com/eclipse-tractusx/bpdm>
