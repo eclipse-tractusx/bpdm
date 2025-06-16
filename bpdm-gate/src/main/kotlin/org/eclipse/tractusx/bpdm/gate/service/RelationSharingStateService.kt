@@ -124,7 +124,7 @@ class RelationSharingStateService(
 
     private fun canBeShared(relationType: RelationType): Boolean{
         return when(relationType){
-            RelationType.IsManagedBy -> false
+            RelationType.IsManagedBy -> true
             RelationType.IsAlternativeHeadquarterFor -> true
         }
     }

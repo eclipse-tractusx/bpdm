@@ -38,8 +38,9 @@ import org.eclipse.tractusx.bpdm.test.testdata.gate.withAddressType
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.eclipse.tractusx.bpdm.test.util.Timeframe
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
@@ -73,8 +74,9 @@ class SharingStateControllerIT @Autowired constructor(
         testName = testInfo.displayName
     }
 
-    @Test
-    fun createSharingStateOnSharableRelation(){
+    @ParameterizedTest
+    @EnumSource(RelationType::class)
+    fun createSharingStateOnSharableRelation(relationType: RelationType){
         val legalEntityId1 = "$testName LE 1"
         val legalEntityId2 = "$testName LE 2"
         val relationId = "$testName R 1"
@@ -84,7 +86,7 @@ class SharingStateControllerIT @Autowired constructor(
             createLegalEntityRequest(legalEntityId2)
         ))
 
-        val creationTimeframe = createRelation(relationId, RelationType.IsAlternativeHeadquarterFor, legalEntityId1, legalEntityId2)
+        val creationTimeframe = createRelation(relationId, relationType, legalEntityId1, legalEntityId2)
 
         val expected = PageDto<RelationSharingStateDto>(1, 1, 0, 1,
             listOf(RelationSharingStateDto(relationId, RelationSharingStateType.Ready, null, null, null, anyTime))
@@ -96,8 +98,9 @@ class SharingStateControllerIT @Autowired constructor(
     }
 
 
-    @Test
-    fun updateSharingStateOnChange(){
+    @ParameterizedTest
+    @EnumSource(RelationType::class)
+    fun updateSharingStateOnChange(relationType: RelationType){
         val legalEntityId1 = "$testName LE 1"
         val legalEntityId2 = "$testName LE 2"
         val legalEntityId3 = "$testName LE 3"
@@ -109,9 +112,9 @@ class SharingStateControllerIT @Autowired constructor(
             createLegalEntityRequest(legalEntityId3)
         ))
 
-        createRelation(relationId, RelationType.IsAlternativeHeadquarterFor, legalEntityId1, legalEntityId2)
+        createRelation(relationId, relationType, legalEntityId1, legalEntityId2)
 
-        val updateTimeframe = createRelation(relationId, RelationType.IsAlternativeHeadquarterFor, legalEntityId1, legalEntityId3)
+        val updateTimeframe = createRelation(relationId, relationType, legalEntityId1, legalEntityId3)
 
         val expected = PageDto<RelationSharingStateDto>(1, 1, 0, 1,
             listOf(RelationSharingStateDto(relationId, RelationSharingStateType.Ready, null, null, null, anyTime))
@@ -122,8 +125,9 @@ class SharingStateControllerIT @Autowired constructor(
         assertIsEqual(actual, expected, updateTimeframe)
     }
 
-    @Test
-    fun onNoChangeNoUpdate(){
+    @ParameterizedTest
+    @EnumSource(RelationType::class)
+    fun onNoChangeNoUpdate(relationType: RelationType){
         val legalEntityId1 = "$testName LE 1"
         val legalEntityId2 = "$testName LE 2"
         val legalEntityId3 = "$testName LE 3"
@@ -135,8 +139,8 @@ class SharingStateControllerIT @Autowired constructor(
             createLegalEntityRequest(legalEntityId3)
         ))
 
-        val creationTimeframe = createRelation(relationId, RelationType.IsAlternativeHeadquarterFor, legalEntityId1, legalEntityId2)
-        createRelation(relationId, RelationType.IsAlternativeHeadquarterFor, legalEntityId1, legalEntityId2)
+        val creationTimeframe = createRelation(relationId, relationType, legalEntityId1, legalEntityId2)
+        createRelation(relationId, relationType, legalEntityId1, legalEntityId2)
 
         val expected = PageDto<RelationSharingStateDto>(1, 1, 0, 1,
             listOf(RelationSharingStateDto(relationId, RelationSharingStateType.Ready, null, null, null, anyTime))
@@ -147,28 +151,9 @@ class SharingStateControllerIT @Autowired constructor(
         assertIsEqual(actual, expected, creationTimeframe)
     }
 
-    @Test
-    fun createNoSharingStateForNonSharableRelation(){
-        val legalEntityId1 = "$testName LE 1"
-        val legalEntityId2 = "$testName LE 2"
-        val relationId = "$testName R 1"
-
-        gateClient.businessParters.upsertBusinessPartnersInput(listOf(
-            createLegalEntityRequest(legalEntityId1),
-            createLegalEntityRequest(legalEntityId2)
-        ))
-
-        val creationTimeframe = createRelation(relationId, RelationType.IsManagedBy, legalEntityId1, legalEntityId2)
-
-        val expected = PageDto<RelationSharingStateDto>(0, 0, 0, 0, emptyList())
-
-        val actual = gateClient.relationSharingState.get(externalIds = listOf(relationId))
-
-        assertIsEqual(actual, expected, creationTimeframe)
-    }
-
-    @Test
-    fun filterByExternalIds(){
+    @ParameterizedTest
+    @EnumSource(RelationType::class)
+    fun filterByExternalIds(relationType: RelationType){
         val legalEntityId1 = "$testName LE 1"
         val legalEntityId2 = "$testName LE 2"
         val legalEntityId3 = "$testName LE 3"
@@ -185,9 +170,10 @@ class SharingStateControllerIT @Autowired constructor(
 
         val creationTimeframe = createSharableRelations(
             listOf(
-                RelationContent(relationId1, legalEntityId1, legalEntityId2),
-                RelationContent(relationId2, legalEntityId3, legalEntityId4),
-            )
+                RelationContent(relationId1, relationType, legalEntityId1, legalEntityId2),
+                RelationContent(relationId2, relationType, legalEntityId3, legalEntityId4),
+            ),
+            relationType
         )
 
         val expected = PageDto<RelationSharingStateDto>(1, 1, 0, 1,
@@ -199,8 +185,9 @@ class SharingStateControllerIT @Autowired constructor(
         assertIsEqual(actual, expected, creationTimeframe)
     }
 
-    @Test
-    fun filterBySharingStateType(){
+    @ParameterizedTest
+    @EnumSource(RelationType::class)
+    fun filterBySharingStateType(relationType: RelationType){
         val legalEntityId1 = "$testName LE 1"
         val legalEntityId2 = "$testName LE 2"
         val legalEntityId3 = "$testName LE 3"
@@ -217,9 +204,10 @@ class SharingStateControllerIT @Autowired constructor(
 
         val creationTimeframe = createSharableRelations(
             listOf(
-                RelationContent(relationId1, legalEntityId1, legalEntityId2),
-                RelationContent(relationId2, legalEntityId3, legalEntityId4),
-            )
+                RelationContent(relationId1, relationType, legalEntityId1, legalEntityId2),
+                RelationContent(relationId2, relationType, legalEntityId3, legalEntityId4),
+            ),
+            relationType
         )
 
         setSharingState(relationId1, RelationSharingStateType.Pending)
@@ -233,8 +221,9 @@ class SharingStateControllerIT @Autowired constructor(
         assertIsEqual(actual, expected, creationTimeframe)
     }
 
-    @Test
-    fun filterByUpdatedAfter(){
+    @ParameterizedTest
+    @EnumSource(RelationType::class)
+    fun filterByUpdatedAfter(relationType: RelationType){
         val legalEntityId1 = "$testName LE 1"
         val legalEntityId2 = "$testName LE 2"
         val legalEntityId3 = "$testName LE 3"
@@ -251,12 +240,13 @@ class SharingStateControllerIT @Autowired constructor(
 
         createSharableRelations(
             listOf(
-                RelationContent(relationId1, legalEntityId1, legalEntityId2),
-                RelationContent(relationId2, legalEntityId3, legalEntityId4),
-            )
+                RelationContent(relationId1, relationType, legalEntityId1, legalEntityId2),
+                RelationContent(relationId2, relationType, legalEntityId3, legalEntityId4),
+            ),
+            relationType
         )
 
-        val updatedTimeframe = createRelation(relationId1, RelationType.IsAlternativeHeadquarterFor, legalEntityId1, legalEntityId3)
+        val updatedTimeframe = createRelation(relationId1, relationType, legalEntityId1, legalEntityId3)
 
 
         val expected = PageDto<RelationSharingStateDto>(1, 1, 0, 1,
@@ -268,8 +258,9 @@ class SharingStateControllerIT @Autowired constructor(
         assertIsEqual(actual, expected, updatedTimeframe)
     }
 
-    @Test
-    fun filterByAllFilters(){
+    @ParameterizedTest
+    @EnumSource(RelationType::class)
+    fun filterByAllFilters(relationType: RelationType){
         val legalEntityId1 = "$testName LE 1"
         val legalEntityId2 = "$testName LE 2"
         val legalEntityId3 = "$testName LE 3"
@@ -294,14 +285,15 @@ class SharingStateControllerIT @Autowired constructor(
             createLegalEntityRequest(legalEntityId8)
         ))
 
-        createRelation(relationId2, RelationType.IsAlternativeHeadquarterFor, legalEntityId1, legalEntityId3)
+        createRelation(relationId2, relationType, legalEntityId1, legalEntityId3)
 
         val creationTimeframe = createSharableRelations(
             listOf(
-                RelationContent(relationId1, legalEntityId1, legalEntityId2),
-                RelationContent(relationId3, legalEntityId5, legalEntityId6),
-                RelationContent(relationId4, legalEntityId7, legalEntityId8),
-            )
+                RelationContent(relationId1, relationType, legalEntityId1, legalEntityId2),
+                RelationContent(relationId3, relationType, legalEntityId5, legalEntityId6),
+                RelationContent(relationId4, relationType, legalEntityId7, legalEntityId8),
+            ),
+            relationType
         )
 
         setSharingState(relationId1, RelationSharingStateType.Pending)
@@ -346,9 +338,9 @@ class SharingStateControllerIT @Autowired constructor(
         return Timeframe(beforeCreation, afterCreation)
     }
 
-    private fun createSharableRelations(requests: List<RelationContent>): Timeframe{
+    private fun createSharableRelations(requests: List<RelationContent>, relationType: RelationType): Timeframe{
         val beforeCreation = Instant.now()
-        requests.forEach { createRelation(it.externalId, RelationType.IsAlternativeHeadquarterFor, it.source, it.target) }
+        requests.forEach { createRelation(it.externalId, relationType, it.source, it.target) }
         val afterCreation = Instant.now()
         return Timeframe(beforeCreation, afterCreation)
     }
@@ -384,6 +376,7 @@ class SharingStateControllerIT @Autowired constructor(
 
     data class RelationContent(
         val externalId: String,
+        val relationType: RelationType,
         val source: String,
         val target: String
     )

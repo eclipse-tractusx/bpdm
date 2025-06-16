@@ -20,5 +20,6 @@
 package org.eclipse.tractusx.bpdm.pool.api.model
 
 enum class RelationType {
-    IsAlternativeHeadquarterFor
+    IsAlternativeHeadquarterFor,
+    IsManagedBy
 }

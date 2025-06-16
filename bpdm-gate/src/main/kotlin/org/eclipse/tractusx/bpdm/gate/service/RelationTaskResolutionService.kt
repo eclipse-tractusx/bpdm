@@ -127,6 +127,7 @@ class RelationTaskResolutionService(
     private fun RelationType.toGateModel(): SharableRelationType{
         return when(this){
             RelationType.IsAlternativeHeadquarterFor -> SharableRelationType.IsAlternativeHeadquarterFor
+            RelationType.IsManagedBy -> SharableRelationType.IsManagedBy
         }
     }
 

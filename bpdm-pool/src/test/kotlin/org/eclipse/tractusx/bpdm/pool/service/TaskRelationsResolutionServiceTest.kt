@@ -30,6 +30,8 @@ import org.eclipse.tractusx.bpdm.test.util.PoolDataHelpers
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
@@ -74,11 +76,12 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
     * WHEN: Attempting to upsert the relations into the pool
     * THEN: The operation should fail, returning an error message
     * */
-    @Test
-    fun `create relations with non existing source and target legal entity`() {
+    @ParameterizedTest
+    @EnumSource(RelationType::class)
+    fun `create relations with non existing source and target legal entity`(relationType: RelationType) {
 
         val createRelationsRequest = BusinessPartnerRelations(
-            relationType = RelationType.IsAlternativeHeadquarterFor,
+            relationType = relationType,
             businessPartnerSourceBpnl = BusinessPartnerVerboseValues.firstBpnL,
             businessPartnerTargetBpnl = BusinessPartnerVerboseValues.secondBpnL
         )
@@ -93,8 +96,9 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
     * WHEN: Attempting to create a relation where source and target are the same entity
     * THEN: The operation should fail, returning an error indicating self-relation is not allowed
     * */
-    @Test
-    fun `create relations with same source and target legal entity`() {
+    @ParameterizedTest
+    @EnumSource(RelationType::class)
+    fun `create relations with same source and target legal entity`(relationType: RelationType) {
 
         // Step 1: Create legal entity
         val entity1 = BusinessPartnerNonVerboseValues.legalEntityCreate1
@@ -105,7 +109,7 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         val savedEntity1 = response.entities.toList()[0]
 
         val createRelationsRequest = BusinessPartnerRelations(
-            relationType = RelationType.IsAlternativeHeadquarterFor,
+            relationType = relationType,
             businessPartnerSourceBpnl = savedEntity1.legalEntity.bpnl,
             businessPartnerTargetBpnl = savedEntity1.legalEntity.bpnl
         )
@@ -155,6 +159,67 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         assertThat(responseLegalEntity.relations.first().isActive).isEqualTo(true)
     }
 
+
+    /**
+     * Tests the validation logic for 'IsManagedBy' relation:
+     *
+     * GIVEN:
+     *  - Three legal entities A, B, and C
+     *  - A valid relation A → B of type 'IsManagedBy'
+     *
+     * WHEN:
+     *  - Trying to create A → C: should fail because A is already managed (validateSingleManager)
+     *  - Trying to create B → C: should fail because it creates a cycle (validateNoChain)
+     *
+     * THEN:
+     *  - Both attempts must return an error in the response
+     *  - Error messages should reflect the violated constraint
+     */
+    @Test
+    fun `validate IsManagedBy relation - reject chain and multiple manager violation`() {
+        // Step 1: Create three legal entities A, B, C
+        val entityA = BusinessPartnerNonVerboseValues.legalEntityCreate1
+        val entityB = BusinessPartnerNonVerboseValues.legalEntityCreate2
+        val entityC = BusinessPartnerNonVerboseValues.legalEntityCreate3
+
+        val response = poolClient.legalEntities.createBusinessPartners(listOf(entityA, entityB, entityC))
+        assertThat(response.entities.size).isEqualTo(3)
+        val savedA = response.entities.toList()[0]
+        val savedB = response.entities.toList()[1]
+        val savedC = response.entities.toList()[2]
+
+        // Step 2: Create valid IsManagedBy relation: A is managed by B
+        val validRelation = BusinessPartnerRelations(
+            relationType = RelationType.IsManagedBy,
+            businessPartnerSourceBpnl = savedA.legalEntity.bpnl,
+            businessPartnerTargetBpnl = savedB.legalEntity.bpnl
+        )
+
+        val validResult = upsertRelationsGoldenRecordIntoPool("TASK_VALID", validRelation)
+        assertThat(validResult[0].errors).isEmpty()
+
+        // Step 3a: Try to make A managed by C -> should fail validateSingleManager
+        val violatingSingleManager = BusinessPartnerRelations(
+            relationType = RelationType.IsManagedBy,
+            businessPartnerSourceBpnl = savedA.legalEntity.bpnl,
+            businessPartnerTargetBpnl = savedC.legalEntity.bpnl
+        )
+
+        val resultSingleManagerViolation = upsertRelationsGoldenRecordIntoPool("TASK_VIOLATE_MANAGER", violatingSingleManager)
+        assertThat(resultSingleManagerViolation[0].errors).hasSize(1)
+        assertThat(resultSingleManagerViolation[0].errors[0].description).contains("already managed by")
+
+        // Step 3b: Try to make B managed by C -> should fail validateNoChain
+        val violatingChain = BusinessPartnerRelations(
+            relationType = RelationType.IsManagedBy,
+            businessPartnerSourceBpnl = savedB.legalEntity.bpnl,
+            businessPartnerTargetBpnl = savedC.legalEntity.bpnl
+        )
+
+        val resultChainViolation = upsertRelationsGoldenRecordIntoPool("TASK_VIOLATE_CHAIN", violatingChain)
+        assertThat(resultChainViolation[0].errors).hasSize(1)
+        assertThat(resultChainViolation[0].errors[0].description).contains("Invalid relation")
+    }
 
 
     private fun upsertRelationsGoldenRecordIntoPool(taskId: String, businessPartnerRelations: BusinessPartnerRelations): List<TaskRelationsStepResultEntryDto> {

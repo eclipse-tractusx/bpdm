@@ -43,9 +43,10 @@ import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.eclipse.tractusx.orchestrator.api.ApiCommons
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.RegisterExtension
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
@@ -99,8 +100,9 @@ class RelationTaskResolutionServiceIT @Autowired constructor(
         orchestratorWireMockServer.resetAll()
     }
 
-    @Test
-    fun resolvePendingTasks(){
+    @ParameterizedTest
+    @EnumSource(RelationType::class)
+    fun resolvePendingTasks(relationType: RelationType){
         val bpnL1 = "$testName BPNL1"
         val bpnL2 = "$testName BPNL2"
         val relationId1 = "$testName R 1"
@@ -124,9 +126,9 @@ class RelationTaskResolutionServiceIT @Autowired constructor(
         ))
 
         val orchestratorMockResultResponse = TaskRelationsStateResponse(listOf(
-            TaskClientRelationsStateDto(taskId1, recordId1, BusinessPartnerRelations(RelationType.IsAlternativeHeadquarterFor, bpnL1,bpnL2),
+            TaskClientRelationsStateDto(taskId1, recordId1, BusinessPartnerRelations(relationType, bpnL1,bpnL2),
                 TaskProcessingRelationsStateDto(ResultState.Success, TaskStep.PoolSync, StepState.Success, emptyList(), anyTime, anyTime, anyTime )),
-            TaskClientRelationsStateDto(taskId2, recordId2, BusinessPartnerRelations(RelationType.IsAlternativeHeadquarterFor, bpnL1,bpnL2),
+            TaskClientRelationsStateDto(taskId2, recordId2, BusinessPartnerRelations(relationType, bpnL1,bpnL2),
                 TaskProcessingRelationsStateDto(ResultState.Error, TaskStep.CleanAndSync, StepState.Error, listOf(TaskRelationsErrorDto(errorType, errorDescription)), anyTime, anyTime, anyTime )),
         ))
 
@@ -147,7 +149,15 @@ class RelationTaskResolutionServiceIT @Autowired constructor(
         relationTaskResolutionService.checkResolveTasks()
 
         val expectedOutput = PageDto<RelationOutputDto>(1, 1, 0, 1, listOf(
-            RelationOutputDto(relationId1, SharableRelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL2, anyTime)
+            RelationOutputDto(
+                relationId1,
+                when(relationType) {
+                  RelationType.IsAlternativeHeadquarterFor -> SharableRelationType.IsAlternativeHeadquarterFor
+                  RelationType.IsManagedBy -> SharableRelationType.IsManagedBy
+                },
+                bpnL1,
+                bpnL2,
+                anyTime)
         ))
         val expectedSharingStates = PageDto<RelationSharingStateDto>(2, 1, 0, 2, listOf(
             RelationSharingStateDto(relationId1, RelationSharingStateType.Success, null, null, taskId1, anyTime),

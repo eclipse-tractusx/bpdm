@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.orchestrator.entity
 
 import jakarta.persistence.*
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
 import org.eclipse.tractusx.orchestrator.api.model.TaskMode
 import org.eclipse.tractusx.orchestrator.api.model.TaskStep
 import org.hibernate.annotations.Type
@@ -130,7 +129,8 @@ class RelationsGoldenRecordTaskDb(
     }
 
     enum class RelationType {
-        IsAlternativeHeadquarterFor
+        IsAlternativeHeadquarterFor,
+        IsManagedBy
     }
 
 }

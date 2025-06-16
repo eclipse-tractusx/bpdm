@@ -33,8 +33,9 @@ import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.gate.GateInputFactory
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
@@ -70,9 +71,10 @@ class RelationChangelogControllerIT @Autowired constructor(
         testName = testInfo.displayName
     }
 
-    @Test
-    fun changelogCreated(){
-        givenRelations(RelationPutEntry("${testName}_rel", RelationType.IsAlternativeHeadquarterFor, "${testName}_source", "${testName}_target"))
+    @ParameterizedTest
+    @EnumSource(RelationType::class)
+    fun changelogCreated(relationType: RelationType){
+        givenRelations(RelationPutEntry("${testName}_rel", relationType, "${testName}_source", "${testName}_target"))
 
         val expectedContent = listOf(
             ChangelogGateDto("${testName}_rel", anyTime, ChangelogType.CREATE)
@@ -82,13 +84,14 @@ class RelationChangelogControllerIT @Autowired constructor(
         assertChangelogsEqual(response.content, expectedContent)
     }
 
-    @Test
-    fun changelogUpdated(){
+    @ParameterizedTest
+    @EnumSource(RelationType::class)
+    fun changelogUpdated(relationType: RelationType){
         val relationExternalId = "${testName}_rel"
         val sourceExternalId = "${testName}_source"
         val targetExternalId = "${testName}_target"
-        givenRelations(RelationPutEntry(relationExternalId, RelationType.IsAlternativeHeadquarterFor, sourceExternalId, targetExternalId))
-        gateClient.relation.put(false, RelationPutRequest(listOf(RelationPutEntry(relationExternalId, RelationType.IsAlternativeHeadquarterFor,targetExternalId, sourceExternalId))))
+        givenRelations(RelationPutEntry(relationExternalId, relationType, sourceExternalId, targetExternalId))
+        gateClient.relation.put(false, RelationPutRequest(listOf(RelationPutEntry(relationExternalId, relationType, targetExternalId, sourceExternalId))))
 
         val expectedContent = listOf(
             ChangelogGateDto("${testName}_rel", anyTime, ChangelogType.CREATE),
@@ -99,14 +102,15 @@ class RelationChangelogControllerIT @Autowired constructor(
         assertChangelogsEqual(response.content, expectedContent)
     }
 
-    @Test
-    fun filterByExternalId(){
+    @ParameterizedTest
+    @EnumSource(RelationType::class)
+    fun filterByExternalId(relationType: RelationType){
         val externalId1 = "${testName}_rel1"
         val externalId2 = "${testName}_rel2"
 
         givenRelations(
-            RelationPutEntry(externalId1, RelationType.IsAlternativeHeadquarterFor, "${externalId1}_source", "${externalId1}_target"),
-            RelationPutEntry(externalId2, RelationType.IsAlternativeHeadquarterFor, "${externalId2}_source", "${externalId2}_target"),
+            RelationPutEntry(externalId1, relationType, "${externalId1}_source", "${externalId1}_target"),
+            RelationPutEntry(externalId2, relationType, "${externalId2}_source", "${externalId2}_target"),
             )
 
         val expectedContent = listOf(
@@ -117,16 +121,17 @@ class RelationChangelogControllerIT @Autowired constructor(
         assertChangelogsEqual(response.content, expectedContent)
     }
 
-    @Test
-    fun filterByTimestamp(){
+    @ParameterizedTest
+    @EnumSource(RelationType::class)
+    fun filterByTimestamp(relationType: RelationType){
         val externalId1 = "${testName}_rel1"
         val externalId2 = "${testName}_rel2"
 
-        givenRelations(RelationPutEntry(externalId1, RelationType.IsAlternativeHeadquarterFor, "${externalId1}_source", "${externalId1}_target"))
+        givenRelations(RelationPutEntry(externalId1, relationType, "${externalId1}_source", "${externalId1}_target"))
 
         val timeAfterFirstCreate = Instant.now()
 
-        givenRelations(RelationPutEntry(externalId2, RelationType.IsAlternativeHeadquarterFor, "${externalId2}_source", "${externalId2}_target"))
+        givenRelations(RelationPutEntry(externalId2, relationType, "${externalId2}_source", "${externalId2}_target"))
 
         val expectedContent = listOf(
             ChangelogGateDto(externalId2, anyTime, ChangelogType.CREATE)
@@ -136,19 +141,20 @@ class RelationChangelogControllerIT @Autowired constructor(
         assertChangelogsEqual(response.content, expectedContent)
     }
 
-    @Test
-    fun filterByAll(){
+    @ParameterizedTest
+    @EnumSource(RelationType::class)
+    fun filterByAll(relationType: RelationType){
         val externalId1 = "${testName}_rel1"
         val externalId2 = "${testName}_rel2"
         val externalId3 = "${testName}_rel3"
 
-        givenRelations(RelationPutEntry(externalId1, RelationType.IsAlternativeHeadquarterFor, "${externalId1}_source", "${externalId1}_target"))
+        givenRelations(RelationPutEntry(externalId1, relationType, "${externalId1}_source", "${externalId1}_target"))
 
         val timeAfterFirstCreate = Instant.now()
 
         givenRelations(
-            RelationPutEntry(externalId2, RelationType.IsAlternativeHeadquarterFor, "${externalId2}_source", "${externalId2}_target"),
-            RelationPutEntry(externalId3, RelationType.IsAlternativeHeadquarterFor, "${externalId3}_source", "${externalId3}_target"),
+            RelationPutEntry(externalId2, relationType, "${externalId2}_source", "${externalId2}_target"),
+            RelationPutEntry(externalId3, relationType, "${externalId3}_source", "${externalId3}_target"),
         )
 
         val expectedContent = listOf(

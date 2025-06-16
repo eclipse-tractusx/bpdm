@@ -3459,10 +3459,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ErrorInfoAddressCreateError"
-        entityCount:
+        errorCount:
           type: integer
           format: int32
-        errorCount:
+        entityCount:
           type: integer
           format: int32
       required:
@@ -3626,10 +3626,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ErrorInfoAddressUpdateError"
-        entityCount:
+        errorCount:
           type: integer
           format: int32
-        errorCount:
+        entityCount:
           type: integer
           format: int32
       required:
@@ -5467,10 +5467,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ErrorInfoLegalEntityCreateError"
-        entityCount:
+        errorCount:
           type: integer
           format: int32
-        errorCount:
+        entityCount:
           type: integer
           format: int32
       required:
@@ -5631,10 +5631,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ErrorInfoLegalEntityUpdateError"
-        entityCount:
+        errorCount:
           type: integer
           format: int32
-        errorCount:
+        entityCount:
           type: integer
           format: int32
       required:
@@ -7897,6 +7897,7 @@ components:
           description: The type of relation between the Legal Entities
           enum:
             - IsAlternativeHeadquarterFor
+            - IsManagedBy
         businessPartnerSourceBpnl:
           type: string
           description: BPN of partner from which the relation emerges (the source)
@@ -7986,10 +7987,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ErrorInfoSiteCreateError"
-        entityCount:
+        errorCount:
           type: integer
           format: int32
-        errorCount:
+        entityCount:
           type: integer
           format: int32
       required:
@@ -8114,10 +8115,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ErrorInfoSiteUpdateError"
-        entityCount:
+        errorCount:
           type: integer
           format: int32
-        errorCount:
+        entityCount:
           type: integer
           format: int32
       required:
