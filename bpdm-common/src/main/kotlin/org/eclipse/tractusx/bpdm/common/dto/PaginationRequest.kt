@@ -29,12 +29,12 @@ import jakarta.validation.constraints.PositiveOrZero
 data class PaginationRequest (
 
     @field:Parameter(
-        description = "Number of page to get results from", schema =
+        description = "Number of page to get results from", required = false, schema =
         Schema(defaultValue = "0"))
     @field:PositiveOrZero
     val page: Int=0,
 
-    @field:Parameter(description = "Size of each page", schema =
+    @field:Parameter(description = "Size of each page", required = false, schema =
     Schema(defaultValue = "10"))
     @field:Min(0)
     @field:Max(100)

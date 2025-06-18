@@ -19,7 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.model.request
 
+import io.swagger.v3.oas.annotations.Parameter
+
 data class LegalEntitySearchRequest(
+    @field:Parameter(required = false)
     val bpnLs: List<String> = emptyList(),
     val legalName: String? = null
 )

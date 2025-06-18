@@ -19,8 +19,12 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.model.request
 
+import io.swagger.v3.oas.annotations.Parameter
+
 data class SiteSearchRequest(
+    @field:Parameter(required = false)
     val siteBpns: List<String> = emptyList(),
+    @field:Parameter(required = false)
     val legalEntityBpns: List<String> = emptyList(),
     val name: String? = null
 )
