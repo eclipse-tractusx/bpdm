@@ -181,6 +181,13 @@
                 <version>42.7.7</version>
             </dependency>
 
+            <!-- Increase dependency version to mitigate high vulnerability -->
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-core</artifactId>
+                <version>11.0.8</version>
+            </dependency>
+
             <!-- Test -->
             <dependency>
                 <groupId>com.github.tomakehurst</groupId>
