@@ -23,7 +23,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 
 data class SiteBpnSearchRequest(
 
-    @Schema(description = "Filter sites that should belong to legal entities (specified by BPNL)")
+    @Schema(description = "Filter sites that should belong to legal entities (specified by BPNL)", required = false)
     val legalEntities: Collection<String> = emptyList(),
 
     @Schema(description = "Filter sites by BPNS of sites")
