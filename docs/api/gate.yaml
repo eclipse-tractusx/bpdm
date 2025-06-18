@@ -2724,6 +2724,7 @@ components:
           type: string
           enum:
             - IsAlternativeHeadquarterFor
+            - IsManagedBy
         sourceBpnL:
           type: string
         targetBpnL:
@@ -2752,6 +2753,7 @@ components:
           description: Only show relations of the given type
           enum:
             - IsAlternativeHeadquarterFor
+            - IsManagedBy
         sourceBpnLs:
           type: array
           description: Only show relations which have the given business partners

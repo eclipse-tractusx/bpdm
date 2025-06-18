@@ -20,5 +20,6 @@
 package org.eclipse.tractusx.bpdm.gate.api.model
 
 enum class SharableRelationType {
-    IsAlternativeHeadquarterFor
+    IsAlternativeHeadquarterFor,
+    IsManagedBy
 }

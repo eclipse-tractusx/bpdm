@@ -54,7 +54,7 @@ class RelationsGoldenRecordTaskEventControllerIT @Autowired constructor(
         businessPartnerTargetBpnl = "BPNL2"
     )
     private val defaultRelations2 = BusinessPartnerRelations(
-        relationType = RelationType.IsAlternativeHeadquarterFor,
+        relationType = RelationType.IsManagedBy,
         businessPartnerSourceBpnl = "BPNL3",
         businessPartnerTargetBpnl = "BPNL4"
     )

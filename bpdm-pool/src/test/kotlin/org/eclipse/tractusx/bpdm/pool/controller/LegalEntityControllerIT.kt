@@ -44,6 +44,8 @@ import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.eclipse.tractusx.bpdm.test.util.PoolDataHelpers
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
@@ -687,8 +689,9 @@ class LegalEntityControllerIT @Autowired constructor(
      * When creating a relation between them
      * Then the relation is persisted and can be retrieved
      */
-    @Test
-    fun `create and fetch relation between two legal entities` () {
+    @ParameterizedTest
+    @EnumSource(RelationType::class)
+    fun `create and fetch relation between two legal entities` (relationType: RelationType) {
         /*
         * This test case is created as abstract and had scope to refactor more in future,
         * when we'll have orchestrator logic confirmed to create and update relations in golden record process.
@@ -706,7 +709,7 @@ class LegalEntityControllerIT @Autowired constructor(
 
         // Step 2: Create a relation
         val relation = RelationDb(
-            type = RelationType.IsAlternativeHeadquarterFor,
+            type = relationType,
             startNode = legalEntityRepository.findByBpnIgnoreCase(savedEntity1.legalEntity.bpnl)!!,
             endNode = legalEntityRepository.findByBpnIgnoreCase(savedEntity2.legalEntity.bpnl)!!,
             isActive = true
@@ -718,7 +721,7 @@ class LegalEntityControllerIT @Autowired constructor(
         val savedRelation = releationRepository.findAll()
 
         assertThat(savedRelation).isNotNull
-        assertThat(savedRelation.first().type).isEqualTo(RelationType.IsAlternativeHeadquarterFor)
+        assertThat(savedRelation.first().type).isEqualTo(relationType)
         assertThat(savedRelation.first().startNode.bpn).isEqualTo(savedEntity1.legalEntity.bpnl)
         assertThat(savedRelation.first().endNode.bpn).isEqualTo(savedEntity2.legalEntity.bpnl)
         assertThat(savedRelation.first().isActive).isTrue()

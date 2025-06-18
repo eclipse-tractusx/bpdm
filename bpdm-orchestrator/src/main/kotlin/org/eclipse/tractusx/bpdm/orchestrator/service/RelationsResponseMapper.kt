@@ -63,6 +63,7 @@ class RelationsResponseMapper {
     fun toRelationType(relationType: RelationsGoldenRecordTaskDb.RelationType) =
         when(relationType){
             RelationsGoldenRecordTaskDb.RelationType.IsAlternativeHeadquarterFor -> RelationType.IsAlternativeHeadquarterFor
+            RelationsGoldenRecordTaskDb.RelationType.IsManagedBy -> RelationType.IsManagedBy
         }
 
     fun toResultState(resultState: RelationsGoldenRecordTaskDb.ResultState) =

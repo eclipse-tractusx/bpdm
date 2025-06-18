@@ -44,12 +44,12 @@ import org.eclipse.tractusx.bpdm.test.testdata.gate.withAddressType
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.eclipse.tractusx.bpdm.test.util.Timeframe
 import org.eclipse.tractusx.orchestrator.api.ApiCommons
-import org.eclipse.tractusx.orchestrator.api.RelationsGoldenRecordTaskApi
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.RegisterExtension
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
@@ -102,8 +102,9 @@ class RelationTaskCreationServiceIT @Autowired constructor(
         orchestratorWireMockServer.resetAll()
     }
 
-    @Test
-    fun createTaskForInitialRelation(){
+    @ParameterizedTest
+    @EnumSource(RelationType::class)
+    fun createTaskForInitialRelation(relationType: RelationType){
         val legalEntityId1 = "$testName LE 1"
         val legalEntityId2 = "$testName LE 2"
         val legalEntityBpnL1 = "$testName BPNL 1"
@@ -119,10 +120,20 @@ class RelationTaskCreationServiceIT @Autowired constructor(
         assignOutputBpnL(legalEntityId1, legalEntityBpnL1)
         assignOutputBpnL(legalEntityId2, legalEntityBpnL2)
 
-        createRelation(relationId, RelationType.IsAlternativeHeadquarterFor, legalEntityId1, legalEntityId2)
+        createRelation(relationId, relationType, legalEntityId1, legalEntityId2)
 
         val orchestratorMockResponse = TaskCreateRelationsResponse(listOf(
-            TaskClientRelationsStateDto(taskId,recordId, BusinessPartnerRelations(org.eclipse.tractusx.orchestrator.api.model.RelationType.IsAlternativeHeadquarterFor, legalEntityBpnL1, legalEntityBpnL2),
+            TaskClientRelationsStateDto(
+                taskId,
+                recordId,
+                BusinessPartnerRelations(
+                    when(relationType) {
+                        RelationType.IsAlternativeHeadquarterFor -> org.eclipse.tractusx.orchestrator.api.model.RelationType.IsAlternativeHeadquarterFor
+                        RelationType.IsManagedBy -> org.eclipse.tractusx.orchestrator.api.model.RelationType.IsManagedBy
+                    },
+                    legalEntityBpnL1,
+                    legalEntityBpnL2
+                ),
                 TaskProcessingRelationsStateDto(ResultState.Pending, TaskStep.CleanAndSync, StepState.Queued, emptyList(), anyTime, anyTime, anyTime))
         ))
 

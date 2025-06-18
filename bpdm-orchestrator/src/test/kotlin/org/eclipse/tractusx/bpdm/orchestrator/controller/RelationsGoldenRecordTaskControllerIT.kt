@@ -49,7 +49,7 @@ class RelationsGoldenRecordTaskControllerIT @Autowired constructor(
 ) {
 
     private val defaultRelations1 = BusinessPartnerRelations(relationType = RelationType.IsAlternativeHeadquarterFor, businessPartnerSourceBpnl = "BPNL1", businessPartnerTargetBpnl = "BPNL2")
-    private val defaultRelations2 = BusinessPartnerRelations(relationType = RelationType.IsAlternativeHeadquarterFor, businessPartnerSourceBpnl = "BPNL3", businessPartnerTargetBpnl = "BPNL4")
+    private val defaultRelations2 = BusinessPartnerRelations(relationType = RelationType.IsManagedBy, businessPartnerSourceBpnl = "BPNL3", businessPartnerTargetBpnl = "BPNL4")
 
     @BeforeEach
     fun cleanUp() {

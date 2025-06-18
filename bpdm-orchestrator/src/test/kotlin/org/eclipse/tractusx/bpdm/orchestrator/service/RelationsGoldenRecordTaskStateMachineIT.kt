@@ -57,7 +57,8 @@ class RelationsGoldenRecordTaskStateMachineIT  @Autowired constructor(
     private val stateMachineConfigProperties: StateMachineConfigProperties
 ) {
 
-    private val businessPartnerRelations = BusinessPartnerRelations(relationType = RelationType.IsAlternativeHeadquarterFor, businessPartnerSourceBpnl = "BPNL1", businessPartnerTargetBpnl = "BPNL2")
+    private val businessPartnerRelations1 = BusinessPartnerRelations(relationType = RelationType.IsAlternativeHeadquarterFor, businessPartnerSourceBpnl = "BPNL1", businessPartnerTargetBpnl = "BPNL2")
+    private val businessPartnerRelations2 = BusinessPartnerRelations(relationType = RelationType.IsManagedBy, businessPartnerSourceBpnl = "BPNL3", businessPartnerTargetBpnl = "BPNL4")
     private lateinit var gateRecord: GateRecordDb
 
     @BeforeEach
@@ -75,7 +76,7 @@ class RelationsGoldenRecordTaskStateMachineIT  @Autowired constructor(
     @Transactional
     fun `initial state`(taskMode: TaskMode) {
         val now = Instant.now()
-        val task = relationsGoldenRecordTaskStateMachine.initTask(taskMode, businessPartnerRelations, gateRecord)
+        val task = relationsGoldenRecordTaskStateMachine.initTask(taskMode, businessPartnerRelations1, gateRecord)
         val expectedStep = stateMachineConfigProperties.modeSteps[taskMode]!!.first()
         val state = task.processingState
 
@@ -98,7 +99,7 @@ class RelationsGoldenRecordTaskStateMachineIT  @Autowired constructor(
     @Transactional
     fun `walk through all UpdateFromSharingMember steps`(taskMode: TaskMode) {
         // new task
-        val task = relationsGoldenRecordTaskStateMachine.initTask(taskMode, businessPartnerRelations, gateRecord)
+        val task = relationsGoldenRecordTaskStateMachine.initTask(taskMode, businessPartnerRelations2, gateRecord)
 
         val allSteps = stateMachineConfigProperties.modeSteps[taskMode]!!
         allSteps.forEach { step ->
@@ -116,10 +117,10 @@ class RelationsGoldenRecordTaskStateMachineIT  @Autowired constructor(
             }.isInstanceOf(RelationsIllegalStateException::class.java)
 
             // resolve
-            relationsGoldenRecordTaskStateMachine.resolveTaskStepToSuccess(task, step, businessPartnerRelations)
+            relationsGoldenRecordTaskStateMachine.resolveTaskStepToSuccess(task, step, businessPartnerRelations2)
 
             // resolve again ignored
-           relationsGoldenRecordTaskStateMachine.resolveTaskStepToSuccess(task, step, businessPartnerRelations)
+           relationsGoldenRecordTaskStateMachine.resolveTaskStepToSuccess(task, step, businessPartnerRelations2)
         }
 
         val finalStep = stateMachineConfigProperties.modeSteps[taskMode]!!.last()
@@ -150,7 +151,7 @@ class RelationsGoldenRecordTaskStateMachineIT  @Autowired constructor(
     @Transactional
     fun `walk through steps and resolve with error`(taskMode: TaskMode) {
         // new task
-        val task = relationsGoldenRecordTaskStateMachine.initTask(taskMode, businessPartnerRelations, gateRecord)
+        val task = relationsGoldenRecordTaskStateMachine.initTask(taskMode, businessPartnerRelations1, gateRecord)
         val expectedStep = stateMachineConfigProperties.modeSteps[taskMode]!!.first()
         assertProcessingState(task.processingState, RelationsGoldenRecordTaskDb.ResultState.Pending, expectedStep, RelationsGoldenRecordTaskDb.StepState.Queued)
         // taskPendingTimeout has been set
@@ -182,7 +183,7 @@ class RelationsGoldenRecordTaskStateMachineIT  @Autowired constructor(
         }.isInstanceOf(RelationsIllegalStateException::class.java)
 
         // Resolve again ignored
-        relationsGoldenRecordTaskStateMachine.resolveTaskStepToSuccess(task, expectedStep, businessPartnerRelations)
+        relationsGoldenRecordTaskStateMachine.resolveTaskStepToSuccess(task, expectedStep, businessPartnerRelations1)
     }
 
     private fun assertProcessingState(processingState: RelationsGoldenRecordTaskDb.ProcessingState,

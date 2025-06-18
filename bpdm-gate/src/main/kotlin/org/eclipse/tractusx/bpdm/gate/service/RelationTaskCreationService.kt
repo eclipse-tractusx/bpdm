@@ -134,7 +134,7 @@ class RelationTaskCreationService(
 
     private fun RelationType.toOrchestratorModel(): org.eclipse.tractusx.orchestrator.api.model.RelationType?{
         return when(this){
-            RelationType.IsManagedBy -> null
+            RelationType.IsManagedBy -> org.eclipse.tractusx.orchestrator.api.model.RelationType.IsManagedBy
             RelationType.IsAlternativeHeadquarterFor -> org.eclipse.tractusx.orchestrator.api.model.RelationType.IsAlternativeHeadquarterFor
         }
     }
