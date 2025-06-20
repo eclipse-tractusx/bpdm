@@ -5,27 +5,26 @@
 This repository is part of the overarching Eclipse Tractus-X project.
 
 BPDM is an acronym for business partner data management.
+
 This project serves two main purposes:
 
-1. Provide services for querying and sharing business partner information
-2. Establish an infrastructure for realising the Golden Record process which turns business partner information from sharing members to Golden Records, that is
-   cleaned and enriched business partner data uniquely identified by a business partner number (BPN)
+1. Provide services for uploading and downloading business partner data records, so that data space participants can find and identify each other and exchange data in a legally secure manner
+2. Establish an infrastructure for realizing the Golden Record process which turns business partner data records from data space participants to Golden Records, that is cleaned and enriched business partner data records uniquely identified by a business partner number (BPN)
 
 The following sections give an overview of this repository's structure.
 
 ## BPDM Applications
 
 Heart of this project is the source code for the BPDM applications.
-Together, those applications provide the infrastucture for the Golden Record process.
+Together, those applications provide the infrastructure for the Golden Record process.
 The BPDM solution contains the following applications:
 
 - [Pool](bpdm-pool): The single source of truth for Golden Records and BPNs
-- [Gate](bpdm-gate): Holds business partner data from sharing members and allows them to share the data to the golden record process
-- [Orchestrator](bpdm-orchestrator): Facilitates business partner data between Gate, Pool and external cleaning services
-- [Cleaning Service Dummy](bpdm-cleaning-service-dummy): A dummy implementation of a cleaning service, responsible for processing business partner data and
-  turning it one step closer to a Golden Record
+- [Gate](bpdm-gate): Allows data space participants to provide business partner data records to the Golden Record process and consume Golden Record data from the BPDM Pool
+- [Orchestrator](bpdm-orchestrator): Supports the coordination of the data flow between BPDM Gate, BPDM Pool and external Data Curation and Enrichment Services
+- [Cleaning Service Dummy](bpdm-cleaning-service-dummy): A dummy implementation of a Data Curation and Enrichment Service, responsible for processing business partner data records and turning them into Golden Records
 
-Subfolders for BPDM applications are easily recognizable by the `bpdm` prefix.
+Sub-folders for BPDM applications are easily recognizable by the `bpdm` prefix.
 
 ## Installation
 
