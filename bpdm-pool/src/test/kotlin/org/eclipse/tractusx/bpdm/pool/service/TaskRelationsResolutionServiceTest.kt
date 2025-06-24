@@ -207,7 +207,7 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
 
         val resultSingleManagerViolation = upsertRelationsGoldenRecordIntoPool("TASK_VIOLATE_MANAGER", violatingSingleManager)
         assertThat(resultSingleManagerViolation[0].errors).hasSize(1)
-        assertThat(resultSingleManagerViolation[0].errors[0].description).contains("already managed by")
+        assertThat(resultSingleManagerViolation[0].errors[0].description).contains("already managed by another Managing Legal Entity")
 
         // Step 3b: Try to make B managed by C -> should fail validateNoChain
         val violatingChain = BusinessPartnerRelations(
@@ -218,7 +218,7 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
 
         val resultChainViolation = upsertRelationsGoldenRecordIntoPool("TASK_VIOLATE_CHAIN", violatingChain)
         assertThat(resultChainViolation[0].errors).hasSize(1)
-        assertThat(resultChainViolation[0].errors[0].description).contains("Invalid relation")
+        assertThat(resultChainViolation[0].errors[0].description).contains("already a Managing Legal Entity.")
     }
 
 

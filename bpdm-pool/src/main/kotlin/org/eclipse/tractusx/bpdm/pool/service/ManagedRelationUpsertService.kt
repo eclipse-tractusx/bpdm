@@ -56,8 +56,15 @@ class ManagedRelationUpsertService(
         val sourceIsTarget = sourceRelations.any { it.endNode.id == source.id }
         val targetIsSource = targetRelations.any { it.startNode.id == target.id }
 
-        if (sourceIsTarget || targetIsSource) {
-            throw BpdmValidationException("Invalid relation: A golden record cannot be both a manager and a managed entity in an 'IsManagedBy' relationship.")
+        when {
+            sourceIsTarget -> throw BpdmValidationException(
+                "Invalid 'IsManagedBy' relation: The legal entity with BPNL '${source.bpn}' is already a Managing Legal Entity. " +
+                        "A Managing Legal Entity cannot also act as a Managed Legal Entity."
+            )
+            targetIsSource -> throw BpdmValidationException(
+                "Invalid 'IsManagedBy' relation: The legal entity with BPNL '${target.bpn}' is already a Managed Legal Entity. " +
+                        "A Managed Legal Entity cannot also act as a Managing Legal Entity."
+            )
         }
     }
 
@@ -67,7 +74,10 @@ class ManagedRelationUpsertService(
 
         if (existingManagers.isNotEmpty()) {
             val managerBpns = existingManagers.joinToString { it.endNode.bpn }
-            throw BpdmValidationException("The entity with BPNL '${source.bpn}' is already managed by: $managerBpns")
+            throw BpdmValidationException(
+                "Invalid 'IsManagedBy' relation: The Managed Legal Entity with BPNL '${source.bpn}' is already managed by another Managing Legal Entity '${managerBpns}'. " +
+                        "A Managed Legal Entity may only have one Managing Legal Entity at a time."
+            )
         }
     }
 
