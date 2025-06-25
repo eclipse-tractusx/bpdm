@@ -89,6 +89,12 @@
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.moduleKey>${project.artifactId}</sonar.moduleKey>
         <sonar.coverage.exclusions>
+            bpdm-gate-api/*,
+            bpdm-orchestrator-api/*,
+            bpdm-pool-api/*,
+            bpdm-system-tester/*,
+            bpdm-migration-helper/*,
+            bpdm-common-test/*,
             bpdm-cleaning-service-dummy/src/main/kotlin/org/eclipse/tractusx/bpdm/cleaning/Application.kt,
             bpdm-gate/src/main/kotlin/org/eclipse/tractusx/bpdm/gate/Application.kt,
             bpdm-migration-helper/src/main/kotlin/org/eclipse/tractusx/bpdm/migration/helper/Application.kt,
