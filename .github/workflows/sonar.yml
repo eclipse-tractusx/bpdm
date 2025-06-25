@@ -27,44 +27,16 @@ on:
   workflow_dispatch:
 
 jobs:
-  analyze:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up JDK 21
-        uses: actions/setup-java@v4
-        with:
-          java-version: '21'
-          distribution: 'temurin'
-
-      - name: Maven Verify
-        run: mvn -B verify
-
-  check_sonar_configured:
-    runs-on: ubuntu-latest
-    steps:
-      - name: check_sonar_configured
-        run: |
-          echo "Checking if sonar is configured: ${{ env.SONAR_CONFIGURED }}"
-    env:
-      SONAR_CONFIGURED: ${{ secrets.SONAR_TOKEN != '' && secrets.SONAR_PROJECT_KEY != '' && secrets.SONAR_ORGANIZATION != '' }}
-    outputs:
-      sonar_configured: ${{ env.SONAR_CONFIGURED }}
-
   analyze_with_Sonar:
-    needs: [check_sonar_configured]
-    # No need to run if we cannot use the sonar token
-    if: >-
-      needs.check_sonar_configured.outputs.sonar_configured == 'true'
-      && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) 
-      && github.actor != 'dependabot[bot]'
+    # Optional: exclude PRs from forks (to avoid secrets exposure)
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of sonar analysis
+          fetch-depth: 0  # Needed for blame info and accurate SonarCloud analysis
 
       - name: Set up JDK 21
         uses: actions/setup-java@v4
@@ -72,7 +44,7 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      - name: Cache maven packages
+      - name: Cache Maven packages
         uses: actions/cache@v4
         with:
           path: ~/.m2
@@ -86,12 +58,15 @@ jobs:
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
 
-      - name: Analyze with Sonar
+      - name: Build, test and analyze with SonarCloud
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}    # Required for PR decoration
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}      # SonarCloud auth token
         run: |
           mvn --batch-mode --update-snapshots verify \
-          org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-          -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }} \
-          -Dcheckstyle.skip -Dpmd.skip=true
+            org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} \
+            -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }} \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
+            -Dcheckstyle.skip -Dpmd.skip=true
