@@ -48,7 +48,6 @@
         <module>bpdm-orchestrator-api</module>
         <module>bpdm-system-tester</module>
         <module>bpdm-migration-helper</module>
-        <module>bpdm-coverage</module>
     </modules>
 
     <properties>
@@ -74,36 +73,13 @@
         <license-tool.version>1.1.0</license-tool.version>
         <assertj.version>3.24.2</assertj.version>
         <commons-beanutils.version>1.11.0</commons-beanutils.version>
-        <!-- versions for Maven plugin -->
-        <jacoco-plugin.version>0.8.12</jacoco-plugin.version>
-        <sonar-maven-plugin.version>3.10.0.2594</sonar-maven-plugin.version>
-        <maven-surefire-plugin.version>3.5.3</maven-surefire-plugin.version>
         <!-- Sonar related properties -->
-        <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
-        <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
-        <sonar.tests>
-            src/test/kotlin
-        </sonar.tests>
         <sonar.organization>eclipse-tractusx</sonar.organization>
-        <sonar.projectKey>eclipse-tractusx_bpdm</sonar.projectKey>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.projectKey>eclipse-tractusx_bpdm</sonar.projectKey>
         <sonar.moduleKey>${project.artifactId}</sonar.moduleKey>
-        <sonar.coverage.exclusions>
-            bpdm-gate-api/*,
-            bpdm-orchestrator-api/*,
-            bpdm-pool-api/*,
-            bpdm-system-tester/*,
-            bpdm-migration-helper/*,
-            bpdm-common-test/*,
-            bpdm-cleaning-service-dummy/src/main/kotlin/org/eclipse/tractusx/bpdm/cleaning/Application.kt,
-            bpdm-gate/src/main/kotlin/org/eclipse/tractusx/bpdm/gate/Application.kt,
-            bpdm-migration-helper/src/main/kotlin/org/eclipse/tractusx/bpdm/migration/helper/Application.kt,
-            bpdm-orchestrator/src/main/kotlin/org/eclipse/tractusx/bpdm/orchestrator/Application.kt,
-            bpdm-pool/src/main/kotlin/org/eclipse/tractusx/bpdm/pool/Application.kt,
-            bpdm-system-tester/src/main/kotlin/org/eclipse/tractusx/bpdm/test/system/Application.kt,
-            **/*Config.kt,
-            **/*Properties
-        </sonar.coverage.exclusions>
+        <sonar.version>3.10.0.2594</sonar.version>
+        <jacoco.version>0.8.12</jacoco.version>
     </properties>
 
     <pluginRepositories>
@@ -254,6 +230,19 @@
         <pluginManagement>
             <plugins>
                 <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>integration-test</id>
+                            <goals>
+                                <goal>integration-test</goal>
+                                <goal>verify</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
                     <groupId>org.jetbrains.kotlin</groupId>
                     <artifactId>kotlin-maven-plugin</artifactId>
                     <version>${kotlin.version}</version>
@@ -316,9 +305,34 @@
                     </executions>
                 </plugin>
                 <plugin>
+                    <groupId>org.sonarsource.scanner.maven</groupId>
+                    <artifactId>sonar-maven-plugin</artifactId>
+                    <version>${sonar.version}</version>
+                </plugin>
+                <!-- Creates test coverage report -->
+                <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>${jacoco-plugin.version}</version>
+                    <version>${jacoco.version}</version>
+                    <executions>
+                        <execution>
+                            <id>prepare-agent</id>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>report</id>
+                            <goals>
+                                <goal>report</goal>
+                            </goals>
+                            <configuration>
+                                <formats>
+                                    <format>XML</format>
+                                </formats>
+                            </configuration>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -366,66 +380,6 @@
                     <summary>DEPENDENCIES</summary>
                     <includeScope>test</includeScope>
                 </configuration>
-            </plugin>
-            <!-- Sonar Scanner-->
-            <plugin>
-                <groupId>org.sonarsource.scanner.maven</groupId>
-                <artifactId>sonar-maven-plugin</artifactId>
-                <version>${sonar-maven-plugin.version}</version>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>integration-test</id>
-                        <goals>
-                            <goal>integration-test</goal>
-                            <goal>verify</goal>
-                        </goals>
-                        <configuration>
-                            <!-- Sets the VM argument line used when integration tests are run. -->
-                            <!--suppress UnresolvedMavenProperty -->
-                            <argLine>${failsafeArgLine}</argLine>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>${maven-surefire-plugin.version}</version>
-                <configuration>
-                    <!-- Sets the VM argument line used when unit tests are run. -->
-                    <!--suppress UnresolvedMavenProperty -->
-                    <argLine>${surefireArgLine}</argLine>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <executions>
-                    <!-- set arg line property for surefire -->
-                    <execution>
-                        <id>prepare-agent</id>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                        <configuration>
-                            <propertyName>surefireArgLine</propertyName>
-                        </configuration>
-                    </execution>
-                    <!-- set arg line property for failsafe -->
-                    <execution>
-                        <id>prepare-agent-integration</id>
-                        <goals>
-                            <goal>prepare-agent-integration</goal>
-                        </goals>
-                        <configuration>
-                            <propertyName>failsafeArgLine</propertyName>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
