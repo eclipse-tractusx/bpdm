@@ -22,7 +22,6 @@ on:
   push:
     branches:
       - main
-      - feat/code-coverage-report  # TEMP: For testing
 
 jobs:
   analyze_with_Sonar:
