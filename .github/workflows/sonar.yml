@@ -32,9 +32,9 @@ jobs:
     steps:
       - name: check_sonar_configured
         run: |
-          echo "Checking if sonar is configured: ${{ env.SONAR_CONFIGURED }}"
+          echo "Checking if sonar is configured: ${{ env.SONAR_CONFIGURED }} and ${{ vars.SONAR_PROJECT_KEY }}"
     env:
-      SONAR_CONFIGURED: ${{ secrets.SONAR_TOKEN != '' && vars.SONAR_PROJECT_KEY != '' && vars.SONAR_ORGANIZATION != '' }}
+      SONAR_CONFIGURED: ${{ vars.SONAR_PROJECT_KEY != '' }}
     outputs:
       sonar_configured: ${{ env.SONAR_CONFIGURED }}
 
