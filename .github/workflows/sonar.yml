@@ -27,11 +27,25 @@ on:
   workflow_dispatch:
 
 jobs:
-  analyze_with_Sonar:
-    # Optional: exclude PRs from forks (to avoid secrets exposure)
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+  check_sonar_configured:
     runs-on: ubuntu-latest
+    steps:
+      - name: check_sonar_configured
+        run: |
+          echo "Checking if sonar is configured: ${{ env.SONAR_CONFIGURED }}"
+    env:
+      SONAR_CONFIGURED: ${{ secrets.SONAR_TOKEN != '' && vars.SONAR_PROJECT_KEY != '' && vars.SONAR_ORGANIZATION != '' }}
+    outputs:
+      sonar_configured: ${{ env.SONAR_CONFIGURED }}
 
+  analyze_with_Sonar:
+    needs: [check_sonar_configured]
+    # No need to run if we cannot use the sonar token
+    if: >-
+      needs.check_sonar_configured.outputs.sonar_configured == 'true'
+      && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) 
+      && github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
