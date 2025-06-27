@@ -19,32 +19,14 @@
 
 name: Sonar Check
 on:
-  pull_request:
+  push:
     branches:
       - main
-      - release/**
-  workflow_call:
-  workflow_dispatch:
+      - feat/code-coverage-report  # TEMP: For testing
 
 jobs:
-  check_sonar_configured:
-    runs-on: ubuntu-latest
-    steps:
-      - name: check_sonar_configured
-        run: |
-          echo "Checking if sonar is configured: ${{ env.SONAR_CONFIGURED }} and ${{ vars.SONAR_PROJECT_KEY }}"
-    env:
-      SONAR_CONFIGURED: ${{ vars.SONAR_PROJECT_KEY != '' }}
-    outputs:
-      sonar_configured: ${{ env.SONAR_CONFIGURED }}
-
   analyze_with_Sonar:
-    needs: [check_sonar_configured]
-    # No need to run if we cannot use the sonar token
-    if: >-
-      needs.check_sonar_configured.outputs.sonar_configured == 'true'
-      && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) 
-      && github.actor != 'dependabot[bot]'
+    if: github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
