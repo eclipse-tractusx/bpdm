@@ -62,4 +62,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}    # Required for PR decoration
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}      # SonarCloud auth token
-        run: ./mvnw -B verify sonar:sonar
+        run: mvn -B verify sonar:sonar
