@@ -19,12 +19,24 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
+import com.nimbusds.openid.connect.sdk.claims.Address
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerIdentifierDto
+import org.eclipse.tractusx.bpdm.gate.api.model.ConfidenceCriteriaDto
+import org.eclipse.tractusx.bpdm.gate.api.model.PhysicalPostalAddressDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressComponentOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityRepresentationOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteRepresentationOutputDto
+import org.eclipse.tractusx.bpdm.pool.api.model.BusinessPartnerSearchFilterType
+import org.eclipse.tractusx.bpdm.pool.api.model.StreetDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.BusinessPartnerSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.BusinessPartnerSearchResultDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteMatchVerboseDto
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
@@ -37,6 +49,7 @@ import org.springframework.context.annotation.Primary
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 
+
 /**
  * Provides search functionality on the Catena-x database for the BPDM system
  */
@@ -48,7 +61,7 @@ class BusinessPartnerSearchService(
     private val addressService: AddressService,
     private val siteService: SiteService,
     private val logisticAddressRepository: LogisticAddressRepository,
-    private val siteRepository: SiteRepository,
+    private val siteRepository: SiteRepository
 ): SearchService {
 
     private val logger = KotlinLogging.logger { }
@@ -69,7 +82,8 @@ class BusinessPartnerSearchService(
         businessPartnerFetchService.fetchLegalEntityDependencies(legalEntityPage.content.map { (_, legalEntity) -> legalEntity }.toSet())
 
         return with(legalEntityPage) {
-            PageDto(totalElements, totalPages, page, contentSize,
+            PageDto(
+                totalElements, totalPages, page, contentSize,
                 content.map { (score, legalEntity) -> legalEntity.toMatchDto(score) })
         }
     }
@@ -125,7 +139,8 @@ class BusinessPartnerSearchService(
         val addressPage = searchAndPrepareAddressPage(searchRequest, paginationRequest)
         addressService.fetchLogisticAddressDependencies(addressPage.content.map { (_, address) -> address }.toSet())
         return with(addressPage) {
-            PageDto(totalElements, totalPages, page, contentSize,
+            PageDto(
+                totalElements, totalPages, page, contentSize,
                 content.map { (score, address) -> address.toMatchDto(score) })
         }
     }
@@ -182,7 +197,8 @@ class BusinessPartnerSearchService(
         siteService.fetchSiteDependenciesPage(sitePage.content.map { site -> site }.toSet())
 
         return with(sitePage) {
-            PageDto(totalElements, totalPages, page, contentSize,
+            PageDto(
+                totalElements, totalPages, page, contentSize,
                 content.map { site -> site.toMatchDto() })
         }
     }
@@ -198,5 +214,319 @@ class BusinessPartnerSearchService(
         val sitePage = siteRepository.findAll(PageRequest.of(paginationRequest.page, paginationRequest.size))
 
         return sitePage.toDto(sitePage.content.map { it })
+    }
+
+    /**
+     * @see searchBusinessPartner
+     *
+     */
+    override fun searchBusinessPartner(
+        searchRequest: LegalEntityPropertiesSearchRequest,
+        searchResultFilter: Set<BusinessPartnerSearchFilterType>?,
+        paginationRequest: PaginationRequest
+    ): PageDto<BusinessPartnerSearchResultDto> {
+
+        val pageRequest = PageRequest.of(paginationRequest.page, paginationRequest.size)
+
+        val includeLegalEntities = shouldInclude(searchResultFilter, BusinessPartnerSearchFilterType.ShowOnlyLegaEntities)
+        val includeSites = shouldInclude(searchResultFilter, BusinessPartnerSearchFilterType.ShowOnlySites)
+        val includeAddresses = shouldInclude(searchResultFilter, BusinessPartnerSearchFilterType.ShowOnlyAdditionalAddresses)
+
+        val results = mutableListOf<BusinessPartnerSearchResultDto>()
+
+        if (searchResultFilter.isNullOrEmpty() || searchResultFilter.contains(BusinessPartnerSearchFilterType.ShowOnlyLegaEntities)) {
+            val legalEntities = legalEntityRepository.findAll(LegalEntityRepository.buildLegalEntitySpecification(searchRequest),pageRequest )
+
+            if (includeLegalEntities) {
+                val legalEntities = legalEntityRepository.findAll(
+                    LegalEntityRepository.buildLegalEntitySpecification(searchRequest),
+                    pageRequest
+                )
+                results.addAll(legalEntities.content.map { searchLegalEntityResultToMapping(it) })
+            }
+
+            if (includeSites) {
+                results.addAll(legalEntities.content.flatMap { it.sites.map { site -> searchSiteResultMapping(site) } })
+            }
+
+            if (includeAddresses) {
+                appendAddressesWithoutDuplicateStreet(
+                    legalEntities.content.flatMap { it.addresses },
+                    results
+                )
+            }
+        }
+
+        if (includeSites) {
+            val sites = siteRepository.findAll(SiteRepository.buildSiteSpecification(searchRequest), pageRequest)
+            results.addAll(sites.content.map { searchSiteResultMapping(it) })
+
+            if (includeLegalEntities) {
+                val parentLegalEntity = legalEntityRepository.findAllById(sites.content.map { it.legalEntity.id })
+                if (parentLegalEntity.isNotEmpty()) {
+                    results.add(searchLegalEntityResultToMapping(parentLegalEntity.first()))
+                }
+            }
+
+            if (includeAddresses) {
+                appendAddressesWithoutDuplicateStreet(
+                    sites.content.flatMap { it.addresses },
+                    results
+                )
+            }
+        }
+
+        val shouldSearchAddressesDirectly = !searchResultFilter.isNullOrEmpty() &&
+                                            !searchRequest.id.isNullOrEmpty() &&
+                                            searchResultFilter.contains(BusinessPartnerSearchFilterType.ShowOnlyAdditionalAddresses)
+
+        if (shouldSearchAddressesDirectly) {
+
+            val addresses = logisticAddressRepository.findAll(
+                LogisticAddressRepository.buildAddressSpecification(searchRequest),
+                pageRequest
+            )
+
+            appendAddressesWithoutDuplicateStreet(addresses.content, results)
+
+            if (includeLegalEntities) {
+                val parentLegalEntity = legalEntityRepository.findAllById(addresses.content.map { it.legalEntity!!.id })
+                if (parentLegalEntity.isNotEmpty()) {
+                    results.add(searchLegalEntityResultToMapping(parentLegalEntity.first()))
+                }
+            }
+        }
+
+        val start = paginationRequest.page * paginationRequest.size
+        val end = minOf(start + paginationRequest.size, results.size)
+        val pagedContent = if (start < results.size) results.subList(start, end) else emptyList()
+
+        return PageDto(
+            totalElements = results.size.toLong(),
+            totalPages = (results.size / paginationRequest.size) + if (results.size % paginationRequest.size == 0) 0 else 1,
+            page = paginationRequest.page,
+            contentSize = paginationRequest.size,
+            content = pagedContent
+        )
+    }
+
+    private fun shouldInclude(
+        searchResultFilter: Set<BusinessPartnerSearchFilterType>?,
+        filterType: BusinessPartnerSearchFilterType
+    ): Boolean {
+        return searchResultFilter.isNullOrEmpty() || searchResultFilter.contains(filterType)
+    }
+
+    private fun appendAddressesWithoutDuplicateStreet(
+        addresses: Iterable<LogisticAddressDb>,
+        results: MutableList<BusinessPartnerSearchResultDto>
+    ) {
+        val existingStreetNames = results
+            .mapNotNull { it.address.physicalPostalAddress.street?.name }
+            .toMutableSet()
+
+        addresses.forEach { address ->
+            val streetName = address.physicalPostalAddress.street?.name
+            if (streetName == null || !existingStreetNames.contains(streetName)) {
+                if (address.site == null) {
+                    results += searchAddressResultMapping(address)
+                }
+                if (streetName != null) {
+                    existingStreetNames += streetName
+                }
+            }
+        }
+    }
+
+
+    private fun searchLegalEntityResultToMapping(result: LegalEntityDb): BusinessPartnerSearchResultDto {
+        return BusinessPartnerSearchResultDto (
+            identifiers = result.identifiers.map { it ->
+                BusinessPartnerIdentifierDto(
+                    type = it.type.technicalKey,
+                    value = it.value,
+                    issuingBody = it.issuingBody
+                )
+            },
+            legalEntity = LegalEntityRepresentationOutputDto(
+                legalEntityBpn = result.bpn,
+                legalName = result.legalName.value,
+                legalForm = result.legalForm?.name,
+                confidenceCriteria = ConfidenceCriteriaDto(
+                    sharedByOwner = result.confidenceCriteria.sharedByOwner,
+                    checkedByExternalDataSource = result.confidenceCriteria.checkedByExternalDataSource,
+                    numberOfSharingMembers = result.confidenceCriteria.numberOfBusinessPartners,
+                    lastConfidenceCheckAt = result.confidenceCriteria.lastConfidenceCheckAt,
+                    nextConfidenceCheckAt = result.confidenceCriteria.nextConfidenceCheckAt,
+                    confidenceLevel = result.confidenceCriteria.confidenceLevel
+                )
+            ),
+            site = null,
+            address = AddressComponentOutputDto(
+                name = null,
+                addressType = AddressType.LegalAddress,
+                addressBpn = result.legalAddress.bpn,
+                physicalPostalAddress = PhysicalPostalAddressDto (
+                    geographicCoordinates = null,
+                    administrativeAreaLevel1 = result.legalAddress.physicalPostalAddress.administrativeAreaLevel1?.countryCode?.name,
+                    street = org.eclipse.tractusx.bpdm.gate.api.model.StreetDto(
+                        name = result.legalAddress.physicalPostalAddress.street?.name,
+                        houseNumber = result.legalAddress.physicalPostalAddress.street?.houseNumber,
+                        houseNumberSupplement = result.legalAddress.physicalPostalAddress.street?.houseNumberSupplement,
+                        milestone = result.legalAddress.physicalPostalAddress.street?.milestone,
+                        direction = result.legalAddress.physicalPostalAddress.street?.direction,
+                        namePrefix = result.legalAddress.physicalPostalAddress.street?.namePrefix,
+                        additionalNamePrefix = result.legalAddress.physicalPostalAddress.street?.additionalNamePrefix,
+                        nameSuffix = result.legalAddress.physicalPostalAddress.street?.nameSuffix,
+                        additionalNameSuffix = result.legalAddress.physicalPostalAddress.street?.additionalNameSuffix
+                    ),
+                    postalCode = result.legalAddress.physicalPostalAddress.postCode,
+                    city = result.legalAddress.physicalPostalAddress.city,
+                    country = result.legalAddress.physicalPostalAddress.country
+                ),
+                confidenceCriteria = ConfidenceCriteriaDto(
+                    sharedByOwner = result.legalAddress.confidenceCriteria.sharedByOwner,
+                    checkedByExternalDataSource = result.legalAddress.confidenceCriteria.checkedByExternalDataSource,
+                    numberOfSharingMembers = result.legalAddress.confidenceCriteria.numberOfBusinessPartners,
+                    lastConfidenceCheckAt = result.legalAddress.confidenceCriteria.lastConfidenceCheckAt,
+                    nextConfidenceCheckAt = result.legalAddress.confidenceCriteria.nextConfidenceCheckAt,
+                    confidenceLevel = result.legalAddress.confidenceCriteria.confidenceLevel
+                )
+            ),
+            isParticipantData = result.isCatenaXMemberData,
+        )
+    }
+    private fun searchSiteResultMapping(result: SiteDb): BusinessPartnerSearchResultDto {
+
+        return BusinessPartnerSearchResultDto(
+            identifiers = result.legalEntity.identifiers.map { it ->
+                BusinessPartnerIdentifierDto(
+                    type = it.type.technicalKey,
+                    value = it.value,
+                    issuingBody = it.issuingBody
+                )
+            },
+            legalEntity = LegalEntityRepresentationOutputDto(
+                legalEntityBpn = result.legalEntity.bpn,
+                legalName = result.legalEntity.legalName.value,
+                legalForm = result.legalEntity.legalForm?.name,
+                confidenceCriteria = ConfidenceCriteriaDto(
+                    sharedByOwner = result.legalEntity.confidenceCriteria.sharedByOwner,
+                    checkedByExternalDataSource = result.legalEntity.confidenceCriteria.checkedByExternalDataSource,
+                    numberOfSharingMembers = result.legalEntity.confidenceCriteria.numberOfBusinessPartners,
+                    lastConfidenceCheckAt = result.legalEntity.confidenceCriteria.lastConfidenceCheckAt,
+                    nextConfidenceCheckAt = result.legalEntity.confidenceCriteria.nextConfidenceCheckAt,
+                    confidenceLevel = result.legalEntity.confidenceCriteria.confidenceLevel
+                )
+            ),
+            site = SiteRepresentationOutputDto (
+                siteBpn = result.bpn,
+                name = result.name,
+                confidenceCriteria = ConfidenceCriteriaDto(
+                    sharedByOwner = result.confidenceCriteria.sharedByOwner,
+                    checkedByExternalDataSource = result.confidenceCriteria.checkedByExternalDataSource,
+                    numberOfSharingMembers = result.confidenceCriteria.numberOfBusinessPartners,
+                    lastConfidenceCheckAt = result.confidenceCriteria.lastConfidenceCheckAt,
+                    nextConfidenceCheckAt = result.confidenceCriteria.nextConfidenceCheckAt,
+                    confidenceLevel = result.confidenceCriteria.confidenceLevel
+                )
+            ),
+            address = AddressComponentOutputDto(
+                name = null,
+                addressType = AddressType.SiteMainAddress,
+                addressBpn = result.mainAddress.bpn,
+                physicalPostalAddress = PhysicalPostalAddressDto (
+                    geographicCoordinates = null,
+                    administrativeAreaLevel1 = result.mainAddress.physicalPostalAddress.administrativeAreaLevel1?.countryCode?.name,
+                    street = org.eclipse.tractusx.bpdm.gate.api.model.StreetDto(
+                        name = result.mainAddress.physicalPostalAddress.street?.name,
+                        houseNumber = result.mainAddress.physicalPostalAddress.street?.houseNumber,
+                        houseNumberSupplement = result.mainAddress.physicalPostalAddress.street?.houseNumberSupplement,
+                        milestone = result.mainAddress.physicalPostalAddress.street?.milestone,
+                        direction = result.mainAddress.physicalPostalAddress.street?.direction,
+                        namePrefix = result.mainAddress.physicalPostalAddress.street?.namePrefix,
+                        additionalNamePrefix = result.mainAddress.physicalPostalAddress.street?.additionalNamePrefix,
+                        nameSuffix = result.mainAddress.physicalPostalAddress.street?.nameSuffix,
+                        additionalNameSuffix = result.mainAddress.physicalPostalAddress.street?.additionalNameSuffix
+                    ),
+                    postalCode = result.mainAddress.physicalPostalAddress.postCode,
+                    city = result.mainAddress.physicalPostalAddress.city,
+                    country = result.mainAddress.physicalPostalAddress.country
+                ),
+                confidenceCriteria = ConfidenceCriteriaDto(
+                    sharedByOwner = result.mainAddress.confidenceCriteria.sharedByOwner,
+                    checkedByExternalDataSource = result.mainAddress.confidenceCriteria.checkedByExternalDataSource,
+                    numberOfSharingMembers = result.mainAddress.confidenceCriteria.numberOfBusinessPartners,
+                    lastConfidenceCheckAt = result.mainAddress.confidenceCriteria.lastConfidenceCheckAt,
+                    nextConfidenceCheckAt = result.mainAddress.confidenceCriteria.nextConfidenceCheckAt,
+                    confidenceLevel = result.mainAddress.confidenceCriteria.confidenceLevel
+                )
+            ),
+            isParticipantData = result.legalEntity.isCatenaXMemberData
+        )
+    }
+    private fun searchAddressResultMapping(result: LogisticAddressDb): BusinessPartnerSearchResultDto {
+
+        val addressType = when (result.id) {
+            result.legalEntity?.legalAddress?.id -> AddressType.LegalAddress
+            result.site?.mainAddress?.id        -> AddressType.SiteMainAddress
+            else                                -> AddressType.AdditionalAddress
+        }
+
+        return BusinessPartnerSearchResultDto(
+            identifiers = result.legalEntity?.identifiers?.map { it ->
+                BusinessPartnerIdentifierDto(
+                    type = it.type.technicalKey,
+                    value = it.value,
+                    issuingBody = it.issuingBody
+                )
+            } as Collection<BusinessPartnerIdentifierDto>,
+            legalEntity = LegalEntityRepresentationOutputDto(
+                legalEntityBpn = result.legalEntity!!.bpn,
+                legalName = result.legalEntity?.legalName?.value,
+                legalForm = result.legalEntity?.legalForm?.name,
+                confidenceCriteria = ConfidenceCriteriaDto(
+                    sharedByOwner = result.legalEntity!!.confidenceCriteria.sharedByOwner,
+                    checkedByExternalDataSource = result.legalEntity!!.confidenceCriteria.checkedByExternalDataSource,
+                    numberOfSharingMembers = result.legalEntity!!.confidenceCriteria.numberOfBusinessPartners,
+                    lastConfidenceCheckAt = result.legalEntity!!.confidenceCriteria.lastConfidenceCheckAt,
+                    nextConfidenceCheckAt = result.legalEntity!!.confidenceCriteria.nextConfidenceCheckAt,
+                    confidenceLevel = result.legalEntity!!.confidenceCriteria.confidenceLevel
+                )
+            ),
+            site = null,
+            address = AddressComponentOutputDto(
+                name = null,
+                addressType = addressType,
+                addressBpn = result.bpn,
+                physicalPostalAddress = PhysicalPostalAddressDto (
+                    geographicCoordinates = null,
+                    administrativeAreaLevel1 = result.physicalPostalAddress.administrativeAreaLevel1?.countryCode?.name,
+                    street = org.eclipse.tractusx.bpdm.gate.api.model.StreetDto(
+                        name = result.physicalPostalAddress.street?.name,
+                        houseNumber = result.physicalPostalAddress.street?.houseNumber,
+                        houseNumberSupplement = result.physicalPostalAddress.street?.houseNumberSupplement,
+                        milestone = result.physicalPostalAddress.street?.milestone,
+                        direction = result.physicalPostalAddress.street?.direction,
+                        namePrefix = result.physicalPostalAddress.street?.namePrefix,
+                        additionalNamePrefix = result.physicalPostalAddress.street?.additionalNamePrefix,
+                        nameSuffix = result.physicalPostalAddress.street?.nameSuffix,
+                        additionalNameSuffix = result.physicalPostalAddress.street?.additionalNameSuffix
+                    ),
+                    postalCode = result.physicalPostalAddress.postCode,
+                    city = result.physicalPostalAddress.city,
+                    country = result.physicalPostalAddress.country
+                ),
+                confidenceCriteria = ConfidenceCriteriaDto(
+                    sharedByOwner = result.confidenceCriteria.sharedByOwner,
+                    checkedByExternalDataSource = result.confidenceCriteria.checkedByExternalDataSource,
+                    numberOfSharingMembers = result.confidenceCriteria.numberOfBusinessPartners,
+                    lastConfidenceCheckAt = result.confidenceCriteria.lastConfidenceCheckAt,
+                    nextConfidenceCheckAt = result.confidenceCriteria.nextConfidenceCheckAt,
+                    confidenceLevel = result.confidenceCriteria.confidenceLevel
+                )
+            ),
+            isParticipantData = result.legalEntity!!.isCatenaXMemberData
+        )
     }
 }

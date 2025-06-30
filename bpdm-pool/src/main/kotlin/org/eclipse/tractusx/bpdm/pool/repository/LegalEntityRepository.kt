@@ -19,9 +19,14 @@
 
 package org.eclipse.tractusx.bpdm.pool.repository
 
+import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
+import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.NameDb
+import org.eclipse.tractusx.bpdm.pool.entity.PhysicalPostalAddressDb
+import org.eclipse.tractusx.bpdm.pool.entity.StreetDb
+import org.eclipse.tractusx.bpdm.pool.util.SearchNormalization
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.Specification
@@ -52,6 +57,99 @@ interface LegalEntityRepository : JpaRepository<LegalEntityDb, Long>, JpaSpecifi
                     builder.equal(root.get<Boolean>(LegalEntityDb::isCatenaXMemberData.name), isCatenaXMemberData)
                 }
             }
+
+        /*
+        business-partner/search
+        */
+        fun buildLegalEntitySpecification(request: LegalEntityPropertiesSearchRequest): Specification<LegalEntityDb> {
+
+            return Specification.where(byBpnL(request.id))
+                .and(byLegalNameSupportGermanUmlauts(request.legalName))
+                .and(byStreet(request.street))
+                .and(byZipCode(request.postcode))
+                .and(byCity(request.city))
+                .and(byCountry(request.country))
+        }
+
+        fun byBpnL(bpnl: String?) =
+            Specification<LegalEntityDb> { root, _, builder ->
+                bpnl?.takeIf { it.isNotEmpty() }?.let {
+                    builder.equal(root.get<String>(LegalEntityDb::bpn.name), bpnl)
+                }
+            }
+
+        fun byLegalNameSupportGermanUmlauts(legalName: String?) =
+            Specification<LegalEntityDb> { root, _, builder ->
+                legalName?.takeIf { it.isNotBlank() }?.let {
+                    builder.like(
+                        root.get(LegalEntityDb::legalNameNormalized.name),
+                        "%${SearchNormalization.normalize(legalName)}%"
+                    )
+                }
+            }
+
+        fun byStreet(street: String?) =
+            Specification<LegalEntityDb> { root, _, builder ->
+                street?.takeIf { it.isNotBlank() }?.let {
+                    val joinAddress = root.join<LegalEntityDb, LogisticAddressDb>("addresses")
+                    builder.like(
+                        joinAddress
+                            .get<PhysicalPostalAddressDb>("physicalPostalAddress")
+                            .get<String>("streetNameNormalized"),
+                        "%${SearchNormalization.normalize(street)}%"
+                    )
+                }
+            }
+
+        fun byZipCode(zipCode: String?) =
+            Specification<LegalEntityDb> { root, _, builder ->
+                zipCode?.takeIf { it.isNotBlank() }?.let {
+                    val joinAddress = root.join<LegalEntityDb, LogisticAddressDb>("addresses")
+                    builder.like (
+                        builder.lower(
+                            joinAddress.get<PhysicalPostalAddressDb>("physicalPostalAddress").get("postCode")
+                        ),
+                        "%${it.lowercase()}%"
+                    )
+                }
+            }
+
+        fun byCity(city: String?) =
+            Specification<LegalEntityDb> { root, _, builder ->
+                city?.takeIf { it.isNotBlank() }?.let {
+                    val normalizedVariants = normalizeGermanUmlauts(city)
+                    val joinAddress = root.join<LegalEntityDb, LogisticAddressDb>("addresses")
+                    val expression = builder.lower(joinAddress.get<PhysicalPostalAddressDb>("physicalPostalAddress").get("city"))
+
+                    val predicates = normalizedVariants.map { variant ->
+                        builder.like(expression, "%$variant%")
+                    }
+
+                    builder.or(*predicates.toTypedArray())
+                }
+            }
+
+        fun byCountry(country: String?) =
+            Specification<LegalEntityDb> { root, _, builder ->
+                country?.takeIf { it.isNotBlank() }?.let {
+                    val joinAddress = root.join<LegalEntityDb, LogisticAddressDb>("addresses")
+                    builder.like(
+                        joinAddress.get<PhysicalPostalAddressDb>("physicalPostalAddress").get("countryNormalized"),
+                        "%${SearchNormalization.normalize(country)}%"
+                    )
+                }
+            }
+
+        fun normalizeGermanUmlauts(input: String): List<String> {
+            val base = input.lowercase();
+            return listOf(
+                base,
+                base.replace("ae", "ä"),
+                base.replace("oe", "ö"),
+                base.replace("ue", "ü"),
+                base.replace("ss", "ß")
+            ).distinct()
+        }
     }
 
     fun findByBpnIgnoreCase(bpn: String): LegalEntityDb?
