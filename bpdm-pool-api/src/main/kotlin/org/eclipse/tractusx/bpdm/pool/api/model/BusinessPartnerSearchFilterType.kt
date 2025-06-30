@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021,2024 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -17,25 +17,10 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.client
+package org.eclipse.tractusx.bpdm.pool.api.model
 
-interface PoolApiClient {
-
-    val addresses: AddressApiClient
-
-    val bpns: BpnApiClient
-
-    val changelogs: ChangeLogApiClient
-
-    val legalEntities: LegalEntityApiClient
-
-    val metadata: MetadataApiClient
-
-    val sites: SiteApiClient
-
-    val members: MembersApiClient
-
-    val participants: DataSpaceParticipantsApiClient
-
-    val businessPartners: BusinessPartnersApiClient
+enum class BusinessPartnerSearchFilterType {
+    IncludeLegalEntities,
+    IncludeSites,
+    IncludeAdditionalAddresses
 }

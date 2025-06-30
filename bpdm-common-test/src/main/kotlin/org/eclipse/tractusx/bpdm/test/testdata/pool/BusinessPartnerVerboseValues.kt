@@ -27,6 +27,7 @@ import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.service.toDto
 import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
+import org.eclipse.tractusx.bpdm.pool.api.model.StreetDto
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -556,4 +557,47 @@ object BusinessPartnerVerboseValues {
         ),
         index = "3"
     )
+
+    val legalEntityUpsert4 = LegalEntityPartnerCreateVerboseDto(
+        legalEntity = LegalEntityVerboseDto(
+            bpnl = thirdBpnl,
+            legalName = "Müller Handels GmbH & Co. KG",
+            legalFormVerbose = legalForm3,
+            identifiers = listOf(LegalEntityIdentifierVerboseDto("An ID Value", identifierType3, "Official Z")),
+            states = listOf(leStatus3),
+            currentness = createdTime1.toInstant(ZoneOffset.UTC),
+            confidenceCriteria = confidenceCriteria3,
+            createdAt = Instant.now(),
+            updatedAt = Instant.now(),
+            isParticipantData = true
+        ),
+        legalAddress = addressPartner3.copy(
+            bpnLegalEntity = legalEntity3.legalEntity.bpnl,
+            addressType = AddressType.LegalAddress
+        ),
+        index = "4"
+    )
+
+    val legalEntityUpsertMultipleIdentifier = LegalEntityPartnerCreateVerboseDto(
+        legalEntity = LegalEntityVerboseDto(
+            bpnl = firstBpnL,
+            legalName = "Business Partner Name",
+            legalFormVerbose = legalForm1,
+            identifiers = listOf(
+                LegalEntityIdentifierVerboseDto("ID-XYZ", identifierType1, "Agency X"),
+                LegalEntityIdentifierVerboseDto("Another ID Value", identifierType2, "Body Y")
+            ),
+            states = listOf(leStatus1),
+            currentness = createdTime1.toInstant(ZoneOffset.UTC),
+            confidenceCriteria = confidenceCriteria1,
+            isParticipantData = false,
+            createdAt = Instant.now(),
+            updatedAt = Instant.now()
+        ),
+        legalAddress = addressPartner1.copy(
+            bpnLegalEntity = legalEntity1.legalEntity.bpnl,
+        ),
+        index = "1"
+    )
+
 }
