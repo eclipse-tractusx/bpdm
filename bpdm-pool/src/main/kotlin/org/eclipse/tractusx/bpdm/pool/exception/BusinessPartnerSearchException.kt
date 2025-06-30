@@ -17,25 +17,12 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.client
+package org.eclipse.tractusx.bpdm.pool.exception
 
-interface PoolApiClient {
+import org.eclipse.tractusx.bpdm.common.exception.BpdmExceptionHandler
+import org.eclipse.tractusx.bpdm.pool.exception.BusinessPartnerExceptionHandler
+import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.ResponseStatus
 
-    val addresses: AddressApiClient
-
-    val bpns: BpnApiClient
-
-    val changelogs: ChangeLogApiClient
-
-    val legalEntities: LegalEntityApiClient
-
-    val metadata: MetadataApiClient
-
-    val sites: SiteApiClient
-
-    val members: MembersApiClient
-
-    val participants: DataSpaceParticipantsApiClient
-
-    val businessPartners: BusinessPartnersApiClient
-}
+@ResponseStatus(HttpStatus.BAD_REQUEST)
+class BusinessPartnerSearchException(override val message: String) : RuntimeException(message)
