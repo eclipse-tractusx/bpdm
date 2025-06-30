@@ -19,16 +19,32 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.model.request
 
+import com.neovisionaries.i18n.CountryCode
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Schema
-
 
 @Schema(description = "Contains keywords used for searching in legal entity properties")
 data class LegalEntityPropertiesSearchRequest(
     @field:Parameter(description = "Filter legal entities by name")
-    val legalName: String?
-) {
+    val legalName: String?,
+
+    @field:Parameter(description = "Filter business partners by CX-BPN.")
+    val bpn: String?,
+
+    @field:Parameter(description = "Filter business partners by street name.")
+    val streetName: String?,
+
+    @field:Parameter(description = "Filter business partners by zip code.")
+    val postalCode: String?,
+
+    @field:Parameter(description = "Filter business partners by city.")
+    val city: String?,
+
+    @field:Parameter(description = "Filter business partners by country code ISO 3166-1.")
+    val country: CountryCode?,
+
+    ) {
     companion object {
-        val EmptySearchRequest = LegalEntityPropertiesSearchRequest(null)
+        val EmptySearchRequest = LegalEntityPropertiesSearchRequest(null, null, null, null, null, null)
     }
 }

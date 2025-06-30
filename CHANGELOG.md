@@ -13,6 +13,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM: Add validity on business partner relation to the golden record process for legal entity relations [#1295](https://github.com/eclipse-tractusx/bpdm/issues/1295)
 - BPDM Gate: Fix synchronization of golden records sometimes skipping updates [#1519](https://github.com/eclipse-tractusx/bpdm/issues/1519)
 - BPDM: The Golden Record Process now automatically calculates the number of sharing members for the confidence criteria [#1464](https://github.com/eclipse-tractusx/sig-release/issues/1464)
+- BPDM Pool: Add a business partner search endpoint [[#1382]](https://github.com/eclipse-tractusx/bpdm/issues/781)
 
 ### Changed
 
