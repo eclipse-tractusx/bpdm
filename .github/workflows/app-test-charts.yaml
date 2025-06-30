@@ -183,6 +183,8 @@ jobs:
               repository: bpdm-cleaning-service-dummy
               tag: test
             startupDelaySeconds: 120
+            springProfiles:
+              system-tester
           tests:
             image:
               registry: kind-registry:5000

@@ -52,7 +52,9 @@ bpdm:
     dependencyCheck:
        # How often the golden record connection dependencies should be checked for being healthy
       cron: '*/30 * * * * *'
-
+    relationCleaning:
+      # When and how often the cleaning service should poll for relation tasks in the orchestrator
+      cron: "5/30 * * * * *"
   cleaningService:
     # When and how often the cleaning service should poll for golden record tasks in the orchestrator
     pollingCron: "5/30 * * * * *"

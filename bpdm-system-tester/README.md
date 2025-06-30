@@ -10,7 +10,7 @@ For a local execution you can follow the following steps:
 ```bash
 mvn -B -U clean package -pl bpdm-system-tester -am -DskipTests
 ```
-2. Install and run the BPDM applications locally with authentication
+2. Install and run the BPDM applications, make sure to use the `system-tester` configuration wherever available.
 3. Run the JAR file so the tests will be executed:
 ```bash
 java -jar bpdm-system-tester/target/bpdm-system-tester.jar

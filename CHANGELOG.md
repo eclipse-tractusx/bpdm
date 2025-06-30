@@ -12,6 +12,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 
 - BPDM: Support for 'IsManagedBy' business partner relations across Gate, Orchestrator, and Pool, including golden record processing and validation for relation chains and unique manager constraints [#1364](https://github.com/eclipse-tractusx/bpdm/issues/1364).
 - CICD: Code Coverage Analysis and Reporting for BPDM [#1338](https://github.com/eclipse-tractusx/bpdm/issues/1338)
+- BPDM Cleaning Dummy: Configuration and scheduling support for relation cleaning dummy service with unit test coverage [#1383](https://github.com/eclipse-tractusx/bpdm/issues/1383).
 
 ### Changed
 
