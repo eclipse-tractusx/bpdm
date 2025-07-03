@@ -73,6 +73,9 @@
         <license-tool.version>1.1.0</license-tool.version>
         <assertj.version>3.24.2</assertj.version>
         <commons-beanutils.version>1.11.0</commons-beanutils.version>
+        <!-- Sonar related properties -->
+        <sonar.version>3.10.0.2594</sonar.version>
+        <jacoco.version>0.8.12</jacoco.version>
     </properties>
 
     <pluginRepositories>
@@ -293,6 +296,36 @@
                                     <source>target/generated-sources/kapt/compile</source>
                                     <source>target/generated-sources/kaptKotlin</source>
                                 </sourceDirs>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.sonarsource.scanner.maven</groupId>
+                    <artifactId>sonar-maven-plugin</artifactId>
+                    <version>${sonar.version}</version>
+                </plugin>
+                <!-- Creates test coverage report -->
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>${jacoco.version}</version>
+                    <executions>
+                        <execution>
+                            <id>prepare-agent</id>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>report</id>
+                            <goals>
+                                <goal>report</goal>
+                            </goals>
+                            <configuration>
+                                <formats>
+                                    <format>XML</format>
+                                </formats>
                             </configuration>
                         </execution>
                     </executions>
