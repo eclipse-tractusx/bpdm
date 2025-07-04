@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.gate.api.exception.ChangeLogOutputError
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogDto
+import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntryDb
 import org.eclipse.tractusx.bpdm.gate.entity.GoldenRecordType
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byCreatedAtGreaterThan
@@ -33,6 +34,7 @@ import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byGol
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byStage
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byTenantBpnl
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
 import java.time.Instant
@@ -64,7 +66,7 @@ class ChangelogService(private val changelogRepository: ChangelogRepository) {
             byGoldenRecordType(goldenRecordType)
         )
 
-        val pageable = PageRequest.of(page, pageSize)
+        val pageable = PageRequest.of(page, pageSize, Sort.by(ChangelogEntryDb::createdAt.name).ascending())
         val pageResponse = changelogRepository.findAll(spec, pageable)
         val setDistinctList = changelogRepository.findDistinctByExternalIdInAndTenantBpnl(nonNullExternalIds, tenantBpnl).map { it.externalId }
 
