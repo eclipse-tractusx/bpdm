@@ -48,6 +48,7 @@
         <module>bpdm-orchestrator-api</module>
         <module>bpdm-system-tester</module>
         <module>bpdm-migration-helper</module>
+        <module>bpdm-coverage-aggregate</module>
     </modules>
 
     <properties>
@@ -75,6 +76,10 @@
         <commons-beanutils.version>1.11.0</commons-beanutils.version>
         <!-- Sonar related properties -->
         <sonar.version>3.10.0.2594</sonar.version>
+        <sonar.coverage.jacoco.xmlReportPaths>
+            ${maven.multiModuleProjectDirectory}/bpdm-coverage-aggregate/target/site/
+            jacoco-aggregate/jacoco.xml
+        </sonar.coverage.jacoco.xmlReportPaths>
         <jacoco.version>0.8.12</jacoco.version>
     </properties>
 
@@ -119,6 +124,16 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>bpdm-cleaning-service-dummy</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>bpdm-pool</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>bpdm-gate</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -292,31 +307,6 @@
                     <artifactId>sonar-maven-plugin</artifactId>
                     <version>${sonar.version}</version>
                 </plugin>
-                <!-- Creates test coverage report -->
-                <plugin>
-                    <groupId>org.jacoco</groupId>
-                    <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>${jacoco.version}</version>
-                    <executions>
-                        <execution>
-                            <id>prepare-agent</id>
-                            <goals>
-                                <goal>prepare-agent</goal>
-                            </goals>
-                        </execution>
-                        <execution>
-                            <id>report</id>
-                            <goals>
-                                <goal>report</goal>
-                            </goals>
-                            <configuration>
-                                <formats>
-                                    <format>XML</format>
-                                </formats>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
@@ -363,6 +353,31 @@
                     <summary>DEPENDENCIES</summary>
                     <includeScope>test</includeScope>
                 </configuration>
+            </plugin>
+            <!-- Creates test coverage report -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco.version}</version>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                        <configuration>
+                            <formats>
+                                <format>XML</format>
+                            </formats>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
