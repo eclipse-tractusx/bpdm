@@ -29,7 +29,7 @@ sources:
   - https://github.com/eclipse-tractusx/bpdm
 dependencies:
   - name: bpdm-common
-    version: 1.0.4
+    version: 1.0.5
     repository: "file://../bpdm-common"
   - name: centralidp
     version: 4.1.0-SNAPSHOT

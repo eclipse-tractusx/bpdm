@@ -76,6 +76,7 @@ spec:
             - mountPath: /etc/conf
               name: config
               readOnly: true
+              recursiveReadOnly: Enabled
             - mountPath: /tmp
               name: cache
       initContainers:

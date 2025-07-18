@@ -49,7 +49,7 @@ dependencies:
     alias: bpdm-orchestrator
     condition: bpdm-orchestrator.enabled
   - name: bpdm-common
-    version: 1.0.4
+    version: 1.0.5
   - name: postgresql
     version: 12.12.10
     repository: https://charts.bitnami.com/bitnami
