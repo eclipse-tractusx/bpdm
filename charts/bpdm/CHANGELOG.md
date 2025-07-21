@@ -6,6 +6,10 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
 ## [6.1.0] - tbd
 
+### Changed
+
+- fix vulnerability in deployments by providing read-only volume mounts 
+
 ## [6.0.0] -  2025-06-16
 
 ### Changed
