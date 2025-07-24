@@ -98,6 +98,32 @@ class BusinessPartnerRelationStepDefs(
     }
 
     /**
+     * Creates a business partner of type legal entity in the Gate and shares it with the Pool
+     *
+     * Waits for sharing process to finish then created BPNL is stored by the given BPN tag in the Gherkin description
+     */
+    @Given("shared legal entity with external-ID {string} and BPNL {string} finished sharing")
+    fun `given shared legal entity finished sharing`(externalId: String, bpnTag: String) {
+        val extId = externalId.toScenarioInstance()
+        val tag = bpnTag.toScenarioInstance()
+
+        val legalEntityInputRequest = inputFactory.createFullValid(extId, withTestRunContext = false)
+            .withAddressType(AddressType.LegalAndSiteMainAddress)
+            .withoutAnyBpn()
+
+        gateClient.businessParters.upsertBusinessPartnersInput(listOf(legalEntityInputRequest))
+
+        // Wait explicitly for sharing to complete
+        stepUtils.waitForBusinessPartnerResult(extId)
+
+        val legalEntityOutput = gateClient.businessParters.getBusinessPartnersOutput(listOf(extId)).content.single()
+        val bpn = legalEntityOutput.legalEntity.legalEntityBpn
+
+        externalIdsByBpnTag[tag] = extId
+        bpnsByTag[tag] = bpn
+    }
+
+    /**
      * Creates a relation new relation and shares it with the pool
      *
      */
