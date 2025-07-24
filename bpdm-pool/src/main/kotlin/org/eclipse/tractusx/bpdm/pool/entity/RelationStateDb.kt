@@ -17,22 +17,25 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.model
+package org.eclipse.tractusx.bpdm.pool.entity
 
-import io.swagger.v3.oas.annotations.media.Schema
+import jakarta.persistence.Column
+import jakarta.persistence.Embeddable
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
+import java.time.LocalDateTime
 
-@Schema(name = "RelationVerboseDto", description = "Directed relation between two business partners")
-data class RelationVerboseDto(
+@Embeddable
+data class RelationStateDb(
 
-    @get:Schema(description = "The type of relation between the Legal Entities")
-    val type: RelationType,
+    @Column(name = "valid_from", nullable = false)
+    val validFrom: LocalDateTime,
 
-    @get:Schema(description = "BPN of partner from which the relation emerges (the source)")
-    val businessPartnerSourceBpnl: String,
+    @Column(name = "valid_to", nullable = false)
+    val validTo: LocalDateTime,
 
-    @get:Schema(description = "BPN of partner to which this relation goes (the target)")
-    val businessPartnerTargetBpnl: String,
-
-    @get:Schema(description = "States of the relation with validity periods")
-    val states: List<RelationStateVerboseDto>
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false)
+    val type: BusinessStateType
 )

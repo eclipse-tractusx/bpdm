@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.pool.api.model.RelationType
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
@@ -27,6 +28,7 @@ import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @Service
 class AlternativeHeadquarterRelationUpsertService(
@@ -39,7 +41,18 @@ class AlternativeHeadquarterRelationUpsertService(
         val standardisedRequest = standardise(upsertRequest)
 
         val result = relationUpsertService.upsertRelation(
-            RelationUpsertService.UpsertRequest(standardisedRequest.source, standardisedRequest.target, RelationType.IsAlternativeHeadquarterFor)
+            RelationUpsertService.UpsertRequest(
+                source = standardisedRequest.source,
+                target = standardisedRequest.target,
+                relationType = RelationType.IsAlternativeHeadquarterFor,
+                states = listOf(
+                    RelationUpsertService.RelationStateRequest(
+                        type = BusinessStateType.ACTIVE,
+                        validFrom = LocalDateTime.now(),
+                        validTo = LocalDateTime.of(9999, 12, 31, 0, 0)
+                    )
+                ),
+            )
         )
 
         if(result.upsertType == UpsertType.Created){
@@ -74,7 +87,10 @@ class AlternativeHeadquarterRelationUpsertService(
             .plus(transitiveTargetRequests)
             .filter { it.source.id != upsertRequest.source.id || it.target.id != upsertRequest.target.id }
             .distinctBy { Pair(it.source.id, it.target.id) }
-            .map { RelationUpsertService.UpsertRequest(it.source, it.target, RelationType.IsAlternativeHeadquarterFor) }
+            .map { RelationUpsertService.UpsertRequest(
+                it.source, it.target, RelationType.IsAlternativeHeadquarterFor,
+                states = TODO()
+            ) }
             .forEach { relationUpsertService.upsertRelation(it) }
     }
 

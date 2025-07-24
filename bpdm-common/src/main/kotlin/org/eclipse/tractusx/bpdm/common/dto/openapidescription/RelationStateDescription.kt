@@ -17,22 +17,15 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.model
+package org.eclipse.tractusx.bpdm.common.dto.openapidescription
 
-import io.swagger.v3.oas.annotations.media.Schema
+object RelationStateDescription {
+    const val header = "A relation state indicates whether a relation between two legal entities is active or inactive " +
+            "within a specific timeframe. This state is provided by the sharing member and represents the validity of the business relation."
 
-@Schema(name = "RelationVerboseDto", description = "Directed relation between two business partners")
-data class RelationVerboseDto(
+    const val validFrom = "The date from which the relation state is valid."
 
-    @get:Schema(description = "The type of relation between the Legal Entities")
-    val type: RelationType,
+    const val validTo = "The date until which the relation state is valid."
 
-    @get:Schema(description = "BPN of partner from which the relation emerges (the source)")
-    val businessPartnerSourceBpnl: String,
-
-    @get:Schema(description = "BPN of partner to which this relation goes (the target)")
-    val businessPartnerTargetBpnl: String,
-
-    @get:Schema(description = "States of the relation with validity periods")
-    val states: List<RelationStateVerboseDto>
-)
+    const val type = "One of the state types: active, inactive. Represents the business status of the relation during the specified timeframe."
+}

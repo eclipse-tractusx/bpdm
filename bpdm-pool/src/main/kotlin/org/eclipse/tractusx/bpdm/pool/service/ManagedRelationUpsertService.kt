@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.pool.api.model.RelationType
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
@@ -27,6 +28,7 @@ import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @Service
 class ManagedRelationUpsertService(
@@ -42,7 +44,18 @@ class ManagedRelationUpsertService(
         validateSingleManager(proposedSource)
 
         val result = relationUpsertService.upsertRelation(
-            RelationUpsertService.UpsertRequest(proposedSource, proposedTarget, RelationType.IsManagedBy)
+            RelationUpsertService.UpsertRequest(
+                source = proposedSource,
+                target = proposedTarget,
+                relationType = RelationType.IsManagedBy,
+                states = listOf(
+                    RelationUpsertService.RelationStateRequest(
+                        type = BusinessStateType.ACTIVE,
+                        validFrom = LocalDateTime.now(),
+                        validTo = LocalDateTime.of(9999, 12, 31, 0, 0)
+                    )
+                ),
+            )
         )
 
         return result

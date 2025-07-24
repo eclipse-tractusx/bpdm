@@ -285,7 +285,15 @@ fun RelationDb.toDto(): RelationVerboseDto {
         type = type,
         businessPartnerSourceBpnl = startNode.bpn,
         businessPartnerTargetBpnl = endNode.bpn,
-        isActive = isActive
+        states = states.map { it.toDto() }
+    )
+}
+
+fun RelationStateDb.toDto(): RelationStateVerboseDto {
+    return RelationStateVerboseDto(
+        validFrom = validFrom,
+        validTo = validTo,
+        type = type
     )
 }
 
