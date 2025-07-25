@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
+import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
@@ -546,6 +547,54 @@ class AddressControllerIT @Autowired constructor(
         testHelpers.assertErrorResponse(response.errors.first(), AddressUpdateError.AddressNotFound, firstInvalidBpn)
         testHelpers.assertErrorResponse(response.errors.last(), AddressUpdateError.AddressNotFound, secondInvalidBpn)
     }
+
+
+    @Test
+    fun `create additional address - too many identifiers`(){
+        val bpnL = poolClient.legalEntities.createBusinessPartners(listOf(BusinessPartnerNonVerboseValues.legalEntityCreate1))
+            .entities.single().legalEntity.bpnl
+
+        val addressToCreate = with(BusinessPartnerNonVerboseValues.addressPartnerCreate1){
+            copy(bpnParent = bpnL, address = address.copy(
+                identifiers = (1 .. 101).map { AddressIdentifierDto(it.toString(), BusinessPartnerNonVerboseValues.addressIdentifierTypeDto1.technicalKey) }
+            ))
+        }
+
+        val createResult = poolClient.addresses.createAddresses(listOf(addressToCreate))
+
+        assertThat(createResult.entities).isEmpty()
+        assertThat(createResult.errors.size).isEqualTo(1)
+
+        val expectedError = ErrorInfo(AddressCreateError.IdentifiersTooMany, "IGNORED", addressToCreate.index)
+        assertHelpers.assertRecursively(createResult.errors.single())
+            .ignoringFields(ErrorInfo<AddressCreateError>::message.name)
+            .isEqualTo(expectedError)
+    }
+
+    @Test
+    fun `update additional address - too many identifiers`(){
+        val bpnL = poolClient.legalEntities.createBusinessPartners(listOf(BusinessPartnerNonVerboseValues.legalEntityCreate1))
+            .entities.single().legalEntity.bpnl
+        val bpnA = poolClient.addresses.createAddresses(listOf(BusinessPartnerNonVerboseValues.addressPartnerCreate1.copy(bpnParent = bpnL)))
+            .entities.single().address.bpna
+
+        val addressToUpdate = with(BusinessPartnerNonVerboseValues.addressPartnerUpdate1){
+            copy(bpna = bpnA, address = address.copy(
+                identifiers = (1 .. 101).map { AddressIdentifierDto(it.toString(), BusinessPartnerNonVerboseValues.addressIdentifierTypeDto1.technicalKey) }
+            ))
+        }
+
+        val updateResult = poolClient.addresses.updateAddresses(listOf(addressToUpdate))
+
+        assertThat(updateResult.entities).isEmpty()
+        assertThat(updateResult.errors.size).isEqualTo(1)
+
+        val expectedError = ErrorInfo(AddressUpdateError.IdentifiersTooMany, "IGNORED",bpnA)
+        assertHelpers.assertRecursively(updateResult.errors.single())
+            .ignoringFields(ErrorInfo<AddressUpdateError>::message.name)
+            .isEqualTo(expectedError)
+    }
+
 
     private fun assertCreatedAddressesAreEqual(actuals: Collection<AddressPartnerCreateVerboseDto>, expected: Collection<AddressPartnerCreateVerboseDto>) {
         actuals.forEach { assertThat(it.address.bpna).matches(testHelpers.bpnAPattern) }

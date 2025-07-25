@@ -42,6 +42,11 @@ class RequestValidationService(
     private val metadataService: MetadataService
 ) {
 
+    companion object{
+        const val IDENTIFIER_AMOUNT_LIMIT = 100
+    }
+
+
     fun validateLegalEntitiesToCreateFromController(leCreateRequests: Collection<LegalEntityPartnerCreateRequest>): Map<RequestWithKey, Collection<ErrorInfo<LegalEntityCreateError>>> {
 
         val leErrorsByRequest = validateLegalEntitiesToCreate(leCreateRequests.map {
@@ -71,7 +76,9 @@ class RequestValidationService(
             val validationErrors =
                 legalFormValidator.validate(legalEntityDto, request) +
                         identifierValidator.validate(legalEntityDto, request) +
-                        duplicatesValidator.validate(legalEntityDto, request, bpn = null)
+                        duplicatesValidator.validate(legalEntityDto, request, bpn = null) +
+                        validateLegalEntityIdentifierTooMany(legalEntityDto, request, LegalEntityCreateError.LegalEntityIdentifiersTooMany)
+
             request to validationErrors
         }.filterValues { it.isNotEmpty() }
     }
@@ -110,7 +117,9 @@ class RequestValidationService(
                 legalFormValidator.validate(legalEntity, requestBridge.request) +
                         identifierValidator.validate(legalEntity, requestBridge.request) +
                         duplicatesValidator.validate(legalEntity, requestBridge.request, requestBridge.bpnL) +
-                        existingBpnValidator.validate(requestBridge.bpnL)
+                        existingBpnValidator.validate(requestBridge.bpnL) +
+                        validateLegalEntityIdentifierTooMany(legalEntity, requestBridge.request, LegalEntityUpdateError.LegalEntityIdentifiersTooMany)
+
             requestBridge.request to validationErrors
         }.filterValues { it.isNotEmpty() }
     }
@@ -132,7 +141,8 @@ class RequestValidationService(
             val validationErrors =
                 regionValidator.validate(legalAddressDto, request) +
                         identifiersValidator.validate(legalAddressDto, request) +
-                        identifiersDuplicateValidator.validate(legalAddressDto, request, bridge.bpnA)
+                        identifiersDuplicateValidator.validate(legalAddressDto, request, bridge.bpnA) +
+                        validateAddressIdentifierTooMany(legalAddressDto, request, messages.identifiersTooMany)
 
             if (validationErrors.isNotEmpty()) {
                 val existing = result[request]
@@ -217,7 +227,8 @@ class RequestValidationService(
                 regionValidator.validate(address, request) +
                         identifiersValidator.validate(address, request) +
                         identifiersDuplicateValidator.validate(address, request, bpn = null) +
-                        parentValidator.validate(request.bpnParent, request)
+                        parentValidator.validate(request.bpnParent, request) +
+                        validateAddressIdentifierTooMany(address, request, AddressCreateError.IdentifiersTooMany)
 
             validationErrors
         }.filterValues { it.isNotEmpty() }
@@ -242,7 +253,9 @@ class RequestValidationService(
             val validationErrors = regionValidator.validate(address, request) +
                     identifiersValidator.validate(address, request) +
                     identifiersDuplicateValidator.validate(address, request, request.bpna) +
-                    existingBpnValidator.validate(request.bpna)
+                    existingBpnValidator.validate(request.bpna) +
+                    validateAddressIdentifierTooMany(address, request, AddressUpdateError.IdentifiersTooMany)
+
             validationErrors
         }.filterValues { it.isNotEmpty() }
     }
@@ -454,6 +467,19 @@ class RequestValidationService(
         )
     }
 
+    private fun <ERROR: ErrorCode> validateLegalEntityIdentifierTooMany(legalEntity: IBaseLegalEntityDto, entityKey: RequestWithKey, errorCode: ERROR): Collection<ErrorInfo<ERROR>>{
+        return  validatedIdentifiersTooMany(legalEntity.identifiers.size, entityKey, errorCode)
+    }
+
+    private fun <ERROR: ErrorCode> validateAddressIdentifierTooMany(address: IBaseLogisticAddressDto, entityKey: RequestWithKey, errorCode: ERROR): Collection<ErrorInfo<ERROR>>{
+        return validatedIdentifiersTooMany(address.identifiers.size, entityKey, errorCode)
+    }
+
+    private fun  <ERROR: ErrorCode> validatedIdentifiersTooMany(identifierAmount: Int, entityKey: RequestWithKey, errorCode: ERROR): Collection<ErrorInfo<ERROR>>{
+        return if(identifierAmount > IDENTIFIER_AMOUNT_LIMIT) listOf(ErrorInfo(errorCode, "Amount of identifiers ($identifierAmount) exceeds limit of $IDENTIFIER_AMOUNT_LIMIT", entityKey.getRequestKey()))
+        else emptyList()
+    }
+
     private data class LegalEntityMetadataKeys(
         val idTypes: Set<String>,
         val legalForms: Set<String>
@@ -493,38 +519,44 @@ class RequestValidationService(
 
         val regionNotFound: ERROR,
         val identifierNotFound: ERROR,
-        val duplicateIdentifier: ERROR
+        val duplicateIdentifier: ERROR,
+        val identifiersTooMany: ERROR
     )
 
 
     val orchestratorMessages = ValidatorErrorCodes(
         regionNotFound = OrchestratorError.AddressRegionNotFound,
         identifierNotFound = OrchestratorError.AddressIdentifierNotFound,
-        duplicateIdentifier = OrchestratorError.AddressDuplicateIdentifier
+        duplicateIdentifier = OrchestratorError.AddressDuplicateIdentifier,
+        identifiersTooMany = OrchestratorError.AddressIdentifiersTooMany
     )
 
     val leCreateMessages = ValidatorErrorCodes(
         regionNotFound = LegalEntityCreateError.LegalAddressRegionNotFound,
         identifierNotFound = LegalEntityCreateError.LegalAddressIdentifierNotFound,
-        duplicateIdentifier = LegalEntityCreateError.LegalAddressDuplicateIdentifier
+        duplicateIdentifier = LegalEntityCreateError.LegalAddressDuplicateIdentifier,
+        identifiersTooMany = LegalEntityCreateError.LegalAddressIdentifiersTooMany
     )
 
     val leUpdateMessages = ValidatorErrorCodes(
         regionNotFound = LegalEntityUpdateError.LegalAddressRegionNotFound,
         identifierNotFound = LegalEntityUpdateError.LegalAddressIdentifierNotFound,
-        duplicateIdentifier = LegalEntityUpdateError.LegalAddressDuplicateIdentifier
+        duplicateIdentifier = LegalEntityUpdateError.LegalAddressDuplicateIdentifier,
+        identifiersTooMany = LegalEntityUpdateError.LegalAddressIdentifiersTooMany
     )
 
     val siteCreateMessages = ValidatorErrorCodes(
         regionNotFound = SiteCreateError.MainAddressRegionNotFound,
         identifierNotFound = SiteCreateError.MainAddressIdentifierNotFound,
-        duplicateIdentifier = SiteCreateError.MainAddressDuplicateIdentifier
+        duplicateIdentifier = SiteCreateError.MainAddressDuplicateIdentifier,
+        identifiersTooMany = SiteCreateError.MainAddressIdentifiersTooMany
     )
 
     val siteUpdateMessages = ValidatorErrorCodes(
         regionNotFound = SiteUpdateError.MainAddressRegionNotFound,
         identifierNotFound = SiteUpdateError.MainAddressIdentifierNotFound,
-        duplicateIdentifier = SiteUpdateError.MainAddressDuplicateIdentifier
+        duplicateIdentifier = SiteUpdateError.MainAddressDuplicateIdentifier,
+        identifiersTooMany = SiteUpdateError.MainAddressIdentifiersTooMany
     )
 
 }

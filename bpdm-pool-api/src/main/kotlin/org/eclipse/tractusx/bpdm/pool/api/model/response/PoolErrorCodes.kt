@@ -35,7 +35,8 @@ enum class LegalEntityCreateError : ErrorCode {
     LegalAddressRegionNotFound,
     LegalAddressIdentifierNotFound,
     LegalAddressDuplicateIdentifier,
-    LegalEntityErrorMapping
+    LegalEntityIdentifiersTooMany,
+    LegalAddressIdentifiersTooMany
 }
 
 @Schema(description = "LegalEntityUpdateError")
@@ -47,8 +48,8 @@ enum class LegalEntityUpdateError : ErrorCode {
     LegalAddressRegionNotFound,
     LegalAddressIdentifierNotFound,
     LegalAddressDuplicateIdentifier,
-    LegalEntityErrorMapping
-
+    LegalEntityIdentifiersTooMany,
+    LegalAddressIdentifiersTooMany
 }
 
 @Schema(description = "SiteCreateError")
@@ -56,7 +57,8 @@ enum class SiteCreateError : ErrorCode {
     LegalEntityNotFound,
     MainAddressIdentifierNotFound,
     MainAddressRegionNotFound,
-    MainAddressDuplicateIdentifier
+    MainAddressDuplicateIdentifier,
+    MainAddressIdentifiersTooMany
 }
 
 @Schema(description = "SiteUpdateError")
@@ -64,7 +66,8 @@ enum class SiteUpdateError : ErrorCode {
     SiteNotFound,
     MainAddressIdentifierNotFound,
     MainAddressRegionNotFound,
-    MainAddressDuplicateIdentifier
+    MainAddressDuplicateIdentifier,
+    MainAddressIdentifiersTooMany
 }
 
 @Schema(description = "AddressCreateError")
@@ -75,6 +78,7 @@ enum class AddressCreateError : ErrorCode {
     RegionNotFound,
     IdentifierNotFound,
     AddressDuplicateIdentifier,
+    IdentifiersTooMany
 }
 
 @Schema(description = "AddressUpdateError")
@@ -83,6 +87,7 @@ enum class AddressUpdateError : ErrorCode {
     RegionNotFound,
     IdentifierNotFound,
     AddressDuplicateIdentifier,
+    IdentifiersTooMany
 }
 
 @Schema(description = "OrchestratorError")
@@ -90,4 +95,5 @@ enum class OrchestratorError : ErrorCode {
     AddressRegionNotFound,
     AddressIdentifierNotFound,
     AddressDuplicateIdentifier,
+    AddressIdentifiersTooMany
 }

@@ -33,11 +33,11 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorCode
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteCreateError
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteUpdateError
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerUpdateResponseWrapper
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.SiteVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerUpdateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SiteWithMainAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.dto.AddressMetadataDto
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
@@ -431,7 +431,8 @@ class SiteLegacyServiceMapper(
     val siteCreateMessages = ValidatorErrorCodes(
         regionNotFound = SiteCreateError.MainAddressRegionNotFound,
         identifierNotFound = SiteCreateError.MainAddressIdentifierNotFound,
-        duplicateIdentifier = SiteCreateError.MainAddressDuplicateIdentifier
+        duplicateIdentifier = SiteCreateError.MainAddressDuplicateIdentifier,
+        identifiersTooMany = SiteCreateError.MainAddressIdentifiersTooMany
     )
 
     @Transactional
@@ -524,7 +525,8 @@ class SiteLegacyServiceMapper(
     val siteUpdateMessages = ValidatorErrorCodes(
         regionNotFound = SiteUpdateError.MainAddressRegionNotFound,
         identifierNotFound = SiteUpdateError.MainAddressIdentifierNotFound,
-        duplicateIdentifier = SiteUpdateError.MainAddressDuplicateIdentifier
+        duplicateIdentifier = SiteUpdateError.MainAddressDuplicateIdentifier,
+        identifiersTooMany = SiteUpdateError.MainAddressIdentifiersTooMany
     )
 
     fun createSitesWithLegalAddressAsMain(requests: Collection<SiteCreateRequestWithLegalAddressAsMain>): SitePartnerCreateResponseWrapper {

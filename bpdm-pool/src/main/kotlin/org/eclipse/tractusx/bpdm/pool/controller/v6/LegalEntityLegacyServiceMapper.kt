@@ -20,12 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.controller.v6
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
-import org.eclipse.tractusx.bpdm.common.dto.IBaseLegalEntityDto
-import org.eclipse.tractusx.bpdm.common.dto.IBaseLogisticAddressDto
-import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.RequestWithKey
+import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.util.findDuplicates
 import org.eclipse.tractusx.bpdm.common.util.mergeMapsWithCollectionInValue
@@ -33,28 +28,23 @@ import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntityPartnerUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntityPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorCode
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityCreateError
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityUpdateError
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalFormDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.SiteVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerUpdateResponseWrapper
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.*
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntityPartnerCreateRequest
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntityPartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerUpdateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.dto.AddressMetadataDto
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.LegalEntityMetadataDto
 import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.eclipse.tractusx.bpdm.pool.repository.*
-import org.eclipse.tractusx.bpdm.pool.service.AddressService
-import org.eclipse.tractusx.bpdm.pool.service.BpnIssuingService
+import org.eclipse.tractusx.bpdm.pool.service.*
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService.AddressMetadataMapping
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService.Companion.createAlternativeAddress
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService.Companion.createConfidenceCriteria
@@ -65,24 +55,13 @@ import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService.Compan
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService.Companion.toLegalEntityIdentifier
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService.Companion.toLegalEntityState
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService.LegalEntityMetadataMapping
-import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerEquivalenceMapper
-import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerFetchService
-import org.eclipse.tractusx.bpdm.pool.service.MetadataService
-import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
-import org.eclipse.tractusx.bpdm.pool.service.RequestValidationService.AddressBridge
-import org.eclipse.tractusx.bpdm.pool.service.RequestValidationService.IdentifierCandidate
-import org.eclipse.tractusx.bpdm.pool.service.RequestValidationService.LegalEntityBridge
-import org.eclipse.tractusx.bpdm.pool.service.RequestValidationService.ValidatorErrorCodes
-import org.eclipse.tractusx.bpdm.pool.service.getAddressType
-import org.eclipse.tractusx.bpdm.pool.service.toDto
+import org.eclipse.tractusx.bpdm.pool.service.RequestValidationService.*
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
 import java.time.temporal.ChronoUnit
-import kotlin.collections.associateBy
-import kotlin.collections.plus
 
 @Service
 class LegalEntityLegacyServiceMapper(
@@ -527,7 +506,8 @@ class LegalEntityLegacyServiceMapper(
     val leCreateMessages = ValidatorErrorCodes(
         regionNotFound = LegalEntityCreateError.LegalAddressRegionNotFound,
         identifierNotFound = LegalEntityCreateError.LegalAddressIdentifierNotFound,
-        duplicateIdentifier = LegalEntityCreateError.LegalAddressDuplicateIdentifier
+        duplicateIdentifier = LegalEntityCreateError.LegalAddressDuplicateIdentifier,
+        identifiersTooMany = LegalEntityCreateError.LegalAddressIdentifiersTooMany
     )
 
     fun LegalEntityDb.toUpsertDto(entryId: String?): LegalEntityPartnerCreateVerboseDto {
@@ -761,7 +741,8 @@ class LegalEntityLegacyServiceMapper(
     val leUpdateMessages = ValidatorErrorCodes(
         regionNotFound = LegalEntityUpdateError.LegalAddressRegionNotFound,
         identifierNotFound = LegalEntityUpdateError.LegalAddressIdentifierNotFound,
-        duplicateIdentifier = LegalEntityUpdateError.LegalAddressDuplicateIdentifier
+        duplicateIdentifier = LegalEntityUpdateError.LegalAddressDuplicateIdentifier,
+        identifiersTooMany = LegalEntityUpdateError.LegalAddressIdentifiersTooMany
     )
 
 }

@@ -27,6 +27,7 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
+import org.eclipse.tractusx.bpdm.pool.exception.BpdmMultiValidationException
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
@@ -176,7 +177,7 @@ class TaskStepBuildService(
         )
         val result = businessPartnerBuildService.createLegalEntities(listOf(createRequest))
         if(result.errors.isNotEmpty())
-            throw BpdmValidationException("Errors on creating Legal Entity: ${result.errors.joinToString()}")
+            throw BpdmMultiValidationException(result.errors.map { "Error when creating legal entity: ${it.message}" })
 
         val legalEntityResult = result.entities.firstOrNull() ?: throw BpdmValidationException("Unknown error when trying to create legal entity")
 
@@ -195,7 +196,7 @@ class TaskStepBuildService(
         )
         val result = businessPartnerBuildService.updateLegalEntities(listOf(updateRequest))
         if(result.errors.isNotEmpty())
-            throw BpdmValidationException("Errors on updating Legal Entity: ${result.errors.joinToString()}")
+            throw BpdmMultiValidationException(result.errors.map { "Error when updating legal entity: ${it.message}" })
 
         val legalEntityResult = result.entities.firstOrNull() ?: throw BpdmValidationException("Unknown error when trying to update legal entity")
 
@@ -326,7 +327,7 @@ class TaskStepBuildService(
         }
 
         if(result.errors.isNotEmpty())
-            throw BpdmValidationException("Errors on creating Site: ${result.errors.joinToString()}")
+            throw BpdmMultiValidationException(result.errors.map { "Error when creating site: ${it.message}" })
 
         val siteResult = result.entities.firstOrNull() ?: throw BpdmValidationException("Unknown error when trying to creating site")
 
@@ -343,7 +344,7 @@ class TaskStepBuildService(
         )
         val result = businessPartnerBuildService.updateSites(listOf(updateRequest))
         if(result.errors.isNotEmpty())
-            throw BpdmValidationException("Errors on updating Site: ${result.errors.joinToString()}")
+            throw BpdmMultiValidationException(result.errors.map { "Error when updating site: ${it.message}" })
 
         val siteResult = result.entities.firstOrNull() ?: throw BpdmValidationException("Unknown error when trying to updating site")
 
@@ -409,7 +410,7 @@ class TaskStepBuildService(
         val result = businessPartnerBuildService.createAddresses(listOf(addressCreateRequest))
 
         if(result.errors.isNotEmpty())
-            throw BpdmValidationException("Errors on creating Address: ${result.errors.joinToString()}")
+            throw BpdmMultiValidationException(result.errors.map { "Errors on creating Address: ${it.message}" })
 
         val addressResult = result.entities.firstOrNull() ?: throw BpdmValidationException("Unknown error when trying to creating address")
 
@@ -427,7 +428,7 @@ class TaskStepBuildService(
         val result = businessPartnerBuildService.updateAddresses(listOf(addressUpdateRequest))
 
         if(result.errors.isNotEmpty())
-            throw BpdmValidationException("Errors on updating Address: ${result.errors.joinToString()}")
+            throw BpdmMultiValidationException(result.errors.map { "Errors on updating Address: ${it.message}" })
 
         val addressResult = result.entities.firstOrNull() ?: throw BpdmValidationException("Unknown error when trying to updating address")
 

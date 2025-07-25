@@ -738,6 +738,98 @@ class LegalEntityControllerIT @Autowired constructor(
 
     }
 
+    @Test
+    fun `create legal entity - too many legal identifiers`(){
+        val legalEntity = with(BusinessPartnerNonVerboseValues.legalEntityCreate1){
+            copy(legalEntity = legalEntity.copy(
+                identifiers = (1 .. 101).map { LegalEntityIdentifierDto(it.toString(), BusinessPartnerNonVerboseValues.identifierType1.technicalKey, null) }
+            ))
+        }
+
+        val createResult = poolClient.legalEntities.createBusinessPartners(listOf(legalEntity))
+
+        assertThat(createResult.entities).isEmpty()
+        assertThat(createResult.errors.size).isEqualTo(1)
+
+        val expectedError = ErrorInfo(LegalEntityCreateError.LegalEntityIdentifiersTooMany, "IGNORED", legalEntity.index)
+
+        assertHelpers.assertRecursively(expectedError)
+            .ignoringFields(ErrorInfo<LegalEntityCreateError>::message.name)
+            .isEqualTo(expectedError)
+    }
+
+    @Test
+    fun `create legal entity - too many legal address identifiers`(){
+        val legalEntity = with(BusinessPartnerNonVerboseValues.legalEntityCreate1){
+            copy(legalAddress = legalAddress.copy(
+                identifiers = (1 .. 101).map { AddressIdentifierDto(it.toString(), BusinessPartnerNonVerboseValues.addressIdentifierTypeDto1.technicalKey) }
+            ))
+        }
+
+        val createResult = poolClient.legalEntities.createBusinessPartners(listOf(legalEntity))
+
+        assertThat(createResult.entities).isEmpty()
+        assertThat(createResult.errors.size).isEqualTo(1)
+
+        val expectedError = ErrorInfo(LegalEntityCreateError.LegalAddressIdentifiersTooMany, "IGNORED", legalEntity.index)
+
+        assertHelpers.assertRecursively(expectedError)
+            .ignoringFields(ErrorInfo<LegalEntityCreateError>::message.name)
+            .isEqualTo(expectedError)
+    }
+
+    @Test
+    fun `update legal entity - too many legal identifiers`(){
+
+        val bpnL = poolClient.legalEntities.createBusinessPartners(listOf(
+            BusinessPartnerNonVerboseValues.legalEntityCreate1
+        )).entities.single().legalEntity.bpnl
+
+        val legalEntity = with(BusinessPartnerNonVerboseValues.legalEntityUpdate1){
+            copy(bpnl = bpnL,
+                legalEntity = legalEntity.copy(
+                identifiers = (1 .. 101).map { LegalEntityIdentifierDto(it.toString(), BusinessPartnerNonVerboseValues.identifierType1.technicalKey, null) }
+            ))
+        }
+
+        val updateResult = poolClient.legalEntities.updateBusinessPartners(listOf(legalEntity))
+
+        assertThat(updateResult.entities).isEmpty()
+        assertThat(updateResult.errors.size).isEqualTo(1)
+
+        val expectedError = ErrorInfo(LegalEntityUpdateError.LegalEntityIdentifiersTooMany, "IGNORED", bpnL)
+
+        assertHelpers.assertRecursively(expectedError)
+            .ignoringFields(ErrorInfo<LegalEntityCreateError>::message.name)
+            .isEqualTo(expectedError)
+    }
+
+    @Test
+    fun `update legal entity - too many legal address identifiers`(){
+
+        val bpnL = poolClient.legalEntities.createBusinessPartners(listOf(
+            BusinessPartnerNonVerboseValues.legalEntityCreate1
+        )).entities.single().legalEntity.bpnl
+
+        val legalEntity = with(BusinessPartnerNonVerboseValues.legalEntityUpdate1){
+            copy(bpnl = bpnL,
+                legalAddress = legalAddress.copy(
+                    identifiers = (1 .. 101).map { AddressIdentifierDto(it.toString(), BusinessPartnerNonVerboseValues.addressIdentifierTypeDto1.technicalKey) }
+                ))
+        }
+
+        val updateResult = poolClient.legalEntities.updateBusinessPartners(listOf(legalEntity))
+
+        assertThat(updateResult.entities).isEmpty()
+        assertThat(updateResult.errors.size).isEqualTo(1)
+
+        val expectedError = ErrorInfo(LegalEntityUpdateError.LegalAddressIdentifiersTooMany, "IGNORED", bpnL)
+
+        assertHelpers.assertRecursively(expectedError)
+            .ignoringFields(ErrorInfo<LegalEntityCreateError>::message.name)
+            .isEqualTo(expectedError)
+    }
+
     fun assertThatCreatedLegalEntitiesEqual(actuals: Collection<LegalEntityPartnerCreateVerboseDto>, expected: Collection<LegalEntityPartnerCreateVerboseDto>) {
         val now = Instant.now()
         val justBeforeCreate = now.minusSeconds(2)
