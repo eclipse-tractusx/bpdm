@@ -25,10 +25,7 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.util.TestHelpers
@@ -555,6 +552,57 @@ class SiteControllerIT @Autowired constructor(
 
         assertHelpers.assertRecursively(firstPage).ignoringFieldsOfTypes(Instant::class.java).isEqualTo(expectedFirstPage)
 
+    }
+
+    @Test
+    fun `create site - too many main address identifiers`(){
+        val bpnL = poolClient.legalEntities.createBusinessPartners(listOf(BusinessPartnerNonVerboseValues.legalEntityCreate1))
+            .entities.single().legalEntity.bpnl
+
+        val siteToCreate = with(BusinessPartnerNonVerboseValues.siteCreate1){
+            copy(bpnlParent = bpnL, site = site.copy(
+                mainAddress = site.mainAddress.copy(
+                    identifiers = (1 .. 101).map { AddressIdentifierDto(it.toString(), BusinessPartnerNonVerboseValues.addressIdentifierTypeDto1.technicalKey) }
+                )
+            ))
+        }
+
+        val createResult = poolClient.sites.createSite(listOf(siteToCreate))
+
+        assertThat(createResult.entities).isEmpty()
+        assertThat(createResult.errors.size).isEqualTo(1)
+
+        val expectedError = ErrorInfo(SiteCreateError.MainAddressIdentifiersTooMany, "IGNORED", siteToCreate.index)
+        assertHelpers.assertRecursively(createResult.errors.single())
+            .ignoringFields(ErrorInfo<SiteCreateError>::message.name)
+            .isEqualTo(expectedError)
+    }
+
+    @Test
+    fun `update site - too many main address identifiers`(){
+        val bpnL = poolClient.legalEntities.createBusinessPartners(listOf(BusinessPartnerNonVerboseValues.legalEntityCreate1))
+            .entities.single().legalEntity.bpnl
+
+        val bpnS = poolClient.sites.createSite(listOf(BusinessPartnerNonVerboseValues.siteCreate1.copy(bpnlParent = bpnL)))
+            .entities.single().site.bpns
+
+        val siteToUpdate = with(BusinessPartnerNonVerboseValues.siteUpdate1){
+            copy(bpns = bpnS, site = site.copy(
+                mainAddress = site.mainAddress.copy(
+                    identifiers = (1 .. 101).map { AddressIdentifierDto(it.toString(), BusinessPartnerNonVerboseValues.addressIdentifierTypeDto1.technicalKey) }
+                )
+            ))
+        }
+
+        val createResult = poolClient.sites.updateSite(listOf(siteToUpdate))
+
+        assertThat(createResult.entities).isEmpty()
+        assertThat(createResult.errors.size).isEqualTo(1)
+
+        val expectedError = ErrorInfo(SiteUpdateError.MainAddressIdentifiersTooMany, "IGNORED", siteToUpdate.bpns)
+        assertHelpers.assertRecursively(createResult.errors.single())
+            .ignoringFields(ErrorInfo<SiteUpdateError>::message.name)
+            .isEqualTo(expectedError)
     }
 
     private fun assertThatCreatedSitesEqual(actuals: Collection<SitePartnerCreateVerboseDto>, expected: Collection<SitePartnerCreateVerboseDto>) {

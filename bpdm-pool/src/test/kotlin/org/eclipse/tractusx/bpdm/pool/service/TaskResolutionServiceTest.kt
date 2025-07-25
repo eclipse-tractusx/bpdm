@@ -349,8 +349,7 @@ class TaskResolutionServiceTest @Autowired constructor(
 
         val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createLegalEntityRequest)
         assertThat(createResult[0].taskId).isEqualTo("TASK_1")
-        assertThat(createResult[0].errors[0].type).isEqualTo(TaskErrorType.Unspecified)
-        assertThat(createResult[0].errors).hasSize(1)
+        assertThat(createResult[0].errors).isNotEmpty
     }
 
 
@@ -1048,5 +1047,62 @@ class TaskResolutionServiceTest @Autowired constructor(
         upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = updateLinkageRequest)
         val updatedLegalEntity = poolClient.legalEntities.getLegalEntity(bpnL)
         assertThat(updatedLegalEntity.legalAddress.addressType == AddressType.LegalAndSiteMainAddress).isTrue()
+    }
+
+    @Test
+    fun `create legal entity - too many identifiers`(){
+        val legalIdentifierTypeKey = orchTestDataFactory.metadata!!.legalEntityIdentifierTypes.first()
+        val addressIdentifierTypeKey = orchTestDataFactory.metadata!!.addressIdentifierTypes.first()
+
+        val businessPartner = orchTestDataFactory.createLegalEntityBusinessPartner("test").copyWithBpnRequests()
+        val businessPartnerWithTooManyIdentifiers = businessPartner.copy(
+            legalEntity = businessPartner.legalEntity.copy(
+                identifiers = createIdentifiers(legalIdentifierTypeKey, 101),
+                legalAddress = businessPartner.legalEntity.legalAddress.copy(identifiers = createIdentifiers(addressIdentifierTypeKey, 101))
+                )
+        )
+
+       val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = businessPartnerWithTooManyIdentifiers)
+
+        assertThat(createResult.size).isEqualTo(1)
+        assertThat(createResult.single().errors.size).isEqualTo(2)
+    }
+
+    @Test
+    fun `create full new site - too many identifiers`(){
+        val addressIdentifierTypeKey = orchTestDataFactory.metadata!!.addressIdentifierTypes.first()
+
+        val businessPartner = orchTestDataFactory.createSiteBusinessPartner("test").copyWithBpnRequests()
+        val businessPartnerWithTooManyIdentifiers = businessPartner.copy(
+            site = businessPartner.site!!.copy(
+                siteMainAddress = businessPartner.site!!.siteMainAddress!!.copy(identifiers = createIdentifiers(addressIdentifierTypeKey, 101))
+            )
+        )
+
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = businessPartnerWithTooManyIdentifiers)
+
+        assertThat(createResult.size).isEqualTo(1)
+        assertThat(createResult.single().errors.size).isEqualTo(1)
+    }
+
+    @Test
+    fun `create full new additional address - too many identifiers`(){
+        val addressIdentifierTypeKey = orchTestDataFactory.metadata!!.addressIdentifierTypes.first()
+
+        val businessPartner = orchTestDataFactory.createFullBusinessPartner("test").copyWithBpnRequests()
+        val businessPartnerWithTooManyIdentifiers = businessPartner.copy(
+            additionalAddress = businessPartner.additionalAddress!!.copy(
+                identifiers = createIdentifiers(addressIdentifierTypeKey, 101)
+            )
+        )
+
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = businessPartnerWithTooManyIdentifiers)
+
+        assertThat(createResult.size).isEqualTo(1)
+        assertThat(createResult.single().errors.size).isEqualTo(1)
+    }
+
+    private fun createIdentifiers(idTypeKey: String, amount: Int): List<Identifier>{
+        return (1 .. amount).map { Identifier(it.toString(), idTypeKey, null) }
     }
 }

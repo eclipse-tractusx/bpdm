@@ -4538,6 +4538,7 @@ components:
             - RegionNotFound
             - IdentifierNotFound
             - AddressDuplicateIdentifier
+            - IdentifiersTooMany
         message:
           type: string
           description: Error message that explains the error
@@ -4561,6 +4562,7 @@ components:
             - RegionNotFound
             - IdentifierNotFound
             - AddressDuplicateIdentifier
+            - IdentifiersTooMany
         message:
           type: string
           description: Error message that explains the error
@@ -4587,6 +4589,8 @@ components:
             - LegalAddressIdentifierNotFound
             - LegalAddressDuplicateIdentifier
             - LegalEntityErrorMapping
+            - LegalEntityIdentifiersTooMany
+            - LegalAddressIdentifiersTooMany
         message:
           type: string
           description: Error message that explains the error
@@ -4614,6 +4618,8 @@ components:
             - LegalAddressIdentifierNotFound
             - LegalAddressDuplicateIdentifier
             - LegalEntityErrorMapping
+            - LegalEntityIdentifiersTooMany
+            - LegalAddressIdentifiersTooMany
         message:
           type: string
           description: Error message that explains the error
@@ -4637,6 +4643,7 @@ components:
             - MainAddressIdentifierNotFound
             - MainAddressRegionNotFound
             - MainAddressDuplicateIdentifier
+            - MainAddressIdentifiersTooMany
         message:
           type: string
           description: Error message that explains the error
@@ -4660,6 +4667,7 @@ components:
             - MainAddressIdentifierNotFound
             - MainAddressRegionNotFound
             - MainAddressDuplicateIdentifier
+            - MainAddressIdentifiersTooMany
         message:
           type: string
           description: Error message that explains the error

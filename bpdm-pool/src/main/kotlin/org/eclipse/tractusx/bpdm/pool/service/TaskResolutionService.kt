@@ -23,6 +23,7 @@ import jakarta.persistence.EntityManager
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.pool.config.GoldenRecordTaskConfigProperties
 import org.eclipse.tractusx.bpdm.pool.entity.GoldenRecordTaskDb
+import org.eclipse.tractusx.bpdm.pool.exception.BpdmMultiValidationException
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.repository.GoldenRecordTaskRepository
@@ -176,6 +177,17 @@ class TaskResolutionService(
                         description = ex.message ?: ""
                     )
                 ),
+                businessPartner = taskStep.businessPartner
+            )
+        } catch (ex: BpdmMultiValidationException){
+            TaskStepResultEntryDto(
+                taskId = taskStep.taskId,
+                errors = ex.validationErrors.map {
+                    TaskErrorDto(
+                        type = TaskErrorType.Unspecified,
+                        description = it
+                    )
+                },
                 businessPartner = taskStep.businessPartner
             )
         } catch (ex: Throwable) {
