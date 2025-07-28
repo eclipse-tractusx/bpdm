@@ -59,6 +59,12 @@ class RelationsGoldenRecordTaskEventControllerIT @Autowired constructor(
         businessPartnerTargetBpnl = "BPNL4"
     )
 
+    private val defaultRelations3 = BusinessPartnerRelations(
+        relationType = RelationType.IsOwnedBy,
+        businessPartnerSourceBpnl = "BPNL5",
+        businessPartnerTargetBpnl = "BPNL6"
+    )
+
     @BeforeEach
     fun cleanUp() {
         dbTestHelpers.truncateDbTables()
@@ -89,7 +95,8 @@ class RelationsGoldenRecordTaskEventControllerIT @Autowired constructor(
                 taskMode,
                 listOf(
                     TaskCreateRelationsRequestEntry(null, defaultRelations1),
-                    TaskCreateRelationsRequestEntry(null, defaultRelations2)
+                    TaskCreateRelationsRequestEntry(null, defaultRelations2),
+                    TaskCreateRelationsRequestEntry(null, defaultRelations3),
                 )
             )
         ).createdTasks

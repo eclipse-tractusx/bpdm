@@ -462,6 +462,7 @@ class GoldenRecordUpdateChunkService(
         when(this){
             RelationType.IsAlternativeHeadquarterFor -> SharableRelationType.IsAlternativeHeadquarterFor
             RelationType.IsManagedBy -> SharableRelationType.IsManagedBy
+            RelationType.IsOwnedBy -> SharableRelationType.IsOwnedBy
         }
 
     private fun createMappingException(property: KProperty<*>, entityId: Long? = null): BpdmNullMappingException {

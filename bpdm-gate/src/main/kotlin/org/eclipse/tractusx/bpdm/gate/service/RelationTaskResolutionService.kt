@@ -128,6 +128,7 @@ class RelationTaskResolutionService(
         return when(this){
             RelationType.IsAlternativeHeadquarterFor -> SharableRelationType.IsAlternativeHeadquarterFor
             RelationType.IsManagedBy -> SharableRelationType.IsManagedBy
+            RelationType.IsOwnedBy -> SharableRelationType.IsOwnedBy
         }
     }
 

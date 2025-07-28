@@ -50,6 +50,8 @@ class RelationsGoldenRecordTaskControllerIT @Autowired constructor(
 
     private val defaultRelations1 = BusinessPartnerRelations(relationType = RelationType.IsAlternativeHeadquarterFor, businessPartnerSourceBpnl = "BPNL1", businessPartnerTargetBpnl = "BPNL2")
     private val defaultRelations2 = BusinessPartnerRelations(relationType = RelationType.IsManagedBy, businessPartnerSourceBpnl = "BPNL3", businessPartnerTargetBpnl = "BPNL4")
+    private val defaultRelations3 = BusinessPartnerRelations(relationType = RelationType.IsOwnedBy, businessPartnerSourceBpnl = "BPNL4", businessPartnerTargetBpnl = "BPNL5")
+
 
     @BeforeEach
     fun cleanUp() {
@@ -62,7 +64,7 @@ class RelationsGoldenRecordTaskControllerIT @Autowired constructor(
         //Create records by creating tasks first for now and there is scope for improvement once bpdm-gate sync relations logic is in place
         val existingRecordIds = createTasksWithoutRecordId(taskMode).createdTasks.map { it.recordId }
 
-        val requestsWithRecords = listOf(defaultRelations1, defaultRelations2)
+        val requestsWithRecords = listOf(defaultRelations1, defaultRelations2, defaultRelations3)
             .zip(existingRecordIds)
             .map { (bpr, recordId) -> TaskCreateRelationsRequestEntry(recordId, bpr) }
 
@@ -83,7 +85,7 @@ class RelationsGoldenRecordTaskControllerIT @Autowired constructor(
 
         //Create newer tasks for the given records
         createTasks(mode = taskMode, entries = createdRecordIds
-            .zip(listOf(defaultRelations1, defaultRelations2))
+            .zip(listOf(defaultRelations1, defaultRelations2, defaultRelations3))
             .map { (recordId, bp) -> TaskCreateRelationsRequestEntry(recordId, bp) }
         ).createdTasks
 
@@ -93,12 +95,12 @@ class RelationsGoldenRecordTaskControllerIT @Autowired constructor(
     }
 
     private fun createTasksWithoutRecordId(mode: TaskMode, businessPartnersRelations: List<BusinessPartnerRelations>? = null): TaskCreateRelationsResponse =
-        createTasks(mode, (businessPartnersRelations ?: listOf(defaultRelations1, defaultRelations2)).map{ bpr -> TaskCreateRelationsRequestEntry(null, bpr) })
+        createTasks(mode, (businessPartnersRelations ?: listOf(defaultRelations1, defaultRelations2, defaultRelations3)).map{ bpr -> TaskCreateRelationsRequestEntry(null, bpr) })
 
     private fun createTasks(mode: TaskMode,
                             entries: List<TaskCreateRelationsRequestEntry>? = null
     ): TaskCreateRelationsResponse{
-        val resolvedEntries = entries ?: listOf(defaultRelations1, defaultRelations2).map { bpr -> TaskCreateRelationsRequestEntry(null, bpr) }
+        val resolvedEntries = entries ?: listOf(defaultRelations1, defaultRelations2, defaultRelations3).map { bpr -> TaskCreateRelationsRequestEntry(null, bpr) }
         return orchestratorClient.relationsGoldenRecordTasks.createTasks(TaskCreateRelationsRequest(mode = mode, requests = resolvedEntries))
     }
 

@@ -14,6 +14,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - CICD: Code Coverage Analysis and Reporting for BPDM [#1338](https://github.com/eclipse-tractusx/bpdm/issues/1338)
 - BPDM Cleaning Dummy: Configuration and scheduling support for relation cleaning dummy service with unit test coverage [#1383](https://github.com/eclipse-tractusx/bpdm/issues/1383).
 - BPDM Pool: Add validation for too many identifiers when creating/updating business partners [1388](https://github.com/eclipse-tractusx/bpdm/issues/1388)
+- BPDM: Add IsOwnedBy relation to the golden record process for sharing majority-owned legal hierarchies [1399](https://github.com/eclipse-tractusx/bpdm/issues/1399)
 
 ### Changed
 

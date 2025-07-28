@@ -34,7 +34,8 @@ import org.eclipse.tractusx.orchestrator.api.model.RelationType as OrchestratorR
 class TaskRelationsStepBuildService(
     private val alternativeHeadquarterRelationService: AlternativeHeadquarterRelationUpsertService,
     private val legalEntityRepository: LegalEntityRepository,
-    private val managedRelationUpsertService: ManagedRelationUpsertService
+    private val managedRelationUpsertService: ManagedRelationUpsertService,
+    private val ownedByRelationService: OwnedByRelationUpsertService
 ) {
 
     @Transactional
@@ -57,6 +58,7 @@ class TaskRelationsStepBuildService(
         val strategyService : IRelationUpsertStrategyService = when(relationDto.relationType){
             OrchestratorRelationType.IsAlternativeHeadquarterFor -> alternativeHeadquarterRelationService
             OrchestratorRelationType.IsManagedBy -> managedRelationUpsertService
+            OrchestratorRelationType.IsOwnedBy -> ownedByRelationService
         }
 
         val upsertResult = strategyService.upsertRelation(upsertRequest)
@@ -80,6 +82,7 @@ class TaskRelationsStepBuildService(
         return when(this){
             RelationType.IsAlternativeHeadquarterFor -> OrchestratorRelationType.IsAlternativeHeadquarterFor
             RelationType.IsManagedBy -> OrchestratorRelationType.IsManagedBy
+            RelationType.IsOwnedBy -> OrchestratorRelationType.IsOwnedBy
         }
     }
 }

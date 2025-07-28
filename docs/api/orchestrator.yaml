@@ -648,6 +648,7 @@ components:
           enum:
             - IsAlternativeHeadquarterFor
             - IsManagedBy
+            - IsOwnedBy
         businessPartnerSourceBpnl:
           type: string
           description: The business partner from which the relation emerges (the source)
