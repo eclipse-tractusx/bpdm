@@ -23,6 +23,7 @@ import jakarta.persistence.*
 import org.eclipse.tractusx.orchestrator.api.model.TaskMode
 import org.eclipse.tractusx.orchestrator.api.model.TaskStep
 import org.hibernate.annotations.Type
+import java.time.Instant
 import java.util.*
 
 @Entity
@@ -68,7 +69,9 @@ class RelationsGoldenRecordTaskDb(
             BusinessPartnerRelations (
                 relationType = relationType.also { businessPartnerRelations.relationType = it },
                 businessPartnerSourceBpnl = businessPartnerSourceBpnl.also { businessPartnerRelations.businessPartnerSourceBpnl = it },
-                businessPartnerTargetBpnl = businessPartnerTargetBpnl.also { businessPartnerRelations.businessPartnerTargetBpnl = it }
+                businessPartnerTargetBpnl = businessPartnerTargetBpnl.also { businessPartnerRelations.businessPartnerTargetBpnl = it },
+                validFrom = validFrom,
+                validTo = validTo
             )
         }
     }
@@ -109,7 +112,11 @@ class RelationsGoldenRecordTaskDb(
         @Column(name = "source_bpnl", nullable = false)
         var businessPartnerSourceBpnl: String,
         @Column(name = "target_bpnl", nullable = false)
-        var businessPartnerTargetBpnl: String
+        var businessPartnerTargetBpnl: String,
+        @Column(name = "valid_from", nullable = false)
+        var validFrom: Instant,
+        @Column(name = "valid_to", nullable = false)
+        var validTo: Instant
     )
 
 

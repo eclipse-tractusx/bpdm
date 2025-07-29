@@ -455,6 +455,8 @@ class GoldenRecordUpdateChunkService(
             relationType = relation.type.toGateModel(),
             sourceBpnL = relation.businessPartnerSourceBpnl,
             targetBpnL = relation.businessPartnerTargetBpnl,
+            validFrom = TODO(),
+            validTo = TODO(),
             updatedAt = placeholderTime
         )
 

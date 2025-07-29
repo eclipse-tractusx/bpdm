@@ -43,7 +43,9 @@ class RelationsResponseMapper {
             BusinessPartnerRelations(
                 relationType = toRelationType(relationType),
                 businessPartnerSourceBpnl = businessPartnerSourceBpnl,
-                businessPartnerTargetBpnl = businessPartnerTargetBpnl
+                businessPartnerTargetBpnl = businessPartnerTargetBpnl,
+                validFrom = validFrom,
+                validTo = validTo,
             )
         }
 
@@ -86,5 +88,17 @@ class RelationsResponseMapper {
     fun toTaskError(taskError: RelationsTaskErrorDb) =
         with(taskError) {
             TaskRelationsErrorDto(type = type, description = description)
+        }
+
+    fun toBusinessPartneRelationVerboseResult(businessPartnerRelations: RelationsGoldenRecordTaskDb.BusinessPartnerRelations) =
+        with(businessPartnerRelations) {
+            BusinessPartnerRelationVerboseDto(
+                relationType = toRelationType(relationType),
+                businessPartnerSourceBpnl = businessPartnerSourceBpnl,
+                businessPartnerTargetBpnl = businessPartnerTargetBpnl,
+                validFrom = validFrom,
+                validTo = validTo,
+                isActive = Instant.now() in validFrom..validTo
+            )
         }
 }

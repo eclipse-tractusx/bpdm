@@ -24,10 +24,11 @@ import org.eclipse.tractusx.bpdm.pool.api.model.RelationType
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
+import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelationVerboseDto
 import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepReservationEntryDto
 import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepResultEntryDto
 import org.springframework.stereotype.Service
+import java.time.Instant
 import org.eclipse.tractusx.orchestrator.api.model.RelationType as OrchestratorRelationType
 
 @Service
@@ -53,7 +54,7 @@ class TaskRelationsStepBuildService(
         val targetLegalEntity = legalEntityRepository.findByBpnIgnoreCase(relationDto.businessPartnerTargetBpnl)
             ?: throw BpdmValidationException("Target legal entity with specified BPNL : ${relationDto.businessPartnerTargetBpnl} not found")
 
-        val upsertRequest = IRelationUpsertStrategyService.UpsertRequest(sourceLegalEntity, targetLegalEntity)
+        val upsertRequest = IRelationUpsertStrategyService.UpsertRequest(sourceLegalEntity, targetLegalEntity, relationDto.validFrom, relationDto.validTo)
         val strategyService : IRelationUpsertStrategyService = when(relationDto.relationType){
             OrchestratorRelationType.IsAlternativeHeadquarterFor -> alternativeHeadquarterRelationService
             OrchestratorRelationType.IsManagedBy -> managedRelationUpsertService
@@ -68,11 +69,14 @@ class TaskRelationsStepBuildService(
         )
     }
 
-    private fun RelationDb.toTaskDto(): BusinessPartnerRelations{
-        return BusinessPartnerRelations(
-            type.toTaskDto(),
-            startNode.bpn,
-            endNode.bpn
+    private fun RelationDb.toTaskDto(): BusinessPartnerRelationVerboseDto{
+        return BusinessPartnerRelationVerboseDto(
+            relationType = type.toTaskDto(),
+            businessPartnerSourceBpnl = startNode.bpn,
+            businessPartnerTargetBpnl = endNode.bpn,
+            validFrom = validFrom,
+            validTo = validTo,
+            isActive = Instant.now() in validFrom..validTo
         )
     }
 

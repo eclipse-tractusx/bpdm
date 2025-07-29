@@ -62,6 +62,8 @@ interface IRelationService {
         val relation: RelationDb,
         val relationType: SharableRelationType,
         val businessPartnerSourceExternalId: String,
-        val businessPartnerTargetExternalId: String
+        val businessPartnerTargetExternalId: String,
+        val validFrom: Instant,
+        val validTo: Instant
     )
 }

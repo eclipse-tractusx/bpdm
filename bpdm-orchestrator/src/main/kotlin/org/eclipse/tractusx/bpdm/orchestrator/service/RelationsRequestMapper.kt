@@ -33,7 +33,9 @@ class RelationsRequestMapper {
             RelationsGoldenRecordTaskDb.BusinessPartnerRelations(
                 relationType = RelationsGoldenRecordTaskDb.RelationType.valueOf(relationType.name),
                 businessPartnerSourceBpnl = businessPartnerSourceBpnl,
-                businessPartnerTargetBpnl = businessPartnerTargetBpnl
+                businessPartnerTargetBpnl = businessPartnerTargetBpnl,
+                validFrom = validFrom,
+                validTo = validTo
             )
         }
 

@@ -17,29 +17,11 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.model
+package org.eclipse.tractusx.bpdm.gate.model
 
-import io.swagger.v3.oas.annotations.media.Schema
 import java.time.Instant
 
-@Schema(name = "RelationVerboseDto", description = "Directed relation between two business partners")
-data class RelationVerboseDto(
-
-    @get:Schema(description = "The type of relation between the Legal Entities")
-    val type: RelationType,
-
-    @get:Schema(description = "BPN of partner from which the relation emerges (the source)")
-    val businessPartnerSourceBpnl: String,
-
-    @get:Schema(description = "BPN of partner to which this relation goes (the target)")
-    val businessPartnerTargetBpnl: String,
-
-    @get:Schema(description = "The date from which the relation is valid.")
-    val validFrom: Instant,
-
-    @get:Schema(description = "The date until the relation is valid.")
-    val validTo: Instant,
-
-    @get:Schema(description = "Status of the relation")
-    val isActive: Boolean
-)
+object RelationDefaults {
+    val VALID_FROM_DEFAULT: Instant = Instant.parse("1970-01-01T00:00:00Z")
+    val VALID_TO_DEFAULT: Instant = Instant.parse("9999-12-31T23:59:59Z")
+}

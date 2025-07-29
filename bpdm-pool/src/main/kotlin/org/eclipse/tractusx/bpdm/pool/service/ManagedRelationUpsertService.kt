@@ -27,6 +27,7 @@ import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.Instant
 
 @Service
 class ManagedRelationUpsertService(
@@ -36,19 +37,20 @@ class ManagedRelationUpsertService(
 
     @Transactional
     override fun upsertRelation(upsertRequest: IRelationUpsertStrategyService.UpsertRequest): UpsertResult<RelationDb> {
-        val (proposedSource, proposedTarget) = upsertRequest
+        val (source, target, validFrom, validTo) = upsertRequest
 
-        validateNoChain(proposedSource, proposedTarget)
-        validateSingleManager(proposedSource)
+        validateNoChain(source, target)
+        validateSingleManager(source, target)
+        validateNoOverlap(source, target, validFrom, validTo)
 
-        val result = relationUpsertService.upsertRelation(
-            RelationUpsertService.UpsertRequest(proposedSource, proposedTarget, RelationType.IsManagedBy)
+        return relationUpsertService.upsertRelation(
+            RelationUpsertService.UpsertRequest(source, target, RelationType.IsManagedBy, validFrom, validTo)
         )
-
-        return result
-
     }
 
+    /**
+     * Prevent loops: Managing entity can't also be managed, and vice versa.
+     */
     private fun validateNoChain(source: LegalEntityDb, target: LegalEntityDb) {
         val sourceRelations = relationRepository.findInSourceOrTarget(RelationType.IsManagedBy, source)
         val targetRelations = relationRepository.findInSourceOrTarget(RelationType.IsManagedBy, target)
@@ -68,15 +70,45 @@ class ManagedRelationUpsertService(
         }
     }
 
-    private fun validateSingleManager(source: LegalEntityDb) {
-        val existingManagers = relationRepository.findInSourceOrTarget(RelationType.IsManagedBy, source)
-            .filter { it.startNode.id == source.id }
+    /**
+     * Enforce only one manager per managed entity, allowing update to same target.
+     */
+    private fun validateSingleManager(source: LegalEntityDb, target: LegalEntityDb) {
+        val conflictingRelations = relationRepository.findInSourceOrTarget(RelationType.IsManagedBy, source)
+            .filter { it.startNode.id == source.id && it.endNode.id != target.id }
 
-        if (existingManagers.isNotEmpty()) {
-            val managerBpns = existingManagers.joinToString { it.endNode.bpn }
+        if (conflictingRelations.isNotEmpty()) {
+            val managerBpns = conflictingRelations.joinToString { it.endNode.bpn }
             throw BpdmValidationException(
                 "Invalid 'IsManagedBy' relation: The Managed Legal Entity with BPNL '${source.bpn}' is already managed by another Managing Legal Entity '${managerBpns}'. " +
                         "A Managed Legal Entity may only have one Managing Legal Entity at a time."
+            )
+        }
+    }
+
+    /**
+     * Prevent multiple validity windows overlapping between same source and target.
+     */
+    private fun validateNoOverlap(
+        source: LegalEntityDb,
+        target: LegalEntityDb,
+        newValidFrom: Instant,
+        newValidTo: Instant
+    ) {
+        val existingRelations = relationRepository.findAll(
+            RelationRepository.byRelation(source, target, RelationType.IsManagedBy)
+        )
+
+        val overlaps = existingRelations.any {
+            // Exclude exact match — update is allowed
+            !(it.validFrom == newValidFrom && it.validTo == newValidTo) &&
+                    !(newValidTo.isBefore(it.validFrom) || newValidFrom.isAfter(it.validTo))
+        }
+
+        if (overlaps) {
+            throw BpdmValidationException(
+                "Overlapping validity period detected for 'IsManagedBy' relation between source '${source.bpn}' and target '${target.bpn}'. " +
+                        "Existing relations must not overlap in time."
             )
         }
     }

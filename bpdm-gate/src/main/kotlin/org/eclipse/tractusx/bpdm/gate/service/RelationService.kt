@@ -30,6 +30,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.*
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
 import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.eclipse.tractusx.bpdm.gate.exception.*
+import org.eclipse.tractusx.bpdm.gate.model.RelationDefaults
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.eclipse.tractusx.bpdm.gate.repository.RelationRepository
 import org.eclipse.tractusx.bpdm.gate.repository.RelationStageRepository
@@ -101,13 +102,15 @@ class RelationService(
         externalId: String?,
         relationType: RelationType,
         sourceBusinessPartnerExternalId: String,
-        targetBusinessPartnerExternalId: String
+        targetBusinessPartnerExternalId: String,
+        validFrom: Instant,
+        validTo: Instant
     ): RelationDto {
         if (externalId != null) {
             val existingRelationship = relationRepository.findByTenantBpnLAndExternalId(tenantBpnL.value, externalId)
             if (existingRelationship != null) throw BpdmRelationAlreadyExistsException(externalId)
         }
-        return toDto(createInputStage(tenantBpnL, externalId, relationType, sourceBusinessPartnerExternalId, targetBusinessPartnerExternalId))
+        return toDto(createInputStage(tenantBpnL, externalId, relationType, sourceBusinessPartnerExternalId, targetBusinessPartnerExternalId, validFrom, validTo))
     }
 
     @Transactional
@@ -127,7 +130,9 @@ class RelationService(
                         externalId = externalId,
                         relationType = relationType,
                         sourceBusinessPartnerExternalId = businessPartnerSourceExternalId,
-                        targetBusinessPartnerExternalId = businessPartnerTargetExternalId
+                        targetBusinessPartnerExternalId = businessPartnerTargetExternalId,
+                        validFrom = validFrom?: RelationDefaults.VALID_FROM_DEFAULT,
+                        validTo = validTo?: RelationDefaults.VALID_TO_DEFAULT
                     )
                 }
             }
@@ -142,7 +147,9 @@ class RelationService(
                         externalId = externalId,
                         relationType = relationType,
                         sourceBusinessPartnerExternalId = businessPartnerSourceExternalId,
-                        targetBusinessPartnerExternalId = businessPartnerTargetExternalId
+                        targetBusinessPartnerExternalId = businessPartnerTargetExternalId,
+                        validFrom = validFrom?: RelationDefaults.VALID_FROM_DEFAULT,
+                        validTo = validTo?: RelationDefaults.VALID_TO_DEFAULT
                     )
                 }
             }.map(::toDto)
@@ -150,7 +157,7 @@ class RelationService(
 
     @Transactional
     override fun upsertOutputRelations(relations: List<IRelationService.RelationUpsertRequest>): List<RelationDb> {
-        return relations.map { upsertOutput(it.relation, it.relationType, it.businessPartnerSourceExternalId, it.businessPartnerTargetExternalId) }
+        return relations.map { upsertOutput(it.relation, it.relationType, it.businessPartnerSourceExternalId, it.businessPartnerTargetExternalId, it.validFrom, it.validTo) }
     }
 
     private fun upsertInputStage(
@@ -158,13 +165,15 @@ class RelationService(
         externalId: String,
         relationType: RelationType,
         sourceBusinessPartnerExternalId: String,
-        targetBusinessPartnerExternalId: String
+        targetBusinessPartnerExternalId: String,
+        validFrom: Instant,
+        validTo: Instant
     ): RelationDto {
         val existingRelationship = relationRepository.findByTenantBpnLAndExternalId(tenantBpnL.value, externalId)
         val upsertedRelationStage = if(existingRelationship == null)
-            createInputStage(tenantBpnL, externalId, relationType, sourceBusinessPartnerExternalId, targetBusinessPartnerExternalId)
+            createInputStage(tenantBpnL, externalId, relationType, sourceBusinessPartnerExternalId, targetBusinessPartnerExternalId, validFrom, validTo)
         else
-            updateInputStage(existingRelationship, relationType, sourceBusinessPartnerExternalId, targetBusinessPartnerExternalId)
+            updateInputStage(existingRelationship, relationType, sourceBusinessPartnerExternalId, targetBusinessPartnerExternalId, validFrom, validTo)
 
         return toDto(upsertedRelationStage)
     }
@@ -173,13 +182,15 @@ class RelationService(
         relation: RelationDb,
         relationType: SharableRelationType,
         sourceBpnL: String,
-        targetBpnL: String
+        targetBpnL: String,
+        validFrom: Instant,
+        validTo: Instant
     ): RelationDb{
         if(sourceBpnL == targetBpnL)
             throw BpdmInvalidRelationException("Source and target should not be the same")
 
         val changelogType = if(relation.output == null) ChangelogType.CREATE else ChangelogType.UPDATE
-        relation.output = RelationOutputDb(relationType, sourceBpnL, targetBpnL, Instant.now())
+        relation.output = RelationOutputDb(relationType, sourceBpnL, targetBpnL, validFrom, validTo, Instant.now())
         relationSharingStateService.setSuccess(relation)
 
         changelogRepository.save(ChangelogEntryDb(relation.externalId, relation.tenantBpnL, changelogType, StageType.Output, GoldenRecordType.Relation))
@@ -191,10 +202,16 @@ class RelationService(
         externalId: String?,
         relationType: RelationType,
         sourceBusinessPartnerExternalId: String,
-        targetBusinessPartnerExternalId: String
+        targetBusinessPartnerExternalId: String,
+        validFrom: Instant,
+        validTo: Instant
     ): RelationStageDb{
         if(sourceBusinessPartnerExternalId == targetBusinessPartnerExternalId)
             throw BpdmInvalidRelationException("Source and target '$sourceBusinessPartnerExternalId' should not be equal.")
+
+        if(validFrom.isAfter(validTo)) {
+            throw BpdmInvalidRelationException("'validFrom' cannot be after 'validTo'.")
+        }
 
         val relation = RelationDb(
             externalId = externalId ?: UUID.randomUUID().toString(),
@@ -214,7 +231,9 @@ class RelationService(
             relationType = relationType,
             stage = StageType.Input,
             source = source,
-            target = target
+            target = target,
+            validFrom = validFrom,
+            validTo = validTo,
         )
 
         relationStageRepository.save(relationStage)
@@ -228,20 +247,28 @@ class RelationService(
         externalId: String,
         relationType: RelationType,
         sourceBusinessPartnerExternalId: String,
-        targetBusinessPartnerExternalId: String
+        targetBusinessPartnerExternalId: String,
+        validFrom: Instant,
+        validTo: Instant
     ): RelationStageDb{
         val existingRelationship = relationRepository.findByTenantBpnLAndExternalId(tenantBpnL.value, externalId) ?: throw BpdmMissingRelationException(externalId)
-        return updateInputStage(existingRelationship, relationType, sourceBusinessPartnerExternalId, targetBusinessPartnerExternalId)
+        return updateInputStage(existingRelationship, relationType, sourceBusinessPartnerExternalId, targetBusinessPartnerExternalId, validFrom, validTo)
     }
 
     private fun updateInputStage(
         relation: RelationDb,
         relationType: RelationType,
         sourceBusinessPartnerExternalId: String,
-        targetBusinessPartnerExternalId: String
+        targetBusinessPartnerExternalId: String,
+        validFrom: Instant,
+        validTo: Instant
     ): RelationStageDb{
         if(sourceBusinessPartnerExternalId == targetBusinessPartnerExternalId)
             throw BpdmInvalidRelationException("Source and target '$sourceBusinessPartnerExternalId' should not be equal.")
+
+        if(validFrom.isAfter(validTo)) {
+            throw BpdmInvalidRelationException("'validFrom' cannot be after 'validTo'.")
+        }
 
         val existingStage = relationStageRepository.findByRelationAndStage(relation, StageType.Input) ?: throw BpdmMissingRelationException(relation.externalId)
 
@@ -250,8 +277,8 @@ class RelationService(
         val target = sharingStateRepository.findByExternalIdAndTenantBpnl(targetBusinessPartnerExternalId, relation.tenantBpnL).singleOrNull()
             ?:  throw BpdmRelationTargetNotFoundException(targetBusinessPartnerExternalId, relation.tenantBpnL)
 
-        val newValues = RelationUpdateComparison(relationType, source, target)
-        val oldValues = RelationUpdateComparison(existingStage.relationType, existingStage.source, existingStage.target)
+        val newValues = RelationUpdateComparison(relationType, source, target, validFrom, validTo)
+        val oldValues = RelationUpdateComparison(existingStage.relationType, existingStage.source, existingStage.target, existingStage.validFrom, existingStage.validTo)
         val hasChanges = newValues != oldValues
         val isInErrorState = relation.sharingState?.sharingStateType == RelationSharingStateType.Error
 
@@ -260,6 +287,8 @@ class RelationService(
             existingStage.source = source
             existingStage.target = target
             existingStage.updatedAt = Instant.now()
+            existingStage.validFrom = validFrom
+            existingStage.validTo = validTo
 
             relationStageRepository.save(existingStage)
             changelogRepository.save(ChangelogEntryDb(relation.externalId, relation.tenantBpnL, ChangelogType.UPDATE, StageType.Input, GoldenRecordType.Relation))
@@ -276,7 +305,9 @@ class RelationService(
         relation: RelationDb,
         relationType: RelationType,
         sourceBusinessPartnerExternalId: String,
-        targetBusinessPartnerExternalId: String
+        targetBusinessPartnerExternalId: String,
+        validFrom: Instant,
+        validTo: Instant
     ): RelationStageDb{
         val source = sharingStateRepository.findByExternalIdAndTenantBpnl(sourceBusinessPartnerExternalId, relation.tenantBpnL).singleOrNull()
             ?: throw BpdmRelationSourceNotFoundException(sourceBusinessPartnerExternalId, relation.tenantBpnL)
@@ -288,7 +319,9 @@ class RelationService(
             relationType = relationType,
             stage = StageType.Output,
             source = source,
-            target = target
+            target = target,
+            validFrom = validFrom,
+            validTo = validTo
         )
 
         relationSharingStateService.setSuccess(relation)
@@ -302,18 +335,22 @@ class RelationService(
         externalId: String,
         relationType: RelationType,
         sourceBusinessPartnerExternalId: String,
-        targetBusinessPartnerExternalId: String
+        targetBusinessPartnerExternalId: String,
+        validFrom: Instant,
+        validTo: Instant
     ): RelationStageDb{
         val existingRelationship = relationRepository.findByTenantBpnLAndExternalId(tenantBpnL.value, externalId) ?: throw BpdmMissingRelationException(externalId)
         val existingStage = relationStageRepository.findByRelationAndStage(existingRelationship, StageType.Input) ?: throw BpdmMissingRelationException(externalId)
-        return updateOutputStage(existingStage, relationType, sourceBusinessPartnerExternalId, targetBusinessPartnerExternalId)
+        return updateOutputStage(existingStage, relationType, sourceBusinessPartnerExternalId, targetBusinessPartnerExternalId, validFrom, validTo)
     }
 
     private fun updateOutputStage(
         relationStage: RelationStageDb,
         relationType: RelationType,
         sourceBusinessPartnerExternalId: String,
-        targetBusinessPartnerExternalId: String
+        targetBusinessPartnerExternalId: String,
+        validFrom: Instant,
+        validTo: Instant
     ): RelationStageDb{
         val relation = relationStage.relation
 
@@ -322,8 +359,8 @@ class RelationService(
         val target = sharingStateRepository.findByExternalIdAndTenantBpnl(targetBusinessPartnerExternalId, relation.tenantBpnL).singleOrNull()
             ?:  throw BpdmRelationTargetNotFoundException(targetBusinessPartnerExternalId, relation.tenantBpnL)
 
-        val newValues = RelationUpdateComparison(relationType, source, target)
-        val oldValues = RelationUpdateComparison(relationStage.relationType, relationStage.source, relationStage.target)
+        val newValues = RelationUpdateComparison(relationType, source, target, validFrom, validTo)
+        val oldValues = RelationUpdateComparison(relationStage.relationType, relationStage.source, relationStage.target, relationStage.validFrom, relationStage.validTo)
         val hasChanges = newValues == oldValues
 
         if(hasChanges){
@@ -347,6 +384,8 @@ class RelationService(
             relationType = entity.relationType,
             businessPartnerSourceExternalId = entity.source.externalId,
             businessPartnerTargetExternalId = entity.target.externalId,
+            validFrom = entity.validFrom,
+            validTo = entity.validTo,
             updatedAt = entity.updatedAt,
             createdAt = entity.createdAt
         )
@@ -358,6 +397,9 @@ class RelationService(
             relationType = entity.output!!.relationType,
             sourceBpnL = entity.output!!.sourceBpnL,
             targetBpnL = entity.output!!.targetBpnL,
+            validFrom = entity.output!!.validFrom,
+            validTo = entity.output!!.validTo,
+            isActive = Instant.now() in entity.output!!.validFrom..entity.output!!.validTo,
             updatedAt = entity.output!!.updatedAt
         )
     }
@@ -365,6 +407,8 @@ class RelationService(
     data class RelationUpdateComparison(
         val relationType: RelationType,
         val source: SharingStateDb,
-        val target: SharingStateDb
+        val target: SharingStateDb,
+        val validFrom: Instant,
+        val validTo: Instant
     )
 }
