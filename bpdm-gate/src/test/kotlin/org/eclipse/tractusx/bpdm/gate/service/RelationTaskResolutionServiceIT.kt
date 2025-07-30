@@ -26,11 +26,7 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationOutputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateDto
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateErrorCode
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateType
-import org.eclipse.tractusx.bpdm.gate.api.model.SharableRelationType
+import org.eclipse.tractusx.bpdm.gate.api.model.*
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationOutputSearchRequest
 import org.eclipse.tractusx.bpdm.gate.controller.SelfClientAsPartnerUploaderInitializer
 import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
@@ -42,6 +38,7 @@ import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.eclipse.tractusx.orchestrator.api.ApiCommons
 import org.eclipse.tractusx.orchestrator.api.model.*
+import org.eclipse.tractusx.orchestrator.api.model.RelationType
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -154,6 +151,7 @@ class RelationTaskResolutionServiceIT @Autowired constructor(
                 when(relationType) {
                   RelationType.IsAlternativeHeadquarterFor -> SharableRelationType.IsAlternativeHeadquarterFor
                   RelationType.IsManagedBy -> SharableRelationType.IsManagedBy
+                    RelationType.IsOwnedBy -> SharableRelationType.IsOwnedBy
                 },
                 bpnL1,
                 bpnL2,

@@ -4588,7 +4588,6 @@ components:
             - LegalAddressRegionNotFound
             - LegalAddressIdentifierNotFound
             - LegalAddressDuplicateIdentifier
-            - LegalEntityErrorMapping
             - LegalEntityIdentifiersTooMany
             - LegalAddressIdentifiersTooMany
         message:
@@ -4617,7 +4616,6 @@ components:
             - LegalAddressRegionNotFound
             - LegalAddressIdentifierNotFound
             - LegalAddressDuplicateIdentifier
-            - LegalEntityErrorMapping
             - LegalEntityIdentifiersTooMany
             - LegalAddressIdentifiersTooMany
         message:
@@ -7906,6 +7904,7 @@ components:
           enum:
             - IsAlternativeHeadquarterFor
             - IsManagedBy
+            - IsOwnedBy
         businessPartnerSourceBpnl:
           type: string
           description: BPN of partner from which the relation emerges (the source)

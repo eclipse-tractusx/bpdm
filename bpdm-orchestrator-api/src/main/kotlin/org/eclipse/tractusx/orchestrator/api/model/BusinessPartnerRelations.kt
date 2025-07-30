@@ -41,5 +41,6 @@ data class BusinessPartnerRelations(
 
 enum class RelationType {
     IsAlternativeHeadquarterFor,
-    IsManagedBy
+    IsManagedBy,
+    IsOwnedBy
 }

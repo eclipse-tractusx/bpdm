@@ -53,4 +53,6 @@ interface RelationRepository : JpaRepository<RelationDb, Long>, JpaSpecification
 
     @Query("SELECT r FROM RelationDb r WHERE r.type = :relationType AND (r.startNode = :legalEntity OR r.endNode = :legalEntity)")
     fun findInSourceOrTarget(relationType: RelationType, legalEntity: LegalEntityDb): Set<RelationDb>
+
+    fun findByTypeAndStartNode(relationType: RelationType, legalEntity: LegalEntityDb): Set<RelationDb>
 }

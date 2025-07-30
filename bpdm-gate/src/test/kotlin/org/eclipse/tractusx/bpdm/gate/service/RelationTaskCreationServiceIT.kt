@@ -130,6 +130,7 @@ class RelationTaskCreationServiceIT @Autowired constructor(
                     when(relationType) {
                         RelationType.IsAlternativeHeadquarterFor -> org.eclipse.tractusx.orchestrator.api.model.RelationType.IsAlternativeHeadquarterFor
                         RelationType.IsManagedBy -> org.eclipse.tractusx.orchestrator.api.model.RelationType.IsManagedBy
+                        RelationType.IsOwnedBy -> org.eclipse.tractusx.orchestrator.api.model.RelationType.IsOwnedBy
                     },
                     legalEntityBpnL1,
                     legalEntityBpnL2

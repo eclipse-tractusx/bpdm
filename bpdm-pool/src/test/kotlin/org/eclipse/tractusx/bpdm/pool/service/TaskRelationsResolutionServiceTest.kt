@@ -27,7 +27,10 @@ import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseVal
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerVerboseValues
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.eclipse.tractusx.bpdm.test.util.PoolDataHelpers
-import org.eclipse.tractusx.orchestrator.api.model.*
+import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
+import org.eclipse.tractusx.orchestrator.api.model.RelationType
+import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepReservationEntryDto
+import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepResultEntryDto
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -219,6 +222,93 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         val resultChainViolation = upsertRelationsGoldenRecordIntoPool("TASK_VIOLATE_CHAIN", violatingChain)
         assertThat(resultChainViolation[0].errors).hasSize(1)
         assertThat(resultChainViolation[0].errors[0].description).contains("already a Managing Legal Entity.")
+    }
+
+    /**
+     * GIVEN legal entity A is owned by legal entity B
+     * WHEN trying to create relation 'legal entity A is owned by legal entity C'
+     * THEN return multiple parents error
+     */
+    @Test
+    fun `create IsOwnedBy relation - violate single parent`(){
+        // Step 1: Create three legal entities A, B, C
+        val entityA = BusinessPartnerNonVerboseValues.legalEntityCreate1
+        val entityB = BusinessPartnerNonVerboseValues.legalEntityCreate2
+        val entityC = BusinessPartnerNonVerboseValues.legalEntityCreate3
+
+        val response = poolClient.legalEntities.createBusinessPartners(listOf(entityA, entityB, entityC))
+        val savedA = response.entities.toList()[0]
+        val savedB = response.entities.toList()[1]
+        val savedC = response.entities.toList()[2]
+
+        // Step 2: Create valid IsOwnedBy relation: A is owned by B
+        val validRelation = BusinessPartnerRelations(
+            relationType = RelationType.IsOwnedBy,
+            businessPartnerSourceBpnl = savedA.legalEntity.bpnl,
+            businessPartnerTargetBpnl = savedB.legalEntity.bpnl
+        )
+        upsertRelationsGoldenRecordIntoPool("TASK_VALID", validRelation)
+
+        // Step 3: Try to make A is owned by C -> should fail because of only one parent allowed
+        val violatingSingleParent = BusinessPartnerRelations(
+            relationType = RelationType.IsOwnedBy,
+            businessPartnerSourceBpnl = savedA.legalEntity.bpnl,
+            businessPartnerTargetBpnl = savedC.legalEntity.bpnl
+        )
+
+        val resultSingleParentViolation = upsertRelationsGoldenRecordIntoPool("TASK_VIOLATE_MANAGER", violatingSingleParent)
+
+        //Step4: Assert error
+        assertThat(resultSingleParentViolation.size).isEqualTo(1)
+        val violationResult = resultSingleParentViolation.first()
+        assertThat(violationResult.errors.size).isEqualTo(1)
+    }
+
+    /**
+     * GIVEN legal entity A is owned by legal entity B which is owned by legal entity C
+     * WHEN trying to create relation 'legal entity C is owned by legal entity A'
+     * THEN return found cycles error
+     */
+    @Test
+    fun `create IsOwnedBy relation - violate no cycles`(){
+        // Step 1: Create three legal entities A, B, C
+        val entityA = BusinessPartnerNonVerboseValues.legalEntityCreate1
+        val entityB = BusinessPartnerNonVerboseValues.legalEntityCreate2
+        val entityC = BusinessPartnerNonVerboseValues.legalEntityCreate3
+
+        val response = poolClient.legalEntities.createBusinessPartners(listOf(entityA, entityB, entityC))
+        val savedA = response.entities.toList()[0]
+        val savedB = response.entities.toList()[1]
+        val savedC = response.entities.toList()[2]
+
+        // Step 2: Create valid IsOwnedBy relation: A is owned by B
+        val validAOwnedByB = BusinessPartnerRelations(
+            relationType = RelationType.IsOwnedBy,
+            businessPartnerSourceBpnl = savedA.legalEntity.bpnl,
+            businessPartnerTargetBpnl = savedB.legalEntity.bpnl
+        )
+        upsertRelationsGoldenRecordIntoPool("TASK_VALID_1", validAOwnedByB)
+
+        val validBOwnedByC = BusinessPartnerRelations(
+            relationType = RelationType.IsOwnedBy,
+            businessPartnerSourceBpnl = savedB.legalEntity.bpnl,
+            businessPartnerTargetBpnl = savedC.legalEntity.bpnl
+        )
+        upsertRelationsGoldenRecordIntoPool("TASK_VALID_2", validBOwnedByC)
+
+        // Step 3: Try to make C is owned by A -> should fail because of no cycles allowed
+        val violatingNoCycles = BusinessPartnerRelations(
+            relationType = RelationType.IsOwnedBy,
+            businessPartnerSourceBpnl = savedC.legalEntity.bpnl,
+            businessPartnerTargetBpnl = savedA.legalEntity.bpnl
+        )
+
+        val resultNoCyclesViolation = upsertRelationsGoldenRecordIntoPool("TASK_VIOLATE_MANAGER", violatingNoCycles)
+
+        //Step4: Assert error
+        assertThat(resultNoCyclesViolation.size).isEqualTo(1)
+        val violationResult = resultNoCyclesViolation.first()
+        assertThat(violationResult.errors.size).isEqualTo(1)
     }
 
 

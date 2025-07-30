@@ -130,7 +130,8 @@ class RelationsGoldenRecordTaskDb(
 
     enum class RelationType {
         IsAlternativeHeadquarterFor,
-        IsManagedBy
+        IsManagedBy,
+        IsOwnedBy
     }
 
 }

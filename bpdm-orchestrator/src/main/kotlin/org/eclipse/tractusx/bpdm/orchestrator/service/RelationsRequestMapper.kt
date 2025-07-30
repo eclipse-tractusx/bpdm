@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.orchestrator.service
 import org.eclipse.tractusx.bpdm.orchestrator.entity.RelationsGoldenRecordTaskDb
 import org.eclipse.tractusx.bpdm.orchestrator.entity.RelationsTaskErrorDb
 import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
+import org.eclipse.tractusx.orchestrator.api.model.RelationType
 import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsErrorDto
 import org.springframework.stereotype.Service
 
@@ -31,7 +32,11 @@ class RelationsRequestMapper {
     fun toBusinessPartnerRelations(businessPartnerRelations: BusinessPartnerRelations) =
         with(businessPartnerRelations){
             RelationsGoldenRecordTaskDb.BusinessPartnerRelations(
-                relationType = RelationsGoldenRecordTaskDb.RelationType.valueOf(relationType.name),
+                relationType = when(relationType){
+                    RelationType.IsAlternativeHeadquarterFor ->  RelationsGoldenRecordTaskDb.RelationType.IsAlternativeHeadquarterFor
+                    RelationType.IsManagedBy ->  RelationsGoldenRecordTaskDb.RelationType.IsManagedBy
+                    RelationType.IsOwnedBy ->  RelationsGoldenRecordTaskDb.RelationType.IsOwnedBy
+                },
                 businessPartnerSourceBpnl = businessPartnerSourceBpnl,
                 businessPartnerTargetBpnl = businessPartnerTargetBpnl
             )

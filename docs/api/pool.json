@@ -3604,7 +3604,7 @@
           "errorCode" : {
             "type" : "string",
             "description" : "Error code identifying the error",
-            "enum" : [ "LegalEntityDuplicateIdentifier", "LegalFormNotFound", "LegalEntityIdentifierNotFound", "LegalAddressRegionNotFound", "LegalAddressIdentifierNotFound", "LegalAddressDuplicateIdentifier", "LegalEntityErrorMapping", "LegalEntityIdentifiersTooMany", "LegalAddressIdentifiersTooMany" ]
+            "enum" : [ "LegalEntityDuplicateIdentifier", "LegalFormNotFound", "LegalEntityIdentifierNotFound", "LegalAddressRegionNotFound", "LegalAddressIdentifierNotFound", "LegalAddressDuplicateIdentifier", "LegalEntityIdentifiersTooMany", "LegalAddressIdentifiersTooMany" ]
           },
           "message" : {
             "type" : "string",
@@ -3625,7 +3625,7 @@
           "errorCode" : {
             "type" : "string",
             "description" : "Error code identifying the error",
-            "enum" : [ "LegalEntityNotFound", "LegalEntityDuplicateIdentifier", "LegalFormNotFound", "LegalEntityIdentifierNotFound", "LegalAddressRegionNotFound", "LegalAddressIdentifierNotFound", "LegalAddressDuplicateIdentifier", "LegalEntityErrorMapping", "LegalEntityIdentifiersTooMany", "LegalAddressIdentifiersTooMany" ]
+            "enum" : [ "LegalEntityNotFound", "LegalEntityDuplicateIdentifier", "LegalFormNotFound", "LegalEntityIdentifierNotFound", "LegalAddressRegionNotFound", "LegalAddressIdentifierNotFound", "LegalAddressDuplicateIdentifier", "LegalEntityIdentifiersTooMany", "LegalAddressIdentifiersTooMany" ]
           },
           "message" : {
             "type" : "string",
@@ -4886,7 +4886,7 @@
           "type" : {
             "type" : "string",
             "description" : "The type of relation between the Legal Entities",
-            "enum" : [ "IsAlternativeHeadquarterFor", "IsManagedBy" ]
+            "enum" : [ "IsAlternativeHeadquarterFor", "IsManagedBy", "IsOwnedBy" ]
           },
           "businessPartnerSourceBpnl" : {
             "type" : "string",

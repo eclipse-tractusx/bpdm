@@ -742,7 +742,7 @@
           "relationType" : {
             "type" : "string",
             "description" : "The type of relation between the business partners",
-            "enum" : [ "IsAlternativeHeadquarterFor", "IsManagedBy" ]
+            "enum" : [ "IsAlternativeHeadquarterFor", "IsManagedBy", "IsOwnedBy" ]
           },
           "businessPartnerSourceBpnl" : {
             "type" : "string",
