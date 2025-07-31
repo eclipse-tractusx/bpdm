@@ -7,7 +7,9 @@
 4. [Limitations of OpenAPI text descriptions](#limitations-of-openapi-text-descriptions)
 5. [Recommended usage scenarios of an EDC enabled communication in Business Partner Data Management Solution](#recommended-usage-scenarios-of-an-edc-enabled-communication-in-business-partner-data-management-solution)
 
-## Use a multi gate deployment approach to realize multi-tenancy
+## ~~Use a multi gate deployment approach to realize multi-tenancy~~
+
+> **Disclaimer:** This decision has been overturned as deploying one gate per tenant is not feasible with thousands of tenants
 
 * status: accepted
 * date: 2023-06-01
