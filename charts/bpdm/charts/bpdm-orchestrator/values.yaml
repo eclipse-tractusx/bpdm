@@ -49,6 +49,10 @@ securityContext:
     drop:
       - ALL
 
+configMountSecurity:
+  readOnly: true
+  recursiveReadOnly: Enabled
+
 service:
   type: ClusterIP
   port: 80

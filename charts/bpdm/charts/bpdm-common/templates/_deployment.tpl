@@ -75,8 +75,8 @@ spec:
           volumeMounts:
             - mountPath: /etc/conf
               name: config
-              readOnly: true
-              recursiveReadOnly: Enabled
+              readOnly: {{ .Values.configMountSecurity.readOnly }}
+              recursiveReadOnly: {{ .Values.configMountSecurity.recursiveReadOnly }}
             - mountPath: /tmp
               name: cache
       initContainers:
