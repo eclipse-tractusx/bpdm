@@ -31,6 +31,7 @@ import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.Instant
 
 @Service
 class RelationUpsertService(
@@ -40,6 +41,8 @@ class RelationUpsertService(
 
     @Transactional
     fun upsertRelation(upsertRequest: UpsertRequest): UpsertResult<RelationDb>{
+        validateValidity(upsertRequest.validFrom, upsertRequest.validTo)
+
         val source = upsertRequest.source
         val target = upsertRequest.target
         val relationType = upsertRequest.relationType
@@ -73,7 +76,8 @@ class RelationUpsertService(
             type = upsertRequest.relationType,
             startNode = source,
             endNode = target,
-            isActive = true
+            validFrom = upsertRequest.validFrom,
+            validTo = upsertRequest.validTo
         )
 
         relationRepository.save(newRelation)
@@ -84,10 +88,19 @@ class RelationUpsertService(
         return newRelation
     }
 
+    private fun validateValidity(validFrom: Instant, validTo: Instant) {
+        if (validFrom.isAfter(validTo)) {
+            throw BpdmValidationException("'validFrom' cannot be after 'validTo'.")
+        }
+    }
+
+
     data class UpsertRequest(
         val source: LegalEntityDb,
         val target: LegalEntityDb,
-        val relationType: RelationType
+        val relationType: RelationType,
+        val validFrom: Instant,
+        val validTo: Instant
     )
 
 }

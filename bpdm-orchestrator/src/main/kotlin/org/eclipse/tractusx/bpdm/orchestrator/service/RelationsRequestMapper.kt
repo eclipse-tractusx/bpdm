@@ -38,7 +38,9 @@ class RelationsRequestMapper {
                     RelationType.IsOwnedBy ->  RelationsGoldenRecordTaskDb.RelationType.IsOwnedBy
                 },
                 businessPartnerSourceBpnl = businessPartnerSourceBpnl,
-                businessPartnerTargetBpnl = businessPartnerTargetBpnl
+                businessPartnerTargetBpnl = businessPartnerTargetBpnl,
+                validFrom = validFrom,
+                validTo = validTo
             )
         }
 

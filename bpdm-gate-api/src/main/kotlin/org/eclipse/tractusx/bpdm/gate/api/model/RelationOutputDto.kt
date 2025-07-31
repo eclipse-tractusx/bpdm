@@ -26,5 +26,8 @@ data class RelationOutputDto(
     val relationType: SharableRelationType,
     val sourceBpnL: String,
     val targetBpnL: String,
+    val validFrom: Instant,
+    val validTo: Instant,
+    val isActive: Boolean,
     val updatedAt: Instant
 )

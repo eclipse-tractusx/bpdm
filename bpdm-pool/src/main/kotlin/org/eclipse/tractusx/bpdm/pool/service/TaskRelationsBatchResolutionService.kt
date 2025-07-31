@@ -80,7 +80,7 @@ class TaskRelationsBatchResolutionService(
     fun resolveUnresolved(){
         val scheduleTime = Instant.now()
 
-        val resultTemplate = TaskRelationsStepResultEntryDto("", BusinessPartnerRelations.empty, listOf(TaskRelationsErrorDto(TaskRelationsErrorType.Unspecified, "Unknown golden record process error during Pool communication")))
+        val resultTemplate = TaskRelationsStepResultEntryDto("", BusinessPartnerRelationVerboseDto.empty, listOf(TaskRelationsErrorDto(TaskRelationsErrorType.Unspecified, "Unknown golden record process error during Pool communication")))
 
         var processedTasks = 0
         var resolvedTasks = 0
@@ -171,7 +171,14 @@ class TaskRelationsResolutionService(
                         description = ex.message ?: ""
                     )
                 ),
-                businessPartnerRelations = taskStep.businessPartnerRelations
+                businessPartnerRelations = BusinessPartnerRelationVerboseDto(
+                    relationType = taskStep.businessPartnerRelations.relationType,
+                    businessPartnerSourceBpnl = taskStep.businessPartnerRelations.businessPartnerSourceBpnl,
+                    businessPartnerTargetBpnl = taskStep.businessPartnerRelations.businessPartnerTargetBpnl,
+                    validFrom = taskStep.businessPartnerRelations.validFrom,
+                    validTo = taskStep.businessPartnerRelations.validTo,
+                    isActive = Instant.now() in taskStep.businessPartnerRelations.validFrom..taskStep.businessPartnerRelations.validTo
+                )
             )
         } catch (ex: Throwable) {
             logger.error(ex) { "An unexpected error occurred during golden record task processing" }
@@ -183,7 +190,14 @@ class TaskRelationsResolutionService(
                         description = "An unexpected error occurred during Pool update"
                     )
                 ),
-                businessPartnerRelations = taskStep.businessPartnerRelations
+                businessPartnerRelations = BusinessPartnerRelationVerboseDto(
+                    relationType = taskStep.businessPartnerRelations.relationType,
+                    businessPartnerSourceBpnl = taskStep.businessPartnerRelations.businessPartnerSourceBpnl,
+                    businessPartnerTargetBpnl = taskStep.businessPartnerRelations.businessPartnerTargetBpnl,
+                    validFrom = taskStep.businessPartnerRelations.validFrom,
+                    validTo = taskStep.businessPartnerRelations.validTo,
+                    isActive = Instant.now() in taskStep.businessPartnerRelations.validFrom..taskStep.businessPartnerRelations.validTo
+                )
             )
         }
     }

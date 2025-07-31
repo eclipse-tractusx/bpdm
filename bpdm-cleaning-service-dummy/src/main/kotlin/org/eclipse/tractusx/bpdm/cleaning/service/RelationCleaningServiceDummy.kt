@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.cleaning.config.CleaningServiceConfigProperties
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.stereotype.Service
+import java.time.Instant
 
 @Service
 class RelationCleaningServiceDummy(
@@ -64,8 +65,16 @@ class RelationCleaningServiceDummy(
     }
 
     fun processRelationCleaningTask(reservedTask: TaskRelationsStepReservationEntryDto): TaskRelationsStepResultEntryDto {
-        val cleanedBusinessPartnerRelation = reservedTask.businessPartnerRelations
-        return TaskRelationsStepResultEntryDto(reservedTask.taskId, cleanedBusinessPartnerRelation)
+        return TaskRelationsStepResultEntryDto(
+            reservedTask.taskId, BusinessPartnerRelationVerboseDto(
+                relationType = reservedTask.businessPartnerRelations.relationType,
+                businessPartnerSourceBpnl = reservedTask.businessPartnerRelations.businessPartnerSourceBpnl,
+                businessPartnerTargetBpnl = reservedTask.businessPartnerRelations.businessPartnerTargetBpnl,
+                validFrom = reservedTask.businessPartnerRelations.validFrom,
+                validTo = reservedTask.businessPartnerRelations.validTo,
+                isActive = Instant.now() in reservedTask.businessPartnerRelations.validFrom..reservedTask.businessPartnerRelations.validTo
+            )
+        )
     }
 
 }

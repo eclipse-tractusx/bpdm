@@ -103,7 +103,7 @@ class RelationTaskResolutionService(
         val outputRequests = tasks.mapNotNull { task ->
             val relation = pendingRelationsById[task.taskId] ?: return@mapNotNull null
             val outputResult = task.businessPartnerRelationsResult
-            IRelationService.RelationUpsertRequest(relation, outputResult.relationType.toGateModel(), outputResult.businessPartnerSourceBpnl, outputResult.businessPartnerTargetBpnl)
+            IRelationService.RelationUpsertRequest(relation, outputResult.relationType.toGateModel(), outputResult.businessPartnerSourceBpnl, outputResult.businessPartnerTargetBpnl, outputResult.validFrom, outputResult.validTo)
         }
         relationService.upsertOutputRelations(outputRequests)
     }

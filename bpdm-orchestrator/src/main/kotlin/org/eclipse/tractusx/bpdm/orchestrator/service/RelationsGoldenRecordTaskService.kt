@@ -120,9 +120,17 @@ class RelationsGoldenRecordTaskService(
                 val errors = resultEntry.errors
                 val resultBusinessPartnerRelaitons = resultEntry.businessPartnerRelations
 
-                when{
+                when {
                     errors.isNotEmpty() -> relationsGoldenRecordTaskStateMachine.doResolveTaskToError(task, step, errors)
-                    else ->  relationsGoldenRecordTaskStateMachine.resolveTaskStepToSuccess(task, step, resultBusinessPartnerRelaitons)
+                    else -> relationsGoldenRecordTaskStateMachine.resolveTaskStepToSuccess(
+                        task, step, BusinessPartnerRelations(
+                            relationType = resultBusinessPartnerRelaitons.relationType,
+                            businessPartnerSourceBpnl = resultBusinessPartnerRelaitons.businessPartnerSourceBpnl,
+                            businessPartnerTargetBpnl = resultBusinessPartnerRelaitons.businessPartnerTargetBpnl,
+                            validFrom = resultBusinessPartnerRelaitons.validFrom,
+                            validTo = resultBusinessPartnerRelaitons.validTo
+                        )
+                    )
                 }
             }
     }

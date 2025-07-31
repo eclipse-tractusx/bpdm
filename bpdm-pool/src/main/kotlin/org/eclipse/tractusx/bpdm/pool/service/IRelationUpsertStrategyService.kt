@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.service
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
+import java.time.Instant
 
 interface IRelationUpsertStrategyService {
 
@@ -29,6 +30,8 @@ interface IRelationUpsertStrategyService {
 
     data class UpsertRequest(
         val source: LegalEntityDb,
-        val target: LegalEntityDb
+        val target: LegalEntityDb,
+        val validFrom: Instant,
+        val validTo: Instant
     )
 }

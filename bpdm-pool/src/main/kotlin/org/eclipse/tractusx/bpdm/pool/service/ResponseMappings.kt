@@ -28,6 +28,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.springframework.data.domain.Page
+import java.time.Instant
 
 
 fun <S, T> Page<S>.toDto(dtoContent: Collection<T>): PageDto<T> {
@@ -285,7 +286,9 @@ fun RelationDb.toDto(): RelationVerboseDto {
         type = type,
         businessPartnerSourceBpnl = startNode.bpn,
         businessPartnerTargetBpnl = endNode.bpn,
-        isActive = isActive
+        validFrom = validFrom,
+        validTo = validTo,
+        isActive = Instant.now() in validFrom..validTo
     )
 }
 

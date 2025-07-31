@@ -36,6 +36,10 @@ data class RelationOutputDb (
     var sourceBpnL: String,
     @Column(name = "output_target_bpnl")
     var targetBpnL: String,
+    @Column(name = "output_valid_from")
+    var validFrom: Instant,
+    @Column(name = "output_valid_to")
+    var validTo: Instant,
     @Column(name = "output_updated_at")
     var updatedAt: Instant,
 ): Comparable<RelationOutputDb>{

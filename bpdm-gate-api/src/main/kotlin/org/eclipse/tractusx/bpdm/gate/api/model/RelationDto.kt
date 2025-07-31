@@ -32,6 +32,10 @@ data class RelationDto(
     override val businessPartnerSourceExternalId: String,
     @Schema(description = "The business partner to which this relation goes (the target)")
     override val businessPartnerTargetExternalId: String,
+    @Schema(description = "The date from which the relation is valid.")
+    val validFrom: Instant,
+    @Schema(description = "The date until the relation is valid.")
+    val validTo: Instant,
     @Schema(description = "The time when this relation was last modified")
     val updatedAt: Instant,
     @Schema(description = "The time when this relation was created")

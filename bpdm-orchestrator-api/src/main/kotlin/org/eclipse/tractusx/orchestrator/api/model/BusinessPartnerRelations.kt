@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.orchestrator.api.model
 
 import io.swagger.v3.oas.annotations.media.Schema
+import java.time.Instant
 
 @Schema(description = "The business partner relations data to be processed ")
 data class BusinessPartnerRelations(
@@ -28,13 +29,46 @@ data class BusinessPartnerRelations(
     @Schema(description = "The business partner from which the relation emerges (the source)")
     val businessPartnerSourceBpnl: String,
     @Schema(description = "The business partner to which this relation goes (the target)")
-    val businessPartnerTargetBpnl: String
+    val businessPartnerTargetBpnl: String,
+    @Schema(description = "Timestamp from which the relation is valid (inclusive)")
+    val validFrom: Instant,
+    @Schema(description = "Timestamp until which the relation is valid (inclusive)")
+    val validTo: Instant
 ) {
     companion object {
         val empty = BusinessPartnerRelations(
             relationType = RelationType.IsAlternativeHeadquarterFor, // or a default type
             businessPartnerSourceBpnl = "",
-            businessPartnerTargetBpnl = ""
+            businessPartnerTargetBpnl = "",
+            validFrom = Instant.EPOCH,
+            validTo = Instant.EPOCH,
+        )
+    }
+}
+
+@Schema(description = "The business partner relations data processed ")
+data class BusinessPartnerRelationVerboseDto(
+    @Schema(description = "The type of relation between the business partners")
+    val relationType: RelationType,
+    @Schema(description = "The business partner from which the relation emerges (the source)")
+    val businessPartnerSourceBpnl: String,
+    @Schema(description = "The business partner to which this relation goes (the target)")
+    val businessPartnerTargetBpnl: String,
+    @Schema(description = "Timestamp from which the relation is valid (inclusive)")
+    val validFrom: Instant,
+    @Schema(description = "Timestamp until which the relation is valid (inclusive)")
+    val validTo: Instant,
+    @Schema(description = "Status of the relation")
+    val isActive: Boolean
+) {
+    companion object {
+        val empty = BusinessPartnerRelationVerboseDto(
+            relationType = RelationType.IsAlternativeHeadquarterFor, // or a default type
+            businessPartnerSourceBpnl = "",
+            businessPartnerTargetBpnl = "",
+            validFrom = Instant.EPOCH,
+            validTo = Instant.EPOCH,
+            isActive = false // or a default type
         )
     }
 }

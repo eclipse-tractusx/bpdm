@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.entity
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 import org.eclipse.tractusx.bpdm.pool.api.model.RelationType
+import java.time.Instant
 
 @Entity
 @Table(
@@ -44,8 +45,11 @@ class RelationDb(
     @JoinColumn(name = "end_node_id", nullable = false)
     val endNode: LegalEntityDb,
 
-    @Column(name = "is_active", nullable = false)
-    val isActive: Boolean
+    @Column(name = "valid_from", nullable = false)
+    val validFrom: Instant,
+
+    @Column(name = "valid_to", nullable = false)
+    val validTo: Instant
 
 ) : BaseEntity()
 

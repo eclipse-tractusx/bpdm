@@ -1,0 +1,8 @@
+-- Remove old column
+ALTER TABLE relations
+DROP COLUMN is_active;
+
+-- Add new validity columns (non-nullable)
+ALTER TABLE relations
+ADD COLUMN valid_from TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT '1970-01-01T00:00:00Z',
+ADD COLUMN valid_to TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT '9999-12-31T23:59:59Z';

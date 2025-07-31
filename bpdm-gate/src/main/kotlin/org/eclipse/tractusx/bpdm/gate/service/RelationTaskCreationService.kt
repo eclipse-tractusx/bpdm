@@ -103,8 +103,10 @@ class RelationTaskCreationService(
             val sourceBpnL = outputsBySharingState[relationStage.source]?.bpnL ?: return@map null
             val targetBpnL = outputsBySharingState[relationStage.target]?.bpnL ?: return@map null
             val relationType = relationStage.relationType.toOrchestratorModel() ?: return@map null
+            val validFrom = relationStage.validFrom
+            val validTo = relationStage.validTo
 
-            TaskCreateRelationsRequestEntry(sharingState.recordId, BusinessPartnerRelations(relationType, sourceBpnL, targetBpnL))
+            TaskCreateRelationsRequestEntry(sharingState.recordId, BusinessPartnerRelations(relationType, sourceBpnL, targetBpnL, validFrom, validTo))
         }
 
         val createdTasks = taskCreateRequests.letNonNull { sendTasks(it) }

@@ -29,7 +29,7 @@ data class TaskRelationsStepResultEntryDto(
     val taskId: String,
 
     @get:Schema(description = "The actual result in form of business partner relations data. Maybe null if an error occurred during processing of this task.")
-    val businessPartnerRelations: BusinessPartnerRelations,
+    val businessPartnerRelations: BusinessPartnerRelationVerboseDto,
 
     @get:ArraySchema(arraySchema = Schema(description = "Errors that occurred during processing of this task"))
     val errors: List<TaskRelationsErrorDto> = emptyList()

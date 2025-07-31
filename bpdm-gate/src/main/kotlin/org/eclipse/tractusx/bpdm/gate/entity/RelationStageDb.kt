@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
 import org.eclipse.tractusx.bpdm.gate.entity.RelationStageDb.Companion.COLUMN_RELATION
 import org.eclipse.tractusx.bpdm.gate.entity.RelationStageDb.Companion.COLUMN_STAGE
+import java.time.Instant
 
 @Entity
 @Table(name = "business_partner_relation_stages",
@@ -47,7 +48,11 @@ class RelationStageDb (
     var source: SharingStateDb,
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "target_sharing_state_id", nullable = false)
-    var target: SharingStateDb
+    var target: SharingStateDb,
+    @Column(name= "valid_from", nullable = false)
+    var validFrom: Instant,
+    @Column(name= "valid_to", nullable = false)
+    var validTo: Instant
 ): BaseEntity(){
     companion object{
         const val COLUMN_RELATION = "relation_id"

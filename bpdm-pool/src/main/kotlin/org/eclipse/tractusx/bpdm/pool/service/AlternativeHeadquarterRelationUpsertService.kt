@@ -27,6 +27,7 @@ import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.Instant
 
 @Service
 class AlternativeHeadquarterRelationUpsertService(
@@ -39,7 +40,13 @@ class AlternativeHeadquarterRelationUpsertService(
         val standardisedRequest = standardise(upsertRequest)
 
         val result = relationUpsertService.upsertRelation(
-            RelationUpsertService.UpsertRequest(standardisedRequest.source, standardisedRequest.target, RelationType.IsAlternativeHeadquarterFor)
+            RelationUpsertService.UpsertRequest(
+                source = standardisedRequest.source,
+                target = standardisedRequest.target,
+                relationType = RelationType.IsAlternativeHeadquarterFor,
+                validFrom = standardisedRequest.validFrom,
+                validTo = standardisedRequest.validTo
+            )
         )
 
         if(result.upsertType == UpsertType.Created){
@@ -55,9 +62,19 @@ class AlternativeHeadquarterRelationUpsertService(
 
         val sourceIsOlder = proposedSource.createdAt < proposedTarget.createdAt
         val upsertRequest = if(sourceIsOlder){
-            IRelationUpsertStrategyService.UpsertRequest(source = proposedTarget, target = proposedSource)
+            IRelationUpsertStrategyService.UpsertRequest(
+                source = proposedTarget,
+                target = proposedSource,
+                validFrom = upsertRequest.validFrom,
+                validTo = upsertRequest.validTo
+            )
         }else{
-            IRelationUpsertStrategyService.UpsertRequest(source = proposedSource, target = proposedTarget)
+            IRelationUpsertStrategyService.UpsertRequest(
+                source = proposedSource,
+                target = proposedTarget,
+                validFrom = upsertRequest.validFrom,
+                validTo = upsertRequest.validTo
+            )
         }
 
         return upsertRequest
@@ -67,24 +84,49 @@ class AlternativeHeadquarterRelationUpsertService(
         val transitiveSourceRelations = relationRepository.findInSourceOrTarget(RelationType.IsAlternativeHeadquarterFor, upsertRequest.source)
         val transitiveTargetRelations = relationRepository.findInSourceOrTarget(RelationType.IsAlternativeHeadquarterFor, upsertRequest.target)
 
-        val transitiveSourceRequests = createTransitiveUpsertRequests(upsertRequest.target, transitiveSourceRelations)
-        val transitiveTargetRequests = createTransitiveUpsertRequests(upsertRequest.source, transitiveTargetRelations)
+        val transitiveSourceRequests = createTransitiveUpsertRequests(
+            upsertRequest.target,
+            transitiveSourceRelations,
+            upsertRequest.validFrom,
+            upsertRequest.validTo
+        )
+        val transitiveTargetRequests = createTransitiveUpsertRequests(
+            upsertRequest.source,
+            transitiveTargetRelations,
+            upsertRequest.validFrom,
+            upsertRequest.validTo
+        )
 
         transitiveSourceRequests
             .plus(transitiveTargetRequests)
             .filter { it.source.id != upsertRequest.source.id || it.target.id != upsertRequest.target.id }
             .distinctBy { Pair(it.source.id, it.target.id) }
-            .map { RelationUpsertService.UpsertRequest(it.source, it.target, RelationType.IsAlternativeHeadquarterFor) }
+            .map { RelationUpsertService.UpsertRequest(it.source, it.target, RelationType.IsAlternativeHeadquarterFor, it.validFrom, it.validTo) }
             .forEach { relationUpsertService.upsertRelation(it) }
     }
 
-    private fun createTransitiveUpsertRequests(legalEntity: LegalEntityDb, relations: Set<RelationDb>): List<IRelationUpsertStrategyService.UpsertRequest>{
+    private fun createTransitiveUpsertRequests(
+        legalEntity: LegalEntityDb,
+        relations: Set<RelationDb>,
+        baseValidFrom: Instant,
+        baseValidTo: Instant
+    ): List<IRelationUpsertStrategyService.UpsertRequest> {
         val allLegalEntities = relations.flatMap { listOf(it.startNode, it.endNode) }.toSet()
 
-        return  allLegalEntities
+        return allLegalEntities
             .filter { legalEntity.id != it.id }
-            .map { IRelationUpsertStrategyService.UpsertRequest(legalEntity, it) }
-            .map { standardise(it) }
+            .map { relatedEntity ->
+                val relation = relations.first { it.startNode == relatedEntity || it.endNode == relatedEntity }
+                val derivedValidFrom = maxOf(relation.validFrom, baseValidFrom)
+                val derivedValidTo = minOf(relation.validTo, baseValidTo)
+
+                IRelationUpsertStrategyService.UpsertRequest(
+                    source = legalEntity,
+                    target = relatedEntity,
+                    validFrom = derivedValidFrom,
+                    validTo = derivedValidTo
+                )
+            }
             .distinctBy { Pair(it.source.id, it.target.id) }
     }
 
