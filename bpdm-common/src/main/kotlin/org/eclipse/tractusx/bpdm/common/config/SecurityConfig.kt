@@ -22,11 +22,16 @@ package org.eclipse.tractusx.bpdm.common.config
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.util.ConditionalOnBoundProperty
 import org.eclipse.tractusx.bpdm.common.util.HasEnablingProperty
+import org.eclipse.tractusx.bpdm.common.util.MethodMatchPointcut
+import org.eclipse.tractusx.bpdm.common.util.UnsecuredRestControllerMethodsMatcher
+import org.springframework.aop.Advisor
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
+import org.springframework.security.authorization.SingleResultAuthorizationManager
+import org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -82,6 +87,7 @@ class OAuthSecurityConfig(
         return CustomJwtAuthenticationConverter(configProperties.clientId)
     }
 
+
     @Bean
     fun filterChain(http: HttpSecurity, customJwtAuthenticationConverter: CustomJwtAuthenticationConverter): SecurityFilterChain {
         logger.info { "Security active, securing endpoint" }
@@ -97,6 +103,7 @@ class OAuthSecurityConfig(
             it.requestMatchers(AntPathRequestMatcher.antMatcher("/actuator/health/**")).permitAll()
             it.requestMatchers(AntPathRequestMatcher.antMatcher("/error")).permitAll()
             it.requestMatchers(AntPathRequestMatcher.antMatcher("/**")).authenticated()
+
         }
         http.oauth2ResourceServer {
             it.jwt { jwt ->
@@ -115,5 +122,16 @@ class OAuthSecurityConfig(
         val source = UrlBasedCorsConfigurationSource()
         source.registerCorsConfiguration("/**", configuration)
         return source
+    }
+
+    /**
+     * This advisor denies all method invocations on RestController methods that are not secured through MethodSecurity-Annotations
+     */
+    @Bean
+    fun denyUnsecuredRestControllerMethodAdvisor(): Advisor{
+        return AuthorizationManagerBeforeMethodInterceptor(
+            MethodMatchPointcut(UnsecuredRestControllerMethodsMatcher()),
+            SingleResultAuthorizationManager.denyAll()
+        )
     }
 }
