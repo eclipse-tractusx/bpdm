@@ -19,7 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
+import org.eclipse.tractusx.bpdm.pool.api.model.DataSpaceParticipantDto
 import org.eclipse.tractusx.bpdm.pool.api.model.RelationType
+import org.eclipse.tractusx.bpdm.pool.api.model.request.DataSpaceParticipantUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
@@ -31,7 +33,8 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class ManagedRelationUpsertService(
     private val relationUpsertService: RelationUpsertService,
-    private val relationRepository: RelationRepository
+    private val relationRepository: RelationRepository,
+    private val dataSpaceParticipantsService: DataSpaceParticipantsService
 ):IRelationUpsertStrategyService {
 
     @Transactional
@@ -40,10 +43,13 @@ class ManagedRelationUpsertService(
 
         validateNoChain(proposedSource, proposedTarget)
         validateSingleManager(proposedSource)
+        validateManagingEntityIsParticipant(proposedTarget)
 
         val result = relationUpsertService.upsertRelation(
             RelationUpsertService.UpsertRequest(proposedSource, proposedTarget, RelationType.IsManagedBy)
         )
+
+        makeManagedEntityParticipantIfRequired(proposedSource)
 
         return result
 
@@ -77,6 +83,25 @@ class ManagedRelationUpsertService(
             throw BpdmValidationException(
                 "Invalid 'IsManagedBy' relation: The Managed Legal Entity with BPNL '${source.bpn}' is already managed by another Managing Legal Entity '${managerBpns}'. " +
                         "A Managed Legal Entity may only have one Managing Legal Entity at a time."
+            )
+        }
+    }
+
+    private fun validateManagingEntityIsParticipant(target: LegalEntityDb) {
+        if (!target.isCatenaXMemberData) {
+            throw BpdmValidationException(
+                "Invalid 'IsManagedBy' relation: The Managing Legal Entity with BPNL '${target.bpn}' is not a dataspace participant. " +
+                        "Only dataspace participants can manage other entities."
+            )
+        }
+    }
+
+    private fun makeManagedEntityParticipantIfRequired(source: LegalEntityDb) {
+        if (!source.isCatenaXMemberData) {
+            dataSpaceParticipantsService.updateMemberships(
+                DataSpaceParticipantUpdateRequest(
+                    listOf(DataSpaceParticipantDto(source.bpn, true))
+                )
             )
         }
     }

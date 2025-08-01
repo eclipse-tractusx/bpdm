@@ -20,8 +20,10 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import org.assertj.core.api.Assertions.assertThat
+import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
+import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntitySearchRequest
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerVerboseValues
@@ -164,10 +166,11 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
 
 
     /**
-     * Tests the validation logic for 'IsManagedBy' relation:
+     * Tests the creation and validation logic for 'IsManagedBy' relation:
      *
      * GIVEN:
-     *  - Three legal entities A, B, and C
+     *  - Three legal entities A, B and C
+     *  - Legal entity B is Dataspace Participant
      *  - A valid relation A → B of type 'IsManagedBy'
      *
      * WHEN:
@@ -179,10 +182,14 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
      *  - Error messages should reflect the violated constraint
      */
     @Test
-    fun `validate IsManagedBy relation - reject chain and multiple manager violation`() {
+    fun `create IsManagedBy relation - reject chain and multiple manager violation`() {
         // Step 1: Create three legal entities A, B, C
         val entityA = BusinessPartnerNonVerboseValues.legalEntityCreate1
-        val entityB = BusinessPartnerNonVerboseValues.legalEntityCreate2
+        val entityB = BusinessPartnerNonVerboseValues.legalEntityCreate2.copy(
+            legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate2.legalEntity.copy(
+                isParticipantData = true
+            )
+        )
         val entityC = BusinessPartnerNonVerboseValues.legalEntityCreate3
 
         val response = poolClient.legalEntities.createBusinessPartners(listOf(entityA, entityB, entityC))
@@ -191,7 +198,7 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         val savedB = response.entities.toList()[1]
         val savedC = response.entities.toList()[2]
 
-        // Step 2: Create valid IsManagedBy relation: A is managed by B
+        // Step 2a: Create valid IsManagedBy relation: A is managed by B
         val validRelation = BusinessPartnerRelations(
             relationType = RelationType.IsManagedBy,
             businessPartnerSourceBpnl = savedA.legalEntity.bpnl,
@@ -200,6 +207,10 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
 
         val validResult = upsertRelationsGoldenRecordIntoPool("TASK_VALID", validRelation)
         assertThat(validResult[0].errors).isEmpty()
+
+        // Step 2b: Managed Legal entity is now DataSpace Participant
+        val searchManagedEntity = poolClient.legalEntities.getLegalEntities(LegalEntitySearchRequest(legalName = entityA.legalEntity.legalName), PaginationRequest(0, 1)).content.first()
+        assertThat(searchManagedEntity.legalEntity.isParticipantData).isEqualTo(true)
 
         // Step 3a: Try to make A managed by C -> should fail validateSingleManager
         val violatingSingleManager = BusinessPartnerRelations(
@@ -222,6 +233,44 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         val resultChainViolation = upsertRelationsGoldenRecordIntoPool("TASK_VIOLATE_CHAIN", violatingChain)
         assertThat(resultChainViolation[0].errors).hasSize(1)
         assertThat(resultChainViolation[0].errors[0].description).contains("already a Managing Legal Entity.")
+    }
+
+    /**
+     * Tests the validation logic for 'IsManagedBy' relation when a target entity is not dataspace participant:
+     *
+     * GIVEN:
+     *  - Two legal entities A and B
+     *  - B is not dataspace participant
+     *
+     * WHEN:
+     *  - Trying to create relation A → B of type 'IsManagedBy'
+     *
+     * THEN:
+     *  - The request must fail because only dataspace participants can manage other entities.
+     */
+    @Test
+    fun `create IsManagedBy relation - violate dataspace participant role`(){
+        // Step 1: Create three legal entities A and B
+        val entityA = BusinessPartnerNonVerboseValues.legalEntityCreate1
+        val entityB = BusinessPartnerNonVerboseValues.legalEntityCreate2
+
+        val response = poolClient.legalEntities.createBusinessPartners(listOf(entityA, entityB))
+        val savedA = response.entities.toList()[0]
+        val savedB = response.entities.toList()[1]
+
+        // Step 2: Try to make A is managed by B -> should fail because of only dataspace participants can manage other entities
+        val violatingDataspaceParticipantRole = BusinessPartnerRelations(
+            relationType = RelationType.IsManagedBy,
+            businessPartnerSourceBpnl = savedA.legalEntity.bpnl,
+            businessPartnerTargetBpnl = savedB.legalEntity.bpnl
+        )
+
+        val resultDataspaceParticipantViolation = upsertRelationsGoldenRecordIntoPool("TASK_VIOLATE_MANAGER", violatingDataspaceParticipantRole)
+
+        //Step4: Assert error
+        assertThat(resultDataspaceParticipantViolation.size).isEqualTo(1)
+        val violationResult = resultDataspaceParticipantViolation.first()
+        assertThat(violationResult.errors.size).isEqualTo(1)
     }
 
     /**
