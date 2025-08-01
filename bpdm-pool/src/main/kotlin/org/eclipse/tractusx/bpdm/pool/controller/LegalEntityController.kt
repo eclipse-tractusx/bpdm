@@ -86,7 +86,7 @@ class LegalEntityController(
         )
     }
 
-
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun getSites(
         bpnl: String,
         paginationRequest: PaginationRequest
