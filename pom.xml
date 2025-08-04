@@ -64,7 +64,7 @@
         <springdoc.version>2.8.9</springdoc.version>
         <nv-i18n.version>1.29</nv-i18n.version>
         <kotlin-logging.version>3.0.5</kotlin-logging.version>
-        <common-csv.version>1.14.0</common-csv.version>
+        <common-csv.version>1.14.1</common-csv.version>
         <wiremock.version>2.35.2</wiremock.version>
         <springmockk.version>4.0.2</springmockk.version>
         <opencsv.version>5.11.2</opencsv.version>
