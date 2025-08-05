@@ -80,13 +80,15 @@ abstract class SelfClientInitializer:  ApplicationContextInitializer<Configurabl
 
 /**
  * Creates a new Keycloak client with a given role available in the [KeyCloakInitializer.ROLE_MANAGEMENT_CLIENT]
- * and configures the tests to use that created client for authentication with the API under test
+ * and configures the tests to use that created client for authentication with the API under test.
+ *
+ * If the roleName is null just creates a user with no roles and permissions attached to it
  *
  * Requires a Keycloak configuration
  */
 abstract class CreateNewSelfClientInitializer: SelfClientInitializer(){
 
-    abstract val roleName: String
+    abstract val roleName: String?
 
     override fun initialize(applicationContext: ConfigurableApplicationContext) {
 
@@ -96,7 +98,7 @@ abstract class CreateNewSelfClientInitializer: SelfClientInitializer(){
 
         val roleManagementClientUuid = clients.findByClientId(KeyCloakInitializer.ROLE_MANAGEMENT_CLIENT).first().id
         val roleManagementClient =  clients.get(roleManagementClientUuid)
-        val role = roleManagementClient.roles().list().find { it.name == roleName }
+        val role = roleName?.let { roleManagementClient.roles().list().find { it.name == roleName } }
 
         clientId.let { clientToCreate ->
             clients.create(ClientRepresentation().apply {
@@ -137,13 +139,25 @@ abstract class CreateNewSelfClientInitializer: SelfClientInitializer(){
             .get(newServiceAccount.id)
             .update(newServiceAccount)
 
-        realm.users()
-            .get(newServiceAccount.id)
-            .roles()
-            .clientLevel(roleManagementClient.toRepresentation().id)
-            .add(listOf(role))
+        if(role != null){
+            realm.users()
+                .get(newServiceAccount.id)
+                .roles()
+                .clientLevel(roleManagementClient.toRepresentation().id)
+                .add(listOf(role))
+        }
+
 
         super.initialize(applicationContext)
     }
+}
 
+/**
+ * Creates a new client having no permissions attached with it
+ */
+class AuthenticatedSelfClient: CreateNewSelfClientInitializer(){
+    override val roleName: String?
+        get() = null
+    override val clientId: String
+        get() = "AuthenticatedClient"
 }
