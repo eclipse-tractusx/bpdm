@@ -142,6 +142,22 @@ You can obtain the generated Open-API documents from the running apps at these s
 
 Please use the formatting as-is when updating the corresponding documents in the api documentation folder.
 
+## Deny Requests on Unsecured Endpoints By Default
+
+In BPDM we make use of two Spring supported security strategies: Request-based and method-based security.
+In the request-based security we define which URL paths and HTTP methods of our APIs should be authenticated or not.
+The actual authorization happens then on individual method-level via Spring's method security implementations.
+Each method that is resolved through request mapping will then evaluate the necessary permissions to access it. 
+A drawback of method-security-based authorization is that there is no default denial on missing method security configuration.
+This means, if a developer forgets to put on a RestController method a permission requirement, any authenticated user can access the endpoint.
+
+For this reason BPDM implements a default behaviour in which we require each RestController method to have a method security annotation.
+If such an annotation is not present, the corresponding request will be denied with a 403 forbidden response.
+
+For the developer this means, they should make sure to give any method in a RestController class an appropriate security annotation.
+Also, all methods in such a controller should be for the sole purpose of request mapping.
+Alternative authorization mechanisms that do not involve method security annotations are thus not supported at the moment.
+
 ## NOTICE
 
 This work is licensed under the [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0).
