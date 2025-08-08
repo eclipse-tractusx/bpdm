@@ -17,10 +17,10 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.dto
+package org.eclipse.tractusx.bpdm.pool.dto.input
 
-
-data class UpsertResult<T>(
-    val relation: T,
-    val upsertType: UpsertType
+data class GeoData(
+    val latitude: Double?,
+    val longitude: Double?,
+    val altitude: Double?
 )

@@ -66,7 +66,7 @@ class TaskRelationsStepBuildService(
         return TaskRelationsStepResultEntryDto(
             taskId = taskEntry.taskId,
             errors = emptyList(),
-            businessPartnerRelations = upsertResult.relation.toTaskDto()
+            businessPartnerRelations = upsertResult.record.toTaskDto()
         )
     }
 

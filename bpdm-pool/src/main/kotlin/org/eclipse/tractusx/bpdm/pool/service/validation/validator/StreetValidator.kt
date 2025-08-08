@@ -17,11 +17,14 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.dto
+package org.eclipse.tractusx.bpdm.pool.service.validation.validator
 
+import org.eclipse.tractusx.bpdm.pool.dto.input.Street
+import org.eclipse.tractusx.bpdm.pool.dto.valid.StreetValid
+import org.eclipse.tractusx.bpdm.pool.dto.validation.Validated
+import org.eclipse.tractusx.bpdm.pool.dto.validation.error.StreetError
 
-enum class UpsertType{
-    Created,
-    Updated,
-    NoChange
+interface StreetValidator {
+
+    fun validate(streets: List<Street>): List<Validated<StreetValid, StreetError>>
 }

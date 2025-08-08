@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
-import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
+import org.eclipse.tractusx.bpdm.pool.dto.result.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
 

@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.adapter.api.v7.AdditionalAddressCreationAdapter
 import org.eclipse.tractusx.bpdm.pool.api.PoolAddressApi
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
@@ -37,7 +38,8 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class AddressController(
     private val addressService: AddressService,
-    private val businessPartnerBuildService: BusinessPartnerBuildService
+    private val businessPartnerBuildService: BusinessPartnerBuildService,
+    private val addressCreateAdapter: AdditionalAddressCreationAdapter
 ) : PoolAddressApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
@@ -73,7 +75,7 @@ class AddressController(
     override fun createAddresses(
         requests: Collection<AddressPartnerCreateRequest>
     ): AddressPartnerCreateResponseWrapper {
-        return businessPartnerBuildService.createAddresses(requests)
+        return addressCreateAdapter.create(requests.toList())
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")

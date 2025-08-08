@@ -25,10 +25,8 @@ import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.*
+import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressCreateError
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateVerboseDto
@@ -36,20 +34,20 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressUpdateError
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.util.TestHelpers
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
-import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues
+import org.eclipse.tractusx.bpdm.test.testdata.pool.*
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues.addressIdentifier
-import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerVerboseValues
-import org.eclipse.tractusx.bpdm.test.testdata.pool.LegalEntityStructureRequest
-import org.eclipse.tractusx.bpdm.test.testdata.pool.SiteStructureRequest
 import org.eclipse.tractusx.bpdm.test.util.AssertHelpers
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.eclipse.tractusx.bpdm.test.util.PoolDataHelpers
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInfo
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
+import java.util.*
+import kotlin.random.Random
 
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
@@ -62,13 +60,24 @@ class AddressControllerIT @Autowired constructor(
     val dbTestHelpers: DbTestHelpers,
     val assertHelpers: AssertHelpers,
     val poolDataHelpers: PoolDataHelpers,
-    val poolClient: PoolApiClient
+    val poolClient: PoolApiClient,
+    val testDataUtil: PoolDataHelper
 ) {
+    private val characterPool: List<Char> = ('a'.. 'z').toList()
+
+    private lateinit var testDataEnvironment: TestDataEnvironment
+    private lateinit var testUUID: UUID
+        private lateinit var random: Random
+        private val exceedLengthSize = 251
+
 
     @BeforeEach
-    fun beforeEach() {
+    fun beforeEach(testInfo: TestInfo) {
         dbTestHelpers.truncateDbTables()
         poolDataHelpers.createPoolMetadata()
+        testDataEnvironment = testDataUtil.createTestDataEnvironment()
+        testUUID = UUID.nameUUIDFromBytes(testInfo.displayName.toByteArray())
+        random = Random(testUUID.hashCode())
     }
 
     /**
@@ -339,17 +348,18 @@ class AddressControllerIT @Autowired constructor(
         val bpnL = givenStructure[0].legalEntity.legalEntity.bpnl
 
 
-        val toCreate = BusinessPartnerNonVerboseValues.addressPartnerCreate5.copy(bpnParent = bpnL)
-        val secondCreate = BusinessPartnerNonVerboseValues.addressPartnerCreate5.copy(bpnParent = bpnL, index = BusinessPartnerNonVerboseValues.addressPartnerCreate4.index)
+        val toCreate = BusinessPartnerNonVerboseValues.addressPartnerCreate5.copy(bpnParent = bpnL, index = "0")
+        val secondCreate = BusinessPartnerNonVerboseValues.addressPartnerCreate5.copy(bpnParent = bpnL, index = "1")
 
         val response = poolClient.addresses.createAddresses(listOf(toCreate, secondCreate))
 
 
-        assertThat(response.errorCount).isEqualTo(1)
+        //Both identifiers of each business partner have the duplicate error
+        assertThat(response.errorCount).isEqualTo(2)
         assertThat(response.entityCount).isEqualTo(0)
-        val errors = response.errors.toList()
-        testHelpers.assertErrorResponse(errors[0], AddressCreateError.AddressDuplicateIdentifier, toCreate.index!!)
-
+        response.errors.forEachIndexed { index, error ->
+            testHelpers.assertErrorResponse(error, AddressCreateError.AddressDuplicateIdentifier, index.toString())
+        }
     }
 
     /**
@@ -596,6 +606,410 @@ class AddressControllerIT @Autowired constructor(
     }
 
 
+    @Test
+    fun `create full valid additional address`(){
+        createValidAddress(testDataEnvironment.requestFactory.createAddressDto("ADD - $testUUID"))
+    }
+
+    @Test
+    fun `try create additional address - missing legal entity parent`(){
+        val addressIndex = "Index"
+
+        val addressData = testDataEnvironment.requestFactory.createAddressDto("ADD - $testUUID")
+        val addressCreateRequest = AddressPartnerCreateRequest(addressData, "BPNL_MISSING", addressIndex)
+
+        val additionalAddressCreateResponse = poolClient.addresses.createAddresses(listOf(addressCreateRequest))
+
+        assertThat(additionalAddressCreateResponse.entities).isEmpty()
+        assertThat(additionalAddressCreateResponse.errors.size).isEqualTo(1)
+
+        val expectedError = ErrorInfo(AddressCreateError.LegalEntityNotFound, "IGNORED", addressIndex)
+
+        assertHelpers.assertRecursively(additionalAddressCreateResponse.errors.single())
+            .ignoringFields(ErrorInfo<AddressCreateError>::message.name)
+            .isEqualTo(expectedError)
+    }
+
+    @Test
+    fun `try create additional address - missing site parent`(){
+        val addressIndex = "Index"
+
+        val addressData = testDataEnvironment.requestFactory.createAddressDto("ADD - $testUUID")
+        val addressCreateRequest = AddressPartnerCreateRequest(addressData, "BPNS_MISSING", addressIndex)
+
+        val additionalAddressCreateResponse = poolClient.addresses.createAddresses(listOf(addressCreateRequest))
+
+        assertThat(additionalAddressCreateResponse.entities).isEmpty()
+        assertThat(additionalAddressCreateResponse.errors.size).isEqualTo(1)
+
+        val expectedError = ErrorInfo(AddressCreateError.SiteNotFound, "IGNORED", addressIndex)
+
+        assertHelpers.assertRecursively(additionalAddressCreateResponse.errors.single())
+            .ignoringFields(ErrorInfo<AddressCreateError>::message.name)
+            .isEqualTo(expectedError)
+    }
+
+    @Test
+    fun `try create additional address - invalid BPN`(){
+        val addressIndex = "Index"
+
+        val addressData = testDataEnvironment.requestFactory.createAddressDto("ADD - $testUUID")
+        val addressCreateRequest = AddressPartnerCreateRequest(addressData, "INVALID", addressIndex)
+
+        val additionalAddressCreateResponse = poolClient.addresses.createAddresses(listOf(addressCreateRequest))
+
+        assertThat(additionalAddressCreateResponse.entities).isEmpty()
+        assertThat(additionalAddressCreateResponse.errors.size).isEqualTo(1)
+
+        val expectedError = ErrorInfo(AddressCreateError.BpnNotValid, "IGNORED", addressIndex)
+
+        assertHelpers.assertRecursively(additionalAddressCreateResponse.errors.single())
+            .ignoringFields(ErrorInfo<AddressCreateError>::message.name)
+            .isEqualTo(expectedError)
+    }
+
+    @Test
+    fun `try create additional address - name too long`(){
+        val addressData = with(testDataEnvironment.requestFactory.createAddressDto("ADD - $testUUID")){
+            copy(name = randomString(251))
+        }
+        expectErrorOnAddressCreation(addressData, AddressCreateError.BpnNotValid)
+    }
+
+    @Test
+    fun `try create additional address - id value too long`(){
+        val addressData = with(testDataEnvironment.requestFactory.createAddressDto("ADD - $testUUID")){
+            copy(identifiers = listOf(identifiers.first().copy(value = randomString(exceedLengthSize))) )
+        }
+        expectErrorOnAddressCreation(addressData, AddressCreateError.BpnNotValid)
+    }
+
+    @Test
+    fun `try create additional address - id type not matching`(){
+        val addressData = with(testDataEnvironment.requestFactory.createAddressDto("ADD - $testUUID")){
+            copy(identifiers = listOf(identifiers.first().copy(type = "MISSING")) )
+        }
+        expectErrorOnAddressCreation(addressData, AddressCreateError.IdentifierNotFound)
+    }
+
+    @Test
+    fun `try create additional address - duplicate identifiers on same request`(){
+        val legalEntity = poolClient.legalEntities.createBusinessPartners(listOf(
+            testDataEnvironment.requestFactory.createLegalEntityRequest("LE - $testUUID"
+            ))).entities.single()
+
+        val requestForGivenAddress = testDataEnvironment.requestFactory.createAddressRequest("ADD1 - $testUUID", legalEntity.legalEntity.bpnl)
+        val requestWithDuplicateIdentifier = with(testDataEnvironment.requestFactory.createAddressRequest("ADD2 - $testUUID", legalEntity.legalEntity.bpnl)){
+            copy(address = address.copy(identifiers = listOf(requestForGivenAddress.address.identifiers.first())))
+        }
+        val creationResponse = poolClient.addresses.createAddresses(listOf(requestForGivenAddress, requestWithDuplicateIdentifier))
+
+        assertThat(creationResponse.entities).isEmpty()
+        assertThat(creationResponse.errors.size).isEqualTo(2)
+
+        val expectedErrors = listOf(
+            ErrorInfo(AddressCreateError.AddressDuplicateIdentifier, "IGNORED", requestForGivenAddress.index),
+            ErrorInfo(AddressCreateError.AddressDuplicateIdentifier, "IGNORED", requestWithDuplicateIdentifier.index)
+        )
+
+            assertHelpers.assertRecursively(creationResponse.errors)
+                .ignoringFields(ErrorInfo<AddressCreateError>::message.name)
+                .isEqualTo(expectedErrors)
+    }
+
+    @Test
+    fun `try create additional address - duplicate identifiers on same address`(){
+        val legalEntity = poolClient.legalEntities.createBusinessPartners(listOf(
+            testDataEnvironment.requestFactory.createLegalEntityRequest("LE - $testUUID"
+            ))).entities.single()
+
+        val requestWithDuplicateIdentifier = with(testDataEnvironment.requestFactory.createAddressRequest("ADD2 - $testUUID", legalEntity.legalEntity.bpnl)){
+            copy(address = address.copy(identifiers = listOf(address.identifiers.first(), address.identifiers.first())))
+        }
+        val creationResponse = poolClient.addresses.createAddresses(listOf(requestWithDuplicateIdentifier))
+
+        assertThat(creationResponse.entities).isEmpty()
+        assertThat(creationResponse.errors.size).isEqualTo(2)
+
+        val expectedErrors = listOf(
+            ErrorInfo(AddressCreateError.AddressDuplicateIdentifier, "IGNORED", requestWithDuplicateIdentifier.index),
+            ErrorInfo(AddressCreateError.AddressDuplicateIdentifier, "IGNORED", requestWithDuplicateIdentifier.index)
+        )
+
+        assertHelpers.assertRecursively(creationResponse.errors)
+            .ignoringFields(ErrorInfo<AddressCreateError>::message.name)
+            .isEqualTo(expectedErrors)
+    }
+
+    @Test
+    fun `try create additional address - physical admin area no match`(){
+        val addressData = with(testDataEnvironment.requestFactory.createAddressDto("ADD - $testUUID")){
+            copy(physicalPostalAddress = physicalPostalAddress.copy(administrativeAreaLevel1 = "NO MATCH") )
+        }
+        expectErrorOnAddressCreation(addressData, AddressCreateError.RegionNotFound)
+    }
+
+    @Test
+    fun `try create additional address - physical admin area level 2 too long`(){
+        val addressData = with(testDataEnvironment.requestFactory.createAddressDto("ADD - $testUUID")){
+            copy(physicalPostalAddress = physicalPostalAddress.copy(administrativeAreaLevel2 = randomString(exceedLengthSize)) )
+        }
+        expectErrorOnAddressCreation(addressData, AddressCreateError.BpnNotValid)
+    }
+
+    @Test
+    fun `try create additional address - physical admin area level 3 too long`(){
+        val addressData = with(testDataEnvironment.requestFactory.createAddressDto("ADD - $testUUID")){
+            copy(physicalPostalAddress = physicalPostalAddress.copy(administrativeAreaLevel3 = randomString(exceedLengthSize)) )
+        }
+        expectErrorOnAddressCreation(addressData, AddressCreateError.BpnNotValid)
+    }
+
+    @Test
+    fun `try create additional address - physical postcode too long`(){
+        val addressData = with(testDataEnvironment.requestFactory.createAddressDto("ADD - $testUUID")){
+            copy(physicalPostalAddress = physicalPostalAddress.copy(postalCode = randomString(exceedLengthSize)) )
+        }
+        expectErrorOnAddressCreation(addressData, AddressCreateError.BpnNotValid)
+    }
+
+    @Test
+    fun `try create additional address - physical city too long`(){
+        val addressData = with(testDataEnvironment.requestFactory.createAddressDto("ADD - $testUUID")){
+            copy(physicalPostalAddress = physicalPostalAddress.copy(city = randomString(exceedLengthSize)) )
+        }
+        expectErrorOnAddressCreation(addressData, AddressCreateError.BpnNotValid)
+    }
+
+    @Test
+    fun `try create additional address - district too long`(){
+        val addressData = with(testDataEnvironment.requestFactory.createAddressDto("ADD - $testUUID")){
+            copy(physicalPostalAddress = physicalPostalAddress.copy(district = randomString(exceedLengthSize)) )
+        }
+        expectErrorOnAddressCreation(addressData, AddressCreateError.BpnNotValid)
+    }
+
+    @Test
+    fun `try create additional address - street name too long`(){
+        val addressData = with(testDataEnvironment.requestFactory.createAddressDto("ADD - $testUUID")){
+            copy(physicalPostalAddress = physicalPostalAddress.copy(street = physicalPostalAddress.street!!.copy(name = randomString(exceedLengthSize))) )
+        }
+        expectErrorOnAddressCreation(addressData, AddressCreateError.BpnNotValid)
+    }
+
+    @Test
+    fun `try create additional address - street house number too long`(){
+        val addressData = with(testDataEnvironment.requestFactory.createAddressDto("ADD - $testUUID")){
+            copy(physicalPostalAddress = physicalPostalAddress.copy(street = physicalPostalAddress.street!!.copy(houseNumber = randomString(exceedLengthSize))) )
+        }
+        expectErrorOnAddressCreation(addressData, AddressCreateError.BpnNotValid)
+    }
+
+    @Test
+    fun `try create additional address - street house number supplement too long`(){
+        val addressData = with(testDataEnvironment.requestFactory.createAddressDto("ADD - $testUUID")){
+            copy(physicalPostalAddress = physicalPostalAddress.copy(street = physicalPostalAddress.street!!.copy(houseNumberSupplement = randomString(exceedLengthSize))) )
+        }
+        expectErrorOnAddressCreation(addressData, AddressCreateError.BpnNotValid)
+    }
+
+    @Test
+    fun `try create additional address - street milestone too long`(){
+        val addressData = with(testDataEnvironment.requestFactory.createAddressDto("ADD - $testUUID")){
+            copy(physicalPostalAddress = physicalPostalAddress.copy(street = physicalPostalAddress.street!!.copy(milestone = randomString(exceedLengthSize))) )
+        }
+        expectErrorOnAddressCreation(addressData, AddressCreateError.BpnNotValid)
+    }
+
+    @Test
+    fun `try create additional address - street direction too long`(){
+        val addressData = with(testDataEnvironment.requestFactory.createAddressDto("ADD - $testUUID")){
+            copy(physicalPostalAddress = physicalPostalAddress.copy(street = physicalPostalAddress.street!!.copy(direction = randomString(exceedLengthSize))) )
+        }
+        expectErrorOnAddressCreation(addressData, AddressCreateError.BpnNotValid)
+    }
+
+    @Test
+    fun `try create additional address - street name prefix too long`(){
+        val addressData = with(testDataEnvironment.requestFactory.createAddressDto("ADD - $testUUID")){
+            copy(physicalPostalAddress = physicalPostalAddress.copy(street = physicalPostalAddress.street!!.copy(namePrefix = randomString(exceedLengthSize))) )
+        }
+        expectErrorOnAddressCreation(addressData, AddressCreateError.BpnNotValid)
+    }
+
+    @Test
+    fun `try create additional address - street additional name prefix too long`(){
+        val addressData = with(testDataEnvironment.requestFactory.createAddressDto("ADD - $testUUID")){
+            copy(physicalPostalAddress = physicalPostalAddress.copy(street = physicalPostalAddress.street!!.copy(additionalNamePrefix = randomString(exceedLengthSize))) )
+        }
+        expectErrorOnAddressCreation(addressData, AddressCreateError.BpnNotValid)
+    }
+
+    @Test
+    fun `try create additional address - street name suffix too long`(){
+        val addressData = with(testDataEnvironment.requestFactory.createAddressDto("ADD - $testUUID")){
+            copy(physicalPostalAddress = physicalPostalAddress.copy(street = physicalPostalAddress.street!!.copy(nameSuffix = randomString(exceedLengthSize))) )
+        }
+        expectErrorOnAddressCreation(addressData, AddressCreateError.BpnNotValid)
+    }
+
+    @Test
+    fun `try create additional address - street additional name suffix too long`(){
+        val addressData = with(testDataEnvironment.requestFactory.createAddressDto("ADD - $testUUID")){
+            copy(physicalPostalAddress = physicalPostalAddress.copy(street = physicalPostalAddress.street!!.copy(additionalNameSuffix = randomString(exceedLengthSize))) )
+        }
+        expectErrorOnAddressCreation(addressData, AddressCreateError.BpnNotValid)
+    }
+
+    @Test
+    fun `try create additional address - company postal code too long`(){
+        val addressData = with(testDataEnvironment.requestFactory.createAddressDto("ADD - $testUUID")){
+            copy(physicalPostalAddress = physicalPostalAddress.copy(companyPostalCode = randomString(exceedLengthSize)))
+        }
+        expectErrorOnAddressCreation(addressData, AddressCreateError.BpnNotValid)
+    }
+
+    @Test
+    fun `try create additional address - industrial zone too long`(){
+        val addressData = with(testDataEnvironment.requestFactory.createAddressDto("ADD - $testUUID")){
+            copy(physicalPostalAddress = physicalPostalAddress.copy(industrialZone = randomString(exceedLengthSize)))
+        }
+        expectErrorOnAddressCreation(addressData, AddressCreateError.BpnNotValid)
+    }
+
+    @Test
+    fun `try create additional address - building too long`(){
+        val addressData = with(testDataEnvironment.requestFactory.createAddressDto("ADD - $testUUID")){
+            copy(physicalPostalAddress = physicalPostalAddress.copy(building = randomString(exceedLengthSize)))
+        }
+        expectErrorOnAddressCreation(addressData, AddressCreateError.BpnNotValid)
+    }
+
+    @Test
+    fun `try create additional address - floor too long`(){
+        val addressData = with(testDataEnvironment.requestFactory.createAddressDto("ADD - $testUUID")){
+            copy(physicalPostalAddress = physicalPostalAddress.copy(floor = randomString(exceedLengthSize)))
+        }
+        expectErrorOnAddressCreation(addressData, AddressCreateError.BpnNotValid)
+    }
+
+    @Test
+    fun `try create additional address - door too long`(){
+        val addressData = with(testDataEnvironment.requestFactory.createAddressDto("ADD - $testUUID")){
+            copy(physicalPostalAddress = physicalPostalAddress.copy(floor = randomString(exceedLengthSize)))
+        }
+        expectErrorOnAddressCreation(addressData, AddressCreateError.BpnNotValid)
+    }
+
+    @Test
+    fun `try create additional address - tax jurisdiction too long`(){
+        val addressData = with(testDataEnvironment.requestFactory.createAddressDto("ADD - $testUUID")){
+            copy(physicalPostalAddress = physicalPostalAddress.copy(taxJurisdictionCode = randomString(exceedLengthSize)))
+        }
+        expectErrorOnAddressCreation(addressData, AddressCreateError.BpnNotValid)
+    }
+
+    @Test
+    fun `try create additional address - alternative admin area level 1 no match`(){
+        val addressData = with(testDataEnvironment.requestFactory.createAddressDto("ADD - $testUUID")){
+            copy(alternativePostalAddress = alternativePostalAddress!!.copy(administrativeAreaLevel1 = "NO MATCH"))
+        }
+        expectErrorOnAddressCreation(addressData, AddressCreateError.RegionNotFound)
+    }
+
+    @Test
+    fun `try create additional address - alternative postal code too long`(){
+        val addressData = with(testDataEnvironment.requestFactory.createAddressDto("ADD - $testUUID")){
+            copy(alternativePostalAddress = alternativePostalAddress!!.copy(postalCode = randomString(exceedLengthSize)))
+        }
+        expectErrorOnAddressCreation(addressData, AddressCreateError.BpnNotValid)
+    }
+
+    @Test
+    fun `try create additional address - alternative city too long`(){
+        val addressData = with(testDataEnvironment.requestFactory.createAddressDto("ADD - $testUUID")){
+            copy(alternativePostalAddress = alternativePostalAddress!!.copy(city = randomString(exceedLengthSize)))
+        }
+        expectErrorOnAddressCreation(addressData, AddressCreateError.BpnNotValid)
+    }
+
+    @Test
+    fun `try create additional address - delivery service number too long`(){
+        val addressData = with(testDataEnvironment.requestFactory.createAddressDto("ADD - $testUUID")){
+            copy(alternativePostalAddress = alternativePostalAddress!!.copy(deliveryServiceNumber = randomString(exceedLengthSize)))
+        }
+        expectErrorOnAddressCreation(addressData, AddressCreateError.BpnNotValid)
+    }
+
+    @Test
+    fun `try create additional address - delivery service qualifier too long`(){
+        val addressData = with(testDataEnvironment.requestFactory.createAddressDto("ADD - $testUUID")){
+            copy(alternativePostalAddress = alternativePostalAddress!!.copy(deliveryServiceQualifier = randomString(exceedLengthSize)))
+        }
+        expectErrorOnAddressCreation(addressData, AddressCreateError.BpnNotValid)
+    }
+
+
+    private fun expectErrorOnAddressCreation(addressData: LogisticAddressDto, errorType: AddressCreateError){
+        val legalEntity = poolClient.legalEntities.createBusinessPartners(listOf(
+            testDataEnvironment.requestFactory.createLegalEntityRequest("LE - $testUUID"
+            ))).entities.single()
+
+        val addressCreateRequest = AddressPartnerCreateRequest(addressData, legalEntity.legalEntity.bpnl, legalEntity.index)
+
+        val additionalAddressCreateResponse = poolClient.addresses.createAddresses(listOf(addressCreateRequest))
+
+        assertThat(additionalAddressCreateResponse.entities).isEmpty()
+        assertThat(additionalAddressCreateResponse.errors.size).isEqualTo(1)
+
+        val expectedError = ErrorInfo(errorType, "IGNORED", legalEntity.index)
+
+        assertHelpers.assertRecursively(additionalAddressCreateResponse.errors.single())
+            .ignoringFields(ErrorInfo<AddressCreateError>::message.name)
+            .isEqualTo(expectedError)
+    }
+
+    @Test
+    fun `create full valid site additional address`(){
+        val legalEntity = poolClient.legalEntities.createBusinessPartners(listOf(
+            testDataEnvironment.requestFactory.createLegalEntityRequest("LE - $testUUID"
+            ))).entities.single()
+
+        val site = poolClient.sites.createSite(listOf(testDataEnvironment.requestFactory.createSiteRequest("S - $testUUID", legalEntity.legalEntity.bpnl)
+        )).entities.single()
+
+        val addressRequest = testDataEnvironment.requestFactory.createAddressRequest("ADD - $testUUID", site.site.bpns)
+        val additionalAddressCreateResponse = poolClient.addresses.createAddresses(listOf(addressRequest))
+
+        val expectedAddress = AddressPartnerCreateVerboseDto(
+            testDataEnvironment.expectFactory.mapToExpectedAdditionalAddress(addressRequest, isCatenaXMemberData = true),
+            addressRequest.index
+        )
+
+        assertThat(additionalAddressCreateResponse.entities.size).isEqualTo(1)
+        assertThat(additionalAddressCreateResponse.errors).isEmpty()
+        assertCreatedAddressesAreEqual(additionalAddressCreateResponse.entities, listOf(expectedAddress))
+    }
+
+    private fun createValidAddress(addressData: LogisticAddressDto){
+        val legalEntity = poolClient.legalEntities.createBusinessPartners(listOf(
+            testDataEnvironment.requestFactory.createLegalEntityRequest("LE - $testUUID"
+            ))).entities.single()
+
+        val addressCreateRequest = AddressPartnerCreateRequest(addressData, legalEntity.legalEntity.bpnl, legalEntity.index)
+
+        val additionalAddressCreateResponse = poolClient.addresses.createAddresses(listOf(addressCreateRequest))
+
+        val expectedAddress = AddressPartnerCreateVerboseDto(
+            testDataEnvironment.expectFactory.mapToExpectedAdditionalAddress(addressCreateRequest, isCatenaXMemberData = true),
+            addressCreateRequest.index
+        )
+
+        assertThat(additionalAddressCreateResponse.entities.size).isEqualTo(1)
+        assertThat(additionalAddressCreateResponse.errors).isEmpty()
+        assertCreatedAddressesAreEqual(additionalAddressCreateResponse.entities, listOf(expectedAddress))
+    }
+
     private fun assertCreatedAddressesAreEqual(actuals: Collection<AddressPartnerCreateVerboseDto>, expected: Collection<AddressPartnerCreateVerboseDto>) {
         actuals.forEach { assertThat(it.address.bpna).matches(testHelpers.bpnAPattern) }
 
@@ -625,5 +1039,8 @@ class AddressControllerIT @Autowired constructor(
 
     private fun requestAddressesOfLegalEntity(bpn: String) =
         poolClient.legalEntities.getAddresses(bpn, PaginationRequest())
+
+    private fun randomString(length: Int) =
+        (1 .. length).map { random.nextInt(0, characterPool.size) }.map { characterPool[it] }.joinToString()
 
 }
