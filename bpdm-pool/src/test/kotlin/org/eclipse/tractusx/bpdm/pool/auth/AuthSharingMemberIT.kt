@@ -40,27 +40,27 @@ class AuthSharingMemberIT @Autowired constructor(
 ): AuthTestBase(
     poolApiClient,
     AddressAuthExpectations(
-        getAddresses = AuthExpectationType.Forbidden,
-        getAddress = AuthExpectationType.Forbidden,
-        postAddressSearch = AuthExpectationType.Forbidden,
+        getAddresses = AuthExpectationType.Authorized,
+        getAddress = AuthExpectationType.Authorized,
+        postAddressSearch = AuthExpectationType.Authorized,
         postAddresses = AuthExpectationType.Forbidden,
         putAddresses = AuthExpectationType.Forbidden
     ),
     SiteAuthExpectations(
-        getSites = AuthExpectationType.Forbidden,
-        getSite = AuthExpectationType.Forbidden,
-        postSiteSearch = AuthExpectationType.Forbidden,
+        getSites = AuthExpectationType.Authorized,
+        getSite = AuthExpectationType.Authorized,
+        postSiteSearch = AuthExpectationType.Authorized,
         postSites = AuthExpectationType.Forbidden,
         putSites = AuthExpectationType.Forbidden
     ),
     LegalEntityAuthExpectations(
-        getLegalEntities = AuthExpectationType.Forbidden,
-        getLegalEntity = AuthExpectationType.Forbidden,
-        postLegalEntitySearch = AuthExpectationType.Forbidden,
+        getLegalEntities = AuthExpectationType.Authorized,
+        getLegalEntity = AuthExpectationType.Authorized,
+        postLegalEntitySearch = AuthExpectationType.Authorized,
         postLegalEntities = AuthExpectationType.Forbidden,
         putLegalEntities = AuthExpectationType.Forbidden,
-        getLegalEntityAddresses = AuthExpectationType.Forbidden,
-        getLegalEntitySites = AuthExpectationType.Forbidden
+        getLegalEntityAddresses = AuthExpectationType.Authorized,
+        getLegalEntitySites = AuthExpectationType.Authorized
     ),
     MetadataAuthExpectations(
         getLegalForm = AuthExpectationType.Authorized,
@@ -80,8 +80,8 @@ class AuthSharingMemberIT @Autowired constructor(
         getMemberships = AuthExpectationType.Forbidden,
         putMemberships = AuthExpectationType.Forbidden
     ),
-    changelogAuthExpectation = AuthExpectationType.Forbidden,
-    bpnAuthExpectation = AuthExpectationType.Forbidden
+    changelogAuthExpectation = AuthExpectationType.Authorized,
+    bpnAuthExpectation = AuthExpectationType.Authorized
 )
 
 class SelfClientAsSharingMemberInitializer : SelfClientInitializer() {
