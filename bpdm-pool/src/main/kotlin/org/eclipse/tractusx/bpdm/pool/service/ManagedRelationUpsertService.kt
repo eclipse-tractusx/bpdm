@@ -19,16 +19,19 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.pool.api.model.DataSpaceParticipantDto
 import org.eclipse.tractusx.bpdm.pool.api.model.RelationType
 import org.eclipse.tractusx.bpdm.pool.api.model.request.DataSpaceParticipantUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
+import org.eclipse.tractusx.bpdm.pool.entity.RelationStateDb
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @Service
 class ManagedRelationUpsertService(
@@ -45,8 +48,17 @@ class ManagedRelationUpsertService(
         validateSingleManager(proposedSource)
         validateManagingEntityIsParticipant(proposedTarget)
 
+
+        val computedStates = upsertRequest.states.map { dto ->
+            RelationStateDb(
+                validFrom = dto.validFrom,
+                validTo = dto.validTo,
+                type = dto.type
+            )
+        }
+
         val result = relationUpsertService.upsertRelation(
-            RelationUpsertService.UpsertRequest(proposedSource, proposedTarget, RelationType.IsManagedBy)
+            RelationUpsertService.UpsertRequest(proposedSource, proposedTarget, RelationType.IsManagedBy, computedStates)
         )
 
         makeManagedEntityParticipantIfRequired(proposedSource)

@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.orchestrator.service
 
+import org.eclipse.tractusx.bpdm.orchestrator.entity.RelationStateDb
 import org.eclipse.tractusx.bpdm.orchestrator.entity.RelationsGoldenRecordTaskDb
 import org.eclipse.tractusx.bpdm.orchestrator.entity.RelationsTaskErrorDb
 import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
@@ -32,13 +33,20 @@ class RelationsRequestMapper {
     fun toBusinessPartnerRelations(businessPartnerRelations: BusinessPartnerRelations) =
         with(businessPartnerRelations){
             RelationsGoldenRecordTaskDb.BusinessPartnerRelations(
-                relationType = when(relationType){
-                    RelationType.IsAlternativeHeadquarterFor ->  RelationsGoldenRecordTaskDb.RelationType.IsAlternativeHeadquarterFor
-                    RelationType.IsManagedBy ->  RelationsGoldenRecordTaskDb.RelationType.IsManagedBy
-                    RelationType.IsOwnedBy ->  RelationsGoldenRecordTaskDb.RelationType.IsOwnedBy
+                relationType = when (relationType) {
+                    RelationType.IsAlternativeHeadquarterFor -> RelationsGoldenRecordTaskDb.RelationType.IsAlternativeHeadquarterFor
+                    RelationType.IsManagedBy -> RelationsGoldenRecordTaskDb.RelationType.IsManagedBy
+                    RelationType.IsOwnedBy -> RelationsGoldenRecordTaskDb.RelationType.IsOwnedBy
                 },
                 businessPartnerSourceBpnl = businessPartnerSourceBpnl,
-                businessPartnerTargetBpnl = businessPartnerTargetBpnl
+                businessPartnerTargetBpnl = businessPartnerTargetBpnl,
+                states = businessPartnerRelations.states.map {
+                    RelationStateDb(
+                        validFrom = it.validFrom,
+                        validTo = it.validTo,
+                        type = it.type
+                    )
+                }.toMutableList()
             )
         }
 

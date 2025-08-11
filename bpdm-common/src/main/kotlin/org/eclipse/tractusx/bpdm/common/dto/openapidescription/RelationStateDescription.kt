@@ -17,20 +17,15 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.service
+package org.eclipse.tractusx.bpdm.common.dto.openapidescription
 
-import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
-import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
-import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
-import org.eclipse.tractusx.bpdm.pool.entity.RelationStateDb
+object RelationStateDescription {
+    const val header = "A relation state indicates whether a relation between two legal entities is active or inactive " +
+            "within a specific timeframe. This state is provided by the sharing member and represents the validity of the business relation."
 
-interface IRelationUpsertStrategyService {
+    const val validFrom = "The date from which the relation state is valid."
 
-    fun upsertRelation(upsertRequest: UpsertRequest): UpsertResult<RelationDb>
+    const val validTo = "The date until which the relation state is valid."
 
-    data class UpsertRequest(
-        val source: LegalEntityDb,
-        val target: LegalEntityDb,
-        val states: Collection<RelationStateDb>
-    )
+    const val type = "One of the state types: active, inactive. Represents the business status of the relation during the specified timeframe."
 }

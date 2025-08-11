@@ -27,6 +27,7 @@ import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
+import org.eclipse.tractusx.bpdm.pool.entity.RelationStateDb
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.springframework.stereotype.Service
@@ -68,12 +69,19 @@ class RelationUpsertService(
     private fun createNewRelation(upsertRequest: UpsertRequest): RelationDb{
         val source = upsertRequest.source
         val target = upsertRequest.target
+        val relationStates = upsertRequest.states.map {
+            RelationStateDb(
+                validFrom = it.validFrom,
+                validTo = it.validTo,
+                type = it.type
+            )
+        }.toMutableList()
 
         val newRelation = RelationDb(
             type = upsertRequest.relationType,
             startNode = source,
             endNode = target,
-            isActive = true
+            states = relationStates,
         )
 
         relationRepository.save(newRelation)
@@ -87,7 +95,8 @@ class RelationUpsertService(
     data class UpsertRequest(
         val source: LegalEntityDb,
         val target: LegalEntityDb,
-        val relationType: RelationType
+        val relationType: RelationType,
+        val states: Collection<RelationStateDb>
     )
 
 }

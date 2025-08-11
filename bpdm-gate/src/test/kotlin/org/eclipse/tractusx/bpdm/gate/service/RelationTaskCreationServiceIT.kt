@@ -25,6 +25,7 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateType
@@ -133,7 +134,14 @@ class RelationTaskCreationServiceIT @Autowired constructor(
                         RelationType.IsOwnedBy -> org.eclipse.tractusx.orchestrator.api.model.RelationType.IsOwnedBy
                     },
                     legalEntityBpnL1,
-                    legalEntityBpnL2
+                    legalEntityBpnL2,
+                    listOf(
+                        RelationStateDto(
+                            validFrom = Instant.parse("2020-01-01T00:00:00Z"),
+                            validTo = Instant.parse("2030-01-01T00:00:00Z"),
+                            type = BusinessStateType.ACTIVE
+                        )
+                    )
                 ),
                 TaskProcessingRelationsStateDto(ResultState.Pending, TaskStep.CleanAndSync, StepState.Queued, emptyList(), anyTime, anyTime, anyTime))
         ))
@@ -168,7 +176,14 @@ class RelationTaskCreationServiceIT @Autowired constructor(
                         externalId = externalId,
                         relationType = relationType,
                         businessPartnerSourceExternalId = source,
-                        businessPartnerTargetExternalId = target
+                        businessPartnerTargetExternalId = target,
+                        mutableListOf(
+                            org.eclipse.tractusx.bpdm.gate.api.model.RelationStateDto(
+                                validFrom = Instant.parse("2020-01-01T00:00:00Z"),
+                                validTo = Instant.parse("2030-01-01T00:00:00Z"),
+                                type = BusinessStateType.ACTIVE
+                            )
+                        )
                     )
                 )
             )

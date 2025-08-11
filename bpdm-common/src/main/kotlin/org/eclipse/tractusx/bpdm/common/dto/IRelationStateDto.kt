@@ -17,26 +17,22 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.api.model
+package org.eclipse.tractusx.bpdm.common.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.RelationStateDescription
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import java.time.Instant
 
-@Schema(description = "A relation from one business partner (the source) to another business partner (the target). ")
-data class RelationDto(
-    @Schema(description = "The identifier with which to reference this relation")
-    override val externalId: String,
-    @Schema(description = "The type of relation between the business partners")
-    override val relationType: RelationType,
-    @Schema(description = "The business partner from which the relation emerges (the source)")
-    override val businessPartnerSourceExternalId: String,
-    @Schema(description = "The business partner to which this relation goes (the target)")
-    override val businessPartnerTargetExternalId: String,
-    @Schema(description = RelationStateDescription.header)
-    val states: Collection<RelationStateDto>,
-    @Schema(description = "The time when this relation was last modified")
-    val updatedAt: Instant,
-    @Schema(description = "The time when this relation was created")
-    val createdAt: Instant,
-): IRelationDto
+@Schema(description = RelationStateDescription.header)
+interface IRelationStateDto{
+
+    @get:Schema(description = RelationStateDescription.validFrom)
+    val validFrom: Instant?
+
+    @get:Schema(description = RelationStateDescription.validTo)
+    val validTo: Instant?
+
+    @get:Schema(description = RelationStateDescription.type)
+    val type: BusinessStateType
+}

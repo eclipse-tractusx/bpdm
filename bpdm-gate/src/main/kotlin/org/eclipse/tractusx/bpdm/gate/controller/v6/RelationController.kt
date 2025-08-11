@@ -87,7 +87,8 @@ class RelationController(
                     externalId = requestBody.externalId,
                     relationType = requestBody.relationType,
                     businessPartnerSourceExternalId = requestBody.businessPartnerSourceExternalId,
-                    businessPartnerTargetExternalId = requestBody.businessPartnerTargetExternalId
+                    businessPartnerTargetExternalId = requestBody.businessPartnerTargetExternalId,
+                    states = TODO(),
                 ))
             ).single()
         } else {
@@ -97,7 +98,8 @@ class RelationController(
                     externalId = requestBody.externalId,
                     relationType = requestBody.relationType,
                     businessPartnerSourceExternalId = requestBody.businessPartnerSourceExternalId,
-                    businessPartnerTargetExternalId = requestBody.businessPartnerTargetExternalId
+                    businessPartnerTargetExternalId = requestBody.businessPartnerTargetExternalId,
+                    states = TODO(),
                 ))
             ).single()
         }

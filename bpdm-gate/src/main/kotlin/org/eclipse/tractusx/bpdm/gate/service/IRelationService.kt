@@ -22,12 +22,10 @@ package org.eclipse.tractusx.bpdm.gate.service
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.mapping.types.BpnLString
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationDto
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationOutputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
-import org.eclipse.tractusx.bpdm.gate.api.model.SharableRelationType
+import org.eclipse.tractusx.bpdm.gate.api.model.*
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
 import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
+import org.eclipse.tractusx.bpdm.gate.entity.RelationStateDb
 import java.time.Instant
 
 interface IRelationService {
@@ -62,6 +60,7 @@ interface IRelationService {
         val relation: RelationDb,
         val relationType: SharableRelationType,
         val businessPartnerSourceExternalId: String,
-        val businessPartnerTargetExternalId: String
+        val businessPartnerTargetExternalId: String,
+        val states: Collection<RelationStateDto>
     )
 }

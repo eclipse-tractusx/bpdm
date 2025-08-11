@@ -19,13 +19,17 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.pool.api.model.RelationType
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
+import org.eclipse.tractusx.bpdm.pool.entity.RelationStateDb
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.springframework.stereotype.Service
+import java.time.Instant
+import java.time.LocalDateTime
 
 @Service
 class OwnedByRelationUpsertService(
@@ -37,12 +41,20 @@ class OwnedByRelationUpsertService(
         val proposedSource = upsertRequest.source
         val proposedTarget = upsertRequest.target
 
+        val computedStates = upsertRequest.states.map { dto ->
+            RelationStateDb(
+                validFrom = dto.validFrom,
+                validTo = dto.validTo,
+                type = if ( Instant.now() in dto.validFrom..dto.validTo) BusinessStateType.ACTIVE else BusinessStateType.INACTIVE
+            )
+        }
+
         validateSingleParent(upsertRequest.source, upsertRequest.target)
         validateNoCycles(upsertRequest.source, upsertRequest.target)
 
 
         val result = relationUpsertService.upsertRelation(
-            RelationUpsertService.UpsertRequest(proposedSource, proposedTarget, RelationType.IsOwnedBy)
+            RelationUpsertService.UpsertRequest(proposedSource, proposedTarget, RelationType.IsOwnedBy, computedStates)
         )
 
         return result

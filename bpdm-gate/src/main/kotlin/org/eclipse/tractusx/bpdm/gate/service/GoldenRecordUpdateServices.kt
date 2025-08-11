@@ -455,7 +455,8 @@ class GoldenRecordUpdateChunkService(
             relationType = relation.type.toGateModel(),
             sourceBpnL = relation.businessPartnerSourceBpnl,
             targetBpnL = relation.businessPartnerTargetBpnl,
-            updatedAt = placeholderTime
+            updatedAt = placeholderTime,
+            states = TODO()
         )
 
     private fun RelationType.toGateModel() =
