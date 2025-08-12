@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
-import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.pool.api.model.DataSpaceParticipantDto
 import org.eclipse.tractusx.bpdm.pool.api.model.RelationType
 import org.eclipse.tractusx.bpdm.pool.api.model.request.DataSpaceParticipantUpdateRequest
@@ -31,7 +30,7 @@ import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDateTime
+import java.time.Instant
 
 @Service
 class ManagedRelationUpsertService(
@@ -45,11 +44,10 @@ class ManagedRelationUpsertService(
         val (proposedSource, proposedTarget) = upsertRequest
 
         validateNoChain(proposedSource, proposedTarget)
-        validateSingleManager(proposedSource)
         validateManagingEntityIsParticipant(proposedTarget)
 
 
-        val computedStates = upsertRequest.states.map { dto ->
+        val proposedStates = upsertRequest.states.map { dto ->
             RelationStateDb(
                 validFrom = dto.validFrom,
                 validTo = dto.validTo,
@@ -57,14 +55,37 @@ class ManagedRelationUpsertService(
             )
         }
 
+        val existingRelations = relationRepository.findByTypeAndStartNode(RelationType.IsManagedBy, proposedSource)
+
+        val sameTargetRelation = existingRelations.find { it.endNode.id == proposedTarget.id }
+
+        if (sameTargetRelation != null) {
+            val mergedStates = mergeStates(sameTargetRelation.states, proposedStates)
+            return relationUpsertService.upsertRelation(
+                RelationUpsertService.UpsertRequest(proposedSource, proposedTarget, RelationType.IsManagedBy, mergedStates)
+            )
+        }
+
+        // Check for overlaps with different targets
+        val conflict = existingRelations.any { existing ->
+            existing.states.any { es ->
+                proposedStates.any { ps -> overlaps(es.validFrom, es.validTo, ps.validFrom, ps.validTo) }
+            }
+        }
+        if (conflict) {
+            throw BpdmValidationException(
+                "Invalid 'IsManagedBy' relation: Overlapping manager period exists for source ${proposedSource.bpn}."
+            )
+        }
+
+        // No overlap — safe to insert new relation
         val result = relationUpsertService.upsertRelation(
-            RelationUpsertService.UpsertRequest(proposedSource, proposedTarget, RelationType.IsManagedBy, computedStates)
+            RelationUpsertService.UpsertRequest(proposedSource, proposedTarget, RelationType.IsManagedBy, proposedStates)
         )
 
         makeManagedEntityParticipantIfRequired(proposedSource)
 
         return result
-
     }
 
     private fun validateNoChain(source: LegalEntityDb, target: LegalEntityDb) {
@@ -86,19 +107,6 @@ class ManagedRelationUpsertService(
         }
     }
 
-    private fun validateSingleManager(source: LegalEntityDb) {
-        val existingManagers = relationRepository.findInSourceOrTarget(RelationType.IsManagedBy, source)
-            .filter { it.startNode.id == source.id }
-
-        if (existingManagers.isNotEmpty()) {
-            val managerBpns = existingManagers.joinToString { it.endNode.bpn }
-            throw BpdmValidationException(
-                "Invalid 'IsManagedBy' relation: The Managed Legal Entity with BPNL '${source.bpn}' is already managed by another Managing Legal Entity '${managerBpns}'. " +
-                        "A Managed Legal Entity may only have one Managing Legal Entity at a time."
-            )
-        }
-    }
-
     private fun validateManagingEntityIsParticipant(target: LegalEntityDb) {
         if (!target.isCatenaXMemberData) {
             throw BpdmValidationException(
@@ -116,6 +124,24 @@ class ManagedRelationUpsertService(
                 )
             )
         }
+    }
+
+    private fun overlaps(from1: Instant, to1: Instant, from2: Instant, to2: Instant): Boolean {
+        return !to1.isBefore(from2) && !from1.isAfter(to2)
+    }
+
+    private fun mergeStates(existingStates: List<RelationStateDb>, proposedStates: List<RelationStateDb>): List<RelationStateDb> {
+        val merged = existingStates.toMutableList()
+        for (ps in proposedStates) {
+            val overlapping = merged.find { overlaps(it.validFrom, it.validTo, ps.validFrom, ps.validTo) && it.type == ps.type }
+            if (overlapping != null) {
+                overlapping.validFrom = minOf(overlapping.validFrom, ps.validFrom)
+                overlapping.validTo = maxOf(overlapping.validTo, ps.validTo)
+            } else {
+                merged.add(ps)
+            }
+        }
+        return merged
     }
 
 }

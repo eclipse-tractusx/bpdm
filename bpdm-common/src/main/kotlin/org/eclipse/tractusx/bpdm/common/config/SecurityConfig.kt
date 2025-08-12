@@ -130,7 +130,7 @@ class OAuthSecurityConfig(
     @Bean
     fun denyUnsecuredRestControllerMethodAdvisor(): Advisor{
         return AuthorizationManagerBeforeMethodInterceptor(
-            MethodMatchPointcut(UnsecuredRestControllerMethodsMatcher()),
+            MethodMatchPointcut(UnsecuredRestControllerMethodsMatcher("org.eclipse.tractusx.bpdm")),
             SingleResultAuthorizationManager.denyAll()
         )
     }

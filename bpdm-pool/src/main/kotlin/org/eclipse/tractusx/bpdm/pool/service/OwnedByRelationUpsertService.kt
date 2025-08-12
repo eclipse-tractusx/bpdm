@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.service
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.pool.api.model.RelationType
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
+import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationStateDb
@@ -45,21 +46,46 @@ class OwnedByRelationUpsertService(
             RelationStateDb(
                 validFrom = dto.validFrom,
                 validTo = dto.validTo,
-                type = if ( Instant.now() in dto.validFrom..dto.validTo) BusinessStateType.ACTIVE else BusinessStateType.INACTIVE
+                type = dto.type
             )
         }
 
-        validateSingleParent(upsertRequest.source, upsertRequest.target)
-        validateNoCycles(upsertRequest.source, upsertRequest.target)
+        validateSingleParent(proposedSource, proposedTarget)
+        validateNoCycles(proposedSource, proposedTarget)
 
+        val existingRelations = relationRepository.findByTypeAndStartNode(RelationType.IsOwnedBy, proposedSource)
+        val sameTargetRelation = existingRelations.find { it.endNode == proposedTarget }
 
-        val result = relationUpsertService.upsertRelation(
-            RelationUpsertService.UpsertRequest(proposedSource, proposedTarget, RelationType.IsOwnedBy, computedStates)
-        )
+        return if (sameTargetRelation != null) {
+            val existingState = sameTargetRelation.states.single() // assuming one per relation
+            val proposedState = computedStates.single()
 
-        return result
+            if (periodsOverlap(existingState.validFrom, existingState.validTo, proposedState.validFrom, proposedState.validTo)) {
+                // Merge
+                val mergedState = RelationStateDb(
+                    validFrom = minOf(existingState.validFrom, proposedState.validFrom),
+                    validTo = maxOf(existingState.validTo, proposedState.validTo),
+                    type = proposedState.type // assume latest type wins
+                )
+                sameTargetRelation.states.clear()
+                sameTargetRelation.states.add(mergedState)
+                relationRepository.save(sameTargetRelation)
+                UpsertResult(sameTargetRelation, UpsertType.Updated)
+            } else {
+                // Append as new valid period
+                sameTargetRelation.states.add(proposedState)
+                relationRepository.save(sameTargetRelation)
+                UpsertResult(sameTargetRelation, UpsertType.Updated)
+            }
+        } else {
+            // No same target → create new relation
+            relationUpsertService.upsertRelation(
+                RelationUpsertService.UpsertRequest(proposedSource, proposedTarget, RelationType.IsOwnedBy, computedStates)
+            )
+        }
     }
 
+    private fun periodsOverlap(s1: Instant, e1: Instant, s2: Instant, e2: Instant) = !e1.isBefore(s2) && !e2.isBefore(s1)
 
     private fun validateSingleParent(child: LegalEntityDb, parent: LegalEntityDb){
         val allChildRelations = relationRepository.findByTypeAndStartNode(RelationType.IsOwnedBy, child)

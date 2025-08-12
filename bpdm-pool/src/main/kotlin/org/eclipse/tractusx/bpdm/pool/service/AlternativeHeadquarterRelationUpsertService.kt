@@ -42,26 +42,52 @@ class AlternativeHeadquarterRelationUpsertService(
     override fun upsertRelation(upsertRequest: IRelationUpsertStrategyService.UpsertRequest): UpsertResult<RelationDb>{
         val standardisedRequest = standardise(upsertRequest)
 
-        val computedStates = upsertRequest.states.map { dto ->
+        val proposedStates = standardisedRequest.states.map { dto ->
             RelationStateDb(
                 validFrom = dto.validFrom,
                 validTo = dto.validTo,
-                type = if ( Instant.now() in dto.validFrom..dto.validTo) BusinessStateType.ACTIVE else BusinessStateType.INACTIVE
+                type = dto.type
             )
         }
 
-        val result = relationUpsertService.upsertRelation(
-            RelationUpsertService.UpsertRequest(standardisedRequest.source, standardisedRequest.target, RelationType.IsAlternativeHeadquarterFor, computedStates)
+        val existingRelations = relationRepository.findByTypeAndStartNode(
+            RelationType.IsAlternativeHeadquarterFor,
+            standardisedRequest.source
         )
 
-        if(result.upsertType == UpsertType.Created){
-            createTransitiveRelations(standardisedRequest)
+        val sameTargetRelation = existingRelations.find { it.endNode.id == standardisedRequest.target.id }
+
+        val finalStates = if (sameTargetRelation != null) {
+            mergeStates(sameTargetRelation.states, proposedStates)
+        } else {
+            proposedStates
+        }
+
+        val result = relationUpsertService.upsertRelation(
+            RelationUpsertService.UpsertRequest(
+                source = standardisedRequest.source,
+                target = standardisedRequest.target,
+                relationType = RelationType.IsAlternativeHeadquarterFor,
+                states = finalStates
+            )
+        )
+
+
+        // Create transitive relations if this is a new relation OR existing one was extended
+        if (result.upsertType == UpsertType.Created || result.upsertType == UpsertType.Updated) {
+            createTransitiveRelations(
+                IRelationUpsertStrategyService.UpsertRequest(
+                    standardisedRequest.source,
+                    standardisedRequest.target,
+                    finalStates
+                )
+            )
         }
 
         return result
     }
 
-    private fun standardise(upsertRequest: IRelationUpsertStrategyService.UpsertRequest): IRelationUpsertStrategyService.UpsertRequest{
+    private fun standardise(upsertRequest: IRelationUpsertStrategyService.UpsertRequest): IRelationUpsertStrategyService.UpsertRequest {
         val proposedSource = upsertRequest.source
         val proposedTarget = upsertRequest.target
 
@@ -74,22 +100,19 @@ class AlternativeHeadquarterRelationUpsertService(
         }
 
         val sourceIsOlder = proposedSource.createdAt < proposedTarget.createdAt
-        val upsertRequest = if(sourceIsOlder){
+        return if (sourceIsOlder) {
             IRelationUpsertStrategyService.UpsertRequest(source = proposedTarget, target = proposedSource, computedStates)
-        }else{
+        } else {
             IRelationUpsertStrategyService.UpsertRequest(source = proposedSource, target = proposedTarget, computedStates)
         }
-
-        return upsertRequest
     }
 
-    private fun createTransitiveRelations(upsertRequest: IRelationUpsertStrategyService.UpsertRequest){
+    private fun createTransitiveRelations(upsertRequest: IRelationUpsertStrategyService.UpsertRequest) {
         val transitiveSourceRelations = relationRepository.findInSourceOrTarget(RelationType.IsAlternativeHeadquarterFor, upsertRequest.source)
         val transitiveTargetRelations = relationRepository.findInSourceOrTarget(RelationType.IsAlternativeHeadquarterFor, upsertRequest.target)
 
         val transitiveSourceRequests = createTransitiveUpsertRequests(upsertRequest.target, transitiveSourceRelations, upsertRequest.states)
         val transitiveTargetRequests = createTransitiveUpsertRequests(upsertRequest.source, transitiveTargetRelations, upsertRequest.states)
-
 
         transitiveSourceRequests
             .plus(transitiveTargetRequests)
@@ -103,14 +126,32 @@ class AlternativeHeadquarterRelationUpsertService(
         legalEntity: LegalEntityDb,
         relations: Set<RelationDb>,
         originalStates: Collection<RelationStateDb>
-    ): List<IRelationUpsertStrategyService.UpsertRequest>{
+    ): List<IRelationUpsertStrategyService.UpsertRequest> {
         val allLegalEntities = relations.flatMap { listOf(it.startNode, it.endNode) }.toSet()
 
-        return  allLegalEntities
+        return allLegalEntities
             .filter { legalEntity.id != it.id }
             .map { IRelationUpsertStrategyService.UpsertRequest(legalEntity, it, originalStates) }
             .map { standardise(it) }
             .distinctBy { Pair(it.source.id, it.target.id) }
+    }
+
+    private fun mergeStates(existingStates: Collection<RelationStateDb>, proposedStates: Collection<RelationStateDb>): List<RelationStateDb> {
+        val merged = existingStates.map { it.copy() }.toMutableList()
+        for (ps in proposedStates) {
+            val overlap = merged.find { overlaps(it.validFrom, it.validTo, ps.validFrom, ps.validTo) && it.type == ps.type }
+            if (overlap != null) {
+                overlap.validFrom = minOf(overlap.validFrom, ps.validFrom)
+                overlap.validTo = maxOf(overlap.validTo, ps.validTo)
+            } else {
+                merged.add(ps)
+            }
+        }
+        return merged
+    }
+
+    private fun overlaps(from1: Instant, to1: Instant, from2: Instant, to2: Instant): Boolean {
+        return !to1.isBefore(from2) && !from1.isAfter(to2)
     }
 
 }

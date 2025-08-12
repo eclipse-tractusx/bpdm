@@ -58,10 +58,19 @@ class RelationUpsertService(
             )
         ).singleOrNull()
 
-        val upsertResult = if(existingRelation != null)
-            UpsertResult(existingRelation, UpsertType.NoChange)
-        else
+        val upsertResult = if (existingRelation != null) {
+            // Update states if changed
+            if (statesDiffer(existingRelation.states, upsertRequest.states)) {
+                existingRelation.states.clear()
+                existingRelation.states.addAll(upsertRequest.states)
+                relationRepository.save(existingRelation)
+                UpsertResult(existingRelation, UpsertType.Updated)
+            } else {
+                UpsertResult(existingRelation, UpsertType.NoChange)
+            }
+        } else {
             UpsertResult(createNewRelation(upsertRequest), UpsertType.Created)
+        }
 
         return upsertResult
     }
@@ -91,6 +100,14 @@ class RelationUpsertService(
 
         return newRelation
     }
+
+    private fun statesDiffer(existingStates: Collection<RelationStateDb>, newStates: Collection<RelationStateDb>): Boolean {
+        if (existingStates.size != newStates.size) return true
+        return existingStates.zip(newStates).any { (e, n) ->
+            e.validFrom != n.validFrom || e.validTo != n.validTo || e.type != n.type
+        }
+    }
+
 
     data class UpsertRequest(
         val source: LegalEntityDb,
