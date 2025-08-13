@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
-import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.pool.api.model.RelationType
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
@@ -30,7 +29,6 @@ import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.springframework.stereotype.Service
 import java.time.Instant
-import java.time.LocalDateTime
 
 @Service
 class OwnedByRelationUpsertService(
@@ -42,7 +40,7 @@ class OwnedByRelationUpsertService(
         val proposedSource = upsertRequest.source
         val proposedTarget = upsertRequest.target
 
-        val computedStates = upsertRequest.states.map { dto ->
+        val proposedStates = upsertRequest.states.map { dto ->
             RelationStateDb(
                 validFrom = dto.validFrom,
                 validTo = dto.validTo,
@@ -50,55 +48,67 @@ class OwnedByRelationUpsertService(
             )
         }
 
-        validateSingleParent(proposedSource, proposedTarget)
+        validateSingleParent(proposedSource, proposedTarget, proposedStates)
         validateNoCycles(proposedSource, proposedTarget)
 
         val existingRelations = relationRepository.findByTypeAndStartNode(RelationType.IsOwnedBy, proposedSource)
         val sameTargetRelation = existingRelations.find { it.endNode == proposedTarget }
 
         return if (sameTargetRelation != null) {
-            val existingState = sameTargetRelation.states.single() // assuming one per relation
-            val proposedState = computedStates.single()
-
-            if (periodsOverlap(existingState.validFrom, existingState.validTo, proposedState.validFrom, proposedState.validTo)) {
-                // Merge
-                val mergedState = RelationStateDb(
-                    validFrom = minOf(existingState.validFrom, proposedState.validFrom),
-                    validTo = maxOf(existingState.validTo, proposedState.validTo),
-                    type = proposedState.type // assume latest type wins
-                )
-                sameTargetRelation.states.clear()
-                sameTargetRelation.states.add(mergedState)
-                relationRepository.save(sameTargetRelation)
-                UpsertResult(sameTargetRelation, UpsertType.Updated)
-            } else {
-                // Append as new valid period
-                sameTargetRelation.states.add(proposedState)
-                relationRepository.save(sameTargetRelation)
-                UpsertResult(sameTargetRelation, UpsertType.Updated)
-            }
+            sameTargetRelation.states.addAll(proposedStates)
+            relationRepository.save(sameTargetRelation)
+            UpsertResult(sameTargetRelation, UpsertType.Updated)
         } else {
             // No same target → create new relation
             relationUpsertService.upsertRelation(
-                RelationUpsertService.UpsertRequest(proposedSource, proposedTarget, RelationType.IsOwnedBy, computedStates)
+                RelationUpsertService.UpsertRequest(proposedSource, proposedTarget, RelationType.IsOwnedBy, proposedStates)
             )
         }
     }
 
     private fun periodsOverlap(s1: Instant, e1: Instant, s2: Instant, e2: Instant) = !e1.isBefore(s2) && !e2.isBefore(s1)
 
-    private fun validateSingleParent(child: LegalEntityDb, parent: LegalEntityDb){
+    /**
+     * Checks that the proposed source (child) does not already have another parent
+     * with overlapping validity periods.
+     */
+    private fun validateSingleParent(
+        child: LegalEntityDb,
+        parent: LegalEntityDb,
+        proposedStates: List<RelationStateDb>
+    ) {
         val allChildRelations = relationRepository.findByTypeAndStartNode(RelationType.IsOwnedBy, child)
         allChildRelations.forEach { relation ->
-            if(relation.endNode != parent)
-                throw BpdmValidationException("Multiple owning entities assigned to the same owned entity: legal entity '${child.bpn}' can't be owned by '${parent.bpn}' as its already owned by '${relation.endNode.bpn}'")
+            if (relation.endNode != parent) {
+                relation.states.forEach { existingState ->
+                    proposedStates.forEach { proposedState ->
+                        if (periodsOverlap(
+                                existingState.validFrom, existingState.validTo,
+                                proposedState.validFrom, proposedState.validTo
+                            )
+                        ) {
+                            throw BpdmValidationException(
+                                "Multiple owning entities assigned to the same owned entity during overlapping validity: " +
+                                        "legal entity '${child.bpn}' can't be owned by '${parent.bpn}' " +
+                                        "as it is already owned by '${relation.endNode.bpn}' in overlapping period."
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 
-    private fun validateNoCycles(child: LegalEntityDb, parent: LegalEntityDb){
+    /**
+     * Checks that no cycles exist in the ownership hierarchy.
+     */
+    private fun validateNoCycles(child: LegalEntityDb, parent: LegalEntityDb) {
         val allOwningAncestors = getAllAncestors(parent)
-        if(allOwningAncestors.contains(child))
-            throw BpdmValidationException("Circular ownership detected in entity hierarchy: legal entity '${child.bpn}' is (transitively) owning '${parent.bpn}' and therefore can't be owned by '${parent.bpn}'.")
+        if (allOwningAncestors.contains(child)) {
+            throw BpdmValidationException(
+                "Circular ownership detected: legal entity '${child.bpn}' is (transitively) owning '${parent.bpn}' and therefore can't be owned by it."
+            )
+        }
     }
 
     /**
