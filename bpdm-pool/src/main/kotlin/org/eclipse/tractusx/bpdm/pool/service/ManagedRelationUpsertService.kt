@@ -46,7 +46,6 @@ class ManagedRelationUpsertService(
         validateNoChain(proposedSource, proposedTarget)
         validateManagingEntityIsParticipant(proposedTarget)
 
-
         val proposedStates = upsertRequest.states.map { dto ->
             RelationStateDb(
                 validFrom = dto.validFrom,
@@ -57,28 +56,27 @@ class ManagedRelationUpsertService(
 
         val existingRelations = relationRepository.findByTypeAndStartNode(RelationType.IsManagedBy, proposedSource)
 
+        // === 1. SAME TARGET EXISTS ===
         val sameTargetRelation = existingRelations.find { it.endNode.id == proposedTarget.id }
-
         if (sameTargetRelation != null) {
-            val mergedStates = mergeStates(sameTargetRelation.states, proposedStates)
+            // Scenario 2: Always replace states with new proposed states
             return relationUpsertService.upsertRelation(
-                RelationUpsertService.UpsertRequest(proposedSource, proposedTarget, RelationType.IsManagedBy, mergedStates)
+                RelationUpsertService.UpsertRequest(proposedSource, proposedTarget, RelationType.IsManagedBy, proposedStates)
             )
         }
 
-        // Check for overlaps with different targets
-        val conflict = existingRelations.any { existing ->
-            existing.states.any { es ->
-                proposedStates.any { ps -> overlaps(es.validFrom, es.validTo, ps.validFrom, ps.validTo) }
-            }
+        // === 2. DIFFERENT TARGET EXISTS ===
+        val conflictWithDifferentTarget = existingRelations.any { existing ->
+            existing.endNode.id != proposedTarget.id && hasOverlap(existing.states, proposedStates)
         }
-        if (conflict) {
+        if (conflictWithDifferentTarget) {
+            // Scenario 3: Overlap with different target -> exception
             throw BpdmValidationException(
                 "Invalid 'IsManagedBy' relation: Overlapping manager period exists for source ${proposedSource.bpn}."
             )
         }
 
-        // No overlap — safe to insert new relation
+        // === 3. NO CONFLICT — create new relation ===
         val result = relationUpsertService.upsertRelation(
             RelationUpsertService.UpsertRequest(proposedSource, proposedTarget, RelationType.IsManagedBy, proposedStates)
         )
@@ -86,6 +84,12 @@ class ManagedRelationUpsertService(
         makeManagedEntityParticipantIfRequired(proposedSource)
 
         return result
+    }
+
+    private fun hasOverlap(existingStates: Collection<RelationStateDb>, proposedStates: Collection<RelationStateDb>): Boolean {
+        return existingStates.any { es ->
+            proposedStates.any { ps -> overlaps(es.validFrom, es.validTo, ps.validFrom, ps.validTo) }
+        }
     }
 
     private fun validateNoChain(source: LegalEntityDb, target: LegalEntityDb) {
@@ -129,19 +133,4 @@ class ManagedRelationUpsertService(
     private fun overlaps(from1: Instant, to1: Instant, from2: Instant, to2: Instant): Boolean {
         return !to1.isBefore(from2) && !from1.isAfter(to2)
     }
-
-    private fun mergeStates(existingStates: List<RelationStateDb>, proposedStates: List<RelationStateDb>): List<RelationStateDb> {
-        val merged = existingStates.toMutableList()
-        for (ps in proposedStates) {
-            val overlapping = merged.find { overlaps(it.validFrom, it.validTo, ps.validFrom, ps.validTo) && it.type == ps.type }
-            if (overlapping != null) {
-                overlapping.validFrom = minOf(overlapping.validFrom, ps.validFrom)
-                overlapping.validTo = maxOf(overlapping.validTo, ps.validTo)
-            } else {
-                merged.add(ps)
-            }
-        }
-        return merged
-    }
-
 }

@@ -186,7 +186,7 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
 
 
     @Test
-    fun `IsManagedBy relation - handle all validity and merge scenarios`() {
+    fun `IsManagedBy relation - handle all validity scenarios`() {
         // Step 1: Create three legal entities A, B, C
         val entityA = BusinessPartnerNonVerboseValues.legalEntityCreate1
         val entityB = BusinessPartnerNonVerboseValues.legalEntityCreate2.copy(
@@ -206,75 +206,74 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         val savedC = response.entities.toList()[2]
 
         /**
-         * Scenario 1: A→B exists, new A→C with non-overlapping validity → new relation created
+         * Scenario 1: A→B exists
          */
         val relationAB = BusinessPartnerRelations(
             relationType = RelationType.IsManagedBy,
             businessPartnerSourceBpnl = savedA.legalEntity.bpnl,
             businessPartnerTargetBpnl = savedB.legalEntity.bpnl,
-            states = listOf(RelationStateDto(validFrom = Instant.parse("2020-01-01T00:00:00Z"), validTo = Instant.parse("2020-12-31T23:59:59Z"), type = BusinessStateType.ACTIVE))
+            states = listOf(RelationStateDto(
+                validFrom = Instant.parse("2020-01-01T00:00:00Z"),
+                validTo = Instant.parse("2020-12-31T23:59:59Z"),
+                type = BusinessStateType.ACTIVE
+            ))
         )
         val resultAB = upsertRelationsGoldenRecordIntoPool("TASK_AB", relationAB)
         assertThat(resultAB[0].errors).isEmpty()
 
-        val relationAC_nonOverlap = BusinessPartnerRelations(
-            relationType = RelationType.IsManagedBy,
-            businessPartnerSourceBpnl = savedA.legalEntity.bpnl,
-            businessPartnerTargetBpnl = savedC.legalEntity.bpnl,
-            states = listOf(RelationStateDto(validFrom = Instant.parse("2021-01-01T00:00:00Z"), validTo = Instant.parse("2021-12-31T23:59:59Z"), type = BusinessStateType.ACTIVE))
-        )
-        val resultAC_nonOverlap = upsertRelationsGoldenRecordIntoPool("TASK_AC_NON_OVERLAP", relationAC_nonOverlap)
-        assertThat(resultAC_nonOverlap[0].errors).isEmpty()
-
         /**
-         * Scenario 2: A→C exists, new A→C with overlapping validity → extend existing validity
-         */
-        val relationAC_overlap = BusinessPartnerRelations(
-            relationType = RelationType.IsManagedBy,
-            businessPartnerSourceBpnl = savedA.legalEntity.bpnl,
-            businessPartnerTargetBpnl = savedC.legalEntity.bpnl,
-            states = listOf(RelationStateDto(validFrom = Instant.parse("2021-06-01T00:00:00Z"), validTo = Instant.parse("2022-06-30T23:59:59Z"), type = BusinessStateType.ACTIVE))
-        )
-        val resultAC_overlap = upsertRelationsGoldenRecordIntoPool("TASK_AC_OVERLAP", relationAC_overlap)
-        assertThat(resultAC_overlap[0].errors).isEmpty()
-
-        // Fetch A→C and verify merged validity (should start 2021-01-01 and end 2022-06-30)
-        // Verify merged validity on A→C
-        val mergedRelationAC = poolClient.legalEntities.getLegalEntity(changeCase(savedA.legalEntity.bpnl))
-            .legalEntity.relations.first { it.businessPartnerTargetBpnl == savedC.legalEntity.bpnl }
-        val mergedState = mergedRelationAC.states.first()
-        assertThat(mergedState.validFrom).isEqualTo(Instant.parse("2021-01-01T00:00:00Z"))
-        assertThat(mergedState.validTo).isEqualTo(Instant.parse("2022-06-30T23:59:59Z"))
-
-        /**
-         * Scenario 3: A→B exists, new A→C overlaps in validity → should throw exception
+         * Scenario 2: A→B exists, new A→C overlaps in validity → should throw exception
          */
         val relationAC_conflict = BusinessPartnerRelations(
             relationType = RelationType.IsManagedBy,
             businessPartnerSourceBpnl = savedA.legalEntity.bpnl,
             businessPartnerTargetBpnl = savedC.legalEntity.bpnl,
-            states = listOf(RelationStateDto(validFrom = Instant.parse("2020-06-01T00:00:00Z"), validTo = Instant.parse("2020-09-30T23:59:59Z"), type = BusinessStateType.ACTIVE))
+            states = listOf(RelationStateDto(
+                validFrom = Instant.parse("2020-06-01T00:00:00Z"),
+                validTo = Instant.parse("2020-09-30T23:59:59Z"),
+                type = BusinessStateType.ACTIVE
+            ))
         )
         val resultAC_conflict = upsertRelationsGoldenRecordIntoPool("TASK_AC_CONFLICT", relationAC_conflict)
         assertThat(resultAC_conflict[0].errors).hasSize(1)
         assertThat(resultAC_conflict[0].errors[0].description).contains("Overlapping manager period exists")
 
         /**
-         * Scenario 4: Same target, non-overlap → merge states into same relation
+         * Scenario 3: A→C exists, new A→C with overlapping validity → overwrite existing validity
          */
-        val relationAB_nonOverlap2 = BusinessPartnerRelations(
+        val relationAC_nonOverlap = BusinessPartnerRelations(
             relationType = RelationType.IsManagedBy,
             businessPartnerSourceBpnl = savedA.legalEntity.bpnl,
-            businessPartnerTargetBpnl = savedB.legalEntity.bpnl,
-            states = listOf(RelationStateDto(validFrom = Instant.parse("2021-01-01T00:00:00Z"), validTo = Instant.parse("2021-12-31T23:59:59Z"), type = BusinessStateType.ACTIVE))
+            businessPartnerTargetBpnl = savedC.legalEntity.bpnl,
+            states = listOf(RelationStateDto(
+                validFrom = Instant.parse("2021-01-01T00:00:00Z"),
+                validTo = Instant.parse("2021-12-31T23:59:59Z"),
+                type = BusinessStateType.ACTIVE
+            ))
         )
-        val resultAB_nonOverlap2 = upsertRelationsGoldenRecordIntoPool("TASK_AB_NON_OVERLAP", relationAB_nonOverlap2)
-        assertThat(resultAB_nonOverlap2[0].errors).isEmpty()
+        val resultAC_nonOverlap = upsertRelationsGoldenRecordIntoPool("TASK_AC_NON_OVERLAP", relationAC_nonOverlap)
+        assertThat(resultAC_nonOverlap[0].errors).isEmpty()
 
-        // Verify A→B now has two states merged
-        val mergedRelationAB = poolClient.legalEntities.getLegalEntity(changeCase(savedA.legalEntity.bpnl))
-            .legalEntity.relations.first { it.businessPartnerTargetBpnl == savedB.legalEntity.bpnl }
-        assertThat(mergedRelationAB.states).hasSize(2)
+        val relationAC_new = BusinessPartnerRelations(
+            relationType = RelationType.IsManagedBy,
+            businessPartnerSourceBpnl = savedA.legalEntity.bpnl,
+            businessPartnerTargetBpnl = savedC.legalEntity.bpnl,
+            states = listOf(RelationStateDto(
+                validFrom = Instant.parse("2021-06-01T00:00:00Z"),
+                validTo = Instant.parse("2022-06-30T23:59:59Z"),
+                type = BusinessStateType.ACTIVE
+            ))
+        )
+        val resultAC_new = upsertRelationsGoldenRecordIntoPool("TASK_AC_NEW", relationAC_new)
+        assertThat(resultAC_new[0].errors).isEmpty()
+
+        // Fetch A→C and verify it now has only the newly proposed state (overwrite, no merge)
+        val updatedRelationAC = poolClient.legalEntities.getLegalEntity(changeCase(savedA.legalEntity.bpnl))
+            .legalEntity.relations.first { it.businessPartnerTargetBpnl == savedC.legalEntity.bpnl }
+        assertThat(updatedRelationAC.states).hasSize(1)
+        val stateAC = updatedRelationAC.states.first()
+        assertThat(stateAC.validFrom).isEqualTo(Instant.parse("2021-06-01T00:00:00Z"))
+        assertThat(stateAC.validTo).isEqualTo(Instant.parse("2022-06-30T23:59:59Z"))
     }
 
     /**
