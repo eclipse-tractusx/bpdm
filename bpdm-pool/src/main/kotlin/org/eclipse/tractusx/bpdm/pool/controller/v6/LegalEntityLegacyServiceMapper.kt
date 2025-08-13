@@ -39,6 +39,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCr
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerUpdateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityWithLegalAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.RelationVerboseDto
 import org.eclipse.tractusx.bpdm.pool.dto.AddressMetadataDto
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.LegalEntityMetadataDto
@@ -185,6 +186,10 @@ class LegalEntityLegacyServiceMapper(
             administrativeAreaLevel1 = administrativeArea?.regionCode,
             isActive = isActive
         )
+    }
+
+    private fun RelationDb.toDto(): RelationVerboseDto {
+        return RelationVerboseDto(type, startNode.bpn, endNode.bpn)
     }
 
     data class LegalEntitySearchRequest(
@@ -744,5 +749,7 @@ class LegalEntityLegacyServiceMapper(
         duplicateIdentifier = LegalEntityUpdateError.LegalAddressDuplicateIdentifier,
         identifiersTooMany = LegalEntityUpdateError.LegalAddressIdentifiersTooMany
     )
+
+
 
 }
