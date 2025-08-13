@@ -35,6 +35,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
 import org.eclipse.tractusx.bpdm.gate.controller.SelfClientAsPartnerUploaderInitializer
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.PostalAddressDb
+import org.eclipse.tractusx.bpdm.gate.model.RelationDefaults
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.eclipse.tractusx.bpdm.gate.util.PrincipalUtil
@@ -137,8 +138,8 @@ class RelationTaskCreationServiceIT @Autowired constructor(
                     legalEntityBpnL2,
                     listOf(
                         RelationStateDto(
-                            validFrom = Instant.parse("2020-01-01T00:00:00Z"),
-                            validTo = Instant.parse("2030-01-01T00:00:00Z"),
+                            validFrom = RelationDefaults.VALID_FROM_DEFAULT,
+                            validTo = RelationDefaults.VALID_TO_DEFAULT,
                             type = BusinessStateType.ACTIVE
                         )
                     )
@@ -176,14 +177,7 @@ class RelationTaskCreationServiceIT @Autowired constructor(
                         externalId = externalId,
                         relationType = relationType,
                         businessPartnerSourceExternalId = source,
-                        businessPartnerTargetExternalId = target,
-                        mutableListOf(
-                            org.eclipse.tractusx.bpdm.gate.api.model.RelationStateDto(
-                                validFrom = Instant.parse("2020-01-01T00:00:00Z"),
-                                validTo = Instant.parse("2030-01-01T00:00:00Z"),
-                                type = BusinessStateType.ACTIVE
-                            )
-                        )
+                        businessPartnerTargetExternalId = target
                     )
                 )
             )

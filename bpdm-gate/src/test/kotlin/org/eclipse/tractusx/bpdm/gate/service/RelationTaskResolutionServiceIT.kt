@@ -25,12 +25,14 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.*
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationOutputSearchRequest
 import org.eclipse.tractusx.bpdm.gate.controller.SelfClientAsPartnerUploaderInitializer
 import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
 import org.eclipse.tractusx.bpdm.gate.entity.RelationSharingStateDb
+import org.eclipse.tractusx.bpdm.gate.model.RelationDefaults
 import org.eclipse.tractusx.bpdm.gate.repository.RelationRepository
 import org.eclipse.tractusx.bpdm.gate.util.PrincipalUtil
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
@@ -38,6 +40,7 @@ import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.eclipse.tractusx.orchestrator.api.ApiCommons
 import org.eclipse.tractusx.orchestrator.api.model.*
+import org.eclipse.tractusx.orchestrator.api.model.RelationStateDto
 import org.eclipse.tractusx.orchestrator.api.model.RelationType
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInfo
@@ -111,6 +114,14 @@ class RelationTaskResolutionServiceIT @Autowired constructor(
         val errorType = TaskRelationsErrorType.Unspecified
         val errorDescription = "$testName error description"
 
+        val relationStates = listOf(
+            RelationStateDto(
+                validFrom = RelationDefaults.VALID_FROM_DEFAULT,
+                validTo = RelationDefaults.VALID_TO_DEFAULT,
+                type = BusinessStateType.ACTIVE
+            )
+        )
+
         val pendingRelations =  listOf(
             RelationDb(relationId1, principalUtil.resolveTenantBpnl().value, RelationSharingStateDb(RelationSharingStateType.Pending, null, null, anyTime, recordId1, taskId1, false), null),
             RelationDb(relationId2, principalUtil.resolveTenantBpnl().value, RelationSharingStateDb(RelationSharingStateType.Pending, null, null, anyTime, recordId2, taskId2, false), null)
@@ -123,9 +134,9 @@ class RelationTaskResolutionServiceIT @Autowired constructor(
         ))
 
         val orchestratorMockResultResponse = TaskRelationsStateResponse(listOf(
-            TaskClientRelationsStateDto(taskId1, recordId1, BusinessPartnerRelations(relationType, bpnL1,bpnL2),
+            TaskClientRelationsStateDto(taskId1, recordId1, BusinessPartnerRelations(relationType, bpnL1,bpnL2, relationStates),
                 TaskProcessingRelationsStateDto(ResultState.Success, TaskStep.PoolSync, StepState.Success, emptyList(), anyTime, anyTime, anyTime )),
-            TaskClientRelationsStateDto(taskId2, recordId2, BusinessPartnerRelations(relationType, bpnL1,bpnL2),
+            TaskClientRelationsStateDto(taskId2, recordId2, BusinessPartnerRelations(relationType, bpnL1,bpnL2, relationStates),
                 TaskProcessingRelationsStateDto(ResultState.Error, TaskStep.CleanAndSync, StepState.Error, listOf(TaskRelationsErrorDto(errorType, errorDescription)), anyTime, anyTime, anyTime )),
         ))
 
@@ -155,6 +166,13 @@ class RelationTaskResolutionServiceIT @Autowired constructor(
                 },
                 bpnL1,
                 bpnL2,
+                listOf(
+                    org.eclipse.tractusx.bpdm.gate.api.model.RelationStateDto(
+                        validFrom = RelationDefaults.VALID_FROM_DEFAULT,
+                        validTo = RelationDefaults.VALID_TO_DEFAULT,
+                        type = BusinessStateType.ACTIVE
+                    )
+                ),
                 anyTime)
         ))
         val expectedSharingStates = PageDto<RelationSharingStateDto>(2, 1, 0, 2, listOf(
