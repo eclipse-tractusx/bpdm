@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.api.model.RelationType
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
@@ -32,6 +33,7 @@ import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.Instant
 
 @Service
 class RelationUpsertService(
@@ -108,6 +110,34 @@ class RelationUpsertService(
         }
     }
 
+    fun filterOverlappingRelations(relationToUpsert: IRelationUpsertStrategyService.UpsertRequest, relations: Collection<RelationDb>): Collection<RelationDb>{
+        val relationsWithoutSelf = relations.filterNot { isTheSameRelation(relationToUpsert, it) }
+        val overlappingRelations = relationsWithoutSelf.filter { hasOverlap(relationToUpsert, it) }
+
+        return overlappingRelations
+    }
+
+
+    private fun isTheSameRelation(relationToUpsert: IRelationUpsertStrategyService.UpsertRequest, relation: RelationDb): Boolean{
+        return relationToUpsert.source.bpn == relation.startNode.bpn && relationToUpsert.target.bpn == relation.endNode.bpn
+    }
+
+    private fun hasOverlap(relationToUpsert: IRelationUpsertStrategyService.UpsertRequest, relation: RelationDb): Boolean{
+        val upsertActiveValidities = relationToUpsert.states.filter { it.type == BusinessStateType.ACTIVE }
+        val existingActiveValidities = relation.states.filter { it.type == BusinessStateType.ACTIVE }
+
+        return upsertActiveValidities.any{ validity1 -> existingActiveValidities.any { validity2 -> hasOverlap(validity1, validity2) } }
+
+    }
+
+    private fun hasOverlap(validity1: RelationStateDb, validity2: RelationStateDb): Boolean {
+        return isInsideValidity(validity1.validFrom, validity2) || isInsideValidity(validity1.validTo, validity2)
+    }
+
+    private fun isInsideValidity(instant: Instant, validity: RelationStateDb): Boolean{
+        return (instant.isAfter(validity.validFrom) || instant == validity.validFrom)
+                && (instant.isBefore(validity.validTo) ||   instant == validity.validTo)
+    }
 
     data class UpsertRequest(
         val source: LegalEntityDb,

@@ -41,63 +41,46 @@ class ManagedRelationUpsertService(
 
     @Transactional
     override fun upsertRelation(upsertRequest: IRelationUpsertStrategyService.UpsertRequest): UpsertResult<RelationDb> {
-        val (proposedSource, proposedTarget) = upsertRequest
 
-        validateNoChain(proposedSource, proposedTarget)
-        validateManagingEntityIsParticipant(proposedTarget)
+        validateSingleManager(upsertRequest)
+        validateNoChain(upsertRequest)
+        validateManagingEntityIsParticipant(upsertRequest.target)
 
-        val proposedStates = upsertRequest.states.map { dto ->
-            RelationStateDb(
-                validFrom = dto.validFrom,
-                validTo = dto.validTo,
-                type = dto.type
-            )
-        }
-
-        val existingRelations = relationRepository.findByTypeAndStartNode(RelationType.IsManagedBy, proposedSource)
-
-        // === 1. SAME TARGET EXISTS ===
-        val sameTargetRelation = existingRelations.find { it.endNode.id == proposedTarget.id }
-        if (sameTargetRelation != null) {
-            // Scenario 2: Always replace states with new proposed states
-            return relationUpsertService.upsertRelation(
-                RelationUpsertService.UpsertRequest(proposedSource, proposedTarget, RelationType.IsManagedBy, proposedStates)
-            )
-        }
-
-        // === 2. DIFFERENT TARGET EXISTS ===
-        val conflictWithDifferentTarget = existingRelations.any { existing ->
-            existing.endNode.id != proposedTarget.id && hasOverlap(existing.states, proposedStates)
-        }
-        if (conflictWithDifferentTarget) {
-            // Scenario 3: Overlap with different target -> exception
-            throw BpdmValidationException(
-                "Invalid 'IsManagedBy' relation: Overlapping manager period exists for source ${proposedSource.bpn}."
-            )
-        }
-
-        // === 3. NO CONFLICT — create new relation ===
         val result = relationUpsertService.upsertRelation(
-            RelationUpsertService.UpsertRequest(proposedSource, proposedTarget, RelationType.IsManagedBy, proposedStates)
+            RelationUpsertService.UpsertRequest(upsertRequest.source, upsertRequest.target, RelationType.IsManagedBy, upsertRequest.states)
         )
-
-        makeManagedEntityParticipantIfRequired(proposedSource)
+        makeManagedEntityParticipantIfRequired(upsertRequest.source)
 
         return result
     }
 
-    private fun hasOverlap(existingStates: Collection<RelationStateDb>, proposedStates: Collection<RelationStateDb>): Boolean {
-        return existingStates.any { es ->
-            proposedStates.any { ps -> overlaps(es.validFrom, es.validTo, ps.validFrom, ps.validTo) }
+    private fun validateSingleManager(upsertRequest: IRelationUpsertStrategyService.UpsertRequest){
+        val source = upsertRequest.source
+
+        val existingManagers = relationRepository.findByTypeAndStartNode(RelationType.IsManagedBy, source)
+        val overlappingExistingManagers = relationUpsertService.filterOverlappingRelations(upsertRequest, existingManagers)
+
+        if (overlappingExistingManagers.isNotEmpty()) {
+            val managerBpns = overlappingExistingManagers.joinToString { it.endNode.bpn }
+            throw BpdmValidationException(
+                "Invalid 'IsManagedBy' relation: The Managed Legal Entity with BPNL '${source.bpn}' is already managed by another Managing Legal Entity '${managerBpns}'. " +
+                        "A Managed Legal Entity may only have one Managing Legal Entity at a time."
+            )
         }
     }
 
-    private fun validateNoChain(source: LegalEntityDb, target: LegalEntityDb) {
+    private fun validateNoChain(upsertRequest: IRelationUpsertStrategyService.UpsertRequest) {
+        val source = upsertRequest.source
+        val target = upsertRequest.target
+
         val sourceRelations = relationRepository.findInSourceOrTarget(RelationType.IsManagedBy, source)
         val targetRelations = relationRepository.findInSourceOrTarget(RelationType.IsManagedBy, target)
 
-        val sourceIsTarget = sourceRelations.any { it.endNode.id == source.id }
-        val targetIsSource = targetRelations.any { it.startNode.id == target.id }
+        val overlappingSourceRelations = relationUpsertService.filterOverlappingRelations(upsertRequest, sourceRelations)
+        val overlappingTargetRelations = relationUpsertService.filterOverlappingRelations(upsertRequest, targetRelations)
+
+        val sourceIsTarget = overlappingSourceRelations.any { it.endNode.id == source.id }
+        val targetIsSource = overlappingTargetRelations.any { it.startNode.id == target.id }
 
         when {
             sourceIsTarget -> throw BpdmValidationException(
@@ -128,9 +111,5 @@ class ManagedRelationUpsertService(
                 )
             )
         }
-    }
-
-    private fun overlaps(from1: Instant, to1: Instant, from2: Instant, to2: Instant): Boolean {
-        return !to1.isBefore(from2) && !from1.isAfter(to2)
     }
 }

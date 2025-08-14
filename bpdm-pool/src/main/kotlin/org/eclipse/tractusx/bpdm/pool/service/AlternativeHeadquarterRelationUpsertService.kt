@@ -138,8 +138,8 @@ class AlternativeHeadquarterRelationUpsertService(
         for (ps in proposedStates) {
             val overlap = merged.find { overlaps(it.validFrom, it.validTo, ps.validFrom, ps.validTo) && it.type == ps.type }
             if (overlap != null) {
-                overlap.validFrom = minOf(overlap.validFrom, ps.validFrom)
-                overlap.validTo = maxOf(overlap.validTo, ps.validTo)
+                overlap.validFrom = maxOf(overlap.validFrom, ps.validFrom)
+                overlap.validTo = minOf(overlap.validTo, ps.validTo)
             } else {
                 merged.add(ps)
             }

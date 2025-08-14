@@ -740,7 +740,7 @@ class LegalEntityControllerIT @Autowired constructor(
         assertThat(responseLegalEntity.relations.first().type).isEqualTo(savedRelation.first().type)
         assertThat(responseLegalEntity.relations.first().businessPartnerSourceBpnl).isEqualTo(savedRelation.first().startNode.bpn)
         assertThat(responseLegalEntity.relations.first().businessPartnerTargetBpnl).isEqualTo(savedRelation.first().endNode.bpn)
-        assertThat(responseLegalEntity.relations.first().states.size).isEqualTo(savedRelation.first().states.size)
+        assertThat(responseLegalEntity.relations.first().states.size).isEqualTo(1)
 
 
     }
