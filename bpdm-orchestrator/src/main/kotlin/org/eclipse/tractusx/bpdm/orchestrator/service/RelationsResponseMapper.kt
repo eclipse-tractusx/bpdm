@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.orchestrator.service
 
+import org.eclipse.tractusx.bpdm.orchestrator.entity.RelationStateDb
 import org.eclipse.tractusx.bpdm.orchestrator.entity.RelationsGoldenRecordTaskDb
 import org.eclipse.tractusx.bpdm.orchestrator.entity.RelationsTaskErrorDb
 import org.eclipse.tractusx.orchestrator.api.model.*
@@ -43,7 +44,14 @@ class RelationsResponseMapper {
             BusinessPartnerRelations(
                 relationType = toRelationType(relationType),
                 businessPartnerSourceBpnl = businessPartnerSourceBpnl,
-                businessPartnerTargetBpnl = businessPartnerTargetBpnl
+                businessPartnerTargetBpnl = businessPartnerTargetBpnl,
+                states = businessPartnerRelations.states.map {
+                    RelationStateDto(
+                        validFrom = it.validFrom,
+                        validTo = it.validTo,
+                        type = it.type
+                    )
+                }.toMutableList()
             )
         }
 

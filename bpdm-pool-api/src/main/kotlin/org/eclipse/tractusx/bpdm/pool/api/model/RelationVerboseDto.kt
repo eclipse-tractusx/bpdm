@@ -33,6 +33,5 @@ data class RelationVerboseDto(
     @get:Schema(description = "BPN of partner to which this relation goes (the target)")
     val businessPartnerTargetBpnl: String,
 
-    @get:Schema(description = "Status of the relation")
-    val isActive: Boolean
+    val states: Collection<RelationStateVerboseDto>
 )

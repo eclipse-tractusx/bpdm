@@ -26,7 +26,10 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.IBaseLegalEntityDto
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityDescription
-import org.eclipse.tractusx.bpdm.pool.api.model.*
+import org.eclipse.tractusx.bpdm.pool.api.model.ConfidenceCriteriaDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityIdentifierVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityStateVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.RelationVerboseDto
 import java.time.Instant
 
 @Schema(description = LegalEntityDescription.header)
@@ -64,7 +67,7 @@ data class LegalEntityVerboseDto(
     @get:Schema(description = CommonDescription.updatedAt)
     val updatedAt: Instant,
 
-) : IBaseLegalEntityDto {
+    ) : IBaseLegalEntityDto {
 
     @get:JsonIgnore
     override val legalForm: String?

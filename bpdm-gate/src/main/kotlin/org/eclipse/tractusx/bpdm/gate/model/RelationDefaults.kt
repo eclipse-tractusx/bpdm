@@ -17,20 +17,11 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.service
+package org.eclipse.tractusx.bpdm.gate.model
 
-import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
-import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
-import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
-import org.eclipse.tractusx.bpdm.pool.entity.RelationStateDb
+import java.time.Instant
 
-interface IRelationUpsertStrategyService {
-
-    fun upsertRelation(upsertRequest: UpsertRequest): UpsertResult<RelationDb>
-
-    data class UpsertRequest(
-        val source: LegalEntityDb,
-        val target: LegalEntityDb,
-        val states: Collection<RelationStateDb>
-    )
+object RelationDefaults {
+    val VALID_FROM_DEFAULT: Instant = Instant.parse("1970-01-01T00:00:00Z")
+    val VALID_TO_DEFAULT: Instant = Instant.parse("9999-12-31T23:59:59Z")
 }

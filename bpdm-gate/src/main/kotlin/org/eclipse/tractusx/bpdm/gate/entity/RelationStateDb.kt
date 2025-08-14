@@ -17,20 +17,25 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.service
+package org.eclipse.tractusx.bpdm.gate.entity
 
-import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
-import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
-import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
-import org.eclipse.tractusx.bpdm.pool.entity.RelationStateDb
+import jakarta.persistence.Column
+import jakarta.persistence.Embeddable
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
+import java.time.Instant
 
-interface IRelationUpsertStrategyService {
+@Embeddable
+data class RelationStateDb(
 
-    fun upsertRelation(upsertRequest: UpsertRequest): UpsertResult<RelationDb>
+    @Column(name = "valid_from", nullable = false)
+    var validFrom: Instant,
 
-    data class UpsertRequest(
-        val source: LegalEntityDb,
-        val target: LegalEntityDb,
-        val states: Collection<RelationStateDb>
-    )
-}
+    @Column(name = "valid_to", nullable = false)
+    var validTo: Instant,
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "state_type", nullable = false)
+    var type: BusinessStateType
+)

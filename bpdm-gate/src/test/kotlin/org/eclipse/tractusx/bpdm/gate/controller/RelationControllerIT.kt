@@ -22,12 +22,15 @@ package org.eclipse.tractusx.bpdm.gate.controller
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationDto
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationStateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationSearchRequest
+import org.eclipse.tractusx.bpdm.gate.model.RelationDefaults
 import org.eclipse.tractusx.bpdm.gate.util.MockAndAssertUtils
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
@@ -113,8 +116,15 @@ class RelationControllerIT @Autowired constructor(
             relationType = relationType,
             businessPartnerSourceExternalId = legalEntityId3,
             businessPartnerTargetExternalId = legalEntityId4,
+            states = listOf(
+                RelationStateDto(
+                    validFrom = RelationDefaults.VALID_FROM_DEFAULT,
+                    validTo = RelationDefaults.VALID_TO_DEFAULT,
+                    type = BusinessStateType.ACTIVE
+                )
+            ),
             updatedAt = Instant.now(),
-            createdAt = Instant.now()
+            createdAt = Instant.now(),
         )
 
         mockAndAssertUtils.assertRelation(
@@ -170,6 +180,13 @@ class RelationControllerIT @Autowired constructor(
             relationType = relationType,
             businessPartnerSourceExternalId = legalEntityId3,
             businessPartnerTargetExternalId = legalEntityId4,
+            states = listOf(
+                RelationStateDto(
+                    validFrom = RelationDefaults.VALID_FROM_DEFAULT,
+                    validTo = RelationDefaults.VALID_TO_DEFAULT,
+                    type = BusinessStateType.ACTIVE
+                )
+            ),
             updatedAt = Instant.now(),
             createdAt = Instant.now()
         )
@@ -227,6 +244,13 @@ class RelationControllerIT @Autowired constructor(
             relationType = relationType,
             businessPartnerSourceExternalId = legalEntityId3,
             businessPartnerTargetExternalId = legalEntityId4,
+            states = listOf(
+                RelationStateDto(
+                    validFrom = RelationDefaults.VALID_FROM_DEFAULT,
+                    validTo = RelationDefaults.VALID_TO_DEFAULT,
+                    type = BusinessStateType.ACTIVE
+                )
+            ),
             updatedAt = Instant.now(),
             createdAt = Instant.now()
         )
@@ -294,6 +318,13 @@ class RelationControllerIT @Autowired constructor(
             relationType = relationType,
             businessPartnerSourceExternalId = legalEntityId4,
             businessPartnerTargetExternalId = legalEntityId1,
+            states = listOf(
+                RelationStateDto(
+                    validFrom = RelationDefaults.VALID_FROM_DEFAULT,
+                    validTo = RelationDefaults.VALID_TO_DEFAULT,
+                    type = BusinessStateType.ACTIVE
+                )
+            ),
             updatedAt = Instant.now(),
             createdAt = Instant.now()
         )
@@ -477,6 +508,13 @@ class RelationControllerIT @Autowired constructor(
             relationType = relationType,
             businessPartnerSourceExternalId = legalEntityId1,
             businessPartnerTargetExternalId = legalEntityId2,
+            states = listOf(
+                RelationStateDto(
+                    validFrom = RelationDefaults.VALID_FROM_DEFAULT,
+                    validTo = RelationDefaults.VALID_TO_DEFAULT,
+                    type = BusinessStateType.ACTIVE
+                )
+            ),
             updatedAt = Instant.now(),
             createdAt = Instant.now()
         )
@@ -513,6 +551,13 @@ class RelationControllerIT @Autowired constructor(
             relationType = relationType,
             businessPartnerSourceExternalId = legalEntityId1,
             businessPartnerTargetExternalId = legalEntityId2,
+            states = listOf(
+                RelationStateDto(
+                    validFrom = RelationDefaults.VALID_FROM_DEFAULT,
+                    validTo = RelationDefaults.VALID_TO_DEFAULT,
+                    type = BusinessStateType.ACTIVE
+                )
+            ),
             updatedAt = Instant.now(),
             createdAt = Instant.now()
         )
@@ -561,6 +606,13 @@ class RelationControllerIT @Autowired constructor(
             relationType = relationType,
             businessPartnerSourceExternalId = legalEntityId3,
             businessPartnerTargetExternalId = legalEntityId1,
+            states = listOf(
+                RelationStateDto(
+                    validFrom = RelationDefaults.VALID_FROM_DEFAULT,
+                    validTo = RelationDefaults.VALID_TO_DEFAULT,
+                    type = BusinessStateType.ACTIVE
+                )
+            ),
             updatedAt = Instant.now(),
             createdAt = Instant.now()
         )
@@ -612,6 +664,13 @@ class RelationControllerIT @Autowired constructor(
             relationType = relationType,
             businessPartnerSourceExternalId = legalEntityId3,
             businessPartnerTargetExternalId = legalEntityId4,
+            states = listOf(
+                RelationStateDto(
+                    validFrom = RelationDefaults.VALID_FROM_DEFAULT,
+                    validTo = RelationDefaults.VALID_TO_DEFAULT,
+                    type = BusinessStateType.ACTIVE
+                )
+            ),
             updatedAt = Instant.now(),
             createdAt = Instant.now()
         )

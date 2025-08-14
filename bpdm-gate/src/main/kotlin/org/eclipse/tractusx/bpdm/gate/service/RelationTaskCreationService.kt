@@ -26,11 +26,16 @@ import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
 import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
+import org.eclipse.tractusx.bpdm.gate.entity.RelationStateDb
 import org.eclipse.tractusx.bpdm.gate.repository.RelationRepository
 import org.eclipse.tractusx.bpdm.gate.repository.RelationStageRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
-import org.eclipse.tractusx.orchestrator.api.model.*
+import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRelationsRequestEntry
+import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
+import org.eclipse.tractusx.orchestrator.api.model.TaskClientRelationsStateDto
+import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRelationsRequest
+import org.eclipse.tractusx.orchestrator.api.model.TaskMode
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
@@ -103,8 +108,9 @@ class RelationTaskCreationService(
             val sourceBpnL = outputsBySharingState[relationStage.source]?.bpnL ?: return@map null
             val targetBpnL = outputsBySharingState[relationStage.target]?.bpnL ?: return@map null
             val relationType = relationStage.relationType.toOrchestratorModel() ?: return@map null
+            val states = relationStage.states.map { it.toOrchestratorModel() }
 
-            TaskCreateRelationsRequestEntry(sharingState.recordId, BusinessPartnerRelations(relationType, sourceBpnL, targetBpnL))
+            TaskCreateRelationsRequestEntry(sharingState.recordId, BusinessPartnerRelations(relationType, sourceBpnL, targetBpnL, states))
         }
 
         val createdTasks = taskCreateRequests.letNonNull { sendTasks(it) }
@@ -159,4 +165,15 @@ class RelationTaskCreationService(
             result[resultIndex++]
         }
     }
+
+    // map a single RelationStateDb to the orchestrator DTO (never nullable unless you expect failure cases)
+    private fun RelationStateDb.toOrchestratorModel():
+            org.eclipse.tractusx.orchestrator.api.model.RelationStateDto {
+        return org.eclipse.tractusx.orchestrator.api.model.RelationStateDto(
+            validFrom = this.validFrom,
+            validTo = this.validTo,
+            type = this.type // BusinessStateType (shared model)
+        )
+    }
+
 }

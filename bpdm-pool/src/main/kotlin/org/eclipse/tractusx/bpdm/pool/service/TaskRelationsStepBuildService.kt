@@ -22,9 +22,11 @@ package org.eclipse.tractusx.bpdm.pool.service
 import jakarta.transaction.Transactional
 import org.eclipse.tractusx.bpdm.pool.api.model.RelationType
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
+import org.eclipse.tractusx.bpdm.pool.entity.RelationStateDb
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
+import org.eclipse.tractusx.orchestrator.api.model.RelationStateDto
 import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepReservationEntryDto
 import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepResultEntryDto
 import org.springframework.stereotype.Service
@@ -54,7 +56,20 @@ class TaskRelationsStepBuildService(
         val targetLegalEntity = legalEntityRepository.findByBpnIgnoreCase(relationDto.businessPartnerTargetBpnl)
             ?: throw BpdmValidationException("Target legal entity with specified BPNL : ${relationDto.businessPartnerTargetBpnl} not found")
 
-        val upsertRequest = IRelationUpsertStrategyService.UpsertRequest(sourceLegalEntity, targetLegalEntity)
+        // Map states from orchestrator
+        val states = relationDto.states.map {
+            RelationStateDb(
+                validFrom = it.validFrom,
+                validTo = it.validTo,
+                type = it.type
+            )
+        }
+
+        val upsertRequest = IRelationUpsertStrategyService.UpsertRequest(
+            sourceLegalEntity,
+            targetLegalEntity,
+            states = states
+        )
         val strategyService : IRelationUpsertStrategyService = when(relationDto.relationType){
             OrchestratorRelationType.IsAlternativeHeadquarterFor -> alternativeHeadquarterRelationService
             OrchestratorRelationType.IsManagedBy -> managedRelationUpsertService
@@ -72,9 +87,16 @@ class TaskRelationsStepBuildService(
 
     private fun RelationDb.toTaskDto(): BusinessPartnerRelations{
         return BusinessPartnerRelations(
-            type.toTaskDto(),
-            startNode.bpn,
-            endNode.bpn
+            relationType = this.type.toTaskDto(),
+            businessPartnerSourceBpnl = this.startNode.bpn,
+            businessPartnerTargetBpnl = this.endNode.bpn,
+            states = this.states.map {
+                RelationStateDto(
+                    validFrom = it.validFrom,
+                    validTo = it.validTo,
+                    type = it.type
+                )
+            }
         )
     }
 
