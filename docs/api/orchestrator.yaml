@@ -655,10 +655,19 @@ components:
         businessPartnerTargetBpnl:
           type: string
           description: The business partner to which this relation goes (the target)
+        states:
+          type: array
+          description: A relation state indicates whether a relation between two legal
+            entities is active or inactive within a specific timeframe. This state
+            is provided by the sharing member and represents the validity of the business
+            relation.
+          items:
+            $ref: "#/components/schemas/RelationStateDto"
       required:
         - businessPartnerSourceBpnl
         - businessPartnerTargetBpnl
         - relationType
+        - states
     BusinessState:
       type: object
       description: The business state information for the corresponding business partner
@@ -971,6 +980,28 @@ components:
         - identifiers
         - physicalAddress
         - states
+    RelationStateDto:
+      type: object
+      properties:
+        validFrom:
+          type: string
+          format: date-time
+          description: The date from which the relation state is valid.
+        validTo:
+          type: string
+          format: date-time
+          description: The date until which the relation state is valid.
+        type:
+          type: string
+          description: "One of the state types: active, inactive. Represents the business\
+            \ status of the relation during the specified timeframe."
+          enum:
+            - ACTIVE
+            - INACTIVE
+      required:
+        - type
+        - validFrom
+        - validTo
     Site:
       type: object
       description: Site information for this business partner data. A site of 'null'

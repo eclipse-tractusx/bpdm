@@ -3064,11 +3064,11 @@
               "$ref" : "#/components/schemas/ErrorInfoAddressCreateError"
             }
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -3201,11 +3201,11 @@
               "$ref" : "#/components/schemas/ErrorInfoAddressUpdateError"
             }
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -3922,11 +3922,11 @@
               "$ref" : "#/components/schemas/ErrorInfoLegalEntityCreateError"
             }
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -4069,11 +4069,11 @@
               "$ref" : "#/components/schemas/ErrorInfoLegalEntityUpdateError"
             }
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -4879,6 +4879,27 @@
         },
         "required" : [ "countryCode", "regionCode", "regionName" ]
       },
+      "RelationStateVerboseDto" : {
+        "type" : "object",
+        "description" : "A relation state indicates whether a relation between two legal entities is active or inactive within a specific timeframe. This state is provided by the sharing member and represents the validity of the business relation.",
+        "properties" : {
+          "validFrom" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "The date from which the relation state is valid."
+          },
+          "validTo" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "The date until which the relation state is valid."
+          },
+          "type" : {
+            "$ref" : "#/components/schemas/TypeKeyNameVerboseDtoBusinessStateType",
+            "description" : "One of the state types: active, inactive. Represents the business status of the relation during the specified timeframe."
+          }
+        },
+        "required" : [ "type", "validFrom", "validTo" ]
+      },
       "RelationVerboseDto" : {
         "type" : "object",
         "description" : "Directed relation between two business partners",
@@ -4896,12 +4917,14 @@
             "type" : "string",
             "description" : "BPN of partner to which this relation goes (the target)"
           },
-          "isActive" : {
-            "type" : "boolean",
-            "description" : "Status of the relation"
+          "states" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/RelationStateVerboseDto"
+            }
           }
         },
-        "required" : [ "businessPartnerSourceBpnl", "businessPartnerTargetBpnl", "isActive", "type" ]
+        "required" : [ "businessPartnerSourceBpnl", "businessPartnerTargetBpnl", "states", "type" ]
       },
       "SiteCreateRequestWithLegalAddressAsMain" : {
         "type" : "object",
@@ -4975,11 +4998,11 @@
               "$ref" : "#/components/schemas/ErrorInfoSiteCreateError"
             }
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -5082,11 +5105,11 @@
               "$ref" : "#/components/schemas/ErrorInfoSiteUpdateError"
             }
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           }
