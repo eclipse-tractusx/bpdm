@@ -60,7 +60,7 @@ maven/mavencentral/io.cucumber/html-formatter/21.13.0, Apache-2.0 AND MIT, appro
 maven/mavencentral/io.cucumber/junit-xml-formatter/0.8.0, MIT, approved, clearlydefined
 maven/mavencentral/io.cucumber/messages/28.0.0, MIT, approved, clearlydefined
 maven/mavencentral/io.cucumber/pretty-formatter/0.3.0, MIT, approved, clearlydefined
-maven/mavencentral/io.cucumber/query/13.5.0, MIT, approved, clearlydefined
+maven/mavencentral/io.cucumber/query/13.6.0, MIT, approved, #22826
 maven/mavencentral/io.cucumber/tag-expressions/6.1.2, MIT AND (BSD-3-Clause AND MIT) AND BSD-3-Clause, approved, #14277
 maven/mavencentral/io.cucumber/testng-xml-formatter/0.4.0, MIT, approved, clearlydefined
 maven/mavencentral/io.github.microutils/kotlin-logging-jvm/3.0.5, Apache-2.0, approved, clearlydefined
@@ -74,9 +74,10 @@ maven/mavencentral/io.mockk/mockk-core-jvm/1.13.3, Apache-2.0, approved, clearly
 maven/mavencentral/io.mockk/mockk-dsl-jvm/1.13.3, Apache-2.0, approved, clearlydefined
 maven/mavencentral/io.mockk/mockk-jvm/1.13.3, Apache-2.0, approved, clearlydefined
 maven/mavencentral/io.netty/netty-buffer/4.1.122.Final, Apache-2.0, approved, CQ21842
+maven/mavencentral/io.netty/netty-codec-base/4.2.4.Final, Apache-2.0, approved, #21322
 maven/mavencentral/io.netty/netty-codec-dns/4.1.122.Final, Apache-2.0 AND BSD-3-Clause AND MIT, approved, CQ20926
 maven/mavencentral/io.netty/netty-codec-http/4.1.122.Final, Apache-2.0 AND BSD-3-Clause AND MIT, approved, CQ20926
-maven/mavencentral/io.netty/netty-codec-http2/4.1.122.Final, Apache-2.0 AND BSD-3-Clause AND MIT, approved, CQ20926
+maven/mavencentral/io.netty/netty-codec-http2/4.2.4.Final, Apache-2.0, approved, #16125
 maven/mavencentral/io.netty/netty-codec-socks/4.1.122.Final, Apache-2.0 AND BSD-3-Clause AND MIT, approved, CQ20926
 maven/mavencentral/io.netty/netty-codec/4.1.122.Final, Apache-2.0 AND BSD-3-Clause AND MIT, approved, CQ20926
 maven/mavencentral/io.netty/netty-common/4.1.122.Final, Apache-2.0 AND MIT AND CC0-1.0, approved, CQ21843
@@ -212,7 +213,7 @@ maven/mavencentral/org.springframework.boot/spring-boot-starter-actuator/3.5.3, 
 maven/mavencentral/org.springframework.boot/spring-boot-starter-data-jpa/3.5.3, Apache-2.0, approved, #22162
 maven/mavencentral/org.springframework.boot/spring-boot-starter-jdbc/3.5.3, Apache-2.0, approved, #22180
 maven/mavencentral/org.springframework.boot/spring-boot-starter-json/3.5.3, Apache-2.0, approved, clearlydefined
-maven/mavencentral/org.springframework.boot/spring-boot-starter-logging/3.5.3, Apache-2.0, approved, clearlydefined
+maven/mavencentral/org.springframework.boot/spring-boot-starter-logging/3.5.3, Apache-2.0, approved, #22825
 maven/mavencentral/org.springframework.boot/spring-boot-starter-oauth2-client/3.5.3, Apache-2.0, approved, #22178
 maven/mavencentral/org.springframework.boot/spring-boot-starter-oauth2-resource-server/3.5.3, Apache-2.0, approved, #21923
 maven/mavencentral/org.springframework.boot/spring-boot-starter-reactor-netty/3.5.3, Apache-2.0, approved, #22185
