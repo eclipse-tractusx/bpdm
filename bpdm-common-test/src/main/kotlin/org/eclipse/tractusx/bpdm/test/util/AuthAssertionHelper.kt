@@ -24,19 +24,18 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 
 class AuthAssertionHelper {
     fun assert(authType: AuthExpectationType, invocation: () -> Unit) {
-        return Assertions.assertThatNoException().isThrownBy {
-            try {
-                invocation()
-            } catch (e: WebClientResponseException.Unauthorized) {
-                if (authType != AuthExpectationType.Unauthorized) {
-                    throw e
-                }
-            } catch (e: WebClientResponseException.Forbidden) {
-                if (authType != AuthExpectationType.Forbidden) {
-                    throw e
-                }
-            } catch (_: WebClientResponseException) { }
+        val actualAuthorizationResult = try {
+            invocation()
+            AuthExpectationType.Authorized
+        } catch (_: WebClientResponseException.Unauthorized) {
+            AuthExpectationType.Unauthorized
+        } catch (_: WebClientResponseException.Forbidden) {
+            AuthExpectationType.Forbidden
+        } catch (_: WebClientResponseException) {
+            AuthExpectationType.Authorized
         }
+
+        Assertions.assertThat(actualAuthorizationResult).isEqualTo(authType)
     }
 }
 
