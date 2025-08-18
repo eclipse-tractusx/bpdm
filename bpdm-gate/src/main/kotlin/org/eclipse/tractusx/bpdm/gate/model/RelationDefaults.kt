@@ -19,9 +19,12 @@
 
 package org.eclipse.tractusx.bpdm.gate.model
 
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationStateDto
 import java.time.Instant
 
 object RelationDefaults {
     val VALID_FROM_DEFAULT: Instant = Instant.parse("1970-01-01T00:00:00Z")
     val VALID_TO_DEFAULT: Instant = Instant.parse("9999-12-31T23:59:59Z")
+    val DEFAULT_STATE: RelationStateDto = RelationStateDto(VALID_FROM_DEFAULT, VALID_TO_DEFAULT, BusinessStateType.ACTIVE)
 }

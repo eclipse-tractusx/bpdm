@@ -43,8 +43,6 @@ class OwnedByRelationUpsertService(
         return relationUpsertService.upsertRelation(upsertServiceRequest)
     }
 
-    private fun periodsOverlap(s1: Instant, e1: Instant, s2: Instant, e2: Instant) = !e1.isBefore(s2) && !e2.isBefore(s1)
-
     /**
      * Checks that the proposed source (child) does not already have another parent
      * with overlapping validity periods.

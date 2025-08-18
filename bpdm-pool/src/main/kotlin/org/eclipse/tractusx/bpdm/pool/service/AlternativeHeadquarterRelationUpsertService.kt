@@ -19,13 +19,16 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.pool.api.model.RelationType
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationStateDb
+import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
+import org.eclipse.tractusx.orchestrator.api.model.RelationStateDto
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
@@ -36,119 +39,72 @@ class AlternativeHeadquarterRelationUpsertService(
     private val relationRepository: RelationRepository
 ): IRelationUpsertStrategyService {
 
+    companion object{
+        private val alwaysActiveState = RelationStateDb(
+            validFrom = Instant.parse("1970-01-01T00:00:00Z"),
+            validTo = Instant.parse("9999-12-31T23:59:59Z"),
+            type = BusinessStateType.ACTIVE
+        )
+    }
+
     @Transactional
     override fun upsertRelation(upsertRequest: IRelationUpsertStrategyService.UpsertRequest): UpsertResult<RelationDb>{
+        if(!isAlwaysActive(upsertRequest)) throw BpdmValidationException("Invalid 'IsAlternativeHeadquarter' relation: This relation type does not support any validity constraints.")
+
         val standardisedRequest = standardise(upsertRequest)
 
-        val proposedStates = standardisedRequest.states.map { dto ->
-            RelationStateDb(
-                validFrom = dto.validFrom,
-                validTo = dto.validTo,
-                type = dto.type
-            )
-        }
-
-        val sameTargetRelation = relationRepository.findByTypeAndStartNode(
-            RelationType.IsAlternativeHeadquarterFor,
-            standardisedRequest.source
-        ).find { it.endNode.id == standardisedRequest.target.id }
-
-        val finalStates = sameTargetRelation?.let {
-            mergeStates(it.states, proposedStates)
-        } ?: proposedStates
-
         val result = relationUpsertService.upsertRelation(
-            RelationUpsertService.UpsertRequest(
-                source = standardisedRequest.source,
-                target = standardisedRequest.target,
-                relationType = RelationType.IsAlternativeHeadquarterFor,
-                states = finalStates
-            )
+            RelationUpsertService.UpsertRequest(standardisedRequest.source, standardisedRequest.target, RelationType.IsAlternativeHeadquarterFor, standardisedRequest.states)
         )
 
-        if (result.upsertType == UpsertType.Created || result.upsertType == UpsertType.Updated) {
-            createOrMergeTransitiveRelations(standardisedRequest.source, standardisedRequest.target, finalStates)
+        if(result.upsertType == UpsertType.Created){
+            createTransitiveRelations(standardisedRequest)
         }
 
         return result
     }
 
-    private fun standardise(upsertRequest: IRelationUpsertStrategyService.UpsertRequest): IRelationUpsertStrategyService.UpsertRequest {
+    private fun standardise(upsertRequest: IRelationUpsertStrategyService.UpsertRequest): IRelationUpsertStrategyService.UpsertRequest{
         val proposedSource = upsertRequest.source
         val proposedTarget = upsertRequest.target
 
-        val computedStates = upsertRequest.states.map { dto ->
-            RelationStateDb(
-                validFrom = dto.validFrom,
-                validTo = dto.validTo,
-                type = dto.type
-            )
-        }
-
         val sourceIsOlder = proposedSource.createdAt < proposedTarget.createdAt
-        return if (sourceIsOlder) {
-            IRelationUpsertStrategyService.UpsertRequest(source = proposedTarget, target = proposedSource, computedStates)
-        } else {
-            IRelationUpsertStrategyService.UpsertRequest(source = proposedSource, target = proposedTarget, computedStates)
+        val upsertRequest = if(sourceIsOlder){
+            IRelationUpsertStrategyService.UpsertRequest(source = proposedTarget, target = proposedSource, states = upsertRequest.states)
+        }else{
+            IRelationUpsertStrategyService.UpsertRequest(source = proposedSource, target = proposedTarget,  states = upsertRequest.states)
         }
+
+        return upsertRequest
     }
 
-    private fun createOrMergeTransitiveRelations(
-        source: LegalEntityDb,
-        target: LegalEntityDb,
-        states: Collection<RelationStateDb>
-    ) {
-        val transitiveSourceRelations = relationRepository.findInSourceOrTarget(RelationType.IsAlternativeHeadquarterFor, source)
-        val transitiveTargetRelations = relationRepository.findInSourceOrTarget(RelationType.IsAlternativeHeadquarterFor, target)
+    private fun createTransitiveRelations(upsertRequest: IRelationUpsertStrategyService.UpsertRequest){
+        val transitiveSourceRelations = relationRepository.findInSourceOrTarget(RelationType.IsAlternativeHeadquarterFor, upsertRequest.source)
+        val transitiveTargetRelations = relationRepository.findInSourceOrTarget(RelationType.IsAlternativeHeadquarterFor, upsertRequest.target)
 
-        val transitiveRequests = createTransitiveUpsertRequests(target, transitiveSourceRelations, states) +
-                createTransitiveUpsertRequests(source, transitiveTargetRelations, states)
+        val transitiveSourceRequests = createTransitiveUpsertRequests(upsertRequest.target, upsertRequest.states, transitiveSourceRelations)
+        val transitiveTargetRequests = createTransitiveUpsertRequests(upsertRequest.source, upsertRequest.states, transitiveTargetRelations)
 
-        transitiveRequests
-            .filter { it.source.id != source.id || it.target.id != target.id }
-            .distinctBy { it.source.id to it.target.id }
-            .forEach { req ->
-                val existing = relationRepository.findByTypeAndStartNode(RelationType.IsAlternativeHeadquarterFor, req.source)
-                    .find { it.endNode.id == req.target.id }
-
-                val mergedStates = existing?.let { mergeStates(it.states, req.states) } ?: req.states
-
-                relationUpsertService.upsertRelation(
-                    RelationUpsertService.UpsertRequest(req.source, req.target, RelationType.IsAlternativeHeadquarterFor, mergedStates)
-                )
-            }
+        transitiveSourceRequests
+            .plus(transitiveTargetRequests)
+            .filter { it.source.id != upsertRequest.source.id || it.target.id != upsertRequest.target.id }
+            .distinctBy { Pair(it.source.id, it.target.id) }
+            .map { RelationUpsertService.UpsertRequest(it.source, it.target, RelationType.IsAlternativeHeadquarterFor, it.states) }
+            .forEach { relationUpsertService.upsertRelation(it) }
     }
 
-    private fun createTransitiveUpsertRequests(
-        legalEntity: LegalEntityDb,
-        relations: Set<RelationDb>,
-        originalStates: Collection<RelationStateDb>
-    ): List<IRelationUpsertStrategyService.UpsertRequest> {
+    private fun createTransitiveUpsertRequests(legalEntity: LegalEntityDb, states: Collection<RelationStateDb>, relations: Set<RelationDb>): List<IRelationUpsertStrategyService.UpsertRequest>{
         val allLegalEntities = relations.flatMap { listOf(it.startNode, it.endNode) }.toSet()
 
-        return allLegalEntities
+        return  allLegalEntities
             .filter { legalEntity.id != it.id }
-            .map { IRelationUpsertStrategyService.UpsertRequest(legalEntity, it, originalStates) }
+            .map { IRelationUpsertStrategyService.UpsertRequest(legalEntity, it, states) }
             .map { standardise(it) }
-            .distinctBy { it.source.id to it.target.id }
+            .distinctBy { Pair(it.source.id, it.target.id) }
     }
 
-    private fun mergeStates(existingStates: Collection<RelationStateDb>, proposedStates: Collection<RelationStateDb>): List<RelationStateDb> {
-        val merged = existingStates.map { it.copy() }.toMutableList()
-        for (ps in proposedStates) {
-            val overlap = merged.find { overlaps(it.validFrom, it.validTo, ps.validFrom, ps.validTo) && it.type == ps.type }
-            if (overlap != null) {
-                overlap.validFrom = maxOf(overlap.validFrom, ps.validFrom)
-                overlap.validTo = minOf(overlap.validTo, ps.validTo)
-            } else {
-                merged.add(ps)
-            }
-        }
-        return merged
-    }
-
-    private fun overlaps(from1: Instant, to1: Instant, from2: Instant, to2: Instant): Boolean {
-        return !to1.isBefore(from2) && !from1.isAfter(to2)
+    private fun isAlwaysActive(upsertRequest: IRelationUpsertStrategyService.UpsertRequest): Boolean{
+        return upsertRequest.states.singleOrNull()?.let { it == alwaysActiveState } ?: false
     }
 
 }

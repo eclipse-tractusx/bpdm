@@ -36,5 +36,5 @@ data class RelationPutEntry(
     @Schema(description = "The external identifier of the business partner to which the relation should point (the target)")
     override val businessPartnerTargetExternalId: String,
     @Schema(description = RelationStateDescription.header)
-    val states: MutableList<RelationStateDto> = mutableListOf()
+    val states: List<RelationStateDto> = listOf()
 ): IRelationDto
