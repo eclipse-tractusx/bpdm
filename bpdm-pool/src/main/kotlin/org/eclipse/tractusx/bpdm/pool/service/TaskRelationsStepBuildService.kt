@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import jakarta.transaction.Transactional
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.pool.api.model.RelationType
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationStateDb
@@ -48,13 +49,14 @@ class TaskRelationsStepBuildService(
         if (relationDto.businessPartnerSourceBpnl == relationDto.businessPartnerTargetBpnl) {
             throw BpdmValidationException("A legal entity cannot have a relation to itself (BPNL: ${relationDto.businessPartnerSourceBpnl}).")
         }
-
         // Fetch legal entities by BPNL
         val sourceLegalEntity = legalEntityRepository.findByBpnIgnoreCase(relationDto.businessPartnerSourceBpnl)
             ?: throw BpdmValidationException("Source legal entity with specified BPNL : ${relationDto.businessPartnerSourceBpnl} not found")
 
         val targetLegalEntity = legalEntityRepository.findByBpnIgnoreCase(relationDto.businessPartnerTargetBpnl)
             ?: throw BpdmValidationException("Target legal entity with specified BPNL : ${relationDto.businessPartnerTargetBpnl} not found")
+
+        validateStates(relationDto)
 
         // Map states from orchestrator
         val states = relationDto.states.map {
@@ -105,6 +107,31 @@ class TaskRelationsStepBuildService(
             RelationType.IsAlternativeHeadquarterFor -> OrchestratorRelationType.IsAlternativeHeadquarterFor
             RelationType.IsManagedBy -> OrchestratorRelationType.IsManagedBy
             RelationType.IsOwnedBy -> OrchestratorRelationType.IsOwnedBy
+        }
+    }
+
+    private fun validateStates(relation: BusinessPartnerRelations) {
+        val states = relation.states
+        if(states.isEmpty()){
+            throw BpdmValidationException("Relation states cannot be empty, at least one validity needed.")
+        }
+
+        // Only one state allowed
+        if (states.size > 1) {
+            throw BpdmValidationException("Only one relation state is allowed, found ${states.size}.")
+        }
+
+        states.first().let { state ->
+            if (state.validFrom.isAfter(state.validTo)) {
+                throw BpdmValidationException(
+                    "validFrom '${state.validFrom}' cannot be after validTo '${state.validTo}'."
+                )
+            }
+            if (state.type !in listOf(BusinessStateType.ACTIVE, BusinessStateType.INACTIVE)) {
+                throw BpdmValidationException(
+                    "Relation state type must be ACTIVE or INACTIVE, found '${state.type}'."
+                )
+            }
         }
     }
 }
