@@ -185,7 +185,7 @@ class RelationService(
         if(sourceBpnL == targetBpnL)
             throw BpdmInvalidRelationException("Source and target should not be the same")
 
-        validateStates(states, relationType)
+        validateStates(states)
 
         val changelogType = if(relation.output == null) ChangelogType.CREATE else ChangelogType.UPDATE
 
@@ -222,7 +222,7 @@ class RelationService(
             throw BpdmInvalidRelationException("Source and target '$sourceBusinessPartnerExternalId' should not be equal.")
 
         val safeStates = ensureDefaultStateIfEmpty(states)
-        validateStates(safeStates, relationType)
+        validateStates(safeStates)
 
         val relation = RelationDb(
             externalId = externalId ?: UUID.randomUUID().toString(),
@@ -283,7 +283,7 @@ class RelationService(
             throw BpdmInvalidRelationException("Source and target '$sourceBusinessPartnerExternalId' should not be equal.")
 
         val safeStates = ensureDefaultStateIfEmpty(states)
-        validateStates(safeStates, relationType)
+        validateStates(safeStates)
 
         val existingStage = relationStageRepository.findByRelationAndStage(relation, StageType.Input) ?: throw BpdmMissingRelationException(relation.externalId)
 
@@ -372,17 +372,7 @@ class RelationService(
         }
     }
 
-    private fun validateStates(states: Collection<RelationStateDto>, sharableRelationType: SharableRelationType){
-        val relationType = when(sharableRelationType){
-            SharableRelationType.IsAlternativeHeadquarterFor -> RelationType.IsAlternativeHeadquarterFor
-            SharableRelationType.IsManagedBy -> RelationType.IsManagedBy
-            SharableRelationType.IsOwnedBy -> RelationType.IsOwnedBy
-        }
-
-        validateStates(states, relationType)
-    }
-
-    private fun validateStates(states: Collection<RelationStateDto>, relationType: RelationType) {
+    private fun validateStates(states: Collection<RelationStateDto>) {
         // Only one state allowed
         if (states.size > 1) {
             throw BpdmInvalidRelationException("Only one relation state is allowed, found ${states.size}.")
@@ -399,11 +389,6 @@ class RelationService(
                     "Relation state type must be ACTIVE or INACTIVE, found '${state.type}'."
                 )
             }
-        }
-
-        if(relationType == RelationType.IsAlternativeHeadquarterFor){
-            if(states.isNotEmpty() && states.single() != DEFAULT_STATE)
-                throw BpdmInvalidRelationException("Invalid 'IsAlternativeHeadquarter' relation: This relation type does not support any validity constraints.")
         }
     }
 }
