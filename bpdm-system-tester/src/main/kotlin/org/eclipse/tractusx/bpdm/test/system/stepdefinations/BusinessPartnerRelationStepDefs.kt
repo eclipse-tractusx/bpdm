@@ -27,15 +27,19 @@ import io.cucumber.java.en.When
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
+import org.eclipse.tractusx.bpdm.common.service.toDto
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationStateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.SharableRelationType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationOutputSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
+import org.eclipse.tractusx.bpdm.pool.api.model.RelationStateVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.RelationVerboseDto
 import org.eclipse.tractusx.bpdm.test.system.utils.StepUtils
 import org.eclipse.tractusx.bpdm.test.system.utils.TestRepository
@@ -175,7 +179,18 @@ class BusinessPartnerRelationStepDefs(
         val sourceLegalEntity = poolApiClient.legalEntities.getLegalEntity(sourceBpn)
         val targetLegalEntity = poolApiClient.legalEntities.getLegalEntity(targetBpn)
 
-        val expectedRelation = RelationVerboseDto(relationType, sourceBpn, targetBpn, true)
+        val expectedRelation = RelationVerboseDto(
+            type = relationType,
+            businessPartnerSourceBpnl = sourceBpn,
+            businessPartnerTargetBpnl = targetBpn,
+            states = listOf(
+                RelationStateVerboseDto(
+                    validFrom = Instant.parse("1970-01-01T00:00:00Z"),
+                    validTo = Instant.parse("9999-12-31T23:59:59Z"),
+                    typeVerbose = BusinessStateType.ACTIVE.toDto()
+                )
+            )
+        )
 
         val sourceRelations = sourceLegalEntity.legalEntity.relations
         val targetRelations = targetLegalEntity.legalEntity.relations
@@ -198,7 +213,20 @@ class BusinessPartnerRelationStepDefs(
 
         val relationOutput = gateClient.relationOutput.postSearch(RelationOutputSearchRequest(externalIds = listOf(externalId))).content.single()
 
-        val expectedRelation = RelationOutputDto(externalId, relationType, sourceBpn, targetBpn, anyTime)
+        val expectedRelation = RelationOutputDto(
+            externalId = externalId,
+            relationType = relationType,
+            sourceBpnL = sourceBpn,
+            targetBpnL = targetBpn,
+            states = listOf(
+                RelationStateDto(
+                    validFrom = Instant.parse("1970-01-01T00:00:00Z"),
+                    validTo = Instant.parse("9999-12-31T23:59:59Z"),
+                    type = BusinessStateType.ACTIVE
+                )
+            ),
+            updatedAt = anyTime,
+        )
 
         Assertions.assertThat(relationOutput)
             .usingRecursiveComparison()

@@ -17,20 +17,19 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.service
+package org.eclipse.tractusx.bpdm.pool.api.v6.model.response
 
-import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
-import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
-import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
-import org.eclipse.tractusx.bpdm.pool.entity.RelationStateDb
+import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.pool.api.model.RelationType
 
-interface IRelationUpsertStrategyService {
+@Schema(name = "RelationVerboseV6Dto", description = "Directed relation between two business partners")
+data class RelationVerboseDto(
+    @get:Schema(description = "The type of relation between the Legal Entities")
+    val type: RelationType,
 
-    fun upsertRelation(upsertRequest: UpsertRequest): UpsertResult<RelationDb>
+    @get:Schema(description = "BPN of partner from which the relation emerges (the source)")
+    val businessPartnerSourceBpnl: String,
 
-    data class UpsertRequest(
-        val source: LegalEntityDb,
-        val target: LegalEntityDb,
-        val states: Collection<RelationStateDb>
-    )
-}
+    @get:Schema(description = "BPN of partner to which this relation goes (the target)")
+    val businessPartnerTargetBpnl: String,
+)

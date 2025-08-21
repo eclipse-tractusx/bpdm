@@ -21,14 +21,18 @@ package org.eclipse.tractusx.bpdm.gate.controller
 
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateType
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationStateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.SharableRelationType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationOutputSearchRequest
 import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
 import org.eclipse.tractusx.bpdm.gate.entity.RelationOutputDb
 import org.eclipse.tractusx.bpdm.gate.entity.RelationSharingStateDb
+import org.eclipse.tractusx.bpdm.gate.entity.RelationStateDb
+import org.eclipse.tractusx.bpdm.gate.model.RelationDefaults
 import org.eclipse.tractusx.bpdm.gate.repository.RelationRepository
 import org.eclipse.tractusx.bpdm.gate.util.PrincipalUtil
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
@@ -95,9 +99,17 @@ class RelationOutputControllerIT @Autowired constructor(
         createOutputRelation(relationId3, SharableRelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL4, relation3UpdateTime)
         createOutputRelation(relationId4, SharableRelationType.IsManagedBy, bpnL5, bpnL6, relation4UpdateTime)
 
+        val relationDefaultStates = listOf(
+            RelationStateDto(
+                validFrom = RelationDefaults.VALID_FROM_DEFAULT,
+                validTo = RelationDefaults.VALID_TO_DEFAULT,
+                type = BusinessStateType.ACTIVE
+            )
+        )
+
         val expected = PageDto<RelationOutputDto>(2, 1, 0, 2, listOf(
-            RelationOutputDto(relationId1, SharableRelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL2, relation1UpdateTime),
-            RelationOutputDto(relationId4, SharableRelationType.IsManagedBy, bpnL5, bpnL6, relation4UpdateTime)
+            RelationOutputDto(relationId1, SharableRelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL2, relationDefaultStates, relation1UpdateTime),
+            RelationOutputDto(relationId4, SharableRelationType.IsManagedBy, bpnL5, bpnL6, relationDefaultStates, relation4UpdateTime)
         ))
         val actual = gateClient.relationOutput.postSearch(RelationOutputSearchRequest(externalIds = listOf(relationId1, relationId4)))
 
@@ -126,17 +138,25 @@ class RelationOutputControllerIT @Autowired constructor(
         createOutputRelation(relationId3, SharableRelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL4, relation3UpdateTime)
         createOutputRelation(relationId4, SharableRelationType.IsManagedBy, bpnL5, bpnL6, relation4UpdateTime)
 
+        val relationDefaultStates = listOf(
+            RelationStateDto(
+                validFrom = RelationDefaults.VALID_FROM_DEFAULT,
+                validTo = RelationDefaults.VALID_TO_DEFAULT,
+                type = BusinessStateType.ACTIVE
+            )
+        )
+
         val expectedAlternativeHeadquarterRelation = PageDto<RelationOutputDto>(3, 1, 0, 3, listOf(
-            RelationOutputDto(relationId1, SharableRelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL2, relation1UpdateTime),
-            RelationOutputDto(relationId2, SharableRelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL3, relation2UpdateTime),
-            RelationOutputDto(relationId3, SharableRelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL4, relation3UpdateTime)
+            RelationOutputDto(relationId1, SharableRelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL2, relationDefaultStates, relation1UpdateTime),
+            RelationOutputDto(relationId2, SharableRelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL3, relationDefaultStates, relation2UpdateTime),
+            RelationOutputDto(relationId3, SharableRelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL4, relationDefaultStates, relation3UpdateTime)
         ))
         val actualAlternativeHeadquarterRelation = gateClient.relationOutput.postSearch(RelationOutputSearchRequest(relationType = SharableRelationType.IsAlternativeHeadquarterFor))
 
         Assertions.assertThat(actualAlternativeHeadquarterRelation).isEqualTo(expectedAlternativeHeadquarterRelation)
 
         val expectedManagedRelation = PageDto<RelationOutputDto>(1, 1, 0, 1, listOf(
-            RelationOutputDto(relationId4, SharableRelationType.IsManagedBy, bpnL5, bpnL6, relation4UpdateTime)
+            RelationOutputDto(relationId4, SharableRelationType.IsManagedBy, bpnL5, bpnL6, relationDefaultStates, relation4UpdateTime)
         ))
 
         val actualManagedRelation = gateClient.relationOutput.postSearch(RelationOutputSearchRequest(relationType = SharableRelationType.IsManagedBy))
@@ -166,9 +186,17 @@ class RelationOutputControllerIT @Autowired constructor(
         createOutputRelation(relationId3, SharableRelationType.IsAlternativeHeadquarterFor, bpnL2, bpnL4, relation3UpdateTime)
         createOutputRelation(relationId4, SharableRelationType.IsManagedBy, bpnL5, bpnL6, relation4UpdateTime)
 
+        val relationDefaultStates = listOf(
+            RelationStateDto(
+                validFrom = RelationDefaults.VALID_FROM_DEFAULT,
+                validTo = RelationDefaults.VALID_TO_DEFAULT,
+                type = BusinessStateType.ACTIVE
+            )
+        )
+
         val expected = PageDto<RelationOutputDto>(2, 1, 0, 2, listOf(
-            RelationOutputDto(relationId1, SharableRelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL2, relation1UpdateTime),
-            RelationOutputDto(relationId4, SharableRelationType.IsManagedBy, bpnL5, bpnL6, relation4UpdateTime)
+            RelationOutputDto(relationId1, SharableRelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL2, relationDefaultStates, relation1UpdateTime),
+            RelationOutputDto(relationId4, SharableRelationType.IsManagedBy, bpnL5, bpnL6, relationDefaultStates, relation4UpdateTime)
         ))
         val actual = gateClient.relationOutput.postSearch(RelationOutputSearchRequest(sourceBpnLs = listOf(bpnL1, bpnL5)))
 
@@ -197,9 +225,17 @@ class RelationOutputControllerIT @Autowired constructor(
         createOutputRelation(relationId3, SharableRelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL4, relation3UpdateTime)
         createOutputRelation(relationId4, SharableRelationType.IsManagedBy, bpnL5, bpnL6, relation4UpdateTime)
 
+        val relationDefaultStates = listOf(
+            RelationStateDto(
+                validFrom = RelationDefaults.VALID_FROM_DEFAULT,
+                validTo = RelationDefaults.VALID_TO_DEFAULT,
+                type = BusinessStateType.ACTIVE
+            )
+        )
+
         val expected = PageDto<RelationOutputDto>(2, 1, 0, 2, listOf(
-            RelationOutputDto(relationId1, SharableRelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL2, relation1UpdateTime),
-            RelationOutputDto(relationId4, SharableRelationType.IsManagedBy, bpnL5, bpnL6, relation4UpdateTime)
+            RelationOutputDto(relationId1, SharableRelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL2, relationDefaultStates, relation1UpdateTime),
+            RelationOutputDto(relationId4, SharableRelationType.IsManagedBy, bpnL5, bpnL6, relationDefaultStates, relation4UpdateTime)
         ))
         val actual = gateClient.relationOutput.postSearch(RelationOutputSearchRequest(targetBpnLs = listOf(bpnL2, bpnL6)))
 
@@ -228,9 +264,17 @@ class RelationOutputControllerIT @Autowired constructor(
         createOutputRelation(relationId3, SharableRelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL4, relation3UpdateTime)
         createOutputRelation(relationId4, SharableRelationType.IsManagedBy, bpnL5, bpnL6, relation4UpdateTime)
 
+        val relationDefaultStates = listOf(
+            RelationStateDto(
+                validFrom = RelationDefaults.VALID_FROM_DEFAULT,
+                validTo = RelationDefaults.VALID_TO_DEFAULT,
+                type = BusinessStateType.ACTIVE
+            )
+        )
+
         val expected = PageDto<RelationOutputDto>(2, 1, 0, 2, listOf(
-            RelationOutputDto(relationId3, SharableRelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL4, relation3UpdateTime),
-            RelationOutputDto(relationId4, SharableRelationType.IsManagedBy, bpnL5, bpnL6, relation4UpdateTime)
+            RelationOutputDto(relationId3, SharableRelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL4, relationDefaultStates, relation3UpdateTime),
+            RelationOutputDto(relationId4, SharableRelationType.IsManagedBy, bpnL5, bpnL6, relationDefaultStates, relation4UpdateTime)
         ))
         val actual = gateClient.relationOutput.postSearch(RelationOutputSearchRequest(updatedAtFrom = relation2UpdateTime))
 
@@ -271,9 +315,17 @@ class RelationOutputControllerIT @Autowired constructor(
         createOutputRelation(relationId5, SharableRelationType.IsManagedBy, bpnL9, bpnL10, relation5UpdateTime)
         createOutputRelation(relationId6, SharableRelationType.IsManagedBy, bpnL11, bpnL12, relation6UpdateTime)
 
+        val relationDefaultStates = listOf(
+            RelationStateDto(
+                validFrom = RelationDefaults.VALID_FROM_DEFAULT,
+                validTo = RelationDefaults.VALID_TO_DEFAULT,
+                type = BusinessStateType.ACTIVE
+            )
+        )
+
 
         val expectedAlternativeHeadquarterRelation = PageDto<RelationOutputDto>(1, 1, 0, 1, listOf(
-            RelationOutputDto(relationId2, SharableRelationType.IsAlternativeHeadquarterFor, bpnL3, bpnL4, relation2UpdateTime)
+            RelationOutputDto(relationId2, SharableRelationType.IsAlternativeHeadquarterFor, bpnL3, bpnL4, relationDefaultStates, relation2UpdateTime)
         ))
         val actualAlternativeHeadquarterRelation = gateClient.relationOutput.postSearch(RelationOutputSearchRequest(
             externalIds = listOf(relationId1, relationId2, relationId3),
@@ -286,8 +338,8 @@ class RelationOutputControllerIT @Autowired constructor(
         Assertions.assertThat(actualAlternativeHeadquarterRelation).isEqualTo(expectedAlternativeHeadquarterRelation)
 
         val expectedManagedRelation = PageDto<RelationOutputDto>(2, 1, 0, 2, listOf(
-            RelationOutputDto(relationId4, SharableRelationType.IsManagedBy, bpnL7, bpnL8, relation4UpdateTime),
-            RelationOutputDto(relationId5, SharableRelationType.IsManagedBy, bpnL9, bpnL10, relation5UpdateTime)
+            RelationOutputDto(relationId4, SharableRelationType.IsManagedBy, bpnL7, bpnL8, relationDefaultStates, relation4UpdateTime),
+            RelationOutputDto(relationId5, SharableRelationType.IsManagedBy, bpnL9, bpnL10, relationDefaultStates, relation5UpdateTime)
         ))
         val actualManagedRelation = gateClient.relationOutput.postSearch(RelationOutputSearchRequest(
             externalIds = listOf(relationId4, relationId5),
@@ -301,7 +353,19 @@ class RelationOutputControllerIT @Autowired constructor(
     }
 
     private fun createOutputRelation(externalId: String, relationType: SharableRelationType, source: String, target: String, updatedAt: Instant){
-        val output = RelationOutputDb(relationType, source, target, updatedAt)
+        val output = RelationOutputDb(
+            relationType = relationType,
+            sourceBpnL = source,
+            targetBpnL = target,
+            updatedAt = updatedAt,
+            states = mutableListOf(
+                RelationStateDb(
+                    validFrom = RelationDefaults.VALID_FROM_DEFAULT,
+                    validTo = RelationDefaults.VALID_TO_DEFAULT,
+                    type = BusinessStateType.ACTIVE
+                )
+            )
+        )
         val successSharingState = RelationSharingStateDb(RelationSharingStateType.Success, null, null, anyTime, null, null, false)
         val relation = RelationDb(externalId, principalUtil.resolveTenantBpnl().value, successSharingState, output)
         relationRepository.save(relation)
