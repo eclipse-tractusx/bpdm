@@ -22,9 +22,15 @@ package org.eclipse.tractusx.bpdm.pool.service
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.BusinessPartnerSearchFilterType
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityIdentifierDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalFormDto
+import org.eclipse.tractusx.bpdm.pool.api.model.StreetDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.BusinessPartnerSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.BusinessPartnerSearchResultDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteMatchVerboseDto
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
@@ -48,7 +54,7 @@ class BusinessPartnerSearchService(
     private val addressService: AddressService,
     private val siteService: SiteService,
     private val logisticAddressRepository: LogisticAddressRepository,
-    private val siteRepository: SiteRepository,
+    private val siteRepository: SiteRepository
 ): SearchService {
 
     private val logger = KotlinLogging.logger { }
@@ -69,7 +75,8 @@ class BusinessPartnerSearchService(
         businessPartnerFetchService.fetchLegalEntityDependencies(legalEntityPage.content.map { (_, legalEntity) -> legalEntity }.toSet())
 
         return with(legalEntityPage) {
-            PageDto(totalElements, totalPages, page, contentSize,
+            PageDto(
+                totalElements, totalPages, page, contentSize,
                 content.map { (score, legalEntity) -> legalEntity.toMatchDto(score) })
         }
     }
@@ -125,7 +132,8 @@ class BusinessPartnerSearchService(
         val addressPage = searchAndPrepareAddressPage(searchRequest, paginationRequest)
         addressService.fetchLogisticAddressDependencies(addressPage.content.map { (_, address) -> address }.toSet())
         return with(addressPage) {
-            PageDto(totalElements, totalPages, page, contentSize,
+            PageDto(
+                totalElements, totalPages, page, contentSize,
                 content.map { (score, address) -> address.toMatchDto(score) })
         }
     }
@@ -182,7 +190,8 @@ class BusinessPartnerSearchService(
         siteService.fetchSiteDependenciesPage(sitePage.content.map { site -> site }.toSet())
 
         return with(sitePage) {
-            PageDto(totalElements, totalPages, page, contentSize,
+            PageDto(
+                totalElements, totalPages, page, contentSize,
                 content.map { site -> site.toMatchDto() })
         }
     }
@@ -198,5 +207,170 @@ class BusinessPartnerSearchService(
         val sitePage = siteRepository.findAll(PageRequest.of(paginationRequest.page, paginationRequest.size))
 
         return sitePage.toDto(sitePage.content.map { it })
+    }
+
+    /**
+     * @see searchBusinessPartner
+     *
+     */
+    override fun searchBusinessPartner(
+        searchRequest: LegalEntityPropertiesSearchRequest,
+        searchResultFilter: Set<BusinessPartnerSearchFilterType>?,
+        paginationRequest: PaginationRequest
+    ): PageDto<BusinessPartnerSearchResultDto> {
+
+        val pageRequest = PageRequest.of(paginationRequest.page, paginationRequest.size)
+
+        val results = mutableListOf<BusinessPartnerSearchResultDto>()
+
+        if (searchResultFilter.isNullOrEmpty() || searchResultFilter.contains(BusinessPartnerSearchFilterType.ShowOnlyLegaEntities)) {
+            val legalEntities = legalEntityRepository.findAll(LegalEntityRepository.buildLegalEntitySpecification(searchRequest),pageRequest )
+            results.addAll(legalEntities.content.map { searchLegalEntityResultToMapping(it) })
+
+            if(searchResultFilter.isNullOrEmpty() || searchResultFilter.contains(BusinessPartnerSearchFilterType.ShowOnlySites)) results.addAll(legalEntities.content.flatMap{it.sites.map{ site->searchSiteResultMapping (site)}})
+
+            if(searchResultFilter.isNullOrEmpty() || searchResultFilter.contains(BusinessPartnerSearchFilterType.ShowOnlyAdditionalAddresses)) {
+                results.addAll(legalEntities.content.flatMap { it.addresses.filterNot { it.physicalPostalAddress.street?.name == results.firstOrNull()?.street?.name }.map { address -> searchAddressResultMapping(address) }})
+            }
+        }
+
+        if (searchResultFilter.isNullOrEmpty() || searchResultFilter.contains(BusinessPartnerSearchFilterType.ShowOnlySites)) {
+            val sites = siteRepository.findAll(SiteRepository.buildSiteSpecification(searchRequest), pageRequest)
+            results.addAll(sites.content.map { searchSiteResultMapping(it) })
+
+            if(searchResultFilter.isNullOrEmpty() || searchResultFilter.contains(BusinessPartnerSearchFilterType.ShowOnlyLegaEntities)) {
+                val parentLegalEntity = legalEntityRepository.findAllById(sites.content.map {it.legalEntity.id});
+                if(parentLegalEntity.isNotEmpty()) results.add(searchLegalEntityResultToMapping(parentLegalEntity.first()) )
+            }
+
+            if(searchResultFilter.isNullOrEmpty() || searchResultFilter.contains(BusinessPartnerSearchFilterType.ShowOnlyAdditionalAddresses)) {
+                results.addAll(sites.content.flatMap {
+                    it.addresses.filterNot { it.physicalPostalAddress.street?.name == results.firstOrNull()?.street?.name }
+                        .map { address -> searchAddressResultMapping(address) }
+                })
+            }
+        }
+
+        if (!searchResultFilter.isNullOrEmpty() && !searchRequest.id.isNullOrEmpty() && searchResultFilter.contains(BusinessPartnerSearchFilterType.ShowOnlyAdditionalAddresses )) {
+
+            val addresses = logisticAddressRepository.findAll(
+                LogisticAddressRepository.buildAddressSpecification(searchRequest),
+                pageRequest
+            )
+
+            results.addAll(addresses.content.map{ searchAddressResultMapping(it) })
+
+            val existingStreetNames = results.map { it.street }.toSet()
+            if (existingStreetNames.isNotEmpty()) {
+                results.addAll(addresses.filterNot { address ->
+                    val streetName = address.physicalPostalAddress.street?.name
+                    streetName != null && existingStreetNames.firstOrNull()?.name!!.contains(streetName)
+                }.map { searchAddressResultMapping(it) })
+            }
+
+            if (searchResultFilter.isEmpty() || searchResultFilter.contains(BusinessPartnerSearchFilterType.ShowOnlyLegaEntities)) {
+                val parentLegalEntity = legalEntityRepository.findAllById(addresses.content.map { it.legalEntity!!.id });
+                if(parentLegalEntity.isNotEmpty()) results.add(searchLegalEntityResultToMapping(parentLegalEntity.first()))
+            }
+        }
+
+        val start = paginationRequest.page * paginationRequest.size
+        val end = minOf(start + paginationRequest.size, results.size)
+        val pagedContent = if (start < results.size) results.subList(start, end) else emptyList()
+
+        return PageDto(
+            totalElements = results.size.toLong(),
+            totalPages = (results.size / paginationRequest.size) + if (results.size % paginationRequest.size == 0) 0 else 1,
+            page = paginationRequest.page,
+            contentSize = paginationRequest.size,
+            content = pagedContent
+        )
+    }
+
+    private fun searchLegalEntityResultToMapping(result: LegalEntityDb): BusinessPartnerSearchResultDto {
+
+        return BusinessPartnerSearchResultDto(
+            id = result.bpn,
+            name = result.legalName.value,
+            identifiers = result.identifiers.map { it ->
+                LegalEntityIdentifierDto(
+                    type = it.type.technicalKey,
+                    value = it.value,
+                    issuingBody = it.issuingBody
+                )
+            },
+            legalForm = result.legalForm?.let {
+                LegalFormDto(
+                    technicalKey = result.legalForm!!.technicalKey,
+                    name = result.legalForm!!.name,
+                    isActive = result.legalForm!!.isActive,
+                    transliteratedName = result.legalForm?.transliteratedName,
+                    country = result.legalForm?.countryCode,
+                    language = result.legalForm?.languageCode,
+                    administrativeAreaLevel1 = result.legalForm?.administrativeArea?.countryCode?.name,
+                    transliteratedAbbreviations = result.legalForm?.transliteratedAbbreviations
+                )
+            },
+            street = StreetDto(
+                name = result.legalAddress.physicalPostalAddress.street?.name,
+                houseNumber = result.legalAddress.physicalPostalAddress.street?.houseNumber,
+                houseNumberSupplement = result.legalAddress.physicalPostalAddress.street?.houseNumberSupplement,
+                milestone = result.legalAddress.physicalPostalAddress.street?.milestone,
+                direction = result.legalAddress.physicalPostalAddress.street?.direction,
+                namePrefix = result.legalAddress.physicalPostalAddress.street?.namePrefix,
+                additionalNamePrefix = result.legalAddress.physicalPostalAddress.street?.additionalNamePrefix,
+                nameSuffix = result.legalAddress.physicalPostalAddress.street?.nameSuffix,
+                additionalNameSuffix = result.legalAddress.physicalPostalAddress.street?.additionalNameSuffix
+            ),
+            city = result.legalAddress.physicalPostalAddress.city,
+            postalCode = result.legalAddress.physicalPostalAddress.postCode.toString(),
+            country = result.legalAddress.physicalPostalAddress.country.toString(),
+        )
+    }
+    private fun searchSiteResultMapping(result: SiteDb): BusinessPartnerSearchResultDto {
+
+        return BusinessPartnerSearchResultDto(
+            id = result.bpn,
+            name = result.name,
+            identifiers = emptyList(),
+            legalForm = null,
+            street = StreetDto(
+                name = result.mainAddress.physicalPostalAddress.street?.name,
+                houseNumber = result.mainAddress.physicalPostalAddress.street?.houseNumber,
+                houseNumberSupplement = result.mainAddress.physicalPostalAddress.street?.houseNumberSupplement,
+                milestone = result.mainAddress.physicalPostalAddress.street?.milestone,
+                direction = result.mainAddress.physicalPostalAddress.street?.direction,
+                namePrefix = result.mainAddress.physicalPostalAddress.street?.namePrefix,
+                additionalNamePrefix = result.mainAddress.physicalPostalAddress.street?.additionalNamePrefix,
+                nameSuffix = result.mainAddress.physicalPostalAddress.street?.nameSuffix,
+                additionalNameSuffix = result.mainAddress.physicalPostalAddress.street?.additionalNameSuffix
+            ),
+            city = result.mainAddress.physicalPostalAddress.city,
+            postalCode = result.mainAddress.physicalPostalAddress.postCode.toString(),
+            country = result.mainAddress.physicalPostalAddress.country.toString(),
+        )
+    }
+    private fun searchAddressResultMapping(result: LogisticAddressDb): BusinessPartnerSearchResultDto {
+
+        return BusinessPartnerSearchResultDto(
+            id = result.bpn,
+            name = result.name,
+            identifiers = emptyList(),
+            legalForm = null,
+            street = StreetDto(
+                name = result.physicalPostalAddress.street?.name,
+                houseNumber = result.physicalPostalAddress.street?.houseNumber,
+                houseNumberSupplement = result.physicalPostalAddress.street?.houseNumberSupplement,
+                milestone = result.physicalPostalAddress.street?.milestone,
+                direction = result.physicalPostalAddress.street?.direction,
+                namePrefix = result.physicalPostalAddress.street?.namePrefix,
+                additionalNamePrefix = result.physicalPostalAddress.street?.additionalNamePrefix,
+                nameSuffix = result.physicalPostalAddress.street?.nameSuffix,
+                additionalNameSuffix = result.physicalPostalAddress.street?.additionalNameSuffix
+            ),
+            city = result.physicalPostalAddress.city,
+            postalCode = result.physicalPostalAddress.postCode.toString(),
+            country = result.physicalPostalAddress.country.toString(),
+        )
     }
 }
