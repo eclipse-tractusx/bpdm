@@ -45,21 +45,21 @@ maven/mavencentral/commons-io/commons-io/2.20.0, Apache-2.0, approved, #22562
 maven/mavencentral/commons-logging/commons-logging/1.2, Apache-2.0, approved, CQ10162
 maven/mavencentral/commons-logging/commons-logging/1.3.5, Apache-2.0, approved, #11783
 maven/mavencentral/io.cucumber/ci-environment/10.0.1, MIT, approved, #15218
-maven/mavencentral/io.cucumber/cucumber-core/7.27.0, Apache-2.0 AND BSD-2-Clause AND MIT, approved, clearlydefined
+maven/mavencentral/io.cucumber/cucumber-core/7.27.2, Apache-2.0 AND BSD-2-Clause AND MIT, approved, clearlydefined
 maven/mavencentral/io.cucumber/cucumber-expressions/18.0.1, MIT, approved, #19277
-maven/mavencentral/io.cucumber/cucumber-gherkin-messages/7.27.0, MIT, approved, clearlydefined
-maven/mavencentral/io.cucumber/cucumber-gherkin/7.27.0, MIT, approved, clearlydefined
-maven/mavencentral/io.cucumber/cucumber-java/7.27.0, MIT, approved, clearlydefined
-maven/mavencentral/io.cucumber/cucumber-junit/7.27.0, MIT, approved, #22827
-maven/mavencentral/io.cucumber/cucumber-plugin/7.27.0, MIT, approved, clearlydefined
-maven/mavencentral/io.cucumber/cucumber-spring/7.27.0, MIT, approved, clearlydefined
-maven/mavencentral/io.cucumber/datatable/7.27.0, Apache-2.0 AND MIT, approved, clearlydefined
-maven/mavencentral/io.cucumber/docstring/7.27.0, MIT, approved, clearlydefined
-maven/mavencentral/io.cucumber/gherkin/33.1.0, MIT, approved, clearlydefined
+maven/mavencentral/io.cucumber/cucumber-gherkin-messages/7.27.2, MIT, approved, clearlydefined
+maven/mavencentral/io.cucumber/cucumber-gherkin/7.27.2, MIT, approved, clearlydefined
+maven/mavencentral/io.cucumber/cucumber-java/7.27.2, MIT, approved, clearlydefined
+maven/mavencentral/io.cucumber/cucumber-junit/7.27.2, MIT, approved, #22827
+maven/mavencentral/io.cucumber/cucumber-plugin/7.27.2, MIT, approved, clearlydefined
+maven/mavencentral/io.cucumber/cucumber-spring/7.27.2, MIT, approved, clearlydefined
+maven/mavencentral/io.cucumber/datatable/7.27.2, Apache-2.0 AND MIT, approved, clearlydefined
+maven/mavencentral/io.cucumber/docstring/7.27.2, MIT, approved, clearlydefined
+maven/mavencentral/io.cucumber/gherkin/34.0.0, MIT, approved, clearlydefined
 maven/mavencentral/io.cucumber/html-formatter/21.13.0, Apache-2.0 AND MIT, approved, #22565
-maven/mavencentral/io.cucumber/junit-xml-formatter/0.8.0, MIT, approved, clearlydefined
+maven/mavencentral/io.cucumber/junit-xml-formatter/0.8.1, MIT, approved, clearlydefined
 maven/mavencentral/io.cucumber/messages/28.1.0, MIT, approved, clearlydefined
-maven/mavencentral/io.cucumber/pretty-formatter/2.0.1, MIT, approved, clearlydefined
+maven/mavencentral/io.cucumber/pretty-formatter/2.1.0, MIT, approved, clearlydefined
 maven/mavencentral/io.cucumber/query/13.6.0, MIT, approved, #22826
 maven/mavencentral/io.cucumber/tag-expressions/6.1.2, MIT AND (BSD-3-Clause AND MIT) AND BSD-3-Clause, approved, #14277
 maven/mavencentral/io.cucumber/testng-xml-formatter/0.5.0, MIT, approved, clearlydefined
