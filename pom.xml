@@ -59,7 +59,7 @@
         <kotlin.compiler.languageVersion>2.1</kotlin.compiler.languageVersion>
         <kotlin.compiler.apiVersion>2.1</kotlin.compiler.apiVersion>
         <spring-boot.version>3.2.5</spring-boot.version>
-        <kotlin.version>2.2.0</kotlin.version>
+        <kotlin.version>2.2.10</kotlin.version>
         <kotlin.coroutines.version>1.8.1</kotlin.coroutines.version>
         <springdoc.version>2.8.9</springdoc.version>
         <nv-i18n.version>1.29</nv-i18n.version>
