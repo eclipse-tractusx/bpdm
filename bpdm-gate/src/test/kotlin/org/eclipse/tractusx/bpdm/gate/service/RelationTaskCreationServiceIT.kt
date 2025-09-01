@@ -25,6 +25,7 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateType
@@ -34,6 +35,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
 import org.eclipse.tractusx.bpdm.gate.controller.SelfClientAsPartnerUploaderInitializer
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.PostalAddressDb
+import org.eclipse.tractusx.bpdm.gate.model.RelationDefaults
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.eclipse.tractusx.bpdm.gate.util.PrincipalUtil
@@ -133,7 +135,14 @@ class RelationTaskCreationServiceIT @Autowired constructor(
                         RelationType.IsOwnedBy -> org.eclipse.tractusx.orchestrator.api.model.RelationType.IsOwnedBy
                     },
                     legalEntityBpnL1,
-                    legalEntityBpnL2
+                    legalEntityBpnL2,
+                    listOf(
+                        RelationStateDto(
+                            validFrom = RelationDefaults.VALID_FROM_DEFAULT,
+                            validTo = RelationDefaults.VALID_TO_DEFAULT,
+                            type = BusinessStateType.ACTIVE
+                        )
+                    )
                 ),
                 TaskProcessingRelationsStateDto(ResultState.Pending, TaskStep.CleanAndSync, StepState.Queued, emptyList(), anyTime, anyTime, anyTime))
         ))

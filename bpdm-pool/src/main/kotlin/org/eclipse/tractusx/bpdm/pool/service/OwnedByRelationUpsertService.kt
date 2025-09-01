@@ -26,6 +26,7 @@ import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.springframework.stereotype.Service
+import java.time.Instant
 
 @Service
 class OwnedByRelationUpsertService(
@@ -34,55 +35,66 @@ class OwnedByRelationUpsertService(
 ): IRelationUpsertStrategyService {
 
     override fun upsertRelation(upsertRequest: IRelationUpsertStrategyService.UpsertRequest): UpsertResult<RelationDb> {
-        val proposedSource = upsertRequest.source
-        val proposedTarget = upsertRequest.target
 
-        validateSingleParent(upsertRequest.source, upsertRequest.target)
-        validateNoCycles(upsertRequest.source, upsertRequest.target)
+        validateSingleOwner(upsertRequest)
+        validateNoCycles(upsertRequest)
 
-
-        val result = relationUpsertService.upsertRelation(
-            RelationUpsertService.UpsertRequest(proposedSource, proposedTarget, RelationType.IsOwnedBy)
-        )
-
-        return result
-    }
-
-
-    private fun validateSingleParent(child: LegalEntityDb, parent: LegalEntityDb){
-        val allChildRelations = relationRepository.findByTypeAndStartNode(RelationType.IsOwnedBy, child)
-        allChildRelations.forEach { relation ->
-            if(relation.endNode != parent)
-                throw BpdmValidationException("Multiple owning entities assigned to the same owned entity: legal entity '${child.bpn}' can't be owned by '${parent.bpn}' as its already owned by '${relation.endNode.bpn}'")
-        }
-    }
-
-    private fun validateNoCycles(child: LegalEntityDb, parent: LegalEntityDb){
-        val allOwningAncestors = getAllAncestors(parent)
-        if(allOwningAncestors.contains(child))
-            throw BpdmValidationException("Circular ownership detected in entity hierarchy: legal entity '${child.bpn}' is (transitively) owning '${parent.bpn}' and therefore can't be owned by '${parent.bpn}'.")
+        val upsertServiceRequest = RelationUpsertService.UpsertRequest(upsertRequest.source, upsertRequest.target, RelationType.IsOwnedBy, upsertRequest.states)
+        return relationUpsertService.upsertRelation(upsertServiceRequest)
     }
 
     /**
-     * Fetch the whole owning parent tree (ancestors, parents of parents) of the given legal entity
+     * Checks that the proposed source (child) does not already have another parent
+     * with overlapping validity periods.
      */
-    private fun getAllAncestors(legalEntity: LegalEntityDb): Set<LegalEntityDb>{
-        val allParents = mutableSetOf<LegalEntityDb>()
-        val parentProcessingQueue =  ArrayDeque<LegalEntityDb>()
+    private fun validateSingleOwner(upsertRequest: IRelationUpsertStrategyService.UpsertRequest) {
+        val allChildRelations = relationRepository.findByTypeAndStartNode(RelationType.IsOwnedBy, upsertRequest.source)
+        val allOverlappingChildRelations = relationUpsertService.filterOverlappingRelations(upsertRequest, allChildRelations)
 
-        parentProcessingQueue.addFirst(legalEntity)
+        allOverlappingChildRelations.forEach { relation ->
+            if (relation.endNode != upsertRequest.target) {
+                throw BpdmValidationException(
+                    "Multiple owning entities assigned to the same owned entity during overlapping validity: " +
+                            "legal entity '${upsertRequest.source.bpn}' can't be owned by '${upsertRequest.target.bpn}' " +
+                            "as it is already owned by '${relation.endNode.bpn}' in overlapping period."
+                )
+            }
+        }
+    }
 
-        lateinit var currentParent: LegalEntityDb
+    /**
+     * Checks that no cycles exist in the ownership hierarchy.
+     */
+    private fun validateNoCycles(upsertRequest: IRelationUpsertStrategyService.UpsertRequest) {
+        val allOwningAncestors = getAllOverlappingAncestors(upsertRequest)
+        if (allOwningAncestors.contains(upsertRequest.source)) {
+            throw BpdmValidationException(
+                "Circular ownership detected: legal entity '${upsertRequest.source.bpn}' is (transitively) owning '${upsertRequest.target.bpn}' and therefore can't be owned by it."
+            )
+        }
+    }
+
+    /**
+     * Fetch the whole overlapping, owning parent tree (ancestors, parents of parents) of the given upsert request
+     */
+    private fun getAllOverlappingAncestors(upsertRequest: IRelationUpsertStrategyService.UpsertRequest): Set<LegalEntityDb>{
+        val allOwners = mutableSetOf<LegalEntityDb>()
+        val ownerProcessingQueue =  ArrayDeque<LegalEntityDb>()
+
+        ownerProcessingQueue.addFirst(upsertRequest.target)
+
+        lateinit var currentOwner: LegalEntityDb
 
         do{
-            currentParent = parentProcessingQueue.removeFirst()
-            allParents.add(currentParent)
+            currentOwner = ownerProcessingQueue.removeFirst()
+            allOwners.add(currentOwner)
             // Fetch Relations in which the currently processed parent node is a child
-            val parentParentRelations = relationRepository.findByTypeAndStartNode(RelationType.IsOwnedBy, currentParent)
-            val parentsOfCurrent = parentParentRelations.map { it.endNode }
-            parentsOfCurrent.forEach { parentProcessingQueue.addFirst(it) }
-        }while (parentProcessingQueue.isNotEmpty())
+            val ownerOfOwnerRelations = relationRepository.findByTypeAndStartNode(RelationType.IsOwnedBy, currentOwner)
+            val overlappingOwnerOfOwnerRelations = relationUpsertService.filterOverlappingRelations(upsertRequest, ownerOfOwnerRelations)
+            val ownersOfCurrent = overlappingOwnerOfOwnerRelations.map { it.endNode }
+            ownersOfCurrent.forEach { ownerProcessingQueue.addFirst(it) }
+        }while (ownerProcessingQueue.isNotEmpty())
 
-        return allParents
+        return allOwners
     }
 }

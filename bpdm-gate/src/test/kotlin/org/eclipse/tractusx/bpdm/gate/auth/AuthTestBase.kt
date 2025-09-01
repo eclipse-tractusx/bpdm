@@ -112,7 +112,9 @@ abstract class AuthTestBase(
 
     @Test
     fun `PUT Relations`() {
-        authAssertions.assert(authExpectations.relation.put) { gateClient.relation.put(true, RelationPutRequest(listOf( RelationPutEntry("", RelationType.IsManagedBy, "", "")))) }
+        authAssertions.assert(authExpectations.relation.put) { gateClient.relation.put(true, RelationPutRequest(listOf( RelationPutEntry("", RelationType.IsManagedBy, "", "",
+            mutableListOf()
+        )))) }
     }
 
     @Test

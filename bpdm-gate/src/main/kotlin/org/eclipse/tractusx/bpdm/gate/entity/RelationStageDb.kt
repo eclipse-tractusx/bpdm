@@ -47,7 +47,14 @@ class RelationStageDb (
     var source: SharingStateDb,
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "target_sharing_state_id", nullable = false)
-    var target: SharingStateDb
+    var target: SharingStateDb,
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(
+        name = "relation_stage_states",
+        joinColumns = [JoinColumn(name = "relation_stage_id", foreignKey = ForeignKey(name = "fk_stage_states_relation"))],
+        indexes = [Index(name = "idx_stage_states_relation_id", columnList = "relation_stage_id")]
+    )
+    var states: MutableList<RelationStateDb>
 ): BaseEntity(){
     companion object{
         const val COLUMN_RELATION = "relation_id"

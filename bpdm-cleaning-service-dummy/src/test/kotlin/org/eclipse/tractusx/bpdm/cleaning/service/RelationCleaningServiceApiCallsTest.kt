@@ -30,6 +30,7 @@ import org.eclipse.tractusx.bpdm.cleaning.config.CleaningServiceConfigProperties
 import org.eclipse.tractusx.bpdm.cleaning.config.OrchestratorConfigProperties
 import org.eclipse.tractusx.orchestrator.api.ApiCommons
 import org.assertj.core.api.Assertions.assertThat
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -145,7 +146,14 @@ class RelationCleaningServiceApiCallsTest @Autowired constructor(
         return BusinessPartnerRelations(
             relationType = relationType,
             businessPartnerSourceBpnl = "BPNL_SOURCE_$idSuffix",
-            businessPartnerTargetBpnl = "BPNL_TARGET_$idSuffix"
+            businessPartnerTargetBpnl = "BPNL_TARGET_$idSuffix",
+            states = listOf(
+                RelationStateDto(
+                    validFrom = Instant.parse("2020-01-01T00:00:00Z"),
+                    validTo = Instant.parse("2030-01-01T00:00:00Z"),
+                    type = BusinessStateType.ACTIVE
+                )
+            ),
         )
     }
 }

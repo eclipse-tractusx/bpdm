@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.orchestrator.controller
 
 import org.assertj.core.api.Assertions.assertThat
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
@@ -30,6 +31,7 @@ import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ContextConfiguration
+import java.time.Instant
 
 
 @SpringBootTest(
@@ -47,10 +49,11 @@ class RelationsGoldenRecordTaskControllerIT @Autowired constructor(
     private val orchestratorClient: OrchestrationApiClient,
     private val dbTestHelpers: DbTestHelpers,
 ) {
+    private val defaultRelationStates = listOf(RelationStateDto(validFrom = Instant.parse("1970-01-01T00:00:00Z"), validTo = Instant.parse("9999-12-31T23:59:59Z"), type = BusinessStateType.ACTIVE))
 
-    private val defaultRelations1 = BusinessPartnerRelations(relationType = RelationType.IsAlternativeHeadquarterFor, businessPartnerSourceBpnl = "BPNL1", businessPartnerTargetBpnl = "BPNL2")
-    private val defaultRelations2 = BusinessPartnerRelations(relationType = RelationType.IsManagedBy, businessPartnerSourceBpnl = "BPNL3", businessPartnerTargetBpnl = "BPNL4")
-    private val defaultRelations3 = BusinessPartnerRelations(relationType = RelationType.IsOwnedBy, businessPartnerSourceBpnl = "BPNL4", businessPartnerTargetBpnl = "BPNL5")
+    private val defaultRelations1 = BusinessPartnerRelations(relationType = RelationType.IsAlternativeHeadquarterFor, businessPartnerSourceBpnl = "BPNL1", businessPartnerTargetBpnl = "BPNL2", states = defaultRelationStates)
+    private val defaultRelations2 = BusinessPartnerRelations(relationType = RelationType.IsManagedBy, businessPartnerSourceBpnl = "BPNL3", businessPartnerTargetBpnl = "BPNL4", states = defaultRelationStates)
+    private val defaultRelations3 = BusinessPartnerRelations(relationType = RelationType.IsOwnedBy, businessPartnerSourceBpnl = "BPNL4", businessPartnerTargetBpnl = "BPNL5", states = defaultRelationStates)
 
 
     @BeforeEach
