@@ -64,18 +64,20 @@ maven/mavencentral/io.cucumber/query/13.6.0, MIT, approved, #22826
 maven/mavencentral/io.cucumber/tag-expressions/6.1.2, MIT AND (BSD-3-Clause AND MIT) AND BSD-3-Clause, approved, #14277
 maven/mavencentral/io.cucumber/testng-xml-formatter/0.5.0, MIT, approved, clearlydefined
 maven/mavencentral/io.github.microutils/kotlin-logging-jvm/3.0.5, Apache-2.0, approved, clearlydefined
-maven/mavencentral/io.micrometer/micrometer-commons/1.15.3, Apache-2.0, approved, clearlydefined
-maven/mavencentral/io.micrometer/micrometer-core/1.15.3, Apache-2.0, approved, clearlydefined
+maven/mavencentral/io.micrometer/micrometer-commons/1.15.3, Apache-2.0 AND (Apache-2.0 AND MIT), approved, #23144
+maven/mavencentral/io.micrometer/micrometer-core/1.15.3, Apache-2.0 AND (Apache-2.0 AND MIT), approved, #23142
 maven/mavencentral/io.micrometer/micrometer-jakarta9/1.15.3, Apache-2.0, approved, #23028
-maven/mavencentral/io.micrometer/micrometer-observation/1.15.3, Apache-2.0, approved, clearlydefined
+maven/mavencentral/io.micrometer/micrometer-observation/1.15.3, Apache-2.0, approved, #23139
 maven/mavencentral/io.mockk/mockk-agent-api-jvm/1.13.3, Apache-2.0, approved, clearlydefined
 maven/mavencentral/io.mockk/mockk-agent-jvm/1.13.3, MIT, approved, #10192
 maven/mavencentral/io.mockk/mockk-core-jvm/1.13.3, Apache-2.0, approved, clearlydefined
 maven/mavencentral/io.mockk/mockk-dsl-jvm/1.13.3, Apache-2.0, approved, clearlydefined
 maven/mavencentral/io.mockk/mockk-jvm/1.13.3, Apache-2.0, approved, clearlydefined
 maven/mavencentral/io.netty/netty-buffer/4.1.124.Final, Apache-2.0, approved, CQ21842
+maven/mavencentral/io.netty/netty-codec-base/4.2.5.Final, Apache-2.0, approved, #21322
+maven/mavencentral/io.netty/netty-codec-compression/4.2.5.Final, Apache-2.0, approved, #16109
 maven/mavencentral/io.netty/netty-codec-dns/4.1.124.Final, Apache-2.0 AND BSD-3-Clause AND MIT, approved, CQ20926
-maven/mavencentral/io.netty/netty-codec-http/4.1.124.Final, Apache-2.0 AND BSD-3-Clause AND MIT, approved, CQ20926
+maven/mavencentral/io.netty/netty-codec-http/4.2.5.Final, Apache-2.0 AND (Apache-2.0 AND MIT) AND (Apache-2.0 AND BSD-3-Clause), approved, #16121
 maven/mavencentral/io.netty/netty-codec-http2/4.1.124.Final, Apache-2.0 AND BSD-3-Clause AND MIT, approved, CQ20926
 maven/mavencentral/io.netty/netty-codec-socks/4.1.124.Final, Apache-2.0 AND BSD-3-Clause AND MIT, approved, CQ20926
 maven/mavencentral/io.netty/netty-codec/4.1.124.Final, Apache-2.0 AND BSD-3-Clause AND MIT, approved, CQ20926
