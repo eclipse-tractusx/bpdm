@@ -56,7 +56,7 @@ dependencies:
     alias: postgres
     condition: postgres.enabled
   - name: centralidp
-    version: 4.2.0
+    version: 4.2.1-rc.1
     repository: https://eclipse-tractusx.github.io/charts/dev
     alias: centralidp
     condition: centralidp.enabled

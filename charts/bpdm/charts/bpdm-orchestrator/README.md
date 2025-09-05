@@ -1,6 +1,6 @@
 # bpdm-orchestrator
 
-![Version: 4.1.0-rc3](https://img.shields.io/badge/Version-4.1.0--rc3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 7.1.0-rc3](https://img.shields.io/badge/AppVersion-7.1.0--rc3-informational?style=flat-square)
+![Version: 4.1.0-SNAPSHOT](https://img.shields.io/badge/Version-4.1.0--SNAPSHOT-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 7.1.0-SNAPSHOT](https://img.shields.io/badge/AppVersion-7.1.0--SNAPSHOT-informational?style=flat-square)
 
 A Helm chart for deploying the BPDM Orchestrator service
 

@@ -8,7 +8,8 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
 ### Changed
 
-- fix vulnerability in deployments by providing read-only volume mounts 
+- fix vulnerability in deployments by providing read-only volume mounts
+- migrated Bitnami chart dependencies to the BitnamiLegacy repository.
 
 ## [6.0.0] -  2025-06-16
 
