@@ -47,7 +47,7 @@ jobs:
           load: true
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@0.33.0
+        uses: aquasecurity/trivy-action@0.33.1
         with:
           image-ref: "bpdm-${{ matrix.app }}:test"
           exit-code: "1"
