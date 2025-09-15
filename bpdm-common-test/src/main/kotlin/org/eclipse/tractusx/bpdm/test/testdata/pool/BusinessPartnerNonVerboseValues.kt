@@ -39,11 +39,18 @@ object BusinessPartnerNonVerboseValues {
 
 
     val addressIdentifierTypeDto1 =
-        IdentifierTypeDto("ADDR_KEY_ONE", IdentifierBusinessPartnerType.ADDRESS, "IdentNameOne", BusinessPartnerVerboseValues.identifierTypeAbbreviation1, BusinessPartnerVerboseValues.identifierTypeTransliteratedName1, BusinessPartnerVerboseValues.identifierTypeTransliteratedAbbreviation1, null, sortedSetOf())
-    val addressIdentifierTypeDto2 =
-        IdentifierTypeDto("ADDR_KEY_TWO", IdentifierBusinessPartnerType.ADDRESS, "IdentNameTwo", BusinessPartnerVerboseValues.identifierTypeAbbreviation2, BusinessPartnerVerboseValues.identifierTypeTransliteratedName2, BusinessPartnerVerboseValues.identifierTypeTransliteratedAbbreviation2, null, sortedSetOf())
-    val addressIdentifierTypeDto3 =
-        IdentifierTypeDto("ADDR_KEY_THREE", IdentifierBusinessPartnerType.ADDRESS, "IdentNameThree", BusinessPartnerVerboseValues.identifierTypeAbbreviation3, BusinessPartnerVerboseValues.identifierTypeTransliteratedName3, BusinessPartnerVerboseValues.identifierTypeTransliteratedAbbreviation3, null, sortedSetOf())
+        IdentifierTypeDto(
+            "FR_SIRET",
+            IdentifierBusinessPartnerType.ADDRESS,
+            "Numéro du système d'identification du répertoire des établissements",
+            BusinessPartnerVerboseValues.addressIdentifierTypeAbbreviation1,
+            BusinessPartnerVerboseValues.addressIdentifierTypeTransliteratedName1,
+            BusinessPartnerVerboseValues.addressIdentifierTypeTransliteratedAbbreviation1,
+            "^\\d{8}\\d{1}\\d{5}$",
+            sortedSetOf(IdentifierTypeCategory.NBR)
+        )
+    val addressIdentifierTypeDto2 = addressIdentifierTypeDto1
+    val addressIdentifierTypeDto3 = addressIdentifierTypeDto1
 
 
     val identifier1 = LegalEntityIdentifierDto(
@@ -65,19 +72,19 @@ object BusinessPartnerNonVerboseValues {
     )
 
     val addressIdentifier1 = AddressIdentifierDto(
-        value = addressIdentifierTypeDto1.name,
+        value = "Address Identifier 1",
         type = addressIdentifierTypeDto1.technicalKey,
     )
 
     val addressIdentifier2 = AddressIdentifierDto(
-        value = addressIdentifierTypeDto2.name,
+        value = "Address Identifier 2",
         type = addressIdentifierTypeDto2.technicalKey,
     )
 
 
     val addressIdentifier = AddressIdentifierDto(
         value = BusinessPartnerVerboseValues.identifier3.value,
-        type = BusinessPartnerVerboseValues.identifierType3.technicalKey,
+        type = addressIdentifierTypeDto1.technicalKey,
     )
 
     val legalForm1 = LegalFormRequest(
