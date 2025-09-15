@@ -17,12 +17,20 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.v6.client
+package org.eclipse.tractusx.bpdm.pool.v6.config
 
-interface PoolApiClient {
+import org.eclipse.tractusx.bpdm.pool.v6.util.AssertRepositoryV6
+import org.eclipse.tractusx.bpdm.test.util.LocalDatetimeSecondsComparator
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
 
-    val metadata: MetadataApiClient
+@Configuration
+@ConditionalOnProperty(name = ["test.v6"], havingValue = "true", matchIfMissing = false)
+class AssertConfiguration {
 
-    val legalEntities: LegalEntityApiClient
-
+    @Bean
+    fun assertRepoV6(localDatetimeSecondsComparator: LocalDatetimeSecondsComparator): AssertRepositoryV6{
+        return AssertRepositoryV6(localDatetimeSecondsComparator)
+    }
 }

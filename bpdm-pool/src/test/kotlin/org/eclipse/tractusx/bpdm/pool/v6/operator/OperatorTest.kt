@@ -43,9 +43,5 @@ abstract class OperatorTest{
     @BeforeEach
     fun beforeEach(testInfo: TestInfo){
         testName = testInfo.displayName
-//        testName = if(testInfo.testMethod.getOrNull()?.name == testInfo.displayName)
-//            testInfo.displayName
-//        else
-//            "${testInfo.testMethod.get().name} ${testInfo.displayName}"
     }
 }

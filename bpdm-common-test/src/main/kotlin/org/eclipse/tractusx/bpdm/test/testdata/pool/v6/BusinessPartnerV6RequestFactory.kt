@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021,2024 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -17,44 +17,36 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.test.testdata.pool
+package org.eclipse.tractusx.bpdm.test.testdata.pool.v6
 
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.pool.api.model.ConfidenceCriteriaDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityIdentifierDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityStateDto
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntityPartnerCreateRequest
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntityPartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.test.testdata.pool.common.BusinessPartnerCommonRequestFactory
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import kotlin.random.Random
 
-
-/**
- * This class provides functions for generating business partner requests
- * Since business partner data is quite complex its creation is centrally contained in this class
- * Other request data should be handled directly inside the test classes
- */
-class BusinessPartnerRequestFactory(
-    availableMetadata: TestMetadata
+class BusinessPartnerV6RequestFactory(
+    testMetadata: TestMetadataV6
 ): BusinessPartnerCommonRequestFactory(
-    availableMetadata.addressIdentifierTypes.map { it.technicalKey },
-    availableMetadata.adminAreas.map { it.code }
+    testMetadata.addressIdentifierTypes.map { it.technicalKey },
+    testMetadata.adminAreas.map { it.code }
 ) {
-    private val availableLegalForms = availableMetadata.legalForms.map { it.technicalKey }
-    private val availableLegalEntityIdentifiers = availableMetadata.legalEntityIdentifierTypes.map { it.technicalKey }
+    private val availableLegalForms = testMetadata.legalForms.map { it.technicalKey }
+    private val availableLegalEntityIdentifiers = testMetadata.legalEntityIdentifierTypes.map { it.technicalKey }
 
-    fun createLegalEntityRequest(
-        seed: String,
-        isParticipantData: Boolean = true
-    ): LegalEntityPartnerCreateRequest {
+
+    fun buildLegalEntityCreateRequest(seed: String): LegalEntityPartnerCreateRequest {
         val longSeed = seed.hashCode().toLong()
         val random = Random(longSeed)
 
         return LegalEntityPartnerCreateRequest(
-            legalEntity = createLegalEntityDto(seed, random, isParticipantData),
+            legalEntity = createLegalEntityDto(seed, random),
             legalAddress = createAddressDto(seed, random),
             index = seed
         )
@@ -71,16 +63,14 @@ class BusinessPartnerRequestFactory(
         )
     }
 
-    fun createLegalEntityDto(seed: String, random: Random =  Random(seed.hashCode().toLong()),  isCatenaXMemberData: Boolean = true): LegalEntityDto {
+    fun createLegalEntityDto(seed: String, random: Random =  Random(seed.hashCode().toLong())): LegalEntityDto {
         val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, 365241780471), random.nextInt(0, 999999999), ZoneOffset.UTC)
 
         return LegalEntityDto(
             legalName = "Legal Name $seed",
             legalShortName = "Legal Short Name $seed",
             legalForm = availableLegalForms.randomOrNull(random),
-            identifiers = listOf(availableLegalEntityIdentifiers.randomOrNull(random), availableLegalEntityIdentifiers.randomOrNull(random))
-                .mapNotNull{ it }
-                .mapIndexed { index, idKey -> LegalEntityIdentifierDto("$idKey Value $seed $index", idKey, "$idKey Issuing Body $seed") },
+            identifiers = listOf(createLegalEntityIdentifier(seed, 0, random), createLegalEntityIdentifier(seed, 1, random)),
             states = listOf(
                 LegalEntityStateDto(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
                 LegalEntityStateDto(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
@@ -93,8 +83,12 @@ class BusinessPartnerRequestFactory(
                 nextConfidenceCheckAt = timeStamp.plusDays(7),
                 confidenceLevel = 5
             ),
-            isParticipantData = isCatenaXMemberData
+            isCatenaXMemberData = random.nextBoolean()
         )
     }
-}
 
+    fun createLegalEntityIdentifier(seed: String, index: Int, random: Random = Random("$seed $index".hashCode().toLong())): LegalEntityIdentifierDto{
+        val idKey = availableLegalEntityIdentifiers.random(random)
+        return LegalEntityIdentifierDto("$idKey Value $seed $index", idKey, "$idKey Issuing Body $seed")
+    }
+}

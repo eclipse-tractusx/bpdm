@@ -17,12 +17,16 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.v6.client
+package org.eclipse.tractusx.bpdm.test.testdata.pool.v6
 
-interface PoolApiClient {
+import org.eclipse.tractusx.bpdm.pool.api.model.CountrySubdivisionDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierTypeDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalFormDto
 
-    val metadata: MetadataApiClient
 
-    val legalEntities: LegalEntityApiClient
-
-}
+data class TestMetadataV6(
+    val legalForms: List<LegalFormDto>,
+    val legalEntityIdentifierTypes: List<IdentifierTypeDto>,
+    val addressIdentifierTypes: List<IdentifierTypeDto>,
+    val adminAreas: List<CountrySubdivisionDto>
+)
