@@ -17,12 +17,11 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.v6.client
+package org.eclipse.tractusx.bpdm.test.testdata.pool.v6
 
-interface PoolApiClient {
-
-    val metadata: MetadataApiClient
-
-    val legalEntities: LegalEntityApiClient
-
+class TestDataV6Factory(
+    testMetadataV6: TestMetadataV6
+){
+    val request: BusinessPartnerV6RequestFactory = BusinessPartnerV6RequestFactory(testMetadataV6)
+    val result: ExpectedBusinessPartnerV6ResultFactory = ExpectedBusinessPartnerV6ResultFactory(testMetadataV6)
 }
