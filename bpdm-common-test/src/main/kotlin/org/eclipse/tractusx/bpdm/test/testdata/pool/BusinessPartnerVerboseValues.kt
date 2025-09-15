@@ -61,38 +61,41 @@ object BusinessPartnerVerboseValues {
     private val country2 = TypeKeyNameVerboseDto(CountryCode.FR, CountryCode.FR.getName())
     private val country3 = TypeKeyNameVerboseDto(CountryCode.PL, CountryCode.PL.getName())
 
-    val identifierType1 = TypeKeyNameVerboseDto("VAT_DE", "Steuernummer")
-    val identifierType2 = TypeKeyNameVerboseDto("VAT_US", "VAT USA")
-    val identifierType3 = TypeKeyNameVerboseDto("VAT_FR", "VAT France")
-    val identifierType4 = TypeKeyNameVerboseDto("VAT_NL", "VAT Netherlands")
+    val identifierType1 = TypeKeyNameVerboseDto("DE_EU_VAT_ID", "European Union Value-added Tax Identification Number")
+    val identifierType2 = TypeKeyNameVerboseDto("DE_HR", "Handelsregisternummer")
+    val identifierType3 = TypeKeyNameVerboseDto("AT_EU_VAT_ID", "European Union Value-added Tax Identification Number")
+    val identifierType4 = TypeKeyNameVerboseDto("DNB_DUNS", "Data Universal Numbering System Number")
 
     val bpnLRequestMapping = BpnRequestIdentifierMappingDto(UUID.randomUUID().toString(), bpn = secondBpnL)
     val bpnSRequestMapping = BpnRequestIdentifierMappingDto(UUID.randomUUID().toString(), bpn = secondBpnS)
     val bpnARequestMapping = BpnRequestIdentifierMappingDto(UUID.randomUUID().toString(), bpn = secondBpnA)
 
-    val identifierTypeAbbreviation1 = "abbreviation1"
-    val identifierTypeAbbreviation2 = "abbreviation2"
-    val identifierTypeAbbreviation3 = "abbreviation3"
-    val identifierTypeAbbreviation4 = "abbreviation4"
+    val identifierTypeAbbreviation1 = "EU VAT ID (number)"
+    val identifierTypeAbbreviation2 = "HR(-nummer)"
+    val identifierTypeAbbreviation3 = "EU VAT ID (number)"
+    val identifierTypeAbbreviation4 = "DUNS (number)"
 
-    val identifierTypeTransliteratedName1 = "transliteratedName1"
-    val identifierTypeTransliteratedName2 = "transliteratedName2"
-    val identifierTypeTransliteratedName3 = "transliteratedName3"
-    val identifierTypeTransliteratedName4 = "transliteratedName4"
+    val identifierTypeTransliteratedName1 = ""
+    val identifierTypeTransliteratedName2 = ""
+    val identifierTypeTransliteratedName3 = ""
+    val identifierTypeTransliteratedName4 = ""
 
-    val identifierTypeTransliteratedAbbreviation1 = "transliteratedAbbreviation1"
-    val identifierTypeTransliteratedAbbreviation2 = "transliteratedAbbreviation2"
-    val identifierTypeTransliteratedAbbreviation3 = "transliteratedAbbreviation3"
-    val identifierTypeTransliteratedAbbreviation4 = "transliteratedAbbreviation4"
+    val identifierTypeTransliteratedAbbreviation1 = ""
+    val identifierTypeTransliteratedAbbreviation2 = ""
+    val identifierTypeTransliteratedAbbreviation3 = ""
+    val identifierTypeTransliteratedAbbreviation4 = ""
 
-    val identifierTypeFormat1 = "format1"
-    val identifierTypeFormat2 = "format2"
-    val identifierTypeFormat3 = "format3"
+    val identifierTypeFormat1 = "^DE\\d{8}\\d{1}(-\\d{5})?$"
+    val identifierTypeFormat2 = "^([BDFGHKMNPRTUVWXY]{1}\\d{1,4}[VR]?\\.)?((HRA)|(G(n|N)R)|(HRB)|(PR)|(VR)|(G(s|S)R))[1-9]{1}[A-Z0-9]{1,5}$"
+    val identifierTypeFormat3 = "^ATU\\d{7}\\d{1}$"
 
     val identifierTypeCategories1 = sortedSetOf(IdentifierTypeCategory.VAT)
-    val identifierTypeCategories2 = sortedSetOf(IdentifierTypeCategory.IBR, IdentifierTypeCategory.TIN)
-    val identifierTypeCategories3 = sortedSetOf(IdentifierTypeCategory.OTH)
+    val identifierTypeCategories2 = sortedSetOf(IdentifierTypeCategory.NBR)
+    val identifierTypeCategories3 = sortedSetOf(IdentifierTypeCategory.VAT)
 
+    val addressIdentifierTypeAbbreviation1 = "(numéro) SIRET"
+    val addressIdentifierTypeTransliteratedName1 = "Numero du systeme d'identification du repertoire des etablissements"
+    val addressIdentifierTypeTransliteratedAbbreviation1 = "(numero) SIRET"
 
 
     val identifier1 =
