@@ -3,3 +3,6 @@ test:
 bpdm:
   tasks:
     cron: '-'
+spring:
+  flyway:
+    clean-disabled: false
