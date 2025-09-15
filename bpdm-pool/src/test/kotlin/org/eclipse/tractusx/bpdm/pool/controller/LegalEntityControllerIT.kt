@@ -41,7 +41,6 @@ import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerVerboseValues
 import org.eclipse.tractusx.bpdm.test.testdata.pool.LegalEntityStructureRequest
 import org.eclipse.tractusx.bpdm.test.util.AssertHelpers
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
-import org.eclipse.tractusx.bpdm.test.util.PoolDataHelpers
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -65,7 +64,6 @@ class LegalEntityControllerIT @Autowired constructor(
     val poolClient: PoolClientImpl,
     val dbTestHelpers: DbTestHelpers,
     val assertHelpers: AssertHelpers,
-    val poolDataHelpers: PoolDataHelpers,
     val legalEntityRepository: LegalEntityRepository,
     val releationRepository: RelationRepository
 ) {
@@ -73,7 +71,6 @@ class LegalEntityControllerIT @Autowired constructor(
     @BeforeEach
     fun beforeEach() {
         dbTestHelpers.truncateDbTables()
-        poolDataHelpers.createPoolMetadata()
     }
 
     /**
@@ -169,19 +166,6 @@ class LegalEntityControllerIT @Autowired constructor(
      */
     @Test
     fun `create legal entities and get duplicate identifier error on address`() {
-        poolClient.metadata.createIdentifierType(
-            IdentifierTypeDto(
-                technicalKey = addressIdentifier.type,
-                businessPartnerType = IdentifierBusinessPartnerType.ADDRESS,
-                name = addressIdentifier.value,
-                abbreviation = BusinessPartnerVerboseValues.identifierTypeAbbreviation1,
-                transliteratedName = BusinessPartnerVerboseValues.identifierTypeTransliteratedName1,
-                transliteratedAbbreviation = BusinessPartnerVerboseValues.identifierTypeTransliteratedAbbreviation1,
-                format = null,
-                categories = sortedSetOf()
-            )
-        )
-
         val request1 = with(BusinessPartnerNonVerboseValues.legalEntityCreate1) {
             copy(
                 index = BusinessPartnerNonVerboseValues.legalEntityCreate1.index,
@@ -395,18 +379,6 @@ class LegalEntityControllerIT @Autowired constructor(
      */
     @Test
     fun `don't create legal entity with same address identifier`() {
-        poolClient.metadata.createIdentifierType(
-            IdentifierTypeDto(
-                technicalKey = addressIdentifier.type,
-                businessPartnerType = IdentifierBusinessPartnerType.ADDRESS,
-                name = addressIdentifier.value,
-                abbreviation = BusinessPartnerVerboseValues.identifierTypeAbbreviation1,
-                transliteratedName = BusinessPartnerVerboseValues.identifierTypeTransliteratedName1,
-                transliteratedAbbreviation = BusinessPartnerVerboseValues.identifierTypeTransliteratedAbbreviation1,
-                format = null,
-                categories = sortedSetOf()
-            )
-        )
 
         val given = with(BusinessPartnerNonVerboseValues.legalEntityCreate1) {
             copy(
