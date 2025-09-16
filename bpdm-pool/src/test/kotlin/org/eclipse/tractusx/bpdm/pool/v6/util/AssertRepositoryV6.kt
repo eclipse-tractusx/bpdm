@@ -20,12 +20,15 @@
 package org.eclipse.tractusx.bpdm.pool.v6.util
 
 import org.assertj.core.api.Assertions
+import org.assertj.core.api.ObjectAssert
+import org.assertj.core.api.RecursiveComparisonAssert
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerUpdateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.test.util.LocalDatetimeSecondsComparator
 import java.time.LocalDateTime
@@ -37,7 +40,7 @@ class AssertRepositoryV6(
     private val localDatetimeSecondsComparator: LocalDatetimeSecondsComparator
 ) {
     companion object{
-        private object LegalEntityPartnerCreateResponseWrapperPaths{
+        private object LegalEntityUpsertResponsePaths{
             val entities: String = LegalEntityPartnerCreateResponseWrapper::entities.name
             val errors: String = LegalEntityPartnerCreateResponseWrapper::errors.name
             val legalEntity: String = "$entities.${LegalEntityPartnerCreateVerboseDto::legalEntity.name}"
@@ -62,25 +65,19 @@ class AssertRepositoryV6(
             val legalAddressCreatedAt =  "${legalAddress}.${LogisticAddressVerboseDto::createdAt.name}"
             val legalAddressUpdatedAt =  "${legalAddress}.${LogisticAddressVerboseDto::updatedAt.name}"
         }
+
     }
 
 
     fun assertLegalEntityCreate(actual: LegalEntityPartnerCreateResponseWrapper, expected: LegalEntityPartnerCreateResponseWrapper){
         Assertions.assertThat(actual)
-            .usingRecursiveComparison()
-            .ignoringCollectionOrder()
-            .ignoringFields(
-                LegalEntityPartnerCreateResponseWrapperPaths.legalEntityCreatedAt,
-                LegalEntityPartnerCreateResponseWrapperPaths.legalEntityUpdatedAt,
-                LegalEntityPartnerCreateResponseWrapperPaths.legalAddressCreatedAt,
-                LegalEntityPartnerCreateResponseWrapperPaths.legalAddressUpdatedAt,
-                LegalEntityPartnerCreateResponseWrapperPaths.currentness,
-                LegalEntityPartnerCreateResponseWrapperPaths.bpnL,
-                LegalEntityPartnerCreateResponseWrapperPaths.bpnA,
-                LegalEntityPartnerCreateResponseWrapperPaths.bpnLegalEntity,
-                LegalEntityPartnerCreateResponseWrapperPaths.errorMessage
-            )
-            .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
+            .usingRecursiveLegalEntityUpsertComparison()
+            .isEqualTo(expected)
+    }
+
+    fun assertLegalEntityUpdate(actual: LegalEntityPartnerUpdateResponseWrapper, expected: LegalEntityPartnerUpdateResponseWrapper){
+        Assertions.assertThat(actual)
+            .usingRecursiveLegalEntityUpsertComparison()
             .isEqualTo(expected)
     }
 
@@ -96,5 +93,22 @@ class AssertRepositoryV6(
             )
             .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
             .isEqualTo(expected)
+    }
+
+    private fun ObjectAssert<*>.usingRecursiveLegalEntityUpsertComparison(): RecursiveComparisonAssert<*>{
+        return this.usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .ignoringFields(
+                LegalEntityUpsertResponsePaths.legalEntityCreatedAt,
+                LegalEntityUpsertResponsePaths.legalEntityUpdatedAt,
+                LegalEntityUpsertResponsePaths.legalAddressCreatedAt,
+                LegalEntityUpsertResponsePaths.legalAddressUpdatedAt,
+                LegalEntityUpsertResponsePaths.currentness,
+                LegalEntityUpsertResponsePaths.bpnL,
+                LegalEntityUpsertResponsePaths.bpnA,
+                LegalEntityUpsertResponsePaths.bpnLegalEntity,
+                LegalEntityUpsertResponsePaths.errorMessage
+            )
+            .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
     }
 }

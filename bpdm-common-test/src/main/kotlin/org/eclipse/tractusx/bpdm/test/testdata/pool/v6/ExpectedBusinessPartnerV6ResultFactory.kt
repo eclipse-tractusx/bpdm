@@ -29,6 +29,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.SiteVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntityPartnerCreateRequest
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntityPartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SiteWithMainAddressVerboseDto
@@ -62,6 +63,31 @@ class ExpectedBusinessPartnerV6ResultFactory(
                 addressUpdatedAt
             ),
             givenRequest.index
+        )
+    }
+
+    fun mapToExpectedLegalEntityUpdate(
+        givenRequest: LegalEntityPartnerUpdateRequest,
+        givenBpnA: String = StringIgnoreComparator.IGNORE_STRING,
+        currentness: Instant = Instant.MIN,
+        legalEntityCreatedAt: Instant = currentness,
+        legalEntityUpdatedAt: Instant = currentness,
+        addressCreatedAt: Instant = currentness,
+        addressUpdatedAt: Instant = currentness
+    ): LegalEntityPartnerCreateVerboseDto{
+        return LegalEntityPartnerCreateVerboseDto(
+            givenRequest.legalEntity.mapToExpectedVerbose(givenRequest.bpnl, currentness, legalEntityCreatedAt, legalEntityUpdatedAt),
+            mapToExpectedResult(
+                givenRequest.legalAddress,
+                givenBpnA,
+                givenRequest.bpnl,
+                null,
+                AddressType.LegalAddress,
+                givenRequest.legalEntity.isCatenaXMemberData,
+                addressCreatedAt,
+                addressUpdatedAt
+            ),
+            givenRequest.bpnl
         )
     }
 
