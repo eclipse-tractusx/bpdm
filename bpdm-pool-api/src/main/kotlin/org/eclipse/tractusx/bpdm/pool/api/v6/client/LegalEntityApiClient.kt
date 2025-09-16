@@ -25,13 +25,16 @@ import org.eclipse.tractusx.bpdm.pool.api.ApiCommons
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntitySearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.PoolLegalEntityApi
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntityPartnerCreateRequest
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntityPartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerUpdateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.service.annotation.GetExchange
 import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
+import org.springframework.web.service.annotation.PutExchange
 
 @HttpExchange
 interface LegalEntityApiClient: PoolLegalEntityApi {
@@ -45,4 +48,9 @@ interface LegalEntityApiClient: PoolLegalEntityApi {
         @ParameterObject searchRequest: LegalEntitySearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageDto<LegalEntityWithLegalAddressVerboseDto>
+
+    @PutExchange(value = ApiCommons.LEGAL_ENTITY_BASE_PATH_V6)
+    override fun updateBusinessPartners(
+        @RequestBody businessPartners: Collection<LegalEntityPartnerUpdateRequest>
+    ): LegalEntityPartnerUpdateResponseWrapper
 }
