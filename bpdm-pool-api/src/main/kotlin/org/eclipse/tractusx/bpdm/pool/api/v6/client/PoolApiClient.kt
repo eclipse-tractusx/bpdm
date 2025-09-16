@@ -25,4 +25,6 @@ interface PoolApiClient {
 
     val legalEntities: LegalEntityApiClient
 
+    val sites: SiteApiClient
+
 }

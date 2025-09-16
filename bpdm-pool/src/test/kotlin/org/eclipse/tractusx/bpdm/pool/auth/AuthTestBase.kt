@@ -93,7 +93,7 @@ abstract class AuthTestBase(
 
     @Test
     fun `POST SitesLegalReference`(){
-        authAssertions.assert(siteAuthExpectations.postSites) { poolApiClient.sites.createSiteWithLegalReference(listOf(requestFactory.createSiteWithLegalReference("1", "BPNL"))) }
+        authAssertions.assert(siteAuthExpectations.postSites) { poolApiClient.sites.createSiteWithLegalReference(listOf(requestFactory.createLegalAddressSite("1", "BPNL"))) }
     }
 
     @Test
