@@ -23,13 +23,11 @@ import org.assertj.core.api.Assertions
 import org.assertj.core.api.ObjectAssert
 import org.assertj.core.api.RecursiveComparisonAssert
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateResponseWrapper
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerUpdateResponseWrapper
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityWithLegalAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.SiteVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.*
 import org.eclipse.tractusx.bpdm.test.util.LocalDatetimeSecondsComparator
 import java.time.LocalDateTime
 
@@ -66,6 +64,31 @@ class AssertRepositoryV6(
             val legalAddressUpdatedAt =  "${legalAddress}.${LogisticAddressVerboseDto::updatedAt.name}"
         }
 
+        private object SiteUpsertResponsePaths{
+            val entities: String = SitePartnerCreateResponseWrapper::entities.name
+            val errors: String = SitePartnerCreateResponseWrapper::errors.name
+            val site: String = "$entities.${SitePartnerCreateVerboseDto::site.name}"
+            val mainAddress: String = "$entities.${SitePartnerCreateVerboseDto::mainAddress.name}"
+            val siteCreatedAt: String = "${site}.${SiteVerboseDto::createdAt.name}"
+            val siteUpdatedAt: String = "${site}.${SiteVerboseDto::updatedAt.name}"
+            val mainAddressCreatedAt: String = "${mainAddress}.${SiteVerboseDto::createdAt.name}"
+            val mainAddressUpdatedAt: String = "${mainAddress}.${SiteVerboseDto::updatedAt.name}"
+            val bpnS: String = "${site}.${SiteVerboseDto::bpns.name}"
+            val bpnA: String = "${mainAddress}.${LogisticAddressVerboseDto::bpna.name}"
+            val bpnSite: String = "${mainAddress}.${LogisticAddressVerboseDto::bpnSite.name}"
+            val errorMessage: String = "${errors}.${ErrorInfo<*>::message.name}"
+        }
+
+        private object SiteSearchResponsePaths{
+            val content = PageDto<*>::content.name
+            val site = "${content}.${SiteWithMainAddressVerboseDto::site.name}"
+            val mainAddress =  "${content}.${SiteWithMainAddressVerboseDto::mainAddress.name}"
+            val siteCreatedAt =  "${site}.${SiteVerboseDto::createdAt.name}"
+            val siteUpdatedAt =  "${site}.${SiteVerboseDto::updatedAt.name}"
+            val mainAddressCreatedAt =  "${mainAddress}.${LogisticAddressVerboseDto::createdAt.name}"
+            val mainAddressUpdatedAt =  "${mainAddress}.${LogisticAddressVerboseDto::updatedAt.name}"
+        }
+
     }
 
 
@@ -94,6 +117,56 @@ class AssertRepositoryV6(
             .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
             .isEqualTo(expected)
     }
+
+    fun assertSiteCreate(actual: SitePartnerCreateResponseWrapper, expected: SitePartnerCreateResponseWrapper){
+        Assertions.assertThat(actual)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .ignoringFields(
+                SiteUpsertResponsePaths.siteCreatedAt,
+                SiteUpsertResponsePaths.siteUpdatedAt,
+                SiteUpsertResponsePaths.mainAddressCreatedAt,
+                SiteUpsertResponsePaths.mainAddressUpdatedAt,
+                SiteUpsertResponsePaths.bpnS,
+                SiteUpsertResponsePaths.bpnA,
+                SiteUpsertResponsePaths.bpnSite,
+                SiteUpsertResponsePaths.errorMessage
+            )
+            .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
+            .isEqualTo(expected)
+    }
+
+    fun assertLegalAddressSiteCreate(actual: SitePartnerCreateResponseWrapper, expected: SitePartnerCreateResponseWrapper){
+        Assertions.assertThat(actual)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .ignoringFields(
+                SiteUpsertResponsePaths.siteCreatedAt,
+                SiteUpsertResponsePaths.siteUpdatedAt,
+                SiteUpsertResponsePaths.mainAddressCreatedAt,
+                SiteUpsertResponsePaths.mainAddressUpdatedAt,
+                SiteUpsertResponsePaths.bpnS,
+                SiteUpsertResponsePaths.bpnSite,
+                SiteUpsertResponsePaths.errorMessage
+            )
+            .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
+            .isEqualTo(expected)
+    }
+
+    fun assertSiteSearch(actual: PageDto<SiteWithMainAddressVerboseDto>, expected: PageDto<SiteWithMainAddressVerboseDto>){
+        Assertions.assertThat(actual)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .ignoringFields(
+                SiteSearchResponsePaths.siteCreatedAt,
+                SiteSearchResponsePaths.siteUpdatedAt,
+                SiteSearchResponsePaths.mainAddressCreatedAt,
+                SiteSearchResponsePaths.mainAddressUpdatedAt,
+            )
+            .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
+            .isEqualTo(expected)
+    }
+
 
     private fun ObjectAssert<*>.usingRecursiveLegalEntityUpsertComparison(): RecursiveComparisonAssert<*>{
         return this.usingRecursiveComparison()

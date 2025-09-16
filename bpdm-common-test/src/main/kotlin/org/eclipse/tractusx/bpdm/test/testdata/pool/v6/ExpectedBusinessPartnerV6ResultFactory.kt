@@ -23,6 +23,7 @@ import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteCreateRequestWithLegalAddressAsMain
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityVerboseDto
@@ -32,6 +33,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntityPartnerCre
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntityPartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityWithLegalAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SiteWithMainAddressVerboseDto
 import org.eclipse.tractusx.bpdm.test.util.StringIgnoreComparator
 import java.time.Instant
@@ -122,28 +124,61 @@ class ExpectedBusinessPartnerV6ResultFactory(
         )
     }
 
-    private fun LegalEntityDto.mapToExpectedVerbose(
-        givenBpnL: String,
-        currentness: Instant,
-        legalEntityCreatedAt: Instant,
-        legalEntityUpdatedAt: Instant
-    ): LegalEntityVerboseDto{
-        return LegalEntityVerboseDto(
-            bpnl = givenBpnL,
-            legalName = legalName,
-            legalShortName = legalShortName,
-            legalFormVerbose = legalForm?.let { lf ->
-                testMetadata.legalForms.find { lf == it.technicalKey }
-                    ?: throw IllegalArgumentException("Legal Form with Key '$lf' is not expected")
+    fun buildExpectedSiteCreateResponse(
+        givenRequest: SitePartnerCreateRequest,
+        isCatenaXMemberData: Boolean,
+        givenBpnS: String = StringIgnoreComparator.IGNORE_STRING,
+        givenBpnA: String = StringIgnoreComparator.IGNORE_STRING,
+        siteCreatedAt: Instant = Instant.MIN,
+        siteUpdatedAt: Instant = siteCreatedAt,
+        addressCreatedAt: Instant = siteCreatedAt,
+        addressUpdatedAt: Instant = siteCreatedAt
+    ): SitePartnerCreateVerboseDto{
+        return SitePartnerCreateVerboseDto(
+            site = givenRequest.site.mapToExpectedVerbose(
+                isCatenaXMemberData = isCatenaXMemberData,
+                bpnLParent = givenRequest.bpnlParent,
+                givenBpnS = givenBpnS,
+                siteCreatedAt = siteCreatedAt,
+                siteUpdatedAt = siteUpdatedAt
+            ),
+            mainAddress =  mapToExpectedResult(
+                givenRequest = givenRequest.site.mainAddress,
+                givenBpnA = givenBpnA,
+                bpnLegalEntity = givenRequest.bpnlParent,
+                bpnSite = givenBpnS,
+                addressType = AddressType.SiteMainAddress,
+                isCatenaXMemberData = isCatenaXMemberData,
+                createdAt = addressCreatedAt,
+                updatedAt = addressUpdatedAt
+            ),
+            index = givenRequest.index
+        )
+    }
+
+    fun buildExpectedLegalAddressSiteCreateResponse(
+        givenSiteRequest: SiteCreateRequestWithLegalAddressAsMain,
+        givenLegalEntity: LegalEntityPartnerCreateVerboseDto,
+        givenBpnS: String = StringIgnoreComparator.IGNORE_STRING,
+        siteCreatedAt: Instant = Instant.MIN,
+        siteUpdatedAt: Instant = siteCreatedAt,
+        index: Int = 0
+    ): SitePartnerCreateVerboseDto{
+        return SitePartnerCreateVerboseDto(
+            site = with(givenSiteRequest){
+                SiteVerboseDto(
+                    givenBpnS,
+                    name,
+                    states.map { mapToExpectedResult(it) },
+                    givenLegalEntity.legalEntity.isCatenaXMemberData,
+                    givenLegalEntity.legalEntity.bpnl,
+                    siteCreatedAt,
+                    siteUpdatedAt,
+                    confidenceCriteria
+                )
             },
-            identifiers = identifiers.map { mapToExpectedResult(it) },
-            states = states.map { mapToExpectedResult(it) },
-            relations = emptyList(),
-            currentness = currentness,
-            confidenceCriteria = confidenceCriteria,
-            isCatenaXMemberData = isCatenaXMemberData,
-            createdAt = legalEntityCreatedAt,
-            updatedAt = legalEntityUpdatedAt
+            mainAddress =  givenLegalEntity.legalAddress.copy(addressType = AddressType.LegalAndSiteMainAddress),
+            index = index.toString()
         )
     }
 
@@ -180,6 +215,15 @@ class ExpectedBusinessPartnerV6ResultFactory(
                 addressCreatedAt,
                 addressUpdatedAt
             )
+        )
+    }
+
+    fun buildExpectedSiteSearchResponse(
+        givenSiteCreateResponse: SitePartnerCreateVerboseDto
+    ): SiteWithMainAddressVerboseDto{
+        return SiteWithMainAddressVerboseDto(
+            site = givenSiteCreateResponse.site,
+            mainAddress = givenSiteCreateResponse.mainAddress
         )
     }
 
@@ -345,5 +389,49 @@ class ExpectedBusinessPartnerV6ResultFactory(
         return with(testMetadata.adminAreas.find { it.code == givenAdminAreaCode }!!) {
             RegionDto(countryCode, code, name)
         }
+    }
+
+    private fun LegalEntityDto.mapToExpectedVerbose(
+        givenBpnL: String,
+        currentness: Instant,
+        legalEntityCreatedAt: Instant,
+        legalEntityUpdatedAt: Instant
+    ): LegalEntityVerboseDto{
+        return LegalEntityVerboseDto(
+            bpnl = givenBpnL,
+            legalName = legalName,
+            legalShortName = legalShortName,
+            legalFormVerbose = legalForm?.let { lf ->
+                testMetadata.legalForms.find { lf == it.technicalKey }
+                    ?: throw IllegalArgumentException("Legal Form with Key '$lf' is not expected")
+            },
+            identifiers = identifiers.map { mapToExpectedResult(it) },
+            states = states.map { mapToExpectedResult(it) },
+            relations = emptyList(),
+            currentness = currentness,
+            confidenceCriteria = confidenceCriteria,
+            isCatenaXMemberData = isCatenaXMemberData,
+            createdAt = legalEntityCreatedAt,
+            updatedAt = legalEntityUpdatedAt
+        )
+    }
+
+    private fun SiteDto.mapToExpectedVerbose(
+        isCatenaXMemberData: Boolean,
+        bpnLParent: String,
+        givenBpnS: String = StringIgnoreComparator.IGNORE_STRING,
+        siteCreatedAt: Instant = Instant.MIN,
+        siteUpdatedAt: Instant = siteCreatedAt
+    ): SiteVerboseDto{
+        return SiteVerboseDto(
+            bpns = givenBpnS,
+            name = name,
+            states = states.map { mapToExpectedResult(it) },
+            isCatenaXMemberData = isCatenaXMemberData,
+            bpnLegalEntity = bpnLParent,
+            createdAt = siteCreatedAt,
+            updatedAt = siteUpdatedAt,
+            confidenceCriteria = confidenceCriteria
+        )
     }
 }
