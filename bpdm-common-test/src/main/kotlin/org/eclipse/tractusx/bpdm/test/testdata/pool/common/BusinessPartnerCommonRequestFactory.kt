@@ -35,7 +35,7 @@ abstract class BusinessPartnerCommonRequestFactory(
 ) {
 
 
-    fun createSiteRequest(seed: String, bpnlParent: String): SitePartnerCreateRequest {
+    fun buildSiteCreateRequest(seed: String, bpnlParent: String): SitePartnerCreateRequest {
         return SitePartnerCreateRequest(
             bpnlParent = bpnlParent,
             index = seed,
@@ -71,7 +71,7 @@ abstract class BusinessPartnerCommonRequestFactory(
         )
     }
 
-    fun createSiteWithLegalReference(seed: String, bpnL: String, random: Random = Random(seed.hashCode().toLong())):SiteCreateRequestWithLegalAddressAsMain{
+    fun buildLegalAddressSiteCreateRequest(seed: String, bpnL: String, random: Random = Random(seed.hashCode().toLong())):SiteCreateRequestWithLegalAddressAsMain{
         val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, 365241780471), random.nextInt(0, 999999999), ZoneOffset.UTC)
 
         return SiteCreateRequestWithLegalAddressAsMain(
