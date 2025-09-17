@@ -17,38 +17,20 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.config
+package org.eclipse.tractusx.bpdm.pool.v6.config
 
-import org.eclipse.tractusx.bpdm.test.util.InstantSecondsComparator
+import org.eclipse.tractusx.bpdm.pool.v6.util.AssertRepositoryV6
 import org.eclipse.tractusx.bpdm.test.util.LocalDatetimeSecondsComparator
-import org.eclipse.tractusx.bpdm.test.util.PoolAssertHelper
-import org.eclipse.tractusx.bpdm.test.util.StringIgnoreComparator
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 @Configuration
-class AssertConfig {
+@ConditionalOnProperty(name = ["test.v6"], havingValue = "true", matchIfMissing = false)
+class AssertConfiguration {
 
     @Bean
-    fun instantSecondsComparator(): InstantSecondsComparator{
-        return InstantSecondsComparator()
+    fun assertRepoV6(localDatetimeSecondsComparator: LocalDatetimeSecondsComparator): AssertRepositoryV6{
+        return AssertRepositoryV6(localDatetimeSecondsComparator)
     }
-
-    @Bean
-    fun localDatetimeSecondsComparator(instantSecondsComparator: InstantSecondsComparator): LocalDatetimeSecondsComparator{
-        return LocalDatetimeSecondsComparator(instantSecondsComparator)
-    }
-
-    /**
-     * Convenience Config to provide an assert helper for all test classes
-     */
-    @Bean
-    fun poolAssertHelper(instantSecondsComparator: InstantSecondsComparator, localDatetimeSecondsComparator: LocalDatetimeSecondsComparator): PoolAssertHelper {
-        val stringIgnoreComparator = StringIgnoreComparator()
-
-        return PoolAssertHelper(instantSecondsComparator, localDatetimeSecondsComparator, stringIgnoreComparator)
-    }
-
-
-
 }
