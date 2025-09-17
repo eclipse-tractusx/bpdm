@@ -24,22 +24,29 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.ApiCommons
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteCreateRequestWithLegalAddressAsMain
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerUpdateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SiteWithMainAddressVerboseDto
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
+import org.springframework.web.service.annotation.PutExchange
 
 @HttpExchange
 interface SiteApiClient {
 
     @PostExchange(value = ApiCommons.SITE_BASE_PATH_V6)
     fun createSite(
-        @RequestBody
-        requests: Collection<SitePartnerCreateRequest>
+        @RequestBody requests: Collection<SitePartnerCreateRequest>
     ): SitePartnerCreateResponseWrapper
+
+    @PutExchange(value = ApiCommons.SITE_BASE_PATH_V6)
+    fun updateSite(
+        @RequestBody requests: Collection<SitePartnerUpdateRequest>
+    ): SitePartnerUpdateResponseWrapper
 
     @PostExchange(value = "${ApiCommons.SITE_BASE_PATH_V6}/search")
     fun postSiteSearch(

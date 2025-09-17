@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteCreateRequestWithLegalAddressAsMain
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressVerboseDto
@@ -179,6 +180,35 @@ class ExpectedBusinessPartnerV6ResultFactory(
             },
             mainAddress =  givenLegalEntity.legalAddress.copy(addressType = AddressType.LegalAndSiteMainAddress),
             index = index.toString()
+        )
+    }
+
+    fun buildExpectedSiteUpdateResponse(
+        givenRequest: SitePartnerUpdateRequest,
+        givenSite: SitePartnerCreateVerboseDto,
+        givenLegalEntity: LegalEntityPartnerCreateVerboseDto,
+        siteUpdatedAt: Instant = Instant.MIN,
+        mainAddressUpdatedAt: Instant = siteUpdatedAt
+    ): SitePartnerCreateVerboseDto{
+        return SitePartnerCreateVerboseDto(
+            site = givenRequest.site.mapToExpectedVerbose(
+                isCatenaXMemberData = givenLegalEntity.legalEntity.isCatenaXMemberData,
+                bpnLParent = givenLegalEntity.legalEntity.bpnl,
+                givenBpnS = givenRequest.bpns,
+                siteCreatedAt = givenSite.site.createdAt,
+                siteUpdatedAt = siteUpdatedAt
+            ),
+            mainAddress =  mapToExpectedResult(
+                givenRequest = givenRequest.site.mainAddress,
+                givenBpnA = givenSite.mainAddress.bpna,
+                bpnLegalEntity = givenLegalEntity.legalEntity.bpnl,
+                bpnSite = givenRequest.bpns,
+                addressType = AddressType.SiteMainAddress,
+                isCatenaXMemberData = givenLegalEntity.legalEntity.isCatenaXMemberData,
+                createdAt = givenSite.mainAddress.createdAt,
+                updatedAt = mainAddressUpdatedAt
+            ),
+            index = givenRequest.bpns
         )
     }
 

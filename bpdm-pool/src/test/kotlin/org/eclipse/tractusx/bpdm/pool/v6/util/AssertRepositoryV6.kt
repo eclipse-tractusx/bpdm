@@ -136,6 +136,22 @@ class AssertRepositoryV6(
             .isEqualTo(expected)
     }
 
+    fun assertSiteUpdate(actual: SitePartnerUpdateResponseWrapper, expected: SitePartnerUpdateResponseWrapper){
+        Assertions.assertThat(actual)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .ignoringFields(
+                SiteUpsertResponsePaths.siteCreatedAt,
+                SiteUpsertResponsePaths.siteUpdatedAt,
+                SiteUpsertResponsePaths.mainAddressCreatedAt,
+                SiteUpsertResponsePaths.mainAddressUpdatedAt,
+                SiteUpsertResponsePaths.bpnA,
+                SiteUpsertResponsePaths.errorMessage
+            )
+            .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
+            .isEqualTo(expected)
+    }
+
     fun assertLegalAddressSiteCreate(actual: SitePartnerCreateResponseWrapper, expected: SitePartnerCreateResponseWrapper){
         Assertions.assertThat(actual)
             .usingRecursiveComparison()
