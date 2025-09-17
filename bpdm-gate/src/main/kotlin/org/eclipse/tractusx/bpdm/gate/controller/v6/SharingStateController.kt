@@ -23,8 +23,10 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.v6.GateSharingStateApi
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.SharingStateDto
+import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.service.SharingStateService
 import org.eclipse.tractusx.bpdm.gate.util.PrincipalUtil
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto as SharingStateDtoV7
 
@@ -33,6 +35,8 @@ class SharingStateController(
     private val sharingStateService: SharingStateService,
     private val principalUtil: PrincipalUtil
 ): GateSharingStateApi {
+
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_SHARING_STATE})")
     override fun getSharingStates(
         paginationRequest: PaginationRequest,
         externalIds: Collection<String>?
