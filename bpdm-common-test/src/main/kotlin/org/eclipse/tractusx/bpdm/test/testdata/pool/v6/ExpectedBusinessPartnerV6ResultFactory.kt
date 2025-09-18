@@ -32,10 +32,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.SiteVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntityPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntityPartnerUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityWithLegalAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SiteWithMainAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.*
 import org.eclipse.tractusx.bpdm.test.util.StringIgnoreComparator
 import java.time.Instant
 
@@ -55,7 +52,7 @@ class ExpectedBusinessPartnerV6ResultFactory(
     ): LegalEntityPartnerCreateVerboseDto{
         return LegalEntityPartnerCreateVerboseDto(
             givenRequest.legalEntity.mapToExpectedVerbose(givenBpnL, currentness, legalEntityCreatedAt, legalEntityUpdatedAt),
-            mapToExpectedResult(
+            buildExpectedAddressResponse(
                 givenRequest.legalAddress,
                 givenBpnA,
                 givenBpnL,
@@ -80,7 +77,7 @@ class ExpectedBusinessPartnerV6ResultFactory(
     ): LegalEntityPartnerCreateVerboseDto{
         return LegalEntityPartnerCreateVerboseDto(
             givenRequest.legalEntity.mapToExpectedVerbose(givenRequest.bpnl, currentness, legalEntityCreatedAt, legalEntityUpdatedAt),
-            mapToExpectedResult(
+            buildExpectedAddressResponse(
                 givenRequest.legalAddress,
                 givenBpnA,
                 givenRequest.bpnl,
@@ -112,7 +109,7 @@ class ExpectedBusinessPartnerV6ResultFactory(
     ): LegalEntityWithLegalAddressVerboseDto {
         return LegalEntityWithLegalAddressVerboseDto(
             legalEntity = givenRequest.legalEntity.mapToExpectedVerbose(givenBpnL, currentness, legalEntityCreatedAt, legalEntityUpdatedAt),
-            legalAddress = mapToExpectedResult(
+            legalAddress = buildExpectedAddressResponse(
                 givenRequest.legalAddress,
                 givenBpnA,
                 givenBpnL,
@@ -143,7 +140,7 @@ class ExpectedBusinessPartnerV6ResultFactory(
                 siteCreatedAt = siteCreatedAt,
                 siteUpdatedAt = siteUpdatedAt
             ),
-            mainAddress =  mapToExpectedResult(
+            mainAddress =  buildExpectedAddressResponse(
                 givenRequest = givenRequest.site.mainAddress,
                 givenBpnA = givenBpnA,
                 bpnLegalEntity = givenRequest.bpnlParent,
@@ -198,7 +195,7 @@ class ExpectedBusinessPartnerV6ResultFactory(
                 siteCreatedAt = givenSite.site.createdAt,
                 siteUpdatedAt = siteUpdatedAt
             ),
-            mainAddress =  mapToExpectedResult(
+            mainAddress =  buildExpectedAddressResponse(
                 givenRequest = givenRequest.site.mainAddress,
                 givenBpnA = givenSite.mainAddress.bpna,
                 bpnLegalEntity = givenLegalEntity.legalEntity.bpnl,
@@ -235,7 +232,7 @@ class ExpectedBusinessPartnerV6ResultFactory(
                     confidenceCriteria = confidenceCriteria
                 )
             },
-            mainAddress = mapToExpectedResult(
+            mainAddress = buildExpectedAddressResponse(
                 givenRequest.site.mainAddress,
                 givenBpnA,
                 givenRequest.bpnlParent,
@@ -264,7 +261,7 @@ class ExpectedBusinessPartnerV6ResultFactory(
         createdAt: Instant = Instant.MIN,
         updatedAt: Instant = createdAt
     ): LogisticAddressVerboseDto {
-        return mapToExpectedResult(
+        return buildExpectedAddressResponse(
             givenRequest = givenRequest.legalAddress,
             givenBpnA = givenBpnA,
             bpnLegalEntity = bpnLegalEntity,
@@ -284,7 +281,7 @@ class ExpectedBusinessPartnerV6ResultFactory(
         createdAt: Instant = Instant.MIN,
         updatedAt: Instant = createdAt
     ): LogisticAddressVerboseDto {
-        return mapToExpectedResult(
+        return buildExpectedAddressResponse(
             givenRequest = givenRequest.site.mainAddress,
             givenBpnA = givenBpnA,
             bpnLegalEntity = givenRequest.bpnlParent,
@@ -296,6 +293,50 @@ class ExpectedBusinessPartnerV6ResultFactory(
         )
     }
 
+    fun buildExpectedAdditionalAddressCreateResponse(
+        givenRequest: AddressPartnerCreateRequest,
+        givenLegalEntity: LegalEntityPartnerCreateVerboseDto,
+        givenBpnA: String = StringIgnoreComparator.IGNORE_STRING,
+        createdAt: Instant = Instant.MIN,
+        updatedAt: Instant = createdAt
+    ): AddressPartnerCreateVerboseDto{
+        return AddressPartnerCreateVerboseDto(
+            address = buildExpectedAddressResponse(
+                givenRequest.address,
+                givenBpnA,
+                givenLegalEntity.legalEntity.bpnl,
+                null,
+                AddressType.AdditionalAddress,
+                givenLegalEntity.legalEntity.isCatenaXMemberData,
+                createdAt,
+                updatedAt
+            ),
+            index = givenRequest.index
+        )
+    }
+
+    fun buildExpectedAdditionalAddressCreateResponse(
+        givenRequest: AddressPartnerCreateRequest,
+        givenSite: SitePartnerCreateVerboseDto,
+        givenBpnA: String = StringIgnoreComparator.IGNORE_STRING,
+        createdAt: Instant = Instant.MIN,
+        updatedAt: Instant = createdAt
+    ): AddressPartnerCreateVerboseDto{
+        return AddressPartnerCreateVerboseDto(
+            address = buildExpectedAddressResponse(
+                givenRequest.address,
+                givenBpnA,
+                givenSite.site.bpnLegalEntity,
+                givenSite.site.bpns,
+                AddressType.AdditionalAddress,
+                givenSite.site.isCatenaXMemberData,
+                createdAt,
+                updatedAt
+            ),
+            index = givenRequest.index
+        )
+    }
+
     fun mapToExpectedAdditionalAddress(
         givenRequest: AddressPartnerCreateRequest,
         isCatenaXMemberData: Boolean,
@@ -304,7 +345,7 @@ class ExpectedBusinessPartnerV6ResultFactory(
         createdAt: Instant = Instant.MIN,
         updatedAt: Instant = createdAt
     ): LogisticAddressVerboseDto {
-        return mapToExpectedResult(
+        return buildExpectedAddressResponse(
             givenRequest = givenRequest.address,
             givenBpnA = givenBpnA,
             bpnLegalEntity = bpnLegalEntityOverwrite ?: givenRequest.bpnParent.takeIf { it.startsWith("BPNL") },
@@ -316,7 +357,7 @@ class ExpectedBusinessPartnerV6ResultFactory(
         )
     }
 
-    private fun mapToExpectedResult(
+    private fun buildExpectedAddressResponse(
         givenRequest: LogisticAddressDto,
         givenBpnA: String,
         bpnLegalEntity: String?,
