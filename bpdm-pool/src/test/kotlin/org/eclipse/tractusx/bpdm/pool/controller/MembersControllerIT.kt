@@ -145,6 +145,6 @@ class MembersControllerIT @Autowired constructor(
     fun createLegalEntity(seed: String, isCatenaXMemberData: Boolean = true) =
         LegalEntityHierarchy(testDataEnvironment.requestFactory.createLegalEntityRequest(seed, isCatenaXMemberData))
 
-    fun createSite(seed: String) = SiteHierarchy(testDataEnvironment.requestFactory.createSiteRequest(seed, ""))
+    fun createSite(seed: String) = SiteHierarchy(testDataEnvironment.requestFactory.buildSiteCreateRequest(seed, ""))
     fun createAddress(seed: String) = testDataEnvironment.requestFactory.createAddressRequest(seed, "")
 }
