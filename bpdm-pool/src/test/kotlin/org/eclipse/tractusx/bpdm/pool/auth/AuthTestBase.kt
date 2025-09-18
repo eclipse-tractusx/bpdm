@@ -68,7 +68,7 @@ abstract class AuthTestBase(
 
     @Test
     fun `PUT Addresses`(){
-        authAssertions.assert(addressAuthExpectations.putAddresses) { poolApiClient.addresses.updateAddresses(listOf(requestFactory.createAddressUpdateRequest("1", ""))) }
+        authAssertions.assert(addressAuthExpectations.putAddresses) { poolApiClient.addresses.updateAddresses(listOf(requestFactory.buildAddressUpdateRequest("1", ""))) }
     }
 
     @Test

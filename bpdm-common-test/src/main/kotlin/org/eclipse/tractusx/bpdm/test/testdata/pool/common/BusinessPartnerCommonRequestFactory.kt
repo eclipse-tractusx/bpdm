@@ -103,7 +103,7 @@ abstract class BusinessPartnerCommonRequestFactory(
         )
     }
 
-    fun createAddressUpdateRequest(seed: String, bpna: String): AddressPartnerUpdateRequest {
+    fun buildAddressUpdateRequest(seed: String, bpna: String): AddressPartnerUpdateRequest {
         return AddressPartnerUpdateRequest(bpna, createAddressDto(seed))
     }
 
