@@ -89,6 +89,16 @@ class AssertRepositoryV6(
             val mainAddressUpdatedAt =  "${mainAddress}.${LogisticAddressVerboseDto::updatedAt.name}"
         }
 
+        private object AdditionalAddressUpsertPaths{
+            private val entities = AddressPartnerCreateResponseWrapper::entities.name
+            private val errors =  AddressPartnerCreateResponseWrapper::errors.name
+            private val address =  "${entities}.${AddressPartnerCreateVerboseDto::address.name}"
+            val bpnA = "${address}.${LogisticAddressVerboseDto::bpna.name}"
+            val createdAt = "${address}.${LogisticAddressVerboseDto::createdAt.name}"
+            val updatedAt = "${address}.${LogisticAddressVerboseDto::updatedAt.name}"
+            val errorMessage = "${errors}.${ErrorInfo<*>::message.name}"
+        }
+
     }
 
 
@@ -178,6 +188,19 @@ class AssertRepositoryV6(
                 SiteSearchResponsePaths.siteUpdatedAt,
                 SiteSearchResponsePaths.mainAddressCreatedAt,
                 SiteSearchResponsePaths.mainAddressUpdatedAt,
+            )
+            .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
+            .isEqualTo(expected)
+    }
+
+    fun assertAdditionalAddressCreate(actual: AddressPartnerCreateResponseWrapper, expected: AddressPartnerCreateResponseWrapper){
+        Assertions.assertThat(actual)
+            .usingRecursiveComparison()
+            .ignoringFields(
+                AdditionalAddressUpsertPaths.bpnA,
+                AdditionalAddressUpsertPaths.createdAt,
+                AdditionalAddressUpsertPaths.updatedAt,
+                AdditionalAddressUpsertPaths.errorMessage
             )
             .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
             .isEqualTo(expected)

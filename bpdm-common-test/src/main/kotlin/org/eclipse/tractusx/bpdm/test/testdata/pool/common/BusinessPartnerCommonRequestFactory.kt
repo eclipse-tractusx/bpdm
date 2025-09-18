@@ -39,14 +39,14 @@ abstract class BusinessPartnerCommonRequestFactory(
         return SitePartnerCreateRequest(
             bpnlParent = bpnlParent,
             index = seed,
-            site = createSiteDto(seed)
+            site = createSiteDto("Main Address $seed")
         )
     }
 
     fun createSiteUpdateRequest(seed: String, bpns: String): SitePartnerUpdateRequest {
         return SitePartnerUpdateRequest(
             bpns = bpns,
-            site = createSiteDto(seed)
+            site = createSiteDto("Main Address $seed")
         )
     }
 
@@ -92,7 +92,7 @@ abstract class BusinessPartnerCommonRequestFactory(
         )
     }
 
-    fun createAddressRequest(seed: String, bpnParent: String): AddressPartnerCreateRequest {
+    fun buildAdditionalAddressCreateRequest(seed: String, bpnParent: String): AddressPartnerCreateRequest {
         val longSeed = seed.hashCode().toLong()
         val random = Random(longSeed)
 

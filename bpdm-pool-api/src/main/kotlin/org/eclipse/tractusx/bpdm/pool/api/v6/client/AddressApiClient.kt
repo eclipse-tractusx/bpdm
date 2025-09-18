@@ -19,14 +19,18 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.v6.client
 
-interface PoolApiClient {
+import org.eclipse.tractusx.bpdm.pool.api.ApiCommons
+import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerCreateResponseWrapper
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.service.annotation.HttpExchange
+import org.springframework.web.service.annotation.PostExchange
 
-    val metadata: MetadataApiClient
+@HttpExchange
+interface AddressApiClient {
 
-    val legalEntities: LegalEntityApiClient
-
-    val sites: SiteApiClient
-
-    val addresses: AddressApiClient
-
+    @PostExchange(value = ApiCommons.ADDRESS_BASE_PATH_V6)
+    fun createAddresses(
+        @RequestBody requests: Collection<AddressPartnerCreateRequest>
+    ): AddressPartnerCreateResponseWrapper
 }

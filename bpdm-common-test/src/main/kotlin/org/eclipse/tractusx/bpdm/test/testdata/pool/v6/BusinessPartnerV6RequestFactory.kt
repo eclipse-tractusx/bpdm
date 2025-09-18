@@ -47,7 +47,7 @@ class BusinessPartnerV6RequestFactory(
 
         return LegalEntityPartnerCreateRequest(
             legalEntity = createLegalEntityDto(seed, random),
-            legalAddress = createAddressDto(seed, random),
+            legalAddress = createAddressDto("Legal Address $seed", random),
             index = seed
         )
     }
@@ -59,7 +59,7 @@ class BusinessPartnerV6RequestFactory(
         return LegalEntityPartnerUpdateRequest(
             bpnl = bpnl,
             legalEntity = createLegalEntityDto(seed, random),
-            legalAddress = createAddressDto(seed, random)
+            legalAddress = createAddressDto("Legal Address $seed", random)
         )
     }
 
