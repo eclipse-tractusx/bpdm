@@ -99,6 +99,14 @@ class AssertRepositoryV6(
             val errorMessage = "${errors}.${ErrorInfo<*>::message.name}"
         }
 
+        private object AddressUpdatePaths{
+            private val entities = AddressPartnerUpdateResponseWrapper::entities.name
+            private val errors =  AddressPartnerUpdateResponseWrapper::errors.name
+            val createdAt = "${entities}.${LogisticAddressVerboseDto::createdAt.name}"
+            val updatedAt = "${entities}.${LogisticAddressVerboseDto::updatedAt.name}"
+            val errorMessage = "${errors}.${ErrorInfo<*>::message.name}"
+        }
+
     }
 
 
@@ -201,6 +209,18 @@ class AssertRepositoryV6(
                 AdditionalAddressUpsertPaths.createdAt,
                 AdditionalAddressUpsertPaths.updatedAt,
                 AdditionalAddressUpsertPaths.errorMessage
+            )
+            .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
+            .isEqualTo(expected)
+    }
+    fun assertAddressUpdate(actual: AddressPartnerUpdateResponseWrapper, expected: AddressPartnerUpdateResponseWrapper){
+        Assertions.assertThat(actual)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .ignoringFields(
+                AddressUpdatePaths.createdAt,
+                AddressUpdatePaths.updatedAt,
+                AddressUpdatePaths.errorMessage
             )
             .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
             .isEqualTo(expected)

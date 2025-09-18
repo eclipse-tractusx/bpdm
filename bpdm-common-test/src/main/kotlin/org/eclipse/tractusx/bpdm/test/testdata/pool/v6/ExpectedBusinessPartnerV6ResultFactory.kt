@@ -22,10 +22,7 @@ package org.eclipse.tractusx.bpdm.test.testdata.pool.v6
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.*
-import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteCreateRequestWithLegalAddressAsMain
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressVerboseDto
@@ -334,6 +331,78 @@ class ExpectedBusinessPartnerV6ResultFactory(
                 updatedAt
             ),
             index = givenRequest.index
+        )
+    }
+
+    fun buildExpectedLegalAddressUpdateResponse(
+        givenRequest: AddressPartnerUpdateRequest,
+        givenLegalEntity: LegalEntityPartnerCreateVerboseDto,
+        createdAt: Instant = Instant.MIN,
+        updatedAt: Instant = createdAt
+    ): LogisticAddressVerboseDto{
+        return buildExpectedAddressResponse(
+                givenRequest.address,
+                givenRequest.bpna,
+                givenLegalEntity.legalEntity.bpnl,
+                null,
+                givenLegalEntity.legalAddress.addressType!!,
+                givenLegalEntity.legalEntity.isCatenaXMemberData,
+                createdAt,
+                updatedAt
+            )
+    }
+
+    fun buildExpectedAdditionalAddressUpdateResponse(
+        givenRequest: AddressPartnerUpdateRequest,
+        givenLegalEntity: LegalEntityPartnerCreateVerboseDto,
+        createdAt: Instant = Instant.MIN,
+        updatedAt: Instant = createdAt
+    ): LogisticAddressVerboseDto{
+        return buildExpectedAddressResponse(
+            givenRequest.address,
+            givenRequest.bpna,
+            givenLegalEntity.legalEntity.bpnl,
+            null,
+            AddressType.AdditionalAddress,
+            givenLegalEntity.legalEntity.isCatenaXMemberData,
+            createdAt,
+            updatedAt
+        )
+    }
+
+    fun buildExpectedMainAddressUpdateResponse(
+        givenRequest: AddressPartnerUpdateRequest,
+        givenSite: SitePartnerCreateVerboseDto,
+        createdAt: Instant = Instant.MIN,
+        updatedAt: Instant = createdAt
+    ): LogisticAddressVerboseDto{
+        return buildExpectedAddressResponse(
+            givenRequest.address,
+            givenRequest.bpna,
+            givenSite.site.bpnLegalEntity,
+            givenSite.site.bpns,
+            givenSite.mainAddress.addressType!!,
+            givenSite.site.isCatenaXMemberData,
+            createdAt,
+            updatedAt
+        )
+    }
+
+    fun buildExpectedAdditionalAddressUpdateResponse(
+        givenRequest: AddressPartnerUpdateRequest,
+        givenSite: SitePartnerCreateVerboseDto,
+        createdAt: Instant = Instant.MIN,
+        updatedAt: Instant = createdAt
+    ): LogisticAddressVerboseDto{
+        return buildExpectedAddressResponse(
+            givenRequest.address,
+            givenRequest.bpna,
+            givenSite.site.bpnLegalEntity,
+            givenSite.site.bpns,
+            AddressType.AdditionalAddress,
+            givenSite.site.isCatenaXMemberData,
+            createdAt,
+            updatedAt
         )
     }
 
