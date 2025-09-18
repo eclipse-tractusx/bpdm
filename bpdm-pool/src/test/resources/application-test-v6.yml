@@ -1,0 +1,8 @@
+test:
+  v6: "true"
+bpdm:
+  tasks:
+    cron: '-'
+spring:
+  flyway:
+    clean-disabled: false
