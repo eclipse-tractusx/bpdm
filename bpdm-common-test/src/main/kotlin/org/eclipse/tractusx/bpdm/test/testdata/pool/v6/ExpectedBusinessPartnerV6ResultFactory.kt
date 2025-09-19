@@ -94,34 +94,9 @@ class ExpectedBusinessPartnerV6ResultFactory(
         return LegalEntityWithLegalAddressVerboseDto(legalEntity = givenCreateResponse.legalEntity, legalAddress = givenCreateResponse.legalAddress)
     }
 
-    fun mapToExpectedLegalEntity(
-        givenRequest: LegalEntityPartnerCreateRequest,
-        givenBpnL: String = StringIgnoreComparator.IGNORE_STRING,
-        givenBpnA: String = StringIgnoreComparator.IGNORE_STRING,
-        currentness: Instant = Instant.MIN,
-        legalEntityCreatedAt: Instant = currentness,
-        legalEntityUpdatedAt: Instant = currentness,
-        addressCreatedAt: Instant = currentness,
-        addressUpdatedAt: Instant = currentness,
-    ): LegalEntityWithLegalAddressVerboseDto {
-        return LegalEntityWithLegalAddressVerboseDto(
-            legalEntity = givenRequest.legalEntity.mapToExpectedVerbose(givenBpnL, currentness, legalEntityCreatedAt, legalEntityUpdatedAt),
-            legalAddress = buildExpectedAddressResponse(
-                givenRequest.legalAddress,
-                givenBpnA,
-                givenBpnL,
-                null,
-                AddressType.LegalAddress,
-                givenRequest.legalEntity.isCatenaXMemberData,
-                addressCreatedAt,
-                addressUpdatedAt
-            )
-        )
-    }
-
     fun buildExpectedSiteCreateResponse(
         givenRequest: SitePartnerCreateRequest,
-        isCatenaXMemberData: Boolean,
+        legalEntityParent: LegalEntityPartnerCreateVerboseDto,
         givenBpnS: String = StringIgnoreComparator.IGNORE_STRING,
         givenBpnA: String = StringIgnoreComparator.IGNORE_STRING,
         siteCreatedAt: Instant = Instant.MIN,
@@ -131,7 +106,7 @@ class ExpectedBusinessPartnerV6ResultFactory(
     ): SitePartnerCreateVerboseDto{
         return SitePartnerCreateVerboseDto(
             site = givenRequest.site.mapToExpectedVerbose(
-                isCatenaXMemberData = isCatenaXMemberData,
+                isCatenaXMemberData = legalEntityParent.legalEntity.isCatenaXMemberData,
                 bpnLParent = givenRequest.bpnlParent,
                 givenBpnS = givenBpnS,
                 siteCreatedAt = siteCreatedAt,
@@ -143,7 +118,7 @@ class ExpectedBusinessPartnerV6ResultFactory(
                 bpnLegalEntity = givenRequest.bpnlParent,
                 bpnSite = givenBpnS,
                 addressType = AddressType.SiteMainAddress,
-                isCatenaXMemberData = isCatenaXMemberData,
+                isCatenaXMemberData = legalEntityParent.legalEntity.isCatenaXMemberData,
                 createdAt = addressCreatedAt,
                 updatedAt = addressUpdatedAt
             ),
@@ -206,87 +181,12 @@ class ExpectedBusinessPartnerV6ResultFactory(
         )
     }
 
-    fun mapToExpectedSite(
-        givenRequest: SitePartnerCreateRequest,
-        isCatenaXMemberData: Boolean,
-        givenBpnS: String = StringIgnoreComparator.IGNORE_STRING,
-        givenBpnA: String = StringIgnoreComparator.IGNORE_STRING,
-        siteCreatedAt: Instant = Instant.MIN,
-        siteUpdatedAt: Instant = siteCreatedAt,
-        addressCreatedAt: Instant = siteCreatedAt,
-        addressUpdatedAt: Instant = siteCreatedAt
-    ): SiteWithMainAddressVerboseDto {
-        return SiteWithMainAddressVerboseDto(
-            site = with(givenRequest.site) {
-                SiteVerboseDto(
-                    bpns = givenBpnS,
-                    name = name,
-                    states = states.map { mapToExpectedResult(it) },
-                    isCatenaXMemberData = isCatenaXMemberData,
-                    bpnLegalEntity = givenRequest.bpnlParent,
-                    createdAt = siteCreatedAt,
-                    updatedAt = siteUpdatedAt,
-                    confidenceCriteria = confidenceCriteria
-                )
-            },
-            mainAddress = buildExpectedAddressResponse(
-                givenRequest.site.mainAddress,
-                givenBpnA,
-                givenRequest.bpnlParent,
-                givenBpnS,
-                AddressType.SiteMainAddress,
-                isCatenaXMemberData,
-                addressCreatedAt,
-                addressUpdatedAt
-            )
-        )
-    }
-
     fun buildExpectedSiteSearchResponse(
         givenSiteCreateResponse: SitePartnerCreateVerboseDto
     ): SiteWithMainAddressVerboseDto{
         return SiteWithMainAddressVerboseDto(
             site = givenSiteCreateResponse.site,
             mainAddress = givenSiteCreateResponse.mainAddress
-        )
-    }
-
-    fun mapLegalEntityToExpectedLegalAddress(
-        givenRequest: LegalEntityPartnerCreateRequest,
-        givenBpnA: String = StringIgnoreComparator.IGNORE_STRING,
-        bpnLegalEntity: String = StringIgnoreComparator.IGNORE_STRING,
-        createdAt: Instant = Instant.MIN,
-        updatedAt: Instant = createdAt
-    ): LogisticAddressVerboseDto {
-        return buildExpectedAddressResponse(
-            givenRequest = givenRequest.legalAddress,
-            givenBpnA = givenBpnA,
-            bpnLegalEntity = bpnLegalEntity,
-            bpnSite = null,
-            addressType = AddressType.LegalAddress,
-            isCatenaXMemberData = givenRequest.legalEntity.isCatenaXMemberData,
-            createdAt = createdAt,
-            updatedAt = updatedAt
-        )
-    }
-
-    fun mapSiteToExpectedSiteMainAddress(
-        givenRequest: SitePartnerCreateRequest,
-        isCatenaXMemberData: Boolean,
-        givenBpnA: String = StringIgnoreComparator.IGNORE_STRING,
-        bpnSite: String = StringIgnoreComparator.IGNORE_STRING,
-        createdAt: Instant = Instant.MIN,
-        updatedAt: Instant = createdAt
-    ): LogisticAddressVerboseDto {
-        return buildExpectedAddressResponse(
-            givenRequest = givenRequest.site.mainAddress,
-            givenBpnA = givenBpnA,
-            bpnLegalEntity = givenRequest.bpnlParent,
-            bpnSite = bpnSite,
-            addressType = AddressType.SiteMainAddress,
-            isCatenaXMemberData = isCatenaXMemberData,
-            createdAt = createdAt,
-            updatedAt = updatedAt
         )
     }
 
@@ -403,26 +303,6 @@ class ExpectedBusinessPartnerV6ResultFactory(
             givenSite.site.isCatenaXMemberData,
             createdAt,
             updatedAt
-        )
-    }
-
-    fun mapToExpectedAdditionalAddress(
-        givenRequest: AddressPartnerCreateRequest,
-        isCatenaXMemberData: Boolean,
-        givenBpnA: String = StringIgnoreComparator.IGNORE_STRING,
-        bpnLegalEntityOverwrite: String? = null,
-        createdAt: Instant = Instant.MIN,
-        updatedAt: Instant = createdAt
-    ): LogisticAddressVerboseDto {
-        return buildExpectedAddressResponse(
-            givenRequest = givenRequest.address,
-            givenBpnA = givenBpnA,
-            bpnLegalEntity = bpnLegalEntityOverwrite ?: givenRequest.bpnParent.takeIf { it.startsWith("BPNL") },
-            bpnSite = givenRequest.bpnParent.takeIf { it.startsWith("BPNS") },
-            addressType = AddressType.AdditionalAddress,
-            isCatenaXMemberData = isCatenaXMemberData,
-            createdAt = createdAt,
-            updatedAt = updatedAt
         )
     }
 

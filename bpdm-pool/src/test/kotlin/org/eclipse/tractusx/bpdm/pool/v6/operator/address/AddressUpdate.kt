@@ -19,12 +19,14 @@
 
 package org.eclipse.tractusx.bpdm.pool.v6.operator.address
 
+import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressUpdateError
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.v6.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerUpdateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.v6.operator.OperatorTest
 import org.eclipse.tractusx.bpdm.pool.v6.util.AssertRepositoryV6
+import org.eclipse.tractusx.bpdm.pool.v6.util.TestDataClientV6
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v6.TestDataV6Factory
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -33,7 +35,8 @@ import org.springframework.beans.factory.annotation.Autowired
 class AddressUpdate @Autowired constructor(
     private val poolClient: PoolApiClient,
     private val testDataV6Factory: TestDataV6Factory,
-    private val assertRepo: AssertRepositoryV6
+    private val assertRepo: AssertRepositoryV6,
+    private val testDataClient: TestDataClientV6
 ): OperatorTest() {
 
     /**
@@ -44,11 +47,10 @@ class AddressUpdate @Autowired constructor(
     @Test
     fun `update valid legal address`(){
         //GIVEN
-        val legalEntityRequest = testDataV6Factory.request.buildLegalEntityCreateRequest(testName)
-        val legalEntityResponse = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single()
+        val legalEntityResponse = testDataClient.createLegalEntity(testName)
 
         //WHEN
-        val addressRequest = testDataV6Factory.request.buildAddressUpdateRequest(testName, legalEntityResponse.legalAddress.bpna)
+        val addressRequest = testDataV6Factory.request.buildAddressUpdateRequest(testName, legalEntityResponse)
         val addressResponse = poolClient.addresses.updateAddresses(listOf(addressRequest))
 
         //THEN
@@ -66,11 +68,8 @@ class AddressUpdate @Autowired constructor(
     @Test
     fun `update valid site main address`(){
         //GIVEN
-        val legalEntityRequest = testDataV6Factory.request.buildLegalEntityCreateRequest(testName)
-        val legalEntityResponse = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single()
-
-        val siteRequest = testDataV6Factory.request.buildSiteCreateRequest(testName, legalEntityResponse.legalEntity.bpnl)
-        val siteResponse = poolClient.sites.createSite(listOf(siteRequest)).entities.single()
+        val legalEntityResponse = testDataClient.createLegalEntity(testName)
+        val siteResponse = testDataClient.createSiteFor(legalEntityResponse, testName)
 
         //WHEN
         val addressRequest = testDataV6Factory.request.buildAddressUpdateRequest(testName, siteResponse.mainAddress.bpna)
@@ -91,11 +90,8 @@ class AddressUpdate @Autowired constructor(
     @Test
     fun `update valid legal site main address`(){
         //GIVEN
-        val legalEntityRequest = testDataV6Factory.request.buildLegalEntityCreateRequest(testName)
-        val legalEntityResponse = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single()
-
-        val siteRequest = testDataV6Factory.request.buildLegalAddressSiteCreateRequest(testName, legalEntityResponse.legalEntity.bpnl)
-        val siteResponse = poolClient.sites.createSiteWithLegalReference(listOf(siteRequest)).entities.single()
+        val legalEntityResponse = testDataClient.createLegalEntity(testName)
+        val siteResponse = testDataClient.createLegalAddressSiteFor(legalEntityResponse, testName)
 
         //WHEN
         val addressRequest = testDataV6Factory.request.buildAddressUpdateRequest(testName, siteResponse.mainAddress.bpna)
@@ -116,14 +112,11 @@ class AddressUpdate @Autowired constructor(
     @Test
     fun `update valid additional address`(){
         //GIVEN
-        val legalEntityRequest = testDataV6Factory.request.buildLegalEntityCreateRequest(testName)
-        val legalEntityResponse = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single()
-
-        val addressCreateRequest =  testDataV6Factory.request.buildAdditionalAddressCreateRequest(testName, legalEntityResponse.legalEntity.bpnl)
-        val addressCreateResponse = poolClient.addresses.createAddresses(listOf(addressCreateRequest)).entities.single()
+        val legalEntityResponse = testDataClient.createLegalEntity(testName)
+        val addressCreateResponse = testDataClient.createAdditionalAddressFor(legalEntityResponse, testName)
 
         //WHEN
-        val addressUpdateRequest = testDataV6Factory.request.buildAddressUpdateRequest("Update $testName", addressCreateResponse.address.bpna)
+        val addressUpdateRequest = testDataV6Factory.request.buildAddressUpdateRequest("Updated $testName", addressCreateResponse.address.bpna)
         val addressUpdateResponse = poolClient.addresses.updateAddresses(listOf(addressUpdateRequest))
 
         //THEN
@@ -141,17 +134,12 @@ class AddressUpdate @Autowired constructor(
     @Test
     fun `update valid additional site address`(){
         //GIVEN
-        val legalEntityRequest = testDataV6Factory.request.buildLegalEntityCreateRequest(testName)
-        val legalEntityResponse = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single()
-
-        val siteRequest = testDataV6Factory.request.buildLegalAddressSiteCreateRequest(testName, legalEntityResponse.legalEntity.bpnl)
-        val siteResponse = poolClient.sites.createSiteWithLegalReference(listOf(siteRequest)).entities.single()
-
-        val addressCreateRequest =  testDataV6Factory.request.buildAdditionalAddressCreateRequest(testName, siteResponse.site.bpns)
-        val addressCreateResponse = poolClient.addresses.createAddresses(listOf(addressCreateRequest)).entities.single()
+        val legalEntityResponse = testDataClient.createLegalEntity(testName)
+        val siteResponse = testDataClient.createSiteFor(legalEntityResponse, testName)
+        val addressCreateResponse = testDataClient.createAdditionalAddressFor(siteResponse, testName)
 
         //WHEN
-        val addressUpdateRequest = testDataV6Factory.request.buildAddressUpdateRequest("Update $testName", addressCreateResponse.address.bpna)
+        val addressUpdateRequest = testDataV6Factory.request.buildAddressUpdateRequest("Updated $testName", addressCreateResponse)
         val addressUpdateResponse = poolClient.addresses.updateAddresses(listOf(addressUpdateRequest))
 
         //THEN
@@ -186,17 +174,14 @@ class AddressUpdate @Autowired constructor(
     @Test
     fun `try update address with duplicate identifier`(){
         //GIVEN
-        val legalEntityRequest = testDataV6Factory.request.buildLegalEntityCreateRequest(testName)
-        val legalEntityResponse = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single()
+        val legalEntityResponse = testDataClient.createLegalEntity(testName)
+        val identifierX = legalEntityResponse.legalAddress.identifiers.first()
 
-        val identifierX = legalEntityRequest.legalAddress.identifiers.first()
-
-        val addressCreateRequest =  testDataV6Factory.request.buildAdditionalAddressCreateRequest(testName, legalEntityResponse.legalEntity.bpnl)
-        val addressCreateResponse = poolClient.addresses.createAddresses(listOf(addressCreateRequest)).entities.single()
+        val addressCreateResponse = testDataClient.createAdditionalAddressFor(legalEntityResponse, testName)
 
         //WHEN
-        val addressRequest = with(testDataV6Factory.request.buildAddressUpdateRequest(testName, addressCreateResponse.address.bpna)){
-            copy(address = address.copy(identifiers = listOf(identifierX)))
+        val addressRequest = with(testDataV6Factory.request.buildAddressUpdateRequest(testName, addressCreateResponse)){
+            copy(address = address.copy(identifiers = listOf(AddressIdentifierDto(identifierX.value, identifierX.type))))
         }
         val addressResponse = poolClient.addresses.updateAddresses(listOf(addressRequest))
 
@@ -215,11 +200,10 @@ class AddressUpdate @Autowired constructor(
     @Test
     fun `try update address with unknown physical region`(){
         //GIVEN
-        val legalEntityRequest = testDataV6Factory.request.buildLegalEntityCreateRequest(testName)
-        val legalEntityResponse = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single()
+        val legalEntityResponse = testDataClient.createLegalEntity(testName)
 
         //WHEN
-        val addressRequest = with(testDataV6Factory.request.buildAddressUpdateRequest(testName, legalEntityResponse.legalAddress.bpna)){
+        val addressRequest = with(testDataV6Factory.request.buildAddressUpdateRequest(testName, legalEntityResponse)){
             copy(address = address.copy(physicalPostalAddress = address.physicalPostalAddress.copy(administrativeAreaLevel1 = "UNKNOWN")))
         }
         val addressResponse = poolClient.addresses.updateAddresses(listOf(addressRequest))
@@ -239,11 +223,10 @@ class AddressUpdate @Autowired constructor(
     @Test
     fun `try update address with unknown alternative region`(){
         //GIVEN
-        val legalEntityRequest = testDataV6Factory.request.buildLegalEntityCreateRequest(testName)
-        val legalEntityResponse = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single()
+        val legalEntityResponse = testDataClient.createLegalEntity(testName)
 
         //WHEN
-        val addressRequest = with(testDataV6Factory.request.buildAddressUpdateRequest(testName, legalEntityResponse.legalAddress.bpna)){
+        val addressRequest = with(testDataV6Factory.request.buildAddressUpdateRequest(testName, legalEntityResponse)){
             copy(address = address.copy(alternativePostalAddress = address.alternativePostalAddress!!.copy(administrativeAreaLevel1 = "UNKNOWN")))
         }
         val addressResponse = poolClient.addresses.updateAddresses(listOf(addressRequest))
@@ -263,11 +246,10 @@ class AddressUpdate @Autowired constructor(
     @Test
     fun `try update address with unknown identifier type`(){
         //GIVEN
-        val legalEntityRequest = testDataV6Factory.request.buildLegalEntityCreateRequest(testName)
-        val legalEntityResponse = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single()
+        val legalEntityResponse = testDataClient.createLegalEntity(testName)
 
         //WHEN
-        val addressRequest = with(testDataV6Factory.request.buildAddressUpdateRequest(testName, legalEntityResponse.legalAddress.bpna)){
+        val addressRequest = with(testDataV6Factory.request.buildAddressUpdateRequest(testName, legalEntityResponse)){
             val unknownIdentifier = address.identifiers.first().copy(type = "UNKNOWN")
             copy(address = address.copy(identifiers = address.identifiers.drop(1).plus(unknownIdentifier)))
         }
@@ -292,11 +274,10 @@ class AddressUpdate @Autowired constructor(
     @Disabled
     fun `try update address with too many identifiers`(){
         //GIVEN
-        val legalEntityRequest = testDataV6Factory.request.buildLegalEntityCreateRequest(testName)
-        val legalEntityResponse = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single()
+        val legalEntityResponse = testDataClient.createLegalEntity(testName)
 
         //WHEN
-        val addressRequest = with(testDataV6Factory.request.buildAddressUpdateRequest(testName, legalEntityResponse.legalAddress.bpna)){
+        val addressRequest = with(testDataV6Factory.request.buildAddressUpdateRequest(testName, legalEntityResponse)){
             val tooManyIdentifiers = (1 .. 101).map { testDataV6Factory.request.createAddressIdentifier(testName, it) }
             copy(address = address.copy(identifiers = tooManyIdentifiers))
         }

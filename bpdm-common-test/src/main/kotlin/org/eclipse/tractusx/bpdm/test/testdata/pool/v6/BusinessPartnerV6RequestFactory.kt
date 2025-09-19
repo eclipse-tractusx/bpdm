@@ -26,6 +26,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityStateDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntityPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntityPartnerUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateVerboseDto
 import org.eclipse.tractusx.bpdm.test.testdata.pool.common.BusinessPartnerCommonRequestFactory
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -50,6 +51,10 @@ class BusinessPartnerV6RequestFactory(
             legalAddress = createAddressDto("Legal Address $seed", random),
             index = seed
         )
+    }
+
+    fun createLegalEntityUpdateRequest(seed: String, legalEntityToUpdate: LegalEntityPartnerCreateVerboseDto): LegalEntityPartnerUpdateRequest {
+        return createLegalEntityUpdateRequest(seed, legalEntityToUpdate.legalEntity.bpnl)
     }
 
     fun createLegalEntityUpdateRequest(seed: String, bpnl: String): LegalEntityPartnerUpdateRequest {

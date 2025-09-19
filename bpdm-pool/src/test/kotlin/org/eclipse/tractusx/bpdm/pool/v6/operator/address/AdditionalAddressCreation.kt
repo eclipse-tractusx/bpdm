@@ -20,12 +20,14 @@
 package org.eclipse.tractusx.bpdm.pool.v6.operator.address
 
 
+import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressCreateError
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.v6.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerCreateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.v6.operator.OperatorTest
 import org.eclipse.tractusx.bpdm.pool.v6.util.AssertRepositoryV6
+import org.eclipse.tractusx.bpdm.pool.v6.util.TestDataClientV6
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v6.TestDataV6Factory
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -34,7 +36,8 @@ import org.springframework.beans.factory.annotation.Autowired
 class AdditionalAddressCreation @Autowired constructor(
     private val poolClient: PoolApiClient,
     private val testDataV6Factory: TestDataV6Factory,
-    private val assertRepo: AssertRepositoryV6
+    private val assertRepo: AssertRepositoryV6,
+    private val testDataClientV6: TestDataClientV6
 ): OperatorTest() {
 
     /**
@@ -45,8 +48,7 @@ class AdditionalAddressCreation @Autowired constructor(
     @Test
     fun `create valid additional address`(){
         //GIVEN
-        val legalEntityRequest = testDataV6Factory.request.buildLegalEntityCreateRequest(testName)
-        val legalEntityResponse = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single()
+        val legalEntityResponse = testDataClientV6.createLegalEntity(testName)
 
         //WHEN
         val addressRequest = testDataV6Factory.request.buildAdditionalAddressCreateRequest(testName, legalEntityResponse.legalEntity.bpnl)
@@ -67,11 +69,8 @@ class AdditionalAddressCreation @Autowired constructor(
     @Test
     fun `create valid additional site address`(){
         //GIVEN
-        val legalEntityRequest = testDataV6Factory.request.buildLegalEntityCreateRequest(testName)
-        val legalEntityResponse = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single()
-
-        val siteRequest = testDataV6Factory.request.buildSiteCreateRequest(testName, legalEntityResponse.legalEntity.bpnl)
-        val siteResponse = poolClient.sites.createSite(listOf(siteRequest)).entities.single()
+        val legalEntityResponse = testDataClientV6.createLegalEntity(testName)
+        val siteResponse = testDataClientV6.createSiteFor(legalEntityResponse, testName)
 
         //WHEN
         val addressRequest = testDataV6Factory.request.buildAdditionalAddressCreateRequest(testName, siteResponse.site.bpns)
@@ -143,13 +142,12 @@ class AdditionalAddressCreation @Autowired constructor(
     @Test
     fun `try create additional address with duplicate identifier`(){
         //GIVEN
-        val legalEntityRequest = testDataV6Factory.request.buildLegalEntityCreateRequest(testName)
-        val legalEntityResponse = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single()
-        val identifierX = legalEntityRequest.legalAddress.identifiers.first()
+        val legalEntityResponse = testDataClientV6.createLegalEntity(testName)
+        val identifierX = legalEntityResponse.legalAddress.identifiers.first()
 
         //WHEN
-        val addressRequest = with(testDataV6Factory.request.buildAdditionalAddressCreateRequest(testName, legalEntityResponse.legalEntity.bpnl)){
-            copy(address = address.copy(identifiers = listOf(identifierX)))
+        val addressRequest = with(testDataV6Factory.request.buildAdditionalAddressCreateRequest(testName, legalEntityResponse)){
+            copy(address = address.copy(identifiers = listOf(AddressIdentifierDto(identifierX.value, identifierX.type))))
         }
         val addressResponse = poolClient.addresses.createAddresses(listOf(addressRequest))
 
@@ -169,14 +167,13 @@ class AdditionalAddressCreation @Autowired constructor(
     @Test
     fun `try create additional addresses having duplicate identifier`(){
         //GIVEN
-        val legalEntityRequest = testDataV6Factory.request.buildLegalEntityCreateRequest(testName)
-        val legalEntityResponse = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single()
+        val legalEntityResponse = testDataClientV6.createLegalEntity(testName)
 
         //WHEN
-        val addressRequest1 = testDataV6Factory.request.buildAdditionalAddressCreateRequest("Address 1 $testName", legalEntityResponse.legalEntity.bpnl)
+        val addressRequest1 = testDataV6Factory.request.buildAdditionalAddressCreateRequest("Address 1 $testName", legalEntityResponse)
         val sameIdentifier = addressRequest1.address.identifiers.first()
 
-        val addressRequest2 = with(testDataV6Factory.request.buildAdditionalAddressCreateRequest("Address 2 $testName", legalEntityResponse.legalEntity.bpnl)){
+        val addressRequest2 = with(testDataV6Factory.request.buildAdditionalAddressCreateRequest("Address 2 $testName", legalEntityResponse)){
             copy(address = address.copy(identifiers = listOf(sameIdentifier)))
         }
         val addressResponse = poolClient.addresses.createAddresses(listOf(addressRequest1, addressRequest2))
@@ -196,11 +193,10 @@ class AdditionalAddressCreation @Autowired constructor(
     @Test
     fun `try create additional address with unknown physical region`(){
         //GIVEN
-        val legalEntityRequest = testDataV6Factory.request.buildLegalEntityCreateRequest(testName)
-        val legalEntityResponse = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single()
+        val legalEntityResponse = testDataClientV6.createLegalEntity(testName)
 
         //WHEN
-        val addressRequest = with(testDataV6Factory.request.buildAdditionalAddressCreateRequest(testName, legalEntityResponse.legalEntity.bpnl)){
+        val addressRequest = with(testDataV6Factory.request.buildAdditionalAddressCreateRequest(testName, legalEntityResponse)){
             copy(address = address.copy(physicalPostalAddress = address.physicalPostalAddress.copy(administrativeAreaLevel1 = "UNKNOWN")))
         }
         val addressResponse = poolClient.addresses.createAddresses(listOf(addressRequest))
@@ -221,11 +217,10 @@ class AdditionalAddressCreation @Autowired constructor(
     @Test
     fun `try create additional address with unknown alternative region`(){
         //GIVEN
-        val legalEntityRequest = testDataV6Factory.request.buildLegalEntityCreateRequest(testName)
-        val legalEntityResponse = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single()
+        val legalEntityResponse = testDataClientV6.createLegalEntity(testName)
 
         //WHEN
-        val addressRequest = with(testDataV6Factory.request.buildAdditionalAddressCreateRequest(testName, legalEntityResponse.legalEntity.bpnl)){
+        val addressRequest = with(testDataV6Factory.request.buildAdditionalAddressCreateRequest(testName, legalEntityResponse)){
             copy(address = address.copy(alternativePostalAddress = address.alternativePostalAddress!!.copy(administrativeAreaLevel1 = "UNKNOWN")))
         }
         val addressResponse = poolClient.addresses.createAddresses(listOf(addressRequest))
@@ -250,11 +245,10 @@ class AdditionalAddressCreation @Autowired constructor(
     @Disabled
     fun `try create additional address with too many identifiers`(){
         //GIVEN
-        val legalEntityRequest = testDataV6Factory.request.buildLegalEntityCreateRequest(testName)
-        val legalEntityResponse = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single()
+        val legalEntityResponse = testDataClientV6.createLegalEntity(testName)
 
         //WHEN
-        val addressRequest = with(testDataV6Factory.request.buildAdditionalAddressCreateRequest(testName, legalEntityResponse.legalEntity.bpnl)){
+        val addressRequest = with(testDataV6Factory.request.buildAdditionalAddressCreateRequest(testName, legalEntityResponse)){
             copy(address = address.copy(identifiers = (1 .. 101).map { testDataV6Factory.request.createAddressIdentifier(testName, it) } ))
         }
         val addressResponse = poolClient.addresses.createAddresses(listOf(addressRequest))
