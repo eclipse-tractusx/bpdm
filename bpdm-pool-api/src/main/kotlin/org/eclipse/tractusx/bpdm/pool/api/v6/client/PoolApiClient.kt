@@ -29,4 +29,6 @@ interface PoolApiClient {
 
     val addresses: AddressApiClient
 
+    val memberships: CxMembershipApiClient
+
 }
