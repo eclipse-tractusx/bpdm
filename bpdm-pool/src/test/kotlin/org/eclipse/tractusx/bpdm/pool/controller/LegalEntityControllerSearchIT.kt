@@ -34,7 +34,6 @@ import org.eclipse.tractusx.bpdm.test.testdata.pool.LegalEntityStructureRequest
 import org.eclipse.tractusx.bpdm.test.testdata.pool.SiteStructureRequest
 import org.eclipse.tractusx.bpdm.test.util.AssertHelpers
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
-import org.eclipse.tractusx.bpdm.test.util.PoolDataHelpers
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -52,7 +51,6 @@ import org.springframework.test.context.ContextConfiguration
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class LegalEntityControllerSearchIT @Autowired constructor(
     val dbTestHelpers: DbTestHelpers,
-    val poolDataHelpers: PoolDataHelpers,
     val testHelpers: TestHelpers,
     val assertHelpers: AssertHelpers,
     val poolClient: PoolClientImpl
@@ -82,7 +80,6 @@ class LegalEntityControllerSearchIT @Autowired constructor(
     @BeforeEach
     fun beforeEach() {
         dbTestHelpers.truncateDbTables()
-        poolDataHelpers.createPoolMetadata()
         val givenStructure = testHelpers.createBusinessPartnerStructure(listOf(partnerStructure1, partnerStructure2))
         givenPartner1 = with(givenStructure[0].legalEntity) { legalEntity }
         givenPartner2 = with(givenStructure[1].legalEntity) { legalEntity }
