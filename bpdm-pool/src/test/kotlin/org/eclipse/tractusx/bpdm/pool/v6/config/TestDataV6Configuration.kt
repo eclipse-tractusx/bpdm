@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.v6.config
 
 import jakarta.persistence.EntityManager
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
+import org.eclipse.tractusx.bpdm.pool.v6.util.TestDataClientV6
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v6.TestDataV6Factory
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v6.TestMetadataV6Provider
 import org.flywaydb.core.Flyway
@@ -46,6 +47,11 @@ class TestDataV6Configuration {
     @Bean
     fun testDataV6Factory(testMetadataV6Provider: TestMetadataV6Provider): TestDataV6Factory{
         return TestDataV6Factory(testMetadataV6Provider.createTestMetadata())
+    }
+
+    @Bean
+    fun testDataClientV6(poolApiClient: PoolApiClientV6, testDataV6Factory: TestDataV6Factory): TestDataClientV6{
+        return TestDataClientV6(testDataV6Factory.request, poolApiClient)
     }
 
 

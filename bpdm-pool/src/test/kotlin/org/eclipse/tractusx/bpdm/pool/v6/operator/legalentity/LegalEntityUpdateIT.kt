@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.v6.operator.legalentity
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityIdentifierDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntitySearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityUpdateError
@@ -28,6 +29,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerUpdateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.v6.operator.OperatorTest
 import org.eclipse.tractusx.bpdm.pool.v6.util.AssertRepositoryV6
+import org.eclipse.tractusx.bpdm.pool.v6.util.TestDataClientV6
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v6.TestDataV6Factory
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -36,7 +38,8 @@ import org.springframework.beans.factory.annotation.Autowired
 class LegalEntityUpdateIT @Autowired constructor(
     private val poolClient: PoolApiClient,
     private val testDataV6Factory: TestDataV6Factory,
-    private val assertRepo: AssertRepositoryV6
+    private val assertRepo: AssertRepositoryV6,
+    private val testDataClient: TestDataClientV6
 ): OperatorTest() {
 
     /**
@@ -47,11 +50,10 @@ class LegalEntityUpdateIT @Autowired constructor(
     @Test
     fun `update legal entity`(){
         //GIVEN
-        val legalEntityRequest = testDataV6Factory.request.buildLegalEntityCreateRequest("Original $testName")
-        val givenLegalEntity = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single().legalEntity
+        val legalEntityResponse = testDataClient.createLegalEntity(testName)
 
         //WHEN
-        val updateRequest = testDataV6Factory.request.createLegalEntityUpdateRequest("Updated $testName", givenLegalEntity.bpnl)
+        val updateRequest = testDataV6Factory.request.createLegalEntityUpdateRequest("Updated $testName", legalEntityResponse)
         val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
 
         //THEN
@@ -69,13 +71,12 @@ class LegalEntityUpdateIT @Autowired constructor(
     @Test
     fun `update legal entity and find it`(){
         //GIVEN
-        val legalEntityRequest = testDataV6Factory.request.buildLegalEntityCreateRequest("Original $testName")
-        val givenLegalEntity = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single().legalEntity
-        val updateRequest = testDataV6Factory.request.createLegalEntityUpdateRequest("Updated $testName", givenLegalEntity.bpnl)
+        val legalEntityResponse = testDataClient.createLegalEntity(testName)
+        val updateRequest = testDataV6Factory.request.createLegalEntityUpdateRequest("Updated $testName", legalEntityResponse)
         val updateResponse = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
 
         //WHEN
-        val response = poolClient.legalEntities.getLegalEntities(LegalEntitySearchRequest(bpnLs = listOf(givenLegalEntity.bpnl)), PaginationRequest())
+        val response = poolClient.legalEntities.getLegalEntities(LegalEntitySearchRequest(bpnLs = listOf(legalEntityResponse.legalEntity.bpnl)), PaginationRequest())
 
         //THEN
         val expectedLegalEntities = updateResponse.entities.map { testDataV6Factory.result.buildExpectedLegalEntitySearchResponse(it) }
@@ -92,16 +93,14 @@ class LegalEntityUpdateIT @Autowired constructor(
     @Test
     fun `try update legal entity with duplicated identifier`(){
         //GIVEN
-        val legalEntityRequestA = testDataV6Factory.request.buildLegalEntityCreateRequest("$testName A")
-        val identifierX = legalEntityRequestA.legalEntity.identifiers.first()
-        poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequestA))
+        val legalEntityResponseA = testDataClient.createLegalEntity("$testName A")
+        val identifierX = legalEntityResponseA.legalEntity.identifiers.first()
 
-        val legalEntityRequestB = testDataV6Factory.request.buildLegalEntityCreateRequest("$testName B")
-        val legalEntityB = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequestB)).entities.single()
+        val legalEntityResponseB =  testDataClient.createLegalEntity("$testName B")
 
         //WHEN
-        val updateRequest =  with(testDataV6Factory.request.createLegalEntityUpdateRequest("Updated $testName", legalEntityB.legalEntity.bpnl)){
-            this.copy(legalEntity = legalEntity.copy(identifiers = listOf(identifierX)))
+        val updateRequest =  with(testDataV6Factory.request.createLegalEntityUpdateRequest("Updated $testName", legalEntityResponseB)){
+            this.copy(legalEntity = legalEntity.copy(identifiers = listOf(LegalEntityIdentifierDto(identifierX.value, identifierX.type, identifierX.issuingBody))))
         }
         val updateResponse = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
 
@@ -119,16 +118,13 @@ class LegalEntityUpdateIT @Autowired constructor(
     @Test
     fun `try update legal entity having duplicated identifiers`(){
         //GIVEN
-        val legalEntityRequestA = testDataV6Factory.request.buildLegalEntityCreateRequest("$testName A")
-        val legalEntityA = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequestA)).entities.single()
-
-        val legalEntityRequestB = testDataV6Factory.request.buildLegalEntityCreateRequest("$testName B")
-        val legalEntityB = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequestB)).entities.single()
+        val legalEntityResponseA = testDataClient.createLegalEntity("$testName A")
+        val legalEntityResponseB =  testDataClient.createLegalEntity("$testName B")
 
         //WHEN
-        val updateRequestA = testDataV6Factory.request.createLegalEntityUpdateRequest("Updated $testName A", legalEntityA.legalEntity.bpnl)
+        val updateRequestA = testDataV6Factory.request.createLegalEntityUpdateRequest("Updated $testName A", legalEntityResponseA)
         val sameIdentifier = updateRequestA.legalEntity.identifiers.first()
-        val updateRequestB =  with(testDataV6Factory.request.createLegalEntityUpdateRequest("Updated $testName B", legalEntityB.legalEntity.bpnl)){
+        val updateRequestB =  with(testDataV6Factory.request.createLegalEntityUpdateRequest("Updated $testName B", legalEntityResponseB)){
             this.copy(legalEntity = legalEntity.copy(identifiers = listOf(sameIdentifier)))
         }
         val updateResponse = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequestA, updateRequestB))
@@ -164,11 +160,10 @@ class LegalEntityUpdateIT @Autowired constructor(
     @Test
     fun `try update legal entity with unknown legal form`(){
         //GIVEN
-        val legalEntityRequest = testDataV6Factory.request.buildLegalEntityCreateRequest("Original $testName")
-        val givenLegalEntity = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single().legalEntity
+        val legalEntityResponse = testDataClient.createLegalEntity(testName)
 
         //WHEN
-        val updateRequest = with(testDataV6Factory.request.createLegalEntityUpdateRequest("Updated $testName", givenLegalEntity.bpnl)){
+        val updateRequest = with(testDataV6Factory.request.createLegalEntityUpdateRequest("Updated $testName", legalEntityResponse)){
             copy(legalEntity = legalEntity.copy(legalForm = "UNKNOWN"))
         }
         val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
@@ -188,11 +183,10 @@ class LegalEntityUpdateIT @Autowired constructor(
     @Test
     fun `try update legal entity with unknown physical region`(){
         //GIVEN
-        val legalEntityRequest = testDataV6Factory.request.buildLegalEntityCreateRequest("Original $testName")
-        val givenLegalEntity = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single().legalEntity
+        val legalEntityResponse = testDataClient.createLegalEntity(testName)
 
         //WHEN
-        val updateRequest = with(testDataV6Factory.request.createLegalEntityUpdateRequest("Updated $testName", givenLegalEntity.bpnl)){
+        val updateRequest = with(testDataV6Factory.request.createLegalEntityUpdateRequest("Updated $testName", legalEntityResponse)){
             copy(legalAddress = legalAddress.copy(physicalPostalAddress = legalAddress.physicalPostalAddress.copy(administrativeAreaLevel1 = "UNKNOWN" )))
         }
         val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
@@ -212,11 +206,10 @@ class LegalEntityUpdateIT @Autowired constructor(
     @Test
     fun `try update legal entity with unknown alternative region`(){
         //GIVEN
-        val legalEntityRequest = testDataV6Factory.request.buildLegalEntityCreateRequest("Original $testName")
-        val givenLegalEntity = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single().legalEntity
+        val legalEntityResponse = testDataClient.createLegalEntity(testName)
 
         //WHEN
-        val updateRequest = with(testDataV6Factory.request.createLegalEntityUpdateRequest("Updated $testName", givenLegalEntity.bpnl)){
+        val updateRequest = with(testDataV6Factory.request.createLegalEntityUpdateRequest("Updated $testName", legalEntityResponse)){
             copy(legalAddress = legalAddress.copy(alternativePostalAddress = legalAddress.alternativePostalAddress!!.copy(administrativeAreaLevel1 = "UNKNOWN" )))
         }
         val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
@@ -236,11 +229,10 @@ class LegalEntityUpdateIT @Autowired constructor(
     @Test
     fun `try update legal entity with unknown identifier type`(){
         //GIVEN
-        val legalEntityRequest = testDataV6Factory.request.buildLegalEntityCreateRequest("Original $testName")
-        val givenLegalEntity = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single().legalEntity
+        val legalEntityResponse = testDataClient.createLegalEntity(testName)
 
         //WHEN
-        val updateRequest = with(testDataV6Factory.request.createLegalEntityUpdateRequest("Updated $testName", givenLegalEntity.bpnl)){
+        val updateRequest = with(testDataV6Factory.request.createLegalEntityUpdateRequest("Updated $testName", legalEntityResponse)){
             val unknownIdentifier = legalEntity.identifiers.first().copy(type = "UNKNOWN")
             copy(legalEntity = legalEntity.copy(identifiers = legalEntity.identifiers.drop(1).plus(unknownIdentifier)))
         }
@@ -261,11 +253,10 @@ class LegalEntityUpdateIT @Autowired constructor(
     @Test
     fun `try update legal entity with unknown legal address identifier type`(){
         //GIVEN
-        val legalEntityRequest = testDataV6Factory.request.buildLegalEntityCreateRequest("Original $testName")
-        val givenLegalEntity = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single().legalEntity
+        val legalEntityResponse = testDataClient.createLegalEntity(testName)
 
         //WHEN
-        val updateRequest = with(testDataV6Factory.request.createLegalEntityUpdateRequest("Updated $testName", givenLegalEntity.bpnl)){
+        val updateRequest = with(testDataV6Factory.request.createLegalEntityUpdateRequest("Updated $testName", legalEntityResponse)){
             val unknownIdentifier = legalAddress.identifiers.first().copy(type = "UNKNOWN")
             copy(legalAddress = legalAddress.copy(identifiers = legalAddress.identifiers.drop(1).plus(unknownIdentifier)))
         }
@@ -291,11 +282,10 @@ class LegalEntityUpdateIT @Autowired constructor(
     @Disabled
     fun `try update legal entity with too many identifiers`(){
         //GIVEN
-        val legalEntityRequest = testDataV6Factory.request.buildLegalEntityCreateRequest("Original $testName")
-        val givenLegalEntity = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single().legalEntity
+        val legalEntityResponse = testDataClient.createLegalEntity(testName)
 
         //WHEN
-        val updateRequest = with(testDataV6Factory.request.createLegalEntityUpdateRequest("Updated $testName", givenLegalEntity.bpnl)){
+        val updateRequest = with(testDataV6Factory.request.createLegalEntityUpdateRequest("Updated $testName", legalEntityResponse)){
             copy(legalEntity = legalEntity.copy(identifiers = (1 .. 101).map { testDataV6Factory.request.createLegalEntityIdentifier("Updated $testName", it) }))
         }
         val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
@@ -319,11 +309,10 @@ class LegalEntityUpdateIT @Autowired constructor(
     @Disabled
     fun `try update legal entity with too many legal address identifiers`(){
         //GIVEN
-        val legalEntityRequest = testDataV6Factory.request.buildLegalEntityCreateRequest("Original $testName")
-        val givenLegalEntity = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single().legalEntity
+        val legalEntityResponse = testDataClient.createLegalEntity(testName)
 
         //WHEN
-        val updateRequest = with(testDataV6Factory.request.createLegalEntityUpdateRequest("Updated $testName", givenLegalEntity.bpnl)){
+        val updateRequest = with(testDataV6Factory.request.createLegalEntityUpdateRequest("Updated $testName", legalEntityResponse)){
             copy(legalAddress = legalAddress.copy(identifiers = (1 .. 101).map { testDataV6Factory.request.createAddressIdentifier("Updated $testName", it) }))
         }
         val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))

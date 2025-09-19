@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.v6.operator.site
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteCreateError
@@ -31,6 +32,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerUpdateRes
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SiteWithMainAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.v6.operator.OperatorTest
 import org.eclipse.tractusx.bpdm.pool.v6.util.AssertRepositoryV6
+import org.eclipse.tractusx.bpdm.pool.v6.util.TestDataClientV6
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v6.TestDataV6Factory
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -39,7 +41,8 @@ import org.springframework.beans.factory.annotation.Autowired
 class SiteUpdateIT @Autowired constructor(
     private val poolClient: PoolApiClient,
     private val testDataV6Factory: TestDataV6Factory,
-    private val assertRepo: AssertRepositoryV6
+    private val assertRepo: AssertRepositoryV6,
+    private val testDataClient: TestDataClientV6
 ): OperatorTest() {
 
     /**
@@ -50,18 +53,15 @@ class SiteUpdateIT @Autowired constructor(
     @Test
     fun `update valid site`(){
         //GIVEN
-        val legalEntityRequest = testDataV6Factory.request.buildLegalEntityCreateRequest("Legal Entity $testName")
-        val givenLegalEntity = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single()
-
-        val givenSiteRequest = testDataV6Factory.request.buildSiteCreateRequest("Given Site $testName", givenLegalEntity.legalEntity.bpnl)
-        val givenSite = poolClient.sites.createSite(listOf(givenSiteRequest)).entities.single()
+        val legalEntityResponse = testDataClient.createLegalEntity(testName)
+        val siteResponse = testDataClient.createSiteFor(legalEntityResponse, testName)
 
         //WHEN
-        val siteUpdateRequest = testDataV6Factory.request.createSiteUpdateRequest("Site Update $testName", givenSite.site.bpns)
+        val siteUpdateRequest = testDataV6Factory.request.createSiteUpdateRequest("Site Update $testName", siteResponse)
         val response = poolClient.sites.updateSite(listOf(siteUpdateRequest))
 
         //THEN
-        val expectedSite = testDataV6Factory.result.buildExpectedSiteUpdateResponse(siteUpdateRequest, givenSite, givenLegalEntity)
+        val expectedSite = testDataV6Factory.result.buildExpectedSiteUpdateResponse(siteUpdateRequest, siteResponse, legalEntityResponse)
         val expectedResponse = SitePartnerUpdateResponseWrapper(listOf(expectedSite), emptyList())
 
         assertRepo.assertSiteUpdate(response, expectedResponse)
@@ -75,13 +75,10 @@ class SiteUpdateIT @Autowired constructor(
     @Test
     fun `update valid site and find it`(){
         //GIVEN
-        val legalEntityRequest = testDataV6Factory.request.buildLegalEntityCreateRequest("Legal Entity $testName")
-        val givenLegalEntity = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single().legalEntity
+        val legalEntityResponse = testDataClient.createLegalEntity(testName)
+        val siteResponse = testDataClient.createSiteFor(legalEntityResponse, testName)
 
-        val siteRequest = testDataV6Factory.request.buildSiteCreateRequest("Site $testName", givenLegalEntity.bpnl)
-        val givenSiteResponse = poolClient.sites.createSite(listOf(siteRequest)).entities.single()
-
-        val siteUpdateRequest = testDataV6Factory.request.createSiteUpdateRequest("Site Update $testName", givenSiteResponse.site.bpns)
+        val siteUpdateRequest = testDataV6Factory.request.createSiteUpdateRequest("Site Update $testName", siteResponse.site.bpns)
         val updatedSiteResponse = poolClient.sites.updateSite(listOf(siteUpdateRequest)).entities.single()
 
         //WHEN
@@ -100,7 +97,7 @@ class SiteUpdateIT @Autowired constructor(
      */
     @Test
     fun `try update site with unknown bpn`(){
-        //GIVEN
+        //WHEN
         val siteUpdateRequest = testDataV6Factory.request.createSiteUpdateRequest(testName, "UNKNOWN")
         val response = poolClient.sites.updateSite(listOf(siteUpdateRequest))
 
@@ -120,24 +117,21 @@ class SiteUpdateIT @Autowired constructor(
     @Test
     fun `try update site with duplicate address identifier`(){
         //GIVEN
-        val legalEntityRequest = testDataV6Factory.request.buildLegalEntityCreateRequest("Legal Entity $testName")
-        val givenLegalEntity = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single().legalEntity
+        val legalEntityResponse = testDataClient.createLegalEntity(testName)
 
-        val siteRequestA = testDataV6Factory.request.buildSiteCreateRequest("Site 1 $testName", givenLegalEntity.bpnl)
-        poolClient.sites.createSite(listOf(siteRequestA)).entities.single().site
-        val identifierX = siteRequestA.site.mainAddress.identifiers.first()
+        val siteResponseA = testDataClient.createSiteFor(legalEntityResponse, "Site A $testName")
+        val identifierX = siteResponseA.mainAddress.identifiers.first()
 
-        val siteRequestB = testDataV6Factory.request.buildSiteCreateRequest("Site 2 $testName", givenLegalEntity.bpnl)
-        val siteB = poolClient.sites.createSite(listOf(siteRequestB)).entities.single().site
+        val siteResponseB = testDataClient.createSiteFor(legalEntityResponse, "Site B $testName")
 
         //WHEN
-        val updateRequest = with(testDataV6Factory.request.createSiteUpdateRequest("Site 1 Update $testName", siteB.bpns)){
-            copy(site = site.copy(mainAddress = site.mainAddress.copy(identifiers = listOf(identifierX))))
+        val updateRequest = with(testDataV6Factory.request.createSiteUpdateRequest("Site B Update $testName", siteResponseB)){
+            copy(site = site.copy(mainAddress = site.mainAddress.copy(identifiers = listOf(AddressIdentifierDto(identifierX.value, identifierX.type)))))
         }
         val siteResponse = poolClient.sites.updateSite(listOf(updateRequest))
 
         //THEN
-        val expectedError = ErrorInfo(SiteUpdateError.MainAddressDuplicateIdentifier, "IGNORED", siteB.bpns)
+        val expectedError = ErrorInfo(SiteUpdateError.MainAddressDuplicateIdentifier, "IGNORED", updateRequest.bpns)
         val expectedResponse = SitePartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepo.assertSiteUpdate(siteResponse, expectedResponse)
@@ -151,14 +145,13 @@ class SiteUpdateIT @Autowired constructor(
     @Test
     fun `try update sites having duplicate address identifiers`(){
         //GIVEN
-        val legalEntityRequest = testDataV6Factory.request.buildLegalEntityCreateRequest("Legal Entity $testName")
-        val givenLegalEntity = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single().legalEntity
+        val legalEntityResponse = testDataClient.createLegalEntity(testName)
 
         //WHEN
-        val siteRequest1 = testDataV6Factory.request.buildSiteCreateRequest("Site 1 $testName", givenLegalEntity.bpnl)
+        val siteRequest1 = testDataV6Factory.request.buildSiteCreateRequest("Site 1 $testName", legalEntityResponse)
         val sameIdentifier = siteRequest1.site.mainAddress.identifiers.first()
 
-        val siteRequest2 = with(testDataV6Factory.request.buildSiteCreateRequest("Site 2 $testName", givenLegalEntity.bpnl)){
+        val siteRequest2 = with(testDataV6Factory.request.buildSiteCreateRequest("Site 2 $testName", legalEntityResponse)){
             copy(site = site.copy(mainAddress = site.mainAddress.copy(identifiers = listOf(sameIdentifier))))
         }
         val siteResponse = poolClient.sites.createSite(listOf(siteRequest1, siteRequest2))
@@ -178,14 +171,11 @@ class SiteUpdateIT @Autowired constructor(
     @Test
     fun `try update site with unknown address identifier`(){
         //GIVEN
-        val legalEntityRequest = testDataV6Factory.request.buildLegalEntityCreateRequest("Legal Entity $testName")
-        val givenLegalEntity = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single().legalEntity
-
-        val givenSiteRequest = testDataV6Factory.request.buildSiteCreateRequest("Given Site $testName", givenLegalEntity.bpnl)
-        val givenSite = poolClient.sites.createSite(listOf(givenSiteRequest)).entities.single().site
+        val legalEntityResponse = testDataClient.createLegalEntity(testName)
+        val siteCreateResponse = testDataClient.createSiteFor(legalEntityResponse, testName)
 
         //WHEN
-        val siteRequest = with(testDataV6Factory.request.createSiteUpdateRequest("New Site $testName", givenSite.bpns)){
+        val siteRequest = with(testDataV6Factory.request.createSiteUpdateRequest("New Site $testName", siteCreateResponse)){
             val unknownIdentifier = site.mainAddress.identifiers.first().copy(type = "UNKNOWN")
             copy(site = site.copy(mainAddress = site.mainAddress.copy(identifiers = site.mainAddress.identifiers.drop(1).plus(unknownIdentifier))))
         }
@@ -206,14 +196,11 @@ class SiteUpdateIT @Autowired constructor(
     @Test
     fun `try update site with unknown physical region`(){
         //GIVEN
-        val legalEntityRequest = testDataV6Factory.request.buildLegalEntityCreateRequest("Legal Entity $testName")
-        val givenLegalEntity = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single().legalEntity
-
-        val givenSiteRequest = testDataV6Factory.request.buildSiteCreateRequest("Given Site $testName", givenLegalEntity.bpnl)
-        val givenSite = poolClient.sites.createSite(listOf(givenSiteRequest)).entities.single().site
+        val legalEntityResponse = testDataClient.createLegalEntity(testName)
+        val siteCreateResponse = testDataClient.createSiteFor(legalEntityResponse, testName)
 
         //WHEN
-        val siteRequest = with(testDataV6Factory.request.createSiteUpdateRequest("New Site $testName", givenSite.bpns)){
+        val siteRequest = with(testDataV6Factory.request.createSiteUpdateRequest("New Site $testName", siteCreateResponse)){
             copy(site = site.copy(mainAddress = site.mainAddress.copy(physicalPostalAddress = site.mainAddress.physicalPostalAddress.copy(administrativeAreaLevel1 = "UNKNOWN"))))
         }
         val siteResponse = poolClient.sites.updateSite(listOf(siteRequest))
@@ -233,14 +220,11 @@ class SiteUpdateIT @Autowired constructor(
     @Test
     fun `try update site with unknown alternative region`(){
         //GIVEN
-        val legalEntityRequest = testDataV6Factory.request.buildLegalEntityCreateRequest("Legal Entity $testName")
-        val givenLegalEntity = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single().legalEntity
-
-        val givenSiteRequest = testDataV6Factory.request.buildSiteCreateRequest("Given Site $testName", givenLegalEntity.bpnl)
-        val givenSite = poolClient.sites.createSite(listOf(givenSiteRequest)).entities.single().site
+        val legalEntityResponse = testDataClient.createLegalEntity(testName)
+        val siteCreateResponse = testDataClient.createSiteFor(legalEntityResponse, testName)
 
         //WHEN
-        val siteRequest = with(testDataV6Factory.request.createSiteUpdateRequest("New Site $testName", givenSite.bpns)){
+        val siteRequest = with(testDataV6Factory.request.createSiteUpdateRequest("New Site $testName", siteCreateResponse)){
             copy(site = site.copy(mainAddress = site.mainAddress.copy(alternativePostalAddress = site.mainAddress.alternativePostalAddress!!.copy(administrativeAreaLevel1 = "UNKNOWN"))))
         }
         val siteResponse = poolClient.sites.updateSite(listOf(siteRequest))
@@ -264,14 +248,11 @@ class SiteUpdateIT @Autowired constructor(
     @Disabled
     fun `try update site with too many identifiers`(){
         //GIVEN
-        val legalEntityRequest = testDataV6Factory.request.buildLegalEntityCreateRequest("Legal Entity $testName")
-        val givenLegalEntity = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single().legalEntity
-
-        val givenSiteRequest = testDataV6Factory.request.buildSiteCreateRequest("Given Site $testName", givenLegalEntity.bpnl)
-        val givenSite = poolClient.sites.createSite(listOf(givenSiteRequest)).entities.single().site
+        val legalEntityResponse = testDataClient.createLegalEntity(testName)
+        val siteCreateResponse = testDataClient.createSiteFor(legalEntityResponse, testName)
 
         //WHEN
-        val siteRequest = with(testDataV6Factory.request.createSiteUpdateRequest("New Site $testName", givenSite.bpns)){
+        val siteRequest = with(testDataV6Factory.request.createSiteUpdateRequest("New Site $testName", siteCreateResponse)){
             copy(site = site.copy(mainAddress = site.mainAddress.copy(identifiers = (1 .. 101).map { testDataV6Factory.request.createAddressIdentifier(testName, it) })))
         }
         val siteResponse = poolClient.sites.updateSite(listOf(siteRequest))

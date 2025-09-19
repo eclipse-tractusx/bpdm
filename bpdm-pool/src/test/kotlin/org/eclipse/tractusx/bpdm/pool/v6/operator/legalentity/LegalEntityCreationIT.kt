@@ -21,6 +21,8 @@ package org.eclipse.tractusx.bpdm.pool.v6.operator.legalentity
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityIdentifierDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntitySearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityCreateError
@@ -28,6 +30,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.v6.operator.OperatorTest
 import org.eclipse.tractusx.bpdm.pool.v6.util.AssertRepositoryV6
+import org.eclipse.tractusx.bpdm.pool.v6.util.TestDataClientV6
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v6.TestDataV6Factory
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -54,7 +57,8 @@ import org.springframework.beans.factory.annotation.Autowired
 class LegalEntityCreationIT @Autowired constructor(
     private val poolClient: PoolApiClient,
     private val testDataV6Factory: TestDataV6Factory,
-    private val assertRepo: AssertRepositoryV6
+    private val assertRepo: AssertRepositoryV6,
+    private val testDataClient: TestDataClientV6
 ): OperatorTest() {
 
     /**
@@ -82,15 +86,14 @@ class LegalEntityCreationIT @Autowired constructor(
     @Test
     fun `create valid legal entity and find it`(){
         //GIVEN
-        val legalEntityRequest = testDataV6Factory.request.buildLegalEntityCreateRequest(testName)
-        val createdLegalEntity = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single()
+        val legalEntityResponse = testDataClient.createLegalEntity(testName)
 
         //WHEN
-        val searchRequest = LegalEntitySearchRequest(listOf(createdLegalEntity.legalEntity.bpnl), null)
+        val searchRequest = LegalEntitySearchRequest(listOf(legalEntityResponse.legalEntity.bpnl), null)
         val searchResponse = poolClient.legalEntities.getLegalEntities(searchRequest, PaginationRequest())
 
         //THEN
-        val expectedSearchResponse = createSingleResultPage(testDataV6Factory.result.buildExpectedLegalEntitySearchResponse(createdLegalEntity))
+        val expectedSearchResponse = createSingleResultPage(testDataV6Factory.result.buildExpectedLegalEntitySearchResponse(legalEntityResponse))
         assertRepo.assertLegalEntitySearch(searchResponse, expectedSearchResponse)
     }
 
@@ -102,13 +105,12 @@ class LegalEntityCreationIT @Autowired constructor(
     @Test
     fun `try create legal entity with duplicated identifier`(){
         //GIVEN
-        val givenLegalEntityRequest = testDataV6Factory.request.buildLegalEntityCreateRequest("$testName 1")
-        val identifierX = givenLegalEntityRequest.legalEntity.identifiers.first()
-        poolClient.legalEntities.createBusinessPartners(listOf(givenLegalEntityRequest)).entities.single()
+        val givenLegalEntityResponse = testDataClient.createLegalEntity("$testName 1")
+        val identifierX = givenLegalEntityResponse.legalEntity.identifiers.first()
 
         //WHEN
         val newLegalEntityRequest =  with(testDataV6Factory.request.buildLegalEntityCreateRequest("$testName 2")){
-            this.copy(legalEntity = legalEntity.copy(identifiers = listOf(identifierX)))
+            this.copy(legalEntity = legalEntity.copy(identifiers = listOf(LegalEntityIdentifierDto(identifierX.value, identifierX.type, identifierX.issuingBody))))
         }
         val creationResponse = poolClient.legalEntities.createBusinessPartners(listOf(newLegalEntityRequest))
 
@@ -148,13 +150,12 @@ class LegalEntityCreationIT @Autowired constructor(
     @Test
     fun `try create legal entity with duplicated legal address identifier`(){
         //GIVEN
-        val givenLegalEntityRequest = testDataV6Factory.request.buildLegalEntityCreateRequest("$testName 1")
-        val identifierX = givenLegalEntityRequest.legalAddress.identifiers.first()
-        poolClient.legalEntities.createBusinessPartners(listOf(givenLegalEntityRequest)).entities.single()
+        val givenLegalEntityResponse = testDataClient.createLegalEntity("$testName 1")
+        val identifierX = givenLegalEntityResponse.legalAddress.identifiers.first()
 
         //WHEN
         val newLegalEntityRequest =  with(testDataV6Factory.request.buildLegalEntityCreateRequest("$testName 2")){
-            this.copy(legalAddress = legalAddress.copy(identifiers = listOf(identifierX)))
+            this.copy(legalAddress = legalAddress.copy(identifiers = listOf(AddressIdentifierDto(identifierX.value, identifierX.type))))
         }
         val creationResponse = poolClient.legalEntities.createBusinessPartners(listOf(newLegalEntityRequest))
 
