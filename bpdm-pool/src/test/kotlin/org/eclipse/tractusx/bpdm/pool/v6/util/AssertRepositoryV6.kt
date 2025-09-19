@@ -64,6 +64,15 @@ class AssertRepositoryV6(
             val legalAddressUpdatedAt =  "${legalAddress}.${LogisticAddressVerboseDto::updatedAt.name}"
         }
 
+        private object LegalEntityGetPaths{
+            private val legalEntity = LegalEntityWithLegalAddressVerboseDto::legalEntity.name
+            private val  legalAddress = LegalEntityWithLegalAddressVerboseDto::legalAddress.name
+            val legalEntityCreatedAt =  "${legalEntity}.${LegalEntityVerboseDto::createdAt.name}"
+            val legalEntityUpdatedAt =  "${legalEntity}.${LegalEntityVerboseDto::updatedAt.name}"
+            val legalAddressCreatedAt =  "${legalAddress}.${LogisticAddressVerboseDto::createdAt.name}"
+            val legalAddressUpdatedAt =  "${legalAddress}.${LogisticAddressVerboseDto::updatedAt.name}"
+        }
+
         private object SiteUpsertResponsePaths{
             val entities: String = SitePartnerCreateResponseWrapper::entities.name
             val errors: String = SitePartnerCreateResponseWrapper::errors.name
@@ -131,6 +140,20 @@ class AssertRepositoryV6(
                 LegalEntityWithLegalAddressVerboseDtoPaths.legalEntityUpdatedAt,
                 LegalEntityWithLegalAddressVerboseDtoPaths.legalAddressCreatedAt,
                 LegalEntityWithLegalAddressVerboseDtoPaths.legalAddressUpdatedAt
+            )
+            .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
+            .isEqualTo(expected)
+    }
+
+    fun assertLegalEntityGet(actual: LegalEntityWithLegalAddressVerboseDto, expected: LegalEntityWithLegalAddressVerboseDto) {
+        Assertions.assertThat(actual)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .ignoringFields(
+                LegalEntityGetPaths.legalEntityCreatedAt,
+                LegalEntityGetPaths.legalEntityUpdatedAt,
+                LegalEntityGetPaths.legalAddressCreatedAt,
+                LegalEntityGetPaths.legalAddressUpdatedAt
             )
             .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
             .isEqualTo(expected)

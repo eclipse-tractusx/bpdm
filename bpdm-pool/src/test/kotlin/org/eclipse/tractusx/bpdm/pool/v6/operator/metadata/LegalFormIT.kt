@@ -23,10 +23,10 @@ import com.neovisionaries.i18n.CountryCode
 import com.neovisionaries.i18n.LanguageCode
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.v6.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalFormDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalFormRequest
 import org.eclipse.tractusx.bpdm.pool.v6.operator.OperatorTest
+import org.eclipse.tractusx.bpdm.pool.v6.util.PoolOperatorClientV6
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -51,7 +51,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 class LegalFormIT @Autowired constructor(
-    private val poolApiClient: PoolApiClient
+    private val poolApiClient: PoolOperatorClientV6
 ): OperatorTest(){
 
     /**

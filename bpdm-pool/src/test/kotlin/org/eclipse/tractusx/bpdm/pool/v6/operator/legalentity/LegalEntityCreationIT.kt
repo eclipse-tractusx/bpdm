@@ -26,10 +26,10 @@ import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityIdentifierDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntitySearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityCreateError
-import org.eclipse.tractusx.bpdm.pool.api.v6.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.v6.operator.OperatorTest
 import org.eclipse.tractusx.bpdm.pool.v6.util.AssertRepositoryV6
+import org.eclipse.tractusx.bpdm.pool.v6.util.PoolOperatorClientV6
 import org.eclipse.tractusx.bpdm.pool.v6.util.TestDataClientV6
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v6.TestDataV6Factory
 import org.junit.jupiter.api.Disabled
@@ -55,7 +55,7 @@ import org.springframework.beans.factory.annotation.Autowired
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 class LegalEntityCreationIT @Autowired constructor(
-    private val poolClient: PoolApiClient,
+    private val poolClient: PoolOperatorClientV6,
     private val testDataV6Factory: TestDataV6Factory,
     private val assertRepo: AssertRepositoryV6,
     private val testDataClient: TestDataClientV6

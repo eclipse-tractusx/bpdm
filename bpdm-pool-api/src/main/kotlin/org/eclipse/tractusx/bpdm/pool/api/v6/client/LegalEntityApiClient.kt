@@ -19,6 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.v6.client
 
+import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.ApiCommons
@@ -30,7 +32,9 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCr
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerUpdateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.springdoc.core.annotations.ParameterObject
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.service.annotation.GetExchange
 import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
@@ -53,4 +57,17 @@ interface LegalEntityApiClient: PoolLegalEntityApi {
     override fun updateBusinessPartners(
         @RequestBody businessPartners: Collection<LegalEntityPartnerUpdateRequest>
     ): LegalEntityPartnerUpdateResponseWrapper
+
+    @GetExchange(value = "${ApiCommons.LEGAL_ENTITY_BASE_PATH_V6}/{idValue}")
+    override fun getLegalEntity(
+        @Parameter(description = "Identifier value") @PathVariable("idValue") idValue: String,
+        @Parameter(description = "Type of identifier to use, defaults to BPN when omitted", schema = Schema(defaultValue = "BPN"))
+        @RequestParam idType: String?
+    ): LegalEntityWithLegalAddressVerboseDto
+
+    @PostExchange(value = "${ApiCommons.LEGAL_ENTITY_BASE_PATH_V6}/search")
+    override fun postLegalEntitySearch(
+        @RequestBody searchRequest: LegalEntitySearchRequest,
+        @ParameterObject paginationRequest: PaginationRequest
+    ): PageDto<LegalEntityWithLegalAddressVerboseDto>
 }
