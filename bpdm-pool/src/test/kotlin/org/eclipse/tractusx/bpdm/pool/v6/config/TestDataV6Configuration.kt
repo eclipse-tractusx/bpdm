@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.v6.config
 
 import jakarta.persistence.EntityManager
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
+import org.eclipse.tractusx.bpdm.pool.v6.util.PoolOperatorClientV6
 import org.eclipse.tractusx.bpdm.pool.v6.util.TestDataClientV6
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v6.TestDataV6Factory
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v6.TestMetadataV6Provider
@@ -28,7 +29,6 @@ import org.flywaydb.core.Flyway
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.eclipse.tractusx.bpdm.pool.api.v6.client.PoolApiClient as PoolApiClientV6
 
 @Configuration
 @ConditionalOnProperty(name = ["test.v6"], havingValue = "true", matchIfMissing = false)
@@ -38,7 +38,7 @@ class TestDataV6Configuration {
      * Include entity manager in the arguments here to make sure that the test data is gathered after the database connection is fully initialized
      */
     @Bean
-    fun testMetadataV6Provider(flyway: Flyway, entityManager: EntityManager, poolClientV6: PoolApiClientV6, poolClient: PoolApiClient): TestMetadataV6Provider{
+    fun testMetadataV6Provider(flyway: Flyway, entityManager: EntityManager, poolClientV6: PoolOperatorClientV6, poolClient: PoolApiClient): TestMetadataV6Provider{
         flyway.clean()
         flyway.migrate()
         return TestMetadataV6Provider(poolClientV6, poolClient)
@@ -50,7 +50,7 @@ class TestDataV6Configuration {
     }
 
     @Bean
-    fun testDataClientV6(poolApiClient: PoolApiClientV6, testDataV6Factory: TestDataV6Factory): TestDataClientV6{
+    fun testDataClientV6(poolApiClient: PoolOperatorClientV6, testDataV6Factory: TestDataV6Factory): TestDataClientV6{
         return TestDataClientV6(testDataV6Factory.request, poolApiClient)
     }
 

@@ -24,7 +24,7 @@ import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.support.WebClientAdapter
 import org.springframework.web.service.invoker.HttpServiceProxyFactory
 
-class PoolClientImpl(
+open class PoolClientImpl(
     private val webClientProvider: () -> WebClient
 ): PoolApiClient {
 

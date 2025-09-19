@@ -24,9 +24,9 @@ import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDetailDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.pool.v6.operator.OperatorTest
+import org.eclipse.tractusx.bpdm.pool.v6.util.PoolOperatorClientV6
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.beans.factory.annotation.Autowired
@@ -52,7 +52,7 @@ import kotlin.random.Random
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 class IdentifierTypeIT @Autowired constructor(
-    private val poolApiClient: PoolApiClient
+    private val poolApiClient: PoolOperatorClientV6
 ): OperatorTest() {
 
     /**

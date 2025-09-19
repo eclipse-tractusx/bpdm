@@ -22,17 +22,17 @@ package org.eclipse.tractusx.bpdm.pool.v6.operator.membership
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.v6.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.CxMembershipDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.CxMembershipSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.CxMembershipUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.v6.operator.OperatorTest
+import org.eclipse.tractusx.bpdm.pool.v6.util.PoolOperatorClientV6
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v6.TestDataV6Factory
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 
 class CxMembershipIT @Autowired constructor(
-    private val poolClient: PoolApiClient,
+    private val poolClient: PoolOperatorClientV6,
     private val testDataV6Factory: TestDataV6Factory
 ): OperatorTest() {
 
