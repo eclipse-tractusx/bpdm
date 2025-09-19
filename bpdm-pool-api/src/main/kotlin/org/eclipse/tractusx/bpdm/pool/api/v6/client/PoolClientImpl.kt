@@ -43,6 +43,8 @@ class PoolClientImpl(
 
     override val addresses by lazy { createClient<AddressApiClient>() }
 
+    override val memberships by lazy { createClient<CxMembershipApiClient>() }
+
     private inline fun <reified T> createClient() =
         httpServiceProxyFactory.createClient(T::class.java)
 }

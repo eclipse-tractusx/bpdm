@@ -23,8 +23,10 @@ import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.auth.SelfClientAsAdminInitializer
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
+import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInfo
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
@@ -38,10 +40,14 @@ import org.springframework.test.context.ContextConfiguration
 @ActiveProfiles("test-v6")
 abstract class OperatorTest{
 
+    @Autowired
+    lateinit var databaseHelpers: DbTestHelpers
+
     lateinit var testName: String
 
     @BeforeEach
     fun beforeEach(testInfo: TestInfo){
         testName = testInfo.displayName
+        databaseHelpers.truncateDbTables()
     }
 }
