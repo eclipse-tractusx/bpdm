@@ -284,6 +284,30 @@ class AssertRepositoryV6(
             .isEqualTo(expected)
     }
 
+    fun assertAddressSearch(actual: PageDto<LogisticAddressVerboseDto>, expected: PageDto<LogisticAddressVerboseDto>){
+        Assertions.assertThat(actual)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .ignoringFields(
+                "${PageDto<*>::content.name}.${LogisticAddressVerboseDto::createdAt.name}",
+                "${PageDto<*>::content.name}.${LogisticAddressVerboseDto::updatedAt.name}",
+            )
+            .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
+            .isEqualTo(expected)
+    }
+
+    fun assertAddressGet(actual: LogisticAddressVerboseDto, expected: LogisticAddressVerboseDto){
+        Assertions.assertThat(actual)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .ignoringFields(
+                 LogisticAddressVerboseDto::createdAt.name,
+                 LogisticAddressVerboseDto::updatedAt.name
+            )
+            .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
+            .isEqualTo(expected)
+    }
+
 
     private fun ObjectAssert<*>.usingRecursiveLegalEntityUpsertComparison(): RecursiveComparisonAssert<*>{
         return this.usingRecursiveComparison()

@@ -26,6 +26,7 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.ApiCommons
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntitySearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.PoolLegalEntityApi
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.SiteVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntityPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntityPartnerUpdateRequest
@@ -77,4 +78,10 @@ interface LegalEntityApiClient: PoolLegalEntityApi {
         @Parameter(description = "BPNL value") @PathVariable bpnl: String,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageDto<SiteVerboseDto>
+
+    @GetExchange(value = "${ApiCommons.LEGAL_ENTITY_BASE_PATH_V6}/{bpnl}/addresses")
+    override fun getAddresses(
+        @Parameter(description = "BPNL value") @PathVariable bpnl: String,
+        @ParameterObject paginationRequest: PaginationRequest
+    ): PageDto<LogisticAddressVerboseDto>
 }
