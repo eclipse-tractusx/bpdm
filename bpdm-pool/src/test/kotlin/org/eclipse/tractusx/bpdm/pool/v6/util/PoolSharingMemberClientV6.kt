@@ -17,23 +17,9 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.config
+package org.eclipse.tractusx.bpdm.pool.v6.util
 
-import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolDataHelper
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
+import org.eclipse.tractusx.bpdm.pool.api.v6.client.PoolClientImpl
+import org.springframework.web.reactive.function.client.WebClient
 
-@Configuration
-class TestdataConfig {
-
-    /**
-     * We create [PoolDataHelper] here with standard metadata to create test data environments from
-     * For more specialized environments you could also not autowire it and  instead create the [PoolDataHelper] in the test class itself
-     */
-    @Bean
-    fun poolDataHelper(poolClient: PoolApiClient): PoolDataHelper {
-        return PoolDataHelper(poolClient)
-    }
-
-}
+class PoolSharingMemberClientV6(webClientProvider: () -> WebClient): PoolClientImpl(webClientProvider)
