@@ -98,6 +98,15 @@ class AssertRepositoryV6(
             val mainAddressUpdatedAt =  "${mainAddress}.${LogisticAddressVerboseDto::updatedAt.name}"
         }
 
+        private object SiteGetResponsePaths{
+            private val site = SiteWithMainAddressVerboseDto::site.name
+            private val mainAddress =  SiteWithMainAddressVerboseDto::mainAddress.name
+            val siteCreatedAt =  "${site}.${SiteVerboseDto::createdAt.name}"
+            val siteUpdatedAt =  "${site}.${SiteVerboseDto::updatedAt.name}"
+            val mainAddressCreatedAt =  "${mainAddress}.${LogisticAddressVerboseDto::createdAt.name}"
+            val mainAddressUpdatedAt =  "${mainAddress}.${LogisticAddressVerboseDto::updatedAt.name}"
+        }
+
         private object AdditionalAddressUpsertPaths{
             private val entities = AddressPartnerCreateResponseWrapper::entities.name
             private val errors =  AddressPartnerCreateResponseWrapper::errors.name
@@ -219,6 +228,32 @@ class AssertRepositoryV6(
                 SiteSearchResponsePaths.siteUpdatedAt,
                 SiteSearchResponsePaths.mainAddressCreatedAt,
                 SiteSearchResponsePaths.mainAddressUpdatedAt,
+            )
+            .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
+            .isEqualTo(expected)
+    }
+
+    fun assertSiteVerbose(actual: PageDto<SiteVerboseDto>, expected: PageDto<SiteVerboseDto>){
+        Assertions.assertThat(actual)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .ignoringFields(
+                "${PageDto<*>::content.name}.${SiteVerboseDto::createdAt.name}",
+                "${PageDto<*>::content.name}.${SiteVerboseDto::updatedAt.name}",
+            )
+            .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
+            .isEqualTo(expected)
+    }
+
+    fun assertSiteGet(actual: SiteWithMainAddressVerboseDto, expected: SiteWithMainAddressVerboseDto){
+        Assertions.assertThat(actual)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .ignoringFields(
+                SiteGetResponsePaths.siteCreatedAt,
+                SiteGetResponsePaths.siteUpdatedAt,
+                SiteGetResponsePaths.mainAddressCreatedAt,
+                SiteGetResponsePaths.mainAddressUpdatedAt,
             )
             .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
             .isEqualTo(expected)
