@@ -21,8 +21,8 @@
 apiVersion: v2
 type: application
 name: bpdm-pool
-appVersion: "7.1.0-rc4"
-version: 8.1.0-rc4
+appVersion: "7.1.0-SNAPSHOT"
+version: 8.1.0-SNAPSHOT
 description: A Helm chart for deploying the BPDM pool service
 home: https://eclipse-tractusx.github.io/docs/kits/Business%20Partner%20Kit/Adoption%20View
 sources:
