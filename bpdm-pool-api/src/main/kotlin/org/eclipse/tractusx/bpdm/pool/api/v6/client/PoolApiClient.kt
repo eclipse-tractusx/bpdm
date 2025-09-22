@@ -31,4 +31,6 @@ interface PoolApiClient {
 
     val memberships: CxMembershipApiClient
 
+    val changelogs: ChangelogApiClient
+
 }

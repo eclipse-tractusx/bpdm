@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.v6.util
 
 import org.eclipse.tractusx.bpdm.pool.api.v6.client.PoolApiClient
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerCreateVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateVerboseDto
@@ -44,9 +45,23 @@ class TestDataClientV6(
         return legalEntityResponse
     }
 
+    fun updateLegalEntity(legalEntity: LegalEntityPartnerCreateVerboseDto, seed: String): LegalEntityPartnerCreateVerboseDto{
+        val legalEntityRequest = requestFactory.createLegalEntityUpdateRequest(seed, legalEntity.legalEntity.bpnl)
+        val legalEntityResponse = poolClient.legalEntities.updateBusinessPartners(listOf(legalEntityRequest)).entities.single()
+
+        return legalEntityResponse
+    }
+
     fun createSiteFor(legalEntity: LegalEntityPartnerCreateVerboseDto, seed: String): SitePartnerCreateVerboseDto{
         val siteRequest = requestFactory.buildSiteCreateRequest(seed, legalEntity.legalEntity.bpnl)
         val siteResponse = poolClient.sites.createSite(listOf(siteRequest)).entities.single()
+
+        return siteResponse
+    }
+
+    fun updateSite(site: SitePartnerCreateVerboseDto, seed: String): SitePartnerCreateVerboseDto{
+        val siteRequest = requestFactory.createSiteUpdateRequest(seed, site.site.bpns)
+        val siteResponse = poolClient.sites.updateSite(listOf(siteRequest)).entities.single()
 
         return siteResponse
     }
@@ -68,6 +83,13 @@ class TestDataClientV6(
     fun createAdditionalAddressFor(site: SitePartnerCreateVerboseDto, seed: String): AddressPartnerCreateVerboseDto{
         val addressRequest = requestFactory.buildAdditionalAddressCreateRequest(seed, site.site.bpns)
         val addressResponse = poolClient.addresses.createAddresses(listOf(addressRequest)).entities.single()
+
+        return addressResponse
+    }
+
+    fun updateAddress(address: AddressPartnerCreateVerboseDto, seed: String): LogisticAddressVerboseDto{
+        val addressRequest = requestFactory.buildAddressUpdateRequest(seed, address.address.bpna)
+        val addressResponse = poolClient.addresses.updateAddresses(listOf(addressRequest)).entities.single()
 
         return addressResponse
     }
