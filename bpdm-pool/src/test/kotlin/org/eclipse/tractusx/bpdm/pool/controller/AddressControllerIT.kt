@@ -26,8 +26,6 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressCreateError
@@ -37,13 +35,11 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.util.TestHelpers
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues
-import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues.addressIdentifier
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerVerboseValues
 import org.eclipse.tractusx.bpdm.test.testdata.pool.LegalEntityStructureRequest
 import org.eclipse.tractusx.bpdm.test.testdata.pool.SiteStructureRequest
 import org.eclipse.tractusx.bpdm.test.util.AssertHelpers
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
-import org.eclipse.tractusx.bpdm.test.util.PoolDataHelpers
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -61,14 +57,12 @@ class AddressControllerIT @Autowired constructor(
     val testHelpers: TestHelpers,
     val dbTestHelpers: DbTestHelpers,
     val assertHelpers: AssertHelpers,
-    val poolDataHelpers: PoolDataHelpers,
     val poolClient: PoolApiClient
 ) {
 
     @BeforeEach
     fun beforeEach() {
         dbTestHelpers.truncateDbTables()
-        poolDataHelpers.createPoolMetadata()
     }
 
     /**
@@ -314,19 +308,6 @@ class AddressControllerIT @Autowired constructor(
     @Test
     fun `create new addresses and get duplicate error`() {
 
-        poolClient.metadata.createIdentifierType(
-            IdentifierTypeDto(
-                technicalKey = addressIdentifier.type,
-                businessPartnerType = IdentifierBusinessPartnerType.ADDRESS,
-                name = addressIdentifier.value,
-                abbreviation = BusinessPartnerVerboseValues.identifierTypeAbbreviation1,
-                transliteratedName = BusinessPartnerVerboseValues.identifierTypeTransliteratedName1,
-                transliteratedAbbreviation = BusinessPartnerVerboseValues.identifierTypeTransliteratedAbbreviation1,
-                format = null,
-                categories = sortedSetOf()
-            )
-        )
-
         val givenStructure = testHelpers.createBusinessPartnerStructure(
             listOf(
                 LegalEntityStructureRequest(
@@ -359,19 +340,6 @@ class AddressControllerIT @Autowired constructor(
      */
     @Test
     fun `update address entities and get duplicate identifier error`() {
-
-        poolClient.metadata.createIdentifierType(
-            IdentifierTypeDto(
-                technicalKey = addressIdentifier.type,
-                businessPartnerType = IdentifierBusinessPartnerType.ADDRESS,
-                name = addressIdentifier.value,
-                abbreviation = BusinessPartnerVerboseValues.identifierTypeAbbreviation1,
-                transliteratedName = BusinessPartnerVerboseValues.identifierTypeTransliteratedName1,
-                transliteratedAbbreviation = BusinessPartnerVerboseValues.identifierTypeTransliteratedAbbreviation1,
-                format = null,
-                categories = sortedSetOf()
-            )
-        )
 
         val givenStructure = testHelpers.createBusinessPartnerStructure(
             listOf(
