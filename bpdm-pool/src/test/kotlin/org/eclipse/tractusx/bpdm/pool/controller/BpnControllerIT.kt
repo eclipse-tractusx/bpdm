@@ -34,7 +34,6 @@ import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseVal
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerVerboseValues
 import org.eclipse.tractusx.bpdm.test.testdata.pool.LegalEntityStructureRequest
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
-import org.eclipse.tractusx.bpdm.test.util.PoolDataHelpers
 import org.junit.Assert
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -58,7 +57,6 @@ class BpnControllerIT @Autowired constructor(
     val testHelpers: TestHelpers,
     val poolClient: PoolClientImpl,
     val dbTestHelpers: DbTestHelpers,
-    val poolDataHelpers: PoolDataHelpers,
     val bpnRequestIdentifierRepository: BpnRequestIdentifierRepository
 ) {
 
@@ -83,7 +81,6 @@ class BpnControllerIT @Autowired constructor(
         val legalEntityCreate3 = BusinessPartnerNonVerboseValues.legalEntityCreate3
 
         dbTestHelpers.truncateDbTables()
-        poolDataHelpers.createPoolMetadata()
         testHelpers.createBusinessPartnerStructure(
             listOf(
                 LegalEntityStructureRequest(legalEntity = legalEntityCreate1),
