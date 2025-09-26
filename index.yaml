@@ -2,6 +2,56 @@ apiVersion: v1
 entries:
   bpdm:
   - apiVersion: v2
+    appVersion: 7.1.0-rc5
+    created: "2025-09-26T06:53:22.250603711Z"
+    dependencies:
+    - alias: bpdm-gate
+      condition: bpdm-gate.enabled
+      name: bpdm-gate
+      repository: ""
+      version: 7.1.0-rc5
+    - alias: bpdm-pool
+      condition: bpdm-pool.enabled
+      name: bpdm-pool
+      repository: ""
+      version: 8.1.0-rc5
+    - alias: bpdm-cleaning-service-dummy
+      condition: bpdm-cleaning-service-dummy.enabled
+      name: bpdm-cleaning-service-dummy
+      repository: ""
+      version: 4.1.0-rc5
+    - alias: bpdm-orchestrator
+      condition: bpdm-orchestrator.enabled
+      name: bpdm-orchestrator
+      repository: ""
+      version: 4.1.0-rc5
+    - name: bpdm-common
+      repository: ""
+      version: 1.0.5
+    - alias: postgres
+      condition: postgres.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 12.12.10
+    - alias: centralidp
+      condition: centralidp.enabled
+      name: centralidp
+      repository: https://eclipse-tractusx.github.io/charts/dev
+      version: 4.2.1
+    description: A Helm chart for Kubernetes that deploys the BPDM applications
+    digest: 59959a970fc252e8f8c871dd268df2ac3a2f097c92d340c0f70abaf0317a3108
+    home: https://github.com/eclipse-tractusx/bpdm
+    maintainers:
+    - name: Nico Koprowski
+    - name: Sujit Karne
+    name: bpdm
+    sources:
+    - https://github.com/eclipse-tractusx/bpdm
+    type: application
+    urls:
+    - https://github.com/eclipse-tractusx/bpdm/releases/download/bpdm-6.1.0-rc5/bpdm-6.1.0-rc5.tgz
+    version: 6.1.0-rc5
+  - apiVersion: v2
     appVersion: 7.1.0-rc4
     created: "2025-09-17T05:13:38.557050123Z"
     dependencies:
@@ -4060,4 +4110,4 @@ entries:
     urls:
     - https://github.com/eclipse-tractusx/bpdm/releases/download/bpdm-pool-4.0.0/bpdm-pool-4.0.0.tgz
     version: 4.0.0
-generated: "2025-09-17T05:13:38.557402304Z"
+generated: "2025-09-26T06:53:22.25096836Z"
