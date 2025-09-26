@@ -19,34 +19,31 @@
 
 package org.eclipse.tractusx.bpdm.pool.v6.config
 
-import jakarta.persistence.EntityManager
-import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.v6.util.PoolOperatorClientV6
 import org.eclipse.tractusx.bpdm.pool.v6.util.TestDataClientV6
+import org.eclipse.tractusx.bpdm.pool.v6.util.metadata.AdminAreaLevel1ImporterV6
+import org.eclipse.tractusx.bpdm.pool.v6.util.metadata.IdentifierTypeImporterV6
+import org.eclipse.tractusx.bpdm.pool.v6.util.metadata.LegalFormImporterV6
+import org.eclipse.tractusx.bpdm.pool.v6.util.metadata.TestMetadataV6FromResourceProvider
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v6.TestDataV6Factory
-import org.eclipse.tractusx.bpdm.test.testdata.pool.v6.TestMetadataV6Provider
-import org.flywaydb.core.Flyway
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.core.io.ResourceLoader
 
 @Configuration
 @ConditionalOnProperty(name = ["test.v6"], havingValue = "true", matchIfMissing = false)
 class TestDataV6Configuration {
 
-    /**
-     * Include entity manager in the arguments here to make sure that the test data is gathered after the database connection is fully initialized
-     */
     @Bean
-    fun testMetadataV6Provider(flyway: Flyway, entityManager: EntityManager, poolClientV6: PoolOperatorClientV6, poolClient: PoolApiClient): TestMetadataV6Provider{
-        flyway.clean()
-        flyway.migrate()
-        return TestMetadataV6Provider(poolClientV6, poolClient)
-    }
+    fun testDataV6Factory(resourceLoader: ResourceLoader): TestDataV6Factory{
+        val legalFormImporterV6 = LegalFormImporterV6(resourceLoader.getResource("classpath:legalforms/2023-09-28-elf-code-list-v1.5.csv"))
+        val adminAreaImporter = AdminAreaLevel1ImporterV6(resourceLoader.getResource("classpath:regions/IP2LOCATION-ISO3166-2.CSV"))
+        val identifierTypeImporter = IdentifierTypeImporterV6(resourceLoader.getResource("classpath:identifiertypes/identifier-types.csv"))
 
-    @Bean
-    fun testDataV6Factory(testMetadataV6Provider: TestMetadataV6Provider): TestDataV6Factory{
-        return TestDataV6Factory(testMetadataV6Provider.createTestMetadata())
+        val testMetadataV6Provider = TestMetadataV6FromResourceProvider(legalFormImporterV6, adminAreaImporter, identifierTypeImporter)
+
+        return TestDataV6Factory(testMetadataV6Provider.createMetadata())
     }
 
     @Bean
