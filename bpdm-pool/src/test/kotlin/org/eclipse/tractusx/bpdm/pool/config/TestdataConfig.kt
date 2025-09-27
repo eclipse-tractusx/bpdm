@@ -21,7 +21,6 @@ package org.eclipse.tractusx.bpdm.pool.config
 
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolDataHelper
-import org.eclipse.tractusx.bpdm.test.testdata.pool.TestMetadataKeys
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
@@ -34,13 +33,7 @@ class TestdataConfig {
      */
     @Bean
     fun poolDataHelper(poolClient: PoolApiClient): PoolDataHelper {
-        return PoolDataHelper(
-            metadataToCreate = TestMetadataKeys(
-                legalEntityIdentifierTypeKeys = listOf("LID1", "LID2", "LID3", "LID4", "LID5", "LID6", "LID7", "LID8"),
-                addressIdentifierTypeKeys = listOf("AID1", "AID2", "AID3", "AID4", "AID5", "AID6", "AID7", "AID8")
-            ),
-            poolClient
-        )
+        return PoolDataHelper(poolClient)
     }
 
 }
