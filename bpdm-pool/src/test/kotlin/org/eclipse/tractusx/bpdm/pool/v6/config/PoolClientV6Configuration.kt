@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.v6.config
 
 import org.eclipse.tractusx.bpdm.common.util.BpdmWebClientProvider
 import org.eclipse.tractusx.bpdm.pool.v6.util.PoolOperatorClientV6
+import org.eclipse.tractusx.bpdm.pool.v6.util.PoolParticipantClientV6
 import org.eclipse.tractusx.bpdm.pool.v6.util.PoolSharingMemberClientV6
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext
@@ -50,6 +51,18 @@ class PoolClientV6Configuration {
         webClientProvider: BpdmWebClientProvider
     ): PoolSharingMemberClientV6 {
         return PoolSharingMemberClientV6 {
+            val properties = selfClientConfigProperties.copy(baseUrl = "http://localhost:${webServerAppCtxt.webServer.port}")
+            webClientProvider.builder(properties).build()
+        }
+    }
+
+    @Bean
+    fun participantClientV6(
+        webServerAppCtxt: ServletWebServerApplicationContext,
+        selfClientConfigProperties: ParticipantClientConfigProperties,
+        webClientProvider: BpdmWebClientProvider
+    ): PoolParticipantClientV6 {
+        return PoolParticipantClientV6 {
             val properties = selfClientConfigProperties.copy(baseUrl = "http://localhost:${webServerAppCtxt.webServer.port}")
             webClientProvider.builder(properties).build()
         }

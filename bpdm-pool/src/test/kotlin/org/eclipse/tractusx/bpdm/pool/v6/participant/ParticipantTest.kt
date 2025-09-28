@@ -17,12 +17,13 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.v6.sharingmember
+package org.eclipse.tractusx.bpdm.pool.v6.participant
 
 import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.auth.SelfClientAsAdminInitializer
 import org.eclipse.tractusx.bpdm.pool.v6.PoolV6Test
-import org.eclipse.tractusx.bpdm.pool.v6.util.PoolSharingMemberClientV6
+import org.eclipse.tractusx.bpdm.pool.v6.util.ParticipantClientInitializer
+import org.eclipse.tractusx.bpdm.pool.v6.util.PoolOperatorClientV6
+import org.eclipse.tractusx.bpdm.pool.v6.util.PoolParticipantClientV6
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.junit.jupiter.api.BeforeEach
@@ -36,15 +37,17 @@ import org.springframework.test.context.ContextConfiguration
 @ContextConfiguration(initializers = [
     PostgreSQLContextInitializer::class,
     KeyCloakInitializer::class,
-    SelfClientAsAdminInitializer::class
+    ParticipantClientInitializer::class
 ])
 @ActiveProfiles("test-v6")
-abstract class SharingMemberTest: PoolV6Test() {
+abstract class ParticipantTest: PoolV6Test() {
     @Autowired
-    lateinit var poolClient: PoolSharingMemberClientV6
+    lateinit var poolClient: PoolParticipantClientV6
+    @Autowired
+    lateinit var operatorClient: PoolOperatorClientV6
 
     @BeforeEach
-    override fun beforeEach(testInfo: TestInfo){
+    override fun beforeEach(testInfo: TestInfo) {
         super.beforeEach(testInfo)
     }
 }
