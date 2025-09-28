@@ -23,6 +23,7 @@ import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.ApiCommons
+import org.eclipse.tractusx.bpdm.pool.api.model.CountrySubdivisionDto
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.v6.PoolMetadataApi
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierTypeDto
@@ -53,4 +54,7 @@ interface MetadataApiClient: PoolMetadataApi {
 
     @GetExchange(value = "${ApiCommons.BASE_PATH_V6}/legal-forms")
     override fun getLegalForms(@ParameterObject paginationRequest: PaginationRequest): PageDto<LegalFormDto>
+
+    @GetExchange(value = "${ApiCommons.BASE_PATH_V6}/administrative-areas-level1")
+    fun getAdminAreasLevel1(@ParameterObject paginationRequest: PaginationRequest): PageDto<CountrySubdivisionDto>
 }
