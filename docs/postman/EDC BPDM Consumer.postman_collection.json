@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "e921804c-5f2f-4ad3-85e2-b31cf4d55d2d",
+		"_postman_id": "d469ef92-1db8-40f7-8efc-a5d16fda37b2",
 		"name": "EDC BPDM Consumer",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "26818013"
+		"_exporter_id": "29584075"
 	},
 	"item": [
 		{
@@ -22,7 +22,8 @@
 											""
 										],
 										"type": "text/javascript",
-										"packages": {}
+										"packages": {},
+										"requests": {}
 									}
 								},
 								{
@@ -33,14 +34,15 @@
 											"    pm.response.to.have.status(200);",
 											"});",
 											"var responseJson = pm.response.json();",
-											"var offerId = responseJson[\"dcat:dataset\"][\"odrl:hasPolicy\"][\"@id\"];",
-											"var assetId = responseJson[\"dcat:dataset\"][\"id\"];",
+											"var offerId = responseJson[\"dataset\"][0][\"hasPolicy\"][0][\"@id\"];",
+											"var assetId = responseJson[\"dataset\"][0][\"@id\"];",
 											"pm.collectionVariables.set(\"OFFER\", offerId);",
 											"pm.collectionVariables.set(\"SELECTED_ASSET\", assetId)",
 											"pm.collectionVariables.set(\"SELECTED_PURPOSE\", \"cx.bpdm.pool:1\")"
 										],
 										"type": "text/javascript",
-										"packages": {}
+										"packages": {},
+										"requests": {}
 									}
 								}
 							],
@@ -49,7 +51,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"@context\": {\r\n        \"@vocab\": \"https://w3id.org/edc/v0.0.1/ns/\"\r\n    },\r\n    \"@type\": \"CatalogRequest\",\r\n    \"counterPartyAddress\": \"{{PROVIDER_EDC_DATASPACE_API}}\",\r\n    \"counterPartyId\": \"{{PROVIDER_BPNL}}\",\r\n    \"protocol\": \"dataspace-protocol-http\",\r\n    \"querySpec\": {\r\n        \"offset\": 0,\r\n        \"limit\": 1,\r\n        \"filterExpression\": [\r\n            {\r\n                \"operandLeft\": \"'http://purl.org/dc/terms/type'.'@id'\",\r\n                \"operator\": \"=\",\r\n                \"operandRight\": \"https://w3id.org/catenax/taxonomy/BPDMPool\"\r\n            },\r\n            {\r\n                \"operandLeft\": \"'http://purl.org/dc/terms/subject'.'@id'\",\r\n                \"operator\": \"=\",\r\n                \"operandRight\": \"https://w3id.org/catenax/taxonomy/ReadAccessPoolForDataSpaceParticipant\"\r\n            },\r\n            {\r\n                \"operandLeft\": \"https://w3id.org/catenax/ontology/common#version\",\r\n                \"operator\": \"=\",\r\n                \"operandRight\": \"7\"\r\n            }\r\n        ]\r\n    }\r\n}",
+									"raw": "{\r\n    \"@context\": {\r\n        \"@vocab\": \"https://w3id.org/edc/v0.0.1/ns/\"\r\n    },\r\n    \"@type\": \"CatalogRequest\",\r\n    \"counterPartyAddress\": \"{{PROVIDER_EDC_DATASPACE_API}}\",\r\n    \"counterPartyId\": \"{{PROVIDER_DID}}\",\r\n    \"protocol\": \"dataspace-protocol-http:2025-1\",\r\n    \"querySpec\": {\r\n        \"offset\": 0,\r\n        \"limit\": 1,\r\n        \"filterExpression\": [\r\n            {\r\n                \"operandLeft\": \"'http://purl.org/dc/terms/type'.'@id'\",\r\n                \"operator\": \"=\",\r\n                \"operandRight\": \"https://w3id.org/catenax/taxonomy/BPDMPool\"\r\n            },\r\n            {\r\n                \"operandLeft\": \"'http://purl.org/dc/terms/subject'.'@id'\",\r\n                \"operator\": \"=\",\r\n                \"operandRight\": \"https://w3id.org/catenax/taxonomy/ReadAccessPoolForDataSpaceParticipant\"\r\n            },\r\n            {\r\n                \"operandLeft\": \"https://w3id.org/catenax/ontology/common#version\",\r\n                \"operator\": \"=\",\r\n                \"operandRight\": \"7\"\r\n            }\r\n        ]\r\n    }\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -80,7 +82,8 @@
 											""
 										],
 										"type": "text/javascript",
-										"packages": {}
+										"packages": {},
+										"requests": {}
 									}
 								},
 								{
@@ -91,14 +94,15 @@
 											"    pm.response.to.have.status(200);",
 											"});",
 											"var responseJson = pm.response.json();",
-											"var offerId = responseJson[\"dcat:dataset\"][\"odrl:hasPolicy\"][\"@id\"];",
-											"var assetId = responseJson[\"dcat:dataset\"][\"id\"];",
+											"var offerId = responseJson[\"dataset\"][0][\"hasPolicy\"][0][\"@id\"];",
+											"var assetId = responseJson[\"dataset\"][0][\"@id\"];",
 											"pm.collectionVariables.set(\"OFFER\", offerId);",
 											"pm.collectionVariables.set(\"SELECTED_ASSET\", assetId)",
 											"pm.collectionVariables.set(\"SELECTED_PURPOSE\", \"cx.bpdm.gate.upload:1\")"
 										],
 										"type": "text/javascript",
-										"packages": {}
+										"packages": {},
+										"requests": {}
 									}
 								}
 							],
@@ -107,7 +111,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"@context\": {\r\n        \"@vocab\": \"https://w3id.org/edc/v0.0.1/ns/\"\r\n    },\r\n    \"@type\": \"CatalogRequest\",\r\n    \"counterPartyAddress\": \"{{PROVIDER_EDC_DATASPACE_API}}\",\r\n    \"counterPartyId\": \"{{PROVIDER_BPNL}}\",\r\n    \"protocol\": \"dataspace-protocol-http\",\r\n    \"querySpec\": {\r\n        \"offset\": 0,\r\n        \"limit\": 1,\r\n        \"filterExpression\": [\r\n            {\r\n                \"operandLeft\": \"'http://purl.org/dc/terms/type'.'@id'\",\r\n                \"operator\": \"=\",\r\n                \"operandRight\": \"https://w3id.org/catenax/taxonomy/BPDMGate\"\r\n            },\r\n            {\r\n                \"operandLeft\": \"'http://purl.org/dc/terms/subject'.'@id'\",\r\n                \"operator\": \"=\",\r\n                \"operandRight\": \"https://w3id.org/catenax/taxonomy/FullAccessGateInputForSharingMember\"\r\n            },\r\n            {\r\n                \"operandLeft\": \"https://w3id.org/catenax/ontology/common#version\",\r\n                \"operator\": \"=\",\r\n                \"operandRight\": \"7\"\r\n            },\r\n            {\r\n                \"operandLeft\": \"https://w3id.org/edc/v0.0.1/ns/BusinessPartnerNumber\",\r\n                \"operator\": \"=\",\r\n                \"operandRight\": \"{{CONSUMER_BPNL}}\"\r\n            }\r\n        ]\r\n    }\r\n}",
+									"raw": "{\r\n    \"@context\": {\r\n        \"@vocab\": \"https://w3id.org/edc/v0.0.1/ns/\"\r\n    },\r\n    \"@type\": \"CatalogRequest\",\r\n    \"counterPartyAddress\": \"{{PROVIDER_EDC_DATASPACE_API}}\",\r\n    \"counterPartyId\": \"{{PROVIDER_DID}}\",\r\n    \"protocol\": \"dataspace-protocol-http:2025-1\",\r\n    \"querySpec\": {\r\n        \"offset\": 0,\r\n        \"limit\": 1,\r\n        \"filterExpression\": [\r\n            {\r\n                \"operandLeft\": \"'http://purl.org/dc/terms/type'.'@id'\",\r\n                \"operator\": \"=\",\r\n                \"operandRight\": \"https://w3id.org/catenax/taxonomy/BPDMGate\"\r\n            },\r\n            {\r\n                \"operandLeft\": \"'http://purl.org/dc/terms/subject'.'@id'\",\r\n                \"operator\": \"=\",\r\n                \"operandRight\": \"https://w3id.org/catenax/taxonomy/FullAccessGateInputForSharingMember\"\r\n            },\r\n            {\r\n                \"operandLeft\": \"https://w3id.org/catenax/ontology/common#version\",\r\n                \"operator\": \"=\",\r\n                \"operandRight\": \"7\"\r\n            },\r\n            {\r\n                \"operandLeft\": \"https://w3id.org/edc/v0.0.1/ns/BusinessPartnerNumber\",\r\n                \"operator\": \"=\",\r\n                \"operandRight\": \"{{CONSUMER_BPNL}}\"\r\n            }\r\n        ]\r\n    }\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -138,7 +142,8 @@
 											""
 										],
 										"type": "text/javascript",
-										"packages": {}
+										"packages": {},
+										"requests": {}
 									}
 								},
 								{
@@ -149,14 +154,15 @@
 											"    pm.response.to.have.status(200);",
 											"});",
 											"var responseJson = pm.response.json();",
-											"var offerId = responseJson[\"dcat:dataset\"][\"odrl:hasPolicy\"][\"@id\"];",
-											"var assetId = responseJson[\"dcat:dataset\"][\"id\"];",
+											"var offerId = responseJson[\"dataset\"][0][\"hasPolicy\"][0][\"@id\"];",
+											"var assetId = responseJson[\"dataset\"][0][\"@id\"];",
 											"pm.collectionVariables.set(\"OFFER\", offerId);",
 											"pm.collectionVariables.set(\"SELECTED_ASSET\", assetId)",
 											"pm.collectionVariables.set(\"SELECTED_PURPOSE\", \"cx.bpdm.gate.upload:1\")"
 										],
 										"type": "text/javascript",
-										"packages": {}
+										"packages": {},
+										"requests": {}
 									}
 								}
 							],
@@ -165,7 +171,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"@context\": {\r\n        \"@vocab\": \"https://w3id.org/edc/v0.0.1/ns/\"\r\n    },\r\n    \"@type\": \"CatalogRequest\",\r\n    \"counterPartyAddress\": \"{{PROVIDER_EDC_DATASPACE_API}}\",\r\n    \"counterPartyId\": \"{{PROVIDER_BPNL}}\",\r\n    \"protocol\": \"dataspace-protocol-http\",\r\n    \"querySpec\": {\r\n        \"offset\": 0,\r\n        \"limit\": 1,\r\n        \"filterExpression\": [\r\n            {\r\n                \"operandLeft\": \"'http://purl.org/dc/terms/type'.'@id'\",\r\n                \"operator\": \"=\",\r\n                \"operandRight\": \"https://w3id.org/catenax/taxonomy/BPDMGate\"\r\n            },\r\n            {\r\n                \"operandLeft\": \"'http://purl.org/dc/terms/subject'.'@id'\",\r\n                \"operator\": \"=\",\r\n                \"operandRight\": \"https://w3id.org/catenax/taxonomy/ReadAccessGateInputForSharingMember\"\r\n            },\r\n            {\r\n                \"operandLeft\": \"https://w3id.org/catenax/ontology/common#version\",\r\n                \"operator\": \"=\",\r\n                \"operandRight\": \"7\"\r\n            },\r\n            {\r\n                \"operandLeft\": \"https://w3id.org/edc/v0.0.1/ns/BusinessPartnerNumber\",\r\n                \"operator\": \"=\",\r\n                \"operandRight\": \"{{CONSUMER_BPNL}}\"\r\n            }\r\n        ]\r\n    }\r\n}",
+									"raw": "{\r\n    \"@context\": {\r\n        \"@vocab\": \"https://w3id.org/edc/v0.0.1/ns/\"\r\n    },\r\n    \"@type\": \"CatalogRequest\",\r\n    \"counterPartyAddress\": \"{{PROVIDER_EDC_DATASPACE_API}}\",\r\n    \"counterPartyId\": \"{{PROVIDER_DID}}\",\r\n    \"protocol\": \"dataspace-protocol-http:2025-1\",\r\n    \"querySpec\": {\r\n        \"offset\": 0,\r\n        \"limit\": 1,\r\n        \"filterExpression\": [\r\n            {\r\n                \"operandLeft\": \"'http://purl.org/dc/terms/type'.'@id'\",\r\n                \"operator\": \"=\",\r\n                \"operandRight\": \"https://w3id.org/catenax/taxonomy/BPDMGate\"\r\n            },\r\n            {\r\n                \"operandLeft\": \"'http://purl.org/dc/terms/subject'.'@id'\",\r\n                \"operator\": \"=\",\r\n                \"operandRight\": \"https://w3id.org/catenax/taxonomy/ReadAccessGateInputForSharingMember\"\r\n            },\r\n            {\r\n                \"operandLeft\": \"https://w3id.org/catenax/ontology/common#version\",\r\n                \"operator\": \"=\",\r\n                \"operandRight\": \"7\"\r\n            },\r\n            {\r\n                \"operandLeft\": \"https://w3id.org/edc/v0.0.1/ns/BusinessPartnerNumber\",\r\n                \"operator\": \"=\",\r\n                \"operandRight\": \"{{CONSUMER_BPNL}}\"\r\n            }\r\n        ]\r\n    }\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -196,7 +202,8 @@
 											""
 										],
 										"type": "text/javascript",
-										"packages": {}
+										"packages": {},
+										"requests": {}
 									}
 								},
 								{
@@ -207,14 +214,15 @@
 											"    pm.response.to.have.status(200);",
 											"});",
 											"var responseJson = pm.response.json();",
-											"var offerId = responseJson[\"dcat:dataset\"][\"odrl:hasPolicy\"][\"@id\"];",
-											"var assetId = responseJson[\"dcat:dataset\"][\"id\"];",
+											"var offerId = responseJson[\"dataset\"][0][\"hasPolicy\"][0][\"@id\"];",
+											"var assetId = responseJson[\"dataset\"][0][\"@id\"];",
 											"pm.collectionVariables.set(\"OFFER\", offerId);",
 											"pm.collectionVariables.set(\"SELECTED_ASSET\", assetId)",
 											"pm.collectionVariables.set(\"SELECTED_PURPOSE\", \"cx.bpdm.gate.download:1\")"
 										],
 										"type": "text/javascript",
-										"packages": {}
+										"packages": {},
+										"requests": {}
 									}
 								}
 							],
@@ -223,7 +231,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"@context\": {\r\n        \"@vocab\": \"https://w3id.org/edc/v0.0.1/ns/\"\r\n    },\r\n    \"@type\": \"CatalogRequest\",\r\n    \"counterPartyAddress\": \"{{PROVIDER_EDC_DATASPACE_API}}\",\r\n    \"counterPartyId\": \"{{PROVIDER_BPNL}}\",\r\n    \"protocol\": \"dataspace-protocol-http\",\r\n    \"querySpec\": {\r\n        \"offset\": 0,\r\n        \"limit\": 1,\r\n        \"filterExpression\": [\r\n            {\r\n                \"operandLeft\": \"'http://purl.org/dc/terms/type'.'@id'\",\r\n                \"operator\": \"=\",\r\n                \"operandRight\": \"https://w3id.org/catenax/taxonomy/BPDMGate\"\r\n            },\r\n            {\r\n                \"operandLeft\": \"'http://purl.org/dc/terms/subject'.'@id'\",\r\n                \"operator\": \"=\",\r\n                \"operandRight\": \"https://w3id.org/catenax/taxonomy/ReadAccessGateOutputForSharingMember\"\r\n            },\r\n            {\r\n                \"operandLeft\": \"https://w3id.org/catenax/ontology/common#version\",\r\n                \"operator\": \"=\",\r\n                \"operandRight\": \"7\"\r\n            },\r\n            {\r\n                \"operandLeft\": \"https://w3id.org/edc/v0.0.1/ns/BusinessPartnerNumber\",\r\n                \"operator\": \"=\",\r\n                \"operandRight\": \"{{CONSUMER_BPNL}}\"\r\n            }\r\n        ]\r\n    }\r\n}",
+									"raw": "{\r\n    \"@context\": {\r\n        \"@vocab\": \"https://w3id.org/edc/v0.0.1/ns/\"\r\n    },\r\n    \"@type\": \"CatalogRequest\",\r\n    \"counterPartyAddress\": \"{{PROVIDER_EDC_DATASPACE_API}}\",\r\n    \"counterPartyId\": \"{{PROVIDER_DID}}\",\r\n    \"protocol\": \"dataspace-protocol-http:2025-1\",\r\n    \"querySpec\": {\r\n        \"offset\": 0,\r\n        \"limit\": 1,\r\n        \"filterExpression\": [\r\n            {\r\n                \"operandLeft\": \"'http://purl.org/dc/terms/type'.'@id'\",\r\n                \"operator\": \"=\",\r\n                \"operandRight\": \"https://w3id.org/catenax/taxonomy/BPDMGate\"\r\n            },\r\n            {\r\n                \"operandLeft\": \"'http://purl.org/dc/terms/subject'.'@id'\",\r\n                \"operator\": \"=\",\r\n                \"operandRight\": \"https://w3id.org/catenax/taxonomy/ReadAccessGateOutputForSharingMember\"\r\n            },\r\n            {\r\n                \"operandLeft\": \"https://w3id.org/catenax/ontology/common#version\",\r\n                \"operator\": \"=\",\r\n                \"operandRight\": \"7\"\r\n            },\r\n            {\r\n                \"operandLeft\": \"https://w3id.org/edc/v0.0.1/ns/BusinessPartnerNumber\",\r\n                \"operator\": \"=\",\r\n                \"operandRight\": \"{{CONSUMER_BPNL}}\"\r\n            }\r\n        ]\r\n    }\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -264,7 +272,8 @@
 											"pm.collectionVariables.set(\"NEGOTIATION\", negotiationId);"
 										],
 										"type": "text/javascript",
-										"packages": {}
+										"packages": {},
+										"requests": {}
 									}
 								}
 							],
@@ -273,7 +282,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"@context\": [\n        \"https://w3id.org/tractusx/policy/v1.0.0\",\n        \"http://www.w3.org/ns/odrl.jsonld\",\n        {\n            \"edc\": \"https://w3id.org/edc/v0.0.1/ns/\"\n        }\n    ],\n    \"@type\": \"ContractRequest\",\n    \"edc:counterPartyAddress\": \"{{PROVIDER_EDC_DATASPACE_API}}\",\n    \"edc:protocol\": \"dataspace-protocol-http\",\n    \"edc:counterPartyId\": \"{{PROVIDER_BPNL}}\",\n    \"edc:policy\": {\n        \"@id\": \"{{OFFER}}\",\n        \"@type\": \"Offer\",\n        \"permission\": [\n            {\n                \"action\": \"use\",\n                \"constraint\": {\n                    \"and\": [\n                        {\n                            \"leftOperand\": \"FrameworkAgreement\",\n                            \"operator\": \"eq\",\n                            \"rightOperand\": \"DataExchangeGovernance:1.0\"\n                        },\n                        {\n                            \"leftOperand\": \"UsagePurpose\",\n                            \"operator\": \"eq\",\n                            \"rightOperand\": \"{{SELECTED_PURPOSE}}\"\n                        }\n                    ]\n                }\n            }\n        ],\n        \"target\": \"{{SELECTED_ASSET}}\",\n        \"assigner\": \"{{PROVIDER_BPNL}}\"\n    }\n}",
+									"raw": "{\n    \"@context\": [\n        \"http://www.w3.org/ns/odrl.jsonld\",\n        {\n            \"cx-policy\": \"https://w3id.org/catenax/2025/9/policy/\",\n            \"edc\": \"https://w3id.org/edc/v0.0.1/ns/\"\n        }\n    ],\n    \"@type\": \"ContractRequest\",\n    \"edc:counterPartyAddress\": \"{{PROVIDER_EDC_DATASPACE_API}}\",\n    \"edc:protocol\": \"dataspace-protocol-http:2025-1\",\n    \"edc:counterPartyId\": \"{{PROVIDER_DID}}\",\n    \"edc:policy\": {\n        \"@id\": \"{{OFFER}}\",\n        \"@type\": \"Offer\",\n        \"permission\": [\n            {\n                \"action\": \"use\",\n                \"constraint\": {\n                    \"and\": [\n                        {\n                            \"leftOperand\": \"cx-policy:FrameworkAgreement\",\n                            \"operator\": \"eq\",\n                            \"rightOperand\": \"DataExchangeGovernance:1.0\"\n                        },\n                        {\n                            \"leftOperand\": \"cx-policy:UsagePurpose\",\n                            \"operator\": \"isAnyOf\",\n                            \"rightOperand\": \"{{SELECTED_PURPOSE}}\"\n                        }\n                    ]\n                }\n            }\n        ],\n        \"target\": \"{{SELECTED_ASSET}}\",\n        \"assigner\": \"{{PROVIDER_DID}}\"\n    }\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -613,14 +622,13 @@
 					},
 					"response": [
 						{
-							"name": "OK",
+							"name": "Search Participant Legal Entities",
 							"originalRequest": {
 								"method": "POST",
 								"header": [
 									{
-										"key": "Authorization",
-										"value": "<token>",
-										"description": "Added as a part of security scheme: oauth2"
+										"key": "Content-Type",
+										"value": "application/json"
 									},
 									{
 										"key": "Accept",
@@ -629,7 +637,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"bpnLs\": [\n    \"sit magna in aliquip\",\n    \"ea Lorem\"\n  ],\n  \"legalName\": \"in co\"\n}",
+									"raw": "{\n  \"bpnLs\": [\n    \"sint dolore\",\n    \"amet\"\n  ],\n  \"legalName\": \"velit Lorem ut\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -649,26 +657,21 @@
 									"query": [
 										{
 											"key": "page",
-											"value": "deserunt esse ut eu"
+											"value": "deserunt esse ut eu",
+											"description": "Number of page to get results from"
 										},
 										{
 											"key": "size",
-											"value": "tempor"
+											"value": "tempor",
+											"description": "Size of each page"
 										}
 									]
 								}
 							},
-							"status": "OK",
-							"code": 200,
-							"_postman_previewlanguage": "json",
-							"header": [
-								{
-									"key": "Content-Type",
-									"value": "application/json"
-								}
-							],
+							"_postman_previewlanguage": null,
+							"header": null,
 							"cookie": [],
-							"body": "{\n  \"content\": [\n    {\n      \"bpnl\": \"dolor do\",\n      \"confidenceCriteria\": {\n        \"checkedByExternalDataSource\": false,\n        \"confidenceLevel\": -75245920,\n        \"lastConfidenceCheckAt\": \"1999-02-20T18:31:55.797Z\",\n        \"nextConfidenceCheckAt\": \"1992-11-16T20:02:50.245Z\",\n        \"numberOfSharingMembers\": 38463084,\n        \"sharedByOwner\": false\n      },\n      \"createdAt\": \"1956-03-11T05:59:49.284Z\",\n      \"currentness\": \"1979-09-13T21:33:18.194Z\",\n      \"identifiers\": [\n        {\n          \"type\": {\n            \"name\": \"enim dolor occaecat in\",\n            \"technicalKey\": \"voluptate aute do\"\n          },\n          \"value\": \"ex in elit eu\",\n          \"issuingBody\": \"ad laboris in ut\"\n        },\n        {\n          \"type\": {\n            \"name\": \"cillum ut ullamco ex veniam\",\n            \"technicalKey\": \"cupidatat labore incididunt non\"\n          },\n          \"value\": \"qui adipisicing\",\n          \"issuingBody\": \"ut consequat\"\n        }\n      ],\n      \"isParticipantData\": true,\n      \"legalAddress\": {\n        \"bpna\": \"est\",\n        \"confidenceCriteria\": {\n          \"checkedByExternalDataSource\": false,\n          \"confidenceLevel\": 81879790,\n          \"lastConfidenceCheckAt\": \"1948-07-14T20:50:13.142Z\",\n          \"nextConfidenceCheckAt\": \"1965-03-07T01:07:12.326Z\",\n          \"numberOfSharingMembers\": -69055361,\n          \"sharedByOwner\": false\n        },\n        \"createdAt\": \"1981-09-14T02:40:08.772Z\",\n        \"identifiers\": [\n          {\n            \"type\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"value\": \"deserunt velit\"\n          },\n          {\n            \"type\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"value\": \"Ut sed laborum culpa Duis\"\n          }\n        ],\n        \"isParticipantData\": true,\n        \"physicalPostalAddress\": {\n          \"city\": \"in consequat\",\n          \"country\": {\n            \"name\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"technicalKey\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            }\n          },\n          \"geographicCoordinates\": {\n            \"latitude\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"longitude\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"altitude\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            }\n          },\n          \"administrativeAreaLevel1\": {\n            \"countryCode\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"regionCode\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"regionName\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            }\n          },\n          \"administrativeAreaLevel2\": \"velit enim adipisicing\",\n          \"administrativeAreaLevel3\": \"amet laboris\",\n          \"postalCode\": \"nisi\",\n          \"district\": \"anim sint\",\n          \"street\": {\n            \"name\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"houseNumber\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"houseNumberSupplement\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"milestone\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"direction\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"namePrefix\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"additionalNamePrefix\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"nameSuffix\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"additionalNameSuffix\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            }\n          },\n          \"companyPostalCode\": \"velit dolor et\",\n          \"industrialZone\": \"et magna\",\n          \"building\": \"sint in\",\n          \"floor\": \"irure ut dolor\",\n          \"door\": \"deserunt commodo sed\",\n          \"taxJurisdictionCode\": \"laboris eu deserunt labore\"\n        },\n        \"states\": [\n          {\n            \"type\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"validFrom\": \"1992-08-27T17:26:30.016Z\",\n            \"validTo\": \"2018-01-01T22:17:59.974Z\"\n          },\n          {\n            \"type\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"validFrom\": \"2021-04-15T12:31:26.278Z\",\n            \"validTo\": \"1949-02-19T08:45:40.136Z\"\n          }\n        ],\n        \"updatedAt\": \"1995-01-21T02:15:58.749Z\",\n        \"name\": \"sit enim\",\n        \"alternativePostalAddress\": {\n          \"city\": \"ullamco tempor\",\n          \"country\": {\n            \"name\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"technicalKey\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            }\n          },\n          \"deliveryServiceNumber\": \"in cupidatat\",\n          \"deliveryServiceType\": \"BOITE_POSTALE\",\n          \"geographicCoordinates\": {\n            \"latitude\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"longitude\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"altitude\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            }\n          },\n          \"administrativeAreaLevel1\": {\n            \"countryCode\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"regionCode\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"regionName\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            }\n          },\n          \"postalCode\": \"occaecat incididunt\",\n          \"deliveryServiceQualifier\": \"cillum\"\n        },\n        \"bpnLegalEntity\": \"ea nulla dolore lab\",\n        \"bpnSite\": \"minim\",\n        \"addressType\": \"AdditionalAddress\"\n      },\n      \"legalName\": \"do dolor\",\n      \"relations\": [\n        {\n          \"businessPartnerSourceBpnl\": \"in consectetur\",\n          \"businessPartnerTargetBpnl\": \"enim non r\",\n          \"isActive\": false,\n          \"type\": \"IsAlternativeHeadquarterFor\"\n        },\n        {\n          \"businessPartnerSourceBpnl\": \"mollit officia enim in\",\n          \"businessPartnerTargetBpnl\": \"sed ex exercitation\",\n          \"isActive\": true,\n          \"type\": \"IsAlternativeHeadquarterFor\"\n        }\n      ],\n      \"states\": [\n        {\n          \"type\": {\n            \"name\": \"velit do officia laboris\",\n            \"technicalKey\": \"INACTIVE\"\n          },\n          \"validFrom\": \"1989-08-24T12:21:36.508Z\",\n          \"validTo\": \"2023-07-26T06:57:59.020Z\"\n        },\n        {\n          \"type\": {\n            \"name\": \"in reprehenderit aute amet voluptate\",\n            \"technicalKey\": \"INACTIVE\"\n          },\n          \"validFrom\": \"2017-11-01T21:34:39.683Z\",\n          \"validTo\": \"1972-02-20T07:37:46.337Z\"\n        }\n      ],\n      \"updatedAt\": \"1950-06-12T17:15:59.200Z\",\n      \"legalShortName\": \"tempor ullamco pariatur cupidatat\",\n      \"legalForm\": {\n        \"isActive\": true,\n        \"name\": \"irure consequat\",\n        \"technicalKey\": \"incididunt et dolor aute commodo\",\n        \"transliteratedName\": \"ut ut ea eiusmod in\",\n        \"abbreviations\": \"dolor ex est\",\n        \"country\": \"CV\",\n        \"language\": \"ar\",\n        \"administrativeAreaLevel1\": \"aliquip pariatur\",\n        \"transliteratedAbbreviations\": \"in nulla amet\"\n      }\n    },\n    {\n      \"bpnl\": \"deserunt enim sun\",\n      \"confidenceCriteria\": {\n        \"checkedByExternalDataSource\": true,\n        \"confidenceLevel\": -88644361,\n        \"lastConfidenceCheckAt\": \"1959-09-21T00:56:44.569Z\",\n        \"nextConfidenceCheckAt\": \"1947-08-12T16:11:34.218Z\",\n        \"numberOfSharingMembers\": 62595734,\n        \"sharedByOwner\": false\n      },\n      \"createdAt\": \"2022-04-14T21:39:39.955Z\",\n      \"currentness\": \"1979-05-18T00:39:37.290Z\",\n      \"identifiers\": [\n        {\n          \"type\": {\n            \"name\": \"dolor\",\n            \"technicalKey\": \"sit aute\"\n          },\n          \"value\": \"dolor Ut\",\n          \"issuingBody\": \"laborum ad ea\"\n        },\n        {\n          \"type\": {\n            \"name\": \"qui in est commodo quis\",\n            \"technicalKey\": \"culpa exercitation reprehenderit\"\n          },\n          \"value\": \"ad a\",\n          \"issuingBody\": \"id non\"\n        }\n      ],\n      \"isParticipantData\": true,\n      \"legalAddress\": {\n        \"bpna\": \"commodo Ut sit\",\n        \"confidenceCriteria\": {\n          \"checkedByExternalDataSource\": false,\n          \"confidenceLevel\": 30793851,\n          \"lastConfidenceCheckAt\": \"1985-02-09T05:33:07.300Z\",\n          \"nextConfidenceCheckAt\": \"1950-05-19T07:25:37.354Z\",\n          \"numberOfSharingMembers\": -6676121,\n          \"sharedByOwner\": false\n        },\n        \"createdAt\": \"1947-08-19T18:26:53.194Z\",\n        \"identifiers\": [\n          {\n            \"type\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"value\": \"ali\"\n          },\n          {\n            \"type\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"value\": \"esse velit\"\n          }\n        ],\n        \"isParticipantData\": true,\n        \"physicalPostalAddress\": {\n          \"city\": \"in minim cupidatat do culpa\",\n          \"country\": {\n            \"name\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"technicalKey\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            }\n          },\n          \"geographicCoordinates\": {\n            \"latitude\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"longitude\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"altitude\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            }\n          },\n          \"administrativeAreaLevel1\": {\n            \"countryCode\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"regionCode\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"regionName\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            }\n          },\n          \"administrativeAreaLevel2\": \"reprehenderit in ad\",\n          \"administrativeAreaLevel3\": \"dolor anim pariatur si\",\n          \"postalCode\": \"sed occaecat nostrud\",\n          \"district\": \"in pariatur ullamco\",\n          \"street\": {\n            \"name\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"houseNumber\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"houseNumberSupplement\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"milestone\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"direction\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"namePrefix\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"additionalNamePrefix\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"nameSuffix\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"additionalNameSuffix\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            }\n          },\n          \"companyPostalCode\": \"eu ea\",\n          \"industrialZone\": \"est ut Lorem ali\",\n          \"building\": \"ad\",\n          \"floor\": \"fugiat anim adipisicing\",\n          \"door\": \"Excepteur\",\n          \"taxJurisdictionCode\": \"consequat officia in\"\n        },\n        \"states\": [\n          {\n            \"type\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"validFrom\": \"1956-10-15T04:27:17.154Z\",\n            \"validTo\": \"1968-01-02T20:08:38.636Z\"\n          },\n          {\n            \"type\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"validFrom\": \"1999-06-25T22:51:38.346Z\",\n            \"validTo\": \"1970-10-04T22:23:24.475Z\"\n          }\n        ],\n        \"updatedAt\": \"2015-07-27T23:38:27.977Z\",\n        \"name\": \"eiusmod sit amet adipisicing\",\n        \"alternativePostalAddress\": {\n          \"city\": \"mollit adipisicing\",\n          \"country\": {\n            \"name\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"technicalKey\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            }\n          },\n          \"deliveryServiceNumber\": \"id\",\n          \"deliveryServiceType\": \"PO_BOX\",\n          \"geographicCoordinates\": {\n            \"latitude\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"longitude\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"altitude\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            }\n          },\n          \"administrativeAreaLevel1\": {\n            \"countryCode\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"regionCode\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            \"regionName\": {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            }\n          },\n          \"postalCode\": \"commodo occaecat\",\n          \"deliveryServiceQualifier\": \"laboris consequat amet Excepteur\"\n        },\n        \"bpnLegalEntity\": \"do ipsum\",\n        \"bpnSite\": \"dolore \",\n        \"addressType\": \"AdditionalAddress\"\n      },\n      \"legalName\": \"dolor exercitation\",\n      \"relations\": [\n        {\n          \"businessPartnerSourceBpnl\": \"nisi ut laboris dolore\",\n          \"businessPartnerTargetBpnl\": \"nulla sed in\",\n          \"isActive\": false,\n          \"type\": \"IsAlternativeHeadquarterFor\"\n        },\n        {\n          \"businessPartnerSourceBpnl\": \"qui\",\n          \"businessPartnerTargetBpnl\": \"id\",\n          \"isActive\": true,\n          \"type\": \"IsAlternativeHeadquarterFor\"\n        }\n      ],\n      \"states\": [\n        {\n          \"type\": {\n            \"name\": \"adipisicing mollit eu\",\n            \"technicalKey\": \"INACTIVE\"\n          },\n          \"validFrom\": \"1999-03-08T11:17:45.794Z\",\n          \"validTo\": \"1989-01-23T00:08:44.848Z\"\n        },\n        {\n          \"type\": {\n            \"name\": \"minim deserunt cupidatat dolore\",\n            \"technicalKey\": \"INACTIVE\"\n          },\n          \"validFrom\": \"2011-12-22T22:22:55.419Z\",\n          \"validTo\": \"1963-10-12T15:50:23.560Z\"\n        }\n      ],\n      \"updatedAt\": \"2016-11-23T04:46:50.527Z\",\n      \"legalShortName\": \"reprehenderit elit esse Ut\",\n      \"legalForm\": {\n        \"isActive\": true,\n        \"name\": \"minim do Lorem\",\n        \"technicalKey\": \"exercitation culpa adipisicing ut\",\n        \"transliteratedName\": \"elit ex et Lorem\",\n        \"abbreviations\": \"deserunt elit\",\n        \"country\": \"BS\",\n        \"language\": \"sk\",\n        \"administrativeAreaLevel1\": \"sunt amet quis dolor est\",\n        \"transliteratedAbbreviations\": \"ex eiusmod in dolore dolore\"\n      }\n    }\n  ],\n  \"contentSize\": 77139214,\n  \"page\": 26100494,\n  \"totalElements\": 46059572,\n  \"totalPages\": -177048\n}"
+							"body": null
 						}
 					]
 				},
@@ -899,7 +902,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}/legal-forms?page=deserunt esse ut eu&size=tempor",
+							"raw": "{{baseUrl}}/legal-forms?page=0&size=10",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -909,12 +912,12 @@
 							"query": [
 								{
 									"key": "page",
-									"value": "deserunt esse ut eu",
+									"value": "0",
 									"description": "Number of page to get results from"
 								},
 								{
 									"key": "size",
-									"value": "tempor",
+									"value": "10",
 									"description": "Size of each page"
 								}
 							]
@@ -1882,7 +1885,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{baseUrl}}/business-partners/sharing-state?page=fugiat mollit off&size=velit culpa",
+									"raw": "{{baseUrl}}/business-partners/sharing-state",
 									"host": [
 										"{{baseUrl}}"
 									],
@@ -1894,12 +1897,14 @@
 										{
 											"key": "page",
 											"value": "fugiat mollit off",
-											"description": "Number of page to get results from"
+											"description": "Number of page to get results from",
+											"disabled": true
 										},
 										{
 											"key": "size",
 											"value": "velit culpa",
-											"description": "Size of each page"
+											"description": "Size of each page",
+											"disabled": true
 										},
 										{
 											"key": "externalIds",
@@ -2002,6 +2007,81 @@
 									],
 									"cookie": [],
 									"body": "{\n  \"content\": [\n    {\n      \"externalId\": \"aliqua do dolor\",\n      \"sharingStateType\": \"Pending\",\n      \"updatedAt\": \"2007-06-08T13:24:45.607Z\",\n      \"sharingErrorCode\": \"NaturalPersonError\",\n      \"sharingErrorMessage\": \"sint\",\n      \"sharingProcessStarted\": \"1957-08-29T13:05:51.712Z\",\n      \"taskId\": \"ut fugiat dolore\"\n    },\n    {\n      \"externalId\": \"pariatur est id\",\n      \"sharingStateType\": \"Pending\",\n      \"updatedAt\": \"2018-08-11T04:57:18.285Z\",\n      \"sharingErrorCode\": \"NaturalPersonError\",\n      \"sharingErrorMessage\": \"culpa dolor\",\n      \"sharingProcessStarted\": \"1957-03-31T02:58:37.512Z\",\n      \"taskId\": \"ex do\"\n    }\n  ],\n  \"contentSize\": -45198910,\n  \"page\": 46096174,\n  \"totalElements\": -75338307,\n  \"totalPages\": 17464701\n}"
+								},
+								{
+									"name": "Returns sharing states of business partners, optionally filtered by a business partner type and an array of external IDs",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/business-partners/sharing-state?externalIds=E2E-25/9-EDC-Roundtrip-1",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"business-partners",
+												"sharing-state"
+											],
+											"query": [
+												{
+													"key": "page",
+													"value": "fugiat mollit off",
+													"description": "Number of page to get results from",
+													"disabled": true
+												},
+												{
+													"key": "size",
+													"value": "velit culpa",
+													"description": "Size of each page",
+													"disabled": true
+												},
+												{
+													"key": "externalIds",
+													"value": "E2E-25/9-EDC-Roundtrip-1",
+													"description": "External IDs"
+												},
+												{
+													"key": "externalIds",
+													"value": "culpa",
+													"description": "External IDs",
+													"disabled": true
+												},
+												{
+													"key": "sharingStateTypes",
+													"value": "Success",
+													"description": "Only show sharing states of given types",
+													"disabled": true
+												},
+												{
+													"key": "sharingStateTypes",
+													"value": "Ready",
+													"description": "Only show sharing states of given types",
+													"disabled": true
+												},
+												{
+													"key": "updatedAfter",
+													"value": "2011-10-09T13:36:01.028Z",
+													"description": "Only show sharing states updated after given time",
+													"disabled": true
+												}
+											]
+										}
+									},
+									"_postman_previewlanguage": "",
+									"header": [],
+									"cookie": [
+										{
+											"expires": "Invalid Date",
+											"domain": "",
+											"path": ""
+										}
+									],
+									"body": ""
 								}
 							]
 						},
@@ -2136,6 +2216,74 @@
 									],
 									"cookie": [],
 									"body": "{\n  \"content\": [\n    {\n      \"externalId\": \"dolore consectetur\",\n      \"sharingStateType\": \"Error\",\n      \"updatedAt\": \"1975-08-07T15:47:17.783Z\",\n      \"sharingErrorCode\": \"SharingTimeout\",\n      \"sharingErrorMessage\": \"non in Lorem tempor\",\n      \"taskId\": \"id irure\"\n    },\n    {\n      \"externalId\": \"cupidatat est\",\n      \"sharingStateType\": \"Pending\",\n      \"updatedAt\": \"1971-08-28T21:30:11.584Z\",\n      \"sharingErrorCode\": \"SharingTimeout\",\n      \"sharingErrorMessage\": \"exercitation qui adipisicing\",\n      \"taskId\": \"elit eu deserunt mollit\"\n    }\n  ],\n  \"contentSize\": -39422480,\n  \"page\": -22115199,\n  \"totalElements\": 55102988,\n  \"totalPages\": -64309310\n}"
+								},
+								{
+									"name": "Returns sharing states of shared business partner relations which can be optionally filtered",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/relations/sharing-state?page=fugiat mollit off&size=velit culpa",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"relations",
+												"sharing-state"
+											],
+											"query": [
+												{
+													"key": "externalIds",
+													"value": "fugiat Lorem nostrud ex quis",
+													"description": "Only show sharing states of given external IDs",
+													"disabled": true
+												},
+												{
+													"key": "externalIds",
+													"value": "culpa",
+													"description": "Only show sharing states of given external IDs",
+													"disabled": true
+												},
+												{
+													"key": "sharingStateTypes",
+													"value": "Pending",
+													"description": "Only show sharing states of given types",
+													"disabled": true
+												},
+												{
+													"key": "sharingStateTypes",
+													"value": "Pending",
+													"description": "Only show sharing states of given types",
+													"disabled": true
+												},
+												{
+													"key": "updatedAfter",
+													"value": "2011-10-09T13:36:01.028Z",
+													"description": "Only show sharing states updated after given time",
+													"disabled": true
+												},
+												{
+													"key": "page",
+													"value": "fugiat mollit off",
+													"description": "Number of page to get results from"
+												},
+												{
+													"key": "size",
+													"value": "velit culpa",
+													"description": "Size of each page"
+												}
+											]
+										}
+									},
+									"_postman_previewlanguage": null,
+									"header": null,
+									"cookie": [],
+									"body": null
 								}
 							]
 						}
@@ -5478,6 +5626,7 @@
 			"listen": "prerequest",
 			"script": {
 				"type": "text/javascript",
+				"requests": {},
 				"exec": [
 					""
 				]
@@ -5487,6 +5636,7 @@
 			"listen": "test",
 			"script": {
 				"type": "text/javascript",
+				"requests": {},
 				"exec": [
 					""
 				]
@@ -5496,43 +5646,35 @@
 	"variable": [
 		{
 			"key": "CONSUMER_EDC_API_KEY",
-			"value": "api-key",
-			"type": "string"
+			"value": "api-key"
 		},
 		{
 			"key": "CONSUMER_EDC_MANAGEMENT_API",
-			"value": "https://www.sharing-member-edc.net/management",
-			"type": "string"
+			"value": "https://www.sharing-member-edc.net/management"
 		},
 		{
 			"key": "PROVIDER_EDC_DATASPACE_API",
-			"value": "https://www.bpdm-edc.net/api/v1/dsp",
-			"type": "string"
+			"value": "https://www.bpdm-edc.net/api/v1/dsp"
 		},
 		{
 			"key": "PROVIDER_BPNL",
-			"value": "BPNL000000000001",
-			"type": "string"
+			"value": "BPNL000000000001"
 		},
 		{
 			"key": "CONSUMER_BPNL",
-			"value": "BPNL0000000001XF",
-			"type": "string"
+			"value": "BPNL0000000001XF"
 		},
 		{
 			"key": "PROVIDER_EDC_PUBLIC_API",
-			"value": "https://www.bpdm-edc.net/api/public",
-			"type": "string"
+			"value": "https://www.bpdm-edc.net/api/public"
 		},
 		{
 			"key": "baseUrl",
-			"value": "{{PROVIDER_EDC_PUBLIC_API}}",
-			"type": "string"
+			"value": "{{PROVIDER_EDC_PUBLIC_API}}"
 		},
 		{
 			"key": "OFFER",
-			"value": "",
-			"type": "string"
+			"value": ""
 		},
 		{
 			"key": "NEGOTIATION",
@@ -5540,23 +5682,19 @@
 		},
 		{
 			"key": "AGREEMENT",
-			"value": "",
-			"type": "string"
+			"value": ""
 		},
 		{
 			"key": "TRANSFER_TOKEN",
-			"value": "",
-			"type": "string"
+			"value": ""
 		},
 		{
 			"key": "SELECTED_ASSET",
-			"value": "",
-			"type": "string"
+			"value": ""
 		},
 		{
 			"key": "SELECTED_PURPOSE",
-			"value": "",
-			"type": "string"
+			"value": ""
 		},
 		{
 			"key": "TRANSFERPROCESS",
@@ -5564,8 +5702,15 @@
 		},
 		{
 			"key": "external_id",
-			"value": "E2E_TEST_2412_1",
-			"type": "string"
+			"value": "E2E_TEST_2412_1"
+		},
+		{
+			"key": "PROVIDER_DID",
+			"value": ""
+		},
+		{
+			"key": "CONSUMER_DID",
+			"value": ""
 		}
 	]
 }
