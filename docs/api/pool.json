@@ -3,7 +3,7 @@
   "info" : {
     "title" : "Business Partner Data Management Pool",
     "description" : "Service that manages and shares business partner data with other CatenaX services",
-    "version" : "7.1.0-SNAPSHOT"
+    "version" : "7.1.0"
   },
   "servers" : [ {
     "url" : "http://localhost:8080",
@@ -3064,11 +3064,11 @@
               "$ref" : "#/components/schemas/ErrorInfoAddressCreateError"
             }
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -3201,11 +3201,11 @@
               "$ref" : "#/components/schemas/ErrorInfoAddressUpdateError"
             }
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -3922,11 +3922,11 @@
               "$ref" : "#/components/schemas/ErrorInfoLegalEntityCreateError"
             }
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -4069,11 +4069,11 @@
               "$ref" : "#/components/schemas/ErrorInfoLegalEntityUpdateError"
             }
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -4975,11 +4975,11 @@
               "$ref" : "#/components/schemas/ErrorInfoSiteCreateError"
             }
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -5082,11 +5082,11 @@
               "$ref" : "#/components/schemas/ErrorInfoSiteUpdateError"
             }
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           }
