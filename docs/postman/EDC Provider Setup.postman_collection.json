@@ -1,16 +1,16 @@
 {
 	"info": {
-		"_postman_id": "5715c0cb-68e3-4f3b-9ca7-03869e6fa7de",
+		"_postman_id": "44664f30-148c-4907-b75a-55c8f6a5872d",
 		"name": "EDC Provider Setup",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "26818013"
+		"_exporter_id": "29584075"
 	},
 	"item": [
 		{
-			"name": "Purpose Policies",
+			"name": "Usage Policies",
 			"item": [
 				{
-					"name": "Create Accept Purpose Pool",
+					"name": "Create Usage Purpose Pool",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -32,7 +32,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"@context\": [\n        \"https://w3id.org/tractusx/policy/v1.0.0\",\n        \"http://www.w3.org/ns/odrl.jsonld\",  \n        {\n             \"@vocab\": \"https://w3id.org/edc/v0.0.1/ns/\",\n             \"dct\": \"http://purl.org/dc/terms/\",\n             \"cx-common\": \"https://w3id.org/catenax/ontology/common#\"\n\n        }\n    ],\n    \"@type\": \"PolicyDefinitionRequestDto\",\n    \"@id\": \"{{POLICY_ACCEPT_PURPOSE_POOL}}\",\n    \"policy\": {\n        \"@type\": \"Set\",\n        \"profile\": \"profile2405\",\n        \"permission\": [\n            {\n                \"action\": \"use\",\n                \"constraint\": {\n                    \"and\": [\n                        {\n                            \"leftOperand\": \"FrameworkAgreement\",\n                            \"operator\": \"eq\",\n                            \"rightOperand\": \"DataExchangeGovernance:1.0\"\n                        },\n                        {\n                            \"leftOperand\": \"UsagePurpose\",\n                            \"operator\": \"eq\",\n                            \"rightOperand\": \"cx.bpdm.pool:1\"\n                        }\n                    ]\n                }\n            }\n        ]\n    },\n    \"privateProperties\": {\n        \"dct:type\": \"AcceptPurposePool\",\n        \"cx-common:version\": \"7\"\n    }\n}",
+							"raw": "{\n    \"@context\": [\n        \"http://www.w3.org/ns/odrl.jsonld\",\n        {\n            \"@vocab\": \"https://w3id.org/edc/v0.0.1/ns/\",\n            \"cx-policy\": \"https://w3id.org/catenax/2025/9/policy/\",\n            \"dct\": \"http://purl.org/dc/terms/\",\n            \"cx-common\": \"https://w3id.org/catenax/ontology/common#\"\n        }\n    ],\n    \"@type\": \"PolicyDefinitionRequestDto\",\n    \"@id\": \"{{POLICY_ACCEPT_PURPOSE_POOL}}\",\n    \"policy\": {\n        \"@type\": \"Set\",\n        \"profile\": \"profile2405\",\n        \"permission\": [\n            {\n                \"action\": \"use\",\n                \"constraint\": {\n                    \"and\": [\n                        {\n                            \"leftOperand\": \"cx-policy:FrameworkAgreement\",\n                            \"operator\": \"eq\",\n                            \"rightOperand\": \"DataExchangeGovernance:1.0\"\n                        },\n                        {\n                            \"leftOperand\": \"cx-policy:UsagePurpose\",\n                            \"operator\": \"isAnyOf\",\n                            \"rightOperand\": \"cx.bpdm.pool:1\"\n                        }\n                    ]\n                }\n            }\n        ]\n    },\n    \"privateProperties\": {\n        \"dct:type\": \"UsagePurposePool\",\n        \"cx-common:version\": \"7\"\n    }\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -53,7 +53,7 @@
 					"response": []
 				},
 				{
-					"name": "Create Accept Purpose Gate Upload",
+					"name": "Create Usage Purpose Gate Upload",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -75,7 +75,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"@context\": [\n        \"https://w3id.org/tractusx/policy/v1.0.0\",\n        \"http://www.w3.org/ns/odrl.jsonld\",  \n        {\n             \"@vocab\": \"https://w3id.org/edc/v0.0.1/ns/\",\n             \"dct\": \"http://purl.org/dc/terms/\",\n             \"cx-common\": \"https://w3id.org/catenax/ontology/common#\"\n\n        }\n    ],\n    \"@type\": \"PolicyDefinitionRequestDto\",\n    \"@id\": \"{{POLICY_ACCEPT_PURPOSE_GATE_UPLOAD}}\",\n    \"policy\": {\n        \"@type\": \"Set\",\n        \"profile\": \"profile2405\",\n        \"permission\": [\n            {\n                \"action\": \"use\",\n                \"constraint\": {\n                    \"and\": [\n                        {\n                            \"leftOperand\": \"FrameworkAgreement\",\n                            \"operator\": \"eq\",\n                            \"rightOperand\": \"DataExchangeGovernance:1.0\"\n                        },\n                        {\n                            \"leftOperand\": \"UsagePurpose\",\n                            \"operator\": \"eq\",\n                            \"rightOperand\": \"cx.bpdm.gate.upload:1\"\n                        }\n                    ]\n                }\n            }\n        ]\n    },\n    \"privateProperties\": {\n        \"dct:type\": \"AcceptPurpose\",\n        \"cx-common:version\": \"7\"\n    }\n}",
+							"raw": "{\n    \"@context\": [\n        \"http://www.w3.org/ns/odrl.jsonld\",\n        {\n            \"@vocab\": \"https://w3id.org/edc/v0.0.1/ns/\",\n            \"cx-policy\": \"https://w3id.org/catenax/2025/9/policy/\",\n            \"dct\": \"http://purl.org/dc/terms/\",\n            \"cx-common\": \"https://w3id.org/catenax/ontology/common#\"\n        }\n    ],\n    \"@type\": \"PolicyDefinitionRequestDto\",\n    \"@id\": \"{{POLICY_ACCEPT_PURPOSE_GATE_UPLOAD}}\",\n    \"policy\": {\n        \"@type\": \"Set\",\n        \"profile\": \"profile2405\",\n        \"permission\": [\n            {\n                \"action\": \"use\",\n                \"constraint\": {\n                    \"and\": [\n                        {\n                            \"leftOperand\": \"cx-policy:FrameworkAgreement\",\n                            \"operator\": \"eq\",\n                            \"rightOperand\": \"DataExchangeGovernance:1.0\"\n                        },\n                        {\n                            \"leftOperand\": \"cx-policy:UsagePurpose\",\n                            \"operator\": \"isAnyOf\",\n                            \"rightOperand\": \"cx.bpdm.gate.upload:1\"\n                        }\n                    ]\n                }\n            }\n        ]\n    },\n    \"privateProperties\": {\n        \"dct:type\": \"UsagePurposeUpload\",\n        \"cx-common:version\": \"7\"\n    }\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -96,7 +96,7 @@
 					"response": []
 				},
 				{
-					"name": "Create Accept Purpose Gate Download",
+					"name": "Create Usage Purpose Gate Download",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -118,7 +118,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"@context\": [\n        \"https://w3id.org/tractusx/policy/v1.0.0\",\n        \"http://www.w3.org/ns/odrl.jsonld\",  \n        {\n             \"@vocab\": \"https://w3id.org/edc/v0.0.1/ns/\",\n             \"dct\": \"http://purl.org/dc/terms/\",\n             \"cx-common\": \"https://w3id.org/catenax/ontology/common#\"\n\n        }\n    ],\n    \"@type\": \"PolicyDefinitionRequestDto\",\n    \"@id\": \"{{POLICY_ACCEPT_PURPOSE_GATE_DOWNLOAD}}\",\n    \"policy\": {\n        \"@type\": \"Set\",\n        \"profile\": \"profile2405\",\n        \"permission\": [\n            {\n                \"action\": \"use\",\n                \"constraint\": {\n                    \"and\": [\n                        {\n                            \"leftOperand\": \"FrameworkAgreement\",\n                            \"operator\": \"eq\",\n                            \"rightOperand\": \"DataExchangeGovernance:1.0\"\n                        },\n                        {\n                            \"leftOperand\": \"UsagePurpose\",\n                            \"operator\": \"eq\",\n                            \"rightOperand\": \"cx.bpdm.gate.download:1\"\n                        }\n                    ]\n                }\n            }\n        ]\n    },\n    \"privateProperties\": {\n        \"dct:type\": \"AcceptPurpose\",\n        \"cx-common:version\": \"7\"\n    }\n}",
+							"raw": "{\n    \"@context\": [\n        \"http://www.w3.org/ns/odrl.jsonld\",\n        {\n            \"@vocab\": \"https://w3id.org/edc/v0.0.1/ns/\",\n            \"cx-policy\": \"https://w3id.org/catenax/2025/9/policy/\",\n            \"dct\": \"http://purl.org/dc/terms/\",\n            \"cx-common\": \"https://w3id.org/catenax/ontology/common#\"\n        }\n    ],\n    \"@type\": \"PolicyDefinitionRequestDto\",\n    \"@id\": \"{{POLICY_ACCEPT_PURPOSE_GATE_DOWNLOAD}}\",\n    \"policy\": {\n        \"@type\": \"Set\",\n        \"profile\": \"profile2405\",\n        \"permission\": [\n            {\n                \"action\": \"use\",\n                \"constraint\": {\n                    \"and\": [\n                        {\n                            \"leftOperand\": \"cx-policy:FrameworkAgreement\",\n                            \"operator\": \"eq\",\n                            \"rightOperand\": \"DataExchangeGovernance:1.0\"\n                        },\n                        {\n                            \"leftOperand\": \"cx-policy:UsagePurpose\",\n                            \"operator\": \"isAnyOf\",\n                            \"rightOperand\": \"cx.bpdm.gate.download:1\"\n                        }\n                    ]\n                }\n            }\n        ]\n    },\n    \"privateProperties\": {\n        \"dct:type\": \"UsagePurposeDownload\",\n        \"cx-common:version\": \"7\"\n    }\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -169,7 +169,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"@context\": [\n        \"http://www.w3.org/ns/odrl.jsonld\",\n        {\n            \"@vocab\": \"https://w3id.org/edc/v0.0.1/ns/\",\n            \"dct\": \"http://purl.org/dc/terms/\",\n            \"cx-common\": \"https://w3id.org/catenax/ontology/common#\",\n            \"tx\": \"https://w3id.org/tractusx/v0.0.1/ns/\"\n        }\n    ],\n    \"@type\": \"PolicyDefinitionRequestDto\",\n    \"@id\": \"{{POLICY_BUSINESS_PARTNER_NUMBER}}\",\n    \"policy\": {\n        \"@type\": \"Set\",\n        \"profile\": \"profile2405\",\n        \"permission\": [\n            {\n                \"action\": \"use\",\n                \"constraint\": {\n                    \"and\": [\n                        {\n                            \"leftOperand\": \"tx:BusinessPartnerNumber\",\n                            \"operator\": \"eq\",\n                            \"rightOperand\": \"{{CONSUMER_BPNL}}\"\n                        }\n                    ]\n                }\n            }\n        ]\n    },\n    \"privateProperties\": {\n        \"BusinessPartnerNumber\": \"{{CONSUMER_BPNL}}\",\n        \"dct:type\": \"HasBusinessPartnerNumber\",\n        \"cx-common:version\": \"7\"\n    }\n}",
+									"raw": "{\n    \"@context\": [\n        \"http://www.w3.org/ns/odrl.jsonld\",\n        {\n            \"@vocab\": \"https://w3id.org/edc/v0.0.1/ns/\",\n            \"cx-policy\": \"https://w3id.org/catenax/2025/9/policy/\",\n            \"dct\": \"http://purl.org/dc/terms/\",\n            \"cx-common\": \"https://w3id.org/catenax/ontology/common#\"\n        }\n    ],\n    \"@type\": \"PolicyDefinitionRequestDto\",\n    \"@id\": \"{{POLICY_BUSINESS_PARTNER_NUMBER}}\",\n    \"policy\": {\n        \"@type\": \"Set\",\n        \"profile\": \"profile2405\",\n        \"permission\": [\n            {\n                \"action\": \"cx-policy:access\",\n                \"constraint\": {\n                    \"and\": [\n                        {\n                            \"leftOperand\": \"cx-policy:BusinessPartnerNumber\",\n                            \"operator\": \"isAnyOf\",\n                            \"rightOperand\": \"{{CONSUMER_BPNL}}\"\n                        }\n                    ]\n                }\n            }\n        ]\n    },\n    \"privateProperties\": {\n        \"BusinessPartnerNumber\": \"{{CONSUMER_BPNL}}\",\n        \"dct:type\": \"AccessBusinessPartnerNumber\",\n        \"cx-common:version\": \"7\"\n    }\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -207,7 +207,8 @@
 											"}"
 										],
 										"type": "text/javascript",
-										"packages": {}
+										"packages": {},
+										"requests": {}
 									}
 								}
 							],
@@ -589,83 +590,67 @@
 	"variable": [
 		{
 			"key": "PROVIDER_EDC_API_KEY",
-			"value": "api-key",
-			"type": "string"
+			"value": "api-key"
 		},
 		{
 			"key": "PROVIDER_EDC_MANAGEMENT_API",
-			"value": "https://www.bpdm-edc.net/management",
-			"type": "string"
+			"value": "https://www.bpdm-edc.net/management"
 		},
 		{
 			"key": "GATE_API",
-			"value": "https://www.bpdm-gate.net/companies/sharing-member/api",
-			"type": "string"
+			"value": "https://www.bpdm-gate.net/companies/sharing-member/api"
 		},
 		{
 			"key": "POOL_API",
-			"value": "https://bpdm-pool.net/api",
-			"type": "string"
+			"value": "https://bpdm-pool.net/api"
 		},
 		{
 			"key": "TOKEN_URL",
-			"value": "https://www.oauth2.net/token",
-			"type": "string"
+			"value": "https://www.oauth2.net/token"
 		},
 		{
 			"key": "CONSUMER_BPNL",
-			"value": "BPNL000000000001",
-			"type": "string"
+			"value": "BPNL000000000001"
 		},
 		{
 			"key": "CONSUMER_NAME",
-			"value": "consumer-name",
-			"type": "string"
+			"value": "consumer-name"
 		},
 		{
 			"key": "CLIENT_ID_POOL_PARTICIPANT_READ",
-			"value": "CLIENT_2_ID",
-			"type": "string"
+			"value": "CLIENT_2_ID"
 		},
 		{
 			"key": "CLIENT_ID_GATE_SHARING_MEMBER_FULL_INPUT",
-			"value": "CLIENT_2_ID",
-			"type": "string"
+			"value": "CLIENT_2_ID"
 		},
 		{
 			"key": "CLIENT_ID_GATE_SHARING_MEMBER_READ_INPUT",
-			"value": "CLIENT_3_ID",
-			"type": "string"
+			"value": "CLIENT_3_ID"
 		},
 		{
 			"key": "CLIENT_ID_GATE_SHARING_MEMBER_READ_OUTPUT",
-			"value": "CLIENT_4_ID",
-			"type": "string"
+			"value": "CLIENT_4_ID"
 		},
 		{
 			"key": "CLIENT_SECRET_PATH_POOL_PARTICIPANT_READ_CLIENT",
-			"value": "vault/path/client/1/secret",
-			"type": "string"
+			"value": "vault/path/client/1/secret"
 		},
 		{
 			"key": "CLIENT_SECRET_PATH_GATE_SHARING_MEMBER_FULL_INPUT",
-			"value": "vault/path/client/2/secret",
-			"type": "string"
+			"value": "vault/path/client/2/secret"
 		},
 		{
 			"key": "CLIENT_SECRET_PATH_GATE_SHARING_MEMBER_READ_INPUT",
-			"value": "vault/path/client/3/secret",
-			"type": "string"
+			"value": "vault/path/client/3/secret"
 		},
 		{
 			"key": "CLIENT_SECRET_PATH_GATE_SHARING_MEMBER_READ_OUTPUT",
-			"value": "vault/path/client/4/secret",
-			"type": "string"
+			"value": "vault/path/client/4/secret"
 		},
 		{
 			"key": "GENERATE_UUIDS",
-			"value": "True",
-			"type": "string"
+			"value": "True"
 		},
 		{
 			"key": "POLICY_ACTIVE_MEMBER",
