@@ -139,15 +139,15 @@ maven/mavencentral/org.awaitility/awaitility/4.2.2, Apache-2.0, approved, #14178
 maven/mavencentral/org.checkerframework/checker-qual/3.49.3, MIT, approved, #20842
 maven/mavencentral/org.eclipse.angus/angus-activation/2.0.2, EPL-2.0 OR GPL-2.0-only with Classpath-exception-2.0, approved, ee4j.angus
 maven/mavencentral/org.eclipse.angus/angus-mail/2.0.4, EPL-2.0 OR GPL-2.0-only with Classpath-exception-2.0, approved, ee4j.angus
-maven/mavencentral/org.eclipse.tractusx/bpdm-cleaning-service-dummy/7.1.0-SNAPSHOT, Apache-2.0, approved, automotive.tractusx
-maven/mavencentral/org.eclipse.tractusx/bpdm-common-test/7.1.0-SNAPSHOT, Apache-2.0, approved, automotive.tractusx
-maven/mavencentral/org.eclipse.tractusx/bpdm-common/7.1.0-SNAPSHOT, Apache-2.0, approved, automotive.tractusx
-maven/mavencentral/org.eclipse.tractusx/bpdm-gate-api/7.1.0-SNAPSHOT, Apache-2.0, approved, automotive.tractusx
-maven/mavencentral/org.eclipse.tractusx/bpdm-gate/7.1.0-SNAPSHOT, Apache-2.0, approved, automotive.tractusx
-maven/mavencentral/org.eclipse.tractusx/bpdm-orchestrator-api/7.1.0-SNAPSHOT, Apache-2.0, approved, automotive.tractusx
-maven/mavencentral/org.eclipse.tractusx/bpdm-orchestrator/7.1.0-SNAPSHOT, Apache-2.0, approved, automotive.tractusx
-maven/mavencentral/org.eclipse.tractusx/bpdm-pool-api/7.1.0-SNAPSHOT, Apache-2.0, approved, automotive.tractusx
-maven/mavencentral/org.eclipse.tractusx/bpdm-pool/7.1.0-SNAPSHOT, Apache-2.0, approved, automotive.tractusx
+maven/mavencentral/org.eclipse.tractusx/bpdm-cleaning-service-dummy/7.1.0, Apache-2.0, approved, automotive.tractusx
+maven/mavencentral/org.eclipse.tractusx/bpdm-common-test/7.1.0, Apache-2.0, approved, automotive.tractusx
+maven/mavencentral/org.eclipse.tractusx/bpdm-common/7.1.0, Apache-2.0, approved, automotive.tractusx
+maven/mavencentral/org.eclipse.tractusx/bpdm-gate-api/7.1.0, Apache-2.0, approved, automotive.tractusx
+maven/mavencentral/org.eclipse.tractusx/bpdm-gate/7.1.0, Apache-2.0, approved, automotive.tractusx
+maven/mavencentral/org.eclipse.tractusx/bpdm-orchestrator-api/7.1.0, Apache-2.0, approved, automotive.tractusx
+maven/mavencentral/org.eclipse.tractusx/bpdm-orchestrator/7.1.0, Apache-2.0, approved, automotive.tractusx
+maven/mavencentral/org.eclipse.tractusx/bpdm-pool-api/7.1.0, Apache-2.0, approved, automotive.tractusx
+maven/mavencentral/org.eclipse.tractusx/bpdm-pool/7.1.0, Apache-2.0, approved, automotive.tractusx
 maven/mavencentral/org.flywaydb/flyway-core/11.7.2, Apache-2.0, approved, clearlydefined
 maven/mavencentral/org.flywaydb/flyway-database-postgresql/11.7.2, Apache-2.0, approved, #21919
 maven/mavencentral/org.glassfish.jaxb/codemodel/4.0.5, BSD-3-Clause, approved, ee4j.jaxb-impl

@@ -6,7 +6,7 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
 For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/CHANGELOG.md) of the charts directly.
 
-## [7.1.0] - tbd
+## [7.1.0] - 2025-09-30
 
 ### Added
 
@@ -15,8 +15,6 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM Cleaning Dummy: Configuration and scheduling support for relation cleaning dummy service with unit test coverage [#1383](https://github.com/eclipse-tractusx/bpdm/issues/1383).
 - BPDM Pool: Add validation for too many identifiers when creating/updating business partners [1388](https://github.com/eclipse-tractusx/bpdm/issues/1388)
 - BPDM: Add IsOwnedBy relation to the golden record process for sharing majority-owned legal hierarchies [1399](https://github.com/eclipse-tractusx/bpdm/issues/1399)
-
-### Changed
 
 ## [7.0.0] - 2025-06-16
 
