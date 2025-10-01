@@ -300,6 +300,20 @@ object BusinessPartnerNonVerboseValues {
         index = BusinessPartnerVerboseValues.legalEntityUpsert3.index
     )
 
+    val legalEntityCreate4 = LegalEntityPartnerCreateRequest(
+        legalEntity = LegalEntityDto(
+            legalName = BusinessPartnerVerboseValues.legalEntityUpsert4.legalEntity.legalName,
+            legalShortName = null,
+            legalForm = BusinessPartnerVerboseValues.legalForm3.technicalKey,
+            identifiers = listOf(identifier3),
+            states = listOf(leStatus3),
+            confidenceCriteria = BusinessPartnerVerboseValues.legalEntity3.legalEntity.confidenceCriteria,
+            isParticipantData = false
+        ),
+        legalAddress = logisticAddress4,
+        index = BusinessPartnerVerboseValues.legalEntityUpsert4.index
+    )
+
     val legalEntityCreateMultipleIdentifier = LegalEntityPartnerCreateRequest(
         legalEntity = LegalEntityDto(
             legalName = BusinessPartnerVerboseValues.legalEntityUpsertMultipleIdentifier.legalEntity.legalName,

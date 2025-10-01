@@ -72,5 +72,7 @@ object ApiCommons {
     const val BPN_NAME = "Bpn Controller"
     const val BPN_DESCRIPTION = "Support functionality for BPN operations"
 
+    const val BUSINESS_PARTNERS_NAME = "Business Partners Controller"
+    const val BUSINESS_PARTNERS_DESCRIPTION = "Look-up business partner"
 
 }
