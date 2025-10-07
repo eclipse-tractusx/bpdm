@@ -35,7 +35,6 @@ import org.eclipse.tractusx.bpdm.test.testdata.pool.LegalEntityStructureRequest
 import org.eclipse.tractusx.bpdm.test.testdata.pool.SiteStructureRequest
 import org.eclipse.tractusx.bpdm.test.util.AssertHelpers
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
-import org.eclipse.tractusx.bpdm.test.util.PoolDataHelpers
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -54,14 +53,12 @@ class ChangelogControllerIT @Autowired constructor(
     val testHelpers: TestHelpers,
     val poolClient: PoolClientImpl,
     val dbTestHelpers: DbTestHelpers,
-    val poolDataHelpers: PoolDataHelpers,
     val assertHelpers: AssertHelpers
 ) {
 
     @BeforeEach
     fun beforeEach() {
         dbTestHelpers.truncateDbTables()
-        poolDataHelpers.createPoolMetadata()
     }
 
     /**

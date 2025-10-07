@@ -251,8 +251,12 @@
                         <compilerPlugins>
                             <plugin>spring</plugin>
                             <plugin>jpa</plugin>
+                            <plugin>no-arg</plugin>
                         </compilerPlugins>
                         <jvmTarget>21</jvmTarget>
+                        <pluginOptions>
+                            <option>no-arg:annotation=org.eclipse.tractusx.bpdm.common.util.NoArg</option>
+                        </pluginOptions>
                     </configuration>
                     <dependencies>
                         <dependency>

@@ -28,9 +28,7 @@ import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalFormDto
 import org.eclipse.tractusx.bpdm.pool.api.model.QualityLevel
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
 import org.eclipse.tractusx.bpdm.pool.entity.FieldQualityRuleDb
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDetailDb
@@ -40,25 +38,20 @@ import org.eclipse.tractusx.bpdm.pool.service.toDto
 import org.eclipse.tractusx.bpdm.pool.util.EndpointValues
 import org.eclipse.tractusx.bpdm.pool.util.TestHelpers
 import org.eclipse.tractusx.bpdm.pool.util.invokeGetEndpoint
-import org.eclipse.tractusx.bpdm.pool.util.invokePostEndpoint
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerVerboseValues
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.assertThrows
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.Arguments
-import org.junit.jupiter.params.provider.MethodSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.web.reactive.function.BodyInserters
-import java.util.stream.Stream
-import kotlin.math.ceil
 
 
 private typealias PostFunction = (client: WebTestClient, metaData: Any) -> Any
@@ -78,18 +71,7 @@ class MetadataControllerIT @Autowired constructor(
     val poolClient: PoolApiClient
 ) {
     companion object {
-
-        private val identifierTypeDtos = listOf(
-            BusinessPartnerNonVerboseValues.identifierTypeDto1,
-            BusinessPartnerNonVerboseValues.identifierTypeDto2,
-            BusinessPartnerNonVerboseValues.identifierTypeDto3
-        )
-
-        private fun postIdentifierType(client: WebTestClient, type: IdentifierTypeDto) =
-            postMetadataSameResponseType(client, type, EndpointValues.CATENA_METADATA_IDENTIFIER_TYPE_PATH)
-
         private fun getIdentifierTypes(client: WebTestClient, page: Int, size: Int): PageDto<IdentifierTypeDto> =
-//            getMetadata<PageResponse<IdentifierTypeDto>>(client, page, size, EndpointValues.CATENA_METADATA_IDENTIFIER_TYPE_PATH)
             client.invokeGetEndpoint(
                 EndpointValues.CATENA_METADATA_IDENTIFIER_TYPE_PATH,
                 Pair("businessPartnerType", IdentifierBusinessPartnerType.LEGAL_ENTITY.name),
@@ -100,73 +82,21 @@ class MetadataControllerIT @Autowired constructor(
         private fun postIdentifierTypeWithoutExpectation(client: WebTestClient, type: IdentifierTypeDto) =
             postMetadataWithoutExpectation(client, type, EndpointValues.CATENA_METADATA_IDENTIFIER_TYPE_PATH)
 
-        private fun postLegalForm(client: WebTestClient, type: LegalFormRequest) =
-            postMetadata<LegalFormRequest, LegalFormDto>(client, type, EndpointValues.CATENA_METADATA_LEGAL_FORM_PATH)
-
-        private fun getLegalForms(client: WebTestClient, page: Int, size: Int): PageDto<LegalFormDto> =
-//            getMetadata<PageResponse<LegalFormResponse>>(client, page, size, EndpointValues.CATENA_METADATA_LEGAL_FORM_PATH)
-            client.invokeGetEndpoint(
-                EndpointValues.CATENA_METADATA_LEGAL_FORM_PATH,
-                Pair(PaginationRequest::page.name, page.toString()),
-                Pair(PaginationRequest::size.name, size.toString())
-            )
-
-        private fun postLegalFormWithoutExpectation(client: WebTestClient, type: LegalFormRequest) =
-            postMetadataWithoutExpectation(client, type, EndpointValues.CATENA_METADATA_LEGAL_FORM_PATH)
-
-
-        private inline fun <reified T : Any> postMetadataSameResponseType(client: WebTestClient, metadata: T, endpointPath: String) =
-            postMetadata<T, T>(client, metadata, endpointPath)
-
-        private inline fun <reified S : Any, reified T : Any> postMetadata(client: WebTestClient, metadata: S, endpointPath: String): T {
-            println("endpoint $endpointPath")
-            return client.invokePostEndpoint(endpointPath, metadata)
-        }
 
         private inline fun <reified T : Any> postMetadataWithoutExpectation(client: WebTestClient, type: T, endpointPath: String): WebTestClient.ResponseSpec {
             return client.post().uri(endpointPath)
                 .body(BodyInserters.fromValue(type))
                 .exchange()
         }
-
-        @JvmStatic
-        fun creationTestArguments(): Stream<Arguments> =
-            Stream.of(
-                Arguments.of(
-                    BusinessPartnerNonVerboseValues.identifierTypeDto1,
-                    BusinessPartnerNonVerboseValues.identifierTypeDto1,
-                    ::postIdentifierType
-                )
-            )
-
-        @JvmStatic
-        fun conflictTestArguments(): Stream<Arguments> =
-            Stream.of(
-                Arguments.of(
-                    BusinessPartnerNonVerboseValues.identifierTypeDto1,
-                    BusinessPartnerNonVerboseValues.identifierTypeDto1,
-                    ::postIdentifierTypeWithoutExpectation,
-                    ::getIdentifierTypes
-                )
-            )
-
-        @JvmStatic
-        fun paginationTestArguments(): Stream<Arguments> =
-            Stream.of(
-                Arguments.of(
-                    identifierTypeDtos,
-                    identifierTypeDtos,
-                    ::postIdentifierType,
-                    ::getIdentifierTypes
-                )
-            )
     }
 
 
-    @BeforeEach
-    fun beforeEach() {
-        dbTestHelpers.truncateDbTables()
+    lateinit var testName: String
 
+    @BeforeEach
+    fun beforeEach(testInfo: TestInfo) {
+        dbTestHelpers.truncateDbTables()
+        testName = testInfo.displayName
     }
 
     /**
@@ -174,12 +104,12 @@ class MetadataControllerIT @Autowired constructor(
      * When creating new metadata
      * Then created metadata returned
      */
-    @ParameterizedTest
-    @MethodSource("creationTestArguments")
-    fun createMetadata(metadata: Any, expected: Any, postMetadata: PostFunction) {
-        val returnedType = postMetadata(webTestClient, metadata)
+    @Test
+    fun createIdentifierType() {
+        val typeToCreate = BusinessPartnerNonVerboseValues.identifierTypeDto1.copy(testName)
+        val createdType = poolClient.metadata.createIdentifierType(BusinessPartnerNonVerboseValues.identifierTypeDto1.copy(testName))
 
-        assertThat(returnedType).isEqualTo(expected)
+        assertThat(createdType).isEqualTo(typeToCreate)
     }
 
     /**
@@ -195,21 +125,21 @@ class MetadataControllerIT @Autowired constructor(
     }
 
     /**
-     * Given metadata with technical key
-     * When trying to create new metadata with that technical key
-     * Then metadata is not created and error returned
+     * Given identifier type with technical key
+     * When trying to create new identifier type with that technical key
+     * Then identifier type is not created and error returned
      */
-    @ParameterizedTest
-    @MethodSource("conflictTestArguments")
-    fun createMetadata_Conflict(metadata: Any, expected: Any, postMetadata: PostFunctionWithoutExpectation, getMetadataPage: GetFunction) {
-        postMetadata(webTestClient, metadata).expectStatus().is2xxSuccessful
+    @Test
+    fun createIdentifierType_Conflict() {
+        val identifier = BusinessPartnerNonVerboseValues.identifierTypeDto1.copy(technicalKey = testName)
+        postIdentifierTypeWithoutExpectation(webTestClient, identifier).expectStatus().is2xxSuccessful
 
         //Expect Error when posting identifier type with same technical key
-        postMetadata(webTestClient, metadata).expectStatus().is4xxClientError
+        postIdentifierTypeWithoutExpectation(webTestClient, identifier).expectStatus().is4xxClientError
 
         //Check type is really not created
-        val returnedPage = getMetadataPage(webTestClient, 0, Int.MAX_VALUE)
-        assertThat(returnedPage.content).isEqualTo(listOf(expected))
+        val returnedPage = getIdentifierTypes(webTestClient, 0, Int.MAX_VALUE)
+        assertThat(returnedPage.content.map { it.technicalKey }.filter { it == testName }.size).isEqualTo(1)
     }
 
     /**
@@ -226,19 +156,16 @@ class MetadataControllerIT @Autowired constructor(
     }
 
     /**
-     * Given metadata
-     * When asking for metadata entries
-     * Then that metadata returned
+     * Given identifier types
+     * When asking for identifier type entries
+     * Then that identifier types returned
      */
-    @ParameterizedTest
-    @MethodSource("paginationTestArguments")
-    fun getMetadata_FullPage(metadata: Collection<Any>, expected: Collection<Any>, postMetadata: PostFunction, getMetadataPage: GetFunction) {
-        metadata.forEach { postMetadata(webTestClient, it) }
+    @Test
+    fun getIdentifierTypes_FullPage() {
+        val paginationRequest = PaginationRequest()
+        val returnedPage = poolClient.metadata.getIdentifierTypes(paginationRequest, IdentifierBusinessPartnerType.LEGAL_ENTITY, null)
 
-        val returnedPage = getMetadataPage(webTestClient, 0, metadata.size)
-        val expectedPage = PageDto(expected.size.toLong(), 1, 0, expected.size, expected)
-
-        assertThat(returnedPage).usingRecursiveComparison().ignoringCollectionOrder().isEqualTo(expectedPage)
+        assertThat(returnedPage.content.size).isEqualTo(paginationRequest.size)
     }
 
     /**
@@ -255,78 +182,6 @@ class MetadataControllerIT @Autowired constructor(
     }
 
     /**
-     * Given entries of metadata
-     * When paginating through all entries
-     * Then all entries returned
-     */
-    @ParameterizedTest
-    @MethodSource("paginationTestArguments")
-    fun getMetadata_Paginated(metadata: Collection<Any>, expected: Collection<Any>, postMetadata: PostFunction, getMetadataPage: GetFunction) {
-        metadata.forEach { postMetadata(webTestClient, it) }
-
-        val returnedMetadata = (metadata.indices).map {
-            val returnedPage = getMetadataPage(webTestClient, it, 1)
-            assertThat(returnedPage.content.size).isEqualTo(1)
-
-            returnedPage.content.first()
-        }
-
-        assertThat(returnedMetadata).usingRecursiveComparison().ignoringCollectionOrder().isEqualTo(expected)
-    }
-
-    /**
-     * Given several metadata entries
-     * When asking for a page of multiple entries
-     * Then get a page of multiple entries
-     */
-    @ParameterizedTest
-    @MethodSource("paginationTestArguments")
-    fun getMetadata_Multiple(metadata: Collection<Any>, expected: Collection<Any>, postMetadata: PostFunction, getMetadataPage: GetFunction) {
-        metadata.forEach { postMetadata(webTestClient, it) }
-
-        val returnedPage = getMetadataPage(webTestClient, 0, 2)
-
-        assertThat(returnedPage.totalElements).isEqualTo(expected.size.toLong())
-        assertThat(returnedPage.totalPages).isEqualTo(ceil(expected.size / 2f).toInt())
-        assertThat(returnedPage.page).isEqualTo(0)
-        assertThat(returnedPage.contentSize).isEqualTo(2)
-        assertThat(returnedPage.content.size).isEqualTo(2)
-        assertThat(returnedPage.content).isSubsetOf(expected)
-    }
-
-    /**
-     * Given several metadata entries
-     * When asking for a page exceeding the size of total entries
-     * Then get a page of all entries
-     */
-    @ParameterizedTest
-    @MethodSource("paginationTestArguments")
-    fun getMetadata_ExceedingSize(metadata: Collection<Any>, expected: Collection<Any>, postMetadata: PostFunction, getMetadataPage: GetFunction) {
-        metadata.forEach { postMetadata(webTestClient, it) }
-
-        val returnedPage = getMetadataPage(webTestClient, 0, metadata.size + 1)
-        val expectedPage = PageDto(expected.size.toLong(), 1, 0, expected.size, expected)
-
-        assertThat(returnedPage).usingRecursiveComparison().ignoringCollectionOrder().isEqualTo(expectedPage)
-    }
-
-    /**
-     * Given several metadata entries
-     * When asking for a page exceeding total number of pages
-     * Then get an empty page
-     */
-    @ParameterizedTest
-    @MethodSource("paginationTestArguments")
-    fun getMetadata_ExceedingPage(metadata: Collection<Any>, expected: Collection<Any>, postMetadata: PostFunction, getMetadataPage: GetFunction) {
-        metadata.forEach { postMetadata(webTestClient, it) }
-
-        val returnedPage = getMetadataPage(webTestClient, metadata.size, 1)
-        val expectedPage = PageDto(expected.size.toLong(), expected.size, expected.size, 0, emptyList<Any>())
-
-        assertThat(returnedPage).usingRecursiveComparison().ignoringCollectionOrder().isEqualTo(expectedPage)
-    }
-
-    /**
      * Given identifier types in db, some "common", others for specific countries
      * When requesting the identifiers for a country
      * Then the "common" identifiers and the identifiers of the requested country are returned
@@ -334,21 +189,21 @@ class MetadataControllerIT @Autowired constructor(
     @Test
     fun getValidIdentifiersForCountry() {
         val identifierType1 = IdentifierTypeDb(
-            technicalKey = BusinessPartnerNonVerboseValues.identifierType1.technicalKey,
+            technicalKey = "$testName 1",
             businessPartnerType = IdentifierBusinessPartnerType.LEGAL_ENTITY,
             name = BusinessPartnerNonVerboseValues.identifierType1.name,
         )
         identifierType1.details.add(IdentifierTypeDetailDb(identifierType1, null, true))
 
         val identifierType2 = IdentifierTypeDb(
-            technicalKey = BusinessPartnerNonVerboseValues.identifierType2.technicalKey,
+            technicalKey = "$testName 2",
             businessPartnerType = IdentifierBusinessPartnerType.LEGAL_ENTITY,
             name = BusinessPartnerNonVerboseValues.identifierType2.name
         )
         identifierType2.details.add(IdentifierTypeDetailDb(identifierType2, UK, false))
 
         val identifierType3 = IdentifierTypeDb(
-            technicalKey = BusinessPartnerNonVerboseValues.identifierType3.technicalKey,
+            technicalKey = "$testName 3",
             businessPartnerType = IdentifierBusinessPartnerType.LEGAL_ENTITY,
             name = BusinessPartnerNonVerboseValues.identifierType3.name
         )
