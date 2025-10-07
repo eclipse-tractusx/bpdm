@@ -3,7 +3,7 @@ info:
   title: Business Partner Data Management Orchestrator
   description: Orchestrator component acts as a passive component and offers for each
     processing steps individual endpoints
-  version: 7.1.0
+  version: 7.2.0-SNAPSHOT
 servers:
   - url: http://localhost:8085
     description: Generated server url
