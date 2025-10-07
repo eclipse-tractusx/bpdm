@@ -25,7 +25,9 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
-import org.eclipse.tractusx.bpdm.pool.api.model.*
+import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.util.TestHelpers
@@ -36,7 +38,6 @@ import org.eclipse.tractusx.bpdm.test.testdata.pool.LegalEntityStructureRequest
 import org.eclipse.tractusx.bpdm.test.testdata.pool.SiteStructureRequest
 import org.eclipse.tractusx.bpdm.test.util.AssertHelpers
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
-import org.eclipse.tractusx.bpdm.test.util.PoolDataHelpers
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -53,12 +54,10 @@ class SiteControllerIT @Autowired constructor(
     val poolClient: PoolClientImpl,
     val dbTestHelpers: DbTestHelpers,
     val assertHelpers: AssertHelpers,
-    val poolDataHelpers: PoolDataHelpers,
 ) {
     @BeforeEach
     fun beforeEach() {
         dbTestHelpers.truncateDbTables()
-        poolDataHelpers.createPoolMetadata()
     }
 
     /**
@@ -265,18 +264,6 @@ class SiteControllerIT @Autowired constructor(
      */
     @Test
     fun `create sites entities and get duplicate identifier error on address`() {
-        poolClient.metadata.createIdentifierType(
-            IdentifierTypeDto(
-                technicalKey = BusinessPartnerNonVerboseValues.addressIdentifier.type,
-                businessPartnerType = IdentifierBusinessPartnerType.ADDRESS,
-                name = BusinessPartnerNonVerboseValues.addressIdentifier.value,
-                abbreviation = BusinessPartnerVerboseValues.identifierTypeAbbreviation1,
-                transliteratedName = BusinessPartnerVerboseValues.identifierTypeTransliteratedName1,
-                transliteratedAbbreviation = BusinessPartnerVerboseValues.identifierTypeTransliteratedAbbreviation1,
-                format = null,
-                categories = sortedSetOf()
-            )
-        )
 
         val givenLegalEntities =
             poolClient.legalEntities.createBusinessPartners(listOf(BusinessPartnerNonVerboseValues.legalEntityCreate1, BusinessPartnerNonVerboseValues.legalEntityCreate2)).entities
@@ -325,19 +312,6 @@ class SiteControllerIT @Autowired constructor(
      */
     @Test
     fun `update site entities and get duplicate identifier error`() {
-
-        poolClient.metadata.createIdentifierType(
-            IdentifierTypeDto(
-                technicalKey = BusinessPartnerNonVerboseValues.addressIdentifier.type,
-                businessPartnerType = IdentifierBusinessPartnerType.ADDRESS,
-                name = BusinessPartnerNonVerboseValues.addressIdentifier.value,
-                abbreviation = BusinessPartnerVerboseValues.identifierTypeAbbreviation1,
-                transliteratedName = BusinessPartnerVerboseValues.identifierTypeTransliteratedName1,
-                transliteratedAbbreviation = BusinessPartnerVerboseValues.identifierTypeTransliteratedAbbreviation1,
-                format = null,
-                categories = sortedSetOf()
-            )
-        )
 
         val givenLegalEntities =
             poolClient.legalEntities.createBusinessPartners(listOf(BusinessPartnerNonVerboseValues.legalEntityCreate1, BusinessPartnerNonVerboseValues.legalEntityCreate2)).entities
