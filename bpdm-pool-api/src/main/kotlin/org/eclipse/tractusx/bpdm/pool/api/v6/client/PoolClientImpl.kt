@@ -49,6 +49,8 @@ open class PoolClientImpl(
 
     override val bpns  by lazy { createClient<BpnApiClient>() }
 
+    override val members  by lazy { createClient<MembersApiClient>() }
+
     private inline fun <reified T> createClient() =
         httpServiceProxyFactory.createClient(T::class.java)
 }

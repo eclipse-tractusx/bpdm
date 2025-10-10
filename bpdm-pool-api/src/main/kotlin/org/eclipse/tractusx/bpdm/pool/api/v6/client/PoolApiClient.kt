@@ -33,6 +33,8 @@ interface PoolApiClient {
 
     val changelogs: ChangelogApiClient
 
+    val members: MembersApiClient
+
     val bpns: BpnApiClient
 
 }
