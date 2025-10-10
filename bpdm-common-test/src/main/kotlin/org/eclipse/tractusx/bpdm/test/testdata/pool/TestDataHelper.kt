@@ -36,13 +36,12 @@ fun List<LegalEntityHierarchy>.getAllAddresses() = flatMap { it.getAllAddresses(
  * Also it has functionality to easily create hierarchical business partner data
  */
 class PoolDataHelper(
-    private val metadataToCreate: TestMetadataKeys,
     private val poolClient: PoolApiClient,
 ) {
 
     fun createTestDataEnvironment(): TestDataEnvironment {
-        val legalEntityIdentifierTypes = metadataToCreate.legalEntityIdentifierTypeKeys.map { poolClient.metadata.createIdentifierType(createIdentifierType(it, IdentifierBusinessPartnerType.LEGAL_ENTITY)) }
-        val addressIdentifierTypes = metadataToCreate.addressIdentifierTypeKeys.map { poolClient.metadata.createIdentifierType(createIdentifierType(it, IdentifierBusinessPartnerType.ADDRESS)) }
+        val legalEntityIdentifierTypes = poolClient.metadata.getIdentifierTypes(PaginationRequest(), IdentifierBusinessPartnerType.LEGAL_ENTITY, null).content.toList()
+        val addressIdentifierTypes = poolClient.metadata.getIdentifierTypes(PaginationRequest(), IdentifierBusinessPartnerType.ADDRESS, null).content.toList()
         val legalForms = poolClient.metadata.getLegalForms(PaginationRequest()).content.toList()
         val adminAreas = poolClient.metadata.getAdminAreasLevel1(PaginationRequest()).content.toList()
 
