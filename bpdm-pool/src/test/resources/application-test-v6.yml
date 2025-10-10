@@ -32,5 +32,8 @@ bpdm:
         client-id:  sa-cl7-cx-2
         client-secret: "**********"
 spring:
+  datasource:
+    hikari:
+      maximum-pool-size: 5
   flyway:
     clean-disabled: false

@@ -45,6 +45,9 @@ class TestDataClientV6(
         return legalEntityResponse
     }
 
+    fun createMemberLegalEntity(seed: String) = createLegalEntityWithMemberOverwrite(seed, true)
+    fun createNonMemberLegalEntity(seed: String) = createLegalEntityWithMemberOverwrite(seed, false)
+
     fun updateLegalEntity(legalEntity: LegalEntityPartnerCreateVerboseDto, seed: String): LegalEntityPartnerCreateVerboseDto{
         val legalEntityRequest = requestFactory.createLegalEntityUpdateRequest(seed, legalEntity.legalEntity.bpnl)
         val legalEntityResponse = poolClient.legalEntities.updateBusinessPartners(listOf(legalEntityRequest)).entities.single()
@@ -92,5 +95,13 @@ class TestDataClientV6(
         val addressResponse = poolClient.addresses.updateAddresses(listOf(addressRequest)).entities.single()
 
         return addressResponse
+    }
+
+
+    private fun createLegalEntityWithMemberOverwrite(seed: String, isMember: Boolean): LegalEntityPartnerCreateVerboseDto{
+        val request =  with(requestFactory.buildLegalEntityCreateRequest(seed))
+        { copy(legalEntity = legalEntity.copy(isCatenaXMemberData = isMember)) }
+
+        return poolClient.legalEntities.createBusinessPartners(listOf(request)).entities.single()
     }
 }
