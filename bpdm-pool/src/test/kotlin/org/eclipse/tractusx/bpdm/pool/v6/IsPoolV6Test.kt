@@ -19,28 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.v6
 
-import org.eclipse.tractusx.bpdm.pool.v6.util.AssertRepositoryV6
-import org.eclipse.tractusx.bpdm.pool.v6.util.TestDataClientV6
-import org.eclipse.tractusx.bpdm.test.testdata.pool.v6.TestDataV6Factory
-import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
-import org.junit.jupiter.api.TestInfo
-import org.springframework.beans.factory.annotation.Autowired
+import org.eclipse.tractusx.bpdm.pool.api.v6.client.PoolApiClient
 
-abstract class PoolV6Test: IsPoolV6Test {
-    @Autowired
-    lateinit var databaseHelpers: DbTestHelpers
-    @Autowired
-    lateinit var testDataClient: TestDataClientV6
-    @Autowired
-    lateinit var testDataFactory: TestDataV6Factory
-    @Autowired
-    lateinit var assertRepository: AssertRepositoryV6
-
-    lateinit var testName: String
-
-    open fun beforeEach(testInfo: TestInfo){
-        testName = testInfo.displayName
-        databaseHelpers.truncateDbTables()
-    }
-
+interface IsPoolV6Test {
+    val poolClient: PoolApiClient
 }

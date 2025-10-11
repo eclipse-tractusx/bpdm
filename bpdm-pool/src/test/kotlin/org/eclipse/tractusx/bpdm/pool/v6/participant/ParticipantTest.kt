@@ -42,7 +42,7 @@ import org.springframework.test.context.ContextConfiguration
 @ActiveProfiles("test-v6")
 abstract class ParticipantTest: PoolV6Test() {
     @Autowired
-    lateinit var poolClient: PoolParticipantClientV6
+    override lateinit var poolClient: PoolParticipantClientV6
     @Autowired
     lateinit var operatorClient: PoolOperatorClientV6
 

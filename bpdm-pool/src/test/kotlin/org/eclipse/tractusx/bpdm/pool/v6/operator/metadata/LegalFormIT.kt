@@ -26,10 +26,8 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalFormDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalFormRequest
 import org.eclipse.tractusx.bpdm.pool.v6.operator.OperatorTest
-import org.eclipse.tractusx.bpdm.pool.v6.util.PoolOperatorClientV6
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.reactive.function.client.WebClientResponseException
 
 /*******************************************************************************
@@ -50,9 +48,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
  *
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
-class LegalFormIT @Autowired constructor(
-    private val poolApiClient: PoolOperatorClientV6
-): OperatorTest(){
+class LegalFormIT: OperatorTest(){
 
     /**
      * WHEN operator creates valid legal form
@@ -61,14 +57,14 @@ class LegalFormIT @Autowired constructor(
     @Test
     fun `create new legal form and find it`(){
         val request = createLegalFormRequest(testName)
-        poolApiClient.metadata.createLegalForm(request)
+        poolClient.metadata.createLegalForm(request)
 
         val expectedResponse = createExpectedLegalForm(request)
 
         var currentPage = 0
         var found = false
         do{
-            val response = poolApiClient.metadata.getLegalForms(PaginationRequest(currentPage, 100))
+            val response = poolClient.metadata.getLegalForms(PaginationRequest(currentPage, 100))
 
             val foundLegalForm = response.content.find { it.technicalKey == request.technicalKey }
             if(foundLegalForm != null){
@@ -89,7 +85,7 @@ class LegalFormIT @Autowired constructor(
     @Test
     fun `create new legal form`(){
         val request = createLegalFormRequest(testName)
-        val response = poolApiClient.metadata.createLegalForm(request)
+        val response = poolClient.metadata.createLegalForm(request)
 
         val expectedResponse = createExpectedLegalForm(request)
         Assertions.assertThat(response).isEqualTo(expectedResponse)
@@ -102,9 +98,9 @@ class LegalFormIT @Autowired constructor(
     @Test
     fun `try create new legal form with duplicate technical key`(){
         val request = createLegalFormRequest(testName)
-        poolApiClient.metadata.createLegalForm(request)
+        poolClient.metadata.createLegalForm(request)
 
-        Assertions.assertThatThrownBy { poolApiClient.metadata.createLegalForm(request) }
+        Assertions.assertThatThrownBy { poolClient.metadata.createLegalForm(request) }
             .isInstanceOf(WebClientResponseException.Conflict::class.java)
     }
 
@@ -122,7 +118,7 @@ class LegalFormIT @Autowired constructor(
         val request = createLegalFormRequest(testName)
             .copy(administrativeAreaLevel1 = "UNKNOWN")
 
-        Assertions.assertThatThrownBy { poolApiClient.metadata.createLegalForm(request) }
+        Assertions.assertThatThrownBy { poolClient.metadata.createLegalForm(request) }
             .isInstanceOf(WebClientResponseException.BadRequest::class.java)
     }
 

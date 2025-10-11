@@ -41,7 +41,7 @@ import org.springframework.test.context.ContextConfiguration
 @ActiveProfiles("test-v6")
 abstract class SharingMemberTest: PoolV6Test() {
     @Autowired
-    lateinit var poolClient: PoolSharingMemberClientV6
+    override lateinit var poolClient: PoolSharingMemberClientV6
 
     @BeforeEach
     override fun beforeEach(testInfo: TestInfo){

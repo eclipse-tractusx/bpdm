@@ -27,20 +27,10 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteCreateError
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.v6.operator.OperatorTest
-import org.eclipse.tractusx.bpdm.pool.v6.util.AssertRepositoryV6
-import org.eclipse.tractusx.bpdm.pool.v6.util.PoolOperatorClientV6
-import org.eclipse.tractusx.bpdm.pool.v6.util.TestDataClientV6
-import org.eclipse.tractusx.bpdm.test.testdata.pool.v6.TestDataV6Factory
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
 
-class SiteCreationIT @Autowired constructor(
-    private val poolClient: PoolOperatorClientV6,
-    private val testDataV6Factory: TestDataV6Factory,
-    private val assertRepo: AssertRepositoryV6,
-    private val testDataClient: TestDataClientV6
-): OperatorTest() {
+class SiteCreationIT: OperatorTest() {
 
     /**
      * GIVEN legal entity
@@ -53,14 +43,14 @@ class SiteCreationIT @Autowired constructor(
         val legalEntityResponse = testDataClient.createLegalEntity(testName)
 
         //WHEN
-        val siteRequest = testDataV6Factory.request.buildSiteCreateRequest("Site $testName", legalEntityResponse)
+        val siteRequest = testDataFactory.request.buildSiteCreateRequest("Site $testName", legalEntityResponse)
         val response = poolClient.sites.createSite(listOf(siteRequest))
 
         //THEN
-        val expectedSite = testDataV6Factory.result.buildExpectedSiteCreateResponse(siteRequest, legalEntityResponse)
+        val expectedSite = testDataFactory.result.buildExpectedSiteCreateResponse(siteRequest, legalEntityResponse)
         val expectedResponse = SitePartnerCreateResponseWrapper(listOf(expectedSite), emptyList())
 
-        assertRepo.assertSiteCreate(response, expectedResponse)
+        assertRepository.assertSiteCreate(response, expectedResponse)
     }
 
     /**
@@ -78,10 +68,10 @@ class SiteCreationIT @Autowired constructor(
         val response = poolClient.sites.postSiteSearch(SiteSearchRequest(siteBpns = listOf(siteResponse.site.bpns)), PaginationRequest())
 
         //THEN
-        val expectedSites = response.content.map { testDataV6Factory.result.buildExpectedSiteSearchResponse(siteResponse) }
+        val expectedSites = response.content.map { testDataFactory.result.buildExpectedSiteSearchResponse(siteResponse) }
         val expectedResponse = PageDto(1, 1, 0, 1, expectedSites)
 
-        assertRepo.assertSiteSearch(response, expectedResponse)
+        assertRepository.assertSiteSearch(response, expectedResponse)
     }
 
     /**
@@ -95,14 +85,14 @@ class SiteCreationIT @Autowired constructor(
         val legalEntityResponse = testDataClient.createLegalEntity(testName)
 
         //WHEN
-        val siteRequest = testDataV6Factory.request.buildLegalAddressSiteCreateRequest("Site $testName", legalEntityResponse)
+        val siteRequest = testDataFactory.request.buildLegalAddressSiteCreateRequest("Site $testName", legalEntityResponse)
         val response = poolClient.sites.createSiteWithLegalReference(listOf(siteRequest))
 
         //THEN
-        val expectedSite = testDataV6Factory.result.buildExpectedLegalAddressSiteCreateResponse(siteRequest, legalEntityResponse)
+        val expectedSite = testDataFactory.result.buildExpectedLegalAddressSiteCreateResponse(siteRequest, legalEntityResponse)
         val expectedResponse = SitePartnerCreateResponseWrapper(listOf(expectedSite), emptyList())
 
-        assertRepo.assertLegalAddressSiteCreate(response, expectedResponse)
+        assertRepository.assertLegalAddressSiteCreate(response, expectedResponse)
     }
 
     /**
@@ -121,14 +111,14 @@ class SiteCreationIT @Autowired constructor(
         testDataClient.createLegalAddressSiteFor(legalEntityResponse, testName)
 
         //WHEN
-        val siteRequest = testDataV6Factory.request.buildLegalAddressSiteCreateRequest("New Legal Address Site $testName", legalEntityResponse)
+        val siteRequest = testDataFactory.request.buildLegalAddressSiteCreateRequest("New Legal Address Site $testName", legalEntityResponse)
         val response = poolClient.sites.createSiteWithLegalReference(listOf(siteRequest))
 
         //THEN
         val expectedError = ErrorInfo(SiteCreateError.LegalEntityNotFound, "IGNORED", "0")
         val expectedResponse = SitePartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
 
-        assertRepo.assertLegalAddressSiteCreate(response, expectedResponse)
+        assertRepository.assertLegalAddressSiteCreate(response, expectedResponse)
     }
 
 
@@ -146,7 +136,7 @@ class SiteCreationIT @Autowired constructor(
         val identifierX = givenSiteResponse.mainAddress.identifiers.first()
 
         //WHEN
-        val siteRequest = with(testDataV6Factory.request.buildSiteCreateRequest("New Site $testName", legalEntityResponse)){
+        val siteRequest = with(testDataFactory.request.buildSiteCreateRequest("New Site $testName", legalEntityResponse)){
             copy(site = site.copy(mainAddress = site.mainAddress.copy(identifiers = listOf(AddressIdentifierDto(identifierX.value, identifierX.type)))))
         }
         val siteResponse = poolClient.sites.createSite(listOf(siteRequest))
@@ -156,7 +146,7 @@ class SiteCreationIT @Autowired constructor(
         val expectedError = ErrorInfo(SiteCreateError.MainAddressDuplicateIdentifier, "IGNORED", siteRequest.index)
         val expectedResponse = SitePartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
 
-        assertRepo.assertSiteCreate(siteResponse, expectedResponse)
+        assertRepository.assertSiteCreate(siteResponse, expectedResponse)
     }
 
     /**
@@ -170,9 +160,9 @@ class SiteCreationIT @Autowired constructor(
         val legalEntityResponse = testDataClient.createLegalEntity(testName)
 
         //WHEN
-        val siteRequest1 = testDataV6Factory.request.buildSiteCreateRequest("Site 1 $testName", legalEntityResponse)
+        val siteRequest1 = testDataFactory.request.buildSiteCreateRequest("Site 1 $testName", legalEntityResponse)
         val sameIdentifier = siteRequest1.site.mainAddress.identifiers.first()
-        val siteRequest2 = with(testDataV6Factory.request.buildSiteCreateRequest("Site 2 $testName", legalEntityResponse)){
+        val siteRequest2 = with(testDataFactory.request.buildSiteCreateRequest("Site 2 $testName", legalEntityResponse)){
             copy(site = site.copy(mainAddress = site.mainAddress.copy(identifiers = listOf(sameIdentifier))))
         }
         val siteResponse = poolClient.sites.createSite(listOf(siteRequest1, siteRequest2))
@@ -181,7 +171,7 @@ class SiteCreationIT @Autowired constructor(
         val expectedErrors = listOf(siteRequest1, siteRequest2).map { ErrorInfo(SiteCreateError.MainAddressDuplicateIdentifier, "IGNORED", it.index) }
         val expectedResponse = SitePartnerCreateResponseWrapper(emptyList(), expectedErrors)
 
-        assertRepo.assertSiteCreate(siteResponse, expectedResponse)
+        assertRepository.assertSiteCreate(siteResponse, expectedResponse)
     }
 
     /**
@@ -195,7 +185,7 @@ class SiteCreationIT @Autowired constructor(
         val legalEntityResponse = testDataClient.createLegalEntity(testName)
 
         //WHEN
-        val siteRequest = with(testDataV6Factory.request.buildSiteCreateRequest("New Site $testName", legalEntityResponse)){
+        val siteRequest = with(testDataFactory.request.buildSiteCreateRequest("New Site $testName", legalEntityResponse)){
             val unknownIdentifier = site.mainAddress.identifiers.first().copy(type = "UNKNOWN")
             copy(site = site.copy(mainAddress = site.mainAddress.copy(identifiers = site.mainAddress.identifiers.drop(1).plus(unknownIdentifier))))
         }
@@ -205,7 +195,7 @@ class SiteCreationIT @Autowired constructor(
         val expectedError = ErrorInfo(SiteCreateError.MainAddressIdentifierNotFound, "IGNORED", siteRequest.index)
         val expectedResponse = SitePartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
 
-        assertRepo.assertSiteCreate(siteResponse, expectedResponse)
+        assertRepository.assertSiteCreate(siteResponse, expectedResponse)
     }
 
     /**
@@ -215,14 +205,14 @@ class SiteCreationIT @Autowired constructor(
     @Test
     fun `try create site with unknown legal entity`(){
         //WHEN
-        val siteRequest = testDataV6Factory.request.buildSiteCreateRequest("New Site $testName", "UNKNOWN")
+        val siteRequest = testDataFactory.request.buildSiteCreateRequest("New Site $testName", "UNKNOWN")
         val siteResponse = poolClient.sites.createSite(listOf(siteRequest))
 
         //THEN
         val expectedError = ErrorInfo(SiteCreateError.LegalEntityNotFound, "IGNORED", siteRequest.index)
         val expectedResponse = SitePartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
 
-        assertRepo.assertSiteCreate(siteResponse, expectedResponse)
+        assertRepository.assertSiteCreate(siteResponse, expectedResponse)
     }
 
     /**
@@ -236,7 +226,7 @@ class SiteCreationIT @Autowired constructor(
         val legalEntityResponse = testDataClient.createLegalEntity(testName)
 
         //WHEN
-        val siteRequest = with(testDataV6Factory.request.buildSiteCreateRequest("New Site $testName", legalEntityResponse)){
+        val siteRequest = with(testDataFactory.request.buildSiteCreateRequest("New Site $testName", legalEntityResponse)){
             copy(site = site.copy(mainAddress = site.mainAddress.copy(physicalPostalAddress = site.mainAddress.physicalPostalAddress.copy(administrativeAreaLevel1 = "UNKNOWN"))))
         }
         val siteResponse = poolClient.sites.createSite(listOf(siteRequest))
@@ -245,7 +235,7 @@ class SiteCreationIT @Autowired constructor(
         val expectedError = ErrorInfo(SiteCreateError.MainAddressRegionNotFound, "IGNORED", siteRequest.index)
         val expectedResponse = SitePartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
 
-        assertRepo.assertSiteCreate(siteResponse, expectedResponse)
+        assertRepository.assertSiteCreate(siteResponse, expectedResponse)
     }
 
     /**
@@ -259,7 +249,7 @@ class SiteCreationIT @Autowired constructor(
         val legalEntityResponse = testDataClient.createLegalEntity(testName)
 
         //WHEN
-        val siteRequest = with(testDataV6Factory.request.buildSiteCreateRequest("New Site $testName", legalEntityResponse)){
+        val siteRequest = with(testDataFactory.request.buildSiteCreateRequest("New Site $testName", legalEntityResponse)){
             copy(site = site.copy(mainAddress = site.mainAddress.copy(alternativePostalAddress = site.mainAddress.alternativePostalAddress!!.copy(administrativeAreaLevel1 = "UNKNOWN"))))
         }
         val siteResponse = poolClient.sites.createSite(listOf(siteRequest))
@@ -268,7 +258,7 @@ class SiteCreationIT @Autowired constructor(
         val expectedError = ErrorInfo(SiteCreateError.MainAddressRegionNotFound, "IGNORED", siteRequest.index)
         val expectedResponse = SitePartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
 
-        assertRepo.assertSiteCreate(siteResponse, expectedResponse)
+        assertRepository.assertSiteCreate(siteResponse, expectedResponse)
     }
 
     /**
@@ -286,8 +276,8 @@ class SiteCreationIT @Autowired constructor(
         val legalEntityResponse = testDataClient.createLegalEntity(testName)
 
         //WHEN
-        val siteRequest = with(testDataV6Factory.request.buildSiteCreateRequest("New Site $testName", legalEntityResponse)){
-            copy(site = site.copy(mainAddress = site.mainAddress.copy(identifiers = (1 .. 101).map { testDataV6Factory.request.createAddressIdentifier(testName, it) })))
+        val siteRequest = with(testDataFactory.request.buildSiteCreateRequest("New Site $testName", legalEntityResponse)){
+            copy(site = site.copy(mainAddress = site.mainAddress.copy(identifiers = (1 .. 101).map { testDataFactory.request.createAddressIdentifier(testName, it) })))
         }
         val siteResponse = poolClient.sites.createSite(listOf(siteRequest))
 
@@ -295,7 +285,7 @@ class SiteCreationIT @Autowired constructor(
         val expectedError = ErrorInfo(SiteCreateError.MainAddressRegionNotFound, "IGNORED", siteRequest.index)
         val expectedResponse = SitePartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
 
-        assertRepo.assertSiteCreate(siteResponse, expectedResponse)
+        assertRepository.assertSiteCreate(siteResponse, expectedResponse)
     }
 
 }

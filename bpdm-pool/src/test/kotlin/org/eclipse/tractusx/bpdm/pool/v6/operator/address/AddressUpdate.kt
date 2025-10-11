@@ -24,20 +24,10 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressUpdateError
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerUpdateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.v6.operator.OperatorTest
-import org.eclipse.tractusx.bpdm.pool.v6.util.AssertRepositoryV6
-import org.eclipse.tractusx.bpdm.pool.v6.util.PoolOperatorClientV6
-import org.eclipse.tractusx.bpdm.pool.v6.util.TestDataClientV6
-import org.eclipse.tractusx.bpdm.test.testdata.pool.v6.TestDataV6Factory
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
 
-class AddressUpdate @Autowired constructor(
-    private val poolClient: PoolOperatorClientV6,
-    private val testDataV6Factory: TestDataV6Factory,
-    private val assertRepo: AssertRepositoryV6,
-    private val testDataClient: TestDataClientV6
-): OperatorTest() {
+class AddressUpdate: OperatorTest() {
 
     /**
      * GIVEN legal entity
@@ -50,14 +40,14 @@ class AddressUpdate @Autowired constructor(
         val legalEntityResponse = testDataClient.createLegalEntity(testName)
 
         //WHEN
-        val addressRequest = testDataV6Factory.request.buildAddressUpdateRequest(testName, legalEntityResponse)
+        val addressRequest = testDataFactory.request.buildAddressUpdateRequest(testName, legalEntityResponse)
         val addressResponse = poolClient.addresses.updateAddresses(listOf(addressRequest))
 
         //THEN
-        val expectedAddress = testDataV6Factory.result.buildExpectedLegalAddressUpdateResponse(addressRequest, legalEntityResponse)
+        val expectedAddress = testDataFactory.result.buildExpectedLegalAddressUpdateResponse(addressRequest, legalEntityResponse)
         val expectedResponse = AddressPartnerUpdateResponseWrapper(listOf(expectedAddress), emptyList())
 
-        assertRepo.assertAddressUpdate(addressResponse, expectedResponse)
+        assertRepository.assertAddressUpdate(addressResponse, expectedResponse)
     }
 
     /**
@@ -72,14 +62,14 @@ class AddressUpdate @Autowired constructor(
         val siteResponse = testDataClient.createSiteFor(legalEntityResponse, testName)
 
         //WHEN
-        val addressRequest = testDataV6Factory.request.buildAddressUpdateRequest(testName, siteResponse.mainAddress.bpna)
+        val addressRequest = testDataFactory.request.buildAddressUpdateRequest(testName, siteResponse.mainAddress.bpna)
         val addressResponse = poolClient.addresses.updateAddresses(listOf(addressRequest))
 
         //THEN
-        val expectedAddress = testDataV6Factory.result.buildExpectedMainAddressUpdateResponse(addressRequest, siteResponse)
+        val expectedAddress = testDataFactory.result.buildExpectedMainAddressUpdateResponse(addressRequest, siteResponse)
         val expectedResponse = AddressPartnerUpdateResponseWrapper(listOf(expectedAddress), emptyList())
 
-        assertRepo.assertAddressUpdate(addressResponse, expectedResponse)
+        assertRepository.assertAddressUpdate(addressResponse, expectedResponse)
     }
 
     /**
@@ -94,14 +84,14 @@ class AddressUpdate @Autowired constructor(
         val siteResponse = testDataClient.createLegalAddressSiteFor(legalEntityResponse, testName)
 
         //WHEN
-        val addressRequest = testDataV6Factory.request.buildAddressUpdateRequest(testName, siteResponse.mainAddress.bpna)
+        val addressRequest = testDataFactory.request.buildAddressUpdateRequest(testName, siteResponse.mainAddress.bpna)
         val addressResponse = poolClient.addresses.updateAddresses(listOf(addressRequest))
 
         //THEN
-        val expectedAddress = testDataV6Factory.result.buildExpectedMainAddressUpdateResponse(addressRequest, siteResponse)
+        val expectedAddress = testDataFactory.result.buildExpectedMainAddressUpdateResponse(addressRequest, siteResponse)
         val expectedResponse = AddressPartnerUpdateResponseWrapper(listOf(expectedAddress), emptyList())
 
-        assertRepo.assertAddressUpdate(addressResponse, expectedResponse)
+        assertRepository.assertAddressUpdate(addressResponse, expectedResponse)
     }
 
     /**
@@ -116,14 +106,14 @@ class AddressUpdate @Autowired constructor(
         val addressCreateResponse = testDataClient.createAdditionalAddressFor(legalEntityResponse, testName)
 
         //WHEN
-        val addressUpdateRequest = testDataV6Factory.request.buildAddressUpdateRequest("Updated $testName", addressCreateResponse.address.bpna)
+        val addressUpdateRequest = testDataFactory.request.buildAddressUpdateRequest("Updated $testName", addressCreateResponse.address.bpna)
         val addressUpdateResponse = poolClient.addresses.updateAddresses(listOf(addressUpdateRequest))
 
         //THEN
-        val expectedAddress = testDataV6Factory.result.buildExpectedAdditionalAddressUpdateResponse(addressUpdateRequest, legalEntityResponse)
+        val expectedAddress = testDataFactory.result.buildExpectedAdditionalAddressUpdateResponse(addressUpdateRequest, legalEntityResponse)
         val expectedResponse = AddressPartnerUpdateResponseWrapper(listOf(expectedAddress), emptyList())
 
-        assertRepo.assertAddressUpdate(addressUpdateResponse, expectedResponse)
+        assertRepository.assertAddressUpdate(addressUpdateResponse, expectedResponse)
     }
 
     /**
@@ -139,14 +129,14 @@ class AddressUpdate @Autowired constructor(
         val addressCreateResponse = testDataClient.createAdditionalAddressFor(siteResponse, testName)
 
         //WHEN
-        val addressUpdateRequest = testDataV6Factory.request.buildAddressUpdateRequest("Updated $testName", addressCreateResponse)
+        val addressUpdateRequest = testDataFactory.request.buildAddressUpdateRequest("Updated $testName", addressCreateResponse)
         val addressUpdateResponse = poolClient.addresses.updateAddresses(listOf(addressUpdateRequest))
 
         //THEN
-        val expectedAddress = testDataV6Factory.result.buildExpectedAdditionalAddressUpdateResponse(addressUpdateRequest, siteResponse)
+        val expectedAddress = testDataFactory.result.buildExpectedAdditionalAddressUpdateResponse(addressUpdateRequest, siteResponse)
         val expectedResponse = AddressPartnerUpdateResponseWrapper(listOf(expectedAddress), emptyList())
 
-        assertRepo.assertAddressUpdate(addressUpdateResponse, expectedResponse)
+        assertRepository.assertAddressUpdate(addressUpdateResponse, expectedResponse)
     }
 
     /**
@@ -156,14 +146,14 @@ class AddressUpdate @Autowired constructor(
     @Test
     fun `try update address with invalid identifier`(){
         //WHEN
-        val addressRequest = testDataV6Factory.request.buildAddressUpdateRequest(testName, "UNKNOWN")
+        val addressRequest = testDataFactory.request.buildAddressUpdateRequest(testName, "UNKNOWN")
         val addressResponse = poolClient.addresses.updateAddresses(listOf(addressRequest))
 
         //THEN
         val expectedError = ErrorInfo(AddressUpdateError.AddressNotFound, "IGNORED", addressRequest.bpna)
         val expectedResponse = AddressPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
 
-        assertRepo.assertAddressUpdate(addressResponse, expectedResponse)
+        assertRepository.assertAddressUpdate(addressResponse, expectedResponse)
     }
 
     /**
@@ -180,7 +170,7 @@ class AddressUpdate @Autowired constructor(
         val addressCreateResponse = testDataClient.createAdditionalAddressFor(legalEntityResponse, testName)
 
         //WHEN
-        val addressRequest = with(testDataV6Factory.request.buildAddressUpdateRequest(testName, addressCreateResponse)){
+        val addressRequest = with(testDataFactory.request.buildAddressUpdateRequest(testName, addressCreateResponse)){
             copy(address = address.copy(identifiers = listOf(AddressIdentifierDto(identifierX.value, identifierX.type))))
         }
         val addressResponse = poolClient.addresses.updateAddresses(listOf(addressRequest))
@@ -189,7 +179,7 @@ class AddressUpdate @Autowired constructor(
         val expectedError = ErrorInfo(AddressUpdateError.AddressDuplicateIdentifier, "IGNORED", addressRequest.bpna)
         val expectedResponse = AddressPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
 
-        assertRepo.assertAddressUpdate(addressResponse, expectedResponse)
+        assertRepository.assertAddressUpdate(addressResponse, expectedResponse)
     }
 
     /**
@@ -203,7 +193,7 @@ class AddressUpdate @Autowired constructor(
         val legalEntityResponse = testDataClient.createLegalEntity(testName)
 
         //WHEN
-        val addressRequest = with(testDataV6Factory.request.buildAddressUpdateRequest(testName, legalEntityResponse)){
+        val addressRequest = with(testDataFactory.request.buildAddressUpdateRequest(testName, legalEntityResponse)){
             copy(address = address.copy(physicalPostalAddress = address.physicalPostalAddress.copy(administrativeAreaLevel1 = "UNKNOWN")))
         }
         val addressResponse = poolClient.addresses.updateAddresses(listOf(addressRequest))
@@ -212,7 +202,7 @@ class AddressUpdate @Autowired constructor(
         val expectedError = ErrorInfo(AddressUpdateError.RegionNotFound, "IGNORED", addressRequest.bpna)
         val expectedResponse = AddressPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
 
-        assertRepo.assertAddressUpdate(addressResponse, expectedResponse)
+        assertRepository.assertAddressUpdate(addressResponse, expectedResponse)
     }
 
     /**
@@ -226,7 +216,7 @@ class AddressUpdate @Autowired constructor(
         val legalEntityResponse = testDataClient.createLegalEntity(testName)
 
         //WHEN
-        val addressRequest = with(testDataV6Factory.request.buildAddressUpdateRequest(testName, legalEntityResponse)){
+        val addressRequest = with(testDataFactory.request.buildAddressUpdateRequest(testName, legalEntityResponse)){
             copy(address = address.copy(alternativePostalAddress = address.alternativePostalAddress!!.copy(administrativeAreaLevel1 = "UNKNOWN")))
         }
         val addressResponse = poolClient.addresses.updateAddresses(listOf(addressRequest))
@@ -235,7 +225,7 @@ class AddressUpdate @Autowired constructor(
         val expectedError = ErrorInfo(AddressUpdateError.RegionNotFound, "IGNORED", addressRequest.bpna)
         val expectedResponse = AddressPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
 
-        assertRepo.assertAddressUpdate(addressResponse, expectedResponse)
+        assertRepository.assertAddressUpdate(addressResponse, expectedResponse)
     }
 
     /**
@@ -249,7 +239,7 @@ class AddressUpdate @Autowired constructor(
         val legalEntityResponse = testDataClient.createLegalEntity(testName)
 
         //WHEN
-        val addressRequest = with(testDataV6Factory.request.buildAddressUpdateRequest(testName, legalEntityResponse)){
+        val addressRequest = with(testDataFactory.request.buildAddressUpdateRequest(testName, legalEntityResponse)){
             val unknownIdentifier = address.identifiers.first().copy(type = "UNKNOWN")
             copy(address = address.copy(identifiers = address.identifiers.drop(1).plus(unknownIdentifier)))
         }
@@ -259,7 +249,7 @@ class AddressUpdate @Autowired constructor(
         val expectedError = ErrorInfo(AddressUpdateError.IdentifierNotFound, "IGNORED", addressRequest.bpna)
         val expectedResponse = AddressPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
 
-        assertRepo.assertAddressUpdate(addressResponse, expectedResponse)
+        assertRepository.assertAddressUpdate(addressResponse, expectedResponse)
     }
 
     /**
@@ -277,8 +267,8 @@ class AddressUpdate @Autowired constructor(
         val legalEntityResponse = testDataClient.createLegalEntity(testName)
 
         //WHEN
-        val addressRequest = with(testDataV6Factory.request.buildAddressUpdateRequest(testName, legalEntityResponse)){
-            val tooManyIdentifiers = (1 .. 101).map { testDataV6Factory.request.createAddressIdentifier(testName, it) }
+        val addressRequest = with(testDataFactory.request.buildAddressUpdateRequest(testName, legalEntityResponse)){
+            val tooManyIdentifiers = (1 .. 101).map { testDataFactory.request.createAddressIdentifier(testName, it) }
             copy(address = address.copy(identifiers = tooManyIdentifiers))
         }
         val addressResponse = poolClient.addresses.updateAddresses(listOf(addressRequest))
@@ -287,7 +277,7 @@ class AddressUpdate @Autowired constructor(
         val expectedError = ErrorInfo(AddressUpdateError.IdentifiersTooMany, "IGNORED", addressRequest.bpna)
         val expectedResponse = AddressPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
 
-        assertRepo.assertAddressUpdate(addressResponse, expectedResponse)
+        assertRepository.assertAddressUpdate(addressResponse, expectedResponse)
     }
 
 }

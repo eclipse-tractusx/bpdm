@@ -26,15 +26,9 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.CxMembershipDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.CxMembershipSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.CxMembershipUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.v6.operator.OperatorTest
-import org.eclipse.tractusx.bpdm.pool.v6.util.PoolOperatorClientV6
-import org.eclipse.tractusx.bpdm.test.testdata.pool.v6.TestDataV6Factory
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
 
-class CxMembershipIT @Autowired constructor(
-    private val poolClient: PoolOperatorClientV6,
-    private val testDataV6Factory: TestDataV6Factory
-): OperatorTest() {
+class CxMembershipIT: OperatorTest() {
 
     /**
      * GIVEN non-member legal entity
@@ -188,7 +182,7 @@ class CxMembershipIT @Autowired constructor(
 
 
     private fun createLegalEntity(seed: String, isMember: Boolean): String{
-        val legalEntityRequest = with(testDataV6Factory.request.buildLegalEntityCreateRequest(seed)){
+        val legalEntityRequest = with(testDataFactory.request.buildLegalEntityCreateRequest(seed)){
             copy(legalEntity = legalEntity.copy(isCatenaXMemberData = isMember))
         }
         return poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single().legalEntity.bpnl
