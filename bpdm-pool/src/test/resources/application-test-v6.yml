@@ -31,6 +31,15 @@ bpdm:
         authorization-grant-type: client_credentials
         client-id:  sa-cl7-cx-2
         client-secret: "**********"
+    unauthorized:
+      base-url: ""
+      security-enabled: true
+      provider:
+        issuer-uri: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}
+      registration:
+        authorization-grant-type: client_credentials
+        client-id: sa-cl7-cx-3
+        client-secret: "**********"
 spring:
   datasource:
     hikari:

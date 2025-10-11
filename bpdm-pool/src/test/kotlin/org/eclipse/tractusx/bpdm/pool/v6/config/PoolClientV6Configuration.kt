@@ -19,10 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.pool.v6.config
 
+import org.eclipse.tractusx.bpdm.common.util.BpdmUnauthorizedWebClientProvider
 import org.eclipse.tractusx.bpdm.common.util.BpdmWebClientProvider
-import org.eclipse.tractusx.bpdm.pool.v6.util.PoolOperatorClientV6
-import org.eclipse.tractusx.bpdm.pool.v6.util.PoolParticipantClientV6
-import org.eclipse.tractusx.bpdm.pool.v6.util.PoolSharingMemberClientV6
+import org.eclipse.tractusx.bpdm.pool.v6.util.*
+import org.eclipse.tractusx.bpdm.test.config.SelfClientConfigProperties
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext
 import org.springframework.context.annotation.Bean
@@ -65,6 +65,28 @@ class PoolClientV6Configuration {
         return PoolParticipantClientV6 {
             val properties = selfClientConfigProperties.copy(baseUrl = "http://localhost:${webServerAppCtxt.webServer.port}")
             webClientProvider.builder(properties).build()
+        }
+    }
+
+    @Bean
+    fun unauthorizedClientV6(
+        webServerAppCtxt: ServletWebServerApplicationContext,
+        selfClientConfigProperties: UnauthorizedClientConfigProperties,
+        webClientProvider: BpdmWebClientProvider
+    ): PoolUnauthorizedClientV6 {
+        return PoolUnauthorizedClientV6 {
+            val properties = selfClientConfigProperties.copy(baseUrl = "http://localhost:${webServerAppCtxt.webServer.port}")
+            webClientProvider.builder(properties).build()
+        }
+    }
+
+    @Bean
+    fun anonymousClientV6(
+        webServerAppCtxt: ServletWebServerApplicationContext
+    ): PoolAnonymousClientV6 {
+        return PoolAnonymousClientV6 {
+            val properties = SelfClientConfigProperties(baseUrl = "http://localhost:${webServerAppCtxt.webServer.port}")
+            BpdmUnauthorizedWebClientProvider().builder(properties).build()
         }
     }
 }

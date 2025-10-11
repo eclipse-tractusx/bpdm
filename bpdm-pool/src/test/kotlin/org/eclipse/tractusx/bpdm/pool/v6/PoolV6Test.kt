@@ -22,19 +22,22 @@ package org.eclipse.tractusx.bpdm.pool.v6
 import org.eclipse.tractusx.bpdm.pool.v6.util.AssertRepositoryV6
 import org.eclipse.tractusx.bpdm.pool.v6.util.TestDataClientV6
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v6.TestDataV6Factory
+import org.eclipse.tractusx.bpdm.test.util.AuthAssertionHelper
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.junit.jupiter.api.TestInfo
 import org.springframework.beans.factory.annotation.Autowired
 
 abstract class PoolV6Test: IsPoolV6Test {
     @Autowired
-    lateinit var databaseHelpers: DbTestHelpers
+    override lateinit var databaseHelpers: DbTestHelpers
     @Autowired
-    lateinit var testDataClient: TestDataClientV6
+    override lateinit var testDataClient: TestDataClientV6
     @Autowired
-    lateinit var testDataFactory: TestDataV6Factory
+    override lateinit var testDataFactory: TestDataV6Factory
     @Autowired
-    lateinit var assertRepository: AssertRepositoryV6
+    override lateinit var assertRepository: AssertRepositoryV6
+
+    override val authAssertionHelper: AuthAssertionHelper = AuthAssertionHelper()
 
     lateinit var testName: String
 

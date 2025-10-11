@@ -17,20 +17,13 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.v6
+package org.eclipse.tractusx.bpdm.pool.v6.sharingmember.auth
 
-import org.eclipse.tractusx.bpdm.pool.api.v6.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.v6.util.AssertRepositoryV6
-import org.eclipse.tractusx.bpdm.pool.v6.util.TestDataClientV6
-import org.eclipse.tractusx.bpdm.test.testdata.pool.v6.TestDataV6Factory
-import org.eclipse.tractusx.bpdm.test.util.AuthAssertionHelper
-import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
+import org.eclipse.tractusx.bpdm.pool.v6.auth.BpnApiAuthV6Test
+import org.eclipse.tractusx.bpdm.pool.v6.sharingmember.SharingMemberTest
+import org.eclipse.tractusx.bpdm.test.util.AuthExpectationType
 
-interface IsPoolV6Test {
-    val poolClient: PoolApiClient
-    val databaseHelpers: DbTestHelpers
-    val testDataClient: TestDataClientV6
-    val testDataFactory: TestDataV6Factory
-    val assertRepository: AssertRepositoryV6
-    val authAssertionHelper: AuthAssertionHelper
+class BpnApiSharingMemberAuthV6Test: SharingMemberTest(), BpnApiAuthV6Test {
+    override val expectationFindBpnsByIdentifiers = AuthExpectationType.Authorized
+    override val expectationFindBpnByRequestedIdentifiers = AuthExpectationType.Authorized
 }
