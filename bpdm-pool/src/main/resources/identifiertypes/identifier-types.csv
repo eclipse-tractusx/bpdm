@@ -1,0 +1,87 @@
+﻿C;BPT;Category;ITC;Name;Transliterated-Name;Abbr;TAbbr;Format
+AT;L;NBR;AT_FBN;Firmenbuchnummer;;FBN;;^\d{1,6}[a-z]$
+AT;L;VAT;AT_EU_VAT_ID;European Union Value-added Tax Identification Number;;EU VAT ID (number);;^ATU\d{7}\d{1}$
+BE;L;NBR;BE_OND;Ondernemingsnummer / Numéro d'entreprise;Ondernemingsnummer / Numero d'entreprise;OND-(nummer) / (numéro) ENT;OND-(nummer) / (numero) ENT;^[0,1]{1}\d{3}\d{3}\d{1}\d{2}$
+BE;L;VAT;BE_BTW;Belasting over de toegevoegde waarde nummer / Numéro de taxe sur la valeur ajoutée;Belasting over de toegevoegde waarde nummer / Numero de taxe sur la valeur ajoutee;BTW(-nummer) / (numéro) TVA;BTW(-nummer) / (numero) TVA;^[0,1]\d{3}\d{3}\d{1}\d{2}$
+BE;L;VAT;BE_EU_VAT_ID;European Union Value-added Tax Identification Number;;EU VAT ID (number);;^BE[0,1]\d{3}\d{3}\d{1}\d{2}$
+BG;L;NBR;BG_EIK;Единен идентификационен код;Edinen identifikatsionen kod;ЕИК;EIK;^\d{8,9}(\d{1})?$
+BG;L;VAT;BG_EU_VAT_ID;European Union Value-added Tax Identification Number;;EU VAT ID (number);;^BG\d{8,9}(\d{1})?$
+CH;L;NBR/TIN;CH_UID;Unternehmens-Identifikationsnummer;;UID;;^CHE-\d{3}\.\d{3}\.\d{3}$
+CH;L;NBR;CH_EHRA_ID;Eidgenössisches Handelsregisteramt-Identifikationsnummer;Eidgenossisches Handelsregisteramt-Identifikationsnummer;EHRA-ID;;^\d{6}$
+CH;L;VAT;CH_UID_MWST;Unternehmens-Identifikationsnummer (Mehrwertsteuer);;UID MWSt.;;^CHE-\d{3}\.\d{3}\.\d{3}\s(MWST|TVA|IPA)$
+CY;L;NBR;CY_AEE;Αριθμός Εγγραφής στο Τμήμα Εφόρου Εταιρειών;Arithmos Engrafis sto Tmima Eforou Etairion;AEE;;^[A-Z]{1,2}\d{1,8}$
+CY;L;TIN;CY_AFT;Αριθμός φορολογικής ταυτότητας;Arithmos forologikis tautotitas;ΑΦΤ;AFT;^[013945]{1}\d{7}[A-Z]{1}$
+CY;L;VAT;CY_EU_VAT_ID;European Union Value-added Tax Identification Number;;EU VAT ID (number);;^CY[013945]{1}\d{7}[A-Z]{1}$
+CZ;L;NBR;CZ_ICO;Identifikační číslo osoby;Identifikacni cislo osoby;IČO;ICO;^[1-9]{1}\d{6,8}\d{1}$
+CZ;L;TIN;CZ_DIC;Daňové identifikační číslo;Danove identifikacni cislo;DIČ;DIC;^[1-9]{1}\d{6,8}\d{1}$
+CZ;L;VAT;CZ_EU_VAT_ID;European Union Value-added Tax Identification Number;;EU VAT ID (number);;^CZ[1-9]{1}\d{6,8}\d{1}$
+DE;L;NBR;DE_HR;Handelsregisternummer;;HR(-nummer);;^([BDFGHKMNPRTUVWXY]{1}\d{1,4}[VR]?\.)?((HRA)|(G(n|N)R)|(HRB)|(PR)|(VR)|(G(s|S)R))[1-9]{1}[A-Z0-9]{1,5}$
+DE;L;VAT;DE_EU_VAT_ID;European Union Value-added Tax Identification Number;;EU VAT ID (number);;^DE\d{8}\d{1}(-\d{5})?$
+DK;L;NBR;DK_CVR;Centrale Virksomhedsregister Nummer;;CVR(-nummer);;^\d{7}\d{1}$
+DK;L;VAT;DK_EU_VAT_ID;European Union Value-added Tax Identification Number;;EU VAT ID (number);;^DK\d{7}\d{1}$
+EE;L;NBR;EE_RG;Äriregistri kood;Ariregistri kood;RG(-kood);;^\d{8}$
+EE;L;VAT;EE_EU_VAT_ID;European Union Value-added Tax Identification Number;;EU VAT ID (number);;^EE\d{8}\d{1}$
+ES;L;NBR;ES_RM;Número de inscripción en el registro mercantil;Numero de inscripcion en el registro mercantil.;(número) RM;(numero) RM;^\d{8}$
+ES;L;TIN;ES_NIF;Número de identificación fiscal (fka Código de identificación fiscal);Numero de identificacion fiscal (fka Codigo de identificacion fiscal);NIF;;^[A-HJ-NP-SUVW]{1}\d{2}\d{5}[A-Z0-9]{1}$
+ES;L;VAT;ES_EU_VAT_ID;European Union Value-added Tax Identification Number;;EU VAT ID (number);;^ES[A-HJ-NP-SUVW]{1}\d{2}\d{5}[A-Z0-9]{1}$ 
+FI;L;NBR;FI_Y;Yritys- ja yhteisötunnus;Yritys- ja yhteisotunnus;Y(-tunnus);;^\d{7}-\d{1}$
+FI;L;VAT;FI_EU_VAT_ID;European Union Value-added Tax Identification Number;;EU VAT ID (number);;^FI\d{7}\d{1}$
+FR;L;NBR;FR_SIREN;Numéro des système d'identification du répertoire des entreprises;Numero du systeme d'identification du repertoire des entreprises;(numéro) SIREN;(numero) SIREN;^\d{8}\d{1}$
+FR;A;NBR;FR_SIRET;Numéro du système d'identification du répertoire des établissements;Numero du systeme d'identification du repertoire des etablissements;(numéro) SIRET;(numero) SIRET;^\d{8}\d{1}\d{5}$
+FR;L;VAT;FR_EU_VAT_ID;European Union Value-added Tax Identification Number;;EU VAT ID (number);;^FR[A-Z0-9]{2}\d{8}\d{1}$
+GB;L;NBR;GB_CRN;Company Registration Number;;CRN;;^((AC|CE|CS|FC|FE|GE|GS|IC|LP|NC|NF|NI|NL|NO|NP|OC|OE|PC|R0|RC|SA|SC|SE|SF|SG|SI|SL|SO|SR|SZ|ZC|\d{2})\d{6})|((IP|SP|RS)[A-Z\d]{6})|(SL\d{5}[\dA])$
+GB;L;TIN;GB_UTR;Unique Taxpayer Reference;;UTR;;^\d{10}$
+GB;L;VAT;GB_VAT_REG;Value-added Tax Registration Number;;VAT Reg. (number);;^GB\d{9}(\d{3})?$
+GR;L;NBR;GR_GEMI;Αριθμός του γενικού εμπορικού μητρώου;Arithmos tou genikou emporikou mitroou;(Αρ.) Γ.Ε.ΜΗ.;(Ar.) G.E.MI.;^[0-9]{1,12}$
+GR;L;TIN;GR_AFM;Αριθμός φορολογικού μητρώου;Arithmos forologikou mitroou;ΑΦΜ;AFM;^\d{8}\d{1}$
+GR;L;VAT;GR_EU_VAT_ID;European Union Value-added Tax Identification Number;;EU VAT ID (number);;^EL\d{8}\d{1}$
+HR;L;NBR;HR_MBS;Matični broj subjekta trgovačkog suda;Maticni broj subjekta trgovackog suda;MBS;;^[0-1]\d{8}$
+HR;L;NBR/TIN;HR_OIB;Osobni identifikacijski broj;;OIB;;^\d{9}\d{2}$
+HR;L;VAT;HR_EU_VAT_ID;European Union Value-added Tax Identification Number;;EU VAT ID (number);;^HR\d{9}\d{2}$
+HU;L;NBR;HU_CJS;Cégjegyzékszám;Cegjegyzekszam;CJS;;^\d{2}-\d{2}-\d{6}$
+HU;L;TIN;HU_AS;Adószám;Adoszam;AS;;^\d{8}-\d{1}-\d{2}$
+HU;L;VAT;HU_EU_VAT_ID;European Union Value-added Tax Identification Number;;EU VAT ID (number);;^HU\d{8}$
+HU;L;VAT;HU_CSPO_AFA_AZ;Csoportos általános forgalmi adó azonosító szám;Csoportos altalanos forgalmi ado azonosito szam;Csop. ÁFA az. (sz.);Csop. AFA az. (sz.);^HU\d{8}\d{3}$
+IE;L;NBR;IE_CRO;Company Registration Office Number;;CRO (number);;^[1-9]\d{1,6}$
+IE;L;VAT;IE_EU_VAT_ID;European Union Value-added Tax Identification Number;;EU VAT ID (number);;^IE\d{7}[A-Z]{2}$
+IT;L;NBR;IT_REA;Numero del registro economico amministrativo;;(numero) REA;;^[A-Z]{2}-\d{7}$
+IT;L;TIN;IT_CF;Codice fiscale;;CF;;^\d{7}\d{3}\d{1}$
+IT;L;VAT;IT_IVA;Codice imposta sul valore aggiunto;;(codice) IVA;;^\d{7}\d{3}\d{1}$
+IT;L;VAT;IT_EU_VAT_ID;European Union Value-added Tax Identification Number;;EU VAT ID (number);;^IT\d{7}\d{3}\d{1}$
+LT;L;NBR;LT_JAR;Juridinių asmenų registro kodas;Juridiniu asmenu registro kodas;JAR (kodas);;^\d{1}\d{7}\d{1}$
+LT;L;VAT;LT_EU_VAT_ID;European Union Value-added Tax Identification Number;;EU VAT ID (number);;^LT\d{1}\d{7}\d{1}(\d{3})?$
+LU;L;NBR;LU_RCS;Numéro registre de commerce et des sociétés;Numero registre de commerce et des societes;(numéro) RCS;(numero) RCS;^[B-Z]\d+$
+LU;L;VAT;LU_EU_VAT_ID;European Union Value-added Tax Identification Number;;EU VAT ID (number);;^LU\d{6}\d{2}$
+LV;L;NBR;LV_URN;Uzņēmuma reģistrācijas numur;Uznemuma registracijas numurs;URN;;^[1-9]{1}\d{7}$
+LV;L;VAT;LV_EU_VAT_ID;European Union Value-added Tax Identification Number;;EU VAT ID (number);;^LV4\d{1}[1-9]{1}\d{7}\d{1}$
+MT;L;NBR;MT_CRN;Company Registration Number;;CRN;;^(C|P|SV|SE|LP|SO|NF|RPF|FD|G)\d{1,5}$
+MT;L;VAT;MT_EU_VAT_ID;European Union Value-added Tax Identification Number;;EU VAT ID (number);;^MT\d{6}\d{2}$
+NL;L;NBR;NL_KVK;Kamer van Koophandel nummer;;KVK (nummer);;^\d{8}$
+NL;L;TIN;NL_RSIN;Rechtspersonen en Samenwerkingsverbanden Informatie Nummer;;RSIN (nummer);;^[1-9]{1}\d{8}$
+NL;L;VAT;NL_EU_VAT_ID;European Union Value-added Tax Identification Number;;EU VAT ID (number);;^NL[1-9]{1}\d{8}$
+NO;L;NBR/TIN;NO_ORG;Organisasjonsnummer;;ORG(-nummer);;^\d{9}$
+NO;L;VAT;NO_ORG_MVA;Organisasjonsnummer (Merverdiavgift);;ORG(-nummer) Mva.;;^\d{9}\sMVA$
+PL;L;NBR;PL_KRS;Numer w krajowym rejestrze sądowym;Numer w krajowym rejestrze sadowym;KRS (numer);;^KRS\d{10}$
+PL;L;NBR;PL_REGON;Numer identyfikacyjny rejestru gospodarki narodowe;;(numer) REGON;;^(\d{9}|\d{14})$
+PL;L;TIN;PL_NIP;Numer identyfikacji podatkowej;;NIP;;^\d{3}\d{6}\d{1}$
+PL;L;VAT;PL_EU_VAT_ID;European Union Value-added Tax Identification Number;;EU VAT ID (number);;^PL\d{3}\d{6}\d{1}$
+PT;L;NBR/TIN;PT_NIPC;Número de Identificação de Pessoa Coletiva (aka Número de Identificação Fiscal);Numero de Identificacao de Pessoa Coletiva (aka Numero de Identificacao Fiscal);NIPC;;^PT5\d{7}\d{1}$
+PT;L;VAT;PT_EU_VAT_ID;European Union Value-added Tax Identification Number;;EU VAT ID (number);;^PT5\d{7}\d{1}$
+RO;L;NBR;RO_NRC;Numărul de ordine în registrul comerţului;Numarul de ordine in registrul comertului;NRC;;^J[0-5]{1}[0-9]{1}/\d{4}/\d{1,6}$
+RO;L;TIN;RO_CUI;Codul Unic de Înregistrare;Codul Unic de Inregistrare;CUI;;^[1-9]\d{0,8}\d{1}$
+RO;L;VAT;RO_EU_VAT_ID;European Union Value-added Tax Identification Number;;EU VAT ID (number);;^RO[1-9]\d{0,8}\d{1}$
+SE;L;NBR;SE_ORG;Organisationsnummer;;ORG(-nummer);;^\d{2}[2-9]{1}\d{3}-?\d{4}$
+SE;L;VAT;SE_EU_VAT_ID;European Union Value-added Tax Identification Number;;EU VAT ID (number);;^SE\d{2}[2-9]{1}\d{3}\d{4}(\d{2})?$
+SI;L;NBR;SI_MAT;Matična številka;Maticana stevilka;MAT (št.);MAT (st.);^\d{10}$
+SI;L;TIN;SI_DAV;Davčna številka;Davcna stevilka;DAV (št.);DAV (st.);^\d{7}\d{1}$
+SI;L;VAT;SI_EU_VAT_ID;European Union Value-added Tax Identification Number;;EU VAT ID (number);;^SI\d{7}\d{1}$
+SK;L;NBR;SK_ICO;Identifikačné číslo organizácie;Identifikacne cislo organizacie;IČO;ICO;^[1-9]{1}\d{7}$
+SK;L;TIN;SK_DIC;Daňové identifikačné číslo;Danove identifikacne cislo;DIČ;DIC;^[1-9]{1}\d{8}\d{1}$
+SK;L;VAT;SK_EU_VAT_ID;European Union Value-added Tax Identification Number;;EU VAT ID (number);;^SK[1-9]{1}\d{8}\d{1}$
+XI;L;NBR;XI_CRN;Company Registration Number;;CRN;;^((AC|CE|CS|FC|FE|GE|GS|IC|LP|NC|NF|NI|NL|NO|NP|OC|OE|PC|R0|RC|SA|SC|SE|SF|SG|SI|SL|SO|SR|SZ|ZC|\d{2})\d{6})|((IP|SP|RS)[A-Z\d]{6})|(SL\d{5}[\dA])$
+XI;L;TIN;XI_UTR;Unique Taxpayer Reference;;UTR;;^\d{10}$
+XI;L;VAT;XI_VAT_REG;Value-added Tax Registration Number;;VAT Reg. (number);;^(XI|GB)\d{9}(\d{3})?$
+-;L;IBR;GLEIF_LEI;Legal Entity Identifier;;LEI;;^[A-Z0-9]{18}[0-9]{2}$
+-;L;IBR;EU_EORI;Economic Operators' Registration and Identification Number;;EORI (number);;^[A-Z]{2}[0-9A-Z]+$
+-;L;OTH;GS1_GLN;Global Location Number;;GLN;;^\d{13}$
+-;L;OTH;DNB_DUNS;Data Universal Numbering System Number;;DUNS (number);;^\d{9}$

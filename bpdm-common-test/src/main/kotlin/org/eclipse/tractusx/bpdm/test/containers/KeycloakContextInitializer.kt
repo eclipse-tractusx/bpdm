@@ -88,10 +88,18 @@ abstract class SelfClientInitializer:  ApplicationContextInitializer<Configurabl
  */
 abstract class CreateNewSelfClientInitializer: SelfClientInitializer(){
 
+    val clientFactory: KeycloakClientFactory = KeycloakClientFactory()
+
     abstract val roleName: String?
 
     override fun initialize(applicationContext: ConfigurableApplicationContext) {
+        clientFactory.createClient(clientId, roleName)
+        super.initialize(applicationContext)
+    }
+}
 
+class KeycloakClientFactory{
+    fun createClient(clientId: String, roleName: String?){
         val adminClient = keycloakContainer.keycloakAdminClient
         val realm = adminClient.realm(KeyCloakInitializer.REALM)
         val clients = realm.clients()
@@ -104,6 +112,7 @@ abstract class CreateNewSelfClientInitializer: SelfClientInitializer(){
             clients.create(ClientRepresentation().apply {
                 this.clientId = clientToCreate
                 this.isServiceAccountsEnabled = true
+                this.secret = "**********"
             })
         }
 
@@ -147,8 +156,6 @@ abstract class CreateNewSelfClientInitializer: SelfClientInitializer(){
                 .add(listOf(role))
         }
 
-
-        super.initialize(applicationContext)
     }
 }
 
