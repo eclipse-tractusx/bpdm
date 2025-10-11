@@ -17,20 +17,25 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.v6
+package org.eclipse.tractusx.bpdm.pool.v6.util
 
-import org.eclipse.tractusx.bpdm.pool.api.v6.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.v6.util.AssertRepositoryV6
-import org.eclipse.tractusx.bpdm.pool.v6.util.TestDataClientV6
-import org.eclipse.tractusx.bpdm.test.testdata.pool.v6.TestDataV6Factory
-import org.eclipse.tractusx.bpdm.test.util.AuthAssertionHelper
-import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
+import org.eclipse.tractusx.bpdm.test.containers.KeycloakClientFactory
+import org.springframework.context.ApplicationContextInitializer
+import org.springframework.context.ConfigurableApplicationContext
 
-interface IsPoolV6Test {
-    val poolClient: PoolApiClient
-    val databaseHelpers: DbTestHelpers
-    val testDataClient: TestDataClientV6
-    val testDataFactory: TestDataV6Factory
-    val assertRepository: AssertRepositoryV6
-    val authAssertionHelper: AuthAssertionHelper
+class UnauthorizedClientInitializer: ApplicationContextInitializer<ConfigurableApplicationContext> {
+    companion object{
+        private var isInitialized = false
+
+        fun initializeOnce(){
+            if(!isInitialized){
+                KeycloakClientFactory().createClient("sa-cl7-cx-3", null)
+                isInitialized = true
+            }
+        }
+    }
+
+    override fun initialize(applicationContext: ConfigurableApplicationContext) {
+        initializeOnce()
+    }
 }
