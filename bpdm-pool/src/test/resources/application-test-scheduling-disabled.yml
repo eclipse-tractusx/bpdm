@@ -1,3 +1,7 @@
 bpdm:
   tasks:
     cron: '-'
+spring:
+  datasource:
+    hikari:
+      maximum-pool-size: 5

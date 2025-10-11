@@ -63,12 +63,12 @@ abstract class AuthTestBase(
 
     @Test
     fun `POST Addresses`(){
-        authAssertions.assert(addressAuthExpectations.postAddresses) { poolApiClient.addresses.createAddresses(listOf(requestFactory.createAddressRequest("1", ""))) }
+        authAssertions.assert(addressAuthExpectations.postAddresses) { poolApiClient.addresses.createAddresses(listOf(requestFactory.buildAdditionalAddressCreateRequest("1", ""))) }
     }
 
     @Test
     fun `PUT Addresses`(){
-        authAssertions.assert(addressAuthExpectations.putAddresses) { poolApiClient.addresses.updateAddresses(listOf(requestFactory.createAddressUpdateRequest("1", ""))) }
+        authAssertions.assert(addressAuthExpectations.putAddresses) { poolApiClient.addresses.updateAddresses(listOf(requestFactory.buildAddressUpdateRequest("1", ""))) }
     }
 
     @Test
@@ -88,12 +88,12 @@ abstract class AuthTestBase(
 
     @Test
     fun `POST Sites`(){
-        authAssertions.assert(siteAuthExpectations.postSites) { poolApiClient.sites.createSite(listOf(requestFactory.createSiteRequest("1", "BPNL"))) }
+        authAssertions.assert(siteAuthExpectations.postSites) { poolApiClient.sites.createSite(listOf(requestFactory.buildSiteCreateRequest("1", "BPNL"))) }
     }
 
     @Test
     fun `POST SitesLegalReference`(){
-        authAssertions.assert(siteAuthExpectations.postSites) { poolApiClient.sites.createSiteWithLegalReference(listOf(requestFactory.createSiteWithLegalReference("1", "BPNL"))) }
+        authAssertions.assert(siteAuthExpectations.postSites) { poolApiClient.sites.createSiteWithLegalReference(listOf(requestFactory.buildLegalAddressSiteCreateRequest("1", "BPNL"))) }
     }
 
     @Test
