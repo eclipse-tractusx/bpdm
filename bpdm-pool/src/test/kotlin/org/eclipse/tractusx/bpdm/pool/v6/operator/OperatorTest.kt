@@ -20,10 +20,10 @@
 package org.eclipse.tractusx.bpdm.pool.v6.operator
 
 import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.auth.SelfClientAsAdminInitializer
+import org.eclipse.tractusx.bpdm.pool.v6.PoolV6Test
+import org.eclipse.tractusx.bpdm.pool.v6.util.PoolOperatorClientV6
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
-import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInfo
 import org.springframework.beans.factory.annotation.Autowired
@@ -34,20 +34,15 @@ import org.springframework.test.context.ContextConfiguration
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class])
 @ContextConfiguration(initializers = [
     PostgreSQLContextInitializer::class,
-    KeyCloakInitializer::class,
-    SelfClientAsAdminInitializer::class
+    KeyCloakInitializer::class
 ])
 @ActiveProfiles("test-v6")
-abstract class OperatorTest{
-
+abstract class OperatorTest: PoolV6Test(){
     @Autowired
-    lateinit var databaseHelpers: DbTestHelpers
-
-    lateinit var testName: String
+    override lateinit var poolClient: PoolOperatorClientV6
 
     @BeforeEach
-    fun beforeEach(testInfo: TestInfo){
-        testName = testInfo.displayName
-        databaseHelpers.truncateDbTables()
+    override fun beforeEach(testInfo: TestInfo) {
+        super.beforeEach(testInfo)
     }
 }

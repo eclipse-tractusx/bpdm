@@ -27,20 +27,10 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityUpdateError
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerUpdateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.v6.operator.OperatorTest
-import org.eclipse.tractusx.bpdm.pool.v6.util.AssertRepositoryV6
-import org.eclipse.tractusx.bpdm.pool.v6.util.PoolOperatorClientV6
-import org.eclipse.tractusx.bpdm.pool.v6.util.TestDataClientV6
-import org.eclipse.tractusx.bpdm.test.testdata.pool.v6.TestDataV6Factory
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
 
-class LegalEntityUpdateIT @Autowired constructor(
-    private val poolClient: PoolOperatorClientV6,
-    private val testDataV6Factory: TestDataV6Factory,
-    private val assertRepo: AssertRepositoryV6,
-    private val testDataClient: TestDataClientV6
-): OperatorTest() {
+class LegalEntityUpdateIT: OperatorTest() {
 
     /**
      * GIVEN legal entity
@@ -53,14 +43,14 @@ class LegalEntityUpdateIT @Autowired constructor(
         val legalEntityResponse = testDataClient.createLegalEntity(testName)
 
         //WHEN
-        val updateRequest = testDataV6Factory.request.createLegalEntityUpdateRequest("Updated $testName", legalEntityResponse)
+        val updateRequest = testDataFactory.request.createLegalEntityUpdateRequest("Updated $testName", legalEntityResponse)
         val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
 
         //THEN
-        val expectedLegalEntities = response.entities.map { testDataV6Factory.result.buildExpectedLegalEntityUpdateResponse(updateRequest) }
+        val expectedLegalEntities = response.entities.map { testDataFactory.result.buildExpectedLegalEntityUpdateResponse(updateRequest) }
         val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(expectedLegalEntities, emptyList())
 
-        assertRepo.assertLegalEntityUpdate(response, expectedResponse)
+        assertRepository.assertLegalEntityUpdate(response, expectedResponse)
     }
 
     /**
@@ -72,17 +62,17 @@ class LegalEntityUpdateIT @Autowired constructor(
     fun `update legal entity and find it`(){
         //GIVEN
         val legalEntityResponse = testDataClient.createLegalEntity(testName)
-        val updateRequest = testDataV6Factory.request.createLegalEntityUpdateRequest("Updated $testName", legalEntityResponse)
+        val updateRequest = testDataFactory.request.createLegalEntityUpdateRequest("Updated $testName", legalEntityResponse)
         val updateResponse = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
 
         //WHEN
         val response = poolClient.legalEntities.getLegalEntities(LegalEntitySearchRequest(bpnLs = listOf(legalEntityResponse.legalEntity.bpnl)), PaginationRequest())
 
         //THEN
-        val expectedLegalEntities = updateResponse.entities.map { testDataV6Factory.result.buildExpectedLegalEntitySearchResponse(it) }
+        val expectedLegalEntities = updateResponse.entities.map { testDataFactory.result.buildExpectedLegalEntitySearchResponse(it) }
         val expectedResponse = PageDto(1, 1, 0, 1, expectedLegalEntities)
 
-        assertRepo.assertLegalEntitySearch(response, expectedResponse)
+        assertRepository.assertLegalEntitySearch(response, expectedResponse)
     }
 
     /**
@@ -99,7 +89,7 @@ class LegalEntityUpdateIT @Autowired constructor(
         val legalEntityResponseB =  testDataClient.createLegalEntity("$testName B")
 
         //WHEN
-        val updateRequest =  with(testDataV6Factory.request.createLegalEntityUpdateRequest("Updated $testName", legalEntityResponseB)){
+        val updateRequest =  with(testDataFactory.request.createLegalEntityUpdateRequest("Updated $testName", legalEntityResponseB)){
             this.copy(legalEntity = legalEntity.copy(identifiers = listOf(LegalEntityIdentifierDto(identifierX.value, identifierX.type, identifierX.issuingBody))))
         }
         val updateResponse = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
@@ -107,7 +97,7 @@ class LegalEntityUpdateIT @Autowired constructor(
         //THEN
         val expectedError = ErrorInfo(LegalEntityUpdateError.LegalEntityDuplicateIdentifier, "IGNORED", updateRequest.bpnl)
         val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
-        assertRepo.assertLegalEntityUpdate(updateResponse, expectedResponse)
+        assertRepository.assertLegalEntityUpdate(updateResponse, expectedResponse)
     }
 
     /**
@@ -122,9 +112,9 @@ class LegalEntityUpdateIT @Autowired constructor(
         val legalEntityResponseB =  testDataClient.createLegalEntity("$testName B")
 
         //WHEN
-        val updateRequestA = testDataV6Factory.request.createLegalEntityUpdateRequest("Updated $testName A", legalEntityResponseA)
+        val updateRequestA = testDataFactory.request.createLegalEntityUpdateRequest("Updated $testName A", legalEntityResponseA)
         val sameIdentifier = updateRequestA.legalEntity.identifiers.first()
-        val updateRequestB =  with(testDataV6Factory.request.createLegalEntityUpdateRequest("Updated $testName B", legalEntityResponseB)){
+        val updateRequestB =  with(testDataFactory.request.createLegalEntityUpdateRequest("Updated $testName B", legalEntityResponseB)){
             this.copy(legalEntity = legalEntity.copy(identifiers = listOf(sameIdentifier)))
         }
         val updateResponse = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequestA, updateRequestB))
@@ -132,7 +122,7 @@ class LegalEntityUpdateIT @Autowired constructor(
         //THEN
         val expectedErrors = listOf(updateRequestA, updateRequestB).map {  ErrorInfo(LegalEntityUpdateError.LegalEntityDuplicateIdentifier, "IGNORED", it.bpnl) }
         val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), expectedErrors)
-        assertRepo.assertLegalEntityUpdate(updateResponse, expectedResponse)
+        assertRepository.assertLegalEntityUpdate(updateResponse, expectedResponse)
     }
 
     /**
@@ -142,14 +132,14 @@ class LegalEntityUpdateIT @Autowired constructor(
     @Test
     fun `try update legal entity with unknown BPNL`(){
         //WHEN
-        val updateRequest = testDataV6Factory.request.createLegalEntityUpdateRequest("Updated $testName", "UNKNOWN")
+        val updateRequest = testDataFactory.request.createLegalEntityUpdateRequest("Updated $testName", "UNKNOWN")
         val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
 
         //THEN
         val expectedError = ErrorInfo(LegalEntityUpdateError.LegalEntityNotFound, "IGNORED", updateRequest.bpnl)
         val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
 
-        assertRepo.assertLegalEntityUpdate(response, expectedResponse)
+        assertRepository.assertLegalEntityUpdate(response, expectedResponse)
     }
 
     /**
@@ -163,7 +153,7 @@ class LegalEntityUpdateIT @Autowired constructor(
         val legalEntityResponse = testDataClient.createLegalEntity(testName)
 
         //WHEN
-        val updateRequest = with(testDataV6Factory.request.createLegalEntityUpdateRequest("Updated $testName", legalEntityResponse)){
+        val updateRequest = with(testDataFactory.request.createLegalEntityUpdateRequest("Updated $testName", legalEntityResponse)){
             copy(legalEntity = legalEntity.copy(legalForm = "UNKNOWN"))
         }
         val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
@@ -172,7 +162,7 @@ class LegalEntityUpdateIT @Autowired constructor(
         val expectedError = ErrorInfo(LegalEntityUpdateError.LegalFormNotFound, "IGNORED", updateRequest.bpnl)
         val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
 
-        assertRepo.assertLegalEntityUpdate(response, expectedResponse)
+        assertRepository.assertLegalEntityUpdate(response, expectedResponse)
     }
 
     /**
@@ -186,7 +176,7 @@ class LegalEntityUpdateIT @Autowired constructor(
         val legalEntityResponse = testDataClient.createLegalEntity(testName)
 
         //WHEN
-        val updateRequest = with(testDataV6Factory.request.createLegalEntityUpdateRequest("Updated $testName", legalEntityResponse)){
+        val updateRequest = with(testDataFactory.request.createLegalEntityUpdateRequest("Updated $testName", legalEntityResponse)){
             copy(legalAddress = legalAddress.copy(physicalPostalAddress = legalAddress.physicalPostalAddress.copy(administrativeAreaLevel1 = "UNKNOWN" )))
         }
         val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
@@ -195,7 +185,7 @@ class LegalEntityUpdateIT @Autowired constructor(
         val expectedError = ErrorInfo(LegalEntityUpdateError.LegalAddressRegionNotFound, "IGNORED", updateRequest.bpnl)
         val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
 
-        assertRepo.assertLegalEntityUpdate(response, expectedResponse)
+        assertRepository.assertLegalEntityUpdate(response, expectedResponse)
     }
 
     /**
@@ -209,7 +199,7 @@ class LegalEntityUpdateIT @Autowired constructor(
         val legalEntityResponse = testDataClient.createLegalEntity(testName)
 
         //WHEN
-        val updateRequest = with(testDataV6Factory.request.createLegalEntityUpdateRequest("Updated $testName", legalEntityResponse)){
+        val updateRequest = with(testDataFactory.request.createLegalEntityUpdateRequest("Updated $testName", legalEntityResponse)){
             copy(legalAddress = legalAddress.copy(alternativePostalAddress = legalAddress.alternativePostalAddress!!.copy(administrativeAreaLevel1 = "UNKNOWN" )))
         }
         val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
@@ -218,7 +208,7 @@ class LegalEntityUpdateIT @Autowired constructor(
         val expectedError = ErrorInfo(LegalEntityUpdateError.LegalAddressRegionNotFound, "IGNORED", updateRequest.bpnl)
         val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
 
-        assertRepo.assertLegalEntityUpdate(response, expectedResponse)
+        assertRepository.assertLegalEntityUpdate(response, expectedResponse)
     }
 
     /**
@@ -232,7 +222,7 @@ class LegalEntityUpdateIT @Autowired constructor(
         val legalEntityResponse = testDataClient.createLegalEntity(testName)
 
         //WHEN
-        val updateRequest = with(testDataV6Factory.request.createLegalEntityUpdateRequest("Updated $testName", legalEntityResponse)){
+        val updateRequest = with(testDataFactory.request.createLegalEntityUpdateRequest("Updated $testName", legalEntityResponse)){
             val unknownIdentifier = legalEntity.identifiers.first().copy(type = "UNKNOWN")
             copy(legalEntity = legalEntity.copy(identifiers = legalEntity.identifiers.drop(1).plus(unknownIdentifier)))
         }
@@ -242,7 +232,7 @@ class LegalEntityUpdateIT @Autowired constructor(
         val expectedError = ErrorInfo(LegalEntityUpdateError.LegalEntityIdentifierNotFound, "IGNORED", updateRequest.bpnl)
         val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
 
-        assertRepo.assertLegalEntityUpdate(response, expectedResponse)
+        assertRepository.assertLegalEntityUpdate(response, expectedResponse)
     }
 
     /**
@@ -256,7 +246,7 @@ class LegalEntityUpdateIT @Autowired constructor(
         val legalEntityResponse = testDataClient.createLegalEntity(testName)
 
         //WHEN
-        val updateRequest = with(testDataV6Factory.request.createLegalEntityUpdateRequest("Updated $testName", legalEntityResponse)){
+        val updateRequest = with(testDataFactory.request.createLegalEntityUpdateRequest("Updated $testName", legalEntityResponse)){
             val unknownIdentifier = legalAddress.identifiers.first().copy(type = "UNKNOWN")
             copy(legalAddress = legalAddress.copy(identifiers = legalAddress.identifiers.drop(1).plus(unknownIdentifier)))
         }
@@ -266,7 +256,7 @@ class LegalEntityUpdateIT @Autowired constructor(
         val expectedError = ErrorInfo(LegalEntityUpdateError.LegalAddressIdentifierNotFound, "IGNORED", updateRequest.bpnl)
         val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
 
-        assertRepo.assertLegalEntityUpdate(response, expectedResponse)
+        assertRepository.assertLegalEntityUpdate(response, expectedResponse)
     }
 
 
@@ -285,8 +275,8 @@ class LegalEntityUpdateIT @Autowired constructor(
         val legalEntityResponse = testDataClient.createLegalEntity(testName)
 
         //WHEN
-        val updateRequest = with(testDataV6Factory.request.createLegalEntityUpdateRequest("Updated $testName", legalEntityResponse)){
-            copy(legalEntity = legalEntity.copy(identifiers = (1 .. 101).map { testDataV6Factory.request.createLegalEntityIdentifier("Updated $testName", it) }))
+        val updateRequest = with(testDataFactory.request.createLegalEntityUpdateRequest("Updated $testName", legalEntityResponse)){
+            copy(legalEntity = legalEntity.copy(identifiers = (1 .. 101).map { testDataFactory.request.createLegalEntityIdentifier("Updated $testName", it) }))
         }
         val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
 
@@ -294,7 +284,7 @@ class LegalEntityUpdateIT @Autowired constructor(
         val expectedError = ErrorInfo(LegalEntityUpdateError.LegalEntityIdentifiersTooMany, "IGNORED", updateRequest.bpnl)
         val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
 
-        assertRepo.assertLegalEntityUpdate(response, expectedResponse)
+        assertRepository.assertLegalEntityUpdate(response, expectedResponse)
     }
 
     /**
@@ -312,8 +302,8 @@ class LegalEntityUpdateIT @Autowired constructor(
         val legalEntityResponse = testDataClient.createLegalEntity(testName)
 
         //WHEN
-        val updateRequest = with(testDataV6Factory.request.createLegalEntityUpdateRequest("Updated $testName", legalEntityResponse)){
-            copy(legalAddress = legalAddress.copy(identifiers = (1 .. 101).map { testDataV6Factory.request.createAddressIdentifier("Updated $testName", it) }))
+        val updateRequest = with(testDataFactory.request.createLegalEntityUpdateRequest("Updated $testName", legalEntityResponse)){
+            copy(legalAddress = legalAddress.copy(identifiers = (1 .. 101).map { testDataFactory.request.createAddressIdentifier("Updated $testName", it) }))
         }
         val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
 
@@ -321,6 +311,6 @@ class LegalEntityUpdateIT @Autowired constructor(
         val expectedError = ErrorInfo(LegalEntityUpdateError.LegalEntityIdentifiersTooMany, "IGNORED", updateRequest.bpnl)
         val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
 
-        assertRepo.assertLegalEntityUpdate(response, expectedResponse)
+        assertRepository.assertLegalEntityUpdate(response, expectedResponse)
     }
 }

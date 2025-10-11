@@ -26,10 +26,8 @@ import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDetailDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.pool.v6.operator.OperatorTest
-import org.eclipse.tractusx.bpdm.pool.v6.util.PoolOperatorClientV6
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import kotlin.random.Random
 
@@ -51,9 +49,7 @@ import kotlin.random.Random
  *
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
-class IdentifierTypeIT @Autowired constructor(
-    private val poolApiClient: PoolOperatorClientV6
-): OperatorTest() {
+class IdentifierTypeIT: OperatorTest() {
 
     /**
      * WHEN operator creates valid identifier type
@@ -63,7 +59,7 @@ class IdentifierTypeIT @Autowired constructor(
     @EnumSource(IdentifierBusinessPartnerType::class)
     fun `create new identifier type`(type: IdentifierBusinessPartnerType){
         val request = createIdentifierTypeRequest(testName, type)
-        val response = poolApiClient.metadata.createIdentifierType(request)
+        val response = poolClient.metadata.createIdentifierType(request)
 
         Assertions.assertThat(response).isEqualTo(request)
     }
@@ -76,12 +72,12 @@ class IdentifierTypeIT @Autowired constructor(
     @EnumSource(IdentifierBusinessPartnerType::class)
     fun `create new identifier type and find it`(type: IdentifierBusinessPartnerType){
         val request = createIdentifierTypeRequest(testName, type)
-        poolApiClient.metadata.createIdentifierType(request)
+        poolClient.metadata.createIdentifierType(request)
 
         var currentPage = 0
         var found = false
         do{
-            val response = poolApiClient.metadata.getIdentifierTypes(PaginationRequest(currentPage, 100), type, null)
+            val response = poolClient.metadata.getIdentifierTypes(PaginationRequest(currentPage, 100), type, null)
 
             val foundIdType = response.content.find { it.technicalKey == request.technicalKey }
             if(foundIdType != null){
@@ -106,9 +102,9 @@ class IdentifierTypeIT @Autowired constructor(
     @EnumSource(IdentifierBusinessPartnerType::class)
     fun `try create new identifier type with duplicate technical key`(type: IdentifierBusinessPartnerType){
         val request = createIdentifierTypeRequest(testName, type)
-        poolApiClient.metadata.createIdentifierType(request)
+        poolClient.metadata.createIdentifierType(request)
 
-        Assertions.assertThatThrownBy { poolApiClient.metadata.createIdentifierType(request) }
+        Assertions.assertThatThrownBy { poolClient.metadata.createIdentifierType(request) }
             .isInstanceOf(WebClientResponseException.Conflict::class.java)
     }
 
