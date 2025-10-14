@@ -21,9 +21,9 @@ package org.eclipse.tractusx.bpdm.pool.v6.participant
 
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.v6.PoolV6Test
-import org.eclipse.tractusx.bpdm.pool.v6.util.ParticipantClientInitializer
 import org.eclipse.tractusx.bpdm.pool.v6.util.PoolOperatorClientV6
 import org.eclipse.tractusx.bpdm.pool.v6.util.PoolParticipantClientV6
+import org.eclipse.tractusx.bpdm.pool.v6.util.PoolTestClientContextInitializer
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.junit.jupiter.api.BeforeEach
@@ -37,7 +37,7 @@ import org.springframework.test.context.ContextConfiguration
 @ContextConfiguration(initializers = [
     PostgreSQLContextInitializer::class,
     KeyCloakInitializer::class,
-    ParticipantClientInitializer::class
+    PoolTestClientContextInitializer::class
 ])
 @ActiveProfiles("test-v6")
 abstract class ParticipantTest: PoolV6Test() {
