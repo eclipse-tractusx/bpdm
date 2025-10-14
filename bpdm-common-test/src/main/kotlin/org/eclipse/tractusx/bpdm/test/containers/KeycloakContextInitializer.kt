@@ -40,15 +40,45 @@ class KeyCloakInitializer: ApplicationContextInitializer<ConfigurableApplication
         const val REALM =  "CX-Central"
         const val TENANT_BPNL = "BPNL00000003CRHK"
         const val ROLE_MANAGEMENT_CLIENT = "technical_roles_management"
+
+        const val CLIENT_ID_OPERATOR = "bpdm-operator"
+        const val CLIENT_ID_SHARING_MEMBER = "bpdm-sharing-member"
+        const val CLIENT_ID_PARTICIPANT = "bpdm-participant"
+        const val CLIENT_ID_UNAUTHORIZED = "bpdm-unauthorized"
+
+        private var isClientsInitialized = false
+
+        lateinit var operatorClientSecret: String
+        lateinit var sharingMemberClientSecret: String
+        lateinit var participantClientSecret: String
+        lateinit var unauthorizedClientSecret: String
     }
+
+    lateinit var clientFactory: KeycloakClientFactory
 
     override fun initialize(applicationContext: ConfigurableApplicationContext) {
         keycloakContainer.start()
 
+        if(!isClientsInitialized)
+            initializeClients()
+
+        val authServerUrl = keycloakContainer.authServerUrl.trimEnd('/')
+
         TestPropertyValues.of(
-            "bpdm.security.auth-server-url=${keycloakContainer.authServerUrl.trimEnd('/')}",
-            "bpdm.security.realm=${REALM}"
+            "bpdm.security.auth-server-url=$authServerUrl",
+            "bpdm.security.realm=$REALM"
         ).applyTo(applicationContext)
+    }
+
+    private fun initializeClients(){
+        clientFactory = KeycloakClientFactory()
+
+        operatorClientSecret = clientFactory.createClient(CLIENT_ID_OPERATOR, "BPDM Pool Admin")
+        sharingMemberClientSecret = clientFactory.createClient(CLIENT_ID_SHARING_MEMBER, "BPDM Pool Sharing Consumer")
+        participantClientSecret = clientFactory.createClient(CLIENT_ID_PARTICIPANT, "BPDM Pool Consumer")
+        unauthorizedClientSecret = clientFactory.createClient(CLIENT_ID_UNAUTHORIZED, null)
+
+        isClientsInitialized = true
     }
 }
 
@@ -99,7 +129,7 @@ abstract class CreateNewSelfClientInitializer: SelfClientInitializer(){
 }
 
 class KeycloakClientFactory{
-    fun createClient(clientId: String, roleName: String?){
+    fun createClient(clientId: String, roleName: String?): String{
         val adminClient = keycloakContainer.keycloakAdminClient
         val realm = adminClient.realm(KeyCloakInitializer.REALM)
         val clients = realm.clients()
@@ -112,7 +142,6 @@ class KeycloakClientFactory{
             clients.create(ClientRepresentation().apply {
                 this.clientId = clientToCreate
                 this.isServiceAccountsEnabled = true
-                this.secret = "**********"
             })
         }
 
@@ -133,8 +162,10 @@ class KeycloakClientFactory{
                 "jsonType.label" to "String"
             )
         }
-        clients
-            .get(createdClientUuid)
+
+        val createdClient = clients.get(createdClientUuid)
+
+        createdClient
             .protocolMappers
             .createMapper(newProtocolMapper)
 
@@ -156,6 +187,7 @@ class KeycloakClientFactory{
                 .add(listOf(role))
         }
 
+        return createdClient.secret.value
     }
 }
 

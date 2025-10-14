@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.v6.anonymous
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.v6.PoolV6Test
 import org.eclipse.tractusx.bpdm.pool.v6.util.PoolAnonymousClientV6
+import org.eclipse.tractusx.bpdm.pool.v6.util.PoolTestClientContextInitializer
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.junit.jupiter.api.BeforeEach
@@ -34,7 +35,8 @@ import org.springframework.test.context.ContextConfiguration
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class])
 @ContextConfiguration(initializers = [
     PostgreSQLContextInitializer::class,
-    KeyCloakInitializer::class
+    KeyCloakInitializer::class,
+    PoolTestClientContextInitializer::class
 ])
 @ActiveProfiles("test-v6")
 abstract class AnonymousTest: PoolV6Test() {

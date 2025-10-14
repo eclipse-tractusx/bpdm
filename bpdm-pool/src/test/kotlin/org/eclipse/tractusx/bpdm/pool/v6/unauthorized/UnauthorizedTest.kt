@@ -21,8 +21,8 @@ package org.eclipse.tractusx.bpdm.pool.v6.unauthorized
 
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.v6.PoolV6Test
+import org.eclipse.tractusx.bpdm.pool.v6.util.PoolTestClientContextInitializer
 import org.eclipse.tractusx.bpdm.pool.v6.util.PoolUnauthorizedClientV6
-import org.eclipse.tractusx.bpdm.pool.v6.util.UnauthorizedClientInitializer
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.junit.jupiter.api.BeforeEach
@@ -36,7 +36,7 @@ import org.springframework.test.context.ContextConfiguration
 @ContextConfiguration(initializers = [
     PostgreSQLContextInitializer::class,
     KeyCloakInitializer::class,
-    UnauthorizedClientInitializer::class
+    PoolTestClientContextInitializer::class
 ])
 @ActiveProfiles("test-v6")
 class UnauthorizedTest: PoolV6Test() {
