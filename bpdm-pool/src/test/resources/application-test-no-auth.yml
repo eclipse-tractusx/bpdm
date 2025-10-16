@@ -25,3 +25,7 @@ bpdm:
       security-enabled: false
     orchestrator:
       security-enabled: false
+spring:
+  datasource:
+    hikari:
+      maximum-pool-size: 5

@@ -29,16 +29,26 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 class AssertConfig {
 
+    @Bean
+    fun instantSecondsComparator(): InstantSecondsComparator{
+        return InstantSecondsComparator()
+    }
+
+    @Bean
+    fun localDatetimeSecondsComparator(instantSecondsComparator: InstantSecondsComparator): LocalDatetimeSecondsComparator{
+        return LocalDatetimeSecondsComparator(instantSecondsComparator)
+    }
+
     /**
      * Convenience Config to provide an assert helper for all test classes
      */
     @Bean
-    fun poolAssertHelper(): PoolAssertHelper {
-        val instantSecondsComparator = InstantSecondsComparator()
-        val localDatetimeSecondsComparator = LocalDatetimeSecondsComparator(instantSecondsComparator)
+    fun poolAssertHelper(instantSecondsComparator: InstantSecondsComparator, localDatetimeSecondsComparator: LocalDatetimeSecondsComparator): PoolAssertHelper {
         val stringIgnoreComparator = StringIgnoreComparator()
 
         return PoolAssertHelper(instantSecondsComparator, localDatetimeSecondsComparator, stringIgnoreComparator)
     }
+
+
 
 }

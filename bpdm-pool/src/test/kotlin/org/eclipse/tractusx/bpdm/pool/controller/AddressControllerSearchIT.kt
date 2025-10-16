@@ -32,7 +32,6 @@ import org.eclipse.tractusx.bpdm.test.testdata.pool.LegalEntityStructureRequest
 import org.eclipse.tractusx.bpdm.test.testdata.pool.SiteStructureRequest
 import org.eclipse.tractusx.bpdm.test.util.AssertHelpers
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
-import org.eclipse.tractusx.bpdm.test.util.PoolDataHelpers
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -49,7 +48,6 @@ import org.springframework.test.context.ContextConfiguration
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class AddressControllerSearchIT @Autowired constructor(
     val dbTestHelpers: DbTestHelpers,
-    val poolDataHelpers: PoolDataHelpers,
     val assertHelpers: AssertHelpers,
     val testHelpers: TestHelpers,
     val poolClient: PoolClientImpl
@@ -89,7 +87,6 @@ class AddressControllerSearchIT @Autowired constructor(
     @BeforeEach
     fun beforeEach() {
         dbTestHelpers.truncateDbTables()
-        poolDataHelpers.createPoolMetadata()
 
 
         val givenStructure = testHelpers.createBusinessPartnerStructure(listOf(partnerStructure3))

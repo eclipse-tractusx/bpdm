@@ -1,4 +1,3 @@
 org.eclipse.tractusx.bpdm.test.config.BpdmCommonTestAutoConfiguration
-org.eclipse.tractusx.bpdm.test.util.PoolDataHelpers
 org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 org.eclipse.tractusx.bpdm.test.util.AssertHelpers

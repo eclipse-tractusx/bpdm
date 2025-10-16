@@ -28,7 +28,6 @@ import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerVerboseValues
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
-import org.eclipse.tractusx.bpdm.test.util.PoolDataHelpers
 import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
 import org.eclipse.tractusx.orchestrator.api.model.RelationType
 import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepReservationEntryDto
@@ -51,14 +50,12 @@ import java.util.*
 class TaskRelationsResolutionServiceTest @Autowired constructor(
     val taskRelationsResolutionService: TaskRelationsResolutionService,
     val poolClient: PoolApiClient,
-    val dbTestHelpers: DbTestHelpers,
-    val poolDataHelpers: PoolDataHelpers
+    val dbTestHelpers: DbTestHelpers
 ) {
 
     @BeforeEach
     fun beforeEach() {
         dbTestHelpers.truncateDbTables()
-        poolDataHelpers.createPoolMetadata()
     }
 
     /*

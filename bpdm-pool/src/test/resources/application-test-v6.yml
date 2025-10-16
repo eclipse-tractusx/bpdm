@@ -1,0 +1,11 @@
+test:
+  v6: "true"
+bpdm:
+  tasks:
+    cron: '-'
+spring:
+  datasource:
+    hikari:
+      maximum-pool-size: 5
+  flyway:
+    clean-disabled: false
