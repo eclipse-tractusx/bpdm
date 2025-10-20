@@ -2,11 +2,21 @@
 
 <!-- TOC -->
 * [Migration Guide](#migration-guide)
+  * [7.1.x to 7.2.x](#71x-to-72x)
+    * [Alternative Headquarters Restriction](#alternative-headquarters-restriction)
   * [7.0.x to 7.1.x](#70x-to-71x)
     * [EDC Version 0.11](#edc-version-011)
     * [Golden Record Process for IsManagedBy Relations](#golden-record-process-for-ismanagedby-relations)
     * [Business Partner Identifier Amount Limit](#business-partner-identifier-amount-limit)
 <!-- TOC -->
+
+## 7.1.x to 7.2.x
+
+### Alternative Headquarters Restriction
+
+Now each legal entity can have only up to one alternative headquarters.
+Please make sure in your Pool and Gate output database each legal entity is part of up to only one such relation and remove relations that violate this constraint.
+Otherwise, the golden record process may show unexpected behaviour. 
 
 ## 7.0.x to 7.1.x
 
