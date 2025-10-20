@@ -109,7 +109,15 @@ class RelationsGoldenRecordTaskDb(
         @Column(name = "source_bpnl", nullable = false)
         var businessPartnerSourceBpnl: String,
         @Column(name = "target_bpnl", nullable = false)
-        var businessPartnerTargetBpnl: String
+        var businessPartnerTargetBpnl: String,
+        @ElementCollection(fetch = FetchType.LAZY)
+        @CollectionTable(
+            name = "relation_task_validity_periods",
+            joinColumns = [JoinColumn(name = "relation_id", foreignKey = ForeignKey(name = "fk_task_relation_validity_periods_relation"))],
+            indexes = [Index(name = "idx_relation_task_validity_periods_relation_id", columnList = "relation_id")]
+        )
+        var validityPeriods: MutableList<RelationValidityPeriod> = mutableListOf()
+
     )
 
 

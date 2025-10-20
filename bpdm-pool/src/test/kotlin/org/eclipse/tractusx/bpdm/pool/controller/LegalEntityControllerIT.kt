@@ -27,6 +27,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntitySearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
+import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.eclipse.tractusx.bpdm.pool.util.EndpointValues
@@ -52,6 +53,7 @@ import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.returnResult
 import java.time.Instant
+import java.time.LocalDate
 
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class]
@@ -684,7 +686,12 @@ class LegalEntityControllerIT @Autowired constructor(
             type = relationType,
             startNode = legalEntityRepository.findByBpnIgnoreCase(savedEntity1.legalEntity.bpnl)!!,
             endNode = legalEntityRepository.findByBpnIgnoreCase(savedEntity2.legalEntity.bpnl)!!,
-            isActive = true
+            validityPeriods = mutableListOf(
+                RelationValidityPeriodDb(
+                    validFrom = LocalDate.parse("1970-01-01"),
+                    validTo = LocalDate.parse("9999-12-31")
+                )
+            ),
         )
 
         releationRepository.save(relation);
@@ -696,7 +703,6 @@ class LegalEntityControllerIT @Autowired constructor(
         assertThat(savedRelation.first().type).isEqualTo(relationType)
         assertThat(savedRelation.first().startNode.bpn).isEqualTo(savedEntity1.legalEntity.bpnl)
         assertThat(savedRelation.first().endNode.bpn).isEqualTo(savedEntity2.legalEntity.bpnl)
-        assertThat(savedRelation.first().isActive).isTrue()
 
         //Step 4: Retrieve legal entity with the relation exists
         val bpnToFind = changeCase(savedEntity1.legalEntity.bpnl)
@@ -705,7 +711,7 @@ class LegalEntityControllerIT @Autowired constructor(
         assertThat(responseLegalEntity.relations.first().type).isEqualTo(savedRelation.first().type)
         assertThat(responseLegalEntity.relations.first().businessPartnerSourceBpnl).isEqualTo(savedRelation.first().startNode.bpn)
         assertThat(responseLegalEntity.relations.first().businessPartnerTargetBpnl).isEqualTo(savedRelation.first().endNode.bpn)
-        assertThat(responseLegalEntity.relations.first().isActive).isEqualTo(savedRelation.first().isActive)
+        assertThat(responseLegalEntity.relations.first().validityPeriods.size).isEqualTo(1)
 
 
     }

@@ -24,6 +24,7 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateErrorCode
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateType
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationValidityPeriodDto
 import org.eclipse.tractusx.bpdm.gate.api.model.SharableRelationType
 import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
@@ -103,7 +104,7 @@ class RelationTaskResolutionService(
         val outputRequests = tasks.mapNotNull { task ->
             val relation = pendingRelationsById[task.taskId] ?: return@mapNotNull null
             val outputResult = task.businessPartnerRelationsResult
-            IRelationService.RelationUpsertRequest(relation, outputResult.relationType.toGateModel(), outputResult.businessPartnerSourceBpnl, outputResult.businessPartnerTargetBpnl)
+            IRelationService.RelationUpsertRequest(relation, outputResult.relationType.toGateModel(), outputResult.businessPartnerSourceBpnl, outputResult.businessPartnerTargetBpnl, outputResult.validityPeriods.map { it.toGateModel() })
         }
         relationService.upsertOutputRelations(outputRequests)
     }
@@ -138,6 +139,11 @@ class RelationTaskResolutionService(
             TaskRelationsErrorType.Unspecified -> RelationSharingStateErrorCode.SharingProcessError
         }
     }
+
+    private fun org.eclipse.tractusx.orchestrator.api.model.RelationValidityPeriod.toGateModel(): RelationValidityPeriodDto {
+        return RelationValidityPeriodDto(validFrom = this.validFrom, validTo = this.validTo)
+    }
+
 
     data class ResolutionStats(
         val resolvedAsSuccess: Int,

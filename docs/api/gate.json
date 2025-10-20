@@ -234,7 +234,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/PageDtoRelationDto"
+                  "$ref" : "#/components/schemas/PageDtoRelationV6Dto"
                 }
               }
             }
@@ -272,7 +272,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/RelationDto"
+                  "$ref" : "#/components/schemas/RelationV6Dto"
                 }
               }
             }
@@ -310,7 +310,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/RelationDto"
+                  "$ref" : "#/components/schemas/RelationV6Dto"
                 }
               }
             }
@@ -2332,6 +2332,40 @@
         },
         "required" : [ "content", "contentSize", "page", "totalElements", "totalPages" ]
       },
+      "PageDtoRelationV6Dto" : {
+        "type" : "object",
+        "description" : "Paginated collection of results",
+        "properties" : {
+          "totalElements" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "Total number of all results in all pages"
+          },
+          "totalPages" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Total number pages"
+          },
+          "page" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Current page number"
+          },
+          "contentSize" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Number of results in the page"
+          },
+          "content" : {
+            "type" : "array",
+            "description" : "Collection of results in the page",
+            "items" : {
+              "$ref" : "#/components/schemas/RelationV6Dto"
+            }
+          }
+        },
+        "required" : [ "content", "contentSize", "page", "totalElements", "totalPages" ]
+      },
       "PageDtoSharingStateDto" : {
         "type" : "object",
         "description" : "Paginated collection of results",
@@ -2465,6 +2499,13 @@
             "type" : "string",
             "description" : "The business partner to which this relation goes (the target)"
           },
+          "validityPeriods" : {
+            "type" : "array",
+            "description" : "A relation validity describes a timeframe in which a relation is active.",
+            "items" : {
+              "$ref" : "#/components/schemas/RelationValidityPeriodDto"
+            }
+          },
           "updatedAt" : {
             "type" : "string",
             "format" : "date-time",
@@ -2476,7 +2517,7 @@
             "description" : "The time when this relation was created"
           }
         },
-        "required" : [ "businessPartnerSourceExternalId", "businessPartnerTargetExternalId", "createdAt", "externalId", "relationType", "updatedAt" ]
+        "required" : [ "businessPartnerSourceExternalId", "businessPartnerTargetExternalId", "createdAt", "externalId", "relationType", "updatedAt", "validityPeriods" ]
       },
       "RelationOutputDto" : {
         "type" : "object",
@@ -2494,12 +2535,18 @@
           "targetBpnL" : {
             "type" : "string"
           },
+          "validityPeriods" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/RelationValidityPeriodDto"
+            }
+          },
           "updatedAt" : {
             "type" : "string",
             "format" : "date-time"
           }
         },
-        "required" : [ "externalId", "relationType", "sourceBpnL", "targetBpnL", "updatedAt" ]
+        "required" : [ "externalId", "relationType", "sourceBpnL", "targetBpnL", "updatedAt", "validityPeriods" ]
       },
       "RelationOutputSearchRequest" : {
         "type" : "object",
@@ -2582,9 +2629,16 @@
           "businessPartnerTargetExternalId" : {
             "type" : "string",
             "description" : "The external identifier of the business partner to which the relation should point (the target)"
+          },
+          "validityPeriods" : {
+            "type" : "array",
+            "description" : "A relation validity describes a timeframe in which a relation is active.",
+            "items" : {
+              "$ref" : "#/components/schemas/RelationValidityPeriodDto"
+            }
           }
         },
-        "required" : [ "businessPartnerSourceExternalId", "businessPartnerTargetExternalId", "externalId", "relationType" ]
+        "required" : [ "businessPartnerSourceExternalId", "businessPartnerTargetExternalId", "externalId", "relationType", "validityPeriods" ]
       },
       "RelationPutRequest" : {
         "type" : "object",
@@ -2680,6 +2734,56 @@
           }
         },
         "required" : [ "externalId", "sharingStateType", "updatedAt" ]
+      },
+      "RelationV6Dto" : {
+        "type" : "object",
+        "description" : "A relation from one business partner (the source) to another business partner (the target). ",
+        "properties" : {
+          "externalId" : {
+            "type" : "string",
+            "description" : "The identifier with which to reference this relation"
+          },
+          "relationType" : {
+            "type" : "string",
+            "description" : "The type of relation between the business partners",
+            "enum" : [ "IsManagedBy", "IsAlternativeHeadquarterFor", "IsOwnedBy" ]
+          },
+          "businessPartnerSourceExternalId" : {
+            "type" : "string",
+            "description" : "The business partner from which the relation emerges (the source)"
+          },
+          "businessPartnerTargetExternalId" : {
+            "type" : "string",
+            "description" : "The business partner to which this relation goes (the target)"
+          },
+          "updatedAt" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "The time when this relation was last modified"
+          },
+          "createdAt" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "The time when this relation was created"
+          }
+        },
+        "required" : [ "businessPartnerSourceExternalId", "businessPartnerTargetExternalId", "createdAt", "externalId", "relationType", "updatedAt" ]
+      },
+      "RelationValidityPeriodDto" : {
+        "type" : "object",
+        "properties" : {
+          "validFrom" : {
+            "type" : "string",
+            "format" : "date",
+            "description" : "The date from which the relation is valid."
+          },
+          "validTo" : {
+            "type" : "string",
+            "format" : "date",
+            "description" : "The date until which the relation is valid."
+          }
+        },
+        "required" : [ "validFrom" ]
       },
       "SharingStateDto" : {
         "type" : "object",

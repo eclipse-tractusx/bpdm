@@ -27,17 +27,18 @@ import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
+import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 
 @Service
 class RelationUpsertService(
     private val relationRepository: RelationRepository,
     private val changelogService: PartnerChangelogService
 ) {
-
     @Transactional
     fun upsertRelation(upsertRequest: UpsertRequest): UpsertResult<RelationDb>{
         val source = upsertRequest.source
@@ -57,10 +58,19 @@ class RelationUpsertService(
             )
         ).singleOrNull()
 
-        val upsertResult = if(existingRelation != null)
-            UpsertResult(existingRelation, UpsertType.NoChange)
-        else
+        val upsertResult = if (existingRelation != null) {
+            // Update validity periods if changed
+            if (validityPeriodsDiffer(existingRelation.validityPeriods, upsertRequest.validityPeriods)) {
+                existingRelation.validityPeriods.clear()
+                existingRelation.validityPeriods.addAll(upsertRequest.validityPeriods)
+                relationRepository.save(existingRelation)
+                UpsertResult(existingRelation, UpsertType.Updated)
+            } else {
+                UpsertResult(existingRelation, UpsertType.NoChange)
+            }
+        } else {
             UpsertResult(createNewRelation(upsertRequest), UpsertType.Created)
+        }
 
         return upsertResult
     }
@@ -68,12 +78,18 @@ class RelationUpsertService(
     private fun createNewRelation(upsertRequest: UpsertRequest): RelationDb{
         val source = upsertRequest.source
         val target = upsertRequest.target
+        val validityPeriods = upsertRequest.validityPeriods.map {
+            RelationValidityPeriodDb(
+                validFrom = it.validFrom,
+                validTo = it.validTo
+            )
+        }.toMutableList()
 
         val newRelation = RelationDb(
             type = upsertRequest.relationType,
             startNode = source,
             endNode = target,
-            isActive = true
+            validityPeriods = validityPeriods,
         )
 
         relationRepository.save(newRelation)
@@ -84,10 +100,60 @@ class RelationUpsertService(
         return newRelation
     }
 
+    private fun validityPeriodsDiffer(existingValidityPeriods: Collection<RelationValidityPeriodDb>, newValidityPeriods: Collection<RelationValidityPeriodDb>): Boolean {
+        if (existingValidityPeriods.size != newValidityPeriods.size) return true
+        return existingValidityPeriods.zip(newValidityPeriods).any { (e, n) ->
+            e.validFrom != n.validFrom || e.validTo != n.validTo
+        }
+    }
+
+    fun filterOverlappingRelations(relationToUpsert: IRelationUpsertStrategyService.UpsertRequest, relations: Collection<RelationDb>): Collection<RelationDb>{
+        val relationsWithoutSelf = relations.filterNot { isTheSameRelation(relationToUpsert, it) }
+        val overlappingRelations = relationsWithoutSelf.filter { hasOverlap(relationToUpsert, it) }
+
+        return overlappingRelations
+    }
+
+
+    private fun isTheSameRelation(relationToUpsert: IRelationUpsertStrategyService.UpsertRequest, relation: RelationDb): Boolean{
+        return relationToUpsert.source.bpn == relation.startNode.bpn && relationToUpsert.target.bpn == relation.endNode.bpn
+    }
+
+    private fun hasOverlap(relationToUpsert: IRelationUpsertStrategyService.UpsertRequest, relation: RelationDb): Boolean{
+        return relationToUpsert.validityPeriods.any{ validity1 -> relation.validityPeriods.any { validity2 -> hasOverlap(validity1, validity2) } }
+
+    }
+
+    private fun hasOverlap(validity1: RelationValidityPeriodDb, validity2: RelationValidityPeriodDb): Boolean {
+        return TimePeriod.fromUnlimited(validity1.validFrom, validity1.validTo)
+            .hasOverlap(TimePeriod.fromUnlimited(validity2.validFrom, validity2.validTo))
+    }
+
     data class UpsertRequest(
         val source: LegalEntityDb,
         val target: LegalEntityDb,
-        val relationType: RelationType
+        val relationType: RelationType,
+        val validityPeriods: Collection<RelationValidityPeriodDb>
     )
 
+    data class TimePeriod(
+        val validFrom: LocalDate,
+        val validTo: LocalDate
+    ){
+        companion object{
+            private val maxValidTo = LocalDate.parse("9999-01-01")
+
+            fun fromUnlimited(validFrom: LocalDate, validTo: LocalDate?): TimePeriod{
+                return TimePeriod(validFrom, validTo ?: maxValidTo)
+            }
+        }
+
+        fun hasOverlap(other: TimePeriod): Boolean{
+            return validFrom < other.validTo && validTo > other.validFrom
+        }
+
+        fun isConsecutive(other: TimePeriod): Boolean{
+            return (validTo == other.validFrom) || (other.validTo == validFrom)
+        }
+    }
 }

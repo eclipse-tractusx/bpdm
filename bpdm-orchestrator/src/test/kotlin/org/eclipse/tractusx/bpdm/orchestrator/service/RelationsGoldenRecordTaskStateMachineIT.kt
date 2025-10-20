@@ -27,6 +27,7 @@ import org.eclipse.tractusx.bpdm.orchestrator.entity.GateRecordDb
 import org.eclipse.tractusx.bpdm.orchestrator.entity.RelationsGoldenRecordTaskDb
 import org.eclipse.tractusx.bpdm.orchestrator.exception.RelationsIllegalStateException
 import org.eclipse.tractusx.bpdm.orchestrator.repository.GateRecordRepository
+import org.eclipse.tractusx.bpdm.orchestrator.util.OrchestratorTestValues
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.eclipse.tractusx.orchestrator.api.model.*
@@ -56,9 +57,8 @@ class RelationsGoldenRecordTaskStateMachineIT  @Autowired constructor(
     private val dbTestHelpers: DbTestHelpers,
     private val stateMachineConfigProperties: StateMachineConfigProperties
 ) {
-
-    private val businessPartnerRelations1 = BusinessPartnerRelations(relationType = RelationType.IsAlternativeHeadquarterFor, businessPartnerSourceBpnl = "BPNL1", businessPartnerTargetBpnl = "BPNL2")
-    private val businessPartnerRelations2 = BusinessPartnerRelations(relationType = RelationType.IsManagedBy, businessPartnerSourceBpnl = "BPNL3", businessPartnerTargetBpnl = "BPNL4")
+    private val businessPartnerRelations1 = BusinessPartnerRelations(relationType = RelationType.IsAlternativeHeadquarterFor, businessPartnerSourceBpnl = "BPNL1", businessPartnerTargetBpnl = "BPNL2", validityPeriods = OrchestratorTestValues.alwaysActiveRelationValidity)
+    private val businessPartnerRelations2 = BusinessPartnerRelations(relationType = RelationType.IsManagedBy, businessPartnerSourceBpnl = "BPNL3", businessPartnerTargetBpnl = "BPNL4", validityPeriods =  OrchestratorTestValues.alwaysActiveRelationValidity)
     private lateinit var gateRecord: GateRecordDb
 
     @BeforeEach

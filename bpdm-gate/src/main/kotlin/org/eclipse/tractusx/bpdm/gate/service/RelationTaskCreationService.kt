@@ -26,6 +26,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
 import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
+import org.eclipse.tractusx.bpdm.gate.entity.RelationValidityPeriodDb
 import org.eclipse.tractusx.bpdm.gate.repository.RelationRepository
 import org.eclipse.tractusx.bpdm.gate.repository.RelationStageRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
@@ -103,8 +104,9 @@ class RelationTaskCreationService(
             val sourceBpnL = outputsBySharingState[relationStage.source]?.bpnL ?: return@map null
             val targetBpnL = outputsBySharingState[relationStage.target]?.bpnL ?: return@map null
             val relationType = relationStage.relationType.toOrchestratorModel() ?: return@map null
+            val validityPeriods = relationStage.validityPeriods.map { it.toOrchestratorModel() }
 
-            TaskCreateRelationsRequestEntry(sharingState.recordId, BusinessPartnerRelations(relationType, sourceBpnL, targetBpnL))
+            TaskCreateRelationsRequestEntry(sharingState.recordId, BusinessPartnerRelations(relationType, sourceBpnL, targetBpnL, validityPeriods))
         }
 
         val createdTasks = taskCreateRequests.letNonNull { sendTasks(it) }
@@ -159,4 +161,11 @@ class RelationTaskCreationService(
             result[resultIndex++]
         }
     }
+
+    // map a single RelationStateDb to the orchestrator DTO (never nullable unless you expect failure cases)
+    private fun RelationValidityPeriodDb.toOrchestratorModel():
+            org.eclipse.tractusx.orchestrator.api.model.RelationValidityPeriod {
+        return org.eclipse.tractusx.orchestrator.api.model.RelationValidityPeriod(validFrom = this.validFrom, validTo = this.validTo)
+    }
+
 }

@@ -22,9 +22,11 @@ package org.eclipse.tractusx.bpdm.pool.service
 import jakarta.transaction.Transactional
 import org.eclipse.tractusx.bpdm.pool.api.model.RelationType
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
+import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
+import org.eclipse.tractusx.orchestrator.api.model.RelationValidityPeriod
 import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepReservationEntryDto
 import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepResultEntryDto
 import org.springframework.stereotype.Service
@@ -37,7 +39,6 @@ class TaskRelationsStepBuildService(
     private val managedRelationUpsertService: ManagedRelationUpsertService,
     private val ownedByRelationService: OwnedByRelationUpsertService
 ) {
-
     @Transactional
     fun upsertBusinessPartnerRelations(taskEntry: TaskRelationsStepReservationEntryDto): TaskRelationsStepResultEntryDto {
         val relationDto = taskEntry.businessPartnerRelations
@@ -46,7 +47,6 @@ class TaskRelationsStepBuildService(
         if (relationDto.businessPartnerSourceBpnl == relationDto.businessPartnerTargetBpnl) {
             throw BpdmValidationException("A legal entity cannot have a relation to itself (BPNL: ${relationDto.businessPartnerSourceBpnl}).")
         }
-
         // Fetch legal entities by BPNL
         val sourceLegalEntity = legalEntityRepository.findByBpnIgnoreCase(relationDto.businessPartnerSourceBpnl)
             ?: throw BpdmValidationException("Source legal entity with specified BPNL : ${relationDto.businessPartnerSourceBpnl} not found")
@@ -54,7 +54,21 @@ class TaskRelationsStepBuildService(
         val targetLegalEntity = legalEntityRepository.findByBpnIgnoreCase(relationDto.businessPartnerTargetBpnl)
             ?: throw BpdmValidationException("Target legal entity with specified BPNL : ${relationDto.businessPartnerTargetBpnl} not found")
 
-        val upsertRequest = IRelationUpsertStrategyService.UpsertRequest(sourceLegalEntity, targetLegalEntity)
+        validateValidityPeriods(relationDto)
+
+        // Map states from orchestrator
+        val validityPeriods = relationDto.validityPeriods.map {
+            RelationValidityPeriodDb(
+                validFrom = it.validFrom,
+                validTo = it.validTo
+            )
+        }
+
+        val upsertRequest = IRelationUpsertStrategyService.UpsertRequest(
+            sourceLegalEntity,
+            targetLegalEntity,
+            validityPeriods = validityPeriods
+        )
         val strategyService : IRelationUpsertStrategyService = when(relationDto.relationType){
             OrchestratorRelationType.IsAlternativeHeadquarterFor -> alternativeHeadquarterRelationService
             OrchestratorRelationType.IsManagedBy -> managedRelationUpsertService
@@ -72,9 +86,15 @@ class TaskRelationsStepBuildService(
 
     private fun RelationDb.toTaskDto(): BusinessPartnerRelations{
         return BusinessPartnerRelations(
-            type.toTaskDto(),
-            startNode.bpn,
-            endNode.bpn
+            relationType = this.type.toTaskDto(),
+            businessPartnerSourceBpnl = this.startNode.bpn,
+            businessPartnerTargetBpnl = this.endNode.bpn,
+            validityPeriods = this.validityPeriods.sortedBy { it.validFrom }.map {
+                RelationValidityPeriod(
+                    validFrom = it.validFrom,
+                    validTo = it.validTo
+                )
+            }
         )
     }
 
@@ -83,6 +103,30 @@ class TaskRelationsStepBuildService(
             RelationType.IsAlternativeHeadquarterFor -> OrchestratorRelationType.IsAlternativeHeadquarterFor
             RelationType.IsManagedBy -> OrchestratorRelationType.IsManagedBy
             RelationType.IsOwnedBy -> OrchestratorRelationType.IsOwnedBy
+        }
+    }
+
+    private fun validateValidityPeriods(relation: BusinessPartnerRelations) {
+        val orderedValidityPeriods = relation.validityPeriods.sortedBy { it.validFrom }
+
+        if(orderedValidityPeriods.isEmpty()){
+            throw BpdmValidationException("Relation validity periods cannot be empty, at least one validity needed.")
+        }
+
+        orderedValidityPeriods.first().let { state ->
+            if (state.validTo != null && state.validFrom.isAfter(state.validTo)) {
+                throw BpdmValidationException("Relation validity period validFrom '${state.validFrom}' cannot be after validTo '${state.validTo}'.")
+            }
+        }
+
+        val orderedTimePeriods = orderedValidityPeriods.map { RelationUpsertService.TimePeriod.fromUnlimited(it.validFrom, it.validTo) }
+        val consecutiveTimePeriodPairs =  orderedTimePeriods.zip(orderedTimePeriods.drop(1))
+
+       val anyOverlap =  consecutiveTimePeriodPairs
+           .any { (state1, state2) -> state1.hasOverlap(state2) }
+
+        if(anyOverlap){
+            throw BpdmValidationException("Relation validity periods must not overlap.")
         }
     }
 }

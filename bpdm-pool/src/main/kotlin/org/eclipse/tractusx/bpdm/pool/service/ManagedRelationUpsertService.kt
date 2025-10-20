@@ -39,28 +39,46 @@ class ManagedRelationUpsertService(
 
     @Transactional
     override fun upsertRelation(upsertRequest: IRelationUpsertStrategyService.UpsertRequest): UpsertResult<RelationDb> {
-        val (proposedSource, proposedTarget) = upsertRequest
 
-        validateNoChain(proposedSource, proposedTarget)
-        validateSingleManager(proposedSource)
-        validateManagingEntityIsParticipant(proposedTarget)
+        validateManagingEntityIsParticipant(upsertRequest.target)
+        validateSingleManager(upsertRequest)
+        validateNoChain(upsertRequest)
 
         val result = relationUpsertService.upsertRelation(
-            RelationUpsertService.UpsertRequest(proposedSource, proposedTarget, RelationType.IsManagedBy)
+            RelationUpsertService.UpsertRequest(upsertRequest.source, upsertRequest.target, RelationType.IsManagedBy, upsertRequest.validityPeriods)
         )
-
-        makeManagedEntityParticipantIfRequired(proposedSource)
+        makeManagedEntityParticipantIfRequired(upsertRequest.source)
 
         return result
-
     }
 
-    private fun validateNoChain(source: LegalEntityDb, target: LegalEntityDb) {
+    private fun validateSingleManager(upsertRequest: IRelationUpsertStrategyService.UpsertRequest){
+        val source = upsertRequest.source
+
+        val existingManagers = relationRepository.findByTypeAndStartNode(RelationType.IsManagedBy, source)
+        val overlappingExistingManagers = relationUpsertService.filterOverlappingRelations(upsertRequest, existingManagers)
+
+        if (overlappingExistingManagers.isNotEmpty()) {
+            val managerBpns = overlappingExistingManagers.joinToString { it.endNode.bpn }
+            throw BpdmValidationException(
+                "Invalid 'IsManagedBy' relation: The Managed Legal Entity with BPNL '${source.bpn}' is already managed by another Managing Legal Entity '${managerBpns}'. " +
+                        "A Managed Legal Entity may only have one Managing Legal Entity at a time."
+            )
+        }
+    }
+
+    private fun validateNoChain(upsertRequest: IRelationUpsertStrategyService.UpsertRequest) {
+        val source = upsertRequest.source
+        val target = upsertRequest.target
+
         val sourceRelations = relationRepository.findInSourceOrTarget(RelationType.IsManagedBy, source)
         val targetRelations = relationRepository.findInSourceOrTarget(RelationType.IsManagedBy, target)
 
-        val sourceIsTarget = sourceRelations.any { it.endNode.id == source.id }
-        val targetIsSource = targetRelations.any { it.startNode.id == target.id }
+        val overlappingSourceRelations = relationUpsertService.filterOverlappingRelations(upsertRequest, sourceRelations)
+        val overlappingTargetRelations = relationUpsertService.filterOverlappingRelations(upsertRequest, targetRelations)
+
+        val sourceIsTarget = overlappingSourceRelations.any { it.endNode.id == source.id }
+        val targetIsSource = overlappingTargetRelations.any { it.startNode.id == target.id }
 
         when {
             sourceIsTarget -> throw BpdmValidationException(
@@ -70,19 +88,6 @@ class ManagedRelationUpsertService(
             targetIsSource -> throw BpdmValidationException(
                 "Invalid 'IsManagedBy' relation: The legal entity with BPNL '${target.bpn}' is already a Managed Legal Entity. " +
                         "A Managed Legal Entity cannot also act as a Managing Legal Entity."
-            )
-        }
-    }
-
-    private fun validateSingleManager(source: LegalEntityDb) {
-        val existingManagers = relationRepository.findInSourceOrTarget(RelationType.IsManagedBy, source)
-            .filter { it.startNode.id == source.id }
-
-        if (existingManagers.isNotEmpty()) {
-            val managerBpns = existingManagers.joinToString { it.endNode.bpn }
-            throw BpdmValidationException(
-                "Invalid 'IsManagedBy' relation: The Managed Legal Entity with BPNL '${source.bpn}' is already managed by another Managing Legal Entity '${managerBpns}'. " +
-                        "A Managed Legal Entity may only have one Managing Legal Entity at a time."
             )
         }
     }
@@ -105,5 +110,4 @@ class ManagedRelationUpsertService(
             )
         }
     }
-
 }

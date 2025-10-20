@@ -8,6 +8,14 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 
 ## [7.2.0] - tbd
 
+### Added
+
+- BPDM: Add validity on business partner relation to the golden record process for legal entity relations [#1295](https://github.com/eclipse-tractusx/bpdm/issues/1295)
+
+### Changed
+
+- BPDM Pool: each legal entity can now have only one alternative headquarter
+
 ## [7.1.0] - 2025-09-30
 
 ### Added

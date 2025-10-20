@@ -28,6 +28,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationSearchRequest
+import org.eclipse.tractusx.bpdm.gate.util.GateTestValues
 import org.eclipse.tractusx.bpdm.gate.util.MockAndAssertUtils
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
@@ -59,7 +60,6 @@ class RelationControllerIT @Autowired constructor(
     private val inputFactory: GateInputFactory,
     private val mockAndAssertUtils: MockAndAssertUtils
 ){
-
     var testName: String = ""
 
     @BeforeEach
@@ -113,8 +113,9 @@ class RelationControllerIT @Autowired constructor(
             relationType = relationType,
             businessPartnerSourceExternalId = legalEntityId3,
             businessPartnerTargetExternalId = legalEntityId4,
+            validityPeriods = GateTestValues.alwaysActiveRelationValidity,
             updatedAt = Instant.now(),
-            createdAt = Instant.now()
+            createdAt = Instant.now(),
         )
 
         mockAndAssertUtils.assertRelation(
@@ -170,6 +171,7 @@ class RelationControllerIT @Autowired constructor(
             relationType = relationType,
             businessPartnerSourceExternalId = legalEntityId3,
             businessPartnerTargetExternalId = legalEntityId4,
+            validityPeriods = GateTestValues.alwaysActiveRelationValidity,
             updatedAt = Instant.now(),
             createdAt = Instant.now()
         )
@@ -227,6 +229,7 @@ class RelationControllerIT @Autowired constructor(
             relationType = relationType,
             businessPartnerSourceExternalId = legalEntityId3,
             businessPartnerTargetExternalId = legalEntityId4,
+            validityPeriods = GateTestValues.alwaysActiveRelationValidity,
             updatedAt = Instant.now(),
             createdAt = Instant.now()
         )
@@ -294,6 +297,7 @@ class RelationControllerIT @Autowired constructor(
             relationType = relationType,
             businessPartnerSourceExternalId = legalEntityId4,
             businessPartnerTargetExternalId = legalEntityId1,
+            validityPeriods = GateTestValues.alwaysActiveRelationValidity,
             updatedAt = Instant.now(),
             createdAt = Instant.now()
         )
@@ -477,6 +481,7 @@ class RelationControllerIT @Autowired constructor(
             relationType = relationType,
             businessPartnerSourceExternalId = legalEntityId1,
             businessPartnerTargetExternalId = legalEntityId2,
+            validityPeriods = GateTestValues.alwaysActiveRelationValidity,
             updatedAt = Instant.now(),
             createdAt = Instant.now()
         )
@@ -513,6 +518,7 @@ class RelationControllerIT @Autowired constructor(
             relationType = relationType,
             businessPartnerSourceExternalId = legalEntityId1,
             businessPartnerTargetExternalId = legalEntityId2,
+            validityPeriods = GateTestValues.alwaysActiveRelationValidity,
             updatedAt = Instant.now(),
             createdAt = Instant.now()
         )
@@ -561,6 +567,7 @@ class RelationControllerIT @Autowired constructor(
             relationType = relationType,
             businessPartnerSourceExternalId = legalEntityId3,
             businessPartnerTargetExternalId = legalEntityId1,
+            validityPeriods = GateTestValues.alwaysActiveRelationValidity,
             updatedAt = Instant.now(),
             createdAt = Instant.now()
         )
@@ -612,6 +619,7 @@ class RelationControllerIT @Autowired constructor(
             relationType = relationType,
             businessPartnerSourceExternalId = legalEntityId3,
             businessPartnerTargetExternalId = legalEntityId4,
+            validityPeriods = GateTestValues.alwaysActiveRelationValidity,
             updatedAt = Instant.now(),
             createdAt = Instant.now()
         )
@@ -1119,7 +1127,8 @@ class RelationControllerIT @Autowired constructor(
                 externalId = externalId,
                 relationType = relationType,
                 businessPartnerSourceExternalId = businessPartnerSourceExternalId,
-                businessPartnerTargetExternalId = businessPartnerTargetExternalId
+                businessPartnerTargetExternalId = businessPartnerTargetExternalId,
+                validityPeriods = GateTestValues.alwaysActiveRelationValidity
             )
         )
     )

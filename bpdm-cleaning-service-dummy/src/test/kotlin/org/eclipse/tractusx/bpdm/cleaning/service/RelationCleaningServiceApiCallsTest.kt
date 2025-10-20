@@ -26,14 +26,15 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import com.github.tomakehurst.wiremock.stubbing.Scenario
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
+import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.cleaning.config.CleaningServiceConfigProperties
 import org.eclipse.tractusx.bpdm.cleaning.config.OrchestratorConfigProperties
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.orchestrator.api.ApiCommons
-import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.orchestrator.api.model.*
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.RegisterExtension
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.beans.factory.annotation.Autowired
@@ -42,7 +43,8 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import java.time.Instant
-import java.util.UUID
+import java.time.LocalDate
+import java.util.*
 
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
@@ -145,7 +147,13 @@ class RelationCleaningServiceApiCallsTest @Autowired constructor(
         return BusinessPartnerRelations(
             relationType = relationType,
             businessPartnerSourceBpnl = "BPNL_SOURCE_$idSuffix",
-            businessPartnerTargetBpnl = "BPNL_TARGET_$idSuffix"
+            businessPartnerTargetBpnl = "BPNL_TARGET_$idSuffix",
+            validityPeriods = listOf(
+                RelationValidityPeriod(
+                    validFrom = LocalDate.parse("2020-01-01"),
+                    validTo = LocalDate.parse("2030-01-01")
+                )
+            ),
         )
     }
 }

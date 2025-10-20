@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021,2024 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -17,13 +17,13 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.model
+package org.eclipse.tractusx.bpdm.pool.api.v6.model.response
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.pool.api.model.RelationType
 
-@Schema(name = "RelationVerboseDto", description = "Directed relation between two business partners")
+@Schema(name = "RelationVerboseV6Dto", description = "Directed relation between two business partners")
 data class RelationVerboseDto(
-
     @get:Schema(description = "The type of relation between the Legal Entities")
     val type: RelationType,
 
@@ -32,6 +32,4 @@ data class RelationVerboseDto(
 
     @get:Schema(description = "BPN of partner to which this relation goes (the target)")
     val businessPartnerTargetBpnl: String,
-
-    val validityPeriods: Collection<RelationValidityPeriod>
 )
