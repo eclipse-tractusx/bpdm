@@ -80,7 +80,7 @@
             ${maven.multiModuleProjectDirectory}/bpdm-coverage-aggregate/target/site/
             jacoco-aggregate/jacoco.xml
         </sonar.coverage.jacoco.xmlReportPaths>
-        <jacoco.version>0.8.13</jacoco.version>
+        <jacoco.version>0.8.14</jacoco.version>
     </properties>
 
     <pluginRepositories>
