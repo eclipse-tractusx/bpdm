@@ -57,7 +57,7 @@ jobs:
           outputs: type=docker,dest=/tmp/bpdm-${{ inputs.app }}.tar
 
       - name: Upload Pool Image
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: bpdm-${{ inputs.app }}-docker
           path: /tmp/bpdm-${{ inputs.app }}.tar
