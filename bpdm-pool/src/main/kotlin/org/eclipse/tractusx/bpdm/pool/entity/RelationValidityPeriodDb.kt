@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021,2024 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -17,21 +17,18 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.model
+package org.eclipse.tractusx.bpdm.pool.entity
 
-import io.swagger.v3.oas.annotations.media.Schema
+import jakarta.persistence.Column
+import jakarta.persistence.Embeddable
+import java.time.LocalDate
 
-@Schema(name = "RelationVerboseDto", description = "Directed relation between two business partners")
-data class RelationVerboseDto(
+@Embeddable
+data class RelationValidityPeriodDb(
 
-    @get:Schema(description = "The type of relation between the Legal Entities")
-    val type: RelationType,
+    @Column(name = "valid_from", nullable = false)
+    var validFrom: LocalDate,
 
-    @get:Schema(description = "BPN of partner from which the relation emerges (the source)")
-    val businessPartnerSourceBpnl: String,
-
-    @get:Schema(description = "BPN of partner to which this relation goes (the target)")
-    val businessPartnerTargetBpnl: String,
-
-    val validityPeriods: Collection<RelationValidityPeriod>
+    @Column(name = "valid_to")
+    var validTo: LocalDate?
 )

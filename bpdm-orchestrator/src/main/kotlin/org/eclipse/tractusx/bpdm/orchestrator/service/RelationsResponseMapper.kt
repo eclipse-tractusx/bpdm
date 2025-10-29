@@ -43,7 +43,13 @@ class RelationsResponseMapper {
             BusinessPartnerRelations(
                 relationType = toRelationType(relationType),
                 businessPartnerSourceBpnl = businessPartnerSourceBpnl,
-                businessPartnerTargetBpnl = businessPartnerTargetBpnl
+                businessPartnerTargetBpnl = businessPartnerTargetBpnl,
+                validityPeriods = businessPartnerRelations.validityPeriods.map {
+                    RelationValidityPeriod(
+                        validFrom = it.validFrom,
+                        validTo = it.validTo
+                    )
+                }.toMutableList()
             )
         }
 

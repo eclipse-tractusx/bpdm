@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.orchestrator.controller
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.orchestrator.config.StateMachineConfigProperties
+import org.eclipse.tractusx.bpdm.orchestrator.util.OrchestratorTestValues
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
@@ -47,22 +48,24 @@ class RelationsGoldenRecordTaskEventControllerIT @Autowired constructor(
     private val dbTestHelpers: DbTestHelpers,
     private val stateMachineConfigProperties: StateMachineConfigProperties
 ) {
-
     private val defaultRelations1 = BusinessPartnerRelations(
         relationType = RelationType.IsAlternativeHeadquarterFor,
         businessPartnerSourceBpnl = "BPNL1",
-        businessPartnerTargetBpnl = "BPNL2"
+        businessPartnerTargetBpnl = "BPNL2",
+        validityPeriods = OrchestratorTestValues.alwaysActiveRelationValidity
     )
     private val defaultRelations2 = BusinessPartnerRelations(
         relationType = RelationType.IsManagedBy,
         businessPartnerSourceBpnl = "BPNL3",
-        businessPartnerTargetBpnl = "BPNL4"
+        businessPartnerTargetBpnl = "BPNL4",
+        validityPeriods = OrchestratorTestValues.alwaysActiveRelationValidity
     )
 
     private val defaultRelations3 = BusinessPartnerRelations(
         relationType = RelationType.IsOwnedBy,
         businessPartnerSourceBpnl = "BPNL5",
-        businessPartnerTargetBpnl = "BPNL6"
+        businessPartnerTargetBpnl = "BPNL6",
+        validityPeriods = OrchestratorTestValues.alwaysActiveRelationValidity
     )
 
     @BeforeEach

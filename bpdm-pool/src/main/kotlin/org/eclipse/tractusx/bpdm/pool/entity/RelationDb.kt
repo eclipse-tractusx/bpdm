@@ -44,8 +44,13 @@ class RelationDb(
     @JoinColumn(name = "end_node_id", nullable = false)
     val endNode: LegalEntityDb,
 
-    @Column(name = "is_active", nullable = false)
-    val isActive: Boolean
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(
+        name = "relation_validity_periods",
+        joinColumns = [JoinColumn(name = "relation_id", foreignKey = ForeignKey(name = "fk_validity_periods_relation"))],
+        indexes = [Index(name = "idx_relation_validity_periods_relation_id", columnList = "relation_id")]
+    )
+    var validityPeriods: MutableList<RelationValidityPeriodDb> = mutableListOf()
 
 ) : BaseEntity()
 

@@ -21,9 +21,9 @@ package org.eclipse.tractusx.bpdm.pool.service
 
 import org.eclipse.tractusx.bpdm.pool.api.model.RelationType
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
-import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
+import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -38,13 +38,11 @@ class AlternativeHeadquarterRelationUpsertService(
     override fun upsertRelation(upsertRequest: IRelationUpsertStrategyService.UpsertRequest): UpsertResult<RelationDb>{
         val standardisedRequest = standardise(upsertRequest)
 
-        val result = relationUpsertService.upsertRelation(
-            RelationUpsertService.UpsertRequest(standardisedRequest.source, standardisedRequest.target, RelationType.IsAlternativeHeadquarterFor)
-        )
+        validateOnlyOneAlternative(standardisedRequest)
 
-        if(result.upsertType == UpsertType.Created){
-            createTransitiveRelations(standardisedRequest)
-        }
+        val result = relationUpsertService.upsertRelation(
+            RelationUpsertService.UpsertRequest(standardisedRequest.source, standardisedRequest.target, RelationType.IsAlternativeHeadquarterFor, standardisedRequest.validityPeriods)
+        )
 
         return result
     }
@@ -55,37 +53,31 @@ class AlternativeHeadquarterRelationUpsertService(
 
         val sourceIsOlder = proposedSource.createdAt < proposedTarget.createdAt
         val upsertRequest = if(sourceIsOlder){
-            IRelationUpsertStrategyService.UpsertRequest(source = proposedTarget, target = proposedSource)
+            IRelationUpsertStrategyService.UpsertRequest(source = proposedTarget, target = proposedSource, validityPeriods = upsertRequest.validityPeriods)
         }else{
-            IRelationUpsertStrategyService.UpsertRequest(source = proposedSource, target = proposedTarget)
+            IRelationUpsertStrategyService.UpsertRequest(source = proposedSource, target = proposedTarget,  validityPeriods = upsertRequest.validityPeriods)
         }
 
         return upsertRequest
     }
 
-    private fun createTransitiveRelations(upsertRequest: IRelationUpsertStrategyService.UpsertRequest){
-        val transitiveSourceRelations = relationRepository.findInSourceOrTarget(RelationType.IsAlternativeHeadquarterFor, upsertRequest.source)
-        val transitiveTargetRelations = relationRepository.findInSourceOrTarget(RelationType.IsAlternativeHeadquarterFor, upsertRequest.target)
-
-        val transitiveSourceRequests = createTransitiveUpsertRequests(upsertRequest.target, transitiveSourceRelations)
-        val transitiveTargetRequests = createTransitiveUpsertRequests(upsertRequest.source, transitiveTargetRelations)
-
-        transitiveSourceRequests
-            .plus(transitiveTargetRequests)
-            .filter { it.source.id != upsertRequest.source.id || it.target.id != upsertRequest.target.id }
-            .distinctBy { Pair(it.source.id, it.target.id) }
-            .map { RelationUpsertService.UpsertRequest(it.source, it.target, RelationType.IsAlternativeHeadquarterFor) }
-            .forEach { relationUpsertService.upsertRelation(it) }
+    private fun validateOnlyOneAlternative(upsertRequest: IRelationUpsertStrategyService.UpsertRequest){
+        validateOnlyOneAlternative(upsertRequest.source, upsertRequest)
+        validateOnlyOneAlternative(upsertRequest.target, upsertRequest)
     }
 
-    private fun createTransitiveUpsertRequests(legalEntity: LegalEntityDb, relations: Set<RelationDb>): List<IRelationUpsertStrategyService.UpsertRequest>{
-        val allLegalEntities = relations.flatMap { listOf(it.startNode, it.endNode) }.toSet()
+    private fun validateOnlyOneAlternative(legalEntity: LegalEntityDb, upsertRequest: IRelationUpsertStrategyService.UpsertRequest){
+        val relations =  relationRepository.findInSourceOrTarget(RelationType.IsAlternativeHeadquarterFor, legalEntity)
+        val overlappingRelations = relationUpsertService.filterOverlappingRelations(upsertRequest, relations)
 
-        return  allLegalEntities
-            .filter { legalEntity.id != it.id }
-            .map { IRelationUpsertStrategyService.UpsertRequest(legalEntity, it) }
-            .map { standardise(it) }
-            .distinctBy { Pair(it.source.id, it.target.id) }
+        val otherRelations =  overlappingRelations.filterNot { it.startNode.bpn == upsertRequest.source.bpn && it.endNode.bpn == upsertRequest.target.bpn }
+
+        if(otherRelations.isNotEmpty()){
+            val otherRelation = otherRelations.first()
+            val otherLegalEntity = if(otherRelation.startNode.bpn == legalEntity.bpn) otherRelation.endNode else otherRelation.startNode
+            throw BpdmValidationException(
+                "Invalid 'IsAlternativeHeadquarter' relation: Legal Entity ${legalEntity.bpn} is already alternative headquarter to ${otherLegalEntity.bpn}"
+            )
+        }
     }
-
 }

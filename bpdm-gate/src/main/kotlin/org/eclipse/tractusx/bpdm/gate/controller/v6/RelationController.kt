@@ -21,19 +21,18 @@ package org.eclipse.tractusx.bpdm.gate.controller.v6
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.model.StageType
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
-import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
 import org.eclipse.tractusx.bpdm.gate.api.v6.GateRelationApi
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPostRequest
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.RelationDto
 import org.eclipse.tractusx.bpdm.gate.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.gate.service.RelationService
 import org.eclipse.tractusx.bpdm.gate.util.PrincipalUtil
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 import java.time.Instant
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationDto as RelationV7Dto
 
 @RestController("RelationControllerLegacy")
 class RelationController(
@@ -58,7 +57,7 @@ class RelationController(
             targetBusinessPartnerExternalIds = businessPartnerTargetExternalIds ?: emptyList(),
             updatedAtFrom = updatedAtFrom,
             paginationRequest = paginationRequest
-        )
+        ).toV6Dto()
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_INPUT_RELATION})")
@@ -71,7 +70,7 @@ class RelationController(
             relationType = requestBody.relationType,
             sourceBusinessPartnerExternalId = requestBody.businessPartnerSourceExternalId,
             targetBusinessPartnerExternalId = requestBody.businessPartnerTargetExternalId
-        )
+        ).toV6Dto()
 
     }
 
@@ -102,7 +101,7 @@ class RelationController(
             ).single()
         }
 
-        return upsertedRelation
+        return upsertedRelation.toV6Dto()
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_INPUT_RELATION})")
@@ -111,5 +110,27 @@ class RelationController(
             tenantBpnL = principalUtil.resolveTenantBpnl(),
             externalId = externalId
         )
+    }
+
+
+    private fun PageDto<RelationV7Dto>.toV6Dto(): PageDto<RelationDto>{
+        return PageDto(
+            totalElements = totalElements,
+            totalPages = totalPages,
+            page = page,
+            contentSize = contentSize,
+            content = content.map { it.toV6Dto() }
+        )
+    }
+
+    private fun RelationV7Dto.toV6Dto(): RelationDto{
+        return RelationDto(
+                externalId = externalId,
+                relationType = relationType,
+                businessPartnerSourceExternalId = businessPartnerSourceExternalId,
+                businessPartnerTargetExternalId = businessPartnerTargetExternalId,
+                updatedAt = updatedAt,
+                createdAt = createdAt
+            )
     }
 }

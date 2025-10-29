@@ -751,9 +751,16 @@
           "businessPartnerTargetBpnl" : {
             "type" : "string",
             "description" : "The business partner to which this relation goes (the target)"
+          },
+          "validityPeriods" : {
+            "type" : "array",
+            "description" : "A relation validity describes a timeframe in which a relation is active.",
+            "items" : {
+              "$ref" : "#/components/schemas/RelationValidityPeriod"
+            }
           }
         },
-        "required" : [ "businessPartnerSourceBpnl", "businessPartnerTargetBpnl", "relationType" ]
+        "required" : [ "businessPartnerSourceBpnl", "businessPartnerTargetBpnl", "relationType", "validityPeriods" ]
       },
       "BusinessState" : {
         "type" : "object",
@@ -1080,6 +1087,22 @@
           }
         },
         "required" : [ "bpnReference", "confidenceCriteria", "identifiers", "physicalAddress", "states" ]
+      },
+      "RelationValidityPeriod" : {
+        "type" : "object",
+        "properties" : {
+          "validFrom" : {
+            "type" : "string",
+            "format" : "date",
+            "description" : "The date from which the relation is valid."
+          },
+          "validTo" : {
+            "type" : "string",
+            "format" : "date",
+            "description" : "The date until which the relation is valid."
+          }
+        },
+        "required" : [ "validFrom" ]
       },
       "Site" : {
         "type" : "object",

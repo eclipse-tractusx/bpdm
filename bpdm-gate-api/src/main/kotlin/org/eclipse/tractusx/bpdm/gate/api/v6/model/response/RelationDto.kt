@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021,2024 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -17,24 +17,25 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.api.model.request
+package org.eclipse.tractusx.bpdm.gate.api.v6.model.response
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.RelationValidityPeriodDescription
 import org.eclipse.tractusx.bpdm.gate.api.model.IRelationDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationValidityPeriodDto
+import java.time.Instant
 
-@Schema(description = "A request to update the content of the given business partner relation")
-data class RelationPutEntry(
-    @Schema(description = "The external identifier of the business partner relation to update")
+@Schema(name = "RelationV6Dto", description = "A relation from one business partner (the source) to another business partner (the target). ")
+data class RelationDto(
+    @Schema(description = "The identifier with which to reference this relation")
     override val externalId: String,
-    @Schema(description = "The type the relation should be")
+    @Schema(description = "The type of relation between the business partners")
     override val relationType: RelationType,
-    @Schema(description = "The external identifier of the business partner from which the relation should emerge (the source)")
+    @Schema(description = "The business partner from which the relation emerges (the source)")
     override val businessPartnerSourceExternalId: String,
-    @Schema(description = "The external identifier of the business partner to which the relation should point (the target)")
+    @Schema(description = "The business partner to which this relation goes (the target)")
     override val businessPartnerTargetExternalId: String,
-    @Schema(description = RelationValidityPeriodDescription.header)
-    val validityPeriods: List<RelationValidityPeriodDto> = listOf()
+    @Schema(description = "The time when this relation was last modified")
+    val updatedAt: Instant,
+    @Schema(description = "The time when this relation was created")
+    val createdAt: Instant,
 ): IRelationDto

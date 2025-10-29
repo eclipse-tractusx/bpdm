@@ -7894,6 +7894,21 @@ components:
         - countryCode
         - regionCode
         - regionName
+    RelationValidityPeriod:
+      type: object
+      description: A relation validity describes a timeframe in which a relation is
+        active.
+      properties:
+        validFrom:
+          type: string
+          format: date
+          description: The date from which the relation is valid.
+        validTo:
+          type: string
+          format: date
+          description: The date until which the relation is valid.
+      required:
+        - validFrom
     RelationVerboseDto:
       type: object
       description: Directed relation between two business partners
@@ -7911,14 +7926,15 @@ components:
         businessPartnerTargetBpnl:
           type: string
           description: BPN of partner to which this relation goes (the target)
-        isActive:
-          type: boolean
-          description: Status of the relation
+        validityPeriods:
+          type: array
+          items:
+            $ref: "#/components/schemas/RelationValidityPeriod"
       required:
         - businessPartnerSourceBpnl
         - businessPartnerTargetBpnl
-        - isActive
         - type
+        - validityPeriods
     SiteCreateRequestWithLegalAddressAsMain:
       type: object
       properties:

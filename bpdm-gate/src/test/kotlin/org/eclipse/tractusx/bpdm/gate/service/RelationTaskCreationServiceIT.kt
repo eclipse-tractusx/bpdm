@@ -57,6 +57,7 @@ import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import java.time.Instant
+import java.time.LocalDate
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ContextConfiguration(initializers = [
@@ -133,7 +134,13 @@ class RelationTaskCreationServiceIT @Autowired constructor(
                         RelationType.IsOwnedBy -> org.eclipse.tractusx.orchestrator.api.model.RelationType.IsOwnedBy
                     },
                     legalEntityBpnL1,
-                    legalEntityBpnL2
+                    legalEntityBpnL2,
+                    listOf(
+                        RelationValidityPeriod(
+                            validFrom = LocalDate.parse("1970-01-01"),
+                            validTo = LocalDate.parse("9999-12-31")
+                        )
+                    )
                 ),
                 TaskProcessingRelationsStateDto(ResultState.Pending, TaskStep.CleanAndSync, StepState.Queued, emptyList(), anyTime, anyTime, anyTime))
         ))

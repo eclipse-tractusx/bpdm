@@ -32,6 +32,7 @@ import org.eclipse.tractusx.bpdm.gate.controller.SelfClientAsPartnerUploaderInit
 import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
 import org.eclipse.tractusx.bpdm.gate.entity.RelationSharingStateDb
 import org.eclipse.tractusx.bpdm.gate.repository.RelationRepository
+import org.eclipse.tractusx.bpdm.gate.util.GateTestValues
 import org.eclipse.tractusx.bpdm.gate.util.PrincipalUtil
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
@@ -122,10 +123,11 @@ class RelationTaskResolutionServiceIT @Autowired constructor(
             FinishedTaskEventsResponse.Event(Instant.now(), ResultState.Success, taskId2),
         ))
 
+        val mockedRelationValidityPeriods = GateTestValues.alwaysActiveRelationValidity.map { RelationValidityPeriod(it.validFrom, it.validTo) }
         val orchestratorMockResultResponse = TaskRelationsStateResponse(listOf(
-            TaskClientRelationsStateDto(taskId1, recordId1, BusinessPartnerRelations(relationType, bpnL1,bpnL2),
+            TaskClientRelationsStateDto(taskId1, recordId1, BusinessPartnerRelations(relationType, bpnL1,bpnL2, mockedRelationValidityPeriods),
                 TaskProcessingRelationsStateDto(ResultState.Success, TaskStep.PoolSync, StepState.Success, emptyList(), anyTime, anyTime, anyTime )),
-            TaskClientRelationsStateDto(taskId2, recordId2, BusinessPartnerRelations(relationType, bpnL1,bpnL2),
+            TaskClientRelationsStateDto(taskId2, recordId2, BusinessPartnerRelations(relationType, bpnL1,bpnL2, mockedRelationValidityPeriods),
                 TaskProcessingRelationsStateDto(ResultState.Error, TaskStep.CleanAndSync, StepState.Error, listOf(TaskRelationsErrorDto(errorType, errorDescription)), anyTime, anyTime, anyTime )),
         ))
 
@@ -155,6 +157,7 @@ class RelationTaskResolutionServiceIT @Autowired constructor(
                 },
                 bpnL1,
                 bpnL2,
+                GateTestValues.alwaysActiveRelationValidity,
                 anyTime)
         ))
         val expectedSharingStates = PageDto<RelationSharingStateDto>(2, 1, 0, 2, listOf(

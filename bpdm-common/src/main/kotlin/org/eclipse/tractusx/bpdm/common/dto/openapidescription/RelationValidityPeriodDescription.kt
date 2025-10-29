@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021,2024 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -17,21 +17,12 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.model
+package org.eclipse.tractusx.bpdm.common.dto.openapidescription
 
-import io.swagger.v3.oas.annotations.media.Schema
+object RelationValidityPeriodDescription {
+    const val header = "A relation validity describes a timeframe in which a relation is active."
 
-@Schema(name = "RelationVerboseDto", description = "Directed relation between two business partners")
-data class RelationVerboseDto(
+    const val validFrom = "The date from which the relation is valid."
 
-    @get:Schema(description = "The type of relation between the Legal Entities")
-    val type: RelationType,
-
-    @get:Schema(description = "BPN of partner from which the relation emerges (the source)")
-    val businessPartnerSourceBpnl: String,
-
-    @get:Schema(description = "BPN of partner to which this relation goes (the target)")
-    val businessPartnerTargetBpnl: String,
-
-    val validityPeriods: Collection<RelationValidityPeriod>
-)
+    const val validTo = "The date until which the relation is valid."
+}

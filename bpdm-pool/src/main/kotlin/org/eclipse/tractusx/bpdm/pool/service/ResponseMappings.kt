@@ -285,7 +285,14 @@ fun RelationDb.toDto(): RelationVerboseDto {
         type = type,
         businessPartnerSourceBpnl = startNode.bpn,
         businessPartnerTargetBpnl = endNode.bpn,
-        isActive = isActive
+        validityPeriods = validityPeriods.sortedBy { it.validFrom }.map { it.toDto() }
+    )
+}
+
+fun RelationValidityPeriodDb.toDto(): RelationValidityPeriod {
+    return RelationValidityPeriod(
+        validFrom = validFrom,
+        validTo = validTo,
     )
 }
 

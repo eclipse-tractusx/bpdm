@@ -17,21 +17,12 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.model
+package org.eclipse.tractusx.bpdm.gate.util
 
-import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationValidityPeriodDto
+import java.time.LocalDate
 
-@Schema(name = "RelationVerboseDto", description = "Directed relation between two business partners")
-data class RelationVerboseDto(
+object GateTestValues {
 
-    @get:Schema(description = "The type of relation between the Legal Entities")
-    val type: RelationType,
-
-    @get:Schema(description = "BPN of partner from which the relation emerges (the source)")
-    val businessPartnerSourceBpnl: String,
-
-    @get:Schema(description = "BPN of partner to which this relation goes (the target)")
-    val businessPartnerTargetBpnl: String,
-
-    val validityPeriods: Collection<RelationValidityPeriod>
-)
+    val alwaysActiveRelationValidity = listOf(RelationValidityPeriodDto(LocalDate.parse("1970-01-01"), LocalDate.parse("9999-12-31")))
+}

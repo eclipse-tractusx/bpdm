@@ -19,11 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.entity
 
-import jakarta.persistence.Column
-import jakarta.persistence.Embeddable
-import jakarta.persistence.EnumType
-import jakarta.persistence.Enumerated
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
+import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.gate.api.model.SharableRelationType
 import java.time.Instant
 
@@ -38,6 +34,13 @@ data class RelationOutputDb (
     var targetBpnL: String,
     @Column(name = "output_updated_at")
     var updatedAt: Instant,
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(
+        name = "relation_output_validity_periods",
+        joinColumns = [JoinColumn(name = "relation_id", foreignKey = ForeignKey(name = "fk_output_validity_periods_relation"))],
+        indexes = [Index(name = "idx_output_validity_periods_relation_id", columnList = "relation_id")]
+    )
+    var validityPeriods: MutableList<RelationValidityPeriodDb>
 ): Comparable<RelationOutputDb>{
     override fun compareTo(other: RelationOutputDb) = compareBy(
         RelationOutputDb::sourceBpnL,

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021,2024 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -20,18 +20,16 @@
 package org.eclipse.tractusx.bpdm.pool.api.model
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.IRelationValidityPeriod
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.RelationValidityPeriodDescription
+import java.time.LocalDate
 
-@Schema(name = "RelationVerboseDto", description = "Directed relation between two business partners")
-data class RelationVerboseDto(
+@Schema(description = RelationValidityPeriodDescription.header)
+data class RelationValidityPeriod(
 
-    @get:Schema(description = "The type of relation between the Legal Entities")
-    val type: RelationType,
+    @get:Schema(description = RelationValidityPeriodDescription.validFrom)
+    override val validFrom: LocalDate,
 
-    @get:Schema(description = "BPN of partner from which the relation emerges (the source)")
-    val businessPartnerSourceBpnl: String,
-
-    @get:Schema(description = "BPN of partner to which this relation goes (the target)")
-    val businessPartnerTargetBpnl: String,
-
-    val validityPeriods: Collection<RelationValidityPeriod>
-)
+    @get:Schema(description = RelationValidityPeriodDescription.validTo)
+    override val validTo: LocalDate?
+): IRelationValidityPeriod
