@@ -82,6 +82,10 @@ bpdm:
       batchSize: 20
       # How often relation tasks should be tried to resolve
       cron: '15/30 * * * * *'
+    recordSync:
+      # How many sharing member records should be synchronized at once
+      batchSize: 20
+      cron: '0/20 * * * * *'
 
   # Connection to the pool and orchestrator
   client:

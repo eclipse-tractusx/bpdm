@@ -23,10 +23,10 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.eclipse.tractusx.bpdm.orchestrator.config.StateMachineConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.config.TaskConfigProperties
-import org.eclipse.tractusx.bpdm.orchestrator.entity.GateRecordDb
 import org.eclipse.tractusx.bpdm.orchestrator.entity.RelationsGoldenRecordTaskDb
+import org.eclipse.tractusx.bpdm.orchestrator.entity.SharingMemberRecordDb
 import org.eclipse.tractusx.bpdm.orchestrator.exception.RelationsIllegalStateException
-import org.eclipse.tractusx.bpdm.orchestrator.repository.GateRecordRepository
+import org.eclipse.tractusx.bpdm.orchestrator.repository.SharingMemberRecordRepository
 import org.eclipse.tractusx.bpdm.orchestrator.util.OrchestratorTestValues
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
@@ -53,18 +53,18 @@ import java.util.*
 class RelationsGoldenRecordTaskStateMachineIT  @Autowired constructor(
     private val relationsGoldenRecordTaskStateMachine: RelationsGoldenRecordTaskStateMachine,
     private val taskConfigProperties: TaskConfigProperties,
-    private val gateRecordRepository: GateRecordRepository,
+    private val sharingMemberRecordRepository: SharingMemberRecordRepository,
     private val dbTestHelpers: DbTestHelpers,
     private val stateMachineConfigProperties: StateMachineConfigProperties
 ) {
     private val businessPartnerRelations1 = BusinessPartnerRelations(relationType = RelationType.IsAlternativeHeadquarterFor, businessPartnerSourceBpnl = "BPNL1", businessPartnerTargetBpnl = "BPNL2", validityPeriods = OrchestratorTestValues.alwaysActiveRelationValidity)
     private val businessPartnerRelations2 = BusinessPartnerRelations(relationType = RelationType.IsManagedBy, businessPartnerSourceBpnl = "BPNL3", businessPartnerTargetBpnl = "BPNL4", validityPeriods =  OrchestratorTestValues.alwaysActiveRelationValidity)
-    private lateinit var gateRecord: GateRecordDb
+    private lateinit var gateRecord: SharingMemberRecordDb
 
     @BeforeEach
     fun cleanUp() {
         dbTestHelpers.truncateDbTables()
-        gateRecord = gateRecordRepository.save(GateRecordDb(publicId = UUID.randomUUID(), privateId = UUID.randomUUID()))
+        gateRecord = sharingMemberRecordRepository.save(SharingMemberRecordDb(publicId = UUID.randomUUID(), privateId = UUID.randomUUID(), isGoldenRecordCounted = null))
     }
 
     /**

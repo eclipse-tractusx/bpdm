@@ -25,10 +25,10 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.assertj.core.data.TemporalUnitOffset
 import org.eclipse.tractusx.bpdm.orchestrator.config.StateMachineConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.config.TaskConfigProperties
-import org.eclipse.tractusx.bpdm.orchestrator.entity.GateRecordDb
 import org.eclipse.tractusx.bpdm.orchestrator.entity.GoldenRecordTaskDb
+import org.eclipse.tractusx.bpdm.orchestrator.entity.SharingMemberRecordDb
 import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmIllegalStateException
-import org.eclipse.tractusx.bpdm.orchestrator.repository.GateRecordRepository
+import org.eclipse.tractusx.bpdm.orchestrator.repository.SharingMemberRecordRepository
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.BusinessPartnerTestDataFactory
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
@@ -61,7 +61,7 @@ val WITHIN_ALLOWED_TIME_OFFSET: TemporalUnitOffset = Assertions.within(10, Chron
 class GoldenRecordTaskStateMachineIT @Autowired constructor(
     private val goldenRecordTaskStateMachine: GoldenRecordTaskStateMachine,
     private val taskConfigProperties: TaskConfigProperties,
-    private val gateRecordRepository: GateRecordRepository,
+    private val sharingMemberRecordRepository: SharingMemberRecordRepository,
     private val dbTestHelpers: DbTestHelpers,
     private val stateMachineConfigProperties: StateMachineConfigProperties
 ) {
@@ -70,12 +70,12 @@ class GoldenRecordTaskStateMachineIT @Autowired constructor(
 
     private val businessPartnerFull = testDataFactory.createFullBusinessPartner("full")
 
-    private lateinit var gateRecord: GateRecordDb
+    private lateinit var gateRecord: SharingMemberRecordDb
 
     @BeforeEach
     fun cleanUp() {
         dbTestHelpers.truncateDbTables()
-        gateRecord = gateRecordRepository.save(GateRecordDb(publicId = UUID.randomUUID(), privateId = UUID.randomUUID()))
+        gateRecord = sharingMemberRecordRepository.save(SharingMemberRecordDb(publicId = UUID.randomUUID(), privateId = UUID.randomUUID(), isGoldenRecordCounted = null))
     }
 
 

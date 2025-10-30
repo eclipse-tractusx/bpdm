@@ -17,8 +17,21 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.model
+package org.eclipse.tractusx.bpdm.pool.config
 
-enum class SyncType{
-    SHARING_MEMBER_RECORDS
+import org.eclipse.tractusx.bpdm.pool.config.SharingMemberRecordSyncConfigProperties.Companion.PREFIX
+import org.springframework.boot.context.properties.ConfigurationProperties
+
+@ConfigurationProperties(prefix = PREFIX)
+data class SharingMemberRecordSyncConfigProperties(
+    val cron: String = "0/10 * * * * *",
+    val batchSize: Int = 100,
+){
+    companion object{
+        const val PREFIX = "bpdm.sharing-member-records"
+        private const val QUALIFIED_NAME = "org.eclipse.tractusx.bpdm.pool.config.SharingMemberRecordSyncConfigProperties"
+        private const val BEAN_QUALIFIER = "'$PREFIX-$QUALIFIED_NAME'"
+
+        const val GET_CRON = "@$BEAN_QUALIFIER.getCron()"
+    }
 }

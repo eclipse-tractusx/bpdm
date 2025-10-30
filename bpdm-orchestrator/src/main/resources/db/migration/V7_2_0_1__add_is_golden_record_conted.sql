@@ -1,0 +1,2 @@
+ALTER TABLE gate_records
+ADD COLUMN is_golden_record_counted BOOLEAN;

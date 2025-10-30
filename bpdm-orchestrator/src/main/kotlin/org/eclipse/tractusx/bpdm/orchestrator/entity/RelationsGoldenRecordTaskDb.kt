@@ -55,7 +55,7 @@ class RelationsGoldenRecordTaskDb(
     var updatedAt: DbTimestamp,
     @ManyToOne
     @JoinColumn(name = "gate_record_id", nullable = false, foreignKey = ForeignKey(name = "fk_tasks_gate_records"))
-    var gateRecord: GateRecordDb,
+    var gateRecord: SharingMemberRecordDb,
 
     @Embedded
     val processingState: ProcessingState,

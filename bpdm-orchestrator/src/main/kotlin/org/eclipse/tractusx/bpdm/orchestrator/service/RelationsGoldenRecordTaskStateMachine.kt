@@ -26,7 +26,10 @@ import org.eclipse.tractusx.bpdm.orchestrator.config.TaskConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.entity.*
 import org.eclipse.tractusx.bpdm.orchestrator.exception.RelationsIllegalStateException
 import org.eclipse.tractusx.bpdm.orchestrator.repository.RelationsGoldenRecordTaskRepository
-import org.eclipse.tractusx.orchestrator.api.model.*
+import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
+import org.eclipse.tractusx.orchestrator.api.model.TaskMode
+import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsErrorDto
+import org.eclipse.tractusx.orchestrator.api.model.TaskStep
 import org.springframework.stereotype.Service
 import java.time.Instant
 
@@ -40,7 +43,7 @@ class RelationsGoldenRecordTaskStateMachine(
 
     private val logger = KotlinLogging.logger { }
 
-    fun initTask(mode: TaskMode, initBusinessPartnerRelations: BusinessPartnerRelations, record: GateRecordDb): RelationsGoldenRecordTaskDb {
+    fun initTask(mode: TaskMode, initBusinessPartnerRelations: BusinessPartnerRelations, record: SharingMemberRecordDb): RelationsGoldenRecordTaskDb {
         logger.debug { "Executing initProcessingState() with parameters mode: $mode and business partner relations data: $initBusinessPartnerRelations" }
 
         val initialStep = getInitialStep(mode)
