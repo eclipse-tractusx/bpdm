@@ -163,7 +163,7 @@ object BusinessPartnerVerboseValues {
     private val confidenceCriteria1 = ConfidenceCriteriaDto(
         sharedByOwner = true,
         checkedByExternalDataSource = true,
-        numberOfSharingMembers = 1,
+        numberOfSharingMembers = 0,
         lastConfidenceCheckAt = LocalDateTime.of(2023, 10, 10, 10, 10, 10),
         nextConfidenceCheckAt = LocalDateTime.of(2024, 10, 10, 10, 10, 10),
         confidenceLevel = 10
@@ -172,7 +172,7 @@ object BusinessPartnerVerboseValues {
     private val confidenceCriteria2 = ConfidenceCriteriaDto(
         sharedByOwner = false,
         checkedByExternalDataSource = false,
-        numberOfSharingMembers = 3,
+        numberOfSharingMembers = 0,
         lastConfidenceCheckAt = LocalDateTime.of(2022, 10, 10, 10, 10, 10),
         nextConfidenceCheckAt = LocalDateTime.of(2025, 10, 10, 10, 10, 10),
         confidenceLevel = 6
@@ -181,7 +181,7 @@ object BusinessPartnerVerboseValues {
     private val confidenceCriteria3 = ConfidenceCriteriaDto(
         sharedByOwner = true,
         checkedByExternalDataSource = false,
-        numberOfSharingMembers = 10,
+        numberOfSharingMembers = 0,
         lastConfidenceCheckAt = LocalDateTime.of(2021, 10, 10, 10, 10, 10),
         nextConfidenceCheckAt = LocalDateTime.of(2026, 10, 10, 10, 10, 10),
         confidenceLevel = 3
@@ -327,7 +327,7 @@ object BusinessPartnerVerboseValues {
         name = "Stammwerk A",
         states = listOf(siteStatus1),
         bpnLegalEntity = firstBpnL,
-        confidenceCriteria = confidenceCriteria1,
+        confidenceCriteria = confidenceCriteria1.copy(numberOfSharingMembers = 1),
         isParticipantData = false,
         createdAt = Instant.now(),
         updatedAt = Instant.now(),
@@ -338,7 +338,7 @@ object BusinessPartnerVerboseValues {
         name = "Halle B1",
         states = listOf(siteStatus2),
         bpnLegalEntity = secondBpnL,
-        confidenceCriteria = confidenceCriteria2,
+        confidenceCriteria = confidenceCriteria2.copy(numberOfSharingMembers = 1),
         isParticipantData = false,
         createdAt = Instant.now(),
         updatedAt = Instant.now(),
@@ -349,7 +349,7 @@ object BusinessPartnerVerboseValues {
         name = "主厂房 C",
         states = listOf(siteStatus3),
         bpnLegalEntity = thirdBpnl,
-        confidenceCriteria = confidenceCriteria3,
+        confidenceCriteria = confidenceCriteria3.copy(numberOfSharingMembers = 1),
         isParticipantData = false,
         createdAt = Instant.now(),
         updatedAt = Instant.now(),

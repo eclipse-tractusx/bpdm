@@ -100,3 +100,9 @@ fun BusinessPartnerOutputDto.withSharedByOwner(sharedByOwner: Boolean) = copy(
     site = site?.copy(confidenceCriteria = site!!.confidenceCriteria.copy(sharedByOwner = sharedByOwner)),
     address = address.copy(confidenceCriteria = address.confidenceCriteria.copy(sharedByOwner = sharedByOwner))
 )
+
+fun BusinessPartnerOutputDto.withNumberOfSharingMembers(legalEntityNumber: Int, siteNumber: Int, addressNumber: Int) = copy(
+    legalEntity = legalEntity.copy(confidenceCriteria = legalEntity.confidenceCriteria.copy(numberOfSharingMembers = legalEntityNumber)),
+    site = site?.copy(confidenceCriteria = site!!.confidenceCriteria.copy(numberOfSharingMembers = siteNumber)),
+    address = address.copy(confidenceCriteria = address.confidenceCriteria.copy(numberOfSharingMembers = addressNumber))
+)

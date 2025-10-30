@@ -32,7 +32,7 @@ import java.util.*
         Index(name = "index_gate_records_private_uuid", columnList = "private_uuid")
     ]
 )
-class GateRecordDb (
+class SharingMemberRecordDb (
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "bpdm_sequence")
     @SequenceGenerator(name = "bpdm_sequence", sequenceName = "bpdm_sequence", allocationSize = 1)
@@ -51,5 +51,8 @@ class GateRecordDb (
     var publicId: UUID,
 
     @Column(name = "private_id", columnDefinition = "UUID", nullable = false, unique = true)
-    var privateId: UUID
+    var privateId: UUID,
+
+    @Column(name = "is_golden_record_counted")
+    var isGoldenRecordCounted: Boolean?
 )

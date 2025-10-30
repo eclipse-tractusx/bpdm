@@ -162,6 +162,8 @@ internal class BusinessPartnerIT @Autowired constructor(
             externalId = "testExternalId",
             sharingErrorCode = null,
             orchestratorRecordId = null,
+            isGoldenRecordCounted = null,
+            syncedIsGoldenRecordCounted = null,
             sharingStateType = SharingStateType.Initial
         )
     }

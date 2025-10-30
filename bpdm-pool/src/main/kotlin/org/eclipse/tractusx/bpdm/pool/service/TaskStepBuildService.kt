@@ -26,12 +26,11 @@ import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
+import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmMultiValidationException
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
-import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
-import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
-import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
+import org.eclipse.tractusx.bpdm.pool.repository.*
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.stereotype.Service
 import java.time.Instant
@@ -53,7 +52,11 @@ class TaskStepBuildService(
     private val bpnRequestIdentifierRepository: BpnRequestIdentifierRepository,
     private val taskResolutionMapper: TaskResolutionMapper,
     private val logisticAddressRepository: LogisticAddressRepository,
-    private val siteRepository: SiteRepository
+    private val siteRepository: SiteRepository,
+    private val sharingMemberRecordRepository: SharingMemberRecordRepository,
+    private val legalEntityRepository: LegalEntityRepository,
+    private val changelogService: PartnerChangelogService,
+    private val sharingMemberConfidenceService: SharingMemberConfidenceService
 ) {
 
     enum class CleaningError(val message: String) {
@@ -97,24 +100,17 @@ class TaskStepBuildService(
         val siteResult = processSite(businessPartnerDto, legalEntityResult.bpnReference.referenceValue!!, taskEntryBpnMapping)
         val addressResult = processAdditionalAddress(businessPartnerDto, legalEntityResult.bpnReference.referenceValue!!, siteResult?.bpnReference?.referenceValue, taskEntryBpnMapping)
 
-        //We do this for one special case:
-        //Legal Entity has not changed but site has changed and the main address is legal address
-        //In this case we want to return the most up-to-date address which is stored in the siteResult
-        val isLegalAndSiteMainAddress =  siteResult?.siteMainAddress?.bpnReference == legalEntityResult.legalAddress.bpnReference
-
-        val businessPartnerResult = with(businessPartnerDto){
-            copy(
-                legalEntity = if(isLegalAndSiteMainAddress) legalEntityResult.copy(legalAddress = siteResult!!.siteMainAddress!!) else legalEntityResult,
-                site = if(isLegalAndSiteMainAddress) siteResult?.copy(siteMainAddress = null) else siteResult,
-                additionalAddress = addressResult
-            )
-        }
+        val (updatedLegalEntityResult, updatedSiteResult, updatedAddressResult) =
+            updateConfidences(businessPartnerDto.type!!, taskEntry.recordId, legalEntityResult, siteResult, addressResult)
 
         taskEntryBpnMapping.writeCreatedMappingsToDb(bpnRequestIdentifierRepository)
-        return TaskStepResultEntryDto(
-            taskId = taskEntry.taskId,
-            businessPartner = businessPartnerResult,
-            errors = emptyList()
+
+        return buildTaskReply(
+            taskEntry.taskId,
+            businessPartnerDto,
+            updatedLegalEntityResult,
+            updatedSiteResult,
+            updatedAddressResult
         )
     }
 
@@ -313,7 +309,7 @@ class TaskStepBuildService(
             val createRequest = SiteCreateRequestWithLegalAddressAsMain(
                 name = poolSite.name,
                 states = poolSite.states,
-                confidenceCriteria = poolSite.confidenceCriteria,
+                confidenceCriteria = poolSite.confidenceCriteria.copy(numberOfSharingMembers = 1),
                 bpnLParent = legalEntityBpn
             )
             businessPartnerBuildService.createSitesWithLegalAddressAsMain(listOf(createRequest))
@@ -331,6 +327,8 @@ class TaskStepBuildService(
 
         val siteResult = result.entities.firstOrNull() ?: throw BpdmValidationException("Unknown error when trying to creating site")
 
+
+
         return taskResolutionMapper.toTaskResult(siteResult.site, siteResult.mainAddress, true)
     }
 
@@ -338,10 +336,7 @@ class TaskStepBuildService(
         bpnS: String,
         poolSite: SitePoolDto,
     ): Site {
-        val updateRequest = SitePartnerUpdateRequest(
-            bpns = bpnS,
-            site = poolSite
-        )
+        val updateRequest = SitePartnerUpdateRequest(bpnS, poolSite)
         val result = businessPartnerBuildService.updateSites(listOf(updateRequest))
         if(result.errors.isNotEmpty())
             throw BpdmMultiValidationException(result.errors.map { "Error when updating site: ${it.message}" })
@@ -433,6 +428,58 @@ class TaskStepBuildService(
         val addressResult = result.entities.firstOrNull() ?: throw BpdmValidationException("Unknown error when trying to updating address")
 
         return  taskResolutionMapper.toTaskResult(addressResult, true)
+    }
+
+    private fun updateConfidences(
+        goldenRecordType: GoldenRecordType,
+        sharingMemberRecordId: String,
+        legalEntityResult: LegalEntity,
+        siteResult: Site?,
+        additionalAddressResult: PostalAddress?
+    ): Triple<LegalEntity, Site?, PostalAddress?>{
+
+        val sharingMemberRecordBpnA = when(goldenRecordType){
+            GoldenRecordType.LegalEntity -> legalEntityResult.legalAddress.bpnReference.referenceValue!!
+            GoldenRecordType.Site -> siteResult!!.siteMainAddress!!.bpnReference.referenceValue!!
+            GoldenRecordType.Address -> additionalAddressResult!!.bpnReference.referenceValue!!
+        }
+
+        val updateResults = sharingMemberConfidenceService.updateAddress(sharingMemberRecordId, sharingMemberRecordBpnA)
+
+        val updatedLegalEntityResult =legalEntityResult.withUpdatedNumberOfSharingMembers(updateResults.updatedLegalEntities, updateResults.updatedAddresses)
+        val updatedSiteResult = siteResult?.copy(siteMainAddress = siteResult.siteMainAddress?.withUpdatedNumberOfSharingMembers(updateResults.updatedAddresses))
+        val updatedAddAddressResult =additionalAddressResult?.withUpdatedNumberOfSharingMembers(updateResults.updatedAddresses)
+
+        return Triple(updatedLegalEntityResult, updatedSiteResult, updatedAddAddressResult)
+    }
+
+
+    private fun buildTaskReply(
+        taskId: String,
+        originalBusinessPartner: BusinessPartner,
+        legalEntityResult: LegalEntity,
+        siteResult: Site?,
+        addressResult: PostalAddress?
+    ): TaskStepResultEntryDto{
+        //We do this for one special case:
+        //Legal Entity has not changed but site has changed and the main address is legal address
+        //In this case we want to return the most up-to-date address which is stored in the siteResult
+        val isLegalAndSiteMainAddress = siteResult?.siteMainAddress?.bpnReference == legalEntityResult.legalAddress.bpnReference
+
+        val businessPartnerResult = with(originalBusinessPartner){
+            copy(
+                legalEntity = if(isLegalAndSiteMainAddress) legalEntityResult.copy(legalAddress = siteResult.siteMainAddress!!) else legalEntityResult,
+                site = if(isLegalAndSiteMainAddress) siteResult.copy(siteMainAddress = null) else siteResult,
+                additionalAddress = addressResult
+            )
+        }
+
+        return TaskStepResultEntryDto(
+            taskId = taskId,
+            businessPartner = businessPartnerResult,
+            errors = emptyList()
+        )
+
     }
 
     private fun toPoolDto(legalEntity: LegalEntity) =
@@ -555,34 +602,45 @@ class TaskStepBuildService(
         }
     }
 
-    private fun assertParentsConsistent(businessPartner: BusinessPartner, taskEntryBpnMapping: TaskEntryBpnMapping){
+    private fun assertParentsConsistent(businessPartner: BusinessPartner, taskEntryBpnMapping: TaskEntryBpnMapping) {
         val addressBpn = businessPartner.additionalAddress?.bpnReference?.let { taskEntryBpnMapping.getBpn(it) }
         val siteBpn = businessPartner.site?.bpnReference?.let { taskEntryBpnMapping.getBpn(it) }
         val legalEntityBpn = taskEntryBpnMapping.getBpn(businessPartner.legalEntity.bpnReference)
 
-        if(siteBpn != null){
+        if (siteBpn != null) {
             val foundSite = siteRepository.findByBpn(siteBpn)
-            if(foundSite != null){
-                if(foundSite.legalEntity.bpn != legalEntityBpn){
+            if (foundSite != null) {
+                if (foundSite.legalEntity.bpn != legalEntityBpn) {
                     throw BpdmValidationException(CleaningError.SITE_WRONG_LEGAL_ENTITY_REFERENCE.message)
                 }
             }
         }
 
-        if(addressBpn != null){
+        if (addressBpn != null) {
             val foundAddress = logisticAddressRepository.findByBpn(addressBpn)
-            if(foundAddress != null){
-                if(foundAddress.legalEntity!!.bpn != legalEntityBpn){
+            if (foundAddress != null) {
+                if (foundAddress.legalEntity!!.bpn != legalEntityBpn) {
                     throw BpdmValidationException(CleaningError.ADDITIONAL_ADDRESS_WRONG_LEGAL_ENTITY_REFERENCE.message)
                 }
-                if(foundAddress.site != null){
-                    if(foundAddress.site!!.bpn != siteBpn){
+                if (foundAddress.site != null) {
+                    if (foundAddress.site!!.bpn != siteBpn) {
                         throw BpdmValidationException(CleaningError.ADDITIONAL_ADDRESS_WRONG_SITE_REFERENCE.message)
                     }
                 }
             }
         }
+    }
 
+    private fun PostalAddress.withUpdatedNumberOfSharingMembers(fromCandidates: Collection<LogisticAddressDb>): PostalAddress{
+        return copy(
+            confidenceCriteria = confidenceCriteria.copy(numberOfSharingMembers = fromCandidates.find { it.bpn == this.bpnReference.referenceValue }?.confidenceCriteria?.numberOfBusinessPartners ?: confidenceCriteria.numberOfSharingMembers )
+        )
+    }
 
+    private fun LegalEntity.withUpdatedNumberOfSharingMembers(legalEntityCandidates: Collection<LegalEntityDb>, legalAddressCandidates: Collection<LogisticAddressDb>): LegalEntity{
+        return copy(
+            confidenceCriteria = confidenceCriteria.copy(numberOfSharingMembers = legalEntityCandidates.find { it.bpn == this.bpnReference.referenceValue }?.confidenceCriteria?.numberOfBusinessPartners ?: confidenceCriteria.numberOfSharingMembers),
+            legalAddress = legalAddress.withUpdatedNumberOfSharingMembers(legalAddressCandidates)
+        )
     }
 }

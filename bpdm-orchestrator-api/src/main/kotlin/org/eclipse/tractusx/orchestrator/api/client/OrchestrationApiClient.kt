@@ -28,4 +28,6 @@ interface OrchestrationApiClient {
     val relationsGoldenRecordTasks : RelationsGoldenRecordTaskApiClient
 
     val relationsFinishedTaskEvents: RelationsFinishedTaskEventApiClient
+
+    val sharingMemberRecords: SharingMemberRecordApiClient
 }

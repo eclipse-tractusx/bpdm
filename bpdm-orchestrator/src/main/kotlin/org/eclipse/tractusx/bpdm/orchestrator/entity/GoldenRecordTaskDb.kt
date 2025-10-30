@@ -21,7 +21,8 @@ package org.eclipse.tractusx.bpdm.orchestrator.entity
 
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.util.replace
-import org.eclipse.tractusx.orchestrator.api.model.*
+import org.eclipse.tractusx.orchestrator.api.model.TaskMode
+import org.eclipse.tractusx.orchestrator.api.model.TaskStep
 import org.hibernate.annotations.Type
 import java.util.*
 
@@ -55,7 +56,7 @@ class GoldenRecordTaskDb(
     var updatedAt: DbTimestamp,
     @ManyToOne
     @JoinColumn(name = "gate_record_id", nullable = false, foreignKey = ForeignKey(name = "fk_tasks_gate_records"))
-    var gateRecord: GateRecordDb,
+    var gateRecord: SharingMemberRecordDb,
 
     @Embedded
     val processingState: ProcessingState,

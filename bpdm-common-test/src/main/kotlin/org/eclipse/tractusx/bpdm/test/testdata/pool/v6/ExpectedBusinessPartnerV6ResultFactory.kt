@@ -144,7 +144,7 @@ class ExpectedBusinessPartnerV6ResultFactory(
                     givenLegalEntity.legalEntity.bpnl,
                     siteCreatedAt,
                     siteUpdatedAt,
-                    confidenceCriteria
+                    mapToExpectedConfidence(confidenceCriteria, 1)
                 )
             },
             mainAddress =  givenLegalEntity.legalAddress.copy(addressType = AddressType.LegalAndSiteMainAddress),
@@ -329,7 +329,7 @@ class ExpectedBusinessPartnerV6ResultFactory(
                 isCatenaXMemberData = isCatenaXMemberData,
                 createdAt = createdAt,
                 updatedAt = updatedAt,
-                confidenceCriteria = confidenceCriteria,
+                confidenceCriteria = mapToExpectedConfidence(confidenceCriteria),
                 addressType = addressType
             )
         }
@@ -429,7 +429,7 @@ class ExpectedBusinessPartnerV6ResultFactory(
             states = states.map { mapToExpectedResult(it) },
             relations = emptyList(),
             currentness = currentness,
-            confidenceCriteria = confidenceCriteria,
+            confidenceCriteria = mapToExpectedConfidence(confidenceCriteria),
             isCatenaXMemberData = isCatenaXMemberData,
             createdAt = legalEntityCreatedAt,
             updatedAt = legalEntityUpdatedAt
@@ -451,7 +451,11 @@ class ExpectedBusinessPartnerV6ResultFactory(
             bpnLegalEntity = bpnLParent,
             createdAt = siteCreatedAt,
             updatedAt = siteUpdatedAt,
-            confidenceCriteria = confidenceCriteria
+            confidenceCriteria = mapToExpectedConfidence(confidenceCriteria, 1)
         )
+    }
+
+    private fun mapToExpectedConfidence(confidenceCriteria: ConfidenceCriteriaDto, numberOfSharingMembers: Int = 0): ConfidenceCriteriaDto{
+        return confidenceCriteria.copy(numberOfSharingMembers = numberOfSharingMembers)
     }
 }

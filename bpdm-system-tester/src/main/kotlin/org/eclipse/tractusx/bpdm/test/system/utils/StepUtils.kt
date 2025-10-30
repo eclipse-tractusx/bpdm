@@ -51,6 +51,20 @@ class StepUtils(
         } as SharingStateType
     }
 
+    fun waitForBusinessPartnerResultConfidenceSync(externalId: String): BusinessPartnerOutputDto = runBlocking {
+        println("Waiting for business partner result confidences to stabilize for $externalId ...")
+        withTimeout(Duration.ofMinutes(2)) {
+            while (true) {
+                val currentOutput = gateClient.businessParters.getBusinessPartnersOutput(listOf(externalId), PaginationRequest()).content.single()
+                if(currentOutput.address.confidenceCriteria.numberOfSharingMembers == 1){
+                    return@withTimeout currentOutput
+                }
+                delay(Duration.ofSeconds(10))
+            }
+        } as BusinessPartnerOutputDto
+    }
+
+
     fun waitForRelationResult(externalId: String): RelationSharingStateType = runBlocking {
         println("Waiting for relation result for $externalId ...")
         withTimeout(Duration.ofMinutes(4)) {

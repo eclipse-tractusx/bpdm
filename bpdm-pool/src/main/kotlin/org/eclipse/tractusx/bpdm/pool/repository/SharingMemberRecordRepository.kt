@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021,2024 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -17,8 +17,16 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.model
+package org.eclipse.tractusx.bpdm.pool.repository
 
-enum class SyncType{
-    SHARING_MEMBER_RECORDS
+import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
+import org.eclipse.tractusx.bpdm.pool.entity.SharingMemberRecordDb
+import org.springframework.data.jpa.repository.JpaRepository
+
+interface SharingMemberRecordRepository:  JpaRepository<SharingMemberRecordDb, Long> {
+
+    fun findByRecordId(recordId: String): SharingMemberRecordDb?
+
+    fun findByAddress(address: LogisticAddressDb): Set<SharingMemberRecordDb>
+
 }

@@ -20,11 +20,16 @@
 
 package org.eclipse.tractusx.bpdm.orchestrator.repository
 
-import org.eclipse.tractusx.bpdm.orchestrator.entity.GateRecordDb
+import org.eclipse.tractusx.bpdm.orchestrator.entity.SharingMemberRecordDb
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.CrudRepository
+import java.time.Instant
 import java.util.*
 
-interface GateRecordRepository: CrudRepository<GateRecordDb, Long> {
+interface SharingMemberRecordRepository: CrudRepository<SharingMemberRecordDb, Long> {
 
-    fun findByPrivateIdIn(privateUuids: Set<UUID>): Set<GateRecordDb>
+    fun findByPrivateIdIn(privateUuids: Set<UUID>): Set<SharingMemberRecordDb>
+
+    fun findByUpdatedAtAfter(updatedAt: Instant, pageable: Pageable): Page<SharingMemberRecordDb>
 }

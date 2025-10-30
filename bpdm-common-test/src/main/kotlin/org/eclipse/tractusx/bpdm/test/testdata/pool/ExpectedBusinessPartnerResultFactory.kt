@@ -65,7 +65,7 @@ class ExpectedBusinessPartnerResultFactory(
                     states = states.map { mapToExpectedResult(it) },
                     relations = emptyList(),
                     currentness = currentness,
-                    confidenceCriteria = confidenceCriteria,
+                    confidenceCriteria = mapToExpectedConfidence(confidenceCriteria),
                     isParticipantData = isParticipantData,
                     createdAt = legalEntityCreatedAt,
                     updatedAt = legalEntityUpdatedAt
@@ -110,7 +110,7 @@ class ExpectedBusinessPartnerResultFactory(
                     bpnLegalEntity = givenRequest.bpnlParent,
                     createdAt = siteCreatedAt,
                     updatedAt = siteUpdatedAt,
-                    confidenceCriteria = confidenceCriteria
+                    confidenceCriteria = mapToExpectedConfidence(confidenceCriteria, 1)
                 )
             },
             mainAddress = mapToExpectedResult(
@@ -222,7 +222,7 @@ class ExpectedBusinessPartnerResultFactory(
                 isParticipantData = isCatenaXMemberData,
                 createdAt = createdAt,
                 updatedAt = updatedAt,
-                confidenceCriteria = confidenceCriteria,
+                confidenceCriteria = mapToExpectedConfidence(confidenceCriteria),
                 addressType = addressType
             )
         }
@@ -302,5 +302,9 @@ class ExpectedBusinessPartnerResultFactory(
         return with(expectedAdminAreasLevel1.find { it.code == givenAdminAreaCode }!!) {
             RegionDto(countryCode, code, name)
         }
+    }
+
+    private fun mapToExpectedConfidence(confidenceCriteria: ConfidenceCriteriaDto, numberOfSharingMembers: Int = 0): ConfidenceCriteriaDto{
+        return confidenceCriteria.copy(numberOfSharingMembers = numberOfSharingMembers)
     }
 }

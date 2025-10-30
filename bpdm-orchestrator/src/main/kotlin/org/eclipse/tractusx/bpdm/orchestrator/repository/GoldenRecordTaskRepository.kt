@@ -20,8 +20,8 @@
 package org.eclipse.tractusx.bpdm.orchestrator.repository
 
 import org.eclipse.tractusx.bpdm.orchestrator.entity.DbTimestamp
-import org.eclipse.tractusx.bpdm.orchestrator.entity.GateRecordDb
 import org.eclipse.tractusx.bpdm.orchestrator.entity.GoldenRecordTaskDb
+import org.eclipse.tractusx.bpdm.orchestrator.entity.SharingMemberRecordDb
 import org.eclipse.tractusx.orchestrator.api.model.TaskStep
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -69,7 +69,7 @@ interface GoldenRecordTaskRepository : CrudRepository<GoldenRecordTaskDb, Long>,
 
     fun findByProcessingStateRetentionTimeoutBefore(time: DbTimestamp, pageable: Pageable): Page<GoldenRecordTaskDb>
 
-    fun findTasksByGateRecordInAndProcessingStateResultState(records: Set<GateRecordDb>, resultState: GoldenRecordTaskDb.ResultState) : Set<GoldenRecordTaskDb>
+    fun findTasksByGateRecordInAndProcessingStateResultState(records: Set<SharingMemberRecordDb>, resultState: GoldenRecordTaskDb.ResultState) : Set<GoldenRecordTaskDb>
 }
 
 fun GoldenRecordTaskRepository.fetchBusinessPartnerData(tasks: Set<GoldenRecordTaskDb>){
