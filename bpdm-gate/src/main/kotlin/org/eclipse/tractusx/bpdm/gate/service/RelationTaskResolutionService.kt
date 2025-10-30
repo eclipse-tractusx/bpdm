@@ -30,7 +30,6 @@ import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
 import org.eclipse.tractusx.bpdm.gate.entity.SyncTypeDb
 import org.eclipse.tractusx.bpdm.gate.repository.RelationRepository
-import org.eclipse.tractusx.bpdm.gate.repository.SyncRecordRepository
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.stereotype.Service
@@ -44,7 +43,6 @@ class RelationTaskResolutionService(
     private val taskConfigProperties: GoldenRecordTaskConfigProperties,
     private val relationService: IRelationService,
     private val sharingStateService: RelationSharingStateService,
-    private val syncRecordRepository: SyncRecordRepository,
     private val entityManager: EntityManager,
     private val transactionTemplate: TransactionTemplate
 ) {
@@ -91,10 +89,7 @@ class RelationTaskResolutionService(
         resolveAsSuccesses(successfulTasks, pendingRelationsById)
         resolveAsErrors(errorTasks, pendingRelationsById)
 
-        events.content.lastOrNull()?.let { latestEvent ->
-            syncRecord.fromTime = latestEvent.timestamp
-            syncRecordRepository.save(syncRecord)
-        }
+        syncRecordService.updateRecord(syncRecord,  events.content.lastOrNull()?.timestamp)
 
         val unresolvedSize = tasks.size - successfulTasks.size - errorTasks.size
         return ResolutionStats(successfulTasks.size, errorTasks.size, unresolvedSize, events.totalPages > 1)

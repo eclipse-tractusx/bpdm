@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.model.SyncStatus
 import org.eclipse.tractusx.bpdm.common.service.BaseSyncRecordService
 import org.eclipse.tractusx.bpdm.pool.api.model.SyncType
 import org.eclipse.tractusx.bpdm.pool.entity.SyncRecordDb
@@ -38,7 +37,6 @@ class SyncRecordService(
     override fun newSyncRecord(type: SyncType, initialFromTime: Instant) =
         SyncRecordDb(
             type = type,
-            status = SyncStatus.NOT_SYNCED,
             fromTime = initialFromTime
         )
 

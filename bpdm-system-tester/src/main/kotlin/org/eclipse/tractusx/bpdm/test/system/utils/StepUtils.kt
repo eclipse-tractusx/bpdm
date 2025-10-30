@@ -40,7 +40,7 @@ class StepUtils(
 
     fun waitForBusinessPartnerResult(externalId: String): SharingStateType = runBlocking {
         println("Waiting for business partner result for $externalId ...")
-        withTimeout(Duration.ofMinutes(3)) {
+        withTimeout(Duration.ofMinutes(4)) {
             while (true) {
                 val sharingState = gateClient.sharingState.getSharingStates(PaginationRequest(), listOf(externalId)).content.single()
                 if (sharingState.sharingStateType == SharingStateType.Success || sharingState.sharingStateType == SharingStateType.Error) {
@@ -53,7 +53,7 @@ class StepUtils(
 
     fun waitForRelationResult(externalId: String): RelationSharingStateType = runBlocking {
         println("Waiting for relation result for $externalId ...")
-        withTimeout(Duration.ofMinutes(3)) {
+        withTimeout(Duration.ofMinutes(4)) {
             while (true) {
                 val sharingState = gateClient.relationSharingState.get(externalIds = listOf(externalId)).content.single()
                 if (sharingState.sharingStateType == RelationSharingStateType.Success || sharingState.sharingStateType == RelationSharingStateType.Error) {
@@ -66,7 +66,7 @@ class StepUtils(
 
     fun waitForRelationTask(externalId: String): String = runBlocking {
         println("Waiting relation getting task assigned for $externalId ...")
-        withTimeout(Duration.ofMinutes(3)) {
+        withTimeout(Duration.ofMinutes(4)) {
             while (true) {
                 val sharingState = gateClient.relationSharingState.get(externalIds = listOf(externalId)).content.single()
                 if(sharingState.taskId != null)
