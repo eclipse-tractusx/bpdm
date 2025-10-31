@@ -83,7 +83,7 @@ class GoldenRecordUpdateChunkService(
     fun updateFromNextChunk(): UpdateStats{
         logger.info { "Update next chunk of Business Partner Output based on Golden Record Updates from the Pool..." }
 
-        val syncRecord = syncRecordService.setSynchronizationStart(SyncTypeDb.POOL_TO_GATE_OUTPUT)
+        val syncRecord = syncRecordService.getOrCreateRecord(SyncTypeDb.POOL_TO_GATE_OUTPUT)
 
         val changelogSearchRequest = ChangelogSearchRequest(timestampAfter = syncRecord.fromTime)
         val pageRequest = PaginationRequest(0, taskConfigProperties.creation.fromPool.batchSize)
@@ -100,7 +100,7 @@ class GoldenRecordUpdateChunkService(
         val updatedSites = updateSites(changedBpnSs).size
         val updatedAddresses = updateAddresses(changedBpnAs).size
 
-        syncRecordService.setSynchronizationSuccess(SyncTypeDb.POOL_TO_GATE_OUTPUT)
+        syncRecordService.updateRecord(syncRecord, poolChangelogEntries.content.lastOrNull()?.timestamp)
 
         logger.debug { "Updated '$updatedLegalEntities' legal entities, '$updatedSites' sites and '$updatedAddresses' addresses." }
 

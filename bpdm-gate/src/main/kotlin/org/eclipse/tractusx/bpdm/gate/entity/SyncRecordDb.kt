@@ -22,7 +22,6 @@ package org.eclipse.tractusx.bpdm.gate.entity
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 import org.eclipse.tractusx.bpdm.common.model.BaseSyncRecord
-import org.eclipse.tractusx.bpdm.common.model.SyncStatus
 import java.time.Instant
 
 @Entity
@@ -32,29 +31,7 @@ class SyncRecordDb(
     @Column(name = "type", nullable = false, unique = true)
     override var type: SyncTypeDb,
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
-    override var status: SyncStatus,
-
     @Column(name = "from_time", nullable = false)
-    override var fromTime: Instant,
-
-    @Column(name = "progress", nullable = false)
-    override var progress: Float = 0f,
-
-    @Column(name = "count", nullable = false)
-    override var count: Int = 0,
-
-    @Column(name = "status_details")
-    override var errorDetails: String? = null,
-
-    @Column(name = "save_state")
-    override var errorSave: String? = null,
-
-    @Column(name = "started_at")
-    override var startedAt: Instant? = null,
-
-    @Column(name = "finished_at")
-    override var finishedAt: Instant? = null,
+    override var fromTime: Instant
 
     ) : BaseEntity(), BaseSyncRecord<SyncTypeDb>

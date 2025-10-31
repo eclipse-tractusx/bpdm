@@ -20,16 +20,10 @@
 package org.eclipse.tractusx.bpdm.common.service
 
 import mu.KLogger
-import org.eclipse.tractusx.bpdm.common.exception.BpdmSyncConflictException
-import org.eclipse.tractusx.bpdm.common.exception.BpdmSyncStateException
 import org.eclipse.tractusx.bpdm.common.model.BaseSyncRecord
-import org.eclipse.tractusx.bpdm.common.model.SyncStatus
-import org.springframework.transaction.annotation.Isolation
-import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
-import java.time.temporal.ChronoUnit
 
 /**
  * This services manages data about the most current sync run for each SYNC_TYPE.
@@ -58,7 +52,6 @@ abstract class BaseSyncRecordService<SYNC_TYPE : Enum<*>, SYNC_RECORD : BaseSync
 
     protected abstract fun findByType(type: SYNC_TYPE): SYNC_RECORD?
 
-    @Transactional(isolation = Isolation.SERIALIZABLE)
     open fun getOrCreateRecord(type: SYNC_TYPE): SYNC_RECORD {
         return findByType(type) ?: run {
             logger.info { "Create new sync record entry for type $type" }
@@ -67,88 +60,14 @@ abstract class BaseSyncRecordService<SYNC_TYPE : Enum<*>, SYNC_RECORD : BaseSync
         }
     }
 
-    @Transactional(isolation = Isolation.SERIALIZABLE)
-    open fun setSynchronizationStart(type: SYNC_TYPE): SYNC_RECORD {
-        val record = getOrCreateRecord(type)
-
-        if (record.status == SyncStatus.RUNNING)
-            throw BpdmSyncConflictException(type)
-
-        logger.debug { "Set sync of type ${record.type} to status ${SyncStatus.RUNNING}" }
-
-        if (record.status != SyncStatus.ERROR) {
-            // For error status the field fromTime is preserved to not miss any data
-            record.fromTime = record.startedAt ?: INITIAL_FROM_TIME
+    open fun updateRecord(syncRecord: SYNC_RECORD, newFromTime: Instant?): SYNC_RECORD {
+        val hasChanges = newFromTime != syncRecord.fromTime
+        if (hasChanges) {
+            logger.debug { "Update from time for sync entry for type ${syncRecord.type}" }
+            syncRecord.fromTime = newFromTime ?: syncRecord.fromTime
+            save(syncRecord)
         }
 
-        record.errorDetails = null
-        record.status = SyncStatus.RUNNING
-        record.startedAt = Instant.now().truncatedTo(ChronoUnit.MICROS)
-        record.finishedAt = null
-        record.count = 0
-        record.progress = 0f
-
-        return save(record)
-    }
-
-    @Transactional(isolation = Isolation.SERIALIZABLE)
-    open fun setSynchronizationSuccess(type: SYNC_TYPE, finishedAt: Instant? = null): SYNC_RECORD {
-        val record = getOrCreateRecord(type)
-        if (record.status != SyncStatus.RUNNING)
-            throw BpdmSyncStateException("Synchronization of type ${record.type} can't switch from state ${record.status} to ${SyncStatus.SUCCESS}.")
-
-        logger.debug { "Set sync of type ${record.type} to status ${SyncStatus.SUCCESS}" }
-
-        record.finishedAt = finishedAt ?: Instant.now().truncatedTo(ChronoUnit.MICROS)
-        record.progress = 1f
-        record.status = SyncStatus.SUCCESS
-        record.errorDetails = null
-        record.errorSave = null
-
-        return save(record)
-    }
-
-    @Transactional(isolation = Isolation.SERIALIZABLE)
-    open fun setSynchronizationError(type: SYNC_TYPE, errorMessage: String, saveState: String?): SYNC_RECORD {
-        val record = getOrCreateRecord(type)
-        logger.debug { "Set sync of type ${record.type} to status ${SyncStatus.ERROR} with message $errorMessage" }
-
-        record.finishedAt = Instant.now().truncatedTo(ChronoUnit.MICROS)
-        record.status = SyncStatus.ERROR
-        record.errorDetails = errorMessage.take(255)
-        record.errorSave = saveState
-
-        return save(record)
-    }
-
-    @Transactional(isolation = Isolation.SERIALIZABLE)
-    open fun setProgress(type: SYNC_TYPE, count: Int, progress: Float): SYNC_RECORD {
-        val record = getOrCreateRecord(type)
-        if (record.status != SyncStatus.RUNNING)
-            throw BpdmSyncStateException("Synchronization of type ${record.type} can't change progress when not running.")
-
-        logger.debug { "Update progress of sync type ${record.type} to $progress" }
-
-        record.count = count
-        record.progress = progress
-
-        return save(record)
-    }
-
-    @Transactional(isolation = Isolation.SERIALIZABLE)
-    open fun reset(type: SYNC_TYPE): SYNC_RECORD {
-        val record = getOrCreateRecord(type)
-        logger.debug { "Reset sync status of type ${record.type}" }
-
-        record.status = SyncStatus.NOT_SYNCED
-        record.errorDetails = null
-        record.errorSave = null
-        record.startedAt = null
-        record.finishedAt = null
-        record.count = 0
-        record.progress = 0f
-        record.fromTime = INITIAL_FROM_TIME
-
-        return save(record)
+        return syncRecord
     }
 }
