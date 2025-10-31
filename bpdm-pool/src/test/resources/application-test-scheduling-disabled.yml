@@ -20,6 +20,8 @@
 bpdm:
   tasks:
     cron: '-'
+  sharingMemberRecords:
+    cron: '-'
 spring:
   datasource:
     hikari:

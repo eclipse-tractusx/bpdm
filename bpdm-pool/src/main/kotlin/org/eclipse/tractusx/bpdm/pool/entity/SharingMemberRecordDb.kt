@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021,2024 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -17,8 +17,25 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.model
+package org.eclipse.tractusx.bpdm.pool.entity
 
-enum class SyncType{
-    SHARING_MEMBER_RECORDS
-}
+import jakarta.persistence.*
+import org.eclipse.tractusx.bpdm.common.model.BaseEntity
+
+@Entity
+@Table(
+    name = "sharing_member_records",
+    indexes = [
+        Index(columnList = "record_id"),
+        Index(columnList = "address")
+    ]
+)
+class SharingMemberRecordDb(
+    @Column(name = "record_id", nullable = false)
+    var recordId: String,
+    @Column(name = "is_golden_record_counted", nullable = false)
+    var isGoldenRecordCounted: Boolean?,
+    @ManyToOne
+    @JoinColumn(name = "address_id", nullable = false)
+    var address: LogisticAddressDb
+): BaseEntity()

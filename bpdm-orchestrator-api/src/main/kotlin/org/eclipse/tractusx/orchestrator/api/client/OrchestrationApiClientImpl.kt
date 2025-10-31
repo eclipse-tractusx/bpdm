@@ -49,6 +49,8 @@ class OrchestrationApiClientImpl(
 
     override val relationsFinishedTaskEvents by lazy { createClient<RelationsFinishedTaskEventApiClient>() }
 
+    override val sharingMemberRecords by lazy { createClient<SharingMemberRecordApiClient>() }
+
     private inline fun <reified T> createClient() =
         httpServiceProxyFactory.createClient(T::class.java)
 }

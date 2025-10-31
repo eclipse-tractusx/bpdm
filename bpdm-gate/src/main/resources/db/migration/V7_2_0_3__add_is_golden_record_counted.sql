@@ -1,0 +1,3 @@
+ALTER TABLE sharing_states
+ADD COLUMN is_golden_record_counted BOOLEAN,
+ADD COLUMN synced_is_golden_record_counted BOOLEAN

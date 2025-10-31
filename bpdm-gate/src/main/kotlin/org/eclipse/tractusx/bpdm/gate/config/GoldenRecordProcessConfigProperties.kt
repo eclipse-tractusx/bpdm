@@ -29,7 +29,8 @@ data class GoldenRecordTaskConfigProperties(
     val dependencyCheck: TaskProcessProperties = TaskProcessProperties(),
     val consistencyCheck: TaskProcessProperties = TaskProcessProperties(),
     val relationCreation: TaskProcessProperties = TaskProcessProperties(),
-    val relationCheck: TaskProcessProperties = TaskProcessProperties()
+    val relationCheck: TaskProcessProperties = TaskProcessProperties(),
+    val recordSync: TaskProcessProperties = TaskProcessProperties()
 ) {
     data class CreationProperties(
         val fromSharingMember: CreationTaskProperties = CreationTaskProperties(),

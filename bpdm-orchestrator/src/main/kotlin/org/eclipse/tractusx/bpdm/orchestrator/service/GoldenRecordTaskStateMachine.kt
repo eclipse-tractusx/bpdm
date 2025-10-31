@@ -40,7 +40,7 @@ class GoldenRecordTaskStateMachine(
 
     private val logger = KotlinLogging.logger { }
 
-    fun initTask(mode: TaskMode, initBusinessPartner: BusinessPartner, record: GateRecordDb): GoldenRecordTaskDb {
+    fun initTask(mode: TaskMode, initBusinessPartner: BusinessPartner, record: SharingMemberRecordDb): GoldenRecordTaskDb {
         logger.debug { "Executing initProcessingState() with parameters mode: $mode and business partner data: $initBusinessPartner" }
 
         val initialStep = getInitialStep(mode)

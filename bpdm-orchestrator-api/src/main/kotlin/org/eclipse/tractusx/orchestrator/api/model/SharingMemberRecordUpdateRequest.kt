@@ -17,8 +17,9 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.model
+package org.eclipse.tractusx.orchestrator.api.model
 
-enum class SyncType{
-    SHARING_MEMBER_RECORDS
-}
+data class SharingMemberRecordUpdateRequest(
+    val recordId: String,
+    val isGoldenRecordCounted: Boolean
+)

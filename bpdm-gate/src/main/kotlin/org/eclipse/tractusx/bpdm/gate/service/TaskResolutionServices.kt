@@ -94,7 +94,8 @@ class TaskResolutionChunkService(
     private val businessPartnerService: BusinessPartnerService,
     private val orchestratorMappings: OrchestratorMappings,
     private val synchRecordService: SyncRecordService,
-    private val goldenRecordUpdateService: GoldenRecordUpdateChunkService
+    private val goldenRecordUpdateService: GoldenRecordUpdateChunkService,
+    private val goldenRecordCountedService: GoldenRecordCountedService
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -210,6 +211,8 @@ class TaskResolutionChunkService(
         // check against the Pool again in case the business partner data is already outdated
         goldenRecordUpdateService.updateAgainstPool(upsertResults.map { it.businessPartner })
         requests.forEach { sharingStateService.setSuccess(it.sharingState) }
+
+        goldenRecordCountedService.setIsGoldenRecordCounted(upsertResults.map { it.businessPartner })
     }
 
     private fun resolveAsErrors(errors: List<RequestCreationResult>) {
