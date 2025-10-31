@@ -190,7 +190,7 @@ object BusinessPartnerVerboseValues {
     val address1 = PhysicalPostalAddressVerboseDto(
         geographicCoordinates = null,
         countryVerbose = country1,
-        postalCode = "71059 ",
+        postalCode = "71059",
         city = "Böblingen",
         administrativeAreaLevel1Verbose = null,
         administrativeAreaLevel2 = "Böblingen",
@@ -582,6 +582,26 @@ object BusinessPartnerVerboseValues {
             addressType = AddressType.LegalAddress
         ),
         index = "3"
+    )
+
+    val legalEntityUpsert4 = LegalEntityPartnerCreateVerboseDto(
+        legalEntity = LegalEntityVerboseDto(
+            bpnl = thirdBpnl,
+            legalName = "Müller Handels GmbH & Co. KG",
+            legalFormVerbose = legalForm3,
+            identifiers = listOf(LegalEntityIdentifierVerboseDto("An ID Value", identifierType3, "Official Z")),
+            states = listOf(leStatus3),
+            currentness = createdTime1.toInstant(ZoneOffset.UTC),
+            confidenceCriteria = confidenceCriteria3,
+            createdAt = Instant.now(),
+            updatedAt = Instant.now(),
+            isParticipantData = true
+        ),
+        legalAddress = addressPartner3.copy(
+            bpnLegalEntity = legalEntity3.legalEntity.bpnl,
+            addressType = AddressType.LegalAddress
+        ),
+        index = "4"
     )
 
     val legalEntityUpsertMultipleIdentifier = LegalEntityPartnerCreateVerboseDto(
