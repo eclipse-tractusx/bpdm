@@ -16,6 +16,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 ### Changed
 
 - BPDM Pool: each legal entity can now have only one alternative headquarter
+- BPDM Pool: V6 POST legal entities API can only have less than or equal to 100 identifiers.
 
 ## [7.1.0] - 2025-09-30
 

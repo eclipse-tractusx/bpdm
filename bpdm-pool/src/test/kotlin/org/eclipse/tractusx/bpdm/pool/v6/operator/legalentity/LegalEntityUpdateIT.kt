@@ -26,6 +26,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntitySearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityUpdateError
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerUpdateResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.controller.v6.LegalEntityLegacyServiceMapper.Companion.IDENTIFIER_AMOUNT_LIMIT
 import org.eclipse.tractusx.bpdm.pool.v6.operator.OperatorTest
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -264,12 +265,8 @@ class LegalEntityUpdateIT: OperatorTest() {
      * GIVEN legal entity
      * WHEN operator tries to update the legal entity with too many identifiers
      * THEN operator sees too many identifiers error in response
-     *
-     * ToDo:
-     * At the moment not as expected: https://github.com/eclipse-tractusx/bpdm/issues/1464
      */
     @Test
-    @Disabled
     fun `try update legal entity with too many identifiers`(){
         //GIVEN
         val legalEntityResponse = testDataClient.createLegalEntity(testName)
@@ -291,12 +288,8 @@ class LegalEntityUpdateIT: OperatorTest() {
      * GIVEN legal entity
      * WHEN operator tries to update the legal entity with too many legal address identifiers
      * THEN operator sees too many legal address identifiers error in response
-     *
-     * ToDo:
-     * At the moment not as expected: https://github.com/eclipse-tractusx/bpdm/issues/1464
      */
     @Test
-    @Disabled
     fun `try update legal entity with too many legal address identifiers`(){
         //GIVEN
         val legalEntityResponse = testDataClient.createLegalEntity(testName)
@@ -308,7 +301,7 @@ class LegalEntityUpdateIT: OperatorTest() {
         val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
 
         //THEN
-        val expectedError = ErrorInfo(LegalEntityUpdateError.LegalEntityIdentifiersTooMany, "IGNORED", updateRequest.bpnl)
+        val expectedError = ErrorInfo(LegalEntityUpdateError.LegalAddressIdentifiersTooMany, "Amount of identifiers (101) exceeds limit of $IDENTIFIER_AMOUNT_LIMIT", updateRequest.bpnl)
         val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertLegalEntityUpdate(response, expectedResponse)

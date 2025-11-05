@@ -39,6 +39,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateRes
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerUpdateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SiteWithMainAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.controller.v6.LegalEntityLegacyServiceMapper.Companion.IDENTIFIER_AMOUNT_LIMIT
 import org.eclipse.tractusx.bpdm.pool.dto.AddressMetadataDto
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
@@ -254,7 +255,8 @@ class SiteLegacyServiceMapper(
             val validationErrors =
                 regionValidator.validate(legalAddressDto, request) +
                         identifiersValidator.validate(legalAddressDto, request) +
-                        identifiersDuplicateValidator.validate(legalAddressDto, request, bridge.bpnA)
+                        identifiersDuplicateValidator.validate(legalAddressDto, request, bridge.bpnA) +
+                        validateAddressIdentifierTooMany(legalAddressDto, request, messages.identifiersTooMany)
 
             if (validationErrors.isNotEmpty()) {
                 val existing = result[request]
@@ -559,6 +561,15 @@ class SiteLegacyServiceMapper(
 
         return SitePartnerCreateResponseWrapper(siteResponse, emptyList())
 
+    }
+
+    private fun <ERROR: ErrorCode> validateAddressIdentifierTooMany(address: IBaseLogisticAddressDto, entityKey: RequestWithKey, errorCode: ERROR): Collection<ErrorInfo<ERROR>>{
+        return validatedIdentifiersTooMany(address.identifiers.size, entityKey, errorCode)
+    }
+
+    private fun  <ERROR: ErrorCode> validatedIdentifiersTooMany(identifierAmount: Int, entityKey: RequestWithKey, errorCode: ERROR): Collection<ErrorInfo<ERROR>>{
+        return if(identifierAmount > IDENTIFIER_AMOUNT_LIMIT) listOf(ErrorInfo(errorCode, "Amount of identifiers ($identifierAmount) exceeds limit of $IDENTIFIER_AMOUNT_LIMIT", entityKey.getRequestKey()))
+        else emptyList()
     }
 
 }

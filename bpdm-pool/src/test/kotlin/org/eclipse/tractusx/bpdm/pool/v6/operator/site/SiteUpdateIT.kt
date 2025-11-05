@@ -29,6 +29,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteUpdateError
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerUpdateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SiteWithMainAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.controller.v6.LegalEntityLegacyServiceMapper.Companion.IDENTIFIER_AMOUNT_LIMIT
 import org.eclipse.tractusx.bpdm.pool.v6.operator.OperatorTest
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -230,12 +231,8 @@ class SiteUpdateIT: OperatorTest() {
      * GIVEN site
      * WHEN operator tries to update the site with too many identifiers
      * THEN operator sees 400 bad request error
-     *
-     * ToDo:
-     *  At the moment not as expected: https://github.com/eclipse-tractusx/bpdm/issues/1464
      */
     @Test
-    @Disabled
     fun `try update site with too many identifiers`(){
         //GIVEN
         val legalEntityResponse = testDataClient.createLegalEntity(testName)
@@ -248,7 +245,7 @@ class SiteUpdateIT: OperatorTest() {
         val siteResponse = poolClient.sites.updateSite(listOf(siteRequest))
 
         //THEN
-        val expectedError = ErrorInfo(SiteUpdateError.MainAddressIdentifiersTooMany, "IGNORED", siteRequest.bpns)
+        val expectedError = ErrorInfo(SiteUpdateError.MainAddressIdentifiersTooMany, "Amount of identifiers (101) exceeds limit of $IDENTIFIER_AMOUNT_LIMIT", siteRequest.bpns)
         val expectedResponse = SitePartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertSiteUpdate(siteResponse, expectedResponse)
