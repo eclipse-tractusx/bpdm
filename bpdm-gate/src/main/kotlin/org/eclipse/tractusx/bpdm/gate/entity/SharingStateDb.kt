@@ -40,6 +40,12 @@ class SharingStateDb(
     @Column(name = "orchestrator_record_id", nullable = true, unique = true)
     var orchestratorRecordId: UUID?,
 
+    @Column(name = "is_golden_record_counted")
+    var isGoldenRecordCounted: Boolean?,
+
+    @Column(name = "synced_is_golden_record_counted")
+    var syncedIsGoldenRecordCounted: Boolean?,
+
     @Enumerated(EnumType.STRING)
     @Column(name = "sharing_state_type", nullable = false)
     var sharingStateType: SharingStateType,

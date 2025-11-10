@@ -1,0 +1,5 @@
+server:
+  port: 8082
+spring:
+  datasource:
+    url: jdbc:postgresql://${bpdm.datasource.host}:5432/bpdm_gate_2

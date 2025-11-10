@@ -17,8 +17,12 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.model
+package org.eclipse.tractusx.bpdm.orchestrator.exception
 
-enum class SyncType{
-    SHARING_MEMBER_RECORDS
-}
+import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.ResponseStatus
+
+@ResponseStatus(HttpStatus.BAD_REQUEST)
+class BpdmRecordIdNotValid(
+    uuidString: String
+): RuntimeException("The given record ID '$uuidString' is not a valid sharing member record UUID.")

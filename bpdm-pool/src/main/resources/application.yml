@@ -84,6 +84,11 @@ bpdm:
     # Up to how many tasks can be requested at the same time
     batchSize: 20
     step: "PoolSync"
+  sharingMemberRecords:
+    # When and how often the Pool should synchronize sharing member record data from the orchestrator
+    cron: '15/30 * * * * *'
+    # Up to how many tasks can be requested at the same time
+    batchSize: 20
   security:
     # Allowed origins for CORS
     cors-origins: '*'

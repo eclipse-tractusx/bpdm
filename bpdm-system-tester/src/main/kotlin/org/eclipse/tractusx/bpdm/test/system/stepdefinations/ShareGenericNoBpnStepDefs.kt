@@ -26,10 +26,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
-import org.eclipse.tractusx.bpdm.test.system.utils.GateOutputFactory
-import org.eclipse.tractusx.bpdm.test.system.utils.StepUtils
-import org.eclipse.tractusx.bpdm.test.system.utils.withAddressType
-import org.eclipse.tractusx.bpdm.test.system.utils.withSharedByOwner
+import org.eclipse.tractusx.bpdm.test.system.utils.*
 import org.eclipse.tractusx.bpdm.test.testdata.gate.GateInputFactory
 import org.eclipse.tractusx.bpdm.test.testdata.gate.TestRunData
 import org.eclipse.tractusx.bpdm.test.testdata.gate.withAddressType
@@ -61,12 +58,20 @@ class ShareGenericNoBpnStepDefs(
 
     @Then("^the sharing member receives output \"([^\"]*)\" with external-ID \"([^\"]*)\" with address type \"([^\"]*)\"$")
     fun `then the sharing member receives output seed with modifier`(seed: String, externalId: String, addressType: String) {
+        val actualAddressType = AddressType.valueOf(addressType)
+        val expectedLegalEntityNumberOfSharingMembers = when(actualAddressType){
+            AddressType.LegalAddress, AddressType.LegalAndSiteMainAddress -> 1
+            else -> 0
+        }
+
         val expectedOutput = gateOutputFactory.createOutput(seed, externalId)
-            .withAddressType(AddressType.valueOf(addressType))
+            .withAddressType(actualAddressType)
             .withSharedByOwner(true)
+            .withNumberOfSharingMembers(expectedLegalEntityNumberOfSharingMembers, 1, 1)
             .copy(isOwnCompanyData = true)
 
         stepUtils.waitForBusinessPartnerResult(expectedOutput.externalId)
+        stepUtils.waitForBusinessPartnerResultConfidenceSync(expectedOutput.externalId)
 
         val actualOutput = gateClient.businessParters.getBusinessPartnersOutput(listOf(expectedOutput.externalId), PaginationRequest()).content.single()
 

@@ -22,7 +22,9 @@ package org.eclipse.tractusx.bpdm.pool.service
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.util.replace
-import org.eclipse.tractusx.bpdm.pool.api.model.*
+import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.dto.AddressMetadataDto
@@ -473,7 +475,7 @@ class BusinessPartnerBuildService(
         address.physicalPostalAddress = createPhysicalAddress(dto.physicalPostalAddress, metadataMap.regions)
         address.alternativePostalAddress = dto.alternativePostalAddress?.let { createAlternativeAddress(it, metadataMap.regions) }
         address.name = dto.name
-        address.confidenceCriteria = createConfidenceCriteria(dto.confidenceCriteria)
+        address.confidenceCriteria = updateConfidenceCriteria(address.confidenceCriteria, dto.confidenceCriteria)
         updateLogisticAddress(address, dto, metadataMap)
         return address
     }
@@ -492,7 +494,7 @@ class BusinessPartnerBuildService(
             addAll(dto.states.map { toAddressState(it, address) })
         }
 
-        address.confidenceCriteria = createConfidenceCriteria(dto.confidenceCriteria)
+        address.confidenceCriteria = updateConfidenceCriteria(address.confidenceCriteria, dto.confidenceCriteria)
     }
 
     private fun LegalEntityMetadataDto.toMapping() =
@@ -597,7 +599,7 @@ class BusinessPartnerBuildService(
             site.states.clear()
             site.states.addAll(siteDto.states.map { toSiteState(it, site) })
 
-            site.confidenceCriteria = createConfidenceCriteria(siteDto.confidenceCriteria!!)
+            site.confidenceCriteria = updateConfidenceCriteria(site.confidenceCriteria, siteDto.confidenceCriteria!!)
         }
 
         fun createSite(
@@ -608,7 +610,7 @@ class BusinessPartnerBuildService(
 
             val name = siteDto.name ?: throw BpdmValidationException(TaskStepBuildService.CleaningError.SITE_NAME_IS_NULL.message)
 
-            val site = SiteDb(bpn = bpnS, name = name, legalEntity = partner, confidenceCriteria = createConfidenceCriteria(siteDto.confidenceCriteria!!))
+            val site = SiteDb(bpn = bpnS, name = name, legalEntity = partner, confidenceCriteria = createConfidenceCriteria(siteDto.confidenceCriteria!!, 1))
 
             site.states.addAll(siteDto.states
                 .map { toSiteState(it, site) })
@@ -649,7 +651,7 @@ class BusinessPartnerBuildService(
 
             legalEntity.identifiers.replace(legalEntityDto.identifiers.map { toLegalEntityIdentifier(it, metadataMap.idTypes, legalEntity) })
             legalEntity.states.replace(legalEntityDto.states.map { toLegalEntityState(it, legalEntity) })
-            legalEntity.confidenceCriteria = createConfidenceCriteria(legalEntityDto.confidenceCriteria)
+            legalEntity.confidenceCriteria = updateConfidenceCriteria( legalEntity.confidenceCriteria, legalEntityDto.confidenceCriteria)
             legalEntity.isCatenaXMemberData = legalEntityDto.isParticipantData
         }
 
@@ -711,15 +713,18 @@ class BusinessPartnerBuildService(
             )
         }
 
-        fun createConfidenceCriteria(confidenceCriteria: IConfidenceCriteriaDto) =
+        fun createConfidenceCriteria(confidenceCriteria: IConfidenceCriteriaDto, numberOfSharingMembers: Int = 0) =
             ConfidenceCriteriaDb(
                 sharedByOwner = confidenceCriteria.sharedByOwner!!,
                 checkedByExternalDataSource = confidenceCriteria.checkedByExternalDataSource!!,
-                numberOfBusinessPartners = confidenceCriteria.numberOfSharingMembers!!,
+                numberOfBusinessPartners = numberOfSharingMembers,
                 lastConfidenceCheckAt = confidenceCriteria.lastConfidenceCheckAt!!,
                 nextConfidenceCheckAt = confidenceCriteria.nextConfidenceCheckAt!!,
                 confidenceLevel = confidenceCriteria.confidenceLevel!!
             )
+
+        fun updateConfidenceCriteria(oldConfidence: ConfidenceCriteriaDb, newConfidence: IConfidenceCriteriaDto) =
+            createConfidenceCriteria(newConfidence).copy(numberOfBusinessPartners = oldConfidence.numberOfBusinessPartners)
     }
 
 }

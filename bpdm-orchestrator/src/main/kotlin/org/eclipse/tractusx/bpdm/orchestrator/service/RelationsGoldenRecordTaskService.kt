@@ -21,12 +21,12 @@ package org.eclipse.tractusx.bpdm.orchestrator.service
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.orchestrator.config.TaskConfigProperties
-import org.eclipse.tractusx.bpdm.orchestrator.entity.GateRecordDb
 import org.eclipse.tractusx.bpdm.orchestrator.entity.RelationsGoldenRecordTaskDb
+import org.eclipse.tractusx.bpdm.orchestrator.entity.SharingMemberRecordDb
 import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmRecordNotFoundException
 import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmTaskNotFoundException
-import org.eclipse.tractusx.bpdm.orchestrator.repository.GateRecordRepository
 import org.eclipse.tractusx.bpdm.orchestrator.repository.RelationsGoldenRecordTaskRepository
+import org.eclipse.tractusx.bpdm.orchestrator.repository.SharingMemberRecordRepository
 import org.eclipse.tractusx.bpdm.orchestrator.repository.fetchRelationsData
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.data.domain.Pageable
@@ -41,7 +41,7 @@ class RelationsGoldenRecordTaskService(
     private val taskConfigProperties: TaskConfigProperties,
     private val relationsResponseMapper: RelationsResponseMapper,
     private val relationsTaskRepository: RelationsGoldenRecordTaskRepository,
-    private val gateRecordRepository: GateRecordRepository,
+    private val sharingMemberRecordRepository: SharingMemberRecordRepository,
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -127,11 +127,11 @@ class RelationsGoldenRecordTaskService(
             }
     }
 
-    private fun getOrCreateGateRecords(requests: List<TaskCreateRelationsRequestEntry>): List<GateRecordDb> {
+    private fun getOrCreateGateRecords(requests: List<TaskCreateRelationsRequestEntry>): List<SharingMemberRecordDb> {
         val privateIds = requests.map { request -> request.recordId?.let { toUUID(it) } }
         val notNullPrivateIds = privateIds.filterNotNull()
 
-        val foundRecords = gateRecordRepository.findByPrivateIdIn(notNullPrivateIds.toSet())
+        val foundRecords = sharingMemberRecordRepository.findByPrivateIdIn(notNullPrivateIds.toSet())
         val foundRecordsByPrivateId = foundRecords.associateBy { it.privateId }
         val requestedNotFoundRecords = notNullPrivateIds.minus(foundRecordsByPrivateId.keys)
 
@@ -139,8 +139,8 @@ class RelationsGoldenRecordTaskService(
             throw BpdmRecordNotFoundException(requestedNotFoundRecords)
 
         return privateIds.map { privateId ->
-            val gateRecord = privateId?.let { foundRecordsByPrivateId[it] } ?: GateRecordDb(publicId = UUID.randomUUID(), privateId = UUID.randomUUID())
-            gateRecordRepository.save(gateRecord)
+            val gateRecord = privateId?.let { foundRecordsByPrivateId[it] } ?: SharingMemberRecordDb(publicId = UUID.randomUUID(), privateId = UUID.randomUUID(), isGoldenRecordCounted = true)
+            sharingMemberRecordRepository.save(gateRecord)
         }
     }
 
@@ -151,7 +151,7 @@ class RelationsGoldenRecordTaskService(
             throw BpdmTaskNotFoundException(uuidString)
         }
 
-    private fun abortOutdatedTasks(records: Set<GateRecordDb>){
+    private fun abortOutdatedTasks(records: Set<SharingMemberRecordDb>){
         return relationsTaskRepository.findTasksByGateRecordInAndProcessingStateResultState(records, RelationsGoldenRecordTaskDb.ResultState.Pending)
             .forEach { task -> relationsGoldenRecordTaskStateMachine.doAbortTask(task) }
     }
