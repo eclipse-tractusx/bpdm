@@ -51,12 +51,13 @@ class StepUtils(
         } as SharingStateType
     }
 
-    fun waitForBusinessPartnerResultConfidenceSync(externalId: String): BusinessPartnerOutputDto = runBlocking {
+    fun waitForBusinessPartnerResultConfidenceSync(externalId: String, expectedLegalEntityNumberOfSharingMembers: Int): BusinessPartnerOutputDto = runBlocking {
         println("Waiting for business partner result confidences to stabilize for $externalId ...")
         withTimeout(Duration.ofMinutes(2)) {
             while (true) {
                 val currentOutput = gateClient.businessParters.getBusinessPartnersOutput(listOf(externalId), PaginationRequest()).content.single()
-                if(currentOutput.address.confidenceCriteria.numberOfSharingMembers == 1){
+                if(currentOutput.address.confidenceCriteria.numberOfSharingMembers == 1
+                    && currentOutput.legalEntity.confidenceCriteria.numberOfSharingMembers == expectedLegalEntityNumberOfSharingMembers){
                     return@withTimeout currentOutput
                 }
                 delay(Duration.ofSeconds(10))

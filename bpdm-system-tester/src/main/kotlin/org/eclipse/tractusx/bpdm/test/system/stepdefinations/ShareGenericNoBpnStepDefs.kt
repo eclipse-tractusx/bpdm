@@ -71,7 +71,7 @@ class ShareGenericNoBpnStepDefs(
             .copy(isOwnCompanyData = true)
 
         stepUtils.waitForBusinessPartnerResult(expectedOutput.externalId)
-        stepUtils.waitForBusinessPartnerResultConfidenceSync(expectedOutput.externalId)
+        stepUtils.waitForBusinessPartnerResultConfidenceSync(expectedOutput.externalId, expectedLegalEntityNumberOfSharingMembers)
 
         val actualOutput = gateClient.businessParters.getBusinessPartnersOutput(listOf(expectedOutput.externalId), PaginationRequest()).content.single()
 
