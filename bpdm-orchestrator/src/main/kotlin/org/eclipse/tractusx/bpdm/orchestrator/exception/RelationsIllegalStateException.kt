@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.orchestrator.exception
 
-import org.eclipse.tractusx.bpdm.orchestrator.entity.GoldenRecordTaskDb
 import org.eclipse.tractusx.bpdm.orchestrator.entity.RelationsGoldenRecordTaskDb
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ResponseStatus

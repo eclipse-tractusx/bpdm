@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.gate.model.upsert.output
 
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
 import org.eclipse.tractusx.bpdm.gate.api.model.SharableRelationType
 
 data class Relation(

@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.model.request
 
-import org.eclipse.tractusx.bpdm.common.dto.*
+import org.eclipse.tractusx.bpdm.common.dto.IBaseSiteDto
 import org.eclipse.tractusx.bpdm.pool.api.model.ConfidenceCriteriaDto
 import org.eclipse.tractusx.bpdm.pool.api.model.SiteStateDto
 

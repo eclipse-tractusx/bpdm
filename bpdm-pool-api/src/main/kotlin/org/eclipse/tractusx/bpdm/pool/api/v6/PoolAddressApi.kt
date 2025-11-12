@@ -29,10 +29,10 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.util.CommonApiPathNames
 import org.eclipse.tractusx.bpdm.pool.api.ApiCommons
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerCreateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerUpdateResponseWrapper
 import org.springdoc.core.annotations.ParameterObject

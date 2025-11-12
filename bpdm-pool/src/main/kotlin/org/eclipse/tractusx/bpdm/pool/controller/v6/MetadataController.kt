@@ -24,9 +24,9 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.v6.PoolMetadataApi
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalFormRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalFormDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalFormRequest
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.springframework.data.domain.PageRequest
 import org.springframework.security.access.prepost.PreAuthorize

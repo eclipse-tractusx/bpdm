@@ -24,9 +24,9 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDetailDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalFormDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalFormRequest
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDetailDb
 import org.eclipse.tractusx.bpdm.pool.entity.LegalFormDb

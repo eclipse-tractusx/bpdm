@@ -21,11 +21,11 @@ package org.eclipse.tractusx.bpdm.pool.controller.v6
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.v6.PoolAddressApi
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.v6.PoolAddressApi
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerCreateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerUpdateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties

@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.gate.api.model.request
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
 import org.eclipse.tractusx.bpdm.gate.api.model.SharableRelationType
 import java.time.Instant
 

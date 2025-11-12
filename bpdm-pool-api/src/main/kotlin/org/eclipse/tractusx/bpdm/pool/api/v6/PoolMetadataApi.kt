@@ -35,7 +35,10 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalFormDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalFormRequest
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
 
 
 @RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
