@@ -58,9 +58,9 @@ abstract class BaseEntity(
 
     @Column(updatable = false, nullable = false, name = "CREATED_AT")
     @CreationTimestamp
-    val createdAt: Instant = Instant.now().truncatedTo(ChronoUnit.MICROS),
+    val createdAt: Instant = Instant.now().truncatedTo(ChronoUnit.NANOS),
 
     @Column(nullable = false, name = "UPDATED_AT")
     @UpdateTimestamp
-    var updatedAt: Instant = Instant.now().truncatedTo(ChronoUnit.MICROS)
+    var updatedAt: Instant = Instant.now().truncatedTo(ChronoUnit.NANOS)
 )
