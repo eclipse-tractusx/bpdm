@@ -401,6 +401,34 @@ class SiteControllerIT @Autowired constructor(
     }
 
     /**
+     * GIVEN legal entity with legal address site
+     * WHEN creating a new legal address site
+     * THEN for these site entity an error is returned
+     */
+    @Test
+    fun `try create duplicate legal address site`(){
+        //GIVEN
+        val givenLegalEntity =
+            poolClient.legalEntities.createBusinessPartners(listOf(BusinessPartnerNonVerboseValues.legalEntityCreate1)).entities
+        val bpnL = givenLegalEntity.first().legalEntity.bpnl
+        val toCreate = listOf(
+            BusinessPartnerNonVerboseValues.siteLegalReferenceUpsert1.copy(bpnLParent = bpnL),
+        )
+        val legalEntityResponse = poolClient.sites.createSiteWithLegalReference(toCreate)
+
+        //WHEN
+        val siteRequest = listOf(
+            BusinessPartnerNonVerboseValues.siteLegalReferenceUpsert2.copy(bpnLParent = bpnL),
+        )
+        val response = poolClient.sites.createSiteWithLegalReference(siteRequest)
+
+        //THEN
+        val expectedError = ErrorInfo(SiteCreateError.MainAddressDuplicateIdentifier, "Can't create site for legal entity $bpnL with legal address as site main address: Legal address already belongs to site ${legalEntityResponse.entities.first().site.bpns}", BusinessPartnerNonVerboseValues.siteLegalReferenceUpsert2.name)
+        assertThat(response.errorCount).isEqualTo(1)
+        testHelpers.assertErrorResponse(response.errors.first(), SiteCreateError.MainAddressDuplicateIdentifier, expectedError.entityKey!!)
+    }
+
+    /**
      * Given sites
      * When updating sites via BPN
      * Then update those sites

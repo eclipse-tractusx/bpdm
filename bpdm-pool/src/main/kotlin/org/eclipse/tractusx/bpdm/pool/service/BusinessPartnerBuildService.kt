@@ -114,14 +114,26 @@ class BusinessPartnerBuildService(
         val bpnSs = bpnIssuingService.issueSiteBpns(requests.size)
 
         val createdSites = requests.zip(bpnSs).map { (siteRequest, bpnS) ->
-            val legalEntityParent =
-                legalEntitiesByBpn[siteRequest.bpnLParent] ?: throw BpdmValidationException("Parent ${siteRequest.bpnLParent} not found for site to create")
+            if (legalEntitiesByBpn[siteRequest.bpnLParent] == null) {
+                return SitePartnerCreateResponseWrapper(emptyList(), listOf(
+                    ErrorInfo(
+                        SiteCreateError.LegalEntityNotFound,
+                        "Parent ${siteRequest.bpnLParent} not found for site to create",
+                        siteRequest.bpnLParent
+                    )
+                ))
+            } else if (legalEntitiesByBpn[siteRequest.bpnLParent]!!.legalAddress.site != null) {
+                return SitePartnerCreateResponseWrapper(emptyList(), listOf(
+                    ErrorInfo(
+                        SiteCreateError.MainAddressDuplicateIdentifier,
+                        "Can't create site for legal entity ${siteRequest.bpnLParent} with legal address as site main address: Legal address already belongs to site ${legalEntitiesByBpn[siteRequest.bpnLParent]!!.legalAddress.site!!.bpn}",
+                        siteRequest.name
+                    )
+                ))
+            }
 
-            if(legalEntityParent.legalAddress.site != null)
-                throw BpdmValidationException("Can't create site for legal entity ${siteRequest.bpnLParent} with legal address as site main address: Legal address already belongs to site ${legalEntityParent.legalAddress.site!!.bpn}")
-
-            createSite(siteRequest, bpnS, legalEntityParent)
-                .apply { mainAddress = legalEntityParent.legalAddress }
+            createSite(siteRequest, bpnS, legalEntitiesByBpn[siteRequest.bpnLParent]!!)
+                .apply { mainAddress = legalEntitiesByBpn[siteRequest.bpnLParent]!!.legalAddress }
                 .apply { mainAddress.site = this }
         }
 

@@ -100,12 +100,8 @@ class SiteCreationIT: OperatorTest() {
      * GIVEN legal entity with legal address site
      * WHEN operator tries to create a new legal address site
      * THEN operator sees error
-     *
-     * ToDo:
-     *  Wrong error response: https://github.com/eclipse-tractusx/bpdm/issues/1471
      */
     @Test
-    @Disabled
     fun `try create duplicate legal address site`(){
         //GIVEN
         val legalEntityResponse = testDataClient.createLegalEntity(testName)
@@ -116,7 +112,7 @@ class SiteCreationIT: OperatorTest() {
         val response = poolClient.sites.createSiteWithLegalReference(listOf(siteRequest))
 
         //THEN
-        val expectedError = ErrorInfo(SiteCreateError.LegalEntityNotFound, "IGNORED", "0")
+        val expectedError = ErrorInfo(SiteCreateError.MainAddressDuplicateIdentifier, "Can't create site for legal entity ${siteRequest.bpnLParent} with legal address as site main address: Legal address already belongs to site ${legalEntityResponse.legalAddress.bpnSite}", siteRequest.name)
         val expectedResponse = SitePartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertLegalAddressSiteCreate(response, expectedResponse)
