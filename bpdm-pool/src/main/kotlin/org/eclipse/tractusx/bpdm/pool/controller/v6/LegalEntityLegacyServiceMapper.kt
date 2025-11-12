@@ -57,6 +57,7 @@ import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService.Compan
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService.Companion.toLegalEntityState
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService.LegalEntityMetadataMapping
 import org.eclipse.tractusx.bpdm.pool.service.RequestValidationService.*
+import org.eclipse.tractusx.bpdm.pool.util.SearchNormalization
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
@@ -558,6 +559,7 @@ class LegalEntityLegacyServiceMapper(
         legalEntity.currentness = createCurrentnessTimestamp()
 
         legalEntity.legalName = NameDb(value = legalEntityDto.legalName, shortName = legalEntityDto.legalShortName)
+        legalEntity.legalNameNormalized = SearchNormalization.normalize(legalEntityDto.legalName)
 
         legalEntity.legalForm = legalEntityDto.legalForm?.let { metadataMap.legalForms[it]!! }
 

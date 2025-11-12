@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.entity
 
 import com.neovisionaries.i18n.CountryCode
 import jakarta.persistence.*
+import org.eclipse.tractusx.bpdm.pool.util.SearchNormalization
 
 @Embeddable
 class PhysicalPostalAddressDb(
@@ -33,6 +34,9 @@ class PhysicalPostalAddressDb(
     @Column(name = "phy_country")
     @Enumerated(EnumType.STRING)
     val country: CountryCode,
+
+    @Column(name = "phy_country_normalized", nullable = false)
+    val countryNormalized: String = SearchNormalization.normalize(country),
 
     /**
      * Region within the country
@@ -94,6 +98,9 @@ class PhysicalPostalAddressDb(
     @AttributeOverride(name = "nameSuffix", column = Column(name = "phy_street_name_suffix"))
     @AttributeOverride(name = "additionalNameSuffix", column = Column(name = "phy_street_additional_name_suffix"))
     val street: StreetDb? = null,
+
+    @Column(name = "phy_street_name_normalized")
+    val streetNameNormalized: String? = SearchNormalization.normalizeOrNull(street?.name),
 
     // specific for PhysicalPostalAddress
 

@@ -17,25 +17,30 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.client
+package org.eclipse.tractusx.bpdm.pool.util
+import com.neovisionaries.i18n.CountryCode
 
-interface PoolApiClient {
+object SearchNormalization {
+    private val replacements = listOf(
+        "ä" to "ae",
+        "ö" to "oe",
+        "ü" to "ue",
+        "ß" to "ss"
+    )
 
-    val addresses: AddressApiClient
+    fun normalize(input: String): String {
+        var normalized = input.lowercase()
+            .trim()
+            .replace("\\s+".toRegex(), " ")
 
-    val bpns: BpnApiClient
+        replacements.forEach { (target, replacement) ->
+            normalized = normalized.replace(target, replacement)
+        }
 
-    val changelogs: ChangeLogApiClient
+        return normalized
+    }
 
-    val legalEntities: LegalEntityApiClient
+    fun normalizeOrNull(input: String?): String? = input?.let { normalize(it) }
 
-    val metadata: MetadataApiClient
-
-    val sites: SiteApiClient
-
-    val members: MembersApiClient
-
-    val participants: DataSpaceParticipantsApiClient
-
-    val businessPartners: BusinessPartnersApiClient
+    fun normalize(country: CountryCode): String = normalize(country.toString())
 }

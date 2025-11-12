@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.entity
 
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
+import org.eclipse.tractusx.bpdm.pool.util.SearchNormalization
 import java.time.Instant
 
 @Entity
@@ -34,6 +35,9 @@ class LegalEntityDb(
 
     @Embedded
     var legalName: NameDb,
+
+    @Column(name = "legal_name_normalized", nullable = false)
+    var legalNameNormalized: String = SearchNormalization.normalize(legalName.value),
 
     @ManyToOne
     @JoinColumn(name = "legal_form_id")
