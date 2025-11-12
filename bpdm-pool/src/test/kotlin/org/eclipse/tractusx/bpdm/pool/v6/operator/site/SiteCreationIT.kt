@@ -26,6 +26,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteCreateError
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.controller.v6.LegalEntityLegacyServiceMapper.Companion.IDENTIFIER_AMOUNT_LIMIT
 import org.eclipse.tractusx.bpdm.pool.v6.operator.OperatorTest
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -265,12 +266,8 @@ class SiteCreationIT: OperatorTest() {
      * GIVEN legal entity
      * WHEN operator tries to create a new site for legal entity with too many identifiers
      * THEN operator sees region not found error
-     *
-     * ToDo:
-     *  At the moment not as expected: https://github.com/eclipse-tractusx/bpdm/issues/1464
      */
     @Test
-    @Disabled
     fun `try create site with too many identifiers`(){
         //GIVEN
         val legalEntityResponse = testDataClient.createLegalEntity(testName)
@@ -282,7 +279,7 @@ class SiteCreationIT: OperatorTest() {
         val siteResponse = poolClient.sites.createSite(listOf(siteRequest))
 
         //THEN
-        val expectedError = ErrorInfo(SiteCreateError.MainAddressRegionNotFound, "IGNORED", siteRequest.index)
+        val expectedError = ErrorInfo(SiteCreateError.MainAddressIdentifiersTooMany, "Amount of identifiers (101) exceeds limit of $IDENTIFIER_AMOUNT_LIMIT", siteRequest.index)
         val expectedResponse = SitePartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertSiteCreate(siteResponse, expectedResponse)

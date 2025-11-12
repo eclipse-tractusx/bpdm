@@ -80,6 +80,10 @@ class LegalEntityLegacyServiceMapper(
     private val businessPartnerEquivalenceMapper: BusinessPartnerEquivalenceMapper
 ) {
 
+    companion object{
+        const val IDENTIFIER_AMOUNT_LIMIT = 100
+    }
+
     private val logger = KotlinLogging.logger { }
 
     /**
@@ -315,7 +319,8 @@ class LegalEntityLegacyServiceMapper(
             val validationErrors =
                 legalFormValidator.validate(legalEntityDto, request) +
                         identifierValidator.validate(legalEntityDto, request) +
-                        duplicatesValidator.validate(legalEntityDto, request, bpn = null)
+                        duplicatesValidator.validate(legalEntityDto, request, bpn = null) +
+                        validateLegalEntityIdentifierTooMany(legalEntityDto, request, LegalEntityCreateError.LegalEntityIdentifiersTooMany)
             request to validationErrors
         }.filterValues { it.isNotEmpty() }
     }
@@ -414,7 +419,8 @@ class LegalEntityLegacyServiceMapper(
             val validationErrors =
                 regionValidator.validate(legalAddressDto, request) +
                         identifiersValidator.validate(legalAddressDto, request) +
-                        identifiersDuplicateValidator.validate(legalAddressDto, request, bridge.bpnA)
+                        identifiersDuplicateValidator.validate(legalAddressDto, request, bridge.bpnA) +
+                        validateAddressIdentifierTooMany(legalAddressDto, request, messages.identifiersTooMany)
 
             if (validationErrors.isNotEmpty()) {
                 val existing = result[request]
@@ -725,7 +731,8 @@ class LegalEntityLegacyServiceMapper(
                 legalFormValidator.validate(legalEntity, requestBridge.request) +
                         identifierValidator.validate(legalEntity, requestBridge.request) +
                         duplicatesValidator.validate(legalEntity, requestBridge.request, requestBridge.bpnL) +
-                        existingBpnValidator.validate(requestBridge.bpnL)
+                        existingBpnValidator.validate(requestBridge.bpnL) +
+                        validateLegalEntityIdentifierTooMany(legalEntity, requestBridge.request, LegalEntityUpdateError.LegalEntityIdentifiersTooMany)
             requestBridge.request to validationErrors
         }.filterValues { it.isNotEmpty() }
     }
@@ -749,6 +756,19 @@ class LegalEntityLegacyServiceMapper(
         duplicateIdentifier = LegalEntityUpdateError.LegalAddressDuplicateIdentifier,
         identifiersTooMany = LegalEntityUpdateError.LegalAddressIdentifiersTooMany
     )
+
+    private fun <ERROR: ErrorCode> validateLegalEntityIdentifierTooMany(legalEntity: IBaseLegalEntityDto, entityKey: RequestWithKey, errorCode: ERROR): Collection<ErrorInfo<ERROR>>{
+        return  validatedIdentifiersTooMany(legalEntity.identifiers.size, entityKey, errorCode)
+    }
+
+    private fun <ERROR: ErrorCode> validateAddressIdentifierTooMany(address: IBaseLogisticAddressDto, entityKey: RequestWithKey, errorCode: ERROR): Collection<ErrorInfo<ERROR>>{
+        return validatedIdentifiersTooMany(address.identifiers.size, entityKey, errorCode)
+    }
+
+    private fun  <ERROR: ErrorCode> validatedIdentifiersTooMany(identifierAmount: Int, entityKey: RequestWithKey, errorCode: ERROR): Collection<ErrorInfo<ERROR>>{
+        return if(identifierAmount > IDENTIFIER_AMOUNT_LIMIT) listOf(ErrorInfo(errorCode, "Amount of identifiers ($identifierAmount) exceeds limit of $IDENTIFIER_AMOUNT_LIMIT", entityKey.getRequestKey()))
+        else emptyList()
+    }
 
 
 

@@ -23,6 +23,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressUpdateError
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerUpdateResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.controller.v6.LegalEntityLegacyServiceMapper.Companion.IDENTIFIER_AMOUNT_LIMIT
 import org.eclipse.tractusx.bpdm.pool.v6.operator.OperatorTest
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -256,12 +257,8 @@ class AddressUpdate: OperatorTest() {
      * GIVEN address
      * WHEN operator tries to update the address with too many identifiers
      * THEN operator sees too many identifiers error
-     *
-     * ToDo:
-     *  Does not work at the moment https://github.com/eclipse-tractusx/bpdm/issues/1464
      */
     @Test
-    @Disabled
     fun `try update address with too many identifiers`(){
         //GIVEN
         val legalEntityResponse = testDataClient.createLegalEntity(testName)
@@ -274,7 +271,7 @@ class AddressUpdate: OperatorTest() {
         val addressResponse = poolClient.addresses.updateAddresses(listOf(addressRequest))
 
         //THEN
-        val expectedError = ErrorInfo(AddressUpdateError.IdentifiersTooMany, "IGNORED", addressRequest.bpna)
+        val expectedError = ErrorInfo(AddressUpdateError.IdentifiersTooMany, "Amount of identifiers (101) exceeds limit of $IDENTIFIER_AMOUNT_LIMIT", addressRequest.bpna)
         val expectedResponse = AddressPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertAddressUpdate(addressResponse, expectedResponse)

@@ -36,6 +36,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerCreateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerUpdateResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.controller.v6.LegalEntityLegacyServiceMapper.Companion.IDENTIFIER_AMOUNT_LIMIT
 import org.eclipse.tractusx.bpdm.pool.dto.AddressMetadataDto
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
@@ -175,8 +176,8 @@ class AddressLegacyServiceMapper(
                 regionValidator.validate(address, request) +
                         identifiersValidator.validate(address, request) +
                         identifiersDuplicateValidator.validate(address, request, bpn = null) +
-                        parentValidator.validate(request.bpnParent, request)
-
+                        parentValidator.validate(request.bpnParent, request) +
+                        validateAddressIdentifierTooMany(address, request, AddressCreateError.IdentifiersTooMany)
             validationErrors
         }.filterValues { it.isNotEmpty() }
     }
@@ -455,7 +456,8 @@ class AddressLegacyServiceMapper(
             val validationErrors = regionValidator.validate(address, request) +
                     identifiersValidator.validate(address, request) +
                     identifiersDuplicateValidator.validate(address, request, request.bpna) +
-                    existingBpnValidator.validate(request.bpna)
+                    existingBpnValidator.validate(request.bpna) +
+                    validateAddressIdentifierTooMany(address, request, AddressUpdateError.IdentifiersTooMany)
             validationErrors
         }.filterValues { it.isNotEmpty() }
     }
@@ -471,6 +473,15 @@ class AddressLegacyServiceMapper(
             else
                 emptyList()
         }
+    }
+
+    private fun <ERROR: ErrorCode> validateAddressIdentifierTooMany(address: IBaseLogisticAddressDto, entityKey: RequestWithKey, errorCode: ERROR): Collection<ErrorInfo<ERROR>>{
+        return validatedIdentifiersTooMany(address.identifiers.size, entityKey, errorCode)
+    }
+
+    private fun  <ERROR: ErrorCode> validatedIdentifiersTooMany(identifierAmount: Int, entityKey: RequestWithKey, errorCode: ERROR): Collection<ErrorInfo<ERROR>>{
+        return if(identifierAmount > IDENTIFIER_AMOUNT_LIMIT) listOf(ErrorInfo(errorCode, "Amount of identifiers ($identifierAmount) exceeds limit of $IDENTIFIER_AMOUNT_LIMIT", entityKey.getRequestKey()))
+        else emptyList()
     }
 
 

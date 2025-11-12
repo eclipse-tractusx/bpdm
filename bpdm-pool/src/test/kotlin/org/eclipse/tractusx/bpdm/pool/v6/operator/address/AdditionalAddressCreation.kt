@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressCreateError
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerCreateResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.controller.v6.LegalEntityLegacyServiceMapper.Companion.IDENTIFIER_AMOUNT_LIMIT
 import org.eclipse.tractusx.bpdm.pool.v6.operator.OperatorTest
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -227,12 +228,8 @@ class AdditionalAddressCreation: OperatorTest() {
      * GIVEN legal entity
      * WHEN operator tries to create a new additional address with too many identifiers
      * THEN operator sees too many identifiers error
-     *
-     * ToDo:
-     *  Currently not working: https://github.com/eclipse-tractusx/bpdm/issues/1464
      */
     @Test
-    @Disabled
     fun `try create additional address with too many identifiers`(){
         //GIVEN
         val legalEntityResponse = testDataClient.createLegalEntity(testName)
@@ -245,7 +242,7 @@ class AdditionalAddressCreation: OperatorTest() {
 
 
         //THEN
-        val expectedError = ErrorInfo(AddressCreateError.IdentifiersTooMany, "IGNORED", addressRequest.index)
+        val expectedError = ErrorInfo(AddressCreateError.IdentifiersTooMany, "Amount of identifiers (101) exceeds limit of $IDENTIFIER_AMOUNT_LIMIT", addressRequest.index)
         val expectedResponse = AddressPartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertAdditionalAddressCreate(addressResponse, expectedResponse)

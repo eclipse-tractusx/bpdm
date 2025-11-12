@@ -27,6 +27,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntitySearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityCreateError
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.controller.v6.LegalEntityLegacyServiceMapper.Companion.IDENTIFIER_AMOUNT_LIMIT
 import org.eclipse.tractusx.bpdm.pool.v6.operator.OperatorTest
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -277,12 +278,8 @@ class LegalEntityCreationIT: OperatorTest() {
     /**
      * WHEN operator tries to create a new legal entity with too many identifiers
      * THEN operator sees error entry in response
-     *
-     * ToDo:
-     * At the moment not as expected: https://github.com/eclipse-tractusx/bpdm/issues/1464
      */
     @Test
-    @Disabled
     fun `try create legal entity with too many identifiers`(){
         //WHEN
         val newLegalEntityRequest = with(testDataFactory.request.buildLegalEntityCreateRequest(testName)){
@@ -300,12 +297,8 @@ class LegalEntityCreationIT: OperatorTest() {
     /**
      * WHEN operator tries to create a new legal entity with too many legal address identifiers
      * THEN operator sees error entry in response
-     *
-     * ToDo:
-     * At the moment not as expected: https://github.com/eclipse-tractusx/bpdm/issues/1464
      */
     @Test
-    @Disabled
     fun `try create legal entity with too many legal address identifiers`(){
         //WHEN
         val newLegalEntityRequest = with(testDataFactory.request.buildLegalEntityCreateRequest(testName)){
@@ -315,7 +308,7 @@ class LegalEntityCreationIT: OperatorTest() {
         val creationResponse = poolClient.legalEntities.createBusinessPartners(listOf(newLegalEntityRequest))
 
         //THEN
-        val expectedError = ErrorInfo(LegalEntityCreateError.LegalAddressIdentifiersTooMany, "IGNORED", newLegalEntityRequest.index)
+        val expectedError = ErrorInfo(LegalEntityCreateError.LegalAddressIdentifiersTooMany, "Amount of identifiers (101) exceeds limit of $IDENTIFIER_AMOUNT_LIMIT", newLegalEntityRequest.index)
         val expectedResponse = LegalEntityPartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
         assertRepository.assertLegalEntityCreate(creationResponse, expectedResponse)
     }
