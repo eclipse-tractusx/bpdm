@@ -117,7 +117,6 @@ class GoldenRecordTaskStateMachineIT @Autowired constructor(
         allSteps.forEach { step ->
             assertProcessingState(task.processingState, GoldenRecordTaskDb.ResultState.Pending, step, GoldenRecordTaskDb.StepState.Queued)
             // taskPendingTimeout has been set
-            val taskPendingTimeout = task.processingState.pendingTimeout
             assertThat(task.processingState.pendingTimeout?.instant).isCloseTo(Instant.now().plus(taskConfigProperties.taskPendingTimeout), WITHIN_ALLOWED_TIME_OFFSET)
 
             // reserve

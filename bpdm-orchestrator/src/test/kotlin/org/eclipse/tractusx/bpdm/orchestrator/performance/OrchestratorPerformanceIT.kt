@@ -43,7 +43,7 @@ import java.util.*
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class OrchestratorPerformanceIT@Autowired constructor(
     private val orchestratorClient: OrchestrationApiClient,
-    private val stateMachineConfigProperties: StateMachineConfigProperties
+    stateMachineConfigProperties: StateMachineConfigProperties
 ) {
 
     private val testDataFactory = BusinessPartnerTestDataFactory()

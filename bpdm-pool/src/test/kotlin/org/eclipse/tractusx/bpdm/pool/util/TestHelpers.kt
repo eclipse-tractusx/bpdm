@@ -20,14 +20,11 @@
 package org.eclipse.tractusx.bpdm.pool.util
 
 import org.assertj.core.api.Assertions
-import org.eclipse.tractusx.bpdm.common.model.SyncStatus
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.request.IdentifiersSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorCode
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SyncDto
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
-import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues
 import org.eclipse.tractusx.bpdm.test.testdata.pool.LegalEntityStructureRequest
 import org.eclipse.tractusx.bpdm.test.testdata.pool.LegalEntityStructureResponse
 import org.eclipse.tractusx.bpdm.test.testdata.pool.SiteStructureResponse
@@ -35,14 +32,7 @@ import org.junit.Assert
 import org.junit.jupiter.api.assertThrows
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
-import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.web.reactive.function.client.WebClientResponseException
-import java.time.Instant
-
-
-private const val ASYNC_TIMEOUT_IN_MS: Long = 5 * 1000 //5 seconds
-private const val ASYNC_CHECK_INTERVAL_IN_MS: Long = 200
-
 
 @Component
 class TestHelpers(
@@ -143,41 +133,6 @@ class TestHelpers(
             Assert.assertEquals(HttpStatus.NOT_FOUND, e.statusCode)
         }
     }
-
-
-    /**
-     * Creates metadata needed for test data defined in the [BusinessPartnerNonVerboseValues]
-     */
-
-
-    fun startSyncAndAwaitSuccess(client: WebTestClient, syncPath: String): SyncDto {
-        return startSyncAndAwaitResult(client, syncPath, SyncStatus.SUCCESS)
-    }
-
-
-
-    private fun startSyncAndAwaitResult(client: WebTestClient, syncPath: String, status: SyncStatus): SyncDto {
-
-        client.invokePostEndpointWithoutResponse(syncPath)
-        //check for async import to finish several times
-        val timeOutAt = Instant.now().plusMillis(ASYNC_TIMEOUT_IN_MS)
-        var syncResponse: SyncDto
-        do {
-            Thread.sleep(ASYNC_CHECK_INTERVAL_IN_MS)
-
-            syncResponse = client.invokeGetEndpoint(syncPath)
-
-            if (syncResponse.status == status)
-                break
-
-        } while (Instant.now().isBefore(timeOutAt))
-
-        Assertions.assertThat(syncResponse.status).isEqualTo(status)
-
-        return syncResponse
-    }
-
-
 
     fun <ERROR : ErrorCode> assertErrorResponse(errorResponse: ErrorInfo<ERROR>, codeToCheck: ERROR, keyToCheck: String) {
         Assertions.assertThat(errorResponse.entityKey).isEqualTo(keyToCheck)

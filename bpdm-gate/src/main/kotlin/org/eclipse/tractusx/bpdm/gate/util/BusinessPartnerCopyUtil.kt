@@ -21,8 +21,10 @@ package org.eclipse.tractusx.bpdm.gate.util
 
 import org.eclipse.tractusx.bpdm.common.util.copyAndSync
 import org.eclipse.tractusx.bpdm.common.util.replace
-import org.eclipse.tractusx.bpdm.gate.entity.RelationOutputDb
-import org.eclipse.tractusx.bpdm.gate.entity.generic.*
+import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
+import org.eclipse.tractusx.bpdm.gate.entity.generic.IdentifierDb
+import org.eclipse.tractusx.bpdm.gate.entity.generic.PostalAddressDb
+import org.eclipse.tractusx.bpdm.gate.entity.generic.StateDb
 import org.springframework.stereotype.Component
 
 @Component
@@ -49,7 +51,6 @@ class BusinessPartnerCopyUtil {
             roles.replace(fromPartner.roles)
 
             states.copyAndSync(fromPartner.states, ::copyValues)
-            classifications.copyAndSync(fromPartner.classifications, ::copyValues)
             identifiers.copyAndSync(fromPartner.identifiers, ::copyValues)
 
             copyValues(fromPartner.postalAddress, postalAddress)
@@ -62,13 +63,6 @@ class BusinessPartnerCopyUtil {
             validTo = fromState.validTo
             type = fromState.type
             businessPartnerTyp = fromState.businessPartnerTyp
-        }
-
-    private fun copyValues(fromClassification: ClassificationDb, toClassification: ClassificationDb) =
-        toClassification.apply {
-            value = fromClassification.value
-            type = fromClassification.type
-            code = fromClassification.code
         }
 
     private fun copyValues(fromIdentifier: IdentifierDb, toIdentifier: IdentifierDb) =
@@ -85,13 +79,4 @@ class BusinessPartnerCopyUtil {
             physicalPostalAddress = fromPostalAddress.physicalPostalAddress
             alternativePostalAddress = fromPostalAddress.alternativePostalAddress
         }
-
-    private fun copyValues(fromRelation: RelationOutputDb, toRelation: RelationOutputDb) =
-        toRelation.apply {
-            relationType = fromRelation.relationType
-            sourceBpnL = fromRelation.sourceBpnL
-            targetBpnL = fromRelation.targetBpnL
-            updatedAt = fromRelation.updatedAt
-        }
-
 }

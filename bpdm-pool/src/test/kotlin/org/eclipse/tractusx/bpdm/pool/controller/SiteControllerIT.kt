@@ -265,8 +265,7 @@ class SiteControllerIT @Autowired constructor(
     @Test
     fun `create sites entities and get duplicate identifier error on address`() {
 
-        val givenLegalEntities =
-            poolClient.legalEntities.createBusinessPartners(listOf(BusinessPartnerNonVerboseValues.legalEntityCreate1, BusinessPartnerNonVerboseValues.legalEntityCreate2)).entities
+        poolClient.legalEntities.createBusinessPartners(listOf(BusinessPartnerNonVerboseValues.legalEntityCreate1, BusinessPartnerNonVerboseValues.legalEntityCreate2)).entities
 
         val request1 = with(BusinessPartnerNonVerboseValues.siteCreate1) {
             copy(
@@ -313,8 +312,7 @@ class SiteControllerIT @Autowired constructor(
     @Test
     fun `update site entities and get duplicate identifier error`() {
 
-        val givenLegalEntities =
-            poolClient.legalEntities.createBusinessPartners(listOf(BusinessPartnerNonVerboseValues.legalEntityCreate1, BusinessPartnerNonVerboseValues.legalEntityCreate2)).entities
+        poolClient.legalEntities.createBusinessPartners(listOf(BusinessPartnerNonVerboseValues.legalEntityCreate1, BusinessPartnerNonVerboseValues.legalEntityCreate2)).entities
 
         val toCreate1 = listOf(BusinessPartnerNonVerboseValues.siteCreate1, BusinessPartnerNonVerboseValues.siteCreate2)
         val response1 = poolClient.sites.createSite(toCreate1)
@@ -323,15 +321,7 @@ class SiteControllerIT @Autowired constructor(
         assertThat(response1.errorCount).isEqualTo(0)
         val bpnList = response1.entities.map { it.site.bpns }
 
-        // 2 equivalent identifiers (in regard to fields type and value) but different from the identifiers in the DB
-        val referenceIdentifier = BusinessPartnerNonVerboseValues.identifier3.copy(
-            issuingBody = BusinessPartnerNonVerboseValues.identifier1.issuingBody
-        )
-        val equivalentIdentifier = referenceIdentifier.copy(
-            issuingBody = BusinessPartnerNonVerboseValues.identifier2.issuingBody
-        )
-
-        // 3 requests using these equivalent identifiers & 1 different request
+        // requests using these equivalent identifiers & 1 different request
         val toUpdate1 = with(BusinessPartnerNonVerboseValues.siteUpdate1) {
             copy(
                 bpns = bpnList[0],

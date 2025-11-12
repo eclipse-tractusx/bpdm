@@ -19,5 +19,4 @@
 
 package org.eclipse.tractusx.bpdm.common.dto
 
-interface IStreetDetailedDto : IBaseStreetDto {
-}
+interface IStreetDetailedDto : IBaseStreetDto

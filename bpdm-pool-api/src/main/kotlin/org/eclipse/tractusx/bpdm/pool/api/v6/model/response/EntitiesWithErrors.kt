@@ -30,12 +30,7 @@ open class EntitiesWithErrors<ENTITY, out ERROR : ErrorCode>(
     open val entities: Collection<ENTITY>,
     @Schema(description = "Errors for not created entities")
     open val errors: Collection<ErrorInfo<ERROR>>
-) {
-    val entityCount: Int
-        get() = entities.size
-    val errorCount: Int
-        get() = errors.size
-}
+)
 
 @Schema(description = CommonDescription.headerEntityWithErrorsWrapper)
 data class LegalEntityPartnerCreateResponseWrapper(

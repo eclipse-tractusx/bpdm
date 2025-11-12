@@ -97,7 +97,7 @@ class RelationOutputControllerIT @Autowired constructor(
         createOutputRelation(relationId3, SharableRelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL4, relation3UpdateTime)
         createOutputRelation(relationId4, SharableRelationType.IsManagedBy, bpnL5, bpnL6, relation4UpdateTime)
 
-        val expected = PageDto<RelationOutputDto>(2, 1, 0, 2, listOf(
+        val expected = PageDto(2, 1, 0, 2, listOf(
             RelationOutputDto(relationId1, SharableRelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL2, GateTestValues.alwaysActiveRelationValidity, relation1UpdateTime),
             RelationOutputDto(relationId4, SharableRelationType.IsManagedBy, bpnL5, bpnL6, GateTestValues.alwaysActiveRelationValidity, relation4UpdateTime)
         ))
@@ -128,7 +128,7 @@ class RelationOutputControllerIT @Autowired constructor(
         createOutputRelation(relationId3, SharableRelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL4, relation3UpdateTime)
         createOutputRelation(relationId4, SharableRelationType.IsManagedBy, bpnL5, bpnL6, relation4UpdateTime)
 
-        val expectedAlternativeHeadquarterRelation = PageDto<RelationOutputDto>(3, 1, 0, 3, listOf(
+        val expectedAlternativeHeadquarterRelation = PageDto(3, 1, 0, 3, listOf(
             RelationOutputDto(relationId1, SharableRelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL2, GateTestValues.alwaysActiveRelationValidity, relation1UpdateTime),
             RelationOutputDto(relationId2, SharableRelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL3, GateTestValues.alwaysActiveRelationValidity, relation2UpdateTime),
             RelationOutputDto(relationId3, SharableRelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL4, GateTestValues.alwaysActiveRelationValidity, relation3UpdateTime)
@@ -137,7 +137,7 @@ class RelationOutputControllerIT @Autowired constructor(
 
         Assertions.assertThat(actualAlternativeHeadquarterRelation).isEqualTo(expectedAlternativeHeadquarterRelation)
 
-        val expectedManagedRelation = PageDto<RelationOutputDto>(1, 1, 0, 1, listOf(
+        val expectedManagedRelation = PageDto(1, 1, 0, 1, listOf(
             RelationOutputDto(relationId4, SharableRelationType.IsManagedBy, bpnL5, bpnL6, GateTestValues.alwaysActiveRelationValidity, relation4UpdateTime)
         ))
 
@@ -168,7 +168,7 @@ class RelationOutputControllerIT @Autowired constructor(
         createOutputRelation(relationId3, SharableRelationType.IsAlternativeHeadquarterFor, bpnL2, bpnL4, relation3UpdateTime)
         createOutputRelation(relationId4, SharableRelationType.IsManagedBy, bpnL5, bpnL6, relation4UpdateTime)
 
-        val expected = PageDto<RelationOutputDto>(2, 1, 0, 2, listOf(
+        val expected = PageDto(2, 1, 0, 2, listOf(
             RelationOutputDto(relationId1, SharableRelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL2, GateTestValues.alwaysActiveRelationValidity, relation1UpdateTime),
             RelationOutputDto(relationId4, SharableRelationType.IsManagedBy, bpnL5, bpnL6, GateTestValues.alwaysActiveRelationValidity, relation4UpdateTime)
         ))
@@ -199,7 +199,7 @@ class RelationOutputControllerIT @Autowired constructor(
         createOutputRelation(relationId3, SharableRelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL4, relation3UpdateTime)
         createOutputRelation(relationId4, SharableRelationType.IsManagedBy, bpnL5, bpnL6, relation4UpdateTime)
 
-        val expected = PageDto<RelationOutputDto>(2, 1, 0, 2, listOf(
+        val expected = PageDto(2, 1, 0, 2, listOf(
             RelationOutputDto(relationId1, SharableRelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL2, GateTestValues.alwaysActiveRelationValidity, relation1UpdateTime),
             RelationOutputDto(relationId4, SharableRelationType.IsManagedBy, bpnL5, bpnL6, GateTestValues.alwaysActiveRelationValidity, relation4UpdateTime)
         ))
@@ -230,7 +230,7 @@ class RelationOutputControllerIT @Autowired constructor(
         createOutputRelation(relationId3, SharableRelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL4, relation3UpdateTime)
         createOutputRelation(relationId4, SharableRelationType.IsManagedBy, bpnL5, bpnL6, relation4UpdateTime)
 
-        val expected = PageDto<RelationOutputDto>(2, 1, 0, 2, listOf(
+        val expected = PageDto(2, 1, 0, 2, listOf(
             RelationOutputDto(relationId3, SharableRelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL4, GateTestValues.alwaysActiveRelationValidity, relation3UpdateTime),
             RelationOutputDto(relationId4, SharableRelationType.IsManagedBy, bpnL5, bpnL6, GateTestValues.alwaysActiveRelationValidity, relation4UpdateTime)
         ))
@@ -273,7 +273,7 @@ class RelationOutputControllerIT @Autowired constructor(
         createOutputRelation(relationId5, SharableRelationType.IsManagedBy, bpnL9, bpnL10, relation5UpdateTime)
         createOutputRelation(relationId6, SharableRelationType.IsManagedBy, bpnL11, bpnL12, relation6UpdateTime)
 
-        val expectedAlternativeHeadquarterRelation = PageDto<RelationOutputDto>(1, 1, 0, 1, listOf(
+        val expectedAlternativeHeadquarterRelation = PageDto(1, 1, 0, 1, listOf(
             RelationOutputDto(relationId2, SharableRelationType.IsAlternativeHeadquarterFor, bpnL3, bpnL4, GateTestValues.alwaysActiveRelationValidity, relation2UpdateTime)
         ))
         val actualAlternativeHeadquarterRelation = gateClient.relationOutput.postSearch(RelationOutputSearchRequest(
@@ -286,7 +286,7 @@ class RelationOutputControllerIT @Autowired constructor(
 
         Assertions.assertThat(actualAlternativeHeadquarterRelation).isEqualTo(expectedAlternativeHeadquarterRelation)
 
-        val expectedManagedRelation = PageDto<RelationOutputDto>(2, 1, 0, 2, listOf(
+        val expectedManagedRelation = PageDto(2, 1, 0, 2, listOf(
             RelationOutputDto(relationId4, SharableRelationType.IsManagedBy, bpnL7, bpnL8, GateTestValues.alwaysActiveRelationValidity, relation4UpdateTime),
             RelationOutputDto(relationId5, SharableRelationType.IsManagedBy, bpnL9, bpnL10, GateTestValues.alwaysActiveRelationValidity, relation5UpdateTime)
         ))

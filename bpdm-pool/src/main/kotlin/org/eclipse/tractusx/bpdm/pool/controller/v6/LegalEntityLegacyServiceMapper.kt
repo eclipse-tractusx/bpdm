@@ -733,7 +733,7 @@ class LegalEntityLegacyServiceMapper(
         }.filterValues { it.isNotEmpty() }
     }
 
-    inner class ValidateUpdateBpnExists<ERROR : ErrorCode>(
+    class ValidateUpdateBpnExists<ERROR : ErrorCode>(
         private val existingBpns: Set<String>,
         private val errorCode: ERROR
     ) {

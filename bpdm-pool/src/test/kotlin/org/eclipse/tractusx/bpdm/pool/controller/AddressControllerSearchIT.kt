@@ -29,7 +29,6 @@ import org.eclipse.tractusx.bpdm.pool.util.TestHelpers
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues
 import org.eclipse.tractusx.bpdm.test.testdata.pool.LegalEntityStructureRequest
-import org.eclipse.tractusx.bpdm.test.testdata.pool.SiteStructureRequest
 import org.eclipse.tractusx.bpdm.test.util.AssertHelpers
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.junit.jupiter.api.BeforeEach
@@ -52,29 +51,6 @@ class AddressControllerSearchIT @Autowired constructor(
     val testHelpers: TestHelpers,
     val poolClient: PoolClientImpl
 ) {
-
-    // TODO Improve and reorganize our testdata
-    //  Currently our testdata is very limited, e.g. the same physical address (postalAddress1) is shared between regular address addressPartnerCreate1,
-    //  the legal address from legalEntityCreate1 and the main address from siteCreate1. This leads to unexpected results in the test cases.
-    //  Furthermore, it's not transparent in the test cases why some text search query should lead to some results. For that you need to dig through the
-    //  shared test data. Probably it would be better if each test case created its own test data with explicit values specific to the test case and
-    //  the expected result, ideally with minimal effort utilizing helper functions or probably Kotlin's powerful builders.
-
-    val partnerStructure1 = LegalEntityStructureRequest(
-        legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate1,
-        addresses = listOf(BusinessPartnerNonVerboseValues.addressPartnerCreate1, BusinessPartnerNonVerboseValues.addressPartnerCreate3)
-    )
-
-
-    val partnerStructure2 = LegalEntityStructureRequest(
-        legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate2,
-        siteStructures = listOf(
-            SiteStructureRequest(
-                site = BusinessPartnerNonVerboseValues.siteCreate1,
-                addresses = listOf(BusinessPartnerNonVerboseValues.addressPartnerCreate2)
-            )
-        )
-    )
 
     val partnerStructure3 = LegalEntityStructureRequest(
         legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate1,

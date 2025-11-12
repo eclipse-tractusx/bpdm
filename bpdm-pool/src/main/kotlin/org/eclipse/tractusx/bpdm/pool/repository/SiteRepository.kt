@@ -68,8 +68,6 @@ interface SiteRepository : JpaRepository<SiteDb, Long>, JpaSpecificationExecutor
 
     fun findByLegalEntity(legalEntity: LegalEntityDb, pageable: Pageable): Page<SiteDb>
 
-    fun findByLegalEntityInOrBpnIn(partners: Collection<LegalEntityDb>, bpns: Collection<String>, pageable: Pageable): Page<SiteDb>
-
     fun findByBpn(bpn: String): SiteDb?
 
     fun findDistinctByBpnIn(bpns: Collection<String>): Set<SiteDb>

@@ -24,7 +24,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 
 
 @Schema(description = "Contains keywords used for searching in legal entity properties")
-data class LegalEntityPropertiesSearchRequest constructor(
+data class LegalEntityPropertiesSearchRequest(
     @field:Parameter(description = "Filter legal entities by name")
     val legalName: String?
 ) {

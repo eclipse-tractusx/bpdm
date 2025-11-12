@@ -147,7 +147,7 @@ class RelationTaskResolutionServiceIT @Autowired constructor(
 
         relationTaskResolutionService.checkResolveTasks()
 
-        val expectedOutput = PageDto<RelationOutputDto>(1, 1, 0, 1, listOf(
+        val expectedOutput = PageDto(1, 1, 0, 1, listOf(
             RelationOutputDto(
                 relationId1,
                 when(relationType) {
@@ -160,7 +160,7 @@ class RelationTaskResolutionServiceIT @Autowired constructor(
                 GateTestValues.alwaysActiveRelationValidity,
                 anyTime)
         ))
-        val expectedSharingStates = PageDto<RelationSharingStateDto>(2, 1, 0, 2, listOf(
+        val expectedSharingStates = PageDto(2, 1, 0, 2, listOf(
             RelationSharingStateDto(relationId1, RelationSharingStateType.Success, null, null, taskId1, anyTime),
             RelationSharingStateDto(relationId2, RelationSharingStateType.Error, RelationSharingStateErrorCode.SharingProcessError, errorDescription, taskId2, anyTime)
         ))

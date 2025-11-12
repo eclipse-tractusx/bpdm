@@ -50,17 +50,6 @@ fun BusinessPartner.copyWithConfidenceCriteria(confidenceCriteria: ConfidenceCri
         additionalAddress = additionalAddress?.copy(confidenceCriteria = confidenceCriteria)
     )
 
-fun BusinessPartner.copyWithAddress(overWriteAddress: PostalAddress = PostalAddress.empty, applyToLegalAddress: Boolean, applyToSiteMainAddress: Boolean, applyToAdditionalAddress: Boolean) =
-    copy(
-        legalEntity = legalEntity.copy(
-            legalAddress = if(applyToLegalAddress) overWriteAddress else legalEntity.legalAddress
-        ),
-        site = site?.copy(
-            siteMainAddress = if(applyToSiteMainAddress) overWriteAddress else site?.siteMainAddress
-        ),
-        additionalAddress = if(applyToAdditionalAddress) overWriteAddress else additionalAddress
-    )
-
 fun BusinessPartner.copyWithLegalAddress(postalAddress: PostalAddress) =
     copy(
         legalEntity = legalEntity.copy(

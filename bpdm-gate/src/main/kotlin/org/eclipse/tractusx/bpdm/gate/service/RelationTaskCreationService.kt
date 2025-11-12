@@ -163,9 +163,8 @@ class RelationTaskCreationService(
     }
 
     // map a single RelationStateDb to the orchestrator DTO (never nullable unless you expect failure cases)
-    private fun RelationValidityPeriodDb.toOrchestratorModel():
-            org.eclipse.tractusx.orchestrator.api.model.RelationValidityPeriod {
-        return org.eclipse.tractusx.orchestrator.api.model.RelationValidityPeriod(validFrom = this.validFrom, validTo = this.validTo)
+    private fun RelationValidityPeriodDb.toOrchestratorModel(): RelationValidityPeriod {
+        return RelationValidityPeriod(validFrom = this.validFrom, validTo = this.validTo)
     }
 
 }

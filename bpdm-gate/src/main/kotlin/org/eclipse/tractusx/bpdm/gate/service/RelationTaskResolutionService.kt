@@ -135,7 +135,7 @@ class RelationTaskResolutionService(
         }
     }
 
-    private fun org.eclipse.tractusx.orchestrator.api.model.RelationValidityPeriod.toGateModel(): RelationValidityPeriodDto {
+    private fun RelationValidityPeriod.toGateModel(): RelationValidityPeriodDto {
         return RelationValidityPeriodDto(validFrom = this.validFrom, validTo = this.validTo)
     }
 

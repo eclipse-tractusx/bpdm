@@ -553,18 +553,6 @@ class BusinessPartnerBuildService(
             )
         }
 
-        fun toLegalEntityClassification(dto: IBaseClassificationDto, partner: LegalEntityDb): LegalEntityClassificationDb {
-
-            val dtoType = dto.type ?: throw BpdmValidationException(TaskStepBuildService.CleaningError.CLASSIFICATION_TYPE_IS_NULL.message)
-
-            return LegalEntityClassificationDb(
-                value = dto.value,
-                code = dto.code,
-                type = dtoType,
-                legalEntity = partner
-            )
-        }
-
         fun toLegalEntityIdentifier(
             dto: ILegalEntityIdentifierDto,
             idTypes: Map<String, IdentifierTypeDb>,

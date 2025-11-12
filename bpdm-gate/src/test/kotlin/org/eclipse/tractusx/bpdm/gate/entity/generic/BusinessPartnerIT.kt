@@ -45,7 +45,6 @@ import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
-import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
@@ -113,7 +112,6 @@ internal class BusinessPartnerIT @Autowired constructor(
         assertEquals(savedEntity.roles.toList(), foundEntity.roles.toList())
         assertEquals(savedEntity.nameParts.toList(), foundEntity.nameParts.toList())
         assertEquals(savedEntity.identifiers.toList(), foundEntity.identifiers.toList())
-        assertEquals(savedEntity.classifications.toList(), foundEntity.classifications.toList())
         assertHelpers.assertRecursively(foundEntity.states.toList()).isEqualTo(savedEntity.states.toList())
     }
 
@@ -188,7 +186,6 @@ internal class BusinessPartnerIT @Autowired constructor(
             roles = sortedSetOf(BusinessPartnerRole.CUSTOMER, BusinessPartnerRole.SUPPLIER),
             identifiers = sortedSetOf(createIdentifier()),
             states = sortedSetOf(createState()),
-            classifications = sortedSetOf(createClassification()),
             stage = StageType.Input,
             legalEntityConfidence = null,
             addressConfidence = null,
@@ -264,15 +261,6 @@ internal class BusinessPartnerIT @Autowired constructor(
             validFrom = LocalDateTime.now(),
             validTo = LocalDateTime.now().plusDays(365),
             businessPartnerTyp = BusinessPartnerType.GENERIC
-        )
-    }
-
-    private fun createClassification(): ClassificationDb {
-
-        return ClassificationDb(
-            value = "A1",
-            code = "OP123",
-            type = ClassificationType.NACE
         )
     }
 

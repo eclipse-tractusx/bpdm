@@ -19,9 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.test.testdata.gate
 
-import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateOutputChildRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.AddressIdentifierDto
-import org.eclipse.tractusx.bpdm.gate.api.model.request.*
+import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressRepresentationInputDto
 
 object BusinessPartnerNonVerboseValues {
@@ -47,116 +45,4 @@ object BusinessPartnerNonVerboseValues {
     val bpInputRequestCleaned = BusinessPartnerVerboseValues.bpInputRequestCleaned
 
     val bpInputRequestError = BusinessPartnerVerboseValues.bpInputRequestError
-
-    val legalEntityGateInputRequest1 = LegalEntityGateInputRequest(
-        legalEntity = BusinessPartnerVerboseValues.legalEntity1,
-        legalAddress = BusinessPartnerVerboseValues.physicalAddress1,
-        externalId = BusinessPartnerVerboseValues.externalId1,
-    )
-
-    val legalEntityGateInputRequest2 = LegalEntityGateInputRequest(
-        legalEntity = BusinessPartnerVerboseValues.legalEntity2,
-        legalAddress = BusinessPartnerVerboseValues.physicalAddress2,
-        externalId = BusinessPartnerVerboseValues.externalId2,
-    )
-
-    val legalEntityGateInputRequest3 = LegalEntityGateInputRequest(
-        legalEntity = BusinessPartnerVerboseValues.legalEntity3,
-        legalAddress = BusinessPartnerVerboseValues.physicalAddress3,
-        externalId = BusinessPartnerVerboseValues.externalId3,
-    )
-
-
-    val siteGateInputRequest1 = SiteGateInputRequest(
-        site = BusinessPartnerVerboseValues.site1,
-        externalId = BusinessPartnerVerboseValues.externalIdSite1,
-        legalEntityExternalId = BusinessPartnerVerboseValues.externalId1,
-        mainAddress = BusinessPartnerVerboseValues.physicalAddress1
-    )
-
-    val siteGateInputRequest2 = SiteGateInputRequest(
-        site = BusinessPartnerVerboseValues.site2,
-        externalId = BusinessPartnerVerboseValues.externalIdSite2,
-        legalEntityExternalId = BusinessPartnerVerboseValues.externalId2,
-        mainAddress = BusinessPartnerVerboseValues.physicalAddress2
-    )
-
-    //Output values for sites
-    val siteGateOutputRequest1 = SiteGateOutputRequest(
-        site = BusinessPartnerVerboseValues.site1,
-        externalId = BusinessPartnerVerboseValues.externalIdSite1,
-        legalEntityExternalId = BusinessPartnerVerboseValues.externalId1,
-        mainAddress = AddressGateOutputChildRequest(BusinessPartnerVerboseValues.physicalAddress1, BusinessPartnerVerboseValues.persistencesiteGateOutputResponse1.mainAddress.bpna),
-        bpn = BusinessPartnerVerboseValues.persistencesiteGateOutputResponse1.bpns
-    )
-
-    val siteGateOutputRequest2 = SiteGateOutputRequest(
-        site = BusinessPartnerVerboseValues.site2,
-        externalId = BusinessPartnerVerboseValues.externalIdSite2,
-        legalEntityExternalId = BusinessPartnerVerboseValues.externalId2,
-        mainAddress = AddressGateOutputChildRequest(BusinessPartnerVerboseValues.physicalAddress2, BusinessPartnerVerboseValues.persistencesiteGateOutputResponse2.mainAddress.bpna),
-        bpn = BusinessPartnerVerboseValues.persistencesiteGateOutputResponse2.bpns
-    )
-
-    val addressGateInputRequest1 = AddressGateInputRequest(
-        address = BusinessPartnerVerboseValues.physicalAddress1.copy(
-            nameParts = BusinessPartnerVerboseValues.logisticAddressGateInputResponse1.address.nameParts,
-            identifiers = listOf(
-                AddressIdentifierDto(BusinessPartnerVerboseValues.identifierValue1, BusinessPartnerVerboseValues.identifierTypeTechnicalKey1)
-            )
-        ),
-        externalId = BusinessPartnerVerboseValues.externalIdAddress1,
-        legalEntityExternalId = BusinessPartnerVerboseValues.externalId1,
-    )
-
-    val addressGateInputRequest2 = AddressGateInputRequest(
-        address = BusinessPartnerVerboseValues.physicalAddress2.copy(
-            nameParts = BusinessPartnerVerboseValues.logisticAddressGateInputResponse2.address.nameParts,
-            identifiers = listOf(
-                AddressIdentifierDto(BusinessPartnerVerboseValues.identifierValue1, BusinessPartnerVerboseValues.identifierTypeTechnicalKey1)
-            )
-        ),
-        externalId = BusinessPartnerVerboseValues.externalIdAddress2,
-        siteExternalId = BusinessPartnerVerboseValues.externalIdSite1,
-    )
-
-    //Output Endpoint Values
-    val addressGateOutputRequest1 = AddressGateOutputRequest(
-        address = BusinessPartnerVerboseValues.physicalAddress1.copy(
-            nameParts = BusinessPartnerVerboseValues.logisticAddressGateOutputResponse1.address.nameParts,
-            identifiers = listOf(
-                AddressIdentifierDto(BusinessPartnerVerboseValues.identifierValue1, BusinessPartnerVerboseValues.identifierTypeTechnicalKey1)
-            )
-        ),
-        externalId = BusinessPartnerVerboseValues.externalIdAddress1,
-        legalEntityExternalId = BusinessPartnerVerboseValues.externalId1,
-        bpn = BusinessPartnerVerboseValues.logisticAddressGateOutputResponse1.bpna
-    )
-
-    val addressGateOutputRequest2 = AddressGateOutputRequest(
-        address = BusinessPartnerVerboseValues.physicalAddress2.copy(
-            nameParts = BusinessPartnerVerboseValues.logisticAddressGateOutputResponse2.address.nameParts,
-            identifiers = listOf(
-                AddressIdentifierDto(BusinessPartnerVerboseValues.identifierValue1, BusinessPartnerVerboseValues.identifierTypeTechnicalKey1)
-            )
-        ),
-        externalId = BusinessPartnerVerboseValues.externalIdAddress2,
-        siteExternalId = BusinessPartnerVerboseValues.externalIdSite1,
-        bpn = BusinessPartnerVerboseValues.logisticAddressGateOutputResponse2.bpna
-    )
-
-    //Output Values
-    val legalEntityGateOutputRequest1 = LegalEntityGateOutputRequest(
-        legalEntity = BusinessPartnerVerboseValues.legalEntity1,
-        legalAddress = AddressGateOutputChildRequest(BusinessPartnerVerboseValues.physicalAddress1, BusinessPartnerVerboseValues.legalEntityGateOutputResponse1.legalAddress.bpna),
-        externalId = BusinessPartnerVerboseValues.externalId1,
-        bpn = BusinessPartnerVerboseValues.legalEntityGateOutputResponse1.bpnl
-    )
-
-    val legalEntityGateOutputRequest2 = LegalEntityGateOutputRequest(
-        legalEntity = BusinessPartnerVerboseValues.legalEntity2,
-        legalAddress = AddressGateOutputChildRequest(BusinessPartnerVerboseValues.physicalAddress2, BusinessPartnerVerboseValues.legalEntityGateOutputResponse2.legalAddress.bpna),
-        externalId = BusinessPartnerVerboseValues.externalId2,
-        bpn = BusinessPartnerVerboseValues.legalEntityGateOutputResponse2.bpnl
-    )
 }

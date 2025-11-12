@@ -25,7 +25,6 @@ import org.eclipse.tractusx.bpdm.pool.config.GoldenRecordTaskConfigProperties
 import org.eclipse.tractusx.bpdm.pool.entity.GoldenRecordTaskDb
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmMultiValidationException
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
-import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.repository.GoldenRecordTaskRepository
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.*
@@ -94,7 +93,7 @@ class TaskBatchResolutionService(
                         orchestrationClient.goldenRecordTasks.resolveStepResults(TaskStepResultRequest(goldenRecordTaskConfigProperties.step, listOf(resultTemplate.copy(taskId = task.taskId))))
                         task.isResolved = true
                         resolvedTasks++
-                    }catch (e: WebClientResponseException.BadRequest){
+                    }catch (_: WebClientResponseException.BadRequest){
                         logger.warn { "Tracked task ${task.taskId} seems to be missing in Orchestrator. Marking it as resolved..." }
                         task.isResolved = true
                         resolvedTasks++
@@ -134,9 +133,7 @@ class TaskBatchResolutionService(
 class TaskResolutionService(
     private val orchestrationClient: OrchestrationApiClient,
     private val taskStepBuildService: TaskStepBuildService,
-    private val bpnRequestIdentifierRepository: BpnRequestIdentifierRepository,
-    private val goldenRecordTaskConfigProperties: GoldenRecordTaskConfigProperties,
-    private val entityManager: EntityManager
+    private val goldenRecordTaskConfigProperties: GoldenRecordTaskConfigProperties
 ) {
     private val logger = KotlinLogging.logger { }
 

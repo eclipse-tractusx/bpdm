@@ -53,11 +53,6 @@ import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.web.reactive.function.BodyInserters
 
-
-private typealias PostFunction = (client: WebTestClient, metaData: Any) -> Any
-private typealias PostFunctionWithoutExpectation = (client: WebTestClient, metaData: Any) -> WebTestClient.ResponseSpec
-private typealias GetFunction = (client: WebTestClient, page: Int, size: Int) -> PageDto<Any>
-
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class]
 )

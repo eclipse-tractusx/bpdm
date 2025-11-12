@@ -178,7 +178,7 @@ fun compareSiteStates(statesVerbose: Collection<SiteStateVerboseDto>, states: Co
     val sortedStates = states!!.sortedBy { it.validFrom }
     sortedVerboseStates.indices.forEach {
         Assertions.assertThat(sortedVerboseStates[it].typeVerbose.technicalKey.name).isEqualTo(sortedStates[it].type?.name)
-        Assertions.assertThat(sortedVerboseStates[it]).usingRecursiveComparison()
+        assertThat(sortedVerboseStates[it]).usingRecursiveComparison()
             .withEqualsForFields(isEqualToIgnoringMilliseconds(), SiteStateVerboseDto::validTo.name)
             .withEqualsForFields(isEqualToIgnoringMilliseconds(), SiteStateVerboseDto::validFrom.name)
             .ignoringFields(SiteStateVerboseDto::typeVerbose.name)

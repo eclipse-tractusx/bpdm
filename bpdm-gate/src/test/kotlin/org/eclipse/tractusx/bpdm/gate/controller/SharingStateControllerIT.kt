@@ -88,7 +88,7 @@ class SharingStateControllerIT @Autowired constructor(
 
         val creationTimeframe = createRelation(relationId, relationType, legalEntityId1, legalEntityId2)
 
-        val expected = PageDto<RelationSharingStateDto>(1, 1, 0, 1,
+        val expected = PageDto(1, 1, 0, 1,
             listOf(RelationSharingStateDto(relationId, RelationSharingStateType.Ready, null, null, null, anyTime))
         )
 
@@ -116,7 +116,7 @@ class SharingStateControllerIT @Autowired constructor(
 
         val updateTimeframe = createRelation(relationId, relationType, legalEntityId1, legalEntityId3)
 
-        val expected = PageDto<RelationSharingStateDto>(1, 1, 0, 1,
+        val expected = PageDto(1, 1, 0, 1,
             listOf(RelationSharingStateDto(relationId, RelationSharingStateType.Ready, null, null, null, anyTime))
         )
 
@@ -142,7 +142,7 @@ class SharingStateControllerIT @Autowired constructor(
         val creationTimeframe = createRelation(relationId, relationType, legalEntityId1, legalEntityId2)
         createRelation(relationId, relationType, legalEntityId1, legalEntityId2)
 
-        val expected = PageDto<RelationSharingStateDto>(1, 1, 0, 1,
+        val expected = PageDto(1, 1, 0, 1,
             listOf(RelationSharingStateDto(relationId, RelationSharingStateType.Ready, null, null, null, anyTime))
         )
 
@@ -176,7 +176,7 @@ class SharingStateControllerIT @Autowired constructor(
             relationType
         )
 
-        val expected = PageDto<RelationSharingStateDto>(1, 1, 0, 1,
+        val expected = PageDto(1, 1, 0, 1,
             listOf(RelationSharingStateDto(relationId1, RelationSharingStateType.Ready, null, null, null, anyTime))
         )
 
@@ -212,7 +212,7 @@ class SharingStateControllerIT @Autowired constructor(
 
         setSharingState(relationId1, RelationSharingStateType.Pending)
 
-        val expected = PageDto<RelationSharingStateDto>(1, 1, 0, 1,
+        val expected = PageDto(1, 1, 0, 1,
             listOf(RelationSharingStateDto(relationId1, RelationSharingStateType.Pending, null, null,  null, anyTime))
         )
 
@@ -249,7 +249,7 @@ class SharingStateControllerIT @Autowired constructor(
         val updatedTimeframe = createRelation(relationId1, relationType, legalEntityId1, legalEntityId3)
 
 
-        val expected = PageDto<RelationSharingStateDto>(1, 1, 0, 1,
+        val expected = PageDto(1, 1, 0, 1,
             listOf(RelationSharingStateDto(relationId1, RelationSharingStateType.Ready, null, null, null, anyTime))
         )
 
@@ -300,7 +300,7 @@ class SharingStateControllerIT @Autowired constructor(
         setSharingState(relationId2, RelationSharingStateType.Pending)
         setSharingState(relationId4, RelationSharingStateType.Pending)
 
-        val expected = PageDto<RelationSharingStateDto>(1, 1, 0, 1,
+        val expected = PageDto(1, 1, 0, 1,
             listOf(RelationSharingStateDto(relationId1, RelationSharingStateType.Pending, null, null, null, anyTime)))
 
         val actual = gateClient.relationSharingState.get(

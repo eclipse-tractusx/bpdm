@@ -61,9 +61,6 @@ class LegalEntityDb(
     @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
     val sites: MutableSet<SiteDb> = mutableSetOf()
 
-    @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val classifications: MutableSet<LegalEntityClassificationDb> = mutableSetOf()
-
     @OneToMany(mappedBy = "startNode", cascade = [CascadeType.ALL], orphanRemoval = true)
     val startNodeRelations: MutableSet<RelationDb> = mutableSetOf()
 

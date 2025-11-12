@@ -22,7 +22,6 @@ package org.eclipse.tractusx.bpdm.common.util
 interface ClientConfigurationProperties : HasEnablingProperty {
     val baseUrl: String
     val securityEnabled: Boolean
-    val oauth2ClientRegistration: String?
 
     override val enabled get() = securityEnabled
 

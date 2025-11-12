@@ -23,14 +23,19 @@ import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
-import org.eclipse.tractusx.bpdm.pool.api.model.*
+import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityIdentifierDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.RelationType
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntitySearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.*
+import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityCreateError
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityUpdateError
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
-import org.eclipse.tractusx.bpdm.pool.util.EndpointValues
 import org.eclipse.tractusx.bpdm.pool.util.TestHelpers
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues
@@ -50,8 +55,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
-import org.springframework.test.web.reactive.server.WebTestClient
-import org.springframework.test.web.reactive.server.returnResult
 import java.time.Instant
 import java.time.LocalDate
 
@@ -62,7 +65,6 @@ import java.time.LocalDate
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class LegalEntityControllerIT @Autowired constructor(
     val testHelpers: TestHelpers,
-    val webTestClient: WebTestClient,
     val poolClient: PoolClientImpl,
     val dbTestHelpers: DbTestHelpers,
     val assertHelpers: AssertHelpers,
@@ -267,12 +269,7 @@ class LegalEntityControllerIT @Autowired constructor(
         assertThat(response1.errorCount).isEqualTo(0)
         val bpnList = response1.entities.map { it.legalEntity.bpnl }
 
-        // 2 equivalent identifiers (in regard to fields type and value) but different from the identifiers in the DB
-        val referenceIdentifier = BusinessPartnerNonVerboseValues.identifier3.copy(
-            issuingBody = BusinessPartnerNonVerboseValues.identifier1.issuingBody
-        )
-
-        // 3 requests using these equivalent identifiers & 1 different request
+        // requests using these equivalent identifiers & 1 different request
         val toUpdate1 = with(BusinessPartnerNonVerboseValues.legalEntityUpdate1) {
             copy(
                 bpnl = bpnList[0],
@@ -694,7 +691,7 @@ class LegalEntityControllerIT @Autowired constructor(
             ),
         )
 
-        releationRepository.save(relation);
+        releationRepository.save(relation)
 
         // Step 3: Retrieve and assert the relation exists
         val savedRelation = releationRepository.findAll()
@@ -835,14 +832,6 @@ class LegalEntityControllerIT @Autowired constructor(
             .isEqualTo(expected)
     }
 
-    private fun retrieveCurrentness(bpn: String) = webTestClient
-        .get()
-        .uri(EndpointValues.CATENA_LEGAL_ENTITY_PATH + "/${bpn}")
-        .exchange().expectStatus().isOk
-        .returnResult<LegalEntityWithLegalAddressVerboseDto>()
-        .responseBody
-        .blockFirst()!!.legalEntity.currentness
-
     private fun changeCase(value: String): String {
         return if (value.uppercase() != value)
             value.uppercase()
@@ -851,12 +840,4 @@ class LegalEntityControllerIT @Autowired constructor(
         else
             throw IllegalArgumentException("Can't change case of string $value")
     }
-
-    private fun toLegalAddressResponse(it: LogisticAddressVerboseDto) = LegalAddressVerboseDto(
-        physicalPostalAddress = it.physicalPostalAddress,
-        alternativePostalAddress = it.alternativePostalAddress,
-        bpnLegalEntity = it.bpnLegalEntity!!,
-        createdAt = it.createdAt,
-        updatedAt = it.updatedAt
-    )
 }

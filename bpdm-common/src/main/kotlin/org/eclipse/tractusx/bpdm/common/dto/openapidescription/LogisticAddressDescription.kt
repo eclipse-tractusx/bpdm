@@ -32,7 +32,6 @@ object LogisticAddressDescription {
             "uniquely identified by the BPNA."
     const val headerCreateRequest = "Request for creating new business partner record of type address. $header"
     const val headerUpdateRequest = "Request for updating a business partner record of type address. $header"
-    const val headerUpsertRequest = "Request for creating/updating a business partner record of type address. $header"
     const val headerCreateResponse = "Created business partner of type address. $header"
     const val headerMatchResponse = "Match for a business partner record of type address. $header"
 
@@ -48,17 +47,10 @@ object LogisticAddressDescription {
     const val physicalPostalAddress = "The physical postal address of the address, such as an office, warehouse, gate, etc."
     const val alternativePostalAddress = "The alternative postal address of the address, for example if the goods are to be picked up somewhere else."
     const val bpnLegalEntity = "The BPNL of the legal entity owning the address."
-    const val isLegalAddress = "Indicates if the address is the legal address to a legal entity."
     const val bpnSite = "The BPNS of the site the address belongs to."
-    const val isMainAddress = "Indicates if the address is the main address to a site. " +
-            "This is where typically the main entrance or the reception is located, or where the mail is delivered to."
     const val roles = "Roles this business partner takes in relation to the sharing member."
 
     const val bpnParent = "BPNL of the legal entity or BPNS of the site this address belongs to."
-    const val legalEntityExternalId = "The identifier which uniquely identifies (in the internal system landscape of the sharing member) " +
-            "the business partner, representing the legal entity, that owns the address."
-    const val siteExternalId = "The identifier which uniquely identifies (in the internal system landscape of the sharing member) " +
-            "the business partner, representing the site, that the address belongs to."
     const val address = "Address information"
 
     const val addressType = "Indicates the address type, the legal address to a legal entity or the main address to a site, " +

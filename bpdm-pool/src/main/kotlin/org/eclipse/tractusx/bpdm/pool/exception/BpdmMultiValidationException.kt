@@ -21,5 +21,4 @@ package org.eclipse.tractusx.bpdm.pool.exception
 
 class BpdmMultiValidationException(
     val validationErrors: List<String>
-) : RuntimeException("Following validation errors found: ${validationErrors.joinToString("\n")}") {
-}
+) : RuntimeException("Following validation errors found: ${validationErrors.joinToString("\n")}")

@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.gate.controller.v6
 
-import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.BusinessPartnerOutputDto
 import org.eclipse.tractusx.bpdm.gate.service.BusinessPartnerService
@@ -30,8 +29,6 @@ import org.springframework.stereotype.Service
 class BusinessPartnerLegacyMapper(
     private val businessPartnerService: BusinessPartnerService
 ) {
-
-    private val logger = KotlinLogging.logger { }
 
     fun getBusinessPartnersOutput(pageRequest: PageRequest, externalIds: Collection<String>?, tenantBpnl: String?): PageDto<BusinessPartnerOutputDto> {
         return businessPartnerService

@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import com.opencsv.CSVWriter
-import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.model.PartnerUploadFileHeader
@@ -40,8 +39,6 @@ class PartnerUploadService(
     private val businessPartnerService: BusinessPartnerService,
     private val poolApiClient: PoolApiClient
 ) {
-
-    private val logger = KotlinLogging.logger { }
 
     fun processFile(file: MultipartFile, tenantBpnl: String?): ResponseEntity<Collection<BusinessPartnerInputDto>> {
         validateTenantBpnl(tenantBpnl)

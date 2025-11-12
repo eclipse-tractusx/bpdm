@@ -30,7 +30,6 @@ import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository
 import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository.Specs.byBusinessPartnerTypesIn
 import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository.Specs.byIsMember
 import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository.Specs.byUpdatedGreaterThan
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.domain.Specification
@@ -59,19 +58,6 @@ class PartnerChangelogService(
     fun createChangelogEntry(request: ChangelogEntryCreateRequest): PartnerChangelogEntryDb{
         logger.debug { "Create ${request.changelogType} changelog entry for ${request.bpn}" }
         return partnerChangelogEntryRepository.save(request.toEntity())
-    }
-
-    fun getChangelogEntriesCreatedAfter(
-        fromTime: Instant,
-        businessPartnerTypesFilters: Collection<BusinessPartnerType> = BusinessPartnerType.values().asList(),
-        pageIndex: Int,
-        pageSize: Int
-    ): Page<PartnerChangelogEntryDb> {
-        return partnerChangelogEntryRepository.findByCreatedAtAfterAndBusinessPartnerTypeIn(
-            fromTime,
-            businessPartnerTypesFilters,
-            PageRequest.of(pageIndex, pageSize, Sort.by(PartnerChangelogEntryDb::createdAt.name).ascending())
-        )
     }
 
     fun getChangeLogEntries(

@@ -45,8 +45,6 @@ interface BpdmMapper<FROM_TYPE, TO_TYPE> {
      */
     fun checkTreatAsNull(valueToMap: FROM_TYPE) = false
 
-    fun checkTreatAsNull(listToMap: List<FROM_TYPE>) = false
-
     /**
      * Try to map given nullable [valueToMap] within the given [context] whereby null is an acceptable value
      *
@@ -59,13 +57,6 @@ interface BpdmMapper<FROM_TYPE, TO_TYPE> {
             ?: NullableMappingResult.ofValidNull()
     }
 
-    fun mapValidNull(listToMap: List<FROM_TYPE>?, context: ValidationContext = ValidationContext.NoContext): NullableMappingResult<List<TO_TYPE>>{
-        return listToMap
-            ?.let { if(checkTreatAsNull(it)) null else it }
-            ?.let { NullableMappingResult.fromResult(map(it, context)) }
-            ?: NullableMappingResult.ofValidNull()
-    }
-
     /**
      * Try to map given nullable [valueToMap] within the given [context] whereby null is not acceptable
      *
@@ -74,9 +65,4 @@ interface BpdmMapper<FROM_TYPE, TO_TYPE> {
     fun mapInvalidNull(valueToMap: FROM_TYPE?, context: ValidationContext = ValidationContext.NoContext): MappingResult<TO_TYPE>{
         return valueToMap?.let { map(it, context) } ?: MappingResult.ofInvalidNull()
     }
-
-    fun mapInvalidNull(listToMap: List<FROM_TYPE>?, context: ValidationContext = ValidationContext.NoContext): MappingResult<List<TO_TYPE>>{
-        return listToMap?.let { map(it, context) } ?: MappingResult.ofInvalidNull()
-    }
-
 }

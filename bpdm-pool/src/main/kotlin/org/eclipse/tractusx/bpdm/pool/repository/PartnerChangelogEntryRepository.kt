@@ -24,8 +24,6 @@ import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.PartnerChangelogEntryDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
@@ -111,10 +109,4 @@ interface PartnerChangelogEntryRepository : JpaRepository<PartnerChangelogEntryD
                 }
             }
     }
-
-    fun findByCreatedAtAfterAndBusinessPartnerTypeIn(
-        createdAt: Instant,
-        businessPartnerType: Collection<BusinessPartnerType>,
-        pageable: Pageable
-    ): Page<PartnerChangelogEntryDb>
 }

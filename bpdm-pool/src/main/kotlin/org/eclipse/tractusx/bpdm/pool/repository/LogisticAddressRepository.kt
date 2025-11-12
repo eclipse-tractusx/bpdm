@@ -78,16 +78,6 @@ interface LogisticAddressRepository : JpaRepository<LogisticAddressDb, Long>, Jp
 
     fun findByLegalEntityAndSiteIsNull(legalEntityDb: LegalEntityDb, pageable: Pageable): Page<LogisticAddressDb>
 
-    @Query("SELECT a FROM LogisticAddressDb a join a.legalEntity p where p.bpn=:bpn")
-    fun findByLegalEntityBpn(bpn: String, pageable: Pageable): Page<LogisticAddressDb>
-
-    fun findByLegalEntityInOrSiteInOrBpnIn(
-        legalEntities: Collection<LegalEntityDb>,
-        sites: Collection<SiteDb>,
-        bpns: Collection<String>,
-        pageable: Pageable
-    ): Page<LogisticAddressDb>
-
     @Query("SELECT a FROM LogisticAddressDb a WHERE LOWER(a.name) LIKE :addressName ORDER BY LENGTH(a.name)")
     fun findByName(addressName: String, pageable: Pageable): Page<LogisticAddressDb>
 

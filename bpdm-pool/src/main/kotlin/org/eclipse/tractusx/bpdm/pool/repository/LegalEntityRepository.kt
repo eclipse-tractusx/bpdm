@@ -56,8 +56,6 @@ interface LegalEntityRepository : JpaRepository<LegalEntityDb, Long>, JpaSpecifi
 
     fun findByBpnIgnoreCase(bpn: String): LegalEntityDb?
 
-    fun existsByBpn(bpn: String): Boolean
-
     fun findDistinctByBpnIn(bpns: Collection<String>): Set<LegalEntityDb>
 
     @Query("SELECT p FROM LegalEntityDb p WHERE LOWER(p.legalName.value) LIKE :value ORDER BY LENGTH(p.legalName.value)")
@@ -74,9 +72,6 @@ interface LegalEntityRepository : JpaRepository<LegalEntityDb, Long>, JpaSpecifi
 
     @Query("SELECT DISTINCT p FROM LegalEntityDb p LEFT JOIN FETCH p.states WHERE p IN :partners")
     fun joinStates(partners: Set<LegalEntityDb>): Set<LegalEntityDb>
-
-    @Query("SELECT DISTINCT p FROM LegalEntityDb p LEFT JOIN FETCH p.classifications WHERE p IN :partners")
-    fun joinClassifications(partners: Set<LegalEntityDb>): Set<LegalEntityDb>
 
     @Query("SELECT DISTINCT p FROM LegalEntityDb p LEFT JOIN FETCH p.startNodeRelations LEFT JOIN FETCH p.endNodeRelations WHERE p IN :partners")
     fun joinRelations(partners: Set<LegalEntityDb>): Set<LegalEntityDb>

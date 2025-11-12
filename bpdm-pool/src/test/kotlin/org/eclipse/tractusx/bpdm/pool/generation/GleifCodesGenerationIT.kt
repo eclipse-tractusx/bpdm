@@ -60,7 +60,7 @@ import java.io.PrintWriter
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class GleifCodesGenerationIT @Autowired constructor(
     private val resourceLoader: ResourceLoader,
-    private val regionRepository: RegionRepository
+    regionRepository: RegionRepository
 ) {
 
     private val logger = KotlinLogging.logger { }

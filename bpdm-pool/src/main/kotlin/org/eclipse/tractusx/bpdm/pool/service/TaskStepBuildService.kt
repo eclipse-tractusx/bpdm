@@ -30,7 +30,9 @@ import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmMultiValidationException
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
-import org.eclipse.tractusx.bpdm.pool.repository.*
+import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
+import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
+import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.stereotype.Service
 import java.time.Instant
@@ -53,25 +55,16 @@ class TaskStepBuildService(
     private val taskResolutionMapper: TaskResolutionMapper,
     private val logisticAddressRepository: LogisticAddressRepository,
     private val siteRepository: SiteRepository,
-    private val sharingMemberRecordRepository: SharingMemberRecordRepository,
-    private val legalEntityRepository: LegalEntityRepository,
-    private val changelogService: PartnerChangelogService,
     private val sharingMemberConfidenceService: SharingMemberConfidenceService
 ) {
 
     enum class CleaningError(val message: String) {
         LEGAL_NAME_IS_NULL("Legal name is null"),
         COUNTRY_CITY_IS_NULL("Country or city in physicalAddress is null"),
-        LEGAL_ENTITY_IS_NULL("Legal entity or BpnL Reference is null"),
-        LEGAL_ADDRESS_IS_NULL("Legal Address is null"),
-        PHYSICAL_ADDRESS_IS_NULL("Physical Address is null"),
         ALTERNATIVE_ADDRESS_DATA_IS_NULL("Country or city or deliveryServiceType or deliveryServiceNumber in alternativeAddress is null"),
         MAINE_ADDRESS_IS_NULL("Main address is null"),
-        BPNS_IS_NULL("BpnS Reference is null"),
         BPNA_IS_NULL("BpnA Reference is null"),
         SITE_NAME_IS_NULL("Site name is null"),
-        INVALID_LEGAL_ENTITY_BPN("Invalid legal entity BPN"),
-        CLASSIFICATION_TYPE_IS_NULL("Classification type is null"),
         PHYSICAL_ADDRESS_COUNTRY_MISSING("Physical Address has no country"),
         PHYSICAL_ADDRESS_CITY_MISSING("Physical Address has no city"),
         ALTERNATIVE_ADDRESS_COUNTRY_MISSING("Alternative Address has no country"),
@@ -82,8 +75,6 @@ class TaskStepBuildService(
         SITE_CONFIDENCE_CRITERIA_MISSING("Site is missing confidence criteria"),
         SITE_NAME_MISSING("Site has no name"),
         LEGAL_ENTITY_CONFIDENCE_CRITERIA_MISSING("Legal Entity has no confidence criteria"),
-        MAIN_ADDRESS_BPN_REFERENCE_MISSING("The BpnA Reference of the site main address is missing"),
-        LEGAL_ADDRESS_BPN_REFERENCE_MISSING("The BpnA Reference of the legal address is missing"),
         SITE_WRONG_LEGAL_ENTITY_REFERENCE("The legal entity is not the parent of the site"),
         ADDITIONAL_ADDRESS_WRONG_SITE_REFERENCE("The site is not the parent of the additional address"),
         ADDITIONAL_ADDRESS_WRONG_LEGAL_ENTITY_REFERENCE("The legal entity is not the parent of the additional address")
