@@ -22,6 +22,9 @@ package org.eclipse.tractusx.bpdm.pool.controller.v6
 import com.neovisionaries.i18n.CountryCode
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
+import org.eclipse.tractusx.bpdm.common.exception.BpdmValidationErrorException
+import org.eclipse.tractusx.bpdm.common.mapping.ValidationContext
+import org.eclipse.tractusx.bpdm.common.mapping.ValidationError
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDetailDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalFormDto
@@ -30,6 +33,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDetailDb
 import org.eclipse.tractusx.bpdm.pool.entity.LegalFormDb
+import org.eclipse.tractusx.bpdm.pool.entity.RegionDb
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmAlreadyExists
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalFormRepository
@@ -95,7 +99,19 @@ class MetadataLegacyServiceMapper(
 
         logger.info { "Create new Legal-Form with key ${request.technicalKey} and name ${request.name}" }
 
-        val region = request.administrativeAreaLevel1?.let { regionRepository.findByRegionCodeIn(setOf(it)) }?.firstOrNull()
+        val region: RegionDb? = request.administrativeAreaLevel1?.let { code ->
+            val regionDb = regionRepository.findByRegionCodeIn(setOf(code)).firstOrNull()
+            if (regionDb == null) {
+                val validationError = ValidationError(
+                    validationErrorCode = "AdministrativeAreaNotFound",
+                    errorDetails = "Administrative area '$code' not found in system.",
+                    erroneousValue = code,
+                    context = ValidationContext.fromRoot( org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest::class, "request", org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest::administrativeAreaLevel1)
+                )
+                throw BpdmValidationErrorException(listOf(validationError))
+            }
+            regionDb
+        }
 
         val legalForm = LegalFormDb(
             technicalKey = request.technicalKey,

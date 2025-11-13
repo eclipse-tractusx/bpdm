@@ -21,6 +21,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM Pool: maintained nanoseconds timestamps accuracy while creating/updating entity [#1449](https://github.com/eclipse-tractusx/bpdm/issues/1449)
 - BPDM Pool: fixed error response while creating duplicate legal address site [#1471](https://github.com/eclipse-tractusx/bpdm/issues/1471)
 - BPDM: The default logging level is now INFO [#1523](https://github.com/eclipse-tractusx/bpdm/issues/1523)
+- BPDM Pool: fixed response while creating legal form with unknown administrative area and stopped legal form being created [#1446](https://github.com/eclipse-tractusx/bpdm/issues/1446)
 
 ## [7.1.0] - 2025-09-30
 

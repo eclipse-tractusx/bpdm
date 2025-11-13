@@ -156,6 +156,17 @@ class MetadataControllerIT @Autowired constructor(
     }
 
     /**
+     * WHEN creating legal form for unknown administrative area
+     * THEN legalForm is not created and error returned
+     */
+    @Test
+    fun createLegalform_UnknownAdministrativeArea(){
+        val legalFormToCreate = BusinessPartnerNonVerboseValues.legalForm2.copy(technicalKey = "UNKNOWN_ADMINISTRATIVE_AREA_TEST", administrativeAreaLevel1 = "UNKNOWN")
+        //Expect Error when posting legal form with same technical key
+        assertThrows<Throwable>{ poolClient.metadata.createLegalForm(legalFormToCreate) }
+    }
+
+    /**
      * Given identifier types
      * When asking for identifier type entries
      * Then that identifier types returned

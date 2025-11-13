@@ -25,6 +25,9 @@ import org.eclipse.tractusx.bpdm.common.dto.IBaseLegalEntityDto
 import org.eclipse.tractusx.bpdm.common.dto.IBaseLogisticAddressDto
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.exception.BpdmValidationErrorException
+import org.eclipse.tractusx.bpdm.common.mapping.ValidationContext
+import org.eclipse.tractusx.bpdm.common.mapping.ValidationError
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
@@ -96,7 +99,19 @@ class MetadataService(
 
         logger.info { "Create new Legal-Form with key ${request.technicalKey} and name ${request.name}" }
 
-        val region = request.administrativeAreaLevel1?.let { regionRepository.findByRegionCodeIn(setOf(it)) }?.firstOrNull()
+        val region: RegionDb? = request.administrativeAreaLevel1?.let { code ->
+            val regionDb = regionRepository.findByRegionCodeIn(setOf(code)).firstOrNull()
+            if (regionDb == null) {
+                val validationError = ValidationError(
+                    validationErrorCode = "AdministrativeAreaNotFound",
+                    errorDetails = "Administrative area '$code' not found in system.",
+                    erroneousValue = code,
+                    context = ValidationContext.fromRoot( LegalFormRequest::class, "request", LegalFormRequest::administrativeAreaLevel1)
+                )
+                throw BpdmValidationErrorException(listOf(validationError))
+            }
+            regionDb
+        }
 
         val legalForm = LegalFormDb(
             technicalKey = request.technicalKey,
