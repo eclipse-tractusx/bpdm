@@ -59,7 +59,7 @@ interface RelationRepository: JpaRepository<RelationDb, Long>, JpaSpecificationE
                 updatedAfter?.let {
                     builder.greaterThan(root
                         .get<RelationSharingStateDb>(RelationDb::sharingState.name)
-                        .get<Instant>(RelationSharingStateDb::updatedAt.name), updatedAfter)
+                        .get(RelationSharingStateDb::updatedAt.name), updatedAfter)
                 }
             }
 

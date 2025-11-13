@@ -151,9 +151,5 @@ class RelationUpsertService(
         fun hasOverlap(other: TimePeriod): Boolean{
             return validFrom < other.validTo && validTo > other.validFrom
         }
-
-        fun isConsecutive(other: TimePeriod): Boolean{
-            return (validTo == other.validFrom) || (other.validTo == validFrom)
-        }
     }
 }

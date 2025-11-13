@@ -24,7 +24,6 @@ import com.neovisionaries.i18n.LanguageCode
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
-import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.service.toDto
 import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
@@ -52,10 +51,6 @@ object BusinessPartnerVerboseValues {
     val thirdBpnS = "BPNS0000000002V9"
 
     private val createdTime1 = LocalDateTime.of(2020, 1, 1, 1, 1)
-    val language0 = TypeKeyNameVerboseDto(LanguageCode.undefined, LanguageCode.undefined.getName())
-    val language1 = TypeKeyNameVerboseDto(LanguageCode.en, LanguageCode.en.getName())
-    val language2 = TypeKeyNameVerboseDto(LanguageCode.de, LanguageCode.de.getName())
-    val language3 = TypeKeyNameVerboseDto(LanguageCode.zh, LanguageCode.zh.getName())
 
     private val country1 = TypeKeyNameVerboseDto(CountryCode.DE, CountryCode.DE.getName())
     private val country2 = TypeKeyNameVerboseDto(CountryCode.FR, CountryCode.FR.getName())
@@ -64,34 +59,20 @@ object BusinessPartnerVerboseValues {
     val identifierType1 = TypeKeyNameVerboseDto("DE_EU_VAT_ID", "European Union Value-added Tax Identification Number")
     val identifierType2 = TypeKeyNameVerboseDto("DE_HR", "Handelsregisternummer")
     val identifierType3 = TypeKeyNameVerboseDto("AT_EU_VAT_ID", "European Union Value-added Tax Identification Number")
-    val identifierType4 = TypeKeyNameVerboseDto("DNB_DUNS", "Data Universal Numbering System Number")
 
     val bpnLRequestMapping = BpnRequestIdentifierMappingDto(UUID.randomUUID().toString(), bpn = secondBpnL)
     val bpnSRequestMapping = BpnRequestIdentifierMappingDto(UUID.randomUUID().toString(), bpn = secondBpnS)
     val bpnARequestMapping = BpnRequestIdentifierMappingDto(UUID.randomUUID().toString(), bpn = secondBpnA)
 
     val identifierTypeAbbreviation1 = "EU VAT ID (number)"
-    val identifierTypeAbbreviation2 = "HR(-nummer)"
-    val identifierTypeAbbreviation3 = "EU VAT ID (number)"
-    val identifierTypeAbbreviation4 = "DUNS (number)"
 
     val identifierTypeTransliteratedName1 = ""
-    val identifierTypeTransliteratedName2 = ""
-    val identifierTypeTransliteratedName3 = ""
-    val identifierTypeTransliteratedName4 = ""
 
     val identifierTypeTransliteratedAbbreviation1 = ""
-    val identifierTypeTransliteratedAbbreviation2 = ""
-    val identifierTypeTransliteratedAbbreviation3 = ""
-    val identifierTypeTransliteratedAbbreviation4 = ""
 
     val identifierTypeFormat1 = "^DE\\d{8}\\d{1}(-\\d{5})?$"
-    val identifierTypeFormat2 = "^([BDFGHKMNPRTUVWXY]{1}\\d{1,4}[VR]?\\.)?((HRA)|(G(n|N)R)|(HRB)|(PR)|(VR)|(G(s|S)R))[1-9]{1}[A-Z0-9]{1,5}$"
-    val identifierTypeFormat3 = "^ATU\\d{7}\\d{1}$"
 
     val identifierTypeCategories1 = sortedSetOf(IdentifierTypeCategory.VAT)
-    val identifierTypeCategories2 = sortedSetOf(IdentifierTypeCategory.NBR)
-    val identifierTypeCategories3 = sortedSetOf(IdentifierTypeCategory.VAT)
 
     val addressIdentifierTypeAbbreviation1 = "(numéro) SIRET"
     val addressIdentifierTypeTransliteratedName1 = "Numero du systeme d'identification du repertoire des etablissements"
@@ -151,14 +132,6 @@ object BusinessPartnerVerboseValues {
     val siteStatus1 = SiteStateVerboseDto(LocalDateTime.of(2020, 1, 1, 0, 0), null, BusinessStateType.ACTIVE.toDto())
     val siteStatus2 = SiteStateVerboseDto(LocalDateTime.of(2019, 1, 1, 0, 0), null, BusinessStateType.INACTIVE.toDto())
     val siteStatus3 = SiteStateVerboseDto(LocalDateTime.of(2018, 1, 1, 0, 0), null, BusinessStateType.ACTIVE.toDto())
-
-    val classificationType = TypeKeyNameVerboseDto(ClassificationType.NACE, ClassificationType.NACE.name)
-
-    val classification1 = LegalEntityClassificationVerboseDto("Sale of motor vehicles", null, classificationType)
-    val classification2 = LegalEntityClassificationVerboseDto("Data processing, hosting and related activities", null, classificationType)
-    val classification3 = LegalEntityClassificationVerboseDto("Other information service activities", null, classificationType)
-    val classification4 = LegalEntityClassificationVerboseDto("Financial and insurance activities", null, classificationType)
-    val classification5 = LegalEntityClassificationVerboseDto("Accounting, bookkeeping and auditing activities; tax consultancy", null, classificationType)
 
     private val confidenceCriteria1 = ConfidenceCriteriaDto(
         sharedByOwner = true,
@@ -583,27 +556,4 @@ object BusinessPartnerVerboseValues {
         ),
         index = "3"
     )
-
-    val legalEntityUpsertMultipleIdentifier = LegalEntityPartnerCreateVerboseDto(
-        legalEntity = LegalEntityVerboseDto(
-            bpnl = firstBpnL,
-            legalName = "Business Partner Name",
-            legalFormVerbose = legalForm1,
-            identifiers = listOf(
-                LegalEntityIdentifierVerboseDto("ID-XYZ", identifierType1, "Agency X"),
-                LegalEntityIdentifierVerboseDto("Another ID Value", identifierType2, "Body Y")
-            ),
-            states = listOf(leStatus1),
-            currentness = createdTime1.toInstant(ZoneOffset.UTC),
-            confidenceCriteria = confidenceCriteria1,
-            isParticipantData = false,
-            createdAt = Instant.now(),
-            updatedAt = Instant.now()
-        ),
-        legalAddress = addressPartner1.copy(
-            bpnLegalEntity = legalEntity1.legalEntity.bpnl,
-        ),
-        index = "1"
-    )
-
 }

@@ -339,7 +339,7 @@ class RequestValidationService(
         }
     }
 
-    inner class ValidateUpdateBpnExists<ERROR : ErrorCode>(
+    class ValidateUpdateBpnExists<ERROR : ErrorCode>(
         private val existingBpns: Set<String>,
         private val errorCode: ERROR
     ) {
@@ -521,14 +521,6 @@ class RequestValidationService(
         val identifierNotFound: ERROR,
         val duplicateIdentifier: ERROR,
         val identifiersTooMany: ERROR
-    )
-
-
-    val orchestratorMessages = ValidatorErrorCodes(
-        regionNotFound = OrchestratorError.AddressRegionNotFound,
-        identifierNotFound = OrchestratorError.AddressIdentifierNotFound,
-        duplicateIdentifier = OrchestratorError.AddressDuplicateIdentifier,
-        identifiersTooMany = OrchestratorError.AddressIdentifiersTooMany
     )
 
     val leCreateMessages = ValidatorErrorCodes(

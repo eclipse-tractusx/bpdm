@@ -30,11 +30,11 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequ
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressCreateError
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressUpdateError
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerCreateVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorCode
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerCreateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerCreateResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerCreateVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerUpdateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.controller.v6.LegalEntityLegacyServiceMapper.Companion.IDENTIFIER_AMOUNT_LIMIT
 import org.eclipse.tractusx.bpdm.pool.dto.AddressMetadataDto
@@ -462,7 +462,7 @@ class AddressLegacyServiceMapper(
         }.filterValues { it.isNotEmpty() }
     }
 
-    inner class ValidateUpdateBpnExists<ERROR : ErrorCode>(
+    class ValidateUpdateBpnExists<ERROR : ErrorCode>(
         private val existingBpns: Set<String>,
         private val errorCode: ERROR
     ) {

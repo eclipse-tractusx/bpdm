@@ -44,7 +44,7 @@ class DataClassUnwrappedJsonDeserializer : JsonDeserializer<Any?>(), ContextualD
         return DataClassUnwrappedJsonDeserializerForType(javaType)
     }
 
-    override fun deserialize(p: JsonParser?, ctxt: DeserializationContext?): Any? {
+    override fun deserialize(p: JsonParser?, ctxt: DeserializationContext?): Any {
         throw IllegalStateException("DataClassUnwrappedJsonDeserializer.deserialize() can not be used directly")
     }
 }
@@ -91,7 +91,7 @@ private class DataClassUnwrappedJsonDeserializerForType(destinationJavaType: Jav
 
     private fun readTreeAsValue(ctxt: DeserializationContext, node: JsonNode?, javaType: JavaType) : Any? =
         if (node == null || node.isNull) null
-        else ctxt.readTreeAsValue<Any?>(node, javaType)
+        else ctxt.readTreeAsValue(node, javaType)
 }
 
 private data class ConstructorParameter(

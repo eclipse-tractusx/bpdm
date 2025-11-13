@@ -23,25 +23,20 @@ import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
-import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
-import org.eclipse.tractusx.bpdm.gate.api.model.*
+import org.eclipse.tractusx.bpdm.gate.api.model.AlternativePostalAddressDto
+import org.eclipse.tractusx.bpdm.gate.api.model.PhysicalPostalAddressDto
+import org.eclipse.tractusx.bpdm.gate.api.model.StreetDto
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressRepresentationInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityRepresentationInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteRepresentationInputDto
-import java.time.Duration
-import java.time.Instant
-import java.time.ZoneOffset
 import kotlin.random.Random
 
 class GateInputFactory(
     private val testMetadata: TestMetadata,
     private val testRunData: TestRunData?
 ) {
-    val genericFullValidWithSiteWithoutAnyBpn = createAllFieldsFilled("genericFullValidWithSiteWithoutAnyBpn")
-    { it.withoutAnyBpn().withAddressType(null) }
-
     fun createAllFieldsFilled(seed: String, transform: (BusinessPartnerInputRequest) -> BusinessPartnerInputRequest = {it}): InputTestData {
         return InputTestData(seed, transform(SeededTestDataCreator(seed).createAllFieldsFilled()))
     }
@@ -87,18 +82,6 @@ class GateInputFactory(
             )
         }
 
-
-        private fun createIdentifiers(): List<BusinessPartnerIdentifierDto>{
-            return listRange.map { testMetadata.identifierTypes.random(random) }
-                .mapIndexed{ index, type -> BusinessPartnerIdentifierDto(type = type, value = "Identifier Value $seed $index", issuingBody = "Issuing Body $seed $index") }
-        }
-
-        private fun createStates(): List<BusinessPartnerStateDto>{
-            return random.nextTime().let {
-                listRange.runningFold(Pair(it, it.plus(random.nextDuration()))){ current, _ -> Pair(current.second, current.second.plus(random.nextDuration())) }
-            }.map { (validFrom, validTo) -> BusinessPartnerStateDto(validFrom = validFrom, validTo = validTo, BusinessStateType.entries.random(random)) }
-        }
-
         private fun createPhysicalAddress(): PhysicalPostalAddressDto{
             return PhysicalPostalAddressDto(
                 geographicCoordinates = GeoCoordinateDto(longitude = random.nextDouble(), latitude = random.nextDouble(), altitude = random.nextDouble()),
@@ -141,11 +124,6 @@ class GateInputFactory(
                 deliveryServiceQualifier = "Delivery Service Qualifier $seed"
             )
         }
-
-        private fun Random.nextInstant() = Instant.ofEpochSecond(nextLong(0, 365241780471))
-        private fun Random.nextTime() = nextInstant().atOffset(ZoneOffset.UTC).toLocalDateTime()
-        private fun Random.nextDuration() = Duration.ofHours(nextLong(0, 10000))
-
     }
 }
 

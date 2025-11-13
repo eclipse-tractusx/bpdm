@@ -19,8 +19,6 @@
 
 package org.eclipse.tractusx.orchestrator.api.model
 
-import io.swagger.v3.oas.annotations.media.Schema
-
 enum class TaskErrorType {
     Timeout,
     Unspecified,

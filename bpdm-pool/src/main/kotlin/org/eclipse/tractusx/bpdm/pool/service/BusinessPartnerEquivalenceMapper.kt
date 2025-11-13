@@ -22,9 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.service
 import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
-import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
-import org.eclipse.tractusx.bpdm.pool.api.model.ConfidenceCriteriaDto
 import org.eclipse.tractusx.bpdm.pool.entity.ConfidenceCriteriaDb
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
@@ -115,18 +113,6 @@ class BusinessPartnerEquivalenceMapper {
             confidenceCriteria = toEquivalenceDto(logisticAddress.confidenceCriteria)
         )
 
-    private fun toEquivalenceDto(confidenceCriteriaDto: ConfidenceCriteriaDto) =
-        with(confidenceCriteriaDto) {
-            ConfidenceCriteriaEquivalenceDto(
-                sharedByOwner,
-                checkedByExternalDataSource,
-                1,
-                lastConfidenceCheckAt,
-                nextConfidenceCheckAt,
-                confidenceLevel
-            )
-        }
-
     private fun toEquivalenceDto(confidenceCriteria: ConfidenceCriteriaDb) =
         with(confidenceCriteria) {
             ConfidenceCriteriaEquivalenceDto(
@@ -178,12 +164,6 @@ class BusinessPartnerEquivalenceMapper {
         override val validTo: LocalDateTime?,
         override val type: BusinessStateType,
     ) : IAddressStateDto, ILegalEntityStateDto, ISiteStateDto
-
-    data class ClassificationEquivalenceDto(
-        override val code: String?,
-        override val value: String?,
-        override val type: ClassificationType
-    ) : ILegalEntityClassificationDto
 
     data class PhysicalAddressEquivalenceDto(
         override val geographicCoordinates: GeoCoordinateDto?,

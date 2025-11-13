@@ -21,14 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.api.v6.model.response
 
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorCode
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityCreateError
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityUpdateError
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteCreateError
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteUpdateError
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressCreateError
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressUpdateError
+import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressVerboseDto
 
 open class EntitiesWithErrors<ENTITY, out ERROR : ErrorCode>(
@@ -37,12 +30,7 @@ open class EntitiesWithErrors<ENTITY, out ERROR : ErrorCode>(
     open val entities: Collection<ENTITY>,
     @Schema(description = "Errors for not created entities")
     open val errors: Collection<ErrorInfo<ERROR>>
-) {
-    val entityCount: Int
-        get() = entities.size
-    val errorCount: Int
-        get() = errors.size
-}
+)
 
 @Schema(description = CommonDescription.headerEntityWithErrorsWrapper)
 data class LegalEntityPartnerCreateResponseWrapper(

@@ -31,7 +31,6 @@ object SiteDescription {
             "addresses belong to which site. A site is uniquely identified by the BPNS."
     const val headerCreateRequest = "Request for creating new business partner record of type site. $header"
     const val headerUpdateRequest = "Request for updating a business partner record of type site. $header"
-    const val headerUpsertRequest = "Request for creating/updating a business partner record of type site. $header"
     const val headerUpsertResponse = "Created/updated business partner of type site. $header"
     const val headerMatchResponse = "Match for a business partner record of type site. $header"
 
@@ -46,7 +45,5 @@ object SiteDescription {
     const val roles = "Roles this business partner takes in relation to the sharing member."
 
     const val bpnlParent = "The BPNL of the legal entity owning the site."
-    const val legalEntityExternalId = "The identifier which uniquely identifies (in the internal system landscape of the sharing member) " +
-            "the business partner owning the site."
     const val site = "Site information"
 }

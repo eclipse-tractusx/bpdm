@@ -27,9 +27,9 @@ import org.eclipse.tractusx.bpdm.common.mapping.ValidationContext.Companion.from
 import org.eclipse.tractusx.bpdm.common.mapping.types.BpnLString
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.CxMembershipUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.CxMembershipDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.CxMembershipSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.CxMembershipUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService

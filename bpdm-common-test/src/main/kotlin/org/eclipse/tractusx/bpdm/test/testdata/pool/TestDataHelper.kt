@@ -19,13 +19,14 @@
 
 package org.eclipse.tractusx.bpdm.test.testdata.pool
 
-import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.model.*
+import org.eclipse.tractusx.bpdm.pool.api.model.CountrySubdivisionDto
+import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
+import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalFormDto
 import org.eclipse.tractusx.bpdm.test.util.Timeframe
 import java.time.Instant
-import kotlin.random.Random
 
 fun List<LegalEntityHierarchy>.getAllLegalEntities() = map { it.legalEntity }
 fun List<LegalEntityHierarchy>.getAllSites() = flatMap { it.getAllSites() }
@@ -77,25 +78,6 @@ class PoolDataHelper(
 
         return HierarchyCreationResponse(hierarchiesWithBpnS, Timeframe(startCreationTime, endCreationTime))
     }
-
-    private fun createIdentifierType(seed: String, type: IdentifierBusinessPartnerType): IdentifierTypeDto {
-        val longSeed = seed.hashCode().toLong()
-        val random = Random(longSeed)
-        return IdentifierTypeDto(
-            technicalKey = seed,
-            businessPartnerType = type,
-            name = "Identifier Name $seed",
-            abbreviation = "Identifier Abbreviation $seed",
-            transliteratedName = "Identifier Transliterated Name $seed",
-            transliteratedAbbreviation = "Identifier Transliterated Abbreviation $seed",
-            format = "Identifier Formart $seed",
-            categories = (1 .. 3).map { IdentifierTypeCategory.entries.random(random) }.toSortedSet(),
-            listOf(
-                IdentifierTypeDetailDto(country = CountryCode.entries.random(random), false),
-                IdentifierTypeDetailDto(country = CountryCode.entries.random(random), false)
-            )
-        )
-    }
 }
 
 data class HierarchyCreationResponse(
@@ -114,9 +96,4 @@ data class TestMetadata(
     val legalEntityIdentifierTypes: List<IdentifierTypeDto>,
     val addressIdentifierTypes: List<IdentifierTypeDto>,
     val adminAreas: List<CountrySubdivisionDto>
-)
-
-data class TestMetadataKeys(
-    val legalEntityIdentifierTypeKeys: List<String>,
-    val addressIdentifierTypeKeys: List<String>
 )

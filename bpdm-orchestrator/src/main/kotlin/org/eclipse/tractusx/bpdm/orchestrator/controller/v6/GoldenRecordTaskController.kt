@@ -25,11 +25,7 @@ import org.eclipse.tractusx.bpdm.orchestrator.config.PermissionConfigProperties
 import org.eclipse.tractusx.orchestrator.api.model.TaskStateRequest
 import org.eclipse.tractusx.orchestrator.api.model.TaskStepReservationRequest
 import org.eclipse.tractusx.orchestrator.api.v6.GoldenRecordTaskApi
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskCreateRequest
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskCreateResponse
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepReservationResponse
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepResultRequest
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStateResponse
+import org.eclipse.tractusx.orchestrator.api.v6.model.*
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.ResponseStatus

@@ -54,10 +54,6 @@ class BusinessPartnerDb(
     @CollectionTable(name = "business_partners_states", joinColumns = [JoinColumn(name = "business_partner_id")])
     val states: SortedSet<StateDb> = sortedSetOf(),
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "business_partners_classifications", joinColumns = [JoinColumn(name = "business_partner_id")])
-    val classifications: SortedSet<ClassificationDb> = sortedSetOf(),
-
     @Column(name = "short_name")
     var shortName: String? = null,
 

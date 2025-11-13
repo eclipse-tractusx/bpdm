@@ -219,26 +219,6 @@ class MetadataService(
         return countryRule
     }
 
-
-    @Transactional
-    fun createRegion(request: RegionDto): RegionDto {
-        logger.info { "Create new Region with key ${request.regionCode} and name ${request.regionName}" }
-
-        val region = RegionDb(
-            countryCode = request.countryCode,
-            regionCode = request.regionCode,
-            regionName = request.regionName
-        )
-
-        return regionRepository.save(region).toRegionDto()
-    }
-
-    fun getRegions(paginationRequest: PaginationRequest): PageDto<RegionDto> {
-        val pageRequest = paginationRequest.toPageRequest(RegionRepository.DEFAULT_SORTING)
-        val page = regionRepository.findAll(pageRequest)
-        return page.toDto(page.content.map { it.toRegionDto() })
-    }
-
     fun getCountrySubdivisions(paginationRequest: PaginationRequest): PageDto<CountrySubdivisionDto> {
         val pageRequest = paginationRequest.toPageRequest(RegionRepository.DEFAULT_SORTING)
         val page = regionRepository.findAll(pageRequest)

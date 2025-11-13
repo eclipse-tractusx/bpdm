@@ -147,7 +147,6 @@ class BusinessPartnerFetchService(
 
         legalEntityRepository.joinIdentifiers(partners)
         legalEntityRepository.joinStates(partners)
-        legalEntityRepository.joinClassifications(partners)
         legalEntityRepository.joinRelations(partners)
         legalEntityRepository.joinLegalForm(partners)
 

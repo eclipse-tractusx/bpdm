@@ -24,10 +24,6 @@ enum class DeliveryServiceType(private val typeName: String) : NamedType {
     PRIVATE_BAG("private bag"),
     BOITE_POSTALE("boite postale");
 
-    fun getTechnicalKey(): String {
-        return name
-    }
-
     override fun getTypeName(): String {
         return typeName
     }

@@ -23,7 +23,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
@@ -33,13 +32,9 @@ import org.eclipse.tractusx.bpdm.gate.api.model.RelationDto
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.RelationPutResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
-import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryVerboseDto
 import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerGenericCommonValues
-import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerVerboseValues
 import org.eclipse.tractusx.bpdm.test.util.AssertHelpers
 import org.eclipse.tractusx.bpdm.test.util.Timeframe
 import org.eclipse.tractusx.orchestrator.api.ApiCommons
@@ -58,7 +53,6 @@ class MockAndAssertUtils @Autowired constructor(
     val ORCHESTRATOR_CREATE_TASKS_URL = ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS
     val ORCHESTRATOR_SEARCH_TASK_STATES_URL = "${ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS}/state/search"
     val ORCHESTRATOR_SEARCH_TASK_RESULT_STATES_URL = "${ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS}/result-state/search"
-    val POOL_API_SEARCH_CHANGE_LOG_URL = "${org.eclipse.tractusx.bpdm.pool.api.ApiCommons.CHANGELOG_BASE_PATH_V7}/search"
 
     val taskStep = TaskStep.entries.first()
 
@@ -202,93 +196,9 @@ class MockAndAssertUtils @Autowired constructor(
         )
     }
 
-    fun mockOrchestratorApiCleanedResponseSizeOne(gateWireMockServer: WireMockExtension) {
-        val taskStateResponse = TaskStateResponse(
-            listOf(
-                TaskClientStateDto(
-                    taskId = "0",
-                    businessPartnerResult = BusinessPartnerGenericCommonValues.businessPartner1,
-                    recordId = "e3a05ebc-ff59-4d09-bd58-da31d6245701",
-                    processingState = TaskProcessingStateDto(
-                        resultState = ResultState.Success,
-                        step = taskStep,
-                        stepState = StepState.Queued,
-                        errors = emptyList(),
-                        createdAt = Instant.now(),
-                        modifiedAt = Instant.now(),
-                        timeout = Instant.now()
-                    )
-                )
-            )
-        )
-        gateWireMockServer.stubFor(
-            WireMock.post(WireMock.urlPathEqualTo(ORCHESTRATOR_SEARCH_TASK_STATES_URL))
-                .willReturn(
-                    WireMock.okJson(objectMapper.writeValueAsString(taskStateResponse))
-                )
-        )
-
-        gateWireMockServer.stubFor(
-            WireMock.get(WireMock.urlPathEqualTo("${ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS}/finished-events")).willReturn(
-                WireMock.okJson(objectMapper.writeValueAsString(
-                    FinishedTaskEventsResponse(1, 1, 0, 1, content =
-                    listOf(
-                        FinishedTaskEventsResponse.Event(Instant.now(), ResultState.Success, "0")
-                    )
-                    )
-                ))
-            )
-        )
-    }
-
-    fun mockPoolApiGetChangeLogs(poolWireMockServer: WireMockExtension) {
-
-        val poolChangelogEntries = PageDto(
-            totalElements = 3,
-            totalPages = 1,
-            page = 0,
-            contentSize = 3,
-            content = listOf(
-                ChangelogEntryVerboseDto(
-                    bpn = BusinessPartnerVerboseValues.bpOutputDtoCleaned.legalEntity.legalEntityBpn,
-                    businessPartnerType = BusinessPartnerType.LEGAL_ENTITY,
-                    timestamp = Instant.now(),
-                    changelogType = ChangelogType.UPDATE
-                ),
-                ChangelogEntryVerboseDto(
-                    bpn = BusinessPartnerVerboseValues.bpOutputDtoCleaned.address.addressBpn,
-                    businessPartnerType = BusinessPartnerType.ADDRESS,
-                    timestamp = Instant.now(),
-                    changelogType = ChangelogType.UPDATE
-                ),
-                ChangelogEntryVerboseDto(
-                    bpn = BusinessPartnerVerboseValues.bpOutputDtoCleaned.site!!.siteBpn!!,
-                    businessPartnerType = BusinessPartnerType.SITE,
-                    timestamp = Instant.now(),
-                    changelogType = ChangelogType.UPDATE
-                )
-            )
-        )
-        // Pool APi get changelogs endpoint
-        poolWireMockServer.stubFor(
-            WireMock.post(WireMock.urlPathEqualTo(POOL_API_SEARCH_CHANGE_LOG_URL))
-                .willReturn(
-                    WireMock.okJson(objectMapper.writeValueAsString(poolChangelogEntries))
-                )
-        )
-    }
-
     fun readSharingStates(externalIds: Collection<String>?): Collection<SharingStateDto> {
 
         return gateClient.sharingState.getSharingStates(PaginationRequest(), externalIds).content
-    }
-
-    fun assertUpsertOutputResponsesMatchRequests(responses: Collection<BusinessPartnerOutputDto>, requests: List<BusinessPartnerOutputDto>) {
-        Assertions.assertThat(responses)
-            .usingRecursiveComparison()
-            .ignoringCollectionOrder()
-            .ignoringFieldsOfTypes(Instant::class.java)
-            .isEqualTo(requests)
     }
 
     fun assertUpsertResponsesMatchRequests(responses: Collection<BusinessPartnerInputDto>, requests: List<BusinessPartnerInputRequest>) {

@@ -189,22 +189,4 @@ class SharingStateService(
                 )
         }
     }
-
-    data class PendingRequest(
-        val externalId: String,
-        val taskId: String,
-        val startTimeOverwrite: LocalDateTime? = null
-    )
-
-    data class SuccessRequest(
-        val externalId: String,
-        val startTimeOverwrite: LocalDateTime? = null
-    )
-
-    data class ErrorRequest(
-        val externalId: String,
-        val errorCode: BusinessPartnerSharingError,
-        val errorMessage: String?,
-        val startTimeOverwrite: LocalDateTime? = null
-    )
 }

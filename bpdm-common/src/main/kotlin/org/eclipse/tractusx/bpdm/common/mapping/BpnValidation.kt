@@ -20,21 +20,20 @@
 package org.eclipse.tractusx.bpdm.common.mapping
 
 class BpnValidation(
-    private val bpnTypeDescriptor: String,
     private val errorCode: String,
     private val errorDetails: String,
-    private val bpnPrefix: String = "BPN",
-    private val codeLength: Int = 10,
-    private val checksumLength: Int = 2,
-    private val allowedAlphabet: String = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-
+    bpnTypeDescriptor: String,
+    bpnPrefix: String = "BPN",
+    codeLength: Int = 10,
+    checksumLength: Int = 2,
+    allowedAlphabet: String = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 ): BpdmValidation<String> {
 
     companion object{
         val bpnLValidation = BpnValidation(
-            "L",
-            CommonValidationErrorCodes.BpnL.name,
-            CommonValidationErrorCodes.BpnL.description
+            errorCode = CommonValidationErrorCodes.BpnL.name,
+            errorDetails = CommonValidationErrorCodes.BpnL.description,
+            bpnTypeDescriptor =  "L",
         )
     }
 

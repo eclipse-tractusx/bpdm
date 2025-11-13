@@ -363,12 +363,6 @@ class AddressControllerIT @Autowired constructor(
         val bpnA2 = givenStructure[0].siteStructures[0].addresses[1].address.bpna
         val bpnA3 = givenStructure[1].addresses[0].address.bpna
 
-        val expected = listOf(
-            BusinessPartnerVerboseValues.addressPartner1.copy(bpna = bpnA2),
-            BusinessPartnerVerboseValues.addressPartner2.copy(bpna = bpnA3),
-            BusinessPartnerVerboseValues.addressPartner3.copy(bpna = bpnA1)
-        )
-
         val toUpdate = listOf(
             BusinessPartnerNonVerboseValues.addressPartnerUpdate1.copy(bpna = bpnA2, address = BusinessPartnerNonVerboseValues.logisticAddress5),
             BusinessPartnerNonVerboseValues.addressPartnerUpdate2.copy(bpna = bpnA3, address = BusinessPartnerNonVerboseValues.logisticAddress5),

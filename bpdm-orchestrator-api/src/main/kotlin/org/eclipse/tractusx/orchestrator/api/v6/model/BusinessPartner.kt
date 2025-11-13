@@ -20,15 +20,7 @@
 package org.eclipse.tractusx.orchestrator.api.v6.model
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.orchestrator.api.model.NamePart
-import org.eclipse.tractusx.orchestrator.api.model.PostalAddress
-import org.eclipse.tractusx.orchestrator.api.model.Site
-import org.eclipse.tractusx.orchestrator.api.model.UncategorizedProperties
-import org.eclipse.tractusx.orchestrator.api.model.GoldenRecordType
-import org.eclipse.tractusx.orchestrator.api.model.BpnReference
-import org.eclipse.tractusx.orchestrator.api.model.Identifier
-import org.eclipse.tractusx.orchestrator.api.model.BusinessState
-import org.eclipse.tractusx.orchestrator.api.model.ConfidenceCriteria
+import org.eclipse.tractusx.orchestrator.api.model.*
 
 @Schema(description = "Generic business partner data for golden record processing. " +
         "Typically a sharing member shares incomplete and/or uncategorized business partner data to the golden record process. " +

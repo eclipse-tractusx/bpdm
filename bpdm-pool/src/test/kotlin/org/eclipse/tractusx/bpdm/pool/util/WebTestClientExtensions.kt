@@ -21,36 +21,6 @@ package org.eclipse.tractusx.bpdm.pool.util
 
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.returnResult
-import org.springframework.web.reactive.function.BodyInserters
-
-
-/**
- * Helper method for invoking a post endpoint on [path] with a request [body] and an expected response body
- * Only works for response bodies that are serialized as Json Objects
- */
-inline fun <reified T : Any> WebTestClient.invokePostEndpoint(path: String, body: Any): T {
-    return post().uri(path)
-        .body(BodyInserters.fromValue(body))
-        .exchange()
-        .expectStatus().is2xxSuccessful
-        .returnResult<T>()
-        .responseBody
-        .blockFirst()!!
-}
-
-
-fun WebTestClient.invokePostEndpointWithoutResponse(path: String, body: Any? = null) {
-    val bodyInserter = body?.let { BodyInserters.fromValue(it) } ?: BodyInserters.empty()
-    post().uri(path)
-        .body(bodyInserter)
-        .exchange()
-        .expectStatus().is2xxSuccessful
-        .expectBody()
-        .returnResult()
-    /*
-    Mitigates Timeout issue when WebTestClient gets executed too many times without result returned
-     */
-}
 
 
 inline fun <reified T : Any> WebTestClient.invokeGetEndpoint(path: String, vararg params: Pair<String, String>): T {

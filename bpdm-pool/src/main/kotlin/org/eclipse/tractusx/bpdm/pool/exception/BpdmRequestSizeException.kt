@@ -24,8 +24,6 @@ import org.springframework.web.bind.annotation.ResponseStatus
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 class BpdmRequestSizeException(
-    val actualSize: Int,
-    val maxSize: Int
-            ): RuntimeException("Request size of $actualSize exceeds maximum size of $maxSize") {
-
-}
+    actualSize: Int,
+    maxSize: Int
+            ): RuntimeException("Request size of $actualSize exceeds maximum size of $maxSize")

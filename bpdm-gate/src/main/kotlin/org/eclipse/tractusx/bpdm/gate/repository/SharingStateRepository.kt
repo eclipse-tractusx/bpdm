@@ -57,7 +57,7 @@ interface SharingStateRepository : PagingAndSortingRepository<SharingStateDb, Lo
             Specification<SharingStateDb> { root, _, builder ->
                 updatedAfter?.let {
                     builder.greaterThan(root
-                        .get<Instant>(SharingStateDb::updatedAt.name), updatedAfter)
+                        .get(SharingStateDb::updatedAt.name), updatedAfter)
                 }
             }
 

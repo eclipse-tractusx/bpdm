@@ -33,7 +33,6 @@ object LegalEntityDescription {
             "identified by the BPNL."
     const val headerCreateRequest = "Request for creating new business partner record of type legal entity. $header"
     const val headerUpdateRequest = "Request for updating a business partner record of type legal entity. $header"
-    const val headerUpsertRequest = "Request for creating/updating a business partner record of type legal entity. $header"
     const val headerUpsertResponse = "Created/updated business partner of type legal entity. $header"
     const val headerMatchResponse = "Match with score for a business partner record of type legal entity. $header"
 
@@ -42,7 +41,6 @@ object LegalEntityDescription {
     const val currentness = "The date the business partner data was last indicated to be still current."
 
     const val legalName = "The name of the legal entity according to official registers."
-    const val legalNameParts = "The list of name parts of the legal entity to accommodate the different number of name fields in different systems."
     const val legalShortName = "The abbreviated name of the legal entity."
     const val legalForm = "The legal form of the legal entity."
     const val legalAddress = "The official, legal correspondence address to be provided to government and tax authorities " +
@@ -50,7 +48,6 @@ object LegalEntityDescription {
 
     const val identifiers = "The list of identifiers of the legal entity."
     const val states = "The list of (temporary) states of the legal entity."
-    const val classifications = "The list of classifications of the legal entity, such as a specific industry."
     const val relations = "Relations to other business partners."
 
 }

@@ -148,26 +148,6 @@ fun LogisticAddressDb.toDto(): LogisticAddressVerboseDto {
     )
 }
 
-fun LogisticAddressDb.toLegalAddressResponse(): LegalAddressVerboseDto {
-    return LegalAddressVerboseDto(
-        physicalPostalAddress = physicalPostalAddress.toDto(),
-        alternativePostalAddress = alternativePostalAddress?.toDto(),
-        bpnLegalEntity = legalEntity?.bpn!!,
-        createdAt = createdAt,
-        updatedAt = updatedAt
-    )
-}
-
-fun LogisticAddressDb.toMainAddressResponse(): MainAddressVerboseDto {
-    return MainAddressVerboseDto(
-        physicalPostalAddress = physicalPostalAddress.toDto(),
-        alternativePostalAddress = alternativePostalAddress?.toDto(),
-        bpnSite = site?.bpn!!,
-        createdAt = createdAt,
-        updatedAt = updatedAt
-    )
-}
-
 fun PhysicalPostalAddressDb.toDto(): PhysicalPostalAddressVerboseDto {
     return PhysicalPostalAddressVerboseDto(
         geographicCoordinates = geographicCoordinates?.toDto(),
@@ -276,10 +256,6 @@ fun GeographicCoordinateDb.toDto(): GeoCoordinateDto {
     return GeoCoordinateDto(longitude, latitude, altitude)
 }
 
-fun LegalEntityClassificationDb.toDto(): LegalEntityClassificationVerboseDto {
-    return LegalEntityClassificationVerboseDto(value, code, type.toDto())
-}
-
 fun RelationDb.toDto(): RelationVerboseDto {
     return RelationVerboseDto(
         type = type,
@@ -298,10 +274,6 @@ fun RelationValidityPeriodDb.toDto(): RelationValidityPeriod {
 
 fun PartnerChangelogEntryDb.toDto(): ChangelogEntryVerboseDto {
     return ChangelogEntryVerboseDto(bpn, businessPartnerType, updatedAt, changelogType)
-}
-
-fun RegionDb.toRegionDto(): RegionDto {
-    return RegionDto(countryCode = countryCode, regionCode = regionCode, regionName = regionName)
 }
 
 fun RegionDb.toCountrySubdivisionDto(): CountrySubdivisionDto {

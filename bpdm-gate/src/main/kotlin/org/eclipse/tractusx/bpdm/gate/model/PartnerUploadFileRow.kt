@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.gate.model
 
 import com.opencsv.bean.CsvBindByName
-import jakarta.validation.constraints.NotEmpty
 
 data class PartnerUploadFileRow(
 

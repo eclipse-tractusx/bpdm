@@ -19,5 +19,4 @@
 
 package org.eclipse.tractusx.bpdm.gate.exception
 
-class BpdmInvalidRelationException(message: String): RuntimeException(message) {
-}
+class BpdmInvalidRelationException(message: String): RuntimeException(message)
