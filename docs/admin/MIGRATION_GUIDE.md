@@ -4,6 +4,7 @@
 * [Migration Guide](#migration-guide)
   * [7.1.x to 7.2.x](#71x-to-72x)
     * [Alternative Headquarters Restriction](#alternative-headquarters-restriction)
+    * [Default Logging Level](#default-logging-level)
   * [7.0.x to 7.1.x](#70x-to-71x)
     * [EDC Version 0.11](#edc-version-011)
     * [Golden Record Process for IsManagedBy Relations](#golden-record-process-for-ismanagedby-relations)
@@ -17,6 +18,21 @@
 Now each legal entity can have only up to one alternative headquarters.
 Please make sure in your Pool and Gate output database each legal entity is part of up to only one such relation and remove relations that violate this constraint.
 Otherwise, the golden record process may show unexpected behaviour. 
+
+### Default Logging Level
+
+In order to reduce unnecessary logging output during CICD processing the new default logging level has been set to `INFO`.
+`DEBUG` level is now only meant to be activated when actually debugging BPDM.
+If you wish to set the logging level to `DEBUG` as before you can insert the following configuration into the application properties:
+
+```yaml
+logging:
+  level:
+    org:
+      eclipse:
+        tractusx:
+          bpdm: DEBUG
+```
 
 ## 7.0.x to 7.1.x
 

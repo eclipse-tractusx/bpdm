@@ -20,6 +20,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM Pool: V6 POST legal entities API can only have less than or equal to 100 identifiers.
 - BPDM Pool: maintained nanoseconds timestamps accuracy while creating/updating entity [#1449](https://github.com/eclipse-tractusx/bpdm/issues/1449)
 - BPDM Pool: fixed error response while creating duplicate legal address site [#1471](https://github.com/eclipse-tractusx/bpdm/issues/1471)
+- BPDM: The default logging level is now INFO [#1523](https://github.com/eclipse-tractusx/bpdm/issues/1523)
 
 ## [7.1.0] - 2025-09-30
 

@@ -122,11 +122,6 @@ logging:
   level:
     # On default show only logs from INFO and above
     root: INFO
-    org:
-      eclipse:
-        tractusx:
-          # Logs from the BPDM applications should be DEBUG and above
-          bpdm: DEBUG
 management:
   endpoint:
     health:
