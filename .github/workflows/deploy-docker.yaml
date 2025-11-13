@@ -68,8 +68,11 @@ jobs:
 
       - name: Create Docker Tags
         id: dockerTags
+        env:
+          IMAGE_NAMESPACE: ${{ env.IMAGE_NAMESPACE }}
+          IMAGE_NAME: ${{ env.IMAGE_NAME }}
         run: |
-          FULL_IMAGE_NAME="${{ env.IMAGE_NAMESPACE }}/${{ env.IMAGE_NAME }}"
+          FULL_IMAGE_NAME="$IMAGE_NAMESPACE/$IMAGE_NAME"
           SUFFIX="${{ steps.semVer.outputs.prerelease &&  '-' || '' }}${{ steps.semVer.outputs.prerelease }}"
           MAJOR="${{ steps.semVer.outputs.major }}"
           MINOR="${MAJOR}.${{ steps.semVer.outputs.minor }}"
