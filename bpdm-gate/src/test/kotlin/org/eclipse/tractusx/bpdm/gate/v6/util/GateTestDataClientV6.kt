@@ -17,13 +17,24 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.v6.util
+package org.eclipse.tractusx.bpdm.gate.v6.util
 
-import org.eclipse.tractusx.bpdm.common.util.BpdmWebClientProvider
-import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
-import org.springframework.boot.web.server.WebServer
+import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
+import org.eclipse.tractusx.bpdm.test.testdata.gate.v6.GateTestDataFactoryV6
+import java.time.Instant
 
-class PoolSharingMemberClientV6(
-    clientProvider: BpdmWebClientProvider,
-    ownWebServer: WebServer
-): PoolTestClientV6(KeyCloakInitializer.CLIENT_ID_SHARING_MEMBER, clientProvider, ownWebServer)
+/**
+ * Client offering functionality to quickly set up a given test environment for test cases (For the GIVEN section)
+ */
+class GateTestDataClientV6 (
+    val testDataFactory: GateTestDataFactoryV6,
+    val operatorClient: GateOperatorClientV6
+){
+
+    fun createBusinessPartnerInput(seed: String, externalId: String = seed, externalSequenceTimestamp: Instant? = null): BusinessPartnerInputDto{
+        val createRequest = testDataFactory.request.createFullValid(seed, externalId).copy(externalSequenceTimestamp = externalSequenceTimestamp)
+        return operatorClient.businessPartners.upsertBusinessPartnersInput(listOf(createRequest)).body!!.single()
+    }
+
+
+}

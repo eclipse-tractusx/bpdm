@@ -17,12 +17,12 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.v6.config
+package org.eclipse.tractusx.bpdm.gate.v6.config
 
-import org.eclipse.tractusx.bpdm.common.util.BpdmClientCreateProperties
-import org.eclipse.tractusx.bpdm.common.util.BpdmUnauthorizedWebClientProvider
 import org.eclipse.tractusx.bpdm.common.util.BpdmWebClientProvider
-import org.eclipse.tractusx.bpdm.pool.v6.util.*
+import org.eclipse.tractusx.bpdm.gate.v6.util.GateInputConsumerClientV6
+import org.eclipse.tractusx.bpdm.gate.v6.util.GateInputManagerClientV6
+import org.eclipse.tractusx.bpdm.gate.v6.util.GateOperatorClientV6
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext
 import org.springframework.context.annotation.Bean
@@ -30,39 +30,24 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 @ConditionalOnProperty(name = ["test.v6"], havingValue = "true", matchIfMissing = false)
-class PoolClientV6Configuration(
-    private val clientProvider: BpdmWebClientProvider,
-    private val webServerAppCtxt: ServletWebServerApplicationContext
+class GateClientV6Config(
+    private val webServerApplicationContext: ServletWebServerApplicationContext,
+    private val clientProvider: BpdmWebClientProvider
 ) {
 
     @Bean
-    fun poolOperatorClientV6(): PoolOperatorClientV6 {
-        return PoolOperatorClientV6(clientProvider, webServerAppCtxt.webServer)
+    fun gateOperatorClientV6(): GateOperatorClientV6{
+        return GateOperatorClientV6(clientProvider, webServerApplicationContext.webServer)
     }
 
     @Bean
-    fun sharingMemberClientV6(): PoolSharingMemberClientV6 {
-        return PoolSharingMemberClientV6(clientProvider, webServerAppCtxt.webServer)
+    fun gateInputManagerClientV6(): GateInputManagerClientV6{
+        return GateInputManagerClientV6(clientProvider, webServerApplicationContext.webServer)
     }
 
     @Bean
-    fun participantClientV6(): PoolParticipantClientV6 {
-        return PoolParticipantClientV6(clientProvider, webServerAppCtxt.webServer)
+    fun gateInputConsumerClientV6(): GateInputConsumerClientV6{
+        return GateInputConsumerClientV6(clientProvider, webServerApplicationContext.webServer)
     }
 
-    @Bean
-    fun unauthorizedClientV6(): PoolUnauthorizedClientV6 {
-        return PoolUnauthorizedClientV6(clientProvider, webServerAppCtxt.webServer)
-    }
-
-    @Bean
-    fun anonymousClientV6(): PoolAnonymousClientV6 {
-        return PoolAnonymousClientV6 {
-            BpdmUnauthorizedWebClientProvider().builder(BpdmClientCreateProperties(
-                registrationId = "",
-                baseUrl = "http://localhost:${webServerAppCtxt.webServer.port}",
-                securityEnabled = false
-            )).build()
-        }
-    }
 }
