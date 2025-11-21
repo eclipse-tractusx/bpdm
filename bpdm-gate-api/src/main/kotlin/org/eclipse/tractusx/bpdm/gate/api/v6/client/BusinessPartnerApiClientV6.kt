@@ -17,13 +17,20 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.v6.util
+package org.eclipse.tractusx.bpdm.gate.api.v6.client
 
-import org.eclipse.tractusx.bpdm.common.util.BpdmWebClientProvider
-import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
-import org.springframework.boot.web.server.WebServer
+import org.eclipse.tractusx.bpdm.gate.api.ApiCommons
+import org.eclipse.tractusx.bpdm.gate.api.GateBusinessPartnerApi
+import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.service.annotation.PutExchange
 
-class PoolSharingMemberClientV6(
-    clientProvider: BpdmWebClientProvider,
-    ownWebServer: WebServer
-): PoolTestClientV6(KeyCloakInitializer.CLIENT_ID_SHARING_MEMBER, clientProvider, ownWebServer)
+
+interface BusinessPartnerApiClientV6: GateBusinessPartnerApi {
+    @PutExchange(value = "${ApiCommons.BASE_PATH_V6}/input/business-partners")
+    override fun upsertBusinessPartnersInput(
+        @RequestBody businessPartners: Collection<BusinessPartnerInputRequest>
+    ): ResponseEntity<Collection<BusinessPartnerInputDto>>
+}
