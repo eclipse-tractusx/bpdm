@@ -17,12 +17,10 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.v6.participant
+package org.eclipse.tractusx.bpdm.gate.v6
 
-import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.v6.PoolV6Test
-import org.eclipse.tractusx.bpdm.pool.v6.util.PoolOperatorClientV6
-import org.eclipse.tractusx.bpdm.pool.v6.util.PoolParticipantClientV6
+import org.eclipse.tractusx.bpdm.gate.Application
+import org.eclipse.tractusx.bpdm.gate.v6.util.GateInputManagerClientV6
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.junit.jupiter.api.BeforeEach
@@ -38,14 +36,14 @@ import org.springframework.test.context.ContextConfiguration
     KeyCloakInitializer::class
 ])
 @ActiveProfiles("test-v6")
-abstract class ParticipantTest: PoolV6Test() {
+abstract class InputManagerV6Test: GateV6Test() {
+
     @Autowired
-    override lateinit var poolClient: PoolParticipantClientV6
-    @Autowired
-    lateinit var operatorClient: PoolOperatorClientV6
+    override lateinit var gateClient: GateInputManagerClientV6
 
     @BeforeEach
     override fun beforeEach(testInfo: TestInfo) {
         super.beforeEach(testInfo)
     }
+
 }

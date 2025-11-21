@@ -19,7 +19,11 @@
 
 package org.eclipse.tractusx.bpdm.pool.v6.util
 
-import org.eclipse.tractusx.bpdm.pool.api.v6.client.PoolClientImpl
-import org.springframework.web.reactive.function.client.WebClient
+import org.eclipse.tractusx.bpdm.common.util.BpdmWebClientProvider
+import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
+import org.springframework.boot.web.server.WebServer
 
-class PoolUnauthorizedClientV6(webClientProvider: () -> WebClient): PoolClientImpl(webClientProvider)
+class PoolUnauthorizedClientV6(
+    clientProvider: BpdmWebClientProvider,
+    ownWebServer: WebServer
+): PoolTestClientV6(KeyCloakInitializer.CLIENT_ID_UNAUTHORIZED, clientProvider, ownWebServer)

@@ -41,44 +41,75 @@ class KeyCloakInitializer: ApplicationContextInitializer<ConfigurableApplication
         const val TENANT_BPNL = "BPNL00000003CRHK"
         const val ROLE_MANAGEMENT_CLIENT = "technical_roles_management"
 
-        const val CLIENT_ID_OPERATOR = "bpdm-operator"
-        const val CLIENT_ID_SHARING_MEMBER = "bpdm-sharing-member"
-        const val CLIENT_ID_PARTICIPANT = "bpdm-participant"
-        const val CLIENT_ID_UNAUTHORIZED = "bpdm-unauthorized"
+        const val CLIENT_ID_OPERATOR = "operator"
+        const val CLIENT_ID_SHARING_MEMBER = "sharing-member"
+        const val CLIENT_ID_PARTICIPANT = "participant"
+        const val CLIENT_ID_UNAUTHORIZED = "unauthorized"
 
-        private var isClientsInitialized = false
+        const val CLIENT_ID_GATE_INPUT_MANAGER = "gate-input-manager"
 
-        lateinit var operatorClientSecret: String
-        lateinit var sharingMemberClientSecret: String
-        lateinit var participantClientSecret: String
-        lateinit var unauthorizedClientSecret: String
+
+        private const val OWN_PROVIDER_ID = "test-keycloak"
+
+        private var isContainerInitialized = false
+        private lateinit var clientRegistrationTestPropertyValues: TestPropertyValues
+
+        private lateinit var clientFactory: KeycloakClientFactory
     }
 
-    lateinit var clientFactory: KeycloakClientFactory
-
     override fun initialize(applicationContext: ConfigurableApplicationContext) {
-        keycloakContainer.start()
-
-        if(!isClientsInitialized)
-            initializeClients()
+        if(!isContainerInitialized){
+            initializeContainer()
+        }
 
         val authServerUrl = keycloakContainer.authServerUrl.trimEnd('/')
+        val issuerUri = "$authServerUrl/realms/$REALM"
 
         TestPropertyValues.of(
             "bpdm.security.auth-server-url=$authServerUrl",
-            "bpdm.security.realm=$REALM"
+            "bpdm.security.realm=$REALM",
+            "spring.security.oauth2.client.provider.${OWN_PROVIDER_ID}.issuer-uri=${issuerUri}"
         ).applyTo(applicationContext)
+
+        clientRegistrationTestPropertyValues.applyTo(applicationContext)
     }
 
-    private fun initializeClients(){
+    private fun initializeContainer(){
+        keycloakContainer.start()
+        clientRegistrationTestPropertyValues = initializeClients()
+
+        isContainerInitialized = true
+    }
+
+    private fun initializeClients(): TestPropertyValues{
         clientFactory = KeycloakClientFactory()
 
-        operatorClientSecret = clientFactory.createClient(CLIENT_ID_OPERATOR, "BPDM Pool Admin")
-        sharingMemberClientSecret = clientFactory.createClient(CLIENT_ID_SHARING_MEMBER, "BPDM Pool Sharing Consumer")
-        participantClientSecret = clientFactory.createClient(CLIENT_ID_PARTICIPANT, "BPDM Pool Consumer")
-        unauthorizedClientSecret = clientFactory.createClient(CLIENT_ID_UNAUTHORIZED, null)
+        val propertyValues = listOf(
+            initializeClient(CLIENT_ID_OPERATOR, listOf("BPDM Pool Admin", "BPDM Sharing Admin")),
+            initializeClient(CLIENT_ID_SHARING_MEMBER, listOf("BPDM Pool Sharing Consumer")),
+            initializeClient(CLIENT_ID_PARTICIPANT, listOf("BPDM Pool Consumer")),
+            initializeClient(CLIENT_ID_GATE_INPUT_MANAGER, listOf("BPDM Sharing Input Manager")),
 
-        isClientsInitialized = true
+            initializeClient(CLIENT_ID_UNAUTHORIZED, emptyList())
+        ).flatten().toTypedArray()
+
+        return TestPropertyValues.of(*propertyValues)
+    }
+
+    private fun initializeClient(
+        clientId: String,
+        roles: List<String>
+    ): List<String> {
+        val secret = clientFactory.createClient(clientId, roles)
+
+        val registrationPrefix = "spring.security.oauth2.client.registration.${clientId}"
+
+        return listOf(
+            "${registrationPrefix}.provider=${OWN_PROVIDER_ID}",
+            "${registrationPrefix}.authorization-grant-type=client_credentials",
+            "${registrationPrefix}.client-id=${clientId}",
+            "${registrationPrefix}.client-secret=${secret}"
+        )
     }
 }
 
@@ -130,13 +161,17 @@ abstract class CreateNewSelfClientInitializer: SelfClientInitializer(){
 
 class KeycloakClientFactory{
     fun createClient(clientId: String, roleName: String?): String{
+        return createClient(clientId, roleName?.let { listOf(it) } ?: emptyList())
+    }
+
+    fun createClient(clientId: String, roleNames: List<String>): String{
         val adminClient = keycloakContainer.keycloakAdminClient
         val realm = adminClient.realm(KeyCloakInitializer.REALM)
         val clients = realm.clients()
 
         val roleManagementClientUuid = clients.findByClientId(KeyCloakInitializer.ROLE_MANAGEMENT_CLIENT).first().id
         val roleManagementClient =  clients.get(roleManagementClientUuid)
-        val role = roleName?.let { roleManagementClient.roles().list().find { it.name == roleName } }
+        val roles = roleNames.map { roleName -> roleManagementClient.roles().list().find { it.name == roleName }!! }
 
         clientId.let { clientToCreate ->
             clients.create(ClientRepresentation().apply {
@@ -179,13 +214,11 @@ class KeycloakClientFactory{
             .get(newServiceAccount.id)
             .update(newServiceAccount)
 
-        if(role != null){
-            realm.users()
-                .get(newServiceAccount.id)
-                .roles()
-                .clientLevel(roleManagementClient.toRepresentation().id)
-                .add(listOf(role))
-        }
+        realm.users()
+            .get(newServiceAccount.id)
+            .roles()
+            .clientLevel(roleManagementClient.toRepresentation().id)
+            .add(roles)
 
         return createdClient.secret.value
     }

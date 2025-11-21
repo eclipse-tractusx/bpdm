@@ -17,13 +17,26 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.v6.util
+package org.eclipse.tractusx.bpdm.gate.v6
 
-import org.eclipse.tractusx.bpdm.common.util.BpdmWebClientProvider
-import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
-import org.springframework.boot.web.server.WebServer
+import org.eclipse.tractusx.bpdm.gate.v6.util.GateAssertRepositoryV6
+import org.eclipse.tractusx.bpdm.gate.v6.util.GateTestDataClientV6
+import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
+import org.junit.jupiter.api.TestInfo
+import org.springframework.beans.factory.annotation.Autowired
 
-class PoolSharingMemberClientV6(
-    clientProvider: BpdmWebClientProvider,
-    ownWebServer: WebServer
-): PoolTestClientV6(KeyCloakInitializer.CLIENT_ID_SHARING_MEMBER, clientProvider, ownWebServer)
+abstract class GateV6Test: IsGateV6Test {
+    @Autowired
+    lateinit var databaseHelpers: DbTestHelpers
+    @Autowired
+    override lateinit var assertRepo: GateAssertRepositoryV6
+    @Autowired
+    override lateinit var testDataClient: GateTestDataClientV6
+
+    lateinit var testName: String
+
+    open fun beforeEach(testInfo: TestInfo){
+        testName = testInfo.displayName
+        databaseHelpers.truncateDbTables()
+    }
+}

@@ -1,0 +1,23 @@
+test:
+  v6: "true"
+bpdm:
+  tasks:
+    creation:
+      fromSharingMember:
+        cron: '-'
+      fromPool:
+        cron: '-'
+    check:
+      cron: '-'
+    healthCheck:
+      cron: '-'
+    relationCreation:
+      cron: '-'
+    relationCheck:
+      cron: '-'
+    recordSync:
+      cron: '-'
+  spring:
+    datasource:
+      hikari:
+        maximum-pool-size: 2
