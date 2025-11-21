@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.v6.util
 
 import org.assertj.core.api.Assertions
+import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.springframework.stereotype.Component
 
@@ -36,6 +37,20 @@ class GateAssertRepositoryV6 {
             .ignoringFields(
                 BusinessPartnerInputDto::createdAt.name,
                 BusinessPartnerInputDto::updatedAt.name
+            )
+            .isEqualTo(expected)
+    }
+
+    fun assertBusinessPartnerInput(actual: PageDto<BusinessPartnerInputDto>, expected: PageDto<BusinessPartnerInputDto>){
+        assertPageHeader(actual, expected)
+        assertBusinessPartnerInput(actual.content, expected.content)
+    }
+
+    private fun assertPageHeader(actual: PageDto<*>, expected: PageDto<*>){
+        Assertions.assertThat(actual)
+            .usingRecursiveComparison()
+            .ignoringFields(
+                PageDto<*>::content.name
             )
             .isEqualTo(expected)
     }
