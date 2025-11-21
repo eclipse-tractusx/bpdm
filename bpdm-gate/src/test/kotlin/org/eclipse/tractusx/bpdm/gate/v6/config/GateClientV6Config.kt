@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.v6.config
 
 import org.eclipse.tractusx.bpdm.common.util.BpdmWebClientProvider
+import org.eclipse.tractusx.bpdm.gate.v6.util.GateInputConsumerClientV6
 import org.eclipse.tractusx.bpdm.gate.v6.util.GateInputManagerClientV6
 import org.eclipse.tractusx.bpdm.gate.v6.util.GateOperatorClientV6
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
@@ -42,6 +43,11 @@ class GateClientV6Config(
     @Bean
     fun gateInputManagerClientV6(): GateInputManagerClientV6{
         return GateInputManagerClientV6(clientProvider, webServerApplicationContext.webServer!!)
+    }
+
+    @Bean
+    fun gateInputConsumerClientV6(): GateInputConsumerClientV6{
+        return GateInputConsumerClientV6(clientProvider, webServerApplicationContext.webServer)
     }
 
 }

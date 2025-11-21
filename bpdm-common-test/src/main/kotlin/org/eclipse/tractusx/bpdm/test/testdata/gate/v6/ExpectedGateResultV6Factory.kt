@@ -45,5 +45,4 @@ class ExpectedGateResultV6Factory {
             )
         }
     }
-
 }

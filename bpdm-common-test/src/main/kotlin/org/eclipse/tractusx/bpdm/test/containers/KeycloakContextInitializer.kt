@@ -47,6 +47,7 @@ class KeyCloakInitializer: ApplicationContextInitializer<ConfigurableApplication
         const val CLIENT_ID_UNAUTHORIZED = "unauthorized"
 
         const val CLIENT_ID_GATE_INPUT_MANAGER = "gate-input-manager"
+        const val CLIENT_ID_GATE_INPUT_CONSUMER = "gate-input-consumer"
 
 
         private const val OWN_PROVIDER_ID = "test-keycloak"
@@ -89,7 +90,7 @@ class KeyCloakInitializer: ApplicationContextInitializer<ConfigurableApplication
             initializeClient(CLIENT_ID_SHARING_MEMBER, listOf("BPDM Pool Sharing Consumer")),
             initializeClient(CLIENT_ID_PARTICIPANT, listOf("BPDM Pool Consumer")),
             initializeClient(CLIENT_ID_GATE_INPUT_MANAGER, listOf("BPDM Sharing Input Manager")),
-
+            initializeClient(CLIENT_ID_GATE_INPUT_CONSUMER, listOf("BPDM Sharing Input Consumer")),
             initializeClient(CLIENT_ID_UNAUTHORIZED, emptyList())
         ).flatten().toTypedArray()
 
