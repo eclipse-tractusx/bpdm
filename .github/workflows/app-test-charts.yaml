@@ -23,7 +23,7 @@ on:
     inputs:
       node_image:
         description: 'kindest/node image for k8s kind cluster'
-        default: 'kindest/node:v1.32.1'
+        default: 'kindest/node:v1.34.0'
         required: false
         type: string
       upgrade_from:
