@@ -3,7 +3,7 @@ info:
   title: Business Partner Data Management Pool
   description: Service that manages and shares business partner data with other CatenaX
     services
-  version: 7.2.0-rc2
+  version: 7.2.0
 servers:
   - url: http://localhost:8080
     description: Generated server url
@@ -3414,10 +3414,12 @@ components:
             registers but according to the name the sharing member chooses.
         states:
           type: array
+          description: The list of (temporary) states of the address.
           items:
             $ref: "#/components/schemas/AddressStateDto"
         identifiers:
           type: array
+          description: The list of identifiers of the address.
           items:
             $ref: "#/components/schemas/AddressIdentifierDto"
         physicalPostalAddress:
@@ -3459,10 +3461,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ErrorInfoAddressCreateError"
-        entityCount:
+        errorCount:
           type: integer
           format: int32
-        errorCount:
+        entityCount:
           type: integer
           format: int32
       required:
@@ -3500,10 +3502,12 @@ components:
             registers but according to the name the sharing member chooses.
         states:
           type: array
+          description: The list of (temporary) states of the address.
           items:
             $ref: "#/components/schemas/AddressStateVerboseDto"
         identifiers:
           type: array
+          description: The list of identifiers of the address.
           items:
             $ref: "#/components/schemas/AddressIdentifierVerboseDto"
         physicalPostalAddress:
@@ -3588,10 +3592,12 @@ components:
             registers but according to the name the sharing member chooses.
         states:
           type: array
+          description: The list of (temporary) states of the address.
           items:
             $ref: "#/components/schemas/AddressStateDto"
         identifiers:
           type: array
+          description: The list of identifiers of the address.
           items:
             $ref: "#/components/schemas/AddressIdentifierDto"
         physicalPostalAddress:
@@ -3626,10 +3632,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ErrorInfoAddressUpdateError"
-        entityCount:
+        errorCount:
           type: integer
           format: int32
-        errorCount:
+        entityCount:
           type: integer
           format: int32
       required:
@@ -4157,11 +4163,15 @@ components:
           example: 2023-03-20T10:23:28.194Z
         bpns:
           type: array
+          description: Only for business partners with the given array of BPNL/S/A.
+            Ignored if empty.
           items:
             type: string
           uniqueItems: true
         businessPartnerTypes:
           type: array
+          description: Only for business partners with the given array of business
+            partner types. Ignored if empty.
           items:
             type: string
             enum:
@@ -5431,10 +5441,12 @@ components:
           description: The legal form of the legal entity.
         identifiers:
           type: array
+          description: The list of identifiers of the legal entity.
           items:
             $ref: "#/components/schemas/LegalEntityIdentifierDto"
         states:
           type: array
+          description: The list of (temporary) states of the legal entity.
           items:
             $ref: "#/components/schemas/LegalEntityStateDto"
         confidenceCriteria:
@@ -5473,10 +5485,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ErrorInfoLegalEntityCreateError"
-        entityCount:
+        errorCount:
           type: integer
           format: int32
-        errorCount:
+        entityCount:
           type: integer
           format: int32
       required:
@@ -5516,14 +5528,17 @@ components:
           description: The legal form of the legal entity.
         identifiers:
           type: array
+          description: The list of identifiers of the legal entity.
           items:
             $ref: "#/components/schemas/LegalEntityIdentifierVerboseDto"
         states:
           type: array
+          description: The list of (temporary) states of the legal entity.
           items:
             $ref: "#/components/schemas/LegalEntityStateVerboseDto"
         relations:
           type: array
+          description: Relations to other business partners.
           items:
             $ref: "#/components/schemas/RelationVerboseDto"
         currentness:
@@ -5597,10 +5612,12 @@ components:
           description: The legal form of the legal entity.
         identifiers:
           type: array
+          description: The list of identifiers of the legal entity.
           items:
             $ref: "#/components/schemas/LegalEntityIdentifierDto"
         states:
           type: array
+          description: The list of (temporary) states of the legal entity.
           items:
             $ref: "#/components/schemas/LegalEntityStateDto"
         confidenceCriteria:
@@ -5637,10 +5654,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ErrorInfoLegalEntityUpdateError"
-        entityCount:
+        errorCount:
           type: integer
           format: int32
-        errorCount:
+        entityCount:
           type: integer
           format: int32
       required:
@@ -5733,14 +5750,17 @@ components:
           description: The legal form of the legal entity.
         identifiers:
           type: array
+          description: The list of identifiers of the legal entity.
           items:
             $ref: "#/components/schemas/LegalEntityIdentifierVerboseDto"
         states:
           type: array
+          description: The list of (temporary) states of the legal entity.
           items:
             $ref: "#/components/schemas/LegalEntityStateVerboseDto"
         relations:
           type: array
+          description: Relations to other business partners.
           items:
             $ref: "#/components/schemas/RelationVerboseDto"
         currentness:
@@ -6784,10 +6804,12 @@ components:
             registers but according to the name the sharing member chooses.
         states:
           type: array
+          description: The list of (temporary) states of the address.
           items:
             $ref: "#/components/schemas/AddressStateDto"
         identifiers:
           type: array
+          description: The list of identifiers of the address.
           items:
             $ref: "#/components/schemas/AddressIdentifierDto"
         physicalPostalAddress:
@@ -6834,10 +6856,12 @@ components:
             registers but according to the name the sharing member chooses.
         states:
           type: array
+          description: The list of (temporary) states of the address.
           items:
             $ref: "#/components/schemas/AddressStateVerboseDto"
         identifiers:
           type: array
+          description: The list of identifiers of the address.
           items:
             $ref: "#/components/schemas/AddressIdentifierVerboseDto"
         physicalPostalAddress:
@@ -7944,6 +7968,7 @@ components:
             but according to the name the owner chooses.
         states:
           type: array
+          description: The list of the (temporary) states of the site.
           items:
             $ref: "#/components/schemas/SiteStateDto"
         confidenceCriteria:
@@ -7976,6 +8001,7 @@ components:
             but according to the name the owner chooses.
         states:
           type: array
+          description: The list of the (temporary) states of the site.
           items:
             $ref: "#/components/schemas/SiteStateDto"
         mainAddress:
@@ -8010,10 +8036,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ErrorInfoSiteCreateError"
-        entityCount:
+        errorCount:
           type: integer
           format: int32
-        errorCount:
+        entityCount:
           type: integer
           format: int32
       required:
@@ -8047,6 +8073,7 @@ components:
             but according to the name the owner chooses.
         states:
           type: array
+          description: The list of the (temporary) states of the site.
           items:
             $ref: "#/components/schemas/SiteStateVerboseDto"
         isParticipantData:
@@ -8110,6 +8137,7 @@ components:
             but according to the name the owner chooses.
         states:
           type: array
+          description: The list of the (temporary) states of the site.
           items:
             $ref: "#/components/schemas/SiteStateDto"
         mainAddress:
@@ -8138,10 +8166,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ErrorInfoSiteUpdateError"
-        entityCount:
+        errorCount:
           type: integer
           format: int32
-        errorCount:
+        entityCount:
           type: integer
           format: int32
       required:
@@ -8234,6 +8262,7 @@ components:
             but according to the name the owner chooses.
         states:
           type: array
+          description: The list of the (temporary) states of the site.
           items:
             $ref: "#/components/schemas/SiteStateVerboseDto"
         isParticipantData:
@@ -8288,6 +8317,7 @@ components:
             but according to the name the owner chooses.
         states:
           type: array
+          description: The list of the (temporary) states of the site.
           items:
             $ref: "#/components/schemas/SiteStateVerboseDto"
         isParticipantData:

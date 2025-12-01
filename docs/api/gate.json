@@ -3,7 +3,7 @@
   "info" : {
     "title" : "Business Partner Data Management Gate",
     "description" : "A gate for a member to share business partner data with CatenaX",
-    "version" : "7.2.0-rc2"
+    "version" : "7.2.0"
   },
   "servers" : [ {
     "url" : "http://localhost:8081",
@@ -1718,24 +1718,28 @@
           },
           "nameParts" : {
             "type" : "array",
+            "description" : "The list of name parts to accommodate the different number of name fields in different systems.",
             "items" : {
               "type" : "string"
             }
           },
           "identifiers" : {
             "type" : "array",
+            "description" : "The list of identifiers of the business partner. Sorted and duplicates removed by the service.",
             "items" : {
               "$ref" : "#/components/schemas/BusinessPartnerIdentifierDto"
             }
           },
           "states" : {
             "type" : "array",
+            "description" : "The list of (temporary) states of the business partner. Sorted and duplicates removed by the service.",
             "items" : {
               "$ref" : "#/components/schemas/BusinessPartnerStateDto"
             }
           },
           "roles" : {
             "type" : "array",
+            "description" : "One or more of the roles, the business partner assumes with respect to the sharing member: Supplier, Customer. Sorted and duplicates removed by the service.",
             "items" : {
               "type" : "string",
               "enum" : [ "SUPPLIER", "CUSTOMER", "ONE_TIME_SUPPLIER", "ONE_TIME_CUSTOMER" ]
@@ -1785,24 +1789,28 @@
           },
           "nameParts" : {
             "type" : "array",
+            "description" : "The list of name parts to accommodate the different number of name fields in different systems.",
             "items" : {
               "type" : "string"
             }
           },
           "identifiers" : {
             "type" : "array",
+            "description" : "The list of identifiers of the business partner. Sorted and duplicates removed by the service.",
             "items" : {
               "$ref" : "#/components/schemas/BusinessPartnerIdentifierDto"
             }
           },
           "states" : {
             "type" : "array",
+            "description" : "The list of (temporary) states of the business partner. Sorted and duplicates removed by the service.",
             "items" : {
               "$ref" : "#/components/schemas/BusinessPartnerStateDto"
             }
           },
           "roles" : {
             "type" : "array",
+            "description" : "One or more of the roles, the business partner assumes with respect to the sharing member: Supplier, Customer. Sorted and duplicates removed by the service.",
             "items" : {
               "type" : "string",
               "enum" : [ "SUPPLIER", "CUSTOMER", "ONE_TIME_SUPPLIER", "ONE_TIME_CUSTOMER" ]
@@ -1842,24 +1850,28 @@
           },
           "nameParts" : {
             "type" : "array",
+            "description" : "The list of name parts to accommodate the different number of name fields in different systems.",
             "items" : {
               "type" : "string"
             }
           },
           "identifiers" : {
             "type" : "array",
+            "description" : "The list of identifiers of the business partner. Sorted and duplicates removed by the service.",
             "items" : {
               "$ref" : "#/components/schemas/BusinessPartnerIdentifierDto"
             }
           },
           "states" : {
             "type" : "array",
+            "description" : "The list of (temporary) states of the business partner. Sorted and duplicates removed by the service.",
             "items" : {
               "$ref" : "#/components/schemas/BusinessPartnerStateDto"
             }
           },
           "roles" : {
             "type" : "array",
+            "description" : "One or more of the roles, the business partner assumes with respect to the sharing member: Supplier, Customer. Sorted and duplicates removed by the service.",
             "items" : {
               "type" : "string",
               "enum" : [ "SUPPLIER", "CUSTOMER", "ONE_TIME_SUPPLIER", "ONE_TIME_CUSTOMER" ]
@@ -1951,6 +1963,7 @@
           },
           "externalIds" : {
             "type" : "array",
+            "description" : "Only for business partners with the given array of external IDs. Ignored if empty.",
             "items" : {
               "type" : "string"
             },
@@ -2143,6 +2156,7 @@
           },
           "content" : {
             "type" : "array",
+            "description" : "Collection of results in the page",
             "items" : {
               "$ref" : "#/components/schemas/ChangelogGateDto"
             }

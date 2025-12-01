@@ -3,7 +3,7 @@
   "info" : {
     "title" : "Business Partner Data Management Pool",
     "description" : "Service that manages and shares business partner data with other CatenaX services",
-    "version" : "7.2.0-rc2"
+    "version" : "7.2.0"
   },
   "servers" : [ {
     "url" : "http://localhost:8080",
@@ -3013,12 +3013,14 @@
           },
           "states" : {
             "type" : "array",
+            "description" : "The list of (temporary) states of the address.",
             "items" : {
               "$ref" : "#/components/schemas/AddressStateDto"
             }
           },
           "identifiers" : {
             "type" : "array",
+            "description" : "The list of identifiers of the address.",
             "items" : {
               "$ref" : "#/components/schemas/AddressIdentifierDto"
             }
@@ -3064,11 +3066,11 @@
               "$ref" : "#/components/schemas/ErrorInfoAddressCreateError"
             }
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -3089,12 +3091,14 @@
           },
           "states" : {
             "type" : "array",
+            "description" : "The list of (temporary) states of the address.",
             "items" : {
               "$ref" : "#/components/schemas/AddressStateVerboseDto"
             }
           },
           "identifiers" : {
             "type" : "array",
+            "description" : "The list of identifiers of the address.",
             "items" : {
               "$ref" : "#/components/schemas/AddressIdentifierVerboseDto"
             }
@@ -3158,12 +3162,14 @@
           },
           "states" : {
             "type" : "array",
+            "description" : "The list of (temporary) states of the address.",
             "items" : {
               "$ref" : "#/components/schemas/AddressStateDto"
             }
           },
           "identifiers" : {
             "type" : "array",
+            "description" : "The list of identifiers of the address.",
             "items" : {
               "$ref" : "#/components/schemas/AddressIdentifierDto"
             }
@@ -3201,11 +3207,11 @@
               "$ref" : "#/components/schemas/ErrorInfoAddressUpdateError"
             }
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -3444,6 +3450,7 @@
           },
           "bpns" : {
             "type" : "array",
+            "description" : "Only for business partners with the given array of BPNL/S/A. Ignored if empty.",
             "items" : {
               "type" : "string"
             },
@@ -3451,6 +3458,7 @@
           },
           "businessPartnerTypes" : {
             "type" : "array",
+            "description" : "Only for business partners with the given array of business partner types. Ignored if empty.",
             "items" : {
               "type" : "string",
               "enum" : [ "LEGAL_ENTITY", "SITE", "ADDRESS", "GENERIC" ]
@@ -3875,12 +3883,14 @@
           },
           "identifiers" : {
             "type" : "array",
+            "description" : "The list of identifiers of the legal entity.",
             "items" : {
               "$ref" : "#/components/schemas/LegalEntityIdentifierDto"
             }
           },
           "states" : {
             "type" : "array",
+            "description" : "The list of (temporary) states of the legal entity.",
             "items" : {
               "$ref" : "#/components/schemas/LegalEntityStateDto"
             }
@@ -3922,11 +3932,11 @@
               "$ref" : "#/components/schemas/ErrorInfoLegalEntityCreateError"
             }
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -3955,18 +3965,21 @@
           },
           "identifiers" : {
             "type" : "array",
+            "description" : "The list of identifiers of the legal entity.",
             "items" : {
               "$ref" : "#/components/schemas/LegalEntityIdentifierVerboseDto"
             }
           },
           "states" : {
             "type" : "array",
+            "description" : "The list of (temporary) states of the legal entity.",
             "items" : {
               "$ref" : "#/components/schemas/LegalEntityStateVerboseDto"
             }
           },
           "relations" : {
             "type" : "array",
+            "description" : "Relations to other business partners.",
             "items" : {
               "$ref" : "#/components/schemas/RelationVerboseDto"
             }
@@ -4026,12 +4039,14 @@
           },
           "identifiers" : {
             "type" : "array",
+            "description" : "The list of identifiers of the legal entity.",
             "items" : {
               "$ref" : "#/components/schemas/LegalEntityIdentifierDto"
             }
           },
           "states" : {
             "type" : "array",
+            "description" : "The list of (temporary) states of the legal entity.",
             "items" : {
               "$ref" : "#/components/schemas/LegalEntityStateDto"
             }
@@ -4069,11 +4084,11 @@
               "$ref" : "#/components/schemas/ErrorInfoLegalEntityUpdateError"
             }
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -4160,18 +4175,21 @@
           },
           "identifiers" : {
             "type" : "array",
+            "description" : "The list of identifiers of the legal entity.",
             "items" : {
               "$ref" : "#/components/schemas/LegalEntityIdentifierVerboseDto"
             }
           },
           "states" : {
             "type" : "array",
+            "description" : "The list of (temporary) states of the legal entity.",
             "items" : {
               "$ref" : "#/components/schemas/LegalEntityStateVerboseDto"
             }
           },
           "relations" : {
             "type" : "array",
+            "description" : "Relations to other business partners.",
             "items" : {
               "$ref" : "#/components/schemas/RelationVerboseDto"
             }
@@ -4299,12 +4317,14 @@
           },
           "states" : {
             "type" : "array",
+            "description" : "The list of (temporary) states of the address.",
             "items" : {
               "$ref" : "#/components/schemas/AddressStateDto"
             }
           },
           "identifiers" : {
             "type" : "array",
+            "description" : "The list of identifiers of the address.",
             "items" : {
               "$ref" : "#/components/schemas/AddressIdentifierDto"
             }
@@ -4337,12 +4357,14 @@
           },
           "states" : {
             "type" : "array",
+            "description" : "The list of (temporary) states of the address.",
             "items" : {
               "$ref" : "#/components/schemas/AddressStateVerboseDto"
             }
           },
           "identifiers" : {
             "type" : "array",
+            "description" : "The list of identifiers of the address.",
             "items" : {
               "$ref" : "#/components/schemas/AddressIdentifierVerboseDto"
             }
@@ -4931,6 +4953,7 @@
           },
           "states" : {
             "type" : "array",
+            "description" : "The list of the (temporary) states of the site.",
             "items" : {
               "$ref" : "#/components/schemas/SiteStateDto"
             }
@@ -4954,6 +4977,7 @@
           },
           "states" : {
             "type" : "array",
+            "description" : "The list of the (temporary) states of the site.",
             "items" : {
               "$ref" : "#/components/schemas/SiteStateDto"
             }
@@ -4994,11 +5018,11 @@
               "$ref" : "#/components/schemas/ErrorInfoSiteCreateError"
             }
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -5019,6 +5043,7 @@
           },
           "states" : {
             "type" : "array",
+            "description" : "The list of the (temporary) states of the site.",
             "items" : {
               "$ref" : "#/components/schemas/SiteStateVerboseDto"
             }
@@ -5069,6 +5094,7 @@
           },
           "states" : {
             "type" : "array",
+            "description" : "The list of the (temporary) states of the site.",
             "items" : {
               "$ref" : "#/components/schemas/SiteStateDto"
             }
@@ -5101,11 +5127,11 @@
               "$ref" : "#/components/schemas/ErrorInfoSiteUpdateError"
             }
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -5190,6 +5216,7 @@
           },
           "states" : {
             "type" : "array",
+            "description" : "The list of the (temporary) states of the site.",
             "items" : {
               "$ref" : "#/components/schemas/SiteStateVerboseDto"
             }
@@ -5232,6 +5259,7 @@
           },
           "states" : {
             "type" : "array",
+            "description" : "The list of the (temporary) states of the site.",
             "items" : {
               "$ref" : "#/components/schemas/SiteStateVerboseDto"
             }

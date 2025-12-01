@@ -3,7 +3,7 @@
   "info" : {
     "title" : "Business Partner Data Management Orchestrator",
     "description" : "Orchestrator component acts as a passive component and offers for each processing steps individual endpoints",
-    "version" : "7.2.0-rc2"
+    "version" : "7.2.0"
   },
   "servers" : [ {
     "url" : "http://localhost:8085",
@@ -15,6 +15,78 @@
     "bearer_scheme" : [ ]
   } ],
   "paths" : {
+    "/v7/sharing-member-records" : {
+      "get" : {
+        "tags" : [ "sharing-member-record-controller" ],
+        "operationId" : "queryRecords",
+        "parameters" : [ {
+          "name" : "timestampAfter",
+          "in" : "query",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        }, {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Number of page to get results from",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Size of each page",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "maximum" : 100,
+            "minimum" : 0
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageDtoSharingMemberRecord"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put" : {
+        "tags" : [ "sharing-member-record-controller" ],
+        "operationId" : "update",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SharingMemberRecordUpdateRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/SharingMemberRecord"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v7/relations/golden-record-tasks" : {
       "post" : {
         "tags" : [ "Task Client" ],
@@ -981,6 +1053,40 @@
         },
         "required" : [ "name", "type" ]
       },
+      "PageDtoSharingMemberRecord" : {
+        "type" : "object",
+        "description" : "Paginated collection of results",
+        "properties" : {
+          "totalElements" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "Total number of all results in all pages"
+          },
+          "totalPages" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Total number pages"
+          },
+          "page" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Current page number"
+          },
+          "contentSize" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Number of results in the page"
+          },
+          "content" : {
+            "type" : "array",
+            "description" : "Collection of results in the page",
+            "items" : {
+              "$ref" : "#/components/schemas/SharingMemberRecord"
+            }
+          }
+        },
+        "required" : [ "content", "contentSize", "page", "totalElements", "totalPages" ]
+      },
       "PhysicalAddress" : {
         "type" : "object",
         "description" : "A physical postal address describes the physical location of an office, warehouse, gate, etc.",
@@ -1103,6 +1209,38 @@
           }
         },
         "required" : [ "validFrom" ]
+      },
+      "SharingMemberRecord" : {
+        "type" : "object",
+        "properties" : {
+          "recordId" : {
+            "type" : "string"
+          },
+          "isGoldenRecordCounted" : {
+            "type" : "boolean"
+          },
+          "createdAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "updatedAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        },
+        "required" : [ "createdAt", "recordId", "updatedAt" ]
+      },
+      "SharingMemberRecordUpdateRequest" : {
+        "type" : "object",
+        "properties" : {
+          "recordId" : {
+            "type" : "string"
+          },
+          "isGoldenRecordCounted" : {
+            "type" : "boolean"
+          }
+        },
+        "required" : [ "isGoldenRecordCounted", "recordId" ]
       },
       "Site" : {
         "type" : "object",
@@ -1232,6 +1370,7 @@
           },
           "requests" : {
             "type" : "array",
+            "description" : "The list of tasks to create",
             "items" : {
               "$ref" : "#/components/schemas/TaskCreateRelationsRequestEntry"
             }
@@ -1277,6 +1416,7 @@
           },
           "requests" : {
             "type" : "array",
+            "description" : "The list of tasks to create",
             "items" : {
               "$ref" : "#/components/schemas/TaskCreateRequestEntry"
             }
@@ -1471,6 +1611,7 @@
         "properties" : {
           "reservedTasks" : {
             "type" : "array",
+            "description" : "The reserved tasks with their business partner relations data to process",
             "items" : {
               "$ref" : "#/components/schemas/TaskRelationsStepReservationEntryDto"
             }
@@ -1498,6 +1639,7 @@
           },
           "errors" : {
             "type" : "array",
+            "description" : "Errors that occurred during processing of this task",
             "items" : {
               "$ref" : "#/components/schemas/TaskRelationsErrorDto"
             }
@@ -1619,6 +1761,7 @@
         "properties" : {
           "reservedTasks" : {
             "type" : "array",
+            "description" : "The reserved tasks with their business partner data to process",
             "items" : {
               "$ref" : "#/components/schemas/TaskStepReservationEntryDto"
             }
@@ -1646,6 +1789,7 @@
           },
           "errors" : {
             "type" : "array",
+            "description" : "Errors that occurred during processing of this task",
             "items" : {
               "$ref" : "#/components/schemas/TaskErrorDto"
             }
