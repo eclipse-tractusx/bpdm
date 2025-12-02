@@ -118,7 +118,7 @@ class BusinessPartnerEquivalenceMapper {
             ConfidenceCriteriaEquivalenceDto(
                 sharedByOwner,
                 checkedByExternalDataSource,
-                numberOfBusinessPartners,
+                numberOfSharingMembers,
                 lastConfidenceCheckAt,
                 nextConfidenceCheckAt,
                 confidenceLevel

@@ -717,14 +717,13 @@ class BusinessPartnerBuildService(
             ConfidenceCriteriaDb(
                 sharedByOwner = confidenceCriteria.sharedByOwner!!,
                 checkedByExternalDataSource = confidenceCriteria.checkedByExternalDataSource!!,
-                numberOfBusinessPartners = numberOfSharingMembers,
+                numberOfSharingMembers = numberOfSharingMembers,
                 lastConfidenceCheckAt = confidenceCriteria.lastConfidenceCheckAt!!,
-                nextConfidenceCheckAt = confidenceCriteria.nextConfidenceCheckAt!!,
-                confidenceLevel = confidenceCriteria.confidenceLevel!!
+                nextConfidenceCheckAt = confidenceCriteria.nextConfidenceCheckAt!!
             )
 
         fun updateConfidenceCriteria(oldConfidence: ConfidenceCriteriaDb, newConfidence: IConfidenceCriteriaDto) =
-            createConfidenceCriteria(newConfidence).copy(numberOfBusinessPartners = oldConfidence.numberOfBusinessPartners)
+            createConfidenceCriteria(newConfidence).copy(numberOfSharingMembers = oldConfidence.numberOfSharingMembers)
     }
 
 }

@@ -338,7 +338,7 @@ class BusinessPartnerSearchService(
                 BusinessPartnerConfidenceCriteriaDto(
                     sharedByOwner = sharedByOwner,
                     checkedByExternalDataSource = checkedByExternalDataSource,
-                    numberOfSharingMembers = numberOfBusinessPartners,
+                    numberOfSharingMembers = numberOfSharingMembers,
                     lastConfidenceCheckAt = lastConfidenceCheckAt,
                     nextConfidenceCheckAt = nextConfidenceCheckAt,
                     confidenceLevel = confidenceLevel
@@ -361,7 +361,7 @@ class BusinessPartnerSearchService(
                     BusinessPartnerConfidenceCriteriaDto(
                         sharedByOwner = sharedByOwner,
                         checkedByExternalDataSource = checkedByExternalDataSource,
-                        numberOfSharingMembers = numberOfBusinessPartners,
+                        numberOfSharingMembers = numberOfSharingMembers,
                         lastConfidenceCheckAt = lastConfidenceCheckAt,
                         nextConfidenceCheckAt = nextConfidenceCheckAt,
                         confidenceLevel = confidenceLevel
@@ -447,7 +447,7 @@ class BusinessPartnerSearchService(
                 BusinessPartnerConfidenceCriteriaDto(
                     sharedByOwner = sharedByOwner,
                     checkedByExternalDataSource = checkedByExternalDataSource,
-                    numberOfSharingMembers = numberOfBusinessPartners,
+                    numberOfSharingMembers = numberOfSharingMembers,
                     lastConfidenceCheckAt = lastConfidenceCheckAt,
                     nextConfidenceCheckAt = nextConfidenceCheckAt,
                     confidenceLevel = confidenceLevel

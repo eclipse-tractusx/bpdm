@@ -140,7 +140,7 @@ object BusinessPartnerVerboseValues {
         numberOfSharingMembers = 0,
         lastConfidenceCheckAt = LocalDateTime.of(2023, 10, 10, 10, 10, 10),
         nextConfidenceCheckAt = LocalDateTime.of(2024, 10, 10, 10, 10, 10),
-        confidenceLevel = 10
+        confidenceLevel = 8
     )
 
     private val confidenceCriteria2 = ConfidenceCriteriaDto(
@@ -149,7 +149,7 @@ object BusinessPartnerVerboseValues {
         numberOfSharingMembers = 0,
         lastConfidenceCheckAt = LocalDateTime.of(2022, 10, 10, 10, 10, 10),
         nextConfidenceCheckAt = LocalDateTime.of(2025, 10, 10, 10, 10, 10),
-        confidenceLevel = 6
+        confidenceLevel = 0
     )
 
     private val confidenceCriteria3 = ConfidenceCriteriaDto(
@@ -158,7 +158,7 @@ object BusinessPartnerVerboseValues {
         numberOfSharingMembers = 0,
         lastConfidenceCheckAt = LocalDateTime.of(2021, 10, 10, 10, 10, 10),
         nextConfidenceCheckAt = LocalDateTime.of(2026, 10, 10, 10, 10, 10),
-        confidenceLevel = 3
+        confidenceLevel = 5
     )
 
     val address1 = PhysicalPostalAddressVerboseDto(
