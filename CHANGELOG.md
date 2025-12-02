@@ -6,6 +6,13 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
 For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/CHANGELOG.md) of the charts directly.
 
+## [7.3.0] - tbd
+
+### Changed
+
+- BPDM Pool: Automatically calculate a business partner's confidence level based on the other confidence criteria [#1554](https://github.com/eclipse-tractusx/bpdm/issues/1554)
+
+
 ## [7.2.0] - 2025-12-01
 
 ### Added

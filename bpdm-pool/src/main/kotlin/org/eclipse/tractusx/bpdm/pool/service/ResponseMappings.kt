@@ -284,7 +284,7 @@ fun ConfidenceCriteriaDb.toDto(): ConfidenceCriteriaDto =
     ConfidenceCriteriaDto(
         sharedByOwner,
         checkedByExternalDataSource,
-        numberOfBusinessPartners,
+        numberOfSharingMembers,
         lastConfidenceCheckAt,
         nextConfidenceCheckAt,
         confidenceLevel
