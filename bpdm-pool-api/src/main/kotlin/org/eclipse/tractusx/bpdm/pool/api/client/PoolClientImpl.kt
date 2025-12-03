@@ -57,6 +57,8 @@ class PoolClientImpl(
 
     override val participants by lazy { createClient<DataSpaceParticipantsApiClient>() }
 
+    override val businessPartners by lazy { createClient<BusinessPartnersApiClient>() }
+
     private inline fun <reified T> createClient() =
         httpServiceProxyFactory.createClient(T::class.java)
 }

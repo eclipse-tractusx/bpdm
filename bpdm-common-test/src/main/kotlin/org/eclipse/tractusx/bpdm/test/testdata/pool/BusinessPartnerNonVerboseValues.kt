@@ -43,6 +43,8 @@ object BusinessPartnerNonVerboseValues {
             sortedSetOf(IdentifierTypeCategory.NBR)
         )
     val addressIdentifierTypeDto2 = addressIdentifierTypeDto1
+    val addressIdentifierTypeDto3 = addressIdentifierTypeDto1
+
 
     val identifier1 = LegalEntityIdentifierDto(
         value = BusinessPartnerVerboseValues.identifier1.value,
@@ -254,6 +256,35 @@ object BusinessPartnerNonVerboseValues {
         legalAddress = logisticAddress3,
         index = BusinessPartnerVerboseValues.legalEntityUpsert3.index
     )
+
+    val legalEntityCreate4 = LegalEntityPartnerCreateRequest(
+        legalEntity = LegalEntityDto(
+            legalName = BusinessPartnerVerboseValues.legalEntityUpsert4.legalEntity.legalName,
+            legalShortName = null,
+            legalForm = BusinessPartnerVerboseValues.legalForm3.technicalKey,
+            identifiers = listOf(identifier3),
+            states = listOf(leStatus3),
+            confidenceCriteria = BusinessPartnerVerboseValues.legalEntity3.legalEntity.confidenceCriteria,
+            isParticipantData = false
+        ),
+        legalAddress = logisticAddress4,
+        index = BusinessPartnerVerboseValues.legalEntityUpsert4.index
+    )
+
+    val legalEntityCreateMultipleIdentifier = LegalEntityPartnerCreateRequest(
+        legalEntity = LegalEntityDto(
+            legalName = BusinessPartnerVerboseValues.legalEntityUpsertMultipleIdentifier.legalEntity.legalName,
+            legalShortName = null,
+            legalForm = BusinessPartnerVerboseValues.legalForm1.technicalKey,
+            identifiers = listOf(identifier1, identifier2),
+            states = listOf(leStatus1),
+            confidenceCriteria = BusinessPartnerVerboseValues.legalEntity1.legalEntity.confidenceCriteria,
+            isParticipantData = false
+        ),
+        legalAddress = logisticAddress1,
+        index = BusinessPartnerVerboseValues.legalEntityUpsertMultipleIdentifier.index
+    )
+
 
     val legalEntityUpdate1 = LegalEntityPartnerUpdateRequest(
         bpnl = BusinessPartnerVerboseValues.legalEntityUpsert1.legalEntity.bpnl,

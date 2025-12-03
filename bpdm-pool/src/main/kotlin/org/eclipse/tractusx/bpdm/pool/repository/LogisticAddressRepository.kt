@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.repository
 
+import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
@@ -70,6 +71,7 @@ interface LogisticAddressRepository : JpaRepository<LogisticAddressDb, Long>, Jp
                     )
                 }
             }
+
     }
 
     fun findByBpn(bpn: String): LogisticAddressDb?
@@ -95,4 +97,66 @@ interface LogisticAddressRepository : JpaRepository<LogisticAddressDb, Long>, Jp
 
     @Query("SELECT DISTINCT p FROM LogisticAddressDb p LEFT JOIN FETCH p.states WHERE p IN :partners")
     fun joinStates(partners: Set<LogisticAddressDb>): Set<LogisticAddressDb>
+
+    @Query(
+        value =
+            """
+            SELECT distinct(la.*)
+            FROM bpdm.logistic_addresses la
+            JOIN bpdm.legal_entities le ON la.legal_entity_id = le.id
+            LEFT JOIN bpdm.sites s ON s.legal_entity_id = le.id
+            WHERE
+                (
+                    CAST(:#{#searchRequest.legalName} AS text) IS NULL
+                    OR bpdm.normalize_name(le.name_value) LIKE '%' || bpdm.normalize_name(:#{#searchRequest.legalName}) || '%'
+                    OR le.name_value ~ ('.*' || REPLACE(:#{#searchRequest.legalName}, '_', '.') || '.*')
+                )
+                AND (
+                    CAST(:#{#searchRequest.bpn} AS text) IS NULL 
+                    OR le.bpn = :#{#searchRequest.bpn}
+                    OR s.bpn = :#{#searchRequest.bpn}
+                    OR la.bpn = :#{#searchRequest.bpn}
+                )
+                AND (
+                    CAST(:#{#searchRequest.streetName} AS text) IS NULL
+                    OR bpdm.normalize_name(la.phy_street_name) LIKE '%' || bpdm.normalize_name(:#{#searchRequest.streetName}) || '%'
+                    OR la.phy_street_name ~ ('.*' || REPLACE(:#{#searchRequest.streetName}, '_', '.') || '.*')
+                )
+                AND ( 
+                    CAST(:#{#searchRequest.postalCode} AS text) IS NULL 
+                    OR la.phy_postcode = :#{#searchRequest.postalCode} 
+                )
+                AND (
+                    CAST(:#{#searchRequest.city} AS text) IS NULL
+                    OR bpdm.normalize_name(la.phy_city) LIKE '%' || bpdm.normalize_name(:#{#searchRequest.city}) || '%'
+                    OR la.phy_city ~ ('.*' || REPLACE(:#{#searchRequest.city}, '_', '.') || '.*')
+                )
+                AND (
+                    CAST(:#{#searchRequest.country?.alpha2} AS text) IS NULL
+                    OR la.phy_country = :#{#searchRequest.country?.alpha2}
+                )
+                AND (
+                       (
+                            CAST(:#{#isLegalEntity} AS boolean) = true
+                            AND le.legal_address_id = la.id
+                       )
+                    OR (
+                            CAST(:#{#isSite} AS boolean) = true
+                            AND s.main_address_id = la.id
+                       )
+                    OR (
+                            CAST(:#{#isAdditionalAddress} AS boolean) = true
+                            AND le.legal_address_id != la.id
+                            AND (s.id IS NULL)
+                       )
+                )
+            """,
+            nativeQuery = true
+    )
+    fun searchBusinessPartner(
+        searchRequest: LegalEntityPropertiesSearchRequest,
+        isLegalEntity: Boolean,
+        isSite: Boolean,
+        isAdditionalAddress: Boolean,
+        pageable: Pageable): Page<LogisticAddressDb>
 }
