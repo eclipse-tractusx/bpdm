@@ -61,6 +61,7 @@ class RelationUpsertService(
         val upsertResult = if (existingRelation != null) {
             // Update validity periods if changed
             if (validityPeriodsDiffer(existingRelation.validityPeriods, upsertRequest.validityPeriods)) {
+                validateNoHistoricChanges(existingRelation.validityPeriods, upsertRequest.validityPeriods)
                 existingRelation.validityPeriods.clear()
                 existingRelation.validityPeriods.addAll(upsertRequest.validityPeriods)
                 relationRepository.save(existingRelation)
@@ -127,6 +128,35 @@ class RelationUpsertService(
     private fun hasOverlap(validity1: RelationValidityPeriodDb, validity2: RelationValidityPeriodDb): Boolean {
         return TimePeriod.fromUnlimited(validity1.validFrom, validity1.validTo)
             .hasOverlap(TimePeriod.fromUnlimited(validity2.validFrom, validity2.validTo))
+    }
+
+    private fun validateNoHistoricChanges(existingValidityPeriods: Collection<RelationValidityPeriodDb>, newValidityPeriods: Collection<RelationValidityPeriodDb>){
+        val nowTime = LocalDate.now()
+
+        val existingTimePeriods = existingValidityPeriods.map { TimePeriod.fromUnlimited(it.validFrom, it.validTo) }
+        val newTimePeriods = newValidityPeriods.map { TimePeriod.fromUnlimited(it.validFrom, it.validTo) }
+
+        newTimePeriods
+            .filter { it.validFrom < nowTime }
+            .forEach { newTimePeriod ->
+            val matchingExistingTimePeriod = existingTimePeriods.find { it.validFrom == newTimePeriod.validFrom }
+
+            if(matchingExistingTimePeriod == null){
+                throw BpdmValidationException("Can't add a new relation validity period from ${newTimePeriod.validFrom} as it lies in the past.")
+            }
+
+            if(newTimePeriod.validTo < nowTime && matchingExistingTimePeriod.validTo != newTimePeriod.validTo){
+                throw BpdmValidationException("Existing relation validity period from ${matchingExistingTimePeriod.validFrom} can't be limited to past date.")
+            }
+        }
+
+        existingTimePeriods
+            .filter { it.validFrom < nowTime }
+            .forEach { existingTimePeriod ->
+                if(newTimePeriods.none { it.validFrom == existingTimePeriod.validFrom }){
+                    throw BpdmValidationException("Existing relation validity period from ${existingTimePeriod.validFrom} can't be deleted as it lies in the past.")
+                }
+            }
     }
 
     data class UpsertRequest(
