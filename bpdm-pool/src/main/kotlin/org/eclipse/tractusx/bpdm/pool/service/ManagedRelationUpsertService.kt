@@ -25,10 +25,13 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.DataSpaceParticipantUpda
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
+import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
+import org.eclipse.tractusx.bpdm.pool.service.RelationUpsertService.TimePeriod
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 
 @Service
 class ManagedRelationUpsertService(
@@ -43,9 +46,16 @@ class ManagedRelationUpsertService(
         validateManagingEntityIsParticipant(upsertRequest.target)
         validateSingleManager(upsertRequest)
         validateNoChain(upsertRequest)
+        validateNoHistoricChanges(upsertRequest)
 
         val result = relationUpsertService.upsertRelation(
-            RelationUpsertService.UpsertRequest(upsertRequest.source, upsertRequest.target, RelationType.IsManagedBy, upsertRequest.validityPeriods)
+            RelationUpsertService.UpsertRequest(
+                source = upsertRequest.source,
+                target = upsertRequest.target,
+                relationType = RelationType.IsManagedBy,
+                validityPeriods = upsertRequest.validityPeriods,
+                existingRelation = upsertRequest.existingRelation
+            )
         )
         makeManagedEntityParticipantIfRequired(upsertRequest.source)
 
@@ -99,6 +109,39 @@ class ManagedRelationUpsertService(
                         "Only dataspace participants can manage other entities."
             )
         }
+    }
+
+    private fun validateNoHistoricChanges(upsertRequest: IRelationUpsertStrategyService.UpsertRequest){
+        validateNoHistoricChanges(upsertRequest.existingRelation?.validityPeriods ?: emptyList(), upsertRequest.validityPeriods)
+    }
+
+    private fun validateNoHistoricChanges(existingValidityPeriods: Collection<RelationValidityPeriodDb>, newValidityPeriods: Collection<RelationValidityPeriodDb>){
+        val nowTime = LocalDate.now()
+
+        val existingTimePeriods = existingValidityPeriods.map { TimePeriod.fromUnlimited(it.validFrom, it.validTo) }
+        val newTimePeriods = newValidityPeriods.map { TimePeriod.fromUnlimited(it.validFrom, it.validTo) }
+
+        newTimePeriods
+            .filter { it.validFrom < nowTime }
+            .forEach { newTimePeriod ->
+                val matchingExistingTimePeriod = existingTimePeriods.find { it.validFrom == newTimePeriod.validFrom }
+
+                if(matchingExistingTimePeriod == null){
+                    throw BpdmValidationException("Can't add a new relation validity period from ${newTimePeriod.validFrom} as it lies in the past.")
+                }
+
+                if(newTimePeriod.validTo < nowTime && matchingExistingTimePeriod.validTo != newTimePeriod.validTo){
+                    throw BpdmValidationException("Existing relation validity period from ${matchingExistingTimePeriod.validFrom} can't be limited to past date.")
+                }
+            }
+
+        existingTimePeriods
+            .filter { it.validFrom < nowTime }
+            .forEach { existingTimePeriod ->
+                if(newTimePeriods.none { it.validFrom == existingTimePeriod.validFrom }){
+                    throw BpdmValidationException("Existing relation validity period from ${existingTimePeriod.validFrom} can't be deleted as it lies in the past.")
+                }
+            }
     }
 
     private fun makeManagedEntityParticipantIfRequired(source: LegalEntityDb) {

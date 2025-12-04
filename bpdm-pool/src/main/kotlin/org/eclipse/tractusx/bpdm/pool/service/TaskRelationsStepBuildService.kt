@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
+import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
 import org.eclipse.tractusx.orchestrator.api.model.RelationValidityPeriod
 import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepReservationEntryDto
@@ -37,7 +38,8 @@ class TaskRelationsStepBuildService(
     private val alternativeHeadquarterRelationService: AlternativeHeadquarterRelationUpsertService,
     private val legalEntityRepository: LegalEntityRepository,
     private val managedRelationUpsertService: ManagedRelationUpsertService,
-    private val ownedByRelationService: OwnedByRelationUpsertService
+    private val ownedByRelationService: OwnedByRelationUpsertService,
+    private val relationRepository: RelationRepository
 ) {
     @Transactional
     fun upsertBusinessPartnerRelations(taskEntry: TaskRelationsStepReservationEntryDto): TaskRelationsStepResultEntryDto {
@@ -64,15 +66,30 @@ class TaskRelationsStepBuildService(
             )
         }
 
+        val legalEntityRelationType: RelationType = when(relationDto.relationType){
+            OrchestratorRelationType.IsAlternativeHeadquarterFor -> RelationType.IsAlternativeHeadquarterFor
+            OrchestratorRelationType.IsManagedBy -> RelationType.IsManagedBy
+            OrchestratorRelationType.IsOwnedBy -> RelationType.IsOwnedBy
+        }
+
+        val existingRelation = relationRepository.findAll(
+            RelationRepository.byRelation(
+                startNode = sourceLegalEntity,
+                endNode = targetLegalEntity,
+                type = legalEntityRelationType
+            )
+        ).singleOrNull()
+
         val upsertRequest = IRelationUpsertStrategyService.UpsertRequest(
-            sourceLegalEntity,
-            targetLegalEntity,
-            validityPeriods = validityPeriods
+            source = sourceLegalEntity,
+            target = targetLegalEntity,
+            validityPeriods = validityPeriods,
+            existingRelation = existingRelation
         )
-        val strategyService : IRelationUpsertStrategyService = when(relationDto.relationType){
-            OrchestratorRelationType.IsAlternativeHeadquarterFor -> alternativeHeadquarterRelationService
-            OrchestratorRelationType.IsManagedBy -> managedRelationUpsertService
-            OrchestratorRelationType.IsOwnedBy -> ownedByRelationService
+        val strategyService : IRelationUpsertStrategyService = when(legalEntityRelationType){
+            RelationType.IsAlternativeHeadquarterFor -> alternativeHeadquarterRelationService
+            RelationType.IsManagedBy -> managedRelationUpsertService
+            RelationType.IsOwnedBy -> ownedByRelationService
         }
 
         val upsertResult = strategyService.upsertRelation(upsertRequest)
