@@ -31,6 +31,7 @@ interface IRelationUpsertStrategyService {
     data class UpsertRequest(
         val source: LegalEntityDb,
         val target: LegalEntityDb,
-        val validityPeriods: Collection<RelationValidityPeriodDb>
+        val validityPeriods: Collection<RelationValidityPeriodDb>,
+        val existingRelation: RelationDb?
     )
 }

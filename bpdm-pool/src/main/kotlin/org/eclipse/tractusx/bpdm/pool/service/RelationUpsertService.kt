@@ -43,20 +43,12 @@ class RelationUpsertService(
     fun upsertRelation(upsertRequest: UpsertRequest): UpsertResult<RelationDb>{
         val source = upsertRequest.source
         val target = upsertRequest.target
-        val relationType = upsertRequest.relationType
+        val existingRelation = upsertRequest.existingRelation
 
         // Prevent self-referencing relations
         if (source == target) {
             throw BpdmValidationException("A legal entity cannot have a relation to itself (BPNL: ${source.bpn}).")
         }
-
-        val existingRelation = relationRepository.findAll(
-            RelationRepository.byRelation(
-                startNode = source,
-                endNode = target,
-                type = relationType
-            )
-        ).singleOrNull()
 
         val upsertResult = if (existingRelation != null) {
             // Update validity periods if changed
@@ -133,7 +125,8 @@ class RelationUpsertService(
         val source: LegalEntityDb,
         val target: LegalEntityDb,
         val relationType: RelationType,
-        val validityPeriods: Collection<RelationValidityPeriodDb>
+        val validityPeriods: Collection<RelationValidityPeriodDb>,
+        val existingRelation: RelationDb?
     )
 
     data class TimePeriod(

@@ -196,6 +196,8 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         val savedB = response.entities.toList()[1]
         val savedC = response.entities.toList()[2]
 
+        val nowDate = LocalDate.now()
+
         /**
          * Scenario 1: A→B exists
          */
@@ -204,8 +206,8 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
             businessPartnerSourceBpnl = savedA.legalEntity.bpnl,
             businessPartnerTargetBpnl = savedB.legalEntity.bpnl,
             validityPeriods = listOf(RelationValidityPeriod(
-                validFrom = LocalDate.parse("2020-01-01"),
-                validTo = LocalDate.parse("2020-12-31")
+                validFrom = nowDate.plusYears(1),
+                validTo = nowDate.plusYears(2)
             ))
         )
         val resultAB = upsertRelationsGoldenRecordIntoPool("TASK_AB", relationAB)
@@ -219,8 +221,8 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
             businessPartnerSourceBpnl = savedA.legalEntity.bpnl,
             businessPartnerTargetBpnl = savedC.legalEntity.bpnl,
             validityPeriods = listOf(RelationValidityPeriod(
-                validFrom = LocalDate.parse("2020-06-01"),
-                validTo = LocalDate.parse("2020-09-30")
+                validFrom = nowDate.plusYears(1).plusMonths(6),
+                validTo = nowDate.plusYears(1).plusMonths(9)
             ))
         )
         val resultAC_conflict = upsertRelationsGoldenRecordIntoPool("TASK_AC_CONFLICT", relationAC_conflict)
@@ -234,8 +236,8 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
             businessPartnerSourceBpnl = savedA.legalEntity.bpnl,
             businessPartnerTargetBpnl = savedC.legalEntity.bpnl,
             validityPeriods = listOf(RelationValidityPeriod(
-                validFrom = LocalDate.parse("2021-01-01"),
-                validTo = LocalDate.parse("2021-12-31")
+                validFrom = nowDate.plusYears(2),
+                validTo = nowDate.plusYears(3)
             ))
         )
         val resultAC_nonOverlap = upsertRelationsGoldenRecordIntoPool("TASK_AC_NON_OVERLAP", relationAC_nonOverlap)
@@ -246,8 +248,8 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
             businessPartnerSourceBpnl = savedA.legalEntity.bpnl,
             businessPartnerTargetBpnl = savedC.legalEntity.bpnl,
             validityPeriods = listOf(RelationValidityPeriod(
-                validFrom = LocalDate.parse("2021-06-01"),
-                validTo = LocalDate.parse("2022-06-30")
+                validFrom = nowDate.plusYears(2),
+                validTo = nowDate.plusYears(3).plusMonths(6)
             ))
         )
         val resultAC_new = upsertRelationsGoldenRecordIntoPool("TASK_AC_NEW", relationAC_new)
@@ -258,8 +260,8 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
             .legalEntity.relations.first { it.businessPartnerTargetBpnl == savedC.legalEntity.bpnl }
         assertThat(updatedRelationAC.validityPeriods).hasSize(1)
         val stateAC = updatedRelationAC.validityPeriods.first()
-        assertThat(stateAC.validFrom).isEqualTo(LocalDate.parse("2021-06-01"))
-        assertThat(stateAC.validTo).isEqualTo(LocalDate.parse("2022-06-30"))
+        assertThat(stateAC.validFrom).isEqualTo(nowDate.plusYears(2))
+        assertThat(stateAC.validTo).isEqualTo(nowDate.plusYears(3).plusMonths(6))
     }
 
     /**
