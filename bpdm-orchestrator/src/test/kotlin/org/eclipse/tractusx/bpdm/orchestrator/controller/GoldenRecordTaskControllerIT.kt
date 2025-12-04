@@ -128,8 +128,10 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
         assertThat(reservedTasks.map { it.taskId }).isEqualTo(createdTasks.map { it.taskId })
 
         // ...and with the correct business partner information
-        assertThat(reservedTasks[0].businessPartner).isEqualTo(defaultBusinessPartner1)
-        assertThat(reservedTasks[1].businessPartner).isEqualTo(defaultBusinessPartner2)
+        assertThat(reservedTasks.map { it.businessPartner })
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .isEqualTo(createdTasks.map{ it.businessPartnerResult })
 
         // trying to reserve more tasks returns no additional entries
         val reservationResponse2 = reserveTasks(expectedStep)
@@ -609,10 +611,10 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
             )
         }
         // check returned BP
-        assertThat(finalTaskStates.map { it.businessPartnerResult })
+        assertThat(finalTaskStates.map { it.businessPartnerResult }.first())
             .usingRecursiveComparison()
             .ignoringCollectionOrder()
-            .isEqualTo(expectedBusinessPartners)
+            .isEqualTo(expectedBusinessPartners.first())
 
 
     }

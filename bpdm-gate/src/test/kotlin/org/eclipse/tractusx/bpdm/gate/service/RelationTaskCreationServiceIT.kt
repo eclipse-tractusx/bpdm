@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
@@ -56,6 +55,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
+import tools.jackson.databind.json.JsonMapper
 import java.time.Instant
 import java.time.LocalDate
 
@@ -73,7 +73,7 @@ class RelationTaskCreationServiceIT @Autowired constructor(
     private val sharingStateRepository: SharingStateRepository,
     private val businessPartnerRepository: BusinessPartnerRepository,
     private val principalUtil: PrincipalUtil,
-    private val objectMapper: ObjectMapper,
+    private val jsonMapper: JsonMapper,
     private val relationTaskCreationService: RelationTaskCreationService
 ) {
     companion object {
@@ -148,7 +148,7 @@ class RelationTaskCreationServiceIT @Autowired constructor(
         orchestratorWireMockServer.stubFor(
             WireMock.post(WireMock.urlPathEqualTo(ApiCommons.BASE_PATH_V7_RELATIONS))
                 .willReturn(
-                    WireMock.okJson(objectMapper.writeValueAsString(orchestratorMockResponse))
+                    WireMock.okJson(jsonMapper.writeValueAsString(orchestratorMockResponse))
                 )
         )
 

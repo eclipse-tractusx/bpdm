@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.gate.controller
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.okJson
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
@@ -56,6 +55,7 @@ import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.web.reactive.function.client.WebClientResponseException
+import tools.jackson.databind.json.JsonMapper
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.time.Instant
@@ -75,7 +75,7 @@ import java.time.LocalDateTime
 class PartnerUploadControllerIT @Autowired constructor(
     val testHelpers: DbTestHelpers,
     val gateClient: GateClient,
-    val jacksonObjectMapper: ObjectMapper,
+    val jsonMapper: JsonMapper,
     val mockAndAssertUtils: MockAndAssertUtils
 ) {
 
@@ -265,7 +265,7 @@ class PartnerUploadControllerIT @Autowired constructor(
                 .withQueryParam("page", WireMock.equalTo("0"))
                 .withQueryParam("size", WireMock.equalTo("1"))
                 .willReturn(
-                    okJson(jacksonObjectMapper.writeValueAsString(responseBody))
+                    okJson(jsonMapper.writeValueAsString(responseBody))
                 )
         )
     }

@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.service
 
 import org.eclipse.tractusx.bpdm.gate.util.OrchestratorHealthIndicator
 import org.eclipse.tractusx.bpdm.gate.util.PoolHealthIndicator
-import org.springframework.boot.actuate.health.Status
+import org.springframework.boot.health.contributor.Status
 import org.springframework.stereotype.Service
 
 @Service

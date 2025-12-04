@@ -60,6 +60,6 @@ class GateClientImpl(
     override val relationChangelog: RelationChangelogApiClient  by lazy { createClient<RelationChangelogApiClient>() }
 
 
-    private inline fun <reified T> createClient() =
-        httpServiceProxyFactory.createClient(T::class.java)
+    private inline fun <reified T: Any> createClient() =
+        httpServiceProxyFactory.createClient(T::class.java)!!
 }

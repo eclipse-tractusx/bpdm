@@ -113,8 +113,6 @@ spring:
           order_inserts: true
           order_updates: true
           batch_versioned_data: true
-        create_empty_composites:
-          enabled: true
 logging:
   pattern:
     # Use BPDM custom log pattern

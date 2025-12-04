@@ -30,11 +30,11 @@ import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.springframework.data.domain.Page
 
 
-fun <S, T> Page<S>.toDto(dtoContent: Collection<T>): PageDto<T> {
+fun <S: Any, T> Page<S>.toDto(dtoContent: Collection<T>): PageDto<T> {
     return PageDto(this.totalElements, this.totalPages, this.number, this.numberOfElements, dtoContent)
 }
 
-fun <S, T> Page<S>.toDto(map: (S) -> T): PageDto<T> {
+fun <S: Any, T> Page<S>.toDto(map: (S) -> T): PageDto<T> {
     return PageDto(totalElements, totalPages, number, numberOfElements, content.map { map(it) })
 }
 

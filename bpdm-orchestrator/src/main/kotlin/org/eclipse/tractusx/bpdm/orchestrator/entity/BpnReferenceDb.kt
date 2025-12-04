@@ -24,6 +24,7 @@ import jakarta.persistence.Embeddable
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType
+import org.hibernate.annotations.Formula
 
 @Embeddable
 data class BpnReferenceDb(
@@ -43,4 +44,7 @@ data class BpnReferenceDb(
         AdditionalAddress,
         UncategorizedAddress
     }
+
+    @Formula("1")
+    private val isNonNull = 1
 }

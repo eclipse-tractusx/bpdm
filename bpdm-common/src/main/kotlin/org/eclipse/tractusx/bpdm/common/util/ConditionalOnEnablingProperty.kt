@@ -48,7 +48,7 @@ class OnConditionalOnEnablingProperty : SpringBootCondition() {
         private const val MISSING_PROPERTY = "Property is missing in environment and thus treated as not enabled."
     }
 
-    override fun getMatchOutcome(context: ConditionContext?, metadata: AnnotatedTypeMetadata?): ConditionOutcome {
+    override fun getMatchOutcome(context: ConditionContext, metadata: AnnotatedTypeMetadata): ConditionOutcome {
         val mergedAnnotation: MergedAnnotation<ConditionalOnBoundProperty> =
             metadata!!.annotations.get(ConditionalOnBoundProperty::class.java)
         val prefix = mergedAnnotation.getString(ConditionalOnBoundProperty::prefix.name)
@@ -57,7 +57,7 @@ class OnConditionalOnEnablingProperty : SpringBootCondition() {
         if (!HasEnablingProperty::class.java.isAssignableFrom(targetClass)) {
             throw RuntimeException("Target type does not implement the ${HasEnablingProperty::class.simpleName} interface.")
         }
-        val bean = Binder.get(context!!.environment).bind(prefix, targetClass).orElse(null)
+        val bean = Binder.get(context.environment).bind(prefix, targetClass).orElse(null)
             ?: return if (shouldBeEnabled)
                 ConditionOutcome.noMatch(MISSING_PROPERTY)
             else

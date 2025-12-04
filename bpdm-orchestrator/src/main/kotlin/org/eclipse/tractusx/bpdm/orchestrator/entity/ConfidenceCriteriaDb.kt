@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.orchestrator.entity
 
 import jakarta.persistence.Column
 import jakarta.persistence.Embeddable
+import org.hibernate.annotations.Formula
 import org.hibernate.annotations.Type
 
 @Embeddable
@@ -48,4 +49,7 @@ data class ConfidenceCriteriaDb(
         AdditionalAddress,
         UncategorizedAddress
     }
+
+    @Formula("1")
+    private val isNonNull = 1
 }

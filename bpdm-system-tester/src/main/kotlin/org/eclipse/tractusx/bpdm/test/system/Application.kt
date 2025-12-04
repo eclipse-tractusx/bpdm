@@ -22,8 +22,8 @@ package org.eclipse.tractusx.bpdm.test.system
 import io.cucumber.junit.Cucumber
 import org.junit.runner.RunWith
 import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan
+import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration
 
 @RunWith(Cucumber::class)
 class CucumberTestRunConfiguration

@@ -33,7 +33,7 @@ class ActiveClientsConfiguredCondition : SpringBootCondition() {
 
         val enabledClients = getClientConfigurationProperties(context.environment).client.filter { it.value.securityEnabled }
 
-        val message = ConditionMessage.forCondition("BPDM OAuth2 Clients Configured Condition", *arrayOfNulls(0))
+        val message = ConditionMessage.forCondition("BPDM OAuth2 Clients Configured Condition")
         return if (enabledClients.isNotEmpty()) {
             ConditionOutcome.match(message.foundExactly("registered clients ${enabledClients.keys.joinToString()}"))
         } else {
@@ -42,7 +42,10 @@ class ActiveClientsConfiguredCondition : SpringBootCondition() {
     }
 
     private fun getClientConfigurationProperties(environment: Environment): BpdmClientConfigProperties {
-        return Binder.get(environment).bind("bpdm", BpdmClientConfigProperties::class.java).orElse(BpdmClientConfigProperties(emptyMap()))
+        return Binder
+            .get(environment)
+            .bind("bpdm", BpdmClientConfigProperties::class.java)
+            .orElseGet { BpdmClientConfigProperties(emptyMap()) }
     }
 
     data class BpdmClientConfigProperties(
