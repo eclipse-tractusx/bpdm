@@ -17,13 +17,16 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.v6.util
+package org.eclipse.tractusx.bpdm.gate.api.v6.client
 
-import org.eclipse.tractusx.bpdm.common.util.BpdmWebClientProvider
-import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
-import org.springframework.boot.web.server.WebServer
+import org.eclipse.tractusx.bpdm.gate.api.ApiCommons
+import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyRequest
+import org.eclipse.tractusx.bpdm.gate.api.v6.GateSharingStateApi
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.service.annotation.PostExchange
 
-class PoolSharingMemberClientV6(
-    clientProvider: BpdmWebClientProvider,
-    ownWebServer: WebServer
-): PoolTestClientV6(KeyCloakInitializer.CLIENT_ID_SHARING_MEMBER, clientProvider, ownWebServer)
+interface SharingStateApiClientV6: GateSharingStateApi {
+
+    @PostExchange(value = "${ApiCommons.SHARING_STATE_PATH_V6}/ready")
+    fun postSharingStateReady(@RequestBody request: PostSharingStateReadyRequest)
+}
