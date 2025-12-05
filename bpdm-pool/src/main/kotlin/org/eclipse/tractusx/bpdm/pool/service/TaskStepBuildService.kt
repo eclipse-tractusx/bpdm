@@ -624,13 +624,13 @@ class TaskStepBuildService(
 
     private fun PostalAddress.withUpdatedNumberOfSharingMembers(fromCandidates: Collection<LogisticAddressDb>): PostalAddress{
         return copy(
-            confidenceCriteria = confidenceCriteria.copy(numberOfSharingMembers = fromCandidates.find { it.bpn == this.bpnReference.referenceValue }?.confidenceCriteria?.numberOfBusinessPartners ?: confidenceCriteria.numberOfSharingMembers )
+            confidenceCriteria = confidenceCriteria.copy(numberOfSharingMembers = fromCandidates.find { it.bpn == this.bpnReference.referenceValue }?.confidenceCriteria?.numberOfSharingMembers ?: confidenceCriteria.numberOfSharingMembers )
         )
     }
 
     private fun LegalEntity.withUpdatedNumberOfSharingMembers(legalEntityCandidates: Collection<LegalEntityDb>, legalAddressCandidates: Collection<LogisticAddressDb>): LegalEntity{
         return copy(
-            confidenceCriteria = confidenceCriteria.copy(numberOfSharingMembers = legalEntityCandidates.find { it.bpn == this.bpnReference.referenceValue }?.confidenceCriteria?.numberOfBusinessPartners ?: confidenceCriteria.numberOfSharingMembers),
+            confidenceCriteria = confidenceCriteria.copy(numberOfSharingMembers = legalEntityCandidates.find { it.bpn == this.bpnReference.referenceValue }?.confidenceCriteria?.numberOfSharingMembers ?: confidenceCriteria.numberOfSharingMembers),
             legalAddress = legalAddress.withUpdatedNumberOfSharingMembers(legalAddressCandidates)
         )
     }

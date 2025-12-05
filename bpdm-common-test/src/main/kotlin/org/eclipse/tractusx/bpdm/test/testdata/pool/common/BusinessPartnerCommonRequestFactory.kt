@@ -79,7 +79,7 @@ abstract class BusinessPartnerCommonRequestFactory(
                 numberOfSharingMembers = 2,
                 lastConfidenceCheckAt = timeStamp.plusDays(10),
                 nextConfidenceCheckAt = timeStamp.plusDays(20),
-                confidenceLevel = 4
+                confidenceLevel = 5
             )
         )
     }
@@ -104,7 +104,7 @@ abstract class BusinessPartnerCommonRequestFactory(
                 numberOfSharingMembers = 2,
                 lastConfidenceCheckAt = timeStamp.plusDays(10),
                 nextConfidenceCheckAt = timeStamp.plusDays(20),
-                confidenceLevel = 4
+                confidenceLevel = 5
             )
         )
     }
@@ -188,7 +188,7 @@ abstract class BusinessPartnerCommonRequestFactory(
                 numberOfSharingMembers = 2,
                 lastConfidenceCheckAt = timeStamp.plusDays(10),
                 nextConfidenceCheckAt = timeStamp.plusDays(20),
-                confidenceLevel = 4
+                confidenceLevel = 5
             )
         )
     }
