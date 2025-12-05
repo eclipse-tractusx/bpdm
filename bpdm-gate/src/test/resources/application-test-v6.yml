@@ -4,6 +4,7 @@ bpdm:
   tasks:
     creation:
       fromSharingMember:
+        starts-as-ready: false
         cron: '-'
       fromPool:
         cron: '-'

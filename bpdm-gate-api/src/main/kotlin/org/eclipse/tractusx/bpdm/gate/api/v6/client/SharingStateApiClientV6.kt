@@ -19,10 +19,14 @@
 
 package org.eclipse.tractusx.bpdm.gate.api.v6.client
 
-interface GateClientV6 {
+import org.eclipse.tractusx.bpdm.gate.api.ApiCommons
+import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyRequest
+import org.eclipse.tractusx.bpdm.gate.api.v6.GateSharingStateApi
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.service.annotation.PostExchange
 
-    val businessPartners: BusinessPartnerApiClientV6
+interface SharingStateApiClientV6: GateSharingStateApi {
 
-    val sharingStates: SharingStateApiClientV6
-
+    @PostExchange(value = "${ApiCommons.SHARING_STATE_PATH_V6}/ready")
+    fun postSharingStateReady(@RequestBody request: PostSharingStateReadyRequest)
 }

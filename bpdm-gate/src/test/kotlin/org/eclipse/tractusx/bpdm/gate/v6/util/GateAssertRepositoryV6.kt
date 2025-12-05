@@ -22,13 +22,20 @@ package org.eclipse.tractusx.bpdm.gate.v6.util
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.BusinessPartnerOutputDto
+import org.eclipse.tractusx.bpdm.test.util.InstantSecondsComparator
+import org.eclipse.tractusx.bpdm.test.util.LocalDatetimeSecondsComparator
 import org.springframework.stereotype.Component
+import java.time.LocalDateTime
 
 /**
  * Offers util functionalities for comparing complex Gate API V6 objects under test
  */
 @Component
 class GateAssertRepositoryV6 {
+
+    private val localDatetimeSecondsComparator = LocalDatetimeSecondsComparator(InstantSecondsComparator())
+
 
     fun assertBusinessPartnerInput(actual: Collection<BusinessPartnerInputDto>, expected: Collection<BusinessPartnerInputDto>){
         Assertions.assertThat(actual)
@@ -44,6 +51,24 @@ class GateAssertRepositoryV6 {
     fun assertBusinessPartnerInput(actual: PageDto<BusinessPartnerInputDto>, expected: PageDto<BusinessPartnerInputDto>){
         assertPageHeader(actual, expected)
         assertBusinessPartnerInput(actual.content, expected.content)
+    }
+
+
+    fun assertBusinessPartnerOutput(actual: Collection<BusinessPartnerOutputDto>, expected: Collection<BusinessPartnerOutputDto>){
+        Assertions.assertThat(actual)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .ignoringFields(
+                BusinessPartnerOutputDto::createdAt.name,
+                BusinessPartnerOutputDto::updatedAt.name
+            )
+            .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
+            .isEqualTo(expected)
+    }
+
+    fun assertBusinessPartnerOutput(actual: PageDto<BusinessPartnerOutputDto>, expected: PageDto<BusinessPartnerOutputDto>){
+        assertPageHeader(actual, expected)
+        assertBusinessPartnerOutput(actual.content, expected.content)
     }
 
     private fun assertPageHeader(actual: PageDto<*>, expected: PageDto<*>){

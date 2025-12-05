@@ -17,12 +17,13 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.api.v6.client
+package org.eclipse.tractusx.bpdm.gate.v6.util
 
-interface GateClientV6 {
+import org.eclipse.tractusx.bpdm.common.util.BpdmWebClientProvider
+import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
+import org.springframework.boot.web.server.WebServer
 
-    val businessPartners: BusinessPartnerApiClientV6
-
-    val sharingStates: SharingStateApiClientV6
-
-}
+class GateOutputConsumerClientV6(
+    clientProvider: BpdmWebClientProvider,
+    ownWebServer: WebServer
+): GateTestClientV6(KeyCloakInitializer.CLIENT_ID_GATE_OUTPUT_CONSUMER, clientProvider, ownWebServer)

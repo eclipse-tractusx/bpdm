@@ -23,9 +23,10 @@ import jakarta.validation.Valid
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.ApiCommons
-import org.eclipse.tractusx.bpdm.gate.api.GateBusinessPartnerApi
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
+import org.eclipse.tractusx.bpdm.gate.api.v6.GateBusinessPartnerApi
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.BusinessPartnerOutputDto
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RequestBody
@@ -35,13 +36,19 @@ import org.springframework.web.service.annotation.PutExchange
 
 interface BusinessPartnerApiClientV6: GateBusinessPartnerApi {
     @PutExchange(value = "${ApiCommons.BASE_PATH_V6}/input/business-partners")
-    override fun upsertBusinessPartnersInput(
+    fun upsertBusinessPartnersInput(
         @RequestBody businessPartners: Collection<BusinessPartnerInputRequest>
     ): ResponseEntity<Collection<BusinessPartnerInputDto>>
 
     @PostExchange(value = "${ApiCommons.BASE_PATH_V6}/input/business-partners/search")
-    override fun getBusinessPartnersInput(
+    fun getBusinessPartnersInput(
+        @RequestBody externalIds: Collection<String>?,
+        @ParameterObject @Valid paginationRequest: PaginationRequest = PaginationRequest()
+    ): PageDto<BusinessPartnerInputDto>
+
+    @PostExchange(value = "${ApiCommons.BASE_PATH_V6}/output/business-partners/search")
+    override fun getBusinessPartnersOutput(
         @RequestBody externalIds: Collection<String>?,
         @ParameterObject @Valid paginationRequest: PaginationRequest
-    ): PageDto<BusinessPartnerInputDto>
+    ): PageDto<BusinessPartnerOutputDto>
 }
