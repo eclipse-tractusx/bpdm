@@ -19,8 +19,13 @@
 
 package org.eclipse.tractusx.bpdm.gate.v6.util
 
+import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
+import org.eclipse.tractusx.bpdm.gate.service.TaskCreationBatchService
+import org.eclipse.tractusx.bpdm.gate.service.TaskResolutionBatchService
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v6.GateTestDataFactoryV6
+import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
+import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolMockDataFactory
 import java.time.Instant
 
 /**
@@ -28,13 +33,36 @@ import java.time.Instant
  */
 class GateTestDataClientV6 (
     val testDataFactory: GateTestDataFactoryV6,
-    val operatorClient: GateOperatorClientV6
+    val operatorClient: GateOperatorClientV6,
+    private val orchestratorMockDataFactory: OrchestratorMockDataFactory,
+    private val taskCreationBatchService: TaskCreationBatchService,
+    private val taskResolutionBatchService: TaskResolutionBatchService,
+    private val tenantBpnL: String,
+    private val poolMockDataFactory: PoolMockDataFactory
 ){
-
     fun createBusinessPartnerInput(seed: String, externalId: String = seed, externalSequenceTimestamp: Instant? = null): BusinessPartnerInputDto{
         val createRequest = testDataFactory.request.createFullValid(seed, externalId).copy(externalSequenceTimestamp = externalSequenceTimestamp)
         return operatorClient.businessPartners.upsertBusinessPartnersInput(listOf(createRequest)).body!!.single()
     }
 
+    fun refineToAdditionalAddressOfSite(input: BusinessPartnerInputDto, seed: String = input.externalId): PoolMockDataFactory.AdditionalAddressOfSiteResult{
+        val poolMockResult = poolMockDataFactory.mockAdditionalAddressOfSiteSearchResult(seed)
+
+        val owningCompany = if(input.isOwnCompanyData) tenantBpnL else null
+        orchestratorMockDataFactory.mockRefineToAdditionalAddressOfSite(
+            seed,
+            poolMockResult.legalEntityParent,
+            poolMockResult.siteParent,
+            poolMockResult.additionalAddress,
+            owningCompany,
+            input.nameParts
+        )
+
+        operatorClient.sharingStates.postSharingStateReady(PostSharingStateReadyRequest(listOf(input.externalId)))
+        taskCreationBatchService.createTasksForReadyBusinessPartners()
+        taskResolutionBatchService.resolveTasks()
+
+        return poolMockResult
+    }
 
 }

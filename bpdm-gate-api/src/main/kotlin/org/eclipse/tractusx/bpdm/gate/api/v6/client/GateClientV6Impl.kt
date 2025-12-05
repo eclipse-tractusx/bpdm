@@ -36,6 +36,7 @@ open class GateClientV6Impl (
     }
 
     override val businessPartners by lazy { createClient<BusinessPartnerApiClientV6>() }
+    override val sharingStates by lazy { createClient<SharingStateApiClientV6>() }
 
 
     private inline fun <reified T> createClient() =
