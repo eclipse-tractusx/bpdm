@@ -23,6 +23,7 @@ import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.BusinessPartnerOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.SharingStateDto
 import org.eclipse.tractusx.bpdm.test.util.InstantSecondsComparator
 import org.eclipse.tractusx.bpdm.test.util.LocalDatetimeSecondsComparator
 import org.springframework.stereotype.Component
@@ -69,6 +70,17 @@ class GateAssertRepositoryV6 {
     fun assertBusinessPartnerOutput(actual: PageDto<BusinessPartnerOutputDto>, expected: PageDto<BusinessPartnerOutputDto>){
         assertPageHeader(actual, expected)
         assertBusinessPartnerOutput(actual.content, expected.content)
+    }
+
+    fun assertSharingStates(actual: PageDto<SharingStateDto>, expected: PageDto<SharingStateDto>){
+        assertPageHeader(actual, expected)
+        assertSharingStates(actual.content, expected.content)
+    }
+
+    fun assertSharingStates(actual: Collection<SharingStateDto>, expected: Collection<SharingStateDto>){
+        Assertions.assertThat(actual)
+            .usingRecursiveComparison()
+            .isEqualTo(expected)
     }
 
     private fun assertPageHeader(actual: PageDto<*>, expected: PageDto<*>){
