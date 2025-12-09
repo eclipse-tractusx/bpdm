@@ -44,8 +44,18 @@ class OrchestratorMockDataFactory(
         addressGoldenRecord: LogisticAddressVerboseDto,
         owningCompany: String?,
         nameParts: List<String>
-    ): BusinessPartner{
+    ): TaskClientStateDto{
+        WireMock.configureFor("localhost", orchestratorMockServer.port())
+
+        val mockedCreatedTask = mockCreateTask(seed)
+
         val refinementTaskData = refinementTestDataFactory.buildBusinessPartner(legalEntityGoldenRecord, siteGoldenRecord, addressGoldenRecord, owningCompany, nameParts)
+        val mockedRefinedTask = mockRefinedToAdditionalAddressOfSite(mockedCreatedTask.taskId, refinementTaskData, seed)
+
+        return mockedRefinedTask
+    }
+
+    fun mockCreateTask(seed: String): TaskClientStateDto{
         WireMock.configureFor("localhost", orchestratorMockServer.port())
 
         val mockedCreatedTaskResponse = buildInitialTaskCreationResponse(seed)
@@ -56,10 +66,16 @@ class OrchestratorMockDataFactory(
                 .willReturn(WireMock.okJson(objectMapper.writeValueAsString(mockedCreatedTaskResponse)))
         )
 
+        return mockedCreatedTask
+    }
+
+    fun mockRefinedToAdditionalAddressOfSite(taskId: String, refinementTaskData: BusinessPartner, seed: String): TaskClientStateDto{
+        WireMock.configureFor("localhost", orchestratorMockServer.port())
+
         WireMock.stubFor(WireMock.get(WireMock.urlPathEqualTo("${BASE_PATH_V7_BUSINESS_PARTNERS}/finished-events")).willReturn(WireMock.okJson(
             objectMapper.writeValueAsString(
                 FinishedTaskEventsResponse(1, 1, 0, 1, listOf(
-                    FinishedTaskEventsResponse.Event(Instant.now(), ResultState.Success, mockedCreatedTask.taskId)
+                    FinishedTaskEventsResponse.Event(Instant.now(), ResultState.Success, taskId)
                 ))
             )
         )))
@@ -69,7 +85,28 @@ class OrchestratorMockDataFactory(
             objectMapper.writeValueAsString(mockedRefinedTasks)
         )))
 
-        return refinementTaskData
+        return mockedRefinedTasks.tasks.single()
+    }
+
+    fun mockSharingError(seed: String, errorType: TaskErrorType): TaskClientStateDto{
+        WireMock.configureFor("localhost", orchestratorMockServer.port())
+
+        val mockedCreatedTask = mockCreateTask(seed)
+
+        WireMock.stubFor(WireMock.get(WireMock.urlPathEqualTo("${BASE_PATH_V7_BUSINESS_PARTNERS}/finished-events")).willReturn(WireMock.okJson(
+            objectMapper.writeValueAsString(
+                FinishedTaskEventsResponse(1, 1, 0, 1, listOf(
+                    FinishedTaskEventsResponse.Event(Instant.now(), ResultState.Error, mockedCreatedTask.taskId)
+                ))
+            )
+        )))
+
+        val mockedErrorTasks = buildErrorTaskState(seed, errorType)
+        WireMock.stubFor(WireMock.post(WireMock.urlPathEqualTo("${BASE_PATH_V7_BUSINESS_PARTNERS}/state/search")).willReturn(WireMock.okJson(
+            objectMapper.writeValueAsString(mockedErrorTasks)
+        )))
+
+        return mockedErrorTasks.tasks.single()
     }
 
     fun buildInitialTaskCreationResponse(seed: String): TaskCreateResponse{
@@ -105,6 +142,27 @@ class OrchestratorMockDataFactory(
                         TaskStep.PoolSync,
                         StepState.Success,
                         emptyList(),
+                        Instant.now(),
+                        Instant.now(),
+                        Instant.now()
+                    )
+                )
+            )
+        )
+    }
+
+    private fun buildErrorTaskState(seed: String, errorType: TaskErrorType): TaskStateResponse{
+        return TaskStateResponse(
+            listOf(
+                TaskClientStateDto(
+                    UUID.nameUUIDFromBytes("TaskID_$seed".encodeToByteArray()).toString(),
+                    UUID.nameUUIDFromBytes("RecordID_$seed".encodeToByteArray()).toString(),
+                    BusinessPartner.empty,
+                    TaskProcessingStateDto(
+                        ResultState.Error,
+                        TaskStep.PoolSync,
+                        StepState.Error,
+                        listOf(TaskErrorDto(errorType, "$seed Description")),
                         Instant.now(),
                         Instant.now(),
                         Instant.now()

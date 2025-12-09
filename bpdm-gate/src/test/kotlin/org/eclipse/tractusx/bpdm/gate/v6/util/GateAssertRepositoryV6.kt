@@ -80,6 +80,7 @@ class GateAssertRepositoryV6 {
     fun assertSharingStates(actual: Collection<SharingStateDto>, expected: Collection<SharingStateDto>){
         Assertions.assertThat(actual)
             .usingRecursiveComparison()
+            .ignoringFields(SharingStateDto::sharingProcessStarted.name)
             .isEqualTo(expected)
     }
 

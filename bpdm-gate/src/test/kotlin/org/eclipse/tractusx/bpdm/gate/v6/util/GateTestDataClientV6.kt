@@ -26,6 +26,8 @@ import org.eclipse.tractusx.bpdm.gate.service.TaskResolutionBatchService
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v6.GateTestDataFactoryV6
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolMockDataFactory
+import org.eclipse.tractusx.orchestrator.api.model.TaskClientStateDto
+import org.eclipse.tractusx.orchestrator.api.model.TaskErrorType
 import java.time.Instant
 
 /**
@@ -58,11 +60,51 @@ class GateTestDataClientV6 (
             input.nameParts
         )
 
-        operatorClient.sharingStates.postSharingStateReady(PostSharingStateReadyRequest(listOf(input.externalId)))
+        setStateToReady(input.externalId)
         taskCreationBatchService.createTasksForReadyBusinessPartners()
         taskResolutionBatchService.resolveTasks()
 
         return poolMockResult
+    }
+
+    fun setStateToReady(externalId: String){
+        operatorClient.sharingStates.postSharingStateReady(PostSharingStateReadyRequest(listOf(externalId)))
+    }
+
+    fun setStateToPending(externalId: String, seed: String = externalId): TaskClientStateDto{
+        setStateToReady(externalId)
+        val createdTask = orchestratorMockDataFactory.mockCreateTask(seed)
+        taskCreationBatchService.createTasksForReadyBusinessPartners()
+
+        return createdTask
+    }
+
+    fun setStateToSuccess(externalId: String, seed: String = externalId): TaskClientStateDto{
+        val poolMockResult = poolMockDataFactory.mockAdditionalAddressOfSiteSearchResult(seed)
+        val mockedRefinedTask = orchestratorMockDataFactory.mockRefineToAdditionalAddressOfSite(
+            seed,
+            poolMockResult.legalEntityParent,
+            poolMockResult.siteParent,
+            poolMockResult.additionalAddress,
+            null,
+            emptyList()
+        )
+
+        setStateToReady(externalId)
+        taskCreationBatchService.createTasksForReadyBusinessPartners()
+        taskResolutionBatchService.resolveTasks()
+
+        return mockedRefinedTask
+    }
+
+    fun setStateToError(externalId: String, seed: String = externalId, errorType: TaskErrorType): TaskClientStateDto{
+        val errorTask = orchestratorMockDataFactory.mockSharingError(seed, errorType)
+
+        setStateToReady(externalId)
+        taskCreationBatchService.createTasksForReadyBusinessPartners()
+        taskResolutionBatchService.resolveTasks()
+
+        return errorTask
     }
 
 }

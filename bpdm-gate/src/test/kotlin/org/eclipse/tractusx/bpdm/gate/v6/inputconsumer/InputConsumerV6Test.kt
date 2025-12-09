@@ -23,6 +23,8 @@ import org.eclipse.tractusx.bpdm.gate.Application
 import org.eclipse.tractusx.bpdm.gate.v6.GateV6Test
 import org.eclipse.tractusx.bpdm.gate.v6.util.GateInputConsumerClientV6
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
+import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockContextInitializer
+import org.eclipse.tractusx.bpdm.test.containers.PoolMockContextInitializer
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInfo
@@ -52,7 +54,9 @@ import org.springframework.test.context.ContextConfiguration
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class])
 @ContextConfiguration(initializers = [
     PostgreSQLContextInitializer::class,
-    KeyCloakInitializer::class
+    KeyCloakInitializer::class,
+    OrchestratorMockContextInitializer::class,
+    PoolMockContextInitializer::class
 ])
 @ActiveProfiles("test-v6")
 abstract class InputConsumerV6Test: GateV6Test() {
