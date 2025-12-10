@@ -132,7 +132,7 @@ class TaskRelationsBatchResolutionService(
 class TaskRelationsResolutionService(
     private val orchestrationClient: OrchestrationApiClient,
     private val goldenRecordTaskConfigProperties: GoldenRecordTaskConfigProperties,
-    private val taskRelationsStepBuildService: TaskRelationsStepBuildService
+    private val taskRelationsStepBuildDispatcherService: TaskRelationsStepBuildDispatcherService
 ) {
     private val logger = KotlinLogging.logger { }
 
@@ -161,7 +161,7 @@ class TaskRelationsResolutionService(
 
     private fun businessPartnerRelationsTaskResult(taskStep: TaskRelationsStepReservationEntryDto): TaskRelationsStepResultEntryDto {
         return try {
-            taskRelationsStepBuildService.upsertBusinessPartnerRelations(taskStep)
+            taskRelationsStepBuildDispatcherService.upsertBusinessPartnerRelations(taskStep)
         }catch (ex: BpdmValidationException) {
             TaskRelationsStepResultEntryDto(
                 taskId = taskStep.taskId,

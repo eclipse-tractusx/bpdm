@@ -53,7 +53,7 @@ import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType as GateRelationType
-import org.eclipse.tractusx.bpdm.pool.api.model.RelationType as PoolRelationType
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType as PoolRelationType
 
 
 class BusinessPartnerRelationStepDefs(
@@ -218,8 +218,8 @@ class BusinessPartnerRelationStepDefs(
         val expectedRelation = RelationOutputDto(
             externalId = externalId,
             relationType = relationType,
-            sourceBpnL = sourceBpn,
-            targetBpnL = targetBpn,
+            sourceBpn = sourceBpn,
+            targetBpn = targetBpn,
             validityPeriods = defaultRelationStates,
             updatedAt = anyTime,
         )

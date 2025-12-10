@@ -6,6 +6,19 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
 For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/CHANGELOG.md) of the charts directly.
 
+## [7.3.0] - tbd
+
+### BREAKING
+
+- Gate: Renamed relation output fields `sourceBpnL` to `sourceBpn` and `targetBpnL` to `targetBpn` to correctly represent BPNs for both Legal Entities (BPNL) and Addresses (BPNA).
+  These fields were previously unused; this corrects misleading naming. See Migration Guide for rationale and impact. [#1561](https://github.com/eclipse-tractusx/bpdm/issues/1561)
+
+### Added
+
+- BPDM: Introduced support for business partner address-to-address relations with the new `IsReplacedBy` relation type. [#1561](https://github.com/eclipse-tractusx/bpdm/issues/1561)
+
+### Changed
+
 ## [7.2.0] - 2025-12-01
 
 ### Added

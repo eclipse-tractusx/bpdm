@@ -97,7 +97,7 @@ interface RelationRepository: JpaRepository<RelationDb, Long>, JpaSpecificationE
                 Specification<RelationDb> { root, _, builder ->
                     root
                         .get<RelationOutputDb>(RelationDb::output.name)
-                        .get<RelationType>(RelationOutputDb::sourceBpnL.name)
+                        .get<RelationType>(RelationOutputDb::sourceBpn.name)
                         .`in`(sourceBpnLs)
                 }
             }
@@ -107,7 +107,7 @@ interface RelationRepository: JpaRepository<RelationDb, Long>, JpaSpecificationE
                 Specification<RelationDb> { root, _, builder ->
                    root
                         .get<RelationOutputDb>(RelationDb::output.name)
-                        .get<RelationType>(RelationOutputDb::targetBpnL.name)
+                        .get<RelationType>(RelationOutputDb::targetBpn.name)
                        .`in`(targetBpnLs)
                 }
             }

@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.service
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
-import org.eclipse.tractusx.bpdm.pool.api.model.RelationType
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
@@ -43,7 +43,7 @@ class RelationUpsertService(
     fun upsertRelation(upsertRequest: UpsertRequest): UpsertResult<RelationDb>{
         val source = upsertRequest.source
         val target = upsertRequest.target
-        val relationType = upsertRequest.relationType
+        val relationType = upsertRequest.legalEntityRelationType
 
         // Prevent self-referencing relations
         if (source == target) {
@@ -86,7 +86,7 @@ class RelationUpsertService(
         }.toMutableList()
 
         val newRelation = RelationDb(
-            type = upsertRequest.relationType,
+            type = upsertRequest.legalEntityRelationType,
             startNode = source,
             endNode = target,
             validityPeriods = validityPeriods,
@@ -132,7 +132,7 @@ class RelationUpsertService(
     data class UpsertRequest(
         val source: LegalEntityDb,
         val target: LegalEntityDb,
-        val relationType: RelationType,
+        val legalEntityRelationType: LegalEntityRelationType,
         val validityPeriods: Collection<RelationValidityPeriodDb>
     )
 

@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
-import org.eclipse.tractusx.bpdm.pool.api.model.RelationType
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
@@ -43,7 +43,7 @@ class OwnedByRelationUpsertService(
 
 
         val result = relationUpsertService.upsertRelation(
-            RelationUpsertService.UpsertRequest(proposedSource, proposedTarget, RelationType.IsOwnedBy, upsertRequest.validityPeriods)
+            RelationUpsertService.UpsertRequest(proposedSource, proposedTarget, LegalEntityRelationType.IsOwnedBy, upsertRequest.validityPeriods)
         )
 
         return result
@@ -54,7 +54,7 @@ class OwnedByRelationUpsertService(
         val child = upsertRequest.source
         val parent = upsertRequest.target
 
-        val allChildRelations = relationRepository.findByTypeAndStartNode(RelationType.IsOwnedBy, child)
+        val allChildRelations = relationRepository.findByTypeAndStartNode(LegalEntityRelationType.IsOwnedBy, child)
         val allOverlappingChildRelations = relationUpsertService.filterOverlappingRelations(upsertRequest, allChildRelations)
 
         allOverlappingChildRelations.forEach { relation ->
@@ -89,7 +89,7 @@ class OwnedByRelationUpsertService(
             allParents.add(currentParent)
 
             // Fetch Relations in which the currently processed parent node is a child
-            val parentParentRelations = relationRepository.findByTypeAndStartNode(RelationType.IsOwnedBy, currentParent)
+            val parentParentRelations = relationRepository.findByTypeAndStartNode(LegalEntityRelationType.IsOwnedBy, currentParent)
             val overlappingParentParentRelations = relationUpsertService.filterOverlappingRelations(upsertRequest, parentParentRelations)
 
             val parentsOfCurrent = overlappingParentParentRelations.map { it.endNode }

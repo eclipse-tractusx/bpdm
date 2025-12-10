@@ -57,8 +57,8 @@ class RelationsGoldenRecordTaskStateMachineIT  @Autowired constructor(
     private val dbTestHelpers: DbTestHelpers,
     private val stateMachineConfigProperties: StateMachineConfigProperties
 ) {
-    private val businessPartnerRelations1 = BusinessPartnerRelations(relationType = RelationType.IsAlternativeHeadquarterFor, businessPartnerSourceBpnl = "BPNL1", businessPartnerTargetBpnl = "BPNL2", validityPeriods = OrchestratorTestValues.alwaysActiveRelationValidity)
-    private val businessPartnerRelations2 = BusinessPartnerRelations(relationType = RelationType.IsManagedBy, businessPartnerSourceBpnl = "BPNL3", businessPartnerTargetBpnl = "BPNL4", validityPeriods =  OrchestratorTestValues.alwaysActiveRelationValidity)
+    private val businessPartnerRelations1 = BusinessPartnerRelations(relationType = RelationType.IsAlternativeHeadquarterFor, businessPartnerSourceBpn = "BPNL1", businessPartnerTargetBpn = "BPNL2", validityPeriods = OrchestratorTestValues.alwaysActiveRelationValidity)
+    private val businessPartnerRelations2 = BusinessPartnerRelations(relationType = RelationType.IsManagedBy, businessPartnerSourceBpn = "BPNL3", businessPartnerTargetBpn = "BPNL4", validityPeriods =  OrchestratorTestValues.alwaysActiveRelationValidity)
     private lateinit var gateRecord: SharingMemberRecordDb
 
     @BeforeEach

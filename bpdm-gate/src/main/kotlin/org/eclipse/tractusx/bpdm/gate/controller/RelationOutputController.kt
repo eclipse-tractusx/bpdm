@@ -45,8 +45,8 @@ class RelationOutputController(
             tenantBpnL = principalUtil.resolveTenantBpnl(),
             externalIds = searchRequest.externalIds ?: emptyList(),
             relationType = searchRequest.relationType,
-            sourceBpnLs = searchRequest.sourceBpnLs ?: emptyList(),
-            targetBpnLs = searchRequest.targetBpnLs ?:emptyList(),
+            sourceBpnLs = searchRequest.sourceBpns ?: emptyList(),
+            targetBpnLs = searchRequest.targetBpns ?:emptyList(),
             updatedAtFrom = searchRequest.updatedAtFrom,
             paginationRequest
         )

@@ -26,7 +26,7 @@ import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityIdentifierDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.RelationType
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntitySearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityCreateError
@@ -661,8 +661,8 @@ class LegalEntityControllerIT @Autowired constructor(
      * Then the relation is persisted and can be retrieved
      */
     @ParameterizedTest
-    @EnumSource(RelationType::class)
-    fun `create and fetch relation between two legal entities` (relationType: RelationType) {
+    @EnumSource(LegalEntityRelationType::class)
+    fun `create and fetch relation between two legal entities` (legalEntityRelationType: LegalEntityRelationType) {
         /*
         * This test case is created as abstract and had scope to refactor more in future,
         * when we'll have orchestrator logic confirmed to create and update relations in golden record process.
@@ -680,7 +680,7 @@ class LegalEntityControllerIT @Autowired constructor(
 
         // Step 2: Create a relation
         val relation = RelationDb(
-            type = relationType,
+            type = legalEntityRelationType,
             startNode = legalEntityRepository.findByBpnIgnoreCase(savedEntity1.legalEntity.bpnl)!!,
             endNode = legalEntityRepository.findByBpnIgnoreCase(savedEntity2.legalEntity.bpnl)!!,
             validityPeriods = mutableListOf(
@@ -697,7 +697,7 @@ class LegalEntityControllerIT @Autowired constructor(
         val savedRelation = releationRepository.findAll()
 
         assertThat(savedRelation).isNotNull
-        assertThat(savedRelation.first().type).isEqualTo(relationType)
+        assertThat(savedRelation.first().type).isEqualTo(legalEntityRelationType)
         assertThat(savedRelation.first().startNode.bpn).isEqualTo(savedEntity1.legalEntity.bpnl)
         assertThat(savedRelation.first().endNode.bpn).isEqualTo(savedEntity2.legalEntity.bpnl)
 
