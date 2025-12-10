@@ -42,8 +42,8 @@ class RelationsResponseMapper {
         with(businessPartnerRelations) {
             BusinessPartnerRelations(
                 relationType = toRelationType(relationType),
-                businessPartnerSourceBpnl = businessPartnerSourceBpnl,
-                businessPartnerTargetBpnl = businessPartnerTargetBpnl,
+                businessPartnerSourceBpn = businessPartnerSourceBpn,
+                businessPartnerTargetBpn = businessPartnerTargetBpn,
                 validityPeriods = businessPartnerRelations.validityPeriods.map {
                     RelationValidityPeriod(
                         validFrom = it.validFrom,
@@ -71,6 +71,7 @@ class RelationsResponseMapper {
             RelationsGoldenRecordTaskDb.RelationType.IsAlternativeHeadquarterFor -> RelationType.IsAlternativeHeadquarterFor
             RelationsGoldenRecordTaskDb.RelationType.IsManagedBy -> RelationType.IsManagedBy
             RelationsGoldenRecordTaskDb.RelationType.IsOwnedBy -> RelationType.IsOwnedBy
+            RelationsGoldenRecordTaskDb.RelationType.IsReplacedBy -> RelationType.IsReplacedBy
         }
 
     fun toResultState(resultState: RelationsGoldenRecordTaskDb.ResultState) =

@@ -172,7 +172,7 @@ class RelationOutputControllerIT @Autowired constructor(
             RelationOutputDto(relationId1, SharableRelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL2, GateTestValues.alwaysActiveRelationValidity, relation1UpdateTime),
             RelationOutputDto(relationId4, SharableRelationType.IsManagedBy, bpnL5, bpnL6, GateTestValues.alwaysActiveRelationValidity, relation4UpdateTime)
         ))
-        val actual = gateClient.relationOutput.postSearch(RelationOutputSearchRequest(sourceBpnLs = listOf(bpnL1, bpnL5)))
+        val actual = gateClient.relationOutput.postSearch(RelationOutputSearchRequest(sourceBpns = listOf(bpnL1, bpnL5)))
 
         Assertions.assertThat(actual).isEqualTo(expected)
     }
@@ -203,7 +203,7 @@ class RelationOutputControllerIT @Autowired constructor(
             RelationOutputDto(relationId1, SharableRelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL2, GateTestValues.alwaysActiveRelationValidity, relation1UpdateTime),
             RelationOutputDto(relationId4, SharableRelationType.IsManagedBy, bpnL5, bpnL6, GateTestValues.alwaysActiveRelationValidity, relation4UpdateTime)
         ))
-        val actual = gateClient.relationOutput.postSearch(RelationOutputSearchRequest(targetBpnLs = listOf(bpnL2, bpnL6)))
+        val actual = gateClient.relationOutput.postSearch(RelationOutputSearchRequest(targetBpns = listOf(bpnL2, bpnL6)))
 
         Assertions.assertThat(actual).isEqualTo(expected)
     }
@@ -279,8 +279,8 @@ class RelationOutputControllerIT @Autowired constructor(
         val actualAlternativeHeadquarterRelation = gateClient.relationOutput.postSearch(RelationOutputSearchRequest(
             externalIds = listOf(relationId1, relationId2, relationId3),
             relationType = SharableRelationType.IsAlternativeHeadquarterFor,
-            sourceBpnLs = listOf(bpnL1, bpnL3),
-            targetBpnLs = listOf(bpnL2, bpnL4, bpnL6),
+            sourceBpns = listOf(bpnL1, bpnL3),
+            targetBpns = listOf(bpnL2, bpnL4, bpnL6),
             updatedAtFrom = relation1UpdateTime
         ))
 
@@ -293,8 +293,8 @@ class RelationOutputControllerIT @Autowired constructor(
         val actualManagedRelation = gateClient.relationOutput.postSearch(RelationOutputSearchRequest(
             externalIds = listOf(relationId4, relationId5),
             relationType = SharableRelationType.IsManagedBy,
-            sourceBpnLs = listOf(bpnL7, bpnL9),
-            targetBpnLs = listOf(bpnL8, bpnL10, bpnL12),
+            sourceBpns = listOf(bpnL7, bpnL9),
+            targetBpns = listOf(bpnL8, bpnL10, bpnL12),
             updatedAtFrom = relation1UpdateTime
         ))
 
@@ -304,8 +304,8 @@ class RelationOutputControllerIT @Autowired constructor(
     private fun createOutputRelation(externalId: String, relationType: SharableRelationType, source: String, target: String, updatedAt: Instant){
         val output = RelationOutputDb(
             relationType = relationType,
-            sourceBpnL = source,
-            targetBpnL = target,
+            sourceBpn = source,
+            targetBpn = target,
             updatedAt = updatedAt,
             validityPeriods = GateTestValues.alwaysActiveRelationValidity.map {
                     RelationValidityPeriodDb(

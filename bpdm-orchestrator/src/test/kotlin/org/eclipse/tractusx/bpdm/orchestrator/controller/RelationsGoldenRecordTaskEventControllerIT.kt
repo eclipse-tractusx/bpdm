@@ -50,21 +50,21 @@ class RelationsGoldenRecordTaskEventControllerIT @Autowired constructor(
 ) {
     private val defaultRelations1 = BusinessPartnerRelations(
         relationType = RelationType.IsAlternativeHeadquarterFor,
-        businessPartnerSourceBpnl = "BPNL1",
-        businessPartnerTargetBpnl = "BPNL2",
+        businessPartnerSourceBpn = "BPNL1",
+        businessPartnerTargetBpn = "BPNL2",
         validityPeriods = OrchestratorTestValues.alwaysActiveRelationValidity
     )
     private val defaultRelations2 = BusinessPartnerRelations(
         relationType = RelationType.IsManagedBy,
-        businessPartnerSourceBpnl = "BPNL3",
-        businessPartnerTargetBpnl = "BPNL4",
+        businessPartnerSourceBpn = "BPNL3",
+        businessPartnerTargetBpn = "BPNL4",
         validityPeriods = OrchestratorTestValues.alwaysActiveRelationValidity
     )
 
     private val defaultRelations3 = BusinessPartnerRelations(
         relationType = RelationType.IsOwnedBy,
-        businessPartnerSourceBpnl = "BPNL5",
-        businessPartnerTargetBpnl = "BPNL6",
+        businessPartnerSourceBpn = "BPNL5",
+        businessPartnerTargetBpn = "BPNL6",
         validityPeriods = OrchestratorTestValues.alwaysActiveRelationValidity
     )
 

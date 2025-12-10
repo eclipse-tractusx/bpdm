@@ -24,8 +24,8 @@ import java.time.Instant
 data class RelationOutputDto(
     val externalId: String,
     val relationType: SharableRelationType,
-    val sourceBpnL: String,
-    val targetBpnL: String,
+    val sourceBpn: String,
+    val targetBpn: String,
     val validityPeriods: Collection<RelationValidityPeriodDto>,
     val updatedAt: Instant
 )

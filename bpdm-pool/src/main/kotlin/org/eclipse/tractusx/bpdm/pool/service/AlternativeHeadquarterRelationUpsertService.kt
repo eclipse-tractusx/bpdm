@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
-import org.eclipse.tractusx.bpdm.pool.api.model.RelationType
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
@@ -41,7 +41,7 @@ class AlternativeHeadquarterRelationUpsertService(
         validateOnlyOneAlternative(standardisedRequest)
 
         val result = relationUpsertService.upsertRelation(
-            RelationUpsertService.UpsertRequest(standardisedRequest.source, standardisedRequest.target, RelationType.IsAlternativeHeadquarterFor, standardisedRequest.validityPeriods)
+            RelationUpsertService.UpsertRequest(standardisedRequest.source, standardisedRequest.target, LegalEntityRelationType.IsAlternativeHeadquarterFor, standardisedRequest.validityPeriods)
         )
 
         return result
@@ -67,7 +67,7 @@ class AlternativeHeadquarterRelationUpsertService(
     }
 
     private fun validateOnlyOneAlternative(legalEntity: LegalEntityDb, upsertRequest: IRelationUpsertStrategyService.UpsertRequest){
-        val relations =  relationRepository.findInSourceOrTarget(RelationType.IsAlternativeHeadquarterFor, legalEntity)
+        val relations =  relationRepository.findInSourceOrTarget(LegalEntityRelationType.IsAlternativeHeadquarterFor, legalEntity)
         val overlappingRelations = relationUpsertService.filterOverlappingRelations(upsertRequest, relations)
 
         val otherRelations =  overlappingRelations.filterNot { it.startNode.bpn == upsertRequest.source.bpn && it.endNode.bpn == upsertRequest.target.bpn }

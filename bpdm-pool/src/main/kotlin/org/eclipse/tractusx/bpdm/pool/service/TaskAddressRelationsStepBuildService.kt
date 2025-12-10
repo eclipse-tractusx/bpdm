@@ -20,11 +20,11 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import jakarta.transaction.Transactional
-import org.eclipse.tractusx.bpdm.pool.api.model.RelationType
-import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
+import org.eclipse.tractusx.bpdm.pool.api.model.AddressRelationType
+import org.eclipse.tractusx.bpdm.pool.entity.AddressRelationDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
-import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
+import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
 import org.eclipse.tractusx.orchestrator.api.model.RelationValidityPeriod
 import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepReservationEntryDto
@@ -33,50 +33,48 @@ import org.springframework.stereotype.Service
 import org.eclipse.tractusx.orchestrator.api.model.RelationType as OrchestratorRelationType
 
 @Service
-class TaskRelationsStepBuildService(
-    private val alternativeHeadquarterRelationService: AlternativeHeadquarterRelationUpsertService,
-    private val legalEntityRepository: LegalEntityRepository,
-    private val managedRelationUpsertService: ManagedRelationUpsertService,
-    private val ownedByRelationService: OwnedByRelationUpsertService
+class TaskAddressRelationsStepBuildService(
+    private val logisticAddressRepository: LogisticAddressRepository,
+    private val addressRelationUpsertService: AddressRelationUpsertService
 ) {
+
     @Transactional
-    fun upsertBusinessPartnerRelations(taskEntry: TaskRelationsStepReservationEntryDto): TaskRelationsStepResultEntryDto {
-        val relationDto = taskEntry.businessPartnerRelations
+    fun upsertAddressRelations(taskEntry: TaskRelationsStepReservationEntryDto): TaskRelationsStepResultEntryDto {
 
-        // Prevent self-referencing relations
-        if (relationDto.businessPartnerSourceBpnl == relationDto.businessPartnerTargetBpnl) {
-            throw BpdmValidationException("A legal entity cannot have a relation to itself (BPNL: ${relationDto.businessPartnerSourceBpnl}).")
+        val addressRelationDto = taskEntry.businessPartnerRelations
+
+        if (addressRelationDto.businessPartnerSourceBpn == addressRelationDto.businessPartnerTargetBpn) {
+            throw BpdmValidationException("An Address cannot have a relation to itself (BPNA: ${addressRelationDto.businessPartnerSourceBpn}).")
         }
-        // Fetch legal entities by BPNL
-        val sourceLegalEntity = legalEntityRepository.findByBpnIgnoreCase(relationDto.businessPartnerSourceBpnl)
-            ?: throw BpdmValidationException("Source legal entity with specified BPNL : ${relationDto.businessPartnerSourceBpnl} not found")
 
-        val targetLegalEntity = legalEntityRepository.findByBpnIgnoreCase(relationDto.businessPartnerTargetBpnl)
-            ?: throw BpdmValidationException("Target legal entity with specified BPNL : ${relationDto.businessPartnerTargetBpnl} not found")
+        // Fetch source & target addresses
+        val sourceAddress = logisticAddressRepository.findByBpn(addressRelationDto.businessPartnerSourceBpn)
+            ?: throw BpdmValidationException("Source address BPNA ${addressRelationDto.businessPartnerSourceBpn} not found")
 
-        validateValidityPeriods(relationDto)
+        val targetAddress = logisticAddressRepository.findByBpn(addressRelationDto.businessPartnerTargetBpn)
+            ?: throw BpdmValidationException("Target address BPNA ${addressRelationDto.businessPartnerTargetBpn} not found")
+
+        validateValidityPeriods(addressRelationDto)
 
         // Map states from orchestrator
-        val validityPeriods = relationDto.validityPeriods.map {
+        val validityPeriods = addressRelationDto.validityPeriods.map {
             RelationValidityPeriodDb(
                 validFrom = it.validFrom,
                 validTo = it.validTo
             )
         }
 
-        val upsertRequest = IRelationUpsertStrategyService.UpsertRequest(
-            sourceLegalEntity,
-            targetLegalEntity,
+        val upsertRequest = IAddressRelationUpsertStratergyService.UpsertRequest(
+            source = sourceAddress,
+            target = targetAddress,
             validityPeriods = validityPeriods
         )
-        val strategyService : IRelationUpsertStrategyService = when(relationDto.relationType){
-            OrchestratorRelationType.IsAlternativeHeadquarterFor -> alternativeHeadquarterRelationService
-            OrchestratorRelationType.IsManagedBy -> managedRelationUpsertService
-            OrchestratorRelationType.IsOwnedBy -> ownedByRelationService
+        val strategyService: IAddressRelationUpsertStratergyService = when(addressRelationDto.relationType) {
+            OrchestratorRelationType.IsReplacedBy -> addressRelationUpsertService
+            else -> throw BpdmValidationException("Unsupported address relation type: ${addressRelationDto.relationType}")
         }
 
         val upsertResult = strategyService.upsertRelation(upsertRequest)
-
         return TaskRelationsStepResultEntryDto(
             taskId = taskEntry.taskId,
             errors = emptyList(),
@@ -84,11 +82,11 @@ class TaskRelationsStepBuildService(
         )
     }
 
-    private fun RelationDb.toTaskDto(): BusinessPartnerRelations{
+    private fun AddressRelationDb.toTaskDto(): BusinessPartnerRelations{
         return BusinessPartnerRelations(
             relationType = this.type.toTaskDto(),
-            businessPartnerSourceBpnl = this.startNode.bpn,
-            businessPartnerTargetBpnl = this.endNode.bpn,
+            businessPartnerSourceBpn = this.startAddress.bpn,
+            businessPartnerTargetBpn = this.endAddress.bpn,
             validityPeriods = this.validityPeriods.sortedBy { it.validFrom }.map {
                 RelationValidityPeriod(
                     validFrom = it.validFrom,
@@ -98,11 +96,9 @@ class TaskRelationsStepBuildService(
         )
     }
 
-    private fun RelationType.toTaskDto(): OrchestratorRelationType{
+    private fun AddressRelationType.toTaskDto(): OrchestratorRelationType{
         return when(this){
-            RelationType.IsAlternativeHeadquarterFor -> OrchestratorRelationType.IsAlternativeHeadquarterFor
-            RelationType.IsManagedBy -> OrchestratorRelationType.IsManagedBy
-            RelationType.IsOwnedBy -> OrchestratorRelationType.IsOwnedBy
+            AddressRelationType.IsReplacedBy -> OrchestratorRelationType.IsReplacedBy
         }
     }
 
@@ -122,8 +118,8 @@ class TaskRelationsStepBuildService(
         val orderedTimePeriods = orderedValidityPeriods.map { RelationUpsertService.TimePeriod.fromUnlimited(it.validFrom, it.validTo) }
         val consecutiveTimePeriodPairs =  orderedTimePeriods.zip(orderedTimePeriods.drop(1))
 
-       val anyOverlap =  consecutiveTimePeriodPairs
-           .any { (state1, state2) -> state1.hasOverlap(state2) }
+        val anyOverlap =  consecutiveTimePeriodPairs
+            .any { (state1, state2) -> state1.hasOverlap(state2) }
 
         if(anyOverlap){
             throw BpdmValidationException("Relation validity periods must not overlap.")

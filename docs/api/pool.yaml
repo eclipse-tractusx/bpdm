@@ -3461,10 +3461,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ErrorInfoAddressCreateError"
-        errorCount:
+        entityCount:
           type: integer
           format: int32
-        entityCount:
+        errorCount:
           type: integer
           format: int32
       required:
@@ -3510,6 +3510,11 @@ components:
           description: The list of identifiers of the address.
           items:
             $ref: "#/components/schemas/AddressIdentifierVerboseDto"
+        relations:
+          type: array
+          description: Relations to other business partners.
+          items:
+            $ref: "#/components/schemas/AddressRelationVerboseDto"
         physicalPostalAddress:
           $ref: "#/components/schemas/PhysicalPostalAddressVerboseDto"
           description: "The physical postal address of the address, such as an office,\
@@ -3560,6 +3565,7 @@ components:
         - identifiers
         - isParticipantData
         - physicalPostalAddress
+        - relations
         - states
         - updatedAt
     AddressPartnerUpdateRequest:
@@ -3632,10 +3638,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ErrorInfoAddressUpdateError"
-        errorCount:
+        entityCount:
           type: integer
           format: int32
-        entityCount:
+        errorCount:
           type: integer
           format: int32
       required:
@@ -3643,6 +3649,34 @@ components:
         - entityCount
         - errorCount
         - errors
+    AddressRelationVerboseDto:
+      type: object
+      description: Directed relation between two business partners of type address
+      properties:
+        type:
+          type: string
+          description: The type of relation between the logistic addresses
+          enum:
+            - IsAlternativeHeadquarterFor
+            - IsManagedBy
+            - IsOwnedBy
+            - IsReplacedBy
+        businessPartnerSourceBpna:
+          type: string
+          description: BPNA of the address from which the relation starts (source)
+        businessPartnerTargetBpna:
+          type: string
+          description: BPNA of the address to which this relation points (target)
+        validityPeriods:
+          type: array
+          description: Validity periods of this address relation
+          items:
+            $ref: "#/components/schemas/RelationValidityPeriod"
+      required:
+        - businessPartnerSourceBpna
+        - businessPartnerTargetBpna
+        - type
+        - validityPeriods
     AddressSearchRequest:
       type: object
       properties:
@@ -5485,10 +5519,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ErrorInfoLegalEntityCreateError"
-        errorCount:
+        entityCount:
           type: integer
           format: int32
-        entityCount:
+        errorCount:
           type: integer
           format: int32
       required:
@@ -5654,10 +5688,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ErrorInfoLegalEntityUpdateError"
-        errorCount:
+        entityCount:
           type: integer
           format: int32
-        entityCount:
+        errorCount:
           type: integer
           format: int32
       required:
@@ -6864,6 +6898,11 @@ components:
           description: The list of identifiers of the address.
           items:
             $ref: "#/components/schemas/AddressIdentifierVerboseDto"
+        relations:
+          type: array
+          description: Relations to other business partners.
+          items:
+            $ref: "#/components/schemas/AddressRelationVerboseDto"
         physicalPostalAddress:
           $ref: "#/components/schemas/PhysicalPostalAddressVerboseDto"
           description: "The physical postal address of the address, such as an office,\
@@ -6910,6 +6949,7 @@ components:
         - identifiers
         - isParticipantData
         - physicalPostalAddress
+        - relations
         - states
         - updatedAt
     PageDtoChangelogEntryVerboseDto:
@@ -7944,6 +7984,7 @@ components:
             - IsAlternativeHeadquarterFor
             - IsManagedBy
             - IsOwnedBy
+            - IsReplacedBy
         businessPartnerSourceBpnl:
           type: string
           description: BPN of partner from which the relation emerges (the source)
@@ -8036,10 +8077,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ErrorInfoSiteCreateError"
-        errorCount:
+        entityCount:
           type: integer
           format: int32
-        entityCount:
+        errorCount:
           type: integer
           format: int32
       required:
@@ -8166,10 +8207,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ErrorInfoSiteUpdateError"
-        errorCount:
+        entityCount:
           type: integer
           format: int32
-        entityCount:
+        errorCount:
           type: integer
           format: int32
       required:

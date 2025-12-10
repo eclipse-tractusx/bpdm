@@ -60,4 +60,10 @@ class LogisticAddressDb(
 
     @OneToMany(mappedBy = "address", cascade = [CascadeType.ALL], orphanRemoval = true)
     val states: MutableSet<AddressStateDb> = mutableSetOf()
+
+    @OneToMany(mappedBy = "startAddress", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val startAddressRelations: MutableSet<AddressRelationDb> = mutableSetOf()
+
+    @OneToMany(mappedBy = "endAddress", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val endAddressRelations: MutableSet<AddressRelationDb> = mutableSetOf()
 }

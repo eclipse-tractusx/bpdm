@@ -99,7 +99,7 @@ class RelationTaskResolutionService(
         val outputRequests = tasks.mapNotNull { task ->
             val relation = pendingRelationsById[task.taskId] ?: return@mapNotNull null
             val outputResult = task.businessPartnerRelationsResult
-            IRelationService.RelationUpsertRequest(relation, outputResult.relationType.toGateModel(), outputResult.businessPartnerSourceBpnl, outputResult.businessPartnerTargetBpnl, outputResult.validityPeriods.map { it.toGateModel() })
+            IRelationService.RelationUpsertRequest(relation, outputResult.relationType.toGateModel(), outputResult.businessPartnerSourceBpn, outputResult.businessPartnerTargetBpn, outputResult.validityPeriods.map { it.toGateModel() })
         }
         relationService.upsertOutputRelations(outputRequests)
     }
@@ -125,6 +125,7 @@ class RelationTaskResolutionService(
             RelationType.IsAlternativeHeadquarterFor -> SharableRelationType.IsAlternativeHeadquarterFor
             RelationType.IsManagedBy -> SharableRelationType.IsManagedBy
             RelationType.IsOwnedBy -> SharableRelationType.IsOwnedBy
+            RelationType.IsReplacedBy -> SharableRelationType.IsReplacedBy
         }
     }
 

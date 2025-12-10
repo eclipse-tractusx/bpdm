@@ -154,6 +154,7 @@ class RelationTaskResolutionServiceIT @Autowired constructor(
                   RelationType.IsAlternativeHeadquarterFor -> SharableRelationType.IsAlternativeHeadquarterFor
                   RelationType.IsManagedBy -> SharableRelationType.IsManagedBy
                     RelationType.IsOwnedBy -> SharableRelationType.IsOwnedBy
+                    RelationType.IsReplacedBy -> SharableRelationType.IsReplacedBy
                 },
                 bpnL1,
                 bpnL2,
