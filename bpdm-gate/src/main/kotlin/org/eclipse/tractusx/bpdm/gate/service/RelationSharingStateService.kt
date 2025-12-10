@@ -127,6 +127,7 @@ class RelationSharingStateService(
             RelationType.IsManagedBy -> true
             RelationType.IsAlternativeHeadquarterFor -> true
             RelationType.IsOwnedBy -> true
+            RelationType.IsReplacedBy -> true
         }
     }
 }

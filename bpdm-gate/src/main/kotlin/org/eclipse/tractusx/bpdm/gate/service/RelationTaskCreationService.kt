@@ -21,7 +21,10 @@ package org.eclipse.tractusx.bpdm.gate.service
 
 import jakarta.persistence.EntityManager
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.dto.AddressType
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.StageType
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateErrorCode
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
 import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
@@ -90,6 +93,7 @@ class RelationTaskCreationService(
     fun sendTaskBatch(batchSize: Int): Int{
         val toSendPage = relationRepository.findBySharingStateAndStaged(RelationSharingStateType.Ready, true, PageRequest.ofSize(batchSize))
         val toSendRelations = toSendPage.content
+        if (toSendRelations.isEmpty()) return 0
 
         val toSendStages = relationStageRepository.findByRelationInAndStage(toSendRelations.toSet(), StageType.Input)
         val stagesByRelation = toSendStages.associateBy { it.relation.id }
@@ -98,15 +102,99 @@ class RelationTaskCreationService(
         val outputs = businessPartnerRepository.findBySharingStateInAndStage(sharingStates.toSet(), StageType.Output)
         val outputsBySharingState = outputs.associateBy { it.sharingState }
 
-        val taskCreateRequests = toSendRelations.map{ relation ->
-            val sharingState = relation.sharingState ?: return@map null
-            val relationStage = stagesByRelation[relation.id] ?: return@map null
-            val sourceBpnL = outputsBySharingState[relationStage.source]?.bpnL ?: return@map null
-            val targetBpnL = outputsBySharingState[relationStage.target]?.bpnL ?: return@map null
-            val relationType = relationStage.relationType.toOrchestratorModel() ?: return@map null
+        val taskCreateRequests = toSendRelations.map { relation ->
+            val sharingState = relation.sharingState ?: run {
+                logger.debug { "Relation has no sharingState; skipping" }
+                return@map null
+            }
+            val relationStage = stagesByRelation[relation.id] ?: run {
+                logger.debug { "No relation stage found for relation; skipping" }
+                return@map null
+            }
+
+            val sourceOutput = outputsBySharingState[relationStage.source] ?: run {
+                logger.debug { "Source output not available yet for relation; skipping" }
+                return@map null
+            }
+
+            val targetOutput = outputsBySharingState[relationStage.target] ?: run {
+                logger.debug { "Target output not available yet for relation; skipping" }
+                return@map null
+            }
+
+            //Determine which kind of golden record relation task we need
+            val taskKind = determineTaskKind(sourceOutput.postalAddress.addressType, targetOutput.postalAddress.addressType, relationStage.relationType)
+            if (taskKind == null) {
+                val message = "Unsupported relation combination for relation: relationType='${relationStage.relationType}', " +
+                        "sourceAddressType='${sourceOutput.postalAddress.addressType}', targetAddressType='${targetOutput.postalAddress.addressType}'"
+                logger.debug { message }
+                unstage(relation)
+                try {
+                    relationSharingStateService.setError(relation, RelationSharingStateErrorCode.SharingProcessError, message)
+                } catch (t: Throwable) {
+                    logger.debug(t) { "setError failed" }
+                }
+                return@map null
+            }
+
+            //Select BPN values strictly based on the determined task kind
+            val (sourceBpn, targetBpn) = when (taskKind) {
+                BusinessPartnerType.LEGAL_ENTITY -> {
+                    val s = sourceOutput.bpnL
+                    val t = targetOutput.bpnL
+                    if (s.isNullOrBlank() || t.isNullOrBlank()) {
+                        val msg = "LEGAL task requires BPNL for both sides but missing for relation: sourceBpnL='$s', targetBpnL='$t'"
+                        logger.warn { msg }
+                        unstage(relation)
+                        try {
+                            relationSharingStateService.setError(relation, RelationSharingStateErrorCode.SharingProcessError, msg)
+                        } catch (t: Throwable) {
+                            logger.debug(t) { "setError failed" }
+                        }
+                        return@map null
+                    }
+                    s to t
+                }
+
+                BusinessPartnerType.ADDRESS -> {
+                    val s = sourceOutput.bpnA
+                    val t = targetOutput.bpnA
+                    if (s.isNullOrBlank() || t.isNullOrBlank()) {
+                        val msg = "ADDRESS task requires BPNA for both sides but missing for relation: sourceBpna='$s', targetBpna='$t'"
+                        logger.warn { msg }
+                        unstage(relation)
+                        try {
+                            relationSharingStateService.setError(relation, RelationSharingStateErrorCode.SharingProcessError, msg)
+                        } catch (t: Throwable) {
+                            logger.debug(t) { "setError failed" }
+                        }
+                        return@map null
+                    }
+                    s to t
+                }
+
+                else -> {
+                    return@map null
+                }
+
+            }
+
+            val relationType = relationStage.relationType.toOrchestratorModel() ?: run {
+                logger.debug { "Cannot map relation type for relation; skipping" }
+                return@map null
+            }
+
             val validityPeriods = relationStage.validityPeriods.map { it.toOrchestratorModel() }
 
-            TaskCreateRelationsRequestEntry(sharingState.recordId, BusinessPartnerRelations(relationType, sourceBpnL, targetBpnL, validityPeriods))
+            TaskCreateRelationsRequestEntry(
+                recordId = sharingState.recordId,
+                businessPartnerRelations = BusinessPartnerRelations(
+                    relationType = relationType,
+                    businessPartnerSourceBpn = sourceBpn,
+                    businessPartnerTargetBpn = targetBpn,
+                    validityPeriods = validityPeriods
+                )
+            )
         }
 
         val createdTasks = taskCreateRequests.letNonNull { sendTasks(it) }
@@ -120,6 +208,28 @@ class RelationTaskCreationService(
         }
 
         return createdTasks.filterNotNull().size
+    }
+
+    private fun determineTaskKind(
+        sourceAddressType: AddressType?,
+        targetAddressType: AddressType?,
+        relationType: RelationType
+    ): BusinessPartnerType? {
+
+        fun isLegalEntityLike(t: AddressType?) = when (t) {
+            AddressType.LegalAndSiteMainAddress,
+            AddressType.LegalAddress -> true
+
+            else -> false
+        }
+
+        fun isAdditional(t: AddressType?) = t == AddressType.AdditionalAddress
+
+        return when {
+            isLegalEntityLike(sourceAddressType) && isLegalEntityLike(targetAddressType) && relationType in listOf(RelationType.IsAlternativeHeadquarterFor, RelationType.IsOwnedBy, RelationType.IsManagedBy) -> BusinessPartnerType.LEGAL_ENTITY
+            ((isAdditional(sourceAddressType) && isLegalEntityLike(targetAddressType)) || (isLegalEntityLike(sourceAddressType) && isAdditional(targetAddressType))) && relationType == RelationType.IsReplacedBy -> BusinessPartnerType.ADDRESS
+            else -> null
+        }
     }
 
     private fun sendTasks(taskCreateRequests: List<TaskCreateRelationsRequestEntry>): List<TaskClientRelationsStateDto?>{
@@ -139,6 +249,7 @@ class RelationTaskCreationService(
             RelationType.IsManagedBy -> org.eclipse.tractusx.orchestrator.api.model.RelationType.IsManagedBy
             RelationType.IsAlternativeHeadquarterFor -> org.eclipse.tractusx.orchestrator.api.model.RelationType.IsAlternativeHeadquarterFor
             RelationType.IsOwnedBy -> org.eclipse.tractusx.orchestrator.api.model.RelationType.IsOwnedBy
+            RelationType.IsReplacedBy -> org.eclipse.tractusx.orchestrator.api.model.RelationType.IsReplacedBy
         }
     }
 

@@ -3171,11 +3171,11 @@
               "$ref" : "#/components/schemas/ErrorInfoAddressCreateError"
             }
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -3206,6 +3206,13 @@
             "description" : "The list of identifiers of the address.",
             "items" : {
               "$ref" : "#/components/schemas/AddressIdentifierVerboseDto"
+            }
+          },
+          "relations" : {
+            "type" : "array",
+            "description" : "Relations to other business partners.",
+            "items" : {
+              "$ref" : "#/components/schemas/AddressRelationVerboseDto"
             }
           },
           "physicalPostalAddress" : {
@@ -3251,7 +3258,7 @@
             "description" : "User defined index to conveniently match this entry to the corresponding entry in the response."
           }
         },
-        "required" : [ "bpna", "confidenceCriteria", "createdAt", "identifiers", "isParticipantData", "physicalPostalAddress", "states", "updatedAt" ]
+        "required" : [ "bpna", "confidenceCriteria", "createdAt", "identifiers", "isParticipantData", "physicalPostalAddress", "relations", "states", "updatedAt" ]
       },
       "AddressPartnerUpdateRequest" : {
         "type" : "object",
@@ -3312,16 +3319,43 @@
               "$ref" : "#/components/schemas/ErrorInfoAddressUpdateError"
             }
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           }
         },
         "required" : [ "entities", "entityCount", "errorCount", "errors" ]
+      },
+      "AddressRelationVerboseDto" : {
+        "type" : "object",
+        "description" : "Directed relation between two business partners of type address",
+        "properties" : {
+          "type" : {
+            "type" : "string",
+            "description" : "The type of relation between the logistic addresses",
+            "enum" : [ "IsAlternativeHeadquarterFor", "IsManagedBy", "IsOwnedBy", "IsReplacedBy" ]
+          },
+          "businessPartnerSourceBpna" : {
+            "type" : "string",
+            "description" : "BPNA of the address from which the relation starts (source)"
+          },
+          "businessPartnerTargetBpna" : {
+            "type" : "string",
+            "description" : "BPNA of the address to which this relation points (target)"
+          },
+          "validityPeriods" : {
+            "type" : "array",
+            "description" : "Validity periods of this address relation",
+            "items" : {
+              "$ref" : "#/components/schemas/RelationValidityPeriod"
+            }
+          }
+        },
+        "required" : [ "businessPartnerSourceBpna", "businessPartnerTargetBpna", "type", "validityPeriods" ]
       },
       "AddressSearchRequest" : {
         "type" : "object",
@@ -4166,11 +4200,11 @@
               "$ref" : "#/components/schemas/ErrorInfoLegalEntityCreateError"
             }
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -4318,11 +4352,11 @@
               "$ref" : "#/components/schemas/ErrorInfoLegalEntityUpdateError"
             }
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -4905,6 +4939,13 @@
               "$ref" : "#/components/schemas/AddressIdentifierVerboseDto"
             }
           },
+          "relations" : {
+            "type" : "array",
+            "description" : "Relations to other business partners.",
+            "items" : {
+              "$ref" : "#/components/schemas/AddressRelationVerboseDto"
+            }
+          },
           "physicalPostalAddress" : {
             "$ref" : "#/components/schemas/PhysicalPostalAddressVerboseDto",
             "description" : "The physical postal address of the address, such as an office, warehouse, gate, etc."
@@ -4944,7 +4985,7 @@
             "enum" : [ "LegalAndSiteMainAddress", "LegalAddress", "SiteMainAddress", "AdditionalAddress" ]
           }
         },
-        "required" : [ "bpna", "confidenceCriteria", "createdAt", "identifiers", "isParticipantData", "physicalPostalAddress", "states", "updatedAt" ]
+        "required" : [ "bpna", "confidenceCriteria", "createdAt", "identifiers", "isParticipantData", "physicalPostalAddress", "relations", "states", "updatedAt" ]
       },
       "LegalEntityRepresentationOutputDto": {
         "type": "object",
@@ -5538,7 +5579,7 @@
           "type" : {
             "type" : "string",
             "description" : "The type of relation between the Legal Entities",
-            "enum" : [ "IsAlternativeHeadquarterFor", "IsManagedBy", "IsOwnedBy" ]
+            "enum" : [ "IsAlternativeHeadquarterFor", "IsManagedBy", "IsOwnedBy", "IsReplacedBy" ]
           },
           "businessPartnerSourceBpnl" : {
             "type" : "string",
@@ -5631,11 +5672,11 @@
               "$ref" : "#/components/schemas/ErrorInfoSiteCreateError"
             }
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -5740,11 +5781,11 @@
               "$ref" : "#/components/schemas/ErrorInfoSiteUpdateError"
             }
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           }

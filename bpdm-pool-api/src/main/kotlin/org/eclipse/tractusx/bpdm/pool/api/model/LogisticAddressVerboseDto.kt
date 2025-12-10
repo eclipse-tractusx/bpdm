@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.model
 
+import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.IBaseLogisticAddressDto
@@ -37,6 +38,10 @@ data class LogisticAddressVerboseDto(
 
     override val states: Collection<AddressStateVerboseDto> = emptyList(),
     override val identifiers: Collection<AddressIdentifierVerboseDto> = emptyList(),
+
+    @get:ArraySchema(arraySchema = Schema(description = LogisticAddressDescription.relations))
+    val relations: Collection<AddressRelationVerboseDto> = emptyList(),
+
     override val physicalPostalAddress: PhysicalPostalAddressVerboseDto,
     override val alternativePostalAddress: AlternativePostalAddressVerboseDto? = null,
 

@@ -188,8 +188,8 @@ class RelationService(
 
         relation.output = RelationOutputDb(
             relationType = relationType,
-            sourceBpnL = sourceBpnL,
-            targetBpnL = targetBpnL,
+            sourceBpn = sourceBpnL,
+            targetBpn = targetBpnL,
             updatedAt = Instant.now(),
             validityPeriods = validityPeriods.map { RelationValidityPeriodDb(validFrom = it.validFrom, validTo = it.validTo) }.toMutableList()
         )
@@ -320,8 +320,8 @@ class RelationService(
         return RelationOutputDto(
             externalId = entity.externalId,
             relationType = entity.output!!.relationType,
-            sourceBpnL = entity.output!!.sourceBpnL,
-            targetBpnL = entity.output!!.targetBpnL,
+            sourceBpn = entity.output!!.sourceBpn,
+            targetBpn = entity.output!!.targetBpn,
             validityPeriods = entity.output!!.validityPeriods.map { it.toDto() },
             updatedAt = entity.output!!.updatedAt
         )

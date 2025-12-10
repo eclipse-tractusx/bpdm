@@ -20,12 +20,12 @@
 package org.eclipse.tractusx.bpdm.pool.api.v6.model.response
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.pool.api.model.RelationType
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
 
 @Schema(name = "RelationVerboseV6Dto", description = "Directed relation between two business partners")
 data class RelationVerboseDto(
     @get:Schema(description = "The type of relation between the Legal Entities")
-    val type: RelationType,
+    val type: LegalEntityRelationType,
 
     @get:Schema(description = "BPN of partner from which the relation emerges (the source)")
     val businessPartnerSourceBpnl: String,

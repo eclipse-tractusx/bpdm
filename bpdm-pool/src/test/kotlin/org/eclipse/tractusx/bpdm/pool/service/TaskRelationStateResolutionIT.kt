@@ -25,6 +25,9 @@ import io.mockk.unmockkStatic
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
+import org.eclipse.tractusx.bpdm.pool.api.model.AddressRelationType
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
+import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateVerboseDto
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolDataHelper
@@ -69,15 +72,15 @@ class TaskRelationStateResolutionIT @Autowired constructor(
     }
 
     @ParameterizedTest
-    @EnumSource(RelationType::class)
-    fun `create valid limited relation`(relationType: RelationType){
+    @EnumSource(LegalEntityRelationType::class)
+    fun `create valid limited legal entity relation`(relationType: LegalEntityRelationType){
         //Given
         val legalEntity1 = createLegalEntity("$testName 1")
         val legalEntity2 = createLegalEntity("$testName 2")
 
         //When
         val relationToCreate = BusinessPartnerRelations(
-            relationType,
+            relationType.toTaskDto(),
             legalEntity2.legalEntity.bpnl,
             legalEntity1.legalEntity.bpnl,
             listOf(
@@ -93,15 +96,39 @@ class TaskRelationStateResolutionIT @Autowired constructor(
     }
 
     @ParameterizedTest
-    @EnumSource(RelationType::class)
-    fun `create valid unlimited relation`(relationType: RelationType){
+    @EnumSource(AddressRelationType::class)
+    fun `create valid limited Address relation`(relationType: AddressRelationType){
+        //Given
+        val legalEntity1 = createLegalEntity("$testName 1")
+        val additionalAddress1 = createAdditionalAddress("$testName Addr 1", legalEntity1)
+
+        //When
+        val relationToCreate = BusinessPartnerRelations(
+            relationType.toTaskDto(),
+            legalEntity1.legalAddress.bpna,
+            additionalAddress1.address.bpna,
+            listOf(
+                RelationValidityPeriod(
+                    validFrom = LocalDate.ofYearDay(2025, 1),
+                    validTo =  LocalDate.ofYearDay(2026, 1)
+                )
+            ))
+        val createdRelation = createRelation(relationToCreate)
+
+        //Then
+        assertSuccess(createdRelation, relationToCreate)
+    }
+
+    @ParameterizedTest
+    @EnumSource(LegalEntityRelationType::class)
+    fun `create valid unlimited legal entity relation`(relationType: LegalEntityRelationType){
         //Given
         val legalEntity1 = createLegalEntity("$testName 1")
         val legalEntity2 = createLegalEntity("$testName 2")
 
         //When
         val relationToCreate = BusinessPartnerRelations(
-            relationType,
+            relationType.toTaskDto(),
             legalEntity2.legalEntity.bpnl,
             legalEntity1.legalEntity.bpnl,
             listOf(
@@ -117,15 +144,39 @@ class TaskRelationStateResolutionIT @Autowired constructor(
     }
 
     @ParameterizedTest
-    @EnumSource(RelationType::class)
-    fun `create valid relation with inactivity`(relationType: RelationType){
+    @EnumSource(AddressRelationType::class)
+    fun `create valid unlimited address relation`(relationType: AddressRelationType){
+        //Given
+        val legalEntity1 = createLegalEntity("$testName 1")
+        val additionalAddress1 = createAdditionalAddress("$testName Addr 1", legalEntity1)
+
+        //When
+        val relationToCreate = BusinessPartnerRelations(
+            relationType.toTaskDto(),
+            legalEntity1.legalAddress.bpna,
+            additionalAddress1.address.bpna,
+            listOf(
+                RelationValidityPeriod(
+                    validFrom = LocalDate.ofYearDay(2025, 1),
+                    validTo = null
+                )
+            ))
+        val createdRelation = createRelation(relationToCreate)
+
+        //Then
+        assertSuccess(createdRelation, relationToCreate)
+    }
+
+    @ParameterizedTest
+    @EnumSource(LegalEntityRelationType::class)
+    fun `create valid legal entity relation with inactivity`(relationType: LegalEntityRelationType){
         //Given
         val legalEntity1 = createLegalEntity("$testName 1")
         val legalEntity2 = createLegalEntity("$testName 2")
 
         //When
         val relationToCreate = BusinessPartnerRelations(
-            relationType,
+            relationType.toTaskDto(),
             legalEntity2.legalEntity.bpnl,
             legalEntity1.legalEntity.bpnl,
             listOf(
@@ -145,15 +196,43 @@ class TaskRelationStateResolutionIT @Autowired constructor(
     }
 
     @ParameterizedTest
-    @EnumSource(RelationType::class)
-    fun `create valid relation with unsorted states`(relationType: RelationType){
+    @EnumSource(AddressRelationType::class)
+    fun `create valid address relation with inactivity`(relationType: AddressRelationType){
+        //Given
+        val legalEntity1 = createLegalEntity("$testName 1")
+        val additionalAddress1 = createAdditionalAddress("$testName Addr 1", legalEntity1)
+
+        //When
+        val relationToCreate = BusinessPartnerRelations(
+            relationType.toTaskDto(),
+            legalEntity1.legalAddress.bpna,
+            additionalAddress1.address.bpna,
+            listOf(
+                RelationValidityPeriod(
+                    validFrom = LocalDate.ofYearDay(2025, 1),
+                    validTo = LocalDate.ofYearDay(2026, 1)
+                ),
+                RelationValidityPeriod(
+                    validFrom = LocalDate.ofYearDay(2027, 1),
+                    validTo = LocalDate.ofYearDay(2028, 1)
+                )
+            ))
+        val createdRelation = createRelation(relationToCreate)
+
+        //Then
+        assertSuccess(createdRelation, relationToCreate)
+    }
+
+    @ParameterizedTest
+    @EnumSource(LegalEntityRelationType::class)
+    fun `create valid legal entity relation with unsorted states`(relationType: LegalEntityRelationType){
         //Given
         val legalEntity1 = createLegalEntity("$testName 1")
         val legalEntity2 = createLegalEntity("$testName 2")
 
         //When
         val relationToCreate = BusinessPartnerRelations(
-            relationType,
+            relationType.toTaskDto(),
             legalEntity2.legalEntity.bpnl,
             legalEntity1.legalEntity.bpnl,
             listOf(
@@ -177,15 +256,47 @@ class TaskRelationStateResolutionIT @Autowired constructor(
     }
 
     @ParameterizedTest
-    @EnumSource(RelationType::class)
-    fun `try create relation without validity`(relationType: RelationType){
+    @EnumSource(AddressRelationType::class)
+    fun `create valid address relation with unsorted states`(relationType: AddressRelationType){
+        //Given
+        val legalEntity1 = createLegalEntity("$testName 1")
+        val additionalAddress1 = createAdditionalAddress("$testName Addr 1", legalEntity1)
+
+        //When
+        val relationToCreate = BusinessPartnerRelations(
+            relationType.toTaskDto(),
+            legalEntity1.legalAddress.bpna,
+            additionalAddress1.address.bpna,
+            listOf(
+                RelationValidityPeriod(
+                    validFrom = LocalDate.ofYearDay(2026, 1),
+                    validTo = LocalDate.ofYearDay(2027, 1)
+                ),
+                RelationValidityPeriod(
+                    validFrom = LocalDate.ofYearDay(2027, 1),
+                    validTo = LocalDate.ofYearDay(2028, 1)
+                ),
+                RelationValidityPeriod(
+                    validFrom = LocalDate.ofYearDay(2025, 1),
+                    validTo = LocalDate.ofYearDay(2026, 1)
+                ),
+            ))
+        val createdRelation = createRelation(relationToCreate)
+
+        //Then
+        assertSuccess(createdRelation, relationToCreate.copy(validityPeriods = relationToCreate.validityPeriods.sortedBy { it.validFrom }))
+    }
+
+    @ParameterizedTest
+    @EnumSource(LegalEntityRelationType::class)
+    fun `try create legal entity relation without validity`(relationType: LegalEntityRelationType){
         //Given
         val legalEntity1 = createLegalEntity("$testName 1")
         val legalEntity2 = createLegalEntity("$testName 2")
 
         //When
         val relationToCreate = BusinessPartnerRelations(
-            relationType,
+            relationType.toTaskDto(),
             legalEntity2.legalEntity.bpnl,
             legalEntity1.legalEntity.bpnl,
             listOf())
@@ -195,17 +306,35 @@ class TaskRelationStateResolutionIT @Autowired constructor(
         assertError(createdRelation)
     }
 
+    @ParameterizedTest
+    @EnumSource(AddressRelationType::class)
+    fun `try create Address relation without validity`(relationType: AddressRelationType){
+        //Given
+        val legalEntity1 = createLegalEntity("$testName 1")
+        val additionalAddress1 = createAdditionalAddress("$testName Addr 1", legalEntity1)
+
+        //When
+        val relationToCreate = BusinessPartnerRelations(
+            relationType.toTaskDto(),
+            legalEntity1.legalAddress.bpna,
+            additionalAddress1.address.bpna,
+            listOf())
+        val createdRelation = createRelation(relationToCreate)
+
+        //Then
+        assertError(createdRelation)
+    }
 
     @ParameterizedTest
-    @EnumSource(RelationType::class)
-    fun `try create relation with overlap in states`(relationType: RelationType){
+    @EnumSource(LegalEntityRelationType::class)
+    fun `try create legal entity relation with overlap in states`(relationType: LegalEntityRelationType){
         //Given
         val legalEntity1 = createLegalEntity("$testName 1")
         val legalEntity2 = createLegalEntity("$testName 2")
 
         //When
         val relationToCreate = BusinessPartnerRelations(
-            relationType,
+            relationType.toTaskDto(),
             legalEntity2.legalEntity.bpnl,
             legalEntity1.legalEntity.bpnl,
             listOf(
@@ -347,14 +476,14 @@ class TaskRelationStateResolutionIT @Autowired constructor(
     }
 
     @ParameterizedTest
-    @EnumSource(RelationType::class)
-    fun `update relation with overwriting future validity`(relationType: RelationType){
+    @EnumSource(LegalEntityRelationType::class)
+    fun `update legal entity relation with overwriting future validity`(relationType: LegalEntityRelationType){
         //Given
         val legalEntity1 = createLegalEntity("$testName 1")
         val legalEntity2 = createLegalEntity("$testName 2")
 
         val relationToCreate = BusinessPartnerRelations(
-            relationType,
+            relationType.toTaskDto(),
             legalEntity2.legalEntity.bpnl,
             legalEntity1.legalEntity.bpnl,
             listOf(
@@ -367,7 +496,7 @@ class TaskRelationStateResolutionIT @Autowired constructor(
 
         //When
         val relationToUpdate = BusinessPartnerRelations(
-            relationType,
+            relationType.toTaskDto(),
             legalEntity2.legalEntity.bpnl,
             legalEntity1.legalEntity.bpnl,
             listOf(
@@ -441,6 +570,38 @@ class TaskRelationStateResolutionIT @Autowired constructor(
         assertError(createdRelation)
     }
 
+    @ParameterizedTest
+    @EnumSource(AddressRelationType::class)
+    fun `try create address relation with overlap in states`(relationType: AddressRelationType){
+        //Given
+        val legalEntity1 = createLegalEntity("$testName 1")
+        val additionalAddress1 = createAdditionalAddress("$testName Addr 1", legalEntity1)
+
+        //When
+        val relationToCreate = BusinessPartnerRelations(
+            relationType.toTaskDto(),
+            legalEntity1.legalAddress.bpna,
+            additionalAddress1.address.bpna,
+            listOf(
+                RelationValidityPeriod(
+                    validFrom = LocalDate.ofYearDay(2025, 1),
+                    validTo = LocalDate.ofYearDay(2027, 1)
+                ),
+                RelationValidityPeriod(
+                    validFrom = LocalDate.ofYearDay(2026, 1),
+                    validTo = LocalDate.ofYearDay(2027, 1)
+                ),
+                RelationValidityPeriod(
+                    validFrom = LocalDate.ofYearDay(2027, 1),
+                    validTo = LocalDate.ofYearDay(2028, 1)
+                )
+            ))
+        val createdRelation = createRelation(relationToCreate)
+
+        //Then
+        assertError(createdRelation)
+    }
+
     private fun createLegalEntity(seed: String): LegalEntityPartnerCreateVerboseDto{
         val request = testDataEnvironment.requestFactory.createLegalEntityRequest(seed, true)
         return poolClient.legalEntities.createBusinessPartners(listOf(request)).entities.single()
@@ -474,5 +635,24 @@ class TaskRelationStateResolutionIT @Autowired constructor(
         methodToExecute()
         unmockkStatic(Instant::class)
         unmockkStatic(Clock::class)
+    }
+
+    private fun createAdditionalAddress(seed: String, legalEntity: LegalEntityPartnerCreateVerboseDto): AddressPartnerCreateVerboseDto {
+        val request = testDataEnvironment.requestFactory.buildAdditionalAddressCreateRequest(seed, legalEntity.legalEntity.bpnl)
+        return poolClient.addresses.createAddresses(listOf(request)).entities.single()
+    }
+
+    private fun LegalEntityRelationType.toTaskDto(): RelationType {
+        return when(this){
+            LegalEntityRelationType.IsAlternativeHeadquarterFor -> RelationType.IsAlternativeHeadquarterFor
+            LegalEntityRelationType.IsManagedBy -> RelationType.IsManagedBy
+            LegalEntityRelationType.IsOwnedBy -> RelationType.IsOwnedBy
+        }
+    }
+
+    private fun AddressRelationType.toTaskDto(): RelationType {
+        return when(this){
+            AddressRelationType.IsReplacedBy -> RelationType.IsReplacedBy
+        }
     }
 }

@@ -26,6 +26,7 @@ import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateErrorCode
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
@@ -104,8 +105,9 @@ class RelationTaskCreationServiceIT @Autowired constructor(
     }
 
     @ParameterizedTest
-    @EnumSource(RelationType::class)
-    fun createTaskForInitialRelation(relationType: RelationType){
+    @EnumSource(value = RelationType::class, names = ["IsAlternativeHeadquarterFor", "IsManagedBy", "IsOwnedBy"])
+    //@EnumSource(RelationType::class)
+    fun createTaskForInitialLegalEntityRelation(relationType: RelationType){
         val legalEntityId1 = "$testName LE 1"
         val legalEntityId2 = "$testName LE 2"
         val legalEntityBpnL1 = "$testName BPNL 1"
@@ -132,6 +134,7 @@ class RelationTaskCreationServiceIT @Autowired constructor(
                         RelationType.IsAlternativeHeadquarterFor -> org.eclipse.tractusx.orchestrator.api.model.RelationType.IsAlternativeHeadquarterFor
                         RelationType.IsManagedBy -> org.eclipse.tractusx.orchestrator.api.model.RelationType.IsManagedBy
                         RelationType.IsOwnedBy -> org.eclipse.tractusx.orchestrator.api.model.RelationType.IsOwnedBy
+                        RelationType.IsReplacedBy -> org.eclipse.tractusx.orchestrator.api.model.RelationType.IsReplacedBy
                     },
                     legalEntityBpnL1,
                     legalEntityBpnL2,
@@ -159,6 +162,187 @@ class RelationTaskCreationServiceIT @Autowired constructor(
         Assertions.assertThat(actual.sharingStateType).isEqualTo(RelationSharingStateType.Pending)
     }
 
+    @ParameterizedTest
+    @EnumSource(value = RelationType::class, names = ["IsReplacedBy"])
+    fun createTaskForInitialAddressRelation(relationType: RelationType) {
+        val legalEntityId = "$testName LE"
+        val additionalAddressId = "$testName AA"
+        val sourceBpna = "$testName BPNA 1"
+        val targetBpna = "$testName BPNA 2"
+        val relationId = "$testName R"
+        val taskId = "$testName T"
+        val recordId = "$testName REC"
+
+        // ---------- INPUT ----------
+        gateClient.businessParters.upsertBusinessPartnersInput(
+            listOf(
+                inputFactory.createAllFieldsFilled(legalEntityId).request
+                    .withAddressType(AddressType.LegalAddress)
+                    .copy(isOwnCompanyData = true),
+
+                inputFactory.createAllFieldsFilled(additionalAddressId).request
+                    .withAddressType(AddressType.AdditionalAddress)
+                    .copy(isOwnCompanyData = true)
+            )
+        )
+
+        // ---------- OUTPUT ----------
+        assignOutputBpna(
+            externalId = legalEntityId,
+            addressType = AddressType.LegalAddress,
+            bpna = sourceBpna
+        )
+
+        assignOutputBpna(
+            externalId = additionalAddressId,
+            addressType = AddressType.AdditionalAddress,
+            bpna = targetBpna
+        )
+
+        // ---------- RELATION ----------
+        createRelation(
+            externalId = relationId,
+            relationType = relationType,
+            source = legalEntityId,
+            target = additionalAddressId
+        )
+
+        // ---------- ORCHESTRATOR MOCK ----------
+        val orchestratorMockResponse = TaskCreateRelationsResponse(
+            listOf(
+                TaskClientRelationsStateDto(
+                    taskId,
+                    recordId,
+                    BusinessPartnerRelations(
+                        org.eclipse.tractusx.orchestrator.api.model.RelationType.IsReplacedBy,
+                        sourceBpna,
+                        targetBpna,
+                        listOf(
+                            RelationValidityPeriod(
+                                LocalDate.parse("1970-01-01"),
+                                LocalDate.parse("9999-12-31")
+                            )
+                        )
+                    ),
+                    TaskProcessingRelationsStateDto(ResultState.Pending, TaskStep.CleanAndSync, StepState.Queued, emptyList(), anyTime, anyTime, anyTime)
+                )
+            )
+        )
+        orchestratorWireMockServer.stubFor(
+            WireMock.post(WireMock.urlPathEqualTo(ApiCommons.BASE_PATH_V7_RELATIONS))
+                .willReturn(WireMock.okJson(objectMapper.writeValueAsString(orchestratorMockResponse)))
+        )
+
+        relationTaskCreationService.sendTasks()
+
+        // ---------- ASSERT ----------
+        val actual = gateClient.relationSharingState.get(externalIds = listOf(relationId)).content.single()
+
+        Assertions.assertThat(actual.sharingStateType).isEqualTo(RelationSharingStateType.Pending)
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = RelationType::class, names = ["IsOwnedBy", "IsManagedBy", "IsAlternativeHeadquarterFor"])
+    fun unsupportedAddressRelation_shouldSetErrorAndUnstage(relationType: RelationType) {
+        val legalEntityId = "$testName LE"
+        val additionalAddressId = "$testName AA"
+        val relationId = "$testName R"
+
+        // ---------- INPUT ----------
+        gateClient.businessParters.upsertBusinessPartnersInput(
+            listOf(
+                inputFactory.createAllFieldsFilled(legalEntityId).request
+                    .withAddressType(AddressType.LegalAddress)
+                    .copy(isOwnCompanyData = true),
+
+                inputFactory.createAllFieldsFilled(additionalAddressId).request
+                    .withAddressType(AddressType.AdditionalAddress)
+                    .copy(isOwnCompanyData = true)
+            )
+        )
+
+        // ---------- OUTPUT ----------
+        assignOutputBpna(
+            externalId = legalEntityId,
+            addressType = AddressType.LegalAddress,
+            bpna = "$testName BPNA-LEGAL"
+        )
+        assignOutputBpna(
+            externalId = additionalAddressId,
+            addressType = AddressType.AdditionalAddress,
+            bpna = "$testName BPNA-ADD"
+        )
+
+        // ---------- RELATION (UNSUPPORTED) ----------
+        createRelation(
+            externalId = relationId,
+            relationType = relationType,
+            source = legalEntityId,
+            target = additionalAddressId
+        )
+
+        // ---------- EXECUTE ----------
+        relationTaskCreationService.sendTasks()
+
+        // ---------- ASSERT: Sharing State ----------
+        val sharingState = gateClient.relationSharingState.get(externalIds = listOf(relationId)).content.single()
+
+        Assertions.assertThat(sharingState.sharingStateType).isEqualTo(RelationSharingStateType.Error)
+        Assertions.assertThat(sharingState.sharingErrorCode).isEqualTo(RelationSharingStateErrorCode.SharingProcessError)
+
+        // ---------- ASSERT: Orchestrator NOT called ----------
+        orchestratorWireMockServer.verify(
+            0,
+            WireMock.postRequestedFor(
+                WireMock.urlPathEqualTo(ApiCommons.BASE_PATH_V7_RELATIONS)
+            )
+        )
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = RelationType::class, names = ["IsReplacedBy"])
+    fun unsupportedLegalEntityRelation_shouldErrorAndUnstage(relationType: RelationType) {
+
+        val le1 = "$testName LE1"
+        val le2 = "$testName LE2"
+        val relationId = "$testName R"
+
+        // ---------- INPUT ----------
+        gateClient.businessParters.upsertBusinessPartnersInput(
+            listOf(
+                createLegalEntityRequest(le1),
+                createLegalEntityRequest(le2)
+            )
+        )
+
+        // ---------- OUTPUT ----------
+        assignOutputBpnL(le1, "$testName BPNL1")
+        assignOutputBpnL(le2, "$testName BPNL2")
+
+        // ---------- RELATION (INVALID) ----------
+        createRelation(
+            externalId = relationId,
+            relationType = relationType,
+            source = le1,
+            target = le2
+        )
+
+        // ---------- EXECUTE ----------
+        relationTaskCreationService.sendTasks()
+
+        // ---------- ASSERT ----------
+        val state = gateClient.relationSharingState.get(externalIds = listOf(relationId)).content.single()
+
+        Assertions.assertThat(state.sharingStateType).isEqualTo(RelationSharingStateType.Error)
+        Assertions.assertThat(state.sharingErrorCode).isEqualTo(RelationSharingStateErrorCode.SharingProcessError)
+
+        orchestratorWireMockServer.verify(
+            0,
+            WireMock.postRequestedFor(
+                WireMock.urlPathEqualTo(ApiCommons.BASE_PATH_V7_RELATIONS)
+            )
+        )
+    }
 
     private fun createLegalEntityRequest(externalId: String) =
         inputFactory.createAllFieldsFilled(externalId).request
@@ -187,6 +371,11 @@ class RelationTaskCreationServiceIT @Autowired constructor(
 
     private fun assignOutputBpnL(legalEntityExternalId: String, bpnL: String){
         val sharingState1 = sharingStateRepository.findByExternalIdAndTenantBpnl(legalEntityExternalId, principalUtil.resolveTenantBpnl().value).first()
-        businessPartnerRepository.save(BusinessPartnerDb(sharingState1, stage = StageType.Output, bpnL = bpnL, postalAddress = PostalAddressDb(), legalEntityConfidence = null, siteConfidence = null, addressConfidence = null))
+        businessPartnerRepository.save(BusinessPartnerDb(sharingState1, stage = StageType.Output, bpnL = bpnL, postalAddress = PostalAddressDb(addressType = AddressType.LegalAddress), legalEntityConfidence = null, siteConfidence = null, addressConfidence = null))
+    }
+
+    private fun assignOutputBpna(externalId: String, addressType: AddressType, bpna: String){
+        val sharingState = sharingStateRepository.findByExternalIdAndTenantBpnl(externalId, principalUtil.resolveTenantBpnl().value).first()
+        businessPartnerRepository.save(BusinessPartnerDb(sharingState, stage = StageType.Output, bpnA = bpna, postalAddress = PostalAddressDb(addressType = addressType), legalEntityConfidence = null, siteConfidence = null, addressConfidence = null))
     }
 }

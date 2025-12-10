@@ -28,10 +28,10 @@ data class RelationOutputDb (
     @Enumerated(EnumType.STRING)
     @Column(name = "output_relation_type")
     var relationType: SharableRelationType,
-    @Column(name = "output_source_bpnl")
-    var sourceBpnL: String,
-    @Column(name = "output_target_bpnl")
-    var targetBpnL: String,
+    @Column(name = "output_source_bpn")
+    var sourceBpn: String,
+    @Column(name = "output_target_bpn")
+    var targetBpn: String,
     @Column(name = "output_updated_at")
     var updatedAt: Instant,
     @ElementCollection(fetch = FetchType.LAZY)
@@ -43,8 +43,8 @@ data class RelationOutputDb (
     var validityPeriods: MutableList<RelationValidityPeriodDb>
 ): Comparable<RelationOutputDb>{
     override fun compareTo(other: RelationOutputDb) = compareBy(
-        RelationOutputDb::sourceBpnL,
-        RelationOutputDb::targetBpnL,
+        RelationOutputDb::sourceBpn,
+        RelationOutputDb::targetBpn,
         RelationOutputDb::relationType
     ).compare(this, other)
 }
