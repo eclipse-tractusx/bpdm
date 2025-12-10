@@ -145,8 +145,8 @@ class RelationCleaningServiceApiCallsTest @Autowired constructor(
     private fun createRelation(idSuffix: String, relationType: RelationType): BusinessPartnerRelations {
         return BusinessPartnerRelations(
             relationType = relationType,
-            businessPartnerSourceBpnl = "BPNL_SOURCE_$idSuffix",
-            businessPartnerTargetBpnl = "BPNL_TARGET_$idSuffix",
+            businessPartnerSourceBpn = "BPNL_SOURCE_$idSuffix",
+            businessPartnerTargetBpn = "BPNL_TARGET_$idSuffix",
             validityPeriods = listOf(
                 RelationValidityPeriod(
                     validFrom = LocalDate.parse("2020-01-01"),

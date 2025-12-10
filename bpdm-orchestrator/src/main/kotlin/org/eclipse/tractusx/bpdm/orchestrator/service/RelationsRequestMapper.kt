@@ -37,9 +37,10 @@ class RelationsRequestMapper {
                     RelationType.IsAlternativeHeadquarterFor -> RelationsGoldenRecordTaskDb.RelationType.IsAlternativeHeadquarterFor
                     RelationType.IsManagedBy -> RelationsGoldenRecordTaskDb.RelationType.IsManagedBy
                     RelationType.IsOwnedBy -> RelationsGoldenRecordTaskDb.RelationType.IsOwnedBy
+                    RelationType.IsReplacedBy -> RelationsGoldenRecordTaskDb.RelationType.IsReplacedBy
                 },
-                businessPartnerSourceBpnl = businessPartnerSourceBpnl,
-                businessPartnerTargetBpnl = businessPartnerTargetBpnl,
+                businessPartnerSourceBpn = businessPartnerSourceBpn,
+                businessPartnerTargetBpn = businessPartnerTargetBpn,
                 validityPeriods = businessPartnerRelations.validityPeriods.map {
                     RelationValidityPeriod(
                         validFrom = it.validFrom,

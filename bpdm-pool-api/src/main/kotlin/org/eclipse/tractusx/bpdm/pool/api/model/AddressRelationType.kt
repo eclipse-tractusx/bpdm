@@ -19,19 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.model
 
-import io.swagger.v3.oas.annotations.media.Schema
-
-@Schema(name = "RelationVerboseDto", description = "Directed relation between two business partners")
-data class RelationVerboseDto(
-
-    @get:Schema(description = "The type of relation between the Legal Entities")
-    val type: LegalEntityRelationType,
-
-    @get:Schema(description = "BPN of partner from which the relation emerges (the source)")
-    val businessPartnerSourceBpnl: String,
-
-    @get:Schema(description = "BPN of partner to which this relation goes (the target)")
-    val businessPartnerTargetBpnl: String,
-
-    val validityPeriods: Collection<RelationValidityPeriod>
-)
+enum class AddressRelationType {
+    IsReplacedBy
+}

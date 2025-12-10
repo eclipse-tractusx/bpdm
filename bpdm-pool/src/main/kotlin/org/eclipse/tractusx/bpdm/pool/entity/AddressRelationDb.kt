@@ -21,36 +21,36 @@ package org.eclipse.tractusx.bpdm.pool.entity
 
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
+import org.eclipse.tractusx.bpdm.pool.api.model.AddressRelationType
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
 
 @Entity
 @Table(
-    name = "relations",
+    name = "address_relations",
     indexes = [
-        Index(columnList = "start_node_id"),
-        Index(columnList = "end_node_id")
+        Index(columnList = "start_address_id"),
+        Index(columnList = "end_address_id")
     ]
 )
-class RelationDb(
+class AddressRelationDb(
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
-    val type: LegalEntityRelationType,
+    val type: AddressRelationType = AddressRelationType.IsReplacedBy, //Only allowed type for address relations
 
     @ManyToOne
-    @JoinColumn(name = "start_node_id", nullable = false)
-    val startNode: LegalEntityDb,
+    @JoinColumn(name = "start_address_id", nullable = false)
+    val startAddress: LogisticAddressDb,
 
     @ManyToOne
-    @JoinColumn(name = "end_node_id", nullable = false)
-    val endNode: LegalEntityDb,
+    @JoinColumn(name = "end_address_id", nullable = false)
+    val endAddress: LogisticAddressDb,
 
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(
-        name = "relation_validity_periods",
-        joinColumns = [JoinColumn(name = "relation_id", foreignKey = ForeignKey(name = "fk_validity_periods_relation"))],
-        indexes = [Index(name = "idx_relation_validity_periods_relation_id", columnList = "relation_id")]
+        name = "address_relation_validity_periods",
+        joinColumns = [JoinColumn(name = "relation_id", foreignKey = ForeignKey(name = "fk_address_relation_validity_periods_relation"))],
+        indexes = [Index(name = "idx_address_relation_validity_periods_relation_id", columnList = "relation_id")]
     )
     var validityPeriods: MutableList<RelationValidityPeriodDb> = mutableListOf()
 
-) : BaseEntity()
-
+): BaseEntity()

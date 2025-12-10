@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import org.eclipse.tractusx.bpdm.pool.api.model.DataSpaceParticipantDto
-import org.eclipse.tractusx.bpdm.pool.api.model.RelationType
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.pool.api.model.request.DataSpaceParticipantUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
@@ -52,7 +52,7 @@ class ManagedRelationUpsertService(
             RelationUpsertService.UpsertRequest(
                 source = upsertRequest.source,
                 target = upsertRequest.target,
-                relationType = RelationType.IsManagedBy,
+                legalEntityRelationType = LegalEntityRelationType.IsManagedBy,
                 validityPeriods = upsertRequest.validityPeriods,
                 existingRelation = upsertRequest.existingRelation
             )
@@ -65,7 +65,7 @@ class ManagedRelationUpsertService(
     private fun validateSingleManager(upsertRequest: IRelationUpsertStrategyService.UpsertRequest){
         val source = upsertRequest.source
 
-        val existingManagers = relationRepository.findByTypeAndStartNode(RelationType.IsManagedBy, source)
+        val existingManagers = relationRepository.findByTypeAndStartNode(LegalEntityRelationType.IsManagedBy, source)
         val overlappingExistingManagers = relationUpsertService.filterOverlappingRelations(upsertRequest, existingManagers)
 
         if (overlappingExistingManagers.isNotEmpty()) {
@@ -81,8 +81,8 @@ class ManagedRelationUpsertService(
         val source = upsertRequest.source
         val target = upsertRequest.target
 
-        val sourceRelations = relationRepository.findInSourceOrTarget(RelationType.IsManagedBy, source)
-        val targetRelations = relationRepository.findInSourceOrTarget(RelationType.IsManagedBy, target)
+        val sourceRelations = relationRepository.findInSourceOrTarget(LegalEntityRelationType.IsManagedBy, source)
+        val targetRelations = relationRepository.findInSourceOrTarget(LegalEntityRelationType.IsManagedBy, target)
 
         val overlappingSourceRelations = relationUpsertService.filterOverlappingRelations(upsertRequest, sourceRelations)
         val overlappingTargetRelations = relationUpsertService.filterOverlappingRelations(upsertRequest, targetRelations)

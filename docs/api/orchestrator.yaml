@@ -700,10 +700,11 @@ components:
             - IsAlternativeHeadquarterFor
             - IsManagedBy
             - IsOwnedBy
-        businessPartnerSourceBpnl:
+            - IsReplacedBy
+        businessPartnerSourceBpn:
           type: string
           description: The business partner from which the relation emerges (the source)
-        businessPartnerTargetBpnl:
+        businessPartnerTargetBpn:
           type: string
           description: The business partner to which this relation goes (the target)
         validityPeriods:
@@ -713,8 +714,8 @@ components:
           items:
             $ref: "#/components/schemas/RelationValidityPeriod"
       required:
-        - businessPartnerSourceBpnl
-        - businessPartnerTargetBpnl
+        - businessPartnerSourceBpn
+        - businessPartnerTargetBpn
         - relationType
         - validityPeriods
     BusinessState:

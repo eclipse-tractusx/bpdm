@@ -141,6 +141,7 @@ paths:
               - IsManagedBy
               - IsAlternativeHeadquarterFor
               - IsOwnedBy
+              - IsReplacedBy
         - name: businessPartnerSourceExternalIds
           in: query
           description: Only show relations which have the given business partners as
@@ -2757,6 +2758,7 @@ components:
             - IsManagedBy
             - IsAlternativeHeadquarterFor
             - IsOwnedBy
+            - IsReplacedBy
         businessPartnerSourceExternalId:
           type: string
           description: The business partner from which the relation emerges (the source)
@@ -2796,9 +2798,10 @@ components:
             - IsAlternativeHeadquarterFor
             - IsManagedBy
             - IsOwnedBy
-        sourceBpnL:
+            - IsReplacedBy
+        sourceBpn:
           type: string
-        targetBpnL:
+        targetBpn:
           type: string
         validityPeriods:
           type: array
@@ -2810,8 +2813,8 @@ components:
       required:
         - externalId
         - relationType
-        - sourceBpnL
-        - targetBpnL
+        - sourceBpn
+        - targetBpn
         - updatedAt
         - validityPeriods
     RelationOutputSearchRequest:
@@ -2831,13 +2834,14 @@ components:
             - IsAlternativeHeadquarterFor
             - IsManagedBy
             - IsOwnedBy
-        sourceBpnLs:
+            - IsReplacedBy
+        sourceBpns:
           type: array
           description: Only show relations which have the given business partners
             as sources
           items:
             type: string
-        targetBpnLs:
+        targetBpns:
           type: array
           description: Only show relations which have the given business partners
             as targets
@@ -2864,6 +2868,7 @@ components:
             - IsManagedBy
             - IsAlternativeHeadquarterFor
             - IsOwnedBy
+            - IsReplacedBy
         businessPartnerSourceExternalId:
           type: string
           description: The external identifier of the business partner from which
@@ -2891,6 +2896,7 @@ components:
             - IsManagedBy
             - IsAlternativeHeadquarterFor
             - IsOwnedBy
+            - IsReplacedBy
         businessPartnerSourceExternalId:
           type: string
           description: The external identifier of the business partner from which
@@ -2947,6 +2953,7 @@ components:
             - IsManagedBy
             - IsAlternativeHeadquarterFor
             - IsOwnedBy
+            - IsReplacedBy
         businessPartnerSourceExternalIds:
           type: array
           description: Only show relations which have the given business partners
@@ -3018,6 +3025,7 @@ components:
             - IsManagedBy
             - IsAlternativeHeadquarterFor
             - IsOwnedBy
+            - IsReplacedBy
         businessPartnerSourceExternalId:
           type: string
           description: The business partner from which the relation emerges (the source)

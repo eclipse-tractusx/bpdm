@@ -170,7 +170,7 @@
           "schema" : {
             "type" : "string",
             "description" : "Only show relations of the given type",
-            "enum" : [ "IsManagedBy", "IsAlternativeHeadquarterFor", "IsOwnedBy" ]
+            "enum" : [ "IsManagedBy", "IsAlternativeHeadquarterFor", "IsOwnedBy", "IsReplacedBy" ]
           }
         }, {
           "name" : "businessPartnerSourceExternalIds",
@@ -2503,7 +2503,7 @@
           "relationType" : {
             "type" : "string",
             "description" : "The type of relation between the business partners",
-            "enum" : [ "IsManagedBy", "IsAlternativeHeadquarterFor", "IsOwnedBy" ]
+            "enum" : [ "IsManagedBy", "IsAlternativeHeadquarterFor", "IsOwnedBy", "IsReplacedBy" ]
           },
           "businessPartnerSourceExternalId" : {
             "type" : "string",
@@ -2541,12 +2541,12 @@
           },
           "relationType" : {
             "type" : "string",
-            "enum" : [ "IsAlternativeHeadquarterFor", "IsManagedBy", "IsOwnedBy" ]
+            "enum" : [ "IsAlternativeHeadquarterFor", "IsManagedBy", "IsOwnedBy", "IsReplacedBy" ]
           },
-          "sourceBpnL" : {
+          "sourceBpn" : {
             "type" : "string"
           },
-          "targetBpnL" : {
+          "targetBpn" : {
             "type" : "string"
           },
           "validityPeriods" : {
@@ -2560,7 +2560,7 @@
             "format" : "date-time"
           }
         },
-        "required" : [ "externalId", "relationType", "sourceBpnL", "targetBpnL", "updatedAt", "validityPeriods" ]
+        "required" : [ "externalId", "relationType", "sourceBpn", "targetBpn", "updatedAt", "validityPeriods" ]
       },
       "RelationOutputSearchRequest" : {
         "type" : "object",
@@ -2576,16 +2576,16 @@
           "relationType" : {
             "type" : "string",
             "description" : "Only show relations of the given type",
-            "enum" : [ "IsAlternativeHeadquarterFor", "IsManagedBy", "IsOwnedBy" ]
+            "enum" : [ "IsAlternativeHeadquarterFor", "IsManagedBy", "IsOwnedBy", "IsReplacedBy" ]
           },
-          "sourceBpnLs" : {
+          "sourceBpns" : {
             "type" : "array",
             "description" : "Only show relations which have the given business partners as sources",
             "items" : {
               "type" : "string"
             }
           },
-          "targetBpnLs" : {
+          "targetBpns" : {
             "type" : "array",
             "description" : "Only show relations which have the given business partners as targets",
             "items" : {
@@ -2610,7 +2610,7 @@
           "relationType" : {
             "type" : "string",
             "description" : "The type of relation that should be created",
-            "enum" : [ "IsManagedBy", "IsAlternativeHeadquarterFor", "IsOwnedBy" ]
+            "enum" : [ "IsManagedBy", "IsAlternativeHeadquarterFor", "IsOwnedBy", "IsReplacedBy" ]
           },
           "businessPartnerSourceExternalId" : {
             "type" : "string",
@@ -2634,7 +2634,7 @@
           "relationType" : {
             "type" : "string",
             "description" : "The type the relation should be",
-            "enum" : [ "IsManagedBy", "IsAlternativeHeadquarterFor", "IsOwnedBy" ]
+            "enum" : [ "IsManagedBy", "IsAlternativeHeadquarterFor", "IsOwnedBy", "IsReplacedBy" ]
           },
           "businessPartnerSourceExternalId" : {
             "type" : "string",
@@ -2693,7 +2693,7 @@
           "relationType" : {
             "type" : "string",
             "description" : "Only show relations of the given type",
-            "enum" : [ "IsManagedBy", "IsAlternativeHeadquarterFor", "IsOwnedBy" ]
+            "enum" : [ "IsManagedBy", "IsAlternativeHeadquarterFor", "IsOwnedBy", "IsReplacedBy" ]
           },
           "businessPartnerSourceExternalIds" : {
             "type" : "array",
@@ -2760,7 +2760,7 @@
           "relationType" : {
             "type" : "string",
             "description" : "The type of relation between the business partners",
-            "enum" : [ "IsManagedBy", "IsAlternativeHeadquarterFor", "IsOwnedBy" ]
+            "enum" : [ "IsManagedBy", "IsAlternativeHeadquarterFor", "IsOwnedBy", "IsReplacedBy" ]
           },
           "businessPartnerSourceExternalId" : {
             "type" : "string",

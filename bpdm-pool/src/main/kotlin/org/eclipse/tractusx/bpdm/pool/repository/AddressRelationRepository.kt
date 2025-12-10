@@ -20,39 +20,39 @@
 package org.eclipse.tractusx.bpdm.pool.repository
 
 import jakarta.persistence.criteria.Predicate
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
-import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
-import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
+import org.eclipse.tractusx.bpdm.pool.api.model.AddressRelationType
+import org.eclipse.tractusx.bpdm.pool.entity.AddressRelationDb
+import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.data.jpa.repository.Query
 
-interface RelationRepository : JpaRepository<RelationDb, Long>, JpaSpecificationExecutor<RelationDb> {
+interface AddressRelationRepository : JpaRepository<AddressRelationDb, Long>, JpaSpecificationExecutor<AddressRelationDb> {
 
     companion object {
-        fun byRelation(startNode: LegalEntityDb?, endNode: LegalEntityDb?, type: LegalEntityRelationType?) =
-            Specification<RelationDb> { root, _, builder ->
+        fun byRelation(startAddress: LogisticAddressDb?, endAddress: LogisticAddressDb?, type: AddressRelationType?) =
+            Specification<AddressRelationDb> { root, _, builder ->
                 val predicates = mutableListOf<Predicate>()
 
-                startNode?.let {
-                    predicates.add(builder.equal(root.get<LegalEntityDb>(RelationDb::startNode.name), it))
+                startAddress?.let {
+                    predicates.add(builder.equal(root.get<LogisticAddressDb>(AddressRelationDb::startAddress.name), it))
                 }
 
-                endNode?.let {
-                    predicates.add(builder.equal(root.get<LegalEntityDb>(RelationDb::endNode.name), it))
+                endAddress?.let {
+                    predicates.add(builder.equal(root.get<LogisticAddressDb>(AddressRelationDb::endAddress.name), it))
                 }
 
                 type?.let {
-                    predicates.add(builder.equal(root.get<LegalEntityRelationType>(RelationDb::type.name), it))
+                    predicates.add(builder.equal(root.get<AddressRelationType>(AddressRelationDb::type.name), it))
                 }
 
                 builder.and(*predicates.toTypedArray())
             }
     }
 
-    @Query("SELECT r FROM RelationDb r WHERE r.type = :legalEntityRelationType AND (r.startNode = :legalEntity OR r.endNode = :legalEntity)")
-    fun findInSourceOrTarget(legalEntityRelationType: LegalEntityRelationType, legalEntity: LegalEntityDb): Set<RelationDb>
+    @Query("SELECT r FROM AddressRelationDb r WHERE r.type = :addressRelationType AND (r.startAddress = :address OR r.endAddress = :address)")
+    fun findInSourceOrTarget(addressRelationType: AddressRelationType, address: LogisticAddressDb): Set<AddressRelationDb>
 
-    fun findByTypeAndStartNode(legalEntityRelationType: LegalEntityRelationType, legalEntity: LegalEntityDb): Set<RelationDb>
+    fun findByTypeAndStartAddress(addressRelationType: AddressRelationType, address: LogisticAddressDb): Set<AddressRelationDb>
 }

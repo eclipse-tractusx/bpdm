@@ -28,17 +28,17 @@ data class BusinessPartnerRelations(
     @Schema(description = "The type of relation between the business partners")
     val relationType: RelationType,
     @Schema(description = "The business partner from which the relation emerges (the source)")
-    val businessPartnerSourceBpnl: String,
+    val businessPartnerSourceBpn: String,
     @Schema(description = "The business partner to which this relation goes (the target)")
-    val businessPartnerTargetBpnl: String,
+    val businessPartnerTargetBpn: String,
     @Schema(description = RelationValidityPeriodDescription.header)
     val validityPeriods : Collection<RelationValidityPeriod>
 ) {
     companion object {
         val empty = BusinessPartnerRelations(
             relationType = RelationType.IsAlternativeHeadquarterFor, // or a default type
-            businessPartnerSourceBpnl = "",
-            businessPartnerTargetBpnl = "",
+            businessPartnerSourceBpn = "",
+            businessPartnerTargetBpn = "",
             validityPeriods = emptyList()
         )
     }
@@ -47,7 +47,8 @@ data class BusinessPartnerRelations(
 enum class RelationType {
     IsAlternativeHeadquarterFor,
     IsManagedBy,
-    IsOwnedBy
+    IsOwnedBy,
+    IsReplacedBy
 }
 
 data class RelationValidityPeriod(

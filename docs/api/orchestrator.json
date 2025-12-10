@@ -814,13 +814,13 @@
           "relationType" : {
             "type" : "string",
             "description" : "The type of relation between the business partners",
-            "enum" : [ "IsAlternativeHeadquarterFor", "IsManagedBy", "IsOwnedBy" ]
+            "enum" : [ "IsAlternativeHeadquarterFor", "IsManagedBy", "IsOwnedBy", "IsReplacedBy" ]
           },
-          "businessPartnerSourceBpnl" : {
+          "businessPartnerSourceBpn" : {
             "type" : "string",
             "description" : "The business partner from which the relation emerges (the source)"
           },
-          "businessPartnerTargetBpnl" : {
+          "businessPartnerTargetBpn" : {
             "type" : "string",
             "description" : "The business partner to which this relation goes (the target)"
           },
@@ -832,7 +832,7 @@
             }
           }
         },
-        "required" : [ "businessPartnerSourceBpnl", "businessPartnerTargetBpnl", "relationType", "validityPeriods" ]
+        "required" : [ "businessPartnerSourceBpn", "businessPartnerTargetBpn", "relationType", "validityPeriods" ]
       },
       "BusinessState" : {
         "type" : "object",

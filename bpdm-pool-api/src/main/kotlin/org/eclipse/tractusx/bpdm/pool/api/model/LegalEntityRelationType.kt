@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.model
 
-enum class RelationType {
+enum class LegalEntityRelationType {
     IsAlternativeHeadquarterFor,
     IsManagedBy,
     IsOwnedBy

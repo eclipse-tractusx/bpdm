@@ -22,5 +22,6 @@ package org.eclipse.tractusx.bpdm.gate.api.model
 enum class RelationType {
     IsManagedBy,
     IsAlternativeHeadquarterFor,
-    IsOwnedBy
+    IsOwnedBy,
+    IsReplacedBy
 }
