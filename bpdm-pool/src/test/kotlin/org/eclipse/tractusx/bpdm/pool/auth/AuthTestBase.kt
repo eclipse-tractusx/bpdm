@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDto
+import org.eclipse.tractusx.bpdm.pool.api.model.ReasonCodeDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerRequestFactory
 import org.eclipse.tractusx.bpdm.test.testdata.pool.TestMetadata
@@ -205,6 +206,21 @@ abstract class AuthTestBase(
     fun `PUT CX Memberships`(){
         authAssertions.assert(membershipAuthExpectations.putMemberships) { poolApiClient.participants.put(DataSpaceParticipantUpdateRequest(listOf())) }
     }
+
+    @Test
+    fun `GET reason codes`(){
+        authAssertions.assert(metadataAuthExpectations.getReasonCodes) { poolApiClient.metadata.getReasonCodes(PaginationRequest()) }
+    }
+
+    @Test
+    fun `PUT reason codes`(){
+        authAssertions.assert(metadataAuthExpectations.putReasonCodes) { poolApiClient.metadata.upsertReasonCode(ReasonCodeUpsertRequest(ReasonCodeDto("", ""))) }
+    }
+
+    @Test
+    fun `DELETE reason codes`(){
+        authAssertions.assert(metadataAuthExpectations.deleteReasonCodes) { poolApiClient.metadata.deleteReasonCode(ReasonCodeDeleteRequest("")) }
+    }
 }
 
 
@@ -240,7 +256,10 @@ data class MetadataAuthExpectations(
     val getIdentifierType: AuthExpectationType,
     val postIdentifierType: AuthExpectationType,
     val getAdminArea: AuthExpectationType,
-    val getFieldQualityRules: AuthExpectationType
+    val getFieldQualityRules: AuthExpectationType,
+    val getReasonCodes: AuthExpectationType,
+    val putReasonCodes: AuthExpectationType,
+    val deleteReasonCodes: AuthExpectationType
 )
 
 data class MembersAuthExpectations(

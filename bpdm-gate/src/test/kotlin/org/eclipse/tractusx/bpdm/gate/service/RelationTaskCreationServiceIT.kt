@@ -230,7 +230,7 @@ class RelationTaskCreationServiceIT @Autowired constructor(
         )
         orchestratorWireMockServer.stubFor(
             WireMock.post(WireMock.urlPathEqualTo(ApiCommons.BASE_PATH_V7_RELATIONS))
-                .willReturn(WireMock.okJson(objectMapper.writeValueAsString(orchestratorMockResponse)))
+                .willReturn(WireMock.okJson(jsonMapper.writeValueAsString(orchestratorMockResponse)))
         )
 
         relationTaskCreationService.sendTasks()
