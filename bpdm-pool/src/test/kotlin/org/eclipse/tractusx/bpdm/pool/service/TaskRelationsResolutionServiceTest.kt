@@ -91,37 +91,10 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
     @EnumSource(LegalEntityRelationType::class)
     fun `create relations with non existing source and target legal entity`(relationType: LegalEntityRelationType) {
 
-        val createRelationsRequest = BusinessPartnerRelations(
-            relationType = relationType.toTaskDto(),
+        val createRelationsRequest = buildAlwaysActiveRelationRequest(
+            relationType = relationType,
             businessPartnerSourceBpn = BusinessPartnerVerboseValues.firstBpnL,
-            businessPartnerTargetBpn = BusinessPartnerVerboseValues.secondBpnL,
-            validityPeriods = listOf(
-                RelationValidityPeriod(
-                    validFrom = LocalDate.parse("1970-01-01"),
-                    validTo = LocalDate.parse("9999-12-31")
-                )
-            )
-        )
-
-        val result = upsertRelationsGoldenRecordIntoPool(taskId = "TASK_1", businessPartnerRelations = createRelationsRequest)
-        assertThat(result[0].taskId).isEqualTo("TASK_1")
-        assertThat(result[0].errors.size).isEqualTo(1)
-    }
-
-    @ParameterizedTest
-    @EnumSource(AddressRelationType::class)
-    fun `create relations with non existing source and target address`(relationType: AddressRelationType) {
-
-        val createRelationsRequest = BusinessPartnerRelations(
-            relationType = relationType.toTaskDto(),
-            businessPartnerSourceBpn = BusinessPartnerVerboseValues.firstBpnA,
-            businessPartnerTargetBpn = BusinessPartnerVerboseValues.secondBpnA,
-            validityPeriods = listOf(
-                RelationValidityPeriod(
-                    validFrom = LocalDate.parse("1970-01-01"),
-                    validTo = LocalDate.parse("9999-12-31")
-                )
-            )
+            businessPartnerTargetBpn = BusinessPartnerVerboseValues.secondBpnL
         )
 
         val result = upsertRelationsGoldenRecordIntoPool(taskId = "TASK_1", businessPartnerRelations = createRelationsRequest)
@@ -146,16 +119,10 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         assertThat(response.entities.size).isEqualTo(1)
         val savedEntity1 = response.entities.toList()[0]
 
-        val createRelationsRequest = BusinessPartnerRelations(
-            relationType = relationType.toTaskDto(),
+        val createRelationsRequest = buildAlwaysActiveRelationRequest(
+            relationType = relationType,
             businessPartnerSourceBpn = savedEntity1.legalEntity.bpnl,
-            businessPartnerTargetBpn = savedEntity1.legalEntity.bpnl,
-            validityPeriods = listOf(
-                RelationValidityPeriod(
-                    validFrom = LocalDate.parse("1970-01-01"),
-                    validTo = LocalDate.parse("9999-12-31")
-                )
-            )
+            businessPartnerTargetBpn = savedEntity1.legalEntity.bpnl
         )
 
         val result = upsertRelationsGoldenRecordIntoPool(taskId = "TASK_1", businessPartnerRelations = createRelationsRequest)
@@ -170,16 +137,10 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         val legalEntity = createLegalEntity("$testName LE1")
         val address = createAdditionalAddress("$testName Addr1", legalEntity)
 
-        val createRelationsRequest = BusinessPartnerRelations(
+        val createRelationsRequest = buildAlwaysActiveRelationRequest(
             relationType = relationType.toTaskDto(),
             businessPartnerSourceBpn = address.address.bpna,
-            businessPartnerTargetBpn = address.address.bpna,
-            validityPeriods = listOf(
-                RelationValidityPeriod(
-                    validFrom = LocalDate.parse("1970-01-01"),
-                    validTo = LocalDate.parse("9999-12-31")
-                )
-            )
+            businessPartnerTargetBpn = address.address.bpna
         )
 
         val result = upsertRelationsGoldenRecordIntoPool(taskId = "TASK_1", businessPartnerRelations = createRelationsRequest)
@@ -207,16 +168,10 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         val savedEntity2 = response.entities.toList()[1]
 
         // Step 2: Create a relation request
-        val createRelationsRequest = BusinessPartnerRelations(
+        val createRelationsRequest = buildAlwaysActiveRelationRequest(
             relationType = RelationType.IsAlternativeHeadquarterFor,
             businessPartnerSourceBpn = savedEntity2.legalEntity.bpnl,
-            businessPartnerTargetBpn = savedEntity1.legalEntity.bpnl,
-            validityPeriods = listOf(
-                RelationValidityPeriod(
-                    validFrom = LocalDate.parse("1970-01-01"),
-                    validTo = LocalDate.parse("9999-12-31")
-                )
-            )
+            businessPartnerTargetBpn = savedEntity1.legalEntity.bpnl
         )
 
         val result = upsertRelationsGoldenRecordIntoPool(taskId = "TASK_1", businessPartnerRelations = createRelationsRequest)
@@ -231,6 +186,7 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         assertThat(responseLegalEntity.relations.first().businessPartnerSourceBpnl).isEqualTo(createRelationsRequest.businessPartnerSourceBpn)
         assertThat(responseLegalEntity.relations.first().businessPartnerTargetBpnl).isEqualTo(createRelationsRequest.businessPartnerTargetBpn)
         assertThat(responseLegalEntity.relations.first().validityPeriods.size).isEqualTo(createRelationsRequest.validityPeriods.size)
+        assertThat(responseLegalEntity.relations.first().reasonCode).isEqualTo(createRelationsRequest.reasonCode)
     }
 
     @ParameterizedTest
@@ -240,16 +196,10 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         val legalEntity1 = createLegalEntity("$testName 1")
         val additionalAddress1 = createAdditionalAddress("$testName Addr 1", legalEntity1)
         // Step 2: Create a relation request
-        val createAddressRelationsRequest = BusinessPartnerRelations(
-            relationType = relationType.toTaskDto(),
+        val createAddressRelationsRequest = buildAlwaysActiveRelationRequest(
+            relationType = relationType,
             businessPartnerSourceBpn = legalEntity1.legalAddress.bpna,
-            businessPartnerTargetBpn = additionalAddress1.address.bpna,
-            validityPeriods = listOf(
-                RelationValidityPeriod(
-                    validFrom = LocalDate.parse("1970-01-01"),
-                    validTo = LocalDate.parse("9999-12-31")
-                )
-            )
+            businessPartnerTargetBpn = additionalAddress1.address.bpna
         )
 
         val result = upsertRelationsGoldenRecordIntoPool(taskId = "TASK_1", businessPartnerRelations = createAddressRelationsRequest)
@@ -265,6 +215,7 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         assertThat(responseAddressRelation.first().businessPartnerSourceBpna).isEqualTo(createAddressRelationsRequest.businessPartnerSourceBpn)
         assertThat(responseAddressRelation.first().businessPartnerTargetBpna).isEqualTo(createAddressRelationsRequest.businessPartnerTargetBpn)
         assertThat(responseAddressRelation.first().validityPeriods.size).isEqualTo(createAddressRelationsRequest.validityPeriods.size)
+        assertThat(responseAddressRelation.first().reasonCode).isEqualTo(createAddressRelationsRequest.reasonCode)
     }
 
 
@@ -291,7 +242,7 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         /**
          * Scenario 1: A→B exists
          */
-        val relationAB = BusinessPartnerRelations(
+        val relationAB = buildRelationRequest(
             relationType = RelationType.IsManagedBy,
             businessPartnerSourceBpn = savedA.legalEntity.bpnl,
             businessPartnerTargetBpn = savedB.legalEntity.bpnl,
@@ -306,7 +257,7 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         /**
          * Scenario 2: A→B exists, new A→C overlaps in validity → should throw exception
          */
-        val relationAC_conflict = BusinessPartnerRelations(
+        val relationAC_conflict = buildRelationRequest(
             relationType = RelationType.IsManagedBy,
             businessPartnerSourceBpn = savedA.legalEntity.bpnl,
             businessPartnerTargetBpn = savedC.legalEntity.bpnl,
@@ -321,7 +272,7 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         /**
          * Scenario 3: A→C exists, new A→C with overlapping validity → overwrite existing validity
          */
-        val relationAC_nonOverlap = BusinessPartnerRelations(
+        val relationAC_nonOverlap = buildRelationRequest(
             relationType = RelationType.IsManagedBy,
             businessPartnerSourceBpn = savedA.legalEntity.bpnl,
             businessPartnerTargetBpn = savedC.legalEntity.bpnl,
@@ -333,7 +284,7 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         val resultAC_nonOverlap = upsertRelationsGoldenRecordIntoPool("TASK_AC_NON_OVERLAP", relationAC_nonOverlap)
         assertThat(resultAC_nonOverlap[0].errors).isEmpty()
 
-        val relationAC_new = BusinessPartnerRelations(
+        val relationAC_new = buildRelationRequest(
             relationType = RelationType.IsManagedBy,
             businessPartnerSourceBpn = savedA.legalEntity.bpnl,
             businessPartnerTargetBpn = savedC.legalEntity.bpnl,
@@ -378,16 +329,10 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         val savedB = response.entities.toList()[1]
 
         // Step 2: Try to make A is managed by B -> should fail because of only dataspace participants can manage other entities
-        val violatingDataspaceParticipantRole = BusinessPartnerRelations(
+        val violatingDataspaceParticipantRole = buildAlwaysActiveRelationRequest(
             relationType = RelationType.IsManagedBy,
             businessPartnerSourceBpn = savedA.legalEntity.bpnl,
-            businessPartnerTargetBpn = savedB.legalEntity.bpnl,
-            validityPeriods = listOf(
-                RelationValidityPeriod(
-                    validFrom = LocalDate.parse("1970-01-01"),
-                    validTo = LocalDate.parse("9999-12-31")
-                )
-            )
+            businessPartnerTargetBpn = savedB.legalEntity.bpnl
         )
 
         val resultDataspaceParticipantViolation = upsertRelationsGoldenRecordIntoPool("TASK_VIOLATE_MANAGER", violatingDataspaceParticipantRole)
@@ -416,30 +361,18 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         val savedC = response.entities.toList()[2]
 
         // Step 2: Create valid IsOwnedBy relation: A is owned by B
-        val validRelation = BusinessPartnerRelations(
+        val validRelation = buildAlwaysActiveRelationRequest(
             relationType = RelationType.IsOwnedBy,
             businessPartnerSourceBpn = savedA.legalEntity.bpnl,
-            businessPartnerTargetBpn = savedB.legalEntity.bpnl,
-            validityPeriods = listOf(
-                RelationValidityPeriod(
-                    validFrom = LocalDate.parse("1970-01-01"),
-                    validTo = LocalDate.parse("9999-12-31")
-                )
-            )
+            businessPartnerTargetBpn = savedB.legalEntity.bpnl
         )
         upsertRelationsGoldenRecordIntoPool("TASK_VALID", validRelation)
 
         // Step 3: Try to make A is owned by C -> should fail because of only one parent allowed
-        val violatingSingleParent = BusinessPartnerRelations(
+        val violatingSingleParent = buildAlwaysActiveRelationRequest(
             relationType = RelationType.IsOwnedBy,
             businessPartnerSourceBpn = savedA.legalEntity.bpnl,
-            businessPartnerTargetBpn = savedC.legalEntity.bpnl,
-            validityPeriods = listOf(
-                RelationValidityPeriod(
-                    validFrom = LocalDate.parse("1970-01-01"),
-                    validTo = LocalDate.parse("9999-12-31")
-                )
-            )
+            businessPartnerTargetBpn = savedC.legalEntity.bpnl
         )
 
         val resultSingleParentViolation = upsertRelationsGoldenRecordIntoPool("TASK_VIOLATE_MANAGER", violatingSingleParent)
@@ -468,43 +401,25 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         val savedC = response.entities.toList()[2]
 
         // Step 2: Create valid IsOwnedBy relation: A is owned by B
-        val validAOwnedByB = BusinessPartnerRelations(
+        val validAOwnedByB = buildAlwaysActiveRelationRequest(
             relationType = RelationType.IsOwnedBy,
             businessPartnerSourceBpn = savedA.legalEntity.bpnl,
-            businessPartnerTargetBpn = savedB.legalEntity.bpnl,
-            validityPeriods = listOf(
-                RelationValidityPeriod(
-                    validFrom = LocalDate.parse("1970-01-01"),
-                    validTo = LocalDate.parse("9999-12-31")
-                )
-            )
+            businessPartnerTargetBpn = savedB.legalEntity.bpnl
         )
         upsertRelationsGoldenRecordIntoPool("TASK_VALID_1", validAOwnedByB)
 
-        val validBOwnedByC = BusinessPartnerRelations(
+        val validBOwnedByC = buildAlwaysActiveRelationRequest(
             relationType = RelationType.IsOwnedBy,
             businessPartnerSourceBpn = savedB.legalEntity.bpnl,
-            businessPartnerTargetBpn = savedC.legalEntity.bpnl,
-            validityPeriods = listOf(
-                RelationValidityPeriod(
-                    validFrom = LocalDate.parse("1970-01-01"),
-                    validTo = LocalDate.parse("9999-12-31")
-                )
-            )
+            businessPartnerTargetBpn = savedC.legalEntity.bpnl
         )
         upsertRelationsGoldenRecordIntoPool("TASK_VALID_2", validBOwnedByC)
 
         // Step 3: Try to make C is owned by A -> should fail because of no cycles allowed
-        val violatingNoCycles = BusinessPartnerRelations(
+        val violatingNoCycles = buildAlwaysActiveRelationRequest(
             relationType = RelationType.IsOwnedBy,
             businessPartnerSourceBpn = savedC.legalEntity.bpnl,
-            businessPartnerTargetBpn = savedA.legalEntity.bpnl,
-            validityPeriods = listOf(
-                RelationValidityPeriod(
-                    validFrom = LocalDate.parse("1970-01-01"),
-                    validTo = LocalDate.parse("9999-12-31")
-                )
-            )
+            businessPartnerTargetBpn = savedA.legalEntity.bpnl
         )
 
         val resultNoCyclesViolation = upsertRelationsGoldenRecordIntoPool("TASK_VIOLATE_MANAGER", violatingNoCycles)
@@ -535,46 +450,28 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         val savedC = response.entities.toList()[2]
 
         // Step 2: Create initial IsOwnedBy relation: A is owned by B
-        val relationAOwnedByB = BusinessPartnerRelations(
+        val relationAOwnedByB = buildAlwaysActiveRelationRequest(
             relationType = RelationType.IsOwnedBy,
             businessPartnerSourceBpn = savedA.legalEntity.bpnl,
-            businessPartnerTargetBpn = savedB.legalEntity.bpnl,
-            validityPeriods = listOf(
-                RelationValidityPeriod(
-                    validFrom = LocalDate.parse("1970-01-01"),
-                    validTo = LocalDate.parse("9999-12-31")
-                )
-            )
+            businessPartnerTargetBpn = savedB.legalEntity.bpnl
         )
         val resultInitial = upsertRelationsGoldenRecordIntoPool("TASK_INITIAL", relationAOwnedByB)
         assertThat(resultInitial[0].errors).isEmpty()
 
         // Step 3: Chain Extension - B is owned by C
-        val relationBOwnedByC = BusinessPartnerRelations(
+        val relationBOwnedByC = buildAlwaysActiveRelationRequest(
             relationType = RelationType.IsOwnedBy,
             businessPartnerSourceBpn = savedB.legalEntity.bpnl,
-            businessPartnerTargetBpn = savedC.legalEntity.bpnl,
-            validityPeriods = listOf(
-                RelationValidityPeriod(
-                    validFrom = LocalDate.parse("1970-01-01"),
-                    validTo = LocalDate.parse("9999-12-31")
-                )
-            )
+            businessPartnerTargetBpn = savedC.legalEntity.bpnl
         )
         val resultChainExtension = upsertRelationsGoldenRecordIntoPool("TASK_CHAIN_EXTENSION", relationBOwnedByC)
         assertThat(resultChainExtension[0].errors).isEmpty()
 
         // Step 4: Update existing A → B with new validity period (non-overlapping)
-        val updatedRelationAOwnedByB = BusinessPartnerRelations(
+        val updatedRelationAOwnedByB = buildAlwaysActiveRelationRequest(
             relationType = RelationType.IsOwnedBy,
             businessPartnerSourceBpn = savedA.legalEntity.bpnl,
-            businessPartnerTargetBpn = savedB.legalEntity.bpnl,
-            validityPeriods = listOf(
-                RelationValidityPeriod(
-                    validFrom = LocalDate.parse("1970-01-01"),
-                    validTo = LocalDate.parse("9999-12-31")
-                )
-            )
+            businessPartnerTargetBpn = savedB.legalEntity.bpnl
         )
         val resultUpdate = upsertRelationsGoldenRecordIntoPool("TASK_UPDATE_EXISTING", updatedRelationAOwnedByB)
         assertThat(resultUpdate[0].errors).isEmpty()
@@ -594,6 +491,41 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         assertThat(relationBtoC!!.validityPeriods.size).isEqualTo(1)
     }
 
+    private fun createLegalEntity(seed: String): LegalEntityPartnerCreateVerboseDto {
+        val request = testDataEnvironment.requestFactory.createLegalEntityRequest(seed, true)
+        return poolClient.legalEntities.createBusinessPartners(listOf(request)).entities.single()
+    }
+
+    private fun createAdditionalAddress(seed: String, legalEntity: LegalEntityPartnerCreateVerboseDto): AddressPartnerCreateVerboseDto {
+        val request = testDataEnvironment.requestFactory.buildAdditionalAddressCreateRequest(seed, legalEntity.legalEntity.bpnl)
+        return poolClient.addresses.createAddresses(listOf(request)).entities.single()
+    }
+    /**
+     * GIVEN relation golden record task with unknown reason code
+     * WHEN trying to refine relation task
+     * THEN sharing process error returned
+     */
+    @Test
+    fun `try create relation with unknown reason code`(){
+        //GIVEN
+        val legalEntity1 =  poolClient.legalEntities.createBusinessPartners(listOf(BusinessPartnerNonVerboseValues.legalEntityCreate1)).entities.single()
+        val legalEntity2 =  poolClient.legalEntities.createBusinessPartners(listOf(BusinessPartnerNonVerboseValues.legalEntityCreate2)).entities.single()
+
+        val relation = buildAlwaysActiveRelationRequest(
+            relationType = RelationType.IsOwnedBy,
+            businessPartnerSourceBpn = legalEntity1.legalEntity.bpnl,
+            businessPartnerTargetBpn = legalEntity2.legalEntity.bpnl
+        ).copy(reasonCode = "NOT EXISTS")
+
+        //WHEN
+        val result = upsertRelationsGoldenRecordIntoPool("ANY ID", relation).single()
+
+        //THEN
+        assertThat(result.errors).isNotEmpty
+        assertThat(result.errors.size).isEqualTo(1)
+        assertThat(result.errors.single().type).isEqualTo(TaskRelationsErrorType.Unspecified)
+    }
+
     @ParameterizedTest
     @EnumSource(LegalEntityRelationType::class)
     fun `reject unsupported address relation type`(relationType: LegalEntityRelationType) {
@@ -601,16 +533,10 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         val legalEntity1 = createLegalEntity("$testName 1")
         val additionalAddress1 = createAdditionalAddress("$testName Addr 1", legalEntity1)
 
-        val createAddressRelationsRequest = BusinessPartnerRelations(
-            relationType = relationType.toTaskDto(),
+        val createAddressRelationsRequest = buildAlwaysActiveRelationRequest(
+            relationType = relationType,
             businessPartnerSourceBpn = legalEntity1.legalAddress.bpna,
-            businessPartnerTargetBpn = additionalAddress1.address.bpna,
-            validityPeriods = listOf(
-                RelationValidityPeriod(
-                    validFrom = LocalDate.parse("1970-01-01"),
-                    validTo = LocalDate.parse("9999-12-31")
-                )
-            )
+            businessPartnerTargetBpn = additionalAddress1.address.bpna
         )
 
         val result = upsertRelationsGoldenRecordIntoPool(taskId = "TASK_1", businessPartnerRelations = createAddressRelationsRequest)
@@ -626,16 +552,10 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         val legalEntity1 = createLegalEntity("$testName 1")
         val legalEntity2 = createLegalEntity("$testName 2")
 
-        val createAddressRelationsRequest = BusinessPartnerRelations(
-            relationType = relationType.toTaskDto(),
+        val createAddressRelationsRequest = buildAlwaysActiveRelationRequest(
+            relationType = relationType,
             businessPartnerSourceBpn = legalEntity1.legalEntity.bpnl,
-            businessPartnerTargetBpn = legalEntity2.legalEntity.bpnl,
-            validityPeriods = listOf(
-                RelationValidityPeriod(
-                    validFrom = LocalDate.parse("1970-01-01"),
-                    validTo = LocalDate.parse("9999-12-31")
-                )
-            )
+            businessPartnerTargetBpn = legalEntity2.legalEntity.bpnl
         )
 
         val result = upsertRelationsGoldenRecordIntoPool(taskId = "TASK_1", businessPartnerRelations = createAddressRelationsRequest)
@@ -644,15 +564,7 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         assertThat(result[0].errors[0].description).isEqualTo("Invalid relation: mixed legal entity or address types not allowed (source=${createAddressRelationsRequest.businessPartnerSourceBpn}, target=${createAddressRelationsRequest.businessPartnerTargetBpn})")
     }
 
-    private fun createLegalEntity(seed: String): LegalEntityPartnerCreateVerboseDto {
-        val request = testDataEnvironment.requestFactory.createLegalEntityRequest(seed, true)
-        return poolClient.legalEntities.createBusinessPartners(listOf(request)).entities.single()
-    }
 
-    private fun createAdditionalAddress(seed: String, legalEntity: LegalEntityPartnerCreateVerboseDto): AddressPartnerCreateVerboseDto {
-        val request = testDataEnvironment.requestFactory.buildAdditionalAddressCreateRequest(seed, legalEntity.legalEntity.bpnl)
-        return poolClient.addresses.createAddresses(listOf(request)).entities.single()
-    }
 
     private fun upsertRelationsGoldenRecordIntoPool(taskId: String, businessPartnerRelations: BusinessPartnerRelations): List<TaskRelationsStepResultEntryDto> {
 
@@ -692,6 +604,64 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
             value.lowercase()
         else
             throw IllegalArgumentException("Can't change case of string $value")
+    }
+
+
+    private fun buildAlwaysActiveRelationRequest(
+        relationType: RelationType,
+        businessPartnerSourceBpn: String,
+        businessPartnerTargetBpn: String
+    ): BusinessPartnerRelations{
+        return buildRelationRequest(
+            relationType,
+            businessPartnerSourceBpn,
+            businessPartnerTargetBpn,
+            listOf(
+                RelationValidityPeriod(
+                    validFrom = LocalDate.of(1970, 1, 1),
+                    validTo = LocalDate.of(9999, 12, 31)
+                )
+            )
+        )
+    }
+
+    private fun buildAlwaysActiveRelationRequest(
+        relationType: LegalEntityRelationType,
+        businessPartnerSourceBpn: String,
+        businessPartnerTargetBpn: String
+    ): BusinessPartnerRelations{
+        return buildAlwaysActiveRelationRequest(
+            relationType = relationType.toTaskDto(),
+            businessPartnerSourceBpn = businessPartnerSourceBpn,
+            businessPartnerTargetBpn = businessPartnerTargetBpn
+        )
+    }
+
+    private fun buildAlwaysActiveRelationRequest(
+        relationType: AddressRelationType,
+        businessPartnerSourceBpn: String,
+        businessPartnerTargetBpn: String
+    ): BusinessPartnerRelations{
+        return buildAlwaysActiveRelationRequest(
+            relationType = relationType.toTaskDto(),
+            businessPartnerSourceBpn = businessPartnerSourceBpn,
+            businessPartnerTargetBpn = businessPartnerTargetBpn
+        )
+    }
+
+    private fun buildRelationRequest(
+        relationType: RelationType,
+        businessPartnerSourceBpn: String,
+        businessPartnerTargetBpn: String,
+        validityPeriods: List<RelationValidityPeriod>
+    ): BusinessPartnerRelations{
+        return BusinessPartnerRelations(
+            relationType = relationType,
+            businessPartnerSourceBpn = businessPartnerSourceBpn,
+            businessPartnerTargetBpn = businessPartnerTargetBpn,
+            validityPeriods = validityPeriods,
+            testDataEnvironment.metadata.reasonCodes.first().technicalKey
+        )
     }
 
 }

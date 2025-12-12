@@ -40,7 +40,9 @@ data class RelationOutputDb (
         joinColumns = [JoinColumn(name = "relation_id", foreignKey = ForeignKey(name = "fk_output_validity_periods_relation"))],
         indexes = [Index(name = "idx_output_validity_periods_relation_id", columnList = "relation_id")]
     )
-    var validityPeriods: MutableList<RelationValidityPeriodDb>
+    var validityPeriods: MutableList<RelationValidityPeriodDb>,
+    @Column(name = "output_reason_code")
+    var reasonCode: String
 ): Comparable<RelationOutputDb>{
     override fun compareTo(other: RelationOutputDb) = compareBy(
         RelationOutputDb::sourceBpn,

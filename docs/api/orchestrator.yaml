@@ -713,9 +713,15 @@ components:
             is active.
           items:
             $ref: "#/components/schemas/RelationValidityPeriod"
+        reasonCode:
+          type: string
+          description: The technical key of the reason code describing why the relation
+            was established. The list of reason codes is available from the golden
+            record Pool.
       required:
         - businessPartnerSourceBpn
         - businessPartnerTargetBpn
+        - reasonCode
         - relationType
         - validityPeriods
     BusinessState:

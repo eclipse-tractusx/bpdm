@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateType
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationValidityPeriodDto
 import org.eclipse.tractusx.bpdm.gate.api.model.SharableRelationType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationOutputSearchRequest
 import org.eclipse.tractusx.bpdm.gate.entity.RelationDb
@@ -68,6 +69,8 @@ class RelationOutputControllerIT @Autowired constructor(
      */
     val anyTime: Instant = OffsetDateTime.of(2025, 1, 1, 1, 1, 1, 1, ZoneOffset.UTC).toInstant()
 
+    val reasonCode = "any"
+
 
     @BeforeEach
     fun beforeEach(testInfo: TestInfo) {
@@ -98,8 +101,8 @@ class RelationOutputControllerIT @Autowired constructor(
         createOutputRelation(relationId4, SharableRelationType.IsManagedBy, bpnL5, bpnL6, relation4UpdateTime)
 
         val expected = PageDto(2, 1, 0, 2, listOf(
-            RelationOutputDto(relationId1, SharableRelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL2, GateTestValues.alwaysActiveRelationValidity, relation1UpdateTime),
-            RelationOutputDto(relationId4, SharableRelationType.IsManagedBy, bpnL5, bpnL6, GateTestValues.alwaysActiveRelationValidity, relation4UpdateTime)
+            buildExpectedOutputDto(relationId1, SharableRelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL2, GateTestValues.alwaysActiveRelationValidity, relation1UpdateTime),
+            buildExpectedOutputDto(relationId4, SharableRelationType.IsManagedBy, bpnL5, bpnL6, GateTestValues.alwaysActiveRelationValidity, relation4UpdateTime)
         ))
         val actual = gateClient.relationOutput.postSearch(RelationOutputSearchRequest(externalIds = listOf(relationId1, relationId4)))
 
@@ -129,16 +132,16 @@ class RelationOutputControllerIT @Autowired constructor(
         createOutputRelation(relationId4, SharableRelationType.IsManagedBy, bpnL5, bpnL6, relation4UpdateTime)
 
         val expectedAlternativeHeadquarterRelation = PageDto(3, 1, 0, 3, listOf(
-            RelationOutputDto(relationId1, SharableRelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL2, GateTestValues.alwaysActiveRelationValidity, relation1UpdateTime),
-            RelationOutputDto(relationId2, SharableRelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL3, GateTestValues.alwaysActiveRelationValidity, relation2UpdateTime),
-            RelationOutputDto(relationId3, SharableRelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL4, GateTestValues.alwaysActiveRelationValidity, relation3UpdateTime)
+            buildExpectedOutputDto(relationId1, SharableRelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL2, GateTestValues.alwaysActiveRelationValidity, relation1UpdateTime),
+            buildExpectedOutputDto(relationId2, SharableRelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL3, GateTestValues.alwaysActiveRelationValidity, relation2UpdateTime),
+            buildExpectedOutputDto(relationId3, SharableRelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL4, GateTestValues.alwaysActiveRelationValidity, relation3UpdateTime)
         ))
         val actualAlternativeHeadquarterRelation = gateClient.relationOutput.postSearch(RelationOutputSearchRequest(relationType = SharableRelationType.IsAlternativeHeadquarterFor))
 
         Assertions.assertThat(actualAlternativeHeadquarterRelation).isEqualTo(expectedAlternativeHeadquarterRelation)
 
         val expectedManagedRelation = PageDto(1, 1, 0, 1, listOf(
-            RelationOutputDto(relationId4, SharableRelationType.IsManagedBy, bpnL5, bpnL6, GateTestValues.alwaysActiveRelationValidity, relation4UpdateTime)
+            buildExpectedOutputDto(relationId4, SharableRelationType.IsManagedBy, bpnL5, bpnL6, GateTestValues.alwaysActiveRelationValidity, relation4UpdateTime)
         ))
 
         val actualManagedRelation = gateClient.relationOutput.postSearch(RelationOutputSearchRequest(relationType = SharableRelationType.IsManagedBy))
@@ -169,8 +172,8 @@ class RelationOutputControllerIT @Autowired constructor(
         createOutputRelation(relationId4, SharableRelationType.IsManagedBy, bpnL5, bpnL6, relation4UpdateTime)
 
         val expected = PageDto(2, 1, 0, 2, listOf(
-            RelationOutputDto(relationId1, SharableRelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL2, GateTestValues.alwaysActiveRelationValidity, relation1UpdateTime),
-            RelationOutputDto(relationId4, SharableRelationType.IsManagedBy, bpnL5, bpnL6, GateTestValues.alwaysActiveRelationValidity, relation4UpdateTime)
+            buildExpectedOutputDto(relationId1, SharableRelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL2, GateTestValues.alwaysActiveRelationValidity, relation1UpdateTime),
+            buildExpectedOutputDto(relationId4, SharableRelationType.IsManagedBy, bpnL5, bpnL6, GateTestValues.alwaysActiveRelationValidity, relation4UpdateTime)
         ))
         val actual = gateClient.relationOutput.postSearch(RelationOutputSearchRequest(sourceBpns = listOf(bpnL1, bpnL5)))
 
@@ -200,8 +203,8 @@ class RelationOutputControllerIT @Autowired constructor(
         createOutputRelation(relationId4, SharableRelationType.IsManagedBy, bpnL5, bpnL6, relation4UpdateTime)
 
         val expected = PageDto(2, 1, 0, 2, listOf(
-            RelationOutputDto(relationId1, SharableRelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL2, GateTestValues.alwaysActiveRelationValidity, relation1UpdateTime),
-            RelationOutputDto(relationId4, SharableRelationType.IsManagedBy, bpnL5, bpnL6, GateTestValues.alwaysActiveRelationValidity, relation4UpdateTime)
+            buildExpectedOutputDto(relationId1, SharableRelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL2, GateTestValues.alwaysActiveRelationValidity, relation1UpdateTime),
+            buildExpectedOutputDto(relationId4, SharableRelationType.IsManagedBy, bpnL5, bpnL6, GateTestValues.alwaysActiveRelationValidity, relation4UpdateTime)
         ))
         val actual = gateClient.relationOutput.postSearch(RelationOutputSearchRequest(targetBpns = listOf(bpnL2, bpnL6)))
 
@@ -231,8 +234,8 @@ class RelationOutputControllerIT @Autowired constructor(
         createOutputRelation(relationId4, SharableRelationType.IsManagedBy, bpnL5, bpnL6, relation4UpdateTime)
 
         val expected = PageDto(2, 1, 0, 2, listOf(
-            RelationOutputDto(relationId3, SharableRelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL4, GateTestValues.alwaysActiveRelationValidity, relation3UpdateTime),
-            RelationOutputDto(relationId4, SharableRelationType.IsManagedBy, bpnL5, bpnL6, GateTestValues.alwaysActiveRelationValidity, relation4UpdateTime)
+            buildExpectedOutputDto(relationId3, SharableRelationType.IsAlternativeHeadquarterFor, bpnL1, bpnL4, GateTestValues.alwaysActiveRelationValidity, relation3UpdateTime),
+            buildExpectedOutputDto(relationId4, SharableRelationType.IsManagedBy, bpnL5, bpnL6, GateTestValues.alwaysActiveRelationValidity, relation4UpdateTime)
         ))
         val actual = gateClient.relationOutput.postSearch(RelationOutputSearchRequest(updatedAtFrom = relation2UpdateTime))
 
@@ -274,7 +277,7 @@ class RelationOutputControllerIT @Autowired constructor(
         createOutputRelation(relationId6, SharableRelationType.IsManagedBy, bpnL11, bpnL12, relation6UpdateTime)
 
         val expectedAlternativeHeadquarterRelation = PageDto(1, 1, 0, 1, listOf(
-            RelationOutputDto(relationId2, SharableRelationType.IsAlternativeHeadquarterFor, bpnL3, bpnL4, GateTestValues.alwaysActiveRelationValidity, relation2UpdateTime)
+            buildExpectedOutputDto(relationId2, SharableRelationType.IsAlternativeHeadquarterFor, bpnL3, bpnL4, GateTestValues.alwaysActiveRelationValidity, relation2UpdateTime)
         ))
         val actualAlternativeHeadquarterRelation = gateClient.relationOutput.postSearch(RelationOutputSearchRequest(
             externalIds = listOf(relationId1, relationId2, relationId3),
@@ -287,8 +290,8 @@ class RelationOutputControllerIT @Autowired constructor(
         Assertions.assertThat(actualAlternativeHeadquarterRelation).isEqualTo(expectedAlternativeHeadquarterRelation)
 
         val expectedManagedRelation = PageDto(2, 1, 0, 2, listOf(
-            RelationOutputDto(relationId4, SharableRelationType.IsManagedBy, bpnL7, bpnL8, GateTestValues.alwaysActiveRelationValidity, relation4UpdateTime),
-            RelationOutputDto(relationId5, SharableRelationType.IsManagedBy, bpnL9, bpnL10, GateTestValues.alwaysActiveRelationValidity, relation5UpdateTime)
+            buildExpectedOutputDto(relationId4, SharableRelationType.IsManagedBy, bpnL7, bpnL8, GateTestValues.alwaysActiveRelationValidity, relation4UpdateTime),
+            buildExpectedOutputDto(relationId5, SharableRelationType.IsManagedBy, bpnL9, bpnL10, GateTestValues.alwaysActiveRelationValidity, relation5UpdateTime)
         ))
         val actualManagedRelation = gateClient.relationOutput.postSearch(RelationOutputSearchRequest(
             externalIds = listOf(relationId4, relationId5),
@@ -312,11 +315,31 @@ class RelationOutputControllerIT @Autowired constructor(
                         validFrom = it.validFrom,
                         validTo = it.validTo
                     )
-                }.toMutableList()
+                }.toMutableList(),
+            reasonCode = reasonCode
         )
         val successSharingState = RelationSharingStateDb(RelationSharingStateType.Success, null, null, anyTime, null, null, false)
         val relation = RelationDb(externalId, principalUtil.resolveTenantBpnl().value, successSharingState, output)
         relationRepository.save(relation)
+    }
+
+    private fun buildExpectedOutputDto(
+        relationId: String,
+        relationType: SharableRelationType,
+        sourceBpn: String,
+        targetBpn: String,
+        validityPeriods: List<RelationValidityPeriodDto>,
+        updateTime: Instant
+    ): RelationOutputDto{
+        return RelationOutputDto(
+            externalId = relationId,
+            relationType = relationType,
+            sourceBpn = sourceBpn,
+            targetBpn = targetBpn,
+            validityPeriods = validityPeriods,
+            reasonCode = reasonCode,
+            updatedAt = updateTime
+        )
     }
 
 }

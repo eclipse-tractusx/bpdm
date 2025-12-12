@@ -48,11 +48,6 @@ class RelationsGoldenRecordTaskControllerIT @Autowired constructor(
     private val orchestratorClient: OrchestrationApiClient,
     private val dbTestHelpers: DbTestHelpers,
 ) {
-    private val defaultRelations1 = BusinessPartnerRelations(relationType = RelationType.IsAlternativeHeadquarterFor, businessPartnerSourceBpn = "BPNL1", businessPartnerTargetBpn = "BPNL2", validityPeriods = OrchestratorTestValues.alwaysActiveRelationValidity)
-    private val defaultRelations2 = BusinessPartnerRelations(relationType = RelationType.IsManagedBy, businessPartnerSourceBpn = "BPNL3", businessPartnerTargetBpn = "BPNL4", validityPeriods = OrchestratorTestValues.alwaysActiveRelationValidity)
-    private val defaultRelations3 = BusinessPartnerRelations(relationType = RelationType.IsOwnedBy, businessPartnerSourceBpn = "BPNL4", businessPartnerTargetBpn = "BPNL5", validityPeriods = OrchestratorTestValues.alwaysActiveRelationValidity)
-
-
     @BeforeEach
     fun cleanUp() {
         dbTestHelpers.truncateDbTables()
@@ -64,7 +59,11 @@ class RelationsGoldenRecordTaskControllerIT @Autowired constructor(
         //Create records by creating tasks first for now and there is scope for improvement once bpdm-gate sync relations logic is in place
         val existingRecordIds = createTasksWithoutRecordId(taskMode).createdTasks.map { it.recordId }
 
-        val requestsWithRecords = listOf(defaultRelations1, defaultRelations2, defaultRelations3)
+        val requestsWithRecords = listOf(
+            OrchestratorTestValues.relationAltHeadquarter,
+            OrchestratorTestValues.relationIsOwnedBy,
+            OrchestratorTestValues.relationIsManagedBy
+        )
             .zip(existingRecordIds)
             .map { (bpr, recordId) -> TaskCreateRelationsRequestEntry(recordId, bpr) }
 
@@ -79,13 +78,23 @@ class RelationsGoldenRecordTaskControllerIT @Autowired constructor(
     @ParameterizedTest
     @EnumSource(TaskMode::class)
     fun `abort relations golden record task when outdated`(taskMode: TaskMode){
-        val createdTasks  = createTasks(mode = taskMode, entries = listOf(defaultRelations1, defaultRelations2).map { TaskCreateRelationsRequestEntry(null, it) }).createdTasks
+        val createdTasks  = createTasks(
+            mode = taskMode,
+            entries = listOf(
+                OrchestratorTestValues.relationAltHeadquarter,
+                OrchestratorTestValues.relationIsOwnedBy
+            ).map { TaskCreateRelationsRequestEntry(null, it) }
+        ).createdTasks
         val createdTaskIds = createdTasks.map { it.toTaskSearchIdentity() }
         val createdRecordIds = createdTasks.map { it.recordId }
 
         //Create newer tasks for the given records
         createTasks(mode = taskMode, entries = createdRecordIds
-            .zip(listOf(defaultRelations1, defaultRelations2, defaultRelations3))
+            .zip(listOf(
+                OrchestratorTestValues.relationAltHeadquarter,
+                OrchestratorTestValues.relationIsOwnedBy,
+                OrchestratorTestValues.relationIsManagedBy
+            ))
             .map { (recordId, bp) -> TaskCreateRelationsRequestEntry(recordId, bp) }
         ).createdTasks
 
@@ -95,12 +104,20 @@ class RelationsGoldenRecordTaskControllerIT @Autowired constructor(
     }
 
     private fun createTasksWithoutRecordId(mode: TaskMode, businessPartnersRelations: List<BusinessPartnerRelations>? = null): TaskCreateRelationsResponse =
-        createTasks(mode, (businessPartnersRelations ?: listOf(defaultRelations1, defaultRelations2, defaultRelations3)).map{ bpr -> TaskCreateRelationsRequestEntry(null, bpr) })
+        createTasks(mode, (businessPartnersRelations ?:  listOf(
+            OrchestratorTestValues.relationAltHeadquarter,
+            OrchestratorTestValues.relationIsOwnedBy,
+            OrchestratorTestValues.relationIsManagedBy
+        )).map{ bpr -> TaskCreateRelationsRequestEntry(null, bpr) })
 
     private fun createTasks(mode: TaskMode,
                             entries: List<TaskCreateRelationsRequestEntry>? = null
     ): TaskCreateRelationsResponse{
-        val resolvedEntries = entries ?: listOf(defaultRelations1, defaultRelations2, defaultRelations3).map { bpr -> TaskCreateRelationsRequestEntry(null, bpr) }
+        val resolvedEntries = entries ?:  listOf(
+            OrchestratorTestValues.relationAltHeadquarter,
+            OrchestratorTestValues.relationIsOwnedBy,
+            OrchestratorTestValues.relationIsManagedBy
+        ).map { bpr -> TaskCreateRelationsRequestEntry(null, bpr) }
         return orchestratorClient.relationsGoldenRecordTasks.createTasks(TaskCreateRelationsRequest(mode = mode, requests = resolvedEntries))
     }
 

@@ -33,5 +33,7 @@ data class RelationVerboseDto(
     @get:Schema(description = "BPN of partner to which this relation goes (the target)")
     val businessPartnerTargetBpnl: String,
 
-    val validityPeriods: Collection<RelationValidityPeriod>
+    val validityPeriods: Collection<RelationValidityPeriod>,
+
+    val reasonCode: String
 )

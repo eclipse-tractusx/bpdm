@@ -80,7 +80,8 @@ class TaskRelationsStepBuildDispatcherServiceIT @Autowired constructor(
                     validFrom = LocalDate.parse("1970-01-01"),
                     validTo = LocalDate.parse("9999-12-31")
                 )
-            )
+            ),
+            reasonCode = testDataEnvironment.metadata.reasonCodes.first().technicalKey
         )
 
         val result = upsertBusinessPartnerRelations(taskId = "TASK_1", businessPartnerRelations = createLegalEntityRelationsRequest)
@@ -105,7 +106,8 @@ class TaskRelationsStepBuildDispatcherServiceIT @Autowired constructor(
                     validFrom = LocalDate.parse("1970-01-01"),
                     validTo = LocalDate.parse("9999-12-31")
                 )
-            )
+            ),
+            reasonCode = testDataEnvironment.metadata.reasonCodes.first().technicalKey
         )
 
         val result = upsertBusinessPartnerRelations(taskId = "TASK_1", businessPartnerRelations = createAddressRelationsRequest)

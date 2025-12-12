@@ -19,7 +19,12 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.model
 
+import io.swagger.v3.oas.annotations.media.Schema
+
+@Schema(description = "Describes a reason for a business partner relation to exist")
 data class ReasonCodeDto(
+    @Schema(description = "The technical key with which to uniquely identity this reason")
     val technicalKey: String,
+    @Schema(description = "Detailed description of the reason")
     val description: String
 )

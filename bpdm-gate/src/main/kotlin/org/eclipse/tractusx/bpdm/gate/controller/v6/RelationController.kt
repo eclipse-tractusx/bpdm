@@ -69,7 +69,8 @@ class RelationController(
             externalId = requestBody.externalId,
             relationType = requestBody.relationType,
             sourceBusinessPartnerExternalId = requestBody.businessPartnerSourceExternalId,
-            targetBusinessPartnerExternalId = requestBody.businessPartnerTargetExternalId
+            targetBusinessPartnerExternalId = requestBody.businessPartnerTargetExternalId,
+            reasonCode = ""
         ).toV6Dto()
 
     }
@@ -86,7 +87,8 @@ class RelationController(
                     externalId = requestBody.externalId,
                     relationType = requestBody.relationType,
                     businessPartnerSourceExternalId = requestBody.businessPartnerSourceExternalId,
-                    businessPartnerTargetExternalId = requestBody.businessPartnerTargetExternalId
+                    businessPartnerTargetExternalId = requestBody.businessPartnerTargetExternalId,
+                    reasonCode = ""
                 ))
             ).single()
         } else {
@@ -96,7 +98,8 @@ class RelationController(
                     externalId = requestBody.externalId,
                     relationType = requestBody.relationType,
                     businessPartnerSourceExternalId = requestBody.businessPartnerSourceExternalId,
-                    businessPartnerTargetExternalId = requestBody.businessPartnerTargetExternalId
+                    businessPartnerTargetExternalId = requestBody.businessPartnerTargetExternalId,
+                    reasonCode = ""
                 ))
             ).single()
         }

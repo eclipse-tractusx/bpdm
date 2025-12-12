@@ -101,13 +101,22 @@ class RelationService(
         externalId: String?,
         relationType: RelationType,
         sourceBusinessPartnerExternalId: String,
-        targetBusinessPartnerExternalId: String
+        targetBusinessPartnerExternalId: String,
+        reasonCode: String
     ): RelationDto {
         if (externalId != null) {
             val existingRelationship = relationRepository.findByTenantBpnLAndExternalId(tenantBpnL.value, externalId)
             if (existingRelationship != null) throw BpdmRelationAlreadyExistsException(externalId)
         }
-        return toDto(createInputStage(tenantBpnL, externalId, relationType, sourceBusinessPartnerExternalId, targetBusinessPartnerExternalId, mutableListOf()))
+        return toDto(createInputStage(
+            tenantBpnL = tenantBpnL,
+            externalId = externalId,
+            relationType = relationType,
+            sourceBusinessPartnerExternalId = sourceBusinessPartnerExternalId,
+            targetBusinessPartnerExternalId = targetBusinessPartnerExternalId,
+            validityPeriods = mutableListOf(),
+            reasonCode = reasonCode
+        ))
     }
 
     @Transactional
@@ -128,7 +137,8 @@ class RelationService(
                         relationType = relationType,
                         sourceBusinessPartnerExternalId = businessPartnerSourceExternalId,
                         targetBusinessPartnerExternalId = businessPartnerTargetExternalId,
-                        validityPeriods = validityPeriods
+                        validityPeriods = validityPeriods,
+                        reasonCode = reasonCode
                     )
                 }
             }
@@ -144,7 +154,8 @@ class RelationService(
                         relationType = relationType,
                         sourceBusinessPartnerExternalId = businessPartnerSourceExternalId,
                         targetBusinessPartnerExternalId = businessPartnerTargetExternalId,
-                        validityPeriods = validityPeriods
+                        validityPeriods = validityPeriods,
+                        reasonCode = reasonCode
                     )
                 }
             }.map(::toDto)
@@ -152,7 +163,14 @@ class RelationService(
 
     @Transactional
     override fun upsertOutputRelations(relations: List<IRelationService.RelationUpsertRequest>): List<RelationDb> {
-        return relations.map { upsertOutput(it.relation, it.relationType, it.businessPartnerSourceExternalId, it.businessPartnerTargetExternalId, it.validityPeriods) }
+        return relations.map { upsertOutput(
+            it.relation,
+            it.relationType,
+            it.businessPartnerSourceExternalId,
+            it.businessPartnerTargetExternalId,
+            it.validityPeriods,
+            it.reasonCode
+        ) }
     }
 
     private fun upsertInputStage(
@@ -161,13 +179,14 @@ class RelationService(
         relationType: RelationType,
         sourceBusinessPartnerExternalId: String,
         targetBusinessPartnerExternalId: String,
-        validityPeriods: List<RelationValidityPeriodDto>
+        validityPeriods: List<RelationValidityPeriodDto>,
+        reasonCode: String
     ): RelationDto {
         val existingRelationship = relationRepository.findByTenantBpnLAndExternalId(tenantBpnL.value, externalId)
         val upsertedRelationStage = if(existingRelationship == null)
-            createInputStage(tenantBpnL, externalId, relationType, sourceBusinessPartnerExternalId, targetBusinessPartnerExternalId, validityPeriods)
+            createInputStage(tenantBpnL, externalId, relationType, sourceBusinessPartnerExternalId, targetBusinessPartnerExternalId, validityPeriods, reasonCode)
         else
-            updateInputStage(existingRelationship, relationType, sourceBusinessPartnerExternalId, targetBusinessPartnerExternalId, validityPeriods)
+            updateInputStage(existingRelationship, relationType, sourceBusinessPartnerExternalId, targetBusinessPartnerExternalId, validityPeriods, reasonCode)
 
         return toDto(upsertedRelationStage)
     }
@@ -177,7 +196,8 @@ class RelationService(
         relationType: SharableRelationType,
         sourceBpnL: String,
         targetBpnL: String,
-        validityPeriods: Collection<RelationValidityPeriodDto>
+        validityPeriods: Collection<RelationValidityPeriodDto>,
+        reasonCode: String
     ): RelationDb{
         if(sourceBpnL == targetBpnL)
             throw BpdmInvalidRelationException("Source and target should not be the same")
@@ -191,7 +211,8 @@ class RelationService(
             sourceBpn = sourceBpnL,
             targetBpn = targetBpnL,
             updatedAt = Instant.now(),
-            validityPeriods = validityPeriods.map { RelationValidityPeriodDb(validFrom = it.validFrom, validTo = it.validTo) }.toMutableList()
+            validityPeriods = validityPeriods.map { RelationValidityPeriodDb(validFrom = it.validFrom, validTo = it.validTo) }.toMutableList(),
+            reasonCode =  reasonCode
         )
         relationSharingStateService.setSuccess(relation)
 
@@ -205,7 +226,8 @@ class RelationService(
         relationType: RelationType,
         sourceBusinessPartnerExternalId: String,
         targetBusinessPartnerExternalId: String,
-        validityPeriods: List<RelationValidityPeriodDto>
+        validityPeriods: List<RelationValidityPeriodDto>,
+        reasonCode: String
     ): RelationStageDb{
         if(sourceBusinessPartnerExternalId == targetBusinessPartnerExternalId)
             throw BpdmInvalidRelationException("Source and target '$sourceBusinessPartnerExternalId' should not be equal.")
@@ -231,7 +253,8 @@ class RelationService(
             stage = StageType.Input,
             source = source,
             target = target,
-            validityPeriods = validityPeriods.map { RelationValidityPeriodDb(validFrom = it.validFrom, validTo = it.validTo) }.toMutableList()
+            validityPeriods = validityPeriods.map { RelationValidityPeriodDb(validFrom = it.validFrom, validTo = it.validTo) }.toMutableList(),
+            reasonCode = reasonCode
         )
 
         relationStageRepository.save(relationStage)
@@ -246,10 +269,18 @@ class RelationService(
         relationType: RelationType,
         sourceBusinessPartnerExternalId: String,
         targetBusinessPartnerExternalId: String,
-        validityPeriods: List<RelationValidityPeriodDto>
+        validityPeriods: List<RelationValidityPeriodDto>,
+        reasonCode: String
     ): RelationStageDb{
         val existingRelationship = relationRepository.findByTenantBpnLAndExternalId(tenantBpnL.value, externalId) ?: throw BpdmMissingRelationException(externalId)
-        return updateInputStage(existingRelationship, relationType, sourceBusinessPartnerExternalId, targetBusinessPartnerExternalId, validityPeriods)
+        return updateInputStage(
+            relation = existingRelationship,
+            relationType = relationType,
+            sourceBusinessPartnerExternalId = sourceBusinessPartnerExternalId,
+            targetBusinessPartnerExternalId = targetBusinessPartnerExternalId,
+            validityPeriods = validityPeriods,
+            reasonCode = reasonCode
+        )
     }
 
     private fun updateInputStage(
@@ -257,7 +288,8 @@ class RelationService(
         relationType: RelationType,
         sourceBusinessPartnerExternalId: String,
         targetBusinessPartnerExternalId: String,
-        validityPeriods: List<RelationValidityPeriodDto>
+        validityPeriods: List<RelationValidityPeriodDto>,
+        reasonCode: String
     ): RelationStageDb{
         if(sourceBusinessPartnerExternalId == targetBusinessPartnerExternalId)
             throw BpdmInvalidRelationException("Source and target '$sourceBusinessPartnerExternalId' should not be equal.")
@@ -273,8 +305,8 @@ class RelationService(
 
         val proposedValidityPeriods = validityPeriods.map { RelationValidityPeriodDb(validFrom = it.validFrom, validTo = it.validTo) }.toMutableList()
 
-        val newValues = RelationUpdateComparison(relationType, source, target, proposedValidityPeriods)
-        val oldValues = RelationUpdateComparison(existingStage.relationType, existingStage.source, existingStage.target, existingStage.validityPeriods)
+        val newValues = RelationUpdateComparison(relationType, source, target, proposedValidityPeriods, reasonCode)
+        val oldValues = RelationUpdateComparison(existingStage.relationType, existingStage.source, existingStage.target, existingStage.validityPeriods, existingStage.reasonCode)
         val hasChanges = newValues != oldValues
         val isInErrorState = relation.sharingState?.sharingStateType == RelationSharingStateType.Error
 
@@ -283,7 +315,9 @@ class RelationService(
             existingStage.source = source
             existingStage.target = target
             existingStage.validityPeriods = proposedValidityPeriods
+            existingStage.reasonCode = reasonCode
             existingStage.updatedAt = Instant.now()
+
 
             relationStageRepository.save(existingStage)
             changelogRepository.save(ChangelogEntryDb(relation.externalId, relation.tenantBpnL, ChangelogType.UPDATE, StageType.Input, GoldenRecordType.Relation))
@@ -305,7 +339,8 @@ class RelationService(
             businessPartnerTargetExternalId = entity.target.externalId,
             validityPeriods = entity.validityPeriods.map { it.toDto() },
             updatedAt = entity.updatedAt,
-            createdAt = entity.createdAt
+            createdAt = entity.createdAt,
+            reasonCode = entity.reasonCode
         )
     }
 
@@ -323,7 +358,8 @@ class RelationService(
             sourceBpn = entity.output!!.sourceBpn,
             targetBpn = entity.output!!.targetBpn,
             validityPeriods = entity.output!!.validityPeriods.map { it.toDto() },
-            updatedAt = entity.output!!.updatedAt
+            updatedAt = entity.output!!.updatedAt,
+            reasonCode = entity.output!!.reasonCode
         )
     }
 
@@ -331,7 +367,8 @@ class RelationService(
         val relationType: RelationType,
         val source: SharingStateDb,
         val target: SharingStateDb,
-        val validityPeriods: MutableList<RelationValidityPeriodDb>
+        val validityPeriods: MutableList<RelationValidityPeriodDb>,
+        val reasonCode: String
     )
 
     private fun validateValidityPeriods(validityPeriods: Collection<RelationValidityPeriodDto>) {
