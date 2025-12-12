@@ -44,11 +44,12 @@ class OwnedByRelationUpsertService(
 
         val result = relationUpsertService.upsertRelation(
             RelationUpsertService.UpsertRequest(
-                proposedSource,
-                proposedTarget,
-                LegalEntityRelationType.IsOwnedBy,
-                upsertRequest.validityPeriods,
-                upsertRequest.existingRelation
+                source = proposedSource,
+                target = proposedTarget,
+                legalEntityRelationType = LegalEntityRelationType.IsOwnedBy,
+                validityPeriods = upsertRequest.validityPeriods,
+                existingRelation = upsertRequest.existingRelation,
+                reasonCode = upsertRequest.reasonCode,
             )
         )
 

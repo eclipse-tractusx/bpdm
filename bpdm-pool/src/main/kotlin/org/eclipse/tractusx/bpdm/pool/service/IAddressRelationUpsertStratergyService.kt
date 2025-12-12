@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.service
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.entity.AddressRelationDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
+import org.eclipse.tractusx.bpdm.pool.entity.ReasonCodeDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
 
 interface IAddressRelationUpsertStratergyService {
@@ -31,6 +32,7 @@ interface IAddressRelationUpsertStratergyService {
     data class UpsertRequest(
         val source: LogisticAddressDb,
         val target: LogisticAddressDb,
-        val validityPeriods: Collection<RelationValidityPeriodDb>
+        val validityPeriods: Collection<RelationValidityPeriodDb>,
+        val reasonCode: ReasonCodeDb
     )
 }

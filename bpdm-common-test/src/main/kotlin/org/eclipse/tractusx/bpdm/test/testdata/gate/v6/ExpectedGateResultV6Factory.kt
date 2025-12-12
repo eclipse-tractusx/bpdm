@@ -26,9 +26,9 @@ import org.eclipse.tractusx.bpdm.gate.api.model.ConfidenceCriteriaDto
 import org.eclipse.tractusx.bpdm.gate.api.model.PhysicalPostalAddressDto
 import org.eclipse.tractusx.bpdm.gate.api.model.StreetDto
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPostRequest
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPutEntryV6
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.*
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.RelationDto
 import org.eclipse.tractusx.bpdm.pool.api.model.*
@@ -76,7 +76,7 @@ class ExpectedGateResultV6Factory {
         )
     }
 
-    fun buildRelationDto(putRequest: RelationPutEntry): RelationDto{
+    fun buildRelationDto(putRequest: RelationPutEntryV6): RelationDto{
         return RelationDto(
             externalId = putRequest.externalId,
             relationType = putRequest.relationType,

@@ -24,13 +24,13 @@ import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
-import org.eclipse.tractusx.bpdm.gate.api.model.AlternativePostalAddressDto
-import org.eclipse.tractusx.bpdm.gate.api.model.PhysicalPostalAddressDto
-import org.eclipse.tractusx.bpdm.gate.api.model.StreetDto
+import org.eclipse.tractusx.bpdm.gate.api.model.*
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
 import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressRepresentationInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityRepresentationInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteRepresentationInputDto
+import java.time.LocalDate
 import kotlin.random.Random
 
 class GateInputFactory(
@@ -43,6 +43,27 @@ class GateInputFactory(
 
     fun createFullValid(seed: String, externalId: String = seed, withTestRunContext: Boolean = true): BusinessPartnerInputRequest {
         return SeededTestDataCreator(seed).createAllFieldsFilled().copy(externalId = testRunData?.toExternalId(externalId)?.takeIf { withTestRunContext } ?: externalId)
+    }
+
+    fun buildRelation(
+        externalId: String,
+        relationType: RelationType,
+        businessPartnerSourceExternalId: String,
+        businessPartnerTargetExternalId: String,
+        seed: String = externalId,
+    ): RelationPutEntry{
+        val longSeed = seed.hashCode().toLong()
+        val random = Random(longSeed)
+
+        return RelationPutEntry(
+            externalId = externalId,
+            relationType = relationType,
+            businessPartnerSourceExternalId = businessPartnerSourceExternalId,
+            businessPartnerTargetExternalId = businessPartnerTargetExternalId,
+            reasonCode = testMetadata.reasonCodes.random(random),
+            validityPeriods = listOf(
+                RelationValidityPeriodDto(LocalDate.of(1970, 1, 1), LocalDate.of(9999, 12, 31)))
+        )
     }
 
     inner class SeededTestDataCreator(
@@ -135,7 +156,8 @@ data class InputTestData(
 data class TestMetadata(
     val identifierTypes: List<String>,
     val legalForms: List<String>,
-    val adminAreas: List<String>
+    val adminAreas: List<String>,
+    val reasonCodes: List<String>
 )
 
 fun BusinessPartnerInputRequest.withoutAnyBpn() = withoutLegalEntityBpn().withoutSiteBpn().withoutAddressBpn()

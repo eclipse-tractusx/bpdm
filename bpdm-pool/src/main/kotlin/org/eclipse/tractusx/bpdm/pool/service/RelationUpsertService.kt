@@ -26,6 +26,7 @@ import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
+import org.eclipse.tractusx.bpdm.pool.entity.ReasonCodeDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
@@ -82,6 +83,7 @@ class RelationUpsertService(
             startNode = source,
             endNode = target,
             validityPeriods = validityPeriods,
+            reasonCode = upsertRequest.reasonCode
         )
 
         relationRepository.save(newRelation)
@@ -126,7 +128,8 @@ class RelationUpsertService(
         val target: LegalEntityDb,
         val legalEntityRelationType: LegalEntityRelationType,
         val validityPeriods: Collection<RelationValidityPeriodDb>,
-        val existingRelation: RelationDb?
+        val existingRelation: RelationDb?,
+        val reasonCode: ReasonCodeDb
     )
 
     data class TimePeriod(

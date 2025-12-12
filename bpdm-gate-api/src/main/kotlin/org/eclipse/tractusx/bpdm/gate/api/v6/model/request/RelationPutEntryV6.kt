@@ -17,29 +17,24 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.api.model
+package org.eclipse.tractusx.bpdm.gate.api.v6.model.request
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.RelationDescription
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.RelationValidityPeriodDescription
-import java.time.Instant
+import org.eclipse.tractusx.bpdm.gate.api.model.IRelationDto
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationValidityPeriodDto
 
-@Schema(description = RelationDescription.header)
-data class RelationDto(
-    @get:Schema(description = RelationDescription.externalId)
+@Schema(description = "A request to update the content of the given business partner relation")
+data class RelationPutEntryV6(
+    @Schema(description = "The external identifier of the business partner relation to update")
     override val externalId: String,
-    @get:Schema(description = RelationDescription.relationType)
+    @Schema(description = "The type the relation should be")
     override val relationType: RelationType,
-    @get:Schema(description = RelationDescription.source)
+    @Schema(description = "The external identifier of the business partner from which the relation should emerge (the source)")
     override val businessPartnerSourceExternalId: String,
-    @get:Schema(description = RelationDescription.target)
+    @Schema(description = "The external identifier of the business partner to which the relation should point (the target)")
     override val businessPartnerTargetExternalId: String,
     @Schema(description = RelationValidityPeriodDescription.header)
-    val validityPeriods: Collection<RelationValidityPeriodDto>,
-    @get:Schema(description = RelationDescription.reasonCode)
-    val reasonCode: String,
-    @get:Schema(description = RelationDescription.updatedAt)
-    val updatedAt: Instant,
-    @get:Schema(description = RelationDescription.createdAt)
-    val createdAt: Instant,
+    val validityPeriods: List<RelationValidityPeriodDto> = listOf(),
 ): IRelationDto

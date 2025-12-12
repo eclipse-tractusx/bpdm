@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.config
 
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
+import org.eclipse.tractusx.bpdm.pool.api.model.ReasonCodeDto
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolDataHelper
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -33,7 +34,11 @@ class TestdataConfig {
      */
     @Bean
     fun poolDataHelper(poolClient: PoolApiClient): PoolDataHelper {
-        return PoolDataHelper(poolClient)
+        return PoolDataHelper(poolClient, listOf(
+            ReasonCodeDto("REASON_CODE_1", "Description 1"),
+            ReasonCodeDto("REASON_CODE_2", "Description 2"),
+            ReasonCodeDto("REASON_CODE_3", "Description 3")
+        ))
     }
 
 }

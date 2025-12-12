@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.v6.relation
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
-import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPutEntryV6
 import org.eclipse.tractusx.bpdm.gate.v6.GateUnscheduledInitialStartV6Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
@@ -43,7 +43,7 @@ class RelationUpsertV6IT: GateUnscheduledInitialStartV6Test() {
         val targetInput = testDataClient.createBusinessPartnerInput("$testName 2")
 
         //WHEN
-        val request = RelationPutEntry(testName, relationType, sourceInput.externalId, targetInput.externalId)
+        val request = RelationPutEntryV6(testName, relationType, sourceInput.externalId, targetInput.externalId)
         val response = gateClient.relations.put(true, request)
 
         //THEN
@@ -67,7 +67,7 @@ class RelationUpsertV6IT: GateUnscheduledInitialStartV6Test() {
         val newTargetInput = testDataClient.createBusinessPartnerInput("$testName 4")
 
         //WHEN
-        val payload = RelationPutEntry(givenRelation.externalId, relationType.toNewType(), newSourceInput.externalId, newTargetInput.externalId)
+        val payload = RelationPutEntryV6(givenRelation.externalId, relationType.toNewType(), newSourceInput.externalId, newTargetInput.externalId)
         val response = gateClient.relations.put(false, payload)
 
         //THEN
@@ -91,7 +91,7 @@ class RelationUpsertV6IT: GateUnscheduledInitialStartV6Test() {
         val newTargetInput = testDataClient.createBusinessPartnerInput("$testName 4")
 
         //WHEN
-        val payload = RelationPutEntry(givenRelation.externalId, relationType.toNewType(), newSourceInput.externalId, newTargetInput.externalId)
+        val payload = RelationPutEntryV6(givenRelation.externalId, relationType.toNewType(), newSourceInput.externalId, newTargetInput.externalId)
         gateClient.relations.put(false, payload)
 
         //THEN
@@ -115,7 +115,7 @@ class RelationUpsertV6IT: GateUnscheduledInitialStartV6Test() {
         val newTargetInput = testDataClient.createBusinessPartnerInput("$testName 4")
 
         //WHEN
-        val payload = RelationPutEntry(givenRelation.externalId, relationType.toNewType(), "NOT EXISTING", newTargetInput.externalId)
+        val payload = RelationPutEntryV6(givenRelation.externalId, relationType.toNewType(), "NOT EXISTING", newTargetInput.externalId)
         val request: () -> Unit = { gateClient.relations.put(false, payload) }
 
         //THEN
@@ -136,7 +136,7 @@ class RelationUpsertV6IT: GateUnscheduledInitialStartV6Test() {
         val newSourceInput = testDataClient.createBusinessPartnerInput("$testName 4")
 
         //WHEN
-        val payload = RelationPutEntry(givenRelation.externalId, relationType.toNewType(), newSourceInput.externalId, "NOT EXISTING")
+        val payload = RelationPutEntryV6(givenRelation.externalId, relationType.toNewType(), newSourceInput.externalId, "NOT EXISTING")
         val request: () -> Unit = { gateClient.relations.put(false, payload) }
 
         //THEN
@@ -156,7 +156,7 @@ class RelationUpsertV6IT: GateUnscheduledInitialStartV6Test() {
         val targetInput = testDataClient.createBusinessPartnerInput("$testName 2")
 
         //WHEN
-        val payload = RelationPutEntry(testName, relationType, sourceInput.externalId, targetInput.externalId)
+        val payload = RelationPutEntryV6(testName, relationType, sourceInput.externalId, targetInput.externalId)
         val request: () -> Unit = { gateClient.relations.put(false, payload) }
 
         //THEN

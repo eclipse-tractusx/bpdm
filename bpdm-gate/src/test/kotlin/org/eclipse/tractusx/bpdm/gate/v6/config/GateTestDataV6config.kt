@@ -65,7 +65,8 @@ class GateTestDataV6config {
             CountrySubdivisionDto(CountryCode.DE, "adminArea1", "adminArea1"),
             CountrySubdivisionDto(CountryCode.US, "adminArea2", "adminArea2"),
             CountrySubdivisionDto(CountryCode.CN, "adminArea3", "adminArea3"),
-        )
+        ),
+        reasonCodes = emptyList()
     )
 
 
@@ -76,7 +77,8 @@ class GateTestDataV6config {
                 testMetadata = TestMetadata(
                     identifierTypes = poolTestMetadata.legalEntityIdentifierTypes.map { it.technicalKey },
                     legalForms = poolTestMetadata.legalForms.map { it.technicalKey },
-                    adminAreas = poolTestMetadata.adminAreas.map { it.code }
+                    adminAreas = poolTestMetadata.adminAreas.map { it.code },
+                    reasonCodes = emptyList(),
                 ),
                 testRunData = null
             ),

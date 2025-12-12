@@ -48,26 +48,6 @@ class RelationsGoldenRecordTaskEventControllerIT @Autowired constructor(
     private val dbTestHelpers: DbTestHelpers,
     private val stateMachineConfigProperties: StateMachineConfigProperties
 ) {
-    private val defaultRelations1 = BusinessPartnerRelations(
-        relationType = RelationType.IsAlternativeHeadquarterFor,
-        businessPartnerSourceBpn = "BPNL1",
-        businessPartnerTargetBpn = "BPNL2",
-        validityPeriods = OrchestratorTestValues.alwaysActiveRelationValidity
-    )
-    private val defaultRelations2 = BusinessPartnerRelations(
-        relationType = RelationType.IsManagedBy,
-        businessPartnerSourceBpn = "BPNL3",
-        businessPartnerTargetBpn = "BPNL4",
-        validityPeriods = OrchestratorTestValues.alwaysActiveRelationValidity
-    )
-
-    private val defaultRelations3 = BusinessPartnerRelations(
-        relationType = RelationType.IsOwnedBy,
-        businessPartnerSourceBpn = "BPNL5",
-        businessPartnerTargetBpn = "BPNL6",
-        validityPeriods = OrchestratorTestValues.alwaysActiveRelationValidity
-    )
-
     @BeforeEach
     fun cleanUp() {
         dbTestHelpers.truncateDbTables()
@@ -97,9 +77,9 @@ class RelationsGoldenRecordTaskEventControllerIT @Autowired constructor(
             TaskCreateRelationsRequest(
                 taskMode,
                 listOf(
-                    TaskCreateRelationsRequestEntry(null, defaultRelations1),
-                    TaskCreateRelationsRequestEntry(null, defaultRelations2),
-                    TaskCreateRelationsRequestEntry(null, defaultRelations3),
+                    TaskCreateRelationsRequestEntry(null, OrchestratorTestValues.relationAltHeadquarter),
+                    TaskCreateRelationsRequestEntry(null, OrchestratorTestValues.relationIsManagedBy),
+                    TaskCreateRelationsRequestEntry(null, OrchestratorTestValues.relationIsManagedBy),
                 )
             )
         ).createdTasks
@@ -200,7 +180,7 @@ class RelationsGoldenRecordTaskEventControllerIT @Autowired constructor(
         val createdTasks = orchestratorClient.relationsGoldenRecordTasks.createTasks(
             TaskCreateRelationsRequest(
                 taskMode,
-                (1..count).map { TaskCreateRelationsRequestEntry(null, defaultRelations1) })
+                (1..count).map { TaskCreateRelationsRequestEntry(null, OrchestratorTestValues.relationAltHeadquarter) })
         ).createdTasks
 
         val allSteps = stateMachineConfigProperties.modeSteps[taskMode]!!
