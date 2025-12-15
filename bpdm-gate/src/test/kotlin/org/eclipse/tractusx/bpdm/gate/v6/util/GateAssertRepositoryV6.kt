@@ -22,6 +22,8 @@ package org.eclipse.tractusx.bpdm.gate.v6.util
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogDto
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.BusinessPartnerOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.SharingStateDto
 import org.eclipse.tractusx.bpdm.test.util.InstantSecondsComparator
@@ -82,6 +84,22 @@ class GateAssertRepositoryV6 {
             .usingRecursiveComparison()
             .ignoringFields(SharingStateDto::sharingProcessStarted.name)
             .isEqualTo(expected)
+    }
+
+    fun assertChangelog(actual: PageChangeLogDto<ChangelogGateDto>, expected: PageChangeLogDto<ChangelogGateDto>){
+        Assertions.assertThat(actual)
+            .usingRecursiveComparison()
+            .ignoringFields(
+                PageDto<*>::content.name
+            )
+            .isEqualTo(expected)
+
+        Assertions.assertThat(actual.content)
+            .usingRecursiveComparison()
+            .ignoringFields(
+                ChangelogGateDto::timestamp.name
+            )
+            .isEqualTo(expected.content)
     }
 
     private fun assertPageHeader(actual: PageDto<*>, expected: PageDto<*>){

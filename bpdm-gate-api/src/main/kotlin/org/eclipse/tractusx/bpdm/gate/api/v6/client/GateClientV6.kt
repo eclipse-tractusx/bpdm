@@ -25,4 +25,6 @@ interface GateClientV6 {
 
     val sharingStates: SharingStateApiClientV6
 
+    val changelog: ChangelogApiClientV6
+
 }
