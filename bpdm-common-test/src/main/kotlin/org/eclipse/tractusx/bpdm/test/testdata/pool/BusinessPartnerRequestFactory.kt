@@ -60,6 +60,8 @@ class BusinessPartnerRequestFactory(
         )
     }
 
+
+
     fun createLegalEntityUpdateRequest(seed: String, bpnl: String): LegalEntityPartnerUpdateRequest {
         val longSeed = seed.hashCode().toLong()
         val random = Random(longSeed)

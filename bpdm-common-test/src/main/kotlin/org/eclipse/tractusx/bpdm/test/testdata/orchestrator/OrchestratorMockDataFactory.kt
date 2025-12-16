@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.test.testdata.orchestrator
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.client.WireMock
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
 import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockContextInitializer
@@ -37,6 +38,61 @@ class OrchestratorMockDataFactory(
 
     private val orchestratorMockServer = OrchestratorMockContextInitializer.wiremockServer
 
+    fun mockRefineToLegalEntity(
+        seed: String,
+        legalEntityGoldenRecord: LegalEntityWithLegalAddressVerboseDto,
+        owningCompany: String?,
+        nameParts: List<String>
+    ): TaskClientStateDto{
+        configureWireMock()
+
+        val mockedCreatedTask = mockCreateTask(seed)
+
+        val refinementTaskData = refinementTestDataFactory.buildLegalEntityBusinessPartner(legalEntityGoldenRecord, owningCompany, nameParts)
+        val mockedRefinedTask = mockTaskRefinedSuccessfully(mockedCreatedTask.taskId, refinementTaskData, seed)
+
+        return mockedRefinedTask
+    }
+
+    fun mockRefineToLegalEntityOnSite(
+        seed: String,
+        legalEntityGoldenRecord: LegalEntityWithLegalAddressVerboseDto,
+        siteGoldenRecord: SiteVerboseDto,
+        owningCompany: String?,
+        nameParts: List<String>
+    ): TaskClientStateDto{
+        configureWireMock()
+
+        val mockedCreatedTask = mockCreateTask(seed)
+
+        val refinementTaskData = refinementTestDataFactory.buildLegalEntityOnSiteBusinessPartner(
+            legalEntityGoldenRecord,
+            siteGoldenRecord,
+            owningCompany,
+            nameParts
+        )
+        val mockedRefinedTask = mockTaskRefinedSuccessfully(mockedCreatedTask.taskId, refinementTaskData, seed)
+
+        return mockedRefinedTask
+    }
+
+    fun mockRefineToSite(
+        seed: String,
+        legalEntityGoldenRecord: LegalEntityWithLegalAddressVerboseDto,
+        siteGoldenRecord: SiteWithMainAddressVerboseDto,
+        owningCompany: String?,
+        nameParts: List<String>
+    ): TaskClientStateDto{
+        configureWireMock()
+
+        val mockedCreatedTask = mockCreateTask(seed)
+
+        val refinementTaskData = refinementTestDataFactory.buildSiteBusinessPartner(legalEntityGoldenRecord, siteGoldenRecord, owningCompany, nameParts)
+        val mockedRefinedTask = mockTaskRefinedSuccessfully(mockedCreatedTask.taskId, refinementTaskData, seed)
+
+        return mockedRefinedTask
+    }
+
     fun mockRefineToAdditionalAddressOfSite(
         seed: String,
         legalEntityGoldenRecord: LegalEntityWithLegalAddressVerboseDto,
@@ -45,12 +101,12 @@ class OrchestratorMockDataFactory(
         owningCompany: String?,
         nameParts: List<String>
     ): TaskClientStateDto{
-        WireMock.configureFor("localhost", orchestratorMockServer.port())
+        configureWireMock()
 
         val mockedCreatedTask = mockCreateTask(seed)
 
-        val refinementTaskData = refinementTestDataFactory.buildBusinessPartner(legalEntityGoldenRecord, siteGoldenRecord, addressGoldenRecord, owningCompany, nameParts)
-        val mockedRefinedTask = mockRefinedToAdditionalAddressOfSite(mockedCreatedTask.taskId, refinementTaskData, seed)
+        val refinementTaskData = refinementTestDataFactory.buildAdditionSiteAddressBusinessPartner(legalEntityGoldenRecord, siteGoldenRecord, addressGoldenRecord, owningCompany, nameParts)
+        val mockedRefinedTask = mockTaskRefinedSuccessfully(mockedCreatedTask.taskId, refinementTaskData, seed)
 
         return mockedRefinedTask
     }
@@ -69,7 +125,7 @@ class OrchestratorMockDataFactory(
         return mockedCreatedTask
     }
 
-    fun mockRefinedToAdditionalAddressOfSite(taskId: String, refinementTaskData: BusinessPartner, seed: String): TaskClientStateDto{
+    fun mockTaskRefinedSuccessfully(taskId: String, refinementTaskData: BusinessPartner, seed: String): TaskClientStateDto{
         WireMock.configureFor("localhost", orchestratorMockServer.port())
 
         WireMock.stubFor(WireMock.get(WireMock.urlPathEqualTo("${BASE_PATH_V7_BUSINESS_PARTNERS}/finished-events")).willReturn(WireMock.okJson(
@@ -170,6 +226,11 @@ class OrchestratorMockDataFactory(
                 )
             )
         )
+    }
+
+    private fun configureWireMock(){
+        WireMock.configureFor("localhost", orchestratorMockServer.port())
+        WireMock.reset()
     }
 
 }

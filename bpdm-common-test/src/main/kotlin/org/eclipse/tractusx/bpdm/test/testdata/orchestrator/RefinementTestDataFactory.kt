@@ -28,7 +28,68 @@ import java.time.ZoneOffset
 
 class RefinementTestDataFactory {
 
-    fun buildBusinessPartner(
+    fun buildLegalEntityBusinessPartner(
+        legalEntityGoldenRecord: LegalEntityWithLegalAddressVerboseDto,
+        owningCompany: String?,
+        nameParts: List<String>
+    ): BusinessPartner{
+        return BusinessPartner(
+            nameParts = listOfNotNull(
+                NamePart(legalEntityGoldenRecord.legalEntity.legalName, NamePartType.LegalName),
+                legalEntityGoldenRecord.legalEntity.legalShortName?.let { NamePart(it, NamePartType.ShortName) },
+                legalEntityGoldenRecord.legalEntity.legalForm?.let { NamePart(it, NamePartType.LegalForm) }
+            ),
+            owningCompany = owningCompany,
+            uncategorized = UncategorizedProperties.empty.copy(nameParts = nameParts),
+            legalEntity = buildLegalEntityComponent(legalEntityGoldenRecord),
+            site = null,
+            additionalAddress = null
+        )
+    }
+
+
+    fun buildLegalEntityOnSiteBusinessPartner(
+        legalEntityGoldenRecord: LegalEntityWithLegalAddressVerboseDto,
+        siteGoldenRecord: SiteVerboseDto,
+        owningCompany: String?,
+        nameParts: List<String>
+    ): BusinessPartner{
+        return BusinessPartner(
+            nameParts = listOfNotNull(
+                NamePart(legalEntityGoldenRecord.legalEntity.legalName, NamePartType.LegalName),
+                legalEntityGoldenRecord.legalEntity.legalShortName?.let { NamePart(it, NamePartType.ShortName) },
+                legalEntityGoldenRecord.legalEntity.legalForm?.let { NamePart(it, NamePartType.LegalForm) }
+            ),
+            owningCompany = owningCompany,
+            uncategorized = UncategorizedProperties.empty.copy(nameParts = nameParts),
+            legalEntity = buildLegalEntityComponent(legalEntityGoldenRecord),
+            site = buildSiteWithLegalAddressAsMainComponent(siteGoldenRecord),
+            additionalAddress = null
+        )
+    }
+
+    fun buildSiteBusinessPartner(
+        legalEntityGoldenRecord: LegalEntityWithLegalAddressVerboseDto,
+        siteGoldenRecord: SiteWithMainAddressVerboseDto,
+        owningCompany: String?,
+        nameParts: List<String>
+    ): BusinessPartner{
+        return BusinessPartner(
+            nameParts = listOfNotNull(
+                NamePart(legalEntityGoldenRecord.legalEntity.legalName, NamePartType.LegalName),
+                legalEntityGoldenRecord.legalEntity.legalShortName?.let { NamePart(it, NamePartType.ShortName) },
+                legalEntityGoldenRecord.legalEntity.legalForm?.let { NamePart(it, NamePartType.LegalForm) },
+                siteGoldenRecord.site.name.let { NamePart(it, NamePartType.SiteName) },
+            ),
+            owningCompany = owningCompany,
+            uncategorized = UncategorizedProperties.empty.copy(nameParts = nameParts),
+            legalEntity = buildLegalEntityComponent(legalEntityGoldenRecord),
+            site = buildSiteComponent(siteGoldenRecord),
+            additionalAddress = null
+        )
+    }
+
+    fun buildAdditionSiteAddressBusinessPartner(
         legalEntityGoldenRecord: LegalEntityWithLegalAddressVerboseDto,
         siteGoldenRecord: SiteWithMainAddressVerboseDto,
         addressGoldenRecord: LogisticAddressVerboseDto,
@@ -39,7 +100,9 @@ class RefinementTestDataFactory {
             nameParts = listOfNotNull(
                 NamePart(legalEntityGoldenRecord.legalEntity.legalName, NamePartType.LegalName),
                 legalEntityGoldenRecord.legalEntity.legalShortName?.let { NamePart(it, NamePartType.ShortName) },
-                legalEntityGoldenRecord.legalEntity.legalForm?.let { NamePart(it, NamePartType.LegalForm) }
+                legalEntityGoldenRecord.legalEntity.legalForm?.let { NamePart(it, NamePartType.LegalForm) },
+                siteGoldenRecord.site.name.let { NamePart(it, NamePartType.SiteName) },
+                addressGoldenRecord.name?.let { NamePart(it, NamePartType.AddressName) }
             ),
             owningCompany = owningCompany,
             uncategorized = UncategorizedProperties.empty.copy(nameParts = nameParts),
@@ -72,6 +135,17 @@ class RefinementTestDataFactory {
             confidenceCriteria = buildConfidence(goldenRecord.site.confidenceCriteria),
             hasChanged = true,
             siteMainAddress = buildPostalAddress(goldenRecord.mainAddress)
+        )
+    }
+
+    private fun buildSiteWithLegalAddressAsMainComponent(goldenRecord: SiteVerboseDto): Site{
+        return Site(
+            bpnReference = BpnReference(goldenRecord.bpns, null, BpnReferenceType.Bpn),
+            siteName = goldenRecord.name,
+            states = goldenRecord.states.map { BusinessState(it.validFrom?.toUtcInstant(), it.validTo?.toUtcInstant(), it.type) },
+            confidenceCriteria = buildConfidence(goldenRecord.confidenceCriteria),
+            hasChanged = true,
+            siteMainAddress = null
         )
     }
 

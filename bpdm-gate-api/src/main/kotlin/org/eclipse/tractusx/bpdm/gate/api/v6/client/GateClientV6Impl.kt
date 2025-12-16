@@ -38,8 +38,7 @@ open class GateClientV6Impl (
     override val businessPartners: BusinessPartnerApiClientV6 by lazy { createClient<BusinessPartnerApiClientV6>() }
     override val sharingStates: SharingStateApiClientV6  by lazy { createClient<SharingStateApiClientV6>() }
     override val changelog: ChangelogApiClientV6  by lazy { createClient<ChangelogApiClientV6>() }
-
-
+    override val stats by lazy { createClient<StatsApiClientV6>() }
 
     private inline fun <reified T: Any> createClient() =
         httpServiceProxyFactory.createClient(T::class.java)!!

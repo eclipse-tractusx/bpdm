@@ -98,6 +98,11 @@ class GateTestDataV6config {
     }
 
     @Bean
+    fun poolRequestFactory(): BusinessPartnerRequestFactory{
+        return BusinessPartnerRequestFactory(poolTestMetadata)
+    }
+
+    @Bean
     fun poolMockDataFactory(
         objectMapper: ObjectMapper
     ): PoolMockDataFactory{

@@ -27,4 +27,6 @@ interface GateClientV6 {
 
     val changelog: ChangelogApiClientV6
 
+    val stats: StatsApiClientV6
+
 }

@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsSharingStatesResponse
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.BusinessPartnerOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.SharingStateDto
 import org.eclipse.tractusx.bpdm.test.util.InstantSecondsComparator
@@ -83,6 +84,12 @@ class GateAssertRepositoryV6 {
         Assertions.assertThat(actual)
             .usingRecursiveComparison()
             .ignoringFields(SharingStateDto::sharingProcessStarted.name)
+            .isEqualTo(expected)
+    }
+
+    fun assertSharingStateStats(actual: StatsSharingStatesResponse, expected: StatsSharingStatesResponse){
+        Assertions.assertThat(actual)
+            .usingRecursiveComparison()
             .isEqualTo(expected)
     }
 
