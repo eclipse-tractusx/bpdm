@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.gate.v6.config
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.gate.service.TaskCreationBatchService
 import org.eclipse.tractusx.bpdm.gate.service.TaskResolutionBatchService
@@ -41,6 +40,7 @@ import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolMockDataFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import tools.jackson.databind.json.JsonMapper
 
 @Configuration
 @ConditionalOnProperty(name = ["test.v6"], havingValue = "true", matchIfMissing = false)
@@ -92,9 +92,9 @@ class GateTestDataV6config {
     @Bean
     fun orchestratorMockDataFactory(
         refinementTestDataFactory: RefinementTestDataFactory,
-        objectMapper: ObjectMapper
+        jsonMapper: JsonMapper
     ): OrchestratorMockDataFactory{
-        return OrchestratorMockDataFactory(refinementTestDataFactory, objectMapper)
+        return OrchestratorMockDataFactory(refinementTestDataFactory, jsonMapper)
     }
 
     @Bean
@@ -104,12 +104,12 @@ class GateTestDataV6config {
 
     @Bean
     fun poolMockDataFactory(
-        objectMapper: ObjectMapper
+        jsonMapper: JsonMapper
     ): PoolMockDataFactory{
         return PoolMockDataFactory(
             BusinessPartnerRequestFactory(poolTestMetadata),
             ExpectedBusinessPartnerResultFactory(poolTestMetadata),
-            objectMapper
+            jsonMapper
         )
     }
 

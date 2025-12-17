@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.test.testdata.pool
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.client.WireMock
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.pool.api.ApiCommons
@@ -30,11 +29,12 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
 import org.eclipse.tractusx.bpdm.test.containers.PoolMockContextInitializer
+import tools.jackson.databind.json.JsonMapper
 
 class PoolMockDataFactory(
     private val requestFactory: BusinessPartnerRequestFactory,
     private val expectedResultFactory: ExpectedBusinessPartnerResultFactory,
-    private val objectMapper: ObjectMapper
+    private val jsonMapper: JsonMapper
 ) {
 
     fun mockLegalEntityAndLegalAddressSearchResult(seed: String): LegalEntityWithLegalAddressVerboseDto{
@@ -104,7 +104,7 @@ class PoolMockDataFactory(
         WireMock.stubFor(
             WireMock
                 .get(WireMock.urlPathEqualTo(ApiCommons.LEGAL_ENTITY_BASE_PATH_V7))
-                .willReturn(WireMock.okJson(objectMapper.writeValueAsString(mockedLegalEntityPage)))
+                .willReturn(WireMock.okJson(jsonMapper.writeValueAsString(mockedLegalEntityPage)))
         )
     }
 
@@ -114,7 +114,7 @@ class PoolMockDataFactory(
         WireMock.stubFor(
             WireMock
                 .get(WireMock.urlPathEqualTo(ApiCommons.SITE_BASE_PATH_V7))
-                .willReturn(WireMock.okJson(objectMapper.writeValueAsString(mockedSitePage)))
+                .willReturn(WireMock.okJson(jsonMapper.writeValueAsString(mockedSitePage)))
         )
     }
 
@@ -124,7 +124,7 @@ class PoolMockDataFactory(
         WireMock.stubFor(
             WireMock
                 .get(WireMock.urlPathEqualTo(ApiCommons.ADDRESS_BASE_PATH_V7))
-                .willReturn(WireMock.okJson(objectMapper.writeValueAsString(mockedAddressPage)))
+                .willReturn(WireMock.okJson(jsonMapper.writeValueAsString(mockedAddressPage)))
         )
     }
 

@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.test.testdata.orchestrator
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.client.WireMock
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerboseDto
@@ -28,12 +27,13 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerb
 import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockContextInitializer
 import org.eclipse.tractusx.orchestrator.api.ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS
 import org.eclipse.tractusx.orchestrator.api.model.*
+import tools.jackson.databind.json.JsonMapper
 import java.time.Instant
 import java.util.*
 
 class OrchestratorMockDataFactory(
     private val refinementTestDataFactory: RefinementTestDataFactory,
-    private val objectMapper: ObjectMapper
+    private val jsonMapper: JsonMapper
 ) {
 
     private val orchestratorMockServer = OrchestratorMockContextInitializer.wiremockServer
@@ -119,7 +119,7 @@ class OrchestratorMockDataFactory(
         WireMock.stubFor(
             WireMock
                 .post(BASE_PATH_V7_BUSINESS_PARTNERS)
-                .willReturn(WireMock.okJson(objectMapper.writeValueAsString(mockedCreatedTaskResponse)))
+                .willReturn(WireMock.okJson(jsonMapper.writeValueAsString(mockedCreatedTaskResponse)))
         )
 
         return mockedCreatedTask
@@ -129,7 +129,7 @@ class OrchestratorMockDataFactory(
         WireMock.configureFor("localhost", orchestratorMockServer.port())
 
         WireMock.stubFor(WireMock.get(WireMock.urlPathEqualTo("${BASE_PATH_V7_BUSINESS_PARTNERS}/finished-events")).willReturn(WireMock.okJson(
-            objectMapper.writeValueAsString(
+            jsonMapper.writeValueAsString(
                 FinishedTaskEventsResponse(1, 1, 0, 1, listOf(
                     FinishedTaskEventsResponse.Event(Instant.now(), ResultState.Success, taskId)
                 ))
@@ -138,7 +138,7 @@ class OrchestratorMockDataFactory(
 
         val mockedRefinedTasks = buildSuccessTaskState(seed, refinementTaskData)
         WireMock.stubFor(WireMock.post(WireMock.urlPathEqualTo("${BASE_PATH_V7_BUSINESS_PARTNERS}/state/search")).willReturn(WireMock.okJson(
-            objectMapper.writeValueAsString(mockedRefinedTasks)
+            jsonMapper.writeValueAsString(mockedRefinedTasks)
         )))
 
         return mockedRefinedTasks.tasks.single()
@@ -150,7 +150,7 @@ class OrchestratorMockDataFactory(
         val mockedCreatedTask = mockCreateTask(seed)
 
         WireMock.stubFor(WireMock.get(WireMock.urlPathEqualTo("${BASE_PATH_V7_BUSINESS_PARTNERS}/finished-events")).willReturn(WireMock.okJson(
-            objectMapper.writeValueAsString(
+            jsonMapper.writeValueAsString(
                 FinishedTaskEventsResponse(1, 1, 0, 1, listOf(
                     FinishedTaskEventsResponse.Event(Instant.now(), ResultState.Error, mockedCreatedTask.taskId)
                 ))
@@ -159,7 +159,7 @@ class OrchestratorMockDataFactory(
 
         val mockedErrorTasks = buildErrorTaskState(seed, errorType)
         WireMock.stubFor(WireMock.post(WireMock.urlPathEqualTo("${BASE_PATH_V7_BUSINESS_PARTNERS}/state/search")).willReturn(WireMock.okJson(
-            objectMapper.writeValueAsString(mockedErrorTasks)
+            jsonMapper.writeValueAsString(mockedErrorTasks)
         )))
 
         return mockedErrorTasks.tasks.single()
