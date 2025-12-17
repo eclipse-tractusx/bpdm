@@ -26,11 +26,11 @@ import org.eclipse.tractusx.bpdm.gate.api.model.ConfidenceCriteriaDto
 import org.eclipse.tractusx.bpdm.gate.api.model.PhysicalPostalAddressDto
 import org.eclipse.tractusx.bpdm.gate.api.model.StreetDto
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.AddressComponentOutputDto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.BusinessPartnerOutputDto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.LegalEntityRepresentationOutputDto
-import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.SiteRepresentationOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPostRequest
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.*
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.RelationDto
 import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
@@ -73,6 +73,28 @@ class ExpectedGateResultV6Factory {
             externalSequenceTimestamp = null,
             createdAt = Instant.MIN,
             updatedAt = Instant.MIN
+        )
+    }
+
+    fun buildRelationDto(putRequest: RelationPutEntry): RelationDto{
+        return RelationDto(
+            externalId = putRequest.externalId,
+            relationType = putRequest.relationType,
+            businessPartnerSourceExternalId = putRequest.businessPartnerSourceExternalId,
+            businessPartnerTargetExternalId = putRequest.businessPartnerTargetExternalId,
+            updatedAt = Instant.now(),
+            createdAt = Instant.now()
+        )
+    }
+
+    fun buildRelationDto(postRequest: RelationPostRequest): RelationDto{
+        return RelationDto(
+            externalId = postRequest.externalId!!,
+            relationType = postRequest.relationType,
+            businessPartnerSourceExternalId = postRequest.businessPartnerSourceExternalId,
+            businessPartnerTargetExternalId = postRequest.businessPartnerTargetExternalId,
+            updatedAt = Instant.now(),
+            createdAt = Instant.now()
         )
     }
 

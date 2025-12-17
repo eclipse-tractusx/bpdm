@@ -26,6 +26,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsSharingStatesResponse
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.BusinessPartnerOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.RelationDto
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.SharingStateDto
 import org.eclipse.tractusx.bpdm.test.util.InstantSecondsComparator
 import org.eclipse.tractusx.bpdm.test.util.LocalDatetimeSecondsComparator
@@ -107,6 +108,31 @@ class GateAssertRepositoryV6 {
                 ChangelogGateDto::timestamp.name
             )
             .isEqualTo(expected.content)
+    }
+
+    fun assertRelation(actual: RelationDto, expected: RelationDto){
+        Assertions.assertThat(actual)
+            .usingRecursiveComparison()
+            .ignoringFields(
+                RelationDto::createdAt.name,
+                RelationDto::updatedAt.name
+            )
+            .isEqualTo(expected)
+    }
+
+    fun assertRelations(actual: PageDto<RelationDto>, expected: PageDto<RelationDto>){
+        assertPageHeader(actual, expected)
+        assertRelations(actual.content, expected.content)
+    }
+
+    fun assertRelations(actual: Collection<RelationDto>, expected: Collection<RelationDto>){
+        Assertions.assertThat(actual)
+            .usingRecursiveComparison()
+            .ignoringFields(
+                RelationDto::createdAt.name,
+                RelationDto::updatedAt.name
+            )
+            .isEqualTo(expected)
     }
 
     private fun assertPageHeader(actual: PageDto<*>, expected: PageDto<*>){

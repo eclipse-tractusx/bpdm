@@ -19,9 +19,13 @@
 
 package org.eclipse.tractusx.bpdm.gate.v6.util
 
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPostRequest
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.RelationDto
 import org.eclipse.tractusx.bpdm.gate.service.TaskCreationBatchService
 import org.eclipse.tractusx.bpdm.gate.service.TaskResolutionBatchService
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
@@ -55,6 +59,17 @@ class GateTestDataClientV6 (
 
     fun createBusinessPartnerInput(request: BusinessPartnerInputRequest): BusinessPartnerInputDto {
         return operatorClient.businessPartners.upsertBusinessPartnersInput(listOf(request)).body!!.single()
+    }
+
+    fun createRelation(externalId: String, source: BusinessPartnerInputDto, target: BusinessPartnerInputDto, relationType: RelationType): RelationDto{
+        return operatorClient.relations.post(RelationPostRequest(externalId, relationType, source.externalId, target.externalId))
+    }
+
+    fun createRelationWithBusinessPartners(externalId: String, relationType: RelationType, seed: String = externalId): RelationDto{
+        val sourceInput = createBusinessPartnerInput("$seed Source")
+        val targetInput = createBusinessPartnerInput("$seed Target")
+
+        return operatorClient.relations.post(RelationPostRequest(externalId, relationType, sourceInput.externalId, targetInput.externalId))
     }
 
     fun refineToLegalEntity(input: BusinessPartnerInputDto, seed: String = input.externalId): LegalEntityWithLegalAddressVerboseDto{

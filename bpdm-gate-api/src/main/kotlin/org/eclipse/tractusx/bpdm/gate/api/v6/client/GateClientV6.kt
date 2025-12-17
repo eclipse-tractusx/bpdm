@@ -29,4 +29,6 @@ interface GateClientV6 {
 
     val stats: StatsApiClientV6
 
+    val relations: RelationApiClientV6
+
 }
