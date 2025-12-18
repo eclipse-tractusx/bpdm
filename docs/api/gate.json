@@ -2494,7 +2494,7 @@
       },
       "RelationDto" : {
         "type" : "object",
-        "description" : "A relation from one business partner (the source) to another business partner (the target). ",
+        "description" : "A relation from one business partner (the source) to another business partner (the target).",
         "properties" : {
           "externalId" : {
             "type" : "string",
@@ -2520,6 +2520,10 @@
               "$ref" : "#/components/schemas/RelationValidityPeriodDto"
             }
           },
+          "reasonCode" : {
+            "type" : "string",
+            "description" : "The technical key of the reason code describing why the relation was established. The list of reason codes is available from the golden record Pool."
+          },
           "updatedAt" : {
             "type" : "string",
             "format" : "date-time",
@@ -2531,36 +2535,47 @@
             "description" : "The time when this relation was created"
           }
         },
-        "required" : [ "businessPartnerSourceExternalId", "businessPartnerTargetExternalId", "createdAt", "externalId", "relationType", "updatedAt", "validityPeriods" ]
+        "required" : [ "businessPartnerSourceExternalId", "businessPartnerTargetExternalId", "createdAt", "externalId", "reasonCode", "relationType", "updatedAt", "validityPeriods" ]
       },
       "RelationOutputDto" : {
         "type" : "object",
+        "description" : "A relation from one business partner (the source) to another business partner (the target).",
         "properties" : {
           "externalId" : {
-            "type" : "string"
+            "type" : "string",
+            "description" : "The identifier with which to reference this relation"
           },
           "relationType" : {
             "type" : "string",
+            "description" : "The type of relation between the business partners",
             "enum" : [ "IsAlternativeHeadquarterFor", "IsManagedBy", "IsOwnedBy", "IsReplacedBy" ]
           },
           "sourceBpn" : {
-            "type" : "string"
+            "type" : "string",
+            "description" : "The business partner from which the relation emerges (the source)"
           },
           "targetBpn" : {
-            "type" : "string"
+            "type" : "string",
+            "description" : "The business partner to which this relation goes (the target)"
           },
           "validityPeriods" : {
             "type" : "array",
+            "description" : "A relation validity describes a timeframe in which a relation is active.",
             "items" : {
               "$ref" : "#/components/schemas/RelationValidityPeriodDto"
             }
           },
+          "reasonCode" : {
+            "type" : "string",
+            "description" : "The technical key of the reason code describing why the relation was established. The list of reason codes is available from the golden record Pool."
+          },
           "updatedAt" : {
             "type" : "string",
-            "format" : "date-time"
+            "format" : "date-time",
+            "description" : "The time when this relation was last modified"
           }
         },
-        "required" : [ "externalId", "relationType", "sourceBpn", "targetBpn", "updatedAt", "validityPeriods" ]
+        "required" : [ "externalId", "reasonCode", "relationType", "sourceBpn", "targetBpn", "updatedAt", "validityPeriods" ]
       },
       "RelationOutputSearchRequest" : {
         "type" : "object",
@@ -2644,6 +2659,10 @@
             "type" : "string",
             "description" : "The external identifier of the business partner to which the relation should point (the target)"
           },
+          "reasonCode" : {
+            "type" : "string",
+            "description" : "The technical key of the reason code describing why the relation was established. The list of reason codes is available from the golden record Pool."
+          },
           "validityPeriods" : {
             "type" : "array",
             "description" : "A relation validity describes a timeframe in which a relation is active.",
@@ -2652,7 +2671,7 @@
             }
           }
         },
-        "required" : [ "businessPartnerSourceExternalId", "businessPartnerTargetExternalId", "externalId", "relationType", "validityPeriods" ]
+        "required" : [ "businessPartnerSourceExternalId", "businessPartnerTargetExternalId", "externalId", "reasonCode", "relationType", "validityPeriods" ]
       },
       "RelationPutRequest" : {
         "type" : "object",

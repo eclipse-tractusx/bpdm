@@ -50,7 +50,10 @@ class RelationDb(
         joinColumns = [JoinColumn(name = "relation_id", foreignKey = ForeignKey(name = "fk_validity_periods_relation"))],
         indexes = [Index(name = "idx_relation_validity_periods_relation_id", columnList = "relation_id")]
     )
-    var validityPeriods: MutableList<RelationValidityPeriodDb> = mutableListOf()
+    var validityPeriods: MutableList<RelationValidityPeriodDb> = mutableListOf(),
 
+    @ManyToOne
+    @JoinColumn(name = "reason_code_id", nullable = false)
+    var reasonCode: ReasonCodeDb
 ) : BaseEntity()
 

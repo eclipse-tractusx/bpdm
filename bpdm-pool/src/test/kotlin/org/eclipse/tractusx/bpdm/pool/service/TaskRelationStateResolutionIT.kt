@@ -80,7 +80,9 @@ class TaskRelationStateResolutionIT @Autowired constructor(
                     validFrom = LocalDate.ofYearDay(2025, 1),
                     validTo =  LocalDate.ofYearDay(2026, 1)
                 )
-            ))
+            ),
+            getAnyReasonCode()
+        )
         val createdRelation = createRelation(relationToCreate)
 
         //Then
@@ -104,7 +106,9 @@ class TaskRelationStateResolutionIT @Autowired constructor(
                     validFrom = LocalDate.ofYearDay(2025, 1),
                     validTo =  LocalDate.ofYearDay(2026, 1)
                 )
-            ))
+            ),
+            getAnyReasonCode()
+        )
         val createdRelation = createRelation(relationToCreate)
 
         //Then
@@ -128,7 +132,9 @@ class TaskRelationStateResolutionIT @Autowired constructor(
                     validFrom = LocalDate.ofYearDay(2025, 1),
                     validTo = null
                 )
-            ))
+            ),
+            getAnyReasonCode()
+        )
         val createdRelation = createRelation(relationToCreate)
 
         //Then
@@ -152,7 +158,9 @@ class TaskRelationStateResolutionIT @Autowired constructor(
                     validFrom = LocalDate.ofYearDay(2025, 1),
                     validTo = null
                 )
-            ))
+            ),
+            getAnyReasonCode()
+            )
         val createdRelation = createRelation(relationToCreate)
 
         //Then
@@ -180,7 +188,9 @@ class TaskRelationStateResolutionIT @Autowired constructor(
                     validFrom = LocalDate.ofYearDay(2027, 1),
                     validTo = LocalDate.ofYearDay(2028, 1)
                 )
-            ))
+            ),
+            getAnyReasonCode()
+        )
         val createdRelation = createRelation(relationToCreate)
 
         //Then
@@ -208,7 +218,9 @@ class TaskRelationStateResolutionIT @Autowired constructor(
                     validFrom = LocalDate.ofYearDay(2027, 1),
                     validTo = LocalDate.ofYearDay(2028, 1)
                 )
-            ))
+            ),
+            getAnyReasonCode()
+        )
         val createdRelation = createRelation(relationToCreate)
 
         //Then
@@ -240,7 +252,9 @@ class TaskRelationStateResolutionIT @Autowired constructor(
                     validFrom = LocalDate.ofYearDay(2025, 1),
                     validTo = LocalDate.ofYearDay(2026, 1)
                 ),
-            ))
+            ),
+            getAnyReasonCode()
+        )
         val createdRelation = createRelation(relationToCreate)
 
         //Then
@@ -272,7 +286,9 @@ class TaskRelationStateResolutionIT @Autowired constructor(
                     validFrom = LocalDate.ofYearDay(2025, 1),
                     validTo = LocalDate.ofYearDay(2026, 1)
                 ),
-            ))
+            ),
+            getAnyReasonCode()
+            )
         val createdRelation = createRelation(relationToCreate)
 
         //Then
@@ -291,7 +307,9 @@ class TaskRelationStateResolutionIT @Autowired constructor(
             relationType.toTaskDto(),
             legalEntity2.legalEntity.bpnl,
             legalEntity1.legalEntity.bpnl,
-            listOf())
+            listOf(),
+            getAnyReasonCode()
+        )
         val createdRelation = createRelation(relationToCreate)
 
         //Then
@@ -310,7 +328,9 @@ class TaskRelationStateResolutionIT @Autowired constructor(
             relationType.toTaskDto(),
             legalEntity1.legalAddress.bpna,
             additionalAddress1.address.bpna,
-            listOf())
+            listOf(),
+            getAnyReasonCode()
+        )
         val createdRelation = createRelation(relationToCreate)
 
         //Then
@@ -342,7 +362,9 @@ class TaskRelationStateResolutionIT @Autowired constructor(
                     validFrom = LocalDate.ofYearDay(2027, 1),
                     validTo = LocalDate.ofYearDay(2028, 1)
                 )
-            ))
+            ),
+            getAnyReasonCode()
+        )
         val createdRelation = createRelation(relationToCreate)
 
         //Then
@@ -374,7 +396,9 @@ class TaskRelationStateResolutionIT @Autowired constructor(
                     validFrom = LocalDate.ofYearDay(2027, 1),
                     validTo = LocalDate.ofYearDay(2028, 1)
                 )
-            ))
+            ),
+            getAnyReasonCode()
+        )
         val createdRelation = createRelation(relationToCreate)
 
         //Then
@@ -421,5 +445,9 @@ class TaskRelationStateResolutionIT @Autowired constructor(
         return when(this){
             AddressRelationType.IsReplacedBy -> RelationType.IsReplacedBy
         }
+    }
+
+    private fun getAnyReasonCode(): String{
+        return testDataEnvironment.metadata.reasonCodes.first().technicalKey
     }
 }

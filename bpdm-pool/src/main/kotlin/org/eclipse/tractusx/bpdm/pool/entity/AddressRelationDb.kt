@@ -22,7 +22,6 @@ package org.eclipse.tractusx.bpdm.pool.entity
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 import org.eclipse.tractusx.bpdm.pool.api.model.AddressRelationType
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
 
 @Entity
 @Table(
@@ -51,6 +50,10 @@ class AddressRelationDb(
         joinColumns = [JoinColumn(name = "relation_id", foreignKey = ForeignKey(name = "fk_address_relation_validity_periods_relation"))],
         indexes = [Index(name = "idx_address_relation_validity_periods_relation_id", columnList = "relation_id")]
     )
-    var validityPeriods: MutableList<RelationValidityPeriodDb> = mutableListOf()
+    var validityPeriods: MutableList<RelationValidityPeriodDb> = mutableListOf(),
+
+    @ManyToOne
+    @JoinColumn(name = "reason_code_id", nullable = false)
+    var reasonCode: ReasonCodeDb
 
 ): BaseEntity()

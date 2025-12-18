@@ -192,7 +192,8 @@ class RelationTaskCreationService(
                     relationType = relationType,
                     businessPartnerSourceBpn = sourceBpn,
                     businessPartnerTargetBpn = targetBpn,
-                    validityPeriods = validityPeriods
+                    validityPeriods = validityPeriods,
+                    reasonCode = relationStage.reasonCode
                 )
             )
         }

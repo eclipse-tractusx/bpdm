@@ -45,7 +45,13 @@ class ManagedRelationUpsertService(
         validateNoChain(upsertRequest)
 
         val result = relationUpsertService.upsertRelation(
-            RelationUpsertService.UpsertRequest(upsertRequest.source, upsertRequest.target, LegalEntityRelationType.IsManagedBy, upsertRequest.validityPeriods)
+            RelationUpsertService.UpsertRequest(
+                source = upsertRequest.source,
+                target = upsertRequest.target,
+                legalEntityRelationType = LegalEntityRelationType.IsManagedBy,
+                validityPeriods = upsertRequest.validityPeriods,
+                reasonCode = upsertRequest.reasonCode
+            )
         )
         makeManagedEntityParticipantIfRequired(upsertRequest.source)
 

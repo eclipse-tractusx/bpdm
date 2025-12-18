@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.repository
 import jakarta.persistence.criteria.Predicate
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
+import org.eclipse.tractusx.bpdm.pool.entity.ReasonCodeDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.repository.JpaRepository
@@ -55,4 +56,6 @@ interface RelationRepository : JpaRepository<RelationDb, Long>, JpaSpecification
     fun findInSourceOrTarget(legalEntityRelationType: LegalEntityRelationType, legalEntity: LegalEntityDb): Set<RelationDb>
 
     fun findByTypeAndStartNode(legalEntityRelationType: LegalEntityRelationType, legalEntity: LegalEntityDb): Set<RelationDb>
+
+    fun existsByReasonCode(reasonCode: ReasonCodeDb): Boolean
 }

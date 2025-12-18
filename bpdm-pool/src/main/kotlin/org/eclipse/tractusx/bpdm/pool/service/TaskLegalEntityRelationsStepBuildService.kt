@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
+import org.eclipse.tractusx.bpdm.pool.repository.ReasonCodeRepository
 import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
 import org.eclipse.tractusx.orchestrator.api.model.RelationValidityPeriod
 import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepReservationEntryDto
@@ -37,7 +38,8 @@ class TaskLegalEntityRelationsStepBuildService(
     private val alternativeHeadquarterRelationService: AlternativeHeadquarterRelationUpsertService,
     private val legalEntityRepository: LegalEntityRepository,
     private val managedRelationUpsertService: ManagedRelationUpsertService,
-    private val ownedByRelationService: OwnedByRelationUpsertService
+    private val ownedByRelationService: OwnedByRelationUpsertService,
+    private val reasonCodeRepository: ReasonCodeRepository
 ) {
     @Transactional
     fun upsertBusinessPartnerRelations(taskEntry: TaskRelationsStepReservationEntryDto): TaskRelationsStepResultEntryDto {
@@ -54,6 +56,9 @@ class TaskLegalEntityRelationsStepBuildService(
         val targetLegalEntity = legalEntityRepository.findByBpnIgnoreCase(relationDto.businessPartnerTargetBpn)
             ?: throw BpdmValidationException("Target legal entity with specified BPNL : ${relationDto.businessPartnerTargetBpn} not found")
 
+        val reasonCode  = reasonCodeRepository.findByTechnicalKey(relationDto.reasonCode)
+            ?: throw BpdmValidationException("Relation reason code '${relationDto.reasonCode}' not found")
+
         validateValidityPeriods(relationDto)
 
         // Map states from orchestrator
@@ -67,7 +72,8 @@ class TaskLegalEntityRelationsStepBuildService(
         val upsertRequest = IRelationUpsertStrategyService.UpsertRequest(
             sourceLegalEntity,
             targetLegalEntity,
-            validityPeriods = validityPeriods
+            validityPeriods = validityPeriods,
+            reasonCode = reasonCode
         )
         val strategyService : IRelationUpsertStrategyService = when(relationDto.relationType){
             OrchestratorRelationType.IsAlternativeHeadquarterFor -> alternativeHeadquarterRelationService
@@ -95,7 +101,8 @@ class TaskLegalEntityRelationsStepBuildService(
                     validFrom = it.validFrom,
                     validTo = it.validTo
                 )
-            }
+            },
+            reasonCode = reasonCode.technicalKey
         )
     }
 

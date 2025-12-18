@@ -2,12 +2,13 @@
 
 <!-- TOC -->
 * [Migration Guide](#migration-guide)
-  * [7.2.x to 7.3.x Migration Guide](#72x-to-73x-migration-guide)
+  * [7.2.x to 7.3.x](#72x-to-73x)
     * [1. Breaking rename of relation DTO fields (Gate)](#1-breaking-rename-of-relation-dto-fields-gate)
       * [Impact](#impact)
       * [Rationale](#rationale)
     * [2. New relation type for addresses](#2-new-relation-type-for-addresses)
     * [3. No required operator actions](#3-no-required-operator-actions)
+    * [4. Reason Codes](#4-reason-codes)
   * [7.1.x to 7.2.x](#71x-to-72x)
     * [Alternative Headquarters Restriction](#alternative-headquarters-restriction)
     * [Default Logging Level](#default-logging-level)
@@ -17,7 +18,7 @@
     * [Business Partner Identifier Amount Limit](#business-partner-identifier-amount-limit)
 <!-- TOC -->
 
-## 7.2.x to 7.3.x Migration Guide
+## 7.2.x to 7.3.x
 
 ### 1. Breaking rename of relation DTO fields (Gate)
 
@@ -66,6 +67,19 @@ This type applies only to address relations and is validated accordingly.
 
 - No existing data needs to be changed.
 - No cleanup or special deployment steps needed.
+
+
+### 4. Reason Codes
+
+Each business partner relation now needs a mandatory reason code.
+Reason codes are not standardized and are therefore managed by the operator of the golden record process.
+
+The list of available reason codes should be managed in the golden record Pool through to the new metadata endpoints.
+
+> Very important:
+> Since reason codes are mandatory and there are no default reason codes this repository does not contain any migration scripts for existing relations.
+> Therefore, if there are already relations present in BPDM the operator needs to add migration scripts assigning reason codes to those relations.
+
 
 ## 7.1.x to 7.2.x
 

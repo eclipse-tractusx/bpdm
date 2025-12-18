@@ -17,31 +17,18 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.config
+package org.eclipse.tractusx.bpdm.pool.entity
 
-import org.eclipse.tractusx.bpdm.test.testdata.gate.GateInputFactory
-import org.eclipse.tractusx.bpdm.test.testdata.gate.TestMetadata
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.Table
+import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 
-@Configuration
-class TestDataConfiguration {
-
-    @Bean
-    fun testMetadata(): TestMetadata {
-        val testMetadata = TestMetadata(
-            identifierTypes = listOf("EU_VAT_ID_DE", "DUNS_ID"),
-            legalForms = listOf("SCE1", "SGST"),
-            adminAreas = listOf("DE-BW", "DE-BY"),
-            reasonCodes = listOf("REASON_CODE_1", "REASON_CODE_2")
-        )
-
-        return testMetadata
-    }
-
-    @Bean
-    fun gateTestDataFactory(testMetadata: TestMetadata): GateInputFactory {
-        return GateInputFactory(testMetadata, null)
-    }
-
-}
+@Entity
+@Table(name = "reason_codes")
+class ReasonCodeDb (
+    @Column(name = "technical_key", unique = true, nullable = false)
+    val technicalKey: String,
+    @Column(name = "description", nullable = false)
+    var description: String
+): BaseEntity()

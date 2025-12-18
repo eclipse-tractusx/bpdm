@@ -17,31 +17,14 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.config
+package org.eclipse.tractusx.bpdm.pool.api.model
 
-import org.eclipse.tractusx.bpdm.test.testdata.gate.GateInputFactory
-import org.eclipse.tractusx.bpdm.test.testdata.gate.TestMetadata
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
+import io.swagger.v3.oas.annotations.media.Schema
 
-@Configuration
-class TestDataConfiguration {
-
-    @Bean
-    fun testMetadata(): TestMetadata {
-        val testMetadata = TestMetadata(
-            identifierTypes = listOf("EU_VAT_ID_DE", "DUNS_ID"),
-            legalForms = listOf("SCE1", "SGST"),
-            adminAreas = listOf("DE-BW", "DE-BY"),
-            reasonCodes = listOf("REASON_CODE_1", "REASON_CODE_2")
-        )
-
-        return testMetadata
-    }
-
-    @Bean
-    fun gateTestDataFactory(testMetadata: TestMetadata): GateInputFactory {
-        return GateInputFactory(testMetadata, null)
-    }
-
-}
+@Schema(description = "Describes a reason for a business partner relation to exist")
+data class ReasonCodeDto(
+    @Schema(description = "The technical key with which to uniquely identity this reason")
+    val technicalKey: String,
+    @Schema(description = "Detailed description of the reason")
+    val description: String
+)

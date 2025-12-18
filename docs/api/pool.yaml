@@ -132,6 +132,75 @@ paths:
                 $ref: "#/components/schemas/SitePartnerCreateResponseWrapper"
         "400":
           description: On malformed requests
+  /v7/reason-codes:
+    get:
+      tags:
+        - Metadata Controller
+      summary: Get page of available business partner relation reason codes
+      operationId: getReasonCodes
+      parameters:
+        - name: page
+          in: query
+          description: Number of page to get results from
+          required: false
+          schema:
+            type: string
+            minimum: 0
+        - name: size
+          in: query
+          description: Size of each page
+          required: false
+          schema:
+            type: string
+            maximum: 100
+            minimum: 0
+      responses:
+        "200":
+          description: "Page of existing reason codes, may be empty"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PageDtoReasonCodeDto"
+        "400":
+          description: On malformed request parameters
+    put:
+      tags:
+        - Metadata Controller
+      summary: Create or update business partner relation reason codes
+      operationId: upsertReasonCode
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReasonCodeUpsertRequest"
+        required: true
+      responses:
+        "200":
+          description: The created reason code with description
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReasonCodeDto"
+        "400":
+          description: On malformed request parameters
+    delete:
+      tags:
+        - Metadata Controller
+      summary: Delete an existing business partner relation reason code
+      operationId: deleteReasonCode
+      parameters:
+        - name: request
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/ReasonCodeDeleteRequest"
+      responses:
+        "200":
+          description: Reason code successfully deleted
+        "404":
+          description: Referenced reason code can not be found
+        "400":
+          description: On malformed requests
   /v7/legal-entities:
     get:
       tags:
@@ -3657,9 +3726,6 @@ components:
           type: string
           description: The type of relation between the logistic addresses
           enum:
-            - IsAlternativeHeadquarterFor
-            - IsManagedBy
-            - IsOwnedBy
             - IsReplacedBy
         businessPartnerSourceBpna:
           type: string
@@ -3672,9 +3738,15 @@ components:
           description: Validity periods of this address relation
           items:
             $ref: "#/components/schemas/RelationValidityPeriod"
+        reasonCode:
+          type: string
+          description: The technical key of the reason code describing why the relation
+            was established. The list of reason codes is available from the golden
+            record Pool.
       required:
         - businessPartnerSourceBpna
         - businessPartnerTargetBpna
+        - reasonCode
         - type
         - validityPeriods
     AddressSearchRequest:
@@ -7200,6 +7272,37 @@ components:
         - page
         - totalElements
         - totalPages
+    PageDtoReasonCodeDto:
+      type: object
+      description: Paginated collection of results
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+          description: Total number of all results in all pages
+        totalPages:
+          type: integer
+          format: int32
+          description: Total number pages
+        page:
+          type: integer
+          format: int32
+          description: Current page number
+        contentSize:
+          type: integer
+          format: int32
+          description: Number of results in the page
+        content:
+          type: array
+          description: Collection of results in the page
+          items:
+            $ref: "#/components/schemas/ReasonCodeDto"
+      required:
+        - content
+        - contentSize
+        - page
+        - totalElements
+        - totalPages
     PageDtoSiteVerboseDto:
       type: object
       description: Paginated collection of results
@@ -7667,6 +7770,33 @@ components:
       required:
         - city
         - country
+    ReasonCodeDeleteRequest:
+      type: object
+      properties:
+        technicalKey:
+          type: string
+      required:
+        - technicalKey
+    ReasonCodeDto:
+      type: object
+      description: Describes a reason for a business partner relation to exist
+      properties:
+        technicalKey:
+          type: string
+          description: The technical key with which to uniquely identity this reason
+        description:
+          type: string
+          description: Detailed description of the reason
+      required:
+        - description
+        - technicalKey
+    ReasonCodeUpsertRequest:
+      type: object
+      properties:
+        reasonCode:
+          $ref: "#/components/schemas/ReasonCodeDto"
+      required:
+        - reasonCode
     RegionDto:
       type: object
       description: Region within a country
@@ -7984,7 +8114,6 @@ components:
             - IsAlternativeHeadquarterFor
             - IsManagedBy
             - IsOwnedBy
-            - IsReplacedBy
         businessPartnerSourceBpnl:
           type: string
           description: BPN of partner from which the relation emerges (the source)
@@ -7995,9 +8124,12 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/RelationValidityPeriod"
+        reasonCode:
+          type: string
       required:
         - businessPartnerSourceBpnl
         - businessPartnerTargetBpnl
+        - reasonCode
         - type
         - validityPeriods
     SiteCreateRequestWithLegalAddressAsMain:
