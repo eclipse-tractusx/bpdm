@@ -52,9 +52,6 @@ on:
         required: false
         type: string
   pull_request:
-    branches:
-      - main
-      - release/**
     paths:
       - 'pom.xml'
       - 'bpdm-**'

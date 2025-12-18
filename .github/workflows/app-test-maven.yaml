@@ -20,9 +20,6 @@
 name: Perform Maven Tests
 on:
   pull_request:
-    branches:
-      - main
-      - release/**
   workflow_call:
   workflow_dispatch:
 
