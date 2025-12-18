@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
+import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.AddressRelationType
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
@@ -52,6 +53,8 @@ class AddressRelationUpsertService(
             throw BpdmValidationException("A Address cannot have a relation to itself (BPNA: ${sourceAddress.bpn}).")
         }
 
+        validateSoureAndTargetAddress(sourceAddress, targetAddress)
+
         val existingRelation = addressRelationRepository.findAll(
             AddressRelationRepository.byRelation(
                 startAddress = sourceAddress,
@@ -84,6 +87,21 @@ class AddressRelationUpsertService(
 
         return upsertResult
 
+    }
+
+    private fun validateSoureAndTargetAddress(source: LogisticAddressDb, target: LogisticAddressDb) {
+        if (source.legalEntity!!.bpn != target.legalEntity!!.bpn) {
+            throw BpdmValidationException("Invalid 'IsReplacedBy' relation: The source address with BPNA '${source.bpn}' and target address with BPNA '${target.bpn}' do not belong to the same Legal Entity (BPNL '${source.legalEntity!!.bpn}' and '${target.legalEntity!!.bpn}'). "
+                    + "Both addresses must belong to the same Legal Entity to create an 'IsReplacedBy' relation.")
+        }
+        if (getAddressType(source) != AddressType.LegalAddress) {
+            throw BpdmValidationException("Invalid source address type for 'IsReplacedBy' relation: The source address with BPNA '${source.bpn}' is of type '${getAddressType(source)}'. "
+                    + "Only addresses of type 'LegalAddress' can be the source of an 'IsReplacedBy' relation.")
+        }
+        if (getAddressType(target) != AddressType.AdditionalAddress) {
+            throw BpdmValidationException("Invalid target address type for 'IsReplacedBy' relation: The target address with BPNA '${target.bpn}' is of type '${getAddressType(target)}'. "
+                    + "Only addresses of type 'AdditionalAddress' can be the target of an 'IsReplacedBy' relation.")
+        }
     }
 
     private fun createNewAddressRelation(upsertRequest: UpsertRequest): AddressRelationDb {
