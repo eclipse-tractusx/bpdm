@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.repository
 
+import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
@@ -70,6 +71,7 @@ interface LogisticAddressRepository : JpaRepository<LogisticAddressDb, Long>, Jp
                     )
                 }
             }
+
     }
 
     fun findByBpn(bpn: String): LogisticAddressDb?
@@ -95,4 +97,83 @@ interface LogisticAddressRepository : JpaRepository<LogisticAddressDb, Long>, Jp
 
     @Query("SELECT DISTINCT p FROM LogisticAddressDb p LEFT JOIN FETCH p.states WHERE p IN :partners")
     fun joinStates(partners: Set<LogisticAddressDb>): Set<LogisticAddressDb>
+
+    @Query(
+        value =
+            """
+            SELECT DISTINCT la
+            FROM LogisticAddressDb la
+            JOIN la.legalEntity le
+            LEFT JOIN la.site s
+            WHERE
+                (
+                    CAST(:#{#searchRequest.legalName} AS text) IS NULL
+                    OR concat(function('bpdm.normalize_name', CAST(la.legalEntity.legalName.value AS text)), '')
+                    Like concat('%', concat(function('bpdm.normalize_name', CAST(:#{#searchRequest.legalName} AS text)), ''), '%')
+                    OR function(
+                       'regexp_match',
+                       concat(CAST(la.legalEntity.legalName.value AS text), ''),
+                       concat('.*', function('regexp_replace', CAST(:#{#searchRequest.legalName} AS text), '_', '.', 'g'), '.*')
+                    ) IS NOT NULL
+                )
+                AND (
+                    CAST(:#{#searchRequest.bpn} AS text) IS NULL 
+                    OR le.bpn = CAST(:#{#searchRequest.bpn} AS text)
+                    OR EXISTS (
+                      SELECT 1 FROM SiteDb s2
+                      WHERE s2.mainAddress = la
+                        AND s2.bpn = CAST(:#{#searchRequest.bpn} AS text)
+                  )
+                )
+                AND (
+                    CAST(:#{#searchRequest.streetName} AS text) IS NULL
+                    OR concat(function('bpdm.normalize_name', cast(la.physicalPostalAddress.street.name as text)),'') 
+                    LIKE concat('%', concat(function('bpdm.normalize_name', CAST(:#{#searchRequest.streetName} AS text)), ''),'%')
+                    OR function(
+                       'regexp_match',
+                       concat(CAST(la.physicalPostalAddress.street.name AS text), ''),
+                       concat('.*', function('regexp_replace', CAST(:#{#searchRequest.streetName} AS text), '_', '.', 'g'), '.*')
+                    ) IS NOT NULL
+                )
+                AND ( 
+                    :#{#searchRequest.postalCode} IS NULL 
+                    OR la.physicalPostalAddress.postCode = :#{#searchRequest.postalCode} 
+                )
+                AND (
+                    CAST(:#{#searchRequest.city} AS text) IS NULL
+                    OR concat(function('bpdm.normalize_name',CAST(la.physicalPostalAddress.city AS text)),'') 
+                    Like concat('%',concat(function('bpdm.normalize_name',CAST(:#{#searchRequest.city} AS text)),''), '%')
+                    OR function(
+                       'regexp_match',
+                       concat(CAST(la.physicalPostalAddress.city AS text), ''),
+                       concat('.*', function('regexp_replace', CAST(:#{#searchRequest.city} AS text), '_', '.', 'g'), '.*')
+                    ) IS NOT NULL
+                )
+                AND (
+                    CAST(:#{#searchRequest.country} AS text) IS NULL
+                    OR la.physicalPostalAddress.country = CAST(:#{#searchRequest.country} AS text)
+                )
+                AND (
+                       (
+                            CAST(:#{#isLegalEntity} AS boolean) = true
+                            AND le.legalAddress = la
+                       )
+                    OR (
+                            CAST(:#{#isSite} AS boolean) = true
+                            AND s.mainAddress = la
+                       )
+                    OR (
+                            CAST(:#{#isAdditionalAddress} AS boolean) = true
+                            AND le.legalAddress <> la
+                            AND s is null
+                       )
+                )
+            """
+    )
+    fun searchBusinessPartner(
+        searchRequest: LegalEntityPropertiesSearchRequest,
+        isLegalEntity: Boolean,
+        isSite: Boolean,
+        isAdditionalAddress: Boolean,
+        pageable: Pageable): Page<LogisticAddressDb>
 }
