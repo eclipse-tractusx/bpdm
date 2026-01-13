@@ -99,9 +99,6 @@ jobs:
         with:
           images: |
             ${{ env.IMAGE_NAMESPACE }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=ref,event=branch
-            type=ref,event=pr
 
       - name: Create Docker Tags
         id: dockerTags
@@ -116,3 +113,26 @@ jobs:
             echo "tags=${FEATURE_TAGS}" >> $GITHUB_OUTPUT
             echo "tags=${FEATURE_TAGS}"
           fi
+
+      - name: DockerHub login
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_HUB_USER }}
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64, linux/arm64
+          push: true
+          file: ${{ inputs.dockerfilePath }}/Dockerfile
+          tags: ${{ steps.dockerTags.outputs.tags }}
+
+      - name: Update Docker Hub description
+        uses: peter-evans/dockerhub-description@v5
+        with:
+          username: ${{ secrets.DOCKER_HUB_USER }}
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+          repository: ${{ env.IMAGE_NAMESPACE }}/${{ env.IMAGE_NAME }}
+          readme-filepath: ${{ inputs.dockerfilePath }}/DOCKER_NOTICE.md
