@@ -70,9 +70,6 @@ bpdm-orchestrator:
 
 postgres:
   enabled: true
-  image:
-    repository: bitnamilegacy/postgresql
-    tag: 15-debian-11
   fullnameOverride: bpdm-postgres
   auth:
     database: bpdm

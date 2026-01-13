@@ -2,6 +2,8 @@
 
 <!-- TOC -->
 * [Migration Guide](#migration-guide)
+  * [7.2.x to 7.3.x](#72x-to-73x)
+    * [Postgres Version Update](#postgres-version-update)
   * [7.1.x to 7.2.x](#71x-to-72x)
     * [Alternative Headquarters Restriction](#alternative-headquarters-restriction)
     * [Default Logging Level](#default-logging-level)
@@ -10,6 +12,20 @@
     * [Golden Record Process for IsManagedBy Relations](#golden-record-process-for-ismanagedby-relations)
     * [Business Partner Identifier Amount Limit](#business-partner-identifier-amount-limit)
 <!-- TOC -->
+
+## 7.2.x to 7.3.x
+
+### Postgres Version Update
+
+The new version has been updated with Postgres version 18.0 instead of the formerly used version 15.x. With this change there was also the switch from the no longer maintained Bitnami image and helm chart to helm charts provided by Cloud Pirate which make use of the standard Postgres image published on Docker Hub.
+
+As a consequence, for a Kubernetes setup done with the provided helm charts, there is no possibility to do an automatic upgrade with the provided helm charts, as the two images are not supporting that. Instead, during update, a operator has to do the following manual steps;
+
+- Backup PostgreSQL data from the old installation 
+- Uninstall the old Helm release 
+- Delete the old PVC 
+- Perform a fresh installation with the new chart 
+- Restore data
 
 ## 7.1.x to 7.2.x
 
