@@ -26,6 +26,9 @@ on:
       - 'bpdm-**'
     branches:
       - main
+      - 'feat/headquarter-relocation'
+  pull_request:
+
 jobs:
   build-docker-pool:
     uses: ./.github/workflows/deploy-docker.yaml
