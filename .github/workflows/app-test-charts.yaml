@@ -93,31 +93,31 @@ jobs:
         uses: helm/chart-testing-action@v2.8.0
 
       - name: Download Pool Image
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: bpdm-pool-docker
           path: /tmp
 
       - name: Download Gate Image
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: bpdm-gate-docker
           path: /tmp
 
       - name: Download Orchestrator Image
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: bpdm-orchestrator-docker
           path: /tmp
 
       - name: Download Cleaning Service Dummy Image
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: bpdm-cleaning-service-dummy-docker
           path: /tmp
 
       - name: Download System Tester Image
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: bpdm-system-tester-docker
           path: /tmp
