@@ -20,9 +20,9 @@
 package org.eclipse.tractusx.bpdm.common.config
 
 import org.eclipse.tractusx.bpdm.common.util.*
-import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties
-import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientPropertiesMapper
 import org.springframework.boot.context.properties.EnableConfigurationProperties
+import org.springframework.boot.security.oauth2.client.autoconfigure.OAuth2ClientProperties
+import org.springframework.boot.security.oauth2.client.autoconfigure.OAuth2ClientPropertiesMapper
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Conditional
 import org.springframework.context.annotation.Configuration
@@ -47,7 +47,7 @@ class BpdmOAuth2ClientRegistrationConfig {
 
         clientsConfigProperties
             .filter { it.securityEnabled }
-            .forEach{ oauth2Properties.provider[it.registration.provider] = it.provider }
+            .forEach{ oauth2Properties.provider[it.registration.provider!!] = it.provider }
 
         val registrations: List<ClientRegistration?> = OAuth2ClientPropertiesMapper(oauth2Properties).asClientRegistrations().values.toList()
         return InMemoryClientRegistrationRepository(registrations)

@@ -23,7 +23,7 @@ import org.eclipse.tractusx.bpdm.common.util.BpdmWebClientProvider
 import org.eclipse.tractusx.bpdm.test.config.SelfClientConfigProperties
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClientImpl
-import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext
+import org.springframework.boot.web.server.servlet.context.ServletWebServerApplicationContext
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
@@ -36,7 +36,7 @@ class OrchestratorClientConfig{
         webClientProvider: BpdmWebClientProvider
     ): OrchestrationApiClient {
         return OrchestrationApiClientImpl {
-            val properties = selfClientConfigProperties.copy(baseUrl = "http://localhost:${webServerAppCtxt.webServer.port}")
+            val properties = selfClientConfigProperties.copy(baseUrl = "http://localhost:${webServerAppCtxt.webServer!!.port}")
             webClientProvider.builder(properties).build()
         }
     }

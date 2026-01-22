@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.orchestrator.entity
 
-import org.hibernate.engine.spi.SharedSessionContractImplementor
+import org.hibernate.type.descriptor.WrapperOptions
 import org.hibernate.usertype.UserType
 import java.io.Serializable
 import java.sql.PreparedStatement
@@ -45,8 +45,8 @@ class DbTimestampConverter: UserType<DbTimestamp> {
         return DbTimestamp::class.java
     }
 
-    override fun nullSafeGet(resultSet: ResultSet, position: Int, p2: SharedSessionContractImplementor?, p3: Any?): DbTimestamp? {
-        return resultSet.getTimestamp(position)?.let { DbTimestamp(it.toInstant()) }
+    override fun nullSafeGet(rs: ResultSet, position: Int, options: WrapperOptions?): DbTimestamp? {
+        return rs.getTimestamp(position)?.let { DbTimestamp(it.toInstant()) }
     }
 
     override fun isMutable(): Boolean {
@@ -65,10 +65,10 @@ class DbTimestampConverter: UserType<DbTimestamp> {
        return p0?.let { DbTimestamp(it.instant) }
     }
 
-    override fun nullSafeSet(preparedStatement: PreparedStatement, timeStamp: DbTimestamp?, index: Int, p3: SharedSessionContractImplementor?) {
-        if(timeStamp == null) preparedStatement.setNull(index, Types.TIMESTAMP)
+    override fun nullSafeSet(st: PreparedStatement, value: DbTimestamp?, position: Int, options: WrapperOptions?) {
+        if(value == null) st.setNull(position, Types.TIMESTAMP)
         else{
-            preparedStatement.setTimestamp(index, Timestamp.from(timeStamp.instant))
+            st.setTimestamp(position, Timestamp.from(value.instant))
         }
     }
 }

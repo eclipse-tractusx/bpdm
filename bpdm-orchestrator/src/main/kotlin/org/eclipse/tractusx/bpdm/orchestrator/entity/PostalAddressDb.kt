@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.orchestrator.entity
 
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
+import org.hibernate.annotations.Formula
 
 @Embeddable
 data class PostalAddressDb(
@@ -137,7 +138,10 @@ data class PostalAddressDb(
         val latitude: Double?,
         @Column(name = "altitude")
         val altitude: Double?
-    )
+    ){
+        @Formula("1")
+        private val isNonNull = 1
+    }
 
     @Embeddable
     data class Street(
@@ -159,5 +163,8 @@ data class PostalAddressDb(
         val nameSuffix: String?,
         @Column(name = "phy_street_name_additional_suffix")
         val additionalNameSuffix: String?,
-    )
+    ){
+        @Formula("1")
+        private val isNonNull = 1
+    }
 }

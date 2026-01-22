@@ -79,7 +79,7 @@ class ParameterObjectArgumentResolver : HttpServiceArgumentResolver {
                 val propValue = memberProperty.get(argument)
                 val propValueString = when (propValue) {
                     is String -> propValue
-                    else -> conversionService.convert(propValue, String::class.java)
+                    else -> conversionService.convert(propValue, String::class.java) ?: ""
                 }
                 if (propValue != null) {
                     requestValues.addRequestParameter(propName, propValueString)

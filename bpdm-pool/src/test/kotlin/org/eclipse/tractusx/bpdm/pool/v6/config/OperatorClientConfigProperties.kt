@@ -23,8 +23,8 @@ import org.eclipse.tractusx.bpdm.common.util.BpdmClientProperties
 import org.eclipse.tractusx.bpdm.common.util.ClientConfigurationProperties
 import org.eclipse.tractusx.bpdm.pool.v6.config.OperatorClientConfigProperties.Companion.PREFIX
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
-import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties
 import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.boot.security.oauth2.client.autoconfigure.OAuth2ClientProperties
 
 @ConditionalOnProperty(name = ["test.v6"], havingValue = "true", matchIfMissing = false)
 @ConfigurationProperties(prefix = PREFIX)

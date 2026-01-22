@@ -60,7 +60,7 @@ interface IdentifierTypeRepository :
                         )
                     )
                 }
-            }
+            } ?: Specification.unrestricted()
     }
 
     fun findByBusinessPartnerTypeAndTechnicalKey(businessPartnerType: IdentifierBusinessPartnerType, key: String): IdentifierTypeDb?

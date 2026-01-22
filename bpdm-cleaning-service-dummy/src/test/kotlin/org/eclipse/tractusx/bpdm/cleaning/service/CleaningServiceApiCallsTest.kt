@@ -20,8 +20,6 @@
 package org.eclipse.tractusx.bpdm.cleaning.service
 
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.tomakehurst.wiremock.admin.model.ServeEventQuery
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
@@ -43,6 +41,8 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.module.kotlin.readValue
 import java.time.Instant
 import java.util.*
 
@@ -53,7 +53,7 @@ import java.util.*
 @ActiveProfiles("test")
 class CleaningServiceApiCallsTest @Autowired constructor(
     private val cleaningServiceDummy: CleaningServiceDummy,
-    private val jacksonObjectMapper: ObjectMapper,
+    private val jsonMapper: JsonMapper,
     private val cleaningServiceConfigProperties: CleaningServiceConfigProperties
 ) {
 
@@ -91,7 +91,7 @@ class CleaningServiceApiCallsTest @Autowired constructor(
             post(urlPathEqualTo(ORCHESTRATOR_RESERVE_TASKS_URL))
                 .inScenario(RESERVATION_SCENARIO)
                 .whenScenarioStateIs(RESERVED_STATE)
-                .willReturn(okJson(jacksonObjectMapper.writeValueAsString(TaskStepReservationResponse(emptyList(), Instant.now()))))
+                .willReturn(okJson(jsonMapper.writeValueAsString(TaskStepReservationResponse(emptyList(), Instant.now()))))
         )
     }
 
@@ -425,7 +425,7 @@ class CleaningServiceApiCallsTest @Autowired constructor(
                 .whenScenarioStateIs(Scenario.STARTED)
                 .willSetStateTo(RESERVED_STATE)
                 .willReturn(
-                    okJson(jacksonObjectMapper.writeValueAsString(createSampleTaskStepReservationResponse(businessPartner)))
+                    okJson(jsonMapper.writeValueAsString(createSampleTaskStepReservationResponse(businessPartner)))
                 )
         )
     }
@@ -448,7 +448,7 @@ class CleaningServiceApiCallsTest @Autowired constructor(
         val serveEvents = orchestratorMockApi.getServeEvents(ServeEventQuery.forStubMapping(stubMapping)).requests
         assertEquals(serveEvents.size, 1)
         val actualRequest = serveEvents.first()!!.request
-        return jacksonObjectMapper.readValue<TaskStepResultRequest>(actualRequest.body)
+        return jsonMapper.readValue<TaskStepResultRequest>(actualRequest.body)
     }
 
     private fun assertIsEqualIgnoreReferenceValue(actual: TaskStepResultRequest, expected: TaskStepResultRequest){

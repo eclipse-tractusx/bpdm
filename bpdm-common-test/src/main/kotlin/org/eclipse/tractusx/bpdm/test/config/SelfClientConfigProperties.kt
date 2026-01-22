@@ -21,8 +21,8 @@ package org.eclipse.tractusx.bpdm.test.config
 
 import org.eclipse.tractusx.bpdm.common.util.BpdmClientProperties
 import org.eclipse.tractusx.bpdm.common.util.ClientConfigurationProperties
-import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties
 import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.boot.security.oauth2.client.autoconfigure.OAuth2ClientProperties
 
 @ConfigurationProperties(prefix = SelfClientConfigProperties.PREFIX)
 data class SelfClientConfigProperties(

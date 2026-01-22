@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.cleaning.service
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.admin.model.ServeEventQuery
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
@@ -41,6 +40,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
+import tools.jackson.databind.json.JsonMapper
 import java.time.Instant
 import java.time.LocalDate
 import java.util.*
@@ -52,7 +52,7 @@ import java.util.*
 @ActiveProfiles("test")
 class RelationCleaningServiceApiCallsTest @Autowired constructor(
     private val relationCleaningServiceDummy: RelationCleaningServiceDummy,
-    private val jacksonObjectMapper: ObjectMapper,
+    private val jsonMapper: JsonMapper,
     private val cleaningServiceConfigProperties: CleaningServiceConfigProperties
 ) {
 
@@ -86,7 +86,7 @@ class RelationCleaningServiceApiCallsTest @Autowired constructor(
             post(urlPathEqualTo(ORCHESTRATOR_RESERVE_TASKS_URL))
                 .inScenario(RESERVATION_SCENARIO)
                 .whenScenarioStateIs(RESERVED_STATE)
-                .willReturn(okJson(jacksonObjectMapper.writeValueAsString(TaskRelationsStepReservationResponse(emptyList(), Instant.now()))))
+                .willReturn(okJson(jsonMapper.writeValueAsString(TaskRelationsStepReservationResponse(emptyList(), Instant.now()))))
         )
     }
 
@@ -117,7 +117,7 @@ class RelationCleaningServiceApiCallsTest @Autowired constructor(
                 .willSetStateTo(RESERVED_STATE)
                 .willReturn(
                     okJson(
-                        jacksonObjectMapper.writeValueAsString(
+                        jsonMapper.writeValueAsString(
                             TaskRelationsStepReservationResponse(
                                 listOf(TaskRelationsStepReservationEntryDto(fixedTaskId, UUID.randomUUID().toString(), relation)),
                                 Instant.now()
@@ -139,7 +139,7 @@ class RelationCleaningServiceApiCallsTest @Autowired constructor(
         val serveEvents = orchestratorMockApi.getServeEvents(ServeEventQuery.forStubMapping(stubMapping)).requests
         assertEquals(1, serveEvents.size)
         val actualRequest = serveEvents.first().request
-        return jacksonObjectMapper.readValue(actualRequest.body, TaskRelationsStepResultRequest::class.java)
+        return jsonMapper.readValue(actualRequest.body, TaskRelationsStepResultRequest::class.java)
     }
 
     private fun createRelation(idSuffix: String, relationType: RelationType): BusinessPartnerRelations {

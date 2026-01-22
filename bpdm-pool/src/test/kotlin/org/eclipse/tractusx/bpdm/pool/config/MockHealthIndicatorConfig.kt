@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.config
 import io.mockk.every
 import io.mockk.mockk
 import org.eclipse.tractusx.bpdm.pool.util.OrchestratorHealthIndicator
-import org.springframework.boot.actuate.health.Health
+import org.springframework.boot.health.contributor.Health
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 

@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.cleaning.service
 
 import org.eclipse.tractusx.bpdm.cleaning.util.OrchestratorHealthIndicator
-import org.springframework.boot.actuate.health.Status
+import org.springframework.boot.health.contributor.Status
 import org.springframework.stereotype.Service
 
 @Service

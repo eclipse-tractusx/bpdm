@@ -38,7 +38,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.web.SecurityFilterChain
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfigurationSource
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
@@ -68,7 +67,7 @@ class NoAuthenticationConfig {
     @Bean
     fun webSecurityCustomizer(): WebSecurityCustomizer {
         logger.info { "Disabling security for any endpoints" }
-        return WebSecurityCustomizer { web -> web.ignoring().requestMatchers(AntPathRequestMatcher("**")) }
+        return WebSecurityCustomizer { web -> web.ignoring().requestMatchers("/**") }
     }
 }
 
@@ -95,14 +94,14 @@ class OAuthSecurityConfig(
         http.cors {}
         http.sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
         http.authorizeHttpRequests {
-            it.requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.OPTIONS, "/**")).permitAll()
-            it.requestMatchers(AntPathRequestMatcher.antMatcher("/")).permitAll() // forwards to swagger
-            it.requestMatchers(AntPathRequestMatcher.antMatcher("/docs/api-docs/**")).permitAll()
-            it.requestMatchers(AntPathRequestMatcher.antMatcher("/docs/api-docs.yaml/**")).permitAll()
-            it.requestMatchers(AntPathRequestMatcher.antMatcher("/ui/swagger-ui/**")).permitAll()
-            it.requestMatchers(AntPathRequestMatcher.antMatcher("/actuator/health/**")).permitAll()
-            it.requestMatchers(AntPathRequestMatcher.antMatcher("/error")).permitAll()
-            it.requestMatchers(AntPathRequestMatcher.antMatcher("/**")).authenticated()
+            it.requestMatchers(HttpMethod.OPTIONS,  "/**").permitAll()
+            it.requestMatchers("/").permitAll() // forwards to swagger
+            it.requestMatchers("/docs/api-docs/**").permitAll()
+            it.requestMatchers("/docs/api-docs.yaml/**").permitAll()
+            it.requestMatchers("/ui/swagger-ui/**").permitAll()
+            it.requestMatchers("/actuator/health/**").permitAll()
+            it.requestMatchers("/error").permitAll()
+            it.requestMatchers("/**").authenticated()
 
         }
         http.oauth2ResourceServer {

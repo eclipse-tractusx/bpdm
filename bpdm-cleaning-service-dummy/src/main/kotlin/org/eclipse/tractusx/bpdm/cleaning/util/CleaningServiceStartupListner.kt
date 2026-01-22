@@ -19,8 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.cleaning.util
 
-import org.springframework.boot.actuate.health.Status
 import org.springframework.boot.context.event.ApplicationReadyEvent
+import org.springframework.boot.health.contributor.Status
 import org.springframework.context.ApplicationListener
 import org.springframework.stereotype.Component
 

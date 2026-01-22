@@ -90,7 +90,7 @@ interface RelationRepository: JpaRepository<RelationDb, Long>, JpaSpecificationE
 
                     builder.equal(relationTypePath, relationType)
                 }
-            }
+            } ?: Specification.unrestricted()
 
         fun byOutputSourceBpnLs(sourceBpnLs: List<String>) =
             sourceBpnLs.takeIf { it.isNotEmpty() }?.let {
@@ -100,7 +100,7 @@ interface RelationRepository: JpaRepository<RelationDb, Long>, JpaSpecificationE
                         .get<RelationType>(RelationOutputDb::sourceBpnL.name)
                         .`in`(sourceBpnLs)
                 }
-            }
+            } ?: Specification.unrestricted()
 
         fun byOutputTargetBpnLs(targetBpnLs: List<String>) =
             targetBpnLs.takeIf { it.isNotEmpty() }?.let {
@@ -110,7 +110,7 @@ interface RelationRepository: JpaRepository<RelationDb, Long>, JpaSpecificationE
                         .get<RelationType>(RelationOutputDb::targetBpnL.name)
                        .`in`(targetBpnLs)
                 }
-            }
+            } ?: Specification.unrestricted()
 
         fun byOutputUpdatedAfter(updatedAfter: Instant?) =
             updatedAfter?.let {
@@ -121,7 +121,7 @@ interface RelationRepository: JpaRepository<RelationDb, Long>, JpaSpecificationE
 
                     builder.greaterThan(updatedAtPath, updatedAfter)
                 }
-            }
+            } ?: Specification.unrestricted()
 
         fun byOutputIsNotNull() =
             Specification<RelationDb> { root, _, builder ->

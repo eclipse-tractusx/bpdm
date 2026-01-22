@@ -22,8 +22,8 @@ package org.eclipse.tractusx.bpdm.gate.util
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest
-import org.springframework.boot.actuate.health.Health
-import org.springframework.boot.actuate.health.HealthIndicator
+import org.springframework.boot.health.contributor.Health
+import org.springframework.boot.health.contributor.HealthIndicator
 import org.springframework.stereotype.Component
 
 @Component("poolHealth")

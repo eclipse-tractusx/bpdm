@@ -48,6 +48,7 @@ import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.reactive.server.WebTestClient
@@ -58,6 +59,7 @@ import org.springframework.web.reactive.function.BodyInserters
 )
 @ActiveProfiles("test-no-auth")
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
+@AutoConfigureWebTestClient
 class MetadataControllerIT @Autowired constructor(
     private val dbTestHelpers: DbTestHelpers,
     private val webTestClient: WebTestClient,

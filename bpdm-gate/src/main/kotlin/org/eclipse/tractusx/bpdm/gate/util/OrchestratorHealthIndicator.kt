@@ -21,8 +21,8 @@ package org.eclipse.tractusx.bpdm.gate.util
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
-import org.springframework.boot.actuate.health.Health
-import org.springframework.boot.actuate.health.HealthIndicator
+import org.springframework.boot.health.contributor.Health
+import org.springframework.boot.health.contributor.HealthIndicator
 import org.springframework.stereotype.Component
 import java.time.Instant
 

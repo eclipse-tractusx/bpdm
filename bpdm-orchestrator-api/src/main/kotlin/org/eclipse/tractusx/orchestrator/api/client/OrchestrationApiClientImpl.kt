@@ -41,16 +41,13 @@ class OrchestrationApiClientImpl(
             .build()
     }
 
-    override val goldenRecordTasks by lazy { createClient<GoldenRecordTaskApiClient>() }
+    override val goldenRecordTasks: GoldenRecordTaskApiClient by lazy { httpServiceProxyFactory.createClient(GoldenRecordTaskApiClient::class.java) }
 
-    override val finishedTaskEvents by lazy { createClient<FinishedTaskEventApiClient>() }
+    override val finishedTaskEvents: FinishedTaskEventApiClient by lazy { httpServiceProxyFactory.createClient(FinishedTaskEventApiClient::class.java) }
 
-    override val relationsGoldenRecordTasks by lazy { createClient<RelationsGoldenRecordTaskApiClient>() }
+    override val relationsGoldenRecordTasks: RelationsGoldenRecordTaskApiClient by lazy { httpServiceProxyFactory.createClient(RelationsGoldenRecordTaskApiClient::class.java) }
 
-    override val relationsFinishedTaskEvents by lazy { createClient<RelationsFinishedTaskEventApiClient>() }
+    override val relationsFinishedTaskEvents: RelationsFinishedTaskEventApiClient by lazy { httpServiceProxyFactory.createClient(RelationsFinishedTaskEventApiClient::class.java) }
 
-    override val sharingMemberRecords by lazy { createClient<SharingMemberRecordApiClient>() }
-
-    private inline fun <reified T> createClient() =
-        httpServiceProxyFactory.createClient(T::class.java)
+    override val sharingMemberRecords: SharingMemberRecordApiClient by lazy { httpServiceProxyFactory.createClient(SharingMemberRecordApiClient::class.java) }
 }

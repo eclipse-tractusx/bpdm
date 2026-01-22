@@ -43,7 +43,7 @@ open class BpdmExceptionHandler: ResponseEntityExceptionHandler() {
         request: WebRequest
     ): ResponseEntity<Any>? {
         logException(ex)
-        val body = createProblemDetail(ex, status, ex.toString(), null as String?, null as Array<Any?>?, request)
+        val body = createProblemDetail(ex, status, ex.toString(), null as String?, null as Array<out Any>?, request)
         return handleExceptionInternal(ex, body, headers, status, request)
     }
 

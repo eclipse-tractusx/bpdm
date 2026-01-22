@@ -44,7 +44,7 @@ fun CountryCode.toDto(): TypeKeyNameVerboseDto<CountryCode> {
 fun PaginationRequest.toPageRequest(sort: Sort = Sort.unsorted()) =
     PageRequest.of(page, size, sort)
 
-fun <T, R> Page<T>.toPageDto(contentMapper: (T) -> R): PageDto<R> =
+fun <T: Any, R> Page<T>.toPageDto(contentMapper: (T) -> R): PageDto<R> =
     PageDto(
         page = number,
         totalElements = totalElements,

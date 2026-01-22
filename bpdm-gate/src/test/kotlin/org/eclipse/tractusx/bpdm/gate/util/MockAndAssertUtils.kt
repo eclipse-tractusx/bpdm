@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.gate.util
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions
@@ -41,12 +40,13 @@ import org.eclipse.tractusx.orchestrator.api.ApiCommons
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
+import tools.jackson.databind.json.JsonMapper
 import java.time.Instant
 
 @Component
 class MockAndAssertUtils @Autowired constructor(
     val gateClient: GateClient,
-    val objectMapper: ObjectMapper,
+    val jsonMapper: JsonMapper,
     val assertHelpers: AssertHelpers
 ) {
 
@@ -123,7 +123,7 @@ class MockAndAssertUtils @Autowired constructor(
         gateWireMockServer.stubFor(
             WireMock.post(WireMock.urlPathEqualTo(ORCHESTRATOR_CREATE_TASKS_URL))
                 .willReturn(
-                    WireMock.okJson(objectMapper.writeValueAsString(taskCreateResponse))
+                    WireMock.okJson(jsonMapper.writeValueAsString(taskCreateResponse))
                 )
         )
     }
@@ -168,13 +168,13 @@ class MockAndAssertUtils @Autowired constructor(
 
         gateWireMockServer.stubFor(
             WireMock.post(WireMock.urlPathEqualTo(ORCHESTRATOR_SEARCH_TASK_STATES_URL)).willReturn(
-                WireMock.okJson(objectMapper.writeValueAsString(taskStateResponse))
+                WireMock.okJson(jsonMapper.writeValueAsString(taskStateResponse))
             )
         )
 
         gateWireMockServer.stubFor(
             WireMock.get(WireMock.urlPathEqualTo("${ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS}/finished-events")).willReturn(
-                WireMock.okJson(objectMapper.writeValueAsString(
+                WireMock.okJson(jsonMapper.writeValueAsString(
                     FinishedTaskEventsResponse(2, 1, 0, 2, content =
                         listOf(
                             FinishedTaskEventsResponse.Event(Instant.now(), ResultState.Success, "0"),
@@ -191,7 +191,7 @@ class MockAndAssertUtils @Autowired constructor(
     fun mockOrchestratorApiResultStates(gateWireMockServer: WireMockExtension, resultStates: List<ResultState?>){
         gateWireMockServer.stubFor(
             WireMock.post(WireMock.urlPathEqualTo(ORCHESTRATOR_SEARCH_TASK_RESULT_STATES_URL)).willReturn(
-                WireMock.okJson(objectMapper.writeValueAsString(TaskResultStateSearchResponse( resultStates = resultStates )))
+                WireMock.okJson(jsonMapper.writeValueAsString(TaskResultStateSearchResponse( resultStates = resultStates )))
             )
         )
     }
