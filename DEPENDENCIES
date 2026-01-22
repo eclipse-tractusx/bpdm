@@ -11,9 +11,9 @@ maven/mavencentral/com.fasterxml.jackson.module/jackson-module-jakarta-xmlbind-a
 maven/mavencentral/com.fasterxml.jackson.module/jackson-module-kotlin/2.20.1, Apache-2.0, approved, clearlydefined
 maven/mavencentral/com.fasterxml/classmate/1.7.1, Apache-2.0, approved, #24482
 maven/mavencentral/com.github.dasniko/testcontainers-keycloak/3.2.0, Apache-2.0, approved, #14719
-maven/mavencentral/com.github.docker-java/docker-java-api/3.4.2, Apache-2.0, approved, #20872
-maven/mavencentral/com.github.docker-java/docker-java-transport-zerodep/3.4.2, Apache-2.0 AND (Apache-2.0 AND BSD-3-Clause), approved, #15745
-maven/mavencentral/com.github.docker-java/docker-java-transport/3.4.2, Apache-2.0, approved, #20873
+maven/mavencentral/com.github.docker-java/docker-java-api/3.7.0, Apache-2.0, approved, clearlydefined
+maven/mavencentral/com.github.docker-java/docker-java-transport-zerodep/3.7.0, Apache-2.0 AND MPL-2.0, approved, #25269
+maven/mavencentral/com.github.docker-java/docker-java-transport/3.7.0, Apache-2.0, approved, clearlydefined
 maven/mavencentral/com.github.java-json-tools/btf/1.3, Apache-2.0 OR LGPL-3.0-only, approved, #15201
 maven/mavencentral/com.github.java-json-tools/jackson-coreutils/2.0, Apache-2.0 OR LGPL-3.0-or-later, approved, #15186
 maven/mavencentral/com.github.java-json-tools/json-patch/1.13, Apache-2.0 OR LGPL-3.0-or-later, approved, CQ23929
@@ -112,12 +112,12 @@ maven/mavencentral/jakarta.xml.bind/jakarta.xml.bind-api/4.0.4, BSD-3-Clause, ap
 maven/mavencentral/junit/junit/4.13.2, EPL-2.0, approved, CQ23636
 maven/mavencentral/net.bytebuddy/byte-buddy-agent/1.17.8, Apache-2.0, approved, #19238
 maven/mavencentral/net.bytebuddy/byte-buddy/1.17.8, Apache-2.0 AND BSD-3-Clause, approved, #19239
-maven/mavencentral/net.java.dev.jna/jna/5.13.0, Apache-2.0 AND LGPL-2.1-or-later, approved, #15196
+maven/mavencentral/net.java.dev.jna/jna/5.18.1, Apache-2.0 AND LGPL-2.1-or-later, approved, #23404
 maven/mavencentral/net.minidev/accessors-smart/2.6.0, Apache-2.0, approved, #24380
 maven/mavencentral/net.minidev/json-smart/2.6.0, Apache-2.0, approved, clearlydefined
 maven/mavencentral/org.antlr/antlr4-runtime/4.13.2, BSD-3-Clause, approved, #10767
 maven/mavencentral/org.apache.commons/commons-collections4/4.5.0, Apache-2.0 AND LicenseRef-Public-Domain, approved, #20791
-maven/mavencentral/org.apache.commons/commons-compress/1.24.0, Apache-2.0 AND BSD-3-Clause AND bzip2-1.0.6 AND LicenseRef-Public-Domain, approved, #10368
+maven/mavencentral/org.apache.commons/commons-compress/1.28.0, Apache-2.0 AND (Apache-2.0 AND BSD-3-Clause), approved, #22677
 maven/mavencentral/org.apache.commons/commons-csv/1.14.1, Apache-2.0, approved, #20279
 maven/mavencentral/org.apache.commons/commons-lang3/3.19.0, Apache-2.0, approved, #23560
 maven/mavencentral/org.apache.commons/commons-text/1.13.1, Apache-2.0, approved, #17931
@@ -204,9 +204,9 @@ maven/mavencentral/org.rnorth.duct-tape/duct-tape/1.0.8, MIT, approved, clearlyd
 maven/mavencentral/org.skyscreamer/jsonassert/1.5.3, Apache-2.0, approved, clearlydefined
 maven/mavencentral/org.slf4j/jul-to-slf4j/2.0.17, MIT, approved, #7698
 maven/mavencentral/org.slf4j/slf4j-api/2.0.17, MIT, approved, #5915
-maven/mavencentral/org.springdoc/springdoc-openapi-starter-common/2.8.14, Apache-2.0, approved, #18209
-maven/mavencentral/org.springdoc/springdoc-openapi-starter-webmvc-api/2.8.14, Apache-2.0, approved, #18210
-maven/mavencentral/org.springdoc/springdoc-openapi-starter-webmvc-ui/2.8.14, Apache-2.0, approved, #18211
+maven/mavencentral/org.springdoc/springdoc-openapi-starter-common/3.0.0, Apache-2.0, approved, #25648
+maven/mavencentral/org.springdoc/springdoc-openapi-starter-webmvc-api/3.0.0, Apache-2.0, approved, clearlydefined
+maven/mavencentral/org.springdoc/springdoc-openapi-starter-webmvc-ui/3.0.0, Apache-2.0, approved, clearlydefined
 maven/mavencentral/org.springframework.boot/spring-boot-actuator-autoconfigure/4.0.1, Apache-2.0, approved, clearlydefined
 maven/mavencentral/org.springframework.boot/spring-boot-actuator/4.0.1, Apache-2.0, approved, clearlydefined
 maven/mavencentral/org.springframework.boot/spring-boot-autoconfigure/4.0.1, Apache-2.0, approved, #24987
@@ -285,11 +285,11 @@ maven/mavencentral/org.springframework/spring-tx/7.0.2, Apache-2.0, approved, #2
 maven/mavencentral/org.springframework/spring-web/7.0.2, Apache-2.0, approved, #24989
 maven/mavencentral/org.springframework/spring-webflux/7.0.2, Apache-2.0, approved, #25625
 maven/mavencentral/org.springframework/spring-webmvc/7.0.2, Apache-2.0, approved, #25606
-maven/mavencentral/org.testcontainers/database-commons/1.21.3, Apache-2.0, approved, #20875
-maven/mavencentral/org.testcontainers/jdbc/1.21.3, Apache-2.0, approved, #20877
-maven/mavencentral/org.testcontainers/junit-jupiter/1.21.3, MIT, approved, clearlydefined
-maven/mavencentral/org.testcontainers/postgresql/1.21.3, MIT, approved, #20876
-maven/mavencentral/org.testcontainers/testcontainers/1.21.3, MIT, approved, #20874
+maven/mavencentral/org.testcontainers/testcontainers-database-commons/2.0.2, Apache-2.0, approved, #25271
+maven/mavencentral/org.testcontainers/testcontainers-jdbc/2.0.2, Apache-2.0, approved, #25272
+maven/mavencentral/org.testcontainers/testcontainers-junit-jupiter/2.0.2, MIT, approved, clearlydefined
+maven/mavencentral/org.testcontainers/testcontainers-postgresql/2.0.2, MIT, approved, #25273
+maven/mavencentral/org.testcontainers/testcontainers/2.0.2, MIT, approved, #25274
 maven/mavencentral/org.webjars/swagger-ui/5.30.1, Apache-2.0 AND (Apache-2.0 AND MIT), approved, #24622
 maven/mavencentral/org.webjars/webjars-locator-lite/1.1.2, MIT, approved, #24484
 maven/mavencentral/org.xmlunit/xmlunit-core/2.10.4, Apache-2.0, approved, #14590
