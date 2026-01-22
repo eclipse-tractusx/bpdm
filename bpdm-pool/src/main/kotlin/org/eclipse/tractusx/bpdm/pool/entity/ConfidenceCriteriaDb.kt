@@ -30,12 +30,28 @@ data class ConfidenceCriteriaDb(
     val sharedByOwner: Boolean,
     @Column(name = "checked_by_external_data_source", nullable = false)
     val checkedByExternalDataSource: Boolean,
-    @Column(name = "number_of_business_partners", nullable = false)
-    val numberOfBusinessPartners: Int,
+    @Column(name = "number_of_sharing_members", nullable = false)
+    val numberOfSharingMembers: Int,
     @Column(name = "last_confidence_check_at", nullable = false)
     val lastConfidenceCheckAt: LocalDateTime,
     @Column(name = "next_confidence_check_at", nullable = false)
-    val nextConfidenceCheckAt: LocalDateTime,
-    @Column(name = "confidence_level", nullable = false)
-    val confidenceLevel: Int,
-)
+    val nextConfidenceCheckAt: LocalDateTime
+){
+    companion object{
+        const val SHARED_BY_OWNER_WEIGHT = 5
+        const val CHECKED_BY_EXTERNAL_DATASOURCE_WEIGHT = 3
+        const val SHARING_MEMBERS_THRESHOLD = 3
+        const val SHARING_MEMBERS_WEIGHT = 1
+    }
+
+    @get:Column(name = "confidence_level", nullable = false)
+    val confidenceLevel: Int
+        get() {
+            val sharedByOwnerLevel = if(sharedByOwner) SHARED_BY_OWNER_WEIGHT else 0
+            val checkedByExternalDataSourceLevel = if(checkedByExternalDataSource) CHECKED_BY_EXTERNAL_DATASOURCE_WEIGHT else 0
+            val numberOfSharingMembersLevel = if(numberOfSharingMembers >= SHARING_MEMBERS_THRESHOLD) SHARING_MEMBERS_WEIGHT else 0
+
+            return sharedByOwnerLevel + checkedByExternalDataSourceLevel + numberOfSharingMembersLevel
+        }
+
+}

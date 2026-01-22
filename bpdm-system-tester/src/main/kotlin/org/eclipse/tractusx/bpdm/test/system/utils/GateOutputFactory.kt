@@ -41,7 +41,7 @@ class GateOutputFactory(
         checkedByExternalDataSource = false,
         lastConfidenceCheckAt = LocalDateTime.now(),
         nextConfidenceCheckAt = LocalDateTime.now().plus (5, ChronoUnit.DAYS),
-        confidenceLevel = 0
+        confidenceLevel = 5
     )
 
     fun createOutput(fromSeed: String, externalId: String = fromSeed): BusinessPartnerOutputDto{
