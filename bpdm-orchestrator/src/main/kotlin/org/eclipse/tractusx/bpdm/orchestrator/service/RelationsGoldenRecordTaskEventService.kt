@@ -44,7 +44,7 @@ class RelationsGoldenRecordTaskEventService(
             totalElements = finishedTasksPage.totalElements,
             totalPages = finishedTasksPage.totalPages,
             page = finishedTasksPage.number,
-            contentSize = finishedTasksPage.size,
+            contentSize = finishedTasksPage.content.size,
             content = finishedTasksPage.content.map { FinishedTaskEventsResponse.Event(it.updatedAt.instant, relationsResponseMapper.toResultState(it.processingState.resultState), it.uuid.toString()) }
         )
     }
