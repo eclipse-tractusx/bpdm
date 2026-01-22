@@ -1,6 +1,6 @@
 # bpdm
 
-![Version: 6.2.0](https://img.shields.io/badge/Version-6.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 7.2.0](https://img.shields.io/badge/AppVersion-7.2.0-informational?style=flat-square)
+![Version: 6.3.0-SNAPSHOT](https://img.shields.io/badge/Version-6.3.0--SNAPSHOT-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 7.3.0-SNAPSHOT](https://img.shields.io/badge/AppVersion-7.3.0--SNAPSHOT-informational?style=flat-square)
 
 A Helm chart for Kubernetes that deploys the BPDM applications
 
@@ -21,13 +21,13 @@ A Helm chart for Kubernetes that deploys the BPDM applications
 
 | Repository | Name | Version |
 |------------|------|---------|
-|  | bpdm-cleaning-service-dummy(bpdm-cleaning-service-dummy) | 4.2.0 |
+|  | bpdm-cleaning-service-dummy(bpdm-cleaning-service-dummy) | 4.3.0-SNAPSHOT |
 |  | bpdm-common | 1.0.5 |
-|  | bpdm-gate(bpdm-gate) | 7.2.0 |
-|  | bpdm-orchestrator(bpdm-orchestrator) | 4.2.0 |
-|  | bpdm-pool(bpdm-pool) | 8.2.0 |
-| https://charts.bitnami.com/bitnami | postgres(postgresql) | 12.12.10 |
+|  | bpdm-gate(bpdm-gate) | 7.3.0-SNAPSHOT |
+|  | bpdm-orchestrator(bpdm-orchestrator) | 4.3.0-SNAPSHOT |
+|  | bpdm-pool(bpdm-pool) | 8.3.0-SNAPSHOT |
 | https://eclipse-tractusx.github.io/charts/dev | centralidp(centralidp) | 4.2.1 |
+| oci://registry-1.docker.io/cloudpirates | postgres | 0.11.0 |
 
 ## Values
 
@@ -69,9 +69,8 @@ A Helm chart for Kubernetes that deploys the BPDM applications
 | postgres.auth.password | string | `"bpdm"` |  |
 | postgres.auth.username | string | `"bpdm"` |  |
 | postgres.enabled | bool | `true` |  |
-| postgres.fullnameOverride | string | `"bpdm-postgres"` |  |
-| postgres.image.repository | string | `"bitnamilegacy/postgresql"` |  |
-| postgres.image.tag | string | `"15-debian-11"` |  |
+| postgres.image.registry | string | `"docker.io"` | PostgreSQL image registry |
+| postgres.image.repository | string | `"postgres"` | PostgreSQL image repository |
 | tests.applicationConfig.bpdm.client.gate.provider.issuer-uri | string | `"http://bpdm-centralidp/auth/realms/CX-Central"` |  |
 | tests.applicationConfig.bpdm.client.orchestrator.provider.issuer-uri | string | `"http://bpdm-centralidp/auth/realms/CX-Central"` |  |
 | tests.applicationConfig.bpdm.client.pool.provider.issuer-uri | string | `"http://bpdm-centralidp/auth/realms/CX-Central"` |  |
