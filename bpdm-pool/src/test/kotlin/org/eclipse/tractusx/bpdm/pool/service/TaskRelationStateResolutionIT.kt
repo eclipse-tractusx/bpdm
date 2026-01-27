@@ -19,6 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
+import io.mockk.every
+import io.mockk.mockkStatic
+import io.mockk.unmockkStatic
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
@@ -29,6 +32,7 @@ import org.eclipse.tractusx.bpdm.test.testdata.pool.TestDataEnvironment
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
@@ -36,7 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
-import java.time.LocalDate
+import java.time.*
 
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class]
@@ -49,9 +53,13 @@ class TaskRelationStateResolutionIT @Autowired constructor(
     private val dataHelper: PoolDataHelper,
     private val dbTestHelpers: DbTestHelpers
 ) {
+    private val pastClock = Clock.fixed(OffsetDateTime.of(1970, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC).toInstant(), ZoneId.of("UTC"))
 
     private lateinit var testDataEnvironment: TestDataEnvironment
     private lateinit var testName: String
+
+    private val futureDate = LocalDate.now().plusYears(1)
+    private val pastDate = LocalDate.now().minusYears(1)
 
     @BeforeEach
     fun beforeEach(testInfo: TestInfo) {
@@ -74,8 +82,8 @@ class TaskRelationStateResolutionIT @Autowired constructor(
             legalEntity1.legalEntity.bpnl,
             listOf(
                 RelationValidityPeriod(
-                    validFrom = LocalDate.ofYearDay(2025, 1),
-                    validTo =  LocalDate.ofYearDay(2026, 1)
+                    validFrom = futureDate,
+                    validTo =  futureDate.plusYears(1)
                 )
             ))
         val createdRelation = createRelation(relationToCreate)
@@ -98,7 +106,7 @@ class TaskRelationStateResolutionIT @Autowired constructor(
             legalEntity1.legalEntity.bpnl,
             listOf(
                 RelationValidityPeriod(
-                    validFrom = LocalDate.ofYearDay(2025, 1),
+                    validFrom = futureDate.plusYears(1),
                     validTo = null
                 )
             ))
@@ -122,12 +130,12 @@ class TaskRelationStateResolutionIT @Autowired constructor(
             legalEntity1.legalEntity.bpnl,
             listOf(
                 RelationValidityPeriod(
-                    validFrom = LocalDate.ofYearDay(2025, 1),
-                    validTo = LocalDate.ofYearDay(2026, 1)
+                    validFrom = futureDate,
+                    validTo = futureDate.plusYears(1)
                 ),
                 RelationValidityPeriod(
-                    validFrom = LocalDate.ofYearDay(2027, 1),
-                    validTo = LocalDate.ofYearDay(2028, 1)
+                    validFrom = futureDate.plusYears(2),
+                    validTo = futureDate.plusYears(3)
                 )
             ))
         val createdRelation = createRelation(relationToCreate)
@@ -150,16 +158,16 @@ class TaskRelationStateResolutionIT @Autowired constructor(
             legalEntity1.legalEntity.bpnl,
             listOf(
                 RelationValidityPeriod(
-                    validFrom = LocalDate.ofYearDay(2026, 1),
-                    validTo = LocalDate.ofYearDay(2027, 1)
+                    validFrom = futureDate.plusYears(1),
+                    validTo = futureDate.plusYears(2)
                 ),
                 RelationValidityPeriod(
-                    validFrom = LocalDate.ofYearDay(2027, 1),
-                    validTo = LocalDate.ofYearDay(2028, 1)
+                    validFrom = futureDate.plusYears(2),
+                    validTo = futureDate.plusYears(3)
                 ),
                 RelationValidityPeriod(
-                    validFrom = LocalDate.ofYearDay(2025, 1),
-                    validTo = LocalDate.ofYearDay(2026, 1)
+                    validFrom = futureDate,
+                    validTo = futureDate.plusYears(1)
                 ),
             ))
         val createdRelation = createRelation(relationToCreate)
@@ -202,16 +210,229 @@ class TaskRelationStateResolutionIT @Autowired constructor(
             legalEntity1.legalEntity.bpnl,
             listOf(
                 RelationValidityPeriod(
-                    validFrom = LocalDate.ofYearDay(2025, 1),
-                    validTo = LocalDate.ofYearDay(2027, 1)
+                    validFrom = futureDate,
+                    validTo = futureDate.plusYears(2)
                 ),
                 RelationValidityPeriod(
-                    validFrom = LocalDate.ofYearDay(2026, 1),
-                    validTo = LocalDate.ofYearDay(2027, 1)
+                    validFrom = futureDate.plusYears(1),
+                    validTo = futureDate.plusYears(2)
                 ),
                 RelationValidityPeriod(
-                    validFrom = LocalDate.ofYearDay(2027, 1),
-                    validTo = LocalDate.ofYearDay(2028, 1)
+                    validFrom = futureDate.plusYears(2),
+                    validTo = futureDate.plusYears(3)
+                )
+            ))
+        val createdRelation = createRelation(relationToCreate)
+
+        //Then
+        assertError(createdRelation)
+    }
+
+    @Test
+    fun `try update IsManagedBy relation with overwriting historic validity`(){
+        //Given
+        val legalEntity1 = createLegalEntity("$testName 1")
+        val legalEntity2 = createLegalEntity("$testName 2")
+
+        executeInPast {
+            val relationToCreate = BusinessPartnerRelations(
+                RelationType.IsManagedBy,
+                legalEntity2.legalEntity.bpnl,
+                legalEntity1.legalEntity.bpnl,
+                listOf(
+                    RelationValidityPeriod(
+                        validFrom = pastDate.minusYears(1),
+                        validTo = pastDate
+                    )
+                ))
+            createRelation(relationToCreate)
+        }
+
+
+        //When
+        val relationToUpdate = BusinessPartnerRelations(
+            RelationType.IsManagedBy,
+            legalEntity2.legalEntity.bpnl,
+            legalEntity1.legalEntity.bpnl,
+            listOf(
+                RelationValidityPeriod(
+                    validFrom = futureDate,
+                    validTo = futureDate.plusYears(1)
+                )
+            )
+        )
+        val updatedRelation = createRelation(relationToUpdate)
+
+        //Then
+        assertError(updatedRelation)
+    }
+
+    @Test
+    fun `try update relation with overwriting ongoing validity start`(){
+        //Given
+        val legalEntity1 = createLegalEntity("$testName 1")
+        val legalEntity2 = createLegalEntity("$testName 2")
+
+        executeInPast {
+            val relationToCreate = BusinessPartnerRelations(
+                RelationType.IsManagedBy,
+                legalEntity2.legalEntity.bpnl,
+                legalEntity1.legalEntity.bpnl,
+                listOf(
+                    RelationValidityPeriod(
+                        validFrom = pastDate.minusYears(1),
+                        validTo = futureDate
+                    )
+                )
+            )
+            createRelation(relationToCreate)
+        }
+
+        //When
+        val relationToUpdate = BusinessPartnerRelations(
+            RelationType.IsManagedBy,
+            legalEntity2.legalEntity.bpnl,
+            legalEntity1.legalEntity.bpnl,
+            listOf(
+                RelationValidityPeriod(
+                    validFrom = pastDate.minusYears(1),
+                    validTo = pastDate
+                )
+            )
+        )
+        val updatedRelation = createRelation(relationToUpdate)
+
+        //Then
+        assertError(updatedRelation)
+    }
+
+    @Test
+    fun `update relation with overwriting ongoing validity end`(){
+        //Given
+        val legalEntity1 = createLegalEntity("$testName 1")
+        val legalEntity2 = createLegalEntity("$testName 2")
+
+
+        executeInPast {
+            val relationToCreate = BusinessPartnerRelations(
+                RelationType.IsManagedBy,
+                legalEntity2.legalEntity.bpnl,
+                legalEntity1.legalEntity.bpnl,
+                listOf(
+                    RelationValidityPeriod(
+                        validFrom = pastDate,
+                        validTo = futureDate
+                    )
+                ))
+            createRelation(relationToCreate)
+        }
+
+        //When
+        val relationToUpdate = BusinessPartnerRelations(
+            RelationType.IsManagedBy,
+            legalEntity2.legalEntity.bpnl,
+            legalEntity1.legalEntity.bpnl,
+            listOf(
+                RelationValidityPeriod(
+                    validFrom = pastDate,
+                    validTo = futureDate.plusYears(1)
+                )
+            )
+        )
+        val updatedRelation = createRelation(relationToUpdate)
+
+
+        //Then
+        assertSuccess(updatedRelation, relationToUpdate)
+    }
+
+    @ParameterizedTest
+    @EnumSource(RelationType::class)
+    fun `update relation with overwriting future validity`(relationType: RelationType){
+        //Given
+        val legalEntity1 = createLegalEntity("$testName 1")
+        val legalEntity2 = createLegalEntity("$testName 2")
+
+        val relationToCreate = BusinessPartnerRelations(
+            relationType,
+            legalEntity2.legalEntity.bpnl,
+            legalEntity1.legalEntity.bpnl,
+            listOf(
+                RelationValidityPeriod(
+                    validFrom = futureDate,
+                    validTo = futureDate.plusYears(1)
+                )
+            ))
+        createRelation(relationToCreate)
+
+        //When
+        val relationToUpdate = BusinessPartnerRelations(
+            relationType,
+            legalEntity2.legalEntity.bpnl,
+            legalEntity1.legalEntity.bpnl,
+            listOf(
+                RelationValidityPeriod(
+                    validFrom = futureDate.plusYears(2),
+                    validTo = null
+                )
+            )
+        )
+        val updatedRelation = createRelation(relationToUpdate)
+
+        //Then
+        assertSuccess(updatedRelation, relationToUpdate)
+    }
+
+    @Test
+    fun `try update IsManagedBy relation with giving historic validity`(){
+        //Given
+        val legalEntity1 = createLegalEntity("$testName 1")
+        val legalEntity2 = createLegalEntity("$testName 2")
+
+        val relationToCreate = BusinessPartnerRelations(
+            RelationType.IsManagedBy,
+            legalEntity2.legalEntity.bpnl,
+            legalEntity1.legalEntity.bpnl,
+            listOf(
+                RelationValidityPeriod(
+                    validFrom = futureDate,
+                    validTo = futureDate.plusYears(1)
+                )
+            ))
+        createRelation(relationToCreate)
+
+        //When
+        val relationToUpdate = BusinessPartnerRelations(
+            RelationType.IsManagedBy,
+            legalEntity2.legalEntity.bpnl,
+            legalEntity1.legalEntity.bpnl,
+            listOf(
+                RelationValidityPeriod(
+                    validFrom = pastDate.minusYears(1),
+                    validTo = pastDate
+                )
+            )
+        )
+        val updatedRelation = createRelation(relationToUpdate)
+
+        //Then
+        assertError(updatedRelation)
+    }
+
+    @Test
+    fun `try create IsManagedBy relation in the past`(){
+        //Given
+        val legalEntity1 = createLegalEntity("$testName 1")
+        val legalEntity2 = createLegalEntity("$testName 2")
+
+        val relationToCreate = BusinessPartnerRelations(
+            RelationType.IsManagedBy,
+            legalEntity2.legalEntity.bpnl,
+            legalEntity1.legalEntity.bpnl,
+            listOf(
+                RelationValidityPeriod(
+                    validFrom = pastDate,
+                    validTo = futureDate.plusYears(1)
                 )
             ))
         val createdRelation = createRelation(relationToCreate)
@@ -241,5 +462,17 @@ class TaskRelationStateResolutionIT @Autowired constructor(
 
     private fun assertError(actual: TaskRelationsStepResultEntryDto){
         Assertions.assertThat(actual.errors).isNotEmpty
+    }
+
+    private fun executeInPast(methodToExecute: () -> Unit){
+        mockkStatic(Instant::class)
+        mockkStatic(Clock::class)
+        every { Instant.now() } returns pastClock.instant()
+        every { Clock.systemUTC() } returns pastClock
+        every { Clock.systemDefaultZone() } returns pastClock
+
+        methodToExecute()
+        unmockkStatic(Instant::class)
+        unmockkStatic(Clock::class)
     }
 }

@@ -41,7 +41,13 @@ class AlternativeHeadquarterRelationUpsertService(
         validateOnlyOneAlternative(standardisedRequest)
 
         val result = relationUpsertService.upsertRelation(
-            RelationUpsertService.UpsertRequest(standardisedRequest.source, standardisedRequest.target, RelationType.IsAlternativeHeadquarterFor, standardisedRequest.validityPeriods)
+            RelationUpsertService.UpsertRequest(
+                standardisedRequest.source,
+                standardisedRequest.target,
+                RelationType.IsAlternativeHeadquarterFor,
+                standardisedRequest.validityPeriods,
+                standardisedRequest.existingRelation
+            )
         )
 
         return result
@@ -52,13 +58,9 @@ class AlternativeHeadquarterRelationUpsertService(
         val proposedTarget = upsertRequest.target
 
         val sourceIsOlder = proposedSource.createdAt < proposedTarget.createdAt
-        val upsertRequest = if(sourceIsOlder){
-            IRelationUpsertStrategyService.UpsertRequest(source = proposedTarget, target = proposedSource, validityPeriods = upsertRequest.validityPeriods)
-        }else{
-            IRelationUpsertStrategyService.UpsertRequest(source = proposedSource, target = proposedTarget,  validityPeriods = upsertRequest.validityPeriods)
-        }
+        val standardisedUpsertRequest = if(sourceIsOlder) upsertRequest.copy(source = proposedTarget, target = proposedSource) else upsertRequest
 
-        return upsertRequest
+        return standardisedUpsertRequest
     }
 
     private fun validateOnlyOneAlternative(upsertRequest: IRelationUpsertStrategyService.UpsertRequest){
