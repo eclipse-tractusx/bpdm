@@ -193,6 +193,8 @@ jobs:
       - name: Create Chart-Testing Config
         run: |
           cat <<EOF > .chart-testing-config.yaml
+          chart-repos:
+            - bitnami=https://charts.bitnami.com/bitnami
           helm-extra-args: --timeout 900s
           EOF
           echo "cat .chart-testing-config.yaml"
@@ -257,10 +259,9 @@ jobs:
         env:
           UPGRADE_FROM: ${{ github.event.inputs.upgrade_from && '--version github.event.inputs.upgrade_from' || '' }}
         run: |
+          helm repo add bitnami https://charts.bitnami.com/bitnami
           helm repo add tractusx-dev https://eclipse-tractusx.github.io/charts/dev
           helm install -f charts/bpdm/ci/test-upgrade-values.yaml  bpdm-test tractusx-dev/bpdm $UPGRADE_FROM
           helm dependency update charts/bpdm
-          kubectl delete statefulset bpdm-postgres --ignore-not-found=true
-          kubectl delete pvc -l app.kubernetes.io/name=postgres --ignore-not-found=true
           helm upgrade -f charts/bpdm/ci/test-upgrade-values.yaml  bpdm-test charts/bpdm
 

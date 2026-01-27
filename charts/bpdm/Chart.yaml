@@ -50,10 +50,10 @@ dependencies:
     condition: bpdm-orchestrator.enabled
   - name: bpdm-common
     version: 1.0.5
-  - name: postgres
-    version: 0.11.0
-    repository: oci://registry-1.docker.io/cloudpirates
-    condition: postgres.enabled
+  - name: postgresql
+    version: 12.12.10
+    repository: https://charts.bitnami.com/bitnami
+    alias: postgres
   - name: centralidp
     version: 4.2.1
     repository: https://eclipse-tractusx.github.io/charts/dev
