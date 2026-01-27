@@ -22,8 +22,8 @@ A Helm chart for deploying the BPDM gate service
 | Repository | Name | Version |
 |------------|------|---------|
 | file://../bpdm-common | bpdm-common | 1.0.5 |
+| https://charts.bitnami.com/bitnami | postgres(postgresql) | 12.12.10 |
 | https://eclipse-tractusx.github.io/charts/dev | centralidp(centralidp) | 4.2.1 |
-| oci://registry-1.docker.io/cloudpirates | postgres | 0.11.0 |
 
 ## Values
 

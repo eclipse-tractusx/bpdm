@@ -26,8 +26,8 @@ A Helm chart for Kubernetes that deploys the BPDM applications
 |  | bpdm-gate(bpdm-gate) | 7.3.0-SNAPSHOT |
 |  | bpdm-orchestrator(bpdm-orchestrator) | 4.3.0-SNAPSHOT |
 |  | bpdm-pool(bpdm-pool) | 8.3.0-SNAPSHOT |
+| https://charts.bitnami.com/bitnami | postgres(postgresql) | 12.12.10 |
 | https://eclipse-tractusx.github.io/charts/dev | centralidp(centralidp) | 4.2.1 |
-| oci://registry-1.docker.io/cloudpirates | postgres | 0.11.0 |
 
 ## Values
 
@@ -69,8 +69,9 @@ A Helm chart for Kubernetes that deploys the BPDM applications
 | postgres.auth.password | string | `"bpdm"` |  |
 | postgres.auth.username | string | `"bpdm"` |  |
 | postgres.enabled | bool | `true` |  |
-| postgres.image.registry | string | `"docker.io"` | PostgreSQL image registry |
-| postgres.image.repository | string | `"postgres"` | PostgreSQL image repository |
+| postgres.fullnameOverride | string | `"bpdm-postgres"` |  |
+| postgres.image.repository | string | `"bitnamilegacy/postgresql"` |  |
+| postgres.image.tag | string | `"15-debian-11"` |  |
 | tests.applicationConfig.bpdm.client.gate.provider.issuer-uri | string | `"http://bpdm-centralidp/auth/realms/CX-Central"` |  |
 | tests.applicationConfig.bpdm.client.orchestrator.provider.issuer-uri | string | `"http://bpdm-centralidp/auth/realms/CX-Central"` |  |
 | tests.applicationConfig.bpdm.client.pool.provider.issuer-uri | string | `"http://bpdm-centralidp/auth/realms/CX-Central"` |  |
