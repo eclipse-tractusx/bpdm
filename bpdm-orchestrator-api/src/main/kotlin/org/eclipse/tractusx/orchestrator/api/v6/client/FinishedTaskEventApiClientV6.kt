@@ -17,18 +17,21 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.test.config
+package org.eclipse.tractusx.orchestrator.api.v6.client
 
-import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.BusinessPartnerTestDataFactory
-import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorRequestFactoryCommon
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
+import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.orchestrator.api.ApiCommons
+import org.eclipse.tractusx.orchestrator.api.FinishedTaskEventApi
+import org.eclipse.tractusx.orchestrator.api.model.FinishedTaskEventsResponse
+import org.springdoc.core.annotations.ParameterObject
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.service.annotation.GetExchange
+import org.springframework.web.service.annotation.HttpExchange
+import java.time.Instant
 
-@Configuration
-class OrchestratorTestDataConfiguration {
+@HttpExchange
+interface FinishedTaskEventApiClientV6: FinishedTaskEventApi {
 
-    @Bean
-    fun orchestratorTestdataFactory(): BusinessPartnerTestDataFactory =
-        BusinessPartnerTestDataFactory(OrchestratorRequestFactoryCommon())
-
+    @GetExchange(value = "${ApiCommons.BASE_PATH_V6}/finished-events")
+    override fun getEvents(@RequestParam timestamp: Instant, @ParameterObject paginationRequest: PaginationRequest): FinishedTaskEventsResponse
 }
