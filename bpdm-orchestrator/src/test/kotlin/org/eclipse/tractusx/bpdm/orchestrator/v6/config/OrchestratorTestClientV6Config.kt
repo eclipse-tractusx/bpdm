@@ -17,30 +17,34 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.v6.config
+package org.eclipse.tractusx.bpdm.orchestrator.v6.config
 
 import org.eclipse.tractusx.bpdm.common.util.BpdmWebClientProvider
-import org.eclipse.tractusx.bpdm.gate.api.v6.client.GateClientV6
-import org.eclipse.tractusx.bpdm.gate.v6.util.GateTestClientProviderV6
+import org.eclipse.tractusx.bpdm.orchestrator.v6.util.OrchestratorTestClientProviderV6
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
+import org.eclipse.tractusx.orchestrator.api.v6.client.OrchestratorApiClientV6
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.web.server.servlet.context.ServletWebServerApplicationContext
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 @Configuration
-@ConditionalOnProperty(name = ["test.v6"], havingValue = "true", matchIfMissing = false)
-class GateClientV6Config{
+@ConditionalOnProperty(name = ["test.v6.enabled"], havingValue = "true", matchIfMissing = false)
+class OrchestratorTestClientV6Config {
+
     @Bean
-    fun testClientProviderV6(
+    fun orchestratorTestClientProviderV6(
         webServerApplicationContext: ServletWebServerApplicationContext,
         clientProvider: BpdmWebClientProvider
-    ): GateTestClientProviderV6{
-        return GateTestClientProviderV6(webServerApplicationContext.webServer!!, clientProvider)
+    ): OrchestratorTestClientProviderV6{
+        return OrchestratorTestClientProviderV6(webServerApplicationContext.webServer!!, clientProvider)
     }
 
     @Bean
-    fun gateClientV6(testClientProvider: GateTestClientProviderV6): GateClientV6{
+    fun orchestratorClientV6(
+        testClientProvider: OrchestratorTestClientProviderV6
+    ): OrchestratorApiClientV6{
         return testClientProvider.createClient(KeyCloakInitializer.CLIENT_ID_OPERATOR)
     }
+
 }

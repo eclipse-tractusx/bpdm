@@ -17,29 +17,27 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.v6
+package org.eclipse.tractusx.bpdm.gate.v6.util
 
-import org.eclipse.tractusx.bpdm.gate.api.v6.client.GateClientV6
-import org.eclipse.tractusx.bpdm.gate.v6.util.GateAssertRepositoryV6
-import org.eclipse.tractusx.bpdm.gate.v6.util.GateTestDataClientV6
-import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
-import org.junit.jupiter.api.TestInfo
-import org.springframework.beans.factory.annotation.Autowired
+import org.eclipse.tractusx.bpdm.common.util.BpdmClientCreateProperties
+import org.eclipse.tractusx.bpdm.common.util.BpdmWebClientProvider
+import org.eclipse.tractusx.bpdm.gate.api.v6.client.GateClientV6Impl
+import org.springframework.boot.web.server.WebServer
 
-abstract class GateV6Test: IsGateV6Test {
-    @Autowired
-    lateinit var databaseHelpers: DbTestHelpers
-    @Autowired
-    override lateinit var assertRepo: GateAssertRepositoryV6
-    @Autowired
-    override lateinit var testDataClient: GateTestDataClientV6
-    @Autowired
-    override lateinit var gateClient: GateClientV6
+class GateTestClientProviderV6(
+    private val ownWebServer: WebServer,
+    private val bpdmWebClientProvider: BpdmWebClientProvider
+) {
 
-    lateinit var testName: String
-
-    open fun beforeEach(testInfo: TestInfo){
-        testName = testInfo.displayName
-        databaseHelpers.truncateDbTables()
+    fun createClient(oauth2RegistrationId: String?): GateClientV6Impl{
+        return GateClientV6Impl{
+            bpdmWebClientProvider.builder(
+                BpdmClientCreateProperties(
+                    oauth2RegistrationId ?: "",
+                    "http://localhost:${ownWebServer.port}",
+                    oauth2RegistrationId != null
+                )
+            ).build()
+        }
     }
 }

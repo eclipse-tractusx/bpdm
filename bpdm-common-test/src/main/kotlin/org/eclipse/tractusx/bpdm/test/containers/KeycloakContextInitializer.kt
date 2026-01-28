@@ -50,6 +50,10 @@ class KeyCloakInitializer: ApplicationContextInitializer<ConfigurableApplication
         const val CLIENT_ID_GATE_INPUT_CONSUMER = "gate-input-consumer"
         const val CLIENT_ID_GATE_OUTPUT_CONSUMER = "gate-output-consumer"
 
+        const val CLIENT_ID_ORCHESTRATOR_PROCESSOR_POOL_SYNC = "orchestrator-pool-sync"
+        const val CLIENT_ID_ORCHESTRATOR_PROCESSOR_CLEAN_AND_SYNC = "orchestrator-clean-and-sync"
+        const val CLIENT_ID_ORCHESTRATOR_PROCESSOR_CLEAN = "orchestrator-clean"
+        const val CLIENT_ID_ORCHESTRATOR_TASK_CREATOR = "orchestrator-task-creator"
 
         private const val OWN_PROVIDER_ID = "test-keycloak"
 
@@ -87,12 +91,16 @@ class KeyCloakInitializer: ApplicationContextInitializer<ConfigurableApplication
         clientFactory = KeycloakClientFactory()
 
         val propertyValues = listOf(
-            initializeClient(CLIENT_ID_OPERATOR, listOf("BPDM Pool Admin", "BPDM Sharing Admin")),
+            initializeClient(CLIENT_ID_OPERATOR, listOf("BPDM Pool Admin", "BPDM Sharing Admin", "BPDM Orchestrator Admin")),
             initializeClient(CLIENT_ID_SHARING_MEMBER, listOf("BPDM Pool Sharing Consumer")),
             initializeClient(CLIENT_ID_PARTICIPANT, listOf("BPDM Pool Consumer")),
             initializeClient(CLIENT_ID_GATE_INPUT_MANAGER, listOf("BPDM Sharing Input Manager")),
             initializeClient(CLIENT_ID_GATE_INPUT_CONSUMER, listOf("BPDM Sharing Input Consumer")),
             initializeClient(CLIENT_ID_GATE_OUTPUT_CONSUMER, listOf("BPDM Sharing Output Consumer")),
+            initializeClient(CLIENT_ID_ORCHESTRATOR_PROCESSOR_POOL_SYNC, listOf("BPDM Orchestrator Processor PoolSync")),
+            initializeClient(CLIENT_ID_ORCHESTRATOR_PROCESSOR_CLEAN_AND_SYNC, listOf("BPDM Orchestrator Processor CleanAndSync")),
+            initializeClient(CLIENT_ID_ORCHESTRATOR_PROCESSOR_CLEAN, listOf("BPDM Orchestrator Processor Clean")),
+            initializeClient(CLIENT_ID_ORCHESTRATOR_TASK_CREATOR, listOf("BPDM Orchestrator Task Creator")),
             initializeClient(CLIENT_ID_UNAUTHORIZED, emptyList())
         ).flatten().toTypedArray()
 

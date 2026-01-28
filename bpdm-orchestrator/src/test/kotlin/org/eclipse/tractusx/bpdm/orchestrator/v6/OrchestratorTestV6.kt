@@ -17,24 +17,30 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.v6
+package org.eclipse.tractusx.bpdm.orchestrator.v6
 
-import org.eclipse.tractusx.bpdm.gate.api.v6.client.GateClientV6
-import org.eclipse.tractusx.bpdm.gate.v6.util.GateAssertRepositoryV6
-import org.eclipse.tractusx.bpdm.gate.v6.util.GateTestDataClientV6
+import org.eclipse.tractusx.bpdm.orchestrator.v6.util.OrchestratorAssertRepositoryV6
+import org.eclipse.tractusx.bpdm.orchestrator.v6.util.OrchestratorTestDataClientV6
+import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorExpectedResultFactoryV6
+import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorRequestFactoryV6
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
+import org.eclipse.tractusx.orchestrator.api.v6.client.OrchestratorApiClientV6
 import org.junit.jupiter.api.TestInfo
 import org.springframework.beans.factory.annotation.Autowired
 
-abstract class GateV6Test: IsGateV6Test {
+abstract class OrchestratorTestV6 {
     @Autowired
     lateinit var databaseHelpers: DbTestHelpers
     @Autowired
-    override lateinit var assertRepo: GateAssertRepositoryV6
+    lateinit var requestFactory: OrchestratorRequestFactoryV6
     @Autowired
-    override lateinit var testDataClient: GateTestDataClientV6
+    lateinit var expectedResultFactory: OrchestratorExpectedResultFactoryV6
     @Autowired
-    override lateinit var gateClient: GateClientV6
+    lateinit var assertRepository: OrchestratorAssertRepositoryV6
+    @Autowired
+    lateinit var orchestratorClient: OrchestratorApiClientV6
+    @Autowired
+    lateinit var testDataClient: OrchestratorTestDataClientV6
 
     lateinit var testName: String
 

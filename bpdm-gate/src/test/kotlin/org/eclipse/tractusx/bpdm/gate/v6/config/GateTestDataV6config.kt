@@ -20,9 +20,9 @@
 package org.eclipse.tractusx.bpdm.gate.v6.config
 
 import com.neovisionaries.i18n.CountryCode
+import org.eclipse.tractusx.bpdm.gate.api.v6.client.GateClientV6
 import org.eclipse.tractusx.bpdm.gate.service.TaskCreationBatchService
 import org.eclipse.tractusx.bpdm.gate.service.TaskResolutionBatchService
-import org.eclipse.tractusx.bpdm.gate.v6.util.GateOperatorClientV6
 import org.eclipse.tractusx.bpdm.gate.v6.util.GateTestDataClientV6
 import org.eclipse.tractusx.bpdm.pool.api.model.CountrySubdivisionDto
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
@@ -116,7 +116,7 @@ class GateTestDataV6config {
     @Bean
     fun gateTestDataClientV6(
         testDataFactory: GateTestDataFactoryV6,
-        operatorClient: GateOperatorClientV6,
+        operatorClient: GateClientV6,
         orchestratorMockDataFactory: OrchestratorMockDataFactory,
         taskCreationBatchService: TaskCreationBatchService,
         taskResolutionBatchService: TaskResolutionBatchService,

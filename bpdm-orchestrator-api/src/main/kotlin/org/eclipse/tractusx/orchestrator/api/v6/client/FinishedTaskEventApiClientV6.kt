@@ -17,29 +17,21 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.v6
+package org.eclipse.tractusx.orchestrator.api.v6.client
 
-import org.eclipse.tractusx.bpdm.gate.api.v6.client.GateClientV6
-import org.eclipse.tractusx.bpdm.gate.v6.util.GateAssertRepositoryV6
-import org.eclipse.tractusx.bpdm.gate.v6.util.GateTestDataClientV6
-import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
-import org.junit.jupiter.api.TestInfo
-import org.springframework.beans.factory.annotation.Autowired
+import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.orchestrator.api.ApiCommons
+import org.eclipse.tractusx.orchestrator.api.FinishedTaskEventApi
+import org.eclipse.tractusx.orchestrator.api.model.FinishedTaskEventsResponse
+import org.springdoc.core.annotations.ParameterObject
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.service.annotation.GetExchange
+import org.springframework.web.service.annotation.HttpExchange
+import java.time.Instant
 
-abstract class GateV6Test: IsGateV6Test {
-    @Autowired
-    lateinit var databaseHelpers: DbTestHelpers
-    @Autowired
-    override lateinit var assertRepo: GateAssertRepositoryV6
-    @Autowired
-    override lateinit var testDataClient: GateTestDataClientV6
-    @Autowired
-    override lateinit var gateClient: GateClientV6
+@HttpExchange
+interface FinishedTaskEventApiClientV6: FinishedTaskEventApi {
 
-    lateinit var testName: String
-
-    open fun beforeEach(testInfo: TestInfo){
-        testName = testInfo.displayName
-        databaseHelpers.truncateDbTables()
-    }
+    @GetExchange(value = "${ApiCommons.BASE_PATH_V6}/finished-events")
+    override fun getEvents(@RequestParam timestamp: Instant, @ParameterObject paginationRequest: PaginationRequest): FinishedTaskEventsResponse
 }

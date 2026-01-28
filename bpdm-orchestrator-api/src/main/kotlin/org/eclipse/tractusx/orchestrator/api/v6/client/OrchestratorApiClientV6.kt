@@ -17,29 +17,12 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.v6
+package org.eclipse.tractusx.orchestrator.api.v6.client
 
-import org.eclipse.tractusx.bpdm.gate.api.v6.client.GateClientV6
-import org.eclipse.tractusx.bpdm.gate.v6.util.GateAssertRepositoryV6
-import org.eclipse.tractusx.bpdm.gate.v6.util.GateTestDataClientV6
-import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
-import org.junit.jupiter.api.TestInfo
-import org.springframework.beans.factory.annotation.Autowired
+interface OrchestratorApiClientV6 {
 
-abstract class GateV6Test: IsGateV6Test {
-    @Autowired
-    lateinit var databaseHelpers: DbTestHelpers
-    @Autowired
-    override lateinit var assertRepo: GateAssertRepositoryV6
-    @Autowired
-    override lateinit var testDataClient: GateTestDataClientV6
-    @Autowired
-    override lateinit var gateClient: GateClientV6
+    val goldenRecordTasks: GoldenRecordTaskApiClientV6
 
-    lateinit var testName: String
+    val finishedTaskEvents: FinishedTaskEventApiClientV6
 
-    open fun beforeEach(testInfo: TestInfo){
-        testName = testInfo.displayName
-        databaseHelpers.truncateDbTables()
-    }
 }
