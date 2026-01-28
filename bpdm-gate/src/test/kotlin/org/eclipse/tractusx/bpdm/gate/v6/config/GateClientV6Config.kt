@@ -19,9 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.gate.v6.config
 
-import org.eclipse.tractusx.bpdm.common.util.BpdmClientCreateProperties
 import org.eclipse.tractusx.bpdm.common.util.BpdmWebClientProvider
-import org.eclipse.tractusx.bpdm.gate.v6.util.*
+import org.eclipse.tractusx.bpdm.gate.api.v6.client.GateClientV6
+import org.eclipse.tractusx.bpdm.gate.v6.util.GateTestClientProviderV6
+import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.web.server.servlet.context.ServletWebServerApplicationContext
 import org.springframework.context.annotation.Bean
@@ -29,46 +30,17 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 @ConditionalOnProperty(name = ["test.v6"], havingValue = "true", matchIfMissing = false)
-class GateClientV6Config(
-    private val webServerApplicationContext: ServletWebServerApplicationContext,
-    private val clientProvider: BpdmWebClientProvider
-) {
-
+class GateClientV6Config{
     @Bean
-    fun gateOperatorClientV6(): GateOperatorClientV6{
-        return GateOperatorClientV6(clientProvider, webServerApplicationContext.webServer!!)
+    fun testClientProviderV6(
+        webServerApplicationContext: ServletWebServerApplicationContext,
+        clientProvider: BpdmWebClientProvider
+    ): GateTestClientProviderV6{
+        return GateTestClientProviderV6(webServerApplicationContext.webServer!!, clientProvider)
     }
 
     @Bean
-    fun gateInputManagerClientV6(): GateInputManagerClientV6{
-        return GateInputManagerClientV6(clientProvider, webServerApplicationContext.webServer!!)
+    fun gateClientV6(testClientProvider: GateTestClientProviderV6): GateClientV6{
+        return testClientProvider.createClient(KeyCloakInitializer.CLIENT_ID_OPERATOR)
     }
-
-    @Bean
-    fun gateInputConsumerClientV6(): GateInputConsumerClientV6{
-        return GateInputConsumerClientV6(clientProvider, webServerApplicationContext.webServer!!)
-    }
-
-    @Bean
-    fun gateOutputConsumerClientV6(): GateOutputConsumerClientV6{
-        return GateOutputConsumerClientV6(clientProvider, webServerApplicationContext.webServer!!)
-    }
-
-    @Bean
-    fun gateUnauthorizedClientV6(): GateUnauthorizedClientV6 {
-        return GateUnauthorizedClientV6(clientProvider, webServerApplicationContext.webServer!!)
-    }
-
-    @Bean
-    fun gateAnonymousClientV6(): GateAnonymousClientV6 {
-        return GateAnonymousClientV6{
-            clientProvider.builder(BpdmClientCreateProperties(
-                registrationId = "",
-                baseUrl = "http://localhost:${webServerApplicationContext.webServer!!.port}",
-                securityEnabled = false
-            )).build()
-        }
-    }
-
-
 }

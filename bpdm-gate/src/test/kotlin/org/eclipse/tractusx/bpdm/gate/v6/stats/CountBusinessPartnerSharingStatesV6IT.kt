@@ -17,12 +17,13 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.v6.inputconsumer
+package org.eclipse.tractusx.bpdm.gate.v6.stats
 
 import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsSharingStatesResponse
+import org.eclipse.tractusx.bpdm.gate.v6.GateUnscheduledInitialStartV6Test
 import org.junit.jupiter.api.Test
 
-class CountBusinessPartnerSharingStatesV6IT: InputConsumerV6Test() {
+class CountBusinessPartnerSharingStatesV6IT: GateUnscheduledInitialStartV6Test() {
 
     /**
      * GIVEN no business partners

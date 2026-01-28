@@ -19,11 +19,25 @@
 
 package org.eclipse.tractusx.bpdm.gate.v6.util
 
+import org.eclipse.tractusx.bpdm.common.util.BpdmClientCreateProperties
 import org.eclipse.tractusx.bpdm.common.util.BpdmWebClientProvider
-import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
+import org.eclipse.tractusx.bpdm.gate.api.v6.client.GateClientV6Impl
 import org.springframework.boot.web.server.WebServer
 
-class GateInputConsumerClientV6(
-    clientProvider: BpdmWebClientProvider,
-    ownWebServer: WebServer
-): GateTestClientV6(KeyCloakInitializer.CLIENT_ID_GATE_INPUT_CONSUMER, clientProvider, ownWebServer)
+class GateTestClientProviderV6(
+    private val ownWebServer: WebServer,
+    private val bpdmWebClientProvider: BpdmWebClientProvider
+) {
+
+    fun createClient(oauth2RegistrationId: String?): GateClientV6Impl{
+        return GateClientV6Impl{
+            bpdmWebClientProvider.builder(
+                BpdmClientCreateProperties(
+                    oauth2RegistrationId ?: "",
+                    "http://localhost:${ownWebServer.port}",
+                    oauth2RegistrationId != null
+                )
+            ).build()
+        }
+    }
+}

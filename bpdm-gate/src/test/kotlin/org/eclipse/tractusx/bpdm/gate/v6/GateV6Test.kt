@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.v6
 
+import org.eclipse.tractusx.bpdm.gate.api.v6.client.GateClientV6
 import org.eclipse.tractusx.bpdm.gate.v6.util.GateAssertRepositoryV6
 import org.eclipse.tractusx.bpdm.gate.v6.util.GateTestDataClientV6
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
@@ -32,6 +33,8 @@ abstract class GateV6Test: IsGateV6Test {
     override lateinit var assertRepo: GateAssertRepositoryV6
     @Autowired
     override lateinit var testDataClient: GateTestDataClientV6
+    @Autowired
+    override lateinit var gateClient: GateClientV6
 
     lateinit var testName: String
 

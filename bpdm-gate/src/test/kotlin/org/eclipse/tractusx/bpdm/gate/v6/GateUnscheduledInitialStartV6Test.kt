@@ -17,18 +17,15 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.v6.outputconsumer
+package org.eclipse.tractusx.bpdm.gate.v6
 
 import org.eclipse.tractusx.bpdm.gate.Application
-import org.eclipse.tractusx.bpdm.gate.v6.GateV6Test
-import org.eclipse.tractusx.bpdm.gate.v6.util.GateOutputConsumerClientV6
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockContextInitializer
 import org.eclipse.tractusx.bpdm.test.containers.PoolMockContextInitializer
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInfo
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
@@ -41,15 +38,10 @@ import org.springframework.test.context.ContextConfiguration
     PoolMockContextInitializer::class
 ])
 @ActiveProfiles("test-v6")
-abstract class GateOutputConsumerV6Test: GateV6Test(){
-
-    @Autowired
-    override lateinit var gateClient: GateOutputConsumerClientV6
+abstract class GateUnscheduledInitialStartV6Test: GateV6Test(){
 
     @BeforeEach
     override fun beforeEach(testInfo: TestInfo) {
         super.beforeEach(testInfo)
-
-        OrchestratorMockContextInitializer.wiremockServer.resetAll()
     }
 }

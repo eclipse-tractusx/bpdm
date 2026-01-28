@@ -17,15 +17,16 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.v6.inputconsumer
+package org.eclipse.tractusx.bpdm.gate.v6.stats
 
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsAddressTypesResponse
+import org.eclipse.tractusx.bpdm.gate.v6.GateUnscheduledInitialStartV6Test
 import org.junit.jupiter.api.Test
 
-class CountAddressTypesV6IT: InputConsumerV6Test() {
+class CountAddressTypesV6IT: GateUnscheduledInitialStartV6Test() {
 
     /**
      * GIVEN no business partner shared

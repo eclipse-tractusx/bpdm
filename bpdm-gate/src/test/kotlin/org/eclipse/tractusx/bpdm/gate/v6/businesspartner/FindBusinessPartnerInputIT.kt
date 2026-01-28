@@ -17,19 +17,12 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.v6.inputmanager
+package org.eclipse.tractusx.bpdm.gate.v6.businesspartner
 
-import org.eclipse.tractusx.bpdm.gate.Application
-import org.eclipse.tractusx.bpdm.gate.v6.GateV6Test
-import org.eclipse.tractusx.bpdm.gate.v6.util.GateInputManagerClientV6
-import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
-import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.TestInfo
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.ContextConfiguration
+import org.eclipse.tractusx.bpdm.common.dto.PageDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
+import org.eclipse.tractusx.bpdm.gate.v6.GateUnscheduledInitialStartV6Test
+import org.junit.jupiter.api.Test
 
 /*******************************************************************************
  * Copyright (c) 2021 Contributors to the Eclipse Foundation
@@ -49,20 +42,42 @@ import org.springframework.test.context.ContextConfiguration
  *
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class])
-@ContextConfiguration(initializers = [
-    PostgreSQLContextInitializer::class,
-    KeyCloakInitializer::class
-])
-@ActiveProfiles("test-v6")
-abstract class InputManagerV6Test: GateV6Test() {
+class FindBusinessPartnerInputIT: GateUnscheduledInitialStartV6Test() {
 
-    @Autowired
-    override lateinit var gateClient: GateInputManagerClientV6
+    /**
+     * GIVEN business partner input under external-ID
+     * WHEN input consumer searches for business partner under external-ID
+     * THEN input consumer receives the given business partner input
+     */
+    @Test
+    fun `find created business partner input`(){
+        //GIVEN
+        val givenBusinessPartnerInput = testDataClient.createBusinessPartnerInput(testName)
 
-    @BeforeEach
-    override fun beforeEach(testInfo: TestInfo) {
-        super.beforeEach(testInfo)
+        //WHEN
+        val response = gateClient.businessPartners.getBusinessPartnersInput(listOf(testName))
+
+        //THEN
+        val expected = PageDto(1, 1, 0, 1, listOf(givenBusinessPartnerInput))
+        assertRepo.assertBusinessPartnerInput(response, expected)
+    }
+
+    /**
+     * GIVEN business partner input under external-ID
+     * WHEN input consumer searches for business partner under a wrong external-ID
+     * THEN input consumer receives an empty result
+     */
+    @Test
+    fun `try find created business partner non-existent external-ID`(){
+        //GIVEN
+        testDataClient.createBusinessPartnerInput(testName)
+
+        //WHEN
+        val response = gateClient.businessPartners.getBusinessPartnersInput(listOf("NOT_EXISTS"))
+
+        //THEN
+        val expected = PageDto<BusinessPartnerInputDto>(0, 0, 0, 0, emptyList())
+        assertRepo.assertBusinessPartnerInput(response, expected)
     }
 
 }

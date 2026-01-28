@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.v6.inputconsumer
+package org.eclipse.tractusx.bpdm.gate.v6.sharingstate
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
@@ -25,10 +25,29 @@ import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyRequest
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.SharingStateDto
+import org.eclipse.tractusx.bpdm.gate.v6.GateUnscheduledInitialStartV6Test
 import org.eclipse.tractusx.orchestrator.api.model.TaskErrorType
 import org.junit.jupiter.api.Test
 
-class FindSharingStatesV6IT: InputConsumerV6Test() {
+/*******************************************************************************
+ * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Apache License, Version 2.0 which is available at
+ * https://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ ******************************************************************************/
+class FindSharingStatesV6IT: GateUnscheduledInitialStartV6Test() {
 
 
     /**
@@ -173,7 +192,14 @@ class FindSharingStatesV6IT: InputConsumerV6Test() {
         val actualResponse = gateClient.sharingStates.getSharingStates(PaginationRequest(), emptyList())
 
         //THEN
-        val expectedSharingState = SharingStateDto(input.externalId, SharingStateType.Error, BusinessPartnerSharingError.NaturalPersonError, errorTask.processingState.errors.single().description, null, errorTask.taskId)
+        val expectedSharingState = SharingStateDto(
+            input.externalId,
+            SharingStateType.Error,
+            BusinessPartnerSharingError.NaturalPersonError,
+            errorTask.processingState.errors.single().description,
+            null,
+            errorTask.taskId
+        )
         val expectedResponse = PageDto(1, 1, 0, 1, listOf(expectedSharingState))
 
         assertRepo.assertSharingStates(actualResponse, expectedResponse)
