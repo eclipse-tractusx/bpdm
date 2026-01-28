@@ -31,6 +31,7 @@ import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmIllegalStateExceptio
 import org.eclipse.tractusx.bpdm.orchestrator.repository.SharingMemberRecordRepository
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.BusinessPartnerTestDataFactory
+import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorRequestFactoryCommon
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.eclipse.tractusx.orchestrator.api.model.TaskErrorDto
 import org.eclipse.tractusx.orchestrator.api.model.TaskErrorType
@@ -66,7 +67,7 @@ class GoldenRecordTaskStateMachineIT @Autowired constructor(
     private val stateMachineConfigProperties: StateMachineConfigProperties
 ) {
 
-    private val testDataFactory = BusinessPartnerTestDataFactory()
+    private val testDataFactory = BusinessPartnerTestDataFactory(OrchestratorRequestFactoryCommon())
 
     private val businessPartnerFull = testDataFactory.createFullBusinessPartner("full")
 

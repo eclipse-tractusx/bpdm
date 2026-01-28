@@ -17,18 +17,12 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.test.config
+package org.eclipse.tractusx.orchestrator.api.v6.client
 
-import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.BusinessPartnerTestDataFactory
-import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorRequestFactoryCommon
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
+interface OrchestratorApiClientV6 {
 
-@Configuration
-class OrchestratorTestDataConfiguration {
+    val goldenRecordTasks: GoldenRecordTaskApiClientV6
 
-    @Bean
-    fun orchestratorTestdataFactory(): BusinessPartnerTestDataFactory =
-        BusinessPartnerTestDataFactory(OrchestratorRequestFactoryCommon())
+    val finishedTaskEvents: FinishedTaskEventApiClientV6
 
 }

@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.orchestrator.performance
 import org.eclipse.tractusx.bpdm.orchestrator.config.StateMachineConfigProperties
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.BusinessPartnerTestDataFactory
+import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorRequestFactoryCommon
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.junit.jupiter.params.ParameterizedTest
@@ -46,7 +47,7 @@ class OrchestratorPerformanceIT@Autowired constructor(
     stateMachineConfigProperties: StateMachineConfigProperties
 ) {
 
-    private val testDataFactory = BusinessPartnerTestDataFactory()
+    private val testDataFactory = BusinessPartnerTestDataFactory(OrchestratorRequestFactoryCommon())
     private val taskMode = stateMachineConfigProperties.modeSteps.keys.first()
     private val step = stateMachineConfigProperties.modeSteps[taskMode]!!.first()
 
