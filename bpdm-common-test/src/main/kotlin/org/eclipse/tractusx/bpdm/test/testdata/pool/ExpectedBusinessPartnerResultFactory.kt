@@ -50,6 +50,7 @@ class ExpectedBusinessPartnerResultFactory(
         legalEntityUpdatedAt: Instant = currentness,
         addressCreatedAt: Instant = currentness,
         addressUpdatedAt: Instant = currentness,
+        isMaintainConfidences: Boolean = false
     ): LegalEntityWithLegalAddressVerboseDto {
         return LegalEntityWithLegalAddressVerboseDto(
             legalEntity = with(givenRequest.legalEntity) {
@@ -65,7 +66,7 @@ class ExpectedBusinessPartnerResultFactory(
                     states = states.map { mapToExpectedResult(it) },
                     relations = emptyList(),
                     currentness = currentness,
-                    confidenceCriteria = mapToExpectedConfidence(confidenceCriteria),
+                    confidenceCriteria = if(isMaintainConfidences) confidenceCriteria else mapToExpectedConfidence(confidenceCriteria),
                     isParticipantData = isParticipantData,
                     createdAt = legalEntityCreatedAt,
                     updatedAt = legalEntityUpdatedAt
@@ -98,7 +99,8 @@ class ExpectedBusinessPartnerResultFactory(
         siteCreatedAt: Instant = Instant.MIN,
         siteUpdatedAt: Instant = siteCreatedAt,
         addressCreatedAt: Instant = siteCreatedAt,
-        addressUpdatedAt: Instant = siteCreatedAt
+        addressUpdatedAt: Instant = siteCreatedAt,
+        isMaintainConfidences: Boolean = false
     ): SiteWithMainAddressVerboseDto {
         return SiteWithMainAddressVerboseDto(
             site = with(givenRequest.site) {
@@ -110,7 +112,7 @@ class ExpectedBusinessPartnerResultFactory(
                     bpnLegalEntity = givenRequest.bpnlParent,
                     createdAt = siteCreatedAt,
                     updatedAt = siteUpdatedAt,
-                    confidenceCriteria = mapToExpectedConfidence(confidenceCriteria, 1)
+                    confidenceCriteria = if(isMaintainConfidences) confidenceCriteria else mapToExpectedConfidence(confidenceCriteria, 1)
                 )
             },
             mainAddress = mapToExpectedResult(
@@ -145,7 +147,8 @@ class ExpectedBusinessPartnerResultFactory(
         givenBpnA: String = StringIgnoreComparator.IGNORE_STRING,
         bpnLegalEntity: String = StringIgnoreComparator.IGNORE_STRING,
         createdAt: Instant = Instant.MIN,
-        updatedAt: Instant = createdAt
+        updatedAt: Instant = createdAt,
+        isMaintainConfidences: Boolean = false
     ): LogisticAddressVerboseDto {
         return mapToExpectedResult(
             givenRequest = givenRequest.legalAddress,
@@ -155,7 +158,8 @@ class ExpectedBusinessPartnerResultFactory(
             addressType = AddressType.LegalAddress,
             isCatenaXMemberData = givenRequest.legalEntity.isParticipantData,
             createdAt = createdAt,
-            updatedAt = updatedAt
+            updatedAt = updatedAt,
+            isMaintainConfidences = isMaintainConfidences
         )
     }
 
@@ -185,7 +189,8 @@ class ExpectedBusinessPartnerResultFactory(
         givenBpnA: String = StringIgnoreComparator.IGNORE_STRING,
         bpnLegalEntityOverwrite: String? = null,
         createdAt: Instant = Instant.MIN,
-        updatedAt: Instant = createdAt
+        updatedAt: Instant = createdAt,
+        isMaintainConfidences: Boolean = false
     ): LogisticAddressVerboseDto {
         return mapToExpectedResult(
             givenRequest = givenRequest.address,
@@ -195,7 +200,8 @@ class ExpectedBusinessPartnerResultFactory(
             addressType = AddressType.AdditionalAddress,
             isCatenaXMemberData = isCatenaXMemberData,
             createdAt = createdAt,
-            updatedAt = updatedAt
+            updatedAt = updatedAt,
+            isMaintainConfidences = isMaintainConfidences
         )
     }
 
@@ -207,7 +213,8 @@ class ExpectedBusinessPartnerResultFactory(
         addressType: AddressType,
         isCatenaXMemberData: Boolean,
         createdAt: Instant,
-        updatedAt: Instant
+        updatedAt: Instant,
+        isMaintainConfidences: Boolean = false
     ): LogisticAddressVerboseDto {
         return with(givenRequest) {
             LogisticAddressVerboseDto(
@@ -222,7 +229,7 @@ class ExpectedBusinessPartnerResultFactory(
                 isParticipantData = isCatenaXMemberData,
                 createdAt = createdAt,
                 updatedAt = updatedAt,
-                confidenceCriteria = mapToExpectedConfidence(confidenceCriteria),
+                confidenceCriteria = if(isMaintainConfidences) confidenceCriteria else mapToExpectedConfidence(confidenceCriteria),
                 addressType = addressType
             )
         }

@@ -19,11 +19,19 @@
 
 package org.eclipse.tractusx.bpdm.pool.v6.util
 
+import org.eclipse.tractusx.bpdm.common.util.BpdmClientCreateProperties
 import org.eclipse.tractusx.bpdm.common.util.BpdmWebClientProvider
-import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
+import org.eclipse.tractusx.bpdm.pool.api.v6.client.PoolClientImpl
 import org.springframework.boot.web.server.WebServer
 
-class PoolSharingMemberClientV6(
+abstract class PoolTestClientV6(
+    registrationId: String,
     clientProvider: BpdmWebClientProvider,
     ownWebServer: WebServer
-): PoolTestClientV6(KeyCloakInitializer.CLIENT_ID_SHARING_MEMBER, clientProvider, ownWebServer)
+): PoolClientImpl({
+        clientProvider.builder(BpdmClientCreateProperties(
+            registrationId = registrationId,
+            baseUrl = "http://localhost:${ownWebServer.port}",
+            securityEnabled = true
+        )).build()
+})

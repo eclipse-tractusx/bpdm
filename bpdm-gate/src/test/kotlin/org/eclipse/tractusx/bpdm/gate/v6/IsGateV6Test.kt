@@ -17,13 +17,17 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.v6.util
+package org.eclipse.tractusx.bpdm.gate.v6
 
-import org.eclipse.tractusx.bpdm.common.util.BpdmWebClientProvider
-import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
-import org.springframework.boot.web.server.WebServer
+import org.eclipse.tractusx.bpdm.gate.api.v6.client.GateClientV6
+import org.eclipse.tractusx.bpdm.gate.v6.util.GateAssertRepositoryV6
+import org.eclipse.tractusx.bpdm.gate.v6.util.GateTestDataClientV6
 
-class PoolSharingMemberClientV6(
-    clientProvider: BpdmWebClientProvider,
-    ownWebServer: WebServer
-): PoolTestClientV6(KeyCloakInitializer.CLIENT_ID_SHARING_MEMBER, clientProvider, ownWebServer)
+interface IsGateV6Test {
+    val gateClient: GateClientV6
+    val assertRepo: GateAssertRepositoryV6
+    val testDataClient: GateTestDataClientV6
+
+    val requestFactory get() = testDataClient.testDataFactory.request
+    val expectedResultFactory get() = testDataClient.testDataFactory.result
+}
