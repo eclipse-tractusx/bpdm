@@ -19,31 +19,25 @@
 
 package org.eclipse.tractusx.bpdm.pool.v6
 
-import org.eclipse.tractusx.bpdm.pool.api.v6.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.v6.util.AssertRepositoryV6
-import org.eclipse.tractusx.bpdm.pool.v6.util.TestDataClientV6
-import org.eclipse.tractusx.bpdm.test.testdata.pool.v6.TestDataV6Factory
-import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
+import org.eclipse.tractusx.bpdm.pool.Application
+import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
+import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInfo
-import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.ContextConfiguration
 
-abstract class PoolV6Test: IsPoolV6Test {
-    @Autowired
-    override lateinit var databaseHelpers: DbTestHelpers
-    @Autowired
-    override lateinit var testDataClient: TestDataClientV6
-    @Autowired
-    override lateinit var testDataFactory: TestDataV6Factory
-    @Autowired
-    override lateinit var assertRepository: AssertRepositoryV6
-    @Autowired
-    override lateinit var poolClient: PoolApiClient
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class])
+@ContextConfiguration(initializers = [
+    PostgreSQLContextInitializer::class,
+    KeyCloakInitializer::class
+])
+@ActiveProfiles("test-v6")
+abstract class UnscheduledPoolV6Test: PoolV6Test() {
 
-    lateinit var testName: String
-
-    open fun beforeEach(testInfo: TestInfo){
-        testName = testInfo.displayName
-        databaseHelpers.truncateDbTables()
+    @BeforeEach
+    override fun beforeEach(testInfo: TestInfo) {
+        super.beforeEach(testInfo)
     }
-
 }

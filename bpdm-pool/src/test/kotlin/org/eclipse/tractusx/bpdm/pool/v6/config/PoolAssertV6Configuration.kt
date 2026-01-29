@@ -19,29 +19,18 @@
 
 package org.eclipse.tractusx.bpdm.pool.v6.config
 
-import org.eclipse.tractusx.bpdm.common.util.BpdmWebClientProvider
-import org.eclipse.tractusx.bpdm.pool.api.v6.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.v6.util.PoolTestClientProviderV6
-import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
+import org.eclipse.tractusx.bpdm.pool.v6.util.AssertRepositoryV6
+import org.eclipse.tractusx.bpdm.test.util.LocalDatetimeSecondsComparator
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
-import org.springframework.boot.web.server.servlet.context.ServletWebServerApplicationContext
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 @Configuration
 @ConditionalOnProperty(name = ["test.v6"], havingValue = "true", matchIfMissing = false)
-class PoolClientV6Configuration{
+class PoolAssertV6Configuration {
 
     @Bean
-    fun poolTestClientProviderV6(
-        webServerAppCtxt: ServletWebServerApplicationContext,
-        clientProvider: BpdmWebClientProvider
-    ): PoolTestClientProviderV6 {
-        return PoolTestClientProviderV6(webServerAppCtxt.webServer!!, clientProvider)
-    }
-
-    @Bean
-    fun poolClientV6(testClientProvider: PoolTestClientProviderV6): PoolApiClient{
-        return testClientProvider.createClient(KeyCloakInitializer.CLIENT_ID_OPERATOR)
+    fun assertRepoV6(localDatetimeSecondsComparator: LocalDatetimeSecondsComparator): AssertRepositoryV6{
+        return AssertRepositoryV6(localDatetimeSecondsComparator)
     }
 }
