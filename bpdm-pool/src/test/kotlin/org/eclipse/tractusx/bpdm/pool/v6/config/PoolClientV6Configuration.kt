@@ -19,10 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.pool.v6.config
 
+import org.eclipse.tractusx.bpdm.common.util.BpdmClientCreateProperties
 import org.eclipse.tractusx.bpdm.common.util.BpdmUnauthorizedWebClientProvider
 import org.eclipse.tractusx.bpdm.common.util.BpdmWebClientProvider
 import org.eclipse.tractusx.bpdm.pool.v6.util.*
-import org.eclipse.tractusx.bpdm.test.config.SelfClientConfigProperties
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.web.server.servlet.context.ServletWebServerApplicationContext
 import org.springframework.context.annotation.Bean
@@ -30,63 +30,39 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 @ConditionalOnProperty(name = ["test.v6"], havingValue = "true", matchIfMissing = false)
-class PoolClientV6Configuration {
+class PoolClientV6Configuration(
+    private val clientProvider: BpdmWebClientProvider,
+    private val webServerAppCtxt: ServletWebServerApplicationContext
+) {
 
     @Bean
-    fun poolOperatorClientV6(
-        webServerAppCtxt: ServletWebServerApplicationContext,
-        selfClientConfigProperties: OperatorClientConfigProperties,
-        webClientProvider: BpdmWebClientProvider
-    ): PoolOperatorClientV6 {
-        return PoolOperatorClientV6 {
-            val properties = selfClientConfigProperties.copy(baseUrl = "http://localhost:${webServerAppCtxt.webServer!!.port}")
-            webClientProvider.builder(properties).build()
-        }
+    fun poolOperatorClientV6(): PoolOperatorClientV6 {
+        return PoolOperatorClientV6(clientProvider, webServerAppCtxt.webServer!!)
     }
 
     @Bean
-    fun sharingMemberClientV6(
-        webServerAppCtxt: ServletWebServerApplicationContext,
-        selfClientConfigProperties: SharingMemberClientConfigProperties,
-        webClientProvider: BpdmWebClientProvider
-    ): PoolSharingMemberClientV6 {
-        return PoolSharingMemberClientV6 {
-            val properties = selfClientConfigProperties.copy(baseUrl = "http://localhost:${webServerAppCtxt.webServer!!.port}")
-            webClientProvider.builder(properties).build()
-        }
+    fun sharingMemberClientV6(): PoolSharingMemberClientV6 {
+        return PoolSharingMemberClientV6(clientProvider, webServerAppCtxt.webServer!!)
     }
 
     @Bean
-    fun participantClientV6(
-        webServerAppCtxt: ServletWebServerApplicationContext,
-        selfClientConfigProperties: ParticipantClientConfigProperties,
-        webClientProvider: BpdmWebClientProvider
-    ): PoolParticipantClientV6 {
-        return PoolParticipantClientV6 {
-            val properties = selfClientConfigProperties.copy(baseUrl = "http://localhost:${webServerAppCtxt.webServer!!.port}")
-            webClientProvider.builder(properties).build()
-        }
+    fun participantClientV6(): PoolParticipantClientV6 {
+        return PoolParticipantClientV6(clientProvider, webServerAppCtxt.webServer!!)
     }
 
     @Bean
-    fun unauthorizedClientV6(
-        webServerAppCtxt: ServletWebServerApplicationContext,
-        selfClientConfigProperties: UnauthorizedClientConfigProperties,
-        webClientProvider: BpdmWebClientProvider
-    ): PoolUnauthorizedClientV6 {
-        return PoolUnauthorizedClientV6 {
-            val properties = selfClientConfigProperties.copy(baseUrl = "http://localhost:${webServerAppCtxt.webServer!!.port}")
-            webClientProvider.builder(properties).build()
-        }
+    fun unauthorizedClientV6(): PoolUnauthorizedClientV6 {
+        return PoolUnauthorizedClientV6(clientProvider, webServerAppCtxt.webServer!!)
     }
 
     @Bean
-    fun anonymousClientV6(
-        webServerAppCtxt: ServletWebServerApplicationContext
-    ): PoolAnonymousClientV6 {
+    fun anonymousClientV6(): PoolAnonymousClientV6 {
         return PoolAnonymousClientV6 {
-            val properties = SelfClientConfigProperties(baseUrl = "http://localhost:${webServerAppCtxt.webServer!!.port}")
-            BpdmUnauthorizedWebClientProvider().builder(properties).build()
+            BpdmUnauthorizedWebClientProvider().builder(BpdmClientCreateProperties(
+                registrationId = "",
+                baseUrl = "http://localhost:${webServerAppCtxt.webServer!!.port}",
+                securityEnabled = false
+            )).build()
         }
     }
 }
