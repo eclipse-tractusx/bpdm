@@ -17,18 +17,28 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.v6
+package org.eclipse.tractusx.bpdm.pool.v6.util
 
+import org.eclipse.tractusx.bpdm.common.util.BpdmClientCreateProperties
+import org.eclipse.tractusx.bpdm.common.util.BpdmWebClientProvider
 import org.eclipse.tractusx.bpdm.pool.api.v6.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.v6.util.AssertRepositoryV6
-import org.eclipse.tractusx.bpdm.pool.v6.util.TestDataClientV6
-import org.eclipse.tractusx.bpdm.test.testdata.pool.v6.TestDataV6Factory
-import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
+import org.eclipse.tractusx.bpdm.pool.api.v6.client.PoolClientImpl
+import org.springframework.boot.web.server.WebServer
 
-interface IsPoolV6Test {
-    val poolClient: PoolApiClient
-    val databaseHelpers: DbTestHelpers
-    val testDataClient: TestDataClientV6
-    val testDataFactory: TestDataV6Factory
-    val assertRepository: AssertRepositoryV6
+class PoolTestClientProviderV6 (
+    private val ownWebServer: WebServer,
+    private val bpdmWebClientProvider: BpdmWebClientProvider
+) {
+
+    fun createClient(oauth2RegistrationId: String?): PoolApiClient{
+        return PoolClientImpl{
+            bpdmWebClientProvider.builder(
+                BpdmClientCreateProperties(
+                    oauth2RegistrationId ?: "",
+                    "http://localhost:${ownWebServer.port}",
+                    oauth2RegistrationId != null
+                )
+            ).build()
+        }
+    }
 }

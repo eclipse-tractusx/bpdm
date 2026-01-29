@@ -17,18 +17,26 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.v6
+package org.eclipse.tractusx.bpdm.pool.v6.metadata
 
-import org.eclipse.tractusx.bpdm.pool.api.v6.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.v6.util.AssertRepositoryV6
-import org.eclipse.tractusx.bpdm.pool.v6.util.TestDataClientV6
-import org.eclipse.tractusx.bpdm.test.testdata.pool.v6.TestDataV6Factory
-import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
+import org.assertj.core.api.Assertions
+import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolV6Test
+import org.junit.jupiter.api.Test
 
-interface IsPoolV6Test {
-    val poolClient: PoolApiClient
-    val databaseHelpers: DbTestHelpers
-    val testDataClient: TestDataClientV6
-    val testDataFactory: TestDataV6Factory
-    val assertRepository: AssertRepositoryV6
+class AdministrativeAreaGetV6IT: UnscheduledPoolV6Test() {
+
+    /**
+     * GIVEN administrative areas level 1
+     * WHEN participant requests available administrative areas
+     * THEN participant gets administrative areas
+     */
+    @Test
+    fun `search administrative areas level 1`(){
+        //WHEN
+        val response = poolClient.metadata.getAdminAreasLevel1(PaginationRequest())
+
+        //THEN
+        Assertions.assertThat(response.content).isNotEmpty
+    }
 }
