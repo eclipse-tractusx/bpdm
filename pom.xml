@@ -230,6 +230,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
+                    <configuration>
+                        <argLine>
+                            --add-opens java.base/java.time=ALL-UNNAMED
+                            --add-opens java.base/java.lang.reflect=ALL-UNNAMED
+                        </argLine>
+                    </configuration>
                     <executions>
                         <execution>
                             <id>integration-test</id>
