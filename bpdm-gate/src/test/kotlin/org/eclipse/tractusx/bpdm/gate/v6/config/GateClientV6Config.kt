@@ -17,26 +17,30 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.v6.config
+package org.eclipse.tractusx.bpdm.gate.v6.config
 
-import org.eclipse.tractusx.bpdm.common.util.BpdmClientProperties
-import org.eclipse.tractusx.bpdm.common.util.ClientConfigurationProperties
-import org.eclipse.tractusx.bpdm.pool.v6.config.SharingMemberClientConfigProperties.Companion.PREFIX
+import org.eclipse.tractusx.bpdm.common.util.BpdmWebClientProvider
+import org.eclipse.tractusx.bpdm.gate.api.v6.client.GateClientV6
+import org.eclipse.tractusx.bpdm.gate.v6.util.GateTestClientProviderV6
+import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
-import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.boot.security.oauth2.client.autoconfigure.OAuth2ClientProperties
+import org.springframework.boot.web.server.servlet.context.ServletWebServerApplicationContext
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
 
+@Configuration
 @ConditionalOnProperty(name = ["test.v6"], havingValue = "true", matchIfMissing = false)
-@ConfigurationProperties(prefix = PREFIX)
-data class SharingMemberClientConfigProperties(
-    override val baseUrl: String,
-    override val securityEnabled: Boolean,
-    override val registration: OAuth2ClientProperties.Registration,
-    override val provider: OAuth2ClientProperties.Provider
-): BpdmClientProperties{
-    companion object{
-        const val PREFIX = "${ClientConfigurationProperties.PREFIX}.sharing-member"
+class GateClientV6Config{
+    @Bean
+    fun testClientProviderV6(
+        webServerApplicationContext: ServletWebServerApplicationContext,
+        clientProvider: BpdmWebClientProvider
+    ): GateTestClientProviderV6{
+        return GateTestClientProviderV6(webServerApplicationContext.webServer!!, clientProvider)
     }
 
-    override fun getId(): String = PREFIX
+    @Bean
+    fun gateClientV6(testClientProvider: GateTestClientProviderV6): GateClientV6{
+        return testClientProvider.createClient(KeyCloakInitializer.CLIENT_ID_OPERATOR)
+    }
 }

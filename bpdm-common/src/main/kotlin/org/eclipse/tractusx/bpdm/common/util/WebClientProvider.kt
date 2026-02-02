@@ -27,18 +27,25 @@ import org.springframework.web.reactive.function.client.WebClient
 
 
 interface BpdmWebClientProvider{
-    fun builder(properties: BpdmClientProperties): WebClient.Builder
+    fun builder(properties: BpdmClientCreateProperties): WebClient.Builder
+
+    fun builder(properties: BpdmClientProperties): WebClient.Builder{
+        return builder(BpdmClientCreateProperties(
+            registrationId = properties.getId(),
+            baseUrl = properties.baseUrl,
+            securityEnabled = properties.securityEnabled
+        ))
+    }
 }
 
 class BpdmOAuth2WebClientProvider(
     private val bpdmWebClientProvider: BpdmWebClientProvider,
     private val authorizedClientManager: OAuth2AuthorizedClientManager
 ): BpdmWebClientProvider{
-
-    override fun builder(properties: BpdmClientProperties): WebClient.Builder{
+    override fun builder(properties: BpdmClientCreateProperties): WebClient.Builder {
         return if(properties.securityEnabled) {
             val oAuth2ExchangeFilter = ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager)
-            oAuth2ExchangeFilter.setDefaultClientRegistrationId(properties.getId())
+            oAuth2ExchangeFilter.setDefaultClientRegistrationId(properties.registrationId)
             oAuth2ExchangeFilter.setDefaultOAuth2AuthorizedClient(true)
 
             bpdmWebClientProvider.builder(properties).apply(oAuth2ExchangeFilter.oauth2Configuration())
@@ -49,10 +56,16 @@ class BpdmOAuth2WebClientProvider(
 }
 
 class BpdmUnauthorizedWebClientProvider: BpdmWebClientProvider{
-    override fun builder(properties: BpdmClientProperties): WebClient.Builder{
+    override fun builder(properties: BpdmClientCreateProperties): WebClient.Builder {
         return WebClient.builder()
             .baseUrl(properties.baseUrl)
             .codecs { codecs -> codecs.defaultCodecs().maxInMemorySize(10 * 1024 * 1024) }
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
     }
 }
+
+data class BpdmClientCreateProperties(
+    val registrationId: String,
+    val baseUrl: String,
+    val securityEnabled: Boolean
+)
