@@ -17,27 +17,30 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.v6
+package org.eclipse.tractusx.bpdm.orchestrator.v6
 
-import org.eclipse.tractusx.bpdm.pool.api.v6.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.v6.util.AssertRepositoryV6
-import org.eclipse.tractusx.bpdm.pool.v6.util.TestDataClientV6
-import org.eclipse.tractusx.bpdm.test.testdata.pool.v6.TestDataV6Factory
+import org.eclipse.tractusx.bpdm.orchestrator.v6.util.OrchestratorAssertRepositoryV6
+import org.eclipse.tractusx.bpdm.orchestrator.v6.util.OrchestratorTestDataClientV6
+import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorExpectedResultFactoryV6
+import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorRequestFactoryV6
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
+import org.eclipse.tractusx.orchestrator.api.v6.client.OrchestratorApiClientV6
 import org.junit.jupiter.api.TestInfo
 import org.springframework.beans.factory.annotation.Autowired
 
-abstract class PoolV6Test: IsPoolV6Test {
+abstract class OrchestratorTestV6 {
     @Autowired
-    override lateinit var databaseHelpers: DbTestHelpers
+    lateinit var databaseHelpers: DbTestHelpers
     @Autowired
-    override lateinit var testDataClient: TestDataClientV6
+    lateinit var requestFactory: OrchestratorRequestFactoryV6
     @Autowired
-    override lateinit var testDataFactory: TestDataV6Factory
+    lateinit var expectedResultFactory: OrchestratorExpectedResultFactoryV6
     @Autowired
-    override lateinit var assertRepository: AssertRepositoryV6
+    lateinit var assertRepository: OrchestratorAssertRepositoryV6
     @Autowired
-    override lateinit var poolClient: PoolApiClient
+    lateinit var orchestratorClient: OrchestratorApiClientV6
+    @Autowired
+    lateinit var testDataClient: OrchestratorTestDataClientV6
 
     lateinit var testName: String
 
@@ -45,5 +48,4 @@ abstract class PoolV6Test: IsPoolV6Test {
         testName = testInfo.displayName
         databaseHelpers.truncateDbTables()
     }
-
 }

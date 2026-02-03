@@ -27,10 +27,7 @@ import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.service.TaskStepBuildService.CleaningError
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
-import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.BusinessPartnerTestDataFactory
-import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.copyWithBpnRequests
-import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.copyWithLegalEntityIdentifiers
-import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.copyWithSiteMainAddress
+import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.*
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolDataHelper
 import org.eclipse.tractusx.bpdm.test.testdata.pool.TestDataEnvironment
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
@@ -70,11 +67,13 @@ class TaskResolutionServiceTest @Autowired constructor(
 
         testDataEnvironment = poolDataHelper.createTestDataEnvironment()
         orchTestDataFactory = BusinessPartnerTestDataFactory(
-            BusinessPartnerTestDataFactory.TestMetadataReferences(
-                legalForms = testDataEnvironment.metadata.legalForms.map { it.technicalKey },
-                legalEntityIdentifierTypes = testDataEnvironment.metadata.legalEntityIdentifierTypes.map { it.technicalKey },
-                addressIdentifierTypes = testDataEnvironment.metadata.addressIdentifierTypes.map { it.technicalKey },
-                adminAreas = testDataEnvironment.metadata.adminAreas.map { it.code }
+            OrchestratorRequestFactoryCommon(
+                TestMetadataReferences(
+                    legalForms = testDataEnvironment.metadata.legalForms.map { it.technicalKey },
+                    legalEntityIdentifierTypes = testDataEnvironment.metadata.legalEntityIdentifierTypes.map { it.technicalKey },
+                    addressIdentifierTypes = testDataEnvironment.metadata.addressIdentifierTypes.map { it.technicalKey },
+                    adminAreas = testDataEnvironment.metadata.adminAreas.map { it.code }
+                )
             )
         )
     }

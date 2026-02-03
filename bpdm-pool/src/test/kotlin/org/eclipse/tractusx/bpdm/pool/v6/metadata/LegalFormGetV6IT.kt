@@ -17,18 +17,26 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.test.config
+package org.eclipse.tractusx.bpdm.pool.v6.metadata
 
-import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.BusinessPartnerTestDataFactory
-import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorRequestFactoryCommon
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
+import org.assertj.core.api.Assertions
+import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolV6Test
+import org.junit.jupiter.api.Test
 
-@Configuration
-class OrchestratorTestDataConfiguration {
+class LegalFormGetV6IT: UnscheduledPoolV6Test() {
 
-    @Bean
-    fun orchestratorTestdataFactory(): BusinessPartnerTestDataFactory =
-        BusinessPartnerTestDataFactory(OrchestratorRequestFactoryCommon())
+    /**
+     * GIVEN legal forms
+     * WHEN participant requests legal forms
+     * THEN participant gets legal forms
+     */
+    @Test
+    fun `search legal forms`(){
+        //WHEN
+        val response = poolClient.metadata.getLegalForms(PaginationRequest())
 
+        //THEN
+        Assertions.assertThat(response.content).isNotEmpty
+    }
 }
