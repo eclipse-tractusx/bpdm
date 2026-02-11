@@ -89,6 +89,9 @@ bpdm:
     cron: '15/30 * * * * *'
     # Up to how many tasks can be requested at the same time
     batchSize: 20
+  eventTriggers:
+    # How often the Pool should check for golden record event triggers to be processed (e.g. IsReplacedByRelation takes into effect)
+    cron: '0/30 * * * * *'
   security:
     # Allowed origins for CORS
     cors-origins: '*'
