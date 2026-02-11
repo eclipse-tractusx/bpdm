@@ -26,19 +26,20 @@ import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
-import org.eclipse.tractusx.bpdm.pool.entity.AddressRelationDb
-import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
-import org.eclipse.tractusx.bpdm.pool.entity.ReasonCodeDb
-import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
+import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
+import org.eclipse.tractusx.bpdm.pool.repository.AddressRelationEventTriggerRepository
 import org.eclipse.tractusx.bpdm.pool.repository.AddressRelationRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 
 @Service
 class AddressRelationUpsertService(
     private val addressRelationRepository: AddressRelationRepository,
-    private val changelogService: PartnerChangelogService
+    private val changelogService: PartnerChangelogService,
+    private val headquarterSyncService: HeadquarterSyncService,
+    private val addressRelationEventTriggerRepository: AddressRelationEventTriggerRepository
 ): IAddressRelationUpsertStratergyService {
 
     @Transactional
@@ -68,13 +69,15 @@ class AddressRelationUpsertService(
             if (validityPeriodsDiffer(existingRelation.validityPeriods, upsertRequest.validityPeriods)) {
                 existingRelation.validityPeriods.clear()
                 existingRelation.validityPeriods.addAll(upsertRequest.validityPeriods)
-                addressRelationRepository.save(existingRelation)
+                addressRelationRepository.saveAndFlush(existingRelation)
+
+                handleHeadquarterSynchronization(existingRelation)
                 UpsertResult(existingRelation, UpsertType.Updated)
             } else {
                 UpsertResult(existingRelation, UpsertType.NoChange)
             }
         } else {
-            UpsertResult(createNewAddressRelation(
+            val newRelation = createNewAddressRelation(
                 UpsertRequest(
                     source = sourceAddress,
                     target = targetAddress,
@@ -82,7 +85,11 @@ class AddressRelationUpsertService(
                     validityPeriods = validityPeriods,
                     reasonCode = upsertRequest.reasonCode
                 )
-            ), UpsertType.Created)
+            )
+
+            handleHeadquarterSynchronization(newRelation)
+
+            UpsertResult(newRelation, UpsertType.Created)
         }
 
         return upsertResult
@@ -122,12 +129,32 @@ class AddressRelationUpsertService(
             reasonCode = upsertRequest.reasonCode
         )
 
-        addressRelationRepository.save(newRelation)
+        addressRelationRepository.saveAndFlush(newRelation)
 
         changelogService.createChangelogEntry(ChangelogEntryCreateRequest(source.bpn, ChangelogType.UPDATE, BusinessPartnerType.ADDRESS))
         changelogService.createChangelogEntry(ChangelogEntryCreateRequest(target.bpn, ChangelogType.UPDATE, BusinessPartnerType.ADDRESS))
 
         return newRelation
+    }
+
+    private fun handleHeadquarterSynchronization(relation: AddressRelationDb){
+        val today = LocalDate.now()
+
+        if(relation.validityPeriods.any { it.validFrom <= today}){
+            headquarterSyncService.synchronizeHeadquarter(relation.startAddress.legalEntity!!)
+        }
+
+         val existingUnprocessedTriggers = addressRelationEventTriggerRepository.findByRelationAndEventType(relation, TriggerEventType.ReplacedAddress)
+            .filterNot { it.isProcessed }
+
+        addressRelationEventTriggerRepository.deleteAll(existingUnprocessedTriggers)
+
+
+        val futureEventTriggers = relation.validityPeriods
+            .filter { it.validFrom > today }
+            .map { AddressRelationEventTriggerDb(it.validFrom, false, TriggerEventType.ReplacedAddress, relation) }
+
+        addressRelationEventTriggerRepository.saveAll(futureEventTriggers)
     }
 
     data class UpsertRequest(
