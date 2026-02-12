@@ -84,7 +84,7 @@ class GateTestDataClientV6 (
     }
 
     fun refineToLegalEntityOnSite(input: BusinessPartnerInputDto, seed: String = input.externalId): PoolMockDataFactory.SiteWithLegalEntityParent{
-        val poolMockResult = poolMockDataFactory.mockSiteAndMainAddressSearchResult(seed)
+        val poolMockResult = poolMockDataFactory.mockLegalAndSiteMainAddressSearchResult(seed)
 
         val owningCompany = if(input.isOwnCompanyData) tenantBpnL else null
         orchestratorMockDataFactory.mockRefineToLegalEntityOnSite(

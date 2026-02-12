@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.test.testdata.pool
 
 import com.github.tomakehurst.wiremock.client.WireMock
+import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.pool.api.ApiCommons
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
@@ -63,6 +64,30 @@ class PoolMockDataFactory(
         mockAddressSearchResult(mockedSite.mainAddress)
 
         return SiteWithLegalEntityParent(mockedLegalEntity, mockedSite)
+    }
+
+    fun mockLegalAndSiteMainAddressSearchResult(seed: String): SiteWithLegalEntityParent{
+        configureWireMock()
+
+        val legalEntity = requestFactory.createLegalEntityRequest(seed)
+            .let{ expectedResultFactory.mapToExpectedLegalEntity(it,  givenBpnL = "BPNL$seed") }
+
+        val site = requestFactory.buildSiteCreateRequest(seed, "BPNL$seed")
+            .let { expectedResultFactory.mapToExpectedSite(it, legalEntity.legalEntity.isParticipantData, givenBpnS = "BPNS$seed") }
+
+        val legalAndSiteMainAddress = requestFactory.buildAdditionalAddressCreateRequest(seed, bpnParent = "BPNS$seed")
+            .let { expectedResultFactory.mapToExpectedAdditionalAddress(it, legalEntity.legalEntity.isParticipantData) }
+            .copy(addressType = AddressType.LegalAndSiteMainAddress)
+
+
+        val mockedLegalEntityResponse = legalEntity.copy(legalAddress = legalAndSiteMainAddress)
+        val mockedSiteResponse = site.copy(mainAddress = legalAndSiteMainAddress)
+
+        mockLegalEntitySearchResult(mockedLegalEntityResponse)
+        mockSiteSearchResult(mockedSiteResponse)
+        mockAddressSearchResult(mockedSiteResponse.mainAddress)
+
+        return SiteWithLegalEntityParent(mockedLegalEntityResponse, mockedSiteResponse)
     }
 
     fun mockAdditionalAddressOfSiteSearchResult(seed: String): AdditionalAddressOfSiteResult{
