@@ -66,7 +66,7 @@
         <kotlin-logging.version>3.0.5</kotlin-logging.version>
         <common-csv.version>1.14.1</common-csv.version>
         <wiremock.version>2.35.2</wiremock.version>
-        <springmockk.version>4.0.2</springmockk.version>
+        <springmockk.version>5.0.1</springmockk.version>
         <opencsv.version>5.12.0</opencsv.version>
         <testcontainers-bom.version>2.0.3</testcontainers-bom.version>
         <testcontainers-keycloak.version>3.2.0</testcontainers-keycloak.version>
