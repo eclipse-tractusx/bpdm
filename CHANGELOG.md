@@ -14,7 +14,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 
 - BPDM Orchestrator: fixed finished task events with correct content size in api response [#1580](https://github.com/eclipse-tractusx/bpdm/issues/1580)
 - BPDM Pool: Add validation for IsManagedBy relations to not overwrite validity periods that lie in the past [#1555](https://github.com/eclipse-tractusx/bpdm/issues/1555)
-
+- BPDM Pool: Automatically calculate a business partner's confidence level based on the other confidence criteria [#1554](https://github.com/eclipse-tractusx/bpdm/issues/1554)
 
 ## [7.2.0] - 2025-12-01
 

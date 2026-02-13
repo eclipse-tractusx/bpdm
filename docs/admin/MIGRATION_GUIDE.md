@@ -2,6 +2,8 @@
 
 <!-- TOC -->
 * [Migration Guide](#migration-guide)
+  * [7.2.x to 7.3.x](#72x-to-73x)
+    * [Automatic Confidence Level](#automatic-confidence-level)
   * [7.1.x to 7.2.x](#71x-to-72x)
     * [Alternative Headquarters Restriction](#alternative-headquarters-restriction)
     * [Default Logging Level](#default-logging-level)
@@ -10,6 +12,19 @@
     * [Golden Record Process for IsManagedBy Relations](#golden-record-process-for-ismanagedby-relations)
     * [Business Partner Identifier Amount Limit](#business-partner-identifier-amount-limit)
 <!-- TOC -->
+
+## 7.2.x to 7.3.x
+
+### Automatic Confidence Level
+
+A golden record's confidence level is now automatically managed by the Pool according to the [golden record standards](https://catenax-ev.github.io/docs/next/standards/CX-0076-GoldenRecordEndtoEndRequirementsStandard#2112-confidence-level).
+
+Please be aware that this version will automatically update the confidence levels of all existing golden records in the Pool.
+This update will also result in changelog entries.
+This way, the new confidence levels will be propagated to all sharing members and interested parties.
+
+Please note that this migration will create changelog entries for every existing golden record in the Pool.
+
 
 ## 7.1.x to 7.2.x
 

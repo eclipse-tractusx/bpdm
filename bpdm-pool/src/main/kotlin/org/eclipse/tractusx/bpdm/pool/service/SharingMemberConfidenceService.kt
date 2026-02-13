@@ -80,19 +80,19 @@ class SharingMemberConfidenceService(
 
     private fun updateNumberOfSharingMembers(address: LogisticAddressDb): Result{
         val newNumberOfSharingMembers = countSharingMembers(address)
-        val addressHasChanges = address.confidenceCriteria.numberOfBusinessPartners != newNumberOfSharingMembers
+        val addressHasChanges = address.confidenceCriteria.numberOfSharingMembers != newNumberOfSharingMembers
 
         if(addressHasChanges){
-            address.confidenceCriteria = address.confidenceCriteria.copy(numberOfBusinessPartners = newNumberOfSharingMembers)
+            address.confidenceCriteria = address.confidenceCriteria.copy(numberOfSharingMembers = newNumberOfSharingMembers)
             logisticAddressRepository.save(address)
             changelogService.createChangelogEntry(ChangelogEntryCreateRequest(address.bpn, ChangelogType.UPDATE, BusinessPartnerType.ADDRESS))
         }
 
         val legalEntity = address.legalEntity!!
         if(legalEntity.legalAddress == address){
-            val legalEntityHasChanges = legalEntity.confidenceCriteria.numberOfBusinessPartners != newNumberOfSharingMembers
+            val legalEntityHasChanges = legalEntity.confidenceCriteria.numberOfSharingMembers != newNumberOfSharingMembers
             if(legalEntityHasChanges){
-                legalEntity.confidenceCriteria = legalEntity.confidenceCriteria.copy(numberOfBusinessPartners = newNumberOfSharingMembers)
+                legalEntity.confidenceCriteria = legalEntity.confidenceCriteria.copy(numberOfSharingMembers = newNumberOfSharingMembers)
                 legalEntityRepository.save(legalEntity)
                 changelogService.createChangelogEntry(ChangelogEntryCreateRequest(legalEntity.bpn, ChangelogType.UPDATE, BusinessPartnerType.LEGAL_ENTITY))
             }
