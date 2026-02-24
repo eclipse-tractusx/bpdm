@@ -327,6 +327,7 @@ class GoldenRecordUpdateChunkService(
         updateIdentifiers(businessPartner.identifiers, address.identifiers.map(::toEntity), BusinessPartnerType.ADDRESS)
         updateStates(businessPartner.states, address.states, BusinessPartnerType.ADDRESS)
         businessPartner.addressName = address.name
+        businessPartner.postalAddress.addressType = address.addressType
         businessPartner.postalAddress.physicalPostalAddress = address.physicalPostalAddress.toEntity()
         businessPartner.postalAddress.alternativePostalAddress = address.alternativePostalAddress?.toEntity()
         businessPartner.addressConfidence?.let { update(it,  address.confidenceCriteria) }
