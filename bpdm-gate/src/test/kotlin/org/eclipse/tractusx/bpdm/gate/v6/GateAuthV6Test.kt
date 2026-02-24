@@ -25,9 +25,9 @@ import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
 import org.eclipse.tractusx.bpdm.gate.api.v6.client.GateClientV6
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPostRequest
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPutEntryV6
 import org.eclipse.tractusx.bpdm.gate.v6.util.GateTestClientProviderV6
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.eclipse.tractusx.bpdm.test.util.AuthAssertionHelper
@@ -136,7 +136,7 @@ class GateAuthV6Test: GateUnscheduledInitialStartV6Test() {
             inputConsumer = AuthExpectationType.Forbidden,
             outputConsumer = AuthExpectationType.Forbidden
         ){
-            gateClient.relations.put(true, RelationPutEntry("", RelationType.IsManagedBy, "", ""))
+            gateClient.relations.put(true, RelationPutEntryV6("", RelationType.IsManagedBy, "", ""))
         }
     }
 

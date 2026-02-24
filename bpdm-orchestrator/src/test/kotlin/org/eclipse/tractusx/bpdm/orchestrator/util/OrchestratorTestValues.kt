@@ -19,10 +19,36 @@
 
 package org.eclipse.tractusx.bpdm.orchestrator.util
 
+import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
+import org.eclipse.tractusx.orchestrator.api.model.RelationType
 import org.eclipse.tractusx.orchestrator.api.model.RelationValidityPeriod
 import java.time.LocalDate
 
 object OrchestratorTestValues {
 
     val alwaysActiveRelationValidity = listOf(RelationValidityPeriod(LocalDate.parse("1970-01-01"), LocalDate.parse("9999-01-01")))
+
+    val relationAltHeadquarter = BusinessPartnerRelations(
+        relationType = RelationType.IsAlternativeHeadquarterFor,
+        businessPartnerSourceBpn = "BPNL1",
+        businessPartnerTargetBpn = "BPNL2",
+        validityPeriods = alwaysActiveRelationValidity,
+        reasonCode = "REASON_CODE_1"
+    )
+
+    val relationIsManagedBy = BusinessPartnerRelations(
+        relationType = RelationType.IsManagedBy,
+        businessPartnerSourceBpn = "BPNL3",
+        businessPartnerTargetBpn = "BPNL4",
+        validityPeriods = alwaysActiveRelationValidity,
+        reasonCode = "REASON_CODE_2"
+    )
+
+    val relationIsOwnedBy = BusinessPartnerRelations(
+        relationType = RelationType.IsOwnedBy,
+        businessPartnerSourceBpn = "BPNL5",
+        businessPartnerTargetBpn = "BPNL6",
+        validityPeriods = alwaysActiveRelationValidity,
+        reasonCode = "REASON_CODE_3"
+    )
 }

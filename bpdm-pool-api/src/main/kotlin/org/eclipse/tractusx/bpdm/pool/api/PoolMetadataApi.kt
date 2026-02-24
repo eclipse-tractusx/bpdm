@@ -178,7 +178,7 @@ interface PoolMetadataApi {
         value = [
             ApiResponse(responseCode = "200", description = "Reason code successfully deleted"),
             ApiResponse(responseCode = "404", description = "Referenced reason code can not be found", content = [Content()]),
-            ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()])
+            ApiResponse(responseCode = "400", description = "On malformed requests", content = [Content()])
         ]
     )
     @Tag(name = ApiCommons.METADATA_NAME, description = ApiCommons.METADATA_DESCRIPTION)

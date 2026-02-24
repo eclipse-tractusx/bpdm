@@ -262,7 +262,8 @@ fun RelationDb.toDto(): RelationVerboseDto {
         type = type,
         businessPartnerSourceBpnl = startNode.bpn,
         businessPartnerTargetBpnl = endNode.bpn,
-        validityPeriods = validityPeriods.sortedBy { it.validFrom }.map { it.toDto() }
+        validityPeriods = validityPeriods.sortedBy { it.validFrom }.map { it.toDto() },
+        reasonCode = reasonCode.technicalKey
     )
 }
 
@@ -271,7 +272,8 @@ fun AddressRelationDb.toDto(): AddressRelationVerboseDto {
         type = type,
         businessPartnerSourceBpna = startAddress.bpn,
         businessPartnerTargetBpna = endAddress.bpn,
-        validityPeriods = validityPeriods.sortedBy { it.validFrom }.map { it.toDto() }
+        validityPeriods = validityPeriods.sortedBy { it.validFrom }.map { it.toDto() },
+        reasonCode = reasonCode.technicalKey
     )
 }
 

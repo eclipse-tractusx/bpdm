@@ -44,7 +44,7 @@ abstract class AuthTestBase(
     private val bpnAuthExpectation: AuthExpectationType
 ) {
     private val authAssertions = AuthAssertionHelper()
-    private val requestFactory = BusinessPartnerRequestFactory(TestMetadata(emptyList(), emptyList(), emptyList(), emptyList()))
+    private val requestFactory = BusinessPartnerRequestFactory(TestMetadata(emptyList(), emptyList(), emptyList(), emptyList(), emptyList()))
 
 
     @Test

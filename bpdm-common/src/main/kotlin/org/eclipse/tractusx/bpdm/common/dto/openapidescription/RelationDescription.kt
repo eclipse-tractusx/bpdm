@@ -17,31 +17,16 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.config
+package org.eclipse.tractusx.bpdm.common.dto.openapidescription
 
-import org.eclipse.tractusx.bpdm.test.testdata.gate.GateInputFactory
-import org.eclipse.tractusx.bpdm.test.testdata.gate.TestMetadata
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
+object RelationDescription {
+    const val header = "A relation from one business partner (the source) to another business partner (the target)."
 
-@Configuration
-class TestDataConfiguration {
-
-    @Bean
-    fun testMetadata(): TestMetadata {
-        val testMetadata = TestMetadata(
-            identifierTypes = listOf("EU_VAT_ID_DE", "DUNS_ID"),
-            legalForms = listOf("SCE1", "SGST"),
-            adminAreas = listOf("DE-BW", "DE-BY"),
-            reasonCodes = listOf("REASON_CODE_1", "REASON_CODE_2")
-        )
-
-        return testMetadata
-    }
-
-    @Bean
-    fun gateTestDataFactory(testMetadata: TestMetadata): GateInputFactory {
-        return GateInputFactory(testMetadata, null)
-    }
-
+    const val externalId = "The identifier with which to reference this relation"
+    const val relationType = "The type of relation between the business partners"
+    const val source = "The business partner from which the relation emerges (the source)"
+    const val target = "The business partner to which this relation goes (the target)"
+    const val reasonCode = "The technical key of the reason code describing why the relation was established. The list of reason codes is available from the golden record Pool."
+    const val updatedAt = "The time when this relation was last modified"
+    const val createdAt = "The time when this relation was created"
 }

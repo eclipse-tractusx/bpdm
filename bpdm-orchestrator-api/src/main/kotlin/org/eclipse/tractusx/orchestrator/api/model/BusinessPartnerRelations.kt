@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.orchestrator.api.model
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.RelationDescription
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.RelationValidityPeriodDescription
 import java.time.LocalDate
 
@@ -32,14 +33,17 @@ data class BusinessPartnerRelations(
     @Schema(description = "The business partner to which this relation goes (the target)")
     val businessPartnerTargetBpn: String,
     @Schema(description = RelationValidityPeriodDescription.header)
-    val validityPeriods : Collection<RelationValidityPeriod>
+    val validityPeriods : Collection<RelationValidityPeriod>,
+    @Schema(description = RelationDescription.reasonCode)
+    val reasonCode: String,
 ) {
     companion object {
         val empty = BusinessPartnerRelations(
             relationType = RelationType.IsAlternativeHeadquarterFor, // or a default type
             businessPartnerSourceBpn = "",
             businessPartnerTargetBpn = "",
-            validityPeriods = emptyList()
+            validityPeriods = emptyList(),
+            reasonCode = ""
         )
     }
 }

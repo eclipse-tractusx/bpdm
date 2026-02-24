@@ -38,6 +38,7 @@ import org.eclipse.tractusx.bpdm.pool.dto.AddressMetadataDto
 import org.eclipse.tractusx.bpdm.pool.dto.LegalEntityMetadataDto
 import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmAlreadyExists
+import org.eclipse.tractusx.bpdm.pool.exception.BpdmReasonCodeInUseException
 import org.eclipse.tractusx.bpdm.pool.repository.*
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
@@ -54,7 +55,8 @@ class MetadataService(
     private val legalFormRepository: LegalFormRepository,
     private val fieldQualityRuleRepository: FieldQualityRuleRepository,
     private val regionRepository: RegionRepository,
-    private val reasonCodeRepository: ReasonCodeRepository
+    private val reasonCodeRepository: ReasonCodeRepository,
+    private val relationRepository: RelationRepository
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -231,6 +233,9 @@ class MetadataService(
     fun deleteReasonCode(deleteRequest: ReasonCodeDeleteRequest){
         val foundReasonCode = reasonCodeRepository.findByTechnicalKey(deleteRequest.technicalKey)
             ?: throw BpdmNotFoundException("Reason Code", deleteRequest.technicalKey)
+
+        if(relationRepository.existsByReasonCode(foundReasonCode))
+            throw BpdmReasonCodeInUseException(foundReasonCode.technicalKey)
 
         reasonCodeRepository.delete(foundReasonCode)
     }

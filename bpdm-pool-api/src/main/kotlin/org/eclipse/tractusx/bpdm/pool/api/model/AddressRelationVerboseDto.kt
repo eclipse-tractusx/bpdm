@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.api.model
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.RelationDescription
 
 @Schema(
     name = "AddressRelationVerboseDto",
@@ -37,5 +38,8 @@ data class AddressRelationVerboseDto(
     val businessPartnerTargetBpna: String,
 
     @get:Schema(description = "Validity periods of this address relation")
-    val validityPeriods: Collection<RelationValidityPeriod>
+    val validityPeriods: Collection<RelationValidityPeriod>,
+
+    @get:Schema(description = RelationDescription.reasonCode)
+    val reasonCode: String
 )

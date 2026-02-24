@@ -68,7 +68,8 @@ class RelationsGoldenRecordTaskDb(
             BusinessPartnerRelations (
                 relationType = relationType.also { businessPartnerRelations.relationType = it },
                 businessPartnerSourceBpn = businessPartnerSourceBpn.also { businessPartnerRelations.businessPartnerSourceBpn = it },
-                businessPartnerTargetBpn = businessPartnerTargetBpn.also { businessPartnerRelations.businessPartnerTargetBpn = it }
+                businessPartnerTargetBpn = businessPartnerTargetBpn.also { businessPartnerRelations.businessPartnerTargetBpn = it },
+                reasonCode = reasonCode
             )
         }
     }
@@ -116,8 +117,9 @@ class RelationsGoldenRecordTaskDb(
             joinColumns = [JoinColumn(name = "relation_id", foreignKey = ForeignKey(name = "fk_task_relation_validity_periods_relation"))],
             indexes = [Index(name = "idx_relation_task_validity_periods_relation_id", columnList = "relation_id")]
         )
-        var validityPeriods: MutableList<RelationValidityPeriod> = mutableListOf()
-
+        var validityPeriods: MutableList<RelationValidityPeriod> = mutableListOf(),
+        @Column(name = "reason_code", nullable = false)
+        var reasonCode: String
     )
 
 

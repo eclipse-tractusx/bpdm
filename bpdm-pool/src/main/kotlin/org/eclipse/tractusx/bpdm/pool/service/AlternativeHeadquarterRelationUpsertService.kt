@@ -42,11 +42,12 @@ class AlternativeHeadquarterRelationUpsertService(
 
         val result = relationUpsertService.upsertRelation(
             RelationUpsertService.UpsertRequest(
-                standardisedRequest.source,
-                standardisedRequest.target,
-                LegalEntityRelationType.IsAlternativeHeadquarterFor,
-                standardisedRequest.validityPeriods,
-                standardisedRequest.existingRelation
+                source = standardisedRequest.source,
+                target = standardisedRequest.target,
+                legalEntityRelationType = LegalEntityRelationType.IsAlternativeHeadquarterFor,
+                validityPeriods = standardisedRequest.validityPeriods,
+                existingRelation = standardisedRequest.existingRelation,
+                reasonCode = standardisedRequest.reasonCode
             )
         )
 

@@ -25,8 +25,8 @@ import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityIdentifierDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntitySearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityCreateError
@@ -35,6 +35,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityUpdateError
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
+import org.eclipse.tractusx.bpdm.pool.repository.ReasonCodeRepository
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.eclipse.tractusx.bpdm.pool.util.TestHelpers
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
@@ -45,6 +46,7 @@ import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseVal
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues.logisticAddress3
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerVerboseValues
 import org.eclipse.tractusx.bpdm.test.testdata.pool.LegalEntityStructureRequest
+import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolDataHelper
 import org.eclipse.tractusx.bpdm.test.util.AssertHelpers
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.junit.jupiter.api.BeforeEach
@@ -69,12 +71,16 @@ class LegalEntityControllerIT @Autowired constructor(
     val dbTestHelpers: DbTestHelpers,
     val assertHelpers: AssertHelpers,
     val legalEntityRepository: LegalEntityRepository,
-    val releationRepository: RelationRepository
+    val releationRepository: RelationRepository,
+    val poolDataHelper: PoolDataHelper,
+    val reasonCodeRepository: ReasonCodeRepository
 ) {
+
 
     @BeforeEach
     fun beforeEach() {
         dbTestHelpers.truncateDbTables()
+        poolDataHelper.createTestDataEnvironment()
     }
 
     /**
@@ -689,6 +695,7 @@ class LegalEntityControllerIT @Autowired constructor(
                     validTo = LocalDate.parse("9999-12-31")
                 )
             ),
+            reasonCode = reasonCodeRepository.findAll().first()
         )
 
         releationRepository.save(relation)

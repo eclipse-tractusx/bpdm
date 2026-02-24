@@ -54,7 +54,8 @@ class ManagedRelationUpsertService(
                 target = upsertRequest.target,
                 legalEntityRelationType = LegalEntityRelationType.IsManagedBy,
                 validityPeriods = upsertRequest.validityPeriods,
-                existingRelation = upsertRequest.existingRelation
+                existingRelation = upsertRequest.existingRelation,
+                reasonCode = upsertRequest.reasonCode
             )
         )
         makeManagedEntityParticipantIfRequired(upsertRequest.source)

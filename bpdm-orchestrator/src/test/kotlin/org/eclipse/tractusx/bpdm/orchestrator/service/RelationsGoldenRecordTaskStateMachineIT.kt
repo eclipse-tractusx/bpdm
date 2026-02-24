@@ -30,7 +30,10 @@ import org.eclipse.tractusx.bpdm.orchestrator.repository.SharingMemberRecordRepo
 import org.eclipse.tractusx.bpdm.orchestrator.util.OrchestratorTestValues
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
-import org.eclipse.tractusx.orchestrator.api.model.*
+import org.eclipse.tractusx.orchestrator.api.model.TaskMode
+import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsErrorDto
+import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsErrorType
+import org.eclipse.tractusx.orchestrator.api.model.TaskStep
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
@@ -57,8 +60,6 @@ class RelationsGoldenRecordTaskStateMachineIT  @Autowired constructor(
     private val dbTestHelpers: DbTestHelpers,
     private val stateMachineConfigProperties: StateMachineConfigProperties
 ) {
-    private val businessPartnerRelations1 = BusinessPartnerRelations(relationType = RelationType.IsAlternativeHeadquarterFor, businessPartnerSourceBpn = "BPNL1", businessPartnerTargetBpn = "BPNL2", validityPeriods = OrchestratorTestValues.alwaysActiveRelationValidity)
-    private val businessPartnerRelations2 = BusinessPartnerRelations(relationType = RelationType.IsManagedBy, businessPartnerSourceBpn = "BPNL3", businessPartnerTargetBpn = "BPNL4", validityPeriods =  OrchestratorTestValues.alwaysActiveRelationValidity)
     private lateinit var gateRecord: SharingMemberRecordDb
 
     @BeforeEach
@@ -76,7 +77,7 @@ class RelationsGoldenRecordTaskStateMachineIT  @Autowired constructor(
     @Transactional
     fun `initial state`(taskMode: TaskMode) {
         val now = Instant.now()
-        val task = relationsGoldenRecordTaskStateMachine.initTask(taskMode, businessPartnerRelations1, gateRecord)
+        val task = relationsGoldenRecordTaskStateMachine.initTask(taskMode, OrchestratorTestValues.relationAltHeadquarter, gateRecord)
         val expectedStep = stateMachineConfigProperties.modeSteps[taskMode]!!.first()
         val state = task.processingState
 
@@ -99,7 +100,7 @@ class RelationsGoldenRecordTaskStateMachineIT  @Autowired constructor(
     @Transactional
     fun `walk through all UpdateFromSharingMember steps`(taskMode: TaskMode) {
         // new task
-        val task = relationsGoldenRecordTaskStateMachine.initTask(taskMode, businessPartnerRelations2, gateRecord)
+        val task = relationsGoldenRecordTaskStateMachine.initTask(taskMode, OrchestratorTestValues.relationAltHeadquarter, gateRecord)
 
         val allSteps = stateMachineConfigProperties.modeSteps[taskMode]!!
         allSteps.forEach { step ->
@@ -117,10 +118,10 @@ class RelationsGoldenRecordTaskStateMachineIT  @Autowired constructor(
             }.isInstanceOf(RelationsIllegalStateException::class.java)
 
             // resolve
-            relationsGoldenRecordTaskStateMachine.resolveTaskStepToSuccess(task, step, businessPartnerRelations2)
+            relationsGoldenRecordTaskStateMachine.resolveTaskStepToSuccess(task, step, OrchestratorTestValues.relationAltHeadquarter)
 
             // resolve again ignored
-           relationsGoldenRecordTaskStateMachine.resolveTaskStepToSuccess(task, step, businessPartnerRelations2)
+           relationsGoldenRecordTaskStateMachine.resolveTaskStepToSuccess(task, step, OrchestratorTestValues.relationAltHeadquarter)
         }
 
         val finalStep = stateMachineConfigProperties.modeSteps[taskMode]!!.last()
@@ -151,7 +152,7 @@ class RelationsGoldenRecordTaskStateMachineIT  @Autowired constructor(
     @Transactional
     fun `walk through steps and resolve with error`(taskMode: TaskMode) {
         // new task
-        val task = relationsGoldenRecordTaskStateMachine.initTask(taskMode, businessPartnerRelations1, gateRecord)
+        val task = relationsGoldenRecordTaskStateMachine.initTask(taskMode, OrchestratorTestValues.relationAltHeadquarter, gateRecord)
         val expectedStep = stateMachineConfigProperties.modeSteps[taskMode]!!.first()
         assertProcessingState(task.processingState, RelationsGoldenRecordTaskDb.ResultState.Pending, expectedStep, RelationsGoldenRecordTaskDb.StepState.Queued)
         // taskPendingTimeout has been set
@@ -183,7 +184,7 @@ class RelationsGoldenRecordTaskStateMachineIT  @Autowired constructor(
         }.isInstanceOf(RelationsIllegalStateException::class.java)
 
         // Resolve again ignored
-        relationsGoldenRecordTaskStateMachine.resolveTaskStepToSuccess(task, expectedStep, businessPartnerRelations1)
+        relationsGoldenRecordTaskStateMachine.resolveTaskStepToSuccess(task, expectedStep, OrchestratorTestValues.relationAltHeadquarter)
     }
 
     private fun assertProcessingState(processingState: RelationsGoldenRecordTaskDb.ProcessingState,

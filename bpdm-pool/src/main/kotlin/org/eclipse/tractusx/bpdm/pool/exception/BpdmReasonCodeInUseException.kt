@@ -17,31 +17,12 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.config
+package org.eclipse.tractusx.bpdm.pool.exception
 
-import org.eclipse.tractusx.bpdm.test.testdata.gate.GateInputFactory
-import org.eclipse.tractusx.bpdm.test.testdata.gate.TestMetadata
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.ResponseStatus
 
-@Configuration
-class TestDataConfiguration {
-
-    @Bean
-    fun testMetadata(): TestMetadata {
-        val testMetadata = TestMetadata(
-            identifierTypes = listOf("EU_VAT_ID_DE", "DUNS_ID"),
-            legalForms = listOf("SCE1", "SGST"),
-            adminAreas = listOf("DE-BW", "DE-BY"),
-            reasonCodes = listOf("REASON_CODE_1", "REASON_CODE_2")
-        )
-
-        return testMetadata
-    }
-
-    @Bean
-    fun gateTestDataFactory(testMetadata: TestMetadata): GateInputFactory {
-        return GateInputFactory(testMetadata, null)
-    }
-
-}
+@ResponseStatus(HttpStatus.BAD_REQUEST)
+class BpdmReasonCodeInUseException(
+    technicalKey: String
+) : RuntimeException("Reason code '$technicalKey' can't be deleted as it is still used.")

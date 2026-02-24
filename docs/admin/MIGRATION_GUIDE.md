@@ -8,6 +8,7 @@
       * [Rationale](#rationale)
     * [New relation type for addresses](#new-relation-type-for-addresses)
     * [No required operator actions](#no-required-operator-actions)
+    * [Reason Codes](#reason-codes)
   * [7.2.x to 7.3.x](#72x-to-73x)
     * [Automatic Confidence Level](#automatic-confidence-level)
   * [7.1.x to 7.2.x](#71x-to-72x)
@@ -71,6 +72,16 @@ This type applies only to address relations and is validated accordingly.
 - No cleanup or special deployment steps needed.
 
 
+### Reason Codes
+
+Each business partner relation now needs a mandatory reason code.
+Reason codes are not standardized and are therefore managed by the operator of the golden record process.
+
+The list of available reason codes should be managed in the golden record Pool through to the new metadata endpoints.
+
+> Very important:
+> Since reason codes are mandatory and there are no default reason codes this repository does not contain any migration scripts for existing relations.
+> Therefore, if there are already relations present in BPDM the operator needs to add migration scripts assigning reason codes to those relations.
 
 ## 7.2.x to 7.3.x
 

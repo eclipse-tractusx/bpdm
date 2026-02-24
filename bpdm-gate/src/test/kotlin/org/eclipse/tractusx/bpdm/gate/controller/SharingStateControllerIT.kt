@@ -26,7 +26,6 @@ import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
-import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
 import org.eclipse.tractusx.bpdm.gate.entity.RelationSharingStateDb
 import org.eclipse.tractusx.bpdm.gate.repository.RelationRepository
@@ -322,16 +321,7 @@ class SharingStateControllerIT @Autowired constructor(
         val beforeCreation = Instant.now()
         gateClient.relation.put(
             createIfNotExist = true,
-            RelationPutRequest(
-                listOf(
-                    RelationPutEntry(
-                        externalId = externalId,
-                        relationType = relationType,
-                        businessPartnerSourceExternalId = source,
-                        businessPartnerTargetExternalId = target
-                    )
-                )
-            )
+            RelationPutRequest(listOf(inputFactory.buildRelation(externalId, relationType, source, target)))
         )
         val afterCreation = Instant.now()
 

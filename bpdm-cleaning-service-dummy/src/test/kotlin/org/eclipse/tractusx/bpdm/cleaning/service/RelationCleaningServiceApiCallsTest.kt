@@ -153,6 +153,7 @@ class RelationCleaningServiceApiCallsTest @Autowired constructor(
                     validTo = LocalDate.parse("2030-01-01")
                 )
             ),
+            reasonCode = "reason code"
         )
     }
 }

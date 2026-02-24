@@ -19,13 +19,25 @@
 
 package org.eclipse.tractusx.bpdm.gate.api.model
 
+import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.RelationDescription
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.RelationValidityPeriodDescription
 import java.time.Instant
 
+@Schema(description = RelationDescription.header)
 data class RelationOutputDto(
+    @get:Schema(description = RelationDescription.externalId)
     val externalId: String,
+    @get:Schema(description = RelationDescription.relationType)
     val relationType: SharableRelationType,
+    @get:Schema(description = RelationDescription.source)
     val sourceBpn: String,
+    @get:Schema(description = RelationDescription.target)
     val targetBpn: String,
+    @get:Schema(description = RelationValidityPeriodDescription.header)
     val validityPeriods: Collection<RelationValidityPeriodDto>,
+    @get:Schema(description = RelationDescription.reasonCode)
+    val reasonCode: String,
+    @get:Schema(description = RelationDescription.updatedAt)
     val updatedAt: Instant
 )

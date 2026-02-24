@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.pool.entity.AddressRelationDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
+import org.eclipse.tractusx.bpdm.pool.repository.ReasonCodeRepository
 import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
 import org.eclipse.tractusx.orchestrator.api.model.RelationValidityPeriod
 import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepReservationEntryDto
@@ -35,7 +36,8 @@ import org.eclipse.tractusx.orchestrator.api.model.RelationType as OrchestratorR
 @Service
 class TaskAddressRelationsStepBuildService(
     private val logisticAddressRepository: LogisticAddressRepository,
-    private val addressRelationUpsertService: AddressRelationUpsertService
+    private val addressRelationUpsertService: AddressRelationUpsertService,
+    private val reasonCodeRepository: ReasonCodeRepository
 ) {
 
     @Transactional
@@ -54,6 +56,9 @@ class TaskAddressRelationsStepBuildService(
         val targetAddress = logisticAddressRepository.findByBpn(addressRelationDto.businessPartnerTargetBpn)
             ?: throw BpdmValidationException("Target address BPNA ${addressRelationDto.businessPartnerTargetBpn} not found")
 
+        val reasonCode  = reasonCodeRepository.findByTechnicalKey(addressRelationDto.reasonCode)
+            ?: throw BpdmValidationException("Relation reason code '${addressRelationDto.reasonCode}' not found")
+
         validateValidityPeriods(addressRelationDto)
 
         // Map states from orchestrator
@@ -67,7 +72,8 @@ class TaskAddressRelationsStepBuildService(
         val upsertRequest = IAddressRelationUpsertStratergyService.UpsertRequest(
             source = sourceAddress,
             target = targetAddress,
-            validityPeriods = validityPeriods
+            validityPeriods = validityPeriods,
+            reasonCode = reasonCode
         )
         val strategyService: IAddressRelationUpsertStratergyService = when(addressRelationDto.relationType) {
             OrchestratorRelationType.IsReplacedBy -> addressRelationUpsertService
@@ -92,7 +98,8 @@ class TaskAddressRelationsStepBuildService(
                     validFrom = it.validFrom,
                     validTo = it.validTo
                 )
-            }
+            },
+            reasonCode = reasonCode.technicalKey
         )
     }
 

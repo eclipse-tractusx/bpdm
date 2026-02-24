@@ -17,31 +17,12 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.config
+package org.eclipse.tractusx.bpdm.gate.api.v6.model.request
 
-import org.eclipse.tractusx.bpdm.test.testdata.gate.GateInputFactory
-import org.eclipse.tractusx.bpdm.test.testdata.gate.TestMetadata
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
+import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
 
-@Configuration
-class TestDataConfiguration {
-
-    @Bean
-    fun testMetadata(): TestMetadata {
-        val testMetadata = TestMetadata(
-            identifierTypes = listOf("EU_VAT_ID_DE", "DUNS_ID"),
-            legalForms = listOf("SCE1", "SGST"),
-            adminAreas = listOf("DE-BW", "DE-BY"),
-            reasonCodes = listOf("REASON_CODE_1", "REASON_CODE_2")
-        )
-
-        return testMetadata
-    }
-
-    @Bean
-    fun gateTestDataFactory(testMetadata: TestMetadata): GateInputFactory {
-        return GateInputFactory(testMetadata, null)
-    }
-
-}
+@Schema(description = "A request to upsert the contents of the given relations")
+data class RelationPutRequest(
+    val relations: List<RelationPutEntry>
+)

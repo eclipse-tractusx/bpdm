@@ -25,7 +25,10 @@ import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
-import org.eclipse.tractusx.bpdm.pool.entity.*
+import org.eclipse.tractusx.bpdm.pool.entity.AddressRelationDb
+import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
+import org.eclipse.tractusx.bpdm.pool.entity.ReasonCodeDb
+import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.AddressRelationRepository
 import org.springframework.stereotype.Service
@@ -73,7 +76,8 @@ class AddressRelationUpsertService(
                     source = sourceAddress,
                     target = targetAddress,
                     addressRelationType = addressRelationType,
-                    validityPeriods = validityPeriods
+                    validityPeriods = validityPeriods,
+                    reasonCode = upsertRequest.reasonCode
                 )
             ), UpsertType.Created)
         }
@@ -97,6 +101,7 @@ class AddressRelationUpsertService(
             startAddress = source,
             endAddress = target,
             validityPeriods = validityPeriods,
+            reasonCode = upsertRequest.reasonCode
         )
 
         addressRelationRepository.save(newRelation)
@@ -111,7 +116,8 @@ class AddressRelationUpsertService(
         val source: LogisticAddressDb,
         val target: LogisticAddressDb,
         val addressRelationType: AddressRelationType,
-        val validityPeriods: Collection<RelationValidityPeriodDb>
+        val validityPeriods: Collection<RelationValidityPeriodDb>,
+        val reasonCode: ReasonCodeDb
     )
 
     private fun validityPeriodsDiffer(existingValidityPeriods: Collection<RelationValidityPeriodDb>, newValidityPeriods: Collection<RelationValidityPeriodDb>): Boolean {

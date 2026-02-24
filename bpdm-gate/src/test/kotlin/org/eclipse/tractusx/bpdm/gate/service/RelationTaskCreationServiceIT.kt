@@ -29,7 +29,6 @@ import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateErrorCode
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
-import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
 import org.eclipse.tractusx.bpdm.gate.controller.SelfClientAsPartnerUploaderInitializer
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
@@ -130,20 +129,21 @@ class RelationTaskCreationServiceIT @Autowired constructor(
                 taskId,
                 recordId,
                 BusinessPartnerRelations(
-                    when(relationType) {
+                    relationType = when (relationType) {
                         RelationType.IsAlternativeHeadquarterFor -> org.eclipse.tractusx.orchestrator.api.model.RelationType.IsAlternativeHeadquarterFor
                         RelationType.IsManagedBy -> org.eclipse.tractusx.orchestrator.api.model.RelationType.IsManagedBy
                         RelationType.IsOwnedBy -> org.eclipse.tractusx.orchestrator.api.model.RelationType.IsOwnedBy
                         RelationType.IsReplacedBy -> org.eclipse.tractusx.orchestrator.api.model.RelationType.IsReplacedBy
                     },
-                    legalEntityBpnL1,
-                    legalEntityBpnL2,
-                    listOf(
+                    businessPartnerSourceBpn = legalEntityBpnL1,
+                    businessPartnerTargetBpn = legalEntityBpnL2,
+                    validityPeriods = listOf(
                         RelationValidityPeriod(
                             validFrom = LocalDate.parse("1970-01-01"),
                             validTo = LocalDate.parse("9999-12-31")
                         )
-                    )
+                    ),
+                    reasonCode = "any code"
                 ),
                 TaskProcessingRelationsStateDto(ResultState.Pending, TaskStep.CleanAndSync, StepState.Queued, emptyList(), anyTime, anyTime, anyTime))
         ))
@@ -222,7 +222,8 @@ class RelationTaskCreationServiceIT @Autowired constructor(
                                 LocalDate.parse("1970-01-01"),
                                 LocalDate.parse("9999-12-31")
                             )
-                        )
+                        ),
+                        "any code"
                     ),
                     TaskProcessingRelationsStateDto(ResultState.Pending, TaskStep.CleanAndSync, StepState.Queued, emptyList(), anyTime, anyTime, anyTime)
                 )
@@ -353,16 +354,7 @@ class RelationTaskCreationServiceIT @Autowired constructor(
         val beforeCreation = Instant.now()
         gateClient.relation.put(
             createIfNotExist = true,
-            RelationPutRequest(
-                listOf(
-                    RelationPutEntry(
-                        externalId = externalId,
-                        relationType = relationType,
-                        businessPartnerSourceExternalId = source,
-                        businessPartnerTargetExternalId = target
-                    )
-                )
-            )
+            RelationPutRequest(listOf( inputFactory.buildRelation(externalId, relationType, source, target)))
         )
         val afterCreation = Instant.now()
 

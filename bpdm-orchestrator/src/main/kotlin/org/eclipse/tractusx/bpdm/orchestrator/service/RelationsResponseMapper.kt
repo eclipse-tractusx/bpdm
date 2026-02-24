@@ -49,7 +49,8 @@ class RelationsResponseMapper {
                         validFrom = it.validFrom,
                         validTo = it.validTo
                     )
-                }.toMutableList()
+                }.toMutableList(),
+                reasonCode = reasonCode
             )
         }
 

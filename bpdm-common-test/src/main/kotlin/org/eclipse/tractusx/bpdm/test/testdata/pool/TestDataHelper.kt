@@ -21,10 +21,8 @@ package org.eclipse.tractusx.bpdm.test.testdata.pool
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.model.CountrySubdivisionDto
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalFormDto
+import org.eclipse.tractusx.bpdm.pool.api.model.*
+import org.eclipse.tractusx.bpdm.pool.api.model.request.ReasonCodeUpsertRequest
 import org.eclipse.tractusx.bpdm.test.util.Timeframe
 import java.time.Instant
 
@@ -38,6 +36,7 @@ fun List<LegalEntityHierarchy>.getAllAddresses() = flatMap { it.getAllAddresses(
  */
 class PoolDataHelper(
     private val poolClient: PoolApiClient,
+    private val reasonCodes: List<ReasonCodeDto>
 ) {
 
     fun createTestDataEnvironment(): TestDataEnvironment {
@@ -46,7 +45,9 @@ class PoolDataHelper(
         val legalForms = poolClient.metadata.getLegalForms(PaginationRequest()).content.toList()
         val adminAreas = poolClient.metadata.getAdminAreasLevel1(PaginationRequest()).content.toList()
 
-        val testMetadata = TestMetadata(legalForms, legalEntityIdentifierTypes, addressIdentifierTypes, adminAreas)
+        reasonCodes.forEach { poolClient.metadata.upsertReasonCode(ReasonCodeUpsertRequest(it)) }
+
+        val testMetadata = TestMetadata(legalForms, legalEntityIdentifierTypes, addressIdentifierTypes, adminAreas, reasonCodes)
 
         val requestFactory = BusinessPartnerRequestFactory(testMetadata)
         val expectedResultFactory = ExpectedBusinessPartnerResultFactory(testMetadata)
@@ -95,5 +96,6 @@ data class TestMetadata(
     val legalForms: List<LegalFormDto>,
     val legalEntityIdentifierTypes: List<IdentifierTypeDto>,
     val addressIdentifierTypes: List<IdentifierTypeDto>,
-    val adminAreas: List<CountrySubdivisionDto>
+    val adminAreas: List<CountrySubdivisionDto>,
+    val reasonCodes: List<ReasonCodeDto>
 )

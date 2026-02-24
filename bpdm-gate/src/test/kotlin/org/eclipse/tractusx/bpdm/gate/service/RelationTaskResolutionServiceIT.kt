@@ -124,10 +124,11 @@ class RelationTaskResolutionServiceIT @Autowired constructor(
         ))
 
         val mockedRelationValidityPeriods = GateTestValues.alwaysActiveRelationValidity.map { RelationValidityPeriod(it.validFrom, it.validTo) }
+        val mockedReasonCode = "mocked code"
         val orchestratorMockResultResponse = TaskRelationsStateResponse(listOf(
-            TaskClientRelationsStateDto(taskId1, recordId1, BusinessPartnerRelations(relationType, bpnL1,bpnL2, mockedRelationValidityPeriods),
+            TaskClientRelationsStateDto(taskId1, recordId1, BusinessPartnerRelations(relationType, bpnL1,bpnL2, mockedRelationValidityPeriods, mockedReasonCode),
                 TaskProcessingRelationsStateDto(ResultState.Success, TaskStep.PoolSync, StepState.Success, emptyList(), anyTime, anyTime, anyTime )),
-            TaskClientRelationsStateDto(taskId2, recordId2, BusinessPartnerRelations(relationType, bpnL1,bpnL2, mockedRelationValidityPeriods),
+            TaskClientRelationsStateDto(taskId2, recordId2, BusinessPartnerRelations(relationType, bpnL1,bpnL2, mockedRelationValidityPeriods, mockedReasonCode),
                 TaskProcessingRelationsStateDto(ResultState.Error, TaskStep.CleanAndSync, StepState.Error, listOf(TaskRelationsErrorDto(errorType, errorDescription)), anyTime, anyTime, anyTime )),
         ))
 
@@ -159,7 +160,9 @@ class RelationTaskResolutionServiceIT @Autowired constructor(
                 bpnL1,
                 bpnL2,
                 GateTestValues.alwaysActiveRelationValidity,
-                anyTime)
+                mockedReasonCode,
+                anyTime
+            )
         ))
         val expectedSharingStates = PageDto(2, 1, 0, 2, listOf(
             RelationSharingStateDto(relationId1, RelationSharingStateType.Success, null, null, taskId1, anyTime),
