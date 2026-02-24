@@ -493,15 +493,6 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         assertThat(relationBtoC!!.validityPeriods.size).isEqualTo(1)
     }
 
-    private fun createLegalEntity(seed: String): LegalEntityPartnerCreateVerboseDto {
-        val request = testDataEnvironment.requestFactory.createLegalEntityRequest(seed, true)
-        return poolClient.legalEntities.createBusinessPartners(listOf(request)).entities.single()
-    }
-
-    private fun createAdditionalAddress(seed: String, legalEntity: LegalEntityPartnerCreateVerboseDto): AddressPartnerCreateVerboseDto {
-        val request = testDataEnvironment.requestFactory.buildAdditionalAddressCreateRequest(seed, legalEntity.legalEntity.bpnl)
-        return poolClient.addresses.createAddresses(listOf(request)).entities.single()
-    }
     /**
      * GIVEN relation golden record task with unknown reason code
      * WHEN trying to refine relation task
@@ -566,7 +557,70 @@ class TaskRelationsResolutionServiceTest @Autowired constructor(
         assertThat(result[0].errors[0].description).isEqualTo("Invalid relation: mixed legal entity or address types not allowed (source=${createAddressRelationsRequest.businessPartnerSourceBpn}, target=${createAddressRelationsRequest.businessPartnerTargetBpn})")
     }
 
+    /**
+     * GIVEN an address relation upsert request
+     *   AND source address is of type AdditionalAddress
+     *   AND target address is of type AdditionalAddress
+     * WHEN trying to upsert an address relation
+     * THEN validation exception is thrown indicating invalid source address type
+     */
+    @ParameterizedTest
+    @EnumSource(AddressRelationType::class)
+    fun `reject address relation when source is not LegalAddress `(relationType: AddressRelationType) {
+        //Given
+        val legalEntity1 = createLegalEntity("$testName 1")
+        val additionalAddress1 = createAdditionalAddress("$testName Addr 1", legalEntity1)
+        val additionalAddress2 = createAdditionalAddress("$testName Addr 2", legalEntity1)
 
+        val createAddressRelationsRequest = buildAlwaysActiveRelationRequest(
+            relationType = relationType,
+            businessPartnerSourceBpn = additionalAddress1.address.bpna,
+            businessPartnerTargetBpn = additionalAddress2.address.bpna
+        )
+
+        val result = upsertRelationsGoldenRecordIntoPool(taskId = "TASK_1", businessPartnerRelations = createAddressRelationsRequest)
+        assertThat(result[0].taskId).isEqualTo("TASK_1")
+        assertThat(result[0].errors.size).isEqualTo(1)
+        assertThat(result[0].errors[0].description).contains("Invalid source address type for 'IsReplacedBy' relation")
+    }
+
+    /**
+     * GIVEN an address relation upsert request
+     *   AND source address is of type LegalAddress associated with legal entity A
+     *   AND target address is of type AdditionalAddress associated with legal entity B
+     * WHEN trying to upsert an address relation
+     * THEN validation exception is thrown indicating invalid address relation
+     */
+    @ParameterizedTest
+    @EnumSource(AddressRelationType::class)
+    fun `reject address relation when two different legal entities involved `(relationType: AddressRelationType) {
+        //Given
+        val legalEntityA = createLegalEntity("$testName A")
+        val legalEntityB = createLegalEntity("$testName B")
+        val additionalAddressB = createAdditionalAddress("$testName Addr 2", legalEntityB)
+
+        val createAddressRelationsRequest = buildAlwaysActiveRelationRequest(
+            relationType = relationType,
+            businessPartnerSourceBpn = legalEntityA.legalAddress.bpna,
+            businessPartnerTargetBpn = additionalAddressB.address.bpna
+        )
+
+        val result = upsertRelationsGoldenRecordIntoPool(taskId = "TASK_1", businessPartnerRelations = createAddressRelationsRequest)
+        assertThat(result[0].taskId).isEqualTo("TASK_1")
+        assertThat(result[0].errors.size).isEqualTo(1)
+        assertThat(result[0].errors[0].description).contains("Invalid 'IsReplacedBy' relation:")
+    }
+
+
+    private fun createLegalEntity(seed: String): LegalEntityPartnerCreateVerboseDto {
+        val request = testDataEnvironment.requestFactory.createLegalEntityRequest(seed, true)
+        return poolClient.legalEntities.createBusinessPartners(listOf(request)).entities.single()
+    }
+
+    private fun createAdditionalAddress(seed: String, legalEntity: LegalEntityPartnerCreateVerboseDto): AddressPartnerCreateVerboseDto {
+        val request = testDataEnvironment.requestFactory.buildAdditionalAddressCreateRequest(seed, legalEntity.legalEntity.bpnl)
+        return poolClient.addresses.createAddresses(listOf(request)).entities.single()
+    }
 
     private fun upsertRelationsGoldenRecordIntoPool(taskId: String, businessPartnerRelations: BusinessPartnerRelations): List<TaskRelationsStepResultEntryDto> {
 
