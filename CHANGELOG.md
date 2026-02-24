@@ -18,6 +18,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM: Introduced support for business partner address-to-address relations with the new `IsReplacedBy` relation type. [#1561](https://github.com/eclipse-tractusx/bpdm/issues/1561)
 - BPDM Pool: Add endpoints to manage reason code metadata [1562](https://github.com/eclipse-tractusx/bpdm/issues/1562)
 - BPDM: Add reason codes to business partner relations [1562](https://github.com/eclipse-tractusx/bpdm/issues/1562)
+- BPDM Pool: Relocate legal entity headquarter when a replaced by relation between a legal address and an additional address activates [#1586](https://github.com/eclipse-tractusx/bpdm/issues/1586)
 
 ### Changed
 

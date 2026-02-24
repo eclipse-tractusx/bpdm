@@ -23,6 +23,7 @@
       * [Sharing Business Partner Data](#sharing-business-partner-data)
       * [Sharing Other Company's Data](#sharing-other-companys-data)
       * [Sharing Own Company Data](#sharing-own-company-data)
+      * [Headquarter Relocation With No Leftover](#headquarter-relocation-with-no-leftover)
     * [VAS Providers](#vas-providers)
     * [Golden Record Processing Service Providers](#golden-record-processing-service-providers)
       * [Outdated Tasks](#outdated-tasks)
@@ -249,6 +250,22 @@ Additionally, you are required to mark the business partner as `isOwnCompanyData
 This is the way to recognize that you want to share your own data.
 
 In contrast to sharing other company's data you are allowed to specify site information including whether an address is a site main address.
+
+#### Headquarter Relocation With No Leftover
+
+The sharing member wants to report to the network that the headquarters address of a legal entity changed (or will change in the future).
+The old headquarters address will not be active anymore (hence 'No Leftover').
+
+Steps for the sharing member to take in order to realize that use case:
+
+1. The sharing member MUST create a business partner record `A` for the existing headquarters address
+2. The sharing member MUST create a business partner record `B` for the new headquarters address
+3. The sharing member MUST create a IsReplacedBy relation from `A` to `B`
+4. The sharing member MUST update the old headquarters address `A` to have an inactive business state
+
+In order to make sure that the golden record process processed the shared records correctly it is recommended that the sharing member SHOULD wait for the output results between steps 1 - 3.
+To clearly indicate that an old headquarters address is set to inactive and not the current legal entity, the sharing member MUST wait for step 3 correct output results before executing the final step 4.
+
 
 ### VAS Providers
 
