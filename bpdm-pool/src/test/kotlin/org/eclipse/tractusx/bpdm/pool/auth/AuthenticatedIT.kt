@@ -70,7 +70,10 @@ class AuthenticatedIT @Autowired constructor(poolApiClient: PoolApiClient)
         getIdentifierType = AuthExpectationType.Forbidden,
         postIdentifierType = AuthExpectationType.Forbidden,
         getAdminArea = AuthExpectationType.Forbidden,
-        getFieldQualityRules = AuthExpectationType.Forbidden
+        getFieldQualityRules = AuthExpectationType.Forbidden,
+        getReasonCodes = AuthExpectationType.Forbidden,
+        putReasonCodes = AuthExpectationType.Forbidden,
+        deleteReasonCodes = AuthExpectationType.Forbidden
     ),
     MembersAuthExpectations(
         postAddressSearch = AuthExpectationType.Forbidden,

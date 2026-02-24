@@ -69,7 +69,10 @@ AuthCxMemberIT @Autowired constructor(
         getIdentifierType = AuthExpectationType.Authorized,
         postIdentifierType = AuthExpectationType.Forbidden,
         getAdminArea = AuthExpectationType.Authorized,
-        getFieldQualityRules = AuthExpectationType.Authorized
+        getFieldQualityRules = AuthExpectationType.Authorized,
+        getReasonCodes = AuthExpectationType.Authorized,
+        putReasonCodes = AuthExpectationType.Forbidden,
+        deleteReasonCodes = AuthExpectationType.Forbidden
     ),
     MembersAuthExpectations(
         postAddressSearch = AuthExpectationType.Authorized,

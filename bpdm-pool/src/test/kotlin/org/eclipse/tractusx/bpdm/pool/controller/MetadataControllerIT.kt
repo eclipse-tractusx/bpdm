@@ -29,6 +29,9 @@ import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.pool.api.model.QualityLevel
+import org.eclipse.tractusx.bpdm.pool.api.model.ReasonCodeDto
+import org.eclipse.tractusx.bpdm.pool.api.model.request.ReasonCodeDeleteRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.ReasonCodeUpsertRequest
 import org.eclipse.tractusx.bpdm.pool.entity.FieldQualityRuleDb
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDetailDb
@@ -280,6 +283,104 @@ class MetadataControllerIT @Autowired constructor(
         assertThat(resultPl?.filter { it.fieldPath == "path1.field4" }).describedAs("PL rule forbidden overwrites default")
             .isEmpty()
     }
+
+    /**
+     * WHEN operator upserts new reason code
+     * THEN operator sees reason code created
+     */
+    @Test
+    fun `create new reason code`(){
+        //WHEN
+        val request = ReasonCodeUpsertRequest(ReasonCodeDto(testName, "$testName description"))
+        val response = poolClient.metadata.upsertReasonCode(request)
+
+        //THEN
+        assertThat(response).isEqualTo(request.reasonCode)
+    }
+
+    /**
+     * GIVEN reason code
+     * WHEN operator searches for reason codes
+     * THEN operator finds reason code
+     */
+    @Test
+    fun `find created reason code`(){
+        //GIVEN
+        val request = ReasonCodeUpsertRequest(ReasonCodeDto(testName, "$testName description"))
+        poolClient.metadata.upsertReasonCode(request)
+
+        //WHEN
+        val response = poolClient.metadata.getReasonCodes(PaginationRequest())
+
+        //THEN
+        val expected = PageDto(1, 1, 0, 1, listOf(request.reasonCode))
+        assertThat(response).isEqualTo(expected)
+    }
+
+    /**
+     * GIVEN reason code
+     * WHEN operator upserts reason code by technical key
+     * THEN operator sees reason code updated
+     */
+    @Test
+    fun `update reason code`(){
+        //GIVEN
+        val createRequest = ReasonCodeUpsertRequest(ReasonCodeDto(testName, "$testName description"))
+        poolClient.metadata.upsertReasonCode(createRequest)
+
+        //WHEN
+        val updateRequest = ReasonCodeUpsertRequest(ReasonCodeDto(createRequest.reasonCode.technicalKey, "$testName updated description"))
+        val response = poolClient.metadata.upsertReasonCode(updateRequest)
+
+        //THEN
+        assertThat(response).isEqualTo(updateRequest.reasonCode)
+    }
+
+    /**
+     * GIVEN updated reason code
+     * WHEN operator searches for reason codes
+     * THEN operator finds updated reason code
+     */
+    @Test
+    fun `find updated reason code`(){
+        //GIVEN
+        val createRequest = ReasonCodeUpsertRequest(ReasonCodeDto(testName, "$testName description"))
+        poolClient.metadata.upsertReasonCode(createRequest)
+
+        val updateRequest = ReasonCodeUpsertRequest(ReasonCodeDto(createRequest.reasonCode.technicalKey, "$testName updated description"))
+        poolClient.metadata.upsertReasonCode(updateRequest)
+
+
+        //WHEN
+        val response = poolClient.metadata.getReasonCodes(PaginationRequest())
+
+        //THEN
+        val expected = PageDto(1, 1, 0, 1, listOf(updateRequest.reasonCode))
+        assertThat(response).isEqualTo(expected)
+    }
+
+    /**
+     * GIVEN reason code
+     * WHEN operator deletes reason code by technical key
+     * THEN operator sees reason code deleted
+     */
+    @Test
+    fun `delete reason code`(){
+        //GIVEN
+        val createRequest = ReasonCodeUpsertRequest(ReasonCodeDto(testName, "$testName description"))
+        poolClient.metadata.upsertReasonCode(createRequest)
+
+        //WHEN
+        val deleteRequest = ReasonCodeDeleteRequest(createRequest.reasonCode.technicalKey)
+        poolClient.metadata.deleteReasonCode(deleteRequest)
+
+        //THEN
+        val searchResult = poolClient.metadata.getReasonCodes(PaginationRequest())
+
+        val expected = PageDto<ReasonCodeDto>(0, 0, 0, 0, emptyList())
+        assertThat(searchResult).isEqualTo(expected)
+    }
+
 
 
     private fun addressRuleMandatory(country: CountryCode?, field: String): FieldQualityRuleDb {

@@ -25,20 +25,21 @@ import org.eclipse.tractusx.bpdm.common.dto.IBaseLegalEntityDto
 import org.eclipse.tractusx.bpdm.common.dto.IBaseLogisticAddressDto
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.exception.BpdmValidationErrorException
 import org.eclipse.tractusx.bpdm.common.mapping.ValidationContext
 import org.eclipse.tractusx.bpdm.common.mapping.ValidationError
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.ReasonCodeDeleteRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.ReasonCodeUpsertRequest
 import org.eclipse.tractusx.bpdm.pool.dto.AddressMetadataDto
 import org.eclipse.tractusx.bpdm.pool.dto.LegalEntityMetadataDto
 import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmAlreadyExists
-import org.eclipse.tractusx.bpdm.pool.repository.FieldQualityRuleRepository
-import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
-import org.eclipse.tractusx.bpdm.pool.repository.LegalFormRepository
-import org.eclipse.tractusx.bpdm.pool.repository.RegionRepository
+import org.eclipse.tractusx.bpdm.pool.repository.*
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
@@ -52,7 +53,8 @@ class MetadataService(
     private val identifierTypeRepository: IdentifierTypeRepository,
     private val legalFormRepository: LegalFormRepository,
     private val fieldQualityRuleRepository: FieldQualityRuleRepository,
-    private val regionRepository: RegionRepository
+    private val regionRepository: RegionRepository,
+    private val reasonCodeRepository: ReasonCodeRepository
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -204,6 +206,33 @@ class MetadataService(
         val idTypeKeys = requests.flatMap { it.identifiers }.map { it.type }.toSet()
         val idTypes = identifierTypeRepository.findByBusinessPartnerTypeAndTechnicalKeyIn(IdentifierBusinessPartnerType.ADDRESS, idTypeKeys)
         return idTypes
+    }
+
+    fun getReasonCodes(paginationRequest: PaginationRequest): PageDto<ReasonCodeDto>{
+        val pageRequest = PageRequest.of(paginationRequest.page, paginationRequest.size)
+        val pageResponse = reasonCodeRepository.findAll(pageRequest)
+
+        return pageResponse.toDto { ReasonCodeDto(technicalKey = it.technicalKey, description = it.description) }
+    }
+
+    @Transactional
+    fun upsertReasonCode(reasonCodeUpsertRequest: ReasonCodeUpsertRequest): ReasonCodeDto{
+        val foundReasonCode = reasonCodeRepository.findByTechnicalKey(reasonCodeUpsertRequest.reasonCode.technicalKey)
+            ?: ReasonCodeDb(reasonCodeUpsertRequest.reasonCode.technicalKey, reasonCodeUpsertRequest.reasonCode.description)
+
+        foundReasonCode.description = reasonCodeUpsertRequest.reasonCode.description
+
+        reasonCodeRepository.save(foundReasonCode)
+
+        return ReasonCodeDto(foundReasonCode.technicalKey, foundReasonCode.description)
+    }
+
+    @Transactional
+    fun deleteReasonCode(deleteRequest: ReasonCodeDeleteRequest){
+        val foundReasonCode = reasonCodeRepository.findByTechnicalKey(deleteRequest.technicalKey)
+            ?: throw BpdmNotFoundException("Reason Code", deleteRequest.technicalKey)
+
+        reasonCodeRepository.delete(foundReasonCode)
     }
 
 

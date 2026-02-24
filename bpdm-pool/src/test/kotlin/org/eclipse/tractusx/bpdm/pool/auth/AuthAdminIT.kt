@@ -62,21 +62,24 @@ class AuthAdminIT @Autowired constructor(
         getLegalEntityAddresses = AuthExpectationType.Authorized,
         getLegalEntitySites = AuthExpectationType.Authorized
     ),
-    MetadataAuthExpectations(
+    metadataAuthExpectations = MetadataAuthExpectations(
         getLegalForm = AuthExpectationType.Authorized,
         postLegalForm = AuthExpectationType.Authorized,
         getIdentifierType = AuthExpectationType.Authorized,
         postIdentifierType = AuthExpectationType.Authorized,
         getAdminArea = AuthExpectationType.Authorized,
-        getFieldQualityRules = AuthExpectationType.Authorized
+        getFieldQualityRules = AuthExpectationType.Authorized,
+        getReasonCodes = AuthExpectationType.Authorized,
+        putReasonCodes = AuthExpectationType.Authorized,
+        deleteReasonCodes = AuthExpectationType.Authorized
     ),
-    MembersAuthExpectations(
+    membersAuthExpectations = MembersAuthExpectations(
         postAddressSearch = AuthExpectationType.Authorized,
         postSiteSearch = AuthExpectationType.Authorized,
         postLegalEntitySearch = AuthExpectationType.Authorized,
         postChangelogSearch = AuthExpectationType.Authorized
     ),
-    CxMembershipsAuthExpectations(
+    membershipAuthExpectations = CxMembershipsAuthExpectations(
         getMemberships = AuthExpectationType.Authorized,
         putMemberships = AuthExpectationType.Authorized
     ),

@@ -66,7 +66,10 @@ class NoAuthIT @Autowired constructor(
         getIdentifierType = AuthExpectationType.Unauthorized,
         postIdentifierType = AuthExpectationType.Unauthorized,
         getAdminArea = AuthExpectationType.Unauthorized,
-        getFieldQualityRules = AuthExpectationType.Unauthorized
+        getFieldQualityRules = AuthExpectationType.Unauthorized,
+        getReasonCodes = AuthExpectationType.Unauthorized,
+        putReasonCodes = AuthExpectationType.Unauthorized,
+        deleteReasonCodes = AuthExpectationType.Unauthorized
     ),
     MembersAuthExpectations(
         postAddressSearch = AuthExpectationType.Unauthorized,
