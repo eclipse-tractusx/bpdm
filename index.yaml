@@ -2,6 +2,55 @@ apiVersion: v1
 entries:
   bpdm:
   - apiVersion: v2
+    appVersion: 7.3.0-rc2
+    created: "2026-02-25T08:09:15.210557771Z"
+    dependencies:
+    - alias: bpdm-gate
+      condition: bpdm-gate.enabled
+      name: bpdm-gate
+      repository: ""
+      version: 7.3.0-rc2
+    - alias: bpdm-pool
+      condition: bpdm-pool.enabled
+      name: bpdm-pool
+      repository: ""
+      version: 8.3.0-rc2
+    - alias: bpdm-cleaning-service-dummy
+      condition: bpdm-cleaning-service-dummy.enabled
+      name: bpdm-cleaning-service-dummy
+      repository: ""
+      version: 4.3.0-rc2
+    - alias: bpdm-orchestrator
+      condition: bpdm-orchestrator.enabled
+      name: bpdm-orchestrator
+      repository: ""
+      version: 4.3.0-rc2
+    - name: bpdm-common
+      repository: ""
+      version: 1.0.5
+    - alias: postgres
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 12.12.10
+    - alias: centralidp
+      condition: centralidp.enabled
+      name: centralidp
+      repository: https://eclipse-tractusx.github.io/charts/dev
+      version: 4.2.1
+    description: A Helm chart for Kubernetes that deploys the BPDM applications
+    digest: 700c41014a7d4c3fd4f6052866a38ec428b65089daa35029f4840c3a32df1b24
+    home: https://github.com/eclipse-tractusx/bpdm
+    maintainers:
+    - name: Nico Koprowski
+    - name: Sujit Karne
+    name: bpdm
+    sources:
+    - https://github.com/eclipse-tractusx/bpdm
+    type: application
+    urls:
+    - https://github.com/eclipse-tractusx/bpdm/releases/download/bpdm-6.3.0-rc2/bpdm-6.3.0-rc2.tgz
+    version: 6.3.0-rc2
+  - apiVersion: v2
     appVersion: 7.3.0-rc1
     created: "2026-02-12T07:40:58.933655805Z"
     dependencies:
@@ -4359,4 +4408,4 @@ entries:
     urls:
     - https://github.com/eclipse-tractusx/bpdm/releases/download/bpdm-pool-4.0.0/bpdm-pool-4.0.0.tgz
     version: 4.0.0
-generated: "2026-02-12T07:40:58.933968897Z"
+generated: "2026-02-25T08:09:15.210896538Z"
