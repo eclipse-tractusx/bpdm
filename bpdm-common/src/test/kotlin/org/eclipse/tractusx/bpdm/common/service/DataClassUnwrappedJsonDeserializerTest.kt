@@ -23,8 +23,8 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import com.fasterxml.jackson.databind.exc.MismatchedInputException
 import com.fasterxml.jackson.module.kotlin.KotlinModule
-import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import org.assertj.core.api.Assertions.*
 import org.junit.jupiter.api.Test
 
@@ -85,8 +85,8 @@ class DataClassUnwrappedJsonDeserializerTest {
         val strMissingNestedField = """
             {"detail1": null, "detail2": 42, "key": "mykey"}
         """.trimIndent()
-        // MissingKotlinParameterException because "detail1" in DetailNonNullDto must not be null!
-        assertThatExceptionOfType(MissingKotlinParameterException::class.java).isThrownBy {
+        // MismatchedInputException because "detail1" in DetailNonNullDto must not be null!
+        assertThatExceptionOfType(MismatchedInputException::class.java).isThrownBy {
             objectMapper.readValue(strMissingNestedField, MainNonNullDto::class.java)
         }
     }
@@ -152,7 +152,7 @@ class DataClassUnwrappedJsonDeserializerTest {
             {"detail1": null, "detail2": 42}
             """.trimIndent()
         // Standard deserializer throws an exception because "detail1" is non-nullable and there is no default value for String
-        assertThatExceptionOfType(MissingKotlinParameterException::class.java).isThrownBy {
+        assertThatExceptionOfType(MismatchedInputException::class.java).isThrownBy {
             objectMapper.readValue(str, DetailNonNullDto::class.java)
         }
     }
