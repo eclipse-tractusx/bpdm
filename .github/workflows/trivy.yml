@@ -20,13 +20,14 @@
 # Depending on the location of your Docker container
 # you need to change the path to the specific Docker registry.
 #
-name: "Trivy"
+name: "Trivy Security Scan"
 
 on:
   push:
     branches:
       - main
-      - 'release/**'
+      - develop
+      - '**'
   schedule:
     # Once a day
     - cron: "0 0 * * *"
@@ -41,17 +42,20 @@ jobs:
       contents: read
       security-events: write
     strategy:
+      fail-fast: false
       matrix:
         app: [pool, gate, orchestrator, cleaning-service-dummy]
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
 
       - name: Build App Image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
         with:
           context: .
           file: docker/${{ matrix.app }}/Dockerfile
@@ -59,18 +63,19 @@ jobs:
           load: true
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@0.33.1
+        uses: aquasecurity/trivy-action@97e0b3872f55f89b95b2f65b3dbab56962816478 # v0.34.2
         with:
           image-ref: "bpdm-${{ matrix.app }}:test"
           format: "sarif"
           output: "trivy-${{ matrix.app }}-results.sarif"
           severity: "CRITICAL,HIGH"
           hide-progress: false
-          exit-code: "0"
+          exit-code: "1"
           limit-severities-for-sarif: true
+          version: "v0.69.3"
 
       - name: Upload Trivy scan results to GitHub Security tab
         if: always()
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@c793b717bc78562f491db7b0e93a3a178b099162 # v4.32.5
         with:
           sarif_file: "trivy-${{ matrix.app }}-results.sarif"
