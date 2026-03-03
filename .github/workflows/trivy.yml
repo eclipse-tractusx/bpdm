@@ -67,7 +67,16 @@ jobs:
           tags: bpdm-${{ matrix.app }}:test
           load: true
 
-      - name: Run Trivy vulnerability scanner
+      - name: Run Trivy vulnerability scanner with table format
+        uses: aquasecurity/trivy-action@97e0b3872f55f89b95b2f65b3dbab56962816478 # v0.34.2
+        with:
+          image-ref: "bpdm-${{ matrix.app }}:test"
+          format: "table"
+          severity: "CRITICAL,HIGH"
+          hide-progress: true
+          version: "v0.69.3"
+
+      - name: Run Trivy vulnerability scanner with sarif format
         uses: aquasecurity/trivy-action@97e0b3872f55f89b95b2f65b3dbab56962816478 # v0.34.2
         with:
           image-ref: "bpdm-${{ matrix.app }}:test"
