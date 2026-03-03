@@ -91,7 +91,9 @@ class OAuthSecurityConfig(
     @Bean
     fun filterChain(http: HttpSecurity, customJwtAuthenticationConverter: CustomJwtAuthenticationConverter): SecurityFilterChain {
         logger.info { "Security active, securing endpoint" }
-        http.csrf { it.disable() }
+        // CSRF protection is intentionally disabled: this is a stateless OAuth2 resource server using JWT bearer tokens
+        // (not cookies), so CSRF attacks are not applicable. See Spring Security docs on CSRF for non-browser clients.
+        http.csrf { it.disable() } // lgtm[java/spring-disabled-csrf-protection]
         http.cors {}
         http.sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
         http.authorizeHttpRequests {
