@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: Business Partner Data Management Gate
   description: A gate for a member to share business partner data with CatenaX
-  version: 7.3.0-rc2
+  version: 7.3.0
 servers:
   - url: http://localhost:8081
     description: Generated server url
@@ -1261,12 +1261,31 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/BusinessPartnerStateDto"
+        identifiers:
+          type: array
+          items:
+            $ref: "#/components/schemas/AddressIdentifierDto"
       required:
         - addressBpn
         - bpnA
         - confidenceCriteria
+        - identifiers
         - physicalPostalAddress
         - states
+    AddressIdentifierDto:
+      type: object
+      description: "An address identifier (uniquely) identifies the address, such\
+        \ as the Global Location Number (GLN)."
+      properties:
+        value:
+          type: string
+          description: The value of the identifier like "0847976000005".
+        type:
+          type: string
+          description: The type of the identifier.
+      required:
+        - type
+        - value
     AddressRepresentationInputDto:
       type: object
       properties:
@@ -1981,7 +2000,6 @@ components:
             - 101 SWITCHING_PROTOCOLS
             - 102 PROCESSING
             - 103 EARLY_HINTS
-            - 103 CHECKPOINT
             - 200 OK
             - 201 CREATED
             - 202 ACCEPTED
@@ -1995,10 +2013,8 @@ components:
             - 300 MULTIPLE_CHOICES
             - 301 MOVED_PERMANENTLY
             - 302 FOUND
-            - 302 MOVED_TEMPORARILY
             - 303 SEE_OTHER
             - 304 NOT_MODIFIED
-            - 305 USE_PROXY
             - 307 TEMPORARY_REDIRECT
             - 308 PERMANENT_REDIRECT
             - 400 BAD_REQUEST
@@ -2014,17 +2030,15 @@ components:
             - 410 GONE
             - 411 LENGTH_REQUIRED
             - 412 PRECONDITION_FAILED
+            - 413 CONTENT_TOO_LARGE
             - 413 PAYLOAD_TOO_LARGE
-            - 413 REQUEST_ENTITY_TOO_LARGE
             - 414 URI_TOO_LONG
-            - 414 REQUEST_URI_TOO_LONG
             - 415 UNSUPPORTED_MEDIA_TYPE
             - 416 REQUESTED_RANGE_NOT_SATISFIABLE
             - 417 EXPECTATION_FAILED
             - 418 I_AM_A_TEAPOT
-            - 419 INSUFFICIENT_SPACE_ON_RESOURCE
-            - 420 METHOD_FAILURE
-            - 421 DESTINATION_LOCKED
+            - 421 MISDIRECTED_REQUEST
+            - 422 UNPROCESSABLE_CONTENT
             - 422 UNPROCESSABLE_ENTITY
             - 423 LOCKED
             - 424 FAILED_DEPENDENCY
