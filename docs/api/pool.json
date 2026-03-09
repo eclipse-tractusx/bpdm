@@ -3,7 +3,7 @@
   "info" : {
     "title" : "Business Partner Data Management Pool",
     "description" : "Service that manages and shares business partner data with other CatenaX services",
-    "version" : "7.3.0-rc2"
+    "version" : "7.3.0"
   },
   "servers" : [ {
     "url" : "http://localhost:8080",
@@ -27,14 +27,14 @@
     "name" : "Site Controller",
     "description" : "Read, create and update business partner of type site"
   }, {
+    "name" : "Business Partners Controller",
+    "description" : "Look-up business partner"
+  }, {
     "name" : "Bpn Controller",
     "description" : "Support functionality for BPN operations"
   }, {
     "name" : "Address Controller",
     "description" : "Read, create and update business partner of type address"
-  }, {
-    "name" : "Business Partner Controller",
-    "description" : "Returns business partner records by searching with different parameters"
   } ],
   "paths" : {
     "/v7/sites" : {
@@ -229,29 +229,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request (e.g., missing both ID and legalName)",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "code": {
-                      "type": "string",
-                      "description": "The HTTP response code."
-                    },
-                    "status": {
-                      "type": "string",
-                      "description": "The HTTP response status."
-                    },
-                    "message": {
-                      "type": "string",
-                      "description": "The error message."
-                    }
-                  }
-                }
-              }
-            }
+          "400" : {
+            "description" : "On malformed search or pagination request"
           }
         }
       },
@@ -801,87 +780,6 @@
           },
           "400" : {
             "description" : "On malformed requests"
-          }
-        }
-      }
-    },
-    "/v7/business-partners/search": {
-      "post": {
-        "tags": [
-          "Business Partners Controller"
-        ],
-        "summary": "Returns business partner records by searching with different parameters",
-        "description": "This endpoint tries to find matches among all existing business partners of type legal entity, filtering out partners which entirely do not match and ranking the remaining partners according to the accuracy of the match.",
-        "operationId": "post",
-        "parameters": [
-          {
-            "name": "searchResultFilter",
-            "in": "query",
-            "required": false,
-            "explode": true,
-            "description": "User can filter out the result by type",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "enum": [
-                  "IncludeLegalEntities",
-                  "IncludeSites",
-                  "IncludeAdditionalAddresses"
-                ]
-              }
-            }
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "description": "Number of page to get results from",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "minimum": 0
-            }
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "description": "Size of each page",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "minimum": 0,
-              "maximum": 100
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LegalEntityPropertiesSearchRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Matching business partners",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/PageDtoBusinessPartnerSearchResultDto"
-                  }
-                }
-              }
-            }
-          },
-          "204": {
-            "description": "valid request but do not provide any parameter value"
-          },
-          "400": {
-            "description": "Invalid request (e.g., missing both ID and legalName)"
           }
         }
       }
@@ -1602,6 +1500,78 @@
           },
           "409" : {
             "description" : "Identifier type with specified technical key already exists"
+          }
+        }
+      }
+    },
+    "/v7/business-partners/search" : {
+      "post" : {
+        "tags" : [ "Business Partners Controller" ],
+        "summary" : "Return business partners look-up result",
+        "description" : "Look-up the business partner data by parameters",
+        "operationId" : "searchBusinessPartners",
+        "parameters" : [ {
+          "name" : "searchResultFilter",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "enum" : [ "IncludeLegalEntities", "IncludeSites", "IncludeAdditionalAddresses" ]
+            },
+            "uniqueItems" : true
+          }
+        }, {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Number of page to get results from",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Size of each page",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "maximum" : 100,
+            "minimum" : 0
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/LegalEntityPropertiesSearchRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Matching business partners",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageDtoBusinessPartnerSearchResultDto"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid request (e.g., missing both ID and legalName)",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageDtoBusinessPartnerSearchResultDto"
+                }
+              }
+            }
           }
         }
       }
@@ -3171,11 +3141,11 @@
               "$ref" : "#/components/schemas/ErrorInfoAddressCreateError"
             }
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -3312,11 +3282,11 @@
               "$ref" : "#/components/schemas/ErrorInfoAddressUpdateError"
             }
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -3392,60 +3362,6 @@
           }
         },
         "required" : [ "type" ]
-      },
-      "AddressComponentOutputDto": {
-        "type": "object",
-        "description": "Address properties of business partner output data",
-        "properties": {
-          "addressBpn": {
-            "type": "string",
-            "description": "The BPNA of the address, on which the business partner provides a view."
-          },
-          "name": {
-            "type": "string",
-            "description": "The name of the address, on which the business partner provides a view. This is not according to official registers but according to the name the sharing members agree on, such as the name of a gate or any other additional names that designate the address in common parlance."
-          },
-          "addressType": {
-            "type": "string",
-            "description": "One of the address types: Legal Address, Site Main Address, Legal and Site Main Address, Additional Address.",
-            "enum": [
-              "LegalAndSiteMainAddress",
-              "LegalAddress",
-              "SiteMainAddress",
-              "AdditionalAddress"
-            ]
-          },
-          "physicalPostalAddress": {
-            "$ref": "#/components/schemas/PhysicalPostalAddressDto",
-            "description": "The physical postal address of the address, on which the business partner provides a view, such as an office, warehouse, gate, etc."
-          },
-          "alternativePostalAddress": {
-            "$ref": "#/components/schemas/AlternativePostalAddressDto",
-            "description": "The alternative postal address of the address, on which the business partner provides a view, for example if the goods are to be picked up somewhere else."
-          },
-          "confidenceCriteria": {
-            "$ref": "#/components/schemas/ConfidenceCriteriaDto"
-          },
-          "states": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/BusinessPartnerStateDto"
-            }
-          },
-          "identifiers": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/AddressIdentifierDto"
-            }
-          }
-        },
-        "required": [
-          "addressBpn",
-          "bpnA",
-          "confidenceCriteria",
-          "physicalPostalAddress",
-          "states"
-        ]
       },
       "AlternativePostalAddressDto" : {
         "type" : "object",
@@ -3571,78 +3487,181 @@
         },
         "required" : [ "requestedIdentifiers" ]
       },
-      "BusinessPartnerSearchResultDto": {
-        "type": "object",
-        "description": "business partner search result",
-        "properties": {
-          "identifiers": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/BusinessPartnerIdentifierDto"
-            }
+      "BusinessPartnerConfidenceCriteriaDto" : {
+        "type" : "object",
+        "properties" : {
+          "sharedByOwner" : {
+            "type" : "boolean"
           },
-          "states": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/BusinessPartnerStateDto"
-            }
+          "checkedByExternalDataSource" : {
+            "type" : "boolean"
           },
-          "legalEntity": {
-            "$ref": "#/components/schemas/LegalEntityRepresentationOutputDto",
-            "description": "The legal entity, on which the business partner provides a view."
+          "numberOfSharingMembers" : {
+            "type" : "integer",
+            "format" : "int32"
           },
-          "site": {
-            "$ref": "#/components/schemas/SiteRepresentationOutputDto",
-            "description": "The site, on which the business partner provides a view."
+          "lastConfidenceCheckAt" : {
+            "type" : "string",
+            "format" : "date-time"
           },
-          "address": {
-            "$ref": "#/components/schemas/AddressComponentOutputDto",
-            "description": "The address, on which the business partner provides a view."
+          "nextConfidenceCheckAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "confidenceLevel" : {
+            "type" : "integer",
+            "format" : "int32"
           }
         },
-        "required": [
-          "identifiers",
-          "legalEntity",
-          "address"
-        ]
+        "required" : [ "checkedByExternalDataSource", "confidenceLevel", "lastConfidenceCheckAt", "nextConfidenceCheckAt", "numberOfSharingMembers", "sharedByOwner" ]
       },
-      "BusinessPartnerIdentifierDto": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string",
-            "description": "The type of the identifier."
+      "BusinessPartnerIdentifierDto" : {
+        "type" : "object",
+        "properties" : {
+          "type" : {
+            "type" : "string",
+            "description" : "The type of the identifier."
           },
-          "value": {
-            "type": "string",
-            "description": "The value of the identifier like \"DE123465789\"."
+          "value" : {
+            "type" : "string",
+            "description" : "The value of the identifier like “DE123465789."
           },
-          "issuingBody": {
-            "type": "string",
-            "description": "The name of the official register, where the identifier is registered. For example, a Handelsregisternummer in Germany is only valid with its corresponding Registergericht and Registerart."
+          "issuingBody" : {
+            "type" : "string",
+            "description" : "The name of the official register, where the identifier is registered. For example, a Handelsregisternummer in Germany is only valid with its corresponding Registergericht and Registerart."
           }
         }
       },
-      "BusinessPartnerStateDto": {
-        "type": "object",
-        "properties": {
-          "validFrom": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Date since when the status is/was valid."
+      "BusinessPartnerLegalEntity" : {
+        "type" : "object",
+        "properties" : {
+          "legalEntityBpn" : {
+            "type" : "string"
           },
-          "validTo": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Date until the status was valid, if applicable."
+          "legalName" : {
+            "type" : "string"
           },
-          "type": {
-            "type": "string",
-            "description": "The type of this specified status.",
-            "enum": [
-              "ACTIVE",
-              "INACTIVE"
-            ]
+          "shortName" : {
+            "type" : "string"
+          },
+          "legalForm" : {
+            "type" : "string"
+          },
+          "confidenceCriteria" : {
+            "$ref" : "#/components/schemas/BusinessPartnerConfidenceCriteriaDto"
+          },
+          "states" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/BusinessPartnerStateDto"
+            }
+          }
+        },
+        "required" : [ "confidenceCriteria", "legalEntityBpn", "states" ]
+      },
+      "BusinessPartnerPostalAddress" : {
+        "type" : "object",
+        "properties" : {
+          "addressBpn" : {
+            "type" : "string"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "addressType" : {
+            "type" : "string",
+            "enum" : [ "LegalAndSiteMainAddress", "LegalAddress", "SiteMainAddress", "AdditionalAddress" ]
+          },
+          "physicalPostalAddress" : {
+            "$ref" : "#/components/schemas/PhysicalPostalAddressDto"
+          },
+          "alternativePostalAddress" : {
+            "$ref" : "#/components/schemas/AlternativePostalAddressDto"
+          },
+          "confidenceCriteria" : {
+            "$ref" : "#/components/schemas/BusinessPartnerConfidenceCriteriaDto"
+          },
+          "states" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/BusinessPartnerStateDto"
+            }
+          },
+          "identifiers" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/AddressIdentifierDto"
+            }
+          }
+        },
+        "required" : [ "addressBpn", "confidenceCriteria", "identifiers", "physicalPostalAddress", "states" ]
+      },
+      "BusinessPartnerSearchResultDto" : {
+        "type" : "object",
+        "description" : "Response of the business partner search result.",
+        "properties" : {
+          "identifiers" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/BusinessPartnerIdentifierDto"
+            }
+          },
+          "states" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/BusinessPartnerStateDto"
+            }
+          },
+          "legalEntity" : {
+            "$ref" : "#/components/schemas/BusinessPartnerLegalEntity"
+          },
+          "site" : {
+            "$ref" : "#/components/schemas/BusinessPartnerSite"
+          },
+          "address" : {
+            "$ref" : "#/components/schemas/BusinessPartnerPostalAddress"
+          },
+          "isParticipantData" : {
+            "type" : "boolean"
+          }
+        },
+        "required" : [ "address", "identifiers", "isParticipantData", "legalEntity", "states" ]
+      },
+      "BusinessPartnerSite" : {
+        "type" : "object",
+        "properties" : {
+          "siteBpn" : {
+            "type" : "string"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "confidenceCriteria" : {
+            "$ref" : "#/components/schemas/BusinessPartnerConfidenceCriteriaDto"
+          },
+          "states" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/BusinessPartnerStateDto"
+            }
+          }
+        },
+        "required" : [ "confidenceCriteria", "siteBpn", "states" ]
+      },
+      "BusinessPartnerStateDto" : {
+        "type" : "object",
+        "properties" : {
+          "validFrom" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "validTo" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "type" : {
+            "type" : "string",
+            "enum" : [ "ACTIVE", "INACTIVE" ]
           }
         }
       },
@@ -4166,11 +4185,11 @@
               "$ref" : "#/components/schemas/ErrorInfoLegalEntityCreateError"
             }
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -4318,16 +4337,41 @@
               "$ref" : "#/components/schemas/ErrorInfoLegalEntityUpdateError"
             }
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           }
         },
         "required" : [ "entities", "entityCount", "errorCount", "errors" ]
+      },
+      "LegalEntityPropertiesSearchRequest" : {
+        "type" : "object",
+        "description" : "Contains keywords used for searching in legal entity properties",
+        "properties" : {
+          "legalName" : {
+            "type" : "string"
+          },
+          "bpn" : {
+            "type" : "string"
+          },
+          "streetName" : {
+            "type" : "string"
+          },
+          "postalCode" : {
+            "type" : "string"
+          },
+          "city" : {
+            "type" : "string"
+          },
+          "country" : {
+            "type" : "string",
+            "enum" : [ "UNDEFINED", "AC", "AD", "AE", "AF", "AG", "AI", "AL", "AM", "AN", "AO", "AQ", "AR", "AS", "AT", "AU", "AW", "AX", "AZ", "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO", "BQ", "BR", "BS", "BT", "BU", "BV", "BW", "BY", "BZ", "CA", "CC", "CD", "CF", "CG", "CH", "CI", "CK", "CL", "CM", "CN", "CO", "CP", "CR", "CS", "CU", "CV", "CW", "CX", "CY", "CZ", "DE", "DG", "DJ", "DK", "DM", "DO", "DZ", "EA", "EC", "EE", "EG", "EH", "ER", "ES", "ET", "EU", "EZ", "FI", "FJ", "FK", "FM", "FO", "FR", "FX", "GA", "GB", "GD", "GE", "GF", "GG", "GH", "GI", "GL", "GM", "GN", "GP", "GQ", "GR", "GS", "GT", "GU", "GW", "GY", "HK", "HM", "HN", "HR", "HT", "HU", "IC", "ID", "IE", "IL", "IM", "IN", "IO", "IQ", "IR", "IS", "IT", "JE", "JM", "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN", "KP", "KR", "KW", "KY", "KZ", "LA", "LB", "LC", "LI", "LK", "LR", "LS", "LT", "LU", "LV", "LY", "MA", "MC", "MD", "ME", "MF", "MG", "MH", "MK", "ML", "MM", "MN", "MO", "MP", "MQ", "MR", "MS", "MT", "MU", "MV", "MW", "MX", "MY", "MZ", "NA", "NC", "NE", "NF", "NG", "NI", "NL", "NO", "NP", "NR", "NT", "NU", "NZ", "OM", "PA", "PE", "PF", "PG", "PH", "PK", "PL", "PM", "PN", "PR", "PS", "PT", "PW", "PY", "QA", "RE", "RO", "RS", "RU", "RW", "SA", "SB", "SC", "SD", "SE", "SF", "SG", "SH", "SI", "SJ", "SK", "SL", "SM", "SN", "SO", "SR", "SS", "ST", "SU", "SV", "SX", "SY", "SZ", "TA", "TC", "TD", "TF", "TG", "TH", "TJ", "TK", "TL", "TM", "TN", "TO", "TP", "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "UK", "UM", "US", "UY", "UZ", "VA", "VC", "VE", "VG", "VI", "VN", "VU", "WF", "WS", "XI", "XU", "XK", "YE", "YT", "YU", "ZA", "ZM", "ZR", "ZW" ]
+          }
+        }
       },
       "LegalEntitySearchRequest" : {
         "type" : "object",
@@ -4541,308 +4585,6 @@
         },
         "required" : [ "isActive", "name", "technicalKey" ]
       },
-      "LegalEntityPropertiesSearchRequest": {
-        "type": "object",
-        "properties": {
-          "bpn": {
-            "type": "string"
-          },
-          "legalName": {
-            "type": "string"
-          },
-          "streetName": {
-            "type": "string"
-          },
-          "postalCode": {
-            "type": "string"
-          },
-          "city": {
-            "type": "string"
-          },
-          "country": {
-            "type": "string",
-            "description": "The 2-digit country code of the physical postal address according to ISO 3166-1.",
-            "enum": [
-              "UNDEFINED",
-              "AC",
-              "AD",
-              "AE",
-              "AF",
-              "AG",
-              "AI",
-              "AL",
-              "AM",
-              "AN",
-              "AO",
-              "AQ",
-              "AR",
-              "AS",
-              "AT",
-              "AU",
-              "AW",
-              "AX",
-              "AZ",
-              "BA",
-              "BB",
-              "BD",
-              "BE",
-              "BF",
-              "BG",
-              "BH",
-              "BI",
-              "BJ",
-              "BL",
-              "BM",
-              "BN",
-              "BO",
-              "BQ",
-              "BR",
-              "BS",
-              "BT",
-              "BU",
-              "BV",
-              "BW",
-              "BY",
-              "BZ",
-              "CA",
-              "CC",
-              "CD",
-              "CF",
-              "CG",
-              "CH",
-              "CI",
-              "CK",
-              "CL",
-              "CM",
-              "CN",
-              "CO",
-              "CP",
-              "CR",
-              "CS",
-              "CU",
-              "CV",
-              "CW",
-              "CX",
-              "CY",
-              "CZ",
-              "DE",
-              "DG",
-              "DJ",
-              "DK",
-              "DM",
-              "DO",
-              "DZ",
-              "EA",
-              "EC",
-              "EE",
-              "EG",
-              "EH",
-              "ER",
-              "ES",
-              "ET",
-              "EU",
-              "EZ",
-              "FI",
-              "FJ",
-              "FK",
-              "FM",
-              "FO",
-              "FR",
-              "FX",
-              "GA",
-              "GB",
-              "GD",
-              "GE",
-              "GF",
-              "GG",
-              "GH",
-              "GI",
-              "GL",
-              "GM",
-              "GN",
-              "GP",
-              "GQ",
-              "GR",
-              "GS",
-              "GT",
-              "GU",
-              "GW",
-              "GY",
-              "HK",
-              "HM",
-              "HN",
-              "HR",
-              "HT",
-              "HU",
-              "IC",
-              "ID",
-              "IE",
-              "IL",
-              "IM",
-              "IN",
-              "IO",
-              "IQ",
-              "IR",
-              "IS",
-              "IT",
-              "JE",
-              "JM",
-              "JO",
-              "JP",
-              "KE",
-              "KG",
-              "KH",
-              "KI",
-              "KM",
-              "KN",
-              "KP",
-              "KR",
-              "KW",
-              "KY",
-              "KZ",
-              "LA",
-              "LB",
-              "LC",
-              "LI",
-              "LK",
-              "LR",
-              "LS",
-              "LT",
-              "LU",
-              "LV",
-              "LY",
-              "MA",
-              "MC",
-              "MD",
-              "ME",
-              "MF",
-              "MG",
-              "MH",
-              "MK",
-              "ML",
-              "MM",
-              "MN",
-              "MO",
-              "MP",
-              "MQ",
-              "MR",
-              "MS",
-              "MT",
-              "MU",
-              "MV",
-              "MW",
-              "MX",
-              "MY",
-              "MZ",
-              "NA",
-              "NC",
-              "NE",
-              "NF",
-              "NG",
-              "NI",
-              "NL",
-              "NO",
-              "NP",
-              "NR",
-              "NT",
-              "NU",
-              "NZ",
-              "OM",
-              "PA",
-              "PE",
-              "PF",
-              "PG",
-              "PH",
-              "PK",
-              "PL",
-              "PM",
-              "PN",
-              "PR",
-              "PS",
-              "PT",
-              "PW",
-              "PY",
-              "QA",
-              "RE",
-              "RO",
-              "RS",
-              "RU",
-              "RW",
-              "SA",
-              "SB",
-              "SC",
-              "SD",
-              "SE",
-              "SF",
-              "SG",
-              "SH",
-              "SI",
-              "SJ",
-              "SK",
-              "SL",
-              "SM",
-              "SN",
-              "SO",
-              "SR",
-              "SS",
-              "ST",
-              "SU",
-              "SV",
-              "SX",
-              "SY",
-              "SZ",
-              "TA",
-              "TC",
-              "TD",
-              "TF",
-              "TG",
-              "TH",
-              "TJ",
-              "TK",
-              "TL",
-              "TM",
-              "TN",
-              "TO",
-              "TP",
-              "TR",
-              "TT",
-              "TV",
-              "TW",
-              "TZ",
-              "UA",
-              "UG",
-              "UK",
-              "UM",
-              "US",
-              "UY",
-              "UZ",
-              "VA",
-              "VC",
-              "VE",
-              "VG",
-              "VI",
-              "VN",
-              "VU",
-              "WF",
-              "WS",
-              "XI",
-              "XU",
-              "XK",
-              "YE",
-              "YT",
-              "YU",
-              "ZA",
-              "ZM",
-              "ZR",
-              "ZW"
-            ]
-          }
-        },
-        "required": [
-          "bpn",
-          "legalName"
-        ]
-      },
       "LogisticAddressDto" : {
         "type" : "object",
         "description" : "In general, an address is a collection of information to describe a physical location, using a street name with a house number and/or a post office box as reference. In addition, an address consists of several postal attributes, such as country, region (state), county, township, city, district, or postal code, which help deliver mail.In Catena-X, an address is a type of business partner representing the legal address of a legal entity, and/or the main address of a site, or any additional address of a legal entity or site (such as different gates).An address is owned by a legal entity. Thus, exactly one legal entity is assigned to an address. An address can belong to a site. Thus, one or no site is assigned to an address. An address is uniquely identified by the BPNA.",
@@ -4946,42 +4688,39 @@
         },
         "required" : [ "bpna", "confidenceCriteria", "createdAt", "identifiers", "isParticipantData", "physicalPostalAddress", "states", "updatedAt" ]
       },
-      "LegalEntityRepresentationOutputDto": {
-        "type": "object",
-        "description": "Legal Entity properties of business partner output data",
-        "properties": {
-          "legalEntityBpn": {
-            "type": "string",
-            "description": "The BPNL of the legal entity, on which the business partner provides a view."
+      "PageDtoBusinessPartnerSearchResultDto" : {
+        "type" : "object",
+        "description" : "Paginated collection of results",
+        "properties" : {
+          "totalElements" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "Total number of all results in all pages"
           },
-          "legalName": {
-            "type": "string",
-            "description": "The name of the legal entity, on which the business partner provides a view, according to official registers."
+          "totalPages" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Total number pages"
           },
-          "shortName": {
-            "type": "string",
-            "description": "The abbreviated name of the legal entity, on which the business partner provides a view."
+          "page" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Current page number"
           },
-          "legalForm": {
-            "type": "string",
-            "description": "The legal form of the legal entity, on which the business partner provides a view."
+          "contentSize" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Number of results in the page"
           },
-          "confidenceCriteria": {
-            "$ref": "#/components/schemas/ConfidenceCriteriaDto"
-          },
-          "states": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/BusinessPartnerStateDto"
+          "content" : {
+            "type" : "array",
+            "description" : "Collection of results in the page",
+            "items" : {
+              "$ref" : "#/components/schemas/BusinessPartnerSearchResultDto"
             }
           }
         },
-        "required": [
-          "bpnL",
-          "confidenceCriteria",
-          "legalEntityBpn",
-          "states"
-        ]
+        "required" : [ "content", "contentSize", "page", "totalElements", "totalPages" ]
       },
       "PageDtoChangelogEntryVerboseDto" : {
         "type" : "object",
@@ -5323,46 +5062,6 @@
         },
         "required" : [ "content", "contentSize", "page", "totalElements", "totalPages" ]
       },
-      "PageDtoBusinessPartnerSearchResultDto": {
-        "type": "object",
-        "description": "Paginated collection of results",
-        "properties": {
-          "totalElements": {
-            "type": "integer",
-            "format": "int64",
-            "description": "Total number of all results in all pages"
-          },
-          "totalPages": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Total number pages"
-          },
-          "page": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Current page number"
-          },
-          "contentSize": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Number of results in the page"
-          },
-          "content": {
-            "type": "array",
-            "description": "Collection of results in the page",
-            "items": {
-              "$ref": "#/components/schemas/BusinessPartnerSearchResultDto"
-            }
-          }
-        },
-        "required": [
-          "content",
-          "contentSize",
-          "page",
-          "totalElements",
-          "totalPages"
-        ]
-      },
       "PhysicalPostalAddressDto" : {
         "type" : "object",
         "description" : "A physical postal address describes the physical location of an office, warehouse, gate, etc.",
@@ -5631,11 +5330,11 @@
               "$ref" : "#/components/schemas/ErrorInfoSiteCreateError"
             }
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -5740,11 +5439,11 @@
               "$ref" : "#/components/schemas/ErrorInfoSiteUpdateError"
             }
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -5945,34 +5644,6 @@
             "description" : "The additional street related information, which is usually printed after the official street name on an address label."
           }
         }
-      },
-      "SiteRepresentationOutputDto": {
-        "type": "object",
-        "description": "Site properties of business partner output data",
-        "properties": {
-          "siteBpn": {
-            "type": "string",
-            "description": "The BPNS of the site, on which the business partner provides a view."
-          },
-          "name": {
-            "type": "string",
-            "description": "The name of the site, on which the business partner provides a view. This is not according to official registers but according to the name the owner chooses."
-          },
-          "confidenceCriteria": {
-            "$ref": "#/components/schemas/ConfidenceCriteriaDto"
-          },
-          "states": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/BusinessPartnerStateDto"
-            }
-          }
-        },
-        "required": [
-          "confidenceCriteria",
-          "siteBpn",
-          "states"
-        ]
       },
       "TypeKeyNameVerboseDtoBusinessStateType" : {
         "type" : "object",
