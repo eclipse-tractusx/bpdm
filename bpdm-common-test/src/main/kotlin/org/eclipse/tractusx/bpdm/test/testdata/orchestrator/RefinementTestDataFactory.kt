@@ -257,7 +257,7 @@ class RefinementTestDataFactory {
         }
     }
 
-    private fun buildPostalAddressScriptVariant(postalAddressScriptVariant: PostalAddressScriptVariant): org.eclipse.tractusx.orchestrator.api.model.PostalAddressScriptVariant{
+    private fun buildPostalAddressScriptVariant(postalAddressScriptVariant: PostalAddressScriptVariantDto): PostalAddressScriptVariant{
         return with(postalAddressScriptVariant){
             PostalAddressScriptVariant(
                 addressName = addressName,

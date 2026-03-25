@@ -181,7 +181,7 @@ class TaskResolutionMapper {
         }
     }
 
-    fun toTaskResult(addressScriptVariant: PostalAddressScriptVariantDto): org.eclipse.tractusx.orchestrator.api.model.PostalAddressScriptVariant{
+    fun toTaskResult(addressScriptVariant: PostalAddressScriptVariantDto): PostalAddressScriptVariant{
         return with(addressScriptVariant){
             PostalAddressScriptVariant(
                 addressName = addressName,

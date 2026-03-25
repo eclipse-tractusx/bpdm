@@ -260,10 +260,6 @@ class ResponseMapper {
             PostalAddressScriptVariantWithScriptCode(it.scriptCode, toPostalAddressScriptVariant(it))
         }
 
-
-    fun toPostalAddressScriptVariants(businessPartner: GoldenRecordTaskDb.BusinessPartner, scope: PostalAddressDb.Scope) =
-        businessPartner.addressScriptVariants.filter { it.scope == scope }.map { toPostalAddressScriptVariant(it) }
-
     fun toPostalAddressScriptVariant(addressScriptVariant: PostalAddressScriptVariantDb) =
         PostalAddressScriptVariant(
             addressName = addressScriptVariant.addressName,

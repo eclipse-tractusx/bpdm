@@ -502,7 +502,7 @@ class TaskStepBuildService(
             LegalEntityScriptVariantDto(scriptCode, legalName, legalShortName, toPoolDto(legalAddress))
         }
 
-    private fun toPoolDto(addressScriptVariant: org.eclipse.tractusx.orchestrator.api.model.PostalAddressScriptVariant) =
+    private fun toPoolDto(addressScriptVariant: PostalAddressScriptVariant) =
         with(addressScriptVariant) {
             PostalAddressScriptVariantDto(addressName,toPoolDto(physicalAddress), alternativeAddress?.let { toPoolDto(it) } )
         }

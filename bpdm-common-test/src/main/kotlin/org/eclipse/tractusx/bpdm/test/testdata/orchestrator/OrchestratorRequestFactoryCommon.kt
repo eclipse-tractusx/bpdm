@@ -208,7 +208,7 @@ class OrchestratorRequestFactoryCommon(
         )
     }
 
-    fun buildPostalAddressScriptVariant(scriptCode: String, seed: String, random: Random = createRandomFromSeed(seed)): PostalAddressScriptVariant{
+    fun buildPostalAddressScriptVariant(scriptCode: String, seed: String): PostalAddressScriptVariant{
         return PostalAddressScriptVariant(
             addressName = buildScriptVariantStringValue("Address Name $seed", seed, scriptCode),
             physicalAddress = buildPhysicalAddressScriptVariant(scriptCode, seed),
