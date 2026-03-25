@@ -23,6 +23,7 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
+import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressInvariantVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressSearchRequest
 import org.eclipse.tractusx.bpdm.pool.util.TestHelpers
@@ -66,7 +67,7 @@ class AddressControllerSearchIT @Autowired constructor(
 
 
         val givenStructure = testHelpers.createBusinessPartnerStructure(listOf(partnerStructure3))
-        givenAddress1 = givenStructure[0].addresses[0].address                      // addressPartnerCreate1
+        givenAddress1 = LogisticAddressVerboseDto(givenStructure[0].addresses[0].address, emptyList())                   // addressPartnerCreate1
     }
 
 
@@ -98,7 +99,7 @@ class AddressControllerSearchIT @Autowired constructor(
     @Test
     fun `search address via name not found`() {
         val expected = PageDto(
-            0, 0, 0, 0, emptyList<LogisticAddressVerboseDto>()
+            0, 0, 0, 0, emptyList<LogisticAddressInvariantVerboseDto>()
         )
 
         val addressSearchRequest = AddressSearchRequest(name =  "NONEXISTENT")

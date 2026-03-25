@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDto
+import org.eclipse.tractusx.bpdm.pool.api.model.ScriptCodeDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerRequestFactory
 import org.eclipse.tractusx.bpdm.test.testdata.pool.TestMetadata
@@ -43,7 +44,7 @@ abstract class AuthTestBase(
     private val bpnAuthExpectation: AuthExpectationType
 ) {
     private val authAssertions = AuthAssertionHelper()
-    private val requestFactory = BusinessPartnerRequestFactory(TestMetadata(emptyList(), emptyList(), emptyList(), emptyList()))
+    private val requestFactory = BusinessPartnerRequestFactory(TestMetadata(emptyList(), emptyList(), emptyList(), emptyList(), listOf(ScriptCodeDto("test", null))))
 
 
     @Test

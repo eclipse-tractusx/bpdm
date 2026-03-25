@@ -78,8 +78,8 @@ class TaskRelationStateResolutionIT @Autowired constructor(
         //When
         val relationToCreate = BusinessPartnerRelations(
             relationType,
-            legalEntity2.legalEntity.bpnl,
-            legalEntity1.legalEntity.bpnl,
+            legalEntity2.legalEntity.header.bpnl,
+            legalEntity1.legalEntity.header.bpnl,
             listOf(
                 RelationValidityPeriod(
                     validFrom = futureDate,
@@ -102,8 +102,8 @@ class TaskRelationStateResolutionIT @Autowired constructor(
         //When
         val relationToCreate = BusinessPartnerRelations(
             relationType,
-            legalEntity2.legalEntity.bpnl,
-            legalEntity1.legalEntity.bpnl,
+            legalEntity2.legalEntity.header.bpnl,
+            legalEntity1.legalEntity.header.bpnl,
             listOf(
                 RelationValidityPeriod(
                     validFrom = futureDate.plusYears(1),
@@ -126,8 +126,8 @@ class TaskRelationStateResolutionIT @Autowired constructor(
         //When
         val relationToCreate = BusinessPartnerRelations(
             relationType,
-            legalEntity2.legalEntity.bpnl,
-            legalEntity1.legalEntity.bpnl,
+            legalEntity2.legalEntity.header.bpnl,
+            legalEntity1.legalEntity.header.bpnl,
             listOf(
                 RelationValidityPeriod(
                     validFrom = futureDate,
@@ -154,8 +154,8 @@ class TaskRelationStateResolutionIT @Autowired constructor(
         //When
         val relationToCreate = BusinessPartnerRelations(
             relationType,
-            legalEntity2.legalEntity.bpnl,
-            legalEntity1.legalEntity.bpnl,
+            legalEntity2.legalEntity.header.bpnl,
+            legalEntity1.legalEntity.header.bpnl,
             listOf(
                 RelationValidityPeriod(
                     validFrom = futureDate.plusYears(1),
@@ -186,8 +186,8 @@ class TaskRelationStateResolutionIT @Autowired constructor(
         //When
         val relationToCreate = BusinessPartnerRelations(
             relationType,
-            legalEntity2.legalEntity.bpnl,
-            legalEntity1.legalEntity.bpnl,
+            legalEntity2.legalEntity.header.bpnl,
+            legalEntity1.legalEntity.header.bpnl,
             listOf())
         val createdRelation = createRelation(relationToCreate)
 
@@ -206,8 +206,8 @@ class TaskRelationStateResolutionIT @Autowired constructor(
         //When
         val relationToCreate = BusinessPartnerRelations(
             relationType,
-            legalEntity2.legalEntity.bpnl,
-            legalEntity1.legalEntity.bpnl,
+            legalEntity2.legalEntity.header.bpnl,
+            legalEntity1.legalEntity.header.bpnl,
             listOf(
                 RelationValidityPeriod(
                     validFrom = futureDate,
@@ -237,8 +237,8 @@ class TaskRelationStateResolutionIT @Autowired constructor(
         executeInPast {
             val relationToCreate = BusinessPartnerRelations(
                 RelationType.IsManagedBy,
-                legalEntity2.legalEntity.bpnl,
-                legalEntity1.legalEntity.bpnl,
+                legalEntity2.legalEntity.header.bpnl,
+                legalEntity1.legalEntity.header.bpnl,
                 listOf(
                     RelationValidityPeriod(
                         validFrom = pastDate.minusYears(1),
@@ -252,8 +252,8 @@ class TaskRelationStateResolutionIT @Autowired constructor(
         //When
         val relationToUpdate = BusinessPartnerRelations(
             RelationType.IsManagedBy,
-            legalEntity2.legalEntity.bpnl,
-            legalEntity1.legalEntity.bpnl,
+            legalEntity2.legalEntity.header.bpnl,
+            legalEntity1.legalEntity.header.bpnl,
             listOf(
                 RelationValidityPeriod(
                     validFrom = futureDate,
@@ -276,8 +276,8 @@ class TaskRelationStateResolutionIT @Autowired constructor(
         executeInPast {
             val relationToCreate = BusinessPartnerRelations(
                 RelationType.IsManagedBy,
-                legalEntity2.legalEntity.bpnl,
-                legalEntity1.legalEntity.bpnl,
+                legalEntity2.legalEntity.header.bpnl,
+                legalEntity1.legalEntity.header.bpnl,
                 listOf(
                     RelationValidityPeriod(
                         validFrom = pastDate.minusYears(1),
@@ -291,8 +291,8 @@ class TaskRelationStateResolutionIT @Autowired constructor(
         //When
         val relationToUpdate = BusinessPartnerRelations(
             RelationType.IsManagedBy,
-            legalEntity2.legalEntity.bpnl,
-            legalEntity1.legalEntity.bpnl,
+            legalEntity2.legalEntity.header.bpnl,
+            legalEntity1.legalEntity.header.bpnl,
             listOf(
                 RelationValidityPeriod(
                     validFrom = pastDate.minusYears(1),
@@ -316,8 +316,8 @@ class TaskRelationStateResolutionIT @Autowired constructor(
         executeInPast {
             val relationToCreate = BusinessPartnerRelations(
                 RelationType.IsManagedBy,
-                legalEntity2.legalEntity.bpnl,
-                legalEntity1.legalEntity.bpnl,
+                legalEntity2.legalEntity.header.bpnl,
+                legalEntity1.legalEntity.header.bpnl,
                 listOf(
                     RelationValidityPeriod(
                         validFrom = pastDate,
@@ -330,8 +330,8 @@ class TaskRelationStateResolutionIT @Autowired constructor(
         //When
         val relationToUpdate = BusinessPartnerRelations(
             RelationType.IsManagedBy,
-            legalEntity2.legalEntity.bpnl,
-            legalEntity1.legalEntity.bpnl,
+            legalEntity2.legalEntity.header.bpnl,
+            legalEntity1.legalEntity.header.bpnl,
             listOf(
                 RelationValidityPeriod(
                     validFrom = pastDate,
@@ -355,8 +355,8 @@ class TaskRelationStateResolutionIT @Autowired constructor(
 
         val relationToCreate = BusinessPartnerRelations(
             relationType,
-            legalEntity2.legalEntity.bpnl,
-            legalEntity1.legalEntity.bpnl,
+            legalEntity2.legalEntity.header.bpnl,
+            legalEntity1.legalEntity.header.bpnl,
             listOf(
                 RelationValidityPeriod(
                     validFrom = futureDate,
@@ -368,8 +368,8 @@ class TaskRelationStateResolutionIT @Autowired constructor(
         //When
         val relationToUpdate = BusinessPartnerRelations(
             relationType,
-            legalEntity2.legalEntity.bpnl,
-            legalEntity1.legalEntity.bpnl,
+            legalEntity2.legalEntity.header.bpnl,
+            legalEntity1.legalEntity.header.bpnl,
             listOf(
                 RelationValidityPeriod(
                     validFrom = futureDate.plusYears(2),
@@ -391,8 +391,8 @@ class TaskRelationStateResolutionIT @Autowired constructor(
 
         val relationToCreate = BusinessPartnerRelations(
             RelationType.IsManagedBy,
-            legalEntity2.legalEntity.bpnl,
-            legalEntity1.legalEntity.bpnl,
+            legalEntity2.legalEntity.header.bpnl,
+            legalEntity1.legalEntity.header.bpnl,
             listOf(
                 RelationValidityPeriod(
                     validFrom = futureDate,
@@ -404,8 +404,8 @@ class TaskRelationStateResolutionIT @Autowired constructor(
         //When
         val relationToUpdate = BusinessPartnerRelations(
             RelationType.IsManagedBy,
-            legalEntity2.legalEntity.bpnl,
-            legalEntity1.legalEntity.bpnl,
+            legalEntity2.legalEntity.header.bpnl,
+            legalEntity1.legalEntity.header.bpnl,
             listOf(
                 RelationValidityPeriod(
                     validFrom = pastDate.minusYears(1),
@@ -427,8 +427,8 @@ class TaskRelationStateResolutionIT @Autowired constructor(
 
         val relationToCreate = BusinessPartnerRelations(
             RelationType.IsManagedBy,
-            legalEntity2.legalEntity.bpnl,
-            legalEntity1.legalEntity.bpnl,
+            legalEntity2.legalEntity.header.bpnl,
+            legalEntity1.legalEntity.header.bpnl,
             listOf(
                 RelationValidityPeriod(
                     validFrom = pastDate,

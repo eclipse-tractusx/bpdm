@@ -191,117 +191,139 @@ object BusinessPartnerNonVerboseValues {
 
     val logisticAddress1 = LogisticAddressDto(
         physicalPostalAddress = postalAddress1,
-        confidenceCriteria = BusinessPartnerVerboseValues.addressPartner1.confidenceCriteria
+        confidenceCriteria = BusinessPartnerVerboseValues.addressPartnerInvariant1.confidenceCriteria
     )
 
     val logisticAddress2 = LogisticAddressDto(
         physicalPostalAddress = postalAddress2,
-        confidenceCriteria = BusinessPartnerVerboseValues.addressPartner2.confidenceCriteria
+        confidenceCriteria = BusinessPartnerVerboseValues.addressPartnerInvariant2.confidenceCriteria
     )
 
     val logisticAddress3 = LogisticAddressDto(
         physicalPostalAddress = postalAddress3,
-        confidenceCriteria = BusinessPartnerVerboseValues.addressPartner3.confidenceCriteria
+        confidenceCriteria = BusinessPartnerVerboseValues.addressPartnerInvariant3.confidenceCriteria
     )
     val logisticAddress4 = LogisticAddressDto(
         physicalPostalAddress = postalAddress1,
-        name = BusinessPartnerVerboseValues.legalEntityUpsert1.legalEntity.legalName,
-        confidenceCriteria = BusinessPartnerVerboseValues.addressPartner1.confidenceCriteria
+        name = BusinessPartnerVerboseValues.legalEntityUpsert1.legalEntity.header.legalName,
+        confidenceCriteria = BusinessPartnerVerboseValues.addressPartnerInvariant1.confidenceCriteria
     )
 
     val logisticAddress5 = LogisticAddressDto(
         physicalPostalAddress = postalAddress1,
         identifiers = listOf(addressIdentifier),
-        confidenceCriteria = BusinessPartnerVerboseValues.addressPartner1.confidenceCriteria
+        confidenceCriteria = BusinessPartnerVerboseValues.addressPartnerInvariant1.confidenceCriteria
     )
 
-    val legalEntityCreate1 = LegalEntityPartnerCreateRequest(
-        legalEntity = LegalEntityDto(
-            legalName = BusinessPartnerVerboseValues.legalEntityUpsert1.legalEntity.legalName,
+    val legalEntity1 = LegalEntityDto(
+        header = LegalEntityHeaderDto(
+            legalName = BusinessPartnerVerboseValues.legalEntityUpsert1.legalEntity.header.legalName,
             legalShortName = null,
             legalForm = BusinessPartnerVerboseValues.legalForm1.technicalKey,
             identifiers = listOf(identifier1),
             states = listOf(leStatus1),
-            confidenceCriteria = BusinessPartnerVerboseValues.legalEntity1.legalEntity.confidenceCriteria,
+            confidenceCriteria = BusinessPartnerVerboseValues.legalEntity1.header.confidenceCriteria,
             isParticipantData = false
         ),
         legalAddress = logisticAddress1,
-        index = BusinessPartnerVerboseValues.legalEntityUpsert1.index
+        scriptVariants = emptyList()
     )
 
-    val legalEntityCreate2 = LegalEntityPartnerCreateRequest(
-        legalEntity = LegalEntityDto(
-            legalName = BusinessPartnerVerboseValues.legalEntityUpsert2.legalEntity.legalName,
+    val legalEntity2 = LegalEntityDto(
+        header =LegalEntityHeaderDto(
+            legalName = BusinessPartnerVerboseValues.legalEntityUpsert2.legalEntity.header.legalName,
             legalShortName = null,
             legalForm = BusinessPartnerVerboseValues.legalForm2.technicalKey,
             identifiers = listOf(identifier2),
             states = listOf(leStatus2),
-            confidenceCriteria = BusinessPartnerVerboseValues.legalEntity2.legalEntity.confidenceCriteria,
+            confidenceCriteria = BusinessPartnerVerboseValues.legalEntity2.header.confidenceCriteria,
             isParticipantData = false
         ),
         legalAddress = logisticAddress2,
-        index = BusinessPartnerVerboseValues.legalEntityUpsert2.index
+        scriptVariants = emptyList()
     )
 
-    val legalEntityCreate3 = LegalEntityPartnerCreateRequest(
-        legalEntity = LegalEntityDto(
-            legalName = BusinessPartnerVerboseValues.legalEntityUpsert3.legalEntity.legalName,
+    val legalEntity3 = LegalEntityDto(
+        header = LegalEntityHeaderDto(
+            legalName = BusinessPartnerVerboseValues.legalEntityUpsert3.legalEntity.header.legalName,
             legalShortName = null,
             legalForm = BusinessPartnerVerboseValues.legalForm3.technicalKey,
             identifiers = listOf(identifier3),
             states = listOf(leStatus3),
-            confidenceCriteria = BusinessPartnerVerboseValues.legalEntity3.legalEntity.confidenceCriteria,
+            confidenceCriteria = BusinessPartnerVerboseValues.legalEntity3.header.confidenceCriteria,
             isParticipantData = false
         ),
         legalAddress = logisticAddress3,
-        index = BusinessPartnerVerboseValues.legalEntityUpsert3.index
+        scriptVariants = emptyList()
     )
 
-    val legalEntityCreate4 = LegalEntityPartnerCreateRequest(
-        legalEntity = LegalEntityDto(
-            legalName = BusinessPartnerVerboseValues.legalEntityUpsert4.legalEntity.legalName,
+    val legalEntity4 = LegalEntityDto(
+        header = LegalEntityHeaderDto(
+            legalName = BusinessPartnerVerboseValues.legalEntityUpsert4.legalEntity.header.legalName,
             legalShortName = null,
             legalForm = BusinessPartnerVerboseValues.legalForm3.technicalKey,
             identifiers = listOf(identifier3),
             states = listOf(leStatus3),
-            confidenceCriteria = BusinessPartnerVerboseValues.legalEntity3.legalEntity.confidenceCriteria,
+            confidenceCriteria = BusinessPartnerVerboseValues.legalEntity3.header.confidenceCriteria,
             isParticipantData = false
         ),
         legalAddress = logisticAddress4,
-        index = BusinessPartnerVerboseValues.legalEntityUpsert4.index
+        scriptVariants = emptyList()
     )
 
-    val legalEntityCreateMultipleIdentifier = LegalEntityPartnerCreateRequest(
-        legalEntity = LegalEntityDto(
-            legalName = BusinessPartnerVerboseValues.legalEntityUpsertMultipleIdentifier.legalEntity.legalName,
+    val legalEntityMultipleIdentifier = LegalEntityDto(
+        header =  LegalEntityHeaderDto(
+            legalName = BusinessPartnerVerboseValues.legalEntityUpsertMultipleIdentifier.legalEntity.header.legalName,
             legalShortName = null,
             legalForm = BusinessPartnerVerboseValues.legalForm1.technicalKey,
             identifiers = listOf(identifier1, identifier2),
             states = listOf(leStatus1),
-            confidenceCriteria = BusinessPartnerVerboseValues.legalEntity1.legalEntity.confidenceCriteria,
+            confidenceCriteria = BusinessPartnerVerboseValues.legalEntity1.header.confidenceCriteria,
             isParticipantData = false
         ),
         legalAddress = logisticAddress1,
+        scriptVariants = emptyList()
+    )
+
+    val legalEntityCreate1 = LegalEntityPartnerCreateRequest(
+        legalEntity = legalEntity1,
+        index = BusinessPartnerVerboseValues.legalEntityUpsert1.index
+    )
+
+    val legalEntityCreate2 = LegalEntityPartnerCreateRequest(
+        legalEntity = legalEntity2,
+        index = BusinessPartnerVerboseValues.legalEntityUpsert2.index
+    )
+
+    val legalEntityCreate3 = LegalEntityPartnerCreateRequest(
+        legalEntity = legalEntity3,
+        index = BusinessPartnerVerboseValues.legalEntityUpsert3.index
+    )
+
+    val legalEntityCreate4 = LegalEntityPartnerCreateRequest(
+        legalEntity = legalEntity4,
+        index = BusinessPartnerVerboseValues.legalEntityUpsert4.index
+    )
+
+    val legalEntityCreateMultipleIdentifier = LegalEntityPartnerCreateRequest(
+        legalEntity = legalEntityMultipleIdentifier,
         index = BusinessPartnerVerboseValues.legalEntityUpsertMultipleIdentifier.index
     )
 
 
     val legalEntityUpdate1 = LegalEntityPartnerUpdateRequest(
-        bpnl = BusinessPartnerVerboseValues.legalEntityUpsert1.legalEntity.bpnl,
-        legalEntity = legalEntityCreate1.legalEntity,
-        legalAddress = legalEntityCreate1.legalAddress,
+        bpnl = BusinessPartnerVerboseValues.legalEntityUpsert1.legalEntity.header.bpnl,
+        legalEntity = legalEntityCreate1.legalEntity
     )
 
     val legalEntityUpdate2 = LegalEntityPartnerUpdateRequest(
-        bpnl = BusinessPartnerVerboseValues.legalEntityUpsert2.legalEntity.bpnl,
-        legalEntity = legalEntityCreate2.legalEntity,
-        legalAddress = legalEntityCreate2.legalAddress,
+        bpnl = BusinessPartnerVerboseValues.legalEntityUpsert2.legalEntity.header.bpnl,
+        legalEntity = legalEntityCreate2.legalEntity
     )
 
     val legalEntityUpdate3 = LegalEntityPartnerUpdateRequest(
-        bpnl = BusinessPartnerVerboseValues.legalEntityUpsert3.legalEntity.bpnl,
-        legalEntity = legalEntityCreate3.legalEntity,
-        legalAddress = legalEntityCreate3.legalAddress,
+        bpnl = BusinessPartnerVerboseValues.legalEntityUpsert3.legalEntity.header.bpnl,
+        legalEntity = legalEntityCreate3.legalEntity
     )
 
     val siteCreate1 = SitePartnerCreateRequest(
@@ -309,7 +331,8 @@ object BusinessPartnerNonVerboseValues {
             name = BusinessPartnerVerboseValues.siteUpsert1.site.name,
             states = listOf(siteStatus1),
             mainAddress = logisticAddress1,
-            confidenceCriteria = BusinessPartnerVerboseValues.site1.confidenceCriteria
+            confidenceCriteria = BusinessPartnerVerboseValues.site1.confidenceCriteria,
+            scriptVariants = emptyList()
         ),
         index = BusinessPartnerVerboseValues.siteUpsert1.index,
         bpnlParent = legalEntityUpdate1.bpnl
@@ -334,7 +357,8 @@ object BusinessPartnerNonVerboseValues {
             name = BusinessPartnerVerboseValues.siteUpsert2.site.name,
             states = listOf(siteStatus2),
             mainAddress = logisticAddress2,
-            confidenceCriteria = BusinessPartnerVerboseValues.site2.confidenceCriteria
+            confidenceCriteria = BusinessPartnerVerboseValues.site2.confidenceCriteria,
+            scriptVariants = emptyList()
         ),
         index = BusinessPartnerVerboseValues.siteUpsert2.index,
         bpnlParent = legalEntityUpdate2.bpnl
@@ -345,7 +369,8 @@ object BusinessPartnerNonVerboseValues {
             name = BusinessPartnerVerboseValues.siteUpsert3.site.name,
             states = listOf(siteStatus3),
             mainAddress = logisticAddress3,
-            confidenceCriteria = BusinessPartnerVerboseValues.site3.confidenceCriteria
+            confidenceCriteria = BusinessPartnerVerboseValues.site3.confidenceCriteria,
+            scriptVariants = emptyList()
         ),
         index = BusinessPartnerVerboseValues.siteUpsert3.index,
         bpnlParent = legalEntityUpdate3.bpnl
@@ -398,17 +423,17 @@ object BusinessPartnerNonVerboseValues {
 
 
     val addressPartnerUpdate1 = AddressPartnerUpdateRequest(
-        bpna = BusinessPartnerVerboseValues.addressPartner1.bpna,
+        bpna = BusinessPartnerVerboseValues.addressPartnerInvariant1.bpna,
         address = logisticAddress1
     )
 
     val addressPartnerUpdate2 = AddressPartnerUpdateRequest(
-        bpna = BusinessPartnerVerboseValues.addressPartner2.bpna,
+        bpna = BusinessPartnerVerboseValues.addressPartnerInvariant2.bpna,
         address = logisticAddress2
     )
 
     val addressPartnerUpdate3 = AddressPartnerUpdateRequest(
-        bpna = BusinessPartnerVerboseValues.addressPartner3.bpna,
+        bpna = BusinessPartnerVerboseValues.addressPartnerInvariant3.bpna,
         address = logisticAddress3
     )
 

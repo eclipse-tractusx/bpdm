@@ -211,5 +211,4 @@ class GateTestDataClientV6 (
         taskCreationBatchService.createTasksForReadyBusinessPartners()
         taskResolutionBatchService.resolveTasks()
     }
-
 }

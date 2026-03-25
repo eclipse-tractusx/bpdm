@@ -26,6 +26,7 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressInvariantVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressCreateError
@@ -82,17 +83,17 @@ class AddressControllerIT @Autowired constructor(
         )
 
         val importedPartner = createdStructures.single().legalEntity
-        val addressesByBpnL = importedPartner.legalEntity.bpnl
+        val addressesByBpnL = importedPartner.header.bpnl
             .let { bpnL -> requestAddressesOfLegalEntity(bpnL).content }
         // 1 legal address, 1 regular address
         assertThat(addressesByBpnL.size).isEqualTo(2)
-        assertThat(addressesByBpnL.count { it.addressType == AddressType.LegalAddress || it.addressType == AddressType.LegalAndSiteMainAddress }).isEqualTo(1)
+        assertThat(addressesByBpnL.count { it.address.addressType == AddressType.LegalAddress || it.address.addressType == AddressType.LegalAndSiteMainAddress }).isEqualTo(1)
 
         // Same address if we use the address-by-BPNA method
         addressesByBpnL
             .forEach { address ->
-                val addressByBpnA = requestAddress(address.bpna)
-                assertThat(addressByBpnA.bpnLegalEntity).isEqualTo(importedPartner.legalEntity.bpnl)
+                val addressByBpnA = requestAddress(address.address.bpna)
+                assertThat(addressByBpnA.address.bpnLegalEntity).isEqualTo(importedPartner.header.bpnl)
                 assertThat(addressByBpnA).isEqualTo(address)
             }
     }
@@ -169,13 +170,13 @@ class AddressControllerIT @Autowired constructor(
             )
         )
 
-        val bpnL2 = createdStructures[1].legalEntity.legalEntity.bpnl
+        val bpnL2 = createdStructures[1].legalEntity.header.bpnl
 
         val searchRequest = AddressSearchRequest(legalEntityBpns = listOf(bpnL2))
         val searchResult = poolClient.addresses.searchAddresses(searchRequest, PaginationRequest())
 
         val expected = listOf(
-            BusinessPartnerVerboseValues.addressPartner2.copy(addressType = AddressType.LegalAddress),
+            BusinessPartnerVerboseValues.addressPartner2.withAddressType(AddressType.LegalAddress),
             BusinessPartnerVerboseValues.addressPartner3
         )
 
@@ -221,7 +222,7 @@ class AddressControllerIT @Autowired constructor(
             .let {
                 assertAddressesAreEqual(
                     it.content, listOf(
-                        BusinessPartnerVerboseValues.addressPartner1.copy(addressType = AddressType.SiteMainAddress),
+                        BusinessPartnerVerboseValues.addressPartner1.withAddressType(AddressType.SiteMainAddress),
                         BusinessPartnerVerboseValues.addressPartner1,
                         BusinessPartnerVerboseValues.addressPartner2,
                     )
@@ -234,7 +235,7 @@ class AddressControllerIT @Autowired constructor(
             .let {
                 assertAddressesAreEqual(
                     it.content, listOf(
-                        BusinessPartnerVerboseValues.addressPartner2.copy(addressType = AddressType.SiteMainAddress),
+                        BusinessPartnerVerboseValues.addressPartner2.withAddressType(AddressType.SiteMainAddress),
                         BusinessPartnerVerboseValues.addressPartner3,
                     )
                 )
@@ -247,8 +248,8 @@ class AddressControllerIT @Autowired constructor(
                 assertAddressesAreEqual(
                     it.content, listOf(
                         // site1
-                        BusinessPartnerVerboseValues.addressPartner1.copy(addressType = AddressType.SiteMainAddress),
-                        BusinessPartnerVerboseValues.addressPartner2.copy(addressType = AddressType.SiteMainAddress),
+                        BusinessPartnerVerboseValues.addressPartner1.withAddressType(AddressType.SiteMainAddress),
+                        BusinessPartnerVerboseValues.addressPartner2.withAddressType(AddressType.SiteMainAddress),
                         BusinessPartnerVerboseValues.addressPartner1,
                         BusinessPartnerVerboseValues.addressPartner2,
                         // site2
@@ -275,7 +276,7 @@ class AddressControllerIT @Autowired constructor(
             )
         )
 
-        val bpnL = givenStructure[0].legalEntity.legalEntity.bpnl
+        val bpnL = givenStructure[0].legalEntity.header.bpnl
         val bpnS = givenStructure[0].siteStructures[0].site.site.bpns
 
         val expected = listOf(
@@ -317,7 +318,7 @@ class AddressControllerIT @Autowired constructor(
             )
         )
 
-        val bpnL = givenStructure[0].legalEntity.legalEntity.bpnl
+        val bpnL = givenStructure[0].legalEntity.header.bpnl
 
 
         val toCreate = BusinessPartnerNonVerboseValues.addressPartnerCreate5.copy(bpnParent = bpnL)
@@ -387,7 +388,7 @@ class AddressControllerIT @Autowired constructor(
     @Test
     fun `don't create addresses with non-existent parent`() {
         val bpnL = poolClient.legalEntities.createBusinessPartners(listOf(BusinessPartnerNonVerboseValues.legalEntityCreate1))
-            .entities.single().legalEntity.bpnl
+            .entities.single().legalEntity.header.bpnl
 
         val expected = listOf(
             BusinessPartnerVerboseValues.addressPartnerCreate1,
@@ -449,9 +450,9 @@ class AddressControllerIT @Autowired constructor(
         val bpnA3 = givenStructure[1].addresses[0].address.bpna
 
         val expected = listOf(
-            BusinessPartnerVerboseValues.addressPartner1.copy(bpna = bpnA2),
-            BusinessPartnerVerboseValues.addressPartner2.copy(bpna = bpnA3),
-            BusinessPartnerVerboseValues.addressPartner3.copy(bpna = bpnA1)
+            BusinessPartnerVerboseValues.addressPartnerInvariant1.copy(bpna = bpnA2),
+            BusinessPartnerVerboseValues.addressPartnerInvariant2.copy(bpna = bpnA3),
+            BusinessPartnerVerboseValues.addressPartnerInvariant3.copy(bpna = bpnA1)
         )
 
         val toUpdate = listOf(
@@ -462,7 +463,7 @@ class AddressControllerIT @Autowired constructor(
 
         val response = poolClient.addresses.updateAddresses(toUpdate)
 
-        assertAddressesAreEqual(response.entities, expected)
+        assertInvariantAddressesAreEqual(response.entities.map { it.address }, expected)
         assertThat(response.errorCount).isEqualTo(0)
     }
 
@@ -490,7 +491,7 @@ class AddressControllerIT @Autowired constructor(
         val bpnA1 = givenStructure[0].siteStructures[0].addresses[0].address.bpna
 
         val expected = listOf(
-            BusinessPartnerVerboseValues.addressPartner2.copy(bpna = bpnA1)
+            BusinessPartnerVerboseValues.addressPartnerInvariant2.copy(bpna = bpnA1)
         )
 
         val firstInvalidBpn = "BPNLXXXXXXXX"
@@ -503,7 +504,7 @@ class AddressControllerIT @Autowired constructor(
 
         val response = poolClient.addresses.updateAddresses(toUpdate)
 
-        assertAddressesAreEqual(response.entities, expected)
+        assertInvariantAddressesAreEqual(response.entities.map { it.address }, expected)
 
         assertThat(response.errorCount).isEqualTo(2)
         testHelpers.assertErrorResponse(response.errors.first(), AddressUpdateError.AddressNotFound, firstInvalidBpn)
@@ -514,7 +515,7 @@ class AddressControllerIT @Autowired constructor(
     @Test
     fun `create additional address - too many identifiers`(){
         val bpnL = poolClient.legalEntities.createBusinessPartners(listOf(BusinessPartnerNonVerboseValues.legalEntityCreate1))
-            .entities.single().legalEntity.bpnl
+            .entities.single().legalEntity.header.bpnl
 
         val addressToCreate = with(BusinessPartnerNonVerboseValues.addressPartnerCreate1){
             copy(bpnParent = bpnL, address = address.copy(
@@ -536,7 +537,7 @@ class AddressControllerIT @Autowired constructor(
     @Test
     fun `update additional address - too many identifiers`(){
         val bpnL = poolClient.legalEntities.createBusinessPartners(listOf(BusinessPartnerNonVerboseValues.legalEntityCreate1))
-            .entities.single().legalEntity.bpnl
+            .entities.single().legalEntity.header.bpnl
         val bpnA = poolClient.addresses.createAddresses(listOf(BusinessPartnerNonVerboseValues.addressPartnerCreate1.copy(bpnParent = bpnL)))
             .entities.single().address.bpna
 
@@ -563,21 +564,27 @@ class AddressControllerIT @Autowired constructor(
 
         assertHelpers.assertRecursively(actuals)
             .ignoringFields(
-                AddressPartnerCreateVerboseDto::address.name + "." + LogisticAddressVerboseDto::bpna.name,
-                AddressPartnerCreateVerboseDto::address.name + "." + LogisticAddressVerboseDto::bpnLegalEntity.name,
-                AddressPartnerCreateVerboseDto::address.name + "." + LogisticAddressVerboseDto::bpnSite.name
+                AddressPartnerCreateVerboseDto::address.name + "." + LogisticAddressInvariantVerboseDto::bpna.name,
+                AddressPartnerCreateVerboseDto::address.name + "." + LogisticAddressInvariantVerboseDto::bpnLegalEntity.name,
+                AddressPartnerCreateVerboseDto::address.name + "." + LogisticAddressInvariantVerboseDto::bpnSite.name
             )
             .isEqualTo(expected)
     }
 
-    private fun assertAddressesAreEqual(actuals: Collection<LogisticAddressVerboseDto>, expected: Collection<LogisticAddressVerboseDto>) {
+    private fun assertAddressesAreEqual(actuals: Collection<LogisticAddressVerboseDto>, expected: Collection<LogisticAddressVerboseDto>){
+        assertInvariantAddressesAreEqual(actuals.map { it.address }, expected.map { it.address })
+        assertHelpers.assertRecursively(actuals.map { it.scriptVariants }).isEqualTo(expected.map { it.scriptVariants })
+    }
+
+
+    private fun assertInvariantAddressesAreEqual(actuals: Collection<LogisticAddressInvariantVerboseDto>, expected: Collection<LogisticAddressInvariantVerboseDto>) {
         actuals.forEach { assertThat(it.bpna).matches(testHelpers.bpnAPattern) }
 
             assertHelpers.assertRecursively(actuals)
                 .ignoringFields(
-                    LogisticAddressVerboseDto::bpna.name,
-                    LogisticAddressVerboseDto::bpnLegalEntity.name,
-                    LogisticAddressVerboseDto::bpnSite.name
+                    LogisticAddressInvariantVerboseDto::bpna.name,
+                    LogisticAddressInvariantVerboseDto::bpnLegalEntity.name,
+                    LogisticAddressInvariantVerboseDto::bpnSite.name
                 )
                 .isEqualTo(expected)
 
@@ -587,5 +594,8 @@ class AddressControllerIT @Autowired constructor(
 
     private fun requestAddressesOfLegalEntity(bpn: String) =
         poolClient.legalEntities.getAddresses(bpn, PaginationRequest())
+
+    private fun LogisticAddressVerboseDto.withAddressType(addressType: AddressType) =
+        copy(address = address.copy(addressType = addressType))
 
 }

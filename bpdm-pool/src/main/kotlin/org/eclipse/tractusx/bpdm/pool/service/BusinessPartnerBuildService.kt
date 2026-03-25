@@ -22,14 +22,10 @@ package org.eclipse.tractusx.bpdm.pool.service
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.util.replace
-import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressDto
+import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
-import org.eclipse.tractusx.bpdm.pool.dto.AddressMetadataDto
-import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
-import org.eclipse.tractusx.bpdm.pool.dto.LegalEntityMetadataDto
+import org.eclipse.tractusx.bpdm.pool.dto.*
 import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
@@ -69,16 +65,15 @@ class BusinessPartnerBuildService(
         val errors = errorsByRequest.flatMap { it.value }
         val validRequests = requests.filterNot { errorsByRequest.containsKey(it) }
 
-        val legalEntityMetadataMap = metadataService.getMetadata(requests.map { it.legalEntity }).toMapping()
-        val addressMetadataMap = metadataService.getMetadata(requests.map { it.legalAddress }).toMapping()
+        val (legalEntityMetadataMap, addressMetadataMap) = metadataService.getMetadata(requests.map { it.legalEntity }).toMapping()
 
         val bpnLs = bpnIssuingService.issueLegalEntityBpns(validRequests.size)
         val bpnAs = bpnIssuingService.issueAddressBpns(validRequests.size)
 
         val requestsByLegalEntities = validRequests
             .mapIndexed { bpnIndex, request ->
-                val legalEntity = createLegalEntity(request.legalEntity, bpnLs[bpnIndex], legalEntityMetadataMap)
-                val legalAddress = createLogisticAddress(request.legalAddress, bpnAs[bpnIndex], legalEntity, null, addressMetadataMap)
+                val legalEntity = createLegalEntityHeader(request.legalEntity.header, bpnLs[bpnIndex], legalEntityMetadataMap, request.legalEntity.scriptVariants)
+                val legalAddress = createLogisticAddress(request.legalEntity.toLegalAddressWithScriptVariants(), bpnAs[bpnIndex], legalEntity, null, addressMetadataMap)
                 legalEntity.legalAddress = legalAddress
                 Pair(legalEntity, request)
             }
@@ -157,15 +152,16 @@ class BusinessPartnerBuildService(
         val errorsByRequest = requestValidationService.validateSitesToCreateFromController(requests)
         val errors = errorsByRequest.flatMap { it.value }
         val validRequests = requests.filterNot { errorsByRequest.containsKey(it) }
-        val validMainAddresses = validRequests.map { it.site.mainAddress }
-        val addressMetadataMap = metadataService.getMetadata(validMainAddresses).toMapping()
+
+        val (siteHeaderMetadata, mainAddressMetadata) = metadataService.getMetadata(validRequests.map { it.site }).toMapping()
+
         val legalEntities = legalEntityRepository.findDistinctByBpnIn(validRequests.map { it.bpnlParent })
         val legalEntitiesByBpn = legalEntities.associateBy { it.bpn }
         val bpnSs = bpnIssuingService.issueSiteBpns(validRequests.size)
         fun createSiteWithMainAddress(bpnIndex: Int, request: SitePartnerCreateRequest) =
-            createSite(request.site, bpnSs[bpnIndex], legalEntitiesByBpn[request.bpnlParent]!!)
+            createSiteHeader(request.site, bpnSs[bpnIndex], legalEntitiesByBpn[request.bpnlParent]!!, siteHeaderMetadata)
                 .apply {
-                    mainAddress = createLogisticAddress(address, request.site.mainAddress, address.bpn, this.legalEntity, this, addressMetadataMap)
+                    mainAddress = createLogisticAddress(address, request.site.toMainAddressWithScriptVariants(), address.bpn, this.legalEntity, this, mainAddressMetadata)
                 }.let { site -> Pair(site, request) }
         val requestsBySites = validRequests
             .mapIndexed { i, request -> createSiteWithMainAddress(i, request) }
@@ -182,8 +178,7 @@ class BusinessPartnerBuildService(
         val errors = errorsByRequest.flatMap { it.value }
         val validRequests = requests.filterNot { errorsByRequest.containsKey(it) }
 
-        val validMainAddresses = validRequests.map { it.site.mainAddress }
-        val addressMetadataMap = metadataService.getMetadata(validMainAddresses).toMapping()
+        val (siteHeaderMetadata, mainAddressMetadata) = metadataService.getMetadata(validRequests.map { it.site }).toMapping()
 
         val legalEntities = legalEntityRepository.findDistinctByBpnIn(validRequests.map { it.bpnlParent })
         val legalEntitiesByBpn = legalEntities.associateBy { it.bpn }
@@ -192,8 +187,8 @@ class BusinessPartnerBuildService(
         val bpnAs = bpnIssuingService.issueAddressBpns(validRequests.size)
 
         fun createSiteWithMainAddress(bpnIndex: Int, request: SitePartnerCreateRequest) =
-            createSite(request.site, bpnSs[bpnIndex], legalEntitiesByBpn[request.bpnlParent]!!)
-                .apply { mainAddress = createLogisticAddress(request.site.mainAddress, bpnAs[bpnIndex], this.legalEntity, this, addressMetadataMap) }
+            createSiteHeader(request.site, bpnSs[bpnIndex], legalEntitiesByBpn[request.bpnlParent]!!, siteHeaderMetadata)
+                .apply { mainAddress = createLogisticAddress(request.site.toMainAddressWithScriptVariants(), bpnAs[bpnIndex], this.legalEntity, this, mainAddressMetadata) }
                 .let { site -> Pair(site, request) }
 
         val requestsBySites = validRequests
@@ -242,7 +237,7 @@ class BusinessPartnerBuildService(
         val legalEntityRequests = validRequests.filter { isLegalEntityRequest(it) }
         val siteRequests = validRequests.filter { isSiteRequest(it) }
 
-        val metadataMap = metadataService.getMetadata(validRequests.map { it.address }).toMapping()
+        val metadataMap = metadataService.getMetadata(validRequests.map { LogisticAddressWithScriptVariantsDto(it.address, it.scriptVariants) }).toMapping()
 
         val addressResponses = createAddressesForSite(siteRequests, metadataMap)
             .plus(createAddressesForLegalEntity(legalEntityRequests, metadataMap))
@@ -265,8 +260,7 @@ class BusinessPartnerBuildService(
         val errors = errorsByRequest.flatMap { it.value }
         val validRequests = requests.filterNot { errorsByRequest.containsKey(it) }
 
-        val legalEntityMetadataMap = metadataService.getMetadata(validRequests.map { it.legalEntity }).toMapping()
-        val addressMetadataMap = metadataService.getMetadata(validRequests.map { it.legalAddress }).toMapping()
+        val (legalEntityMetadataMap, addressMetadataMap) = metadataService.getMetadata(requests.map { it.legalEntity }).toMapping()
 
         val bpnsToFetch = validRequests.map { it.bpnl }
         val legalEntities = legalEntityRepository.findDistinctByBpnIn(bpnsToFetch)
@@ -276,8 +270,8 @@ class BusinessPartnerBuildService(
         val legalEntityRequestPairs = legalEntities.map { legalEntity -> Pair(legalEntity, requestsByBpn[legalEntity.bpn]!!) }
         legalEntityRequestPairs.forEach { (legalEntity, request) ->
             val legalEntityBeforeUpdate = businessPartnerEquivalenceMapper.toEquivalenceDto(legalEntity)
-            updateLegalEntity(legalEntity, request.legalEntity, legalEntityMetadataMap)
-            updateLogisticAddress(legalEntity.legalAddress, request.legalAddress, addressMetadataMap)
+            updateLegalEntity(legalEntity, request.legalEntity.header, legalEntityMetadataMap, request.legalEntity.scriptVariants)
+            updateLogisticAddress(legalEntity.legalAddress, request.legalEntity.toLegalAddressWithScriptVariants(), addressMetadataMap)
             val legalEntityAfterUpdate = businessPartnerEquivalenceMapper.toEquivalenceDto(legalEntity)
 
             if (legalEntityBeforeUpdate != legalEntityAfterUpdate) {
@@ -319,7 +313,7 @@ class BusinessPartnerBuildService(
         val errors = errorsByRequest.flatMap { it.value }
         val validRequests = requests.filterNot { errorsByRequest.containsKey(it) }
 
-        val addressMetadataMap = metadataService.getMetadata(requests.map { it.site.mainAddress }).toMapping()
+        val (siteHeaderMetadata, mainAddressMetadata) = metadataService.getMetadata(requests.map { it.site }).toMapping()
 
         val bpnsToFetch = validRequests.map { it.bpns }
         val sites = siteRepository.findDistinctByBpnIn(bpnsToFetch)
@@ -328,8 +322,8 @@ class BusinessPartnerBuildService(
         val siteRequestPairs = sites.map { site -> Pair(site, requestByBpnMap[site.bpn]!!) }
         siteRequestPairs.forEach { (site, request) ->
             val siteBeforeUpdate = businessPartnerEquivalenceMapper.toEquivalenceDto(site)
-            updateSite(site, request.site)
-            updateLogisticAddress(site.mainAddress, request.site.mainAddress, addressMetadataMap)
+            updateSiteHeader(site, request.site, siteHeaderMetadata)
+            updateLogisticAddress(site.mainAddress, request.site.toMainAddressWithScriptVariants(), mainAddressMetadata)
             val siteAfterUpdate = businessPartnerEquivalenceMapper.toEquivalenceDto(site)
 
             if (siteBeforeUpdate != siteAfterUpdate) {
@@ -363,12 +357,12 @@ class BusinessPartnerBuildService(
         val validRequests = requests.filterNot { errorsByRequest.containsKey(it) }
 
         val addresses = logisticAddressRepository.findDistinctByBpnIn(validRequests.map { it.bpna })
-        val metadataMap = metadataService.getMetadata(validRequests.map { it.address }).toMapping()
+        val metadataMap = metadataService.getMetadata(validRequests.map { LogisticAddressWithScriptVariantsDto(it.address, it.scriptVariants) }).toMapping()
 
         val addressRequestPairs = addresses.sortedBy { it.bpn }.zip(requests.sortedBy { it.bpna })
         addressRequestPairs.forEach { (address, request) ->
             val addressBeforeUpdate = businessPartnerEquivalenceMapper.toEquivalenceDto(address)
-            updateLogisticAddress(address, request.address, metadataMap)
+            updateLogisticAddress(address, request.toAddressWithScriptVariants(), metadataMap)
             val addressAfterUpdate = businessPartnerEquivalenceMapper.toEquivalenceDto(address)
 
             if (addressBeforeUpdate != addressAfterUpdate) {
@@ -380,7 +374,7 @@ class BusinessPartnerBuildService(
             }
         }
 
-        val addressResponses = addresses.map { it.toDto() }
+        val addressResponses = addresses.map { it.toUpdateDto() }
 
         return AddressPartnerUpdateResponseWrapper(addressResponses, errors)
     }
@@ -398,7 +392,7 @@ class BusinessPartnerBuildService(
         val addressesWithIndex = validRequests
             .mapIndexed { i, request ->
                 val legalEntity = parentLegalEntitiesByBpn[request.bpnParent]!!
-                val address = createLogisticAddress(request.address, bpnAs[i], legalEntity, null, metadataMap)
+                val address = createLogisticAddress(request.toAddressWithScriptVariants(), bpnAs[i], legalEntity, null, metadataMap)
                 Pair(address, request.index)
             }
 
@@ -419,7 +413,7 @@ class BusinessPartnerBuildService(
         val addressesWithIndex = validRequests
             .mapIndexed { i, request ->
                 val site = siteParentsByBpn[request.bpnParent]!!
-                val address = createLogisticAddress(request.address, bpnAs[i], site.legalEntity, site, metadataMap)
+                val address = createLogisticAddress(request.toAddressWithScriptVariants(), bpnAs[i], site.legalEntity, site, metadataMap)
                 Pair(address, request.index)
             }
 
@@ -429,9 +423,28 @@ class BusinessPartnerBuildService(
         }
     }
 
+    private fun createSiteHeader(
+        siteDto: SiteDto,
+        bpnS: String,
+        partner: LegalEntityDb,
+        metadataMap: SiteHeaderMetadataMapping
+    ): SiteDb{
+        val createdSite = createSite(siteDto, bpnS, partner)
+        createdSite.scriptVariants.replace(siteDto.scriptVariants.map { SiteScriptVariantDb(metadataMap.scriptCodes[it.scriptCode]!!, it.name) })
+
+        return createdSite
+    }
+    private fun updateSiteHeader(site: SiteDb, siteDto: SiteDto, metadataMap: SiteHeaderMetadataMapping): SiteDb {
+        updateSite(site, siteDto)
+        site.scriptVariants.replace(siteDto.scriptVariants.map { SiteScriptVariantDb(metadataMap.scriptCodes[it.scriptCode]!!, it.name) })
+
+        return site
+    }
+
+
 
     private fun createLogisticAddress(
-        dto: LogisticAddressDto,
+        dto: LogisticAddressWithScriptVariantsDto,
         bpn: String,
         legalEntity: LegalEntityDb,
         site: SiteDb?,
@@ -443,7 +456,7 @@ class BusinessPartnerBuildService(
         }
 
     private fun createLogisticAddressInternal(
-        dto: LogisticAddressDto,
+        dto: LogisticAddressWithScriptVariantsDto,
         bpn: String,
         metadataMap: AddressMetadataMapping
     ): LogisticAddressDb {
@@ -451,10 +464,10 @@ class BusinessPartnerBuildService(
             bpn = bpn,
             legalEntity = null,
             site = null,
-            physicalPostalAddress = createPhysicalAddress(dto.physicalPostalAddress, metadataMap.regions),
-            alternativePostalAddress = dto.alternativePostalAddress?.let { createAlternativeAddress(it, metadataMap.regions) },
-            name = dto.name,
-            confidenceCriteria = createConfidenceCriteria(dto.confidenceCriteria)
+            physicalPostalAddress = createPhysicalAddress(dto.address.physicalPostalAddress, metadataMap.regions),
+            alternativePostalAddress = dto.address.alternativePostalAddress?.let { createAlternativeAddress(it, metadataMap.regions) },
+            name = dto.address.name,
+            confidenceCriteria = createConfidenceCriteria(dto.address.confidenceCriteria)
         )
 
         updateLogisticAddress(address, dto, metadataMap)
@@ -464,7 +477,7 @@ class BusinessPartnerBuildService(
 
     private fun createLogisticAddress(
         address: LogisticAddressDb,
-        dto: LogisticAddressDto,
+        dto: LogisticAddressWithScriptVariantsDto,
         bpn: String,
         legalEntity: LegalEntityDb,
         site: SiteDb?,
@@ -477,60 +490,125 @@ class BusinessPartnerBuildService(
 
     private fun updateLogisticAddressInternal(
         address: LogisticAddressDb,
-        dto: LogisticAddressDto,
+        dto: LogisticAddressWithScriptVariantsDto,
         bpn: String,
         metadataMap: AddressMetadataMapping
     ): LogisticAddressDb {
         address.bpn = bpn
         address.legalEntity = null
         address.site = null
-        address.physicalPostalAddress = createPhysicalAddress(dto.physicalPostalAddress, metadataMap.regions)
-        address.alternativePostalAddress = dto.alternativePostalAddress?.let { createAlternativeAddress(it, metadataMap.regions) }
-        address.name = dto.name
-        address.confidenceCriteria = updateConfidenceCriteria(address.confidenceCriteria, dto.confidenceCriteria)
+        address.physicalPostalAddress = createPhysicalAddress(dto.address.physicalPostalAddress, metadataMap.regions)
+        address.alternativePostalAddress = dto.address.alternativePostalAddress?.let { createAlternativeAddress(it, metadataMap.regions) }
+        address.name = dto.address.name
+        address.confidenceCriteria = updateConfidenceCriteria(address.confidenceCriteria, dto.address.confidenceCriteria)
         updateLogisticAddress(address, dto, metadataMap)
         return address
     }
 
-    private fun updateLogisticAddress(address: LogisticAddressDb, dto: LogisticAddressDto, metadataMap: AddressMetadataMapping) {
-        address.name = dto.name
-        address.physicalPostalAddress = createPhysicalAddress(dto.physicalPostalAddress, metadataMap.regions)
-        address.alternativePostalAddress = dto.alternativePostalAddress?.let { createAlternativeAddress(it, metadataMap.regions) }
+    private fun updateLogisticAddress(
+        address: LogisticAddressDb,
+        dto: LogisticAddressWithScriptVariantsDto,
+        metadataMap: AddressMetadataMapping
+    ) {
+        val addressDto = dto.address
+
+        address.name = addressDto.name
+        address.physicalPostalAddress = createPhysicalAddress(addressDto.physicalPostalAddress, metadataMap.regions)
+        address.alternativePostalAddress = addressDto.alternativePostalAddress?.let { createAlternativeAddress(it, metadataMap.regions) }
 
         address.identifiers.apply {
             clear()
-            addAll(dto.identifiers.map { toAddressIdentifier(it, metadataMap.idTypes, address) })
+            addAll(addressDto.identifiers.map { toAddressIdentifier(it, metadataMap.idTypes, address) })
         }
         address.states.apply {
             clear()
-            addAll(dto.states.map { toAddressState(it, address) })
+            addAll(addressDto.states.map { toAddressState(it, address) })
         }
 
-        address.confidenceCriteria = updateConfidenceCriteria(address.confidenceCriteria, dto.confidenceCriteria)
+        address.confidenceCriteria = updateConfidenceCriteria(address.confidenceCriteria, addressDto.confidenceCriteria)
+
+        val scriptVariants = dto.scriptVariants.map { toAddressScriptVariantDb(metadataMap.scriptCodes[it.scriptCode]!!, it) }
+        address.scriptVariants.replace(scriptVariants)
     }
 
-    private fun LegalEntityMetadataDto.toMapping() =
-        LegalEntityMetadataMapping(
+    private fun LegalEntityHeaderMetadataDto.toMapping() =
+        LegalEntityHeaderMetadataMapping(
             idTypes = idTypes.associateBy { it.technicalKey },
-            legalForms = legalForms.associateBy { it.technicalKey }
+            legalForms = legalForms.associateBy { it.technicalKey },
+            scriptCodes = scriptCodes.associateBy { it.technicalKey }
         )
+
+    private fun SiteMetadataDto.toMapping() =
+        Pair(SiteHeaderMetadataMapping(scriptCodes.associateBy { it.technicalKey }), addressMetadata.toMapping())
 
     private fun AddressMetadataDto.toMapping() =
         AddressMetadataMapping(
             idTypes = idTypes.associateBy { it.technicalKey },
-            regions = regions.associateBy { it.regionCode }
+            regions = regions.associateBy { it.regionCode },
+            scriptCodes = scriptCodes.associateBy { it.technicalKey }
         )
 
+    private fun AddressInvariantMetadataDto.toMapping() =
+        AddressMetadataDto(idTypes, regions, emptyList()).toMapping()
 
-    data class LegalEntityMetadataMapping(
+    private fun LegalEntityMetadataDto.toMapping() =
+        Pair(
+            headerMetadata.toMapping(),
+            legalAddressMetadata.toMapping()
+        )
+
+    data class LegalEntityHeaderMetadataMapping(
         val idTypes: Map<String, IdentifierTypeDb>,
-        val legalForms: Map<String, LegalFormDb>
+        val legalForms: Map<String, LegalFormDb>,
+        val scriptCodes: Map<String, ScriptCodeDb>
+    )
+
+    data class SiteHeaderMetadataMapping(
+        val scriptCodes: Map<String, ScriptCodeDb>
     )
 
     data class AddressMetadataMapping(
         val idTypes: Map<String, IdentifierTypeDb>,
-        val regions: Map<String, RegionDb>
+        val regions: Map<String, RegionDb>,
+        val scriptCodes: Map<String, ScriptCodeDb>
     )
+
+    private fun toAddressScriptVariantDb(scriptCode: ScriptCodeDb, scriptVariant: LogisticAddressScriptVariantDto): LogisticAddressScriptVariantDb{
+        return LogisticAddressScriptVariantDb(
+            scriptCode = scriptCode,
+            name = scriptVariant.address.addressName,
+            physicalAddress = toPhysicalAddressScriptVariantDb(scriptVariant.address.physicalAddress),
+            alternativeAddress = scriptVariant.address.alternativeAddress?.let { toAlternativeAddressScriptVariantDb(it) }
+        )
+    }
+
+    private fun toPhysicalAddressScriptVariantDb(scriptVariant: PhysicalAddressScriptVariantDto): PhysicalAddressScriptVariantDb{
+        return with(scriptVariant){
+            PhysicalAddressScriptVariantDb(
+                postalCode = postalCode,
+                city = city,
+                district = district,
+                street = street?.let {createStreet(it) },
+                companyPostalCode = companyPostalCode,
+                industrialZone = industrialZone,
+                building = building,
+                floor = floor,
+                door = door,
+                taxJurisdictionCode = taxJurisdictionCode
+            )
+        }
+    }
+
+    private fun toAlternativeAddressScriptVariantDb(alternativeAddressScriptVariant: AlternativeAddressScriptVariantDto): AlternativeAddressScriptVariantDb{
+        return with(alternativeAddressScriptVariant){
+            AlternativeAddressScriptVariantDb(
+                postalCode = postalCode,
+                city = city,
+                deliveryServiceQualifier = deliveryServiceQualifier,
+                deliveryServiceNumber = deliveryServiceNumber
+            )
+        }
+    }
 
     companion object {
 
@@ -618,41 +696,45 @@ class BusinessPartnerBuildService(
             return site
         }
 
-        fun createLegalEntity(
-            legalEntityDto: LegalEntityDto,
+        fun createLegalEntityHeader(
+            legalEntityHeaderDto: LegalEntityHeaderDto,
             bpnL: String,
-            metadataMap: LegalEntityMetadataMapping
+            metadataMap: LegalEntityHeaderMetadataMapping,
+            scriptVariants: List<LegalEntityScriptVariantDto>
         ): LegalEntityDb {
             // it has to be validated that the legalForm exits
-            val legalForm = legalEntityDto.legalForm?.let { metadataMap.legalForms[it]!! }
-            val legalName = NameDb(value = legalEntityDto.legalName, shortName = legalEntityDto.legalShortName)
+            val legalForm = legalEntityHeaderDto.legalForm?.let { metadataMap.legalForms[it]!! }
+            val legalName = NameDb(value = legalEntityHeaderDto.legalName, shortName = legalEntityHeaderDto.legalShortName)
             val newLegalEntity = LegalEntityDb(
                 bpn = bpnL,
                 legalName = legalName,
                 legalForm = legalForm,
                 currentness = Instant.now().truncatedTo(ChronoUnit.MICROS),
-                confidenceCriteria = createConfidenceCriteria(legalEntityDto.confidenceCriteria),
-                isCatenaXMemberData = legalEntityDto.isParticipantData
+                confidenceCriteria = createConfidenceCriteria(legalEntityHeaderDto.confidenceCriteria),
+                isCatenaXMemberData = legalEntityHeaderDto.isParticipantData
             )
-            updateLegalEntity(newLegalEntity, legalEntityDto, metadataMap)
+            updateLegalEntity(newLegalEntity, legalEntityHeaderDto, metadataMap, scriptVariants)
 
             return newLegalEntity
         }
         fun updateLegalEntity(
             legalEntity: LegalEntityDb,
-            legalEntityDto: LegalEntityDto,
-            metadataMap: LegalEntityMetadataMapping
+            legalEntityHeaderDto: LegalEntityHeaderDto,
+            metadataMap: LegalEntityHeaderMetadataMapping,
+            scriptVariants: List<LegalEntityScriptVariantDto>
         ) {
             legalEntity.currentness = createCurrentnessTimestamp()
 
-            legalEntity.legalName = NameDb(value = legalEntityDto.legalName, shortName = legalEntityDto.legalShortName)
+            legalEntity.legalName = NameDb(value = legalEntityHeaderDto.legalName, shortName = legalEntityHeaderDto.legalShortName)
 
-            legalEntity.legalForm = legalEntityDto.legalForm?.let { metadataMap.legalForms[it]!! }
+            legalEntity.legalForm = legalEntityHeaderDto.legalForm?.let { metadataMap.legalForms[it]!! }
 
-            legalEntity.identifiers.replace(legalEntityDto.identifiers.map { toLegalEntityIdentifier(it, metadataMap.idTypes, legalEntity) })
-            legalEntity.states.replace(legalEntityDto.states.map { toLegalEntityState(it, legalEntity) })
-            legalEntity.confidenceCriteria = updateConfidenceCriteria( legalEntity.confidenceCriteria, legalEntityDto.confidenceCriteria)
-            legalEntity.isCatenaXMemberData = legalEntityDto.isParticipantData
+            legalEntity.identifiers.replace(legalEntityHeaderDto.identifiers.map { toLegalEntityIdentifier(it, metadataMap.idTypes, legalEntity) })
+            legalEntity.states.replace(legalEntityHeaderDto.states.map { toLegalEntityState(it, legalEntity) })
+            legalEntity.confidenceCriteria = updateConfidenceCriteria( legalEntity.confidenceCriteria, legalEntityHeaderDto.confidenceCriteria)
+            legalEntity.isCatenaXMemberData = legalEntityHeaderDto.isParticipantData
+
+            legalEntity.scriptVariants.replace(scriptVariants.map { variant -> LegalEntityScriptVariantDb(metadataMap.scriptCodes[variant.scriptCode]!!, variant.legalName, variant.shortName) })
         }
 
         fun createPhysicalAddress(physicalAddress: IBasePhysicalPostalAddressDto, regions: Map<String, RegionDb>): PhysicalPostalAddressDb {
@@ -670,19 +752,7 @@ class BusinessPartnerBuildService(
                 postCode = physicalAddress.postalCode,
                 city = physicalAddress.city!!,
                 districtLevel1 = physicalAddress.district,
-                street = physicalAddress.street?.let {
-                    StreetDb(
-                        name = it.name,
-                        houseNumber = it.houseNumber,
-                        houseNumberSupplement = it.houseNumberSupplement,
-                        milestone = it.milestone,
-                        direction = it.direction,
-                        namePrefix = it.namePrefix,
-                        additionalNamePrefix = it.additionalNamePrefix,
-                        nameSuffix = it.nameSuffix,
-                        additionalNameSuffix = it.additionalNameSuffix
-                    )
-                },
+                street = physicalAddress.street?.let { createStreet(it) },
                 companyPostCode = physicalAddress.companyPostalCode,
                 industrialZone = physicalAddress.industrialZone,
                 building = physicalAddress.building,
@@ -690,6 +760,22 @@ class BusinessPartnerBuildService(
                 door = physicalAddress.door,
                 taxJurisdictionCode = physicalAddress.taxJurisdictionCode
             )
+        }
+
+        fun createStreet(street: IBaseStreetDto): StreetDb{
+            return with(street){
+                StreetDb(
+                    name = name,
+                    houseNumber = houseNumber,
+                    houseNumberSupplement = houseNumberSupplement,
+                    milestone = milestone,
+                    direction = direction,
+                    namePrefix = namePrefix,
+                    additionalNamePrefix = additionalNamePrefix,
+                    nameSuffix = nameSuffix,
+                    additionalNameSuffix = additionalNameSuffix
+                )
+            }
         }
 
         fun createAlternativeAddress(alternativeAddress: IBaseAlternativePostalAddressDto, regions: Map<String, RegionDb>): AlternativePostalAddressDb {
@@ -725,5 +811,40 @@ class BusinessPartnerBuildService(
         fun updateConfidenceCriteria(oldConfidence: ConfidenceCriteriaDb, newConfidence: IConfidenceCriteriaDto) =
             createConfidenceCriteria(newConfidence).copy(numberOfSharingMembers = oldConfidence.numberOfSharingMembers)
     }
+
+
+    private fun LegalEntityDto.toLegalAddressWithScriptVariants(): LogisticAddressWithScriptVariantsDto{
+        return LogisticAddressWithScriptVariantsDto(
+            legalAddress,
+            scriptVariants.map { it.toAddressVariant() }
+        )
+    }
+
+    private fun SiteDto.toMainAddressWithScriptVariants(): LogisticAddressWithScriptVariantsDto{
+        return LogisticAddressWithScriptVariantsDto(
+            mainAddress,
+            scriptVariants.map { it.toAddressVariant() }
+        )
+    }
+
+    private fun AddressPartnerCreateRequest.toAddressWithScriptVariants(): LogisticAddressWithScriptVariantsDto{
+        return LogisticAddressWithScriptVariantsDto(
+            address,
+            scriptVariants
+        )
+    }
+
+    private fun AddressPartnerUpdateRequest.toAddressWithScriptVariants(): LogisticAddressWithScriptVariantsDto{
+        return LogisticAddressWithScriptVariantsDto(
+            address,
+            scriptVariants
+        )
+    }
+
+    private fun LegalEntityScriptVariantDto.toAddressVariant() =
+        LogisticAddressScriptVariantDto(scriptCode, legalAddress)
+
+    private fun SiteScriptVariantDto.toAddressVariant() =
+        LogisticAddressScriptVariantDto(scriptCode, mainAddress)
 
 }

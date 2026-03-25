@@ -41,6 +41,7 @@ data class BusinessPartnerOutputDto(
     override val site: SiteRepresentationOutputDto?,
     override val address: AddressComponentOutputDto,
     override val externalSequenceTimestamp: Instant? = null,
+    val scriptVariants: List<BusinessPartnerScriptVariantDto> = emptyList(),
 
     @get:Schema(description = CommonDescription.createdAt)
     val createdAt: Instant,

@@ -25,17 +25,12 @@ import org.eclipse.tractusx.bpdm.common.dto.RequestWithKey
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityDescription
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressDto
 
 @Schema(description = LegalEntityDescription.headerCreateRequest)
 data class LegalEntityPartnerCreateRequest(
 
-    @field:JsonUnwrapped
+    @get:JsonUnwrapped
     val legalEntity: LegalEntityDto,
-
-    // TODO OpenAPI description for complex field does not work!!
-    @get:Schema(description = LegalEntityDescription.legalAddress)
-    val legalAddress: LogisticAddressDto,
 
     @get:Schema(description = CommonDescription.index)
     val index: String?

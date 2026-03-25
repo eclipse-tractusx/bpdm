@@ -83,7 +83,10 @@ class GoldenRecordTaskDb(
                 isCatenaXMemberData = isCatenaXMemberData.also { businessPartner.isCatenaXMemberData = it },
                 owningCompany = owningCompany.also { businessPartner.owningCompany = it },
                 legalEntityHasChanged = legalEntityHasChanged.also { businessPartner.legalEntityHasChanged = it },
-                siteHasChanged = siteHasChanged.also { businessPartner.siteHasChanged = it }
+                siteHasChanged = siteHasChanged.also { businessPartner.siteHasChanged = it },
+                addressScriptVariants = addressScriptVariants.also { businessPartner.addressScriptVariants.replace(it) },
+                legalEntityHeaderScriptVariants = legalEntityHeaderScriptVariants.also { businessPartner.legalEntityHeaderScriptVariants.replace(it) },
+                siteHeaderScriptVariants = siteHeaderScriptVariants.also { businessPartner.siteHeaderScriptVariants.replace(it) }
             )
         }
     }
@@ -190,7 +193,28 @@ class GoldenRecordTaskDb(
         @Column(name = "legal_entity_has_changed")
         var legalEntityHasChanged: Boolean?,
         @Column(name = "site_has_changed")
-        var siteHasChanged: Boolean?
+        var siteHasChanged: Boolean?,
+        @ElementCollection(fetch = FetchType.LAZY)
+        @CollectionTable(
+            name = "business_partner_address_script_variants",
+            joinColumns = [JoinColumn(name = "task_id", foreignKey = ForeignKey(name = "fk_address_script_variants_tasks"))],
+            indexes = [Index(name = "index_address_script_variants_task_id", columnList = "task_id")]
+        )
+        val addressScriptVariants: MutableList<PostalAddressScriptVariantDb>,
+        @ElementCollection(fetch = FetchType.LAZY)
+        @CollectionTable(
+            name = "business_partner_legal_entity_script_variants",
+            joinColumns = [JoinColumn(name = "task_id", foreignKey = ForeignKey(name = "fk_legal_entity_script_variants_tasks"))],
+            indexes = [Index(name = "index_legal_entity_script_variants_task_id", columnList = "task_id")]
+        )
+        val legalEntityHeaderScriptVariants: MutableList<LegalEntityHeaderScriptVariantDb>,
+        @ElementCollection(fetch = FetchType.LAZY)
+        @CollectionTable(
+            name = "business_partner_site_script_variants",
+            joinColumns = [JoinColumn(name = "task_id", foreignKey = ForeignKey(name = "fk_site_script_variants_tasks"))],
+            indexes = [Index(name = "index_site_script_variants_task_id", columnList = "task_id")]
+        )
+        val siteHeaderScriptVariants: MutableList<SiteHeaderScriptVariantDb>,
     )
 
     enum class ResultState{

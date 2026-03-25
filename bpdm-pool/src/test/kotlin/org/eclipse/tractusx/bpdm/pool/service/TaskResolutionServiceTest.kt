@@ -72,7 +72,8 @@ class TaskResolutionServiceTest @Autowired constructor(
                     legalForms = testDataEnvironment.metadata.legalForms.map { it.technicalKey },
                     legalEntityIdentifierTypes = testDataEnvironment.metadata.legalEntityIdentifierTypes.map { it.technicalKey },
                     addressIdentifierTypes = testDataEnvironment.metadata.addressIdentifierTypes.map { it.technicalKey },
-                    adminAreas = testDataEnvironment.metadata.adminAreas.map { it.code }
+                    adminAreas = testDataEnvironment.metadata.adminAreas.map { it.code },
+                    scriptCodes = testDataEnvironment.metadata.scriptCodes.map { it.technicalKey }
                 )
             )
         )
@@ -118,7 +119,7 @@ class TaskResolutionServiceTest @Autowired constructor(
 
         val createdLegalEntity = poolClient.legalEntities.getLegalEntity(createResult[0].businessPartner.legalEntity.bpnReference.referenceValue!!)
         assertThat(createdLegalEntity.legalAddress.bpnLegalEntity).isNotNull()
-        assertThat(createResult[0].businessPartner.legalEntity.bpnReference.referenceValue).isEqualTo(createdLegalEntity.legalEntity.bpnl)
+        assertThat(createResult[0].businessPartner.legalEntity.bpnReference.referenceValue).isEqualTo(createdLegalEntity.header.bpnl)
         compareLegalEntity(createdLegalEntity, createResult[0].businessPartner.legalEntity)
     }
 
@@ -140,7 +141,7 @@ class TaskResolutionServiceTest @Autowired constructor(
 
         val createdLegalEntity = poolClient.legalEntities.getLegalEntity(createResult[0].businessPartner.legalEntity.bpnReference.referenceValue!!)
         assertThat(createdLegalEntity.legalAddress.bpnLegalEntity).isNotNull()
-        assertThat(createResult[0].businessPartner.legalEntity.bpnReference.referenceValue).isEqualTo(createdLegalEntity.legalEntity.bpnl)
+        assertThat(createResult[0].businessPartner.legalEntity.bpnReference.referenceValue).isEqualTo(createdLegalEntity.header.bpnl)
         compareLegalEntity(createdLegalEntity, createResult[0].businessPartner.legalEntity)
     }
 
@@ -164,13 +165,13 @@ class TaskResolutionServiceTest @Autowired constructor(
         assertThat(bpnMappings.size).isEqualTo(3)
 
         val createdLegalEntity = poolClient.legalEntities.getLegalEntity(createResult[0].businessPartner.legalEntity.bpnReference.referenceValue!!)
-        assertThat(createdLegalEntity.legalAddress.bpnLegalEntity).isEqualTo(createdLegalEntity.legalEntity.bpnl)
+        assertThat(createdLegalEntity.legalAddress.bpnLegalEntity).isEqualTo(createdLegalEntity.header.bpnl)
         assertThat(createdLegalEntity.legalAddress.addressType == AddressType.LegalAddress).isTrue()
-        assertThat(createResult[0].businessPartner.legalEntity.bpnReference.referenceValue).isEqualTo(createdLegalEntity.legalEntity.bpnl)
+        assertThat(createResult[0].businessPartner.legalEntity.bpnReference.referenceValue).isEqualTo(createdLegalEntity.header.bpnl)
         compareLegalEntity(createdLegalEntity, createResult[0].businessPartner.legalEntity)
         val createdAdditionalAddress = poolClient.addresses.getAddress(createResult[0].businessPartner.additionalAddress?.bpnReference?.referenceValue!!)
-        assertThat(createdAdditionalAddress.bpnLegalEntity).isEqualTo(createdLegalEntity.legalEntity.bpnl)
-        assertThat(createdAdditionalAddress.addressType == AddressType.AdditionalAddress).isTrue()
+        assertThat(createdAdditionalAddress.address.bpnLegalEntity).isEqualTo(createdLegalEntity.header.bpnl)
+        assertThat(createdAdditionalAddress.address.addressType == AddressType.AdditionalAddress).isTrue()
     }
 
     @Test
@@ -193,13 +194,13 @@ class TaskResolutionServiceTest @Autowired constructor(
         assertThat(bpnMappings.size).isEqualTo(3)
 
         val createdLegalEntity = poolClient.legalEntities.getLegalEntity(createResult[0].businessPartner.legalEntity.bpnReference.referenceValue!!)
-        assertThat(createdLegalEntity.legalAddress.bpnLegalEntity).isEqualTo(createdLegalEntity.legalEntity.bpnl)
+        assertThat(createdLegalEntity.legalAddress.bpnLegalEntity).isEqualTo(createdLegalEntity.header.bpnl)
         assertThat(createdLegalEntity.legalAddress.addressType == AddressType.LegalAddress).isTrue()
-        assertThat(createResult[0].businessPartner.legalEntity.bpnReference.referenceValue).isEqualTo(createdLegalEntity.legalEntity.bpnl)
+        assertThat(createResult[0].businessPartner.legalEntity.bpnReference.referenceValue).isEqualTo(createdLegalEntity.header.bpnl)
         compareLegalEntity(createdLegalEntity, createResult[0].businessPartner.legalEntity.copy(isParticipantData = false))
         val createdAdditionalAddress = poolClient.addresses.getAddress(createResult[0].businessPartner.additionalAddress?.bpnReference?.referenceValue!!)
-        assertThat(createdAdditionalAddress.bpnLegalEntity).isEqualTo(createdLegalEntity.legalEntity.bpnl)
-        assertThat(createdAdditionalAddress.addressType == AddressType.AdditionalAddress).isTrue()
+        assertThat(createdAdditionalAddress.address.bpnLegalEntity).isEqualTo(createdLegalEntity.header.bpnl)
+        assertThat(createdAdditionalAddress.address.addressType == AddressType.AdditionalAddress).isTrue()
     }
 
     @Test
@@ -368,7 +369,7 @@ class TaskResolutionServiceTest @Autowired constructor(
         val resultSteps2 = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = createLegalEntityRequest)
         assertThat(resultSteps2[0].taskId).isEqualTo("TASK_2")
         assertThat(resultSteps2[0].errors.size).isEqualTo(0)
-        assertThat(createdLegalEntity1.legalEntity.bpnl).isEqualTo(resultSteps2[0].businessPartner.legalEntity.bpnReference.referenceValue!!)
+        assertThat(createdLegalEntity1.header.bpnl).isEqualTo(resultSteps2[0].businessPartner.legalEntity.bpnReference.referenceValue!!)
     }
 
     @Test
@@ -396,9 +397,9 @@ class TaskResolutionServiceTest @Autowired constructor(
 
         assertThat(resultSteps2[0].taskId).isEqualTo("TASK_2")
         assertThat(resultSteps2[0].errors.size).isEqualTo(0)
-        assertThat(createdLegalEntity1.legalEntity.bpnl).isNotEqualTo(resultSteps2[0].businessPartner.legalEntity.bpnReference.referenceValue!!)
+        assertThat(createdLegalEntity1.header.bpnl).isNotEqualTo(resultSteps2[0].businessPartner.legalEntity.bpnReference.referenceValue!!)
         val createdLegalEntity2 = poolClient.legalEntities.getLegalEntity(resultSteps2[0].businessPartner.legalEntity.bpnReference.referenceValue!!)
-        assertThat(resultSteps2[0].businessPartner.legalEntity.bpnReference.referenceValue).isEqualTo(createdLegalEntity2.legalEntity.bpnl)
+        assertThat(resultSteps2[0].businessPartner.legalEntity.bpnReference.referenceValue).isEqualTo(createdLegalEntity2.header.bpnl)
     }
 
     @Test
@@ -424,7 +425,7 @@ class TaskResolutionServiceTest @Autowired constructor(
         assertThat(updateResult[0].errors.size).isEqualTo(0)
 
         val updatedLegalEntity = poolClient.legalEntities.getLegalEntity(updateResult[0].businessPartner.legalEntity.bpnReference.referenceValue!!)
-        assertThat(updatedLegalEntity.legalEntity.legalName).isEqualTo(updateLegalEntityRequest.legalEntity.legalName)
+        assertThat(updatedLegalEntity.header.legalName).isEqualTo(updateLegalEntityRequest.legalEntity.legalName)
         compareLegalEntity(updatedLegalEntity, updateResult[0].businessPartner.legalEntity)
     }
 
@@ -453,7 +454,7 @@ class TaskResolutionServiceTest @Autowired constructor(
         assertThat(updateResult[0].errors.size).isEqualTo(0)
 
         val updatedLegalEntity = poolClient.legalEntities.getLegalEntity(updateResult[0].businessPartner.legalEntity.bpnReference.referenceValue!!)
-        assertThat(updatedLegalEntity.legalEntity.legalName).isEqualTo(updateLegalEntityRequest.legalEntity.legalName)
+        assertThat(updatedLegalEntity.header.legalName).isEqualTo(updateLegalEntityRequest.legalEntity.legalName)
         compareLegalEntity(updatedLegalEntity, updateResult[0].businessPartner.legalEntity.copy(isParticipantData = createLegalEntityRequest.legalEntity.isParticipantData))
     }
 
@@ -482,7 +483,7 @@ class TaskResolutionServiceTest @Autowired constructor(
         assertThat(updateResult[0].errors.size).isEqualTo(0)
 
         val updatedLegalEntity = poolClient.legalEntities.getLegalEntity(updateResult[0].businessPartner.legalEntity.bpnReference.referenceValue!!)
-        assertThat(updatedLegalEntity.legalEntity.legalName).isEqualTo(updateLegalEntityRequest.legalEntity.legalName)
+        assertThat(updatedLegalEntity.header.legalName).isEqualTo(updateLegalEntityRequest.legalEntity.legalName)
         compareLegalEntity(updatedLegalEntity, updateResult[0].businessPartner.legalEntity.copy(isParticipantData = createLegalEntityRequest.legalEntity.isParticipantData))
     }
 
@@ -509,7 +510,7 @@ class TaskResolutionServiceTest @Autowired constructor(
         assertThat(updateResult[0].errors.size).isEqualTo(0)
 
         val updatedLegalEntity = poolClient.legalEntities.getLegalEntity(updateResult[0].businessPartner.legalEntity.bpnReference.referenceValue!!)
-        assertThat(updatedLegalEntity.legalEntity.legalName).isEqualTo(updateLegalEntityRequest.legalEntity.legalName)
+        assertThat(updatedLegalEntity.header.legalName).isEqualTo(updateLegalEntityRequest.legalEntity.legalName)
         compareLegalEntity(updatedLegalEntity, updateResult[0].businessPartner.legalEntity)
     }
 
@@ -610,12 +611,12 @@ class TaskResolutionServiceTest @Autowired constructor(
             .copyWithBpnRequests()
 
         val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createSiteRequest)
-        val createdLeAddress = poolClient.addresses.getAddress(createResult[0].businessPartner.legalEntity.legalAddress.bpnReference.referenceValue!!)
-        val createdAdditionalAddress = poolClient.addresses.getAddress(createResult[0].businessPartner.additionalAddress?.bpnReference?.referenceValue!!)
+        val createdLeAddress = poolClient.addresses.getAddress(createResult[0].businessPartner.legalEntity.legalAddress.bpnReference.referenceValue!!).address
+        val createdAdditionalAddress = poolClient.addresses.getAddress(createResult[0].businessPartner.additionalAddress?.bpnReference?.referenceValue!!).address
         assertThat(createResult[0].taskId).isEqualTo("TASK_1")
         assertThat(createResult[0].errors).hasSize(0)
         assertThat(createdLeAddress.name).isEqualTo(createSiteRequest.legalEntity.legalAddress.addressName)
-        compareLogisticAddress(createdAdditionalAddress, createResult[0].businessPartner.additionalAddress)
+        compareLogisticAddress(createdAdditionalAddress, createResult[0].businessPartner.additionalAddress?.postalProperties)
         assertThat(createdAdditionalAddress.bpnLegalEntity).isEqualTo(createResult[0].businessPartner.legalEntity.bpnReference.referenceValue)
         assertThat(createdAdditionalAddress.bpnSite).isEqualTo(createResult[0].businessPartner.site?.bpnReference?.referenceValue)
         assertThat(createdAdditionalAddress.addressType == AddressType.AdditionalAddress).isTrue()
@@ -666,9 +667,11 @@ class TaskResolutionServiceTest @Autowired constructor(
                         identifiers = listOf(sameIdentifier)
                     )
                 ),
-                additionalAddress = additionalAddress!!.copy(
-                    identifiers = listOf(sameIdentifier)
-                )
+                additionalAddress = additionalAddress!!.copyAsPostalAddress {
+                    it.copy(
+                        identifiers = listOf(sameIdentifier)
+                    )
+                }
             )
         }.copyWithBpnRequests()
 
@@ -757,9 +760,11 @@ class TaskResolutionServiceTest @Autowired constructor(
                         identifiers = listOf(sameIdentifier)
                     )
                 ),
-                additionalAddress = additionalAddress!!.copy(
-                    identifiers = listOf(sameIdentifier)
-                )
+                additionalAddress = additionalAddress!!.copyAsPostalAddress {
+                    it.copy(
+                        identifiers = listOf(sameIdentifier)
+                 )
+                }
             )
         }
 
@@ -794,13 +799,13 @@ class TaskResolutionServiceTest @Autowired constructor(
             .copyWithBpnRequests()
 
         val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = fullBpWithAddress)
-        val createdLeAddress = poolClient.addresses.getAddress(createResult[0].businessPartner.legalEntity.legalAddress.bpnReference.referenceValue!!)
-        val createdAdditionalAddress = poolClient.addresses.getAddress(createResult[0].businessPartner.additionalAddress?.bpnReference?.referenceValue!!)
+        val createdLeAddress = poolClient.addresses.getAddress(createResult[0].businessPartner.legalEntity.legalAddress.bpnReference.referenceValue!!).address
+        val createdAdditionalAddress = poolClient.addresses.getAddress(createResult[0].businessPartner.additionalAddress?.bpnReference?.referenceValue!!).address
         assertThat(createResult[0].taskId).isEqualTo("TASK_1")
         assertThat(createResult[0].errors).hasSize(0)
         assertThat(createdLeAddress.addressType == AddressType.LegalAddress).isTrue()
         assertThat(createdAdditionalAddress.addressType == AddressType.AdditionalAddress).isTrue()
-        compareLogisticAddress(createdAdditionalAddress, createResult[0].businessPartner.additionalAddress)
+        compareLogisticAddress(createdAdditionalAddress, createResult[0].businessPartner.additionalAddress?.postalProperties)
     }
 
     @Test
@@ -914,7 +919,7 @@ class TaskResolutionServiceTest @Autowired constructor(
     }
 
     fun BusinessPartner.withAdditionalAddressReference(postalAddressBpn: BpnReference): BusinessPartner {
-        return copy(additionalAddress = additionalAddress?.copy(bpnReference = postalAddressBpn))
+        return copy(additionalAddress = additionalAddress?.copyAsPostalAddress { it.copy(bpnReference = postalAddressBpn)  } )
     }
 
 
@@ -1012,14 +1017,14 @@ class TaskResolutionServiceTest @Autowired constructor(
             .copy(site = null)
         val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createLegalEntityRequest)
         val bpna = createResult[0].businessPartner.additionalAddress?.bpnReference?.referenceValue!!
-        val createdAdditionalAddress = poolClient.addresses.getAddress(bpna)
+        val createdAdditionalAddress = poolClient.addresses.getAddress(bpna).address
         assertThat(createdAdditionalAddress.addressType == AddressType.AdditionalAddress).isTrue()
         val updateLinkageRequest = orchTestDataFactory.createFullBusinessPartner("test")
             .withLegalReferences(leRefValue.toBpnRequest(), leAddressRefValue.toBpnRequest())
             .withSiteReferences(siteRefValue.toBpnRequest(), addressRefValue.toBpnRequest())
             .copy(additionalAddress = null)
         upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = updateLinkageRequest)
-        val createdAddress = poolClient.addresses.getAddress(bpna)
+        val createdAddress = poolClient.addresses.getAddress(bpna).address
         assertThat(createdAddress.addressType == AddressType.AdditionalAddress).isFalse()
         assertThat(createdAddress.addressType == AddressType.SiteMainAddress).isTrue()
     }
@@ -1036,10 +1041,10 @@ class TaskResolutionServiceTest @Autowired constructor(
         val bpnL = createResult[0].businessPartner.legalEntity.bpnReference.referenceValue!!
         val createdLegalEntity = poolClient.legalEntities.getLegalEntity(bpnL)
         assertThat(createdLegalEntity.legalAddress.bpnLegalEntity).isNotNull()
-        assertThat(createResult[0].businessPartner.legalEntity.bpnReference.referenceValue).isEqualTo(createdLegalEntity.legalEntity.bpnl)
+        assertThat(createResult[0].businessPartner.legalEntity.bpnReference.referenceValue).isEqualTo(createdLegalEntity.header.bpnl)
         compareLegalEntity(createdLegalEntity, createResult[0].businessPartner.legalEntity)
         //Convert addressType from LegalAddress to LegalAndSiteMainAddress
-        var site = Site(siteRefValue.toBpnRequest(), "site", listOf(), fullConfidenceCriteria(), false, null)
+        var site = Site(siteRefValue.toBpnRequest(), "site", listOf(), fullConfidenceCriteria(), false, null, emptyList())
         val updateLinkageRequest = orchTestDataFactory.createFullBusinessPartner("test")
             .withLegalReferences(leRefValue.toBpnRequest(), leAddressRefValue.toBpnRequest())
             .copy(site = site, additionalAddress = null)
@@ -1090,9 +1095,11 @@ class TaskResolutionServiceTest @Autowired constructor(
 
         val businessPartner = orchTestDataFactory.createFullBusinessPartner("test").copyWithBpnRequests()
         val businessPartnerWithTooManyIdentifiers = businessPartner.copy(
-            additionalAddress = businessPartner.additionalAddress!!.copy(
-                identifiers = createIdentifiers(addressIdentifierTypeKey, 101)
-            )
+            additionalAddress = businessPartner.additionalAddress!!.copyAsPostalAddress {
+                it.copy(
+                    identifiers = createIdentifiers(addressIdentifierTypeKey, 101)
+                )
+            }
         )
 
         val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = businessPartnerWithTooManyIdentifiers)

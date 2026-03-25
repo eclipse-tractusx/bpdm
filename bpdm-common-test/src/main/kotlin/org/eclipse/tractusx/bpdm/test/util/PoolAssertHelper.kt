@@ -20,8 +20,8 @@
 package org.eclipse.tractusx.bpdm.test.util
 
 import org.assertj.core.api.Assertions
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityHeaderVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressInvariantVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
@@ -48,23 +48,23 @@ class PoolAssertHelper(
             .ignoringCollectionOrder()
             .ignoringAllOverriddenEquals()
             .ignoringFields(
-                "${LegalEntityWithLegalAddressVerboseDto::legalEntity.name}.${LegalEntityVerboseDto::createdAt.name}",
-                "${LegalEntityWithLegalAddressVerboseDto::legalEntity.name}.${LegalEntityVerboseDto::updatedAt.name}",
-                "${LegalEntityWithLegalAddressVerboseDto::legalEntity.name}.${LegalEntityVerboseDto::bpnl.name}",
-                "${LegalEntityWithLegalAddressVerboseDto::legalEntity.name}.${LegalEntityVerboseDto::currentness.name}",
-                "${LegalEntityWithLegalAddressVerboseDto::legalAddress.name}.${LogisticAddressVerboseDto::bpna.name}",
-                "${LegalEntityWithLegalAddressVerboseDto::legalAddress.name}.${LogisticAddressVerboseDto::bpnLegalEntity.name}",
-                "${LegalEntityWithLegalAddressVerboseDto::legalAddress.name}.${LogisticAddressVerboseDto::createdAt.name}",
-                "${LegalEntityWithLegalAddressVerboseDto::legalAddress.name}.${LogisticAddressVerboseDto::updatedAt.name}"
+                "${LegalEntityWithLegalAddressVerboseDto::header.name}.${LegalEntityHeaderVerboseDto::createdAt.name}",
+                "${LegalEntityWithLegalAddressVerboseDto::header.name}.${LegalEntityHeaderVerboseDto::updatedAt.name}",
+                "${LegalEntityWithLegalAddressVerboseDto::header.name}.${LegalEntityHeaderVerboseDto::bpnl.name}",
+                "${LegalEntityWithLegalAddressVerboseDto::header.name}.${LegalEntityHeaderVerboseDto::currentness.name}",
+                "${LegalEntityWithLegalAddressVerboseDto::legalAddress.name}.${LogisticAddressInvariantVerboseDto::bpna.name}",
+                "${LegalEntityWithLegalAddressVerboseDto::legalAddress.name}.${LogisticAddressInvariantVerboseDto::bpnLegalEntity.name}",
+                "${LegalEntityWithLegalAddressVerboseDto::legalAddress.name}.${LogisticAddressInvariantVerboseDto::createdAt.name}",
+                "${LegalEntityWithLegalAddressVerboseDto::legalAddress.name}.${LogisticAddressInvariantVerboseDto::updatedAt.name}"
             )
             .withComparatorForType(instantSecondsComparator, Instant::class.java)
             .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
             .isEqualTo(expected)
 
-        actual.forEach { Assertions.assertThat(it.legalEntity.bpnl).isEqualTo(it.legalAddress.bpnLegalEntity) }
-        actual.forEach { Assertions.assertThat(it.legalEntity.currentness).isBetween(creationTimeframe.startTime, creationTimeframe.endTime) }
-        actual.forEach { Assertions.assertThat(it.legalEntity.createdAt).isBetween(creationTimeframe.startTime, creationTimeframe.endTime) }
-        actual.forEach { Assertions.assertThat(it.legalEntity.updatedAt).isBetween(updateTimeframe.startTime, updateTimeframe.endTime) }
+        actual.forEach { Assertions.assertThat(it.header.bpnl).isEqualTo(it.legalAddress.bpnLegalEntity) }
+        actual.forEach { Assertions.assertThat(it.header.currentness).isBetween(creationTimeframe.startTime, creationTimeframe.endTime) }
+        actual.forEach { Assertions.assertThat(it.header.createdAt).isBetween(creationTimeframe.startTime, creationTimeframe.endTime) }
+        actual.forEach { Assertions.assertThat(it.header.updatedAt).isBetween(updateTimeframe.startTime, updateTimeframe.endTime) }
         actual.forEach { Assertions.assertThat(it.legalAddress.createdAt).isBetween(creationTimeframe.startTime, creationTimeframe.endTime) }
         actual.forEach { Assertions.assertThat(it.legalAddress.updatedAt).isBetween(updateTimeframe.startTime, updateTimeframe.endTime) }
     }
@@ -83,10 +83,10 @@ class PoolAssertHelper(
                 "${SiteWithMainAddressVerboseDto::site.name}.${SiteVerboseDto::createdAt.name}",
                 "${SiteWithMainAddressVerboseDto::site.name}.${SiteVerboseDto::updatedAt.name}",
                 "${SiteWithMainAddressVerboseDto::site.name}.${SiteVerboseDto::bpns.name}",
-                "${SiteWithMainAddressVerboseDto::mainAddress.name}.${LogisticAddressVerboseDto::bpna.name}",
-                "${SiteWithMainAddressVerboseDto::mainAddress.name}.${LogisticAddressVerboseDto::bpnSite.name}",
-                "${SiteWithMainAddressVerboseDto::mainAddress.name}.${LogisticAddressVerboseDto::createdAt.name}",
-                "${SiteWithMainAddressVerboseDto::mainAddress.name}.${LogisticAddressVerboseDto::updatedAt.name}",
+                "${SiteWithMainAddressVerboseDto::mainAddress.name}.${LogisticAddressInvariantVerboseDto::bpna.name}",
+                "${SiteWithMainAddressVerboseDto::mainAddress.name}.${LogisticAddressInvariantVerboseDto::bpnSite.name}",
+                "${SiteWithMainAddressVerboseDto::mainAddress.name}.${LogisticAddressInvariantVerboseDto::createdAt.name}",
+                "${SiteWithMainAddressVerboseDto::mainAddress.name}.${LogisticAddressInvariantVerboseDto::updatedAt.name}",
             )
             .withComparatorForType(instantSecondsComparator, Instant::class.java)
             .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
@@ -100,8 +100,8 @@ class PoolAssertHelper(
     }
 
     fun assertAddressResponse(
-        actual: Collection<LogisticAddressVerboseDto>,
-        expected: Collection<LogisticAddressVerboseDto>,
+        actual: Collection<LogisticAddressInvariantVerboseDto>,
+        expected: Collection<LogisticAddressInvariantVerboseDto>,
         creationTimeframe: Timeframe,
         updateTimeframe: Timeframe = creationTimeframe
     ) {
@@ -111,9 +111,9 @@ class PoolAssertHelper(
             .ignoringCollectionOrder()
             .ignoringAllOverriddenEquals()
             .ignoringFields(
-                LogisticAddressVerboseDto::createdAt.name,
-                LogisticAddressVerboseDto::updatedAt.name,
-                LogisticAddressVerboseDto::bpna.name
+                LogisticAddressInvariantVerboseDto::createdAt.name,
+                LogisticAddressInvariantVerboseDto::updatedAt.name,
+                LogisticAddressInvariantVerboseDto::bpna.name
             )
             .withComparatorForType(instantSecondsComparator, Instant::class.java)
             .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)

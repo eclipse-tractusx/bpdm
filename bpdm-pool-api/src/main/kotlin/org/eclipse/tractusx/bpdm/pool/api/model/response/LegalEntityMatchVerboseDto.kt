@@ -23,8 +23,8 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityDescription
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityHeaderVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressInvariantVerboseDto
 
 @Schema(description = LegalEntityDescription.headerMatchResponse)
 data class LegalEntityMatchVerboseDto(
@@ -33,9 +33,9 @@ data class LegalEntityMatchVerboseDto(
     val score: Float,
 
     @field:JsonUnwrapped
-    val legalEntity: LegalEntityVerboseDto,
+    val legalEntity: LegalEntityHeaderVerboseDto,
 
     // TODO OpenAPI description for complex field does not work!!
     @get:Schema(description = LegalEntityDescription.legalAddress)
-    val legalAddress: LogisticAddressVerboseDto,
+    val legalAddress: LogisticAddressInvariantVerboseDto,
 )

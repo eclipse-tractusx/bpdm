@@ -82,6 +82,11 @@ object BusinessPartnerGenericCommonValues {
         states = emptyList()
     )
 
+    val addressWithScriptVariants = PostalAddressWithScriptVariants(
+        postalProperties = address,
+        scriptVariants = emptyList()
+    )
+
     //Business Partner with two entries in every collection
     val businessPartner1 = BusinessPartner(
         nameParts = emptyList(),
@@ -111,7 +116,7 @@ object BusinessPartnerGenericCommonValues {
                     type = BusinessStateType.ACTIVE
                 )
             ),
-            address = address
+            address = addressWithScriptVariants
         ),
         owningCompany = "BPNL_CLEANED_VALUES",
         legalEntity = LegalEntity(
@@ -131,7 +136,8 @@ object BusinessPartnerGenericCommonValues {
             states = emptyList(),
             isParticipantData = false,
             hasChanged = true,
-            legalAddress = address
+            legalAddress = address,
+            scriptVariants = emptyList()
         ),
         site = Site(
             bpnReference = BpnReference("000000123BBB222", null, BpnReferenceType.BpnRequestIdentifier),
@@ -146,8 +152,9 @@ object BusinessPartnerGenericCommonValues {
             ),
             states = emptyList(),
             hasChanged = true,
-            siteMainAddress = address
+            siteMainAddress = address,
+            scriptVariants = emptyList()
         ),
-        additionalAddress = address
+        additionalAddress = addressWithScriptVariants
     )
 }

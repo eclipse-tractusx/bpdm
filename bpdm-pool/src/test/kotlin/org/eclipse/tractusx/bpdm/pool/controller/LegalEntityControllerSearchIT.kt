@@ -23,8 +23,8 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityHeaderVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressInvariantVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntitySearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.util.TestHelpers
@@ -63,28 +63,28 @@ class LegalEntityControllerSearchIT @Autowired constructor(
         )
     )
     private val partnerStructure2 = LegalEntityStructureRequest(
-        legalEntity = with(BusinessPartnerNonVerboseValues.legalEntityCreate2){ copy(legalEntity = legalEntity.copy(legalName = BusinessPartnerNonVerboseValues.legalEntityCreate1.legalEntity.legalName) )},
+        legalEntity = with(BusinessPartnerNonVerboseValues.legalEntityCreate2){ copy(legalEntity = legalEntity.copy(header = legalEntity.header.copy(legalName = BusinessPartnerNonVerboseValues.legalEntityCreate1.legalEntity.header.legalName) ))},
         siteStructures = listOf(
             SiteStructureRequest(BusinessPartnerNonVerboseValues.siteCreate2),
             SiteStructureRequest(BusinessPartnerNonVerboseValues.siteCreate1) //same site here to attain multiple results when needed
         )
     )
 
-    private lateinit var givenPartner1: LegalEntityVerboseDto
-    private lateinit var givenPartner2: LegalEntityVerboseDto
+    private lateinit var givenPartner1: LegalEntityHeaderVerboseDto
+    private lateinit var givenPartner2: LegalEntityHeaderVerboseDto
     private lateinit var legalName1: String
     private lateinit var legalName2: String
-    private lateinit var legalAddress1: LogisticAddressVerboseDto
-    private lateinit var legalAddress2: LogisticAddressVerboseDto
+    private lateinit var legalAddress1: LogisticAddressInvariantVerboseDto
+    private lateinit var legalAddress2: LogisticAddressInvariantVerboseDto
 
     @BeforeEach
     fun beforeEach() {
         dbTestHelpers.truncateDbTables()
         val givenStructure = testHelpers.createBusinessPartnerStructure(listOf(partnerStructure1, partnerStructure2))
-        givenPartner1 = with(givenStructure[0].legalEntity) { legalEntity }
-        givenPartner2 = with(givenStructure[1].legalEntity) { legalEntity }
-        legalName1 = givenStructure[0].legalEntity.legalEntity.legalName
-        legalName2 = givenStructure[1].legalEntity.legalEntity.legalName
+        givenPartner1 = with(givenStructure[0].legalEntity) { header }
+        givenPartner2 = with(givenStructure[1].legalEntity) { header }
+        legalName1 = givenStructure[0].legalEntity.header.legalName
+        legalName2 = givenStructure[1].legalEntity.header.legalName
         legalAddress1 = givenStructure[0].legalEntity.legalAddress
         legalAddress2 = givenStructure[1].legalEntity.legalAddress
     }
@@ -100,8 +100,8 @@ class LegalEntityControllerSearchIT @Autowired constructor(
         val expected = PageDto(
             2, 1, 0, 2,
             listOf(
-                LegalEntityWithLegalAddressVerboseDto(legalEntity = givenPartner1, legalAddress = legalAddress1),
-                LegalEntityWithLegalAddressVerboseDto(legalEntity = givenPartner2, legalAddress = legalAddress2)
+                LegalEntityWithLegalAddressVerboseDto(header = givenPartner1, legalAddress = legalAddress1),
+                LegalEntityWithLegalAddressVerboseDto(header = givenPartner2, legalAddress = legalAddress2)
             )
         )
 
@@ -120,12 +120,12 @@ class LegalEntityControllerSearchIT @Autowired constructor(
 
         val expectedFirstPage = PageDto(
             2, 2, 0, 1, listOf(
-                LegalEntityWithLegalAddressVerboseDto(legalEntity = givenPartner1, legalAddress = legalAddress1)
+                LegalEntityWithLegalAddressVerboseDto(header = givenPartner1, legalAddress = legalAddress1)
             )
         )
         val expectedSecondPage = PageDto(
             2, 2, 1, 1, listOf(
-                LegalEntityWithLegalAddressVerboseDto(legalEntity = givenPartner2, legalAddress = legalAddress2)
+                LegalEntityWithLegalAddressVerboseDto(header = givenPartner2, legalAddress = legalAddress2)
             )
         )
 

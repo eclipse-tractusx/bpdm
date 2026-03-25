@@ -23,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.SiteDescription
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressInvariantVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerboseDto
 
 @Schema(description = SiteDescription.headerUpsertResponse)
@@ -34,7 +34,7 @@ data class SitePartnerCreateVerboseDto(
 
     // TODO OpenAPI description for complex field does not work!!
     @get:Schema(description = SiteDescription.mainAddress)
-    val mainAddress: LogisticAddressVerboseDto,
+    val mainAddress: LogisticAddressInvariantVerboseDto,
 
     @get:Schema(description = CommonDescription.index)
     val index: String?

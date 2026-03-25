@@ -194,8 +194,8 @@ class BusinessPartnerRelationStepDefs(
             validityPeriods = defaultPoolRelationStates
         )
 
-        val sourceRelations = sourceLegalEntity.legalEntity.relations
-        val targetRelations = targetLegalEntity.legalEntity.relations
+        val sourceRelations = sourceLegalEntity.header.relations
+        val targetRelations = targetLegalEntity.header.relations
 
         Assertions.assertThat(sourceRelations).contains(expectedRelation)
         Assertions.assertThat(targetRelations).contains(expectedRelation)

@@ -145,7 +145,10 @@ class GoldenRecordTaskLegacyServiceMapper(
                 isCatenaXMemberData = legalEntity.isCatenaXMemberData,
                 owningCompany = owningCompany,
                 legalEntityHasChanged = legalEntity.hasChanged,
-                siteHasChanged = site?.hasChanged
+                siteHasChanged = site?.hasChanged,
+                addressScriptVariants = mutableListOf(),
+                legalEntityHeaderScriptVariants = mutableListOf(),
+                siteHeaderScriptVariants = mutableListOf()
             )
         }
 
@@ -220,7 +223,7 @@ class GoldenRecordTaskLegacyServiceMapper(
                 PostalAddressDb.Scope.LegalAddress -> businessPartner.legalEntity.legalAddress
                 PostalAddressDb.Scope.SiteMainAddress -> businessPartner.site?.siteMainAddress
                 PostalAddressDb.Scope.AdditionalAddress -> businessPartner.additionalAddress
-                PostalAddressDb.Scope.UncategorizedAddress -> businessPartner.uncategorized.address
+                PostalAddressDb.Scope.UncategorizedAddress -> businessPartner.uncategorized.address?.postalProperties
             }?.let { scope to toPostalAddress(it, scope) }
         }.toMap().toMutableMap()
 
@@ -364,7 +367,7 @@ class GoldenRecordTaskLegacyServiceMapper(
             nameParts = toResponseUncategorizedNameParts(businessPartner.nameParts),
             identifiers = toResponseIdentifiers(businessPartner, IdentifierDb.Scope.Uncategorized),
             states = toResponseStates(businessPartner, BusinessStateDb.Scope.Uncategorized),
-            address = toResponsePostalAddress(businessPartner, PostalAddressDb.Scope.UncategorizedAddress)
+            address = toResponsePostalAddress(businessPartner, PostalAddressDb.Scope.UncategorizedAddress)?.let { PostalAddressWithScriptVariants(it, emptyList()) }
         )
 
     fun toResponseUncategorizedNameParts(nameParts: List<NamePartDb>) =
@@ -533,7 +536,8 @@ class GoldenRecordTaskLegacyServiceMapper(
                     states = toResponseStates(businessPartner, BusinessStateDb.Scope.Site),
                     confidenceCriteria = toResponseConfidence(businessPartner, ConfidenceCriteriaDb.Scope.Site),
                     hasChanged = siteHasChanged,
-                    siteMainAddress = toResponsePostalAddress(businessPartner, PostalAddressDb.Scope.SiteMainAddress)
+                    siteMainAddress = toResponsePostalAddress(businessPartner, PostalAddressDb.Scope.SiteMainAddress),
+                    scriptVariants = emptyList()
                 )
             }
         }

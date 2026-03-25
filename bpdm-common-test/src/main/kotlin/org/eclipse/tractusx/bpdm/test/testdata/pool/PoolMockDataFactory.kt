@@ -45,7 +45,7 @@ class PoolMockDataFactory(
         val mockedLegalEntity = expectedResultFactory.mapToExpectedLegalEntity(legalEntityRequest, givenBpnL = "BPNL$seed")
 
         mockLegalEntitySearchResult(mockedLegalEntity)
-        mockAddressSearchResult(mockedLegalEntity.legalAddress)
+        mockAddressSearchResult(LogisticAddressVerboseDto(mockedLegalEntity.legalAddress, emptyList()))
 
         return mockedLegalEntity
     }
@@ -56,12 +56,12 @@ class PoolMockDataFactory(
         val legalEntityRequest = requestFactory.createLegalEntityRequest(seed)
         val mockedLegalEntity = expectedResultFactory.mapToExpectedLegalEntity(legalEntityRequest, givenBpnL = "BPNL$seed")
 
-        val siteRequest = requestFactory.buildSiteCreateRequest(seed, mockedLegalEntity.legalEntity.bpnl)
-        val mockedSite = expectedResultFactory.mapToExpectedSite(siteRequest, mockedLegalEntity.legalEntity.isParticipantData, givenBpnS = "BPNS$seed")
+        val siteRequest = requestFactory.buildSiteCreateRequest(seed, mockedLegalEntity.header.bpnl)
+        val mockedSite = expectedResultFactory.mapToExpectedSite(siteRequest, mockedLegalEntity.header.isParticipantData, givenBpnS = "BPNS$seed")
 
         mockLegalEntitySearchResult(mockedLegalEntity)
         mockSiteSearchResult(mockedSite)
-        mockAddressSearchResult(mockedSite.mainAddress)
+        mockAddressSearchResult(LogisticAddressVerboseDto(mockedSite.mainAddress, emptyList()))
 
         return SiteWithLegalEntityParent(mockedLegalEntity, mockedSite)
     }
@@ -73,10 +73,10 @@ class PoolMockDataFactory(
             .let{ expectedResultFactory.mapToExpectedLegalEntity(it,  givenBpnL = "BPNL$seed") }
 
         val site = requestFactory.buildSiteCreateRequest(seed, "BPNL$seed")
-            .let { expectedResultFactory.mapToExpectedSite(it, legalEntity.legalEntity.isParticipantData, givenBpnS = "BPNS$seed") }
+            .let { expectedResultFactory.mapToExpectedSite(it, legalEntity.header.isParticipantData, givenBpnS = "BPNS$seed") }
 
         val legalAndSiteMainAddress = requestFactory.buildAdditionalAddressCreateRequest(seed, bpnParent = "BPNS$seed")
-            .let { expectedResultFactory.mapToExpectedAdditionalAddress(it, legalEntity.legalEntity.isParticipantData) }
+            .let { expectedResultFactory.mapToExpectedAdditionalAddress(it, legalEntity.header.isParticipantData) }
             .copy(addressType = AddressType.LegalAndSiteMainAddress)
 
 
@@ -85,7 +85,7 @@ class PoolMockDataFactory(
 
         mockLegalEntitySearchResult(mockedLegalEntityResponse)
         mockSiteSearchResult(mockedSiteResponse)
-        mockAddressSearchResult(mockedSiteResponse.mainAddress)
+        mockAddressSearchResult(LogisticAddressVerboseDto(mockedSiteResponse.mainAddress, emptyList()))
 
         return SiteWithLegalEntityParent(mockedLegalEntityResponse, mockedSiteResponse)
     }
@@ -111,8 +111,9 @@ class PoolMockDataFactory(
         WireMock.reset()
 
         val mockedLegalEntity = expectedResultFactory.mapToExpectedLegalEntity(legalEntityRequest, siteRequest.bpnlParent, isMaintainConfidences = true)
-        val mockedSite = expectedResultFactory.mapToExpectedSite(siteRequest, mockedLegalEntity.legalEntity.isParticipantData, additionalAddressRequest.bpnParent, isMaintainConfidences = true)
-        val mockedAddress = expectedResultFactory.mapToExpectedAdditionalAddress(additionalAddressRequest, mockedLegalEntity.legalEntity.isParticipantData, givenBpnA = "BPNA$seed", isMaintainConfidences = true)
+        val mockedSite = expectedResultFactory.mapToExpectedSite(siteRequest, mockedLegalEntity.header.isParticipantData, additionalAddressRequest.bpnParent, isMaintainConfidences = true)
+        val mockedInvariantAddress = expectedResultFactory.mapToExpectedAdditionalAddress(additionalAddressRequest, mockedLegalEntity.header.isParticipantData, givenBpnA = "BPNA$seed", isMaintainConfidences = true)
+        val mockedAddress = LogisticAddressVerboseDto(mockedInvariantAddress, additionalAddressRequest.scriptVariants)
 
         mockLegalEntitySearchResult(mockedLegalEntity)
         mockSiteSearchResult(mockedSite)

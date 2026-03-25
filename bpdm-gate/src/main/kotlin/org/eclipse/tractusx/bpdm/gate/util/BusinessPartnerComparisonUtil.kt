@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.util
 
+import org.eclipse.tractusx.bpdm.gate.entity.BusinessPartnerScriptVariantDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.PostalAddressDb
 import org.springframework.stereotype.Component
@@ -42,12 +43,30 @@ class BusinessPartnerComparisonUtil {
                 entity.stage != persistedBP.stage ||
                 entity.identifiers != persistedBP.identifiers ||
                 entity.states != persistedBP.states ||
-                postalAddressHasChanges(entity.postalAddress, persistedBP.postalAddress)
+                postalAddressHasChanges(entity.postalAddress, persistedBP.postalAddress) ||
+                scriptVariantsHaveChanges(entity.scriptVariants, persistedBP.scriptVariants)
     }
 
     private fun postalAddressHasChanges(entityPostalAddress: PostalAddressDb, persistedPostalAddress: PostalAddressDb): Boolean {
         return (entityPostalAddress.addressType != persistedPostalAddress.addressType) ||
                 (entityPostalAddress.alternativePostalAddress != persistedPostalAddress.alternativePostalAddress) ||
                 (entityPostalAddress.physicalPostalAddress != persistedPostalAddress.physicalPostalAddress)
+    }
+
+    private fun scriptVariantsHaveChanges(entities: List<BusinessPartnerScriptVariantDb>, persistedEntities: List<BusinessPartnerScriptVariantDb>): Boolean{
+        return entities.size != persistedEntities.size ||
+                entities.sortedBy { it.scriptCode }.zip(persistedEntities.sortedBy { it.scriptCode }){ entity, persistedEntity ->
+                    scriptVariantHasChanges(entity, persistedEntity)
+                }.any { it }
+    }
+
+    private fun scriptVariantHasChanges(entity: BusinessPartnerScriptVariantDb, persistedEntity: BusinessPartnerScriptVariantDb): Boolean{
+        return entity.scriptCode != persistedEntity.scriptCode ||
+                entity.siteName != persistedEntity.siteName ||
+                entity.legalName != persistedEntity.legalName ||
+                entity.shortName != persistedEntity.shortName ||
+                entity.nameParts != persistedEntity.nameParts ||
+                entity.physicalAddress != persistedEntity.physicalAddress ||
+                entity.alternativeAddress != persistedEntity.alternativeAddress
     }
 }

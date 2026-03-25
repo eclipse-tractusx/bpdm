@@ -48,6 +48,33 @@ fun <T> MutableCollection<T>.copyAndSync(elements: Collection<T>, copyFunction: 
     }
 }
 
+fun <T> MutableCollection<T>.copyAndSync(elements: Collection<T>, copyFunction: (T, T) -> T, createFunction: () -> T) {
+    // copy the overlap of the two collections
+    elements.zip(this).forEach { (fromState, toState) -> copyFunction(fromState, toState) }
+
+    val sizeDifference = size - elements.size
+    if (sizeDifference > 0) {
+        //Remove the remaining elements from the original collection
+        drop(elements.size).forEach { remove(it) }
+    } else {
+        //Add the additional elements to the original collection
+        val newElements = elements.drop(size)
+        addAll(newElements.map { copyFunction(it, createFunction()) })
+    }
+}
+
+fun <K, V> MutableMap<K, V>.copyAndSync(fromMap: Map<K, V>, copyFunction: (V, V) -> V, createFunction: (V) -> V) {
+    val (keysInBothMaps, keysNotInFromMap) = this.keys.partition { fromMap.containsKey(it) }
+    val keysNotInThisMap = fromMap.keys.mapNotNull{ key -> if(this.containsKey(key)) null else key }
+
+    //Update existing
+    keysInBothMaps.forEach{ key -> copyFunction(fromMap[key]!!, this[key]!!) }
+    //Delete if missing in new map
+    keysNotInFromMap.forEach { key -> this.remove(key) }
+    //Add if missing in this map
+    keysNotInThisMap.forEach { key -> this[key] = createFunction(fromMap[key]!!) }
+}
+
 fun <T> Collection<T>.findDuplicates(): Set<T> =
     this.groupBy { it }
         .filter { it.value.size > 1 }

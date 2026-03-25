@@ -72,4 +72,9 @@ class MetadataController(
         return metadataService.getCountrySubdivisions(paginationRequest)
     }
 
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
+    override fun getScriptCodes(paginationRequest: PaginationRequest): PageDto<ScriptCodeDto> {
+       return metadataService.getScriptCodes(paginationRequest)
+    }
+
 }

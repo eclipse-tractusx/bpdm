@@ -23,15 +23,10 @@ import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
+import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityIdentifierDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.RelationType
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntitySearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityCreateError
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityUpdateError
+import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
@@ -42,7 +37,6 @@ import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseVal
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues.addressIdentifier
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues.addressIdentifier1
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues.addressIdentifier2
-import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues.logisticAddress3
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerVerboseValues
 import org.eclipse.tractusx.bpdm.test.testdata.pool.LegalEntityStructureRequest
 import org.eclipse.tractusx.bpdm.test.util.AssertHelpers
@@ -84,13 +78,9 @@ class LegalEntityControllerIT @Autowired constructor(
      */
     @Test
     fun `create new legal entity`() {
-        val expectedBpn = BusinessPartnerVerboseValues.legalEntityUpsert1.legalEntity.bpnl
+        val expectedBpn = BusinessPartnerVerboseValues.legalEntityUpsert1.legalEntity.header.bpnl
         val expected = with(BusinessPartnerVerboseValues.legalEntityUpsert1) {
-            copy(
-                legalEntity = legalEntity.copy(
-                    bpnl = expectedBpn
-                )
-            )
+            copy(legalEntity = legalEntity.withBpnL(expectedBpn))
         }
 
         val toCreate = BusinessPartnerNonVerboseValues.legalEntityCreate1
@@ -127,25 +117,19 @@ class LegalEntityControllerIT @Autowired constructor(
         val request1 = with(BusinessPartnerNonVerboseValues.legalEntityCreate1) {
             copy(
                 index = BusinessPartnerNonVerboseValues.legalEntityCreate1.index,
-                legalEntity = legalEntity.copy(
-
-                )
+                legalEntity = legalEntity.withLegalIdentifier(equivalentIdentifier)
             )
         }
         val request2 = with(BusinessPartnerNonVerboseValues.legalEntityCreate1) {
             copy(
                 index = BusinessPartnerNonVerboseValues.legalEntityCreate2.index,
-                legalEntity = legalEntity.copy(
-                    identifiers = listOf(identicalIdentifier)
-                )
+                legalEntity = legalEntity.withLegalIdentifier(identicalIdentifier)
             )
         }
         val request3 = with(BusinessPartnerNonVerboseValues.legalEntityCreate1) {
             copy(
                 index = BusinessPartnerNonVerboseValues.legalEntityCreate3.index,
-                legalEntity = legalEntity.copy(
-                    identifiers = listOf(equivalentIdentifier)
-                )
+                legalEntity = legalEntity.withLegalIdentifier(identicalIdentifier)
             )
         }
         val requestOkay = BusinessPartnerNonVerboseValues.legalEntityCreate3
@@ -173,19 +157,17 @@ class LegalEntityControllerIT @Autowired constructor(
         val request1 = with(BusinessPartnerNonVerboseValues.legalEntityCreate1) {
             copy(
                 index = BusinessPartnerNonVerboseValues.legalEntityCreate1.index,
-                legalEntity = legalEntity.copy(
-                    identifiers = listOf()
-                ),
-                legalAddress = logisticAddress3.copy(identifiers = listOf(addressIdentifier))
+                legalEntity =  legalEntity
+                    .withLegalIdentifiers(emptyList())
+                    .withAddressIdentifier(addressIdentifier)
             )
         }
         val request2 = with(BusinessPartnerNonVerboseValues.legalEntityCreate1) {
             copy(
                 index = BusinessPartnerNonVerboseValues.legalEntityCreate2.index,
-                legalEntity = legalEntity.copy(
-                    identifiers = listOf()
-                ),
-                legalAddress = logisticAddress3.copy(identifiers = listOf(addressIdentifier))
+                legalEntity = legalEntity
+                    .withLegalIdentifiers(emptyList())
+                    .withAddressIdentifier(addressIdentifier)
             )
         }
 
@@ -213,7 +195,7 @@ class LegalEntityControllerIT @Autowired constructor(
         val response1 = poolClient.legalEntities.createBusinessPartners(toCreate1)
 
         assertThat(response1.errorCount).isEqualTo(0)
-        val bpnList = response1.entities.map { it.legalEntity.bpnl }
+        val bpnList = response1.entities.map { it.legalEntity.header.bpnl }
 
         // 2 equivalent identifiers (in regard to fields type and value) but different from the identifiers in the DB
         val referenceIdentifier = BusinessPartnerNonVerboseValues.identifier3.copy(
@@ -227,17 +209,13 @@ class LegalEntityControllerIT @Autowired constructor(
         val toUpdate1 = with(BusinessPartnerNonVerboseValues.legalEntityUpdate1) {
             copy(
                 bpnl = bpnList[0],
-                legalEntity = legalEntity.copy(
-                    identifiers = listOf(referenceIdentifier)
-                )
+                legalEntity = legalEntity.withLegalIdentifier(referenceIdentifier)
             )
         }
         val toUpdate2 = with(BusinessPartnerNonVerboseValues.legalEntityUpdate2) {
             copy(
                 bpnl = bpnList[1],
-                legalEntity = legalEntity.copy(
-                    identifiers = listOf(equivalentIdentifier)
-                )
+                legalEntity = legalEntity.withLegalIdentifier(equivalentIdentifier)
             )
         }
 
@@ -261,19 +239,18 @@ class LegalEntityControllerIT @Autowired constructor(
         val toCreate1 = listOf(
             BusinessPartnerNonVerboseValues.legalEntityCreate1
             , BusinessPartnerNonVerboseValues.legalEntityCreate2.copy(
-                legalAddress = BusinessPartnerNonVerboseValues.logisticAddress2.copy(
-                    identifiers = listOf(addressIdentifier1, addressIdentifier2))
-            ))
+                legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate2.legalEntity.withAddressIdentifiers(listOf(addressIdentifier1, addressIdentifier2))
+               ))
         val response1 = poolClient.legalEntities.createBusinessPartners(toCreate1)
 
         assertThat(response1.errorCount).isEqualTo(0)
-        val bpnList = response1.entities.map { it.legalEntity.bpnl }
+        val bpnList = response1.entities.map { it.legalEntity.header.bpnl }
 
         // requests using these equivalent identifiers & 1 different request
         val toUpdate1 = with(BusinessPartnerNonVerboseValues.legalEntityUpdate1) {
             copy(
                 bpnl = bpnList[0],
-                legalAddress = legalAddress.copy( identifiers = listOf(addressIdentifier1, addressIdentifier2))
+                legalEntity = legalEntity.withAddressIdentifiers(listOf(addressIdentifier1, addressIdentifier2))
             )
         }
 
@@ -281,7 +258,7 @@ class LegalEntityControllerIT @Autowired constructor(
         val toUpdate2 = with(BusinessPartnerNonVerboseValues.legalEntityUpdate2) {
             copy(
                 bpnl = bpnList[1],
-                legalAddress = legalAddress.copy( identifiers = listOf(addressIdentifier1, addressIdentifier2))
+                legalEntity = legalEntity.withAddressIdentifiers(listOf(addressIdentifier1, addressIdentifier2))
             )
         }
 
@@ -299,13 +276,15 @@ class LegalEntityControllerIT @Autowired constructor(
         val toCreate1 = listOf(
             BusinessPartnerNonVerboseValues.legalEntityCreate1
             , BusinessPartnerNonVerboseValues.legalEntityCreate2.copy(
-                legalAddress = BusinessPartnerNonVerboseValues.logisticAddress2.copy(
-                    identifiers = listOf(addressIdentifier1, addressIdentifier2))
+                legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate2.legalEntity.copy(
+                    legalAddress = BusinessPartnerNonVerboseValues.logisticAddress2.copy(
+                        identifiers = listOf(addressIdentifier1, addressIdentifier2))
+                )
             ))
         val response1 = poolClient.legalEntities.createBusinessPartners(toCreate1)
 
         assertThat(response1.errorCount).isEqualTo(0)
-        val bpnList = response1.entities.map { it.legalEntity.bpnl }
+        val bpnList = response1.entities.map { it.legalEntity.header.bpnl }
 
         // 2 equivalent identifiers (in regard to fields type and value) but different from the identifiers in the DB
         val referenceIdentifier = BusinessPartnerNonVerboseValues.identifier3.copy(
@@ -316,14 +295,14 @@ class LegalEntityControllerIT @Autowired constructor(
         val toUpdate1 = with(BusinessPartnerNonVerboseValues.legalEntityUpdate1) {
             copy(
                 bpnl = bpnList[0],
-                legalEntity = legalEntity.copy(identifiers = listOf(referenceIdentifier))
+                legalEntity = legalEntity.withLegalIdentifier(referenceIdentifier)
             )
         }
 
         val toUpdate2 = with(BusinessPartnerNonVerboseValues.legalEntityUpdate2) {
             copy(
                 bpnl = bpnList[1],
-                legalAddress = legalAddress.copy( identifiers = listOf(addressIdentifier1, addressIdentifier2))
+                legalEntity = legalEntity.withAddressIdentifiers(listOf(addressIdentifier1, addressIdentifier2))
             )
         }
 
@@ -357,7 +336,9 @@ class LegalEntityControllerIT @Autowired constructor(
      */
     @Test
     fun `don't create legal entity with same identifier`() {
-        val given = with(BusinessPartnerNonVerboseValues.legalEntityCreate1) { copy(legalEntity = legalEntity.copy(identifiers = listOf(BusinessPartnerNonVerboseValues.identifier1))) }
+        val given = with(BusinessPartnerNonVerboseValues.legalEntityCreate1) { copy(legalEntity = legalEntity.copy(header = legalEntity.header.copy(
+            identifiers = listOf(BusinessPartnerNonVerboseValues.identifier1)
+        ))) }
         poolClient.legalEntities.createBusinessPartners(listOf(given))
         val expected = listOf(BusinessPartnerVerboseValues.legalEntityUpsert2, BusinessPartnerVerboseValues.legalEntityUpsert3)
 
@@ -382,10 +363,12 @@ class LegalEntityControllerIT @Autowired constructor(
         val given = with(BusinessPartnerNonVerboseValues.legalEntityCreate1) {
             copy(
                 legalEntity = legalEntity.copy(
-                    identifiers = listOf()
-                ),
-                legalAddress = legalAddress.copy(
-                    identifiers = listOf(addressIdentifier)
+                    header = legalEntity.header.copy(
+                        identifiers = listOf()
+                    ),
+                    legalAddress = legalEntity.legalAddress.copy(
+                        identifiers = listOf(addressIdentifier)
+                    )
                 )
             )
         }
@@ -413,19 +396,11 @@ class LegalEntityControllerIT @Autowired constructor(
 
         val createResponse = poolClient.legalEntities.createBusinessPartners(given)
             .entities.single()
-        val givenBpnL = createResponse.legalEntity.bpnl
-        val givenBpnA = createResponse.legalAddress.bpna
+        val givenBpnL = createResponse.legalEntity.header.bpnl
+        val givenBpnA = createResponse.legalEntity.legalAddress.bpna
 
         val expected = with(BusinessPartnerVerboseValues.legalEntityUpsert3) {
-            copy(
-                legalAddress = legalAddress.copy(
-                    bpna = givenBpnA,
-                    bpnLegalEntity = givenBpnL
-                ),
-                legalEntity = legalEntity.copy(
-                    bpnl = givenBpnL,
-                ),
-            )
+            copy(legalEntity = legalEntity.withBpnL(givenBpnL).withBpnA(givenBpnA))
         }
 
         val toUpdate = BusinessPartnerNonVerboseValues.legalEntityUpdate3.copy(
@@ -448,28 +423,18 @@ class LegalEntityControllerIT @Autowired constructor(
 
         val createResponse = poolClient.legalEntities.createBusinessPartners(given)
         val createdEntity = createResponse.entities.toList()[1]
-        val bpnL = createdEntity.legalEntity.bpnl
-        val bpnA = createdEntity.legalAddress.bpna
+        val bpnL = createdEntity.legalEntity.header.bpnl
+        val bpnA = createdEntity.legalEntity.legalAddress.bpna
 
         val toUpdate1 =
-            BusinessPartnerNonVerboseValues.legalEntityUpdate3.copy(bpnl = "NONEXISTENT", legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate1.legalEntity.copy(identifiers = listOf()))
+            BusinessPartnerNonVerboseValues.legalEntityUpdate3.copy(bpnl = "NONEXISTENT", legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate1.legalEntity.withLegalIdentifiers(listOf()))
         val toUpdate2 =
-            BusinessPartnerNonVerboseValues.legalEntityUpdate3.copy(bpnl = bpnL, legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate3.legalEntity.copy(identifiers = listOf()))
+            BusinessPartnerNonVerboseValues.legalEntityUpdate3.copy(bpnl = bpnL, legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate3.legalEntity.withLegalIdentifiers(listOf()))
 
         val toUpdate = listOf(toUpdate1, toUpdate2)
 
         val expected = with(BusinessPartnerVerboseValues.legalEntityUpsert3) {
-            copy(
-                legalAddress = legalAddress.copy(
-                    bpna = bpnA,
-                    bpnLegalEntity = bpnL
-                ),
-                legalEntity = legalEntity.copy(
-                    bpnl = bpnL,
-                    identifiers = listOf()
-                ),
-
-                )
+            copy(legalEntity = legalEntity.withBpnL(bpnL).withBpnA(bpnA).withLegalIdentifiers(listOf()))
         }
 
         val response = poolClient.legalEntities.updateBusinessPartners(toUpdate)
@@ -497,11 +462,11 @@ class LegalEntityControllerIT @Autowired constructor(
         val givenLegalEntities = testHelpers.createBusinessPartnerStructure(givenStructures).map { it.legalEntity }
 
         val expected = givenLegalEntities
-            .map { it.legalEntity }
+            .map { it.header }
             .take(2) // only search for a subset of the existing legal entities
 
         val bpnsToSearch = LegalEntitySearchRequest(bpnLs = expected.map { it.bpnl })
-        val response = poolClient.legalEntities.postLegalEntitySearch(bpnsToSearch, PaginationRequest()).content.map { it.legalEntity }
+        val response = poolClient.legalEntities.postLegalEntitySearch(bpnsToSearch, PaginationRequest()).content.map { it.header }
 
         assertThat(response)
             .usingRecursiveComparison()
@@ -525,11 +490,11 @@ class LegalEntityControllerIT @Autowired constructor(
         val givenLegalEntities = testHelpers.createBusinessPartnerStructure(givenStructures).map { it.legalEntity }
 
         val expected = givenLegalEntities
-            .map { it.legalEntity }
+            .map { it.header }
             .first() // search for first
 
         val identifierToFind = expected.identifiers.first()
-        val response = poolClient.legalEntities.getLegalEntity(identifierToFind.value, identifierToFind.typeVerbose.technicalKey).legalEntity
+        val response = poolClient.legalEntities.getLegalEntity(identifierToFind.value, identifierToFind.typeVerbose.technicalKey).header
 
         assertThat(response)
             .usingRecursiveComparison()
@@ -553,13 +518,13 @@ class LegalEntityControllerIT @Autowired constructor(
         val givenLegalEntities = testHelpers.createBusinessPartnerStructure(givenStructures).map { it.legalEntity }
 
         val expected = givenLegalEntities
-            .map { it.legalEntity }
+            .map { it.header }
             .first() // search for first
 
         var identifierToFind = expected.identifiers.first()
         identifierToFind = identifierToFind.copy(value = changeCase(identifierToFind.value))
 
-        val response = poolClient.legalEntities.getLegalEntity(identifierToFind.value, identifierToFind.typeVerbose.technicalKey).legalEntity
+        val response = poolClient.legalEntities.getLegalEntity(identifierToFind.value, identifierToFind.typeVerbose.technicalKey).header
 
         assertThat(response)
             .usingRecursiveComparison()
@@ -583,12 +548,12 @@ class LegalEntityControllerIT @Autowired constructor(
         val givenLegalEntities = testHelpers.createBusinessPartnerStructure(givenStructures).map { it.legalEntity }
 
         val expected = givenLegalEntities
-            .map { it.legalEntity }
+            .map { it.header }
             .first() // search for first
 
         val bpnToFind = expected.bpnl
 
-        val response = poolClient.legalEntities.getLegalEntity(bpnToFind).legalEntity
+        val response = poolClient.legalEntities.getLegalEntity(bpnToFind).header
 
         assertThat(response)
             .usingRecursiveComparison()
@@ -612,11 +577,11 @@ class LegalEntityControllerIT @Autowired constructor(
         val givenLegalEntities = testHelpers.createBusinessPartnerStructure(givenStructures).map { it.legalEntity }
 
         val expected = givenLegalEntities
-            .map { it.legalEntity }
+            .map { it.header }
             .first() // search for first
 
         val bpnToFind = changeCase(expected.bpnl)
-        val response = poolClient.legalEntities.getLegalEntity(bpnToFind).legalEntity
+        val response = poolClient.legalEntities.getLegalEntity(bpnToFind).header
 
         assertThat(response)
             .usingRecursiveComparison()
@@ -641,11 +606,11 @@ class LegalEntityControllerIT @Autowired constructor(
         val givenLegalEntities = testHelpers.createBusinessPartnerStructure(givenStructures).map { it.legalEntity }
 
         val expected = givenLegalEntities
-            .map { it.legalEntity }
+            .map { it.header }
             .take(2) // only search for a subset of the existing legal entities
 
         val bpnsToSearch = LegalEntitySearchRequest(bpnLs = expected.map { it.bpnl }.plus("NONEXISTENT")) // also search for nonexistent BPN
-        val response = poolClient.legalEntities.postLegalEntitySearch(bpnsToSearch, PaginationRequest()).content.map { it.legalEntity }
+        val response = poolClient.legalEntities.postLegalEntitySearch(bpnsToSearch, PaginationRequest()).content.map { it.header }
 
         assertThat(response)
             .usingRecursiveComparison()
@@ -681,8 +646,8 @@ class LegalEntityControllerIT @Autowired constructor(
         // Step 2: Create a relation
         val relation = RelationDb(
             type = relationType,
-            startNode = legalEntityRepository.findByBpnIgnoreCase(savedEntity1.legalEntity.bpnl)!!,
-            endNode = legalEntityRepository.findByBpnIgnoreCase(savedEntity2.legalEntity.bpnl)!!,
+            startNode = legalEntityRepository.findByBpnIgnoreCase(savedEntity1.legalEntity.header.bpnl)!!,
+            endNode = legalEntityRepository.findByBpnIgnoreCase(savedEntity2.legalEntity.header.bpnl)!!,
             validityPeriods = mutableListOf(
                 RelationValidityPeriodDb(
                     validFrom = LocalDate.parse("1970-01-01"),
@@ -698,12 +663,12 @@ class LegalEntityControllerIT @Autowired constructor(
 
         assertThat(savedRelation).isNotNull
         assertThat(savedRelation.first().type).isEqualTo(relationType)
-        assertThat(savedRelation.first().startNode.bpn).isEqualTo(savedEntity1.legalEntity.bpnl)
-        assertThat(savedRelation.first().endNode.bpn).isEqualTo(savedEntity2.legalEntity.bpnl)
+        assertThat(savedRelation.first().startNode.bpn).isEqualTo(savedEntity1.legalEntity.header.bpnl)
+        assertThat(savedRelation.first().endNode.bpn).isEqualTo(savedEntity2.legalEntity.header.bpnl)
 
         //Step 4: Retrieve legal entity with the relation exists
-        val bpnToFind = changeCase(savedEntity1.legalEntity.bpnl)
-        val responseLegalEntity = poolClient.legalEntities.getLegalEntity(bpnToFind).legalEntity
+        val bpnToFind = changeCase(savedEntity1.legalEntity.header.bpnl)
+        val responseLegalEntity = poolClient.legalEntities.getLegalEntity(bpnToFind).header
         assertThat(responseLegalEntity.relations).isNotNull
         assertThat(responseLegalEntity.relations.first().type).isEqualTo(savedRelation.first().type)
         assertThat(responseLegalEntity.relations.first().businessPartnerSourceBpnl).isEqualTo(savedRelation.first().startNode.bpn)
@@ -716,7 +681,7 @@ class LegalEntityControllerIT @Autowired constructor(
     @Test
     fun `create legal entity - too many legal identifiers`(){
         val legalEntity = with(BusinessPartnerNonVerboseValues.legalEntityCreate1){
-            copy(legalEntity = legalEntity.copy(
+            copy(legalEntity = legalEntity.withLegalIdentifiers(
                 identifiers = (1 .. 101).map { LegalEntityIdentifierDto(it.toString(), BusinessPartnerNonVerboseValues.identifierType1.technicalKey, null) }
             ))
         }
@@ -736,7 +701,7 @@ class LegalEntityControllerIT @Autowired constructor(
     @Test
     fun `create legal entity - too many legal address identifiers`(){
         val legalEntity = with(BusinessPartnerNonVerboseValues.legalEntityCreate1){
-            copy(legalAddress = legalAddress.copy(
+            copy(legalEntity = legalEntity.withAddressIdentifiers(
                 identifiers = (1 .. 101).map { AddressIdentifierDto(it.toString(), BusinessPartnerNonVerboseValues.addressIdentifierTypeDto1.technicalKey) }
             ))
         }
@@ -758,11 +723,11 @@ class LegalEntityControllerIT @Autowired constructor(
 
         val bpnL = poolClient.legalEntities.createBusinessPartners(listOf(
             BusinessPartnerNonVerboseValues.legalEntityCreate1
-        )).entities.single().legalEntity.bpnl
+        )).entities.single().legalEntity.header.bpnl
 
         val legalEntity = with(BusinessPartnerNonVerboseValues.legalEntityUpdate1){
             copy(bpnl = bpnL,
-                legalEntity = legalEntity.copy(
+                legalEntity = legalEntity.withLegalIdentifiers(
                 identifiers = (1 .. 101).map { LegalEntityIdentifierDto(it.toString(), BusinessPartnerNonVerboseValues.identifierType1.technicalKey, null) }
             ))
         }
@@ -784,11 +749,11 @@ class LegalEntityControllerIT @Autowired constructor(
 
         val bpnL = poolClient.legalEntities.createBusinessPartners(listOf(
             BusinessPartnerNonVerboseValues.legalEntityCreate1
-        )).entities.single().legalEntity.bpnl
+        )).entities.single().legalEntity.header.bpnl
 
         val legalEntity = with(BusinessPartnerNonVerboseValues.legalEntityUpdate1){
             copy(bpnl = bpnL,
-                legalAddress = legalAddress.copy(
+                legalEntity = legalEntity.withAddressIdentifiers(
                     identifiers = (1 .. 101).map { AddressIdentifierDto(it.toString(), BusinessPartnerNonVerboseValues.addressIdentifierTypeDto1.technicalKey) }
                 ))
         }
@@ -808,14 +773,16 @@ class LegalEntityControllerIT @Autowired constructor(
     fun assertThatCreatedLegalEntitiesEqual(actuals: Collection<LegalEntityPartnerCreateVerboseDto>, expected: Collection<LegalEntityPartnerCreateVerboseDto>) {
         val now = Instant.now()
         val justBeforeCreate = now.minusSeconds(2)
-        actuals.forEach { assertThat(it.legalEntity.currentness).isBetween(justBeforeCreate, now) }
-        actuals.forEach { assertThat(it.legalEntity.bpnl).matches(testHelpers.bpnLPattern) }
+        actuals.forEach { assertThat(it.legalEntity.header.currentness).isBetween(justBeforeCreate, now) }
+        actuals.forEach { assertThat(it.legalEntity.header.bpnl).matches(testHelpers.bpnLPattern) }
 
-        assertHelpers.assertRecursively(actuals)
-            .ignoringFields(LegalEntityPartnerCreateVerboseDto::index.name)
-            .ignoringFieldsOfTypes(Instant::class.java)
-            .ignoringFieldsMatchingRegexes(".*${LegalEntityVerboseDto::bpnl.name}")
-            .isEqualTo(expected)
+        actuals.sortedBy { it.index }.zip(expected.sortedBy { it.index }){ actual, expected ->
+            assertHelpers.assertRecursively(actual)
+                .ignoringFields(LegalEntityPartnerCreateVerboseDto::index.name)
+                .ignoringFieldsOfTypes(Instant::class.java)
+                .ignoringFieldsMatchingRegexes(".*${LegalEntityHeaderVerboseDto::bpnl.name}")
+                .isEqualTo(expected)
+        }
     }
 
     fun assertThatModifiedLegalEntitiesEqual(
@@ -824,7 +791,7 @@ class LegalEntityControllerIT @Autowired constructor(
     ) {
         val now = Instant.now()
         val justBeforeCreate = now.minusSeconds(3)
-        actuals.forEach { assertThat(it.legalEntity.currentness).isBetween(justBeforeCreate, now) }
+        actuals.forEach { assertThat(it.legalEntity.header.currentness).isBetween(justBeforeCreate, now) }
 
         assertHelpers.assertRecursively(actuals)
             .ignoringFieldsOfTypes(Instant::class.java)
@@ -839,5 +806,36 @@ class LegalEntityControllerIT @Autowired constructor(
             value.lowercase()
         else
             throw IllegalArgumentException("Can't change case of string $value")
+    }
+
+
+    private fun LegalEntityDto.withLegalIdentifier(identifier: LegalEntityIdentifierDto): LegalEntityDto{
+        return withLegalIdentifiers(listOf(identifier))
+    }
+    private fun LegalEntityDto.withLegalIdentifiers(identifiers: List<LegalEntityIdentifierDto>): LegalEntityDto{
+        return copy(header = header.copy(identifiers = identifiers))
+    }
+
+    private fun LegalEntityDto.withAddressIdentifier(identifier: AddressIdentifierDto): LegalEntityDto{
+        return withAddressIdentifiers(listOf(identifier))
+    }
+
+    private fun LegalEntityDto.withAddressIdentifiers(identifiers: List<AddressIdentifierDto>): LegalEntityDto{
+        return copy(legalAddress = legalAddress.copy(identifiers = identifiers))
+    }
+
+    private fun LegalEntityWithLegalAddressVerboseDto.withBpnL(bpnL: String): LegalEntityWithLegalAddressVerboseDto{
+        return copy(
+            header = header.copy(bpnl = bpnL),
+            legalAddress = legalAddress.copy(bpnLegalEntity = bpnL)
+        )
+    }
+
+    private fun LegalEntityWithLegalAddressVerboseDto.withBpnA(bpnA: String): LegalEntityWithLegalAddressVerboseDto{
+        return copy(legalAddress = legalAddress.copy(bpna = bpnA))
+    }
+
+    private fun LegalEntityWithLegalAddressVerboseDto.withLegalIdentifiers(identifiers: List<LegalEntityIdentifierVerboseDto>): LegalEntityWithLegalAddressVerboseDto{
+        return copy(header = header.copy(identifiers = identifiers))
     }
 }

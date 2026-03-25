@@ -42,7 +42,8 @@ class OrchestratorTestDataV6Config {
             legalForms = listOf("LF1", "LF2", "LF3"),
             legalEntityIdentifierTypes = listOf("LEID1", "LEID2", "LEID3"),
             addressIdentifierTypes = listOf("ADDID1", "ADDID2", "ADDID3"),
-            adminAreas = listOf("ADMINAREA1", "ADMINAREA2", "ADMINAREA3")
+            adminAreas = listOf("ADMINAREA1", "ADMINAREA2", "ADMINAREA3"),
+            scriptCodes = emptyList()
         )
         val commonRequestFactory = OrchestratorRequestFactoryCommon(metadata)
         return OrchestratorRequestFactoryV6(commonRequestFactory)

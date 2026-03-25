@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.model.upsert.output
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
+import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerScriptVariantDto
 
 data class OutputUpsertData(
     val nameParts: List<String>,
@@ -41,5 +42,6 @@ data class OutputUpsertData(
     val alternativePostalAddress: AlternativeAddress?,
     val legalEntityConfidence: ConfidenceCriteria,
     val siteConfidence: ConfidenceCriteria?,
-    val addressConfidence: ConfidenceCriteria
+    val addressConfidence: ConfidenceCriteria,
+    val scriptVariants: List<BusinessPartnerScriptVariantDto>
 )

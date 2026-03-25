@@ -19,44 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.model
 
-import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.AddressType
-import org.eclipse.tractusx.bpdm.common.dto.IBaseLogisticAddressDto
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LogisticAddressDescription
-import java.time.Instant
-
-@Schema(description = LogisticAddressDescription.header)
 data class LogisticAddressVerboseDto(
-
-    @get:Schema(description = LogisticAddressDescription.bpna)
-    val bpna: String,
-
-    @get:Schema(description = LogisticAddressDescription.name)
-    val name: String? = null,
-
-    override val states: Collection<AddressStateVerboseDto> = emptyList(),
-    override val identifiers: Collection<AddressIdentifierVerboseDto> = emptyList(),
-    override val physicalPostalAddress: PhysicalPostalAddressVerboseDto,
-    override val alternativePostalAddress: AlternativePostalAddressVerboseDto? = null,
-
-    @get:Schema(description = LogisticAddressDescription.bpnLegalEntity)
-    val bpnLegalEntity: String?,
-
-    @get:Schema(description = LogisticAddressDescription.bpnSite)
-    val bpnSite: String?,
-
-    @get:Schema(description = "Indicates whether the address is owned and thus provided by a Data Space Participant.")
-    val isParticipantData: Boolean,
-
-    @get:Schema(description = CommonDescription.createdAt)
-    val createdAt: Instant,
-
-    @get:Schema(description = CommonDescription.updatedAt)
-    val updatedAt: Instant,
-
-    override val confidenceCriteria: ConfidenceCriteriaDto,
-
-    @get:Schema(name = "addressType", description = LogisticAddressDescription.addressType)
-    val addressType: AddressType? = null,
-) : IBaseLogisticAddressDto
+    val address: LogisticAddressInvariantVerboseDto,
+    val scriptVariants: List<LogisticAddressScriptVariantDto>
+)
