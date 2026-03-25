@@ -283,6 +283,7 @@ data class ConfidenceCriteria(
         "The additional address is either an additional address of the legal entity (site is null) or of the site (site is not null). " +
         "An additional address of 'Null' means the business partner data has no additional address")
 data class PostalAddressWithScriptVariants(
+    @field:JsonUnwrapped
     val postalProperties: PostalAddress,
     val scriptVariants: List<PostalAddressScriptVariantWithScriptCode>,
 ): IsPostalAddress{
