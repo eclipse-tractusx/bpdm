@@ -43,7 +43,6 @@ object BusinessPartnerNonVerboseValues {
             sortedSetOf(IdentifierTypeCategory.NBR)
         )
     val addressIdentifierTypeDto2 = addressIdentifierTypeDto1
-    val addressIdentifierTypeDto3 = addressIdentifierTypeDto1
 
 
     val identifier1 = LegalEntityIdentifierDto(
@@ -303,11 +302,6 @@ object BusinessPartnerNonVerboseValues {
     val legalEntityCreate4 = LegalEntityPartnerCreateRequest(
         legalEntity = legalEntity4,
         index = BusinessPartnerVerboseValues.legalEntityUpsert4.index
-    )
-
-    val legalEntityCreateMultipleIdentifier = LegalEntityPartnerCreateRequest(
-        legalEntity = legalEntityMultipleIdentifier,
-        index = BusinessPartnerVerboseValues.legalEntityUpsertMultipleIdentifier.index
     )
 
 

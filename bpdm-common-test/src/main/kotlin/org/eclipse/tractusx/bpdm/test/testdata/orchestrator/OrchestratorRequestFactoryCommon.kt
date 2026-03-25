@@ -185,7 +185,7 @@ class OrchestratorRequestFactoryCommon(
             scriptCode = scriptCode,
             legalName = buildScriptVariantStringValue("Legal Name", seed, scriptCode),
             legalShortName = buildScriptVariantStringValue("Legal Short Name", seed, scriptCode),
-            legalAddress = buildPostalAddressScriptVariant(scriptCode, seed, random)
+            legalAddress = buildPostalAddressScriptVariant(scriptCode, seed)
         )
     }
 
@@ -195,7 +195,7 @@ class OrchestratorRequestFactoryCommon(
         return SiteScriptVariant(
             scriptCode = scriptCode,
             siteName = buildScriptVariantStringValue("Site Name $seed", seed, scriptCode),
-            mainAddress = buildPostalAddressScriptVariant(scriptCode, seed, random)
+            mainAddress = buildPostalAddressScriptVariant(scriptCode, seed)
         )
     }
 
@@ -204,7 +204,7 @@ class OrchestratorRequestFactoryCommon(
 
         return PostalAddressScriptVariantWithScriptCode(
             scriptCode = scriptCode,
-            postalProperties = buildPostalAddressScriptVariant(scriptCode, seed, random)
+            postalProperties = buildPostalAddressScriptVariant(scriptCode, seed)
         )
     }
 
