@@ -62,6 +62,3 @@ CREATE TABLE address_script_variants
     CONSTRAINT fk_script_variants_addresses FOREIGN KEY (logistic_address_id) REFERENCES logistic_addresses(id),
     CONSTRAINT uc_script_code_address UNIQUE (script_code_id, logistic_address_id)
 );
-
-INSERT INTO script_codes (id, uuid, created_at, updated_at, technical_key, description)
-VALUES (nextval('bpdm_sequence'), gen_random_uuid(), now(), now(), 'test', 'test description');
