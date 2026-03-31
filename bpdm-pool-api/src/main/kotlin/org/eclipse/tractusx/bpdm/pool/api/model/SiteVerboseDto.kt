@@ -34,7 +34,7 @@ data class SiteVerboseDto(
     override val name: String,
     override val states: Collection<SiteStateVerboseDto> = emptyList(),
 
-    @get:Schema(description = "Indicates whether the site is owned and thus provided by a Data Space Participant.")
+    @get:Schema(description = "Indicates whether the site is owned and thus provided by a Data Space Participant.", name = "isParticipantData")
     val isParticipantData: Boolean,
 
     @get:Schema(description = SiteDescription.bpnLegalEntity)

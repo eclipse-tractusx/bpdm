@@ -19,7 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.model
 
+import io.swagger.v3.oas.annotations.media.Schema
+
 data class DataSpaceParticipantDto (
     val bpnL: String,
+    @get:Schema(name = "isDataSpaceParticipant")
     val isDataSpaceParticipant: Boolean
 )
