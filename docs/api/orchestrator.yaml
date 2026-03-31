@@ -3,7 +3,7 @@ info:
   title: Business Partner Data Management Orchestrator
   description: Orchestrator component acts as a passive component and offers for each
     processing steps individual endpoints
-  version: 7.3.0
+  version: 7.4.0-SNAPSHOT
 servers:
   - url: http://localhost:8085
     description: Generated server url
@@ -576,43 +576,22 @@ components:
           $ref: "#/components/schemas/GeoCoordinate"
         country:
           type: string
-          description: The 2-digit country code of the physical postal address according
-            to ISO 3166-1.
         administrativeAreaLevel1:
           type: string
-          description: "The 2-digit country subdivision code according to ISO 3166-2,\
-            \ such as a region within a country."
         postalCode:
           type: string
-          description: "The alphanumeric identifier (sometimes including spaces or\
-            \ punctuation) of the physical postal address for the purpose of sorting\
-            \ mail, synonyms:postcode, post code, PIN or ZIP code."
         city:
           type: string
-          description: "The name of the city of the physical postal address, synonyms:\
-            \ town, village, municipality."
         deliveryServiceType:
           type: string
-          description: "One of the alternative postal address types: P.O. box, private\
-            \ bag, boite postale."
           enum:
             - PO_BOX
             - PRIVATE_BAG
             - BOITE_POSTALE
         deliveryServiceQualifier:
           type: string
-          description: "The qualifier uniquely identifying the delivery service endpoint\
-            \ of the alternative postal address in conjunction with the delivery service\
-            \ number. In some countries for example, entering a P.O. box number, postal\
-            \ code and city is not sufficient to uniquely identify a P.O. box, because\
-            \ the same P.O. box number is assigned multiple times in some cities."
         deliveryServiceNumber:
           type: string
-          description: "The number indicating the delivery service endpoint of the\
-            \ alternative postal address to which the delivery is to be delivered,\
-            \ such as a P.O. box number or a private bag number."
-      required:
-        - geographicCoordinates
     BpnReference:
       type: object
       description: A reference to a BPN for the corresponding business partner data.
@@ -628,18 +607,10 @@ components:
       properties:
         referenceValue:
           type: string
-          description: "The value of the reference, either an existing BPN or a BPN\
-            \ request identifier (which is freely chosen by the duplication check\
-            \ provider)"
         desiredBpn:
           type: string
-          description: 'The desired BPN when a new golden record has to be created
-            for this business partner data.Requires a BPN request identifier that
-            is not associated with an existing BPN. At this moment the golden record
-            process does not support creating desired BPNs and ignores this field. '
         referenceType:
           type: string
-          description: Whether this reference is a BPN or BPN request identifier
           enum:
             - Bpn
             - BpnRequestIdentifier
@@ -657,14 +628,10 @@ components:
       properties:
         nameParts:
           type: array
-          description: Fully categorized and cleaned name parts based on the uncategorized
-            name parts provided
           items:
             $ref: "#/components/schemas/NamePart"
         owningCompany:
           type: string
-          description: The BPNL of the legal entity to which this business partner
-            data belongs to
         uncategorized:
           $ref: "#/components/schemas/UncategorizedProperties"
         legalEntity:
@@ -685,38 +652,24 @@ components:
             - LegalEntity
             - Site
             - Address
-      required:
-        - legalEntity
-        - nameParts
-        - uncategorized
     BusinessPartnerRelations:
       type: object
       description: 'The business partner relations data to be processed '
       properties:
         relationType:
           type: string
-          description: The type of relation between the business partners
           enum:
             - IsAlternativeHeadquarterFor
             - IsManagedBy
             - IsOwnedBy
         businessPartnerSourceBpnl:
           type: string
-          description: The business partner from which the relation emerges (the source)
         businessPartnerTargetBpnl:
           type: string
-          description: The business partner to which this relation goes (the target)
         validityPeriods:
           type: array
-          description: A relation validity describes a timeframe in which a relation
-            is active.
           items:
             $ref: "#/components/schemas/RelationValidityPeriod"
-      required:
-        - businessPartnerSourceBpnl
-        - businessPartnerTargetBpnl
-        - relationType
-        - validityPeriods
     BusinessState:
       type: object
       description: The business state information for the corresponding business partner
@@ -743,29 +696,20 @@ components:
       properties:
         sharedByOwner:
           type: boolean
-          description: Whether the business partner data is shared by the actual owner
         checkedByExternalDataSource:
           type: boolean
-          description: "The corresponding business partner data has been verified\
-            \ by an external data source, like an official register"
         numberOfSharingMembers:
           type: integer
           format: int32
-          description: How many sharing members have already shared the matched golden
-            record
         lastConfidenceCheckAt:
           type: string
           format: date-time
-          description: Last time the confidence values have been checked (and updated
-            if needed)
         nextConfidenceCheckAt:
           type: string
           format: date-time
-          description: Next time the confidence values should be checked
         confidenceLevel:
           type: integer
           format: int32
-          description: The overall confidence level of the matched golden record
     Entry:
       type: object
       properties:
@@ -773,9 +717,6 @@ components:
           type: string
         recordId:
           type: string
-      required:
-        - recordId
-        - taskId
     Event:
       type: object
       properties:
@@ -790,10 +731,6 @@ components:
             - Error
         taskId:
           type: string
-      required:
-        - resultState
-        - taskId
-        - timestamp
     FinishedTaskEventsResponse:
       type: object
       properties:
@@ -818,12 +755,6 @@ components:
           description: Collection of results in the page
           items:
             $ref: "#/components/schemas/Event"
-      required:
-        - content
-        - contentSize
-        - page
-        - totalElements
-        - totalPages
     GeoCoordinate:
       type: object
       description: "The exact location of the physical postal address in latitude,\
@@ -862,50 +793,33 @@ components:
           $ref: "#/components/schemas/BpnReference"
         legalName:
           type: string
-          description: The legal name of this legal entity according to official registers
         legalShortName:
           type: string
-          description: "The abbreviated name of this legal entity, if it exists"
         legalForm:
           type: string
-          description: The legal form of this legal entity
         identifiers:
           type: array
-          description: Identifiers for this legal entity (in addition to the BPNL)
           items:
             $ref: "#/components/schemas/Identifier"
         states:
           type: array
-          description: The business state history of this legal entity
           items:
             $ref: "#/components/schemas/BusinessState"
         confidenceCriteria:
           $ref: "#/components/schemas/ConfidenceCriteria"
+        hasChanged:
+          type: boolean
+        legalAddress:
+          $ref: "#/components/schemas/PostalAddress"
         isParticipantData:
           type: boolean
           description: Whether this legal entity is part of the Data Space network
-        hasChanged:
-          type: boolean
-          description: "Whether this legal entity information differs from its golden\
-            \ record counterpart in the Pool. +The Pool will not update the legal\
-            \ entity if it is set to false. However, if this legal entity constitutes\
-            \ a new legal entity golden record, it is still created independent of\
-            \ this flag."
-        legalAddress:
-          $ref: "#/components/schemas/PostalAddress"
-      required:
-        - bpnReference
-        - confidenceCriteria
-        - identifiers
-        - legalAddress
-        - states
     NamePart:
       type: object
       description: A categorized name part for this business partner data
       properties:
         name:
           type: string
-          description: The name part value
         type:
           type: string
           description: |
@@ -921,9 +835,6 @@ components:
             - LegalForm
             - SiteName
             - AddressName
-      required:
-        - name
-        - type
     PageDtoSharingMemberRecord:
       type: object
       description: Paginated collection of results
@@ -949,12 +860,6 @@ components:
           description: Collection of results in the page
           items:
             $ref: "#/components/schemas/SharingMemberRecord"
-      required:
-        - content
-        - contentSize
-        - page
-        - totalElements
-        - totalPages
     PhysicalAddress:
       type: object
       description: "A physical postal address describes the physical location of an\
@@ -964,63 +869,32 @@ components:
           $ref: "#/components/schemas/GeoCoordinate"
         country:
           type: string
-          description: The 2-digit country code of the physical postal address according
-            to ISO 3166-1.
         administrativeAreaLevel1:
           type: string
-          description: "The 2-digit country subdivision code according to ISO 3166-2,\
-            \ such as a region within a country."
         administrativeAreaLevel2:
           type: string
-          description: "The name of the locally regulated secondary country subdivision\
-            \ of the physical postal address, such as county within a country."
         administrativeAreaLevel3:
           type: string
-          description: "The name of the locally regulated tertiary country subdivision\
-            \ of the physical address, such as townships within a country."
         postalCode:
           type: string
-          description: "The alphanumeric identifier (sometimes including spaces or\
-            \ punctuation) of the physical postal address for the purpose of sorting\
-            \ mail, synonyms:postcode, post code, PIN or ZIP code."
         city:
           type: string
-          description: "The name of the city of the physical postal address, synonyms:\
-            \ town, village, municipality."
         district:
           type: string
-          description: The name of the district of the physical postal address which
-            divides the city in several smaller areas.
         street:
           $ref: "#/components/schemas/Street"
         companyPostalCode:
           type: string
-          description: "The company postal code of the physical postal address, which\
-            \ is sometimes required for large companies."
         industrialZone:
           type: string
-          description: "The industrial zone of the physical postal address, designating\
-            \ an area for industrial development, synonym: industrial area."
         building:
           type: string
-          description: The alphanumeric identifier of the building addressed by the
-            physical postal address.
         floor:
           type: string
-          description: "The number of a floor in the building addressed by the physical\
-            \ postal address, synonym: level."
         door:
           type: string
-          description: "The number of a door in the building on the respective floor\
-            \ addressed by the physical postal address, synonyms: room, suite."
         taxJurisdictionCode:
           type: string
-          description: "Tax jurisdiction codes are used to identify the specific jurisdiction(s)\
-            \ that a company belong to, particularly in bureaucratic processes such\
-            \ as tax returns and IRS forms."
-      required:
-        - geographicCoordinates
-        - street
     PostalAddress:
       type: object
       description: "Address information of this business partner data. The address\
@@ -1031,15 +905,12 @@ components:
           $ref: "#/components/schemas/BpnReference"
         addressName:
           type: string
-          description: The name of this address
         identifiers:
           type: array
-          description: Identifiers for this address (in addition to the BPNA)
           items:
             $ref: "#/components/schemas/Identifier"
         states:
           type: array
-          description: The business state history of this address
           items:
             $ref: "#/components/schemas/BusinessState"
         confidenceCriteria:
@@ -1050,46 +921,28 @@ components:
           $ref: "#/components/schemas/AlternativeAddress"
         hasChanged:
           type: boolean
-          deprecated: true
-          description: Whether this address information differs from its golden record
-            counterpart in the Pool.Currently deprecated and ignored by the golden
-            record creation and update process.
-      required:
-        - bpnReference
-        - confidenceCriteria
-        - identifiers
-        - physicalAddress
-        - states
     RelationValidityPeriod:
       type: object
       properties:
         validFrom:
           type: string
           format: date
-          description: The date from which the relation is valid.
         validTo:
           type: string
           format: date
-          description: The date until which the relation is valid.
-      required:
-        - validFrom
     SharingMemberRecord:
       type: object
       properties:
         recordId:
           type: string
-        isGoldenRecordCounted:
-          type: boolean
         createdAt:
           type: string
           format: date-time
         updatedAt:
           type: string
           format: date-time
-      required:
-        - createdAt
-        - recordId
-        - updatedAt
+        isGoldenRecordCounted:
+          type: boolean
     SharingMemberRecordUpdateRequest:
       type: object
       properties:
@@ -1097,9 +950,6 @@ components:
           type: string
         isGoldenRecordCounted:
           type: boolean
-      required:
-        - isGoldenRecordCounted
-        - recordId
     Site:
       type: object
       description: Site information for this business partner data. A site of 'null'
@@ -1109,31 +959,20 @@ components:
           $ref: "#/components/schemas/BpnReference"
         siteName:
           type: string
-          description: The name of this site
         states:
           type: array
-          description: The business state history of this site
           items:
             $ref: "#/components/schemas/BusinessState"
         confidenceCriteria:
           $ref: "#/components/schemas/ConfidenceCriteria"
         hasChanged:
           type: boolean
-          description: "Whether this site information differs from its golden record\
-            \ counterpart in the Pool. +The Pool will not update the site if it is\
-            \ set to false. However, if this site constitutes a new site golden record,\
-            \ it is still created independent of this flag."
         siteMainAddress:
           $ref: "#/components/schemas/PostalAddress"
         siteMainIsLegalAddress:
           type: boolean
           description: This site's main address is the legal address of the legal
             entity. The address information therefore is stored in the legal address.
-      required:
-        - bpnReference
-        - confidenceCriteria
-        - siteMainIsLegalAddress
-        - states
     Street:
       type: object
       description: "The street of the physical postal address, synonyms: road, avenue,\
@@ -1141,39 +980,22 @@ components:
       properties:
         name:
           type: string
-          description: The name of the street.
         houseNumber:
           type: string
-          description: The number representing the exact location of a building within
-            the street.
         houseNumberSupplement:
           type: string
-          description: The supplement to the house number
         milestone:
           type: string
-          description: "The number representing the exact location of an addressed\
-            \ object within a street without house numbers, such as within long roads."
         direction:
           type: string
-          description: "The cardinal direction describing where the exit to the location\
-            \ of the addressed object on large highways / motorways is located, such\
-            \ as Highway 101 South."
         namePrefix:
           type: string
-          description: "The street related information, which is usually printed before\
-            \ the official street name on an address label."
         additionalNamePrefix:
           type: string
-          description: "The additional street related information, which is usually\
-            \ printed before the official street name on an address label."
         nameSuffix:
           type: string
-          description: "The street related information, which is usually printed after\
-            \ the official street name on an address label."
         additionalNameSuffix:
           type: string
-          description: "The additional street related information, which is usually\
-            \ printed after the official street name on an address label."
     TaskClientRelationsStateDto:
       type: object
       description: The golden record task's processing state together with optional
@@ -1190,7 +1012,6 @@ components:
         processingState:
           $ref: "#/components/schemas/TaskProcessingRelationsStateDto"
       required:
-        - businessPartnerRelationsResult
         - processingState
         - recordId
         - taskId
@@ -1210,7 +1031,6 @@ components:
         processingState:
           $ref: "#/components/schemas/TaskProcessingStateDto"
       required:
-        - businessPartnerResult
         - processingState
         - recordId
         - taskId
@@ -1233,7 +1053,6 @@ components:
             $ref: "#/components/schemas/TaskCreateRelationsRequestEntry"
       required:
         - mode
-        - requests
     TaskCreateRelationsRequestEntry:
       type: object
       properties:
@@ -1244,8 +1063,6 @@ components:
         businessPartnerRelations:
           $ref: "#/components/schemas/BusinessPartnerRelations"
           description: The business partner relationship data to be processed
-      required:
-        - businessPartnerRelations
     TaskCreateRelationsResponse:
       type: object
       description: Response object for giving a list of created tasks
@@ -1254,8 +1071,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/TaskClientRelationsStateDto"
-      required:
-        - createdTasks
     TaskCreateRequest:
       type: object
       description: Request object to specify for which business partner data tasks
@@ -1275,7 +1090,6 @@ components:
             $ref: "#/components/schemas/TaskCreateRequestEntry"
       required:
         - mode
-        - requests
     TaskCreateRequestEntry:
       type: object
       properties:
@@ -1286,8 +1100,6 @@ components:
         businessPartner:
           $ref: "#/components/schemas/BusinessPartner"
           description: The business partner data to be processed
-      required:
-        - businessPartner
     TaskCreateResponse:
       type: object
       description: Response object for giving a list of created tasks
@@ -1296,8 +1108,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/TaskClientStateDto"
-      required:
-        - createdTasks
     TaskErrorDto:
       type: object
       description: "Describes an error that happened during processing of a task \n"
@@ -1382,7 +1192,6 @@ components:
         - resultState
         - step
         - stepState
-        - timeout
     TaskProcessingStateDto:
       type: object
       description: Contains detailed information about the current processing state
@@ -1437,7 +1246,6 @@ components:
         - resultState
         - step
         - stepState
-        - timeout
     TaskRelationsErrorDto:
       type: object
       description: "Describes an error that happened during processing of a task \n"
@@ -1462,8 +1270,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/TaskClientRelationsStateDto"
-      required:
-        - tasks
     TaskRelationsStepReservationEntryDto:
       type: object
       description: Task reservation entry
@@ -1478,10 +1284,6 @@ components:
         businessPartnerRelations:
           $ref: "#/components/schemas/BusinessPartnerRelations"
           description: The business partner relations data to process
-      required:
-        - businessPartnerRelations
-        - recordId
-        - taskId
     TaskRelationsStepReservationResponse:
       type: object
       description: Response object for giving a list of reserved tasks
@@ -1498,9 +1300,6 @@ components:
           deprecated: true
           description: The timestamp until the reservation is valid and results are
             accepted
-      required:
-        - reservedTasks
-        - timeout
     TaskRelationsStepResultEntryDto:
       type: object
       description: A step result for a relations golden record task
@@ -1518,8 +1317,6 @@ components:
           items:
             $ref: "#/components/schemas/TaskRelationsErrorDto"
       required:
-        - businessPartnerRelations
-        - errors
         - taskId
     TaskRelationsStepResultRequest:
       type: object
@@ -1538,7 +1335,6 @@ components:
           items:
             $ref: "#/components/schemas/TaskRelationsStepResultEntryDto"
       required:
-        - results
         - step
     TaskResultStateSearchRequest:
       type: object
@@ -1547,8 +1343,6 @@ components:
           type: array
           items:
             type: string
-      required:
-        - taskIds
     TaskResultStateSearchResponse:
       type: object
       properties:
@@ -1560,8 +1354,6 @@ components:
               - Pending
               - Success
               - Error
-      required:
-        - resultStates
     TaskStateRequest:
       type: object
       description: Request object for giving a list of task identifiers to search
@@ -1571,8 +1363,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Entry"
-      required:
-        - entries
     TaskStateResponse:
       type: object
       description: Response object for giving a list of task states
@@ -1581,8 +1371,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/TaskClientStateDto"
-      required:
-        - tasks
     TaskStepReservationEntryDto:
       type: object
       description: Task reservation entry
@@ -1599,11 +1387,6 @@ components:
           description: The business partner data to process
         requestKey:
           type: string
-      required:
-        - businessPartner
-        - recordId
-        - requestKey
-        - taskId
     TaskStepReservationRequest:
       type: object
       description: Request object for reserving a number of tasks waiting in a step
@@ -1639,9 +1422,6 @@ components:
           deprecated: true
           description: The timestamp until the reservation is valid and results are
             accepted
-      required:
-        - reservedTasks
-        - timeout
     TaskStepResultEntryDto:
       type: object
       description: A step result for a golden record task
@@ -1659,8 +1439,6 @@ components:
           items:
             $ref: "#/components/schemas/TaskErrorDto"
       required:
-        - businessPartner
-        - errors
         - taskId
     TaskStepResultRequest:
       type: object
@@ -1679,7 +1457,6 @@ components:
           items:
             $ref: "#/components/schemas/TaskStepResultEntryDto"
       required:
-        - results
         - step
     UncategorizedProperties:
       type: object
@@ -1687,30 +1464,18 @@ components:
       properties:
         nameParts:
           type: array
-          description: The plain uncategorized name of the business partner how it
-            appears in the sharing member system
           items:
             type: string
         identifiers:
           type: array
-          description: "Identifiers for which it is unknown whether they belong to\
-            \ the legal entity, site or any address"
           items:
             $ref: "#/components/schemas/Identifier"
         states:
           type: array
-          description: "Business states for which it is unknown whether they belong\
-            \ to the legal entity, site or any address"
           items:
             $ref: "#/components/schemas/BusinessState"
         address:
           $ref: "#/components/schemas/PostalAddress"
-          description: "Address information for which it is unknown whether they belong\
-            \ to the legal, site main or additional address"
-      required:
-        - identifiers
-        - nameParts
-        - states
   securitySchemes:
     open_id_scheme:
       type: oauth2

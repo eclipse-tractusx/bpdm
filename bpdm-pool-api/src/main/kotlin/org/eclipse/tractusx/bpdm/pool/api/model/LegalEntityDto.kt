@@ -35,7 +35,7 @@ data class LegalEntityDto(
     override val states: Collection<LegalEntityStateDto> = emptyList(),
     override val confidenceCriteria: ConfidenceCriteriaDto,
 
-    @get:Schema(description = "Indicates whether the legal entity is owned and thus provided by a Data Space Participant.")
+    @get:Schema(description = "Indicates whether the legal entity is owned and thus provided by a Data Space Participant.", name = "isParticipantData")
     val isParticipantData: Boolean
 
 ) : IBaseLegalEntityDto

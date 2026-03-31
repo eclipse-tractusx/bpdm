@@ -19,10 +19,12 @@
 
 package org.eclipse.tractusx.orchestrator.api
 
+import io.swagger.v3.oas.annotations.media.Schema
 import java.time.Instant
 
 class SharingMemberRecord (
     val recordId: String,
+    @get:Schema(name = "isGoldenRecordCounted")
     val isGoldenRecordCounted: Boolean?,
     val createdAt: Instant,
     val updatedAt: Instant

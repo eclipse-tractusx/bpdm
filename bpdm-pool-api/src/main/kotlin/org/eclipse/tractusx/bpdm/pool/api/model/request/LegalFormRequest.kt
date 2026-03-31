@@ -49,6 +49,6 @@ data class LegalFormRequest(
     @Schema(description = "The administrative area level 1 this legal form belongs to")
     val administrativeAreaLevel1: String?,
 
-    @Schema(description = "Whether this legal form is considered as active according to GLEIF")
+    @get:Schema(description = "Whether this legal form is considered as active according to GLEIF", name = "isActive")
     val isActive: Boolean
 )
