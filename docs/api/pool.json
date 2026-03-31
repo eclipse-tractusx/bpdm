@@ -3,7 +3,7 @@
   "info" : {
     "title" : "Business Partner Data Management Pool",
     "description" : "Service that manages and shares business partner data with other CatenaX services",
-    "version" : "7.3.0"
+    "version" : "7.4.0-SNAPSHOT"
   },
   "servers" : [ {
     "url" : "http://localhost:8080",
@@ -3060,8 +3060,7 @@
             "type" : "string",
             "description" : "The type of the identifier."
           }
-        },
-        "required" : [ "type", "value" ]
+        }
       },
       "AddressIdentifierVerboseDto" : {
         "type" : "object",
@@ -3075,8 +3074,7 @@
             "$ref" : "#/components/schemas/TypeKeyNameVerboseDtoString",
             "description" : "The type of the identifier."
           }
-        },
-        "required" : [ "type", "value" ]
+        }
       },
       "AddressPartnerCreateRequest" : {
         "type" : "object",
@@ -3112,18 +3110,15 @@
             "$ref" : "#/components/schemas/ConfidenceCriteriaDto"
           },
           "bpnParent" : {
-            "type" : "string",
-            "description" : "BPNL of the legal entity or BPNS of the site this address belongs to."
+            "type" : "string"
           },
           "index" : {
-            "type" : "string",
-            "description" : "User defined index to conveniently match this entry to the corresponding entry in the response."
+            "type" : "string"
           },
           "requestKey" : {
             "type" : "string"
           }
-        },
-        "required" : [ "bpnParent", "confidenceCriteria", "identifiers", "physicalPostalAddress", "states" ]
+        }
       },
       "AddressPartnerCreateResponseWrapper" : {
         "type" : "object",
@@ -3149,8 +3144,7 @@
             "type" : "integer",
             "format" : "int32"
           }
-        },
-        "required" : [ "entities", "entityCount", "errorCount", "errors" ]
+        }
       },
       "AddressPartnerCreateVerboseDto" : {
         "type" : "object",
@@ -3194,10 +3188,6 @@
             "type" : "string",
             "description" : "The BPNS of the site the address belongs to."
           },
-          "isParticipantData" : {
-            "type" : "boolean",
-            "description" : "Indicates whether the address is owned and thus provided by a Data Space Participant."
-          },
           "createdAt" : {
             "type" : "string",
             "format" : "date-time",
@@ -3216,20 +3206,21 @@
             "description" : "Indicates the address type, the legal address to a legal entity or the main address to a site, an additional address, or both legal and site address.The site main address is where typically the main entrance or the reception is located, or where the mail is delivered to.",
             "enum" : [ "LegalAndSiteMainAddress", "LegalAddress", "SiteMainAddress", "AdditionalAddress" ]
           },
+          "isParticipantData" : {
+            "type" : "boolean",
+            "description" : "Indicates whether the address is owned and thus provided by a Data Space Participant."
+          },
           "index" : {
-            "type" : "string",
-            "description" : "User defined index to conveniently match this entry to the corresponding entry in the response."
+            "type" : "string"
           }
-        },
-        "required" : [ "bpna", "confidenceCriteria", "createdAt", "identifiers", "isParticipantData", "physicalPostalAddress", "states", "updatedAt" ]
+        }
       },
       "AddressPartnerUpdateRequest" : {
         "type" : "object",
         "description" : "Request for updating a business partner record of type address. In general, an address is a collection of information to describe a physical location, using a street name with a house number and/or a post office box as reference. In addition, an address consists of several postal attributes, such as country, region (state), county, township, city, district, or postal code, which help deliver mail.In Catena-X, an address is a type of business partner representing the legal address of a legal entity, and/or the main address of a site, or any additional address of a legal entity or site (such as different gates).An address is owned by a legal entity. Thus, exactly one legal entity is assigned to an address. An address can belong to a site. Thus, one or no site is assigned to an address. An address is uniquely identified by the BPNA.",
         "properties" : {
           "bpna" : {
-            "type" : "string",
-            "description" : "A BPNA represents and uniquely identifies an address, which can be the legal address of a legal entity, and/or the main address of a site, or any additional address of a legal entity or site (such as different gates). It is important to note that only the BPNL must be used to uniquely identify a legal entity. Even in the case that the BPNA represents the legal address of the legal entity, it shall not be used to uniquely identify the legal entity."
+            "type" : "string"
           },
           "name" : {
             "type" : "string",
@@ -3263,8 +3254,7 @@
           "requestKey" : {
             "type" : "string"
           }
-        },
-        "required" : [ "bpna", "confidenceCriteria", "identifiers", "physicalPostalAddress", "requestKey", "states" ]
+        }
       },
       "AddressPartnerUpdateResponseWrapper" : {
         "type" : "object",
@@ -3290,8 +3280,7 @@
             "type" : "integer",
             "format" : "int32"
           }
-        },
-        "required" : [ "entities", "entityCount", "errorCount", "errors" ]
+        }
       },
       "AddressSearchRequest" : {
         "type" : "object",
@@ -3317,8 +3306,7 @@
           "name" : {
             "type" : "string"
           }
-        },
-        "required" : [ "addressBpns", "legalEntityBpns", "siteBpns" ]
+        }
       },
       "AddressStateDto" : {
         "type" : "object",
@@ -3339,8 +3327,7 @@
             "description" : "One of the state types: active, inactive.",
             "enum" : [ "ACTIVE", "INACTIVE" ]
           }
-        },
-        "required" : [ "type" ]
+        }
       },
       "AddressStateVerboseDto" : {
         "type" : "object",
@@ -3360,8 +3347,7 @@
             "$ref" : "#/components/schemas/TypeKeyNameVerboseDtoBusinessStateType",
             "description" : "One of the state types: active, inactive."
           }
-        },
-        "required" : [ "type" ]
+        }
       },
       "AlternativePostalAddressDto" : {
         "type" : "object",
@@ -3410,14 +3396,6 @@
           "geographicCoordinates" : {
             "$ref" : "#/components/schemas/GeoCoordinateDto"
           },
-          "country" : {
-            "$ref" : "#/components/schemas/TypeKeyNameVerboseDtoCountryCode",
-            "description" : "The 2-digit country code of the physical postal address according to ISO 3166-1."
-          },
-          "administrativeAreaLevel1" : {
-            "$ref" : "#/components/schemas/RegionDto",
-            "description" : "The 2-digit country subdivision code according to ISO 3166-2, such as a region within a country."
-          },
           "postalCode" : {
             "type" : "string",
             "description" : "The alphanumeric identifier (sometimes including spaces or punctuation) of the physical postal address for the purpose of sorting mail, synonyms:postcode, post code, PIN or ZIP code."
@@ -3438,39 +3416,40 @@
           "deliveryServiceNumber" : {
             "type" : "string",
             "description" : "The number indicating the delivery service endpoint of the alternative postal address to which the delivery is to be delivered, such as a P.O. box number or a private bag number."
+          },
+          "country" : {
+            "$ref" : "#/components/schemas/TypeKeyNameVerboseDtoCountryCode",
+            "description" : "The 2-digit country code of the physical postal address according to ISO 3166-1."
+          },
+          "administrativeAreaLevel1" : {
+            "$ref" : "#/components/schemas/RegionDto",
+            "description" : "The 2-digit country subdivision code according to ISO 3166-2, such as a region within a country."
           }
-        },
-        "required" : [ "city", "country", "deliveryServiceNumber", "deliveryServiceType" ]
+        }
       },
       "BpnIdentifierMappingDto" : {
         "type" : "object",
         "description" : "Mapping of Business Partner Number to identifier value",
         "properties" : {
           "idValue" : {
-            "type" : "string",
-            "description" : "Value of the identifier"
+            "type" : "string"
           },
           "bpn" : {
-            "type" : "string",
-            "description" : "Business Partner Number"
+            "type" : "string"
           }
-        },
-        "required" : [ "bpn", "idValue" ]
+        }
       },
       "BpnRequestIdentifierMappingDto" : {
         "type" : "object",
         "description" : "Mapping of Business Partner Number to requested-identifier value",
         "properties" : {
           "requestedIdentifier" : {
-            "type" : "string",
-            "description" : "Value of the requested-identifier"
+            "type" : "string"
           },
           "bpn" : {
-            "type" : "string",
-            "description" : "Business Partner Number"
+            "type" : "string"
           }
-        },
-        "required" : [ "bpn", "requestedIdentifier" ]
+        }
       },
       "BpnRequestIdentifierSearchRequest" : {
         "type" : "object",
@@ -3478,14 +3457,12 @@
         "properties" : {
           "requestedIdentifiers" : {
             "type" : "array",
-            "description" : "Value of the requested-identifier",
             "items" : {
               "type" : "string"
             },
             "uniqueItems" : true
           }
-        },
-        "required" : [ "requestedIdentifiers" ]
+        }
       },
       "BusinessPartnerConfidenceCriteriaDto" : {
         "type" : "object",
@@ -3512,8 +3489,7 @@
             "type" : "integer",
             "format" : "int32"
           }
-        },
-        "required" : [ "checkedByExternalDataSource", "confidenceLevel", "lastConfidenceCheckAt", "nextConfidenceCheckAt", "numberOfSharingMembers", "sharedByOwner" ]
+        }
       },
       "BusinessPartnerIdentifierDto" : {
         "type" : "object",
@@ -3556,8 +3532,7 @@
               "$ref" : "#/components/schemas/BusinessPartnerStateDto"
             }
           }
-        },
-        "required" : [ "confidenceCriteria", "legalEntityBpn", "states" ]
+        }
       },
       "BusinessPartnerPostalAddress" : {
         "type" : "object",
@@ -3593,8 +3568,7 @@
               "$ref" : "#/components/schemas/AddressIdentifierDto"
             }
           }
-        },
-        "required" : [ "addressBpn", "confidenceCriteria", "identifiers", "physicalPostalAddress", "states" ]
+        }
       },
       "BusinessPartnerSearchResultDto" : {
         "type" : "object",
@@ -3624,8 +3598,7 @@
           "isParticipantData" : {
             "type" : "boolean"
           }
-        },
-        "required" : [ "address", "identifiers", "isParticipantData", "legalEntity", "states" ]
+        }
       },
       "BusinessPartnerSite" : {
         "type" : "object",
@@ -3645,8 +3618,7 @@
               "$ref" : "#/components/schemas/BusinessPartnerStateDto"
             }
           }
-        },
-        "required" : [ "confidenceCriteria", "siteBpn", "states" ]
+        }
       },
       "BusinessPartnerStateDto" : {
         "type" : "object",
@@ -3688,8 +3660,7 @@
             "description" : "One of the actions for which the changelog entry was created: create, update.",
             "enum" : [ "CREATE", "UPDATE" ]
           }
-        },
-        "required" : [ "bpn", "businessPartnerType", "changelogType", "timestamp" ]
+        }
       },
       "ChangelogSearchRequest" : {
         "type" : "object",
@@ -3745,8 +3716,7 @@
             "type" : "integer",
             "format" : "int32"
           }
-        },
-        "required" : [ "checkedByExternalDataSource", "confidenceLevel", "lastConfidenceCheckAt", "nextConfidenceCheckAt", "numberOfSharingMembers", "sharedByOwner" ]
+        }
       },
       "CountrySubdivisionDto" : {
         "type" : "object",
@@ -3765,8 +3735,7 @@
             "type" : "string",
             "description" : "The name of the country subdivision according to ISO 3166-2"
           }
-        },
-        "required" : [ "code", "countryCode", "name" ]
+        }
       },
       "CxMembershipDto" : {
         "type" : "object",
@@ -3777,8 +3746,7 @@
           "isCatenaXMember" : {
             "type" : "boolean"
           }
-        },
-        "required" : [ "bpnL", "isCatenaXMember" ]
+        }
       },
       "CxMembershipUpdateRequest" : {
         "type" : "object",
@@ -3789,8 +3757,7 @@
               "$ref" : "#/components/schemas/CxMembershipDto"
             }
           }
-        },
-        "required" : [ "memberships" ]
+        }
       },
       "DataSpaceParticipantDto" : {
         "type" : "object",
@@ -3801,8 +3768,7 @@
           "isDataSpaceParticipant" : {
             "type" : "boolean"
           }
-        },
-        "required" : [ "bpnL", "isDataSpaceParticipant" ]
+        }
       },
       "DataSpaceParticipantUpdateRequest" : {
         "type" : "object",
@@ -3813,8 +3779,7 @@
               "$ref" : "#/components/schemas/DataSpaceParticipantDto"
             }
           }
-        },
-        "required" : [ "participants" ]
+        }
       },
       "ErrorInfoAddressCreateError" : {
         "type" : "object",
@@ -3822,19 +3787,16 @@
         "properties" : {
           "errorCode" : {
             "type" : "string",
-            "description" : "Error code identifying the error",
+            "description" : "AddressCreateError",
             "enum" : [ "BpnNotValid", "SiteNotFound", "LegalEntityNotFound", "RegionNotFound", "IdentifierNotFound", "AddressDuplicateIdentifier", "IdentifiersTooMany" ]
           },
           "message" : {
-            "type" : "string",
-            "description" : "Error message that explains the error"
+            "type" : "string"
           },
           "entityKey" : {
-            "type" : "string",
-            "description" : "Key of the entity that failed from the request object: index or BPN"
+            "type" : "string"
           }
         },
-        "required" : [ "errorCode", "message" ],
         "title" : "ErrorInfo"
       },
       "ErrorInfoAddressUpdateError" : {
@@ -3843,19 +3805,16 @@
         "properties" : {
           "errorCode" : {
             "type" : "string",
-            "description" : "Error code identifying the error",
+            "description" : "AddressUpdateError",
             "enum" : [ "AddressNotFound", "RegionNotFound", "IdentifierNotFound", "AddressDuplicateIdentifier", "IdentifiersTooMany" ]
           },
           "message" : {
-            "type" : "string",
-            "description" : "Error message that explains the error"
+            "type" : "string"
           },
           "entityKey" : {
-            "type" : "string",
-            "description" : "Key of the entity that failed from the request object: index or BPN"
+            "type" : "string"
           }
         },
-        "required" : [ "errorCode", "message" ],
         "title" : "ErrorInfo"
       },
       "ErrorInfoLegalEntityCreateError" : {
@@ -3864,19 +3823,16 @@
         "properties" : {
           "errorCode" : {
             "type" : "string",
-            "description" : "Error code identifying the error",
+            "description" : "LegalEntityCreateError",
             "enum" : [ "LegalEntityDuplicateIdentifier", "LegalFormNotFound", "LegalEntityIdentifierNotFound", "LegalAddressRegionNotFound", "LegalAddressIdentifierNotFound", "LegalAddressDuplicateIdentifier", "LegalEntityIdentifiersTooMany", "LegalAddressIdentifiersTooMany" ]
           },
           "message" : {
-            "type" : "string",
-            "description" : "Error message that explains the error"
+            "type" : "string"
           },
           "entityKey" : {
-            "type" : "string",
-            "description" : "Key of the entity that failed from the request object: index or BPN"
+            "type" : "string"
           }
         },
-        "required" : [ "errorCode", "message" ],
         "title" : "ErrorInfo"
       },
       "ErrorInfoLegalEntityUpdateError" : {
@@ -3885,19 +3841,16 @@
         "properties" : {
           "errorCode" : {
             "type" : "string",
-            "description" : "Error code identifying the error",
+            "description" : "LegalEntityUpdateError",
             "enum" : [ "LegalEntityNotFound", "LegalEntityDuplicateIdentifier", "LegalFormNotFound", "LegalEntityIdentifierNotFound", "LegalAddressRegionNotFound", "LegalAddressIdentifierNotFound", "LegalAddressDuplicateIdentifier", "LegalEntityIdentifiersTooMany", "LegalAddressIdentifiersTooMany" ]
           },
           "message" : {
-            "type" : "string",
-            "description" : "Error message that explains the error"
+            "type" : "string"
           },
           "entityKey" : {
-            "type" : "string",
-            "description" : "Key of the entity that failed from the request object: index or BPN"
+            "type" : "string"
           }
         },
-        "required" : [ "errorCode", "message" ],
         "title" : "ErrorInfo"
       },
       "ErrorInfoSiteCreateError" : {
@@ -3906,19 +3859,16 @@
         "properties" : {
           "errorCode" : {
             "type" : "string",
-            "description" : "Error code identifying the error",
+            "description" : "SiteCreateError",
             "enum" : [ "LegalEntityNotFound", "MainAddressIdentifierNotFound", "MainAddressRegionNotFound", "MainAddressDuplicateIdentifier", "MainAddressIdentifiersTooMany" ]
           },
           "message" : {
-            "type" : "string",
-            "description" : "Error message that explains the error"
+            "type" : "string"
           },
           "entityKey" : {
-            "type" : "string",
-            "description" : "Key of the entity that failed from the request object: index or BPN"
+            "type" : "string"
           }
         },
-        "required" : [ "errorCode", "message" ],
         "title" : "ErrorInfo"
       },
       "ErrorInfoSiteUpdateError" : {
@@ -3927,19 +3877,16 @@
         "properties" : {
           "errorCode" : {
             "type" : "string",
-            "description" : "Error code identifying the error",
+            "description" : "SiteUpdateError",
             "enum" : [ "SiteNotFound", "MainAddressIdentifierNotFound", "MainAddressRegionNotFound", "MainAddressDuplicateIdentifier", "MainAddressIdentifiersTooMany" ]
           },
           "message" : {
-            "type" : "string",
-            "description" : "Error message that explains the error"
+            "type" : "string"
           },
           "entityKey" : {
-            "type" : "string",
-            "description" : "Key of the entity that failed from the request object: index or BPN"
+            "type" : "string"
           }
         },
-        "required" : [ "errorCode", "message" ],
         "title" : "ErrorInfo"
       },
       "FieldQualityRuleDto" : {
@@ -3964,8 +3911,7 @@
             "description" : "Quality level of the field",
             "enum" : [ "MANDATORY", "OPTIONAL", "FORBIDDEN" ]
           }
-        },
-        "required" : [ "country", "fieldPath", "qualityLevel" ]
+        }
       },
       "GeoCoordinateDto" : {
         "type" : "object",
@@ -3986,8 +3932,7 @@
             "format" : "double",
             "description" : "Altitude, if applicable"
           }
-        },
-        "required" : [ "latitude", "longitude" ]
+        }
       },
       "IdentifierTypeDetailDto" : {
         "type" : "object",
@@ -4002,8 +3947,7 @@
             "type" : "boolean",
             "description" : "True if identifier is mandatory in this country."
           }
-        },
-        "required" : [ "mandatory" ]
+        }
       },
       "IdentifierTypeDto" : {
         "type" : "object",
@@ -4054,8 +3998,7 @@
               "$ref" : "#/components/schemas/IdentifierTypeDetailDto"
             }
           }
-        },
-        "required" : [ "businessPartnerType", "categories", "details", "name", "technicalKey" ]
+        }
       },
       "IdentifiersSearchRequest" : {
         "type" : "object",
@@ -4063,22 +4006,19 @@
         "properties" : {
           "businessPartnerType" : {
             "type" : "string",
-            "description" : "Legal entities (L) or addresses (A)",
+            "description" : "Specifies if an identifier type is valid for legal entities (L) or addresses (A). Sites (S) are not supported.",
             "enum" : [ "LEGAL_ENTITY", "ADDRESS" ]
           },
           "idType" : {
-            "type" : "string",
-            "description" : "Technical key of the type to which the identifiers belongs to"
+            "type" : "string"
           },
           "idValues" : {
             "type" : "array",
-            "description" : "Values of the identifiers",
             "items" : {
               "type" : "string"
             }
           }
-        },
-        "required" : [ "businessPartnerType", "idType", "idValues" ]
+        }
       },
       "LegalEntityIdentifierDto" : {
         "type" : "object",
@@ -4096,8 +4036,7 @@
             "type" : "string",
             "description" : "The name of the official register, where the identifier is registered. For example, a Handelsregisternummer in Germany is only valid with its corresponding Handelsregister."
           }
-        },
-        "required" : [ "type", "value" ]
+        }
       },
       "LegalEntityIdentifierVerboseDto" : {
         "type" : "object",
@@ -4107,16 +4046,15 @@
             "type" : "string",
             "description" : "The value of the identifier like \"DE123465789\"."
           },
-          "type" : {
-            "$ref" : "#/components/schemas/TypeKeyNameVerboseDtoString",
-            "description" : "The type of the identifier."
-          },
           "issuingBody" : {
             "type" : "string",
             "description" : "The name of the official register, where the identifier is registered. For example, a Handelsregisternummer in Germany is only valid with its corresponding Handelsregister."
+          },
+          "type" : {
+            "$ref" : "#/components/schemas/TypeKeyNameVerboseDtoString",
+            "description" : "The type of the identifier."
           }
-        },
-        "required" : [ "type", "value" ]
+        }
       },
       "LegalEntityPartnerCreateRequest" : {
         "type" : "object",
@@ -4166,8 +4104,7 @@
           "requestKey" : {
             "type" : "string"
           }
-        },
-        "required" : [ "confidenceCriteria", "identifiers", "isParticipantData", "legalAddress", "legalName", "states" ]
+        }
       },
       "LegalEntityPartnerCreateResponseWrapper" : {
         "type" : "object",
@@ -4193,8 +4130,7 @@
             "type" : "integer",
             "format" : "int32"
           }
-        },
-        "required" : [ "entities", "entityCount", "errorCount", "errors" ]
+        }
       },
       "LegalEntityPartnerCreateVerboseDto" : {
         "type" : "object",
@@ -4211,10 +4147,6 @@
           "legalShortName" : {
             "type" : "string",
             "description" : "The abbreviated name of the legal entity."
-          },
-          "legalForm" : {
-            "$ref" : "#/components/schemas/LegalFormDto",
-            "description" : "The legal form of the legal entity."
           },
           "identifiers" : {
             "type" : "array",
@@ -4245,10 +4177,6 @@
           "confidenceCriteria" : {
             "$ref" : "#/components/schemas/ConfidenceCriteriaDto"
           },
-          "isParticipantData" : {
-            "type" : "boolean",
-            "description" : "Indicates whether the legal entity is owned and thus provided by a Data Space Participant."
-          },
           "createdAt" : {
             "type" : "string",
             "format" : "date-time",
@@ -4259,6 +4187,14 @@
             "format" : "date-time",
             "description" : "The date when the data record has been last updated."
           },
+          "isParticipantData" : {
+            "type" : "boolean",
+            "description" : "Indicates whether the legal entity is owned and thus provided by a Data Space Participant."
+          },
+          "legalForm" : {
+            "$ref" : "#/components/schemas/LegalFormDto",
+            "description" : "The legal form of the legal entity."
+          },
           "legalAddress" : {
             "$ref" : "#/components/schemas/LogisticAddressVerboseDto",
             "description" : "The official, legal correspondence address to be provided to government and tax authorities and used in all legal or court documents."
@@ -4267,8 +4203,7 @@
             "type" : "string",
             "description" : "User defined index to conveniently match this entry to the corresponding entry in the response."
           }
-        },
-        "required" : [ "bpnl", "confidenceCriteria", "createdAt", "currentness", "identifiers", "isParticipantData", "legalAddress", "legalName", "relations", "states", "updatedAt" ]
+        }
       },
       "LegalEntityPartnerUpdateRequest" : {
         "type" : "object",
@@ -4318,8 +4253,7 @@
           "requestKey" : {
             "type" : "string"
           }
-        },
-        "required" : [ "bpnl", "confidenceCriteria", "identifiers", "isParticipantData", "legalAddress", "legalName", "requestKey", "states" ]
+        }
       },
       "LegalEntityPartnerUpdateResponseWrapper" : {
         "type" : "object",
@@ -4345,8 +4279,7 @@
             "type" : "integer",
             "format" : "int32"
           }
-        },
-        "required" : [ "entities", "entityCount", "errorCount", "errors" ]
+        }
       },
       "LegalEntityPropertiesSearchRequest" : {
         "type" : "object",
@@ -4385,8 +4318,7 @@
           "legalName" : {
             "type" : "string"
           }
-        },
-        "required" : [ "bpnLs" ]
+        }
       },
       "LegalEntityStateDto" : {
         "type" : "object",
@@ -4407,8 +4339,7 @@
             "description" : "One of the state types: active, inactive.",
             "enum" : [ "ACTIVE", "INACTIVE" ]
           }
-        },
-        "required" : [ "type" ]
+        }
       },
       "LegalEntityStateVerboseDto" : {
         "type" : "object",
@@ -4428,8 +4359,7 @@
             "$ref" : "#/components/schemas/TypeKeyNameVerboseDtoBusinessStateType",
             "description" : "One of the state types: active, inactive."
           }
-        },
-        "required" : [ "type" ]
+        }
       },
       "LegalEntityWithLegalAddressVerboseDto" : {
         "type" : "object",
@@ -4446,10 +4376,6 @@
           "legalShortName" : {
             "type" : "string",
             "description" : "The abbreviated name of the legal entity."
-          },
-          "legalForm" : {
-            "$ref" : "#/components/schemas/LegalFormDto",
-            "description" : "The legal form of the legal entity."
           },
           "identifiers" : {
             "type" : "array",
@@ -4480,10 +4406,6 @@
           "confidenceCriteria" : {
             "$ref" : "#/components/schemas/ConfidenceCriteriaDto"
           },
-          "isParticipantData" : {
-            "type" : "boolean",
-            "description" : "Indicates whether the legal entity is owned and thus provided by a Data Space Participant."
-          },
           "createdAt" : {
             "type" : "string",
             "format" : "date-time",
@@ -4494,12 +4416,19 @@
             "format" : "date-time",
             "description" : "The date when the data record has been last updated."
           },
+          "isParticipantData" : {
+            "type" : "boolean",
+            "description" : "Indicates whether the legal entity is owned and thus provided by a Data Space Participant."
+          },
+          "legalForm" : {
+            "$ref" : "#/components/schemas/LegalFormDto",
+            "description" : "The legal form of the legal entity."
+          },
           "legalAddress" : {
             "$ref" : "#/components/schemas/LogisticAddressVerboseDto",
             "description" : "The official, legal correspondence address to be provided to government and tax authorities and used in all legal or court documents."
           }
-        },
-        "required" : [ "bpnl", "confidenceCriteria", "createdAt", "currentness", "identifiers", "isParticipantData", "legalAddress", "legalName", "relations", "states", "updatedAt" ]
+        }
       },
       "LegalFormDto" : {
         "type" : "object",
@@ -4537,53 +4466,43 @@
           "isActive" : {
             "type" : "boolean"
           }
-        },
-        "required" : [ "isActive", "name", "technicalKey" ]
+        }
       },
       "LegalFormRequest" : {
         "type" : "object",
         "description" : "New legal form record to be referenced by business partners",
         "properties" : {
           "technicalKey" : {
-            "type" : "string",
-            "description" : "Unique key to be used for reference"
+            "type" : "string"
           },
           "name" : {
-            "type" : "string",
-            "description" : "Full name of the legal form"
+            "type" : "string"
           },
           "transliteratedName" : {
-            "type" : "string",
-            "description" : "Transliterated name of the legal form"
+            "type" : "string"
           },
           "abbreviations" : {
-            "type" : "string",
-            "description" : "Comma separed list of abbreviations of the legal form name"
+            "type" : "string"
           },
           "transliteratedAbbreviations" : {
-            "type" : "string",
-            "description" : "Transliterated abbreviations of the legal form abbreviations"
+            "type" : "string"
           },
           "country" : {
             "type" : "string",
-            "description" : "The country to which this legal form belongs to",
             "enum" : [ "UNDEFINED", "AC", "AD", "AE", "AF", "AG", "AI", "AL", "AM", "AN", "AO", "AQ", "AR", "AS", "AT", "AU", "AW", "AX", "AZ", "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO", "BQ", "BR", "BS", "BT", "BU", "BV", "BW", "BY", "BZ", "CA", "CC", "CD", "CF", "CG", "CH", "CI", "CK", "CL", "CM", "CN", "CO", "CP", "CR", "CS", "CU", "CV", "CW", "CX", "CY", "CZ", "DE", "DG", "DJ", "DK", "DM", "DO", "DZ", "EA", "EC", "EE", "EG", "EH", "ER", "ES", "ET", "EU", "EZ", "FI", "FJ", "FK", "FM", "FO", "FR", "FX", "GA", "GB", "GD", "GE", "GF", "GG", "GH", "GI", "GL", "GM", "GN", "GP", "GQ", "GR", "GS", "GT", "GU", "GW", "GY", "HK", "HM", "HN", "HR", "HT", "HU", "IC", "ID", "IE", "IL", "IM", "IN", "IO", "IQ", "IR", "IS", "IT", "JE", "JM", "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN", "KP", "KR", "KW", "KY", "KZ", "LA", "LB", "LC", "LI", "LK", "LR", "LS", "LT", "LU", "LV", "LY", "MA", "MC", "MD", "ME", "MF", "MG", "MH", "MK", "ML", "MM", "MN", "MO", "MP", "MQ", "MR", "MS", "MT", "MU", "MV", "MW", "MX", "MY", "MZ", "NA", "NC", "NE", "NF", "NG", "NI", "NL", "NO", "NP", "NR", "NT", "NU", "NZ", "OM", "PA", "PE", "PF", "PG", "PH", "PK", "PL", "PM", "PN", "PR", "PS", "PT", "PW", "PY", "QA", "RE", "RO", "RS", "RU", "RW", "SA", "SB", "SC", "SD", "SE", "SF", "SG", "SH", "SI", "SJ", "SK", "SL", "SM", "SN", "SO", "SR", "SS", "ST", "SU", "SV", "SX", "SY", "SZ", "TA", "TC", "TD", "TF", "TG", "TH", "TJ", "TK", "TL", "TM", "TN", "TO", "TP", "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "UK", "UM", "US", "UY", "UZ", "VA", "VC", "VE", "VG", "VI", "VN", "VU", "WF", "WS", "XI", "XU", "XK", "YE", "YT", "YU", "ZA", "ZM", "ZR", "ZW" ]
           },
           "language" : {
             "type" : "string",
-            "description" : "The language of the legal form's name",
             "enum" : [ "undefined", "aa", "ab", "ae", "af", "ak", "am", "an", "ar", "as", "av", "ay", "az", "ba", "be", "bg", "bh", "bi", "bm", "bn", "bo", "br", "bs", "ca", "ce", "ch", "co", "cr", "cs", "cu", "cv", "cy", "da", "de", "dv", "dz", "ee", "el", "en", "eo", "es", "et", "eu", "fa", "ff", "fi", "fj", "fo", "fr", "fy", "ga", "gd", "gl", "gn", "gu", "gv", "ha", "he", "hi", "ho", "hr", "ht", "hu", "hy", "hz", "ia", "id", "ie", "ig", "ii", "ik", "io", "is", "it", "iu", "ja", "jv", "ka", "kg", "ki", "kj", "kk", "kl", "km", "kn", "ko", "kr", "ks", "ku", "kv", "kw", "ky", "la", "lb", "lg", "li", "ln", "lo", "lt", "lu", "lv", "mg", "mh", "mi", "mk", "ml", "mn", "mr", "ms", "mt", "my", "na", "nb", "nd", "ne", "ng", "nl", "nn", "no", "nr", "nv", "ny", "oc", "oj", "om", "or", "os", "pa", "pi", "pl", "ps", "pt", "qu", "rm", "rn", "ro", "ru", "rw", "sa", "sc", "sd", "se", "sg", "si", "sk", "sl", "sm", "sn", "so", "sq", "sr", "ss", "st", "su", "sv", "sw", "ta", "te", "tg", "th", "ti", "tk", "tl", "tn", "to", "tr", "ts", "tt", "tw", "ty", "ug", "uk", "ur", "uz", "ve", "vi", "vo", "wa", "wo", "xh", "yi", "yo", "za", "zh", "zu" ]
           },
           "administrativeAreaLevel1" : {
-            "type" : "string",
-            "description" : "The administrative area level 1 this legal form belongs to"
+            "type" : "string"
           },
           "isActive" : {
             "type" : "boolean",
             "description" : "Whether this legal form is considered as active according to GLEIF"
           }
-        },
-        "required" : [ "isActive", "name", "technicalKey" ]
+        }
       },
       "LogisticAddressDto" : {
         "type" : "object",
@@ -4618,8 +4537,7 @@
           "confidenceCriteria" : {
             "$ref" : "#/components/schemas/ConfidenceCriteriaDto"
           }
-        },
-        "required" : [ "confidenceCriteria", "identifiers", "physicalPostalAddress", "states" ]
+        }
       },
       "LogisticAddressVerboseDto" : {
         "type" : "object",
@@ -4663,10 +4581,6 @@
             "type" : "string",
             "description" : "The BPNS of the site the address belongs to."
           },
-          "isParticipantData" : {
-            "type" : "boolean",
-            "description" : "Indicates whether the address is owned and thus provided by a Data Space Participant."
-          },
           "createdAt" : {
             "type" : "string",
             "format" : "date-time",
@@ -4684,9 +4598,12 @@
             "type" : "string",
             "description" : "Indicates the address type, the legal address to a legal entity or the main address to a site, an additional address, or both legal and site address.The site main address is where typically the main entrance or the reception is located, or where the mail is delivered to.",
             "enum" : [ "LegalAndSiteMainAddress", "LegalAddress", "SiteMainAddress", "AdditionalAddress" ]
+          },
+          "isParticipantData" : {
+            "type" : "boolean",
+            "description" : "Indicates whether the address is owned and thus provided by a Data Space Participant."
           }
-        },
-        "required" : [ "bpna", "confidenceCriteria", "createdAt", "identifiers", "isParticipantData", "physicalPostalAddress", "states", "updatedAt" ]
+        }
       },
       "PageDtoBusinessPartnerSearchResultDto" : {
         "type" : "object",
@@ -4719,8 +4636,7 @@
               "$ref" : "#/components/schemas/BusinessPartnerSearchResultDto"
             }
           }
-        },
-        "required" : [ "content", "contentSize", "page", "totalElements", "totalPages" ]
+        }
       },
       "PageDtoChangelogEntryVerboseDto" : {
         "type" : "object",
@@ -4753,8 +4669,7 @@
               "$ref" : "#/components/schemas/ChangelogEntryVerboseDto"
             }
           }
-        },
-        "required" : [ "content", "contentSize", "page", "totalElements", "totalPages" ]
+        }
       },
       "PageDtoCountrySubdivisionDto" : {
         "type" : "object",
@@ -4787,8 +4702,7 @@
               "$ref" : "#/components/schemas/CountrySubdivisionDto"
             }
           }
-        },
-        "required" : [ "content", "contentSize", "page", "totalElements", "totalPages" ]
+        }
       },
       "PageDtoCxMembershipDto" : {
         "type" : "object",
@@ -4821,8 +4735,7 @@
               "$ref" : "#/components/schemas/CxMembershipDto"
             }
           }
-        },
-        "required" : [ "content", "contentSize", "page", "totalElements", "totalPages" ]
+        }
       },
       "PageDtoDataSpaceParticipantDto" : {
         "type" : "object",
@@ -4855,8 +4768,7 @@
               "$ref" : "#/components/schemas/DataSpaceParticipantDto"
             }
           }
-        },
-        "required" : [ "content", "contentSize", "page", "totalElements", "totalPages" ]
+        }
       },
       "PageDtoIdentifierTypeDto" : {
         "type" : "object",
@@ -4889,8 +4801,7 @@
               "$ref" : "#/components/schemas/IdentifierTypeDto"
             }
           }
-        },
-        "required" : [ "content", "contentSize", "page", "totalElements", "totalPages" ]
+        }
       },
       "PageDtoLegalEntityWithLegalAddressVerboseDto" : {
         "type" : "object",
@@ -4923,8 +4834,7 @@
               "$ref" : "#/components/schemas/LegalEntityWithLegalAddressVerboseDto"
             }
           }
-        },
-        "required" : [ "content", "contentSize", "page", "totalElements", "totalPages" ]
+        }
       },
       "PageDtoLegalFormDto" : {
         "type" : "object",
@@ -4957,8 +4867,7 @@
               "$ref" : "#/components/schemas/LegalFormDto"
             }
           }
-        },
-        "required" : [ "content", "contentSize", "page", "totalElements", "totalPages" ]
+        }
       },
       "PageDtoLogisticAddressVerboseDto" : {
         "type" : "object",
@@ -4991,8 +4900,7 @@
               "$ref" : "#/components/schemas/LogisticAddressVerboseDto"
             }
           }
-        },
-        "required" : [ "content", "contentSize", "page", "totalElements", "totalPages" ]
+        }
       },
       "PageDtoSiteVerboseDto" : {
         "type" : "object",
@@ -5025,8 +4933,7 @@
               "$ref" : "#/components/schemas/SiteVerboseDto"
             }
           }
-        },
-        "required" : [ "content", "contentSize", "page", "totalElements", "totalPages" ]
+        }
       },
       "PageDtoSiteWithMainAddressVerboseDto" : {
         "type" : "object",
@@ -5059,8 +4966,7 @@
               "$ref" : "#/components/schemas/SiteWithMainAddressVerboseDto"
             }
           }
-        },
-        "required" : [ "content", "contentSize", "page", "totalElements", "totalPages" ]
+        }
       },
       "PhysicalPostalAddressDto" : {
         "type" : "object",
@@ -5125,8 +5031,7 @@
             "type" : "string",
             "description" : "Tax jurisdiction codes are used to identify the specific jurisdiction(s) that a company belong to, particularly in bureaucratic processes such as tax returns and IRS forms."
           }
-        },
-        "required" : [ "city", "country" ]
+        }
       },
       "PhysicalPostalAddressVerboseDto" : {
         "type" : "object",
@@ -5134,14 +5039,6 @@
         "properties" : {
           "geographicCoordinates" : {
             "$ref" : "#/components/schemas/GeoCoordinateDto"
-          },
-          "country" : {
-            "$ref" : "#/components/schemas/TypeKeyNameVerboseDtoCountryCode",
-            "description" : "The 2-digit country code of the physical postal address according to ISO 3166-1."
-          },
-          "administrativeAreaLevel1" : {
-            "$ref" : "#/components/schemas/RegionDto",
-            "description" : "The 2-digit country subdivision code according to ISO 3166-2, such as a region within a country."
           },
           "administrativeAreaLevel2" : {
             "type" : "string",
@@ -5189,9 +5086,16 @@
           "taxJurisdictionCode" : {
             "type" : "string",
             "description" : "Tax jurisdiction codes are used to identify the specific jurisdiction(s) that a company belong to, particularly in bureaucratic processes such as tax returns and IRS forms."
+          },
+          "country" : {
+            "$ref" : "#/components/schemas/TypeKeyNameVerboseDtoCountryCode",
+            "description" : "The 2-digit country code of the physical postal address according to ISO 3166-1."
+          },
+          "administrativeAreaLevel1" : {
+            "$ref" : "#/components/schemas/RegionDto",
+            "description" : "The 2-digit country subdivision code according to ISO 3166-2, such as a region within a country."
           }
-        },
-        "required" : [ "city", "country" ]
+        }
       },
       "RegionDto" : {
         "type" : "object",
@@ -5210,8 +5114,7 @@
             "type" : "string",
             "description" : "Describes the full name of the region within a country according to ISO 3166-214"
           }
-        },
-        "required" : [ "countryCode", "regionCode", "regionName" ]
+        }
       },
       "RelationValidityPeriod" : {
         "type" : "object",
@@ -5227,8 +5130,7 @@
             "format" : "date",
             "description" : "The date until which the relation is valid."
           }
-        },
-        "required" : [ "validFrom" ]
+        }
       },
       "RelationVerboseDto" : {
         "type" : "object",
@@ -5253,8 +5155,7 @@
               "$ref" : "#/components/schemas/RelationValidityPeriod"
             }
           }
-        },
-        "required" : [ "businessPartnerSourceBpnl", "businessPartnerTargetBpnl", "type", "validityPeriods" ]
+        }
       },
       "SiteCreateRequestWithLegalAddressAsMain" : {
         "type" : "object",
@@ -5276,8 +5177,7 @@
           "bpnLParent" : {
             "type" : "string"
           }
-        },
-        "required" : [ "bpnLParent", "confidenceCriteria", "name", "states" ]
+        }
       },
       "SitePartnerCreateRequest" : {
         "type" : "object",
@@ -5301,18 +5201,15 @@
             "$ref" : "#/components/schemas/ConfidenceCriteriaDto"
           },
           "bpnlParent" : {
-            "type" : "string",
-            "description" : "The BPNL of the legal entity owning the site."
+            "type" : "string"
           },
           "index" : {
-            "type" : "string",
-            "description" : "User defined index to conveniently match this entry to the corresponding entry in the response."
+            "type" : "string"
           },
           "requestKey" : {
             "type" : "string"
           }
-        },
-        "required" : [ "bpnlParent", "confidenceCriteria", "mainAddress", "name", "states" ]
+        }
       },
       "SitePartnerCreateResponseWrapper" : {
         "type" : "object",
@@ -5338,8 +5235,7 @@
             "type" : "integer",
             "format" : "int32"
           }
-        },
-        "required" : [ "entities", "entityCount", "errorCount", "errors" ]
+        }
       },
       "SitePartnerCreateVerboseDto" : {
         "type" : "object",
@@ -5360,10 +5256,6 @@
               "$ref" : "#/components/schemas/SiteStateVerboseDto"
             }
           },
-          "isParticipantData" : {
-            "type" : "boolean",
-            "description" : "Indicates whether the site is owned and thus provided by a Data Space Participant."
-          },
           "bpnLegalEntity" : {
             "type" : "string",
             "description" : "The BPNL of the legal entity owning the site."
@@ -5381,6 +5273,10 @@
           "confidenceCriteria" : {
             "$ref" : "#/components/schemas/ConfidenceCriteriaDto"
           },
+          "isParticipantData" : {
+            "type" : "boolean",
+            "description" : "Indicates whether the site is owned and thus provided by a Data Space Participant."
+          },
           "mainAddress" : {
             "$ref" : "#/components/schemas/LogisticAddressVerboseDto",
             "description" : "The address, where typically the main entrance or the reception is located, or where the mail is delivered to."
@@ -5389,16 +5285,14 @@
             "type" : "string",
             "description" : "User defined index to conveniently match this entry to the corresponding entry in the response."
           }
-        },
-        "required" : [ "bpnLegalEntity", "bpns", "confidenceCriteria", "createdAt", "isParticipantData", "mainAddress", "name", "states", "updatedAt" ]
+        }
       },
       "SitePartnerUpdateRequest" : {
         "type" : "object",
         "description" : "Request for updating a business partner record of type site. In general, a site is a delimited geographical area in which an organization (such as an enterprise or company, university, association, etc.) conducts business. In Catena-X, a site is a type of business partner representing a physical location or area owned by a legal entity, where a production plant, a warehouse, or an office building is located. A site is owned by a legal entity. Thus, exactly one legal entity is assigned to a site. A site has exactly one main address, but it is possible to specify additional addresses (such as different gates), that belong to a site. Thus, at least one address is assigned to a site. A site can only be uploaded and modified by the owner (the legal entity), because only the owner knows which addresses belong to which site. A site is uniquely identified by the BPNS.",
         "properties" : {
           "bpns" : {
-            "type" : "string",
-            "description" : "A BPNS represents and uniquely identifies a site, which is where for example a production plant, a warehouse, or an office building is located."
+            "type" : "string"
           },
           "name" : {
             "type" : "string",
@@ -5420,8 +5314,7 @@
           "requestKey" : {
             "type" : "string"
           }
-        },
-        "required" : [ "bpns", "confidenceCriteria", "mainAddress", "name", "requestKey", "states" ]
+        }
       },
       "SitePartnerUpdateResponseWrapper" : {
         "type" : "object",
@@ -5447,8 +5340,7 @@
             "type" : "integer",
             "format" : "int32"
           }
-        },
-        "required" : [ "entities", "entityCount", "errorCount", "errors" ]
+        }
       },
       "SiteSearchRequest" : {
         "type" : "object",
@@ -5468,8 +5360,7 @@
           "name" : {
             "type" : "string"
           }
-        },
-        "required" : [ "legalEntityBpns", "siteBpns" ]
+        }
       },
       "SiteStateDto" : {
         "type" : "object",
@@ -5490,8 +5381,7 @@
             "description" : "One of the state types: active, inactive.",
             "enum" : [ "ACTIVE", "INACTIVE" ]
           }
-        },
-        "required" : [ "type" ]
+        }
       },
       "SiteStateVerboseDto" : {
         "type" : "object",
@@ -5511,8 +5401,7 @@
             "$ref" : "#/components/schemas/TypeKeyNameVerboseDtoBusinessStateType",
             "description" : "One of the state types: active, inactive."
           }
-        },
-        "required" : [ "type" ]
+        }
       },
       "SiteVerboseDto" : {
         "type" : "object",
@@ -5533,10 +5422,6 @@
               "$ref" : "#/components/schemas/SiteStateVerboseDto"
             }
           },
-          "isParticipantData" : {
-            "type" : "boolean",
-            "description" : "Indicates whether the site is owned and thus provided by a Data Space Participant."
-          },
           "bpnLegalEntity" : {
             "type" : "string",
             "description" : "The BPNL of the legal entity owning the site."
@@ -5553,9 +5438,12 @@
           },
           "confidenceCriteria" : {
             "$ref" : "#/components/schemas/ConfidenceCriteriaDto"
+          },
+          "isParticipantData" : {
+            "type" : "boolean",
+            "description" : "Indicates whether the site is owned and thus provided by a Data Space Participant."
           }
-        },
-        "required" : [ "bpnLegalEntity", "bpns", "confidenceCriteria", "createdAt", "isParticipantData", "name", "states", "updatedAt" ]
+        }
       },
       "SiteWithMainAddressVerboseDto" : {
         "type" : "object",
@@ -5576,10 +5464,6 @@
               "$ref" : "#/components/schemas/SiteStateVerboseDto"
             }
           },
-          "isParticipantData" : {
-            "type" : "boolean",
-            "description" : "Indicates whether the site is owned and thus provided by a Data Space Participant."
-          },
           "bpnLegalEntity" : {
             "type" : "string",
             "description" : "The BPNL of the legal entity owning the site."
@@ -5597,12 +5481,14 @@
           "confidenceCriteria" : {
             "$ref" : "#/components/schemas/ConfidenceCriteriaDto"
           },
+          "isParticipantData" : {
+            "type" : "boolean",
+            "description" : "Indicates whether the site is owned and thus provided by a Data Space Participant."
+          },
           "mainAddress" : {
-            "$ref" : "#/components/schemas/LogisticAddressVerboseDto",
-            "description" : "The address, where typically the main entrance or the reception is located, or where the mail is delivered to."
+            "$ref" : "#/components/schemas/LogisticAddressVerboseDto"
           }
-        },
-        "required" : [ "bpnLegalEntity", "bpns", "confidenceCriteria", "createdAt", "isParticipantData", "mainAddress", "name", "states", "updatedAt" ]
+        }
       },
       "StreetDto" : {
         "type" : "object",
@@ -5658,8 +5544,7 @@
             "type" : "string",
             "description" : "Name or denotation of this type"
           }
-        },
-        "required" : [ "name", "technicalKey" ]
+        }
       },
       "TypeKeyNameVerboseDtoCountryCode" : {
         "type" : "object",
@@ -5674,8 +5559,7 @@
             "type" : "string",
             "description" : "Name or denotation of this type"
           }
-        },
-        "required" : [ "name", "technicalKey" ]
+        }
       },
       "TypeKeyNameVerboseDtoString" : {
         "type" : "object",
@@ -5689,8 +5573,7 @@
             "type" : "string",
             "description" : "Name or denotation of this type"
           }
-        },
-        "required" : [ "name", "technicalKey" ]
+        }
       }
     },
     "securitySchemes" : {

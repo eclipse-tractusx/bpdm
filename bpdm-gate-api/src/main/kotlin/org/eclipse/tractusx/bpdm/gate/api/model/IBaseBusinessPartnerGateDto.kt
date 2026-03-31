@@ -29,7 +29,7 @@ interface IBaseBusinessPartnerGateDto : IBaseBusinessPartnerDto {
     @get:Schema(description = CommonDescription.externalId)
     val externalId: String
 
-    @get:Schema(description = "Indicates whether the sharing member claims (in the initial upload) the business partner to belong to the company data of the sharing member.")
+    @get:Schema(description = "Indicates whether the sharing member claims (in the initial upload) the business partner to belong to the company data of the sharing member.", name = "isOwnCompanyData")
     val isOwnCompanyData: Boolean
 
     @get:Schema(description = "The timestamp indicates the last time point of change from the user side")

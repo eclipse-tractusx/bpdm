@@ -2,33 +2,33 @@ openapi: 3.1.0
 info:
   title: Business Partner Data Management Gate
   description: A gate for a member to share business partner data with CatenaX
-  version: 7.3.0
+  version: 7.4.0-SNAPSHOT
 servers:
-  - url: http://localhost:8081
-    description: Generated server url
+- url: http://localhost:8081
+  description: Generated server url
 security:
-  - open_id_scheme: []
-  - bearer_scheme: []
+- open_id_scheme: []
+- bearer_scheme: []
 paths:
   /v7/input/relations:
     put:
       tags:
-        - relation-controller
+      - relation-controller
       summary: Update a business partner input relation
       description: 'Update an existing business partner relation on the input stage.
         By using a request parameter it is also possible to create a relation if the
         relation with the given external identifier does not exist. '
       operationId: put
       parameters:
-        - name: createIfNotExist
-          in: query
-          description: If true a business partner relation will be created even if a
-            relation could not be found under the given external identifier.
-          required: false
-          schema:
-            type: boolean
-            description: If true a business partner relation will be created even if
-              a relation could not be found under the given external identifier.
+      - name: createIfNotExist
+        in: query
+        description: If true a business partner relation will be created even if a
+          relation could not be found under the given external identifier.
+        required: false
+        schema:
+          type: boolean
+          description: If true a business partner relation will be created even if
+            a relation could not be found under the given external identifier.
       requestBody:
         content:
           application/json:
@@ -53,7 +53,7 @@ paths:
   /v6/input/business-partners:
     put:
       tags:
-        - business-partner-controller
+      - business-partner-controller
       summary: Create or update business partner with given external ID
       description: "Create or update generic business partner. Updates instead of\
         \ creating a new business partner if an already existing external ID is used.\
@@ -83,7 +83,7 @@ paths:
   /v7/input/business-partners:
     put:
       tags:
-        - business-partner-controller
+      - business-partner-controller
       summary: Create or update business partner with given external ID
       description: "Create or update generic business partner. Updates instead of\
         \ creating a new business partner if an already existing external ID is used.\
@@ -113,85 +113,85 @@ paths:
   /v6/input/business-partner-relations:
     get:
       tags:
-        - relation-controller
+      - relation-controller
       summary: Find business partner input relations
       description: Find paginated list of business partner relations from the input
         stage. There are various filter criteria available. All filters are 'AND'
         filters.
       operationId: get
       parameters:
-        - name: externalIds
-          in: query
+      - name: externalIds
+        in: query
+        description: Only show relations with the given external identifiers
+        required: false
+        schema:
+          type: array
           description: Only show relations with the given external identifiers
-          required: false
-          schema:
-            type: array
-            description: Only show relations with the given external identifiers
-            items:
-              type: string
-              description: Only show relations with the given external identifiers
-        - name: relationType
-          in: query
-          description: Only show relations of the given type
-          required: false
-          schema:
+          items:
             type: string
-            description: Only show relations of the given type
-            enum:
-              - IsManagedBy
-              - IsAlternativeHeadquarterFor
-              - IsOwnedBy
-        - name: businessPartnerSourceExternalIds
-          in: query
-          description: Only show relations which have the given business partners as
-            sources
-          required: false
-          schema:
-            type: array
+            description: Only show relations with the given external identifiers
+      - name: relationType
+        in: query
+        description: Only show relations of the given type
+        required: false
+        schema:
+          type: string
+          description: Only show relations of the given type
+          enum:
+          - IsManagedBy
+          - IsAlternativeHeadquarterFor
+          - IsOwnedBy
+      - name: businessPartnerSourceExternalIds
+        in: query
+        description: Only show relations which have the given business partners as
+          sources
+        required: false
+        schema:
+          type: array
+          description: Only show relations which have the given business partners
+            as sources
+          items:
+            type: string
             description: Only show relations which have the given business partners
               as sources
-            items:
-              type: string
-              description: Only show relations which have the given business partners
-                as sources
-        - name: businessPartnerTargetExternalIds
-          in: query
-          description: Only show relations which have the given business partners as
-            targets
-          required: false
-          schema:
-            type: array
+      - name: businessPartnerTargetExternalIds
+        in: query
+        description: Only show relations which have the given business partners as
+          targets
+        required: false
+        schema:
+          type: array
+          description: Only show relations which have the given business partners
+            as targets
+          items:
+            type: string
             description: Only show relations which have the given business partners
               as targets
-            items:
-              type: string
-              description: Only show relations which have the given business partners
-                as targets
-        - name: updatedAtFrom
-          in: query
+      - name: updatedAtFrom
+        in: query
+        description: Only show relations which have been modified after the given
+          time stamp
+        required: false
+        schema:
+          type: string
+          format: date-time
           description: Only show relations which have been modified after the given
             time stamp
-          required: false
-          schema:
-            type: string
-            format: date-time
-            description: Only show relations which have been modified after the given
-              time stamp
-        - name: page
-          in: query
-          description: Number of page to get results from
-          required: false
-          schema:
-            type: string
-            minimum: 0
-        - name: size
-          in: query
-          description: Size of each page
-          required: false
-          schema:
-            type: string
-            maximum: 100
-            minimum: 0
+      - name: page
+        in: query
+        description: Number of page to get results from
+        required: false
+        schema:
+          type: string
+          minimum: 0
+      - name: size
+        in: query
+        description: Size of each page
+        required: false
+        schema:
+          type: string
+          maximum: 100
+          minimum: 0
       responses:
         "200":
           description: A paginated list of business partner relations for the input
@@ -202,22 +202,22 @@ paths:
                 $ref: "#/components/schemas/PageDtoRelationV6Dto"
     put:
       tags:
-        - relation-controller
+      - relation-controller
       summary: Update a business partner input relation
       description: 'Update an existing business partner relation on the input stage.
         By using a request parameter it is also possible to create a relation if the
         relation with the given external identifier does not exist. '
       operationId: put_1
       parameters:
-        - name: createIfNotExist
-          in: query
-          description: If true a business partner relation will be created even if a
-            relation could not be found under the given external identifier.
-          required: false
-          schema:
-            type: boolean
-            description: If true a business partner relation will be created even if
-              a relation could not be found under the given external identifier.
+      - name: createIfNotExist
+        in: query
+        description: If true a business partner relation will be created even if a
+          relation could not be found under the given external identifier.
+        required: false
+        schema:
+          type: boolean
+          description: If true a business partner relation will be created even if
+            a relation could not be found under the given external identifier.
       requestBody:
         content:
           application/json:
@@ -241,7 +241,7 @@ paths:
                 $ref: "#/components/schemas/GateErrorResponse"
     post:
       tags:
-        - relation-controller
+      - relation-controller
       summary: Create a new business partner input relation
       description: Create a new relation between two business partner entries on the
         input stage. The external identifier is optional and a new one will be automatically
@@ -276,19 +276,19 @@ paths:
                 $ref: "#/components/schemas/GateErrorResponse"
     delete:
       tags:
-        - relation-controller
+      - relation-controller
       summary: Delete an existing business partner relation
       description: Delete a relation between two business partners on the input stage.
       operationId: delete
       parameters:
-        - name: externalId
-          in: query
-          description: The external identifier of the business partner relation to delete
-          required: true
-          schema:
-            type: string
-            description: The external identifier of the business partner relation to
-              delete
+      - name: externalId
+        in: query
+        description: The external identifier of the business partner relation to delete
+        required: true
+        schema:
+          type: string
+          description: The external identifier of the business partner relation to
+            delete
       responses:
         "200":
           description: The specified relation has been deleted.
@@ -301,28 +301,28 @@ paths:
   /v7/output/relations/search:
     post:
       tags:
-        - relation-controller
+      - relation-controller
       summary: Find business partner output relations
       description: Find paginated list of business partner relations from the output
         stage. There are various filter criteria available. All filters are 'AND'
         filters.
       operationId: postSearch
       parameters:
-        - name: page
-          in: query
-          description: Number of page to get results from
-          required: false
-          schema:
-            type: string
-            minimum: 0
-        - name: size
-          in: query
-          description: Size of each page
-          required: false
-          schema:
-            type: string
-            maximum: 100
-            minimum: 0
+      - name: page
+        in: query
+        description: Number of page to get results from
+        required: false
+        schema:
+          type: string
+          minimum: 0
+      - name: size
+        in: query
+        description: Size of each page
+        required: false
+        schema:
+          type: string
+          maximum: 100
+          minimum: 0
       requestBody:
         content:
           application/json:
@@ -339,7 +339,7 @@ paths:
   /v7/output/relations/changelog/search:
     post:
       tags:
-        - relation-changelog-controller
+      - relation-changelog-controller
       summary: Returns changelog entries for changes to business partner relations
         in the output stage
       description: "Returns business partner relation changelog entries as of a specified\
@@ -347,21 +347,21 @@ paths:
         \ array of external IDs."
       operationId: getOutputChangelog
       parameters:
-        - name: page
-          in: query
-          description: Number of page to get results from
-          required: false
-          schema:
-            type: string
-            minimum: 0
-        - name: size
-          in: query
-          description: Size of each page
-          required: false
-          schema:
-            type: string
-            maximum: 100
-            minimum: 0
+      - name: page
+        in: query
+        description: Number of page to get results from
+        required: false
+        schema:
+          type: string
+          minimum: 0
+      - name: size
+        in: query
+        description: Size of each page
+        required: false
+        schema:
+          type: string
+          maximum: 100
+          minimum: 0
       requestBody:
         content:
           application/json:
@@ -380,7 +380,7 @@ paths:
   /v7/output/business-partners/search:
     post:
       tags:
-        - business-partner-controller
+      - business-partner-controller
       summary: Search business partners by an array of external IDs from the output
         stage
       description: Get page of business partners output data filtered by a collection
@@ -388,21 +388,21 @@ paths:
         all business partners.
       operationId: getBusinessPartnersOutput
       parameters:
-        - name: page
-          in: query
-          description: Number of page to get results from
-          required: false
-          schema:
-            type: string
-            minimum: 0
-        - name: size
-          in: query
-          description: Size of each page
-          required: false
-          schema:
-            type: string
-            maximum: 100
-            minimum: 0
+      - name: page
+        in: query
+        description: Number of page to get results from
+        required: false
+        schema:
+          type: string
+          minimum: 0
+      - name: size
+        in: query
+        description: Size of each page
+        required: false
+        schema:
+          type: string
+          maximum: 100
+          minimum: 0
       requestBody:
         content:
           application/json:
@@ -422,7 +422,7 @@ paths:
   /v6/output/changelog/search:
     post:
       tags:
-        - changelog-controller
+      - changelog-controller
       summary: Returns changelog entries for changes to the business partner output
         stage
       description: "Returns changelog entries as of a specified timestamp from the\
@@ -430,21 +430,21 @@ paths:
         \ and a business partner type."
       operationId: getOutputChangelog_1
       parameters:
-        - name: page
-          in: query
-          description: Number of page to get results from
-          required: false
-          schema:
-            type: string
-            minimum: 0
-        - name: size
-          in: query
-          description: Size of each page
-          required: false
-          schema:
-            type: string
-            maximum: 100
-            minimum: 0
+      - name: page
+        in: query
+        description: Number of page to get results from
+        required: false
+        schema:
+          type: string
+          minimum: 0
+      - name: size
+        in: query
+        description: Size of each page
+        required: false
+        schema:
+          type: string
+          maximum: 100
+          minimum: 0
       requestBody:
         content:
           application/json:
@@ -463,7 +463,7 @@ paths:
   /v7/output/business-partners/changelog/search:
     post:
       tags:
-        - changelog-controller
+      - changelog-controller
       summary: Returns changelog entries for changes to the business partner output
         stage
       description: "Returns changelog entries as of a specified timestamp from the\
@@ -471,21 +471,21 @@ paths:
         \ and a business partner type."
       operationId: getOutputChangelog_2
       parameters:
-        - name: page
-          in: query
-          description: Number of page to get results from
-          required: false
-          schema:
-            type: string
-            minimum: 0
-        - name: size
-          in: query
-          description: Size of each page
-          required: false
-          schema:
-            type: string
-            maximum: 100
-            minimum: 0
+      - name: page
+        in: query
+        description: Number of page to get results from
+        required: false
+        schema:
+          type: string
+          minimum: 0
+      - name: size
+        in: query
+        description: Size of each page
+        required: false
+        schema:
+          type: string
+          maximum: 100
+          minimum: 0
       requestBody:
         content:
           application/json:
@@ -504,28 +504,28 @@ paths:
   /v7/input/relations/search:
     post:
       tags:
-        - relation-controller
+      - relation-controller
       summary: Find business partner input relations
       description: Find paginated list of business partner relations from the input
         stage. There are various filter criteria available. All filters are 'AND'
         filters.
       operationId: postSearch_1
       parameters:
-        - name: page
-          in: query
-          description: Number of page to get results from
-          required: false
-          schema:
-            type: string
-            minimum: 0
-        - name: size
-          in: query
-          description: Size of each page
-          required: false
-          schema:
-            type: string
-            maximum: 100
-            minimum: 0
+      - name: page
+        in: query
+        description: Number of page to get results from
+        required: false
+        schema:
+          type: string
+          minimum: 0
+      - name: size
+        in: query
+        description: Size of each page
+        required: false
+        schema:
+          type: string
+          maximum: 100
+          minimum: 0
       requestBody:
         content:
           application/json:
@@ -542,7 +542,7 @@ paths:
   /v7/input/relations/changelog/search:
     post:
       tags:
-        - relation-changelog-controller
+      - relation-changelog-controller
       summary: Returns changelog entries for changes to business partner relations
         in the input stage
       description: "Returns business partner relation changelog entries as of a specified\
@@ -550,21 +550,21 @@ paths:
         \ array of external IDs."
       operationId: getInputChangelog
       parameters:
-        - name: page
-          in: query
-          description: Number of page to get results from
-          required: false
-          schema:
-            type: string
-            minimum: 0
-        - name: size
-          in: query
-          description: Size of each page
-          required: false
-          schema:
-            type: string
-            maximum: 100
-            minimum: 0
+      - name: page
+        in: query
+        description: Number of page to get results from
+        required: false
+        schema:
+          type: string
+          minimum: 0
+      - name: size
+        in: query
+        description: Size of each page
+        required: false
+        schema:
+          type: string
+          maximum: 100
+          minimum: 0
       requestBody:
         content:
           application/json:
@@ -583,7 +583,7 @@ paths:
   /v7/input/business-partners/changelog/search:
     post:
       tags:
-        - changelog-controller
+      - changelog-controller
       summary: Returns changelog entries for changes to the business partner input
         stage
       description: "Returns changelog entries as of a specified timestamp from the\
@@ -591,21 +591,21 @@ paths:
         \ and a business partner type."
       operationId: getInputChangelog_1
       parameters:
-        - name: page
-          in: query
-          description: Number of page to get results from
-          required: false
-          schema:
-            type: string
-            minimum: 0
-        - name: size
-          in: query
-          description: Size of each page
-          required: false
-          schema:
-            type: string
-            maximum: 100
-            minimum: 0
+      - name: page
+        in: query
+        description: Number of page to get results from
+        required: false
+        schema:
+          type: string
+          minimum: 0
+      - name: size
+        in: query
+        description: Size of each page
+        required: false
+        schema:
+          type: string
+          maximum: 100
+          minimum: 0
       requestBody:
         content:
           application/json:
@@ -624,7 +624,7 @@ paths:
   /v6/input/changelog/search:
     post:
       tags:
-        - changelog-controller
+      - changelog-controller
       summary: Returns changelog entries for changes to the business partner input
         stage
       description: "Returns changelog entries as of a specified timestamp from the\
@@ -632,21 +632,21 @@ paths:
         \ and a business partner type."
       operationId: getInputChangelog_2
       parameters:
-        - name: page
-          in: query
-          description: Number of page to get results from
-          required: false
-          schema:
-            type: string
-            minimum: 0
-        - name: size
-          in: query
-          description: Size of each page
-          required: false
-          schema:
-            type: string
-            maximum: 100
-            minimum: 0
+      - name: page
+        in: query
+        description: Number of page to get results from
+        required: false
+        schema:
+          type: string
+          minimum: 0
+      - name: size
+        in: query
+        description: Size of each page
+        required: false
+        schema:
+          type: string
+          maximum: 100
+          minimum: 0
       requestBody:
         content:
           application/json:
@@ -665,7 +665,7 @@ paths:
   /v7/business-partners/sharing-state/ready:
     post:
       tags:
-        - sharing-state-controller
+      - sharing-state-controller
       summary: Sets the given business partners into ready to be shared state
       description: "The business partners to set the ready state for are identified\
         \ by their external-id. Only business partners in an initial or error state\
@@ -688,7 +688,7 @@ paths:
   /v6/sharing-state/ready:
     post:
       tags:
-        - sharing-state-controller
+      - sharing-state-controller
       summary: Sets the given business partners into ready to be shared state
       description: "The business partners to set the ready state for are identified\
         \ by their external-id. Only business partners in an initial or error state\
@@ -711,7 +711,7 @@ paths:
   /v6/output/business-partners/search:
     post:
       tags:
-        - business-partner-controller
+      - business-partner-controller
       summary: Search business partners by an array of external IDs from the output
         stage
       description: Get page of business partners output data filtered by a collection
@@ -719,21 +719,21 @@ paths:
         all business partners.
       operationId: getBusinessPartnersOutput_1
       parameters:
-        - name: page
-          in: query
-          description: Number of page to get results from
-          required: false
-          schema:
-            type: string
-            minimum: 0
-        - name: size
-          in: query
-          description: Size of each page
-          required: false
-          schema:
-            type: string
-            maximum: 100
-            minimum: 0
+      - name: page
+        in: query
+        description: Number of page to get results from
+        required: false
+        schema:
+          type: string
+          minimum: 0
+      - name: size
+        in: query
+        description: Size of each page
+        required: false
+        schema:
+          type: string
+          maximum: 100
+          minimum: 0
       requestBody:
         content:
           application/json:
@@ -753,7 +753,7 @@ paths:
   /v6/input/partner-upload-process:
     post:
       tags:
-        - partner-upload-controller
+      - partner-upload-controller
       summary: Create or update business partners from uploaded CSV file
       description: 'Create or update generic business partners. Updates instead of
         creating a new business partner if an already existing external ID is used.
@@ -769,7 +769,7 @@ paths:
                   type: string
                   format: binary
               required:
-                - file
+              - file
       responses:
         "200":
           description: Business partners were successfully updated or created
@@ -793,7 +793,7 @@ paths:
   /v7/input/partner-upload-process:
     post:
       tags:
-        - partner-upload-controller
+      - partner-upload-controller
       summary: Create or update business partners from uploaded CSV file
       description: 'Create or update generic business partners. Updates instead of
         creating a new business partner if an already existing external ID is used.
@@ -809,7 +809,7 @@ paths:
                   type: string
                   format: binary
               required:
-                - file
+              - file
       responses:
         "200":
           description: Business partners were successfully updated or created
@@ -833,28 +833,28 @@ paths:
   /v6/input/business-partners/search:
     post:
       tags:
-        - business-partner-controller
+      - business-partner-controller
       summary: Search business partner by external ID. An empty external ID list returns
         a paginated list of all business partners.
       description: Get page of business partners filtered by a collection of external
         IDs.
       operationId: getBusinessPartnersInput
       parameters:
-        - name: page
-          in: query
-          description: Number of page to get results from
-          required: false
-          schema:
-            type: string
-            minimum: 0
-        - name: size
-          in: query
-          description: Size of each page
-          required: false
-          schema:
-            type: string
-            maximum: 100
-            minimum: 0
+      - name: page
+        in: query
+        description: Number of page to get results from
+        required: false
+        schema:
+          type: string
+          minimum: 0
+      - name: size
+        in: query
+        description: Size of each page
+        required: false
+        schema:
+          type: string
+          maximum: 100
+          minimum: 0
       requestBody:
         content:
           application/json:
@@ -874,28 +874,28 @@ paths:
   /v7/input/business-partners/search:
     post:
       tags:
-        - business-partner-controller
+      - business-partner-controller
       summary: Search business partner by external ID. An empty external ID list returns
         a paginated list of all business partners.
       description: Get page of business partners filtered by a collection of external
         IDs.
       operationId: getBusinessPartnersInput_1
       parameters:
-        - name: page
-          in: query
-          description: Number of page to get results from
-          required: false
-          schema:
-            type: string
-            minimum: 0
-        - name: size
-          in: query
-          description: Size of each page
-          required: false
-          schema:
-            type: string
-            maximum: 100
-            minimum: 0
+      - name: page
+        in: query
+        description: Number of page to get results from
+        required: false
+        schema:
+          type: string
+          minimum: 0
+      - name: size
+        in: query
+        description: Size of each page
+        required: false
+        schema:
+          type: string
+          maximum: 100
+          minimum: 0
       requestBody:
         content:
           application/json:
@@ -915,54 +915,54 @@ paths:
   /v7/relations/sharing-state:
     get:
       tags:
-        - sharing-state-controller
+      - sharing-state-controller
       summary: Returns sharing states of shared business partner relations which can
         be optionally filtered
       operationId: get_1
       parameters:
-        - name: externalIds
-          in: query
-          description: Only show sharing states of given external IDs
-          required: false
-          schema:
-            type: array
-            items:
-              type: string
-        - name: sharingStateTypes
-          in: query
-          description: Only show sharing states of given types
-          required: false
-          schema:
-            type: array
-            items:
-              type: string
-              enum:
-                - Ready
-                - Pending
-                - Error
-                - Success
-        - name: updatedAfter
-          in: query
-          description: Only show sharing states updated after given time
-          required: false
-          schema:
+      - name: externalIds
+        in: query
+        description: Only show sharing states of given external IDs
+        required: false
+        schema:
+          type: array
+          items:
             type: string
-            format: date-time
-        - name: page
-          in: query
-          description: Number of page to get results from
-          required: false
-          schema:
+      - name: sharingStateTypes
+        in: query
+        description: Only show sharing states of given types
+        required: false
+        schema:
+          type: array
+          items:
             type: string
-            minimum: 0
-        - name: size
-          in: query
-          description: Size of each page
-          required: false
-          schema:
-            type: string
-            maximum: 100
-            minimum: 0
+            enum:
+            - Ready
+            - Pending
+            - Error
+            - Success
+      - name: updatedAfter
+        in: query
+        description: Only show sharing states updated after given time
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: page
+        in: query
+        description: Number of page to get results from
+        required: false
+        schema:
+          type: string
+          minimum: 0
+      - name: size
+        in: query
+        description: Size of each page
+        required: false
+        schema:
+          type: string
+          maximum: 100
+          minimum: 0
       responses:
         "200":
           description: Page of sharing states
@@ -973,55 +973,55 @@ paths:
   /v7/business-partners/sharing-state:
     get:
       tags:
-        - sharing-state-controller
+      - sharing-state-controller
       summary: "Returns sharing states of business partners, optionally filtered by\
         \ a business partner type and an array of external IDs"
       operationId: getSharingStates
       parameters:
-        - name: page
-          in: query
-          description: Number of page to get results from
-          required: false
-          schema:
+      - name: page
+        in: query
+        description: Number of page to get results from
+        required: false
+        schema:
+          type: string
+          minimum: 0
+      - name: size
+        in: query
+        description: Size of each page
+        required: false
+        schema:
+          type: string
+          maximum: 100
+          minimum: 0
+      - name: externalIds
+        in: query
+        description: External IDs
+        required: false
+        schema:
+          type: array
+          items:
             type: string
-            minimum: 0
-        - name: size
-          in: query
-          description: Size of each page
-          required: false
-          schema:
+      - name: sharingStateTypes
+        in: query
+        description: Only show sharing states of given types
+        required: false
+        schema:
+          type: array
+          items:
             type: string
-            maximum: 100
-            minimum: 0
-        - name: externalIds
-          in: query
-          description: External IDs
-          required: false
-          schema:
-            type: array
-            items:
-              type: string
-        - name: sharingStateTypes
-          in: query
-          description: Only show sharing states of given types
-          required: false
-          schema:
-            type: array
-            items:
-              type: string
-              enum:
-                - Pending
-                - Success
-                - Error
-                - Initial
-                - Ready
-        - name: updatedAfter
-          in: query
-          description: Only show sharing states updated after given time
-          required: false
-          schema:
-            type: string
-            format: date-time
+            enum:
+            - Pending
+            - Success
+            - Error
+            - Initial
+            - Ready
+      - name: updatedAfter
+        in: query
+        description: Only show sharing states updated after given time
+        required: false
+        schema:
+          type: string
+          format: date-time
       responses:
         "200":
           description: Page of sharing states
@@ -1032,17 +1032,17 @@ paths:
   /v6/stats/{stage}/address-types:
     get:
       tags:
-        - stats-controller
+      - stats-controller
       operationId: countAddressTypes
       parameters:
-        - name: stage
-          in: path
-          required: true
-          schema:
-            type: string
-            enum:
-              - Input
-              - Output
+      - name: stage
+        in: path
+        required: true
+        schema:
+          type: string
+          enum:
+          - Input
+          - Output
       responses:
         "200":
           description: OK
@@ -1053,17 +1053,17 @@ paths:
   /v7/stats/{stage}/address-types:
     get:
       tags:
-        - stats-controller
+      - stats-controller
       operationId: countAddressTypes_1
       parameters:
-        - name: stage
-          in: path
-          required: true
-          schema:
-            type: string
-            enum:
-              - Input
-              - Output
+      - name: stage
+        in: path
+        required: true
+        schema:
+          type: string
+          enum:
+          - Input
+          - Output
       responses:
         "200":
           description: OK
@@ -1074,7 +1074,7 @@ paths:
   /v7/stats/stages:
     get:
       tags:
-        - stats-controller
+      - stats-controller
       operationId: countPartnersPerStage
       responses:
         "200":
@@ -1086,7 +1086,7 @@ paths:
   /v6/stats/stages:
     get:
       tags:
-        - stats-controller
+      - stats-controller
       operationId: countPartnersPerStage_1
       responses:
         "200":
@@ -1098,7 +1098,7 @@ paths:
   /v6/stats/sharing-states:
     get:
       tags:
-        - stats-controller
+      - stats-controller
       operationId: countPartnersBySharingState
       responses:
         "200":
@@ -1110,7 +1110,7 @@ paths:
   /v7/stats/sharing-states:
     get:
       tags:
-        - stats-controller
+      - stats-controller
       operationId: countPartnersBySharingState_1
       responses:
         "200":
@@ -1122,7 +1122,7 @@ paths:
   /v6/stats/confidence-criteria:
     get:
       tags:
-        - stats-controller
+      - stats-controller
       operationId: getConfidenceCriteriaStats
       responses:
         "200":
@@ -1134,7 +1134,7 @@ paths:
   /v7/stats/confidence-criteria:
     get:
       tags:
-        - stats-controller
+      - stats-controller
       operationId: getConfidenceCriteriaStats_1
       responses:
         "200":
@@ -1146,34 +1146,34 @@ paths:
   /v6/sharing-state:
     get:
       tags:
-        - sharing-state-controller
+      - sharing-state-controller
       summary: "Returns sharing states of business partners, optionally filtered by\
         \ a business partner type and an array of external IDs"
       operationId: getSharingStates_1
       parameters:
-        - name: page
-          in: query
-          description: Number of page to get results from
-          required: false
-          schema:
+      - name: page
+        in: query
+        description: Number of page to get results from
+        required: false
+        schema:
+          type: string
+          minimum: 0
+      - name: size
+        in: query
+        description: Size of each page
+        required: false
+        schema:
+          type: string
+          maximum: 100
+          minimum: 0
+      - name: externalIds
+        in: query
+        description: External IDs
+        required: false
+        schema:
+          type: array
+          items:
             type: string
-            minimum: 0
-        - name: size
-          in: query
-          description: Size of each page
-          required: false
-          schema:
-            type: string
-            maximum: 100
-            minimum: 0
-        - name: externalIds
-          in: query
-          description: External IDs
-          required: false
-          schema:
-            type: array
-            items:
-              type: string
       responses:
         "200":
           description: Page of sharing states
@@ -1184,7 +1184,7 @@ paths:
   /v6/input/partner-upload-template:
     get:
       tags:
-        - partner-upload-controller
+      - partner-upload-controller
       summary: Get CSV template with headers in file
       description: Create empty CSV file template including headers.Generated CSV
         file can later be used for uploading business partner data.
@@ -1204,7 +1204,7 @@ paths:
   /v7/input/partner-upload-template:
     get:
       tags:
-        - partner-upload-controller
+      - partner-upload-controller
       summary: Get CSV template with headers in file
       description: Create empty CSV file template including headers.Generated CSV
         file can later be used for uploading business partner data.
@@ -1242,10 +1242,10 @@ components:
           description: "One of the address types: Legal Address, Site Main Address,\
             \ Legal and Site Main Address, Additional Address. "
           enum:
-            - LegalAndSiteMainAddress
-            - LegalAddress
-            - SiteMainAddress
-            - AdditionalAddress
+          - LegalAndSiteMainAddress
+          - LegalAddress
+          - SiteMainAddress
+          - AdditionalAddress
         physicalPostalAddress:
           $ref: "#/components/schemas/PhysicalPostalAddressDto"
           description: "The physical postal address of the address, on which the business\
@@ -1266,12 +1266,7 @@ components:
           items:
             $ref: "#/components/schemas/AddressIdentifierDto"
       required:
-        - addressBpn
-        - bpnA
-        - confidenceCriteria
-        - identifiers
-        - physicalPostalAddress
-        - states
+      - bpnA
     AddressIdentifierDto:
       type: object
       description: "An address identifier (uniquely) identifies the address, such\
@@ -1283,9 +1278,6 @@ components:
         type:
           type: string
           description: The type of the identifier.
-      required:
-        - type
-        - value
     AddressRepresentationInputDto:
       type: object
       properties:
@@ -1304,10 +1296,10 @@ components:
           description: "One of the address types: Legal Address, Site Main Address,\
             \ Legal and Site Main Address, Additional Address. "
           enum:
-            - LegalAndSiteMainAddress
-            - LegalAddress
-            - SiteMainAddress
-            - AdditionalAddress
+          - LegalAndSiteMainAddress
+          - LegalAddress
+          - SiteMainAddress
+          - AdditionalAddress
         physicalPostalAddress:
           $ref: "#/components/schemas/PhysicalPostalAddressDto"
           description: "The physical postal address of the address, on which the business\
@@ -1321,9 +1313,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/BusinessPartnerStateDto"
-      required:
-        - physicalPostalAddress
-        - states
     AlternativePostalAddressDto:
       type: object
       description: An alternative postal address describes an alternative way of delivery
@@ -1336,278 +1325,278 @@ components:
           description: The 2-digit country code of the physical postal address according
             to ISO 3166-1.
           enum:
-            - UNDEFINED
-            - AC
-            - AD
-            - AE
-            - AF
-            - AG
-            - AI
-            - AL
-            - AM
-            - AN
-            - AO
-            - AQ
-            - AR
-            - AS
-            - AT
-            - AU
-            - AW
-            - AX
-            - AZ
-            - BA
-            - BB
-            - BD
-            - BE
-            - BF
-            - BG
-            - BH
-            - BI
-            - BJ
-            - BL
-            - BM
-            - BN
-            - BO
-            - BQ
-            - BR
-            - BS
-            - BT
-            - BU
-            - BV
-            - BW
-            - BY
-            - BZ
-            - CA
-            - CC
-            - CD
-            - CF
-            - CG
-            - CH
-            - CI
-            - CK
-            - CL
-            - CM
-            - CN
-            - CO
-            - CP
-            - CR
-            - CS
-            - CU
-            - CV
-            - CW
-            - CX
-            - CY
-            - CZ
-            - DE
-            - DG
-            - DJ
-            - DK
-            - DM
-            - DO
-            - DZ
-            - EA
-            - EC
-            - EE
-            - EG
-            - EH
-            - ER
-            - ES
-            - ET
-            - EU
-            - EZ
-            - FI
-            - FJ
-            - FK
-            - FM
-            - FO
-            - FR
-            - FX
-            - GA
-            - GB
-            - GD
-            - GE
-            - GF
-            - GG
-            - GH
-            - GI
-            - GL
-            - GM
-            - GN
-            - GP
-            - GQ
-            - GR
-            - GS
-            - GT
-            - GU
-            - GW
-            - GY
-            - HK
-            - HM
-            - HN
-            - HR
-            - HT
-            - HU
-            - IC
-            - ID
-            - IE
-            - IL
-            - IM
-            - IN
-            - IO
-            - IQ
-            - IR
-            - IS
-            - IT
-            - JE
-            - JM
-            - JO
-            - JP
-            - KE
-            - KG
-            - KH
-            - KI
-            - KM
-            - KN
-            - KP
-            - KR
-            - KW
-            - KY
-            - KZ
-            - LA
-            - LB
-            - LC
-            - LI
-            - LK
-            - LR
-            - LS
-            - LT
-            - LU
-            - LV
-            - LY
-            - MA
-            - MC
-            - MD
-            - ME
-            - MF
-            - MG
-            - MH
-            - MK
-            - ML
-            - MM
-            - MN
-            - MO
-            - MP
-            - MQ
-            - MR
-            - MS
-            - MT
-            - MU
-            - MV
-            - MW
-            - MX
-            - MY
-            - MZ
-            - NA
-            - NC
-            - NE
-            - NF
-            - NG
-            - NI
-            - NL
-            - "NO"
-            - NP
-            - NR
-            - NT
-            - NU
-            - NZ
-            - OM
-            - PA
-            - PE
-            - PF
-            - PG
-            - PH
-            - PK
-            - PL
-            - PM
-            - PN
-            - PR
-            - PS
-            - PT
-            - PW
-            - PY
-            - QA
-            - RE
-            - RO
-            - RS
-            - RU
-            - RW
-            - SA
-            - SB
-            - SC
-            - SD
-            - SE
-            - SF
-            - SG
-            - SH
-            - SI
-            - SJ
-            - SK
-            - SL
-            - SM
-            - SN
-            - SO
-            - SR
-            - SS
-            - ST
-            - SU
-            - SV
-            - SX
-            - SY
-            - SZ
-            - TA
-            - TC
-            - TD
-            - TF
-            - TG
-            - TH
-            - TJ
-            - TK
-            - TL
-            - TM
-            - TN
-            - TO
-            - TP
-            - TR
-            - TT
-            - TV
-            - TW
-            - TZ
-            - UA
-            - UG
-            - UK
-            - UM
-            - US
-            - UY
-            - UZ
-            - VA
-            - VC
-            - VE
-            - VG
-            - VI
-            - VN
-            - VU
-            - WF
-            - WS
-            - XI
-            - XU
-            - XK
-            - YE
-            - YT
-            - YU
-            - ZA
-            - ZM
-            - ZR
-            - ZW
+          - UNDEFINED
+          - AC
+          - AD
+          - AE
+          - AF
+          - AG
+          - AI
+          - AL
+          - AM
+          - AN
+          - AO
+          - AQ
+          - AR
+          - AS
+          - AT
+          - AU
+          - AW
+          - AX
+          - AZ
+          - BA
+          - BB
+          - BD
+          - BE
+          - BF
+          - BG
+          - BH
+          - BI
+          - BJ
+          - BL
+          - BM
+          - BN
+          - BO
+          - BQ
+          - BR
+          - BS
+          - BT
+          - BU
+          - BV
+          - BW
+          - BY
+          - BZ
+          - CA
+          - CC
+          - CD
+          - CF
+          - CG
+          - CH
+          - CI
+          - CK
+          - CL
+          - CM
+          - CN
+          - CO
+          - CP
+          - CR
+          - CS
+          - CU
+          - CV
+          - CW
+          - CX
+          - CY
+          - CZ
+          - DE
+          - DG
+          - DJ
+          - DK
+          - DM
+          - DO
+          - DZ
+          - EA
+          - EC
+          - EE
+          - EG
+          - EH
+          - ER
+          - ES
+          - ET
+          - EU
+          - EZ
+          - FI
+          - FJ
+          - FK
+          - FM
+          - FO
+          - FR
+          - FX
+          - GA
+          - GB
+          - GD
+          - GE
+          - GF
+          - GG
+          - GH
+          - GI
+          - GL
+          - GM
+          - GN
+          - GP
+          - GQ
+          - GR
+          - GS
+          - GT
+          - GU
+          - GW
+          - GY
+          - HK
+          - HM
+          - HN
+          - HR
+          - HT
+          - HU
+          - IC
+          - ID
+          - IE
+          - IL
+          - IM
+          - IN
+          - IO
+          - IQ
+          - IR
+          - IS
+          - IT
+          - JE
+          - JM
+          - JO
+          - JP
+          - KE
+          - KG
+          - KH
+          - KI
+          - KM
+          - KN
+          - KP
+          - KR
+          - KW
+          - KY
+          - KZ
+          - LA
+          - LB
+          - LC
+          - LI
+          - LK
+          - LR
+          - LS
+          - LT
+          - LU
+          - LV
+          - LY
+          - MA
+          - MC
+          - MD
+          - ME
+          - MF
+          - MG
+          - MH
+          - MK
+          - ML
+          - MM
+          - MN
+          - MO
+          - MP
+          - MQ
+          - MR
+          - MS
+          - MT
+          - MU
+          - MV
+          - MW
+          - MX
+          - MY
+          - MZ
+          - NA
+          - NC
+          - NE
+          - NF
+          - NG
+          - NI
+          - NL
+          - "NO"
+          - NP
+          - NR
+          - NT
+          - NU
+          - NZ
+          - OM
+          - PA
+          - PE
+          - PF
+          - PG
+          - PH
+          - PK
+          - PL
+          - PM
+          - PN
+          - PR
+          - PS
+          - PT
+          - PW
+          - PY
+          - QA
+          - RE
+          - RO
+          - RS
+          - RU
+          - RW
+          - SA
+          - SB
+          - SC
+          - SD
+          - SE
+          - SF
+          - SG
+          - SH
+          - SI
+          - SJ
+          - SK
+          - SL
+          - SM
+          - SN
+          - SO
+          - SR
+          - SS
+          - ST
+          - SU
+          - SV
+          - SX
+          - SY
+          - SZ
+          - TA
+          - TC
+          - TD
+          - TF
+          - TG
+          - TH
+          - TJ
+          - TK
+          - TL
+          - TM
+          - TN
+          - TO
+          - TP
+          - TR
+          - TT
+          - TV
+          - TW
+          - TZ
+          - UA
+          - UG
+          - UK
+          - UM
+          - US
+          - UY
+          - UZ
+          - VA
+          - VC
+          - VE
+          - VG
+          - VI
+          - VN
+          - VU
+          - WF
+          - WS
+          - XI
+          - XU
+          - XK
+          - YE
+          - YT
+          - YU
+          - ZA
+          - ZM
+          - ZR
+          - ZW
         administrativeAreaLevel1:
           type: string
           description: "The 2-digit country subdivision code according to ISO 3166-2,\
@@ -1626,9 +1615,9 @@ components:
           description: "One of the alternative postal address types: P.O. box, private\
             \ bag, boite postale."
           enum:
-            - PO_BOX
-            - PRIVATE_BAG
-            - BOITE_POSTALE
+          - PO_BOX
+          - PRIVATE_BAG
+          - BOITE_POSTALE
         deliveryServiceQualifier:
           type: string
           description: "The qualifier uniquely identifying the delivery service endpoint\
@@ -1689,15 +1678,10 @@ components:
           items:
             type: string
             enum:
-              - SUPPLIER
-              - CUSTOMER
-              - ONE_TIME_SUPPLIER
-              - ONE_TIME_CUSTOMER
-        isOwnCompanyData:
-          type: boolean
-          description: Indicates whether the sharing member claims (in the initial
-            upload) the business partner to belong to the company data of the sharing
-            member.
+            - SUPPLIER
+            - CUSTOMER
+            - ONE_TIME_SUPPLIER
+            - ONE_TIME_CUSTOMER
         legalEntity:
           $ref: "#/components/schemas/LegalEntityRepresentationInputDto"
           description: "The legal entity, on which the business partner provides a\
@@ -1721,21 +1705,16 @@ components:
           type: string
           format: date-time
           description: The date when the data record has been last updated.
+        isOwnCompanyData:
+          type: boolean
+          description: Indicates whether the sharing member claims (in the initial
+            upload) the business partner to belong to the company data of the sharing
+            member.
       required:
-        - address
-        - bpnA
-        - bpnL
-        - createdAt
-        - externalId
-        - identifiers
-        - isOwnCompanyData
-        - legalEntity
-        - nameParts
-        - postalAddress
-        - roles
-        - site
-        - states
-        - updatedAt
+      - bpnA
+      - bpnL
+      - externalId
+      - postalAddress
     BusinessPartnerInputRequest:
       type: object
       description: Generic business partner with external id
@@ -1770,15 +1749,10 @@ components:
           items:
             type: string
             enum:
-              - SUPPLIER
-              - CUSTOMER
-              - ONE_TIME_SUPPLIER
-              - ONE_TIME_CUSTOMER
-        isOwnCompanyData:
-          type: boolean
-          description: Indicates whether the sharing member claims (in the initial
-            upload) the business partner to belong to the company data of the sharing
-            member.
+            - SUPPLIER
+            - CUSTOMER
+            - ONE_TIME_SUPPLIER
+            - ONE_TIME_CUSTOMER
         legalEntity:
           $ref: "#/components/schemas/LegalEntityRepresentationInputDto"
           description: "The legal entity, on which the business partner provides a\
@@ -1794,16 +1768,13 @@ components:
           format: date-time
           description: The timestamp indicates the last time point of change from
             the user side
+        isOwnCompanyData:
+          type: boolean
+          description: Indicates whether the sharing member claims (in the initial
+            upload) the business partner to belong to the company data of the sharing
+            member.
       required:
-        - address
-        - externalId
-        - identifiers
-        - isOwnCompanyData
-        - legalEntity
-        - nameParts
-        - roles
-        - site
-        - states
+      - externalId
     BusinessPartnerOutputDto:
       type: object
       description: Generic business partner output with external id
@@ -1838,15 +1809,10 @@ components:
           items:
             type: string
             enum:
-              - SUPPLIER
-              - CUSTOMER
-              - ONE_TIME_SUPPLIER
-              - ONE_TIME_CUSTOMER
-        isOwnCompanyData:
-          type: boolean
-          description: Indicates whether the sharing member claims (in the initial
-            upload) the business partner to belong to the company data of the sharing
-            member.
+            - SUPPLIER
+            - CUSTOMER
+            - ONE_TIME_SUPPLIER
+            - ONE_TIME_CUSTOMER
         legalEntity:
           $ref: "#/components/schemas/LegalEntityRepresentationOutputDto"
           description: "The legal entity, on which the business partner provides a\
@@ -1870,17 +1836,13 @@ components:
           type: string
           format: date-time
           description: The date when the data record has been last updated.
+        isOwnCompanyData:
+          type: boolean
+          description: Indicates whether the sharing member claims (in the initial
+            upload) the business partner to belong to the company data of the sharing
+            member.
       required:
-        - address
-        - createdAt
-        - externalId
-        - identifiers
-        - isOwnCompanyData
-        - legalEntity
-        - nameParts
-        - roles
-        - states
-        - updatedAt
+      - externalId
     BusinessPartnerStateDto:
       type: object
       properties:
@@ -1896,8 +1858,8 @@ components:
           type: string
           description: The type of this specified status.
           enum:
-            - ACTIVE
-            - INACTIVE
+          - ACTIVE
+          - INACTIVE
     ChangelogGateDto:
       type: object
       description: "An entry of the changelog, which is created each time a business\
@@ -1917,12 +1879,8 @@ components:
           description: "One of the actions for which the changelog entry was created:\
             \ create, update."
           enum:
-            - CREATE
-            - UPDATE
-      required:
-        - changelogType
-        - externalId
-        - timestamp
+          - CREATE
+          - UPDATE
     ChangelogSearchRequest:
       type: object
       properties:
@@ -1958,13 +1916,6 @@ components:
         confidenceLevel:
           type: integer
           format: int32
-      required:
-        - checkedByExternalDataSource
-        - confidenceLevel
-        - lastConfidenceCheckAt
-        - nextConfidenceCheckAt
-        - numberOfSharingMembers
-        - sharedByOwner
     ErrorInfoChangeLogOutputError:
       type: object
       description: Holds information about failures
@@ -1973,16 +1924,13 @@ components:
           type: string
           description: Error code identifying the error
           enum:
-            - ExternalIdNotFound
+          - ExternalIdNotFound
         message:
           type: string
           description: Error message that explains the error
         entityKey:
           type: string
           description: Key (externalId) of the entity that failed
-      required:
-        - errorCode
-        - message
       title: ErrorInfo
     GateErrorResponse:
       type: object
@@ -1991,88 +1939,79 @@ components:
         timestamp:
           type: string
           format: date-time
-          description: Timestamp of the error occurrence
         status:
           type: string
-          description: HTTP status of the error response
           enum:
-            - 100 CONTINUE
-            - 101 SWITCHING_PROTOCOLS
-            - 102 PROCESSING
-            - 103 EARLY_HINTS
-            - 200 OK
-            - 201 CREATED
-            - 202 ACCEPTED
-            - 203 NON_AUTHORITATIVE_INFORMATION
-            - 204 NO_CONTENT
-            - 205 RESET_CONTENT
-            - 206 PARTIAL_CONTENT
-            - 207 MULTI_STATUS
-            - 208 ALREADY_REPORTED
-            - 226 IM_USED
-            - 300 MULTIPLE_CHOICES
-            - 301 MOVED_PERMANENTLY
-            - 302 FOUND
-            - 303 SEE_OTHER
-            - 304 NOT_MODIFIED
-            - 307 TEMPORARY_REDIRECT
-            - 308 PERMANENT_REDIRECT
-            - 400 BAD_REQUEST
-            - 401 UNAUTHORIZED
-            - 402 PAYMENT_REQUIRED
-            - 403 FORBIDDEN
-            - 404 NOT_FOUND
-            - 405 METHOD_NOT_ALLOWED
-            - 406 NOT_ACCEPTABLE
-            - 407 PROXY_AUTHENTICATION_REQUIRED
-            - 408 REQUEST_TIMEOUT
-            - 409 CONFLICT
-            - 410 GONE
-            - 411 LENGTH_REQUIRED
-            - 412 PRECONDITION_FAILED
-            - 413 CONTENT_TOO_LARGE
-            - 413 PAYLOAD_TOO_LARGE
-            - 414 URI_TOO_LONG
-            - 415 UNSUPPORTED_MEDIA_TYPE
-            - 416 REQUESTED_RANGE_NOT_SATISFIABLE
-            - 417 EXPECTATION_FAILED
-            - 418 I_AM_A_TEAPOT
-            - 421 MISDIRECTED_REQUEST
-            - 422 UNPROCESSABLE_CONTENT
-            - 422 UNPROCESSABLE_ENTITY
-            - 423 LOCKED
-            - 424 FAILED_DEPENDENCY
-            - 425 TOO_EARLY
-            - 426 UPGRADE_REQUIRED
-            - 428 PRECONDITION_REQUIRED
-            - 429 TOO_MANY_REQUESTS
-            - 431 REQUEST_HEADER_FIELDS_TOO_LARGE
-            - 451 UNAVAILABLE_FOR_LEGAL_REASONS
-            - 500 INTERNAL_SERVER_ERROR
-            - 501 NOT_IMPLEMENTED
-            - 502 BAD_GATEWAY
-            - 503 SERVICE_UNAVAILABLE
-            - 504 GATEWAY_TIMEOUT
-            - 505 HTTP_VERSION_NOT_SUPPORTED
-            - 506 VARIANT_ALSO_NEGOTIATES
-            - 507 INSUFFICIENT_STORAGE
-            - 508 LOOP_DETECTED
-            - 509 BANDWIDTH_LIMIT_EXCEEDED
-            - 510 NOT_EXTENDED
-            - 511 NETWORK_AUTHENTICATION_REQUIRED
+          - 100 CONTINUE
+          - 101 SWITCHING_PROTOCOLS
+          - 102 PROCESSING
+          - 103 EARLY_HINTS
+          - 200 OK
+          - 201 CREATED
+          - 202 ACCEPTED
+          - 203 NON_AUTHORITATIVE_INFORMATION
+          - 204 NO_CONTENT
+          - 205 RESET_CONTENT
+          - 206 PARTIAL_CONTENT
+          - 207 MULTI_STATUS
+          - 208 ALREADY_REPORTED
+          - 226 IM_USED
+          - 300 MULTIPLE_CHOICES
+          - 301 MOVED_PERMANENTLY
+          - 302 FOUND
+          - 303 SEE_OTHER
+          - 304 NOT_MODIFIED
+          - 307 TEMPORARY_REDIRECT
+          - 308 PERMANENT_REDIRECT
+          - 400 BAD_REQUEST
+          - 401 UNAUTHORIZED
+          - 402 PAYMENT_REQUIRED
+          - 403 FORBIDDEN
+          - 404 NOT_FOUND
+          - 405 METHOD_NOT_ALLOWED
+          - 406 NOT_ACCEPTABLE
+          - 407 PROXY_AUTHENTICATION_REQUIRED
+          - 408 REQUEST_TIMEOUT
+          - 409 CONFLICT
+          - 410 GONE
+          - 411 LENGTH_REQUIRED
+          - 412 PRECONDITION_FAILED
+          - 413 CONTENT_TOO_LARGE
+          - 413 PAYLOAD_TOO_LARGE
+          - 414 URI_TOO_LONG
+          - 415 UNSUPPORTED_MEDIA_TYPE
+          - 416 REQUESTED_RANGE_NOT_SATISFIABLE
+          - 417 EXPECTATION_FAILED
+          - 418 I_AM_A_TEAPOT
+          - 421 MISDIRECTED_REQUEST
+          - 422 UNPROCESSABLE_CONTENT
+          - 422 UNPROCESSABLE_ENTITY
+          - 423 LOCKED
+          - 424 FAILED_DEPENDENCY
+          - 425 TOO_EARLY
+          - 426 UPGRADE_REQUIRED
+          - 428 PRECONDITION_REQUIRED
+          - 429 TOO_MANY_REQUESTS
+          - 431 REQUEST_HEADER_FIELDS_TOO_LARGE
+          - 451 UNAVAILABLE_FOR_LEGAL_REASONS
+          - 500 INTERNAL_SERVER_ERROR
+          - 501 NOT_IMPLEMENTED
+          - 502 BAD_GATEWAY
+          - 503 SERVICE_UNAVAILABLE
+          - 504 GATEWAY_TIMEOUT
+          - 505 HTTP_VERSION_NOT_SUPPORTED
+          - 506 VARIANT_ALSO_NEGOTIATES
+          - 507 INSUFFICIENT_STORAGE
+          - 508 LOOP_DETECTED
+          - 509 BANDWIDTH_LIMIT_EXCEEDED
+          - 510 NOT_EXTENDED
+          - 511 NETWORK_AUTHENTICATION_REQUIRED
         error:
           type: array
-          description: List of error messages
           items:
             type: string
         path:
           type: string
-          description: Request path where the error occurred
-      required:
-        - error
-        - path
-        - status
-        - timestamp
     GeoCoordinateDto:
       type: object
       description: "The exact location of the physical postal address in latitude,\
@@ -2090,9 +2029,6 @@ components:
           type: number
           format: double
           description: "Altitude, if applicable"
-      required:
-        - latitude
-        - longitude
     LegalEntityRepresentationInputDto:
       type: object
       properties:
@@ -2116,8 +2052,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/BusinessPartnerStateDto"
-      required:
-        - states
     LegalEntityRepresentationOutputDto:
       type: object
       description: Legal Entity properties of business partner output data
@@ -2145,10 +2079,7 @@ components:
           items:
             $ref: "#/components/schemas/BusinessPartnerStateDto"
       required:
-        - bpnL
-        - confidenceCriteria
-        - legalEntityBpn
-        - states
+      - bpnL
     PageChangeLogDtoChangelogGateDto:
       type: object
       description: Paginated collection of results
@@ -2184,14 +2115,6 @@ components:
           description: Infos about the entries with errors
           items:
             $ref: "#/components/schemas/ErrorInfoChangeLogOutputError"
-      required:
-        - content
-        - contentSize
-        - errors
-        - invalidEntries
-        - page
-        - totalElements
-        - totalPages
     PageDtoBusinessPartnerInputDto:
       type: object
       description: Paginated collection of results
@@ -2217,12 +2140,6 @@ components:
           description: Collection of results in the page
           items:
             $ref: "#/components/schemas/BusinessPartnerInputDto"
-      required:
-        - content
-        - contentSize
-        - page
-        - totalElements
-        - totalPages
     PageDtoBusinessPartnerOutputDto:
       type: object
       description: Paginated collection of results
@@ -2248,12 +2165,6 @@ components:
           description: Collection of results in the page
           items:
             $ref: "#/components/schemas/BusinessPartnerOutputDto"
-      required:
-        - content
-        - contentSize
-        - page
-        - totalElements
-        - totalPages
     PageDtoRelationDto:
       type: object
       description: Paginated collection of results
@@ -2279,12 +2190,6 @@ components:
           description: Collection of results in the page
           items:
             $ref: "#/components/schemas/RelationDto"
-      required:
-        - content
-        - contentSize
-        - page
-        - totalElements
-        - totalPages
     PageDtoRelationOutputDto:
       type: object
       description: Paginated collection of results
@@ -2310,12 +2215,6 @@ components:
           description: Collection of results in the page
           items:
             $ref: "#/components/schemas/RelationOutputDto"
-      required:
-        - content
-        - contentSize
-        - page
-        - totalElements
-        - totalPages
     PageDtoRelationSharingStateDto:
       type: object
       description: Paginated collection of results
@@ -2341,12 +2240,6 @@ components:
           description: Collection of results in the page
           items:
             $ref: "#/components/schemas/RelationSharingStateDto"
-      required:
-        - content
-        - contentSize
-        - page
-        - totalElements
-        - totalPages
     PageDtoRelationV6Dto:
       type: object
       description: Paginated collection of results
@@ -2372,12 +2265,6 @@ components:
           description: Collection of results in the page
           items:
             $ref: "#/components/schemas/RelationV6Dto"
-      required:
-        - content
-        - contentSize
-        - page
-        - totalElements
-        - totalPages
     PageDtoSharingStateDto:
       type: object
       description: Paginated collection of results
@@ -2403,12 +2290,6 @@ components:
           description: Collection of results in the page
           items:
             $ref: "#/components/schemas/SharingStateDto"
-      required:
-        - content
-        - contentSize
-        - page
-        - totalElements
-        - totalPages
     PhysicalPostalAddressDto:
       type: object
       description: "A physical postal address describes the physical location of an\
@@ -2421,278 +2302,278 @@ components:
           description: The 2-digit country code of the physical postal address according
             to ISO 3166-1.
           enum:
-            - UNDEFINED
-            - AC
-            - AD
-            - AE
-            - AF
-            - AG
-            - AI
-            - AL
-            - AM
-            - AN
-            - AO
-            - AQ
-            - AR
-            - AS
-            - AT
-            - AU
-            - AW
-            - AX
-            - AZ
-            - BA
-            - BB
-            - BD
-            - BE
-            - BF
-            - BG
-            - BH
-            - BI
-            - BJ
-            - BL
-            - BM
-            - BN
-            - BO
-            - BQ
-            - BR
-            - BS
-            - BT
-            - BU
-            - BV
-            - BW
-            - BY
-            - BZ
-            - CA
-            - CC
-            - CD
-            - CF
-            - CG
-            - CH
-            - CI
-            - CK
-            - CL
-            - CM
-            - CN
-            - CO
-            - CP
-            - CR
-            - CS
-            - CU
-            - CV
-            - CW
-            - CX
-            - CY
-            - CZ
-            - DE
-            - DG
-            - DJ
-            - DK
-            - DM
-            - DO
-            - DZ
-            - EA
-            - EC
-            - EE
-            - EG
-            - EH
-            - ER
-            - ES
-            - ET
-            - EU
-            - EZ
-            - FI
-            - FJ
-            - FK
-            - FM
-            - FO
-            - FR
-            - FX
-            - GA
-            - GB
-            - GD
-            - GE
-            - GF
-            - GG
-            - GH
-            - GI
-            - GL
-            - GM
-            - GN
-            - GP
-            - GQ
-            - GR
-            - GS
-            - GT
-            - GU
-            - GW
-            - GY
-            - HK
-            - HM
-            - HN
-            - HR
-            - HT
-            - HU
-            - IC
-            - ID
-            - IE
-            - IL
-            - IM
-            - IN
-            - IO
-            - IQ
-            - IR
-            - IS
-            - IT
-            - JE
-            - JM
-            - JO
-            - JP
-            - KE
-            - KG
-            - KH
-            - KI
-            - KM
-            - KN
-            - KP
-            - KR
-            - KW
-            - KY
-            - KZ
-            - LA
-            - LB
-            - LC
-            - LI
-            - LK
-            - LR
-            - LS
-            - LT
-            - LU
-            - LV
-            - LY
-            - MA
-            - MC
-            - MD
-            - ME
-            - MF
-            - MG
-            - MH
-            - MK
-            - ML
-            - MM
-            - MN
-            - MO
-            - MP
-            - MQ
-            - MR
-            - MS
-            - MT
-            - MU
-            - MV
-            - MW
-            - MX
-            - MY
-            - MZ
-            - NA
-            - NC
-            - NE
-            - NF
-            - NG
-            - NI
-            - NL
-            - "NO"
-            - NP
-            - NR
-            - NT
-            - NU
-            - NZ
-            - OM
-            - PA
-            - PE
-            - PF
-            - PG
-            - PH
-            - PK
-            - PL
-            - PM
-            - PN
-            - PR
-            - PS
-            - PT
-            - PW
-            - PY
-            - QA
-            - RE
-            - RO
-            - RS
-            - RU
-            - RW
-            - SA
-            - SB
-            - SC
-            - SD
-            - SE
-            - SF
-            - SG
-            - SH
-            - SI
-            - SJ
-            - SK
-            - SL
-            - SM
-            - SN
-            - SO
-            - SR
-            - SS
-            - ST
-            - SU
-            - SV
-            - SX
-            - SY
-            - SZ
-            - TA
-            - TC
-            - TD
-            - TF
-            - TG
-            - TH
-            - TJ
-            - TK
-            - TL
-            - TM
-            - TN
-            - TO
-            - TP
-            - TR
-            - TT
-            - TV
-            - TW
-            - TZ
-            - UA
-            - UG
-            - UK
-            - UM
-            - US
-            - UY
-            - UZ
-            - VA
-            - VC
-            - VE
-            - VG
-            - VI
-            - VN
-            - VU
-            - WF
-            - WS
-            - XI
-            - XU
-            - XK
-            - YE
-            - YT
-            - YU
-            - ZA
-            - ZM
-            - ZR
-            - ZW
+          - UNDEFINED
+          - AC
+          - AD
+          - AE
+          - AF
+          - AG
+          - AI
+          - AL
+          - AM
+          - AN
+          - AO
+          - AQ
+          - AR
+          - AS
+          - AT
+          - AU
+          - AW
+          - AX
+          - AZ
+          - BA
+          - BB
+          - BD
+          - BE
+          - BF
+          - BG
+          - BH
+          - BI
+          - BJ
+          - BL
+          - BM
+          - BN
+          - BO
+          - BQ
+          - BR
+          - BS
+          - BT
+          - BU
+          - BV
+          - BW
+          - BY
+          - BZ
+          - CA
+          - CC
+          - CD
+          - CF
+          - CG
+          - CH
+          - CI
+          - CK
+          - CL
+          - CM
+          - CN
+          - CO
+          - CP
+          - CR
+          - CS
+          - CU
+          - CV
+          - CW
+          - CX
+          - CY
+          - CZ
+          - DE
+          - DG
+          - DJ
+          - DK
+          - DM
+          - DO
+          - DZ
+          - EA
+          - EC
+          - EE
+          - EG
+          - EH
+          - ER
+          - ES
+          - ET
+          - EU
+          - EZ
+          - FI
+          - FJ
+          - FK
+          - FM
+          - FO
+          - FR
+          - FX
+          - GA
+          - GB
+          - GD
+          - GE
+          - GF
+          - GG
+          - GH
+          - GI
+          - GL
+          - GM
+          - GN
+          - GP
+          - GQ
+          - GR
+          - GS
+          - GT
+          - GU
+          - GW
+          - GY
+          - HK
+          - HM
+          - HN
+          - HR
+          - HT
+          - HU
+          - IC
+          - ID
+          - IE
+          - IL
+          - IM
+          - IN
+          - IO
+          - IQ
+          - IR
+          - IS
+          - IT
+          - JE
+          - JM
+          - JO
+          - JP
+          - KE
+          - KG
+          - KH
+          - KI
+          - KM
+          - KN
+          - KP
+          - KR
+          - KW
+          - KY
+          - KZ
+          - LA
+          - LB
+          - LC
+          - LI
+          - LK
+          - LR
+          - LS
+          - LT
+          - LU
+          - LV
+          - LY
+          - MA
+          - MC
+          - MD
+          - ME
+          - MF
+          - MG
+          - MH
+          - MK
+          - ML
+          - MM
+          - MN
+          - MO
+          - MP
+          - MQ
+          - MR
+          - MS
+          - MT
+          - MU
+          - MV
+          - MW
+          - MX
+          - MY
+          - MZ
+          - NA
+          - NC
+          - NE
+          - NF
+          - NG
+          - NI
+          - NL
+          - "NO"
+          - NP
+          - NR
+          - NT
+          - NU
+          - NZ
+          - OM
+          - PA
+          - PE
+          - PF
+          - PG
+          - PH
+          - PK
+          - PL
+          - PM
+          - PN
+          - PR
+          - PS
+          - PT
+          - PW
+          - PY
+          - QA
+          - RE
+          - RO
+          - RS
+          - RU
+          - RW
+          - SA
+          - SB
+          - SC
+          - SD
+          - SE
+          - SF
+          - SG
+          - SH
+          - SI
+          - SJ
+          - SK
+          - SL
+          - SM
+          - SN
+          - SO
+          - SR
+          - SS
+          - ST
+          - SU
+          - SV
+          - SX
+          - SY
+          - SZ
+          - TA
+          - TC
+          - TD
+          - TF
+          - TG
+          - TH
+          - TJ
+          - TK
+          - TL
+          - TM
+          - TN
+          - TO
+          - TP
+          - TR
+          - TT
+          - TV
+          - TW
+          - TZ
+          - UA
+          - UG
+          - UK
+          - UM
+          - US
+          - UY
+          - UZ
+          - VA
+          - VC
+          - VE
+          - VG
+          - VI
+          - VN
+          - VU
+          - WF
+          - WS
+          - XI
+          - XU
+          - XK
+          - YE
+          - YT
+          - YU
+          - ZA
+          - ZM
+          - ZR
+          - ZW
         administrativeAreaLevel1:
           type: string
           description: "The 2-digit country subdivision code according to ISO 3166-2,\
@@ -2754,8 +2635,6 @@ components:
           type: array
           items:
             type: string
-      required:
-        - externalIds
     RelationDto:
       type: object
       description: 'A relation from one business partner (the source) to another business
@@ -2763,42 +2642,26 @@ components:
       properties:
         externalId:
           type: string
-          description: The identifier with which to reference this relation
         relationType:
           type: string
-          description: The type of relation between the business partners
           enum:
-            - IsManagedBy
-            - IsAlternativeHeadquarterFor
-            - IsOwnedBy
+          - IsManagedBy
+          - IsAlternativeHeadquarterFor
+          - IsOwnedBy
         businessPartnerSourceExternalId:
           type: string
-          description: The business partner from which the relation emerges (the source)
         businessPartnerTargetExternalId:
           type: string
-          description: The business partner to which this relation goes (the target)
         validityPeriods:
           type: array
-          description: A relation validity describes a timeframe in which a relation
-            is active.
           items:
             $ref: "#/components/schemas/RelationValidityPeriodDto"
         updatedAt:
           type: string
           format: date-time
-          description: The time when this relation was last modified
         createdAt:
           type: string
           format: date-time
-          description: The time when this relation was created
-      required:
-        - businessPartnerSourceExternalId
-        - businessPartnerTargetExternalId
-        - createdAt
-        - externalId
-        - relationType
-        - updatedAt
-        - validityPeriods
     RelationOutputDto:
       type: object
       properties:
@@ -2807,9 +2670,9 @@ components:
         relationType:
           type: string
           enum:
-            - IsAlternativeHeadquarterFor
-            - IsManagedBy
-            - IsOwnedBy
+          - IsAlternativeHeadquarterFor
+          - IsManagedBy
+          - IsOwnedBy
         sourceBpnL:
           type: string
         targetBpnL:
@@ -2821,13 +2684,6 @@ components:
         updatedAt:
           type: string
           format: date-time
-      required:
-        - externalId
-        - relationType
-        - sourceBpnL
-        - targetBpnL
-        - updatedAt
-        - validityPeriods
     RelationOutputSearchRequest:
       type: object
       description: Request payload containing search parameters for business partner
@@ -2835,96 +2691,61 @@ components:
       properties:
         externalIds:
           type: array
-          description: Only show relations with the given external identifiers
           items:
             type: string
         relationType:
           type: string
-          description: Only show relations of the given type
           enum:
-            - IsAlternativeHeadquarterFor
-            - IsManagedBy
-            - IsOwnedBy
+          - IsAlternativeHeadquarterFor
+          - IsManagedBy
+          - IsOwnedBy
         sourceBpnLs:
           type: array
-          description: Only show relations which have the given business partners
-            as sources
           items:
             type: string
         targetBpnLs:
           type: array
-          description: Only show relations which have the given business partners
-            as targets
           items:
             type: string
         updatedAtFrom:
           type: string
           format: date-time
-          description: Only show relations which have been modified after the given
-            time stamp
     RelationPostRequest:
       type: object
       description: A request to create a new relation between two business partners
       properties:
         externalId:
           type: string
-          description: The identifier under which the relation will be referenced.
-            If not given a unique identifier will be automatically assigned by the
-            system. A given external identifier needs be unique.
         relationType:
           type: string
-          description: The type of relation that should be created
           enum:
-            - IsManagedBy
-            - IsAlternativeHeadquarterFor
-            - IsOwnedBy
+          - IsManagedBy
+          - IsAlternativeHeadquarterFor
+          - IsOwnedBy
         businessPartnerSourceExternalId:
           type: string
-          description: The external identifier of the business partner from which
-            the relation should emerge (the source)
         businessPartnerTargetExternalId:
           type: string
-          description: The external identifier of the business partner to which the
-            relation should point (the target)
-      required:
-        - businessPartnerSourceExternalId
-        - businessPartnerTargetExternalId
-        - relationType
     RelationPutEntry:
       type: object
       description: A request to update the content of the given business partner relation
       properties:
         externalId:
           type: string
-          description: The external identifier of the business partner relation to
-            update
         relationType:
           type: string
-          description: The type the relation should be
           enum:
-            - IsManagedBy
-            - IsAlternativeHeadquarterFor
-            - IsOwnedBy
+          - IsManagedBy
+          - IsAlternativeHeadquarterFor
+          - IsOwnedBy
         businessPartnerSourceExternalId:
           type: string
-          description: The external identifier of the business partner from which
-            the relation should emerge (the source)
         businessPartnerTargetExternalId:
           type: string
-          description: The external identifier of the business partner to which the
-            relation should point (the target)
         validityPeriods:
           type: array
-          description: A relation validity describes a timeframe in which a relation
-            is active.
           items:
             $ref: "#/components/schemas/RelationValidityPeriodDto"
-      required:
-        - businessPartnerSourceExternalId
-        - businessPartnerTargetExternalId
-        - externalId
-        - relationType
-        - validityPeriods
     RelationPutRequest:
       type: object
       description: A request to upsert the contents of the given relations
@@ -2933,8 +2754,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/RelationPutEntry"
-      required:
-        - relations
     RelationPutResponse:
       type: object
       properties:
@@ -2942,8 +2761,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/RelationDto"
-      required:
-        - upsertedRelations
     RelationSearchRequest:
       type: object
       description: Request payload containing search parameters for business partner
@@ -2951,33 +2768,25 @@ components:
       properties:
         externalIds:
           type: array
-          description: Only show relations with the given external identifiers
           items:
             type: string
         relationType:
           type: string
-          description: Only show relations of the given type
           enum:
-            - IsManagedBy
-            - IsAlternativeHeadquarterFor
-            - IsOwnedBy
+          - IsManagedBy
+          - IsAlternativeHeadquarterFor
+          - IsOwnedBy
         businessPartnerSourceExternalIds:
           type: array
-          description: Only show relations which have the given business partners
-            as sources
           items:
             type: string
         businessPartnerTargetExternalIds:
           type: array
-          description: Only show relations which have the given business partners
-            as targets
           items:
             type: string
         updatedAtFrom:
           type: string
           format: date-time
-          description: Only show relations which have been modified after the given
-            time stamp
     RelationSharingStateDto:
       type: object
       properties:
@@ -2989,10 +2798,10 @@ components:
           type: string
           description: One of the sharing state types of the current sharing state.
           enum:
-            - Ready
-            - Pending
-            - Error
-            - Success
+          - Ready
+          - Pending
+          - Error
+          - Success
         sharingErrorCode:
           type: string
           description: "One of the sharing error codes in case the current sharing\
@@ -3000,8 +2809,8 @@ components:
             \ occurred during the sharing process.\n* `SharingTimeout`: The processing\
             \ took to long to complete.\n"
           enum:
-            - SharingProcessError
-            - SharingTimeout
+          - SharingProcessError
+          - SharingTimeout
         sharingErrorMessage:
           type: string
           description: The error message in case the current sharing state type is
@@ -3013,10 +2822,6 @@ components:
           type: string
           format: date-time
           description: The orchestrator task identifier that was created
-      required:
-        - externalId
-        - sharingStateType
-        - updatedAt
     RelationV6Dto:
       type: object
       description: 'A relation from one business partner (the source) to another business
@@ -3024,48 +2829,31 @@ components:
       properties:
         externalId:
           type: string
-          description: The identifier with which to reference this relation
         relationType:
           type: string
-          description: The type of relation between the business partners
           enum:
-            - IsManagedBy
-            - IsAlternativeHeadquarterFor
-            - IsOwnedBy
+          - IsManagedBy
+          - IsAlternativeHeadquarterFor
+          - IsOwnedBy
         businessPartnerSourceExternalId:
           type: string
-          description: The business partner from which the relation emerges (the source)
         businessPartnerTargetExternalId:
           type: string
-          description: The business partner to which this relation goes (the target)
         updatedAt:
           type: string
           format: date-time
-          description: The time when this relation was last modified
         createdAt:
           type: string
           format: date-time
-          description: The time when this relation was created
-      required:
-        - businessPartnerSourceExternalId
-        - businessPartnerTargetExternalId
-        - createdAt
-        - externalId
-        - relationType
-        - updatedAt
     RelationValidityPeriodDto:
       type: object
       properties:
         validFrom:
           type: string
           format: date
-          description: The date from which the relation is valid.
         validTo:
           type: string
           format: date
-          description: The date until which the relation is valid.
-      required:
-        - validFrom
     SharingStateDto:
       type: object
       description: |
@@ -3079,11 +2867,11 @@ components:
           type: string
           description: One of the sharing state types of the current sharing state.
           enum:
-            - Pending
-            - Success
-            - Error
-            - Initial
-            - Ready
+          - Pending
+          - Success
+          - Error
+          - Initial
+          - Ready
         sharingErrorCode:
           type: string
           description: "One of the sharing error codes in case the current sharing\
@@ -3097,16 +2885,16 @@ components:
             * `UnknownSpecialCharacters`: The provided record contains unallowed special\
             \ characters."
           enum:
-            - SharingProcessError
-            - SharingTimeout
-            - BpnNotInPool
-            - MissingTaskID
-            - NaturalPersonError
-            - BpnErrorNotFound
-            - BpnErrorTooManyOptions
-            - MandatoryFieldValidationFailed
-            - BlacklistCountryPresent
-            - UnknownSpecialCharacters
+          - SharingProcessError
+          - SharingTimeout
+          - BpnNotInPool
+          - MissingTaskID
+          - NaturalPersonError
+          - BpnErrorNotFound
+          - BpnErrorTooManyOptions
+          - MandatoryFieldValidationFailed
+          - BlacklistCountryPresent
+          - UnknownSpecialCharacters
         sharingErrorMessage:
           type: string
           description: The error message in case the current sharing state type is
@@ -3122,10 +2910,6 @@ components:
           type: string
           format: date-time
           description: The time when the sharing state has been last updated
-      required:
-        - externalId
-        - sharingStateType
-        - updatedAt
     SiteRepresentationInputDto:
       type: object
       properties:
@@ -3142,8 +2926,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/BusinessPartnerStateDto"
-      required:
-        - states
     SiteRepresentationOutputDto:
       type: object
       description: Site properties of business partner output data
@@ -3163,10 +2945,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/BusinessPartnerStateDto"
-      required:
-        - confidenceCriteria
-        - siteBpn
-        - states
     StatsAddressTypesResponse:
       type: object
       properties:
@@ -3182,11 +2960,6 @@ components:
         additionalTotal:
           type: integer
           format: int32
-      required:
-        - additionalTotal
-        - legalAndSiteTotal
-        - legalTotal
-        - siteTotal
     StatsConfidenceCriteriaResponse:
       type: object
       properties:
@@ -3205,12 +2978,6 @@ components:
         confidenceLevelAverage:
           type: number
           format: float
-      required:
-        - checkedByExternalDataSourceTotal
-        - confidenceLevelAverage
-        - numberOfBusinessPartnersAverage
-        - sharedByOwnerTotal
-        - uniqueTotal
     StatsSharingStatesResponse:
       type: object
       properties:
@@ -3229,12 +2996,6 @@ components:
         errorTotal:
           type: integer
           format: int32
-      required:
-        - errorTotal
-        - initialTotal
-        - pendingTotal
-        - readyTotal
-        - successTotal
     StatsStagesResponse:
       type: object
       properties:
@@ -3244,9 +3005,6 @@ components:
         outputTotal:
           type: integer
           format: int32
-      required:
-        - inputTotal
-        - outputTotal
     StreetDto:
       type: object
       description: "The street of the physical postal address, synonyms: road, avenue,\
