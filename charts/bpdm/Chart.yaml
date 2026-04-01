@@ -49,13 +49,13 @@ dependencies:
     alias: bpdm-orchestrator
     condition: bpdm-orchestrator.enabled
   - name: bpdm-common
-    version: 1.0.5
+    version: 1.1.0
   - name: postgresql
     version: 12.12.10
     repository: https://charts.bitnami.com/bitnami
     alias: postgres
-  - name: centralidp
-    version: 4.2.1
-    repository: https://eclipse-tractusx.github.io/charts/dev
-    alias: centralidp
-    condition: centralidp.enabled
+  - name: keycloak
+    repository: https://charts.bitnami.com/bitnami
+    version: 23.0.0
+    condition: keycloak.enabled
+    alias: keycloak

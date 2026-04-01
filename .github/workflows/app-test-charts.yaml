@@ -202,7 +202,7 @@ jobs:
           cat .chart-testing-config.yaml
 
       - name: Run chart-testing (install)
-        run: ct install --charts charts/bpdm --config .chart-testing-config.yaml
+        run: ct install --release-name bpdm --charts charts/bpdm --config .chart-testing-config.yaml
 
       - name: Create Test Upgrade Values
         run: |

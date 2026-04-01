@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.test.containers.CreateNewSelfClientInitializer
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
+import org.eclipse.tractusx.bpdm.test.containers.SelfClientInitializer
 import org.eclipse.tractusx.bpdm.test.util.AuthExpectationType
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -84,10 +85,7 @@ class AuthAdminIT @Autowired constructor(
     bpnAuthExpectation = AuthExpectationType.Authorized
 )
 
-class SelfClientAsAdminInitializer : CreateNewSelfClientInitializer() {
+class SelfClientAsAdminInitializer : SelfClientInitializer() {
     override val clientId: String
-        get() = "BPDM-POOL"
-
-    override val roleName: String
-        get() = "BPDM Pool Admin"
+        get() = "BPDM_POOL"
 }

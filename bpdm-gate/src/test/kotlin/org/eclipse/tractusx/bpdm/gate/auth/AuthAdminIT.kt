@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.test.containers.CreateNewSelfClientInitializer
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
+import org.eclipse.tractusx.bpdm.test.containers.SelfClientInitializer
 import org.eclipse.tractusx.bpdm.test.util.AuthAssertionHelper
 import org.eclipse.tractusx.bpdm.test.util.AuthExpectationType
 import org.springframework.beans.factory.annotation.Autowired
@@ -85,12 +86,9 @@ class AuthAdminIT @Autowired constructor(
     )
 ) {
 
-    class SelfClientAsAdminInitializer : CreateNewSelfClientInitializer() {
+    class SelfClientAsAdminInitializer : SelfClientInitializer() {
         override val clientId: String
-            get() = "BPDM-GATE"
-
-        override val roleName: String
-            get() = "BPDM Sharing Admin"
+            get() = "BPDM_GATE"
     }
 }
 

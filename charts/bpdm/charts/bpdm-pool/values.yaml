@@ -51,7 +51,7 @@ securityContext:
 
 configMountSecurity:
   readOnly: true
-  recursiveReadOnly: Enabled
+  recursiveReadOnly: Disabled
 
 service:
   type: ClusterIP
@@ -139,6 +139,3 @@ postgres:
     database: bpdm
     username: bpdm
     password: *postgresPass
-
-centralidp:
-  enabled: true
