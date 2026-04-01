@@ -37,7 +37,7 @@ data class LegalEntityHeaderDto(
     override val confidenceCriteria: ConfidenceCriteriaDto,
 
     @field:JsonProperty("isParticipantData")
-    @get:Schema(description = "Indicates whether the legal entity is owned and thus provided by a Data Space Participant.")
+    @get:Schema(description = "Indicates whether the legal entity is owned and thus provided by a Data Space Participant.", name = "isParticipantData")
     val isParticipantData: Boolean
 
 ) : IBaseLegalEntityDto

@@ -1671,6 +1671,37 @@
           }
         }
       },
+      "AddressScriptVariantDto" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string"
+          },
+          "physicalAddress" : {
+            "$ref" : "#/components/schemas/PhysicalAddressScriptVariantDto"
+          },
+          "alternativeAddress" : {
+            "$ref" : "#/components/schemas/AlternativeAddressScriptVariantDto"
+          }
+        }
+      },
+      "AlternativeAddressScriptVariantDto" : {
+        "type" : "object",
+        "properties" : {
+          "postalCode" : {
+            "type" : "string"
+          },
+          "city" : {
+            "type" : "string"
+          },
+          "deliveryServiceQualifier" : {
+            "type" : "string"
+          },
+          "deliveryServiceNumber" : {
+            "type" : "string"
+          }
+        }
+      },
       "AlternativePostalAddressDto" : {
         "type" : "object",
         "description" : "An alternative postal address describes an alternative way of delivery for example if the goods are to be picked up somewhere else.",
@@ -1781,6 +1812,12 @@
             "format" : "date-time",
             "description" : "The timestamp indicates the last time point of change from the user side"
           },
+          "scriptVariants" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/BusinessPartnerScriptVariantDto"
+            }
+          },
           "createdAt" : {
             "type" : "string",
             "format" : "date-time",
@@ -1852,6 +1889,12 @@
             "format" : "date-time",
             "description" : "The timestamp indicates the last time point of change from the user side"
           },
+          "scriptVariants" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/BusinessPartnerScriptVariantDto"
+            }
+          },
           "isOwnCompanyData" : {
             "type" : "boolean",
             "description" : "Indicates whether the sharing member claims (in the initial upload) the business partner to belong to the company data of the sharing member."
@@ -1913,6 +1956,12 @@
             "format" : "date-time",
             "description" : "The timestamp indicates the last time point of change from the user side"
           },
+          "scriptVariants" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/BusinessPartnerScriptVariantDto"
+            }
+          },
           "createdAt" : {
             "type" : "string",
             "format" : "date-time",
@@ -1929,6 +1978,29 @@
           }
         },
         "required" : [ "externalId" ]
+      },
+      "BusinessPartnerScriptVariantDto" : {
+        "type" : "object",
+        "properties" : {
+          "scriptCode" : {
+            "type" : "string"
+          },
+          "nameParts" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "legalEntity" : {
+            "$ref" : "#/components/schemas/LegalEntityScriptVariantDto"
+          },
+          "site" : {
+            "$ref" : "#/components/schemas/SiteScriptVariantDto"
+          },
+          "address" : {
+            "$ref" : "#/components/schemas/AddressScriptVariantDto"
+          }
+        }
       },
       "BusinessPartnerStateDto" : {
         "type" : "object",
@@ -2138,6 +2210,17 @@
           }
         },
         "required" : [ "bpnL" ]
+      },
+      "LegalEntityScriptVariantDto" : {
+        "type" : "object",
+        "properties" : {
+          "legalName" : {
+            "type" : "string"
+          },
+          "shortName" : {
+            "type" : "string"
+          }
+        }
       },
       "PageChangeLogDtoChangelogGateDto" : {
         "type" : "object",
@@ -2412,6 +2495,41 @@
             "items" : {
               "$ref" : "#/components/schemas/SharingStateDto"
             }
+          }
+        }
+      },
+      "PhysicalAddressScriptVariantDto" : {
+        "type" : "object",
+        "properties" : {
+          "postalCode" : {
+            "type" : "string"
+          },
+          "city" : {
+            "type" : "string"
+          },
+          "district" : {
+            "type" : "string"
+          },
+          "street" : {
+            "$ref" : "#/components/schemas/StreetDto"
+          },
+          "companyPostalCode" : {
+            "type" : "string"
+          },
+          "industrialZone" : {
+            "type" : "string"
+          },
+          "building" : {
+            "type" : "string"
+          },
+          "floor" : {
+            "type" : "string"
+          },
+          "door" : {
+            "type" : "string"
+          },
+          "taxJurisdictionCode" : {
+            "type" : "string"
           }
         }
       },
@@ -2833,6 +2951,14 @@
             "items" : {
               "$ref" : "#/components/schemas/BusinessPartnerStateDto"
             }
+          }
+        }
+      },
+      "SiteScriptVariantDto" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string"
           }
         }
       },

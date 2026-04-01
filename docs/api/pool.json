@@ -1272,7 +1272,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/PageDtoLogisticAddressVerboseDto"
+                  "$ref" : "#/components/schemas/PageDtoLogisticAddressInvariantVerboseDto"
                 }
               }
             }
@@ -2480,6 +2480,44 @@
         }
       }
     },
+    "/v7/script-codes" : {
+      "get" : {
+        "tags" : [ "metadata-controller" ],
+        "operationId" : "getScriptCodes",
+        "parameters" : [ {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Number of page to get results from",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Size of each page",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "maximum" : 100,
+            "minimum" : 0
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageDtoScriptCodeDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v7/legal-entities/{idValue}" : {
       "get" : {
         "tags" : [ "Legal Entity Controller" ],
@@ -3109,6 +3147,12 @@
           "confidenceCriteria" : {
             "$ref" : "#/components/schemas/ConfidenceCriteriaDto"
           },
+          "scriptVariants" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/LogisticAddressScriptVariantDto"
+            }
+          },
           "bpnParent" : {
             "type" : "string"
           },
@@ -3210,6 +3254,12 @@
             "type" : "boolean",
             "description" : "Indicates whether the address is owned and thus provided by a Data Space Participant."
           },
+          "scriptVariants" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/LogisticAddressScriptVariantDto"
+            }
+          },
           "index" : {
             "type" : "string"
           }
@@ -3251,6 +3301,12 @@
           "confidenceCriteria" : {
             "$ref" : "#/components/schemas/ConfidenceCriteriaDto"
           },
+          "scriptVariants" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/LogisticAddressScriptVariantDto"
+            }
+          },
           "requestKey" : {
             "type" : "string"
           }
@@ -3263,7 +3319,7 @@
           "entities" : {
             "type" : "array",
             "items" : {
-              "$ref" : "#/components/schemas/LogisticAddressVerboseDto"
+              "$ref" : "#/components/schemas/AddressPartnerUpdateVerboseDto"
             }
           },
           "errors" : {
@@ -3279,6 +3335,77 @@
           "errorCount" : {
             "type" : "integer",
             "format" : "int32"
+          }
+        }
+      },
+      "AddressPartnerUpdateVerboseDto" : {
+        "type" : "object",
+        "properties" : {
+          "bpna" : {
+            "type" : "string",
+            "description" : "A BPNA represents and uniquely identifies an address, which can be the legal address of a legal entity, and/or the main address of a site, or any additional address of a legal entity or site (such as different gates). It is important to note that only the BPNL must be used to uniquely identify a legal entity. Even in the case that the BPNA represents the legal address of the legal entity, it shall not be used to uniquely identify the legal entity."
+          },
+          "name" : {
+            "type" : "string",
+            "description" : "The name of the address. This is not according to official registers but according to the name the sharing member chooses."
+          },
+          "states" : {
+            "type" : "array",
+            "description" : "The list of (temporary) states of the address.",
+            "items" : {
+              "$ref" : "#/components/schemas/AddressStateVerboseDto"
+            }
+          },
+          "identifiers" : {
+            "type" : "array",
+            "description" : "The list of identifiers of the address.",
+            "items" : {
+              "$ref" : "#/components/schemas/AddressIdentifierVerboseDto"
+            }
+          },
+          "physicalPostalAddress" : {
+            "$ref" : "#/components/schemas/PhysicalPostalAddressVerboseDto",
+            "description" : "The physical postal address of the address, such as an office, warehouse, gate, etc."
+          },
+          "alternativePostalAddress" : {
+            "$ref" : "#/components/schemas/AlternativePostalAddressVerboseDto",
+            "description" : "The alternative postal address of the address, for example if the goods are to be picked up somewhere else."
+          },
+          "bpnLegalEntity" : {
+            "type" : "string",
+            "description" : "The BPNL of the legal entity owning the address."
+          },
+          "bpnSite" : {
+            "type" : "string",
+            "description" : "The BPNS of the site the address belongs to."
+          },
+          "createdAt" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "The date when the data record has been created."
+          },
+          "updatedAt" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "The date when the data record has been last updated."
+          },
+          "confidenceCriteria" : {
+            "$ref" : "#/components/schemas/ConfidenceCriteriaDto"
+          },
+          "addressType" : {
+            "type" : "string",
+            "description" : "Indicates the address type, the legal address to a legal entity or the main address to a site, an additional address, or both legal and site address.The site main address is where typically the main entrance or the reception is located, or where the mail is delivered to.",
+            "enum" : [ "LegalAndSiteMainAddress", "LegalAddress", "SiteMainAddress", "AdditionalAddress" ]
+          },
+          "isParticipantData" : {
+            "type" : "boolean",
+            "description" : "Indicates whether the address is owned and thus provided by a Data Space Participant."
+          },
+          "scriptVariants" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/LogisticAddressScriptVariantDto"
+            }
           }
         }
       },
@@ -3346,6 +3473,23 @@
           "type" : {
             "$ref" : "#/components/schemas/TypeKeyNameVerboseDtoBusinessStateType",
             "description" : "One of the state types: active, inactive."
+          }
+        }
+      },
+      "AlternativeAddressScriptVariantDto" : {
+        "type" : "object",
+        "properties" : {
+          "postalCode" : {
+            "type" : "string"
+          },
+          "city" : {
+            "type" : "string"
+          },
+          "deliveryServiceQualifier" : {
+            "type" : "string"
+          },
+          "deliveryServiceNumber" : {
+            "type" : "string"
           }
         }
       },
@@ -4090,12 +4234,17 @@
             "$ref" : "#/components/schemas/ConfidenceCriteriaDto"
           },
           "isParticipantData" : {
-            "type" : "boolean",
-            "description" : "Indicates whether the legal entity is owned and thus provided by a Data Space Participant."
+            "type" : "boolean"
           },
           "legalAddress" : {
             "$ref" : "#/components/schemas/LogisticAddressDto",
             "description" : "The official, legal correspondence address to be provided to government and tax authorities and used in all legal or court documents."
+          },
+          "scriptVariants" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/LegalEntityScriptVariantDto"
+            }
           },
           "index" : {
             "type" : "string",
@@ -4196,8 +4345,14 @@
             "description" : "The legal form of the legal entity."
           },
           "legalAddress" : {
-            "$ref" : "#/components/schemas/LogisticAddressVerboseDto",
+            "$ref" : "#/components/schemas/LogisticAddressInvariantVerboseDto",
             "description" : "The official, legal correspondence address to be provided to government and tax authorities and used in all legal or court documents."
+          },
+          "scriptVariants" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/LegalEntityScriptVariantDto"
+            }
           },
           "index" : {
             "type" : "string",
@@ -4243,12 +4398,17 @@
             "$ref" : "#/components/schemas/ConfidenceCriteriaDto"
           },
           "isParticipantData" : {
-            "type" : "boolean",
-            "description" : "Indicates whether the legal entity is owned and thus provided by a Data Space Participant."
+            "type" : "boolean"
           },
           "legalAddress" : {
             "$ref" : "#/components/schemas/LogisticAddressDto",
             "description" : "The official, legal correspondence address to be provided to government and tax authorities and used in all legal or court documents."
+          },
+          "scriptVariants" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/LegalEntityScriptVariantDto"
+            }
           },
           "requestKey" : {
             "type" : "string"
@@ -4303,6 +4463,23 @@
           "country" : {
             "type" : "string",
             "enum" : [ "UNDEFINED", "AC", "AD", "AE", "AF", "AG", "AI", "AL", "AM", "AN", "AO", "AQ", "AR", "AS", "AT", "AU", "AW", "AX", "AZ", "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO", "BQ", "BR", "BS", "BT", "BU", "BV", "BW", "BY", "BZ", "CA", "CC", "CD", "CF", "CG", "CH", "CI", "CK", "CL", "CM", "CN", "CO", "CP", "CR", "CS", "CU", "CV", "CW", "CX", "CY", "CZ", "DE", "DG", "DJ", "DK", "DM", "DO", "DZ", "EA", "EC", "EE", "EG", "EH", "ER", "ES", "ET", "EU", "EZ", "FI", "FJ", "FK", "FM", "FO", "FR", "FX", "GA", "GB", "GD", "GE", "GF", "GG", "GH", "GI", "GL", "GM", "GN", "GP", "GQ", "GR", "GS", "GT", "GU", "GW", "GY", "HK", "HM", "HN", "HR", "HT", "HU", "IC", "ID", "IE", "IL", "IM", "IN", "IO", "IQ", "IR", "IS", "IT", "JE", "JM", "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN", "KP", "KR", "KW", "KY", "KZ", "LA", "LB", "LC", "LI", "LK", "LR", "LS", "LT", "LU", "LV", "LY", "MA", "MC", "MD", "ME", "MF", "MG", "MH", "MK", "ML", "MM", "MN", "MO", "MP", "MQ", "MR", "MS", "MT", "MU", "MV", "MW", "MX", "MY", "MZ", "NA", "NC", "NE", "NF", "NG", "NI", "NL", "NO", "NP", "NR", "NT", "NU", "NZ", "OM", "PA", "PE", "PF", "PG", "PH", "PK", "PL", "PM", "PN", "PR", "PS", "PT", "PW", "PY", "QA", "RE", "RO", "RS", "RU", "RW", "SA", "SB", "SC", "SD", "SE", "SF", "SG", "SH", "SI", "SJ", "SK", "SL", "SM", "SN", "SO", "SR", "SS", "ST", "SU", "SV", "SX", "SY", "SZ", "TA", "TC", "TD", "TF", "TG", "TH", "TJ", "TK", "TL", "TM", "TN", "TO", "TP", "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "UK", "UM", "US", "UY", "UZ", "VA", "VC", "VE", "VG", "VI", "VN", "VU", "WF", "WS", "XI", "XU", "XK", "YE", "YT", "YU", "ZA", "ZM", "ZR", "ZW" ]
+          }
+        }
+      },
+      "LegalEntityScriptVariantDto" : {
+        "type" : "object",
+        "properties" : {
+          "scriptCode" : {
+            "type" : "string"
+          },
+          "legalName" : {
+            "type" : "string"
+          },
+          "shortName" : {
+            "type" : "string"
+          },
+          "legalAddress" : {
+            "$ref" : "#/components/schemas/PostalAddressScriptVariantDto"
           }
         }
       },
@@ -4425,8 +4602,14 @@
             "description" : "The legal form of the legal entity."
           },
           "legalAddress" : {
-            "$ref" : "#/components/schemas/LogisticAddressVerboseDto",
+            "$ref" : "#/components/schemas/LogisticAddressInvariantVerboseDto",
             "description" : "The official, legal correspondence address to be provided to government and tax authorities and used in all legal or court documents."
+          },
+          "scriptVariants" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/LegalEntityScriptVariantDto"
+            }
           }
         }
       },
@@ -4539,7 +4722,7 @@
           }
         }
       },
-      "LogisticAddressVerboseDto" : {
+      "LogisticAddressInvariantVerboseDto" : {
         "type" : "object",
         "description" : "In general, an address is a collection of information to describe a physical location, using a street name with a house number and/or a post office box as reference. In addition, an address consists of several postal attributes, such as country, region (state), county, township, city, district, or postal code, which help deliver mail.In Catena-X, an address is a type of business partner representing the legal address of a legal entity, and/or the main address of a site, or any additional address of a legal entity or site (such as different gates).An address is owned by a legal entity. Thus, exactly one legal entity is assigned to an address. An address can belong to a site. Thus, one or no site is assigned to an address. An address is uniquely identified by the BPNA.",
         "properties" : {
@@ -4602,6 +4785,89 @@
           "isParticipantData" : {
             "type" : "boolean",
             "description" : "Indicates whether the address is owned and thus provided by a Data Space Participant."
+          }
+        }
+      },
+      "LogisticAddressScriptVariantDto" : {
+        "type" : "object",
+        "properties" : {
+          "scriptCode" : {
+            "type" : "string"
+          },
+          "addressName" : {
+            "type" : "string"
+          },
+          "physicalAddress" : {
+            "$ref" : "#/components/schemas/PhysicalAddressScriptVariantDto"
+          },
+          "alternativeAddress" : {
+            "$ref" : "#/components/schemas/AlternativeAddressScriptVariantDto"
+          }
+        }
+      },
+      "LogisticAddressVerboseDto" : {
+        "type" : "object",
+        "description" : "In general, an address is a collection of information to describe a physical location, using a street name with a house number and/or a post office box as reference. In addition, an address consists of several postal attributes, such as country, region (state), county, township, city, district, or postal code, which help deliver mail.In Catena-X, an address is a type of business partner representing the legal address of a legal entity, and/or the main address of a site, or any additional address of a legal entity or site (such as different gates).An address is owned by a legal entity. Thus, exactly one legal entity is assigned to an address. An address can belong to a site. Thus, one or no site is assigned to an address. An address is uniquely identified by the BPNA.",
+        "properties" : {
+          "bpna" : {
+            "type" : "string",
+            "description" : "A BPNA represents and uniquely identifies an address, which can be the legal address of a legal entity, and/or the main address of a site, or any additional address of a legal entity or site (such as different gates). It is important to note that only the BPNL must be used to uniquely identify a legal entity. Even in the case that the BPNA represents the legal address of the legal entity, it shall not be used to uniquely identify the legal entity."
+          },
+          "name" : {
+            "type" : "string",
+            "description" : "The name of the address. This is not according to official registers but according to the name the sharing member chooses."
+          },
+          "states" : {
+            "type" : "array",
+            "description" : "The list of (temporary) states of the address.",
+            "items" : {
+              "$ref" : "#/components/schemas/AddressStateVerboseDto"
+            }
+          },
+          "identifiers" : {
+            "type" : "array",
+            "description" : "The list of identifiers of the address.",
+            "items" : {
+              "$ref" : "#/components/schemas/AddressIdentifierVerboseDto"
+            }
+          },
+          "physicalPostalAddress" : {
+            "$ref" : "#/components/schemas/PhysicalPostalAddressVerboseDto",
+            "description" : "The physical postal address of the address, such as an office, warehouse, gate, etc."
+          },
+          "alternativePostalAddress" : {
+            "$ref" : "#/components/schemas/AlternativePostalAddressVerboseDto",
+            "description" : "The alternative postal address of the address, for example if the goods are to be picked up somewhere else."
+          },
+          "bpnLegalEntity" : {
+            "type" : "string",
+            "description" : "The BPNL of the legal entity owning the address."
+          },
+          "bpnSite" : {
+            "type" : "string",
+            "description" : "The BPNS of the site the address belongs to."
+          },
+          "createdAt" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "The date when the data record has been created."
+          },
+          "updatedAt" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "The date when the data record has been last updated."
+          },
+          "confidenceCriteria" : {
+            "$ref" : "#/components/schemas/ConfidenceCriteriaDto"
+          },
+          "addressType" : {
+            "type" : "string",
+            "description" : "Indicates the address type, the legal address to a legal entity or the main address to a site, an additional address, or both legal and site address.The site main address is where typically the main entrance or the reception is located, or where the mail is delivered to.",
+            "enum" : [ "LegalAndSiteMainAddress", "LegalAddress", "SiteMainAddress", "AdditionalAddress" ]
+          },
+          "isCatenaXMemberData" : {
+            "type" : "boolean",
+            "description" : "Indicates whether the address is owned and thus provided by a Catena-X Member."
           }
         }
       },
@@ -4869,6 +5135,39 @@
           }
         }
       },
+      "PageDtoLogisticAddressInvariantVerboseDto" : {
+        "type" : "object",
+        "description" : "Paginated collection of results",
+        "properties" : {
+          "totalElements" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "Total number of all results in all pages"
+          },
+          "totalPages" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Total number pages"
+          },
+          "page" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Current page number"
+          },
+          "contentSize" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Number of results in the page"
+          },
+          "content" : {
+            "type" : "array",
+            "description" : "Collection of results in the page",
+            "items" : {
+              "$ref" : "#/components/schemas/LogisticAddressInvariantVerboseDto"
+            }
+          }
+        }
+      },
       "PageDtoLogisticAddressVerboseDto" : {
         "type" : "object",
         "description" : "Paginated collection of results",
@@ -4898,6 +5197,39 @@
             "description" : "Collection of results in the page",
             "items" : {
               "$ref" : "#/components/schemas/LogisticAddressVerboseDto"
+            }
+          }
+        }
+      },
+      "PageDtoScriptCodeDto" : {
+        "type" : "object",
+        "description" : "Paginated collection of results",
+        "properties" : {
+          "totalElements" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "Total number of all results in all pages"
+          },
+          "totalPages" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Total number pages"
+          },
+          "page" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Current page number"
+          },
+          "contentSize" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Number of results in the page"
+          },
+          "content" : {
+            "type" : "array",
+            "description" : "Collection of results in the page",
+            "items" : {
+              "$ref" : "#/components/schemas/ScriptCodeDto"
             }
           }
         }
@@ -4965,6 +5297,41 @@
             "items" : {
               "$ref" : "#/components/schemas/SiteWithMainAddressVerboseDto"
             }
+          }
+        }
+      },
+      "PhysicalAddressScriptVariantDto" : {
+        "type" : "object",
+        "properties" : {
+          "postalCode" : {
+            "type" : "string"
+          },
+          "city" : {
+            "type" : "string"
+          },
+          "district" : {
+            "type" : "string"
+          },
+          "street" : {
+            "$ref" : "#/components/schemas/StreetDto"
+          },
+          "companyPostalCode" : {
+            "type" : "string"
+          },
+          "industrialZone" : {
+            "type" : "string"
+          },
+          "building" : {
+            "type" : "string"
+          },
+          "floor" : {
+            "type" : "string"
+          },
+          "door" : {
+            "type" : "string"
+          },
+          "taxJurisdictionCode" : {
+            "type" : "string"
           }
         }
       },
@@ -5097,6 +5464,20 @@
           }
         }
       },
+      "PostalAddressScriptVariantDto" : {
+        "type" : "object",
+        "properties" : {
+          "addressName" : {
+            "type" : "string"
+          },
+          "physicalAddress" : {
+            "$ref" : "#/components/schemas/PhysicalAddressScriptVariantDto"
+          },
+          "alternativeAddress" : {
+            "$ref" : "#/components/schemas/AlternativeAddressScriptVariantDto"
+          }
+        }
+      },
       "RegionDto" : {
         "type" : "object",
         "description" : "Region within a country",
@@ -5157,6 +5538,17 @@
           }
         }
       },
+      "ScriptCodeDto" : {
+        "type" : "object",
+        "properties" : {
+          "technicalKey" : {
+            "type" : "string"
+          },
+          "description" : {
+            "type" : "string"
+          }
+        }
+      },
       "SiteCreateRequestWithLegalAddressAsMain" : {
         "type" : "object",
         "properties" : {
@@ -5199,6 +5591,12 @@
           },
           "confidenceCriteria" : {
             "$ref" : "#/components/schemas/ConfidenceCriteriaDto"
+          },
+          "scriptVariants" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/SiteScriptVariantDto"
+            }
           },
           "bpnlParent" : {
             "type" : "string"
@@ -5273,12 +5671,18 @@
           "confidenceCriteria" : {
             "$ref" : "#/components/schemas/ConfidenceCriteriaDto"
           },
+          "scriptVariants" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/SiteScriptVariantDto"
+            }
+          },
           "isParticipantData" : {
             "type" : "boolean",
             "description" : "Indicates whether the site is owned and thus provided by a Data Space Participant."
           },
           "mainAddress" : {
-            "$ref" : "#/components/schemas/LogisticAddressVerboseDto",
+            "$ref" : "#/components/schemas/LogisticAddressInvariantVerboseDto",
             "description" : "The address, where typically the main entrance or the reception is located, or where the mail is delivered to."
           },
           "index" : {
@@ -5311,6 +5715,12 @@
           "confidenceCriteria" : {
             "$ref" : "#/components/schemas/ConfidenceCriteriaDto"
           },
+          "scriptVariants" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/SiteScriptVariantDto"
+            }
+          },
           "requestKey" : {
             "type" : "string"
           }
@@ -5339,6 +5749,20 @@
           "errorCount" : {
             "type" : "integer",
             "format" : "int32"
+          }
+        }
+      },
+      "SiteScriptVariantDto" : {
+        "type" : "object",
+        "properties" : {
+          "scriptCode" : {
+            "type" : "string"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "mainAddress" : {
+            "$ref" : "#/components/schemas/PostalAddressScriptVariantDto"
           }
         }
       },
@@ -5439,6 +5863,12 @@
           "confidenceCriteria" : {
             "$ref" : "#/components/schemas/ConfidenceCriteriaDto"
           },
+          "scriptVariants" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/SiteScriptVariantDto"
+            }
+          },
           "isParticipantData" : {
             "type" : "boolean",
             "description" : "Indicates whether the site is owned and thus provided by a Data Space Participant."
@@ -5481,12 +5911,18 @@
           "confidenceCriteria" : {
             "$ref" : "#/components/schemas/ConfidenceCriteriaDto"
           },
+          "scriptVariants" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/SiteScriptVariantDto"
+            }
+          },
           "isParticipantData" : {
             "type" : "boolean",
             "description" : "Indicates whether the site is owned and thus provided by a Data Space Participant."
           },
           "mainAddress" : {
-            "$ref" : "#/components/schemas/LogisticAddressVerboseDto"
+            "$ref" : "#/components/schemas/LogisticAddressInvariantVerboseDto"
           }
         }
       },

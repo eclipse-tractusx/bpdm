@@ -430,12 +430,6 @@ data class UncategorizedProperties(
     }
 }
 
-data class UncategorizedScriptVariant(
-    val scriptCode: String,
-    val nameParts: List<String>,
-    val address: PostalAddressScriptVariant
-)
-
 data class LegalEntityScriptVariant(
     val scriptCode: String,
     val legalName: String?,
