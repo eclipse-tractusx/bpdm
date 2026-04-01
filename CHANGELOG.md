@@ -6,6 +6,12 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
 For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/CHANGELOG.md) of the charts directly.
 
+## [7.4.0] - tbd
+
+### Added
+
+- Script variants and script codes for business partner data [#1593](https://github.com/eclipse-tractusx/bpdm/issues/1593)
+
 ## [7.3.0] - 2026-03-6
 
 ### Added
