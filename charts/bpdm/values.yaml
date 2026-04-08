@@ -69,6 +69,7 @@ bpdm-pool:
         host: bpdm-postgres
       security:
         auth-server-url: "http://bpdm-keycloak"
+        realm: BPDM
   postgres:
     enabled: false
 
@@ -109,6 +110,8 @@ keycloak:
   realm:
     import: true
     existingSecret: bpdm-realm
+  service:
+    httpPort: 80
   postgres:
     enabled: true
     auth:
