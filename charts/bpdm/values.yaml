@@ -100,6 +100,10 @@ postgres:
     database: bpdm
     username: bpdm
     password: bpdm
+  customUser:
+    database: keycloak
+    name: keycloak
+    password: keycloak-db-password
 
 keycloak:
   enabled: true
@@ -112,11 +116,17 @@ keycloak:
     existingSecret: bpdm-realm
   service:
     httpPort: 80
+  database:
+    type: "postgres"
+    host: "bpdm-postgres"
+    port: "5432"
+    name: "keycloak"
+    username: "keycloak"
+    password: "keycloak-db-password"
   postgres:
-    enabled: true
-    auth:
-      database: "keycloak"
-      password: "keycloak-db-password"
+    enabled: false
+  mariadb:
+    enabled: false
 
 tests:
   applicationConfig:
