@@ -96,11 +96,11 @@ Determine postgres service/host name to connect to
 {{- end }}}
 
 {/*
-Determine centralidp service/host name to connect to
+Determine keycloak service/host name to connect to
 */}}
-{{- define "bpdm.centralidpDependency" -}}
-    {{- if .Subcharts.centralidp }}
-        {{- include "centralidp.fullname" .Subcharts.centralidp }}
+{{- define "bpdm.keycloakDependency" -}}
+    {{- if .Subcharts.keycloak }}
+        {{- include "common.names.fullname" .Subcharts.keycloak }}
     {{- end}}
 {{- end }}}
 

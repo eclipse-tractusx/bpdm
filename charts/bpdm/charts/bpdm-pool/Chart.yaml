@@ -28,19 +28,9 @@ home: https://eclipse-tractusx.github.io/docs/kits/Business%20Partner%20Kit/Adop
 sources:
   - https://github.com/eclipse-tractusx/bpdm
 dependencies:
-  - name: postgresql
-    version: 12.12.10
-    repository: https://charts.bitnami.com/bitnami
-    alias: postgres
-    condition: postgres.enabled
   - name: bpdm-common
-    version: 1.0.5
+    version: 1.1.0
     repository: "file://../bpdm-common"
-  - name: centralidp
-    version: 4.2.1
-    repository: https://eclipse-tractusx.github.io/charts/dev
-    alias: centralidp
-    condition: centralidp.enabled
 maintainers:
   - name: Nico Koprowski
   - name: Sujit Karne

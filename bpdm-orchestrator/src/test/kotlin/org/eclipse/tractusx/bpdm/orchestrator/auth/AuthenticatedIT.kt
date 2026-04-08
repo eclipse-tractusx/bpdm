@@ -23,6 +23,7 @@ import org.eclipse.tractusx.bpdm.orchestrator.Application
 import org.eclipse.tractusx.bpdm.test.containers.AuthenticatedSelfClient
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
+import org.eclipse.tractusx.bpdm.test.containers.SelfClientInitializer
 import org.eclipse.tractusx.bpdm.test.util.AuthAssertionHelper
 import org.eclipse.tractusx.bpdm.test.util.AuthExpectationType
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
@@ -35,7 +36,7 @@ import org.springframework.test.context.ContextConfiguration
 @ContextConfiguration(initializers = [
     PostgreSQLContextInitializer::class,
     KeyCloakInitializer::class,
-    AuthenticatedSelfClient::class
+    AuthenticatedIT.SelfClientAsUnauthorizedInitializer::class
 ])
 class AuthenticatedIT @Autowired constructor(
     orchestratorClient: OrchestrationApiClient,
@@ -53,4 +54,10 @@ class AuthenticatedIT @Autowired constructor(
         steps = TaskStep.entries
             .associateWith { TaskStepAuthExpectations(postReservation = AuthExpectationType.Forbidden, postResult = AuthExpectationType.Forbidden) }
     )
-)
+){
+
+    class SelfClientAsUnauthorizedInitializer : SelfClientInitializer() {
+        override val clientId: String
+            get() = "BPDM_PARTICIPANT"
+    }
+}

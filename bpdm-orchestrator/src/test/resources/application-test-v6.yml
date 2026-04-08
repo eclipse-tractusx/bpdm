@@ -8,3 +8,37 @@ spring:
   datasource:
     hikari:
       maximum-pool-size: 2
+  security:
+    oauth2:
+      client:
+        registration:
+          admin:
+            provider: "test-keycloak"
+            authorization-grant-type: "client_credentials"
+            client-id: "BPDM_ORCHESTRATOR"
+            client-secret: "**********"
+          task-creator:
+            provider: "test-keycloak"
+            authorization-grant-type: "client_credentials"
+            client-id: "BPDM_TASK_CREATOR"
+            client-secret: "**********"
+          refiner-pool-sync:
+            provider: "test-keycloak"
+            authorization-grant-type: "client_credentials"
+            client-id: "BPDM_REFINER_POOL_SYNC"
+            client-secret: "**********"
+          refiner-clean-and-sync:
+            provider: "test-keycloak"
+            authorization-grant-type: "client_credentials"
+            client-id: "BPDM_REFINER_CLEAN_AND_SYNC"
+            client-secret: "**********"
+          refiner-clean:
+            provider: "test-keycloak"
+            authorization-grant-type: "client_credentials"
+            client-id: "BPDM_REFINER_CLEAN"
+            client-secret: "**********"
+          unauthorized:
+            provider: "test-keycloak"
+            authorization-grant-type: "client_credentials"
+            client-id: "BPDM_PARTICIPANT"
+            client-secret: "**********"
