@@ -21,10 +21,7 @@ package org.eclipse.tractusx.bpdm.test.containers
 
 import dasniko.testcontainers.keycloak.KeycloakContainer
 import org.eclipse.tractusx.bpdm.test.config.SelfClientConfigProperties
-import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer.Companion.TENANT_BPNL
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer.Companion.keycloakContainer
-import org.keycloak.representations.idm.ClientRepresentation
-import org.keycloak.representations.idm.ProtocolMapperRepresentation
 import org.springframework.boot.test.util.TestPropertyValues
 import org.springframework.context.ApplicationContextInitializer
 import org.springframework.context.ConfigurableApplicationContext
@@ -39,7 +36,6 @@ class KeyCloakInitializer: ApplicationContextInitializer<ConfigurableApplication
 
         const val REALM =  "BPDM"
         const val TENANT_BPNL = "BPNL000000000001"
-        const val ROLE_MANAGEMENT_CLIENT = "technical_roles_management"
 
         const val CLIENT_ID_OPERATOR = "admin"
         const val CLIENT_ID_SHARING_MEMBER = "sharing-member"
