@@ -51,7 +51,7 @@ securityContext:
 
 configMountSecurity:
   readOnly: true
-  recursiveReadOnly: Disabled
+  recursiveReadOnly: Enabled
 
 service:
   type: ClusterIP
