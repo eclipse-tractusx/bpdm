@@ -194,8 +194,6 @@ jobs:
       - name: Create Chart-Testing Config
         run: |
           cat <<EOF > .chart-testing-config.yaml
-          chart-repos:
-            - cloudpirates=oci://registry-1.docker.io/cloudpirates
           helm-extra-args: --timeout 900s
           EOF
           echo "cat .chart-testing-config.yaml"
@@ -240,8 +238,6 @@ jobs:
         env:
           UPGRADE_FROM: ${{ github.event.inputs.upgrade_from && '--version github.event.inputs.upgrade_from' || '' }}
         run: |
-          helm repo add cloudpirates oci://registry-1.docker.io/cloudpirates
-          helm repo add tractusx-dev https://eclipse-tractusx.github.io/charts/dev
           helm install -f charts/bpdm/ci/test-upgrade-values.yaml  bpdm-test tractusx-dev/bpdm $UPGRADE_FROM
           helm dependency update charts/bpdm
           helm upgrade -f charts/bpdm/ci/test-upgrade-values.yaml  bpdm-test charts/bpdm
