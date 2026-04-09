@@ -58,6 +58,11 @@ bpdm-gate:
         host: bpdm-postgres
       security:
         auth-server-url: "http://bpdm-keycloak"
+  applicationSecrets:
+    spring:
+      datasource:
+        # Change this password for production
+        password: bpdm
   postgres:
     enabled: false
 
@@ -70,8 +75,11 @@ bpdm-pool:
       security:
         auth-server-url: "http://bpdm-keycloak"
         realm: BPDM
-  postgres:
-    enabled: false
+  applicationSecrets:
+    spring:
+      datasource:
+        # Change this password for production
+        password: bpdm
 
 bpdm-cleaning-service-dummy:
   enabled: true
@@ -90,6 +98,11 @@ bpdm-orchestrator:
         host: bpdm-postgres
       security:
         auth-server-url: "http://bpdm-keycloak"
+  applicationSecrets:
+    spring:
+      datasource:
+        # Change this password for production
+        password: bpdm
   postgres:
     enabled: false
 
