@@ -7,6 +7,8 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 ## [7.4.0] - tbd
 
 - Increase appversion to 7.4.0
+- Remove Bitnami Postgres dependency [#1625](https://github.com/eclipse-tractusx/bpdm/issues/1625)
+
 
 ## [7.3.0] - 2025-03-06
 

@@ -195,9 +195,8 @@ jobs:
         run: |
           cat <<EOF > .chart-testing-config.yaml
           chart-repos:
-            - bitnami=https://charts.bitnami.com/bitnami
+            - cloudpirates=oci://registry-1.docker.io/cloudpirates
           helm-extra-args: --timeout 900s
-          release-name: bpdm
           EOF
           echo "cat .chart-testing-config.yaml"
           cat .chart-testing-config.yaml
@@ -233,25 +232,6 @@ jobs:
               registry: kind-registry:5000
               repository: bpdm-system-tester
               tag: test
-          keycloak:
-            auth:
-              adminPassword: password
-            replicaCount: 1
-            postgresql:
-              auth:
-                # -- Non-root user password.
-                password: password
-                # -- Root user password.
-                postgresPassword: password
-              architecture: standalone
-            secrets:
-              postgresql:
-                auth:
-                  existingSecret:
-                    postgrespassword: password
-                    password: password
-            realmSeeding:
-              enabled: false
           EOF
           echo "cat charts/bpdm/ci/test-upgrade-values.yaml"
           cat charts/bpdm/ci/test-upgrade-values.yaml
@@ -260,7 +240,7 @@ jobs:
         env:
           UPGRADE_FROM: ${{ github.event.inputs.upgrade_from && '--version github.event.inputs.upgrade_from' || '' }}
         run: |
-          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm repo add cloudpirates oci://registry-1.docker.io/cloudpirates
           helm repo add tractusx-dev https://eclipse-tractusx.github.io/charts/dev
           helm install -f charts/bpdm/ci/test-upgrade-values.yaml  bpdm-test tractusx-dev/bpdm $UPGRADE_FROM
           helm dependency update charts/bpdm

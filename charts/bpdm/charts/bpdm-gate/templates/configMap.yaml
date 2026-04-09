@@ -21,13 +21,9 @@
 {{ include "bpdm-common.configMap" (dict "context" $ "defaultValues" "bpdm-gate.configmapDefaults") -}}
 {{- define "bpdm-gate.configmapDefaults" -}}
 bpdm:
-  datasource:
-    host: {{ include "bpdm.postgresDependency" . }}
   client:
     pool:
       base-url: http://{{ include "bpdm.toReleaseName" (list . "bpdm-pool") }}
     orchestrator:
       base-url: http://{{ include "bpdm.toReleaseName" (list . "bpdm-orchestrator") }}
-  security:
-    auth-server-url: http://{{ include "bpdm.keycloakDependency" . }}
 {{- end -}}

@@ -85,26 +85,6 @@ Create name of application secret
 {{- printf "%s-application" (include "bpdm.fullname" .) }}
 {{- end }}
 
-{/*
-Determine postgres service/host name to connect to
-*/}}
-{{- define "bpdm.postgresDependency" -}}
-    {{- if .Subcharts.postgres }}
-        .Values.postgres.nameOverride
-        {{- include "postgresql.v1.primary.fullname" .Subcharts.postgres }}
-    {{- end}}
-{{- end }}}
-
-{/*
-Determine keycloak service/host name to connect to
-*/}}
-{{- define "bpdm.keycloakDependency" -}}
-    {{- if .Subcharts.keycloak }}
-        {{- include "common.names.fullname" .Subcharts.keycloak }}
-    {{- end}}
-{{- end }}}
-
-
 {{- /*
 Merges three templates one after another in the following order:
 valuesOverride -overrides-> (defaultOverride -overrides-> baseTemplate)

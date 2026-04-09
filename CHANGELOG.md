@@ -6,6 +6,14 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
 For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/CHANGELOG.md) of the charts directly.
 
+## [7.4.0] - tbd
+
+## Breaking
+
+- Upgraded Postgres and Keycloak versions [#1625](https://github.com/eclipse-tractusx/bpdm/issues/1625).
+This change is breaking for operators who may use the embedded database of the delivered Charts.
+Please consult the [MIGRATION_GUIDE](./docs/admin/MIGRATION_GUIDE.md).
+
 ## [7.3.0] - 2026-03-6
 
 ### Added
