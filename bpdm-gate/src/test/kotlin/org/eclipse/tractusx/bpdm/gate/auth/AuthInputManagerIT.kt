@@ -21,7 +21,6 @@ package org.eclipse.tractusx.bpdm.gate.auth
 
 import org.eclipse.tractusx.bpdm.gate.Application
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
-import org.eclipse.tractusx.bpdm.test.containers.CreateNewSelfClientInitializer
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.containers.SelfClientInitializer

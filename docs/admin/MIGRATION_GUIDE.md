@@ -3,6 +3,9 @@
 <!-- TOC -->
 * [Migration Guide](#migration-guide)
   * [7.2.x to 7.3.x](#72x-to-73x)
+    * [Postgres Upgrade (BREAKING)](#postgres-upgrade-breaking)
+    * [Keycloak Upgrade (BREAKING)](#keycloak-upgrade-breaking)
+  * [7.2.x to 7.3.x](#72x-to-73x-1)
     * [Automatic Confidence Level](#automatic-confidence-level)
   * [7.1.x to 7.2.x](#71x-to-72x)
     * [Alternative Headquarters Restriction](#alternative-headquarters-restriction)

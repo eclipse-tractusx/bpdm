@@ -192,13 +192,3 @@ class KeycloakClientFactory{
         return createdClient.secret.value
     }
 }
-
-/**
- * Creates a new client having no permissions attached with it
- */
-class AuthenticatedSelfClient: CreateNewSelfClientInitializer(){
-    override val roleName: String?
-        get() = null
-    override val clientId: String
-        get() = "AuthenticatedClient"
-}

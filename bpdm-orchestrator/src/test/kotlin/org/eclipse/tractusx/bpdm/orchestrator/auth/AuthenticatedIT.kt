@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.orchestrator.auth
 
 import org.eclipse.tractusx.bpdm.orchestrator.Application
-import org.eclipse.tractusx.bpdm.test.containers.AuthenticatedSelfClient
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.containers.SelfClientInitializer
