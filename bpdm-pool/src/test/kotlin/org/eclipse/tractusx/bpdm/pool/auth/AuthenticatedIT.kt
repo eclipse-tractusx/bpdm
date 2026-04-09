@@ -21,9 +21,9 @@ package org.eclipse.tractusx.bpdm.pool.auth
 
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.test.containers.AuthenticatedSelfClient
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
+import org.eclipse.tractusx.bpdm.test.containers.SelfClientInitializer
 import org.eclipse.tractusx.bpdm.test.util.AuthExpectationType
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -36,7 +36,7 @@ import org.springframework.test.context.ContextConfiguration
 @ContextConfiguration(initializers = [
     PostgreSQLContextInitializer::class,
     KeyCloakInitializer::class,
-    AuthenticatedSelfClient::class
+    AuthenticatedIT.SelfClientAsAuthenticatedInitializer::class
 ])
 class AuthenticatedIT @Autowired constructor(poolApiClient: PoolApiClient)
     : AuthTestBase(
@@ -84,4 +84,11 @@ class AuthenticatedIT @Autowired constructor(poolApiClient: PoolApiClient)
     ),
     changelogAuthExpectation = AuthExpectationType.Forbidden,
     bpnAuthExpectation = AuthExpectationType.Forbidden
-    )
+    ){
+
+    class SelfClientAsAuthenticatedInitializer : SelfClientInitializer() {
+        override val clientId: String
+            get() = "BPDM_TASK_CREATOR"
+    }
+    }
+

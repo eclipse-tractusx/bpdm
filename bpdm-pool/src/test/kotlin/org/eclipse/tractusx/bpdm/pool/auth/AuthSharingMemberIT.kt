@@ -86,5 +86,5 @@ class AuthSharingMemberIT @Autowired constructor(
 
 class SelfClientAsSharingMemberInitializer : SelfClientInitializer() {
     override val clientId: String
-        get() = "sa-cl7-cx-1"
+        get() = "BPDM_SHARING_MEMBER"
 }
