@@ -1,32 +1,35 @@
 /*******************************************************************************
  * Copyright (c) 2021 Contributors to the Eclipse Foundation
  *
- * See the NOTICE file(s) distributed with this work for additional
+ * See the NOTICE file(s) distributed with this work for additional 
  * information regarding copyright ownership.
  *
- * This program and the accompanying materials are made available under the
- * terms of the Apache License, Version 2.0 which is available at
+ * This program and the accompanying materials are made available under the 
+ * terms of the Apache License, Version 2.0 which is available at 
  * https://www.apache.org/licenses/LICENSE-2.0.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations
+ * Unless required by applicable law or agreed to in writing, software 
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT 
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
+ * License for the specific language governing permissions and limitations 
  * under the License.
  *
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.v6
+package org.eclipse.tractusx.bpdm.orchestrator.v7.businesspartner
 
+import org.assertj.core.api.Assertions
+import org.eclipse.tractusx.bpdm.orchestrator.v7.UnscheduledOrchestratorTestBaseV7
 import org.eclipse.tractusx.orchestrator.api.model.TaskStep
+import org.eclipse.tractusx.orchestrator.api.model.TaskStepReservationEntryDto
 import org.eclipse.tractusx.orchestrator.api.model.TaskStepReservationRequest
-import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepReservationResponse
+import org.eclipse.tractusx.orchestrator.api.model.TaskStepReservationResponse
 import org.junit.jupiter.api.Test
+import org.springframework.web.reactive.function.client.WebClientResponseException
 import java.time.Instant
 
-class TaskReservationV6IT: UnscheduledOrchestratorTestBaseV6() {
-
+class BusinessPartnerTaskReservationV7IT: UnscheduledOrchestratorTestBaseV7() {
 
     /**
      * GIVEN task in queue in step
@@ -36,16 +39,16 @@ class TaskReservationV6IT: UnscheduledOrchestratorTestBaseV6() {
     @Test
     fun `reserve queued tasks`(){
         //GIVEN
-        val createdTask = testDataClient.createTask(testName)
+        val createdTask = testDataClient.createBusinessPartnerTask(testName)
 
         //WHEN
         val reservationRequest = TaskStepReservationRequest(step = createdTask.processingState.step)
         val reservedTasks = orchestratorClient.goldenRecordTasks.reserveTasksForStep(reservationRequest)
 
         //THEN
-        val expectedEntry = expectedResultFactory.buildTaskStepReservationEntry(createdTask.businessPartnerResult)
-        val expectedResult = TaskStepReservationResponse(listOf(expectedEntry), Instant.now().plus(expectedResultFactory.pendingTimeout))
-        assertRepository.assertTaskReservationResponse(reservedTasks, expectedResult)
+        val expectedEntry = TaskStepReservationEntryDto(taskId = createdTask.taskId, recordId = createdTask.recordId, businessPartner = createdTask.businessPartnerResult)
+        val expectedResult = TaskStepReservationResponse(listOf(expectedEntry), Instant.now().plus(resultFactory.pendingTimeout))
+        assertRepo.assertBusinessPartnerTaskReservationResponseEqual(reservedTasks, expectedResult, ignoreRecordId = true)
     }
 
     /**
@@ -61,7 +64,7 @@ class TaskReservationV6IT: UnscheduledOrchestratorTestBaseV6() {
 
         //THEN
         val expectedResult = TaskStepReservationResponse(emptyList(), Instant.now())
-        assertRepository.assertTaskReservationResponse(reservedTasks, expectedResult)
+        assertRepo.assertBusinessPartnerTaskReservationResponseEqual(reservedTasks, expectedResult, ignoreRecordId = false)
     }
 
     /**
@@ -72,7 +75,7 @@ class TaskReservationV6IT: UnscheduledOrchestratorTestBaseV6() {
     @Test
     fun `reserve different step tasks`(){
         //GIVEN
-        val createdTask = testDataClient.createTask(testName)
+        val createdTask = testDataClient.createBusinessPartnerTask(testName)
 
         //WHEN
         val reservationRequest = TaskStepReservationRequest(step = getDifferentStep(createdTask.processingState.step))
@@ -80,7 +83,7 @@ class TaskReservationV6IT: UnscheduledOrchestratorTestBaseV6() {
 
         //THEN
         val expectedResult = TaskStepReservationResponse(emptyList(), Instant.now())
-        assertRepository.assertTaskReservationResponse(reservedTasks, expectedResult)
+        assertRepo.assertBusinessPartnerTaskReservationResponseEqual(reservedTasks, expectedResult, ignoreRecordId = false)
     }
 
     /**
@@ -91,8 +94,8 @@ class TaskReservationV6IT: UnscheduledOrchestratorTestBaseV6() {
     @Test
     fun `reserve reserved step tasks`(){
         //GIVEN
-        val createdTask = testDataClient.createTask(testName)
-        testDataClient.reserveTasks(createdTask.processingState.step)
+        val createdTask = testDataClient.createBusinessPartnerTask(testName)
+        testDataClient.reserveBusinessPartnerTasks(createdTask.processingState.step)
 
         //WHEN
         val reservationRequest = TaskStepReservationRequest(step = createdTask.processingState.step)
@@ -100,7 +103,22 @@ class TaskReservationV6IT: UnscheduledOrchestratorTestBaseV6() {
 
         //THEN
         val expectedResult = TaskStepReservationResponse(emptyList(), Instant.now())
-        assertRepository.assertTaskReservationResponse(reservedTasks, expectedResult)
+        assertRepo.assertBusinessPartnerTaskReservationResponseEqual(reservedTasks, expectedResult, ignoreRecordId = false)
+    }
+
+    /**
+     * WHEN reserving too many business partner tasks
+     * THEN throw 400 BAD REQUEST
+     */
+    @Test
+    fun `try requesting too many business partner cleaning tasks`() {
+        //WHEN
+        val request: () -> Unit = {
+            orchestratorClient.goldenRecordTasks.reserveTasksForStep(TaskStepReservationRequest(200, TaskStep.CleanAndSync))
+        }
+
+        //THEN
+        Assertions.assertThatThrownBy(request).isInstanceOf(WebClientResponseException.BadRequest::class.java)
     }
 
     private fun getDifferentStep(step: TaskStep): TaskStep {

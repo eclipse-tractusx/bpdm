@@ -17,17 +17,15 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.v6
+package org.eclipse.tractusx.bpdm.orchestrator.v7.businesspartner
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.orchestrator.api.model.FinishedTaskEventsResponse
-import org.eclipse.tractusx.orchestrator.api.model.ResultState
-import org.eclipse.tractusx.orchestrator.api.model.TaskMode
-import org.eclipse.tractusx.orchestrator.api.model.TaskStep
+import org.eclipse.tractusx.bpdm.orchestrator.v7.UnscheduledOrchestratorTestBaseV7
+import org.eclipse.tractusx.orchestrator.api.model.*
 import org.junit.jupiter.api.Test
 import java.time.Instant
 
-class FinishedTaskEventV6IT: UnscheduledOrchestratorTestBaseV6() {
+class BusinessPartnerTaskFinishedEventSearchV7IT: UnscheduledOrchestratorTestBaseV7() {
 
     /**
      * GIVEN task has been finished successfully
@@ -37,8 +35,8 @@ class FinishedTaskEventV6IT: UnscheduledOrchestratorTestBaseV6() {
     @Test
     fun `get successfully finished task event`(){
         //GIVEN
-        val createdTask = testDataClient.createTask(testName, TaskMode.UpdateFromPool)
-        testDataClient.resolveTask(createdTask.taskId, TaskStep.Clean, testName)
+        val createdTask = testDataClient.createBusinessPartnerTask(testName, TaskMode.UpdateFromPool)
+        testDataClient.reserveAndResolveBusinessPartnerTask(createdTask.taskId, TaskStep.Clean, testName)
 
         //WHEN
         val response = orchestratorClient.finishedTaskEvents.getEvents(createdTask.processingState.createdAt, PaginationRequest())
@@ -48,7 +46,7 @@ class FinishedTaskEventV6IT: UnscheduledOrchestratorTestBaseV6() {
             FinishedTaskEventsResponse.Event(Instant.now(), ResultState.Success, createdTask.taskId)
         ))
 
-        assertRepository.assertFinishedTasksResponse(response, expectedResponse)
+        assertRepo.assertFinishedTaskEventsResponseEqual(response, expectedResponse)
     }
 
     /**
@@ -59,8 +57,8 @@ class FinishedTaskEventV6IT: UnscheduledOrchestratorTestBaseV6() {
     @Test
     fun `get failed finished task event`(){
         //GIVEN
-        val createdTask = testDataClient.createTask(testName, TaskMode.UpdateFromPool)
-        testDataClient.failTask(createdTask.taskId, TaskStep.Clean)
+        val createdTask = testDataClient.createBusinessPartnerTask(testName, TaskMode.UpdateFromPool)
+        testDataClient.failBusinessPartnerTask(createdTask.taskId, TaskStep.Clean)
 
         //WHEN
         val response = orchestratorClient.finishedTaskEvents.getEvents(createdTask.processingState.createdAt, PaginationRequest())
@@ -70,7 +68,7 @@ class FinishedTaskEventV6IT: UnscheduledOrchestratorTestBaseV6() {
             FinishedTaskEventsResponse.Event(Instant.now(), ResultState.Error, createdTask.taskId)
         ))
 
-        assertRepository.assertFinishedTasksResponse(response, expectedResponse)
+        assertRepo.assertFinishedTaskEventsResponseEqual(response, expectedResponse)
     }
 
     /**
@@ -81,12 +79,12 @@ class FinishedTaskEventV6IT: UnscheduledOrchestratorTestBaseV6() {
     @Test
     fun `get task event after time`(){
         //GIVEN
-        val createdTask1 = testDataClient.createTask("$testName 1", TaskMode.UpdateFromPool)
-        val createdTask2 = testDataClient.createTask("$testName 1", TaskMode.UpdateFromPool)
+        val createdTask1 = testDataClient.createBusinessPartnerTask("$testName 1", TaskMode.UpdateFromPool)
+        val createdTask2 = testDataClient.createBusinessPartnerTask("$testName 1", TaskMode.UpdateFromPool)
 
-        testDataClient.failTask(createdTask1.taskId, TaskStep.Clean)
+        testDataClient.failBusinessPartnerTask(createdTask1.taskId, TaskStep.Clean)
         val timeX = Instant.now()
-        testDataClient.failTask(createdTask2.taskId, TaskStep.Clean)
+        testDataClient.failBusinessPartnerTask(createdTask2.taskId, TaskStep.Clean)
 
         //WHEN
         val response = orchestratorClient.finishedTaskEvents.getEvents(timeX, PaginationRequest())
@@ -96,7 +94,7 @@ class FinishedTaskEventV6IT: UnscheduledOrchestratorTestBaseV6() {
             FinishedTaskEventsResponse.Event(Instant.now(), ResultState.Error, createdTask2.taskId)
         ))
 
-        assertRepository.assertFinishedTasksResponse(response, expectedResponse)
+        assertRepo.assertFinishedTaskEventsResponseEqual(response, expectedResponse)
     }
 
     /**
@@ -112,6 +110,53 @@ class FinishedTaskEventV6IT: UnscheduledOrchestratorTestBaseV6() {
         //THEN
         val expectedResponse = FinishedTaskEventsResponse(0, 0, 0, 0, emptyList())
 
-        assertRepository.assertFinishedTasksResponse(response, expectedResponse)
+        assertRepo.assertFinishedTaskEventsResponseEqual(response, expectedResponse)
     }
+
+    /**
+     * GIVEN no finished tasks
+     * WHEN requesting finished tasks event
+     * THEN empty
+     */
+    @Test
+    fun `get empty finished task events no finished tasks`(){
+        //GIVEN
+        testDataClient.createBusinessPartnerTask("testName 1")
+        testDataClient.createBusinessPartnerTask("testName 2")
+        testDataClient.createBusinessPartnerTask("testName 3")
+
+        //WHEN
+        val response = orchestratorClient.finishedTaskEvents.getEvents(Instant.now(), PaginationRequest())
+
+        //THEN
+        val expectedResponse = FinishedTaskEventsResponse(0, 0, 0, 0, emptyList())
+
+        assertRepo.assertFinishedTaskEventsResponseEqual(response, expectedResponse)
+    }
+
+    /**
+    * GIVEN finished tasks
+    * WHEN requesting paginated finished tasks
+    * THEN return paginated
+    */
+    @Test
+    fun `get paginated finished task events`(){
+        //GIVEN
+        val createdTasks = (1 .. 6).map { testDataClient.createBusinessPartnerTask("$testName $it", TaskMode.UpdateFromPool) }
+        orchestratorClient.goldenRecordTasks.reserveTasksForStep(TaskStepReservationRequest(step = TaskStep.Clean))
+        createdTasks.forEach { testDataClient.resolveBusinessPartnerTask(it.taskId, TaskStep.Clean, "Resolved $testName ${it.taskId}") }
+
+        //WHEN
+        val response = orchestratorClient.finishedTaskEvents.getEvents(createdTasks.first().processingState.createdAt, PaginationRequest(1, 3))
+
+        //THEN
+        val expectedResponse = FinishedTaskEventsResponse(6, 2, 1, 3, createdTasks.drop(3).map {
+            FinishedTaskEventsResponse.Event(Instant.now(), ResultState.Success, it.taskId)
+        }
+        )
+
+        assertRepo.assertFinishedTaskEventsResponseEqual(response, expectedResponse)
+    }
+
+
 }

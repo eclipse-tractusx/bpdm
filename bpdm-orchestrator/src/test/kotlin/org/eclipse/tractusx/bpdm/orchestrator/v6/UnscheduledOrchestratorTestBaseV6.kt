@@ -19,22 +19,12 @@
 
 package org.eclipse.tractusx.bpdm.orchestrator.v6
 
-import org.eclipse.tractusx.bpdm.orchestrator.Application
-import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
-import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
+import org.eclipse.tractusx.bpdm.orchestrator.UnscheduledTestEnvironment
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInfo
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.ContextConfiguration
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class])
-@ContextConfiguration(initializers = [
-    PostgreSQLContextInitializer::class,
-    KeyCloakInitializer::class
-])
-@ActiveProfiles("test-v6")
-abstract  class UnscheduledOrchestratorTestV6: OrchestratorTestV6(){
+@UnscheduledTestEnvironment
+abstract  class UnscheduledOrchestratorTestBaseV6: OrchestratorTestBaseV6(){
 
     @BeforeEach
     override fun beforeEach(testInfo: TestInfo) {

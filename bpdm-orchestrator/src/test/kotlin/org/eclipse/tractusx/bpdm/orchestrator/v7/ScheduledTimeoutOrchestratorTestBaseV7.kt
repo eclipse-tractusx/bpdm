@@ -17,15 +17,17 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.entity
+package org.eclipse.tractusx.bpdm.orchestrator.v7
 
-import jakarta.persistence.Column
-import jakarta.persistence.Embeddable
+import org.eclipse.tractusx.bpdm.orchestrator.ScheduledTimeoutTestEnvironment
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.TestInfo
 
-@Embeddable
-data class SiteHeaderScriptVariantDb(
-    @Column(name = "script_code", nullable = false)
-    val scriptCode: String,
-    @Column(name = "site_name")
-    var siteName: String?
-)
+@ScheduledTimeoutTestEnvironment
+abstract class ScheduledTimeoutOrchestratorTestBaseV7: OrchestratorTestBaseV7(){
+
+    @BeforeEach
+    override fun beforeEach(testInfo: TestInfo) {
+        super.beforeEach(testInfo)
+    }
+}

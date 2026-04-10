@@ -17,15 +17,18 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.entity
+package org.eclipse.tractusx.bpdm.orchestrator
 
-import jakarta.persistence.Column
-import jakarta.persistence.Embeddable
+import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
+import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.ContextConfiguration
 
-@Embeddable
-data class SiteHeaderScriptVariantDb(
-    @Column(name = "script_code", nullable = false)
-    val scriptCode: String,
-    @Column(name = "site_name")
-    var siteName: String?
-)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class])
+@ContextConfiguration(initializers = [
+    PostgreSQLContextInitializer::class,
+    KeyCloakInitializer::class
+])
+@ActiveProfiles("test-scheduled")
+annotation class ScheduledTimeoutTestEnvironment

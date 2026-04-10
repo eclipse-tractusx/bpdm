@@ -17,17 +17,12 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.auth
+package org.eclipse.tractusx.bpdm.orchestrator
 
-import org.eclipse.tractusx.bpdm.orchestrator.Application
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
-import org.eclipse.tractusx.bpdm.test.util.AuthAssertionHelper
-import org.eclipse.tractusx.bpdm.test.util.AuthExpectationType
-import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
-import org.eclipse.tractusx.orchestrator.api.model.TaskStep
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class])
@@ -35,20 +30,5 @@ import org.springframework.test.context.ContextConfiguration
     PostgreSQLContextInitializer::class,
     KeyCloakInitializer::class
 ])
-class NoAuthIT @Autowired constructor(
-    orchestratorClient: OrchestrationApiClient,
-    authAssertionHelper: AuthAssertionHelper
-): AuthTestBase(
-    orchestratorClient,
-    authAssertionHelper,
-    OrchestratorAuthExpectations(
-        tasks = TaskAuthExpectations(
-            postTask = AuthExpectationType.Unauthorized,
-            postStateSearch = AuthExpectationType.Unauthorized,
-            postRelationsTask = AuthExpectationType.Unauthorized,
-            postRelationsStateSearch = AuthExpectationType.Unauthorized
-        ),
-        steps = TaskStep.entries
-            .associateWith { TaskStepAuthExpectations(postReservation = AuthExpectationType.Unauthorized, postResult = AuthExpectationType.Unauthorized) }
-    )
-)
+@ActiveProfiles("test-unscheduled")
+annotation class UnscheduledTestEnvironment
