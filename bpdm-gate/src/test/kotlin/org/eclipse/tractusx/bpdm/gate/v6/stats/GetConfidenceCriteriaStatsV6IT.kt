@@ -74,7 +74,7 @@ class GetConfidenceCriteriaStatsV6IT: GateUnscheduledInitialStartV6Test() {
         val addressConfidence2 = ConfidenceCriteriaDto(false, false, 3, LocalDateTime.now(), LocalDateTime.now(), 1)
 
         val legalEntityRequest1 = with(poolRequestFactory.createLegalEntityRequest("$testName 1")){
-            copy(legalEntity = legalEntity.copy(confidenceCriteria = legalEntityConfidence1))
+            copy(legalEntity = legalEntity.copy(header = legalEntity.header.copy(confidenceCriteria = legalEntityConfidence1)))
         }
 
         val siteRequest1 =  with(poolRequestFactory.buildSiteCreateRequest(testName, "BPNL$testName 1")){
@@ -86,7 +86,7 @@ class GetConfidenceCriteriaStatsV6IT: GateUnscheduledInitialStartV6Test() {
         }
 
         val legalEntityRequest2 = with(poolRequestFactory.createLegalEntityRequest("$testName 2")){
-            copy(legalEntity = legalEntity.copy(confidenceCriteria = legalEntityConfidence2))
+            copy(legalEntity = legalEntity.copy(header = legalEntity.header.copy(confidenceCriteria = legalEntityConfidence2)))
         }
 
         val siteRequest2 =  with(poolRequestFactory.buildSiteCreateRequest("$testName 2", "BPNL$testName 2")){

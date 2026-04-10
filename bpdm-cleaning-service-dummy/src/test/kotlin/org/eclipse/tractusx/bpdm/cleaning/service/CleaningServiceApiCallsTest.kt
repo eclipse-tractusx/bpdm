@@ -116,7 +116,7 @@ class CleaningServiceApiCallsTest @Autowired constructor(
             mockedBusinessPartner
                 .copyWithBpnReferences(defaultBpnRequest)
                 .copyWithLegalAddress(mockedBusinessPartner.uncategorized.address!!)
-                .copyWithSiteMainAddress(mockedBusinessPartner.uncategorized.address!!)
+                .copyWithSiteMainAddress(mockedBusinessPartner.uncategorized.address!!.postalProperties)
                 .copyWithConfidenceCriteria(expectedConfidenceCriteria)
                 .copyWithHasChanged(false, false, true)
                 .copyAsCxMemberData()
@@ -147,8 +147,8 @@ class CleaningServiceApiCallsTest @Autowired constructor(
         //Create expectations
         val expectedResponse = createResultRequest(
             mockedBusinessPartner
-                .copyWithLegalAddress(mockedBusinessPartner.uncategorized.address!!)
-                .copyWithSiteMainAddress(mockedBusinessPartner.uncategorized.address!!)
+                .copyWithLegalAddress(mockedBusinessPartner.uncategorized.address!!.postalProperties)
+                .copyWithSiteMainAddress(mockedBusinessPartner.uncategorized.address!!.postalProperties)
                 .copyWithConfidenceCriteria(expectedConfidenceCriteria)
                 .copyWithHasChanged(false, false, true)
                 .copyAsCxMemberData()
@@ -181,7 +181,7 @@ class CleaningServiceApiCallsTest @Autowired constructor(
         val expectedResponse = createResultRequest(
             mockedBusinessPartner
                 .copyWithBpnReferences(defaultBpnRequest)
-                .copyWithLegalAddress(mockedBusinessPartner.uncategorized.address!!)
+                .copyWithLegalAddress(mockedBusinessPartner.uncategorized.address!!.postalProperties)
                 .copyWithConfidenceCriteria(expectedConfidenceCriteria)
                 .copyWithHasChanged(false, false, true)
                 .copyAsCxMemberData()
@@ -212,7 +212,7 @@ class CleaningServiceApiCallsTest @Autowired constructor(
         //Create expectations
         val expectedResponse = createResultRequest(
             mockedBusinessPartner
-                .copyWithLegalAddress(mockedBusinessPartner.uncategorized.address!!)
+                .copyWithLegalAddress(mockedBusinessPartner.uncategorized.address!!.postalProperties)
                 .copyWithConfidenceCriteria(expectedConfidenceCriteria)
                 .copyWithHasChanged(false, false, true)
                 .copyAsCxMemberData()
@@ -310,7 +310,7 @@ class CleaningServiceApiCallsTest @Autowired constructor(
             mockedBusinessPartner
                 .copyWithBpnReferences(defaultBpnRequest)
                 .copyWithConfidenceCriteria(expectedConfidenceCriteria)
-                .copyWithHasChanged(false, true, false)
+                .copyWithHasChanged(true, true, false)
                 .copyAsCxMemberData()
         )
 
@@ -340,7 +340,7 @@ class CleaningServiceApiCallsTest @Autowired constructor(
         val expectedResponse = createResultRequest(
             mockedBusinessPartner
                 .copyWithConfidenceCriteria(expectedConfidenceCriteria)
-                .copyWithHasChanged(false, true, false)
+                .copyWithHasChanged(true, true, false)
                 .copyAsCxMemberData()
         )
 

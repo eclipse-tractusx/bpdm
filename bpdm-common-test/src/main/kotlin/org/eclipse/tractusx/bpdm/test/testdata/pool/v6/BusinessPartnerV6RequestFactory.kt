@@ -36,7 +36,8 @@ class BusinessPartnerV6RequestFactory(
     testMetadata: TestMetadataV6
 ): BusinessPartnerCommonRequestFactory(
     testMetadata.addressIdentifierTypes.map { it.technicalKey },
-    testMetadata.adminAreas.map { it.code }
+    testMetadata.adminAreas.map { it.code },
+    emptyList()
 ) {
     private val availableLegalForms = testMetadata.legalForms.map { it.technicalKey }
     private val availableLegalEntityIdentifiers = testMetadata.legalEntityIdentifierTypes.map { it.technicalKey }

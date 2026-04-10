@@ -37,7 +37,7 @@ class OrchestratorRequestFactoryCommon(
             nameParts = 1.rangeTo(random.nextInt(2, 5)).map { index -> "$seed Uncategorized Name Part $index" },
             identifiers = 1.rangeTo(random.nextInt(2, 5)).map { index -> buildIdentifier(seed, index, null)  },
             states = buildStates(random),
-            address = buildPostalAddress(seed, null)
+            address = buildPostalAddressWithScripVariants(seed, null)
         )
     }
 
@@ -48,8 +48,13 @@ class OrchestratorRequestFactoryCommon(
             states = buildStates(random),
             confidenceCriteria = buildConfidenceCriteria(random),
             hasChanged = true,
-            siteMainAddress = buildPostalAddress(seed, AddressType.SiteMainAddress)
+            siteMainAddress = buildPostalAddress(seed, AddressType.SiteMainAddress),
+            scriptVariants = listOf(buildSiteScriptVariant(seed, random)),
         )
+    }
+
+    fun buildPostalAddressWithScripVariants(seed: String, addressType: AddressType?, random: Random = createRandomFromSeed(seed)): PostalAddressWithScriptVariants{
+        return PostalAddressWithScriptVariants(buildPostalAddress(seed, addressType, random), listOf(buildAddressVariantWithScriptCode(seed, random)))
     }
 
     fun buildPostalAddress(seed: String, addressType: AddressType?, random: Random = createRandomFromSeed(seed)): PostalAddress {
@@ -173,6 +178,78 @@ class OrchestratorRequestFactoryCommon(
         )
     }
 
+    fun buildLegalEntityScriptVariant(seed: String, random: Random = createRandomFromSeed(seed)): LegalEntityScriptVariant {
+        val scriptCode = metadata?.scriptCodes?.randomOrNull(random) ?: "Script Code $seed"
+
+        return LegalEntityScriptVariant(
+            scriptCode = scriptCode,
+            legalName = buildScriptVariantStringValue("Legal Name", seed, scriptCode),
+            legalShortName = buildScriptVariantStringValue("Legal Short Name", seed, scriptCode),
+            legalAddress = buildPostalAddressScriptVariant(scriptCode, seed)
+        )
+    }
+
+    fun buildSiteScriptVariant(seed: String, random: Random = createRandomFromSeed(seed)): SiteScriptVariant {
+        val scriptCode = metadata?.scriptCodes?.randomOrNull(random) ?: "Script Code $seed"
+
+        return SiteScriptVariant(
+            scriptCode = scriptCode,
+            siteName = buildScriptVariantStringValue("Site Name $seed", seed, scriptCode),
+            mainAddress = buildPostalAddressScriptVariant(scriptCode, seed)
+        )
+    }
+
+    fun buildAddressVariantWithScriptCode(seed: String, random: Random = createRandomFromSeed(seed)): PostalAddressScriptVariantWithScriptCode{
+        val scriptCode = metadata?.scriptCodes?.randomOrNull(random) ?: "Script Code $seed"
+
+        return PostalAddressScriptVariantWithScriptCode(
+            scriptCode = scriptCode,
+            postalProperties = buildPostalAddressScriptVariant(scriptCode, seed)
+        )
+    }
+
+    fun buildPostalAddressScriptVariant(scriptCode: String, seed: String): PostalAddressScriptVariant{
+        return PostalAddressScriptVariant(
+            addressName = buildScriptVariantStringValue("Address Name $seed", seed, scriptCode),
+            physicalAddress = buildPhysicalAddressScriptVariant(scriptCode, seed),
+            alternativeAddress = buildAlternativeAddressScriptVariant(scriptCode, seed)
+        )
+    }
+
+    fun buildPhysicalAddressScriptVariant(scriptCode: String, seed: String): PhysicalAddressScriptVariant{
+        return PhysicalAddressScriptVariant(
+            postalCode = buildScriptVariantStringValue("Postal Code", seed, scriptCode),
+            city = buildScriptVariantStringValue("City", seed, scriptCode),
+            district = buildScriptVariantStringValue("District", seed, scriptCode),
+            street = Street(
+                name = buildScriptVariantStringValue("Street Name", seed, scriptCode),
+                houseNumber = buildScriptVariantStringValue("HouseNumber", seed, scriptCode),
+                houseNumberSupplement =  buildScriptVariantStringValue("House Number Supplement", seed, scriptCode),
+                milestone = buildScriptVariantStringValue("Milestone", seed, scriptCode),
+                direction = buildScriptVariantStringValue("Direction", seed, scriptCode),
+                namePrefix = buildScriptVariantStringValue("NamePrefix", seed, scriptCode),
+                additionalNamePrefix = buildScriptVariantStringValue("AdditionalNamePrefix", seed, scriptCode),
+                nameSuffix = buildScriptVariantStringValue("NameSuffix", seed, scriptCode),
+                additionalNameSuffix = buildScriptVariantStringValue("AdditionalNameSuffix", seed, scriptCode),
+            ),
+            companyPostalCode = buildScriptVariantStringValue("CompanyPostal Code", seed, scriptCode),
+            industrialZone = buildScriptVariantStringValue("IndustrialZone", seed, scriptCode),
+            building = buildScriptVariantStringValue("Building", seed, scriptCode),
+            floor = buildScriptVariantStringValue("Floor", seed, scriptCode),
+            door = buildScriptVariantStringValue("Door", seed, scriptCode),
+            taxJurisdictionCode = buildScriptVariantStringValue("Tax Jurisdiction", seed, scriptCode),
+        )
+    }
+
+    fun buildAlternativeAddressScriptVariant(scriptCode: String, seed: String): AlternativeAddressScriptVariant{
+        return AlternativeAddressScriptVariant(
+            postalCode = buildScriptVariantStringValue("Postal Code $seed", seed, scriptCode),
+            city = buildScriptVariantStringValue("City $seed", seed, scriptCode),
+            deliveryServiceQualifier = buildScriptVariantStringValue("Delivery Service Qualifier $seed", seed, scriptCode),
+            deliveryServiceNumber = buildScriptVariantStringValue("Delivery Service Number $seed", seed, scriptCode)
+        )
+    }
+
     fun getLegalIdentifierTypeReference(seed: String, random: Random = createRandomFromSeed(seed)): String{
         return metadata?.legalEntityIdentifierTypes?.random(random) ?: "Legal Identifier Type $seed"
     }
@@ -191,12 +268,15 @@ class OrchestratorRequestFactoryCommon(
 
     private fun Random.nextInstant() = Instant.ofEpochSecond(nextLong(100000L, 200000L))
 
-
+    private fun buildScriptVariantStringValue(name: String, seed: String, scriptCode: String): String {
+        return "$name $seed Variant $scriptCode"
+    }
 }
 
 data class TestMetadataReferences(
     val legalForms: List<String>,
     val legalEntityIdentifierTypes: List<String>,
     val addressIdentifierTypes: List<String>,
-    val adminAreas: List<String>
+    val adminAreas: List<String>,
+    val scriptCodes: List<String>,
 )

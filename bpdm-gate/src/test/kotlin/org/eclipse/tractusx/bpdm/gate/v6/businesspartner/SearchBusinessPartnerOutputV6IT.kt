@@ -74,7 +74,7 @@ class SearchBusinessPartnerOutputV6IT: GateUnscheduledInitialStartV6Test(){
                     createdInput,
                     connectedGoldenRecords.legalEntityParent,
                     connectedGoldenRecords.siteParent,
-                    connectedGoldenRecords.additionalAddress
+                    connectedGoldenRecords.additionalAddress.address
                 )
             )
         )
@@ -111,7 +111,7 @@ class SearchBusinessPartnerOutputV6IT: GateUnscheduledInitialStartV6Test(){
                 input,
                 goldenRecords.legalEntityParent,
                 goldenRecords.siteParent,
-                goldenRecords.additionalAddress
+                goldenRecords.additionalAddress.address
             )
         }
         val expected = PageDto(3, 1, 0, 3, expectedContent)

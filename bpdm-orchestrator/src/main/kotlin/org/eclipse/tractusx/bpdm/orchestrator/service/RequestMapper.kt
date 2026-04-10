@@ -43,7 +43,10 @@ class RequestMapper {
                 isCatenaXMemberData = legalEntity.isParticipantData,
                 owningCompany = owningCompany,
                 legalEntityHasChanged = legalEntity.hasChanged,
-                siteHasChanged = site?.hasChanged
+                siteHasChanged = site?.hasChanged,
+                legalEntityHeaderScriptVariants = toLegalEntityScriptVariants(businessPartner),
+                siteHeaderScriptVariants = toSiteScriptVariants(businessPartner),
+                addressScriptVariants = toAddressScriptVariants(businessPartner)
             )
         }
 
@@ -134,8 +137,8 @@ class RequestMapper {
             when (scope) {
                 PostalAddressDb.Scope.LegalAddress -> businessPartner.legalEntity.legalAddress
                 PostalAddressDb.Scope.SiteMainAddress -> businessPartner.site?.siteMainAddress
-                PostalAddressDb.Scope.AdditionalAddress -> businessPartner.additionalAddress
-                PostalAddressDb.Scope.UncategorizedAddress -> businessPartner.uncategorized.address
+                PostalAddressDb.Scope.AdditionalAddress -> businessPartner.additionalAddress?.toPostalAddress()
+                PostalAddressDb.Scope.UncategorizedAddress -> businessPartner.uncategorized.address?.toPostalAddress()
             }?.let { scope to toPostalAddress(it, scope) }
         }.toMap().toMutableMap()
 
@@ -233,5 +236,63 @@ class RequestMapper {
                 additionalNameSuffix
             )
         }
+
+    fun toLegalEntityScriptVariants(businessPartner: BusinessPartner): MutableList<LegalEntityHeaderScriptVariantDb>{
+        return businessPartner.legalEntity.scriptVariants.map { LegalEntityHeaderScriptVariantDb(it.scriptCode, it.legalName, it.legalShortName) }.toMutableList()
+    }
+
+    fun toSiteScriptVariants(businessPartner: BusinessPartner): MutableList<SiteHeaderScriptVariantDb>{
+        return businessPartner.site?.scriptVariants?.map { SiteHeaderScriptVariantDb(it.scriptCode, it.siteName) }?.toMutableList() ?: mutableListOf()
+    }
+
+    fun toAddressScriptVariants(businessPartner: BusinessPartner): MutableList<PostalAddressScriptVariantDb>{
+        return listOfNotNull(
+            businessPartner.legalEntity.scriptVariants.map { toPostalAddressScriptVariant(PostalAddressDb.Scope.LegalAddress, it.scriptCode, it.legalAddress) },
+            businessPartner.site?.scriptVariants?.map { toPostalAddressScriptVariant(PostalAddressDb.Scope.SiteMainAddress, it.scriptCode, it.mainAddress) },
+            businessPartner.additionalAddress?.scriptVariants?.map { toPostalAddressScriptVariant(PostalAddressDb.Scope.AdditionalAddress, it.scriptCode, it.postalProperties) },
+            businessPartner.uncategorized.address?.scriptVariants?.map { toPostalAddressScriptVariant(PostalAddressDb.Scope.UncategorizedAddress, it.scriptCode, it.postalProperties) }
+        ).flatten().toMutableList()
+    }
+
+
+    fun toPostalAddressScriptVariant(scope: PostalAddressDb.Scope, scriptCode: String, postalAddressScriptVariant: PostalAddressScriptVariant): PostalAddressScriptVariantDb{
+        return with(postalAddressScriptVariant){
+            PostalAddressScriptVariantDb(
+                scope = scope,
+                scriptCode = scriptCode,
+                addressName = addressName,
+                physicalAddress = toPhysicalAddressScriptVariant(physicalAddress),
+                alternativeAddress = alternativeAddress?.let { toAlternativeAddressScriptVariant(it) })
+        }
+    }
+
+    fun toPhysicalAddressScriptVariant(physicalAddressScriptVariant: PhysicalAddressScriptVariant): PhysicalAddressScriptVariantDb{
+        return with(physicalAddressScriptVariant){
+            PhysicalAddressScriptVariantDb(
+                postalCode = postalCode,
+                city = city,
+                district = district,
+                street = toStreet(street),
+                companyPostalCode = companyPostalCode,
+                industrialZone = industrialZone,
+                building = building,
+                floor = floor,
+                door = door,
+                taxJurisdictionCode = taxJurisdictionCode
+
+            )
+        }
+    }
+
+    fun toAlternativeAddressScriptVariant(alternativeAddressScriptVariant: AlternativeAddressScriptVariant): AlternativeAddressScriptVariantDb{
+        return with(alternativeAddressScriptVariant){
+            AlternativeAddressScriptVariantDb(
+                postalCode = postalCode,
+                city = city,
+                deliveryServiceQualifier = deliveryServiceQualifier,
+                deliveryServiceNumber = deliveryServiceNumber
+            )
+        }
+    }
 
 }

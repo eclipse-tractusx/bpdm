@@ -21,10 +21,7 @@ package org.eclipse.tractusx.bpdm.test.testdata.pool
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.model.CountrySubdivisionDto
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalFormDto
+import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.test.util.Timeframe
 import java.time.Instant
 
@@ -45,8 +42,9 @@ class PoolDataHelper(
         val addressIdentifierTypes = poolClient.metadata.getIdentifierTypes(PaginationRequest(), IdentifierBusinessPartnerType.ADDRESS, null).content.toList()
         val legalForms = poolClient.metadata.getLegalForms(PaginationRequest()).content.toList()
         val adminAreas = poolClient.metadata.getAdminAreasLevel1(PaginationRequest()).content.toList()
+        val scriptCodes = poolClient.metadata.getScriptCodes(PaginationRequest()).content.toList()
 
-        val testMetadata = TestMetadata(legalForms, legalEntityIdentifierTypes, addressIdentifierTypes, adminAreas)
+        val testMetadata = TestMetadata(legalForms, legalEntityIdentifierTypes, addressIdentifierTypes, adminAreas, scriptCodes)
 
         val requestFactory = BusinessPartnerRequestFactory(testMetadata)
         val expectedResultFactory = ExpectedBusinessPartnerResultFactory(testMetadata)
@@ -58,7 +56,7 @@ class PoolDataHelper(
         val startCreationTime = Instant.now()
 
         val bpnlsByIndex =
-            poolClient.legalEntities.createBusinessPartners(hierarchies.getAllLegalEntities()).entities.associate { Pair(it.index, it.legalEntity.bpnl) }
+            poolClient.legalEntities.createBusinessPartners(hierarchies.getAllLegalEntities()).entities.associate { Pair(it.index, it.legalEntity.header.bpnl) }
                 .toMap()
 
         val hierarchiesWithBpnL = hierarchies.map { hierarchy ->
@@ -95,5 +93,6 @@ data class TestMetadata(
     val legalForms: List<LegalFormDto>,
     val legalEntityIdentifierTypes: List<IdentifierTypeDto>,
     val addressIdentifierTypes: List<IdentifierTypeDto>,
-    val adminAreas: List<CountrySubdivisionDto>
+    val adminAreas: List<CountrySubdivisionDto>,
+    val scriptCodes: List<ScriptCodeDto>
 )

@@ -745,6 +745,23 @@
           }
         }
       },
+      "AlternativeAddressScriptVariant" : {
+        "type" : "object",
+        "properties" : {
+          "postalCode" : {
+            "type" : "string"
+          },
+          "city" : {
+            "type" : "string"
+          },
+          "deliveryServiceQualifier" : {
+            "type" : "string"
+          },
+          "deliveryServiceNumber" : {
+            "type" : "string"
+          }
+        }
+      },
       "BpnReference" : {
         "type" : "object",
         "description" : "A reference to a BPN for the corresponding business partner data. Either this reference contains an existing BPN or a BPN request identifier. The golden record process makes sure that the each unique BPN request identifier is associated to a unique BPN. For a new BPN request identifier the golden record process creates a new BPN (and golden record) and associates it with the BPN request identifier. Known BPN request identifiers are resolved to the BPN and the corresponding golden record is updated with the business partner data. This makes it possible for duplication check services to reference unique business partners by their own BPN request identifiers instead of needing to rely on BPNs for identification.",
@@ -784,7 +801,7 @@
             "$ref" : "#/components/schemas/Site"
           },
           "additionalAddress" : {
-            "$ref" : "#/components/schemas/PostalAddress"
+            "$ref" : "#/components/schemas/PostalAddressWithScriptVariants"
           },
           "type" : {
             "type" : "string",
@@ -996,9 +1013,32 @@
           "legalAddress" : {
             "$ref" : "#/components/schemas/PostalAddress"
           },
+          "scriptVariants" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/LegalEntityScriptVariant"
+            }
+          },
           "isParticipantData" : {
             "type" : "boolean",
             "description" : "Whether this legal entity is part of the Data Space network"
+          }
+        }
+      },
+      "LegalEntityScriptVariant" : {
+        "type" : "object",
+        "properties" : {
+          "scriptCode" : {
+            "type" : "string"
+          },
+          "legalName" : {
+            "type" : "string"
+          },
+          "legalShortName" : {
+            "type" : "string"
+          },
+          "legalAddress" : {
+            "$ref" : "#/components/schemas/PostalAddressScriptVariant"
           }
         }
       },
@@ -1100,6 +1140,41 @@
           }
         }
       },
+      "PhysicalAddressScriptVariant" : {
+        "type" : "object",
+        "properties" : {
+          "postalCode" : {
+            "type" : "string"
+          },
+          "city" : {
+            "type" : "string"
+          },
+          "district" : {
+            "type" : "string"
+          },
+          "street" : {
+            "$ref" : "#/components/schemas/Street"
+          },
+          "companyPostalCode" : {
+            "type" : "string"
+          },
+          "industrialZone" : {
+            "type" : "string"
+          },
+          "building" : {
+            "type" : "string"
+          },
+          "floor" : {
+            "type" : "string"
+          },
+          "door" : {
+            "type" : "string"
+          },
+          "taxJurisdictionCode" : {
+            "type" : "string"
+          }
+        }
+      },
       "PostalAddress" : {
         "type" : "object",
         "description" : "Address information of this business partner data. The address can be either a legal, site main and/or additional address. This can also refer to address information which is unknown to which type it belongs to.",
@@ -1108,16 +1183,19 @@
             "$ref" : "#/components/schemas/BpnReference"
           },
           "addressName" : {
-            "type" : "string"
+            "type" : "string",
+            "description" : "The name of this address"
           },
           "identifiers" : {
             "type" : "array",
+            "description" : "Identifiers for this address (in addition to the BPNA)",
             "items" : {
               "$ref" : "#/components/schemas/Identifier"
             }
           },
           "states" : {
             "type" : "array",
+            "description" : "The business state history of this address",
             "items" : {
               "$ref" : "#/components/schemas/BusinessState"
             }
@@ -1132,7 +1210,87 @@
             "$ref" : "#/components/schemas/AlternativeAddress"
           },
           "hasChanged" : {
-            "type" : "boolean"
+            "type" : "boolean",
+            "deprecated" : true,
+            "description" : "Whether this address information differs from its golden record counterpart in the Pool.Currently deprecated and ignored by the golden record creation and update process."
+          }
+        }
+      },
+      "PostalAddressScriptVariant" : {
+        "type" : "object",
+        "properties" : {
+          "addressName" : {
+            "type" : "string"
+          },
+          "physicalAddress" : {
+            "$ref" : "#/components/schemas/PhysicalAddressScriptVariant"
+          },
+          "alternativeAddress" : {
+            "$ref" : "#/components/schemas/AlternativeAddressScriptVariant"
+          }
+        }
+      },
+      "PostalAddressScriptVariantWithScriptCode" : {
+        "type" : "object",
+        "properties" : {
+          "scriptCode" : {
+            "type" : "string"
+          },
+          "addressName" : {
+            "type" : "string"
+          },
+          "physicalAddress" : {
+            "$ref" : "#/components/schemas/PhysicalAddressScriptVariant"
+          },
+          "alternativeAddress" : {
+            "$ref" : "#/components/schemas/AlternativeAddressScriptVariant"
+          }
+        }
+      },
+      "PostalAddressWithScriptVariants" : {
+        "type" : "object",
+        "description" : "The additional address information of this business partner data. An additional address is an address that is distinct from the legal and site main address. The additional address is either an additional address of the legal entity (site is null) or of the site (site is not null). An additional address of 'Null' means the business partner data has no additional address",
+        "properties" : {
+          "bpnReference" : {
+            "$ref" : "#/components/schemas/BpnReference"
+          },
+          "addressName" : {
+            "type" : "string",
+            "description" : "The name of this address"
+          },
+          "identifiers" : {
+            "type" : "array",
+            "description" : "Identifiers for this address (in addition to the BPNA)",
+            "items" : {
+              "$ref" : "#/components/schemas/Identifier"
+            }
+          },
+          "states" : {
+            "type" : "array",
+            "description" : "The business state history of this address",
+            "items" : {
+              "$ref" : "#/components/schemas/BusinessState"
+            }
+          },
+          "confidenceCriteria" : {
+            "$ref" : "#/components/schemas/ConfidenceCriteria"
+          },
+          "physicalAddress" : {
+            "$ref" : "#/components/schemas/PhysicalAddress"
+          },
+          "alternativeAddress" : {
+            "$ref" : "#/components/schemas/AlternativeAddress"
+          },
+          "hasChanged" : {
+            "type" : "boolean",
+            "deprecated" : true,
+            "description" : "Whether this address information differs from its golden record counterpart in the Pool.Currently deprecated and ignored by the golden record creation and update process."
+          },
+          "scriptVariants" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/PostalAddressScriptVariantWithScriptCode"
+            }
           }
         }
       },
@@ -1204,9 +1362,29 @@
           "siteMainAddress" : {
             "$ref" : "#/components/schemas/PostalAddress"
           },
+          "scriptVariants" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/SiteScriptVariant"
+            }
+          },
           "siteMainIsLegalAddress" : {
             "type" : "boolean",
             "description" : "This site's main address is the legal address of the legal entity. The address information therefore is stored in the legal address."
+          }
+        }
+      },
+      "SiteScriptVariant" : {
+        "type" : "object",
+        "properties" : {
+          "scriptCode" : {
+            "type" : "string"
+          },
+          "siteName" : {
+            "type" : "string"
+          },
+          "mainAddress" : {
+            "$ref" : "#/components/schemas/PostalAddressScriptVariant"
           }
         }
       },
@@ -1749,7 +1927,7 @@
             }
           },
           "address" : {
-            "$ref" : "#/components/schemas/PostalAddress"
+            "$ref" : "#/components/schemas/PostalAddressWithScriptVariants"
           }
         }
       }

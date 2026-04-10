@@ -27,6 +27,7 @@ import org.eclipse.tractusx.bpdm.gate.v6.util.GateTestDataClientV6
 import org.eclipse.tractusx.bpdm.pool.api.model.CountrySubdivisionDto
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDto
+import org.eclipse.tractusx.bpdm.pool.api.model.ScriptCodeDto
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.gate.GateInputFactory
 import org.eclipse.tractusx.bpdm.test.testdata.gate.TestMetadata
@@ -66,6 +67,9 @@ class GateTestDataV6config {
             CountrySubdivisionDto(CountryCode.DE, "adminArea1", "adminArea1"),
             CountrySubdivisionDto(CountryCode.US, "adminArea2", "adminArea2"),
             CountrySubdivisionDto(CountryCode.CN, "adminArea3", "adminArea3"),
+        ),
+        scriptCodes = listOf(
+            ScriptCodeDto("Test", "Test Description")
         )
     )
 

@@ -968,7 +968,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PageDtoLogisticAddressVerboseDto"
+                $ref: "#/components/schemas/PageDtoLogisticAddressInvariantVerboseDto"
   /v7/legal-forms:
     get:
       tags:
@@ -2434,6 +2434,34 @@ paths:
           description: On malformed request parameters
         "404":
           description: No site found under specified BPNS
+  /v7/script-codes:
+    get:
+      tags:
+        - metadata-controller
+      operationId: getScriptCodes
+      parameters:
+        - name: page
+          in: query
+          description: Number of page to get results from
+          required: false
+          schema:
+            type: string
+            minimum: 0
+        - name: size
+          in: query
+          description: Size of each page
+          required: false
+          schema:
+            type: string
+            maximum: 100
+            minimum: 0
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PageDtoScriptCodeDto"
   /v7/legal-entities/{idValue}:
     get:
       tags:
@@ -3482,6 +3510,10 @@ components:
             \ if the goods are to be picked up somewhere else."
         confidenceCriteria:
           $ref: "#/components/schemas/ConfidenceCriteriaDto"
+        scriptVariants:
+          type: array
+          items:
+            $ref: "#/components/schemas/LogisticAddressScriptVariantDto"
         bpnParent:
           type: string
         index:
@@ -3584,6 +3616,10 @@ components:
           type: boolean
           description: Indicates whether the address is owned and thus provided by
             a Data Space Participant.
+        scriptVariants:
+          type: array
+          items:
+            $ref: "#/components/schemas/LogisticAddressScriptVariantDto"
         index:
           type: string
     AddressPartnerUpdateRequest:
@@ -3627,6 +3663,10 @@ components:
             \ if the goods are to be picked up somewhere else."
         confidenceCriteria:
           $ref: "#/components/schemas/ConfidenceCriteriaDto"
+        scriptVariants:
+          type: array
+          items:
+            $ref: "#/components/schemas/LogisticAddressScriptVariantDto"
         requestKey:
           type: string
     AddressPartnerUpdateResponseWrapper:
@@ -3637,7 +3677,7 @@ components:
         entities:
           type: array
           items:
-            $ref: "#/components/schemas/LogisticAddressVerboseDto"
+            $ref: "#/components/schemas/AddressPartnerUpdateVerboseDto"
         errors:
           type: array
           items:
@@ -3648,6 +3688,75 @@ components:
         errorCount:
           type: integer
           format: int32
+    AddressPartnerUpdateVerboseDto:
+      type: object
+      properties:
+        bpna:
+          type: string
+          description: "A BPNA represents and uniquely identifies an address, which\
+            \ can be the legal address of a legal entity, and/or the main address\
+            \ of a site, or any additional address of a legal entity or site (such\
+            \ as different gates). It is important to note that only the BPNL must\
+            \ be used to uniquely identify a legal entity. Even in the case that the\
+            \ BPNA represents the legal address of the legal entity, it shall not\
+            \ be used to uniquely identify the legal entity."
+        name:
+          type: string
+          description: The name of the address. This is not according to official
+            registers but according to the name the sharing member chooses.
+        states:
+          type: array
+          description: The list of (temporary) states of the address.
+          items:
+            $ref: "#/components/schemas/AddressStateVerboseDto"
+        identifiers:
+          type: array
+          description: The list of identifiers of the address.
+          items:
+            $ref: "#/components/schemas/AddressIdentifierVerboseDto"
+        physicalPostalAddress:
+          $ref: "#/components/schemas/PhysicalPostalAddressVerboseDto"
+          description: "The physical postal address of the address, such as an office,\
+            \ warehouse, gate, etc."
+        alternativePostalAddress:
+          $ref: "#/components/schemas/AlternativePostalAddressVerboseDto"
+          description: "The alternative postal address of the address, for example\
+            \ if the goods are to be picked up somewhere else."
+        bpnLegalEntity:
+          type: string
+          description: The BPNL of the legal entity owning the address.
+        bpnSite:
+          type: string
+          description: The BPNS of the site the address belongs to.
+        createdAt:
+          type: string
+          format: date-time
+          description: The date when the data record has been created.
+        updatedAt:
+          type: string
+          format: date-time
+          description: The date when the data record has been last updated.
+        confidenceCriteria:
+          $ref: "#/components/schemas/ConfidenceCriteriaDto"
+        addressType:
+          type: string
+          description: "Indicates the address type, the legal address to a legal entity\
+            \ or the main address to a site, an additional address, or both legal\
+            \ and site address.The site main address is where typically the main entrance\
+            \ or the reception is located, or where the mail is delivered to."
+          enum:
+            - LegalAndSiteMainAddress
+            - LegalAddress
+            - SiteMainAddress
+            - AdditionalAddress
+        isParticipantData:
+          type: boolean
+          description: Indicates whether the address is owned and thus provided by
+            a Data Space Participant.
+        scriptVariants:
+          type: array
+          items:
+            $ref: "#/components/schemas/LogisticAddressScriptVariantDto"
     AddressSearchRequest:
       type: object
       properties:
@@ -3704,6 +3813,17 @@ components:
         type:
           $ref: "#/components/schemas/TypeKeyNameVerboseDtoBusinessStateType"
           description: "One of the state types: active, inactive."
+    AlternativeAddressScriptVariantDto:
+      type: object
+      properties:
+        postalCode:
+          type: string
+        city:
+          type: string
+        deliveryServiceQualifier:
+          type: string
+        deliveryServiceNumber:
+          type: string
     AlternativePostalAddressDto:
       type: object
       description: An alternative postal address describes an alternative way of delivery
@@ -5468,12 +5588,14 @@ components:
           $ref: "#/components/schemas/ConfidenceCriteriaDto"
         isParticipantData:
           type: boolean
-          description: Indicates whether the legal entity is owned and thus provided
-            by a Data Space Participant.
         legalAddress:
           $ref: "#/components/schemas/LogisticAddressDto"
           description: "The official, legal correspondence address to be provided\
             \ to government and tax authorities and used in all legal or court documents."
+        scriptVariants:
+          type: array
+          items:
+            $ref: "#/components/schemas/LegalEntityScriptVariantDto"
         index:
           type: string
           description: User defined index to conveniently match this entry to the
@@ -5564,9 +5686,13 @@ components:
           $ref: "#/components/schemas/LegalFormDto"
           description: The legal form of the legal entity.
         legalAddress:
-          $ref: "#/components/schemas/LogisticAddressVerboseDto"
+          $ref: "#/components/schemas/LogisticAddressInvariantVerboseDto"
           description: "The official, legal correspondence address to be provided\
             \ to government and tax authorities and used in all legal or court documents."
+        scriptVariants:
+          type: array
+          items:
+            $ref: "#/components/schemas/LegalEntityScriptVariantDto"
         index:
           type: string
           description: User defined index to conveniently match this entry to the
@@ -5615,12 +5741,14 @@ components:
           $ref: "#/components/schemas/ConfidenceCriteriaDto"
         isParticipantData:
           type: boolean
-          description: Indicates whether the legal entity is owned and thus provided
-            by a Data Space Participant.
         legalAddress:
           $ref: "#/components/schemas/LogisticAddressDto"
           description: "The official, legal correspondence address to be provided\
             \ to government and tax authorities and used in all legal or court documents."
+        scriptVariants:
+          type: array
+          items:
+            $ref: "#/components/schemas/LegalEntityScriptVariantDto"
         requestKey:
           type: string
     LegalEntityPartnerUpdateResponseWrapper:
@@ -5931,6 +6059,17 @@ components:
             - ZM
             - ZR
             - ZW
+    LegalEntityScriptVariantDto:
+      type: object
+      properties:
+        scriptCode:
+          type: string
+        legalName:
+          type: string
+        shortName:
+          type: string
+        legalAddress:
+          $ref: "#/components/schemas/PostalAddressScriptVariantDto"
     LegalEntitySearchRequest:
       type: object
       properties:
@@ -6043,9 +6182,13 @@ components:
           $ref: "#/components/schemas/LegalFormDto"
           description: The legal form of the legal entity.
         legalAddress:
-          $ref: "#/components/schemas/LogisticAddressVerboseDto"
+          $ref: "#/components/schemas/LogisticAddressInvariantVerboseDto"
           description: "The official, legal correspondence address to be provided\
             \ to government and tax authorities and used in all legal or court documents."
+        scriptVariants:
+          type: array
+          items:
+            $ref: "#/components/schemas/LegalEntityScriptVariantDto"
     LegalFormDto:
       type: object
       description: "A legal form is a mandatory corporate legal framework by which\
@@ -7054,7 +7197,7 @@ components:
             \ if the goods are to be picked up somewhere else."
         confidenceCriteria:
           $ref: "#/components/schemas/ConfidenceCriteriaDto"
-    LogisticAddressVerboseDto:
+    LogisticAddressInvariantVerboseDto:
       type: object
       description: "In general, an address is a collection of information to describe\
         \ a physical location, using a street name with a house number and/or a post\
@@ -7130,6 +7273,93 @@ components:
           type: boolean
           description: Indicates whether the address is owned and thus provided by
             a Data Space Participant.
+    LogisticAddressScriptVariantDto:
+      type: object
+      properties:
+        scriptCode:
+          type: string
+        addressName:
+          type: string
+        physicalAddress:
+          $ref: "#/components/schemas/PhysicalAddressScriptVariantDto"
+        alternativeAddress:
+          $ref: "#/components/schemas/AlternativeAddressScriptVariantDto"
+    LogisticAddressVerboseDto:
+      type: object
+      description: "In general, an address is a collection of information to describe\
+        \ a physical location, using a street name with a house number and/or a post\
+        \ office box as reference. In addition, an address consists of several postal\
+        \ attributes, such as country, region (state), county, township, city, district,\
+        \ or postal code, which help deliver mail.In Catena-X, an address is a type\
+        \ of business partner representing the legal address of a legal entity, and/or\
+        \ the main address of a site, or any additional address of a legal entity\
+        \ or site (such as different gates).An address is owned by a legal entity.\
+        \ Thus, exactly one legal entity is assigned to an address. An address can\
+        \ belong to a site. Thus, one or no site is assigned to an address. An address\
+        \ is uniquely identified by the BPNA."
+      properties:
+        bpna:
+          type: string
+          description: "A BPNA represents and uniquely identifies an address, which\
+            \ can be the legal address of a legal entity, and/or the main address\
+            \ of a site, or any additional address of a legal entity or site (such\
+            \ as different gates). It is important to note that only the BPNL must\
+            \ be used to uniquely identify a legal entity. Even in the case that the\
+            \ BPNA represents the legal address of the legal entity, it shall not\
+            \ be used to uniquely identify the legal entity."
+        name:
+          type: string
+          description: The name of the address. This is not according to official
+            registers but according to the name the sharing member chooses.
+        states:
+          type: array
+          description: The list of (temporary) states of the address.
+          items:
+            $ref: "#/components/schemas/AddressStateVerboseDto"
+        identifiers:
+          type: array
+          description: The list of identifiers of the address.
+          items:
+            $ref: "#/components/schemas/AddressIdentifierVerboseDto"
+        physicalPostalAddress:
+          $ref: "#/components/schemas/PhysicalPostalAddressVerboseDto"
+          description: "The physical postal address of the address, such as an office,\
+            \ warehouse, gate, etc."
+        alternativePostalAddress:
+          $ref: "#/components/schemas/AlternativePostalAddressVerboseDto"
+          description: "The alternative postal address of the address, for example\
+            \ if the goods are to be picked up somewhere else."
+        bpnLegalEntity:
+          type: string
+          description: The BPNL of the legal entity owning the address.
+        bpnSite:
+          type: string
+          description: The BPNS of the site the address belongs to.
+        createdAt:
+          type: string
+          format: date-time
+          description: The date when the data record has been created.
+        updatedAt:
+          type: string
+          format: date-time
+          description: The date when the data record has been last updated.
+        confidenceCriteria:
+          $ref: "#/components/schemas/ConfidenceCriteriaDto"
+        addressType:
+          type: string
+          description: "Indicates the address type, the legal address to a legal entity\
+            \ or the main address to a site, an additional address, or both legal\
+            \ and site address.The site main address is where typically the main entrance\
+            \ or the reception is located, or where the mail is delivered to."
+          enum:
+            - LegalAndSiteMainAddress
+            - LegalAddress
+            - SiteMainAddress
+            - AdditionalAddress
+        isCatenaXMemberData:
+          type: boolean
+          description: Indicates whether the address is owned and thus provided by
+            a Catena-X Member.
     PageDtoBusinessPartnerSearchResultDto:
       type: object
       description: Paginated collection of results
@@ -7330,6 +7560,31 @@ components:
           description: Collection of results in the page
           items:
             $ref: "#/components/schemas/LegalFormDto"
+    PageDtoLogisticAddressInvariantVerboseDto:
+      type: object
+      description: Paginated collection of results
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+          description: Total number of all results in all pages
+        totalPages:
+          type: integer
+          format: int32
+          description: Total number pages
+        page:
+          type: integer
+          format: int32
+          description: Current page number
+        contentSize:
+          type: integer
+          format: int32
+          description: Number of results in the page
+        content:
+          type: array
+          description: Collection of results in the page
+          items:
+            $ref: "#/components/schemas/LogisticAddressInvariantVerboseDto"
     PageDtoLogisticAddressVerboseDto:
       type: object
       description: Paginated collection of results
@@ -7355,6 +7610,31 @@ components:
           description: Collection of results in the page
           items:
             $ref: "#/components/schemas/LogisticAddressVerboseDto"
+    PageDtoScriptCodeDto:
+      type: object
+      description: Paginated collection of results
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+          description: Total number of all results in all pages
+        totalPages:
+          type: integer
+          format: int32
+          description: Total number pages
+        page:
+          type: integer
+          format: int32
+          description: Current page number
+        contentSize:
+          type: integer
+          format: int32
+          description: Number of results in the page
+        content:
+          type: array
+          description: Collection of results in the page
+          items:
+            $ref: "#/components/schemas/ScriptCodeDto"
     PageDtoSiteVerboseDto:
       type: object
       description: Paginated collection of results
@@ -7405,6 +7685,29 @@ components:
           description: Collection of results in the page
           items:
             $ref: "#/components/schemas/SiteWithMainAddressVerboseDto"
+    PhysicalAddressScriptVariantDto:
+      type: object
+      properties:
+        postalCode:
+          type: string
+        city:
+          type: string
+        district:
+          type: string
+        street:
+          $ref: "#/components/schemas/StreetDto"
+        companyPostalCode:
+          type: string
+        industrialZone:
+          type: string
+        building:
+          type: string
+        floor:
+          type: string
+        door:
+          type: string
+        taxJurisdictionCode:
+          type: string
     PhysicalPostalAddressDto:
       type: object
       description: "A physical postal address describes the physical location of an\
@@ -7804,6 +8107,15 @@ components:
           $ref: "#/components/schemas/RegionDto"
           description: "The 2-digit country subdivision code according to ISO 3166-2,\
             \ such as a region within a country."
+    PostalAddressScriptVariantDto:
+      type: object
+      properties:
+        addressName:
+          type: string
+        physicalAddress:
+          $ref: "#/components/schemas/PhysicalAddressScriptVariantDto"
+        alternativeAddress:
+          $ref: "#/components/schemas/AlternativeAddressScriptVariantDto"
     RegionDto:
       type: object
       description: Region within a country
@@ -8125,6 +8437,13 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/RelationValidityPeriod"
+    ScriptCodeDto:
+      type: object
+      properties:
+        technicalKey:
+          type: string
+        description:
+          type: string
     SiteCreateRequestWithLegalAddressAsMain:
       type: object
       properties:
@@ -8169,6 +8488,10 @@ components:
           $ref: "#/components/schemas/LogisticAddressDto"
         confidenceCriteria:
           $ref: "#/components/schemas/ConfidenceCriteriaDto"
+        scriptVariants:
+          type: array
+          items:
+            $ref: "#/components/schemas/SiteScriptVariantDto"
         bpnlParent:
           type: string
         index:
@@ -8236,12 +8559,16 @@ components:
           description: The date when the data record has been last updated.
         confidenceCriteria:
           $ref: "#/components/schemas/ConfidenceCriteriaDto"
+        scriptVariants:
+          type: array
+          items:
+            $ref: "#/components/schemas/SiteScriptVariantDto"
         isParticipantData:
           type: boolean
           description: Indicates whether the site is owned and thus provided by a
             Data Space Participant.
         mainAddress:
-          $ref: "#/components/schemas/LogisticAddressVerboseDto"
+          $ref: "#/components/schemas/LogisticAddressInvariantVerboseDto"
           description: "The address, where typically the main entrance or the reception\
             \ is located, or where the mail is delivered to."
         index:
@@ -8278,6 +8605,10 @@ components:
           $ref: "#/components/schemas/LogisticAddressDto"
         confidenceCriteria:
           $ref: "#/components/schemas/ConfidenceCriteriaDto"
+        scriptVariants:
+          type: array
+          items:
+            $ref: "#/components/schemas/SiteScriptVariantDto"
         requestKey:
           type: string
     SitePartnerUpdateResponseWrapper:
@@ -8299,6 +8630,15 @@ components:
         errorCount:
           type: integer
           format: int32
+    SiteScriptVariantDto:
+      type: object
+      properties:
+        scriptCode:
+          type: string
+        name:
+          type: string
+        mainAddress:
+          $ref: "#/components/schemas/PostalAddressScriptVariantDto"
     SiteSearchRequest:
       type: object
       properties:
@@ -8393,6 +8733,10 @@ components:
           description: The date when the data record has been last updated.
         confidenceCriteria:
           $ref: "#/components/schemas/ConfidenceCriteriaDto"
+        scriptVariants:
+          type: array
+          items:
+            $ref: "#/components/schemas/SiteScriptVariantDto"
         isParticipantData:
           type: boolean
           description: Indicates whether the site is owned and thus provided by a
@@ -8439,12 +8783,16 @@ components:
           description: The date when the data record has been last updated.
         confidenceCriteria:
           $ref: "#/components/schemas/ConfidenceCriteriaDto"
+        scriptVariants:
+          type: array
+          items:
+            $ref: "#/components/schemas/SiteScriptVariantDto"
         isParticipantData:
           type: boolean
           description: Indicates whether the site is owned and thus provided by a
             Data Space Participant.
         mainAddress:
-          $ref: "#/components/schemas/LogisticAddressVerboseDto"
+          $ref: "#/components/schemas/LogisticAddressInvariantVerboseDto"
     StreetDto:
       type: object
       description: "The street of the physical postal address, synonyms: road, avenue,\

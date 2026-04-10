@@ -65,7 +65,7 @@ class ResponseMapper {
                 uncategorized = toUncategorizedProperties(businessPartner),
                 legalEntity = toLegalEntity(businessPartner),
                 site = toSite(businessPartner),
-                additionalAddress = toPostalAddress(businessPartner, PostalAddressDb.Scope.AdditionalAddress)
+                additionalAddress = toAdditionalAddress(businessPartner)
             )
         }
 
@@ -75,7 +75,7 @@ class ResponseMapper {
             nameParts = toUncategorizedNameParts(businessPartner.nameParts),
             identifiers = toIdentifiers(businessPartner, IdentifierDb.Scope.Uncategorized),
             states = toStates(businessPartner, BusinessStateDb.Scope.Uncategorized),
-            address = toPostalAddress(businessPartner, PostalAddressDb.Scope.UncategorizedAddress)
+            address = toUncategorizedAddress(businessPartner)
         )
 
     fun toLegalEntity(businessPartner: GoldenRecordTaskDb.BusinessPartner) =
@@ -90,7 +90,8 @@ class ResponseMapper {
                 confidenceCriteria = toConfidence(businessPartner, ConfidenceCriteriaDb.Scope.LegalEntity),
                 isParticipantData = isCatenaXMemberData,
                 hasChanged = legalEntityHasChanged,
-                legalAddress = toPostalAddressOrEmpty(businessPartner, PostalAddressDb.Scope.LegalAddress)!!
+                legalAddress = toPostalAddressOrEmpty(businessPartner, PostalAddressDb.Scope.LegalAddress)!!,
+                scriptVariants = toLegalEntityScriptVariants(businessPartner)
             )
         }
 
@@ -103,7 +104,8 @@ class ResponseMapper {
                     states = toStates(businessPartner, BusinessStateDb.Scope.Site),
                     confidenceCriteria = toConfidence(businessPartner, ConfidenceCriteriaDb.Scope.Site),
                     hasChanged = siteHasChanged,
-                    siteMainAddress = toPostalAddress(businessPartner, PostalAddressDb.Scope.SiteMainAddress)
+                    siteMainAddress = toPostalAddress(businessPartner, PostalAddressDb.Scope.SiteMainAddress),
+                    scriptVariants = toSiteScriptVariants(businessPartner)
                 )
             }
         }
@@ -146,6 +148,16 @@ class ResponseMapper {
 
     fun toPostalAddressOrEmpty(businessPartner: GoldenRecordTaskDb.BusinessPartner, scope: PostalAddressDb.Scope) =
         toPostalAddress(businessPartner, scope)
+
+    fun toAdditionalAddress(businessPartner: GoldenRecordTaskDb.BusinessPartner) =
+        toPostalAddress(businessPartner, PostalAddressDb.Scope.AdditionalAddress)?.let {
+            PostalAddressWithScriptVariants(it, toAdditionalAddressScriptVariant(businessPartner))
+        }
+
+    fun toUncategorizedAddress(businessPartner: GoldenRecordTaskDb.BusinessPartner) =
+        toPostalAddress(businessPartner, PostalAddressDb.Scope.UncategorizedAddress)?.let {
+            PostalAddressWithScriptVariants(it, toUncategorizedAddressScriptVariant(businessPartner))
+        }
 
     fun toPostalAddress(businessPartner: GoldenRecordTaskDb.BusinessPartner, scope: PostalAddressDb.Scope) =
         businessPartner.addresses[scope]?.let { postalAddress ->
@@ -236,5 +248,69 @@ class ResponseMapper {
             GoldenRecordTaskDb.StepState.Error -> StepState.Error
             GoldenRecordTaskDb.StepState.Aborted -> StepState.Error
         }
+
+
+    fun toAdditionalAddressScriptVariant(businessPartner: GoldenRecordTaskDb.BusinessPartner) =
+        businessPartner.addressScriptVariants.filter { it.scope == PostalAddressDb.Scope.AdditionalAddress }.map{
+            PostalAddressScriptVariantWithScriptCode(it.scriptCode, toPostalAddressScriptVariant(it))
+        }
+
+    fun toUncategorizedAddressScriptVariant(businessPartner: GoldenRecordTaskDb.BusinessPartner) =
+        businessPartner.addressScriptVariants.filter { it.scope == PostalAddressDb.Scope.UncategorizedAddress }.map{
+            PostalAddressScriptVariantWithScriptCode(it.scriptCode, toPostalAddressScriptVariant(it))
+        }
+
+    fun toPostalAddressScriptVariant(addressScriptVariant: PostalAddressScriptVariantDb) =
+        PostalAddressScriptVariant(
+            addressName = addressScriptVariant.addressName,
+            physicalAddress = toPhysicalAddressScriptVariant(addressScriptVariant.physicalAddress),
+            alternativeAddress = addressScriptVariant.alternativeAddress?.let { toAlternativeAddressScriptVariant(it) }
+        )
+
+    fun toPhysicalAddressScriptVariant(physicalAddressScriptVariant: PhysicalAddressScriptVariantDb) =
+        with(physicalAddressScriptVariant){
+            PhysicalAddressScriptVariant(
+                postalCode = postalCode,
+                city = city,
+                district = district,
+                street = toStreet(street),
+                companyPostalCode = companyPostalCode,
+                industrialZone = industrialZone,
+                building = building,
+                floor = floor,
+                door = door,
+                taxJurisdictionCode = taxJurisdictionCode
+            )
+        }
+
+    fun toAlternativeAddressScriptVariant(alternativeAddressScriptVariant: AlternativeAddressScriptVariantDb) =
+        with(alternativeAddressScriptVariant){
+            AlternativeAddressScriptVariant(
+                postalCode = postalCode,
+                city = city,
+                deliveryServiceQualifier = deliveryServiceQualifier,
+                deliveryServiceNumber = deliveryServiceNumber
+            )
+        }
+
+    fun toLegalEntityScriptVariants(businessPartner: GoldenRecordTaskDb.BusinessPartner): List<LegalEntityScriptVariant>{
+        val legalAddressVariantsByScriptCode = businessPartner.addressScriptVariants.filter { it.scope == PostalAddressDb.Scope.LegalAddress }.associateBy { it.scriptCode }
+
+        return businessPartner.legalEntityHeaderScriptVariants.map { headerVariant ->
+            val legalAddressVariant = legalAddressVariantsByScriptCode[headerVariant.scriptCode]
+
+            LegalEntityScriptVariant(headerVariant.scriptCode, headerVariant.legalName, headerVariant.legalShortName, legalAddressVariant?.let { toPostalAddressScriptVariant(it) } ?: PostalAddressScriptVariant.empty )
+        }
+    }
+
+    fun toSiteScriptVariants(businessPartner: GoldenRecordTaskDb.BusinessPartner): List<SiteScriptVariant>{
+        val mainAddressVariantsByScriptCode = businessPartner.addressScriptVariants.filter { it.scope == PostalAddressDb.Scope.SiteMainAddress }.associateBy { it.scriptCode }
+
+        return businessPartner.siteHeaderScriptVariants.map { headerVariant ->
+            val mainAddressVariant = mainAddressVariantsByScriptCode[headerVariant.scriptCode]
+
+            SiteScriptVariant(headerVariant.scriptCode, headerVariant.siteName ?: "", mainAddressVariant?.let { toPostalAddressScriptVariant(it) } ?: PostalAddressScriptVariant.empty )
+        }
+    }
 
 }

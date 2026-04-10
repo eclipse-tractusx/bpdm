@@ -24,7 +24,6 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.RequestWithKey
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityDescription
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressDto
 
 @Schema(description = LegalEntityDescription.headerUpdateRequest)
 data class LegalEntityPartnerUpdateRequest(
@@ -32,14 +31,10 @@ data class LegalEntityPartnerUpdateRequest(
     @get:Schema(description = LegalEntityDescription.bpnl)
     val bpnl: String,
 
-    @field:JsonUnwrapped
-    val legalEntity: LegalEntityDto,
+    @get:JsonUnwrapped
+    val legalEntity: LegalEntityDto
 
-    // TODO OpenAPI description for complex field does not work!!
-    @get:Schema(description = LegalEntityDescription.legalAddress)
-    val legalAddress: LogisticAddressDto
-
-): RequestWithKey {
+    ): RequestWithKey {
 
     override fun getRequestKey(): String {
         return bpnl

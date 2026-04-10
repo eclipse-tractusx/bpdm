@@ -8,11 +8,15 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 
 ## [7.4.0] - tbd
 
-## Breaking
+### Breaking
 
 - Upgraded Postgres and Keycloak versions [#1625](https://github.com/eclipse-tractusx/bpdm/issues/1625).
-This change is breaking for operators who may use the embedded database of the delivered Charts.
-Please consult the [MIGRATION_GUIDE](./docs/admin/MIGRATION_GUIDE.md).
+  This change is breaking for operators who may use the embedded database of the delivered Charts.
+  Please consult the [MIGRATION_GUIDE](./docs/admin/MIGRATION_GUIDE.md).
+
+### Added
+
+- Script variants and script codes for business partner data [#1593](https://github.com/eclipse-tractusx/bpdm/issues/1593)
 
 ## [7.3.0] - 2026-03-6
 

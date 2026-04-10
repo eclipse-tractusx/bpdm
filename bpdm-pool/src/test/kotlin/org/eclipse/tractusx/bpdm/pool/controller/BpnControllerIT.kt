@@ -60,22 +60,26 @@ class BpnControllerIT @Autowired constructor(
     val bpnRequestIdentifierRepository: BpnRequestIdentifierRepository
 ) {
 
-    val identifierType = BusinessPartnerNonVerboseValues.legalEntityCreate1.legalEntity.identifiers.first().type
-    val identifierValue1 = BusinessPartnerNonVerboseValues.legalEntityCreate1.legalEntity.identifiers.first().value
-    val identifierValue2 = BusinessPartnerNonVerboseValues.legalEntityCreate2.legalEntity.identifiers.first().value
-    val identifierValue3 = BusinessPartnerNonVerboseValues.legalEntityCreate3.legalEntity.identifiers.first().value
+    val identifierType = BusinessPartnerNonVerboseValues.legalEntityCreate1.legalEntity.header.identifiers.first().type
+    val identifierValue1 = BusinessPartnerNonVerboseValues.legalEntityCreate1.legalEntity.header.identifiers.first().value
+    val identifierValue2 = BusinessPartnerNonVerboseValues.legalEntityCreate2.legalEntity.header.identifiers.first().value
+    val identifierValue3 = BusinessPartnerNonVerboseValues.legalEntityCreate3.legalEntity.header.identifiers.first().value
 
     @BeforeEach
     fun beforeEach() {
         // ensure LE1 and 2 have same identifierType
         val legalEntityCreate1 = with(BusinessPartnerNonVerboseValues.legalEntityCreate1) { copy(
             legalEntity = legalEntity.copy(
-                identifiers = listOf(LegalEntityIdentifierDto(identifierValue1, identifierType, null))
+                header = legalEntity.header.copy(
+                    identifiers = listOf(LegalEntityIdentifierDto(identifierValue1, identifierType, null))
+                )
             )
         ) }
         val legalEntityCreate2 = with(BusinessPartnerNonVerboseValues.legalEntityCreate2) { copy(
             legalEntity = legalEntity.copy(
-                identifiers = listOf(LegalEntityIdentifierDto(identifierValue2, identifierType, null))
+                header = legalEntity.header.copy(
+                    identifiers = listOf(LegalEntityIdentifierDto(identifierValue2, identifierType, null))
+                )
             )
         ) }
         val legalEntityCreate3 = BusinessPartnerNonVerboseValues.legalEntityCreate3

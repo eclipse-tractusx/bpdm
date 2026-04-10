@@ -167,4 +167,5 @@ data class PostalAddressDb(
         @Formula("1")
         private val isNonNull = 1
     }
+
 }

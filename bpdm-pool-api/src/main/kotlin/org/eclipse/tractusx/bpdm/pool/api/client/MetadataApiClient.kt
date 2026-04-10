@@ -58,4 +58,7 @@ interface MetadataApiClient: PoolMetadataApi {
 
     @GetExchange(value = "${ApiCommons.BASE_PATH_V7}/legal-forms")
     override fun getLegalForms(@ParameterObject paginationRequest: PaginationRequest): PageDto<LegalFormDto>
+
+    @GetExchange(value = "${ApiCommons.BASE_PATH_V7}/script-codes")
+    override fun getScriptCodes(@ParameterObject paginationRequest: PaginationRequest): PageDto<ScriptCodeDto>
 }

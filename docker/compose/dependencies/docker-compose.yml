@@ -35,7 +35,7 @@ services:
       - "5432:5432"
     volumes:
       - ./postgres-init.sh:/docker-entrypoint-initdb.d/postgres-init.sh:ro
-      - bpdm-postgres-data:/var/lib/postgresql/data
+      - bpdm-postgres-data:/var/lib/postgresql
 
   keycloak:
     image: docker.io/keycloak/keycloak:26.5.6@sha256:8d44614c74798322c4e07fbe0ecb15cfbb5879d69b484628555f58ade06f0d8c

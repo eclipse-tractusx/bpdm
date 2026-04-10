@@ -23,6 +23,7 @@ import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 import org.eclipse.tractusx.bpdm.common.model.StageType
+import org.eclipse.tractusx.bpdm.gate.entity.BusinessPartnerScriptVariantDb
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import java.time.Instant
 import java.util.*
@@ -117,5 +118,8 @@ class BusinessPartnerDb(
                 addressConfidence = null
             )
     }
+
+    @OneToMany(fetch = FetchType.EAGER, cascade = [CascadeType.ALL], orphanRemoval = true, mappedBy = "businessPartner")
+    val scriptVariants: MutableList<BusinessPartnerScriptVariantDb> = mutableListOf()
 }
 

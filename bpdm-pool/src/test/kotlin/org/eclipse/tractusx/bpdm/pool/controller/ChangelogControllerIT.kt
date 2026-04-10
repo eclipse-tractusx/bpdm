@@ -77,15 +77,15 @@ class ChangelogControllerIT @Autowired constructor(
                 LegalEntityStructureRequest(legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate2)
             )
         )
-        val bpnL1 = createdStructures[0].legalEntity.legalEntity.bpnl
-        val bpnL2 = createdStructures[1].legalEntity.legalEntity.bpnl
+        val bpnL1 = createdStructures[0].legalEntity.header.bpnl
+        val bpnL2 = createdStructures[1].legalEntity.header.bpnl
 
         val bpnA1 = createdStructures[0].legalEntity.legalAddress.bpna
         val bpnA2 = createdStructures[1].legalEntity.legalAddress.bpna
 
         val toUpdate = listOf(
-            with(BusinessPartnerNonVerboseValues.legalEntityUpdate1) { copy(bpnl = bpnL1, legalEntity = legalEntity.copy(legalName = "New Name 1")) },
-            with(BusinessPartnerNonVerboseValues.legalEntityUpdate2) { copy(bpnl = bpnL2, legalEntity = legalEntity.copy(legalName = "New Name 2")) }
+            with(BusinessPartnerNonVerboseValues.legalEntityUpdate1) { copy(bpnl = bpnL1, legalEntity = legalEntity.copy(header = legalEntity.header.copy( legalName = "New Name 1"))) },
+            with(BusinessPartnerNonVerboseValues.legalEntityUpdate2) { copy(bpnl = bpnL2, legalEntity = legalEntity.copy(header = legalEntity.header.copy( legalName = "New Name 2"))) }
         )
         poolClient.legalEntities.updateBusinessPartners(
             toUpdate
@@ -136,7 +136,7 @@ class ChangelogControllerIT @Autowired constructor(
                 )
             )
         )
-        val bpnL = createdStructures[0].legalEntity.legalEntity.bpnl
+        val bpnL = createdStructures[0].legalEntity.header.bpnl
         val bpnS1 = createdStructures[0].siteStructures[0].site.site.bpns
         val bpnS2 = createdStructures[0].siteStructures[1].site.site.bpns
         val bpnLegalAddress = createdStructures[0].legalEntity.legalAddress.bpna
@@ -208,7 +208,7 @@ class ChangelogControllerIT @Autowired constructor(
                 )
             )
         )
-        val bpnL = createdStructures[0].legalEntity.legalEntity.bpnl
+        val bpnL = createdStructures[0].legalEntity.header.bpnl
         val bpnS1 = createdStructures[0].siteStructures[0].site.site.bpns
         val bpnLegalAddress = createdStructures[0].legalEntity.legalAddress.bpna
         val bpnMainAddress = createdStructures[0].siteStructures[0].site.mainAddress.bpna
@@ -272,9 +272,9 @@ class ChangelogControllerIT @Autowired constructor(
                 LegalEntityStructureRequest(legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate3),
             )
         )
-        val bpnL1 = createdStructures[0].legalEntity.legalEntity.bpnl
-        val bpnL2 = createdStructures[1].legalEntity.legalEntity.bpnl
-        val bpnL3 = createdStructures[2].legalEntity.legalEntity.bpnl
+        val bpnL1 = createdStructures[0].legalEntity.header.bpnl
+        val bpnL2 = createdStructures[1].legalEntity.header.bpnl
+        val bpnL3 = createdStructures[2].legalEntity.header.bpnl
 
 
         val timeAfterUpdate = Instant.now()
@@ -324,7 +324,7 @@ class ChangelogControllerIT @Autowired constructor(
                 )
             )
         )
-        val bpnL = createdStructures[0].legalEntity.legalEntity.bpnl
+        val bpnL = createdStructures[0].legalEntity.header.bpnl
         val bpnS = createdStructures[0].siteStructures[0].site.site.bpns
         val bpnLegalAddress = createdStructures[0].legalEntity.legalAddress.bpna
         val bpnMainAddress = createdStructures[0].siteStructures[0].site.mainAddress.bpna
@@ -386,8 +386,8 @@ class ChangelogControllerIT @Autowired constructor(
                 LegalEntityStructureRequest(legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate3)
             )
         )
-        val bpnL1 = createdStructures[0].legalEntity.legalEntity.bpnl
-        val bpnL2 = createdStructures[1].legalEntity.legalEntity.bpnl
+        val bpnL1 = createdStructures[0].legalEntity.header.bpnl
+        val bpnL2 = createdStructures[1].legalEntity.header.bpnl
 
 
         val timeAfterUpdate = Instant.now()
@@ -432,8 +432,8 @@ class ChangelogControllerIT @Autowired constructor(
             )
         )
 
-        val bpnL1 = createdStructures[0].legalEntity.legalEntity.bpnl
-        val bpnL2 = createdStructures[1].legalEntity.legalEntity.bpnl
+        val bpnL1 = createdStructures[0].legalEntity.header.bpnl
+        val bpnL2 = createdStructures[1].legalEntity.header.bpnl
 
         val timeAfterSecondInsert = Instant.now()
 

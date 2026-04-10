@@ -60,7 +60,7 @@ class TestHelpers(
         val assignedSiteRequests =
             partnerStructures.flatMap {
                 it.siteStructures.map { site ->
-                    site.site.copy(bpnlParent = indexedLegalEntities[it.legalEntity.index]!!.legalEntity.bpnl)
+                    site.site.copy(bpnlParent = indexedLegalEntities[it.legalEntity.index]!!.legalEntity.header.bpnl)
                 }
             }
         val sitesWithErrorsResponse = poolClient.sites.createSite(assignedSiteRequests)
@@ -69,7 +69,7 @@ class TestHelpers(
         val assignedSitelessAddresses =
             partnerStructures.flatMap {
                 it.addresses.map { address ->
-                    address.copy(bpnParent = indexedLegalEntities[it.legalEntity.index]!!.legalEntity.bpnl)
+                    address.copy(bpnParent = indexedLegalEntities[it.legalEntity.index]!!.legalEntity.header.bpnl)
                 }
             }
         val assignedSiteAddresses =
@@ -85,7 +85,7 @@ class TestHelpers(
 
         return partnerStructures.map { legalEntityStructure ->
             LegalEntityStructureResponse(
-                legalEntity = indexedLegalEntities[legalEntityStructure.legalEntity.index]!!,
+                legalEntity = indexedLegalEntities[legalEntityStructure.legalEntity.index]!!.legalEntity,
                 siteStructures = legalEntityStructure.siteStructures.map { siteStructure ->
                     SiteStructureResponse(
                         site = indexedSites[siteStructure.site.index]!!,

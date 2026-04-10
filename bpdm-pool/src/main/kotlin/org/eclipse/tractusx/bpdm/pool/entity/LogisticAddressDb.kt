@@ -52,9 +52,13 @@ class LogisticAddressDb(
     var alternativePostalAddress: AlternativePostalAddressDb?,
 
     @Embedded
-    var confidenceCriteria: ConfidenceCriteriaDb
+    var confidenceCriteria: ConfidenceCriteriaDb,
 
-) : BaseEntity() {
+    @ElementCollection
+    @CollectionTable(name = "address_script_variants", joinColumns = [JoinColumn(name = "logistic_address_id")])
+    val scriptVariants: MutableList<LogisticAddressScriptVariantDb> = mutableListOf(),
+
+    ) : BaseEntity() {
     @OneToMany(mappedBy = "address", cascade = [CascadeType.ALL], orphanRemoval = true)
     val identifiers: MutableSet<AddressIdentifierDb> = mutableSetOf()
 

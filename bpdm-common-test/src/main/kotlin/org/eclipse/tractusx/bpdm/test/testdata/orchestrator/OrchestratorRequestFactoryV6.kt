@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.test.testdata.orchestrator
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
+import org.eclipse.tractusx.orchestrator.api.model.Site
 import org.eclipse.tractusx.orchestrator.api.model.UncategorizedProperties
 import org.eclipse.tractusx.orchestrator.api.v6.model.BusinessPartner
 import org.eclipse.tractusx.orchestrator.api.v6.model.LegalEntity
@@ -43,9 +44,9 @@ class OrchestratorRequestFactoryV6(
         return BusinessPartner(
             nameParts = commonFactory.buildNameParts(seed),
             owningCompany = "BPNLOwner",
-            uncategorized = commonFactory.buildUncategorizedProperties(seed, random),
+            uncategorized = commonFactory.buildUncategorizedProperties(seed, random).withoutScriptVariants(),
             legalEntity = buildLegalEntityProperties(seed, random),
-            site = commonFactory.buildSite(seed, random),
+            site = commonFactory.buildSite(seed, random).withoutScriptVariants(),
             additionalAddress = commonFactory.buildPostalAddress(seed, AddressType.AdditionalAddress, random)
         )
     }
@@ -67,7 +68,7 @@ class OrchestratorRequestFactoryV6(
             owningCompany = "BPNLOwner",
             uncategorized = UncategorizedProperties.empty,
             legalEntity = buildLegalEntityProperties(seed, random),
-            site = commonFactory.buildSite(seed, random),
+            site = commonFactory.buildSite(seed, random).withoutScriptVariants(),
             additionalAddress = null
         )
     }
@@ -78,7 +79,7 @@ class OrchestratorRequestFactoryV6(
             owningCompany = "BPNLOwner",
             uncategorized = UncategorizedProperties.empty,
             legalEntity = buildLegalEntityProperties(seed, random),
-            site = commonFactory.buildSite(seed, random).copy(siteMainAddress = null),
+            site = commonFactory.buildSite(seed, random).copy(siteMainAddress = null).withoutScriptVariants(),
             additionalAddress = null
         )
     }
@@ -100,7 +101,7 @@ class OrchestratorRequestFactoryV6(
             owningCompany = "BPNLOwner",
             uncategorized = UncategorizedProperties.empty,
             legalEntity = buildLegalEntityProperties(seed, random),
-            site = commonFactory.buildSite(seed, random),
+            site = commonFactory.buildSite(seed, random).withoutScriptVariants(),
             additionalAddress = commonFactory.buildPostalAddress(seed, AddressType.AdditionalAddress, random)
         )
     }
@@ -125,4 +126,10 @@ class OrchestratorRequestFactoryV6(
     private fun createRandomFromSeed(seed: String): Random{
         return Random(seed.hashCode())
     }
+
+    private fun UncategorizedProperties.withoutScriptVariants() =
+        copy(address = address?.copy(scriptVariants = emptyList()))
+
+    private fun Site.withoutScriptVariants() =
+        copy(scriptVariants = emptyList())
 }

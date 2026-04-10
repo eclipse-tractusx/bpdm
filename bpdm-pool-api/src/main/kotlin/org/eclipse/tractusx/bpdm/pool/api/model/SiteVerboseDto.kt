@@ -46,6 +46,8 @@ data class SiteVerboseDto(
     @get:Schema(description = CommonDescription.updatedAt)
     val updatedAt: Instant,
 
-    override val confidenceCriteria: ConfidenceCriteriaDto
+    override val confidenceCriteria: ConfidenceCriteriaDto,
+
+    val scriptVariants: List<SiteScriptVariantDto>
 
 ) : IBaseSiteDto

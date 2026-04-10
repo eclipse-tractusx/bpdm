@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.orchestrator.api.model
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.PostalAddressDescription
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.StreetDescription
@@ -40,7 +41,7 @@ data class BusinessPartner(
     val uncategorized: UncategorizedProperties,
     val legalEntity: LegalEntity,
     val site: Site?,
-    val additionalAddress: PostalAddress?,
+    val additionalAddress: PostalAddressWithScriptVariants?,
 ){
     companion object{
         val empty = BusinessPartner(
@@ -124,20 +125,15 @@ data class BpnReference(
         "The address can be either a legal, site main and/or additional address. " +
         "This can also refer to address information which is unknown to which type it belongs to.")
 data class PostalAddress(
-    val bpnReference: BpnReference,
-    @Schema( description = "The name of this address")
-    val addressName: String?,
-    @Schema(description = "Identifiers for this address (in addition to the BPNA)")
-    val identifiers: List<Identifier>,
-    @Schema(description = "The business state history of this address")
-    val states: List<BusinessState>,
-    val confidenceCriteria: ConfidenceCriteria,
-    val physicalAddress: PhysicalAddress,
-    val alternativeAddress: AlternativeAddress?,
-    @Schema(description = "Whether this address information differs from its golden record counterpart in the Pool." +
-            "Currently deprecated and ignored by the golden record creation and update process.", deprecated = true)
-    val hasChanged: Boolean?
-){
+    override val bpnReference: BpnReference,
+    override val addressName: String?,
+    override val identifiers: List<Identifier>,
+    override val states: List<BusinessState>,
+    override val confidenceCriteria: ConfidenceCriteria,
+    override val physicalAddress: PhysicalAddress,
+    override val alternativeAddress: AlternativeAddress?,
+    override val hasChanged: Boolean?
+): IsPostalAddress{
     companion object{
         val empty = PostalAddress(
             bpnReference = BpnReference.empty,
@@ -286,14 +282,57 @@ data class ConfidenceCriteria(
         "An additional address is an address that is distinct from the legal and site main address. " +
         "The additional address is either an additional address of the legal entity (site is null) or of the site (site is not null). " +
         "An additional address of 'Null' means the business partner data has no additional address")
-data class AdditionalAddress(
-    val addressBpn: BpnReference,
-    @Schema(description = "Whether this additional address information differs from its golden record counterpart in the Pool. +" +
-            "The Pool will not update the address if it is set to false. " +
-            "However, if this address constitutes a new additional address golden record, it is still created independent of this flag.")
-    val hasChanged: Boolean?,
-    val postalProperties: PostalAddress
-)
+data class PostalAddressWithScriptVariants(
+    @field:JsonUnwrapped
+    val postalProperties: PostalAddress,
+    val scriptVariants: List<PostalAddressScriptVariantWithScriptCode>,
+): IsPostalAddress{
+    companion object{
+        val empty = PostalAddressWithScriptVariants(
+            postalProperties = PostalAddress.empty,
+            scriptVariants = emptyList()
+        )
+    }
+
+    fun copyAsPostalAddress(transform: (PostalAddress) -> PostalAddress): PostalAddressWithScriptVariants{
+        return copy(postalProperties = transform(postalProperties))
+    }
+
+    fun toPostalAddress() =
+        PostalAddress(
+            bpnReference = bpnReference,
+            addressName = addressName,
+            identifiers = identifiers,
+            states = states,
+            confidenceCriteria = confidenceCriteria,
+            physicalAddress = physicalAddress,
+            alternativeAddress = alternativeAddress,
+            hasChanged = hasChanged
+        )
+
+    override val bpnReference: BpnReference
+        get() = postalProperties.bpnReference
+
+    override val addressName: String?
+        get() = postalProperties.addressName
+
+    override val identifiers: List<Identifier>
+        get() = postalProperties.identifiers
+    override val states: List<BusinessState>
+        get() = postalProperties.states
+
+    override val confidenceCriteria: ConfidenceCriteria
+        get() = postalProperties.confidenceCriteria
+
+    override val physicalAddress: PhysicalAddress
+        get() = postalProperties.physicalAddress
+
+    override val alternativeAddress: AlternativeAddress?
+        get() = postalProperties.alternativeAddress
+
+    override val hasChanged: Boolean?
+        get() = postalProperties.hasChanged
+}
 
 @Schema(description = "Legal entity information for this business partner data. " +
         "Every business partner either is a legal entity or belongs to a legal entity." +
@@ -317,7 +356,8 @@ data class LegalEntity(
             "The Pool will not update the legal entity if it is set to false. " +
             "However, if this legal entity constitutes a new legal entity golden record, it is still created independent of this flag.")
     val hasChanged: Boolean?,
-    val legalAddress: PostalAddress
+    val legalAddress: PostalAddress,
+    val scriptVariants: List<LegalEntityScriptVariant>
 ){
     companion object{
         val empty = LegalEntity(
@@ -330,7 +370,8 @@ data class LegalEntity(
             confidenceCriteria = ConfidenceCriteria.empty,
             isParticipantData = null,
             hasChanged = null,
-            legalAddress = PostalAddress.empty
+            legalAddress = PostalAddress.empty,
+            scriptVariants = emptyList()
         )
     }
 }
@@ -348,7 +389,8 @@ data class Site(
             "The Pool will not update the site if it is set to false. " +
             "However, if this site constitutes a new site golden record, it is still created independent of this flag.")
     val hasChanged: Boolean?,
-    val siteMainAddress: PostalAddress?
+    val siteMainAddress: PostalAddress?,
+    val scriptVariants: List<SiteScriptVariant>
 ){
     companion object{
         val empty = Site(
@@ -357,7 +399,8 @@ data class Site(
             states = emptyList(),
             confidenceCriteria = ConfidenceCriteria.empty,
             hasChanged = null,
-            siteMainAddress = PostalAddress.empty
+            siteMainAddress = PostalAddress.empty,
+            scriptVariants = emptyList()
         )
     }
 
@@ -375,7 +418,7 @@ data class UncategorizedProperties(
     @Schema(description = "Business states for which it is unknown whether they belong to the legal entity, site or any address")
     val states: List<BusinessState>,
     @Schema(description = "Address information for which it is unknown whether they belong to the legal, site main or additional address")
-    val address: PostalAddress?
+    val address: PostalAddressWithScriptVariants?
 ){
     companion object{
         val empty = UncategorizedProperties(
@@ -386,6 +429,74 @@ data class UncategorizedProperties(
         )
     }
 }
+
+data class LegalEntityScriptVariant(
+    val scriptCode: String,
+    val legalName: String?,
+    val legalShortName: String?,
+    val legalAddress: PostalAddressScriptVariant
+)
+
+data class SiteScriptVariant(
+    val scriptCode: String,
+    val siteName: String,
+    val mainAddress: PostalAddressScriptVariant
+)
+
+data class PostalAddressScriptVariantWithScriptCode(
+    val scriptCode: String,
+    @field:JsonUnwrapped
+    val postalProperties: PostalAddressScriptVariant
+)
+
+data class PostalAddressScriptVariant(
+    val addressName: String?,
+    val physicalAddress: PhysicalAddressScriptVariant,
+    val alternativeAddress: AlternativeAddressScriptVariant?,
+){
+    companion object{
+        val empty = PostalAddressScriptVariant(
+            addressName = null,
+            physicalAddress = PhysicalAddressScriptVariant.empty,
+            alternativeAddress = null
+        )
+    }
+}
+
+data class PhysicalAddressScriptVariant(
+    val postalCode: String?,
+    val city: String?,
+    val district: String?,
+    val street: Street,
+    val companyPostalCode: String?,
+    val industrialZone: String?,
+    val building: String?,
+    val floor: String?,
+    val door: String?,
+    val taxJurisdictionCode: String?,
+){
+    companion object{
+        val empty = PhysicalAddressScriptVariant(
+            postalCode = null,
+            city = null,
+            district = null,
+            street = Street.empty,
+            companyPostalCode = null,
+            industrialZone = null,
+            building = null,
+            floor = null,
+            door = null,
+            taxJurisdictionCode = null
+        )
+    }
+}
+
+data class AlternativeAddressScriptVariant(
+    val postalCode: String?,
+    val city: String?,
+    val deliveryServiceQualifier: String?,
+    val deliveryServiceNumber: String?
+)
 
 enum class NamePartType{
     LegalName,
@@ -404,4 +515,20 @@ enum class GoldenRecordType{
 enum class BpnReferenceType {
     Bpn,
     BpnRequestIdentifier
+}
+
+interface IsPostalAddress{
+    val bpnReference: BpnReference
+    @get:Schema( description = "The name of this address")
+    val addressName: String?
+    @get:Schema(description = "Identifiers for this address (in addition to the BPNA)")
+    val identifiers: List<Identifier>
+    @get:Schema(description = "The business state history of this address")
+    val states: List<BusinessState>
+    val confidenceCriteria: ConfidenceCriteria
+    val physicalAddress: PhysicalAddress
+    val alternativeAddress: AlternativeAddress?
+    @get:Schema(description = "Whether this address information differs from its golden record counterpart in the Pool." +
+            "Currently deprecated and ignored by the golden record creation and update process.", deprecated = true)
+    val hasChanged: Boolean?
 }

@@ -26,10 +26,12 @@ import org.eclipse.tractusx.bpdm.gate.model.upsert.output.*
 import org.springframework.stereotype.Service
 
 @Service
-class OutputUpsertMappings {
+class OutputUpsertMappings(
+    private val businessPartnerMappings: BusinessPartnerMappings
+) {
 
     fun toEntity(upsertData: OutputUpsertData, sharingState: SharingStateDb): BusinessPartnerDb {
-        return with(upsertData) {
+        val businessPartner =  with(upsertData) {
             BusinessPartnerDb(
                 sharingState = sharingState,
                 stage = StageType.Output,
@@ -52,6 +54,11 @@ class OutputUpsertMappings {
                 addressConfidence = addressConfidence.toEntity()
             )
         }
+
+        val scriptVariants = upsertData.scriptVariants.map { variant ->  businessPartnerMappings.toScriptVariantDb(businessPartner, variant) }
+        scriptVariants.forEach { businessPartner.scriptVariants.add(it) }
+
+        return businessPartner
     }
 
     private fun Identifier.toEntity() =
