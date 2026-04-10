@@ -37,6 +37,7 @@ class PostgreSQLContextInitializer : ApplicationContextInitializer<ConfigurableA
                 .parse("docker.io/postgres:18.3@sha256:a9abf4275f9e99bff8e6aed712b3b7dfec9cac1341bba01c1ffdfce9ff9fc34a")
                 .asCompatibleSubstituteFor("postgres")
             )
+            .withCommand("max_connections=200")
             .withAccessToHost(true)
             .withNetwork(Network.SHARED)
     }
