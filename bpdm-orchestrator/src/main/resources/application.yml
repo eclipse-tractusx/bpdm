@@ -48,9 +48,9 @@ bpdm:
     # URL to the auth endpoint of the Keycloak server
     auth-url: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}/protocol/openid-connect/auth
     # This application's resource or client. Used for finding permissions in the given Bearer token
-    client-id: Cl25-CX-BPDM-Orchestrator
+    client-id: BPDM_ORCHESTRATOR
     # The keycloak realm to consider
-    realm: CX-Central
+    realm: BPDM
     # URL to the token refresh endpoint of the Keycloak server
     refresh-url: ${bpdm.security.token-url}
     # URL to the token validation endpoint of the Keycloak server

@@ -21,9 +21,9 @@ package org.eclipse.tractusx.bpdm.gate.auth
 
 import org.eclipse.tractusx.bpdm.gate.Application
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
-import org.eclipse.tractusx.bpdm.test.containers.AuthenticatedSelfClient
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
+import org.eclipse.tractusx.bpdm.test.containers.SelfClientInitializer
 import org.eclipse.tractusx.bpdm.test.util.AuthAssertionHelper
 import org.eclipse.tractusx.bpdm.test.util.AuthExpectationType
 import org.springframework.beans.factory.annotation.Autowired
@@ -35,7 +35,7 @@ import org.springframework.test.context.ContextConfiguration
 @ContextConfiguration(initializers = [
     PostgreSQLContextInitializer::class,
     KeyCloakInitializer::class,
-    AuthenticatedSelfClient::class
+    AuthenticatedIT.SelfClientAsUnauthorizedInitializer::class
 ])
 @ActiveProfiles("test")
 class AuthenticatedIT @Autowired constructor(
@@ -83,4 +83,10 @@ class AuthenticatedIT @Autowired constructor(
             getOutput = AuthExpectationType.Forbidden
         )
     )
-)
+){
+
+    class SelfClientAsUnauthorizedInitializer : SelfClientInitializer() {
+        override val clientId: String
+            get() = "BPDM_PARTICIPANT"
+    }
+}

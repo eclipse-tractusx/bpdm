@@ -53,7 +53,7 @@ class AuthTaskProcessorCleanIT @Autowired constructor(
         steps = TaskStep.entries.associateWith { step ->
             when(step){
                 TaskStep.Clean -> AuthExpectationType.Authorized
-                TaskStep.CleanAndSync -> AuthExpectationType.Authorized
+                TaskStep.CleanAndSync -> AuthExpectationType.Forbidden
                 else -> AuthExpectationType.Forbidden
             }
         }.mapValues {  TaskStepAuthExpectations(postReservation = it.value, postResult = it.value) }
@@ -62,6 +62,6 @@ class AuthTaskProcessorCleanIT @Autowired constructor(
 
     class SelfClientAsTaskProcessorCleanInitializer : SelfClientInitializer() {
         override val clientId: String
-            get() = "sa-cl25-cx-1"
+            get() = "BPDM_REFINER_CLEAN"
     }
 }

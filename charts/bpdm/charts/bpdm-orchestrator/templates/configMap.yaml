@@ -21,8 +21,4 @@
 {{ include "bpdm-common.configMap" (dict "context" $ "defaultValues" "bpdm-orchestrator.configmapDefaults") -}}
 {{- define "bpdm-orchestrator.configmapDefaults" -}}
 bpdm:
-  datasource:
-    host: {{ include "bpdm.postgresDependency" . }}
-  security:
-    auth-server-url: http://{{ include "bpdm.centralidpDependency" . }}/auth
 {{- end -}}

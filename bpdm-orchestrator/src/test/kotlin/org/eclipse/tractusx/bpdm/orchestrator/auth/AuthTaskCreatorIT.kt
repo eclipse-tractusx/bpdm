@@ -57,6 +57,6 @@ class AuthTaskCreatorIT @Autowired constructor(
 
     class SelfClientAsTaskCreatorInitializer : SelfClientInitializer() {
         override val clientId: String
-            get() = "sa-cl25-cx-3"
+            get() = "BPDM_TASK_CREATOR"
     }
 }
