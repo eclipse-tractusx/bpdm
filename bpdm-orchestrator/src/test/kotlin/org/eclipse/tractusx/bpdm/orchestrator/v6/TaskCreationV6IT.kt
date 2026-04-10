@@ -27,7 +27,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.web.reactive.function.client.WebClientResponseException
 
-class TaskCreationV6IT: UnscheduledOrchestratorTestV6() {
+class TaskCreationV6IT: UnscheduledOrchestratorTestBaseV6() {
 
     /**
      * WHEN user requests new task for new data for new sharing member record
