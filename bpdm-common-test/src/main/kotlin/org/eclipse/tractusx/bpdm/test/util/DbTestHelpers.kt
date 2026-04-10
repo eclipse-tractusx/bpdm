@@ -20,19 +20,14 @@
 package org.eclipse.tractusx.bpdm.test.util
 
 import jakarta.persistence.EntityManager
-import jakarta.persistence.EntityManagerFactory
+import jakarta.transaction.Transactional
 import org.springframework.stereotype.Component
 
 
 @Component
-class DbTestHelpers(private val entityManagerFactory: EntityManagerFactory?) {
+class DbTestHelpers(private val entityManager: EntityManager?) {
 
-    val em: EntityManager? by lazy {
-        entityManagerFactory?.createEntityManager()
-    }
-
-
-
+    @Transactional
     fun truncateDbTables() {
         truncateDbTablesFromSchema("bpdm")
         truncateDbTablesFromSchema("bpdmgate")
@@ -41,9 +36,7 @@ class DbTestHelpers(private val entityManagerFactory: EntityManagerFactory?) {
     }
 
     private fun truncateDbTablesFromSchema(dbSchemaName: String) {
-        em?.transaction?.begin()
-
-        em?.createNativeQuery(
+        entityManager?.createNativeQuery(
             """
                     DO $$ DECLARE table_names RECORD;
                     BEGIN
@@ -57,8 +50,6 @@ class DbTestHelpers(private val entityManagerFactory: EntityManagerFactory?) {
                     END $$;
                 """.trimIndent()
         )?.executeUpdate()
-
-        em?.transaction?.commit()
     }
 
 
