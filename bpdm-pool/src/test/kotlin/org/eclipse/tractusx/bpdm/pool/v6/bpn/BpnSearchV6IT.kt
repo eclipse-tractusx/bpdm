@@ -23,10 +23,10 @@ import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.request.IdentifiersSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingDto
-import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolV6Test
+import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolTestBaseV6
 import org.junit.jupiter.api.Test
 
-class BpnSearchV6IT: UnscheduledPoolV6Test() {
+class BpnSearchV6IT: UnscheduledPoolTestBaseV6() {
 
 
     /**

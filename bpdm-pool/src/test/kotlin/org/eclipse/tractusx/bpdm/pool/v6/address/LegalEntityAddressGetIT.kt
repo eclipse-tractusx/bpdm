@@ -22,11 +22,11 @@ package org.eclipse.tractusx.bpdm.pool.v6.address
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolV6Test
+import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolTestBaseV6
 import org.junit.jupiter.api.Test
 import org.springframework.web.reactive.function.client.WebClientResponseException
 
-class LegalEntityAddressGetIT: UnscheduledPoolV6Test() {
+class LegalEntityAddressGetIT: UnscheduledPoolTestBaseV6() {
 
     /**
      * GIVEN addresses directly belonging to legal entity

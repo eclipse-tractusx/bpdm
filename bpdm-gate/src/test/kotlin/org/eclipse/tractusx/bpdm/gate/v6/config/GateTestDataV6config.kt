@@ -48,7 +48,7 @@ import tools.jackson.databind.json.JsonMapper
 @ConditionalOnProperty(name = ["test.v6"], havingValue = "true", matchIfMissing = false)
 class GateTestDataV6config {
 
-    private val poolTestMetadata = org.eclipse.tractusx.bpdm.test.testdata.pool.TestMetadata(
+    private val poolTestMetadata = org.eclipse.tractusx.bpdm.test.testdata.pool.TestMetadataV7(
         legalForms = listOf(
             BusinessPartnerVerboseValues.legalForm1,
             BusinessPartnerVerboseValues.legalForm2

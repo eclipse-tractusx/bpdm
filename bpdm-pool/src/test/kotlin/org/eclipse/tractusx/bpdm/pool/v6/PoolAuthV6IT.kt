@@ -35,7 +35,7 @@ import org.eclipse.tractusx.bpdm.test.util.AuthExpectationType
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 
-class PoolAuthV6IT: UnscheduledPoolV6Test() {
+class PoolAuthV6IT: UnscheduledPoolTestBaseV6() {
 
     private val authAssertionHelper = AuthAssertionHelper()
 

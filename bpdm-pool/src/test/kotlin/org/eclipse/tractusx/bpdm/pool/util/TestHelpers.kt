@@ -19,12 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.util
 
-import org.assertj.core.api.Assertions
-import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
+import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.request.IdentifiersSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorCode
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
-import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.test.testdata.pool.LegalEntityStructureRequest
 import org.eclipse.tractusx.bpdm.test.testdata.pool.LegalEntityStructureResponse
 import org.eclipse.tractusx.bpdm.test.testdata.pool.SiteStructureResponse
@@ -36,15 +32,8 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 
 @Component
 class TestHelpers(
-    private val bpnConfigProperties: BpnConfigProperties,
-    private val poolClient: PoolClientImpl
+    private val poolClient: PoolApiClient
 ) {
-
-    val bpnLPattern = createBpnPattern(bpnConfigProperties.legalEntityChar)
-    val bpnSPattern = createBpnPattern(bpnConfigProperties.siteChar)
-    val bpnAPattern = createBpnPattern(bpnConfigProperties.addressChar)
-
-
     /**
      * Creates legal entities, sites and addresses according to the given [partnerStructures]
      * Retains the order: All response objects will be in the same order as their request counterparts
@@ -97,15 +86,6 @@ class TestHelpers(
         }
     }
 
-    fun `get address by bpn-a, not found`(bpn: String) {
-        try {
-            val result = poolClient.addresses.getAddress(bpn)
-            assertThrows<WebClientResponseException> { result }
-        } catch (e: WebClientResponseException) {
-            Assert.assertEquals(HttpStatus.NOT_FOUND, e.statusCode)
-        }
-    }
-
     fun `find bpns by identifiers, bpn request limit exceeded`(identifiersSearchRequest: IdentifiersSearchRequest) {
         try {
             val result = poolClient.bpns.findBpnsByIdentifiers(identifiersSearchRequest)
@@ -123,23 +103,5 @@ class TestHelpers(
         } catch (e: WebClientResponseException) {
             Assert.assertEquals(HttpStatus.NOT_FOUND, e.statusCode)
         }
-    }
-
-    fun `get site by bpn-s, not found`(bpn: String) {
-        try {
-            val result = poolClient.sites.getSite(bpn)
-            assertThrows<WebClientResponseException> { result }
-        } catch (e: WebClientResponseException) {
-            Assert.assertEquals(HttpStatus.NOT_FOUND, e.statusCode)
-        }
-    }
-
-    fun <ERROR : ErrorCode> assertErrorResponse(errorResponse: ErrorInfo<ERROR>, codeToCheck: ERROR, keyToCheck: String) {
-        Assertions.assertThat(errorResponse.entityKey).isEqualTo(keyToCheck)
-        Assertions.assertThat(errorResponse.errorCode).isEqualTo(codeToCheck)
-    }
-
-    private fun createBpnPattern(typeId: Char): String {
-        return "${bpnConfigProperties.id}$typeId[${bpnConfigProperties.alphabet}]{${bpnConfigProperties.counterDigits + 2}}"
     }
 }

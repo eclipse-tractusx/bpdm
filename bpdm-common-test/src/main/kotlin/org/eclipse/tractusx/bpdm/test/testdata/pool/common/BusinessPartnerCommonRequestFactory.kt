@@ -33,9 +33,9 @@ import java.time.ZoneOffset
 import kotlin.random.Random
 
 abstract class BusinessPartnerCommonRequestFactory(
-    private val availableAddressIdentifiers: Collection<String>,
-    private val availableAdminAreas: Collection<String>,
-    private val availableScriptCodes: Collection<String>
+    protected val availableAddressIdentifiers: Collection<String>,
+    protected val availableAdminAreas: Collection<String>,
+    protected val availableScriptCodes: Collection<String>
 ) {
 
     fun buildSiteCreateRequest(seed: String, legalEntityParent: LegalEntityPartnerCreateVerboseDto): SitePartnerCreateRequest {
@@ -147,7 +147,7 @@ abstract class BusinessPartnerCommonRequestFactory(
                 AddressStateDto(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
                 AddressStateDto(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
             ),
-            identifiers = (1 ..2.coerceAtMost(availableAddressIdentifiers.size)).map { createAddressIdentifier(seed, it, random) },
+            identifiers = (1 ..2.coerceAtMost(availableAddressIdentifiers.size)).map { buildAddressIdentifier(seed, it, random) },
             physicalPostalAddress = PhysicalPostalAddressDto(
                 geographicCoordinates = GeoCoordinateDto(longitude = random.nextDouble(), latitude = random.nextDouble(), altitude = random.nextDouble()),
                 country = CountryCode.entries.random(random),
@@ -186,17 +186,17 @@ abstract class BusinessPartnerCommonRequestFactory(
                 deliveryServiceQualifier = "Delivery Service Qualifier $seed"
             ),
             confidenceCriteria = ConfidenceCriteriaDto(
-                sharedByOwner = true,
+                sharedByOwner = false,
                 checkedByExternalDataSource = false,
-                numberOfSharingMembers = 2,
+                numberOfSharingMembers = 0,
                 lastConfidenceCheckAt = timeStamp.plusDays(10),
                 nextConfidenceCheckAt = timeStamp.plusDays(20),
-                confidenceLevel = 5
+                confidenceLevel = 0
             )
         )
     }
 
-    fun createAddressIdentifier(seed: String, index: Int, random: Random = Random("$seed $index".hashCode().toLong())): AddressIdentifierDto{
+    fun buildAddressIdentifier(seed: String, index: Int = 0, random: Random = Random("$seed $index".hashCode().toLong())): AddressIdentifierDto{
         val idKey = availableAddressIdentifiers.random(random)
         return AddressIdentifierDto("$idKey Value $seed $index", idKey)
     }
@@ -260,7 +260,7 @@ abstract class BusinessPartnerCommonRequestFactory(
         )
     }
 
-    private fun buildScriptVariantStringValue(name: String, seed: String, scriptCode: String): String{
+    protected fun buildScriptVariantStringValue(name: String, seed: String, scriptCode: String): String{
         return "$name $seed Variant $scriptCode"
     }
 }

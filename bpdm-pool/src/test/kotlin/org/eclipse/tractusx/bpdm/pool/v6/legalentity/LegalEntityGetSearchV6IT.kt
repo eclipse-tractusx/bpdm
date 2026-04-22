@@ -22,10 +22,10 @@ package org.eclipse.tractusx.bpdm.pool.v6.legalentity
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntitySearchRequest
-import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolV6Test
+import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolTestBaseV6
 import org.junit.jupiter.api.Test
 
-class LegalEntityGetSearchV6IT: UnscheduledPoolV6Test()
+class LegalEntityGetSearchV6IT: UnscheduledPoolTestBaseV6()
 {
     /**
      * GIVEN legal entities

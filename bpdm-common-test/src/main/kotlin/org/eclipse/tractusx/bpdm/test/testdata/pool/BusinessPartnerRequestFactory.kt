@@ -22,7 +22,6 @@ package org.eclipse.tractusx.bpdm.test.testdata.pool
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.test.testdata.pool.common.BusinessPartnerCommonRequestFactory
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -35,7 +34,7 @@ import kotlin.random.Random
  * Other request data should be handled directly inside the test classes
  */
 class BusinessPartnerRequestFactory(
-    availableMetadata: TestMetadata
+    availableMetadata: TestMetadataV7
 ): BusinessPartnerCommonRequestFactory(
     availableMetadata.addressIdentifierTypes.map { it.technicalKey },
     availableMetadata.adminAreas.map { it.code },
@@ -43,7 +42,6 @@ class BusinessPartnerRequestFactory(
 ) {
     private val availableLegalForms = availableMetadata.legalForms.map { it.technicalKey }
     private val availableLegalEntityIdentifiers = availableMetadata.legalEntityIdentifierTypes.map { it.technicalKey }
-    private val availableScriptCodes = availableMetadata.scriptCodes.map { it.technicalKey }
 
     fun createLegalEntityRequest(
         seed: String,
@@ -55,16 +53,6 @@ class BusinessPartnerRequestFactory(
         return LegalEntityPartnerCreateRequest(
             legalEntity = createLegalEntityDto(seed, random, isParticipantData),
             index = seed
-        )
-    }
-
-    fun createLegalEntityUpdateRequest(seed: String, bpnl: String): LegalEntityPartnerUpdateRequest {
-        val longSeed = seed.hashCode().toLong()
-        val random = Random(longSeed)
-
-        return LegalEntityPartnerUpdateRequest(
-            bpnl = bpnl,
-            legalEntity = createLegalEntityDto(seed, random)
         )
     }
 
