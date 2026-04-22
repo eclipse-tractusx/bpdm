@@ -21,28 +21,14 @@ package org.eclipse.tractusx.bpdm.pool.v6.util.metadata
 
 import com.neovisionaries.i18n.CountryCode
 import com.neovisionaries.i18n.LanguageCode
-import com.opencsv.bean.CsvToBeanBuilder
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalFormDto
-import org.springframework.core.io.Resource
-import java.io.InputStreamReader
+import org.eclipse.tractusx.bpdm.pool.util.metadata.LegalFormEntryImporter
 
 class LegalFormImporterV6(
-    private val legalFormResource: Resource
+    private val legalFormEntryImporter: LegalFormEntryImporter
 ) {
     fun importFromResource(): List<LegalFormDto>{
-        val reader = InputStreamReader(legalFormResource.inputStream)
-        val rows = CsvToBeanBuilder<LegalFormEntry>(reader)
-            .withType(LegalFormEntry::class.java)
-            .withIgnoreLeadingWhiteSpace(true)
-            .build()
-            .parse()
-
-        val uniqueRows = rows
-            .filterNotNull()
-            .filter { it.elfCode?.takeIf { it.isNotBlank() } != null }
-            .filter { it.name?.takeIf { it.isNotBlank() } != null }
-            .groupBy { it.elfCode }
-            .map { (_, group) -> group.first() }
+        val uniqueRows = legalFormEntryImporter.importFromResource()
         val legalForms = uniqueRows.map { entry ->
             LegalFormDto(
                 technicalKey = entry.elfCode!!,

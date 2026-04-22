@@ -22,10 +22,10 @@ package org.eclipse.tractusx.bpdm.pool.v6.site
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteSearchRequest
-import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolV6Test
+import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolTestBaseV6
 import org.junit.jupiter.api.Test
 
-class SiteSearchV6IT: UnscheduledPoolV6Test() {
+class SiteSearchV6IT: UnscheduledPoolTestBaseV6() {
 
     /**
      * GIVEN sites

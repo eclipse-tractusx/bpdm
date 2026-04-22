@@ -37,4 +37,6 @@ data class LegalEntityWithLegalAddressVerboseDto(
     val legalAddress: LogisticAddressInvariantVerboseDto,
 
     val scriptVariants: List<LegalEntityScriptVariantDto> = emptyList()
-)
+){
+    companion object
+}

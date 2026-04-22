@@ -30,10 +30,10 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateRes
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerUpdateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SiteWithMainAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.controller.v6.LegalEntityLegacyServiceMapper
-import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolV6Test
+import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolTestBaseV6
 import org.junit.jupiter.api.Test
 
-class SiteUpdateV6IT: UnscheduledPoolV6Test() {
+class SiteUpdateV6IT: UnscheduledPoolTestBaseV6() {
 
     /**
      * GIVEN site
@@ -239,7 +239,7 @@ class SiteUpdateV6IT: UnscheduledPoolV6Test() {
 
         //WHEN
         val siteRequest = with(testDataFactory.request.createSiteUpdateRequest("New Site $testName", siteCreateResponse)){
-            copy(site = site.copy(mainAddress = site.mainAddress.copy(identifiers = (1 .. 101).map { testDataFactory.request.createAddressIdentifier(testName, it) })))
+            copy(site = site.copy(mainAddress = site.mainAddress.copy(identifiers = (1 .. 101).map { testDataFactory.request.buildAddressIdentifier(testName, it) })))
         }
         val siteResponse = poolClient.sites.updateSite(listOf(siteRequest))
 

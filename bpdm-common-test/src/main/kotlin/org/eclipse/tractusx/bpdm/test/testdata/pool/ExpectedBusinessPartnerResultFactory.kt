@@ -34,7 +34,7 @@ import java.time.Instant
  * This class contains functionality for creating expected results for business partner data
  */
 class ExpectedBusinessPartnerResultFactory(
-    expectedMetadata: TestMetadata
+    expectedMetadata: TestMetadataV7
 ) {
     private val expectedAdminAreasLevel1: Collection<CountrySubdivisionDto> = expectedMetadata.adminAreas
     private val expectedLegalForms: Collection<LegalFormDto> = expectedMetadata.legalForms
@@ -86,12 +86,6 @@ class ExpectedBusinessPartnerResultFactory(
         )
     }
 
-    fun mapToExpectedSites(
-        hierarchy: LegalEntityHierarchy
-    ): List<SiteWithMainAddressVerboseDto> {
-        return hierarchy.getAllSites().map { mapToExpectedSite(it, hierarchy.legalEntity.legalEntity.header.isParticipantData) }
-    }
-
     fun mapToExpectedSite(
         givenRequest: SitePartnerCreateRequest,
         isCatenaXMemberData: Boolean,
@@ -127,61 +121,6 @@ class ExpectedBusinessPartnerResultFactory(
                 addressCreatedAt,
                 addressUpdatedAt
             )
-        )
-    }
-
-    fun mapToExpectedAddresses(
-        hierarchy: LegalEntityHierarchy
-    ): List<LogisticAddressInvariantVerboseDto> {
-        val isCxMember = hierarchy.legalEntity.legalEntity.header.isParticipantData
-        val legalEntityAdditionalAddresses = hierarchy.addresses
-        val siteAdditionalAddressesWithBpnl = hierarchy.siteHierarchy
-            .flatMap{ siteHierarchy -> siteHierarchy.addresses.map { Pair(it, siteHierarchy.site.bpnlParent) } }
-
-        return listOf(mapLegalEntityToExpectedLegalAddress(hierarchy.legalEntity))
-            .plus(hierarchy.getAllSites().map { mapSiteToExpectedSiteMainAddress(it, isCxMember) })
-            .plus(legalEntityAdditionalAddresses.map { mapToExpectedAdditionalAddress(it,isCxMember) })
-            .plus(siteAdditionalAddressesWithBpnl.map { (additionalAddress, bpnl) -> mapToExpectedAdditionalAddress(additionalAddress, isCxMember, bpnLegalEntityOverwrite = bpnl) })
-    }
-
-    fun mapLegalEntityToExpectedLegalAddress(
-        givenRequest: LegalEntityPartnerCreateRequest,
-        givenBpnA: String = StringIgnoreComparator.IGNORE_STRING,
-        bpnLegalEntity: String = StringIgnoreComparator.IGNORE_STRING,
-        createdAt: Instant = Instant.MIN,
-        updatedAt: Instant = createdAt,
-        isMaintainConfidences: Boolean = false
-    ): LogisticAddressInvariantVerboseDto {
-        return mapToExpectedResult(
-            givenRequest = givenRequest.legalEntity.legalAddress,
-            givenBpnA = givenBpnA,
-            bpnLegalEntity = bpnLegalEntity,
-            bpnSite = null,
-            addressType = AddressType.LegalAddress,
-            isCatenaXMemberData = givenRequest.legalEntity.header.isParticipantData,
-            createdAt = createdAt,
-            updatedAt = updatedAt,
-            isMaintainConfidences = isMaintainConfidences
-        )
-    }
-
-    fun mapSiteToExpectedSiteMainAddress(
-        givenRequest: SitePartnerCreateRequest,
-        isCatenaXMemberData: Boolean,
-        givenBpnA: String = StringIgnoreComparator.IGNORE_STRING,
-        bpnSite: String = StringIgnoreComparator.IGNORE_STRING,
-        createdAt: Instant = Instant.MIN,
-        updatedAt: Instant = createdAt
-    ): LogisticAddressInvariantVerboseDto {
-        return mapToExpectedResult(
-            givenRequest = givenRequest.site.mainAddress,
-            givenBpnA = givenBpnA,
-            bpnLegalEntity = givenRequest.bpnlParent,
-            bpnSite = bpnSite,
-            addressType = AddressType.SiteMainAddress,
-            isCatenaXMemberData = isCatenaXMemberData,
-            createdAt = createdAt,
-            updatedAt = updatedAt
         )
     }
 

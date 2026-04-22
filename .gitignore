@@ -29,3 +29,5 @@ application-developer.yml
 .flattened-pom.xml
 #Mac
 **/.DS_Store
+#Claude Code
+CLAUDE.md
