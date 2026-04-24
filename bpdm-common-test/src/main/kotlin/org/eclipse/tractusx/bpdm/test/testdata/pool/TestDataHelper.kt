@@ -23,12 +23,6 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.request.ReasonCodeUpsertRequest
-import org.eclipse.tractusx.bpdm.test.util.Timeframe
-import java.time.Instant
-
-fun List<LegalEntityHierarchy>.getAllLegalEntities() = map { it.legalEntity }
-fun List<LegalEntityHierarchy>.getAllSites() = flatMap { it.getAllSites() }
-fun List<LegalEntityHierarchy>.getAllAddresses() = flatMap { it.getAllAddresses() }
 
 /**
  * This class provides functionality to create a [TestDataEnvironment] to support creating and comparing business partner data
@@ -44,58 +38,29 @@ class PoolDataHelper(
         val addressIdentifierTypes = poolClient.metadata.getIdentifierTypes(PaginationRequest(), IdentifierBusinessPartnerType.ADDRESS, null).content.toList()
         val legalForms = poolClient.metadata.getLegalForms(PaginationRequest()).content.toList()
         val adminAreas = poolClient.metadata.getAdminAreasLevel1(PaginationRequest()).content.toList()
+        val scriptCodes = poolClient.metadata.getScriptCodes(PaginationRequest()).content.toList()
 
         reasonCodes.forEach { poolClient.metadata.upsertReasonCode(ReasonCodeUpsertRequest(it)) }
 
-        val testMetadata = TestMetadata(legalForms, legalEntityIdentifierTypes, addressIdentifierTypes, adminAreas, reasonCodes)
+        val testMetadata = TestMetadataV7(legalForms, legalEntityIdentifierTypes, addressIdentifierTypes, adminAreas, scriptCodes, reasonCodes)
 
         val requestFactory = BusinessPartnerRequestFactory(testMetadata)
         val expectedResultFactory = ExpectedBusinessPartnerResultFactory(testMetadata)
 
         return TestDataEnvironment(testMetadata, requestFactory, expectedResultFactory)
     }
-
-    fun createBusinessPartnerHierarchies(hierarchies: List<LegalEntityHierarchy>): HierarchyCreationResponse {
-        val startCreationTime = Instant.now()
-
-        val bpnlsByIndex =
-            poolClient.legalEntities.createBusinessPartners(hierarchies.getAllLegalEntities()).entities.associate { Pair(it.index, it.legalEntity.bpnl) }
-                .toMap()
-
-        val hierarchiesWithBpnL = hierarchies.map { hierarchy ->
-            val bpnl = bpnlsByIndex[hierarchy.legalEntity.index]!!
-            hierarchy.setParentBpnl(bpnl)
-        }
-
-        val bpnsByIndex = poolClient.sites.createSite(hierarchiesWithBpnL.getAllSites()).entities.associate { Pair(it.index, it.site.bpns) }.toMap()
-
-        val hierarchiesWithBpnS = hierarchiesWithBpnL.map { hierarchy ->
-            hierarchy.copy(siteHierarchy = hierarchy.siteHierarchy.map { it.setParentBpns(bpnsByIndex[it.site.index]!!) })
-        }
-
-        poolClient.addresses.createAddresses(hierarchiesWithBpnS.getAllAddresses())
-
-        val endCreationTime = Instant.now()
-
-        return HierarchyCreationResponse(hierarchiesWithBpnS, Timeframe(startCreationTime, endCreationTime))
-    }
 }
-
-data class HierarchyCreationResponse(
-    val hierarchiesWithBpns: List<LegalEntityHierarchy>,
-    val creationTimeframe: Timeframe
-)
-
 data class TestDataEnvironment(
-    val metadata: TestMetadata,
+    val metadata: TestMetadataV7,
     val requestFactory: BusinessPartnerRequestFactory,
     val expectFactory: ExpectedBusinessPartnerResultFactory
 )
 
-data class TestMetadata(
+data class TestMetadataV7(
     val legalForms: List<LegalFormDto>,
     val legalEntityIdentifierTypes: List<IdentifierTypeDto>,
     val addressIdentifierTypes: List<IdentifierTypeDto>,
     val adminAreas: List<CountrySubdivisionDto>,
+    val scriptCodes: List<ScriptCodeDto>,
     val reasonCodes: List<ReasonCodeDto>
 )

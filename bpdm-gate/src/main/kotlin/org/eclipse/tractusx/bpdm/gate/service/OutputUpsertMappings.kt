@@ -23,13 +23,17 @@ import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.eclipse.tractusx.bpdm.gate.entity.generic.*
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.*
+import org.eclipse.tractusx.orchestrator.api.model.AddressGoldenRecordRelation
+import org.eclipse.tractusx.orchestrator.api.model.LegalEntityGoldenRecordRelation
 import org.springframework.stereotype.Service
 
 @Service
-class OutputUpsertMappings {
+class OutputUpsertMappings(
+    private val businessPartnerMappings: BusinessPartnerMappings
+) {
 
     fun toEntity(upsertData: OutputUpsertData, sharingState: SharingStateDb): BusinessPartnerDb {
-        return with(upsertData) {
+        val businessPartner =  with(upsertData) {
             BusinessPartnerDb(
                 sharingState = sharingState,
                 stage = StageType.Output,
@@ -52,7 +56,31 @@ class OutputUpsertMappings {
                 addressConfidence = addressConfidence.toEntity()
             )
         }
+
+        val scriptVariants = upsertData.scriptVariants.map { variant ->  businessPartnerMappings.toScriptVariantDb(businessPartner, variant) }
+        scriptVariants.forEach { businessPartner.scriptVariants.add(it) }
+
+        upsertData.legalEntityGoldenRecordRelations.map { toLegalEntityGoldenRecordRelation(it) }
+            .forEach { businessPartner.legalEntityGoldenRecordRelations.add(it) }
+        upsertData.addressGoldenRecordRelations.map { toAddressGoldenRecordRelation(it) }
+            .forEach { businessPartner.addressGoldenRecordRelations.add(it) }
+
+        return businessPartner
     }
+
+    private fun toLegalEntityGoldenRecordRelation(relation: LegalEntityGoldenRecordRelation) =
+        LegalEntityGoldenRecordRelationDb(
+            relationType = relation.relationType,
+            sourceBpn = relation.sourceBpn,
+            targetBpn = relation.targetBpn
+        )
+
+    private fun toAddressGoldenRecordRelation(relation: AddressGoldenRecordRelation) =
+        AddressGoldenRecordRelationDb(
+            relationType = relation.relationType,
+            sourceBpn = relation.sourceBpn,
+            targetBpn = relation.targetBpn
+        )
 
     private fun Identifier.toEntity() =
         IdentifierDb(type = type, value = value, issuingBody = issuingBody, businessPartnerType = businessPartnerType)

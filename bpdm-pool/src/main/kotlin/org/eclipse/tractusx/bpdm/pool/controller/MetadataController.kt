@@ -89,4 +89,9 @@ class MetadataController(
        metadataService.deleteReasonCode(request)
     }
 
+    @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
+    override fun getScriptCodes(paginationRequest: PaginationRequest): PageDto<ScriptCodeDto> {
+       return metadataService.getScriptCodes(paginationRequest)
+    }
+
 }

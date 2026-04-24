@@ -27,4 +27,4 @@ bpdm:
 spring:
   datasource:
     hikari:
-      maximum-pool-size: 5
+      maximum-pool-size: 2

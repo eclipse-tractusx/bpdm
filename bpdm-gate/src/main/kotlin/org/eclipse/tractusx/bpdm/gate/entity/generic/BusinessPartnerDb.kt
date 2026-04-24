@@ -23,6 +23,7 @@ import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 import org.eclipse.tractusx.bpdm.common.model.StageType
+import org.eclipse.tractusx.bpdm.gate.entity.BusinessPartnerScriptVariantDb
 import org.eclipse.tractusx.bpdm.gate.entity.SharingStateDb
 import java.time.Instant
 import java.util.*
@@ -102,7 +103,15 @@ class BusinessPartnerDb(
     var addressConfidence: ConfidenceCriteriaDb?,
 
     @Column(name = "external_sequence_timestamp")
-    var externalSequenceTimestamp: Instant? = null
+    var externalSequenceTimestamp: Instant? = null,
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "business_partners_le_golden_record_relations", joinColumns = [JoinColumn(name = "business_partner_id")])
+    val legalEntityGoldenRecordRelations: MutableList<LegalEntityGoldenRecordRelationDb> = mutableListOf(),
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "business_partners_address_golden_record_relations", joinColumns = [JoinColumn(name = "business_partner_id")])
+    val addressGoldenRecordRelations: MutableList<AddressGoldenRecordRelationDb> = mutableListOf()
 
     ) : BaseEntity() {
 
@@ -117,5 +126,8 @@ class BusinessPartnerDb(
                 addressConfidence = null
             )
     }
+
+    @OneToMany(fetch = FetchType.EAGER, cascade = [CascadeType.ALL], orphanRemoval = true, mappedBy = "businessPartner")
+    val scriptVariants: MutableList<BusinessPartnerScriptVariantDb> = mutableListOf()
 }
 

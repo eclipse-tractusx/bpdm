@@ -72,7 +72,7 @@ class DataSpaceParticipantsControllerIT @Autowired constructor(
         val actualMemberships = poolClient.participants.get(DataSpaceParticipantSearchRequest(), PaginationRequest(size = legalEntityRequests.size)).content
 
         val expectedMemberships = legalEntityRequests.zip(bpnLsToFind)
-            .map { (request, bpnL) -> DataSpaceParticipantDto(bpnL, request.legalEntity.isParticipantData) }
+            .map { (request, bpnL) -> DataSpaceParticipantDto(bpnL, request.legalEntity.header.isParticipantData) }
 
 
         assertThat(actualMemberships).isEqualTo(expectedMemberships)
@@ -94,7 +94,7 @@ class DataSpaceParticipantsControllerIT @Autowired constructor(
 
 
         val expectedMembershipsTotal =  legalEntityRequests.zip(bpnLsToFind)
-            .map { (request, bpnL) -> DataSpaceParticipantDto(bpnL, request.legalEntity.isParticipantData) }
+            .map { (request, bpnL) -> DataSpaceParticipantDto(bpnL, request.legalEntity.header.isParticipantData) }
 
         val expectedMembershipsPage1 = expectedMembershipsTotal.take(2)
         val expectedMembershipsPage2 = expectedMembershipsTotal.drop(2).take(2)
@@ -121,7 +121,7 @@ class DataSpaceParticipantsControllerIT @Autowired constructor(
         val actualMemberships = poolClient.participants.get(DataSpaceParticipantSearchRequest(bpnLsToFind), PaginationRequest()).content
 
         val expectedMemberships = legalEntitiesToFind.zip(bpnLsToFind)
-            .map { (request, bpnL) -> DataSpaceParticipantDto(bpnL, request.legalEntity.isParticipantData) }
+            .map { (request, bpnL) -> DataSpaceParticipantDto(bpnL, request.legalEntity.header.isParticipantData) }
 
 
         assertThat(actualMemberships).isEqualTo(expectedMemberships)
@@ -145,7 +145,7 @@ class DataSpaceParticipantsControllerIT @Autowired constructor(
         val actualMemberships = poolClient.participants.get(DataSpaceParticipantSearchRequest(isDataSpaceParticipant = true), PaginationRequest()).content
 
         val expectedMemberships = legalEntitiesToFind.zip(bpnLsToFind)
-            .map { (request, bpnL) -> DataSpaceParticipantDto(bpnL, request.legalEntity.isParticipantData) }
+            .map { (request, bpnL) -> DataSpaceParticipantDto(bpnL, request.legalEntity.header.isParticipantData) }
 
 
         assertThat(actualMemberships).isEqualTo(expectedMemberships)
@@ -170,7 +170,7 @@ class DataSpaceParticipantsControllerIT @Autowired constructor(
         val actualMemberships = poolClient.participants.get(DataSpaceParticipantSearchRequest(isDataSpaceParticipant = false), PaginationRequest()).content
 
         val expectedMemberships = legalEntitiesToFind.zip(bpnLsToFind)
-            .map { (request, bpnL) -> DataSpaceParticipantDto(bpnL, request.legalEntity.isParticipantData) }
+            .map { (request, bpnL) -> DataSpaceParticipantDto(bpnL, request.legalEntity.header.isParticipantData) }
 
 
         assertThat(actualMemberships).isEqualTo(expectedMemberships)
@@ -194,7 +194,7 @@ class DataSpaceParticipantsControllerIT @Autowired constructor(
         val actualMemberships = poolClient.participants.get(DataSpaceParticipantSearchRequest(bpnLs = bpnLsToFind, isDataSpaceParticipant = true), PaginationRequest()).content
 
         val expectedMemberships = legalEntitiesToFind.zip(bpnLsToFind)
-            .map { (request, bpnL) -> DataSpaceParticipantDto(bpnL, request.legalEntity.isParticipantData) }
+            .map { (request, bpnL) -> DataSpaceParticipantDto(bpnL, request.legalEntity.header.isParticipantData) }
 
 
         assertThat(actualMemberships).isEqualTo(expectedMemberships)
@@ -218,7 +218,7 @@ class DataSpaceParticipantsControllerIT @Autowired constructor(
         val actualMemberships = poolClient.participants.get(DataSpaceParticipantSearchRequest(bpnLs = bpnLsToFind, isDataSpaceParticipant = false), PaginationRequest()).content
 
         val expectedMemberships = legalEntitiesToFind.zip(bpnLsToFind)
-            .map { (request, bpnL) -> DataSpaceParticipantDto(bpnL, request.legalEntity.isParticipantData) }
+            .map { (request, bpnL) -> DataSpaceParticipantDto(bpnL, request.legalEntity.header.isParticipantData) }
 
 
         assertThat(actualMemberships).isEqualTo(expectedMemberships)
@@ -235,7 +235,7 @@ class DataSpaceParticipantsControllerIT @Autowired constructor(
         val givenLegalEntities = poolClient.legalEntities.createBusinessPartners(legalEntityRequests).entities
         val givenBpnLs = getBpnLs(legalEntityRequests, givenLegalEntities)
 
-        val membershipUpdates = legalEntityRequests.zip(givenBpnLs).map { (request, bpnL) -> DataSpaceParticipantDto(bpnL, !request.legalEntity.isParticipantData) }
+        val membershipUpdates = legalEntityRequests.zip(givenBpnLs).map { (request, bpnL) -> DataSpaceParticipantDto(bpnL, !request.legalEntity.header.isParticipantData) }
         poolClient.participants.put(DataSpaceParticipantUpdateRequest(membershipUpdates))
 
         val actualMemberships = poolClient.participants.get(DataSpaceParticipantSearchRequest(), PaginationRequest()).content
@@ -250,7 +250,7 @@ class DataSpaceParticipantsControllerIT @Autowired constructor(
      */
     private fun getBpnLs(requests: List<LegalEntityPartnerCreateRequest>, givenLegalEntities: Collection<LegalEntityPartnerCreateVerboseDto>): List<String>{
         return givenLegalEntities
-            .associate { Pair(it.index, it.legalEntity.bpnl) }
+            .associate { Pair(it.index, it.legalEntity.header.bpnl) }
             .let { bpnLsByIndex ->  requests.map { bpnLsByIndex[it.index]!! } }
     }
 

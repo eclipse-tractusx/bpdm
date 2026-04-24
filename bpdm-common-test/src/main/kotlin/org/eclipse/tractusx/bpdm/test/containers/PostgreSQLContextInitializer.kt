@@ -24,14 +24,20 @@ import org.springframework.boot.test.util.TestPropertyValues
 import org.springframework.context.ApplicationContextInitializer
 import org.springframework.context.ConfigurableApplicationContext
 import org.testcontainers.containers.Network
-import org.testcontainers.containers.PostgreSQLContainer
+import org.testcontainers.postgresql.PostgreSQLContainer
+import org.testcontainers.utility.DockerImageName
 
 /**
  * When used on a spring boot test, starts a singleton postgres db container that is shared between all integration tests.
  */
 class PostgreSQLContextInitializer : ApplicationContextInitializer<ConfigurableApplicationContext> {
     companion object {
-        val postgreSQLContainer = PostgreSQLContainer("postgres:15.4")
+        val postgreSQLContainer = PostgreSQLContainer(
+            DockerImageName
+                .parse("docker.io/postgres:18.3@sha256:a9abf4275f9e99bff8e6aed712b3b7dfec9cac1341bba01c1ffdfce9ff9fc34a")
+                .asCompatibleSubstituteFor("postgres")
+            )
+            .withCommand("-c max_connections=200")
             .withAccessToHost(true)
             .withNetwork(Network.SHARED)
     }

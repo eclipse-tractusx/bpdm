@@ -34,7 +34,7 @@ import java.time.Instant
  * This class contains functionality for creating expected results for business partner data
  */
 class ExpectedBusinessPartnerResultFactory(
-    expectedMetadata: TestMetadata
+    expectedMetadata: TestMetadataV7
 ) {
     private val expectedAdminAreasLevel1: Collection<CountrySubdivisionDto> = expectedMetadata.adminAreas
     private val expectedLegalForms: Collection<LegalFormDto> = expectedMetadata.legalForms
@@ -53,8 +53,8 @@ class ExpectedBusinessPartnerResultFactory(
         isMaintainConfidences: Boolean = false
     ): LegalEntityWithLegalAddressVerboseDto {
         return LegalEntityWithLegalAddressVerboseDto(
-            legalEntity = with(givenRequest.legalEntity) {
-                LegalEntityVerboseDto(
+            header = with(givenRequest.legalEntity.header) {
+                LegalEntityHeaderVerboseDto(
                     bpnl = givenBpnL,
                     legalName = legalName,
                     legalShortName = legalShortName,
@@ -73,22 +73,17 @@ class ExpectedBusinessPartnerResultFactory(
                 )
             },
             legalAddress = mapToExpectedResult(
-                givenRequest.legalAddress,
+                givenRequest.legalEntity.legalAddress,
                 givenBpnA,
                 givenBpnL,
                 null,
                 AddressType.LegalAddress,
-                givenRequest.legalEntity.isParticipantData,
+                givenRequest.legalEntity.header.isParticipantData,
                 addressCreatedAt,
                 addressUpdatedAt
-            )
+            ),
+            scriptVariants = givenRequest.legalEntity.scriptVariants
         )
-    }
-
-    fun mapToExpectedSites(
-        hierarchy: LegalEntityHierarchy
-    ): List<SiteWithMainAddressVerboseDto> {
-        return hierarchy.getAllSites().map { mapToExpectedSite(it, hierarchy.legalEntity.legalEntity.isParticipantData) }
     }
 
     fun mapToExpectedSite(
@@ -110,6 +105,7 @@ class ExpectedBusinessPartnerResultFactory(
                     states = states.map { mapToExpectedResult(it) },
                     isParticipantData = isCatenaXMemberData,
                     bpnLegalEntity = givenRequest.bpnlParent,
+                    scriptVariants = scriptVariants,
                     createdAt = siteCreatedAt,
                     updatedAt = siteUpdatedAt,
                     confidenceCriteria = if(isMaintainConfidences) confidenceCriteria else mapToExpectedConfidence(confidenceCriteria, 1)
@@ -128,61 +124,6 @@ class ExpectedBusinessPartnerResultFactory(
         )
     }
 
-    fun mapToExpectedAddresses(
-        hierarchy: LegalEntityHierarchy
-    ): List<LogisticAddressVerboseDto> {
-        val isCxMember = hierarchy.legalEntity.legalEntity.isParticipantData
-        val legalEntityAdditionalAddresses = hierarchy.addresses
-        val siteAdditionalAddressesWithBpnl = hierarchy.siteHierarchy
-            .flatMap{ siteHierarchy -> siteHierarchy.addresses.map { Pair(it, siteHierarchy.site.bpnlParent) } }
-
-        return listOf(mapLegalEntityToExpectedLegalAddress(hierarchy.legalEntity))
-            .plus(hierarchy.getAllSites().map { mapSiteToExpectedSiteMainAddress(it, isCxMember) })
-            .plus(legalEntityAdditionalAddresses.map { mapToExpectedAdditionalAddress(it,isCxMember) })
-            .plus(siteAdditionalAddressesWithBpnl.map { (additionalAddress, bpnl) -> mapToExpectedAdditionalAddress(additionalAddress, isCxMember, bpnLegalEntityOverwrite = bpnl) })
-    }
-
-    fun mapLegalEntityToExpectedLegalAddress(
-        givenRequest: LegalEntityPartnerCreateRequest,
-        givenBpnA: String = StringIgnoreComparator.IGNORE_STRING,
-        bpnLegalEntity: String = StringIgnoreComparator.IGNORE_STRING,
-        createdAt: Instant = Instant.MIN,
-        updatedAt: Instant = createdAt,
-        isMaintainConfidences: Boolean = false
-    ): LogisticAddressVerboseDto {
-        return mapToExpectedResult(
-            givenRequest = givenRequest.legalAddress,
-            givenBpnA = givenBpnA,
-            bpnLegalEntity = bpnLegalEntity,
-            bpnSite = null,
-            addressType = AddressType.LegalAddress,
-            isCatenaXMemberData = givenRequest.legalEntity.isParticipantData,
-            createdAt = createdAt,
-            updatedAt = updatedAt,
-            isMaintainConfidences = isMaintainConfidences
-        )
-    }
-
-    fun mapSiteToExpectedSiteMainAddress(
-        givenRequest: SitePartnerCreateRequest,
-        isCatenaXMemberData: Boolean,
-        givenBpnA: String = StringIgnoreComparator.IGNORE_STRING,
-        bpnSite: String = StringIgnoreComparator.IGNORE_STRING,
-        createdAt: Instant = Instant.MIN,
-        updatedAt: Instant = createdAt
-    ): LogisticAddressVerboseDto {
-        return mapToExpectedResult(
-            givenRequest = givenRequest.site.mainAddress,
-            givenBpnA = givenBpnA,
-            bpnLegalEntity = givenRequest.bpnlParent,
-            bpnSite = bpnSite,
-            addressType = AddressType.SiteMainAddress,
-            isCatenaXMemberData = isCatenaXMemberData,
-            createdAt = createdAt,
-            updatedAt = updatedAt
-        )
-    }
-
     fun mapToExpectedAdditionalAddress(
         givenRequest: AddressPartnerCreateRequest,
         isCatenaXMemberData: Boolean,
@@ -191,7 +132,7 @@ class ExpectedBusinessPartnerResultFactory(
         createdAt: Instant = Instant.MIN,
         updatedAt: Instant = createdAt,
         isMaintainConfidences: Boolean = false
-    ): LogisticAddressVerboseDto {
+    ): LogisticAddressInvariantVerboseDto {
         return mapToExpectedResult(
             givenRequest = givenRequest.address,
             givenBpnA = givenBpnA,
@@ -215,9 +156,9 @@ class ExpectedBusinessPartnerResultFactory(
         createdAt: Instant,
         updatedAt: Instant,
         isMaintainConfidences: Boolean = false
-    ): LogisticAddressVerboseDto {
+    ): LogisticAddressInvariantVerboseDto {
         return with(givenRequest) {
-            LogisticAddressVerboseDto(
+            LogisticAddressInvariantVerboseDto(
                 bpna = givenBpnA,
                 name = name,
                 states = states.map { mapToExpectedResult(it) },

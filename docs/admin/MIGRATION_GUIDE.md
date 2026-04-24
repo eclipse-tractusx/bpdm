@@ -10,6 +10,9 @@
     * [No required operator actions](#no-required-operator-actions)
     * [Reason Codes](#reason-codes)
   * [7.2.x to 7.3.x](#72x-to-73x)
+    * [Postgres Upgrade (BREAKING)](#postgres-upgrade-breaking)
+    * [Keycloak Upgrade (BREAKING)](#keycloak-upgrade-breaking)
+  * [7.2.x to 7.3.x](#72x-to-73x-1)
     * [Automatic Confidence Level](#automatic-confidence-level)
   * [7.1.x to 7.2.x](#71x-to-72x)
     * [Alternative Headquarters Restriction](#alternative-headquarters-restriction)
@@ -82,6 +85,26 @@ The list of available reason codes should be managed in the golden record Pool t
 > Very important:
 > Since reason codes are mandatory and there are no default reason codes this repository does not contain any migration scripts for existing relations.
 > Therefore, if there are already relations present in BPDM the operator needs to add migration scripts assigning reason codes to those relations.
+
+## 7.2.x to 7.3.x
+
+### Postgres Upgrade (BREAKING)
+
+The embedded Postgres of the BPDM Charts has been updated from 15 to 18.
+The subchart's vendor also changed from Bitnami to Cloudpirates so we expect not much of any backwards compatibility for Chart features.
+In order to migrate your data please consult the [Tractus-X common migration guide](https://github.com/eclipse-tractusx/tutorial-resources/blob/keycloak-migration/migration-guides/GENERIC_POSTGRESQL_MIGRATION_GUIDE.md).
+
+Please note that using the embedded Postgres for BPDM Chart deployments is discouraged for production use.
+We recommend to host an external Postgres database and alter the BPDM Chart configuration to access such database.
+
+### Keycloak Upgrade (BREAKING)
+
+The embedded Central-IDP dependency of the BPDM Charts has been replaced by a Cloudpirates Keycloak Chart.
+This means not only have the Chart features dramatically changed but also the Keycloak version is upgraded from 25 to 26.
+In order to migrate your data please consult the  [Tractus-X common migration guide](https://github.com/eclipse-tractusx/tutorial-resources/blob/keycloak-migration/migration-guides/GENERIC_BITNAMI_TO_CLOUDPIRATES_KEYCLOAK_MIGRATION_GUIDE.md).
+
+Please note that the embedded Keycloak is only meant for test and development purposes and absolutely not for production use.
+We recommend to host an external Central-IDP or common Keycloak instance and alter the BPDM Chart configuration to access it.
 
 ## 7.2.x to 7.3.x
 

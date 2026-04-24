@@ -59,7 +59,7 @@ class ExpectedGateResultV6Factory {
         }
     }
 
-    fun buildBusinessPartnerOutput(input: BusinessPartnerInputDto, goldenRecordLegalEntity: LegalEntityWithLegalAddressVerboseDto, siteGoldenRecord: SiteWithMainAddressVerboseDto, addressGoldenRecord: LogisticAddressVerboseDto): BusinessPartnerOutputDto{
+    fun buildBusinessPartnerOutput(input: BusinessPartnerInputDto, goldenRecordLegalEntity: LegalEntityWithLegalAddressVerboseDto, siteGoldenRecord: SiteWithMainAddressVerboseDto, addressGoldenRecord: LogisticAddressInvariantVerboseDto): BusinessPartnerOutputDto{
         return BusinessPartnerOutputDto(
             externalId = input.externalId,
             nameParts = input.nameParts,
@@ -67,7 +67,7 @@ class ExpectedGateResultV6Factory {
             states = addressGoldenRecord.states.map { BusinessPartnerStateDto(it.validFrom, it.validTo, it.type) },
             roles = input.roles,
             isOwnCompanyData = input.isOwnCompanyData,
-            legalEntity = buildLegalEntityRepresentation(goldenRecordLegalEntity.legalEntity),
+            legalEntity = buildLegalEntityRepresentation(goldenRecordLegalEntity.header),
             site = buildSiteRepresentation(siteGoldenRecord.site),
             address = buildAddressComponent(addressGoldenRecord, AddressType.AdditionalAddress),
             externalSequenceTimestamp = null,
@@ -98,7 +98,7 @@ class ExpectedGateResultV6Factory {
         )
     }
 
-    private fun buildLegalEntityRepresentation(legalEntity: LegalEntityVerboseDto): LegalEntityRepresentationOutputDto{
+    private fun buildLegalEntityRepresentation(legalEntity: LegalEntityHeaderVerboseDto): LegalEntityRepresentationOutputDto{
         return LegalEntityRepresentationOutputDto(
             legalEntityBpn = legalEntity.bpnl,
             legalName = legalEntity.legalName,
@@ -109,7 +109,7 @@ class ExpectedGateResultV6Factory {
         )
     }
 
-    private fun buildAddressComponent(logisticAddress: LogisticAddressVerboseDto, addressType: AddressType): AddressComponentOutputDto{
+    private fun buildAddressComponent(logisticAddress: LogisticAddressInvariantVerboseDto, addressType: AddressType): AddressComponentOutputDto{
         return AddressComponentOutputDto(
             addressBpn = logisticAddress.bpna,
             name = logisticAddress.name,

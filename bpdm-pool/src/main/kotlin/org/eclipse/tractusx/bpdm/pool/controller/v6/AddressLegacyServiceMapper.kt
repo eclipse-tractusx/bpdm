@@ -37,7 +37,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerCreate
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerCreateVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerUpdateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.controller.v6.LegalEntityLegacyServiceMapper.Companion.IDENTIFIER_AMOUNT_LIMIT
-import org.eclipse.tractusx.bpdm.pool.dto.AddressMetadataDto
+import org.eclipse.tractusx.bpdm.pool.dto.AddressInvariantMetadataDto
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
@@ -301,10 +301,11 @@ class AddressLegacyServiceMapper(
             emptyList()
     }
 
-    private fun AddressMetadataDto.toMapping() =
+    private fun AddressInvariantMetadataDto.toMapping() =
         AddressMetadataMapping(
             idTypes = idTypes.associateBy { it.technicalKey },
-            regions = regions.associateBy { it.regionCode }
+            regions = regions.associateBy { it.regionCode },
+            scriptCodes = emptyMap()
         )
 
     private fun createAddressesForSite(

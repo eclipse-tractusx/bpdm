@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
+## [4.4.0] - tbd
+
+- Increase appversion to 7.4.0
+- Remove Bitnami Postgres dependency [#1625](https://github.com/eclipse-tractusx/bpdm/issues/1625)
+
+## [4.3.0] - 2025-03-06
+
+- Increase appversion to 7.3.0
+
 ## [4.2.0] - 2025-12-1
 
 - Increase appversion to 7.2.0

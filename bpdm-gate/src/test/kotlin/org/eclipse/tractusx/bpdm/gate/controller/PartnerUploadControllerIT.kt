@@ -29,11 +29,12 @@ import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityRepresentationInputDto
+import org.eclipse.tractusx.bpdm.gate.auth.AuthAdminIT
 import org.eclipse.tractusx.bpdm.gate.util.MockAndAssertUtils
 import org.eclipse.tractusx.bpdm.pool.api.ApiCommons
 import org.eclipse.tractusx.bpdm.pool.api.model.ConfidenceCriteriaDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityHeaderVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressInvariantVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.PhysicalPostalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
@@ -69,7 +70,7 @@ import java.time.LocalDateTime
     initializers = [
         PostgreSQLContextInitializer::class,
         KeyCloakInitializer::class,
-        SelfClientAsPartnerUploaderInitializer::class
+        AuthAdminIT.SelfClientAsAdminInitializer::class
     ]
 )
 class PartnerUploadControllerIT @Autowired constructor(
@@ -196,7 +197,7 @@ class PartnerUploadControllerIT @Autowired constructor(
     }
 
     fun poolMockGetLegalEntitiesApi(tenantBpnl: String, legalName: String) {
-        val legalEntity1 = LegalEntityVerboseDto(
+        val legalEntity1 = LegalEntityHeaderVerboseDto(
             bpnl = tenantBpnl,
             legalName = legalName,
             legalShortName = null,
@@ -218,7 +219,7 @@ class PartnerUploadControllerIT @Autowired constructor(
             updatedAt = Instant.now()
         )
 
-        val legalAddress1 = LogisticAddressVerboseDto(
+        val legalAddress1 = LogisticAddressInvariantVerboseDto(
             bpna = "BPNA00000000009W",
             physicalPostalAddress = PhysicalPostalAddressVerboseDto(
                 geographicCoordinates = null,
@@ -255,7 +256,7 @@ class PartnerUploadControllerIT @Autowired constructor(
         val responseBody = PageDto(
             1, 1, 0, 1,
             listOf(
-                LegalEntityWithLegalAddressVerboseDto(legalEntity = legalEntity1, legalAddress = legalAddress1)
+                LegalEntityWithLegalAddressVerboseDto(header = legalEntity1, legalAddress = legalAddress1)
             )
         )
 
@@ -301,6 +302,6 @@ class PartnerUploadControllerIT @Autowired constructor(
 
 class SelfClientAsPartnerUploaderInitializer : SelfClientInitializer() {
     override val clientId: String
-        get() = "sa-cl7-cx-5"
+        get() = "BPDM_GATE"
 }
 

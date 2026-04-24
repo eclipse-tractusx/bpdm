@@ -35,9 +35,9 @@ class RefinementTestDataFactory {
     ): BusinessPartner{
         return BusinessPartner(
             nameParts = listOfNotNull(
-                NamePart(legalEntityGoldenRecord.legalEntity.legalName, NamePartType.LegalName),
-                legalEntityGoldenRecord.legalEntity.legalShortName?.let { NamePart(it, NamePartType.ShortName) },
-                legalEntityGoldenRecord.legalEntity.legalForm?.let { NamePart(it, NamePartType.LegalForm) }
+                NamePart(legalEntityGoldenRecord.header.legalName, NamePartType.LegalName),
+                legalEntityGoldenRecord.header.legalShortName?.let { NamePart(it, NamePartType.ShortName) },
+                legalEntityGoldenRecord.header.legalForm?.let { NamePart(it, NamePartType.LegalForm) }
             ),
             owningCompany = owningCompany,
             uncategorized = UncategorizedProperties.empty.copy(nameParts = nameParts),
@@ -56,9 +56,9 @@ class RefinementTestDataFactory {
     ): BusinessPartner{
         return BusinessPartner(
             nameParts = listOfNotNull(
-                NamePart(legalEntityGoldenRecord.legalEntity.legalName, NamePartType.LegalName),
-                legalEntityGoldenRecord.legalEntity.legalShortName?.let { NamePart(it, NamePartType.ShortName) },
-                legalEntityGoldenRecord.legalEntity.legalForm?.let { NamePart(it, NamePartType.LegalForm) }
+                NamePart(legalEntityGoldenRecord.header.legalName, NamePartType.LegalName),
+                legalEntityGoldenRecord.header.legalShortName?.let { NamePart(it, NamePartType.ShortName) },
+                legalEntityGoldenRecord.header.legalForm?.let { NamePart(it, NamePartType.LegalForm) }
             ),
             owningCompany = owningCompany,
             uncategorized = UncategorizedProperties.empty.copy(nameParts = nameParts),
@@ -76,9 +76,9 @@ class RefinementTestDataFactory {
     ): BusinessPartner{
         return BusinessPartner(
             nameParts = listOfNotNull(
-                NamePart(legalEntityGoldenRecord.legalEntity.legalName, NamePartType.LegalName),
-                legalEntityGoldenRecord.legalEntity.legalShortName?.let { NamePart(it, NamePartType.ShortName) },
-                legalEntityGoldenRecord.legalEntity.legalForm?.let { NamePart(it, NamePartType.LegalForm) },
+                NamePart(legalEntityGoldenRecord.header.legalName, NamePartType.LegalName),
+                legalEntityGoldenRecord.header.legalShortName?.let { NamePart(it, NamePartType.ShortName) },
+                legalEntityGoldenRecord.header.legalForm?.let { NamePart(it, NamePartType.LegalForm) },
                 siteGoldenRecord.site.name.let { NamePart(it, NamePartType.SiteName) },
             ),
             owningCompany = owningCompany,
@@ -98,32 +98,33 @@ class RefinementTestDataFactory {
     ): BusinessPartner{
         return BusinessPartner(
             nameParts = listOfNotNull(
-                NamePart(legalEntityGoldenRecord.legalEntity.legalName, NamePartType.LegalName),
-                legalEntityGoldenRecord.legalEntity.legalShortName?.let { NamePart(it, NamePartType.ShortName) },
-                legalEntityGoldenRecord.legalEntity.legalForm?.let { NamePart(it, NamePartType.LegalForm) },
+                NamePart(legalEntityGoldenRecord.header.legalName, NamePartType.LegalName),
+                legalEntityGoldenRecord.header.legalShortName?.let { NamePart(it, NamePartType.ShortName) },
+                legalEntityGoldenRecord.header.legalForm?.let { NamePart(it, NamePartType.LegalForm) },
                 siteGoldenRecord.site.name.let { NamePart(it, NamePartType.SiteName) },
-                addressGoldenRecord.name?.let { NamePart(it, NamePartType.AddressName) }
+                addressGoldenRecord.address.name?.let { NamePart(it, NamePartType.AddressName) }
             ),
             owningCompany = owningCompany,
             uncategorized = UncategorizedProperties.empty.copy(nameParts = nameParts),
             legalEntity = buildLegalEntityComponent(legalEntityGoldenRecord),
             site = buildSiteComponent(siteGoldenRecord),
-            additionalAddress = buildPostalAddress(addressGoldenRecord)
+            additionalAddress = buildPostalAddressWithScriptVariants(addressGoldenRecord)
         )
     }
 
     private fun buildLegalEntityComponent(goldenRecord: LegalEntityWithLegalAddressVerboseDto): LegalEntity{
         return LegalEntity(
-            bpnReference = BpnReference(goldenRecord.legalEntity.bpnl, null, BpnReferenceType.Bpn),
-            legalName = goldenRecord.legalEntity.legalName,
-            legalShortName = goldenRecord.legalEntity.legalShortName,
-            legalForm = goldenRecord.legalEntity.legalForm,
-            identifiers = goldenRecord.legalEntity.identifiers.map { Identifier(it.value, it.type, it.issuingBody) },
-            states = goldenRecord.legalEntity.states.map { BusinessState(it.validFrom?.toUtcInstant(), it.validTo?.toUtcInstant(), it.type) },
-            confidenceCriteria = buildConfidence(goldenRecord.legalEntity.confidenceCriteria),
-            isParticipantData = goldenRecord.legalEntity.isParticipantData,
+            bpnReference = BpnReference(goldenRecord.header.bpnl, null, BpnReferenceType.Bpn),
+            legalName = goldenRecord.header.legalName,
+            legalShortName = goldenRecord.header.legalShortName,
+            legalForm = goldenRecord.header.legalForm,
+            identifiers = goldenRecord.header.identifiers.map { Identifier(it.value, it.type, it.issuingBody) },
+            states = goldenRecord.header.states.map { BusinessState(it.validFrom?.toUtcInstant(), it.validTo?.toUtcInstant(), it.type) },
+            confidenceCriteria = buildConfidence(goldenRecord.header.confidenceCriteria),
+            isParticipantData = goldenRecord.header.isParticipantData,
             hasChanged = true,
-            legalAddress = buildPostalAddress(goldenRecord.legalAddress)
+            legalAddress = buildPostalAddress(goldenRecord.legalAddress),
+            scriptVariants = goldenRecord.scriptVariants.map { buildLegalEntityScriptVariant(it) }
         )
     }
 
@@ -134,7 +135,8 @@ class RefinementTestDataFactory {
             states = goldenRecord.site.states.map { BusinessState(it.validFrom?.toUtcInstant(), it.validTo?.toUtcInstant(), it.type) },
             confidenceCriteria = buildConfidence(goldenRecord.site.confidenceCriteria),
             hasChanged = true,
-            siteMainAddress = buildPostalAddress(goldenRecord.mainAddress)
+            siteMainAddress = buildPostalAddress(goldenRecord.mainAddress),
+            scriptVariants = goldenRecord.site.scriptVariants.map { buildSiteScriptVariant(it) }
         )
     }
 
@@ -145,7 +147,8 @@ class RefinementTestDataFactory {
             states = goldenRecord.states.map { BusinessState(it.validFrom?.toUtcInstant(), it.validTo?.toUtcInstant(), it.type) },
             confidenceCriteria = buildConfidence(goldenRecord.confidenceCriteria),
             hasChanged = true,
-            siteMainAddress = null
+            siteMainAddress = null,
+            scriptVariants = goldenRecord.scriptVariants.map { buildSiteScriptVariant(it) }
         )
     }
 
@@ -160,7 +163,14 @@ class RefinementTestDataFactory {
         )
     }
 
-    private fun buildPostalAddress(logisticAddress: LogisticAddressVerboseDto): PostalAddress{
+    private fun buildPostalAddressWithScriptVariants(logisticAddress: LogisticAddressVerboseDto): PostalAddressWithScriptVariants{
+        return PostalAddressWithScriptVariants(
+            postalProperties = buildPostalAddress(logisticAddress.address),
+            scriptVariants = logisticAddress.scriptVariants.map { buildPostalAddressScriptVariantWithScriptCode(it) }
+        )
+    }
+
+    private fun buildPostalAddress(logisticAddress: LogisticAddressInvariantVerboseDto): PostalAddress{
         return PostalAddress(
             bpnReference = BpnReference(logisticAddress.bpna, null, BpnReferenceType.Bpn),
             hasChanged = true,
@@ -218,6 +228,70 @@ class RefinementTestDataFactory {
             additionalNamePrefix = street.additionalNamePrefix,
             additionalNameSuffix = street.additionalNameSuffix
         )
+    }
+
+    private fun buildLegalEntityScriptVariant(legalEntityScriptVariantDto: LegalEntityScriptVariantDto): LegalEntityScriptVariant{
+        return with(legalEntityScriptVariantDto){
+            LegalEntityScriptVariant(
+                scriptCode = scriptCode,
+                legalName = legalName,
+                legalShortName = shortName,
+                legalAddress = buildPostalAddressScriptVariant(legalAddress)
+            )
+        }
+    }
+
+    private fun buildSiteScriptVariant(siteScriptVariant: SiteScriptVariantDto): SiteScriptVariant{
+        return with(siteScriptVariant){
+            SiteScriptVariant(
+                scriptCode = scriptCode,
+                siteName = name,
+                mainAddress = buildPostalAddressScriptVariant(mainAddress)
+            )
+        }
+    }
+
+    private fun buildPostalAddressScriptVariantWithScriptCode(logisticAddressScriptVariant: LogisticAddressScriptVariantDto): PostalAddressScriptVariantWithScriptCode{
+        return with(logisticAddressScriptVariant){
+            PostalAddressScriptVariantWithScriptCode(scriptCode, buildPostalAddressScriptVariant(logisticAddressScriptVariant.address))
+        }
+    }
+
+    private fun buildPostalAddressScriptVariant(postalAddressScriptVariant: PostalAddressScriptVariantDto): PostalAddressScriptVariant{
+        return with(postalAddressScriptVariant){
+            PostalAddressScriptVariant(
+                addressName = addressName,
+                physicalAddress = buildPhysicalAddressScriptVariant(physicalAddress),
+                alternativeAddress = alternativeAddress?.let { buildAlternativeAddressScriptVariant(it) }
+            )
+        }
+    }
+
+    private fun buildPhysicalAddressScriptVariant(physicalAddressScriptVariant: PhysicalAddressScriptVariantDto): PhysicalAddressScriptVariant{
+        return with(physicalAddressScriptVariant){
+            PhysicalAddressScriptVariant(
+                postalCode = postalCode,
+                city = city,
+                district = district,
+                street = street?.let { buildStreet(it) } ?: Street.empty,
+                companyPostalCode = companyPostalCode,
+                industrialZone = industrialZone,
+                building = building,
+                floor = floor,
+                door = door,
+                taxJurisdictionCode = taxJurisdictionCode)
+        }
+    }
+
+    private fun buildAlternativeAddressScriptVariant(alternativeAddressScriptVariant: AlternativeAddressScriptVariantDto): AlternativeAddressScriptVariant{
+        return with(alternativeAddressScriptVariant){
+            AlternativeAddressScriptVariant(
+                postalCode = postalCode,
+                city = city,
+                deliveryServiceQualifier = deliveryServiceQualifier,
+                deliveryServiceNumber = deliveryServiceNumber
+            )
+        }
     }
 
     private fun LocalDateTime.toUtcInstant() = toInstant(ZoneOffset.UTC)

@@ -19,35 +19,21 @@
 
 package org.eclipse.tractusx.bpdm.pool.controller
 
-import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.BusinessPartnerSearchFilterType
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityHeaderVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressInvariantVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.StreetDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AlternativePostalAddressDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.BusinessPartnerConfidenceCriteriaDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.BusinessPartnerIdentifierDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.BusinessPartnerLegalEntity
-import org.eclipse.tractusx.bpdm.pool.api.model.response.BusinessPartnerPostalAddress
-import org.eclipse.tractusx.bpdm.pool.api.model.response.BusinessPartnerSearchResultDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.BusinessPartnerSite
-import org.eclipse.tractusx.bpdm.pool.api.model.response.BusinessPartnerStateDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.PhysicalPostalAddressDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.util.TestHelpers
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
-import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues
-import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerVerboseValues
-import org.eclipse.tractusx.bpdm.test.testdata.pool.LegalEntityStructureRequest
-import org.eclipse.tractusx.bpdm.test.testdata.pool.SiteStructureRequest
+import org.eclipse.tractusx.bpdm.test.testdata.pool.*
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
-import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolDataHelper
-import org.eclipse.tractusx.bpdm.test.testdata.pool.TestDataEnvironment
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -84,18 +70,18 @@ class BusinessPartnerControllerIT@Autowired constructor(
         legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate4
     )
 
-    private lateinit var givenPartner1: LegalEntityVerboseDto
-    private lateinit var legalAddress1: LogisticAddressVerboseDto
+    private lateinit var givenPartner1: LegalEntityHeaderVerboseDto
+    private lateinit var legalAddress1: LogisticAddressInvariantVerboseDto
 
     @BeforeEach
     fun beforeEach() {
         dbTestHelpers.truncateDbTables()
         testDataEnvironment = dataHelper.createTestDataEnvironment()
         val givenStructure = testHelpers.createBusinessPartnerStructure(listOf(partnerStructure1))
-        givenPartner1 = with(givenStructure[0].legalEntity) { legalEntity }
+        givenPartner1 = with(givenStructure[0].legalEntity) { header }
         legalAddress1 = givenStructure[0].legalEntity.legalAddress
 
-        val parentBpn = givenStructure.firstOrNull()!!.legalEntity.legalEntity.bpnl
+        val parentBpn = givenStructure.firstOrNull()!!.legalEntity.header.bpnl
         val addressToCreate = with(BusinessPartnerNonVerboseValues.addressPartnerCreate1) {
             copy(bpnParent = parentBpn)
         }
@@ -315,7 +301,7 @@ class BusinessPartnerControllerIT@Autowired constructor(
         testDataEnvironment = dataHelper.createTestDataEnvironment()
         val givenStructure =testHelpers.createBusinessPartnerStructure(listOf(partnerStructure2))
 
-        val parentBpn = givenStructure.firstOrNull()!!.legalEntity.legalEntity.bpnl
+        val parentBpn = givenStructure.firstOrNull()!!.legalEntity.header.bpnl
         val addressToCreate = with(BusinessPartnerNonVerboseValues.addressPartnerCreate1) {
             copy(bpnParent = parentBpn)
         }
@@ -345,19 +331,19 @@ class BusinessPartnerControllerIT@Autowired constructor(
                 validTo = BusinessPartnerVerboseValues.leStatus3.validTo,
                 type = BusinessPartnerVerboseValues.leStatus3.type,
             )),
-            isParticipantData = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.isParticipantData,
+            isParticipantData = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.header.isParticipantData,
             legalEntity = BusinessPartnerLegalEntity(
                 legalEntityBpn = "BPNL000000000065",
-                legalName = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.legalName,
-                shortName = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.legalShortName,
+                legalName = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.header.legalName,
+                shortName = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.header.legalShortName,
                 legalForm = BusinessPartnerVerboseValues.legalForm3.technicalKey,
                 confidenceCriteria = BusinessPartnerConfidenceCriteriaDto(
-                    sharedByOwner = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.confidenceCriteria.sharedByOwner,
-                    checkedByExternalDataSource = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.confidenceCriteria.checkedByExternalDataSource,
-                    numberOfSharingMembers = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.confidenceCriteria.numberOfSharingMembers,
-                    lastConfidenceCheckAt = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.confidenceCriteria.lastConfidenceCheckAt,
-                    nextConfidenceCheckAt = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.confidenceCriteria.nextConfidenceCheckAt,
-                    confidenceLevel = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.confidenceCriteria.confidenceLevel
+                    sharedByOwner = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.header.confidenceCriteria.sharedByOwner,
+                    checkedByExternalDataSource = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.header.confidenceCriteria.checkedByExternalDataSource,
+                    numberOfSharingMembers = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.header.confidenceCriteria.numberOfSharingMembers,
+                    lastConfidenceCheckAt = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.header.confidenceCriteria.lastConfidenceCheckAt,
+                    nextConfidenceCheckAt = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.header.confidenceCriteria.nextConfidenceCheckAt,
+                    confidenceLevel = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.header.confidenceCriteria.confidenceLevel
                 ),
                 states = listOf(BusinessPartnerStateDto(
                     validFrom = BusinessPartnerVerboseValues.leStatus3.validFrom,
@@ -434,19 +420,19 @@ class BusinessPartnerControllerIT@Autowired constructor(
                 validTo = BusinessPartnerVerboseValues.leStatus3.validTo,
                 type = BusinessPartnerVerboseValues.leStatus3.type,
             )),
-            isParticipantData = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.isParticipantData,
+            isParticipantData = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.header.isParticipantData,
             legalEntity = BusinessPartnerLegalEntity(
                 legalEntityBpn = "BPNL000000000065",
-                legalName = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.legalName,
-                shortName = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.legalShortName,
+                legalName = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.header.legalName,
+                shortName = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.header.legalShortName,
                 legalForm = BusinessPartnerVerboseValues.legalForm3.technicalKey,
                 confidenceCriteria = BusinessPartnerConfidenceCriteriaDto (
-                    sharedByOwner = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.confidenceCriteria.sharedByOwner,
-                    checkedByExternalDataSource = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.confidenceCriteria.checkedByExternalDataSource,
-                    numberOfSharingMembers = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.confidenceCriteria.numberOfSharingMembers,
-                    lastConfidenceCheckAt = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.confidenceCriteria.lastConfidenceCheckAt,
-                    nextConfidenceCheckAt = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.confidenceCriteria.nextConfidenceCheckAt,
-                    confidenceLevel = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.confidenceCriteria.confidenceLevel
+                    sharedByOwner = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.header.confidenceCriteria.sharedByOwner,
+                    checkedByExternalDataSource = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.header.confidenceCriteria.checkedByExternalDataSource,
+                    numberOfSharingMembers = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.header.confidenceCriteria.numberOfSharingMembers,
+                    lastConfidenceCheckAt = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.header.confidenceCriteria.lastConfidenceCheckAt,
+                    nextConfidenceCheckAt = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.header.confidenceCriteria.nextConfidenceCheckAt,
+                    confidenceLevel = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.header.confidenceCriteria.confidenceLevel
                 ),
                 states = listOf(BusinessPartnerStateDto(
                     validFrom = BusinessPartnerVerboseValues.leStatus3.validFrom,
@@ -511,12 +497,12 @@ class BusinessPartnerControllerIT@Autowired constructor(
                     deliveryServiceNumber = null
                 ),
                 confidenceCriteria = BusinessPartnerConfidenceCriteriaDto (
-                    sharedByOwner = BusinessPartnerVerboseValues.addressPartner1.confidenceCriteria.sharedByOwner,
-                    checkedByExternalDataSource = BusinessPartnerVerboseValues.addressPartner1.confidenceCriteria.checkedByExternalDataSource,
-                    numberOfSharingMembers = BusinessPartnerVerboseValues.addressPartner1.confidenceCriteria.numberOfSharingMembers,
-                    lastConfidenceCheckAt = BusinessPartnerVerboseValues.addressPartner1.confidenceCriteria.lastConfidenceCheckAt,
-                    nextConfidenceCheckAt = BusinessPartnerVerboseValues.addressPartner1.confidenceCriteria.nextConfidenceCheckAt,
-                    confidenceLevel = BusinessPartnerVerboseValues.addressPartner1.confidenceCriteria.confidenceLevel
+                    sharedByOwner = BusinessPartnerVerboseValues.addressPartnerInvariant1.confidenceCriteria.sharedByOwner,
+                    checkedByExternalDataSource = BusinessPartnerVerboseValues.addressPartnerInvariant1.confidenceCriteria.checkedByExternalDataSource,
+                    numberOfSharingMembers = BusinessPartnerVerboseValues.addressPartnerInvariant1.confidenceCriteria.numberOfSharingMembers,
+                    lastConfidenceCheckAt = BusinessPartnerVerboseValues.addressPartnerInvariant1.confidenceCriteria.lastConfidenceCheckAt,
+                    nextConfidenceCheckAt = BusinessPartnerVerboseValues.addressPartnerInvariant1.confidenceCriteria.nextConfidenceCheckAt,
+                    confidenceLevel = BusinessPartnerVerboseValues.addressPartnerInvariant1.confidenceCriteria.confidenceLevel
                 ),
                 states = emptyList(),
             )
@@ -539,19 +525,19 @@ class BusinessPartnerControllerIT@Autowired constructor(
                 validTo = BusinessPartnerVerboseValues.leStatus3.validTo,
                 type = BusinessPartnerVerboseValues.leStatus3.type,
             )),
-            isParticipantData = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.isParticipantData,
+            isParticipantData = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.header.isParticipantData,
             legalEntity = BusinessPartnerLegalEntity(
                 legalEntityBpn = "BPNL000000000065",
-                legalName = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.legalName,
-                shortName = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.legalShortName,
+                legalName = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.header.legalName,
+                shortName = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.header.legalShortName,
                 legalForm = BusinessPartnerVerboseValues.legalForm3.technicalKey,
                 confidenceCriteria = BusinessPartnerConfidenceCriteriaDto (
-                    sharedByOwner = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.confidenceCriteria.sharedByOwner,
-                    checkedByExternalDataSource = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.confidenceCriteria.checkedByExternalDataSource,
-                    numberOfSharingMembers = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.confidenceCriteria.numberOfSharingMembers,
-                    lastConfidenceCheckAt = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.confidenceCriteria.lastConfidenceCheckAt,
-                    nextConfidenceCheckAt = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.confidenceCriteria.nextConfidenceCheckAt,
-                    confidenceLevel = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.confidenceCriteria.confidenceLevel
+                    sharedByOwner = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.header.confidenceCriteria.sharedByOwner,
+                    checkedByExternalDataSource = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.header.confidenceCriteria.checkedByExternalDataSource,
+                    numberOfSharingMembers = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.header.confidenceCriteria.numberOfSharingMembers,
+                    lastConfidenceCheckAt = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.header.confidenceCriteria.lastConfidenceCheckAt,
+                    nextConfidenceCheckAt = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.header.confidenceCriteria.nextConfidenceCheckAt,
+                    confidenceLevel = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.header.confidenceCriteria.confidenceLevel
                 ),
                 states = listOf(BusinessPartnerStateDto(
                     validFrom = BusinessPartnerVerboseValues.leStatus3.validFrom,
@@ -600,12 +586,12 @@ class BusinessPartnerControllerIT@Autowired constructor(
                     deliveryServiceNumber = null
                 ),
                 confidenceCriteria = BusinessPartnerConfidenceCriteriaDto (
-                    sharedByOwner = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalAddress.confidenceCriteria.sharedByOwner,
-                    checkedByExternalDataSource = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalAddress.confidenceCriteria.checkedByExternalDataSource,
-                    numberOfSharingMembers = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalAddress.confidenceCriteria.numberOfSharingMembers,
-                    lastConfidenceCheckAt = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalAddress.confidenceCriteria.lastConfidenceCheckAt,
-                    nextConfidenceCheckAt = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalAddress.confidenceCriteria.nextConfidenceCheckAt,
-                    confidenceLevel = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalAddress.confidenceCriteria.confidenceLevel
+                    sharedByOwner = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.legalAddress.confidenceCriteria.sharedByOwner,
+                    checkedByExternalDataSource = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.legalAddress.confidenceCriteria.checkedByExternalDataSource,
+                    numberOfSharingMembers = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.legalAddress.confidenceCriteria.numberOfSharingMembers,
+                    lastConfidenceCheckAt = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.legalAddress.confidenceCriteria.lastConfidenceCheckAt,
+                    nextConfidenceCheckAt = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.legalAddress.confidenceCriteria.nextConfidenceCheckAt,
+                    confidenceLevel = BusinessPartnerNonVerboseValues.legalEntityCreate4.legalEntity.legalAddress.confidenceCriteria.confidenceLevel
                 ),
                 states = emptyList(),
             )

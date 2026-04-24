@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.test.util
 
 import org.eclipse.tractusx.bpdm.test.util.StringIgnoreComparator.Companion.IGNORE_STRING
+import java.time.Duration
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -27,18 +28,21 @@ import java.time.ZoneOffset
 
 /**
  * Instants given and then returned from a database query differ slightly on the nanosecond level
- * This comparator compares Instants only to the second
+ * This comparator compares Instants only to the millisecond
  */
 class InstantSecondsComparator : Comparator<Instant> {
     override fun compare(actual: Instant?, expected: Instant?): Int {
         if (actual != null && expected != null) {
-            return (actual.epochSecond - expected.epochSecond).toInt()
+            val durationBetween = Duration.between(actual, expected).abs()
+            if(durationBetween.toSeconds() < 1L){
+                if(durationBetween.toNanos() < 1_000_000L) {
+                    return 0
+                }
+            }
+            return actual.compareTo(expected)
         }
 
-        return if (actual != expected)
-            -1
-        else
-            0
+        return if (actual != expected) -1 else 0
     }
 }
 
@@ -54,7 +58,7 @@ class LocalDatetimeSecondsComparator(private val instantComparator: InstantSecon
 /**
  * This comparator compares Strings but returns true if one of the Strings has the value of [IGNORE_STRING]
  */
-class StringIgnoreComparator() : Comparator<String> {
+class StringIgnoreComparator : Comparator<String> {
     companion object {
         const val IGNORE_STRING = "IGNORE"
     }

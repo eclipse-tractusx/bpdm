@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.util
 
 import org.eclipse.tractusx.bpdm.common.util.copyAndSync
 import org.eclipse.tractusx.bpdm.common.util.replace
+import org.eclipse.tractusx.bpdm.gate.entity.BusinessPartnerScriptVariantDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.IdentifierDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.PostalAddressDb
@@ -49,11 +50,15 @@ class BusinessPartnerCopyUtil {
 
             nameParts.replace(fromPartner.nameParts)
             roles.replace(fromPartner.roles)
+            legalEntityGoldenRecordRelations.replace(fromPartner.legalEntityGoldenRecordRelations)
+            addressGoldenRecordRelations.replace(fromPartner.addressGoldenRecordRelations)
 
             states.copyAndSync(fromPartner.states, ::copyValues)
             identifiers.copyAndSync(fromPartner.identifiers, ::copyValues)
 
             copyValues(fromPartner.postalAddress, postalAddress)
+
+            syncScriptVariants(fromPartner, toPartner)
         }
     }
 
@@ -79,4 +84,32 @@ class BusinessPartnerCopyUtil {
             physicalPostalAddress = fromPostalAddress.physicalPostalAddress
             alternativePostalAddress = fromPostalAddress.alternativePostalAddress
         }
+
+    private fun copyValues(fromScriptVariant: BusinessPartnerScriptVariantDb, toScriptVariantDb: BusinessPartnerScriptVariantDb) =
+        toScriptVariantDb.apply {
+            scriptCode = fromScriptVariant.scriptCode
+            nameParts.replace( fromScriptVariant.nameParts)
+            legalName = fromScriptVariant.legalName
+            shortName = fromScriptVariant.shortName
+            siteName = fromScriptVariant.siteName
+            addressName = fromScriptVariant.addressName
+            physicalAddress = fromScriptVariant.physicalAddress
+            alternativeAddress = fromScriptVariant.alternativeAddress
+        }
+
+    private fun syncScriptVariants(fromPartner: BusinessPartnerDb, toPartner: BusinessPartnerDb) {
+        val scriptVariantsByCode = toPartner.scriptVariants.associateBy { it.scriptCode }
+        val matchedScriptCodes = fromPartner.scriptVariants.map { fromPartnerScriptVariant ->
+            val matchedVariant = scriptVariantsByCode[fromPartnerScriptVariant.scriptCode]
+                ?: BusinessPartnerScriptVariantDb(fromPartnerScriptVariant.scriptCode, toPartner)
+                    .apply { toPartner.scriptVariants.add(this) }
+
+            copyValues(fromPartnerScriptVariant, matchedVariant)
+            matchedVariant.scriptCode
+        }
+
+        val notMatchedVariants = toPartner.scriptVariants.filterNot { it.scriptCode in  matchedScriptCodes}
+        toPartner.scriptVariants.removeAll(notMatchedVariants)
+    }
+
 }

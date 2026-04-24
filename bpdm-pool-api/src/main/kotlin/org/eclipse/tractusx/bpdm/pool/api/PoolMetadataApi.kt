@@ -145,6 +145,8 @@ interface PoolMetadataApi {
     @GetMapping(value = ["${ApiCommons.BASE_PATH_V6}/administrative-areas-level1", "${ApiCommons.BASE_PATH_V7}/administrative-areas-level1"])
     fun getAdminAreasLevel1(@ParameterObject paginationRequest: PaginationRequest): PageDto<CountrySubdivisionDto>
 
+    @GetMapping(value = ["${ApiCommons.BASE_PATH_V7}/script-codes"])
+    fun getScriptCodes(@ParameterObject paginationRequest: PaginationRequest): PageDto<ScriptCodeDto>
     @Operation(
         summary = "Get page of available business partner relation reason codes"
     )

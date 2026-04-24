@@ -129,20 +129,6 @@ applicationConfig:
 
 # Used to overwrite the secret property values of the application configuration
 applicationSecrets:
-  spring:
-    dataSource:
-      # Change this password for production
-      password: &postgresPass  bpdm
-
-postgres:
-  enabled: true
-  auth:
-    database: bpdm
-    username: bpdm
-    password: *postgresPass
-
-centralidp:
-  enabled: true
 
 
 

@@ -73,8 +73,8 @@ class TaskRelationsStepBuildDispatcherServiceIT @Autowired constructor(
 
         val createLegalEntityRelationsRequest = BusinessPartnerRelations(
             relationType = LegalEntityRelationType.IsOwnedBy.toTaskDto(),
-            businessPartnerSourceBpn = legalEntity1.legalEntity.bpnl,
-            businessPartnerTargetBpn = legalEntity2.legalEntity.bpnl,
+            businessPartnerSourceBpn = legalEntity1.legalEntity.header.bpnl,
+            businessPartnerTargetBpn = legalEntity2.legalEntity.header.bpnl,
             validityPeriods = listOf(
                 RelationValidityPeriod(
                     validFrom = LocalDate.parse("1970-01-01"),
@@ -98,8 +98,8 @@ class TaskRelationsStepBuildDispatcherServiceIT @Autowired constructor(
 
         val createLegalEntityRelationsRequest = BusinessPartnerRelations(
             relationType = LegalEntityRelationType.IsAlternativeHeadquarterFor.toTaskDto(),
-            businessPartnerSourceBpn = legalEntity1.legalEntity.bpnl,
-            businessPartnerTargetBpn = legalEntity2.legalEntity.bpnl,
+            businessPartnerSourceBpn = legalEntity1.legalEntity.header.bpnl,
+            businessPartnerTargetBpn = legalEntity2.legalEntity.header.bpnl,
             validityPeriods = listOf(
                 RelationValidityPeriod(
                     validFrom = LocalDate.parse("1970-01-01"),
@@ -123,8 +123,8 @@ class TaskRelationsStepBuildDispatcherServiceIT @Autowired constructor(
 
         val createLegalEntityRelationsRequest = BusinessPartnerRelations(
             relationType = LegalEntityRelationType.IsManagedBy.toTaskDto(),
-            businessPartnerSourceBpn = legalEntity1.legalEntity.bpnl,
-            businessPartnerTargetBpn = legalEntity2.legalEntity.bpnl,
+            businessPartnerSourceBpn = legalEntity1.legalEntity.header.bpnl,
+            businessPartnerTargetBpn = legalEntity2.legalEntity.header.bpnl,
             validityPeriods = listOf(
                 RelationValidityPeriod(
                     //Can't create relation in the past
@@ -150,7 +150,7 @@ class TaskRelationsStepBuildDispatcherServiceIT @Autowired constructor(
 
         val createAddressRelationsRequest = BusinessPartnerRelations(
             relationType = relationType.toTaskDto(),
-            businessPartnerSourceBpn = legalEntity1.legalAddress.bpna,
+            businessPartnerSourceBpn = legalEntity1.legalEntity.legalAddress.bpna,
             businessPartnerTargetBpn = additionalAddress1.address.bpna,
             validityPeriods = listOf(
                 RelationValidityPeriod(
@@ -163,7 +163,7 @@ class TaskRelationsStepBuildDispatcherServiceIT @Autowired constructor(
 
         val result = upsertBusinessPartnerRelations(taskId = "TASK_1", businessPartnerRelations = createAddressRelationsRequest)
         assertThat(result.taskId).isEqualTo("TASK_1")
-        assertThat(result.businessPartnerRelations.businessPartnerSourceBpn).isEqualTo(legalEntity1.legalAddress.bpna)
+        assertThat(result.businessPartnerRelations.businessPartnerSourceBpn).isEqualTo(legalEntity1.legalEntity.legalAddress.bpna)
         assertThat(result.errors.size).isEqualTo(0)
     }
 
@@ -173,7 +173,7 @@ class TaskRelationsStepBuildDispatcherServiceIT @Autowired constructor(
     }
 
     private fun createAdditionalAddress(seed: String, legalEntity: LegalEntityPartnerCreateVerboseDto): AddressPartnerCreateVerboseDto{
-        val request = testDataEnvironment.requestFactory.buildAdditionalAddressCreateRequest(seed, legalEntity.legalEntity.bpnl)
+        val request = testDataEnvironment.requestFactory.buildAdditionalAddressCreateRequest(seed, legalEntity.legalEntity.header.bpnl)
         return poolClient.addresses.createAddresses(listOf(request)).entities.single()
     }
 

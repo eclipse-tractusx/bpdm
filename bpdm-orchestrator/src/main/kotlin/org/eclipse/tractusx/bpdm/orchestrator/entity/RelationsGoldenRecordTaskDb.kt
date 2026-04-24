@@ -69,7 +69,7 @@ class RelationsGoldenRecordTaskDb(
                 relationType = relationType.also { businessPartnerRelations.relationType = it },
                 businessPartnerSourceBpn = businessPartnerSourceBpn.also { businessPartnerRelations.businessPartnerSourceBpn = it },
                 businessPartnerTargetBpn = businessPartnerTargetBpn.also { businessPartnerRelations.businessPartnerTargetBpn = it },
-                reasonCode = reasonCode
+                reasonCode = reasonCode.also { businessPartnerRelations.reasonCode = it }
             )
         }
     }

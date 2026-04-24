@@ -35,6 +35,7 @@ data class BusinessPartnerSearchResultDto(
     val legalEntity: BusinessPartnerLegalEntity,
     val site: BusinessPartnerSite?,
     val address: BusinessPartnerPostalAddress,
+    @get:Schema(name = "isParticipantData")
     val isParticipantData: Boolean
 )
 

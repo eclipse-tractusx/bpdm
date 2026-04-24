@@ -25,8 +25,9 @@ import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
+import org.eclipse.tractusx.bpdm.gate.api.model.*
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
-import org.eclipse.tractusx.bpdm.gate.entity.GeographicCoordinateDb
+import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartnerDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.ConfidenceCriteriaDb
 import org.eclipse.tractusx.bpdm.gate.entity.generic.StateDb
@@ -34,6 +35,7 @@ import org.eclipse.tractusx.bpdm.gate.model.upsert.output.OutputUpsertData
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.PhysicalPostalAddress
 import org.eclipse.tractusx.bpdm.gate.model.upsert.output.State
 import org.eclipse.tractusx.orchestrator.api.model.*
+import org.eclipse.tractusx.orchestrator.api.model.GoldenRecordType
 import org.springframework.stereotype.Service
 import java.time.ZoneOffset
 
@@ -52,6 +54,10 @@ class OrchestratorMappings(
 
     fun toOrchestratorDto(entity: BusinessPartnerDb): BusinessPartner {
         val postalAddress = toPostalAddress(entity)
+        val postalAddressScriptVariants = entity.scriptVariants.map { toPostalAddressScriptVariantWithScriptCode(it) }
+
+        val isLegalAddress = entity.postalAddress.addressType == AddressType.LegalAddress || entity.postalAddress.addressType == AddressType.LegalAndSiteMainAddress
+        val isMainAddress = entity.postalAddress.addressType == AddressType.SiteMainAddress
 
         return BusinessPartner(
             nameParts = emptyList(),
@@ -59,7 +65,7 @@ class OrchestratorMappings(
                 nameParts = entity.nameParts,
                 identifiers = entity.identifiers.filter { it.businessPartnerType == BusinessPartnerType.GENERIC }.map { Identifier(it.value, it.type, it.issuingBody) },
                 states = entity.states.filter { it.businessPartnerTyp == BusinessPartnerType.GENERIC }.map { toState(it) },
-                address = postalAddress.takeIf { entity.postalAddress.addressType == null }
+                address = postalAddress.takeIf { entity.postalAddress.addressType == null }?.let { PostalAddressWithScriptVariants(it, postalAddressScriptVariants)  }
             ),
             owningCompany = getOwnerBpnL(entity),
             legalEntity = LegalEntity(
@@ -72,7 +78,8 @@ class OrchestratorMappings(
                 confidenceCriteria = toConfidenceCriteria(entity.legalEntityConfidence),
                 isParticipantData = null,
                 hasChanged = true,
-                legalAddress = postalAddress.takeIf { entity.postalAddress.addressType == AddressType.LegalAddress || entity.postalAddress.addressType == AddressType.LegalAndSiteMainAddress } ?: PostalAddress.empty
+                legalAddress = postalAddress.takeIf { isLegalAddress} ?: PostalAddress.empty,
+                scriptVariants = entity.scriptVariants.takeIf { isLegalAddress }?.map { toLegalEntityScriptVariant(it) } ?:emptyList()
             ),
             site = Site(
                 bpnReference = toBpnReference(entity.bpnS),
@@ -80,9 +87,10 @@ class OrchestratorMappings(
                 states = entity.states.filter { it.businessPartnerTyp == BusinessPartnerType.SITE }.map { toState(it) },
                 confidenceCriteria = toConfidenceCriteria(entity.siteConfidence),
                 hasChanged = true,
-                siteMainAddress = postalAddress.takeIf { entity.postalAddress.addressType == AddressType.SiteMainAddress }
+                siteMainAddress = postalAddress.takeIf { isMainAddress },
+                scriptVariants = entity.scriptVariants.takeIf { isMainAddress }?.map { toSiteScriptVariant(it) } ?:emptyList()
             ).takeIf { entity.bpnS != null || entity.siteName != null },
-            additionalAddress = postalAddress.takeIf { entity.postalAddress.addressType == AddressType.AdditionalAddress }
+            additionalAddress = postalAddress.takeIf { entity.postalAddress.addressType == AddressType.AdditionalAddress }?.let { PostalAddressWithScriptVariants(it, postalAddressScriptVariants) }
         )
     }
 
@@ -104,21 +112,7 @@ class OrchestratorMappings(
                         postalCode = postalCode,
                         city = city,
                         district = district,
-                        street = street?.let {
-                            with(it) {
-                                Street(
-                                    name = name,
-                                    houseNumber = houseNumber,
-                                    houseNumberSupplement = houseNumberSupplement,
-                                    milestone = milestone,
-                                    direction = direction,
-                                    namePrefix = namePrefix,
-                                    additionalNamePrefix = additionalNamePrefix,
-                                    nameSuffix = nameSuffix,
-                                    additionalNameSuffix = additionalNameSuffix
-                                )
-                            }
-                        } ?: Street.empty,
+                        street = toStreet(street),
                         companyPostalCode = companyPostalCode,
                         industrialZone = industrialZone,
                         building = building,
@@ -146,6 +140,22 @@ class OrchestratorMappings(
         )
     }
 
+    private fun toStreet(street: StreetDb?) =
+        street?.let {
+            with(it) {
+                Street(
+                    name = name,
+                    houseNumber = houseNumber,
+                    houseNumberSupplement = houseNumberSupplement,
+                    milestone = milestone,
+                    direction = direction,
+                    namePrefix = namePrefix,
+                    additionalNamePrefix = additionalNamePrefix,
+                    nameSuffix = nameSuffix,
+                    additionalNameSuffix = additionalNameSuffix
+                )
+            }
+        } ?: Street.empty
 
     private fun toGeographicCoordinates(geoCoordinate: GeographicCoordinateDb?): GeoCoordinate {
         return geoCoordinate?.let { with(it) {
@@ -236,10 +246,79 @@ class OrchestratorMappings(
                 legalEntityConfidence = toConfidenceCriteria(legalEntity.confidenceCriteria),
                 siteConfidence = site?.let { toConfidenceCriteria(it.confidenceCriteria) },
                 addressConfidence = toConfidenceCriteria(postalAddress.confidenceCriteria),
-                isOwnCompanyData = if (tenantBpnl != null && owningCompany != null) tenantBpnl == owningCompany else false
+                isOwnCompanyData = if (tenantBpnl != null && owningCompany != null) tenantBpnl == owningCompany else false,
+                scriptVariants = toScriptVariants(addressType, dto),
+                legalEntityGoldenRecordRelations = legalEntity.goldenRecordRelations,
+                addressGoldenRecordRelations = toAddressGoldenRecordRelations(addressType, dto)
             )
         }
     }
+
+    private fun toAddressGoldenRecordRelations(addressType: AddressType, dto: BusinessPartner): List<AddressGoldenRecordRelation> =
+        when (addressType) {
+            AddressType.LegalAndSiteMainAddress, AddressType.LegalAddress -> dto.legalEntity.legalAddress.goldenRecordRelations
+            AddressType.SiteMainAddress -> dto.site!!.siteMainAddress!!.goldenRecordRelations
+            AddressType.AdditionalAddress -> dto.additionalAddress!!.postalProperties.goldenRecordRelations
+        }
+
+    private fun toScriptVariants(addressType: AddressType, dto: BusinessPartner): List<BusinessPartnerScriptVariantDto>{
+        val addressScriptVariants = when(addressType){
+            AddressType.LegalAndSiteMainAddress, AddressType.LegalAddress  -> dto.legalEntity.scriptVariants.map { PostalAddressScriptVariantWithScriptCode(it.scriptCode, it.legalAddress) }
+            AddressType.SiteMainAddress -> dto.site!!.scriptVariants.map { PostalAddressScriptVariantWithScriptCode(it.scriptCode, it.mainAddress) }
+            AddressType.AdditionalAddress -> dto.additionalAddress!!.scriptVariants.map { it }
+        }
+
+        val legalEntityVariantsByCode = dto.legalEntity.scriptVariants.associateBy { it.scriptCode }
+        val siteScriptVariantsByCode = dto.site?.scriptVariants?.associateBy { it.scriptCode } ?: emptyMap()
+
+        return addressScriptVariants.map { addressVariant ->
+            val legalEntityVariant = toLegalEntityScriptVariant(legalEntityVariantsByCode[addressVariant.scriptCode]) ?: LegalEntityScriptVariantDto()
+            val siteScriptVariant = toSiteScriptVariant(siteScriptVariantsByCode[addressVariant.scriptCode]) ?: SiteScriptVariantDto()
+            val addressScriptVariant = toAddressScriptVariant(addressVariant.postalProperties)
+
+            BusinessPartnerScriptVariantDto(addressVariant.scriptCode, legalEntity = legalEntityVariant, site = siteScriptVariant, address = addressScriptVariant)
+        }
+    }
+
+    private fun toLegalEntityScriptVariant(dto: LegalEntityScriptVariant?) =
+        dto?.let { LegalEntityScriptVariantDto(it.legalName, it.legalShortName) }
+
+    private fun toSiteScriptVariant(dto: SiteScriptVariant?) =
+        dto?.let { SiteScriptVariantDto(it.siteName) }
+
+    private fun toAddressScriptVariant(dto: PostalAddressScriptVariant) =
+        AddressScriptVariantDto(
+            name = dto.addressName,
+            physicalAddress = toPhysicalAddressScriptVariant(dto.physicalAddress),
+            alternativeAddress = toAlternativeAddressScriptVariant(dto.alternativeAddress)
+        )
+
+    private fun toPhysicalAddressScriptVariant(dto: PhysicalAddressScriptVariant) =
+        with(dto){
+            PhysicalAddressScriptVariantDto(
+                postalCode = postalCode,
+                city = city,
+                district = district,
+                street = toScriptVariantStreet(street),
+                companyPostalCode = companyPostalCode,
+                industrialZone = industrialZone,
+                building = building,
+                floor = floor,
+                door = door,
+                taxJurisdictionCode = taxJurisdictionCode
+            )
+        }
+
+    private fun toAlternativeAddressScriptVariant(dto: AlternativeAddressScriptVariant?) =
+        dto?.let { with(it){
+            AlternativeAddressScriptVariantDto(
+                postalCode = postalCode,
+                city = city,
+                deliveryServiceQualifier = deliveryServiceQualifier,
+                deliveryServiceNumber = deliveryServiceNumber
+            )
+        }
+        }
 
 
     private fun toIdentifier(dto: Identifier, businessPartnerType: BusinessPartnerType) =
@@ -317,6 +396,19 @@ class OrchestratorMappings(
             additionalNameSuffix = dto.additionalNameSuffix
         )
 
+    private fun toScriptVariantStreet(dto: Street) =
+        StreetDto(
+            name = dto.name,
+            houseNumber = dto.houseNumber,
+            houseNumberSupplement = dto.houseNumberSupplement,
+            milestone = dto.milestone,
+            direction = dto.direction,
+            namePrefix = dto.namePrefix,
+            additionalNamePrefix = dto.additionalNamePrefix,
+            nameSuffix = dto.nameSuffix,
+            additionalNameSuffix = dto.additionalNameSuffix
+        )
+
     private fun toGeographicCoordinate(dto: GeoCoordinate) =
         dto.latitude?.let { lat ->
             dto.longitude?.let {  lon ->
@@ -333,4 +425,50 @@ class OrchestratorMappings(
             nextConfidenceCheckAt = dto.nextConfidenceCheckAt!!.atZone(ZoneOffset.UTC).toLocalDateTime(),
             confidenceLevel = dto.confidenceLevel!!
         )
+
+    private fun toPostalAddressScriptVariantWithScriptCode(scriptVariant: BusinessPartnerScriptVariantDb) =
+        PostalAddressScriptVariantWithScriptCode(scriptVariant.scriptCode, toPostalAddressScriptVariant(scriptVariant))
+
+    private fun toPostalAddressScriptVariant(scriptVariant: BusinessPartnerScriptVariantDb) =
+        PostalAddressScriptVariant(
+            addressName = scriptVariant.addressName,
+            physicalAddress = toPhysicalAddressScriptVariant(scriptVariant.physicalAddress),
+            alternativeAddress = toAlternativeAddressScriptVariant(scriptVariant.alternativeAddress)
+        )
+
+    private fun toPhysicalAddressScriptVariant(scriptVariant: PhysicalPostalAddressScriptVariantDb?) =
+        scriptVariant?.let {
+            with(it){
+                PhysicalAddressScriptVariant(
+                    postalCode = postalCode,
+                    city = city,
+                    district = district,
+                    street = toStreet(street),
+                    companyPostalCode = companyPostalCode,
+                    industrialZone = industrialZone,
+                    building = building,
+                    floor = floor,
+                    door = door,
+                    taxJurisdictionCode = taxJurisdictionCode)
+            }
+        } ?: PhysicalAddressScriptVariant.empty
+
+
+    private fun toAlternativeAddressScriptVariant(scriptVariant: AlternativePostalAddressScriptVariantDb?) =
+        scriptVariant?.let {
+            with(it){
+                AlternativeAddressScriptVariant(
+                    postalCode = postalCode,
+                    city = city,
+                    deliveryServiceQualifier = deliveryServiceQualifier,
+                    deliveryServiceNumber = deliveryServiceNumber
+                )
+            }
+        }
+
+    private fun toLegalEntityScriptVariant(scriptVariantDb: BusinessPartnerScriptVariantDb) =
+        LegalEntityScriptVariant(scriptVariantDb.scriptCode, scriptVariantDb.legalName, scriptVariantDb.shortName, toPostalAddressScriptVariant(scriptVariantDb))
+
+    private fun toSiteScriptVariant(scriptVariantDb: BusinessPartnerScriptVariantDb) =
+        SiteScriptVariant(scriptVariantDb.scriptCode, scriptVariantDb.siteName ?: "", toPostalAddressScriptVariant(scriptVariantDb))
 }

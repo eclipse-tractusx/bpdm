@@ -28,6 +28,7 @@ import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.AddressRelationType
 import org.eclipse.tractusx.bpdm.pool.api.model.AddressRelationVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.PostalAddressScriptVariantDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
@@ -91,11 +92,11 @@ class TriggerBatchProcessExecutionServiceIT @Autowired constructor(
         val legalEntityRequest = requestFactory.createLegalEntityRequest(testName, true)
         val createdLegalEntity = poolApiClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single()
 
-        val addAddressRequest = requestFactory.buildAdditionalAddressCreateRequest("$testName 2", createdLegalEntity.legalEntity.bpnl)
+        val addAddressRequest = requestFactory.buildAdditionalAddressCreateRequest("$testName 2", createdLegalEntity.legalEntity.header.bpnl).copy(scriptVariants = emptyList())
         val createdAddAddress = poolApiClient.addresses.createAddresses(listOf(addAddressRequest)).entities.single()
 
         val activeLater = listOf(RelationValidityPeriod(LocalDate.now().plusDays(1), null))
-        val replacedByRelation = BusinessPartnerRelations(RelationType.IsReplacedBy, createdLegalEntity.legalAddress.bpna, createdAddAddress.address.bpna, activeLater, anyReasonCode())
+        val replacedByRelation = BusinessPartnerRelations(RelationType.IsReplacedBy, createdLegalEntity.legalEntity.legalAddress.bpna, createdAddAddress.address.bpna, activeLater, anyReasonCode())
         val taskToResolve = TaskRelationsStepReservationEntryDto("Any", "Any", replacedByRelation)
         taskRelationsResolutionService.upsertRelationsGoldenRecordIntoPool(listOf(taskToResolve))
 
@@ -103,7 +104,7 @@ class TriggerBatchProcessExecutionServiceIT @Autowired constructor(
         executeAtDate(LocalDate.now().plusDays(1)){ triggerBatchProcessExecutionService.executeUnprocessedTriggers() }
 
         //THEN
-        val actualLegalEntity = poolApiClient.legalEntities.getLegalEntity(createdLegalEntity.legalEntity.bpnl)
+        val actualLegalEntity = poolApiClient.legalEntities.getLegalEntity(createdLegalEntity.legalEntity.header.bpnl)
         val expectedLegalEntity = buildExpectedRelocatedHeadquarterLegalEntity(createdLegalEntity, createdAddAddress, replacedByRelation)
 
         poolAssertHelper.assertLegalEntityResponse(listOf(actualLegalEntity), listOf(expectedLegalEntity), Timeframe(Instant.now().minusSeconds(2), Instant.now()))
@@ -121,21 +122,21 @@ class TriggerBatchProcessExecutionServiceIT @Autowired constructor(
         val legalEntityRequest = requestFactory.createLegalEntityRequest(testName, true)
         val createdLegalEntity = poolApiClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest)).entities.single()
 
-        val addAddressRequest = requestFactory.buildAdditionalAddressCreateRequest("$testName 2", createdLegalEntity.legalEntity.bpnl)
+        val addAddressRequest = requestFactory.buildAdditionalAddressCreateRequest("$testName 2", createdLegalEntity.legalEntity.header.bpnl)
         val createdAddAddress = poolApiClient.addresses.createAddresses(listOf(addAddressRequest)).entities.single()
 
         val activeLater = listOf(RelationValidityPeriod(LocalDate.now().plusDays(1), null))
-        val replacedByRelation = BusinessPartnerRelations(RelationType.IsReplacedBy, createdLegalEntity.legalAddress.bpna, createdAddAddress.address.bpna, activeLater, anyReasonCode())
+        val replacedByRelation = BusinessPartnerRelations(RelationType.IsReplacedBy, createdLegalEntity.legalEntity.legalAddress.bpna, createdAddAddress.address.bpna, activeLater, anyReasonCode())
         val taskToResolve = TaskRelationsStepReservationEntryDto("Any", "Any", replacedByRelation)
         taskRelationsResolutionService.upsertRelationsGoldenRecordIntoPool(listOf(taskToResolve))
 
-        val originalLegalEntity = poolApiClient.legalEntities.getLegalEntity(createdLegalEntity.legalEntity.bpnl)
+        val originalLegalEntity = poolApiClient.legalEntities.getLegalEntity(createdLegalEntity.legalEntity.header.bpnl)
 
         //WHEN
         triggerBatchProcessExecutionService.executeUnprocessedTriggers()
 
         //THEN
-        val actualLegalEntity = poolApiClient.legalEntities.getLegalEntity(createdLegalEntity.legalEntity.bpnl)
+        val actualLegalEntity = poolApiClient.legalEntities.getLegalEntity(createdLegalEntity.legalEntity.header.bpnl)
         val expectedLegalEntity = originalLegalEntity
 
         poolAssertHelper.assertLegalEntityResponse(listOf(actualLegalEntity), listOf(expectedLegalEntity), Timeframe(Instant.now().minusSeconds(2), Instant.now()))
@@ -164,8 +165,9 @@ class TriggerBatchProcessExecutionServiceIT @Autowired constructor(
         val newReplacedRelation = buildAddressReplacedByRelation(replacedByRelation)
 
         return LegalEntityWithLegalAddressVerboseDto(
-            legalEntity = legalEntity.legalEntity,
-            legalAddress = newLegalAddress.address.copy(addressType = AddressType.LegalAddress, relations = newLegalAddress.address.relations.plus(newReplacedRelation))
+            header = legalEntity.legalEntity.header,
+            legalAddress = newLegalAddress.address.copy(addressType = AddressType.LegalAddress, relations = newLegalAddress.address.relations.plus(newReplacedRelation)),
+            scriptVariants = legalEntity.legalEntity.scriptVariants.map { it.copy(legalAddress = PostalAddressScriptVariantDto()) }
         )
     }
 

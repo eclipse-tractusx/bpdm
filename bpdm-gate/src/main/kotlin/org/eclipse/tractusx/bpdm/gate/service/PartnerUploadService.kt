@@ -50,7 +50,7 @@ class PartnerUploadService(
                 require(entities.isNotEmpty()) { "No legal entities found for tenantBpnl: $tenantBpnl" }
                 require(entities.size == 1) { "Multiple legal entities found for tenantBpnl: $tenantBpnl" }
             }
-            .first().legalEntity.legalName
+            .first().header.legalName
         val csvData: List<PartnerUploadFileRow> = PartnerFileUtil.parseCsv(file)
         val businessPartnerDtos = PartnerFileUtil.validateAndMapToBusinessPartnerInputRequests(csvData, tenantBpnl, legalName)
         val result = businessPartnerService.upsertBusinessPartnersInput(businessPartnerDtos, tenantBpnl)
