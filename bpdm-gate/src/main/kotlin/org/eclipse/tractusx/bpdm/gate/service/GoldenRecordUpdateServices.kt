@@ -39,6 +39,10 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntitySearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
+import org.eclipse.tractusx.orchestrator.api.model.AddressGoldenRecordRelation
+import org.eclipse.tractusx.orchestrator.api.model.AddressGoldenRecordRelationType
+import org.eclipse.tractusx.orchestrator.api.model.LegalEntityGoldenRecordRelation
+import org.eclipse.tractusx.orchestrator.api.model.LegalEntityGoldenRecordRelationType
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -238,6 +242,8 @@ class GoldenRecordUpdateChunkService(
             siteConfidence = siteConfidence?.toUpsertData(),
             addressConfidence = addressConfidence?.toUpsertData() ?: throw createMappingException(BusinessPartnerDb::addressConfidence, id),
             scriptVariants = scriptVariants.map { businessPartnerMappings.toScriptVariantDto(it) },
+            legalEntityGoldenRecordRelations = legalEntityGoldenRecordRelations.map { it.toUpsertData() },
+            addressGoldenRecordRelations = addressGoldenRecordRelations.map { it.toUpsertData() },
         )
     }
 
@@ -311,6 +317,14 @@ class GoldenRecordUpdateChunkService(
         return GeoCoordinate(longitude, latitude, altitude)
     }
 
+    private fun LegalEntityGoldenRecordRelationDb.toUpsertData(): LegalEntityGoldenRecordRelation {
+        return LegalEntityGoldenRecordRelation(relationType, sourceBpn, targetBpn)
+    }
+
+    private fun AddressGoldenRecordRelationDb.toUpsertData(): AddressGoldenRecordRelation {
+        return AddressGoldenRecordRelation(relationType, sourceBpn, targetBpn)
+    }
+
     private fun update(businessPartner: BusinessPartnerDb, legalEntity: LegalEntityWithLegalAddressVerboseDto){
         val header = legalEntity.header
         updateIdentifiers(businessPartner.identifiers, header.identifiers.map(::toEntity), BusinessPartnerType.LEGAL_ENTITY)
@@ -319,6 +333,7 @@ class GoldenRecordUpdateChunkService(
         businessPartner.legalForm = header.legalForm
         businessPartner.shortName = header.legalShortName
         businessPartner.legalEntityConfidence?.let { update(it,  header.confidenceCriteria) }
+        businessPartner.legalEntityGoldenRecordRelations.addAll(legalEntity.header.relations.map(::toLegalEntityEntity))
 
         val variantByCode = businessPartner.scriptVariants.associateBy { it.scriptCode }
 
@@ -352,6 +367,7 @@ class GoldenRecordUpdateChunkService(
         businessPartner.postalAddress.physicalPostalAddress = addressProperties.physicalPostalAddress.toEntity()
         businessPartner.postalAddress.alternativePostalAddress = addressProperties.alternativePostalAddress?.toEntity()
         businessPartner.addressConfidence?.let { update(it,  addressProperties.confidenceCriteria) }
+        businessPartner.addressGoldenRecordRelations.addAll(emptyList())
 
         val goldenRecordVariantByCode = address.scriptVariants.associateBy { it.scriptCode }
         businessPartner.scriptVariants.forEach { variant ->
@@ -417,6 +433,26 @@ class GoldenRecordUpdateChunkService(
             issuingBody = null,
             businessPartnerType = BusinessPartnerType.ADDRESS
         )
+
+    private fun toLegalEntityEntity(poolDto: RelationVerboseDto) =
+        LegalEntityGoldenRecordRelationDb(
+            relationType = when (poolDto.type) {
+                RelationType.IsAlternativeHeadquarterFor -> LegalEntityGoldenRecordRelationType.IsAlternativeHeadquarterFor
+                RelationType.IsManagedBy -> LegalEntityGoldenRecordRelationType.IsManagedBy
+                RelationType.IsOwnedBy -> LegalEntityGoldenRecordRelationType.IsOwnedBy
+            },
+            sourceBpn = poolDto.businessPartnerSourceBpnl,
+            targetBpn = poolDto.businessPartnerTargetBpnl
+        )
+
+
+    private fun toAddressEntity(poolDto: RelationVerboseDto) =
+        AddressGoldenRecordRelation(
+            relationType = AddressGoldenRecordRelationType.IsReplacedBy,
+            sourceBpn = poolDto.businessPartnerSourceBpnl,
+            targetBpn = poolDto.businessPartnerTargetBpnl
+        )
+
 
     private fun toEntity(poolDto: IBaseStateDto, businessPartnerType: BusinessPartnerType) =
         StateDb(

@@ -50,6 +50,8 @@ class BusinessPartnerCopyUtil {
 
             nameParts.replace(fromPartner.nameParts)
             roles.replace(fromPartner.roles)
+            legalEntityGoldenRecordRelations.replace(fromPartner.legalEntityGoldenRecordRelations)
+            addressGoldenRecordRelations.replace(fromPartner.addressGoldenRecordRelations)
 
             states.copyAndSync(fromPartner.states, ::copyValues)
             identifiers.copyAndSync(fromPartner.identifiers, ::copyValues)

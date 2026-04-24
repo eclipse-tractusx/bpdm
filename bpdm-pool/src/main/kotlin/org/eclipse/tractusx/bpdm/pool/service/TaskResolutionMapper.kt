@@ -45,7 +45,8 @@ class TaskResolutionMapper {
                 isParticipantData = legalEntity.isParticipantData,
                 hasChanged = hasChanged,
                 legalAddress = toTaskResult(legalAddress, hasChanged),
-                scriptVariants = scriptVariants.map { toTaskResult(it) }
+                scriptVariants = scriptVariants.map { toTaskResult(it) },
+                goldenRecordRelations = legalEntity.relations.map { toTaskResult(it) }
             )
         }
     }
@@ -94,7 +95,8 @@ class TaskResolutionMapper {
                 confidenceCriteria = toTaskResult(confidenceCriteria),
                 physicalAddress = toTaskResult(physicalPostalAddress),
                 alternativeAddress =  alternativePostalAddress?.let { toTaskResult(it) },
-                hasChanged = hasChanged
+                hasChanged = hasChanged,
+                goldenRecordRelations = emptyList()
             )
         }
     }
@@ -215,6 +217,18 @@ class TaskResolutionMapper {
                 deliveryServiceNumber = deliveryServiceNumber
             )
         }
+    }
+
+    fun toTaskResult(relation: RelationVerboseDto): LegalEntityGoldenRecordRelation{
+        return LegalEntityGoldenRecordRelation(
+            relationType = when (relation.type) {
+                org.eclipse.tractusx.bpdm.pool.api.model.RelationType.IsAlternativeHeadquarterFor -> LegalEntityGoldenRecordRelationType.IsAlternativeHeadquarterFor
+                org.eclipse.tractusx.bpdm.pool.api.model.RelationType.IsManagedBy -> LegalEntityGoldenRecordRelationType.IsManagedBy
+                org.eclipse.tractusx.bpdm.pool.api.model.RelationType.IsOwnedBy ->LegalEntityGoldenRecordRelationType.IsOwnedBy
+            },
+            sourceBpn = relation.businessPartnerSourceBpnl,
+            targetBpn = relation.businessPartnerTargetBpnl
+        )
     }
 
 

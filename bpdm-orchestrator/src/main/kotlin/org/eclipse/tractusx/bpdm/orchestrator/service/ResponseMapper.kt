@@ -91,7 +91,8 @@ class ResponseMapper {
                 isParticipantData = isCatenaXMemberData,
                 hasChanged = legalEntityHasChanged,
                 legalAddress = toPostalAddressOrEmpty(businessPartner, PostalAddressDb.Scope.LegalAddress)!!,
-                scriptVariants = toLegalEntityScriptVariants(businessPartner)
+                scriptVariants = toLegalEntityScriptVariants(businessPartner),
+                goldenRecordRelations = toLegalEntityGoldenRecordRelations(businessPartner)
             )
         }
 
@@ -170,7 +171,8 @@ class ResponseMapper {
                     confidenceCriteria = toConfidence(businessPartner, scope.confidence),
                     physicalAddress = toPhysicalAddress(physicalAddress),
                     alternativeAddress = toAlternativeAddress(alternativeAddress),
-                    hasChanged = hasChanged
+                    hasChanged = hasChanged,
+                    goldenRecordRelations = scope.addressGoldenRecordRelation?.let { toAddressGoldenRecordRelations(businessPartner, it) } ?: emptyList()
                 )
             }
         }
@@ -302,6 +304,15 @@ class ResponseMapper {
             LegalEntityScriptVariant(headerVariant.scriptCode, headerVariant.legalName, headerVariant.legalShortName, legalAddressVariant?.let { toPostalAddressScriptVariant(it) } ?: PostalAddressScriptVariant.empty )
         }
     }
+
+    fun toLegalEntityGoldenRecordRelations(businessPartner: GoldenRecordTaskDb.BusinessPartner) =
+        businessPartner.legalEntityGoldenRecordRelations
+            .map { LegalEntityGoldenRecordRelation(it.relationType, it.sourceBpn, it.targetBpn) }
+
+    fun toAddressGoldenRecordRelations(businessPartner: GoldenRecordTaskDb.BusinessPartner, scope: AddressGoldenRecordRelationDb.Scope) =
+        businessPartner.addressGoldenRecordRelations
+            .filter { it.scope == scope }
+            .map { AddressGoldenRecordRelation(it.relationType, it.sourceBpn, it.targetBpn) }
 
     fun toSiteScriptVariants(businessPartner: GoldenRecordTaskDb.BusinessPartner): List<SiteScriptVariant>{
         val mainAddressVariantsByScriptCode = businessPartner.addressScriptVariants.filter { it.scope == PostalAddressDb.Scope.SiteMainAddress }.associateBy { it.scriptCode }

@@ -1265,8 +1265,23 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/AddressIdentifierDto"
+        goldenRecordRelations:
+          type: array
+          items:
+            $ref: "#/components/schemas/AddressGoldenRecordRelationDto"
       required:
         - bpnA
+    AddressGoldenRecordRelationDto:
+      type: object
+      properties:
+        relationType:
+          type: string
+          enum:
+            - IsReplacedBy
+        sourceBpn:
+          type: string
+        targetBpn:
+          type: string
     AddressIdentifierDto:
       type: object
       description: "An address identifier (uniquely) identifies the address, such\
@@ -2076,6 +2091,19 @@ components:
           type: number
           format: double
           description: "Altitude, if applicable"
+    LegalEntityGoldenRecordRelationDto:
+      type: object
+      properties:
+        relationType:
+          type: string
+          enum:
+            - IsAlternativeHeadquarterFor
+            - IsManagedBy
+            - IsOwnedBy
+        sourceBpn:
+          type: string
+        targetBpn:
+          type: string
     LegalEntityRepresentationInputDto:
       type: object
       properties:
@@ -2125,6 +2153,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/BusinessPartnerStateDto"
+        goldenRecordRelations:
+          type: array
+          items:
+            $ref: "#/components/schemas/LegalEntityGoldenRecordRelationDto"
       required:
         - bpnL
     LegalEntityScriptVariantDto:
@@ -3131,12 +3163,12 @@ components:
       type: oauth2
       flows:
         clientCredentials:
-          tokenUrl: http://localhost:8180/realms/CX-Central/protocol/openid-connect/token
+          tokenUrl: http://localhost:8180/realms/BPDM/protocol/openid-connect/token
           scopes: {}
         authorizationCode:
-          authorizationUrl: http://localhost:8180/realms/CX-Central/protocol/openid-connect/auth
-          tokenUrl: http://localhost:8180/realms/CX-Central/protocol/openid-connect/token
-          refreshUrl: http://localhost:8180/realms/CX-Central/protocol/openid-connect/token
+          authorizationUrl: http://localhost:8180/realms/BPDM/protocol/openid-connect/auth
+          tokenUrl: http://localhost:8180/realms/BPDM/protocol/openid-connect/token
+          refreshUrl: http://localhost:8180/realms/BPDM/protocol/openid-connect/token
           scopes: {}
     bearer_scheme:
       type: http
