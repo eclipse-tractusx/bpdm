@@ -39,31 +39,36 @@ data class PostalAddressDb(
         val bpnReference: BpnReferenceDb.Scope,
         val identifier: IdentifierDb.Scope,
         val state: BusinessStateDb.Scope,
-        val confidence: ConfidenceCriteriaDb.Scope
+        val confidence: ConfidenceCriteriaDb.Scope,
+        val addressGoldenRecordRelation: AddressGoldenRecordRelationDb.Scope?
     ) {
         LegalAddress(
             BpnReferenceDb.Scope.LegalAddress,
             IdentifierDb.Scope.LegalAddress,
             BusinessStateDb.Scope.LegalAddress,
-            ConfidenceCriteriaDb.Scope.LegalAddress
+            ConfidenceCriteriaDb.Scope.LegalAddress,
+            AddressGoldenRecordRelationDb.Scope.LegalAddress
         ),
         SiteMainAddress(
             BpnReferenceDb.Scope.SiteMainAddress,
             IdentifierDb.Scope.SiteMainAddress,
             BusinessStateDb.Scope.SiteMainAddress,
-            ConfidenceCriteriaDb.Scope.SiteMainAddress
+            ConfidenceCriteriaDb.Scope.SiteMainAddress,
+            AddressGoldenRecordRelationDb.Scope.SiteMainAddress
         ),
         AdditionalAddress(
             BpnReferenceDb.Scope.AdditionalAddress,
             IdentifierDb.Scope.AdditionalAddress,
             BusinessStateDb.Scope.AdditionalAddress,
-            ConfidenceCriteriaDb.Scope.AdditionalAddress
+            ConfidenceCriteriaDb.Scope.AdditionalAddress,
+            AddressGoldenRecordRelationDb.Scope.AdditionalAddress
         ),
         UncategorizedAddress(
             BpnReferenceDb.Scope.UncategorizedAddress,
             IdentifierDb.Scope.UncategorizedAddress,
             BusinessStateDb.Scope.UncategorizedAddress,
-            ConfidenceCriteriaDb.Scope.UncategorizedAddress
+            ConfidenceCriteriaDb.Scope.UncategorizedAddress,
+            null
         )
     }
 

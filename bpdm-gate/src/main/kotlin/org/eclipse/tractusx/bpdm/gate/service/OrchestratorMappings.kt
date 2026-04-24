@@ -247,10 +247,19 @@ class OrchestratorMappings(
                 siteConfidence = site?.let { toConfidenceCriteria(it.confidenceCriteria) },
                 addressConfidence = toConfidenceCriteria(postalAddress.confidenceCriteria),
                 isOwnCompanyData = if (tenantBpnl != null && owningCompany != null) tenantBpnl == owningCompany else false,
-                scriptVariants = toScriptVariants(addressType, dto)
+                scriptVariants = toScriptVariants(addressType, dto),
+                legalEntityGoldenRecordRelations = legalEntity.goldenRecordRelations,
+                addressGoldenRecordRelations = toAddressGoldenRecordRelations(addressType, dto)
             )
         }
     }
+
+    private fun toAddressGoldenRecordRelations(addressType: AddressType, dto: BusinessPartner): List<AddressGoldenRecordRelation> =
+        when (addressType) {
+            AddressType.LegalAndSiteMainAddress, AddressType.LegalAddress -> dto.legalEntity.legalAddress.goldenRecordRelations
+            AddressType.SiteMainAddress -> dto.site!!.siteMainAddress!!.goldenRecordRelations
+            AddressType.AdditionalAddress -> dto.additionalAddress!!.postalProperties.goldenRecordRelations
+        }
 
     private fun toScriptVariants(addressType: AddressType, dto: BusinessPartner): List<BusinessPartnerScriptVariantDto>{
         val addressScriptVariants = when(addressType){
