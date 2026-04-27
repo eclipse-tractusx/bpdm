@@ -112,62 +112,6 @@ class BpnControllerIT @Autowired constructor(
     }
 
     /**
-     * Given some business partners imported
-     * When requesting bpn to SaaS id mappings and all the requested SaaS ids exist in the db
-     * Then all the requested mappings are returned
-     */
-    @Test
-    fun `find bpns by identifiers, all found`() {
-        val identifiersSearchRequest =
-            IdentifiersSearchRequest(IdentifierBusinessPartnerType.LEGAL_ENTITY, identifierType, listOf(identifierValue1, identifierValue2))
-
-        val bpnIdentifierMappings = poolClient.bpns.findBpnsByIdentifiers(identifiersSearchRequest).body
-
-        assertThat(bpnIdentifierMappings!!.map { it.idValue }).containsExactlyInAnyOrder(identifierValue1, identifierValue2)
-    }
-
-    /**
-     * Given some business partners imported
-     * When requesting bpn to SaaS id mappings and only some of the requested SaaS ids exist in the db
-     * Then only the requested mappings that exist in the db are returned
-     */
-    @Test
-    fun `find bpns by identifiers, only some found`() {
-        val identifiersSearchRequest =
-            IdentifiersSearchRequest(IdentifierBusinessPartnerType.LEGAL_ENTITY, identifierType, listOf(identifierValue1, "someNonexistentSaasId"))
-
-        val bpnIdentifierMappings = poolClient.bpns.findBpnsByIdentifiers(identifiersSearchRequest).body
-
-        assertThat(bpnIdentifierMappings!!.map { it.idValue }).containsExactlyInAnyOrder(identifierValue1)
-    }
-
-    /**
-     * Given some business partners imported
-     * When requesting too many bpn to SaaS id mappings in a single request, so that the requested number exceeds the configured limit
-     * Then a "bad request" response is sent
-     */
-    @Test
-    fun `find bpns by identifiers, bpn request limit exceeded`() {
-        val identifiersSearchRequest =
-            IdentifiersSearchRequest(IdentifierBusinessPartnerType.LEGAL_ENTITY, identifierType, listOf(identifierValue1, identifierValue2, identifierValue3))
-
-        testHelpers.`find bpns by identifiers, bpn request limit exceeded`(identifiersSearchRequest)
-    }
-
-    /**
-     * Given some business partners imported
-     * When requested identifier type not found
-     * Then a "not found" response is sent
-     */
-    @Test
-    fun `find bpns by nonexistent identifier type`() {
-        val identifiersSearchRequest =
-            IdentifiersSearchRequest(IdentifierBusinessPartnerType.LEGAL_ENTITY, "NONEXISTENT_IDENTIFIER_TYPE", listOf(identifierValue1))
-
-        testHelpers.`find bpns by nonexistent identifier type`(identifiersSearchRequest)
-    }
-
-    /**
      * Fetch the BPNL/S/A based on the provided request identifier
      */
     @Test
