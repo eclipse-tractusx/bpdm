@@ -21,14 +21,23 @@ package org.eclipse.tractusx.bpdm.pool.v7.bpn
 
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
+import org.eclipse.tractusx.bpdm.pool.api.model.request.BpnRequestIdentifierSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.IdentifiersSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnRequestIdentifierMappingDto
 import org.eclipse.tractusx.bpdm.pool.v7.UnscheduledPoolTestBaseV7
+import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorRequestFactoryV7
+import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.copyWithBpnRequests
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withLegalIdentifiers
+import org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.reactive.function.client.WebClientResponseException
 
 class BpnSearchV7IT : UnscheduledPoolTestBaseV7() {
+
+    @Autowired
+    private lateinit var orchestratorRequestFactory: OrchestratorRequestFactoryV7
 
     /**
      * GIVEN legal entity with identifier X
@@ -165,5 +174,147 @@ class BpnSearchV7IT : UnscheduledPoolTestBaseV7() {
             IdentifiersSearchRequest(IdentifierBusinessPartnerType.ADDRESS, identifierX.type, listOf(identifierX.value))
         )}
             .isInstanceOf(WebClientResponseException.NotFound::class.java)
+    }
+
+    @Test
+    fun `find bpnL by requested identifier`() {
+        //GIVEN
+        val businessPartner =  orchestratorRequestFactory.buildLegalEntityBusinessPartner(testName).copyWithBpnRequests()
+        val processedBusinessPartner = testDataClient.processTask(testName, businessPartner)
+
+        val bpnlRequestIdentifier = businessPartner.legalEntity.bpnReference.referenceValue!!
+        val bpnl = processedBusinessPartner.legalEntity.bpnReference.referenceValue!!
+
+        //WHEN
+        val response = poolClient.bpns.findBpnByRequestedIdentifiers(BpnRequestIdentifierSearchRequest(setOf(bpnlRequestIdentifier))).body
+
+        //THEN
+        val expected = setOf(BpnRequestIdentifierMappingDto(bpnlRequestIdentifier, bpnl))
+
+        Assertions.assertThat(response).isEqualTo(expected)
+    }
+
+    /**
+     * GIVEN a golden record task with a BPN request identifier for the legal address
+     * WHEN searching for the BPN by that request identifier
+     * THEN the assigned BPNA of the legal address is returned
+     */
+    @Test
+    fun `find bpnA for legal address by requested identifier`() {
+        //GIVEN
+        val businessPartner = orchestratorRequestFactory.buildLegalEntityBusinessPartner(testName).copyWithBpnRequests()
+        val processedBusinessPartner = testDataClient.processTask(testName, businessPartner)
+
+        val bpnaRequestIdentifier = businessPartner.legalEntity.legalAddress.bpnReference.referenceValue!!
+        val bpna = processedBusinessPartner.legalEntity.legalAddress.bpnReference.referenceValue!!
+
+        //WHEN
+        val response = poolClient.bpns.findBpnByRequestedIdentifiers(BpnRequestIdentifierSearchRequest(setOf(bpnaRequestIdentifier))).body
+
+        //THEN
+        val expected = setOf(BpnRequestIdentifierMappingDto(bpnaRequestIdentifier, bpna))
+        Assertions.assertThat(response).isEqualTo(expected)
+    }
+
+    /**
+     * GIVEN a golden record task with a BPN request identifier for the site
+     * WHEN searching for the BPN by that request identifier
+     * THEN the assigned BPNS of the site is returned
+     */
+    @Test
+    fun `find bpnS by requested identifier`() {
+        //GIVEN
+        val businessPartner = orchestratorRequestFactory.buildSiteBusinessPartner(testName).copyWithBpnRequests()
+        val processedBusinessPartner = testDataClient.processTask(testName, businessPartner)
+
+        val bpnsRequestIdentifier = businessPartner.site!!.bpnReference.referenceValue!!
+        val bpns = processedBusinessPartner.site!!.bpnReference.referenceValue!!
+
+        //WHEN
+        val response = poolClient.bpns.findBpnByRequestedIdentifiers(BpnRequestIdentifierSearchRequest(setOf(bpnsRequestIdentifier))).body
+
+        //THEN
+        val expected = setOf(BpnRequestIdentifierMappingDto(bpnsRequestIdentifier, bpns))
+        Assertions.assertThat(response).isEqualTo(expected)
+    }
+
+    /**
+     * GIVEN a golden record task with a BPN request identifier for the site main address
+     * WHEN searching for the BPN by that request identifier
+     * THEN the assigned BPNA of the site main address is returned
+     */
+    @Test
+    fun `find bpnA for site main address by requested identifier`() {
+        //GIVEN
+        val businessPartner = orchestratorRequestFactory.buildSiteBusinessPartner(testName).copyWithBpnRequests()
+        val processedBusinessPartner = testDataClient.processTask(testName, businessPartner)
+
+        val bpnaRequestIdentifier = businessPartner.site!!.siteMainAddress!!.bpnReference.referenceValue!!
+        val bpna = processedBusinessPartner.site!!.siteMainAddress!!.bpnReference.referenceValue!!
+
+        //WHEN
+        val response = poolClient.bpns.findBpnByRequestedIdentifiers(BpnRequestIdentifierSearchRequest(setOf(bpnaRequestIdentifier))).body
+
+        //THEN
+        val expected = setOf(BpnRequestIdentifierMappingDto(bpnaRequestIdentifier, bpna))
+        Assertions.assertThat(response).isEqualTo(expected)
+    }
+
+    /**
+     * GIVEN a golden record task with a BPN request identifier for an additional address of the legal entity
+     * WHEN searching for the BPN by that request identifier
+     * THEN the assigned BPNA of the additional address is returned
+     */
+    @Test
+    fun `find bpnA for additional address of legal entity by requested identifier`() {
+        //GIVEN
+        val businessPartner = orchestratorRequestFactory.buildLegalEntityAdditionalAddressBusinessPartner(testName).copyWithBpnRequests()
+        val processedBusinessPartner = testDataClient.processTask(testName, businessPartner)
+
+        val bpnaRequestIdentifier = businessPartner.additionalAddress!!.bpnReference.referenceValue!!
+        val bpna = processedBusinessPartner.additionalAddress!!.bpnReference.referenceValue!!
+
+        //WHEN
+        val response = poolClient.bpns.findBpnByRequestedIdentifiers(BpnRequestIdentifierSearchRequest(setOf(bpnaRequestIdentifier))).body
+
+        //THEN
+        val expected = setOf(BpnRequestIdentifierMappingDto(bpnaRequestIdentifier, bpna))
+        Assertions.assertThat(response).isEqualTo(expected)
+    }
+
+    /**
+     * GIVEN a golden record task with a BPN request identifier for an additional address of the site
+     * WHEN searching for the BPN by that request identifier
+     * THEN the assigned BPNA of the additional address is returned
+     */
+    @Test
+    fun `find bpnA for additional address of site by requested identifier`() {
+        //GIVEN
+        val businessPartner = orchestratorRequestFactory.buildSiteAdditionalAddressBusinessPartner(testName).copyWithBpnRequests()
+        val processedBusinessPartner = testDataClient.processTask(testName, businessPartner)
+
+        val bpnaRequestIdentifier = businessPartner.additionalAddress!!.bpnReference.referenceValue!!
+        val bpna = processedBusinessPartner.additionalAddress!!.bpnReference.referenceValue!!
+
+        //WHEN
+        val response = poolClient.bpns.findBpnByRequestedIdentifiers(BpnRequestIdentifierSearchRequest(setOf(bpnaRequestIdentifier))).body
+
+        //THEN
+        val expected = setOf(BpnRequestIdentifierMappingDto(bpnaRequestIdentifier, bpna))
+        Assertions.assertThat(response).isEqualTo(expected)
+    }
+
+    /**
+     * GIVEN no golden record tasks
+     * WHEN searching for a BPN by an unknown request identifier
+     * THEN an empty response is returned
+     */
+    @Test
+    fun `find bpn by unknown requested identifier returns empty`() {
+        //WHEN
+        val response = poolClient.bpns.findBpnByRequestedIdentifiers(BpnRequestIdentifierSearchRequest(setOf("UNKNOWN_REQUEST_IDENTIFIER"))).body
+
+        //THEN
+        Assertions.assertThat(response).isEmpty()
     }
 }

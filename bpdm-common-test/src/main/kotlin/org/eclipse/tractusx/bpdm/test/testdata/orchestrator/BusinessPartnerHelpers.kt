@@ -77,10 +77,13 @@ fun BusinessPartner.copyWithHasChanged(legalEntityChanged: Boolean = false, site
 
 fun BusinessPartner.copyWithBpnRequests() =
     copy(
-        legalEntity = legalEntity.copy(bpnReference = legalEntity.bpnReference.copy(referenceType = BpnReferenceType.BpnRequestIdentifier)),
-        site = site?.copy(bpnReference = site!!.bpnReference.copy(referenceType = BpnReferenceType.BpnRequestIdentifier)),
-        additionalAddress = additionalAddress?.copyAsPostalAddress{ it.copy(bpnReference = additionalAddress!!.bpnReference.copy(referenceType = BpnReferenceType.BpnRequestIdentifier)) }
+        legalEntity = legalEntity.copy(bpnReference = legalEntity.bpnReference.copy(referenceType = BpnReferenceType.BpnRequestIdentifier), legalAddress = legalEntity.legalAddress.copyWithBpnRequests()),
+        site = site?.copy(bpnReference = site!!.bpnReference.copy(referenceType = BpnReferenceType.BpnRequestIdentifier), siteMainAddress = site?.siteMainAddress?.copyWithBpnRequests()),
+        additionalAddress = additionalAddress?.copyAsPostalAddress{ it.copyWithBpnRequests() }
     )
+
+fun PostalAddress.copyWithBpnRequests() =
+    copy(bpnReference = bpnReference.copy(referenceType = BpnReferenceType.BpnRequestIdentifier))
 
 fun BusinessPartner.copyAsCxMemberData() =
     copy(
