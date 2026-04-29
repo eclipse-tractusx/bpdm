@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.v7.util
 
+import com.github.tomakehurst.wiremock.client.WireMock
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateRequest
@@ -26,13 +27,19 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerUpdate
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateVerboseDto
+import org.eclipse.tractusx.bpdm.pool.service.TaskBatchResolutionService
+import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.PoolRequestFactoryV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withParticipantData
+import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
 
 class TestDataClientV7(
     private val poolClient: PoolApiClient,
-    private val requestFactory: PoolRequestFactoryV7
+    private val requestFactory: PoolRequestFactoryV7,
+    private val orchestratorMockDataFactory: OrchestratorMockDataFactory,
+    private val taskBatchResolutionService: TaskBatchResolutionService
 ) {
+
 
     fun createLegalEntity(seed: String): LegalEntityWithLegalAddressVerboseDto{
         return createLegalEntity(requestFactory.buildLegalEntity(seed))
@@ -77,5 +84,15 @@ class TestDataClientV7(
     fun createAdditionalAddress(site: SitePartnerCreateVerboseDto, seed: String): AddressPartnerCreateVerboseDto {
         val request = requestFactory.buildAdditionalAddressCreateRequest(seed, site)
         return poolClient.addresses.createAddresses(listOf(request)).entities.first()
+    }
+
+    fun processTask(seed: String, businessPartner: BusinessPartner): BusinessPartner{
+        WireMock.reset()
+
+        orchestratorMockDataFactory.mockReservedBusinessPartner(seed, businessPartner)
+
+        taskBatchResolutionService.processTasks()
+        val businessPartnerResult = orchestratorMockDataFactory.getBusinessPartnerResolution()
+        return businessPartnerResult
     }
 }

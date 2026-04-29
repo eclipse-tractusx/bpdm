@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool
 
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
+import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockContextInitializer
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
@@ -28,7 +29,8 @@ import org.springframework.test.context.ContextConfiguration
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class])
 @ContextConfiguration(initializers = [
     PostgreSQLContextInitializer::class,
-    KeyCloakInitializer::class
+    KeyCloakInitializer::class,
+    OrchestratorMockContextInitializer::class
 ])
 @ActiveProfiles("test-unscheduled")
 annotation class UnscheduledTestEnvironment
