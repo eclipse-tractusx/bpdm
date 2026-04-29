@@ -25,7 +25,7 @@ import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyRequest
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.SharingStateDto
-import org.eclipse.tractusx.bpdm.gate.v6.GateUnscheduledInitialStartV6Test
+import org.eclipse.tractusx.bpdm.gate.v6.UnscheduledGateV6TestBase
 import org.eclipse.tractusx.orchestrator.api.model.TaskErrorType
 import org.junit.jupiter.api.Test
 
@@ -47,7 +47,7 @@ import org.junit.jupiter.api.Test
  *
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
-class FindSharingStatesV6IT: GateUnscheduledInitialStartV6Test() {
+class FindSharingStatesV6IT: UnscheduledGateV6TestBase() {
 
 
     /**

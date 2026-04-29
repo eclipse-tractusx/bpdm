@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.v6.stats
 
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsConfidenceCriteriaResponse
-import org.eclipse.tractusx.bpdm.gate.v6.GateUnscheduledInitialStartV6Test
+import org.eclipse.tractusx.bpdm.gate.v6.UnscheduledGateV6TestBase
 import org.eclipse.tractusx.bpdm.pool.api.model.ConfidenceCriteriaDto
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerRequestFactory
 import org.junit.jupiter.api.Disabled
@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDateTime
 
-class GetConfidenceCriteriaStatsV6IT: GateUnscheduledInitialStartV6Test() {
+class GetConfidenceCriteriaStatsV6IT: UnscheduledGateV6TestBase() {
 
 
     @Autowired

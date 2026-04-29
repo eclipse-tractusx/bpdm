@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.v6.config
+package org.eclipse.tractusx.bpdm.gate.config
 
 import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.gate.api.v6.client.GateClientV6
@@ -39,16 +39,34 @@ import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerRequestFactor
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerVerboseValues
 import org.eclipse.tractusx.bpdm.test.testdata.pool.ExpectedBusinessPartnerResultFactory
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolMockDataFactory
+import org.eclipse.tractusx.bpdm.test.testdata.pool.TestMetadataV7
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import tools.jackson.databind.json.JsonMapper
 
+/*******************************************************************************
+ * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Apache License, Version 2.0 which is available at
+ * https://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ ******************************************************************************/
 @Configuration
-@ConditionalOnProperty(name = ["test.v6"], havingValue = "true", matchIfMissing = false)
 class GateTestDataV6config {
 
-    private val poolTestMetadata = org.eclipse.tractusx.bpdm.test.testdata.pool.TestMetadataV7(
+    private val poolTestMetadata = TestMetadataV7(
         legalForms = listOf(
             BusinessPartnerVerboseValues.legalForm1,
             BusinessPartnerVerboseValues.legalForm2
@@ -75,7 +93,7 @@ class GateTestDataV6config {
 
 
     @Bean
-    fun testDataFactoryV6(): GateTestDataFactoryV6{
+    fun testDataFactoryV6(): GateTestDataFactoryV6 {
         return GateTestDataFactoryV6(
             GateInputFactory(
                 testMetadata = TestMetadata(
@@ -90,7 +108,7 @@ class GateTestDataV6config {
     }
 
     @Bean
-    fun refinementTestDataFactory(): RefinementTestDataFactory{
+    fun refinementTestDataFactory(): RefinementTestDataFactory {
         return RefinementTestDataFactory()
     }
 
@@ -98,19 +116,19 @@ class GateTestDataV6config {
     fun orchestratorMockDataFactory(
         refinementTestDataFactory: RefinementTestDataFactory,
         jsonMapper: JsonMapper
-    ): OrchestratorMockDataFactory{
+    ): OrchestratorMockDataFactory {
         return OrchestratorMockDataFactory(refinementTestDataFactory, jsonMapper)
     }
 
     @Bean
-    fun poolRequestFactory(): BusinessPartnerRequestFactory{
+    fun poolRequestFactory(): BusinessPartnerRequestFactory {
         return BusinessPartnerRequestFactory(poolTestMetadata)
     }
 
     @Bean
     fun poolMockDataFactory(
         jsonMapper: JsonMapper
-    ): PoolMockDataFactory{
+    ): PoolMockDataFactory {
         return PoolMockDataFactory(
             BusinessPartnerRequestFactory(poolTestMetadata),
             ExpectedBusinessPartnerResultFactory(poolTestMetadata),
@@ -126,14 +144,14 @@ class GateTestDataV6config {
         taskCreationBatchService: TaskCreationBatchService,
         taskResolutionBatchService: TaskResolutionBatchService,
         poolMockDataFactory: PoolMockDataFactory
-    ): GateTestDataClientV6{
+    ): GateTestDataClientV6 {
         return GateTestDataClientV6(
             testDataFactory,
             operatorClient,
             orchestratorMockDataFactory,
             taskCreationBatchService,
             taskResolutionBatchService,
-            KeyCloakInitializer.TENANT_BPNL,
+            KeyCloakInitializer.Companion.TENANT_BPNL,
             poolMockDataFactory
         )
     }

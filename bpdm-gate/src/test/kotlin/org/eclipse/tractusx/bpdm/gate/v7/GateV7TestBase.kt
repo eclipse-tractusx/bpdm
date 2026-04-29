@@ -21,6 +21,4 @@ package org.eclipse.tractusx.bpdm.gate.v7
 
 import org.eclipse.tractusx.bpdm.gate.GateTestBase
 
-abstract class GateTestBaseV7 : GateTestBase() {
-
-}
+abstract class GateTestBaseV7 : GateTestBase()

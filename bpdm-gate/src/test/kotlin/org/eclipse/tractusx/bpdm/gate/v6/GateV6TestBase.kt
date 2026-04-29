@@ -19,27 +19,23 @@
 
 package org.eclipse.tractusx.bpdm.gate.v6
 
+import org.eclipse.tractusx.bpdm.gate.GateTestBase
 import org.eclipse.tractusx.bpdm.gate.api.v6.client.GateClientV6
 import org.eclipse.tractusx.bpdm.gate.v6.util.GateAssertRepositoryV6
 import org.eclipse.tractusx.bpdm.gate.v6.util.GateTestDataClientV6
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInfo
 import org.springframework.beans.factory.annotation.Autowired
 
-abstract class GateV6Test: IsGateV6Test {
+abstract class GateV6TestBase: GateTestBase() {
     @Autowired
-    lateinit var databaseHelpers: DbTestHelpers
+    lateinit var assertRepo: GateAssertRepositoryV6
     @Autowired
-    override lateinit var assertRepo: GateAssertRepositoryV6
+    lateinit var testDataClient: GateTestDataClientV6
     @Autowired
-    override lateinit var testDataClient: GateTestDataClientV6
-    @Autowired
-    override lateinit var gateClient: GateClientV6
+    lateinit var gateClient: GateClientV6
 
-    lateinit var testName: String
-
-    open fun beforeEach(testInfo: TestInfo){
-        testName = testInfo.displayName
-        databaseHelpers.truncateDbTables()
-    }
+    val requestFactory get() = testDataClient.testDataFactory.request
+    val expectedResultFactory get() = testDataClient.testDataFactory.result
 }

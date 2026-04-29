@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.v6.businesspartner
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
-import org.eclipse.tractusx.bpdm.gate.v6.GateUnscheduledInitialStartV6Test
+import org.eclipse.tractusx.bpdm.gate.v6.UnscheduledGateV6TestBase
 import org.junit.jupiter.api.Test
 
 /*******************************************************************************
@@ -42,7 +42,7 @@ import org.junit.jupiter.api.Test
  *
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
-class FindBusinessPartnerInputIT: GateUnscheduledInitialStartV6Test() {
+class FindBusinessPartnerInputIT: UnscheduledGateV6TestBase() {
 
     /**
      * GIVEN business partner input under external-ID
