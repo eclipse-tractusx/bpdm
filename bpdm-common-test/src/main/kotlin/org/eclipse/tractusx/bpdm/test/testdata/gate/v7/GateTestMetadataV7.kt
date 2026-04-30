@@ -17,8 +17,11 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.v7
+package org.eclipse.tractusx.bpdm.test.testdata.gate.v7
 
-import org.eclipse.tractusx.bpdm.gate.GateTestBase
-
-abstract class GateTestBaseV7 : GateTestBase()
+data class GateTestMetadataV7(
+    val identifierTypes: List<String>,
+    val legalForms: List<String>,
+    val adminAreas: List<String>,
+    val scriptVariants: List<String>
+)

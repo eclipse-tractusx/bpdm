@@ -35,12 +35,7 @@ import org.eclipse.tractusx.bpdm.test.testdata.gate.v6.ExpectedGateResultV6Facto
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v6.GateTestDataFactoryV6
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.RefinementTestDataFactory
-import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerRequestFactory
-import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerVerboseValues
-import org.eclipse.tractusx.bpdm.test.testdata.pool.ExpectedBusinessPartnerResultFactory
-import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolMockDataFactory
-import org.eclipse.tractusx.bpdm.test.testdata.pool.TestMetadataV7
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.eclipse.tractusx.bpdm.test.testdata.pool.*
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import tools.jackson.databind.json.JsonMapper
@@ -64,7 +59,7 @@ import tools.jackson.databind.json.JsonMapper
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 @Configuration
-class GateTestDataV6config {
+class GateTestDataV6Config {
 
     private val poolTestMetadata = TestMetadataV7(
         legalForms = listOf(
