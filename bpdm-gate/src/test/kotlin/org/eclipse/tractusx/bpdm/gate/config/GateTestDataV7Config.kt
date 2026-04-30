@@ -19,9 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.config
 
-import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.v7.util.GateAssertRepositoryV7
-import org.eclipse.tractusx.bpdm.gate.v7.util.GateTestDataClientV7
 import org.eclipse.tractusx.bpdm.test.testdata.gate.GateInputFactory
 import org.eclipse.tractusx.bpdm.test.testdata.gate.TestMetadata
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.BusinessPartnerInputDtoV7Factory
@@ -65,11 +63,6 @@ class GateTestDataV7Config {
     @Bean
     fun businessPartnerInputDtoV7Factory(): BusinessPartnerInputDtoV7Factory {
         return BusinessPartnerInputDtoV7Factory()
-    }
-
-    @Bean
-    fun gateTestDataClientV7(gateClient: GateClient, businessPartnerInputRequestV7Factory: BusinessPartnerInputRequestV7Factory): GateTestDataClientV7{
-        return GateTestDataClientV7(gateClient, businessPartnerInputRequestV7Factory)
     }
 
     @Bean

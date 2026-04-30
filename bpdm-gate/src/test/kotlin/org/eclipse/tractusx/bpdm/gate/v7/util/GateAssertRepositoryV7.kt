@@ -20,11 +20,13 @@
 package org.eclipse.tractusx.bpdm.gate.v7.util
 
 import org.assertj.core.api.Assertions
+import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
 
 class GateAssertRepositoryV7 {
 
-    fun assertBusinessPartnerInput(actual: Collection<BusinessPartnerInputDto>, expected: Collection<BusinessPartnerInputDto>){
+    fun assertBusinessPartnerInput(actual: Collection<BusinessPartnerInputDto>, expected: Collection<BusinessPartnerInputDto>) {
         Assertions.assertThat(actual)
             .usingRecursiveComparison()
             .ignoringCollectionOrder()
@@ -32,6 +34,33 @@ class GateAssertRepositoryV7 {
                 BusinessPartnerInputDto::createdAt.name,
                 BusinessPartnerInputDto::updatedAt.name
             )
+            .isEqualTo(expected)
+    }
+
+    fun assertBusinessPartnerInput(actual: PageDto<BusinessPartnerInputDto>, expected: PageDto<BusinessPartnerInputDto>) {
+        assertPageHeader(actual, expected)
+        assertBusinessPartnerInput(actual.content, expected.content)
+    }
+
+    fun assertSharingStates(actual: PageDto<SharingStateDto>, expected: PageDto<SharingStateDto>) {
+        assertPageHeader(actual, expected)
+        assertSharingStates(actual.content, expected.content)
+    }
+
+    fun assertSharingStates(actual: Collection<SharingStateDto>, expected: Collection<SharingStateDto>) {
+        Assertions.assertThat(actual)
+            .usingRecursiveComparison()
+            .ignoringFields(
+                SharingStateDto::updatedAt.name,
+                SharingStateDto::sharingProcessStarted.name
+            )
+            .isEqualTo(expected)
+    }
+
+    private fun assertPageHeader(actual: PageDto<*>, expected: PageDto<*>) {
+        Assertions.assertThat(actual)
+            .usingRecursiveComparison()
+            .ignoringFields(PageDto<*>::content.name)
             .isEqualTo(expected)
     }
 }

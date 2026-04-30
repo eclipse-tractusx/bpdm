@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.v7.util
 
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
+import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.BusinessPartnerInputRequestV7Factory
 
@@ -28,8 +29,12 @@ class GateTestDataClientV7(
     private val businessPartnerInputRequestV7Factory: BusinessPartnerInputRequestV7Factory
 ) {
 
-    fun createBusinessPartnerInput(seed: String): BusinessPartnerInputDto{
+    fun createBusinessPartnerInput(seed: String): BusinessPartnerInputDto {
         val request = businessPartnerInputRequestV7Factory.fromSeed(seed)
+        return createBusinessPartnerInput(request)
+    }
+
+    fun createBusinessPartnerInput(request: BusinessPartnerInputRequest): BusinessPartnerInputDto {
         return gateClient.businessParters.upsertBusinessPartnersInput(listOf(request)).body!!.single()
     }
 }

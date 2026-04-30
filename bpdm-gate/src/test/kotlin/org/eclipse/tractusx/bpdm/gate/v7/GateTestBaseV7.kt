@@ -34,8 +34,6 @@ abstract class GateTestBaseV7 : GateTestBase(){
     @Autowired
     lateinit var assertRepo: GateAssertRepositoryV7
     @Autowired
-    lateinit var testDataClient: GateTestDataClientV7
-    @Autowired
     lateinit var businessPartnerInputRequestFactory: BusinessPartnerInputRequestV7Factory
     @Autowired
     lateinit var businessPartnerInputFactory: BusinessPartnerInputDtoV7Factory
@@ -43,9 +41,11 @@ abstract class GateTestBaseV7 : GateTestBase(){
     lateinit var testClientProvider: GateTestClientProviderV7
 
     lateinit var gateClient: GateClient
+    lateinit var testDataClient: GateTestDataClientV7
 
     @PostConstruct
     fun init() {
         gateClient = testClientProvider.createClient(KeyCloakInitializer.CLIENT_ID_OPERATOR)
+        testDataClient = GateTestDataClientV7(gateClient, businessPartnerInputRequestFactory)
     }
 }

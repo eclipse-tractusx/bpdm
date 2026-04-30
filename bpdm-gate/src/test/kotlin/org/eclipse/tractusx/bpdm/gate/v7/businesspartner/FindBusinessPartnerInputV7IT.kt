@@ -17,32 +17,14 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.v6.businesspartner
+package org.eclipse.tractusx.bpdm.gate.v7.businesspartner
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
-import org.eclipse.tractusx.bpdm.gate.v6.UnscheduledGateV6TestBase
+import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
 import org.junit.jupiter.api.Test
 
-/*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
- *
- * See the NOTICE file(s) distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This program and the accompanying materials are made available under the
- * terms of the Apache License, Version 2.0 which is available at
- * https://www.apache.org/licenses/LICENSE-2.0.
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations
- * under the License.
- *
- * SPDX-License-Identifier: Apache-2.0
- ******************************************************************************/
-class FindBusinessPartnerInputIT: UnscheduledGateV6TestBase() {
+class FindBusinessPartnerInputV7IT : UnscheduledGateTestBaseV7() {
 
     /**
      * GIVEN business partner input under external-ID
@@ -50,15 +32,15 @@ class FindBusinessPartnerInputIT: UnscheduledGateV6TestBase() {
      * THEN input consumer receives the given business partner input
      */
     @Test
-    fun `find created business partner input`(){
+    fun `find created business partner input`() {
         //GIVEN
-        val givenBusinessPartnerInput = testDataClient.createBusinessPartnerInput(testName)
+        val created = testDataClient.createBusinessPartnerInput(testName)
 
         //WHEN
-        val response = gateClient.businessPartners.getBusinessPartnersInput(listOf(testName))
+        val response = gateClient.businessParters.getBusinessPartnersInput(listOf(testName))
 
         //THEN
-        val expected = PageDto(1, 1, 0, 1, listOf(givenBusinessPartnerInput))
+        val expected = PageDto(1, 1, 0, 1, listOf(created))
         assertRepo.assertBusinessPartnerInput(response, expected)
     }
 
@@ -68,16 +50,15 @@ class FindBusinessPartnerInputIT: UnscheduledGateV6TestBase() {
      * THEN input consumer receives an empty result
      */
     @Test
-    fun `try find created business partner non-existent external-ID`(){
+    fun `try find created business partner with non-existent external-ID`() {
         //GIVEN
         testDataClient.createBusinessPartnerInput(testName)
 
         //WHEN
-        val response = gateClient.businessPartners.getBusinessPartnersInput(listOf("NOT_EXISTS"))
+        val response = gateClient.businessParters.getBusinessPartnersInput(listOf("NOT_EXISTS"))
 
         //THEN
         val expected = PageDto<BusinessPartnerInputDto>(0, 0, 0, 0, emptyList())
         assertRepo.assertBusinessPartnerInput(response, expected)
     }
-
 }
