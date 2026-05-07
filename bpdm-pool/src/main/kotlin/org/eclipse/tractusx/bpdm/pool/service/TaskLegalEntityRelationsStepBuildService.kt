@@ -20,11 +20,12 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import jakarta.transaction.Transactional
-import org.eclipse.tractusx.bpdm.pool.api.model.RelationType
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
+import org.eclipse.tractusx.bpdm.pool.repository.ReasonCodeRepository
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
 import org.eclipse.tractusx.orchestrator.api.model.RelationValidityPeriod
@@ -34,27 +35,31 @@ import org.springframework.stereotype.Service
 import org.eclipse.tractusx.orchestrator.api.model.RelationType as OrchestratorRelationType
 
 @Service
-class TaskRelationsStepBuildService(
+class TaskLegalEntityRelationsStepBuildService(
     private val alternativeHeadquarterRelationService: AlternativeHeadquarterRelationUpsertService,
     private val legalEntityRepository: LegalEntityRepository,
     private val managedRelationUpsertService: ManagedRelationUpsertService,
     private val ownedByRelationService: OwnedByRelationUpsertService,
-    private val relationRepository: RelationRepository
+    private val relationRepository: RelationRepository,
+    private val reasonCodeRepository: ReasonCodeRepository
 ) {
     @Transactional
     fun upsertBusinessPartnerRelations(taskEntry: TaskRelationsStepReservationEntryDto): TaskRelationsStepResultEntryDto {
         val relationDto = taskEntry.businessPartnerRelations
 
         // Prevent self-referencing relations
-        if (relationDto.businessPartnerSourceBpnl == relationDto.businessPartnerTargetBpnl) {
-            throw BpdmValidationException("A legal entity cannot have a relation to itself (BPNL: ${relationDto.businessPartnerSourceBpnl}).")
+        if (relationDto.businessPartnerSourceBpn == relationDto.businessPartnerTargetBpn) {
+            throw BpdmValidationException("A legal entity cannot have a relation to itself (BPNL: ${relationDto.businessPartnerSourceBpn}).")
         }
         // Fetch legal entities by BPNL
-        val sourceLegalEntity = legalEntityRepository.findByBpnIgnoreCase(relationDto.businessPartnerSourceBpnl)
-            ?: throw BpdmValidationException("Source legal entity with specified BPNL : ${relationDto.businessPartnerSourceBpnl} not found")
+        val sourceLegalEntity = legalEntityRepository.findByBpnIgnoreCase(relationDto.businessPartnerSourceBpn)
+            ?: throw BpdmValidationException("Source legal entity with specified BPNL : ${relationDto.businessPartnerSourceBpn} not found")
 
-        val targetLegalEntity = legalEntityRepository.findByBpnIgnoreCase(relationDto.businessPartnerTargetBpnl)
-            ?: throw BpdmValidationException("Target legal entity with specified BPNL : ${relationDto.businessPartnerTargetBpnl} not found")
+        val targetLegalEntity = legalEntityRepository.findByBpnIgnoreCase(relationDto.businessPartnerTargetBpn)
+            ?: throw BpdmValidationException("Target legal entity with specified BPNL : ${relationDto.businessPartnerTargetBpn} not found")
+
+        val reasonCode  = reasonCodeRepository.findByTechnicalKey(relationDto.reasonCode)
+            ?: throw BpdmValidationException("Relation reason code '${relationDto.reasonCode}' not found")
 
         validateValidityPeriods(relationDto)
 
@@ -66,10 +71,11 @@ class TaskRelationsStepBuildService(
             )
         }
 
-        val legalEntityRelationType: RelationType = when(relationDto.relationType){
-            OrchestratorRelationType.IsAlternativeHeadquarterFor -> RelationType.IsAlternativeHeadquarterFor
-            OrchestratorRelationType.IsManagedBy -> RelationType.IsManagedBy
-            OrchestratorRelationType.IsOwnedBy -> RelationType.IsOwnedBy
+        val legalEntityRelationType: LegalEntityRelationType = when(relationDto.relationType){
+            OrchestratorRelationType.IsAlternativeHeadquarterFor -> LegalEntityRelationType.IsAlternativeHeadquarterFor
+            OrchestratorRelationType.IsManagedBy -> LegalEntityRelationType.IsManagedBy
+            OrchestratorRelationType.IsOwnedBy -> LegalEntityRelationType.IsOwnedBy
+            else -> throw BpdmValidationException("Unsupported relation type for legal entity relations: ${relationDto.relationType}")
         }
 
         val existingRelation = relationRepository.findAll(
@@ -84,12 +90,13 @@ class TaskRelationsStepBuildService(
             source = sourceLegalEntity,
             target = targetLegalEntity,
             validityPeriods = validityPeriods,
-            existingRelation = existingRelation
+            existingRelation = existingRelation,
+            reasonCode = reasonCode
         )
         val strategyService : IRelationUpsertStrategyService = when(legalEntityRelationType){
-            RelationType.IsAlternativeHeadquarterFor -> alternativeHeadquarterRelationService
-            RelationType.IsManagedBy -> managedRelationUpsertService
-            RelationType.IsOwnedBy -> ownedByRelationService
+            LegalEntityRelationType.IsAlternativeHeadquarterFor -> alternativeHeadquarterRelationService
+            LegalEntityRelationType.IsManagedBy -> managedRelationUpsertService
+            LegalEntityRelationType.IsOwnedBy -> ownedByRelationService
         }
 
         val upsertResult = strategyService.upsertRelation(upsertRequest)
@@ -104,22 +111,23 @@ class TaskRelationsStepBuildService(
     private fun RelationDb.toTaskDto(): BusinessPartnerRelations{
         return BusinessPartnerRelations(
             relationType = this.type.toTaskDto(),
-            businessPartnerSourceBpnl = this.startNode.bpn,
-            businessPartnerTargetBpnl = this.endNode.bpn,
+            businessPartnerSourceBpn = this.startNode.bpn,
+            businessPartnerTargetBpn = this.endNode.bpn,
             validityPeriods = this.validityPeriods.sortedBy { it.validFrom }.map {
                 RelationValidityPeriod(
                     validFrom = it.validFrom,
                     validTo = it.validTo
                 )
-            }
+            },
+            reasonCode = reasonCode.technicalKey
         )
     }
 
-    private fun RelationType.toTaskDto(): OrchestratorRelationType{
+    private fun LegalEntityRelationType.toTaskDto(): OrchestratorRelationType{
         return when(this){
-            RelationType.IsAlternativeHeadquarterFor -> OrchestratorRelationType.IsAlternativeHeadquarterFor
-            RelationType.IsManagedBy -> OrchestratorRelationType.IsManagedBy
-            RelationType.IsOwnedBy -> OrchestratorRelationType.IsOwnedBy
+            LegalEntityRelationType.IsAlternativeHeadquarterFor -> OrchestratorRelationType.IsAlternativeHeadquarterFor
+            LegalEntityRelationType.IsManagedBy -> OrchestratorRelationType.IsManagedBy
+            LegalEntityRelationType.IsOwnedBy -> OrchestratorRelationType.IsOwnedBy
         }
     }
 

@@ -21,10 +21,7 @@ package org.eclipse.tractusx.bpdm.orchestrator.config
 
 import org.eclipse.tractusx.bpdm.orchestrator.v7.util.OrchestratorAssertRepositoryV7
 import org.eclipse.tractusx.bpdm.orchestrator.v7.util.OrchestratorTestDataClientV7
-import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.BusinessPartnerTestDataFactory
-import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorExpectedResultFactoryV7
-import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorRequestFactoryCommon
-import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorRequestFactoryV7
+import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.*
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -36,7 +33,16 @@ class OrchestratorTestDataV7Config {
     fun orchestratorRequestFactoryV7(
         businessPartnerTestDataFactory: BusinessPartnerTestDataFactory
     ): OrchestratorRequestFactoryV7{
-        return OrchestratorRequestFactoryV7(businessPartnerTestDataFactory, OrchestratorRequestFactoryCommon())
+        val metadata = TestMetadataReferences(
+            legalForms = listOf("LF1", "LF2", "LF3"),
+            legalEntityIdentifierTypes = listOf("LEID1", "LEID2", "LEID3"),
+            addressIdentifierTypes = listOf("ADDID1", "ADDID2", "ADDID3"),
+            adminAreas = listOf("ADMINAREA1", "ADMINAREA2", "ADMINAREA3"),
+            scriptCodes = listOf("CHINESE_SIMPLIFIED", "CHINESE_TRADITIONAL", "JAPANESE"),
+            reasonCodes = listOf("REASON1", "REASON2", "REASON3")
+        )
+        val commonRequestFactory = OrchestratorRequestFactoryCommon(metadata)
+        return OrchestratorRequestFactoryV7(businessPartnerTestDataFactory, commonRequestFactory)
     }
 
     @Bean

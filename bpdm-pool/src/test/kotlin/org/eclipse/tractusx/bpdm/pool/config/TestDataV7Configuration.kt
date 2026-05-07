@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.config
 
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
+import org.eclipse.tractusx.bpdm.pool.api.model.ReasonCodeDto
 import org.eclipse.tractusx.bpdm.pool.api.model.ScriptCodeDto
 import org.eclipse.tractusx.bpdm.pool.service.TaskBatchResolutionService
 import org.eclipse.tractusx.bpdm.pool.util.metadata.AdminAreaLevel1EntryImporter
@@ -53,7 +54,11 @@ class TestDataV7Configuration {
      */
     @Bean
     fun poolDataHelper(poolClient: PoolApiClient): PoolDataHelper {
-        return PoolDataHelper(poolClient)
+        return PoolDataHelper(poolClient, listOf(
+            ReasonCodeDto("REASON1", "REASON1 description"),
+            ReasonCodeDto("REASON2", "REASON2 description"),
+            ReasonCodeDto("REASON3", "REASON3 description"),
+        ))
     }
 
     @Bean
@@ -74,13 +79,19 @@ class TestDataV7Configuration {
             ScriptCodeDto("CHINESE_TRADITIONAL", "Traditional Chinese characters"),
             ScriptCodeDto("KANJI", "Japanese Characters (Hiragana, Katakana and Kanji)")
         )
+        val reasonCodes = listOf(
+            ReasonCodeDto("REASON1", "REASON1 description"),
+            ReasonCodeDto("REASON2", "REASON2 description"),
+            ReasonCodeDto("REASON3", "REASON3 description"),
+        )
 
         return TestMetadataV7(
             legalForms = legalForms,
             legalEntityIdentifierTypes = identifierTypes.filter { it.businessPartnerType == IdentifierBusinessPartnerType.LEGAL_ENTITY },
             addressIdentifierTypes = identifierTypes.filter { it.businessPartnerType == IdentifierBusinessPartnerType.ADDRESS },
             adminAreas = adminAreas,
-            scriptCodes = scriptCodes
+            scriptCodes = scriptCodes,
+            reasonCodes = reasonCodes
         )
     }
 
@@ -111,7 +122,8 @@ class TestDataV7Configuration {
             legalEntityIdentifierTypes = testMetadataV7.legalEntityIdentifierTypes.map { it.technicalKey },
             addressIdentifierTypes = testMetadataV7.addressIdentifierTypes.map { it.technicalKey },
             adminAreas = testMetadataV7.adminAreas.map { it.code },
-            scriptCodes = testMetadataV7.scriptCodes.map { it.technicalKey }
+            scriptCodes = testMetadataV7.scriptCodes.map { it.technicalKey },
+            reasonCodes = testMetadataV7.reasonCodes.map { it.technicalKey },
         )
         return OrchestratorRequestFactoryCommon(orchestratorMetadata)
     }

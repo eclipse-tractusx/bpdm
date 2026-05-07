@@ -73,7 +73,8 @@ class TaskResolutionServiceTest @Autowired constructor(
                     legalEntityIdentifierTypes = testDataEnvironment.metadata.legalEntityIdentifierTypes.map { it.technicalKey },
                     addressIdentifierTypes = testDataEnvironment.metadata.addressIdentifierTypes.map { it.technicalKey },
                     adminAreas = testDataEnvironment.metadata.adminAreas.map { it.code },
-                    scriptCodes = testDataEnvironment.metadata.scriptCodes.map { it.technicalKey }
+                    scriptCodes = testDataEnvironment.metadata.scriptCodes.map { it.technicalKey },
+                    reasonCodes = testDataEnvironment.metadata.reasonCodes.map { it.technicalKey }
                 )
             )
         )

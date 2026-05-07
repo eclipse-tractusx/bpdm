@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.gate.config
 
-import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.test.testdata.gate.GateInputFactory
 import org.eclipse.tractusx.bpdm.test.testdata.gate.TestMetadata
 import org.springframework.context.annotation.Bean
@@ -29,11 +28,12 @@ import org.springframework.context.annotation.Configuration
 class TestDataConfiguration {
 
     @Bean
-    fun testMetadata(poolClient: PoolApiClient): TestMetadata {
+    fun testMetadata(): TestMetadata {
         val testMetadata = TestMetadata(
             identifierTypes = listOf("EU_VAT_ID_DE", "DUNS_ID"),
             legalForms = listOf("SCE1", "SGST"),
-            adminAreas = listOf("DE-BW", "DE-BY")
+            adminAreas = listOf("DE-BW", "DE-BY"),
+            reasonCodes = listOf("REASON_CODE_1", "REASON_CODE_2")
         )
 
         return testMetadata

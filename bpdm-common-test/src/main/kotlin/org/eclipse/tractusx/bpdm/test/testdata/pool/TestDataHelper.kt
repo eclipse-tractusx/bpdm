@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.test.testdata.pool
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.*
+import org.eclipse.tractusx.bpdm.pool.api.model.request.ReasonCodeUpsertRequest
 
 /**
  * This class provides functionality to create a [TestDataEnvironment] to support creating and comparing business partner data
@@ -29,6 +30,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.*
  */
 class PoolDataHelper(
     private val poolClient: PoolApiClient,
+    private val reasonCodes: List<ReasonCodeDto>
 ) {
 
     fun createTestDataEnvironment(): TestDataEnvironment {
@@ -38,7 +40,9 @@ class PoolDataHelper(
         val adminAreas = poolClient.metadata.getAdminAreasLevel1(PaginationRequest()).content.toList()
         val scriptCodes = poolClient.metadata.getScriptCodes(PaginationRequest()).content.toList()
 
-        val testMetadata = TestMetadataV7(legalForms, legalEntityIdentifierTypes, addressIdentifierTypes, adminAreas, scriptCodes)
+        reasonCodes.forEach { poolClient.metadata.upsertReasonCode(ReasonCodeUpsertRequest(it)) }
+
+        val testMetadata = TestMetadataV7(legalForms, legalEntityIdentifierTypes, addressIdentifierTypes, adminAreas, scriptCodes, reasonCodes)
 
         val requestFactory = BusinessPartnerRequestFactory(testMetadata)
         val expectedResultFactory = ExpectedBusinessPartnerResultFactory(testMetadata)
@@ -57,5 +61,6 @@ data class TestMetadataV7(
     val legalEntityIdentifierTypes: List<IdentifierTypeDto>,
     val addressIdentifierTypes: List<IdentifierTypeDto>,
     val adminAreas: List<CountrySubdivisionDto>,
-    val scriptCodes: List<ScriptCodeDto>
+    val scriptCodes: List<ScriptCodeDto>,
+    val reasonCodes: List<ReasonCodeDto>
 )

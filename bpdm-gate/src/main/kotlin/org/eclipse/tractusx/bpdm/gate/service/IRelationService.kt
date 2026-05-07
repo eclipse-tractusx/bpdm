@@ -60,6 +60,7 @@ interface IRelationService {
         val relationType: SharableRelationType,
         val businessPartnerSourceExternalId: String,
         val businessPartnerTargetExternalId: String,
-        val validityPeriods: Collection<RelationValidityPeriodDto>
+        val validityPeriods: Collection<RelationValidityPeriodDto>,
+        val reasonCode: String
     )
 }

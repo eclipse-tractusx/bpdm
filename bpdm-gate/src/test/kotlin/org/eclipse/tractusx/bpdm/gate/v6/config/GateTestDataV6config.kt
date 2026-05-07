@@ -70,7 +70,8 @@ class GateTestDataV6config {
         ),
         scriptCodes = listOf(
             ScriptCodeDto("Test", "Test Description")
-        )
+        ),
+        reasonCodes = emptyList()
     )
 
 
@@ -81,7 +82,8 @@ class GateTestDataV6config {
                 testMetadata = TestMetadata(
                     identifierTypes = poolTestMetadata.legalEntityIdentifierTypes.map { it.technicalKey },
                     legalForms = poolTestMetadata.legalForms.map { it.technicalKey },
-                    adminAreas = poolTestMetadata.adminAreas.map { it.code }
+                    adminAreas = poolTestMetadata.adminAreas.map { it.code },
+                    reasonCodes = emptyList(),
                 ),
                 testRunData = null
             ),
