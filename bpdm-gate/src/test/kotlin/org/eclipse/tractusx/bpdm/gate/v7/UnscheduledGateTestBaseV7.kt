@@ -17,20 +17,9 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool
+package org.eclipse.tractusx.bpdm.gate.v7
 
-import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
-import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockContextInitializer
-import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.ContextConfiguration
+import org.eclipse.tractusx.bpdm.gate.UnscheduledTestEnvironment
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class])
-@ContextConfiguration(initializers = [
-    PostgreSQLContextInitializer::class,
-    KeyCloakInitializer::class,
-    OrchestratorMockContextInitializer::class
-])
-@ActiveProfiles("test-unscheduled")
-annotation class UnscheduledTestEnvironment
+@UnscheduledTestEnvironment
+class UnscheduledGateTestBaseV7: GateTestBaseV7()

@@ -17,38 +17,28 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.config
+package org.eclipse.tractusx.bpdm.gate.v7.util
 
+import org.eclipse.tractusx.bpdm.common.util.BpdmClientCreateProperties
 import org.eclipse.tractusx.bpdm.common.util.BpdmWebClientProvider
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClientImpl
-import org.eclipse.tractusx.bpdm.gate.v7.util.GateTestClientProviderV7
-import org.eclipse.tractusx.bpdm.test.config.SelfClientConfigProperties
-import org.springframework.boot.web.server.servlet.context.ServletWebServerApplicationContext
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
+import org.springframework.boot.web.server.WebServer
 
-@Configuration
-class GateClientConfig{
+class GateTestClientProviderV7(
+    private val ownWebServer: WebServer,
+    private val bpdmWebClientProvider: BpdmWebClientProvider
+) {
 
-    @Bean
-    fun gateClient(webServerAppCtxt: ServletWebServerApplicationContext,
-                   bpdmWebClientProvider: BpdmWebClientProvider,
-                   properties: SelfClientConfigProperties
-                   ): GateClient {
+    fun createClient(oauth2RegistrationId: String?): GateClient {
         return GateClientImpl {
-            val baseUrl = "http://localhost:${webServerAppCtxt.webServer!!.port}"
-            bpdmWebClientProvider.builder(properties.copy(baseUrl = baseUrl)).build()
+            bpdmWebClientProvider.builder(
+                BpdmClientCreateProperties(
+                    oauth2RegistrationId ?: "",
+                    "http://localhost:${ownWebServer.port}",
+                    oauth2RegistrationId != null
+                )
+            ).build()
         }
     }
-
-    @Bean
-    fun gateTestClientProviderV7(
-        webServerAppCtxt: ServletWebServerApplicationContext,
-        bpdmWebClientProvider: BpdmWebClientProvider
-    ): GateTestClientProviderV7 {
-        return GateTestClientProviderV7(webServerAppCtxt.webServer!!, bpdmWebClientProvider)
-    }
-
 }
-

@@ -1,0 +1,52 @@
+bpdm:
+  bpn:
+    owner-bpn-l: "BPNL000000000001"
+  tasks:
+    creation:
+      fromSharingMember:
+        cron: '-'
+      fromPool:
+        cron: '-'
+    check:
+      cron: '-'
+    healthCheck:
+      cron: '-'
+    relationCreation:
+      cron: '-'
+    relationCheck:
+      cron: '-'
+    recordSync:
+      cron: '-'
+spring:
+  datasource:
+    hikari:
+      maximum-pool-size: 2
+  security:
+    oauth2:
+      client:
+        registration:
+          admin:
+            provider: "test-keycloak"
+            authorization-grant-type: "client_credentials"
+            client-id: "BPDM_ADMIN"
+            client-secret: "**********"
+          gate-input-manager:
+            provider: "test-keycloak"
+            authorization-grant-type: "client_credentials"
+            client-id: "BPDM_GATE_INPUT_MANAGER"
+            client-secret: "**********"
+          gate-input-consumer:
+            provider: "test-keycloak"
+            authorization-grant-type: "client_credentials"
+            client-id: "BPDM_GATE_INPUT_CONSUMER"
+            client-secret: "**********"
+          gate-output-consumer:
+            provider: "test-keycloak"
+            authorization-grant-type: "client_credentials"
+            client-id: "BPDM_GATE_OUTPUT_CONSUMER"
+            client-secret: "**********"
+          unauthorized:
+            provider: "test-keycloak"
+            authorization-grant-type: "client_credentials"
+            client-id: "BPDM_TASK_CREATOR"
+            client-secret: "**********"

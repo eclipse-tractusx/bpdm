@@ -28,6 +28,7 @@ import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockContextInitiali
 import org.eclipse.tractusx.orchestrator.api.ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS
 import org.eclipse.tractusx.orchestrator.api.model.*
 import tools.jackson.databind.json.JsonMapper
+import java.time.Duration
 import java.time.Instant
 import java.util.*
 
@@ -37,6 +38,14 @@ class OrchestratorMockDataFactory(
 ) {
 
     private val orchestratorMockServer = OrchestratorMockContextInitializer.wiremockServer
+
+    fun mockBusinessPartnerWaitingInStep(
+        businessPartner: BusinessPartner,
+        taskStep: TaskStep
+    ){
+        configureWireMock()
+
+    }
 
     fun mockRefineToLegalEntity(
         seed: String,
@@ -165,6 +174,41 @@ class OrchestratorMockDataFactory(
         return mockedErrorTasks.tasks.single()
     }
 
+    fun mockReservedBusinessPartner(seed: String, businessPartner: BusinessPartner): TaskStepReservationEntryDto{
+        WireMock.configureFor("localhost", orchestratorMockServer.port())
+
+        val mockedReservedTasks = buildReservedTasks(seed, businessPartner)
+        val emptyReservation = TaskStepReservationResponse(emptyList(), Instant.now().plus(Duration.ofSeconds(60)))
+
+        WireMock.stubFor(
+            WireMock.post(WireMock.urlPathEqualTo("${BASE_PATH_V7_BUSINESS_PARTNERS}/step-reservations"))
+                .inScenario("step-reservations")
+                .whenScenarioStateIs(com.github.tomakehurst.wiremock.stubbing.Scenario.STARTED)
+                .willReturn(WireMock.okJson(jsonMapper.writeValueAsString(mockedReservedTasks)))
+                .willSetStateTo("empty")
+        )
+        WireMock.stubFor(
+            WireMock.post(WireMock.urlPathEqualTo("${BASE_PATH_V7_BUSINESS_PARTNERS}/step-reservations"))
+                .inScenario("step-reservations")
+                .whenScenarioStateIs("empty")
+                .willReturn(WireMock.okJson(jsonMapper.writeValueAsString(emptyReservation)))
+        )
+
+        WireMock.stubFor(WireMock.post(WireMock.urlPathEqualTo("${BASE_PATH_V7_BUSINESS_PARTNERS}/step-results"))
+            .willReturn(WireMock.ok()))
+
+        return mockedReservedTasks.reservedTasks.single()
+    }
+
+    fun getBusinessPartnerResolution(): BusinessPartner{
+        WireMock.configureFor("localhost", orchestratorMockServer.port())
+
+        val loggedRequests = WireMock.findAll(WireMock.postRequestedFor(WireMock.urlPathEqualTo("${BASE_PATH_V7_BUSINESS_PARTNERS}/step-results")))
+        val postedResult =  jsonMapper.readValue(loggedRequests.first().body, TaskStepResultRequest::class.java)
+
+        return postedResult.results.first().businessPartner
+    }
+
     fun buildInitialTaskCreationResponse(seed: String): TaskCreateResponse{
         return TaskCreateResponse(
             listOf(
@@ -225,6 +269,19 @@ class OrchestratorMockDataFactory(
                     )
                 )
             )
+        )
+    }
+
+    private fun buildReservedTasks(seed: String, businessPartner: BusinessPartner): TaskStepReservationResponse{
+        return TaskStepReservationResponse(
+            listOf(
+                TaskStepReservationEntryDto(
+                    UUID.nameUUIDFromBytes("TaskID_$seed".encodeToByteArray()).toString(),
+                    UUID.nameUUIDFromBytes("RecordID_$seed".encodeToByteArray()).toString(),
+                    businessPartner
+                )
+            ),
+            Instant.now().plus(Duration.ofSeconds(60)),
         )
     }
 

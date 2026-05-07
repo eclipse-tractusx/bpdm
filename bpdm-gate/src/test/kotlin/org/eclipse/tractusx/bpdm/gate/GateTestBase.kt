@@ -17,20 +17,25 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool
+package org.eclipse.tractusx.bpdm.gate
 
-import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
-import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockContextInitializer
-import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.ContextConfiguration
+import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.TestInfo
+import org.springframework.beans.factory.annotation.Autowired
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class])
-@ContextConfiguration(initializers = [
-    PostgreSQLContextInitializer::class,
-    KeyCloakInitializer::class,
-    OrchestratorMockContextInitializer::class
-])
-@ActiveProfiles("test-unscheduled")
-annotation class UnscheduledTestEnvironment
+abstract class GateTestBase {
+    @Autowired
+    lateinit var databaseHelpers: DbTestHelpers
+
+    lateinit var testName: String
+
+    /**
+     * Needs to be overwritten and annotated with @BeforeEach as Junit does not pick the annotation up from the base class
+     */
+    @BeforeEach
+    open fun beforeEach(testInfo: TestInfo){
+        testName = testInfo.displayName
+        databaseHelpers.truncateDbTables()
+    }
+}
