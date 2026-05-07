@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsSharingStatesResponse
 
 class GateAssertRepositoryV7 {
 
@@ -57,6 +58,10 @@ class GateAssertRepositoryV7 {
                 SharingStateDto::sharingProcessStarted.name
             )
             .isEqualTo(expected)
+    }
+
+    fun assertSharingStateStats(actual: StatsSharingStatesResponse, expected: StatsSharingStatesResponse) {
+        Assertions.assertThat(actual).isEqualTo(expected)
     }
 
     fun assertChangelog(actual: PageChangeLogDto<ChangelogGateDto>, expected: PageChangeLogDto<ChangelogGateDto>) {

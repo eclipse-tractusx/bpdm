@@ -103,19 +103,6 @@ class GateTestDataV6Config {
     }
 
     @Bean
-    fun refinementTestDataFactory(): RefinementTestDataFactory {
-        return RefinementTestDataFactory()
-    }
-
-    @Bean
-    fun orchestratorMockDataFactory(
-        refinementTestDataFactory: RefinementTestDataFactory,
-        jsonMapper: JsonMapper
-    ): OrchestratorMockDataFactory {
-        return OrchestratorMockDataFactory(refinementTestDataFactory, jsonMapper)
-    }
-
-    @Bean
     fun poolRequestFactory(): BusinessPartnerRequestFactory {
         return BusinessPartnerRequestFactory(poolTestMetadata)
     }

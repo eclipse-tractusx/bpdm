@@ -39,12 +39,16 @@ class OrchestratorMockDataFactory(
 
     private val orchestratorMockServer = OrchestratorMockContextInitializer.wiremockServer
 
-    fun mockBusinessPartnerWaitingInStep(
-        businessPartner: BusinessPartner,
-        taskStep: TaskStep
-    ){
+    fun mockRefineToSuccess(
+        seed: String,
+        businessPartnerData: BusinessPartner
+    ): TaskClientStateDto{
         configureWireMock()
 
+        val mockedCreatedTask = mockCreateTask(seed)
+        val mockedRefinedTask = mockTaskRefinedSuccessfully(mockedCreatedTask.taskId, businessPartnerData, seed)
+
+        return mockedRefinedTask
     }
 
     fun mockRefineToLegalEntity(

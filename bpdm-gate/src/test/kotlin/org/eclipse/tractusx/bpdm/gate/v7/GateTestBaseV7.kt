@@ -22,12 +22,16 @@ package org.eclipse.tractusx.bpdm.gate.v7
 import jakarta.annotation.PostConstruct
 import org.eclipse.tractusx.bpdm.gate.GateTestBase
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
+import org.eclipse.tractusx.bpdm.gate.service.TaskCreationBatchService
+import org.eclipse.tractusx.bpdm.gate.service.TaskResolutionBatchService
 import org.eclipse.tractusx.bpdm.gate.v7.util.GateAssertRepositoryV7
 import org.eclipse.tractusx.bpdm.gate.v7.util.GateTestClientProviderV7
 import org.eclipse.tractusx.bpdm.gate.v7.util.GateTestDataClientV7
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.BusinessPartnerInputDtoV7Factory
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.BusinessPartnerInputRequestV7Factory
+import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
+import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorRequestFactoryV7
 import org.springframework.beans.factory.annotation.Autowired
 
 abstract class GateTestBaseV7 : GateTestBase(){
@@ -39,6 +43,14 @@ abstract class GateTestBaseV7 : GateTestBase(){
     lateinit var businessPartnerInputFactory: BusinessPartnerInputDtoV7Factory
     @Autowired
     lateinit var testClientProvider: GateTestClientProviderV7
+    @Autowired
+    lateinit var orchestratorMockDataFactory: OrchestratorMockDataFactory
+    @Autowired
+    lateinit var taskCreationBatchService: TaskCreationBatchService
+    @Autowired
+    lateinit var taskResolutionBatchService: TaskResolutionBatchService
+    @Autowired
+    lateinit var orchestratorRequestFactoryV7: OrchestratorRequestFactoryV7
 
     lateinit var gateClient: GateClient
     lateinit var testDataClient: GateTestDataClientV7
@@ -46,6 +58,13 @@ abstract class GateTestBaseV7 : GateTestBase(){
     @PostConstruct
     fun init() {
         gateClient = testClientProvider.createClient(KeyCloakInitializer.CLIENT_ID_OPERATOR)
-        testDataClient = GateTestDataClientV7(gateClient, businessPartnerInputRequestFactory)
+        testDataClient = GateTestDataClientV7(
+            gateClient,
+            businessPartnerInputRequestFactory,
+            orchestratorRequestFactoryV7,
+            orchestratorMockDataFactory,
+            taskCreationBatchService,
+            taskResolutionBatchService
+        )
     }
 }
