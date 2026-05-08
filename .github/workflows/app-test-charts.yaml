@@ -51,13 +51,6 @@ on:
         default: 'latest'
         required: false
         type: string
-  pull_request:
-    paths:
-      - 'pom.xml'
-      - 'bpdm-**'
-      - 'charts/**'
-      - '.github/workflows/app-test-charts.yaml'
-      - 'docker/**'
   push:
     branches:
       - main

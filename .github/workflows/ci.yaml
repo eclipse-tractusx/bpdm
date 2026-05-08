@@ -31,7 +31,7 @@ jobs:
     uses: ./.github/workflows/app-test-maven.yaml
 
   trufflehog:
-    uses: ./.github/workflows/trufflehog.yaml
+    uses: ./.github/workflows/trufflehog.yml
 
   containerize:
     uses: ./.github/workflows/docker-build-and-cache-all.yaml
