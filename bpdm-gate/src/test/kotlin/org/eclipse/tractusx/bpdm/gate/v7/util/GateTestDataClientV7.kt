@@ -37,6 +37,8 @@ import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.copyWithBpnReference
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.copyWithBpnReferences
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.copyWithBpnRequests
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolMockDataFactory
+import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.PoolRequestFactoryV7
+import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.PoolResponseFactoryV7
 import org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType
 
 class GateTestDataClientV7(
@@ -46,6 +48,8 @@ class GateTestDataClientV7(
     private val orchestratorMockDataFactory: OrchestratorMockDataFactory,
     private val taskCreationBatchService: TaskCreationBatchService,
     private val taskResolutionBatchService: TaskResolutionBatchService,
+    private val poolResponseFactory: PoolResponseFactoryV7,
+    private val poolMockDataFactory: PoolMockDataFactory,
 ) {
 
     fun createBusinessPartnerInput(seed: String): BusinessPartnerInputDto {
@@ -79,7 +83,8 @@ class GateTestDataClientV7(
     }
 
     fun refineToLegalEntity(input: BusinessPartnerInputDto, seed: String = input.externalId): LegalEntityWithLegalAddressVerboseDto{
-        val poolMockResult = poolMockDataFactory.mockLegalEntityAndLegalAddressSearchResult(seed)
+        val poolMockResult = poolResponseFactory.buildLegalEntityWithLegalAddress()
+        poolMockDataFactory.
 
         val owningCompany = if(input.isOwnCompanyData) tenantBpnL else null
         orchestratorMockDataFactory.mockRefineToLegalEntity(seed, poolMockResult, owningCompany, input.nameParts)

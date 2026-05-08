@@ -37,7 +37,6 @@ class PoolMockDataFactory(
     private val expectedResultFactory: ExpectedBusinessPartnerResultFactory,
     private val jsonMapper: JsonMapper
 ) {
-
     fun mockLegalEntityAndLegalAddressSearchResult(seed: String): LegalEntityWithLegalAddressVerboseDto{
         configureWireMock()
 
@@ -48,6 +47,10 @@ class PoolMockDataFactory(
         mockAddressSearchResult(LogisticAddressVerboseDto(mockedLegalEntity.legalAddress, emptyList()))
 
         return mockedLegalEntity
+    }
+
+    fun mockLegalEntity(legalEntityRequest: LegalEntityPartnerCreateRequest): LegalEntityWithLegalAddressVerboseDto{
+
     }
 
     fun mockSiteAndMainAddressSearchResult(seed: String): SiteWithLegalEntityParent{
