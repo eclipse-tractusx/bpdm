@@ -37,10 +37,14 @@ jobs:
           name: bpdm-${{ matrix.app }}-docker
           path: /tmp
 
+      - name: Load App Image
+        run: |
+          docker load --input /tmp/bpdm-${{ matrix.app }}-docker.tar
+
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 #v0.36.0
         with:
-          image-ref: "bpdm-${{ matrix.app }}:test"
+          image-ref: "bpdm-${{ matrix.app }}-docker:test"
           exit-code: "1"
           severity: "CRITICAL,HIGH"
           timeout: 15m
