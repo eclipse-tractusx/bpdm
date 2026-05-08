@@ -25,6 +25,7 @@ on:
   schedule:
     - cron: "0 0 * * *" # Once a day
   workflow_dispatch:
+  workflow_call:
 
 permissions:
   actions: read
