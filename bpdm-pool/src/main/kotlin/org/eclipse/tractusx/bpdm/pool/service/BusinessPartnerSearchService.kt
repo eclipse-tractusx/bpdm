@@ -396,9 +396,9 @@ class BusinessPartnerSearchService(
             physicalPostalAddress = PhysicalPostalAddressDto(
                 geographicCoordinates = physical.geographicCoordinates?.let {
                     GeoCoordinateDto(
-                    longitude = physical.geographicCoordinates.longitude,
-                    latitude = physical.geographicCoordinates.latitude,
-                    altitude = physical.geographicCoordinates.altitude
+                    longitude = it.longitude,
+                    latitude = it.latitude,
+                    altitude = it.altitude
                 )},
                 administrativeAreaLevel1 = physical.administrativeAreaLevel1?.regionCode,
                 administrativeAreaLevel2 = physical.administrativeAreaLevel2,
@@ -418,9 +418,9 @@ class BusinessPartnerSearchService(
             alternativePostalAddress = AlternativePostalAddressDto(
                 geographicCoordinates = alternative?.geographicCoordinates?.let {
                     GeoCoordinateDto(
-                        longitude = alternative.geographicCoordinates.longitude,
-                        latitude = alternative.geographicCoordinates.latitude,
-                        altitude = alternative.geographicCoordinates.altitude
+                        longitude = it.longitude,
+                        latitude = it.latitude,
+                        altitude = it.altitude
                     )},
                 country = alternative?.country,
                 administrativeAreaLevel1 = alternative?.administrativeAreaLevel1?.countryCode?.name,
