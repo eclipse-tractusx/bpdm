@@ -98,7 +98,7 @@ class BusinessPartnerEquivalenceMapper {
             alternativePostalAddress = with(logisticAddress.alternativePostalAddress) {
                 this?.let {
                     AlternativeEquivalenceDto(
-                        geographicCoordinates = geographicCoordinates?.let { with(geographicCoordinates) { GeoCoordinateDto(longitude, latitude, altitude) } },
+                        geographicCoordinates = geographicCoordinates?.let { GeoCoordinateDto(it.longitude, it.latitude, it.altitude) },
                         country = country,
                         administrativeAreaLevel1 = administrativeAreaLevel1?.regionCode,
                         postalCode = postCode,
