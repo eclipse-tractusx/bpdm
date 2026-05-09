@@ -10,9 +10,9 @@ maven/mavencentral/com.fasterxml.jackson.jakarta.rs/jackson-jakarta-rs-json-prov
 maven/mavencentral/com.fasterxml.jackson.module/jackson-module-jakarta-xmlbind-annotations/2.21.3, Apache-2.0, approved, #25588
 maven/mavencentral/com.fasterxml/classmate/1.7.3, Apache-2.0, approved, #24482
 maven/mavencentral/com.github.dasniko/testcontainers-keycloak/3.2.0, Apache-2.0, approved, #14719
-maven/mavencentral/com.github.docker-java/docker-java-api/3.7.0, Apache-2.0, approved, #26612
-maven/mavencentral/com.github.docker-java/docker-java-transport-zerodep/3.7.0, Apache-2.0 AND MPL-2.0, approved, #25269
-maven/mavencentral/com.github.docker-java/docker-java-transport/3.7.0, Apache-2.0, approved, #26615
+maven/mavencentral/com.github.docker-java/docker-java-api/3.7.1, Apache-2.0, approved, #26612
+maven/mavencentral/com.github.docker-java/docker-java-transport-zerodep/3.7.1, Apache-2.0 AND MPL-2.0, approved, #25269
+maven/mavencentral/com.github.docker-java/docker-java-transport/3.7.1, Apache-2.0, approved, #26615
 maven/mavencentral/com.github.java-json-tools/btf/1.3, Apache-2.0 OR LGPL-3.0-only, approved, #15201
 maven/mavencentral/com.github.java-json-tools/jackson-coreutils/2.0, Apache-2.0 OR LGPL-3.0-or-later, approved, #15186
 maven/mavencentral/com.github.java-json-tools/json-patch/1.13, Apache-2.0 OR LGPL-3.0-or-later, approved, CQ23929
@@ -284,11 +284,11 @@ maven/mavencentral/org.springframework/spring-tx/7.0.7, Apache-2.0, approved, #2
 maven/mavencentral/org.springframework/spring-web/7.0.7, Apache-2.0, approved, #24989
 maven/mavencentral/org.springframework/spring-webflux/7.0.7, Apache-2.0, approved, #25625
 maven/mavencentral/org.springframework/spring-webmvc/7.0.7, Apache-2.0, approved, #25606
-maven/mavencentral/org.testcontainers/testcontainers-database-commons/2.0.3, Apache-2.0, approved, #25271
-maven/mavencentral/org.testcontainers/testcontainers-jdbc/2.0.3, Apache-2.0, approved, #25272
-maven/mavencentral/org.testcontainers/testcontainers-junit-jupiter/2.0.3, MIT, approved, #26032
-maven/mavencentral/org.testcontainers/testcontainers-postgresql/2.0.3, MIT, approved, #25273
-maven/mavencentral/org.testcontainers/testcontainers/2.0.3, MIT, approved, #25274
+maven/mavencentral/org.testcontainers/testcontainers-database-commons/2.0.4, Apache-2.0, approved, #25271
+maven/mavencentral/org.testcontainers/testcontainers-jdbc/2.0.4, Apache-2.0, approved, #25272
+maven/mavencentral/org.testcontainers/testcontainers-junit-jupiter/2.0.4, MIT, approved, #26032
+maven/mavencentral/org.testcontainers/testcontainers-postgresql/2.0.4, MIT, approved, #25273
+maven/mavencentral/org.testcontainers/testcontainers/2.0.4, MIT, approved, #25274
 maven/mavencentral/org.webjars/swagger-ui/5.31.0, Apache-2.0 AND (Apache-2.0 AND MIT), approved, #25559
 maven/mavencentral/org.webjars/webjars-locator-lite/1.1.3, MIT, approved, #24484
 maven/mavencentral/org.xmlunit/xmlunit-core/2.10.4, Apache-2.0, approved, #14590
