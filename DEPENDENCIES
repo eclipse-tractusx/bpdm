@@ -26,7 +26,7 @@ maven/mavencentral/com.nimbusds/content-type/2.3, Apache-2.0, approved, clearlyd
 maven/mavencentral/com.nimbusds/lang-tag/1.7, Apache-2.0, approved, clearlydefined
 maven/mavencentral/com.nimbusds/nimbus-jose-jwt/10.4, Apache-2.0, approved, #22824
 maven/mavencentral/com.nimbusds/oauth2-oidc-sdk/11.26.1, Apache-2.0, approved, clearlydefined
-maven/mavencentral/com.ninja-squad/springmockk/4.0.2, Apache-2.0, approved, clearlydefined
+maven/mavencentral/com.ninja-squad/springmockk/5.0.1, Apache-2.0, approved, clearlydefined
 maven/mavencentral/com.opencsv/opencsv/5.12.0, Apache-2.0, approved, #22890
 maven/mavencentral/com.sun.istack/istack-commons-runtime/4.1.2, BSD-3-Clause, approved, #15290
 maven/mavencentral/com.sun.istack/istack-commons-tools/4.1.2, BSD-3-Clause, approved, #2580
@@ -67,11 +67,11 @@ maven/mavencentral/io.micrometer/micrometer-commons/1.16.5, Apache-2.0 AND (Apac
 maven/mavencentral/io.micrometer/micrometer-core/1.16.5, Apache-2.0 AND (Apache-2.0 AND MIT), approved, #24722
 maven/mavencentral/io.micrometer/micrometer-jakarta9/1.16.5, Apache-2.0, approved, #25608
 maven/mavencentral/io.micrometer/micrometer-observation/1.16.5, Apache-2.0, approved, #24713
-maven/mavencentral/io.mockk/mockk-agent-api-jvm/1.13.3, Apache-2.0, approved, clearlydefined
-maven/mavencentral/io.mockk/mockk-agent-jvm/1.13.3, MIT, approved, #10192
-maven/mavencentral/io.mockk/mockk-core-jvm/1.13.3, Apache-2.0, approved, clearlydefined
-maven/mavencentral/io.mockk/mockk-dsl-jvm/1.13.3, Apache-2.0, approved, clearlydefined
-maven/mavencentral/io.mockk/mockk-jvm/1.13.3, Apache-2.0, approved, clearlydefined
+maven/mavencentral/io.mockk/mockk-agent-api-jvm/1.14.6, Apache-2.0, approved, clearlydefined
+maven/mavencentral/io.mockk/mockk-agent-jvm/1.14.6, Apache-2.0, approved, clearlydefined
+maven/mavencentral/io.mockk/mockk-core-jvm/1.14.6, Apache-2.0, approved, clearlydefined
+maven/mavencentral/io.mockk/mockk-dsl-jvm/1.14.6, Apache-2.0, approved, clearlydefined
+maven/mavencentral/io.mockk/mockk-jvm/1.14.6, Apache-2.0, approved, clearlydefined
 maven/mavencentral/io.netty/netty-buffer/4.2.13.Final, Apache-2.0, approved, #16116
 maven/mavencentral/io.netty/netty-codec-base/4.2.13.Final, Apache-2.0, approved, #21322
 maven/mavencentral/io.netty/netty-codec-classes-quic/4.2.13.Final, Apache-2.0, approved, #21311
