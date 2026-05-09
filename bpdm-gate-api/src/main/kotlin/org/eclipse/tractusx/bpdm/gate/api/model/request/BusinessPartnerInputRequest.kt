@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.api.model.request
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerIdentifierDto
+import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerScriptVariantDto
 import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerStateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.IBaseBusinessPartnerGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressRepresentationInputDto
@@ -44,6 +45,6 @@ data class BusinessPartnerInputRequest(
     override val legalEntity: LegalEntityRepresentationInputDto = LegalEntityRepresentationInputDto(),
     override val site: SiteRepresentationInputDto = SiteRepresentationInputDto(),
     override val address: AddressRepresentationInputDto = AddressRepresentationInputDto(),
-    override val externalSequenceTimestamp: Instant? = null
-
+    override val externalSequenceTimestamp: Instant? = null,
+    val scriptVariants: List<BusinessPartnerScriptVariantDto> = emptyList()
 ) : IBaseBusinessPartnerGateDto

@@ -49,7 +49,7 @@ class BusinessPartnerTestDataFactory(
             uncategorized = orchestratorRequestFactory.buildUncategorizedProperties(seed, random),
             legalEntity = createLegalEntity(seed, random),
             site = orchestratorRequestFactory.buildSite(seed, random),
-            additionalAddress = orchestratorRequestFactory.buildPostalAddress(seed, AddressType.AdditionalAddress, random)
+            additionalAddress = orchestratorRequestFactory.buildPostalAddressWithScripVariants(seed, AddressType.AdditionalAddress, random)
         )
     }
 
@@ -75,7 +75,8 @@ class BusinessPartnerTestDataFactory(
             confidenceCriteria = orchestratorRequestFactory.buildConfidenceCriteria(random),
             isParticipantData = random.nextBoolean(),
             hasChanged = true,
-            legalAddress = orchestratorRequestFactory.buildPostalAddress(seed, AddressType.LegalAddress, random)
+            legalAddress = orchestratorRequestFactory.buildPostalAddress(seed, AddressType.LegalAddress, random),
+            scriptVariants = listOf(orchestratorRequestFactory.buildLegalEntityScriptVariant(seed, random))
         )
     }
 

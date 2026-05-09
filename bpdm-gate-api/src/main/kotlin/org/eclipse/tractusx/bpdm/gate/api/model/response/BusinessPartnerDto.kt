@@ -42,6 +42,7 @@ data class BusinessPartnerInputDto(
     override val site: SiteRepresentationInputDto = SiteRepresentationInputDto(),
     override val address: AddressRepresentationInputDto = AddressRepresentationInputDto(),
     override val externalSequenceTimestamp:Instant? = null,
+    val scriptVariants: List<BusinessPartnerScriptVariantDto> = emptyList(),
 
     @get:Schema(description = CommonDescription.createdAt)
     val createdAt: Instant,

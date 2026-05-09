@@ -28,7 +28,7 @@ import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStateResponse
 import org.junit.jupiter.api.Test
 import org.springframework.web.reactive.function.client.WebClientResponseException
 
-class TaskSearchV6IT: UnscheduledOrchestratorTestV6() {
+class TaskSearchV6IT: UnscheduledOrchestratorTestBaseV6() {
 
     /**
      * GIVEN created task

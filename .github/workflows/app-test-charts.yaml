@@ -71,17 +71,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd #v6.0.2
 
       - name: Kubernetes KinD Cluster
-        uses: helm/kind-action@v1
+        uses: helm/kind-action@ef37e7f390d99f746eb8b610417061a60e82a6cc #v1.14.0
         with:
           version: v0.31.0
           registry: true
           node_image: ${{ github.event.inputs.node_image || 'kindest/node:v1.35.0' }}
 
       - name: Set up Helm
-        uses: azure/setup-helm@v4
+        uses: azure/setup-helm@dda3372f752e03dde6b3237bc9431cdc2f7a02a2 #v5.0.0
         with:
           version: ${{ github.event.inputs.helm_version || 'latest' }}
 
@@ -91,28 +91,28 @@ jobs:
           check-latest: true
 
       - name: Set up chart-testing
-        uses: helm/chart-testing-action@v2.8.0
+        uses: helm/chart-testing-action@6ec842c01de15ebb84c8627d2744a0c2f2755c9f #v2.8.0
 
       - name: Download Pool Image
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c #v8.1
         with:
           name: bpdm-pool-docker
           path: /tmp
 
       - name: Download Gate Image
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c #v8.1
         with:
           name: bpdm-gate-docker
           path: /tmp
 
       - name: Download Orchestrator Image
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c #v8.1
         with:
           name: bpdm-orchestrator-docker
           path: /tmp
 
       - name: Download Cleaning Service Dummy Image
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c #v8.1
         with:
           name: bpdm-cleaning-service-dummy-docker
           path: /tmp
@@ -194,8 +194,6 @@ jobs:
       - name: Create Chart-Testing Config
         run: |
           cat <<EOF > .chart-testing-config.yaml
-          chart-repos:
-            - bitnami=https://charts.bitnami.com/bitnami
           helm-extra-args: --timeout 900s
           EOF
           echo "cat .chart-testing-config.yaml"
@@ -232,26 +230,6 @@ jobs:
               registry: kind-registry:5000
               repository: bpdm-system-tester
               tag: test
-          centralidp:
-            keycloak:
-              auth:
-                adminPassword: password
-              replicaCount: 1
-              postgresql:
-                auth:
-                  # -- Non-root user password.
-                  password: password
-                  # -- Root user password.
-                  postgresPassword: password
-                architecture: standalone
-            secrets:
-              postgresql:
-                auth:
-                  existingSecret:
-                    postgrespassword: password
-                    password: password
-            realmSeeding:
-              enabled: false
           EOF
           echo "cat charts/bpdm/ci/test-upgrade-values.yaml"
           cat charts/bpdm/ci/test-upgrade-values.yaml
@@ -260,7 +238,6 @@ jobs:
         env:
           UPGRADE_FROM: ${{ github.event.inputs.upgrade_from && '--version github.event.inputs.upgrade_from' || '' }}
         run: |
-          helm repo add bitnami https://charts.bitnami.com/bitnami
           helm repo add tractusx-dev https://eclipse-tractusx.github.io/charts/dev
           helm install -f charts/bpdm/ci/test-upgrade-values.yaml  bpdm-test tractusx-dev/bpdm $UPGRADE_FROM
           helm dependency update charts/bpdm

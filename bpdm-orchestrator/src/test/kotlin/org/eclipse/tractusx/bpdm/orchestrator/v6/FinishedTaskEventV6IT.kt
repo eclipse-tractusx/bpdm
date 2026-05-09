@@ -27,7 +27,7 @@ import org.eclipse.tractusx.orchestrator.api.model.TaskStep
 import org.junit.jupiter.api.Test
 import java.time.Instant
 
-class FinishedTaskEventV6IT: UnscheduledOrchestratorTestV6() {
+class FinishedTaskEventV6IT: UnscheduledOrchestratorTestBaseV6() {
 
     /**
      * GIVEN task has been finished successfully

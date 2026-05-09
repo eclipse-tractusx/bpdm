@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import java.time.Instant
 
-class TaskResolutionV6IT: UnscheduledOrchestratorTestV6() {
+class TaskResolutionV6IT: UnscheduledOrchestratorTestBaseV6() {
 
     /**
      * GIVEN reserved task

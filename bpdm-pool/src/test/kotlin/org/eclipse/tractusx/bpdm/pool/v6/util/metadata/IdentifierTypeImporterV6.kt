@@ -19,26 +19,16 @@
 
 package org.eclipse.tractusx.bpdm.pool.v6.util.metadata
 
-import com.opencsv.bean.CsvToBeanBuilder
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierTypeDto
-import org.springframework.core.io.Resource
-import java.io.InputStreamReader
+import org.eclipse.tractusx.bpdm.pool.util.metadata.IdentifierTypeEntryImporter
 
 class IdentifierTypeImporterV6(
-    private val identifierTypeResource: Resource
+    private val identifierTypeEntryImporter: IdentifierTypeEntryImporter
 ) {
 
     fun importFromResource(): List<IdentifierTypeDto>{
-        val reader = InputStreamReader(identifierTypeResource.inputStream)
-        val rows = CsvToBeanBuilder<IdentifierTypeEntry>(reader)
-            .withType(IdentifierTypeEntry::class.java)
-            .withIgnoreLeadingWhiteSpace(true)
-            .withSeparator(';')
-            .build()
-            .parse()
-
-        val uniqueRows = rows.filterNotNull().groupBy { it.technicalKey }.map { (_, group) -> group.first() }
+        val uniqueRows = identifierTypeEntryImporter.importFromResource()
         val adminAreas = uniqueRows.map { entry ->
             IdentifierTypeDto(
                 businessPartnerType = toBusinessPartnerType(entry.businessPartnerType!!),

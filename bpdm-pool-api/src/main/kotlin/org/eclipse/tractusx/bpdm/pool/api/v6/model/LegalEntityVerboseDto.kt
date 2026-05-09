@@ -58,7 +58,7 @@ data class LegalEntityVerboseDto(
 
     override val confidenceCriteria: ConfidenceCriteriaDto,
 
-    @get:Schema(description = "Indicates whether the legal entity is owned and thus provided by a Catena-X Member.")
+    @get:Schema(description = "Indicates whether the legal entity is owned and thus provided by a Catena-X Member.", name = "isCatenaXMemberData")
     val isCatenaXMemberData: Boolean,
 
     @get:Schema(description = CommonDescription.createdAt)

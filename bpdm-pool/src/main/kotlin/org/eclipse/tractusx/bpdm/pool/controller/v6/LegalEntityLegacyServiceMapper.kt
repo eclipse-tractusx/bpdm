@@ -36,9 +36,9 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.*
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntityPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntityPartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.*
-import org.eclipse.tractusx.bpdm.pool.dto.AddressMetadataDto
+import org.eclipse.tractusx.bpdm.pool.dto.AddressInvariantMetadataDto
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
-import org.eclipse.tractusx.bpdm.pool.dto.LegalEntityMetadataDto
+import org.eclipse.tractusx.bpdm.pool.dto.LegalEntityInvariantHeaderMetadataDto
 import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.eclipse.tractusx.bpdm.pool.repository.*
 import org.eclipse.tractusx.bpdm.pool.service.*
@@ -51,7 +51,7 @@ import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService.Compan
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService.Companion.toAddressState
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService.Companion.toLegalEntityIdentifier
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService.Companion.toLegalEntityState
-import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService.LegalEntityMetadataMapping
+import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService.LegalEntityHeaderMetadataMapping
 import org.eclipse.tractusx.bpdm.pool.service.RequestValidationService.*
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.jpa.domain.Specification
@@ -528,7 +528,7 @@ class LegalEntityLegacyServiceMapper(
     fun createLegalEntity(
         legalEntityDto: LegalEntityDto,
         bpnL: String,
-        metadataMap: LegalEntityMetadataMapping
+        metadataMap: LegalEntityHeaderMetadataMapping
     ): LegalEntityDb {
         // it has to be validated that the legalForm exits
         val legalForm = legalEntityDto.legalForm?.let { metadataMap.legalForms[it]!! }
@@ -549,7 +549,7 @@ class LegalEntityLegacyServiceMapper(
     fun updateLegalEntity(
         legalEntity: LegalEntityDb,
         legalEntityDto: LegalEntityDto,
-        metadataMap: LegalEntityMetadataMapping
+        metadataMap: LegalEntityHeaderMetadataMapping
     ) {
         legalEntity.currentness = createCurrentnessTimestamp()
 
@@ -563,16 +563,18 @@ class LegalEntityLegacyServiceMapper(
         legalEntity.isCatenaXMemberData = legalEntityDto.isCatenaXMemberData
     }
 
-    private fun LegalEntityMetadataDto.toMapping() =
-        LegalEntityMetadataMapping(
+    private fun LegalEntityInvariantHeaderMetadataDto.toMapping() =
+        LegalEntityHeaderMetadataMapping(
             idTypes = idTypes.associateBy { it.technicalKey },
-            legalForms = legalForms.associateBy { it.technicalKey }
+            legalForms = legalForms.associateBy { it.technicalKey },
+            scriptCodes = emptyMap()
         )
 
-    private fun AddressMetadataDto.toMapping() =
+    private fun AddressInvariantMetadataDto.toMapping() =
         AddressMetadataMapping(
             idTypes = idTypes.associateBy { it.technicalKey },
-            regions = regions.associateBy { it.regionCode }
+            regions = regions.associateBy { it.regionCode },
+            scriptCodes = emptyMap()
         )
 
     private fun createLogisticAddress(
@@ -624,7 +626,7 @@ class LegalEntityLegacyServiceMapper(
         address.confidenceCriteria = createConfidenceCriteria(dto.confidenceCriteria)
     }
 
-    private fun LegalEntityMetadataDto.toKeys(): LegalEntityMetadataKeys {
+    private fun LegalEntityInvariantHeaderMetadataDto.toKeys(): LegalEntityMetadataKeys {
         return LegalEntityMetadataKeys(
             idTypes = idTypes.map { it.technicalKey }.toSet(),
             legalForms = legalForms.map { it.technicalKey }.toSet()

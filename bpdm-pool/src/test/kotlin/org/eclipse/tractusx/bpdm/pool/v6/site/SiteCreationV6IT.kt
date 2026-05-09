@@ -27,10 +27,10 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteCreateError
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.controller.v6.LegalEntityLegacyServiceMapper
-import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolV6Test
+import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolTestBaseV6
 import org.junit.jupiter.api.Test
 
-class SiteCreationV6IT: UnscheduledPoolV6Test() {
+class SiteCreationV6IT: UnscheduledPoolTestBaseV6() {
 
     /**
      * GIVEN legal entity
@@ -273,7 +273,7 @@ class SiteCreationV6IT: UnscheduledPoolV6Test() {
 
         //WHEN
         val siteRequest = with(testDataFactory.request.buildSiteCreateRequest("New Site $testName", legalEntityResponse)){
-            copy(site = site.copy(mainAddress = site.mainAddress.copy(identifiers = (1 .. 101).map { testDataFactory.request.createAddressIdentifier(testName, it) })))
+            copy(site = site.copy(mainAddress = site.mainAddress.copy(identifiers = (1 .. 101).map { testDataFactory.request.buildAddressIdentifier(testName, it) })))
         }
         val siteResponse = poolClient.sites.createSite(listOf(siteRequest))
 

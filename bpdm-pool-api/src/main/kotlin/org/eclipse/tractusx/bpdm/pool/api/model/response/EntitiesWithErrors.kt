@@ -21,7 +21,6 @@ package org.eclipse.tractusx.bpdm.pool.api.model.response
 
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 
 open class EntitiesWithErrors<ENTITY, out ERROR : ErrorCode>(
 
@@ -68,6 +67,6 @@ data class AddressPartnerCreateResponseWrapper(
 
 @Schema(description = CommonDescription.headerEntityWithErrorsWrapper)
 data class AddressPartnerUpdateResponseWrapper(
-    override val entities: Collection<LogisticAddressVerboseDto>,
+    override val entities: Collection<AddressPartnerUpdateVerboseDto>,
     override val errors: Collection<ErrorInfo<AddressUpdateError>>
-) : EntitiesWithErrors<LogisticAddressVerboseDto, AddressUpdateError>(entities, errors)
+) : EntitiesWithErrors<AddressPartnerUpdateVerboseDto, AddressUpdateError>(entities, errors)

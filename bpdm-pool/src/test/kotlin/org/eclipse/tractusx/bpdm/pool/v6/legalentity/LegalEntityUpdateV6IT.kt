@@ -27,10 +27,10 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityUpdateError
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerUpdateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.controller.v6.LegalEntityLegacyServiceMapper
-import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolV6Test
+import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolTestBaseV6
 import org.junit.jupiter.api.Test
 
-class LegalEntityUpdateV6IT: UnscheduledPoolV6Test() {
+class LegalEntityUpdateV6IT: UnscheduledPoolTestBaseV6() {
 
     /**
      * GIVEN legal entity
@@ -304,7 +304,7 @@ class LegalEntityUpdateV6IT: UnscheduledPoolV6Test() {
 
         //WHEN
         val updateRequest = with(testDataFactory.request.createLegalEntityUpdateRequest("Updated $testName", legalEntityResponse)){
-            copy(legalAddress = legalAddress.copy(identifiers = (1 .. 101).map { testDataFactory.request.createAddressIdentifier("Updated $testName", it) }))
+            copy(legalAddress = legalAddress.copy(identifiers = (1 .. 101).map { testDataFactory.request.buildAddressIdentifier("Updated $testName", it) }))
         }
         val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
 

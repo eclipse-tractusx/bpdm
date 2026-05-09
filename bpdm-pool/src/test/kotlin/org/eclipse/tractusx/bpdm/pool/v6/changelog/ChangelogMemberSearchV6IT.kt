@@ -27,11 +27,11 @@ import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolV6Test
+import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolTestBaseV6
 import org.junit.jupiter.api.Test
 import java.time.Instant
 
-class ChangelogMemberSearchV6IT: UnscheduledPoolV6Test() {
+class ChangelogMemberSearchV6IT: UnscheduledPoolTestBaseV6() {
 
     private val anyTime = Instant.MIN
 

@@ -20,19 +20,14 @@
 package org.eclipse.tractusx.bpdm.test.util
 
 import jakarta.persistence.EntityManager
-import jakarta.persistence.EntityManagerFactory
+import jakarta.transaction.Transactional
 import org.springframework.stereotype.Component
 
 
 @Component
-class DbTestHelpers(private val entityManagerFactory: EntityManagerFactory?) {
+class DbTestHelpers(private val entityManager: EntityManager?) {
 
-    val em: EntityManager? by lazy {
-        entityManagerFactory?.createEntityManager()
-    }
-
-
-
+    @Transactional
     fun truncateDbTables() {
         truncateDbTablesFromSchema("bpdm")
         truncateDbTablesFromSchema("bpdmgate")
@@ -41,24 +36,20 @@ class DbTestHelpers(private val entityManagerFactory: EntityManagerFactory?) {
     }
 
     private fun truncateDbTablesFromSchema(dbSchemaName: String) {
-        em?.transaction?.begin()
-
-        em?.createNativeQuery(
+        entityManager?.createNativeQuery(
             """
                     DO $$ DECLARE table_names RECORD;
                     BEGIN
                         FOR table_names IN SELECT table_name
                             FROM information_schema.tables
                             WHERE table_schema='$dbSchemaName'
-                            AND table_name NOT IN ('flyway_schema_history','regions', 'legal_forms', 'identifier_types') 
+                            AND table_name NOT IN ('flyway_schema_history','regions', 'legal_forms', 'identifier_types', 'script_codes') 
                         LOOP 
                             EXECUTE format('TRUNCATE TABLE "$dbSchemaName".%I CONTINUE IDENTITY CASCADE;', table_names.table_name);
                         END LOOP;
                     END $$;
                 """.trimIndent()
         )?.executeUpdate()
-
-        em?.transaction?.commit()
     }
 
 

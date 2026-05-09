@@ -86,9 +86,9 @@ class GoldenRecordConsistencyService(
         val foundSites = if(sitesToCheck.isNotEmpty()) poolApiClient.sites.getSites(SiteSearchRequest(siteBpns = sitesToCheck), PaginationRequest(0, sitesToCheck.size)).content else emptyList()
         val foundAddresses = if(addressesToCheck.isNotEmpty()) poolApiClient.addresses.getAddresses(AddressSearchRequest(addressBpns = addressesToCheck), PaginationRequest(0, addressesToCheck.size)).content else emptyList()
 
-        val foundBpnLs = foundLegalEntities.map { it.legalEntity.bpnl }.toSet()
+        val foundBpnLs = foundLegalEntities.map { it.header.bpnl }.toSet()
         val foundBpnSs = foundSites.map { it.site.bpns }.toSet()
-        val foundBpnAs = foundAddresses.map { it.bpna }.toSet()
+        val foundBpnAs = foundAddresses.map { it.address.bpna }.toSet()
 
         val missingLegalEntities = legalEntitiesToCheck.minus(foundBpnLs).toSet()
         val missingSites = sitesToCheck.minus(foundBpnSs).toSet()

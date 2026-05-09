@@ -24,9 +24,9 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.ApiCommons
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
-import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
 import org.eclipse.tractusx.bpdm.gate.api.v6.GateRelationApi
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPostRequest
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPutEntryV6
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.RelationDto
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.web.bind.annotation.RequestBody
@@ -63,7 +63,7 @@ interface RelationApiClientV6: GateRelationApi {
     @PutExchange(value = ApiCommons.RELATIONS_INPUT_PATH_V6)
     override fun put(
         @RequestParam createIfNotExist: Boolean,
-        @RequestBody requestBody: RelationPutEntry
+        @RequestBody requestBody: RelationPutEntryV6
     ): RelationDto
 
     @DeleteExchange(value = ApiCommons.RELATIONS_INPUT_PATH_V6)

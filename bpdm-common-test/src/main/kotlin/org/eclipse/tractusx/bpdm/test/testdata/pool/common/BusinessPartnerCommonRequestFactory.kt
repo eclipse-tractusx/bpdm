@@ -33,8 +33,9 @@ import java.time.ZoneOffset
 import kotlin.random.Random
 
 abstract class BusinessPartnerCommonRequestFactory(
-    private val availableAddressIdentifiers: Collection<String>,
-    private val availableAdminAreas: Collection<String>
+    protected val availableAddressIdentifiers: Collection<String>,
+    protected val availableAdminAreas: Collection<String>,
+    protected val availableScriptCodes: Collection<String>
 ) {
 
     fun buildSiteCreateRequest(seed: String, legalEntityParent: LegalEntityPartnerCreateVerboseDto): SitePartnerCreateRequest {
@@ -73,6 +74,7 @@ abstract class BusinessPartnerCommonRequestFactory(
                 SiteStateDto(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
             ),
             mainAddress = createAddressDto(seed, random),
+            scriptVariants = listOfNotNull(buildSiteScriptVariant(seed, random)),
             confidenceCriteria = ConfidenceCriteriaDto(
                 sharedByOwner = true,
                 checkedByExternalDataSource = false,
@@ -120,20 +122,21 @@ abstract class BusinessPartnerCommonRequestFactory(
         return AddressPartnerCreateRequest(
             bpnParent = bpnParent,
             index = seed,
-            address = createAddressDto(seed, random)
+            address = createAddressDto(seed, random),
+            scriptVariants = listOfNotNull(buildLogisticAddressScriptVariant(seed, random))
         )
     }
 
     fun buildAddressUpdateRequest(seed: String, legalAddressToUpdate: LegalEntityPartnerCreateVerboseDto): AddressPartnerUpdateRequest {
-        return AddressPartnerUpdateRequest(legalAddressToUpdate.legalAddress.bpna, createAddressDto(seed))
+        return buildAddressUpdateRequest(seed, legalAddressToUpdate.legalAddress.bpna)
     }
 
     fun buildAddressUpdateRequest(seed: String, addressToUpdate: AddressPartnerCreateVerboseDto): AddressPartnerUpdateRequest {
-        return AddressPartnerUpdateRequest(addressToUpdate.address.bpna, createAddressDto(seed))
+        return buildAddressUpdateRequest(seed, addressToUpdate.address.bpna)
     }
 
-    fun buildAddressUpdateRequest(seed: String, bpna: String): AddressPartnerUpdateRequest {
-        return AddressPartnerUpdateRequest(bpna, createAddressDto(seed))
+    fun buildAddressUpdateRequest(seed: String, bpna: String, random: Random = Random(seed.hashCode().toLong())): AddressPartnerUpdateRequest {
+        return AddressPartnerUpdateRequest(bpna, createAddressDto(seed, random), listOfNotNull(buildLogisticAddressScriptVariant(seed, random)))
     }
 
     fun createAddressDto(seed: String, random: Random = Random(seed.hashCode().toLong())): LogisticAddressDto {
@@ -144,7 +147,7 @@ abstract class BusinessPartnerCommonRequestFactory(
                 AddressStateDto(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
                 AddressStateDto(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
             ),
-            identifiers = (1 ..2.coerceAtMost(availableAddressIdentifiers.size)).map { createAddressIdentifier(seed, it, random) },
+            identifiers = (1 ..2.coerceAtMost(availableAddressIdentifiers.size)).map { buildAddressIdentifier(seed, it, random) },
             physicalPostalAddress = PhysicalPostalAddressDto(
                 geographicCoordinates = GeoCoordinateDto(longitude = random.nextDouble(), latitude = random.nextDouble(), altitude = random.nextDouble()),
                 country = CountryCode.entries.random(random),
@@ -183,18 +186,81 @@ abstract class BusinessPartnerCommonRequestFactory(
                 deliveryServiceQualifier = "Delivery Service Qualifier $seed"
             ),
             confidenceCriteria = ConfidenceCriteriaDto(
-                sharedByOwner = true,
+                sharedByOwner = false,
                 checkedByExternalDataSource = false,
-                numberOfSharingMembers = 2,
+                numberOfSharingMembers = 0,
                 lastConfidenceCheckAt = timeStamp.plusDays(10),
                 nextConfidenceCheckAt = timeStamp.plusDays(20),
-                confidenceLevel = 5
+                confidenceLevel = 0
             )
         )
     }
 
-    fun createAddressIdentifier(seed: String, index: Int, random: Random = Random("$seed $index".hashCode().toLong())): AddressIdentifierDto{
+    fun buildAddressIdentifier(seed: String, index: Int = 0, random: Random = Random("$seed $index".hashCode().toLong())): AddressIdentifierDto{
         val idKey = availableAddressIdentifiers.random(random)
         return AddressIdentifierDto("$idKey Value $seed $index", idKey)
+    }
+
+    fun buildSiteScriptVariant(seed: String, random: Random = Random(seed.hashCode().toLong())): SiteScriptVariantDto?{
+        val scriptCode = availableScriptCodes.randomOrNull(random) ?: return null
+        return SiteScriptVariantDto(
+            scriptCode = scriptCode,
+            name = buildScriptVariantStringValue("Site Name", seed, scriptCode),
+            mainAddress = buildPostalAddressScriptVariant(scriptCode, seed)
+        )
+    }
+
+    fun buildLogisticAddressScriptVariant(seed: String, random: Random = Random(seed.hashCode().toLong())): LogisticAddressScriptVariantDto? {
+        val scriptCode = availableScriptCodes.randomOrNull(random) ?: return null
+        return LogisticAddressScriptVariantDto(
+            scriptCode = scriptCode,
+            address = buildPostalAddressScriptVariant(scriptCode, seed)
+        )
+    }
+
+    fun buildPostalAddressScriptVariant(scriptCode: String, seed: String): PostalAddressScriptVariantDto{
+        return PostalAddressScriptVariantDto(
+            addressName = buildScriptVariantStringValue("Address Name", seed, scriptCode),
+            physicalAddress = buildPhysicalAddressScriptVariant(scriptCode, seed),
+            alternativeAddress = buildAlternativeAddressScriptVariant(scriptCode, seed)
+        )
+    }
+
+    fun buildPhysicalAddressScriptVariant(scriptCode: String, seed: String): PhysicalAddressScriptVariantDto{
+        return PhysicalAddressScriptVariantDto(
+            postalCode = buildScriptVariantStringValue("Postal Code", seed, scriptCode),
+            city = buildScriptVariantStringValue("City", seed, scriptCode),
+            district = buildScriptVariantStringValue("District", seed, scriptCode),
+            street = StreetDto(
+                name = buildScriptVariantStringValue("Street Name", seed, scriptCode),
+                houseNumber = buildScriptVariantStringValue("House Number", seed, scriptCode),
+                houseNumberSupplement = buildScriptVariantStringValue("House Number Supplement", seed, scriptCode),
+                milestone = buildScriptVariantStringValue("Milestone", seed, scriptCode),
+                direction = buildScriptVariantStringValue("Direction", seed, scriptCode),
+                namePrefix = buildScriptVariantStringValue("Name Prefix", seed, scriptCode),
+                nameSuffix = buildScriptVariantStringValue("Name Suffix", seed, scriptCode),
+                additionalNamePrefix = buildScriptVariantStringValue("Additional Name Prefix", seed, scriptCode),
+                additionalNameSuffix = buildScriptVariantStringValue("Additional Name Suffix", seed, scriptCode)
+            ),
+            companyPostalCode = buildScriptVariantStringValue("Company Postal Code", seed, scriptCode),
+            industrialZone = buildScriptVariantStringValue("Industrial Zone", seed, scriptCode),
+            building = buildScriptVariantStringValue("Building", seed, scriptCode),
+            floor = buildScriptVariantStringValue("Floor", seed, scriptCode),
+            door = buildScriptVariantStringValue("Door", seed, scriptCode),
+            taxJurisdictionCode = buildScriptVariantStringValue("Tax Jurisdiction Code", seed, scriptCode)
+        )
+    }
+
+    fun buildAlternativeAddressScriptVariant(scriptCode: String, seed: String): AlternativeAddressScriptVariantDto{
+        return AlternativeAddressScriptVariantDto(
+            postalCode = buildScriptVariantStringValue("Postal Code", seed, scriptCode),
+            city = buildScriptVariantStringValue("City", seed, scriptCode),
+            deliveryServiceNumber = buildScriptVariantStringValue("Delivery Service Number ", seed, scriptCode),
+            deliveryServiceQualifier = buildScriptVariantStringValue("Delivery Service Qualifier ", seed, scriptCode)
+        )
+    }
+
+    protected fun buildScriptVariantStringValue(name: String, seed: String, scriptCode: String): String{
+        return "$name $seed Variant $scriptCode"
     }
 }

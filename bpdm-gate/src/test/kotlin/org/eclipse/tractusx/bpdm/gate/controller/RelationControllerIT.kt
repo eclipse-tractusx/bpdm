@@ -28,7 +28,6 @@ import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationSearchRequest
-import org.eclipse.tractusx.bpdm.gate.util.GateTestValues
 import org.eclipse.tractusx.bpdm.gate.util.MockAndAssertUtils
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
@@ -97,26 +96,16 @@ class RelationControllerIT @Autowired constructor(
         val afterCreation = Instant.now()
 
         val beforeUpdate = Instant.now()
-        val response = gateClient.relation.put(
-            createIfNotExist = false,
-            singleUpserRequest(
-                externalId = relationId,
-                relationType = relationType,
-                businessPartnerSourceExternalId = legalEntityId3,
-                businessPartnerTargetExternalId = legalEntityId4
-            )
-        )
-        val afterUpdate = Instant.now()
-
-        val expectation = RelationDto(
+        val updateRequest =  singleUpserRequest(
             externalId = relationId,
             relationType = relationType,
             businessPartnerSourceExternalId = legalEntityId3,
-            businessPartnerTargetExternalId = legalEntityId4,
-            validityPeriods = GateTestValues.alwaysActiveRelationValidity,
-            updatedAt = Instant.now(),
-            createdAt = Instant.now(),
+            businessPartnerTargetExternalId = legalEntityId4
         )
+        val response = gateClient.relation.put(createIfNotExist = false, updateRequest)
+        val afterUpdate = Instant.now()
+
+        val expectation = buildExpectedRelationDto(updateRequest.relations.single())
 
         mockAndAssertUtils.assertRelation(
             actual = response,
@@ -155,26 +144,16 @@ class RelationControllerIT @Autowired constructor(
         val afterCreation = Instant.now()
 
         val beforeUpdate = Instant.now()
-        val response = gateClient.relation.put(
-            createIfNotExist = false,
-            singleUpserRequest(
-                externalId = relationId,
-                relationType = relationType,
-                businessPartnerSourceExternalId = legalEntityId3,
-                businessPartnerTargetExternalId = legalEntityId4
-            )
-        )
-        val afterUpdate = Instant.now()
-
-        val expectation = RelationDto(
+        val updateRequest =  singleUpserRequest(
             externalId = relationId,
             relationType = relationType,
             businessPartnerSourceExternalId = legalEntityId3,
-            businessPartnerTargetExternalId = legalEntityId4,
-            validityPeriods = GateTestValues.alwaysActiveRelationValidity,
-            updatedAt = Instant.now(),
-            createdAt = Instant.now()
+            businessPartnerTargetExternalId = legalEntityId4
         )
+        val response = gateClient.relation.put(createIfNotExist = false, updateRequest)
+        val afterUpdate = Instant.now()
+
+        val expectation =  buildExpectedRelationDto(updateRequest.relations.single())
 
         mockAndAssertUtils.assertRelation(
             actual = response,
@@ -213,26 +192,16 @@ class RelationControllerIT @Autowired constructor(
         val afterCreation = Instant.now()
 
         val beforeUpdate = Instant.now()
-        val response = gateClient.relation.put(
-            createIfNotExist = false,
-            singleUpserRequest(
-                externalId = relationId,
-                relationType = relationType,
-                businessPartnerSourceExternalId = legalEntityId3,
-                businessPartnerTargetExternalId = legalEntityId4
-            )
-        )
-        val afterUpdate = Instant.now()
-
-        val expectation = RelationDto(
+        val updateRequest = singleUpserRequest(
             externalId = relationId,
             relationType = relationType,
             businessPartnerSourceExternalId = legalEntityId3,
-            businessPartnerTargetExternalId = legalEntityId4,
-            validityPeriods = GateTestValues.alwaysActiveRelationValidity,
-            updatedAt = Instant.now(),
-            createdAt = Instant.now()
+            businessPartnerTargetExternalId = legalEntityId4
         )
+        val response = gateClient.relation.put(createIfNotExist = false, updateRequest)
+        val afterUpdate = Instant.now()
+
+        val expectation = buildExpectedRelationDto(updateRequest.relations.single())
 
         mockAndAssertUtils.assertRelation(
             actual = response,
@@ -281,26 +250,16 @@ class RelationControllerIT @Autowired constructor(
         val afterCreation = Instant.now()
 
         val beforeUpdate = Instant.now()
-        val response = gateClient.relation.put(
-            createIfNotExist = false,
-            singleUpserRequest(
-                externalId = relationId2,
-                relationType = relationType,
-                businessPartnerSourceExternalId = legalEntityId4,
-                businessPartnerTargetExternalId = legalEntityId1
-            )
-        )
-        val afterUpdate = Instant.now()
-
-        val expectation = RelationDto(
+        val updateRequest = singleUpserRequest(
             externalId = relationId2,
             relationType = relationType,
             businessPartnerSourceExternalId = legalEntityId4,
-            businessPartnerTargetExternalId = legalEntityId1,
-            validityPeriods = GateTestValues.alwaysActiveRelationValidity,
-            updatedAt = Instant.now(),
-            createdAt = Instant.now()
+            businessPartnerTargetExternalId = legalEntityId1
         )
+        val response = gateClient.relation.put(createIfNotExist = false, updateRequest)
+        val afterUpdate = Instant.now()
+
+        val expectation = buildExpectedRelationDto(updateRequest.relations.single())
 
         mockAndAssertUtils.assertRelation(
             actual = response,
@@ -465,26 +424,16 @@ class RelationControllerIT @Autowired constructor(
         ))
 
         val beforePost = Instant.now()
-        val response = gateClient.relation.put(
-            createIfNotExist = true,
-            singleUpserRequest(
-                externalId = relationId,
-                relationType = relationType,
-                businessPartnerSourceExternalId = legalEntityId1,
-                businessPartnerTargetExternalId = legalEntityId2
-            )
-        )
-        val afterPost = Instant.now()
-
-        val expectation = RelationDto(
+        val createRequest = singleUpserRequest(
             externalId = relationId,
             relationType = relationType,
             businessPartnerSourceExternalId = legalEntityId1,
-            businessPartnerTargetExternalId = legalEntityId2,
-            validityPeriods = GateTestValues.alwaysActiveRelationValidity,
-            updatedAt = Instant.now(),
-            createdAt = Instant.now()
+            businessPartnerTargetExternalId = legalEntityId2
         )
+        val response = gateClient.relation.put(createIfNotExist = true, createRequest)
+        val afterPost = Instant.now()
+
+        val expectation = buildExpectedRelationDto(createRequest.relations.single())
 
         mockAndAssertUtils.assertRelation(response, expectation, Timeframe(beforePost, afterPost), ignoreExternalId = false)
     }
@@ -502,26 +451,16 @@ class RelationControllerIT @Autowired constructor(
         ))
 
         val beforePost = Instant.now()
-        val response = gateClient.relation.put(
-            createIfNotExist = true,
-            singleUpserRequest(
-                externalId = relationId,
-                relationType = relationType,
-                businessPartnerSourceExternalId = legalEntityId1,
-                businessPartnerTargetExternalId = legalEntityId2
-            )
-        )
-        val afterPost = Instant.now()
-
-        val expectation = RelationDto(
+        val createRequest =  singleUpserRequest(
             externalId = relationId,
             relationType = relationType,
             businessPartnerSourceExternalId = legalEntityId1,
-            businessPartnerTargetExternalId = legalEntityId2,
-            validityPeriods = GateTestValues.alwaysActiveRelationValidity,
-            updatedAt = Instant.now(),
-            createdAt = Instant.now()
+            businessPartnerTargetExternalId = legalEntityId2
         )
+        val response = gateClient.relation.put(createIfNotExist = true, createRequest)
+        val afterPost = Instant.now()
+
+        val expectation = buildExpectedRelationDto(createRequest.relations.single())
 
         mockAndAssertUtils.assertRelation(response, expectation, Timeframe(beforePost, afterPost), ignoreExternalId =  false)
     }
@@ -551,26 +490,16 @@ class RelationControllerIT @Autowired constructor(
         )
 
         val beforePost = Instant.now()
-        val response = gateClient.relation.put(
-            createIfNotExist = true,
-            singleUpserRequest(
-                externalId = relationId2,
-                relationType = relationType,
-                businessPartnerSourceExternalId = legalEntityId3,
-                businessPartnerTargetExternalId = legalEntityId1
-            )
-        )
-        val afterPost = Instant.now()
-
-        val expectation = RelationDto(
+        val createRequest =  singleUpserRequest(
             externalId = relationId2,
             relationType = relationType,
             businessPartnerSourceExternalId = legalEntityId3,
-            businessPartnerTargetExternalId = legalEntityId1,
-            validityPeriods = GateTestValues.alwaysActiveRelationValidity,
-            updatedAt = Instant.now(),
-            createdAt = Instant.now()
+            businessPartnerTargetExternalId = legalEntityId1
         )
+        val response = gateClient.relation.put(createIfNotExist = true, createRequest)
+        val afterPost = Instant.now()
+
+        val expectation = buildExpectedRelationDto(createRequest.relations.single())
 
         mockAndAssertUtils.assertRelation(response, expectation, Timeframe(beforePost, afterPost), ignoreExternalId = false)
     }
@@ -603,26 +532,16 @@ class RelationControllerIT @Autowired constructor(
         val afterCreate = Instant.now()
 
         val beforePut = Instant.now()
-        val response = gateClient.relation.put(
-            createIfNotExist = true,
-            singleUpserRequest(
-                externalId = testName,
-                relationType = relationType,
-                businessPartnerSourceExternalId = legalEntityId3,
-                businessPartnerTargetExternalId = legalEntityId4
-            )
-        )
-        val afterPut = Instant.now()
-
-        val expectation = RelationDto(
+        val updateRequest =  singleUpserRequest(
             externalId = testName,
             relationType = relationType,
             businessPartnerSourceExternalId = legalEntityId3,
-            businessPartnerTargetExternalId = legalEntityId4,
-            validityPeriods = GateTestValues.alwaysActiveRelationValidity,
-            updatedAt = Instant.now(),
-            createdAt = Instant.now()
+            businessPartnerTargetExternalId = legalEntityId4
         )
+        val response = gateClient.relation.put(createIfNotExist = true, updateRequest)
+        val afterPut = Instant.now()
+
+        val expectation = buildExpectedRelationDto(updateRequest.relations.single())
 
         mockAndAssertUtils.assertRelation(
             actual = response,
@@ -726,19 +645,19 @@ class RelationControllerIT @Autowired constructor(
             createIfNotExist = true,
             RelationPutRequest(
                 relations = listOf(
-                    RelationPutEntry(
+                    inputFactory.buildRelation(
                         externalId = relationId1,
                         relationType = relationType,
                         businessPartnerSourceExternalId = legalEntityId2,
                         businessPartnerTargetExternalId = legalEntityId1
                     ),
-                    RelationPutEntry(
+                    inputFactory.buildRelation(
                         externalId = relationId2,
                         relationType = relationType,
                         businessPartnerSourceExternalId = legalEntityId3,
                         businessPartnerTargetExternalId = legalEntityId1
                     ),
-                    RelationPutEntry(
+                    inputFactory.buildRelation(
                         externalId = relationId3,
                         relationType = relationType,
                         businessPartnerSourceExternalId = legalEntityId4,
@@ -781,19 +700,19 @@ class RelationControllerIT @Autowired constructor(
             createIfNotExist = true,
             RelationPutRequest(
                 relations = listOf(
-                    RelationPutEntry(
+                    inputFactory.buildRelation(
                         externalId = relationId1,
                         relationType = relationType,
                         businessPartnerSourceExternalId = legalEntityId2,
                         businessPartnerTargetExternalId = legalEntityId1
                     ),
-                    RelationPutEntry(
+                    inputFactory.buildRelation(
                         externalId = relationId2,
                         relationType = relationType,
                         businessPartnerSourceExternalId = legalEntityId3,
                         businessPartnerTargetExternalId = legalEntityId1
                     ),
-                    RelationPutEntry(
+                    inputFactory.buildRelation(
                         externalId = relationId3,
                         relationType = relationType,
                         businessPartnerSourceExternalId = legalEntityId4,
@@ -836,19 +755,19 @@ class RelationControllerIT @Autowired constructor(
             createIfNotExist = true,
             RelationPutRequest(
                 relations = listOf(
-                    RelationPutEntry(
+                    inputFactory.buildRelation(
                         externalId = relationId1,
                         relationType = relationType,
                         businessPartnerSourceExternalId = legalEntityId2,
                         businessPartnerTargetExternalId = legalEntityId1
                     ),
-                    RelationPutEntry(
+                    inputFactory.buildRelation(
                         externalId = relationId2,
                         relationType = relationType,
                         businessPartnerSourceExternalId = legalEntityId3,
                         businessPartnerTargetExternalId = legalEntityId1
                     ),
-                    RelationPutEntry(
+                    inputFactory.buildRelation(
                         externalId = relationId3,
                         relationType = relationType,
                         businessPartnerSourceExternalId = legalEntityId4,
@@ -895,25 +814,25 @@ class RelationControllerIT @Autowired constructor(
             createIfNotExist = true,
             RelationPutRequest(
                 relations = listOf(
-                    RelationPutEntry(
+                    inputFactory.buildRelation(
                         externalId = relationId1,
                         relationType = relationType,
                         businessPartnerSourceExternalId = legalEntityId2,
                         businessPartnerTargetExternalId = legalEntityId1
                     ),
-                    RelationPutEntry(
+                    inputFactory.buildRelation(
                         externalId = relationId2,
                         relationType = relationType,
                         businessPartnerSourceExternalId = legalEntityId3,
                         businessPartnerTargetExternalId = legalEntityId1
                     ),
-                    RelationPutEntry(
+                    inputFactory.buildRelation(
                         externalId = relationId3,
                         relationType = relationType,
                         businessPartnerSourceExternalId = legalEntityId4,
                         businessPartnerTargetExternalId = legalEntityId1
                     ),
-                    RelationPutEntry(
+                    inputFactory.buildRelation(
                         externalId = relationId4,
                         relationType = relationType,
                         businessPartnerSourceExternalId = legalEntityId5,
@@ -955,19 +874,19 @@ class RelationControllerIT @Autowired constructor(
             createIfNotExist = true,
             RelationPutRequest(
                 relations = listOf(
-                    RelationPutEntry(
+                    inputFactory.buildRelation(
                         externalId = relationId1,
                         relationType = relationType,
                         businessPartnerSourceExternalId = legalEntityId2,
                         businessPartnerTargetExternalId = legalEntityId1
                     ),
-                    RelationPutEntry(
+                    inputFactory.buildRelation(
                         externalId = relationId2,
                         relationType = relationType,
                         businessPartnerSourceExternalId = legalEntityId3,
                         businessPartnerTargetExternalId = legalEntityId1
                     ),
-                    RelationPutEntry(
+                    inputFactory.buildRelation(
                         externalId = relationId3,
                         relationType = relationType,
                         businessPartnerSourceExternalId = legalEntityId4,
@@ -1019,13 +938,13 @@ class RelationControllerIT @Autowired constructor(
             createIfNotExist = true,
             RelationPutRequest(
                 relations = listOf(
-                    RelationPutEntry(
+                    inputFactory.buildRelation(
                         externalId = relationId2,
                         relationType = relationType,
                         businessPartnerSourceExternalId = legalEntityId3,
                         businessPartnerTargetExternalId = legalEntityId1
                     ),
-                    RelationPutEntry(
+                    inputFactory.buildRelation(
                         externalId = relationId3,
                         relationType = relationType,
                         businessPartnerSourceExternalId = legalEntityId4,
@@ -1076,13 +995,13 @@ class RelationControllerIT @Autowired constructor(
             createIfNotExist = true,
             RelationPutRequest(
                 relations = listOf(
-                    RelationPutEntry(
+                    inputFactory.buildRelation(
                         externalId = relationId2,
                         relationType = relationType,
                         businessPartnerSourceExternalId = legalEntityId3,
                         businessPartnerTargetExternalId = legalEntityId1
                     ),
-                    RelationPutEntry(
+                    inputFactory.buildRelation(
                         externalId = relationId3,
                         relationType = relationType,
                         businessPartnerSourceExternalId = legalEntityId4,
@@ -1123,13 +1042,25 @@ class RelationControllerIT @Autowired constructor(
         businessPartnerTargetExternalId: String
     ) = RelationPutRequest(
         listOf(
-            RelationPutEntry(
+            inputFactory.buildRelation(
                 externalId = externalId,
                 relationType = relationType,
                 businessPartnerSourceExternalId = businessPartnerSourceExternalId,
-                businessPartnerTargetExternalId = businessPartnerTargetExternalId,
-                validityPeriods = GateTestValues.alwaysActiveRelationValidity
+                businessPartnerTargetExternalId = businessPartnerTargetExternalId
             )
         )
     )
+
+    private fun buildExpectedRelationDto(putEntry: RelationPutEntry): RelationDto{
+        return RelationDto(
+            externalId = putEntry.externalId,
+            relationType = putEntry.relationType,
+            businessPartnerSourceExternalId = putEntry.businessPartnerSourceExternalId,
+            businessPartnerTargetExternalId = putEntry.businessPartnerTargetExternalId,
+            validityPeriods = putEntry.validityPeriods,
+            reasonCode = putEntry.reasonCode,
+            updatedAt = Instant.now(),
+            createdAt = Instant.now(),
+        )
+    }
 }

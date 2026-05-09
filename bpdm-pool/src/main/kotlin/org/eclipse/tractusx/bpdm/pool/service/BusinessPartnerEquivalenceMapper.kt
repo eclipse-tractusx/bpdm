@@ -23,10 +23,7 @@ import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
-import org.eclipse.tractusx.bpdm.pool.entity.ConfidenceCriteriaDb
-import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
-import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
-import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
+import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.util.*
@@ -44,7 +41,8 @@ class BusinessPartnerEquivalenceMapper {
                 states = states.map { StateEquivalenceDto(it.validFrom, it.validTo, it.type) }.toSortedSet(compareBy { it.validFrom }),
                 confidenceCriteria = toEquivalenceDto(confidenceCriteria),
                 isCatenaXMemberData = isCatenaXMemberData,
-                legalAddress = toEquivalenceDto(legalEntity.legalAddress)
+                legalAddress = toEquivalenceDto(legalEntity.legalAddress),
+                scriptVariants = scriptVariants.map { toEquivalenceDto(it) }.toSortedSet(compareBy { it.scriptCode })
             )
         }
 
@@ -54,7 +52,8 @@ class BusinessPartnerEquivalenceMapper {
                 name = name,
                 states = states.map { StateEquivalenceDto(it.validFrom, it.validTo, it.type) }.toSortedSet(compareBy { it.validFrom }),
                 confidenceCriteria = toEquivalenceDto(confidenceCriteria),
-                mainAddress = toEquivalenceDto(mainAddress)
+                mainAddress = toEquivalenceDto(mainAddress),
+                scriptVariants = scriptVariants.map { SiteHeaderScriptVariantEquivalenceDto(it.scriptCode.technicalKey, it.name) }.toSortedSet(compareBy { it.scriptCode })
             )
         }
 
@@ -110,8 +109,56 @@ class BusinessPartnerEquivalenceMapper {
                     )
                 }
             },
-            confidenceCriteria = toEquivalenceDto(logisticAddress.confidenceCriteria)
+            confidenceCriteria = toEquivalenceDto(logisticAddress.confidenceCriteria),
+            scriptVariants = logisticAddress.scriptVariants.map { toEquivalenceDto(it) }.toSortedSet(compareBy { it.scriptCode })
         )
+
+    fun toEquivalenceDto(logisticAddressScriptVariant: LogisticAddressScriptVariantDb ) =
+        with(logisticAddressScriptVariant){
+            LogisticAddressScriptVariantEquivalenceDto(
+                scriptCode = scriptCode.technicalKey,
+                name = name,
+                physicalAddress = with(physicalAddress){
+                    PhysicalAddressScriptVariantEquivalenceDto(
+                        postalCode = postalCode,
+                        city = city,
+                        district = district,
+                        street = street?.let {
+                            with(it) {
+                                StreetEquivalenceDto(
+                                    name = name,
+                                    houseNumber = houseNumber,
+                                    houseNumberSupplement = houseNumberSupplement,
+                                    milestone = milestone,
+                                    direction = direction,
+                                    namePrefix = namePrefix,
+                                    additionalNamePrefix = additionalNamePrefix,
+                                    nameSuffix = nameSuffix,
+                                    additionalNameSuffix = additionalNamePrefix
+                                )
+                            }
+                        },
+                        companyPostalCode = companyPostalCode,
+                        industrialZone = industrialZone,
+                        building = building,
+                        floor = floor,
+                        door = door,
+                        taxJurisdictionCode = taxJurisdictionCode
+                    )
+                },
+                alternativeAddress = alternativeAddress?.let {
+                    with(it){
+                        AlternativeAddressScriptVariantEquivalenceDto(
+                            postalCode = postalCode,
+                            city = city,
+                            deliveryServiceQualifier = deliveryServiceQualifier,
+                            deliveryServiceNumber = deliveryServiceNumber
+                        )
+                    }
+                }
+            )
+        }
+
 
     private fun toEquivalenceDto(confidenceCriteria: ConfidenceCriteriaDb) =
         with(confidenceCriteria) {
@@ -125,6 +172,9 @@ class BusinessPartnerEquivalenceMapper {
             )
         }
 
+    private fun toEquivalenceDto(legalEntityScriptVariantDb: LegalEntityScriptVariantDb) =
+        with(legalEntityScriptVariantDb) { LegalEntityScriptVariantEquivalenceDto(scriptCode.technicalKey, legalName, shortName) }
+
     data class LegalEntityEquivalenceDto(
         override val legalForm: String?,
         val legalName: String?,
@@ -133,15 +183,28 @@ class BusinessPartnerEquivalenceMapper {
         override val states: SortedSet<StateEquivalenceDto>,
         override val confidenceCriteria: ConfidenceCriteriaEquivalenceDto?,
         val legalAddress: LogisticAddressEquivalenceDto?,
-        val isCatenaXMemberData: Boolean
+        val isCatenaXMemberData: Boolean,
+        val scriptVariants: SortedSet<LegalEntityScriptVariantEquivalenceDto>,
     ) : IBaseLegalEntityDto
+
+    data class LegalEntityScriptVariantEquivalenceDto(
+        val scriptCode: String,
+        val legalName: String?,
+        val legalShortName: String?
+    )
 
     data class SiteEquivalenceDto(
         override val name: String?,
         override val states: Collection<StateEquivalenceDto>,
         override val confidenceCriteria: ConfidenceCriteriaEquivalenceDto?,
-        val mainAddress: LogisticAddressEquivalenceDto
+        val mainAddress: LogisticAddressEquivalenceDto,
+        val scriptVariants: SortedSet<SiteHeaderScriptVariantEquivalenceDto>,
     ) : IBaseSiteDto
+
+    data class SiteHeaderScriptVariantEquivalenceDto(
+        val scriptCode: String,
+        val name: String
+    )
 
     data class LogisticAddressEquivalenceDto(
         val name: String?,
@@ -149,7 +212,8 @@ class BusinessPartnerEquivalenceMapper {
         override val identifiers: Collection<IdentifierEquivalenceDto>,
         override val physicalPostalAddress: PhysicalAddressEquivalenceDto?,
         override val alternativePostalAddress: AlternativeEquivalenceDto?,
-        override val confidenceCriteria: ConfidenceCriteriaEquivalenceDto?
+        override val confidenceCriteria: ConfidenceCriteriaEquivalenceDto?,
+        val scriptVariants: SortedSet<LogisticAddressScriptVariantEquivalenceDto>
     ) : IBaseLogisticAddressDto
 
     data class IdentifierEquivalenceDto(
@@ -214,4 +278,31 @@ class BusinessPartnerEquivalenceMapper {
         override val nextConfidenceCheckAt: LocalDateTime?,
         override val confidenceLevel: Int?
     ) : IConfidenceCriteriaDto
+
+    data class LogisticAddressScriptVariantEquivalenceDto(
+        val scriptCode: String,
+        val name: String?,
+        val physicalAddress: PhysicalAddressScriptVariantEquivalenceDto?,
+        val alternativeAddress: AlternativeAddressScriptVariantEquivalenceDto?
+    )
+
+    data class PhysicalAddressScriptVariantEquivalenceDto(
+        val postalCode: String?,
+        val city: String?,
+        val district: String?,
+        val street: StreetEquivalenceDto?,
+        val companyPostalCode: String?,
+        val industrialZone: String?,
+        val building: String?,
+        val floor: String?,
+        val door: String?,
+        val taxJurisdictionCode: String?
+    )
+
+    data class AlternativeAddressScriptVariantEquivalenceDto(
+        val postalCode: String?,
+        val city: String?,
+        val deliveryServiceQualifier: String?,
+        val deliveryServiceNumber: String?
+    )
 }

@@ -28,10 +28,10 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityCreateError
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.controller.v6.LegalEntityLegacyServiceMapper
-import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolV6Test
+import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolTestBaseV6
 import org.junit.jupiter.api.Test
 
-class LegalEntityCreationV6IT: UnscheduledPoolV6Test() {
+class LegalEntityCreationV6IT: UnscheduledPoolTestBaseV6() {
 
     /**
      * WHEN operator creates a new valid legal entity
@@ -289,7 +289,7 @@ class LegalEntityCreationV6IT: UnscheduledPoolV6Test() {
     fun `try create legal entity with too many legal address identifiers`(){
         //WHEN
         val newLegalEntityRequest = with(testDataFactory.request.buildLegalEntityCreateRequest(testName)){
-            copy(legalAddress = legalAddress.copy(identifiers = (1 .. 101).map { testDataFactory.request.createAddressIdentifier(testName, it) }))
+            copy(legalAddress = legalAddress.copy(identifiers = (1 .. 101).map { testDataFactory.request.buildAddressIdentifier(testName, it) }))
         }
 
         val creationResponse = poolClient.legalEntities.createBusinessPartners(listOf(newLegalEntityRequest))
