@@ -31,5 +31,7 @@ data class SiteDto(
 
     val mainAddress: LogisticAddressDto,
 
-    override val confidenceCriteria: ConfidenceCriteriaDto
+    override val confidenceCriteria: ConfidenceCriteriaDto,
+
+    val scriptVariants: List<SiteScriptVariantDto> = emptyList()
 ) : IBaseSiteDto

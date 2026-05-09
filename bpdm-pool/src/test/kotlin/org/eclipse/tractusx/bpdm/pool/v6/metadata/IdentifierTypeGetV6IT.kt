@@ -25,10 +25,10 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDetailDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierTypeDto
-import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolV6Test
+import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolTestBaseV6
 import org.junit.jupiter.api.Test
 
-class IdentifierTypeGetV6IT: UnscheduledPoolV6Test() {
+class IdentifierTypeGetV6IT: UnscheduledPoolTestBaseV6() {
 
     /**
      * GIVEN identifier types

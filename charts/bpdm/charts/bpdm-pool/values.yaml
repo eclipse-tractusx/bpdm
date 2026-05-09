@@ -128,17 +128,3 @@ startupProbe:
 applicationConfig:
 
 applicationSecrets:
-  spring:
-    dataSource:
-      # Change this password for production
-      password: &postgresPass  bpdm
-
-postgres:
-  enabled: false
-  auth:
-    database: bpdm
-    username: bpdm
-    password: *postgresPass
-
-centralidp:
-  enabled: true

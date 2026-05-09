@@ -20,24 +20,15 @@
 package org.eclipse.tractusx.bpdm.pool.v6.util.metadata
 
 import com.neovisionaries.i18n.CountryCode
-import com.opencsv.bean.CsvToBeanBuilder
 import org.eclipse.tractusx.bpdm.pool.api.model.CountrySubdivisionDto
-import org.springframework.core.io.Resource
-import java.io.InputStreamReader
+import org.eclipse.tractusx.bpdm.pool.util.metadata.AdminAreaLevel1EntryImporter
 
 class AdminAreaLevel1ImporterV6(
-    private val adminAreaResource: Resource
+    private val adminAreaLevel1EntryImporter: AdminAreaLevel1EntryImporter
 ) {
 
     fun importFromResource(): List<CountrySubdivisionDto>{
-        val reader = InputStreamReader(adminAreaResource.inputStream)
-        val rows = CsvToBeanBuilder<AdminAreaLevel1Entry>(reader)
-            .withType(AdminAreaLevel1Entry::class.java)
-            .withIgnoreLeadingWhiteSpace(true)
-            .build()
-            .parse()
-
-        val uniqueRows = rows.filterNotNull().groupBy { it.code }.map { (_, group) -> group.first() }
+        val uniqueRows = adminAreaLevel1EntryImporter.importFromResource()
         val adminAreas = uniqueRows.map { entry ->
             CountrySubdivisionDto(
                 countryCode = CountryCode.getByAlpha2Code(entry.countryCode!!),

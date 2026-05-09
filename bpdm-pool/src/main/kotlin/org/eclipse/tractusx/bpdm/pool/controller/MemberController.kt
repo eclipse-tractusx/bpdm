@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.controller
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.PoolMembersApi
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressInvariantVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntitySearchRequest
@@ -79,16 +79,13 @@ class MemberController(
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_MEMBER_PARTNER})")
-    override fun searchAddresses(searchRequest: AddressSearchRequest, paginationRequest: PaginationRequest): PageDto<LogisticAddressVerboseDto> {
-        return addressService.searchAddresses(
-            AddressService.AddressSearchRequest(
-                addressBpns = searchRequest.addressBpns,
-                siteBpns = searchRequest.siteBpns,
-                legalEntityBpns = searchRequest.legalEntityBpns,
-                name = searchRequest.name,
-                isCatenaXMemberData = true
-            ),
-            paginationRequest
+    override fun searchAddresses(searchRequest: AddressSearchRequest, paginationRequest: PaginationRequest): PageDto<LogisticAddressInvariantVerboseDto> {
+        return addressService.searchParticipantAddresses(
+            addressBpns = searchRequest.addressBpns,
+            siteBpns = searchRequest.siteBpns,
+            legalEntityBpns = searchRequest.legalEntityBpns,
+            name = searchRequest.name,
+            paginationRequest = paginationRequest
         )
     }
 

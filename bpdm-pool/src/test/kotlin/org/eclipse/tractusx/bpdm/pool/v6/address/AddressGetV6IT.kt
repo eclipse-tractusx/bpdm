@@ -20,11 +20,11 @@
 package org.eclipse.tractusx.bpdm.pool.v6.address
 
 import org.assertj.core.api.Assertions
-import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolV6Test
+import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolTestBaseV6
 import org.junit.jupiter.api.Test
 import org.springframework.web.reactive.function.client.WebClientResponseException
 
-class AddressGetV6IT: UnscheduledPoolV6Test() {
+class AddressGetV6IT: UnscheduledPoolTestBaseV6() {
 
     /**
      * GIVEN address

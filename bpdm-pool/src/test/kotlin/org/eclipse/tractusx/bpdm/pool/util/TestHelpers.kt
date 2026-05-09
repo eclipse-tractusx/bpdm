@@ -19,12 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.util
 
-import org.assertj.core.api.Assertions
-import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
+import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.request.IdentifiersSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorCode
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
-import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.test.testdata.pool.LegalEntityStructureRequest
 import org.eclipse.tractusx.bpdm.test.testdata.pool.LegalEntityStructureResponse
 import org.eclipse.tractusx.bpdm.test.testdata.pool.SiteStructureResponse
@@ -36,15 +32,8 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 
 @Component
 class TestHelpers(
-    private val bpnConfigProperties: BpnConfigProperties,
-    private val poolClient: PoolClientImpl
+    private val poolClient: PoolApiClient
 ) {
-
-    val bpnLPattern = createBpnPattern(bpnConfigProperties.legalEntityChar)
-    val bpnSPattern = createBpnPattern(bpnConfigProperties.siteChar)
-    val bpnAPattern = createBpnPattern(bpnConfigProperties.addressChar)
-
-
     /**
      * Creates legal entities, sites and addresses according to the given [partnerStructures]
      * Retains the order: All response objects will be in the same order as their request counterparts
@@ -60,7 +49,7 @@ class TestHelpers(
         val assignedSiteRequests =
             partnerStructures.flatMap {
                 it.siteStructures.map { site ->
-                    site.site.copy(bpnlParent = indexedLegalEntities[it.legalEntity.index]!!.legalEntity.bpnl)
+                    site.site.copy(bpnlParent = indexedLegalEntities[it.legalEntity.index]!!.legalEntity.header.bpnl)
                 }
             }
         val sitesWithErrorsResponse = poolClient.sites.createSite(assignedSiteRequests)
@@ -69,7 +58,7 @@ class TestHelpers(
         val assignedSitelessAddresses =
             partnerStructures.flatMap {
                 it.addresses.map { address ->
-                    address.copy(bpnParent = indexedLegalEntities[it.legalEntity.index]!!.legalEntity.bpnl)
+                    address.copy(bpnParent = indexedLegalEntities[it.legalEntity.index]!!.legalEntity.header.bpnl)
                 }
             }
         val assignedSiteAddresses =
@@ -85,7 +74,7 @@ class TestHelpers(
 
         return partnerStructures.map { legalEntityStructure ->
             LegalEntityStructureResponse(
-                legalEntity = indexedLegalEntities[legalEntityStructure.legalEntity.index]!!,
+                legalEntity = indexedLegalEntities[legalEntityStructure.legalEntity.index]!!.legalEntity,
                 siteStructures = legalEntityStructure.siteStructures.map { siteStructure ->
                     SiteStructureResponse(
                         site = indexedSites[siteStructure.site.index]!!,
@@ -94,15 +83,6 @@ class TestHelpers(
                 },
                 addresses = legalEntityStructure.addresses.map { indexedAddresses[it.index]!! }
             )
-        }
-    }
-
-    fun `get address by bpn-a, not found`(bpn: String) {
-        try {
-            val result = poolClient.addresses.getAddress(bpn)
-            assertThrows<WebClientResponseException> { result }
-        } catch (e: WebClientResponseException) {
-            Assert.assertEquals(HttpStatus.NOT_FOUND, e.statusCode)
         }
     }
 
@@ -123,23 +103,5 @@ class TestHelpers(
         } catch (e: WebClientResponseException) {
             Assert.assertEquals(HttpStatus.NOT_FOUND, e.statusCode)
         }
-    }
-
-    fun `get site by bpn-s, not found`(bpn: String) {
-        try {
-            val result = poolClient.sites.getSite(bpn)
-            assertThrows<WebClientResponseException> { result }
-        } catch (e: WebClientResponseException) {
-            Assert.assertEquals(HttpStatus.NOT_FOUND, e.statusCode)
-        }
-    }
-
-    fun <ERROR : ErrorCode> assertErrorResponse(errorResponse: ErrorInfo<ERROR>, codeToCheck: ERROR, keyToCheck: String) {
-        Assertions.assertThat(errorResponse.entityKey).isEqualTo(keyToCheck)
-        Assertions.assertThat(errorResponse.errorCode).isEqualTo(codeToCheck)
-    }
-
-    private fun createBpnPattern(typeId: Char): String {
-        return "${bpnConfigProperties.id}$typeId[${bpnConfigProperties.alphabet}]{${bpnConfigProperties.counterDigits + 2}}"
     }
 }

@@ -23,7 +23,7 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntitySearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityWithLegalAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolV6Test
+import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolTestBaseV6
 import org.junit.jupiter.api.Test
 
 /*******************************************************************************
@@ -44,7 +44,7 @@ import org.junit.jupiter.api.Test
  *
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
-class LegalEntityMemberSearchV6IT: UnscheduledPoolV6Test() {
+class LegalEntityMemberSearchV6IT: UnscheduledPoolTestBaseV6() {
 
     /**
      * GIVEN member and non-member legal entity data

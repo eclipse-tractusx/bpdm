@@ -99,9 +99,9 @@ class CleaningServiceDummy(
 
     private fun cleanLegalEntity(businessPartner: BusinessPartner, sharedByOwner: Boolean): LegalEntity {
         val addressToClean = businessPartner.legalEntity.legalAddress.takeIf { it != PostalAddress.empty }
-            ?: businessPartner.uncategorized.address
+            ?: businessPartner.uncategorized.address?.postalProperties
             ?: businessPartner.site?.siteMainAddress
-            ?: businessPartner.additionalAddress
+            ?: businessPartner.additionalAddress?.postalProperties
             ?: PostalAddress.empty
 
         val legalAddressBpnReference =  addressToClean.bpnReference
@@ -114,7 +114,7 @@ class CleaningServiceDummy(
                     identifiers = identifiers.takeIf { it.isNotEmpty() } ?: businessPartner.uncategorized.identifiers,
                     states = states,
                     confidenceCriteria = dummyConfidenceCriteria.copy(sharedByOwner = sharedByOwner),
-                    hasChanged = businessPartner.type == GoldenRecordType.LegalEntity,
+                    hasChanged = (businessPartner.type == GoldenRecordType.LegalEntity) || (businessPartner.type == GoldenRecordType.Site && businessPartner.site!!.siteMainIsLegalAddress),
                     isParticipantData = sharedByOwner,
                     legalAddress = cleanAddress(addressToClean, legalAddressBpnReference, true, sharedByOwner),
                 )
@@ -128,8 +128,8 @@ class CleaningServiceDummy(
                 null
             }else {
                 site.siteMainAddress?.takeIf { it != PostalAddress.empty }
-                    ?: businessPartner.uncategorized.address
-                    ?: businessPartner.additionalAddress
+                    ?: businessPartner.uncategorized.address?.postalProperties
+                    ?: businessPartner.additionalAddress?.postalProperties
                     ?: PostalAddress.empty
             }
 
@@ -147,14 +147,18 @@ class CleaningServiceDummy(
         }
     }
 
-    private fun cleanAdditionalAddress(businessPartner: BusinessPartner, sharedByOwner: Boolean): PostalAddress? {
+    private fun cleanAdditionalAddress(businessPartner: BusinessPartner, sharedByOwner: Boolean): PostalAddressWithScriptVariants? {
         return businessPartner.additionalAddress?.let {
-            cleanAddress(
-                it,
-                it.bpnReference.toRequestIfNotBpn(businessPartner.legalEntityReference(), businessPartner.siteReference(), businessPartner.addressReference()),
-                businessPartner.type == GoldenRecordType.Address,
-                sharedByOwner
+            PostalAddressWithScriptVariants(
+                postalProperties = cleanAddress(
+                    it.postalProperties,
+                    it.bpnReference.toRequestIfNotBpn(businessPartner.legalEntityReference(), businessPartner.siteReference(), businessPartner.addressReference()),
+                    businessPartner.type == GoldenRecordType.Address,
+                    sharedByOwner
+                ),
+                scriptVariants = it.scriptVariants
             )
+
         }
     }
 

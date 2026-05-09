@@ -19,7 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.v6.model
 
+import io.swagger.v3.oas.annotations.media.Schema
+
 data class CxMembershipDto (
     val bpnL: String,
+    @get:Schema(name = "isCatenaXMember")
     val isCatenaXMember: Boolean
 )

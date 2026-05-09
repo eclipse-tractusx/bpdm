@@ -25,20 +25,21 @@ import org.eclipse.tractusx.bpdm.common.dto.IBaseLegalEntityDto
 import org.eclipse.tractusx.bpdm.common.dto.IBaseLogisticAddressDto
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.exception.BpdmValidationErrorException
 import org.eclipse.tractusx.bpdm.common.mapping.ValidationContext
 import org.eclipse.tractusx.bpdm.common.mapping.ValidationError
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
-import org.eclipse.tractusx.bpdm.pool.dto.AddressMetadataDto
-import org.eclipse.tractusx.bpdm.pool.dto.LegalEntityMetadataDto
+import org.eclipse.tractusx.bpdm.pool.api.model.request.ReasonCodeDeleteRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.ReasonCodeUpsertRequest
+import org.eclipse.tractusx.bpdm.pool.dto.*
 import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmAlreadyExists
-import org.eclipse.tractusx.bpdm.pool.repository.FieldQualityRuleRepository
-import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
-import org.eclipse.tractusx.bpdm.pool.repository.LegalFormRepository
-import org.eclipse.tractusx.bpdm.pool.repository.RegionRepository
+import org.eclipse.tractusx.bpdm.pool.exception.BpdmReasonCodeInUseException
+import org.eclipse.tractusx.bpdm.pool.repository.*
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
@@ -52,7 +53,10 @@ class MetadataService(
     private val identifierTypeRepository: IdentifierTypeRepository,
     private val legalFormRepository: LegalFormRepository,
     private val fieldQualityRuleRepository: FieldQualityRuleRepository,
-    private val regionRepository: RegionRepository
+    private val regionRepository: RegionRepository,
+    private val scriptCodeRepository: ScriptCodeRepository,
+    private val reasonCodeRepository: ReasonCodeRepository,
+    private val relationRepository: RelationRepository,
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -169,17 +173,51 @@ class MetadataService(
         return resultList
     }
 
-    fun getMetadata(requests: Collection<IBaseLegalEntityDto>): LegalEntityMetadataDto {
+    fun getScriptCodes(paginationRequest: PaginationRequest): PageDto<ScriptCodeDto> {
+        return scriptCodeRepository.findAll(PageRequest.of(paginationRequest.page, paginationRequest.size)).toDto {
+            ScriptCodeDto(it.technicalKey, it.description)
+        }
+    }
+
+    fun getMetadata(requests: Collection<LegalEntityDto>): LegalEntityMetadataDto{
+        val invariantHeaderMetadata = getMetadata(requests.map { it.header })
+        val scriptCodes = scriptCodeRepository.findByTechnicalKeyIn(requests.flatMap { it.scriptVariants }.map { it.scriptCode }.toSet())
+
+        val headerMetaData = LegalEntityHeaderMetadataDto(invariantHeaderMetadata.idTypes, invariantHeaderMetadata.legalForms, scriptCodes)
+
+        val invariantAddressMetadata = getMetadata(requests.map { it.legalAddress })
+        val addressMetadata = AddressMetadataDto(invariantAddressMetadata.idTypes, invariantAddressMetadata.regions, scriptCodes)
+
+        return LegalEntityMetadataDto(headerMetaData, addressMetadata)
+    }
+
+    fun getMetadata(requests: Collection<SiteDto>): SiteMetadataDto{
+        val scriptCodes = scriptCodeRepository.findByTechnicalKeyIn(requests.flatMap { it.scriptVariants }.map { it.scriptCode }.toSet())
+
+        val invariantAddressMetadata = getMetadata(requests.map { it.mainAddress })
+        val addressMetadata = AddressMetadataDto(invariantAddressMetadata.idTypes, invariantAddressMetadata.regions, scriptCodes)
+
+        return SiteMetadataDto(scriptCodes, addressMetadata)
+    }
+
+    fun getMetadata(requests: Collection<IBaseLegalEntityDto>): LegalEntityInvariantHeaderMetadataDto {
         val idTypeKeys = requests.flatMap { it.identifiers }.map { it.type }.toSet()
         val idTypes = identifierTypeRepository.findByBusinessPartnerTypeAndTechnicalKeyIn(IdentifierBusinessPartnerType.LEGAL_ENTITY, idTypeKeys)
 
         val legalFormKeys = requests.mapNotNull { it.legalForm }.toSet()
         val legalForms = legalFormRepository.findByTechnicalKeyIn(legalFormKeys)
 
-        return LegalEntityMetadataDto(idTypes, legalForms)
+        return LegalEntityInvariantHeaderMetadataDto(idTypes, legalForms)
     }
 
-    fun getMetadata(requests: Collection<IBaseLogisticAddressDto>): AddressMetadataDto {
+    fun getMetadata(requests: Collection<LogisticAddressWithScriptVariantsDto>): AddressMetadataDto{
+        val invariantMetadata = getMetadata(requests.map { it.address })
+        val scriptCodes = scriptCodeRepository.findByTechnicalKeyIn(requests.flatMap { it.scriptVariants }.map { it.scriptCode }.toSet())
+
+        return AddressMetadataDto(invariantMetadata.idTypes, invariantMetadata.regions, scriptCodes)
+    }
+
+    fun getMetadata(requests: Collection<IBaseLogisticAddressDto>): AddressInvariantMetadataDto {
         val idTypeKeys = requests.flatMap { it.identifiers }.map { it.type }.toSet()
         val idTypes = identifierTypeRepository.findByBusinessPartnerTypeAndTechnicalKeyIn(IdentifierBusinessPartnerType.ADDRESS, idTypeKeys)
 
@@ -188,7 +226,7 @@ class MetadataService(
             .toSet()
         val regions = regionRepository.findByRegionCodeIn(regionKeys)
 
-        return AddressMetadataDto(idTypes, regions)
+        return AddressInvariantMetadataDto(idTypes, regions)
     }
 
     fun getRegions(requests: Collection<IBaseLogisticAddressDto>): Set<RegionDb> {
@@ -204,6 +242,36 @@ class MetadataService(
         val idTypeKeys = requests.flatMap { it.identifiers }.map { it.type }.toSet()
         val idTypes = identifierTypeRepository.findByBusinessPartnerTypeAndTechnicalKeyIn(IdentifierBusinessPartnerType.ADDRESS, idTypeKeys)
         return idTypes
+    }
+
+    fun getReasonCodes(paginationRequest: PaginationRequest): PageDto<ReasonCodeDto>{
+        val pageRequest = PageRequest.of(paginationRequest.page, paginationRequest.size)
+        val pageResponse = reasonCodeRepository.findAll(pageRequest)
+
+        return pageResponse.toDto { ReasonCodeDto(technicalKey = it.technicalKey, description = it.description) }
+    }
+
+    @Transactional
+    fun upsertReasonCode(reasonCodeUpsertRequest: ReasonCodeUpsertRequest): ReasonCodeDto{
+        val foundReasonCode = reasonCodeRepository.findByTechnicalKey(reasonCodeUpsertRequest.reasonCode.technicalKey)
+            ?: ReasonCodeDb(reasonCodeUpsertRequest.reasonCode.technicalKey, reasonCodeUpsertRequest.reasonCode.description)
+
+        foundReasonCode.description = reasonCodeUpsertRequest.reasonCode.description
+
+        reasonCodeRepository.save(foundReasonCode)
+
+        return ReasonCodeDto(foundReasonCode.technicalKey, foundReasonCode.description)
+    }
+
+    @Transactional
+    fun deleteReasonCode(deleteRequest: ReasonCodeDeleteRequest){
+        val foundReasonCode = reasonCodeRepository.findByTechnicalKey(deleteRequest.technicalKey)
+            ?: throw BpdmNotFoundException("Reason Code", deleteRequest.technicalKey)
+
+        if(relationRepository.existsByReasonCode(foundReasonCode))
+            throw BpdmReasonCodeInUseException(foundReasonCode.technicalKey)
+
+        reasonCodeRepository.delete(foundReasonCode)
     }
 
 
