@@ -20,23 +20,26 @@
 package org.eclipse.tractusx.bpdm.gate.api.model
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.RelationDescription
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.RelationValidityPeriodDescription
 import java.time.Instant
 
-@Schema(description = "A relation from one business partner (the source) to another business partner (the target). ")
+@Schema(description = RelationDescription.header)
 data class RelationDto(
-    @Schema(description = "The identifier with which to reference this relation")
+    @get:Schema(description = RelationDescription.externalId)
     override val externalId: String,
-    @Schema(description = "The type of relation between the business partners")
+    @get:Schema(description = RelationDescription.relationType)
     override val relationType: RelationType,
-    @Schema(description = "The business partner from which the relation emerges (the source)")
+    @get:Schema(description = RelationDescription.source)
     override val businessPartnerSourceExternalId: String,
-    @Schema(description = "The business partner to which this relation goes (the target)")
+    @get:Schema(description = RelationDescription.target)
     override val businessPartnerTargetExternalId: String,
     @Schema(description = RelationValidityPeriodDescription.header)
     val validityPeriods: Collection<RelationValidityPeriodDto>,
-    @Schema(description = "The time when this relation was last modified")
+    @get:Schema(description = RelationDescription.reasonCode)
+    val reasonCode: String,
+    @get:Schema(description = RelationDescription.updatedAt)
     val updatedAt: Instant,
-    @Schema(description = "The time when this relation was created")
+    @get:Schema(description = RelationDescription.createdAt)
     val createdAt: Instant,
 ): IRelationDto

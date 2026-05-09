@@ -19,23 +19,14 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.model
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.IBaseLegalEntityDto
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityDescription
 
-@Schema(description = LegalEntityDescription.header)
 data class LegalEntityDto(
-
-    @get:Schema(description = LegalEntityDescription.legalName)
-    val legalName: String,
-
-    override val legalShortName: String?,
-    override val legalForm: String? = null,
-    override val identifiers: Collection<LegalEntityIdentifierDto> = emptyList(),
-    override val states: Collection<LegalEntityStateDto> = emptyList(),
-    override val confidenceCriteria: ConfidenceCriteriaDto,
-
-    @get:Schema(description = "Indicates whether the legal entity is owned and thus provided by a Data Space Participant.")
-    val isParticipantData: Boolean
-
-) : IBaseLegalEntityDto
+    @field:JsonUnwrapped
+    val header: LegalEntityHeaderDto,
+    @get:Schema(description = LegalEntityDescription.legalAddress)
+    val legalAddress: LogisticAddressDto,
+    val scriptVariants: List<LegalEntityScriptVariantDto> = emptyList()
+)

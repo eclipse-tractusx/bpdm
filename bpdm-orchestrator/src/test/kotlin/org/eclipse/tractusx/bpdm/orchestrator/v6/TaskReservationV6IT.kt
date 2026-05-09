@@ -25,7 +25,7 @@ import org.eclipse.tractusx.orchestrator.api.v6.model.TaskStepReservationRespons
 import org.junit.jupiter.api.Test
 import java.time.Instant
 
-class TaskReservationV6IT: UnscheduledOrchestratorTestV6() {
+class TaskReservationV6IT: UnscheduledOrchestratorTestBaseV6() {
 
 
     /**

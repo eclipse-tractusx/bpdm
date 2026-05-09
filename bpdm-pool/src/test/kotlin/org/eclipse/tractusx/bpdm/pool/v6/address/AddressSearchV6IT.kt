@@ -22,10 +22,10 @@ package org.eclipse.tractusx.bpdm.pool.v6.address
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressSearchRequest
-import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolV6Test
+import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolTestBaseV6
 import org.junit.jupiter.api.Test
 
-class AddressSearchV6IT: UnscheduledPoolV6Test() {
+class AddressSearchV6IT: UnscheduledPoolTestBaseV6() {
 
     /**
      * GIVEN addresses

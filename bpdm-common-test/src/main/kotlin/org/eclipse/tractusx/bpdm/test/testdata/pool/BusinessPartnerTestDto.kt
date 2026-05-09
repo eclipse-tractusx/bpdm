@@ -23,7 +23,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequ
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateVerboseDto
 
 data class LegalEntityStructureRequest(
@@ -38,7 +38,7 @@ data class SiteStructureRequest(
 )
 
 data class LegalEntityStructureResponse(
-    val legalEntity: LegalEntityPartnerCreateVerboseDto,
+    val legalEntity: LegalEntityWithLegalAddressVerboseDto,
     val siteStructures: List<SiteStructureResponse> = emptyList(),
     val addresses: List<AddressPartnerCreateVerboseDto> = emptyList()
 )

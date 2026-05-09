@@ -24,10 +24,10 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressUpdateError
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerUpdateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.controller.v6.LegalEntityLegacyServiceMapper.Companion.IDENTIFIER_AMOUNT_LIMIT
-import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolV6Test
+import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolTestBaseV6
 import org.junit.jupiter.api.Test
 
-class AddressUpdateV6IT: UnscheduledPoolV6Test() {
+class AddressUpdateV6IT: UnscheduledPoolTestBaseV6() {
 
     /**
      * GIVEN legal entity
@@ -264,7 +264,7 @@ class AddressUpdateV6IT: UnscheduledPoolV6Test() {
 
         //WHEN
         val addressRequest = with(testDataFactory.request.buildAddressUpdateRequest(testName, legalEntityResponse)){
-            val tooManyIdentifiers = (1 .. 101).map { testDataFactory.request.createAddressIdentifier(testName, it) }
+            val tooManyIdentifiers = (1 .. 101).map { testDataFactory.request.buildAddressIdentifier(testName, it) }
             copy(address = address.copy(identifiers = tooManyIdentifiers))
         }
         val addressResponse = poolClient.addresses.updateAddresses(listOf(addressRequest))

@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.api.model.response
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LogisticAddressDescription
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressInvariantVerboseDto
 
 
 @Schema(description = LogisticAddressDescription.headerMatchResponse)
@@ -33,5 +33,5 @@ data class AddressMatchVerboseDto(
 
     // TODO OpenAPI description for complex field does not work!!
     @get:Schema(description = LogisticAddressDescription.address)
-    val address: LogisticAddressVerboseDto
+    val address: LogisticAddressInvariantVerboseDto
 )

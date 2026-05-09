@@ -21,11 +21,12 @@ package org.eclipse.tractusx.bpdm.pool.service
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
-import org.eclipse.tractusx.bpdm.pool.api.model.RelationType
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
+import org.eclipse.tractusx.bpdm.pool.entity.ReasonCodeDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
@@ -78,10 +79,11 @@ class RelationUpsertService(
         }.toMutableList()
 
         val newRelation = RelationDb(
-            type = upsertRequest.relationType,
+            type = upsertRequest.legalEntityRelationType,
             startNode = source,
             endNode = target,
             validityPeriods = validityPeriods,
+            reasonCode = upsertRequest.reasonCode
         )
 
         relationRepository.save(newRelation)
@@ -124,9 +126,10 @@ class RelationUpsertService(
     data class UpsertRequest(
         val source: LegalEntityDb,
         val target: LegalEntityDb,
-        val relationType: RelationType,
+        val legalEntityRelationType: LegalEntityRelationType,
         val validityPeriods: Collection<RelationValidityPeriodDb>,
-        val existingRelation: RelationDb?
+        val existingRelation: RelationDb?,
+        val reasonCode: ReasonCodeDb
     )
 
     data class TimePeriod(

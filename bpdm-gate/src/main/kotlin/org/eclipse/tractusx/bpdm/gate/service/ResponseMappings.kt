@@ -62,7 +62,7 @@ fun GeographicCoordinateDb.toGeographicCoordinateDto(): GeoCoordinateDto {
     return GeoCoordinateDto(longitude, latitude, altitude)
 }
 
-private fun StreetDb.toStreetDto(): StreetDto {
+fun StreetDb.toStreetDto(): StreetDto {
 
     return StreetDto(
         name = name,

@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.api.model.response
 
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.SiteDescription
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressInvariantVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerboseDto
 
 @Schema(description = SiteDescription.headerMatchResponse)
@@ -32,7 +32,7 @@ data class SiteMatchVerboseDto(
 
     // TODO OpenAPI description for complex field does not work!!
     @Schema(description = SiteDescription.mainAddress)
-    val mainAddress: LogisticAddressVerboseDto,
+    val mainAddress: LogisticAddressInvariantVerboseDto,
 
     // TODO OpenAPI description for complex field does not work!!
     @Schema(description = SiteDescription.site)

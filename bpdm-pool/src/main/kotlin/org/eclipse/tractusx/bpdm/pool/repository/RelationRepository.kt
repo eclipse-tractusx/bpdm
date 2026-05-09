@@ -20,8 +20,9 @@
 package org.eclipse.tractusx.bpdm.pool.repository
 
 import jakarta.persistence.criteria.Predicate
-import org.eclipse.tractusx.bpdm.pool.api.model.RelationType
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
+import org.eclipse.tractusx.bpdm.pool.entity.ReasonCodeDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.repository.JpaRepository
@@ -31,7 +32,7 @@ import org.springframework.data.jpa.repository.Query
 interface RelationRepository : JpaRepository<RelationDb, Long>, JpaSpecificationExecutor<RelationDb> {
 
     companion object {
-        fun byRelation(startNode: LegalEntityDb?, endNode: LegalEntityDb?, type: RelationType?) =
+        fun byRelation(startNode: LegalEntityDb?, endNode: LegalEntityDb?, type: LegalEntityRelationType?) =
             Specification<RelationDb> { root, _, builder ->
                 val predicates = mutableListOf<Predicate>()
 
@@ -44,15 +45,17 @@ interface RelationRepository : JpaRepository<RelationDb, Long>, JpaSpecification
                 }
 
                 type?.let {
-                    predicates.add(builder.equal(root.get<RelationType>(RelationDb::type.name), it))
+                    predicates.add(builder.equal(root.get<LegalEntityRelationType>(RelationDb::type.name), it))
                 }
 
                 builder.and(*predicates.toTypedArray())
             }
     }
 
-    @Query("SELECT r FROM RelationDb r WHERE r.type = :relationType AND (r.startNode = :legalEntity OR r.endNode = :legalEntity)")
-    fun findInSourceOrTarget(relationType: RelationType, legalEntity: LegalEntityDb): Set<RelationDb>
+    @Query("SELECT r FROM RelationDb r WHERE r.type = :legalEntityRelationType AND (r.startNode = :legalEntity OR r.endNode = :legalEntity)")
+    fun findInSourceOrTarget(legalEntityRelationType: LegalEntityRelationType, legalEntity: LegalEntityDb): Set<RelationDb>
 
-    fun findByTypeAndStartNode(relationType: RelationType, legalEntity: LegalEntityDb): Set<RelationDb>
+    fun findByTypeAndStartNode(legalEntityRelationType: LegalEntityRelationType, legalEntity: LegalEntityDb): Set<RelationDb>
+
+    fun existsByReasonCode(reasonCode: ReasonCodeDb): Boolean
 }

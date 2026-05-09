@@ -38,6 +38,10 @@ class SiteDb(
     @JoinColumn(name = "legal_entity_id", nullable = false)
     var legalEntity: LegalEntityDb,
 
+    @ElementCollection
+    @CollectionTable(name = "site_script_variants", joinColumns = [JoinColumn(name = "site_id")])
+    val scriptVariants: MutableList<SiteScriptVariantDb> = mutableListOf(),
+
     ) : BaseEntity() {
 
     @OneToMany(mappedBy = "site", cascade = [CascadeType.ALL], orphanRemoval = true)

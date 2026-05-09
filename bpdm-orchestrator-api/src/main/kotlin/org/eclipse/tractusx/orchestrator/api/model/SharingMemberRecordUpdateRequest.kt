@@ -19,7 +19,10 @@
 
 package org.eclipse.tractusx.orchestrator.api.model
 
+import io.swagger.v3.oas.annotations.media.Schema
+
 data class SharingMemberRecordUpdateRequest(
     val recordId: String,
+    @get:Schema(name = "isGoldenRecordCounted")
     val isGoldenRecordCounted: Boolean
 )

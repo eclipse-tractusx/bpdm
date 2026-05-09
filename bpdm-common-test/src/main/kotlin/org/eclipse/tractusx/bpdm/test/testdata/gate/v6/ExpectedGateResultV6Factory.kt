@@ -26,9 +26,9 @@ import org.eclipse.tractusx.bpdm.gate.api.model.ConfidenceCriteriaDto
 import org.eclipse.tractusx.bpdm.gate.api.model.PhysicalPostalAddressDto
 import org.eclipse.tractusx.bpdm.gate.api.model.StreetDto
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPostRequest
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPutEntryV6
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.*
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.RelationDto
 import org.eclipse.tractusx.bpdm.pool.api.model.*
@@ -59,7 +59,7 @@ class ExpectedGateResultV6Factory {
         }
     }
 
-    fun buildBusinessPartnerOutput(input: BusinessPartnerInputDto, goldenRecordLegalEntity: LegalEntityWithLegalAddressVerboseDto, siteGoldenRecord: SiteWithMainAddressVerboseDto, addressGoldenRecord: LogisticAddressVerboseDto): BusinessPartnerOutputDto{
+    fun buildBusinessPartnerOutput(input: BusinessPartnerInputDto, goldenRecordLegalEntity: LegalEntityWithLegalAddressVerboseDto, siteGoldenRecord: SiteWithMainAddressVerboseDto, addressGoldenRecord: LogisticAddressInvariantVerboseDto): BusinessPartnerOutputDto{
         return BusinessPartnerOutputDto(
             externalId = input.externalId,
             nameParts = input.nameParts,
@@ -67,7 +67,7 @@ class ExpectedGateResultV6Factory {
             states = addressGoldenRecord.states.map { BusinessPartnerStateDto(it.validFrom, it.validTo, it.type) },
             roles = input.roles,
             isOwnCompanyData = input.isOwnCompanyData,
-            legalEntity = buildLegalEntityRepresentation(goldenRecordLegalEntity.legalEntity),
+            legalEntity = buildLegalEntityRepresentation(goldenRecordLegalEntity.header),
             site = buildSiteRepresentation(siteGoldenRecord.site),
             address = buildAddressComponent(addressGoldenRecord, AddressType.AdditionalAddress),
             externalSequenceTimestamp = null,
@@ -76,7 +76,7 @@ class ExpectedGateResultV6Factory {
         )
     }
 
-    fun buildRelationDto(putRequest: RelationPutEntry): RelationDto{
+    fun buildRelationDto(putRequest: RelationPutEntryV6): RelationDto{
         return RelationDto(
             externalId = putRequest.externalId,
             relationType = putRequest.relationType,
@@ -98,7 +98,7 @@ class ExpectedGateResultV6Factory {
         )
     }
 
-    private fun buildLegalEntityRepresentation(legalEntity: LegalEntityVerboseDto): LegalEntityRepresentationOutputDto{
+    private fun buildLegalEntityRepresentation(legalEntity: LegalEntityHeaderVerboseDto): LegalEntityRepresentationOutputDto{
         return LegalEntityRepresentationOutputDto(
             legalEntityBpn = legalEntity.bpnl,
             legalName = legalEntity.legalName,
@@ -109,7 +109,7 @@ class ExpectedGateResultV6Factory {
         )
     }
 
-    private fun buildAddressComponent(logisticAddress: LogisticAddressVerboseDto, addressType: AddressType): AddressComponentOutputDto{
+    private fun buildAddressComponent(logisticAddress: LogisticAddressInvariantVerboseDto, addressType: AddressType): AddressComponentOutputDto{
         return AddressComponentOutputDto(
             addressBpn = logisticAddress.bpna,
             name = logisticAddress.name,

@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressInvariantVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
@@ -55,6 +56,32 @@ class AddressService(
         val addressPage = logisticAddressRepository.findAll(spec, paginationRequest.toPageRequest())
 
         return addressPage.toDto { it.toDto() }
+    }
+
+    fun searchParticipantAddresses(
+        addressBpns: List<String>?,
+        siteBpns: List<String>?,
+        legalEntityBpns: List<String>?,
+        name: String?,
+        paginationRequest: PaginationRequest
+    ): PageDto<LogisticAddressInvariantVerboseDto>{
+        val variantResponse = searchAddresses(
+            AddressSearchRequest(
+                addressBpns = addressBpns,
+                siteBpns = siteBpns,
+                legalEntityBpns = legalEntityBpns,
+                name = name,
+                isCatenaXMemberData = true
+            ), paginationRequest
+        )
+
+        return PageDto(
+            variantResponse.totalElements,
+            variantResponse.totalPages,
+            variantResponse.page,
+            variantResponse.contentSize,
+            variantResponse.content.map { it.address }
+        )
     }
 
     /**
