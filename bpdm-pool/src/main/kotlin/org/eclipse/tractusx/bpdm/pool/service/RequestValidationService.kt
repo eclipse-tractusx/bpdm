@@ -27,7 +27,7 @@ import org.eclipse.tractusx.bpdm.common.util.findDuplicates
 import org.eclipse.tractusx.bpdm.common.util.mergeMapsWithCollectionInValue
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
-import org.eclipse.tractusx.bpdm.pool.dto.LegalEntityMetadataDto
+import org.eclipse.tractusx.bpdm.pool.dto.LegalEntityInvariantHeaderMetadataDto
 import org.eclipse.tractusx.bpdm.pool.repository.*
 import org.springframework.stereotype.Service
 
@@ -50,10 +50,10 @@ class RequestValidationService(
     fun validateLegalEntitiesToCreateFromController(leCreateRequests: Collection<LegalEntityPartnerCreateRequest>): Map<RequestWithKey, Collection<ErrorInfo<LegalEntityCreateError>>> {
 
         val leErrorsByRequest = validateLegalEntitiesToCreate(leCreateRequests.map {
-            LegalEntityBridge(legalEntity = it.legalEntity, request = it, bpnL = null)
+            LegalEntityBridge(legalEntity = it.legalEntity.header, request = it, bpnL = null)
         })
         val legalAddressBridges = leCreateRequests.map {
-            AddressBridge(address = it.legalAddress, request = it, bpnA = null)
+            AddressBridge(address = it.legalEntity.legalAddress, request = it, bpnA = null)
         }
 
         val addressErrorsByRequest = validateAddresses(legalAddressBridges, leCreateMessages)
@@ -88,12 +88,12 @@ class RequestValidationService(
     ): Map<RequestWithKey, Collection<ErrorInfo<LegalEntityUpdateError>>> {
 
         val leErrorsByRequest = validateLegalEntitiesToUpdate(leRequests.map {
-            LegalEntityBridge(legalEntity = it.legalEntity, request = it, bpnL = it.bpnl)
+            LegalEntityBridge(legalEntity = it.legalEntity.header, request = it, bpnL = it.bpnl)
         })
 
         val addressBpnByLegalEntityBpnL = legalEntityRepository.findDistinctByBpnIn(leRequests.map { it.bpnl }).associate { it.bpn to it.legalAddress.bpn }
         val legalAddressBridges = leRequests.map {
-            AddressBridge(address = it.legalAddress, request = it, bpnA = addressBpnByLegalEntityBpnL[it.bpnl])
+            AddressBridge(address = it.legalEntity.legalAddress, request = it, bpnA = addressBpnByLegalEntityBpnL[it.bpnl])
         }
         val addressErrorsByRequest = validateAddresses(legalAddressBridges, leUpdateMessages)
         return mergeMapsWithCollectionInValue(leErrorsByRequest, addressErrorsByRequest)
@@ -460,7 +460,7 @@ class RequestValidationService(
         }
     }
 
-    private fun LegalEntityMetadataDto.toKeys(): LegalEntityMetadataKeys {
+    private fun LegalEntityInvariantHeaderMetadataDto.toKeys(): LegalEntityMetadataKeys {
         return LegalEntityMetadataKeys(
             idTypes = idTypes.map { it.technicalKey }.toSet(),
             legalForms = legalForms.map { it.technicalKey }.toSet()

@@ -46,5 +46,6 @@ data class LegalFormDto(
 
     val transliteratedAbbreviations: String?,
 
+    @get:Schema(name = "isActive")
     val isActive: Boolean
 )

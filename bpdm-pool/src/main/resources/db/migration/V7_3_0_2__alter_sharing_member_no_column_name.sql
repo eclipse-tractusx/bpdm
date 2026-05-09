@@ -1,0 +1,3 @@
+ALTER TABLE legal_entities RENAME COLUMN number_of_business_partners TO number_of_sharing_members;
+ALTER TABLE sites RENAME COLUMN number_of_business_partners TO number_of_sharing_members;
+ALTER TABLE logistic_addresses RENAME COLUMN number_of_business_partners TO number_of_sharing_members;

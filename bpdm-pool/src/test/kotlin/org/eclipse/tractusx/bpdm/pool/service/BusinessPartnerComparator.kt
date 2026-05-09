@@ -34,7 +34,7 @@ import java.util.function.BiPredicate
 
 fun compareLegalEntity(verboseRequest: LegalEntityWithLegalAddressVerboseDto, legalEntity: LegalEntity?) {
 
-    val verboseLegalEntity = verboseRequest.legalEntity
+    val verboseLegalEntity = verboseRequest.header
 
     assertThat(verboseLegalEntity.legalShortName).isEqualTo(legalEntity?.legalShortName)
     assertThat(verboseLegalEntity.legalFormVerbose?.technicalKey).isEqualTo(legalEntity?.legalForm)
@@ -63,7 +63,7 @@ fun compareSite(verboseRequest: SiteWithMainAddressVerboseDto, site: Site?) {
     compareLogisticAddress(verboseMainAddress, mainAddress)
 }
 
-fun compareLogisticAddress(verboseAddress: LogisticAddressVerboseDto, address: PostalAddress?) {
+fun compareLogisticAddress(verboseAddress: LogisticAddressInvariantVerboseDto, address: PostalAddress?) {
 
     assertThat(verboseAddress.name).isEqualTo(address?.addressName)
     compareAddressStates(verboseAddress.states, address?.states)

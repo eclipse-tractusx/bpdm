@@ -6,15 +6,38 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
 For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/CHANGELOG.md) of the charts directly.
 
-## [7.3.0] - tbd
+## [7.4.0] - tbd
+
+### Breaking
+
+- Upgraded Postgres and Keycloak versions [#1625](https://github.com/eclipse-tractusx/bpdm/issues/1625).
+  This change is breaking for operators who may use the embedded database of the delivered Charts.
+  Please consult the [MIGRATION_GUIDE](./docs/admin/MIGRATION_GUIDE.md).
 
 ### Added
+
+- Script variants and script codes for business partner data [#1593](https://github.com/eclipse-tractusx/bpdm/issues/1593)
+- BPDM Gate: Golden record relations to business partner output [#1630](https://github.com/eclipse-tractusx/bpdm/issues/1630)
+
+## [7.3.0] - 2026-03-6
+
+### BREAKING
+
+- Gate: Renamed relation output fields `sourceBpnL` to `sourceBpn` and `targetBpnL` to `targetBpn` to correctly represent BPNs for both Legal Entities (BPNL) and Addresses (BPNA).
+  These fields were previously unused; this corrects misleading naming. See Migration Guide for rationale and impact. [#1561](https://github.com/eclipse-tractusx/bpdm/issues/1561)
+
+### Added
+
+- BPDM: Introduced support for business partner address-to-address relations with the new `IsReplacedBy` relation type. [#1561](https://github.com/eclipse-tractusx/bpdm/issues/1561)
+- BPDM Pool: Add endpoints to manage reason code metadata [1562](https://github.com/eclipse-tractusx/bpdm/issues/1562)
+- BPDM: Add reason codes to business partner relations [1562](https://github.com/eclipse-tractusx/bpdm/issues/1562)
+- BPDM Pool: Relocate legal entity headquarter when a replaced by relation between a legal address and an additional address activates [#1586](https://github.com/eclipse-tractusx/bpdm/issues/1586)
 
 ### Changed
 
 - BPDM Orchestrator: fixed finished task events with correct content size in api response [#1580](https://github.com/eclipse-tractusx/bpdm/issues/1580)
 - BPDM Pool: Add validation for IsManagedBy relations to not overwrite validity periods that lie in the past [#1555](https://github.com/eclipse-tractusx/bpdm/issues/1555)
-
+- BPDM Pool: Automatically calculate a business partner's confidence level based on the other confidence criteria [#1554](https://github.com/eclipse-tractusx/bpdm/issues/1554)
 
 ## [7.2.0] - 2025-12-01
 

@@ -29,9 +29,9 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.ApiCommons
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
-import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
 import org.eclipse.tractusx.bpdm.gate.api.model.response.GateErrorResponse
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPostRequest
+import org.eclipse.tractusx.bpdm.gate.api.v6.model.request.RelationPutEntryV6
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.RelationDto
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
@@ -112,7 +112,7 @@ interface GateRelationApi {
     fun put(
         @Schema(description = "If true a business partner relation will be created even if a relation could not be found under the given external identifier.")
         @RequestParam createIfNotExist: Boolean = false,
-        @RequestBody requestBody: RelationPutEntry
+        @RequestBody requestBody: RelationPutEntryV6
     ): RelationDto
 
     @Operation(

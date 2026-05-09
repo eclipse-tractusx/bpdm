@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.test.config
 
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.BusinessPartnerTestDataFactory
+import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorRequestFactoryCommon
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
@@ -28,6 +29,6 @@ class OrchestratorTestDataConfiguration {
 
     @Bean
     fun orchestratorTestdataFactory(): BusinessPartnerTestDataFactory =
-        BusinessPartnerTestDataFactory()
+        BusinessPartnerTestDataFactory(OrchestratorRequestFactoryCommon())
 
 }

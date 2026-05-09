@@ -22,8 +22,8 @@ apiVersion: v2
 name: bpdm
 type: application
 description: A Helm chart for Kubernetes that deploys the BPDM applications
-version: 6.3.0-SNAPSHOT
-appVersion: "7.3.0-SNAPSHOT"
+version: 6.4.0-SNAPSHOT
+appVersion: "7.4.0-SNAPSHOT"
 home: https://github.com/eclipse-tractusx/bpdm
 sources:
   - https://github.com/eclipse-tractusx/bpdm
@@ -33,29 +33,29 @@ maintainers:
 
 dependencies:
   - name: bpdm-gate
-    version: 7.3.0-SNAPSHOT
+    version: 7.4.0-SNAPSHOT
     alias: bpdm-gate
     condition: bpdm-gate.enabled
   - name: bpdm-pool
-    version: 8.3.0-SNAPSHOT
+    version: 8.4.0-SNAPSHOT
     alias: bpdm-pool
     condition: bpdm-pool.enabled
   - name: bpdm-cleaning-service-dummy
-    version: 4.3.0-SNAPSHOT
+    version: 4.4.0-SNAPSHOT
     alias: bpdm-cleaning-service-dummy
     condition: bpdm-cleaning-service-dummy.enabled
   - name: bpdm-orchestrator
-    version: 4.3.0-SNAPSHOT
+    version: 4.4.0-SNAPSHOT
     alias: bpdm-orchestrator
     condition: bpdm-orchestrator.enabled
   - name: bpdm-common
-    version: 1.0.5
-  - name: postgresql
-    version: 12.12.10
-    repository: https://charts.bitnami.com/bitnami
+    version: 2.0.0
+  - name: postgres
     alias: postgres
-  - name: centralidp
-    version: 4.2.1
-    repository: https://eclipse-tractusx.github.io/charts/dev
-    alias: centralidp
-    condition: centralidp.enabled
+    condition: postgre.enabled
+    repository: oci://registry-1.docker.io/cloudpirates
+    version: 0.11.0
+  - name: keycloak
+    repository: oci://registry-1.docker.io/cloudpirates
+    version: 0.19.8
+    condition: keycloak.enabled

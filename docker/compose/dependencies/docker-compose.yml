@@ -22,7 +22,7 @@
 services:
 
   postgres:
-    image: postgres:15.4
+    image: docker.io/postgres:18.3@sha256:a9abf4275f9e99bff8e6aed712b3b7dfec9cac1341bba01c1ffdfce9ff9fc34a
     container_name: bpdm-postgres
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
@@ -35,10 +35,10 @@ services:
       - "5432:5432"
     volumes:
       - ./postgres-init.sh:/docker-entrypoint-initdb.d/postgres-init.sh:ro
-      - bpdm-postgres-data:/var/lib/postgresql/data
+      - bpdm-postgres-data:/var/lib/postgresql
 
   keycloak:
-    image: quay.io/keycloak/keycloak:23.0
+    image: docker.io/keycloak/keycloak:26.5.6@sha256:8d44614c74798322c4e07fbe0ecb15cfbb5879d69b484628555f58ade06f0d8c
     container_name: bpdm-keycloak
     environment:
       - KC_DB=postgres
@@ -52,7 +52,7 @@ services:
     depends_on:
       - postgres
     volumes:
-      - ../../../bpdm-common-test/src/main/resources/keycloak/CX-Central.json:/opt/keycloak/data/import/CX-Central.json:ro
+      - ../../../bpdm-common-test/src/main/resources/keycloak/BPDM-realm.json:/opt/keycloak/data/import/BPDM-realm.json:ro
 
 volumes:
   bpdm-postgres-data:

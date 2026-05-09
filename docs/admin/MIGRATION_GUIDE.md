@@ -2,6 +2,18 @@
 
 <!-- TOC -->
 * [Migration Guide](#migration-guide)
+  * [Next](#next)
+    * [Breaking rename of relation DTO fields (Gate)](#breaking-rename-of-relation-dto-fields-gate)
+      * [Impact](#impact)
+      * [Rationale](#rationale)
+    * [New relation type for addresses](#new-relation-type-for-addresses)
+    * [No required operator actions](#no-required-operator-actions)
+    * [Reason Codes](#reason-codes)
+  * [7.2.x to 7.3.x](#72x-to-73x)
+    * [Postgres Upgrade (BREAKING)](#postgres-upgrade-breaking)
+    * [Keycloak Upgrade (BREAKING)](#keycloak-upgrade-breaking)
+  * [7.2.x to 7.3.x](#72x-to-73x-1)
+    * [Automatic Confidence Level](#automatic-confidence-level)
   * [7.1.x to 7.2.x](#71x-to-72x)
     * [Alternative Headquarters Restriction](#alternative-headquarters-restriction)
     * [Default Logging Level](#default-logging-level)
@@ -10,6 +22,101 @@
     * [Golden Record Process for IsManagedBy Relations](#golden-record-process-for-ismanagedby-relations)
     * [Business Partner Identifier Amount Limit](#business-partner-identifier-amount-limit)
 <!-- TOC -->
+
+
+## Next
+
+### Breaking rename of relation DTO fields (Gate)
+
+In previous releases, relation outputs in the Gate API exposed the fields:
+
+- `sourceBpnL`
+- `targetBpnL`
+
+These names were technically incorrect:
+
+- They implied the fields were **always** BPNLs.
+- They were not suitable for the newly introduced **address relations**, where BPNAs must be returned.
+
+To correct this and make the fields generic, the following rename was implemented:
+
+- `sourceBpnL` → `sourceBpn`
+- `targetBpnL` → `targetBpn`
+
+#### Impact
+- This is technically a *breaking change* because:
+    - API response field names changed.
+    - Database column names changed accordingly.
+- However, these fields were **not used by any consumers** to date (based on internal usage and customer feedback).
+- Therefore the practical impact is negligible.
+
+#### Rationale
+- Gate now supports both:
+    - Legal entity relations → BPNL
+    - Address relations → BPNA
+- A neutral naming scheme (`sourceBpn`, `targetBpn`) avoids confusion and future-proofs the API.
+- This change is required for consistency with the newly introduced address relation functionality.
+
+---
+
+### New relation type for addresses
+
+Gate now exposes a dedicated relation type:
+
+- `IsReplacedBy`
+
+This type applies only to address relations and is validated accordingly.
+
+---
+
+### No required operator actions
+
+- No existing data needs to be changed.
+- No cleanup or special deployment steps needed.
+
+
+### Reason Codes
+
+Each business partner relation now needs a mandatory reason code.
+Reason codes are not standardized and are therefore managed by the operator of the golden record process.
+
+The list of available reason codes should be managed in the golden record Pool through to the new metadata endpoints.
+
+> Very important:
+> Since reason codes are mandatory and there are no default reason codes this repository does not contain any migration scripts for existing relations.
+> Therefore, if there are already relations present in BPDM the operator needs to add migration scripts assigning reason codes to those relations.
+
+## 7.2.x to 7.3.x
+
+### Postgres Upgrade (BREAKING)
+
+The embedded Postgres of the BPDM Charts has been updated from 15 to 18.
+The subchart's vendor also changed from Bitnami to Cloudpirates so we expect not much of any backwards compatibility for Chart features.
+In order to migrate your data please consult the [Tractus-X common migration guide](https://github.com/eclipse-tractusx/tutorial-resources/blob/keycloak-migration/migration-guides/GENERIC_POSTGRESQL_MIGRATION_GUIDE.md).
+
+Please note that using the embedded Postgres for BPDM Chart deployments is discouraged for production use.
+We recommend to host an external Postgres database and alter the BPDM Chart configuration to access such database.
+
+### Keycloak Upgrade (BREAKING)
+
+The embedded Central-IDP dependency of the BPDM Charts has been replaced by a Cloudpirates Keycloak Chart.
+This means not only have the Chart features dramatically changed but also the Keycloak version is upgraded from 25 to 26.
+In order to migrate your data please consult the  [Tractus-X common migration guide](https://github.com/eclipse-tractusx/tutorial-resources/blob/keycloak-migration/migration-guides/GENERIC_BITNAMI_TO_CLOUDPIRATES_KEYCLOAK_MIGRATION_GUIDE.md).
+
+Please note that the embedded Keycloak is only meant for test and development purposes and absolutely not for production use.
+We recommend to host an external Central-IDP or common Keycloak instance and alter the BPDM Chart configuration to access it.
+
+## 7.2.x to 7.3.x
+
+### Automatic Confidence Level
+
+A golden record's confidence level is now automatically managed by the Pool according to the [golden record standards](https://catenax-ev.github.io/docs/next/standards/CX-0076-GoldenRecordEndtoEndRequirementsStandard#2112-confidence-level).
+
+Please be aware that this version will automatically update the confidence levels of all existing golden records in the Pool.
+This update will also result in changelog entries.
+This way, the new confidence levels will be propagated to all sharing members and interested parties.
+
+Please note that this migration will create changelog entries for every existing golden record in the Pool.
 
 ## 7.1.x to 7.2.x
 

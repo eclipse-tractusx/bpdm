@@ -23,13 +23,16 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LogisticAddressDescription
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressInvariantVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressScriptVariantDto
 
 @Schema(description = LogisticAddressDescription.headerCreateResponse)
 data class AddressPartnerCreateVerboseDto(
 
     @field:JsonUnwrapped
-    val address: LogisticAddressVerboseDto,
+    val address: LogisticAddressInvariantVerboseDto,
+
+    val scriptVariants: List<LogisticAddressScriptVariantDto>,
 
     @Schema(description = CommonDescription.index)
     val index: String?

@@ -40,12 +40,11 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateVer
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerUpdateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SiteWithMainAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.controller.v6.LegalEntityLegacyServiceMapper.Companion.IDENTIFIER_AMOUNT_LIMIT
-import org.eclipse.tractusx.bpdm.pool.dto.AddressMetadataDto
+import org.eclipse.tractusx.bpdm.pool.dto.AddressInvariantMetadataDto
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
-import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.AddressIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
@@ -355,10 +354,11 @@ class SiteLegacyServiceMapper(
         val value: String
     )
 
-    private fun AddressMetadataDto.toMapping() =
+    private fun AddressInvariantMetadataDto.toMapping() =
         AddressMetadataMapping(
             idTypes = idTypes.associateBy { it.technicalKey },
-            regions = regions.associateBy { it.regionCode }
+            regions = regions.associateBy { it.regionCode },
+            scriptCodes = emptyMap()
         )
 
     private fun createLogisticAddress(

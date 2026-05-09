@@ -46,7 +46,11 @@ class LegalEntityDb(
     var confidenceCriteria: ConfidenceCriteriaDb,
 
     @Column(name = "is_catena_member", nullable = false)
-    var isCatenaXMemberData: Boolean
+    var isCatenaXMemberData: Boolean,
+
+    @ElementCollection
+    @CollectionTable(name = "legal_entity_script_variants", joinColumns = [JoinColumn(name = "legal_entity_id")])
+    val scriptVariants: MutableList<LegalEntityScriptVariantDb> = mutableListOf(),
 
 ) : BaseEntity() {
     @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
