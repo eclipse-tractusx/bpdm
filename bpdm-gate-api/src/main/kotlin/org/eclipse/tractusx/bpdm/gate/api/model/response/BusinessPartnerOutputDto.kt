@@ -61,7 +61,8 @@ data class LegalEntityRepresentationOutputDto(
     override val shortName: String? = null,
     override val legalForm: String? = null,
     val confidenceCriteria: ConfidenceCriteriaDto,
-    override val states: Collection<BusinessPartnerStateDto> = emptyList()
+    override val states: Collection<BusinessPartnerStateDto> = emptyList(),
+    val goldenRecordRelations: List<LegalEntityGoldenRecordRelationDto> = emptyList()
 ) : IBaseLegalEntityRepresentation
 
 @Schema(
@@ -87,4 +88,5 @@ data class AddressComponentOutputDto(
     val confidenceCriteria: ConfidenceCriteriaDto,
     override val states: Collection<BusinessPartnerStateDto> = emptyList(),
     val identifiers: Collection<AddressIdentifierDto> = emptyList(),
+    val goldenRecordRelations: List<AddressGoldenRecordRelationDto> = emptyList()
 ) : IBaseAddressRepresentation

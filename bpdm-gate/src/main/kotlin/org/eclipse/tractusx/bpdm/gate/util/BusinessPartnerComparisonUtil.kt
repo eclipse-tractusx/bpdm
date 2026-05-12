@@ -43,6 +43,8 @@ class BusinessPartnerComparisonUtil {
                 entity.stage != persistedBP.stage ||
                 entity.identifiers != persistedBP.identifiers ||
                 entity.states != persistedBP.states ||
+                entity.legalEntityGoldenRecordRelations != persistedBP.legalEntityGoldenRecordRelations ||
+                entity.addressGoldenRecordRelations != persistedBP.addressGoldenRecordRelations ||
                 postalAddressHasChanges(entity.postalAddress, persistedBP.postalAddress) ||
                 scriptVariantsHaveChanges(entity.scriptVariants, persistedBP.scriptVariants)
     }

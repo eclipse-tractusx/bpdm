@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.orchestrator.api.model
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.RelationDescription
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.RelationValidityPeriodDescription
 import java.time.LocalDate
 
@@ -28,18 +29,21 @@ data class BusinessPartnerRelations(
     @Schema(description = "The type of relation between the business partners")
     val relationType: RelationType,
     @Schema(description = "The business partner from which the relation emerges (the source)")
-    val businessPartnerSourceBpnl: String,
+    val businessPartnerSourceBpn: String,
     @Schema(description = "The business partner to which this relation goes (the target)")
-    val businessPartnerTargetBpnl: String,
+    val businessPartnerTargetBpn: String,
     @Schema(description = RelationValidityPeriodDescription.header)
-    val validityPeriods : Collection<RelationValidityPeriod>
+    val validityPeriods : Collection<RelationValidityPeriod>,
+    @Schema(description = RelationDescription.reasonCode)
+    val reasonCode: String,
 ) {
     companion object {
         val empty = BusinessPartnerRelations(
             relationType = RelationType.IsAlternativeHeadquarterFor, // or a default type
-            businessPartnerSourceBpnl = "",
-            businessPartnerTargetBpnl = "",
-            validityPeriods = emptyList()
+            businessPartnerSourceBpn = "",
+            businessPartnerTargetBpn = "",
+            validityPeriods = emptyList(),
+            reasonCode = ""
         )
     }
 }
@@ -47,7 +51,8 @@ data class BusinessPartnerRelations(
 enum class RelationType {
     IsAlternativeHeadquarterFor,
     IsManagedBy,
-    IsOwnedBy
+    IsOwnedBy,
+    IsReplacedBy
 }
 
 data class RelationValidityPeriod(

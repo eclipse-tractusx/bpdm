@@ -1621,9 +1621,30 @@
             "items" : {
               "$ref" : "#/components/schemas/AddressIdentifierDto"
             }
+          },
+          "goldenRecordRelations" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/AddressGoldenRecordRelationDto"
+            }
           }
         },
         "required" : [ "bpnA" ]
+      },
+      "AddressGoldenRecordRelationDto" : {
+        "type" : "object",
+        "properties" : {
+          "relationType" : {
+            "type" : "string",
+            "enum" : [ "IsReplacedBy" ]
+          },
+          "sourceBpn" : {
+            "type" : "string"
+          },
+          "targetBpn" : {
+            "type" : "string"
+          }
+        }
       },
       "AddressIdentifierDto" : {
         "type" : "object",
@@ -2152,6 +2173,21 @@
           }
         }
       },
+      "LegalEntityGoldenRecordRelationDto" : {
+        "type" : "object",
+        "properties" : {
+          "relationType" : {
+            "type" : "string",
+            "enum" : [ "IsAlternativeHeadquarterFor", "IsManagedBy", "IsOwnedBy" ]
+          },
+          "sourceBpn" : {
+            "type" : "string"
+          },
+          "targetBpn" : {
+            "type" : "string"
+          }
+        }
+      },
       "LegalEntityRepresentationInputDto" : {
         "type" : "object",
         "properties" : {
@@ -2206,6 +2242,12 @@
             "type" : "array",
             "items" : {
               "$ref" : "#/components/schemas/BusinessPartnerStateDto"
+            }
+          },
+          "goldenRecordRelations" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/LegalEntityGoldenRecordRelationDto"
             }
           }
         },
@@ -3093,13 +3135,13 @@
         "type" : "oauth2",
         "flows" : {
           "clientCredentials" : {
-            "tokenUrl" : "http://localhost:8180/realms/CX-Central/protocol/openid-connect/token",
+            "tokenUrl" : "http://localhost:8180/realms/BPDM/protocol/openid-connect/token",
             "scopes" : { }
           },
           "authorizationCode" : {
-            "authorizationUrl" : "http://localhost:8180/realms/CX-Central/protocol/openid-connect/auth",
-            "tokenUrl" : "http://localhost:8180/realms/CX-Central/protocol/openid-connect/token",
-            "refreshUrl" : "http://localhost:8180/realms/CX-Central/protocol/openid-connect/token",
+            "authorizationUrl" : "http://localhost:8180/realms/BPDM/protocol/openid-connect/auth",
+            "tokenUrl" : "http://localhost:8180/realms/BPDM/protocol/openid-connect/token",
+            "refreshUrl" : "http://localhost:8180/realms/BPDM/protocol/openid-connect/token",
             "scopes" : { }
           }
         }

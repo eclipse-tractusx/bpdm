@@ -25,23 +25,11 @@ import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.BusinessPartnerSearchFilterType
+import org.eclipse.tractusx.bpdm.pool.api.model.StreetDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.BusinessPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AlternativePostalAddressDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.BusinessPartnerConfidenceCriteriaDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.BusinessPartnerIdentifierDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.BusinessPartnerLegalEntity
-import org.eclipse.tractusx.bpdm.pool.api.model.response.BusinessPartnerPostalAddress
-import org.eclipse.tractusx.bpdm.pool.api.model.response.PhysicalPostalAddressDto
-import org.eclipse.tractusx.bpdm.pool.api.model.StreetDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressIdentifierDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.BusinessPartnerSearchResultDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.BusinessPartnerSite
-import org.eclipse.tractusx.bpdm.pool.api.model.response.BusinessPartnerStateDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteMatchVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
@@ -408,9 +396,9 @@ class BusinessPartnerSearchService(
             physicalPostalAddress = PhysicalPostalAddressDto(
                 geographicCoordinates = physical.geographicCoordinates?.let {
                     GeoCoordinateDto(
-                    longitude = physical.geographicCoordinates.longitude,
-                    latitude = physical.geographicCoordinates.latitude,
-                    altitude = physical.geographicCoordinates.altitude
+                    longitude = it.longitude,
+                    latitude = it.latitude,
+                    altitude = it.altitude
                 )},
                 administrativeAreaLevel1 = physical.administrativeAreaLevel1?.regionCode,
                 administrativeAreaLevel2 = physical.administrativeAreaLevel2,
@@ -430,9 +418,9 @@ class BusinessPartnerSearchService(
             alternativePostalAddress = AlternativePostalAddressDto(
                 geographicCoordinates = alternative?.geographicCoordinates?.let {
                     GeoCoordinateDto(
-                        longitude = alternative.geographicCoordinates.longitude,
-                        latitude = alternative.geographicCoordinates.latitude,
-                        altitude = alternative.geographicCoordinates.altitude
+                        longitude = it.longitude,
+                        latitude = it.latitude,
+                        altitude = it.altitude
                     )},
                 country = alternative?.country,
                 administrativeAreaLevel1 = alternative?.administrativeAreaLevel1?.countryCode?.name,

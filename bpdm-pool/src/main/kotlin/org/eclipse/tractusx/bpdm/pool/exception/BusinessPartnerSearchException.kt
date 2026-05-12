@@ -19,8 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.exception
 
-import org.eclipse.tractusx.bpdm.common.exception.BpdmExceptionHandler
-import org.eclipse.tractusx.bpdm.pool.exception.BusinessPartnerExceptionHandler
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ResponseStatus
 

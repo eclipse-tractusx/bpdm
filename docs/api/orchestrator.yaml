@@ -567,6 +567,19 @@ paths:
           description: On malformed requests
 components:
   schemas:
+    AddressGoldenRecordRelation:
+      type: object
+      description: "A golden record relation between addresses, pointing from a source\
+        \ BPNA to a target BPNA"
+      properties:
+        relationType:
+          type: string
+          enum:
+            - IsReplacedBy
+        sourceBpn:
+          type: string
+        targetBpn:
+          type: string
     AlternativeAddress:
       type: object
       description: An alternative postal address describes an alternative way of delivery
@@ -826,9 +839,28 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/LegalEntityScriptVariant"
+        goldenRecordRelations:
+          type: array
+          items:
+            $ref: "#/components/schemas/LegalEntityGoldenRecordRelation"
         isParticipantData:
           type: boolean
           description: Whether this legal entity is part of the Data Space network
+    LegalEntityGoldenRecordRelation:
+      type: object
+      description: "A golden record relation between legal entities, pointing from\
+        \ a source BPNL to a target BPNL"
+      properties:
+        relationType:
+          type: string
+          enum:
+            - IsAlternativeHeadquarterFor
+            - IsManagedBy
+            - IsOwnedBy
+        sourceBpn:
+          type: string
+        targetBpn:
+          type: string
     LegalEntityScriptVariant:
       type: object
       properties:
@@ -977,6 +1009,11 @@ components:
           description: Whether this address information differs from its golden record
             counterpart in the Pool.Currently deprecated and ignored by the golden
             record creation and update process.
+        goldenRecordRelations:
+          type: array
+          description: Golden record relations belonging to this address
+          items:
+            $ref: "#/components/schemas/AddressGoldenRecordRelation"
     PostalAddressScriptVariant:
       type: object
       properties:
@@ -1032,6 +1069,11 @@ components:
           description: Whether this address information differs from its golden record
             counterpart in the Pool.Currently deprecated and ignored by the golden
             record creation and update process.
+        goldenRecordRelations:
+          type: array
+          description: Golden record relations belonging to this address
+          items:
+            $ref: "#/components/schemas/AddressGoldenRecordRelation"
         scriptVariants:
           type: array
           items:
@@ -1609,12 +1651,12 @@ components:
       type: oauth2
       flows:
         clientCredentials:
-          tokenUrl: http://localhost:8180/realms/CX-Central/protocol/openid-connect/token
+          tokenUrl: http://localhost:8180/realms/BPDM/protocol/openid-connect/token
           scopes: {}
         authorizationCode:
-          authorizationUrl: http://localhost:8180/realms/CX-Central/protocol/openid-connect/auth
-          tokenUrl: http://localhost:8180/realms/CX-Central/protocol/openid-connect/token
-          refreshUrl: http://localhost:8180/realms/CX-Central/protocol/openid-connect/token
+          authorizationUrl: http://localhost:8180/realms/BPDM/protocol/openid-connect/auth
+          tokenUrl: http://localhost:8180/realms/BPDM/protocol/openid-connect/token
+          refreshUrl: http://localhost:8180/realms/BPDM/protocol/openid-connect/token
           scopes: {}
     bearer_scheme:
       type: http

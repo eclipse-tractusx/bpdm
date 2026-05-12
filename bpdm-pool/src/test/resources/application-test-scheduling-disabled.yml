@@ -22,6 +22,8 @@ bpdm:
     cron: '-'
   sharingMemberRecords:
     cron: '-'
+  eventTriggers:
+    cron: '-'
 spring:
   datasource:
     hikari:

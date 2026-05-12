@@ -46,7 +46,9 @@ class RequestMapper {
                 siteHasChanged = site?.hasChanged,
                 legalEntityHeaderScriptVariants = toLegalEntityScriptVariants(businessPartner),
                 siteHeaderScriptVariants = toSiteScriptVariants(businessPartner),
-                addressScriptVariants = toAddressScriptVariants(businessPartner)
+                addressScriptVariants = toAddressScriptVariants(businessPartner),
+                legalEntityGoldenRecordRelations = toLegalEntityGoldenRecordRelations(businessPartner),
+                addressGoldenRecordRelations = toAddressGoldenRecordRelations(businessPartner)
             )
         }
 
@@ -294,5 +296,25 @@ class RequestMapper {
             )
         }
     }
+
+    fun toLegalEntityGoldenRecordRelations(businessPartner: BusinessPartner): MutableList<LegalEntityGoldenRecordRelationDb> =
+        businessPartner.legalEntity.goldenRecordRelations
+            .map { LegalEntityGoldenRecordRelationDb(it.relationType, it.sourceBpn, it.targetBpn) }
+            .toMutableList()
+
+    fun toAddressGoldenRecordRelations(businessPartner: BusinessPartner): MutableList<AddressGoldenRecordRelationDb> =
+        listOfNotNull(
+            businessPartner.legalEntity.legalAddress.goldenRecordRelations.map { toAddressGoldenRecordRelation(it, AddressGoldenRecordRelationDb.Scope.LegalAddress) },
+            businessPartner.site?.siteMainAddress?.goldenRecordRelations?.map { toAddressGoldenRecordRelation(it, AddressGoldenRecordRelationDb.Scope.SiteMainAddress) },
+            businessPartner.additionalAddress?.postalProperties?.goldenRecordRelations?.map { toAddressGoldenRecordRelation(it, AddressGoldenRecordRelationDb.Scope.AdditionalAddress) }
+        ).flatten().toMutableList()
+
+    fun toAddressGoldenRecordRelation(relation: AddressGoldenRecordRelation, scope: AddressGoldenRecordRelationDb.Scope) =
+        AddressGoldenRecordRelationDb(
+            relationType = relation.relationType,
+            sourceBpn = relation.sourceBpn,
+            targetBpn = relation.targetBpn,
+            scope = scope
+        )
 
 }

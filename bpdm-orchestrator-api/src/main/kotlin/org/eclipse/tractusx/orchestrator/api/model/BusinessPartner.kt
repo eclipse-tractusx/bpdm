@@ -132,7 +132,8 @@ data class PostalAddress(
     override val confidenceCriteria: ConfidenceCriteria,
     override val physicalAddress: PhysicalAddress,
     override val alternativeAddress: AlternativeAddress?,
-    override val hasChanged: Boolean?
+    override val hasChanged: Boolean?,
+    override val goldenRecordRelations: List<AddressGoldenRecordRelation> = emptyList()
 ): IsPostalAddress{
     companion object{
         val empty = PostalAddress(
@@ -143,7 +144,8 @@ data class PostalAddress(
             confidenceCriteria = ConfidenceCriteria.empty,
             physicalAddress = PhysicalAddress.empty,
             alternativeAddress = null,
-            hasChanged = null
+            hasChanged = null,
+            goldenRecordRelations = emptyList()
         )
     }
 }
@@ -307,7 +309,8 @@ data class PostalAddressWithScriptVariants(
             confidenceCriteria = confidenceCriteria,
             physicalAddress = physicalAddress,
             alternativeAddress = alternativeAddress,
-            hasChanged = hasChanged
+            hasChanged = hasChanged,
+            goldenRecordRelations = postalProperties.goldenRecordRelations
         )
 
     override val bpnReference: BpnReference
@@ -332,6 +335,9 @@ data class PostalAddressWithScriptVariants(
 
     override val hasChanged: Boolean?
         get() = postalProperties.hasChanged
+
+    override val goldenRecordRelations: List<AddressGoldenRecordRelation>
+        get() = postalProperties.goldenRecordRelations
 }
 
 @Schema(description = "Legal entity information for this business partner data. " +
@@ -357,7 +363,9 @@ data class LegalEntity(
             "However, if this legal entity constitutes a new legal entity golden record, it is still created independent of this flag.")
     val hasChanged: Boolean?,
     val legalAddress: PostalAddress,
-    val scriptVariants: List<LegalEntityScriptVariant>
+    val scriptVariants: List<LegalEntityScriptVariant>,
+    @Schema(description = "Golden record relations belonging to this legal entity")
+    val goldenRecordRelations: List<LegalEntityGoldenRecordRelation> = emptyList()
 ){
     companion object{
         val empty = LegalEntity(
@@ -371,7 +379,8 @@ data class LegalEntity(
             isParticipantData = null,
             hasChanged = null,
             legalAddress = PostalAddress.empty,
-            scriptVariants = emptyList()
+            scriptVariants = emptyList(),
+            goldenRecordRelations = emptyList()
         )
     }
 }
@@ -531,4 +540,6 @@ interface IsPostalAddress{
     @get:Schema(description = "Whether this address information differs from its golden record counterpart in the Pool." +
             "Currently deprecated and ignored by the golden record creation and update process.", deprecated = true)
     val hasChanged: Boolean?
+    @get:Schema(description = "Golden record relations belonging to this address")
+    val goldenRecordRelations: List<AddressGoldenRecordRelation>
 }

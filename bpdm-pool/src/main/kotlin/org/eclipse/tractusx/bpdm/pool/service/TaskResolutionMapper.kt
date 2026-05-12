@@ -45,7 +45,8 @@ class TaskResolutionMapper {
                 isParticipantData = legalEntity.isParticipantData,
                 hasChanged = hasChanged,
                 legalAddress = toTaskResult(legalAddress, hasChanged),
-                scriptVariants = scriptVariants.map { toTaskResult(it) }
+                scriptVariants = scriptVariants.map { toTaskResult(it) },
+                goldenRecordRelations = legalEntity.relations.map { toTaskResult(it) }
             )
         }
     }
@@ -94,7 +95,8 @@ class TaskResolutionMapper {
                 confidenceCriteria = toTaskResult(confidenceCriteria),
                 physicalAddress = toTaskResult(physicalPostalAddress),
                 alternativeAddress =  alternativePostalAddress?.let { toTaskResult(it) },
-                hasChanged = hasChanged
+                hasChanged = hasChanged,
+                goldenRecordRelations = relations.map { toTaskResult(it) }
             )
         }
     }
@@ -215,6 +217,28 @@ class TaskResolutionMapper {
                 deliveryServiceNumber = deliveryServiceNumber
             )
         }
+    }
+
+    fun toTaskResult(relation: RelationVerboseDto): LegalEntityGoldenRecordRelation{
+        return LegalEntityGoldenRecordRelation(
+            relationType = when (relation.type) {
+                LegalEntityRelationType.IsAlternativeHeadquarterFor -> LegalEntityGoldenRecordRelationType.IsAlternativeHeadquarterFor
+                LegalEntityRelationType.IsManagedBy -> LegalEntityGoldenRecordRelationType.IsManagedBy
+                LegalEntityRelationType.IsOwnedBy ->LegalEntityGoldenRecordRelationType.IsOwnedBy
+            },
+            sourceBpn = relation.businessPartnerSourceBpnl,
+            targetBpn = relation.businessPartnerTargetBpnl
+        )
+    }
+
+    fun toTaskResult(relation: AddressRelationVerboseDto): AddressGoldenRecordRelation{
+        return AddressGoldenRecordRelation(
+            relationType = when (relation.type) {
+                AddressRelationType.IsReplacedBy -> AddressGoldenRecordRelationType.IsReplacedBy
+            },
+            sourceBpn = relation.businessPartnerSourceBpna,
+            targetBpn = relation.businessPartnerTargetBpna
+        )
     }
 
 

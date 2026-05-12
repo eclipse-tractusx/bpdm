@@ -29,7 +29,6 @@ import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityRepresentationInputDto
-import org.eclipse.tractusx.bpdm.gate.auth.AuthAdminIT
 import org.eclipse.tractusx.bpdm.gate.util.MockAndAssertUtils
 import org.eclipse.tractusx.bpdm.pool.api.ApiCommons
 import org.eclipse.tractusx.bpdm.pool.api.model.ConfidenceCriteriaDto
@@ -70,7 +69,7 @@ import java.time.LocalDateTime
     initializers = [
         PostgreSQLContextInitializer::class,
         KeyCloakInitializer::class,
-        AuthAdminIT.SelfClientAsAdminInitializer::class
+        SelfClientAsPartnerUploaderInitializer::class
     ]
 )
 class PartnerUploadControllerIT @Autowired constructor(

@@ -31,6 +31,8 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.*
 import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.eclipse.tractusx.bpdm.gate.entity.generic.*
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidPartnerException
+import org.eclipse.tractusx.orchestrator.api.model.AddressGoldenRecordRelationType
+import org.eclipse.tractusx.orchestrator.api.model.LegalEntityGoldenRecordRelationType
 import org.springframework.stereotype.Service
 
 @Service
@@ -165,7 +167,8 @@ class BusinessPartnerMappings {
                 entity.sharingState.externalId,
                 "Missing address confidence criteria"
             ),
-            states = toStateDtos(entity.states, BusinessPartnerType.LEGAL_ENTITY)
+            states = toStateDtos(entity.states, BusinessPartnerType.LEGAL_ENTITY),
+            goldenRecordRelations = entity.legalEntityGoldenRecordRelations.map { LegalEntityGoldenRecordRelationDto(toLeRelationType(it.relationType), it.sourceBpn, it.targetBpn) }
         )
     }
 
@@ -201,7 +204,8 @@ class BusinessPartnerMappings {
                 entity.sharingState.externalId,
                 "Missing legal entity confidence criteria"
             ),
-            states = toStateDtos(entity.states, BusinessPartnerType.ADDRESS)
+            states = toStateDtos(entity.states, BusinessPartnerType.ADDRESS),
+            goldenRecordRelations = entity.addressGoldenRecordRelations.map { AddressGoldenRecordRelationDto(toAddressRelationType(it.relationType), it.sourceBpn, it.targetBpn) }
         )
     }
 
@@ -394,4 +398,16 @@ class BusinessPartnerMappings {
 
     private fun toGeographicCoordinate(dto: GeoCoordinateDto) =
         GeographicCoordinateDb(latitude = dto.latitude, longitude = dto.longitude, altitude = dto.altitude)
+
+    private fun toLeRelationType(type: LegalEntityGoldenRecordRelationType) =
+        when (type) {
+            LegalEntityGoldenRecordRelationType.IsAlternativeHeadquarterFor -> LegalEntityGoldenRecordRelationTypeDto.IsAlternativeHeadquarterFor
+            LegalEntityGoldenRecordRelationType.IsManagedBy -> LegalEntityGoldenRecordRelationTypeDto.IsManagedBy
+            LegalEntityGoldenRecordRelationType.IsOwnedBy -> LegalEntityGoldenRecordRelationTypeDto.IsOwnedBy
+        }
+
+    private fun toAddressRelationType(type: AddressGoldenRecordRelationType) =
+        when (type) {
+            AddressGoldenRecordRelationType.IsReplacedBy -> AddressGoldenRecordRelationTypeDto.IsReplacedBy
+        }
 }
