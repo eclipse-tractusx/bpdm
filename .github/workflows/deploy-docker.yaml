@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2021,2024 Contributors to the Eclipse Foundation
+# Copyright (c) 2021 Contributors to the Eclipse Foundation
 #
 # See the NOTICE file(s) distributed with this work for additional
 # information regarding copyright ownership.
@@ -49,7 +49,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
       - name: Extract Maven Project Version
         id: pomVersion
@@ -59,17 +59,20 @@ jobs:
 
       - name: Parse semantic version from string
         id: semVer
-        uses: release-kit/semver@v2
+        uses: release-kit/semver@97491c46500b6e758ced599794164a234b8aa08c #v2.0.7
         with:
           string: 'v${{ steps.pomVersion.outputs.version }}'
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@6524bf65af31da8d45b59e8c27de4bd072b392f5
+        uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd #v4.0.0
 
-      - name: Create Docker Tags
-        id: dockerTags
+      - name: Create Main Docker Tags
+        id: dockerMainTags
+        env:
+          IMAGE_NAMESPACE: ${{ env.IMAGE_NAMESPACE }}
+          IMAGE_NAME: ${{ env.IMAGE_NAME }}
         run: |
-          FULL_IMAGE_NAME="${{ env.IMAGE_NAMESPACE }}/${{ env.IMAGE_NAME }}"
+          FULL_IMAGE_NAME="$IMAGE_NAMESPACE/$IMAGE_NAME"
           SUFFIX="${{ steps.semVer.outputs.prerelease &&  '-' || '' }}${{ steps.semVer.outputs.prerelease }}"
           MAJOR="${{ steps.semVer.outputs.major }}"
           MINOR="${MAJOR}.${{ steps.semVer.outputs.minor }}"
@@ -90,14 +93,35 @@ jobs:
           echo "tags=${ALL_TAGS}" >> $GITHUB_OUTPUT
           echo "tags=${ALL_TAGS}"
 
+      - name: Create Feature Docker Tags
+        id: dockerFeatureTags
+        uses: docker/metadata-action@030e881283bb7a6894de51c315a6bfe6a94e05cf #v6.0.0
+        with:
+          images: |
+            ${{ env.IMAGE_NAMESPACE }}/${{ env.IMAGE_NAME }}
+
+      - name: Create Docker Tags
+        id: dockerTags
+        env:
+          MAIN_TAGS: ${{ steps.dockerMainTags.outputs.tags }}
+          FEATURE_TAGS: ${{ steps.dockerFeatureTags.outputs.tags }}
+        run: |
+          if ${{ github.ref_name == 'main' &&  true || false }}; then 
+            echo "tags=${MAIN_TAGS}" >> $GITHUB_OUTPUT
+            echo "tags=${MAIN_TAGS}"
+          else
+            echo "tags=${FEATURE_TAGS}" >> $GITHUB_OUTPUT
+            echo "tags=${FEATURE_TAGS}"
+          fi
+
       - name: DockerHub login
-        uses: docker/login-action@v3
+        uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 #v4.1.0
         with:
           username: ${{ secrets.DOCKER_HUB_USER }}
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
       - name: Build and push
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f #v7.1.0
         with:
           context: .
           platforms: linux/amd64, linux/arm64
@@ -106,7 +130,7 @@ jobs:
           tags: ${{ steps.dockerTags.outputs.tags }}
 
       - name: Update Docker Hub description
-        uses: peter-evans/dockerhub-description@v4
+        uses: peter-evans/dockerhub-description@1b9a80c056b620d92cedb9d9b5a223409c68ddfa #v5.0.0
         with:
           username: ${{ secrets.DOCKER_HUB_USER }}
           password: ${{ secrets.DOCKER_HUB_TOKEN }}

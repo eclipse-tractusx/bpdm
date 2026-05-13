@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2021,2024 Contributors to the Eclipse Foundation
+# Copyright (c) 2021 Contributors to the Eclipse Foundation
 #
 # See the NOTICE file(s) distributed with this work for additional
 # information regarding copyright ownership.
@@ -41,7 +41,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           fetch-depth: 0
 
@@ -61,12 +61,12 @@ jobs:
           echo "isRelease=$IS_RELEASE" >> $GITHUB_OUTPUT
 
       - name: Set up Helm
-        uses: azure/setup-helm@v4
+        uses: azure/setup-helm@dda3372f752e03dde6b3237bc9431cdc2f7a02a2 #v5.0.0
         with:
           version: ${{ github.event.inputs.helm_version || 'latest' }}
 
       - name: Set up chart-testing
-        uses: helm/chart-testing-action@v2.7.0
+        uses: helm/chart-testing-action@6ec842c01de15ebb84c8627d2744a0c2f2755c9f #v2.8.0
 
       - name: Create Chart-Testing Config
         run: |
@@ -80,4 +80,6 @@ jobs:
           cat .chart-testing-config.yaml
 
       - name: Run chart-testing (lint)
-        run: ct lint --target-branch ${{ github.event.repository.default_branch }} --config .chart-testing-config.yaml
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: ct lint --target-branch $DEFAULT_BRANCH --config .chart-testing-config.yaml

@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2021,2024 Contributors to the Eclipse Foundation
+# Copyright (c) 2021 Contributors to the Eclipse Foundation
 #
 # See the NOTICE file(s) distributed with this work for additional
 # information regarding copyright ownership.
@@ -23,7 +23,7 @@ on:
     inputs:
       node_image:
         description: 'kindest/node image for k8s kind cluster'
-        default: 'kindest/node:v1.32.1'
+        default: 'kindest/node:v1.35.0'
         required: false
         type: string
       upgrade_from:
@@ -39,7 +39,7 @@ on:
     inputs:
       node_image:
         description: 'kindest/node image for k8s kind cluster'
-        default: 'kindest/node:v1.32.1'
+        default: 'kindest/node:v1.35.0'
         required: false
         type: string
       upgrade_from:
@@ -52,9 +52,6 @@ on:
         required: false
         type: string
   pull_request:
-    branches:
-      - main
-      - release/**
     paths:
       - 'pom.xml'
       - 'bpdm-**'
@@ -74,53 +71,54 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
       - name: Kubernetes KinD Cluster
-        uses: container-tools/kind-action@v2
+        uses: helm/kind-action@ef37e7f390d99f746eb8b610417061a60e82a6cc #v1.14.0
         with:
-          version: v0.20.0
-          node_image: ${{ github.event.inputs.node_image || 'kindest/node:v1.32.1' }}
+          version: v0.31.0
+          registry: true
+          node_image: ${{ github.event.inputs.node_image || 'kindest/node:v1.35.0' }}
 
       - name: Set up Helm
-        uses: azure/setup-helm@v4
+        uses: azure/setup-helm@dda3372f752e03dde6b3237bc9431cdc2f7a02a2 #v5.0.0
         with:
           version: ${{ github.event.inputs.helm_version || 'latest' }}
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.9'
           check-latest: true
 
       - name: Set up chart-testing
-        uses: helm/chart-testing-action@v2.7.0
+        uses: helm/chart-testing-action@6ec842c01de15ebb84c8627d2744a0c2f2755c9f #v2.8.0
 
       - name: Download Pool Image
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c #v8.1
         with:
           name: bpdm-pool-docker
           path: /tmp
 
       - name: Download Gate Image
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c #v8.1
         with:
           name: bpdm-gate-docker
           path: /tmp
 
       - name: Download Orchestrator Image
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c #v8.1
         with:
           name: bpdm-orchestrator-docker
           path: /tmp
 
       - name: Download Cleaning Service Dummy Image
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c #v8.1
         with:
           name: bpdm-cleaning-service-dummy-docker
           path: /tmp
 
       - name: Download System Tester Image
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: bpdm-system-tester-docker
           path: /tmp
@@ -183,6 +181,8 @@ jobs:
               repository: bpdm-cleaning-service-dummy
               tag: test
             startupDelaySeconds: 120
+            springProfiles:
+              system-tester
           tests:
             image:
               registry: kind-registry:5000
@@ -194,9 +194,7 @@ jobs:
       - name: Create Chart-Testing Config
         run: |
           cat <<EOF > .chart-testing-config.yaml
-          chart-repos:
-            - bitnami=https://charts.bitnami.com/bitnami
-          helm-extra-args: --timeout 600s
+          helm-extra-args: --timeout 900s
           EOF
           echo "cat .chart-testing-config.yaml"
           cat .chart-testing-config.yaml
@@ -232,35 +230,15 @@ jobs:
               registry: kind-registry:5000
               repository: bpdm-system-tester
               tag: test
-          centralidp:
-            keycloak:
-              auth:
-                adminPassword: password
-              replicaCount: 1
-              postgresql:
-                auth:
-                  # -- Non-root user password.
-                  password: password
-                  # -- Root user password.
-                  postgresPassword: password
-                architecture: standalone
-            secrets:
-              postgresql:
-                auth:
-                  existingSecret:
-                    postgrespassword: password
-                    password: password
-            realmSeeding:
-              enabled: false
           EOF
           echo "cat charts/bpdm/ci/test-upgrade-values.yaml"
           cat charts/bpdm/ci/test-upgrade-values.yaml
 
       - name: Run helm upgrade
+        env:
+          UPGRADE_FROM: ${{ github.event.inputs.upgrade_from && '--version github.event.inputs.upgrade_from' || '' }}
         run: |
-          helm repo add bitnami https://charts.bitnami.com/bitnami
           helm repo add tractusx-dev https://eclipse-tractusx.github.io/charts/dev
-          helm install -f charts/bpdm/ci/test-upgrade-values.yaml  bpdm-test tractusx-dev/bpdm ${{ github.event.inputs.upgrade_from && '--version github.event.inputs.upgrade_from' || '' }}
+          helm install -f charts/bpdm/ci/test-upgrade-values.yaml  bpdm-test tractusx-dev/bpdm $UPGRADE_FROM
           helm dependency update charts/bpdm
           helm upgrade -f charts/bpdm/ci/test-upgrade-values.yaml  bpdm-test charts/bpdm
-
