@@ -117,6 +117,18 @@ class GateAssertRepositoryV7(
             .isEqualTo(expected)
     }
 
+    fun assertRelations(actual: PageDto<RelationDto>, expected: PageDto<RelationDto>) {
+        assertPageHeader(actual, expected)
+        assertRelations(actual.content, expected.content)
+    }
+
+    fun assertRelationPageMetadata(actual: PageDto<RelationDto>, totalElements: Long, totalPages: Int, page: Int, contentSize: Int) {
+        Assertions.assertThat(actual.totalElements).isEqualTo(totalElements)
+        Assertions.assertThat(actual.totalPages).isEqualTo(totalPages)
+        Assertions.assertThat(actual.page).isEqualTo(page)
+        Assertions.assertThat(actual.contentSize).isEqualTo(contentSize)
+    }
+
     fun assertChangelog(actual: PageChangeLogDto<ChangelogGateDto>, expected: PageChangeLogDto<ChangelogGateDto>) {
         Assertions.assertThat(actual)
             .usingRecursiveComparison()

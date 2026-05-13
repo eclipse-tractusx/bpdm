@@ -35,13 +35,17 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequ
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.BusinessPartnerInputRequestV7Factory
+import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.RelationInputRequestV7Factory
+import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.withRelationType
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolMockDataFactory
 
 class GateTestDataClientV7(
     private val gateClient: GateClient,
     private val businessPartnerInputRequestV7Factory: BusinessPartnerInputRequestV7Factory,
+    private val relationInputRequestV7Factory: RelationInputRequestV7Factory,
     private val orchestratorMockDataFactory: OrchestratorMockDataFactory,
     private val taskCreationBatchService: TaskCreationBatchService,
     private val taskResolutionBatchService: TaskResolutionBatchService,
@@ -66,6 +70,12 @@ class GateTestDataClientV7(
         upsertBusinessPartnerInput(entry.businessPartnerSourceExternalId)
         upsertBusinessPartnerInput(entry.businessPartnerTargetExternalId)
         return upsertRelationInput(entry, createIfNotExist)
+    }
+
+    fun upsertRelationInputWithBusinessPartners(seed: String, relationType: RelationType): RelationDto {
+        return upsertRelationInputWithBusinessPartners(
+            relationInputRequestV7Factory.fromSeed(seed).withRelationType(relationType)
+        )
     }
 
     fun setStateToReady(externalId: String) {

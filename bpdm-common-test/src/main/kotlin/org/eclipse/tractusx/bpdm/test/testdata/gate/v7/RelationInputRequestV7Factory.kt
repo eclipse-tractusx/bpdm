@@ -66,3 +66,5 @@ fun RelationPutEntry.withRelationType(relationType: RelationType) = copy(relatio
 fun RelationPutEntry.withSource(businessPartnerSourceExternalId: String) = copy(businessPartnerSourceExternalId = businessPartnerSourceExternalId)
 fun RelationPutEntry.withTarget(businessPartnerTargetExternalId: String) = copy(businessPartnerTargetExternalId = businessPartnerTargetExternalId)
 fun RelationPutEntry.withValidityPeriods(validityPeriods: List<RelationValidityPeriodDto>) = copy(validityPeriods = validityPeriods)
+
+fun RelationType.other(): RelationType = RelationType.entries.first { it != this }

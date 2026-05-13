@@ -73,6 +73,7 @@ abstract class GateTestBaseV7 : GateTestBase(){
         testDataClient = GateTestDataClientV7(
             gateClient,
             businessPartnerInputRequestFactory,
+            relationInputRequestFactory,
             orchestratorMockDataFactory,
             taskCreationBatchService,
             taskResolutionBatchService,
