@@ -24,6 +24,8 @@ import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequ
 import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
+import org.eclipse.tractusx.orchestrator.api.model.TaskClientStateDto
+import org.eclipse.tractusx.orchestrator.api.model.TaskErrorType
 import org.eclipse.tractusx.bpdm.gate.service.TaskCreationBatchService
 import org.eclipse.tractusx.bpdm.gate.service.TaskResolutionBatchService
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
@@ -55,6 +57,37 @@ class GateTestDataClientV7(
 
     fun setStateToReady(externalId: String) {
         gateClient.sharingState.postSharingStateReady(PostSharingStateReadyRequest(listOf(externalId)))
+    }
+
+    fun setStateToPending(externalId: String, seed: String = externalId): TaskClientStateDto {
+        setStateToReady(externalId)
+        val createdTask = orchestratorMockDataFactory.mockCreateTask(seed)
+        taskCreationBatchService.createTasksForReadyBusinessPartners()
+        return createdTask
+    }
+
+    fun setStateToSuccess(externalId: String, seed: String = externalId): TaskClientStateDto {
+        val poolMockResult = poolMockDataFactory.mockAdditionalAddressOfSiteSearchResult(seed)
+        val mockedRefinedTask = orchestratorMockDataFactory.mockRefineToAdditionalAddressOfSite(
+            seed,
+            poolMockResult.legalEntityParent,
+            poolMockResult.siteParent,
+            poolMockResult.additionalAddress,
+            null,
+            emptyList()
+        )
+        setStateToReady(externalId)
+        taskCreationBatchService.createTasksForReadyBusinessPartners()
+        taskResolutionBatchService.resolveTasks()
+        return mockedRefinedTask
+    }
+
+    fun setStateToError(externalId: String, seed: String = externalId, errorType: TaskErrorType): TaskClientStateDto {
+        val errorTask = orchestratorMockDataFactory.mockSharingError(seed, errorType)
+        setStateToReady(externalId)
+        taskCreationBatchService.createTasksForReadyBusinessPartners()
+        taskResolutionBatchService.resolveTasks()
+        return errorTask
     }
 
     fun createBusinessPartnerOutput(seed: String): BusinessPartnerOutputDto {
