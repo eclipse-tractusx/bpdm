@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2021,2024 Contributors to the Eclipse Foundation
+# Copyright (c) 2021 Contributors to the Eclipse Foundation
 #
 # See the NOTICE file(s) distributed with this work for additional
 # information regarding copyright ownership.
@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           fetch-depth: 0
 
@@ -60,12 +60,12 @@ jobs:
 
       - name: Install Helm
         if:  steps.checkRelease.outputs.isRelease == 'true'
-        uses: azure/setup-helm@v4
+        uses: azure/setup-helm@dda3372f752e03dde6b3237bc9431cdc2f7a02a2 #v5.0.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run chart-releaser
         if:  steps.checkRelease.outputs.isRelease == 'true'
-        uses: helm/chart-releaser-action@v1.7.0
+        uses: helm/chart-releaser-action@cae68fefc6b5f367a0275617c9f83181ba54714f #v1.7.0
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
