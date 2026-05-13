@@ -32,6 +32,7 @@ import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.BusinessPartnerInputDtoV7
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.BusinessPartnerInputRequestV7Factory
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorRequestFactoryV7
+import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolMockDataFactory
 import org.springframework.beans.factory.annotation.Autowired
 
 abstract class GateTestBaseV7 : GateTestBase(){
@@ -51,6 +52,8 @@ abstract class GateTestBaseV7 : GateTestBase(){
     lateinit var taskResolutionBatchService: TaskResolutionBatchService
     @Autowired
     lateinit var orchestratorRequestFactoryV7: OrchestratorRequestFactoryV7
+    @Autowired
+    lateinit var poolMockDataFactory: PoolMockDataFactory
 
     lateinit var gateClient: GateClient
     lateinit var testDataClient: GateTestDataClientV7
@@ -64,7 +67,9 @@ abstract class GateTestBaseV7 : GateTestBase(){
             orchestratorRequestFactoryV7,
             orchestratorMockDataFactory,
             taskCreationBatchService,
-            taskResolutionBatchService
+            taskResolutionBatchService,
+            poolMockDataFactory,
+            KeyCloakInitializer.TENANT_BPNL
         )
     }
 }
