@@ -40,81 +40,21 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import tools.jackson.databind.json.JsonMapper
 
-/*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
- *
- * See the NOTICE file(s) distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This program and the accompanying materials are made available under the
- * terms of the Apache License, Version 2.0 which is available at
- * https://www.apache.org/licenses/LICENSE-2.0.
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations
- * under the License.
- *
- * SPDX-License-Identifier: Apache-2.0
- ******************************************************************************/
 @Configuration
 class GateTestDataV6Config {
 
-    private val poolTestMetadata = TestMetadataV7(
-        legalForms = listOf(
-            BusinessPartnerVerboseValues.legalForm1,
-            BusinessPartnerVerboseValues.legalForm2
-        ),
-        legalEntityIdentifierTypes = listOf(
-            IdentifierTypeDto("idType1", IdentifierBusinessPartnerType.LEGAL_ENTITY, "idType1", null, null, null, null, sortedSetOf(), emptyList()),
-            IdentifierTypeDto("idType2", IdentifierBusinessPartnerType.LEGAL_ENTITY, "idType2", null, null, null, null, sortedSetOf(), emptyList()),
-            IdentifierTypeDto("idType3", IdentifierBusinessPartnerType.LEGAL_ENTITY, "idType3", null, null, null, null, sortedSetOf(), emptyList())
-        ),
-        addressIdentifierTypes = listOf(
-            IdentifierTypeDto("addressIdType1", IdentifierBusinessPartnerType.ADDRESS, "addressIdType1", null, null, null, null, sortedSetOf(), emptyList()),
-            IdentifierTypeDto("addressIdType2", IdentifierBusinessPartnerType.ADDRESS, "addressIdType2", null, null, null, null, sortedSetOf(), emptyList()),
-            IdentifierTypeDto("addressIdType3", IdentifierBusinessPartnerType.ADDRESS, "addressIdType3", null, null, null, null, sortedSetOf(), emptyList())
-        ),
-        adminAreas = listOf(
-            CountrySubdivisionDto(CountryCode.DE, "adminArea1", "adminArea1"),
-            CountrySubdivisionDto(CountryCode.US, "adminArea2", "adminArea2"),
-            CountrySubdivisionDto(CountryCode.CN, "adminArea3", "adminArea3"),
-        ),
-        scriptCodes = listOf(
-            ScriptCodeDto("Test", "Test Description")
-        )
-    )
-
-
     @Bean
-    fun testDataFactoryV6(): GateTestDataFactoryV6 {
+    fun testDataFactoryV6(testMetadataV7: TestMetadataV7): GateTestDataFactoryV6 {
         return GateTestDataFactoryV6(
             GateInputFactory(
                 testMetadata = TestMetadata(
-                    identifierTypes = poolTestMetadata.legalEntityIdentifierTypes.map { it.technicalKey },
-                    legalForms = poolTestMetadata.legalForms.map { it.technicalKey },
-                    adminAreas = poolTestMetadata.adminAreas.map { it.code }
+                    identifierTypes = testMetadataV7.legalEntityIdentifierTypes.map { it.technicalKey },
+                    legalForms = testMetadataV7.legalForms.map { it.technicalKey },
+                    adminAreas = testMetadataV7.adminAreas.map { it.code }
                 ),
                 testRunData = null
             ),
             ExpectedGateResultV6Factory()
-        )
-    }
-
-    @Bean
-    fun poolRequestFactory(): BusinessPartnerRequestFactory {
-        return BusinessPartnerRequestFactory(poolTestMetadata)
-    }
-
-    @Bean
-    fun poolMockDataFactory(
-        jsonMapper: JsonMapper
-    ): PoolMockDataFactory {
-        return PoolMockDataFactory(
-            BusinessPartnerRequestFactory(poolTestMetadata),
-            ExpectedBusinessPartnerResultFactory(poolTestMetadata),
-            jsonMapper
         )
     }
 
@@ -133,7 +73,7 @@ class GateTestDataV6Config {
             orchestratorMockDataFactory,
             taskCreationBatchService,
             taskResolutionBatchService,
-            KeyCloakInitializer.Companion.TENANT_BPNL,
+            KeyCloakInitializer.TENANT_BPNL,
             poolMockDataFactory
         )
     }

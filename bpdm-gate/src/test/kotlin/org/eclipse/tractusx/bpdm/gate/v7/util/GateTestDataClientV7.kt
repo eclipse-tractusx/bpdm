@@ -48,8 +48,8 @@ class GateTestDataClientV7(
     private val orchestratorMockDataFactory: OrchestratorMockDataFactory,
     private val taskCreationBatchService: TaskCreationBatchService,
     private val taskResolutionBatchService: TaskResolutionBatchService,
-    private val poolResponseFactory: PoolResponseFactoryV7,
     private val poolMockDataFactory: PoolMockDataFactory,
+    private val tenantBpnL: String,
 ) {
 
     fun createBusinessPartnerInput(seed: String): BusinessPartnerInputDto {
@@ -71,24 +71,12 @@ class GateTestDataClientV7(
     }
 
     fun refineToSuccess(input: BusinessPartnerInputDto, seed: String = input.externalId): BusinessPartnerOutputDto{
-        val refinedBusinessPartnerData = orchestratorRequestFactoryV7.buildAdditionalAddressOfSiteBusinessPartner(seed)
-            .copyWithBpnReferenceType(BpnReferenceType.Bpn)
-
-        orchestratorMockDataFactory.mockRefineToSuccess(seed, refinedBusinessPartnerData)
-
-        taskCreationBatchService.createTasksForReadyBusinessPartners()
-        taskResolutionBatchService.resolveTasks()
-
-        return gateClient.businessParters.getBusinessPartnersOutput(listOf(input.externalId)).content.single()
+        prepareLegalEntityRefinement(input, seed)
+        return shareBusinessPartnerAndResolve(input.externalId)
     }
 
     fun refineToLegalEntity(input: BusinessPartnerInputDto, seed: String = input.externalId): LegalEntityWithLegalAddressVerboseDto{
-        val poolMockResult = poolResponseFactory.buildLegalEntityWithLegalAddress()
-        poolMockDataFactory.
-
-        val owningCompany = if(input.isOwnCompanyData) tenantBpnL else null
-        orchestratorMockDataFactory.mockRefineToLegalEntity(seed, poolMockResult, owningCompany, input.nameParts)
-
+        val poolMockResult = prepareLegalEntityRefinement(input)
         shareBusinessPartnerAndResolve(input.externalId)
 
         return poolMockResult
@@ -170,5 +158,21 @@ class GateTestDataClientV7(
         return poolMockResult
     }
 
+    private fun prepareLegalEntityRefinement(input: BusinessPartnerInputDto, seed: String = input.externalId): LegalEntityWithLegalAddressVerboseDto{
+        val poolMockResult = poolMockDataFactory.mockLegalEntityAndLegalAddressSearchResult(seed)
+
+        val owningCompany = if(input.isOwnCompanyData) tenantBpnL else null
+        orchestratorMockDataFactory.mockRefineToLegalEntity(seed, poolMockResult, owningCompany, input.nameParts)
+
+        return poolMockResult
+    }
+
+    private fun shareBusinessPartnerAndResolve(externalId: String): BusinessPartnerOutputDto{
+        gateClient.sharingState.postSharingStateReady(PostSharingStateReadyRequest(listOf(externalId)))
+        taskCreationBatchService.createTasksForReadyBusinessPartners()
+        taskResolutionBatchService.resolveTasks()
+
+        return gateClient.businessParters.getBusinessPartnersOutput(listOf(externalId)).content.single()
+    }
 
 }

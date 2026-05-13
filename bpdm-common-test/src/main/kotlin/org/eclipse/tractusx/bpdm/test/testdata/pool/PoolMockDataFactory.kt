@@ -49,10 +49,6 @@ class PoolMockDataFactory(
         return mockedLegalEntity
     }
 
-    fun mockLegalEntity(legalEntityRequest: LegalEntityPartnerCreateRequest): LegalEntityWithLegalAddressVerboseDto{
-
-    }
-
     fun mockSiteAndMainAddressSearchResult(seed: String): SiteWithLegalEntityParent{
         configureWireMock()
 
