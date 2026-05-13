@@ -30,6 +30,8 @@ import org.eclipse.tractusx.bpdm.gate.v7.util.GateTestDataClientV7
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.BusinessPartnerInputDtoV7Factory
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.BusinessPartnerInputRequestV7Factory
+import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.BusinessPartnerOutputDtoV7Factory
+import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.PageChangeLogV7Factory
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorRequestFactoryV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolMockDataFactory
@@ -42,6 +44,10 @@ abstract class GateTestBaseV7 : GateTestBase(){
     lateinit var businessPartnerInputRequestFactory: BusinessPartnerInputRequestV7Factory
     @Autowired
     lateinit var businessPartnerInputFactory: BusinessPartnerInputDtoV7Factory
+    @Autowired
+    lateinit var pageChangeLogFactory: PageChangeLogV7Factory
+    @Autowired
+    lateinit var businessPartnerOutputFactory: BusinessPartnerOutputDtoV7Factory
     @Autowired
     lateinit var testClientProvider: GateTestClientProviderV7
     @Autowired
@@ -64,7 +70,6 @@ abstract class GateTestBaseV7 : GateTestBase(){
         testDataClient = GateTestDataClientV7(
             gateClient,
             businessPartnerInputRequestFactory,
-            orchestratorRequestFactoryV7,
             orchestratorMockDataFactory,
             taskCreationBatchService,
             taskResolutionBatchService,

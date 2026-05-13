@@ -24,7 +24,11 @@ import org.eclipse.tractusx.bpdm.test.testdata.gate.GateInputFactory
 import org.eclipse.tractusx.bpdm.test.testdata.gate.TestMetadata
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.BusinessPartnerInputDtoV7Factory
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.BusinessPartnerInputRequestV7Factory
+import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.BusinessPartnerOutputDtoV7Factory
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.GateTestMetadataV7
+import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.PageChangeLogV7Factory
+import org.eclipse.tractusx.bpdm.test.util.InstantSecondsComparator
+import org.eclipse.tractusx.bpdm.test.util.LocalDatetimeSecondsComparator
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
@@ -67,7 +71,21 @@ class GateTestDataV7Config {
 
     @Bean
     fun gateAssertRepositoryV7(): GateAssertRepositoryV7{
-        return GateAssertRepositoryV7()
+        val instantSecondsComparator = InstantSecondsComparator()
+        return GateAssertRepositoryV7(
+            instantSecondsComparator,
+            LocalDatetimeSecondsComparator(instantSecondsComparator)
+        )
+    }
+
+    @Bean
+    fun pageChangeLogV7Factory(): PageChangeLogV7Factory{
+        return PageChangeLogV7Factory()
+    }
+
+    @Bean
+    fun businessPartnerOutputDtoV7Factory(): BusinessPartnerOutputDtoV7Factory{
+        return BusinessPartnerOutputDtoV7Factory()
     }
 
 }

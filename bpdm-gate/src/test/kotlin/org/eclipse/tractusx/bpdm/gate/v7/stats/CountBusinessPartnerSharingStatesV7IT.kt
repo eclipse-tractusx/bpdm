@@ -47,9 +47,9 @@ class CountBusinessPartnerSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `count initial sharing states`() {
         //GIVEN
-        testDataClient.createBusinessPartnerInput("$testName 1")
-        testDataClient.createBusinessPartnerInput("$testName 2")
-        testDataClient.createBusinessPartnerInput("$testName 3")
+        testDataClient.upsertBusinessPartnerInput("$testName 1")
+        testDataClient.upsertBusinessPartnerInput("$testName 2")
+        testDataClient.upsertBusinessPartnerInput("$testName 3")
 
         //WHEN
         val response = gateClient.stats.countPartnersBySharingState()
@@ -66,9 +66,9 @@ class CountBusinessPartnerSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `count ready sharing states`() {
         //GIVEN
-        val input1 = testDataClient.createBusinessPartnerInput("$testName 1")
-        val input2 = testDataClient.createBusinessPartnerInput("$testName 2")
-        val input3 = testDataClient.createBusinessPartnerInput("$testName 3")
+        val input1 = testDataClient.upsertBusinessPartnerInput("$testName 1")
+        val input2 = testDataClient.upsertBusinessPartnerInput("$testName 2")
+        val input3 = testDataClient.upsertBusinessPartnerInput("$testName 3")
 
         testDataClient.setStateToReady(input1.externalId)
         testDataClient.setStateToReady(input2.externalId)

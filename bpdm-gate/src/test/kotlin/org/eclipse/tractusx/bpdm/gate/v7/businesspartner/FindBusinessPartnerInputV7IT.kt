@@ -34,7 +34,7 @@ class FindBusinessPartnerInputV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `find created business partner input`() {
         //GIVEN
-        val created = testDataClient.createBusinessPartnerInput(testName)
+        val created = testDataClient.upsertBusinessPartnerInput(testName)
 
         //WHEN
         val response = gateClient.businessParters.getBusinessPartnersInput(listOf(testName))
@@ -52,7 +52,7 @@ class FindBusinessPartnerInputV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `try find created business partner with non-existent external-ID`() {
         //GIVEN
-        testDataClient.createBusinessPartnerInput(testName)
+        testDataClient.upsertBusinessPartnerInput(testName)
 
         //WHEN
         val response = gateClient.businessParters.getBusinessPartnersInput(listOf("NOT_EXISTS"))

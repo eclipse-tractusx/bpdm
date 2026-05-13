@@ -65,7 +65,7 @@ class CreateBusinessPartnerInputV7IT: UnscheduledGateTestBaseV7() {
     @Test
     fun `update business partner input`() {
         //GIVEN
-        testDataClient.createBusinessPartnerInput(
+        testDataClient.upsertBusinessPartnerInput(
             businessPartnerInputRequestFactory.fromSeed("Initial $testName")
                 .copy(externalId = testName, externalSequenceTimestamp = null)
         )
@@ -87,7 +87,7 @@ class CreateBusinessPartnerInputV7IT: UnscheduledGateTestBaseV7() {
     @Test
     fun `update business partner input with newer sequence timestamp`() {
         //GIVEN
-        val created = testDataClient.createBusinessPartnerInput(
+        val created = testDataClient.upsertBusinessPartnerInput(
             businessPartnerInputRequestFactory.fromSeed("Initial $testName").copy(externalId = testName)
         )
 
@@ -110,7 +110,7 @@ class CreateBusinessPartnerInputV7IT: UnscheduledGateTestBaseV7() {
     @Test
     fun `try update input with no changes`() {
         //GIVEN
-        testDataClient.createBusinessPartnerInput(testName)
+        testDataClient.upsertBusinessPartnerInput(testName)
 
         //WHEN
         val request = businessPartnerInputRequestFactory.fromSeed(testName)
@@ -128,7 +128,7 @@ class CreateBusinessPartnerInputV7IT: UnscheduledGateTestBaseV7() {
     @Test
     fun `try update input with earlier external sequence timestamp`() {
         //GIVEN
-        val created = testDataClient.createBusinessPartnerInput(
+        val created = testDataClient.upsertBusinessPartnerInput(
             businessPartnerInputRequestFactory.fromSeed("Initial $testName")
                 .copy(externalId = testName, externalSequenceTimestamp = Instant.now())
         )

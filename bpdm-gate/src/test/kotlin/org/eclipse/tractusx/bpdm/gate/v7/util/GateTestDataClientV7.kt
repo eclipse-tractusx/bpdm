@@ -32,19 +32,11 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.BusinessPartnerInputRequestV7Factory
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
-import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorRequestFactoryV7
-import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.copyWithBpnReferenceType
-import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.copyWithBpnReferences
-import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.copyWithBpnRequests
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolMockDataFactory
-import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.PoolRequestFactoryV7
-import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.PoolResponseFactoryV7
-import org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType
 
 class GateTestDataClientV7(
     private val gateClient: GateClient,
     private val businessPartnerInputRequestV7Factory: BusinessPartnerInputRequestV7Factory,
-    private val orchestratorRequestFactoryV7: OrchestratorRequestFactoryV7,
     private val orchestratorMockDataFactory: OrchestratorMockDataFactory,
     private val taskCreationBatchService: TaskCreationBatchService,
     private val taskResolutionBatchService: TaskResolutionBatchService,
@@ -52,12 +44,12 @@ class GateTestDataClientV7(
     private val tenantBpnL: String,
 ) {
 
-    fun createBusinessPartnerInput(seed: String): BusinessPartnerInputDto {
+    fun upsertBusinessPartnerInput(seed: String): BusinessPartnerInputDto {
         val request = businessPartnerInputRequestV7Factory.fromSeed(seed)
-        return createBusinessPartnerInput(request)
+        return upsertBusinessPartnerInput(request)
     }
 
-    fun createBusinessPartnerInput(request: BusinessPartnerInputRequest): BusinessPartnerInputDto {
+    fun upsertBusinessPartnerInput(request: BusinessPartnerInputRequest): BusinessPartnerInputDto {
         return gateClient.businessParters.upsertBusinessPartnersInput(listOf(request)).body!!.single()
     }
 
@@ -65,9 +57,16 @@ class GateTestDataClientV7(
         gateClient.sharingState.postSharingStateReady(PostSharingStateReadyRequest(listOf(externalId)))
     }
 
-    fun createBusinessPartnerOutput(externalId: String): BusinessPartnerOutputDto {
-        val createdInput = createBusinessPartnerInput(externalId)
-        return refineToSuccess(createdInput)
+    fun createBusinessPartnerOutput(seed: String): BusinessPartnerOutputDto {
+        val upsertedInput = upsertBusinessPartnerInput(seed)
+        return refineToSuccess(upsertedInput)
+    }
+
+    fun updateBusinessPartnerOutput(output: BusinessPartnerOutputDto, newSeed: String): BusinessPartnerOutputDto {
+        val upsertedInput = upsertBusinessPartnerInput(
+            businessPartnerInputRequestV7Factory.fromSeed(newSeed).copy(externalId = output.externalId)
+        )
+        return refineToSuccess(upsertedInput)
     }
 
     fun refineToSuccess(input: BusinessPartnerInputDto, seed: String = input.externalId): BusinessPartnerOutputDto{
@@ -118,30 +117,6 @@ class GateTestDataClientV7(
 
     fun refineToAdditionalAddressOfSite(input: BusinessPartnerInputDto, seed: String = input.externalId): PoolMockDataFactory.AdditionalAddressOfSiteResult{
         val poolMockResult = poolMockDataFactory.mockAdditionalAddressOfSiteSearchResult(seed)
-
-        val owningCompany = if(input.isOwnCompanyData) tenantBpnL else null
-        orchestratorMockDataFactory.mockRefineToAdditionalAddressOfSite(
-            seed,
-            poolMockResult.legalEntityParent,
-            poolMockResult.siteParent,
-            poolMockResult.additionalAddress,
-            owningCompany,
-            input.nameParts
-        )
-
-        shareBusinessPartnerAndResolve(input.externalId)
-
-        return poolMockResult
-    }
-
-    fun refineToAdditionalAddressOfSite(
-        input: BusinessPartnerInputDto,
-        legalEntityRequest: LegalEntityPartnerCreateRequest,
-        siteRequest: SitePartnerCreateRequest,
-        additionalAddressRequest: AddressPartnerCreateRequest,
-        seed: String = input.externalId
-    ): PoolMockDataFactory.AdditionalAddressOfSiteResult{
-        val poolMockResult = poolMockDataFactory.mockAdditionalAddressOfSiteSearchResult(legalEntityRequest, siteRequest, additionalAddressRequest, seed)
 
         val owningCompany = if(input.isOwnCompanyData) tenantBpnL else null
         orchestratorMockDataFactory.mockRefineToAdditionalAddressOfSite(

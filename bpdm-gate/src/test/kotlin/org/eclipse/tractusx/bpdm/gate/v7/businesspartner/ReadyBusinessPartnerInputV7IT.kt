@@ -40,7 +40,7 @@ class ReadyBusinessPartnerInputV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `ready uploaded input for sharing`() {
         //GIVEN
-        testDataClient.createBusinessPartnerInput(testName)
+        testDataClient.upsertBusinessPartnerInput(testName)
 
         //WHEN
         gateClient.sharingState.postSharingStateReady(PostSharingStateReadyRequest(listOf(testName)))
@@ -61,7 +61,7 @@ class ReadyBusinessPartnerInputV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `try ready already ready business partner`() {
         //GIVEN
-        testDataClient.createBusinessPartnerInput(testName)
+        testDataClient.upsertBusinessPartnerInput(testName)
         gateClient.sharingState.postSharingStateReady(PostSharingStateReadyRequest(listOf(testName)))
 
         //WHEN THEN

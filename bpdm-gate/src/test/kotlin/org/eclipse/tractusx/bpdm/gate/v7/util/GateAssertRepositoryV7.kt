@@ -21,28 +21,58 @@ package org.eclipse.tractusx.bpdm.gate.v7.util
 
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressComponentOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressRepresentationInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityRepresentationInputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityRepresentationOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteRepresentationInputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteRepresentationOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsSharingStatesResponse
+import org.eclipse.tractusx.bpdm.test.util.InstantSecondsComparator
+import org.eclipse.tractusx.bpdm.test.util.LocalDatetimeSecondsComparator
+import java.time.Instant
+import java.time.LocalDateTime
 
-class GateAssertRepositoryV7 {
+class GateAssertRepositoryV7(
+    private val instantSecondsComparator: InstantSecondsComparator,
+    private val localDatetimeSecondsComparator: LocalDatetimeSecondsComparator
+) {
 
     fun assertBusinessPartnerInput(actual: Collection<BusinessPartnerInputDto>, expected: Collection<BusinessPartnerInputDto>) {
-        Assertions.assertThat(actual)
+        Assertions.assertThat(actual.sortedBy { it.externalId }.map { it.sortContent() })
             .usingRecursiveComparison()
-            .ignoringCollectionOrder()
             .ignoringFields(
                 BusinessPartnerInputDto::createdAt.name,
                 BusinessPartnerInputDto::updatedAt.name
             )
-            .isEqualTo(expected)
+            .isEqualTo(expected.sortedBy { it.externalId }.map { it.sortContent() })
     }
 
     fun assertBusinessPartnerInput(actual: PageDto<BusinessPartnerInputDto>, expected: PageDto<BusinessPartnerInputDto>) {
         assertPageHeader(actual, expected)
         assertBusinessPartnerInput(actual.content, expected.content)
+    }
+
+    fun assertBusinessPartnerOutput(actual: Collection<BusinessPartnerOutputDto>, expected: Collection<BusinessPartnerOutputDto>) {
+        Assertions.assertThat(actual.sortedBy { it.externalId }.map { it.sortContent() })
+            .usingRecursiveComparison()
+            .ignoringFields(
+                BusinessPartnerOutputDto::createdAt.name,
+                BusinessPartnerOutputDto::updatedAt.name
+            )
+            .withComparatorForType(instantSecondsComparator, Instant::class.java)
+            .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
+            .isEqualTo(expected.sortedBy { it.externalId }.map { it.sortContent() })
+    }
+
+    fun assertBusinessPartnerOutput(actual: PageDto<BusinessPartnerOutputDto>, expected: PageDto<BusinessPartnerOutputDto>) {
+        assertPageHeader(actual, expected)
+        assertBusinessPartnerOutput(actual.content, expected.content)
     }
 
     fun assertSharingStates(actual: PageDto<SharingStateDto>, expected: PageDto<SharingStateDto>) {
@@ -83,4 +113,51 @@ class GateAssertRepositoryV7 {
             .ignoringFields(PageDto<*>::content.name)
             .isEqualTo(expected)
     }
+
+    private fun BusinessPartnerInputDto.sortContent() =
+        copy(
+            identifiers = identifiers.sortedBy { it.value },
+            states = states.sortedBy { it.validFrom?.toString() },
+            roles = roles.sortedBy { it.name },
+            scriptVariants = scriptVariants.sortedBy { it.scriptCode },
+            legalEntity = legalEntity.sortContent(),
+            site = site.sortContent(),
+            address = address.sortContent()
+        )
+
+    private fun LegalEntityRepresentationInputDto.sortContent() =
+        copy(states = states.sortedBy { it.validFrom?.toString() })
+
+    private fun SiteRepresentationInputDto.sortContent() =
+        copy(states = states.sortedBy { it.validFrom?.toString() })
+
+    private fun AddressRepresentationInputDto.sortContent() =
+        copy(states = states.sortedBy { it.validFrom?.toString() })
+
+    private fun BusinessPartnerOutputDto.sortContent() =
+        copy(
+            identifiers = identifiers.sortedBy { it.value },
+            states = states.sortedBy { it.validFrom?.toString() },
+            roles = roles.sortedBy { it.name },
+            scriptVariants = scriptVariants.sortedBy { it.scriptCode },
+            legalEntity = legalEntity.sortContent(),
+            site = site?.sortContent(),
+            address = address.sortContent()
+        )
+
+    private fun LegalEntityRepresentationOutputDto.sortContent() =
+        copy(
+            states = states.sortedBy { it.validFrom?.toString() },
+            goldenRecordRelations = goldenRecordRelations.sortedBy { it.sourceBpn }
+        )
+
+    private fun SiteRepresentationOutputDto.sortContent() =
+        copy(states = states.sortedBy { it.validFrom?.toString() })
+
+    private fun AddressComponentOutputDto.sortContent() =
+        copy(
+            states = states.sortedBy { it.validFrom?.toString() },
+            identifiers = identifiers.sortedBy { it.value },
+            goldenRecordRelations = goldenRecordRelations.sortedBy { it.sourceBpn }
+        )
 }
