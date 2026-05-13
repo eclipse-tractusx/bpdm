@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.v7.util
 
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressComponentOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressRepresentationInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
@@ -92,6 +93,28 @@ class GateAssertRepositoryV7(
 
     fun assertSharingStateStats(actual: StatsSharingStatesResponse, expected: StatsSharingStatesResponse) {
         Assertions.assertThat(actual).isEqualTo(expected)
+    }
+
+    fun assertRelation(actual: RelationDto, expected: RelationDto) {
+        Assertions.assertThat(actual)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .ignoringFields(
+                RelationDto::createdAt.name,
+                RelationDto::updatedAt.name
+            )
+            .isEqualTo(expected)
+    }
+
+    fun assertRelations(actual: Collection<RelationDto>, expected: Collection<RelationDto>) {
+        Assertions.assertThat(actual)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .ignoringFields(
+                RelationDto::createdAt.name,
+                RelationDto::updatedAt.name
+            )
+            .isEqualTo(expected)
     }
 
     fun assertChangelog(actual: PageChangeLogDto<ChangelogGateDto>, expected: PageChangeLogDto<ChangelogGateDto>) {

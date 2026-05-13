@@ -32,6 +32,7 @@ import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.BusinessPartnerInputDtoV7
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.BusinessPartnerInputRequestV7Factory
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.BusinessPartnerOutputDtoV7Factory
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.PageChangeLogV7Factory
+import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.RelationInputRequestV7Factory
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorRequestFactoryV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolMockDataFactory
@@ -40,6 +41,8 @@ import org.springframework.beans.factory.annotation.Autowired
 abstract class GateTestBaseV7 : GateTestBase(){
     @Autowired
     lateinit var assertRepo: GateAssertRepositoryV7
+    @Autowired
+    lateinit var relationInputRequestFactory: RelationInputRequestV7Factory
     @Autowired
     lateinit var businessPartnerInputRequestFactory: BusinessPartnerInputRequestV7Factory
     @Autowired

@@ -20,8 +20,11 @@
 package org.eclipse.tractusx.bpdm.gate.v7.util
 
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationDto
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
+import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
 import org.eclipse.tractusx.orchestrator.api.model.TaskClientStateDto
@@ -53,6 +56,16 @@ class GateTestDataClientV7(
 
     fun upsertBusinessPartnerInput(request: BusinessPartnerInputRequest): BusinessPartnerInputDto {
         return gateClient.businessParters.upsertBusinessPartnersInput(listOf(request)).body!!.single()
+    }
+
+    fun upsertRelationInput(entry: RelationPutEntry, createIfNotExist: Boolean = true): RelationDto {
+        return gateClient.relation.put(createIfNotExist, RelationPutRequest(listOf(entry))).upsertedRelations.single()
+    }
+
+    fun upsertRelationInputWithBusinessPartners(entry: RelationPutEntry, createIfNotExist: Boolean = true): RelationDto {
+        upsertBusinessPartnerInput(entry.businessPartnerSourceExternalId)
+        upsertBusinessPartnerInput(entry.businessPartnerTargetExternalId)
+        return upsertRelationInput(entry, createIfNotExist)
     }
 
     fun setStateToReady(externalId: String) {
