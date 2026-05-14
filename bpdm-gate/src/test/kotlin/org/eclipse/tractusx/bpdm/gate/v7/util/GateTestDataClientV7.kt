@@ -203,6 +203,41 @@ class GateTestDataClientV7(
         return poolMockResult
     }
 
+    fun createLegalEntityRelationOutput(seed: String, relationType: RelationType = RelationType.IsManagedBy): Pair<RelationDto, BusinessPartnerRelations> {
+        val source = upsertBusinessPartnerInput("$seed Source")
+        val target = upsertBusinessPartnerInput("$seed Target")
+        val request = relationInputRequestV7Factory.fromSeed(seed).withRelationType(relationType)
+        val relationInput = upsertRelationInput(request)
+        refineToLegalEntity(source)
+        refineToLegalEntity(target)
+        val goldenRecord = refineRelationToSuccess(relationInput)
+        return Pair(relationInput, goldenRecord)
+    }
+
+    fun createAddressRelationOutput(seed: String, relationType: RelationType = RelationType.IsReplacedBy): Pair<RelationDto, BusinessPartnerRelations> {
+        val source = upsertBusinessPartnerInput("$seed Source")
+        val target = upsertBusinessPartnerInput("$seed Target")
+        val request = relationInputRequestV7Factory.fromSeed(seed).withRelationType(relationType)
+        val relationInput = upsertRelationInput(request)
+        refineToLegalEntityOnSite(source)
+        refineToAdditionalAddressOfSite(target)
+        val goldenRecord = refineRelationToSuccess(relationInput)
+        return Pair(relationInput, goldenRecord)
+    }
+
+    fun updateLegalEntityRelationOutput(original: RelationDto, updateSeed: String, relationType: RelationType): BusinessPartnerRelations {
+        val newSource = upsertBusinessPartnerInput("$updateSeed Source")
+        val newTarget = upsertBusinessPartnerInput("$updateSeed Target")
+        val updatedRequest = relationInputRequestV7Factory.fromSeed(updateSeed).copy(
+            externalId = original.externalId,
+            relationType = relationType
+        )
+        val updatedRelationInput = upsertRelationInput(updatedRequest)
+        refineToLegalEntity(newSource)
+        refineToLegalEntity(newTarget)
+        return refineRelationToSuccess(updatedRelationInput, updateSeed)
+    }
+
     fun refineRelationToSuccess(input: RelationDto, seed: String = input.externalId): BusinessPartnerRelations{
         val refinementResult = orchestratorMockDataFactory.mockRefineRelation(seed).businessPartnerRelationsResult
         relationTaskCreationService.sendTasks()
