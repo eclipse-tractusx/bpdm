@@ -56,4 +56,5 @@ object LogisticAddressDescription {
     const val addressType = "Indicates the address type, the legal address to a legal entity or the main address to a site, " +
             "an additional address, or both legal and site address." +
             "The site main address is where typically the main entrance or the reception is located, or where the mail is delivered to."
+    const val relations = "Relations to other business partners."
 }

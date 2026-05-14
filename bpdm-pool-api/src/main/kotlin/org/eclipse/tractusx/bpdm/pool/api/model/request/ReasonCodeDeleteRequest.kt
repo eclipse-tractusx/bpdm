@@ -17,10 +17,8 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.model
+package org.eclipse.tractusx.bpdm.pool.api.model.request
 
-enum class RelationType {
-    IsAlternativeHeadquarterFor,
-    IsManagedBy,
-    IsOwnedBy
-}
+data class ReasonCodeDeleteRequest(
+    val technicalKey: String
+)

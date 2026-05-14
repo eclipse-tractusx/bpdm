@@ -1,0 +1,2 @@
+ALTER TABLE business_partner_relations RENAME COLUMN output_source_bpnl TO output_source_bpn;
+ALTER TABLE business_partner_relations RENAME COLUMN output_target_bpnl TO output_target_bpn;

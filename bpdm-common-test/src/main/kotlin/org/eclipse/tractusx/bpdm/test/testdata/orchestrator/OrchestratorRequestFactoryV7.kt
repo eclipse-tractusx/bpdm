@@ -53,7 +53,8 @@ class OrchestratorRequestFactoryV7(
             validityPeriods = listOf(
                 RelationValidityPeriod(LocalDate.of(2024, 1, 1), LocalDate.of(2025, 1, 1)),
                 RelationValidityPeriod(LocalDate.of(2026, 1, 1), null),
-            )
+            ),
+            reasonCode = commonFactory.metadata!!.reasonCodes.random(random)
         )
     }
 

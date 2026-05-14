@@ -42,7 +42,8 @@ class GateTestDataV7Config {
         return TestMetadata(
             identifierTypes = listOf("EU_VAT_ID_DE", "DUNS_ID"),
             legalForms = listOf("SCE1", "SGST"),
-            adminAreas = listOf("DE-BW", "DE-BY")
+            adminAreas = listOf("DE-BW", "DE-BY"),
+            reasonCodes = listOf("HEADQUARTER_RELOCATION", "OTHER"),
         )
     }
 
@@ -57,7 +58,8 @@ class GateTestDataV7Config {
             identifierTypes = listOf("EU_VAT_ID_DE", "DUNS_ID"),
             legalForms = listOf("SCE1", "SGST"),
             adminAreas = listOf("DE-BW", "DE-BY"),
-            scriptVariants = listOf("Latn", "Arab", "Hans", "Cyrl")
+            scriptVariants = listOf("Latn", "Arab", "Hans", "Cyrl"),
+            reasonCodes = listOf("HEADQUARTER_RELOCATION", "OTHER"),
         )
     }
 
@@ -91,8 +93,8 @@ class GateTestDataV7Config {
     }
 
     @Bean
-    fun relationInputRequestV7Factory(): RelationInputRequestV7Factory {
-        return RelationInputRequestV7Factory()
+    fun relationInputRequestV7Factory(testMetadataV7: GateTestMetadataV7): RelationInputRequestV7Factory {
+        return RelationInputRequestV7Factory(testMetadataV7)
     }
 
     @Bean

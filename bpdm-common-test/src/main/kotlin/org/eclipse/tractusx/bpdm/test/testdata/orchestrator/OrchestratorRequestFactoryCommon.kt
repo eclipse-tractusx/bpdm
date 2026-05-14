@@ -279,4 +279,5 @@ data class TestMetadataReferences(
     val addressIdentifierTypes: List<String>,
     val adminAreas: List<String>,
     val scriptCodes: List<String>,
+    val reasonCodes: List<String>
 )

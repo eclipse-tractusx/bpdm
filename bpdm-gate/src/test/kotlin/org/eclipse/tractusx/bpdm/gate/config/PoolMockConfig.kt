@@ -23,6 +23,7 @@ import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.pool.api.model.CountrySubdivisionDto
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDto
+import org.eclipse.tractusx.bpdm.pool.api.model.ReasonCodeDto
 import org.eclipse.tractusx.bpdm.pool.api.model.ScriptCodeDto
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerRequestFactory
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerVerboseValues
@@ -60,6 +61,10 @@ class PoolMockConfig {
             ),
             scriptCodes = listOf(
                 ScriptCodeDto("Test", "Test Description")
+            ),
+            reasonCodes = listOf(
+                ReasonCodeDto("HEADQUARTER_RELOCATION", "Test Reason"),
+                ReasonCodeDto("OTHER", "Another Test Reason"),
             )
         )
     }

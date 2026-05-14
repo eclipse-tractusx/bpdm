@@ -333,7 +333,7 @@ class GoldenRecordUpdateChunkService(
         businessPartner.legalForm = header.legalForm
         businessPartner.shortName = header.legalShortName
         businessPartner.legalEntityConfidence?.let { update(it,  header.confidenceCriteria) }
-        businessPartner.legalEntityGoldenRecordRelations.addAll(legalEntity.header.relations.map(::toLegalEntityEntity))
+        businessPartner.legalEntityGoldenRecordRelations.addAll(legalEntity.header.relations.map(::toEntity))
 
         val variantByCode = businessPartner.scriptVariants.associateBy { it.scriptCode }
 
@@ -364,10 +364,11 @@ class GoldenRecordUpdateChunkService(
         updateIdentifiers(businessPartner.identifiers, addressProperties.identifiers.map(::toEntity), BusinessPartnerType.ADDRESS)
         updateStates(businessPartner.states, addressProperties.states, BusinessPartnerType.ADDRESS)
         businessPartner.addressName = addressProperties.name
+        businessPartner.postalAddress.addressType = addressProperties.addressType
         businessPartner.postalAddress.physicalPostalAddress = addressProperties.physicalPostalAddress.toEntity()
         businessPartner.postalAddress.alternativePostalAddress = addressProperties.alternativePostalAddress?.toEntity()
         businessPartner.addressConfidence?.let { update(it,  addressProperties.confidenceCriteria) }
-        businessPartner.addressGoldenRecordRelations.addAll(emptyList())
+        businessPartner.addressGoldenRecordRelations.addAll(addressProperties.relations.map(::toEntity))
 
         val goldenRecordVariantByCode = address.scriptVariants.associateBy { it.scriptCode }
         businessPartner.scriptVariants.forEach { variant ->
@@ -434,27 +435,28 @@ class GoldenRecordUpdateChunkService(
             businessPartnerType = BusinessPartnerType.ADDRESS
         )
 
-    private fun toLegalEntityEntity(poolDto: RelationVerboseDto) =
+    private fun toEntity(poolDto: RelationVerboseDto) =
         LegalEntityGoldenRecordRelationDb(
             relationType = when (poolDto.type) {
-                RelationType.IsAlternativeHeadquarterFor -> LegalEntityGoldenRecordRelationType.IsAlternativeHeadquarterFor
-                RelationType.IsManagedBy -> LegalEntityGoldenRecordRelationType.IsManagedBy
-                RelationType.IsOwnedBy -> LegalEntityGoldenRecordRelationType.IsOwnedBy
+                LegalEntityRelationType.IsAlternativeHeadquarterFor -> LegalEntityGoldenRecordRelationType.IsAlternativeHeadquarterFor
+                LegalEntityRelationType.IsManagedBy -> LegalEntityGoldenRecordRelationType.IsManagedBy
+                LegalEntityRelationType.IsOwnedBy -> LegalEntityGoldenRecordRelationType.IsOwnedBy
             },
             sourceBpn = poolDto.businessPartnerSourceBpnl,
             targetBpn = poolDto.businessPartnerTargetBpnl
         )
 
 
-    private fun toAddressEntity(poolDto: RelationVerboseDto) =
-        AddressGoldenRecordRelation(
-            relationType = AddressGoldenRecordRelationType.IsReplacedBy,
-            sourceBpn = poolDto.businessPartnerSourceBpnl,
-            targetBpn = poolDto.businessPartnerTargetBpnl
+    private fun toEntity(poolDto: AddressRelationVerboseDto) =
+        AddressGoldenRecordRelationDb(
+            relationType = when(poolDto.type){
+                AddressRelationType.IsReplacedBy -> AddressGoldenRecordRelationType.IsReplacedBy
+            },
+            sourceBpn = poolDto.businessPartnerSourceBpna,
+            targetBpn = poolDto.businessPartnerTargetBpna
         )
 
-
-    private fun toEntity(poolDto: IBaseStateDto, businessPartnerType: BusinessPartnerType) =
+    fun toEntity(poolDto: IBaseStateDto, businessPartnerType: BusinessPartnerType) =
         StateDb(
             validFrom = poolDto.validFrom,
             validTo = poolDto.validTo,

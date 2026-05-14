@@ -96,7 +96,7 @@ class TaskResolutionMapper {
                 physicalAddress = toTaskResult(physicalPostalAddress),
                 alternativeAddress =  alternativePostalAddress?.let { toTaskResult(it) },
                 hasChanged = hasChanged,
-                goldenRecordRelations = emptyList()
+                goldenRecordRelations = relations.map { toTaskResult(it) }
             )
         }
     }
@@ -222,12 +222,22 @@ class TaskResolutionMapper {
     fun toTaskResult(relation: RelationVerboseDto): LegalEntityGoldenRecordRelation{
         return LegalEntityGoldenRecordRelation(
             relationType = when (relation.type) {
-                org.eclipse.tractusx.bpdm.pool.api.model.RelationType.IsAlternativeHeadquarterFor -> LegalEntityGoldenRecordRelationType.IsAlternativeHeadquarterFor
-                org.eclipse.tractusx.bpdm.pool.api.model.RelationType.IsManagedBy -> LegalEntityGoldenRecordRelationType.IsManagedBy
-                org.eclipse.tractusx.bpdm.pool.api.model.RelationType.IsOwnedBy ->LegalEntityGoldenRecordRelationType.IsOwnedBy
+                LegalEntityRelationType.IsAlternativeHeadquarterFor -> LegalEntityGoldenRecordRelationType.IsAlternativeHeadquarterFor
+                LegalEntityRelationType.IsManagedBy -> LegalEntityGoldenRecordRelationType.IsManagedBy
+                LegalEntityRelationType.IsOwnedBy ->LegalEntityGoldenRecordRelationType.IsOwnedBy
             },
             sourceBpn = relation.businessPartnerSourceBpnl,
             targetBpn = relation.businessPartnerTargetBpnl
+        )
+    }
+
+    fun toTaskResult(relation: AddressRelationVerboseDto): AddressGoldenRecordRelation{
+        return AddressGoldenRecordRelation(
+            relationType = when (relation.type) {
+                AddressRelationType.IsReplacedBy -> AddressGoldenRecordRelationType.IsReplacedBy
+            },
+            sourceBpn = relation.businessPartnerSourceBpna,
+            targetBpn = relation.businessPartnerTargetBpna
         )
     }
 

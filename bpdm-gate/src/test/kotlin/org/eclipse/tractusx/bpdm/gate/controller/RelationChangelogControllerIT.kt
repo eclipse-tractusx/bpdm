@@ -74,7 +74,7 @@ class RelationChangelogControllerIT @Autowired constructor(
     @ParameterizedTest
     @EnumSource(RelationType::class)
     fun changelogCreated(relationType: RelationType){
-        givenRelations(RelationPutEntry("${testName}_rel", relationType, "${testName}_source", "${testName}_target"))
+        givenRelations(gateInputFactory.buildRelation("${testName}_rel", relationType, "${testName}_source", "${testName}_target"))
 
         val expectedContent = listOf(
             ChangelogGateDto("${testName}_rel", anyTime, ChangelogType.CREATE)
@@ -90,8 +90,8 @@ class RelationChangelogControllerIT @Autowired constructor(
         val relationExternalId = "${testName}_rel"
         val sourceExternalId = "${testName}_source"
         val targetExternalId = "${testName}_target"
-        givenRelations(RelationPutEntry(relationExternalId, relationType, sourceExternalId, targetExternalId))
-        gateClient.relation.put(false, RelationPutRequest(listOf(RelationPutEntry(relationExternalId, relationType, targetExternalId, sourceExternalId))))
+        givenRelations(gateInputFactory.buildRelation(relationExternalId, relationType, sourceExternalId, targetExternalId))
+        gateClient.relation.put(false, RelationPutRequest(listOf(gateInputFactory.buildRelation(relationExternalId, relationType, targetExternalId, sourceExternalId))))
 
         val expectedContent = listOf(
             ChangelogGateDto("${testName}_rel", anyTime, ChangelogType.CREATE),
@@ -109,8 +109,8 @@ class RelationChangelogControllerIT @Autowired constructor(
         val externalId2 = "${testName}_rel2"
 
         givenRelations(
-            RelationPutEntry(externalId1, relationType, "${externalId1}_source", "${externalId1}_target"),
-            RelationPutEntry(externalId2, relationType, "${externalId2}_source", "${externalId2}_target"),
+            gateInputFactory.buildRelation(externalId1, relationType, "${externalId1}_source", "${externalId1}_target"),
+            gateInputFactory.buildRelation(externalId2, relationType, "${externalId2}_source", "${externalId2}_target"),
             )
 
         val expectedContent = listOf(
@@ -127,11 +127,11 @@ class RelationChangelogControllerIT @Autowired constructor(
         val externalId1 = "${testName}_rel1"
         val externalId2 = "${testName}_rel2"
 
-        givenRelations(RelationPutEntry(externalId1, relationType, "${externalId1}_source", "${externalId1}_target"))
+        givenRelations(gateInputFactory.buildRelation(externalId1, relationType, "${externalId1}_source", "${externalId1}_target"))
 
         val timeAfterFirstCreate = Instant.now()
 
-        givenRelations(RelationPutEntry(externalId2, relationType, "${externalId2}_source", "${externalId2}_target"))
+        givenRelations(gateInputFactory.buildRelation(externalId2, relationType, "${externalId2}_source", "${externalId2}_target"))
 
         val expectedContent = listOf(
             ChangelogGateDto(externalId2, anyTime, ChangelogType.CREATE)
@@ -148,13 +148,13 @@ class RelationChangelogControllerIT @Autowired constructor(
         val externalId2 = "${testName}_rel2"
         val externalId3 = "${testName}_rel3"
 
-        givenRelations(RelationPutEntry(externalId1, relationType, "${externalId1}_source", "${externalId1}_target"))
+        givenRelations(gateInputFactory.buildRelation(externalId1, relationType, "${externalId1}_source", "${externalId1}_target"))
 
         val timeAfterFirstCreate = Instant.now()
 
         givenRelations(
-            RelationPutEntry(externalId2, relationType, "${externalId2}_source", "${externalId2}_target"),
-            RelationPutEntry(externalId3, relationType, "${externalId3}_source", "${externalId3}_target"),
+            gateInputFactory.buildRelation(externalId2, relationType, "${externalId2}_source", "${externalId2}_target"),
+            gateInputFactory.buildRelation(externalId3, relationType, "${externalId3}_source", "${externalId3}_target"),
         )
 
         val expectedContent = listOf(

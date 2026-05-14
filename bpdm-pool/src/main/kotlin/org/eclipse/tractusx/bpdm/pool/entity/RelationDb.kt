@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.entity
 
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
-import org.eclipse.tractusx.bpdm.pool.api.model.RelationType
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
 
 @Entity
 @Table(
@@ -34,7 +34,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.RelationType
 class RelationDb(
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
-    val type: RelationType,
+    val type: LegalEntityRelationType,
 
     @ManyToOne
     @JoinColumn(name = "start_node_id", nullable = false)
@@ -50,7 +50,10 @@ class RelationDb(
         joinColumns = [JoinColumn(name = "relation_id", foreignKey = ForeignKey(name = "fk_validity_periods_relation"))],
         indexes = [Index(name = "idx_relation_validity_periods_relation_id", columnList = "relation_id")]
     )
-    var validityPeriods: MutableList<RelationValidityPeriodDb> = mutableListOf()
+    var validityPeriods: MutableList<RelationValidityPeriodDb> = mutableListOf(),
 
+    @ManyToOne
+    @JoinColumn(name = "reason_code_id", nullable = false)
+    var reasonCode: ReasonCodeDb
 ) : BaseEntity()
 

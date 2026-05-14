@@ -35,12 +35,14 @@ class RelationOutputDtoV7Factory {
                 RelationType.IsAlternativeHeadquarterFor -> SharableRelationType.IsAlternativeHeadquarterFor
                 RelationType.IsManagedBy -> SharableRelationType.IsManagedBy
                 RelationType.IsOwnedBy -> SharableRelationType.IsOwnedBy
+                RelationType.IsReplacedBy -> SharableRelationType.IsReplacedBy
             },
-            goldenRecordRelation.businessPartnerSourceBpnl,
-            goldenRecordRelation.businessPartnerTargetBpnl,
+            goldenRecordRelation.businessPartnerSourceBpn,
+            goldenRecordRelation.businessPartnerTargetBpn,
             goldenRecordRelation.validityPeriods.map {
                 RelationValidityPeriodDto(it.validFrom, it.validTo)
             },
+            goldenRecordRelation.reasonCode,
             Instant.MIN
         )
     }

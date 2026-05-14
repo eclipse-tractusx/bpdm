@@ -147,6 +147,7 @@ fun LogisticAddressDb.toInvariantDto(): LogisticAddressInvariantVerboseDto {
         name = name,
         states = states.map { it.toDto() },
         identifiers = identifiers.map { it.toDto() },
+        relations = startAddressRelations.plus(endAddressRelations).map { it.toDto() },
         physicalPostalAddress = physicalPostalAddress.toDto(),
         alternativePostalAddress = alternativePostalAddress?.toDto(),
         confidenceCriteria = confidenceCriteria.toDto(),
@@ -277,7 +278,18 @@ fun RelationDb.toDto(): RelationVerboseDto {
         type = type,
         businessPartnerSourceBpnl = startNode.bpn,
         businessPartnerTargetBpnl = endNode.bpn,
-        validityPeriods = validityPeriods.sortedBy { it.validFrom }.map { it.toDto() }
+        validityPeriods = validityPeriods.sortedBy { it.validFrom }.map { it.toDto() },
+        reasonCode = reasonCode.technicalKey
+    )
+}
+
+fun AddressRelationDb.toDto(): AddressRelationVerboseDto {
+    return AddressRelationVerboseDto(
+        type = type,
+        businessPartnerSourceBpna = startAddress.bpn,
+        businessPartnerTargetBpna = endAddress.bpn,
+        validityPeriods = validityPeriods.sortedBy { it.validFrom }.map { it.toDto() },
+        reasonCode = reasonCode.technicalKey
     )
 }
 

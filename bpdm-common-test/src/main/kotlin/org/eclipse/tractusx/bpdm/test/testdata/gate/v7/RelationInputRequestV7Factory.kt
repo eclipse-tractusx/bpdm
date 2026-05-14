@@ -27,7 +27,9 @@ import java.time.Instant
 import java.time.LocalDate
 import kotlin.random.Random
 
-class RelationInputRequestV7Factory {
+class RelationInputRequestV7Factory(
+    private val testMetadata: GateTestMetadataV7
+) {
 
     fun fromSeed(seed: String): RelationPutEntry = SeededCreator(seed).create()
 
@@ -37,6 +39,7 @@ class RelationInputRequestV7Factory {
         businessPartnerSourceExternalId = entry.businessPartnerSourceExternalId,
         businessPartnerTargetExternalId = entry.businessPartnerTargetExternalId,
         validityPeriods = entry.validityPeriods,
+        reasonCode = entry.reasonCode,
         updatedAt = Instant.now(),
         createdAt = Instant.now()
     )
@@ -50,6 +53,7 @@ class RelationInputRequestV7Factory {
             relationType = RelationType.entries.random(random),
             businessPartnerSourceExternalId = "$seed Source",
             businessPartnerTargetExternalId = "$seed Target",
+            reasonCode = testMetadata.reasonCodes.random(random),
             validityPeriods = createValidityPeriods()
         )
 

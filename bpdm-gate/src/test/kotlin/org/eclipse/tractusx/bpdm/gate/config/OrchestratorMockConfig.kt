@@ -19,12 +19,15 @@
 
 package org.eclipse.tractusx.bpdm.gate.config
 
+import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.GateTestMetadataV7
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.BusinessPartnerTestDataFactory
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorExpectedResultFactoryV7
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorRequestFactoryCommon
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorRequestFactoryV7
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.RefinementTestDataFactory
+import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.TestMetadataReferences
+import org.eclipse.tractusx.bpdm.test.testdata.pool.TestMetadataV7
 import org.eclipse.tractusx.orchestrator.api.model.TaskMode
 import org.eclipse.tractusx.orchestrator.api.model.TaskStep
 import org.springframework.context.annotation.Bean
@@ -51,8 +54,17 @@ class OrchestratorMockConfig {
     }
 
     @Bean
-    fun orchestratorRequestFactoryV7(): OrchestratorRequestFactoryV7{
-        val orchestratorCommonFactory = OrchestratorRequestFactoryCommon()
+    fun orchestratorRequestFactoryV7(testMetadataV7: TestMetadataV7): OrchestratorRequestFactoryV7{
+        val testMetadataReferences = TestMetadataReferences(
+            testMetadataV7.legalForms.map { it.technicalKey },
+            testMetadataV7.legalEntityIdentifierTypes.map { it.technicalKey },
+            testMetadataV7.addressIdentifierTypes.map { it.technicalKey },
+            testMetadataV7.adminAreas.map { it.code },
+            testMetadataV7.reasonCodes.map { it.technicalKey },
+            testMetadataV7.scriptCodes.map { it.technicalKey }
+        )
+
+        val orchestratorCommonFactory = OrchestratorRequestFactoryCommon(testMetadataReferences)
         return OrchestratorRequestFactoryV7(BusinessPartnerTestDataFactory(orchestratorCommonFactory), orchestratorCommonFactory)
     }
 
