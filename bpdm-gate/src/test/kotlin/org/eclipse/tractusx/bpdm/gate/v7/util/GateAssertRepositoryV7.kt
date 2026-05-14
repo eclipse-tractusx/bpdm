@@ -23,6 +23,7 @@ import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressComponentOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressRepresentationInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
@@ -94,6 +95,25 @@ class GateAssertRepositoryV7(
 
     fun assertSharingStateStats(actual: StatsSharingStatesResponse, expected: StatsSharingStatesResponse) {
         Assertions.assertThat(actual).isEqualTo(expected)
+    }
+
+    fun assertRelationSharingStates(actual: PageDto<RelationSharingStateDto>, expected: PageDto<RelationSharingStateDto>) {
+        assertPageHeader(actual, expected)
+        assertRelationSharingStates(actual.content, expected.content)
+    }
+
+    fun assertRelationSharingStates(actual: Collection<RelationSharingStateDto>, expected: Collection<RelationSharingStateDto>) {
+        Assertions.assertThat(actual)
+            .usingRecursiveComparison()
+            .ignoringFields(RelationSharingStateDto::updatedAt.name)
+            .isEqualTo(expected)
+    }
+
+    fun assertRelationSharingStatePageMetadata(actual: PageDto<RelationSharingStateDto>, totalElements: Long, totalPages: Int, page: Int, contentSize: Int) {
+        Assertions.assertThat(actual.totalElements).isEqualTo(totalElements)
+        Assertions.assertThat(actual.totalPages).isEqualTo(totalPages)
+        Assertions.assertThat(actual.page).isEqualTo(page)
+        Assertions.assertThat(actual.contentSize).isEqualTo(contentSize)
     }
 
     fun assertRelation(actual: RelationDto, expected: RelationDto) {

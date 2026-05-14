@@ -45,6 +45,8 @@ import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.withRelationType
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolMockDataFactory
 import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
+import org.eclipse.tractusx.orchestrator.api.model.TaskClientRelationsStateDto
+import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsErrorType
 
 class GateTestDataClientV7(
     private val gateClient: GateClient,
@@ -101,6 +103,36 @@ class GateTestDataClientV7(
         val createdTask = orchestratorMockDataFactory.mockCreateTask(seed)
         taskCreationBatchService.createTasksForReadyBusinessPartners()
         return createdTask
+    }
+
+    fun createRelationInputWithRefinedLegalEntityBPs(seed: String, relationType: RelationType = RelationType.IsManagedBy): RelationDto {
+        val source = upsertBusinessPartnerInput("$seed Source")
+        val target = upsertBusinessPartnerInput("$seed Target")
+        val request = relationInputRequestV7Factory.fromSeed(seed).withRelationType(relationType)
+        val relationInput = upsertRelationInput(request)
+        refineToLegalEntity(source)
+        refineToLegalEntity(target)
+        return relationInput
+    }
+
+    fun setRelationStateToPending(externalId: String, seed: String = externalId): TaskClientRelationsStateDto {
+        val createdTask = orchestratorMockDataFactory.mockCreateRelationTask(seed)
+        relationTaskCreationService.sendTasks()
+        return createdTask
+    }
+
+    fun setRelationStateToSuccess(externalId: String, seed: String = externalId): TaskClientRelationsStateDto {
+        val refinedTask = orchestratorMockDataFactory.mockRefineRelation(seed)
+        relationTaskCreationService.sendTasks()
+        relationTaskResolutionService.checkResolveTasks()
+        return refinedTask
+    }
+
+    fun setRelationStateToError(externalId: String, seed: String = externalId, errorType: TaskRelationsErrorType): TaskClientRelationsStateDto {
+        val errorTask = orchestratorMockDataFactory.mockRelationSharingError(seed, errorType)
+        relationTaskCreationService.sendTasks()
+        relationTaskResolutionService.checkResolveTasks()
+        return errorTask
     }
 
     fun setStateToSuccess(externalId: String, seed: String = externalId): TaskClientStateDto {

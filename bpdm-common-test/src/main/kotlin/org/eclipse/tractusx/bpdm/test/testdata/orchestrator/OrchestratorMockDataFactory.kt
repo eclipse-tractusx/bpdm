@@ -214,6 +214,27 @@ class OrchestratorMockDataFactory(
         return mockedErrorTasks.tasks.single()
     }
 
+    fun mockRelationSharingError(seed: String, errorType: TaskRelationsErrorType): TaskClientRelationsStateDto{
+        WireMock.configureFor("localhost", orchestratorMockServer.port())
+
+        val mockedCreatedTask = mockCreateRelationTask(seed)
+
+        WireMock.stubFor(WireMock.get(WireMock.urlPathEqualTo("${BASE_PATH_V7_RELATIONS}/finished-events")).willReturn(WireMock.okJson(
+            jsonMapper.writeValueAsString(
+                FinishedTaskEventsResponse(1, 1, 0, 1, listOf(
+                    FinishedTaskEventsResponse.Event(Instant.now(), ResultState.Error, mockedCreatedTask.taskId)
+                ))
+            )
+        )))
+
+        val mockedErrorTasks = buildErrorRelationTaskState(seed, errorType)
+        WireMock.stubFor(WireMock.post(WireMock.urlPathEqualTo("${BASE_PATH_V7_RELATIONS}/state/search")).willReturn(WireMock.okJson(
+            jsonMapper.writeValueAsString(mockedErrorTasks)
+        )))
+
+        return mockedErrorTasks.tasks.single()
+    }
+
     fun mockCreateRelationTask(seed: String): TaskClientRelationsStateDto{
         WireMock.configureFor("localhost", orchestratorMockServer.port())
 
@@ -359,6 +380,27 @@ class OrchestratorMockDataFactory(
                         TaskStep.PoolSync,
                         StepState.Error,
                         listOf(TaskErrorDto(errorType, "$seed Description")),
+                        Instant.now(),
+                        Instant.now(),
+                        Instant.now()
+                    )
+                )
+            )
+        )
+    }
+
+    private fun buildErrorRelationTaskState(seed: String, errorType: TaskRelationsErrorType): TaskRelationsStateResponse{
+        return TaskRelationsStateResponse(
+            listOf(
+                TaskClientRelationsStateDto(
+                    UUID.nameUUIDFromBytes("TaskID_$seed".encodeToByteArray()).toString(),
+                    UUID.nameUUIDFromBytes("RecordID_$seed".encodeToByteArray()).toString(),
+                    BusinessPartnerRelations.empty,
+                    TaskProcessingRelationsStateDto(
+                        ResultState.Error,
+                        TaskStep.PoolSync,
+                        StepState.Error,
+                        listOf(TaskRelationsErrorDto(errorType, "$seed Description")),
                         Instant.now(),
                         Instant.now(),
                         Instant.now()
