@@ -36,11 +36,15 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreate
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
+import org.eclipse.tractusx.bpdm.gate.service.RelationTaskCreationService
+import org.eclipse.tractusx.bpdm.gate.service.RelationTaskResolutionService
+import org.eclipse.tractusx.bpdm.gate.service.RelationTaskResolutionServiceIT
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.BusinessPartnerInputRequestV7Factory
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.RelationInputRequestV7Factory
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.withRelationType
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolMockDataFactory
+import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
 
 class GateTestDataClientV7(
     private val gateClient: GateClient,
@@ -49,6 +53,8 @@ class GateTestDataClientV7(
     private val orchestratorMockDataFactory: OrchestratorMockDataFactory,
     private val taskCreationBatchService: TaskCreationBatchService,
     private val taskResolutionBatchService: TaskResolutionBatchService,
+    private val relationTaskResolutionService: RelationTaskResolutionService,
+    private val relationTaskCreationService: RelationTaskCreationService,
     private val poolMockDataFactory: PoolMockDataFactory,
     private val tenantBpnL: String,
 ) {
@@ -64,6 +70,14 @@ class GateTestDataClientV7(
 
     fun upsertRelationInput(entry: RelationPutEntry, createIfNotExist: Boolean = true): RelationDto {
         return gateClient.relation.put(createIfNotExist, RelationPutRequest(listOf(entry))).upsertedRelations.single()
+    }
+
+    fun upsertRelationInput(externalId: String, source: BusinessPartnerInputDto, target: BusinessPartnerInputDto,  seed: String = externalId): RelationDto {
+        val request = relationInputRequestV7Factory.fromSeed(seed).copy(
+            businessPartnerSourceExternalId = source.externalId,
+            businessPartnerTargetExternalId = target.externalId
+        )
+        return gateClient.relation.put(true, RelationPutRequest(listOf(request))).upsertedRelations.single()
     }
 
     fun upsertRelationInputWithBusinessPartners(entry: RelationPutEntry, createIfNotExist: Boolean = true): RelationDto {
@@ -189,6 +203,15 @@ class GateTestDataClientV7(
         return poolMockResult
     }
 
+    fun refineRelationToSuccess(input: RelationDto, seed: String = input.externalId): BusinessPartnerRelations{
+        val refinementResult = orchestratorMockDataFactory.mockRefineRelation(seed).businessPartnerRelationsResult
+        relationTaskCreationService.sendTasks()
+        relationTaskResolutionService.checkResolveTasks()
+
+        return refinementResult
+    }
+
+
     private fun prepareLegalEntityRefinement(input: BusinessPartnerInputDto, seed: String = input.externalId): LegalEntityWithLegalAddressVerboseDto{
         val poolMockResult = poolMockDataFactory.mockLegalEntityAndLegalAddressSearchResult(seed)
 
@@ -205,5 +228,4 @@ class GateTestDataClientV7(
 
         return gateClient.businessParters.getBusinessPartnersOutput(listOf(externalId)).content.single()
     }
-
 }

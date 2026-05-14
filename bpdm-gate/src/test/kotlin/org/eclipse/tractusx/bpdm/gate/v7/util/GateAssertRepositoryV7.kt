@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.v7.util
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationDto
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressComponentOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressRepresentationInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
@@ -120,6 +121,19 @@ class GateAssertRepositoryV7(
     fun assertRelations(actual: PageDto<RelationDto>, expected: PageDto<RelationDto>) {
         assertPageHeader(actual, expected)
         assertRelations(actual.content, expected.content)
+    }
+
+    fun assertRelationOutput(actual: Collection<RelationOutputDto>, expected: Collection<RelationOutputDto>) {
+        Assertions.assertThat(actual)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .ignoringFields(RelationOutputDto::updatedAt.name)
+            .isEqualTo(expected)
+    }
+
+    fun assertRelationOutput(actual: PageDto<RelationOutputDto>, expected: PageDto<RelationOutputDto>) {
+        assertPageHeader(actual, expected)
+        assertRelationOutput(actual.content, expected.content)
     }
 
     fun assertRelationPageMetadata(actual: PageDto<RelationDto>, totalElements: Long, totalPages: Int, page: Int, contentSize: Int) {

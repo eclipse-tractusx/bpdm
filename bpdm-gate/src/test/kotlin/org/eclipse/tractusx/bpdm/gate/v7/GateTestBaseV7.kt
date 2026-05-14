@@ -22,6 +22,8 @@ package org.eclipse.tractusx.bpdm.gate.v7
 import jakarta.annotation.PostConstruct
 import org.eclipse.tractusx.bpdm.gate.GateTestBase
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
+import org.eclipse.tractusx.bpdm.gate.service.RelationTaskCreationService
+import org.eclipse.tractusx.bpdm.gate.service.RelationTaskResolutionService
 import org.eclipse.tractusx.bpdm.gate.service.TaskCreationBatchService
 import org.eclipse.tractusx.bpdm.gate.service.TaskResolutionBatchService
 import org.eclipse.tractusx.bpdm.gate.v7.util.GateAssertRepositoryV7
@@ -33,14 +35,21 @@ import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.BusinessPartnerInputReque
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.BusinessPartnerOutputDtoV7Factory
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.PageChangeLogV7Factory
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.RelationInputRequestV7Factory
+import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.RelationOutputDtoV7Factory
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorRequestFactoryV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolMockDataFactory
 import org.springframework.beans.factory.annotation.Autowired
 
 abstract class GateTestBaseV7 : GateTestBase(){
+
+    //test utilities
     @Autowired
     lateinit var assertRepo: GateAssertRepositoryV7
+    @Autowired
+    lateinit var testClientProvider: GateTestClientProviderV7
+
+    //gate test data Factories
     @Autowired
     lateinit var relationInputRequestFactory: RelationInputRequestV7Factory
     @Autowired
@@ -52,13 +61,21 @@ abstract class GateTestBaseV7 : GateTestBase(){
     @Autowired
     lateinit var businessPartnerOutputFactory: BusinessPartnerOutputDtoV7Factory
     @Autowired
-    lateinit var testClientProvider: GateTestClientProviderV7
-    @Autowired
-    lateinit var orchestratorMockDataFactory: OrchestratorMockDataFactory
+    lateinit var relationOutputFactory: RelationOutputDtoV7Factory
+
+    //gate services
     @Autowired
     lateinit var taskCreationBatchService: TaskCreationBatchService
     @Autowired
     lateinit var taskResolutionBatchService: TaskResolutionBatchService
+    @Autowired
+    lateinit var relationTaskResolutionService: RelationTaskResolutionService
+    @Autowired
+    lateinit var relationTaskCreationService: RelationTaskCreationService
+
+    //mock utilities
+    @Autowired
+    lateinit var orchestratorMockDataFactory: OrchestratorMockDataFactory
     @Autowired
     lateinit var orchestratorRequestFactoryV7: OrchestratorRequestFactoryV7
     @Autowired
@@ -77,6 +94,8 @@ abstract class GateTestBaseV7 : GateTestBase(){
             orchestratorMockDataFactory,
             taskCreationBatchService,
             taskResolutionBatchService,
+            relationTaskResolutionService,
+            relationTaskCreationService,
             poolMockDataFactory,
             KeyCloakInitializer.TENANT_BPNL
         )

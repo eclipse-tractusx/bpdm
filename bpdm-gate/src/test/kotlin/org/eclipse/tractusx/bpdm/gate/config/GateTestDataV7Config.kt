@@ -28,6 +28,7 @@ import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.BusinessPartnerOutputDtoV
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.GateTestMetadataV7
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.PageChangeLogV7Factory
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.RelationInputRequestV7Factory
+import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.RelationOutputDtoV7Factory
 import org.eclipse.tractusx.bpdm.test.util.InstantSecondsComparator
 import org.eclipse.tractusx.bpdm.test.util.LocalDatetimeSecondsComparator
 import org.springframework.context.annotation.Bean
@@ -92,6 +93,11 @@ class GateTestDataV7Config {
     @Bean
     fun relationInputRequestV7Factory(): RelationInputRequestV7Factory {
         return RelationInputRequestV7Factory()
+    }
+
+    @Bean
+    fun relationOutputDtoV7Factory(): RelationOutputDtoV7Factory {
+        return RelationOutputDtoV7Factory()
     }
 
 }

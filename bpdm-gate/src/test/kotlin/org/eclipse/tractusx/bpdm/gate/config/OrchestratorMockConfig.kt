@@ -20,13 +20,17 @@
 package org.eclipse.tractusx.bpdm.gate.config
 
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.BusinessPartnerTestDataFactory
+import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorExpectedResultFactoryV7
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorRequestFactoryCommon
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorRequestFactoryV7
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.RefinementTestDataFactory
+import org.eclipse.tractusx.orchestrator.api.model.TaskMode
+import org.eclipse.tractusx.orchestrator.api.model.TaskStep
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import tools.jackson.databind.json.JsonMapper
+import java.time.Duration
 
 @Configuration
 class OrchestratorMockConfig {
@@ -39,9 +43,11 @@ class OrchestratorMockConfig {
     @Bean
     fun orchestratorMockDataFactory(
         refinementTestDataFactory: RefinementTestDataFactory,
+        requestFactory: OrchestratorRequestFactoryV7,
+        resultFactory: OrchestratorExpectedResultFactoryV7,
         jsonMapper: JsonMapper
     ): OrchestratorMockDataFactory {
-        return OrchestratorMockDataFactory(refinementTestDataFactory, jsonMapper)
+        return OrchestratorMockDataFactory(refinementTestDataFactory,requestFactory, resultFactory, jsonMapper)
     }
 
     @Bean
@@ -49,4 +55,17 @@ class OrchestratorMockConfig {
         val orchestratorCommonFactory = OrchestratorRequestFactoryCommon()
         return OrchestratorRequestFactoryV7(BusinessPartnerTestDataFactory(orchestratorCommonFactory), orchestratorCommonFactory)
     }
+
+    @Bean
+    fun orchestratorExpectedResultFactoryV7(): OrchestratorExpectedResultFactoryV7{
+        return OrchestratorExpectedResultFactoryV7(
+            Duration.ofDays(1),
+            Duration.ofDays(1),
+            mapOf(
+                Pair(TaskMode.UpdateFromPool, listOf(TaskStep.CleanAndSync, TaskStep.PoolSync)),
+                Pair(TaskMode.UpdateFromSharingMember, listOf(TaskStep.Clean))
+            )
+        )
+    }
+
 }

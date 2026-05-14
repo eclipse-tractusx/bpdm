@@ -20,12 +20,14 @@
 package org.eclipse.tractusx.bpdm.test.testdata.orchestrator
 
 import com.github.tomakehurst.wiremock.client.WireMock
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationOutputDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
 import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockContextInitializer
 import org.eclipse.tractusx.orchestrator.api.ApiCommons.BASE_PATH_V7_BUSINESS_PARTNERS
+import org.eclipse.tractusx.orchestrator.api.ApiCommons.BASE_PATH_V7_RELATIONS
 import org.eclipse.tractusx.orchestrator.api.model.*
 import tools.jackson.databind.json.JsonMapper
 import java.time.Duration
@@ -34,6 +36,8 @@ import java.util.*
 
 class OrchestratorMockDataFactory(
     private val refinementTestDataFactory: RefinementTestDataFactory,
+    private val requestFactory: OrchestratorRequestFactoryV7,
+    private val resultFactory: OrchestratorExpectedResultFactoryV7,
     private val jsonMapper: JsonMapper
 ) {
 
@@ -124,6 +128,19 @@ class OrchestratorMockDataFactory(
         return mockedRefinedTask
     }
 
+    fun mockRefineRelation(seed: String): TaskClientRelationsStateDto{
+        configureWireMock()
+
+        val mockedCreatedTask = mockCreateRelationTask(seed)
+
+        val inputRelation = requestFactory.buildRelation(seed)
+        val refinementTaskData = resultFactory.buildCreatedRelationTaskClientState(inputRelation, TaskMode.UpdateFromSharingMember)
+
+        val mockedRefinedTask = mockRelationTaskRefinedSuccessfully(mockedCreatedTask.taskId, refinementTaskData.businessPartnerRelationsResult, seed)
+
+        return mockedRefinedTask
+    }
+
     fun mockCreateTask(seed: String): TaskClientStateDto{
         WireMock.configureFor("localhost", orchestratorMockServer.port())
 
@@ -157,6 +174,25 @@ class OrchestratorMockDataFactory(
         return mockedRefinedTasks.tasks.single()
     }
 
+    fun mockRelationTaskRefinedSuccessfully(taskId: String, refinementTaskData: BusinessPartnerRelations, seed: String): TaskClientRelationsStateDto{
+        WireMock.configureFor("localhost", orchestratorMockServer.port())
+
+        WireMock.stubFor(WireMock.get(WireMock.urlPathEqualTo("${BASE_PATH_V7_RELATIONS}/finished-events")).willReturn(WireMock.okJson(
+            jsonMapper.writeValueAsString(
+                FinishedTaskEventsResponse(1, 1, 0, 1, listOf(
+                    FinishedTaskEventsResponse.Event(Instant.now(), ResultState.Success, taskId)
+                ))
+            )
+        )))
+
+        val mockedRefinedTasks = buildSuccessRelationTaskState(seed, refinementTaskData)
+        WireMock.stubFor(WireMock.post(WireMock.urlPathEqualTo("${BASE_PATH_V7_RELATIONS}/state/search")).willReturn(WireMock.okJson(
+            jsonMapper.writeValueAsString(mockedRefinedTasks)
+        )))
+
+        return mockedRefinedTasks.tasks.single()
+    }
+
     fun mockSharingError(seed: String, errorType: TaskErrorType): TaskClientStateDto{
         WireMock.configureFor("localhost", orchestratorMockServer.port())
 
@@ -176,6 +212,20 @@ class OrchestratorMockDataFactory(
         )))
 
         return mockedErrorTasks.tasks.single()
+    }
+
+    fun mockCreateRelationTask(seed: String): TaskClientRelationsStateDto{
+        WireMock.configureFor("localhost", orchestratorMockServer.port())
+
+        val mockedCreatedTaskResponse = buildInitialRelationTaskResponse(seed)
+        val mockedCreatedTask = mockedCreatedTaskResponse.createdTasks.single()
+        WireMock.stubFor(
+            WireMock
+                .post(BASE_PATH_V7_RELATIONS)
+                .willReturn(WireMock.okJson(jsonMapper.writeValueAsString(mockedCreatedTaskResponse)))
+        )
+
+        return mockedCreatedTask
     }
 
     fun mockReservedBusinessPartner(seed: String, businessPartner: BusinessPartner): TaskStepReservationEntryDto{
@@ -234,6 +284,27 @@ class OrchestratorMockDataFactory(
         )
     }
 
+    fun buildInitialRelationTaskResponse(seed: String): TaskCreateRelationsResponse{
+        return TaskCreateRelationsResponse(
+            listOf(
+                TaskClientRelationsStateDto(
+                    UUID.nameUUIDFromBytes("TaskID_$seed".encodeToByteArray()).toString(),
+                    UUID.nameUUIDFromBytes("RecordID_$seed".encodeToByteArray()).toString(),
+                    BusinessPartnerRelations.empty,
+                    TaskProcessingRelationsStateDto(
+                        ResultState.Pending,
+                        TaskStep.CleanAndSync,
+                        StepState.Queued,
+                        emptyList(),
+                        Instant.now(),
+                        Instant.now(),
+                        Instant.now()
+                    )
+                )
+            )
+        )
+    }
+
     fun buildSuccessTaskState(seed: String, finishedBusinessPartner: BusinessPartner): TaskStateResponse{
         return TaskStateResponse(
             listOf(
@@ -242,6 +313,27 @@ class OrchestratorMockDataFactory(
                     UUID.nameUUIDFromBytes("RecordID_$seed".encodeToByteArray()).toString(),
                     finishedBusinessPartner,
                     TaskProcessingStateDto(
+                        ResultState.Success,
+                        TaskStep.PoolSync,
+                        StepState.Success,
+                        emptyList(),
+                        Instant.now(),
+                        Instant.now(),
+                        Instant.now()
+                    )
+                )
+            )
+        )
+    }
+
+    fun buildSuccessRelationTaskState(seed: String, finishedRelation: BusinessPartnerRelations): TaskRelationsStateResponse {
+        return TaskRelationsStateResponse(
+            listOf(
+                TaskClientRelationsStateDto(
+                    UUID.nameUUIDFromBytes("TaskID_$seed".encodeToByteArray()).toString(),
+                    UUID.nameUUIDFromBytes("RecordID_$seed".encodeToByteArray()).toString(),
+                    finishedRelation,
+                    TaskProcessingRelationsStateDto(
                         ResultState.Success,
                         TaskStep.PoolSync,
                         StepState.Success,
