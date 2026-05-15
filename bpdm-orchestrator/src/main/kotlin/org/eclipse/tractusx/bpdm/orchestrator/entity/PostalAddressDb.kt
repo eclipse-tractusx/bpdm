@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.orchestrator.entity
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.hibernate.annotations.Formula
+import org.hibernate.annotations.Type
 
 @Embeddable
 data class PostalAddressDb(
@@ -32,7 +33,10 @@ data class PostalAddressDb(
     @Embedded
     val alternativeAddress: AlternativeAddress,
     @Column(name = "has_changed")
-    val hasChanged: Boolean?
+    val hasChanged: Boolean?,
+    @Type(value = DbTimestampConverter::class)
+    @Column(name = "updated_at")
+    val updatedAt: DbTimestamp? = null
 ) {
     //associate also with equivalent scopes of other entities
     enum class Scope(
