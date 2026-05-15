@@ -81,6 +81,8 @@ abstract class GateTestBaseV7 : GateTestBase(){
     @Autowired
     lateinit var poolMockDataFactory: PoolMockDataFactory
 
+
+
     lateinit var gateClient: GateClient
     lateinit var testDataClient: GateTestDataClientV7
 
@@ -97,7 +99,7 @@ abstract class GateTestBaseV7 : GateTestBase(){
             relationTaskResolutionService,
             relationTaskCreationService,
             poolMockDataFactory,
-            KeyCloakInitializer.TENANT_BPNL
+            tenantBPNL
         )
     }
 }

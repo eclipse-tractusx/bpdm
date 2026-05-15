@@ -36,7 +36,7 @@ import java.time.ZoneOffset
 import kotlin.random.Random
 
 class BusinessPartnerInputRequestV7Factory(
-    private val testMetadata: GateTestMetadataV7
+    val testMetadata: GateTestMetadataV7
 ) {
     fun fromSeed(seed: String): BusinessPartnerInputRequest = SeededCreator(seed).create()
 

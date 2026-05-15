@@ -33,10 +33,11 @@ import org.eclipse.tractusx.bpdm.test.containers.PoolMockContextInitializer
 import tools.jackson.databind.json.JsonMapper
 
 class PoolMockDataFactory(
-    private val requestFactory: BusinessPartnerRequestFactory,
-    private val expectedResultFactory: ExpectedBusinessPartnerResultFactory,
+    val requestFactory: BusinessPartnerRequestFactory,
+    val expectedResultFactory: ExpectedBusinessPartnerResultFactory,
     private val jsonMapper: JsonMapper
 ) {
+
     fun mockLegalEntityAndLegalAddressSearchResult(seed: String): LegalEntityWithLegalAddressVerboseDto{
         configureWireMock()
 
@@ -123,7 +124,8 @@ class PoolMockDataFactory(
 
 
 
-    private fun mockLegalEntitySearchResult(legalEntityResult: LegalEntityWithLegalAddressVerboseDto){
+    fun mockLegalEntitySearchResult(legalEntityResult: LegalEntityWithLegalAddressVerboseDto){
+        WireMock.configureFor("localhost", PoolMockContextInitializer.wiremockServer.port())
 
         val mockedLegalEntityPage = PageDto(1, 1, 0, 1, listOf(legalEntityResult))
         WireMock.stubFor(
@@ -164,7 +166,7 @@ class PoolMockDataFactory(
         val additionalAddress: LogisticAddressVerboseDto
     )
 
-    private fun configureWireMock(){
+    fun configureWireMock(){
         WireMock.configureFor("localhost", PoolMockContextInitializer.wiremockServer.port())
         WireMock.reset()
     }
