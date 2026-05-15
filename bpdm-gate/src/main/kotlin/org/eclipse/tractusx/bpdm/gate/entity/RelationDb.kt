@@ -38,7 +38,8 @@ class RelationDb(
     var tenantBpnL: String,
     @Embedded
     var sharingState: RelationSharingStateDb?,
-    @Embedded
+    @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true, optional = true)
+    @JoinColumn(name = "output_id", foreignKey = ForeignKey(name = "fk_relation_output"))
     var output: RelationOutputDb?
 ) : BaseEntity(){
     companion object{

@@ -19,6 +19,10 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - Script variants and script codes for business partner data [#1593](https://github.com/eclipse-tractusx/bpdm/issues/1593)
 - BPDM Gate: Golden record relations to business partner output [#1630](https://github.com/eclipse-tractusx/bpdm/issues/1630)
 
+### Changed
+
+- BPDM Gate: Fix V7 relation output changelog always showing "UPDATE" type even if the relation output has been created [#1665](https://github.com/eclipse-tractusx/bpdm/issues/1665)
+
 ## [7.3.0] - 2026-03-6
 
 ### BREAKING
