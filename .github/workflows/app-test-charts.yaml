@@ -51,23 +51,12 @@ on:
         default: 'latest'
         required: false
         type: string
-  pull_request:
-    paths:
-      - 'pom.xml'
-      - 'bpdm-**'
-      - 'charts/**'
-      - '.github/workflows/app-test-charts.yaml'
-      - 'docker/**'
   push:
     branches:
       - main
       - release/**
 jobs:
-  build-apps:
-    uses: ./.github/workflows/docker-build-and-cache-all.yaml
-
   execute-tests:
-    needs:  build-apps
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
