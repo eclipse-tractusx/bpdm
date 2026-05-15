@@ -52,8 +52,6 @@
     </modules>
 
     <properties>
-        <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
-        <testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
         <revision>7.4.0-SNAPSHOT</revision>
         <java.version>21</java.version>
         <maven.compiler.source>21</maven.compiler.source>
@@ -312,6 +310,18 @@
                                     <source>src/main/kotlin</source>
                                     <source>target/generated-sources/kapt/compile</source>
                                     <source>target/generated-sources/kaptKotlin</source>
+                                </sourceDirs>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>test-compile</id>
+                            <phase>test-compile</phase>
+                            <goals>
+                                <goal>test-compile</goal>
+                            </goals>
+                            <configuration>
+                                <sourceDirs>
+                                    <sourceDir>src/test/kotlin</sourceDir>
                                 </sourceDirs>
                             </configuration>
                         </execution>
