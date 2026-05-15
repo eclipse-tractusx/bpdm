@@ -210,7 +210,7 @@ class RelationService(
             relationType = relationType,
             sourceBpn = sourceBpnL,
             targetBpn = targetBpnL,
-            updatedAt = Instant.now(),
+            resultUpdatedAt = Instant.now(),
             validityPeriods = validityPeriods.map { RelationValidityPeriodDb(validFrom = it.validFrom, validTo = it.validTo) }.toMutableList(),
             reasonCode =  reasonCode
         )
@@ -358,7 +358,7 @@ class RelationService(
             sourceBpn = entity.output!!.sourceBpn,
             targetBpn = entity.output!!.targetBpn,
             validityPeriods = entity.output!!.validityPeriods.map { it.toDto() },
-            updatedAt = entity.output!!.updatedAt,
+            updatedAt = entity.output!!.resultUpdatedAt,
             reasonCode = entity.output!!.reasonCode
         )
     }
