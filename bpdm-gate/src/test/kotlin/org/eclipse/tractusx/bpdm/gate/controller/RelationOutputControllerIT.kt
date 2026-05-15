@@ -309,7 +309,7 @@ class RelationOutputControllerIT @Autowired constructor(
             relationType = relationType,
             sourceBpn = source,
             targetBpn = target,
-            updatedAt = updatedAt,
+            resultUpdatedAt = updatedAt,
             validityPeriods = GateTestValues.alwaysActiveRelationValidity.map {
                     RelationValidityPeriodDb(
                         validFrom = it.validFrom,
