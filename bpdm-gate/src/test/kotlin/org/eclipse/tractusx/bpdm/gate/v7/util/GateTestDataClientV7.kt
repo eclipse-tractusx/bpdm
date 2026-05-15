@@ -101,6 +101,21 @@ class GateTestDataClientV7(
         return createdTask
     }
 
+    fun createRelationWithOutputs(
+        seed: String,
+        relationType: RelationType,
+        sourceRefine: (BusinessPartnerInputDto) -> Unit,
+        targetRefine: (BusinessPartnerInputDto) -> Unit
+    ): RelationDto {
+        val source = upsertBusinessPartnerInput("$seed Source")
+        val target = upsertBusinessPartnerInput("$seed Target")
+        val request = relationInputRequestV7Factory.fromSeed(seed).copy(relationType = relationType)
+        val relation = upsertRelationInput(request)
+        sourceRefine(source)
+        targetRefine(target)
+        return relation
+    }
+
     fun createRelationInputWithRefinedLegalEntityBPs(seed: String, relationType: RelationType = RelationType.IsManagedBy): RelationDto {
         val source = upsertBusinessPartnerInput("$seed Source")
         val target = upsertBusinessPartnerInput("$seed Target")

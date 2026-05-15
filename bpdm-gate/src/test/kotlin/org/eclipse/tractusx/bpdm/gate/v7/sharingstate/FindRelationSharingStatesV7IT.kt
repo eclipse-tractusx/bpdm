@@ -276,4 +276,242 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
         //THEN
         assertRepo.assertRelationSharingStatePageMetadata(response, totalElements = 2L, totalPages = 1, page = 1, contentSize = 0)
     }
+
+    /**
+     * GIVEN an IsManagedBy relation where the source has a legal entity output and the target has a site output,
+     *   and the golden record task creation has been triggered
+     * WHEN input consumer searches for the relation sharing state
+     * THEN the sharing state shows Error because IsManagedBy requires both sides to be legal entities
+     */
+    @Test
+    fun `IsManagedBy between legal entity source and site target leads to sharing error`() {
+        //GIVEN
+        val relation = testDataClient.createRelationWithOutputs(testName, RelationType.IsManagedBy,
+            { testDataClient.refineToLegalEntity(it) },
+            { testDataClient.refineToSite(it) }
+        )
+        relationTaskCreationService.sendTasks()
+
+        //WHEN
+        val actual = gateClient.relationSharingState.get(externalIds = listOf(relation.externalId))
+
+        //THEN
+        val expected = expectedErrorState(relation.externalId)
+        assertRepo.assertRelationSharingStates(actual, PageDto(1L, 1, 0, 1, listOf(expected)))
+    }
+
+    /**
+     * GIVEN an IsManagedBy relation where the source has a site output and the target has a legal entity output,
+     *   and the golden record task creation has been triggered
+     * WHEN input consumer searches for the relation sharing state
+     * THEN the sharing state shows Error because IsManagedBy requires both sides to be legal entities
+     */
+    @Test
+    fun `IsManagedBy between site source and legal entity target leads to sharing error`() {
+        //GIVEN
+        val relation = testDataClient.createRelationWithOutputs(testName, RelationType.IsManagedBy,
+            { testDataClient.refineToSite(it) },
+            { testDataClient.refineToLegalEntity(it) }
+        )
+        relationTaskCreationService.sendTasks()
+
+        //WHEN
+        val actual = gateClient.relationSharingState.get(externalIds = listOf(relation.externalId))
+
+        //THEN
+        val expected = expectedErrorState(relation.externalId)
+        assertRepo.assertRelationSharingStates(actual, PageDto(1L, 1, 0, 1, listOf(expected)))
+    }
+
+    /**
+     * GIVEN an IsManagedBy relation where the source has a legal entity output and the target has an additional address output,
+     *   and the golden record task creation has been triggered
+     * WHEN input consumer searches for the relation sharing state
+     * THEN the sharing state shows Error because IsManagedBy requires both sides to be legal entities
+     */
+    @Test
+    fun `IsManagedBy between legal entity source and additional address target leads to sharing error`() {
+        //GIVEN
+        val relation = testDataClient.createRelationWithOutputs(testName, RelationType.IsManagedBy,
+            { testDataClient.refineToLegalEntity(it) },
+            { testDataClient.refineToAdditionalAddressOfSite(it) }
+        )
+        relationTaskCreationService.sendTasks()
+
+        //WHEN
+        val actual = gateClient.relationSharingState.get(externalIds = listOf(relation.externalId))
+
+        //THEN
+        val expected = expectedErrorState(relation.externalId)
+        assertRepo.assertRelationSharingStates(actual, PageDto(1L, 1, 0, 1, listOf(expected)))
+    }
+
+    /**
+     * GIVEN an IsManagedBy relation where the source has an additional address output and the target has a legal entity output,
+     *   and the golden record task creation has been triggered
+     * WHEN input consumer searches for the relation sharing state
+     * THEN the sharing state shows Error because IsManagedBy requires both sides to be legal entities
+     */
+    @Test
+    fun `IsManagedBy between additional address source and legal entity target leads to sharing error`() {
+        //GIVEN
+        val relation = testDataClient.createRelationWithOutputs(testName, RelationType.IsManagedBy,
+            { testDataClient.refineToAdditionalAddressOfSite(it) },
+            { testDataClient.refineToLegalEntity(it) }
+        )
+        relationTaskCreationService.sendTasks()
+
+        //WHEN
+        val actual = gateClient.relationSharingState.get(externalIds = listOf(relation.externalId))
+
+        //THEN
+        val expected = expectedErrorState(relation.externalId)
+        assertRepo.assertRelationSharingStates(actual, PageDto(1L, 1, 0, 1, listOf(expected)))
+    }
+
+    /**
+     * GIVEN an IsOwnedBy relation where both source and target have site outputs,
+     *   and the golden record task creation has been triggered
+     * WHEN input consumer searches for the relation sharing state
+     * THEN the sharing state shows Error because IsOwnedBy requires both sides to be legal entities
+     */
+    @Test
+    fun `IsOwnedBy between two sites leads to sharing error`() {
+        //GIVEN
+        val relation = testDataClient.createRelationWithOutputs(testName, RelationType.IsOwnedBy,
+            { testDataClient.refineToSite(it) },
+            { testDataClient.refineToSite(it) }
+        )
+        relationTaskCreationService.sendTasks()
+
+        //WHEN
+        val actual = gateClient.relationSharingState.get(externalIds = listOf(relation.externalId))
+
+        //THEN
+        val expected = expectedErrorState(relation.externalId)
+        assertRepo.assertRelationSharingStates(actual, PageDto(1L, 1, 0, 1, listOf(expected)))
+    }
+
+    /**
+     * GIVEN an IsAlternativeHeadquarterFor relation where both source and target have additional address outputs,
+     *   and the golden record task creation has been triggered
+     * WHEN input consumer searches for the relation sharing state
+     * THEN the sharing state shows Error because IsAlternativeHeadquarterFor requires both sides to be legal entities
+     */
+    @Test
+    fun `IsAlternativeHeadquarterFor between two additional addresses leads to sharing error`() {
+        //GIVEN
+        val relation = testDataClient.createRelationWithOutputs(testName, RelationType.IsAlternativeHeadquarterFor,
+            { testDataClient.refineToAdditionalAddressOfSite(it) },
+            { testDataClient.refineToAdditionalAddressOfSite(it) }
+        )
+        relationTaskCreationService.sendTasks()
+
+        //WHEN
+        val actual = gateClient.relationSharingState.get(externalIds = listOf(relation.externalId))
+
+        //THEN
+        val expected = expectedErrorState(relation.externalId)
+        assertRepo.assertRelationSharingStates(actual, PageDto(1L, 1, 0, 1, listOf(expected)))
+    }
+
+    /**
+     * GIVEN an IsReplacedBy relation where both source and target have legal entity outputs,
+     *   and the golden record task creation has been triggered
+     * WHEN input consumer searches for the relation sharing state
+     * THEN the sharing state shows Error because IsReplacedBy requires one side to be a legal entity and the other an additional address
+     */
+    @Test
+    fun `IsReplacedBy between two legal entities leads to sharing error`() {
+        //GIVEN
+        val relation = testDataClient.createRelationWithOutputs(testName, RelationType.IsReplacedBy,
+            { testDataClient.refineToLegalEntity(it) },
+            { testDataClient.refineToLegalEntity(it) }
+        )
+        relationTaskCreationService.sendTasks()
+
+        //WHEN
+        val actual = gateClient.relationSharingState.get(externalIds = listOf(relation.externalId))
+
+        //THEN
+        val expected = expectedErrorState(relation.externalId)
+        assertRepo.assertRelationSharingStates(actual, PageDto(1L, 1, 0, 1, listOf(expected)))
+    }
+
+    /**
+     * GIVEN an IsReplacedBy relation where the source has a site output and the target has an additional address output,
+     *   and the golden record task creation has been triggered
+     * WHEN input consumer searches for the relation sharing state
+     * THEN the sharing state shows Error because IsReplacedBy requires the non-additional side to be a legal entity, not a site
+     */
+    @Test
+    fun `IsReplacedBy between site source and additional address target leads to sharing error`() {
+        //GIVEN
+        val relation = testDataClient.createRelationWithOutputs(testName, RelationType.IsReplacedBy,
+            { testDataClient.refineToSite(it) },
+            { testDataClient.refineToAdditionalAddressOfSite(it) }
+        )
+        relationTaskCreationService.sendTasks()
+
+        //WHEN
+        val actual = gateClient.relationSharingState.get(externalIds = listOf(relation.externalId))
+
+        //THEN
+        val expected = expectedErrorState(relation.externalId)
+        assertRepo.assertRelationSharingStates(actual, PageDto(1L, 1, 0, 1, listOf(expected)))
+    }
+
+    /**
+     * GIVEN an IsReplacedBy relation where the source has a legal entity output and the target has a site output,
+     *   and the golden record task creation has been triggered
+     * WHEN input consumer searches for the relation sharing state
+     * THEN the sharing state shows Error because IsReplacedBy requires the non-legal-entity side to be an additional address, not a site
+     */
+    @Test
+    fun `IsReplacedBy between legal entity source and site target leads to sharing error`() {
+        //GIVEN
+        val relation = testDataClient.createRelationWithOutputs(testName, RelationType.IsReplacedBy,
+            { testDataClient.refineToLegalEntity(it) },
+            { testDataClient.refineToSite(it) }
+        )
+        relationTaskCreationService.sendTasks()
+
+        //WHEN
+        val actual = gateClient.relationSharingState.get(externalIds = listOf(relation.externalId))
+
+        //THEN
+        val expected = expectedErrorState(relation.externalId)
+        assertRepo.assertRelationSharingStates(actual, PageDto(1L, 1, 0, 1, listOf(expected)))
+    }
+
+    /**
+     * GIVEN an IsReplacedBy relation where both source and target have additional address outputs,
+     *   and the golden record task creation has been triggered
+     * WHEN input consumer searches for the relation sharing state
+     * THEN the sharing state shows Error because IsReplacedBy requires one side to be a legal entity
+     */
+    @Test
+    fun `IsReplacedBy between two additional addresses leads to sharing error`() {
+        //GIVEN
+        val relation = testDataClient.createRelationWithOutputs(testName, RelationType.IsReplacedBy,
+            { testDataClient.refineToAdditionalAddressOfSite(it) },
+            { testDataClient.refineToAdditionalAddressOfSite(it) }
+        )
+        relationTaskCreationService.sendTasks()
+
+        //WHEN
+        val actual = gateClient.relationSharingState.get(externalIds = listOf(relation.externalId))
+
+        //THEN
+        val expected = expectedErrorState(relation.externalId)
+        assertRepo.assertRelationSharingStates(actual, PageDto(1L, 1, 0, 1, listOf(expected)))
+    }
+
+    private fun expectedErrorState(externalId: String) = RelationSharingStateDto(
+        externalId = externalId,
+        sharingStateType = RelationSharingStateType.Error,
+        sharingErrorCode = RelationSharingStateErrorCode.SharingProcessError,
+        taskId = null,
+        updatedAt = Instant.MIN
+    )
 }

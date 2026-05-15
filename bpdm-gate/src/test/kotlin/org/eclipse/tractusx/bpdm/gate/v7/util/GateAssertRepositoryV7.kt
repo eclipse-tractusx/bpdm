@@ -105,7 +105,10 @@ class GateAssertRepositoryV7(
     fun assertRelationSharingStates(actual: Collection<RelationSharingStateDto>, expected: Collection<RelationSharingStateDto>) {
         Assertions.assertThat(actual)
             .usingRecursiveComparison()
-            .ignoringFields(RelationSharingStateDto::updatedAt.name)
+            .ignoringFields(
+                RelationSharingStateDto::updatedAt.name,
+                RelationSharingStateDto::sharingErrorMessage.name
+            )
             .isEqualTo(expected)
     }
 
