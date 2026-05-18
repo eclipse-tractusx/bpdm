@@ -20,24 +20,10 @@
 package org.eclipse.tractusx.bpdm.gate.config
 
 import com.neovisionaries.i18n.CountryCode
-import org.eclipse.tractusx.bpdm.pool.api.model.CountrySubdivisionDto
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDto
-import org.eclipse.tractusx.bpdm.pool.api.model.ReasonCodeDto
-import org.eclipse.tractusx.bpdm.pool.api.model.ScriptCodeDto
+import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.test.testdata.GoldenRecordMockFactory
-import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.BusinessPartnerTestDataFactory
-import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorExpectedResultFactoryV7
-import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
-import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorRequestFactoryCommon
-import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorRequestFactoryV7
-import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.RefinementTestDataFactory
-import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.TestMetadataReferences
-import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerRequestFactory
-import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerVerboseValues
-import org.eclipse.tractusx.bpdm.test.testdata.pool.ExpectedBusinessPartnerResultFactory
-import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolMockDataFactory
-import org.eclipse.tractusx.bpdm.test.testdata.pool.TestMetadataV7
+import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.*
+import org.eclipse.tractusx.bpdm.test.testdata.pool.*
 import org.eclipse.tractusx.orchestrator.api.model.TaskMode
 import org.eclipse.tractusx.orchestrator.api.model.TaskStep
 import org.springframework.context.annotation.Bean

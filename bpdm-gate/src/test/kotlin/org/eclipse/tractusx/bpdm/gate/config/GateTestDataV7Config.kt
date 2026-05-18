@@ -22,14 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.config
 import org.eclipse.tractusx.bpdm.gate.v7.util.GateAssertRepositoryV7
 import org.eclipse.tractusx.bpdm.test.testdata.gate.GateInputFactory
 import org.eclipse.tractusx.bpdm.test.testdata.gate.TestMetadata
-import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.BusinessPartnerInputDtoV7Factory
-import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.BusinessPartnerInputRequestV7Factory
-import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.BusinessPartnerOutputDtoV7Factory
-import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.GateTestMetadataV7
-import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.TestDataFactoryGateV7
-import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.PageChangeLogV7Factory
-import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.RelationInputRequestV7Factory
-import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.RelationOutputDtoV7Factory
+import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.*
 import org.eclipse.tractusx.bpdm.test.util.InstantSecondsComparator
 import org.eclipse.tractusx.bpdm.test.util.LocalDatetimeSecondsComparator
 import org.springframework.context.annotation.Bean

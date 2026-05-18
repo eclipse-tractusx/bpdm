@@ -19,26 +19,20 @@
 
 package org.eclipse.tractusx.bpdm.gate.config
 
-import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.gate.api.v6.client.GateClientV6
 import org.eclipse.tractusx.bpdm.gate.service.TaskCreationBatchService
 import org.eclipse.tractusx.bpdm.gate.service.TaskResolutionBatchService
 import org.eclipse.tractusx.bpdm.gate.v6.util.GateTestDataClientV6
-import org.eclipse.tractusx.bpdm.pool.api.model.CountrySubdivisionDto
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDto
-import org.eclipse.tractusx.bpdm.pool.api.model.ScriptCodeDto
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.gate.GateInputFactory
 import org.eclipse.tractusx.bpdm.test.testdata.gate.TestMetadata
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v6.ExpectedGateResultV6Factory
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v6.GateTestDataFactoryV6
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
-import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.RefinementTestDataFactory
-import org.eclipse.tractusx.bpdm.test.testdata.pool.*
+import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolMockDataFactory
+import org.eclipse.tractusx.bpdm.test.testdata.pool.TestMetadataV7
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import tools.jackson.databind.json.JsonMapper
 
 @Configuration
 class GateTestDataV6Config {

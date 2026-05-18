@@ -19,20 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.config
 
-import com.neovisionaries.i18n.CountryCode
-import org.eclipse.tractusx.bpdm.pool.api.model.CountrySubdivisionDto
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDto
-import org.eclipse.tractusx.bpdm.pool.api.model.ReasonCodeDto
-import org.eclipse.tractusx.bpdm.pool.api.model.ScriptCodeDto
-import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerRequestFactory
-import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerVerboseValues
-import org.eclipse.tractusx.bpdm.test.testdata.pool.ExpectedBusinessPartnerResultFactory
-import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolMockDataFactory
-import org.eclipse.tractusx.bpdm.test.testdata.pool.TestMetadataV7
-import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import tools.jackson.databind.json.JsonMapper
 
 @Configuration
 class PoolMockConfig {
