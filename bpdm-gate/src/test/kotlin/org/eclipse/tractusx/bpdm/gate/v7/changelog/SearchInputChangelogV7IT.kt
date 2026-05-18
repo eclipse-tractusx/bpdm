@@ -61,7 +61,7 @@ class SearchInputChangelogV7IT : UnscheduledGateTestBaseV7() {
         //GIVEN
         testDataClient.upsertBusinessPartnerInput(testName)
         testDataClient.upsertBusinessPartnerInput(
-            businessPartnerInputRequestFactory.fromSeed("Updated $testName").copy(externalId = testName)
+            testData.businessPartner.input.request.fromSeed("Updated $testName").copy(externalId = testName)
         )
 
         //WHEN

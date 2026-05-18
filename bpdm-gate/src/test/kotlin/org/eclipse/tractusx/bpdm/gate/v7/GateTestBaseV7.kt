@@ -33,6 +33,7 @@ import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.BusinessPartnerInputDtoV7Factory
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.BusinessPartnerInputRequestV7Factory
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.BusinessPartnerOutputDtoV7Factory
+import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.TestDataFactoryGateV7
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.PageChangeLogV7Factory
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.RelationInputRequestV7Factory
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.RelationOutputDtoV7Factory
@@ -48,20 +49,8 @@ abstract class GateTestBaseV7 : GateTestBase(){
     lateinit var assertRepo: GateAssertRepositoryV7
     @Autowired
     lateinit var testClientProvider: GateTestClientProviderV7
-
-    //gate test data Factories
     @Autowired
-    lateinit var relationInputRequestFactory: RelationInputRequestV7Factory
-    @Autowired
-    lateinit var businessPartnerInputRequestFactory: BusinessPartnerInputRequestV7Factory
-    @Autowired
-    lateinit var businessPartnerInputFactory: BusinessPartnerInputDtoV7Factory
-    @Autowired
-    lateinit var pageChangeLogFactory: PageChangeLogV7Factory
-    @Autowired
-    lateinit var businessPartnerOutputFactory: BusinessPartnerOutputDtoV7Factory
-    @Autowired
-    lateinit var relationOutputFactory: RelationOutputDtoV7Factory
+    lateinit var testData: TestDataFactoryGateV7
 
     //gate services
     @Autowired
@@ -81,8 +70,6 @@ abstract class GateTestBaseV7 : GateTestBase(){
     @Autowired
     lateinit var poolMockDataFactory: PoolMockDataFactory
 
-
-
     lateinit var gateClient: GateClient
     lateinit var testDataClient: GateTestDataClientV7
 
@@ -91,8 +78,7 @@ abstract class GateTestBaseV7 : GateTestBase(){
         gateClient = testClientProvider.createClient(KeyCloakInitializer.CLIENT_ID_OPERATOR)
         testDataClient = GateTestDataClientV7(
             gateClient,
-            businessPartnerInputRequestFactory,
-            relationInputRequestFactory,
+            testData,
             orchestratorMockDataFactory,
             taskCreationBatchService,
             taskResolutionBatchService,

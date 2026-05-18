@@ -49,7 +49,7 @@ class SearchRelationOutputChangelogV7IT : UnscheduledGateTestBaseV7() {
         val response = gateClient.relationChangelog.getOutputChangelog(PaginationRequest(), ChangelogSearchRequest())
 
         //THEN
-        val expected = pageChangeLogFactory.ofOnePageWithoutInvalids(
+        val expected = testData.changelog.ofOnePage(
             ChangelogGateDto(relationInput.externalId, anyTime, ChangelogType.CREATE)
         )
         assertRepo.assertChangelog(response, expected)
@@ -70,7 +70,7 @@ class SearchRelationOutputChangelogV7IT : UnscheduledGateTestBaseV7() {
         val response = gateClient.relationChangelog.getOutputChangelog(PaginationRequest(), ChangelogSearchRequest())
 
         //THEN
-        val expected = pageChangeLogFactory.ofOnePageWithoutInvalids(
+        val expected = testData.changelog.ofOnePage(
             ChangelogGateDto(relationInput.externalId, anyTime, ChangelogType.CREATE),
             ChangelogGateDto(relationInput.externalId, anyTime, ChangelogType.UPDATE)
         )
@@ -94,7 +94,7 @@ class SearchRelationOutputChangelogV7IT : UnscheduledGateTestBaseV7() {
         val response = gateClient.relationChangelog.getOutputChangelog(PaginationRequest(), request)
 
         //THEN
-        val expected = pageChangeLogFactory.ofOnePageWithoutInvalids(
+        val expected = testData.changelog.ofOnePage(
             ChangelogGateDto(rel1.externalId, anyTime, ChangelogType.CREATE)
         )
         assertRepo.assertChangelog(response, expected)
@@ -120,7 +120,7 @@ class SearchRelationOutputChangelogV7IT : UnscheduledGateTestBaseV7() {
         val response = gateClient.relationChangelog.getOutputChangelog(PaginationRequest(), request)
 
         //THEN
-        val expected = pageChangeLogFactory.ofOnePageWithoutInvalids(
+        val expected = testData.changelog.ofOnePage(
             ChangelogGateDto(rel3.externalId, anyTime, ChangelogType.CREATE)
         )
         assertRepo.assertChangelog(response, expected)
@@ -146,7 +146,7 @@ class SearchRelationOutputChangelogV7IT : UnscheduledGateTestBaseV7() {
         val response = gateClient.relationChangelog.getOutputChangelog(PaginationRequest(), request)
 
         //THEN
-        val expected = pageChangeLogFactory.ofOnePageWithoutInvalids(
+        val expected = testData.changelog.ofOnePage(
             ChangelogGateDto(relA.externalId, anyTime, ChangelogType.UPDATE)
         )
         assertRepo.assertChangelog(response, expected)

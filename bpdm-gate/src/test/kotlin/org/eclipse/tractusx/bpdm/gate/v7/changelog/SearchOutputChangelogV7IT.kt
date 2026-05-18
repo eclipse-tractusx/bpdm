@@ -49,7 +49,7 @@ class SearchOutputChangelogV7IT: UnscheduledGateTestBaseV7() {
 
         //THEN
         val expectedEntry = ChangelogGateDto(testName, anyTime, ChangelogType.CREATE)
-        val expected = pageChangeLogFactory.ofOnePageWithoutInvalids(expectedEntry)
+        val expected = testData.changelog.ofOnePage(expectedEntry)
 
         assertRepo.assertChangelog(response, expected)
     }
@@ -71,7 +71,7 @@ class SearchOutputChangelogV7IT: UnscheduledGateTestBaseV7() {
         val response = gateClient.changelog.getOutputChangelog(PaginationRequest(), ChangelogSearchRequest())
 
         //THEN
-        val expected = pageChangeLogFactory.ofOnePageWithoutInvalids(
+        val expected = testData.changelog.ofOnePage(
             ChangelogGateDto(testName, anyTime, ChangelogType.CREATE),
             ChangelogGateDto(testName, anyTime, ChangelogType.UPDATE)
         )
@@ -96,7 +96,7 @@ class SearchOutputChangelogV7IT: UnscheduledGateTestBaseV7() {
         val response = gateClient.changelog.getOutputChangelog(PaginationRequest(), request)
 
         //THEN
-        val expected = pageChangeLogFactory.ofOnePageWithoutInvalids(
+        val expected = testData.changelog.ofOnePage(
             ChangelogGateDto(outputToBeFound.externalId, anyTime, ChangelogType.CREATE)
         )
         assertRepo.assertChangelog(response, expected)
@@ -122,7 +122,7 @@ class SearchOutputChangelogV7IT: UnscheduledGateTestBaseV7() {
         val response = gateClient.changelog.getOutputChangelog(PaginationRequest(), request)
 
         //THEN
-        val expected = pageChangeLogFactory.ofOnePageWithoutInvalids(
+        val expected = testData.changelog.ofOnePage(
             ChangelogGateDto(outputAfterTimeX.externalId, anyTime, ChangelogType.CREATE)
         )
         assertRepo.assertChangelog(response, expected)
@@ -148,7 +148,7 @@ class SearchOutputChangelogV7IT: UnscheduledGateTestBaseV7() {
         val response = gateClient.changelog.getOutputChangelog(PaginationRequest(), request)
 
         //THEN
-        val expected = pageChangeLogFactory.ofOnePageWithoutInvalids(
+        val expected = testData.changelog.ofOnePage(
             ChangelogGateDto(outputA.externalId, anyTime, ChangelogType.UPDATE)
         )
         assertRepo.assertChangelog(response, expected)

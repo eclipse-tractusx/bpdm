@@ -49,7 +49,7 @@ class SearchOutputRelationV7IT: UnscheduledGateTestBaseV7(){
         val response = gateClient.relationOutput.postSearch()
 
         //THEN
-        val expectedOutput = relationOutputFactory.fromGoldenRecord(relationInput.externalId, relationGoldenRecord)
+        val expectedOutput = testData.relation.output.fromGoldenRecord(relationInput.externalId, relationGoldenRecord)
         val expectedResponse = PageDto(1, 1, 0, 1, listOf(expectedOutput))
 
         assertRepo.assertRelationOutput(response, expectedResponse)
@@ -73,7 +73,7 @@ class SearchOutputRelationV7IT: UnscheduledGateTestBaseV7(){
         val response = gateClient.relationOutput.postSearch()
 
         //THEN
-        val expectedOutput = relationOutputFactory.fromGoldenRecord(relationInput.externalId, relationGoldenRecord)
+        val expectedOutput = testData.relation.output.fromGoldenRecord(relationInput.externalId, relationGoldenRecord)
         val expectedResponse = PageDto(1, 1, 0, 1, listOf(expectedOutput))
 
         assertRepo.assertRelationOutput(response, expectedResponse)
@@ -95,7 +95,7 @@ class SearchOutputRelationV7IT: UnscheduledGateTestBaseV7(){
         val response = gateClient.relationOutput.postSearch()
 
         //THEN
-        val expectedOutput = relationOutputFactory.fromGoldenRecord(relationInput.externalId, relationGoldenRecord)
+        val expectedOutput = testData.relation.output.fromGoldenRecord(relationInput.externalId, relationGoldenRecord)
         val expectedResponse = PageDto(1, 1, 0, 1, listOf(expectedOutput))
 
         assertRepo.assertRelationOutput(response, expectedResponse)
@@ -133,7 +133,7 @@ class SearchOutputRelationV7IT: UnscheduledGateTestBaseV7(){
         val response = gateClient.relationOutput.postSearch(RelationOutputSearchRequest(externalIds = listOf(inquired.externalId)))
 
         //THEN
-        val expectedOutput = relationOutputFactory.fromGoldenRecord(inquired.externalId, goldenRecord)
+        val expectedOutput = testData.relation.output.fromGoldenRecord(inquired.externalId, goldenRecord)
         assertRepo.assertRelationOutput(response, PageDto(1, 1, 0, 1, listOf(expectedOutput)))
     }
 
@@ -156,8 +156,8 @@ class SearchOutputRelationV7IT: UnscheduledGateTestBaseV7(){
 
         //THEN
         val expectedOutputs = listOf(
-            relationOutputFactory.fromGoldenRecord(rel1.externalId, golden1),
-            relationOutputFactory.fromGoldenRecord(rel2.externalId, golden2)
+            testData.relation.output.fromGoldenRecord(rel1.externalId, golden1),
+            testData.relation.output.fromGoldenRecord(rel2.externalId, golden2)
         )
         assertRepo.assertRelationOutput(response, PageDto(2, 1, 0, 2, expectedOutputs))
     }
@@ -181,9 +181,9 @@ class SearchOutputRelationV7IT: UnscheduledGateTestBaseV7(){
 
         //THEN
         val allOutputs = listOf(
-            relationOutputFactory.fromGoldenRecord(rel1.externalId, golden1),
-            relationOutputFactory.fromGoldenRecord(rel2.externalId, golden2),
-            relationOutputFactory.fromGoldenRecord(rel3.externalId, golden3)
+            testData.relation.output.fromGoldenRecord(rel1.externalId, golden1),
+            testData.relation.output.fromGoldenRecord(rel2.externalId, golden2),
+            testData.relation.output.fromGoldenRecord(rel3.externalId, golden3)
         )
         val expectedOutputs = allOutputs.filter { it.relationType == filterType }
         assertRepo.assertRelationOutput(response, PageDto(expectedOutputs.size.toLong(), 1, 0, expectedOutputs.size, expectedOutputs))
@@ -207,7 +207,7 @@ class SearchOutputRelationV7IT: UnscheduledGateTestBaseV7(){
         )
 
         //THEN
-        val expectedOutput = relationOutputFactory.fromGoldenRecord(inquired.externalId, goldenRecord)
+        val expectedOutput = testData.relation.output.fromGoldenRecord(inquired.externalId, goldenRecord)
         assertRepo.assertRelationOutput(response, PageDto(1, 1, 0, 1, listOf(expectedOutput)))
     }
 
@@ -230,8 +230,8 @@ class SearchOutputRelationV7IT: UnscheduledGateTestBaseV7(){
 
         //THEN
         val expectedOutputs = listOf(
-            relationOutputFactory.fromGoldenRecord(rel1.externalId, golden1),
-            relationOutputFactory.fromGoldenRecord(rel2.externalId, golden2)
+            testData.relation.output.fromGoldenRecord(rel1.externalId, golden1),
+            testData.relation.output.fromGoldenRecord(rel2.externalId, golden2)
         )
         assertRepo.assertRelationOutput(response, PageDto(2, 1, 0, 2, expectedOutputs))
     }
@@ -254,7 +254,7 @@ class SearchOutputRelationV7IT: UnscheduledGateTestBaseV7(){
         )
 
         //THEN
-        val expectedOutput = relationOutputFactory.fromGoldenRecord(inquired.externalId, goldenRecord)
+        val expectedOutput = testData.relation.output.fromGoldenRecord(inquired.externalId, goldenRecord)
         assertRepo.assertRelationOutput(response, PageDto(1, 1, 0, 1, listOf(expectedOutput)))
     }
 
@@ -277,8 +277,8 @@ class SearchOutputRelationV7IT: UnscheduledGateTestBaseV7(){
 
         //THEN
         val expectedOutputs = listOf(
-            relationOutputFactory.fromGoldenRecord(rel1.externalId, golden1),
-            relationOutputFactory.fromGoldenRecord(rel2.externalId, golden2)
+            testData.relation.output.fromGoldenRecord(rel1.externalId, golden1),
+            testData.relation.output.fromGoldenRecord(rel2.externalId, golden2)
         )
         assertRepo.assertRelationOutput(response, PageDto(2, 1, 0, 2, expectedOutputs))
     }
@@ -304,8 +304,8 @@ class SearchOutputRelationV7IT: UnscheduledGateTestBaseV7(){
 
         //THEN
         val expectedOutputs = listOf(
-            relationOutputFactory.fromGoldenRecord(new1.externalId, golden1),
-            relationOutputFactory.fromGoldenRecord(new2.externalId, golden2)
+            testData.relation.output.fromGoldenRecord(new1.externalId, golden1),
+            testData.relation.output.fromGoldenRecord(new2.externalId, golden2)
         )
         assertRepo.assertRelationOutput(response, PageDto(2, 1, 0, 2, expectedOutputs))
     }
@@ -334,7 +334,7 @@ class SearchOutputRelationV7IT: UnscheduledGateTestBaseV7(){
         )
 
         //THEN
-        val expectedOutput = relationOutputFactory.fromGoldenRecord(rel1.externalId, golden1)
+        val expectedOutput = testData.relation.output.fromGoldenRecord(rel1.externalId, golden1)
         assertRepo.assertRelationOutput(response, PageDto(1, 1, 0, 1, listOf(expectedOutput)))
     }
 
@@ -363,7 +363,7 @@ class SearchOutputRelationV7IT: UnscheduledGateTestBaseV7(){
         )
 
         //THEN - new BPNs find the updated output
-        val expectedOutput = relationOutputFactory.fromGoldenRecord(relationInput.externalId, updatedGoldenRecord)
+        val expectedOutput = testData.relation.output.fromGoldenRecord(relationInput.externalId, updatedGoldenRecord)
         assertRepo.assertRelationOutput(responseByNewBpns, PageDto(1, 1, 0, 1, listOf(expectedOutput)))
 
         //THEN - superseded source BPN returns nothing

@@ -26,6 +26,7 @@ import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.BusinessPartnerInputDtoV7
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.BusinessPartnerInputRequestV7Factory
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.BusinessPartnerOutputDtoV7Factory
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.GateTestMetadataV7
+import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.TestDataFactoryGateV7
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.PageChangeLogV7Factory
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.RelationInputRequestV7Factory
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.RelationOutputDtoV7Factory
@@ -100,6 +101,25 @@ class GateTestDataV7Config {
     @Bean
     fun relationOutputDtoV7Factory(): RelationOutputDtoV7Factory {
         return RelationOutputDtoV7Factory()
+    }
+
+    @Bean
+    fun gateV7TestDataFactory(
+        businessPartnerInputRequestV7Factory: BusinessPartnerInputRequestV7Factory,
+        businessPartnerInputDtoV7Factory: BusinessPartnerInputDtoV7Factory,
+        businessPartnerOutputDtoV7Factory: BusinessPartnerOutputDtoV7Factory,
+        relationInputRequestV7Factory: RelationInputRequestV7Factory,
+        relationOutputDtoV7Factory: RelationOutputDtoV7Factory,
+        pageChangeLogV7Factory: PageChangeLogV7Factory
+    ): TestDataFactoryGateV7 {
+        return TestDataFactoryGateV7(
+            businessPartnerInputRequestV7Factory,
+            businessPartnerInputDtoV7Factory,
+            businessPartnerOutputDtoV7Factory,
+            relationInputRequestV7Factory,
+            relationOutputDtoV7Factory,
+            pageChangeLogV7Factory
+        )
     }
 
 }

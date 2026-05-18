@@ -42,7 +42,7 @@ class SearchBusinessPartnerOutputV7IT: UnscheduledGateTestBaseV7() {
         val response = gateClient.businessParters.getBusinessPartnersOutput(listOf(createdInput.externalId))
 
         //THEN
-        val expectedOutput =  businessPartnerOutputFactory.fromLegalEntity(createdInput, legalEntityGoldenRecord)
+        val expectedOutput =  testData.businessPartner.output.fromLegalEntity(createdInput, legalEntityGoldenRecord)
         val expectedResponse = PageDto(1, 1, 0, 1, listOf(expectedOutput))
 
         assertRepo.assertBusinessPartnerOutput(response, expectedResponse)
@@ -64,7 +64,7 @@ class SearchBusinessPartnerOutputV7IT: UnscheduledGateTestBaseV7() {
         val response = gateClient.businessParters.getBusinessPartnersOutput(listOf(createdInput.externalId))
 
         //THEN
-        val expectedOutput = businessPartnerOutputFactory.fromLegalEntityOnSite(createdInput, goldenRecord.legalEntityParent, goldenRecord.site)
+        val expectedOutput = testData.businessPartner.output.fromLegalEntityOnSite(createdInput, goldenRecord.legalEntityParent, goldenRecord.site)
         val expectedResponse = PageDto(1, 1, 0, 1, listOf(expectedOutput))
 
         assertRepo.assertBusinessPartnerOutput(response, expectedResponse)
@@ -86,7 +86,7 @@ class SearchBusinessPartnerOutputV7IT: UnscheduledGateTestBaseV7() {
         val response = gateClient.businessParters.getBusinessPartnersOutput(listOf(createdInput.externalId))
 
         //THEN
-        val expectedOutput = businessPartnerOutputFactory.fromSite(createdInput, goldenRecord.legalEntityParent, goldenRecord.site)
+        val expectedOutput = testData.businessPartner.output.fromSite(createdInput, goldenRecord.legalEntityParent, goldenRecord.site)
         val expectedResponse = PageDto(1, 1, 0, 1, listOf(expectedOutput))
 
         assertRepo.assertBusinessPartnerOutput(response, expectedResponse)
@@ -108,7 +108,7 @@ class SearchBusinessPartnerOutputV7IT: UnscheduledGateTestBaseV7() {
         val response = gateClient.businessParters.getBusinessPartnersOutput(listOf(createdInput.externalId))
 
         //THEN
-        val expectedOutput = businessPartnerOutputFactory.fromAdditionalAddressOnSite(createdInput, goldenRecord.legalEntityParent, goldenRecord.siteParent, goldenRecord.additionalAddress)
+        val expectedOutput = testData.businessPartner.output.fromAdditionalAddressOnSite(createdInput, goldenRecord.legalEntityParent, goldenRecord.siteParent, goldenRecord.additionalAddress)
         val expectedResponse = PageDto(1, 1, 0, 1, listOf(expectedOutput))
 
         assertRepo.assertBusinessPartnerOutput(response, expectedResponse)
@@ -147,7 +147,7 @@ class SearchBusinessPartnerOutputV7IT: UnscheduledGateTestBaseV7() {
         val response = gateClient.businessParters.getBusinessPartnersOutput(listOf(createdInput.externalId, "non-existing-external-id"))
 
         //THEN
-        val expectedOutput = businessPartnerOutputFactory.fromLegalEntity(createdInput, legalEntityGoldenRecord)
+        val expectedOutput = testData.businessPartner.output.fromLegalEntity(createdInput, legalEntityGoldenRecord)
         val expectedResponse = PageDto(1, 1, 0, 1, listOf(expectedOutput))
 
         assertRepo.assertBusinessPartnerOutput(response, expectedResponse)

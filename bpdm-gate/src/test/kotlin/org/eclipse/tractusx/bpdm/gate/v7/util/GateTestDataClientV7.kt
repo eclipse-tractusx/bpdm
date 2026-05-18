@@ -35,8 +35,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAdd
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
 import org.eclipse.tractusx.bpdm.gate.service.RelationTaskCreationService
 import org.eclipse.tractusx.bpdm.gate.service.RelationTaskResolutionService
-import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.BusinessPartnerInputRequestV7Factory
-import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.RelationInputRequestV7Factory
+import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.TestDataFactoryGateV7
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.withRelationType
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolMockDataFactory
@@ -46,8 +45,7 @@ import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsErrorType
 
 class GateTestDataClientV7(
     private val gateClient: GateClient,
-    private val businessPartnerInputRequestV7Factory: BusinessPartnerInputRequestV7Factory,
-    private val relationInputRequestV7Factory: RelationInputRequestV7Factory,
+    private val testDataFactory: TestDataFactoryGateV7,
     private val orchestratorMockDataFactory: OrchestratorMockDataFactory,
     private val taskCreationBatchService: TaskCreationBatchService,
     private val taskResolutionBatchService: TaskResolutionBatchService,
@@ -58,7 +56,7 @@ class GateTestDataClientV7(
 ) {
 
     fun upsertBusinessPartnerInput(seed: String): BusinessPartnerInputDto {
-        val request = businessPartnerInputRequestV7Factory.fromSeed(seed)
+        val request = testDataFactory.businessPartner.input.request.fromSeed(seed)
         return upsertBusinessPartnerInput(request)
     }
 
@@ -71,7 +69,7 @@ class GateTestDataClientV7(
     }
 
     fun upsertRelationInput(externalId: String, source: BusinessPartnerInputDto, target: BusinessPartnerInputDto,  seed: String = externalId): RelationDto {
-        val request = relationInputRequestV7Factory.fromSeed(seed).copy(
+        val request = testDataFactory.relation.input.request.fromSeed(seed).copy(
             businessPartnerSourceExternalId = source.externalId,
             businessPartnerTargetExternalId = target.externalId
         )
@@ -86,7 +84,7 @@ class GateTestDataClientV7(
 
     fun upsertRelationInputWithBusinessPartners(seed: String, relationType: RelationType): RelationDto {
         return upsertRelationInputWithBusinessPartners(
-            relationInputRequestV7Factory.fromSeed(seed).withRelationType(relationType)
+            testDataFactory.relation.input.request.fromSeed(seed).withRelationType(relationType)
         )
     }
 
@@ -109,7 +107,7 @@ class GateTestDataClientV7(
     ): RelationDto {
         val source = upsertBusinessPartnerInput("$seed Source")
         val target = upsertBusinessPartnerInput("$seed Target")
-        val request = relationInputRequestV7Factory.fromSeed(seed).copy(relationType = relationType)
+        val request = testDataFactory.relation.input.request.fromSeed(seed).copy(relationType = relationType)
         val relation = upsertRelationInput(request)
         sourceRefine(source)
         targetRefine(target)
@@ -119,7 +117,7 @@ class GateTestDataClientV7(
     fun createRelationInputWithRefinedLegalEntityBPs(seed: String, relationType: RelationType = RelationType.IsManagedBy): RelationDto {
         val source = upsertBusinessPartnerInput("$seed Source")
         val target = upsertBusinessPartnerInput("$seed Target")
-        val request = relationInputRequestV7Factory.fromSeed(seed).withRelationType(relationType)
+        val request = testDataFactory.relation.input.request.fromSeed(seed).withRelationType(relationType)
         val relationInput = upsertRelationInput(request)
         refineToLegalEntity(source)
         refineToLegalEntity(target)
@@ -177,7 +175,7 @@ class GateTestDataClientV7(
 
     fun updateBusinessPartnerOutput(output: BusinessPartnerOutputDto, newSeed: String): BusinessPartnerOutputDto {
         val upsertedInput = upsertBusinessPartnerInput(
-            businessPartnerInputRequestV7Factory.fromSeed(newSeed).copy(externalId = output.externalId)
+            testDataFactory.businessPartner.input.request.fromSeed(newSeed).copy(externalId = output.externalId)
         )
         return refineToSuccess(upsertedInput)
     }
@@ -249,7 +247,7 @@ class GateTestDataClientV7(
     fun createLegalEntityRelationOutput(seed: String, relationType: RelationType = RelationType.IsManagedBy): Pair<RelationDto, BusinessPartnerRelations> {
         val source = upsertBusinessPartnerInput("$seed Source")
         val target = upsertBusinessPartnerInput("$seed Target")
-        val request = relationInputRequestV7Factory.fromSeed(seed).withRelationType(relationType)
+        val request = testDataFactory.relation.input.request.fromSeed(seed).withRelationType(relationType)
         val relationInput = upsertRelationInput(request)
         refineToLegalEntity(source)
         refineToLegalEntity(target)
@@ -260,7 +258,7 @@ class GateTestDataClientV7(
     fun createAddressRelationOutput(seed: String, relationType: RelationType = RelationType.IsReplacedBy): Pair<RelationDto, BusinessPartnerRelations> {
         val source = upsertBusinessPartnerInput("$seed Source")
         val target = upsertBusinessPartnerInput("$seed Target")
-        val request = relationInputRequestV7Factory.fromSeed(seed).withRelationType(relationType)
+        val request = testDataFactory.relation.input.request.fromSeed(seed).withRelationType(relationType)
         val relationInput = upsertRelationInput(request)
         refineToLegalEntityOnSite(source)
         refineToAdditionalAddressOfSite(target)
@@ -271,7 +269,7 @@ class GateTestDataClientV7(
     fun updateLegalEntityRelationOutput(original: RelationDto, updateSeed: String, relationType: RelationType): BusinessPartnerRelations {
         val newSource = upsertBusinessPartnerInput("$updateSeed Source")
         val newTarget = upsertBusinessPartnerInput("$updateSeed Target")
-        val updatedRequest = relationInputRequestV7Factory.fromSeed(updateSeed).copy(
+        val updatedRequest = testDataFactory.relation.input.request.fromSeed(updateSeed).copy(
             externalId = original.externalId,
             relationType = relationType
         )

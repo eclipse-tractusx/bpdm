@@ -34,11 +34,11 @@ class CreateBusinessPartnerInputV7IT: UnscheduledGateTestBaseV7() {
     @Test
     fun `create empty business partner input`(){
         //WHEN
-        val emptyBusinessPartner= BusinessPartnerInputRequest(externalId = testName)
+        val emptyBusinessPartner = BusinessPartnerInputRequest(externalId = testName)
         val response = gateClient.businessParters.upsertBusinessPartnersInput(listOf(emptyBusinessPartner)).body!!
 
         //THEN
-        val expected = businessPartnerInputFactory.fromRequest(emptyBusinessPartner)
+        val expected = testData.businessPartner.input.response.fromRequest(emptyBusinessPartner)
         assertRepo.assertBusinessPartnerInput(response, listOf(expected))
     }
 
@@ -49,11 +49,11 @@ class CreateBusinessPartnerInputV7IT: UnscheduledGateTestBaseV7() {
     @Test
     fun `create filled business partner input`(){
         //WHEN
-        val request =  businessPartnerInputRequestFactory.fromSeed(testName)
+        val request = testData.businessPartner.input.request.fromSeed(testName)
         val response = gateClient.businessParters.upsertBusinessPartnersInput(listOf(request)).body!!
 
         //THEN
-        val expected = businessPartnerInputFactory.fromRequest(request)
+        val expected = testData.businessPartner.input.response.fromRequest(request)
         assertRepo.assertBusinessPartnerInput(response, listOf(expected))
     }
 
@@ -66,16 +66,16 @@ class CreateBusinessPartnerInputV7IT: UnscheduledGateTestBaseV7() {
     fun `update business partner input`() {
         //GIVEN
         testDataClient.upsertBusinessPartnerInput(
-            businessPartnerInputRequestFactory.fromSeed("Initial $testName")
+            testData.businessPartner.input.request.fromSeed("Initial $testName")
                 .copy(externalId = testName, externalSequenceTimestamp = null)
         )
 
         //WHEN
-        val request = businessPartnerInputRequestFactory.fromSeed("Updated $testName").copy(externalId = testName)
+        val request = testData.businessPartner.input.request.fromSeed("Updated $testName").copy(externalId = testName)
         val response = gateClient.businessParters.upsertBusinessPartnersInput(listOf(request)).body!!
 
         //THEN
-        val expected = businessPartnerInputFactory.fromRequest(request)
+        val expected = testData.businessPartner.input.response.fromRequest(request)
         assertRepo.assertBusinessPartnerInput(response, listOf(expected))
     }
 
@@ -88,19 +88,18 @@ class CreateBusinessPartnerInputV7IT: UnscheduledGateTestBaseV7() {
     fun `update business partner input with newer sequence timestamp`() {
         //GIVEN
         val created = testDataClient.upsertBusinessPartnerInput(
-            businessPartnerInputRequestFactory.fromSeed("Initial $testName").copy(externalId = testName)
+            testData.businessPartner.input.request.fromSeed("Initial $testName").copy(externalId = testName)
         )
 
         //WHEN
-        val request = businessPartnerInputRequestFactory.fromSeed("Updated $testName")
+        val request = testData.businessPartner.input.request.fromSeed("Updated $testName")
             .copy(externalId = testName, externalSequenceTimestamp = created.externalSequenceTimestamp!!.plusSeconds(10))
         val response = gateClient.businessParters.upsertBusinessPartnersInput(listOf(request)).body!!
 
         //THEN
-        val expected = businessPartnerInputFactory.fromRequest(request)
+        val expected = testData.businessPartner.input.response.fromRequest(request)
         assertRepo.assertBusinessPartnerInput(response, listOf(expected))
     }
-
 
     /**
      * GIVEN business partner input
@@ -113,7 +112,7 @@ class CreateBusinessPartnerInputV7IT: UnscheduledGateTestBaseV7() {
         testDataClient.upsertBusinessPartnerInput(testName)
 
         //WHEN
-        val request = businessPartnerInputRequestFactory.fromSeed(testName)
+        val request = testData.businessPartner.input.request.fromSeed(testName)
         val response = gateClient.businessParters.upsertBusinessPartnersInput(listOf(request)).body
 
         //THEN
@@ -129,12 +128,12 @@ class CreateBusinessPartnerInputV7IT: UnscheduledGateTestBaseV7() {
     fun `try update input with earlier external sequence timestamp`() {
         //GIVEN
         val created = testDataClient.upsertBusinessPartnerInput(
-            businessPartnerInputRequestFactory.fromSeed("Initial $testName")
+            testData.businessPartner.input.request.fromSeed("Initial $testName")
                 .copy(externalId = testName, externalSequenceTimestamp = Instant.now())
         )
 
         //WHEN
-        val request = businessPartnerInputRequestFactory.fromSeed("Updated $testName")
+        val request = testData.businessPartner.input.request.fromSeed("Updated $testName")
             .copy(externalId = testName, externalSequenceTimestamp = created.externalSequenceTimestamp!!.minusSeconds(10))
         val response = gateClient.businessParters.upsertBusinessPartnersInput(listOf(request)).body
 
