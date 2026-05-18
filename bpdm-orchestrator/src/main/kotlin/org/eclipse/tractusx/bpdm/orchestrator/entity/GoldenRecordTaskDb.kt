@@ -84,6 +84,8 @@ class GoldenRecordTaskDb(
                 owningCompany = owningCompany.also { businessPartner.owningCompany = it },
                 legalEntityHasChanged = legalEntityHasChanged.also { businessPartner.legalEntityHasChanged = it },
                 siteHasChanged = siteHasChanged.also { businessPartner.siteHasChanged = it },
+                legalEntityUpdatedAt = legalEntityUpdatedAt.also { businessPartner.legalEntityUpdatedAt = it },
+                siteUpdatedAt = siteUpdatedAt.also { businessPartner.siteUpdatedAt = it },
                 addressScriptVariants = addressScriptVariants.also { businessPartner.addressScriptVariants.replace(it) },
                 legalEntityHeaderScriptVariants = legalEntityHeaderScriptVariants.also { businessPartner.legalEntityHeaderScriptVariants.replace(it) },
                 siteHeaderScriptVariants = siteHeaderScriptVariants.also { businessPartner.siteHeaderScriptVariants.replace(it) },
@@ -196,6 +198,12 @@ class GoldenRecordTaskDb(
         var legalEntityHasChanged: Boolean?,
         @Column(name = "site_has_changed")
         var siteHasChanged: Boolean?,
+        @Type(value = DbTimestampConverter::class)
+        @Column(name = "legal_entity_updated_at")
+        var legalEntityUpdatedAt: DbTimestamp? = null,
+        @Type(value = DbTimestampConverter::class)
+        @Column(name = "site_updated_at")
+        var siteUpdatedAt: DbTimestamp? = null,
         @ElementCollection(fetch = FetchType.LAZY)
         @CollectionTable(
             name = "business_partner_address_script_variants",
