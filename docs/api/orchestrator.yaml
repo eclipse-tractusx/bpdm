@@ -686,14 +686,17 @@ components:
             - IsAlternativeHeadquarterFor
             - IsManagedBy
             - IsOwnedBy
-        businessPartnerSourceBpnl:
+            - IsReplacedBy
+        businessPartnerSourceBpn:
           type: string
-        businessPartnerTargetBpnl:
+        businessPartnerTargetBpn:
           type: string
         validityPeriods:
           type: array
           items:
             $ref: "#/components/schemas/RelationValidityPeriod"
+        reasonCode:
+          type: string
     BusinessState:
       type: object
       description: The business state information for the corresponding business partner
@@ -843,6 +846,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/LegalEntityGoldenRecordRelation"
+        updatedAt:
+          type: string
+          format: date-time
         isParticipantData:
           type: boolean
           description: Whether this legal entity is part of the Data Space network
@@ -1014,6 +1020,11 @@ components:
           description: Golden record relations belonging to this address
           items:
             $ref: "#/components/schemas/AddressGoldenRecordRelation"
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when this address was last updated in the source
+            system
     PostalAddressScriptVariant:
       type: object
       properties:
@@ -1074,6 +1085,11 @@ components:
           description: Golden record relations belonging to this address
           items:
             $ref: "#/components/schemas/AddressGoldenRecordRelation"
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when this address was last updated in the source
+            system
         scriptVariants:
           type: array
           items:
@@ -1130,6 +1146,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SiteScriptVariant"
+        updatedAt:
+          type: string
+          format: date-time
         siteMainIsLegalAddress:
           type: boolean
           description: This site's main address is the legal address of the legal
