@@ -90,28 +90,6 @@ class BusinessPartnerOutputDtoV7Factory {
         )
     }
 
-    fun fromAdditionalAddress(
-        input: BusinessPartnerInputDto,
-        legalEntity: LegalEntityWithLegalAddressVerboseDto,
-        additionalAddress: LogisticAddressVerboseDto
-    ): BusinessPartnerOutputDto{
-        return BusinessPartnerOutputDto(
-            externalId = input.externalId,
-            nameParts = input.nameParts,
-            identifiers = additionalAddress.address.identifiers.map { BusinessPartnerIdentifierDto(it.type, it.value, null) },
-            states = additionalAddress.address.states.map { BusinessPartnerStateDto(it.validFrom, it.validTo, it.type) },
-            roles = input.roles,
-            isOwnCompanyData = input.isOwnCompanyData,
-            legalEntity = buildLegalEntityRepresentation(legalEntity.header),
-            site = null,
-            address = buildAddressRepresentation(additionalAddress.address, AddressType.AdditionalAddress),
-            externalSequenceTimestamp = null,
-            scriptVariants = legalEntity.scriptVariants.zip(additionalAddress.scriptVariants){ leScript, addScript -> buildAdditionalAddressScriptVariant(leScript, addScript) },
-            createdAt = Instant.MIN,
-            updatedAt = Instant.MIN
-        )
-    }
-
     fun fromAdditionalAddressOnSite(
         input: BusinessPartnerInputDto,
         legalEntity: LegalEntityWithLegalAddressVerboseDto,
