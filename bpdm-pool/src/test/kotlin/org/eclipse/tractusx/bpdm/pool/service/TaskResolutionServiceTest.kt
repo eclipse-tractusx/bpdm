@@ -26,6 +26,7 @@ import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.service.TaskStepBuildService.CleaningError
+import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockConfiguration
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.*
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolDataHelper
@@ -38,6 +39,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import java.time.Instant
@@ -49,6 +51,7 @@ import java.util.*
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class]
 )
 @ActiveProfiles("test-no-auth")
+@Import(OrchestratorMockConfiguration::class)
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class TaskResolutionServiceTest @Autowired constructor(
     val cleaningStepService: TaskResolutionService,

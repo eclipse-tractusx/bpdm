@@ -26,6 +26,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.AddressRelationType
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateVerboseDto
+import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockConfiguration
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolDataHelper
 import org.eclipse.tractusx.bpdm.test.testdata.pool.TestDataEnvironment
@@ -38,6 +39,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import java.time.LocalDate
@@ -47,6 +49,7 @@ import java.util.*
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class]
 )
 @ActiveProfiles("test-no-auth")
+@Import(OrchestratorMockConfiguration::class)
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class TaskRelationsStepBuildDispatcherServiceIT @Autowired constructor(
     val taskRelationsStepBuildDispatcherService: TaskRelationsStepBuildDispatcherService,
