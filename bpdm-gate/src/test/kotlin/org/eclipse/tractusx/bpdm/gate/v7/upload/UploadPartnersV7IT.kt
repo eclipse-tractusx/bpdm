@@ -75,8 +75,8 @@ class UploadPartnersV7IT: UnscheduledGateTestBaseV7() {
     @Test
     fun `update business partners by CSV`() {
         //GIVEN
-        testDataClient.upsertBusinessPartnerInput(ExpectedResponses.validEntry1.externalId)
-        testDataClient.upsertBusinessPartnerInput(ExpectedResponses.validEntry2.externalId)
+        testDataClient.businessPartner.upsertInput(ExpectedResponses.validEntry1.externalId)
+        testDataClient.businessPartner.upsertInput(ExpectedResponses.validEntry2.externalId)
 
         //WHEN
         val partnerUploadFile = ClassPathResource("testData/valid_partner_data.csv")

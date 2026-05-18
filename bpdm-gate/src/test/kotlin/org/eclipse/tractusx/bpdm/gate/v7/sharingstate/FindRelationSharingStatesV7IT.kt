@@ -40,9 +40,9 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `find relation sharing state by external id`() {
         //GIVEN
-        testDataClient.upsertRelationInputWithBusinessPartners("IGNORED 1 $testName", RelationType.IsManagedBy)
-        testDataClient.upsertRelationInputWithBusinessPartners("IGNORED 2 $testName", RelationType.IsOwnedBy)
-        val relation = testDataClient.upsertRelationInputWithBusinessPartners(testName, RelationType.IsManagedBy)
+        testDataClient.relation.upsertRelationInputWithBusinessPartners("IGNORED 1 $testName", RelationType.IsManagedBy)
+        testDataClient.relation.upsertRelationInputWithBusinessPartners("IGNORED 2 $testName", RelationType.IsOwnedBy)
+        val relation = testDataClient.relation.upsertRelationInputWithBusinessPartners(testName, RelationType.IsManagedBy)
 
         //WHEN
         val actualResponse = gateClient.relationSharingState.get(externalIds = listOf(relation.externalId))
@@ -66,9 +66,9 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `find relation sharing states by multiple external ids`() {
         //GIVEN
-        val rel1 = testDataClient.upsertRelationInputWithBusinessPartners("1 $testName", RelationType.IsManagedBy)
-        val rel2 = testDataClient.upsertRelationInputWithBusinessPartners("2 $testName", RelationType.IsOwnedBy)
-        val rel3 = testDataClient.upsertRelationInputWithBusinessPartners("3 $testName", RelationType.IsAlternativeHeadquarterFor)
+        val rel1 = testDataClient.relation.upsertRelationInputWithBusinessPartners("1 $testName", RelationType.IsManagedBy)
+        val rel2 = testDataClient.relation.upsertRelationInputWithBusinessPartners("2 $testName", RelationType.IsOwnedBy)
+        val rel3 = testDataClient.relation.upsertRelationInputWithBusinessPartners("3 $testName", RelationType.IsAlternativeHeadquarterFor)
 
         //WHEN
         val actualResponse = gateClient.relationSharingState.get(
@@ -96,7 +96,7 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `find ready relation sharing state`() {
         //GIVEN
-        val relation = testDataClient.upsertRelationInputWithBusinessPartners(testName, RelationType.IsManagedBy)
+        val relation = testDataClient.relation.upsertRelationInputWithBusinessPartners(testName, RelationType.IsManagedBy)
 
         //WHEN
         val actualResponse = gateClient.relationSharingState.get()
@@ -120,8 +120,8 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `find pending relation sharing state`() {
         //GIVEN
-        val relation = testDataClient.createRelationInputWithRefinedLegalEntityBPs(testName)
-        val createdTask = testDataClient.setRelationStateToPending(relation.externalId)
+        val relation = testDataClient.relation.createRelationInputWithRefinedLegalEntityBPs(testName)
+        val createdTask = testDataClient.relation.setRelationStateToPending(relation.externalId)
 
         //WHEN
         val actualResponse = gateClient.relationSharingState.get()
@@ -145,8 +145,8 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `find success relation sharing state`() {
         //GIVEN
-        val relation = testDataClient.createRelationInputWithRefinedLegalEntityBPs(testName)
-        val refinedTask = testDataClient.setRelationStateToSuccess(relation.externalId)
+        val relation = testDataClient.relation.createRelationInputWithRefinedLegalEntityBPs(testName)
+        val refinedTask = testDataClient.relation.setRelationStateToSuccess(relation.externalId)
 
         //WHEN
         val actualResponse = gateClient.relationSharingState.get()
@@ -170,8 +170,8 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `find error relation sharing state`() {
         //GIVEN
-        val relation = testDataClient.createRelationInputWithRefinedLegalEntityBPs(testName)
-        val errorTask = testDataClient.setRelationStateToError(relation.externalId, errorType = TaskRelationsErrorType.Unspecified)
+        val relation = testDataClient.relation.createRelationInputWithRefinedLegalEntityBPs(testName)
+        val errorTask = testDataClient.relation.setRelationStateToError(relation.externalId, errorType = TaskRelationsErrorType.Unspecified)
 
         //WHEN
         val actualResponse = gateClient.relationSharingState.get()
@@ -197,10 +197,10 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `filter relation sharing states by sharing state type`() {
         //GIVEN - create relPending with refined BP outputs, move it to Pending, then create relReady (stays Ready)
-        val relPending = testDataClient.createRelationInputWithRefinedLegalEntityBPs("pending $testName")
-        val createdTask = testDataClient.setRelationStateToPending(relPending.externalId)
+        val relPending = testDataClient.relation.createRelationInputWithRefinedLegalEntityBPs("pending $testName")
+        val createdTask = testDataClient.relation.setRelationStateToPending(relPending.externalId)
 
-        val relReady = testDataClient.upsertRelationInputWithBusinessPartners("ready $testName", RelationType.IsOwnedBy)
+        val relReady = testDataClient.relation.upsertRelationInputWithBusinessPartners("ready $testName", RelationType.IsOwnedBy)
 
         //WHEN filter by Pending
         val pendingResponse = gateClient.relationSharingState.get(sharingStateTypes = listOf(RelationSharingStateType.Pending))
@@ -235,9 +235,9 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `paginate relation sharing states across multiple pages`() {
         //GIVEN
-        val rel1 = testDataClient.upsertRelationInputWithBusinessPartners("1 $testName", RelationType.IsManagedBy)
-        val rel2 = testDataClient.upsertRelationInputWithBusinessPartners("2 $testName", RelationType.IsOwnedBy)
-        val rel3 = testDataClient.upsertRelationInputWithBusinessPartners("3 $testName", RelationType.IsAlternativeHeadquarterFor)
+        val rel1 = testDataClient.relation.upsertRelationInputWithBusinessPartners("1 $testName", RelationType.IsManagedBy)
+        val rel2 = testDataClient.relation.upsertRelationInputWithBusinessPartners("2 $testName", RelationType.IsOwnedBy)
+        val rel3 = testDataClient.relation.upsertRelationInputWithBusinessPartners("3 $testName", RelationType.IsAlternativeHeadquarterFor)
 
         //WHEN
         val page0 = gateClient.relationSharingState.get(paginationRequest = PaginationRequest(page = 0, size = 2))
@@ -267,8 +267,8 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `get page beyond available relation sharing states returns empty`() {
         //GIVEN
-        testDataClient.upsertRelationInputWithBusinessPartners("1 $testName", RelationType.IsManagedBy)
-        testDataClient.upsertRelationInputWithBusinessPartners("2 $testName", RelationType.IsOwnedBy)
+        testDataClient.relation.upsertRelationInputWithBusinessPartners("1 $testName", RelationType.IsManagedBy)
+        testDataClient.relation.upsertRelationInputWithBusinessPartners("2 $testName", RelationType.IsOwnedBy)
 
         //WHEN
         val response = gateClient.relationSharingState.get(paginationRequest = PaginationRequest(page = 1, size = 5))
@@ -286,9 +286,9 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `IsManagedBy between legal entity source and site target leads to sharing error`() {
         //GIVEN
-        val relation = testDataClient.createRelationWithOutputs(testName, RelationType.IsManagedBy,
-            { testDataClient.refineToLegalEntity(it) },
-            { testDataClient.refineToSite(it) }
+        val relation = testDataClient.relation.createRelationWithOutputs(testName, RelationType.IsManagedBy,
+            { testDataClient.businessPartner.refineToLegalEntity(it) },
+            { testDataClient.businessPartner.refineToSite(it) }
         )
         relationTaskCreationService.sendTasks()
 
@@ -309,9 +309,9 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `IsManagedBy between site source and legal entity target leads to sharing error`() {
         //GIVEN
-        val relation = testDataClient.createRelationWithOutputs(testName, RelationType.IsManagedBy,
-            { testDataClient.refineToSite(it) },
-            { testDataClient.refineToLegalEntity(it) }
+        val relation = testDataClient.relation.createRelationWithOutputs(testName, RelationType.IsManagedBy,
+            { testDataClient.businessPartner.refineToSite(it) },
+            { testDataClient.businessPartner.refineToLegalEntity(it) }
         )
         relationTaskCreationService.sendTasks()
 
@@ -332,9 +332,9 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `IsManagedBy between legal entity source and additional address target leads to sharing error`() {
         //GIVEN
-        val relation = testDataClient.createRelationWithOutputs(testName, RelationType.IsManagedBy,
-            { testDataClient.refineToLegalEntity(it) },
-            { testDataClient.refineToAdditionalAddressOfSite(it) }
+        val relation = testDataClient.relation.createRelationWithOutputs(testName, RelationType.IsManagedBy,
+            { testDataClient.businessPartner.refineToLegalEntity(it) },
+            { testDataClient.businessPartner.refineToAdditionalAddressOfSite(it) }
         )
         relationTaskCreationService.sendTasks()
 
@@ -355,9 +355,9 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `IsManagedBy between additional address source and legal entity target leads to sharing error`() {
         //GIVEN
-        val relation = testDataClient.createRelationWithOutputs(testName, RelationType.IsManagedBy,
-            { testDataClient.refineToAdditionalAddressOfSite(it) },
-            { testDataClient.refineToLegalEntity(it) }
+        val relation = testDataClient.relation.createRelationWithOutputs(testName, RelationType.IsManagedBy,
+            { testDataClient.businessPartner.refineToAdditionalAddressOfSite(it) },
+            { testDataClient.businessPartner.refineToLegalEntity(it) }
         )
         relationTaskCreationService.sendTasks()
 
@@ -378,9 +378,9 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `IsOwnedBy between two sites leads to sharing error`() {
         //GIVEN
-        val relation = testDataClient.createRelationWithOutputs(testName, RelationType.IsOwnedBy,
-            { testDataClient.refineToSite(it) },
-            { testDataClient.refineToSite(it) }
+        val relation = testDataClient.relation.createRelationWithOutputs(testName, RelationType.IsOwnedBy,
+            { testDataClient.businessPartner.refineToSite(it) },
+            { testDataClient.businessPartner.refineToSite(it) }
         )
         relationTaskCreationService.sendTasks()
 
@@ -401,9 +401,9 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `IsAlternativeHeadquarterFor between two additional addresses leads to sharing error`() {
         //GIVEN
-        val relation = testDataClient.createRelationWithOutputs(testName, RelationType.IsAlternativeHeadquarterFor,
-            { testDataClient.refineToAdditionalAddressOfSite(it) },
-            { testDataClient.refineToAdditionalAddressOfSite(it) }
+        val relation = testDataClient.relation.createRelationWithOutputs(testName, RelationType.IsAlternativeHeadquarterFor,
+            { testDataClient.businessPartner.refineToAdditionalAddressOfSite(it) },
+            { testDataClient.businessPartner.refineToAdditionalAddressOfSite(it) }
         )
         relationTaskCreationService.sendTasks()
 
@@ -424,9 +424,9 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `IsReplacedBy between two legal entities leads to sharing error`() {
         //GIVEN
-        val relation = testDataClient.createRelationWithOutputs(testName, RelationType.IsReplacedBy,
-            { testDataClient.refineToLegalEntity(it) },
-            { testDataClient.refineToLegalEntity(it) }
+        val relation = testDataClient.relation.createRelationWithOutputs(testName, RelationType.IsReplacedBy,
+            { testDataClient.businessPartner.refineToLegalEntity(it) },
+            { testDataClient.businessPartner.refineToLegalEntity(it) }
         )
         relationTaskCreationService.sendTasks()
 
@@ -447,9 +447,9 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `IsReplacedBy between site source and additional address target leads to sharing error`() {
         //GIVEN
-        val relation = testDataClient.createRelationWithOutputs(testName, RelationType.IsReplacedBy,
-            { testDataClient.refineToSite(it) },
-            { testDataClient.refineToAdditionalAddressOfSite(it) }
+        val relation = testDataClient.relation.createRelationWithOutputs(testName, RelationType.IsReplacedBy,
+            { testDataClient.businessPartner.refineToSite(it) },
+            { testDataClient.businessPartner.refineToAdditionalAddressOfSite(it) }
         )
         relationTaskCreationService.sendTasks()
 
@@ -470,9 +470,9 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `IsReplacedBy between legal entity source and site target leads to sharing error`() {
         //GIVEN
-        val relation = testDataClient.createRelationWithOutputs(testName, RelationType.IsReplacedBy,
-            { testDataClient.refineToLegalEntity(it) },
-            { testDataClient.refineToSite(it) }
+        val relation = testDataClient.relation.createRelationWithOutputs(testName, RelationType.IsReplacedBy,
+            { testDataClient.businessPartner.refineToLegalEntity(it) },
+            { testDataClient.businessPartner.refineToSite(it) }
         )
         relationTaskCreationService.sendTasks()
 
@@ -493,9 +493,9 @@ class FindRelationSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `IsReplacedBy between two additional addresses leads to sharing error`() {
         //GIVEN
-        val relation = testDataClient.createRelationWithOutputs(testName, RelationType.IsReplacedBy,
-            { testDataClient.refineToAdditionalAddressOfSite(it) },
-            { testDataClient.refineToAdditionalAddressOfSite(it) }
+        val relation = testDataClient.relation.createRelationWithOutputs(testName, RelationType.IsReplacedBy,
+            { testDataClient.businessPartner.refineToAdditionalAddressOfSite(it) },
+            { testDataClient.businessPartner.refineToAdditionalAddressOfSite(it) }
         )
         relationTaskCreationService.sendTasks()
 

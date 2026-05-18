@@ -40,7 +40,7 @@ class SearchInputChangelogV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `find input create changelog`() {
         //GIVEN
-        testDataClient.upsertBusinessPartnerInput(testName)
+        testDataClient.businessPartner.upsertInput(testName)
 
         //WHEN
         val response = gateClient.changelog.getInputChangelog(PaginationRequest(), ChangelogSearchRequest())
@@ -59,8 +59,8 @@ class SearchInputChangelogV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `find input update changelog`() {
         //GIVEN
-        testDataClient.upsertBusinessPartnerInput(testName)
-        testDataClient.upsertBusinessPartnerInput(
+        testDataClient.businessPartner.upsertInput(testName)
+        testDataClient.businessPartner.upsertInput(
             testData.businessPartner.input.request.fromSeed("Updated $testName").copy(externalId = testName)
         )
 
@@ -84,9 +84,9 @@ class SearchInputChangelogV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `find input changelogs by external-ID`() {
         //GIVEN
-        val createdToBeFound = testDataClient.upsertBusinessPartnerInput("$testName 1")
-        testDataClient.upsertBusinessPartnerInput("$testName 2")
-        testDataClient.upsertBusinessPartnerInput("$testName 3")
+        val createdToBeFound = testDataClient.businessPartner.upsertInput("$testName 1")
+        testDataClient.businessPartner.upsertInput("$testName 2")
+        testDataClient.businessPartner.upsertInput("$testName 3")
 
         //WHEN
         val request = ChangelogSearchRequest(externalIds = setOf(createdToBeFound.externalId))
@@ -106,12 +106,12 @@ class SearchInputChangelogV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `find input changelogs by timestamp after`() {
         //GIVEN
-        testDataClient.upsertBusinessPartnerInput("$testName 1")
-        testDataClient.upsertBusinessPartnerInput("$testName 2")
+        testDataClient.businessPartner.upsertInput("$testName 1")
+        testDataClient.businessPartner.upsertInput("$testName 2")
 
         val timeX = Instant.now()
 
-        val createdToBeFound = testDataClient.upsertBusinessPartnerInput("$testName 3")
+        val createdToBeFound = testDataClient.businessPartner.upsertInput("$testName 3")
 
         //WHEN
         val request = ChangelogSearchRequest(timestampAfter = timeX)

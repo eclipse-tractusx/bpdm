@@ -42,7 +42,7 @@ class SearchOutputChangelogV7IT: UnscheduledGateTestBaseV7() {
     @Test
     fun `find output create changelog`(){
         //GIVEN
-        testDataClient.createBusinessPartnerOutput(testName)
+        testDataClient.businessPartner.createOutput(testName)
 
         //WHEN
         val response = gateClient.changelog.getOutputChangelog(PaginationRequest(), ChangelogSearchRequest())
@@ -63,9 +63,9 @@ class SearchOutputChangelogV7IT: UnscheduledGateTestBaseV7() {
     @Test
     fun `find output update changelog`(){
         //GIVEN
-        val output = testDataClient.createBusinessPartnerOutput(testName)
+        val output = testDataClient.businessPartner.createOutput(testName)
 
-        testDataClient.updateBusinessPartnerOutput(output, "Updated $testName")
+        testDataClient.businessPartner.updateOutput(output, "Updated $testName")
 
         //WHEN
         val response = gateClient.changelog.getOutputChangelog(PaginationRequest(), ChangelogSearchRequest())
@@ -87,9 +87,9 @@ class SearchOutputChangelogV7IT: UnscheduledGateTestBaseV7() {
     @Test
     fun `find output changelogs by external-ID`() {
         //GIVEN
-        val outputToBeFound = testDataClient.createBusinessPartnerOutput("$testName 1")
-        testDataClient.createBusinessPartnerOutput("$testName 2")
-        testDataClient.createBusinessPartnerOutput("$testName 3")
+        val outputToBeFound = testDataClient.businessPartner.createOutput("$testName 1")
+        testDataClient.businessPartner.createOutput("$testName 2")
+        testDataClient.businessPartner.createOutput("$testName 3")
 
         //WHEN
         val request = ChangelogSearchRequest(externalIds = setOf(outputToBeFound.externalId))
@@ -110,12 +110,12 @@ class SearchOutputChangelogV7IT: UnscheduledGateTestBaseV7() {
     @Test
     fun `find output changelogs by timestamp after`() {
         //GIVEN
-        testDataClient.createBusinessPartnerOutput("$testName 1")
-        testDataClient.createBusinessPartnerOutput("$testName 2")
+        testDataClient.businessPartner.createOutput("$testName 1")
+        testDataClient.businessPartner.createOutput("$testName 2")
 
         val timeX = Instant.now()
 
-        val outputAfterTimeX = testDataClient.createBusinessPartnerOutput("$testName 3")
+        val outputAfterTimeX = testDataClient.businessPartner.createOutput("$testName 3")
 
         //WHEN
         val request = ChangelogSearchRequest(timestampAfter = timeX)
@@ -136,12 +136,12 @@ class SearchOutputChangelogV7IT: UnscheduledGateTestBaseV7() {
     @Test
     fun `find output changelogs combining external-ID and timestamp filters`() {
         //GIVEN
-        val outputA = testDataClient.createBusinessPartnerOutput("$testName A")
+        val outputA = testDataClient.businessPartner.createOutput("$testName A")
 
         val timeX = Instant.now()
 
-        testDataClient.updateBusinessPartnerOutput(outputA, "Updated $testName A")
-        testDataClient.createBusinessPartnerOutput("$testName B")
+        testDataClient.businessPartner.updateOutput(outputA, "Updated $testName A")
+        testDataClient.businessPartner.createOutput("$testName B")
 
         //WHEN
         val request = ChangelogSearchRequest(externalIds = setOf(outputA.externalId), timestampAfter = timeX)
@@ -162,7 +162,7 @@ class SearchOutputChangelogV7IT: UnscheduledGateTestBaseV7() {
     @Test
     fun `return error for non-existing external-ID in output changelog`() {
         //GIVEN
-        testDataClient.createBusinessPartnerOutput(testName)
+        testDataClient.businessPartner.createOutput(testName)
         val unknownExternalId = "non-existing-external-id"
 
         //WHEN
@@ -190,9 +190,9 @@ class SearchOutputChangelogV7IT: UnscheduledGateTestBaseV7() {
     @Test
     fun `paginate output changelogs - first page`() {
         //GIVEN
-        testDataClient.createBusinessPartnerOutput("$testName 1")
-        testDataClient.createBusinessPartnerOutput("$testName 2")
-        testDataClient.createBusinessPartnerOutput("$testName 3")
+        testDataClient.businessPartner.createOutput("$testName 1")
+        testDataClient.businessPartner.createOutput("$testName 2")
+        testDataClient.businessPartner.createOutput("$testName 3")
 
         //WHEN
         val response = gateClient.changelog.getOutputChangelog(PaginationRequest(page = 0, size = 2), ChangelogSearchRequest())
@@ -221,9 +221,9 @@ class SearchOutputChangelogV7IT: UnscheduledGateTestBaseV7() {
     @Test
     fun `paginate output changelogs - second page`() {
         //GIVEN
-        testDataClient.createBusinessPartnerOutput("$testName 1")
-        testDataClient.createBusinessPartnerOutput("$testName 2")
-        testDataClient.createBusinessPartnerOutput("$testName 3")
+        testDataClient.businessPartner.createOutput("$testName 1")
+        testDataClient.businessPartner.createOutput("$testName 2")
+        testDataClient.businessPartner.createOutput("$testName 3")
 
         //WHEN
         val response = gateClient.changelog.getOutputChangelog(PaginationRequest(page = 1, size = 2), ChangelogSearchRequest())
