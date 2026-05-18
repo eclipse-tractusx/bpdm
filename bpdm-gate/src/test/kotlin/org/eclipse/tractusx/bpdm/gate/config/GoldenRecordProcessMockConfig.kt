@@ -22,59 +22,14 @@ package org.eclipse.tractusx.bpdm.gate.config
 import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.test.testdata.GoldenRecordMockFactory
-import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.*
+import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
 import org.eclipse.tractusx.bpdm.test.testdata.pool.*
-import org.eclipse.tractusx.orchestrator.api.model.TaskMode
-import org.eclipse.tractusx.orchestrator.api.model.TaskStep
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import tools.jackson.databind.json.JsonMapper
-import java.time.Duration
 
 @Configuration
 class GoldenRecordProcessMockConfig {
-
-    @Bean
-    fun refinementTestDataFactory(): RefinementTestDataFactory {
-        return RefinementTestDataFactory()
-    }
-
-    @Bean
-    fun orchestratorMockDataFactory(
-        refinementTestDataFactory: RefinementTestDataFactory,
-        requestFactory: OrchestratorRequestFactoryV7,
-        resultFactory: OrchestratorExpectedResultFactoryV7,
-        jsonMapper: JsonMapper
-    ): OrchestratorMockDataFactory {
-        return OrchestratorMockDataFactory(refinementTestDataFactory,requestFactory, resultFactory, jsonMapper)
-    }
-
-    @Bean
-    fun orchestratorRequestFactoryV7(testMetadataV7: TestMetadataV7): OrchestratorRequestFactoryV7{
-        val testMetadataReferences = TestMetadataReferences(
-            testMetadataV7.legalForms.map { it.technicalKey },
-            testMetadataV7.legalEntityIdentifierTypes.map { it.technicalKey },
-            testMetadataV7.addressIdentifierTypes.map { it.technicalKey },
-            testMetadataV7.adminAreas.map { it.code },
-            testMetadataV7.reasonCodes.map { it.technicalKey },
-            testMetadataV7.scriptCodes.map { it.technicalKey }
-        )
-
-        val orchestratorCommonFactory = OrchestratorRequestFactoryCommon(testMetadataReferences)
-        return OrchestratorRequestFactoryV7(BusinessPartnerTestDataFactory(orchestratorCommonFactory), orchestratorCommonFactory)
-    }
-
-    @Bean
-    fun orchestratorExpectedResultFactoryV7(): OrchestratorExpectedResultFactoryV7{
-        return OrchestratorExpectedResultFactoryV7(
-            Duration.ofDays(1),
-            Duration.ofDays(1),
-            mapOf(
-                Pair(TaskMode.UpdateFromPool, listOf(TaskStep.CleanAndSync, TaskStep.PoolSync)),
-                Pair(TaskMode.UpdateFromSharingMember, listOf(TaskStep.Clean))
-            )
-        )
-    }
 
     @Bean
     fun testMetadataV7(): TestMetadataV7{

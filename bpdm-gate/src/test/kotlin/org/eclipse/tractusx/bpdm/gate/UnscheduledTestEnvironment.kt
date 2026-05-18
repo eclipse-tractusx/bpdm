@@ -20,10 +20,12 @@
 package org.eclipse.tractusx.bpdm.gate
 
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
+import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockConfiguration
 import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockContextInitializer
 import org.eclipse.tractusx.bpdm.test.containers.PoolMockContextInitializer
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 
@@ -34,5 +36,6 @@ import org.springframework.test.context.ContextConfiguration
     OrchestratorMockContextInitializer::class,
     PoolMockContextInitializer::class
 ])
+@Import(OrchestratorMockConfiguration::class)
 @ActiveProfiles("test-unscheduled")
 annotation class UnscheduledTestEnvironment
