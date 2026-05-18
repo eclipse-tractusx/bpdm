@@ -121,6 +121,6 @@ class CountAddressTypesV7IT : UnscheduledGateTestBaseV7() {
     private fun createInputOfType(seed: String, addressType: AddressType) {
         val request = testData.businessPartner.input.request.fromSeed(seed)
             .copy(address = testData.businessPartner.input.request.fromSeed(seed).address.copy(addressType = addressType))
-        testDataClient.upsertBusinessPartnerInput(request)
+        testDataClient.businessPartner.upsertInput(request)
     }
 }

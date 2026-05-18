@@ -35,8 +35,8 @@ class SearchBusinessPartnerOutputV7IT: UnscheduledGateTestBaseV7() {
     @Test
     fun `search legal entity business partner output`(){
         //GIVEN
-        val createdInput = testDataClient.upsertBusinessPartnerInput(testName)
-        val legalEntityGoldenRecord = testDataClient.refineToLegalEntity(createdInput)
+        val createdInput = testDataClient.businessPartner.upsertInput(testName)
+        val legalEntityGoldenRecord = testDataClient.businessPartner.refineToLegalEntity(createdInput)
 
         //WHEN
         val response = gateClient.businessParters.getBusinessPartnersOutput(listOf(createdInput.externalId))
@@ -57,8 +57,8 @@ class SearchBusinessPartnerOutputV7IT: UnscheduledGateTestBaseV7() {
     @Test
     fun `search legal entity on site business partner output`(){
         //GIVEN
-        val createdInput = testDataClient.upsertBusinessPartnerInput(testName)
-        val goldenRecord = testDataClient.refineToLegalEntityOnSite(createdInput)
+        val createdInput = testDataClient.businessPartner.upsertInput(testName)
+        val goldenRecord = testDataClient.businessPartner.refineToLegalEntityOnSite(createdInput)
 
         //WHEN
         val response = gateClient.businessParters.getBusinessPartnersOutput(listOf(createdInput.externalId))
@@ -79,8 +79,8 @@ class SearchBusinessPartnerOutputV7IT: UnscheduledGateTestBaseV7() {
     @Test
     fun `search site business partner output`(){
         //GIVEN
-        val createdInput = testDataClient.upsertBusinessPartnerInput(testName)
-        val goldenRecord = testDataClient.refineToSite(createdInput)
+        val createdInput = testDataClient.businessPartner.upsertInput(testName)
+        val goldenRecord = testDataClient.businessPartner.refineToSite(createdInput)
 
         //WHEN
         val response = gateClient.businessParters.getBusinessPartnersOutput(listOf(createdInput.externalId))
@@ -101,8 +101,8 @@ class SearchBusinessPartnerOutputV7IT: UnscheduledGateTestBaseV7() {
     @Test
     fun `search additional address of site business partner output`(){
         //GIVEN
-        val createdInput = testDataClient.upsertBusinessPartnerInput(testName)
-        val goldenRecord = testDataClient.refineToAdditionalAddressOfSite(createdInput)
+        val createdInput = testDataClient.businessPartner.upsertInput(testName)
+        val goldenRecord = testDataClient.businessPartner.refineToAdditionalAddressOfSite(createdInput)
 
         //WHEN
         val response = gateClient.businessParters.getBusinessPartnersOutput(listOf(createdInput.externalId))
@@ -140,8 +140,8 @@ class SearchBusinessPartnerOutputV7IT: UnscheduledGateTestBaseV7() {
     @Test
     fun `search business partner output filters out non-existing external-IDs`(){
         //GIVEN
-        val createdInput = testDataClient.upsertBusinessPartnerInput(testName)
-        val legalEntityGoldenRecord = testDataClient.refineToLegalEntity(createdInput)
+        val createdInput = testDataClient.businessPartner.upsertInput(testName)
+        val legalEntityGoldenRecord = testDataClient.businessPartner.refineToLegalEntity(createdInput)
 
         //WHEN
         val response = gateClient.businessParters.getBusinessPartnersOutput(listOf(createdInput.externalId, "non-existing-external-id"))

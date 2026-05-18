@@ -39,9 +39,9 @@ class FindSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `find sharing state by external id`() {
         //GIVEN
-        testDataClient.upsertBusinessPartnerInput("IGNORED 1 $testName")
-        testDataClient.upsertBusinessPartnerInput("IGNORED 2 $testName")
-        testDataClient.upsertBusinessPartnerInput(testName)
+        testDataClient.businessPartner.upsertInput("IGNORED 1 $testName")
+        testDataClient.businessPartner.upsertInput("IGNORED 2 $testName")
+        testDataClient.businessPartner.upsertInput(testName)
 
         //WHEN
         val actualResponse = gateClient.sharingState.getSharingStates(PaginationRequest(), listOf(testName))
@@ -61,9 +61,9 @@ class FindSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `find sharing states`() {
         //GIVEN
-        val input1 = testDataClient.upsertBusinessPartnerInput("1 $testName")
-        val input2 = testDataClient.upsertBusinessPartnerInput("2 $testName")
-        val input3 = testDataClient.upsertBusinessPartnerInput("3 $testName")
+        val input1 = testDataClient.businessPartner.upsertInput("1 $testName")
+        val input2 = testDataClient.businessPartner.upsertInput("2 $testName")
+        val input3 = testDataClient.businessPartner.upsertInput("3 $testName")
 
         //WHEN
         val actualResponse = gateClient.sharingState.getSharingStates(PaginationRequest(), listOf(input1.externalId, input2.externalId, input3.externalId))
@@ -85,7 +85,7 @@ class FindSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `find initial sharing state`() {
         //GIVEN
-        val input = testDataClient.upsertBusinessPartnerInput(testName)
+        val input = testDataClient.businessPartner.upsertInput(testName)
 
         //WHEN
         val actualResponse = gateClient.sharingState.getSharingStates(PaginationRequest(), null)
@@ -105,8 +105,8 @@ class FindSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `find ready sharing state`() {
         //GIVEN
-        val input = testDataClient.upsertBusinessPartnerInput(testName)
-        testDataClient.setStateToReady(input.externalId)
+        val input = testDataClient.businessPartner.upsertInput(testName)
+        testDataClient.businessPartner.setStateToReady(input.externalId)
 
         //WHEN
         val actualResponse = gateClient.sharingState.getSharingStates(PaginationRequest(), null)
@@ -126,8 +126,8 @@ class FindSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `find pending sharing state`() {
         //GIVEN
-        val input = testDataClient.upsertBusinessPartnerInput(testName)
-        val createdTask = testDataClient.setStateToPending(input.externalId)
+        val input = testDataClient.businessPartner.upsertInput(testName)
+        val createdTask = testDataClient.businessPartner.setStateToPending(input.externalId)
 
         //WHEN
         val actualResponse = gateClient.sharingState.getSharingStates(PaginationRequest(), null)
@@ -147,8 +147,8 @@ class FindSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `find success sharing state`() {
         //GIVEN
-        val input = testDataClient.upsertBusinessPartnerInput(testName)
-        val refinedTask = testDataClient.setStateToSuccess(input.externalId)
+        val input = testDataClient.businessPartner.upsertInput(testName)
+        val refinedTask = testDataClient.businessPartner.setStateToSuccess(input.externalId)
 
         //WHEN
         val actualResponse = gateClient.sharingState.getSharingStates(PaginationRequest(), null)
@@ -168,8 +168,8 @@ class FindSharingStatesV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `find error sharing state`() {
         //GIVEN
-        val input = testDataClient.upsertBusinessPartnerInput(testName)
-        val errorTask = testDataClient.setStateToError(input.externalId, errorType = TaskErrorType.NaturalPersonError)
+        val input = testDataClient.businessPartner.upsertInput(testName)
+        val errorTask = testDataClient.businessPartner.setStateToError(input.externalId, errorType = TaskErrorType.NaturalPersonError)
 
         //WHEN
         val actualResponse = gateClient.sharingState.getSharingStates(PaginationRequest(), null)

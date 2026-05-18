@@ -43,7 +43,7 @@ class SearchOutputRelationV7IT: UnscheduledGateTestBaseV7(){
     @EnumSource(GateTestTypes.LegalEntityRelationType::class)
     fun `search relation output between legal entities`(legalEntityRelationType: GateTestTypes.LegalEntityRelationType) {
         //GIVEN
-        val (relationInput, relationGoldenRecord) = testDataClient.createLegalEntityRelationOutput(testName, legalEntityRelationType.gateRelationType)
+        val (relationInput, relationGoldenRecord) = testDataClient.relation.createLegalEntityRelationOutput(testName, legalEntityRelationType.gateRelationType)
 
         //WHEN
         val response = gateClient.relationOutput.postSearch()
@@ -65,9 +65,9 @@ class SearchOutputRelationV7IT: UnscheduledGateTestBaseV7(){
     @EnumSource(GateTestTypes.LegalEntityRelationType::class)
     fun `search updated relation output between legal entities`(legalEntityRelationType: GateTestTypes.LegalEntityRelationType) {
         //GIVEN
-        val (relationInput, _) = testDataClient.createLegalEntityRelationOutput(testName, legalEntityRelationType.gateRelationType)
+        val (relationInput, _) = testDataClient.relation.createLegalEntityRelationOutput(testName, legalEntityRelationType.gateRelationType)
         val otherType = RelationType.entries.find { it != legalEntityRelationType.gateRelationType }!!
-        val relationGoldenRecord = testDataClient.updateLegalEntityRelationOutput(relationInput, "Updated $testName", otherType)
+        val relationGoldenRecord = testDataClient.relation.updateLegalEntityRelationOutput(relationInput, "Updated $testName", otherType)
 
         //WHEN
         val response = gateClient.relationOutput.postSearch()
@@ -89,7 +89,7 @@ class SearchOutputRelationV7IT: UnscheduledGateTestBaseV7(){
     @EnumSource(GateTestTypes.AddressRelationType::class)
     fun `search relation output between legal address and additional address`(addressRelationType: GateTestTypes.AddressRelationType) {
         //GIVEN
-        val (relationInput, relationGoldenRecord) = testDataClient.createAddressRelationOutput(testName, addressRelationType.gateRelationType)
+        val (relationInput, relationGoldenRecord) = testDataClient.relation.createAddressRelationOutput(testName, addressRelationType.gateRelationType)
 
         //WHEN
         val response = gateClient.relationOutput.postSearch()
@@ -125,9 +125,9 @@ class SearchOutputRelationV7IT: UnscheduledGateTestBaseV7(){
     @Test
     fun `find output by external ID`() {
         //GIVEN
-        val (inquired, goldenRecord) = testDataClient.createLegalEntityRelationOutput("$testName 1")
-        testDataClient.createLegalEntityRelationOutput("$testName 2")
-        testDataClient.createLegalEntityRelationOutput("$testName 3")
+        val (inquired, goldenRecord) = testDataClient.relation.createLegalEntityRelationOutput("$testName 1")
+        testDataClient.relation.createLegalEntityRelationOutput("$testName 2")
+        testDataClient.relation.createLegalEntityRelationOutput("$testName 3")
 
         //WHEN
         val response = gateClient.relationOutput.postSearch(RelationOutputSearchRequest(externalIds = listOf(inquired.externalId)))
@@ -145,9 +145,9 @@ class SearchOutputRelationV7IT: UnscheduledGateTestBaseV7(){
     @Test
     fun `find outputs by multiple external IDs`() {
         //GIVEN
-        val (rel1, golden1) = testDataClient.createLegalEntityRelationOutput("$testName 1")
-        val (rel2, golden2) = testDataClient.createLegalEntityRelationOutput("$testName 2")
-        testDataClient.createLegalEntityRelationOutput("$testName 3")
+        val (rel1, golden1) = testDataClient.relation.createLegalEntityRelationOutput("$testName 1")
+        val (rel2, golden2) = testDataClient.relation.createLegalEntityRelationOutput("$testName 2")
+        testDataClient.relation.createLegalEntityRelationOutput("$testName 3")
 
         //WHEN
         val response = gateClient.relationOutput.postSearch(
@@ -170,9 +170,9 @@ class SearchOutputRelationV7IT: UnscheduledGateTestBaseV7(){
     @Test
     fun `find outputs by relation type`() {
         //GIVEN
-        val (rel1, golden1) = testDataClient.createLegalEntityRelationOutput("$testName 1")
-        val (rel2, golden2) = testDataClient.createLegalEntityRelationOutput("$testName 2")
-        val (rel3, golden3) = testDataClient.createLegalEntityRelationOutput("$testName 3")
+        val (rel1, golden1) = testDataClient.relation.createLegalEntityRelationOutput("$testName 1")
+        val (rel2, golden2) = testDataClient.relation.createLegalEntityRelationOutput("$testName 2")
+        val (rel3, golden3) = testDataClient.relation.createLegalEntityRelationOutput("$testName 3")
 
         val filterType = SharableRelationType.valueOf(golden1.relationType.name)
 
@@ -197,9 +197,9 @@ class SearchOutputRelationV7IT: UnscheduledGateTestBaseV7(){
     @Test
     fun `find output by source BPN`() {
         //GIVEN
-        val (inquired, goldenRecord) = testDataClient.createLegalEntityRelationOutput("$testName 1")
-        testDataClient.createLegalEntityRelationOutput("$testName 2")
-        testDataClient.createLegalEntityRelationOutput("$testName 3")
+        val (inquired, goldenRecord) = testDataClient.relation.createLegalEntityRelationOutput("$testName 1")
+        testDataClient.relation.createLegalEntityRelationOutput("$testName 2")
+        testDataClient.relation.createLegalEntityRelationOutput("$testName 3")
 
         //WHEN
         val response = gateClient.relationOutput.postSearch(
@@ -219,9 +219,9 @@ class SearchOutputRelationV7IT: UnscheduledGateTestBaseV7(){
     @Test
     fun `find outputs by multiple source BPNs`() {
         //GIVEN
-        val (rel1, golden1) = testDataClient.createLegalEntityRelationOutput("$testName 1")
-        val (rel2, golden2) = testDataClient.createLegalEntityRelationOutput("$testName 2")
-        testDataClient.createLegalEntityRelationOutput("$testName 3")
+        val (rel1, golden1) = testDataClient.relation.createLegalEntityRelationOutput("$testName 1")
+        val (rel2, golden2) = testDataClient.relation.createLegalEntityRelationOutput("$testName 2")
+        testDataClient.relation.createLegalEntityRelationOutput("$testName 3")
 
         //WHEN
         val response = gateClient.relationOutput.postSearch(
@@ -244,9 +244,9 @@ class SearchOutputRelationV7IT: UnscheduledGateTestBaseV7(){
     @Test
     fun `find output by target BPN`() {
         //GIVEN
-        val (inquired, goldenRecord) = testDataClient.createLegalEntityRelationOutput("$testName 1")
-        testDataClient.createLegalEntityRelationOutput("$testName 2")
-        testDataClient.createLegalEntityRelationOutput("$testName 3")
+        val (inquired, goldenRecord) = testDataClient.relation.createLegalEntityRelationOutput("$testName 1")
+        testDataClient.relation.createLegalEntityRelationOutput("$testName 2")
+        testDataClient.relation.createLegalEntityRelationOutput("$testName 3")
 
         //WHEN
         val response = gateClient.relationOutput.postSearch(
@@ -266,9 +266,9 @@ class SearchOutputRelationV7IT: UnscheduledGateTestBaseV7(){
     @Test
     fun `find outputs by multiple target BPNs`() {
         //GIVEN
-        val (rel1, golden1) = testDataClient.createLegalEntityRelationOutput("$testName 1")
-        val (rel2, golden2) = testDataClient.createLegalEntityRelationOutput("$testName 2")
-        testDataClient.createLegalEntityRelationOutput("$testName 3")
+        val (rel1, golden1) = testDataClient.relation.createLegalEntityRelationOutput("$testName 1")
+        val (rel2, golden2) = testDataClient.relation.createLegalEntityRelationOutput("$testName 2")
+        testDataClient.relation.createLegalEntityRelationOutput("$testName 3")
 
         //WHEN
         val response = gateClient.relationOutput.postSearch(
@@ -291,13 +291,13 @@ class SearchOutputRelationV7IT: UnscheduledGateTestBaseV7(){
     @Test
     fun `find outputs updated after timestamp`() {
         //GIVEN
-        testDataClient.createLegalEntityRelationOutput("$testName old 1")
-        testDataClient.createLegalEntityRelationOutput("$testName old 2")
+        testDataClient.relation.createLegalEntityRelationOutput("$testName old 1")
+        testDataClient.relation.createLegalEntityRelationOutput("$testName old 2")
 
         val updatedAtFrom = Instant.now()
 
-        val (new1, golden1) = testDataClient.createLegalEntityRelationOutput("$testName new 1")
-        val (new2, golden2) = testDataClient.createLegalEntityRelationOutput("$testName new 2")
+        val (new1, golden1) = testDataClient.relation.createLegalEntityRelationOutput("$testName new 1")
+        val (new2, golden2) = testDataClient.relation.createLegalEntityRelationOutput("$testName new 2")
 
         //WHEN
         val response = gateClient.relationOutput.postSearch(RelationOutputSearchRequest(updatedAtFrom = updatedAtFrom))
@@ -318,9 +318,9 @@ class SearchOutputRelationV7IT: UnscheduledGateTestBaseV7(){
     @Test
     fun `find output using combined filters`() {
         //GIVEN
-        val (rel1, golden1) = testDataClient.createLegalEntityRelationOutput("$testName 1")
-        val (rel2, _) = testDataClient.createLegalEntityRelationOutput("$testName 2")
-        testDataClient.createLegalEntityRelationOutput("$testName 3")
+        val (rel1, golden1) = testDataClient.relation.createLegalEntityRelationOutput("$testName 1")
+        val (rel2, _) = testDataClient.relation.createLegalEntityRelationOutput("$testName 2")
+        testDataClient.relation.createLegalEntityRelationOutput("$testName 3")
 
         val filterType = SharableRelationType.valueOf(golden1.relationType.name)
 
@@ -346,8 +346,8 @@ class SearchOutputRelationV7IT: UnscheduledGateTestBaseV7(){
     @Test
     fun `search updated output is findable by new source and target BPNs`() {
         //GIVEN
-        val (relationInput, initialGoldenRecord) = testDataClient.createLegalEntityRelationOutput(testName, RelationType.IsManagedBy)
-        val updatedGoldenRecord = testDataClient.updateLegalEntityRelationOutput(relationInput, "$testName updated", RelationType.IsOwnedBy)
+        val (relationInput, initialGoldenRecord) = testDataClient.relation.createLegalEntityRelationOutput(testName, RelationType.IsManagedBy)
+        val updatedGoldenRecord = testDataClient.relation.updateLegalEntityRelationOutput(relationInput, "$testName updated", RelationType.IsOwnedBy)
 
         //WHEN - search by new source and target BPNs
         val responseByNewBpns = gateClient.relationOutput.postSearch(

@@ -32,6 +32,7 @@ import org.eclipse.tractusx.bpdm.pool.v7.util.IdentifierTypeV7Importer
 import org.eclipse.tractusx.bpdm.pool.v7.util.LegalFormV7Importer
 import org.eclipse.tractusx.bpdm.pool.v7.util.TestDataClientV7
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.BusinessPartnerTestDataFactory
+import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorExpectedResultFactoryV7
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorRequestFactoryCommon
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorRequestFactoryV7
@@ -41,9 +42,12 @@ import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolDataHelper
 import org.eclipse.tractusx.bpdm.test.testdata.pool.TestMetadataV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.PoolRequestFactoryV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.PoolResponseFactoryV7
+import org.eclipse.tractusx.orchestrator.api.model.TaskMode
+import org.eclipse.tractusx.orchestrator.api.model.TaskStep
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import tools.jackson.databind.json.JsonMapper
+import java.time.Duration
 
 @Configuration
 class TestDataV7Configuration {
@@ -111,8 +115,13 @@ class TestDataV7Configuration {
     }
 
     @Bean
-    fun orchestratorMockDataFactory(refinementTestDataFactory: RefinementTestDataFactory, jsonMapper: JsonMapper): OrchestratorMockDataFactory{
-        return OrchestratorMockDataFactory(refinementTestDataFactory, jsonMapper)
+    fun orchestratorMockDataFactory(
+        refinementTestDataFactory: RefinementTestDataFactory,
+        requestFactoryV7: OrchestratorRequestFactoryV7,
+        resultFactoryV7: OrchestratorExpectedResultFactoryV7,
+        jsonMapper: JsonMapper
+    ): OrchestratorMockDataFactory{
+        return OrchestratorMockDataFactory(refinementTestDataFactory,requestFactoryV7, resultFactoryV7, jsonMapper)
     }
 
     @Bean
@@ -139,6 +148,18 @@ class TestDataV7Configuration {
         orchestratorRequestFactoryCommon: OrchestratorRequestFactoryCommon
     ): OrchestratorRequestFactoryV7 {
         return OrchestratorRequestFactoryV7(businessPartnerTestDataFactory, orchestratorRequestFactoryCommon)
+    }
+
+    @Bean
+    fun orchestratorExpectedResultFactoryV7(): OrchestratorExpectedResultFactoryV7{
+        return OrchestratorExpectedResultFactoryV7(
+            Duration.ofDays(1),
+            Duration.ofDays(1),
+            mapOf(
+                Pair(TaskMode.UpdateFromPool, listOf(TaskStep.CleanAndSync, TaskStep.PoolSync)),
+                Pair(TaskMode.UpdateFromSharingMember, listOf(TaskStep.Clean))
+            )
+        )
     }
 
     @Bean

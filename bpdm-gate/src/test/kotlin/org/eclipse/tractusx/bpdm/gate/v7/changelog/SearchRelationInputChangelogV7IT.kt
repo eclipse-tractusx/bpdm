@@ -41,7 +41,7 @@ class SearchRelationInputChangelogV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `find relation input create changelog`() {
         //GIVEN
-        val relation = testDataClient.upsertRelationInputWithBusinessPartners(testName, RelationType.IsManagedBy)
+        val relation = testDataClient.relation.upsertRelationInputWithBusinessPartners(testName, RelationType.IsManagedBy)
 
         //WHEN
         val response = gateClient.relationChangelog.getInputChangelog(PaginationRequest(), ChangelogSearchRequest())
@@ -61,9 +61,9 @@ class SearchRelationInputChangelogV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `find relation input update changelog`() {
         //GIVEN
-        testDataClient.upsertRelationInputWithBusinessPartners(testName, RelationType.IsManagedBy)
+        testDataClient.relation.upsertRelationInputWithBusinessPartners(testName, RelationType.IsManagedBy)
         val updateEntry = testData.relation.input.request.fromSeed(testName).withRelationType(RelationType.IsOwnedBy)
-        testDataClient.upsertRelationInput(updateEntry)
+        testDataClient.relation.upsertRelationInput(updateEntry)
 
         //WHEN
         val response = gateClient.relationChangelog.getInputChangelog(PaginationRequest(), ChangelogSearchRequest())
@@ -84,9 +84,9 @@ class SearchRelationInputChangelogV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `find relation input changelogs by external-ID`() {
         //GIVEN
-        val rel1 = testDataClient.upsertRelationInputWithBusinessPartners("$testName 1", RelationType.IsManagedBy)
-        testDataClient.upsertRelationInputWithBusinessPartners("$testName 2", RelationType.IsOwnedBy)
-        testDataClient.upsertRelationInputWithBusinessPartners("$testName 3", RelationType.IsManagedBy)
+        val rel1 = testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 1", RelationType.IsManagedBy)
+        testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 2", RelationType.IsOwnedBy)
+        testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 3", RelationType.IsManagedBy)
 
         //WHEN
         val request = ChangelogSearchRequest(externalIds = setOf(rel1.externalId))
@@ -107,12 +107,12 @@ class SearchRelationInputChangelogV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `find relation input changelogs by timestamp after`() {
         //GIVEN
-        testDataClient.upsertRelationInputWithBusinessPartners("$testName 1", RelationType.IsManagedBy)
-        testDataClient.upsertRelationInputWithBusinessPartners("$testName 2", RelationType.IsOwnedBy)
+        testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 1", RelationType.IsManagedBy)
+        testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 2", RelationType.IsOwnedBy)
 
         val timeX = Instant.now()
 
-        val rel3 = testDataClient.upsertRelationInputWithBusinessPartners("$testName 3", RelationType.IsManagedBy)
+        val rel3 = testDataClient.relation.upsertRelationInputWithBusinessPartners("$testName 3", RelationType.IsManagedBy)
 
         //WHEN
         val request = ChangelogSearchRequest(timestampAfter = timeX)

@@ -20,8 +20,69 @@ Read it before writing a new test or modifying the test infrastructure.
 7. [API Clients](#7-api-clients)
 8. [Mock Factories](#8-mock-factories)
 9. [Assertion Repository](#9-assertion-repository)
-10. [Adding a New Test: Step-by-Step Checklist](#10-adding-a-new-test-step-by-step-checklist)
-11. [Common Mistakes & Anti-Patterns](#11-common-mistakes--anti-patterns)
+10. [Parameterized Tests](#10-parameterized-tests)
+11. [Adding a New Test: Step-by-Step Checklist](#11-adding-a-new-test-step-by-step-checklist)
+12. [Common Mistakes & Anti-Patterns](#12-common-mistakes--anti-patterns)
+
+---
+
+## Overview
+
+The diagram below shows how the components of the test suite fit together.
+Each section of this guide covers one of these components in detail.
+
+```mermaid
+graph TD
+    subgraph TestMethod["Concrete Test Class (e.g. SearchBusinessPartnerOutputV7IT)"]
+        GIVEN["GIVEN"]
+        WHEN["WHEN"]
+        THEN["THEN"]
+    end
+
+    subgraph Utilities["Test Utilities — inherited via base class hierarchy"]
+        TDC["Test Data Client\ncoordinates state setup"]
+        GC["Api Client\nauthenticated HTTP client"]
+        AR["Assertion Repository\ncomparison logic"]
+        TD["Test Data\nDTO factories"]
+    end
+
+    subgraph TDCInternals["Inside test data client"]
+        GMF["Mock Factories\ncoordinates mocked API calls"]
+        SVC["Application Internal Services\nfor example invoke task resolution"]
+    end
+
+    subgraph App["Application Under Test"]
+        GATE["Application — Spring Boot, RANDOM_PORT"]
+    end
+
+    subgraph Infra["Test Infrastructure"]
+        PG[("PostgreSQL\nTestContainers")]
+        KC["Keycloak\nTestContainers"]
+        OW["Orchestrator\nWireMock"]
+        PW["Pool\nWireMock"]
+    end
+
+    GIVEN -->|uses| TDC
+    WHEN -->|calls| GC
+    THEN -->|builds expected with| TD
+    THEN -->|delegates assertion to| AR
+
+    TDC -->|creates DTOs via| TD
+    TDC -->|sets up stubs via| GMF
+    TDC -->|drives pipeline via| SVC
+    TDC -->|submits data via| GC
+
+    GC -->|HTTP| GATE
+    SVC -->|direct call| GATE
+
+    GMF -->|configures stubs| OW
+    GMF -->|configures stubs| PW
+
+    GATE <-->|JPA| PG
+    GATE <-->|OAuth2| KC
+    GATE -->|HTTP| OW
+    GATE -->|HTTP| PW
+```
 
 ---
 
@@ -166,17 +227,19 @@ abstract class GateTestBaseV7 : GateTestBase() {
     // Factory for creating authenticated API clients
     @Autowired lateinit var testClientProvider: GateTestClientProviderV7
 
-    // Test data factories
-    @Autowired lateinit var businessPartnerInputRequestFactory: BusinessPartnerInputRequestV7Factory
-    @Autowired lateinit var businessPartnerInputFactory: BusinessPartnerInputDtoV7Factory
-    @Autowired lateinit var businessPartnerOutputFactory: BusinessPartnerOutputDtoV7Factory
-    @Autowired lateinit var relationInputRequestFactory: RelationInputRequestV7Factory
-    @Autowired lateinit var relationOutputFactory: RelationOutputDtoV7Factory
-    @Autowired lateinit var pageChangeLogFactory: PageChangeLogV7Factory
+    // Hierarchical test data factory (request builders and response converters)
+    @Autowired lateinit var testData: TestDataFactoryGateV7
+
+    // Gate internal services — triggered directly in TestDataClient to drive the sharing pipeline
+    @Autowired lateinit var taskCreationBatchService: TaskCreationBatchService
+    @Autowired lateinit var taskResolutionBatchService: TaskResolutionBatchService
+    @Autowired lateinit var relationTaskCreationService: RelationTaskCreationService
+    @Autowired lateinit var relationTaskResolutionService: RelationTaskResolutionService
 
     // Mock factories for simulating Pool and Orchestrator APIs
     @Autowired lateinit var orchestratorMockDataFactory: OrchestratorMockDataFactory
     @Autowired lateinit var poolMockDataFactory: PoolMockDataFactory
+    @Autowired lateinit var goldenRecordMockFactory: GoldenRecordMockFactory
 
     // Initialised after startup (requires the random server port)
     lateinit var gateClient: GateClient
@@ -185,7 +248,12 @@ abstract class GateTestBaseV7 : GateTestBase() {
     @PostConstruct
     fun init() {
         gateClient = testClientProvider.createClient(KeyCloakInitializer.CLIENT_ID_OPERATOR)
-        testDataClient = GateTestDataClientV7(gateClient, ...)
+        testDataClient = GateTestDataClientV7(
+            gateClient, testData, orchestratorMockDataFactory,
+            taskCreationBatchService, taskResolutionBatchService,
+            relationTaskResolutionService, relationTaskCreationService,
+            goldenRecordMockFactory, tenantBPNL
+        )
     }
 }
 ```
@@ -234,14 +302,14 @@ Here is a complete example:
 @Test
 fun `search legal entity business partner output`() {
     //GIVEN
-    val createdInput = testDataClient.upsertBusinessPartnerInput(testName)
-    val legalEntityGoldenRecord = testDataClient.refineToLegalEntity(createdInput)
+    val createdInput = testDataClient.businessPartner.upsertInput(testName)
+    val legalEntityGoldenRecord = testDataClient.businessPartner.refineToLegalEntity(createdInput)
 
     //WHEN
     val response = gateClient.businessParters.getBusinessPartnersOutput(listOf(createdInput.externalId))
 
     //THEN
-    val expectedOutput = businessPartnerOutputFactory.fromLegalEntity(createdInput, legalEntityGoldenRecord)
+    val expectedOutput = testData.businessPartner.output.fromLegalEntity(createdInput, legalEntityGoldenRecord)
     val expectedResponse = PageDto(1, 1, 0, 1, listOf(expectedOutput))
     assertRepo.assertBusinessPartnerOutput(response, expectedResponse)
 }
@@ -258,11 +326,11 @@ Its methods are named after the business outcome they achieve, not the technical
 
 ```kotlin
 // Good — the name tells you what state you're creating
-val createdInput = testDataClient.upsertBusinessPartnerInput(testName)
-val goldenRecord = testDataClient.refineToLegalEntity(createdInput)
+val createdInput = testDataClient.businessPartner.upsertInput(testName)
+val goldenRecord = testDataClient.businessPartner.refineToLegalEntity(createdInput)
 
 // Bad — manually assembling the same state through low-level calls
-val request = businessPartnerInputRequestFactory.fromSeed(testName)
+val request = testData.businessPartner.input.request.fromSeed(testName)
 gateClient.businessParters.upsertBusinessPartnersInput(listOf(request))
 gateClient.sharingState.postSharingStateReady(PostSharingStateReadyRequest(listOf(testName)))
 taskCreationBatchService.createTasksForReadyBusinessPartners()
@@ -277,7 +345,7 @@ It should not contain any assertions.
 
 ### The WHEN section
 
-The WHEN section is a single API call through `gateClient`.
+The WHEN section is a single API call through the module's API client.
 It captures the response in a local variable.
 
 ```kotlin
@@ -290,18 +358,18 @@ If you find yourself making two calls here, consider whether you are testing two
 
 ### The THEN section
 
-The THEN section constructs the expected response using a factory method, then delegates to `assertRepo` to compare it against the actual response.
+The THEN section constructs the expected response using a factory method, then delegates to the assertion repository to compare it against the actual response.
 
 ```kotlin
 //THEN
-val expectedOutput = businessPartnerOutputFactory.fromLegalEntity(createdInput, legalEntityGoldenRecord)
+val expectedOutput = testData.businessPartner.output.fromLegalEntity(createdInput, legalEntityGoldenRecord)
 val expectedResponse = PageDto(1, 1, 0, 1, listOf(expectedOutput))
 assertRepo.assertBusinessPartnerOutput(response, expectedResponse)
 ```
 
 Build the expected object from factory methods rather than constructing it field by field.
 Factories are aware of which fields are incidental (seeded randomly) and produce consistent, comparable objects.
-The assertion is always delegated to `assertRepo` — never written inline.
+The assertion is always delegated to the assertion repository — never written inline.
 
 ---
 
@@ -309,6 +377,30 @@ The assertion is always delegated to `assertRepo` — never written inline.
 
 Test data factories create DTO objects for use in request payloads and response expectations.
 They live in `bpdm-common-test` so they can be shared across modules.
+
+A module's factories are typically exposed through a single hierarchical entry point that mirrors the domain.
+The Gate V7 tests use `testData` (of type `TestDataFactoryGateV7`) with this structure:
+
+```
+testData
+  ├── businessPartner
+  │   ├── input
+  │   │   ├── request.fromSeed(seed)         → BusinessPartnerInputRequest
+  │   │   └── response.fromRequest(request)  → BusinessPartnerInputDto
+  │   └── output
+  │       ├── fromLegalEntity(input, legalEntity)
+  │       ├── fromLegalEntityOnSite(input, legalEntity, site)
+  │       ├── fromSite(input, legalEntity, site)
+  │       └── fromAdditionalAddressOnSite(input, legalEntity, site, additionalAddress)
+  ├── relation
+  │   ├── input
+  │   │   ├── request.fromSeed(seed)         → RelationPutEntry
+  │   │   └── response.fromRequest(entry)    → RelationDto
+  │   └── output
+  │       └── fromGoldenRecord(externalId, goldenRecord)
+  └── changelog
+      └── ofOnePage(vararg entries)
+```
 
 ### Seeded creation
 
@@ -361,7 +453,7 @@ When a test needs to control a specific field — because that field is the subj
 
 ```kotlin
 // The test cares about the externalId and relationType, not the rest of the relation fields
-val updatedRequest = relationInputRequestV7Factory.fromSeed(updateSeed).copy(
+val updatedRequest = testData.relation.input.request.fromSeed(updateSeed).copy(
     externalId = original.externalId,
     relationType = relationType
 )
@@ -372,32 +464,45 @@ Extension functions can provide named shortcuts for common overrides to keep tes
 
 ### Conversion factories
 
-Alongside request factories, there are factories that convert between related DTO types:
+Alongside request factories, there are factories that convert between related DTO types.
+The Gate V7 tests illustrate the pattern:
 
-- `BusinessPartnerInputDtoV7Factory.fromRequest(request)` — converts an input request to the expected response DTO (adding server-assigned fields like timestamps as placeholder values)
-- `BusinessPartnerOutputDtoV7Factory.fromLegalEntity(input, goldenRecord)` — constructs the expected output DTO by combining the submitted input with the golden record data returned by the Pool mock
+- `testData.businessPartner.input.response.fromRequest(request)` — converts an input request to the expected response DTO (adding server-assigned fields like timestamps as placeholder values)
+- `testData.businessPartner.output.fromLegalEntity(input, goldenRecord)` — constructs the expected output DTO by combining the submitted input with the golden record data returned by the Pool mock
+- `testData.relation.output.fromGoldenRecord(externalId, goldenRecord)` — constructs the expected relation output DTO from the relation input and the orchestrator refinement result
 
 These conversion factories encode the mapping rules between what was sent and what the API should return.
 Keeping them in shared modules ensures that the same mapping logic is used everywhere the expectation is constructed.
 
 ### Factory naming conventions
 
-Factories are named after the DTO type they produce, and the factory method reflects how the input is provided:
+Factories are named after the DTO type they produce, and the factory method reflects how the input is provided.
+The Gate V7 factories illustrate the conventions:
 
-| Method | Input | Output |
+| Access path | Input | Output |
 |---|---|---|
-| `fromSeed(seed)` | A seed string | A fully populated request DTO |
-| `fromRequest(request)` | A previously created request | The corresponding response DTO |
-| `fromLegalEntity(input, goldenRecord)` | Input DTO + golden record | The expected output DTO |
+| `testData.businessPartner.input.request.fromSeed(seed)` | A seed string | A fully populated input request DTO |
+| `testData.businessPartner.input.response.fromRequest(request)` | A previously created request | The corresponding input response DTO |
+| `testData.businessPartner.output.fromLegalEntity(input, goldenRecord)` | Input DTO + golden record | The expected business partner output DTO |
+| `testData.relation.input.request.fromSeed(seed)` | A seed string | A fully populated relation put entry |
+| `testData.relation.output.fromGoldenRecord(externalId, goldenRecord)` | Relation external ID + orchestrator result | The expected relation output DTO |
 
 ---
 
 ## 6. TestDataClient
 
-`GateTestDataClientV7` (`bpdm-gate/src/test/kotlin/.../gate/v7/util/GateTestDataClientV7.kt`) is the primary tool for the GIVEN section.
+The TestDataClient is the primary tool for the GIVEN section.
 It encapsulates multi-step state setup behind named, business-level methods.
 
-### What it hides
+When the domain is complex enough, a TestDataClient is itself a thin coordinator that delegates to namespaced sub-clients — one per domain area.
+The Gate V7 TestDataClient (`GateTestDataClientV7`) follows this pattern, exposing two sub-clients:
+
+```kotlin
+testDataClient.businessPartner   // BusinessPartnerTestDataClientV7
+testDataClient.relation          // RelationTestDataClientV7
+```
+
+### `testDataClient.businessPartner`
 
 Setting up a business partner that has gone through the full sharing pipeline involves:
 1. Submitting the business partner input via the Gate API
@@ -406,51 +511,22 @@ Setting up a business partner that has gone through the full sharing pipeline in
 4. Triggering the Gate's task creation service
 5. Triggering the Gate's task resolution service
 
-`testDataClient.refineToLegalEntity(input)` does all of this:
-
-```kotlin
-fun refineToLegalEntity(input: BusinessPartnerInputDto, seed: String = input.externalId): LegalEntityWithLegalAddressVerboseDto {
-    val poolMockResult = prepareLegalEntityRefinement(input)
-    shareBusinessPartnerAndResolve(input.externalId)
-    return poolMockResult
-}
-
-private fun prepareLegalEntityRefinement(input: BusinessPartnerInputDto, seed: String = input.externalId): LegalEntityWithLegalAddressVerboseDto {
-    val poolMockResult = poolMockDataFactory.mockLegalEntityAndLegalAddressSearchResult(seed)
-    val owningCompany = if (input.isOwnCompanyData) tenantBpnL else null
-    orchestratorMockDataFactory.mockRefineToLegalEntity(seed, poolMockResult, owningCompany, input.nameParts)
-    return poolMockResult
-}
-
-private fun shareBusinessPartnerAndResolve(externalId: String): BusinessPartnerOutputDto {
-    gateClient.sharingState.postSharingStateReady(PostSharingStateReadyRequest(listOf(externalId)))
-    taskCreationBatchService.createTasksForReadyBusinessPartners()
-    taskResolutionBatchService.resolveTasks()
-    return gateClient.businessParters.getBusinessPartnersOutput(listOf(externalId)).content.single()
-}
-```
-
-In a test method, this appears as two lines:
+`testDataClient.businessPartner.refineToLegalEntity(input)` does all of this.
+In a test method, it appears as two lines:
 
 ```kotlin
 //GIVEN
-val createdInput = testDataClient.upsertBusinessPartnerInput(testName)
-val legalEntityGoldenRecord = testDataClient.refineToLegalEntity(createdInput)
+val createdInput = testDataClient.businessPartner.upsertInput(testName)
+val legalEntityGoldenRecord = testDataClient.businessPartner.refineToLegalEntity(createdInput)
 ```
 
-### Method categories
-
-`GateTestDataClientV7` groups its methods into three categories:
-
-**Upsert** — submit data to the Gate API:
+**Upsert** — submit business partner data to the Gate API:
 ```kotlin
-fun upsertBusinessPartnerInput(seed: String): BusinessPartnerInputDto
-fun upsertBusinessPartnerInput(request: BusinessPartnerInputRequest): BusinessPartnerInputDto
-fun upsertRelationInput(entry: RelationPutEntry, createIfNotExist: Boolean = true): RelationDto
-fun upsertRelationInputWithBusinessPartners(seed: String, relationType: RelationType): RelationDto
+fun upsertInput(seed: String): BusinessPartnerInputDto
+fun upsertInput(request: BusinessPartnerInputRequest): BusinessPartnerInputDto
 ```
 
-**Refinement** — drive a business partner through the sharing pipeline to a specific outcome:
+**Refinement** — drive a business partner through the sharing pipeline to a specific golden record outcome:
 ```kotlin
 fun refineToLegalEntity(input: BusinessPartnerInputDto): LegalEntityWithLegalAddressVerboseDto
 fun refineToLegalEntityOnSite(input: BusinessPartnerInputDto): PoolMockDataFactory.SiteWithLegalEntityParent
@@ -459,12 +535,52 @@ fun refineToAdditionalAddressOfSite(input: BusinessPartnerInputDto): PoolMockDat
 fun refineToSuccess(input: BusinessPartnerInputDto): BusinessPartnerOutputDto
 ```
 
+**Compound** — upsert and immediately refine in one call:
+```kotlin
+fun createOutput(seed: String): BusinessPartnerOutputDto
+fun updateOutput(output: BusinessPartnerOutputDto, newSeed: String): BusinessPartnerOutputDto
+```
+
 **State progression** — move a sharing state to a specific stage without full refinement:
 ```kotlin
 fun setStateToReady(externalId: String)
 fun setStateToPending(externalId: String, seed: String = externalId): TaskClientStateDto
 fun setStateToSuccess(externalId: String, seed: String = externalId): TaskClientStateDto
 fun setStateToError(externalId: String, seed: String = externalId, errorType: TaskErrorType): TaskClientStateDto
+```
+
+### `testDataClient.relation`
+
+Relation setup follows the same principle.
+A relation output requires both business partner endpoints to be refined first, so the methods coordinate business partner and relation setup together:
+
+```kotlin
+//GIVEN
+val (relationInput, goldenRecord) = testDataClient.relation.createLegalEntityRelationOutput(testName)
+```
+
+**Upsert** — submit relation data to the Gate API:
+```kotlin
+fun upsertRelationInput(entry: RelationPutEntry, createIfNotExist: Boolean = true): RelationDto
+fun upsertRelationInput(externalId: String, source: BusinessPartnerInputDto, target: BusinessPartnerInputDto): RelationDto
+fun upsertRelationInputWithBusinessPartners(entry: RelationPutEntry, createIfNotExist: Boolean = true): RelationDto
+fun upsertRelationInputWithBusinessPartners(seed: String, relationType: RelationType): RelationDto
+```
+
+**Compound** — set up the full relation pipeline including business partner refinement:
+```kotlin
+fun createRelationInputWithRefinedLegalEntityBPs(seed: String, relationType: RelationType): RelationDto
+fun createLegalEntityRelationOutput(seed: String, relationType: RelationType): Pair<RelationDto, BusinessPartnerRelations>
+fun createAddressRelationOutput(seed: String, relationType: RelationType): Pair<RelationDto, BusinessPartnerRelations>
+fun updateLegalEntityRelationOutput(original: RelationDto, updateSeed: String, relationType: RelationType): BusinessPartnerRelations
+fun refineRelationToSuccess(input: RelationDto, seed: String = input.externalId): BusinessPartnerRelations
+```
+
+**State progression** — move a relation sharing state to a specific stage:
+```kotlin
+fun setRelationStateToPending(externalId: String, seed: String = externalId): TaskClientRelationsStateDto
+fun setRelationStateToSuccess(externalId: String, seed: String = externalId): TaskClientRelationsStateDto
+fun setRelationStateToError(externalId: String, seed: String = externalId, errorType: TaskRelationsErrorType): TaskClientRelationsStateDto
 ```
 
 ### Naming principle
@@ -509,28 +625,30 @@ Authentication tests that need to verify role-based access control use `testClie
 
 ## 8. Mock Factories
 
-When the Gate application calls out to the Pool or Orchestrator APIs, those calls are intercepted by WireMock servers.
+When the application under test calls out to external services, those calls are intercepted by WireMock servers.
 Mock factories configure WireMock stubs that define what those servers return.
 
 ### Structure
 
-Mock factories are part of `bpdm-common-test` and are grouped by the service they simulate:
+Mock factories are part of `bpdm-common-test` and are organised at two levels:
+
+**Low-level factories** — configure stubs for a single service:
 
 - `PoolMockDataFactory` — stubs Pool API endpoints (legal entity search, site search, address search)
 - `OrchestratorMockDataFactory` — stubs Orchestrator API endpoints (task creation, task status, refinement results)
 
-Each factory method sets up a WireMock stub and returns the mocked response object, so the test can use it to build expected response DTOs:
+**High-level coordinator** — coordinates both services for end-to-end refinement scenarios:
+
+- `GoldenRecordMockFactory` — sets up both Pool and Orchestrator stubs together for a complete refinement scenario
+
+For example, a legal entity refinement requires a Pool stub (returning the golden record data) and an Orchestrator stub (returning the task result that references it).
+`GoldenRecordMockFactory.mockLegalEntityRefinement(seed, owningCompany, nameParts)` sets up both stubs and returns the Pool mock result, which the test can use to build its expected output DTO:
 
 ```kotlin
-// From PoolMockDataFactory
-fun mockLegalEntityAndLegalAddressSearchResult(seed: String): LegalEntityWithLegalAddressVerboseDto {
-    val result = buildLegalEntityResult(seed)
-    val page = PageDto(1, 1, 0, 1, listOf(result))
-    WireMock.stubFor(
-        WireMock.get(WireMock.urlPathEqualTo(ApiCommons.LEGAL_ENTITY_BASE_PATH_V7))
-            .willReturn(WireMock.okJson(jsonMapper.writeValueAsString(page)))
-    )
-    return result
+fun mockLegalEntityRefinement(seed: String, owningCompany: String?, nameParts: List<String>): LegalEntityWithLegalAddressVerboseDto {
+    val poolMockResult = poolMockDataFactory.mockLegalEntityAndLegalAddressSearchResult(seed)
+    orchestratorMockDataFactory.mockRefineToLegalEntity(seed, poolMockResult, owningCompany, nameParts)
+    return poolMockResult
 }
 ```
 
@@ -541,14 +659,15 @@ Tests do not call mock factories directly in the GIVEN section.
 This ensures mock setup and business-logic state setup are coordinated correctly and the GIVEN section stays readable.
 
 The exception is when a test needs a custom mock configuration that `TestDataClient` does not offer.
-In that case, the mock factory can be called directly — but this should be rare and should prompt consideration of whether a new `TestDataClient` method is warranted.
+In that case, a mock factory can be called directly — but this should be rare and should prompt consideration of whether a new `TestDataClient` method is warranted.
 
 ---
 
 ## 9. Assertion Repository
 
-`GateAssertRepositoryV7` (`bpdm-gate/src/test/kotlin/.../gate/v7/util/GateAssertRepositoryV7.kt`) is the single place where comparison logic lives.
-All `THEN` sections call `assertRepo` — never AssertJ directly.
+Each module has a single assertion repository that is the only place where comparison logic lives.
+All `THEN` sections call it — never AssertJ directly.
+In the Gate V7 tests this is `GateAssertRepositoryV7` (`bpdm-gate/src/test/kotlin/.../gate/v7/util/GateAssertRepositoryV7.kt`), accessed via the inherited `assertRepo` field.
 
 ### Recursive comparison
 
@@ -596,7 +715,58 @@ When adding assertions for new DTO types, check whether the new type contains `I
 
 ---
 
-## 10. Adding a New Test: Step-by-Step Checklist
+## 10. Parameterized Tests
+
+Some tests need to verify the same behaviour across multiple values — for example, testing that all legal-entity relation types produce valid output, or that all address relation types are handled correctly.
+Rather than duplicating test methods, use JUnit 5's `@ParameterizedTest` with `@EnumSource`.
+
+The enum passed to `@EnumSource` can be an existing application model enum (e.g., `RelationType`) or a dedicated test utility enum that wraps or subsets domain values.
+Dedicated test enums belong in `bpdm-common-test` so they are reusable across modules.
+The Gate V7 tests use `GateTestTypes` for this purpose:
+
+```kotlin
+object GateTestTypes {
+    enum class LegalEntityRelationType(val gateRelationType: RelationType) {
+        IsOwnedBy(RelationType.IsOwnedBy),
+        IsAlternativeHeadquarterFor(RelationType.IsAlternativeHeadquarterFor),
+        IsManagedBy(RelationType.IsManagedBy)
+    }
+
+    enum class AddressRelationType(val gateRelationType: RelationType) {
+        IsReplacedBy(RelationType.IsReplacedBy)
+    }
+}
+```
+
+A parameterized test receives the enum value as a parameter and uses it to drive both the GIVEN setup and the WHEN call:
+
+```kotlin
+@ParameterizedTest
+@EnumSource(GateTestTypes.LegalEntityRelationType::class)
+fun `search relation output between legal entities`(legalEntityRelationType: GateTestTypes.LegalEntityRelationType) {
+    //GIVEN
+    val (relationInput, goldenRecord) = testDataClient.relation.createLegalEntityRelationOutput(
+        testName,
+        legalEntityRelationType.gateRelationType
+    )
+
+    //WHEN
+    val response = gateClient.relationOutput.postSearch()
+
+    //THEN
+    val expectedOutput = testData.relation.output.fromGoldenRecord(relationInput.externalId, goldenRecord)
+    assertRepo.assertRelationOutput(response, PageDto(1, 1, 0, 1, listOf(expectedOutput)))
+}
+```
+
+JUnit generates one test case per enum constant, each with a display name that includes the constant name.
+The `testName` seed therefore differs per constant, keeping test data isolated.
+
+Prefer `@EnumSource` with a named enum over `@MethodSource` or `@ValueSource` with inline values — a named enum is self-documenting and keeps the value set in one discoverable place.
+
+---
+
+## 11. Adding a New Test: Step-by-Step Checklist
 
 Use this checklist when writing a new test case.
 
@@ -608,40 +778,46 @@ Use this checklist when writing a new test case.
 
 **GIVEN section:**
 
-- [ ] Use `testDataClient` methods to set up system state — avoid calling Gate API clients or mock factories directly in the test method
-- [ ] Pass `testName` as the seed to all `testDataClient` methods that accept one
+- [ ] Use the module's TestDataClient to set up system state — avoid calling API clients or mock factories directly in the test method
+- [ ] Pass `testName` as the seed to all TestDataClient methods that accept one
 - [ ] Limit the GIVEN section to the state that is *necessary* for this specific scenario. Avoid creating data that the WHEN or THEN section does not use.
 
 **WHEN section:**
 
-- [ ] Use `gateClient` to call exactly one endpoint
+- [ ] Use the module's API client to call exactly one endpoint
 - [ ] Capture the response in a local variable
 
 **THEN section:**
 
-- [ ] Construct the expected response using the appropriate factory method (`businessPartnerOutputFactory.fromLegalEntity(...)`, `businessPartnerInputFactory.fromRequest(...)`, etc.)
-- [ ] Delegate the assertion to `assertRepo` — do not use `Assertions.assertThat(...)` directly in a test method
+- [ ] Construct the expected response using the appropriate test data factory method
+- [ ] Delegate the assertion to the assertion repository — do not use `Assertions.assertThat(...)` directly in a test method
 - [ ] Do not assert on individual fields unless the factory cannot express the expectation
 
 **Test method name:**
 
 - [ ] Write the test name as a readable sentence describing the scenario, not the technical steps: `` `search legal entity business partner output` `` not `` `callGetOutputEndpointWithLegalEntityId` ``
 
+**If the test covers multiple domain values (e.g., all relation types):**
+
+- [ ] Use `@ParameterizedTest` + `@EnumSource` with an appropriate application model or test utility enum
+- [ ] If a dedicated test enum is needed, add it to the module's test types utility in `bpdm-common-test`
+
 **If you need a new TestDataClient method:**
 
+- [ ] Add it to the module's TestDataClient (or the appropriate domain sub-client if the TestDataClient is namespaced by domain area)
 - [ ] Name it after the business outcome, not the implementation steps
-- [ ] If it requires new WireMock stubs, add factory methods to the appropriate mock factory class rather than inlining WireMock calls
+- [ ] If it requires new WireMock stubs, add factory methods to the appropriate mock factory rather than inlining WireMock calls in the TestDataClient
 - [ ] Ensure the method returns the data the test will need for building expected DTOs
 
 **If you need a new assertion method:**
 
-- [ ] Add it to `GateAssertRepositoryV7`, not inline in the test
+- [ ] Add it to the module's assertion repository, not inline in the test
 - [ ] Apply `.usingRecursiveComparison()` with the standard ignored fields for the DTO type
 - [ ] Register `instantSecondsComparator` and `localDatetimeSecondsComparator` if the DTO contains `Instant` or `LocalDateTime` fields
 
 ---
 
-## 11. Common Mistakes & Anti-Patterns
+## 12. Common Mistakes & Anti-Patterns
 
 ### Injecting utilities directly into a test class
 
@@ -661,7 +837,7 @@ If a utility is missing from the base class, add it there — not in the concret
 ```kotlin
 // Bad — test reveals implementation, not intent
 //GIVEN
-val request = businessPartnerInputRequestFactory.fromSeed(testName)
+val request = testData.businessPartner.input.request.fromSeed(testName)
 gateClient.businessParters.upsertBusinessPartnersInput(listOf(request))
 gateClient.sharingState.postSharingStateReady(PostSharingStateReadyRequest(listOf(testName)))
 taskCreationBatchService.createTasksForReadyBusinessPartners()
@@ -669,8 +845,8 @@ taskResolutionBatchService.resolveTasks()
 
 // Good — test communicates what state it needs
 //GIVEN
-val createdInput = testDataClient.upsertBusinessPartnerInput(testName)
-testDataClient.refineToLegalEntity(createdInput)
+val createdInput = testDataClient.businessPartner.upsertInput(testName)
+testDataClient.businessPartner.refineToLegalEntity(createdInput)
 ```
 
 ### Asserting on incidental fields
@@ -681,7 +857,7 @@ testDataClient.refineToLegalEntity(createdInput)
 assertThat(response.address.physicalPostalAddress.city).isEqualTo("City search legal entity business partner output")
 ```
 
-Use `assertRepo` methods to compare full expected objects.
+Use the assertion repository methods to compare full expected objects.
 If a specific field value matters for the test scenario, the test should have explicitly set that field via `copy()` in the GIVEN section and the assertion should cover the full object.
 
 ### Duplicating assertion logic in tests
@@ -695,7 +871,7 @@ assertThat(response.content[0].legalEntity.legalName).isEqualTo(expected.legalEn
 // ... 20 more fields
 ```
 
-Write the assertion once in `GateAssertRepositoryV7` and call it from every test that needs it.
+Write the assertion once in the assertion repository and call it from every test that needs it.
 Duplicated assertion logic means that when the DTO changes, every test that duplicated the logic must be updated.
 
 ### Testing multiple scenarios in one test method
@@ -704,8 +880,12 @@ Duplicated assertion logic means that when the DTO changes, every test that dupl
 // Bad — two distinct scenarios merged into one test
 @Test
 fun `test business partner output`() {
-    val legalEntity = testDataClient.refineToLegalEntity(testDataClient.upsertBusinessPartnerInput(testName))
-    val site = testDataClient.refineToSite(testDataClient.upsertBusinessPartnerInput("other"))
+    val legalEntity = testDataClient.businessPartner.refineToLegalEntity(
+        testDataClient.businessPartner.upsertInput(testName)
+    )
+    val site = testDataClient.businessPartner.refineToSite(
+        testDataClient.businessPartner.upsertInput("other")
+    )
     // ... assertions on both
 }
 ```
@@ -717,14 +897,21 @@ If the GIVEN section sets up two independent preconditions and the THEN section 
 
 ```kotlin
 // Bad — hardcoded seed creates a conflict if another test in the class uses the same seed
-val input = testDataClient.upsertBusinessPartnerInput("my-test-data")
+val input = testDataClient.businessPartner.upsertInput("my-test-data")  // Gate V7 example
 
 // Good — testName is unique per test and automatically reset between tests
-val input = testDataClient.upsertBusinessPartnerInput(testName)
+val input = testDataClient.businessPartner.upsertInput(testName)  // Gate V7 example
 ```
 
 `testName` is populated from the JUnit display name before each test and the database is reset between tests.
 Always use `testName` as the seed unless you have a specific reason to use a different value (e.g., creating two distinct entities in one test, in which case derive both seeds from `testName`: `"$testName source"`, `"$testName target"`).
+
+### Misusing the TestDataClient structure
+
+When a TestDataClient groups methods by domain area, use the correct namespace.
+For example, in the Gate V7 tests `GateTestDataClientV7` exposes `testDataClient.businessPartner` and `testDataClient.relation` — calling business-partner setup methods on the wrong sub-client, or calling flat methods that do not exist, will not compile and signals a misunderstanding of the TestDataClient's structure.
+
+Consult the TestDataClient for the module you are working in to understand which sub-clients and method categories are available before writing a GIVEN section.
 
 ---
 

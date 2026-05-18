@@ -48,9 +48,9 @@ class CountBusinessPartnersPerStageV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `count business partner inputs`() {
         //GIVEN
-        testDataClient.upsertBusinessPartnerInput("$testName 1")
-        testDataClient.upsertBusinessPartnerInput("$testName 2")
-        testDataClient.upsertBusinessPartnerInput("$testName 3")
+        testDataClient.businessPartner.upsertInput("$testName 1")
+        testDataClient.businessPartner.upsertInput("$testName 2")
+        testDataClient.businessPartner.upsertInput("$testName 3")
 
         //WHEN
         val response = gateClient.stats.countPartnersPerStage()

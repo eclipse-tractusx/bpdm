@@ -43,7 +43,7 @@ class SearchRelationOutputChangelogV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `find relation output create changelog`() {
         //GIVEN
-        val (relationInput, _) = testDataClient.createLegalEntityRelationOutput(testName)
+        val (relationInput, _) = testDataClient.relation.createLegalEntityRelationOutput(testName)
 
         //WHEN
         val response = gateClient.relationChangelog.getOutputChangelog(PaginationRequest(), ChangelogSearchRequest())
@@ -63,8 +63,8 @@ class SearchRelationOutputChangelogV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `find relation output update changelog`() {
         //GIVEN
-        val (relationInput, _) = testDataClient.createLegalEntityRelationOutput(testName)
-        testDataClient.updateLegalEntityRelationOutput(relationInput, "Updated $testName", RelationType.IsOwnedBy)
+        val (relationInput, _) = testDataClient.relation.createLegalEntityRelationOutput(testName)
+        testDataClient.relation.updateLegalEntityRelationOutput(relationInput, "Updated $testName", RelationType.IsOwnedBy)
 
         //WHEN
         val response = gateClient.relationChangelog.getOutputChangelog(PaginationRequest(), ChangelogSearchRequest())
@@ -85,9 +85,9 @@ class SearchRelationOutputChangelogV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `find relation output changelogs by external-ID`() {
         //GIVEN
-        val (rel1, _) = testDataClient.createLegalEntityRelationOutput("$testName 1")
-        testDataClient.createLegalEntityRelationOutput("$testName 2")
-        testDataClient.createLegalEntityRelationOutput("$testName 3")
+        val (rel1, _) = testDataClient.relation.createLegalEntityRelationOutput("$testName 1")
+        testDataClient.relation.createLegalEntityRelationOutput("$testName 2")
+        testDataClient.relation.createLegalEntityRelationOutput("$testName 3")
 
         //WHEN
         val request = ChangelogSearchRequest(externalIds = setOf(rel1.externalId))
@@ -108,12 +108,12 @@ class SearchRelationOutputChangelogV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `find relation output changelogs by timestamp after`() {
         //GIVEN
-        testDataClient.createLegalEntityRelationOutput("$testName 1")
-        testDataClient.createLegalEntityRelationOutput("$testName 2")
+        testDataClient.relation.createLegalEntityRelationOutput("$testName 1")
+        testDataClient.relation.createLegalEntityRelationOutput("$testName 2")
 
         val timeX = Instant.now()
 
-        val (rel3, _) = testDataClient.createLegalEntityRelationOutput("$testName 3")
+        val (rel3, _) = testDataClient.relation.createLegalEntityRelationOutput("$testName 3")
 
         //WHEN
         val request = ChangelogSearchRequest(timestampAfter = timeX)
@@ -134,12 +134,12 @@ class SearchRelationOutputChangelogV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `find relation output changelogs combining external-ID and timestamp filters`() {
         //GIVEN
-        val (relA, _) = testDataClient.createLegalEntityRelationOutput("$testName A")
+        val (relA, _) = testDataClient.relation.createLegalEntityRelationOutput("$testName A")
 
         val timeX = Instant.now()
 
-        testDataClient.updateLegalEntityRelationOutput(relA, "Updated $testName A", RelationType.IsOwnedBy)
-        testDataClient.createLegalEntityRelationOutput("$testName B")
+        testDataClient.relation.updateLegalEntityRelationOutput(relA, "Updated $testName A", RelationType.IsOwnedBy)
+        testDataClient.relation.createLegalEntityRelationOutput("$testName B")
 
         //WHEN
         val request = ChangelogSearchRequest(externalIds = setOf(relA.externalId), timestampAfter = timeX)
@@ -160,7 +160,7 @@ class SearchRelationOutputChangelogV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `return error for non-existing external-ID in relation output changelog`() {
         //GIVEN
-        testDataClient.createLegalEntityRelationOutput(testName)
+        testDataClient.relation.createLegalEntityRelationOutput(testName)
         val unknownExternalId = "non-existing-relation-external-id"
 
         //WHEN
@@ -188,9 +188,9 @@ class SearchRelationOutputChangelogV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `paginate relation output changelogs - first page`() {
         //GIVEN
-        testDataClient.createLegalEntityRelationOutput("$testName 1")
-        testDataClient.createLegalEntityRelationOutput("$testName 2")
-        testDataClient.createLegalEntityRelationOutput("$testName 3")
+        testDataClient.relation.createLegalEntityRelationOutput("$testName 1")
+        testDataClient.relation.createLegalEntityRelationOutput("$testName 2")
+        testDataClient.relation.createLegalEntityRelationOutput("$testName 3")
 
         //WHEN
         val response = gateClient.relationChangelog.getOutputChangelog(PaginationRequest(page = 0, size = 2), ChangelogSearchRequest())
@@ -219,9 +219,9 @@ class SearchRelationOutputChangelogV7IT : UnscheduledGateTestBaseV7() {
     @Test
     fun `paginate relation output changelogs - second page`() {
         //GIVEN
-        testDataClient.createLegalEntityRelationOutput("$testName 1")
-        testDataClient.createLegalEntityRelationOutput("$testName 2")
-        testDataClient.createLegalEntityRelationOutput("$testName 3")
+        testDataClient.relation.createLegalEntityRelationOutput("$testName 1")
+        testDataClient.relation.createLegalEntityRelationOutput("$testName 2")
+        testDataClient.relation.createLegalEntityRelationOutput("$testName 3")
 
         //WHEN
         val response = gateClient.relationChangelog.getOutputChangelog(PaginationRequest(page = 1, size = 2), ChangelogSearchRequest())
