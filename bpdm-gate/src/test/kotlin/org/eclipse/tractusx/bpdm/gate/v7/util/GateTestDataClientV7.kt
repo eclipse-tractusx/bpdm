@@ -33,6 +33,7 @@ import org.eclipse.tractusx.bpdm.gate.service.RelationTaskResolutionService
 import org.eclipse.tractusx.bpdm.gate.service.TaskCreationBatchService
 import org.eclipse.tractusx.bpdm.gate.service.TaskResolutionBatchService
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
+import org.eclipse.tractusx.bpdm.test.testdata.GoldenRecordMockFactory
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.TestDataFactoryGateV7
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.withRelationType
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
@@ -47,7 +48,7 @@ class GateTestDataClientV7(
     private val taskResolutionBatchService: TaskResolutionBatchService,
     private val relationTaskResolutionService: RelationTaskResolutionService,
     private val relationTaskCreationService: RelationTaskCreationService,
-    private val poolMockDataFactory: PoolMockDataFactory,
+    private val goldenRecordMockFactory: GoldenRecordMockFactory,
     private val tenantBpnL: String,
 ) {
 
@@ -141,19 +142,11 @@ class GateTestDataClientV7(
     }
 
     fun setStateToSuccess(externalId: String, seed: String = externalId): TaskClientStateDto {
-        val poolMockResult = poolMockDataFactory.mockAdditionalAddressOfSiteSearchResult(seed)
-        val mockedRefinedTask = orchestratorMockDataFactory.mockRefineToAdditionalAddressOfSite(
-            seed,
-            poolMockResult.legalEntityParent,
-            poolMockResult.siteParent,
-            poolMockResult.additionalAddress,
-            null,
-            emptyList()
-        )
+        val refinement = goldenRecordMockFactory.mockAdditionalAddressOfSiteRefinement(seed, null, emptyList())
         setStateToReady(externalId)
         taskCreationBatchService.createTasksForReadyBusinessPartners()
         taskResolutionBatchService.resolveTasks()
-        return mockedRefinedTask
+        return refinement.taskState
     }
 
     fun setStateToError(externalId: String, seed: String = externalId, errorType: TaskErrorType): TaskClientStateDto {
@@ -189,55 +182,24 @@ class GateTestDataClientV7(
     }
 
     fun refineToLegalEntityOnSite(input: BusinessPartnerInputDto, seed: String = input.externalId): PoolMockDataFactory.SiteWithLegalEntityParent{
-        val poolMockResult = poolMockDataFactory.mockLegalAndSiteMainAddressSearchResult(seed)
-
         val owningCompany = if(input.isOwnCompanyData) tenantBpnL else null
-        orchestratorMockDataFactory.mockRefineToLegalEntityOnSite(
-            seed,
-            poolMockResult.legalEntityParent,
-            poolMockResult.site.site,
-            owningCompany,
-            input.nameParts
-        )
-
+        val poolMockResult = goldenRecordMockFactory.mockLegalEntityOnSiteRefinement(seed, owningCompany, input.nameParts)
         shareBusinessPartnerAndResolve(input.externalId)
-
         return poolMockResult
     }
 
     fun refineToSite(input: BusinessPartnerInputDto, seed: String = input.externalId): PoolMockDataFactory.SiteWithLegalEntityParent{
-        val poolMockResult = poolMockDataFactory.mockSiteAndMainAddressSearchResult(seed)
-
         val owningCompany = if(input.isOwnCompanyData) tenantBpnL else null
-        orchestratorMockDataFactory.mockRefineToSite(
-            seed,
-            poolMockResult.legalEntityParent,
-            poolMockResult.site,
-            owningCompany,
-            input.nameParts
-        )
-
+        val poolMockResult = goldenRecordMockFactory.mockSiteRefinement(seed, owningCompany, input.nameParts)
         shareBusinessPartnerAndResolve(input.externalId)
-
         return poolMockResult
     }
 
     fun refineToAdditionalAddressOfSite(input: BusinessPartnerInputDto, seed: String = input.externalId): PoolMockDataFactory.AdditionalAddressOfSiteResult{
-        val poolMockResult = poolMockDataFactory.mockAdditionalAddressOfSiteSearchResult(seed)
-
         val owningCompany = if(input.isOwnCompanyData) tenantBpnL else null
-        orchestratorMockDataFactory.mockRefineToAdditionalAddressOfSite(
-            seed,
-            poolMockResult.legalEntityParent,
-            poolMockResult.siteParent,
-            poolMockResult.additionalAddress,
-            owningCompany,
-            input.nameParts
-        )
-
+        val refinement = goldenRecordMockFactory.mockAdditionalAddressOfSiteRefinement(seed, owningCompany, input.nameParts)
         shareBusinessPartnerAndResolve(input.externalId)
-
-        return poolMockResult
+        return refinement.poolResult
     }
 
     fun createLegalEntityRelationOutput(seed: String, relationType: RelationType = RelationType.IsManagedBy): Pair<RelationDto, BusinessPartnerRelations> {
@@ -285,12 +247,8 @@ class GateTestDataClientV7(
 
 
     private fun prepareLegalEntityRefinement(input: BusinessPartnerInputDto, seed: String = input.externalId): LegalEntityWithLegalAddressVerboseDto{
-        val poolMockResult = poolMockDataFactory.mockLegalEntityAndLegalAddressSearchResult(seed)
-
         val owningCompany = if(input.isOwnCompanyData) tenantBpnL else null
-        orchestratorMockDataFactory.mockRefineToLegalEntity(seed, poolMockResult, owningCompany, input.nameParts)
-
-        return poolMockResult
+        return goldenRecordMockFactory.mockLegalEntityRefinement(seed, owningCompany, input.nameParts)
     }
 
     private fun shareBusinessPartnerAndResolve(externalId: String): BusinessPartnerOutputDto{

@@ -37,52 +37,5 @@ import tools.jackson.databind.json.JsonMapper
 @Configuration
 class PoolMockConfig {
 
-    @Bean
-    fun testMetadataV7(): TestMetadataV7{
-        return TestMetadataV7(
-            legalForms = listOf(
-                BusinessPartnerVerboseValues.legalForm1,
-                BusinessPartnerVerboseValues.legalForm2
-            ),
-            legalEntityIdentifierTypes = listOf(
-                IdentifierTypeDto("idType1", IdentifierBusinessPartnerType.LEGAL_ENTITY, "idType1", null, null, null, null, sortedSetOf(), emptyList()),
-                IdentifierTypeDto("idType2", IdentifierBusinessPartnerType.LEGAL_ENTITY, "idType2", null, null, null, null, sortedSetOf(), emptyList()),
-                IdentifierTypeDto("idType3", IdentifierBusinessPartnerType.LEGAL_ENTITY, "idType3", null, null, null, null, sortedSetOf(), emptyList())
-            ),
-            addressIdentifierTypes = listOf(
-                IdentifierTypeDto("addressIdType1", IdentifierBusinessPartnerType.ADDRESS, "addressIdType1", null, null, null, null, sortedSetOf(), emptyList()),
-                IdentifierTypeDto("addressIdType2", IdentifierBusinessPartnerType.ADDRESS, "addressIdType2", null, null, null, null, sortedSetOf(), emptyList()),
-                IdentifierTypeDto("addressIdType3", IdentifierBusinessPartnerType.ADDRESS, "addressIdType3", null, null, null, null, sortedSetOf(), emptyList())
-            ),
-            adminAreas = listOf(
-                CountrySubdivisionDto(CountryCode.DE, "adminArea1", "adminArea1"),
-                CountrySubdivisionDto(CountryCode.US, "adminArea2", "adminArea2"),
-                CountrySubdivisionDto(CountryCode.CN, "adminArea3", "adminArea3"),
-            ),
-            scriptCodes = listOf(
-                ScriptCodeDto("Test", "Test Description")
-            ),
-            reasonCodes = listOf(
-                ReasonCodeDto("HEADQUARTER_RELOCATION", "Test Reason"),
-                ReasonCodeDto("OTHER", "Another Test Reason"),
-            )
-        )
-    }
 
-    @Bean
-    fun poolRequestFactory(testMetadataV7: TestMetadataV7): BusinessPartnerRequestFactory {
-        return BusinessPartnerRequestFactory(testMetadataV7)
-    }
-
-    @Bean
-    fun poolMockDataFactory(
-        jsonMapper: JsonMapper,
-        testMetadataV7: TestMetadataV7
-    ): PoolMockDataFactory {
-        return PoolMockDataFactory(
-            BusinessPartnerRequestFactory(testMetadataV7),
-            ExpectedBusinessPartnerResultFactory(testMetadataV7),
-            jsonMapper
-        )
-    }
 }
