@@ -26,6 +26,66 @@ Read it before writing a new test or modifying the test infrastructure.
 
 ---
 
+## Overview
+
+The diagram below shows how the components of the test suite fit together.
+Each section of this guide covers one of these components in detail.
+
+```mermaid
+graph TD
+    subgraph TestMethod["Concrete Test Class (e.g. SearchBusinessPartnerOutputV7IT)"]
+        GIVEN["GIVEN"]
+        WHEN["WHEN"]
+        THEN["THEN"]
+    end
+
+    subgraph Utilities["Test Utilities — inherited via base class hierarchy"]
+        TDC["Test Data Client\ncoordinates state setup"]
+        GC["Api Client\nauthenticated HTTP client"]
+        AR["Assertion Repository\ncomparison logic"]
+        TD["Test Data\nDTO factories"]
+    end
+
+    subgraph TDCInternals["Inside test data client"]
+        GMF["Mock Factories\ncoordinates mocked API calls"]
+        SVC["Application Internal Services\nfor example invoke task resolution"]
+    end
+
+    subgraph App["Application Under Test"]
+        GATE["Application — Spring Boot, RANDOM_PORT"]
+    end
+
+    subgraph Infra["Test Infrastructure"]
+        PG[("PostgreSQL\nTestContainers")]
+        KC["Keycloak\nTestContainers"]
+        OW["Orchestrator\nWireMock"]
+        PW["Pool\nWireMock"]
+    end
+
+    GIVEN -->|uses| TDC
+    WHEN -->|calls| GC
+    THEN -->|builds expected with| TD
+    THEN -->|delegates assertion to| AR
+
+    TDC -->|creates DTOs via| TD
+    TDC -->|sets up stubs via| GMF
+    TDC -->|drives pipeline via| SVC
+    TDC -->|submits data via| GC
+
+    GC -->|HTTP| GATE
+    SVC -->|direct call| GATE
+
+    GMF -->|configures stubs| OW
+    GMF -->|configures stubs| PW
+
+    GATE <-->|JPA| PG
+    GATE <-->|OAuth2| KC
+    GATE -->|HTTP| OW
+    GATE -->|HTTP| PW
+```
+
+---
+
 ## 1. Philosophy & Goals
 
 BPDM tests are **system-level black-box tests**.
