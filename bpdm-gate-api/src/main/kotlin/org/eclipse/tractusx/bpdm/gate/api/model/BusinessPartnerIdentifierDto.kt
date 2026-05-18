@@ -24,7 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.IBusinessPartnerIdentifierDto
 
 data class BusinessPartnerIdentifierDto(
 
-    @get:Schema(description = "The type of the identifier.")
+    @get:Schema(description = "The type of the identifier.",)
     override val type: String?,
     @get:Schema(description = "The value of the identifier like “DE123465789.")
     override val value: String?,

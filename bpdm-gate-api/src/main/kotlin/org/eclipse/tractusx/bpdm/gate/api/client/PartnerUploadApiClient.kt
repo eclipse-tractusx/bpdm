@@ -20,32 +20,31 @@
 package org.eclipse.tractusx.bpdm.gate.api.client
 
 import org.eclipse.tractusx.bpdm.gate.api.ApiCommons
-import org.eclipse.tractusx.bpdm.gate.api.GatePartnerUploadApi
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.springframework.core.io.ByteArrayResource
+import org.springframework.core.io.Resource
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RequestPart
-import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.service.annotation.GetExchange
 import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
 
 @HttpExchange
-interface PartnerUploadApiClient : GatePartnerUploadApi {
+interface PartnerUploadApiClient {
 
     @PostExchange(
         url = "${ApiCommons.BASE_PATH_V7}/input/partner-upload-process",
         contentType = MediaType.MULTIPART_FORM_DATA_VALUE,
         accept = ["application/json"]
     )
-    override fun uploadPartnerCsvFile(
-        @RequestPart("file") file: MultipartFile
+    fun uploadPartnerCsvFile(
+        @RequestPart("file") file: Resource
     ): ResponseEntity<Collection<BusinessPartnerInputDto>>
 
     @GetExchange(
         url = "${ApiCommons.BASE_PATH_V7}/input/partner-upload-template",
     )
-    override fun getPartnerCsvTemplate(): ResponseEntity<ByteArrayResource>
+    fun getPartnerCsvTemplate(): ResponseEntity<ByteArrayResource>
 
 }

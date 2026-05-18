@@ -2,6 +2,24 @@
 
 Documentation here concerns developers who want to contribute to this repository.
 
+<!-- TOC -->
+* [Developer View](#developer-view)
+  * [Testing Guide](#testing-guide)
+  * [Apps and Charts](#apps-and-charts)
+  * [License Check](#license-check)
+  * [Branching Strategy](#branching-strategy)
+  * [Adapting Golden Record Process Steps](#adapting-golden-record-process-steps)
+  * [GitHub Workflows](#github-workflows)
+  * [Create API Documentation](#create-api-documentation)
+  * [Deny Requests on Unsecured Endpoints By Default](#deny-requests-on-unsecured-endpoints-by-default)
+  * [NOTICE](#notice)
+<!-- TOC -->
+
+## Testing Guide
+
+All contributions should be covered by API tests.
+Our in-depth [testing guide](testing-guide.md) how our testing setup works and what to look out for when writing your own test code.
+
 ## Apps and Charts
 
 The CICD pipeline tests new code contributions by deploying them in the current version of the BPDM chart.
