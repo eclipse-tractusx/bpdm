@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: Business Partner Data Management Gate
   description: A gate for a member to share business partner data with CatenaX
-  version: 7.4.0-SNAPSHOT
+  version: 7.4.0-rc1
 servers:
   - url: http://localhost:8081
     description: Generated server url
@@ -141,6 +141,7 @@ paths:
               - IsManagedBy
               - IsAlternativeHeadquarterFor
               - IsOwnedBy
+              - IsReplacedBy
         - name: businessPartnerSourceExternalIds
           in: query
           description: Only show relations which have the given business partners as
@@ -222,7 +223,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RelationPutEntry"
+              $ref: "#/components/schemas/RelationPutEntryV6"
         required: true
       responses:
         "200":
@@ -2746,53 +2747,80 @@ components:
             type: string
     RelationDto:
       type: object
-      description: 'A relation from one business partner (the source) to another business
-        partner (the target). '
+      description: A relation from one business partner (the source) to another business
+        partner (the target).
       properties:
         externalId:
           type: string
+          description: The identifier with which to reference this relation
         relationType:
           type: string
+          description: The type of relation between the business partners
           enum:
             - IsManagedBy
             - IsAlternativeHeadquarterFor
             - IsOwnedBy
+            - IsReplacedBy
         businessPartnerSourceExternalId:
           type: string
+          description: The business partner from which the relation emerges (the source)
         businessPartnerTargetExternalId:
           type: string
+          description: The business partner to which this relation goes (the target)
         validityPeriods:
           type: array
           items:
             $ref: "#/components/schemas/RelationValidityPeriodDto"
+        reasonCode:
+          type: string
+          description: The technical key of the reason code describing why the relation
+            was established. The list of reason codes is available from the golden
+            record Pool.
         updatedAt:
           type: string
           format: date-time
+          description: The time when this relation was last modified
         createdAt:
           type: string
           format: date-time
+          description: The time when this relation was created
     RelationOutputDto:
       type: object
+      description: A relation from one business partner (the source) to another business
+        partner (the target).
       properties:
         externalId:
           type: string
+          description: The identifier with which to reference this relation
         relationType:
           type: string
+          description: The type of relation between the business partners
           enum:
             - IsAlternativeHeadquarterFor
             - IsManagedBy
             - IsOwnedBy
-        sourceBpnL:
+            - IsReplacedBy
+        sourceBpn:
           type: string
-        targetBpnL:
+          description: The business partner from which the relation emerges (the source)
+        targetBpn:
           type: string
+          description: The business partner to which this relation goes (the target)
         validityPeriods:
           type: array
+          description: A relation validity describes a timeframe in which a relation
+            is active.
           items:
             $ref: "#/components/schemas/RelationValidityPeriodDto"
+        reasonCode:
+          type: string
+          description: The technical key of the reason code describing why the relation
+            was established. The list of reason codes is available from the golden
+            record Pool.
         updatedAt:
           type: string
           format: date-time
+          description: The time when this relation was last modified
     RelationOutputSearchRequest:
       type: object
       description: Request payload containing search parameters for business partner
@@ -2808,11 +2836,12 @@ components:
             - IsAlternativeHeadquarterFor
             - IsManagedBy
             - IsOwnedBy
-        sourceBpnLs:
+            - IsReplacedBy
+        sourceBpns:
           type: array
           items:
             type: string
-        targetBpnLs:
+        targetBpns:
           type: array
           items:
             type: string
@@ -2831,6 +2860,7 @@ components:
             - IsManagedBy
             - IsAlternativeHeadquarterFor
             - IsOwnedBy
+            - IsReplacedBy
         businessPartnerSourceExternalId:
           type: string
         businessPartnerTargetExternalId:
@@ -2847,6 +2877,33 @@ components:
             - IsManagedBy
             - IsAlternativeHeadquarterFor
             - IsOwnedBy
+            - IsReplacedBy
+        businessPartnerSourceExternalId:
+          type: string
+        businessPartnerTargetExternalId:
+          type: string
+        reasonCode:
+          type: string
+          description: The technical key of the reason code describing why the relation
+            was established. The list of reason codes is available from the golden
+            record Pool.
+        validityPeriods:
+          type: array
+          items:
+            $ref: "#/components/schemas/RelationValidityPeriodDto"
+    RelationPutEntryV6:
+      type: object
+      description: A request to update the content of the given business partner relation
+      properties:
+        externalId:
+          type: string
+        relationType:
+          type: string
+          enum:
+            - IsManagedBy
+            - IsAlternativeHeadquarterFor
+            - IsOwnedBy
+            - IsReplacedBy
         businessPartnerSourceExternalId:
           type: string
         businessPartnerTargetExternalId:
@@ -2885,6 +2942,7 @@ components:
             - IsManagedBy
             - IsAlternativeHeadquarterFor
             - IsOwnedBy
+            - IsReplacedBy
         businessPartnerSourceExternalIds:
           type: array
           items:
@@ -2944,6 +3002,7 @@ components:
             - IsManagedBy
             - IsAlternativeHeadquarterFor
             - IsOwnedBy
+            - IsReplacedBy
         businessPartnerSourceExternalId:
           type: string
         businessPartnerTargetExternalId:

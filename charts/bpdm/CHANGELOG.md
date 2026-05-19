@@ -4,10 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
-## [6.3.0] - tbd
+## [7.0.0] - 2026-05-19
 
-- Increase appversion to 7.4.0
-- Remove Bitnami Postgres dependency [#1625](https://github.com/eclipse-tractusx/bpdm/issues/1625)
+### Breaking
+
+- Replaced Bitnami Postgres dependency with CloudPirates Postgres dependency [#1625](https://github.com/eclipse-tractusx/bpdm/issues/1625)
+
+### Changed
+
+- Increase appversion to 7.4.0-rc1
+- Update BPDM Gate Chart to version 8.0.0
+- Update BPDM Pool Chart to version 9.0.0
+- Update BPDM Orchestrator Chart to version 5.0.0
+- Update BPDM Cleaning Service Dummy Chart to version 5.0.0
 
 ## [6.3.0] - 2026-03-6
 
