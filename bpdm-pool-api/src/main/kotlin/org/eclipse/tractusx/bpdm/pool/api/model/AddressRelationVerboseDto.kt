@@ -41,5 +41,5 @@ data class AddressRelationVerboseDto(
     val validityPeriods: Collection<RelationValidityPeriod>,
 
     @get:Schema(description = RelationDescription.reasonCode)
-    val reasonCode: String
+    val reasonCode: String?
 )
