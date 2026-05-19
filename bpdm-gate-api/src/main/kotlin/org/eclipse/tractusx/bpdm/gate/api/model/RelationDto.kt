@@ -37,7 +37,7 @@ data class RelationDto(
     @Schema(description = RelationValidityPeriodDescription.header)
     val validityPeriods: Collection<RelationValidityPeriodDto>,
     @get:Schema(description = RelationDescription.reasonCode)
-    val reasonCode: String,
+    val reasonCode: String?,
     @get:Schema(description = RelationDescription.updatedAt)
     val updatedAt: Instant,
     @get:Schema(description = RelationDescription.createdAt)

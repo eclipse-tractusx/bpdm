@@ -43,6 +43,6 @@ class RelationOutputDb(
         indexes = [Index(name = "idx_output_validity_periods_relation_id", columnList = "output_id")]
     )
     var validityPeriods: MutableList<RelationValidityPeriodDb>,
-    @Column(name = "reason_code", nullable = false)
-    var reasonCode: String
+    @Column(name = "reason_code")
+    var reasonCode: String?
 ) : BaseEntity()

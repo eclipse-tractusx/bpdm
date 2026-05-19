@@ -58,8 +58,9 @@ class TaskLegalEntityRelationsStepBuildService(
         val targetLegalEntity = legalEntityRepository.findByBpnIgnoreCase(relationDto.businessPartnerTargetBpn)
             ?: throw BpdmValidationException("Target legal entity with specified BPNL : ${relationDto.businessPartnerTargetBpn} not found")
 
-        val reasonCode  = reasonCodeRepository.findByTechnicalKey(relationDto.reasonCode)
-            ?: throw BpdmValidationException("Relation reason code '${relationDto.reasonCode}' not found")
+        val reasonCode  = relationDto.reasonCode?.let {
+            reasonCodeRepository.findByTechnicalKey(it) ?: throw BpdmValidationException("Relation reason code '${relationDto.reasonCode}' not found")
+        }
 
         validateValidityPeriods(relationDto)
 
@@ -119,7 +120,7 @@ class TaskLegalEntityRelationsStepBuildService(
                     validTo = it.validTo
                 )
             },
-            reasonCode = reasonCode.technicalKey
+            reasonCode = reasonCode?.technicalKey
         )
     }
 

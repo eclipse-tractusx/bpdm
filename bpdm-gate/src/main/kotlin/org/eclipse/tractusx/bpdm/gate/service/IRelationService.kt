@@ -61,6 +61,6 @@ interface IRelationService {
         val businessPartnerSourceExternalId: String,
         val businessPartnerTargetExternalId: String,
         val validityPeriods: Collection<RelationValidityPeriodDto>,
-        val reasonCode: String
+        val reasonCode: String?
     )
 }

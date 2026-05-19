@@ -8,7 +8,7 @@ CREATE TABLE relation_outputs
     source_bpn        VARCHAR(255)                NOT NULL,
     target_bpn        VARCHAR(255)                NOT NULL,
     result_updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    reason_code       VARCHAR(255)                NOT NULL,
+    reason_code       VARCHAR(255),
     CONSTRAINT pk_relation_outputs PRIMARY KEY (id),
     CONSTRAINT uc_relation_outputs_uuid UNIQUE (uuid)
 );

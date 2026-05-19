@@ -37,7 +37,7 @@ data class RelationPutEntry(
     @Schema(description = "The external identifier of the business partner to which the relation should point (the target)")
     override val businessPartnerTargetExternalId: String,
     @get:Schema(description = RelationDescription.reasonCode)
-    val reasonCode: String,
+    val reasonCode: String?,
     @Schema(description = RelationValidityPeriodDescription.header)
     val validityPeriods: List<RelationValidityPeriodDto> = listOf(),
 ): IRelationDto
