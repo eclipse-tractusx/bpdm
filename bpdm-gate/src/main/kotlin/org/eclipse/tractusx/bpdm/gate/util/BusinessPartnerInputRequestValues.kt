@@ -87,7 +87,7 @@ object BusinessPartnerInputRequestValues {
             physicalPostalAddress = PhysicalPostalAddressDto(
                 geographicCoordinates = geoCoordinate,
                 country = CountryCode.UNDEFINED,
-                administrativeAreaLevel1 = "string",
+                administrativeAreaLevel1 = "AD-02",
                 administrativeAreaLevel2 = "string",
                 administrativeAreaLevel3 = "string",
                 postalCode = "string",
@@ -104,7 +104,7 @@ object BusinessPartnerInputRequestValues {
             alternativePostalAddress = AlternativePostalAddressDto(
                 geographicCoordinates = geoCoordinate,
                 country = CountryCode.UNDEFINED,
-                administrativeAreaLevel1 = "string",
+                administrativeAreaLevel1 = "AD-02",
                 postalCode = "string",
                 city = "string",
                 deliveryServiceType = DeliveryServiceType.PO_BOX,
