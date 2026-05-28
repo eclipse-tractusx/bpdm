@@ -20,56 +20,32 @@
 package org.eclipse.tractusx.bpdm.pool.v7.metadata
 
 import org.assertj.core.api.Assertions.assertThat
-import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.ReasonCodeDto
-import org.eclipse.tractusx.bpdm.pool.api.model.request.ReasonCodeDeleteRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.ReasonCodeUpsertRequest
 import org.eclipse.tractusx.bpdm.pool.v7.UnscheduledPoolTestBaseV7
 import org.junit.jupiter.api.Test
 
-class ReasonCodeGetV7IT: UnscheduledPoolTestBaseV7() {
+class ReasonCodeGetV7IT : UnscheduledPoolTestBaseV7() {
 
     /**
-     * GIVEN reason code
-     * WHEN operator searches for reason codes
-     * THEN operator finds reason code
+     * GIVEN the Pool is freshly deployed with the default Flyway migration
+     * WHEN an operator requests reason codes
+     * THEN all six default reason codes are present
      */
     @Test
-    fun `find created reason code`(){
-        //GIVEN
-        val request = ReasonCodeUpsertRequest(ReasonCodeDto(testName, "$testName description"))
-        poolClient.metadata.upsertReasonCode(request)
+    fun `default reason codes are seeded and returned by GET`() {
+        val expectedTechnicalKeys = setOf(
+            "HEADQUARTER_RELOCATION",
+            "SITE_RELOCATION",
+            "LEGAL_ENTITY_COURT_DISTRICT_CHANGE",
+            "MERGER",
+            "SPLIT_SPIN_OFF",
+            "INSOLVENCY_ABSORPTION"
+        )
 
-        //WHEN
-        val response = poolClient.metadata.getReasonCodes(PaginationRequest())
+        val response = poolClient.metadata.getReasonCodes(PaginationRequest(page = 0, size = 100))
 
-        //THEN
-        val expected = PageDto(1, 1, 0, 1, listOf(request.reasonCode))
-        assertThat(response).isEqualTo(expected)
-    }
-
-    /**
-     * GIVEN updated reason code
-     * WHEN operator searches for reason codes
-     * THEN operator finds updated reason code
-     */
-    @Test
-    fun `find updated reason code`(){
-        //GIVEN
-        val createRequest = ReasonCodeUpsertRequest(ReasonCodeDto(testName, "$testName description"))
-        poolClient.metadata.upsertReasonCode(createRequest)
-
-        val updateRequest = ReasonCodeUpsertRequest(ReasonCodeDto(createRequest.reasonCode.technicalKey, "$testName updated description"))
-        poolClient.metadata.upsertReasonCode(updateRequest)
-
-
-        //WHEN
-        val response = poolClient.metadata.getReasonCodes(PaginationRequest())
-
-        //THEN
-        val expected = PageDto(1, 1, 0, 1, listOf(updateRequest.reasonCode))
-        assertThat(response).isEqualTo(expected)
+        val actualTechnicalKeys = response.content.map { it.technicalKey }.toSet()
+        assertThat(actualTechnicalKeys).containsAll(expectedTechnicalKeys)
     }
 
 }

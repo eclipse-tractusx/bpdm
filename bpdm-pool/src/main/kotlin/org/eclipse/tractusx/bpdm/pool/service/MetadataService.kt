@@ -25,19 +25,15 @@ import org.eclipse.tractusx.bpdm.common.dto.IBaseLegalEntityDto
 import org.eclipse.tractusx.bpdm.common.dto.IBaseLogisticAddressDto
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.exception.BpdmValidationErrorException
 import org.eclipse.tractusx.bpdm.common.mapping.ValidationContext
 import org.eclipse.tractusx.bpdm.common.mapping.ValidationError
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.ReasonCodeDeleteRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.ReasonCodeUpsertRequest
 import org.eclipse.tractusx.bpdm.pool.dto.*
 import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmAlreadyExists
-import org.eclipse.tractusx.bpdm.pool.exception.BpdmReasonCodeInUseException
 import org.eclipse.tractusx.bpdm.pool.repository.*
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
@@ -56,7 +52,6 @@ class MetadataService(
     private val regionRepository: RegionRepository,
     private val scriptCodeRepository: ScriptCodeRepository,
     private val reasonCodeRepository: ReasonCodeRepository,
-    private val relationRepository: RelationRepository,
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -249,29 +244,6 @@ class MetadataService(
         val pageResponse = reasonCodeRepository.findAll(pageRequest)
 
         return pageResponse.toDto { ReasonCodeDto(technicalKey = it.technicalKey, description = it.description) }
-    }
-
-    @Transactional
-    fun upsertReasonCode(reasonCodeUpsertRequest: ReasonCodeUpsertRequest): ReasonCodeDto{
-        val foundReasonCode = reasonCodeRepository.findByTechnicalKey(reasonCodeUpsertRequest.reasonCode.technicalKey)
-            ?: ReasonCodeDb(reasonCodeUpsertRequest.reasonCode.technicalKey, reasonCodeUpsertRequest.reasonCode.description)
-
-        foundReasonCode.description = reasonCodeUpsertRequest.reasonCode.description
-
-        reasonCodeRepository.save(foundReasonCode)
-
-        return ReasonCodeDto(foundReasonCode.technicalKey, foundReasonCode.description)
-    }
-
-    @Transactional
-    fun deleteReasonCode(deleteRequest: ReasonCodeDeleteRequest){
-        val foundReasonCode = reasonCodeRepository.findByTechnicalKey(deleteRequest.technicalKey)
-            ?: throw BpdmNotFoundException("Reason Code", deleteRequest.technicalKey)
-
-        if(relationRepository.existsByReasonCode(foundReasonCode))
-            throw BpdmReasonCodeInUseException(foundReasonCode.technicalKey)
-
-        reasonCodeRepository.delete(foundReasonCode)
     }
 
 

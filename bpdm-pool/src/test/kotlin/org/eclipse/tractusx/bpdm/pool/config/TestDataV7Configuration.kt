@@ -49,9 +49,9 @@ class TestDataV7Configuration {
     @Bean
     fun poolDataHelper(poolClient: PoolApiClient): PoolDataHelper {
         return PoolDataHelper(poolClient, listOf(
-            ReasonCodeDto("REASON1", "REASON1 description"),
-            ReasonCodeDto("REASON2", "REASON2 description"),
-            ReasonCodeDto("REASON3", "REASON3 description"),
+            ReasonCodeDto("HEADQUARTER_RELOCATION", "Complete relocation of a legal entity headquarter to a new physical location"),
+            ReasonCodeDto("SITE_RELOCATION", "Complete relocation of a site to a new physical location"),
+            ReasonCodeDto("MERGER", "Merger of two or more legal entities into a single successor entity"),
         ))
     }
 
@@ -74,9 +74,9 @@ class TestDataV7Configuration {
             ScriptCodeDto("KANJI", "Japanese Characters (Hiragana, Katakana and Kanji)")
         )
         val reasonCodes = listOf(
-            ReasonCodeDto("REASON1", "REASON1 description"),
-            ReasonCodeDto("REASON2", "REASON2 description"),
-            ReasonCodeDto("REASON3", "REASON3 description"),
+            ReasonCodeDto("HEADQUARTER_RELOCATION", "Complete relocation of a legal entity headquarter to a new physical location"),
+            ReasonCodeDto("SITE_RELOCATION", "Complete relocation of a site to a new physical location"),
+            ReasonCodeDto("MERGER", "Merger of two or more legal entities into a single successor entity"),
         )
 
         return TestMetadataV7(
