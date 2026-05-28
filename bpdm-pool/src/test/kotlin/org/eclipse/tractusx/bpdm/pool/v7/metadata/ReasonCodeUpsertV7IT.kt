@@ -19,44 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.v7.metadata
 
-import org.assertj.core.api.Assertions.assertThat
-import org.eclipse.tractusx.bpdm.pool.api.model.ReasonCodeDto
-import org.eclipse.tractusx.bpdm.pool.api.model.request.ReasonCodeUpsertRequest
-import org.eclipse.tractusx.bpdm.pool.v7.UnscheduledPoolTestBaseV7
-import org.junit.jupiter.api.Test
+// Reason codes are now read-only (seeded via Flyway migration V7_4_0_6).
+// The PUT /v7/reason-codes endpoint has been removed.
+// Tests for the GET endpoint are located in ReasonCodeGetV7IT.
 
-class ReasonCodeUpsertV7IT: UnscheduledPoolTestBaseV7() {
-
-    /**
-     * WHEN operator upserts new reason code
-     * THEN operator sees reason code created
-     */
-    @Test
-    fun `create new reason code`(){
-        //WHEN
-        val request = ReasonCodeUpsertRequest(ReasonCodeDto(testName, "$testName description"))
-        val response = poolClient.metadata.upsertReasonCode(request)
-
-        //THEN
-        assertThat(response).isEqualTo(request.reasonCode)
-    }
-
-    /**
-     * GIVEN reason code
-     * WHEN operator upserts reason code by technical key
-     * THEN operator sees reason code updated
-     */
-    @Test
-    fun `update reason code`(){
-        //GIVEN
-        val createRequest = ReasonCodeUpsertRequest(ReasonCodeDto(testName, "$testName description"))
-        poolClient.metadata.upsertReasonCode(createRequest)
-
-        //WHEN
-        val updateRequest = ReasonCodeUpsertRequest(ReasonCodeDto(createRequest.reasonCode.technicalKey, "$testName updated description"))
-        val response = poolClient.metadata.upsertReasonCode(updateRequest)
-
-        //THEN
-        assertThat(response).isEqualTo(updateRequest.reasonCode)
-    }
-}

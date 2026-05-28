@@ -2462,6 +2462,37 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PageDtoScriptCodeDto"
+  /v7/reason-codes:
+    get:
+      tags:
+        - Metadata Controller
+      summary: Get page of available business partner relation reason codes
+      operationId: getReasonCodes
+      parameters:
+        - name: page
+          in: query
+          description: Number of page to get results from
+          required: false
+          schema:
+            type: string
+            minimum: 0
+        - name: size
+          in: query
+          description: Size of each page
+          required: false
+          schema:
+            type: string
+            maximum: 100
+            minimum: 0
+      responses:
+        "200":
+          description: "Page of existing reason codes, may be empty"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PageDtoReasonCodeDto"
+        "400":
+          description: On malformed request parameters
   /v7/legal-entities/{idValue}:
     get:
       tags:
@@ -3585,6 +3616,11 @@ components:
           $ref: "#/components/schemas/AlternativePostalAddressVerboseDto"
           description: "The alternative postal address of the address, for example\
             \ if the goods are to be picked up somewhere else."
+        relations:
+          type: array
+          description: Relations to other business partners.
+          items:
+            $ref: "#/components/schemas/AddressRelationVerboseDto"
         bpnLegalEntity:
           type: string
           description: The BPNL of the legal entity owning the address.
@@ -3722,6 +3758,11 @@ components:
           $ref: "#/components/schemas/AlternativePostalAddressVerboseDto"
           description: "The alternative postal address of the address, for example\
             \ if the goods are to be picked up somewhere else."
+        relations:
+          type: array
+          description: Relations to other business partners.
+          items:
+            $ref: "#/components/schemas/AddressRelationVerboseDto"
         bpnLegalEntity:
           type: string
           description: The BPNL of the legal entity owning the address.
@@ -3757,6 +3798,31 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/LogisticAddressScriptVariantDto"
+    AddressRelationVerboseDto:
+      type: object
+      description: Directed relation between two business partners of type address
+      properties:
+        type:
+          type: string
+          description: The type of relation between the logistic addresses
+          enum:
+            - IsReplacedBy
+        businessPartnerSourceBpna:
+          type: string
+          description: BPNA of the address from which the relation starts (source)
+        businessPartnerTargetBpna:
+          type: string
+          description: BPNA of the address to which this relation points (target)
+        validityPeriods:
+          type: array
+          description: Validity periods of this address relation
+          items:
+            $ref: "#/components/schemas/RelationValidityPeriod"
+        reasonCode:
+          type: string
+          description: The technical key of the reason code describing why the relation
+            was established. The list of reason codes is available from the golden
+            record Pool.
     AddressSearchRequest:
       type: object
       properties:
@@ -7242,6 +7308,11 @@ components:
           $ref: "#/components/schemas/AlternativePostalAddressVerboseDto"
           description: "The alternative postal address of the address, for example\
             \ if the goods are to be picked up somewhere else."
+        relations:
+          type: array
+          description: Relations to other business partners.
+          items:
+            $ref: "#/components/schemas/AddressRelationVerboseDto"
         bpnLegalEntity:
           type: string
           description: The BPNL of the legal entity owning the address.
@@ -7610,6 +7681,31 @@ components:
           description: Collection of results in the page
           items:
             $ref: "#/components/schemas/LogisticAddressVerboseDto"
+    PageDtoReasonCodeDto:
+      type: object
+      description: Paginated collection of results
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+          description: Total number of all results in all pages
+        totalPages:
+          type: integer
+          format: int32
+          description: Total number pages
+        page:
+          type: integer
+          format: int32
+          description: Current page number
+        contentSize:
+          type: integer
+          format: int32
+          description: Number of results in the page
+        content:
+          type: array
+          description: Collection of results in the page
+          items:
+            $ref: "#/components/schemas/ReasonCodeDto"
     PageDtoScriptCodeDto:
       type: object
       description: Paginated collection of results
@@ -8116,6 +8212,14 @@ components:
           $ref: "#/components/schemas/PhysicalAddressScriptVariantDto"
         alternativeAddress:
           $ref: "#/components/schemas/AlternativeAddressScriptVariantDto"
+    ReasonCodeDto:
+      type: object
+      description: Describes a reason for a business partner relation to exist
+      properties:
+        technicalKey:
+          type: string
+        description:
+          type: string
     RegionDto:
       type: object
       description: Region within a country
@@ -8437,6 +8541,8 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/RelationValidityPeriod"
+        reasonCode:
+          type: string
     ScriptCodeDto:
       type: object
       properties:
@@ -9143,12 +9249,12 @@ components:
       type: oauth2
       flows:
         clientCredentials:
-          tokenUrl: http://localhost:8180/realms/CX-Central/protocol/openid-connect/token
+          tokenUrl: http://localhost:8180/realms/BPDM/protocol/openid-connect/token
           scopes: {}
         authorizationCode:
-          authorizationUrl: http://localhost:8180/realms/CX-Central/protocol/openid-connect/auth
-          tokenUrl: http://localhost:8180/realms/CX-Central/protocol/openid-connect/token
-          refreshUrl: http://localhost:8180/realms/CX-Central/protocol/openid-connect/token
+          authorizationUrl: http://localhost:8180/realms/BPDM/protocol/openid-connect/auth
+          tokenUrl: http://localhost:8180/realms/BPDM/protocol/openid-connect/token
+          refreshUrl: http://localhost:8180/realms/BPDM/protocol/openid-connect/token
           scopes: {}
     bearer_scheme:
       type: http

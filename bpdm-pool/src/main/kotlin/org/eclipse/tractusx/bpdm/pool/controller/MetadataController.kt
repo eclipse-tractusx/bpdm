@@ -25,8 +25,6 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.PoolMetadataApi
 import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.ReasonCodeDeleteRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.ReasonCodeUpsertRequest
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.service.MetadataService
 import org.springframework.data.domain.PageRequest
@@ -79,15 +77,6 @@ class MetadataController(
        return metadataService.getReasonCodes(paginationRequest)
     }
 
-    @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_METADATA})")
-    override fun upsertReasonCode(request: ReasonCodeUpsertRequest): ReasonCodeDto {
-        return metadataService.upsertReasonCode(request)
-    }
-
-    @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_METADATA})")
-    override fun deleteReasonCode(request: ReasonCodeDeleteRequest) {
-       metadataService.deleteReasonCode(request)
-    }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_METADATA})")
     override fun getScriptCodes(paginationRequest: PaginationRequest): PageDto<ScriptCodeDto> {
