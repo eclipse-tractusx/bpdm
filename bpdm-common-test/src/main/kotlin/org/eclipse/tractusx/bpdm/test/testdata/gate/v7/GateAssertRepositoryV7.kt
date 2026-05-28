@@ -17,23 +17,74 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.v7.util
+package org.eclipse.tractusx.bpdm.test.testdata.gate.v7
 
 import org.assertj.core.api.Assertions
+import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.*
+import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressComponentOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressRepresentationInputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityRepresentationInputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityRepresentationOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteRepresentationInputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteRepresentationOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsSharingStatesResponse
 import org.eclipse.tractusx.bpdm.test.util.InstantSecondsComparator
 import org.eclipse.tractusx.bpdm.test.util.LocalDatetimeSecondsComparator
 import java.time.Instant
 import java.time.LocalDateTime
 
+/*******************************************************************************
+ * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Apache License, Version 2.0 which is available at
+ * https://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ ******************************************************************************/
 class GateAssertRepositoryV7(
     private val instantSecondsComparator: InstantSecondsComparator,
     private val localDatetimeSecondsComparator: LocalDatetimeSecondsComparator
 ) {
+
+    val outputComparisonConfig: RecursiveComparisonConfiguration = RecursiveComparisonConfiguration.builder()
+        .withIgnoredFields(
+            BusinessPartnerOutputDto::createdAt.name,
+            BusinessPartnerOutputDto::updatedAt.name
+        )
+        .withComparatorForType(instantSecondsComparator, Instant::class.java)
+        .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
+        .build()
+
+    val outputComparisonConfigNoBpn: RecursiveComparisonConfiguration = RecursiveComparisonConfiguration.builder()
+        .withIgnoredFields(
+            BusinessPartnerOutputDto::createdAt.name,
+            BusinessPartnerOutputDto::updatedAt.name,
+            "legalEntity.${LegalEntityRepresentationOutputDto::legalEntityBpn.name}",
+            "site.${SiteRepresentationOutputDto::siteBpn.name}",
+            "address.${AddressComponentOutputDto::addressBpn.name}"
+        )
+        .withComparatorForType(instantSecondsComparator, Instant::class.java)
+        .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
+        .build()
 
     fun assertBusinessPartnerInput(actual: Collection<BusinessPartnerInputDto>, expected: Collection<BusinessPartnerInputDto>) {
         Assertions.assertThat(actual.sortedBy { it.externalId }.map { it.sortContent() })
@@ -50,21 +101,23 @@ class GateAssertRepositoryV7(
         assertBusinessPartnerInput(actual.content, expected.content)
     }
 
-    fun assertBusinessPartnerOutput(actual: Collection<BusinessPartnerOutputDto>, expected: Collection<BusinessPartnerOutputDto>) {
+    fun assertBusinessPartnerOutput(
+        actual: Collection<BusinessPartnerOutputDto>,
+        expected: Collection<BusinessPartnerOutputDto>,
+        config: RecursiveComparisonConfiguration = outputComparisonConfig
+    ) {
         Assertions.assertThat(actual.sortedBy { it.externalId }.map { it.sortContent() })
-            .usingRecursiveComparison()
-            .ignoringFields(
-                BusinessPartnerOutputDto::createdAt.name,
-                BusinessPartnerOutputDto::updatedAt.name
-            )
-            .withComparatorForType(instantSecondsComparator, Instant::class.java)
-            .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
+            .usingRecursiveComparison(config)
             .isEqualTo(expected.sortedBy { it.externalId }.map { it.sortContent() })
     }
 
-    fun assertBusinessPartnerOutput(actual: PageDto<BusinessPartnerOutputDto>, expected: PageDto<BusinessPartnerOutputDto>) {
+    fun assertBusinessPartnerOutput(
+        actual: PageDto<BusinessPartnerOutputDto>,
+        expected: PageDto<BusinessPartnerOutputDto>,
+        config: RecursiveComparisonConfiguration = outputComparisonConfig
+    ) {
         assertPageHeader(actual, expected)
-        assertBusinessPartnerOutput(actual.content, expected.content)
+        assertBusinessPartnerOutput(actual.content, expected.content, config)
     }
 
     fun assertSharingStates(actual: PageDto<SharingStateDto>, expected: PageDto<SharingStateDto>) {
@@ -77,7 +130,8 @@ class GateAssertRepositoryV7(
             .usingRecursiveComparison()
             .ignoringFields(
                 SharingStateDto::updatedAt.name,
-                SharingStateDto::sharingProcessStarted.name
+                SharingStateDto::sharingProcessStarted.name,
+                SharingStateDto::taskId.name
             )
             .isEqualTo(expected)
     }
