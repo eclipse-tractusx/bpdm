@@ -1627,6 +1627,11 @@
             "items" : {
               "$ref" : "#/components/schemas/AddressGoldenRecordRelationDto"
             }
+          },
+          "updatedAt" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "Timestamp when the associated address golden record was last updated"
           }
         },
         "required" : [ "bpnA" ]
@@ -2249,6 +2254,11 @@
             "items" : {
               "$ref" : "#/components/schemas/LegalEntityGoldenRecordRelationDto"
             }
+          },
+          "updatedAt" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "Timestamp when the associated legal entity golden record was last updated"
           }
         },
         "required" : [ "bpnL" ]
@@ -3043,6 +3053,11 @@
             "items" : {
               "$ref" : "#/components/schemas/BusinessPartnerStateDto"
             }
+          },
+          "updatedAt" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "Timestamp when the associated site golden record was last updated"
           }
         }
       },

@@ -105,6 +105,15 @@ class BusinessPartnerDb(
     @Column(name = "external_sequence_timestamp")
     var externalSequenceTimestamp: Instant? = null,
 
+    @Column(name = "legal_entity_updated_at")
+    var legalEntityUpdatedAt: Instant? = null,
+
+    @Column(name = "site_updated_at")
+    var siteUpdatedAt: Instant? = null,
+
+    @Column(name = "address_updated_at")
+    var addressUpdatedAt: Instant? = null,
+
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "business_partners_le_golden_record_relations", joinColumns = [JoinColumn(name = "business_partner_id")])
     val legalEntityGoldenRecordRelations: MutableList<LegalEntityGoldenRecordRelationDb> = mutableListOf(),

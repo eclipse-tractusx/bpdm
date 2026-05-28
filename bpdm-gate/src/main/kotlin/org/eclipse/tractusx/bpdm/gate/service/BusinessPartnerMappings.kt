@@ -168,7 +168,8 @@ class BusinessPartnerMappings {
                 "Missing address confidence criteria"
             ),
             states = toStateDtos(entity.states, BusinessPartnerType.LEGAL_ENTITY),
-            goldenRecordRelations = entity.legalEntityGoldenRecordRelations.map { LegalEntityGoldenRecordRelationDto(toLeRelationType(it.relationType), it.sourceBpn, it.targetBpn) }
+            goldenRecordRelations = entity.legalEntityGoldenRecordRelations.map { LegalEntityGoldenRecordRelationDto(toLeRelationType(it.relationType), it.sourceBpn, it.targetBpn) },
+            updatedAt = entity.legalEntityUpdatedAt
         )
     }
 
@@ -183,7 +184,8 @@ class BusinessPartnerMappings {
                         entity.sharingState.externalId,
                         "Missing site confidence criteria"
                     ),
-                    states = toStateDtos(entity.states, BusinessPartnerType.SITE)
+                    states = toStateDtos(entity.states, BusinessPartnerType.SITE),
+                    updatedAt = entity.siteUpdatedAt
                 )
             }
     }
@@ -205,7 +207,8 @@ class BusinessPartnerMappings {
                 "Missing legal entity confidence criteria"
             ),
             states = toStateDtos(entity.states, BusinessPartnerType.ADDRESS),
-            goldenRecordRelations = entity.addressGoldenRecordRelations.map { AddressGoldenRecordRelationDto(toAddressRelationType(it.relationType), it.sourceBpn, it.targetBpn) }
+            goldenRecordRelations = entity.addressGoldenRecordRelations.map { AddressGoldenRecordRelationDto(toAddressRelationType(it.relationType), it.sourceBpn, it.targetBpn) },
+            updatedAt = entity.addressUpdatedAt
         )
     }
 

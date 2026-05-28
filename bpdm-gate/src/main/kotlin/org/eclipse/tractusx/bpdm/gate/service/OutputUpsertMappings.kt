@@ -53,7 +53,10 @@ class OutputUpsertMappings(
                 postalAddress = PostalAddressDb(addressType, physicalPostalAddress.toEntity(), alternativePostalAddress?.toEntity()),
                 legalEntityConfidence = legalEntityConfidence.toEntity(),
                 siteConfidence = siteConfidence?.toEntity(),
-                addressConfidence = addressConfidence.toEntity()
+                addressConfidence = addressConfidence.toEntity(),
+                legalEntityUpdatedAt = legalEntityUpdatedAt,
+                siteUpdatedAt = siteUpdatedAt,
+                addressUpdatedAt = addressUpdatedAt
             )
         }
 

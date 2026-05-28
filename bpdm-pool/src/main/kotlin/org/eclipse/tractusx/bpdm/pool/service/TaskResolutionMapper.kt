@@ -46,7 +46,8 @@ class TaskResolutionMapper {
                 hasChanged = hasChanged,
                 legalAddress = toTaskResult(legalAddress, hasChanged),
                 scriptVariants = scriptVariants.map { toTaskResult(it) },
-                goldenRecordRelations = legalEntity.relations.map { toTaskResult(it) }
+                goldenRecordRelations = legalEntity.relations.map { toTaskResult(it) },
+                updatedAt = updatedAt
             )
         }
     }
@@ -63,7 +64,8 @@ class TaskResolutionMapper {
                 //However, due to synchronization issues we will pass the address here
                 // and perform that last step to set this to null later on after we use this site main address to override the legal entities legal address
                 siteMainAddress = toTaskResult(siteMainAddress, hasChanged),
-                scriptVariants = scriptVariants.map { toTaskResult(it) }
+                scriptVariants = scriptVariants.map { toTaskResult(it) },
+                updatedAt = updatedAt
             )
         }
     }
@@ -96,7 +98,8 @@ class TaskResolutionMapper {
                 physicalAddress = toTaskResult(physicalPostalAddress),
                 alternativeAddress =  alternativePostalAddress?.let { toTaskResult(it) },
                 hasChanged = hasChanged,
-                goldenRecordRelations = relations.map { toTaskResult(it) }
+                goldenRecordRelations = relations.map { toTaskResult(it) },
+                updatedAt = updatedAt
             )
         }
     }

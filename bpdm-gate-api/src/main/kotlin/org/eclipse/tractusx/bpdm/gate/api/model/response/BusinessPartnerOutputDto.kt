@@ -62,7 +62,10 @@ data class LegalEntityRepresentationOutputDto(
     override val legalForm: String? = null,
     val confidenceCriteria: ConfidenceCriteriaDto,
     override val states: Collection<BusinessPartnerStateDto> = emptyList(),
-    val goldenRecordRelations: List<LegalEntityGoldenRecordRelationDto> = emptyList()
+    val goldenRecordRelations: List<LegalEntityGoldenRecordRelationDto> = emptyList(),
+
+    @get:Schema(description = "Timestamp when the associated legal entity golden record was last updated")
+    val updatedAt: Instant? = null
 ) : IBaseLegalEntityRepresentation
 
 @Schema(
@@ -72,7 +75,10 @@ data class SiteRepresentationOutputDto(
     override val siteBpn: String,
     override val name: String? = null,
     val confidenceCriteria: ConfidenceCriteriaDto,
-    override val states: Collection<BusinessPartnerStateDto> = emptyList()
+    override val states: Collection<BusinessPartnerStateDto> = emptyList(),
+
+    @get:Schema(description = "Timestamp when the associated site golden record was last updated")
+    val updatedAt: Instant? = null
 ) : IBaseSiteRepresentation
 
 @Schema(
@@ -88,5 +94,8 @@ data class AddressComponentOutputDto(
     val confidenceCriteria: ConfidenceCriteriaDto,
     override val states: Collection<BusinessPartnerStateDto> = emptyList(),
     val identifiers: Collection<AddressIdentifierDto> = emptyList(),
-    val goldenRecordRelations: List<AddressGoldenRecordRelationDto> = emptyList()
+    val goldenRecordRelations: List<AddressGoldenRecordRelationDto> = emptyList(),
+
+    @get:Schema(description = "Timestamp when the associated address golden record was last updated")
+    val updatedAt: Instant? = null
 ) : IBaseAddressRepresentation
