@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.ReasonCodeDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.ReasonCodeUpsertRequest
 import org.eclipse.tractusx.bpdm.test.system.utils.GateOutputFactory
+import org.eclipse.tractusx.bpdm.test.system.utils.ShareOwnCompanyDataTestDataGenerator
 import org.eclipse.tractusx.bpdm.test.system.utils.SharingStateWatcher
 import org.eclipse.tractusx.bpdm.test.system.utils.StepUtils
 import org.eclipse.tractusx.bpdm.test.system.utils.TaskReservationWatcher
@@ -183,6 +184,21 @@ class TestDataConfiguration {
             relationInputRequestV7Factory,
             relationOutputDtoV7Factory,
             pageChangeLogV7Factory
+        )
+    }
+
+    @Bean
+    fun shareOwnCompanyDataTestDataGenerator(
+        poolRequestFactoryV7: PoolRequestFactoryV7,
+        poolResponseFactoryV7: PoolResponseFactoryV7,
+        refinementTestDataFactory: RefinementTestDataFactory,
+        testDataFactoryGateV7: TestDataFactoryGateV7
+    ): ShareOwnCompanyDataTestDataGenerator {
+        return ShareOwnCompanyDataTestDataGenerator(
+            poolRequestFactoryV7,
+            poolResponseFactoryV7,
+            refinementTestDataFactory,
+            testDataFactoryGateV7
         )
     }
 
