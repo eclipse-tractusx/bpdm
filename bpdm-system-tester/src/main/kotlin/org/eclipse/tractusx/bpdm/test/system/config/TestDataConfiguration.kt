@@ -41,7 +41,7 @@ class TestDataConfiguration {
             identifierTypes = listOf("EU_VAT_ID_DE", "DUNS_ID"),
             legalForms = listOf("SCE1", "SGST"),
             adminAreas = listOf("DE-BW", "DE-BY"),
-            reasonCodes = listOf("HEADQUARTER_RELOCATION", "SITE_RELOCATION")
+            reasonCodes = listOf("HEADQUARTER_RELOCATION")
         )
 
 

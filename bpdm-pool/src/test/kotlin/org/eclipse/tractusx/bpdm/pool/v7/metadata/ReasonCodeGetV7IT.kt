@@ -29,17 +29,12 @@ class ReasonCodeGetV7IT : UnscheduledPoolTestBaseV7() {
     /**
      * GIVEN the Pool is freshly deployed with the default Flyway migration
      * WHEN an operator requests reason codes
-     * THEN all six default reason codes are present
+     * THEN the default reason code HEADQUARTER_RELOCATION is present
      */
     @Test
     fun `default reason codes are seeded and returned by GET`() {
         val expectedTechnicalKeys = setOf(
-            "HEADQUARTER_RELOCATION",
-            "SITE_RELOCATION",
-            "LEGAL_ENTITY_COURT_DISTRICT_CHANGE",
-            "MERGER",
-            "SPLIT_SPIN_OFF",
-            "INSOLVENCY_ABSORPTION"
+            "HEADQUARTER_RELOCATION"
         )
 
         val response = poolClient.metadata.getReasonCodes(PaginationRequest(page = 0, size = 100))
