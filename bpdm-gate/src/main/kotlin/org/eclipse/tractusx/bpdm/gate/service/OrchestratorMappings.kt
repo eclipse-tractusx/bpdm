@@ -268,15 +268,18 @@ class OrchestratorMappings(
             AddressType.AdditionalAddress -> dto.additionalAddress!!.scriptVariants.map { it }
         }
 
+        val addressVariantByCode = addressScriptVariants.associateBy { it.scriptCode }
         val legalEntityVariantsByCode = dto.legalEntity.scriptVariants.associateBy { it.scriptCode }
         val siteScriptVariantsByCode = dto.site?.scriptVariants?.associateBy { it.scriptCode } ?: emptyMap()
 
-        return addressScriptVariants.map { addressVariant ->
-            val legalEntityVariant = toLegalEntityScriptVariant(legalEntityVariantsByCode[addressVariant.scriptCode]) ?: LegalEntityScriptVariantDto()
-            val siteScriptVariant = toSiteScriptVariant(siteScriptVariantsByCode[addressVariant.scriptCode]) ?: SiteScriptVariantDto()
-            val addressScriptVariant = toAddressScriptVariant(addressVariant.postalProperties)
+        val allScriptCodes = addressVariantByCode.keys.plus(legalEntityVariantsByCode.keys).plus(siteScriptVariantsByCode.keys)
 
-            BusinessPartnerScriptVariantDto(addressVariant.scriptCode, legalEntity = legalEntityVariant, site = siteScriptVariant, address = addressScriptVariant)
+        return allScriptCodes.map { scriptCode ->
+            val legalEntityVariant = toLegalEntityScriptVariant(legalEntityVariantsByCode[scriptCode]) ?: LegalEntityScriptVariantDto()
+            val siteScriptVariant = toSiteScriptVariant(siteScriptVariantsByCode[scriptCode]) ?: SiteScriptVariantDto()
+            val addressScriptVariant = addressVariantByCode[scriptCode]?.let { toAddressScriptVariant(it.postalProperties)  }?: AddressScriptVariantDto()
+
+            BusinessPartnerScriptVariantDto(scriptCode, legalEntity = legalEntityVariant, site = siteScriptVariant, address = addressScriptVariant)
         }
     }
 
