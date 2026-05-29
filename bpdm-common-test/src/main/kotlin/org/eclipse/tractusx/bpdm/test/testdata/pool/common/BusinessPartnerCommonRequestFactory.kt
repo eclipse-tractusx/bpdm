@@ -28,6 +28,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerCreateVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateVerboseDto
+import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withSharedByOwner
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import kotlin.random.Random
@@ -100,7 +101,7 @@ abstract class BusinessPartnerCommonRequestFactory(
                 SiteStateDto(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
                 SiteStateDto(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
             ),
-            mainAddress = createAddressDto(seed, random),
+            mainAddress = createAddressDto(seed, random).withSharedByOwner(true),
             scriptVariants = listOfNotNull(buildSiteScriptVariant(seed, random)),
             confidenceCriteria = ConfidenceCriteriaDto(
                 sharedByOwner = true,

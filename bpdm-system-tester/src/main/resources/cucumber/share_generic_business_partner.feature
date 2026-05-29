@@ -40,3 +40,16 @@ Feature: Share own company business partner data without BPNs
     When record "A" is refined to "S1"
     Then polling business partner record "A" sharing state leads to success
     And business partner record "A" output data matches "O1"
+
+    Scenario: Refine input to new additional address of site
+
+    Given legal entity "L1"
+    Given site "S1" of legal entity "L1"
+    Given additional address "A1" of site "S1"
+    Given input data "I1"
+        | isOwnCompanyData | true |
+    Given output data "O1" based on input "I1" for additional address "A1" of site
+    When uploading into business partner record "A" input data "I1"
+    When record "A" is refined to "S1"
+    Then polling business partner record "A" sharing state leads to success
+    And business partner record "A" output data matches "O1"

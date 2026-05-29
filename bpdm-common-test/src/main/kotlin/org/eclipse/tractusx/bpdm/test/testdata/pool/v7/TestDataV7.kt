@@ -45,7 +45,7 @@ object TestDataV7 {
         checkedByExternalDataSource = false
     )
 
-    val IsShared = GivenConfidence(
+    val SharedByOwner = GivenConfidence(
         sharedByOwner = true,
         checkedByExternalDataSource = false
     )

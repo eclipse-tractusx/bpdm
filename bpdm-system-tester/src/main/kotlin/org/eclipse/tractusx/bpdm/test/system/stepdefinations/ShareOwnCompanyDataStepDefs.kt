@@ -34,17 +34,17 @@ import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
 import org.eclipse.tractusx.bpdm.pool.api.model.SiteHeaderScriptVariantDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
-import org.eclipse.tractusx.bpdm.test.system.utils.SharingStateWatcher
+import org.eclipse.tractusx.bpdm.test.system.utils.AdditionalAddressWithParent
 import org.eclipse.tractusx.bpdm.test.system.utils.ScenarioContext
+import org.eclipse.tractusx.bpdm.test.system.utils.SharingStateWatcher
 import org.eclipse.tractusx.bpdm.test.system.utils.SiteBasedLegalEntity
+import org.eclipse.tractusx.bpdm.test.system.utils.SiteWithParent
 import org.eclipse.tractusx.bpdm.test.system.utils.TaskReservationWatcher
 import org.eclipse.tractusx.bpdm.test.testdata.gate.TestRunData
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.GateAssertRepositoryV7
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.TestDataFactoryGateV7
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.RefinementTestDataFactory
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.copyWithBpnReferenceType
-import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.copyWithBpnRequests
-import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.copyWithConfidenceCriteria
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.PoolRequestFactoryV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.PoolResponseFactoryV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.TestDataV7
@@ -55,6 +55,7 @@ import org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType
 import org.eclipse.tractusx.orchestrator.api.model.TaskStep
 import org.eclipse.tractusx.orchestrator.api.model.TaskStepResultEntryDto
 import org.eclipse.tractusx.orchestrator.api.model.TaskStepResultRequest
+import org.junit.Test
 import java.time.Instant
 
 class ShareOwnCompanyDataStepDefs(
@@ -91,10 +92,12 @@ class ShareOwnCompanyDataStepDefs(
     }
 
     @Given("site-based legal entity {string}")
-    fun `legal entity on site data`(legalEntityDataId: String) {
+    fun `given site-based legal entity`(legalEntityDataId: String) {
         val runUniqueId = legalEntityDataId.asRunUniqueId()
 
-        val legalEntity = with(poolRequestFactory.buildLegalEntity(runUniqueId).withParticipantData(true)
+        val legalEntity = with(poolRequestFactory.buildLegalEntity(runUniqueId)
+            .withParticipantData(true)
+            .withConfidence(TestDataV7.SharedByOwner)
             .let{ poolResponseFactory.buildLegalEntityWithLegalAddress(it) }){
             copy(
                 header = header.copy(bpnl = "BPNL$runUniqueId"),
@@ -121,7 +124,9 @@ class ShareOwnCompanyDataStepDefs(
     fun `given legal entity`(legalEntityDataId: String) {
         val runUniqueId = legalEntityDataId.asRunUniqueId()
 
-        val legalEntity = with(poolRequestFactory.buildLegalEntity(runUniqueId).withParticipantData(true)
+        val legalEntity = with(poolRequestFactory.buildLegalEntity(runUniqueId)
+            .withParticipantData(true)
+            .withConfidence(TestDataV7.SharedByOwner)
             .let{ poolResponseFactory.buildLegalEntityWithLegalAddress(it) }){
             copy(
                 header = header.copy(bpnl = "BPNL$runUniqueId"),
@@ -139,8 +144,30 @@ class ShareOwnCompanyDataStepDefs(
         context.taskData[runUniqueId] = taskData
     }
 
+    @Given("site {string} of legal entity {string}")
+    fun `given site`(siteDataId: String, legalEntityDataId: String) {
+        val runUniqueLegalEntityId = legalEntityDataId.asRunUniqueId()
+        val runUniqueSiteId = siteDataId.asRunUniqueId()
+
+        val legalEntity = context.legalEntities[runUniqueLegalEntityId]!!
+
+        val site = poolRequestFactory.buildSiteCreateRequest(runUniqueSiteId, legalEntity.header.bpnl)
+            .let { poolResponseFactory.buildSiteSiteCreate(
+                withValuesFrom = it,
+                bpnS = "BPNS$runUniqueSiteId",
+                bpnA = "BPNA$runUniqueSiteId"
+            ) }
+            .let { poolResponseFactory.buildSiteSearchResponse(it) }
+
+        context.sites[runUniqueSiteId] = SiteWithParent(legalEntity, site)
+
+        val taskData = refinementTestDataFactory.buildSiteBusinessPartner(legalEntity, site, "BPNL000000000001", emptyList())
+            .copyWithBpnReferenceType(BpnReferenceType.BpnRequestIdentifier)
+        context.taskData[runUniqueSiteId] = taskData
+    }
+
     @Given("input data {string}")
-    fun `input data`(inputDataId: String, dataTable: DataTable) {
+    fun `given input data`(inputDataId: String, dataTable: DataTable) {
         val runUniqueId = inputDataId.asRunUniqueId()
         val overrides = dataTable.asMap()
 
@@ -151,7 +178,7 @@ class ShareOwnCompanyDataStepDefs(
     }
 
     @Given("output data {string} based on input {string} for site-based legal entity {string}")
-    fun `output data for legal entity on site based on`(outputDataId: String, inputDataId: String, legalEntityDataId: String) {
+    fun `given output data for legal entity on site based on`(outputDataId: String, inputDataId: String, legalEntityDataId: String) {
         val outputRunUniqueId  = outputDataId.asRunUniqueId()
         val inputRunUniqueId = inputDataId.asRunUniqueId()
         val legalEntityRunUniqueId = legalEntityDataId.asRunUniqueId()
@@ -181,9 +208,67 @@ class ShareOwnCompanyDataStepDefs(
         context.outputData[outputRunUniqueId] = outputData
     }
 
+    @Given("output data {string} based on input {string} for site {string}")
+    fun `given output data based on input for site`(outputDataId: String, inputDataId: String, siteDataId: String) {
+        val outputRunUniqueId  = outputDataId.asRunUniqueId()
+        val inputRunUniqueId = inputDataId.asRunUniqueId()
+        val siteRunUniqueId = siteDataId.asRunUniqueId()
+
+        val siteWithParent = context.sites[siteRunUniqueId]!!
+        val inputData = context.inputData[inputRunUniqueId]!!
+
+        val input = testDataFactoryGate.businessPartner.input.response.fromRequest(inputData)
+
+        val outputData = testDataFactoryGate.businessPartner.output.fromSite(input, siteWithParent.legalEntity, siteWithParent.site)
+        context.outputData[outputRunUniqueId] = outputData
+    }
+
+
+    @Given("additional address {string} of site {string}")
+    fun `given additional address`(addressDataId: String, siteDataId: String) {
+        val runUniqueAddressId = addressDataId.asRunUniqueId()
+        val runUniqueSiteId = siteDataId.asRunUniqueId()
+
+        val siteWithParent = context.sites[runUniqueSiteId]!!
+
+        val request = poolRequestFactory.buildAdditionalAddressCreateRequest(runUniqueAddressId, siteWithParent.site.site.bpns)
+            .withConfidence(TestDataV7.SharedByOwner)
+        val additionalAddress = poolResponseFactory
+            .buildAdditionalAddressCreate(request, siteWithParent.legalEntity, "BPNA$runUniqueAddressId")
+            .let { it.copy(address = it.address.copy(bpnSite = siteWithParent.site.site.bpns)) }
+            .withConfidence(TestDataV7.SharedByOwnerConfidence)
+            .let { poolResponseFactory.buildAddressSearchResponse(it) }
+
+        context.additionalAddresses[runUniqueAddressId] = AdditionalAddressWithParent(siteWithParent, additionalAddress)
+
+        val taskData = refinementTestDataFactory.buildAdditionSiteAddressBusinessPartner(
+            siteWithParent.legalEntity, siteWithParent.site, additionalAddress, "BPNL000000000001", emptyList()
+        ).copyWithBpnReferenceType(BpnReferenceType.BpnRequestIdentifier)
+        context.taskData[runUniqueSiteId] = taskData
+    }
+
+    @Given("output data {string} based on input {string} for additional address {string} of site")
+    fun `given output data based on input for additional address of site`(outputDataId: String, inputDataId: String, addressDataId: String) {
+        val outputRunUniqueId = outputDataId.asRunUniqueId()
+        val inputRunUniqueId = inputDataId.asRunUniqueId()
+        val addressRunUniqueId = addressDataId.asRunUniqueId()
+
+        val additionalAddressWithParent = context.additionalAddresses[addressRunUniqueId]!!
+        val inputData = context.inputData[inputRunUniqueId]!!
+
+        val input = testDataFactoryGate.businessPartner.input.response.fromRequest(inputData)
+
+        val outputData = testDataFactoryGate.businessPartner.output.fromAdditionalAddressOnSite(
+            input,
+            additionalAddressWithParent.siteWithParent.legalEntity,
+            additionalAddressWithParent.siteWithParent.site,
+            additionalAddressWithParent.address
+        )
+        context.outputData[outputRunUniqueId] = outputData
+    }
 
     @When("uploading into business partner record {string} input data {string}")
-    fun `uploading into business partner record input data`(recordId: String, inputDataId: String) {
+    fun `when uploading into business partner record input data`(recordId: String, inputDataId: String) {
         val recordRunUniqueId = recordId.asRunUniqueId()
         val inputRunUniqueId = inputDataId.asRunUniqueId()
 
@@ -193,7 +278,7 @@ class ShareOwnCompanyDataStepDefs(
     }
 
     @When("record {string} is refined to {string}")
-    fun `record is refined to`(recordId: String, taskDataId: String) {
+    fun `when record is refined to`(recordId: String, taskDataId: String) {
         val recordRunUniqueId = recordId.asRunUniqueId()
         val taskRunUniqueId = taskDataId.asRunUniqueId()
 
@@ -208,7 +293,7 @@ class ShareOwnCompanyDataStepDefs(
     }
 
     @Then("polling business partner record {string} sharing state leads to success")
-    fun `polling business partner record sharing state leads to success`(recordId: String) {
+    fun `then polling business partner record sharing state leads to success`(recordId: String) {
         val recordRunUniqueId = recordId.asRunUniqueId()
 
         sharingStateWatcher.waitForCompletedState(recordRunUniqueId)
@@ -220,7 +305,7 @@ class ShareOwnCompanyDataStepDefs(
     }
 
     @Then("business partner record {string} output data matches {string}")
-    fun `business partner record output data matches`(recordId: String, outputDataId: String) {
+    fun `then business partner record output data matches`(recordId: String, outputDataId: String) {
         val recordRunUniqueId = recordId.asRunUniqueId()
         val outputRunUniqueId  = outputDataId.asRunUniqueId()
 

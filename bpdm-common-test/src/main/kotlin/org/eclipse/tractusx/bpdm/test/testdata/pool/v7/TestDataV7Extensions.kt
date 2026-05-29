@@ -39,6 +39,9 @@ fun LegalEntityDto.withLegalIdentifiers(identifiers: List<LegalEntityIdentifierD
 fun LegalEntityDto.withLegalIdentifiers(vararg identifiers: LegalEntityIdentifierDto) =
     withLegalIdentifiers(identifiers.toList())
 
+fun LegalEntityDto.withConfidence(givenConfidence: GivenConfidence) =
+    copy(header = header.withConfidence(givenConfidence), legalAddress = legalAddress.withConfidence(givenConfidence))
+
 fun LegalEntityPartnerCreateRequest.withLegalAddressIdentifiers(identifiers: List<AddressIdentifierDto>) =
     copy(legalEntity = legalEntity.withLegalAddressIdentifiers(identifiers))
 
@@ -101,6 +104,9 @@ fun LegalEntityDto.withParticipantData(isParticipantData: Boolean) =
 
 fun LegalEntityHeaderDto.withParticipantData(isParticipantData: Boolean) =
     copy(isParticipantData = isParticipantData, confidenceCriteria = confidenceCriteria.copy(sharedByOwner = isParticipantData))
+
+fun LegalEntityHeaderDto.withConfidence(givenConfidence: GivenConfidence) =
+    copy(confidenceCriteria = confidenceCriteria.withGivenConfidence(givenConfidence))
 
 fun LogisticAddressDto.withSharedByOwner(isSharedByOwner: Boolean)  =
     copy(confidenceCriteria = confidenceCriteria.copy(sharedByOwner = isSharedByOwner))
