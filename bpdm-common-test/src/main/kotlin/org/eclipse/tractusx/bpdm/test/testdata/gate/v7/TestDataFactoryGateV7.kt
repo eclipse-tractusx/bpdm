@@ -103,6 +103,12 @@ class TestDataFactoryGateV7(
                 site: SiteWithMainAddressVerboseDto,
                 additionalAddress: LogisticAddressVerboseDto
             ) = bpOutputDtoFactory.fromAdditionalAddressOnSite(input, legalEntity, site, additionalAddress)
+
+            fun fromAdditionalAddressOnLegalEntity(
+                input: BusinessPartnerInputDto,
+                legalEntity: LegalEntityWithLegalAddressVerboseDto,
+                additionalAddress: LogisticAddressVerboseDto
+            ) = bpOutputDtoFactory.fromAdditionalAddressOnLegalEntity(input, legalEntity, additionalAddress)
         }
     }
 

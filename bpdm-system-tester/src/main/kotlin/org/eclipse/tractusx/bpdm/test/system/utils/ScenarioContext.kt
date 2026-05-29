@@ -25,15 +25,14 @@ import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityVerboseDto
-import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolMockDataFactory.SiteWithLegalEntityParent
 import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
 
 class ScenarioContext {
     val siteLegalEntities: MutableMap<String, SiteBasedLegalEntity> = mutableMapOf()
     val legalEntities: MutableMap<String, LegalEntityWithLegalAddressVerboseDto> = mutableMapOf()
     val sites: MutableMap<String, SiteWithParent> = mutableMapOf()
-    val additionalAddresses: MutableMap<String, AdditionalAddressWithParent> = mutableMapOf()
+    val additionalSiteAddresses: MutableMap<String, AdditionalSiteAddressWithParent> = mutableMapOf()
+    val additionalLegalEntityAddresses: MutableMap<String, AdditionalLegalEntityAddressWithParent> = mutableMapOf()
     val taskData:      MutableMap<String, BusinessPartner> = mutableMapOf()
     val inputData:     MutableMap<String, BusinessPartnerInputRequest> = mutableMapOf()
     val outputData:    MutableMap<String, BusinessPartnerOutputDto> = mutableMapOf()
@@ -50,7 +49,12 @@ data class SiteWithParent(
     val site: SiteWithMainAddressVerboseDto
 )
 
-data class AdditionalAddressWithParent(
+data class AdditionalSiteAddressWithParent(
     val siteWithParent: SiteWithParent,
+    val address: LogisticAddressVerboseDto
+)
+
+data class AdditionalLegalEntityAddressWithParent(
+    val legalEntity: LegalEntityWithLegalAddressVerboseDto,
     val address: LogisticAddressVerboseDto
 )

@@ -34,7 +34,8 @@ import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
 import org.eclipse.tractusx.bpdm.pool.api.model.SiteHeaderScriptVariantDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
-import org.eclipse.tractusx.bpdm.test.system.utils.AdditionalAddressWithParent
+import org.eclipse.tractusx.bpdm.test.system.utils.AdditionalLegalEntityAddressWithParent
+import org.eclipse.tractusx.bpdm.test.system.utils.AdditionalSiteAddressWithParent
 import org.eclipse.tractusx.bpdm.test.system.utils.ScenarioContext
 import org.eclipse.tractusx.bpdm.test.system.utils.SharingStateWatcher
 import org.eclipse.tractusx.bpdm.test.system.utils.SiteBasedLegalEntity
@@ -55,7 +56,6 @@ import org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType
 import org.eclipse.tractusx.orchestrator.api.model.TaskStep
 import org.eclipse.tractusx.orchestrator.api.model.TaskStepResultEntryDto
 import org.eclipse.tractusx.orchestrator.api.model.TaskStepResultRequest
-import org.junit.Test
 import java.time.Instant
 
 class ShareOwnCompanyDataStepDefs(
@@ -239,7 +239,7 @@ class ShareOwnCompanyDataStepDefs(
             .withConfidence(TestDataV7.SharedByOwnerConfidence)
             .let { poolResponseFactory.buildAddressSearchResponse(it) }
 
-        context.additionalAddresses[runUniqueAddressId] = AdditionalAddressWithParent(siteWithParent, additionalAddress)
+        context.additionalSiteAddresses[runUniqueAddressId] = AdditionalSiteAddressWithParent(siteWithParent, additionalAddress)
 
         val taskData = refinementTestDataFactory.buildAdditionSiteAddressBusinessPartner(
             siteWithParent.legalEntity, siteWithParent.site, additionalAddress, "BPNL000000000001", emptyList()
@@ -253,7 +253,7 @@ class ShareOwnCompanyDataStepDefs(
         val inputRunUniqueId = inputDataId.asRunUniqueId()
         val addressRunUniqueId = addressDataId.asRunUniqueId()
 
-        val additionalAddressWithParent = context.additionalAddresses[addressRunUniqueId]!!
+        val additionalAddressWithParent = context.additionalSiteAddresses[addressRunUniqueId]!!
         val inputData = context.inputData[inputRunUniqueId]!!
 
         val input = testDataFactoryGate.businessPartner.input.response.fromRequest(inputData)
@@ -262,6 +262,47 @@ class ShareOwnCompanyDataStepDefs(
             input,
             additionalAddressWithParent.siteWithParent.legalEntity,
             additionalAddressWithParent.siteWithParent.site,
+            additionalAddressWithParent.address
+        )
+        context.outputData[outputRunUniqueId] = outputData
+    }
+
+    @Given("additional address {string} of legal entity {string}")
+    fun `given additional address of legal entity`(addressDataId: String, legalEntityDataId: String) {
+        val runUniqueAddressId = addressDataId.asRunUniqueId()
+        val runUniqueLegalEntityId = legalEntityDataId.asRunUniqueId()
+
+        val legalEntity = context.legalEntities[runUniqueLegalEntityId]!!
+
+        val request = poolRequestFactory.buildAdditionalAddressCreateRequest(runUniqueAddressId, legalEntity)
+            .withConfidence(TestDataV7.SharedByOwner)
+        val additionalAddress = poolResponseFactory
+            .buildAdditionalAddressCreate(request, legalEntity, "BPNA$runUniqueAddressId")
+            .withConfidence(TestDataV7.SharedByOwnerConfidence)
+            .let { poolResponseFactory.buildAddressSearchResponse(it) }
+
+        context.additionalLegalEntityAddresses[runUniqueAddressId] = AdditionalLegalEntityAddressWithParent(legalEntity, additionalAddress)
+
+        val taskData = refinementTestDataFactory.buildAdditionLegalEntityAddressBusinessPartner(
+            legalEntity, additionalAddress, "BPNL000000000001", emptyList()
+        ).copyWithBpnReferenceType(BpnReferenceType.BpnRequestIdentifier)
+        context.taskData[runUniqueLegalEntityId] = taskData
+    }
+
+    @Given("output data {string} based on input {string} for additional address {string} of legal entity")
+    fun `given output data based on input for additional address of legal entity`(outputDataId: String, inputDataId: String, addressDataId: String) {
+        val outputRunUniqueId = outputDataId.asRunUniqueId()
+        val inputRunUniqueId = inputDataId.asRunUniqueId()
+        val addressRunUniqueId = addressDataId.asRunUniqueId()
+
+        val additionalAddressWithParent = context.additionalLegalEntityAddresses[addressRunUniqueId]!!
+        val inputData = context.inputData[inputRunUniqueId]!!
+
+        val input = testDataFactoryGate.businessPartner.input.response.fromRequest(inputData)
+
+        val outputData = testDataFactoryGate.businessPartner.output.fromAdditionalAddressOnLegalEntity(
+            input,
+            additionalAddressWithParent.legalEntity,
             additionalAddressWithParent.address
         )
         context.outputData[outputRunUniqueId] = outputData

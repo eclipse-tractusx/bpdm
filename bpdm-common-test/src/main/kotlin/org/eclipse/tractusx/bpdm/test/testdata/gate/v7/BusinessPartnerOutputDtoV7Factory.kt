@@ -98,6 +98,32 @@ class BusinessPartnerOutputDtoV7Factory {
         )
     }
 
+    fun fromAdditionalAddressOnLegalEntity(
+        input: BusinessPartnerInputDto,
+        legalEntity: LegalEntityWithLegalAddressVerboseDto,
+        additionalAddress: LogisticAddressVerboseDto
+    ): BusinessPartnerOutputDto {
+        return BusinessPartnerOutputDto(
+            externalId = input.externalId,
+            nameParts = input.nameParts,
+            identifiers = additionalAddress.address.identifiers.map { BusinessPartnerIdentifierDto(it.type, it.value, null) },
+            states = additionalAddress.address.states.map { BusinessPartnerStateDto(it.validFrom, it.validTo, it.type) },
+            roles = input.roles,
+            isOwnCompanyData = input.isOwnCompanyData,
+            legalEntity = buildLegalEntityRepresentation(legalEntity.header),
+            site = null,
+            address = buildAddressRepresentation(additionalAddress.address, AddressType.AdditionalAddress),
+            externalSequenceTimestamp = null,
+            scriptVariants = run {
+                val leByCode = legalEntity.scriptVariants.associateBy { it.scriptCode }
+                val addByCode = additionalAddress.scriptVariants.associateBy { it.scriptCode }
+                (leByCode.keys + addByCode.keys).map { code -> buildAdditionalAddressScriptVariant(code, leByCode[code], addByCode[code]) }
+            },
+            createdAt = Instant.MIN,
+            updatedAt = Instant.MIN
+        )
+    }
+
     fun fromAdditionalAddressOnSite(
         input: BusinessPartnerInputDto,
         legalEntity: LegalEntityWithLegalAddressVerboseDto,
