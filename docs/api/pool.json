@@ -175,102 +175,6 @@
         }
       }
     },
-    "/v7/reason-codes" : {
-      "get" : {
-        "tags" : [ "Metadata Controller" ],
-        "summary" : "Get page of available business partner relation reason codes",
-        "operationId" : "getReasonCodes",
-        "parameters" : [ {
-          "name" : "page",
-          "in" : "query",
-          "description" : "Number of page to get results from",
-          "required" : false,
-          "schema" : {
-            "type" : "string",
-            "minimum" : 0
-          }
-        }, {
-          "name" : "size",
-          "in" : "query",
-          "description" : "Size of each page",
-          "required" : false,
-          "schema" : {
-            "type" : "string",
-            "maximum" : 100,
-            "minimum" : 0
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "Page of existing reason codes, may be empty",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/PageDtoReasonCodeDto"
-                }
-              }
-            }
-          },
-          "400" : {
-            "description" : "On malformed request parameters"
-          }
-        }
-      },
-      "put" : {
-        "tags" : [ "Metadata Controller" ],
-        "summary" : "Create or update business partner relation reason codes",
-        "operationId" : "upsertReasonCode",
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/ReasonCodeUpsertRequest"
-              }
-            }
-          },
-          "required" : true
-        },
-        "responses" : {
-          "200" : {
-            "description" : "The created reason code with description",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/ReasonCodeDto"
-                }
-              }
-            }
-          },
-          "400" : {
-            "description" : "On malformed request parameters"
-          }
-        }
-      },
-      "delete" : {
-        "tags" : [ "Metadata Controller" ],
-        "summary" : "Delete an existing business partner relation reason code",
-        "operationId" : "deleteReasonCode",
-        "parameters" : [ {
-          "name" : "request",
-          "in" : "query",
-          "required" : true,
-          "schema" : {
-            "$ref" : "#/components/schemas/ReasonCodeDeleteRequest"
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "Reason code successfully deleted"
-          },
-          "404" : {
-            "description" : "Referenced reason code can not be found"
-          },
-          "400" : {
-            "description" : "On malformed requests"
-          }
-        }
-      }
-    },
     "/v7/legal-entities" : {
       "get" : {
         "tags" : [ "Legal Entity Controller" ],
@@ -2614,6 +2518,48 @@
         }
       }
     },
+    "/v7/reason-codes" : {
+      "get" : {
+        "tags" : [ "Metadata Controller" ],
+        "summary" : "Get page of available business partner relation reason codes",
+        "operationId" : "getReasonCodes",
+        "parameters" : [ {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Number of page to get results from",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "minimum" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Size of each page",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "maximum" : 100,
+            "minimum" : 0
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Page of existing reason codes, may be empty",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageDtoReasonCodeDto"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "On malformed request parameters"
+          }
+        }
+      }
+    },
     "/v7/legal-entities/{idValue}" : {
       "get" : {
         "tags" : [ "Legal Entity Controller" ],
@@ -3276,11 +3222,11 @@
               "$ref" : "#/components/schemas/ErrorInfoAddressCreateError"
             }
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -3431,11 +3377,11 @@
               "$ref" : "#/components/schemas/ErrorInfoAddressUpdateError"
             }
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -4411,11 +4357,11 @@
               "$ref" : "#/components/schemas/ErrorInfoLegalEntityCreateError"
             }
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -4571,11 +4517,11 @@
               "$ref" : "#/components/schemas/ErrorInfoLegalEntityUpdateError"
             }
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -5658,14 +5604,6 @@
           }
         }
       },
-      "ReasonCodeDeleteRequest" : {
-        "type" : "object",
-        "properties" : {
-          "technicalKey" : {
-            "type" : "string"
-          }
-        }
-      },
       "ReasonCodeDto" : {
         "type" : "object",
         "description" : "Describes a reason for a business partner relation to exist",
@@ -5675,14 +5613,6 @@
           },
           "description" : {
             "type" : "string"
-          }
-        }
-      },
-      "ReasonCodeUpsertRequest" : {
-        "type" : "object",
-        "properties" : {
-          "reasonCode" : {
-            "$ref" : "#/components/schemas/ReasonCodeDto"
           }
         }
       },
@@ -5853,11 +5783,11 @@
               "$ref" : "#/components/schemas/ErrorInfoSiteCreateError"
             }
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -5970,11 +5900,11 @@
               "$ref" : "#/components/schemas/ErrorInfoSiteUpdateError"
             }
           },
-          "errorCount" : {
+          "entityCount" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "entityCount" : {
+          "errorCount" : {
             "type" : "integer",
             "format" : "int32"
           }
