@@ -3602,10 +3602,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ErrorInfoAddressCreateError"
-        entityCount:
+        errorCount:
           type: integer
           format: int32
-        errorCount:
+        entityCount:
           type: integer
           format: int32
     AddressPartnerCreateVerboseDto:
@@ -3756,10 +3756,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ErrorInfoAddressUpdateError"
-        entityCount:
+        errorCount:
           type: integer
           format: int32
-        errorCount:
+        entityCount:
           type: integer
           format: int32
     AddressPartnerUpdateVerboseDto:
@@ -5719,10 +5719,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ErrorInfoLegalEntityCreateError"
-        entityCount:
+        errorCount:
           type: integer
           format: int32
-        errorCount:
+        entityCount:
           type: integer
           format: int32
     LegalEntityPartnerCreateVerboseDto:
@@ -5868,10 +5868,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ErrorInfoLegalEntityUpdateError"
-        entityCount:
+        errorCount:
           type: integer
           format: int32
-        errorCount:
+        entityCount:
           type: integer
           format: int32
     LegalEntityPropertiesSearchRequest:
@@ -8614,6 +8614,17 @@ components:
           $ref: "#/components/schemas/ConfidenceCriteriaDto"
         bpnLParent:
           type: string
+        scriptVariants:
+          type: array
+          items:
+            $ref: "#/components/schemas/SiteHeaderScriptVariantDto"
+    SiteHeaderScriptVariantDto:
+      type: object
+      properties:
+        scriptCode:
+          type: string
+        name:
+          type: string
     SitePartnerCreateRequest:
       type: object
       description: "Request for creating new business partner record of type site.\
@@ -8665,10 +8676,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ErrorInfoSiteCreateError"
-        entityCount:
+        errorCount:
           type: integer
           format: int32
-        errorCount:
+        entityCount:
           type: integer
           format: int32
     SitePartnerCreateVerboseDto:
@@ -8778,10 +8789,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ErrorInfoSiteUpdateError"
-        entityCount:
+        errorCount:
           type: integer
           format: int32
-        errorCount:
+        entityCount:
           type: integer
           format: int32
     SiteScriptVariantDto:

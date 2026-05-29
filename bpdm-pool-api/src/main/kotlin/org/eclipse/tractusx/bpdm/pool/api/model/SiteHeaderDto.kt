@@ -17,23 +17,13 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.model.request
+package org.eclipse.tractusx.bpdm.pool.api.model
 
 import org.eclipse.tractusx.bpdm.common.dto.IBaseSiteDto
-import org.eclipse.tractusx.bpdm.pool.api.model.ConfidenceCriteriaDto
-import org.eclipse.tractusx.bpdm.pool.api.model.SiteHeaderDto
-import org.eclipse.tractusx.bpdm.pool.api.model.SiteHeaderScriptVariantDto
-import org.eclipse.tractusx.bpdm.pool.api.model.SiteStateDto
 
-data class SiteCreateRequestWithLegalAddressAsMain(
+data class SiteHeaderDto (
     override val name: String,
     override val states: Collection<SiteStateDto>,
     override val confidenceCriteria: ConfidenceCriteriaDto,
-    val bpnLParent: String,
     val scriptVariants: List<SiteHeaderScriptVariantDto> = emptyList()
-) : IBaseSiteDto{
-    fun toHeader(): SiteHeaderDto{
-        return SiteHeaderDto(name, states, confidenceCriteria, scriptVariants)
-    }
-}
-
+): IBaseSiteDto
