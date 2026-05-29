@@ -27,9 +27,11 @@ import io.swagger.v3.oas.models.security.*
 import io.swagger.v3.oas.models.servers.Server
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.util.OpenApiCustomizerFactory
+import org.eclipse.tractusx.bpdm.common.util.OpenApiExampleCustomizer
 import org.springdoc.core.customizers.ParameterCustomizer
 import org.springdoc.core.extractor.DelegatingMethodParameter
 import org.springdoc.core.models.GroupedOpenApi
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
@@ -69,14 +71,23 @@ class OpenApiConfig(
             .build()
     }
 
+
     @Bean
-    fun version7Group(openApiCustomizerFactory: OpenApiCustomizerFactory): GroupedOpenApi {
+    @ConditionalOnMissingBean(OpenApiExampleCustomizer::class)
+    fun openApiExampleCustomizer(): OpenApiExampleCustomizer {
+        return OpenApiExampleCustomizer(emptyList())
+    }
+
+
+    @Bean
+    fun version7Group(openApiCustomizerFactory: OpenApiCustomizerFactory, openApiExampleCustomizer: OpenApiExampleCustomizer): GroupedOpenApi {
         return GroupedOpenApi.builder()
             .group("v7")
             .pathsToMatch("/v7/**")
             .displayName("V7")
             .addOpenApiCustomizer(openApiCustomizerFactory.sortSchemaCustomiser())
             .addOpenApiCustomizer(openApiCustomizerFactory.versionApiCustomizer("v7"))
+            .addOpenApiCustomizer(openApiExampleCustomizer)
             .build()
     }
 

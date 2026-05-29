@@ -17,23 +17,28 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.model.request
+package org.eclipse.tractusx.bpdm.common.util
+import io.swagger.v3.oas.models.OpenAPI
+import mu.KotlinLogging
+import org.springdoc.core.customizers.OpenApiCustomizer
 
-import org.eclipse.tractusx.bpdm.common.dto.IBaseSiteDto
-import org.eclipse.tractusx.bpdm.pool.api.model.ConfidenceCriteriaDto
-import org.eclipse.tractusx.bpdm.pool.api.model.SiteHeaderDto
-import org.eclipse.tractusx.bpdm.pool.api.model.SiteHeaderScriptVariantDto
-import org.eclipse.tractusx.bpdm.pool.api.model.SiteStateDto
+class OpenApiExampleCustomizer(
+    private val examples: List<OpenApiSchemaExample>
+) : OpenApiCustomizer {
 
-data class SiteCreateRequestWithLegalAddressAsMain(
-    override val name: String,
-    override val states: Collection<SiteStateDto>,
-    override val confidenceCriteria: ConfidenceCriteriaDto,
-    val bpnLParent: String,
-    val scriptVariants: List<SiteHeaderScriptVariantDto> = emptyList()
-) : IBaseSiteDto{
-    fun toHeader(): SiteHeaderDto{
-        return SiteHeaderDto(name, states, confidenceCriteria, scriptVariants)
+    private val logger = KotlinLogging.logger { }
+
+
+    override fun customise(openApi: OpenAPI) {
+        logger.info { "Examples size: ${examples.size}" }
+        examples.forEach { schemaExample ->
+            val schema = openApi.components?.schemas?.get(schemaExample.schemaName)
+            if (schema != null) {
+                schema.example = schemaExample.example
+                logger.info { "Example attached to schema: ${schemaExample.schemaName}" }
+            } else {
+                logger.warn { "Schema not found: ${schemaExample.schemaName}" }
+            }
+        }
     }
 }
-

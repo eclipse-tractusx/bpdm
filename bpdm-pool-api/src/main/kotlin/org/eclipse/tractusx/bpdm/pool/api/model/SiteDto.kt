@@ -34,4 +34,13 @@ data class SiteDto(
     override val confidenceCriteria: ConfidenceCriteriaDto,
 
     val scriptVariants: List<SiteScriptVariantDto> = emptyList()
-) : IBaseSiteDto
+) : IBaseSiteDto{
+    fun toHeader(): SiteHeaderDto{
+        return SiteHeaderDto(
+            name,
+            states,
+            confidenceCriteria,
+            scriptVariants.map { it.toHeader() }
+        )
+    }
+}

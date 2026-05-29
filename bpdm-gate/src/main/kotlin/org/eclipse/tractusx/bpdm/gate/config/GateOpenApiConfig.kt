@@ -17,23 +17,22 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.model.request
+package org.eclipse.tractusx.bpdm.gate.config
+import org.eclipse.tractusx.bpdm.common.util.OpenApiExampleCustomizer
+import org.eclipse.tractusx.bpdm.gate.util.BusinessPartnerInputRequestValues
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
 
-import org.eclipse.tractusx.bpdm.common.dto.IBaseSiteDto
-import org.eclipse.tractusx.bpdm.pool.api.model.ConfidenceCriteriaDto
-import org.eclipse.tractusx.bpdm.pool.api.model.SiteHeaderDto
-import org.eclipse.tractusx.bpdm.pool.api.model.SiteHeaderScriptVariantDto
-import org.eclipse.tractusx.bpdm.pool.api.model.SiteStateDto
 
-data class SiteCreateRequestWithLegalAddressAsMain(
-    override val name: String,
-    override val states: Collection<SiteStateDto>,
-    override val confidenceCriteria: ConfidenceCriteriaDto,
-    val bpnLParent: String,
-    val scriptVariants: List<SiteHeaderScriptVariantDto> = emptyList()
-) : IBaseSiteDto{
-    fun toHeader(): SiteHeaderDto{
-        return SiteHeaderDto(name, states, confidenceCriteria, scriptVariants)
+
+
+@Configuration
+class GateOpenApiConfig {
+
+    @Bean
+    fun openApiExampleCustomizer(): OpenApiExampleCustomizer {
+        return OpenApiExampleCustomizer(
+            listOf(BusinessPartnerInputRequestValues.businessPartnerInputRequestExample)
+        )
     }
 }
-

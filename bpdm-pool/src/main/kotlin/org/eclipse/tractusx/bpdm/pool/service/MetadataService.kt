@@ -200,6 +200,9 @@ class MetadataService(
         return SiteMetadataDto(scriptCodes, addressMetadata)
     }
 
+    fun getSiteHeaderScriptCodes(scriptVariants: Collection<SiteHeaderScriptVariantDto>): Set<ScriptCodeDb> =
+        scriptCodeRepository.findByTechnicalKeyIn(scriptVariants.map { it.scriptCode }.toSet())
+
     fun getMetadata(requests: Collection<IBaseLegalEntityDto>): LegalEntityInvariantHeaderMetadataDto {
         val idTypeKeys = requests.flatMap { it.identifiers }.map { it.type }.toSet()
         val idTypes = identifierTypeRepository.findByBusinessPartnerTypeAndTechnicalKeyIn(IdentifierBusinessPartnerType.LEGAL_ENTITY, idTypeKeys)
