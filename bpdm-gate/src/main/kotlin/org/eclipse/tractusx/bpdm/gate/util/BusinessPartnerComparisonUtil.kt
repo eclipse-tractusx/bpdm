@@ -41,6 +41,9 @@ class BusinessPartnerComparisonUtil {
                 entity.bpnS != persistedBP.bpnS ||
                 entity.bpnA != persistedBP.bpnA ||
                 entity.stage != persistedBP.stage ||
+                entity.legalEntityUpdatedAt != persistedBP.legalEntityUpdatedAt ||
+                entity.siteUpdatedAt != persistedBP.siteUpdatedAt ||
+                entity.addressUpdatedAt != persistedBP.addressUpdatedAt ||
                 entity.identifiers != persistedBP.identifiers ||
                 entity.states != persistedBP.states ||
                 entity.legalEntityGoldenRecordRelations != persistedBP.legalEntityGoldenRecordRelations ||

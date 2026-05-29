@@ -18,6 +18,17 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 
 - Script variants and script codes for business partner data [#1593](https://github.com/eclipse-tractusx/bpdm/issues/1593)
 - BPDM Gate: Golden record relations to business partner output [#1630](https://github.com/eclipse-tractusx/bpdm/issues/1630)
+- BPDM Pool: Populating Golden Record Task Business Partner's UpdatedAt [#1564](https://github.com/eclipse-tractusx/bpdm/issues/1564)
+- BPDM Gate: Persist and expose golden record component `updatedAt` timestamps in output and skip stale output updates [#1689](https://github.com/eclipse-tractusx/bpdm/issues/1689)
+
+
+### Added
+
+- BPDM Pool: Seed default Business Partner Relation Reason Codes via Flyway migration [#1679] (https://github.com/eclipse-tractusx/bpdm/issues/1679)
+
+### Changed
+
+- BPDM Pool: Make Reason Codes read-only by removing PUT and DELETE endpoints [#1687] (https://github.com/eclipse-tractusx/bpdm/issues/1687)
 
 
 ### Added
