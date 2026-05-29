@@ -80,7 +80,8 @@ class GateAssertRepositoryV7(
             BusinessPartnerOutputDto::updatedAt.name,
             "legalEntity.${LegalEntityRepresentationOutputDto::legalEntityBpn.name}",
             "site.${SiteRepresentationOutputDto::siteBpn.name}",
-            "address.${AddressComponentOutputDto::addressBpn.name}"
+            "address.${AddressComponentOutputDto::addressBpn.name}",
+            BusinessPartnerOutputDto::nameParts.name
         )
         .withComparatorForType(instantSecondsComparator, Instant::class.java)
         .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)

@@ -42,6 +42,33 @@ abstract class BusinessPartnerCommonRequestFactory(
         return buildSiteCreateRequest(seed, legalEntityParent.legalEntity.bpnl)
     }
 
+    fun buildLegalSiteCreateRequest(seed: String, bpnlParent: String, random: Random = Random(seed.hashCode().toLong())): SiteCreateRequestWithLegalAddressAsMain{
+        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, 365241780471), random.nextInt(0, 999999999), ZoneOffset.UTC)
+
+        return SiteCreateRequestWithLegalAddressAsMain(
+            name = "Site Name $seed",
+            states = listOf(
+                SiteStateDto(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
+                SiteStateDto(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
+            ),
+            scriptVariants = availableScriptCodes.shuffled(random).take(2).map { scriptCode ->
+                SiteHeaderScriptVariantDto(
+                    scriptCode = scriptCode,
+                    name = buildScriptVariantStringValue("Site Name", seed, scriptCode)
+                )
+            },
+            bpnLParent = bpnlParent,
+            confidenceCriteria = ConfidenceCriteriaDto(
+                sharedByOwner = true,
+                checkedByExternalDataSource = false,
+                numberOfSharingMembers = 2,
+                lastConfidenceCheckAt = timeStamp.plusDays(10),
+                nextConfidenceCheckAt = timeStamp.plusDays(20),
+                confidenceLevel = 5
+            )
+        )
+    }
+
     fun buildSiteCreateRequest(seed: String, bpnlParent: String): SitePartnerCreateRequest {
         return SitePartnerCreateRequest(
             bpnlParent = bpnlParent,

@@ -29,6 +29,7 @@ import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
 
 class ScenarioContext {
     val siteLegalEntities: MutableMap<String, SiteBasedLegalEntity> = mutableMapOf()
+    val legalEntities: MutableMap<String, LegalEntityWithLegalAddressVerboseDto> = mutableMapOf()
     val taskData:      MutableMap<String, BusinessPartner> = mutableMapOf()
     val inputData:     MutableMap<String, BusinessPartnerInputRequest> = mutableMapOf()
     val outputData:    MutableMap<String, BusinessPartnerOutputDto> = mutableMapOf()

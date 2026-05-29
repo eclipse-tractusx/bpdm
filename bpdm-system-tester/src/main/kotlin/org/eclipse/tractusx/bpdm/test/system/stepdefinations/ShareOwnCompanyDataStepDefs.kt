@@ -32,6 +32,7 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
+import org.eclipse.tractusx.bpdm.pool.api.model.SiteHeaderScriptVariantDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
 import org.eclipse.tractusx.bpdm.test.system.utils.SharingStateWatcher
 import org.eclipse.tractusx.bpdm.test.system.utils.ScenarioContext
@@ -104,26 +105,47 @@ class ShareOwnCompanyDataStepDefs(
             )
         }.withConfidence(TestDataV7.SharedByOwnerConfidence)
 
-        val site = poolRequestFactory.buildSiteCreateRequest(runUniqueId, legalEntity.header.bpnl)
-            .let { poolResponseFactory.buildSite(it.site) }
-            .copy(
-                bpns = "BPNS$runUniqueId",
-                isParticipantData = legalEntity.header.isParticipantData
-            )
+        val site = with(poolRequestFactory.buildLegalSiteCreateRequest(runUniqueId, legalEntity.header.bpnl)){
+           copy(scriptVariants = scriptVariants.zip(legalEntity.scriptVariants){ siteScript, leScript -> SiteHeaderScriptVariantDto(leScript.scriptCode, siteScript.name) })
+        }.let { poolResponseFactory.buildLegalSiteCreate(it, legalEntity, "BPNS$runUniqueId") }
 
-        val siteBasedLegalEntity = SiteBasedLegalEntity(legalEntity, site)
+        val siteBasedLegalEntity = SiteBasedLegalEntity(legalEntity, site.site)
         context.siteLegalEntities[runUniqueId] = siteBasedLegalEntity
 
-        val taskData = refinementTestDataFactory.buildLegalEntityOnSiteBusinessPartner(legalEntity, site, "", emptyList())
+        val taskData = refinementTestDataFactory.buildLegalEntityOnSiteBusinessPartner(legalEntity, site.site, "BPNL000000000001", emptyList())
+            .copyWithBpnReferenceType(BpnReferenceType.BpnRequestIdentifier)
+        context.taskData[runUniqueId] = taskData
+    }
+
+    @Given("legal entity {string}")
+    fun `given legal entity`(legalEntityDataId: String) {
+        val runUniqueId = legalEntityDataId.asRunUniqueId()
+
+        val legalEntity = with(poolRequestFactory.buildLegalEntity(runUniqueId).withParticipantData(true)
+            .let{ poolResponseFactory.buildLegalEntityWithLegalAddress(it) }){
+            copy(
+                header = header.copy(bpnl = "BPNL$runUniqueId"),
+                legalAddress = legalAddress.copy(
+                    bpna = "BPNAL$runUniqueId",
+                    addressType = AddressType.LegalAddress
+                )
+            )
+        }.withConfidence(TestDataV7.SharedByOwnerConfidence)
+
+        context.legalEntities[runUniqueId] = legalEntity
+
+        val taskData = refinementTestDataFactory.buildLegalEntityBusinessPartner(legalEntity, "BPNL000000000001", emptyList())
             .copyWithBpnReferenceType(BpnReferenceType.BpnRequestIdentifier)
         context.taskData[runUniqueId] = taskData
     }
 
     @Given("input data {string}")
-    fun `input data`(inputDataId: String) {
+    fun `input data`(inputDataId: String, dataTable: DataTable) {
         val runUniqueId = inputDataId.asRunUniqueId()
+        val overrides = dataTable.asMap()
 
-        val inputData = testDataFactoryGate.businessPartner.input.request.fromSeed(runUniqueId)
+        var inputData = testDataFactoryGate.businessPartner.input.request.fromSeed(runUniqueId)
+        overrides["isOwnCompanyData"]?.let { inputData = inputData.copy(isOwnCompanyData = it.toBoolean()) }
 
         context.inputData[runUniqueId] = inputData
     }
@@ -142,8 +164,23 @@ class ShareOwnCompanyDataStepDefs(
 
         val outputData = testDataFactoryGate.businessPartner.output.fromLegalEntityOnSite(input,siteBasedLegalEntity.legalEntity, siteWithMainAddress)
         context.outputData[outputRunUniqueId] = outputData
-
     }
+
+    @Given("output data {string} based on input {string} for legal entity {string}")
+    fun `given output data for legal entity based on`(outputDataId: String, inputDataId: String, legalEntityDataId: String) {
+        val outputRunUniqueId  = outputDataId.asRunUniqueId()
+        val inputRunUniqueId = inputDataId.asRunUniqueId()
+        val legalEntityRunUniqueId = legalEntityDataId.asRunUniqueId()
+
+        val legalEntity = context.legalEntities[legalEntityRunUniqueId]!!
+        val inputData = context.inputData[inputRunUniqueId]!!
+
+        val input = testDataFactoryGate.businessPartner.input.response.fromRequest(inputData)
+
+        val outputData = testDataFactoryGate.businessPartner.output.fromLegalEntity(input, legalEntity)
+        context.outputData[outputRunUniqueId] = outputData
+    }
+
 
     @When("uploading into business partner record {string} input data {string}")
     fun `uploading into business partner record input data`(recordId: String, inputDataId: String) {
@@ -191,7 +228,7 @@ class ShareOwnCompanyDataStepDefs(
 
         val output = gateClient.businessParters.getBusinessPartnersOutput(listOf(recordRunUniqueId))
 
-        assertRepository.assertBusinessPartnerOutput(output, PageDto(1, 1, 0, 1, listOf(expectedOutputData)))
+        assertRepository.assertBusinessPartnerOutput(output, PageDto(1, 1, 0, 1, listOf(expectedOutputData)), assertRepository.outputComparisonConfigNoBpn)
     }
 
     private fun String.asScenarioUniqueId(): String{
