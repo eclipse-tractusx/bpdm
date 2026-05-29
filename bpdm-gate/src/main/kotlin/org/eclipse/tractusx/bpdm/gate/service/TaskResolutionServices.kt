@@ -202,7 +202,18 @@ class TaskResolutionChunkService(
     }
 
     private fun resolveAsUpserts(requests: List<RequestCreationResult>) {
-        val upsertResults = businessPartnerService.upsertBusinessPartnersOutput(requests.map {
+        val existingOutputsBySharingStateId = businessPartnerRepository
+            .findBySharingStateInAndStage(requests.map { it.sharingState }, StageType.Output)
+            .associateBy { it.sharingState.id }
+
+        val upsertRequests = requests.filter {
+            shouldWriteOutputByGoldenRecordTimestamp(
+                incoming = it.businessPartnerResult!!,
+                stored = existingOutputsBySharingStateId[it.sharingState.id]
+            )
+        }
+
+        val upsertResults = businessPartnerService.upsertBusinessPartnersOutput(upsertRequests.map {
             BusinessPartnerService.OutputUpsertRequest(
                 it.sharingState,
                 it.businessPartnerResult!!
@@ -213,6 +224,29 @@ class TaskResolutionChunkService(
         requests.forEach { sharingStateService.setSuccess(it.sharingState) }
 
         goldenRecordCountedService.setIsGoldenRecordCounted(upsertResults.map { it.businessPartner })
+    }
+
+    private fun shouldWriteOutputByGoldenRecordTimestamp(incoming: OutputUpsertData, stored: BusinessPartnerDb?): Boolean {
+        val incomingComponentTimestamps = listOf(incoming.legalEntityUpdatedAt, incoming.siteUpdatedAt, incoming.addressUpdatedAt)
+        if (incomingComponentTimestamps.all { it == null }) return true
+        if (stored == null) return true
+
+        val storedComponentTimestamps = listOf(stored.legalEntityUpdatedAt, stored.siteUpdatedAt, stored.addressUpdatedAt)
+        if (storedComponentTimestamps.all { it == null }) return true
+
+        val timestampPairs = listOf(
+            incoming.legalEntityUpdatedAt to stored.legalEntityUpdatedAt,
+            incoming.siteUpdatedAt to stored.siteUpdatedAt,
+            incoming.addressUpdatedAt to stored.addressUpdatedAt
+        )
+
+        val shouldSkip = timestampPairs
+            .filter { (incomingTimestamp, _) -> incomingTimestamp != null }
+            .all { (incomingTimestamp, storedTimestamp) ->
+                storedTimestamp != null && !incomingTimestamp!!.isAfter(storedTimestamp)
+            }
+
+        return !shouldSkip
     }
 
     private fun resolveAsErrors(errors: List<RequestCreationResult>) {
