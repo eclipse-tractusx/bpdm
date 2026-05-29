@@ -36,18 +36,13 @@ import java.time.Instant
 class TestDataConfiguration {
 
     @Bean
-    fun testMetadata(poolClient: PoolApiClient): TestMetadata {
+    fun testMetadata(): TestMetadata {
         val testMetadata = TestMetadata(
             identifierTypes = listOf("EU_VAT_ID_DE", "DUNS_ID"),
             legalForms = listOf("SCE1", "SGST"),
             adminAreas = listOf("DE-BW", "DE-BY"),
-            reasonCodes = listOf("REASON_CODE_1", "REASON_CODE_2")
+            reasonCodes = listOf("HEADQUARTER_RELOCATION")
         )
-
-        testMetadata.reasonCodes.forEach { reasonCode ->
-            val reasonCodeDto = ReasonCodeDto(reasonCode, "$reasonCode description")
-            poolClient.metadata.upsertReasonCode(ReasonCodeUpsertRequest(reasonCodeDto))
-        }
 
 
         return testMetadata
