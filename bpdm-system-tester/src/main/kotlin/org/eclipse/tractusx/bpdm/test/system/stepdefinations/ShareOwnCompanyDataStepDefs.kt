@@ -57,201 +57,131 @@ class ShareOwnCompanyDataStepDefs(
 ) : SpringTestRunConfiguration() {
 
     companion object {
-        private val scenarioHolder = ThreadLocal<Scenario>()
-        private val contextHolder  = ThreadLocal<ScenarioContext>()
+        private val contextHolder = ThreadLocal<ScenarioContext>()
     }
 
-    private val scenario: Scenario        get() = scenarioHolder.get()
-    private val context:  ScenarioContext get() = contextHolder.get()
+    private val context: ScenarioContext get() = contextHolder.get()
 
     @Before
     fun setUp(scenario: Scenario) {
-        scenarioHolder.set(scenario)
-        contextHolder.set(ScenarioContext())
+        contextHolder.set(ScenarioContext(scenario.id, testRunData.testTime))
     }
 
     @After
     fun tearDown() {
-        scenarioHolder.remove()
         contextHolder.remove()
     }
 
     @Given("site-based legal entity {string}")
     fun `given site-based legal entity`(legalEntityDataId: String) {
-        val scenarioUniqueId = legalEntityDataId.asScenarioUniqueId()
-        val runUniqueId = legalEntityDataId.asRunUniqueId()
-
-        val result = testDataGenerator.buildSiteBasedLegalEntity(scenarioUniqueId, runUniqueId)
-        context.siteLegalEntities[runUniqueId] = result.siteBasedLegalEntity
-        context.taskData[runUniqueId] = result.taskData
+        val result = testDataGenerator.buildSiteBasedLegalEntity(legalEntityDataId, context)
+        context.siteLegalEntities[legalEntityDataId] = result.siteBasedLegalEntity
+        context.taskData[legalEntityDataId] = result.taskData
     }
 
     @Given("legal entity {string}")
     fun `given legal entity`(legalEntityDataId: String) {
-        val scenarioUniqueId = legalEntityDataId.asScenarioUniqueId()
-        val runUniqueId = legalEntityDataId.asRunUniqueId()
-
-        val result = testDataGenerator.buildLegalEntity(scenarioUniqueId, runUniqueId)
-        context.legalEntities[runUniqueId] = result.legalEntity
-        context.taskData[runUniqueId] = result.taskData
+        val result = testDataGenerator.buildLegalEntity(legalEntityDataId, context)
+        context.legalEntities[legalEntityDataId] = result.legalEntity
+        context.taskData[legalEntityDataId] = result.taskData
     }
 
     @Given("site {string} of legal entity {string}")
     fun `given site`(siteDataId: String, legalEntityDataId: String) {
-        val runUniqueLegalEntityId = legalEntityDataId.asRunUniqueId()
-        val scenarioUniqueSiteId = siteDataId.asScenarioUniqueId()
-        val runUniqueSiteId = siteDataId.asRunUniqueId()
-
-        val legalEntity = context.legalEntities[runUniqueLegalEntityId]!!
-
-        val result = testDataGenerator.buildSite(scenarioUniqueSiteId, runUniqueSiteId, legalEntity)
-        context.sites[runUniqueSiteId] = result.siteWithParent
-        context.taskData[runUniqueSiteId] = result.taskData
+        val legalEntity = context.legalEntities[legalEntityDataId]!!
+        val result = testDataGenerator.buildSite(siteDataId, context, legalEntity)
+        context.sites[siteDataId] = result.siteWithParent
+        context.taskData[siteDataId] = result.taskData
     }
 
     @Given("input data {string}")
     fun `given input data`(inputDataId: String, dataTable: DataTable) {
-        val scenarioUniqueId = inputDataId.asScenarioUniqueId()
-        val runUniqueId = inputDataId.asRunUniqueId()
         val overrides = dataTable.asMap()
-
-        var inputData = testDataGenerator.buildInputData(scenarioUniqueId, runUniqueId)
+        var inputData = testDataGenerator.buildInputData(inputDataId, context)
         overrides["isOwnCompanyData"]?.let { inputData = inputData.copy(isOwnCompanyData = it.toBoolean()) }
-
-        context.inputData[runUniqueId] = inputData
+        context.inputData[inputDataId] = inputData
     }
 
     @Given("output data {string} based on input {string} for site-based legal entity {string}")
     fun `given output data for legal entity on site based on`(outputDataId: String, inputDataId: String, legalEntityDataId: String) {
-        val outputRunUniqueId  = outputDataId.asRunUniqueId()
-        val inputRunUniqueId = inputDataId.asRunUniqueId()
-        val legalEntityRunUniqueId = legalEntityDataId.asRunUniqueId()
-
-        val siteBasedLegalEntity = context.siteLegalEntities[legalEntityRunUniqueId]!!
-        val inputData = context.inputData[inputRunUniqueId]!!
-
+        val siteBasedLegalEntity = context.siteLegalEntities[legalEntityDataId]!!
+        val inputData = context.inputData[inputDataId]!!
         val input = testDataFactoryGate.businessPartner.input.response.fromRequest(inputData)
         val siteWithMainAddress = SiteWithMainAddressVerboseDto(siteBasedLegalEntity.site, siteBasedLegalEntity.legalEntity.legalAddress)
-
-        val outputData = testDataFactoryGate.businessPartner.output.fromLegalEntityOnSite(input, siteBasedLegalEntity.legalEntity, siteWithMainAddress)
-        context.outputData[outputRunUniqueId] = outputData
+        context.outputData[outputDataId] = testDataFactoryGate.businessPartner.output.fromLegalEntityOnSite(input, siteBasedLegalEntity.legalEntity, siteWithMainAddress)
     }
 
     @Given("output data {string} based on input {string} for legal entity {string}")
     fun `given output data for legal entity based on`(outputDataId: String, inputDataId: String, legalEntityDataId: String) {
-        val outputRunUniqueId  = outputDataId.asRunUniqueId()
-        val inputRunUniqueId = inputDataId.asRunUniqueId()
-        val legalEntityRunUniqueId = legalEntityDataId.asRunUniqueId()
-
-        val legalEntity = context.legalEntities[legalEntityRunUniqueId]!!
-        val inputData = context.inputData[inputRunUniqueId]!!
-
+        val legalEntity = context.legalEntities[legalEntityDataId]!!
+        val inputData = context.inputData[inputDataId]!!
         val input = testDataFactoryGate.businessPartner.input.response.fromRequest(inputData)
-
-        val outputData = testDataFactoryGate.businessPartner.output.fromLegalEntity(input, legalEntity)
-        context.outputData[outputRunUniqueId] = outputData
+        context.outputData[outputDataId] = testDataFactoryGate.businessPartner.output.fromLegalEntity(input, legalEntity)
     }
 
     @Given("output data {string} based on input {string} for site {string}")
     fun `given output data based on input for site`(outputDataId: String, inputDataId: String, siteDataId: String) {
-        val outputRunUniqueId  = outputDataId.asRunUniqueId()
-        val inputRunUniqueId = inputDataId.asRunUniqueId()
-        val siteRunUniqueId = siteDataId.asRunUniqueId()
-
-        val siteWithParent = context.sites[siteRunUniqueId]!!
-        val inputData = context.inputData[inputRunUniqueId]!!
-
+        val siteWithParent = context.sites[siteDataId]!!
+        val inputData = context.inputData[inputDataId]!!
         val input = testDataFactoryGate.businessPartner.input.response.fromRequest(inputData)
-
-        val outputData = testDataFactoryGate.businessPartner.output.fromSite(input, siteWithParent.legalEntity, siteWithParent.site)
-        context.outputData[outputRunUniqueId] = outputData
+        context.outputData[outputDataId] = testDataFactoryGate.businessPartner.output.fromSite(input, siteWithParent.legalEntity, siteWithParent.site)
     }
 
     @Given("additional address {string} of site {string}")
     fun `given additional address`(addressDataId: String, siteDataId: String) {
-        val scenarioUniqueAddressId = addressDataId.asScenarioUniqueId()
-        val runUniqueAddressId = addressDataId.asRunUniqueId()
-        val runUniqueSiteId = siteDataId.asRunUniqueId()
-
-        val siteWithParent = context.sites[runUniqueSiteId]!!
-
-        val result = testDataGenerator.buildAdditionalSiteAddress(scenarioUniqueAddressId, runUniqueAddressId, siteWithParent)
-        context.additionalSiteAddresses[runUniqueAddressId] = result.additionalSiteAddressWithParent
-        context.taskData[runUniqueSiteId] = result.taskData
+        val siteWithParent = context.sites[siteDataId]!!
+        val result = testDataGenerator.buildAdditionalSiteAddress(addressDataId, context, siteWithParent)
+        context.additionalSiteAddresses[addressDataId] = result.additionalSiteAddressWithParent
+        context.taskData[siteDataId] = result.taskData
     }
 
     @Given("output data {string} based on input {string} for additional address {string} of site")
     fun `given output data based on input for additional address of site`(outputDataId: String, inputDataId: String, addressDataId: String) {
-        val outputRunUniqueId = outputDataId.asRunUniqueId()
-        val inputRunUniqueId = inputDataId.asRunUniqueId()
-        val addressRunUniqueId = addressDataId.asRunUniqueId()
-
-        val additionalAddressWithParent = context.additionalSiteAddresses[addressRunUniqueId]!!
-        val inputData = context.inputData[inputRunUniqueId]!!
-
+        val additionalAddressWithParent = context.additionalSiteAddresses[addressDataId]!!
+        val inputData = context.inputData[inputDataId]!!
         val input = testDataFactoryGate.businessPartner.input.response.fromRequest(inputData)
-
-        val outputData = testDataFactoryGate.businessPartner.output.fromAdditionalAddressOnSite(
+        context.outputData[outputDataId] = testDataFactoryGate.businessPartner.output.fromAdditionalAddressOnSite(
             input,
             additionalAddressWithParent.siteWithParent.legalEntity,
             additionalAddressWithParent.siteWithParent.site,
             additionalAddressWithParent.address
         )
-        context.outputData[outputRunUniqueId] = outputData
     }
 
     @Given("additional address {string} of legal entity {string}")
     fun `given additional address of legal entity`(addressDataId: String, legalEntityDataId: String) {
-        val scenarioUniqueAddressId = addressDataId.asScenarioUniqueId()
-        val runUniqueAddressId = addressDataId.asRunUniqueId()
-        val runUniqueLegalEntityId = legalEntityDataId.asRunUniqueId()
-
-        val legalEntity = context.legalEntities[runUniqueLegalEntityId]!!
-
-        val result = testDataGenerator.buildAdditionalLegalEntityAddress(scenarioUniqueAddressId, runUniqueAddressId, legalEntity)
-        context.additionalLegalEntityAddresses[runUniqueAddressId] = result.additionalLegalEntityAddressWithParent
-        context.taskData[runUniqueLegalEntityId] = result.taskData
+        val legalEntity = context.legalEntities[legalEntityDataId]!!
+        val result = testDataGenerator.buildAdditionalLegalEntityAddress(addressDataId, context, legalEntity)
+        context.additionalLegalEntityAddresses[addressDataId] = result.additionalLegalEntityAddressWithParent
+        context.taskData[legalEntityDataId] = result.taskData
     }
 
     @Given("output data {string} based on input {string} for additional address {string} of legal entity")
     fun `given output data based on input for additional address of legal entity`(outputDataId: String, inputDataId: String, addressDataId: String) {
-        val outputRunUniqueId = outputDataId.asRunUniqueId()
-        val inputRunUniqueId = inputDataId.asRunUniqueId()
-        val addressRunUniqueId = addressDataId.asRunUniqueId()
-
-        val additionalAddressWithParent = context.additionalLegalEntityAddresses[addressRunUniqueId]!!
-        val inputData = context.inputData[inputRunUniqueId]!!
-
+        val additionalAddressWithParent = context.additionalLegalEntityAddresses[addressDataId]!!
+        val inputData = context.inputData[inputDataId]!!
         val input = testDataFactoryGate.businessPartner.input.response.fromRequest(inputData)
-
-        val outputData = testDataFactoryGate.businessPartner.output.fromAdditionalAddressOnLegalEntity(
+        context.outputData[outputDataId] = testDataFactoryGate.businessPartner.output.fromAdditionalAddressOnLegalEntity(
             input,
             additionalAddressWithParent.legalEntity,
             additionalAddressWithParent.address
         )
-        context.outputData[outputRunUniqueId] = outputData
     }
 
     @When("uploading into business partner record {string} input data {string}")
     fun `when uploading into business partner record input data`(recordId: String, inputDataId: String) {
-        val recordRunUniqueId = recordId.asRunUniqueId()
-        val inputRunUniqueId = inputDataId.asRunUniqueId()
-
-        val inputData = context.inputData[inputRunUniqueId]!!
-
-        gateClient.businessParters.upsertBusinessPartnersInput(listOf(inputData.copy(externalId = recordRunUniqueId)))
+        val inputData = context.inputData[inputDataId]!!
+        gateClient.businessParters.upsertBusinessPartnersInput(listOf(inputData.copy(externalId = context.runId(recordId))))
     }
 
     @When("record {string} is refined to {string}")
     fun `when record is refined to`(recordId: String, taskDataId: String) {
-        val recordRunUniqueId = recordId.asRunUniqueId()
-        val taskRunUniqueId = taskDataId.asRunUniqueId()
+        val taskData = context.taskData[taskDataId]!!
+        val recordRunId = context.runId(recordId)
 
-        val taskData = context.taskData[taskRunUniqueId]!!
+        sharingStateWatcher.waitForPendingState(recordRunId)
 
-        sharingStateWatcher.waitForPendingState(recordRunUniqueId)
-
-        val taskId = gateClient.sharingState.getSharingStates(PaginationRequest(),listOf(recordRunUniqueId)).content.single().taskId!!
+        val taskId = gateClient.sharingState.getSharingStates(PaginationRequest(), listOf(recordRunId)).content.single().taskId!!
         taskReservationWatcher.waitForReservedTask(taskId)
 
         orchestratorClient.goldenRecordTasks.resolveStepResults(TaskStepResultRequest(TaskStep.CleanAndSync, listOf(TaskStepResultEntryDto(taskId, taskData))))
@@ -259,33 +189,21 @@ class ShareOwnCompanyDataStepDefs(
 
     @Then("polling business partner record {string} sharing state leads to success")
     fun `then polling business partner record sharing state leads to success`(recordId: String) {
-        val recordRunUniqueId = recordId.asRunUniqueId()
+        val recordRunId = context.runId(recordId)
 
-        sharingStateWatcher.waitForCompletedState(recordRunUniqueId)
+        sharingStateWatcher.waitForCompletedState(recordRunId)
 
-        val sharingStates = gateClient.sharingState.getSharingStates(PaginationRequest(),listOf(recordRunUniqueId)).content
-
-        val expectedSharingStates = listOf(SharingStateDto(recordRunUniqueId, SharingStateType.Success, updatedAt = Instant.now()))
+        val sharingStates = gateClient.sharingState.getSharingStates(PaginationRequest(), listOf(recordRunId)).content
+        val expectedSharingStates = listOf(SharingStateDto(recordRunId, SharingStateType.Success, updatedAt = Instant.now()))
         assertRepository.assertSharingStates(sharingStates, expectedSharingStates)
     }
 
     @Then("business partner record {string} output data matches {string}")
     fun `then business partner record output data matches`(recordId: String, outputDataId: String) {
-        val recordRunUniqueId = recordId.asRunUniqueId()
-        val outputRunUniqueId  = outputDataId.asRunUniqueId()
+        val recordRunId = context.runId(recordId)
+        val expectedOutputData = context.outputData[outputDataId]!!.copy(externalId = recordRunId)
 
-        val expectedOutputData = context.outputData[outputRunUniqueId]!!.copy(externalId = recordRunUniqueId)
-
-        val output = gateClient.businessParters.getBusinessPartnersOutput(listOf(recordRunUniqueId))
-
+        val output = gateClient.businessParters.getBusinessPartnersOutput(listOf(recordRunId))
         assertRepository.assertBusinessPartnerOutput(output, PageDto(1, 1, 0, 1, listOf(expectedOutputData)), assertRepository.outputComparisonConfigNoBpn)
-    }
-
-    private fun String.asScenarioUniqueId(): String {
-        return "$this${scenario.id}"
-    }
-
-    private fun String.asRunUniqueId(): String {
-        return "${this.asScenarioUniqueId()}${testRunData.testTime}"
     }
 }

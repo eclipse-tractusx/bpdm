@@ -26,17 +26,20 @@ import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
 import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
+import java.time.Instant
 
-class ScenarioContext {
+class ScenarioContext(val scenarioSuffix: String, private val timeSuffix: Instant) {
+
     val siteLegalEntities: MutableMap<String, SiteBasedLegalEntity> = mutableMapOf()
     val legalEntities: MutableMap<String, LegalEntityWithLegalAddressVerboseDto> = mutableMapOf()
     val sites: MutableMap<String, SiteWithParent> = mutableMapOf()
     val additionalSiteAddresses: MutableMap<String, AdditionalSiteAddressWithParent> = mutableMapOf()
     val additionalLegalEntityAddresses: MutableMap<String, AdditionalLegalEntityAddressWithParent> = mutableMapOf()
-    val taskData:      MutableMap<String, BusinessPartner> = mutableMapOf()
-    val inputData:     MutableMap<String, BusinessPartnerInputRequest> = mutableMapOf()
-    val outputData:    MutableMap<String, BusinessPartnerOutputDto> = mutableMapOf()
-    val taskIds:       MutableMap<String, String> = mutableMapOf()
+    val taskData: MutableMap<String, BusinessPartner> = mutableMapOf()
+    val inputData: MutableMap<String, BusinessPartnerInputRequest> = mutableMapOf()
+    val outputData: MutableMap<String, BusinessPartnerOutputDto> = mutableMapOf()
+
+    fun runId(id: String) = "$id$scenarioSuffix$timeSuffix"
 }
 
 data class SiteBasedLegalEntity(
