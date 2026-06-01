@@ -153,12 +153,12 @@ class ShareOwnCompanyDataStepDefs(
     }
 
     @Given("additional address {string} of site {string}")
-    fun `given additional address`(addressDataId: String, siteDataId: String) {
+    fun `given additional address of site`(addressDataId: String, siteDataId: String) {
         logger.info { "[$scenarioName] Given: additional address '$addressDataId' of site '$siteDataId'" }
         val siteWithParent = context.sites[siteDataId]!!
         val result = testDataGenerator.buildAdditionalSiteAddress(addressDataId, siteWithParent)
         context.additionalSiteAddresses[addressDataId] = result.additionalSiteAddressWithParent
-        context.taskData[siteDataId] = result.taskData
+        context.taskData[addressDataId] = result.taskData
     }
 
     @Given("output data {string} based on input {string} for additional address {string} of site")
@@ -181,7 +181,7 @@ class ShareOwnCompanyDataStepDefs(
         val legalEntity = context.legalEntities[legalEntityDataId]!!
         val result = testDataGenerator.buildAdditionalLegalEntityAddress(addressDataId, legalEntity)
         context.additionalLegalEntityAddresses[addressDataId] = result.additionalLegalEntityAddressWithParent
-        context.taskData[legalEntityDataId] = result.taskData
+        context.taskData[addressDataId] = result.taskData
     }
 
     @Given("output data {string} based on input {string} for additional address {string} of legal entity")
