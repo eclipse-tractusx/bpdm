@@ -44,9 +44,8 @@ import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.TaskStep
 import org.eclipse.tractusx.orchestrator.api.model.TaskStepResultEntryDto
 import org.eclipse.tractusx.orchestrator.api.model.TaskStepResultRequest
+import tools.jackson.databind.json.JsonMapper
 import java.time.Instant
-import java.time.temporal.ChronoUnit
-import java.util.concurrent.TimeUnit
 
 class ShareOwnCompanyDataStepDefs(
     private val gateClient: GateClient,
@@ -56,7 +55,8 @@ class ShareOwnCompanyDataStepDefs(
     private val testRunData: TestRunData,
     private val testDataGenerator: ShareOwnCompanyDataTestDataGenerator,
     private val testDataFactoryGate: TestDataFactoryGateV7,
-    private val assertRepository: GateAssertRepositoryV7
+    private val assertRepository: GateAssertRepositoryV7,
+    private val jsonMapper: JsonMapper
 ) : SpringTestRunConfiguration() {
 
     companion object {
@@ -68,8 +68,21 @@ class ShareOwnCompanyDataStepDefs(
 
     @Before
     fun setUp(scenario: Scenario) {
-        ScenarioContext.set(ScenarioContext(scenario.name, scenario.id, testRunData.testTime))
+        ScenarioContext.set(ScenarioContext(scenario.name, scenario.id, testRunData.testTime, scenario))
         logger.info { "Starting scenario: '${scenario.name}'" }
+    }
+
+    private fun attachGateCall(method: String, path: String, request: Any? = null, response: Any? = null) {
+        val content = buildMap {
+            put("uri", "$method $path")
+            if (request != null) put("request", request)
+            if (response != null) put("response", response)
+        }
+        context.scenario.attach(
+            jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(content),
+            "application/json",
+            "$method $path"
+        )
     }
 
     @After
@@ -188,7 +201,9 @@ class ShareOwnCompanyDataStepDefs(
     fun `when uploading into business partner record input data`(recordId: String, inputDataId: String) {
         logger.info { "[$scenarioName] When: uploading into business partner record '$recordId' input data '$inputDataId'" }
         val inputData = context.inputData[inputDataId]!!
-        gateClient.businessParters.upsertBusinessPartnersInput(listOf(inputData.copy(externalId = context.runId(recordId))))
+        val request = listOf(inputData.copy(externalId = context.runId(recordId)))
+        val response = gateClient.businessParters.upsertBusinessPartnersInput(request)
+        attachGateCall("PUT", "/v7/input/business-partners", request = request, response = response.body)
     }
 
     @When("record {string} is refined to {string}")
@@ -199,7 +214,9 @@ class ShareOwnCompanyDataStepDefs(
 
         sharingStateWatcher.waitForTaskId(recordId)
 
-        val taskId = gateClient.sharingState.getSharingStates(PaginationRequest(), listOf(recordRunId)).content.single().taskId!!
+        val sharingStatesPage = gateClient.sharingState.getSharingStates(PaginationRequest(), listOf(recordRunId))
+        attachGateCall("GET", "/v7/business-partners/sharing-state", request = mapOf("externalIds" to listOf(recordRunId)), response = sharingStatesPage)
+        val taskId = sharingStatesPage.content.single().taskId!!
         taskReservationWatcher.waitForReservedTask(taskId)
 
         orchestratorClient.goldenRecordTasks.resolveStepResults(TaskStepResultRequest(TaskStep.CleanAndSync, listOf(TaskStepResultEntryDto(taskId, taskData))))
@@ -212,7 +229,9 @@ class ShareOwnCompanyDataStepDefs(
 
         sharingStateWatcher.waitForCompletedState(recordId)
 
-        val sharingStates = gateClient.sharingState.getSharingStates(PaginationRequest(), listOf(recordRunId)).content
+        val sharingStatesPage = gateClient.sharingState.getSharingStates(PaginationRequest(), listOf(recordRunId))
+        attachGateCall("GET", "/v7/business-partners/sharing-state", request = mapOf("externalIds" to listOf(recordRunId)), response = sharingStatesPage)
+        val sharingStates = sharingStatesPage.content
         val expectedSharingStates = listOf(SharingStateDto(recordRunId, SharingStateType.Success, updatedAt = Instant.now()))
         assertRepository.assertSharingStates(sharingStates, expectedSharingStates)
     }
@@ -223,7 +242,9 @@ class ShareOwnCompanyDataStepDefs(
         val recordRunId = context.runId(recordId)
         val expectedOutputData = context.outputData[outputDataId]!!.copy(externalId = recordRunId)
 
-        val output = gateClient.businessParters.getBusinessPartnersOutput(listOf(recordRunId))
+        val externalIds = listOf(recordRunId)
+        val output = gateClient.businessParters.getBusinessPartnersOutput(externalIds)
+        attachGateCall("POST", "/v7/output/business-partners/search", request = externalIds, response = output)
         assertRepository.assertBusinessPartnerOutput(output, PageDto(1, 1, 0, 1, listOf(expectedOutputData)), assertRepository.outputComparisonConfigNoBpn)
     }
 }

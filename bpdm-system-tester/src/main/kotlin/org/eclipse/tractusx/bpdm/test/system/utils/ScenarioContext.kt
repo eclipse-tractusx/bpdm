@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.test.system.utils
 
+import io.cucumber.java.Scenario
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
@@ -29,7 +30,7 @@ import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
-class ScenarioContext(val scenarioName: String, val scenarioSuffix: String, timeSuffix: Instant) {
+class ScenarioContext(val scenarioName: String, val scenarioSuffix: String, timeSuffix: Instant, val scenario: Scenario) {
 
     companion object {
         private val threadLocal = ThreadLocal<ScenarioContext?>()
