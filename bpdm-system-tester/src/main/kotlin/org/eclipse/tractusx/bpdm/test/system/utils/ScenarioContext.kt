@@ -29,7 +29,15 @@ import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
-class ScenarioContext(val scenarioSuffix: String, timeSuffix: Instant) {
+class ScenarioContext(val scenarioName: String, val scenarioSuffix: String, timeSuffix: Instant) {
+
+    companion object {
+        private val threadLocal = ThreadLocal<ScenarioContext?>()
+
+        fun current(): ScenarioContext? = threadLocal.get()
+        fun set(context: ScenarioContext) = threadLocal.set(context)
+        fun clear() = threadLocal.remove()
+    }
 
     private val timeSuffix = timeSuffix.truncatedTo(ChronoUnit.SECONDS)
 
@@ -42,7 +50,8 @@ class ScenarioContext(val scenarioSuffix: String, timeSuffix: Instant) {
     val inputData: MutableMap<String, BusinessPartnerInputRequest> = mutableMapOf()
     val outputData: MutableMap<String, BusinessPartnerOutputDto> = mutableMapOf()
 
-    fun runId(id: String) = "$id-$scenarioSuffix-$timeSuffix"
+    fun scenarioId() = "$scenarioSuffix-$timeSuffix"
+    fun runId(id: String) = "$id-${scenarioId()}"
 }
 
 data class SiteBasedLegalEntity(

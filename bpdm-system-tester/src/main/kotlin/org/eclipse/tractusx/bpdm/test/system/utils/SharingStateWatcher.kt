@@ -59,11 +59,12 @@ class SharingStateWatcher(
     }
 
     fun waitForCompletedState(externalId: String): SharingStateType {
-        logger.info { "Waiting for completed sharing state of '$externalId'" }
+        val scenario = ScenarioContext.current()?.scenarioName
+        logger.info { "[$scenario] Waiting for completed sharing state of '$externalId'" }
         val future = awaitingCompletedState.computeIfAbsent(externalId) { CompletableFuture() }
         return try {
             val result = future.get(WAIT_TIMEOUT.toMillis(), TimeUnit.MILLISECONDS)
-            logger.info { "Sharing state of '$externalId' completed with: $result" }
+            logger.info { "[$scenario] Sharing state of '$externalId' completed with: $result" }
             result
         } catch (e: TimeoutException) {
             awaitingCompletedState.remove(externalId)
@@ -72,11 +73,12 @@ class SharingStateWatcher(
     }
 
     fun waitForTaskId(externalId: String): SharingStateType {
-        logger.info { "Waiting for task ID assignment of '$externalId'" }
+        val scenario = ScenarioContext.current()?.scenarioName
+        logger.info { "[$scenario] Waiting for task ID assignment of '$externalId'" }
         val future = awaitingTaskId.computeIfAbsent(externalId) { CompletableFuture() }
         return try {
             val result = future.get(WAIT_TIMEOUT.toMillis(), TimeUnit.MILLISECONDS)
-            logger.info { "Task ID assigned for '$externalId', sharing state is now: $result" }
+            logger.info { "[$scenario] Task ID assigned for '$externalId', sharing state is now: $result" }
             result
         } catch (e: TimeoutException) {
             awaitingTaskId.remove(externalId)

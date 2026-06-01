@@ -61,24 +61,20 @@ class ShareOwnCompanyDataStepDefs(
 
     companion object {
         private val logger = KotlinLogging.logger { }
-        private val contextHolder = ThreadLocal<ScenarioContext>()
-        private val scenarioNameHolder = ThreadLocal<String>()
     }
 
-    private val context: ScenarioContext get() = contextHolder.get()
-    private val scenarioName: String get() = scenarioNameHolder.get()
+    private val context: ScenarioContext get() = ScenarioContext.current()!!
+    private val scenarioName: String get() = context.scenarioName
 
     @Before
     fun setUp(scenario: Scenario) {
-        contextHolder.set(ScenarioContext(scenario.id, testRunData.testTime))
-        scenarioNameHolder.set(scenario.name)
+        ScenarioContext.set(ScenarioContext(scenario.name, scenario.id, testRunData.testTime))
         logger.info { "Starting scenario: '${scenario.name}'" }
     }
 
     @After
     fun tearDown() {
-        contextHolder.remove()
-        scenarioNameHolder.remove()
+        ScenarioContext.clear()
     }
 
     @Given("site-based legal entity {string}")
