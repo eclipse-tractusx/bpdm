@@ -27,8 +27,11 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAdd
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
 import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
 import java.time.Instant
+import java.time.temporal.ChronoUnit
 
-class ScenarioContext(val scenarioSuffix: String, private val timeSuffix: Instant) {
+class ScenarioContext(val scenarioSuffix: String, timeSuffix: Instant) {
+
+    private val timeSuffix = timeSuffix.truncatedTo(ChronoUnit.SECONDS)
 
     val siteLegalEntities: MutableMap<String, SiteBasedLegalEntity> = mutableMapOf()
     val legalEntities: MutableMap<String, LegalEntityWithLegalAddressVerboseDto> = mutableMapOf()
@@ -39,7 +42,7 @@ class ScenarioContext(val scenarioSuffix: String, private val timeSuffix: Instan
     val inputData: MutableMap<String, BusinessPartnerInputRequest> = mutableMapOf()
     val outputData: MutableMap<String, BusinessPartnerOutputDto> = mutableMapOf()
 
-    fun runId(id: String) = "$id$scenarioSuffix$timeSuffix"
+    fun runId(id: String) = "$id-$scenarioSuffix-$timeSuffix"
 }
 
 data class SiteBasedLegalEntity(

@@ -13,10 +13,10 @@ Feature: Share own company business partner data without BPNs
     Given input data "I1"
         | isOwnCompanyData | true |
     Given output data "O1" based on input "I1" for site-based legal entity "L1"
-    When uploading into business partner record "A" input data "I1"
-    When record "A" is refined to "L1"
-    Then polling business partner record "A" sharing state leads to success
-    And business partner record "A" output data matches "O1"
+    When uploading into business partner record "BP1" input data "I1"
+    When record "BP1" is refined to "L1"
+    Then polling business partner record "BP1" sharing state leads to success
+    And business partner record "BP1" output data matches "O1"
 
     Scenario: Refine input to new legal entity
 
@@ -24,10 +24,10 @@ Feature: Share own company business partner data without BPNs
     Given input data "I1"
         | isOwnCompanyData | true |
     Given output data "O1" based on input "I1" for legal entity "L1"
-    When uploading into business partner record "A" input data "I1"
-    When record "A" is refined to "L1"
-    Then polling business partner record "A" sharing state leads to success
-    And business partner record "A" output data matches "O1"
+    When uploading into business partner record "BP1" input data "I1"
+    When record "BP1" is refined to "L1"
+    Then polling business partner record "BP1" sharing state leads to success
+    And business partner record "BP1" output data matches "O1"
 
     Scenario: Refine input to new site
 
@@ -36,10 +36,10 @@ Feature: Share own company business partner data without BPNs
     Given input data "I1"
         | isOwnCompanyData | true |
     Given output data "O1" based on input "I1" for site "S1"
-    When uploading into business partner record "A" input data "I1"
-    When record "A" is refined to "S1"
-    Then polling business partner record "A" sharing state leads to success
-    And business partner record "A" output data matches "O1"
+    When uploading into business partner record "BP1" input data "I1"
+    When record "BP1" is refined to "S1"
+    Then polling business partner record "BP1" sharing state leads to success
+    And business partner record "BP1" output data matches "O1"
 
     Scenario: Refine input to new additional address of site
 
@@ -49,10 +49,10 @@ Feature: Share own company business partner data without BPNs
     Given input data "I1"
         | isOwnCompanyData | true |
     Given output data "O1" based on input "I1" for additional address "A1" of site
-    When uploading into business partner record "A" input data "I1"
-    When record "A" is refined to "S1"
-    Then polling business partner record "A" sharing state leads to success
-    And business partner record "A" output data matches "O1"
+    When uploading into business partner record "BP1" input data "I1"
+    When record "BP1" is refined to "S1"
+    Then polling business partner record "BP1" sharing state leads to success
+    And business partner record "BP1" output data matches "O1"
 
     Scenario: Refine input to new additional address
 
@@ -61,7 +61,25 @@ Feature: Share own company business partner data without BPNs
     Given input data "I1"
         | isOwnCompanyData | true |
     Given output data "O1" based on input "I1" for additional address "A1" of legal entity
-    When uploading into business partner record "A" input data "I1"
-    When record "A" is refined to "L1"
-    Then polling business partner record "A" sharing state leads to success
-    And business partner record "A" output data matches "O1"
+    When uploading into business partner record "BP1" input data "I1"
+    When record "BP1" is refined to "L1"
+    Then polling business partner record "BP1" sharing state leads to success
+    And business partner record "BP1" output data matches "O1"
+
+    Scenario: Update Site-Based Legal Entity
+
+    Given site-based legal entity "L1"
+    Given site-based legal entity "L2"
+    Given input data "I1"
+        | isOwnCompanyData | true |
+    Given input data "I2"
+        | isOwnCompanyData | true |
+    Given output data "O1" based on input "I1" for site-based legal entity "L1"
+    Given output data "O2" based on input "I2" for site-based legal entity "L2"
+    When uploading into business partner record "BP1" input data "I1"
+    When record "BP1" is refined to "L1"
+    Then polling business partner record "BP1" sharing state leads to success
+    When uploading into business partner record "BP1" input data "I2"
+    When record "BP1" is refined to "L2"
+    Then polling business partner record "BP1" sharing state leads to success
+    And business partner record "BP1" output data matches "O2"

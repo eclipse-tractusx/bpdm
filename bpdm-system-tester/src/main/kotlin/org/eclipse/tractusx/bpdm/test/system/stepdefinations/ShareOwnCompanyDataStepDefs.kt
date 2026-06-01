@@ -26,6 +26,7 @@ import io.cucumber.java.Scenario
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
+import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
@@ -44,6 +45,8 @@ import org.eclipse.tractusx.orchestrator.api.model.TaskStep
 import org.eclipse.tractusx.orchestrator.api.model.TaskStepResultEntryDto
 import org.eclipse.tractusx.orchestrator.api.model.TaskStepResultRequest
 import java.time.Instant
+import java.time.temporal.ChronoUnit
+import java.util.concurrent.TimeUnit
 
 class ShareOwnCompanyDataStepDefs(
     private val gateClient: GateClient,
@@ -57,23 +60,30 @@ class ShareOwnCompanyDataStepDefs(
 ) : SpringTestRunConfiguration() {
 
     companion object {
+        private val logger = KotlinLogging.logger { }
         private val contextHolder = ThreadLocal<ScenarioContext>()
+        private val scenarioNameHolder = ThreadLocal<String>()
     }
 
     private val context: ScenarioContext get() = contextHolder.get()
+    private val scenarioName: String get() = scenarioNameHolder.get()
 
     @Before
     fun setUp(scenario: Scenario) {
         contextHolder.set(ScenarioContext(scenario.id, testRunData.testTime))
+        scenarioNameHolder.set(scenario.name)
+        logger.info { "Starting scenario: '${scenario.name}'" }
     }
 
     @After
     fun tearDown() {
         contextHolder.remove()
+        scenarioNameHolder.remove()
     }
 
     @Given("site-based legal entity {string}")
     fun `given site-based legal entity`(legalEntityDataId: String) {
+        logger.info { "[$scenarioName] Given: site-based legal entity '$legalEntityDataId'" }
         val result = testDataGenerator.buildSiteBasedLegalEntity(legalEntityDataId, context)
         context.siteLegalEntities[legalEntityDataId] = result.siteBasedLegalEntity
         context.taskData[legalEntityDataId] = result.taskData
@@ -81,6 +91,7 @@ class ShareOwnCompanyDataStepDefs(
 
     @Given("legal entity {string}")
     fun `given legal entity`(legalEntityDataId: String) {
+        logger.info { "[$scenarioName] Given: legal entity '$legalEntityDataId'" }
         val result = testDataGenerator.buildLegalEntity(legalEntityDataId, context)
         context.legalEntities[legalEntityDataId] = result.legalEntity
         context.taskData[legalEntityDataId] = result.taskData
@@ -88,6 +99,7 @@ class ShareOwnCompanyDataStepDefs(
 
     @Given("site {string} of legal entity {string}")
     fun `given site`(siteDataId: String, legalEntityDataId: String) {
+        logger.info { "[$scenarioName] Given: site '$siteDataId' of legal entity '$legalEntityDataId'" }
         val legalEntity = context.legalEntities[legalEntityDataId]!!
         val result = testDataGenerator.buildSite(siteDataId, context, legalEntity)
         context.sites[siteDataId] = result.siteWithParent
@@ -96,6 +108,7 @@ class ShareOwnCompanyDataStepDefs(
 
     @Given("input data {string}")
     fun `given input data`(inputDataId: String, dataTable: DataTable) {
+        logger.info { "[$scenarioName] Given: input data '$inputDataId'" }
         val overrides = dataTable.asMap()
         var inputData = testDataGenerator.buildInputData(inputDataId, context)
         overrides["isOwnCompanyData"]?.let { inputData = inputData.copy(isOwnCompanyData = it.toBoolean()) }
@@ -104,6 +117,7 @@ class ShareOwnCompanyDataStepDefs(
 
     @Given("output data {string} based on input {string} for site-based legal entity {string}")
     fun `given output data for legal entity on site based on`(outputDataId: String, inputDataId: String, legalEntityDataId: String) {
+        logger.info { "[$scenarioName] Given: output data '$outputDataId' based on input '$inputDataId' for site-based legal entity '$legalEntityDataId'" }
         val siteBasedLegalEntity = context.siteLegalEntities[legalEntityDataId]!!
         val inputData = context.inputData[inputDataId]!!
         val input = testDataFactoryGate.businessPartner.input.response.fromRequest(inputData)
@@ -113,6 +127,7 @@ class ShareOwnCompanyDataStepDefs(
 
     @Given("output data {string} based on input {string} for legal entity {string}")
     fun `given output data for legal entity based on`(outputDataId: String, inputDataId: String, legalEntityDataId: String) {
+        logger.info { "[$scenarioName] Given: output data '$outputDataId' based on input '$inputDataId' for legal entity '$legalEntityDataId'" }
         val legalEntity = context.legalEntities[legalEntityDataId]!!
         val inputData = context.inputData[inputDataId]!!
         val input = testDataFactoryGate.businessPartner.input.response.fromRequest(inputData)
@@ -121,6 +136,7 @@ class ShareOwnCompanyDataStepDefs(
 
     @Given("output data {string} based on input {string} for site {string}")
     fun `given output data based on input for site`(outputDataId: String, inputDataId: String, siteDataId: String) {
+        logger.info { "[$scenarioName] Given: output data '$outputDataId' based on input '$inputDataId' for site '$siteDataId'" }
         val siteWithParent = context.sites[siteDataId]!!
         val inputData = context.inputData[inputDataId]!!
         val input = testDataFactoryGate.businessPartner.input.response.fromRequest(inputData)
@@ -129,6 +145,7 @@ class ShareOwnCompanyDataStepDefs(
 
     @Given("additional address {string} of site {string}")
     fun `given additional address`(addressDataId: String, siteDataId: String) {
+        logger.info { "[$scenarioName] Given: additional address '$addressDataId' of site '$siteDataId'" }
         val siteWithParent = context.sites[siteDataId]!!
         val result = testDataGenerator.buildAdditionalSiteAddress(addressDataId, context, siteWithParent)
         context.additionalSiteAddresses[addressDataId] = result.additionalSiteAddressWithParent
@@ -137,6 +154,7 @@ class ShareOwnCompanyDataStepDefs(
 
     @Given("output data {string} based on input {string} for additional address {string} of site")
     fun `given output data based on input for additional address of site`(outputDataId: String, inputDataId: String, addressDataId: String) {
+        logger.info { "[$scenarioName] Given: output data '$outputDataId' based on input '$inputDataId' for additional address '$addressDataId' of site" }
         val additionalAddressWithParent = context.additionalSiteAddresses[addressDataId]!!
         val inputData = context.inputData[inputDataId]!!
         val input = testDataFactoryGate.businessPartner.input.response.fromRequest(inputData)
@@ -150,6 +168,7 @@ class ShareOwnCompanyDataStepDefs(
 
     @Given("additional address {string} of legal entity {string}")
     fun `given additional address of legal entity`(addressDataId: String, legalEntityDataId: String) {
+        logger.info { "[$scenarioName] Given: additional address '$addressDataId' of legal entity '$legalEntityDataId'" }
         val legalEntity = context.legalEntities[legalEntityDataId]!!
         val result = testDataGenerator.buildAdditionalLegalEntityAddress(addressDataId, context, legalEntity)
         context.additionalLegalEntityAddresses[addressDataId] = result.additionalLegalEntityAddressWithParent
@@ -158,6 +177,7 @@ class ShareOwnCompanyDataStepDefs(
 
     @Given("output data {string} based on input {string} for additional address {string} of legal entity")
     fun `given output data based on input for additional address of legal entity`(outputDataId: String, inputDataId: String, addressDataId: String) {
+        logger.info { "[$scenarioName] Given: output data '$outputDataId' based on input '$inputDataId' for additional address '$addressDataId' of legal entity" }
         val additionalAddressWithParent = context.additionalLegalEntityAddresses[addressDataId]!!
         val inputData = context.inputData[inputDataId]!!
         val input = testDataFactoryGate.businessPartner.input.response.fromRequest(inputData)
@@ -170,16 +190,18 @@ class ShareOwnCompanyDataStepDefs(
 
     @When("uploading into business partner record {string} input data {string}")
     fun `when uploading into business partner record input data`(recordId: String, inputDataId: String) {
+        logger.info { "[$scenarioName] When: uploading into business partner record '$recordId' input data '$inputDataId'" }
         val inputData = context.inputData[inputDataId]!!
         gateClient.businessParters.upsertBusinessPartnersInput(listOf(inputData.copy(externalId = context.runId(recordId))))
     }
 
     @When("record {string} is refined to {string}")
     fun `when record is refined to`(recordId: String, taskDataId: String) {
+        logger.info { "[$scenarioName] When: record '$recordId' is refined to '$taskDataId'" }
         val taskData = context.taskData[taskDataId]!!
         val recordRunId = context.runId(recordId)
 
-        sharingStateWatcher.waitForPendingState(recordRunId)
+        sharingStateWatcher.waitForTaskId(recordRunId)
 
         val taskId = gateClient.sharingState.getSharingStates(PaginationRequest(), listOf(recordRunId)).content.single().taskId!!
         taskReservationWatcher.waitForReservedTask(taskId)
@@ -189,6 +211,7 @@ class ShareOwnCompanyDataStepDefs(
 
     @Then("polling business partner record {string} sharing state leads to success")
     fun `then polling business partner record sharing state leads to success`(recordId: String) {
+        logger.info { "[$scenarioName] Then: polling business partner record '$recordId' sharing state leads to success" }
         val recordRunId = context.runId(recordId)
 
         sharingStateWatcher.waitForCompletedState(recordRunId)
@@ -200,6 +223,7 @@ class ShareOwnCompanyDataStepDefs(
 
     @Then("business partner record {string} output data matches {string}")
     fun `then business partner record output data matches`(recordId: String, outputDataId: String) {
+        logger.info { "[$scenarioName] Then: business partner record '$recordId' output data matches '$outputDataId'" }
         val recordRunId = context.runId(recordId)
         val expectedOutputData = context.outputData[outputDataId]!!.copy(externalId = recordRunId)
 

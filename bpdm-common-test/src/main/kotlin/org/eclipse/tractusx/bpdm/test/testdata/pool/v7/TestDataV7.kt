@@ -35,6 +35,11 @@ object TestDataV7 {
         confidenceLevel = 5
     )
 
+    val SyncedSharedByOwnerConfidence = CalculatedConfidence(
+        numberOfSharingMembers = 1,
+        confidenceLevel = 5
+    )
+
     val DefaultSiteConfidence = CalculatedConfidence(
         numberOfSharingMembers = 1,
         confidenceLevel = 5

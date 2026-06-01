@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.test.system.utils
 
+import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
@@ -34,14 +35,20 @@ class SharingStateWatcher(
 ) {
 
     companion object {
-        private val COMPLETED_STATES = setOf(SharingStateType.Success, SharingStateType.Error, SharingStateType.Initial)
+        private val logger = KotlinLogging.logger { }
+
+        // Success is completed after a fixed delay (see CONFIDENCE_SYNC_DELAY_SECONDS) rather
+        // than immediately, because the golden record process may silently adjust confidence
+        // criteria for up to 30 seconds after reporting Success.
+        private val TERMINAL_STATES = setOf(SharingStateType.Error, SharingStateType.Initial)
         private val WAIT_TIMEOUT = Duration.ofMinutes(4)
         private const val POLL_INTERVAL_SECONDS = 10L
+        private const val CONFIDENCE_SYNC_DELAY_SECONDS = 35L
         private const val PAGE_SIZE = 100
     }
 
     private val awaitingCompletedState = ConcurrentHashMap<String, CompletableFuture<SharingStateType>>()
-    private val awaitingPendingState   = ConcurrentHashMap<String, CompletableFuture<SharingStateType>>()
+    private val awaitingTaskId         = ConcurrentHashMap<String, CompletableFuture<SharingStateType>>()
 
     private val scheduler = Executors.newSingleThreadScheduledExecutor { runnable ->
         Thread(runnable, "sharing-state-watcher").also { it.isDaemon = true }
@@ -52,27 +59,33 @@ class SharingStateWatcher(
     }
 
     fun waitForCompletedState(externalId: String): SharingStateType {
+        logger.info { "Waiting for completed sharing state of '$externalId'" }
         val future = awaitingCompletedState.computeIfAbsent(externalId) { CompletableFuture() }
         return try {
-            future.get(WAIT_TIMEOUT.toMillis(), TimeUnit.MILLISECONDS)
+            val result = future.get(WAIT_TIMEOUT.toMillis(), TimeUnit.MILLISECONDS)
+            logger.info { "Sharing state of '$externalId' completed with: $result" }
+            result
         } catch (e: TimeoutException) {
             awaitingCompletedState.remove(externalId)
             throw TimeoutException("Sharing state for '$externalId' did not reach a completed state within ${WAIT_TIMEOUT.toMinutes()} minutes")
         }
     }
 
-    fun waitForPendingState(externalId: String): SharingStateType {
-        val future = awaitingPendingState.computeIfAbsent(externalId) { CompletableFuture() }
+    fun waitForTaskId(externalId: String): SharingStateType {
+        logger.info { "Waiting for task ID assignment of '$externalId'" }
+        val future = awaitingTaskId.computeIfAbsent(externalId) { CompletableFuture() }
         return try {
-            future.get(WAIT_TIMEOUT.toMillis(), TimeUnit.MILLISECONDS)
+            val result = future.get(WAIT_TIMEOUT.toMillis(), TimeUnit.MILLISECONDS)
+            logger.info { "Task ID assigned for '$externalId', sharing state is now: $result" }
+            result
         } catch (e: TimeoutException) {
-            awaitingPendingState.remove(externalId)
-            throw TimeoutException("Sharing state for '$externalId' did not reach pending state within ${WAIT_TIMEOUT.toMinutes()} minutes")
+            awaitingTaskId.remove(externalId)
+            throw TimeoutException("Sharing state for '$externalId' did not receive a task ID within ${WAIT_TIMEOUT.toMinutes()} minutes")
         }
     }
 
     private fun poll() {
-        val externalIds = (awaitingCompletedState.keys + awaitingPendingState.keys).distinct()
+        val externalIds = (awaitingCompletedState.keys + awaitingTaskId.keys).distinct()
         if (externalIds.isEmpty()) return
 
         try {
@@ -84,18 +97,27 @@ class SharingStateWatcher(
                     externalIds
                 )
                 response.content.forEach { state ->
-                    if (state.sharingStateType in COMPLETED_STATES) {
+                    if (state.sharingStateType == SharingStateType.Success) {
+                        val future = awaitingCompletedState.remove(state.externalId)
+                        if (future != null) {
+                            scheduler.schedule(
+                                { future.complete(SharingStateType.Success) },
+                                CONFIDENCE_SYNC_DELAY_SECONDS,
+                                TimeUnit.SECONDS
+                            )
+                        }
+                    } else if (state.sharingStateType in TERMINAL_STATES) {
                         awaitingCompletedState.remove(state.externalId)?.complete(state.sharingStateType)
                     }
-                    if (state.sharingStateType == SharingStateType.Pending) {
-                        awaitingPendingState.remove(state.externalId)?.complete(state.sharingStateType)
+                    if (state.taskId != null || state.sharingStateType == SharingStateType.Error || state.sharingStateType == SharingStateType.Success) {
+                        awaitingTaskId.remove(state.externalId)?.complete(state.sharingStateType)
                     }
                 }
                 fetched += response.content.size
                 page++
             } while (fetched < response.totalElements)
-        } catch (_: Exception) {
-            // transient errors must not kill the scheduler thread; next poll will retry
+        } catch (e: Exception) {
+            logger.warn(e) { "Poll failed, will retry in ${POLL_INTERVAL_SECONDS}s" }
         }
     }
 }
