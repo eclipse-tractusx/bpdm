@@ -80,7 +80,7 @@ class ShareOwnCompanyDataStepDefs(
     @Given("site-based legal entity {string}")
     fun `given site-based legal entity`(legalEntityDataId: String) {
         logger.info { "[$scenarioName] Given: site-based legal entity '$legalEntityDataId'" }
-        val result = testDataGenerator.buildSiteBasedLegalEntity(legalEntityDataId, context)
+        val result = testDataGenerator.buildSiteBasedLegalEntity(legalEntityDataId)
         context.siteLegalEntities[legalEntityDataId] = result.siteBasedLegalEntity
         context.taskData[legalEntityDataId] = result.taskData
     }
@@ -88,7 +88,7 @@ class ShareOwnCompanyDataStepDefs(
     @Given("legal entity {string}")
     fun `given legal entity`(legalEntityDataId: String) {
         logger.info { "[$scenarioName] Given: legal entity '$legalEntityDataId'" }
-        val result = testDataGenerator.buildLegalEntity(legalEntityDataId, context)
+        val result = testDataGenerator.buildLegalEntity(legalEntityDataId)
         context.legalEntities[legalEntityDataId] = result.legalEntity
         context.taskData[legalEntityDataId] = result.taskData
     }
@@ -97,7 +97,7 @@ class ShareOwnCompanyDataStepDefs(
     fun `given site`(siteDataId: String, legalEntityDataId: String) {
         logger.info { "[$scenarioName] Given: site '$siteDataId' of legal entity '$legalEntityDataId'" }
         val legalEntity = context.legalEntities[legalEntityDataId]!!
-        val result = testDataGenerator.buildSite(siteDataId, context, legalEntity)
+        val result = testDataGenerator.buildSite(siteDataId, legalEntity)
         context.sites[siteDataId] = result.siteWithParent
         context.taskData[siteDataId] = result.taskData
     }
@@ -106,7 +106,7 @@ class ShareOwnCompanyDataStepDefs(
     fun `given input data`(inputDataId: String, dataTable: DataTable) {
         logger.info { "[$scenarioName] Given: input data '$inputDataId'" }
         val overrides = dataTable.asMap()
-        var inputData = testDataGenerator.buildInputData(inputDataId, context)
+        var inputData = testDataGenerator.buildInputData(inputDataId)
         overrides["isOwnCompanyData"]?.let { inputData = inputData.copy(isOwnCompanyData = it.toBoolean()) }
         context.inputData[inputDataId] = inputData
     }
@@ -143,7 +143,7 @@ class ShareOwnCompanyDataStepDefs(
     fun `given additional address`(addressDataId: String, siteDataId: String) {
         logger.info { "[$scenarioName] Given: additional address '$addressDataId' of site '$siteDataId'" }
         val siteWithParent = context.sites[siteDataId]!!
-        val result = testDataGenerator.buildAdditionalSiteAddress(addressDataId, context, siteWithParent)
+        val result = testDataGenerator.buildAdditionalSiteAddress(addressDataId, siteWithParent)
         context.additionalSiteAddresses[addressDataId] = result.additionalSiteAddressWithParent
         context.taskData[siteDataId] = result.taskData
     }
@@ -166,7 +166,7 @@ class ShareOwnCompanyDataStepDefs(
     fun `given additional address of legal entity`(addressDataId: String, legalEntityDataId: String) {
         logger.info { "[$scenarioName] Given: additional address '$addressDataId' of legal entity '$legalEntityDataId'" }
         val legalEntity = context.legalEntities[legalEntityDataId]!!
-        val result = testDataGenerator.buildAdditionalLegalEntityAddress(addressDataId, context, legalEntity)
+        val result = testDataGenerator.buildAdditionalLegalEntityAddress(addressDataId, legalEntity)
         context.additionalLegalEntityAddresses[addressDataId] = result.additionalLegalEntityAddressWithParent
         context.taskData[legalEntityDataId] = result.taskData
     }

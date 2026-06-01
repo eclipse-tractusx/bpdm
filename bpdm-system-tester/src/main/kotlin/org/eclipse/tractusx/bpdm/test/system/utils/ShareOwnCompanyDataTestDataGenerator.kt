@@ -78,10 +78,11 @@ class ShareOwnCompanyDataTestDataGenerator(
         val taskData: BusinessPartner
     )
 
-    fun buildSiteBasedLegalEntity(id: String, context: ScenarioContext): SiteBasedLegalEntityResult {
-        val legalEntity = buildLegalEntityResponse(scenarioId(id, context), context.runId(id), AddressType.LegalAndSiteMainAddress)
+    fun buildSiteBasedLegalEntity(id: String): SiteBasedLegalEntityResult {
+        val context = ScenarioContext.current()!!
+        val legalEntity = buildLegalEntityResponse(scenarioId(id), context.runId(id), AddressType.LegalAndSiteMainAddress)
 
-        val siteCreate = with(poolRequestFactory.buildLegalSiteCreateRequest(scenarioId(id, context), legalEntity.header.bpnl)) {
+        val siteCreate = with(poolRequestFactory.buildLegalSiteCreateRequest(scenarioId(id), legalEntity.header.bpnl)) {
             copy(scriptVariants = scriptVariants.zip(legalEntity.scriptVariants) { siteScript, leScript ->
                 SiteHeaderScriptVariantDto(leScript.scriptCode, siteScript.name)
             })
@@ -94,8 +95,9 @@ class ShareOwnCompanyDataTestDataGenerator(
         return SiteBasedLegalEntityResult(SiteBasedLegalEntity(legalEntity, siteCreate.site), taskData)
     }
 
-    fun buildLegalEntity(id: String, context: ScenarioContext): LegalEntityResult {
-        val legalEntity = buildLegalEntityResponse(scenarioId(id, context), context.runId(id), AddressType.LegalAddress)
+    fun buildLegalEntity(id: String): LegalEntityResult {
+        val context = ScenarioContext.current()!!
+        val legalEntity = buildLegalEntityResponse(scenarioId(id), context.runId(id), AddressType.LegalAddress)
 
         val taskData = refinementTestDataFactory.buildLegalEntityBusinessPartner(legalEntity, "BPNL000000000001", emptyList())
             .copyWithBpnReferenceType(BpnReferenceType.BpnRequestIdentifier)
@@ -103,10 +105,11 @@ class ShareOwnCompanyDataTestDataGenerator(
         return LegalEntityResult(legalEntity, taskData)
     }
 
-    fun buildSite(id: String, context: ScenarioContext, legalEntity: LegalEntityWithLegalAddressVerboseDto): SiteResult {
+    fun buildSite(id: String, legalEntity: LegalEntityWithLegalAddressVerboseDto): SiteResult {
+        val context = ScenarioContext.current()!!
         val legalEntityParent = legalEntity.copy(header = legalEntity.header.withConfidence(TestDataV7.SharedByOwnerConfidence))
 
-        val siteCreate = poolRequestFactory.buildSiteCreateRequest(scenarioId(id, context), legalEntityParent.header.bpnl)
+        val siteCreate = poolRequestFactory.buildSiteCreateRequest(scenarioId(id), legalEntityParent.header.bpnl)
             .let { poolResponseFactory.buildSiteSiteCreate(it, bpnS = "BPNS${context.runId(id)}", bpnA = "BPNA${context.runId(id)}") }
         val site = with(poolResponseFactory.buildSiteSearchResponse(siteCreate)){ copy(mainAddress = mainAddress.withConfidence(TestDataV7.SyncedSharedByOwnerConfidence)) }
         val siteWithParent = SiteWithParent(legalEntityParent, site)
@@ -117,18 +120,19 @@ class ShareOwnCompanyDataTestDataGenerator(
         return SiteResult(siteWithParent, taskData)
     }
 
-    fun buildInputData(id: String, context: ScenarioContext): BusinessPartnerInputRequest {
-        return testDataFactoryGate.businessPartner.input.request.fromSeed(scenarioId(id, context))
+    fun buildInputData(id: String): BusinessPartnerInputRequest {
+        val context = ScenarioContext.current()!!
+        return testDataFactoryGate.businessPartner.input.request.fromSeed(scenarioId(id))
             .withRunUniqueReferences(context.runId(id))
             .copy(externalSequenceTimestamp = Instant.now())
     }
 
     fun buildAdditionalSiteAddress(
         id: String,
-        context: ScenarioContext,
         siteWithParent: SiteWithParent
     ): AdditionalSiteAddressResult {
-        val request = poolRequestFactory.buildAdditionalAddressCreateRequest(scenarioId(id, context), siteWithParent.site.site.bpns)
+        val context = ScenarioContext.current()!!
+        val request = poolRequestFactory.buildAdditionalAddressCreateRequest(scenarioId(id), siteWithParent.site.site.bpns)
             .withConfidence(TestDataV7.SharedByOwner)
             .withRunUniqueIdentifiers(context.runId(id))
 
@@ -147,12 +151,12 @@ class ShareOwnCompanyDataTestDataGenerator(
 
     fun buildAdditionalLegalEntityAddress(
         id: String,
-        context: ScenarioContext,
         legalEntity: LegalEntityWithLegalAddressVerboseDto
     ): AdditionalLegalEntityAddressResult {
+        val context = ScenarioContext.current()!!
         val legalEntityParent = legalEntity.copy(header = legalEntity.header.withConfidence(TestDataV7.SharedByOwnerConfidence))
 
-        val request = poolRequestFactory.buildAdditionalAddressCreateRequest(scenarioId(id, context), legalEntity)
+        val request = poolRequestFactory.buildAdditionalAddressCreateRequest(scenarioId(id), legalEntity)
             .withConfidence(TestDataV7.SharedByOwner)
             .withRunUniqueIdentifiers(context.runId(id))
 
@@ -168,7 +172,7 @@ class ShareOwnCompanyDataTestDataGenerator(
         return AdditionalLegalEntityAddressResult(AdditionalLegalEntityAddressWithParent(legalEntityParent, additionalAddress), taskData)
     }
 
-    private fun scenarioId(id: String, context: ScenarioContext) = "$id${context.scenarioSuffix}"
+    private fun scenarioId(id: String) = "$id${ScenarioContext.current()!!.scenarioSuffix}"
 
     private fun buildLegalEntityResponse(
         scenarioUniqueId: String,
