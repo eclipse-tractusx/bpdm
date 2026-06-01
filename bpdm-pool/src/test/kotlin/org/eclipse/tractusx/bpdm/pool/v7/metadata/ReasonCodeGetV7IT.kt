@@ -20,7 +20,9 @@
 package org.eclipse.tractusx.bpdm.pool.v7.metadata
 
 import org.assertj.core.api.Assertions.assertThat
+import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.ReasonCodeDto
 import org.eclipse.tractusx.bpdm.pool.v7.UnscheduledPoolTestBaseV7
 import org.junit.jupiter.api.Test
 
@@ -33,14 +35,12 @@ class ReasonCodeGetV7IT : UnscheduledPoolTestBaseV7() {
      */
     @Test
     fun `default reason codes are seeded and returned by GET`() {
-        val expectedTechnicalKeys = setOf(
-            "HEADQUARTER_RELOCATION"
-        )
-
+        //WHEN
         val response = poolClient.metadata.getReasonCodes(PaginationRequest(page = 0, size = 100))
 
-        val actualTechnicalKeys = response.content.map { it.technicalKey }.toSet()
-        assertThat(actualTechnicalKeys).containsAll(expectedTechnicalKeys)
+        //THEN
+        val expected = PageDto(1L, 1, 0, 1, listOf(ReasonCodeDto("HEADQUARTER_RELOCATION", "Complete relocation of a legal entity headquarter to a new physical location")))
+        assertThat(response).isEqualTo(expected)
     }
 
 
