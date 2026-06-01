@@ -197,7 +197,7 @@ class ShareOwnCompanyDataStepDefs(
         val taskData = context.taskData[taskDataId]!!
         val recordRunId = context.runId(recordId)
 
-        sharingStateWatcher.waitForTaskId(recordRunId)
+        sharingStateWatcher.waitForTaskId(recordId)
 
         val taskId = gateClient.sharingState.getSharingStates(PaginationRequest(), listOf(recordRunId)).content.single().taskId!!
         taskReservationWatcher.waitForReservedTask(taskId)
@@ -210,7 +210,7 @@ class ShareOwnCompanyDataStepDefs(
         logger.info { "[$scenarioName] Then: polling business partner record '$recordId' sharing state leads to success" }
         val recordRunId = context.runId(recordId)
 
-        sharingStateWatcher.waitForCompletedState(recordRunId)
+        sharingStateWatcher.waitForCompletedState(recordId)
 
         val sharingStates = gateClient.sharingState.getSharingStates(PaginationRequest(), listOf(recordRunId)).content
         val expectedSharingStates = listOf(SharingStateDto(recordRunId, SharingStateType.Success, updatedAt = Instant.now()))

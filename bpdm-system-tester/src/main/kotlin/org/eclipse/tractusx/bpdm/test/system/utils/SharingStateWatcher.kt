@@ -58,31 +58,33 @@ class SharingStateWatcher(
         scheduler.scheduleWithFixedDelay(::poll, 0, POLL_INTERVAL_SECONDS, TimeUnit.SECONDS)
     }
 
-    fun waitForCompletedState(externalId: String): SharingStateType {
+    fun waitForCompletedState(recordId: String): SharingStateType {
         val scenario = ScenarioContext.current()?.scenarioName
-        logger.info { "[$scenario] Waiting for completed sharing state of '$externalId'" }
+        val externalId = ScenarioContext.current()!!.runId(recordId)
+        logger.info { "[$scenario] Waiting for completed sharing state of '$recordId'" }
         val future = awaitingCompletedState.computeIfAbsent(externalId) { CompletableFuture() }
         return try {
             val result = future.get(WAIT_TIMEOUT.toMillis(), TimeUnit.MILLISECONDS)
-            logger.info { "[$scenario] Sharing state of '$externalId' completed with: $result" }
+            logger.info { "[$scenario] Sharing state of '$recordId' completed with: $result" }
             result
         } catch (e: TimeoutException) {
             awaitingCompletedState.remove(externalId)
-            throw TimeoutException("Sharing state for '$externalId' did not reach a completed state within ${WAIT_TIMEOUT.toMinutes()} minutes")
+            throw TimeoutException("Sharing state for '$recordId' did not reach a completed state within ${WAIT_TIMEOUT.toMinutes()} minutes")
         }
     }
 
-    fun waitForTaskId(externalId: String): SharingStateType {
+    fun waitForTaskId(recordId: String): SharingStateType {
         val scenario = ScenarioContext.current()?.scenarioName
-        logger.info { "[$scenario] Waiting for task ID assignment of '$externalId'" }
+        val externalId = ScenarioContext.current()!!.runId(recordId)
+        logger.info { "[$scenario] Waiting for task ID assignment of '$recordId'" }
         val future = awaitingTaskId.computeIfAbsent(externalId) { CompletableFuture() }
         return try {
             val result = future.get(WAIT_TIMEOUT.toMillis(), TimeUnit.MILLISECONDS)
-            logger.info { "[$scenario] Task ID assigned for '$externalId', sharing state is now: $result" }
+            logger.info { "[$scenario] Task ID assigned for '$recordId', sharing state is now: $result" }
             result
         } catch (e: TimeoutException) {
             awaitingTaskId.remove(externalId)
-            throw TimeoutException("Sharing state for '$externalId' did not receive a task ID within ${WAIT_TIMEOUT.toMinutes()} minutes")
+            throw TimeoutException("Sharing state for '$recordId' did not receive a task ID within ${WAIT_TIMEOUT.toMinutes()} minutes")
         }
     }
 
