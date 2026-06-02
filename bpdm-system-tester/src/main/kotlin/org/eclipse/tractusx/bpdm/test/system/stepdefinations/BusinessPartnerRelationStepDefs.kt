@@ -19,11 +19,14 @@
 
 package org.eclipse.tractusx.bpdm.test.system.stepdefinations
 
+import io.cucumber.java.After
+import io.cucumber.java.Before
 import io.cucumber.java.BeforeStep
 import io.cucumber.java.Scenario
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
+import mu.KotlinLogging
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
@@ -37,9 +40,13 @@ import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.RelationValidityPeriod
 import org.eclipse.tractusx.bpdm.pool.api.model.RelationVerboseDto
+import org.eclipse.tractusx.bpdm.test.system.utils.BusinessPartnerRelationTestDataGenerator
+import org.eclipse.tractusx.bpdm.test.system.utils.ScenarioContext
 import org.eclipse.tractusx.bpdm.test.system.utils.StepUtils
 import org.eclipse.tractusx.bpdm.test.system.utils.TestRepository
 import org.eclipse.tractusx.bpdm.test.testdata.gate.GateInputFactory
+import org.eclipse.tractusx.bpdm.test.testdata.gate.TestRunData
+import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.TestDataFactoryGateV7
 import org.eclipse.tractusx.bpdm.test.testdata.gate.withAddressType
 import org.eclipse.tractusx.bpdm.test.testdata.gate.withoutAnyBpn
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
@@ -54,220 +61,66 @@ import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType as PoolR
 
 
 class BusinessPartnerRelationStepDefs(
-    private val stepUtils: StepUtils,
-    private val inputFactory: GateInputFactory,
+    private val testRunData: TestRunData,
     private val gateClient: GateClient,
     private val orchestratorClient: OrchestrationApiClient,
-    private val poolApiClient: PoolApiClient,
-    private val testRepository: TestRepository
+    private val testDataFactoryGate: TestDataFactoryGateV7,
+    private val testDataGenerator: BusinessPartnerRelationTestDataGenerator
 ): SpringTestRunConfiguration() {
 
-    private val anyTime: Instant = OffsetDateTime.of(2025, 1, 1, 1, 1, 1, 1, ZoneOffset.UTC).toInstant()
-    /**
-     * Since BPNs are created on-the-fly by the Pool we can't assign a certain BPN directly to a shared record
-     * Therefore we associate the BPN tag in the Gherkin description with the BPN after it has been generated
-     * In the following Cucumber steps we can then reference the BPN by the BPN tag in the Gherkin description
-     */
-    private val bpnsByTag = mutableMapOf<String, String>()
-    private val externalIdsByBpnTag = mutableMapOf<String, String>()
-
-    private lateinit var scenario: Scenario
-
-    @BeforeStep
-    fun initializeScenario(scenario: Scenario){
-        this.scenario = scenario
+    companion object {
+        private val logger = KotlinLogging.logger { }
     }
 
-    /**
-     * Creates a business partner of type legal entity in the Gate and shares it with the Pool
-     *
-     * The created BPNL is stored by the given BPN tag in the Gherkin description
-     */
-    @Given("shared legal entity with external-ID {string} and BPNL {string}")
-    fun `given shared legal entity`(externalId: String, bpnTag: String) {
-        val externalId = externalId.toScenarioInstance()
-        val bpnTag = bpnTag.toScenarioInstance()
+    private val context: ScenarioContext get() = ScenarioContext.current()!!
+    private val scenarioName: String get() = context.scenarioName
 
-        val legalEntityInputRequest = inputFactory.createFullValid(externalId, withTestRunContext = false)
-            .withAddressType(AddressType.LegalAndSiteMainAddress)
-            .withoutAnyBpn()
-
-        gateClient.businessParters.upsertBusinessPartnersInput(listOf(legalEntityInputRequest))
-        externalIdsByBpnTag.put(bpnTag, externalId)
+    @Before
+    fun setUp(scenario: Scenario) {
+        ScenarioContext.set(ScenarioContext(scenario.name, scenario.id, testRunData.testTime, scenario))
+        logger.info { "Starting scenario: '${scenario.name}'" }
     }
 
-    /**
-     * Creates a business partner of type legal entity in the Gate and shares it with the Pool
-     *
-     * Waits for sharing process to finish then created BPNL is stored by the given BPN tag in the Gherkin description
-     */
-    @Given("shared legal entity with external-ID {string} and BPNL {string} finished sharing")
-    fun `given shared legal entity finished sharing`(externalId: String, bpnTag: String) {
-        val extId = externalId.toScenarioInstance()
-        val tag = bpnTag.toScenarioInstance()
-
-        val legalEntityInputRequest = inputFactory.createFullValid(extId, withTestRunContext = false)
-            .withAddressType(AddressType.LegalAndSiteMainAddress)
-            .withoutAnyBpn()
-
-        gateClient.businessParters.upsertBusinessPartnersInput(listOf(legalEntityInputRequest))
-
-        // Wait explicitly for sharing to complete
-        stepUtils.waitForBusinessPartnerResult(extId)
-
-        val legalEntityOutput = gateClient.businessParters.getBusinessPartnersOutput(listOf(extId)).content.single()
-        val bpn = legalEntityOutput.legalEntity.legalEntityBpn
-
-        externalIdsByBpnTag[tag] = extId
-        bpnsByTag[tag] = bpn
+    @After
+    fun tearDown() {
+        ScenarioContext.clear()
     }
 
-    /**
-     * Creates a relation new relation and shares it with the pool
-     *
-     */
-    @Given("shared relation with external-ID {string} of type {string}, source {string} and target {string}")
-    fun `given shared relation`(
-        relationExternalId: String,
-        relationTypeString: String,
-        sourceExternalId: String,
-        targetExternalId: String
-    ) {
-        val relationExternalId = relationExternalId.toScenarioInstance()
-        val relationType = GateRelationType.valueOf(relationTypeString)
-        val sourceExternalId = sourceExternalId.toScenarioInstance()
-        val targetExternalId = targetExternalId.toScenarioInstance()
-
-        shareRelation(relationExternalId, relationType, sourceExternalId, targetExternalId)
+    @Given("relation input data {string} of type {string} from {string} to {string}")
+    fun `given relation input data`(relationInputDataId: String, relationType: String, fromRecordId: String, toRecordId: String) {
+        logger.info { "[$scenarioName] Given: relation input data '$relationInputDataId' of type '$relationType' from '$fromRecordId' to '$toRecordId'" }
+        val result = testDataGenerator.buildRelationInputData(relationInputDataId, relationType, fromRecordId, toRecordId)
+        context.relationInputData[relationInputDataId] = result.relationInputEntry
     }
 
-
-    /**
-     * A relation is created in the Gate and passed through the refinement step in the golden record process
-     *
-     * The relation content is not changed in the refinement step
-     */
-    @When("sharing relation with external-ID {string} of type {string}, source {string} and target {string}")
-    fun `when sharing relation`(externalId: String, relationTypeString: String, source: String, target: String) {
-        val externalId = externalId.toScenarioInstance()
-        val source = source.toScenarioInstance()
-        val target = target.toScenarioInstance()
-        val relationType = GateRelationType.valueOf(relationTypeString)
-
-        shareRelation(externalId, relationType, source, target)
-        stepUtils.waitForRelationResult(externalId)
+    @Given("relation output data {string} based on input {string}")
+    fun `given relation output data`(relationOutputDataId: String, relationInputDataId: String) {
+        logger.info { "[$scenarioName] Given: relation output data '$relationOutputDataId' based on input '$relationInputDataId'" }
+        TODO()
     }
 
-    /**
-     * Check whether the Pool's golden record legal entities have the specified relation information
-     *
-     * Check both legal entities that are referenced in the source and target of the relation
-     */
-    @Then("Pool has relation of type {string}, source {string} and target {string} with content {string}")
-    fun `then pool has relation`(relationTypeString: String, sourceBpnTag: String, targetBpnTag: String, relationExternalId: String) {
-        val sourceBpnTag = sourceBpnTag.toScenarioInstance()
-        val targetBpnTag = targetBpnTag.toScenarioInstance()
-        val relationType = PoolRelationType.valueOf(relationTypeString)
-        val sourceBpn = getBpnL(sourceBpnTag)
-        val targetBpn = getBpnL(targetBpnTag)
-
-        val sourceLegalEntity = poolApiClient.legalEntities.getLegalEntity(sourceBpn)
-        val targetLegalEntity = poolApiClient.legalEntities.getLegalEntity(targetBpn)
-
-        val basedOnInput =  inputFactory.buildRelation(relationExternalId, GateRelationType.entries.random(), sourceBpn, targetBpn)
-        val expectedRelation = RelationVerboseDto(
-            type = relationType,
-            businessPartnerSourceBpnl = sourceBpn,
-            businessPartnerTargetBpnl = targetBpn,
-            validityPeriods = basedOnInput.validityPeriods.map { RelationValidityPeriod(it.validFrom, it.validTo) },
-            reasonCode = basedOnInput.reasonCode
-        )
-
-        val sourceRelations = sourceLegalEntity.header.relations
-        val targetRelations = targetLegalEntity.header.relations
-
-        Assertions.assertThat(sourceRelations).contains(expectedRelation)
-        Assertions.assertThat(targetRelations).contains(expectedRelation)
+    @When("uploading into relation record {string} input data {string}")
+    fun `when uploading into relation record input data`(recordId: String, inputDataId: String) {
+        logger.info { "[$scenarioName] When: uploading into relation record '$recordId' input data '$inputDataId'" }
+        TODO()
     }
 
-    /**
-     * Check Gate has the specified relation output
-     */
-    @Then("Gate has relation output with external-ID {string} of type of type {string}, source {string} and target {string}")
-    fun `then gate has relation output`(externalId: String, relationTypeString: String, sourceBpnTag: String, targetBpnTag: String) {
-        val externalId = externalId.toScenarioInstance()
-        val sourceBpnTag = sourceBpnTag.toScenarioInstance()
-        val targetBpnTag = targetBpnTag.toScenarioInstance()
-        val relationType = SharableRelationType.valueOf(relationTypeString)
-        val sourceBpn = getBpnL(sourceBpnTag)
-        val targetBpn = getBpnL(targetBpnTag)
-
-        val relationOutput = gateClient.relationOutput.postSearch(RelationOutputSearchRequest(externalIds = listOf(externalId))).content.single()
-
-        val basedOnInput =  inputFactory.buildRelation(externalId, GateRelationType.entries.random(), sourceBpn, targetBpn)
-        val expectedRelation = RelationOutputDto(
-                externalId = externalId,
-                relationType = relationType,
-                sourceBpn = sourceBpn,
-                targetBpn = targetBpn,
-                validityPeriods = basedOnInput.validityPeriods,
-                reasonCode = basedOnInput.reasonCode,
-                updatedAt = anyTime,
-            )
-
-        Assertions.assertThat(relationOutput)
-            .usingRecursiveComparison()
-            .ignoringFields(RelationOutputDto::updatedAt.name)
-            .isEqualTo(expectedRelation)
-    }
-    /**
-     * Check Gate has changelog output entry of given type
-     */
-    @Then("Gate has relation changelog entry with external-ID {string} with type {string}")
-    fun `then gate has output changelog entry`(externalId: String, changelogTypeString: String) {
-        val externalId = externalId.toScenarioInstance()
-        val changelogType = ChangelogType.valueOf(changelogTypeString)
-
-        val changelogResponse = gateClient.relationChangelog.getOutputChangelog(PaginationRequest(), ChangelogSearchRequest(externalIds = setOf(externalId)))
-
-        assert(changelogResponse.content.any{ it.changelogType == changelogType })
+    @When("relation record {string} is refined to {string}")
+    fun `when relation record is refined to`(recordId: String, relationOutputDataId: String) {
+        logger.info { "[$scenarioName] When: relation record '$recordId' is refined to '$relationOutputDataId'" }
+        TODO()
     }
 
-    private fun shareRelation(
-        relationExternalId: String,
-        relationType: GateRelationType,
-        sourceExternalId: String,
-        targetExternalId: String
-    ){
-        val relationInputRequest = inputFactory.buildRelation(relationExternalId, relationType, sourceExternalId, targetExternalId)
-        gateClient.relation.put(true, RelationPutRequest(listOf(relationInputRequest)))
-        val taskId = stepUtils.waitForRelationTask(relationExternalId)
-
-        testRepository.reserveTasks()
-        resolveReservedTask(taskId)
+    @Then("polling relation record {string} sharing state leads to success")
+    fun `then polling relation record sharing state leads to success`(recordId: String) {
+        logger.info { "[$scenarioName] Then: polling relation record '$recordId' sharing state leads to success" }
+        TODO()
     }
 
-    /**
-     * Resolves without changing the relation content
-     */
-    private fun resolveReservedTask(taskId: String){
-        val reservedTask = testRepository.getReservedTask(taskId)
-
-        val refinementResult = TaskRelationsStepResultEntryDto(reservedTask.taskId, reservedTask.businessPartnerRelations, emptyList())
-        orchestratorClient.relationsGoldenRecordTasks.resolveStepResults(TaskRelationsStepResultRequest(TaskStep.CleanAndSync, listOf(refinementResult)))
-    }
-
-    private fun String.toScenarioInstance() = "${scenario.name}-$this"
-
-    private fun getBpnL(bpnTag: String): String{
-        if(!bpnsByTag.contains(bpnTag)){
-                val externalId = externalIdsByBpnTag[bpnTag]!!
-                stepUtils.waitForBusinessPartnerResult(externalId)
-                val legalEntityOutput = gateClient.businessParters.getBusinessPartnersOutput(listOf(externalId)).content.single()
-                bpnsByTag.put(bpnTag,  legalEntityOutput.legalEntity.legalEntityBpn)
-        }
-
-        return bpnsByTag[bpnTag]!!
+    @Then("relation record {string} output data matches {string}")
+    fun `then relation record output data matches`(recordId: String, outputDataId: String) {
+        logger.info { "[$scenarioName] Then: relation record '$recordId' output data matches '$outputDataId'" }
+        TODO()
     }
 
 }
