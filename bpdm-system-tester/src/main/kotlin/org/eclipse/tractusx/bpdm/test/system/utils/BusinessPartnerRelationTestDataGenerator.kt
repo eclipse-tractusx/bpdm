@@ -20,12 +20,15 @@
 package org.eclipse.tractusx.bpdm.test.system.utils
 
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationValidityPeriodDto
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.TestDataFactoryGateV7
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.withExternalId
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.withRelationType
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.withSource
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.withTarget
+import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.withValidityPeriods
+import java.time.LocalDate
 
 
 /**
@@ -42,6 +45,20 @@ class BusinessPartnerRelationTestDataGenerator(
     data class RelationInputResult(
         val relationInputEntry: RelationPutEntry
     )
+
+    fun buildRelationInputDataWithFutureValidity(
+        id: String,
+        relationType: String,
+        fromRecordId: String,
+        toRecordId: String
+    ): RelationInputResult {
+        val futureValidity = listOf(RelationValidityPeriodDto(
+            validFrom = LocalDate.now().plusYears(1),
+            validTo = null
+        ))
+        val result = buildRelationInputData(id, relationType, fromRecordId, toRecordId)
+        return result.copy(relationInputEntry = result.relationInputEntry.withValidityPeriods(futureValidity))
+    }
 
     fun buildRelationInputData(
         id: String,

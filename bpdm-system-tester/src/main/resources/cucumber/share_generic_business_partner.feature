@@ -18,6 +18,7 @@ Feature: Share own company business partner data without BPNs
     Then polling business partner record "BP1" sharing state leads to success
     And business partner record "BP1" output data matches "O1"
 
+    @TEST_CXTPM-962
     Scenario: Refine input to new legal entity
 
     Given legal entity "L1"
@@ -29,6 +30,7 @@ Feature: Share own company business partner data without BPNs
     Then polling business partner record "BP1" sharing state leads to success
     And business partner record "BP1" output data matches "O1"
 
+    @TEST_CXTPM-963
     Scenario: Refine input to new site
 
     Given legal entity "L1"
@@ -41,6 +43,7 @@ Feature: Share own company business partner data without BPNs
     Then polling business partner record "BP1" sharing state leads to success
     And business partner record "BP1" output data matches "O1"
 
+    @TEST_CXTPM-964
     Scenario: Refine input to new additional address of site
 
     Given legal entity "L1"
@@ -54,6 +57,7 @@ Feature: Share own company business partner data without BPNs
     Then polling business partner record "BP1" sharing state leads to success
     And business partner record "BP1" output data matches "O1"
 
+    @TEST_CXTPM-965
     Scenario: Refine input to new additional address
 
     Given legal entity "L1"
@@ -66,6 +70,7 @@ Feature: Share own company business partner data without BPNs
     Then polling business partner record "BP1" sharing state leads to success
     And business partner record "BP1" output data matches "O1"
 
+    @TEST_CXTPM-971
     Scenario: Update Site-Based Legal Entity
 
     Given site-based legal entity "L1"
@@ -84,6 +89,7 @@ Feature: Share own company business partner data without BPNs
     Then polling business partner record "BP1" sharing state leads to success
     And business partner record "BP1" output data matches "O2"
 
+    @TEST_CXTPM-966
     Scenario: Update Legal Entity
 
     Given legal entity "L1"
@@ -102,6 +108,7 @@ Feature: Share own company business partner data without BPNs
     Then polling business partner record "BP1" sharing state leads to success
     And business partner record "BP1" output data matches "O2"
 
+    @TEST_CXTPM-967
     Scenario: Update Site
 
     Given legal entity "L1"
@@ -121,6 +128,7 @@ Feature: Share own company business partner data without BPNs
     Then polling business partner record "BP1" sharing state leads to success
     And business partner record "BP1" output data matches "O2"
 
+    @TEST_CXTPM-968
     Scenario: Update Additional Address Of Site
 
     Given legal entity "L1"
@@ -141,6 +149,7 @@ Feature: Share own company business partner data without BPNs
     Then polling business partner record "BP1" sharing state leads to success
     And business partner record "BP1" output data matches "O2"
 
+    @TEST_CXTPM-969
     Scenario: Update Additional Address Of Legal Entity
 
     Given legal entity "L1"

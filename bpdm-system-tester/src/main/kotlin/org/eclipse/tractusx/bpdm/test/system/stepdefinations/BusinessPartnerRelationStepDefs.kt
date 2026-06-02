@@ -59,11 +59,8 @@ import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
 import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepResultEntryDto
 import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepResultRequest
 import org.eclipse.tractusx.orchestrator.api.model.TaskStep
+import tools.jackson.databind.json.JsonMapper
 import java.time.Instant
-import java.time.OffsetDateTime
-import java.time.ZoneOffset
-import org.eclipse.tractusx.bpdm.gate.api.model.RelationType as GateRelationType
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType as PoolRelationType
 
 
 class BusinessPartnerRelationStepDefs(
@@ -74,7 +71,8 @@ class BusinessPartnerRelationStepDefs(
     private val testDataGenerator: BusinessPartnerRelationTestDataGenerator,
     private val sharingStateWatcher: SharingStateWatcher,
     private val taskReservationWatcher: TaskReservationWatcher,
-    private val assertRepository: GateAssertRepositoryV7
+    private val assertRepository: GateAssertRepositoryV7,
+    private val jsonMapper: JsonMapper
 ): SpringTestRunConfiguration() {
 
     companion object {
@@ -83,6 +81,19 @@ class BusinessPartnerRelationStepDefs(
 
     private val context: ScenarioContext get() = ScenarioContext.current()!!
     private val scenarioName: String get() = context.scenarioName
+
+    private fun attachGateCall(method: String, path: String, request: Any? = null, response: Any? = null) {
+        val content = buildMap {
+            put("uri", "$method $path")
+            if (request != null) put("request", request)
+            if (response != null) put("response", response)
+        }
+        context.scenario.attach(
+            jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(content),
+            "application/json",
+            "$method $path"
+        )
+    }
 
     @Before
     fun setUp(scenario: Scenario) {
@@ -99,6 +110,13 @@ class BusinessPartnerRelationStepDefs(
     fun `given relation input data`(relationInputDataId: String, relationType: String, fromRecordId: String, toRecordId: String) {
         logger.info { "[$scenarioName] Given: relation input data '$relationInputDataId' of type '$relationType' from '$fromRecordId' to '$toRecordId'" }
         val result = testDataGenerator.buildRelationInputData(relationInputDataId, relationType, fromRecordId, toRecordId)
+        context.relationInputData[relationInputDataId] = result.relationInputEntry
+    }
+
+    @Given("relation input data {string} of type {string} from {string} to {string} with future validity")
+    fun `given relation input data with future validity`(relationInputDataId: String, relationType: String, fromRecordId: String, toRecordId: String) {
+        logger.info { "[$scenarioName] Given: relation input data '$relationInputDataId' of type '$relationType' from '$fromRecordId' to '$toRecordId' with future validity" }
+        val result = testDataGenerator.buildRelationInputDataWithFutureValidity(relationInputDataId, relationType, fromRecordId, toRecordId)
         context.relationInputData[relationInputDataId] = result.relationInputEntry
     }
 
@@ -119,11 +137,12 @@ class BusinessPartnerRelationStepDefs(
         logger.info { "[$scenarioName] When: uploading into relation record '$recordId' input data '$inputDataId'" }
         val inputEntry = context.relationInputData[inputDataId]!!
         val request = RelationPutRequest(listOf(inputEntry.copy(externalId = context.runId(recordId))))
-        gateClient.relation.put(true, request)
+        val response = gateClient.relation.put(true, request)
+        attachGateCall("PUT", "/v7/input/relations", request = request, response = response)
     }
 
-    @When("relation record {string} is refined to {string}")
-    fun `when relation record is refined to`(recordId: String, relationOutputDataId: String) {
+    @When("legal entity relation record {string} is refined to {string}")
+    fun `when legal entity relation record is refined to`(recordId: String, relationOutputDataId: String) {
         logger.info { "[$scenarioName] When: relation record '$recordId' is refined to '$relationOutputDataId'" }
         val recordRunId = context.runId(recordId)
         val relationOutput = context.relationOutputData[relationOutputDataId]!!
@@ -136,15 +155,66 @@ class BusinessPartnerRelationStepDefs(
             updatedAfter = null,
             paginationRequest = PaginationRequest()
         )
+        attachGateCall("GET", "/v7/relations/sharing-state", request = mapOf("externalIds" to listOf(recordRunId)), response = sharingStatePage)
         val taskId = sharingStatePage.content.single().taskId!!
         taskReservationWatcher.waitForReservedRelationTask(taskId)
 
-        val sourceOutput = gateClient.businessParters.getBusinessPartnersOutput(listOf(relationOutput.sourceExternalId)).content.single()
-        val targetOutput = gateClient.businessParters.getBusinessPartnersOutput(listOf(relationOutput.targetExternalId)).content.single()
+        val sourceOutputPage = gateClient.businessParters.getBusinessPartnersOutput(listOf(relationOutput.sourceExternalId))
+        attachGateCall("POST", "/v7/output/business-partners/search", request = listOf(relationOutput.sourceExternalId), response = sourceOutputPage)
+        val sourceOutput = sourceOutputPage.content.single()
+
+        val targetOutputPage = gateClient.businessParters.getBusinessPartnersOutput(listOf(relationOutput.targetExternalId))
+        attachGateCall("POST", "/v7/output/business-partners/search", request = listOf(relationOutput.targetExternalId), response = targetOutputPage)
+        val targetOutput = targetOutputPage.content.single()
 
         val relationOutputWithBPNs = relationOutput.outputDto.copy(
             sourceBpn = sourceOutput.legalEntity.legalEntityBpn,
             targetBpn = targetOutput.legalEntity.legalEntityBpn
+        )
+        context.relationOutputData[relationOutputDataId] = relationOutput.copy(outputDto = relationOutputWithBPNs)
+
+        val refinedRelation = BusinessPartnerRelations(
+            relationType = RelationType.valueOf(relationOutputWithBPNs.relationType.name),
+            businessPartnerSourceBpn = relationOutputWithBPNs.sourceBpn,
+            businessPartnerTargetBpn = relationOutputWithBPNs.targetBpn,
+            validityPeriods = relationOutputWithBPNs.validityPeriods.map { RelationValidityPeriod(it.validFrom, it.validTo) },
+            reasonCode = relationOutputWithBPNs.reasonCode
+        )
+
+        orchestratorClient.relationsGoldenRecordTasks.resolveStepResults(
+            TaskRelationsStepResultRequest(TaskStep.CleanAndSync, listOf(TaskRelationsStepResultEntryDto(taskId, refinedRelation)))
+        )
+    }
+
+    @When("address relation record {string} is refined to {string}")
+    fun `when address relation record is refined to`(recordId: String, relationOutputDataId: String) {
+        logger.info { "[$scenarioName] When: relation record '$recordId' is refined to '$relationOutputDataId'" }
+        val recordRunId = context.runId(recordId)
+        val relationOutput = context.relationOutputData[relationOutputDataId]!!
+
+        sharingStateWatcher.waitForRelationTaskId(recordId)
+
+        val sharingStatePage = gateClient.relationSharingState.get(
+            externalIds = listOf(recordRunId),
+            sharingStateTypes = null,
+            updatedAfter = null,
+            paginationRequest = PaginationRequest()
+        )
+        attachGateCall("GET", "/v7/relations/sharing-state", request = mapOf("externalIds" to listOf(recordRunId)), response = sharingStatePage)
+        val taskId = sharingStatePage.content.single().taskId!!
+        taskReservationWatcher.waitForReservedRelationTask(taskId)
+
+        val sourceOutputPage = gateClient.businessParters.getBusinessPartnersOutput(listOf(relationOutput.sourceExternalId))
+        attachGateCall("POST", "/v7/output/business-partners/search", request = listOf(relationOutput.sourceExternalId), response = sourceOutputPage)
+        val sourceOutput = sourceOutputPage.content.single()
+
+        val targetOutputPage = gateClient.businessParters.getBusinessPartnersOutput(listOf(relationOutput.targetExternalId))
+        attachGateCall("POST", "/v7/output/business-partners/search", request = listOf(relationOutput.targetExternalId), response = targetOutputPage)
+        val targetOutput = targetOutputPage.content.single()
+
+        val relationOutputWithBPNs = relationOutput.outputDto.copy(
+            sourceBpn = sourceOutput.address.addressBpn,
+            targetBpn = targetOutput.address.addressBpn
         )
         context.relationOutputData[relationOutputDataId] = relationOutput.copy(outputDto = relationOutputWithBPNs)
 
@@ -174,6 +244,7 @@ class BusinessPartnerRelationStepDefs(
             updatedAfter = null,
             paginationRequest = PaginationRequest()
         )
+        attachGateCall("GET", "/v7/relations/sharing-state", request = mapOf("externalIds" to listOf(recordRunId)), response = sharingStatePage)
         val expectedSharingStates = listOf(
             RelationSharingStateDto(
                 externalId = recordRunId,
@@ -195,7 +266,22 @@ class BusinessPartnerRelationStepDefs(
             RelationOutputSearchRequest(externalIds = listOf(recordRunId)),
             PaginationRequest()
         )
+        attachGateCall("POST", "/v7/output/relations/search", request = RelationOutputSearchRequest(externalIds = listOf(recordRunId)), response = actual)
         assertRepository.assertRelationOutput(actual, PageDto(1, 1, 0, 1, listOf(expectedOutputDto)))
+    }
+
+    @Then("relation record {string} output data matches {string} in any direction")
+    fun `then relation record output data matches in any direction`(recordId: String, outputDataId: String) {
+        logger.info { "[$scenarioName] Then: relation record '$recordId' output data matches '$outputDataId' in any direction" }
+        val recordRunId = context.runId(recordId)
+        val expectedOutputDto = context.relationOutputData[outputDataId]!!.outputDto.copy(externalId = recordRunId)
+
+        val actual = gateClient.relationOutput.postSearch(
+            RelationOutputSearchRequest(externalIds = listOf(recordRunId)),
+            PaginationRequest()
+        )
+        attachGateCall("POST", "/v7/output/relations/search", request = RelationOutputSearchRequest(externalIds = listOf(recordRunId)), response = actual)
+        assertRepository.assertRelationOutputInAnyDirection(actual, PageDto(1, 1, 0, 1, listOf(expectedOutputDto)))
     }
 
 }

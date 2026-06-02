@@ -203,6 +203,32 @@ class GateAssertRepositoryV7(
         assertRelationOutput(actual.content, expected.content)
     }
 
+    fun assertRelationOutputInAnyDirection(actual: PageDto<RelationOutputDto>, expected: PageDto<RelationOutputDto>) {
+        assertPageHeader(actual, expected)
+        assertRelationOutputInAnyDirection(actual.content, expected.content)
+    }
+
+    fun assertRelationOutputInAnyDirection(actual: Collection<RelationOutputDto>, expected: Collection<RelationOutputDto>) {
+        Assertions.assertThat(actual)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .ignoringFields(
+                RelationOutputDto::updatedAt.name,
+                RelationOutputDto::sourceBpn.name,
+                RelationOutputDto::targetBpn.name
+            )
+            .isEqualTo(expected)
+
+        actual.forEach { actualDto ->
+            val expectedDto = expected.single { it.externalId == actualDto.externalId }
+            val actualBpns = setOf(actualDto.sourceBpn, actualDto.targetBpn)
+            val expectedBpns = setOf(expectedDto.sourceBpn, expectedDto.targetBpn)
+            Assertions.assertThat(actualBpns)
+                .describedAs("BPN pair for relation '${actualDto.externalId}' must match in any direction")
+                .isEqualTo(expectedBpns)
+        }
+    }
+
     fun assertRelationPageMetadata(actual: PageDto<RelationDto>, totalElements: Long, totalPages: Int, page: Int, contentSize: Int) {
         Assertions.assertThat(actual.totalElements).isEqualTo(totalElements)
         Assertions.assertThat(actual.totalPages).isEqualTo(totalPages)
