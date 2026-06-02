@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.test.system.utils
 
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
+import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepReservationEntryDto
 import org.eclipse.tractusx.orchestrator.api.model.TaskStep
 import org.eclipse.tractusx.orchestrator.api.model.TaskStepReservationEntryDto
 import org.eclipse.tractusx.orchestrator.api.model.TaskStepReservationRequest
@@ -44,6 +45,9 @@ class TaskReservationWatcher(
     private val reservedTasks  = ConcurrentHashMap<String, TaskStepReservationEntryDto>()
     // futures for callers that are waiting on a not-yet-reserved taskId
     private val waitingFutures = ConcurrentHashMap<String, CompletableFuture<TaskStepReservationEntryDto>>()
+
+    private val reservedRelationTasks  = ConcurrentHashMap<String, TaskRelationsStepReservationEntryDto>()
+    private val waitingRelationFutures = ConcurrentHashMap<String, CompletableFuture<TaskRelationsStepReservationEntryDto>>()
 
     private val scheduler = Executors.newSingleThreadScheduledExecutor { runnable ->
         Thread(runnable, "task-reservation-watcher").also { it.isDaemon = true }
@@ -73,16 +77,49 @@ class TaskReservationWatcher(
         }
     }
 
+    fun waitForReservedRelationTask(taskId: String): TaskRelationsStepReservationEntryDto {
+        reservedRelationTasks[taskId]?.let { return it }
+
+        val future = waitingRelationFutures.computeIfAbsent(taskId) { CompletableFuture() }
+        reservedRelationTasks[taskId]?.let {
+            waitingRelationFutures.remove(taskId)
+            return it
+        }
+
+        return try {
+            future.get(WAIT_TIMEOUT.toMillis(), TimeUnit.MILLISECONDS)
+        } catch (e: TimeoutException) {
+            waitingRelationFutures.remove(taskId)
+            throw TimeoutException("No CleanAndSync relation task was reserved for record '$taskId' within ${WAIT_TIMEOUT.toMinutes()} minutes")
+        }
+    }
+
     private fun poll() {
-        if (waitingFutures.isEmpty()) return
+        if (waitingFutures.isEmpty() && waitingRelationFutures.isEmpty()) return
 
         try {
-            val response = orchestrationApiClient.goldenRecordTasks.reserveTasksForStep(
-                TaskStepReservationRequest(RESERVATION_AMOUNT, TaskStep.CleanAndSync)
-            )
-            response.reservedTasks.forEach { entry ->
-                reservedTasks[entry.taskId] = entry
-                waitingFutures.remove(entry.taskId)?.complete(entry)
+            if (waitingFutures.isNotEmpty()) {
+                val response = orchestrationApiClient.goldenRecordTasks.reserveTasksForStep(
+                    TaskStepReservationRequest(RESERVATION_AMOUNT, TaskStep.CleanAndSync)
+                )
+                response.reservedTasks.forEach { entry ->
+                    reservedTasks[entry.taskId] = entry
+                    waitingFutures.remove(entry.taskId)?.complete(entry)
+                }
+            }
+        } catch (_: Exception) {
+            // transient errors must not kill the scheduler thread; next poll will retry
+        }
+
+        try {
+            if (waitingRelationFutures.isNotEmpty()) {
+                val response = orchestrationApiClient.relationsGoldenRecordTasks.reserveTasksForStep(
+                    TaskStepReservationRequest(RESERVATION_AMOUNT, TaskStep.CleanAndSync)
+                )
+                response.reservedTasks.forEach { entry ->
+                    reservedRelationTasks[entry.taskId] = entry
+                    waitingRelationFutures.remove(entry.taskId)?.complete(entry)
+                }
             }
         } catch (_: Exception) {
             // transient errors must not kill the scheduler thread; next poll will retry

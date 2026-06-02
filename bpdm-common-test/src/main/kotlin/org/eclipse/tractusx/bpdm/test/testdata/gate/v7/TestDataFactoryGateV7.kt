@@ -134,6 +134,9 @@ class TestDataFactoryGateV7(
         inner class OutputFactory {
             fun fromGoldenRecord(externalId: String, goldenRecordRelation: BusinessPartnerRelations) =
                 relationOutputDtoFactory.fromGoldenRecord(externalId, goldenRecordRelation)
+
+            fun fromInput(entry: RelationPutEntry) =
+                relationOutputDtoFactory.fromInput(entry)
         }
     }
 

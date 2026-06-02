@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.test.system.utils
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import java.time.Duration
 import java.util.concurrent.CompletableFuture
@@ -41,14 +42,17 @@ class SharingStateWatcher(
         // than immediately, because the golden record process may silently adjust confidence
         // criteria for up to 30 seconds after reporting Success.
         private val TERMINAL_STATES = setOf(SharingStateType.Error, SharingStateType.Initial)
+        private val RELATION_TERMINAL_STATES = setOf(RelationSharingStateType.Error, RelationSharingStateType.Ready)
         private val WAIT_TIMEOUT = Duration.ofMinutes(4)
         private const val POLL_INTERVAL_SECONDS = 10L
         private const val CONFIDENCE_SYNC_DELAY_SECONDS = 35L
         private const val PAGE_SIZE = 100
     }
 
-    private val awaitingCompletedState = ConcurrentHashMap<String, CompletableFuture<SharingStateType>>()
-    private val awaitingTaskId         = ConcurrentHashMap<String, CompletableFuture<SharingStateType>>()
+    private val awaitingCompletedState         = ConcurrentHashMap<String, CompletableFuture<SharingStateType>>()
+    private val awaitingTaskId                 = ConcurrentHashMap<String, CompletableFuture<SharingStateType>>()
+    private val awaitingRelationCompletedState = ConcurrentHashMap<String, CompletableFuture<RelationSharingStateType>>()
+    private val awaitingRelationTaskId         = ConcurrentHashMap<String, CompletableFuture<RelationSharingStateType>>()
 
     private val scheduler = Executors.newSingleThreadScheduledExecutor { runnable ->
         Thread(runnable, "sharing-state-watcher").also { it.isDaemon = true }
@@ -88,7 +92,42 @@ class SharingStateWatcher(
         }
     }
 
+    fun waitForRelationCompletedState(recordId: String): RelationSharingStateType {
+        val scenario = ScenarioContext.current()?.scenarioName
+        val externalId = ScenarioContext.current()!!.runId(recordId)
+        logger.info { "[$scenario] Waiting for completed relation sharing state of '$recordId'" }
+        val future = awaitingRelationCompletedState.computeIfAbsent(externalId) { CompletableFuture() }
+        return try {
+            val result = future.get(WAIT_TIMEOUT.toMillis(), TimeUnit.MILLISECONDS)
+            logger.info { "[$scenario] Relation sharing state of '$recordId' completed with: $result" }
+            result
+        } catch (e: TimeoutException) {
+            awaitingRelationCompletedState.remove(externalId)
+            throw TimeoutException("Relation sharing state for '$recordId' did not reach a completed state within ${WAIT_TIMEOUT.toMinutes()} minutes")
+        }
+    }
+
+    fun waitForRelationTaskId(recordId: String): RelationSharingStateType {
+        val scenario = ScenarioContext.current()?.scenarioName
+        val externalId = ScenarioContext.current()!!.runId(recordId)
+        logger.info { "[$scenario] Waiting for task ID assignment of relation '$recordId'" }
+        val future = awaitingRelationTaskId.computeIfAbsent(externalId) { CompletableFuture() }
+        return try {
+            val result = future.get(WAIT_TIMEOUT.toMillis(), TimeUnit.MILLISECONDS)
+            logger.info { "[$scenario] Task ID assigned for relation '$recordId', sharing state is now: $result" }
+            result
+        } catch (e: TimeoutException) {
+            awaitingRelationTaskId.remove(externalId)
+            throw TimeoutException("Relation sharing state for '$recordId' did not receive a task ID within ${WAIT_TIMEOUT.toMinutes()} minutes")
+        }
+    }
+
     private fun poll() {
+        pollBusinessPartnerSharingStates()
+        pollRelationSharingStates()
+    }
+
+    private fun pollBusinessPartnerSharingStates() {
         val externalIds = (awaitingCompletedState.keys + awaitingTaskId.keys).distinct()
         if (externalIds.isEmpty()) return
 
@@ -121,7 +160,46 @@ class SharingStateWatcher(
                 page++
             } while (fetched < response.totalElements)
         } catch (e: Exception) {
-            logger.warn(e) { "Poll failed, will retry in ${POLL_INTERVAL_SECONDS}s" }
+            logger.warn(e) { "BP sharing state poll failed, will retry in ${POLL_INTERVAL_SECONDS}s" }
+        }
+    }
+
+    private fun pollRelationSharingStates() {
+        val externalIds = (awaitingRelationCompletedState.keys + awaitingRelationTaskId.keys).distinct()
+        if (externalIds.isEmpty()) return
+
+        try {
+            var page = 0
+            var fetched = 0
+            do {
+                val response = gateClient.relationSharingState.get(
+                    externalIds = externalIds,
+                    sharingStateTypes = null,
+                    updatedAfter = null,
+                    paginationRequest = PaginationRequest(page, PAGE_SIZE)
+                )
+                response.content.forEach { state ->
+                    if (state.sharingStateType == RelationSharingStateType.Success) {
+                        val future = awaitingRelationCompletedState.remove(state.externalId)
+                        if (future != null) {
+                            scheduler.schedule(
+                                { future.complete(RelationSharingStateType.Success) },
+                                CONFIDENCE_SYNC_DELAY_SECONDS,
+                                TimeUnit.SECONDS
+                            )
+                        }
+                    } else if (state.sharingStateType in RELATION_TERMINAL_STATES) {
+                        awaitingRelationCompletedState.remove(state.externalId)?.complete(state.sharingStateType)
+                    }
+                    if (state.taskId != null || state.sharingStateType == RelationSharingStateType.Error || state.sharingStateType == RelationSharingStateType.Success) {
+                        awaitingRelationTaskId.remove(state.externalId)?.complete(state.sharingStateType)
+                    }
+                }
+                fetched += response.content.size
+                page++
+            } while (fetched < response.totalElements)
+        } catch (e: Exception) {
+            logger.warn(e) { "Relation sharing state poll failed, will retry in ${POLL_INTERVAL_SECONDS}s" }
         }
     }
 }

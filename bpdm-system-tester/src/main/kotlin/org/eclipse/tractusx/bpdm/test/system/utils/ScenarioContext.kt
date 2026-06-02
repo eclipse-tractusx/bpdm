@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.test.system.utils
 
 import io.cucumber.java.Scenario
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
@@ -52,6 +53,7 @@ class ScenarioContext(val scenarioName: String, val scenarioSuffix: String, time
     val inputData: MutableMap<String, BusinessPartnerInputRequest> = mutableMapOf()
     val outputData: MutableMap<String, BusinessPartnerOutputDto> = mutableMapOf()
     val relationInputData: MutableMap<String, RelationPutEntry> = mutableMapOf()
+    val relationOutputData: MutableMap<String, RelationOutputContext> = mutableMapOf()
 
     fun scenarioId() = "$scenarioSuffix-$timeSuffix"
     fun runId(id: String) = "$id-${scenarioId()}"
@@ -75,4 +77,10 @@ data class AdditionalSiteAddressWithParent(
 data class AdditionalLegalEntityAddressWithParent(
     val legalEntity: LegalEntityWithLegalAddressVerboseDto,
     val address: LogisticAddressVerboseDto
+)
+
+data class RelationOutputContext(
+    val outputDto: RelationOutputDto,
+    val sourceExternalId: String,
+    val targetExternalId: String
 )

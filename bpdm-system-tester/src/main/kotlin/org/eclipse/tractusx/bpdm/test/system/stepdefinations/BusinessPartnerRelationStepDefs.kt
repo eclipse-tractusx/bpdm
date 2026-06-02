@@ -32,17 +32,22 @@ import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
+import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.SharableRelationType
-import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationOutputSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
-import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.model.RelationValidityPeriod
-import org.eclipse.tractusx.bpdm.pool.api.model.RelationVerboseDto
+import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.GateAssertRepositoryV7
+import org.eclipse.tractusx.orchestrator.api.model.RelationValidityPeriod
+import org.eclipse.tractusx.orchestrator.api.model.RelationType
 import org.eclipse.tractusx.bpdm.test.system.utils.BusinessPartnerRelationTestDataGenerator
+import org.eclipse.tractusx.bpdm.test.system.utils.RelationOutputContext
 import org.eclipse.tractusx.bpdm.test.system.utils.ScenarioContext
+import org.eclipse.tractusx.bpdm.test.system.utils.SharingStateWatcher
 import org.eclipse.tractusx.bpdm.test.system.utils.StepUtils
+import org.eclipse.tractusx.bpdm.test.system.utils.TaskReservationWatcher
 import org.eclipse.tractusx.bpdm.test.system.utils.TestRepository
 import org.eclipse.tractusx.bpdm.test.testdata.gate.GateInputFactory
 import org.eclipse.tractusx.bpdm.test.testdata.gate.TestRunData
@@ -50,6 +55,7 @@ import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.TestDataFactoryGateV7
 import org.eclipse.tractusx.bpdm.test.testdata.gate.withAddressType
 import org.eclipse.tractusx.bpdm.test.testdata.gate.withoutAnyBpn
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
+import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
 import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepResultEntryDto
 import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepResultRequest
 import org.eclipse.tractusx.orchestrator.api.model.TaskStep
@@ -65,7 +71,10 @@ class BusinessPartnerRelationStepDefs(
     private val gateClient: GateClient,
     private val orchestratorClient: OrchestrationApiClient,
     private val testDataFactoryGate: TestDataFactoryGateV7,
-    private val testDataGenerator: BusinessPartnerRelationTestDataGenerator
+    private val testDataGenerator: BusinessPartnerRelationTestDataGenerator,
+    private val sharingStateWatcher: SharingStateWatcher,
+    private val taskReservationWatcher: TaskReservationWatcher,
+    private val assertRepository: GateAssertRepositoryV7
 ): SpringTestRunConfiguration() {
 
     companion object {
@@ -96,31 +105,97 @@ class BusinessPartnerRelationStepDefs(
     @Given("relation output data {string} based on input {string}")
     fun `given relation output data`(relationOutputDataId: String, relationInputDataId: String) {
         logger.info { "[$scenarioName] Given: relation output data '$relationOutputDataId' based on input '$relationInputDataId'" }
-        TODO()
+        val inputEntry = context.relationInputData[relationInputDataId]!!
+        val outputDto = testDataFactoryGate.relation.output.fromInput(inputEntry)
+        context.relationOutputData[relationOutputDataId] = RelationOutputContext(
+            outputDto = outputDto,
+            sourceExternalId = inputEntry.businessPartnerSourceExternalId,
+            targetExternalId = inputEntry.businessPartnerTargetExternalId
+        )
     }
 
     @When("uploading into relation record {string} input data {string}")
     fun `when uploading into relation record input data`(recordId: String, inputDataId: String) {
         logger.info { "[$scenarioName] When: uploading into relation record '$recordId' input data '$inputDataId'" }
-        TODO()
+        val inputEntry = context.relationInputData[inputDataId]!!
+        val request = RelationPutRequest(listOf(inputEntry.copy(externalId = context.runId(recordId))))
+        gateClient.relation.put(true, request)
     }
 
     @When("relation record {string} is refined to {string}")
     fun `when relation record is refined to`(recordId: String, relationOutputDataId: String) {
         logger.info { "[$scenarioName] When: relation record '$recordId' is refined to '$relationOutputDataId'" }
-        TODO()
+        val recordRunId = context.runId(recordId)
+        val relationOutput = context.relationOutputData[relationOutputDataId]!!
+
+        sharingStateWatcher.waitForRelationTaskId(recordId)
+
+        val sharingStatePage = gateClient.relationSharingState.get(
+            externalIds = listOf(recordRunId),
+            sharingStateTypes = null,
+            updatedAfter = null,
+            paginationRequest = PaginationRequest()
+        )
+        val taskId = sharingStatePage.content.single().taskId!!
+        taskReservationWatcher.waitForReservedRelationTask(taskId)
+
+        val sourceOutput = gateClient.businessParters.getBusinessPartnersOutput(listOf(relationOutput.sourceExternalId)).content.single()
+        val targetOutput = gateClient.businessParters.getBusinessPartnersOutput(listOf(relationOutput.targetExternalId)).content.single()
+
+        val relationOutputWithBPNs = relationOutput.outputDto.copy(
+            sourceBpn = sourceOutput.legalEntity.legalEntityBpn,
+            targetBpn = targetOutput.legalEntity.legalEntityBpn
+        )
+        context.relationOutputData[relationOutputDataId] = relationOutput.copy(outputDto = relationOutputWithBPNs)
+
+        val refinedRelation = BusinessPartnerRelations(
+            relationType = RelationType.valueOf(relationOutputWithBPNs.relationType.name),
+            businessPartnerSourceBpn = relationOutputWithBPNs.sourceBpn,
+            businessPartnerTargetBpn = relationOutputWithBPNs.targetBpn,
+            validityPeriods = relationOutputWithBPNs.validityPeriods.map { RelationValidityPeriod(it.validFrom, it.validTo) },
+            reasonCode = relationOutputWithBPNs.reasonCode
+        )
+
+        orchestratorClient.relationsGoldenRecordTasks.resolveStepResults(
+            TaskRelationsStepResultRequest(TaskStep.CleanAndSync, listOf(TaskRelationsStepResultEntryDto(taskId, refinedRelation)))
+        )
     }
 
     @Then("polling relation record {string} sharing state leads to success")
     fun `then polling relation record sharing state leads to success`(recordId: String) {
         logger.info { "[$scenarioName] Then: polling relation record '$recordId' sharing state leads to success" }
-        TODO()
+        val recordRunId = context.runId(recordId)
+
+        sharingStateWatcher.waitForRelationCompletedState(recordId)
+
+        val sharingStatePage = gateClient.relationSharingState.get(
+            externalIds = listOf(recordRunId),
+            sharingStateTypes = null,
+            updatedAfter = null,
+            paginationRequest = PaginationRequest()
+        )
+        val expectedSharingStates = listOf(
+            RelationSharingStateDto(
+                externalId = recordRunId,
+                sharingStateType = RelationSharingStateType.Success,
+                taskId = sharingStatePage.content.single().taskId,
+                updatedAt = Instant.now()
+            )
+        )
+        assertRepository.assertRelationSharingStates(sharingStatePage.content, expectedSharingStates)
     }
 
     @Then("relation record {string} output data matches {string}")
     fun `then relation record output data matches`(recordId: String, outputDataId: String) {
         logger.info { "[$scenarioName] Then: relation record '$recordId' output data matches '$outputDataId'" }
-        TODO()
+        val recordRunId = context.runId(recordId)
+        val expectedOutputDto = context.relationOutputData[outputDataId]!!.outputDto.copy(externalId = recordRunId)
+
+        val actual = gateClient.relationOutput.postSearch(
+            RelationOutputSearchRequest(externalIds = listOf(recordRunId)),
+            PaginationRequest()
+        )
+        assertRepository.assertRelationOutput(actual, PageDto(1, 1, 0, 1, listOf(expectedOutputDto)))
     }
 
 }

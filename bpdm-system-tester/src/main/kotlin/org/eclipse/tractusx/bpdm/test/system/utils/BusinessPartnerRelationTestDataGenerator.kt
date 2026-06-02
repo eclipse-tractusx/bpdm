@@ -27,6 +27,7 @@ import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.withRelationType
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.withSource
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.withTarget
 
+
 /**
  * Generates test data for business partner relation system tests.
  *
