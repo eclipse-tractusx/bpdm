@@ -54,6 +54,8 @@ class ScenarioContext(val scenarioName: String, val scenarioSuffix: String, time
     val outputData: MutableMap<String, BusinessPartnerOutputDto> = mutableMapOf()
     val relationInputData: MutableMap<String, RelationPutEntry> = mutableMapOf()
     val relationOutputData: MutableMap<String, RelationOutputContext> = mutableMapOf()
+    val records: MutableMap<String, RecordState> = mutableMapOf()
+    val relations: MutableMap<String, RelationState> = mutableMapOf()
 
     fun scenarioId() = "$scenarioSuffix-$timeSuffix"
     fun runId(id: String) = "$id-${scenarioId()}"
@@ -83,4 +85,18 @@ data class RelationOutputContext(
     val outputDto: RelationOutputDto,
     val sourceExternalId: String,
     val targetExternalId: String
+)
+
+data class RecordState(
+    val contentSeed: String? = null,
+    val currentInput: BusinessPartnerInputRequest? = null,
+    val currentTaskData: BusinessPartner? = null,
+    val currentExpectedOutput: BusinessPartnerOutputDto? = null,
+    val legalEntity: LegalEntityWithLegalAddressVerboseDto? = null
+)
+
+data class RelationState(
+    val sourceRecordId: String,
+    val targetRecordId: String,
+    val currentExpectedOutput: RelationOutputDto? = null
 )
