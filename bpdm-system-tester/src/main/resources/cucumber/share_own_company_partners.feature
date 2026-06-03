@@ -54,8 +54,8 @@ Feature: Share own company business partner data
     Given "BP1" has already been shared as a legal entity
     And "BP2" has already been shared as an additional address of "BP1"'s legal entity
     When a sharing member submits an IsReplacedBy relation "R1" from "BP1"'s address to "BP2"'s address
-    And the cleaning service refines relation "R1" as a headquarter relocation
+    And the cleaning service accepts relation "R1" as submitted
     Then relation "R1" reaches sharing success
-    And relation "R1" output reflects the address replacement
+    And relation "R1" output is the accepted relation with the two addresses linked
     And "BP1" is reclassified to an additional address with its address data unchanged
     And "BP2" is reclassified to the legal entity's headquarters with its address data unchanged

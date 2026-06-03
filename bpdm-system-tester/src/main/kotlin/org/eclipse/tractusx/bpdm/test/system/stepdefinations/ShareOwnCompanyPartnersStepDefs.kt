@@ -32,6 +32,7 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationSharingStateType
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationValidityPeriodDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType as GateRelationType
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationOutputSearchRequest
@@ -56,6 +57,7 @@ import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.withTarget
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
 import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
+import org.eclipse.tractusx.orchestrator.api.model.RelationValidityPeriod
 import org.eclipse.tractusx.orchestrator.api.model.RelationType as OrchestratorRelationType
 import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepResultEntryDto
 import org.eclipse.tractusx.orchestrator.api.model.TaskRelationsStepResultRequest
@@ -179,14 +181,17 @@ class ShareOwnCompanyPartnersStepDefs(
         val response = gateClient.relation.put(true, request)
         attachGateCall("PUT", "/v7/input/relations", request = request, response = response)
         context.relations[relationId] = RelationState(
+            submittedEntry = entry,
             sourceRecordId = sourceRecordId,
             targetRecordId = targetRecordId
         )
     }
 
-    @When("the cleaning service refines relation {string} as a headquarter relocation")
-    fun `when refine relation as headquarter relocation`(relationId: String) {
-        logger.info { "[$scenarioName] When: cleaning service refines relation '$relationId' as a headquarter relocation" }
+    // The cleaning service does not reclassify the relation — it confirms the type the
+    // sharing member submitted and resolves the BPN references from the Pool addresses.
+    @When("the cleaning service accepts relation {string} as submitted")
+    fun `when accept relation as submitted`(relationId: String) {
+        logger.info { "[$scenarioName] When: cleaning service accepts relation '$relationId' as submitted" }
         val relationState = context.relations[relationId]!!
         val runId = context.runId(relationId)
 
@@ -208,21 +213,25 @@ class ShareOwnCompanyPartnersStepDefs(
         val sourceBpn = sourceOutputPage.content.single().address.addressBpn
         val targetBpn = targetOutputPage.content.single().address.addressBpn
 
+        // Derive the relation type from what the sharing member submitted — the cleaning
+        // service does not override it.
+        val submittedRelationType = OrchestratorRelationType.valueOf(relationState.submittedEntry.relationType.name)
         orchestratorClient.relationsGoldenRecordTasks.resolveStepResults(
             TaskRelationsStepResultRequest(TaskStep.CleanAndSync, listOf(
                 TaskRelationsStepResultEntryDto(taskId, BusinessPartnerRelations(
-                    relationType = OrchestratorRelationType.IsReplacedBy,
+                    relationType = submittedRelationType,
                     businessPartnerSourceBpn = sourceBpn,
                     businessPartnerTargetBpn = targetBpn,
-                    validityPeriods = emptyList(),
-                    reasonCode = null
+                    validityPeriods = relationState.submittedEntry.validityPeriods.map { RelationValidityPeriod(it.validFrom, it.validTo) },
+                    reasonCode = relationState.submittedEntry.reasonCode
                 ))
             ))
         )
 
-        // Source record (BP1): was the legal address, demoted to additional address.
-        // Target record (BP2): was an additional address, promoted to the legal address.
-        // Address coordinates are unchanged; only the address type classification changes.
+        // Accepting an IsReplacedBy relation causes address type changes in the Pool.
+        // Source (BP1): was the legal address, demoted to additional address.
+        // Target (BP2): was an additional address, promoted to the legal address.
+        // Address coordinates are unchanged; only the classification changes.
         val sourceState = context.records[relationState.sourceRecordId]!!
         val targetState = context.records[relationState.targetRecordId]!!
         context.records[relationState.sourceRecordId] = sourceState.copy(
@@ -232,15 +241,11 @@ class ShareOwnCompanyPartnersStepDefs(
             currentExpectedOutput = targetState.currentExpectedOutput!!.withAddressType(AddressType.LegalAddress)
         )
 
-        val expectedRelationOutput = testDataFactoryGate.relation.output.fromInput(
-            testDataFactoryGate.relation.input.request
-                .fromSeed("$relationId${context.scenarioSuffix}")
-                .withExternalId(runId)
-                .withRelationType(GateRelationType.IsReplacedBy)
-                .withSource(sourceRunId)
-                .withTarget(targetRunId)
-        ).copy(sourceBpn = sourceBpn, targetBpn = targetBpn)
-        context.relations[relationId] = relationState.copy(currentExpectedOutput = expectedRelationOutput)
+        // Store the resolved BPNs for the Then step to use when building its expectation.
+        context.relations[relationId] = relationState.copy(
+            resolvedSourceBpn = sourceBpn,
+            resolvedTargetBpn = targetBpn
+        )
     }
 
     // -------------------------------------------------------------------------
@@ -315,11 +320,18 @@ class ShareOwnCompanyPartnersStepDefs(
         assertRepository.assertRelationSharingStates(sharingStatePage.content, expected)
     }
 
-    @Then("relation {string} output reflects the address replacement")
-    fun `then relation output reflects address replacement`(relationId: String) {
-        logger.info { "[$scenarioName] Then: relation '$relationId' output reflects the address replacement" }
+    @Then("relation {string} output is the accepted relation with the two addresses linked")
+    fun `then relation output is accepted relation with addresses linked`(relationId: String) {
+        logger.info { "[$scenarioName] Then: relation '$relationId' output is the accepted relation with the two addresses linked" }
         val runId = context.runId(relationId)
-        val expectedOutput = context.relations[relationId]!!.currentExpectedOutput!!.copy(externalId = runId)
+        val state = context.relations[relationId]!!
+        val expectedOutput = testDataFactoryGate.relation.output
+            .fromInput(state.submittedEntry)
+            .copy(
+                externalId = runId,
+                sourceBpn = state.resolvedSourceBpn!!,
+                targetBpn = state.resolvedTargetBpn!!
+            )
         val actual = gateClient.relationOutput.postSearch(
             RelationOutputSearchRequest(externalIds = listOf(runId)), PaginationRequest()
         )

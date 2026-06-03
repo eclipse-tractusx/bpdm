@@ -96,7 +96,9 @@ data class RecordState(
 )
 
 data class RelationState(
+    val submittedEntry: RelationPutEntry,
     val sourceRecordId: String,
     val targetRecordId: String,
-    val currentExpectedOutput: RelationOutputDto? = null
+    val resolvedSourceBpn: String? = null,
+    val resolvedTargetBpn: String? = null
 )
