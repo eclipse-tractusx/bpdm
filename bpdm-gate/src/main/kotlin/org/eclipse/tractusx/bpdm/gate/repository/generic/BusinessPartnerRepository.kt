@@ -66,6 +66,7 @@ interface BusinessPartnerRepository : PagingAndSortingRepository<BusinessPartner
     }
 
     fun findBySharingStateInAndStage(sharingStates: Collection<SharingStateDb>, stage: StageType): Set<BusinessPartnerDb>
+    fun findBySharingStateAndStage(sharingState: SharingStateDb, stage: StageType): BusinessPartnerDb?
 
     @Query("SELECT b.stage as stage, COUNT(b.stage) as count FROM BusinessPartnerDb AS b GROUP BY b.stage")
     fun countPerStages(): List<PartnersPerStageCount>
