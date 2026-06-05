@@ -20,3 +20,9 @@ Feature: Output Reflects Golden Record Master Data
     When the sharing member shares record "acme-address-record"
     And the golden record process refines record "acme-address-record" to additional address "acme-branch" of legal entity "acme" with master data "acme-address-content"
     Then "acme-address-record" output reflects additional address "acme-branch" of legal entity "acme" in its master data
+
+  Scenario: Updated Additional Address Of Legal Entity Master Data In Output
+    Given record "acme-address-record" reflects additional address "acme-branch" of legal entity "acme" with master data "acme-address-content"
+    When the sharing member updates record "acme-address-record"
+    And the golden record process refines record "acme-address-record" to additional address "acme-branch" of legal entity "acme" with master data "acme-address-updated-content"
+    Then "acme-address-record" output reflects additional address "acme-branch" of legal entity "acme" in its master data

@@ -68,6 +68,24 @@ class GoldenRecordContentsInOutputStepDefs(
         `when refines to legal entity with master data`(recordId, legalEntityId, masterDataSeed)
     }
 
+    @Given("record {string} reflects additional address {string} of legal entity {string} with master data {string}")
+    fun `given record reflects additional address master data`(
+        recordId: String,
+        addressId: String,
+        legalEntityId: String,
+        masterDataSeed: String
+    ) {
+        logger.info {
+            "[$scenarioName] Given: record '$recordId' reflects additional address '$addressId' of legal entity " +
+                "'$legalEntityId' with master data '$masterDataSeed'"
+        }
+        // Compose the established share -> refine flow so scenarios can start from a record that already
+        // reflects the additional address. The refine step waits for the sharing process to complete, so no
+        // separate assertion or wait is needed here.
+        `when shares record`(recordId)
+        `when refines to additional address of legal entity`(recordId, addressId, legalEntityId, masterDataSeed)
+    }
+
     // -------------------------------------------------------------------------
     // When
     // -------------------------------------------------------------------------
