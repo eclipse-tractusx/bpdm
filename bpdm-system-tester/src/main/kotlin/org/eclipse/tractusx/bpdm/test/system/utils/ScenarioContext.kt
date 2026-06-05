@@ -90,9 +90,9 @@ data class RelationOutputContext(
 data class RecordState(
     val contentSeed: String? = null,
     val currentInput: BusinessPartnerInputRequest? = null,
-    val currentTaskData: BusinessPartner? = null,
-    val currentExpectedOutput: BusinessPartnerOutputDto? = null,
-    val legalEntity: LegalEntityWithLegalAddressVerboseDto? = null
+    val legalEntity: LegalEntityWithLegalAddressVerboseDto? = null,
+    val poolSite: SiteWithMainAddressVerboseDto? = null,
+    val poolAddress: LogisticAddressVerboseDto? = null,
 )
 
 data class RelationState(

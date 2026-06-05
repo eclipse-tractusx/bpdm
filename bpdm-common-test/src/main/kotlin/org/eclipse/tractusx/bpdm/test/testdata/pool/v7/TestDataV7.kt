@@ -55,4 +55,14 @@ object TestDataV7 {
         checkedByExternalDataSource = false
     )
 
+    val CheckedByExternalSource = GivenConfidence(
+        sharedByOwner = false,
+        checkedByExternalDataSource = true
+    )
+
+    val SharedByOwnerAndChecked = GivenConfidence(
+        sharedByOwner = true,
+        checkedByExternalDataSource = true
+    )
+
 }

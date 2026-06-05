@@ -31,6 +31,7 @@ import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.copyWithBpnReference
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.PoolRequestFactoryV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.PoolResponseFactoryV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.TestDataV7
+import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.GivenConfidence
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withConfidence
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withParticipantData
 import org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType
@@ -78,9 +79,9 @@ class ShareOwnCompanyDataTestDataGenerator(
         val taskData: BusinessPartner
     )
 
-    fun buildSiteBasedLegalEntity(id: String): SiteBasedLegalEntityResult {
+    fun buildSiteBasedLegalEntity(id: String, givenConfidence: GivenConfidence = TestDataV7.SharedByOwner): SiteBasedLegalEntityResult {
         val context = ScenarioContext.current()!!
-        val legalEntity = buildLegalEntityResponse(scenarioId(id), context.runId(id), AddressType.LegalAndSiteMainAddress)
+        val legalEntity = buildLegalEntityResponse(scenarioId(id), context.runId(id), AddressType.LegalAndSiteMainAddress, givenConfidence)
 
         val siteCreate = with(poolRequestFactory.buildLegalSiteCreateRequest(scenarioId(id), legalEntity.header.bpnl)) {
             copy(scriptVariants = scriptVariants.zip(legalEntity.scriptVariants) { siteScript, leScript ->
@@ -95,9 +96,9 @@ class ShareOwnCompanyDataTestDataGenerator(
         return SiteBasedLegalEntityResult(SiteBasedLegalEntity(legalEntity, siteCreate.site), taskData)
     }
 
-    fun buildLegalEntity(id: String): LegalEntityResult {
+    fun buildLegalEntity(id: String, givenConfidence: GivenConfidence = TestDataV7.SharedByOwner): LegalEntityResult {
         val context = ScenarioContext.current()!!
-        val legalEntity = buildLegalEntityResponse(scenarioId(id), context.runId(id), AddressType.LegalAddress)
+        val legalEntity = buildLegalEntityResponse(scenarioId(id), context.runId(id), AddressType.LegalAddress, givenConfidence)
 
         val taskData = refinementTestDataFactory.buildLegalEntityBusinessPartner(legalEntity, "BPNL000000000001", emptyList())
             .copyWithBpnReferenceType(BpnReferenceType.BpnRequestIdentifier)
@@ -129,11 +130,12 @@ class ShareOwnCompanyDataTestDataGenerator(
 
     fun buildAdditionalSiteAddress(
         id: String,
-        siteWithParent: SiteWithParent
+        siteWithParent: SiteWithParent,
+        givenConfidence: GivenConfidence = TestDataV7.SharedByOwner
     ): AdditionalSiteAddressResult {
         val context = ScenarioContext.current()!!
         val request = poolRequestFactory.buildAdditionalAddressCreateRequest(scenarioId(id), siteWithParent.site.site.bpns)
-            .withConfidence(TestDataV7.SharedByOwner)
+            .withConfidence(givenConfidence)
             .withRunUniqueIdentifiers(context.runId(id))
 
         val additionalAddress = poolResponseFactory
@@ -151,13 +153,14 @@ class ShareOwnCompanyDataTestDataGenerator(
 
     fun buildAdditionalLegalEntityAddress(
         id: String,
-        legalEntity: LegalEntityWithLegalAddressVerboseDto
+        legalEntity: LegalEntityWithLegalAddressVerboseDto,
+        givenConfidence: GivenConfidence = TestDataV7.SharedByOwner
     ): AdditionalLegalEntityAddressResult {
         val context = ScenarioContext.current()!!
         val legalEntityParent = legalEntity.copy(header = legalEntity.header.withConfidence(TestDataV7.SharedByOwnerConfidence))
 
         val request = poolRequestFactory.buildAdditionalAddressCreateRequest(scenarioId(id), legalEntity)
-            .withConfidence(TestDataV7.SharedByOwner)
+            .withConfidence(givenConfidence)
             .withRunUniqueIdentifiers(context.runId(id))
 
         val additionalAddress = poolResponseFactory
@@ -177,12 +180,13 @@ class ShareOwnCompanyDataTestDataGenerator(
     private fun buildLegalEntityResponse(
         scenarioUniqueId: String,
         runUniqueId: String,
-        legalAddressType: AddressType
+        legalAddressType: AddressType,
+        givenConfidence: GivenConfidence = TestDataV7.SharedByOwner
     ): LegalEntityWithLegalAddressVerboseDto {
         return with(
             poolRequestFactory.buildLegalEntity(scenarioUniqueId)
-                .withParticipantData(true)
-                .withConfidence(TestDataV7.SharedByOwner)
+                .withParticipantData(givenConfidence.sharedByOwner)
+                .withConfidence(givenConfidence)
                 .withRunUniqueIdentifiers(runUniqueId)
                 .let { poolResponseFactory.buildLegalEntityWithLegalAddress(it) }
         ) {

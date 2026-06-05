@@ -1,0 +1,169 @@
+/*******************************************************************************
+ * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Apache License, Version 2.0 which is available at
+ * https://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ ******************************************************************************/
+
+package org.eclipse.tractusx.bpdm.test.system.utils
+
+import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
+import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.GivenConfidence
+import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
+import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
+import org.eclipse.tractusx.orchestrator.api.model.TaskStep
+import org.eclipse.tractusx.orchestrator.api.model.TaskStepResultEntryDto
+import org.eclipse.tractusx.orchestrator.api.model.TaskStepResultRequest
+import tools.jackson.databind.json.JsonMapper
+
+class BusinessPartnerShareActions(
+    private val gateClient: GateClient,
+    private val orchestratorClient: OrchestrationApiClient,
+    private val testDataGenerator: ShareOwnCompanyDataTestDataGenerator,
+    private val sharingStateWatcher: SharingStateWatcher,
+    private val taskReservationWatcher: TaskReservationWatcher,
+    private val jsonMapper: JsonMapper
+) {
+
+    companion object {
+        private val logger = KotlinLogging.logger { }
+    }
+
+    private val context: ScenarioContext get() = ScenarioContext.current()!!
+
+    fun upload(recordId: String, isOwnCompanyData: Boolean, contentSeed: String = recordId) {
+        val inputData = testDataGenerator.buildInputData(contentSeed).copy(isOwnCompanyData = isOwnCompanyData)
+        val runId = context.runId(recordId)
+        val request = listOf(inputData.copy(externalId = runId))
+        val response = gateClient.businessParters.upsertBusinessPartnersInput(request)
+        attachApiCall("PUT", "/v7/input/business-partners", request, response.body)
+        context.records[recordId] = (context.records[recordId] ?: RecordState()).copy(
+            contentSeed = contentSeed,
+            currentInput = inputData
+        )
+    }
+
+    fun refineAsLegalEntity(recordId: String, verified: Boolean) {
+        val state = context.records[recordId]!!
+        val entityResult = testDataGenerator.buildLegalEntity(state.contentSeed!!, givenConfidence(state, verified))
+        resolveTask(recordId, entityResult.taskData)
+        context.records[recordId] = state.copy(legalEntity = entityResult.legalEntity)
+    }
+
+    fun refineAsSiteBasedLegalEntity(recordId: String, verified: Boolean) {
+        val state = context.records[recordId]!!
+        val entityResult = testDataGenerator.buildSiteBasedLegalEntity(state.contentSeed!!, givenConfidence(state, verified))
+        resolveTask(recordId, entityResult.taskData)
+        context.records[recordId] = state.copy(
+            legalEntity = entityResult.siteBasedLegalEntity.legalEntity,
+            poolSite = SiteWithMainAddressVerboseDto(
+                entityResult.siteBasedLegalEntity.site,
+                entityResult.siteBasedLegalEntity.legalEntity.legalAddress
+            )
+        )
+    }
+
+    fun refineAsSite(recordId: String) {
+        val state = context.records[recordId]!!
+        val contentSeed = state.contentSeed!!
+        val parentResult = testDataGenerator.buildLegalEntity("${contentSeed}Parent")
+        val siteResult = testDataGenerator.buildSite(contentSeed, parentResult.legalEntity)
+        resolveTask(recordId, siteResult.taskData)
+        context.records[recordId] = state.copy(
+            legalEntity = siteResult.siteWithParent.legalEntity,
+            poolSite = siteResult.siteWithParent.site
+        )
+    }
+
+    fun refineAsAdditionalAddressOfLegalEntity(recordId: String, verified: Boolean) {
+        val state = context.records[recordId]!!
+        val contentSeed = state.contentSeed!!
+        val parentResult = testDataGenerator.buildLegalEntity("${contentSeed}Parent")
+        val addressResult = testDataGenerator.buildAdditionalLegalEntityAddress(contentSeed, parentResult.legalEntity, givenConfidence(state, verified))
+        resolveTask(recordId, addressResult.taskData)
+        context.records[recordId] = state.copy(
+            legalEntity = addressResult.additionalLegalEntityAddressWithParent.legalEntity,
+            poolAddress = addressResult.additionalLegalEntityAddressWithParent.address
+        )
+    }
+
+    fun refineAsAdditionalAddressOfSite(recordId: String, verified: Boolean) {
+        val state = context.records[recordId]!!
+        val contentSeed = state.contentSeed!!
+        val parentResult = testDataGenerator.buildLegalEntity("${contentSeed}Parent")
+        val siteResult = testDataGenerator.buildSite("${contentSeed}Site", parentResult.legalEntity)
+        val addressResult = testDataGenerator.buildAdditionalSiteAddress(contentSeed, siteResult.siteWithParent, givenConfidence(state, verified))
+        resolveTask(recordId, addressResult.taskData)
+        context.records[recordId] = state.copy(
+            legalEntity = addressResult.additionalSiteAddressWithParent.siteWithParent.legalEntity,
+            poolSite = addressResult.additionalSiteAddressWithParent.siteWithParent.site,
+            poolAddress = addressResult.additionalSiteAddressWithParent.address
+        )
+    }
+
+    fun completeShare(recordId: String, refine: (String) -> Unit) {
+        refine(recordId)
+        sharingStateWatcher.waitForCompletedState(recordId)
+    }
+
+    fun completeShareAsAdditionalAddressOf(
+        recordId: String,
+        parentLegalEntity: LegalEntityWithLegalAddressVerboseDto
+    ) {
+        val state = context.records[recordId]!!
+        val addressResult = testDataGenerator.buildAdditionalLegalEntityAddress(state.contentSeed!!, parentLegalEntity, givenConfidence(state, verified = false))
+        resolveTask(recordId, addressResult.taskData)
+        context.records[recordId] = state.copy(
+            legalEntity = parentLegalEntity,
+            poolAddress = addressResult.additionalLegalEntityAddressWithParent.address
+        )
+        sharingStateWatcher.waitForCompletedState(recordId)
+    }
+
+    private fun resolveTask(recordId: String, taskData: BusinessPartner) {
+        val runId = context.runId(recordId)
+        sharingStateWatcher.waitForTaskId(recordId)
+        val sharingStatePage = gateClient.sharingState.getSharingStates(PaginationRequest(), listOf(runId))
+        attachApiCall("GET", "/v7/business-partners/sharing-state", mapOf("externalIds" to listOf(runId)), sharingStatePage)
+        val taskId = sharingStatePage.content.single().taskId!!
+        taskReservationWatcher.waitForReservedTask(taskId)
+        orchestratorClient.goldenRecordTasks.resolveStepResults(
+            TaskStepResultRequest(TaskStep.CleanAndSync, listOf(TaskStepResultEntryDto(taskId, taskData)))
+        )
+    }
+
+    private fun givenConfidence(state: RecordState, verified: Boolean): GivenConfidence =
+        GivenConfidence(
+            sharedByOwner = state.currentInput?.isOwnCompanyData ?: false,
+            checkedByExternalDataSource = verified
+        )
+
+    private fun attachApiCall(method: String, path: String, request: Any? = null, response: Any? = null) {
+        val content = buildMap {
+            put("uri", "$method $path")
+            if (request != null) put("request", request)
+            if (response != null) put("response", response)
+        }
+        context.scenario.attach(
+            jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(content),
+            "application/json",
+            "$method $path"
+        )
+    }
+}

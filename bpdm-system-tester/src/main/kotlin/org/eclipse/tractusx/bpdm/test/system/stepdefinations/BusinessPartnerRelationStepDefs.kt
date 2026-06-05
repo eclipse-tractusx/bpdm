@@ -19,10 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.test.system.stepdefinations
 
-import io.cucumber.java.After
-import io.cucumber.java.Before
-import io.cucumber.java.BeforeStep
-import io.cucumber.java.Scenario
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
@@ -50,7 +46,6 @@ import org.eclipse.tractusx.bpdm.test.system.utils.StepUtils
 import org.eclipse.tractusx.bpdm.test.system.utils.TaskReservationWatcher
 import org.eclipse.tractusx.bpdm.test.system.utils.TestRepository
 import org.eclipse.tractusx.bpdm.test.testdata.gate.GateInputFactory
-import org.eclipse.tractusx.bpdm.test.testdata.gate.TestRunData
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.TestDataFactoryGateV7
 import org.eclipse.tractusx.bpdm.test.testdata.gate.withAddressType
 import org.eclipse.tractusx.bpdm.test.testdata.gate.withoutAnyBpn
@@ -64,7 +59,6 @@ import java.time.Instant
 
 
 class BusinessPartnerRelationStepDefs(
-    private val testRunData: TestRunData,
     private val gateClient: GateClient,
     private val orchestratorClient: OrchestrationApiClient,
     private val testDataFactoryGate: TestDataFactoryGateV7,
@@ -93,17 +87,6 @@ class BusinessPartnerRelationStepDefs(
             "application/json",
             "$method $path"
         )
-    }
-
-    @Before
-    fun setUp(scenario: Scenario) {
-        ScenarioContext.set(ScenarioContext(scenario.name, scenario.id, testRunData.testTime, scenario))
-        logger.info { "Starting scenario: '${scenario.name}'" }
-    }
-
-    @After
-    fun tearDown() {
-        ScenarioContext.clear()
     }
 
     @Given("relation input data {string} of type {string} from {string} to {string}")

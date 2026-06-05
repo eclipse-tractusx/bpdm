@@ -20,9 +20,6 @@
 package org.eclipse.tractusx.bpdm.test.system.stepdefinations
 
 import io.cucumber.datatable.DataTable
-import io.cucumber.java.After
-import io.cucumber.java.Before
-import io.cucumber.java.Scenario
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
@@ -37,7 +34,6 @@ import org.eclipse.tractusx.bpdm.test.system.utils.ScenarioContext
 import org.eclipse.tractusx.bpdm.test.system.utils.ShareOwnCompanyDataTestDataGenerator
 import org.eclipse.tractusx.bpdm.test.system.utils.SharingStateWatcher
 import org.eclipse.tractusx.bpdm.test.system.utils.TaskReservationWatcher
-import org.eclipse.tractusx.bpdm.test.testdata.gate.TestRunData
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.GateAssertRepositoryV7
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.TestDataFactoryGateV7
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
@@ -52,7 +48,6 @@ class ShareOwnCompanyDataStepDefs(
     private val orchestratorClient: OrchestrationApiClient,
     private val sharingStateWatcher: SharingStateWatcher,
     private val taskReservationWatcher: TaskReservationWatcher,
-    private val testRunData: TestRunData,
     private val testDataGenerator: ShareOwnCompanyDataTestDataGenerator,
     private val testDataFactoryGate: TestDataFactoryGateV7,
     private val assertRepository: GateAssertRepositoryV7,
@@ -66,12 +61,6 @@ class ShareOwnCompanyDataStepDefs(
     private val context: ScenarioContext get() = ScenarioContext.current()!!
     private val scenarioName: String get() = context.scenarioName
 
-    @Before
-    fun setUp(scenario: Scenario) {
-        ScenarioContext.set(ScenarioContext(scenario.name, scenario.id, testRunData.testTime, scenario))
-        logger.info { "Starting scenario: '${scenario.name}'" }
-    }
-
     private fun attachGateCall(method: String, path: String, request: Any? = null, response: Any? = null) {
         val content = buildMap {
             put("uri", "$method $path")
@@ -83,11 +72,6 @@ class ShareOwnCompanyDataStepDefs(
             "application/json",
             "$method $path"
         )
-    }
-
-    @After
-    fun tearDown() {
-        ScenarioContext.clear()
     }
 
     @Given("site-based legal entity {string}")
