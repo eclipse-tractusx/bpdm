@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.ReasonCodeDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.ReasonCodeUpsertRequest
 import org.eclipse.tractusx.bpdm.test.system.utils.BusinessPartnerRelationTestDataGenerator
+import org.eclipse.tractusx.bpdm.test.system.utils.BusinessPartnerShareActions
 import org.eclipse.tractusx.bpdm.test.system.utils.GateOutputFactory
 import org.eclipse.tractusx.bpdm.test.system.utils.ShareOwnCompanyDataTestDataGenerator
 import org.eclipse.tractusx.bpdm.test.system.utils.SharingStateWatcher
@@ -49,8 +50,10 @@ import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.PoolRequestFactoryV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.PoolResponseFactoryV7
 import org.eclipse.tractusx.bpdm.test.util.InstantSecondsComparator
 import org.eclipse.tractusx.bpdm.test.util.LocalDatetimeSecondsComparator
+import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import tools.jackson.databind.json.JsonMapper
 import java.time.Instant
 
 @Configuration
@@ -215,5 +218,24 @@ class TestDataConfiguration {
         val instantSecondsComparator = InstantSecondsComparator()
         val localDatetimeSecondsComparator = LocalDatetimeSecondsComparator(instantSecondsComparator)
         return GateAssertRepositoryV7(instantSecondsComparator, localDatetimeSecondsComparator)
+    }
+
+    @Bean
+    fun businessPartnerShareActions(
+        gateClient: GateClient,
+        orchestratorClient: OrchestrationApiClient,
+        testDataGenerator: ShareOwnCompanyDataTestDataGenerator,
+        sharingStateWatcher: SharingStateWatcher,
+        taskReservationWatcher: TaskReservationWatcher,
+        jsonMapper: JsonMapper
+    ): BusinessPartnerShareActions{
+        return BusinessPartnerShareActions(
+            gateClient,
+            orchestratorClient,
+            testDataGenerator,
+            sharingStateWatcher,
+            taskReservationWatcher,
+            jsonMapper
+        )
     }
 }

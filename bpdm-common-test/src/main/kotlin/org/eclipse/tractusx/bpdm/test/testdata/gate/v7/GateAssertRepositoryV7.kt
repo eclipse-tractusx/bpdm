@@ -87,6 +87,47 @@ class GateAssertRepositoryV7(
         .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
         .build()
 
+    /**
+     * Compares only the master data of an output business partner: the descriptive legal entity, site
+     * and address attributes (legal name / short name / legal form, site name, address name / type /
+     * postal addresses).
+     *
+     * Everything else is ignored on purpose: identifiers, states, roles, confidence criteria, golden
+     * record relations, BPNs, script variants and timestamps. Those are produced by the test data
+     * factories with a lot of derived logic and are covered by dedicated tests, so ignoring them here
+     * keeps master-data assertions stable when that factory logic is refactored.
+     */
+    val outputMasterDataComparisonConfig: RecursiveComparisonConfiguration = RecursiveComparisonConfiguration.builder()
+        .withIgnoredFields(
+            BusinessPartnerOutputDto::createdAt.name,
+            BusinessPartnerOutputDto::updatedAt.name,
+            BusinessPartnerOutputDto::nameParts.name,
+            BusinessPartnerOutputDto::identifiers.name,
+            BusinessPartnerOutputDto::states.name,
+            BusinessPartnerOutputDto::roles.name,
+            BusinessPartnerOutputDto::isOwnCompanyData.name,
+            BusinessPartnerOutputDto::externalSequenceTimestamp.name,
+            BusinessPartnerOutputDto::scriptVariants.name,
+            // legal entity: keep only legalName / shortName / legalForm
+            "legalEntity.${LegalEntityRepresentationOutputDto::legalEntityBpn.name}",
+            "legalEntity.${LegalEntityRepresentationOutputDto::confidenceCriteria.name}",
+            "legalEntity.${LegalEntityRepresentationOutputDto::states.name}",
+            "legalEntity.${LegalEntityRepresentationOutputDto::goldenRecordRelations.name}",
+            // site: keep only name
+            "site.${SiteRepresentationOutputDto::siteBpn.name}",
+            "site.${SiteRepresentationOutputDto::confidenceCriteria.name}",
+            "site.${SiteRepresentationOutputDto::states.name}",
+            // address: keep only name / addressType / physical & alternative postal address
+            "address.${AddressComponentOutputDto::addressBpn.name}",
+            "address.${AddressComponentOutputDto::confidenceCriteria.name}",
+            "address.${AddressComponentOutputDto::states.name}",
+            "address.${AddressComponentOutputDto::identifiers.name}",
+            "address.${AddressComponentOutputDto::goldenRecordRelations.name}"
+        )
+        .withComparatorForType(instantSecondsComparator, Instant::class.java)
+        .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
+        .build()
+
     fun assertBusinessPartnerInput(actual: Collection<BusinessPartnerInputDto>, expected: Collection<BusinessPartnerInputDto>) {
         Assertions.assertThat(actual.sortedBy { it.externalId }.map { it.sortContent() })
             .usingRecursiveComparison()
