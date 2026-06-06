@@ -132,6 +132,15 @@ fun LegalEntityHeaderVerboseDto.withConfidence(confidence: CalculatedConfidence)
 fun LogisticAddressInvariantVerboseDto.withConfidence(confidence: CalculatedConfidence) =
     copy(confidenceCriteria = confidenceCriteria.withCalculatedConfidence(confidence))
 
+fun LegalEntityWithLegalAddressVerboseDto.withConfidence(confidence: GivenConfidence) =
+    copy(header = header.withConfidence(confidence), legalAddress = legalAddress.withConfidence(confidence))
+
+fun LegalEntityHeaderVerboseDto.withConfidence(confidence: GivenConfidence) =
+    copy(confidenceCriteria = confidenceCriteria.withGivenConfidence(confidence))
+
+fun LogisticAddressInvariantVerboseDto.withConfidence(confidence: GivenConfidence) =
+    copy(confidenceCriteria = confidenceCriteria.withGivenConfidence(confidence))
+
 fun ConfidenceCriteriaDto.withCalculatedConfidence(confidence: CalculatedConfidence): ConfidenceCriteriaDto {
     return copy(
         numberOfSharingMembers = confidence.numberOfSharingMembers,

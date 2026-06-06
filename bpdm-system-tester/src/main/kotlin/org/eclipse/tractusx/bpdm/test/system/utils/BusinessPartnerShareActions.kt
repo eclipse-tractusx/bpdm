@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.GivenConfidence
+import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.TestDataV7
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.BpnReference
 import org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType
@@ -175,7 +176,9 @@ class BusinessPartnerShareActions(
     fun refineAsAdditionalAddressOfLegalEntity(recordId: String, verified: Boolean) {
         val state = context.records[recordId]!!
         val contentSeed = state.contentSeed!!
-        val parentResult = testDataGenerator.buildLegalEntity("${contentSeed}Parent")
+        // The parent legal entity is determined by the golden record process, not shared by the owner, so it
+        // is built without the owner signal. Only the resulting additional address carries it.
+        val parentResult = testDataGenerator.buildLegalEntity("${contentSeed}Parent", TestDataV7.NotCheckedNotOwned)
         val addressResult = testDataGenerator.buildAdditionalLegalEntityAddress(contentSeed, parentResult.legalEntity, givenConfidence(state, verified))
         resolveTask(recordId, addressResult.taskData)
         context.records[recordId] = state.copy(
@@ -201,7 +204,9 @@ class BusinessPartnerShareActions(
         verified: Boolean = false
     ): AdditionalLegalEntityAddressWithParent {
         val state = context.records[recordId]!!
-        val parentResult = testDataGenerator.buildLegalEntity("${masterDataSeed}Parent", givenConfidence(state, verified))
+        // The parent legal entity is determined by the golden record process, not shared by the owner, so it
+        // is built without the owner signal. Only the resulting additional address carries it.
+        val parentResult = testDataGenerator.buildLegalEntity("${masterDataSeed}Parent", TestDataV7.NotCheckedNotOwned)
         val addressResult = testDataGenerator.buildAdditionalLegalEntityAddress(masterDataSeed, parentResult.legalEntity, givenConfidence(state, verified))
         resolveTask(recordId, addressResult.taskData.withGoldenRecordRequestIdentifiers(legalEntityLabel, additionalAddressLabel = additionalAddressLabel))
         context.records[recordId] = state.copy(
@@ -215,7 +220,10 @@ class BusinessPartnerShareActions(
     fun refineAsAdditionalAddressOfSite(recordId: String, verified: Boolean) {
         val state = context.records[recordId]!!
         val contentSeed = state.contentSeed!!
-        val parentResult = testDataGenerator.buildLegalEntity("${contentSeed}Parent")
+        // The parent legal entity is determined by the golden record process, not shared by the owner, so it
+        // is built without the owner signal. Only the resulting additional address carries it (the site keeps
+        // its own always-OwnerShared confidence).
+        val parentResult = testDataGenerator.buildLegalEntity("${contentSeed}Parent", TestDataV7.NotCheckedNotOwned)
         val siteResult = testDataGenerator.buildSite("${contentSeed}Site", parentResult.legalEntity)
         val addressResult = testDataGenerator.buildAdditionalSiteAddress(contentSeed, siteResult.siteWithParent, givenConfidence(state, verified))
         resolveTask(recordId, addressResult.taskData)
@@ -243,7 +251,10 @@ class BusinessPartnerShareActions(
         legalEntityLabel: String
     ): AdditionalSiteAddressWithParent {
         val state = context.records[recordId]!!
-        val parentResult = testDataGenerator.buildLegalEntity("${masterDataSeed}Parent")
+        // The parent legal entity is determined by the golden record process, not shared by the owner, so it
+        // is built without the owner signal. Only the resulting additional address carries it (the site keeps
+        // its own always-OwnerShared confidence).
+        val parentResult = testDataGenerator.buildLegalEntity("${masterDataSeed}Parent", TestDataV7.NotCheckedNotOwned)
         val siteResult = testDataGenerator.buildSite("${masterDataSeed}Site", parentResult.legalEntity)
         val addressResult = testDataGenerator.buildAdditionalSiteAddress(masterDataSeed, siteResult.siteWithParent)
         resolveTask(

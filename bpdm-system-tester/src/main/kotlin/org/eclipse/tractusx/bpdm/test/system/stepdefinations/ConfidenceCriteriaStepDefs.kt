@@ -31,12 +31,15 @@ import org.eclipse.tractusx.bpdm.test.system.utils.ScenarioContext
 /**
  * Steps for the "Output Reflects Golden Record Confidence Criteria" feature.
  *
- * The owner signal (whether the data was shared as own company data) is set by the share step:
- * "the sharing member shares own company record {string}" turns it on, while
- * "the sharing member shares third-party record {string}" turns it off. Spelling both out keeps the confidence
+ * The owner signal (whether the data is owner-shared) is only *requested* by the share step:
+ * "the sharing member shares own company record {string}" requests it, while
+ * "the sharing member shares third-party record {string}" does not. Spelling both out keeps the confidence
  * scenarios explicit about the owner signal instead of relying on the implicit default of the general share
- * step. The verification signal is set by the refine step variants below. Each refine step waits for the
- * golden record process to complete so the output is available for the Then assertions.
+ * step. It is the refine step, however, that *finally assigns* the owner signal: the golden record process
+ * decides what the record actually is and assigns the signal only to the entity the record is refined to. A
+ * parent entity the process determines (e.g. the legal entity above a refined-to additional address) never
+ * inherits the owner signal. The verification signal is set by the refine step variants below. Each refine
+ * step waits for the golden record process to complete so the output is available for the Then assertions.
  */
 class ConfidenceCriteriaStepDefs(
     private val shareActions: BusinessPartnerShareActions,
@@ -57,9 +60,9 @@ class ConfidenceCriteriaStepDefs(
     @When("the sharing member shares own company record {string}")
     fun `when shares own company record`(recordId: String) {
         logger.info { "[$scenarioName] When: the sharing member shares own company record '$recordId'" }
-        // Own company data turns the OwnerShared signal on. Same behaviour as the general
-        // "the sharing member shares record" step; spelled out here to make the owner signal explicit in the
-        // confidence scenarios.
+        // Own company data requests the OwnerShared signal; the refine step finally assigns it, and only to
+        // the entity the record is refined to. Same behaviour as the general "the sharing member shares record"
+        // step; spelled out here to make the owner signal explicit in the confidence scenarios.
         shareActions.upload(recordId, isOwnCompanyData = true)
     }
 
@@ -77,7 +80,9 @@ class ConfidenceCriteriaStepDefs(
     // request identifiers and wait for the completed sharing state internally, so the output golden record is
     // ready for the Then assertions. Every record in this feature owns its golden records, so the master data
     // seed and entity labels are derived from the record id. Parent entities (legal entity, site) the matched
-    // entity hangs off of get their own suffixed labels so their golden record identifiers stay distinct.
+    // entity hangs off of get their own suffixed labels so their golden record identifiers stay distinct. A
+    // determined parent entity never inherits the owner signal: refining a record shared as own company data to
+    // an additional address makes only that address OwnerShared, leaving the determined parent at NoConfidence.
     // -------------------------------------------------------------------------
 
     @When("the golden record process refines record {string} to a legal entity without external verification")

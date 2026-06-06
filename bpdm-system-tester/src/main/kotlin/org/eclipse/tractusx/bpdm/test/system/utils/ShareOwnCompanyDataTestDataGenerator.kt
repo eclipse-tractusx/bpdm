@@ -134,21 +134,25 @@ class ShareOwnCompanyDataTestDataGenerator(
         givenConfidence: GivenConfidence = TestDataV7.SharedByOwner
     ): AdditionalSiteAddressResult {
         val context = ScenarioContext.current()!!
-        val request = poolRequestFactory.buildAdditionalAddressCreateRequest(scenarioId(id), siteWithParent.site.site.bpns)
+        // The legal entity above a refined-to additional address is a parent the golden record process
+        // determined, so it never inherits the owner signal (see [asDeterminedParent]). The site keeps its
+        // own confidence: a site always carries OwnerShared confidence.
+        val determinedParent = siteWithParent.copy(legalEntity = siteWithParent.legalEntity.asDeterminedParent())
+        val request = poolRequestFactory.buildAdditionalAddressCreateRequest(scenarioId(id), determinedParent.site.site.bpns)
             .withConfidence(givenConfidence)
             .withRunUniqueIdentifiers(context.runId(id))
 
         val additionalAddress = poolResponseFactory
-            .buildAdditionalAddressCreate(request, siteWithParent.legalEntity, "BPNA${context.runId(id)}")
-            .let { it.copy(address = it.address.copy(bpnSite = siteWithParent.site.site.bpns)) }
+            .buildAdditionalAddressCreate(request, determinedParent.legalEntity, "BPNA${context.runId(id)}")
+            .let { it.copy(address = it.address.copy(bpnSite = determinedParent.site.site.bpns)) }
             .withConfidence(TestDataV7.SyncedSharedByOwnerConfidence)
             .let { poolResponseFactory.buildAddressSearchResponse(it) }
 
         val taskData = refinementTestDataFactory.buildAdditionSiteAddressBusinessPartner(
-            siteWithParent.legalEntity, siteWithParent.site, additionalAddress, "BPNL000000000001", emptyList()
+            determinedParent.legalEntity, determinedParent.site, additionalAddress, "BPNL000000000001", emptyList()
         ).copyWithBpnReferenceType(BpnReferenceType.BpnRequestIdentifier)
 
-        return AdditionalSiteAddressResult(AdditionalSiteAddressWithParent(siteWithParent, additionalAddress), taskData)
+        return AdditionalSiteAddressResult(AdditionalSiteAddressWithParent(determinedParent, additionalAddress), taskData)
     }
 
     fun buildAdditionalLegalEntityAddress(
@@ -157,7 +161,10 @@ class ShareOwnCompanyDataTestDataGenerator(
         givenConfidence: GivenConfidence = TestDataV7.SharedByOwner
     ): AdditionalLegalEntityAddressResult {
         val context = ScenarioContext.current()!!
-        val legalEntityParent = legalEntity.copy(header = legalEntity.header.withConfidence(TestDataV7.SharedByOwnerConfidence))
+        // The legal entity above a refined-to additional address is a parent the golden record process
+        // determined, so it never inherits the owner signal the address was shared with (see
+        // [asDeterminedParent]).
+        val legalEntityParent = legalEntity.asDeterminedParent()
 
         val request = poolRequestFactory.buildAdditionalAddressCreateRequest(scenarioId(id), legalEntity)
             .withConfidence(givenConfidence)
@@ -174,6 +181,16 @@ class ShareOwnCompanyDataTestDataGenerator(
 
         return AdditionalLegalEntityAddressResult(AdditionalLegalEntityAddressWithParent(legalEntityParent, additionalAddress), taskData)
     }
+
+    /**
+     * Renders a legal entity as a parent the golden record process *determined* (the legal entity above a
+     * refined-to site or additional address). The owner signal a record was shared with is finally assigned by
+     * the refinement step and belongs only to the entity the record was refined to; a determined parent never
+     * inherits it. So a determined parent always carries NoConfidence (owner signal off, not externally
+     * verified, confidence level 0).
+     */
+    private fun LegalEntityWithLegalAddressVerboseDto.asDeterminedParent(): LegalEntityWithLegalAddressVerboseDto =
+        withConfidence(TestDataV7.NotCheckedNotOwned).withConfidence(TestDataV7.NoConfidence)
 
     private fun scenarioId(id: String) = "$id${ScenarioContext.current()!!.scenarioSuffix}"
 

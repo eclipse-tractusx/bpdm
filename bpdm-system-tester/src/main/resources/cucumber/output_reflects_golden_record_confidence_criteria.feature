@@ -1,11 +1,18 @@
 Feature: Output Reflects Golden Record Confidence Criteria
 
   # This feature covers how a record's output reflects the confidence criteria of the golden record it was
-  # refined to. Confidence criteria reflect two independent signals: whether the owner submitted the data as
-  # their own company data (OwnerShared signal, set by sharing as own vs. third-party data) and whether the
-  # golden record process provider verified it against an external data source (Verified signal, set by
-  # refining with vs. without external verification). The following named levels are used throughout
-  # (timestamps are excluded from comparison):
+  # refined to. Confidence criteria reflect two independent signals: whether the data is owner-shared
+  # (OwnerShared signal) and whether the golden record process provider verified it against an external data
+  # source (Verified signal, set by refining with vs. without external verification).
+  #
+  # The OwnerShared signal is only *requested* by the sharing member (by sharing as own vs. third-party data);
+  # it is the golden record process refinement step that *finally assigns* it. The owner can signal intent, but
+  # the refinement determines what the record actually is, and it assigns the signal only to the entity the
+  # record is refined to (the resulting business partner) - never to a parent entity the process itself
+  # determined. So when a record shared as own company data is refined to an additional address, only that
+  # address becomes OwnerShared; its determined parent legal entity carries NoConfidence.
+  #
+  # The following named levels are used throughout (timestamps are excluded from comparison):
   #
   #   NoConfidence         - neither signal is set
   #   OwnerShared          - owner submitted as own company data; not externally verified
