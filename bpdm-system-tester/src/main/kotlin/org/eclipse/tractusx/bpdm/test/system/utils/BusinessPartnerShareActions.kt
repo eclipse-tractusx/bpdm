@@ -26,6 +26,8 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAdd
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.GivenConfidence
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
+import org.eclipse.tractusx.orchestrator.api.model.BpnReference
+import org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType
 import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
 import org.eclipse.tractusx.orchestrator.api.model.TaskStep
 import org.eclipse.tractusx.orchestrator.api.model.TaskStepResultEntryDto
@@ -69,13 +71,20 @@ class BusinessPartnerShareActions(
     /**
      * Refines a record into a legal entity whose master data is built from [masterDataSeed], independent
      * of the seed the record was shared with, and waits for the golden record process to complete so the
-     * resulting output and Pool golden record are available. Returns the golden record so the caller can
-     * store it as the current expectation for that legal entity.
+     * resulting output and Pool golden record are available. The golden record identity is keyed by
+     * [legalEntityLabel] (not by the seed), so refining a different record to the same label lands on the same
+     * Pool golden record and updates its master data. Returns the golden record so the caller can store it as
+     * the current expectation for that legal entity.
      */
-    fun refineAsLegalEntity(recordId: String, masterDataSeed: String, verified: Boolean = false): LegalEntityWithLegalAddressVerboseDto {
+    fun refineAsLegalEntity(
+        recordId: String,
+        masterDataSeed: String,
+        legalEntityLabel: String,
+        verified: Boolean = false
+    ): LegalEntityWithLegalAddressVerboseDto {
         val state = context.records[recordId]!!
         val entityResult = testDataGenerator.buildLegalEntity(masterDataSeed, givenConfidence(state, verified))
-        resolveTask(recordId, entityResult.taskData)
+        resolveTask(recordId, entityResult.taskData.withGoldenRecordRequestIdentifiers(legalEntityLabel))
         context.records[recordId] = state.copy(legalEntity = entityResult.legalEntity)
         sharingStateWatcher.waitForCompletedState(recordId)
         return entityResult.legalEntity
@@ -94,6 +103,36 @@ class BusinessPartnerShareActions(
         )
     }
 
+    /**
+     * Refines a record into a site-based legal entity (a legal entity whose legal address is also its site's main
+     * address) whose master data is built from [masterDataSeed], independent of the seed the record was shared
+     * with, and waits for the golden record process to complete so the resulting output and Pool golden record are
+     * available. The golden record identities are keyed by [legalEntityLabel] and [siteLabel] (not by the seed), so
+     * refining a different record to the same labels lands on the same Pool golden records and updates their master
+     * data. Returns the site together with its parent legal entity so the caller can store them as the current
+     * expectation.
+     */
+    fun refineAsSiteBasedLegalEntity(
+        recordId: String,
+        masterDataSeed: String,
+        siteLabel: String,
+        legalEntityLabel: String,
+        verified: Boolean = false
+    ): SiteBasedLegalEntity {
+        val state = context.records[recordId]!!
+        val entityResult = testDataGenerator.buildSiteBasedLegalEntity(masterDataSeed, givenConfidence(state, verified))
+        resolveTask(recordId, entityResult.taskData.withGoldenRecordRequestIdentifiers(legalEntityLabel, siteLabel = siteLabel))
+        context.records[recordId] = state.copy(
+            legalEntity = entityResult.siteBasedLegalEntity.legalEntity,
+            poolSite = SiteWithMainAddressVerboseDto(
+                entityResult.siteBasedLegalEntity.site,
+                entityResult.siteBasedLegalEntity.legalEntity.legalAddress
+            )
+        )
+        sharingStateWatcher.waitForCompletedState(recordId)
+        return entityResult.siteBasedLegalEntity
+    }
+
     fun refineAsSite(recordId: String) {
         val state = context.records[recordId]!!
         val contentSeed = state.contentSeed!!
@@ -104,6 +143,33 @@ class BusinessPartnerShareActions(
             legalEntity = siteResult.siteWithParent.legalEntity,
             poolSite = siteResult.siteWithParent.site
         )
+    }
+
+    /**
+     * Refines a record into a site (and its parent legal entity) whose master data is built from
+     * [masterDataSeed], independent of the seed the record was shared with, and waits for the golden record
+     * process to complete so the resulting output and Pool golden record are available. The golden record
+     * identities are keyed by [siteLabel] and its parent [legalEntityLabel] (not by the seed), so refining a
+     * different record to the same labels lands on the same Pool golden records and updates their master data.
+     * Returns the site together with its parent legal entity so the caller can store them as the current
+     * expectation.
+     */
+    fun refineAsSite(
+        recordId: String,
+        masterDataSeed: String,
+        siteLabel: String,
+        legalEntityLabel: String
+    ): SiteWithParent {
+        val state = context.records[recordId]!!
+        val parentResult = testDataGenerator.buildLegalEntity("${masterDataSeed}Parent")
+        val siteResult = testDataGenerator.buildSite(masterDataSeed, parentResult.legalEntity)
+        resolveTask(recordId, siteResult.taskData.withGoldenRecordRequestIdentifiers(legalEntityLabel, siteLabel = siteLabel))
+        context.records[recordId] = state.copy(
+            legalEntity = siteResult.siteWithParent.legalEntity,
+            poolSite = siteResult.siteWithParent.site
+        )
+        sharingStateWatcher.waitForCompletedState(recordId)
+        return siteResult.siteWithParent
     }
 
     fun refineAsAdditionalAddressOfLegalEntity(recordId: String, verified: Boolean) {
@@ -121,18 +187,23 @@ class BusinessPartnerShareActions(
     /**
      * Refines a record into an additional address of a legal entity whose master data is built from
      * [masterDataSeed], independent of the seed the record was shared with, and waits for the golden record
-     * process to complete so the resulting output and Pool golden record are available. Returns the address
-     * together with its parent legal entity so the caller can store them as the current expectation.
+     * process to complete so the resulting output and Pool golden record are available. The golden record
+     * identities are keyed by [additionalAddressLabel] and its parent [legalEntityLabel] (not by the seed), so
+     * refining a different record to the same labels lands on the same Pool golden records and updates their
+     * master data. Returns the address together with its parent legal entity so the caller can store them as
+     * the current expectation.
      */
     fun refineAsAdditionalAddressOfLegalEntity(
         recordId: String,
         masterDataSeed: String,
+        additionalAddressLabel: String,
+        legalEntityLabel: String,
         verified: Boolean = false
     ): AdditionalLegalEntityAddressWithParent {
         val state = context.records[recordId]!!
         val parentResult = testDataGenerator.buildLegalEntity("${masterDataSeed}Parent", givenConfidence(state, verified))
         val addressResult = testDataGenerator.buildAdditionalLegalEntityAddress(masterDataSeed, parentResult.legalEntity, givenConfidence(state, verified))
-        resolveTask(recordId, addressResult.taskData)
+        resolveTask(recordId, addressResult.taskData.withGoldenRecordRequestIdentifiers(legalEntityLabel, additionalAddressLabel = additionalAddressLabel))
         context.records[recordId] = state.copy(
             legalEntity = addressResult.additionalLegalEntityAddressWithParent.legalEntity,
             poolAddress = addressResult.additionalLegalEntityAddressWithParent.address
@@ -153,6 +224,43 @@ class BusinessPartnerShareActions(
             poolSite = addressResult.additionalSiteAddressWithParent.siteWithParent.site,
             poolAddress = addressResult.additionalSiteAddressWithParent.address
         )
+    }
+
+    /**
+     * Refines a record into an additional address of a site (and its parent site and legal entity) whose
+     * master data is built from [masterDataSeed], independent of the seed the record was shared with, and waits
+     * for the golden record process to complete so the resulting output and Pool golden record are available.
+     * The golden record identities are keyed by [additionalAddressLabel], its parent [siteLabel] and the
+     * [legalEntityLabel] (not by the seed), so refining a different record to the same labels lands on the same
+     * Pool golden records and updates their master data. Returns the address together with its parent site and
+     * legal entity so the caller can store them as the current expectation.
+     */
+    fun refineAsAdditionalAddressOfSite(
+        recordId: String,
+        masterDataSeed: String,
+        additionalAddressLabel: String,
+        siteLabel: String,
+        legalEntityLabel: String
+    ): AdditionalSiteAddressWithParent {
+        val state = context.records[recordId]!!
+        val parentResult = testDataGenerator.buildLegalEntity("${masterDataSeed}Parent")
+        val siteResult = testDataGenerator.buildSite("${masterDataSeed}Site", parentResult.legalEntity)
+        val addressResult = testDataGenerator.buildAdditionalSiteAddress(masterDataSeed, siteResult.siteWithParent)
+        resolveTask(
+            recordId,
+            addressResult.taskData.withGoldenRecordRequestIdentifiers(
+                legalEntityLabel,
+                siteLabel = siteLabel,
+                additionalAddressLabel = additionalAddressLabel
+            )
+        )
+        context.records[recordId] = state.copy(
+            legalEntity = addressResult.additionalSiteAddressWithParent.siteWithParent.legalEntity,
+            poolSite = addressResult.additionalSiteAddressWithParent.siteWithParent.site,
+            poolAddress = addressResult.additionalSiteAddressWithParent.address
+        )
+        sharingStateWatcher.waitForCompletedState(recordId)
+        return addressResult.additionalSiteAddressWithParent
     }
 
     fun completeShare(recordId: String, refine: (String) -> Unit) {
@@ -191,6 +299,39 @@ class BusinessPartnerShareActions(
             sharedByOwner = state.currentInput?.isOwnCompanyData ?: false,
             checkedByExternalDataSource = verified
         )
+
+    /**
+     * Rewrites the golden record BPN references in the refinement task as BPN request identifiers derived from
+     * the stable entity labels instead of the per-refinement master data seed. The Pool resolves a known
+     * request identifier to the same BPN and updates that golden record (see [BpnReference]), so two records
+     * refined to the same labels land on the same Pool golden records. This is what lets one record's
+     * refinement change the master data of a golden record that another record already reflects. The inline
+     * response BPNs are left untouched on purpose: assertions ignore them and re-check the BPNs separately
+     * against the Pool.
+     */
+    private fun BusinessPartner.withGoldenRecordRequestIdentifiers(
+        legalEntityLabel: String,
+        siteLabel: String? = null,
+        additionalAddressLabel: String? = null
+    ): BusinessPartner =
+        copy(
+            legalEntity = legalEntity.copy(
+                bpnReference = requestIdentifier("BPNL", legalEntityLabel),
+                legalAddress = legalEntity.legalAddress.copy(bpnReference = requestIdentifier("BPNA", legalEntityLabel))
+            ),
+            site = siteLabel?.let { label ->
+                site?.copy(
+                    bpnReference = requestIdentifier("BPNS", label),
+                    siteMainAddress = site?.siteMainAddress?.copy(bpnReference = requestIdentifier("BPNA", label))
+                )
+            } ?: site,
+            additionalAddress = additionalAddressLabel?.let { label ->
+                additionalAddress?.copyAsPostalAddress { it.copy(bpnReference = requestIdentifier("BPNA", label)) }
+            } ?: additionalAddress
+        )
+
+    private fun requestIdentifier(prefix: String, label: String): BpnReference =
+        BpnReference("$prefix-request-${context.runId(label)}", null, BpnReferenceType.BpnRequestIdentifier)
 
     private fun attachApiCall(method: String, path: String, request: Any? = null, response: Any? = null) {
         val content = buildMap {

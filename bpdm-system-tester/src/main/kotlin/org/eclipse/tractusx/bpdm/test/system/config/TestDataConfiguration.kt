@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.ReasonCodeDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.ReasonCodeUpsertRequest
 import org.eclipse.tractusx.bpdm.test.system.utils.BusinessPartnerRelationTestDataGenerator
 import org.eclipse.tractusx.bpdm.test.system.utils.BusinessPartnerShareActions
+import org.eclipse.tractusx.bpdm.test.system.utils.ConfidenceAssertHelper
 import org.eclipse.tractusx.bpdm.test.system.utils.GateOutputFactory
 import org.eclipse.tractusx.bpdm.test.system.utils.ShareOwnCompanyDataTestDataGenerator
 import org.eclipse.tractusx.bpdm.test.system.utils.SharingStateWatcher
@@ -218,6 +219,14 @@ class TestDataConfiguration {
         val instantSecondsComparator = InstantSecondsComparator()
         val localDatetimeSecondsComparator = LocalDatetimeSecondsComparator(instantSecondsComparator)
         return GateAssertRepositoryV7(instantSecondsComparator, localDatetimeSecondsComparator)
+    }
+
+    @Bean
+    fun confidenceAssertHelper(
+        gateClient: GateClient,
+        jsonMapper: JsonMapper
+    ): ConfidenceAssertHelper {
+        return ConfidenceAssertHelper(gateClient, jsonMapper)
     }
 
     @Bean

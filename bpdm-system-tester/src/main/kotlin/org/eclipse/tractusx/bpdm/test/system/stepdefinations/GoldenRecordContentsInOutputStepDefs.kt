@@ -68,6 +68,24 @@ class GoldenRecordContentsInOutputStepDefs(
         `when refines to legal entity with master data`(recordId, legalEntityId, masterDataSeed)
     }
 
+    @Given("record {string} reflects site {string} of legal entity {string} with master data {string}")
+    fun `given record reflects site master data`(
+        recordId: String,
+        siteId: String,
+        legalEntityId: String,
+        masterDataSeed: String
+    ) {
+        logger.info {
+            "[$scenarioName] Given: record '$recordId' reflects site '$siteId' of legal entity '$legalEntityId' " +
+                "with master data '$masterDataSeed'"
+        }
+        // Compose the established share -> refine flow so scenarios can start from a record that already
+        // reflects the site. The refine step waits for the sharing process to complete, so no separate
+        // assertion or wait is needed here.
+        `when shares record`(recordId)
+        `when refines to site of legal entity`(recordId, siteId, legalEntityId, masterDataSeed)
+    }
+
     @Given("record {string} reflects additional address {string} of legal entity {string} with master data {string}")
     fun `given record reflects additional address master data`(
         recordId: String,
@@ -84,6 +102,25 @@ class GoldenRecordContentsInOutputStepDefs(
         // separate assertion or wait is needed here.
         `when shares record`(recordId)
         `when refines to additional address of legal entity`(recordId, addressId, legalEntityId, masterDataSeed)
+    }
+
+    @Given("record {string} reflects additional address {string} of site {string} of legal entity {string} with master data {string}")
+    fun `given record reflects additional address of site master data`(
+        recordId: String,
+        addressId: String,
+        siteId: String,
+        legalEntityId: String,
+        masterDataSeed: String
+    ) {
+        logger.info {
+            "[$scenarioName] Given: record '$recordId' reflects additional address '$addressId' of site '$siteId' " +
+                "of legal entity '$legalEntityId' with master data '$masterDataSeed'"
+        }
+        // Compose the established share -> refine flow so scenarios can start from a record that already
+        // reflects the additional address of the site. The refine step waits for the sharing process to
+        // complete, so no separate assertion or wait is needed here.
+        `when shares record`(recordId)
+        `when refines to additional address of site`(recordId, addressId, siteId, legalEntityId, masterDataSeed)
     }
 
     // -------------------------------------------------------------------------
@@ -117,8 +154,26 @@ class GoldenRecordContentsInOutputStepDefs(
         // The refinement is the single place that defines the master data. Store (and overwrite on
         // re-refinement) the resulting golden record under its label so the Then can assert by reference
         // and update scenarios automatically expect the latest master data.
-        val legalEntity = shareActions.refineAsLegalEntity(recordId, masterDataSeed)
+        val legalEntity = shareActions.refineAsLegalEntity(recordId, masterDataSeed, legalEntityId)
         context.legalEntities[legalEntityId] = legalEntity
+    }
+
+    @When("the golden record process refines record {string} to site {string} of legal entity {string} with master data {string}")
+    fun `when refines to site of legal entity`(
+        recordId: String,
+        siteId: String,
+        legalEntityId: String,
+        masterDataSeed: String
+    ) {
+        logger.info {
+            "[$scenarioName] When: the golden record process refines record '$recordId' to site '$siteId' " +
+                "of legal entity '$legalEntityId' with master data '$masterDataSeed'"
+        }
+        // Store the resulting site (and its parent legal entity) under their labels so the Then can assert by
+        // reference and re-refinement automatically updates the expectation.
+        val siteWithParent = shareActions.refineAsSite(recordId, masterDataSeed, siteId, legalEntityId)
+        context.legalEntities[legalEntityId] = siteWithParent.legalEntity
+        context.sites[siteId] = siteWithParent
     }
 
     @When("the golden record process refines record {string} to additional address {string} of legal entity {string} with master data {string}")
@@ -134,9 +189,29 @@ class GoldenRecordContentsInOutputStepDefs(
         }
         // Store the resulting address (and its parent legal entity) under their labels so the Then can assert
         // by reference and re-refinement automatically updates the expectation.
-        val addressWithParent = shareActions.refineAsAdditionalAddressOfLegalEntity(recordId, masterDataSeed)
+        val addressWithParent = shareActions.refineAsAdditionalAddressOfLegalEntity(recordId, masterDataSeed, addressId, legalEntityId)
         context.legalEntities[legalEntityId] = addressWithParent.legalEntity
         context.additionalLegalEntityAddresses[addressId] = addressWithParent
+    }
+
+    @When("the golden record process refines record {string} to additional address {string} of site {string} of legal entity {string} with master data {string}")
+    fun `when refines to additional address of site`(
+        recordId: String,
+        addressId: String,
+        siteId: String,
+        legalEntityId: String,
+        masterDataSeed: String
+    ) {
+        logger.info {
+            "[$scenarioName] When: the golden record process refines record '$recordId' to additional address " +
+                "'$addressId' of site '$siteId' of legal entity '$legalEntityId' with master data '$masterDataSeed'"
+        }
+        // Store the resulting address (and its parent site and legal entity) under their labels so the Then can
+        // assert by reference and re-refinement automatically updates the expectation.
+        val addressWithParent = shareActions.refineAsAdditionalAddressOfSite(recordId, masterDataSeed, addressId, siteId, legalEntityId)
+        context.legalEntities[legalEntityId] = addressWithParent.siteWithParent.legalEntity
+        context.sites[siteId] = addressWithParent.siteWithParent
+        context.additionalSiteAddresses[addressId] = addressWithParent
     }
 
     // -------------------------------------------------------------------------
@@ -181,6 +256,58 @@ class GoldenRecordContentsInOutputStepDefs(
         assertThat(poolLegalEntity.legalAddress.addressType)
             .describedAs("Pool legal address of legal entity '%s' must be typed as a legal address", legalEntityId)
             .isEqualTo(AddressType.LegalAddress)
+    }
+
+    @Then("{string} output reflects site {string} of legal entity {string} in its master data")
+    fun `then output reflects site master data`(recordId: String, siteId: String, legalEntityId: String) {
+        logger.info {
+            "[$scenarioName] Then: '$recordId' output reflects site '$siteId' of legal entity '$legalEntityId' " +
+                "in its master data"
+        }
+        // Expected master data is the currently defined site (and its parent legal entity) for this label, set
+        // by the golden record refinement step. Reflecting the site implies reflecting its main address,
+        // reachable as expected.site.mainAddress.
+        val expected = context.sites[siteId]
+            ?: error("site '$siteId' must be defined by an earlier golden record refinement step")
+
+        val runId = context.runId(recordId)
+        val inputResponse = inputResponseOf(recordId)
+        val outputFactory = testDataFactoryGate.businessPartner.output
+        val expectedOutput = outputFactory
+            .fromSite(inputResponse, expected.legalEntity, expected.site)
+            .copy(externalId = runId)
+
+        // (1) The Gate output carries the expected master data inline.
+        val actualOutput = assertGateOutputCarriesMasterData(runId, expectedOutput)
+
+        // (2) The output's BPNs really reference a Pool golden record with the same master data. Reduce the
+        // Pool legal entity and site through the same output factory so we can reuse the comparison.
+        val referencedBpnl = actualOutput.legalEntity.legalEntityBpn
+        val referencedBpns = actualOutput.site!!.siteBpn
+        val poolLegalEntity = poolClient.legalEntities.getLegalEntity(referencedBpnl, "BPN")
+        attachCall("GET", "/v7/legal-entities/$referencedBpnl", response = poolLegalEntity)
+        val poolSite = poolClient.sites.getSite(referencedBpns)
+        attachCall("GET", "/v7/sites/$referencedBpns", response = poolSite)
+        val poolAsOutput = outputFactory
+            .fromSite(inputResponse, poolLegalEntity, poolSite)
+            .copy(externalId = runId)
+        assertPoolGoldenRecordReflectsMasterData(expectedOutput, poolAsOutput)
+
+        // The output's BPNs must point to this legal entity, its site and the site's main address in the Pool.
+        assertThat(actualOutput.legalEntity.legalEntityBpn)
+            .describedAs("output legal entity BPN must reference legal entity '%s' in the Pool", legalEntityId)
+            .isEqualTo(poolLegalEntity.header.bpnl)
+        assertThat(actualOutput.site!!.siteBpn)
+            .describedAs("output site BPN must reference site '%s' of legal entity '%s' in the Pool", siteId, legalEntityId)
+            .isEqualTo(poolSite.site.bpns)
+        assertThat(actualOutput.address.addressBpn)
+            .describedAs("output address BPN must reference site '%s's main address in the Pool", siteId)
+            .isEqualTo(poolSite.mainAddress.bpna)
+
+        // The referenced Pool address must actually be the site's main address.
+        assertThat(actualOutput.address.addressType)
+            .describedAs("Pool main address of site '%s' must be typed as a site main address", siteId)
+            .isEqualTo(AddressType.SiteMainAddress)
     }
 
     @Then("{string} output reflects additional address {string} of legal entity {string} in its master data")
@@ -231,6 +358,154 @@ class GoldenRecordContentsInOutputStepDefs(
             .isEqualTo(AddressType.AdditionalAddress)
     }
 
+    @Then("{string} output reflects additional address {string} of site {string} of legal entity {string} in its master data")
+    fun `then output reflects additional address of site master data`(
+        recordId: String,
+        addressId: String,
+        siteId: String,
+        legalEntityId: String
+    ) {
+        logger.info {
+            "[$scenarioName] Then: '$recordId' output reflects additional address '$addressId' of site '$siteId' " +
+                "of legal entity '$legalEntityId' in its master data"
+        }
+        // Expected master data is the currently defined additional address (and its parent site and legal
+        // entity) for this label, set by the golden record refinement step.
+        val expected = context.additionalSiteAddresses[addressId]
+            ?: error("additional address '$addressId' must be defined by an earlier golden record refinement step")
+
+        val runId = context.runId(recordId)
+        val inputResponse = inputResponseOf(recordId)
+        val outputFactory = testDataFactoryGate.businessPartner.output
+        val expectedOutput = outputFactory
+            .fromAdditionalAddressOnSite(inputResponse, expected.siteWithParent.legalEntity, expected.siteWithParent.site, expected.address)
+            .copy(externalId = runId)
+
+        // (1) The Gate output carries the expected master data inline.
+        val actualOutput = assertGateOutputCarriesMasterData(runId, expectedOutput)
+
+        // (2) The output's BPNs really reference a Pool golden record with the same master data. Reduce the
+        // Pool legal entity, site and address through the same output factory so we can reuse the comparison.
+        val referencedBpnl = actualOutput.legalEntity.legalEntityBpn
+        val referencedBpns = actualOutput.site!!.siteBpn
+        val referencedBpna = actualOutput.address.addressBpn
+        val poolLegalEntity = poolClient.legalEntities.getLegalEntity(referencedBpnl, "BPN")
+        attachCall("GET", "/v7/legal-entities/$referencedBpnl", response = poolLegalEntity)
+        val poolSite = poolClient.sites.getSite(referencedBpns)
+        attachCall("GET", "/v7/sites/$referencedBpns", response = poolSite)
+        val poolAddress = poolClient.addresses.getAddress(referencedBpna)
+        attachCall("GET", "/v7/addresses/$referencedBpna", response = poolAddress)
+        val poolAsOutput = outputFactory
+            .fromAdditionalAddressOnSite(inputResponse, poolLegalEntity, poolSite, poolAddress)
+            .copy(externalId = runId)
+        assertPoolGoldenRecordReflectsMasterData(expectedOutput, poolAsOutput)
+
+        // The output's BPNs must point to this legal entity, its site and the site's additional address in the Pool.
+        assertThat(actualOutput.legalEntity.legalEntityBpn)
+            .describedAs("output legal entity BPN must reference legal entity '%s' in the Pool", legalEntityId)
+            .isEqualTo(poolLegalEntity.header.bpnl)
+        assertThat(actualOutput.site!!.siteBpn)
+            .describedAs("output site BPN must reference site '%s' of legal entity '%s' in the Pool", siteId, legalEntityId)
+            .isEqualTo(poolSite.site.bpns)
+        assertThat(actualOutput.address.addressBpn)
+            .describedAs("output address BPN must reference additional address '%s' of site '%s' in the Pool", addressId, siteId)
+            .isEqualTo(poolAddress.address.bpna)
+
+        // The referenced Pool address must actually be an additional address.
+        assertThat(poolAddress.address.addressType)
+            .describedAs("Pool address '%s' of site '%s' must be typed as an additional address", addressId, siteId)
+            .isEqualTo(AddressType.AdditionalAddress)
+    }
+
+    // -------------------------------------------------------------------------
+    // Then - top-level identifiers and states surfacing rule
+    //
+    // The record's top-level identifiers and states surface the identifiers/states of the entity the record
+    // reflects, and which entity that is depends on the record type. The expected output is built by the same
+    // output factory used for master data, which already encodes the rule (legal entity -> the legal entity's,
+    // site -> none + the site's, additional address -> the address's), so these steps simply pin that rule by
+    // comparing ONLY the top-level identifiers and states.
+    // -------------------------------------------------------------------------
+
+    @Then("{string} output top-level identifiers and states reflect legal entity {string}")
+    fun `then output reflects legal entity identifiers and states`(recordId: String, legalEntityId: String) {
+        logger.info {
+            "[$scenarioName] Then: '$recordId' output top-level identifiers and states reflect legal entity '$legalEntityId'"
+        }
+        val expectedLegalEntity = context.legalEntities[legalEntityId]
+            ?: error("legal entity '$legalEntityId' must be defined by an earlier golden record refinement step")
+
+        val runId = context.runId(recordId)
+        val outputFactory = testDataFactoryGate.businessPartner.output
+        val expectedOutput = outputFactory.fromLegalEntity(inputResponseOf(recordId), expectedLegalEntity).copy(externalId = runId)
+
+        assertGateOutputTopLevelIdentifiersAndStates(runId, expectedOutput)
+    }
+
+    @Then("{string} output has no top-level identifiers and its states reflect site {string} of legal entity {string}")
+    fun `then output has no identifiers and reflects site states`(recordId: String, siteId: String, legalEntityId: String) {
+        logger.info {
+            "[$scenarioName] Then: '$recordId' output has no top-level identifiers and its states reflect site " +
+                "'$siteId' of legal entity '$legalEntityId'"
+        }
+        val expected = context.sites[siteId]
+            ?: error("site '$siteId' must be defined by an earlier golden record refinement step")
+
+        val runId = context.runId(recordId)
+        val outputFactory = testDataFactoryGate.businessPartner.output
+        // The factory surfaces no identifiers for a site record; the empty expectation below asserts exactly that.
+        val expectedOutput = outputFactory
+            .fromSite(inputResponseOf(recordId), expected.legalEntity, expected.site)
+            .copy(externalId = runId)
+
+        assertGateOutputTopLevelIdentifiersAndStates(runId, expectedOutput)
+    }
+
+    @Then("{string} output top-level identifiers and states reflect additional address {string} of legal entity {string}")
+    fun `then output reflects additional address of legal entity identifiers and states`(
+        recordId: String,
+        addressId: String,
+        legalEntityId: String
+    ) {
+        logger.info {
+            "[$scenarioName] Then: '$recordId' output top-level identifiers and states reflect additional address " +
+                "'$addressId' of legal entity '$legalEntityId'"
+        }
+        val expected = context.additionalLegalEntityAddresses[addressId]
+            ?: error("additional address '$addressId' must be defined by an earlier golden record refinement step")
+
+        val runId = context.runId(recordId)
+        val outputFactory = testDataFactoryGate.businessPartner.output
+        val expectedOutput = outputFactory
+            .fromAdditionalAddressOnLegalEntity(inputResponseOf(recordId), expected.legalEntity, expected.address)
+            .copy(externalId = runId)
+
+        assertGateOutputTopLevelIdentifiersAndStates(runId, expectedOutput)
+    }
+
+    @Then("{string} output top-level identifiers and states reflect additional address {string} of site {string} of legal entity {string}")
+    fun `then output reflects additional address of site identifiers and states`(
+        recordId: String,
+        addressId: String,
+        siteId: String,
+        legalEntityId: String
+    ) {
+        logger.info {
+            "[$scenarioName] Then: '$recordId' output top-level identifiers and states reflect additional address " +
+                "'$addressId' of site '$siteId' of legal entity '$legalEntityId'"
+        }
+        val expected = context.additionalSiteAddresses[addressId]
+            ?: error("additional address '$addressId' must be defined by an earlier golden record refinement step")
+
+        val runId = context.runId(recordId)
+        val outputFactory = testDataFactoryGate.businessPartner.output
+        val expectedOutput = outputFactory
+            .fromAdditionalAddressOnSite(inputResponseOf(recordId), expected.siteWithParent.legalEntity, expected.siteWithParent.site, expected.address)
+            .copy(externalId = runId)
+
+        assertGateOutputTopLevelIdentifiersAndStates(runId, expectedOutput)
+    }
+
     // -------------------------------------------------------------------------
     // Private helpers
     // -------------------------------------------------------------------------
@@ -251,6 +526,21 @@ class GoldenRecordContentsInOutputStepDefs(
             assertRepository.outputMasterDataComparisonConfig
         )
         return actualOutputPage.content.single()
+    }
+
+    /**
+     * Asserts the single Gate output for [runId] carries exactly [expectedOutput]'s top-level identifiers and
+     * states - the fields that surface the identifiers/states of the reflected entity - and nothing else is
+     * compared.
+     */
+    private fun assertGateOutputTopLevelIdentifiersAndStates(runId: String, expectedOutput: BusinessPartnerOutputDto) {
+        val actualOutputPage = gateClient.businessParters.getBusinessPartnersOutput(listOf(runId))
+        attachCall("POST", "/v7/output/business-partners/search", request = listOf(runId), response = actualOutputPage)
+        assertRepository.assertBusinessPartnerOutput(
+            actualOutputPage,
+            PageDto(1, 1, 0, 1, listOf(expectedOutput)),
+            assertRepository.outputTopLevelIdentifiersAndStatesComparisonConfig
+        )
     }
 
     /**

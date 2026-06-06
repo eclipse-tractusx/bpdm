@@ -1,0 +1,84 @@
+Feature: Output Reflects Golden Record Confidence Criteria
+
+  # This feature covers how a record's output reflects the confidence criteria of the golden record it was
+  # refined to. Confidence criteria reflect two independent signals: whether the owner submitted the data as
+  # their own company data (OwnerShared signal, set by sharing as own vs. third-party data) and whether the
+  # golden record process provider verified it against an external data source (Verified signal, set by
+  # refining with vs. without external verification). The following named levels are used throughout
+  # (timestamps are excluded from comparison):
+  #
+  #   NoConfidence         - neither signal is set
+  #   OwnerShared          - owner submitted as own company data; not externally verified
+  #   Verified             - externally verified; not submitted as own company data
+  #   VerifiedOwnerShared  - both signals are set
+  #
+  # Sites always carry OwnerShared confidence. For legal entities and addresses the level depends on the two
+  # signals and on whether the matched address is a legal address or an additional address. When the matched
+  # address is a legal address, the legal entity and the address share the same confidence level. When the
+  # matched address is an additional address, the legal entity always carries NoConfidence and the address is
+  # evaluated independently.
+
+  # -- Legal entity matched to legal address --
+
+  Scenario: Legal Entity And Legal Address Reflect NoConfidence When Neither Signal Is Set
+    When the sharing member shares third-party record "acme-record"
+    And the golden record process refines record "acme-record" to a legal entity without external verification
+    Then "acme-record" output reflects NoConfidence for its legal entity
+    And "acme-record" output reflects NoConfidence for its legal address
+
+  Scenario: Legal Entity And Legal Address Reflect OwnerShared When Shared As Own Company Data
+    When the sharing member shares own company record "acme-record"
+    And the golden record process refines record "acme-record" to a legal entity without external verification
+    Then "acme-record" output reflects OwnerShared confidence for its legal entity
+    And "acme-record" output reflects OwnerShared confidence for its legal address
+
+  Scenario: Legal Entity And Legal Address Reflect Verified When Externally Verified
+    When the sharing member shares third-party record "acme-record"
+    And the golden record process refines record "acme-record" to a legal entity with external verification
+    Then "acme-record" output reflects Verified confidence for its legal entity
+    And "acme-record" output reflects Verified confidence for its legal address
+
+  Scenario: Legal Entity And Legal Address Reflect VerifiedOwnerShared When Both Signals Are Set
+    When the sharing member shares own company record "acme-record"
+    And the golden record process refines record "acme-record" to a legal entity with external verification
+    Then "acme-record" output reflects VerifiedOwnerShared confidence for its legal entity
+    And "acme-record" output reflects VerifiedOwnerShared confidence for its legal address
+
+  # -- Additional address of legal entity --
+
+  Scenario: Legal Entity Reflects NoConfidence When The Matched Address Is An Additional Address
+    When the sharing member shares own company record "acme-address-record"
+    And the golden record process refines record "acme-address-record" to an additional address of a legal entity without external verification
+    Then "acme-address-record" output reflects NoConfidence for its legal entity
+    And "acme-address-record" output reflects OwnerShared confidence for its additional address
+
+  Scenario: Additional Address Confidence Is Independent Of The Legal Entity When Both Signals Are Set
+    When the sharing member shares own company record "acme-address-record"
+    And the golden record process refines record "acme-address-record" to an additional address of a legal entity with external verification
+    Then "acme-address-record" output reflects NoConfidence for its legal entity
+    And "acme-address-record" output reflects VerifiedOwnerShared confidence for its additional address
+
+  # -- Site --
+
+  Scenario: Site Always Reflects OwnerShared Confidence Regardless Of The Owner Signal
+    When the sharing member shares third-party record "acme-site-record"
+    And the golden record process refines record "acme-site-record" to a site
+    Then "acme-site-record" output reflects OwnerShared confidence for its site
+
+  # -- Site-based legal entity --
+
+  Scenario: Site Reflects OwnerShared Even When Legal Entity And Legal Address Reflect NoConfidence
+    When the sharing member shares third-party record "acme-site-record"
+    And the golden record process refines record "acme-site-record" to a site-based legal entity without external verification
+    Then "acme-site-record" output reflects OwnerShared confidence for its site
+    And "acme-site-record" output reflects NoConfidence for its legal entity
+    And "acme-site-record" output reflects NoConfidence for its legal address
+
+  # -- Additional address of site --
+
+  Scenario: Legal Entity Reflects NoConfidence And Site Reflects OwnerShared When The Matched Address Is An Additional Address Of A Site
+    When the sharing member shares own company record "acme-site-address-record"
+    And the golden record process refines record "acme-site-address-record" to an additional address of a site without external verification
+    Then "acme-site-address-record" output reflects OwnerShared confidence for its site
+    And "acme-site-address-record" output reflects NoConfidence for its legal entity
+    And "acme-site-address-record" output reflects OwnerShared confidence for its additional address

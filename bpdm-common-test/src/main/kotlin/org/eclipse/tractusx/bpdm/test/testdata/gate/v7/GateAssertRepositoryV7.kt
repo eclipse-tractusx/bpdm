@@ -128,6 +128,28 @@ class GateAssertRepositoryV7(
         .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
         .build()
 
+    /**
+     * Compares ONLY the record's top-level [BusinessPartnerOutputDto.identifiers] and
+     * [BusinessPartnerOutputDto.states]. These two fields surface the identifiers and states of the entity
+     * the record reflects, and which entity that is depends on the record type:
+     *  - legal entity record   -> the legal entity's identifiers and states
+     *  - site record           -> NO identifiers, the site's states
+     *  - additional address    -> the address's identifiers and states
+     *
+     * Everything else is ignored on purpose (the inverse of [outputMasterDataComparisonConfig]): descriptive
+     * master data, BPNs, the nested per-entity identifiers/states, roles, confidence criteria, relations,
+     * script variants and timestamps are covered by their own tests. Restricting the comparison to these two
+     * fields keeps the surfacing rule the single subject of these assertions.
+     */
+    val outputTopLevelIdentifiersAndStatesComparisonConfig: RecursiveComparisonConfiguration = RecursiveComparisonConfiguration.builder()
+        .withComparedFields(
+            BusinessPartnerOutputDto::identifiers.name,
+            BusinessPartnerOutputDto::states.name
+        )
+        .withComparatorForType(instantSecondsComparator, Instant::class.java)
+        .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
+        .build()
+
     fun assertBusinessPartnerInput(actual: Collection<BusinessPartnerInputDto>, expected: Collection<BusinessPartnerInputDto>) {
         Assertions.assertThat(actual.sortedBy { it.externalId }.map { it.sortContent() })
             .usingRecursiveComparison()
