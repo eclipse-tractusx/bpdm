@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.test.system.utils
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
+import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.GivenConfidence
@@ -85,6 +86,33 @@ class BusinessPartnerShareActions(
     ): LegalEntityWithLegalAddressVerboseDto {
         val state = context.records[recordId]!!
         val entityResult = testDataGenerator.buildLegalEntity(masterDataSeed, givenConfidence(state, verified))
+        resolveTask(recordId, entityResult.taskData.withGoldenRecordRequestIdentifiers(legalEntityLabel))
+        context.records[recordId] = state.copy(legalEntity = entityResult.legalEntity)
+        sharingStateWatcher.waitForCompletedState(recordId)
+        return entityResult.legalEntity
+    }
+
+    /**
+     * Refines a record into a legal entity exactly like the label overload above, but pins the legal entity's
+     * single script variant to [scriptCode] (on both the resulting golden record and the refinement task, so
+     * they stay consistent). This lets a scenario give the legal entity a known, distinct script code - needed
+     * when a later additional address of the same legal entity carries a different code and the merged output
+     * must show both. Returns the golden record so the caller can store it as the current expectation.
+     */
+    fun refineAsLegalEntity(
+        recordId: String,
+        masterDataSeed: String,
+        legalEntityLabel: String,
+        verified: Boolean,
+        scriptCode: String
+    ): LegalEntityWithLegalAddressVerboseDto {
+        val state = context.records[recordId]!!
+        val entityResult = testDataGenerator.buildLegalEntity(masterDataSeed, givenConfidence(state, verified)).let {
+            it.copy(
+                legalEntity = it.legalEntity.withScriptCode(scriptCode),
+                taskData = it.taskData.withLegalEntityScriptCode(scriptCode)
+            )
+        }
         resolveTask(recordId, entityResult.taskData.withGoldenRecordRequestIdentifiers(legalEntityLabel))
         context.records[recordId] = state.copy(legalEntity = entityResult.legalEntity)
         sharingStateWatcher.waitForCompletedState(recordId)
@@ -217,6 +245,48 @@ class BusinessPartnerShareActions(
         return addressResult.additionalLegalEntityAddressWithParent
     }
 
+    /**
+     * Refines a record into an additional address of an *existing* legal entity golden record - the one stored
+     * under [parentLegalEntityLabel] by an earlier refinement - instead of building a fresh parent. The parent
+     * keeps its own (already shared) script variant, and the new additional address gets its single script
+     * variant pinned to [scriptCode]. Resolving with the parent's request identifier makes the Pool match the
+     * existing parent and merely add the new address, so the parent's script variant is preserved. This is what
+     * the merge scenario needs: a legal entity carrying script code A and one of its additional addresses
+     * carrying a different script code B, whose merged output then shows both. Returns the address together with
+     * its parent so the caller can store it as the current expectation.
+     */
+    fun refineAsAdditionalAddressOfExistingLegalEntity(
+        recordId: String,
+        masterDataSeed: String,
+        additionalAddressLabel: String,
+        parentLegalEntityLabel: String,
+        scriptCode: String
+    ): AdditionalLegalEntityAddressWithParent {
+        val state = context.records[recordId]!!
+        val parentLegalEntity = context.legalEntities[parentLegalEntityLabel]
+            ?: error("legal entity '$parentLegalEntityLabel' must be defined by an earlier refinement step")
+        val addressResult = testDataGenerator
+            .buildAdditionalLegalEntityAddress(masterDataSeed, parentLegalEntity, givenConfidence(state, verified = false))
+            .let {
+                it.copy(
+                    additionalLegalEntityAddressWithParent = it.additionalLegalEntityAddressWithParent.copy(
+                        address = it.additionalLegalEntityAddressWithParent.address.withScriptCode(scriptCode)
+                    ),
+                    taskData = it.taskData.withAdditionalAddressScriptCode(scriptCode)
+                )
+            }
+        resolveTask(
+            recordId,
+            addressResult.taskData.withGoldenRecordRequestIdentifiers(parentLegalEntityLabel, additionalAddressLabel = additionalAddressLabel)
+        )
+        context.records[recordId] = state.copy(
+            legalEntity = addressResult.additionalLegalEntityAddressWithParent.legalEntity,
+            poolAddress = addressResult.additionalLegalEntityAddressWithParent.address
+        )
+        sharingStateWatcher.waitForCompletedState(recordId)
+        return addressResult.additionalLegalEntityAddressWithParent
+    }
+
     fun refineAsAdditionalAddressOfSite(recordId: String, verified: Boolean) {
         val state = context.records[recordId]!!
         val contentSeed = state.contentSeed!!
@@ -310,6 +380,31 @@ class BusinessPartnerShareActions(
             sharedByOwner = state.currentInput?.isOwnCompanyData ?: false,
             checkedByExternalDataSource = verified
         )
+
+    // -------------------------------------------------------------------------
+    // Script code pinning
+    //
+    // Each generated golden record carries a single script variant whose code is otherwise derived
+    // pseudo-randomly from the seed. These helpers rewrite only that code - on the Pool golden record DTO and
+    // on the matching orchestrator refinement task in lock-step - so a scenario can give two related entities
+    // distinct, known script codes. The derived variant values are intentionally left untouched: the
+    // assertions only require the task and the expected golden record to agree, and rewriting both together
+    // keeps them so.
+    // -------------------------------------------------------------------------
+
+    private fun LegalEntityWithLegalAddressVerboseDto.withScriptCode(scriptCode: String): LegalEntityWithLegalAddressVerboseDto =
+        copy(scriptVariants = scriptVariants.map { it.copy(scriptCode = scriptCode) })
+
+    private fun LogisticAddressVerboseDto.withScriptCode(scriptCode: String): LogisticAddressVerboseDto =
+        copy(scriptVariants = scriptVariants.map { it.copy(scriptCode = scriptCode) })
+
+    private fun BusinessPartner.withLegalEntityScriptCode(scriptCode: String): BusinessPartner =
+        copy(legalEntity = legalEntity.copy(scriptVariants = legalEntity.scriptVariants.map { it.copy(scriptCode = scriptCode) }))
+
+    private fun BusinessPartner.withAdditionalAddressScriptCode(scriptCode: String): BusinessPartner {
+        val address = additionalAddress ?: return this
+        return copy(additionalAddress = address.copy(scriptVariants = address.scriptVariants.map { it.copy(scriptCode = scriptCode) }))
+    }
 
     /**
      * Rewrites the golden record BPN references in the refinement task as BPN request identifiers derived from

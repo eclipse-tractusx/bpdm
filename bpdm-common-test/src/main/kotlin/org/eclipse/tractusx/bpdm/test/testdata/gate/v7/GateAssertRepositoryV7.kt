@@ -150,6 +150,22 @@ class GateAssertRepositoryV7(
         .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
         .build()
 
+    /**
+     * Compares ONLY the record's [BusinessPartnerOutputDto.scriptVariants]. This field reflects the merged
+     * script variants of the golden records the record was refined to (the matched entity and its parents),
+     * keyed by script code. Everything else - master data, identifiers, states, BPNs, confidence criteria,
+     * relations and timestamps - is ignored on purpose and covered by its own tests, so that script-variant
+     * assertions stay the single subject here. [sortContent] already sorts the variants by script code, so
+     * ordering does not affect the comparison.
+     */
+    val outputScriptVariantsComparisonConfig: RecursiveComparisonConfiguration = RecursiveComparisonConfiguration.builder()
+        .withComparedFields(
+            BusinessPartnerOutputDto::scriptVariants.name
+        )
+        .withComparatorForType(instantSecondsComparator, Instant::class.java)
+        .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
+        .build()
+
     fun assertBusinessPartnerInput(actual: Collection<BusinessPartnerInputDto>, expected: Collection<BusinessPartnerInputDto>) {
         Assertions.assertThat(actual.sortedBy { it.externalId }.map { it.sortContent() })
             .usingRecursiveComparison()
