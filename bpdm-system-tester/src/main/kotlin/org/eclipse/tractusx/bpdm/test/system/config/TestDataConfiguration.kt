@@ -27,6 +27,7 @@ import org.eclipse.tractusx.bpdm.test.system.utils.BusinessPartnerRelationTestDa
 import org.eclipse.tractusx.bpdm.test.system.utils.BusinessPartnerShareActions
 import org.eclipse.tractusx.bpdm.test.system.utils.ConfidenceAssertHelper
 import org.eclipse.tractusx.bpdm.test.system.utils.GateOutputFactory
+import org.eclipse.tractusx.bpdm.test.system.utils.GoldenRecordRelationAssertHelper
 import org.eclipse.tractusx.bpdm.test.system.utils.ShareOwnCompanyDataTestDataGenerator
 import org.eclipse.tractusx.bpdm.test.system.utils.SharingStateWatcher
 import org.eclipse.tractusx.bpdm.test.system.utils.StepUtils
@@ -138,7 +139,7 @@ class TestDataConfiguration {
             identifierTypes = listOf("EU_VAT_ID_DE", "DUNS_ID"),
             legalForms = listOf("SCE1", "SGST"),
             adminAreas = listOf("DE-BW", "DE-BY"),
-            scriptVariants = listOf("Latn", "Arab", "Hans", "Cyrl"),
+            scriptVariants = listOf("CHINESE_SIMPLIFIED", "CHINESE_TRADITIONAL", "KANJI", "HANGUL"),
             reasonCodes = listOf("REASON_CODE_1", "REASON_CODE_2"),
         )
     }
@@ -227,6 +228,14 @@ class TestDataConfiguration {
         jsonMapper: JsonMapper
     ): ConfidenceAssertHelper {
         return ConfidenceAssertHelper(gateClient, jsonMapper)
+    }
+
+    @Bean
+    fun goldenRecordRelationAssertHelper(
+        gateClient: GateClient,
+        jsonMapper: JsonMapper
+    ): GoldenRecordRelationAssertHelper {
+        return GoldenRecordRelationAssertHelper(gateClient, jsonMapper)
     }
 
     @Bean
