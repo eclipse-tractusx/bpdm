@@ -23,6 +23,7 @@ import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType as GateRelationType
@@ -76,6 +77,10 @@ class GoldenRecordRelationsInOutputStepDefs(
         private val logger = KotlinLogging.logger { }
 
         private val ADDRESS_RELATION_TYPES = setOf(GateRelationType.IsReplacedBy)
+
+        // A relocated address that became the headquarter may be a plain legal address or, for a site-based
+        // legal entity, the combined legal and site main address.
+        private val LEGAL_ADDRESS_TYPES = setOf(AddressType.LegalAddress, AddressType.LegalAndSiteMainAddress)
     }
 
     private val context: ScenarioContext get() = ScenarioContext.current()!!
@@ -127,13 +132,27 @@ class GoldenRecordRelationsInOutputStepDefs(
         // Attach the additional address to the legal entity golden record an earlier step already refined, so
         // both addresses share one legal entity - required for an IsReplacedBy relation between them.
         shareActions.upload(recordId, isOwnCompanyData = true)
-        shareActions.refineAsAdditionalAddressOfExistingLegalEntity(
+        val addressWithParent = shareActions.refineAsAdditionalAddressOfExistingLegalEntity(
             recordId,
             masterDataSeed = addressId,
             additionalAddressLabel = addressId,
             parentLegalEntityLabel = legalEntityId,
             scriptCode = "CHINESE_SIMPLIFIED"
         )
+        context.addressBpnByLabel[addressId] = addressWithParent.address.address.bpna
+    }
+
+    @Given("record {string} reflects legal entity {string} with legal address {string}")
+    fun `given record reflects legal entity with legal address`(recordId: String, legalEntityId: String, legalAddressId: String) {
+        logger.info {
+            "[$scenarioName] Given: record '$recordId' reflects legal entity '$legalEntityId' with legal address '$legalAddressId'"
+        }
+        // Like the plain legal entity Given, but the legal address is named so a later step can assert how its
+        // role changes (e.g. a headquarter relocation turning it into an additional address).
+        shareActions.upload(recordId, isOwnCompanyData = true)
+        val legalEntity = shareActions.refineAsLegalEntity(recordId, masterDataSeed = legalEntityId, legalEntityLabel = legalEntityId)
+        context.legalEntities[legalEntityId] = legalEntity
+        context.addressBpnByLabel[legalAddressId] = legalEntity.legalAddress.bpna
     }
 
     private fun shareAndRefineLegalEntity(recordId: String, legalEntityId: String) {
@@ -266,9 +285,29 @@ class GoldenRecordRelationsInOutputStepDefs(
         assertHelper.assertRelationOutputReflectsEstablished(relationId, context.relations[relationId]!!)
     }
 
+    @Then("record {string} reflects {string} as legal address of {string}")
+    fun `then record reflects address as legal address`(recordId: String, addressId: String, legalEntityId: String) {
+        logger.info { "[$scenarioName] Then: record '$recordId' reflects '$addressId' as legal address of '$legalEntityId'" }
+        assertHelper.assertRecordReflectsAddressAs(recordId, LEGAL_ADDRESS_TYPES)
+    }
+
+    @Then("record {string} reflects {string} as additional address of {string}")
+    fun `then record reflects address as additional address`(recordId: String, addressId: String, legalEntityId: String) {
+        logger.info { "[$scenarioName] Then: record '$recordId' reflects '$addressId' as additional address of '$legalEntityId'" }
+        assertHelper.assertRecordReflectsAddressAs(recordId, setOf(AddressType.AdditionalAddress))
+    }
+
     // -------------------------------------------------------------------------
     // Private helpers
     // -------------------------------------------------------------------------
+
+    private fun addressBpnOf(addressId: String): String =
+        context.addressBpnByLabel[addressId]
+            ?: error("address '$addressId' must be named by an earlier refinement step")
+
+    private fun bpnlOf(legalEntityId: String): String =
+        context.legalEntities[legalEntityId]?.header?.bpnl
+            ?: error("legal entity '$legalEntityId' must be defined by an earlier refinement step")
 
     private fun goldenRecordBpnOf(recordId: String, isAddressRelation: Boolean): String {
         val runId = context.runId(recordId)

@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.test.system.utils
 
 import org.assertj.core.api.Assertions.assertThat
+import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGoldenRecordRelationTypeDto
@@ -119,6 +120,17 @@ class GoldenRecordRelationAssertHelper(
         assertThat(output.reasonCode)
             .describedAs("relation output of '%s' must reflect the established reason code", relationId)
             .isEqualTo(relation.submittedEntry.reasonCode)
+    }
+
+    fun assertRecordReflectsAddressAs(
+        recordId: String,
+        expectedAddressTypes: Set<AddressType>
+    ) {
+        val output = fetchOutput(recordId)
+
+        assertThat(output.address.addressType)
+            .describedAs("address output of '%s' must be classified as one of %s", recordId, expectedAddressTypes)
+            .isIn(expectedAddressTypes)
     }
 
     private fun toGateType(relation: RelationState): RelationType = relation.submittedEntry.relationType

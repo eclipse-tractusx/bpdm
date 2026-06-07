@@ -49,6 +49,9 @@ class ScenarioContext(val scenarioName: String, val scenarioSuffix: String, time
     val sites: MutableMap<String, SiteWithParent> = mutableMapOf()
     val additionalSiteAddresses: MutableMap<String, AdditionalSiteAddressWithParent> = mutableMapOf()
     val additionalLegalEntityAddresses: MutableMap<String, AdditionalLegalEntityAddressWithParent> = mutableMapOf()
+    // BPNA of an address remembered under the label a scenario refers to it by, so an assertion can name a
+    // specific address (e.g. the relocation source/target) independent of how the record was refined.
+    val addressBpnByLabel: MutableMap<String, String> = mutableMapOf()
     val taskData: MutableMap<String, BusinessPartner> = mutableMapOf()
     val inputData: MutableMap<String, BusinessPartnerInputRequest> = mutableMapOf()
     val outputData: MutableMap<String, BusinessPartnerOutputDto> = mutableMapOf()
