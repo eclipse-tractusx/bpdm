@@ -260,6 +260,12 @@ class GoldenRecordRelationsInOutputStepDefs(
         assertHelper.assertAddressRelationReflected(recordId, context.relations[relationId]!!)
     }
 
+    @Then("relation {string} output reflects the established golden record relation")
+    fun `then relation output reflects established relation`(relationId: String) {
+        logger.info { "[$scenarioName] Then: relation '$relationId' output reflects the established golden record relation" }
+        assertHelper.assertRelationOutputReflectsEstablished(relationId, context.relations[relationId]!!)
+    }
+
     // -------------------------------------------------------------------------
     // Private helpers
     // -------------------------------------------------------------------------

@@ -20,10 +20,13 @@
 package org.eclipse.tractusx.bpdm.test.system.utils
 
 import org.assertj.core.api.Assertions.assertThat
+import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGoldenRecordRelationTypeDto
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGoldenRecordRelationTypeDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
+import org.eclipse.tractusx.bpdm.gate.api.model.SharableRelationType
+import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationOutputSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
 import tools.jackson.databind.json.JsonMapper
 
@@ -81,6 +84,41 @@ class GoldenRecordRelationAssertHelper(
         assertThat(output.address.goldenRecordRelations.map { setOf(it.sourceBpn, it.targetBpn) to it.relationType })
             .describedAs("address output of '%s' must reflect a %s relation between BPNs %s", recordId, expectedType, expectedBpns)
             .contains(expectedBpns to expectedType)
+    }
+
+    /**
+     * Asserts the relation's own Gate output reflects the golden record relation [relation] the establish step
+     * resolved in the Pool: the sharing member can read back, under the relation's external id, the established
+     * relation type, the connected golden record BPNs, the validity periods and the reason code.
+     *
+     * The BPN pair is compared as a set so the assertion stays independent of the relation's direction, which
+     * matches the convention used for the record outputs and keeps it robust against the address-type swap an
+     * IsReplacedBy relation triggers.
+     */
+    fun assertRelationOutputReflectsEstablished(relationId: String, relation: RelationState) {
+        val runId = context.runId(relationId)
+        val expectedType = SharableRelationType.valueOf(toGateType(relation).name)
+        val expectedBpns = resolvedBpnPair(relation)
+
+        val searchRequest = RelationOutputSearchRequest(externalIds = listOf(runId))
+        val outputPage = gateClient.relationOutput.postSearch(searchRequest, PaginationRequest())
+        attachApiCall("POST", "/v7/output/relations/search", searchRequest, outputPage)
+
+        val output = outputPage.content.singleOrNull()
+            ?: error("relation '$relationId' must have exactly one output, but found ${outputPage.content.size}")
+
+        assertThat(output.relationType)
+            .describedAs("relation output of '%s' must be of the established golden record type", relationId)
+            .isEqualTo(expectedType)
+        assertThat(setOf(output.sourceBpn, output.targetBpn))
+            .describedAs("relation output of '%s' must connect the established golden record BPNs %s", relationId, expectedBpns)
+            .isEqualTo(expectedBpns)
+        assertThat(output.validityPeriods)
+            .describedAs("relation output of '%s' must reflect the established validity periods", relationId)
+            .containsExactlyInAnyOrderElementsOf(relation.submittedEntry.validityPeriods)
+        assertThat(output.reasonCode)
+            .describedAs("relation output of '%s' must reflect the established reason code", relationId)
+            .isEqualTo(relation.submittedEntry.reasonCode)
     }
 
     private fun toGateType(relation: RelationState): RelationType = relation.submittedEntry.relationType
