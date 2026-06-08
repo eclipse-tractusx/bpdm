@@ -38,6 +38,7 @@ import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.eclipse.tractusx.bpdm.gate.util.BusinessPartnerComparisonUtil
 import org.eclipse.tractusx.bpdm.gate.util.BusinessPartnerCopyUtil
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.jpa.domain.Specification
@@ -135,10 +136,17 @@ class BusinessPartnerService(
         }
 
         if (hasChanges && shouldUpdate) {
-            changelogRepository.save(ChangelogEntryDb(sharingState.externalId, sharingState.tenantBpnl, changeType, stage, GoldenRecordType.BusinessPartner))
-
             copyUtil.copyValues(upsertData, partnerToUpsert)
-            businessPartnerRepository.save(partnerToUpsert)
+            try {
+                businessPartnerRepository.save(partnerToUpsert)
+            } catch (exception: DataIntegrityViolationException) {
+                val existingPartnerAfterConflict = businessPartnerRepository.findBySharingStateAndStage(sharingState, stage)
+                    ?: throw exception
+
+                return upsertFromEntity(existingPartnerAfterConflict, upsertData)
+            }
+
+            changelogRepository.save(ChangelogEntryDb(sharingState.externalId, sharingState.tenantBpnl, changeType, stage, GoldenRecordType.BusinessPartner))
         }
 
         return UpsertResult(hasChanges, shouldUpdate, changeType, partnerToUpsert)

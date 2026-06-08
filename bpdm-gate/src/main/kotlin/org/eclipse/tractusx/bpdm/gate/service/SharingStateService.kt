@@ -37,6 +37,7 @@ import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository.Specs.by
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository.Specs.byUpdatedAfter
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.jpa.domain.Specification
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.time.LocalDateTime
@@ -168,14 +169,17 @@ class SharingStateService(
 
 
     private fun getOrCreate(externalIds: List<String>, ownerBpnl: String?): List<SharingStateDb> {
-        val sharingStates = stateRepository.findByExternalIdInAndTenantBpnl(externalIds, ownerBpnl)
+        val distinctExternalIds = externalIds.distinct()
+        val sharingStates = stateRepository.findByExternalIdInAndTenantBpnl(distinctExternalIds, ownerBpnl)
         val sharingStatesByExternalId = sharingStates.associateBy { it.externalId }
+        val newSharingStatesByExternalId = mutableMapOf<String, SharingStateDb>()
 
-        return externalIds.map { externalId ->
+        val statesByExternalId = distinctExternalIds.associateWith { externalId ->
             sharingStatesByExternalId[externalId]
-                ?: setInitial(
-                    SharingStateDb(
-                        externalId,
+                ?: newSharingStatesByExternalId[externalId]
+                ?: run {
+                    val newState = SharingStateDb(
+                        externalId = externalId,
                         sharingStateType = SharingStateType.Ready,
                         orchestratorRecordId = null,
                         sharingErrorCode = null,
@@ -185,7 +189,17 @@ class SharingStateService(
                         isGoldenRecordCounted = null,
                         syncedIsGoldenRecordCounted = null
                     )
-                )
+                    val persistedState = try {
+                        setInitial(newState)
+                    } catch (_: DataIntegrityViolationException) {
+                        stateRepository.findByExternalIdAndTenantBpnl(externalId, ownerBpnl).single()
+                    }
+
+                    newSharingStatesByExternalId[externalId] = persistedState
+                    persistedState
+                }
         }
+
+        return externalIds.map { statesByExternalId[it]!! }
     }
 }
