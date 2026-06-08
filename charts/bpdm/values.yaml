@@ -18,7 +18,8 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################################
 
-fullnameOverride: bpdm
+nameOverride: ""
+fullnameOverride: ""
 
 clients:
   admin:
@@ -52,75 +53,49 @@ clients:
 
 bpdm-gate:
   enabled: true
-  applicationConfig:
-    bpdm:
-      datasource:
-        host: bpdm-postgres
-      security:
-        auth-server-url: "http://bpdm-keycloak"
-  applicationSecrets:
-    spring:
-      datasource:
-        # Change this password for production
-        password: bpdm
-  postgres:
-    enabled: false
+  externalApplicationConfig:
+    - name: bpdm-postgres-connection-config
+    - name: bpdm-keycloak-connection-config
 
 bpdm-pool:
   enabled: true
-  applicationConfig:
-    bpdm:
-      datasource:
-        host: bpdm-postgres
-      security:
-        auth-server-url: "http://bpdm-keycloak"
-        realm: BPDM
-  applicationSecrets:
-    spring:
-      datasource:
-        # Change this password for production
-        password: bpdm
+  externalApplicationConfig:
+    - name: bpdm-postgres-connection-config
+    - name: bpdm-keycloak-connection-config
 
 bpdm-cleaning-service-dummy:
   enabled: true
-  applicationConfig:
-    bpdm:
-      client:
-        orchestrator:
-          provider:
-            issuer-uri: http://bpdm-keycloak/realms/BPDM
+  externalApplicationConfig:
+    - name: bpdm-keycloak-connection-config
 
 bpdm-orchestrator:
   enabled: true
-  applicationConfig:
-    bpdm:
-      datasource:
-        host: bpdm-postgres
-      security:
-        auth-server-url: "http://bpdm-keycloak"
-  applicationSecrets:
-    spring:
-      datasource:
-        # Change this password for production
-        password: bpdm
-  postgres:
-    enabled: false
+  externalApplicationConfig:
+    - name: bpdm-postgres-connection-config
+    - name: bpdm-keycloak-connection-config
 
+# Bundled Postgres database.
+# When enabled, a "<fullname>-postgres-connection-config" ConfigMap is also generated and applied
+# to the BPDM applications (via their externalApplicationConfig). Its datasource host is derived
+# from the values below, so the apps automatically point at this Postgres. Disabling postgres also
+# removes that ConfigMap (and the apps must then be configured against an external database).
 postgres:
   enabled: true
-  fullnameOverride: bpdm-postgres
-  auth:
-    database: bpdm
-    username: bpdm
-    password: bpdm
+  nameOverride: bpdm-postgres
   customUser:
-    database: keycloak
-    name: keycloak
-    password: keycloak-db-password
+    database: bpdm
+    name: bpdm
+    # Change this password for production
+    password: bpdm
 
+# Bundled Keycloak.
+# When enabled, a "<fullname>-keycloak-connection-config" ConfigMap is also generated and applied
+# to the BPDM applications (via their externalApplicationConfig). Its auth-server-url / issuer-uri
+# are derived from the values below, so the apps automatically point at this Keycloak. Disabling
+# keycloak also removes that ConfigMap (and the apps must then be configured against an external IdP).
 keycloak:
   enabled: true
-  fullnameOverride: bpdm-keycloak
+  nameOverride: bpdm-keycloak
   keycloak:
     adminPassword: admin
     production: false
@@ -129,15 +104,9 @@ keycloak:
     existingSecret: bpdm-realm
   service:
     httpPort: 80
-  database:
-    type: "postgres"
-    host: "bpdm-postgres"
-    port: "5432"
-    name: "keycloak"
-    username: "keycloak"
-    password: "keycloak-db-password"
   postgres:
-    enabled: false
+    enabled: true
+    nameOverride: bpdm-keycloak-postgres
   mariadb:
     enabled: false
 

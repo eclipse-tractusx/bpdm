@@ -19,6 +19,7 @@
 ################################################################################
 
 {{- define "bpdm-common.deployment" -}}
+{{- $externalConfigs := include "bpdm.externalApplicationConfig.names" . | fromJsonArray -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -58,7 +59,10 @@ spec:
             - name: SPRING_PROFILES_ACTIVE
               value: {{ .Values.springProfiles | join ","  }}
             - name: SPRING_CONFIG_IMPORT
-              value: "/etc/conf/deployment.yml,/etc/conf/secrets.yml"
+              {{- $imports := list -}}
+              {{- range $i, $name := $externalConfigs }}{{ $imports = append $imports (printf "/etc/conf/application-%d.yml" $i) }}{{ end }}
+              {{- $imports = concat $imports (list "/etc/conf/deployment.yml" "/etc/conf/secrets.yml") }}
+              value: {{ join "," $imports | quote }}
           ports:
             - name: http
               containerPort: {{ .Values.service.targetPort }}
@@ -108,6 +112,13 @@ spec:
         - name: config
           projected:
             sources:
+              {{- range $i, $name := $externalConfigs }}
+              - configMap:
+                  name: {{ $name }}
+                  items:
+                    - key: application.yml
+                      path: application-{{ $i }}.yml
+              {{- end }}
               - configMap:
                   name: {{ include "bpdm.fullname" . }}
               - secret:

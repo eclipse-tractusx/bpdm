@@ -124,6 +124,16 @@ startupProbe:
   successThreshold: 1
 
 
+# List of existing ConfigMaps (managed outside this chart), each containing an 'application.yml',
+# loaded as additional, lower-precedence application config sources. Entries are applied in list
+# order (later entries override earlier ones); the chart's own applicationConfig still wins.
+externalApplicationConfig: []
+  # - # Full name of the existing ConfigMap. When set, it is used as-is.
+  #   fullname:
+  #   # Name of the existing ConfigMap. When 'fullname' is empty, the actual ConfigMap name is
+  #   # calculated from the release name and this value (like the chart fullname calculation).
+  #   name:
+
 # Used to overwrite the default property values of the application configuration
 applicationConfig:
 
