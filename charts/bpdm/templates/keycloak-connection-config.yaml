@@ -18,23 +18,24 @@
 ## SPDX-License-Identifier: Apache-2.0
 #################################################################################
 
-# Coupled to the bundled Keycloak dependency on purpose: this ConfigMap only describes how to reach
+# Coupled to the bundled Keycloak dependency on purpose: this Secret only describes how to reach
 # that Keycloak, so its lifecycle follows it. Enabling keycloak generates this connection config
 # (auth-server-url / issuer-uri derived from the keycloak values) and applies it to the BPDM
-# applications via their externalApplicationConfig; disabling keycloak removes it. There is no
-# separate toggle.
+# applications via their externalApplicationConfig; disabling keycloak removes it. The URLs are not
+# sensitive, but it is a Secret for uniformity with the other connection configs. No separate toggle.
 {{- if (.Values.keycloak | default dict).enabled }}
 {{- $keycloakHost := include "bpdm.dependencyFullname" (list . .Values.keycloak "keycloak") }}
 {{- $keycloakPort := ((.Values.keycloak | default dict).service | default dict).httpPort | default 80 }}
 {{- $keycloakUrl := printf "http://%s" $keycloakHost }}
 {{- if ne ($keycloakPort | toString) "80" }}{{- $keycloakUrl = printf "%s:%v" $keycloakUrl $keycloakPort }}{{- end }}
 apiVersion: v1
-kind: ConfigMap
+kind: Secret
 metadata:
   name: {{ include "bpdm.fullname" . }}-keycloak-connection-config
   labels:
     {{- include "bpdm.labels" . | nindent 4 }}
-data:
+type: Opaque
+stringData:
   application.yml: |-
     bpdm:
       security:

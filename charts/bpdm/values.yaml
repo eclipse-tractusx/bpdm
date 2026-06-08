@@ -75,24 +75,34 @@ bpdm-orchestrator:
     - name: bpdm-keycloak-connection-config
 
 # Bundled Postgres database.
-# When enabled, a "<fullname>-postgres-connection-config" ConfigMap is also generated and applied
-# to the BPDM applications (via their externalApplicationConfig). Its datasource host is derived
-# from the values below, so the apps automatically point at this Postgres. Disabling postgres also
-# removes that ConfigMap (and the apps must then be configured against an external database).
+# When enabled, a "<fullname>-postgres-connection-config" Secret is also generated and applied to the
+# BPDM applications (via their externalApplicationConfig). That umbrella-managed Secret is also the
+# DB user source for this dependency: customUser.existingSecret below points the postgres chart at it
+# (instead of an inline password), so a single Secret feeds both the database and the applications.
+# Disabling postgres removes that Secret (and the apps must then be configured against an external DB).
 postgres:
   enabled: true
   nameOverride: bpdm-postgres
   customUser:
-    database: bpdm
     name: bpdm
-    # Change this password for production
-    password: bpdm
+    database: bpdm
+    # password: optional. When set, that fixed password is used. When left unset, a password is
+    #   generated once and preserved across upgrades in the "<fullname>-postgres-connection-config"
+    #   Secret (it never lives in these values). Set it to pin a known password instead.
+    # password: bpdm
+    # The DB user is created from the umbrella-managed connection-config Secret rather than from an
+    # inline password. The value is a template so it resolves to the same name the apps reference.
+    existingSecret: '{{ include "bpdm.toReleaseName" (list . "bpdm-postgres-connection-config") }}'
+    secretKeys:
+      name: username
+      password: password
+      database: database
 
 # Bundled Keycloak.
-# When enabled, a "<fullname>-keycloak-connection-config" ConfigMap is also generated and applied
-# to the BPDM applications (via their externalApplicationConfig). Its auth-server-url / issuer-uri
-# are derived from the values below, so the apps automatically point at this Keycloak. Disabling
-# keycloak also removes that ConfigMap (and the apps must then be configured against an external IdP).
+# When enabled, a "<fullname>-keycloak-connection-config" Secret is also generated and applied to
+# the BPDM applications (via their externalApplicationConfig). Its auth-server-url / issuer-uri are
+# derived from the values below, so the apps automatically point at this Keycloak. Disabling keycloak
+# also removes that Secret (and the apps must then be configured against an external IdP).
 keycloak:
   enabled: true
   nameOverride: bpdm-keycloak

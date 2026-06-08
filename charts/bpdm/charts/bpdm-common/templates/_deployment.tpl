@@ -113,7 +113,7 @@ spec:
           projected:
             sources:
               {{- range $i, $name := $externalConfigs }}
-              - configMap:
+              - secret:
                   name: {{ $name }}
                   items:
                     - key: application.yml

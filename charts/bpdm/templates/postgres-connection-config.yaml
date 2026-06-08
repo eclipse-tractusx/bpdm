@@ -18,21 +18,51 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################################
 
-# Coupled to the bundled Postgres dependency on purpose: this ConfigMap only describes how to reach
-# that Postgres, so its lifecycle follows it. Enabling postgres generates this connection config
-# (datasource host derived from the postgres values) and applies it to the BPDM applications via
-# their externalApplicationConfig; disabling postgres removes it. There is no separate toggle.
+# Coupled to the bundled Postgres dependency on purpose. This Secret is the single source of truth
+# for the BPDM database user and carries two kinds of data:
+#   * discrete username/password/database keys, which the postgres dependency consumes as its custom
+#     user (postgres.customUser.existingSecret + secretKeys), and
+#   * an application.yml entry, which the BPDM applications mount via their externalApplicationConfig.
+# The password is differentiated between two cases:
+#   * postgres.customUser.password set    -> that value is used directly, and
+#   * postgres.customUser.password unset  -> a password is generated once and then preserved across
+#     upgrades by looking up the already-deployed Secret (so it never lives in values and is stable).
+# Computing it in this single template guarantees the postgres user and the apps get the same value.
+# Enabling postgres generates this Secret; disabling postgres removes it. There is no separate toggle.
 {{- if (.Values.postgres | default dict).enabled }}
+{{- $customUser := (.Values.postgres | default dict).customUser | default dict }}
 {{- $postgresHost := include "bpdm.dependencyFullname" (list . .Values.postgres "postgres") }}
+{{- $secretName := printf "%s-postgres-connection-config" (include "bpdm.fullname" .) }}
+{{- $username := $customUser.name | default "bpdm" }}
+{{- $database := $customUser.database | default $username }}
+{{- $password := $customUser.password | default "" | toString }}
+{{- if not $password }}
+{{-   $existing := lookup "v1" "Secret" .Release.Namespace $secretName }}
+{{-   if and $existing (hasKey ($existing.data | default dict) "password") }}
+{{-     $password = index $existing.data "password" | b64dec }}
+{{-   else }}
+{{-     $password = randAlphaNum 32 }}
+{{-   end }}
+{{- end }}
 apiVersion: v1
-kind: ConfigMap
+kind: Secret
 metadata:
-  name: {{ include "bpdm.fullname" . }}-postgres-connection-config
+  name: {{ $secretName }}
   labels:
     {{- include "bpdm.labels" . | nindent 4 }}
-data:
+type: Opaque
+stringData:
+  # Discrete keys consumed by the postgres dependency (customUser.existingSecret + secretKeys).
+  username: {{ $username | quote }}
+  password: {{ $password | quote }}
+  database: {{ $database | quote }}
+  # Spring config mounted by the BPDM applications via their externalApplicationConfig.
   application.yml: |-
     bpdm:
       datasource:
         host: {{ $postgresHost }}
+    spring:
+      datasource:
+        username: {{ $username | quote }}
+        password: {{ $password | quote }}
 {{- end }}
