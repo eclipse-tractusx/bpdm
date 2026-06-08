@@ -135,10 +135,10 @@ class BusinessPartnerService(
         }
 
         if (hasChanges && shouldUpdate) {
-                changelogRepository.save(ChangelogEntryDb(sharingState.externalId, sharingState.tenantBpnl, changeType, stage, GoldenRecordType.BusinessPartner))
+            changelogRepository.save(ChangelogEntryDb(sharingState.externalId, sharingState.tenantBpnl, changeType, stage, GoldenRecordType.BusinessPartner))
 
-                copyUtil.copyValues(upsertData, partnerToUpsert)
-                businessPartnerRepository.save(partnerToUpsert)
+            copyUtil.copyValues(upsertData, partnerToUpsert)
+            businessPartnerRepository.save(partnerToUpsert)
         }
 
         return UpsertResult(hasChanges, shouldUpdate, changeType, partnerToUpsert)

@@ -68,7 +68,6 @@ class SharingStateService(
             byUpdatedAfter(updatedAfter)
         )
         val sharingStatePage = stateRepository.findAll(spec, pageRequest)
-
         return sharingStatePage.toPageDto {
             SharingStateDto(
                 externalId = it.externalId,

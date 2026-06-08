@@ -20,6 +20,10 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM Gate: Golden record relations to business partner output [#1630](https://github.com/eclipse-tractusx/bpdm/issues/1630)
 - BPDM Pool: Seed default Business Partner Relation Reason Code via Flyway migration [#1679](https://github.com/eclipse-tractusx/bpdm/issues/1679)
 
+### Added
+
+- BPDM Gate: Migration script to enforce unique constraints to fix parallel inserts with same external id being accepted in Gate [#1546](https://github.com/eclipse-tractusx/bpdm/issues/1546)
+
 ### Changed
 
 - BPDM Gate: Fix V7 relation output changelog always showing "UPDATE" type even if the relation output has been created [#1665](https://github.com/eclipse-tractusx/bpdm/issues/1665)
