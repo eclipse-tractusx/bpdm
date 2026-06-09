@@ -121,7 +121,6 @@ keycloak:
   enabled: true
   nameOverride: bpdm-keycloak
   keycloak:
-    adminPassword: admin   # dev default - override in production
     production: false      # dev mode: relaxes the TLS/hostname requirements; do not use in production
   realm:
     # Enables `--import-realm`. The realm Secret itself is mounted via extraVolumes below, NOT via
