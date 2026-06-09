@@ -18,10 +18,4 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################################
 
-{{ include "bpdm-common.configMap" (dict "context" $ "defaultValues" "bpdm-pool.configmapValues") -}}
-{{- define "bpdm-pool.configmapValues" -}}
-bpdm:
-  client:
-    orchestrator:
-      base-url: http://{{ include "bpdm.toReleaseName" (list . "bpdm-orchestrator") }}
-{{- end -}}
+{{ include "bpdm-common.configMap" . -}}

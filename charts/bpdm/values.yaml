@@ -18,35 +18,36 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################################
 
-clients:
-  admin:
-    secret: "**********"
-  gate:
-    secret: "**********"
-  pool:
-    secret: "**********"
-  orchestrator:
-    secret: "**********"
-  cleaningDummy:
-    secret: "**********"
-  gateInputConsumer:
-    secret: "**********"
-  gateInputManager:
-    secret: "**********"
-  gateOutputConsumer:
-    secret: "**********"
-  participant:
-    secret: "**********"
-  sharingMember:
-    secret: "**********"
-  taskCreator:
-    secret: "**********"
-  refinerClean:
-    secret: "**********"
-  refinerCleanAndSync:
-    secret: "**********"
-  refinerPoolSync:
-    secret: "**********"
+bpdmRealm:
+  clients:
+    admin:
+      secret: "**********"
+    gate:
+      secret: "**********"
+    pool:
+      secret: "**********"
+    orchestrator:
+      secret: "**********"
+    cleaningDummy:
+      secret: "**********"
+    gateInputConsumer:
+      secret: "**********"
+    gateInputManager:
+      secret: "**********"
+    gateOutputConsumer:
+      secret: "**********"
+    participant:
+      secret: "**********"
+    sharingMember:
+      secret: "**********"
+    taskCreator:
+      secret: "**********"
+    refinerClean:
+      secret: "**********"
+    refinerCleanAndSync:
+      secret: "**********"
+    refinerPoolSync:
+      secret: "**********"
 
 # externalApplicationConfig entries are fully qualified names of existing Secrets, each carrying an
 # `application.yml` key that is mounted as a low-precedence Spring config import. Entries are rendered

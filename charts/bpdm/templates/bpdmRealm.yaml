@@ -1,3 +1,4 @@
+{{- if .Values.keycloak.enabled }}
 apiVersion: v1
 kind: Secret
 metadata:
@@ -1510,7 +1511,7 @@ stringData:
           "enabled": true,
           "alwaysDisplayInConsole": false,
           "clientAuthenticatorType": "client-secret",
-          "secret": "{{ .Values.clients.admin.secret }}",
+          "secret": "{{ .Values.bpdmRealm.clients.admin.secret }}",
           "redirectUris": [
             "/*"
           ],
@@ -1613,7 +1614,7 @@ stringData:
           "enabled": true,
           "alwaysDisplayInConsole": false,
           "clientAuthenticatorType": "client-secret",
-          "secret": "{{ .Values.clients.cleaningDummy.secret }}",
+          "secret": "{{ .Values.bpdmRealm.clients.cleaningDummy.secret }}",
           "redirectUris": [
             "/*"
           ],
@@ -1717,7 +1718,7 @@ stringData:
           "enabled": true,
           "alwaysDisplayInConsole": false,
           "clientAuthenticatorType": "client-secret",
-          "secret": "{{ .Values.clients.gate.secret }}",
+          "secret": "{{ .Values.bpdmRealm.clients.gate.secret }}",
           "redirectUris": [
             "/*"
           ],
@@ -1821,7 +1822,7 @@ stringData:
           "enabled": true,
           "alwaysDisplayInConsole": false,
           "clientAuthenticatorType": "client-secret",
-          "secret": "{{ .Values.clients.gateInputConsumer.secret }}",
+          "secret": "{{ .Values.bpdmRealm.clients.gateInputConsumer.secret }}",
           "redirectUris": [
             "/*"
           ],
@@ -1920,7 +1921,7 @@ stringData:
           "enabled": true,
           "alwaysDisplayInConsole": false,
           "clientAuthenticatorType": "client-secret",
-          "secret": "{{ .Values.clients.gateInputManager.secret }}",
+          "secret": "{{ .Values.bpdmRealm.clients.gateInputManager.secret }}",
           "redirectUris": [
             "/*"
           ],
@@ -2019,7 +2020,7 @@ stringData:
           "enabled": true,
           "alwaysDisplayInConsole": false,
           "clientAuthenticatorType": "client-secret",
-          "secret": "{{ .Values.clients.gateOutputConsumer.secret }}",
+          "secret": "{{ .Values.bpdmRealm.clients.gateOutputConsumer.secret }}",
           "redirectUris": [
             "/*"
           ],
@@ -2118,7 +2119,7 @@ stringData:
           "enabled": true,
           "alwaysDisplayInConsole": false,
           "clientAuthenticatorType": "client-secret",
-          "secret": "{{ .Values.clients.orchestrator.secret }}",
+          "secret": "{{ .Values.bpdmRealm.clients.orchestrator.secret }}",
           "redirectUris": [
             "*"
           ],
@@ -2222,7 +2223,7 @@ stringData:
           "enabled": true,
           "alwaysDisplayInConsole": false,
           "clientAuthenticatorType": "client-secret",
-          "secret": "{{ .Values.clients.participant.secret }}",
+          "secret": "{{ .Values.bpdmRealm.clients.participant.secret }}",
           "redirectUris": [
             "/*"
           ],
@@ -2321,7 +2322,7 @@ stringData:
           "enabled": true,
           "alwaysDisplayInConsole": false,
           "clientAuthenticatorType": "client-secret",
-          "secret": "{{ .Values.clients.pool.secret }}",
+          "secret": "{{ .Values.bpdmRealm.clients.pool.secret }}",
           "redirectUris": [
             "/*"
           ],
@@ -2424,7 +2425,7 @@ stringData:
           "enabled": true,
           "alwaysDisplayInConsole": false,
           "clientAuthenticatorType": "client-secret",
-          "secret": "{{ .Values.clients.refinerClean.secret }}",
+          "secret": "{{ .Values.bpdmRealm.clients.refinerClean.secret }}",
           "redirectUris": [
             "/*"
           ],
@@ -2523,7 +2524,7 @@ stringData:
           "enabled": true,
           "alwaysDisplayInConsole": false,
           "clientAuthenticatorType": "client-secret",
-          "secret": "{{ .Values.clients.refinerCleanAndSync.secret }}",
+          "secret": "{{ .Values.bpdmRealm.clients.refinerCleanAndSync.secret }}",
           "redirectUris": [
             "/*"
           ],
@@ -2622,7 +2623,7 @@ stringData:
           "enabled": true,
           "alwaysDisplayInConsole": false,
           "clientAuthenticatorType": "client-secret",
-          "secret": "{{ .Values.clients.refinerPoolSync.secret }}",
+          "secret": "{{ .Values.bpdmRealm.clients.refinerPoolSync.secret }}",
           "redirectUris": [
             "/*"
           ],
@@ -2721,7 +2722,7 @@ stringData:
           "enabled": true,
           "alwaysDisplayInConsole": false,
           "clientAuthenticatorType": "client-secret",
-          "secret": "{{ .Values.clients.sharingMember.secret }}",
+          "secret": "{{ .Values.bpdmRealm.clients.sharingMember.secret }}",
           "redirectUris": [
             "/*"
           ],
@@ -2821,7 +2822,7 @@ stringData:
           "enabled": true,
           "alwaysDisplayInConsole": false,
           "clientAuthenticatorType": "client-secret",
-          "secret": "{{ .Values.clients.taskCreator.secret }}",
+          "secret": "{{ .Values.bpdmRealm.clients.taskCreator.secret }}",
           "redirectUris": [
             "/*"
           ],
@@ -4489,3 +4490,4 @@ stringData:
         "policies": []
       }
     }
+{{- end }}

@@ -149,33 +149,3 @@ existing Secret; it is rendered through `tpl` so it may reference helpers such a
 {{- end -}}
 {{- $names | toJson -}}
 {{- end -}}
-
-{{- /*
-Merges three templates one after another in the following order:
-valuesOverride -overrides-> (defaultOverride -overrides-> baseTemplate)
-
-Usage: include "bpdm-common.threeWayMerge" ("context" $ "baseTemplate" "templateName" "defaultOverride" "templateName" "valuesOverride" "templateName")
-*/}}
-{{- define "bpdm-common.threeWayMerge" -}}
-    {{- if .defaultOverride -}}
-        {{- $ := .context -}}
-        {{- $baseTemplateDict := fromYaml (include .baseTemplate $) | default (dict ) -}}
-        {{- $defaultOverrideDict := fromYaml (include .defaultOverride $) | default (dict )  -}}
-        {{- $valuesOverrideDict:= fromYaml (include .valuesOverride $) | default (dict )  -}}
-        {{- $finalDict :=  merge $valuesOverrideDict $defaultOverrideDict $baseTemplateDict -}}
-        {{- toYaml $finalDict -}}
-    {{- else -}}
-        {{- include "bpdm-common.merge" (dict "context" .context "baseTemplate" .baseTemplate "override" .valuesOverride) }}
-    {{- end -}}
-{{- end -}}
-
-{{- define "bpdm-common.merge" -}}
-    {{- $ := .context -}}
-    {{- $baseTemplateDict := fromYaml (include .baseTemplate $) | default (dict ) -}}
-    {{- $overrideDict := fromYaml (include .override $) | default (dict )  -}}
-    {{- $finalDict :=  merge $overrideDict $baseTemplateDict -}}
-    {{- toYaml $finalDict -}}
-{{- end -}}
-
-{{- define "bpdm-common.empty" -}}
-{{- end -}}

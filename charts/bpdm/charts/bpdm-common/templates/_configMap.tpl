@@ -18,26 +18,16 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################################
 
-{{- define "bpdm-common.configMap.tpl" -}}
-{{- $ := .context -}}
+{{- define "bpdm-common.configMap" -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{include "bpdm.fullname" $}}
   labels:
-    {{- include "bpdm.labels" $ | nindent 4 }}
+    {{- include "bpdm.labels" . | nindent 4 }}
 data:
   deployment.yml: |-
-{{- if .override }}
-{{- .override | toYaml | nindent 4}}
-{{- end}}
-{{- end -}}
-
-{{- define "bpdm-common.configMap" -}}
-{{- $ := .context -}}
-{{- $defaultTemplate := .defaultValues | default "bpdm-common.empty"  -}}
-{{- $defaultValues := fromYaml (include $defaultTemplate $) | default (dict )  -}}
-{{- $override := .context.Values.applicationConfig | default (dict ) -}}
-{{- $finalValues := mergeOverwrite $defaultValues $override -}}
-{{- include "bpdm-common.configMap.tpl" (dict "context" $ "override" $finalValues) -}}
+{{- if .Values.applicationConfig }}
+{{- .Values.applicationConfig | toYaml | nindent 4 }}
+{{- end }}
 {{- end -}}
