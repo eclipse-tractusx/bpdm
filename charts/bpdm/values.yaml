@@ -58,17 +58,20 @@ bpdm-gate:
   externalApplicationConfig:
     - '{{ include "bpdm.postgresConnectionConfig.name" . }}'
     - '{{ include "bpdm.gateKeycloakConfig.name" . }}'
+    - '{{ include "bpdm.clientUrlConfig.name" . }}'
 
 bpdm-pool:
   enabled: true
   externalApplicationConfig:
     - '{{ include "bpdm.postgresConnectionConfig.name" . }}'
     - '{{ include "bpdm.poolKeycloakConfig.name" . }}'
+    - '{{ include "bpdm.clientUrlConfig.name" . }}'
 
 bpdm-cleaning-service-dummy:
   enabled: true
   externalApplicationConfig:
     - '{{ include "bpdm.cleaningDummyKeycloakConfig.name" . }}'
+    - '{{ include "bpdm.clientUrlConfig.name" . }}'
 
 bpdm-orchestrator:
   enabled: true
@@ -135,7 +138,6 @@ keycloak:
     httpPort: 80
   postgres:
     enabled: true
-    nameOverride: bpdm-keycloak-postgres
   mariadb:
     enabled: false
 

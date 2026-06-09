@@ -192,6 +192,44 @@ Usage: include "bpdm.resolveOrGenerateSecret" (list ctx secretName key configure
 {{- end -}}
 {{- end -}}
 
+{{- define "bpdm.clientUrlConfig.name" -}}
+{{- printf "%s-client-url-config" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{/*
+Compute the base HTTP URL of the bundled bpdm-orchestrator dependency.
+Incorporates a non-80 service.port when set; otherwise omits the port for a clean URL.
+
+Usage: include "bpdm.orchestratorUrl" .
+*/}}
+{{- define "bpdm.orchestratorUrl" -}}
+{{- $values := index .Values "bpdm-orchestrator" | default dict -}}
+{{- $host := include "bpdm.dependencyFullname" (list . $values "bpdm-orchestrator") -}}
+{{- $port := ($values.service | default dict).port | default 80 -}}
+{{- if eq ($port | toString) "80" -}}
+{{- printf "http://%s" $host -}}
+{{- else -}}
+{{- printf "http://%s:%v" $host $port -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Compute the base HTTP URL of the bundled bpdm-pool dependency.
+Incorporates a non-80 service.port when set; otherwise omits the port for a clean URL.
+
+Usage: include "bpdm.poolUrl" .
+*/}}
+{{- define "bpdm.poolUrl" -}}
+{{- $values := index .Values "bpdm-pool" | default dict -}}
+{{- $host := include "bpdm.dependencyFullname" (list . $values "bpdm-pool") -}}
+{{- $port := ($values.service | default dict).port | default 80 -}}
+{{- if eq ($port | toString) "80" -}}
+{{- printf "http://%s" $host -}}
+{{- else -}}
+{{- printf "http://%s:%v" $host $port -}}
+{{- end -}}
+{{- end -}}
+
 {{- define "bpdm.externalApplicationConfig.names" -}}
 {{- $ctx := . -}}
 {{- $names := list -}}
