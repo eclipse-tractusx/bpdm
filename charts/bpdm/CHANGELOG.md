@@ -6,9 +6,19 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
 ## [7.0.0] - tbd
 
+### Added
+
+- The chart now generates and wires all connection and credential Secrets on install: the bundled Postgres connection (database user and password), the per-service Keycloak client configuration, the in-cluster client URLs and the Keycloak realm import. The stack comes up pre-wired without having to configure passwords, client secrets or service URLs by hand.
+- OAuth client secrets and the bundled Postgres password are auto-generated when left empty and preserved across upgrades. Pin a known value by setting `bpdmRealm.clients.<client>.secret` or `postgres.customUser.password`.
+- Post-install notes describing how to reach the deployed applications (Swagger UI), the Keycloak admin console, and how to run the bundled end-to-end smoke test.
+
 ### Breaking
 
 - Replaced Bitnami Postgres dependency with CloudPirates Postgres dependency [#1625](https://github.com/eclipse-tractusx/bpdm/issues/1625)
+- Restructured `values.yaml`: the per-service `applicationConfig`/`applicationSecrets` blocks and the inline database and auth-server connection settings were replaced by umbrella-generated config Secrets referenced through each service's `externalApplicationConfig`. Customizations made under the removed keys must be migrated.
+- Renamed the top-level `clients` value to `bpdmRealm.clients`; its `secret` fields now default to empty (auto-generated) instead of placeholder values.
+- The bundled Keycloak now runs its own database (`keycloak.postgres.enabled: true`) instead of sharing the BPDM Postgres database; the previous `keycloak.database` settings were removed.
+- The bundled Postgres and Keycloak are now addressed via `nameOverride`, so their in-cluster service names follow the `<release-name>-bpdm-postgres` / `<release-name>-bpdm-keycloak` pattern instead of the fixed `bpdm-postgres` / `bpdm-keycloak` names.
 
 ### Changed
 
@@ -17,6 +27,9 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 - Update BPDM Pool Chart to version 9.0.0
 - Update BPDM Orchestrator Chart to version 5.0.0
 - Update BPDM Cleaning Service Dummy Chart to version 5.0.0
+- Fixed the bundled Postgres toggle: the dependency condition `postgre.enabled` was corrected to `postgres.enabled`, so setting `postgres.enabled: false` now actually disables the bundled database.
+- Updated the bundled Keycloak dependency from 0.19.8 to 0.21.10.
+- Expanded the chart description with an overview of the golden record showcase and a quick-start guide.
 
 ## [6.3.0] - 2026-03-6
 
