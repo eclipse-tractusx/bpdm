@@ -32,7 +32,7 @@
 {{- if (.Values.postgres | default dict).enabled }}
 {{- $customUser := (.Values.postgres | default dict).customUser | default dict }}
 {{- $postgresHost := include "bpdm.dependencyFullname" (list . .Values.postgres "postgres") }}
-{{- $secretName := printf "%s-postgres-connection-config" (include "bpdm.fullname" .) }}
+{{- $secretName := include "bpdm.postgresConnectionConfig.name" . }}
 {{- $username := $customUser.name | default "bpdm" }}
 {{- $database := $customUser.database | default $username }}
 {{- $password := $customUser.password | default "" | toString }}

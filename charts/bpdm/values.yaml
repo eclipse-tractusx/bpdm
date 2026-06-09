@@ -18,9 +18,6 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################################
 
-nameOverride: ""
-fullnameOverride: ""
-
 clients:
   admin:
     secret: "**********"
@@ -51,32 +48,36 @@ clients:
   refinerPoolSync:
     secret: "**********"
 
+# externalApplicationConfig entries are fully qualified names of existing Secrets, each carrying an
+# `application.yml` key that is mounted as a low-precedence Spring config import. Entries are rendered
+# through `tpl`, so they may reference helpers - here the connection-config name helpers resolve the
+# same Secret names that the umbrella generates for the bundled Postgres/Keycloak connection configs.
 bpdm-gate:
   enabled: true
   externalApplicationConfig:
-    - name: bpdm-postgres-connection-config
-    - name: bpdm-keycloak-connection-config
+    - '{{ include "bpdm.postgresConnectionConfig.name" . }}'
+    - '{{ include "bpdm.keycloakConnectionConfig.name" . }}'
 
 bpdm-pool:
   enabled: true
   externalApplicationConfig:
-    - name: bpdm-postgres-connection-config
-    - name: bpdm-keycloak-connection-config
+    - '{{ include "bpdm.postgresConnectionConfig.name" . }}'
+    - '{{ include "bpdm.keycloakConnectionConfig.name" . }}'
 
 bpdm-cleaning-service-dummy:
   enabled: true
   externalApplicationConfig:
-    - name: bpdm-keycloak-connection-config
+    - '{{ include "bpdm.keycloakConnectionConfig.name" . }}'
 
 bpdm-orchestrator:
   enabled: true
   externalApplicationConfig:
-    - name: bpdm-postgres-connection-config
-    - name: bpdm-keycloak-connection-config
+    - '{{ include "bpdm.postgresConnectionConfig.name" . }}'
+    - '{{ include "bpdm.keycloakConnectionConfig.name" . }}'
 
 # Bundled Postgres database.
-# When enabled, a "<fullname>-postgres-connection-config" Secret is also generated and applied to the
-# BPDM applications (via their externalApplicationConfig). That umbrella-managed Secret is also the
+# When enabled, a "<release-name>-postgres-connection-config" Secret is also generated and applied to
+# the BPDM applications (via their externalApplicationConfig). That umbrella-managed Secret is also the
 # DB user source for this dependency: customUser.existingSecret below points the postgres chart at it
 # (instead of an inline password), so a single Secret feeds both the database and the applications.
 # Disabling postgres removes that Secret (and the apps must then be configured against an external DB).
@@ -87,19 +88,21 @@ postgres:
     name: bpdm
     database: bpdm
     # password: optional. When set, that fixed password is used. When left unset, a password is
-    #   generated once and preserved across upgrades in the "<fullname>-postgres-connection-config"
+    #   generated once and preserved across upgrades in the "<release-name>-postgres-connection-config"
     #   Secret (it never lives in these values). Set it to pin a known password instead.
     # password: bpdm
     # The DB user is created from the umbrella-managed connection-config Secret rather than from an
     # inline password. The value is a template so it resolves to the same name the apps reference.
-    existingSecret: '{{ include "bpdm.toReleaseName" (list . "bpdm-postgres-connection-config") }}'
+    # It renders in the postgres subchart scope, but `.Release.Name` (and thus this helper) is visible
+    # there, so it resolves to the same generated Secret name.
+    existingSecret: '{{ include "bpdm.postgresConnectionConfig.name" . }}'
     secretKeys:
       name: username
       password: password
       database: database
 
 # Bundled Keycloak.
-# When enabled, a "<fullname>-keycloak-connection-config" Secret is also generated and applied to
+# When enabled, a "<release-name>-keycloak-connection-config" Secret is also generated and applied to
 # the BPDM applications (via their externalApplicationConfig). Its auth-server-url / issuer-uri are
 # derived from the values below, so the apps automatically point at this Keycloak. Disabling keycloak
 # also removes that Secret (and the apps must then be configured against an external IdP).
@@ -110,8 +113,23 @@ keycloak:
     adminPassword: admin
     production: false
   realm:
+    # Enables `--import-realm`. The realm Secret itself is mounted via extraVolumes below, NOT via
+    # realm.existingSecret: that field is not rendered through `tpl`, so it could only hold a static
+    # literal, which would collide across releases in one namespace. Leaving existingSecret/configFile
+    # unset disables the keycloak chart's own realm volume, freeing /opt/keycloak/data/import for ours.
     import: true
-    existingSecret: bpdm-realm
+  # Mount the umbrella-generated realm Secret (templates/bpdmRealm.yaml) into the import directory.
+  # extraVolumes/extraVolumeMounts ARE rendered through `tpl`, so the release-scoped Secret name
+  # resolves here via the same helper the Secret is named with - this is what lets the realm Secret be
+  # per-release instead of a static literal.
+  extraVolumes:
+    - name: realm-config
+      secret:
+        secretName: '{{ include "bpdm.realmConfig.name" . }}'
+  extraVolumeMounts:
+    - name: realm-config
+      mountPath: /opt/keycloak/data/import
+      readOnly: true
   service:
     httpPort: 80
   postgres:

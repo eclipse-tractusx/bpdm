@@ -1,7 +1,11 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: {{include "bpdm.fullname" $}}-realm
+  # Release-scoped name so several releases can coexist in one namespace. The bundled keycloak mounts
+  # this Secret into its realm import dir via extraVolumes (see values.yaml) rather than via
+  # keycloak.realm.existingSecret: that field is not rendered through `tpl` and so could only carry a
+  # static literal, whereas extraVolumes IS templated and references this same helper.
+  name: {{ include "bpdm.realmConfig.name" . }}
   labels:
     {{- include "bpdm.labels" $ | nindent 4 }}
 stringData:
