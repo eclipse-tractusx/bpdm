@@ -4600,4 +4600,39 @@ stringData:
     bpdm:
       security:
         auth-server-url: {{ $keycloakUrl | quote }}
+---
+# Keycloak config for the system-tester `helm test` hook. Unlike the per-service configs above, the
+# tester acts as a privileged client against all three APIs: it uses the BPDM_ADMIN client (whose
+# service account holds the `admin` role on BPDM_GATE, BPDM_POOL and BPDM_ORCHESTRATOR in this realm)
+# for every outbound connection, so the end-to-end scenarios can both write and read across Gate,
+# Pool and Orchestrator. Base-urls come from the shared client-url-config Secret.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "bpdm.testerKeycloakConfig.name" . }}
+  labels:
+    {{- include "bpdm.labels" $ | nindent 4 }}
+type: Opaque
+stringData:
+  application.yml: |-
+    bpdm:
+      client:
+        gate:
+          provider:
+            issuer-uri: {{ printf "%s/realms/BPDM" $keycloakUrl | quote }}
+          registration:
+            client-id: BPDM_ADMIN
+            client-secret: {{ $adminSecret | quote }}
+        pool:
+          provider:
+            issuer-uri: {{ printf "%s/realms/BPDM" $keycloakUrl | quote }}
+          registration:
+            client-id: BPDM_ADMIN
+            client-secret: {{ $adminSecret | quote }}
+        orchestrator:
+          provider:
+            issuer-uri: {{ printf "%s/realms/BPDM" $keycloakUrl | quote }}
+          registration:
+            client-id: BPDM_ADMIN
+            client-secret: {{ $adminSecret | quote }}
 {{- end }}

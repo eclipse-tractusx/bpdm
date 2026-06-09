@@ -78,6 +78,10 @@ Usage: include "bpdm.postgresConnectionConfig.name" .
 {{- printf "%s-orchestrator-keycloak-config" .Release.Name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
+{{- define "bpdm.testerKeycloakConfig.name" -}}
+{{- printf "%s-tester-keycloak-config" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
 {{/*
 Compute the base HTTP URL of the bundled Keycloak dependency.
 Incorporates a non-80 httpPort when set; otherwise omits the port for a clean URL.
@@ -203,6 +207,23 @@ Usage: include "bpdm.poolUrl" .
 {{- define "bpdm.poolUrl" -}}
 {{- $values := index .Values "bpdm-pool" | default dict -}}
 {{- $host := include "bpdm.dependencyFullname" (list . $values "bpdm-pool") -}}
+{{- $port := ($values.service | default dict).port | default 80 -}}
+{{- if eq ($port | toString) "80" -}}
+{{- printf "http://%s" $host -}}
+{{- else -}}
+{{- printf "http://%s:%v" $host $port -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Compute the base HTTP URL of the bundled bpdm-gate dependency.
+Incorporates a non-80 service.port when set; otherwise omits the port for a clean URL.
+
+Usage: include "bpdm.gateUrl" .
+*/}}
+{{- define "bpdm.gateUrl" -}}
+{{- $values := index .Values "bpdm-gate" | default dict -}}
+{{- $host := include "bpdm.dependencyFullname" (list . $values "bpdm-gate") -}}
 {{- $port := ($values.service | default dict).port | default 80 -}}
 {{- if eq ($port | toString) "80" -}}
 {{- printf "http://%s" $host -}}

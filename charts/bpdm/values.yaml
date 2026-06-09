@@ -148,22 +148,13 @@ keycloak:
     enabled: false
 
 # Helm `test` hook that runs the bpdm-system-tester image as an end-to-end smoke test against the
-# deployed release (templates/tests/test-connection.yaml + secret.yaml).
+# deployed release (templates/tests/test-connection.yaml). The tester is wired through the same
+# umbrella-generated config Secrets as the applications: base-urls come from the client-url-config
+# Secret and credentials from the tester-keycloak-config Secret (which authenticates as BPDM_ADMIN
+# against Gate, Pool and Orchestrator). It therefore requires the bundled keycloak to be enabled.
 tests:
-  # Rendered into the test pod's `secrets.yml` Spring config import. The issuer-uris point the
-  # tester at the in-cluster realm so it can obtain tokens for the Gate/Pool/Orchestrator clients.
-  applicationConfig:
-    bpdm:
-      client:
-        gate:
-          provider:
-            issuer-uri: http://bpdm-keycloak/realms/BPDM
-        pool:
-          provider:
-            issuer-uri: http://bpdm-keycloak/realms/BPDM
-        orchestrator:
-          provider:
-            issuer-uri: http://bpdm-keycloak/realms/BPDM
+  # Toggles whether the `helm test` hook pod is rendered for this release.
+  enabled: false
   # The bpdm-system-tester container image run by the test pod.
   image:
     registry: docker.io
@@ -171,3 +162,15 @@ tests:
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
     tag: ""
+  # Matches the hardened securityContext used by the bundled BPDM applications.
+  securityContext:
+    seccompProfile:
+      type: RuntimeDefault
+    allowPrivilegeEscalation: false
+    runAsNonRoot: true
+    readOnlyRootFilesystem: true
+    runAsUser: 10001
+    runAsGroup: 10001
+    capabilities:
+      drop:
+        - ALL

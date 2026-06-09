@@ -177,6 +177,16 @@ jobs:
               registry: kind-registry:5000
               repository: bpdm-cleaning-service-dummy
               tag: test
+            # Disables the cleaning service's relation-cleaning poller so it does not race the
+            # system-tester, which reserves and resolves the relation tasks itself.
+            springProfiles:
+              - system-tester
+          tests:
+            enabled: true
+            image:
+              registry: kind-registry:5000
+              repository: bpdm-system-tester
+              tag: test
           EOF
           echo "cat charts/bpdm/ci/test-values.yaml"
           cat charts/bpdm/ci/test-values.yaml

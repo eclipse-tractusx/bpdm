@@ -11,6 +11,7 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 - The chart now generates and wires all connection and credential Secrets on install: the bundled Postgres connection (database user and password), the per-service Keycloak client configuration, the in-cluster client URLs and the Keycloak realm import. The stack comes up pre-wired without having to configure passwords, client secrets or service URLs by hand. [#1708](https://github.com/eclipse-tractusx/bpdm/issues/1708)
 - OAuth client secrets and the bundled Postgres password are auto-generated when left empty and preserved across upgrades. Pin a known value by setting `bpdmRealm.clients.<client>.secret` or `postgres.customUser.password`. [#1708](https://github.com/eclipse-tractusx/bpdm/issues/1708)
 - Post-install notes describing how to reach the deployed applications (Swagger UI), the Keycloak admin console, and how to run the bundled end-to-end smoke test. [#1708](https://github.com/eclipse-tractusx/bpdm/issues/1708)
+- The bundled end-to-end smoke test (`helm test`) is wired through the umbrella-generated config Secrets like the applications: base-urls come from the client-url-config Secret (now also carrying the Gate base-url) and credentials from a dedicated tester Keycloak config Secret that authenticates as `BPDM_ADMIN` against Gate, Pool and Orchestrator. Toggle it via `tests.enabled` (off by default). [#1708](https://github.com/eclipse-tractusx/bpdm/issues/1708)
 
 ### Breaking
 

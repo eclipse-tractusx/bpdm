@@ -64,6 +64,8 @@ http://localhost:8080/ui/swagger-ui :
 {{- end }}
 
 In-cluster, the services call each other under these base URLs:
+{{- if $gate.enabled }}
+  - Gate:         {{ include "bpdm.gateUrl" . }}{{ end }}
 {{- if $pool.enabled }}
   - Pool:         {{ include "bpdm.poolUrl" . }}{{ end }}
 {{- if $orchestrator.enabled }}
@@ -102,3 +104,25 @@ The business partner clients and roles live in the "BPDM" realm.
 Check that all pods are running:
 
   kubectl -n {{ $ns }} get pods -l app.kubernetes.io/instance={{ .Release.Name }}
+{{ if .Values.tests.enabled }}
+##############################################################################
+## End-to-end smoke test
+##############################################################################
+
+The bundled bpdm-system-tester runs the full golden record process (share via
+Gate, clean via Orchestrator/Cleaning Dummy, read back from Pool) as a Helm test
+hook. It authenticates as the BPDM_ADMIN client against Gate, Pool and
+Orchestrator using the generated client secret. Run it with:
+
+  helm test {{ .Release.Name }} -n {{ $ns }}
+{{- else }}
+##############################################################################
+## End-to-end smoke test
+##############################################################################
+
+A bundled end-to-end smoke test (bpdm-system-tester) can run the full golden
+record process as a Helm test hook. It is disabled by default; enable it by
+installing with `--set tests.enabled=true`, then run:
+
+  helm test {{ .Release.Name }} -n {{ $ns }}
+{{- end }}

@@ -18,12 +18,13 @@ SPDX-License-Identifier: Apache-2.0
 */}}
 
 # Provides base-urls for outbound BPDM client connections so that Gate, Pool,
-# and Cleaning Service Dummy can reach each other in-cluster. The URLs are
+# and Cleaning Service Dummy can reach each other in-cluster - and so the
+# system-tester test hook can reach Gate, Pool, and Orchestrator. The URLs are
 # derived from the dependency service names (computed the same way Kubernetes
 # resolves them) so they are always consistent with the deployed services.
-# Mounted by the BPDM applications via their externalApplicationConfig; the
-# authentication credentials for each client are kept in the per-service
-# Keycloak config Secrets.
+# Mounted by the BPDM applications (and the test pod) via their
+# externalApplicationConfig; the authentication credentials for each client are
+# kept in the per-service Keycloak config Secrets.
 apiVersion: v1
 kind: Secret
 metadata:
@@ -39,3 +40,5 @@ stringData:
           base-url: {{ include "bpdm.orchestratorUrl" . | quote }}
         pool:
           base-url: {{ include "bpdm.poolUrl" . | quote }}
+        gate:
+          base-url: {{ include "bpdm.gateUrl" . | quote }}

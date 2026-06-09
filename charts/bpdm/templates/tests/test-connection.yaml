@@ -1,0 +1,72 @@
+{{/*
+Copyright (c) 2021 Contributors to the Eclipse Foundation
+
+See the NOTICE file(s) distributed with this work for additional
+information regarding copyright ownership.
+
+This program and the accompanying materials are made available under the
+terms of the Apache License, Version 2.0 which is available at
+https://www.apache.org/licenses/LICENSE-2.0.
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+License for the specific language governing permissions and limitations
+under the License.
+
+SPDX-License-Identifier: Apache-2.0
+*/}}
+
+{{- if .Values.tests.enabled }}
+# Helm `test` hook running the bpdm-system-tester image as an end-to-end smoke test against the
+# deployed release. It is wired exactly like the BPDM applications: the umbrella-generated config
+# Secrets are projected into /etc/conf and imported as low-precedence Spring config, so the tester
+# inherits the in-cluster service URLs and credentials without any static, release-specific values.
+#   * client-url-config supplies the Gate/Pool/Orchestrator base-urls, and
+#   * tester-keycloak-config supplies the issuer-uris and the BPDM_ADMIN client credentials that
+#     grant the tester admin authority across Gate, Pool and Orchestrator.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ .Release.Name }}-test"
+  labels:
+    {{- include "bpdm.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  automountServiceAccountToken: false
+  restartPolicy: Never
+  containers:
+    - name: bpdm-system-tester
+      image: "{{ .Values.tests.image.registry }}/{{ .Values.tests.image.repository }}:{{ .Values.tests.image.tag | default .Chart.AppVersion }}"
+      imagePullPolicy: {{ .Values.tests.image.pullPolicy }}
+      securityContext:
+        {{- toYaml .Values.tests.securityContext | nindent 8 }}
+      env:
+        - name: SPRING_CONFIG_IMPORT
+          value: "/etc/conf/application-0.yml,/etc/conf/application-1.yml"
+      volumeMounts:
+        - mountPath: /etc/conf
+          name: config
+          readOnly: true
+        - mountPath: /tmp
+          name: cache
+  volumes:
+    - name: config
+      projected:
+        sources:
+          - secret:
+              name: {{ include "bpdm.clientUrlConfig.name" . }}
+              items:
+                - key: application.yml
+                  path: application-0.yml
+          - secret:
+              name: {{ include "bpdm.testerKeycloakConfig.name" . }}
+              items:
+                - key: application.yml
+                  path: application-1.yml
+    - name: cache
+      emptyDir:
+        sizeLimit: 200Mi
+{{- end }}
