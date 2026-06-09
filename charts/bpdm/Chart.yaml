@@ -21,7 +21,32 @@
 apiVersion: v2
 name: bpdm
 type: application
-description: A Helm chart for Kubernetes that deploys the BPDM applications
+description: |
+  Deploys the full BPDM application stack as a single release and configures it end to
+  end, showcasing how a golden record process is realized for a single sharing member.
+
+  The chart bundles the four BPDM services — Gate, Pool, Orchestrator and the reference
+  Cleaning Service Dummy — together with a PostgreSQL database and a Keycloak instance that
+  is pre-seeded with the `BPDM` realm. On install it generates and wires the connection and
+  credential secrets the services need, so the stack comes up ready to run: a sharing member
+  uploads business partner data through the Gate, the Orchestrator coordinates cleaning and
+  golden record creation, and the result is shared back via the Gate and the Pool. Each
+  dependency (the services, PostgreSQL and Keycloak) can be disabled individually to instead
+  integrate with externally managed infrastructure.
+
+  ## Quick start
+
+  ```bash
+  # Resolve dependencies and install the release
+  helm dependency build charts/bpdm
+  helm install bpdm charts/bpdm
+
+  # Run the bundled end-to-end smoke test
+  helm test bpdm
+  ```
+
+  See `values.yaml` for configuration, including `bpdmRealm.clients.*.secret` to pin client
+  secrets and the `postgres`/`keycloak` toggles for running against external infrastructure.
 version: 7.0.0-SNAPSHOT
 appVersion: "7.4.0-SNAPSHOT"
 home: https://github.com/eclipse-tractusx/bpdm

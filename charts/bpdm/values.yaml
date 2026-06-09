@@ -18,6 +18,11 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################################
 
+# OAuth client secrets for the service-account clients in the bundled Keycloak realm
+# (rendered into the "<release-name>-realm" Secret by templates/bpdmRealm.yaml). For each entry,
+# leave secret empty to auto-generate a 32-char value that is then preserved across upgrades in
+# that Secret, or set it to pin a known secret (e.g. to match an external IdP or to share the
+# credential with an outside consumer of that client).
 bpdmRealm:
   clients:
     admin:
@@ -49,10 +54,12 @@ bpdmRealm:
     refinerPoolSync:
       secret: ""
 
+# The four blocks below configure the bundled BPDM services. For each, `enabled` toggles whether
+# that service is deployed as part of this release. They share the same wiring pattern:
 # externalApplicationConfig entries are fully qualified names of existing Secrets, each carrying an
 # `application.yml` key that is mounted as a low-precedence Spring config import. Entries are rendered
 # through `tpl`, so they may reference helpers - here the connection-config name helpers resolve the
-# same Secret names that the umbrella generates for the bundled Postgres/Keycloak connection configs.
+# same Secret names that the umbrella generates for the bundled Postgres/Keycloak/client-url configs.
 bpdm-gate:
   enabled: true
   externalApplicationConfig:
@@ -114,8 +121,8 @@ keycloak:
   enabled: true
   nameOverride: bpdm-keycloak
   keycloak:
-    adminPassword: admin
-    production: false
+    adminPassword: admin   # dev default - override in production
+    production: false      # dev mode: relaxes the TLS/hostname requirements; do not use in production
   realm:
     # Enables `--import-realm`. The realm Secret itself is mounted via extraVolumes below, NOT via
     # realm.existingSecret: that field is not rendered through `tpl`, so it could only hold a static
@@ -141,7 +148,11 @@ keycloak:
   mariadb:
     enabled: false
 
+# Helm `test` hook that runs the bpdm-system-tester image as an end-to-end smoke test against the
+# deployed release (templates/tests/test-connection.yaml + secret.yaml).
 tests:
+  # Rendered into the test pod's `secrets.yml` Spring config import. The issuer-uris point the
+  # tester at the in-cluster realm so it can obtain tokens for the Gate/Pool/Orchestrator clients.
   applicationConfig:
     bpdm:
       client:
@@ -154,6 +165,7 @@ tests:
         orchestrator:
           provider:
             issuer-uri: http://bpdm-keycloak/realms/BPDM
+  # The bpdm-system-tester container image run by the test pod.
   image:
     registry: docker.io
     repository: tractusx/bpdm-system-tester

@@ -59,7 +59,7 @@ spec:
               value: {{ .Values.springProfiles | join ","  }}
             - name: SPRING_CONFIG_IMPORT
               {{- $imports := list -}}
-              {{- range $i, $name := $externalConfigs }}{{ $imports = append $imports (printf "/etc/conf/application-%d.yml" $i) }}{{ end }}
+              {{- range $i, $name := $externalConfigs }}{{ $imports = append $imports (printf "optional:/etc/conf/application-%d.yml" $i) }}{{ end }}
               {{- $imports = concat $imports (list "/etc/conf/deployment.yml" "/etc/conf/secrets.yml") }}
               value: {{ join "," $imports | quote }}
           ports:
@@ -114,6 +114,7 @@ spec:
               {{- range $i, $name := $externalConfigs }}
               - secret:
                   name: {{ $name }}
+                  optional: true
                   items:
                     - key: application.yml
                       path: application-{{ $i }}.yml
