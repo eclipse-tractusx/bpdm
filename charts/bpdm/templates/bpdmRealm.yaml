@@ -1,4 +1,20 @@
 {{- if .Values.keycloak.enabled }}
+{{- $secretName := include "bpdm.realmConfig.name" . }}
+{{- $clients := (.Values.bpdmRealm | default dict).clients | default dict }}
+{{- $adminSecret           := include "bpdm.resolveOrGenerateSecret" (list . $secretName "admin-client-secret"              (($clients.admin             | default dict).secret | default "")) }}
+{{- $cleaningDummySecret   := include "bpdm.resolveOrGenerateSecret" (list . $secretName "cleaning-dummy-client-secret"     (($clients.cleaningDummy     | default dict).secret | default "")) }}
+{{- $gateSecret            := include "bpdm.resolveOrGenerateSecret" (list . $secretName "gate-client-secret"               (($clients.gate              | default dict).secret | default "")) }}
+{{- $gateInputConsumerSecret  := include "bpdm.resolveOrGenerateSecret" (list . $secretName "gate-input-consumer-client-secret"  (($clients.gateInputConsumer  | default dict).secret | default "")) }}
+{{- $gateInputManagerSecret   := include "bpdm.resolveOrGenerateSecret" (list . $secretName "gate-input-manager-client-secret"   (($clients.gateInputManager   | default dict).secret | default "")) }}
+{{- $gateOutputConsumerSecret := include "bpdm.resolveOrGenerateSecret" (list . $secretName "gate-output-consumer-client-secret" (($clients.gateOutputConsumer | default dict).secret | default "")) }}
+{{- $orchestratorSecret    := include "bpdm.resolveOrGenerateSecret" (list . $secretName "orchestrator-client-secret"       (($clients.orchestrator      | default dict).secret | default "")) }}
+{{- $participantSecret     := include "bpdm.resolveOrGenerateSecret" (list . $secretName "participant-client-secret"        (($clients.participant       | default dict).secret | default "")) }}
+{{- $poolSecret            := include "bpdm.resolveOrGenerateSecret" (list . $secretName "pool-client-secret"               (($clients.pool              | default dict).secret | default "")) }}
+{{- $refinerCleanSecret    := include "bpdm.resolveOrGenerateSecret" (list . $secretName "refiner-clean-client-secret"      (($clients.refinerClean      | default dict).secret | default "")) }}
+{{- $refinerCleanAndSyncSecret := include "bpdm.resolveOrGenerateSecret" (list . $secretName "refiner-clean-and-sync-client-secret" (($clients.refinerCleanAndSync | default dict).secret | default "")) }}
+{{- $refinerPoolSyncSecret := include "bpdm.resolveOrGenerateSecret" (list . $secretName "refiner-pool-sync-client-secret"  (($clients.refinerPoolSync   | default dict).secret | default "")) }}
+{{- $sharingMemberSecret   := include "bpdm.resolveOrGenerateSecret" (list . $secretName "sharing-member-client-secret"    (($clients.sharingMember     | default dict).secret | default "")) }}
+{{- $taskCreatorSecret     := include "bpdm.resolveOrGenerateSecret" (list . $secretName "task-creator-client-secret"      (($clients.taskCreator       | default dict).secret | default "")) }}
 apiVersion: v1
 kind: Secret
 metadata:
@@ -6,10 +22,24 @@ metadata:
   # this Secret into its realm import dir via extraVolumes (see values.yaml) rather than via
   # keycloak.realm.existingSecret: that field is not rendered through `tpl` and so could only carry a
   # static literal, whereas extraVolumes IS templated and references this same helper.
-  name: {{ include "bpdm.realmConfig.name" . }}
+  name: {{ $secretName }}
   labels:
     {{- include "bpdm.labels" $ | nindent 4 }}
 stringData:
+  admin-client-secret: {{ $adminSecret | quote }}
+  cleaning-dummy-client-secret: {{ $cleaningDummySecret | quote }}
+  gate-client-secret: {{ $gateSecret | quote }}
+  gate-input-consumer-client-secret: {{ $gateInputConsumerSecret | quote }}
+  gate-input-manager-client-secret: {{ $gateInputManagerSecret | quote }}
+  gate-output-consumer-client-secret: {{ $gateOutputConsumerSecret | quote }}
+  orchestrator-client-secret: {{ $orchestratorSecret | quote }}
+  participant-client-secret: {{ $participantSecret | quote }}
+  pool-client-secret: {{ $poolSecret | quote }}
+  refiner-clean-client-secret: {{ $refinerCleanSecret | quote }}
+  refiner-clean-and-sync-client-secret: {{ $refinerCleanAndSyncSecret | quote }}
+  refiner-pool-sync-client-secret: {{ $refinerPoolSyncSecret | quote }}
+  sharing-member-client-secret: {{ $sharingMemberSecret | quote }}
+  task-creator-client-secret: {{ $taskCreatorSecret | quote }}
   BPDM-realm.json: |-
     {
       "realm": "BPDM",
@@ -1511,7 +1541,7 @@ stringData:
           "enabled": true,
           "alwaysDisplayInConsole": false,
           "clientAuthenticatorType": "client-secret",
-          "secret": "{{ .Values.bpdmRealm.clients.admin.secret }}",
+          "secret": "{{ $adminSecret }}",
           "redirectUris": [
             "/*"
           ],
@@ -1614,7 +1644,7 @@ stringData:
           "enabled": true,
           "alwaysDisplayInConsole": false,
           "clientAuthenticatorType": "client-secret",
-          "secret": "{{ .Values.bpdmRealm.clients.cleaningDummy.secret }}",
+          "secret": "{{ $cleaningDummySecret }}",
           "redirectUris": [
             "/*"
           ],
@@ -1718,7 +1748,7 @@ stringData:
           "enabled": true,
           "alwaysDisplayInConsole": false,
           "clientAuthenticatorType": "client-secret",
-          "secret": "{{ .Values.bpdmRealm.clients.gate.secret }}",
+          "secret": "{{ $gateSecret }}",
           "redirectUris": [
             "/*"
           ],
@@ -1822,7 +1852,7 @@ stringData:
           "enabled": true,
           "alwaysDisplayInConsole": false,
           "clientAuthenticatorType": "client-secret",
-          "secret": "{{ .Values.bpdmRealm.clients.gateInputConsumer.secret }}",
+          "secret": "{{ $gateInputConsumerSecret }}",
           "redirectUris": [
             "/*"
           ],
@@ -1921,7 +1951,7 @@ stringData:
           "enabled": true,
           "alwaysDisplayInConsole": false,
           "clientAuthenticatorType": "client-secret",
-          "secret": "{{ .Values.bpdmRealm.clients.gateInputManager.secret }}",
+          "secret": "{{ $gateInputManagerSecret }}",
           "redirectUris": [
             "/*"
           ],
@@ -2020,7 +2050,7 @@ stringData:
           "enabled": true,
           "alwaysDisplayInConsole": false,
           "clientAuthenticatorType": "client-secret",
-          "secret": "{{ .Values.bpdmRealm.clients.gateOutputConsumer.secret }}",
+          "secret": "{{ $gateOutputConsumerSecret }}",
           "redirectUris": [
             "/*"
           ],
@@ -2119,7 +2149,7 @@ stringData:
           "enabled": true,
           "alwaysDisplayInConsole": false,
           "clientAuthenticatorType": "client-secret",
-          "secret": "{{ .Values.bpdmRealm.clients.orchestrator.secret }}",
+          "secret": "{{ $orchestratorSecret }}",
           "redirectUris": [
             "*"
           ],
@@ -2223,7 +2253,7 @@ stringData:
           "enabled": true,
           "alwaysDisplayInConsole": false,
           "clientAuthenticatorType": "client-secret",
-          "secret": "{{ .Values.bpdmRealm.clients.participant.secret }}",
+          "secret": "{{ $participantSecret }}",
           "redirectUris": [
             "/*"
           ],
@@ -2322,7 +2352,7 @@ stringData:
           "enabled": true,
           "alwaysDisplayInConsole": false,
           "clientAuthenticatorType": "client-secret",
-          "secret": "{{ .Values.bpdmRealm.clients.pool.secret }}",
+          "secret": "{{ $poolSecret }}",
           "redirectUris": [
             "/*"
           ],
@@ -2425,7 +2455,7 @@ stringData:
           "enabled": true,
           "alwaysDisplayInConsole": false,
           "clientAuthenticatorType": "client-secret",
-          "secret": "{{ .Values.bpdmRealm.clients.refinerClean.secret }}",
+          "secret": "{{ $refinerCleanSecret }}",
           "redirectUris": [
             "/*"
           ],
@@ -2524,7 +2554,7 @@ stringData:
           "enabled": true,
           "alwaysDisplayInConsole": false,
           "clientAuthenticatorType": "client-secret",
-          "secret": "{{ .Values.bpdmRealm.clients.refinerCleanAndSync.secret }}",
+          "secret": "{{ $refinerCleanAndSyncSecret }}",
           "redirectUris": [
             "/*"
           ],
@@ -2623,7 +2653,7 @@ stringData:
           "enabled": true,
           "alwaysDisplayInConsole": false,
           "clientAuthenticatorType": "client-secret",
-          "secret": "{{ .Values.bpdmRealm.clients.refinerPoolSync.secret }}",
+          "secret": "{{ $refinerPoolSyncSecret }}",
           "redirectUris": [
             "/*"
           ],
@@ -2722,7 +2752,7 @@ stringData:
           "enabled": true,
           "alwaysDisplayInConsole": false,
           "clientAuthenticatorType": "client-secret",
-          "secret": "{{ .Values.bpdmRealm.clients.sharingMember.secret }}",
+          "secret": "{{ $sharingMemberSecret }}",
           "redirectUris": [
             "/*"
           ],
@@ -2822,7 +2852,7 @@ stringData:
           "enabled": true,
           "alwaysDisplayInConsole": false,
           "clientAuthenticatorType": "client-secret",
-          "secret": "{{ .Values.bpdmRealm.clients.taskCreator.secret }}",
+          "secret": "{{ $taskCreatorSecret }}",
           "redirectUris": [
             "/*"
           ],

@@ -21,33 +21,33 @@
 bpdmRealm:
   clients:
     admin:
-      secret: "**********"
+      secret: ""
     gate:
-      secret: "**********"
+      secret: ""
     pool:
-      secret: "**********"
+      secret: ""
     orchestrator:
-      secret: "**********"
+      secret: ""
     cleaningDummy:
-      secret: "**********"
+      secret: ""
     gateInputConsumer:
-      secret: "**********"
+      secret: ""
     gateInputManager:
-      secret: "**********"
+      secret: ""
     gateOutputConsumer:
-      secret: "**********"
+      secret: ""
     participant:
-      secret: "**********"
+      secret: ""
     sharingMember:
-      secret: "**********"
+      secret: ""
     taskCreator:
-      secret: "**********"
+      secret: ""
     refinerClean:
-      secret: "**********"
+      secret: ""
     refinerCleanAndSync:
-      secret: "**********"
+      secret: ""
     refinerPoolSync:
-      secret: "**********"
+      secret: ""
 
 # externalApplicationConfig entries are fully qualified names of existing Secrets, each carrying an
 # `application.yml` key that is mounted as a low-precedence Spring config import. Entries are rendered

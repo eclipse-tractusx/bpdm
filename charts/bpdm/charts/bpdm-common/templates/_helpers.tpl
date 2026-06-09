@@ -140,6 +140,30 @@ Each `.Values.externalApplicationConfig` entry is a string holding the fully qua
 existing Secret; it is rendered through `tpl` so it may reference helpers such as
 `bpdm.postgresConnectionConfig.name`. Order is preserved and entries that render empty are dropped.
 */}}
+{{/*
+Resolve a secret value: use configuredValue if non-empty, otherwise look up key in an existing
+Secret, otherwise generate a random 32-character alphanumeric string. Stable across upgrades as
+long as the Secret persists in the cluster.
+
+Usage: include "bpdm.resolveOrGenerateSecret" (list ctx secretName key configuredValue)
+*/}}
+{{- define "bpdm.resolveOrGenerateSecret" -}}
+{{- $ctx := index . 0 -}}
+{{- $secretName := index . 1 -}}
+{{- $key := index . 2 -}}
+{{- $configured := index . 3 | toString -}}
+{{- if $configured -}}
+{{- $configured -}}
+{{- else -}}
+{{-   $existing := lookup "v1" "Secret" $ctx.Release.Namespace $secretName -}}
+{{-   if and $existing (hasKey ($existing.data | default dict) $key) -}}
+{{-     index $existing.data $key | b64dec -}}
+{{-   else -}}
+{{-     randAlphaNum 32 -}}
+{{-   end -}}
+{{- end -}}
+{{- end -}}
+
 {{- define "bpdm.externalApplicationConfig.names" -}}
 {{- $ctx := . -}}
 {{- $names := list -}}
