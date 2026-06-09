@@ -29,7 +29,6 @@ sources:
   - https://github.com/eclipse-tractusx/bpdm
 maintainers:
   - name: Nico Koprowski
-  - name: Sujit Karne
 
 dependencies:
   - name: bpdm-gate

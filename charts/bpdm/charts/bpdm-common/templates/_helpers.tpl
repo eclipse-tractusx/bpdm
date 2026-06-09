@@ -30,26 +30,17 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 If release name contains chart name it will be used as a full name.
 */}}
 {{- define "bpdm.fullname" -}}
-{{- if .Values.fullnameOverride }}
-  {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
-{{- else if .Values.nameOverride }}
-    {{- include "bpdm.toReleaseName" (list . .Values.nameOverride)  -}}
-{{- else }}
-    {{- include "bpdm.toReleaseName" (list . .Chart.Name)  -}}
-{{- end }}
-{{- end }}
-
-{{- define "bpdm.toReleaseName" -}}
-{{- $top := first . }}
-{{- $name := index . 1 }}
-{{- if contains $name $top.Release.Name }}
-{{- $top.Release.Name | trunc 63 | trimSuffix "-" }}
-{{- else if hasPrefix $top.Release.Name $name  }}
-{{- $name | trunc 63 | trimSuffix "-" }}
-{{- else }}
-{{- printf "%s-%s" $top.Release.Name $name | trunc 63 | trimSuffix "-" }}
-{{- end }}
-{{- end }}
+{{- if .Values.fullnameOverride -}}
+{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- $name := default .Chart.Name .Values.nameOverride -}}
+{{- if contains $name .Release.Name -}}
+{{- .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
 
 {{/*
 Names of the umbrella-managed wiring Secrets: the Postgres/Keycloak connection configs and the
@@ -139,10 +130,9 @@ Create name of application secret
 
 {{/*
 Resolve the determined full name of a dependency (sub)chart from the umbrella context.
-Replicates the standard Helm fullname algorithm (fullnameOverride wins; otherwise the
-release name combined with nameOverride|chartName, collapsed when the release name already
-contains it). Lets the umbrella compute e.g. the deployed Postgres/Keycloak service name
-from the values it passes to those dependencies.
+Delegates to "bpdm.fullname" by synthesizing the (sub)chart's own scope (.Chart/.Values/.Release),
+so producer and consumer compute names through the exact same algorithm. Lets the umbrella compute
+e.g. the deployed Postgres/Keycloak service name from the values it passes to those dependencies.
 
 Usage: include "bpdm.dependencyFullname" (list $ $dependencyValues "chartName")
 */}}
@@ -150,16 +140,7 @@ Usage: include "bpdm.dependencyFullname" (list $ $dependencyValues "chartName")
 {{- $ctx := index . 0 -}}
 {{- $values := index . 1 | default dict -}}
 {{- $chartName := index . 2 -}}
-{{- if $values.fullnameOverride -}}
-{{- $values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
-{{- else -}}
-{{- $name := $values.nameOverride | default $chartName -}}
-{{- if contains $name $ctx.Release.Name -}}
-{{- $ctx.Release.Name | trunc 63 | trimSuffix "-" -}}
-{{- else -}}
-{{- printf "%s-%s" $ctx.Release.Name $name | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
-{{- end -}}
+{{- include "bpdm.fullname" (dict "Release" $ctx.Release "Chart" (dict "Name" $chartName) "Values" $values) -}}
 {{- end -}}
 
 {{/*
