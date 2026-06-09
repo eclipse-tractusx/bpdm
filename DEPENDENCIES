@@ -128,9 +128,9 @@ maven/mavencentral/org.apache.james/apache-mime4j-dom/0.8.9, Apache-2.0, approve
 maven/mavencentral/org.apache.james/apache-mime4j-storage/0.8.9, Apache-2.0, approved, clearlydefined
 maven/mavencentral/org.apache.logging.log4j/log4j-api/2.25.4, Apache-2.0, approved, #21940
 maven/mavencentral/org.apache.logging.log4j/log4j-to-slf4j/2.25.4, Apache-2.0, approved, #21937
-maven/mavencentral/org.apache.tomcat.embed/tomcat-embed-core/11.0.21, Apache-2.0 AND (EPL-2.0 OR GPL-2.0-only WITH Classpath-exception-2.0) AND (CDDL-1.0 OR GPL-2.0-or-later), approved, #19217
-maven/mavencentral/org.apache.tomcat.embed/tomcat-embed-el/11.0.21, Apache-2.0, approved, #22421
-maven/mavencentral/org.apache.tomcat.embed/tomcat-embed-websocket/11.0.21, Apache-2.0, approved, #21065
+maven/mavencentral/org.apache.tomcat.embed/tomcat-embed-core/11.0.22, Apache-2.0 AND (EPL-2.0 OR GPL-2.0-only WITH Classpath-exception-2.0) AND (CDDL-1.0 OR GPL-2.0-or-later), approved, #19217
+maven/mavencentral/org.apache.tomcat.embed/tomcat-embed-el/11.0.22, Apache-2.0, approved, #22421
+maven/mavencentral/org.apache.tomcat.embed/tomcat-embed-websocket/11.0.22, Apache-2.0, approved, #21065
 maven/mavencentral/org.apiguardian/apiguardian-api/1.1.2, Apache-2.0, approved, #17641
 maven/mavencentral/org.aspectj/aspectjweaver/1.9.25.1, EPL-1.0, approved, tools.aspectj
 maven/mavencentral/org.assertj/assertj-core/3.24.2, Apache-2.0, approved, #6161
