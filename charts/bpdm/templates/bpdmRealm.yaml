@@ -1,5 +1,6 @@
 {{- if .Values.keycloak.enabled }}
 {{- $secretName := include "bpdm.realmConfig.name" . }}
+{{- $keycloakUrl := include "bpdm.keycloakUrl" . }}
 {{- $clients := (.Values.bpdmRealm | default dict).clients | default dict }}
 {{- $adminSecret           := include "bpdm.resolveOrGenerateSecret" (list . $secretName "admin-client-secret"              (($clients.admin             | default dict).secret | default "")) }}
 {{- $cleaningDummySecret   := include "bpdm.resolveOrGenerateSecret" (list . $secretName "cleaning-dummy-client-secret"     (($clients.cleaningDummy     | default dict).secret | default "")) }}
@@ -4520,4 +4521,83 @@ stringData:
         "policies": []
       }
     }
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "bpdm.gateKeycloakConfig.name" . }}
+  labels:
+    {{- include "bpdm.labels" $ | nindent 4 }}
+type: Opaque
+stringData:
+  application.yml: |-
+    bpdm:
+      security:
+        auth-server-url: {{ $keycloakUrl | quote }}
+      client:
+        orchestrator:
+          provider:
+            issuer-uri: {{ printf "%s/realms/BPDM" $keycloakUrl | quote }}
+          registration:
+            client-id: BPDM_TASK_CREATOR
+            client-secret: {{ $taskCreatorSecret | quote }}
+        pool:
+          provider:
+            issuer-uri: {{ printf "%s/realms/BPDM" $keycloakUrl | quote }}
+          registration:
+            client-id: BPDM_SHARING_MEMBER
+            client-secret: {{ $sharingMemberSecret | quote }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "bpdm.poolKeycloakConfig.name" . }}
+  labels:
+    {{- include "bpdm.labels" $ | nindent 4 }}
+type: Opaque
+stringData:
+  application.yml: |-
+    bpdm:
+      security:
+        auth-server-url: {{ $keycloakUrl | quote }}
+      client:
+        orchestrator:
+          provider:
+            issuer-uri: {{ printf "%s/realms/BPDM" $keycloakUrl | quote }}
+          registration:
+            client-id: BPDM_REFINER_POOL_SYNC
+            client-secret: {{ $refinerPoolSyncSecret | quote }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "bpdm.cleaningDummyKeycloakConfig.name" . }}
+  labels:
+    {{- include "bpdm.labels" $ | nindent 4 }}
+type: Opaque
+stringData:
+  application.yml: |-
+    bpdm:
+      security:
+        auth-server-url: {{ $keycloakUrl | quote }}
+      client:
+        orchestrator:
+          provider:
+            issuer-uri: {{ printf "%s/realms/BPDM" $keycloakUrl | quote }}
+          registration:
+            client-id: BPDM_CLEANING_SERVICE_DUMMY
+            client-secret: {{ $cleaningDummySecret | quote }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "bpdm.orchestratorKeycloakConfig.name" . }}
+  labels:
+    {{- include "bpdm.labels" $ | nindent 4 }}
+type: Opaque
+stringData:
+  application.yml: |-
+    bpdm:
+      security:
+        auth-server-url: {{ $keycloakUrl | quote }}
 {{- end }}

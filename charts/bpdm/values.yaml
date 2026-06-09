@@ -57,24 +57,24 @@ bpdm-gate:
   enabled: true
   externalApplicationConfig:
     - '{{ include "bpdm.postgresConnectionConfig.name" . }}'
-    - '{{ include "bpdm.keycloakConnectionConfig.name" . }}'
+    - '{{ include "bpdm.gateKeycloakConfig.name" . }}'
 
 bpdm-pool:
   enabled: true
   externalApplicationConfig:
     - '{{ include "bpdm.postgresConnectionConfig.name" . }}'
-    - '{{ include "bpdm.keycloakConnectionConfig.name" . }}'
+    - '{{ include "bpdm.poolKeycloakConfig.name" . }}'
 
 bpdm-cleaning-service-dummy:
   enabled: true
   externalApplicationConfig:
-    - '{{ include "bpdm.keycloakConnectionConfig.name" . }}'
+    - '{{ include "bpdm.cleaningDummyKeycloakConfig.name" . }}'
 
 bpdm-orchestrator:
   enabled: true
   externalApplicationConfig:
     - '{{ include "bpdm.postgresConnectionConfig.name" . }}'
-    - '{{ include "bpdm.keycloakConnectionConfig.name" . }}'
+    - '{{ include "bpdm.orchestratorKeycloakConfig.name" . }}'
 
 # Bundled Postgres database.
 # When enabled, a "<release-name>-postgres-connection-config" Secret is also generated and applied to
@@ -103,10 +103,10 @@ postgres:
       database: database
 
 # Bundled Keycloak.
-# When enabled, a "<release-name>-keycloak-connection-config" Secret is also generated and applied to
-# the BPDM applications (via their externalApplicationConfig). Its auth-server-url / issuer-uri are
-# derived from the values below, so the apps automatically point at this Keycloak. Disabling keycloak
-# also removes that Secret (and the apps must then be configured against an external IdP).
+# When enabled, per-service keycloak config Secrets are generated alongside the realm Secret and applied
+# to each BPDM application (via their externalApplicationConfig). Each carries auth-server-url, the
+# outbound client issuer-uri, and the client credentials for that service. Disabling keycloak removes
+# all of these Secrets (and the apps must then be configured against an external IdP).
 keycloak:
   enabled: true
   nameOverride: bpdm-keycloak

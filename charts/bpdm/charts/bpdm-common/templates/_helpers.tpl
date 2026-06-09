@@ -67,12 +67,40 @@ Usage: include "bpdm.postgresConnectionConfig.name" .
 {{- printf "%s-postgres-connection-config" .Release.Name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
-{{- define "bpdm.keycloakConnectionConfig.name" -}}
-{{- printf "%s-keycloak-connection-config" .Release.Name | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
-
 {{- define "bpdm.realmConfig.name" -}}
 {{- printf "%s-realm" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{- define "bpdm.gateKeycloakConfig.name" -}}
+{{- printf "%s-gate-keycloak-config" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{- define "bpdm.poolKeycloakConfig.name" -}}
+{{- printf "%s-pool-keycloak-config" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{- define "bpdm.cleaningDummyKeycloakConfig.name" -}}
+{{- printf "%s-cleaning-dummy-keycloak-config" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{- define "bpdm.orchestratorKeycloakConfig.name" -}}
+{{- printf "%s-orchestrator-keycloak-config" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{/*
+Compute the base HTTP URL of the bundled Keycloak dependency.
+Incorporates a non-80 httpPort when set; otherwise omits the port for a clean URL.
+
+Usage: include "bpdm.keycloakUrl" .
+*/}}
+{{- define "bpdm.keycloakUrl" -}}
+{{- $host := include "bpdm.dependencyFullname" (list . .Values.keycloak "keycloak") -}}
+{{- $port := ((.Values.keycloak | default dict).service | default dict).httpPort | default 80 -}}
+{{- if eq ($port | toString) "80" -}}
+{{- printf "http://%s" $host -}}
+{{- else -}}
+{{- printf "http://%s:%v" $host $port -}}
+{{- end -}}
 {{- end -}}
 
 {{/*
