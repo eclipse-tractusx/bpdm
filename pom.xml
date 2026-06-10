@@ -86,6 +86,7 @@
         <jackson-2-bom.version>2.21.3</jackson-2-bom.version>
         <postgresql.version>42.7.11</postgresql.version>
         <netty.version>4.2.13.Final</netty.version>
+        <tomcat.version>11.0.22</tomcat.version>
     </properties>
 
     <pluginRepositories>
