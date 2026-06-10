@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
-## [7.0.0] - tbd
+## [7.0.0] - 2026-06-10
 
 ### Added
 
@@ -24,7 +24,7 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
 ### Changed
 
-- Increase appversion to 7.4.0-SNAPSHOT
+- Increase appversion to 7.4.0-rc2
 - Update BPDM Gate Chart to version 8.0.0
 - Update BPDM Pool Chart to version 9.0.0
 - Update BPDM Orchestrator Chart to version 5.0.0
