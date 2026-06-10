@@ -1,6 +1,6 @@
 # bpdm-orchestrator
 
-![Version: 5.0.0-SNAPSHOT](https://img.shields.io/badge/Version-5.0.0--SNAPSHOT-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 7.4.0-SNAPSHOT](https://img.shields.io/badge/AppVersion-7.4.0--SNAPSHOT-informational?style=flat-square)
+![Version: 5.0.0-rc2](https://img.shields.io/badge/Version-5.0.0--rc2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 7.4.0-rc2](https://img.shields.io/badge/AppVersion-7.4.0--rc2-informational?style=flat-square)
 
 A Helm chart for deploying the BPDM Orchestrator service
 
@@ -32,11 +32,11 @@ A Helm chart for deploying the BPDM Orchestrator service
 | affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.topologyKey | string | `"kubernetes.io/hostname"` |  |
 | affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].weight | int | `100` |  |
 | applicationConfig | string | `nil` |  |
-| applicationSecrets.spring.dataSource.password | string | `"bpdm"` |  |
+| applicationSecrets | string | `nil` |  |
 | autoscaling.enabled | bool | `false` |  |
-| centralidp.enabled | bool | `true` |  |
 | configMountSecurity.readOnly | bool | `true` |  |
 | configMountSecurity.recursiveReadOnly | string | `"Enabled"` |  |
+| externalApplicationConfig | list | `[]` |  |
 | fullnameOverride | string | `nil` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.registry | string | `"docker.io"` |  |
@@ -58,10 +58,6 @@ A Helm chart for deploying the BPDM Orchestrator service
 | nameOverride | string | `nil` |  |
 | nodeSelector | object | `{}` |  |
 | podAnnotations | object | `{}` |  |
-| postgres.auth.database | string | `"bpdm"` |  |
-| postgres.auth.password | string | `"bpdm"` |  |
-| postgres.auth.username | string | `"bpdm"` |  |
-| postgres.enabled | bool | `true` |  |
 | readinessProbe.failureThreshold | int | `5` |  |
 | readinessProbe.httpGet.path | string | `"/actuator/health/readiness"` |  |
 | readinessProbe.httpGet.port | int | `8085` |  |

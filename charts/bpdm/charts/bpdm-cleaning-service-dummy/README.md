@@ -1,6 +1,6 @@
 # bpdm-cleaning-service-dummy
 
-![Version: 5.0.0-SNAPSHOT](https://img.shields.io/badge/Version-5.0.0--SNAPSHOT-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 7.4.0-SNAPSHOT](https://img.shields.io/badge/AppVersion-7.4.0--SNAPSHOT-informational?style=flat-square)
+![Version: 5.0.0-rc2](https://img.shields.io/badge/Version-5.0.0--rc2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 7.4.0-rc2](https://img.shields.io/badge/AppVersion-7.4.0--rc2-informational?style=flat-square)
 
 A Helm chart for deploying the BPDM cleaning service
 
@@ -34,9 +34,9 @@ A Helm chart for deploying the BPDM cleaning service
 | applicationConfig | string | `nil` |  |
 | applicationSecrets | string | `nil` |  |
 | autoscaling.enabled | bool | `false` |  |
-| centralidp.enabled | bool | `true` |  |
 | configMountSecurity.readOnly | bool | `true` |  |
 | configMountSecurity.recursiveReadOnly | string | `"Enabled"` |  |
+| externalApplicationConfig | list | `[]` |  |
 | fullnameOverride | string | `nil` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.registry | string | `"docker.io"` |  |

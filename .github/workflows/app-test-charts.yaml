@@ -162,28 +162,27 @@ jobs:
               registry: kind-registry:5000
               repository: bpdm-pool
               tag: test
-            startupDelaySeconds: 120
           bpdm-gate:
             image:
               registry: kind-registry:5000
               repository: bpdm-gate
               tag: test
-            startupDelaySeconds: 120
           bpdm-orchestrator:
             image:
               registry: kind-registry:5000
               repository: bpdm-orchestrator
               tag: test
-            startupDelaySeconds: 120
           bpdm-cleaning-service-dummy:
             image:
               registry: kind-registry:5000
               repository: bpdm-cleaning-service-dummy
               tag: test
-            startupDelaySeconds: 120
+            # Disables the cleaning service's relation-cleaning poller so it does not race the
+            # system-tester, which reserves and resolves the relation tasks itself.
             springProfiles:
-              system-tester
+              - system-tester
           tests:
+            enabled: true
             image:
               registry: kind-registry:5000
               repository: bpdm-system-tester
@@ -224,11 +223,6 @@ jobs:
             image:
               registry: kind-registry:5000
               repository: bpdm-cleaning-service-dummy
-              tag: test
-          tests:
-            image:
-              registry: kind-registry:5000
-              repository: bpdm-system-tester
               tag: test
           EOF
           echo "cat charts/bpdm/ci/test-upgrade-values.yaml"

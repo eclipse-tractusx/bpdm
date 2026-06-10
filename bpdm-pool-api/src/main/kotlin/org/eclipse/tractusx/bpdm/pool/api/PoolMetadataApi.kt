@@ -30,8 +30,6 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.ReasonCodeDeleteRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.ReasonCodeUpsertRequest
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -160,30 +158,4 @@ interface PoolMetadataApi {
     @GetMapping(value = ["${ApiCommons.BASE_PATH_V7}/reason-codes"])
     fun getReasonCodes(@ParameterObject paginationRequest: PaginationRequest): PageDto<ReasonCodeDto>
 
-    @Operation(
-        summary = "Create or update business partner relation reason codes"
-    )
-    @ApiResponses(
-        value = [
-            ApiResponse(responseCode = "200", description = "The created reason code with description"),
-            ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()])
-        ]
-    )
-    @Tag(name = ApiCommons.METADATA_NAME, description = ApiCommons.METADATA_DESCRIPTION)
-    @PutMapping(value = ["${ApiCommons.BASE_PATH_V7}/reason-codes"])
-    fun upsertReasonCode(@RequestBody request: ReasonCodeUpsertRequest): ReasonCodeDto
-
-    @Operation(
-        summary = "Delete an existing business partner relation reason code"
-    )
-    @ApiResponses(
-        value = [
-            ApiResponse(responseCode = "200", description = "Reason code successfully deleted"),
-            ApiResponse(responseCode = "404", description = "Referenced reason code can not be found", content = [Content()]),
-            ApiResponse(responseCode = "400", description = "On malformed requests", content = [Content()])
-        ]
-    )
-    @Tag(name = ApiCommons.METADATA_NAME, description = ApiCommons.METADATA_DESCRIPTION)
-    @DeleteMapping(value = ["${ApiCommons.BASE_PATH_V7}/reason-codes"])
-    fun deleteReasonCode(request: ReasonCodeDeleteRequest)
 }
