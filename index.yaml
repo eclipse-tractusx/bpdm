@@ -2,6 +2,69 @@ apiVersion: v1
 entries:
   bpdm:
   - apiVersion: v2
+    appVersion: 7.4.0-rc2
+    created: "2026-06-10T06:02:32.458688101Z"
+    dependencies:
+    - alias: bpdm-gate
+      condition: bpdm-gate.enabled
+      name: bpdm-gate
+      repository: ""
+      version: 8.0.0-rc2
+    - alias: bpdm-pool
+      condition: bpdm-pool.enabled
+      name: bpdm-pool
+      repository: ""
+      version: 9.0.0-rc2
+    - alias: bpdm-cleaning-service-dummy
+      condition: bpdm-cleaning-service-dummy.enabled
+      name: bpdm-cleaning-service-dummy
+      repository: ""
+      version: 5.0.0-rc2
+    - alias: bpdm-orchestrator
+      condition: bpdm-orchestrator.enabled
+      name: bpdm-orchestrator
+      repository: ""
+      version: 5.0.0-rc2
+    - name: bpdm-common
+      repository: ""
+      version: 2.0.0
+    - alias: postgres
+      condition: postgres.enabled
+      name: postgres
+      repository: oci://registry-1.docker.io/cloudpirates
+      version: 0.11.0
+    - condition: keycloak.enabled
+      name: keycloak
+      repository: oci://registry-1.docker.io/cloudpirates
+      version: 0.21.10
+    description: 'Deploys the full BPDM application stack as a single release and
+      configures it end to end, showcasing how a golden record process is realized
+      for a single sharing member.  The chart bundles the four BPDM services — Gate,
+      Pool, Orchestrator and the reference Cleaning Service Dummy — together with
+      a PostgreSQL database and a Keycloak instance that is pre-seeded with the `BPDM`
+      realm. On install it generates and wires the connection and credential secrets
+      the services need, so the stack comes up ready to run: a sharing member uploads
+      business partner data through the Gate, the Orchestrator coordinates cleaning
+      and golden record creation, and the result is shared back via the Gate and the
+      Pool. Each dependency (the services, PostgreSQL and Keycloak) can be disabled
+      individually to instead integrate with externally managed infrastructure.  ##
+      Quick start  ```bash # Resolve dependencies and install the release helm dependency
+      build charts/bpdm helm install bpdm charts/bpdm  # Run the bundled end-to-end
+      smoke test helm test bpdm ```  See `values.yaml` for configuration, including
+      `bpdmRealm.clients.*.secret` to pin client secrets and the `postgres`/`keycloak`
+      toggles for running against external infrastructure. '
+    digest: 49617522ea68fcbcc922ce6a084a689851d5c617b299f0b6d53d92dd629517a5
+    home: https://github.com/eclipse-tractusx/bpdm
+    maintainers:
+    - name: Nico Koprowski
+    name: bpdm
+    sources:
+    - https://github.com/eclipse-tractusx/bpdm
+    type: application
+    urls:
+    - https://github.com/eclipse-tractusx/bpdm/releases/download/bpdm-7.0.0-rc2/bpdm-7.0.0-rc2.tgz
+    version: 7.0.0-rc2
+  - apiVersion: v2
     appVersion: 7.4.0-rc1
     created: "2026-05-19T05:55:27.863891502Z"
     dependencies:
@@ -4506,4 +4569,4 @@ entries:
     urls:
     - https://github.com/eclipse-tractusx/bpdm/releases/download/bpdm-pool-4.0.0/bpdm-pool-4.0.0.tgz
     version: 4.0.0
-generated: "2026-05-19T05:55:27.864266709Z"
+generated: "2026-06-10T06:02:32.459016345Z"
