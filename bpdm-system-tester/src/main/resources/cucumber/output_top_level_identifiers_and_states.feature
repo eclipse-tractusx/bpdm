@@ -12,7 +12,7 @@
 # "output_reflects_golden_record_master_data_changes.feature") deliberately IGNORE identifiers and states;
 # this feature is their counterpart and asserts ONLY the top-level identifiers and states, ignoring the
 # descriptive master data.
-
+@CXTPM-1039
 Feature: Output Top-Level Identifiers And States Reflect The Refined Entity
 
   #h3. Test Objective:
@@ -24,6 +24,7 @@ Feature: Output Top-Level Identifiers And States Reflect The Refined Entity
   ## The sharing member shares a record.
   ## The golden record process refines it to a legal entity.
   ## The record's top-level identifiers and states reflect the legal entity.
+  @TEST_CXTPM-1034 @BPDM
   Scenario: Legal Entity Record Surfaces The Legal Entity's Identifiers And States
     When the sharing member shares record "acme-record"
     And the golden record process refines record "acme-record" to legal entity "acme" with master data "acme-content"
@@ -38,6 +39,7 @@ Feature: Output Top-Level Identifiers And States Reflect The Refined Entity
   ## The sharing member shares a record.
   ## The golden record process refines it to a site of a legal entity.
   ## The record's output has no top-level identifiers and its states reflect the site.
+  @TEST_CXTPM-1033 @BPDM
   Scenario: Site Record Surfaces No Identifiers And The Site's States
     When the sharing member shares record "acme-site-record"
     And the golden record process refines record "acme-site-record" to site "acme-site" of legal entity "acme" with master data "acme-site-content"
@@ -52,6 +54,7 @@ Feature: Output Top-Level Identifiers And States Reflect The Refined Entity
   ## The sharing member shares a record.
   ## The golden record process refines it to an additional address of a legal entity.
   ## The record's top-level identifiers and states reflect the additional address.
+  @TEST_CXTPM-1032 @BPDM
   Scenario: Additional Address Of Legal Entity Record Surfaces The Address's Identifiers And States
     When the sharing member shares record "acme-address-record"
     And the golden record process refines record "acme-address-record" to additional address "acme-branch" of legal entity "acme" with master data "acme-address-content"
@@ -66,6 +69,7 @@ Feature: Output Top-Level Identifiers And States Reflect The Refined Entity
   ## The sharing member shares a record.
   ## The golden record process refines it to an additional address of a site.
   ## The record's top-level identifiers and states reflect the additional address.
+  @TEST_CXTPM-1031 @BPDM
   Scenario: Additional Address Of Site Record Surfaces The Address's Identifiers And States
     When the sharing member shares record "acme-site-address-record"
     And the golden record process refines record "acme-site-address-record" to additional address "acme-dock" of site "acme-site" of legal entity "acme" with master data "acme-site-address-content"

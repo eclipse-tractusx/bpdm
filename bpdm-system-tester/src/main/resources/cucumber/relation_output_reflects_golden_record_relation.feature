@@ -1,3 +1,4 @@
+@CXTPM-1039
 Feature: Sharing Member Relation Output Reflects Golden Record Relation
 
   #h3. Test Objective:
@@ -13,6 +14,7 @@ Feature: Sharing Member Relation Output Reflects Golden Record Relation
   ## The sharing member shares an IsOwnedBy relation from the owned record to the owner record.
   ## The golden record process establishes the relation.
   ## The relation output reflects the established golden record relation.
+  @TEST_CXTPM-1035 @BPDM
   Scenario: IsOwnedBy Relation Reflected In Sharing Member Relation Output
     Given record "owner-record" reflects legal entity "owner"
     And record "owned-record" reflects legal entity "owned"
@@ -33,6 +35,7 @@ Feature: Sharing Member Relation Output Reflects Golden Record Relation
   ## The sharing member shares an IsAlternativeHeadquarterFor relation from the alternative to the main headquarter record.
   ## The golden record process establishes the relation.
   ## The relation output reflects the established golden record relation.
+  @TEST_CXTPM-1036 @BPDM
   Scenario: IsAlternativeHeadquarterFor Relation Reflected In Sharing Member Relation Output
     Given record "main-hq-record" reflects legal entity "main-hq"
     And record "alt-hq-record" reflects legal entity "alt-hq"
@@ -53,6 +56,7 @@ Feature: Sharing Member Relation Output Reflects Golden Record Relation
   ## The sharing member shares an IsManagedBy relation from the managed to the manager record, with validity starting now and not in the past.
   ## The golden record process establishes the relation.
   ## The relation output reflects the established golden record relation.
+  @TEST_CXTPM-1037 @BPDM
   Scenario: IsManagedBy Relation Reflected In Sharing Member Relation Output
     Given own company record "manager-record" reflects legal entity "manager"
     And own company record "managed-record" reflects legal entity "managed"
@@ -73,6 +77,7 @@ Feature: Sharing Member Relation Output Reflects Golden Record Relation
   ## The sharing member shares an IsReplacedBy relation from the legal address to the additional address, effective immediately.
   ## The golden record process establishes the relation.
   ## The relation output reflects the established golden record relation.
+  @TEST_CXTPM-1038 @BPDM
   Scenario: IsReplacedBy Relation Reflected In Sharing Member Relation Output
     Given record "legal-address-record" reflects legal entity "acme"
     And record "branch-record" reflects additional address "acme-branch" of the existing legal entity "acme"

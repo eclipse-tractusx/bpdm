@@ -107,8 +107,7 @@ class TestDataConfiguration {
     @Bean
     fun testMetadataV7(poolClient: PoolApiClient): TestMetadataV7 {
         val poolDataHelper = PoolDataHelper(poolClient, listOf(
-            ReasonCodeDto("REASON_CODE_1", "REASON_CODE_1 description"),
-            ReasonCodeDto("REASON_CODE_2", "REASON_CODE_2 description"),
+            ReasonCodeDto("HEADQUARTER_RELOCATION", "HEADQUARTER_RELOCATION description")
         ))
         return poolDataHelper.createTestDataEnvironment().metadata
     }
@@ -135,7 +134,7 @@ class TestDataConfiguration {
             legalForms = listOf("SCE1", "SGST"),
             adminAreas = listOf("DE-BW", "DE-BY"),
             scriptVariants = listOf("CHINESE_SIMPLIFIED", "CHINESE_TRADITIONAL", "KANJI", "HANGUL"),
-            reasonCodes = listOf("REASON_CODE_1", "REASON_CODE_2"),
+            reasonCodes = listOf("HEADQUARTER_RELOCATION"),
         )
     }
 

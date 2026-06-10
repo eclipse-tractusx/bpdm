@@ -22,7 +22,7 @@
 # address is a legal address, the legal entity and the address share the same confidence level. When the
 # matched address is an additional address, the legal entity always carries NoConfidence and the address is
 # evaluated independently.
-
+@CXTPM-1039
 Feature: Output Reflects Golden Record Confidence Criteria
 
   # -- Legal entity matched to legal address --
@@ -36,7 +36,8 @@ Feature: Output Reflects Golden Record Confidence Criteria
   ## The sharing member shares a third-party record.
   ## The golden record process refines it to a legal entity without external verification.
   ## The output reflects NoConfidence for both the legal entity and the legal address.
-  Scenario: Legal Entity And Legal Address Reflect NoConfidence When Neither Signal Is Set
+  @TEST_CXTPM-997 @BPDM
+  Scenario: Legal Entity No Confidence
     When the sharing member shares third-party record "acme-record"
     And the golden record process refines record "acme-record" to a legal entity without external verification
     Then "acme-record" output reflects NoConfidence for its legal entity
@@ -51,7 +52,8 @@ Feature: Output Reflects Golden Record Confidence Criteria
   ## The sharing member shares an own company record.
   ## The golden record process refines it to a legal entity without external verification.
   ## The output reflects OwnerShared confidence for both the legal entity and the legal address.
-  Scenario: Legal Entity And Legal Address Reflect OwnerShared When Shared As Own Company Data
+  @TEST_CXTPM-994 @BPDM
+  Scenario: Legal Entity Shared By Owner
     When the sharing member shares own company record "acme-record"
     And the golden record process refines record "acme-record" to a legal entity without external verification
     Then "acme-record" output reflects OwnerShared confidence for its legal entity
@@ -66,7 +68,8 @@ Feature: Output Reflects Golden Record Confidence Criteria
   ## The sharing member shares a third-party record.
   ## The golden record process refines it to a legal entity with external verification.
   ## The output reflects Verified confidence for both the legal entity and the legal address.
-  Scenario: Legal Entity And Legal Address Reflect Verified When Externally Verified
+  @TEST_CXTPM-1001 @BPDM
+  Scenario: Legal Entity Verified By External Datasource
     When the sharing member shares third-party record "acme-record"
     And the golden record process refines record "acme-record" to a legal entity with external verification
     Then "acme-record" output reflects Verified confidence for its legal entity
@@ -81,7 +84,8 @@ Feature: Output Reflects Golden Record Confidence Criteria
   ## The sharing member shares an own company record.
   ## The golden record process refines it to a legal entity with external verification.
   ## The output reflects VerifiedOwnerShared confidence for both the legal entity and the legal address.
-  Scenario: Legal Entity And Legal Address Reflect VerifiedOwnerShared When Both Signals Are Set
+  @TEST_CXTPM-998 @BPDM
+  Scenario: Legal Entity Shared And Verified By External Datasource
     When the sharing member shares own company record "acme-record"
     And the golden record process refines record "acme-record" to a legal entity with external verification
     Then "acme-record" output reflects VerifiedOwnerShared confidence for its legal entity
@@ -98,7 +102,8 @@ Feature: Output Reflects Golden Record Confidence Criteria
   ## The sharing member shares an own company record.
   ## The golden record process refines it to an additional address of a legal entity without external verification.
   ## The output reflects NoConfidence for the legal entity and OwnerShared confidence for the additional address.
-  Scenario: Legal Entity Reflects NoConfidence When The Matched Address Is An Additional Address
+  @TEST_CXTPM-1000 @BPDM
+  Scenario: Additional Address Shared By Owner
     When the sharing member shares own company record "acme-address-record"
     And the golden record process refines record "acme-address-record" to an additional address of a legal entity without external verification
     Then "acme-address-record" output reflects NoConfidence for its legal entity
@@ -113,7 +118,8 @@ Feature: Output Reflects Golden Record Confidence Criteria
   ## The sharing member shares an own company record.
   ## The golden record process refines it to an additional address of a legal entity with external verification.
   ## The output reflects NoConfidence for the legal entity and VerifiedOwnerShared confidence for the additional address.
-  Scenario: Additional Address Confidence Is Independent Of The Legal Entity When Both Signals Are Set
+  @TEST_CXTPM-996 @BPDM
+  Scenario: Additional Address Shared And Verified By External Datasource
     When the sharing member shares own company record "acme-address-record"
     And the golden record process refines record "acme-address-record" to an additional address of a legal entity with external verification
     Then "acme-address-record" output reflects NoConfidence for its legal entity
@@ -130,7 +136,8 @@ Feature: Output Reflects Golden Record Confidence Criteria
   ## The sharing member shares a third-party record.
   ## The golden record process refines it to a site.
   ## The output reflects OwnerShared confidence for the site.
-  Scenario: Site Always Reflects OwnerShared Confidence Regardless Of The Owner Signal
+  @TEST_CXTPM-1002 @BPDM
+  Scenario: Site Confidence
     When the sharing member shares third-party record "acme-site-record"
     And the golden record process refines record "acme-site-record" to a site
     Then "acme-site-record" output reflects OwnerShared confidence for its site
@@ -146,7 +153,8 @@ Feature: Output Reflects Golden Record Confidence Criteria
   ## The sharing member shares a third-party record.
   ## The golden record process refines it to a site-based legal entity without external verification.
   ## The output reflects OwnerShared confidence for the site and NoConfidence for the legal entity and legal address.
-  Scenario: Site Reflects OwnerShared Even When Legal Entity And Legal Address Reflect NoConfidence
+  @TEST_CXTPM-999 @BPDM
+  Scenario: Site Under No Confidence Legal Entity
     When the sharing member shares third-party record "acme-site-record"
     And the golden record process refines record "acme-site-record" to a site-based legal entity without external verification
     Then "acme-site-record" output reflects OwnerShared confidence for its site
@@ -164,7 +172,8 @@ Feature: Output Reflects Golden Record Confidence Criteria
   ## The sharing member shares an own company record.
   ## The golden record process refines it to an additional address of a site without external verification.
   ## The output reflects OwnerShared confidence for the site and the additional address, and NoConfidence for the legal entity.
-  Scenario: Legal Entity Reflects NoConfidence And Site Reflects OwnerShared When The Matched Address Is An Additional Address Of A Site
+  @TEST_CXTPM-995 @BPDM
+  Scenario: Additional Address Of Site Shared By Owner
     When the sharing member shares own company record "acme-site-address-record"
     And the golden record process refines record "acme-site-address-record" to an additional address of a site without external verification
     Then "acme-site-address-record" output reflects OwnerShared confidence for its site

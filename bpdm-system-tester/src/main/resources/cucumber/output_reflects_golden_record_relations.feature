@@ -19,7 +19,7 @@
 #     currently valid. The Pool expects the legal address as the relation source and the additional address
 #     as the target, and reclassifies (swaps) the two addresses; this feature only asserts that the relation
 #     is reflected and accepts the swap.
-
+@CXTPM-1039
 Feature: Output Reflects Golden Record Relations
 
   #h3. Test Objective:
@@ -35,6 +35,7 @@ Feature: Output Reflects Golden Record Relations
   ## The sharing member shares an IsOwnedBy relation from the owned record to the owner record.
   ## The golden record process establishes the relation.
   ## Both records' outputs reflect the relation on their legal entity.
+  @TEST_CXTPM-1008 @BPDM
   Scenario: IsOwnedBy Relation Reflected In Legal Entity Outputs
     Given record "owner-record" reflects legal entity "owner"
     And record "owned-record" reflects legal entity "owned"
@@ -56,6 +57,7 @@ Feature: Output Reflects Golden Record Relations
   ## The sharing member shares an IsAlternativeHeadquarterFor relation from the alternative to the main headquarter record.
   ## The golden record process establishes the relation.
   ## Both records' outputs reflect the relation on their legal entity.
+  @TEST_CXTPM-1010 @BPDM
   Scenario: IsAlternativeHeadquarterFor Relation Reflected In Legal Entity Outputs
     Given record "main-hq-record" reflects legal entity "main-hq"
     And record "alt-hq-record" reflects legal entity "alt-hq"
@@ -77,6 +79,7 @@ Feature: Output Reflects Golden Record Relations
   ## The sharing member shares an IsManagedBy relation from the managed to the manager record, with validity starting now and not in the past.
   ## The golden record process establishes the relation.
   ## Both records' outputs reflect the relation on their legal entity.
+  @TEST_CXTPM-1009 @BPDM
   Scenario: IsManagedBy Relation Reflected In Legal Entity Outputs
     Given own company record "manager-record" reflects legal entity "manager"
     And own company record "managed-record" reflects legal entity "managed"
@@ -98,6 +101,7 @@ Feature: Output Reflects Golden Record Relations
   ## The sharing member shares an IsReplacedBy relation from the legal address to the additional address, effective immediately.
   ## The golden record process establishes the relation (the Pool swaps the two addresses).
   ## Both records' outputs reflect the relation on their address.
+  @TEST_CXTPM-1007 @BPDM
   Scenario: IsReplacedBy Relation Reflected In Address Outputs
     Given record "legal-address-record" reflects legal entity "acme"
     And record "branch-record" reflects additional address "acme-branch" of the existing legal entity "acme"
@@ -119,6 +123,7 @@ Feature: Output Reflects Golden Record Relations
   ## The sharing member shares an IsOwnedBy relation onto the legal entity and an IsReplacedBy relation onto its additional address.
   ## The golden record process establishes both relations.
   ## The additional address record's output reflects the parent legal entity relation and the address relation.
+  @TEST_CXTPM-1011 @BPDM
   Scenario: Additional Address Record Reflects Its Parent Legal Entity Relation
     Given record "legal-entity-record" reflects legal entity "acme"
     And record "branch-record" reflects additional address "acme-branch" of the existing legal entity "acme"
