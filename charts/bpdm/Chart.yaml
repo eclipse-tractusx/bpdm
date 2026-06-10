@@ -47,8 +47,8 @@ description: |
 
   See `values.yaml` for configuration, including `bpdmRealm.clients.*.secret` to pin client
   secrets and the `postgres`/`keycloak` toggles for running against external infrastructure.
-version: 7.0.0-rc2
-appVersion: "7.4.0-rc2"
+version: 7.0.0
+appVersion: "7.4.0"
 home: https://github.com/eclipse-tractusx/bpdm
 sources:
   - https://github.com/eclipse-tractusx/bpdm
@@ -57,19 +57,19 @@ maintainers:
 
 dependencies:
   - name: bpdm-gate
-    version: 8.0.0-rc2
+    version: 8.0.0
     alias: bpdm-gate
     condition: bpdm-gate.enabled
   - name: bpdm-pool
-    version: 9.0.0-rc2
+    version: 9.0.0
     alias: bpdm-pool
     condition: bpdm-pool.enabled
   - name: bpdm-cleaning-service-dummy
-    version: 5.0.0-rc2
+    version: 5.0.0
     alias: bpdm-cleaning-service-dummy
     condition: bpdm-cleaning-service-dummy.enabled
   - name: bpdm-orchestrator
-    version: 5.0.0-rc2
+    version: 5.0.0
     alias: bpdm-orchestrator
     condition: bpdm-orchestrator.enabled
   - name: bpdm-common
