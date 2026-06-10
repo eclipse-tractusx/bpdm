@@ -45,8 +45,8 @@ mvn spring-boot:run
 ```
 
 After this you have full-fledged running BPDM system.
-The Keycloak realm adheres to the configuration of the [Central-IDP](https://github.com/eclipse-tractusx/portal-iam/blob/main/docs/admin/technical-documentation/03.%20Clients.md#initial-clients-and-service-accounts).
-For accessing the BPDM APIs you can choose one of the pre-existing clients over client authentication flow, notably sa-cl7-cx5 or sa-cl7-cx7 for access to Gate and Pool.
+The Keycloak realm is the `BPDM` realm configured in [BPDM-realm.json](bpdm-common-test/src/main/resources/keycloak/BPDM-realm.json).
+For accessing the BPDM APIs you can authenticate over the client credentials flow using one of the pre-existing service account clients, notably `BPDM_GATE` and `BPDM_POOL` for access to Gate and Pool respectively, or `BPDM_ADMIN` for full access.
 As a next step on how to pass business partner data and create golden records you can have a look at the [api documentation](docs/api/README.md) of this repository.
 
 ### Gate Configuration
@@ -122,70 +122,48 @@ helm install bpdm --values path/to/values/file.yml ./charts/bpdm
 The following sections provide example use cases for default overrides.
 
 
-#### Overriding Postgres Passwords
+#### Overriding the Postgres Password
 
-If you want to change the default password of the given postgres database you can override the postgres configuration and the connection configuration of each BPDM app that uses the database:
+The bundled Postgres uses a dedicated BPDM database user whose password is generated once and preserved across upgrades in the umbrella-managed `<release-name>-postgres-connection-config` Secret.
+To pin a known password instead, set it once at the umbrella level.
+The same value is shared with both the database and the applications automatically, so no per-service datasource configuration is required:
 
 ```yaml
 postgres:
-  password: $PASSWORD
-bpdm-gate:
-  applicationSecrets:
-    spring:
-      datasource:
-        password: $PASSWORD
-bpdm-pool:
-  applicationSecrets:
-    spring:
-      datasource:
-        password: $PASSWORD
-bpdm-orchestrator:
-  applicationSecrets:
-    spring:
-      datasource:
-        password: $PASSWORD
+  customUser:
+    password: $PASSWORD
 ```
 
-#### Overriding Central-IDP Secrets
+#### Overriding OAuth Client Secrets
 
-You can use [seeding](https://github.com/eclipse-tractusx/portal-iam/tree/v3.0.1/charts/centralidp) for adding custom passwords to the Central-IDP dependency.
-The new client clients secrets then need to be given to the connections of each BPDM app:
+The bundled Keycloak realm defines a service-account client for each BPDM service.
+Their secrets are generated once and preserved across upgrades.
+To pin known secrets (for example to match an external consumer of a client), set them under `bpdmRealm.clients`:
 
 ```yaml
-bpdm-gate:
-  applicationSecrets:
-    bpdm:
-      client:
-        orchestrator:
-          registration:
-            client-secret: $GATE_ORCH_CLIENT_SECRET
-        pool:
-          registration:
-            client-secret: $GATE_POOL_CLIENT_SECRET
-bpdm-pool:
-  applicationSecrets:
-    bpdm:
-      client:
-        orchestrator:
-          registration:
-            client-secret: $POOL_ORCH_CLIENT_SECRET
-bpdm-cleaning-service-dummy:
-  applicationSecrets:
-    bpdm:
-      client:
-        orchestrator:
-          registration:
-            client-secret: $CLEANING_DUMMY_ORCH_CLIENT_SECRET
+bpdmRealm:
+  clients:
+    gate:
+      secret: $GATE_SECRET
+    pool:
+      secret: $POOL_SECRET
+    orchestrator:
+      secret: $ORCHESTRATOR_SECRET
+    cleaningDummy:
+      secret: $CLEANING_DUMMY_SECRET
 ```
+
+The available client keys are `admin`, `gate`, `pool`, `orchestrator`, `cleaningDummy`, `gateInputConsumer`, `gateInputManager`, `gateOutputConsumer`, `participant`, `sharingMember`, `taskCreator`, `refinerClean`, `refinerCleanAndSync` and `refinerPoolSync`.
+The umbrella wires each application to its client automatically, so no per-service client configuration is needed when using the bundled Keycloak.
 
 #### Insecure Installation
 
 For non-production purposes you may want to install BPDM applications that are not authenticated.
 All BPDM applications offer a Spring profile to quickly remove all authentication configuration for their APIs and client connections.
-In this case you can also disable the Central-IDP dependency from being deployed.
+In this case you can also disable the bundled Keycloak dependency from being deployed.
 
 ```yaml
-centralIdp:
+keycloak:
   enabled: false
 bpdm-gate:
   springProfiles:
@@ -211,47 +189,89 @@ However, for production it is recommended to host dedicated Postgres and Keycloa
 
 >Additional Requirements
 >
-> * Postgres (15.4.0 supported)
-> * Keycloak (22.0.3 supported)
+> * Postgres (18.0 supported)
+> * Keycloak (26.6.3 supported)
 
-In this case, you can disable the dependencies and configure the connection to external systems in the application configuration.
+Disable the bundled dependencies and supply the connection settings through each service's `applicationConfig` (non-secret values) and `applicationSecrets` (credentials).
+Gate, Pool and Orchestrator connect to the database; the Cleaning Service Dummy only needs the authentication settings.
+When connecting to an external IdP you also need to provide the client secrets for the outbound BPDM client connections (under `applicationSecrets.bpdm.client`), matching the clients configured in that IdP.
 
 ```yaml
-centralIdp:
-  enabled: false
 postgres:
+  enabled: false
+keycloak:
   enabled: false
 bpdm-gate:
   applicationConfig:
     bpdm:
       datasource:
-        host: "http://remote-postgres"
+        host: remote-postgres
       security:
-        auth-server-url: "http://remote-centralIdp/auth"
+        auth-server-url: "https://remote-keycloak/auth"
+        realm: BPDM
+  applicationSecrets:
+    spring:
+      datasource:
+        username: bpdm
+        password: $DB_PASSWORD
+    bpdm:
+      client:
+        orchestrator:
+          registration:
+            client-secret: $GATE_ORCH_CLIENT_SECRET
+        pool:
+          registration:
+            client-secret: $GATE_POOL_CLIENT_SECRET
 bpdm-pool:
   applicationConfig:
     bpdm:
       datasource:
-        host: "http://remote-postgres"
+        host: remote-postgres
       security:
-        auth-server-url: "http://remote-centralIdp/auth"
+        auth-server-url: "https://remote-keycloak/auth"
+        realm: BPDM
+  applicationSecrets:
+    spring:
+      datasource:
+        username: bpdm
+        password: $DB_PASSWORD
+    bpdm:
+      client:
+        orchestrator:
+          registration:
+            client-secret: $POOL_ORCH_CLIENT_SECRET
 bpdm-orchestrator:
   applicationConfig:
     bpdm:
       datasource:
-        host: "http://remote-postgres"
+        host: remote-postgres
       security:
-        auth-server-url: "http://remote-centralIdp/auth"
+        auth-server-url: "https://remote-keycloak/auth"
+        realm: BPDM
+  applicationSecrets:
+    spring:
+      datasource:
+        username: bpdm
+        password: $DB_PASSWORD
 bpdm-cleaning-service-dummy:
   applicationConfig:
     bpdm:
+      security:
+        auth-server-url: "https://remote-keycloak/auth"
+        realm: BPDM
       client:
         orchestrator:
           provider:
-            issuer-uri: "http://remote-centralIdp/auth"
+            issuer-uri: "https://remote-keycloak/auth/realms/BPDM"
+  applicationSecrets:
+    bpdm:
+      client:
+        orchestrator:
+          registration:
+            client-secret: $CLEANING_DUMMY_ORCH_CLIENT_SECRET
 ```
 
-You can combine this configuration with the examples for overriding password and secrets to adapt BPDM's connection configuration to you wishes.
+You can combine this configuration with the examples for overriding passwords and secrets to adapt BPDM's connection configuration to your wishes.
 
 ### Fine-granular Configuration
 
@@ -273,7 +293,7 @@ For deploying an EDC please consult the documentation on the [EDC repository](ht
 ### Requirements
 
 * Running BPDM applications
-* Running EDC (0.7.3 supported)
+* Running EDC (0.11 supported)
 
 ### Installation
 
@@ -347,7 +367,7 @@ The following instructions assume you are using the BPDM helm chart to deploy th
 
 #### Deploy the initial golden record process components
 
-1. Disable the own Central-IDP dependency
+1. Disable the bundled Keycloak dependency
 2. Set the authentication server to the Central-IDP instance used by the Portal
 3. Override the default client secrets with the ones used in the Portal's Central-IDP
 4. Expose the Pool over ingress on context path `pool` to make it available to the Portal
@@ -357,7 +377,7 @@ The following instructions assume you are using the BPDM helm chart to deploy th
 ```yaml
 # Helm Values Overwrite
 
-centralidp:
+keycloak:
   enabled: false
 bpdm-pool:
   ingress:
@@ -480,7 +500,7 @@ The new Gate should be configured in the following way:
 ```yaml
 # Helm Values Overwrite
 
-centralIdp:
+keycloak:
   enabled: false
 bpdm-pool:
   enabled: false
