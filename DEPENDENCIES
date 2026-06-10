@@ -72,27 +72,27 @@ maven/mavencentral/io.mockk/mockk-agent-jvm/1.14.6, Apache-2.0, approved, clearl
 maven/mavencentral/io.mockk/mockk-core-jvm/1.14.6, Apache-2.0, approved, clearlydefined
 maven/mavencentral/io.mockk/mockk-dsl-jvm/1.14.6, Apache-2.0, approved, clearlydefined
 maven/mavencentral/io.mockk/mockk-jvm/1.14.6, Apache-2.0, approved, clearlydefined
-maven/mavencentral/io.netty/netty-buffer/4.2.13.Final, Apache-2.0, approved, #16116
-maven/mavencentral/io.netty/netty-codec-base/4.2.13.Final, Apache-2.0, approved, #21322
-maven/mavencentral/io.netty/netty-codec-classes-quic/4.2.13.Final, Apache-2.0, approved, #21311
-maven/mavencentral/io.netty/netty-codec-compression/4.2.13.Final, Apache-2.0, approved, #16109
-maven/mavencentral/io.netty/netty-codec-dns/4.2.13.Final, Apache-2.0, approved, #16112
-maven/mavencentral/io.netty/netty-codec-http/4.2.13.Final, Apache-2.0 AND (Apache-2.0 AND MIT) AND (Apache-2.0 AND BSD-3-Clause), approved, #16121
-maven/mavencentral/io.netty/netty-codec-http2/4.2.13.Final, Apache-2.0, approved, #16125
-maven/mavencentral/io.netty/netty-codec-http3/4.2.13.Final, Apache-2.0, approved, #25607
-maven/mavencentral/io.netty/netty-codec-native-quic/4.2.13.Final, Apache-2.0, approved, #21319
-maven/mavencentral/io.netty/netty-codec-socks/4.2.13.Final, Apache-2.0, approved, #16117
-maven/mavencentral/io.netty/netty-common/4.2.13.Final, Apache-2.0 AND (Apache-2.0 AND CC0-1.0) AND (Apache-2.0 AND MIT), approved, #16124
-maven/mavencentral/io.netty/netty-handler-proxy/4.2.13.Final, Apache-2.0, approved, #16111
-maven/mavencentral/io.netty/netty-handler/4.2.13.Final, Apache-2.0, approved, #16123
-maven/mavencentral/io.netty/netty-resolver-dns-classes-macos/4.2.13.Final, Apache-2.0, approved, #21316
-maven/mavencentral/io.netty/netty-resolver-dns-native-macos/4.2.13.Final, Apache-2.0, approved, #21330
-maven/mavencentral/io.netty/netty-resolver-dns/4.2.13.Final, Apache-2.0, approved, #16110
-maven/mavencentral/io.netty/netty-resolver/4.2.13.Final, Apache-2.0, approved, #16126
-maven/mavencentral/io.netty/netty-transport-classes-epoll/4.2.13.Final, Apache-2.0, approved, #21317
-maven/mavencentral/io.netty/netty-transport-native-epoll/4.2.13.Final, Apache-2.0, approved, #21327
-maven/mavencentral/io.netty/netty-transport-native-unix-common/4.2.13.Final, Apache-2.0, approved, #21329
-maven/mavencentral/io.netty/netty-transport/4.2.13.Final, Apache-2.0, approved, #16113
+maven/mavencentral/io.netty/netty-buffer/4.2.15.Final, Apache-2.0, approved, #16116
+maven/mavencentral/io.netty/netty-codec-base/4.2.15.Final, Apache-2.0, approved, #21322
+maven/mavencentral/io.netty/netty-codec-classes-quic/4.2.15.Final, Apache-2.0, approved, #21311
+maven/mavencentral/io.netty/netty-codec-compression/4.2.15.Final, Apache-2.0, approved, #16109
+maven/mavencentral/io.netty/netty-codec-dns/4.2.15.Final, Apache-2.0, approved, #16112
+maven/mavencentral/io.netty/netty-codec-http/4.2.15.Final, Apache-2.0 AND (Apache-2.0 AND MIT) AND (Apache-2.0 AND BSD-3-Clause), approved, #16121
+maven/mavencentral/io.netty/netty-codec-http2/4.2.15.Final, Apache-2.0, approved, #16125
+maven/mavencentral/io.netty/netty-codec-http3/4.2.15.Final, Apache-2.0, approved, #25607
+maven/mavencentral/io.netty/netty-codec-native-quic/4.2.15.Final, Apache-2.0, approved, #21319
+maven/mavencentral/io.netty/netty-codec-socks/4.2.15.Final, Apache-2.0, approved, #16117
+maven/mavencentral/io.netty/netty-common/4.2.15.Final, Apache-2.0 AND (Apache-2.0 AND CC0-1.0) AND (Apache-2.0 AND MIT), approved, #16124
+maven/mavencentral/io.netty/netty-handler-proxy/4.2.15.Final, Apache-2.0, approved, #16111
+maven/mavencentral/io.netty/netty-handler/4.2.15.Final, Apache-2.0, approved, #16123
+maven/mavencentral/io.netty/netty-resolver-dns-classes-macos/4.2.15.Final, Apache-2.0, approved, #21316
+maven/mavencentral/io.netty/netty-resolver-dns-native-macos/4.2.15.Final, Apache-2.0, approved, #21330
+maven/mavencentral/io.netty/netty-resolver-dns/4.2.15.Final, Apache-2.0, approved, #16110
+maven/mavencentral/io.netty/netty-resolver/4.2.15.Final, Apache-2.0, approved, #16126
+maven/mavencentral/io.netty/netty-transport-classes-epoll/4.2.15.Final, Apache-2.0, approved, #21317
+maven/mavencentral/io.netty/netty-transport-native-epoll/4.2.15.Final, Apache-2.0, approved, #21327
+maven/mavencentral/io.netty/netty-transport-native-unix-common/4.2.15.Final, Apache-2.0, approved, #21329
+maven/mavencentral/io.netty/netty-transport/4.2.15.Final, Apache-2.0, approved, #16113
 maven/mavencentral/io.projectreactor.netty/reactor-netty-core/1.3.5, Apache-2.0, approved, #25603
 maven/mavencentral/io.projectreactor.netty/reactor-netty-http/1.3.5, Apache-2.0, approved, #25597
 maven/mavencentral/io.projectreactor/reactor-core/3.8.5, Apache-2.0, approved, #25635
