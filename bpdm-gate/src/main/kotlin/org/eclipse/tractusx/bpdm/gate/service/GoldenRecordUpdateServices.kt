@@ -351,9 +351,12 @@ class GoldenRecordUpdateChunkService(
         businessPartner.siteName = site.name
         businessPartner.siteConfidence?.let { update(it,  site.confidenceCriteria) }
 
-        val goldenRecordVariantByCode = site.scriptVariants.associateBy { it.scriptCode }
-        businessPartner.scriptVariants.forEach { variant ->
-            val goldenRecordVariant = goldenRecordVariantByCode[variant.scriptCode] ?: return@forEach
+        val goldenRecordVariantByCode = businessPartner.scriptVariants.associateBy { it.scriptCode }
+
+        site.scriptVariants.groupBy { it.scriptCode }.map { it.value.first() }.forEach { goldenRecordVariant ->
+            val variant = goldenRecordVariantByCode[goldenRecordVariant.scriptCode]
+                ?: BusinessPartnerScriptVariantDb(goldenRecordVariant.scriptCode, businessPartner).apply {   businessPartner.scriptVariants.add(this) }
+
             variant.siteName = goldenRecordVariant.name
         }
     }
@@ -370,9 +373,11 @@ class GoldenRecordUpdateChunkService(
         businessPartner.addressConfidence?.let { update(it,  addressProperties.confidenceCriteria) }
         businessPartner.addressGoldenRecordRelations.addAll(addressProperties.relations.map(::toEntity))
 
-        val goldenRecordVariantByCode = address.scriptVariants.associateBy { it.scriptCode }
-        businessPartner.scriptVariants.forEach { variant ->
-            val goldenRecordVariant = goldenRecordVariantByCode[variant.scriptCode] ?: return@forEach
+        val goldenRecordVariantByCode = businessPartner.scriptVariants.associateBy { it.scriptCode }
+        address.scriptVariants.groupBy { it.scriptCode }.map { it.value.first() }.forEach { goldenRecordVariant ->
+            val variant = goldenRecordVariantByCode[goldenRecordVariant.scriptCode]
+                ?: BusinessPartnerScriptVariantDb(goldenRecordVariant.scriptCode, businessPartner).apply {   businessPartner.scriptVariants.add(this) }
+
             variant.addressName = goldenRecordVariant.address.addressName
             variant.physicalAddress = goldenRecordVariant.address.physicalAddress.toEntity()
             variant.alternativeAddress = goldenRecordVariant.address.alternativeAddress?.toEntity()

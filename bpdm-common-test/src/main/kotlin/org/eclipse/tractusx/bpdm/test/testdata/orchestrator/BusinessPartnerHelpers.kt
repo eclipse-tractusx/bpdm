@@ -75,17 +75,20 @@ fun BusinessPartner.copyWithHasChanged(legalEntityChanged: Boolean = false, site
         additionalAddress = additionalAddress?.copyAsPostalAddress{ it.copy(hasChanged = additionalAddressChanged) }
     )
 
-fun BusinessPartner.copyWithBpnRequests() =
+fun BusinessPartner.copyWithBpnRequests() = copyWithBpnReferenceType(BpnReferenceType.BpnRequestIdentifier)
+
+fun BusinessPartner.copyWithBpnReferenceType(bpnReferenceType: BpnReferenceType) =
     copy(
-        legalEntity = legalEntity.copy(bpnReference = legalEntity.bpnReference.copy(referenceType = BpnReferenceType.BpnRequestIdentifier), legalAddress = legalEntity.legalAddress.copyWithBpnRequests()),
-        site = site?.copy(bpnReference = site!!.bpnReference.copy(referenceType = BpnReferenceType.BpnRequestIdentifier), siteMainAddress = site?.siteMainAddress?.copyWithBpnRequests()),
-        additionalAddress = additionalAddress?.copyAsPostalAddress{ it.copyWithBpnRequests() }
+        legalEntity = legalEntity.copy(bpnReference = legalEntity.bpnReference.copy(referenceType = bpnReferenceType), legalAddress = legalEntity.legalAddress.copyWithBpnReferenceType(bpnReferenceType)),
+        site = site?.copy(bpnReference = site!!.bpnReference.copy(referenceType = bpnReferenceType), siteMainAddress = site?.siteMainAddress?.copyWithBpnReferenceType(bpnReferenceType)),
+        additionalAddress = additionalAddress?.copyAsPostalAddress{ it.copyWithBpnReferenceType(bpnReferenceType) }
     )
 
-fun PostalAddress.copyWithBpnRequests() =
-    copy(bpnReference = bpnReference.copy(referenceType = BpnReferenceType.BpnRequestIdentifier))
+fun PostalAddress.copyWithBpnReferenceType(bpnReferenceType: BpnReferenceType) =
+    copy(bpnReference = bpnReference.copy(referenceType = bpnReferenceType))
 
 fun BusinessPartner.copyAsCxMemberData() =
     copy(
         legalEntity = legalEntity.copy(isParticipantData = true)
     )
+

@@ -21,41 +21,42 @@
 apiVersion: v2
 name: bpdm
 type: application
-description: A Helm chart for Kubernetes that deploys the BPDM applications
-version: 6.4.0-SNAPSHOT
-appVersion: "7.4.0-SNAPSHOT"
+description: |
+  Deploys the full BPDM application stack as a single release and configures it end to
+  end, showcasing how a golden record process is realized for a single sharing member.
+version: 7.1.0-SNAPSHOT
+appVersion: "7.5.0-SNAPSHOT"
 home: https://github.com/eclipse-tractusx/bpdm
 sources:
   - https://github.com/eclipse-tractusx/bpdm
 maintainers:
   - name: Nico Koprowski
-  - name: Sujit Karne
 
 dependencies:
   - name: bpdm-gate
-    version: 7.4.0-SNAPSHOT
+    version: 8.1.0-SNAPSHOT
     alias: bpdm-gate
     condition: bpdm-gate.enabled
   - name: bpdm-pool
-    version: 8.4.0-SNAPSHOT
+    version: 9.1.0-SNAPSHOT
     alias: bpdm-pool
     condition: bpdm-pool.enabled
   - name: bpdm-cleaning-service-dummy
-    version: 4.4.0-SNAPSHOT
+    version: 5.1.0-SNAPSHOT
     alias: bpdm-cleaning-service-dummy
     condition: bpdm-cleaning-service-dummy.enabled
   - name: bpdm-orchestrator
-    version: 4.4.0-SNAPSHOT
+    version: 5.1.0-SNAPSHOT
     alias: bpdm-orchestrator
     condition: bpdm-orchestrator.enabled
   - name: bpdm-common
     version: 2.0.0
   - name: postgres
     alias: postgres
-    condition: postgre.enabled
+    condition: postgres.enabled
     repository: oci://registry-1.docker.io/cloudpirates
     version: 0.11.0
   - name: keycloak
     repository: oci://registry-1.docker.io/cloudpirates
-    version: 0.19.8
+    version: 0.21.10
     condition: keycloak.enabled

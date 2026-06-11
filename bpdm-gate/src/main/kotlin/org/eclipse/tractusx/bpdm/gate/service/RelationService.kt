@@ -180,7 +180,7 @@ class RelationService(
         sourceBusinessPartnerExternalId: String,
         targetBusinessPartnerExternalId: String,
         validityPeriods: List<RelationValidityPeriodDto>,
-        reasonCode: String
+        reasonCode: String?
     ): RelationDto {
         val existingRelationship = relationRepository.findByTenantBpnLAndExternalId(tenantBpnL.value, externalId)
         val upsertedRelationStage = if(existingRelationship == null)
@@ -197,7 +197,7 @@ class RelationService(
         sourceBpnL: String,
         targetBpnL: String,
         validityPeriods: Collection<RelationValidityPeriodDto>,
-        reasonCode: String
+        reasonCode: String?
     ): RelationDb{
         if(sourceBpnL == targetBpnL)
             throw BpdmInvalidRelationException("Source and target should not be the same")
@@ -227,7 +227,7 @@ class RelationService(
         sourceBusinessPartnerExternalId: String,
         targetBusinessPartnerExternalId: String,
         validityPeriods: List<RelationValidityPeriodDto>,
-        reasonCode: String
+        reasonCode: String?
     ): RelationStageDb{
         if(sourceBusinessPartnerExternalId == targetBusinessPartnerExternalId)
             throw BpdmInvalidRelationException("Source and target '$sourceBusinessPartnerExternalId' should not be equal.")
@@ -270,7 +270,7 @@ class RelationService(
         sourceBusinessPartnerExternalId: String,
         targetBusinessPartnerExternalId: String,
         validityPeriods: List<RelationValidityPeriodDto>,
-        reasonCode: String
+        reasonCode: String?
     ): RelationStageDb{
         val existingRelationship = relationRepository.findByTenantBpnLAndExternalId(tenantBpnL.value, externalId) ?: throw BpdmMissingRelationException(externalId)
         return updateInputStage(
@@ -289,7 +289,7 @@ class RelationService(
         sourceBusinessPartnerExternalId: String,
         targetBusinessPartnerExternalId: String,
         validityPeriods: List<RelationValidityPeriodDto>,
-        reasonCode: String
+        reasonCode: String?
     ): RelationStageDb{
         if(sourceBusinessPartnerExternalId == targetBusinessPartnerExternalId)
             throw BpdmInvalidRelationException("Source and target '$sourceBusinessPartnerExternalId' should not be equal.")
@@ -368,7 +368,7 @@ class RelationService(
         val source: SharingStateDb,
         val target: SharingStateDb,
         val validityPeriods: MutableList<RelationValidityPeriodDb>,
-        val reasonCode: String
+        val reasonCode: String?
     )
 
     private fun validateValidityPeriods(validityPeriods: Collection<RelationValidityPeriodDto>) {

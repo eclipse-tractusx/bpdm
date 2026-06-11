@@ -129,7 +129,7 @@ class RelationUpsertService(
         val legalEntityRelationType: LegalEntityRelationType,
         val validityPeriods: Collection<RelationValidityPeriodDb>,
         val existingRelation: RelationDb?,
-        val reasonCode: ReasonCodeDb
+        val reasonCode: ReasonCodeDb?
     )
 
     data class TimePeriod(

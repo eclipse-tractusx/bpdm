@@ -19,12 +19,16 @@
 
 package org.eclipse.tractusx.bpdm.gate
 
+import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInfo
 import org.springframework.beans.factory.annotation.Autowired
 
 abstract class GateTestBase {
+
+    val tenantBPNL = KeyCloakInitializer.TENANT_BPNL
+
     @Autowired
     lateinit var databaseHelpers: DbTestHelpers
 

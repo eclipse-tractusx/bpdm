@@ -43,7 +43,7 @@ class DbTestHelpers(private val entityManager: EntityManager?) {
                         FOR table_names IN SELECT table_name
                             FROM information_schema.tables
                             WHERE table_schema='$dbSchemaName'
-                            AND table_name NOT IN ('flyway_schema_history','regions', 'legal_forms', 'identifier_types', 'script_codes') 
+                            AND table_name NOT IN ('flyway_schema_history','regions', 'legal_forms', 'identifier_types', 'script_codes', 'reason_codes') 
                         LOOP 
                             EXECUTE format('TRUNCATE TABLE "$dbSchemaName".%I CONTINUE IDENTITY CASCADE;', table_names.table_name);
                         END LOOP;

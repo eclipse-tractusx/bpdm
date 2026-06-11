@@ -2,17 +2,17 @@
 
 <!-- TOC -->
 * [Migration Guide](#migration-guide)
-  * [Next](#next)
+  * [7.4.x to 7.5.x](#74x-to-75x)
+  * [7.3.x to 7.4.x](#73x-to-74x)
     * [Breaking rename of relation DTO fields (Gate)](#breaking-rename-of-relation-dto-fields-gate)
       * [Impact](#impact)
       * [Rationale](#rationale)
     * [New relation type for addresses](#new-relation-type-for-addresses)
     * [No required operator actions](#no-required-operator-actions)
     * [Reason Codes](#reason-codes)
-  * [7.2.x to 7.3.x](#72x-to-73x)
     * [Postgres Upgrade (BREAKING)](#postgres-upgrade-breaking)
     * [Keycloak Upgrade (BREAKING)](#keycloak-upgrade-breaking)
-  * [7.2.x to 7.3.x](#72x-to-73x-1)
+  * [7.2.x to 7.3.x](#72x-to-73x)
     * [Automatic Confidence Level](#automatic-confidence-level)
   * [7.1.x to 7.2.x](#71x-to-72x)
     * [Alternative Headquarters Restriction](#alternative-headquarters-restriction)
@@ -24,7 +24,11 @@
 <!-- TOC -->
 
 
-## Next
+## 7.4.x to 7.5.x
+
+_No migration steps yet._
+
+## 7.3.x to 7.4.x
 
 ### Breaking rename of relation DTO fields (Gate)
 
@@ -85,8 +89,6 @@ The list of available reason codes should be managed in the golden record Pool t
 > Very important:
 > Since reason codes are mandatory and there are no default reason codes this repository does not contain any migration scripts for existing relations.
 > Therefore, if there are already relations present in BPDM the operator needs to add migration scripts assigning reason codes to those relations.
-
-## 7.2.x to 7.3.x
 
 ### Postgres Upgrade (BREAKING)
 

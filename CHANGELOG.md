@@ -6,7 +6,15 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
 For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/CHANGELOG.md) of the charts directly.
 
-## [7.4.0] - tbd
+## [7.5.0] - unreleased
+
+### Breaking
+
+### Added
+
+### Changed
+
+## [7.4.0] - 2026-06-10
 
 ### Breaking
 
@@ -18,11 +26,12 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 
 - Script variants and script codes for business partner data [#1593](https://github.com/eclipse-tractusx/bpdm/issues/1593)
 - BPDM Gate: Golden record relations to business partner output [#1630](https://github.com/eclipse-tractusx/bpdm/issues/1630)
-- BPDM Orchestrator: updatedAt timestamps for golden record task components [#1564](https://github.com/eclipse-tractusx/bpdm/issues/1564)
+- BPDM Pool: Seed default Business Partner Relation Reason Code via Flyway migration [#1679](https://github.com/eclipse-tractusx/bpdm/issues/1679)
 
 ### Changed
 
 - BPDM Gate: Fix V7 relation output changelog always showing "UPDATE" type even if the relation output has been created [#1665](https://github.com/eclipse-tractusx/bpdm/issues/1665)
+- BPDM Gate: Fix rare bug in which duplicate sharing member records with the same external-id can be created if they are shared in parallel [#1546](https://github.com/eclipse-tractusx/bpdm/issues/1546)
 
 ## [7.3.0] - 2026-03-6
 

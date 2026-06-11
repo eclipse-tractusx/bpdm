@@ -24,7 +24,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogDto
-import org.eclipse.tractusx.bpdm.gate.v6.GateUnscheduledInitialStartV6Test
+import org.eclipse.tractusx.bpdm.gate.v6.UnscheduledGateV6TestBase
 import org.junit.jupiter.api.Test
 import java.time.Instant
 
@@ -46,7 +46,7 @@ import java.time.Instant
  *
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
-class SearchOutputChangelogV6IT: GateUnscheduledInitialStartV6Test() {
+class SearchOutputChangelogV6IT: UnscheduledGateV6TestBase() {
 
     private val anyTime = Instant.now()
 

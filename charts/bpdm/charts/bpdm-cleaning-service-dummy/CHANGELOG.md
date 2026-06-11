@@ -5,7 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
 
-## [4.4.0] - tbd
+## [5.0.0] - 2026-06-10
+
+### Added
+
+- New `externalApplicationConfig` value to load additional application configuration from existing Secrets. Each referenced Secret provides an `application.yml` that is mounted as a lower-precedence config source, layered beneath the chart's own `applicationConfig`. This lets connection and credential settings be supplied from externally managed Secrets. [#1708](https://github.com/eclipse-tractusx/bpdm/issues/1708)
+
+### Breaking
+
+- Replaced Bitnami Postgres dependency with CloudPirates Postgres dependency [#1625](https://github.com/eclipse-tractusx/bpdm/issues/1625)
+
+### Changed
 
 - Increase appversion to 7.4.0
 

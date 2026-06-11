@@ -7,30 +7,30 @@ C4Context
 
     Person(bpdm_user, "(Technical) User of the BPDM APIs")
 
-    System(pool_postgres, "Pool Database", "Postgres: 14.5")
-    System(gate_postgres, "Gate Database", "Postgres: 14.5")
+    System(pool_postgres, "Pool Database", "Postgres: 18")
+    System(gate_postgres, "Gate Database", "Postgres: 18")
 
     Deployment_Node(pool_machine, "OS Environment", "Linux Alpine 3.16"){
-        Deployment_Node(pool_java, "Runtime Environment", "JAVA RE 17") {
-            Container(pool_container, "Pool Application", "Spring Boot: 3.1")
+        Deployment_Node(pool_java, "Runtime Environment", "JAVA RE 21") {
+            Container(pool_container, "Pool Application", "Spring Boot: 3.2")
         }
     }
 
     Deployment_Node(gate_machine, "OS Environment", "Linux Alpine 3.16"){
-        Deployment_Node(gate_java, "Runtime Environment", "JAVA RE 17") {
-            Container(gate_container, "Gate Application", "Spring Boot: 3.1")
+        Deployment_Node(gate_java, "Runtime Environment", "JAVA RE 21") {
+            Container(gate_container, "Gate Application", "Spring Boot: 3.2")
         }
     }
 
     Deployment_Node(orchestrator_machine, "OS Environment", "Linux Alpine 3.16"){
-        Deployment_Node(orchestrator_java, "Runtime Environment", "JAVA RE 17") {
-            Container(orchestrator_container, "Orchestrator Application", "Spring Boot: 3.1")
+        Deployment_Node(orchestrator_java, "Runtime Environment", "JAVA RE 21") {
+            Container(orchestrator_container, "Orchestrator Application", "Spring Boot: 3.2")
         }
     }
 
      Deployment_Node(dummy_machine, "OS Environment", "Linux Alpine 3.16"){
-        Deployment_Node(dummy_java, "Runtime Environment", "JAVA RE 17") {
-            Container(dummy_container, "Cleaning Service Dummy Application", "Spring Boot: 3.1")
+        Deployment_Node(dummy_java, "Runtime Environment", "JAVA RE 21") {
+            Container(dummy_container, "Cleaning Service Dummy Application", "Spring Boot: 3.2")
         }
     }
 
@@ -59,7 +59,7 @@ C4Context
         Container(nginx, "Ingress Controller", "Nginx Reverse Proxy")
         Container(service, "Service", "Service Kubernetes Resource")
 
-        Container(database, "Database Deployment", "Chart bitnami/postgres:11.9.13")
+        Container(database, "Database Deployment", "Chart cloudpirates/postgres:0.11.0")
         Container(other_bpdm, "Other BPDM Application Deployment", "Helm Chart")
 
         Deployment_Node(deployment, "Deployment", "Deployment Kubernetes Resource"){
