@@ -12,6 +12,8 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 
 ### Added
 
+- BPDM Pool: Seed Business Partner Relation Reason Codes via Flyway migration [#1679](https://github.com/eclipse-tractusx/bpdm/issues/1679)
+
 ### Changed
 
 ## [7.4.0] - 2026-06-10
