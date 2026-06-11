@@ -93,7 +93,7 @@ object BusinessPartnerVerboseValues {
         transliteratedName = "Limited Liability Company",
         country = CountryCode.US,
         language = LanguageCode.en,
-        administrativeAreaLevel1 = "US-CA",
+        administrativeAreaLevel1 = CountrySubdivisionDto(countryCode = CountryCode.US, code = "US-CA", name = "California"),
         transliteratedAbbreviations = null,
         isActive = true,
 
