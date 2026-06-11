@@ -50,6 +50,10 @@ class TestDataV7Configuration {
     fun poolDataHelper(poolClient: PoolApiClient): PoolDataHelper {
         return PoolDataHelper(poolClient, listOf(
             ReasonCodeDto("HEADQUARTER_RELOCATION", "Complete relocation of a legal entity headquarter to a new physical location"),
+            ReasonCodeDto("LEGAL_ENTITY_COURT_DISTRICT_CHANGE", "Re-registration of a legal entity in a different court district, generating a new BPNL with new legal registration values"),
+            ReasonCodeDto("MERGER", "Merger of two or more legal entities into a single successor entity"),
+            ReasonCodeDto("SPLIT_SPIN_OFF", "Split or spin-off of a legal entity into one or more new entities"),
+            ReasonCodeDto("INSOLVENCY_ABSORPTION", "Absorption of an insolvent business partner's remaining assets by another entity"),
         ))
     }
 
@@ -73,6 +77,10 @@ class TestDataV7Configuration {
         )
         val reasonCodes = listOf(
             ReasonCodeDto("HEADQUARTER_RELOCATION", "Complete relocation of a legal entity headquarter to a new physical location"),
+            ReasonCodeDto("LEGAL_ENTITY_COURT_DISTRICT_CHANGE", "Re-registration of a legal entity in a different court district, generating a new BPNL with new legal registration values"),
+            ReasonCodeDto("MERGER", "Merger of two or more legal entities into a single successor entity"),
+            ReasonCodeDto("SPLIT_SPIN_OFF", "Split or spin-off of a legal entity into one or more new entities"),
+            ReasonCodeDto("INSOLVENCY_ABSORPTION", "Absorption of an insolvent business partner's remaining assets by another entity"),
         )
 
         return TestMetadataV7(
