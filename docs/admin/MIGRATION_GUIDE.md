@@ -2,6 +2,7 @@
 
 <!-- TOC -->
 * [Migration Guide](#migration-guide)
+  * [7.4.x to 7.5.x](#74x-to-75x)
   * [7.3.x to 7.4.x](#73x-to-74x)
     * [Breaking rename of relation DTO fields (Gate)](#breaking-rename-of-relation-dto-fields-gate)
       * [Impact](#impact)
@@ -22,6 +23,10 @@
     * [Business Partner Identifier Amount Limit](#business-partner-identifier-amount-limit)
 <!-- TOC -->
 
+
+## 7.4.x to 7.5.x
+
+_No migration steps yet._
 
 ## 7.3.x to 7.4.x
 
