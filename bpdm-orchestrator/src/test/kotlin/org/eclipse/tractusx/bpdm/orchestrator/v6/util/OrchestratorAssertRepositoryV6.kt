@@ -44,6 +44,7 @@ class OrchestratorAssertRepositoryV6 {
                 TaskClientStateDto::recordId.name,
                 TaskClientStateDto::processingState.name
             )
+            .ignoringFieldsMatchingRegexes("(?i).*updatedAt")
             .ignoringFieldsMatchingRegexes("(?i).*path.*")
             .isEqualTo(expected)
         assertProcessingStates(actual.map { it.processingState }, expected.map { it.processingState })
@@ -60,6 +61,7 @@ class OrchestratorAssertRepositoryV6 {
             .ignoringFields(
                 TaskClientStateDto::processingState.name
             )
+            .ignoringFieldsMatchingRegexes("(?i).*updatedAt")
             .ignoringFieldsMatchingRegexes("(?i).*path.*")
             .isEqualTo(expected)
 
@@ -101,6 +103,7 @@ class OrchestratorAssertRepositoryV6 {
                 TaskStepReservationEntryDto::taskId.name,
                 TaskStepReservationEntryDto::recordId.name
             )
+            .ignoringFieldsMatchingRegexes("(?i).*updatedAt")
             .ignoringFieldsMatchingRegexes("(?i).*path.*")
             .isEqualTo(expected)
     }
