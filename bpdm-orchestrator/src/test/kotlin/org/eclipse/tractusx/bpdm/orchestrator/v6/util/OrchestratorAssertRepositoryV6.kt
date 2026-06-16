@@ -43,9 +43,7 @@ class OrchestratorAssertRepositoryV6 {
                 TaskClientStateDto::taskId.name,
                 TaskClientStateDto::recordId.name,
                 TaskClientStateDto::processingState.name
-            )
-            .ignoringFieldsMatchingRegexes("(?i).*path.*")
-            .isEqualTo(expected)
+            ).isEqualTo(expected)
         assertProcessingStates(actual.map { it.processingState }, expected.map { it.processingState })
     }
 
@@ -60,7 +58,6 @@ class OrchestratorAssertRepositoryV6 {
             .ignoringFields(
                 TaskClientStateDto::processingState.name
             )
-            .ignoringFieldsMatchingRegexes("(?i).*path.*")
             .isEqualTo(expected)
 
         assertProcessingStates(actual.map { it.processingState }, expected.map { it.processingState })
@@ -86,7 +83,6 @@ class OrchestratorAssertRepositoryV6 {
         Assertions.assertThat(actual)
             .usingRecursiveComparison()
             .ignoringFields(FinishedTaskEventsResponse.Event::timestamp.name)
-            .ignoringFieldsMatchingRegexes("(?i).*path.*")
             .isEqualTo(expected)
 
         actual.zip(expected){ actualEntry, expectedEntry ->
@@ -101,7 +97,6 @@ class OrchestratorAssertRepositoryV6 {
                 TaskStepReservationEntryDto::taskId.name,
                 TaskStepReservationEntryDto::recordId.name
             )
-            .ignoringFieldsMatchingRegexes("(?i).*path.*")
             .isEqualTo(expected)
     }
 
@@ -111,7 +106,6 @@ class OrchestratorAssertRepositoryV6 {
             .ignoringFields(TaskProcessingStateDto::createdAt.name)
             .ignoringFields(TaskProcessingStateDto::modifiedAt.name)
             .ignoringFields(TaskProcessingStateDto::timeout.name)
-            .ignoringFieldsMatchingRegexes("(?i).*path.*")
             .isEqualTo(expected)
 
         actual.zip(expected).forEach { (actualEntry, expectedEntry) ->
