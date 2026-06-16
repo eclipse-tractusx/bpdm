@@ -43,7 +43,10 @@ data class BusinessPartnerOutputDto(
     override val externalSequenceTimestamp: Instant? = null,
 
     @get:Schema(description = CommonDescription.createdAt)
-    val createdAt: Instant
+    val createdAt: Instant,
+
+    @get:Schema(description = CommonDescription.updatedAt)
+    val updatedAt: Instant
 
 ) : IBaseBusinessPartnerGateDto
 

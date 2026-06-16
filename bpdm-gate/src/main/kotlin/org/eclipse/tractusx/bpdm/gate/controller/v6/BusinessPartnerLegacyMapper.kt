@@ -83,7 +83,8 @@ class BusinessPartnerLegacyMapper(
                 states = this.address.states
             ),
             externalSequenceTimestamp = this.externalSequenceTimestamp,
-            createdAt = this.createdAt
+            createdAt = this.createdAt,
+            updatedAt = this.updatedAt
         )
     }
 }
