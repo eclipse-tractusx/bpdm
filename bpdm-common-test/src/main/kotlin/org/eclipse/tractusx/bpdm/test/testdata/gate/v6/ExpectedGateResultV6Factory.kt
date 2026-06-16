@@ -71,8 +71,7 @@ class ExpectedGateResultV6Factory {
             site = buildSiteRepresentation(siteGoldenRecord.site),
             address = buildAddressComponent(addressGoldenRecord, AddressType.AdditionalAddress),
             externalSequenceTimestamp = null,
-            createdAt = Instant.MIN,
-            updatedAt = Instant.MIN
+            createdAt = Instant.MIN
         )
     }
 

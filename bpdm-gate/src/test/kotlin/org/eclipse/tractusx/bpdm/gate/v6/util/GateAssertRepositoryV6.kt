@@ -65,7 +65,6 @@ class GateAssertRepositoryV6 {
             .ignoringCollectionOrder()
             .ignoringFields(
                 BusinessPartnerOutputDto::createdAt.name,
-                BusinessPartnerOutputDto::updatedAt.name
             )
             .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
             .isEqualTo(expected)
