@@ -50,6 +50,7 @@ class OrchestratorRequestFactoryCommon(
             hasChanged = true,
             siteMainAddress = buildPostalAddress(seed, AddressType.SiteMainAddress),
             scriptVariants = listOf(buildSiteScriptVariant(seed, random)),
+            updatedAt = buildUpdatedAt(random)
         )
     }
 
@@ -101,8 +102,13 @@ class OrchestratorRequestFactoryCommon(
                 deliveryServiceNumber = "Delivery Service Number $seed",
                 deliveryServiceType = DeliveryServiceType.entries.random(random),
                 deliveryServiceQualifier = "Delivery Service Qualifier $seed"
-            )
+            ),
+            updatedAt = buildUpdatedAt(random)
         )
+    }
+
+    fun buildUpdatedAt(random: Random): Instant {
+        return random.nextInstant()
     }
 
     fun buildBpnLReference(seed: String): BpnReference{
