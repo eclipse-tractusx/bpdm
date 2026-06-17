@@ -20,11 +20,15 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
+import org.eclipse.tractusx.bpdm.pool.model.AddressContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.AddressCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.AddressCreateParseError
 import org.eclipse.tractusx.bpdm.pool.model.AddressCreateRequest
 import org.eclipse.tractusx.bpdm.pool.model.AddressUpserted
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
+import org.eclipse.tractusx.bpdm.pool.model.combine
+import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
+import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.springframework.stereotype.Service
 
 /**
@@ -33,10 +37,43 @@ import org.springframework.stereotype.Service
  * Both honour the order-preserving positional list contract (see [ParseResult]).
  */
 @Service
-class AddressCreateService {
+class AddressCreateService(
+    private val addressRequestParser: LogisticAddressRequestParser,
+    private val duplicateValidator: AddressIdentifierDuplicateValidator,
+    private val legalEntityRepository: LegalEntityRepository,
+    private val siteRepository: SiteRepository
+) {
 
-    fun parse(requests: List<AddressCreateRequest>): List<ParseResult<AddressCreateParsed, AddressCreateParseError>> =
-        TODO("parse: validate requests to bounded addresses and resolve legal entity/site parents")
+    fun parse(requests: List<AddressCreateRequest>): List<ParseResult<AddressCreateParsed, AddressCreateParseError>> {
+        val contents = requests.map { it.content }
+
+        val contentResults = addressRequestParser.parse(contents)
+        // Created addresses have no own identity yet, so none of their identifiers can be self-duplicates.
+        val duplicateErrors = duplicateValidator.validate(contents, ownerBpns = requests.map { null })
+
+        val legalEntitiesByBpn = legalEntityRepository
+            .findDistinctByBpnIn(requests.map { it.legalEntityBpn }.toSet())
+            .associateBy { it.bpn }
+        val sitesByBpn = siteRepository
+            .findDistinctByBpnIn(requests.mapNotNull { it.siteBpn }.toSet())
+            .associateBy { it.bpn }
+
+        return requests.mapIndexed { index, request ->
+            val resolutionErrors = mutableListOf<AddressCreateParseError>()
+
+            val legalEntity = legalEntitiesByBpn[request.legalEntityBpn]
+                ?: run { resolutionErrors.add(AddressCreateParseError.UnresolvableLegalEntity(request.legalEntityBpn)); null }
+            val site = request.siteBpn?.let { siteBpn ->
+                sitesByBpn[siteBpn] ?: run { resolutionErrors.add(AddressCreateParseError.UnresolvableSite(siteBpn)); null }
+            }
+
+            val contentResult: ParseResult<AddressContentParsed, AddressCreateParseError> = contentResults[index]
+            contentResult.combine(resolutionErrors + duplicateErrors[index]) { content ->
+                // Reached only when there are no errors, so the legal entity above is resolved.
+                AddressCreateParsed(legalEntity!!, site, content.address, content.scriptVariants)
+            }
+        }
+    }
 
     fun create(parsed: List<AddressCreateParsed>): List<UpsertResult<AddressUpserted>> =
         TODO("create: persist parsed addresses and map to results")

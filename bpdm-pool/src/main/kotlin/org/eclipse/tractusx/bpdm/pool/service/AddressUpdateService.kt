@@ -20,11 +20,14 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
+import org.eclipse.tractusx.bpdm.pool.model.AddressContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.AddressUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.AddressUpdateParseError
 import org.eclipse.tractusx.bpdm.pool.model.AddressUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.model.AddressUpserted
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
+import org.eclipse.tractusx.bpdm.pool.model.combine
+import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.springframework.stereotype.Service
 
 /**
@@ -33,10 +36,36 @@ import org.springframework.stereotype.Service
  * positional list contract (see [ParseResult]).
  */
 @Service
-class AddressUpdateService {
+class AddressUpdateService(
+    private val addressRequestParser: LogisticAddressRequestParser,
+    private val duplicateValidator: AddressIdentifierDuplicateValidator,
+    private val logisticAddressRepository: LogisticAddressRepository
+) {
 
-    fun parse(requests: List<AddressUpdateRequest>): List<ParseResult<AddressUpdateParsed, AddressUpdateParseError>> =
-        TODO("parse: validate requests to bounded addresses and resolve the update target")
+    fun parse(requests: List<AddressUpdateRequest>): List<ParseResult<AddressUpdateParsed, AddressUpdateParseError>> {
+        val contents = requests.map { it.content }
+
+        val contentResults = addressRequestParser.parse(contents)
+        // An address may legitimately re-submit its own existing identifiers, so its own BPN is excluded from duplicates.
+        val duplicateErrors = duplicateValidator.validate(contents, ownerBpns = requests.map { it.addressBpn })
+
+        val targetsByBpn = logisticAddressRepository
+            .findDistinctByBpnIn(requests.map { it.addressBpn }.toSet())
+            .associateBy { it.bpn }
+
+        return requests.mapIndexed { index, request ->
+            val resolutionErrors = mutableListOf<AddressUpdateParseError>()
+
+            val target = targetsByBpn[request.addressBpn]
+                ?: run { resolutionErrors.add(AddressUpdateParseError.UnresolvableTarget(request.addressBpn)); null }
+
+            val contentResult: ParseResult<AddressContentParsed, AddressUpdateParseError> = contentResults[index]
+            contentResult.combine(resolutionErrors + duplicateErrors[index]) { content ->
+                // Reached only when there are no errors, so the target above is resolved.
+                AddressUpdateParsed(target!!, content.address, content.scriptVariants)
+            }
+        }
+    }
 
     fun update(parsed: List<AddressUpdateParsed>): List<UpsertResult<AddressUpserted>> =
         TODO("update: apply changes to parsed addresses and map to results")
