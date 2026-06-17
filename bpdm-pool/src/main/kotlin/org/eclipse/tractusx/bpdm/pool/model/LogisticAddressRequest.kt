@@ -26,7 +26,7 @@ import java.time.Instant
 /**
  * Loose (unvalidated) inbound counterpart of [LogisticAddress]: every constraint that distinguishes a valid address is
  * relaxed (country as raw String, city/delivery fields/confidence nullable) so a single `parse` can be the one validation
- * funnel for all callers. `parse` turns this into the bounded [LogisticAddress]. Already-nullable value types (`Street`,
+ * funnel for all callers. `parse` turns this into the bounded [LogisticAddressParsed]. Already-nullable value types (`Street`,
  * the script-variant types) are reused as-is rather than re-declared as request variants.
  */
 data class LogisticAddressRequest(
@@ -82,10 +82,8 @@ data class GeoCoordinateRequest(
 data class ConfidenceCriteriaRequest(
     val sharedByOwner: Boolean?,
     val checkedByExternalDataSource: Boolean?,
-    val numberOfSharingMembers: Int?,
     val lastConfidenceCheckAt: Instant?,
-    val nextConfidenceCheckAt: Instant?,
-    val confidenceLevel: Int?
+    val nextConfidenceCheckAt: Instant?
 )
 
 data class AddressStateRequest(

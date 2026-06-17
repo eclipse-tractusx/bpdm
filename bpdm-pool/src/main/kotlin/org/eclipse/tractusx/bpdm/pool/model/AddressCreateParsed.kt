@@ -23,7 +23,7 @@ import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 
 /**
- * Result of parsing an [AddressCreateRequest]: the loose request has been validated to a bounded [LogisticAddress] and
+ * Result of parsing an [AddressCreateRequest]: the loose request has been validated to a bounded [LogisticAddressParsed] and
  * the parent BPNs resolved to entities. This is the only stage that carries persistence entities — `create` consumes it
  * directly to write the new address.
  */

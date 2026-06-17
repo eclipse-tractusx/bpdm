@@ -23,6 +23,7 @@ import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
 import org.eclipse.tractusx.bpdm.pool.entity.RegionDb
+import java.time.Instant
 
 /**
  * Bounded address whose metadata has been resolved to entities: identifier type, administrative area level 1 (region)
@@ -36,7 +37,18 @@ data class LogisticAddressParsed(
     val identifiers: List<AddressIdentifierParsed>,
     val physicalPostalAddress: PhysicalPostalAddressParsed,
     val alternativePostalAddress: AlternativePostalAddressParsed?,
-    val confidenceCriteria: ConfidenceCriteria
+    val confidenceCriteria: ConfidenceCriteriaParsed
+)
+
+/**
+ * Inbound (upsert) confidence criteria: only the fields a caller actually supplies. `numberOfSharingMembers` and
+ * `confidenceLevel` are Pool-computed, not upserted, so they appear solely on the outbound [ConfidenceCriteria].
+ */
+data class ConfidenceCriteriaParsed(
+    val sharedByOwner: Boolean,
+    val checkedByExternalDataSource: Boolean,
+    val lastConfidenceCheckAt: Instant,
+    val nextConfidenceCheckAt: Instant
 )
 
 data class PhysicalPostalAddressParsed(

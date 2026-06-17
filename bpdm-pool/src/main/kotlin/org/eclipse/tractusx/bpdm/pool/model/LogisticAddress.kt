@@ -88,3 +88,22 @@ data class AddressIdentifier(
     val value: String,
     val type: String
 )
+
+data class GeoCoordinate(
+    val longitude: Double,
+    val latitude: Double,
+    val altitude: Double? = null
+)
+
+/**
+ * Outbound confidence criteria as returned after an upsert: the supplied input plus the two Pool-computed values
+ * (`numberOfSharingMembers`, `confidenceLevel`). The read counterpart of the inbound [ConfidenceCriteriaParsed].
+ */
+data class ConfidenceCriteria(
+    val sharedByOwner: Boolean,
+    val checkedByExternalDataSource: Boolean,
+    val numberOfSharingMembers: Int,
+    val lastConfidenceCheckAt: Instant,
+    val nextConfidenceCheckAt: Instant,
+    val confidenceLevel: Int
+)

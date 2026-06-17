@@ -37,7 +37,7 @@ import org.eclipse.tractusx.bpdm.pool.model.AddressState
 import org.eclipse.tractusx.bpdm.pool.model.AddressStateRequest
 import org.eclipse.tractusx.bpdm.pool.model.AlternativePostalAddressParsed
 import org.eclipse.tractusx.bpdm.pool.model.AlternativePostalAddressRequest
-import org.eclipse.tractusx.bpdm.pool.model.ConfidenceCriteria
+import org.eclipse.tractusx.bpdm.pool.model.ConfidenceCriteriaParsed
 import org.eclipse.tractusx.bpdm.pool.model.ConfidenceCriteriaRequest
 import org.eclipse.tractusx.bpdm.pool.model.GeoCoordinate
 import org.eclipse.tractusx.bpdm.pool.model.GeoCoordinateRequest
@@ -185,28 +185,24 @@ class LogisticAddressRequestParser(
     private fun parseConfidence(
         request: ConfidenceCriteriaRequest,
         errors: MutableList<AddressSharedParseError>
-    ): ConfidenceCriteria? {
+    ): ConfidenceCriteriaParsed? {
         val sharedByOwner = request.sharedByOwner
         val checkedByExternalDataSource = request.checkedByExternalDataSource
-        val numberOfSharingMembers = request.numberOfSharingMembers
         val lastConfidenceCheckAt = request.lastConfidenceCheckAt
         val nextConfidenceCheckAt = request.nextConfidenceCheckAt
-        val confidenceLevel = request.confidenceLevel
 
-        if (sharedByOwner == null || checkedByExternalDataSource == null || numberOfSharingMembers == null ||
-            lastConfidenceCheckAt == null || nextConfidenceCheckAt == null || confidenceLevel == null
+        if (sharedByOwner == null || checkedByExternalDataSource == null ||
+            lastConfidenceCheckAt == null || nextConfidenceCheckAt == null
         ) {
             errors.add(AddressFieldParseError.ConfidenceCriteriaMissing)
             return null
         }
 
-        return ConfidenceCriteria(
+        return ConfidenceCriteriaParsed(
             sharedByOwner = sharedByOwner,
             checkedByExternalDataSource = checkedByExternalDataSource,
-            numberOfSharingMembers = numberOfSharingMembers,
             lastConfidenceCheckAt = lastConfidenceCheckAt,
-            nextConfidenceCheckAt = nextConfidenceCheckAt,
-            confidenceLevel = confidenceLevel
+            nextConfidenceCheckAt = nextConfidenceCheckAt
         )
     }
 

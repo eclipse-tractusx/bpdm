@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.model
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 
 /**
- * Result of parsing an [AddressUpdateRequest]: the loose request has been validated to a bounded [LogisticAddress] and
+ * Result of parsing an [AddressUpdateRequest]: the loose request has been validated to a bounded [LogisticAddressParsed] and
  * the target BPN resolved to its existing entity. Update never re-parents, so no parent entities are carried. `update`
  * consumes it directly to apply changes to [target].
  */
