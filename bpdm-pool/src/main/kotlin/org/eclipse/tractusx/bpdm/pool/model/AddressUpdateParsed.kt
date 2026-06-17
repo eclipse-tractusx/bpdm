@@ -17,10 +17,17 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.dto
+package org.eclipse.tractusx.bpdm.pool.model
 
+import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 
-data class UpsertResult<T>(
-    val value: T,
-    val upsertType: UpsertType
+/**
+ * Result of parsing an [AddressUpdateRequest]: the loose request has been validated to a bounded [LogisticAddress] and
+ * the target BPN resolved to its existing entity. Update never re-parents, so no parent entities are carried. `update`
+ * consumes it directly to apply changes to [target].
+ */
+data class AddressUpdateParsed(
+    val target: LogisticAddressDb,
+    val address: LogisticAddressParsed,
+    val scriptVariants: List<AddressScriptVariantParsed>
 )

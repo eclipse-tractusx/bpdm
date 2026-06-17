@@ -17,10 +17,17 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.dto
+package org.eclipse.tractusx.bpdm.pool.model
 
-
-data class UpsertResult<T>(
-    val value: T,
-    val upsertType: UpsertType
+/**
+ * Entity-free result of an address create/update, shared by both operations. Wrapped in `UpsertResult<AddressUpserted>`
+ * so the `UpsertType` carries whether the address was created, updated, or left unchanged. Parents are exposed as BPNs
+ * (never `SiteDb`/`LegalEntityDb`) so callers and controllers stay decoupled from persistence entities.
+ */
+data class AddressUpserted(
+    val bpn: String,
+    val legalEntityBpn: String,
+    val siteBpn: String?,
+    val address: LogisticAddress,
+    val scriptVariants: List<AddressScriptVariant>
 )

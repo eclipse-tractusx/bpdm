@@ -17,10 +17,19 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.dto
+package org.eclipse.tractusx.bpdm.pool.model
 
+import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
+import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 
-data class UpsertResult<T>(
-    val value: T,
-    val upsertType: UpsertType
+/**
+ * Result of parsing an [AddressCreateRequest]: the loose request has been validated to a bounded [LogisticAddress] and
+ * the parent BPNs resolved to entities. This is the only stage that carries persistence entities — `create` consumes it
+ * directly to write the new address.
+ */
+data class AddressCreateParsed(
+    val legalEntity: LegalEntityDb,
+    val site: SiteDb?,
+    val address: LogisticAddressParsed,
+    val scriptVariants: List<AddressScriptVariantParsed>
 )

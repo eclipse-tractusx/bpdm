@@ -17,10 +17,15 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.dto
+package org.eclipse.tractusx.bpdm.pool.model
 
+import java.time.Instant
 
-data class UpsertResult<T>(
-    val value: T,
-    val upsertType: UpsertType
+data class ConfidenceCriteria(
+    val sharedByOwner: Boolean,
+    val checkedByExternalDataSource: Boolean,
+    val numberOfSharingMembers: Int,
+    val lastConfidenceCheckAt: Instant,
+    val nextConfidenceCheckAt: Instant,
+    val confidenceLevel: Int
 )

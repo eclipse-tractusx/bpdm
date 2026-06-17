@@ -17,10 +17,16 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.dto
+package org.eclipse.tractusx.bpdm.pool.model
 
-
-data class UpsertResult<T>(
-    val value: T,
-    val upsertType: UpsertType
-)
+/**
+ * Per-entry outcome of parsing a single request into [T] or a list of errors [E].
+ *
+ * A `parse` returning `List<ParseResult<T, E>>` guarantees the result is order-preserving and positional: the result has
+ * the same size as the input and the i-th result is the verdict for the i-th request. Failures are per entry, not a
+ * batch-wide partition, so one bad request never discards the verdicts of its neighbours.
+ */
+sealed interface ParseResult<out T, out E> {
+    data class Success<out T>(val parsed: T) : ParseResult<T, Nothing>
+    data class Failure<out E>(val errors: List<E>) : ParseResult<Nothing, E>
+}

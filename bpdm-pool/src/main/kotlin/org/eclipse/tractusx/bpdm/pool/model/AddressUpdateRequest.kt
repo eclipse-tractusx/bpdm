@@ -17,10 +17,13 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.dto
+package org.eclipse.tractusx.bpdm.pool.model
 
-
-data class UpsertResult<T>(
-    val value: T,
-    val upsertType: UpsertType
+/**
+ * Request to update an existing address identified by [addressBpn]. Update never re-parents, so no parent fields are
+ * carried. `parse` resolves the target (or yields `UnresolvableTarget`).
+ */
+data class AddressUpdateRequest(
+    val addressBpn: String,
+    val content: AddressContentRequest
 )

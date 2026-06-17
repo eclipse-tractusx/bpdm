@@ -17,10 +17,14 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.dto
+package org.eclipse.tractusx.bpdm.pool.model
 
-
-data class UpsertResult<T>(
-    val value: T,
-    val upsertType: UpsertType
+/**
+ * Request to create an address. Both parents are explicit (Option A): the legal entity is always supplied, the site is
+ * optional. `parse` resolves these BPNs to entities (or yields `UnresolvableLegalEntity`/`UnresolvableSite`).
+ */
+data class AddressCreateRequest(
+    val legalEntityBpn: String,
+    val siteBpn: String?,
+    val content: AddressContentRequest
 )
