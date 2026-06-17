@@ -30,6 +30,16 @@ import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmMultiValidationException
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
+import org.eclipse.tractusx.bpdm.pool.mapper.GoldenRecordTaskAddressRequestMapper
+import org.eclipse.tractusx.bpdm.pool.model.AddressConstraintParseError
+import org.eclipse.tractusx.bpdm.pool.model.AddressCreateParseError
+import org.eclipse.tractusx.bpdm.pool.model.AddressCreateRequest
+import org.eclipse.tractusx.bpdm.pool.model.AddressFieldParseError
+import org.eclipse.tractusx.bpdm.pool.model.AddressMetadataParseError
+import org.eclipse.tractusx.bpdm.pool.model.AddressSharedParseError
+import org.eclipse.tractusx.bpdm.pool.model.AddressUpdateParseError
+import org.eclipse.tractusx.bpdm.pool.model.AddressUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
@@ -55,7 +65,10 @@ class TaskStepBuildService(
     private val taskResolutionMapper: TaskResolutionMapper,
     private val logisticAddressRepository: LogisticAddressRepository,
     private val siteRepository: SiteRepository,
-    private val sharingMemberConfidenceService: SharingMemberConfidenceService
+    private val sharingMemberConfidenceService: SharingMemberConfidenceService,
+    private val addressCreateService: AddressCreateService,
+    private val addressUpdateService: AddressUpdateService,
+    private val taskAddressRequestMapper: GoldenRecordTaskAddressRequestMapper
 ) {
 
     enum class CleaningError(val message: String) {
@@ -346,16 +359,12 @@ class TaskStepBuildService(
         val bpnAReference = additionalAddress.bpnReference
         val bpnA = taskEntryBpnMapping.getBpn(bpnAReference)
 
-        val addressResult = if(bpnA != null && additionalAddress.hasChanged == false){
-            // No need to upsert just fetch the data
-            val result = addressService.searchAddresses(AddressService.AddressSearchRequest(addressBpns = listOf(bpnA), null, null, null, null), PaginationRequest(0, 1))
-                .content.firstOrNull() ?: throw BpdmValidationException(CleaningError.BPNA_IS_NULL.message)
-            taskResolutionMapper.toTaskResult(result.address, result.scriptVariants, false)
-        }else{
+        return if (bpnA != null && additionalAddress.hasChanged == false) {
+            // No need to upsert, just fetch the data
+            fetchAddressResult(bpnA, hasChanged = false)
+        } else {
             upsertAdditionalAddress(additionalAddress, legalEntityBpn, siteBpn, taskEntryBpnMapping)
         }
-
-        return addressResult
     }
 
     private fun upsertAdditionalAddress(
@@ -367,62 +376,110 @@ class TaskStepBuildService(
         val bpnAReference = additionalAddress.bpnReference
         val bpnA = taskEntryBpnMapping.getBpn(bpnAReference)
 
-        val poolAddress = toPoolDto(additionalAddress.postalProperties)
-        val addressScriptVariants = additionalAddress.scriptVariants.map { toPoolDto(it) }
-
-        val addressResult = if (bpnA == null) {
-            createLogisticAddress(poolAddress, addressScriptVariants, legalEntityBpn, siteBpn)
-        }
-        else {
-            updateLogisticAddress(bpnA, poolAddress, addressScriptVariants)
+        val upsertedBpn = if (bpnA == null) {
+            createLogisticAddress(additionalAddress, legalEntityBpn, siteBpn)
+        } else {
+            updateLogisticAddress(bpnA, additionalAddress)
         }
 
-        taskEntryBpnMapping.addMapping(bpnAReference, addressResult.bpnReference.referenceValue!!)
+        taskEntryBpnMapping.addMapping(bpnAReference, upsertedBpn)
 
-        return addressResult
+        // Read the upserted golden record back so the reply carries its full state, including golden record relations.
+        return fetchAddressResult(upsertedBpn, hasChanged = true)
+    }
+
+    private fun fetchAddressResult(bpnA: String, hasChanged: Boolean?): PostalAddressWithScriptVariants {
+        val result = addressService.searchAddresses(AddressService.AddressSearchRequest(addressBpns = listOf(bpnA), null, null, null, null), PaginationRequest(0, 1))
+            .content.firstOrNull() ?: throw BpdmValidationException(CleaningError.BPNA_IS_NULL.message)
+        return taskResolutionMapper.toTaskResult(result.address, result.scriptVariants, hasChanged)
     }
 
     private fun createLogisticAddress(
-        poolAddress: LogisticAddressPoolDto,
-        scriptVariants: List<LogisticAddressScriptVariantDto>,
+        additionalAddress: PostalAddressWithScriptVariants,
         legalEntityBpn: String,
         siteBpn: String?
-    ): PostalAddressWithScriptVariants {
-        val addressCreateRequest = AddressPartnerCreateRequest(
-            bpnParent = siteBpn ?: legalEntityBpn,
-            index = "",
-            address = poolAddress,
-            scriptVariants = scriptVariants
+    ): String {
+        val request = AddressCreateRequest(
+            legalEntityBpn = legalEntityBpn,
+            siteBpn = siteBpn,
+            content = taskAddressRequestMapper.toContentRequest(additionalAddress)
         )
-        val result = businessPartnerBuildService.createAddresses(listOf(addressCreateRequest))
 
-        if(result.errors.isNotEmpty())
-            throw BpdmMultiValidationException(result.errors.map { "Errors on creating Address: ${it.message}" })
+        val parsed = when (val result = addressCreateService.parse(listOf(request)).single()) {
+            is ParseResult.Success -> result.parsed
+            is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { "Errors on creating Address: ${renderError(it)}" })
+        }
 
-        val addressResult = result.entities.firstOrNull() ?: throw BpdmValidationException("Unknown error when trying to creating address")
-
-        return taskResolutionMapper.toTaskResult(addressResult.address, addressResult.scriptVariants, true)
+        return addressCreateService.create(listOf(parsed)).single().value.bpn
     }
 
     private fun updateLogisticAddress(
         bpnA: String,
-        poolAddress: LogisticAddressPoolDto,
-        scriptVariants: List<LogisticAddressScriptVariantDto>
-    ): PostalAddressWithScriptVariants {
-        val addressUpdateRequest = AddressPartnerUpdateRequest(
-            bpna = bpnA,
-            address =  poolAddress,
-            scriptVariants = scriptVariants
+        additionalAddress: PostalAddressWithScriptVariants
+    ): String {
+        val request = AddressUpdateRequest(
+            addressBpn = bpnA,
+            content = taskAddressRequestMapper.toContentRequest(additionalAddress)
         )
-        val result = businessPartnerBuildService.updateAddresses(listOf(addressUpdateRequest))
 
-        if(result.errors.isNotEmpty())
-            throw BpdmMultiValidationException(result.errors.map { "Errors on updating Address: ${it.message}" })
+        val parsed = when (val result = addressUpdateService.parse(listOf(request)).single()) {
+            is ParseResult.Success -> result.parsed
+            is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { "Errors on updating Address: ${renderError(it)}" })
+        }
 
-        val addressResult = result.entities.firstOrNull() ?: throw BpdmValidationException("Unknown error when trying to updating address")
-
-        return  taskResolutionMapper.toTaskResult(addressResult.address, addressResult.scriptVariants, true)
+        return addressUpdateService.update(listOf(parsed)).single().value.bpn
     }
+
+    // Address parse errors are rendered to messages here (caller-local) so the task path keeps its existing error wording;
+    // the field errors reuse the CleaningError texts the old throwing translation produced.
+    private fun renderError(error: AddressCreateParseError): String =
+        when (error) {
+            is AddressCreateParseError.UnresolvableLegalEntity -> "Legal entity ${error.bpn} not found"
+            is AddressCreateParseError.UnresolvableSite -> "Site ${error.bpn} not found"
+            is AddressSharedParseError -> renderError(error)
+        }
+
+    private fun renderError(error: AddressUpdateParseError): String =
+        when (error) {
+            is AddressUpdateParseError.UnresolvableTarget -> "Address ${error.bpn} not found"
+            is AddressSharedParseError -> renderError(error)
+        }
+
+    private fun renderError(error: AddressSharedParseError): String =
+        when (error) {
+            is AddressFieldParseError -> renderFieldError(error)
+            is AddressMetadataParseError -> renderMetadataError(error)
+            is AddressConstraintParseError -> renderConstraintError(error)
+        }
+
+    private fun renderFieldError(error: AddressFieldParseError): String =
+        when (error) {
+            AddressFieldParseError.PhysicalCountryMissing -> CleaningError.PHYSICAL_ADDRESS_COUNTRY_MISSING.message
+            AddressFieldParseError.PhysicalCityMissing -> CleaningError.PHYSICAL_ADDRESS_CITY_MISSING.message
+            AddressFieldParseError.AlternativeCountryMissing -> CleaningError.ALTERNATIVE_ADDRESS_COUNTRY_MISSING.message
+            AddressFieldParseError.AlternativeCityMissing -> CleaningError.ALTERNATIVE_ADDRESS_CITY_MISSING.message
+            AddressFieldParseError.AlternativeDeliveryServiceTypeMissing -> CleaningError.ALTERNATIVE_ADDRESS_DELIVERY_SERVICE_TYPE_MISSING.message
+            AddressFieldParseError.AlternativeDeliveryServiceNumberMissing -> CleaningError.ALTERNATIVE_ADDRESS_DELIVERY_SERVICE_NUMBER_MISSING.message
+            AddressFieldParseError.ConfidenceCriteriaMissing -> CleaningError.ADDRESS_CONFIDENCE_CRITERIA_MISSING.message
+            is AddressFieldParseError.CountryCodeNotRecognized -> "Country Code not recognized"
+            is AddressFieldParseError.IdentifierValueMissing -> "Identifier value is null"
+            is AddressFieldParseError.IdentifierTypeMissing -> "Identifier type is null"
+            is AddressFieldParseError.StateTypeMissing -> "Business Partner state type is null"
+        }
+
+    private fun renderMetadataError(error: AddressMetadataParseError): String =
+        when (error) {
+            is AddressMetadataParseError.IdentifierTypeNotFound -> "Address identifier type '${error.type}' is not known"
+            is AddressMetadataParseError.PhysicalRegionNotFound -> "Region '${error.regionCode}' in physical address is not known"
+            is AddressMetadataParseError.AlternativeRegionNotFound -> "Region '${error.regionCode}' in alternative address is not known"
+            is AddressMetadataParseError.ScriptCodeNotFound -> "Script code '${error.scriptCode}' is not known"
+        }
+
+    private fun renderConstraintError(error: AddressConstraintParseError): String =
+        when (error) {
+            is AddressConstraintParseError.IdentifiersTooMany -> "Too many identifiers: ${error.count} exceeds the allowed limit"
+            is AddressConstraintParseError.DuplicateIdentifier -> "Duplicate identifier of type '${error.type}' with value '${error.value}'"
+        }
 
     private fun updateConfidences(
         goldenRecordType: GoldenRecordType,
@@ -548,12 +605,6 @@ class TaskStepBuildService(
     private fun toPoolDto(siteScriptVariant: SiteScriptVariant) =
         with(siteScriptVariant) {
             SiteScriptVariantDto(scriptCode, siteName, toPoolDto(mainAddress))
-        }
-
-
-    private fun toPoolDto(addressScriptVariant: PostalAddressScriptVariantWithScriptCode) =
-        with(addressScriptVariant) {
-            LogisticAddressScriptVariantDto(scriptCode, toPoolDto(postalProperties))
         }
 
     private fun toPoolDto(logisticAddress: PostalAddress) =
