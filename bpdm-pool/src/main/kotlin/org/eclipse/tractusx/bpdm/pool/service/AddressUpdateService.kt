@@ -19,7 +19,15 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.common.util.replace
+import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
+import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
+import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
+import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
+import org.eclipse.tractusx.bpdm.pool.mapper.AddressEntityMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.AddressUpsertedMapper
 import org.eclipse.tractusx.bpdm.pool.model.AddressContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.AddressUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.AddressUpdateParseError
@@ -29,6 +37,7 @@ import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.combine
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 /**
  * Updates existing logistic addresses in two explicit phases: [parse] validates loose requests and resolves the update
@@ -39,7 +48,11 @@ import org.springframework.stereotype.Service
 class AddressUpdateService(
     private val addressRequestParser: LogisticAddressRequestParser,
     private val duplicateValidator: AddressIdentifierDuplicateValidator,
-    private val logisticAddressRepository: LogisticAddressRepository
+    private val logisticAddressRepository: LogisticAddressRepository,
+    private val changelogService: PartnerChangelogService,
+    private val equivalenceMapper: BusinessPartnerEquivalenceMapper,
+    private val addressEntityMapper: AddressEntityMapper,
+    private val addressUpsertedMapper: AddressUpsertedMapper
 ) {
 
     fun parse(requests: List<AddressUpdateRequest>): List<ParseResult<AddressUpdateParsed, AddressUpdateParseError>> {
@@ -67,6 +80,38 @@ class AddressUpdateService(
         }
     }
 
+    @Transactional
     fun update(parsed: List<AddressUpdateParsed>): List<UpsertResult<AddressUpserted>> =
-        TODO("update: apply changes to parsed addresses and map to results")
+        parsed.map { update(it) }
+
+    private fun update(parsed: AddressUpdateParsed): UpsertResult<AddressUpserted> {
+        val target = parsed.target
+
+        val before = equivalenceMapper.toEquivalenceDto(target)
+        applyChanges(target, parsed)
+        val after = equivalenceMapper.toEquivalenceDto(target)
+
+        val upsertType = if (before != after) {
+            logisticAddressRepository.save(target)
+            changelogService.createChangelogEntries(listOf(ChangelogEntryCreateRequest(target.bpn, ChangelogType.UPDATE, BusinessPartnerType.ADDRESS)))
+            UpsertType.Updated
+        } else {
+            UpsertType.NoChange
+        }
+
+        return UpsertResult(addressUpsertedMapper.toUpserted(target), upsertType)
+    }
+
+    private fun applyChanges(target: LogisticAddressDb, parsed: AddressUpdateParsed) {
+        val address = parsed.address
+
+        target.name = address.name
+        target.physicalPostalAddress = addressEntityMapper.toPhysical(address.physicalPostalAddress)
+        target.alternativePostalAddress = address.alternativePostalAddress?.let { addressEntityMapper.toAlternative(it) }
+        // The sharing-member count is Pool-maintained, not part of the update payload, so carry the current value forward.
+        target.confidenceCriteria = addressEntityMapper.toConfidence(address.confidenceCriteria, target.confidenceCriteria.numberOfSharingMembers)
+        target.identifiers.replace(addressEntityMapper.toIdentifiers(address.identifiers, target))
+        target.states.replace(addressEntityMapper.toStates(address.states, target))
+        target.scriptVariants.replace(addressEntityMapper.toScriptVariants(parsed.scriptVariants))
+    }
 }

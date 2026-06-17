@@ -19,7 +19,13 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
+import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
+import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
+import org.eclipse.tractusx.bpdm.pool.mapper.AddressEntityMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.AddressUpsertedMapper
 import org.eclipse.tractusx.bpdm.pool.model.AddressContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.AddressCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.AddressCreateParseError
@@ -28,8 +34,10 @@ import org.eclipse.tractusx.bpdm.pool.model.AddressUpserted
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.combine
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
+import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 /**
  * Creates logistic addresses in two explicit phases so callers can route validation failures themselves:
@@ -41,7 +49,12 @@ class AddressCreateService(
     private val addressRequestParser: LogisticAddressRequestParser,
     private val duplicateValidator: AddressIdentifierDuplicateValidator,
     private val legalEntityRepository: LegalEntityRepository,
-    private val siteRepository: SiteRepository
+    private val siteRepository: SiteRepository,
+    private val bpnIssuingService: BpnIssuingService,
+    private val logisticAddressRepository: LogisticAddressRepository,
+    private val changelogService: PartnerChangelogService,
+    private val addressEntityMapper: AddressEntityMapper,
+    private val addressUpsertedMapper: AddressUpsertedMapper
 ) {
 
     fun parse(requests: List<AddressCreateRequest>): List<ParseResult<AddressCreateParsed, AddressCreateParseError>> {
@@ -75,6 +88,17 @@ class AddressCreateService(
         }
     }
 
-    fun create(parsed: List<AddressCreateParsed>): List<UpsertResult<AddressUpserted>> =
-        TODO("create: persist parsed addresses and map to results")
+    @Transactional
+    fun create(parsed: List<AddressCreateParsed>): List<UpsertResult<AddressUpserted>> {
+        val bpns = bpnIssuingService.issueAddressBpns(parsed.size)
+        // A freshly created address has no shared history yet, so its sharing-member count starts at zero.
+        val entities = parsed.zip(bpns) { entry, bpn -> addressEntityMapper.toEntity(bpn, entry, numberOfSharingMembers = 0) }
+
+        logisticAddressRepository.saveAll(entities)
+        changelogService.createChangelogEntries(entities.map {
+            ChangelogEntryCreateRequest(it.bpn, ChangelogType.CREATE, BusinessPartnerType.ADDRESS)
+        })
+
+        return entities.map { UpsertResult(addressUpsertedMapper.toUpserted(it), UpsertType.Created) }
+    }
 }
