@@ -4,7 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
-## [1.0.4] - tbd
+## [2.0.0] - tbd
+
+### Added
+
+- Support for mounting `externalApplicationConfig` Secrets into the application deployment as additional, lower-precedence Spring config sources. [#1708](https://github.com/eclipse-tractusx/bpdm/issues/1708)
+- Template helpers to derive in-cluster connection details (Postgres, Keycloak and BPDM service URLs and Secret names) from the deployed dependencies, and to resolve-or-generate Secret values. [#1708](https://github.com/eclipse-tractusx/bpdm/issues/1708)
 
 ## [1.0.3] - 2025-03-06
 

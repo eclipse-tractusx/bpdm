@@ -35,7 +35,7 @@ import org.eclipse.tractusx.bpdm.test.util.AuthExpectationType
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 
-class GateAuthV6Test: GateUnscheduledInitialStartV6Test() {
+class GateAuthV6Test: UnscheduledGateV6TestBase() {
     @Autowired
     lateinit var authAssertionHelper: AuthAssertionHelper
     @Autowired

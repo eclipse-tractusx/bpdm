@@ -20,10 +20,10 @@
 package org.eclipse.tractusx.bpdm.gate.v6.stats
 
 import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsSharingStatesResponse
-import org.eclipse.tractusx.bpdm.gate.v6.GateUnscheduledInitialStartV6Test
+import org.eclipse.tractusx.bpdm.gate.v6.UnscheduledGateV6TestBase
 import org.junit.jupiter.api.Test
 
-class CountBusinessPartnerSharingStatesV6IT: GateUnscheduledInitialStartV6Test() {
+class CountBusinessPartnerSharingStatesV6IT: UnscheduledGateV6TestBase() {
 
     /**
      * GIVEN no business partners

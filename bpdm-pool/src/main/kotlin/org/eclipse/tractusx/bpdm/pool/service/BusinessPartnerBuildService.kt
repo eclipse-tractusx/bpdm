@@ -108,6 +108,9 @@ class BusinessPartnerBuildService(
 
         val bpnSs = bpnIssuingService.issueSiteBpns(requests.size)
 
+        val siteHeaderMetadataMapping = SiteHeaderMetadataMapping(metadataService.getSiteHeaderScriptCodes(requests.flatMap { it.scriptVariants })
+            .associateBy { it.technicalKey })
+
         val createdSites = requests.zip(bpnSs).map { (siteRequest, bpnS) ->
             if (legalEntitiesByBpn[siteRequest.bpnLParent] == null) {
                 return SitePartnerCreateResponseWrapper(emptyList(), listOf(
@@ -127,7 +130,7 @@ class BusinessPartnerBuildService(
                 ))
             }
 
-            createSite(siteRequest, bpnS, legalEntitiesByBpn[siteRequest.bpnLParent]!!)
+            createSiteHeader(siteRequest.toHeader(), bpnS, legalEntitiesByBpn[siteRequest.bpnLParent]!!, siteHeaderMetadataMapping)
                 .apply { mainAddress = legalEntitiesByBpn[siteRequest.bpnLParent]!!.legalAddress }
                 .apply { mainAddress.site = this }
         }
@@ -159,7 +162,7 @@ class BusinessPartnerBuildService(
         val legalEntitiesByBpn = legalEntities.associateBy { it.bpn }
         val bpnSs = bpnIssuingService.issueSiteBpns(validRequests.size)
         fun createSiteWithMainAddress(bpnIndex: Int, request: SitePartnerCreateRequest) =
-            createSiteHeader(request.site, bpnSs[bpnIndex], legalEntitiesByBpn[request.bpnlParent]!!, siteHeaderMetadata)
+            createSiteHeader(request.site.toHeader(), bpnSs[bpnIndex], legalEntitiesByBpn[request.bpnlParent]!!, siteHeaderMetadata)
                 .apply {
                     mainAddress = createLogisticAddress(address, request.site.toMainAddressWithScriptVariants(), address.bpn, this.legalEntity, this, mainAddressMetadata)
                 }.let { site -> Pair(site, request) }
@@ -187,7 +190,7 @@ class BusinessPartnerBuildService(
         val bpnAs = bpnIssuingService.issueAddressBpns(validRequests.size)
 
         fun createSiteWithMainAddress(bpnIndex: Int, request: SitePartnerCreateRequest) =
-            createSiteHeader(request.site, bpnSs[bpnIndex], legalEntitiesByBpn[request.bpnlParent]!!, siteHeaderMetadata)
+            createSiteHeader(request.site.toHeader(), bpnSs[bpnIndex], legalEntitiesByBpn[request.bpnlParent]!!, siteHeaderMetadata)
                 .apply { mainAddress = createLogisticAddress(request.site.toMainAddressWithScriptVariants(), bpnAs[bpnIndex], this.legalEntity, this, mainAddressMetadata) }
                 .let { site -> Pair(site, request) }
 
@@ -424,13 +427,13 @@ class BusinessPartnerBuildService(
     }
 
     private fun createSiteHeader(
-        siteDto: SiteDto,
+        siteHeaderRequest: SiteHeaderDto,
         bpnS: String,
         partner: LegalEntityDb,
         metadataMap: SiteHeaderMetadataMapping
     ): SiteDb{
-        val createdSite = createSite(siteDto, bpnS, partner)
-        createdSite.scriptVariants.replace(siteDto.scriptVariants.map { SiteScriptVariantDb(metadataMap.scriptCodes[it.scriptCode]!!, it.name) })
+        val createdSite = createSite(siteHeaderRequest, bpnS, partner)
+        createdSite.scriptVariants.replace(siteHeaderRequest.scriptVariants.map { SiteScriptVariantDb(metadataMap.scriptCodes[it.scriptCode]!!, it.name) })
 
         return createdSite
     }

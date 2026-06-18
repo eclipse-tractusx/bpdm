@@ -18,145 +18,159 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################################
 
-fullnameOverride: bpdm
+# OAuth client secrets for the service-account clients in the bundled Keycloak realm
+# (rendered into the "<release-name>-realm" Secret by templates/bpdmRealm.yaml). For each entry,
+# leave secret empty to auto-generate a 32-char value that is then preserved across upgrades in
+# that Secret, or set it to pin a known secret (e.g. to match an external IdP or to share the
+# credential with an outside consumer of that client).
+bpdmRealm:
+  clients:
+    admin:
+      secret: ""
+    gate:
+      secret: ""
+    pool:
+      secret: ""
+    orchestrator:
+      secret: ""
+    cleaningDummy:
+      secret: ""
+    gateInputConsumer:
+      secret: ""
+    gateInputManager:
+      secret: ""
+    gateOutputConsumer:
+      secret: ""
+    participant:
+      secret: ""
+    sharingMember:
+      secret: ""
+    taskCreator:
+      secret: ""
+    refinerClean:
+      secret: ""
+    refinerCleanAndSync:
+      secret: ""
+    refinerPoolSync:
+      secret: ""
 
-clients:
-  admin:
-    secret: "**********"
-  gate:
-    secret: "**********"
-  pool:
-    secret: "**********"
-  orchestrator:
-    secret: "**********"
-  cleaningDummy:
-    secret: "**********"
-  gateInputConsumer:
-    secret: "**********"
-  gateInputManager:
-    secret: "**********"
-  gateOutputConsumer:
-    secret: "**********"
-  participant:
-    secret: "**********"
-  sharingMember:
-    secret: "**********"
-  taskCreator:
-    secret: "**********"
-  refinerClean:
-    secret: "**********"
-  refinerCleanAndSync:
-    secret: "**********"
-  refinerPoolSync:
-    secret: "**********"
-
+# The four blocks below configure the bundled BPDM services. For each, `enabled` toggles whether
+# that service is deployed as part of this release. They share the same wiring pattern:
+# externalApplicationConfig entries are fully qualified names of existing Secrets, each carrying an
+# `application.yml` key that is mounted as a low-precedence Spring config import. Entries are rendered
+# through `tpl`, so they may reference helpers - here the connection-config name helpers resolve the
+# same Secret names that the umbrella generates for the bundled Postgres/Keycloak/client-url configs.
 bpdm-gate:
   enabled: true
-  applicationConfig:
-    bpdm:
-      datasource:
-        host: bpdm-postgres
-      security:
-        auth-server-url: "http://bpdm-keycloak"
-  applicationSecrets:
-    spring:
-      datasource:
-        # Change this password for production
-        password: bpdm
-  postgres:
-    enabled: false
+  externalApplicationConfig:
+    - '{{ include "bpdm.postgresConnectionConfig.name" . }}'
+    - '{{ include "bpdm.gateKeycloakConfig.name" . }}'
+    - '{{ include "bpdm.clientUrlConfig.name" . }}'
 
 bpdm-pool:
   enabled: true
-  applicationConfig:
-    bpdm:
-      datasource:
-        host: bpdm-postgres
-      security:
-        auth-server-url: "http://bpdm-keycloak"
-        realm: BPDM
-  applicationSecrets:
-    spring:
-      datasource:
-        # Change this password for production
-        password: bpdm
+  externalApplicationConfig:
+    - '{{ include "bpdm.postgresConnectionConfig.name" . }}'
+    - '{{ include "bpdm.poolKeycloakConfig.name" . }}'
+    - '{{ include "bpdm.clientUrlConfig.name" . }}'
 
 bpdm-cleaning-service-dummy:
   enabled: true
-  applicationConfig:
-    bpdm:
-      client:
-        orchestrator:
-          provider:
-            issuer-uri: http://bpdm-keycloak/realms/BPDM
+  externalApplicationConfig:
+    - '{{ include "bpdm.cleaningDummyKeycloakConfig.name" . }}'
+    - '{{ include "bpdm.clientUrlConfig.name" . }}'
 
 bpdm-orchestrator:
   enabled: true
-  applicationConfig:
-    bpdm:
-      datasource:
-        host: bpdm-postgres
-      security:
-        auth-server-url: "http://bpdm-keycloak"
-  applicationSecrets:
-    spring:
-      datasource:
-        # Change this password for production
-        password: bpdm
-  postgres:
-    enabled: false
+  externalApplicationConfig:
+    - '{{ include "bpdm.postgresConnectionConfig.name" . }}'
+    - '{{ include "bpdm.orchestratorKeycloakConfig.name" . }}'
 
+# Bundled Postgres database.
+# When enabled, a "<release-name>-postgres-connection-config" Secret is also generated and applied to
+# the BPDM applications (via their externalApplicationConfig). That umbrella-managed Secret is also the
+# DB user source for this dependency: customUser.existingSecret below points the postgres chart at it
+# (instead of an inline password), so a single Secret feeds both the database and the applications.
+# Disabling postgres removes that Secret (and the apps must then be configured against an external DB).
 postgres:
   enabled: true
-  fullnameOverride: bpdm-postgres
-  auth:
-    database: bpdm
-    username: bpdm
-    password: bpdm
+  nameOverride: bpdm-postgres
   customUser:
-    database: keycloak
-    name: keycloak
-    password: keycloak-db-password
+    name: bpdm
+    database: bpdm
+    # password: optional. When set, that fixed password is used. When left unset, a password is
+    #   generated once and preserved across upgrades in the "<release-name>-postgres-connection-config"
+    #   Secret (it never lives in these values). Set it to pin a known password instead.
+    # password: bpdm
+    # The DB user is created from the umbrella-managed connection-config Secret rather than from an
+    # inline password. The value is a template so it resolves to the same name the apps reference.
+    # It renders in the postgres subchart scope, but `.Release.Name` (and thus this helper) is visible
+    # there, so it resolves to the same generated Secret name.
+    existingSecret: '{{ include "bpdm.postgresConnectionConfig.name" . }}'
+    secretKeys:
+      name: username
+      password: password
+      database: database
 
+# Bundled Keycloak.
+# When enabled, per-service keycloak config Secrets are generated alongside the realm Secret and applied
+# to each BPDM application (via their externalApplicationConfig). Each carries auth-server-url, the
+# outbound client issuer-uri, and the client credentials for that service. Disabling keycloak removes
+# all of these Secrets (and the apps must then be configured against an external IdP).
 keycloak:
   enabled: true
-  fullnameOverride: bpdm-keycloak
+  nameOverride: bpdm-keycloak
   keycloak:
-    adminPassword: admin
-    production: false
+    production: false      # dev mode: relaxes the TLS/hostname requirements; do not use in production
   realm:
+    # Enables `--import-realm`. The realm Secret itself is mounted via extraVolumes below, NOT via
+    # realm.existingSecret: that field is not rendered through `tpl`, so it could only hold a static
+    # literal, which would collide across releases in one namespace. Leaving existingSecret/configFile
+    # unset disables the keycloak chart's own realm volume, freeing /opt/keycloak/data/import for ours.
     import: true
-    existingSecret: bpdm-realm
+  # Mount the umbrella-generated realm Secret (templates/bpdmRealm.yaml) into the import directory.
+  # extraVolumes/extraVolumeMounts ARE rendered through `tpl`, so the release-scoped Secret name
+  # resolves here via the same helper the Secret is named with - this is what lets the realm Secret be
+  # per-release instead of a static literal.
+  extraVolumes:
+    - name: realm-config
+      secret:
+        secretName: '{{ include "bpdm.realmConfig.name" . }}'
+  extraVolumeMounts:
+    - name: realm-config
+      mountPath: /opt/keycloak/data/import
+      readOnly: true
   service:
     httpPort: 80
-  database:
-    type: "postgres"
-    host: "bpdm-postgres"
-    port: "5432"
-    name: "keycloak"
-    username: "keycloak"
-    password: "keycloak-db-password"
   postgres:
-    enabled: false
+    enabled: true
   mariadb:
     enabled: false
 
+# Helm `test` hook that runs the bpdm-system-tester image as an end-to-end smoke test against the
+# deployed release (templates/tests/test-connection.yaml). The tester is wired through the same
+# umbrella-generated config Secrets as the applications: base-urls come from the client-url-config
+# Secret and credentials from the tester-keycloak-config Secret (which authenticates as BPDM_ADMIN
+# against Gate, Pool and Orchestrator). It therefore requires the bundled keycloak to be enabled.
 tests:
-  applicationConfig:
-    bpdm:
-      client:
-        gate:
-          provider:
-            issuer-uri: http://bpdm-keycloak/realms/BPDM
-        pool:
-          provider:
-            issuer-uri: http://bpdm-keycloak/realms/BPDM
-        orchestrator:
-          provider:
-            issuer-uri: http://bpdm-keycloak/realms/BPDM
+  # Toggles whether the `helm test` hook pod is rendered for this release.
+  enabled: false
+  # The bpdm-system-tester container image run by the test pod.
   image:
     registry: docker.io
     repository: tractusx/bpdm-system-tester
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
     tag: ""
+  # Matches the hardened securityContext used by the bundled BPDM applications.
+  securityContext:
+    seccompProfile:
+      type: RuntimeDefault
+    allowPrivilegeEscalation: false
+    runAsNonRoot: true
+    readOnlyRootFilesystem: true
+    runAsUser: 10001
+    runAsGroup: 10001
+    capabilities:
+      drop:
+        - ALL

@@ -56,8 +56,9 @@ class TaskAddressRelationsStepBuildService(
         val targetAddress = logisticAddressRepository.findByBpn(addressRelationDto.businessPartnerTargetBpn)
             ?: throw BpdmValidationException("Target address BPNA ${addressRelationDto.businessPartnerTargetBpn} not found")
 
-        val reasonCode  = reasonCodeRepository.findByTechnicalKey(addressRelationDto.reasonCode)
-            ?: throw BpdmValidationException("Relation reason code '${addressRelationDto.reasonCode}' not found")
+        val reasonCode = addressRelationDto.reasonCode?.let {
+            reasonCodeRepository.findByTechnicalKey(it) ?: throw BpdmValidationException("Relation reason code '${addressRelationDto.reasonCode}' not found")
+        }
 
         validateValidityPeriods(addressRelationDto)
 
@@ -99,7 +100,7 @@ class TaskAddressRelationsStepBuildService(
                     validTo = it.validTo
                 )
             },
-            reasonCode = reasonCode.technicalKey
+            reasonCode = reasonCode?.technicalKey
         )
     }
 

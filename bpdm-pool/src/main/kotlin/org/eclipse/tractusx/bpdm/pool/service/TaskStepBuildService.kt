@@ -298,7 +298,8 @@ class TaskStepBuildService(
                 name = poolSite.name,
                 states = poolSite.states,
                 confidenceCriteria = poolSite.confidenceCriteria.copy(numberOfSharingMembers = 1),
-                bpnLParent = legalEntityBpn
+                bpnLParent = legalEntityBpn,
+                scriptVariants = poolSite.scriptVariants.map { it.toHeader() }
             )
             businessPartnerBuildService.createSitesWithLegalAddressAsMain(listOf(createRequest))
         }else{

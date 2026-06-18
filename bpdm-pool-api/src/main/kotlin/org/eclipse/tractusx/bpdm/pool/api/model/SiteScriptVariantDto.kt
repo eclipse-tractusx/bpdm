@@ -23,4 +23,11 @@ data class SiteScriptVariantDto(
     val scriptCode: String,
     val name: String,
     val mainAddress: PostalAddressScriptVariantDto
-)
+){
+    fun toHeader(): SiteHeaderScriptVariantDto{
+        return SiteHeaderScriptVariantDto(
+            scriptCode,
+            name
+        )
+    }
+}

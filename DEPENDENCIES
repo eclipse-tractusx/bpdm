@@ -72,27 +72,27 @@ maven/mavencentral/io.mockk/mockk-agent-jvm/1.14.6, Apache-2.0, approved, clearl
 maven/mavencentral/io.mockk/mockk-core-jvm/1.14.6, Apache-2.0, approved, clearlydefined
 maven/mavencentral/io.mockk/mockk-dsl-jvm/1.14.6, Apache-2.0, approved, clearlydefined
 maven/mavencentral/io.mockk/mockk-jvm/1.14.6, Apache-2.0, approved, clearlydefined
-maven/mavencentral/io.netty/netty-buffer/4.2.13.Final, Apache-2.0, approved, #16116
-maven/mavencentral/io.netty/netty-codec-base/4.2.13.Final, Apache-2.0, approved, #21322
-maven/mavencentral/io.netty/netty-codec-classes-quic/4.2.13.Final, Apache-2.0, approved, #21311
-maven/mavencentral/io.netty/netty-codec-compression/4.2.13.Final, Apache-2.0, approved, #16109
-maven/mavencentral/io.netty/netty-codec-dns/4.2.13.Final, Apache-2.0, approved, #16112
-maven/mavencentral/io.netty/netty-codec-http/4.2.13.Final, Apache-2.0 AND (Apache-2.0 AND MIT) AND (Apache-2.0 AND BSD-3-Clause), approved, #16121
-maven/mavencentral/io.netty/netty-codec-http2/4.2.13.Final, Apache-2.0, approved, #16125
-maven/mavencentral/io.netty/netty-codec-http3/4.2.13.Final, Apache-2.0, approved, #25607
-maven/mavencentral/io.netty/netty-codec-native-quic/4.2.13.Final, Apache-2.0, approved, #21319
-maven/mavencentral/io.netty/netty-codec-socks/4.2.13.Final, Apache-2.0, approved, #16117
-maven/mavencentral/io.netty/netty-common/4.2.13.Final, Apache-2.0 AND (Apache-2.0 AND CC0-1.0) AND (Apache-2.0 AND MIT), approved, #16124
-maven/mavencentral/io.netty/netty-handler-proxy/4.2.13.Final, Apache-2.0, approved, #16111
-maven/mavencentral/io.netty/netty-handler/4.2.13.Final, Apache-2.0, approved, #16123
-maven/mavencentral/io.netty/netty-resolver-dns-classes-macos/4.2.13.Final, Apache-2.0, approved, #21316
-maven/mavencentral/io.netty/netty-resolver-dns-native-macos/4.2.13.Final, Apache-2.0, approved, #21330
-maven/mavencentral/io.netty/netty-resolver-dns/4.2.13.Final, Apache-2.0, approved, #16110
-maven/mavencentral/io.netty/netty-resolver/4.2.13.Final, Apache-2.0, approved, #16126
-maven/mavencentral/io.netty/netty-transport-classes-epoll/4.2.13.Final, Apache-2.0, approved, #21317
-maven/mavencentral/io.netty/netty-transport-native-epoll/4.2.13.Final, Apache-2.0, approved, #21327
-maven/mavencentral/io.netty/netty-transport-native-unix-common/4.2.13.Final, Apache-2.0, approved, #21329
-maven/mavencentral/io.netty/netty-transport/4.2.13.Final, Apache-2.0, approved, #16113
+maven/mavencentral/io.netty/netty-buffer/4.2.15.Final, Apache-2.0, approved, #16116
+maven/mavencentral/io.netty/netty-codec-base/4.2.15.Final, Apache-2.0, approved, #21322
+maven/mavencentral/io.netty/netty-codec-classes-quic/4.2.15.Final, Apache-2.0, approved, #21311
+maven/mavencentral/io.netty/netty-codec-compression/4.2.15.Final, Apache-2.0, approved, #16109
+maven/mavencentral/io.netty/netty-codec-dns/4.2.15.Final, Apache-2.0, approved, #16112
+maven/mavencentral/io.netty/netty-codec-http/4.2.15.Final, Apache-2.0 AND (Apache-2.0 AND MIT) AND (Apache-2.0 AND BSD-3-Clause), approved, #16121
+maven/mavencentral/io.netty/netty-codec-http2/4.2.15.Final, Apache-2.0, approved, #16125
+maven/mavencentral/io.netty/netty-codec-http3/4.2.15.Final, Apache-2.0, approved, #25607
+maven/mavencentral/io.netty/netty-codec-native-quic/4.2.15.Final, Apache-2.0, approved, #21319
+maven/mavencentral/io.netty/netty-codec-socks/4.2.15.Final, Apache-2.0, approved, #16117
+maven/mavencentral/io.netty/netty-common/4.2.15.Final, Apache-2.0 AND (Apache-2.0 AND CC0-1.0) AND (Apache-2.0 AND MIT), approved, #16124
+maven/mavencentral/io.netty/netty-handler-proxy/4.2.15.Final, Apache-2.0, approved, #16111
+maven/mavencentral/io.netty/netty-handler/4.2.15.Final, Apache-2.0, approved, #16123
+maven/mavencentral/io.netty/netty-resolver-dns-classes-macos/4.2.15.Final, Apache-2.0, approved, #21316
+maven/mavencentral/io.netty/netty-resolver-dns-native-macos/4.2.15.Final, Apache-2.0, approved, #21330
+maven/mavencentral/io.netty/netty-resolver-dns/4.2.15.Final, Apache-2.0, approved, #16110
+maven/mavencentral/io.netty/netty-resolver/4.2.15.Final, Apache-2.0, approved, #16126
+maven/mavencentral/io.netty/netty-transport-classes-epoll/4.2.15.Final, Apache-2.0, approved, #21317
+maven/mavencentral/io.netty/netty-transport-native-epoll/4.2.15.Final, Apache-2.0, approved, #21327
+maven/mavencentral/io.netty/netty-transport-native-unix-common/4.2.15.Final, Apache-2.0, approved, #21329
+maven/mavencentral/io.netty/netty-transport/4.2.15.Final, Apache-2.0, approved, #16113
 maven/mavencentral/io.projectreactor.netty/reactor-netty-core/1.3.5, Apache-2.0, approved, #25603
 maven/mavencentral/io.projectreactor.netty/reactor-netty-http/1.3.5, Apache-2.0, approved, #25597
 maven/mavencentral/io.projectreactor/reactor-core/3.8.5, Apache-2.0, approved, #25635
@@ -128,9 +128,9 @@ maven/mavencentral/org.apache.james/apache-mime4j-dom/0.8.9, Apache-2.0, approve
 maven/mavencentral/org.apache.james/apache-mime4j-storage/0.8.9, Apache-2.0, approved, clearlydefined
 maven/mavencentral/org.apache.logging.log4j/log4j-api/2.25.4, Apache-2.0, approved, #21940
 maven/mavencentral/org.apache.logging.log4j/log4j-to-slf4j/2.25.4, Apache-2.0, approved, #21937
-maven/mavencentral/org.apache.tomcat.embed/tomcat-embed-core/11.0.21, Apache-2.0 AND (EPL-2.0 OR GPL-2.0-only WITH Classpath-exception-2.0) AND (CDDL-1.0 OR GPL-2.0-or-later), approved, #19217
-maven/mavencentral/org.apache.tomcat.embed/tomcat-embed-el/11.0.21, Apache-2.0, approved, #22421
-maven/mavencentral/org.apache.tomcat.embed/tomcat-embed-websocket/11.0.21, Apache-2.0, approved, #21065
+maven/mavencentral/org.apache.tomcat.embed/tomcat-embed-core/11.0.22, Apache-2.0 AND (EPL-2.0 OR GPL-2.0-only WITH Classpath-exception-2.0) AND (CDDL-1.0 OR GPL-2.0-or-later), approved, #19217
+maven/mavencentral/org.apache.tomcat.embed/tomcat-embed-el/11.0.22, Apache-2.0, approved, #22421
+maven/mavencentral/org.apache.tomcat.embed/tomcat-embed-websocket/11.0.22, Apache-2.0, approved, #21065
 maven/mavencentral/org.apiguardian/apiguardian-api/1.1.2, Apache-2.0, approved, #17641
 maven/mavencentral/org.aspectj/aspectjweaver/1.9.25.1, EPL-1.0, approved, tools.aspectj
 maven/mavencentral/org.assertj/assertj-core/3.24.2, Apache-2.0, approved, #6161
@@ -138,15 +138,15 @@ maven/mavencentral/org.awaitility/awaitility/4.3.0, Apache-2.0, approved, clearl
 maven/mavencentral/org.eclipse.angus/angus-activation/1.0.0, EPL-2.0 OR GPL-2.0-only with Classpath-exception-2.0, approved, ee4j.angus
 maven/mavencentral/org.eclipse.angus/angus-activation/2.0.3, EPL-2.0 OR GPL-2.0-only with Classpath-exception-2.0, approved, ee4j.angus
 maven/mavencentral/org.eclipse.angus/angus-mail/2.0.5, EPL-2.0 OR GPL-2.0-only with Classpath-exception-2.0, approved, ee4j.angus
-maven/mavencentral/org.eclipse.tractusx/bpdm-cleaning-service-dummy/7.4.0-SNAPSHOT, Apache-2.0, approved, automotive.tractusx
-maven/mavencentral/org.eclipse.tractusx/bpdm-common-test/7.4.0-SNAPSHOT, Apache-2.0, approved, automotive.tractusx
-maven/mavencentral/org.eclipse.tractusx/bpdm-common/7.4.0-SNAPSHOT, Apache-2.0, approved, automotive.tractusx
-maven/mavencentral/org.eclipse.tractusx/bpdm-gate-api/7.4.0-SNAPSHOT, Apache-2.0, approved, automotive.tractusx
-maven/mavencentral/org.eclipse.tractusx/bpdm-gate/7.4.0-SNAPSHOT, Apache-2.0, approved, automotive.tractusx
-maven/mavencentral/org.eclipse.tractusx/bpdm-orchestrator-api/7.4.0-SNAPSHOT, Apache-2.0, approved, automotive.tractusx
-maven/mavencentral/org.eclipse.tractusx/bpdm-orchestrator/7.4.0-SNAPSHOT, Apache-2.0, approved, automotive.tractusx
-maven/mavencentral/org.eclipse.tractusx/bpdm-pool-api/7.4.0-SNAPSHOT, Apache-2.0, approved, automotive.tractusx
-maven/mavencentral/org.eclipse.tractusx/bpdm-pool/7.4.0-SNAPSHOT, Apache-2.0, approved, automotive.tractusx
+maven/mavencentral/org.eclipse.tractusx/bpdm-cleaning-service-dummy/7.4.0, Apache-2.0, approved, automotive.tractusx
+maven/mavencentral/org.eclipse.tractusx/bpdm-common-test/7.4.0, Apache-2.0, approved, automotive.tractusx
+maven/mavencentral/org.eclipse.tractusx/bpdm-common/7.4.0, Apache-2.0, approved, automotive.tractusx
+maven/mavencentral/org.eclipse.tractusx/bpdm-gate-api/7.4.0, Apache-2.0, approved, automotive.tractusx
+maven/mavencentral/org.eclipse.tractusx/bpdm-gate/7.4.0, Apache-2.0, approved, automotive.tractusx
+maven/mavencentral/org.eclipse.tractusx/bpdm-orchestrator-api/7.4.0, Apache-2.0, approved, automotive.tractusx
+maven/mavencentral/org.eclipse.tractusx/bpdm-orchestrator/7.4.0, Apache-2.0, approved, automotive.tractusx
+maven/mavencentral/org.eclipse.tractusx/bpdm-pool-api/7.4.0, Apache-2.0, approved, automotive.tractusx
+maven/mavencentral/org.eclipse.tractusx/bpdm-pool/7.4.0, Apache-2.0, approved, automotive.tractusx
 maven/mavencentral/org.flywaydb/flyway-core/11.14.1, Apache-2.0, approved, #25604
 maven/mavencentral/org.flywaydb/flyway-database-postgresql/11.14.1, Apache-2.0, approved, #25627
 maven/mavencentral/org.glassfish.jaxb/codemodel/4.0.6, BSD-3-Clause, approved, ee4j.jaxb-impl
