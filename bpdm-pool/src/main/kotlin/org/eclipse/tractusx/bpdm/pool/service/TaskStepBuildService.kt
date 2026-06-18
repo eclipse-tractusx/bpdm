@@ -410,7 +410,7 @@ class TaskStepBuildService(
             is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { "Errors on creating Address: ${renderError(it)}" })
         }
 
-        return addressCreateService.create(listOf(parsed)).single().value.bpn
+        return addressCreateService.create(listOf(parsed)).single().bpn
     }
 
     private fun updateLogisticAddress(

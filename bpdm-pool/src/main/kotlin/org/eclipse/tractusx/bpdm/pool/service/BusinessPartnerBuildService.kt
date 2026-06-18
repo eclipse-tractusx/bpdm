@@ -28,6 +28,11 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.dto.*
 import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
+import org.eclipse.tractusx.bpdm.pool.mapper.AddressParseErrorMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.LogisticAddressDtoRequestMapper
+import org.eclipse.tractusx.bpdm.pool.model.AddressCreateRequest
+import org.eclipse.tractusx.bpdm.pool.model.AddressUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
@@ -49,7 +54,11 @@ class BusinessPartnerBuildService(
     private val siteRepository: SiteRepository,
     private val logisticAddressRepository: LogisticAddressRepository,
     private val requestValidationService: RequestValidationService,
-    private val businessPartnerEquivalenceMapper: BusinessPartnerEquivalenceMapper
+    private val businessPartnerEquivalenceMapper: BusinessPartnerEquivalenceMapper,
+    private val addressCreateService: AddressCreateService,
+    private val addressUpdateService: AddressUpdateService,
+    private val logisticAddressDtoRequestMapper: LogisticAddressDtoRequestMapper,
+    private val addressParseErrorMapper: AddressParseErrorMapper
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -223,33 +232,75 @@ class BusinessPartnerBuildService(
         return sites
     }
 
+    /**
+     * `@Transactional` so parent resolution and [AddressCreateService.parseAndCreate] (which resolves entities, then
+     * persists) share one persistence context. The single `bpnParent` is resolved into the explicit (legalEntity, site)
+     * parents the service expects (a site parent contributes its own legal entity); that resolution also reports the
+     * precise `BpnNotValid`/`SiteNotFound`/`LegalEntityNotFound` parent errors, which `parse` alone could not
+     * distinguish. All address-content validation is delegated to `parse`.
+     */
     @Transactional
     fun createAddresses(requests: Collection<AddressPartnerCreateRequest>): AddressPartnerCreateResponseWrapper {
         logger.info { "Create ${requests.size} new addresses" }
 
-        val errorsByRequest = requestValidationService.validateAddressesToCreateFromController(requests)
-        val errors = errorsByRequest.flatMap { it.value }
-        val validRequests = requests.filterNot { errorsByRequest.containsKey(it) }
+        val requestList = requests.toList()
+        val parents = resolveCreateParents(requestList)
 
-        fun isLegalEntityRequest(request: AddressPartnerCreateRequest) =
-            bpnIssuingService.translateToBusinessPartnerType(request.bpnParent) == BusinessPartnerType.LEGAL_ENTITY
+        // Only requests with a resolved parent reach the service; the others already have a parent error.
+        val parentErrors = mutableListOf<ErrorInfo<AddressCreateError>>()
+        val createRequests = mutableListOf<Pair<AddressPartnerCreateRequest, AddressCreateRequest>>()
+        requestList.zip(parents).forEach { (request, parent) ->
+            when (parent) {
+                is CreateParent.Invalid -> parentErrors.add(parent.error)
+                is CreateParent.Resolved -> {
+                    val content = logisticAddressDtoRequestMapper.toContentRequest(request.address, request.scriptVariants)
+                    createRequests.add(request to AddressCreateRequest(parent.legalEntityBpn, parent.siteBpn, content))
+                }
+            }
+        }
 
-        fun isSiteRequest(request: AddressPartnerCreateRequest) =
-            bpnIssuingService.translateToBusinessPartnerType(request.bpnParent) == BusinessPartnerType.SITE
+        val responses = mutableListOf<AddressPartnerCreateVerboseDto>()
+        val parseErrors = mutableListOf<ErrorInfo<AddressCreateError>>()
+        createRequests.zip(addressCreateService.parseAndCreate(createRequests.map { it.second })).forEach { (pair, result) ->
+            val request = pair.first
+            when (result) {
+                is ParseResult.Success -> responses.add(result.parsed.toCreateResponse(request.index))
+                is ParseResult.Failure -> parseErrors.addAll(result.errors.map { addressParseErrorMapper.toCreateErrorInfo(it, request.index) })
+            }
+        }
 
-        val legalEntityRequests = validRequests.filter { isLegalEntityRequest(it) }
-        val siteRequests = validRequests.filter { isSiteRequest(it) }
+        return AddressPartnerCreateResponseWrapper(responses, parentErrors + parseErrors)
+    }
 
-        val metadataMap = metadataService.getMetadata(validRequests.map { LogisticAddressWithScriptVariantsDto(it.address, it.scriptVariants) }).toMapping()
+    private sealed interface CreateParent {
+        data class Resolved(val legalEntityBpn: String, val siteBpn: String?) : CreateParent
+        data class Invalid(val error: ErrorInfo<AddressCreateError>) : CreateParent
+    }
 
-        val addressResponses = createAddressesForSite(siteRequests, metadataMap)
-            .plus(createAddressesForLegalEntity(legalEntityRequests, metadataMap))
+    /**
+     * Resolves each request's single `bpnParent` into the explicit (legalEntity, site) pair the create service needs,
+     * validating existence in the same pass. A legal-entity parent resolves to itself; a site parent contributes its own
+     * legal entity. Positional: result[i] corresponds to requests[i].
+     */
+    private fun resolveCreateParents(requests: List<AddressPartnerCreateRequest>): List<CreateParent> {
+        val typeByBpn = requests.map { it.bpnParent }.associateWith { bpnIssuingService.translateToBusinessPartnerType(it) }
+        val legalEntityParentBpns = typeByBpn.filterValues { it == BusinessPartnerType.LEGAL_ENTITY }.keys
+        val siteParentBpns = typeByBpn.filterValues { it == BusinessPartnerType.SITE }.keys
+        val existingLegalEntityBpns = legalEntityRepository.findDistinctByBpnIn(legalEntityParentBpns).map { it.bpn }.toSet()
+        val sitesByBpn = siteRepository.findDistinctByBpnIn(siteParentBpns).associateBy { it.bpn }
 
-        changelogService.createChangelogEntries(addressResponses.map {
-            ChangelogEntryCreateRequest(it.address.bpna, ChangelogType.CREATE, BusinessPartnerType.ADDRESS)
-        })
-
-        return AddressPartnerCreateResponseWrapper(addressResponses, errors)
+        return requests.map { request ->
+            val parent = request.bpnParent
+            when (typeByBpn[parent]) {
+                BusinessPartnerType.LEGAL_ENTITY ->
+                    if (parent in existingLegalEntityBpns) CreateParent.Resolved(parent, siteBpn = null)
+                    else CreateParent.Invalid(ErrorInfo(AddressCreateError.LegalEntityNotFound, "Parent with BPN '$parent' not found", request.index))
+                BusinessPartnerType.SITE ->
+                    sitesByBpn[parent]?.let { CreateParent.Resolved(it.legalEntity.bpn, siteBpn = parent) }
+                        ?: CreateParent.Invalid(ErrorInfo(AddressCreateError.SiteNotFound, "Parent with BPN '$parent' not found", request.index))
+                else -> CreateParent.Invalid(ErrorInfo(AddressCreateError.BpnNotValid, "Parent '$parent' is not a valid BPNL/BPNS", request.index))
+            }
+        }
     }
 
     /**
@@ -352,78 +403,30 @@ class BusinessPartnerBuildService(
         return SitePartnerUpdateResponseWrapper(siteResponses, errors)
     }
 
+    /**
+     * `@Transactional` so [AddressUpdateService.parseAndUpdate] resolves the target entities and mutates their lazy
+     * collections in one persistence context instead of relying on Open-Session-in-View. All validation (including
+     * "address not found") is delegated to `parse`; there is no parent to resolve on update.
+     */
+    @Transactional
     fun updateAddresses(requests: Collection<AddressPartnerUpdateRequest>): AddressPartnerUpdateResponseWrapper {
         logger.info { "Update ${requests.size} business partner addresses" }
 
-        val errorsByRequest = requestValidationService.validateAddressesToUpdateFromController(requests)
-        val errors = errorsByRequest.flatMap { it.value }
-        val validRequests = requests.filterNot { errorsByRequest.containsKey(it) }
+        val requestList = requests.toList()
+        val updateRequests = requestList.map {
+            AddressUpdateRequest(addressBpn = it.bpna, content = logisticAddressDtoRequestMapper.toContentRequest(it.address, it.scriptVariants))
+        }
 
-        val addresses = logisticAddressRepository.findDistinctByBpnIn(validRequests.map { it.bpna })
-        val metadataMap = metadataService.getMetadata(validRequests.map { LogisticAddressWithScriptVariantsDto(it.address, it.scriptVariants) }).toMapping()
-
-        val addressRequestPairs = addresses.sortedBy { it.bpn }.zip(requests.sortedBy { it.bpna })
-        addressRequestPairs.forEach { (address, request) ->
-            val addressBeforeUpdate = businessPartnerEquivalenceMapper.toEquivalenceDto(address)
-            updateLogisticAddress(address, request.toAddressWithScriptVariants(), metadataMap)
-            val addressAfterUpdate = businessPartnerEquivalenceMapper.toEquivalenceDto(address)
-
-            if (addressBeforeUpdate != addressAfterUpdate) {
-                logger.info { "Address ${address.bpn} was updated" }
-
-                logisticAddressRepository.save(address)
-
-                changelogService.createChangelogEntries(listOf(ChangelogEntryCreateRequest(address.bpn, ChangelogType.UPDATE, BusinessPartnerType.ADDRESS)))
+        val responses = mutableListOf<AddressPartnerUpdateVerboseDto>()
+        val errors = mutableListOf<ErrorInfo<AddressUpdateError>>()
+        requestList.zip(addressUpdateService.parseAndUpdate(updateRequests)).forEach { (request, result) ->
+            when (result) {
+                is ParseResult.Success -> responses.add(result.parsed.value.toUpdateDto())
+                is ParseResult.Failure -> errors.addAll(result.errors.map { addressParseErrorMapper.toUpdateErrorInfo(it, request.bpna) })
             }
         }
 
-        val addressResponses = addresses.map { it.toUpdateDto() }
-
-        return AddressPartnerUpdateResponseWrapper(addressResponses, errors)
-    }
-
-    private fun createAddressesForLegalEntity(
-        validRequests: Collection<AddressPartnerCreateRequest>,
-        metadataMap: AddressMetadataMapping
-    ): Collection<AddressPartnerCreateVerboseDto> {
-
-        val bpnLsToFetch = validRequests.map { it.bpnParent }
-        val parentLegalEntities = businessPartnerFetchService.fetchByBpns(bpnLsToFetch)
-        val parentLegalEntitiesByBpn = parentLegalEntities.associateBy { it.bpn }
-
-        val bpnAs = bpnIssuingService.issueAddressBpns(validRequests.size)
-        val addressesWithIndex = validRequests
-            .mapIndexed { i, request ->
-                val legalEntity = parentLegalEntitiesByBpn[request.bpnParent]!!
-                val address = createLogisticAddress(request.toAddressWithScriptVariants(), bpnAs[i], legalEntity, null, metadataMap)
-                Pair(address, request.index)
-            }
-
-        logisticAddressRepository.saveAll(addressesWithIndex.map { (address, _) -> address })
-        return addressesWithIndex.map { (address, index) -> address.toCreateResponse(index) }
-    }
-
-    private fun createAddressesForSite(
-        validRequests: Collection<AddressPartnerCreateRequest>,
-        metadataMap: AddressMetadataMapping
-    ): List<AddressPartnerCreateVerboseDto> {
-
-        val bpnsToFetch = validRequests.map { it.bpnParent }
-        val siteParents = siteRepository.findDistinctByBpnIn(bpnsToFetch)
-        val siteParentsByBpn = siteParents.associateBy { it.bpn }
-
-        val bpnAs = bpnIssuingService.issueAddressBpns(validRequests.size)
-        val addressesWithIndex = validRequests
-            .mapIndexed { i, request ->
-                val site = siteParentsByBpn[request.bpnParent]!!
-                val address = createLogisticAddress(request.toAddressWithScriptVariants(), bpnAs[i], site.legalEntity, site, metadataMap)
-                Pair(address, request.index)
-            }
-
-        logisticAddressRepository.saveAll(addressesWithIndex.map { (address, _) -> address })
-        return addressesWithIndex.map { (address, index) ->
-            address.toCreateResponse(index).also { logger.info { "Address ${address.bpn} was created" } }
-        }
+        return AddressPartnerUpdateResponseWrapper(responses, errors)
     }
 
     private fun createSiteHeader(
@@ -827,20 +830,6 @@ class BusinessPartnerBuildService(
         return LogisticAddressWithScriptVariantsDto(
             mainAddress,
             scriptVariants.map { it.toAddressVariant() }
-        )
-    }
-
-    private fun AddressPartnerCreateRequest.toAddressWithScriptVariants(): LogisticAddressWithScriptVariantsDto{
-        return LogisticAddressWithScriptVariantsDto(
-            address,
-            scriptVariants
-        )
-    }
-
-    private fun AddressPartnerUpdateRequest.toAddressWithScriptVariants(): LogisticAddressWithScriptVariantsDto{
-        return LogisticAddressWithScriptVariantsDto(
-            address,
-            scriptVariants
         )
     }
 

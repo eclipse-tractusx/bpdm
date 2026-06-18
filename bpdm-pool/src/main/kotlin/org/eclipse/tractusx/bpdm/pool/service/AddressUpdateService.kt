@@ -27,12 +27,10 @@ import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.mapper.AddressEntityMapper
-import org.eclipse.tractusx.bpdm.pool.mapper.AddressUpsertedMapper
 import org.eclipse.tractusx.bpdm.pool.model.AddressContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.AddressUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.AddressUpdateParseError
 import org.eclipse.tractusx.bpdm.pool.model.AddressUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.model.AddressUpserted
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.combine
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
@@ -51,8 +49,7 @@ class AddressUpdateService(
     private val logisticAddressRepository: LogisticAddressRepository,
     private val changelogService: PartnerChangelogService,
     private val equivalenceMapper: BusinessPartnerEquivalenceMapper,
-    private val addressEntityMapper: AddressEntityMapper,
-    private val addressUpsertedMapper: AddressUpsertedMapper
+    private val addressEntityMapper: AddressEntityMapper
 ) {
 
     fun parse(requests: List<AddressUpdateRequest>): List<ParseResult<AddressUpdateParsed, AddressUpdateParseError>> {
@@ -80,11 +77,36 @@ class AddressUpdateService(
         }
     }
 
+    /**
+     * Convenience for callers that route per-entry failures: [parse] then [update] the successful entries, returning
+     * one result per request (positional, see [ParseResult]) where each is either the upsert outcome or the parse
+     * errors for that entry. `@Transactional` so resolution and the mutation of lazy collections share one persistence
+     * context.
+     */
     @Transactional
-    fun update(parsed: List<AddressUpdateParsed>): List<UpsertResult<AddressUpserted>> =
+    fun parseAndUpdate(requests: List<AddressUpdateRequest>): List<ParseResult<UpsertResult<LogisticAddressDb>, AddressUpdateParseError>> {
+        val parseResults = parse(requests)
+        val updated = update(parseResults.filterIsInstance<ParseResult.Success<AddressUpdateParsed>>().map { it.parsed })
+
+        val updatedIterator = updated.iterator()
+        return parseResults.map { result ->
+            when (result) {
+                is ParseResult.Success -> ParseResult.Success(updatedIterator.next())
+                is ParseResult.Failure -> result
+            }
+        }
+    }
+
+    /**
+     * Returns the updated entities (within the caller's transaction) rather than a detached response model: the write
+     * is a pure in-transaction collaborator, and building version-specific responses is the job of the border/application
+     * service at the edge. See the address service layering rationale.
+     */
+    @Transactional
+    fun update(parsed: List<AddressUpdateParsed>): List<UpsertResult<LogisticAddressDb>> =
         parsed.map { update(it) }
 
-    private fun update(parsed: AddressUpdateParsed): UpsertResult<AddressUpserted> {
+    private fun update(parsed: AddressUpdateParsed): UpsertResult<LogisticAddressDb> {
         val target = parsed.target
 
         val before = equivalenceMapper.toEquivalenceDto(target)
@@ -99,7 +121,7 @@ class AddressUpdateService(
             UpsertType.NoChange
         }
 
-        return UpsertResult(addressUpsertedMapper.toUpserted(target), upsertType)
+        return UpsertResult(target, upsertType)
     }
 
     private fun applyChanges(target: LogisticAddressDb, parsed: AddressUpdateParsed) {

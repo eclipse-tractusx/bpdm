@@ -39,7 +39,6 @@ class RequestValidationService(
     private val addressIdentifierRepository: AddressIdentifierRepository,
     private val bpnIssuingService: BpnIssuingService,
     private val siteRepository: SiteRepository,
-    private val addressRepository: LogisticAddressRepository,
     private val metadataService: MetadataService
 ) {
 
@@ -203,56 +202,6 @@ class RequestValidationService(
         return requestBridges.associate { bridge ->
             val validationErrors = existingBpnValidator.validate(bridge.bpnS)
             bridge.request to validationErrors
-        }.filterValues { it.isNotEmpty() }
-    }
-
-    fun validateAddressesToCreateFromController(
-        addressRequests: Collection<AddressPartnerCreateRequest>
-    ): Map<AddressPartnerCreateRequest, Collection<ErrorInfo<AddressCreateError>>> {
-
-        val addressDtos = addressRequests.map { it.address }
-        val regionValidator = ValidateAdministrativeAreaLevel1Exists(addressDtos, AddressCreateError.RegionNotFound)
-        val identifiersValidator = ValidateIdentifierTypesExists(addressDtos, AddressCreateError.IdentifierNotFound)
-        val identifiersDuplicateValidator = ValidateAddressIdentifiersDuplicated(addressDtos, AddressCreateError.AddressDuplicateIdentifier)
-        val parentValidator = ValidateAddressParent(addressRequests)
-
-        return addressRequests.associateWith { request ->
-            val address = request.address
-
-            val validationErrors =
-                regionValidator.validate(address, request) +
-                        identifiersValidator.validate(address, request) +
-                        identifiersDuplicateValidator.validate(address, request, bpn = null) +
-                        parentValidator.validate(request.bpnParent, request) +
-                        validateAddressIdentifierTooMany(address, request, AddressCreateError.IdentifiersTooMany)
-
-            validationErrors
-        }.filterValues { it.isNotEmpty() }
-    }
-
-    fun validateAddressesToUpdateFromController(
-        addressRequests: Collection<AddressPartnerUpdateRequest>
-    ): Map<AddressPartnerUpdateRequest, Collection<ErrorInfo<AddressUpdateError>>> {
-
-        val addressDtos = addressRequests.map { it.address }
-        val requestedAddressBpns = addressRequests.map { it.bpna }
-        val existingAddressBpns = addressRepository.findDistinctByBpnIn(requestedAddressBpns).map { it.bpn }.toSet()
-
-        val regionValidator = ValidateAdministrativeAreaLevel1Exists(addressDtos, AddressUpdateError.RegionNotFound)
-        val identifiersValidator = ValidateIdentifierTypesExists(addressDtos, AddressUpdateError.IdentifierNotFound)
-        val identifiersDuplicateValidator = ValidateAddressIdentifiersDuplicated(addressDtos, AddressUpdateError.AddressDuplicateIdentifier)
-        val existingBpnValidator = ValidateUpdateBpnExists(existingAddressBpns, AddressUpdateError.AddressNotFound)
-
-        return addressRequests.associateWith { request ->
-            val address = request.address
-
-            val validationErrors = regionValidator.validate(address, request) +
-                    identifiersValidator.validate(address, request) +
-                    identifiersDuplicateValidator.validate(address, request, request.bpna) +
-                    existingBpnValidator.validate(request.bpna) +
-                    validateAddressIdentifierTooMany(address, request, AddressUpdateError.IdentifiersTooMany)
-
-            validationErrors
         }.filterValues { it.isNotEmpty() }
     }
 
@@ -428,32 +377,6 @@ class RequestValidationService(
             return duplicatesFromRequest.plus(duplicatesFromDb)
         }
 
-    }
-
-    private inner class ValidateAddressParent(requests: Collection<AddressPartnerCreateRequest>) {
-
-        val requestsByParentType = requests.groupBy { bpnIssuingService.translateToBusinessPartnerType(it.bpnParent) }
-        val legalEntityParentBpns = requestsByParentType[BusinessPartnerType.LEGAL_ENTITY]?.map { it.bpnParent } ?: emptyList()
-        val existingLegalEntities = legalEntityRepository.findDistinctByBpnIn(legalEntityParentBpns).map { it.bpn }.toSet()
-
-        val siteParentBpns = requestsByParentType[BusinessPartnerType.SITE]?.map { it.bpnParent } ?: emptyList()
-        val existingSites = siteRepository.findDistinctByBpnIn(siteParentBpns).map { it.bpn }.toSet()
-
-        fun validate(bpnParent: String, entityKey: RequestWithKey): Collection<ErrorInfo<AddressCreateError>> {
-            val type = bpnIssuingService.translateToBusinessPartnerType(bpnParent)
-            return when (type) {
-                BusinessPartnerType.LEGAL_ENTITY -> validateParentBpnExists(
-                    bpnParent,
-                    entityKey.getRequestKey(),
-                    existingLegalEntities,
-                    AddressCreateError.LegalEntityNotFound
-                )
-
-                BusinessPartnerType.SITE -> validateParentBpnExists(bpnParent, entityKey.getRequestKey(), existingSites, AddressCreateError.SiteNotFound)
-                else -> listOf(ErrorInfo(AddressCreateError.BpnNotValid, "Parent '${bpnParent}' is not a valid BPNL/BPNS", entityKey.getRequestKey()))
-
-            }
-        }
     }
 
     private fun LegalEntityInvariantHeaderMetadataDto.toKeys(): LegalEntityMetadataKeys {

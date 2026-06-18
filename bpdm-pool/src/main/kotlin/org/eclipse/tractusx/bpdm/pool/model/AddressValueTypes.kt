@@ -19,15 +19,34 @@
 
 package org.eclipse.tractusx.bpdm.pool.model
 
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
+import java.time.Instant
+
 /**
- * Entity-free result of an address create/update, shared by both operations. Wrapped in `UpsertResult<AddressUpserted>`
- * so the `UpsertType` carries whether the address was created, updated, or left unchanged. Parents are exposed as BPNs
- * (never `SiteDb`/`LegalEntityDb`) so callers and controllers stay decoupled from persistence entities.
+ * Bounded address value types that carry no stage-specific metadata, so they are shared across the loose request
+ * ([LogisticAddressRequest]) and resolved ([LogisticAddressParsed]) stages without per-stage variants.
  */
-data class AddressUpserted(
-    val bpn: String,
-    val legalEntityBpn: String,
-    val siteBpn: String?,
-    val address: LogisticAddress,
-    val scriptVariants: List<AddressScriptVariant>
+
+data class Street(
+    val name: String? = null,
+    val houseNumber: String? = null,
+    val houseNumberSupplement: String? = null,
+    val milestone: String? = null,
+    val direction: String? = null,
+    val namePrefix: String? = null,
+    val additionalNamePrefix: String? = null,
+    val nameSuffix: String? = null,
+    val additionalNameSuffix: String? = null
+)
+
+data class AddressState(
+    val validFrom: Instant?,
+    val validTo: Instant?,
+    val type: BusinessStateType
+)
+
+data class GeoCoordinate(
+    val longitude: Double,
+    val latitude: Double,
+    val altitude: Double? = null
 )

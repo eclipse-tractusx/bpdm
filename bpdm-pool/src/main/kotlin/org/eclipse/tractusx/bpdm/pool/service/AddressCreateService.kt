@@ -22,15 +22,12 @@ package org.eclipse.tractusx.bpdm.pool.service
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
-import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
-import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
+import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.mapper.AddressEntityMapper
-import org.eclipse.tractusx.bpdm.pool.mapper.AddressUpsertedMapper
 import org.eclipse.tractusx.bpdm.pool.model.AddressContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.AddressCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.AddressCreateParseError
 import org.eclipse.tractusx.bpdm.pool.model.AddressCreateRequest
-import org.eclipse.tractusx.bpdm.pool.model.AddressUpserted
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.combine
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
@@ -53,8 +50,7 @@ class AddressCreateService(
     private val bpnIssuingService: BpnIssuingService,
     private val logisticAddressRepository: LogisticAddressRepository,
     private val changelogService: PartnerChangelogService,
-    private val addressEntityMapper: AddressEntityMapper,
-    private val addressUpsertedMapper: AddressUpsertedMapper
+    private val addressEntityMapper: AddressEntityMapper
 ) {
 
     fun parse(requests: List<AddressCreateRequest>): List<ParseResult<AddressCreateParsed, AddressCreateParseError>> {
@@ -88,8 +84,33 @@ class AddressCreateService(
         }
     }
 
+    /**
+     * Convenience for callers that route per-entry failures: [parse] then [create] the successful entries, returning
+     * one result per request (positional, see [ParseResult]) where each is either the persisted entity or the parse
+     * errors for that entry. `@Transactional` so resolution and persistence share one persistence context.
+     */
     @Transactional
-    fun create(parsed: List<AddressCreateParsed>): List<UpsertResult<AddressUpserted>> {
+    fun parseAndCreate(requests: List<AddressCreateRequest>): List<ParseResult<LogisticAddressDb, AddressCreateParseError>> {
+        val parseResults = parse(requests)
+        val created = create(parseResults.filterIsInstance<ParseResult.Success<AddressCreateParsed>>().map { it.parsed })
+
+        val createdIterator = created.iterator()
+        return parseResults.map { result ->
+            when (result) {
+                is ParseResult.Success -> ParseResult.Success(createdIterator.next())
+                is ParseResult.Failure -> result
+            }
+        }
+    }
+
+    /**
+     * Returns the persisted entities (within the caller's transaction) rather than a detached response model: the
+     * write is a pure in-transaction collaborator, and turning entities into version-specific responses is the job of
+     * the border/application service at the edge. See the address service layering rationale. No `UpsertType` here —
+     * a create always yields `Created`, unlike update which can be a no-op.
+     */
+    @Transactional
+    fun create(parsed: List<AddressCreateParsed>): List<LogisticAddressDb> {
         val bpns = bpnIssuingService.issueAddressBpns(parsed.size)
         // A freshly created address has no shared history yet, so its sharing-member count starts at zero.
         val entities = parsed.zip(bpns) { entry, bpn -> addressEntityMapper.toEntity(bpn, entry, numberOfSharingMembers = 0) }
@@ -99,6 +120,6 @@ class AddressCreateService(
             ChangelogEntryCreateRequest(it.bpn, ChangelogType.CREATE, BusinessPartnerType.ADDRESS)
         })
 
-        return entities.map { UpsertResult(addressUpsertedMapper.toUpserted(it), UpsertType.Created) }
+        return entities
     }
 }
