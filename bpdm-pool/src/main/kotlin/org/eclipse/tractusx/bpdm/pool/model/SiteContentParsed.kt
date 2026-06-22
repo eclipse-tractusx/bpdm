@@ -1,0 +1,41 @@
+/*******************************************************************************
+ * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Apache License, Version 2.0 which is available at
+ * https://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ ******************************************************************************/
+
+package org.eclipse.tractusx.bpdm.pool.model
+
+import org.eclipse.tractusx.bpdm.pool.entity.ScriptCodeDb
+
+/**
+ * Bounded counterpart of [SiteContentRequest]: name/confidence validated to non-null, script-variant codes resolved to
+ * entities, and the main address validated to the shared [AddressContentParsed]. The success payload of the site content
+ * parse; the entity mapper consumes it to build/mutate a site.
+ */
+data class SiteContentParsed(
+    val name: String,
+    val states: List<SiteState>,
+    val confidenceCriteria: ConfidenceCriteriaParsed,
+    val scriptVariants: List<SiteScriptVariantParsed>,
+    val mainAddress: AddressContentParsed
+)
+
+/** Parsed counterpart of [SiteScriptVariant] with the script code resolved to its entity. */
+data class SiteScriptVariantParsed(
+    val scriptCode: ScriptCodeDb,
+    val name: String
+)
