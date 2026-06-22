@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorCode
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityCreateError
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteCreateError
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteUpdateError
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.model.AddressConstraintParseError
 import org.eclipse.tractusx.bpdm.pool.model.AddressCreateParseError
@@ -111,6 +112,20 @@ class AddressParseErrorMapper {
             identifierNotFound = SiteCreateError.MainAddressIdentifierNotFound,
             duplicateIdentifier = SiteCreateError.MainAddressDuplicateIdentifier,
             identifiersTooMany = SiteCreateError.MainAddressIdentifiersTooMany
+        )
+
+    /**
+     * For the main address embedded in a site update: the content parser only ever produces [AddressContentParseError],
+     * mapped to the `MainAddress*` codes.
+     */
+    fun toSiteUpdateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfo<SiteUpdateError> =
+        sharedErrorInfo(
+            error,
+            entityKey,
+            regionNotFound = SiteUpdateError.MainAddressRegionNotFound,
+            identifierNotFound = SiteUpdateError.MainAddressIdentifierNotFound,
+            duplicateIdentifier = SiteUpdateError.MainAddressDuplicateIdentifier,
+            identifiersTooMany = SiteUpdateError.MainAddressIdentifiersTooMany
         )
 
     private fun <E : ErrorCode> sharedErrorInfo(

@@ -30,6 +30,8 @@ import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.mapper.AddressParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.LogisticAddressDtoRequestMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.SiteDtoRequestMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.SiteParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.model.AddressContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.AddressCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.AddressCreateRequest
@@ -61,7 +63,11 @@ class BusinessPartnerBuildService(
     private val additionalAddressUpdateService: AdditionalAddressUpdateService,
     private val addressCreateService: AddressCreateService,
     private val logisticAddressDtoRequestMapper: LogisticAddressDtoRequestMapper,
-    private val addressParseErrorMapper: AddressParseErrorMapper
+    private val addressParseErrorMapper: AddressParseErrorMapper,
+    private val siteCreateService: SiteCreateService,
+    private val siteUpdateService: SiteUpdateService,
+    private val siteDtoRequestMapper: SiteDtoRequestMapper,
+    private val siteParseErrorMapper: SiteParseErrorMapper
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -200,53 +206,18 @@ class BusinessPartnerBuildService(
         logger.info { "Create ${requests.size} new sites" }
 
         val requestList = requests.toList()
-        val headerErrorsByRequest = requestValidationService.validateSitesToCreate(requests)
-        val (siteHeaderMetadata, _) = metadataService.getMetadata(requestList.map { it.site }).toMapping()
+        val createRequests = requestList.map { siteDtoRequestMapper.toCreateRequest(it) }
 
-        // The main address content is validated by the address create service's `parse`, independently of header/parent
-        // validation, so a request can report both a parent error and an address error (matching the previous behavior).
-        val contentResults = addressCreateService.parseContent(
-            requestList.map { logisticAddressDtoRequestMapper.toContentRequest(it.site.toMainAddressWithScriptVariants()) }
-        )
-
+        val responses = mutableListOf<SitePartnerCreateVerboseDto>()
         val errors = mutableListOf<ErrorInfo<SiteCreateError>>()
-        val buildable = mutableListOf<Pair<SitePartnerCreateRequest, AddressContentParsed>>()
-        requestList.forEachIndexed { index, request ->
-            val headerErrors = headerErrorsByRequest[request].orEmpty()
-            errors.addAll(headerErrors)
-            when (val contentResult = contentResults[index]) {
-                is ParseResult.Failure -> errors.addAll(contentResult.errors.map { addressParseErrorMapper.toSiteCreateErrorInfo(it, request.index) })
-                is ParseResult.Success -> if (headerErrors.isEmpty()) buildable.add(request to contentResult.parsed)
+        requestList.zip(siteCreateService.parseAndCreate(createRequests)).forEach { (request, result) ->
+            when (result) {
+                is ParseResult.Success -> responses.add(result.parsed.toUpsertDto(request.index))
+                is ParseResult.Failure -> errors.addAll(result.errors.map { siteParseErrorMapper.toCreateErrorInfo(it, request.index) })
             }
         }
 
-        val legalEntitiesByBpn = legalEntityRepository.findDistinctByBpnIn(buildable.map { it.first.bpnlParent }).associateBy { it.bpn }
-        val bpnSs = bpnIssuingService.issueSiteBpns(buildable.size)
-        val sitesByRequest = buildable.mapIndexed { index, (request, content) ->
-            val site = createSiteHeader(request.site.toHeader(), bpnSs[index], legalEntitiesByBpn[request.bpnlParent]!!, siteHeaderMetadata)
-            Triple(site, request, content)
-        }
-
-        val sites = sitesByRequest.map { it.first }
-        // Emit the site changelog before the address create service emits the ADDRESS CREATE changelog, so the overall
-        // changelog order stays "site, then its main address".
-        changelogService.createChangelogEntries(sites.map {
-            ChangelogEntryCreateRequest(it.bpn, ChangelogType.CREATE, BusinessPartnerType.SITE)
-        })
-
-        // The address create service owns the address BPN + ADDRESS CREATE changelog; the parent site is still unsaved
-        // (flushed in the right order at commit thanks to the nullable back-FK and order_inserts).
-        val mainAddresses = addressCreateService.create(sitesByRequest.map { (site, _, content) ->
-            AddressCreateParsed(site.legalEntity, site, content.address, content.scriptVariants)
-        })
-        sitesByRequest.zip(mainAddresses).forEach { (entry, address) -> entry.first.mainAddress = address }
-
-        sites.forEach { logger.info { "Site ${it.bpn} was created" } }
-        siteRepository.saveAll(sites)
-
-        val siteResponse = sitesByRequest.map { (site, request, _) -> site.toUpsertDto(request.index) }
-
-        return SitePartnerCreateResponseWrapper(siteResponse, errors)
+        return SitePartnerCreateResponseWrapper(responses, errors)
     }
 
     private fun createChangeLogAndSaveSiteInformation(requestsBySites: Map<SiteDb, SitePartnerCreateRequest>): Set<SiteDb> {
@@ -400,44 +371,19 @@ class BusinessPartnerBuildService(
     fun updateSites(requests: Collection<SitePartnerUpdateRequest>): SitePartnerUpdateResponseWrapper {
         logger.info { "Update ${requests.size} sites" }
 
-        val errorsByRequest = requestValidationService.validateSitesToUpdateFromController(requests)
-        val errors = errorsByRequest.flatMap { it.value }
-        val validRequests = requests.filterNot { errorsByRequest.containsKey(it) }
+        val requestList = requests.toList()
+        val updateRequests = requestList.map { siteDtoRequestMapper.toUpdateRequest(it) }
 
-        val (siteHeaderMetadata, mainAddressMetadata) = metadataService.getMetadata(requests.map { it.site }).toMapping()
-
-        val bpnsToFetch = validRequests.map { it.bpns }
-        val sites = siteRepository.findDistinctByBpnIn(bpnsToFetch)
-        val requestByBpnMap = validRequests.associateBy { it.bpns }
-
-        val siteRequestPairs = sites.map { site -> Pair(site, requestByBpnMap[site.bpn]!!) }
-        siteRequestPairs.forEach { (site, request) ->
-            val siteBeforeUpdate = businessPartnerEquivalenceMapper.toEquivalenceDto(site)
-            updateSiteHeader(site, request.site, siteHeaderMetadata)
-            updateLogisticAddress(site.mainAddress, request.site.toMainAddressWithScriptVariants(), mainAddressMetadata)
-            val siteAfterUpdate = businessPartnerEquivalenceMapper.toEquivalenceDto(site)
-
-            if (siteBeforeUpdate != siteAfterUpdate) {
-                logger.info { "Site ${site.bpn} was updated" }
-
-                siteRepository.save(site)
-
-                changelogService.createChangelogEntries(listOf(ChangelogEntryCreateRequest(site.bpn, ChangelogType.UPDATE, BusinessPartnerType.SITE)))
-                changelogService.createChangelogEntries(
-                    listOf(
-                        ChangelogEntryCreateRequest(
-                            site.mainAddress.bpn,
-                            ChangelogType.UPDATE,
-                            BusinessPartnerType.ADDRESS
-                        )
-                    )
-                )
+        val responses = mutableListOf<SitePartnerCreateVerboseDto>()
+        val errors = mutableListOf<ErrorInfo<SiteUpdateError>>()
+        requestList.zip(siteUpdateService.parseAndUpdate(updateRequests)).forEach { (request, result) ->
+            when (result) {
+                is ParseResult.Success -> responses.add(result.parsed.value.toUpsertDto(request.bpns))
+                is ParseResult.Failure -> errors.addAll(result.errors.map { siteParseErrorMapper.toUpdateErrorInfo(it, request.bpns) })
             }
         }
 
-        val siteResponses = siteRequestPairs.map { (site, request) -> site.toUpsertDto(request.bpns) }
-
-        return SitePartnerUpdateResponseWrapper(siteResponses, errors)
+        return SitePartnerUpdateResponseWrapper(responses, errors)
     }
 
     /**
@@ -477,14 +423,6 @@ class BusinessPartnerBuildService(
 
         return createdSite
     }
-    private fun updateSiteHeader(site: SiteDb, siteDto: SiteDto, metadataMap: SiteHeaderMetadataMapping): SiteDb {
-        updateSite(site, siteDto)
-        site.scriptVariants.replace(siteDto.scriptVariants.map { SiteScriptVariantDb(metadataMap.scriptCodes[it.scriptCode]!!, it.name) })
-
-        return site
-    }
-
-
 
     // Re-parents an existing address onto a site as its main address (used by createSiteMainAddressFromAdditionalAddress,
     // #3 — still on the legacy builder pending Phase 3).
@@ -681,6 +619,7 @@ class BusinessPartnerBuildService(
             )
         }
 
+        // Still used by the v6 legacy site mapper (controller/v6/SiteLegacyServiceMapper); the v7 path uses SiteUpdateService.
         fun updateSite(site: SiteDb, siteDto: IBaseSiteDto) {
 
             val name = siteDto.name ?: throw BpdmValidationException(TaskStepBuildService.CleaningError.SITE_NAME_IS_NULL.message)
