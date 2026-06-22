@@ -29,6 +29,8 @@ import org.eclipse.tractusx.bpdm.pool.dto.*
 import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.mapper.AddressParseErrorMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.LegalEntityDtoRequestMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.LegalEntityParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.LogisticAddressDtoRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.SiteDtoRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.SiteParseErrorMapper
@@ -67,7 +69,11 @@ class BusinessPartnerBuildService(
     private val siteCreateService: SiteCreateService,
     private val siteUpdateService: SiteUpdateService,
     private val siteDtoRequestMapper: SiteDtoRequestMapper,
-    private val siteParseErrorMapper: SiteParseErrorMapper
+    private val siteParseErrorMapper: SiteParseErrorMapper,
+    private val legalEntityCreateService: LegalEntityCreateService,
+    private val legalEntityUpdateService: LegalEntityUpdateService,
+    private val legalEntityDtoRequestMapper: LegalEntityDtoRequestMapper,
+    private val legalEntityParseErrorMapper: LegalEntityParseErrorMapper
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -80,52 +86,18 @@ class BusinessPartnerBuildService(
         logger.info { "Create ${requests.size} new legal entities" }
 
         val requestList = requests.toList()
-        val headerErrorsByRequest = requestValidationService.validateLegalEntitiesToCreateFromController(requests)
-        val (legalEntityMetadataMap, _) = metadataService.getMetadata(requests.map { it.legalEntity }).toMapping()
+        val createRequests = requestList.map { legalEntityDtoRequestMapper.toCreateRequest(it) }
 
-        // The legal address content is validated by the address create service's `parse`, independently of header
-        // validation, so a request can report both a header error and an address error (matching the previous behavior).
-        val contentResults = addressCreateService.parseContent(
-            requestList.map { logisticAddressDtoRequestMapper.toContentRequest(it.legalEntity.toLegalAddressWithScriptVariants()) }
-        )
-
+        val responses = mutableListOf<LegalEntityPartnerCreateVerboseDto>()
         val errors = mutableListOf<ErrorInfo<LegalEntityCreateError>>()
-        val buildable = mutableListOf<Pair<LegalEntityPartnerCreateRequest, AddressContentParsed>>()
-        requestList.forEachIndexed { index, request ->
-            val headerErrors = headerErrorsByRequest[request].orEmpty()
-            errors.addAll(headerErrors)
-            when (val contentResult = contentResults[index]) {
-                is ParseResult.Failure -> errors.addAll(contentResult.errors.map { addressParseErrorMapper.toLegalEntityCreateErrorInfo(it, request.index) })
-                is ParseResult.Success -> if (headerErrors.isEmpty()) buildable.add(request to contentResult.parsed)
+        requestList.zip(legalEntityCreateService.parseAndCreate(createRequests)).forEach { (request, result) ->
+            when (result) {
+                is ParseResult.Success -> responses.add(result.parsed.toUpsertDto(request.index))
+                is ParseResult.Failure -> errors.addAll(result.errors.map { legalEntityParseErrorMapper.toCreateErrorInfo(it, request.index) })
             }
         }
 
-        val bpnLs = bpnIssuingService.issueLegalEntityBpns(buildable.size)
-        val legalEntitiesByRequest = buildable.mapIndexed { index, (request, content) ->
-            val legalEntity = createLegalEntityHeader(request.legalEntity.header, bpnLs[index], legalEntityMetadataMap, request.legalEntity.scriptVariants)
-            Triple(legalEntity, request, content)
-        }
-
-        val legalEntities = legalEntitiesByRequest.map { it.first }
-        // Emit the legal entity changelog before the address create service emits the ADDRESS CREATE changelog, so the
-        // overall changelog order stays "legal entity, then its legal address".
-        changelogService.createChangelogEntries(legalEntities.map {
-            ChangelogEntryCreateRequest(it.bpn, ChangelogType.CREATE, BusinessPartnerType.LEGAL_ENTITY)
-        })
-
-        // The address create service owns the address BPN + ADDRESS CREATE changelog; the parent here is still unsaved
-        // (flushed in the right order at commit thanks to the nullable back-FK and order_inserts).
-        val legalAddresses = addressCreateService.create(legalEntitiesByRequest.map { (legalEntity, _, content) ->
-            AddressCreateParsed(legalEntity, site = null, content.address, content.scriptVariants)
-        })
-        legalEntitiesByRequest.zip(legalAddresses).forEach { (entry, address) -> entry.first.legalAddress = address }
-
-        legalEntities.forEach { logger.info { "Legal Entity ${it.bpn} was created" } }
-        legalEntityRepository.saveAll(legalEntities)
-
-        val legalEntityResponse = legalEntitiesByRequest.map { (legalEntity, request, _) -> legalEntity.toUpsertDto(request.index) }
-
-        return LegalEntityPartnerCreateResponseWrapper(legalEntityResponse, errors)
+        return LegalEntityPartnerCreateResponseWrapper(responses, errors)
     }
 
     fun createSitesWithLegalAddressAsMain(requests: Collection<SiteCreateRequestWithLegalAddressAsMain>): SitePartnerCreateResponseWrapper {
@@ -318,53 +290,19 @@ class BusinessPartnerBuildService(
     fun updateLegalEntities(requests: Collection<LegalEntityPartnerUpdateRequest>): LegalEntityPartnerUpdateResponseWrapper {
         logger.info { "Update ${requests.size} legal entities" }
 
-        val errorsByRequest = requestValidationService.validateLegalEntitiesToUpdateFromController(requests)
-        val errors = errorsByRequest.flatMap { it.value }
-        val validRequests = requests.filterNot { errorsByRequest.containsKey(it) }
+        val requestList = requests.toList()
+        val updateRequests = requestList.map { legalEntityDtoRequestMapper.toUpdateRequest(it) }
 
-        val (legalEntityMetadataMap, addressMetadataMap) = metadataService.getMetadata(requests.map { it.legalEntity }).toMapping()
-
-        val bpnsToFetch = validRequests.map { it.bpnl }
-        val legalEntities = legalEntityRepository.findDistinctByBpnIn(bpnsToFetch)
-        businessPartnerFetchService.fetchDependenciesWithLegalAddress(legalEntities)
-        val requestsByBpn = validRequests.associateBy { it.bpnl }
-
-        val legalEntityRequestPairs = legalEntities.map { legalEntity -> Pair(legalEntity, requestsByBpn[legalEntity.bpn]!!) }
-        legalEntityRequestPairs.forEach { (legalEntity, request) ->
-            val legalEntityBeforeUpdate = businessPartnerEquivalenceMapper.toEquivalenceDto(legalEntity)
-            updateLegalEntity(legalEntity, request.legalEntity.header, legalEntityMetadataMap, request.legalEntity.scriptVariants)
-            updateLogisticAddress(legalEntity.legalAddress, request.legalEntity.toLegalAddressWithScriptVariants(), addressMetadataMap)
-            val legalEntityAfterUpdate = businessPartnerEquivalenceMapper.toEquivalenceDto(legalEntity)
-
-            if (legalEntityBeforeUpdate != legalEntityAfterUpdate) {
-                logger.info { "Legal Entity ${legalEntity.bpn} was updated" }
-
-                legalEntityRepository.save(legalEntity)
-
-                changelogService.createChangelogEntries(
-                    listOf(
-                        ChangelogEntryCreateRequest(
-                            legalEntity.bpn,
-                            ChangelogType.UPDATE,
-                            BusinessPartnerType.LEGAL_ENTITY
-                        )
-                    )
-                )
-                changelogService.createChangelogEntries(
-                    listOf(
-                        ChangelogEntryCreateRequest(
-                            legalEntity.legalAddress.bpn,
-                            ChangelogType.UPDATE,
-                            BusinessPartnerType.ADDRESS
-                        )
-                    )
-                )
+        val responses = mutableListOf<LegalEntityPartnerCreateVerboseDto>()
+        val errors = mutableListOf<ErrorInfo<LegalEntityUpdateError>>()
+        requestList.zip(legalEntityUpdateService.parseAndUpdate(updateRequests)).forEach { (request, result) ->
+            when (result) {
+                is ParseResult.Success -> responses.add(result.parsed.value.toUpsertDto(request.bpnl))
+                is ParseResult.Failure -> errors.addAll(result.errors.map { legalEntityParseErrorMapper.toUpdateErrorInfo(it, request.bpnl) })
             }
         }
 
-        val legalEntityResponses = legalEntityRequestPairs.map { (legalEntity, request) -> legalEntity.toUpsertDto(request.bpnl) }
-
-        return LegalEntityPartnerUpdateResponseWrapper(legalEntityResponses, errors)
+        return LegalEntityPartnerUpdateResponseWrapper(responses, errors)
     }
 
     @Transactional

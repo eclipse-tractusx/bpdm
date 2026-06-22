@@ -25,11 +25,17 @@ sealed interface AddressUpdateParseError
 
 /**
  * Errors produced by parsing address *content* (the shared content parser). Each case is, from a single definition, a
- * subtype of every operation that embeds an address: standalone address create/update and a site's main address. So a
- * site's main-address content errors are site errors directly — no wrapping, callers match them flatly or via a single
- * `is AddressContentParseError` branch.
+ * subtype of every operation that embeds an address: standalone address create/update, a site's main address and a legal
+ * entity's legal address. So a site's main-address or a legal entity's legal-address content errors are that operation's
+ * errors directly — no wrapping, callers match them flatly or via a single `is AddressContentParseError` branch.
  */
-sealed interface AddressContentParseError : AddressCreateParseError, AddressUpdateParseError, SiteCreateParseError, SiteUpdateParseError
+sealed interface AddressContentParseError :
+    AddressCreateParseError,
+    AddressUpdateParseError,
+    SiteCreateParseError,
+    SiteUpdateParseError,
+    LegalEntityCreateParseError,
+    LegalEntityUpdateParseError
 
 /**
  * Field-presence/format errors. Cases mirror the address-relevant `TaskStepBuildService.CleaningError` entries.

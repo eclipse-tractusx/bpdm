@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressUpdateError
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorCode
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityCreateError
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityUpdateError
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteCreateError
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteUpdateError
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
@@ -98,6 +99,20 @@ class AddressParseErrorMapper {
             identifierNotFound = LegalEntityCreateError.LegalAddressIdentifierNotFound,
             duplicateIdentifier = LegalEntityCreateError.LegalAddressDuplicateIdentifier,
             identifiersTooMany = LegalEntityCreateError.LegalAddressIdentifiersTooMany
+        )
+
+    /**
+     * For the legal address embedded in a legal-entity update: the content parser only ever produces
+     * [AddressContentParseError], mapped to the `LegalAddress*` codes.
+     */
+    fun toLegalEntityUpdateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfo<LegalEntityUpdateError> =
+        sharedErrorInfo(
+            error,
+            entityKey,
+            regionNotFound = LegalEntityUpdateError.LegalAddressRegionNotFound,
+            identifierNotFound = LegalEntityUpdateError.LegalAddressIdentifierNotFound,
+            duplicateIdentifier = LegalEntityUpdateError.LegalAddressDuplicateIdentifier,
+            identifiersTooMany = LegalEntityUpdateError.LegalAddressIdentifiersTooMany
         )
 
     /**

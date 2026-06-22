@@ -29,6 +29,6 @@ package org.eclipse.tractusx.bpdm.pool.model
  * operation does that; if one ever resolved, say, two different sites in different roles, a role distinction would be
  * reintroduced there.
  */
-data class UnresolvableLegalEntity(val bpn: String) : AddressCreateParseError, SiteCreateParseError
+data class UnresolvableLegalEntity(val bpn: String) : AddressCreateParseError, SiteCreateParseError, LegalEntityUpdateParseError
 data class UnresolvableSite(val bpn: String) : AddressCreateParseError, SiteUpdateParseError
 data class UnresolvableAddress(val bpn: String) : AddressUpdateParseError
