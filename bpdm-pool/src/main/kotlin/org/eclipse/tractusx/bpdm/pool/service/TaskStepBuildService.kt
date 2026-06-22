@@ -38,8 +38,9 @@ import org.eclipse.tractusx.bpdm.pool.model.UnresolvableSite
 import org.eclipse.tractusx.bpdm.pool.model.AddressCreateRequest
 import org.eclipse.tractusx.bpdm.pool.model.AddressFieldParseError
 import org.eclipse.tractusx.bpdm.pool.model.AddressMetadataParseError
-import org.eclipse.tractusx.bpdm.pool.model.AddressSharedParseError
+import org.eclipse.tractusx.bpdm.pool.model.AddressContentParseError
 import org.eclipse.tractusx.bpdm.pool.model.AddressUpdateParseError
+import org.eclipse.tractusx.bpdm.pool.model.UnresolvableAddress
 import org.eclipse.tractusx.bpdm.pool.model.AddressUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
@@ -434,16 +435,16 @@ class TaskStepBuildService(
         when (error) {
             is UnresolvableLegalEntity -> "Legal entity ${error.bpn} not found"
             is UnresolvableSite -> "Site ${error.bpn} not found"
-            is AddressSharedParseError -> renderError(error)
+            is AddressContentParseError -> renderError(error)
         }
 
     private fun renderError(error: AddressUpdateParseError): String =
         when (error) {
-            is AddressUpdateParseError.UnresolvableTarget -> "Address ${error.bpn} not found"
-            is AddressSharedParseError -> renderError(error)
+            is UnresolvableAddress -> "Address ${error.bpn} not found"
+            is AddressContentParseError -> renderError(error)
         }
 
-    private fun renderError(error: AddressSharedParseError): String =
+    private fun renderError(error: AddressContentParseError): String =
         when (error) {
             is AddressFieldParseError -> renderFieldError(error)
             is AddressMetadataParseError -> renderMetadataError(error)

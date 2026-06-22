@@ -30,7 +30,7 @@ import org.eclipse.tractusx.bpdm.pool.mapper.AddressEntityMapper
 import org.eclipse.tractusx.bpdm.pool.model.AddressContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.AddressContentRequest
 import org.eclipse.tractusx.bpdm.pool.model.AddressScriptVariantParsed
-import org.eclipse.tractusx.bpdm.pool.model.AddressSharedParseError
+import org.eclipse.tractusx.bpdm.pool.model.AddressContentParseError
 import org.eclipse.tractusx.bpdm.pool.model.AddressUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.LogisticAddressParsed
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
@@ -59,7 +59,7 @@ class AddressUpdateService(
      * Validates address content only (presence/format, metadata resolution, identifier duplicates). [ownerBpns] is the
      * BPN of each entry's update target, so an address may legitimately re-submit its own existing identifiers.
      */
-    fun parseContent(contents: List<AddressContentRequest>, ownerBpns: List<String?>): List<ParseResult<AddressContentParsed, AddressSharedParseError>> {
+    fun parseContent(contents: List<AddressContentRequest>, ownerBpns: List<String?>): List<ParseResult<AddressContentParsed, AddressContentParseError>> {
         val contentResults = addressRequestParser.parse(contents)
         val duplicateErrors = duplicateValidator.validate(contents, ownerBpns)
         return contentResults.mapIndexed { index, result -> result.combine(duplicateErrors[index]) { it } }

@@ -27,7 +27,7 @@ import org.eclipse.tractusx.bpdm.pool.mapper.AddressEntityMapper
 import org.eclipse.tractusx.bpdm.pool.model.AddressContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.AddressContentRequest
 import org.eclipse.tractusx.bpdm.pool.model.AddressCreateParsed
-import org.eclipse.tractusx.bpdm.pool.model.AddressSharedParseError
+import org.eclipse.tractusx.bpdm.pool.model.AddressContentParseError
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.combine
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
@@ -55,7 +55,7 @@ class AddressCreateService(
      * Validates address content only (presence/format, metadata resolution, identifier duplicates). Created addresses
      * have no identity yet, so none of their identifiers can be self-duplicates (owner BPN is null).
      */
-    fun parseContent(contents: List<AddressContentRequest>): List<ParseResult<AddressContentParsed, AddressSharedParseError>> {
+    fun parseContent(contents: List<AddressContentRequest>): List<ParseResult<AddressContentParsed, AddressContentParseError>> {
         val contentResults = addressRequestParser.parse(contents)
         val duplicateErrors = duplicateValidator.validate(contents, ownerBpns = contents.map { null })
         return contentResults.mapIndexed { index, result -> result.combine(duplicateErrors[index]) { it } }

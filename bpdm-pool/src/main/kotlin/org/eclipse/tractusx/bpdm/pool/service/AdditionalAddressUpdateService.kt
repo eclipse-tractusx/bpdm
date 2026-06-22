@@ -32,7 +32,7 @@ import org.springframework.transaction.annotation.Transactional
 /**
  * Updates logistic addresses identified by BPN (the "additional address" REST and task paths). This is the thin,
  * resolving layer on top of [AddressUpdateService]: it resolves the target BPN to its existing entity (yielding
- * `UnresolvableTarget` on a miss) and delegates content validation and the update to the lower service. Order-preserving
+ * `UnresolvableAddress` on a miss) and delegates content validation and the update to the lower service. Order-preserving
  * positional contract (see [ParseResult]).
  */
 @Service

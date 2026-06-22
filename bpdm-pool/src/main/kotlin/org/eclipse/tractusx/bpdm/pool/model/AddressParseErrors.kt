@@ -21,24 +21,20 @@ package org.eclipse.tractusx.bpdm.pool.model
 
 sealed interface AddressCreateParseError
 
-sealed interface AddressUpdateParseError {
-    data class UnresolvableTarget(val bpn: String) : AddressUpdateParseError
-}
-
-data class UnresolvableLegalEntity(val bpn: String) : AddressCreateParseError
-data class UnresolvableSite(val bpn: String) : AddressCreateParseError
+sealed interface AddressUpdateParseError
 
 /**
- * Errors shared by create and update. As a subtype of both operation error types, each case is a genuine subtype of both
- * from a single definition (no wrapping), so callers can match them flatly or via a single `is AddressSharedParseError`
- * branch. The shared address-content parser produces exactly these.
+ * Errors produced by parsing address *content* (the shared content parser). Each case is, from a single definition, a
+ * subtype of every operation that embeds an address: standalone address create/update and a site's main address. So a
+ * site's main-address content errors are site errors directly — no wrapping, callers match them flatly or via a single
+ * `is AddressContentParseError` branch.
  */
-sealed interface AddressSharedParseError : AddressCreateParseError, AddressUpdateParseError
+sealed interface AddressContentParseError : AddressCreateParseError, AddressUpdateParseError, SiteCreateParseError, SiteUpdateParseError
 
 /**
  * Field-presence/format errors. Cases mirror the address-relevant `TaskStepBuildService.CleaningError` entries.
  */
-sealed interface AddressFieldParseError : AddressSharedParseError {
+sealed interface AddressFieldParseError : AddressContentParseError {
     data object PhysicalCountryMissing : AddressFieldParseError
     data object PhysicalCityMissing : AddressFieldParseError
     data object AlternativeCountryMissing : AddressFieldParseError
@@ -56,7 +52,7 @@ sealed interface AddressFieldParseError : AddressSharedParseError {
  * Metadata-resolution errors: a referenced metadata key exists in the request but no matching entity is registered.
  * Distinct from [AddressFieldParseError] (presence/format) since these are lookups against persisted metadata.
  */
-sealed interface AddressMetadataParseError : AddressSharedParseError {
+sealed interface AddressMetadataParseError : AddressContentParseError {
     data class IdentifierTypeNotFound(val index: Int, val type: String) : AddressMetadataParseError
     data class PhysicalRegionNotFound(val regionCode: String) : AddressMetadataParseError
     data class AlternativeRegionNotFound(val regionCode: String) : AddressMetadataParseError
@@ -67,7 +63,7 @@ sealed interface AddressMetadataParseError : AddressSharedParseError {
  * Cardinality/uniqueness constraint violations. `IdentifiersTooMany` is content-intrinsic (produced by the content parser);
  * `DuplicateIdentifier` is identity-aware and DB-backed (produced by the duplicate validator).
  */
-sealed interface AddressConstraintParseError : AddressSharedParseError {
+sealed interface AddressConstraintParseError : AddressContentParseError {
     data class IdentifiersTooMany(val count: Int) : AddressConstraintParseError
     data class DuplicateIdentifier(val index: Int, val type: String, val value: String) : AddressConstraintParseError
 }

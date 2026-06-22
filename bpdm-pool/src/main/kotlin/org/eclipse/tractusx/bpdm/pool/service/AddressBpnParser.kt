@@ -20,14 +20,14 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
-import org.eclipse.tractusx.bpdm.pool.model.AddressUpdateParseError
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
+import org.eclipse.tractusx.bpdm.pool.model.UnresolvableAddress
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.springframework.stereotype.Service
 
 /**
  * Resolves address BPNs to their existing entities, batched and order-preserving (see [ParseResult]): an unresolvable
- * BPN yields an [AddressUpdateParseError.UnresolvableTarget] for that entry. Single responsibility so any service that
+ * BPN yields an [UnresolvableAddress] for that entry. Single responsibility so any service that
  * needs to look up an address by BPN (e.g. an update target) can reuse it and combine its result with other parsers via
  * `zipParseResults`.
  */
@@ -36,14 +36,14 @@ class AddressBpnParser(
     private val logisticAddressRepository: LogisticAddressRepository,
 ) {
 
-    fun parse(addressBpns: List<String>): List<ParseResult<LogisticAddressDb, AddressUpdateParseError.UnresolvableTarget>> {
+    fun parse(addressBpns: List<String>): List<ParseResult<LogisticAddressDb, UnresolvableAddress>> {
         val addressesByBpn = logisticAddressRepository
             .findDistinctByBpnIn(addressBpns.toSet())
             .associateBy { it.bpn }
 
         return addressBpns.map { bpn ->
             when (val address = addressesByBpn[bpn]) {
-                null -> ParseResult.ofSingleFailure(AddressUpdateParseError.UnresolvableTarget(bpn))
+                null -> ParseResult.ofSingleFailure(UnresolvableAddress(bpn))
                 else -> ParseResult.Success(address)
             }
         }

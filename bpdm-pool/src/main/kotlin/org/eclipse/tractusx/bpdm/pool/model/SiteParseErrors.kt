@@ -19,11 +19,17 @@
 
 package org.eclipse.tractusx.bpdm.pool.model
 
+sealed interface SiteCreateParseError
+
+sealed interface SiteUpdateParseError
+
 /**
- * Request to update an existing address identified by [addressBpn]. Update never re-parents, so no parent fields are
- * carried. `parse` resolves the target (or yields `UnresolvableAddress`).
+ * Errors produced by parsing site *header* content (everything but the main address). As a subtype of both site
+ * operations from a single definition, the same content errors flow into create and update without wrapping; the main
+ * address contributes its own [AddressContentParseError], which is likewise a site error directly.
  */
-data class AddressUpdateRequest(
-    val addressBpn: String,
-    val content: AddressContentRequest
-)
+sealed interface SiteContentParseError : SiteCreateParseError, SiteUpdateParseError {
+    data object NameMissing : SiteContentParseError
+    data object ConfidenceCriteriaMissing : SiteContentParseError
+    data class ScriptCodeNotFound(val index: Int, val scriptCode: String) : SiteContentParseError
+}

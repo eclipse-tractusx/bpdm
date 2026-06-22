@@ -32,8 +32,9 @@ import org.eclipse.tractusx.bpdm.pool.model.UnresolvableLegalEntity
 import org.eclipse.tractusx.bpdm.pool.model.UnresolvableSite
 import org.eclipse.tractusx.bpdm.pool.model.AddressFieldParseError
 import org.eclipse.tractusx.bpdm.pool.model.AddressMetadataParseError
-import org.eclipse.tractusx.bpdm.pool.model.AddressSharedParseError
+import org.eclipse.tractusx.bpdm.pool.model.AddressContentParseError
 import org.eclipse.tractusx.bpdm.pool.model.AddressUpdateParseError
+import org.eclipse.tractusx.bpdm.pool.model.UnresolvableAddress
 import org.springframework.stereotype.Component
 
 /**
@@ -60,7 +61,7 @@ class AddressParseErrorMapper {
                 ErrorInfo(AddressCreateError.LegalEntityNotFound, "Parent legal entity '${error.bpn}' not found", entityKey)
             is UnresolvableSite ->
                 ErrorInfo(AddressCreateError.SiteNotFound, "Parent site '${error.bpn}' not found", entityKey)
-            is AddressSharedParseError -> sharedErrorInfo(
+            is AddressContentParseError -> sharedErrorInfo(
                 error,
                 entityKey,
                 regionNotFound = AddressCreateError.RegionNotFound,
@@ -72,9 +73,9 @@ class AddressParseErrorMapper {
 
     fun toUpdateErrorInfo(error: AddressUpdateParseError, entityKey: String?): ErrorInfo<AddressUpdateError> =
         when (error) {
-            is AddressUpdateParseError.UnresolvableTarget ->
+            is UnresolvableAddress ->
                 ErrorInfo(AddressUpdateError.AddressNotFound, "Address '${error.bpn}' can't be updated as it doesn't exist", entityKey)
-            is AddressSharedParseError -> sharedErrorInfo(
+            is AddressContentParseError -> sharedErrorInfo(
                 error,
                 entityKey,
                 regionNotFound = AddressUpdateError.RegionNotFound,
@@ -86,9 +87,9 @@ class AddressParseErrorMapper {
 
     /**
      * For the legal address embedded in a legal-entity create: the content parser only ever produces
-     * [AddressSharedParseError] (there is no parent to resolve here), mapped to the `LegalAddress*` codes.
+     * [AddressContentParseError] (there is no parent to resolve here), mapped to the `LegalAddress*` codes.
      */
-    fun toLegalEntityCreateErrorInfo(error: AddressSharedParseError, entityKey: String?): ErrorInfo<LegalEntityCreateError> =
+    fun toLegalEntityCreateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfo<LegalEntityCreateError> =
         sharedErrorInfo(
             error,
             entityKey,
@@ -100,9 +101,9 @@ class AddressParseErrorMapper {
 
     /**
      * For the main address embedded in a site create: the content parser only ever produces
-     * [AddressSharedParseError], mapped to the `MainAddress*` codes.
+     * [AddressContentParseError], mapped to the `MainAddress*` codes.
      */
-    fun toSiteCreateErrorInfo(error: AddressSharedParseError, entityKey: String?): ErrorInfo<SiteCreateError> =
+    fun toSiteCreateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfo<SiteCreateError> =
         sharedErrorInfo(
             error,
             entityKey,
@@ -113,7 +114,7 @@ class AddressParseErrorMapper {
         )
 
     private fun <E : ErrorCode> sharedErrorInfo(
-        error: AddressSharedParseError,
+        error: AddressContentParseError,
         entityKey: String?,
         regionNotFound: E,
         identifierNotFound: E,
@@ -139,6 +140,6 @@ class AddressParseErrorMapper {
             }
         }
 
-    private fun internalError(error: AddressSharedParseError) =
+    private fun internalError(error: AddressContentParseError) =
         BpdmValidationException("Unexpected address validation error that has no client error code: $error")
 }

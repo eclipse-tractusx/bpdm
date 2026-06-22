@@ -32,7 +32,7 @@ import org.eclipse.tractusx.bpdm.pool.model.AddressMetadata
 import org.eclipse.tractusx.bpdm.pool.model.AddressMetadataParseError
 import org.eclipse.tractusx.bpdm.pool.model.AddressScriptVariant
 import org.eclipse.tractusx.bpdm.pool.model.AddressScriptVariantParsed
-import org.eclipse.tractusx.bpdm.pool.model.AddressSharedParseError
+import org.eclipse.tractusx.bpdm.pool.model.AddressContentParseError
 import org.eclipse.tractusx.bpdm.pool.model.AddressState
 import org.eclipse.tractusx.bpdm.pool.model.AddressStateRequest
 import org.eclipse.tractusx.bpdm.pool.model.AlternativePostalAddressParsed
@@ -54,7 +54,7 @@ import org.springframework.stereotype.Service
 /**
  * Validates loose [LogisticAddressRequest] content into the bounded, metadata-resolved [LogisticAddressParsed], the
  * shared step of both address create and update parsing. All errors are accumulated (not fail-fast) so one entry's report
- * is complete, and they are [AddressSharedParseError] (field + metadata), each a subtype of both operation error types.
+ * is complete, and they are [AddressContentParseError] (field + metadata), each a subtype of both operation error types.
  *
  * [fetchMetadata] resolves all metadata for a whole batch in one query per kind; [parse] then validates a single entry
  * against that pre-fetched metadata.
@@ -66,7 +66,7 @@ class LogisticAddressRequestParser(
     private val scriptCodeRepository: ScriptCodeRepository
 ) {
 
-    fun parse(contents: List<AddressContentRequest>): List<ParseResult<AddressContentParsed, AddressSharedParseError>> {
+    fun parse(contents: List<AddressContentRequest>): List<ParseResult<AddressContentParsed, AddressContentParseError>> {
         val metadata = fetchMetadata(contents)
         return contents.map { parseEntry(it, metadata) }
     }
@@ -95,10 +95,10 @@ class LogisticAddressRequestParser(
     private fun parseEntry(
         content: AddressContentRequest,
         metadata: AddressMetadata
-    ): ParseResult<AddressContentParsed, AddressSharedParseError> {
+    ): ParseResult<AddressContentParsed, AddressContentParseError> {
         val request = content.address
         val scriptVariants = content.scriptVariants
-        val errors = mutableListOf<AddressSharedParseError>()
+        val errors = mutableListOf<AddressContentParseError>()
 
         val physical = parsePhysical(request.physicalPostalAddress, metadata, errors)
         val alternative = request.alternativePostalAddress?.let { parseAlternative(it, metadata, errors) }
@@ -128,7 +128,7 @@ class LogisticAddressRequestParser(
     private fun parsePhysical(
         request: PhysicalPostalAddressRequest,
         metadata: AddressMetadata,
-        errors: MutableList<AddressSharedParseError>
+        errors: MutableList<AddressContentParseError>
     ): PhysicalPostalAddressParsed? {
         val country = parseCountry(request.country, errors, AddressFieldParseError.PhysicalCountryMissing)
         val city = request.city ?: run { errors.add(AddressFieldParseError.PhysicalCityMissing); null }
@@ -158,7 +158,7 @@ class LogisticAddressRequestParser(
     private fun parseAlternative(
         request: AlternativePostalAddressRequest,
         metadata: AddressMetadata,
-        errors: MutableList<AddressSharedParseError>
+        errors: MutableList<AddressContentParseError>
     ): AlternativePostalAddressParsed? {
         val country = parseCountry(request.country, errors, AddressFieldParseError.AlternativeCountryMissing)
         val city = request.city ?: run { errors.add(AddressFieldParseError.AlternativeCityMissing); null }
@@ -184,7 +184,7 @@ class LogisticAddressRequestParser(
 
     private fun parseConfidence(
         request: ConfidenceCriteriaRequest,
-        errors: MutableList<AddressSharedParseError>
+        errors: MutableList<AddressContentParseError>
     ): ConfidenceCriteriaParsed? {
         val sharedByOwner = request.sharedByOwner
         val checkedByExternalDataSource = request.checkedByExternalDataSource
@@ -209,7 +209,7 @@ class LogisticAddressRequestParser(
     private fun parseIdentifiers(
         requests: List<AddressIdentifierRequest>,
         metadata: AddressMetadata,
-        errors: MutableList<AddressSharedParseError>
+        errors: MutableList<AddressContentParseError>
     ): List<AddressIdentifierParsed> {
         if (requests.size > ValidationLimits.IDENTIFIER_AMOUNT_LIMIT) {
             errors.add(AddressConstraintParseError.IdentifiersTooMany(requests.size))
@@ -227,7 +227,7 @@ class LogisticAddressRequestParser(
 
     private fun parseStates(
         requests: List<AddressStateRequest>,
-        errors: MutableList<AddressSharedParseError>
+        errors: MutableList<AddressContentParseError>
     ): List<AddressState> =
         requests.mapIndexedNotNull { index, request ->
             val type = request.type ?: run { errors.add(AddressFieldParseError.StateTypeMissing(index)); return@mapIndexedNotNull null }
@@ -238,7 +238,7 @@ class LogisticAddressRequestParser(
         index: Int,
         variant: AddressScriptVariant,
         metadata: AddressMetadata,
-        errors: MutableList<AddressSharedParseError>
+        errors: MutableList<AddressContentParseError>
     ): AddressScriptVariantParsed? {
         val scriptCode = metadata.scriptCodes[variant.scriptCode]
             ?: run { errors.add(AddressMetadataParseError.ScriptCodeNotFound(index, variant.scriptCode)); return null }
@@ -248,7 +248,7 @@ class LogisticAddressRequestParser(
     private fun parseRegion(
         regionCode: String?,
         metadata: AddressMetadata,
-        errors: MutableList<AddressSharedParseError>,
+        errors: MutableList<AddressContentParseError>,
         notFound: (String) -> AddressMetadataParseError
     ): RegionDb? {
         if (regionCode == null) return null
@@ -257,7 +257,7 @@ class LogisticAddressRequestParser(
 
     private fun parseCountry(
         value: String?,
-        errors: MutableList<AddressSharedParseError>,
+        errors: MutableList<AddressContentParseError>,
         missingError: AddressFieldParseError
     ): CountryCode? {
         if (value == null) {
