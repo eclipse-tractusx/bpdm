@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
+import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.service.TaskStepBuildService.CleaningError
 import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockConfiguration
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
@@ -56,6 +57,7 @@ import java.util.*
 class TaskResolutionServiceTest @Autowired constructor(
     val cleaningStepService: TaskResolutionService,
     val bpnRequestIdentifierRepository: BpnRequestIdentifierRepository,
+    val legalEntityRepository: LegalEntityRepository,
     val poolClient: PoolApiClient,
     val dbTestHelpers: DbTestHelpers,
     val poolDataHelper: PoolDataHelper
@@ -147,6 +149,46 @@ class TaskResolutionServiceTest @Autowired constructor(
         assertThat(createdLegalEntity.legalAddress.bpnLegalEntity).isNotNull()
         assertThat(createResult[0].businessPartner.legalEntity.bpnReference.referenceValue).isEqualTo(createdLegalEntity.header.bpnl)
         compareLegalEntity(createdLegalEntity, createResult[0].businessPartner.legalEntity)
+    }
+
+    @Test
+    fun `create legal entity persists ownership ultimate and keeps ultimate owner bpnl empty`() {
+        val baseRequest = minValidLegalEntity()
+        val createRequest = baseRequest
+            .copy(legalEntity = baseRequest.legalEntity.copy(ownershipUltimate = true))
+            .withLegalReferences("owner-flag-bpnl".toBpnRequest(), "owner-flag-bpna".toBpnRequest())
+
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_OWNERSHIP_1", businessPartner = createRequest)
+        assertThat(createResult[0].errors).isEmpty()
+
+        val createdBpnl = createResult[0].businessPartner.legalEntity.bpnReference.referenceValue!!
+        assertThat(createResult[0].businessPartner.legalEntity.ownershipUltimate).isTrue()
+        assertThat(createResult[0].businessPartner.legalEntity.ultimateOwnerBpnl).isNull()
+
+        val createdFromPoolApi = poolClient.legalEntities.getLegalEntity(createdBpnl)
+        assertThat(createdFromPoolApi.header.ownershipUltimate).isTrue()
+        assertThat(createdFromPoolApi.header.ultimateOwnerBpnl).isNull()
+
+        val persistedEntity = legalEntityRepository.findByBpnIgnoreCase(createdBpnl)
+        assertThat(persistedEntity).isNotNull()
+        assertThat(persistedEntity!!.ownershipUltimate).isTrue()
+        assertThat(persistedEntity.ultimateOwnerBpnl).isNull()
+    }
+
+    @Test
+    fun `create legal entity without ownership fields remains backwards compatible`() {
+        val createRequest = minValidLegalEntity()
+            .withLegalReferences("owner-default-bpnl".toBpnRequest(), "owner-default-bpna".toBpnRequest())
+
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_OWNERSHIP_2", businessPartner = createRequest)
+        assertThat(createResult[0].errors).isEmpty()
+
+        val createdBpnl = createResult[0].businessPartner.legalEntity.bpnReference.referenceValue!!
+        val persistedEntity = legalEntityRepository.findByBpnIgnoreCase(createdBpnl)
+
+        assertThat(persistedEntity).isNotNull()
+        assertThat(persistedEntity!!.ownershipUltimate).isFalse()
+        assertThat(persistedEntity.ultimateOwnerBpnl).isNull()
     }
 
 
@@ -1110,6 +1152,109 @@ class TaskResolutionServiceTest @Autowired constructor(
 
         assertThat(createResult.size).isEqualTo(1)
         assertThat(createResult.single().errors.size).isEqualTo(1)
+    }
+
+    @Test
+    fun `repository test - ownershipUltimate and ultimateOwnerBpnl columns persist correctly`() {
+        // This test verifies the persistence layer correctly handles the new ultimate owner columns
+        
+        // Create a legal entity with ownershipUltimate set to true
+        val createRequest = minValidLegalEntity()
+            .copy(legalEntity = minValidLegalEntity().legalEntity.copy(ownershipUltimate = true))
+            .withLegalReferences("repo-test-bpnl".toBpnRequest(), "repo-test-bpna".toBpnRequest())
+
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_REPO_TEST_1", businessPartner = createRequest)
+        assertThat(createResult[0].errors).isEmpty()
+
+        val createdBpnl = createResult[0].businessPartner.legalEntity.bpnReference.referenceValue!!
+
+        // Verify the entity was persisted with the correct values
+        val persistedEntity = legalEntityRepository.findByBpnIgnoreCase(createdBpnl)
+        assertThat(persistedEntity).isNotNull()
+        assertThat(persistedEntity!!.ownershipUltimate).isTrue()
+        assertThat(persistedEntity.ultimateOwnerBpnl).isNull()
+
+        // Update the entity to set ownershipUltimate to false
+        val updateRequest = createRequest
+            .copy(legalEntity = createRequest.legalEntity.copy(ownershipUltimate = false))
+
+        val updateResult = upsertGoldenRecordIntoPool(taskId = "TASK_REPO_TEST_2", businessPartner = updateRequest)
+        assertThat(updateResult[0].errors).isEmpty()
+
+        // Verify the update was persisted correctly
+        val updatedEntity = legalEntityRepository.findByBpnIgnoreCase(createdBpnl)
+        assertThat(updatedEntity).isNotNull()
+        assertThat(updatedEntity!!.ownershipUltimate).isFalse()
+        assertThat(updatedEntity.ultimateOwnerBpnl).isNull()
+    }
+
+    @Test
+    fun `repository test - ultimateOwnerBpnl can be set and persisted`() {
+        // This test verifies that ultimateOwnerBpnl can be set (even though resolution logic isn't implemented)
+        
+        val targetBpnl = "BPNL000000000XXX"
+        
+        // Create a legal entity with ultimateOwnerBpnl set
+        val createRequest = minValidLegalEntity()
+            .copy(legalEntity = minValidLegalEntity().legalEntity.copy(
+                ownershipUltimate = false,
+                ultimateOwnerBpnl = targetBpnl
+            ))
+            .withLegalReferences("repo-test-bpnl-2".toBpnRequest(), "repo-test-bpna-2".toBpnRequest())
+
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_REPO_TEST_3", businessPartner = createRequest)
+        assertThat(createResult[0].errors).isEmpty()
+
+        val createdBpnl = createResult[0].businessPartner.legalEntity.bpnReference.referenceValue!!
+
+        // Verify the entity was persisted with the correct ultimateOwnerBpnl
+        val persistedEntity = legalEntityRepository.findByBpnIgnoreCase(createdBpnl)
+        assertThat(persistedEntity).isNotNull()
+        assertThat(persistedEntity!!.ownershipUltimate).isFalse()
+        assertThat(persistedEntity.ultimateOwnerBpnl).isEqualTo(targetBpnl)
+    }
+
+    @Test
+    fun `backwards compatibility regression test - existing client without new fields`() {
+        // This test simulates an existing client that doesn't send the new ownershipUltimate and ultimateOwnerBpnl fields
+        // It verifies that the request still works correctly and defaults are applied
+        
+        // Create a request without the new fields (simulating an existing client)
+        val legacyRequest = minValidLegalEntity()
+            .withLegalReferences("legacy-bpnl".toBpnRequest(), "legacy-bpna".toBpnRequest())
+
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_LEGACY_1", businessPartner = legacyRequest)
+        assertThat(createResult[0].errors).isEmpty()
+
+        val createdBpnl = createResult[0].businessPartner.legalEntity.bpnReference.referenceValue!!
+
+        // Verify the entity was created with default values
+        val persistedEntity = legalEntityRepository.findByBpnIgnoreCase(createdBpnl)
+        assertThat(persistedEntity).isNotNull()
+        assertThat(persistedEntity!!.ownershipUltimate).isFalse() // Default value
+        assertThat(persistedEntity.ultimateOwnerBpnl).isNull() // Default value
+
+        // Verify the response can be read by the client
+        val responseFromPool = poolClient.legalEntities.getLegalEntity(createdBpnl)
+        assertThat(responseFromPool.header.ownershipUltimate).isFalse()
+        assertThat(responseFromPool.header.ultimateOwnerBpnl).isNull()
+
+        // Update with another legacy request (still without new fields)
+        val updateRequest = legacyRequest.copy(
+            legalEntity = legacyRequest.legalEntity.copy(
+                legalName = "Updated Legal Name"
+            )
+        )
+
+        val updateResult = upsertGoldenRecordIntoPool(taskId = "TASK_LEGACY_2", businessPartner = updateRequest)
+        assertThat(updateResult[0].errors).isEmpty()
+
+        // Verify the update worked and defaults are maintained
+        val updatedEntity = legalEntityRepository.findByBpnIgnoreCase(createdBpnl)
+        assertThat(updatedEntity).isNotNull()
+        assertThat(updatedEntity!!.legalName.value).isEqualTo("Updated Legal Name")
+        assertThat(updatedEntity.ownershipUltimate).isFalse() // Should remain false
+        assertThat(updatedEntity.ultimateOwnerBpnl).isNull() // Should remain null
     }
 
     private fun createIdentifiers(idTypeKey: String, amount: Int): List<Identifier>{

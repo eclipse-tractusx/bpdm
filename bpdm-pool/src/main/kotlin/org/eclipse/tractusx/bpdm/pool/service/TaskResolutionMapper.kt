@@ -44,6 +44,8 @@ class TaskResolutionMapper {
                 confidenceCriteria = toTaskResult(confidenceCriteria),
                 isParticipantData = legalEntity.isParticipantData,
                 hasChanged = hasChanged,
+                ownershipUltimate = ownershipUltimate,
+                ultimateOwnerBpnl = ultimateOwnerBpnl,
                 legalAddress = toTaskResult(legalAddress, hasChanged),
                 scriptVariants = scriptVariants.map { toTaskResult(it) },
                 goldenRecordRelations = legalEntity.relations.map { toTaskResult(it) }

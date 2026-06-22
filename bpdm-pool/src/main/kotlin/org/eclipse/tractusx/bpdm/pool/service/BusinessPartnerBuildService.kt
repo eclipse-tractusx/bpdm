@@ -714,7 +714,9 @@ class BusinessPartnerBuildService(
                 legalForm = legalForm,
                 currentness = Instant.now().truncatedTo(ChronoUnit.MICROS),
                 confidenceCriteria = createConfidenceCriteria(legalEntityHeaderDto.confidenceCriteria),
-                isCatenaXMemberData = legalEntityHeaderDto.isParticipantData
+                isCatenaXMemberData = legalEntityHeaderDto.isParticipantData,
+                ownershipUltimate = legalEntityHeaderDto.ownershipUltimate ?: false,
+                ultimateOwnerBpnl = legalEntityHeaderDto.ultimateOwnerBpnl
             )
             updateLegalEntity(newLegalEntity, legalEntityHeaderDto, metadataMap, scriptVariants)
 
@@ -736,6 +738,8 @@ class BusinessPartnerBuildService(
             legalEntity.states.replace(legalEntityHeaderDto.states.map { toLegalEntityState(it, legalEntity) })
             legalEntity.confidenceCriteria = updateConfidenceCriteria( legalEntity.confidenceCriteria, legalEntityHeaderDto.confidenceCriteria)
             legalEntity.isCatenaXMemberData = legalEntityHeaderDto.isParticipantData
+            legalEntity.ownershipUltimate = legalEntityHeaderDto.ownershipUltimate ?: legalEntity.ownershipUltimate
+            legalEntity.ultimateOwnerBpnl = legalEntityHeaderDto.ultimateOwnerBpnl ?: legalEntity.ultimateOwnerBpnl
 
             legalEntity.scriptVariants.replace(scriptVariants.map { variant -> LegalEntityScriptVariantDb(metadataMap.scriptCodes[variant.scriptCode]!!, variant.legalName, variant.shortName) })
         }

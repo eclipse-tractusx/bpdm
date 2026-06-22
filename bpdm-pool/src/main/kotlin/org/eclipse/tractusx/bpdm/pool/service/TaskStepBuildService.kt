@@ -494,7 +494,9 @@ class TaskStepBuildService(
                 identifiers = identifiers.map { assertNotNull(it).let { LegalEntityIdentifierDto(it.value!!, it.type!!, it.issuingBody) } },
                 states = states.map { assertNotNull(it).let { LegalEntityStateDto(it.validFrom.toLocalDateTime(), it.validTo.toLocalDateTime(), it.type!!) }   },
                 confidenceCriteria = toPoolDto(confidenceCriteria, CleaningError.LEGAL_ENTITY_CONFIDENCE_CRITERIA_MISSING),
-                isParticipantData = isParticipantData ?: false
+                isParticipantData = isParticipantData ?: false,
+                ownershipUltimate = ownershipUltimate,
+                ultimateOwnerBpnl = ultimateOwnerBpnl
             )
         }
 

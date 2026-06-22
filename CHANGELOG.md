@@ -12,6 +12,8 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 
 ### Added
 
+- BPDM Pool: Added ultimate owner tracking fields to legal entities - `ownershipUltimate` flag and `ultimateOwnerBpnl` column - to support future ultimate owner resolution features [#1718](https://github.com/eclipse-tractusx/bpdm/issues/1718)
+
 ### Changed
 
 ## [7.4.0] - 2026-06-10
