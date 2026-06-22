@@ -23,17 +23,24 @@ import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import java.time.Instant
 
 /**
- * Loose (unvalidated) inbound site content: the site header plus its main address. `name`/`confidenceCriteria` are
- * relaxed so a single `parse` validates them (yielding [SiteContentParseError.NameMissing] /
- * [SiteContentParseError.ConfidenceCriteriaMissing]). The main address reuses the shared [AddressContentRequest], so its
- * content is validated by the same address content parser. `parse` turns this into the bounded [SiteContentParsed].
+ * Loose (unvalidated) inbound site content: the site [header] plus its [mainAddress]. The two are parsed independently —
+ * the header by [org.eclipse.tractusx.bpdm.pool.service.SiteHeaderParser], the main address by the shared address
+ * content parser — then recombined into the bounded [SiteContentParsed].
  */
 data class SiteContentRequest(
+    val header: SiteHeaderRequest,
+    val mainAddress: AddressContentRequest
+)
+
+/**
+ * Loose site header (everything but the main address). `name`/`confidenceCriteria` are relaxed so the header parse
+ * validates them (yielding [SiteContentParseError.NameMissing] / [SiteContentParseError.ConfidenceCriteriaMissing]).
+ */
+data class SiteHeaderRequest(
     val name: String?,
     val states: List<SiteState>,
     val confidenceCriteria: ConfidenceCriteriaRequest,
-    val scriptVariants: List<SiteScriptVariant>,
-    val mainAddress: AddressContentRequest
+    val scriptVariants: List<SiteScriptVariant>
 )
 
 /** Loose site-header script variant: only `scriptCode` needs resolving to its entity; the localized main address travels with [AddressContentRequest]. */
