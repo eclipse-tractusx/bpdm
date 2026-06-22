@@ -29,6 +29,10 @@ package org.eclipse.tractusx.bpdm.pool.model
 sealed interface ParseResult<out T, out E> {
     data class Success<out T>(val parsed: T) : ParseResult<T, Nothing>
     data class Failure<out E>(val errors: List<E>) : ParseResult<Nothing, E>
+
+    companion object{
+        fun <E> ofSingleFailure(error: E) : ParseResult<Nothing, E> = Failure(listOf(error))
+    }
 }
 
 /**
@@ -42,3 +46,60 @@ fun <T, R, E> ParseResult<T, E>.combine(extraErrors: List<E>, transform: (T) -> 
         is ParseResult.Success -> if (extraErrors.isEmpty()) ParseResult.Success(transform(parsed)) else ParseResult.Failure(extraErrors)
         is ParseResult.Failure -> ParseResult.Failure(errors + extraErrors)
     }
+
+/**
+ * Combines several independent parse results for the *same* entry into one, accumulating the errors of all that failed
+ * and applying [transform] to their parsed values only when every input succeeded (applicative validation). This lets a
+ * service assemble one operation result from results produced by separate, single-responsibility parsers (e.g. content,
+ * legal-entity parent, site parent) without manual error collection. Each input may carry a narrower error type; thanks
+ * to `ParseResult`'s covariance in the error type they unify to the wider operation error type [E].
+ */
+fun <A, B, R, E> zipParseResults(a: ParseResult<A, E>, b: ParseResult<B, E>, transform: (A, B) -> R): ParseResult<R, E> {
+    val errors = failureErrors(a, b)
+    return if (errors.isEmpty())
+        ParseResult.Success(transform(a.successValue(), b.successValue()))
+    else
+        ParseResult.Failure(errors)
+}
+
+fun <A, B, C, R, E> zipParseResults(
+    a: ParseResult<A, E>,
+    b: ParseResult<B, E>,
+    c: ParseResult<C, E>,
+    transform: (A, B, C) -> R
+): ParseResult<R, E> {
+    val errors = failureErrors(a, b, c)
+    return if (errors.isEmpty())
+        ParseResult.Success(transform(a.successValue(), b.successValue(), c.successValue()))
+    else
+        ParseResult.Failure(errors)
+}
+
+/**
+ * Positional list overloads of [zipParseResults]: combine the parse results of several order-preserving lists entry by
+ * entry. The lists must share the same size (the per-entry positional contract of [ParseResult]).
+ */
+fun <A, B, R, E> zipParseResults(
+    a: List<ParseResult<A, E>>,
+    b: List<ParseResult<B, E>>,
+    transform: (A, B) -> R
+): List<ParseResult<R, E>> {
+    require(a.size == b.size) { "Parse result lists must align positionally: ${a.size} vs ${b.size}" }
+    return a.indices.map { index -> zipParseResults(a[index], b[index], transform) }
+}
+
+fun <A, B, C, R, E> zipParseResults(
+    a: List<ParseResult<A, E>>,
+    b: List<ParseResult<B, E>>,
+    c: List<ParseResult<C, E>>,
+    transform: (A, B, C) -> R
+): List<ParseResult<R, E>> {
+    require(a.size == b.size && b.size == c.size) { "Parse result lists must align positionally: ${a.size}, ${b.size}, ${c.size}" }
+    return a.indices.map { index -> zipParseResults(a[index], b[index], c[index], transform) }
+}
+
+private fun <E> failureErrors(vararg results: ParseResult<*, E>): List<E> =
+    results.filterIsInstance<ParseResult.Failure<E>>().flatMap { it.errors }
+
+// Safe only after [failureErrors] has confirmed no input failed.
+private fun <T> ParseResult<T, *>.successValue(): T = (this as ParseResult.Success<T>).parsed

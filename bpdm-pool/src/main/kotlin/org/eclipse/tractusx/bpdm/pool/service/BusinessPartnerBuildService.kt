@@ -30,6 +30,8 @@ import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.mapper.AddressParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.LogisticAddressDtoRequestMapper
+import org.eclipse.tractusx.bpdm.pool.model.AddressContentParsed
+import org.eclipse.tractusx.bpdm.pool.model.AddressCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.AddressCreateRequest
 import org.eclipse.tractusx.bpdm.pool.model.AddressUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
@@ -55,8 +57,9 @@ class BusinessPartnerBuildService(
     private val logisticAddressRepository: LogisticAddressRepository,
     private val requestValidationService: RequestValidationService,
     private val businessPartnerEquivalenceMapper: BusinessPartnerEquivalenceMapper,
+    private val additionalAddressCreateService: AdditionalAddressCreateService,
+    private val additionalAddressUpdateService: AdditionalAddressUpdateService,
     private val addressCreateService: AddressCreateService,
-    private val addressUpdateService: AddressUpdateService,
     private val logisticAddressDtoRequestMapper: LogisticAddressDtoRequestMapper,
     private val addressParseErrorMapper: AddressParseErrorMapper
 ) {
@@ -70,41 +73,51 @@ class BusinessPartnerBuildService(
     fun createLegalEntities(requests: Collection<LegalEntityPartnerCreateRequest>): LegalEntityPartnerCreateResponseWrapper {
         logger.info { "Create ${requests.size} new legal entities" }
 
-        val errorsByRequest = requestValidationService.validateLegalEntitiesToCreateFromController(requests)
-        val errors = errorsByRequest.flatMap { it.value }
-        val validRequests = requests.filterNot { errorsByRequest.containsKey(it) }
+        val requestList = requests.toList()
+        val headerErrorsByRequest = requestValidationService.validateLegalEntitiesToCreateFromController(requests)
+        val (legalEntityMetadataMap, _) = metadataService.getMetadata(requests.map { it.legalEntity }).toMapping()
 
-        val (legalEntityMetadataMap, addressMetadataMap) = metadataService.getMetadata(requests.map { it.legalEntity }).toMapping()
+        // The legal address content is validated by the address create service's `parse`, independently of header
+        // validation, so a request can report both a header error and an address error (matching the previous behavior).
+        val contentResults = addressCreateService.parseContent(
+            requestList.map { logisticAddressDtoRequestMapper.toContentRequest(it.legalEntity.toLegalAddressWithScriptVariants()) }
+        )
 
-        val bpnLs = bpnIssuingService.issueLegalEntityBpns(validRequests.size)
-        val bpnAs = bpnIssuingService.issueAddressBpns(validRequests.size)
-
-        val requestsByLegalEntities = validRequests
-            .mapIndexed { bpnIndex, request ->
-                val legalEntity = createLegalEntityHeader(request.legalEntity.header, bpnLs[bpnIndex], legalEntityMetadataMap, request.legalEntity.scriptVariants)
-                val legalAddress = createLogisticAddress(request.legalEntity.toLegalAddressWithScriptVariants(), bpnAs[bpnIndex], legalEntity, null, addressMetadataMap)
-                legalEntity.legalAddress = legalAddress
-                Pair(legalEntity, request)
+        val errors = mutableListOf<ErrorInfo<LegalEntityCreateError>>()
+        val buildable = mutableListOf<Pair<LegalEntityPartnerCreateRequest, AddressContentParsed>>()
+        requestList.forEachIndexed { index, request ->
+            val headerErrors = headerErrorsByRequest[request].orEmpty()
+            errors.addAll(headerErrors)
+            when (val contentResult = contentResults[index]) {
+                is ParseResult.Failure -> errors.addAll(contentResult.errors.map { addressParseErrorMapper.toLegalEntityCreateErrorInfo(it, request.index) })
+                is ParseResult.Success -> if (headerErrors.isEmpty()) buildable.add(request to contentResult.parsed)
             }
-            .toMap()
+        }
 
-        val legalEntities = requestsByLegalEntities.keys
+        val bpnLs = bpnIssuingService.issueLegalEntityBpns(buildable.size)
+        val legalEntitiesByRequest = buildable.mapIndexed { index, (request, content) ->
+            val legalEntity = createLegalEntityHeader(request.legalEntity.header, bpnLs[index], legalEntityMetadataMap, request.legalEntity.scriptVariants)
+            Triple(legalEntity, request, content)
+        }
 
+        val legalEntities = legalEntitiesByRequest.map { it.first }
+        // Emit the legal entity changelog before the address create service emits the ADDRESS CREATE changelog, so the
+        // overall changelog order stays "legal entity, then its legal address".
         changelogService.createChangelogEntries(legalEntities.map {
             ChangelogEntryCreateRequest(it.bpn, ChangelogType.CREATE, BusinessPartnerType.LEGAL_ENTITY)
         })
-        changelogService.createChangelogEntries(legalEntities.map {
-            ChangelogEntryCreateRequest(it.legalAddress.bpn, ChangelogType.CREATE, BusinessPartnerType.ADDRESS)
+
+        // The address create service owns the address BPN + ADDRESS CREATE changelog; the parent here is still unsaved
+        // (flushed in the right order at commit thanks to the nullable back-FK and order_inserts).
+        val legalAddresses = addressCreateService.create(legalEntitiesByRequest.map { (legalEntity, _, content) ->
+            AddressCreateParsed(legalEntity, site = null, content.address, content.scriptVariants)
         })
+        legalEntitiesByRequest.zip(legalAddresses).forEach { (entry, address) -> entry.first.legalAddress = address }
 
-        legalEntities.map {
-
-            logger.info { logger.info { "Legal Entity ${it.bpn} was created" } }
-
-        }
+        legalEntities.forEach { logger.info { "Legal Entity ${it.bpn} was created" } }
         legalEntityRepository.saveAll(legalEntities)
 
-        val legalEntityResponse = legalEntities.map { it.toUpsertDto(requestsByLegalEntities[it]!!.index) }
+        val legalEntityResponse = legalEntitiesByRequest.map { (legalEntity, request, _) -> legalEntity.toUpsertDto(request.index) }
 
         return LegalEntityPartnerCreateResponseWrapper(legalEntityResponse, errors)
     }
@@ -186,28 +199,52 @@ class BusinessPartnerBuildService(
     fun createSitesWithMainAddress(requests: Collection<SitePartnerCreateRequest>): SitePartnerCreateResponseWrapper {
         logger.info { "Create ${requests.size} new sites" }
 
-        val errorsByRequest = requestValidationService.validateSitesToCreateFromController(requests)
-        val errors = errorsByRequest.flatMap { it.value }
-        val validRequests = requests.filterNot { errorsByRequest.containsKey(it) }
+        val requestList = requests.toList()
+        val headerErrorsByRequest = requestValidationService.validateSitesToCreate(requests)
+        val (siteHeaderMetadata, _) = metadataService.getMetadata(requestList.map { it.site }).toMapping()
 
-        val (siteHeaderMetadata, mainAddressMetadata) = metadataService.getMetadata(validRequests.map { it.site }).toMapping()
+        // The main address content is validated by the address create service's `parse`, independently of header/parent
+        // validation, so a request can report both a parent error and an address error (matching the previous behavior).
+        val contentResults = addressCreateService.parseContent(
+            requestList.map { logisticAddressDtoRequestMapper.toContentRequest(it.site.toMainAddressWithScriptVariants()) }
+        )
 
-        val legalEntities = legalEntityRepository.findDistinctByBpnIn(validRequests.map { it.bpnlParent })
-        val legalEntitiesByBpn = legalEntities.associateBy { it.bpn }
+        val errors = mutableListOf<ErrorInfo<SiteCreateError>>()
+        val buildable = mutableListOf<Pair<SitePartnerCreateRequest, AddressContentParsed>>()
+        requestList.forEachIndexed { index, request ->
+            val headerErrors = headerErrorsByRequest[request].orEmpty()
+            errors.addAll(headerErrors)
+            when (val contentResult = contentResults[index]) {
+                is ParseResult.Failure -> errors.addAll(contentResult.errors.map { addressParseErrorMapper.toSiteCreateErrorInfo(it, request.index) })
+                is ParseResult.Success -> if (headerErrors.isEmpty()) buildable.add(request to contentResult.parsed)
+            }
+        }
 
-        val bpnSs = bpnIssuingService.issueSiteBpns(validRequests.size)
-        val bpnAs = bpnIssuingService.issueAddressBpns(validRequests.size)
+        val legalEntitiesByBpn = legalEntityRepository.findDistinctByBpnIn(buildable.map { it.first.bpnlParent }).associateBy { it.bpn }
+        val bpnSs = bpnIssuingService.issueSiteBpns(buildable.size)
+        val sitesByRequest = buildable.mapIndexed { index, (request, content) ->
+            val site = createSiteHeader(request.site.toHeader(), bpnSs[index], legalEntitiesByBpn[request.bpnlParent]!!, siteHeaderMetadata)
+            Triple(site, request, content)
+        }
 
-        fun createSiteWithMainAddress(bpnIndex: Int, request: SitePartnerCreateRequest) =
-            createSiteHeader(request.site.toHeader(), bpnSs[bpnIndex], legalEntitiesByBpn[request.bpnlParent]!!, siteHeaderMetadata)
-                .apply { mainAddress = createLogisticAddress(request.site.toMainAddressWithScriptVariants(), bpnAs[bpnIndex], this.legalEntity, this, mainAddressMetadata) }
-                .let { site -> Pair(site, request) }
+        val sites = sitesByRequest.map { it.first }
+        // Emit the site changelog before the address create service emits the ADDRESS CREATE changelog, so the overall
+        // changelog order stays "site, then its main address".
+        changelogService.createChangelogEntries(sites.map {
+            ChangelogEntryCreateRequest(it.bpn, ChangelogType.CREATE, BusinessPartnerType.SITE)
+        })
 
-        val requestsBySites = validRequests
-            .mapIndexed { i, request -> createSiteWithMainAddress(i, request) }
-            .toMap()
+        // The address create service owns the address BPN + ADDRESS CREATE changelog; the parent site is still unsaved
+        // (flushed in the right order at commit thanks to the nullable back-FK and order_inserts).
+        val mainAddresses = addressCreateService.create(sitesByRequest.map { (site, _, content) ->
+            AddressCreateParsed(site.legalEntity, site, content.address, content.scriptVariants)
+        })
+        sitesByRequest.zip(mainAddresses).forEach { (entry, address) -> entry.first.mainAddress = address }
 
-        val siteResponse = createChangeLogAndSaveSiteInformation(requestsBySites).map { it.toUpsertDto(requestsBySites[it]!!.index) }
+        sites.forEach { logger.info { "Site ${it.bpn} was created" } }
+        siteRepository.saveAll(sites)
+
+        val siteResponse = sitesByRequest.map { (site, request, _) -> site.toUpsertDto(request.index) }
 
         return SitePartnerCreateResponseWrapper(siteResponse, errors)
     }
@@ -261,7 +298,7 @@ class BusinessPartnerBuildService(
 
         val responses = mutableListOf<AddressPartnerCreateVerboseDto>()
         val parseErrors = mutableListOf<ErrorInfo<AddressCreateError>>()
-        createRequests.zip(addressCreateService.parseAndCreate(createRequests.map { it.second })).forEach { (pair, result) ->
+        createRequests.zip(additionalAddressCreateService.parseAndCreate(createRequests.map { it.second })).forEach { (pair, result) ->
             val request = pair.first
             when (result) {
                 is ParseResult.Success -> responses.add(result.parsed.toCreateResponse(request.index))
@@ -419,7 +456,7 @@ class BusinessPartnerBuildService(
 
         val responses = mutableListOf<AddressPartnerUpdateVerboseDto>()
         val errors = mutableListOf<ErrorInfo<AddressUpdateError>>()
-        requestList.zip(addressUpdateService.parseAndUpdate(updateRequests)).forEach { (request, result) ->
+        requestList.zip(additionalAddressUpdateService.parseAndUpdate(updateRequests)).forEach { (request, result) ->
             when (result) {
                 is ParseResult.Success -> responses.add(result.parsed.value.toUpdateDto())
                 is ParseResult.Failure -> errors.addAll(result.errors.map { addressParseErrorMapper.toUpdateErrorInfo(it, request.bpna) })
@@ -449,38 +486,8 @@ class BusinessPartnerBuildService(
 
 
 
-    private fun createLogisticAddress(
-        dto: LogisticAddressWithScriptVariantsDto,
-        bpn: String,
-        legalEntity: LegalEntityDb,
-        site: SiteDb?,
-        metadataMap: AddressMetadataMapping
-    ) = createLogisticAddressInternal(dto, bpn, metadataMap)
-        .apply {
-            this.legalEntity = legalEntity
-            this.site = site
-        }
-
-    private fun createLogisticAddressInternal(
-        dto: LogisticAddressWithScriptVariantsDto,
-        bpn: String,
-        metadataMap: AddressMetadataMapping
-    ): LogisticAddressDb {
-        val address = LogisticAddressDb(
-            bpn = bpn,
-            legalEntity = null,
-            site = null,
-            physicalPostalAddress = createPhysicalAddress(dto.address.physicalPostalAddress, metadataMap.regions),
-            alternativePostalAddress = dto.address.alternativePostalAddress?.let { createAlternativeAddress(it, metadataMap.regions) },
-            name = dto.address.name,
-            confidenceCriteria = createConfidenceCriteria(dto.address.confidenceCriteria)
-        )
-
-        updateLogisticAddress(address, dto, metadataMap)
-
-        return address
-    }
-
+    // Re-parents an existing address onto a site as its main address (used by createSiteMainAddressFromAdditionalAddress,
+    // #3 — still on the legacy builder pending Phase 3).
     private fun createLogisticAddress(
         address: LogisticAddressDb,
         dto: LogisticAddressWithScriptVariantsDto,

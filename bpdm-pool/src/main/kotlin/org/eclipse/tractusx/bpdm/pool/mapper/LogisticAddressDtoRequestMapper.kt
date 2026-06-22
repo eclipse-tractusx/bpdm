@@ -31,6 +31,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.PhysicalAddressScriptVariantDto
 import org.eclipse.tractusx.bpdm.pool.api.model.PhysicalPostalAddressDto
 import org.eclipse.tractusx.bpdm.pool.api.model.PostalAddressScriptVariantDto
 import org.eclipse.tractusx.bpdm.pool.api.model.StreetDto
+import org.eclipse.tractusx.bpdm.pool.dto.LogisticAddressWithScriptVariantsDto
 import org.eclipse.tractusx.bpdm.pool.model.*
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
@@ -51,6 +52,9 @@ class LogisticAddressDtoRequestMapper {
             address = toAddressRequest(address),
             scriptVariants = scriptVariants.map { toScriptVariant(it) }
         )
+
+    fun toContentRequest(addressWithScriptVariants: LogisticAddressWithScriptVariantsDto): AddressContentRequest =
+        toContentRequest(addressWithScriptVariants.address, addressWithScriptVariants.scriptVariants)
 
     private fun toAddressRequest(address: LogisticAddressDto): LogisticAddressRequest =
         LogisticAddressRequest(

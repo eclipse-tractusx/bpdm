@@ -33,6 +33,8 @@ import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.mapper.GoldenRecordTaskAddressRequestMapper
 import org.eclipse.tractusx.bpdm.pool.model.AddressConstraintParseError
 import org.eclipse.tractusx.bpdm.pool.model.AddressCreateParseError
+import org.eclipse.tractusx.bpdm.pool.model.UnresolvableLegalEntity
+import org.eclipse.tractusx.bpdm.pool.model.UnresolvableSite
 import org.eclipse.tractusx.bpdm.pool.model.AddressCreateRequest
 import org.eclipse.tractusx.bpdm.pool.model.AddressFieldParseError
 import org.eclipse.tractusx.bpdm.pool.model.AddressMetadataParseError
@@ -66,8 +68,8 @@ class TaskStepBuildService(
     private val logisticAddressRepository: LogisticAddressRepository,
     private val siteRepository: SiteRepository,
     private val sharingMemberConfidenceService: SharingMemberConfidenceService,
-    private val addressCreateService: AddressCreateService,
-    private val addressUpdateService: AddressUpdateService,
+    private val additionalAddressCreateService: AdditionalAddressCreateService,
+    private val additionalAddressUpdateService: AdditionalAddressUpdateService,
     private val taskAddressRequestMapper: GoldenRecordTaskAddressRequestMapper
 ) {
 
@@ -405,12 +407,10 @@ class TaskStepBuildService(
             content = taskAddressRequestMapper.toContentRequest(additionalAddress)
         )
 
-        val parsed = when (val result = addressCreateService.parse(listOf(request)).single()) {
-            is ParseResult.Success -> result.parsed
+        return when (val result = additionalAddressCreateService.parseAndCreate(listOf(request)).single()) {
+            is ParseResult.Success -> result.parsed.bpn
             is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { "Errors on creating Address: ${renderError(it)}" })
         }
-
-        return addressCreateService.create(listOf(parsed)).single().bpn
     }
 
     private fun updateLogisticAddress(
@@ -422,20 +422,18 @@ class TaskStepBuildService(
             content = taskAddressRequestMapper.toContentRequest(additionalAddress)
         )
 
-        val parsed = when (val result = addressUpdateService.parse(listOf(request)).single()) {
-            is ParseResult.Success -> result.parsed
+        return when (val result = additionalAddressUpdateService.parseAndUpdate(listOf(request)).single()) {
+            is ParseResult.Success -> result.parsed.value.bpn
             is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { "Errors on updating Address: ${renderError(it)}" })
         }
-
-        return addressUpdateService.update(listOf(parsed)).single().value.bpn
     }
 
     // Address parse errors are rendered to messages here (caller-local) so the task path keeps its existing error wording;
     // the field errors reuse the CleaningError texts the old throwing translation produced.
     private fun renderError(error: AddressCreateParseError): String =
         when (error) {
-            is AddressCreateParseError.UnresolvableLegalEntity -> "Legal entity ${error.bpn} not found"
-            is AddressCreateParseError.UnresolvableSite -> "Site ${error.bpn} not found"
+            is UnresolvableLegalEntity -> "Legal entity ${error.bpn} not found"
+            is UnresolvableSite -> "Site ${error.bpn} not found"
             is AddressSharedParseError -> renderError(error)
         }
 

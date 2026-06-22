@@ -25,89 +25,47 @@ import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.mapper.AddressEntityMapper
 import org.eclipse.tractusx.bpdm.pool.model.AddressContentParsed
+import org.eclipse.tractusx.bpdm.pool.model.AddressContentRequest
 import org.eclipse.tractusx.bpdm.pool.model.AddressCreateParsed
-import org.eclipse.tractusx.bpdm.pool.model.AddressCreateParseError
-import org.eclipse.tractusx.bpdm.pool.model.AddressCreateRequest
+import org.eclipse.tractusx.bpdm.pool.model.AddressSharedParseError
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.combine
-import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
-import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Creates logistic addresses in two explicit phases so callers can route validation failures themselves:
- * [parse] validates loose requests and resolves parents to entities; [create] persists already-parsed addresses.
- * Both honour the order-preserving positional list contract (see [ParseResult]).
+ * Creates logistic addresses from already-resolved parents. This is the lower, parent-injected layer: it validates
+ * address *content* and persists the address, but it does not resolve any parent (that is [AdditionalAddressCreateService]'s
+ * job). Callers that already hold the parent entity — including in-transaction creators whose parent is not yet
+ * persisted — use this service directly. All methods honour the order-preserving positional list contract (see
+ * [ParseResult]).
  */
 @Service
 class AddressCreateService(
     private val addressRequestParser: LogisticAddressRequestParser,
     private val duplicateValidator: AddressIdentifierDuplicateValidator,
-    private val legalEntityRepository: LegalEntityRepository,
-    private val siteRepository: SiteRepository,
     private val bpnIssuingService: BpnIssuingService,
     private val logisticAddressRepository: LogisticAddressRepository,
     private val changelogService: PartnerChangelogService,
     private val addressEntityMapper: AddressEntityMapper
 ) {
 
-    fun parse(requests: List<AddressCreateRequest>): List<ParseResult<AddressCreateParsed, AddressCreateParseError>> {
-        val contents = requests.map { it.content }
-
-        val contentResults = addressRequestParser.parse(contents)
-        // Created addresses have no own identity yet, so none of their identifiers can be self-duplicates.
-        val duplicateErrors = duplicateValidator.validate(contents, ownerBpns = requests.map { null })
-
-        val legalEntitiesByBpn = legalEntityRepository
-            .findDistinctByBpnIn(requests.map { it.legalEntityBpn }.toSet())
-            .associateBy { it.bpn }
-        val sitesByBpn = siteRepository
-            .findDistinctByBpnIn(requests.mapNotNull { it.siteBpn }.toSet())
-            .associateBy { it.bpn }
-
-        return requests.mapIndexed { index, request ->
-            val resolutionErrors = mutableListOf<AddressCreateParseError>()
-
-            val legalEntity = legalEntitiesByBpn[request.legalEntityBpn]
-                ?: run { resolutionErrors.add(AddressCreateParseError.UnresolvableLegalEntity(request.legalEntityBpn)); null }
-            val site = request.siteBpn?.let { siteBpn ->
-                sitesByBpn[siteBpn] ?: run { resolutionErrors.add(AddressCreateParseError.UnresolvableSite(siteBpn)); null }
-            }
-
-            val contentResult: ParseResult<AddressContentParsed, AddressCreateParseError> = contentResults[index]
-            contentResult.combine(resolutionErrors + duplicateErrors[index]) { content ->
-                // Reached only when there are no errors, so the legal entity above is resolved.
-                AddressCreateParsed(legalEntity!!, site, content.address, content.scriptVariants)
-            }
-        }
-    }
-
     /**
-     * Convenience for callers that route per-entry failures: [parse] then [create] the successful entries, returning
-     * one result per request (positional, see [ParseResult]) where each is either the persisted entity or the parse
-     * errors for that entry. `@Transactional` so resolution and persistence share one persistence context.
+     * Validates address content only (presence/format, metadata resolution, identifier duplicates). Created addresses
+     * have no identity yet, so none of their identifiers can be self-duplicates (owner BPN is null).
      */
-    @Transactional
-    fun parseAndCreate(requests: List<AddressCreateRequest>): List<ParseResult<LogisticAddressDb, AddressCreateParseError>> {
-        val parseResults = parse(requests)
-        val created = create(parseResults.filterIsInstance<ParseResult.Success<AddressCreateParsed>>().map { it.parsed })
-
-        val createdIterator = created.iterator()
-        return parseResults.map { result ->
-            when (result) {
-                is ParseResult.Success -> ParseResult.Success(createdIterator.next())
-                is ParseResult.Failure -> result
-            }
-        }
+    fun parseContent(contents: List<AddressContentRequest>): List<ParseResult<AddressContentParsed, AddressSharedParseError>> {
+        val contentResults = addressRequestParser.parse(contents)
+        val duplicateErrors = duplicateValidator.validate(contents, ownerBpns = contents.map { null })
+        return contentResults.mapIndexed { index, result -> result.combine(duplicateErrors[index]) { it } }
     }
 
     /**
      * Returns the persisted entities (within the caller's transaction) rather than a detached response model: the
      * write is a pure in-transaction collaborator, and turning entities into version-specific responses is the job of
-     * the border/application service at the edge. See the address service layering rationale. No `UpsertType` here —
-     * a create always yields `Created`, unlike update which can be a no-op.
+     * the border/application service at the edge. No `UpsertType` here — a create always yields `Created`, unlike update
+     * which can be a no-op.
      */
     @Transactional
     fun create(parsed: List<AddressCreateParsed>): List<LogisticAddressDb> {
@@ -121,5 +79,22 @@ class AddressCreateService(
         })
 
         return entities
+    }
+
+    /**
+     * Executes [create] for the successfully parsed entries and weaves the persisted entities back into a positional
+     * list aligned with the input; failures pass through unchanged (via [ParseResult]'s `out T` covariance). Generic in
+     * the error type so both this service and [AdditionalAddressCreateService] (whose errors are wider) can reuse it.
+     */
+    fun <E> parseAndCreate(parseResults: List<ParseResult<AddressCreateParsed, E>>): List<ParseResult<LogisticAddressDb, E>> {
+        val created = create(parseResults.filterIsInstance<ParseResult.Success<AddressCreateParsed>>().map { it.parsed })
+
+        val createdIterator = created.iterator()
+        return parseResults.map { result ->
+            when (result) {
+                is ParseResult.Success -> ParseResult.Success(createdIterator.next())
+                is ParseResult.Failure -> result
+            }
+        }
     }
 }

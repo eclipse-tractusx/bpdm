@@ -28,9 +28,11 @@ import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.mapper.AddressEntityMapper
 import org.eclipse.tractusx.bpdm.pool.model.AddressContentParsed
+import org.eclipse.tractusx.bpdm.pool.model.AddressContentRequest
+import org.eclipse.tractusx.bpdm.pool.model.AddressScriptVariantParsed
+import org.eclipse.tractusx.bpdm.pool.model.AddressSharedParseError
 import org.eclipse.tractusx.bpdm.pool.model.AddressUpdateParsed
-import org.eclipse.tractusx.bpdm.pool.model.AddressUpdateParseError
-import org.eclipse.tractusx.bpdm.pool.model.AddressUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.model.LogisticAddressParsed
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.combine
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
@@ -38,9 +40,10 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Updates existing logistic addresses in two explicit phases: [parse] validates loose requests and resolves the update
- * target entity (never re-parents); [update] applies changes to already-parsed addresses. Both honour the order-preserving
- * positional list contract (see [ParseResult]).
+ * Updates existing logistic addresses given an already-resolved target. This is the lower, target-injected layer: it
+ * validates address *content* and applies changes to a supplied managed entity, but it does not resolve the target by
+ * BPN (that is [AdditionalAddressUpdateService]'s job). Update never re-parents. Callers that already hold the managed
+ * target use this service directly. Order-preserving positional contract (see [ParseResult]).
  */
 @Service
 class AddressUpdateService(
@@ -52,55 +55,20 @@ class AddressUpdateService(
     private val addressEntityMapper: AddressEntityMapper
 ) {
 
-    fun parse(requests: List<AddressUpdateRequest>): List<ParseResult<AddressUpdateParsed, AddressUpdateParseError>> {
-        val contents = requests.map { it.content }
-
-        val contentResults = addressRequestParser.parse(contents)
-        // An address may legitimately re-submit its own existing identifiers, so its own BPN is excluded from duplicates.
-        val duplicateErrors = duplicateValidator.validate(contents, ownerBpns = requests.map { it.addressBpn })
-
-        val targetsByBpn = logisticAddressRepository
-            .findDistinctByBpnIn(requests.map { it.addressBpn }.toSet())
-            .associateBy { it.bpn }
-
-        return requests.mapIndexed { index, request ->
-            val resolutionErrors = mutableListOf<AddressUpdateParseError>()
-
-            val target = targetsByBpn[request.addressBpn]
-                ?: run { resolutionErrors.add(AddressUpdateParseError.UnresolvableTarget(request.addressBpn)); null }
-
-            val contentResult: ParseResult<AddressContentParsed, AddressUpdateParseError> = contentResults[index]
-            contentResult.combine(resolutionErrors + duplicateErrors[index]) { content ->
-                // Reached only when there are no errors, so the target above is resolved.
-                AddressUpdateParsed(target!!, content.address, content.scriptVariants)
-            }
-        }
-    }
-
     /**
-     * Convenience for callers that route per-entry failures: [parse] then [update] the successful entries, returning
-     * one result per request (positional, see [ParseResult]) where each is either the upsert outcome or the parse
-     * errors for that entry. `@Transactional` so resolution and the mutation of lazy collections share one persistence
-     * context.
+     * Validates address content only (presence/format, metadata resolution, identifier duplicates). [ownerBpns] is the
+     * BPN of each entry's update target, so an address may legitimately re-submit its own existing identifiers.
      */
-    @Transactional
-    fun parseAndUpdate(requests: List<AddressUpdateRequest>): List<ParseResult<UpsertResult<LogisticAddressDb>, AddressUpdateParseError>> {
-        val parseResults = parse(requests)
-        val updated = update(parseResults.filterIsInstance<ParseResult.Success<AddressUpdateParsed>>().map { it.parsed })
-
-        val updatedIterator = updated.iterator()
-        return parseResults.map { result ->
-            when (result) {
-                is ParseResult.Success -> ParseResult.Success(updatedIterator.next())
-                is ParseResult.Failure -> result
-            }
-        }
+    fun parseContent(contents: List<AddressContentRequest>, ownerBpns: List<String?>): List<ParseResult<AddressContentParsed, AddressSharedParseError>> {
+        val contentResults = addressRequestParser.parse(contents)
+        val duplicateErrors = duplicateValidator.validate(contents, ownerBpns)
+        return contentResults.mapIndexed { index, result -> result.combine(duplicateErrors[index]) { it } }
     }
 
     /**
      * Returns the updated entities (within the caller's transaction) rather than a detached response model: the write
      * is a pure in-transaction collaborator, and building version-specific responses is the job of the border/application
-     * service at the edge. See the address service layering rationale.
+     * service at the edge.
      */
     @Transactional
     fun update(parsed: List<AddressUpdateParsed>): List<UpsertResult<LogisticAddressDb>> =
@@ -110,7 +78,8 @@ class AddressUpdateService(
         val target = parsed.target
 
         val before = equivalenceMapper.toEquivalenceDto(target)
-        applyChanges(target, parsed)
+        // The sharing-member count is Pool-maintained, not part of the update payload, so carry the current value forward.
+        applyTo(target, parsed.address, parsed.scriptVariants, target.confidenceCriteria.numberOfSharingMembers)
         val after = equivalenceMapper.toEquivalenceDto(target)
 
         val upsertType = if (before != after) {
@@ -124,16 +93,35 @@ class AddressUpdateService(
         return UpsertResult(target, upsertType)
     }
 
-    private fun applyChanges(target: LogisticAddressDb, parsed: AddressUpdateParsed) {
-        val address = parsed.address
-
+    /**
+     * Applies parsed address content onto a managed entity using the pure mapper sub-builders. Does not save or emit a
+     * changelog — callers that own aggregate-level change detection (legal entity / site) reuse this and decide
+     * persistence themselves.
+     */
+    fun applyTo(target: LogisticAddressDb, address: LogisticAddressParsed, scriptVariants: List<AddressScriptVariantParsed>, numberOfSharingMembers: Int) {
         target.name = address.name
         target.physicalPostalAddress = addressEntityMapper.toPhysical(address.physicalPostalAddress)
         target.alternativePostalAddress = address.alternativePostalAddress?.let { addressEntityMapper.toAlternative(it) }
-        // The sharing-member count is Pool-maintained, not part of the update payload, so carry the current value forward.
-        target.confidenceCriteria = addressEntityMapper.toConfidence(address.confidenceCriteria, target.confidenceCriteria.numberOfSharingMembers)
+        target.confidenceCriteria = addressEntityMapper.toConfidence(address.confidenceCriteria, numberOfSharingMembers)
         target.identifiers.replace(addressEntityMapper.toIdentifiers(address.identifiers, target))
         target.states.replace(addressEntityMapper.toStates(address.states, target))
-        target.scriptVariants.replace(addressEntityMapper.toScriptVariants(parsed.scriptVariants))
+        target.scriptVariants.replace(addressEntityMapper.toScriptVariants(scriptVariants))
+    }
+
+    /**
+     * Executes [update] for the successfully parsed entries and weaves the results back into a positional list aligned
+     * with the input; failures pass through unchanged. Generic in the error type so both this service and
+     * [AdditionalAddressUpdateService] (whose errors are wider) can reuse it.
+     */
+    fun <E> parseAndUpdate(parseResults: List<ParseResult<AddressUpdateParsed, E>>): List<ParseResult<UpsertResult<LogisticAddressDb>, E>> {
+        val updated = update(parseResults.filterIsInstance<ParseResult.Success<AddressUpdateParsed>>().map { it.parsed })
+
+        val updatedIterator = updated.iterator()
+        return parseResults.map { result ->
+            when (result) {
+                is ParseResult.Success -> ParseResult.Success(updatedIterator.next())
+                is ParseResult.Failure -> result
+            }
+        }
     }
 }

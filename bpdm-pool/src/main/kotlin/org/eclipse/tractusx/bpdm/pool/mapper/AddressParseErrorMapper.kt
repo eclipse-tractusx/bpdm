@@ -23,9 +23,13 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressCreateError
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressUpdateError
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorCode
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityCreateError
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteCreateError
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.model.AddressConstraintParseError
 import org.eclipse.tractusx.bpdm.pool.model.AddressCreateParseError
+import org.eclipse.tractusx.bpdm.pool.model.UnresolvableLegalEntity
+import org.eclipse.tractusx.bpdm.pool.model.UnresolvableSite
 import org.eclipse.tractusx.bpdm.pool.model.AddressFieldParseError
 import org.eclipse.tractusx.bpdm.pool.model.AddressMetadataParseError
 import org.eclipse.tractusx.bpdm.pool.model.AddressSharedParseError
@@ -52,9 +56,9 @@ class AddressParseErrorMapper {
 
     fun toCreateErrorInfo(error: AddressCreateParseError, entityKey: String?): ErrorInfo<AddressCreateError> =
         when (error) {
-            is AddressCreateParseError.UnresolvableLegalEntity ->
+            is UnresolvableLegalEntity ->
                 ErrorInfo(AddressCreateError.LegalEntityNotFound, "Parent legal entity '${error.bpn}' not found", entityKey)
-            is AddressCreateParseError.UnresolvableSite ->
+            is UnresolvableSite ->
                 ErrorInfo(AddressCreateError.SiteNotFound, "Parent site '${error.bpn}' not found", entityKey)
             is AddressSharedParseError -> sharedErrorInfo(
                 error,
@@ -79,6 +83,34 @@ class AddressParseErrorMapper {
                 identifiersTooMany = AddressUpdateError.IdentifiersTooMany
             )
         }
+
+    /**
+     * For the legal address embedded in a legal-entity create: the content parser only ever produces
+     * [AddressSharedParseError] (there is no parent to resolve here), mapped to the `LegalAddress*` codes.
+     */
+    fun toLegalEntityCreateErrorInfo(error: AddressSharedParseError, entityKey: String?): ErrorInfo<LegalEntityCreateError> =
+        sharedErrorInfo(
+            error,
+            entityKey,
+            regionNotFound = LegalEntityCreateError.LegalAddressRegionNotFound,
+            identifierNotFound = LegalEntityCreateError.LegalAddressIdentifierNotFound,
+            duplicateIdentifier = LegalEntityCreateError.LegalAddressDuplicateIdentifier,
+            identifiersTooMany = LegalEntityCreateError.LegalAddressIdentifiersTooMany
+        )
+
+    /**
+     * For the main address embedded in a site create: the content parser only ever produces
+     * [AddressSharedParseError], mapped to the `MainAddress*` codes.
+     */
+    fun toSiteCreateErrorInfo(error: AddressSharedParseError, entityKey: String?): ErrorInfo<SiteCreateError> =
+        sharedErrorInfo(
+            error,
+            entityKey,
+            regionNotFound = SiteCreateError.MainAddressRegionNotFound,
+            identifierNotFound = SiteCreateError.MainAddressIdentifierNotFound,
+            duplicateIdentifier = SiteCreateError.MainAddressDuplicateIdentifier,
+            identifiersTooMany = SiteCreateError.MainAddressIdentifiersTooMany
+        )
 
     private fun <E : ErrorCode> sharedErrorInfo(
         error: AddressSharedParseError,

@@ -42,18 +42,14 @@ class RequestValidationService(
     private val metadataService: MetadataService
 ) {
 
-    fun validateLegalEntitiesToCreateFromController(leCreateRequests: Collection<LegalEntityPartnerCreateRequest>): Map<RequestWithKey, Collection<ErrorInfo<LegalEntityCreateError>>> {
-
-        val leErrorsByRequest = validateLegalEntitiesToCreate(leCreateRequests.map {
+    /**
+     * Header/identifier validation only. The embedded legal address is validated by the address create service's
+     * `parse` (the single content-validation funnel), so it is no longer checked here.
+     */
+    fun validateLegalEntitiesToCreateFromController(leCreateRequests: Collection<LegalEntityPartnerCreateRequest>): Map<RequestWithKey, Collection<ErrorInfo<LegalEntityCreateError>>> =
+        validateLegalEntitiesToCreate(leCreateRequests.map {
             LegalEntityBridge(legalEntity = it.legalEntity.header, request = it, bpnL = null)
         })
-        val legalAddressBridges = leCreateRequests.map {
-            AddressBridge(address = it.legalEntity.legalAddress, request = it, bpnA = null)
-        }
-
-        val addressErrorsByRequest = validateAddresses(legalAddressBridges, leCreateMessages)
-        return mergeMapsWithCollectionInValue(leErrorsByRequest, addressErrorsByRequest)
-    }
 
     private fun validateLegalEntitiesToCreate(
         requestBridges: List<LegalEntityBridge>
@@ -440,13 +436,6 @@ class RequestValidationService(
         val identifierNotFound: ERROR,
         val duplicateIdentifier: ERROR,
         val identifiersTooMany: ERROR
-    )
-
-    val leCreateMessages = ValidatorErrorCodes(
-        regionNotFound = LegalEntityCreateError.LegalAddressRegionNotFound,
-        identifierNotFound = LegalEntityCreateError.LegalAddressIdentifierNotFound,
-        duplicateIdentifier = LegalEntityCreateError.LegalAddressDuplicateIdentifier,
-        identifiersTooMany = LegalEntityCreateError.LegalAddressIdentifiersTooMany
     )
 
     val leUpdateMessages = ValidatorErrorCodes(

@@ -19,14 +19,14 @@
 
 package org.eclipse.tractusx.bpdm.pool.model
 
-sealed interface AddressCreateParseError {
-    data class UnresolvableLegalEntity(val bpn: String) : AddressCreateParseError
-    data class UnresolvableSite(val bpn: String) : AddressCreateParseError
-}
+sealed interface AddressCreateParseError
 
 sealed interface AddressUpdateParseError {
     data class UnresolvableTarget(val bpn: String) : AddressUpdateParseError
 }
+
+data class UnresolvableLegalEntity(val bpn: String) : AddressCreateParseError
+data class UnresolvableSite(val bpn: String) : AddressCreateParseError
 
 /**
  * Errors shared by create and update. As a subtype of both operation error types, each case is a genuine subtype of both
