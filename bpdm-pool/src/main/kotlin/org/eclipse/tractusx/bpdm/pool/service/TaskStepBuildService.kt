@@ -382,7 +382,7 @@ class TaskStepBuildService(
         val upsertedBpn = if (bpnA == null) {
             createLogisticAddress(additionalAddress, legalEntityBpn, siteBpn)
         } else {
-            updateLogisticAddress(bpnA, additionalAddress)
+            updateLogisticAddress(bpnA, siteBpn, additionalAddress)
         }
 
         taskEntryBpnMapping.addMapping(bpnAReference, upsertedBpn)
@@ -416,10 +416,12 @@ class TaskStepBuildService(
 
     private fun updateLogisticAddress(
         bpnA: String,
+        siteBpn: String?,
         additionalAddress: PostalAddressWithScriptVariants
     ): String {
         val request = AddressUpdateRequest(
             addressBpn = bpnA,
+            siteBpn = siteBpn,
             content = taskAddressRequestMapper.toContentRequest(additionalAddress)
         )
 
@@ -442,6 +444,7 @@ class TaskStepBuildService(
         when (error) {
             is UnresolvableAddress -> "Address ${error.bpn} not found"
             is AddressContentParseError -> renderError(error)
+            is UnresolvableSite -> "Site parent ${error.bpn} not found"
         }
 
     private fun renderError(error: AddressContentParseError): String =
@@ -724,11 +727,6 @@ class TaskStepBuildService(
             if (foundAddress != null) {
                 if (foundAddress.legalEntity!!.bpn != legalEntityBpn) {
                     throw BpdmValidationException(CleaningError.ADDITIONAL_ADDRESS_WRONG_LEGAL_ENTITY_REFERENCE.message)
-                }
-                if (foundAddress.site != null) {
-                    if (foundAddress.site!!.bpn != siteBpn) {
-                        throw BpdmValidationException(CleaningError.ADDITIONAL_ADDRESS_WRONG_SITE_REFERENCE.message)
-                    }
                 }
             }
         }

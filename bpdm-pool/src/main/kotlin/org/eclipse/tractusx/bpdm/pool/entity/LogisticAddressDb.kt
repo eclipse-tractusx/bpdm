@@ -70,4 +70,12 @@ class LogisticAddressDb(
 
     @OneToMany(mappedBy = "endAddress", cascade = [CascadeType.ALL], orphanRemoval = true)
     val endAddressRelations: MutableSet<AddressRelationDb> = mutableSetOf()
+
+    @ManyToMany
+    @JoinTable(
+        name = "address_additional_sites",
+        joinColumns = [JoinColumn(name = "address_id", referencedColumnName = "id")],
+        inverseJoinColumns = [JoinColumn(name = "site_id", referencedColumnName = "id")]
+    )
+    val additionalSites: MutableSet<SiteDb> = mutableSetOf()
 }

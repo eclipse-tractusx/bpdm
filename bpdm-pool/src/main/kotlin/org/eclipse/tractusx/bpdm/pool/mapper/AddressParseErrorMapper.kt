@@ -85,6 +85,7 @@ class AddressParseErrorMapper {
                 duplicateIdentifier = AddressUpdateError.AddressDuplicateIdentifier,
                 identifiersTooMany = AddressUpdateError.IdentifiersTooMany
             )
+            is UnresolvableSite -> throw internalError(error)
         }
 
     /**
@@ -170,6 +171,6 @@ class AddressParseErrorMapper {
             }
         }
 
-    private fun internalError(error: AddressContentParseError) =
+    private fun internalError(error: Any) =
         BpdmValidationException("Unexpected address validation error that has no client error code: $error")
 }

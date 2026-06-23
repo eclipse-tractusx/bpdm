@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.model
 
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
+import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 
 /**
  * Result of parsing an [AddressUpdateRequest]: the loose request has been validated to a bounded [LogisticAddressParsed] and
@@ -28,6 +29,7 @@ import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
  */
 data class AddressUpdateParsed(
     val target: LogisticAddressDb,
+    val site: SiteDb?,
     val address: LogisticAddressParsed,
     val scriptVariants: List<AddressScriptVariantParsed>
 )

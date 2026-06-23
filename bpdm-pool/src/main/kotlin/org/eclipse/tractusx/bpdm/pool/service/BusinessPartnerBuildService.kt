@@ -335,7 +335,7 @@ class BusinessPartnerBuildService(
 
         val requestList = requests.toList()
         val updateRequests = requestList.map {
-            AddressUpdateRequest(addressBpn = it.bpna, content = logisticAddressDtoRequestMapper.toContentRequest(it.address, it.scriptVariants))
+            AddressUpdateRequest(addressBpn = it.bpna, siteBpn = null, content = logisticAddressDtoRequestMapper.toContentRequest(it.address, it.scriptVariants))
         }
 
         val responses = mutableListOf<AddressPartnerUpdateVerboseDto>()

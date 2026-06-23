@@ -80,6 +80,7 @@ class AddressUpdateService(
         val before = equivalenceMapper.toEquivalenceDto(target)
         // The sharing-member count is Pool-maintained, not part of the update payload, so carry the current value forward.
         applyTo(target, parsed.address, parsed.scriptVariants, target.confidenceCriteria.numberOfSharingMembers)
+        parsed.site?.run { target.additionalSites.add(parsed.site) }
         val after = equivalenceMapper.toEquivalenceDto(target)
 
         val upsertType = if (before != after) {

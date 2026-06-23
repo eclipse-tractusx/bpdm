@@ -38,15 +38,17 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class AdditionalAddressUpdateService(
     private val addressUpdateService: AddressUpdateService,
-    private val addressBpnParser: AddressBpnParser
+    private val addressBpnParser: AddressBpnParser,
+    private val siteBpnParser: SiteBpnParser
 ) {
 
     fun parse(requests: List<AddressUpdateRequest>): List<ParseResult<AddressUpdateParsed, AddressUpdateParseError>> {
         val contentResults = addressUpdateService.parseContent(requests.map { it.content }, requests.map { it.addressBpn })
         val targetResults = addressBpnParser.parse(requests.map { it.addressBpn })
+        val siteResults = siteBpnParser.parse(requests.map { it.siteBpn })
 
-        return zipParseResults(contentResults, targetResults) { content, target ->
-            AddressUpdateParsed(target, content.address, content.scriptVariants)
+        return zipParseResults(contentResults, targetResults, siteResults) { content, target, site ->
+            AddressUpdateParsed(target, site, content.address, content.scriptVariants)
         }
     }
 

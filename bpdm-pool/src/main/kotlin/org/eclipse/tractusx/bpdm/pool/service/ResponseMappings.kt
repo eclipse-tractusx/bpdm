@@ -142,6 +142,7 @@ fun LogisticAddressDb.toInvariantDto(): LogisticAddressInvariantVerboseDto {
         bpna = bpn,
         bpnLegalEntity = legalEntity?.bpn,
         bpnSite = site?.bpn,
+        additionalSites = additionalSites.map { it.bpn },
         createdAt = createdAt,
         updatedAt = updatedAt,
         name = name,

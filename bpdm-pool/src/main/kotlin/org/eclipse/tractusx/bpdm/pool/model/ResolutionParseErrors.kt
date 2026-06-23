@@ -30,5 +30,5 @@ package org.eclipse.tractusx.bpdm.pool.model
  * reintroduced there.
  */
 data class UnresolvableLegalEntity(val bpn: String) : AddressCreateParseError, SiteCreateParseError, LegalEntityUpdateParseError
-data class UnresolvableSite(val bpn: String) : AddressCreateParseError, SiteUpdateParseError
+data class UnresolvableSite(val bpn: String) : AddressCreateParseError, SiteUpdateParseError, AddressUpdateParseError
 data class UnresolvableAddress(val bpn: String) : AddressUpdateParseError
