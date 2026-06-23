@@ -22,7 +22,9 @@ package org.eclipse.tractusx.bpdm.pool.api.model
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.IBaseLogisticAddressDto
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LogisticAddressDescription
+import java.time.Instant
 
 @Schema(description = LogisticAddressDescription.header)
 data class LogisticAddressDto(
@@ -40,5 +42,8 @@ data class LogisticAddressDto(
 
     override val alternativePostalAddress: AlternativePostalAddressDto? = null,
 
-    override val confidenceCriteria: ConfidenceCriteriaDto
+    override val confidenceCriteria: ConfidenceCriteriaDto,
+
+    @get:Schema(description = CommonDescription.updatedAt)
+    val updatedAt: Instant? = null
 ) : IBaseLogisticAddressDto

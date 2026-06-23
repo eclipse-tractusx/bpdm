@@ -543,7 +543,8 @@ class TaskStepBuildService(
                 states = states.map { assertNotNull(it).let { SiteStateDto(it.validFrom.toLocalDateTime(), it.validTo.toLocalDateTime(), it.type!!) }},
                 mainAddress = toPoolDto(siteMainAddress),
                 confidenceCriteria = toPoolDto(confidenceCriteria, CleaningError.SITE_CONFIDENCE_CRITERIA_MISSING),
-                scriptVariants = scriptVariants.map { toPoolDto(it) }
+                scriptVariants = scriptVariants.map { toPoolDto(it) },
+                updatedAt = updatedAt
             )
         }
 
@@ -566,7 +567,8 @@ class TaskStepBuildService(
                 identifiers = identifiers.map { assertNotNull(it).let { AddressIdentifierDto(it.value!!, it.type!!) } },
                 physicalPostalAddress = toPoolDto(physicalAddress),
                 alternativePostalAddress = alternativeAddress?.let { toPoolDto(it) },
-                confidenceCriteria = toPoolDto(confidenceCriteria, CleaningError.ADDRESS_CONFIDENCE_CRITERIA_MISSING)
+                confidenceCriteria = toPoolDto(confidenceCriteria, CleaningError.ADDRESS_CONFIDENCE_CRITERIA_MISSING),
+                updatedAt = updatedAt
             )
         }
 
