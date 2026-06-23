@@ -30,6 +30,7 @@ import org.eclipse.tractusx.bpdm.pool.model.AddressCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.AddressContentParseError
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.combine
+import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -55,7 +56,7 @@ class AddressCreateService(
      * Validates address content only (presence/format, metadata resolution, identifier duplicates). Created addresses
      * have no identity yet, so none of their identifiers can be self-duplicates (owner BPN is null).
      */
-    fun parseContent(contents: List<AddressContentRequest>): List<ParseResult<AddressContentParsed, AddressContentParseError>> {
+    fun parse(contents: List<AddressContentRequest>): List<ParseResult<AddressContentParsed, AddressContentParseError>> {
         val contentResults = addressRequestParser.parse(contents)
         val duplicateErrors = duplicateValidator.validate(contents, ownerBpns = contents.map { null })
         return contentResults.mapIndexed { index, result -> result.combine(duplicateErrors[index]) { it } }
@@ -86,15 +87,6 @@ class AddressCreateService(
      * list aligned with the input; failures pass through unchanged (via [ParseResult]'s `out T` covariance). Generic in
      * the error type so both this service and [AdditionalAddressCreateService] (whose errors are wider) can reuse it.
      */
-    fun <E> parseAndCreate(parseResults: List<ParseResult<AddressCreateParsed, E>>): List<ParseResult<LogisticAddressDb, E>> {
-        val created = create(parseResults.filterIsInstance<ParseResult.Success<AddressCreateParsed>>().map { it.parsed })
-
-        val createdIterator = created.iterator()
-        return parseResults.map { result ->
-            when (result) {
-                is ParseResult.Success -> ParseResult.Success(createdIterator.next())
-                is ParseResult.Failure -> result
-            }
-        }
-    }
+    fun parseAndCreate(requests:  List<AddressContentRequest>): List<ParseResult<LogisticAddressDb, AddressContentParseError>> =
+        parseAndExecute(requests, ::parse, ::create)
 }

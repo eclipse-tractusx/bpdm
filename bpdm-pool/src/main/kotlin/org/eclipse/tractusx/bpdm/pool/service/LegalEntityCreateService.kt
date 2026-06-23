@@ -63,7 +63,7 @@ class LegalEntityCreateService(
         val duplicateErrors = duplicateValidator.validate(headers, headers.map { null })
         val mergedHeaderResults = headerResults.zip(duplicateErrors) { result, extra -> result.combine(extra) { it } }
 
-        val legalAddressResults = addressCreateService.parseContent(requests.map { it.content.legalAddress })
+        val legalAddressResults = addressCreateService.parse(requests.map { it.content.legalAddress })
 
         return zipParseResults(mergedHeaderResults, legalAddressResults) { header, legalAddress ->
             LegalEntityCreateParsed(LegalEntityContentParsed(header, legalAddress))

@@ -56,7 +56,7 @@ class SiteCreateService(
     fun parse(requests: List<SiteCreateRequest>): List<ParseResult<SiteCreateParsed, SiteCreateParseError>> {
         val headerResults = siteHeaderParser.parse(requests.map { it.content.header })
         val legalEntityResults = legalEntityBpnParser.parse(requests.map { it.legalEntityBpn })
-        val mainAddressResults = addressCreateService.parseContent(requests.map { it.content.mainAddress })
+        val mainAddressResults = addressCreateService.parse(requests.map { it.content.mainAddress })
 
         return zipParseResults(headerResults, legalEntityResults, mainAddressResults) { header, legalEntity, mainAddress ->
             SiteCreateParsed(legalEntity, SiteContentParsed(header, mainAddress))

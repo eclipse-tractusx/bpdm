@@ -98,6 +98,24 @@ fun <A, B, C, R, E> zipParseResults(
     return a.indices.map { index -> zipParseResults(a[index], b[index], c[index], transform) }
 }
 
+fun <REQUEST, PARSED, CREATED, ERROR> parseAndExecute(
+    requests: List<REQUEST>,
+    parse: (List<REQUEST>) -> List<ParseResult<PARSED, ERROR>>,
+    execute: (List<PARSED>) -> List<CREATED>
+): List<ParseResult<CREATED, ERROR>> {
+    val parseResults = parse(requests)
+    val executionResults = execute(parseResults.filterIsInstance<ParseResult.Success<PARSED>>().map { it.parsed })
+
+    val executionIterator = executionResults.iterator()
+    return parseResults.map { result ->
+        when (result) {
+            is ParseResult.Success -> ParseResult.Success(executionIterator.next())
+            is ParseResult.Failure -> result
+        }
+    }
+}
+
+
 private fun <E> failureErrors(vararg results: ParseResult<*, E>): List<E> =
     results.filterIsInstance<ParseResult.Failure<E>>().flatMap { it.errors }
 

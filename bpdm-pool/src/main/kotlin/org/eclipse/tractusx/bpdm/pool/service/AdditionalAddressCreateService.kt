@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.pool.model.AddressCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.AddressCreateParseError
 import org.eclipse.tractusx.bpdm.pool.model.AddressCreateRequest
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
+import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.model.zipParseResults
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -42,7 +43,7 @@ class AdditionalAddressCreateService(
 ) {
 
     fun parse(requests: List<AddressCreateRequest>): List<ParseResult<AddressCreateParsed, AddressCreateParseError>> {
-        val contentResults = addressCreateService.parseContent(requests.map { it.content })
+        val contentResults = addressCreateService.parse(requests.map { it.content })
         val legalEntityResults = legalEntityBpnParser.parse(requests.map { it.legalEntityBpn })
         val siteResults = siteBpnParser.parse(requests.map { it.siteBpn })
 
@@ -51,7 +52,10 @@ class AdditionalAddressCreateService(
         }
     }
 
+    fun create(requests: List<AddressCreateParsed>): List<LogisticAddressDb> =
+        addressCreateService.create(requests)
+
     @Transactional
     fun parseAndCreate(requests: List<AddressCreateRequest>): List<ParseResult<LogisticAddressDb, AddressCreateParseError>> =
-        addressCreateService.parseAndCreate(parse(requests))
+        parseAndExecute(requests, ::parse, ::create)
 }
