@@ -20,7 +20,6 @@
 name: Lint Charts
 
 on:
-  pull_request:
   workflow_call:
     inputs:
       helm_version:

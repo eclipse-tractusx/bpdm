@@ -17,23 +17,32 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################################
 
-name: Perform Maven Tests
+name: Perform continuous integration checks
 on:
   workflow_call:
-  workflow_dispatch:
-
+  pull_request:
+    branches:
+      - main
 jobs:
-  analyze:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd #v6.0.2
+  check-versions:
+    uses: ./.github/workflows/check-versions.yaml
 
-      - name: Set up JDK 21
-        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 #v5.2.0
-        with:
-          java-version: '21'
-          distribution: 'temurin'
+  maven-verify:
+    uses: ./.github/workflows/app-test-maven.yaml
 
-      - name: Maven Verify
-        run: mvn -B verify
+  trufflehog:
+    uses: ./.github/workflows/trufflehog.yml
+
+  containerize:
+    uses: ./.github/workflows/docker-build-and-cache-all.yaml
+
+  trivy:
+    needs: containerize
+    uses: ./.github/workflows/app-test-trivy.yaml
+
+  chart-lint:
+    uses: ./.github/workflows/chart-test-lint.yaml
+
+  chart-tests:
+    needs: containerize
+    uses: ./.github/workflows/app-test-charts.yaml
