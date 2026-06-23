@@ -405,7 +405,9 @@ object BusinessPartnerVerboseValues {
             confidenceCriteria = confidenceCriteria1,
             isParticipantData = false,
             createdAt = Instant.now(),
-            updatedAt = Instant.now()
+            updatedAt = Instant.now(),
+            ownershipUltimate = false,
+            ultimateOwnerBpnl = null
         ),
         legalAddress = addressPartnerInvariant1.copy(bpnLegalEntity = firstBpnL, addressType = AddressType.LegalAddress)
     )
@@ -421,7 +423,9 @@ object BusinessPartnerVerboseValues {
             confidenceCriteria = confidenceCriteria2,
             isParticipantData = false,
             createdAt = Instant.now(),
-            updatedAt = Instant.now()
+            updatedAt = Instant.now(),
+            ownershipUltimate = false,
+            ultimateOwnerBpnl = null
         ),
         legalAddress = addressPartnerInvariant2.copy(bpnLegalEntity = secondBpnL, addressType = AddressType.LegalAddress)
     )
@@ -437,7 +441,9 @@ object BusinessPartnerVerboseValues {
             confidenceCriteria = confidenceCriteria3,
             isParticipantData = false,
             createdAt = Instant.now(),
-            updatedAt = Instant.now()
+            updatedAt = Instant.now(),
+            ownershipUltimate = false,
+            ultimateOwnerBpnl = null
         ),
         legalAddress = addressPartnerInvariant3.copy(bpnLegalEntity = thirdBpnl, addressType = AddressType.LegalAddress)
     )
@@ -453,7 +459,9 @@ object BusinessPartnerVerboseValues {
             confidenceCriteria = confidenceCriteria3,
             createdAt = Instant.now(),
             updatedAt = Instant.now(),
-            isParticipantData = true
+            isParticipantData = true,
+            ownershipUltimate = false,
+            ultimateOwnerBpnl = null
         ),
         legalAddress = addressPartnerInvariant3.copy(
             bpnLegalEntity = legalEntity3.header.bpnl,
@@ -475,7 +483,9 @@ object BusinessPartnerVerboseValues {
             confidenceCriteria = confidenceCriteria1,
             isParticipantData = false,
             createdAt = Instant.now(),
-            updatedAt = Instant.now()
+            updatedAt = Instant.now(),
+            ownershipUltimate = false,
+            ultimateOwnerBpnl = null
         ),
         legalAddress = addressPartnerInvariant1.copy(
             bpnLegalEntity = legalEntity1.header.bpnl,
