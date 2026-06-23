@@ -21,7 +21,9 @@ package org.eclipse.tractusx.bpdm.pool.api.model
 
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.IBaseSiteDto
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.SiteDescription
+import java.time.Instant
 
 @Schema(description = SiteDescription.header)
 data class SiteDto(
@@ -33,7 +35,10 @@ data class SiteDto(
 
     override val confidenceCriteria: ConfidenceCriteriaDto,
 
-    val scriptVariants: List<SiteScriptVariantDto> = emptyList()
+    val scriptVariants: List<SiteScriptVariantDto> = emptyList(),
+
+    @get:Schema(description = CommonDescription.updatedAt)
+    val updatedAt: Instant? = null
 ) : IBaseSiteDto{
     fun toHeader(): SiteHeaderDto{
         return SiteHeaderDto(
