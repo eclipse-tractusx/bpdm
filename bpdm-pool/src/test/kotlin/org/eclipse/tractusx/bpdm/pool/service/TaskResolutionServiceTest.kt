@@ -872,26 +872,6 @@ class TaskResolutionServiceTest @Autowired constructor(
         assertThat(updateWithWrongLegalEntity[0].errors[0].description).isEqualTo(CleaningError.ADDITIONAL_ADDRESS_WRONG_LEGAL_ENTITY_REFERENCE.message)
     }
 
-    @Test
-    fun `error on additional address update with wrong site parent`() {
-        val addressCreateRequest = orchTestDataFactory.createFullBusinessPartner("ADDRESS_ON_SITE1").copyWithBpnRequests()
-        upsertGoldenRecordIntoPool(
-            taskId = "TASK_1",
-            businessPartner = addressCreateRequest
-        )
-
-        val updateWithWrongSite = upsertGoldenRecordIntoPool(
-            taskId = "TASK_2",
-            businessPartner = orchTestDataFactory.createFullBusinessPartner("ADDRESS_ON_SITE2")
-                .withLegalReferences(addressCreateRequest.legalEntity.bpnReference, addressCreateRequest.legalEntity.legalAddress.bpnReference)
-                .withAdditionalAddressReference(addressCreateRequest.additionalAddress!!.bpnReference)
-        )
-
-        assertThat(updateWithWrongSite[0].taskId).isEqualTo("TASK_2")
-        assertThat(updateWithWrongSite[0].errors).hasSize(1)
-        assertThat(updateWithWrongSite[0].errors[0].description).isEqualTo(CleaningError.ADDITIONAL_ADDRESS_WRONG_SITE_REFERENCE.message)
-    }
-
 
     fun upsertGoldenRecordIntoPool(taskId: String, businessPartner: BusinessPartner): List<TaskStepResultEntryDto> {
 

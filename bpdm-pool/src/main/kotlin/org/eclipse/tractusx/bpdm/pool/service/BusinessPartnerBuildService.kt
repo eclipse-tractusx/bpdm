@@ -120,11 +120,11 @@ class BusinessPartnerBuildService(
                         siteRequest.bpnLParent
                     )
                 ))
-            } else if (legalEntitiesByBpn[siteRequest.bpnLParent]!!.legalAddress.site != null) {
+            } else if (legalEntitiesByBpn[siteRequest.bpnLParent]!!.legalAddress.sites.isNotEmpty()) {
                 return SitePartnerCreateResponseWrapper(emptyList(), listOf(
                     ErrorInfo(
                         SiteCreateError.MainAddressDuplicateIdentifier,
-                        "Can't create site for legal entity ${siteRequest.bpnLParent} with legal address as site main address: Legal address already belongs to site ${legalEntitiesByBpn[siteRequest.bpnLParent]!!.legalAddress.site!!.bpn}",
+                        "Can't create site for legal entity ${siteRequest.bpnLParent} with legal address as site main address: Legal address already belongs to site ${legalEntitiesByBpn[siteRequest.bpnLParent]!!.legalAddress.sites.first().bpn}",
                         siteRequest.name
                     )
                 ))
@@ -132,7 +132,7 @@ class BusinessPartnerBuildService(
 
             createSiteHeader(siteRequest.toHeader(), bpnS, legalEntitiesByBpn[siteRequest.bpnLParent]!!, siteHeaderMetadataMapping)
                 .apply { mainAddress = legalEntitiesByBpn[siteRequest.bpnLParent]!!.legalAddress }
-                .apply { mainAddress.site = this }
+                .apply { mainAddress.sites.add(this) }
         }
 
         siteRepository.saveAll(createdSites)
@@ -374,7 +374,7 @@ class BusinessPartnerBuildService(
     ) = updateLogisticAddressInternal(address, dto, bpn, metadataMap)
         .apply {
             this.legalEntity = legalEntity
-            this.site = site
+            site?.let { sites.add(it) }
         }
 
     private fun updateLogisticAddressInternal(
@@ -385,7 +385,7 @@ class BusinessPartnerBuildService(
     ): LogisticAddressDb {
         address.bpn = bpn
         address.legalEntity = null
-        address.site = null
+        address.sites.clear()
         address.physicalPostalAddress = createPhysicalAddress(dto.address.physicalPostalAddress, metadataMap.regions)
         address.alternativePostalAddress = dto.address.alternativePostalAddress?.let { createAlternativeAddress(it, metadataMap.regions) }
         address.name = dto.address.name

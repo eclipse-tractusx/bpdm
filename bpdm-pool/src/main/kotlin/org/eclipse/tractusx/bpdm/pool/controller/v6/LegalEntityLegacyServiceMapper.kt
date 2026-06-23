@@ -143,7 +143,7 @@ class LegalEntityLegacyServiceMapper(
         return LogisticAddressVerboseDto(
             bpna = bpn,
             bpnLegalEntity = legalEntity?.bpn,
-            bpnSite = site?.bpn,
+            bpnSite = mainSite?.bpn,
             createdAt = createdAt,
             updatedAt = updatedAt,
             name = name,
@@ -152,7 +152,7 @@ class LegalEntityLegacyServiceMapper(
             physicalPostalAddress = physicalPostalAddress.toDto(),
             alternativePostalAddress = alternativePostalAddress?.toDto(),
             confidenceCriteria = confidenceCriteria.toDto(),
-            isCatenaXMemberData = legalEntity?.isCatenaXMemberData ?: site?.legalEntity?.isCatenaXMemberData ?: false,
+            isCatenaXMemberData = legalEntity?.isCatenaXMemberData ?: mainSite?.legalEntity?.isCatenaXMemberData ?: false,
             addressType = getAddressType(this)
         )
     }
@@ -234,7 +234,7 @@ class LegalEntityLegacyServiceMapper(
         logger.debug { "Executing findByPartnerBpn() with parameters $bpnl // $pageIndex // $pageSize" }
         val legalEntity = legalEntityRepository.findByBpnIgnoreCase(bpnl) ?:  throw BpdmNotFoundException("Business Partner", bpnl)
 
-        val page = logisticAddressRepository.findByLegalEntityAndSiteIsNull(legalEntity, PageRequest.of(pageIndex, pageSize))
+        val page = logisticAddressRepository.findByLegalEntityAndSitesIsEmpty(legalEntity, PageRequest.of(pageIndex, pageSize))
         addressService.fetchLogisticAddressDependencies(page.map { it }.toSet())
         return page.toDto(page.content.map { it.toDto() })
     }
@@ -586,7 +586,7 @@ class LegalEntityLegacyServiceMapper(
     ) = createLogisticAddressInternal(dto, bpn, metadataMap)
         .apply {
             this.legalEntity = legalEntity
-            this.site = site
+            site?.let { sites.add(it) }
         }
 
     private fun createLogisticAddressInternal(
@@ -597,7 +597,6 @@ class LegalEntityLegacyServiceMapper(
         val address = LogisticAddressDb(
             bpn = bpn,
             legalEntity = null,
-            site = null,
             physicalPostalAddress = createPhysicalAddress(dto.physicalPostalAddress, metadataMap.regions),
             alternativePostalAddress = dto.alternativePostalAddress?.let { createAlternativeAddress(it, metadataMap.regions) },
             name = dto.name,

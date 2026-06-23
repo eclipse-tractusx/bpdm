@@ -88,7 +88,7 @@ class AddressLegacyServiceMapper(
         return LogisticAddressVerboseDto(
             bpna = bpn,
             bpnLegalEntity = legalEntity?.bpn,
-            bpnSite = site?.bpn,
+            bpnSite = mainSite?.bpn,
             createdAt = createdAt,
             updatedAt = updatedAt,
             name = name,
@@ -97,7 +97,7 @@ class AddressLegacyServiceMapper(
             physicalPostalAddress = physicalPostalAddress.toDto(),
             alternativePostalAddress = alternativePostalAddress?.toDto(),
             confidenceCriteria = confidenceCriteria.toDto(),
-            isCatenaXMemberData = legalEntity?.isCatenaXMemberData ?: site?.legalEntity?.isCatenaXMemberData ?: false,
+            isCatenaXMemberData = legalEntity?.isCatenaXMemberData ?: mainSite?.legalEntity?.isCatenaXMemberData ?: false,
             addressType = getAddressType(this)
         )
     }
@@ -347,7 +347,7 @@ class AddressLegacyServiceMapper(
     ) = createLogisticAddressInternal(dto, bpn, metadataMap)
         .apply {
             this.legalEntity = legalEntity
-            this.site = site
+            site?.let { sites.add(it) }
         }
 
     private fun createLogisticAddressInternal(
@@ -358,7 +358,6 @@ class AddressLegacyServiceMapper(
         val address = LogisticAddressDb(
             bpn = bpn,
             legalEntity = null,
-            site = null,
             physicalPostalAddress = createPhysicalAddress(dto.physicalPostalAddress, metadataMap.regions),
             alternativePostalAddress = dto.alternativePostalAddress?.let { createAlternativeAddress(it, metadataMap.regions) },
             name = dto.name,

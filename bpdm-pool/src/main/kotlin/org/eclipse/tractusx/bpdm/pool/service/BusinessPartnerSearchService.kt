@@ -282,12 +282,12 @@ class BusinessPartnerSearchService(
         }
 
         val legalAddressId = result.legalEntity?.legalAddress?.id
-        val siteMainAddressId = result.site?.mainAddress?.id
+        val isSiteMainAddress = result.sites.any { it.mainAddress == result }
 
         val addressType = when {
-            result.id == legalAddressId && result.id == siteMainAddressId -> AddressType.LegalAndSiteMainAddress
+            result.id == legalAddressId && isSiteMainAddress -> AddressType.LegalAndSiteMainAddress
             result.id == legalAddressId -> AddressType.LegalAddress
-            result.id == siteMainAddressId -> AddressType.SiteMainAddress
+            isSiteMainAddress -> AddressType.SiteMainAddress
             else -> AddressType.AdditionalAddress
         }
 
@@ -341,7 +341,7 @@ class BusinessPartnerSearchService(
             }
         )
 
-        val siteDto = result.site?.let { site ->
+        val siteDto = result.mainSite?.let { site ->
             BusinessPartnerSite(
                 siteBpn = site.bpn,
                 name = site.name,

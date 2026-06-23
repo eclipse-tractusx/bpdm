@@ -104,7 +104,7 @@ class SiteLegacyServiceMapper(
         return LogisticAddressVerboseDto(
             bpna = bpn,
             bpnLegalEntity = legalEntity?.bpn,
-            bpnSite = site?.bpn,
+            bpnSite = mainSite?.bpn,
             createdAt = createdAt,
             updatedAt = updatedAt,
             name = name,
@@ -113,7 +113,7 @@ class SiteLegacyServiceMapper(
             physicalPostalAddress = physicalPostalAddress.toDto(),
             alternativePostalAddress = alternativePostalAddress?.toDto(),
             confidenceCriteria = confidenceCriteria.toDto(),
-            isCatenaXMemberData = legalEntity?.isCatenaXMemberData ?: site?.legalEntity?.isCatenaXMemberData ?: false,
+            isCatenaXMemberData = legalEntity?.isCatenaXMemberData ?: mainSite?.legalEntity?.isCatenaXMemberData ?: false,
             addressType = getAddressType(this)
         )
     }
@@ -370,7 +370,7 @@ class SiteLegacyServiceMapper(
     ) = createLogisticAddressInternal(dto, bpn, metadataMap)
         .apply {
             this.legalEntity = legalEntity
-            this.site = site
+            site?.let { sites.add(it) }
         }
 
     private fun createLogisticAddressInternal(
@@ -381,7 +381,6 @@ class SiteLegacyServiceMapper(
         val address = LogisticAddressDb(
             bpn = bpn,
             legalEntity = null,
-            site = null,
             physicalPostalAddress = createPhysicalAddress(dto.physicalPostalAddress, metadataMap.regions),
             alternativePostalAddress = dto.alternativePostalAddress?.let { createAlternativeAddress(it, metadataMap.regions) },
             name = dto.name,
@@ -548,11 +547,11 @@ class SiteLegacyServiceMapper(
                         siteRequest.bpnLParent
                     )
                 ))
-            } else if (legalEntitiesByBpn[siteRequest.bpnLParent]!!.legalAddress.site != null) {
+            } else if (legalEntitiesByBpn[siteRequest.bpnLParent]!!.legalAddress.sites.isNotEmpty()) {
                 return SitePartnerCreateResponseWrapper(emptyList(), listOf(
                     ErrorInfo(
                         SiteCreateError.MainAddressDuplicateIdentifier,
-                        "Can't create site for legal entity ${siteRequest.bpnLParent} with legal address as site main address: Legal address already belongs to site ${legalEntitiesByBpn[siteRequest.bpnLParent]!!.legalAddress.site!!.bpn}",
+                        "Can't create site for legal entity ${siteRequest.bpnLParent} with legal address as site main address: Legal address already belongs to site ${legalEntitiesByBpn[siteRequest.bpnLParent]!!.legalAddress.sites.first().bpn}",
                         siteRequest.name
                     )
                 ))
@@ -560,7 +559,7 @@ class SiteLegacyServiceMapper(
 
             createSite(siteRequest, bpnS, legalEntitiesByBpn[siteRequest.bpnLParent]!!)
                 .apply { mainAddress = legalEntitiesByBpn[siteRequest.bpnLParent]!!.legalAddress }
-                .apply { mainAddress.site = this }
+                .apply { mainAddress.sites.add(this) }
         }
 
         siteRepository.saveAll(createdSites)

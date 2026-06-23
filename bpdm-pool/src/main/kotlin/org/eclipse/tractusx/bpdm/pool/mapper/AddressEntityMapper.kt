@@ -41,13 +41,13 @@ class AddressEntityMapper {
         val entity = LogisticAddressDb(
             bpn = bpn,
             legalEntity = parsed.legalEntity,
-            site = parsed.site,
             name = parsed.address.name,
             physicalPostalAddress = toPhysical(parsed.address.physicalPostalAddress),
             alternativePostalAddress = parsed.address.alternativePostalAddress?.let { toAlternative(it) },
             confidenceCriteria = toConfidence(parsed.address.confidenceCriteria, numberOfSharingMembers),
             scriptVariants = toScriptVariants(parsed.scriptVariants).toMutableList()
         )
+        parsed.site?.let { entity.sites.add(it) }
         entity.identifiers.addAll(toIdentifiers(parsed.address.identifiers, entity))
         entity.states.addAll(toStates(parsed.address.states, entity))
         return entity
