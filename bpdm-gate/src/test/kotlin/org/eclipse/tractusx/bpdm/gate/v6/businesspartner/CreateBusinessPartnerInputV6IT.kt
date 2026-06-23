@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.v6.businesspartner
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
-import org.eclipse.tractusx.bpdm.gate.v6.GateUnscheduledInitialStartV6Test
+import org.eclipse.tractusx.bpdm.gate.v6.UnscheduledGateV6TestBase
 import org.junit.jupiter.api.Test
 import java.time.Instant
 
@@ -62,7 +62,7 @@ import java.time.Instant
  *
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
-class CreateBusinessPartnerInputV6IT: GateUnscheduledInitialStartV6Test() {
+class CreateBusinessPartnerInputV6IT: UnscheduledGateV6TestBase() {
 
     /**
      * WHEN input manager creates a new empty record

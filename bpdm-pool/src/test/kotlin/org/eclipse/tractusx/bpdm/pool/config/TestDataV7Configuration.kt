@@ -31,19 +31,13 @@ import org.eclipse.tractusx.bpdm.pool.v7.util.AdminAreaLevel1V7Importer
 import org.eclipse.tractusx.bpdm.pool.v7.util.IdentifierTypeV7Importer
 import org.eclipse.tractusx.bpdm.pool.v7.util.LegalFormV7Importer
 import org.eclipse.tractusx.bpdm.pool.v7.util.TestDataClientV7
-import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.BusinessPartnerTestDataFactory
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorMockDataFactory
-import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorRequestFactoryCommon
-import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorRequestFactoryV7
-import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.RefinementTestDataFactory
-import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.TestMetadataReferences
 import org.eclipse.tractusx.bpdm.test.testdata.pool.PoolDataHelper
 import org.eclipse.tractusx.bpdm.test.testdata.pool.TestMetadataV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.PoolRequestFactoryV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.PoolResponseFactoryV7
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import tools.jackson.databind.json.JsonMapper
 
 @Configuration
 class TestDataV7Configuration {
@@ -55,9 +49,7 @@ class TestDataV7Configuration {
     @Bean
     fun poolDataHelper(poolClient: PoolApiClient): PoolDataHelper {
         return PoolDataHelper(poolClient, listOf(
-            ReasonCodeDto("REASON1", "REASON1 description"),
-            ReasonCodeDto("REASON2", "REASON2 description"),
-            ReasonCodeDto("REASON3", "REASON3 description"),
+            ReasonCodeDto("HEADQUARTER_RELOCATION", "Complete relocation of a legal entity headquarter to a new physical location"),
         ))
     }
 
@@ -80,9 +72,7 @@ class TestDataV7Configuration {
             ScriptCodeDto("KANJI", "Japanese Characters (Hiragana, Katakana and Kanji)")
         )
         val reasonCodes = listOf(
-            ReasonCodeDto("REASON1", "REASON1 description"),
-            ReasonCodeDto("REASON2", "REASON2 description"),
-            ReasonCodeDto("REASON3", "REASON3 description"),
+            ReasonCodeDto("HEADQUARTER_RELOCATION", "Complete relocation of a legal entity headquarter to a new physical location"),
         )
 
         return TestMetadataV7(
@@ -103,42 +93,6 @@ class TestDataV7Configuration {
     @Bean
     fun responseFactoryV7(testMetadata: TestMetadataV7): PoolResponseFactoryV7{
         return PoolResponseFactoryV7(testMetadata)
-    }
-
-    @Bean
-    fun refinementTestDataFactory(): RefinementTestDataFactory{
-        return RefinementTestDataFactory()
-    }
-
-    @Bean
-    fun orchestratorMockDataFactory(refinementTestDataFactory: RefinementTestDataFactory, jsonMapper: JsonMapper): OrchestratorMockDataFactory{
-        return OrchestratorMockDataFactory(refinementTestDataFactory, jsonMapper)
-    }
-
-    @Bean
-    fun orchestratorRequestFactoryCommon(testMetadataV7: TestMetadataV7): OrchestratorRequestFactoryCommon{
-        val orchestratorMetadata = TestMetadataReferences(
-            legalForms = testMetadataV7.legalForms.map { it.technicalKey },
-            legalEntityIdentifierTypes = testMetadataV7.legalEntityIdentifierTypes.map { it.technicalKey },
-            addressIdentifierTypes = testMetadataV7.addressIdentifierTypes.map { it.technicalKey },
-            adminAreas = testMetadataV7.adminAreas.map { it.code },
-            scriptCodes = testMetadataV7.scriptCodes.map { it.technicalKey },
-            reasonCodes = testMetadataV7.reasonCodes.map { it.technicalKey },
-        )
-        return OrchestratorRequestFactoryCommon(orchestratorMetadata)
-    }
-
-    @Bean
-    fun businessPartnerTestDataFactory(orchestratorRequestFactoryCommon: OrchestratorRequestFactoryCommon): BusinessPartnerTestDataFactory {
-        return BusinessPartnerTestDataFactory(orchestratorRequestFactoryCommon)
-    }
-
-    @Bean
-    fun orchestratorRequestFactory(
-        businessPartnerTestDataFactory: BusinessPartnerTestDataFactory,
-        orchestratorRequestFactoryCommon: OrchestratorRequestFactoryCommon
-    ): OrchestratorRequestFactoryV7 {
-        return OrchestratorRequestFactoryV7(businessPartnerTestDataFactory, orchestratorRequestFactoryCommon)
     }
 
     @Bean

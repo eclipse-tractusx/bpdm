@@ -118,8 +118,8 @@ class RelationsGoldenRecordTaskDb(
             indexes = [Index(name = "idx_relation_task_validity_periods_relation_id", columnList = "relation_id")]
         )
         var validityPeriods: MutableList<RelationValidityPeriod> = mutableListOf(),
-        @Column(name = "reason_code", nullable = false)
-        var reasonCode: String
+        @Column(name = "reason_code")
+        var reasonCode: String?
     )
 
 
