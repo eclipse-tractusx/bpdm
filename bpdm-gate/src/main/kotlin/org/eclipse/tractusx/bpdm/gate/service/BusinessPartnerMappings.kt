@@ -167,6 +167,8 @@ class BusinessPartnerMappings {
                 entity.sharingState.externalId,
                 "Missing address confidence criteria"
             ),
+            ownershipUltimate = entity.ownershipUltimate,
+            ultimateOwnerBpnl = entity.ultimateOwnerBpnl,
             states = toStateDtos(entity.states, BusinessPartnerType.LEGAL_ENTITY),
             goldenRecordRelations = entity.legalEntityGoldenRecordRelations.map { LegalEntityGoldenRecordRelationDto(toLeRelationType(it.relationType), it.sourceBpn, it.targetBpn) }
         )

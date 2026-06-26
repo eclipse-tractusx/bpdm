@@ -249,7 +249,9 @@ class OrchestratorMappings(
                 isOwnCompanyData = if (tenantBpnl != null && owningCompany != null) tenantBpnl == owningCompany else false,
                 scriptVariants = toScriptVariants(addressType, dto),
                 legalEntityGoldenRecordRelations = legalEntity.goldenRecordRelations,
-                addressGoldenRecordRelations = toAddressGoldenRecordRelations(addressType, dto)
+                addressGoldenRecordRelations = toAddressGoldenRecordRelations(addressType, dto),
+                ownershipUltimate = legalEntity.ownershipUltimate,
+                ultimateOwnerBpnl = legalEntity.ultimateOwnerBpnl
             )
         }
     }

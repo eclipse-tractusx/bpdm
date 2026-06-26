@@ -244,6 +244,8 @@ class GoldenRecordUpdateChunkService(
             scriptVariants = scriptVariants.map { businessPartnerMappings.toScriptVariantDto(it) },
             legalEntityGoldenRecordRelations = legalEntityGoldenRecordRelations.map { it.toUpsertData() },
             addressGoldenRecordRelations = addressGoldenRecordRelations.map { it.toUpsertData() },
+            ownershipUltimate = ownershipUltimate,
+            ultimateOwnerBpnl = ultimateOwnerBpnl
         )
     }
 
