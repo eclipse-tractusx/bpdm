@@ -24,8 +24,11 @@ import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateVerboseDto
 import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
+import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.eclipse.tractusx.bpdm.pool.service.TaskStepBuildService.CleaningError
 import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockConfiguration
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
@@ -60,7 +63,10 @@ class TaskResolutionServiceTest @Autowired constructor(
     val legalEntityRepository: LegalEntityRepository,
     val poolClient: PoolApiClient,
     val dbTestHelpers: DbTestHelpers,
-    val poolDataHelper: PoolDataHelper
+    val poolDataHelper: PoolDataHelper,
+    val ultimateOwnerResolutionService: UltimateOwnerResolutionService,
+    val ownedByRelationUpsertService: OwnedByRelationUpsertService,
+    val relationRepository: RelationRepository
 ) {
 
     private lateinit var orchTestDataFactory: BusinessPartnerTestDataFactory
@@ -1323,6 +1329,170 @@ class TaskResolutionServiceTest @Autowired constructor(
         assertThat(updatedEntity!!.legalName.value).isEqualTo("Updated Legal Name")
         assertThat(updatedEntity.ownershipUltimate).isFalse() // Should remain false
         assertThat(updatedEntity.ultimateOwnerBpnl).isNull() // Should remain null
+    }
+
+    @Test
+    fun `ultimate owner resolution - resolve with flag set at top`() {
+        // Create three legal entities
+        val subsidiary = createLegalEntity("BPNL_S")
+        val intermediate = createLegalEntity("BPNL_I")
+        val groupParent = createLegalEntity("BPNL_P")
+
+        // Set ownershipUltimate flag on group parent
+        val groupParentEntity = legalEntityRepository.findByBpnIgnoreCase(groupParent.legalEntity.header.bpnl)!!
+        groupParentEntity.ownershipUltimate = true
+        legalEntityRepository.save(groupParentEntity)
+
+        // Create chain: subsidiary -> intermediate -> groupParent (flagged)
+        createIsOwnedByRelation(subsidiary.legalEntity.header.bpnl, intermediate.legalEntity.header.bpnl)
+        createIsOwnedByRelation(intermediate.legalEntity.header.bpnl, groupParent.legalEntity.header.bpnl)
+
+        // Resolve ultimate owner for subsidiary
+        val subsidiaryEntity = legalEntityRepository.findByBpnIgnoreCase(subsidiary.legalEntity.header.bpnl)!!
+        val ultimateOwner = ultimateOwnerResolutionService.resolveUltimateOwner(subsidiaryEntity)
+
+        assertThat(ultimateOwner).isEqualTo(groupParent.legalEntity.header.bpnl)
+    }
+
+    @Test
+    fun `ultimate owner resolution - no ultimate owner when flag not set at top`() {
+        // Create three legal entities
+        val subsidiary = createLegalEntity("BPNL_S")
+        val intermediate = createLegalEntity("BPNL_I")
+        val groupParent = createLegalEntity("BPNL_P")
+
+        // Create chain but top is not flagged
+        createIsOwnedByRelation(subsidiary.legalEntity.header.bpnl, intermediate.legalEntity.header.bpnl)
+        createIsOwnedByRelation(intermediate.legalEntity.header.bpnl, groupParent.legalEntity.header.bpnl)
+
+        // Resolve ultimate owner for subsidiary
+        val subsidiaryEntity = legalEntityRepository.findByBpnIgnoreCase(subsidiary.legalEntity.header.bpnl)!!
+        val ultimateOwner = ultimateOwnerResolutionService.resolveUltimateOwner(subsidiaryEntity)
+
+        assertThat(ultimateOwner).isNull()
+    }
+
+    @Test
+    fun `ultimate owner resolution - no ultimate owner when no relations present`() {
+        // Create a legal entity with no relations
+        val subsidiary = createLegalEntity("BPNL_S")
+
+        // Resolve ultimate owner
+        val subsidiaryEntity = legalEntityRepository.findByBpnIgnoreCase(subsidiary.legalEntity.header.bpnl)!!
+        val ultimateOwner = ultimateOwnerResolutionService.resolveUltimateOwner(subsidiaryEntity)
+
+        assertThat(ultimateOwner).isNull()
+    }
+
+    @Test
+    fun `ultimate owner consistency - recompute when relation is added`() {
+        val subsidiary = createLegalEntity("BPNL_S")
+        val intermediate = createLegalEntity("BPNL_I")
+        val groupParent = createLegalEntity("BPNL_P")
+
+        val groupParentEntity = legalEntityRepository.findByBpnIgnoreCase(groupParent.legalEntity.header.bpnl)!!
+        groupParentEntity.ownershipUltimate = true
+        legalEntityRepository.save(groupParentEntity)
+
+        createIsOwnedByRelationViaService(subsidiary.legalEntity.header.bpnl, intermediate.legalEntity.header.bpnl)
+        createIsOwnedByRelationViaService(intermediate.legalEntity.header.bpnl, groupParent.legalEntity.header.bpnl)
+
+        val updatedSubsidiary = legalEntityRepository.findByBpnIgnoreCase(subsidiary.legalEntity.header.bpnl)
+        val updatedIntermediate = legalEntityRepository.findByBpnIgnoreCase(intermediate.legalEntity.header.bpnl)
+
+        assertThat(updatedSubsidiary).isNotNull()
+        assertThat(updatedSubsidiary!!.ultimateOwnerBpnl).isEqualTo(groupParent.legalEntity.header.bpnl)
+        assertThat(updatedIntermediate).isNotNull()
+        assertThat(updatedIntermediate!!.ultimateOwnerBpnl).isEqualTo(groupParent.legalEntity.header.bpnl)
+    }
+
+    @Test
+    fun `ultimate owner consistency - multi-level chain reports same ultimate`() {
+        val subsidiary = createLegalEntity("BPNL_S")
+        val intermediate = createLegalEntity("BPNL_I")
+        val groupParent = createLegalEntity("BPNL_P")
+
+        val groupParentEntity = legalEntityRepository.findByBpnIgnoreCase(groupParent.legalEntity.header.bpnl)!!
+        groupParentEntity.ownershipUltimate = true
+        legalEntityRepository.save(groupParentEntity)
+
+        createIsOwnedByRelationViaService(subsidiary.legalEntity.header.bpnl, intermediate.legalEntity.header.bpnl)
+        createIsOwnedByRelationViaService(intermediate.legalEntity.header.bpnl, groupParent.legalEntity.header.bpnl)
+
+        val updatedSubsidiary = legalEntityRepository.findByBpnIgnoreCase(subsidiary.legalEntity.header.bpnl)
+        val updatedIntermediate = legalEntityRepository.findByBpnIgnoreCase(intermediate.legalEntity.header.bpnl)
+
+        assertThat(updatedSubsidiary).isNotNull()
+        assertThat(updatedIntermediate).isNotNull()
+        assertThat(updatedSubsidiary!!.ultimateOwnerBpnl).isEqualTo(groupParent.legalEntity.header.bpnl)
+        assertThat(updatedIntermediate!!.ultimateOwnerBpnl).isEqualTo(groupParent.legalEntity.header.bpnl)
+    }
+
+    @Test
+    fun `ultimate owner consistency - no ultimate owner when top not flagged`() {
+        val subsidiary = createLegalEntity("BPNL_S")
+        val intermediate = createLegalEntity("BPNL_I")
+        val groupParent = createLegalEntity("BPNL_P")
+
+        createIsOwnedByRelationViaService(subsidiary.legalEntity.header.bpnl, intermediate.legalEntity.header.bpnl)
+        createIsOwnedByRelationViaService(intermediate.legalEntity.header.bpnl, groupParent.legalEntity.header.bpnl)
+
+        val updatedSubsidiary = legalEntityRepository.findByBpnIgnoreCase(subsidiary.legalEntity.header.bpnl)
+        val updatedIntermediate = legalEntityRepository.findByBpnIgnoreCase(intermediate.legalEntity.header.bpnl)
+
+        assertThat(updatedSubsidiary).isNotNull()
+        assertThat(updatedSubsidiary!!.ultimateOwnerBpnl).isNull()
+        assertThat(updatedIntermediate).isNotNull()
+        assertThat(updatedIntermediate!!.ultimateOwnerBpnl).isNull()
+    }
+
+    @Test
+    fun `ultimate owner cycle protection during resolution`() {
+        val subsidiary = createLegalEntity("BPNL_S")
+        val intermediate = createLegalEntity("BPNL_I")
+        val groupParent = createLegalEntity("BPNL_P")
+        val groupParentEntity = legalEntityRepository.findByBpnIgnoreCase(groupParent.legalEntity.header.bpnl)!!
+        groupParentEntity.ownershipUltimate = true
+        legalEntityRepository.save(groupParentEntity)
+        createIsOwnedByRelation(subsidiary.legalEntity.header.bpnl, intermediate.legalEntity.header.bpnl)
+        createIsOwnedByRelation(intermediate.legalEntity.header.bpnl, groupParent.legalEntity.header.bpnl)
+        createIsOwnedByRelation(groupParent.legalEntity.header.bpnl, subsidiary.legalEntity.header.bpnl)
+        val subsidiaryEntity = legalEntityRepository.findByBpnIgnoreCase(subsidiary.legalEntity.header.bpnl)!!
+        val ultimateOwner = ultimateOwnerResolutionService.resolveUltimateOwner(subsidiaryEntity)
+        assertThat(ultimateOwner).isNull()
+    }
+
+    private fun createLegalEntity(seed: String): LegalEntityPartnerCreateVerboseDto {
+        val request = testDataEnvironment.requestFactory.createLegalEntityRequest(seed, true)
+        return poolClient.legalEntities.createBusinessPartners(listOf(request)).entities.single()
+    }
+
+    private fun createIsOwnedByRelation(sourceBpn: String, targetBpn: String) {
+        val sourceEntity = legalEntityRepository.findByBpnIgnoreCase(sourceBpn)!!
+        val targetEntity = legalEntityRepository.findByBpnIgnoreCase(targetBpn)!!
+
+        val relation = org.eclipse.tractusx.bpdm.pool.entity.RelationDb(
+            type = LegalEntityRelationType.IsOwnedBy,
+            startNode = sourceEntity,
+            endNode = targetEntity,
+            validityPeriods = mutableListOf(),
+            reasonCode = null
+        )
+        relationRepository.save(relation)
+    }
+
+    private fun createIsOwnedByRelationViaService(sourceBpn: String, targetBpn: String) {
+        val sourceEntity = legalEntityRepository.findByBpnIgnoreCase(sourceBpn)!!
+        val targetEntity = legalEntityRepository.findByBpnIgnoreCase(targetBpn)!!
+
+        val upsertRequest = IRelationUpsertStrategyService.UpsertRequest(
+            source = sourceEntity,
+            target = targetEntity,
+            validityPeriods = emptyList(),
+            existingRelation = null,
+            reasonCode = null
+        )
+        ownedByRelationUpsertService.upsertRelation(upsertRequest)
     }
 
     private fun createIdentifiers(idTypeKey: String, amount: Int): List<Identifier>{

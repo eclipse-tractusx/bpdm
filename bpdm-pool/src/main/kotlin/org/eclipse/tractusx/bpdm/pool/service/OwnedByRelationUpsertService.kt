@@ -30,7 +30,8 @@ import org.springframework.stereotype.Service
 @Service
 class OwnedByRelationUpsertService(
     private val relationUpsertService: RelationUpsertService,
-    private val relationRepository: RelationRepository
+    private val relationRepository: RelationRepository,
+    private val ultimateOwnerResolutionService: UltimateOwnerResolutionService
 ): IRelationUpsertStrategyService {
 
 
@@ -52,6 +53,8 @@ class OwnedByRelationUpsertService(
                 reasonCode = upsertRequest.reasonCode,
             )
         )
+
+        ultimateOwnerResolutionService.updateUltimateOwnerForEntityAndDescendants(proposedSource)
 
         return result
     }
