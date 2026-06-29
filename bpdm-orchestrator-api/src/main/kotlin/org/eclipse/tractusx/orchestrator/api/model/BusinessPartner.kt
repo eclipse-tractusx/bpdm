@@ -368,11 +368,7 @@ data class LegalEntity(
             "The Pool will not update the legal entity if it is set to false. " +
             "However, if this legal entity constitutes a new legal entity golden record, it is still created independent of this flag.")
     val hasChanged: Boolean?,
-    @Schema(description = "Whether this legal entity is the ultimate owner in the ownership chain. " +
-            "This optional flag is provided by the golden record process and persisted in the Pool.")
     val ownershipUltimate: Boolean? = null,
-    @Schema(description = "The BPNL of the ultimate owner in the ownership chain. " +
-            "This value is persisted by the Pool and remains empty in this feature.")
     val ultimateOwnerBpnl: String? = null,
     val legalAddress: PostalAddress,
     val scriptVariants: List<LegalEntityScriptVariant>,

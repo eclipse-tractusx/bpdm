@@ -32,4 +32,12 @@ object CommonDescription {
 
     const val roles = "Roles this business partner takes in relation to the sharing member."
 
+    const val ownershipUltimate = "Whether this legal entity is the ultimate owner in the ownership chain. \" +\n" +
+            "            \"This flag is provided by the golden record process and persisted in the Pool. \" +\n" +
+            "            \"The ultimate owner resolution logic is not implemented in this feature."
+
+    const  val  ultimateOwnerBpnl =   "The BPNL of the ultimate owner in the ownership chain. " +
+            "This field is persisted in the Pool but not resolved in this feature. " +
+            "It will be populated by future features that implement ultimate owner resolution."
+
 }
