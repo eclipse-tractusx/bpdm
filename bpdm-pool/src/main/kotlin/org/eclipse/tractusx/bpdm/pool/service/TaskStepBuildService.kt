@@ -266,7 +266,7 @@ class TaskStepBuildService(
             site = poolSite,
             index = ""
         )
-        val result = businessPartnerBuildService.createSiteMainAddressFromAdditionalAddress(listOf(createRequest), additionalAddress)
+        val result = businessPartnerBuildService.createSiteMainAddressFromAdditionalAddress(listOf(createRequest), additionalAddress.bpn)
             .entities.firstOrNull() ?: throw BpdmValidationException("Unknown error when trying to creating site")
         val siteResult = taskResolutionMapper.toTaskResult(result.site, result.mainAddress, true)
 

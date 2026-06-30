@@ -31,7 +31,7 @@ package org.eclipse.tractusx.bpdm.pool.model
  */
 data class UnresolvableLegalEntity(val bpn: String) : AddressCreateParseError, SiteCreateParseError, LegalEntityUpdateParseError
 data class UnresolvableSite(val bpn: String) : AddressCreateParseError, SiteUpdateParseError, AddressUpdateParseError
-data class UnresolvableAddress(val bpn: String) : AddressUpdateParseError
+data class UnresolvableAddress(val bpn: String) : AddressUpdateParseError, SiteCreateParseError
 
 /**
  * A single, untyped parent BPN is neither a BPNL nor a BPNS, so its parent role can't even be determined (distinct from

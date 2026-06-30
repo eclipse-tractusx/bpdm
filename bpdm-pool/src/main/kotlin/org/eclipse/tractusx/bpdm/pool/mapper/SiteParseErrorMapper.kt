@@ -28,6 +28,7 @@ import org.eclipse.tractusx.bpdm.pool.model.LegalAddressAlreadyMainAddress
 import org.eclipse.tractusx.bpdm.pool.model.SiteContentParseError
 import org.eclipse.tractusx.bpdm.pool.model.SiteCreateParseError
 import org.eclipse.tractusx.bpdm.pool.model.SiteUpdateParseError
+import org.eclipse.tractusx.bpdm.pool.model.UnresolvableAddress
 import org.eclipse.tractusx.bpdm.pool.model.UnresolvableLegalEntity
 import org.eclipse.tractusx.bpdm.pool.model.UnresolvableSite
 import org.springframework.stereotype.Component
@@ -38,9 +39,10 @@ import org.springframework.stereotype.Component
  * to the `MainAddress*` codes) cover all reachable cases.
  *
  * [SiteContentParseError] (site header) has no public `Site*Error` code: name/confidence are guaranteed present by the
- * bounded REST DTO (so those are unreachable), and an unknown header script code previously NPE'd to a 500. Either way it
- * is treated as an internal error. The `when` blocks are exhaustive so a newly added parse error fails to compile here
- * until it is given a code.
+ * bounded REST DTO (so those are unreachable), and an unknown header script code previously NPE'd to a 500. Likewise
+ * [UnresolvableAddress] (the referenced main address of the "site from additional address" path) has no public code: that
+ * path's caller only invokes it for an address it just resolved. Either way it is treated as an internal error. The
+ * `when` blocks are exhaustive so a newly added parse error fails to compile here until it is given a code.
  */
 @Component
 class SiteParseErrorMapper(
@@ -54,6 +56,7 @@ class SiteParseErrorMapper(
             is LegalAddressAlreadyMainAddress ->
                 ErrorInfo(SiteCreateError.MainAddressDuplicateIdentifier, "Legal address already belongs to site '${error.bpnSite}'", entityKey)
             is AddressContentParseError -> addressParseErrorMapper.toSiteCreateErrorInfo(error, entityKey)
+            is UnresolvableAddress -> throw internalError(error)
             is SiteContentParseError -> throw internalError(error)
         }
 
@@ -65,6 +68,6 @@ class SiteParseErrorMapper(
             is SiteContentParseError -> throw internalError(error)
         }
 
-    private fun internalError(error: SiteContentParseError) =
-        BpdmValidationException("Unexpected site content parse error (no public error code): $error")
+    private fun internalError(error: SiteCreateParseError) =
+        BpdmValidationException("Unexpected site parse error (no public error code): $error")
 }

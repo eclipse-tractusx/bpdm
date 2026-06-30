@@ -66,6 +66,7 @@ class BusinessPartnerBuildService(
     private val addressParseErrorMapper: AddressParseErrorMapper,
     private val siteCreateService: SiteCreateService,
     private val siteCreateWithLegalAddressAsMainService: SiteCreateWithLegalAddressAsMainService,
+    private val siteCreateWithReferencedAddressAsMainService: SiteCreateWithReferencedAddressAsMainService,
     private val siteUpdateService: SiteUpdateService,
     private val siteDtoRequestMapper: SiteDtoRequestMapper,
     private val siteParseErrorMapper: SiteParseErrorMapper,
@@ -122,27 +123,21 @@ class BusinessPartnerBuildService(
     @Transactional
     fun createSiteMainAddressFromAdditionalAddress(
         requests: Collection<SitePartnerCreateRequest>,
-        address: LogisticAddressDb
+        mainAddressBpn: String
     ): SitePartnerCreateResponseWrapper {
-        val errorsByRequest = requestValidationService.validateSitesToCreateFromController(requests)
-        val errors = errorsByRequest.flatMap { it.value }
-        val validRequests = requests.filterNot { errorsByRequest.containsKey(it) }
+        val requestList = requests.toList()
+        val createRequests = requestList.map { siteDtoRequestMapper.toCreateWithReferencedAddressAsMainRequest(it, mainAddressBpn) }
 
-        val (siteHeaderMetadata, mainAddressMetadata) = metadataService.getMetadata(validRequests.map { it.site }).toMapping()
+        val responses = mutableListOf<SitePartnerCreateVerboseDto>()
+        val errors = mutableListOf<ErrorInfo<SiteCreateError>>()
+        requestList.zip(siteCreateWithReferencedAddressAsMainService.parseAndCreate(createRequests)).forEach { (request, result) ->
+            when (result) {
+                is ParseResult.Success -> responses.add(result.parsed.toUpsertDto(request.index))
+                is ParseResult.Failure -> errors.addAll(result.errors.map { siteParseErrorMapper.toCreateErrorInfo(it, request.index) })
+            }
+        }
 
-        val legalEntities = legalEntityRepository.findDistinctByBpnIn(validRequests.map { it.bpnlParent })
-        val legalEntitiesByBpn = legalEntities.associateBy { it.bpn }
-        val bpnSs = bpnIssuingService.issueSiteBpns(validRequests.size)
-        fun createSiteWithMainAddress(bpnIndex: Int, request: SitePartnerCreateRequest) =
-            createSiteHeader(request.site.toHeader(), bpnSs[bpnIndex], legalEntitiesByBpn[request.bpnlParent]!!, siteHeaderMetadata)
-                .apply {
-                    mainAddress = createLogisticAddress(address, request.site.toMainAddressWithScriptVariants(), address.bpn, this.legalEntity, this, mainAddressMetadata)
-                }.let { site -> Pair(site, request) }
-        val requestsBySites = validRequests
-            .mapIndexed { i, request -> createSiteWithMainAddress(i, request) }
-            .toMap()
-        val siteResponse = createChangeLogAndSaveSiteInformation(requestsBySites).map { it.toUpsertDto(requestsBySites[it]!!.index) }
-        return SitePartnerCreateResponseWrapper(siteResponse, errors)
+        return SitePartnerCreateResponseWrapper(responses, errors)
     }
 
     @Transactional
