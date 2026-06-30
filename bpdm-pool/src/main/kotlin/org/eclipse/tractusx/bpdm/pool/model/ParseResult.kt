@@ -98,6 +98,28 @@ fun <A, B, C, R, E> zipParseResults(
     return a.indices.map { index -> zipParseResults(a[index], b[index], c[index], transform) }
 }
 
+/**
+ * Chains a second parse stage after a first, positionally: [second] runs only on the entries [first] parsed
+ * successfully, and its per-entry verdicts are woven back into [first]'s positions. Failures of [first] pass straight
+ * through unchanged. Lets a higher pipeline stage delegate to a lower stage's `parse` (which itself yields per-entry
+ * `ParseResult`s) without manually re-interleaving the two. Same success-iterator weave as [parseAndExecute], but the
+ * downstream step returns verdicts rather than finished values.
+ */
+fun <A, B, E> chainParseResults(
+    first: List<ParseResult<A, E>>,
+    second: (List<A>) -> List<ParseResult<B, E>>
+): List<ParseResult<B, E>> {
+    val secondResults = second(first.filterIsInstance<ParseResult.Success<A>>().map { it.parsed })
+
+    val secondIterator = secondResults.iterator()
+    return first.map { result ->
+        when (result) {
+            is ParseResult.Success -> secondIterator.next()
+            is ParseResult.Failure -> result
+        }
+    }
+}
+
 fun <REQUEST, PARSED, CREATED, ERROR> parseAndExecute(
     requests: List<REQUEST>,
     parse: (List<REQUEST>) -> List<ParseResult<PARSED, ERROR>>,

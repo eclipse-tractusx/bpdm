@@ -34,9 +34,7 @@ import org.eclipse.tractusx.bpdm.pool.mapper.LegalEntityParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.LogisticAddressDtoRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.SiteDtoRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.SiteParseErrorMapper
-import org.eclipse.tractusx.bpdm.pool.model.AddressContentParsed
-import org.eclipse.tractusx.bpdm.pool.model.AddressCreateParsed
-import org.eclipse.tractusx.bpdm.pool.model.AddressCreateRequest
+import org.eclipse.tractusx.bpdm.pool.model.AddressCreateUntypedParentRequest
 import org.eclipse.tractusx.bpdm.pool.model.AddressUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
@@ -61,7 +59,7 @@ class BusinessPartnerBuildService(
     private val logisticAddressRepository: LogisticAddressRepository,
     private val requestValidationService: RequestValidationService,
     private val businessPartnerEquivalenceMapper: BusinessPartnerEquivalenceMapper,
-    private val additionalAddressCreateService: AdditionalAddressCreateService,
+    private val untypedParentAddressCreateService: UntypedParentAddressCreateService,
     private val additionalAddressUpdateService: AdditionalAddressUpdateService,
     private val addressCreateService: AddressCreateService,
     private val logisticAddressDtoRequestMapper: LogisticAddressDtoRequestMapper,
@@ -213,74 +211,30 @@ class BusinessPartnerBuildService(
     }
 
     /**
-     * `@Transactional` so parent resolution and [AddressCreateService.parseAndCreate] (which resolves entities, then
-     * persists) share one persistence context. The single `bpnParent` is resolved into the explicit (legalEntity, site)
-     * parents the service expects (a site parent contributes its own legal entity); that resolution also reports the
-     * precise `BpnNotValid`/`SiteNotFound`/`LegalEntityNotFound` parent errors, which `parse` alone could not
-     * distinguish. All address-content validation is delegated to `parse`.
+     * `@Transactional` so [UntypedParentAddressCreateService.parseAndCreate] resolves the parent BPN, validates content
+     * and persists the address in one persistence context. The single `bpnParent` is resolved into the explicit
+     * (legalEntity, site) parents — and the precise `BpnNotValid`/`SiteNotFound`/`LegalEntityNotFound` parent errors are
+     * reported — inside that service; this border method only maps DTOs and verdicts.
      */
     @Transactional
     fun createAddresses(requests: Collection<AddressPartnerCreateRequest>): AddressPartnerCreateResponseWrapper {
         logger.info { "Create ${requests.size} new addresses" }
 
         val requestList = requests.toList()
-        val parents = resolveCreateParents(requestList)
-
-        // Only requests with a resolved parent reach the service; the others already have a parent error.
-        val parentErrors = mutableListOf<ErrorInfo<AddressCreateError>>()
-        val createRequests = mutableListOf<Pair<AddressPartnerCreateRequest, AddressCreateRequest>>()
-        requestList.zip(parents).forEach { (request, parent) ->
-            when (parent) {
-                is CreateParent.Invalid -> parentErrors.add(parent.error)
-                is CreateParent.Resolved -> {
-                    val content = logisticAddressDtoRequestMapper.toContentRequest(request.address, request.scriptVariants)
-                    createRequests.add(request to AddressCreateRequest(parent.legalEntityBpn, parent.siteBpn, content))
-                }
-            }
+        val createRequests = requestList.map {
+            AddressCreateUntypedParentRequest(it.bpnParent, logisticAddressDtoRequestMapper.toContentRequest(it.address, it.scriptVariants))
         }
 
         val responses = mutableListOf<AddressPartnerCreateVerboseDto>()
-        val parseErrors = mutableListOf<ErrorInfo<AddressCreateError>>()
-        createRequests.zip(additionalAddressCreateService.parseAndCreate(createRequests.map { it.second })).forEach { (pair, result) ->
-            val request = pair.first
+        val errors = mutableListOf<ErrorInfo<AddressCreateError>>()
+        requestList.zip(untypedParentAddressCreateService.parseAndCreate(createRequests)).forEach { (request, result) ->
             when (result) {
                 is ParseResult.Success -> responses.add(result.parsed.toCreateResponse(request.index))
-                is ParseResult.Failure -> parseErrors.addAll(result.errors.map { addressParseErrorMapper.toCreateErrorInfo(it, request.index) })
+                is ParseResult.Failure -> errors.addAll(result.errors.map { addressParseErrorMapper.toCreateErrorInfo(it, request.index) })
             }
         }
 
-        return AddressPartnerCreateResponseWrapper(responses, parentErrors + parseErrors)
-    }
-
-    private sealed interface CreateParent {
-        data class Resolved(val legalEntityBpn: String, val siteBpn: String?) : CreateParent
-        data class Invalid(val error: ErrorInfo<AddressCreateError>) : CreateParent
-    }
-
-    /**
-     * Resolves each request's single `bpnParent` into the explicit (legalEntity, site) pair the create service needs,
-     * validating existence in the same pass. A legal-entity parent resolves to itself; a site parent contributes its own
-     * legal entity. Positional: result[i] corresponds to requests[i].
-     */
-    private fun resolveCreateParents(requests: List<AddressPartnerCreateRequest>): List<CreateParent> {
-        val typeByBpn = requests.map { it.bpnParent }.associateWith { bpnIssuingService.translateToBusinessPartnerType(it) }
-        val legalEntityParentBpns = typeByBpn.filterValues { it == BusinessPartnerType.LEGAL_ENTITY }.keys
-        val siteParentBpns = typeByBpn.filterValues { it == BusinessPartnerType.SITE }.keys
-        val existingLegalEntityBpns = legalEntityRepository.findDistinctByBpnIn(legalEntityParentBpns).map { it.bpn }.toSet()
-        val sitesByBpn = siteRepository.findDistinctByBpnIn(siteParentBpns).associateBy { it.bpn }
-
-        return requests.map { request ->
-            val parent = request.bpnParent
-            when (typeByBpn[parent]) {
-                BusinessPartnerType.LEGAL_ENTITY ->
-                    if (parent in existingLegalEntityBpns) CreateParent.Resolved(parent, siteBpn = null)
-                    else CreateParent.Invalid(ErrorInfo(AddressCreateError.LegalEntityNotFound, "Parent with BPN '$parent' not found", request.index))
-                BusinessPartnerType.SITE ->
-                    sitesByBpn[parent]?.let { CreateParent.Resolved(it.legalEntity.bpn, siteBpn = parent) }
-                        ?: CreateParent.Invalid(ErrorInfo(AddressCreateError.SiteNotFound, "Parent with BPN '$parent' not found", request.index))
-                else -> CreateParent.Invalid(ErrorInfo(AddressCreateError.BpnNotValid, "Parent '$parent' is not a valid BPNL/BPNS", request.index))
-            }
-        }
+        return AddressPartnerCreateResponseWrapper(responses, errors)
     }
 
     /**

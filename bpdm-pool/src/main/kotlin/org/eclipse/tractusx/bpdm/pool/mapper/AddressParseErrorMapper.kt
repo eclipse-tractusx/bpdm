@@ -30,6 +30,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteUpdateError
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.model.AddressConstraintParseError
 import org.eclipse.tractusx.bpdm.pool.model.AddressCreateParseError
+import org.eclipse.tractusx.bpdm.pool.model.InvalidParentBpn
 import org.eclipse.tractusx.bpdm.pool.model.UnresolvableLegalEntity
 import org.eclipse.tractusx.bpdm.pool.model.UnresolvableSite
 import org.eclipse.tractusx.bpdm.pool.model.AddressFieldParseError
@@ -59,6 +60,8 @@ class AddressParseErrorMapper {
 
     fun toCreateErrorInfo(error: AddressCreateParseError, entityKey: String?): ErrorInfo<AddressCreateError> =
         when (error) {
+            is InvalidParentBpn ->
+                ErrorInfo(AddressCreateError.BpnNotValid, "Parent '${error.bpn}' is not a valid BPNL/BPNS", entityKey)
             is UnresolvableLegalEntity ->
                 ErrorInfo(AddressCreateError.LegalEntityNotFound, "Parent legal entity '${error.bpn}' not found", entityKey)
             is UnresolvableSite ->

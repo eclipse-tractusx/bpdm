@@ -23,13 +23,16 @@ import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 
 /**
- * Result of parsing an [AddressCreateTypedParentsRequest]: the loose request has been validated to a bounded [LogisticAddressParsed] and
- * the parent BPNs resolved to entities. This is the only stage that carries persistence entities — `create` consumes it
- * directly to write the new address.
+ * Request to create an address whose parents are already *resolved* to entities — the legal entity always present, the
+ * site optional. Nothing about the parents remains to be looked up, so this is what the lowest layer ([AddressCreateService])
+ * consumes; `parse` only has to validate the address [content] before [AddressCreateParsed] is persisted. In-transaction
+ * callers whose parent entity is not yet persisted use this directly rather than going through BPN resolution.
+ *
+ * This is the final stage of the parent-resolution pipeline: untyped BPN ([AddressCreateUntypedParentRequest]) → typed
+ * BPNs ([AddressCreateTypedParentsRequest]) → resolved entities.
  */
-data class AddressCreateParsed(
+data class AddressCreateResolvedParentsRequest(
     val legalEntity: LegalEntityDb,
     val site: SiteDb?,
-    val address: LogisticAddressParsed,
-    val scriptVariants: List<AddressScriptVariantParsed>
+    val content: AddressContentRequest
 )

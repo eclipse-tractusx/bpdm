@@ -81,12 +81,4 @@ class AddressCreateService(
 
         return entities
     }
-
-    /**
-     * Executes [create] for the successfully parsed entries and weaves the persisted entities back into a positional
-     * list aligned with the input; failures pass through unchanged (via [ParseResult]'s `out T` covariance). Generic in
-     * the error type so both this service and [AdditionalAddressCreateService] (whose errors are wider) can reuse it.
-     */
-    fun parseAndCreate(requests:  List<AddressContentRequest>): List<ParseResult<LogisticAddressDb, AddressContentParseError>> =
-        parseAndExecute(requests, ::parse, ::create)
 }

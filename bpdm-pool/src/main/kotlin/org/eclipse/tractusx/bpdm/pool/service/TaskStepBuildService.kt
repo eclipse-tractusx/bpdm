@@ -33,9 +33,10 @@ import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.mapper.GoldenRecordTaskAddressRequestMapper
 import org.eclipse.tractusx.bpdm.pool.model.AddressConstraintParseError
 import org.eclipse.tractusx.bpdm.pool.model.AddressCreateParseError
+import org.eclipse.tractusx.bpdm.pool.model.InvalidParentBpn
 import org.eclipse.tractusx.bpdm.pool.model.UnresolvableLegalEntity
 import org.eclipse.tractusx.bpdm.pool.model.UnresolvableSite
-import org.eclipse.tractusx.bpdm.pool.model.AddressCreateRequest
+import org.eclipse.tractusx.bpdm.pool.model.AddressCreateTypedParentsRequest
 import org.eclipse.tractusx.bpdm.pool.model.AddressFieldParseError
 import org.eclipse.tractusx.bpdm.pool.model.AddressMetadataParseError
 import org.eclipse.tractusx.bpdm.pool.model.AddressContentParseError
@@ -402,7 +403,7 @@ class TaskStepBuildService(
         legalEntityBpn: String,
         siteBpn: String?
     ): String {
-        val request = AddressCreateRequest(
+        val request = AddressCreateTypedParentsRequest(
             legalEntityBpn = legalEntityBpn,
             siteBpn = siteBpn,
             content = taskAddressRequestMapper.toContentRequest(additionalAddress)
@@ -437,6 +438,8 @@ class TaskStepBuildService(
         when (error) {
             is UnresolvableLegalEntity -> "Legal entity ${error.bpn} not found"
             is UnresolvableSite -> "Site ${error.bpn} not found"
+            // Unreachable on the task path: parents arrive already typed, so the untyped-stage InvalidParentBpn never occurs here.
+            is InvalidParentBpn -> "Parent ${error.bpn} is not a valid BPNL/BPNS"
             is AddressContentParseError -> renderError(error)
         }
 

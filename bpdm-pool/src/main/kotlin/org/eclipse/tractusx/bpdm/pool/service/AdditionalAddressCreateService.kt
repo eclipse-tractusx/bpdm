@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.service
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.model.AddressCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.AddressCreateParseError
-import org.eclipse.tractusx.bpdm.pool.model.AddressCreateRequest
+import org.eclipse.tractusx.bpdm.pool.model.AddressCreateTypedParentsRequest
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.model.zipParseResults
@@ -42,7 +42,7 @@ class AdditionalAddressCreateService(
     private val siteBpnParser: SiteBpnParser
 ) {
 
-    fun parse(requests: List<AddressCreateRequest>): List<ParseResult<AddressCreateParsed, AddressCreateParseError>> {
+    fun parse(requests: List<AddressCreateTypedParentsRequest>): List<ParseResult<AddressCreateParsed, AddressCreateParseError>> {
         val contentResults = addressCreateService.parse(requests.map { it.content })
         val legalEntityResults = legalEntityBpnParser.parse(requests.map { it.legalEntityBpn })
         val siteResults = siteBpnParser.parse(requests.map { it.siteBpn })
@@ -56,6 +56,6 @@ class AdditionalAddressCreateService(
         addressCreateService.create(requests)
 
     @Transactional
-    fun parseAndCreate(requests: List<AddressCreateRequest>): List<ParseResult<LogisticAddressDb, AddressCreateParseError>> =
+    fun parseAndCreate(requests: List<AddressCreateTypedParentsRequest>): List<ParseResult<LogisticAddressDb, AddressCreateParseError>> =
         parseAndExecute(requests, ::parse, ::create)
 }
