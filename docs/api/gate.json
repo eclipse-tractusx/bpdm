@@ -1852,7 +1852,7 @@
           "updatedAt" : {
             "type" : "string",
             "format" : "date-time",
-            "description" : "The date when the data record has been last updated."
+            "description" : "Timestamp when the business partner record was last updated"
           },
           "isOwnCompanyData" : {
             "type" : "boolean",
@@ -1996,7 +1996,7 @@
           "updatedAt" : {
             "type" : "string",
             "format" : "date-time",
-            "description" : "The date when the data record has been last updated."
+            "description" : "Timestamp when the business partner record was last updated"
           },
           "isOwnCompanyData" : {
             "type" : "boolean",

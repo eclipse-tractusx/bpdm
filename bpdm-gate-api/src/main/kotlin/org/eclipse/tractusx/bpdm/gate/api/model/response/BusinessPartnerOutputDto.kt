@@ -46,7 +46,7 @@ data class BusinessPartnerOutputDto(
     @get:Schema(description = CommonDescription.createdAt)
     val createdAt: Instant,
 
-    @get:Schema(description = CommonDescription.updatedAt)
+    @get:Schema(description = "Timestamp when the business partner record was last updated")
     val updatedAt: Instant
 
 ) : IBaseBusinessPartnerGateDto
