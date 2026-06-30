@@ -89,7 +89,7 @@ class SiteCreationV7IT : UnscheduledPoolTestBaseV7() {
         val response = poolClient.sites.createSiteWithLegalReference(listOf(siteRequest))
 
         //THEN
-        val expectedError = ErrorInfo(SiteCreateError.MainAddressDuplicateIdentifier, "IGNORED", siteRequest.name)
+        val expectedError = ErrorInfo(SiteCreateError.MainAddressDuplicateIdentifier, "IGNORED", "0")
         val expectedResponse = SitePartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertSiteCreateResponseWrapperIsEqual(response, expectedResponse)

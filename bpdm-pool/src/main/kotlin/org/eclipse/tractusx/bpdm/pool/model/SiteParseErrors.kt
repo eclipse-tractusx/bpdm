@@ -24,6 +24,12 @@ sealed interface SiteCreateParseError
 sealed interface SiteUpdateParseError
 
 /**
+ * The legal entity's legal address already backs site [bpnSite], so it can't also be a new site's main address. Only the
+ * "site with legal address as main" create path can raise this; the regular site-create path builds a fresh main address.
+ */
+data class LegalAddressAlreadyMainAddress(val bpnSite: String) : SiteCreateParseError
+
+/**
  * Errors produced by parsing site *header* content (everything but the main address). As a subtype of both site
  * operations from a single definition, the same content errors flow into create and update without wrapping; the main
  * address contributes its own [AddressContentParseError], which is likewise a site error directly.

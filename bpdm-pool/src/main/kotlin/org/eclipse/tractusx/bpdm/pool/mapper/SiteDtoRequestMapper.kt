@@ -22,11 +22,13 @@ package org.eclipse.tractusx.bpdm.pool.mapper
 import org.eclipse.tractusx.bpdm.pool.api.model.ConfidenceCriteriaDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressScriptVariantDto
 import org.eclipse.tractusx.bpdm.pool.api.model.SiteDto
+import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteCreateRequestWithLegalAddressAsMain
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.model.ConfidenceCriteriaRequest
 import org.eclipse.tractusx.bpdm.pool.model.SiteContentRequest
 import org.eclipse.tractusx.bpdm.pool.model.SiteCreateRequest
+import org.eclipse.tractusx.bpdm.pool.model.SiteCreateWithLegalAddressAsMainRequest
 import org.eclipse.tractusx.bpdm.pool.model.SiteHeaderRequest
 import org.eclipse.tractusx.bpdm.pool.model.SiteScriptVariant
 import org.eclipse.tractusx.bpdm.pool.model.SiteState
@@ -52,6 +54,17 @@ class SiteDtoRequestMapper(
 
     fun toUpdateRequest(request: SitePartnerUpdateRequest): SiteUpdateRequest =
         SiteUpdateRequest(siteBpn = request.bpns, content = toContentRequest(request.site))
+
+    fun toCreateWithLegalAddressAsMainRequest(request: SiteCreateRequestWithLegalAddressAsMain): SiteCreateWithLegalAddressAsMainRequest =
+        SiteCreateWithLegalAddressAsMainRequest(
+            legalEntityBpn = request.bpnLParent,
+            header = SiteHeaderRequest(
+                name = request.name,
+                states = request.states.map { SiteState(it.validFrom?.toUtcInstant(), it.validTo?.toUtcInstant(), it.type) },
+                confidenceCriteria = toConfidenceRequest(request.confidenceCriteria),
+                scriptVariants = request.scriptVariants.map { SiteScriptVariant(it.scriptCode, it.name) }
+            )
+        )
 
     private fun toContentRequest(site: SiteDto): SiteContentRequest =
         SiteContentRequest(

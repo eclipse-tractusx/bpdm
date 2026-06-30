@@ -65,6 +65,7 @@ class BusinessPartnerBuildService(
     private val logisticAddressDtoRequestMapper: LogisticAddressDtoRequestMapper,
     private val addressParseErrorMapper: AddressParseErrorMapper,
     private val siteCreateService: SiteCreateService,
+    private val siteCreateWithLegalAddressAsMainService: SiteCreateWithLegalAddressAsMainService,
     private val siteUpdateService: SiteUpdateService,
     private val siteDtoRequestMapper: SiteDtoRequestMapper,
     private val siteParseErrorMapper: SiteParseErrorMapper,
@@ -98,51 +99,24 @@ class BusinessPartnerBuildService(
         return LegalEntityPartnerCreateResponseWrapper(responses, errors)
     }
 
+    @Transactional
     fun createSitesWithLegalAddressAsMain(requests: Collection<SiteCreateRequestWithLegalAddressAsMain>): SitePartnerCreateResponseWrapper {
         logger.info { "Create ${requests.size} new sites with legal address as site main address" }
 
-        val legalEntities = legalEntityRepository.findDistinctByBpnIn(requests.map { it.bpnLParent })
-        val legalEntitiesByBpn = legalEntities.associateBy { it.bpn }
+        val requestList = requests.toList()
+        val createRequests = requestList.map { siteDtoRequestMapper.toCreateWithLegalAddressAsMainRequest(it) }
 
-        val bpnSs = bpnIssuingService.issueSiteBpns(requests.size)
-
-        val siteHeaderMetadataMapping = SiteHeaderMetadataMapping(metadataService.getSiteHeaderScriptCodes(requests.flatMap { it.scriptVariants })
-            .associateBy { it.technicalKey })
-
-        val createdSites = requests.zip(bpnSs).map { (siteRequest, bpnS) ->
-            if (legalEntitiesByBpn[siteRequest.bpnLParent] == null) {
-                return SitePartnerCreateResponseWrapper(emptyList(), listOf(
-                    ErrorInfo(
-                        SiteCreateError.LegalEntityNotFound,
-                        "Parent ${siteRequest.bpnLParent} not found for site to create",
-                        siteRequest.bpnLParent
-                    )
-                ))
-            } else if (legalEntitiesByBpn[siteRequest.bpnLParent]!!.legalAddress.sites.isNotEmpty()) {
-                return SitePartnerCreateResponseWrapper(emptyList(), listOf(
-                    ErrorInfo(
-                        SiteCreateError.MainAddressDuplicateIdentifier,
-                        "Can't create site for legal entity ${siteRequest.bpnLParent} with legal address as site main address: Legal address already belongs to site ${legalEntitiesByBpn[siteRequest.bpnLParent]!!.legalAddress.sites.first().bpn}",
-                        siteRequest.name
-                    )
-                ))
+        val responses = mutableListOf<SitePartnerCreateVerboseDto>()
+        val errors = mutableListOf<ErrorInfo<SiteCreateError>>()
+        siteCreateWithLegalAddressAsMainService.parseAndCreate(createRequests).forEachIndexed { index, result ->
+            val entityKey = index.toString()
+            when (result) {
+                is ParseResult.Success -> responses.add(result.parsed.toUpsertDto(entityKey))
+                is ParseResult.Failure -> errors.addAll(result.errors.map { siteParseErrorMapper.toCreateErrorInfo(it, entityKey) })
             }
-
-            createSiteHeader(siteRequest.toHeader(), bpnS, legalEntitiesByBpn[siteRequest.bpnLParent]!!, siteHeaderMetadataMapping)
-                .apply { mainAddress = legalEntitiesByBpn[siteRequest.bpnLParent]!!.legalAddress }
-                .apply { mainAddress.sites.add(this) }
         }
 
-        siteRepository.saveAll(createdSites)
-
-        changelogService.createChangelogEntries(createdSites.map {
-            ChangelogEntryCreateRequest(it.bpn, ChangelogType.CREATE, BusinessPartnerType.SITE)
-        })
-
-        val siteResponse = createdSites.mapIndexed { index, site -> site.toUpsertDto(index.toString()) }
-
-        return SitePartnerCreateResponseWrapper(siteResponse, emptyList())
-
+        return SitePartnerCreateResponseWrapper(responses, errors)
     }
 
     @Transactional

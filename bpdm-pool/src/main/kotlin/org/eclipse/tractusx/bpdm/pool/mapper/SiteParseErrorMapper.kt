@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteCreateError
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteUpdateError
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.model.AddressContentParseError
+import org.eclipse.tractusx.bpdm.pool.model.LegalAddressAlreadyMainAddress
 import org.eclipse.tractusx.bpdm.pool.model.SiteContentParseError
 import org.eclipse.tractusx.bpdm.pool.model.SiteCreateParseError
 import org.eclipse.tractusx.bpdm.pool.model.SiteUpdateParseError
@@ -50,6 +51,8 @@ class SiteParseErrorMapper(
         when (error) {
             is UnresolvableLegalEntity ->
                 ErrorInfo(SiteCreateError.LegalEntityNotFound, "Parent legal entity '${error.bpn}' not found", entityKey)
+            is LegalAddressAlreadyMainAddress ->
+                ErrorInfo(SiteCreateError.MainAddressDuplicateIdentifier, "Legal address already belongs to site '${error.bpnSite}'", entityKey)
             is AddressContentParseError -> addressParseErrorMapper.toSiteCreateErrorInfo(error, entityKey)
             is SiteContentParseError -> throw internalError(error)
         }

@@ -20,11 +20,13 @@
 package org.eclipse.tractusx.bpdm.pool.mapper
 
 import org.eclipse.tractusx.bpdm.pool.entity.ConfidenceCriteriaDb
+import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteScriptVariantDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteStateDb
 import org.eclipse.tractusx.bpdm.pool.model.ConfidenceCriteriaParsed
 import org.eclipse.tractusx.bpdm.pool.model.SiteCreateParsed
+import org.eclipse.tractusx.bpdm.pool.model.SiteHeaderParsed
 import org.eclipse.tractusx.bpdm.pool.model.SiteScriptVariantParsed
 import org.eclipse.tractusx.bpdm.pool.model.SiteState
 import org.springframework.stereotype.Component
@@ -46,13 +48,15 @@ class SiteEntityMapper(
     private val addressEntityMapper: AddressEntityMapper
 ) {
 
-    fun toEntity(bpn: String, parsed: SiteCreateParsed, numberOfSharingMembers: Int): SiteDb {
-        val header = parsed.content.header
+    fun toEntity(bpn: String, parsed: SiteCreateParsed, numberOfSharingMembers: Int): SiteDb =
+        toEntity(bpn, parsed.legalEntity, parsed.content.header, numberOfSharingMembers)
+
+    fun toEntity(bpn: String, legalEntity: LegalEntityDb, header: SiteHeaderParsed, numberOfSharingMembers: Int): SiteDb {
         val entity = SiteDb(
             bpn = bpn,
             name = header.name,
             confidenceCriteria = toConfidence(header.confidenceCriteria, numberOfSharingMembers),
-            legalEntity = parsed.legalEntity,
+            legalEntity = legalEntity,
             scriptVariants = toScriptVariants(header.scriptVariants).toMutableList()
         )
         entity.states.addAll(toStates(header.states, entity))
