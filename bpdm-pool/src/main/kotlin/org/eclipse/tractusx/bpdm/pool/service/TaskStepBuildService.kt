@@ -30,7 +30,7 @@ import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmMultiValidationException
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
-import org.eclipse.tractusx.bpdm.pool.mapper.GoldenRecordTaskAddressRequestMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.inbound.GoldenRecordTaskAddressRequestMapper
 import org.eclipse.tractusx.bpdm.pool.model.AddressConstraintParseError
 import org.eclipse.tractusx.bpdm.pool.model.AddressCreateParseError
 import org.eclipse.tractusx.bpdm.pool.model.InvalidParentBpn

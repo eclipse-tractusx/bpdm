@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.mapper
+package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound
 
 import org.eclipse.tractusx.bpdm.pool.api.model.ConfidenceCriteriaDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityDto
@@ -40,12 +40,12 @@ import java.time.ZoneOffset
  * Pure translation of a Pool API legal-entity request into the loose domain [LegalEntityCreateRequest] /
  * [LegalEntityUpdateRequest] consumed by the legal-entity services. No validation happens here — that is the legal-entity
  * service's `parse`. The legal address (and its localized script variants, carried per-variant on the legal entity) is
- * delegated to [LogisticAddressDtoRequestMapper]; the Pool-computed confidence values are dropped there. Boundary time
+ * delegated to [AddressDtoRequestMapper]; the Pool-computed confidence values are dropped there. Boundary time
  * fields are converted from the API's `LocalDateTime` (UTC) to the domain's `Instant`.
  */
 @Component
 class LegalEntityDtoRequestMapper(
-    private val logisticAddressDtoRequestMapper: LogisticAddressDtoRequestMapper
+    private val addressDtoRequestMapper: AddressDtoRequestMapper
 ) {
 
     fun toCreateRequest(request: LegalEntityPartnerCreateRequest): LegalEntityCreateRequest =
@@ -57,7 +57,7 @@ class LegalEntityDtoRequestMapper(
     private fun toContentRequest(legalEntity: LegalEntityDto): LegalEntityContentRequest =
         LegalEntityContentRequest(
             header = toHeaderRequest(legalEntity),
-            legalAddress = logisticAddressDtoRequestMapper.toContentRequest(
+            legalAddress = addressDtoRequestMapper.toContentRequest(
                 legalEntity.legalAddress,
                 legalEntity.scriptVariants.map { LogisticAddressScriptVariantDto(it.scriptCode, it.legalAddress) }
             )

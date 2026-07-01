@@ -41,7 +41,6 @@ class BusinessPartnerEquivalenceMapper {
                 states = states.map { StateEquivalenceDto(it.validFrom, it.validTo, it.type) }.toSortedSet(compareBy { it.validFrom }),
                 confidenceCriteria = toEquivalenceDto(confidenceCriteria),
                 isCatenaXMemberData = isCatenaXMemberData,
-                legalAddress = toEquivalenceDto(legalEntity.legalAddress),
                 scriptVariants = scriptVariants.map { toEquivalenceDto(it) }.toSortedSet(compareBy { it.scriptCode })
             )
         }
@@ -52,7 +51,6 @@ class BusinessPartnerEquivalenceMapper {
                 name = name,
                 states = states.map { StateEquivalenceDto(it.validFrom, it.validTo, it.type) }.toSortedSet(compareBy { it.validFrom }),
                 confidenceCriteria = toEquivalenceDto(confidenceCriteria),
-                mainAddress = toEquivalenceDto(mainAddress),
                 scriptVariants = scriptVariants.map { SiteHeaderScriptVariantEquivalenceDto(it.scriptCode.technicalKey, it.name) }.toSortedSet(compareBy { it.scriptCode })
             )
         }
@@ -182,7 +180,6 @@ class BusinessPartnerEquivalenceMapper {
         override val identifiers: SortedSet<IdentifierEquivalenceDto>,
         override val states: SortedSet<StateEquivalenceDto>,
         override val confidenceCriteria: ConfidenceCriteriaEquivalenceDto?,
-        val legalAddress: LogisticAddressEquivalenceDto?,
         val isCatenaXMemberData: Boolean,
         val scriptVariants: SortedSet<LegalEntityScriptVariantEquivalenceDto>,
     ) : IBaseLegalEntityDto
@@ -197,7 +194,6 @@ class BusinessPartnerEquivalenceMapper {
         override val name: String?,
         override val states: Collection<StateEquivalenceDto>,
         override val confidenceCriteria: ConfidenceCriteriaEquivalenceDto?,
-        val mainAddress: LogisticAddressEquivalenceDto,
         val scriptVariants: SortedSet<SiteHeaderScriptVariantEquivalenceDto>,
     ) : IBaseSiteDto
 

@@ -23,7 +23,7 @@ import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
-import org.eclipse.tractusx.bpdm.pool.mapper.LegalEntityEntityMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.entity.LegalEntityEntityMapper
 import org.eclipse.tractusx.bpdm.pool.model.AddressCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityCreateParseError
@@ -31,6 +31,7 @@ import org.eclipse.tractusx.bpdm.pool.model.LegalEntityCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityCreateRequest
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.combine
+import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.model.zipParseResults
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.springframework.stereotype.Service
@@ -102,14 +103,6 @@ class LegalEntityCreateService(
     }
 
     @Transactional
-    fun parseAndCreate(requests: List<LegalEntityCreateRequest>): List<ParseResult<LegalEntityDb, LegalEntityCreateParseError>> {
-        val parseResults = parse(requests)
-        val created = create(parseResults.filterIsInstance<ParseResult.Success<LegalEntityCreateParsed>>().map { it.parsed }).iterator()
-        return parseResults.map { result ->
-            when (result) {
-                is ParseResult.Success -> ParseResult.Success(created.next())
-                is ParseResult.Failure -> result
-            }
-        }
-    }
+    fun parseAndCreate(requests: List<LegalEntityCreateRequest>): List<ParseResult<LegalEntityDb, LegalEntityCreateParseError>> =
+        parseAndExecute(requests, ::parse, ::create)
 }

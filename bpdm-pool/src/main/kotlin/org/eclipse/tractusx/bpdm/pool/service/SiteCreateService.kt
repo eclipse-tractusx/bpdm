@@ -23,14 +23,16 @@ import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
-import org.eclipse.tractusx.bpdm.pool.mapper.SiteEntityMapper
 import org.eclipse.tractusx.bpdm.pool.model.AddressCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.SiteContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.SiteCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.SiteCreateParseError
 import org.eclipse.tractusx.bpdm.pool.model.SiteCreateRequest
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
+import org.eclipse.tractusx.bpdm.pool.model.SiteHeaderCreateParsed
+import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.model.zipParseResults
+import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -44,17 +46,14 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class SiteCreateService(
-    private val siteHeaderParser: SiteHeaderParser,
     private val legalEntityBpnParser: LegalEntityBpnParser,
     private val addressCreateService: AddressCreateService,
-    private val bpnIssuingService: BpnIssuingService,
-    private val siteRepository: SiteRepository,
-    private val changelogService: PartnerChangelogService,
-    private val siteEntityMapper: SiteEntityMapper
+    private val siteHeaderCreateService: SiteHeaderCreateService,
+    private val siteRepository: SiteRepository
 ) {
 
     fun parse(requests: List<SiteCreateRequest>): List<ParseResult<SiteCreateParsed, SiteCreateParseError>> {
-        val headerResults = siteHeaderParser.parse(requests.map { it.content.header })
+        val headerResults = siteHeaderCreateService.parse(requests.map { it.content.header })
         val legalEntityResults = legalEntityBpnParser.parse(requests.map { it.legalEntityBpn })
         val mainAddressResults = addressCreateService.parse(requests.map { it.content.mainAddress })
 
@@ -69,37 +68,24 @@ class SiteCreateService(
      */
     @Transactional
     fun create(parsed: List<SiteCreateParsed>): List<SiteDb> {
-        val bpns = bpnIssuingService.issueSiteBpns(parsed.size)
-        // A new site's confidence starts with one sharing member (preserves the previous create behavior).
-        val sites = parsed.zip(bpns) { entry, bpn -> siteEntityMapper.toEntity(bpn, entry, numberOfSharingMembers = 1) }
+        val sites = siteHeaderCreateService.create(parsed.map { SiteHeaderCreateParsed(it.legalEntity, it.content.header) })
 
-        // Emit the site changelog before the address create service emits the ADDRESS CREATE changelog, so the overall
-        // changelog order stays "site, then its main address".
-        changelogService.createChangelogEntries(sites.map {
-            ChangelogEntryCreateRequest(it.bpn, ChangelogType.CREATE, BusinessPartnerType.SITE)
-        })
-
-        // The main address's parent is the still-unsaved site; it flushes in the right order at commit thanks to the
-        // nullable back-FK and order_inserts. The address create service owns the address BPN + ADDRESS CREATE changelog.
         val mainAddresses = addressCreateService.create(parsed.zip(sites).map { (entry, site) ->
             val mainAddress = entry.content.mainAddress
             AddressCreateParsed(site.legalEntity, site, mainAddress.address, mainAddress.scriptVariants)
         })
+
+        // The sites are already persistent (saved by siteHeaderCreateService); setting mainAddress mutates the managed
+        // entities, so dirty tracking flushes the main_address FK at commit — same as the other site-create paths.
         sites.zip(mainAddresses).forEach { (site, address) -> site.mainAddress = address }
 
         siteRepository.saveAll(sites)
+
         return sites
     }
 
     @Transactional
     fun parseAndCreate(requests: List<SiteCreateRequest>): List<ParseResult<SiteDb, SiteCreateParseError>> {
-        val parseResults = parse(requests)
-        val created = create(parseResults.filterIsInstance<ParseResult.Success<SiteCreateParsed>>().map { it.parsed }).iterator()
-        return parseResults.map { result ->
-            when (result) {
-                is ParseResult.Success -> ParseResult.Success(created.next())
-                is ParseResult.Failure -> result
-            }
-        }
+        return parseAndExecute(requests, ::parse, ::create)
     }
 }

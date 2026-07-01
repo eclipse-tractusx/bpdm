@@ -23,11 +23,13 @@ import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
-import org.eclipse.tractusx.bpdm.pool.mapper.SiteEntityMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.entity.SiteEntityMapper
+import org.eclipse.tractusx.bpdm.pool.model.AddressSiteAssignment
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.SiteCreateParseError
 import org.eclipse.tractusx.bpdm.pool.model.SiteCreateWithReferencedAddressAsMainParsed
 import org.eclipse.tractusx.bpdm.pool.model.SiteCreateWithReferencedAddressAsMainRequest
+import org.eclipse.tractusx.bpdm.pool.model.SiteHeaderCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.model.zipParseResults
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
@@ -47,11 +49,9 @@ import org.springframework.transaction.annotation.Transactional
 class SiteCreateWithReferencedAddressAsMainService(
     private val siteHeaderParser: SiteHeaderParser,
     private val addressBpnParser: AddressBpnParser,
-    private val addressUpdateService: AddressUpdateService,
-    private val bpnIssuingService: BpnIssuingService,
     private val siteRepository: SiteRepository,
-    private val changelogService: PartnerChangelogService,
-    private val siteEntityMapper: SiteEntityMapper
+    private val siteHeaderCreateService: SiteHeaderCreateService,
+    private val addressSiteAssignmentService: AddressSiteAssignmentService
 ) {
 
     fun parse(
@@ -65,32 +65,15 @@ class SiteCreateWithReferencedAddressAsMainService(
         }
     }
 
-    /**
-     * Returns the persisted entities (within the caller's transaction) rather than a detached response model: building
-     * version-specific responses is the job of the border/application service at the edge.
-     */
     @Transactional
     fun create(parsed: List<SiteCreateWithReferencedAddressAsMainParsed>): List<SiteDb> {
-        val bpns = bpnIssuingService.issueSiteBpns(parsed.size)
-        // A new site's confidence starts with one sharing member (preserves the previous create behavior).
-        val sites = parsed.zip(bpns) { entry, bpn ->
-            val site = siteEntityMapper.toEntity(bpn, entry.mainAddress.legalEntity!!, entry.siteHeader, numberOfSharingMembers = 1)
-            val mainAddress = entry.mainAddress
-
-            mainAddress.sites.add(site)
-            site.mainAddress = mainAddress
-            site
-        }
-
-        // Mirror the previous behavior's changelog order: site first, then its (now re-parented) main address.
-        changelogService.createChangelogEntries(sites.map {
-            ChangelogEntryCreateRequest(it.bpn, ChangelogType.CREATE, BusinessPartnerType.SITE)
-        })
-        changelogService.createChangelogEntries(sites.map {
-            ChangelogEntryCreateRequest(it.mainAddress.bpn, ChangelogType.UPDATE, BusinessPartnerType.ADDRESS)
-        })
-
+        val sites = siteHeaderCreateService.create(parsed.map { SiteHeaderCreateParsed(it.mainAddress.legalEntity!!, it.siteHeader) })
+        sites.zip(parsed.map { it.mainAddress }).forEach { (site, address) -> site.mainAddress = address }
         siteRepository.saveAll(sites)
+
+        val mainAddressRequests = parsed.zip(sites) { siteRequest, createdSite -> AddressSiteAssignment(siteRequest.mainAddress, createdSite) }
+        addressSiteAssignmentService.assign(mainAddressRequests)
+
         return sites
     }
 

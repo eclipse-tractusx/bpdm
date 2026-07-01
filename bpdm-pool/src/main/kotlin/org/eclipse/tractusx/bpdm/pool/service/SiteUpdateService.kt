@@ -26,29 +26,24 @@ import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
-import org.eclipse.tractusx.bpdm.pool.mapper.SiteEntityMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.entity.SiteEntityMapper
+import org.eclipse.tractusx.bpdm.pool.model.AddressContentUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.SiteContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.SiteUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.SiteUpdateParseError
 import org.eclipse.tractusx.bpdm.pool.model.SiteUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
+import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.model.zipParseResults
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
-/**
- * Updates existing sites, the site counterpart of [AdditionalAddressUpdateService]. `parse` resolves the target site and
- * validates header + main-address content; `update` mutates the managed site and its main address, gating the save and
- * BOTH changelog entries on a whole-aggregate change (preserving the previous update behavior). The main address is
- * mutated via [AddressUpdateService.applyTo] — which deliberately does not save or emit its own changelog — so the site
- * keeps aggregate-level gating. Order-preserving positional contract (see [ParseResult]).
- */
 @Service
 class SiteUpdateService(
     private val siteHeaderParser: SiteHeaderParser,
     private val siteBpnParser: SiteBpnParser,
-    private val addressUpdateService: AddressUpdateService,
+    private val addressContentUpdateService: AddressContentUpdateService,
     private val siteRepository: SiteRepository,
     private val changelogService: PartnerChangelogService,
     private val equivalenceMapper: BusinessPartnerEquivalenceMapper,
@@ -60,7 +55,7 @@ class SiteUpdateService(
         val headerResults = siteHeaderParser.parse(requests.map { it.content.header })
         // The main address's duplicate check is scoped to its owning address; its BPN comes from the resolved target.
         val ownerBpns = targetResults.map { (it as? ParseResult.Success)?.parsed?.mainAddress?.bpn }
-        val mainAddressResults = addressUpdateService.parseContent(requests.map { it.content.mainAddress }, ownerBpns)
+        val mainAddressResults = addressContentUpdateService.parse(requests.map { it.content.mainAddress }, ownerBpns)
 
         return zipParseResults(headerResults, targetResults, mainAddressResults) { header, target, mainAddress ->
             SiteUpdateParsed(target, SiteContentParsed(header, mainAddress))
@@ -72,20 +67,28 @@ class SiteUpdateService(
      * version-specific responses is the job of the border/application service at the edge.
      */
     @Transactional
-    fun update(parsed: List<SiteUpdateParsed>): List<UpsertResult<SiteDb>> =
-        parsed.map { update(it) }
+    fun update(parsed: List<SiteUpdateParsed>): List<UpsertResult<SiteDb>>{
+        val siteResults = parsed.map { update(it) }
+
+        val mainAddressRequests = parsed.map { AddressContentUpdateParsed(it.target.mainAddress, it.content.mainAddress.address, it.content.mainAddress.scriptVariants, true) }
+        val mainAddressResults = addressContentUpdateService.update(mainAddressRequests)
+
+        return siteResults.zip(mainAddressResults){ siteResult, mainAddressResult ->
+            val changed = siteResult.upsertType == UpsertType.Updated || mainAddressResult.upsertType == UpsertType.Updated
+            UpsertResult(siteResult.value, if(changed) UpsertType.Updated else UpsertType.NoChange)
+        }
+    }
 
     private fun update(parsed: SiteUpdateParsed): UpsertResult<SiteDb> {
         val target = parsed.target
 
         val before = equivalenceMapper.toEquivalenceDto(target)
-        applyTo(target, parsed.content)
+        doUpdateEntity(target, parsed.content)
         val after = equivalenceMapper.toEquivalenceDto(target)
 
         val upsertType = if (before != after) {
             siteRepository.save(target)
             changelogService.createChangelogEntries(listOf(ChangelogEntryCreateRequest(target.bpn, ChangelogType.UPDATE, BusinessPartnerType.SITE)))
-            changelogService.createChangelogEntries(listOf(ChangelogEntryCreateRequest(target.mainAddress.bpn, ChangelogType.UPDATE, BusinessPartnerType.ADDRESS)))
             UpsertType.Updated
         } else {
             UpsertType.NoChange
@@ -94,27 +97,16 @@ class SiteUpdateService(
         return UpsertResult(target, upsertType)
     }
 
-    private fun applyTo(target: SiteDb, content: SiteContentParsed) {
+    @Transactional
+    fun parseAndUpdate(requests: List<SiteUpdateRequest>): List<ParseResult<UpsertResult<SiteDb>, SiteUpdateParseError>> =
+        parseAndExecute(requests, ::parse, ::update)
+
+    private fun doUpdateEntity(target: SiteDb, content: SiteContentParsed) {
         val header = content.header
         target.name = header.name
         // The sharing-member count is Pool-maintained, not part of the update payload, so carry the current value forward.
         target.confidenceCriteria = siteEntityMapper.toConfidence(header.confidenceCriteria, target.confidenceCriteria.numberOfSharingMembers)
         target.states.replace(siteEntityMapper.toStates(header.states, target))
         target.scriptVariants.replace(siteEntityMapper.toScriptVariants(header.scriptVariants))
-
-        val mainAddress = content.mainAddress
-        addressUpdateService.applyTo(target.mainAddress, mainAddress.address, mainAddress.scriptVariants, target.mainAddress.confidenceCriteria.numberOfSharingMembers)
-    }
-
-    @Transactional
-    fun parseAndUpdate(requests: List<SiteUpdateRequest>): List<ParseResult<UpsertResult<SiteDb>, SiteUpdateParseError>> {
-        val parseResults = parse(requests)
-        val updated = update(parseResults.filterIsInstance<ParseResult.Success<SiteUpdateParsed>>().map { it.parsed }).iterator()
-        return parseResults.map { result ->
-            when (result) {
-                is ParseResult.Success -> ParseResult.Success(updated.next())
-                is ParseResult.Failure -> result
-            }
-        }
     }
 }

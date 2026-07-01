@@ -17,63 +17,66 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.mapper
+package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound
 
+import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
+import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto
+import org.eclipse.tractusx.bpdm.pool.api.model.AddressStateDto
+import org.eclipse.tractusx.bpdm.pool.api.model.AlternativeAddressScriptVariantDto
+import org.eclipse.tractusx.bpdm.pool.api.model.AlternativePostalAddressDto
+import org.eclipse.tractusx.bpdm.pool.api.model.ConfidenceCriteriaDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressScriptVariantDto
+import org.eclipse.tractusx.bpdm.pool.api.model.PhysicalAddressScriptVariantDto
+import org.eclipse.tractusx.bpdm.pool.api.model.PhysicalPostalAddressDto
+import org.eclipse.tractusx.bpdm.pool.api.model.PostalAddressScriptVariantDto
+import org.eclipse.tractusx.bpdm.pool.api.model.StreetDto
+import org.eclipse.tractusx.bpdm.pool.dto.LogisticAddressWithScriptVariantsDto
 import org.eclipse.tractusx.bpdm.pool.model.*
 import org.springframework.stereotype.Component
-import org.eclipse.tractusx.orchestrator.api.model.AlternativeAddress as TaskAlternativeAddress
-import org.eclipse.tractusx.orchestrator.api.model.AlternativeAddressScriptVariant as TaskAlternativeAddressScriptVariant
-import org.eclipse.tractusx.orchestrator.api.model.BusinessState as TaskBusinessState
-import org.eclipse.tractusx.orchestrator.api.model.ConfidenceCriteria as TaskConfidenceCriteria
-import org.eclipse.tractusx.orchestrator.api.model.GeoCoordinate as TaskGeoCoordinate
-import org.eclipse.tractusx.orchestrator.api.model.Identifier as TaskIdentifier
-import org.eclipse.tractusx.orchestrator.api.model.PhysicalAddress as TaskPhysicalAddress
-import org.eclipse.tractusx.orchestrator.api.model.PhysicalAddressScriptVariant as TaskPhysicalAddressScriptVariant
-import org.eclipse.tractusx.orchestrator.api.model.PostalAddress as TaskPostalAddress
-import org.eclipse.tractusx.orchestrator.api.model.PostalAddressScriptVariant as TaskPostalAddressScriptVariant
-import org.eclipse.tractusx.orchestrator.api.model.PostalAddressScriptVariantWithScriptCode as TaskScriptVariant
-import org.eclipse.tractusx.orchestrator.api.model.PostalAddressWithScriptVariants as TaskAddress
-import org.eclipse.tractusx.orchestrator.api.model.Street as TaskStreet
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 /**
- * Pure translation of a cleaning task's address (the orchestrator business-partner model) into the loose
- * [AddressContentRequest] consumed by the address services. No validation happens here — that is the address services'
- * `parse` — so every field is passed through as-is (raw country strings, nullable values). The Pool-computed confidence
- * values (`numberOfSharingMembers`, `confidenceLevel`) are intentionally dropped: they are not part of an upsert.
- *
- * Orchestrator model types are aliased with a `Task` prefix to disambiguate them from the identically named loose
- * domain request types.
+ * Pure translation of a Pool API logistic address into the loose [AddressContentRequest] consumed by the address
+ * services. No validation happens here — that is the address services' `parse` — so the country enum is passed on as its
+ * raw alpha-2 string and the parser re-validates it through the single funnel. The Pool-computed confidence values
+ * (`numberOfSharingMembers`, `confidenceLevel`) are intentionally dropped: they are not part of an upsert. Boundary time
+ * fields are converted from the API's `LocalDateTime` (UTC) to the domain's `Instant`.
  */
 @Component
-class GoldenRecordTaskAddressRequestMapper {
+class AddressDtoRequestMapper {
 
-    fun toContentRequest(address: TaskAddress): AddressContentRequest =
+    fun toContentRequest(address: LogisticAddressDto, scriptVariants: List<LogisticAddressScriptVariantDto>): AddressContentRequest =
         AddressContentRequest(
-            address = toAddressRequest(address.postalProperties),
-            scriptVariants = address.scriptVariants.map { toScriptVariant(it) }
+            address = toAddressRequest(address),
+            scriptVariants = scriptVariants.map { toScriptVariant(it) }
         )
 
-    private fun toAddressRequest(address: TaskPostalAddress): LogisticAddressRequest =
+    fun toContentRequest(addressWithScriptVariants: LogisticAddressWithScriptVariantsDto): AddressContentRequest =
+        toContentRequest(addressWithScriptVariants.address, addressWithScriptVariants.scriptVariants)
+
+    private fun toAddressRequest(address: LogisticAddressDto): LogisticAddressRequest =
         LogisticAddressRequest(
-            name = address.addressName,
+            name = address.name,
             states = address.states.map { toStateRequest(it) },
             identifiers = address.identifiers.map { toIdentifierRequest(it) },
-            physicalPostalAddress = toPhysicalRequest(address.physicalAddress),
-            alternativePostalAddress = address.alternativeAddress?.let { toAlternativeRequest(it) },
+            physicalPostalAddress = toPhysicalRequest(address.physicalPostalAddress),
+            alternativePostalAddress = address.alternativePostalAddress?.let { toAlternativeRequest(it) },
             confidenceCriteria = toConfidenceRequest(address.confidenceCriteria)
         )
 
-    private fun toPhysicalRequest(physical: TaskPhysicalAddress): PhysicalPostalAddressRequest =
+    private fun toPhysicalRequest(physical: PhysicalPostalAddressDto): PhysicalPostalAddressRequest =
         PhysicalPostalAddressRequest(
-            geographicCoordinates = toGeoRequest(physical.geographicCoordinates),
-            country = physical.country,
+            geographicCoordinates = physical.geographicCoordinates?.let { toGeoRequest(it) },
+            country = physical.country.alpha2,
             administrativeAreaLevel1 = physical.administrativeAreaLevel1,
             administrativeAreaLevel2 = physical.administrativeAreaLevel2,
             administrativeAreaLevel3 = physical.administrativeAreaLevel3,
             postalCode = physical.postalCode,
             city = physical.city,
             district = physical.district,
-            street = toStreet(physical.street),
+            street = physical.street?.let { toStreet(it) },
             companyPostalCode = physical.companyPostalCode,
             industrialZone = physical.industrialZone,
             building = physical.building,
@@ -82,10 +85,10 @@ class GoldenRecordTaskAddressRequestMapper {
             taxJurisdictionCode = physical.taxJurisdictionCode
         )
 
-    private fun toAlternativeRequest(alternative: TaskAlternativeAddress): AlternativePostalAddressRequest =
+    private fun toAlternativeRequest(alternative: AlternativePostalAddressDto): AlternativePostalAddressRequest =
         AlternativePostalAddressRequest(
-            geographicCoordinates = toGeoRequest(alternative.geographicCoordinates),
-            country = alternative.country,
+            geographicCoordinates = alternative.geographicCoordinates?.let { toGeoRequest(it) },
+            country = alternative.country.alpha2,
             administrativeAreaLevel1 = alternative.administrativeAreaLevel1,
             postalCode = alternative.postalCode,
             city = alternative.city,
@@ -94,42 +97,42 @@ class GoldenRecordTaskAddressRequestMapper {
             deliveryServiceNumber = alternative.deliveryServiceNumber
         )
 
-    private fun toConfidenceRequest(confidence: TaskConfidenceCriteria): ConfidenceCriteriaRequest =
+    private fun toConfidenceRequest(confidence: ConfidenceCriteriaDto): ConfidenceCriteriaRequest =
         ConfidenceCriteriaRequest(
             sharedByOwner = confidence.sharedByOwner,
             checkedByExternalDataSource = confidence.checkedByExternalDataSource,
-            lastConfidenceCheckAt = confidence.lastConfidenceCheckAt,
-            nextConfidenceCheckAt = confidence.nextConfidenceCheckAt
+            lastConfidenceCheckAt = confidence.lastConfidenceCheckAt.toUtcInstant(),
+            nextConfidenceCheckAt = confidence.nextConfidenceCheckAt.toUtcInstant()
         )
 
-    private fun toStateRequest(state: TaskBusinessState): AddressStateRequest =
-        AddressStateRequest(validFrom = state.validFrom, validTo = state.validTo, type = state.type)
+    private fun toStateRequest(state: AddressStateDto): AddressStateRequest =
+        AddressStateRequest(validFrom = state.validFrom?.toUtcInstant(), validTo = state.validTo?.toUtcInstant(), type = state.type)
 
-    private fun toIdentifierRequest(identifier: TaskIdentifier): AddressIdentifierRequest =
+    private fun toIdentifierRequest(identifier: AddressIdentifierDto): AddressIdentifierRequest =
         AddressIdentifierRequest(value = identifier.value, type = identifier.type)
 
-    private fun toGeoRequest(geo: TaskGeoCoordinate): GeoCoordinateRequest =
+    private fun toGeoRequest(geo: GeoCoordinateDto): GeoCoordinateRequest =
         GeoCoordinateRequest(longitude = geo.longitude, latitude = geo.latitude, altitude = geo.altitude)
 
-    private fun toScriptVariant(variant: TaskScriptVariant): AddressScriptVariant =
+    private fun toScriptVariant(variant: LogisticAddressScriptVariantDto): AddressScriptVariant =
         AddressScriptVariant(
             scriptCode = variant.scriptCode,
-            address = toPostalScriptVariant(variant.postalProperties)
+            address = toPostalScriptVariant(variant.address)
         )
 
-    private fun toPostalScriptVariant(variant: TaskPostalAddressScriptVariant): PostalAddressScriptVariant =
+    private fun toPostalScriptVariant(variant: PostalAddressScriptVariantDto): PostalAddressScriptVariant =
         PostalAddressScriptVariant(
             addressName = variant.addressName,
             physicalAddress = toPhysicalScriptVariant(variant.physicalAddress),
             alternativeAddress = variant.alternativeAddress?.let { toAlternativeScriptVariant(it) }
         )
 
-    private fun toPhysicalScriptVariant(variant: TaskPhysicalAddressScriptVariant): PhysicalAddressScriptVariant =
+    private fun toPhysicalScriptVariant(variant: PhysicalAddressScriptVariantDto): PhysicalAddressScriptVariant =
         PhysicalAddressScriptVariant(
             postalCode = variant.postalCode,
             city = variant.city,
             district = variant.district,
-            street = toStreet(variant.street),
+            street = variant.street?.let { toStreet(it) },
             companyPostalCode = variant.companyPostalCode,
             industrialZone = variant.industrialZone,
             building = variant.building,
@@ -138,7 +141,7 @@ class GoldenRecordTaskAddressRequestMapper {
             taxJurisdictionCode = variant.taxJurisdictionCode
         )
 
-    private fun toAlternativeScriptVariant(variant: TaskAlternativeAddressScriptVariant): AlternativeAddressScriptVariant =
+    private fun toAlternativeScriptVariant(variant: AlternativeAddressScriptVariantDto): AlternativeAddressScriptVariant =
         AlternativeAddressScriptVariant(
             postalCode = variant.postalCode,
             city = variant.city,
@@ -146,7 +149,7 @@ class GoldenRecordTaskAddressRequestMapper {
             deliveryServiceNumber = variant.deliveryServiceNumber
         )
 
-    private fun toStreet(street: TaskStreet): Street =
+    private fun toStreet(street: StreetDto): Street =
         Street(
             name = street.name,
             houseNumber = street.houseNumber,
@@ -158,4 +161,6 @@ class GoldenRecordTaskAddressRequestMapper {
             nameSuffix = street.nameSuffix,
             additionalNameSuffix = street.additionalNameSuffix
         )
+
+    private fun LocalDateTime.toUtcInstant() = toInstant(ZoneOffset.UTC)
 }

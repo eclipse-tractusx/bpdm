@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.pool.model.AddressUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.AddressUpdateParseError
 import org.eclipse.tractusx.bpdm.pool.model.AddressUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
+import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.model.zipParseResults
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -52,7 +53,11 @@ class AdditionalAddressUpdateService(
         }
     }
 
+    fun update(requests: List<AddressUpdateParsed>): List<UpsertResult<LogisticAddressDb>> {
+        return addressUpdateService.update(requests)
+    }
+
     @Transactional
     fun parseAndUpdate(requests: List<AddressUpdateRequest>): List<ParseResult<UpsertResult<LogisticAddressDb>, AddressUpdateParseError>> =
-        addressUpdateService.parseAndUpdate(parse(requests))
+        parseAndExecute(requests, ::parse, ::update)
 }

@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.mapper
+package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound
 
 import org.eclipse.tractusx.bpdm.pool.api.model.ConfidenceCriteriaDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressScriptVariantDto
@@ -41,13 +41,13 @@ import java.time.ZoneOffset
 /**
  * Pure translation of a Pool API site request into the loose domain [SiteCreateRequest] / [SiteUpdateRequest] consumed by
  * the site services. No validation happens here — that is the site service's `parse`. The main address (and its localized
- * script variants, carried per-variant on the site) is delegated to [LogisticAddressDtoRequestMapper]; the Pool-computed
+ * script variants, carried per-variant on the site) is delegated to [AddressDtoRequestMapper]; the Pool-computed
  * confidence values are dropped there. Boundary time fields are converted from the API's `LocalDateTime` (UTC) to the
  * domain's `Instant`.
  */
 @Component
 class SiteDtoRequestMapper(
-    private val logisticAddressDtoRequestMapper: LogisticAddressDtoRequestMapper
+    private val addressDtoRequestMapper: AddressDtoRequestMapper
 ) {
 
     fun toCreateRequest(request: SitePartnerCreateRequest): SiteCreateRequest =
@@ -79,7 +79,7 @@ class SiteDtoRequestMapper(
     private fun toContentRequest(site: SiteDto): SiteContentRequest =
         SiteContentRequest(
             header = toHeaderRequest(site),
-            mainAddress = logisticAddressDtoRequestMapper.toContentRequest(
+            mainAddress = addressDtoRequestMapper.toContentRequest(
                 site.mainAddress,
                 site.scriptVariants.map { LogisticAddressScriptVariantDto(it.scriptCode, it.mainAddress) }
             )

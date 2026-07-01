@@ -23,12 +23,14 @@ import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
-import org.eclipse.tractusx.bpdm.pool.mapper.SiteEntityMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.entity.SiteEntityMapper
+import org.eclipse.tractusx.bpdm.pool.model.AddressSiteAssignment
 import org.eclipse.tractusx.bpdm.pool.model.LegalAddressAlreadyMainAddress
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.SiteCreateParseError
 import org.eclipse.tractusx.bpdm.pool.model.SiteCreateWithLegalAddressAsMainParsed
 import org.eclipse.tractusx.bpdm.pool.model.SiteCreateWithLegalAddressAsMainRequest
+import org.eclipse.tractusx.bpdm.pool.model.SiteHeaderCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.combine
 import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.model.zipParseResults
@@ -46,29 +48,18 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class SiteCreateWithLegalAddressAsMainService(
-    private val siteHeaderParser: SiteHeaderParser,
     private val legalEntityBpnParser: LegalEntityBpnParser,
-    private val bpnIssuingService: BpnIssuingService,
+    private val siteHeaderCreateService: SiteHeaderCreateService,
+    private val addressSiteAssignmentService: AddressSiteAssignmentService,
     private val siteRepository: SiteRepository,
-    private val changelogService: PartnerChangelogService,
-    private val siteEntityMapper: SiteEntityMapper
 ) {
 
     fun parse(
         requests: List<SiteCreateWithLegalAddressAsMainRequest>
     ): List<ParseResult<SiteCreateWithLegalAddressAsMainParsed, SiteCreateParseError>> {
-        val headerResults = siteHeaderParser.parse(requests.map { it.header })
 
-        // Fold the "legal address already in use" check onto the resolved parent: an already-attached legal address can't
-        // back a second site. The check needs the resolved entity, so it rides on the legal-entity parse result.
-        val legalEntityResults = legalEntityBpnParser.parse(requests.map { it.legalEntityBpn }).map { result ->
-            val alreadyUsedErrors: List<SiteCreateParseError> = when (result) {
-                is ParseResult.Success -> result.parsed.legalAddress.sites.firstOrNull()
-                    ?.let { listOf(LegalAddressAlreadyMainAddress(it.bpn)) } ?: emptyList()
-                is ParseResult.Failure -> emptyList()
-            }
-            result.combine(alreadyUsedErrors) { it }
-        }
+        val headerResults = siteHeaderCreateService.parse(requests.map { it.header })
+        val legalEntityResults = legalEntityBpnParser.parse(requests.map { it.legalEntityBpn })
 
         return zipParseResults(legalEntityResults, headerResults) { legalEntity, header ->
             SiteCreateWithLegalAddressAsMainParsed(legalEntity, header)
@@ -81,22 +72,18 @@ class SiteCreateWithLegalAddressAsMainService(
      */
     @Transactional
     fun create(parsed: List<SiteCreateWithLegalAddressAsMainParsed>): List<SiteDb> {
-        val bpns = bpnIssuingService.issueSiteBpns(parsed.size)
-        // A new site's confidence starts with one sharing member (preserves the previous create behavior).
-        val sites = parsed.zip(bpns) { entry, bpn ->
-            siteEntityMapper.toEntity(bpn, entry.legalEntity, entry.header, numberOfSharingMembers = 1).apply {
-                // Reuse the legal entity's existing legal address as the main address instead of creating a new one.
-                mainAddress = entry.legalEntity.legalAddress
-                mainAddress.sites.add(this)
-            }
-        }
+        val sites = siteHeaderCreateService.create(parsed.map { SiteHeaderCreateParsed(it.legalEntity, it.header) })
 
-        // Only a SITE changelog: the reused legal address already exists, so no ADDRESS CREATE is emitted.
-        changelogService.createChangelogEntries(sites.map {
-            ChangelogEntryCreateRequest(it.bpn, ChangelogType.CREATE, BusinessPartnerType.SITE)
-        })
-
+        // The legal entity's existing legal address is reused verbatim as the site's main address. Set the (mandatory)
+        // main-address FK and persist the sites *before* wiring them into the address's `sites` membership: the site must
+        // be a managed entity before it is added to the address collection, otherwise the address re-save weaves a
+        // transient site into the collection and later reads back an unhydrated phantom.
+        sites.zip(parsed) { site, siteRequest -> site.mainAddress = siteRequest.legalEntity.legalAddress }
         siteRepository.saveAll(sites)
+
+        val mainAddressRequests = parsed.zip(sites) { siteRequest, createdSite -> AddressSiteAssignment(siteRequest.legalEntity.legalAddress, createdSite) }
+        addressSiteAssignmentService.assign(mainAddressRequests)
+
         return sites
     }
 

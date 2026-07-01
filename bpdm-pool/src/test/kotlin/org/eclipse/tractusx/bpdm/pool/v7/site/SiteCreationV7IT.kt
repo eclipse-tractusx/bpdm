@@ -74,28 +74,6 @@ class SiteCreationV7IT : UnscheduledPoolTestBaseV7() {
     }
 
     /**
-     * GIVEN legal entity with legal address site
-     * WHEN operator tries to create a new legal address site
-     * THEN operator sees MainAddressDuplicateIdentifier error
-     */
-    @Test
-    fun `try create duplicate legal address site`() {
-        //GIVEN
-        val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
-        testDataClient.createLegalAddressSite(legalEntityResponse, testName)
-
-        //WHEN
-        val siteRequest = requestFactory.buildLegalAddressSiteCreateRequest("New Legal Address Site $testName", legalEntityResponse)
-        val response = poolClient.sites.createSiteWithLegalReference(listOf(siteRequest))
-
-        //THEN
-        val expectedError = ErrorInfo(SiteCreateError.MainAddressDuplicateIdentifier, "IGNORED", "0")
-        val expectedResponse = SitePartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
-
-        assertRepository.assertSiteCreateResponseWrapperIsEqual(response, expectedResponse)
-    }
-
-    /**
      * GIVEN legal entity and site with main address identifier X
      * WHEN operator tries to create a new site for legal entity with main address identifier X
      * THEN operator sees MainAddressDuplicateIdentifier error

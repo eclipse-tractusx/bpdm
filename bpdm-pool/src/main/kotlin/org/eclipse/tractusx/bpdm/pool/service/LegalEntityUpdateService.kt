@@ -26,13 +26,15 @@ import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
-import org.eclipse.tractusx.bpdm.pool.mapper.LegalEntityEntityMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.entity.LegalEntityEntityMapper
+import org.eclipse.tractusx.bpdm.pool.model.AddressUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityUpdateParseError
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.combine
+import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.model.zipParseResults
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.springframework.stereotype.Service
@@ -40,13 +42,6 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
-/**
- * Updates existing legal entities. `parse` resolves the target legal entity and validates header + identifier-uniqueness +
- * legal-address content; `update` mutates the managed legal entity and its legal address, gating the save and BOTH
- * changelog entries on a whole-aggregate change (preserving the previous update behavior). The legal address is mutated
- * via [AddressUpdateService.applyTo] — which deliberately does not save or emit its own changelog — so the legal entity
- * keeps aggregate-level gating. Order-preserving positional contract (see [ParseResult]).
- */
 @Service
 class LegalEntityUpdateService(
     private val legalEntityBpnParser: LegalEntityBpnParser,
@@ -78,25 +73,29 @@ class LegalEntityUpdateService(
         }
     }
 
-    /**
-     * Returns the updated entities (within the caller's transaction) rather than a detached response model: building
-     * version-specific responses is the job of the border/application service at the edge.
-     */
     @Transactional
-    fun update(parsed: List<LegalEntityUpdateParsed>): List<UpsertResult<LegalEntityDb>> =
-        parsed.map { update(it) }
+    fun update(parsed: List<LegalEntityUpdateParsed>): List<UpsertResult<LegalEntityDb>>{
+        val headerResults = parsed.map { update(it) }
+
+        val legalAddressRequests = parsed.map { AddressUpdateParsed(it.target.legalAddress, null, it.content.legalAddress.address, it.content.legalAddress.scriptVariants) }
+        val legalAddressResults = addressUpdateService.update(legalAddressRequests)
+
+        return headerResults.zip(legalAddressResults){ headerResult, legalAddressResult ->
+            val changed = headerResult.upsertType == UpsertType.Updated || legalAddressResult.upsertType == UpsertType.Updated
+            UpsertResult(headerResult.value, if(changed) UpsertType.Updated else UpsertType.NoChange)
+        }
+    }
 
     private fun update(parsed: LegalEntityUpdateParsed): UpsertResult<LegalEntityDb> {
         val target = parsed.target
 
         val before = equivalenceMapper.toEquivalenceDto(target)
-        applyTo(target, parsed.content)
+        doUpdateEntity(target, parsed.content)
         val after = equivalenceMapper.toEquivalenceDto(target)
 
         val upsertType = if (before != after) {
             legalEntityRepository.save(target)
             changelogService.createChangelogEntries(listOf(ChangelogEntryCreateRequest(target.bpn, ChangelogType.UPDATE, BusinessPartnerType.LEGAL_ENTITY)))
-            changelogService.createChangelogEntries(listOf(ChangelogEntryCreateRequest(target.legalAddress.bpn, ChangelogType.UPDATE, BusinessPartnerType.ADDRESS)))
             UpsertType.Updated
         } else {
             UpsertType.NoChange
@@ -105,7 +104,7 @@ class LegalEntityUpdateService(
         return UpsertResult(target, upsertType)
     }
 
-    private fun applyTo(target: LegalEntityDb, content: LegalEntityContentParsed) {
+    private fun doUpdateEntity(target: LegalEntityDb, content: LegalEntityContentParsed) {
         val header = content.header
         target.legalName = legalEntityEntityMapper.toLegalName(header)
         target.legalForm = header.legalForm
@@ -118,20 +117,10 @@ class LegalEntityUpdateService(
         // currentness is refreshed on every update; it is excluded from the equivalence diff, so it never by itself marks
         // the aggregate as changed (matches the previous update behavior).
         target.currentness = Instant.now().truncatedTo(ChronoUnit.MICROS)
-
-        val legalAddress = content.legalAddress
-        addressUpdateService.applyTo(target.legalAddress, legalAddress.address, legalAddress.scriptVariants, target.legalAddress.confidenceCriteria.numberOfSharingMembers)
     }
 
     @Transactional
     fun parseAndUpdate(requests: List<LegalEntityUpdateRequest>): List<ParseResult<UpsertResult<LegalEntityDb>, LegalEntityUpdateParseError>> {
-        val parseResults = parse(requests)
-        val updated = update(parseResults.filterIsInstance<ParseResult.Success<LegalEntityUpdateParsed>>().map { it.parsed }).iterator()
-        return parseResults.map { result ->
-            when (result) {
-                is ParseResult.Success -> ParseResult.Success(updated.next())
-                is ParseResult.Failure -> result
-            }
-        }
+        return parseAndExecute(requests, ::parse, ::update)
     }
 }
