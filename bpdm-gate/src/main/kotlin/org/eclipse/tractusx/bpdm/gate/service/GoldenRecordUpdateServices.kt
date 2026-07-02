@@ -188,12 +188,13 @@ class GoldenRecordUpdateChunkService(
 
         val addressesByBpn = addresses.associateBy { it.address.bpna }
 
-        // The Pool exposes an address's additional site memberships as bare BPNS; resolve them to names in one batch.
-        val additionalSiteNamesByBpn = resolveSiteNames(addresses.flatMap { it.address.additionalSites })
+        // Resolve names in one batch for every site an address belongs to. The Pool's `bpnSite` (its oldest member)
+        // may itself be "additional" for an output that follows a different site, so it is a name candidate too.
+        val siteNamesByBpn = resolveSiteNames(addresses.flatMap { listOfNotNull(it.address.bpnSite) + it.address.additionalSites })
 
         return businessPartnersToUpdate.mapNotNull { output ->
             val address = addressesByBpn[output.bpnA!!] ?: return@mapNotNull null
-            val upsertData = address.toUpsertData(output, additionalSiteNamesByBpn)
+            val upsertData = address.toUpsertData(output, siteNamesByBpn)
             businessPartnerService.updateBusinessPartnerOutput(output, upsertData)
         }
     }
@@ -387,8 +388,16 @@ class GoldenRecordUpdateChunkService(
         businessPartner.addressConfidence?.let { update(it,  addressProperties.confidenceCriteria) }
         businessPartner.addressGoldenRecordRelations.addAll(addressProperties.relations.map(::toEntity))
 
+        // Which of the address's sites is "additional" is relative to the site THIS output follows, not the Pool's
+        // `bpnSite` (its oldest member): the output tracks the site that was shared (bpnS), which may be any member.
+        // If the output does not yet track a site but the address is a site main, it starts tracking `bpnSite` below,
+        // so anticipate that here. Everything else the address belongs to becomes an additional site.
+        val trackedSiteBpn = businessPartner.bpnS ?: addressProperties.bpnSite
+        val additionalSiteBpns = (listOfNotNull(addressProperties.bpnSite) + addressProperties.additionalSites)
+            .distinct()
+            .filterNot { it == trackedSiteBpn }
         businessPartner.additionalSites.clear()
-        businessPartner.additionalSites.addAll(addressProperties.additionalSites.map { AdditionalSiteDb(it, siteNamesByBpn[it]) })
+        businessPartner.additionalSites.addAll(additionalSiteBpns.map { AdditionalSiteDb(it, siteNamesByBpn[it]) })
 
         val goldenRecordVariantByCode = businessPartner.scriptVariants.associateBy { it.scriptCode }
         address.scriptVariants.groupBy { it.scriptCode }.map { it.value.first() }.forEach { goldenRecordVariant ->
