@@ -82,7 +82,7 @@ class UltimateOwnerResolutionService(
         val ultimateOwnerBpnl = resolveUltimateOwner(legalEntity)
         val previousUltimateOwnerBpnl = legalEntity.ultimateOwnerBpnl
 
-        if (previousUltimateOwnerBpnl != ultimateOwnerBpnl) {
+        if (previousUltimateOwnerBpnl == null && ultimateOwnerBpnl != null) {
             legalEntity.ultimateOwnerBpnl = ultimateOwnerBpnl
             legalEntityRepository.save(legalEntity)
             changelogService.createChangelogEntry(

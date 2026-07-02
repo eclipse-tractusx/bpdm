@@ -169,16 +169,16 @@ class TaskResolutionServiceTest @Autowired constructor(
 
         val createdBpnl = createResult[0].businessPartner.legalEntity.bpnReference.referenceValue!!
         assertThat(createResult[0].businessPartner.legalEntity.ownershipUltimate).isTrue()
-        assertThat(createResult[0].businessPartner.legalEntity.ultimateOwnerBpnl).isNull()
+        assertThat(createResult[0].businessPartner.legalEntity.ultimateOwnerBpnl).isEqualTo(createdBpnl)
 
         val createdFromPoolApi = poolClient.legalEntities.getLegalEntity(createdBpnl)
         assertThat(createdFromPoolApi.header.ownershipUltimate).isTrue()
-        assertThat(createdFromPoolApi.header.ultimateOwnerBpnl).isNull()
+        assertThat(createdFromPoolApi.header.ultimateOwnerBpnl).isEqualTo(createdBpnl)
 
         val persistedEntity = legalEntityRepository.findByBpnIgnoreCase(createdBpnl)
         assertThat(persistedEntity).isNotNull()
         assertThat(persistedEntity!!.ownershipUltimate).isTrue()
-        assertThat(persistedEntity.ultimateOwnerBpnl).isNull()
+        assertThat(persistedEntity.ultimateOwnerBpnl).isEqualTo(createdBpnl)
     }
 
     @Test
@@ -1246,7 +1246,7 @@ class TaskResolutionServiceTest @Autowired constructor(
         val persistedEntity = legalEntityRepository.findByBpnIgnoreCase(createdBpnl)
         assertThat(persistedEntity).isNotNull()
         assertThat(persistedEntity!!.ownershipUltimate).isTrue()
-        assertThat(persistedEntity.ultimateOwnerBpnl).isNull()
+        assertThat(persistedEntity.ultimateOwnerBpnl).isEqualTo(createdBpnl)
 
         // Update the entity to set ownershipUltimate to false
         val updateRequest = createRequest
