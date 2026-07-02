@@ -81,16 +81,17 @@ class UltimateOwnerResolutionService(
 
         val ultimateOwnerBpnl = resolveUltimateOwner(legalEntity)
         val previousUltimateOwnerBpnl = legalEntity.ultimateOwnerBpnl
-        legalEntity.ultimateOwnerBpnl = ultimateOwnerBpnl
-        legalEntityRepository.save(legalEntity)
 
         if (previousUltimateOwnerBpnl != ultimateOwnerBpnl) {
+            legalEntity.ultimateOwnerBpnl = ultimateOwnerBpnl
+            legalEntityRepository.save(legalEntity)
             changelogService.createChangelogEntry(
                 ChangelogEntryCreateRequest(legalEntity.bpn, ChangelogType.UPDATE, BusinessPartnerType.LEGAL_ENTITY)
             )
+            logger.debug { "Updated ultimateOwnerBpnl for ${legalEntity.bpn} from $previousUltimateOwnerBpnl to $ultimateOwnerBpnl" }
+        } else {
+            logger.debug { "ultimateOwnerBpnl for ${legalEntity.bpn} unchanged: $ultimateOwnerBpnl" }
         }
-
-        logger.debug { "Updated ultimateOwnerBpnl for ${legalEntity.bpn} to ${legalEntity.ultimateOwnerBpnl}" }
 
         val childRelations = relationRepository.findByTypeAndEndNode(LegalEntityRelationType.IsOwnedBy, legalEntity)
 
