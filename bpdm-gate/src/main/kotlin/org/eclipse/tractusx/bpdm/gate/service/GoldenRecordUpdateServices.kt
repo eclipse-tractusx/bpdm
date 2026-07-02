@@ -336,6 +336,8 @@ class GoldenRecordUpdateChunkService(
         businessPartner.shortName = header.legalShortName
         businessPartner.legalEntityConfidence?.let { update(it,  header.confidenceCriteria) }
         businessPartner.legalEntityGoldenRecordRelations.addAll(legalEntity.header.relations.map(::toEntity))
+        businessPartner.ownershipUltimate = header.ownershipUltimate
+        businessPartner.ultimateOwnerBpnl = header.ultimateOwnerBpnl
 
         val variantByCode = businessPartner.scriptVariants.associateBy { it.scriptCode }
 

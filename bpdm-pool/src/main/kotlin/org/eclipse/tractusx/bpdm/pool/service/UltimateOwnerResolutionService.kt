@@ -20,7 +20,10 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
+import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
@@ -30,7 +33,8 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class UltimateOwnerResolutionService(
     private val relationRepository: RelationRepository,
-    private val legalEntityRepository: LegalEntityRepository
+    private val legalEntityRepository: LegalEntityRepository,
+    private val changelogService: PartnerChangelogService
 ) {
     private val logger = KotlinLogging.logger { }
 
@@ -43,7 +47,7 @@ class UltimateOwnerResolutionService(
 
     private fun resolveUltimateOwnerWithCycleProtection(legalEntity: LegalEntityDb, visited: MutableSet<String>): String? {
         val currentBpn = legalEntity.bpn
-        
+
         if (currentBpn in visited) {
             logger.warn { "Cycle detected in ownership chain at BPNL: $currentBpn" }
             return null
@@ -51,7 +55,7 @@ class UltimateOwnerResolutionService(
         visited.add(currentBpn)
 
         val owningRelations = relationRepository.findByTypeAndStartNode(LegalEntityRelationType.IsOwnedBy, legalEntity)
-        
+
         if (owningRelations.isEmpty()) {
             return if (legalEntity.ownershipUltimate) currentBpn else null
         }
@@ -66,18 +70,9 @@ class UltimateOwnerResolutionService(
     }
 
     @Transactional
-    fun updateUltimateOwnerForEntity(legalEntity: LegalEntityDb) {
-        val ultimateOwnerBpnl = resolveUltimateOwner(legalEntity)
-        legalEntity.ultimateOwnerBpnl = ultimateOwnerBpnl
-        legalEntityRepository.save(legalEntity)
-        
-        logger.debug { "Updated ultimateOwnerBpnl for ${legalEntity.bpn} to $ultimateOwnerBpnl" }
-    }
-
-    @Transactional
     fun updateUltimateOwnerForEntityAndDescendants(legalEntity: LegalEntityDb, visited: MutableSet<String> = mutableSetOf()) {
         val currentBpn = legalEntity.bpn
-        
+
         if (currentBpn in visited) {
             logger.warn { "Cycle detected in descendant update at BPNL: $currentBpn" }
             return
@@ -85,13 +80,20 @@ class UltimateOwnerResolutionService(
         visited.add(currentBpn)
 
         val ultimateOwnerBpnl = resolveUltimateOwner(legalEntity)
+        val previousUltimateOwnerBpnl = legalEntity.ultimateOwnerBpnl
         legalEntity.ultimateOwnerBpnl = ultimateOwnerBpnl
         legalEntityRepository.save(legalEntity)
-        
-        logger.debug { "Updated ultimateOwnerBpnl for ${legalEntity.bpn} to $ultimateOwnerBpnl" }
+
+        if (previousUltimateOwnerBpnl != ultimateOwnerBpnl) {
+            changelogService.createChangelogEntry(
+                ChangelogEntryCreateRequest(legalEntity.bpn, ChangelogType.UPDATE, BusinessPartnerType.LEGAL_ENTITY)
+            )
+        }
+
+        logger.debug { "Updated ultimateOwnerBpnl for ${legalEntity.bpn} to ${legalEntity.ultimateOwnerBpnl}" }
 
         val childRelations = relationRepository.findByTypeAndEndNode(LegalEntityRelationType.IsOwnedBy, legalEntity)
-        
+
         for (relation in childRelations) {
             val child = relation.startNode
             updateUltimateOwnerForEntityAndDescendants(child, visited)
@@ -99,29 +101,4 @@ class UltimateOwnerResolutionService(
     }
 
 
-    fun findDescendants(legalEntity: LegalEntityDb): Set<LegalEntityDb> {
-        val descendants = mutableSetOf<LegalEntityDb>()
-        val queue = ArrayDeque<LegalEntityDb>()
-        val visited = mutableSetOf<String>()
-
-        queue.add(legalEntity)
-        visited.add(legalEntity.bpn)
-
-        while (queue.isNotEmpty()) {
-            val current = queue.removeFirst()
-            
-            val childRelations = relationRepository.findByTypeAndEndNode(LegalEntityRelationType.IsOwnedBy, current)
-            
-            for (relation in childRelations) {
-                val child = relation.startNode
-                if (child.bpn !in visited) {
-                    visited.add(child.bpn)
-                    descendants.add(child)
-                    queue.add(child)
-                }
-            }
-        }
-
-        return descendants
-    }
 }

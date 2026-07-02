@@ -49,7 +49,8 @@ class BusinessPartnerBuildService(
     private val siteRepository: SiteRepository,
     private val logisticAddressRepository: LogisticAddressRepository,
     private val requestValidationService: RequestValidationService,
-    private val businessPartnerEquivalenceMapper: BusinessPartnerEquivalenceMapper
+    private val businessPartnerEquivalenceMapper: BusinessPartnerEquivalenceMapper,
+    private val ultimateOwnerResolutionService: UltimateOwnerResolutionService
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -94,6 +95,10 @@ class BusinessPartnerBuildService(
 
         }
         legalEntityRepository.saveAll(legalEntities)
+
+        legalEntities.forEach { createdEntity ->
+            ultimateOwnerResolutionService.updateUltimateOwnerForEntityAndDescendants(createdEntity)
+        }
 
         val legalEntityResponse = legalEntities.map { it.toUpsertDto(requestsByLegalEntities[it]!!.index) }
 
@@ -281,6 +286,9 @@ class BusinessPartnerBuildService(
                 logger.info { "Legal Entity ${legalEntity.bpn} was updated" }
 
                 legalEntityRepository.save(legalEntity)
+
+                // Keep ownership chain data in sync after legal entity updates.
+                ultimateOwnerResolutionService.updateUltimateOwnerForEntityAndDescendants(legalEntity)
 
                 changelogService.createChangelogEntries(
                     listOf(
@@ -739,7 +747,7 @@ class BusinessPartnerBuildService(
             legalEntity.confidenceCriteria = updateConfidenceCriteria( legalEntity.confidenceCriteria, legalEntityHeaderDto.confidenceCriteria)
             legalEntity.isCatenaXMemberData = legalEntityHeaderDto.isParticipantData
             legalEntity.ownershipUltimate = legalEntityHeaderDto.ownershipUltimate ?: legalEntity.ownershipUltimate
-            legalEntity.ultimateOwnerBpnl = legalEntityHeaderDto.ultimateOwnerBpnl ?: legalEntity.ultimateOwnerBpnl
+            legalEntity.ultimateOwnerBpnl = legalEntityHeaderDto.ultimateOwnerBpnl
 
             legalEntity.scriptVariants.replace(scriptVariants.map { variant -> LegalEntityScriptVariantDb(metadataMap.scriptCodes[variant.scriptCode]!!, variant.legalName, variant.shortName) })
         }
