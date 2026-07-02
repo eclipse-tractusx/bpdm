@@ -85,6 +85,7 @@ class BusinessPartnerMappings {
             address = toAddressComponentOutputDto(entity),
             externalSequenceTimestamp = entity.externalSequenceTimestamp,
             scriptVariants = entity.scriptVariants.map { variant -> toScriptVariantDto(variant) },
+            additionalSites = entity.additionalSites.map { AdditionalSiteOutputDto(siteBpn = it.bpn, name = it.name) },
             createdAt = entity.createdAt,
             updatedAt = entity.updatedAt
         )

@@ -124,6 +124,13 @@ class BusinessPartnerTestDataClientV7(
         return refinement.poolResult
     }
 
+    fun refineToAdditionalAddressWithAdditionalSites(input: BusinessPartnerInputDto, seed: String = input.externalId): PoolMockDataFactory.AdditionalAddressWithAdditionalSitesResult {
+        val owningCompany = if (input.isOwnCompanyData) tenantBpnL else null
+        val refinement = goldenRecordMockFactory.mockAdditionalAddressWithAdditionalSitesRefinement(seed, owningCompany, input.nameParts)
+        shareBusinessPartnerAndResolve(input.externalId)
+        return refinement.poolResult
+    }
+
     private fun prepareLegalEntityRefinement(input: BusinessPartnerInputDto, seed: String = input.externalId): LegalEntityWithLegalAddressVerboseDto {
         val owningCompany = if (input.isOwnCompanyData) tenantBpnL else null
         return goldenRecordMockFactory.mockLegalEntityRefinement(seed, owningCompany, input.nameParts)

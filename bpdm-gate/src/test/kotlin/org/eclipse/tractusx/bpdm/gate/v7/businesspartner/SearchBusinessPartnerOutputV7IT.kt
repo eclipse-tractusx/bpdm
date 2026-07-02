@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.v7.businesspartner
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.AdditionalSiteOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
 import org.junit.jupiter.api.Test
@@ -109,6 +110,31 @@ class SearchBusinessPartnerOutputV7IT: UnscheduledGateTestBaseV7() {
 
         //THEN
         val expectedOutput = testData.businessPartner.output.fromAdditionalAddressOnSite(createdInput, goldenRecord.legalEntityParent, goldenRecord.siteParent, goldenRecord.additionalAddress)
+        val expectedResponse = PageDto(1, 1, 0, 1, listOf(expectedOutput))
+
+        assertRepo.assertBusinessPartnerOutput(response, expectedResponse)
+    }
+
+    /**
+     * GIVEN business partner output based on an additional address that belongs to further sites beyond its primary site
+     * WHEN output consumer searches for output with that external-ID
+     * THEN output consumer sees the further site memberships in the additionalSites collection, resolved to name/BPN pairs
+     *
+     */
+    @Test
+    fun `search additional address business partner output with additional sites`(){
+        //GIVEN
+        val createdInput = testDataClient.businessPartner.upsertInput(testName)
+        val goldenRecord = testDataClient.businessPartner.refineToAdditionalAddressWithAdditionalSites(createdInput)
+
+        //WHEN
+        val response = gateClient.businessParters.getBusinessPartnersOutput(listOf(createdInput.externalId))
+
+        //THEN
+        val expectedAdditionalSites = goldenRecord.additionalSites.map { AdditionalSiteOutputDto(it.site.bpns, it.site.name) }
+        val expectedOutput = testData.businessPartner.output.fromAdditionalAddressOnSite(
+            createdInput, goldenRecord.legalEntityParent, goldenRecord.siteParent, goldenRecord.additionalAddress, expectedAdditionalSites
+        )
         val expectedResponse = PageDto(1, 1, 0, 1, listOf(expectedOutput))
 
         assertRepo.assertBusinessPartnerOutput(response, expectedResponse)

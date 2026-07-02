@@ -64,6 +64,8 @@ class OutputUpsertMappings(
             .forEach { businessPartner.legalEntityGoldenRecordRelations.add(it) }
         upsertData.addressGoldenRecordRelations.map { toAddressGoldenRecordRelation(it) }
             .forEach { businessPartner.addressGoldenRecordRelations.add(it) }
+        upsertData.additionalSites.map { AdditionalSiteDb(it.siteBpn, it.name) }
+            .forEach { businessPartner.additionalSites.add(it) }
 
         return businessPartner
     }

@@ -47,5 +47,6 @@ data class OutputUpsertData(
     val addressConfidence: ConfidenceCriteria,
     val scriptVariants: List<BusinessPartnerScriptVariantDto>,
     val legalEntityGoldenRecordRelations: List<LegalEntityGoldenRecordRelation>,
-    val addressGoldenRecordRelations: List<AddressGoldenRecordRelation>
+    val addressGoldenRecordRelations: List<AddressGoldenRecordRelation>,
+    val additionalSites: List<AdditionalSite> = emptyList()
 )

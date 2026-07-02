@@ -43,6 +43,9 @@ data class BusinessPartnerOutputDto(
     override val externalSequenceTimestamp: Instant? = null,
     val scriptVariants: List<BusinessPartnerScriptVariantDto> = emptyList(),
 
+    @get:Schema(description = "The further sites this business partner's address belongs to, in addition to the primary 'site'.")
+    val additionalSites: Collection<AdditionalSiteOutputDto> = emptyList(),
+
     @get:Schema(description = CommonDescription.createdAt)
     val createdAt: Instant,
 
@@ -74,6 +77,17 @@ data class SiteRepresentationOutputDto(
     val confidenceCriteria: ConfidenceCriteriaDto,
     override val states: Collection<BusinessPartnerStateDto> = emptyList()
 ) : IBaseSiteRepresentation
+
+@Schema(
+    description = "A further site a business partner's address belongs to, in addition to its primary site",
+    requiredProperties = ["siteBpn"]
+)
+data class AdditionalSiteOutputDto(
+    @get:Schema(description = "The BPNS of the site")
+    val siteBpn: String,
+    @get:Schema(description = "The name of the site")
+    val name: String? = null
+)
 
 @Schema(
     description = "Address properties of business partner output data",

@@ -45,6 +45,7 @@ class BusinessPartnerComparisonUtil {
                 entity.states != persistedBP.states ||
                 entity.legalEntityGoldenRecordRelations != persistedBP.legalEntityGoldenRecordRelations ||
                 entity.addressGoldenRecordRelations != persistedBP.addressGoldenRecordRelations ||
+                entity.additionalSites != persistedBP.additionalSites ||
                 postalAddressHasChanges(entity.postalAddress, persistedBP.postalAddress) ||
                 scriptVariantsHaveChanges(entity.scriptVariants, persistedBP.scriptVariants)
     }

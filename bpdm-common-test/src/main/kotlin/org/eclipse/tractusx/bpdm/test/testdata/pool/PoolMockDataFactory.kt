@@ -124,6 +124,31 @@ class PoolMockDataFactory(
 
 
 
+    fun mockAdditionalAddressWithAdditionalSitesSearchResult(seed: String): AdditionalAddressWithAdditionalSitesResult {
+        configureWireMock()
+        WireMock.reset()
+
+        val legalEntityRequest = requestFactory.createLegalEntityRequest(seed)
+        val siteRequest = requestFactory.buildSiteCreateRequest(seed, "BPNL$seed")
+        val additionalSiteRequest = requestFactory.buildSiteCreateRequest("${seed}Additional", "BPNL$seed")
+        val addressRequest = requestFactory.buildAdditionalAddressCreateRequest(seed, "BPNS$seed")
+
+        val mockedLegalEntity = expectedResultFactory.mapToExpectedLegalEntity(legalEntityRequest, siteRequest.bpnlParent, isMaintainConfidences = true)
+        val mockedSite = expectedResultFactory.mapToExpectedSite(siteRequest, mockedLegalEntity.header.isParticipantData, "BPNS$seed", isMaintainConfidences = true)
+        val mockedAdditionalSite = expectedResultFactory.mapToExpectedSite(additionalSiteRequest, mockedLegalEntity.header.isParticipantData, "BPNS${seed}Additional", isMaintainConfidences = true)
+
+        val mockedInvariantAddress = expectedResultFactory
+            .mapToExpectedAdditionalAddress(addressRequest, mockedLegalEntity.header.isParticipantData, givenBpnA = "BPNA$seed", isMaintainConfidences = true)
+            .copy(additionalSites = listOf(mockedAdditionalSite.site.bpns))
+        val mockedAddress = LogisticAddressVerboseDto(mockedInvariantAddress, addressRequest.scriptVariants)
+
+        mockLegalEntitySearchResult(mockedLegalEntity)
+        mockSiteSearchResult(listOf(mockedSite, mockedAdditionalSite))
+        mockAddressSearchResult(mockedAddress)
+
+        return AdditionalAddressWithAdditionalSitesResult(mockedLegalEntity, mockedSite, mockedAddress, listOf(mockedAdditionalSite))
+    }
+
     fun mockLegalEntitySearchResult(legalEntityResult: LegalEntityWithLegalAddressVerboseDto){
         WireMock.configureFor("localhost", PoolMockContextInitializer.wiremockServer.port())
 
@@ -135,9 +160,11 @@ class PoolMockDataFactory(
         )
     }
 
-    private fun mockSiteSearchResult(siteResult: SiteWithMainAddressVerboseDto){
+    private fun mockSiteSearchResult(siteResult: SiteWithMainAddressVerboseDto) = mockSiteSearchResult(listOf(siteResult))
 
-        val mockedSitePage = PageDto(1, 1, 0, 1, listOf(siteResult))
+    private fun mockSiteSearchResult(siteResults: List<SiteWithMainAddressVerboseDto>){
+
+        val mockedSitePage = PageDto(siteResults.size.toLong(), 1, 0, siteResults.size, siteResults)
         WireMock.stubFor(
             WireMock
                 .get(WireMock.urlPathEqualTo(ApiCommons.SITE_BASE_PATH_V7))
@@ -164,6 +191,13 @@ class PoolMockDataFactory(
         val legalEntityParent: LegalEntityWithLegalAddressVerboseDto,
         val siteParent: SiteWithMainAddressVerboseDto,
         val additionalAddress: LogisticAddressVerboseDto
+    )
+
+    data class AdditionalAddressWithAdditionalSitesResult(
+        val legalEntityParent: LegalEntityWithLegalAddressVerboseDto,
+        val siteParent: SiteWithMainAddressVerboseDto,
+        val additionalAddress: LogisticAddressVerboseDto,
+        val additionalSites: List<SiteWithMainAddressVerboseDto>
     )
 
     fun configureWireMock(){

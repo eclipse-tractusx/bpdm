@@ -188,11 +188,24 @@ class GoldenRecordUpdateChunkService(
 
         val addressesByBpn = addresses.associateBy { it.address.bpna }
 
+        // The Pool exposes an address's additional site memberships as bare BPNS; resolve them to names in one batch.
+        val additionalSiteNamesByBpn = resolveSiteNames(addresses.flatMap { it.address.additionalSites })
+
         return businessPartnersToUpdate.mapNotNull { output ->
             val address = addressesByBpn[output.bpnA!!] ?: return@mapNotNull null
-            val upsertData = address.toUpsertData(output)
+            val upsertData = address.toUpsertData(output, additionalSiteNamesByBpn)
             businessPartnerService.updateBusinessPartnerOutput(output, upsertData)
         }
+    }
+
+    private fun resolveSiteNames(siteBpns: Collection<String>): Map<String, String> {
+        val distinctBpns = siteBpns.distinct()
+        if (distinctBpns.isEmpty()) return emptyMap()
+
+        val searchRequest = SiteSearchRequest(siteBpns = distinctBpns)
+        return poolClient.sites.getSites(searchRequest, PaginationRequest(size = distinctBpns.size)).content
+            .map { it.site }
+            .associate { it.bpns to it.name }
     }
 
     private fun LegalEntityWithLegalAddressVerboseDto.toUpsertData(existingOutput: BusinessPartnerDb): OutputUpsertData {
@@ -211,10 +224,10 @@ class GoldenRecordUpdateChunkService(
         return copy.toUpsertData()
     }
 
-    private fun LogisticAddressVerboseDto.toUpsertData(existingOutput: BusinessPartnerDb): OutputUpsertData {
+    private fun LogisticAddressVerboseDto.toUpsertData(existingOutput: BusinessPartnerDb, siteNamesByBpn: Map<String, String>): OutputUpsertData {
         val copy = BusinessPartnerDb.createEmpty(existingOutput.sharingState, existingOutput.stage)
         copyUtil.copyValues(existingOutput, copy)
-        return update(copy, this)
+        return update(copy, this, siteNamesByBpn)
     }
 
     private fun BusinessPartnerDb.toUpsertData(): OutputUpsertData {
@@ -244,6 +257,7 @@ class GoldenRecordUpdateChunkService(
             scriptVariants = scriptVariants.map { businessPartnerMappings.toScriptVariantDto(it) },
             legalEntityGoldenRecordRelations = legalEntityGoldenRecordRelations.map { it.toUpsertData() },
             addressGoldenRecordRelations = addressGoldenRecordRelations.map { it.toUpsertData() },
+            additionalSites = additionalSites.map { AdditionalSite(it.bpn, it.name) },
         )
     }
 
@@ -361,7 +375,7 @@ class GoldenRecordUpdateChunkService(
         }
     }
 
-    private fun update(businessPartner: BusinessPartnerDb, address: LogisticAddressVerboseDto) : OutputUpsertData{
+    private fun update(businessPartner: BusinessPartnerDb, address: LogisticAddressVerboseDto, siteNamesByBpn: Map<String, String>) : OutputUpsertData{
         val addressProperties = address.address
 
         updateIdentifiers(businessPartner.identifiers, addressProperties.identifiers.map(::toEntity), BusinessPartnerType.ADDRESS)
@@ -372,6 +386,9 @@ class GoldenRecordUpdateChunkService(
         businessPartner.postalAddress.alternativePostalAddress = addressProperties.alternativePostalAddress?.toEntity()
         businessPartner.addressConfidence?.let { update(it,  addressProperties.confidenceCriteria) }
         businessPartner.addressGoldenRecordRelations.addAll(addressProperties.relations.map(::toEntity))
+
+        businessPartner.additionalSites.clear()
+        businessPartner.additionalSites.addAll(addressProperties.additionalSites.map { AdditionalSiteDb(it, siteNamesByBpn[it]) })
 
         val goldenRecordVariantByCode = businessPartner.scriptVariants.associateBy { it.scriptCode }
         address.scriptVariants.groupBy { it.scriptCode }.map { it.value.first() }.forEach { goldenRecordVariant ->

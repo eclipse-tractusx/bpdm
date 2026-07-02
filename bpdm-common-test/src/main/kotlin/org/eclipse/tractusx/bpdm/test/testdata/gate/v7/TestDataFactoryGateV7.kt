@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.test.testdata.gate.v7
 
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
+import org.eclipse.tractusx.bpdm.gate.api.model.response.AdditionalSiteOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
@@ -101,8 +102,9 @@ class TestDataFactoryGateV7(
                 input: BusinessPartnerInputDto,
                 legalEntity: LegalEntityWithLegalAddressVerboseDto,
                 site: SiteWithMainAddressVerboseDto,
-                additionalAddress: LogisticAddressVerboseDto
-            ) = bpOutputDtoFactory.fromAdditionalAddressOnSite(input, legalEntity, site, additionalAddress)
+                additionalAddress: LogisticAddressVerboseDto,
+                additionalSites: Collection<AdditionalSiteOutputDto> = emptyList()
+            ) = bpOutputDtoFactory.fromAdditionalAddressOnSite(input, legalEntity, site, additionalAddress, additionalSites)
         }
     }
 
