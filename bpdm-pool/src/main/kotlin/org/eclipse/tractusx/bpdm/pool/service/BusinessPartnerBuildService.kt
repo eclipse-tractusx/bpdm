@@ -46,7 +46,6 @@ import org.eclipse.tractusx.bpdm.pool.service.operation.AddressUpdateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.LegalEntityCreateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.LegalEntityUpdateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.SiteCreateService
-import org.eclipse.tractusx.bpdm.pool.service.operation.SiteCreateWithLegalAddressAsMainService
 import org.eclipse.tractusx.bpdm.pool.service.operation.SiteCreateWithReferencedAddressAsMainService
 import org.eclipse.tractusx.bpdm.pool.service.operation.SiteUpdateService
 import org.eclipse.tractusx.bpdm.pool.service.parser.AddressUpdateParser
@@ -76,7 +75,6 @@ class BusinessPartnerBuildService(
     private val siteCreateParser: SiteCreateParser,
     private val siteCreateService: SiteCreateService,
     private val siteCreateWithLegalAddressAsMainParser: SiteCreateWithLegalAddressAsMainParser,
-    private val siteCreateWithLegalAddressAsMainService: SiteCreateWithLegalAddressAsMainService,
     private val siteCreateWithReferencedAddressAsMainParser: SiteCreateWithReferencedAddressAsMainParser,
     private val siteCreateWithReferencedAddressAsMainService: SiteCreateWithReferencedAddressAsMainService,
     private val siteUpdateParser: SiteUpdateParser,
@@ -124,7 +122,7 @@ class BusinessPartnerBuildService(
 
         val responses = mutableListOf<SitePartnerCreateVerboseDto>()
         val errors = mutableListOf<ErrorInfo<SiteCreateError>>()
-        parseAndExecute(createRequests, siteCreateWithLegalAddressAsMainParser::parse, siteCreateWithLegalAddressAsMainService::create).forEachIndexed { index, result ->
+        parseAndExecute(createRequests, siteCreateWithLegalAddressAsMainParser::parse, siteCreateWithReferencedAddressAsMainService::create).forEachIndexed { index, result ->
             val entityKey = index.toString()
             when (result) {
                 is ParseResult.Success -> responses.add(result.parsed.toUpsertDto(entityKey))

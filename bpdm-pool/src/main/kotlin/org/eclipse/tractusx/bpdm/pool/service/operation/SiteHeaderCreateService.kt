@@ -32,8 +32,8 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Creates the site *header* — the shared piece the three site-create paths ([SiteCreateService],
- * [SiteCreateWithLegalAddressAsMainService], [SiteCreateWithReferencedAddressAsMainService]) have in common: issue the
+ * Creates the site *header* — the shared piece the site-create paths ([SiteCreateService],
+ * [SiteCreateWithReferencedAddressAsMainService]) have in common: issue the
  * site BPN, map the header to an entity, and emit the SITE CREATE changelog. It deliberately does **not** create,
  * resolve, or attach a main address, and it does **not** persist the site.
  *
@@ -50,8 +50,7 @@ import org.springframework.transaction.annotation.Transactional
 class SiteHeaderCreateService(
     private val bpnIssuingService: BpnIssuingService,
     private val changelogService: PartnerChangelogService,
-    private val siteEntityMapper: SiteEntityMapper,
-    private val siteRepository: SiteRepository
+    private val siteEntityMapper: SiteEntityMapper
 ) {
 
     /**

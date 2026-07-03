@@ -21,16 +21,18 @@ package org.eclipse.tractusx.bpdm.pool.service.parser
 
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.SiteCreateParseError
-import org.eclipse.tractusx.bpdm.pool.model.SiteCreateWithLegalAddressAsMainParsed
+import org.eclipse.tractusx.bpdm.pool.model.SiteCreateWithReferencedAddressAsMainParsed
 import org.eclipse.tractusx.bpdm.pool.model.SiteCreateWithLegalAddressAsMainRequest
 import org.eclipse.tractusx.bpdm.pool.model.zipParseResults
 import org.springframework.stereotype.Service
 
 /**
- * Parses "site with legal address as main" requests into the [SiteCreateWithLegalAddressAsMainParsed] command consumed by
- * [org.eclipse.tractusx.bpdm.pool.service.operation.SiteCreateWithLegalAddressAsMainService]. Resolves the legal-entity
- * parent and validates the site header; the main address is the parent's existing legal address, so no address content is
- * parsed here. Order-preserving positional contract (see [org.eclipse.tractusx.bpdm.pool.model.ParseResult]).
+ * Parses "site with legal address as main" requests into a [SiteCreateWithReferencedAddressAsMainParsed] command: this
+ * path is just the referenced-address case where the referenced main address is the parent legal entity's own legal
+ * address. It resolves the legal-entity parent and validates the site header, then hands off the legal address as the
+ * (already-resolved) main address — so [org.eclipse.tractusx.bpdm.pool.service.operation.SiteCreateWithReferencedAddressAsMainService]
+ * can create it with no dedicated legal-address operation. Order-preserving positional contract (see
+ * [org.eclipse.tractusx.bpdm.pool.model.ParseResult]).
  */
 @Service
 class SiteCreateWithLegalAddressAsMainParser(
@@ -40,12 +42,14 @@ class SiteCreateWithLegalAddressAsMainParser(
 
     fun parse(
         requests: List<SiteCreateWithLegalAddressAsMainRequest>
-    ): List<ParseResult<SiteCreateWithLegalAddressAsMainParsed, SiteCreateParseError>> {
+    ): List<ParseResult<SiteCreateWithReferencedAddressAsMainParsed, SiteCreateParseError>> {
         val headerResults = siteHeaderParser.parse(requests.map { it.header })
         val legalEntityResults = legalEntityBpnParser.parse(requests.map { it.legalEntityBpn })
 
         return zipParseResults(legalEntityResults, headerResults) { legalEntity, header ->
-            SiteCreateWithLegalAddressAsMainParsed(legalEntity, header)
+            // The legal address is the site's main address; its own back-reference gives the parent legal entity, so the
+            // referenced-address operation derives the same parent this path used to pass explicitly.
+            SiteCreateWithReferencedAddressAsMainParsed(legalEntity.legalAddress, header)
         }
     }
 }

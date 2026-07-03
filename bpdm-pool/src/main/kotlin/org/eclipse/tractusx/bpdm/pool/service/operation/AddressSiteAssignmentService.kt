@@ -51,8 +51,8 @@ import org.springframework.transaction.annotation.Transactional
  ******************************************************************************/
 /**
  * Assigns a site as a member of an *existing* logistic address — the shared "an address gained a site" step, reusable by
- * the site-create paths (e.g. [SiteCreateWithLegalAddressAsMainService], which reuses a legal address verbatim) and the
- * address-update services. It mutates only the address's `sites` membership; it does **not** set `SiteDb.mainAddress`
+ * the site-create paths (e.g. [SiteCreateWithReferencedAddressAsMainService], which reuses an existing address verbatim)
+ * and the address-update services. It mutates only the address's `sites` membership; it does **not** set `SiteDb.mainAddress`
  * (main-ness is the site's concern) so it is equally usable for additional-address assignment.
  *
  * Membership is part of the address's state (see [org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerEquivalenceMapper] — `sites` is in the address
