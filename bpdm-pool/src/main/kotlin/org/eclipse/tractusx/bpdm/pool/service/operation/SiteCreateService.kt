@@ -30,7 +30,7 @@ import org.eclipse.tractusx.bpdm.pool.model.SiteHeaderCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.model.zipParseResults
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
-import org.eclipse.tractusx.bpdm.pool.service.operation.SiteHeaderCreateService
+import org.eclipse.tractusx.bpdm.pool.service.parser.AddressContentParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntityBpnParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -54,7 +54,7 @@ import org.springframework.transaction.annotation.Transactional
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 /**
- * Creates sites under an existing legal entity, the site counterpart of [AdditionalAddressCreateService]. `parse` resolves
+ * Creates sites under an existing legal entity, the site counterpart of the additional-address create path. `parse` resolves
  * the legal-entity parent and validates header + main-address content (each by a single-responsibility parser, combined
  * with `zipParseResults`); `create` persists the site and its main address. Sites always attach to a persisted legal
  * entity, so no parent-injected lower layer is needed — the main address (whose parent is the still-unsaved site) is
@@ -63,6 +63,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class SiteCreateService(
     private val legalEntityBpnParser: LegalEntityBpnParser,
+    private val addressContentParser: AddressContentParser,
     private val addressCreateService: AddressCreateService,
     private val siteHeaderCreateService: SiteHeaderCreateService,
     private val siteRepository: SiteRepository
@@ -71,7 +72,8 @@ class SiteCreateService(
     fun parse(requests: List<SiteCreateRequest>): List<ParseResult<SiteCreateParsed, SiteCreateParseError>> {
         val headerResults = siteHeaderCreateService.parse(requests.map { it.content.header })
         val legalEntityResults = legalEntityBpnParser.parse(requests.map { it.legalEntityBpn })
-        val mainAddressResults = addressCreateService.parse(requests.map { it.content.mainAddress })
+        val mainAddresses = requests.map { it.content.mainAddress }
+        val mainAddressResults = addressContentParser.parse(mainAddresses, mainAddresses.map { null })
 
         return zipParseResults(headerResults, legalEntityResults, mainAddressResults) { header, legalEntity, mainAddress ->
             SiteCreateParsed(legalEntity, SiteContentParsed(header, mainAddress))

@@ -38,6 +38,7 @@ import org.eclipse.tractusx.bpdm.pool.model.zipParseResults
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerEquivalenceMapper
 import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
+import org.eclipse.tractusx.bpdm.pool.service.parser.AddressContentParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.SiteHeaderParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.SiteBpnParser
 import org.springframework.stereotype.Service
@@ -65,6 +66,7 @@ import org.springframework.transaction.annotation.Transactional
 class SiteUpdateService(
     private val siteHeaderParser: SiteHeaderParser,
     private val siteBpnParser: SiteBpnParser,
+    private val addressContentParser: AddressContentParser,
     private val addressContentUpdateService: AddressContentUpdateService,
     private val siteRepository: SiteRepository,
     private val changelogService: PartnerChangelogService,
@@ -77,7 +79,7 @@ class SiteUpdateService(
         val headerResults = siteHeaderParser.parse(requests.map { it.content.header })
         // The main address's duplicate check is scoped to its owning address; its BPN comes from the resolved target.
         val ownerBpns = targetResults.map { (it as? ParseResult.Success)?.parsed?.mainAddress?.bpn }
-        val mainAddressResults = addressContentUpdateService.parse(requests.map { it.content.mainAddress }, ownerBpns)
+        val mainAddressResults = addressContentParser.parse(requests.map { it.content.mainAddress }, ownerBpns)
 
         return zipParseResults(headerResults, targetResults, mainAddressResults) { header, target, mainAddress ->
             SiteUpdateParsed(target, SiteContentParsed(header, mainAddress))

@@ -39,6 +39,7 @@ import org.eclipse.tractusx.bpdm.pool.model.zipParseResults
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerEquivalenceMapper
 import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
+import org.eclipse.tractusx.bpdm.pool.service.parser.AddressContentParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntityBpnParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntityHeaderParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntityIdentifierDuplicateValidator
@@ -70,6 +71,7 @@ class LegalEntityUpdateService(
     private val legalEntityBpnParser: LegalEntityBpnParser,
     private val legalEntityHeaderParser: LegalEntityHeaderParser,
     private val duplicateValidator: LegalEntityIdentifierDuplicateValidator,
+    private val addressContentParser: AddressContentParser,
     private val addressUpdateService: AddressUpdateService,
     private val legalEntityRepository: LegalEntityRepository,
     private val changelogService: PartnerChangelogService,
@@ -89,7 +91,7 @@ class LegalEntityUpdateService(
 
         // The legal address's duplicate check is scoped to its owning address; its BPN comes from the resolved target.
         val legalAddressOwnerBpns = targetResults.map { (it as? ParseResult.Success)?.parsed?.legalAddress?.bpn }
-        val legalAddressResults = addressUpdateService.parseContent(requests.map { it.content.legalAddress }, legalAddressOwnerBpns)
+        val legalAddressResults = addressContentParser.parse(requests.map { it.content.legalAddress }, legalAddressOwnerBpns)
 
         return zipParseResults(mergedHeaderResults, targetResults, legalAddressResults) { header, target, legalAddress ->
             LegalEntityUpdateParsed(target, LegalEntityContentParsed(header, legalAddress))

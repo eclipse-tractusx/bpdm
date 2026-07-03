@@ -44,11 +44,14 @@ import org.eclipse.tractusx.bpdm.pool.model.AddressUpdateParseError
 import org.eclipse.tractusx.bpdm.pool.model.UnresolvableAddress
 import org.eclipse.tractusx.bpdm.pool.model.AddressUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
+import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
-import org.eclipse.tractusx.bpdm.pool.service.operation.AdditionalAddressCreateService
-import org.eclipse.tractusx.bpdm.pool.service.operation.AdditionalAddressUpdateService
+import org.eclipse.tractusx.bpdm.pool.service.operation.AddressCreateService
+import org.eclipse.tractusx.bpdm.pool.service.operation.AddressUpdateService
+import org.eclipse.tractusx.bpdm.pool.service.parser.AddressUpdateParser
+import org.eclipse.tractusx.bpdm.pool.service.parser.TypedParentAddressCreateParser
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.stereotype.Service
 import java.time.Instant
@@ -72,8 +75,10 @@ class TaskStepBuildService(
     private val logisticAddressRepository: LogisticAddressRepository,
     private val siteRepository: SiteRepository,
     private val sharingMemberConfidenceService: SharingMemberConfidenceService,
-    private val additionalAddressCreateService: AdditionalAddressCreateService,
-    private val additionalAddressUpdateService: AdditionalAddressUpdateService,
+    private val typedParentAddressCreateParser: TypedParentAddressCreateParser,
+    private val addressCreateService: AddressCreateService,
+    private val addressUpdateParser: AddressUpdateParser,
+    private val addressUpdateService: AddressUpdateService,
     private val taskAddressRequestMapper: GoldenRecordTaskAddressRequestMapper
 ) {
 
@@ -411,7 +416,8 @@ class TaskStepBuildService(
             content = taskAddressRequestMapper.toContentRequest(additionalAddress)
         )
 
-        return when (val result = additionalAddressCreateService.parseAndCreate(listOf(request)).single()) {
+        val result = parseAndExecute(listOf(request), typedParentAddressCreateParser::parse, addressCreateService::create).single()
+        return when (result) {
             is ParseResult.Success -> result.parsed.bpn
             is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { "Errors on creating Address: ${renderError(it)}" })
         }
@@ -428,7 +434,8 @@ class TaskStepBuildService(
             content = taskAddressRequestMapper.toContentRequest(additionalAddress)
         )
 
-        return when (val result = additionalAddressUpdateService.parseAndUpdate(listOf(request)).single()) {
+        val result = parseAndExecute(listOf(request), addressUpdateParser::parse, addressUpdateService::update).single()
+        return when (result) {
             is ParseResult.Success -> result.parsed.value.bpn
             is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { "Errors on updating Address: ${renderError(it)}" })
         }

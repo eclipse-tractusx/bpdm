@@ -35,6 +35,7 @@ import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.model.zipParseResults
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.service.BpnIssuingService
+import org.eclipse.tractusx.bpdm.pool.service.parser.AddressContentParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntityHeaderParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntityIdentifierDuplicateValidator
 import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
@@ -72,6 +73,7 @@ import java.time.temporal.ChronoUnit
 class LegalEntityCreateService(
     private val legalEntityHeaderParser: LegalEntityHeaderParser,
     private val duplicateValidator: LegalEntityIdentifierDuplicateValidator,
+    private val addressContentParser: AddressContentParser,
     private val addressCreateService: AddressCreateService,
     private val bpnIssuingService: BpnIssuingService,
     private val legalEntityRepository: LegalEntityRepository,
@@ -86,7 +88,8 @@ class LegalEntityCreateService(
         val duplicateErrors = duplicateValidator.validate(headers, headers.map { null })
         val mergedHeaderResults = headerResults.zip(duplicateErrors) { result, extra -> result.combine(extra) { it } }
 
-        val legalAddressResults = addressCreateService.parse(requests.map { it.content.legalAddress })
+        val legalAddresses = requests.map { it.content.legalAddress }
+        val legalAddressResults = addressContentParser.parse(legalAddresses, legalAddresses.map { null })
 
         return zipParseResults(mergedHeaderResults, legalAddressResults) { header, legalAddress ->
             LegalEntityCreateParsed(LegalEntityContentParsed(header, legalAddress))

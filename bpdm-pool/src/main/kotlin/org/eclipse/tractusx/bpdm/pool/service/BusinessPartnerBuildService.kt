@@ -37,17 +37,20 @@ import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.SiteDtoRequestMapper
 import org.eclipse.tractusx.bpdm.pool.model.AddressCreateUntypedParentRequest
 import org.eclipse.tractusx.bpdm.pool.model.AddressUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
+import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
-import org.eclipse.tractusx.bpdm.pool.service.operation.AdditionalAddressUpdateService
+import org.eclipse.tractusx.bpdm.pool.service.operation.AddressCreateService
+import org.eclipse.tractusx.bpdm.pool.service.operation.AddressUpdateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.LegalEntityCreateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.LegalEntityUpdateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.SiteCreateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.SiteCreateWithLegalAddressAsMainService
 import org.eclipse.tractusx.bpdm.pool.service.operation.SiteCreateWithReferencedAddressAsMainService
 import org.eclipse.tractusx.bpdm.pool.service.operation.SiteUpdateService
-import org.eclipse.tractusx.bpdm.pool.service.operation.UntypedParentAddressCreateService
+import org.eclipse.tractusx.bpdm.pool.service.parser.AddressUpdateParser
+import org.eclipse.tractusx.bpdm.pool.service.parser.UntypedParentAddressCreateParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
@@ -58,8 +61,10 @@ import java.time.temporal.ChronoUnit
  */
 @Service
 class BusinessPartnerBuildService(
-    private val untypedParentAddressCreateService: UntypedParentAddressCreateService,
-    private val additionalAddressUpdateService: AdditionalAddressUpdateService,
+    private val untypedParentAddressCreateParser: UntypedParentAddressCreateParser,
+    private val addressCreateService: AddressCreateService,
+    private val addressUpdateParser: AddressUpdateParser,
+    private val addressUpdateService: AddressUpdateService,
     private val addressDtoRequestMapper: AddressDtoRequestMapper,
     private val addressParseErrorMapper: AddressParseErrorMapper,
     private val siteCreateService: SiteCreateService,
@@ -158,10 +163,10 @@ class BusinessPartnerBuildService(
     }
 
     /**
-     * `@Transactional` so [UntypedParentAddressCreateService.parseAndCreate] resolves the parent BPN, validates content
-     * and persists the address in one persistence context. The single `bpnParent` is resolved into the explicit
-     * (legalEntity, site) parents — and the precise `BpnNotValid`/`SiteNotFound`/`LegalEntityNotFound` parent errors are
-     * reported — inside that service; this border method only maps DTOs and verdicts.
+     * `@Transactional` so parse and execute share one persistence context: [UntypedParentAddressCreateParser] resolves
+     * the single `bpnParent` into the explicit (legalEntity, site) parents — reporting the precise
+     * `BpnNotValid`/`SiteNotFound`/`LegalEntityNotFound` parent errors and validating content — then
+     * [AddressCreateService] persists the addresses. This border method only maps DTOs and verdicts.
      */
     @Transactional
     fun createAddresses(requests: Collection<AddressPartnerCreateRequest>): AddressPartnerCreateResponseWrapper {
@@ -174,7 +179,7 @@ class BusinessPartnerBuildService(
 
         val responses = mutableListOf<AddressPartnerCreateVerboseDto>()
         val errors = mutableListOf<ErrorInfo<AddressCreateError>>()
-        requestList.zip(untypedParentAddressCreateService.parseAndCreate(createRequests)).forEach { (request, result) ->
+        requestList.zip(parseAndExecute(createRequests, untypedParentAddressCreateParser::parse, addressCreateService::create)).forEach { (request, result) ->
             when (result) {
                 is ParseResult.Success -> responses.add(result.parsed.toCreateResponse(request.index))
                 is ParseResult.Failure -> errors.addAll(result.errors.map { addressParseErrorMapper.toCreateErrorInfo(it, request.index) })
@@ -226,9 +231,9 @@ class BusinessPartnerBuildService(
     }
 
     /**
-     * `@Transactional` so [org.eclipse.tractusx.bpdm.pool.service.operation.AddressUpdateService.parseAndUpdate] resolves the target entities and mutates their lazy
-     * collections in one persistence context instead of relying on Open-Session-in-View. All validation (including
-     * "address not found") is delegated to `parse`; there is no parent to resolve on update.
+     * `@Transactional` so parse and execute share one persistence context: [AddressUpdateParser] resolves the target
+     * entities (reporting "address not found") and validates content, then [AddressUpdateService] mutates their lazy
+     * collections — instead of relying on Open-Session-in-View. There is no parent to resolve on update.
      */
     @Transactional
     fun updateAddresses(requests: Collection<AddressPartnerUpdateRequest>): AddressPartnerUpdateResponseWrapper {
@@ -241,7 +246,7 @@ class BusinessPartnerBuildService(
 
         val responses = mutableListOf<AddressPartnerUpdateVerboseDto>()
         val errors = mutableListOf<ErrorInfo<AddressUpdateError>>()
-        requestList.zip(additionalAddressUpdateService.parseAndUpdate(updateRequests)).forEach { (request, result) ->
+        requestList.zip(parseAndExecute(updateRequests, addressUpdateParser::parse, addressUpdateService::update)).forEach { (request, result) ->
             when (result) {
                 is ParseResult.Success -> responses.add(result.parsed.value.toUpdateDto())
                 is ParseResult.Failure -> errors.addAll(result.errors.map { addressParseErrorMapper.toUpdateErrorInfo(it, request.bpna) })
