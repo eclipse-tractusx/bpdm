@@ -30,7 +30,7 @@ sealed interface LegalEntityUpdateParseError
  *
  * Kept flat (no Field/Metadata/Constraint sub-grouping like the address errors) because legal-entity create and update
  * share the whole set and no caller needs to match a sub-group. The identifier presence errors and `DuplicateIdentifier`
- * carry the offending entry's `index`; `DuplicateIdentifier` is produced by [org.eclipse.tractusx.bpdm.pool.service.LegalEntityIdentifierDuplicateValidator]
+ * carry the offending entry's `index`; `DuplicateIdentifier` is produced by [org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntityIdentifierDuplicateValidator]
  * (it needs the owner BPN), the rest by the header parser.
  */
 sealed interface LegalEntityContentParseError : LegalEntityCreateParseError, LegalEntityUpdateParseError {

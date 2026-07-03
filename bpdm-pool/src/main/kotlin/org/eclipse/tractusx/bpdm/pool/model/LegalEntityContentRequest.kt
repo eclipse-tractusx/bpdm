@@ -24,7 +24,7 @@ import java.time.Instant
 
 /**
  * Loose (unvalidated) inbound legal-entity content: the legal-entity [header] plus its [legalAddress]. The two are parsed
- * independently — the header by [org.eclipse.tractusx.bpdm.pool.service.LegalEntityHeaderParser], the legal address by the
+ * independently — the header by [org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntityHeaderParser], the legal address by the
  * shared address content parser — then recombined into the bounded [LegalEntityContentParsed].
  */
 data class LegalEntityContentRequest(

@@ -17,32 +17,48 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.service
+package org.eclipse.tractusx.bpdm.pool.service.operation
 
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
-import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.model.AddressCreateParsed
-import org.eclipse.tractusx.bpdm.pool.model.SiteContentParsed
-import org.eclipse.tractusx.bpdm.pool.model.SiteCreateParsed
-import org.eclipse.tractusx.bpdm.pool.model.SiteCreateParseError
-import org.eclipse.tractusx.bpdm.pool.model.SiteCreateRequest
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
+import org.eclipse.tractusx.bpdm.pool.model.SiteContentParsed
+import org.eclipse.tractusx.bpdm.pool.model.SiteCreateParseError
+import org.eclipse.tractusx.bpdm.pool.model.SiteCreateParsed
+import org.eclipse.tractusx.bpdm.pool.model.SiteCreateRequest
 import org.eclipse.tractusx.bpdm.pool.model.SiteHeaderCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.model.zipParseResults
-import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
+import org.eclipse.tractusx.bpdm.pool.service.operation.SiteHeaderCreateService
+import org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntityBpnParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
+/*******************************************************************************
+ * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Apache License, Version 2.0 which is available at
+ * https://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ ******************************************************************************/
 /**
  * Creates sites under an existing legal entity, the site counterpart of [AdditionalAddressCreateService]. `parse` resolves
  * the legal-entity parent and validates header + main-address content (each by a single-responsibility parser, combined
  * with `zipParseResults`); `create` persists the site and its main address. Sites always attach to a persisted legal
  * entity, so no parent-injected lower layer is needed — the main address (whose parent is the still-unsaved site) is
- * delegated to the parent-injected [AddressCreateService]. Order-preserving positional contract (see [ParseResult]).
+ * delegated to the parent-injected [AddressCreateService]. Order-preserving positional contract (see [org.eclipse.tractusx.bpdm.pool.model.ParseResult]).
  */
 @Service
 class SiteCreateService(

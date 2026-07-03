@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.service
+package org.eclipse.tractusx.bpdm.pool.service.parser
 
 import org.eclipse.tractusx.bpdm.pool.entity.ScriptCodeDb
 import org.eclipse.tractusx.bpdm.pool.model.ConfidenceCriteriaParsed
@@ -31,9 +31,27 @@ import org.eclipse.tractusx.bpdm.pool.model.SiteScriptVariantParsed
 import org.eclipse.tractusx.bpdm.pool.repository.ScriptCodeRepository
 import org.springframework.stereotype.Service
 
+/*******************************************************************************
+ * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Apache License, Version 2.0 which is available at
+ * https://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ ******************************************************************************/
 /**
- * Validates loose [SiteHeaderRequest] content into the bounded [SiteHeaderParsed] — the site counterpart of
- * [LogisticAddressRequestParser], covering only the site header (the main address is parsed separately by the address
+ * Validates loose [org.eclipse.tractusx.bpdm.pool.model.SiteHeaderRequest] content into the bounded [org.eclipse.tractusx.bpdm.pool.model.SiteHeaderParsed] — the site counterpart of
+ * [org.eclipse.tractusx.bpdm.pool.service.LogisticAddressRequestParser], covering only the site header (the main address is parsed separately by the address
  * content parser and recombined by the site service). All errors are accumulated (not fail-fast) so one entry's report
  * is complete. Script codes are resolved for the whole batch in one query, then each entry is validated against them.
  */

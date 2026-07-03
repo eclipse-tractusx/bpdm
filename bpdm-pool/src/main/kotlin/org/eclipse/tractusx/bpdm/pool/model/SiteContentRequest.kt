@@ -24,7 +24,7 @@ import java.time.Instant
 
 /**
  * Loose (unvalidated) inbound site content: the site [header] plus its [mainAddress]. The two are parsed independently —
- * the header by [org.eclipse.tractusx.bpdm.pool.service.SiteHeaderParser], the main address by the shared address
+ * the header by [org.eclipse.tractusx.bpdm.pool.service.parser.SiteHeaderParser], the main address by the shared address
  * content parser — then recombined into the bounded [SiteContentParsed].
  */
 data class SiteContentRequest(

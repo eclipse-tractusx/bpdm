@@ -47,6 +47,8 @@ import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
+import org.eclipse.tractusx.bpdm.pool.service.operation.AdditionalAddressCreateService
+import org.eclipse.tractusx.bpdm.pool.service.operation.AdditionalAddressUpdateService
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.stereotype.Service
 import java.time.Instant

@@ -40,6 +40,14 @@ import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
+import org.eclipse.tractusx.bpdm.pool.service.operation.AdditionalAddressUpdateService
+import org.eclipse.tractusx.bpdm.pool.service.operation.LegalEntityCreateService
+import org.eclipse.tractusx.bpdm.pool.service.operation.LegalEntityUpdateService
+import org.eclipse.tractusx.bpdm.pool.service.operation.SiteCreateService
+import org.eclipse.tractusx.bpdm.pool.service.operation.SiteCreateWithLegalAddressAsMainService
+import org.eclipse.tractusx.bpdm.pool.service.operation.SiteCreateWithReferencedAddressAsMainService
+import org.eclipse.tractusx.bpdm.pool.service.operation.SiteUpdateService
+import org.eclipse.tractusx.bpdm.pool.service.operation.UntypedParentAddressCreateService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
@@ -218,7 +226,7 @@ class BusinessPartnerBuildService(
     }
 
     /**
-     * `@Transactional` so [AddressUpdateService.parseAndUpdate] resolves the target entities and mutates their lazy
+     * `@Transactional` so [org.eclipse.tractusx.bpdm.pool.service.operation.AddressUpdateService.parseAndUpdate] resolves the target entities and mutates their lazy
      * collections in one persistence context instead of relying on Open-Session-in-View. All validation (including
      * "address not found") is delegated to `parse`; there is no parent to resolve on update.
      */
