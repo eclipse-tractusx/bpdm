@@ -24,36 +24,13 @@ import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.SiteEntityMapper
-import org.eclipse.tractusx.bpdm.pool.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.SiteContentParseError
 import org.eclipse.tractusx.bpdm.pool.model.SiteHeaderCreateParsed
-import org.eclipse.tractusx.bpdm.pool.model.SiteHeaderParsed
-import org.eclipse.tractusx.bpdm.pool.model.SiteHeaderRequest
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.eclipse.tractusx.bpdm.pool.service.BpnIssuingService
 import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
-import org.eclipse.tractusx.bpdm.pool.service.parser.SiteHeaderParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
-/*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
- *
- * See the NOTICE file(s) distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This program and the accompanying materials are made available under the
- * terms of the Apache License, Version 2.0 which is available at
- * https://www.apache.org/licenses/LICENSE-2.0.
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations
- * under the License.
- *
- * SPDX-License-Identifier: Apache-2.0
- ******************************************************************************/
 /**
  * Creates the site *header* — the shared piece the three site-create paths ([SiteCreateService],
  * [SiteCreateWithLegalAddressAsMainService], [SiteCreateWithReferencedAddressAsMainService]) have in common: issue the
@@ -71,16 +48,11 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class SiteHeaderCreateService(
-    private val siteHeaderParser: SiteHeaderParser,
     private val bpnIssuingService: BpnIssuingService,
     private val changelogService: PartnerChangelogService,
     private val siteEntityMapper: SiteEntityMapper,
     private val siteRepository: SiteRepository
 ) {
-
-    /** Validates the loose site header content only (no parent resolution, no main address). */
-    fun parse(headers: List<SiteHeaderRequest>): List<ParseResult<SiteHeaderParsed, SiteContentParseError>> =
-        siteHeaderParser.parse(headers)
 
     /**
      * Builds the site headers under their (already-resolved) parents and emits the SITE CREATE changelog. Returns the

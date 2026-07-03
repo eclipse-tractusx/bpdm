@@ -50,6 +50,12 @@ import org.eclipse.tractusx.bpdm.pool.service.operation.SiteCreateWithLegalAddre
 import org.eclipse.tractusx.bpdm.pool.service.operation.SiteCreateWithReferencedAddressAsMainService
 import org.eclipse.tractusx.bpdm.pool.service.operation.SiteUpdateService
 import org.eclipse.tractusx.bpdm.pool.service.parser.AddressUpdateParser
+import org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntityCreateParser
+import org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntityUpdateParser
+import org.eclipse.tractusx.bpdm.pool.service.parser.SiteCreateParser
+import org.eclipse.tractusx.bpdm.pool.service.parser.SiteCreateWithLegalAddressAsMainParser
+import org.eclipse.tractusx.bpdm.pool.service.parser.SiteCreateWithReferencedAddressAsMainParser
+import org.eclipse.tractusx.bpdm.pool.service.parser.SiteUpdateParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.UntypedParentAddressCreateParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -67,13 +73,19 @@ class BusinessPartnerBuildService(
     private val addressUpdateService: AddressUpdateService,
     private val addressDtoRequestMapper: AddressDtoRequestMapper,
     private val addressParseErrorMapper: AddressParseErrorMapper,
+    private val siteCreateParser: SiteCreateParser,
     private val siteCreateService: SiteCreateService,
+    private val siteCreateWithLegalAddressAsMainParser: SiteCreateWithLegalAddressAsMainParser,
     private val siteCreateWithLegalAddressAsMainService: SiteCreateWithLegalAddressAsMainService,
+    private val siteCreateWithReferencedAddressAsMainParser: SiteCreateWithReferencedAddressAsMainParser,
     private val siteCreateWithReferencedAddressAsMainService: SiteCreateWithReferencedAddressAsMainService,
+    private val siteUpdateParser: SiteUpdateParser,
     private val siteUpdateService: SiteUpdateService,
     private val siteDtoRequestMapper: SiteDtoRequestMapper,
     private val siteParseErrorMapper: SiteParseErrorMapper,
+    private val legalEntityCreateParser: LegalEntityCreateParser,
     private val legalEntityCreateService: LegalEntityCreateService,
+    private val legalEntityUpdateParser: LegalEntityUpdateParser,
     private val legalEntityUpdateService: LegalEntityUpdateService,
     private val legalEntityDtoRequestMapper: LegalEntityDtoRequestMapper,
     private val legalEntityParseErrorMapper: LegalEntityParseErrorMapper
@@ -93,7 +105,7 @@ class BusinessPartnerBuildService(
 
         val responses = mutableListOf<LegalEntityPartnerCreateVerboseDto>()
         val errors = mutableListOf<ErrorInfo<LegalEntityCreateError>>()
-        requestList.zip(legalEntityCreateService.parseAndCreate(createRequests)).forEach { (request, result) ->
+        requestList.zip(parseAndExecute(createRequests, legalEntityCreateParser::parse, legalEntityCreateService::create)).forEach { (request, result) ->
             when (result) {
                 is ParseResult.Success -> responses.add(result.parsed.toUpsertDto(request.index))
                 is ParseResult.Failure -> errors.addAll(result.errors.map { legalEntityParseErrorMapper.toCreateErrorInfo(it, request.index) })
@@ -112,7 +124,7 @@ class BusinessPartnerBuildService(
 
         val responses = mutableListOf<SitePartnerCreateVerboseDto>()
         val errors = mutableListOf<ErrorInfo<SiteCreateError>>()
-        siteCreateWithLegalAddressAsMainService.parseAndCreate(createRequests).forEachIndexed { index, result ->
+        parseAndExecute(createRequests, siteCreateWithLegalAddressAsMainParser::parse, siteCreateWithLegalAddressAsMainService::create).forEachIndexed { index, result ->
             val entityKey = index.toString()
             when (result) {
                 is ParseResult.Success -> responses.add(result.parsed.toUpsertDto(entityKey))
@@ -133,7 +145,7 @@ class BusinessPartnerBuildService(
 
         val responses = mutableListOf<SitePartnerCreateVerboseDto>()
         val errors = mutableListOf<ErrorInfo<SiteCreateError>>()
-        requestList.zip(siteCreateWithReferencedAddressAsMainService.parseAndCreate(createRequests)).forEach { (request, result) ->
+        requestList.zip(parseAndExecute(createRequests, siteCreateWithReferencedAddressAsMainParser::parse, siteCreateWithReferencedAddressAsMainService::create)).forEach { (request, result) ->
             when (result) {
                 is ParseResult.Success -> responses.add(result.parsed.toUpsertDto(request.index))
                 is ParseResult.Failure -> errors.addAll(result.errors.map { siteParseErrorMapper.toCreateErrorInfo(it, request.index) })
@@ -152,7 +164,7 @@ class BusinessPartnerBuildService(
 
         val responses = mutableListOf<SitePartnerCreateVerboseDto>()
         val errors = mutableListOf<ErrorInfo<SiteCreateError>>()
-        requestList.zip(siteCreateService.parseAndCreate(createRequests)).forEach { (request, result) ->
+        requestList.zip(parseAndExecute(createRequests, siteCreateParser::parse, siteCreateService::create)).forEach { (request, result) ->
             when (result) {
                 is ParseResult.Success -> responses.add(result.parsed.toUpsertDto(request.index))
                 is ParseResult.Failure -> errors.addAll(result.errors.map { siteParseErrorMapper.toCreateErrorInfo(it, request.index) })
@@ -201,7 +213,7 @@ class BusinessPartnerBuildService(
 
         val responses = mutableListOf<LegalEntityPartnerCreateVerboseDto>()
         val errors = mutableListOf<ErrorInfo<LegalEntityUpdateError>>()
-        requestList.zip(legalEntityUpdateService.parseAndUpdate(updateRequests)).forEach { (request, result) ->
+        requestList.zip(parseAndExecute(updateRequests, legalEntityUpdateParser::parse, legalEntityUpdateService::update)).forEach { (request, result) ->
             when (result) {
                 is ParseResult.Success -> responses.add(result.parsed.value.toUpsertDto(request.bpnl))
                 is ParseResult.Failure -> errors.addAll(result.errors.map { legalEntityParseErrorMapper.toUpdateErrorInfo(it, request.bpnl) })
@@ -220,7 +232,7 @@ class BusinessPartnerBuildService(
 
         val responses = mutableListOf<SitePartnerCreateVerboseDto>()
         val errors = mutableListOf<ErrorInfo<SiteUpdateError>>()
-        requestList.zip(siteUpdateService.parseAndUpdate(updateRequests)).forEach { (request, result) ->
+        requestList.zip(parseAndExecute(updateRequests, siteUpdateParser::parse, siteUpdateService::update)).forEach { (request, result) ->
             when (result) {
                 is ParseResult.Success -> responses.add(result.parsed.value.toUpsertDto(request.bpns))
                 is ParseResult.Failure -> errors.addAll(result.errors.map { siteParseErrorMapper.toUpdateErrorInfo(it, request.bpns) })

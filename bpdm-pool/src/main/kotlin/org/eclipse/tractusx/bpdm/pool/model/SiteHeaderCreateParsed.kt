@@ -22,9 +22,9 @@ package org.eclipse.tractusx.bpdm.pool.model
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 
 /**
- * Input to [SiteHeaderCreateService.create]: the resolved parent legal entity and a validated site header, but no main
+ * Input to `SiteHeaderCreateService.create`: the resolved parent legal entity and a validated site header, but no main
  * address. It carries only what is needed to build the site header — the caller pairs its own resolved parent with the
- * header validated by [SiteHeaderCreateService.parse]. The main address is the caller's concern (see the service doc).
+ * header validated by the site header parser. The main address is the caller's concern (see the service doc).
  */
 data class SiteHeaderCreateParsed(
     val legalEntity: LegalEntityDb,
