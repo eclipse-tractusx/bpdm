@@ -22,16 +22,21 @@ package org.eclipse.tractusx.bpdm.pool.service
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
+import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityRelationEventTriggerDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
+import org.eclipse.tractusx.bpdm.pool.entity.TriggerEventType
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
+import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRelationEventTriggerRepository
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class OwnedByRelationUpsertService(
     private val relationUpsertService: RelationUpsertService,
     private val relationRepository: RelationRepository,
-    private val ultimateOwnerResolutionService: UltimateOwnerResolutionService
+    private val ultimateOwnerResolutionService: UltimateOwnerResolutionService,
+    private val legalEntityRelationEventTriggerRepository: LegalEntityRelationEventTriggerRepository
 ): IRelationUpsertStrategyService {
 
 
@@ -56,9 +61,38 @@ class OwnedByRelationUpsertService(
 
         ultimateOwnerResolutionService.updateUltimateOwnerForEntityAndDescendants(proposedSource)
 
+        handleValidityBoundaryTriggers(result.relation)
+
         return result
     }
 
+    /**
+     * Replace all existing unprocessed OwnershipValidityBoundary triggers for the relation with fresh
+     * ones derived from the current validity periods:
+     * - validFrom > today  →  trigger on validFrom (relation becomes active)
+     * - validTo != null && validTo+1 > today  →  trigger on validTo+1 (relation expires)
+     */
+    private fun handleValidityBoundaryTriggers(relation: RelationDb) {
+        val today = LocalDate.now()
+
+        val existingUnprocessedTriggers = legalEntityRelationEventTriggerRepository
+            .findByRelationAndEventType(relation, TriggerEventType.OwnershipValidityBoundary)
+            .filterNot { it.isProcessed }
+
+        legalEntityRelationEventTriggerRepository.deleteAll(existingUnprocessedTriggers)
+
+        val validFromTriggers = relation.validityPeriods
+            .filter { it.validFrom > today }
+            .map { LegalEntityRelationEventTriggerDb(it.validFrom, false, TriggerEventType.OwnershipValidityBoundary, relation) }
+
+        val expiryTriggers = relation.validityPeriods
+            .mapNotNull { it.validTo }
+            .map { it.plusDays(1) }
+            .filter { it > today }
+            .map { LegalEntityRelationEventTriggerDb(it, false, TriggerEventType.OwnershipValidityBoundary, relation) }
+
+        legalEntityRelationEventTriggerRepository.saveAll(validFromTriggers + expiryTriggers)
+    }
 
     private fun validateSingleParent(upsertRequest: IRelationUpsertStrategyService.UpsertRequest){
         val child = upsertRequest.source

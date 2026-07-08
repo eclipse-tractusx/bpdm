@@ -174,7 +174,9 @@ class BusinessPartnerMappings {
             ownershipUltimate = entity.ownershipUltimate,
             ultimateOwnerBpnl = entity.ultimateOwnerBpnl,
             states = toStateDtos(entity.states, BusinessPartnerType.LEGAL_ENTITY),
-            goldenRecordRelations = entity.legalEntityGoldenRecordRelations.map { LegalEntityGoldenRecordRelationDto(toLeRelationType(it.relationType), it.sourceBpn, it.targetBpn) }
+            goldenRecordRelations = entity.legalEntityGoldenRecordRelations
+                .distinctBy { Triple(it.relationType, it.sourceBpn, it.targetBpn) }
+                .map { LegalEntityGoldenRecordRelationDto(toLeRelationType(it.relationType), it.sourceBpn, it.targetBpn) }
         )
     }
 
@@ -211,7 +213,9 @@ class BusinessPartnerMappings {
                 "Missing legal entity confidence criteria"
             ),
             states = toStateDtos(entity.states, BusinessPartnerType.ADDRESS),
-            goldenRecordRelations = entity.addressGoldenRecordRelations.map { AddressGoldenRecordRelationDto(toAddressRelationType(it.relationType), it.sourceBpn, it.targetBpn) }
+            goldenRecordRelations = entity.addressGoldenRecordRelations
+                .distinctBy { Triple(it.relationType, it.sourceBpn, it.targetBpn) }
+                .map { AddressGoldenRecordRelationDto(toAddressRelationType(it.relationType), it.sourceBpn, it.targetBpn) }
         )
     }
 

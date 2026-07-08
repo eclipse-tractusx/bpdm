@@ -25,10 +25,12 @@ import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
+import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 
 @Service
 class UltimateOwnerResolutionService(
@@ -55,11 +57,12 @@ class UltimateOwnerResolutionService(
         visited.add(currentBpn)
 
         val owningRelations = relationRepository.findByTypeAndStartNode(LegalEntityRelationType.IsOwnedBy, legalEntity)
+        val currentlyValidRelations = owningRelations.filter { isRelationCurrentlyValid(it) }
 
-        if (owningRelations.isEmpty()) {
+        if (currentlyValidRelations.isEmpty()) {
             return if (legalEntity.ownershipUltimate) currentBpn else null
         }
-        for (relation in owningRelations) {
+        for (relation in currentlyValidRelations) {
             val parent = relation.endNode
             val parentUltimateOwner = resolveUltimateOwnerWithCycleProtection(parent, visited)
             if (parentUltimateOwner != null) {
@@ -67,6 +70,15 @@ class UltimateOwnerResolutionService(
             }
         }
         return null
+    }
+
+    private fun isRelationCurrentlyValid(relation: RelationDb): Boolean {
+        val today = LocalDate.now()
+        return relation.validityPeriods.any { period ->
+            val validTo = period.validTo
+            (period.validFrom.isEqual(today) || period.validFrom.isBefore(today)) &&
+            (validTo == null || validTo.isAfter(today) || validTo.isEqual(today))
+        }
     }
 
     @Transactional
@@ -82,7 +94,7 @@ class UltimateOwnerResolutionService(
         val ultimateOwnerBpnl = resolveUltimateOwner(legalEntity)
         val previousUltimateOwnerBpnl = legalEntity.ultimateOwnerBpnl
 
-        if (previousUltimateOwnerBpnl == null && ultimateOwnerBpnl != null) {
+        if (previousUltimateOwnerBpnl != ultimateOwnerBpnl) {
             legalEntity.ultimateOwnerBpnl = ultimateOwnerBpnl
             legalEntityRepository.save(legalEntity)
             changelogService.createChangelogEntry(
