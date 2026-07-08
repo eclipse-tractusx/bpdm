@@ -43,7 +43,7 @@ import java.time.temporal.ChronoUnit
  */
 @Service
 class LegalEntityCreateService(
-    private val addressCreateService: AddressCreateService,
+    private val addressBuilder: LogisticAddressBuilder,
     private val bpnIssuingService: BpnIssuingService,
     private val legalEntityRepository: LegalEntityRepository,
     private val changelogService: PartnerChangelogService,
@@ -63,21 +63,23 @@ class LegalEntityCreateService(
             legalEntityEntityMapper.toEntity(bpn, entry.content.header, currentness, numberOfSharingMembers = 0)
         }
 
-        // Emit the legal entity changelog before the address create service emits the ADDRESS CREATE changelog, so the
-        // overall changelog order stays "legal entity, then its legal address".
-        changelogService.createChangelogEntries(legalEntities.map {
-            ChangelogEntryCreateRequest(it.bpn, ChangelogType.CREATE, BusinessPartnerType.LEGAL_ENTITY)
-        })
-
-        // The legal address's parent is the still-unsaved legal entity (no site); it flushes in the right order at commit
-        // thanks to the nullable back-FK and order_inserts. The address create service owns the address BPN + changelog.
-        val legalAddresses = addressCreateService.create(parsed.zip(legalEntities).map { (entry, legalEntity) ->
+        // Build the (still-unsaved) legal addresses so we can wire the legal entity ⇄ legal address cycle in memory,
+        // then persist in the order we choose. The legal address's parent is the still-unsaved legal entity (no site);
+        // the cyclic insert flushes correctly thanks to the nullable back-FK and order_inserts.
+        val builtAddresses = addressBuilder.build(parsed.zip(legalEntities).map { (entry, legalEntity) ->
             val legalAddress = entry.content.legalAddress
             AddressCreateParsed(legalEntity, site = null, legalAddress.address, legalAddress.scriptVariants)
         })
-        legalEntities.zip(legalAddresses).forEach { (legalEntity, address) -> legalEntity.legalAddress = address }
+        legalEntities.zip(builtAddresses).forEach { (legalEntity, address) -> legalEntity.legalAddress = address.value }
 
+        // Emit the legal entity changelog before the address builder emits the ADDRESS CREATE changelog, so the overall
+        // changelog order stays "legal entity, then its legal address".
+        changelogService.createChangelogEntries(legalEntities.map {
+            ChangelogEntryCreateRequest(it.bpn, ChangelogType.CREATE, BusinessPartnerType.LEGAL_ENTITY)
+        })
         legalEntityRepository.saveAll(legalEntities)
+        addressBuilder.persist(builtAddresses)
+
         return legalEntities
     }
 }

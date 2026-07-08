@@ -19,15 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation
 
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
-import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
-import org.eclipse.tractusx.bpdm.pool.mapper.entity.AddressEntityMapper
 import org.eclipse.tractusx.bpdm.pool.model.AddressCreateParsed
-import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
-import org.eclipse.tractusx.bpdm.pool.service.BpnIssuingService
-import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -39,13 +32,13 @@ import org.springframework.transaction.annotation.Transactional
  * [org.eclipse.tractusx.bpdm.pool.service.parser.UntypedParentAddressCreateParser]); in-transaction creators whose
  * parent is not yet persisted build the command themselves and call [create] directly. Order-preserving positional
  * contract (see [org.eclipse.tractusx.bpdm.pool.model.ParseResult]).
+ *
+ * This is the single-call convenience over [LogisticAddressBuilder]: it builds and immediately persists. Callers that
+ * own a cyclic parent relationship use the builder's two phases directly so they can wire the graph before persisting.
  */
 @Service
 class AddressCreateService(
-    private val bpnIssuingService: BpnIssuingService,
-    private val logisticAddressRepository: LogisticAddressRepository,
-    private val changelogService: PartnerChangelogService,
-    private val addressEntityMapper: AddressEntityMapper
+    private val addressBuilder: LogisticAddressBuilder
 ) {
 
     /**
@@ -55,16 +48,6 @@ class AddressCreateService(
      * which can be a no-op.
      */
     @Transactional
-    fun create(parsed: List<AddressCreateParsed>): List<LogisticAddressDb> {
-        val bpns = bpnIssuingService.issueAddressBpns(parsed.size)
-        // A freshly created address has no shared history yet, so its sharing-member count starts at zero.
-        val entities = parsed.zip(bpns) { entry, bpn -> addressEntityMapper.toEntity(bpn, entry, numberOfSharingMembers = 0) }
-
-        logisticAddressRepository.saveAll(entities)
-        changelogService.createChangelogEntries(entities.map {
-            ChangelogEntryCreateRequest(it.bpn, ChangelogType.CREATE, BusinessPartnerType.ADDRESS)
-        })
-
-        return entities
-    }
+    fun create(parsed: List<AddressCreateParsed>): List<LogisticAddressDb> =
+        addressBuilder.persist(addressBuilder.build(parsed)).map { it.value }
 }
