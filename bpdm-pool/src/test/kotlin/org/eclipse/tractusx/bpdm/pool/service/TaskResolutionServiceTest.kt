@@ -1230,9 +1230,6 @@ class TaskResolutionServiceTest @Autowired constructor(
 
     @Test
     fun `repository test - ownershipUltimate and ultimateOwnerBpnl columns persist correctly`() {
-        // This test verifies the persistence layer correctly handles the new ultimate owner columns
-        
-        // Create a legal entity with ownershipUltimate set to true
         val createRequest = minValidLegalEntity()
             .copy(legalEntity = minValidLegalEntity().legalEntity.copy(ownershipUltimate = true))
             .withLegalReferences("repo-test-bpnl".toBpnRequest(), "repo-test-bpna".toBpnRequest())
@@ -1242,20 +1239,17 @@ class TaskResolutionServiceTest @Autowired constructor(
 
         val createdBpnl = createResult[0].businessPartner.legalEntity.bpnReference.referenceValue!!
 
-        // Verify the entity was persisted with the correct values
         val persistedEntity = legalEntityRepository.findByBpnIgnoreCase(createdBpnl)
         assertThat(persistedEntity).isNotNull()
         assertThat(persistedEntity!!.ownershipUltimate).isTrue()
         assertThat(persistedEntity.ultimateOwnerBpnl).isEqualTo(createdBpnl)
 
-        // Update the entity to set ownershipUltimate to false
         val updateRequest = createRequest
             .copy(legalEntity = createRequest.legalEntity.copy(ownershipUltimate = false))
 
         val updateResult = upsertGoldenRecordIntoPool(taskId = "TASK_REPO_TEST_2", businessPartner = updateRequest)
         assertThat(updateResult[0].errors).isEmpty()
 
-        // Verify the update was persisted correctly
         val updatedEntity = legalEntityRepository.findByBpnIgnoreCase(createdBpnl)
         assertThat(updatedEntity).isNotNull()
         assertThat(updatedEntity!!.ownershipUltimate).isFalse()
@@ -1263,12 +1257,32 @@ class TaskResolutionServiceTest @Autowired constructor(
     }
 
     @Test
+    fun `update ownershipUltimate flag on legal entity persists the flag change`() {
+        val createRequest = minValidLegalEntity()
+            .copy(legalEntity = minValidLegalEntity().legalEntity.copy(ownershipUltimate = false))
+            .withLegalReferences("flag-update-bpnl".toBpnRequest(), "flag-update-bpna".toBpnRequest())
+
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_FLAG_UPDATE_1", businessPartner = createRequest)
+        assertThat(createResult[0].errors).isEmpty()
+
+        val createdBpnl = createResult[0].businessPartner.legalEntity.bpnReference.referenceValue!!
+        val updateRequest = createRequest.copy(
+            legalEntity = createRequest.legalEntity.copy(ownershipUltimate = true)
+        )
+
+        val updateResult = upsertGoldenRecordIntoPool(taskId = "TASK_FLAG_UPDATE_2", businessPartner = updateRequest)
+        assertThat(updateResult[0].errors).isEmpty()
+
+        val updatedEntity = legalEntityRepository.findByBpnIgnoreCase(createdBpnl)
+        assertThat(updatedEntity).isNotNull()
+        assertThat(updatedEntity!!.ownershipUltimate).isTrue()
+    }
+
+    @Test
     fun `repository test - ultimateOwnerBpnl can be set and persisted`() {
-        // This test verifies that ultimateOwnerBpnl can be set (even though resolution logic isn't implemented)
-        
+
         val targetBpnl = "BPNL000000000XXX"
         
-        // Create a legal entity with ultimateOwnerBpnl set
         val createRequest = minValidLegalEntity()
             .copy(legalEntity = minValidLegalEntity().legalEntity.copy(
                 ownershipUltimate = false,
@@ -1281,7 +1295,6 @@ class TaskResolutionServiceTest @Autowired constructor(
 
         val createdBpnl = createResult[0].businessPartner.legalEntity.bpnReference.referenceValue!!
 
-        // Verify the entity was persisted with the correct ultimateOwnerBpnl
         val persistedEntity = legalEntityRepository.findByBpnIgnoreCase(createdBpnl)
         assertThat(persistedEntity).isNotNull()
         assertThat(persistedEntity!!.ownershipUltimate).isFalse()
@@ -1290,10 +1303,7 @@ class TaskResolutionServiceTest @Autowired constructor(
 
     @Test
     fun `backwards compatibility regression test - existing client without new fields`() {
-        // This test simulates an existing client that doesn't send the new ownershipUltimate and ultimateOwnerBpnl fields
-        // It verifies that the request still works correctly and defaults are applied
-        
-        // Create a request without the new fields (simulating an existing client)
+
         val legacyRequest = minValidLegalEntity()
             .withLegalReferences("legacy-bpnl".toBpnRequest(), "legacy-bpna".toBpnRequest())
 
@@ -1302,18 +1312,15 @@ class TaskResolutionServiceTest @Autowired constructor(
 
         val createdBpnl = createResult[0].businessPartner.legalEntity.bpnReference.referenceValue!!
 
-        // Verify the entity was created with default values
         val persistedEntity = legalEntityRepository.findByBpnIgnoreCase(createdBpnl)
         assertThat(persistedEntity).isNotNull()
-        assertThat(persistedEntity!!.ownershipUltimate).isFalse() // Default value
-        assertThat(persistedEntity.ultimateOwnerBpnl).isNull() // Default value
+        assertThat(persistedEntity!!.ownershipUltimate).isFalse()
+        assertThat(persistedEntity.ultimateOwnerBpnl).isNull()
 
-        // Verify the response can be read by the client
         val responseFromPool = poolClient.legalEntities.getLegalEntity(createdBpnl)
         assertThat(responseFromPool.header.ownershipUltimate).isFalse()
         assertThat(responseFromPool.header.ultimateOwnerBpnl).isNull()
 
-        // Update with another legacy request (still without new fields)
         val updateRequest = legacyRequest.copy(
             legalEntity = legacyRequest.legalEntity.copy(
                 legalName = "Updated Legal Name"
@@ -1323,31 +1330,26 @@ class TaskResolutionServiceTest @Autowired constructor(
         val updateResult = upsertGoldenRecordIntoPool(taskId = "TASK_LEGACY_2", businessPartner = updateRequest)
         assertThat(updateResult[0].errors).isEmpty()
 
-        // Verify the update worked and defaults are maintained
         val updatedEntity = legalEntityRepository.findByBpnIgnoreCase(createdBpnl)
         assertThat(updatedEntity).isNotNull()
         assertThat(updatedEntity!!.legalName.value).isEqualTo("Updated Legal Name")
-        assertThat(updatedEntity.ownershipUltimate).isFalse() // Should remain false
-        assertThat(updatedEntity.ultimateOwnerBpnl).isNull() // Should remain null
+        assertThat(updatedEntity.ownershipUltimate).isFalse()
+        assertThat(updatedEntity.ultimateOwnerBpnl).isNull()
     }
 
     @Test
     fun `ultimate owner resolution - resolve with flag set at top`() {
-        // Create three legal entities
         val subsidiary = createLegalEntity("BPNL_S")
         val intermediate = createLegalEntity("BPNL_I")
         val groupParent = createLegalEntity("BPNL_P")
 
-        // Set ownershipUltimate flag on group parent
         val groupParentEntity = legalEntityRepository.findByBpnIgnoreCase(groupParent.legalEntity.header.bpnl)!!
         groupParentEntity.ownershipUltimate = true
         legalEntityRepository.save(groupParentEntity)
 
-        // Create chain: subsidiary -> intermediate -> groupParent (flagged)
         createIsOwnedByRelation(subsidiary.legalEntity.header.bpnl, intermediate.legalEntity.header.bpnl)
         createIsOwnedByRelation(intermediate.legalEntity.header.bpnl, groupParent.legalEntity.header.bpnl)
 
-        // Resolve ultimate owner for subsidiary
         val subsidiaryEntity = legalEntityRepository.findByBpnIgnoreCase(subsidiary.legalEntity.header.bpnl)!!
         val ultimateOwner = ultimateOwnerResolutionService.resolveUltimateOwner(subsidiaryEntity)
 
@@ -1361,11 +1363,9 @@ class TaskResolutionServiceTest @Autowired constructor(
         val intermediate = createLegalEntity("BPNL_I")
         val groupParent = createLegalEntity("BPNL_P")
 
-        // Create chain but top is not flagged
         createIsOwnedByRelation(subsidiary.legalEntity.header.bpnl, intermediate.legalEntity.header.bpnl)
         createIsOwnedByRelation(intermediate.legalEntity.header.bpnl, groupParent.legalEntity.header.bpnl)
 
-        // Resolve ultimate owner for subsidiary
         val subsidiaryEntity = legalEntityRepository.findByBpnIgnoreCase(subsidiary.legalEntity.header.bpnl)!!
         val ultimateOwner = ultimateOwnerResolutionService.resolveUltimateOwner(subsidiaryEntity)
 
@@ -1374,10 +1374,8 @@ class TaskResolutionServiceTest @Autowired constructor(
 
     @Test
     fun `ultimate owner resolution - no ultimate owner when no relations present`() {
-        // Create a legal entity with no relations
         val subsidiary = createLegalEntity("BPNL_S")
 
-        // Resolve ultimate owner
         val subsidiaryEntity = legalEntityRepository.findByBpnIgnoreCase(subsidiary.legalEntity.header.bpnl)!!
         val ultimateOwner = ultimateOwnerResolutionService.resolveUltimateOwner(subsidiaryEntity)
 

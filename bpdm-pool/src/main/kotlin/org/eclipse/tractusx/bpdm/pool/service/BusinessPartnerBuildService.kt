@@ -278,17 +278,20 @@ class BusinessPartnerBuildService(
         val legalEntityRequestPairs = legalEntities.map { legalEntity -> Pair(legalEntity, requestsByBpn[legalEntity.bpn]!!) }
         legalEntityRequestPairs.forEach { (legalEntity, request) ->
             val legalEntityBeforeUpdate = businessPartnerEquivalenceMapper.toEquivalenceDto(legalEntity)
+            val ownershipUltimateBeforeUpdate = legalEntity.ownershipUltimate
             updateLegalEntity(legalEntity, request.legalEntity.header, legalEntityMetadataMap, request.legalEntity.scriptVariants)
             updateLogisticAddress(legalEntity.legalAddress, request.legalEntity.toLegalAddressWithScriptVariants(), addressMetadataMap)
             val legalEntityAfterUpdate = businessPartnerEquivalenceMapper.toEquivalenceDto(legalEntity)
+            val ownershipUltimateChanged = ownershipUltimateBeforeUpdate != legalEntity.ownershipUltimate
 
-            if (legalEntityBeforeUpdate != legalEntityAfterUpdate) {
+            if (legalEntityBeforeUpdate != legalEntityAfterUpdate || ownershipUltimateChanged) {
                 logger.info { "Legal Entity ${legalEntity.bpn} was updated" }
 
                 legalEntityRepository.save(legalEntity)
 
-                // Keep ownership chain data in sync after legal entity updates.
-                ultimateOwnerResolutionService.updateUltimateOwnerForEntityAndDescendants(legalEntity)
+                if (ownershipUltimateChanged) {
+                    ultimateOwnerResolutionService.updateUltimateOwnerForEntityAndDescendants(legalEntity)
+                }
 
                 changelogService.createChangelogEntries(
                     listOf(
