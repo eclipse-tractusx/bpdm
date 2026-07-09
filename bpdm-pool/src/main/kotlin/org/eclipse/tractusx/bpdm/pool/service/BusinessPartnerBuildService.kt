@@ -97,9 +97,7 @@ class BusinessPartnerBuildService(
         legalEntityRepository.saveAll(legalEntities)
 
         legalEntities.forEach { createdEntity ->
-            if (createdEntity.ownershipUltimate) {
-                ultimateOwnerResolutionService.updateUltimateOwnerForEntityAndDescendants(createdEntity)
-            }
+            ultimateOwnerResolutionService.updateUltimateOwnerForEntityAndDescendants(createdEntity)
         }
 
         val legalEntityResponse = legalEntities.map { it.toUpsertDto(requestsByLegalEntities[it]!!.index) }

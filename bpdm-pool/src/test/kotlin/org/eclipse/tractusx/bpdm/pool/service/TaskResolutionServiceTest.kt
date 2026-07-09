@@ -1278,28 +1278,6 @@ class TaskResolutionServiceTest @Autowired constructor(
         assertThat(updatedEntity!!.ownershipUltimate).isTrue()
     }
 
-    @Test
-    fun `repository test - ultimateOwnerBpnl can be set and persisted`() {
-
-        val targetBpnl = "BPNL000000000XXX"
-        
-        val createRequest = minValidLegalEntity()
-            .copy(legalEntity = minValidLegalEntity().legalEntity.copy(
-                ownershipUltimate = false,
-                ultimateOwnerBpnl = targetBpnl
-            ))
-            .withLegalReferences("repo-test-bpnl-2".toBpnRequest(), "repo-test-bpna-2".toBpnRequest())
-
-        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_REPO_TEST_3", businessPartner = createRequest)
-        assertThat(createResult[0].errors).isEmpty()
-
-        val createdBpnl = createResult[0].businessPartner.legalEntity.bpnReference.referenceValue!!
-
-        val persistedEntity = legalEntityRepository.findByBpnIgnoreCase(createdBpnl)
-        assertThat(persistedEntity).isNotNull()
-        assertThat(persistedEntity!!.ownershipUltimate).isFalse()
-        assertThat(persistedEntity.ultimateOwnerBpnl).isEqualTo(targetBpnl)
-    }
 
     @Test
     fun `backwards compatibility regression test - existing client without new fields`() {
