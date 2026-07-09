@@ -1,0 +1,89 @@
+/*******************************************************************************
+ * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Apache License, Version 2.0 which is available at
+ * https://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ ******************************************************************************/
+
+package org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.inbound
+
+import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
+import org.eclipse.tractusx.bpdm.pool.model.SiteContentRequest
+import org.eclipse.tractusx.bpdm.pool.model.SiteCreateRequest
+import org.eclipse.tractusx.bpdm.pool.model.SiteCreateWithLegalAddressAsMainRequest
+import org.eclipse.tractusx.bpdm.pool.model.SiteCreateWithReferencedAddressAsMainRequest
+import org.eclipse.tractusx.bpdm.pool.model.SiteHeaderRequest
+import org.eclipse.tractusx.bpdm.pool.model.SiteState
+import org.eclipse.tractusx.bpdm.pool.model.SiteUpdateRequest
+import org.springframework.stereotype.Component
+import org.eclipse.tractusx.bpdm.pool.model.SiteScriptVariant as SiteScriptVariantRequest
+import org.eclipse.tractusx.orchestrator.api.model.BusinessState as TaskBusinessState
+import org.eclipse.tractusx.orchestrator.api.model.PostalAddress as TaskPostalAddress
+import org.eclipse.tractusx.orchestrator.api.model.PostalAddressScriptVariantWithScriptCode as TaskScriptVariant
+import org.eclipse.tractusx.orchestrator.api.model.Site as TaskSite
+
+/**
+ * Pure translation of a cleaning task's site (the orchestrator business-partner model) into the loose domain site
+ * requests consumed by the site services. No content validation happens here — that is the site service's `parse` — so
+ * raw strings and nullable values are passed through. The main address (and its localized script variants, reconstructed
+ * per script code from the site's `scriptVariants`) is delegated to [GoldenRecordTaskAddressRequestMapper]; the
+ * Pool-computed confidence values are dropped there. The caller resolves which orchestrator address is the site main
+ * address (the site's own or, when the site main is the legal address, the legal entity's legal address) and passes it in.
+ *
+ * The sole exception to pure pass-through is a missing state type: the loose request's [SiteState] type is non-null by
+ * contract (the header parser reuses it as-is, see `SiteContentRequest`), so this boundary mapper enforces that
+ * precondition — matching the previous throwing behavior of the task path.
+ */
+@Component
+class GoldenRecordTaskSiteRequestMapper(
+    private val addressRequestMapper: GoldenRecordTaskAddressRequestMapper
+) {
+
+    fun toCreateRequest(legalEntityBpn: String, site: TaskSite, mainAddress: TaskPostalAddress): SiteCreateRequest =
+        SiteCreateRequest(legalEntityBpn = legalEntityBpn, content = toContentRequest(site, mainAddress))
+
+    fun toUpdateRequest(siteBpn: String, site: TaskSite, mainAddress: TaskPostalAddress): SiteUpdateRequest =
+        SiteUpdateRequest(siteBpn = siteBpn, content = toContentRequest(site, mainAddress))
+
+    fun toCreateWithLegalAddressAsMainRequest(legalEntityBpn: String, site: TaskSite): SiteCreateWithLegalAddressAsMainRequest =
+        SiteCreateWithLegalAddressAsMainRequest(legalEntityBpn = legalEntityBpn, header = toHeaderRequest(site))
+
+    fun toCreateWithReferencedAddressAsMainRequest(mainAddressBpn: String, site: TaskSite, mainAddress: TaskPostalAddress): SiteCreateWithReferencedAddressAsMainRequest =
+        SiteCreateWithReferencedAddressAsMainRequest(mainAddressBpn = mainAddressBpn, content = toContentRequest(site, mainAddress))
+
+    private fun toContentRequest(site: TaskSite, mainAddress: TaskPostalAddress): SiteContentRequest =
+        SiteContentRequest(
+            header = toHeaderRequest(site),
+            mainAddress = addressRequestMapper.toContentRequest(
+                mainAddress,
+                site.scriptVariants.map { TaskScriptVariant(it.scriptCode, it.mainAddress) }
+            )
+        )
+
+    private fun toHeaderRequest(site: TaskSite): SiteHeaderRequest =
+        SiteHeaderRequest(
+            name = site.siteName,
+            states = site.states.map { toState(it) },
+            confidenceCriteria = addressRequestMapper.toConfidenceRequest(site.confidenceCriteria),
+            scriptVariants = site.scriptVariants.map { SiteScriptVariantRequest(it.scriptCode, it.siteName) }
+        )
+
+    private fun toState(state: TaskBusinessState): SiteState =
+        SiteState(
+            validFrom = state.validFrom,
+            validTo = state.validTo,
+            type = state.type ?: throw BpdmValidationException("Business Partner state type is null")
+        )
+}

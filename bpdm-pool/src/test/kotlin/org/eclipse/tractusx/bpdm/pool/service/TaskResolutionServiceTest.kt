@@ -92,7 +92,9 @@ class TaskResolutionServiceTest @Autowired constructor(
 
         val result = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createLegalEntityRequest)
         assertThat(result[0].taskId).isEqualTo("TASK_1")
-        assertThat(result[0].errors.size).isEqualTo(1)
+        // The content parsers accumulate all validation errors rather than failing fast on the first missing field:
+        // legal name + confidence (legal-entity header) and country + city + confidence (empty legal address).
+        assertThat(result[0].errors.size).isEqualTo(5)
     }
 
     @Test

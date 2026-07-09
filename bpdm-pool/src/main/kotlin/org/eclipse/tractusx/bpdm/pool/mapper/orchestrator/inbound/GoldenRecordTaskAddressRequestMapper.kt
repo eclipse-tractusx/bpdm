@@ -48,9 +48,26 @@ import org.eclipse.tractusx.orchestrator.api.model.Street as TaskStreet
 class GoldenRecordTaskAddressRequestMapper {
 
     fun toContentRequest(address: TaskAddress): AddressContentRequest =
+        toContentRequest(address.postalProperties, address.scriptVariants)
+
+    /**
+     * Overload for the legal / site main address, where the postal properties and the localized script variants are not
+     * bundled in a [TaskAddress] but travel separately (the postal address on the legal entity / site, the variants
+     * reconstructed per script code from its `scriptVariants`). Both callers ultimately produce the same
+     * [AddressContentRequest].
+     */
+    fun toContentRequest(address: TaskPostalAddress, scriptVariants: List<TaskScriptVariant>): AddressContentRequest =
         AddressContentRequest(
-            address = toAddressRequest(address.postalProperties),
-            scriptVariants = address.scriptVariants.map { toScriptVariant(it) }
+            address = toAddressRequest(address),
+            scriptVariants = scriptVariants.map { toScriptVariant(it) }
+        )
+
+    fun toConfidenceRequest(confidence: TaskConfidenceCriteria): ConfidenceCriteriaRequest =
+        ConfidenceCriteriaRequest(
+            sharedByOwner = confidence.sharedByOwner,
+            checkedByExternalDataSource = confidence.checkedByExternalDataSource,
+            lastConfidenceCheckAt = confidence.lastConfidenceCheckAt,
+            nextConfidenceCheckAt = confidence.nextConfidenceCheckAt
         )
 
     private fun toAddressRequest(address: TaskPostalAddress): LogisticAddressRequest =
@@ -92,14 +109,6 @@ class GoldenRecordTaskAddressRequestMapper {
             deliveryServiceType = alternative.deliveryServiceType,
             deliveryServiceQualifier = alternative.deliveryServiceQualifier,
             deliveryServiceNumber = alternative.deliveryServiceNumber
-        )
-
-    private fun toConfidenceRequest(confidence: TaskConfidenceCriteria): ConfidenceCriteriaRequest =
-        ConfidenceCriteriaRequest(
-            sharedByOwner = confidence.sharedByOwner,
-            checkedByExternalDataSource = confidence.checkedByExternalDataSource,
-            lastConfidenceCheckAt = confidence.lastConfidenceCheckAt,
-            nextConfidenceCheckAt = confidence.nextConfidenceCheckAt
         )
 
     private fun toStateRequest(state: TaskBusinessState): AddressStateRequest =
