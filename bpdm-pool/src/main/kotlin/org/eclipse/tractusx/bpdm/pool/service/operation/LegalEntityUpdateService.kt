@@ -19,10 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation
 
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.util.replace
-import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
-import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
@@ -30,9 +27,7 @@ import org.eclipse.tractusx.bpdm.pool.mapper.entity.LegalEntityEntityMapper
 import org.eclipse.tractusx.bpdm.pool.model.AddressUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityUpdateParsed
-import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
-import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerEquivalenceMapper
-import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
+import org.eclipse.tractusx.bpdm.pool.service.writer.LegalEntityWriter
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
@@ -41,22 +36,22 @@ import java.time.temporal.ChronoUnit
 /**
  * Updates legal entities — the composite legal-entity-update *operation*. It consumes a [LegalEntityUpdateParsed] command
  * (target resolved, header + legal-address content validated by
- * [org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntityUpdateParser]), applies the header change under before/after
- * change detection, and delegates the legal-address change to [AddressUpdateService], netting a single UPDATE when either
- * side changed. Order-preserving positional contract (see [org.eclipse.tractusx.bpdm.pool.model.ParseResult]).
+ * [org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntityUpdateParser]), applies the header change (delegating change
+ * detection, save and LEGAL_ENTITY changelog to [org.eclipse.tractusx.bpdm.pool.service.writer.LegalEntityWriter]), and delegates the legal-address change to
+ * [AddressUpdateService], netting a single UPDATE when either side changed. Order-preserving positional contract (see
+ * [org.eclipse.tractusx.bpdm.pool.model.ParseResult]).
  */
 @Service
 class LegalEntityUpdateService(
     private val addressUpdateService: AddressUpdateService,
-    private val legalEntityRepository: LegalEntityRepository,
-    private val changelogService: PartnerChangelogService,
-    private val equivalenceMapper: BusinessPartnerEquivalenceMapper,
+    private val legalEntityWriter: LegalEntityWriter,
     private val legalEntityEntityMapper: LegalEntityEntityMapper
 ) {
 
     @Transactional
     fun update(parsed: List<LegalEntityUpdateParsed>): List<UpsertResult<LegalEntityDb>>{
-        val headerResults = parsed.map { update(it) }
+        // Stage + commit the headers first so all LEGAL_ENTITY changelogs precede the legal-address ADDRESS changelogs below.
+        val headerResults = legalEntityWriter.commit(parsed.map { entry -> legalEntityWriter.stageUpdate(entry.target) { doUpdateEntity(it, entry.content) } })
 
         val legalAddressRequests = parsed.map {
             AddressUpdateParsed(
@@ -72,24 +67,6 @@ class LegalEntityUpdateService(
             val changed = headerResult.upsertType == UpsertType.Updated || legalAddressResult.upsertType == UpsertType.Updated
             UpsertResult(headerResult.value, if (changed) UpsertType.Updated else UpsertType.NoChange)
         }
-    }
-
-    private fun update(parsed: LegalEntityUpdateParsed): UpsertResult<LegalEntityDb> {
-        val target = parsed.target
-
-        val before = equivalenceMapper.toEquivalenceDto(target)
-        doUpdateEntity(target, parsed.content)
-        val after = equivalenceMapper.toEquivalenceDto(target)
-
-        val upsertType = if (before != after) {
-            legalEntityRepository.save(target)
-            changelogService.createChangelogEntries(listOf(ChangelogEntryCreateRequest(target.bpn, ChangelogType.UPDATE, BusinessPartnerType.LEGAL_ENTITY)))
-            UpsertType.Updated
-        } else {
-            UpsertType.NoChange
-        }
-
-        return UpsertResult(target, upsertType)
     }
 
     private fun doUpdateEntity(target: LegalEntityDb, content: LegalEntityContentParsed) {

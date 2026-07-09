@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.service.operation
 
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.model.AddressCreateParsed
+import org.eclipse.tractusx.bpdm.pool.service.writer.LogisticAddressWriter
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -33,12 +34,12 @@ import org.springframework.transaction.annotation.Transactional
  * parent is not yet persisted build the command themselves and call [create] directly. Order-preserving positional
  * contract (see [org.eclipse.tractusx.bpdm.pool.model.ParseResult]).
  *
- * This is the single-call convenience over [LogisticAddressBuilder]: it builds and immediately persists. Callers that
- * own a cyclic parent relationship use the builder's two phases directly so they can wire the graph before persisting.
+ * This is the single-call convenience over [org.eclipse.tractusx.bpdm.pool.service.writer.LogisticAddressWriter]: it stages and immediately commits. Callers that own
+ * a cyclic parent relationship use the writer's stage/commit phases directly so they can wire the graph before committing.
  */
 @Service
 class AddressCreateService(
-    private val addressBuilder: LogisticAddressBuilder
+    private val addressWriter: LogisticAddressWriter
 ) {
 
     /**
@@ -49,5 +50,5 @@ class AddressCreateService(
      */
     @Transactional
     fun create(parsed: List<AddressCreateParsed>): List<LogisticAddressDb> =
-        addressBuilder.persist(addressBuilder.build(parsed)).map { it.value }
+        addressWriter.commit(addressWriter.stageCreate(parsed)).map { it.value }
 }

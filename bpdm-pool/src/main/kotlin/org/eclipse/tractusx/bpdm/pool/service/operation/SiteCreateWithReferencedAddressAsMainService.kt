@@ -20,10 +20,10 @@
 package org.eclipse.tractusx.bpdm.pool.service.operation
 
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
-import org.eclipse.tractusx.bpdm.pool.model.AddressSiteAssignment
 import org.eclipse.tractusx.bpdm.pool.model.SiteCreateWithReferencedAddressAsMainParsed
 import org.eclipse.tractusx.bpdm.pool.model.SiteHeaderCreateParsed
-import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
+import org.eclipse.tractusx.bpdm.pool.service.writer.LogisticAddressWriter
+import org.eclipse.tractusx.bpdm.pool.service.writer.SiteWriter
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -38,20 +38,22 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class SiteCreateWithReferencedAddressAsMainService(
-    private val siteRepository: SiteRepository,
-    private val siteHeaderCreateService: SiteHeaderCreateService,
-    private val addressSiteAssignmentService: AddressSiteAssignmentService
+    private val siteWriter: SiteWriter,
+    private val addressWriter: LogisticAddressWriter
 ) {
 
     @Transactional
     fun create(parsed: List<SiteCreateWithReferencedAddressAsMainParsed>): List<SiteDb> {
-        val sites = siteHeaderCreateService.create(parsed.map { SiteHeaderCreateParsed(it.mainAddress.legalEntity!!, it.siteHeader) })
-        sites.zip(parsed.map { it.mainAddress }).forEach { (site, address) -> site.mainAddress = address }
-        siteRepository.saveAll(sites)
 
-        val mainAddressRequests = parsed.zip(sites) { siteRequest, createdSite -> AddressSiteAssignment(siteRequest.mainAddress, createdSite) }
-        addressSiteAssignmentService.assign(mainAddressRequests)
+        val stagedSites = siteWriter.stageCreate(parsed.map { SiteHeaderCreateParsed(it.mainAddress.legalEntity!!, it.siteHeader) })
 
-        return sites
+        //Wire sites to site main address
+        val stagedAddressUpdates = parsed.zip(stagedSites).map { (entry, stagedSite) -> addressWriter.stageUpdate(entry.mainAddress) { it.sites.add(stagedSite.site) } }
+        stagedSites.zip(stagedAddressUpdates).forEach { (stagedSite, stagedAddressUpdate) -> stagedSite.site.mainAddress = stagedAddressUpdate.address }
+
+        val createdSites = siteWriter.commit(stagedSites).map { it.value }
+        addressWriter.commit(stagedAddressUpdates)
+
+        return createdSites
     }
 }

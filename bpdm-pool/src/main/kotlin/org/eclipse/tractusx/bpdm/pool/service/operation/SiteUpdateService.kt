@@ -19,36 +19,29 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation
 
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.util.replace
-import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
-import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.SiteEntityMapper
-import org.eclipse.tractusx.bpdm.pool.model.AddressContentUpdateParsed
+import org.eclipse.tractusx.bpdm.pool.model.AddressUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.SiteContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.SiteUpdateParsed
-import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
-import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerEquivalenceMapper
-import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
+import org.eclipse.tractusx.bpdm.pool.service.writer.SiteWriter
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
  * Updates sites — the composite site-update *operation*. It consumes a [SiteUpdateParsed] command (target resolved,
  * header + main-address content validated by [org.eclipse.tractusx.bpdm.pool.service.parser.SiteUpdateParser]), applies
- * the header change under before/after change detection, and delegates the main-address change to
- * [AddressContentUpdateService], netting a single UPDATE when either side changed. Order-preserving positional contract
- * (see [org.eclipse.tractusx.bpdm.pool.model.ParseResult]).
+ * the header change (delegating change detection, save and SITE changelog to [org.eclipse.tractusx.bpdm.pool.service.writer.SiteWriter]), and delegates the
+ * main-address change to [AddressUpdateService] (with no site assignment), netting a single UPDATE when either side
+ * changed. Order-preserving positional contract (see [org.eclipse.tractusx.bpdm.pool.model.ParseResult]).
  */
 @Service
 class SiteUpdateService(
-    private val addressContentUpdateService: AddressContentUpdateService,
-    private val siteRepository: SiteRepository,
-    private val changelogService: PartnerChangelogService,
-    private val equivalenceMapper: BusinessPartnerEquivalenceMapper,
+    private val addressUpdateService: AddressUpdateService,
+    private val siteWriter: SiteWriter,
     private val siteEntityMapper: SiteEntityMapper
 ) {
 
@@ -58,40 +51,23 @@ class SiteUpdateService(
      */
     @Transactional
     fun update(parsed: List<SiteUpdateParsed>): List<UpsertResult<SiteDb>>{
-        val siteResults = parsed.map { update(it) }
+        // Stage + commit the site headers first so all SITE changelogs precede the main-address ADDRESS changelogs below.
+        val siteResults = siteWriter.commit(parsed.map { entry -> siteWriter.stageUpdate(entry.target) { doUpdateEntity(it, entry.content) } })
 
         val mainAddressRequests = parsed.map {
-            AddressContentUpdateParsed(
+            AddressUpdateParsed(
                 it.target.mainAddress,
+                null,
                 it.content.mainAddress.address,
-                it.content.mainAddress.scriptVariants,
-                true
+                it.content.mainAddress.scriptVariants
             )
         }
-        val mainAddressResults = addressContentUpdateService.update(mainAddressRequests)
+        val mainAddressResults = addressUpdateService.update(mainAddressRequests)
 
         return siteResults.zip(mainAddressResults){ siteResult, mainAddressResult ->
             val changed = siteResult.upsertType == UpsertType.Updated || mainAddressResult.upsertType == UpsertType.Updated
             UpsertResult(siteResult.value, if (changed) UpsertType.Updated else UpsertType.NoChange)
         }
-    }
-
-    private fun update(parsed: SiteUpdateParsed): UpsertResult<SiteDb> {
-        val target = parsed.target
-
-        val before = equivalenceMapper.toEquivalenceDto(target)
-        doUpdateEntity(target, parsed.content)
-        val after = equivalenceMapper.toEquivalenceDto(target)
-
-        val upsertType = if (before != after) {
-            siteRepository.save(target)
-            changelogService.createChangelogEntries(listOf(ChangelogEntryCreateRequest(target.bpn, ChangelogType.UPDATE, BusinessPartnerType.SITE)))
-            UpsertType.Updated
-        } else {
-            UpsertType.NoChange
-        }
-
-        return UpsertResult(target, upsertType)
     }
 
     private fun doUpdateEntity(target: SiteDb, content: SiteContentParsed) {

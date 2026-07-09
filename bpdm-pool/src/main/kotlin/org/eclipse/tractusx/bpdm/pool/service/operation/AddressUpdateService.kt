@@ -19,47 +19,50 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation
 
-import org.eclipse.tractusx.bpdm.common.util.mapSelectedBatch
+import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
-import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
-import org.eclipse.tractusx.bpdm.pool.model.AddressContentUpdateParsed
-import org.eclipse.tractusx.bpdm.pool.model.AddressSiteAssignment
+import org.eclipse.tractusx.bpdm.pool.mapper.entity.AddressEntityMapper
+import org.eclipse.tractusx.bpdm.pool.model.AddressScriptVariantParsed
 import org.eclipse.tractusx.bpdm.pool.model.AddressUpdateParsed
+import org.eclipse.tractusx.bpdm.pool.model.LogisticAddressParsed
+import org.eclipse.tractusx.bpdm.pool.service.writer.LogisticAddressWriter
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Updates existing logistic addresses given an already-resolved target — the composite address-update *operation*:
- * it optionally assigns the address to a site ([AddressSiteAssignmentService]) and applies the content change
- * ([AddressContentUpdateService]) under one combined change detection, so a membership change and a content change net a
- * single ADDRESS UPDATE. Update never re-parents. Content validation and target resolution are the parser's job
- * ([org.eclipse.tractusx.bpdm.pool.service.parser.AddressUpdateParser]); callers that already hold the managed target and
- * a validated command call [update] directly. Order-preserving positional contract (see
- * [org.eclipse.tractusx.bpdm.pool.model.ParseResult]).
+ * Updates existing logistic addresses given an already-resolved target — the single address-update *operation*. It
+ * optionally assigns the address to a site and applies the content change, composing both into one
+ * [LogisticAddressWriter.stageUpdate] so a membership change and a content change net a single ADDRESS UPDATE (one
+ * mutation, one change detection, one changelog). Update never re-parents. Content validation and target resolution are
+ * the parser's job ([org.eclipse.tractusx.bpdm.pool.service.parser.AddressUpdateParser]); callers that already hold the
+ * managed target and a validated command (e.g. the legal-entity/site update operations, passing `site = null`) call
+ * [update] directly. Order-preserving positional contract (see [org.eclipse.tractusx.bpdm.pool.model.ParseResult]).
  */
 @Service
 class AddressUpdateService(
-    private val addressSiteAssignmentService: AddressSiteAssignmentService,
-    private val addressContentUpdateService: AddressContentUpdateService
+    private val addressWriter: LogisticAddressWriter,
+    private val addressEntityMapper: AddressEntityMapper
 ) {
 
     @Transactional
-    fun update(parsed: List<AddressUpdateParsed>): List<UpsertResult<LogisticAddressDb>> {
-        val assignResults = parsed.mapSelectedBatch(
-                select = { entry -> entry.site?.let { AddressSiteAssignment(entry.target, it) } },
-                default = false,
-                transform = { assignments -> addressSiteAssignmentService.assign(assignments).map { it.upsertType == UpsertType.Updated } },
-            )
+    fun update(parsed: List<AddressUpdateParsed>): List<UpsertResult<LogisticAddressDb>> =
+        addressWriter.commit(parsed.map { entry ->
+            addressWriter.stageUpdate(entry.target) { address ->
+                entry.site?.let { address.sites.add(it) }
+                applyContent(address, entry.address, entry.scriptVariants)
+            }
+        })
 
-        val contentUpdateRequests =  parsed.zip(assignResults) { entry, assignResult ->
-            AddressContentUpdateParsed(entry.target, entry.address, entry.scriptVariants, !assignResult)
-        }
-        val contentUpdateResults = addressContentUpdateService.update(contentUpdateRequests)
-
-        return contentUpdateResults.zip(assignResults) { contentResult, siteUpdated ->
-            val changed = contentResult.upsertType == UpsertType.Updated || siteUpdated
-            contentResult.copy(upsertType = if (changed) UpsertType.Updated else UpsertType.NoChange)
-        }
+    private fun applyContent(target: LogisticAddressDb, address: LogisticAddressParsed, scriptVariants: List<AddressScriptVariantParsed>) {
+        // The sharing-member count is Pool-maintained, not part of the update payload, so carry the current value forward.
+        val numberOfSharingMembers = target.confidenceCriteria.numberOfSharingMembers
+        target.name = address.name
+        target.physicalPostalAddress = addressEntityMapper.toPhysical(address.physicalPostalAddress)
+        target.alternativePostalAddress = address.alternativePostalAddress?.let { addressEntityMapper.toAlternative(it) }
+        target.confidenceCriteria = addressEntityMapper.toConfidence(address.confidenceCriteria, numberOfSharingMembers)
+        target.identifiers.replace(addressEntityMapper.toIdentifiers(address.identifiers, target))
+        target.states.replace(addressEntityMapper.toStates(address.states, target))
+        target.scriptVariants.replace(addressEntityMapper.toScriptVariants(scriptVariants))
     }
 }

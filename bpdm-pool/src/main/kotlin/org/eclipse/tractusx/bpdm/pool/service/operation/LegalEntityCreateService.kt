@@ -19,35 +19,26 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation
 
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
-import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
-import org.eclipse.tractusx.bpdm.pool.mapper.entity.LegalEntityEntityMapper
 import org.eclipse.tractusx.bpdm.pool.model.AddressCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityCreateParsed
-import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
-import org.eclipse.tractusx.bpdm.pool.service.BpnIssuingService
-import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
+import org.eclipse.tractusx.bpdm.pool.service.writer.LegalEntityWriter
+import org.eclipse.tractusx.bpdm.pool.service.writer.LogisticAddressWriter
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.Instant
-import java.time.temporal.ChronoUnit
 
 /**
  * Creates legal entities, the top of the business-partner hierarchy — the single owner of the legal-entity-create
  * *operation*. It consumes a [LegalEntityCreateParsed] command (header + legal-address content already validated by
- * [org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntityCreateParser]), issues the BPN and persists the legal entity
- * and its legal address. The legal address (whose parent is the still-unsaved legal entity) is delegated to
- * [AddressCreateService]. Order-preserving positional contract (see [org.eclipse.tractusx.bpdm.pool.model.ParseResult]).
+ * [org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntityCreateParser]) and persists the legal entity and its legal
+ * address. Both the legal entity ([org.eclipse.tractusx.bpdm.pool.service.writer.LegalEntityWriter]) and its legal address ([org.eclipse.tractusx.bpdm.pool.service.writer.LogisticAddressWriter]) are staged unsaved
+ * so the legal entity ⇄ legal address cycle can be wired in memory before persisting. Order-preserving positional
+ * contract (see [org.eclipse.tractusx.bpdm.pool.model.ParseResult]).
  */
 @Service
 class LegalEntityCreateService(
-    private val addressBuilder: LogisticAddressBuilder,
-    private val bpnIssuingService: BpnIssuingService,
-    private val legalEntityRepository: LegalEntityRepository,
-    private val changelogService: PartnerChangelogService,
-    private val legalEntityEntityMapper: LegalEntityEntityMapper
+    private val addressWriter: LogisticAddressWriter,
+    private val legalEntityWriter: LegalEntityWriter
 ) {
 
     /**
@@ -56,29 +47,16 @@ class LegalEntityCreateService(
      */
     @Transactional
     fun create(parsed: List<LegalEntityCreateParsed>): List<LegalEntityDb> {
-        val bpns = bpnIssuingService.issueLegalEntityBpns(parsed.size)
-        val currentness = Instant.now().truncatedTo(ChronoUnit.MICROS)
-        // A new legal entity's confidence starts with zero sharing members (preserves the previous create behavior).
-        val legalEntities = parsed.zip(bpns) { entry, bpn ->
-            legalEntityEntityMapper.toEntity(bpn, entry.content.header, currentness, numberOfSharingMembers = 0)
-        }
-
-        // Build the (still-unsaved) legal addresses so we can wire the legal entity ⇄ legal address cycle in memory,
-        // then persist in the order we choose. The legal address's parent is the still-unsaved legal entity (no site);
-        // the cyclic insert flushes correctly thanks to the nullable back-FK and order_inserts.
-        val builtAddresses = addressBuilder.build(parsed.zip(legalEntities).map { (entry, legalEntity) ->
+        val stagedLegalEntities = legalEntityWriter.stageCreate(parsed.map { it.content.header })
+        val stagedAddresses = addressWriter.stageCreate(parsed.zip(stagedLegalEntities).map { (entry, staged) ->
             val legalAddress = entry.content.legalAddress
-            AddressCreateParsed(legalEntity, site = null, legalAddress.address, legalAddress.scriptVariants)
+            AddressCreateParsed(staged.legalEntity, site = null, legalAddress.address, legalAddress.scriptVariants)
         })
-        legalEntities.zip(builtAddresses).forEach { (legalEntity, address) -> legalEntity.legalAddress = address.value }
 
-        // Emit the legal entity changelog before the address builder emits the ADDRESS CREATE changelog, so the overall
-        // changelog order stays "legal entity, then its legal address".
-        changelogService.createChangelogEntries(legalEntities.map {
-            ChangelogEntryCreateRequest(it.bpn, ChangelogType.CREATE, BusinessPartnerType.LEGAL_ENTITY)
-        })
-        legalEntityRepository.saveAll(legalEntities)
-        addressBuilder.persist(builtAddresses)
+        stagedLegalEntities.zip(stagedAddresses).forEach { (staged, stagedAddress) -> staged.legalEntity.legalAddress = stagedAddress.address }
+
+        val legalEntities = legalEntityWriter.commit(stagedLegalEntities).map { it.value }
+        addressWriter.commit(stagedAddresses)
 
         return legalEntities
     }

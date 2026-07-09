@@ -23,22 +23,23 @@ import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.model.AddressCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.SiteCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.SiteHeaderCreateParsed
-import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
+import org.eclipse.tractusx.bpdm.pool.service.writer.LogisticAddressWriter
+import org.eclipse.tractusx.bpdm.pool.service.writer.SiteWriter
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
  * Creates sites under an existing legal entity — the single owner of the site-create *operation*. It consumes a
  * [SiteCreateParsed] command (parent resolved, header + main-address content validated by
- * [org.eclipse.tractusx.bpdm.pool.service.parser.SiteCreateParser]) and persists the site and its main address. The main
- * address (whose parent is the still-unsaved site) is delegated to [AddressCreateService]. Order-preserving positional
- * contract (see [org.eclipse.tractusx.bpdm.pool.model.ParseResult]).
+ * [org.eclipse.tractusx.bpdm.pool.service.parser.SiteCreateParser]) and persists the site and its newly created main
+ * address. Both the site ([org.eclipse.tractusx.bpdm.pool.service.writer.SiteWriter]) and its main address ([org.eclipse.tractusx.bpdm.pool.service.writer.LogisticAddressWriter]) are staged unsaved so the site ⇄
+ * main-address cycle can be wired in memory before persisting. Order-preserving positional contract (see
+ * [org.eclipse.tractusx.bpdm.pool.model.ParseResult]).
  */
 @Service
 class SiteCreateService(
-    private val addressCreateService: AddressCreateService,
-    private val siteHeaderCreateService: SiteHeaderCreateService,
-    private val siteRepository: SiteRepository
+    private val addressWriter: LogisticAddressWriter,
+    private val siteWriter: SiteWriter
 ) {
 
     /**
@@ -47,18 +48,16 @@ class SiteCreateService(
      */
     @Transactional
     fun create(parsed: List<SiteCreateParsed>): List<SiteDb> {
-        val sites = siteHeaderCreateService.create(parsed.map { SiteHeaderCreateParsed(it.legalEntity, it.content.header) })
-
-        val mainAddresses = addressCreateService.create(parsed.zip(sites).map { (entry, site) ->
+        val stagedSites = siteWriter.stageCreate(parsed.map { SiteHeaderCreateParsed(it.legalEntity, it.content.header) })
+        val stagedAddresses = addressWriter.stageCreate(parsed.zip(stagedSites).map { (entry, staged) ->
             val mainAddress = entry.content.mainAddress
-            AddressCreateParsed(site.legalEntity, site, mainAddress.address, mainAddress.scriptVariants)
+            AddressCreateParsed(staged.site.legalEntity, staged.site, mainAddress.address, mainAddress.scriptVariants)
         })
 
-        // The sites are already persistent (saved by siteHeaderCreateService); setting mainAddress mutates the managed
-        // entities, so dirty tracking flushes the main_address FK at commit — same as the other site-create paths.
-        sites.zip(mainAddresses).forEach { (site, address) -> site.mainAddress = address }
+        stagedSites.zip(stagedAddresses).forEach { (stagedSite, stagedAddress) -> stagedSite.site.mainAddress = stagedAddress.address }
 
-        siteRepository.saveAll(sites)
+        val sites = siteWriter.commit(stagedSites).map { it.value }
+        addressWriter.commit(stagedAddresses)
 
         return sites
     }

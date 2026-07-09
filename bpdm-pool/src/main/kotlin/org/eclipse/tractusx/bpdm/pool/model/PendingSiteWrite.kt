@@ -19,14 +19,16 @@
 
 package org.eclipse.tractusx.bpdm.pool.model
 
-import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
+import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
+import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 
 /**
- * Input to `SiteWriter.stageCreate`: the resolved parent legal entity and a validated site header, but no main address.
- * It carries only what is needed to build the site header — the caller pairs its own resolved parent with the header
- * validated by the site header parser. The main address is the caller's concern (see the writer doc).
+ * A site with a staged, not-yet-persisted write (create or update) and the resulting change state. Produced by
+ * [org.eclipse.tractusx.bpdm.pool.service.writer.SiteWriter]'s `stageCreate`/`stageUpdate` and consumed by its
+ * `commit`, which is the single place a site is saved and changelogged. It is handed to callers so they can wire the
+ * (still-unsaved) site into its mandatory main address before it is persisted.
  */
-data class SiteHeaderCreateParsed(
-    val legalEntity: LegalEntityDb,
-    val header: SiteHeaderParsed
+data class PendingSiteWrite(
+    val site: SiteDb,
+    val upsertType: UpsertType
 )
