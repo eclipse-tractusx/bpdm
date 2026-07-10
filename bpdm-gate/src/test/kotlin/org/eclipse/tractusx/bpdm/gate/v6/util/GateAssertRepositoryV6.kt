@@ -104,7 +104,6 @@ class GateAssertRepositoryV6 {
 
         Assertions.assertThat(actual.content)
             .usingRecursiveComparison()
-            .ignoringCollectionOrder()
             .ignoringFields(
                 ChangelogGateDto::timestamp.name
             )
