@@ -48,8 +48,6 @@ import java.time.Instant
  ******************************************************************************/
 class SearchOutputChangelogV6IT: UnscheduledGateV6TestBase() {
 
-    private val anyTime = Instant.now()
-
     /**
      * GIVEN created output
      * WHEN output consumer searches for changelogs
@@ -65,6 +63,7 @@ class SearchOutputChangelogV6IT: UnscheduledGateV6TestBase() {
         val response = gateClient.changelog.getOutputChangelog(PaginationRequest(), ChangelogSearchRequest())
 
         //THEN
+        val anyTime = Instant.now()
         val expectedEntry = ChangelogGateDto(testName, anyTime, ChangelogType.CREATE)
         val expected = PageChangeLogDto(1, 1, 0, 1, listOf(expectedEntry), 0, emptyList())
 
@@ -89,6 +88,7 @@ class SearchOutputChangelogV6IT: UnscheduledGateV6TestBase() {
         val response = gateClient.changelog.getOutputChangelog(PaginationRequest(), ChangelogSearchRequest())
 
         //THEN
+        val anyTime = Instant.now()
         val expectedEntries = listOf(
             ChangelogGateDto(testName, anyTime, ChangelogType.CREATE),
             ChangelogGateDto(testName, anyTime, ChangelogType.UPDATE),
@@ -120,6 +120,7 @@ class SearchOutputChangelogV6IT: UnscheduledGateV6TestBase() {
         val response = gateClient.changelog.getOutputChangelog(PaginationRequest(), request)
 
         //THEN
+        val anyTime = Instant.now()
         val expectedEntries = listOf(
             ChangelogGateDto(createdInput1.externalId, anyTime, ChangelogType.CREATE)
         )
@@ -153,6 +154,7 @@ class SearchOutputChangelogV6IT: UnscheduledGateV6TestBase() {
         val response = gateClient.changelog.getOutputChangelog(PaginationRequest(), request)
 
         //THEN
+        val anyTime = Instant.now()
         val expectedEntries = listOf(
             ChangelogGateDto(createdInput3.externalId, anyTime, ChangelogType.CREATE)
         )
