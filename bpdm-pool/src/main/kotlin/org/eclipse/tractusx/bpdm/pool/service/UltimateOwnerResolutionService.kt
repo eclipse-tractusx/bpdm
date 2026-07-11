@@ -29,6 +29,7 @@ import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 
 @Service
 class UltimateOwnerResolutionService(
@@ -55,11 +56,12 @@ class UltimateOwnerResolutionService(
         visited.add(currentBpn)
 
         val owningRelations = relationRepository.findByTypeAndStartNode(LegalEntityRelationType.IsOwnedBy, legalEntity)
+        val validOwningRelations = owningRelations.filter { isRelationCurrentlyValid(it) }
 
-        if (owningRelations.isEmpty()) {
+        if (validOwningRelations.isEmpty()) {
             return if (legalEntity.ownershipUltimate) currentBpn else null
         }
-        for (relation in owningRelations) {
+        for (relation in validOwningRelations) {
             val parent = relation.endNode
             val parentUltimateOwner = resolveUltimateOwnerWithCycleProtection(parent, visited)
             if (parentUltimateOwner != null) {
@@ -94,12 +96,25 @@ class UltimateOwnerResolutionService(
         }
 
         val childRelations = relationRepository.findByTypeAndEndNode(LegalEntityRelationType.IsOwnedBy, legalEntity)
+        val validChildRelations = childRelations.filter { isRelationCurrentlyValid(it) }
 
-        for (relation in childRelations) {
+        for (relation in validChildRelations) {
             val child = relation.startNode
             updateUltimateOwnerForEntityAndDescendants(child, visited)
         }
     }
 
+    private fun isRelationCurrentlyValid(relation: org.eclipse.tractusx.bpdm.pool.entity.RelationDb): Boolean {
+        if (relation.validityPeriods.isEmpty()) {
+            return false
+        }
+        
+        val today = LocalDate.now()
+        return relation.validityPeriods.any { period ->
+            val isAfterOrOnStart = today >= period.validFrom
+            val isBeforeOrOnEnd = period.validTo == null || today <= period.validTo
+            isAfterOrOnStart && isBeforeOrOnEnd
+        }
+    }
 
 }
