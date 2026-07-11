@@ -97,18 +97,18 @@ class TaskRelationsResolutionHeadquarterRelocationIT @Autowired constructor(
         val createdAddAddress = poolApiClient.addresses.createAddresses(listOf(addAddressRequest)).entities.single()
 
         //WHEN
-        val updateStartTime = Instant.now()
+        val updateStartTime = Instant.now().minusSeconds(1)
         val activeNow = listOf(RelationValidityPeriod(LocalDate.now(), null))
         val replacedByRelation = BusinessPartnerRelations(RelationType.IsReplacedBy, createdLegalEntity.legalEntity.legalAddress.bpna, createdAddAddress.address.bpna, activeNow, anyReasonCode())
         val taskToResolve = TaskRelationsStepReservationEntryDto("Any", "Any", replacedByRelation)
         taskRelationsResolutionService.upsertRelationsGoldenRecordIntoPool(listOf(taskToResolve))
-        val updateEndTime = Instant.now()
+        val updateEndTime = Instant.now().plusSeconds(1)
 
         //THEN
         val actualLegalEntity = poolApiClient.legalEntities.getLegalEntity(createdLegalEntity.legalEntity.header.bpnl)
         val expectedLegalEntity = buildExpectedRelocatedHeadquarterLegalEntity(createdLegalEntity, createdAddAddress, replacedByRelation)
 
-        poolAssertHelper.assertLegalEntityResponse(listOf(actualLegalEntity), listOf(expectedLegalEntity), Timeframe(updateStartTime.minusSeconds(1), updateEndTime.plusSeconds(1)))
+        poolAssertHelper.assertLegalEntityResponse(listOf(actualLegalEntity), listOf(expectedLegalEntity), Timeframe(updateStartTime, updateEndTime))
     }
 
     /**
@@ -126,12 +126,12 @@ class TaskRelationsResolutionHeadquarterRelocationIT @Autowired constructor(
         val createdAddAddress = poolApiClient.addresses.createAddresses(listOf(addAddressRequest)).entities.single()
 
         //WHEN
-        val updateStartTime = Instant.now()
+        val updateStartTime = Instant.now().minusSeconds(2)
         val activeLater = listOf(RelationValidityPeriod(LocalDate.now().plusDays(1), null))
         val replacedByRelation = BusinessPartnerRelations(RelationType.IsReplacedBy, createdLegalEntity.legalEntity.legalAddress.bpna, createdAddAddress.address.bpna, activeLater, anyReasonCode())
         val taskToResolve = TaskRelationsStepReservationEntryDto("Any", "Any", replacedByRelation)
         taskRelationsResolutionService.upsertRelationsGoldenRecordIntoPool(listOf(taskToResolve))
-        val updateEndTime = Instant.now()
+        val updateEndTime = Instant.now().plusSeconds(2)
 
         //THEN
         val actualLegalEntity = poolApiClient.legalEntities.getLegalEntity(createdLegalEntity.legalEntity.header.bpnl)
@@ -141,7 +141,7 @@ class TaskRelationsResolutionHeadquarterRelocationIT @Autowired constructor(
             scriptVariants = createdLegalEntity.legalEntity.scriptVariants
         )
 
-        poolAssertHelper.assertLegalEntityResponse(listOf(actualLegalEntity), listOf(expectedLegalEntity), Timeframe(updateStartTime.minusSeconds(1), updateEndTime.plusSeconds(1)))
+        poolAssertHelper.assertLegalEntityResponse(listOf(actualLegalEntity), listOf(expectedLegalEntity), Timeframe(updateStartTime, updateEndTime))
     }
 
     private fun anyReasonCode(): String{

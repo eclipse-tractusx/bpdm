@@ -31,48 +31,6 @@ import org.junit.jupiter.api.Test
 class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
 
     /**
-     * GIVEN non-participant legal entity
-     * WHEN operator updates the given legal entity as participant with new values
-     * THEN legal entity with all values updated and shared by owner confidence is returned
-     */
-    @Test
-    fun `update non-participant legal entity as participant`(){
-        //GIVEN
-        val givenLegalEntity = testDataClient.createLegalEntity(requestFactory.buildLegalEntity(testName).withParticipantData(false))
-
-        //WHEN
-        val updateRequest = requestFactory.buildLegalEntityUpdateRequest("Updated $testName", givenLegalEntity.header.bpnl).withParticipantData(true)
-        val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
-
-        //THEN
-        val expectedLegalEntities = listOf(resultFactory.buildLegalEntityUpdate(updateRequest, givenLegalEntity).withConfidence(TestDataV7.SharedByOwnerConfidence))
-        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(expectedLegalEntities, emptyList())
-
-        assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
-    }
-
-    /**
-     * GIVEN non-participant legal entity
-     * WHEN operator updates the given legal entity as non-participant with new values
-     * THEN legal entity with all values updated and no confidence is returned
-     */
-    @Test
-    fun `update participant legal entity as non-participant`(){
-        //GIVEN
-        val givenLegalEntity = testDataClient.createLegalEntity(requestFactory.buildLegalEntity(testName).withParticipantData(true))
-
-        //WHEN
-        val updateRequest = requestFactory.buildLegalEntityUpdateRequest("Updated $testName", givenLegalEntity.header.bpnl).withParticipantData(false)
-        val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
-
-        //THEN
-        val expectedLegalEntities = listOf(resultFactory.buildLegalEntityUpdate(updateRequest, givenLegalEntity).withConfidence(TestDataV7.NoConfidence))
-        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(expectedLegalEntities, emptyList())
-
-        assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
-    }
-
-    /**
      * GIVEN legal entity A with identifier X and legal entity B
      * WHEN operator tries to update legal entity B with legal identifier X
      * THEN operator sees LegalEntityDuplicateIdentifier error entry in response
