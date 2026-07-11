@@ -57,12 +57,12 @@ class UltimateOwnerResolutionService(
         visited.add(currentBpn)
 
         val owningRelations = relationRepository.findByTypeAndStartNode(LegalEntityRelationType.IsOwnedBy, legalEntity)
-        val currentlyValidRelations = owningRelations.filter { isRelationCurrentlyValid(it) }
+        val validOwningRelations = owningRelations.filter { isRelationCurrentlyValid(it) }
 
-        if (currentlyValidRelations.isEmpty()) {
+        if (validOwningRelations.isEmpty()) {
             return if (legalEntity.ownershipUltimate) currentBpn else null
         }
-        for (relation in currentlyValidRelations) {
+        for (relation in validOwningRelations) {
             val parent = relation.endNode
             val parentUltimateOwner = resolveUltimateOwnerWithCycleProtection(parent, visited)
             if (parentUltimateOwner != null) {
@@ -70,15 +70,6 @@ class UltimateOwnerResolutionService(
             }
         }
         return null
-    }
-
-    private fun isRelationCurrentlyValid(relation: RelationDb): Boolean {
-        val today = LocalDate.now()
-        return relation.validityPeriods.any { period ->
-            val validTo = period.validTo
-            (period.validFrom.isEqual(today) || period.validFrom.isBefore(today)) &&
-            (validTo == null || validTo.isAfter(today) || validTo.isEqual(today))
-        }
     }
 
     @Transactional
@@ -106,12 +97,25 @@ class UltimateOwnerResolutionService(
         }
 
         val childRelations = relationRepository.findByTypeAndEndNode(LegalEntityRelationType.IsOwnedBy, legalEntity)
+        val validChildRelations = childRelations.filter { isRelationCurrentlyValid(it) }
 
-        for (relation in childRelations) {
+        for (relation in validChildRelations) {
             val child = relation.startNode
             updateUltimateOwnerForEntityAndDescendants(child, visited)
         }
     }
 
+    private fun isRelationCurrentlyValid(relation: org.eclipse.tractusx.bpdm.pool.entity.RelationDb): Boolean {
+        if (relation.validityPeriods.isEmpty()) {
+            return false
+        }
+        
+        val today = LocalDate.now()
+        return relation.validityPeriods.any { period ->
+            val isAfterOrOnStart = today >= period.validFrom
+            val isBeforeOrOnEnd = period.validTo == null || today <= period.validTo
+            isAfterOrOnStart && isBeforeOrOnEnd
+        }
+    }
 
 }
