@@ -31,6 +31,40 @@ import org.junit.jupiter.api.Test
 class LegalEntityCreationV7IT: UnscheduledPoolTestBaseV7() {
 
     /**
+     * WHEN operator creates a new valid non-participant legal entity
+     * THEN created legal entity with no confidence is returned
+     */
+    @Test
+    fun `create valid non-participant legal entity`(){
+        //WHEN
+        val legalEntityRequest = requestFactory.buildLegalEntityCreateRequest(testName).withParticipantData(false)
+        val response = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest))
+
+        //THEN
+        val expectedLegalEntities = listOf(resultFactory.buildLegalEntityCreate(legalEntityRequest).withConfidence(TestDataV7.NoConfidence))
+        val expectedResponse = LegalEntityPartnerCreateResponseWrapper(expectedLegalEntities, emptyList())
+
+        assertRepository.assertLegalEntityCreateResponseWrapperIsEqual(response, expectedResponse)
+    }
+
+    /**
+     * WHEN operator creates a new valid participant legal entity
+     * THEN created legal entity with shared by owner confidence returned
+     */
+    @Test
+    fun `create valid participant legal entity`(){
+        //WHEN
+        val legalEntityRequest = requestFactory.buildLegalEntityCreateRequest(testName).withParticipantData(true)
+        val response = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest))
+
+        //THEN
+        val expectedLegalEntities = listOf(resultFactory.buildLegalEntityCreate(legalEntityRequest).withConfidence(TestDataV7.SharedByOwnerConfidence))
+        val expectedResponse = LegalEntityPartnerCreateResponseWrapper(expectedLegalEntities, emptyList())
+
+        assertRepository.assertLegalEntityCreateResponseWrapperIsEqual(response, expectedResponse)
+    }
+
+    /**
      * GIVEN legal entity with legal identifier X
      * WHEN operator tries to create a new legal entity with the same legal identifier X
      * THEN operator sees a LegalEntityDuplicateIdentifier error entry in response
