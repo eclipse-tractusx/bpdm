@@ -26,14 +26,13 @@ import org.eclipse.tractusx.bpdm.pool.mapper.entity.AddressEntityMapper
 import org.eclipse.tractusx.bpdm.pool.model.AddressScriptVariantParsed
 import org.eclipse.tractusx.bpdm.pool.model.AddressUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.LogisticAddressParsed
-import org.eclipse.tractusx.bpdm.pool.service.writer.LogisticAddressWriter
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
  * Updates existing logistic addresses given an already-resolved target — the single address-update *operation*. It
  * optionally assigns the address to a site and applies the content change, composing both into one
- * [LogisticAddressWriter.stageUpdate] so a membership change and a content change net a single ADDRESS UPDATE (one
+ * [LogisticAddressStagedUpdateService.stageUpdate] so a membership change and a content change net a single ADDRESS UPDATE (one
  * mutation, one change detection, one changelog). Update never re-parents. Content validation and target resolution are
  * the parser's job ([org.eclipse.tractusx.bpdm.pool.service.parser.AddressUpdateParser]); callers that already hold the
  * managed target and a validated command (e.g. the legal-entity/site update operations, passing `site = null`) call
@@ -41,14 +40,14 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class AddressUpdateService(
-    private val addressWriter: LogisticAddressWriter,
+    private val addressStagedUpdateService: LogisticAddressStagedUpdateService,
     private val addressEntityMapper: AddressEntityMapper
 ) {
 
     @Transactional
     fun update(parsed: List<AddressUpdateParsed>): List<UpsertResult<LogisticAddressDb>> =
-        addressWriter.commit(parsed.map { entry ->
-            addressWriter.stageUpdate(entry.target) { address ->
+        addressStagedUpdateService.commit(parsed.map { entry ->
+            addressStagedUpdateService.stageUpdate(entry.target) { address ->
                 entry.site?.let { address.sites.add(it) }
                 applyContent(address, entry.address, entry.scriptVariants)
             }

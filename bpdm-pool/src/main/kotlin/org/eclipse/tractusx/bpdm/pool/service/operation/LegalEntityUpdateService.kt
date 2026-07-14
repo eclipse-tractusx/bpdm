@@ -19,7 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation
 
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.util.replace
+import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
+import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
@@ -27,7 +30,10 @@ import org.eclipse.tractusx.bpdm.pool.mapper.entity.LegalEntityEntityMapper
 import org.eclipse.tractusx.bpdm.pool.model.AddressUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityUpdateParsed
-import org.eclipse.tractusx.bpdm.pool.service.writer.LegalEntityWriter
+import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityIdentifierRepository
+import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
+import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerEquivalenceMapper
+import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
@@ -44,14 +50,15 @@ import java.time.temporal.ChronoUnit
 @Service
 class LegalEntityUpdateService(
     private val addressUpdateService: AddressUpdateService,
-    private val legalEntityWriter: LegalEntityWriter,
-    private val legalEntityEntityMapper: LegalEntityEntityMapper
+    private val legalEntityEntityMapper: LegalEntityEntityMapper,
+    private val repository: LegalEntityRepository,
+    private val equivalenceMapper: BusinessPartnerEquivalenceMapper,
+    private val changelogService: PartnerChangelogService
 ) {
 
     @Transactional
     fun update(parsed: List<LegalEntityUpdateParsed>): List<UpsertResult<LegalEntityDb>>{
-        // Stage + commit the headers first so all LEGAL_ENTITY changelogs precede the legal-address ADDRESS changelogs below.
-        val headerResults = legalEntityWriter.commit(parsed.map { entry -> legalEntityWriter.stageUpdate(entry.target) { doUpdateEntity(it, entry.content) } })
+        val headerResults = parsed.map { updateHeader(it) }
 
         val legalAddressRequests = parsed.map {
             AddressUpdateParsed(
@@ -63,11 +70,32 @@ class LegalEntityUpdateService(
         }
         val legalAddressResults = addressUpdateService.update(legalAddressRequests)
 
-        return headerResults.zip(legalAddressResults){ headerResult, legalAddressResult ->
+        val overallResults = headerResults.zip(legalAddressResults){ headerResult, legalAddressResult ->
             val changed = headerResult.upsertType == UpsertType.Updated || legalAddressResult.upsertType == UpsertType.Updated
             UpsertResult(headerResult.value, if (changed) UpsertType.Updated else UpsertType.NoChange)
         }
+
+        changelogService.createChangelogEntries(
+            overallResults
+                .filter { it.upsertType == UpsertType.Updated }
+                .map { ChangelogEntryCreateRequest(it.value.bpn, ChangelogType.UPDATE, BusinessPartnerType.LEGAL_ENTITY) }
+        )
+
+        return overallResults
     }
+
+    private fun updateHeader(request: LegalEntityUpdateParsed): UpsertResult<LegalEntityDb> {
+        val before = equivalenceMapper.toEquivalenceDto(request.target)
+        doUpdateEntity(request.target, request.content)
+        val after = equivalenceMapper.toEquivalenceDto(request.target)
+
+        val changed = before != after
+
+        if(changed) repository.save(request.target)
+
+        return UpsertResult(request.target, if (changed) UpsertType.Updated else UpsertType.NoChange)
+    }
+
 
     private fun doUpdateEntity(target: LegalEntityDb, content: LegalEntityContentParsed) {
         val header = content.header

@@ -19,12 +19,15 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation
 
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
+import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.model.AddressCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.SiteCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.SiteHeaderCreateParsed
-import org.eclipse.tractusx.bpdm.pool.service.writer.LogisticAddressWriter
-import org.eclipse.tractusx.bpdm.pool.service.writer.SiteWriter
+import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
+import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -32,14 +35,16 @@ import org.springframework.transaction.annotation.Transactional
  * Creates sites under an existing legal entity — the single owner of the site-create *operation*. It consumes a
  * [SiteCreateParsed] command (parent resolved, header + main-address content validated by
  * [org.eclipse.tractusx.bpdm.pool.service.parser.SiteCreateParser]) and persists the site and its newly created main
- * address. Both the site ([org.eclipse.tractusx.bpdm.pool.service.writer.SiteWriter]) and its main address ([org.eclipse.tractusx.bpdm.pool.service.writer.LogisticAddressWriter]) are staged unsaved so the site ⇄
- * main-address cycle can be wired in memory before persisting. Order-preserving positional contract (see
- * [org.eclipse.tractusx.bpdm.pool.model.ParseResult]).
+ * address. Both the site ([org.eclipse.tractusx.bpdm.pool.service.writer.SiteWriter]) and its main address
+ * ([LogisticAddressStagedCreateService]) are staged unsaved so the site ⇄ main-address cycle can be wired in memory
+ * before persisting. Order-preserving positional contract (see [org.eclipse.tractusx.bpdm.pool.model.ParseResult]).
  */
 @Service
 class SiteCreateService(
-    private val addressWriter: LogisticAddressWriter,
-    private val siteWriter: SiteWriter
+    private val addressStagedCreateService: LogisticAddressStagedCreateService,
+    private val siteHeaderTransientCreateService: SiteHeaderTransientCreateService,
+    private val siteRepository: SiteRepository,
+    private val changelogService: PartnerChangelogService
 ) {
 
     /**
@@ -48,16 +53,18 @@ class SiteCreateService(
      */
     @Transactional
     fun create(parsed: List<SiteCreateParsed>): List<SiteDb> {
-        val stagedSites = siteWriter.stageCreate(parsed.map { SiteHeaderCreateParsed(it.legalEntity, it.content.header) })
-        val stagedAddresses = addressWriter.stageCreate(parsed.zip(stagedSites).map { (entry, staged) ->
+        val sites = siteHeaderTransientCreateService.createTransiently(parsed.map { SiteHeaderCreateParsed(it.legalEntity, it.content.header) })
+        val stagedAddresses = addressStagedCreateService.stageCreate(parsed.zip(sites).map { (entry, site) ->
             val mainAddress = entry.content.mainAddress
-            AddressCreateParsed(staged.site.legalEntity, staged.site, mainAddress.address, mainAddress.scriptVariants)
+            AddressCreateParsed(site.legalEntity, site, mainAddress.address, mainAddress.scriptVariants)
         })
 
-        stagedSites.zip(stagedAddresses).forEach { (stagedSite, stagedAddress) -> stagedSite.site.mainAddress = stagedAddress.address }
+        sites.zip(stagedAddresses).forEach { (site, stagedAddress) -> site.mainAddress = stagedAddress.address }
 
-        val sites = siteWriter.commit(stagedSites).map { it.value }
-        addressWriter.commit(stagedAddresses)
+        siteRepository.saveAll(sites)
+        changelogService.createChangelogEntries(sites.map { ChangelogEntryCreateRequest(it.bpn, ChangelogType.CREATE, BusinessPartnerType.SITE) })
+
+        addressStagedCreateService.commit(stagedAddresses)
 
         return sites
     }

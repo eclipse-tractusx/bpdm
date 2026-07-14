@@ -19,26 +19,39 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation
 
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
+import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
+import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
+import org.eclipse.tractusx.bpdm.pool.mapper.entity.LegalEntityEntityMapper
 import org.eclipse.tractusx.bpdm.pool.model.AddressCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityCreateParsed
-import org.eclipse.tractusx.bpdm.pool.service.writer.LegalEntityWriter
-import org.eclipse.tractusx.bpdm.pool.service.writer.LogisticAddressWriter
+import org.eclipse.tractusx.bpdm.pool.model.LegalEntityHeaderParsed
+import org.eclipse.tractusx.bpdm.pool.model.PendingLegalEntityWrite
+import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
+import org.eclipse.tractusx.bpdm.pool.service.BpnIssuingService
+import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 
 /**
  * Creates legal entities, the top of the business-partner hierarchy — the single owner of the legal-entity-create
  * *operation*. It consumes a [LegalEntityCreateParsed] command (header + legal-address content already validated by
  * [org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntityCreateParser]) and persists the legal entity and its legal
- * address. Both the legal entity ([org.eclipse.tractusx.bpdm.pool.service.writer.LegalEntityWriter]) and its legal address ([org.eclipse.tractusx.bpdm.pool.service.writer.LogisticAddressWriter]) are staged unsaved
- * so the legal entity ⇄ legal address cycle can be wired in memory before persisting. Order-preserving positional
- * contract (see [org.eclipse.tractusx.bpdm.pool.model.ParseResult]).
+ * address. Both the legal entity ([LegalEntityHeaderTransientCreateService]) and its legal address
+ * ([LogisticAddressStagedCreateService]) are staged unsaved so the legal entity ⇄ legal address cycle can be wired in
+ * memory before persisting. Order-preserving positional contract (see [org.eclipse.tractusx.bpdm.pool.model.ParseResult]).
  */
 @Service
 class LegalEntityCreateService(
-    private val addressWriter: LogisticAddressWriter,
-    private val legalEntityWriter: LegalEntityWriter
+    private val addressStagedCreateService: LogisticAddressStagedCreateService,
+    private val legalEntityEntityMapper: LegalEntityEntityMapper,
+    private val bpnIssuingService: BpnIssuingService,
+    private val changelogService: PartnerChangelogService,
+    private val legalEntityRepository: LegalEntityRepository
 ) {
 
     /**
@@ -47,17 +60,28 @@ class LegalEntityCreateService(
      */
     @Transactional
     fun create(parsed: List<LegalEntityCreateParsed>): List<LegalEntityDb> {
-        val stagedLegalEntities = legalEntityWriter.stageCreate(parsed.map { it.content.header })
-        val stagedAddresses = addressWriter.stageCreate(parsed.zip(stagedLegalEntities).map { (entry, staged) ->
+        val legalEntities = createHeaders(parsed.map { it.content.header })
+        val stagedAddresses = addressStagedCreateService.stageCreate(parsed.zip(legalEntities).map { (entry, legalEntity) ->
             val legalAddress = entry.content.legalAddress
-            AddressCreateParsed(staged.legalEntity, site = null, legalAddress.address, legalAddress.scriptVariants)
+            AddressCreateParsed(legalEntity, site = null, legalAddress.address, legalAddress.scriptVariants)
         })
 
-        stagedLegalEntities.zip(stagedAddresses).forEach { (staged, stagedAddress) -> staged.legalEntity.legalAddress = stagedAddress.address }
+        legalEntities.zip(stagedAddresses).forEach { (legalEntity, stagedAddress) -> legalEntity.legalAddress = stagedAddress.address }
 
-        val legalEntities = legalEntityWriter.commit(stagedLegalEntities).map { it.value }
-        addressWriter.commit(stagedAddresses)
+        changelogService.createChangelogEntries(legalEntities.map { ChangelogEntryCreateRequest(it.bpn, ChangelogType.CREATE, BusinessPartnerType.LEGAL_ENTITY) })
+        legalEntityRepository.saveAll(legalEntities)
+
+        addressStagedCreateService.commit(stagedAddresses)
 
         return legalEntities
+    }
+
+    private fun createHeaders(headers: List<LegalEntityHeaderParsed>): List<LegalEntityDb>{
+        val bpns = bpnIssuingService.issueLegalEntityBpns(headers.size)
+        val currentness = Instant.now().truncatedTo(ChronoUnit.MICROS)
+        // A new legal entity's confidence starts with zero sharing members (preserves the previous create behavior).
+        return headers.zip(bpns) { header, bpn ->
+            legalEntityEntityMapper.toEntity(bpn, header, currentness, numberOfSharingMembers = 0)
+        }
     }
 }

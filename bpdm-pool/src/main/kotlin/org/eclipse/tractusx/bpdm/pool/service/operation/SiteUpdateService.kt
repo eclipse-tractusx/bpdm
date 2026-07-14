@@ -19,7 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation
 
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.util.replace
+import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
+import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
@@ -27,7 +30,10 @@ import org.eclipse.tractusx.bpdm.pool.mapper.entity.SiteEntityMapper
 import org.eclipse.tractusx.bpdm.pool.model.AddressUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.SiteContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.SiteUpdateParsed
-import org.eclipse.tractusx.bpdm.pool.service.writer.SiteWriter
+import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
+import org.eclipse.tractusx.bpdm.pool.service.BpnIssuingService
+import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerEquivalenceMapper
+import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -41,8 +47,10 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class SiteUpdateService(
     private val addressUpdateService: AddressUpdateService,
-    private val siteWriter: SiteWriter,
-    private val siteEntityMapper: SiteEntityMapper
+    private val siteRepository: SiteRepository,
+    private val changelogService: PartnerChangelogService,
+    private val siteEntityMapper: SiteEntityMapper,
+    private val equivalenceMapper: BusinessPartnerEquivalenceMapper
 ) {
 
     /**
@@ -51,8 +59,7 @@ class SiteUpdateService(
      */
     @Transactional
     fun update(parsed: List<SiteUpdateParsed>): List<UpsertResult<SiteDb>>{
-        // Stage + commit the site headers first so all SITE changelogs precede the main-address ADDRESS changelogs below.
-        val siteResults = siteWriter.commit(parsed.map { entry -> siteWriter.stageUpdate(entry.target) { doUpdateEntity(it, entry.content) } })
+        val headerResults = updateHeaders(parsed)
 
         val mainAddressRequests = parsed.map {
             AddressUpdateParsed(
@@ -64,10 +71,28 @@ class SiteUpdateService(
         }
         val mainAddressResults = addressUpdateService.update(mainAddressRequests)
 
-        return siteResults.zip(mainAddressResults){ siteResult, mainAddressResult ->
-            val changed = siteResult.upsertType == UpsertType.Updated || mainAddressResult.upsertType == UpsertType.Updated
-            UpsertResult(siteResult.value, if (changed) UpsertType.Updated else UpsertType.NoChange)
+        return headerResults.zip(mainAddressResults){ headerResult, mainAddressResult ->
+            val changed = headerResult.upsertType == UpsertType.Updated || mainAddressResult.upsertType == UpsertType.Updated
+            UpsertResult(headerResult.value, if (changed) UpsertType.Updated else UpsertType.NoChange)
         }
+    }
+
+    private fun updateHeaders(requests: List<SiteUpdateParsed>): List<UpsertResult<SiteDb>>{
+        val headerResults = requests.map { updateHeader(it) }
+        val changedHeaders = headerResults.filter { it.upsertType == UpsertType.Updated }
+
+        changelogService.createChangelogEntries(changedHeaders.map { ChangelogEntryCreateRequest(it.value.bpn, ChangelogType.UPDATE, BusinessPartnerType.SITE) })
+        siteRepository.saveAll(changedHeaders.map { it.value })
+
+        return headerResults
+    }
+
+    private fun updateHeader(request: SiteUpdateParsed): UpsertResult<SiteDb>{
+        val before = equivalenceMapper.toEquivalenceDto(request.target)
+        doUpdateEntity(request.target, request.content)
+        val after = equivalenceMapper.toEquivalenceDto(request.target)
+
+        return UpsertResult(request.target, if (before != after) UpsertType.Updated else UpsertType.NoChange)
     }
 
     private fun doUpdateEntity(target: SiteDb, content: SiteContentParsed) {
