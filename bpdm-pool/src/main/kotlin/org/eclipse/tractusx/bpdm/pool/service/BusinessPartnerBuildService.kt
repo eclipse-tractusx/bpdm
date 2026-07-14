@@ -28,20 +28,16 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.dto.*
 import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.LegalEntityParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.SiteParseErrorMapper
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.LegalEntityDtoRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.SiteDtoRequestMapper
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
-import org.eclipse.tractusx.bpdm.pool.service.operation.LegalEntityUpdateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.SiteCreateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.SiteCreateWithReferencedAddressAsMainService
 import org.eclipse.tractusx.bpdm.pool.service.operation.SiteUpdateService
-import org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntityUpdateParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.SiteCreateParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.SiteCreateWithLegalAddressAsMainParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.SiteCreateWithReferencedAddressAsMainParser
@@ -64,11 +60,7 @@ class BusinessPartnerBuildService(
     private val siteUpdateParser: SiteUpdateParser,
     private val siteUpdateService: SiteUpdateService,
     private val siteDtoRequestMapper: SiteDtoRequestMapper,
-    private val siteParseErrorMapper: SiteParseErrorMapper,
-    private val legalEntityUpdateParser: LegalEntityUpdateParser,
-    private val legalEntityUpdateService: LegalEntityUpdateService,
-    private val legalEntityDtoRequestMapper: LegalEntityDtoRequestMapper,
-    private val legalEntityParseErrorMapper: LegalEntityParseErrorMapper
+    private val siteParseErrorMapper: SiteParseErrorMapper
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -115,25 +107,6 @@ class BusinessPartnerBuildService(
     /**
      * Update existing records with [requests]
      */
-    @Transactional
-    fun updateLegalEntities(requests: Collection<LegalEntityPartnerUpdateRequest>): LegalEntityPartnerUpdateResponseWrapper {
-        logger.info { "Update ${requests.size} legal entities" }
-
-        val requestList = requests.toList()
-        val updateRequests = requestList.map { legalEntityDtoRequestMapper.toUpdateRequest(it) }
-
-        val responses = mutableListOf<LegalEntityPartnerCreateVerboseDto>()
-        val errors = mutableListOf<ErrorInfo<LegalEntityUpdateError>>()
-        requestList.zip(parseAndExecute(updateRequests, legalEntityUpdateParser::parse, legalEntityUpdateService::update)).forEach { (request, result) ->
-            when (result) {
-                is ParseResult.Success -> responses.add(result.parsed.value.toUpsertDto(request.bpnl))
-                is ParseResult.Failure -> errors.addAll(result.errors.map { legalEntityParseErrorMapper.toUpdateErrorInfo(it, request.bpnl) })
-            }
-        }
-
-        return LegalEntityPartnerUpdateResponseWrapper(responses, errors)
-    }
-
     @Transactional
     fun updateSites(requests: Collection<SitePartnerUpdateRequest>): SitePartnerUpdateResponseWrapper {
         logger.info { "Update ${requests.size} sites" }

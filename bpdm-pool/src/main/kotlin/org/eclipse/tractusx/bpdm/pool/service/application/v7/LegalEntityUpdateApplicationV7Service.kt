@@ -1,0 +1,77 @@
+/*******************************************************************************
+ * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Apache License, Version 2.0 which is available at
+ * https://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ ******************************************************************************/
+
+package org.eclipse.tractusx.bpdm.pool.service.application.v7
+
+import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerUpdateResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityUpdateError
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.LegalEntityDtoRequestMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.LegalEntityParseErrorMapper
+import org.eclipse.tractusx.bpdm.pool.model.ParseResult
+import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
+import org.eclipse.tractusx.bpdm.pool.service.operation.LegalEntityUpdateService
+import org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntityUpdateParser
+import org.eclipse.tractusx.bpdm.pool.service.toUpsertDto
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+
+/**
+ * Application service for the V7 "update legal entities" operation: the boundary between the REST API and the domain. It
+ * accepts the API [LegalEntityPartnerUpdateRequest]s, translates them into the internal
+ * [org.eclipse.tractusx.bpdm.pool.model.LegalEntityUpdateRequest] domain model, drives the parse/execute pipeline, and
+ * maps the per-entry verdicts back into the API [LegalEntityPartnerUpdateResponseWrapper]. It holds no business rules of
+ * its own — validation, target resolution and persistence live in the collaborators it orchestrates.
+ *
+ * `@Transactional` so parse and execute share one persistence context: [LegalEntityUpdateParser] resolves the target
+ * legal entities by BPNL (reporting "legal entity not found") and validates content, then [LegalEntityUpdateService]
+ * mutates their lazy collections. There is no parent to resolve on update.
+ */
+@Service
+class LegalEntityUpdateApplicationV7Service(
+    private val legalEntityUpdateParser: LegalEntityUpdateParser,
+    private val legalEntityUpdateService: LegalEntityUpdateService,
+    private val legalEntityDtoRequestMapper: LegalEntityDtoRequestMapper,
+    private val legalEntityParseErrorMapper: LegalEntityParseErrorMapper
+) {
+
+    private val logger = KotlinLogging.logger { }
+
+    @Transactional
+    fun updateLegalEntities(requests: Collection<LegalEntityPartnerUpdateRequest>): LegalEntityPartnerUpdateResponseWrapper {
+        logger.info { "Update ${requests.size} legal entities" }
+
+        val requestList = requests.toList()
+        val updateRequests = requestList.map { legalEntityDtoRequestMapper.toUpdateRequest(it) }
+
+        val responses = mutableListOf<LegalEntityPartnerCreateVerboseDto>()
+        val errors = mutableListOf<ErrorInfo<LegalEntityUpdateError>>()
+        requestList.zip(parseAndExecute(updateRequests, legalEntityUpdateParser::parse, legalEntityUpdateService::update)).forEach { (request, result) ->
+            when (result) {
+                is ParseResult.Success -> responses.add(result.parsed.value.toUpsertDto(request.bpnl))
+                is ParseResult.Failure -> errors.addAll(result.errors.map { legalEntityParseErrorMapper.toUpdateErrorInfo(it, request.bpnl) })
+            }
+        }
+
+        return LegalEntityPartnerUpdateResponseWrapper(responses, errors)
+    }
+}

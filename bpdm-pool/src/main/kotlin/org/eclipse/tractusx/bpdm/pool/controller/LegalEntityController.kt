@@ -33,10 +33,10 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAdd
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.service.AddressService
-import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerFetchService
 import org.eclipse.tractusx.bpdm.pool.service.SiteService
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.LegalEntityCreateApplicationV7Service
+import org.eclipse.tractusx.bpdm.pool.service.application.v7.LegalEntityUpdateApplicationV7Service
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
@@ -44,11 +44,11 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class LegalEntityController(
     val businessPartnerFetchService: BusinessPartnerFetchService,
-    val businessPartnerBuildService: BusinessPartnerBuildService,
     val bpnConfigProperties: BpnConfigProperties,
     val siteService: SiteService,
     val addressService: AddressService,
-    val legalEntityCreateApplicationService: LegalEntityCreateApplicationV7Service
+    val legalEntityCreateApplicationService: LegalEntityCreateApplicationV7Service,
+    val legalEntityUpdateApplicationService: LegalEntityUpdateApplicationV7Service
 ) : PoolLegalEntityApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
@@ -115,6 +115,6 @@ class LegalEntityController(
     override fun updateBusinessPartners(
         businessPartners: Collection<LegalEntityPartnerUpdateRequest>
     ): LegalEntityPartnerUpdateResponseWrapper {
-        return businessPartnerBuildService.updateLegalEntities(businessPartners)
+        return legalEntityUpdateApplicationService.updateLegalEntities(businessPartners)
     }
 }
