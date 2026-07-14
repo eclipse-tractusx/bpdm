@@ -37,12 +37,10 @@ import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
-import org.eclipse.tractusx.bpdm.pool.service.operation.LegalEntityCreateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.LegalEntityUpdateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.SiteCreateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.SiteCreateWithReferencedAddressAsMainService
 import org.eclipse.tractusx.bpdm.pool.service.operation.SiteUpdateService
-import org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntityCreateParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntityUpdateParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.SiteCreateParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.SiteCreateWithLegalAddressAsMainParser
@@ -67,8 +65,6 @@ class BusinessPartnerBuildService(
     private val siteUpdateService: SiteUpdateService,
     private val siteDtoRequestMapper: SiteDtoRequestMapper,
     private val siteParseErrorMapper: SiteParseErrorMapper,
-    private val legalEntityCreateParser: LegalEntityCreateParser,
-    private val legalEntityCreateService: LegalEntityCreateService,
     private val legalEntityUpdateParser: LegalEntityUpdateParser,
     private val legalEntityUpdateService: LegalEntityUpdateService,
     private val legalEntityDtoRequestMapper: LegalEntityDtoRequestMapper,
@@ -76,28 +72,6 @@ class BusinessPartnerBuildService(
 ) {
 
     private val logger = KotlinLogging.logger { }
-
-    /**
-     * Create new business partner records from [requests]
-     */
-    @Transactional
-    fun createLegalEntities(requests: Collection<LegalEntityPartnerCreateRequest>): LegalEntityPartnerCreateResponseWrapper {
-        logger.info { "Create ${requests.size} new legal entities" }
-
-        val requestList = requests.toList()
-        val createRequests = requestList.map { legalEntityDtoRequestMapper.toCreateRequest(it) }
-
-        val responses = mutableListOf<LegalEntityPartnerCreateVerboseDto>()
-        val errors = mutableListOf<ErrorInfo<LegalEntityCreateError>>()
-        requestList.zip(parseAndExecute(createRequests, legalEntityCreateParser::parse, legalEntityCreateService::create)).forEach { (request, result) ->
-            when (result) {
-                is ParseResult.Success -> responses.add(result.parsed.toUpsertDto(request.index))
-                is ParseResult.Failure -> errors.addAll(result.errors.map { legalEntityParseErrorMapper.toCreateErrorInfo(it, request.index) })
-            }
-        }
-
-        return LegalEntityPartnerCreateResponseWrapper(responses, errors)
-    }
 
     @Transactional
     fun createSitesWithLegalAddressAsMain(requests: Collection<SiteCreateRequestWithLegalAddressAsMain>): SitePartnerCreateResponseWrapper {

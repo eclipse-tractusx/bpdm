@@ -36,6 +36,7 @@ import org.eclipse.tractusx.bpdm.pool.service.AddressService
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerFetchService
 import org.eclipse.tractusx.bpdm.pool.service.SiteService
+import org.eclipse.tractusx.bpdm.pool.service.application.v7.LegalEntityCreateApplicationV7Service
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
@@ -46,7 +47,8 @@ class LegalEntityController(
     val businessPartnerBuildService: BusinessPartnerBuildService,
     val bpnConfigProperties: BpnConfigProperties,
     val siteService: SiteService,
-    val addressService: AddressService
+    val addressService: AddressService,
+    val legalEntityCreateApplicationService: LegalEntityCreateApplicationV7Service
 ) : PoolLegalEntityApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
@@ -106,7 +108,7 @@ class LegalEntityController(
     override fun createBusinessPartners(
         businessPartners: Collection<LegalEntityPartnerCreateRequest>
     ): LegalEntityPartnerCreateResponseWrapper {
-        return businessPartnerBuildService.createLegalEntities(businessPartners)
+        return legalEntityCreateApplicationService.createLegalEntities(businessPartners)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")
