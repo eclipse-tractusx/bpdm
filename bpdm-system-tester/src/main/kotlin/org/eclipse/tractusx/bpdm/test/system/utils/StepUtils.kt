@@ -113,7 +113,6 @@ class StepUtils(
         "${BusinessPartnerOutputDto::site.name}.${AddressComponentOutputDto::confidenceCriteria.name}.${ConfidenceCriteriaDto::nextConfidenceCheckAt.name}",
         "${BusinessPartnerOutputDto::address.name}.${AddressComponentOutputDto::confidenceCriteria.name}.${ConfidenceCriteriaDto::lastConfidenceCheckAt.name}",
         "${BusinessPartnerOutputDto::address.name}.${AddressComponentOutputDto::confidenceCriteria.name}.${ConfidenceCriteriaDto::nextConfidenceCheckAt.name}",
-        "${BusinessPartnerOutputDto::legalEntity.name}.${LegalEntityRepresentationOutputDto::ownershipUltimate.name}",
     )
 
 
