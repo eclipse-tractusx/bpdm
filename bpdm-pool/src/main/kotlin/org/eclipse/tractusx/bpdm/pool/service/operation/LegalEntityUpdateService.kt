@@ -42,10 +42,10 @@ import java.time.temporal.ChronoUnit
 /**
  * Updates legal entities — the composite legal-entity-update *operation*. It consumes a [LegalEntityUpdateParsed] command
  * (target resolved, header + legal-address content validated by
- * [org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntityUpdateParser]), applies the header change (delegating change
- * detection, save and LEGAL_ENTITY changelog to [org.eclipse.tractusx.bpdm.pool.service.writer.LegalEntityWriter]), and delegates the legal-address change to
- * [AddressUpdateService], netting a single UPDATE when either side changed. Order-preserving positional contract (see
- * [org.eclipse.tractusx.bpdm.pool.model.ParseResult]).
+ * [org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntityUpdateParser]), applies and change-detects the header, and
+ * delegates the legal-address change to [AddressUpdateService], netting a single UPDATE when either side changed. The
+ * legal address is staged (not yet committed) so the parent LEGAL_ENTITY changelog is emitted before the child ADDRESS
+ * changelog. Order-preserving positional contract (see [org.eclipse.tractusx.bpdm.pool.model.ParseResult]).
  */
 @Service
 class LegalEntityUpdateService(
@@ -68,18 +68,22 @@ class LegalEntityUpdateService(
                 it.content.legalAddress.scriptVariants
             )
         }
-        val legalAddressResults = addressUpdateService.update(legalAddressRequests)
+        val stagedLegalAddresses = addressUpdateService.stageUpdate(legalAddressRequests)
 
-        val overallResults = headerResults.zip(legalAddressResults){ headerResult, legalAddressResult ->
-            val changed = headerResult.upsertType == UpsertType.Updated || legalAddressResult.upsertType == UpsertType.Updated
+        val overallResults = headerResults.zip(stagedLegalAddresses){ headerResult, stagedLegalAddress ->
+            val changed = headerResult.upsertType == UpsertType.Updated || stagedLegalAddress.upsertType == UpsertType.Updated
             UpsertResult(headerResult.value, if (changed) UpsertType.Updated else UpsertType.NoChange)
         }
 
+        // Emit the parent LEGAL_ENTITY changelog before committing the legal address so the parent UPDATE precedes the
+        // child ADDRESS UPDATE. Staging above yielded the address change flag without emitting its changelog yet.
         changelogService.createChangelogEntries(
             overallResults
                 .filter { it.upsertType == UpsertType.Updated }
                 .map { ChangelogEntryCreateRequest(it.value.bpn, ChangelogType.UPDATE, BusinessPartnerType.LEGAL_ENTITY) }
         )
+
+        addressUpdateService.commit(stagedLegalAddresses)
 
         return overallResults
     }

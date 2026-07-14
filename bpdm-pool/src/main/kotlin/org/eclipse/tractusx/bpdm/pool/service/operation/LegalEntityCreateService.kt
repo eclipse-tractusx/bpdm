@@ -41,7 +41,7 @@ import java.time.temporal.ChronoUnit
  * Creates legal entities, the top of the business-partner hierarchy — the single owner of the legal-entity-create
  * *operation*. It consumes a [LegalEntityCreateParsed] command (header + legal-address content already validated by
  * [org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntityCreateParser]) and persists the legal entity and its legal
- * address. Both the legal entity ([LegalEntityHeaderTransientCreateService]) and its legal address
+ * address. Both the legal entity (via [LegalEntityEntityMapper]) and its legal address
  * ([LogisticAddressStagedCreateService]) are staged unsaved so the legal entity ⇄ legal address cycle can be wired in
  * memory before persisting. Order-preserving positional contract (see [org.eclipse.tractusx.bpdm.pool.model.ParseResult]).
  */

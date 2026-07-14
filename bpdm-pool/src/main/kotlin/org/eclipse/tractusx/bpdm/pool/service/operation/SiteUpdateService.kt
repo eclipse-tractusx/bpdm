@@ -31,7 +31,6 @@ import org.eclipse.tractusx.bpdm.pool.model.AddressUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.SiteContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.SiteUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
-import org.eclipse.tractusx.bpdm.pool.service.BpnIssuingService
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerEquivalenceMapper
 import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
 import org.springframework.stereotype.Service
@@ -40,9 +39,10 @@ import org.springframework.transaction.annotation.Transactional
 /**
  * Updates sites — the composite site-update *operation*. It consumes a [SiteUpdateParsed] command (target resolved,
  * header + main-address content validated by [org.eclipse.tractusx.bpdm.pool.service.parser.SiteUpdateParser]), applies
- * the header change (delegating change detection, save and SITE changelog to [org.eclipse.tractusx.bpdm.pool.service.writer.SiteWriter]), and delegates the
- * main-address change to [AddressUpdateService] (with no site assignment), netting a single UPDATE when either side
- * changed. Order-preserving positional contract (see [org.eclipse.tractusx.bpdm.pool.model.ParseResult]).
+ * and change-detects the header, and delegates the main-address change to [AddressUpdateService] (with no site
+ * assignment), netting a single UPDATE when either side changed. The main address is staged (not yet committed) so the
+ * parent SITE changelog is emitted before the child ADDRESS changelog. Order-preserving positional contract (see
+ * [org.eclipse.tractusx.bpdm.pool.model.ParseResult]).
  */
 @Service
 class SiteUpdateService(
@@ -59,7 +59,7 @@ class SiteUpdateService(
      */
     @Transactional
     fun update(parsed: List<SiteUpdateParsed>): List<UpsertResult<SiteDb>>{
-        val headerResults = updateHeaders(parsed)
+        val headerResults = parsed.map { updateHeader(it) }
 
         val mainAddressRequests = parsed.map {
             AddressUpdateParsed(
@@ -69,22 +69,25 @@ class SiteUpdateService(
                 it.content.mainAddress.scriptVariants
             )
         }
-        val mainAddressResults = addressUpdateService.update(mainAddressRequests)
+        val stagedMainAddresses = addressUpdateService.stageUpdate(mainAddressRequests)
 
-        return headerResults.zip(mainAddressResults){ headerResult, mainAddressResult ->
-            val changed = headerResult.upsertType == UpsertType.Updated || mainAddressResult.upsertType == UpsertType.Updated
+        val overallResults = headerResults.zip(stagedMainAddresses){ headerResult, stagedMainAddress ->
+            val changed = headerResult.upsertType == UpsertType.Updated || stagedMainAddress.upsertType == UpsertType.Updated
             UpsertResult(headerResult.value, if (changed) UpsertType.Updated else UpsertType.NoChange)
         }
-    }
 
-    private fun updateHeaders(requests: List<SiteUpdateParsed>): List<UpsertResult<SiteDb>>{
-        val headerResults = requests.map { updateHeader(it) }
-        val changedHeaders = headerResults.filter { it.upsertType == UpsertType.Updated }
+        // Emit the parent SITE changelog before committing the main address so the parent UPDATE precedes the child
+        // ADDRESS UPDATE. Staging above yielded the address change flag without emitting its changelog yet.
+        changelogService.createChangelogEntries(
+            overallResults
+                .filter { it.upsertType == UpsertType.Updated }
+                .map { ChangelogEntryCreateRequest(it.value.bpn, ChangelogType.UPDATE, BusinessPartnerType.SITE) }
+        )
+        siteRepository.saveAll(headerResults.filter { it.upsertType == UpsertType.Updated }.map { it.value })
 
-        changelogService.createChangelogEntries(changedHeaders.map { ChangelogEntryCreateRequest(it.value.bpn, ChangelogType.UPDATE, BusinessPartnerType.SITE) })
-        siteRepository.saveAll(changedHeaders.map { it.value })
+        addressUpdateService.commit(stagedMainAddresses)
 
-        return headerResults
+        return overallResults
     }
 
     private fun updateHeader(request: SiteUpdateParsed): UpsertResult<SiteDb>{

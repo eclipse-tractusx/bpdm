@@ -28,7 +28,9 @@ import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.eclipse.tractusx.bpdm.pool.service.BpnIssuingService
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerEquivalenceMapper
 import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
+import org.springframework.stereotype.Service
 
+@Service
 class SiteHeaderTransientCreateService(
     private val bpnIssuingService: BpnIssuingService,
     private val siteEntityMapper: SiteEntityMapper
