@@ -20,30 +20,23 @@
 package org.eclipse.tractusx.bpdm.pool.controller.v6
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.*
+import org.eclipse.tractusx.bpdm.common.dto.PageDto
+import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityCreateError
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityUpdateError
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.*
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntityPartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntityPartnerUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.*
-import org.eclipse.tractusx.bpdm.pool.entity.*
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.LegalEntityDtoRequestMapper
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.LegalEntityParseErrorMapper
-import org.eclipse.tractusx.bpdm.pool.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.SiteVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityWithLegalAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
+import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
+import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.toV6Dto
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
-import org.eclipse.tractusx.bpdm.pool.service.*
-import org.eclipse.tractusx.bpdm.pool.service.operation.LegalEntityCreateService
-import org.eclipse.tractusx.bpdm.pool.service.operation.LegalEntityUpdateService
-import org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntityCreateParser
-import org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntityUpdateParser
+import org.eclipse.tractusx.bpdm.pool.service.AddressService
+import org.eclipse.tractusx.bpdm.pool.service.toDto
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
@@ -55,13 +48,7 @@ class LegalEntityLegacyServiceMapper(
     private val identifierTypeRepository: IdentifierTypeRepository,
     private val siteRepository: SiteRepository,
     private val logisticAddressRepository: LogisticAddressRepository,
-    private val addressService: AddressService,
-    private val legalEntityDtoRequestMapper: LegalEntityDtoRequestMapper,
-    private val legalEntityCreateParser: LegalEntityCreateParser,
-    private val legalEntityCreateService: LegalEntityCreateService,
-    private val legalEntityUpdateParser: LegalEntityUpdateParser,
-    private val legalEntityUpdateService: LegalEntityUpdateService,
-    private val legalEntityParseErrorMapper: LegalEntityParseErrorMapper
+    private val addressService: AddressService
 ) {
 
     companion object {
@@ -124,62 +111,9 @@ class LegalEntityLegacyServiceMapper(
 
     fun toLegalEntityWithLegalAddress(entity: LegalEntityDb): LegalEntityWithLegalAddressVerboseDto {
         return LegalEntityWithLegalAddressVerboseDto(
-            legalAddress = entity.legalAddress.toDto(),
-            legalEntity = entity.toDto()
+            legalAddress = entity.legalAddress.toV6Dto(),
+            legalEntity = entity.toV6Dto()
         )
-    }
-
-    fun LogisticAddressDb.toDto(): LogisticAddressVerboseDto {
-        return LogisticAddressVerboseDto(
-            bpna = bpn,
-            bpnLegalEntity = legalEntity?.bpn,
-            bpnSite = mainSite?.bpn,
-            createdAt = createdAt,
-            updatedAt = updatedAt,
-            name = name,
-            states = states.map { it.toDto() },
-            identifiers = identifiers.map { it.toDto() },
-            physicalPostalAddress = physicalPostalAddress.toDto(),
-            alternativePostalAddress = alternativePostalAddress?.toDto(),
-            confidenceCriteria = confidenceCriteria.toDto(),
-            isCatenaXMemberData = legalEntity?.isCatenaXMemberData ?: mainSite?.legalEntity?.isCatenaXMemberData ?: false,
-            addressType = getAddressType(this)
-        )
-    }
-
-    fun LegalEntityDb.toDto(): LegalEntityVerboseDto {
-        return LegalEntityVerboseDto(
-            bpnl = bpn,
-            legalName = legalName.value,
-            legalShortName = legalName.shortName,
-            legalFormVerbose = legalForm?.toDto(),
-            identifiers = identifiers.map { it.toDto() },
-            states = states.map { it.toDto() },
-            relations = startNodeRelations.plus(endNodeRelations).map { it.toDto() },
-            currentness = currentness,
-            confidenceCriteria = confidenceCriteria.toDto(),
-            isCatenaXMemberData = isCatenaXMemberData,
-            createdAt = createdAt,
-            updatedAt = updatedAt,
-        )
-    }
-
-    fun LegalFormDb.toDto(): LegalFormDto {
-        return LegalFormDto(
-            technicalKey = technicalKey,
-            name = name,
-            transliteratedName = transliteratedName,
-            abbreviation = abbreviation,
-            transliteratedAbbreviations = transliteratedAbbreviations,
-            country = countryCode,
-            language = languageCode,
-            administrativeAreaLevel1 = administrativeArea?.regionCode,
-            isActive = isActive
-        )
-    }
-
-    private fun RelationDb.toDto(): RelationVerboseDto {
-        return RelationVerboseDto(type, startNode.bpn, endNode.bpn)
     }
 
     data class LegalEntitySearchRequest(
@@ -194,7 +128,7 @@ class LegalEntityLegacyServiceMapper(
 
         val page = siteRepository.findByLegalEntity(legalEntity, PageRequest.of(pageIndex, pageSize))
         fetchSiteDependencies(page.toSet())
-        return page.toDto(page.content.map { it.toDto() })
+        return page.toDto(page.content.map { it.toV6Dto() })
     }
 
     private fun fetchSiteDependencies(sites: Set<SiteDb>) {
@@ -202,19 +136,6 @@ class LegalEntityLegacyServiceMapper(
         siteRepository.joinStates(sites)
         val addresses = sites.flatMap { it.addresses }.toSet()
         addressService.fetchLogisticAddressDependencies(addresses)
-    }
-
-    fun SiteDb.toDto(): SiteVerboseDto {
-        return SiteVerboseDto(
-            bpn,
-            name,
-            states = states.map { it.toDto() },
-            bpnLegalEntity = legalEntity.bpn,
-            confidenceCriteria = confidenceCriteria.toDto(),
-            isCatenaXMemberData = legalEntity.isCatenaXMemberData,
-            createdAt = createdAt,
-            updatedAt = updatedAt,
-        )
     }
 
     /**
@@ -226,58 +147,6 @@ class LegalEntityLegacyServiceMapper(
 
         val page = logisticAddressRepository.findByLegalEntityAndSitesIsEmpty(legalEntity, PageRequest.of(pageIndex, pageSize))
         addressService.fetchLogisticAddressDependencies(page.map { it }.toSet())
-        return page.toDto(page.content.map { it.toDto() })
-    }
-
-    /**
-     * Create new business partner records from [requests]
-     */
-    @Transactional
-    fun createLegalEntities(requests: Collection<LegalEntityPartnerCreateRequest>): LegalEntityPartnerCreateResponseWrapper {
-        logger.info { "Create ${requests.size} new legal entities" }
-
-        val requestList = requests.toList()
-        val createRequests = requestList.map { legalEntityDtoRequestMapper.toCreateRequest(it) }
-
-        val responses = mutableListOf<LegalEntityPartnerCreateVerboseDto>()
-        val errors = mutableListOf<ErrorInfo<LegalEntityCreateError>>()
-        requestList.zip(parseAndExecute(createRequests, legalEntityCreateParser::parse, legalEntityCreateService::create)).forEach { (request, result) ->
-            when (result) {
-                is ParseResult.Success -> responses.add(result.parsed.toUpsertDto(request.index))
-                is ParseResult.Failure -> errors.addAll(result.errors.map { legalEntityParseErrorMapper.toCreateErrorInfo(it, request.index) })
-            }
-        }
-
-        return LegalEntityPartnerCreateResponseWrapper(responses, errors)
-    }
-
-    fun LegalEntityDb.toUpsertDto(entryId: String?): LegalEntityPartnerCreateVerboseDto {
-        return LegalEntityPartnerCreateVerboseDto(
-            legalEntity = toDto(),
-            legalAddress = legalAddress.toDto(),
-            index = entryId
-        )
-    }
-
-    /**
-     * Update existing records with [requests]
-     */
-    @Transactional
-    fun updateLegalEntities(requests: Collection<LegalEntityPartnerUpdateRequest>): LegalEntityPartnerUpdateResponseWrapper {
-        logger.info { "Update ${requests.size} legal entities" }
-
-        val requestList = requests.toList()
-        val updateRequests = requestList.map { legalEntityDtoRequestMapper.toUpdateRequest(it) }
-
-        val responses = mutableListOf<LegalEntityPartnerCreateVerboseDto>()
-        val errors = mutableListOf<ErrorInfo<LegalEntityUpdateError>>()
-        requestList.zip(parseAndExecute(updateRequests, legalEntityUpdateParser::parse, legalEntityUpdateService::update)).forEach { (request, result) ->
-            when (result) {
-                is ParseResult.Success -> responses.add(result.parsed.value.toUpsertDto(request.bpnl))
-                is ParseResult.Failure -> errors.addAll(result.errors.map { legalEntityParseErrorMapper.toUpdateErrorInfo(it, request.bpnl) })
-            }
-        }
-
-        return LegalEntityPartnerUpdateResponseWrapper(responses, errors)
+        return page.toDto(page.content.map { it.toV6Dto() })
     }
 }
