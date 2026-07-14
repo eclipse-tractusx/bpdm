@@ -1455,6 +1455,7 @@ class TaskResolutionServiceTest @Autowired constructor(
         relationRepository.save(relation)
     }
 
+    @org.springframework.transaction.annotation.Transactional
     private fun createIsOwnedByRelationViaService(sourceBpn: String, targetBpn: String) {
         val sourceEntity = legalEntityRepository.findByBpnIgnoreCase(sourceBpn)!!
         val targetEntity = legalEntityRepository.findByBpnIgnoreCase(targetBpn)!!
