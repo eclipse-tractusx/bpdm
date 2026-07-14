@@ -495,8 +495,7 @@ class TaskStepBuildService(
                 states = states.map { assertNotNull(it).let { LegalEntityStateDto(it.validFrom.toLocalDateTime(), it.validTo.toLocalDateTime(), it.type!!) }   },
                 confidenceCriteria = toPoolDto(confidenceCriteria, CleaningError.LEGAL_ENTITY_CONFIDENCE_CRITERIA_MISSING),
                 isParticipantData = isParticipantData ?: false,
-                ownershipUltimate = ownershipUltimate,
-                ultimateOwnerBpnl = ultimateOwnerBpnl
+                ownershipUltimate = ownershipUltimate
             )
         }
 
@@ -702,19 +701,19 @@ class TaskStepBuildService(
     }
 
     private fun Site.withRelevantScriptVariants(businessPartner: BusinessPartner): Site {
-       val scriptVariants =  if(siteMainIsLegalAddress){
+        val scriptVariants =  if(siteMainIsLegalAddress){
             val legalEntityVariantsByCode = businessPartner.legalEntity.scriptVariants.associateBy { it.scriptCode }
             val siteVariantsByCode = scriptVariants.associateBy { it.scriptCode }
             val allScriptCodes = legalEntityVariantsByCode.keys.plus(siteVariantsByCode.keys)
 
-           allScriptCodes.map { scriptCode ->
-               val legalEntityVariant = legalEntityVariantsByCode[scriptCode]
-               val siteVariant = siteVariantsByCode[scriptCode] ?: SiteScriptVariant(scriptCode, "", org.eclipse.tractusx.orchestrator.api.model.PostalAddressScriptVariant.empty)
+            allScriptCodes.map { scriptCode ->
+                val legalEntityVariant = legalEntityVariantsByCode[scriptCode]
+                val siteVariant = siteVariantsByCode[scriptCode] ?: SiteScriptVariant(scriptCode, "", org.eclipse.tractusx.orchestrator.api.model.PostalAddressScriptVariant.empty)
 
-               val mainAddressVariant = legalEntityVariant?.legalAddress ?: siteVariant.mainAddress
+                val mainAddressVariant = legalEntityVariant?.legalAddress ?: siteVariant.mainAddress
 
-               siteVariant.copy(mainAddress = mainAddressVariant)
-           }
+                siteVariant.copy(mainAddress = mainAddressVariant)
+            }
         }else { scriptVariants }
 
         return copy(scriptVariants = scriptVariants)

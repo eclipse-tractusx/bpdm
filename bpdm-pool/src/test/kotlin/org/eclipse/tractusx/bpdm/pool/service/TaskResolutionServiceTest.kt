@@ -815,7 +815,7 @@ class TaskResolutionServiceTest @Autowired constructor(
                 additionalAddress = additionalAddress!!.copyAsPostalAddress {
                     it.copy(
                         identifiers = listOf(sameIdentifier)
-                 )
+                    )
                 }
             )
         }
@@ -1048,7 +1048,7 @@ class TaskResolutionServiceTest @Autowired constructor(
             site = site?.copy(
                 bpnReference = siteBpn,
                 siteMainAddress = site!!.siteMainAddress!!.copy(bpnReference = siteMainAddressBpn)
-                )
+            )
         )
     }
 
@@ -1069,14 +1069,14 @@ class TaskResolutionServiceTest @Autowired constructor(
 
     private fun minValidLegalEntity(): BusinessPartner {
         return with(BusinessPartner.empty) {
-        copy(
-            legalEntity = legalEntity.copy(
-                bpnReference = BpnReference(referenceValue = "BPNL REQUEST ID", null, referenceType = BpnRequestIdentifier),
-                legalName = "Legal Name",
-                confidenceCriteria = fullConfidenceCriteria(),
-                legalAddress = minValidAddress().copy(confidenceCriteria = fullConfidenceCriteria())
+            copy(
+                legalEntity = legalEntity.copy(
+                    bpnReference = BpnReference(referenceValue = "BPNL REQUEST ID", null, referenceType = BpnRequestIdentifier),
+                    legalName = "Legal Name",
+                    confidenceCriteria = fullConfidenceCriteria(),
+                    legalAddress = minValidAddress().copy(confidenceCriteria = fullConfidenceCriteria())
+                )
             )
-        )
         }
     }
 
@@ -1183,10 +1183,10 @@ class TaskResolutionServiceTest @Autowired constructor(
             legalEntity = businessPartner.legalEntity.copy(
                 identifiers = createIdentifiers(legalIdentifierTypeKey, 101),
                 legalAddress = businessPartner.legalEntity.legalAddress.copy(identifiers = createIdentifiers(addressIdentifierTypeKey, 101))
-                )
+            )
         )
 
-       val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = businessPartnerWithTooManyIdentifiers)
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = businessPartnerWithTooManyIdentifiers)
 
         assertThat(createResult.size).isEqualTo(1)
         assertThat(createResult.single().errors.size).isEqualTo(2)
@@ -1449,7 +1449,7 @@ class TaskResolutionServiceTest @Autowired constructor(
             type = LegalEntityRelationType.IsOwnedBy,
             startNode = sourceEntity,
             endNode = targetEntity,
-            validityPeriods = mutableListOf(),
+            validityPeriods = mutableListOf(currentValidityPeriod()),
             reasonCode = null
         )
         relationRepository.save(relation)
@@ -1462,12 +1462,20 @@ class TaskResolutionServiceTest @Autowired constructor(
         val upsertRequest = IRelationUpsertStrategyService.UpsertRequest(
             source = sourceEntity,
             target = targetEntity,
-            validityPeriods = emptyList(),
+            validityPeriods = listOf(currentValidityPeriod()),
             existingRelation = null,
             reasonCode = null
         )
         ownedByRelationUpsertService.upsertRelation(upsertRequest)
     }
+
+    // Production rejects relations without validity periods (see TaskLegalEntityRelationsStepBuildService.validateValidityPeriods),
+    // so fixtures must supply a currently-active, open-ended period to mirror that guarantee.
+    private fun currentValidityPeriod() =
+        org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb(
+            validFrom = java.time.LocalDate.now().minusDays(1),
+            validTo = null
+        )
 
     private fun createIdentifiers(idTypeKey: String, amount: Int): List<Identifier>{
         return (1 .. amount).map { Identifier(it.toString(), idTypeKey, null) }

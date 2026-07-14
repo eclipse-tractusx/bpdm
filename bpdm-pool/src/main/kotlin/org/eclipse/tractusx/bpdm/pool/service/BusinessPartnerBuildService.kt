@@ -725,8 +725,8 @@ class BusinessPartnerBuildService(
                 currentness = Instant.now().truncatedTo(ChronoUnit.MICROS),
                 confidenceCriteria = createConfidenceCriteria(legalEntityHeaderDto.confidenceCriteria),
                 isCatenaXMemberData = legalEntityHeaderDto.isParticipantData,
-                ownershipUltimate = legalEntityHeaderDto.ownershipUltimate ?: false,
-                ultimateOwnerBpnl = legalEntityHeaderDto.ultimateOwnerBpnl
+                ownershipUltimate = legalEntityHeaderDto.ownershipUltimate ?: false
+                // ultimateOwnerBpnl is derived by UltimateOwnerResolutionService, never taken from the request
             )
             updateLegalEntity(newLegalEntity, legalEntityHeaderDto, metadataMap, scriptVariants)
 
@@ -749,7 +749,7 @@ class BusinessPartnerBuildService(
             legalEntity.confidenceCriteria = updateConfidenceCriteria( legalEntity.confidenceCriteria, legalEntityHeaderDto.confidenceCriteria)
             legalEntity.isCatenaXMemberData = legalEntityHeaderDto.isParticipantData
             legalEntity.ownershipUltimate = legalEntityHeaderDto.ownershipUltimate ?: legalEntity.ownershipUltimate
-            legalEntity.ultimateOwnerBpnl = legalEntityHeaderDto.ultimateOwnerBpnl
+            // ultimateOwnerBpnl is derived by UltimateOwnerResolutionService; the request must not overwrite it
 
             legalEntity.scriptVariants.replace(scriptVariants.map { variant -> LegalEntityScriptVariantDb(metadataMap.scriptCodes[variant.scriptCode]!!, variant.legalName, variant.shortName) })
         }

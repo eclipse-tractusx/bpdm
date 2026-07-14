@@ -44,13 +44,8 @@ data class LegalEntityHeaderDto(
 
     @get:Schema(description = "Whether this legal entity is the ultimate owner in the ownership chain. " +
             "This flag is provided by the golden record process and persisted in the Pool. " +
-            "The ultimate owner resolution logic is not implemented in this feature.")
+            "The resulting ultimate owner BPNL is derived by the Pool and only returned on read.")
     val ownershipUltimate: Boolean? = null,
-
-    @get:Schema(description = "The BPNL of the ultimate owner in the ownership chain. " +
-            "This field is persisted in the Pool but not resolved in this feature. " +
-            "It will be populated by future features that implement ultimate owner resolution.")
-    val ultimateOwnerBpnl: String? = null,
 
     @get:Schema(description = CommonDescription.updatedAt)
     val updatedAt: Instant? = null

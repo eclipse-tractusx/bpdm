@@ -67,31 +67,42 @@ class OwnedByRelationUpsertService(
     }
 
     /**
-     * Replace all existing unprocessed OwnershipValidityBoundary triggers for the relation with fresh
-     * ones derived from the current validity periods:
+     * Reconcile the unprocessed OwnershipValidityBoundary triggers for the relation against the set derived
+     * from its current validity periods:
      * - validFrom > today  →  trigger on validFrom (relation becomes active)
      * - validTo != null && validTo+1 > today  →  trigger on validTo+1 (relation expires)
+     *
+     * Only the difference is applied (delete stale dates, insert missing ones); triggers whose date is
+     * unchanged are left in place. A blind delete+reinsert would collide on the
+     * (relation_id, event_type, trigger_date) unique constraint, because Hibernate flushes inserts before
+     * deletes within a transaction — so re-upserting a relation with unchanged trigger dates would fail.
      */
     private fun handleValidityBoundaryTriggers(relation: RelationDb) {
         val today = LocalDate.now()
 
-        val existingUnprocessedTriggers = legalEntityRelationEventTriggerRepository
-            .findByRelationAndEventType(relation, TriggerEventType.OwnershipValidityBoundary)
-            .filterNot { it.isProcessed }
+        val validFromDates = relation.validityPeriods
+            .map { it.validFrom }
+            .filter { it > today }
 
-        legalEntityRelationEventTriggerRepository.deleteAll(existingUnprocessedTriggers)
-
-        val validFromTriggers = relation.validityPeriods
-            .filter { it.validFrom > today }
-            .map { LegalEntityRelationEventTriggerDb(it.validFrom, false, TriggerEventType.OwnershipValidityBoundary, relation) }
-
-        val expiryTriggers = relation.validityPeriods
+        val expiryDates = relation.validityPeriods
             .mapNotNull { it.validTo }
             .map { it.plusDays(1) }
             .filter { it > today }
-            .map { LegalEntityRelationEventTriggerDb(it, false, TriggerEventType.OwnershipValidityBoundary, relation) }
 
-        legalEntityRelationEventTriggerRepository.saveAll(validFromTriggers + expiryTriggers)
+        val desiredTriggerDates = (validFromDates + expiryDates).toSet()
+
+        val existingUnprocessedTriggers = legalEntityRelationEventTriggerRepository
+            .findByRelationAndEventType(relation, TriggerEventType.OwnershipValidityBoundary)
+            .filterNot { it.isProcessed }
+        val existingTriggerDates = existingUnprocessedTriggers.map { it.triggerDate }.toSet()
+
+        val triggersToDelete = existingUnprocessedTriggers.filterNot { it.triggerDate in desiredTriggerDates }
+        val triggerDatesToCreate = desiredTriggerDates - existingTriggerDates
+
+        legalEntityRelationEventTriggerRepository.deleteAll(triggersToDelete)
+        legalEntityRelationEventTriggerRepository.saveAll(
+            triggerDatesToCreate.map { LegalEntityRelationEventTriggerDb(it, false, TriggerEventType.OwnershipValidityBoundary, relation) }
+        )
     }
 
     private fun validateSingleParent(upsertRequest: IRelationUpsertStrategyService.UpsertRequest){
