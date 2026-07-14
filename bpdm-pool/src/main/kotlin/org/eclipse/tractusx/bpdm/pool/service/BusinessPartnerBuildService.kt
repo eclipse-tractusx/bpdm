@@ -120,26 +120,6 @@ class BusinessPartnerBuildService(
     }
 
     @Transactional
-    fun createSiteMainAddressFromAdditionalAddress(
-        requests: Collection<SitePartnerCreateRequest>,
-        mainAddressBpn: String
-    ): SitePartnerCreateResponseWrapper {
-        val requestList = requests.toList()
-        val createRequests = requestList.map { siteDtoRequestMapper.toCreateWithReferencedAddressAsMainRequest(it, mainAddressBpn) }
-
-        val responses = mutableListOf<SitePartnerCreateVerboseDto>()
-        val errors = mutableListOf<ErrorInfo<SiteCreateError>>()
-        requestList.zip(parseAndExecute(createRequests, siteCreateWithReferencedAddressAsMainParser::parse, siteCreateWithReferencedAddressAsMainService::create)).forEach { (request, result) ->
-            when (result) {
-                is ParseResult.Success -> responses.add(result.parsed.toUpsertDto(request.index))
-                is ParseResult.Failure -> errors.addAll(result.errors.map { siteParseErrorMapper.toCreateErrorInfo(it, request.index) })
-            }
-        }
-
-        return SitePartnerCreateResponseWrapper(responses, errors)
-    }
-
-    @Transactional
     fun createSitesWithMainAddress(requests: Collection<SitePartnerCreateRequest>): SitePartnerCreateResponseWrapper {
         logger.info { "Create ${requests.size} new sites" }
 
@@ -199,32 +179,7 @@ class BusinessPartnerBuildService(
         return SitePartnerUpdateResponseWrapper(responses, errors)
     }
 
-    data class LegalEntityHeaderMetadataMapping(
-        val idTypes: Map<String, IdentifierTypeDb>,
-        val legalForms: Map<String, LegalFormDb>,
-        val scriptCodes: Map<String, ScriptCodeDb>
-    )
-
-    data class AddressMetadataMapping(
-        val idTypes: Map<String, IdentifierTypeDb>,
-        val regions: Map<String, RegionDb>,
-        val scriptCodes: Map<String, ScriptCodeDb>
-    )
-
     companion object {
-
-        fun createCurrentnessTimestamp(): Instant {
-            return Instant.now().truncatedTo(ChronoUnit.MICROS)
-        }
-
-        fun toLegalEntityState(dto: ILegalEntityStateDto, legalEntity: LegalEntityDb): LegalEntityStateDb {
-            return LegalEntityStateDb(
-                validFrom = dto.validFrom,
-                validTo = dto.validTo,
-                type = dto.type,
-                legalEntity = legalEntity
-            )
-        }
 
         fun toSiteState(dto: ISiteStateDto, site: SiteDb): SiteStateDb {
             return SiteStateDb(
@@ -234,41 +189,6 @@ class BusinessPartnerBuildService(
                 site = site
             )
         }
-
-        fun toAddressState(dto: IAddressStateDto, address: LogisticAddressDb): AddressStateDb {
-            return AddressStateDb(
-                validFrom = dto.validFrom,
-                validTo = dto.validTo,
-                type = dto.type,
-                address = address
-            )
-        }
-
-        fun toLegalEntityIdentifier(
-            dto: ILegalEntityIdentifierDto,
-            idTypes: Map<String, IdentifierTypeDb>,
-            partner: LegalEntityDb
-        ): LegalEntityIdentifierDb {
-            return LegalEntityIdentifierDb(
-                value = dto.value,
-                type = idTypes[dto.type]!!,
-                issuingBody = dto.issuingBody,
-                legalEntity = partner
-            )
-        }
-
-        fun toAddressIdentifier(
-            dto: IAddressIdentifierDto,
-            idTypes: Map<String, IdentifierTypeDb>,
-            partner: LogisticAddressDb
-        ): AddressIdentifierDb {
-            return AddressIdentifierDb(
-                value = dto.value,
-                type = idTypes[dto.type]!!,
-                address = partner
-            )
-        }
-
         // Still used by the v6 legacy site mapper (controller/v6/SiteLegacyServiceMapper); the v7 path uses SiteUpdateService.
         fun updateSite(site: SiteDb, siteDto: IBaseSiteDto) {
 
@@ -298,67 +218,6 @@ class BusinessPartnerBuildService(
             return site
         }
 
-        fun createPhysicalAddress(physicalAddress: IBasePhysicalPostalAddressDto, regions: Map<String, RegionDb>): PhysicalPostalAddressDb {
-
-            if (physicalAddress.country == null || physicalAddress.city == null) {
-                throw BpdmValidationException(TaskStepBuildService.CleaningError.COUNTRY_CITY_IS_NULL.message)
-            }
-
-            return PhysicalPostalAddressDb(
-                geographicCoordinates = physicalAddress.geographicCoordinates?.let { GeographicCoordinateDb(it.latitude, it.longitude, it.altitude) },
-                country = physicalAddress.country!!,
-                administrativeAreaLevel1 = regions[physicalAddress.administrativeAreaLevel1],
-                administrativeAreaLevel2 = physicalAddress.administrativeAreaLevel2,
-                administrativeAreaLevel3 = physicalAddress.administrativeAreaLevel3,
-                postCode = physicalAddress.postalCode,
-                city = physicalAddress.city!!,
-                districtLevel1 = physicalAddress.district,
-                street = physicalAddress.street?.let { createStreet(it) },
-                companyPostCode = physicalAddress.companyPostalCode,
-                industrialZone = physicalAddress.industrialZone,
-                building = physicalAddress.building,
-                floor = physicalAddress.floor,
-                door = physicalAddress.door,
-                taxJurisdictionCode = physicalAddress.taxJurisdictionCode
-            )
-        }
-
-        fun createStreet(street: IBaseStreetDto): StreetDb{
-            return with(street){
-                StreetDb(
-                    name = name,
-                    houseNumber = houseNumber,
-                    houseNumberSupplement = houseNumberSupplement,
-                    milestone = milestone,
-                    direction = direction,
-                    namePrefix = namePrefix,
-                    additionalNamePrefix = additionalNamePrefix,
-                    nameSuffix = nameSuffix,
-                    additionalNameSuffix = additionalNameSuffix
-                )
-            }
-        }
-
-        fun createAlternativeAddress(alternativeAddress: IBaseAlternativePostalAddressDto, regions: Map<String, RegionDb>): AlternativePostalAddressDb {
-
-            if (alternativeAddress.country == null || alternativeAddress.city == null ||
-                alternativeAddress.deliveryServiceType == null || alternativeAddress.deliveryServiceNumber == null
-            ) {
-
-                throw BpdmValidationException(TaskStepBuildService.CleaningError.ALTERNATIVE_ADDRESS_DATA_IS_NULL.message)
-            }
-
-            return AlternativePostalAddressDb(
-                geographicCoordinates = alternativeAddress.geographicCoordinates?.let { GeographicCoordinateDb(it.latitude, it.longitude, it.altitude) },
-                country = alternativeAddress.country!!,
-                administrativeAreaLevel1 = regions[alternativeAddress.administrativeAreaLevel1],
-                postCode = alternativeAddress.postalCode,
-                city = alternativeAddress.city!!,
-                deliveryServiceType = alternativeAddress.deliveryServiceType!!,
-                deliveryServiceNumber = alternativeAddress.deliveryServiceNumber!!,
-                deliveryServiceQualifier = alternativeAddress.deliveryServiceQualifier
-            )
-        }
 
         fun createConfidenceCriteria(confidenceCriteria: IConfidenceCriteriaDto, numberOfSharingMembers: Int = 0) =
             ConfidenceCriteriaDb(
