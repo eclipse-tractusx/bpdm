@@ -25,7 +25,6 @@ import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.ReasonCodeDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
 import org.springframework.data.jpa.domain.Specification
-import org.springframework.data.jpa.repository.EntityGraph
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.data.jpa.repository.Query
@@ -56,10 +55,8 @@ interface RelationRepository : JpaRepository<RelationDb, Long>, JpaSpecification
     @Query("SELECT r FROM RelationDb r WHERE r.type = :legalEntityRelationType AND (r.startNode = :legalEntity OR r.endNode = :legalEntity)")
     fun findInSourceOrTarget(legalEntityRelationType: LegalEntityRelationType, legalEntity: LegalEntityDb): Set<RelationDb>
 
-    @EntityGraph(value = "RelationDb.withValidityPeriods", type = EntityGraph.EntityGraphType.LOAD)
     fun findByTypeAndStartNode(legalEntityRelationType: LegalEntityRelationType, legalEntity: LegalEntityDb): Set<RelationDb>
 
-    @EntityGraph(value = "RelationDb.withValidityPeriods", type = EntityGraph.EntityGraphType.LOAD)
     fun findByTypeAndEndNode(legalEntityRelationType: LegalEntityRelationType, legalEntity: LegalEntityDb): Set<RelationDb>
 
     fun existsByReasonCode(reasonCode: ReasonCodeDb): Boolean

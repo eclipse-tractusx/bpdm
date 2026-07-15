@@ -31,10 +31,6 @@ import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
         Index(columnList = "end_node_id")
     ]
 )
-@NamedEntityGraph(
-    name = "RelationDb.withValidityPeriods",
-    attributeNodes = [NamedAttributeNode("validityPeriods")]
-)
 class RelationDb(
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)

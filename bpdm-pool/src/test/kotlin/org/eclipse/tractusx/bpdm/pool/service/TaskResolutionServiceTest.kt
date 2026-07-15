@@ -30,6 +30,7 @@ import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.eclipse.tractusx.bpdm.pool.service.TaskStepBuildService.CleaningError
+import org.springframework.transaction.support.TransactionTemplate
 import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockConfiguration
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.*
@@ -66,7 +67,8 @@ class TaskResolutionServiceTest @Autowired constructor(
     val poolDataHelper: PoolDataHelper,
     val ultimateOwnerResolutionService: UltimateOwnerResolutionService,
     val ownedByRelationUpsertService: OwnedByRelationUpsertService,
-    val relationRepository: RelationRepository
+    val relationRepository: RelationRepository,
+    val transactionTemplate: TransactionTemplate
 ) {
 
     private lateinit var orchTestDataFactory: BusinessPartnerTestDataFactory
@@ -1455,19 +1457,21 @@ class TaskResolutionServiceTest @Autowired constructor(
         relationRepository.save(relation)
     }
 
-    @org.springframework.transaction.annotation.Transactional
     private fun createIsOwnedByRelationViaService(sourceBpn: String, targetBpn: String) {
-        val sourceEntity = legalEntityRepository.findByBpnIgnoreCase(sourceBpn)!!
-        val targetEntity = legalEntityRepository.findByBpnIgnoreCase(targetBpn)!!
+        transactionTemplate.execute {
+            val sourceEntity = legalEntityRepository.findByBpnIgnoreCase(sourceBpn)!!
+            val targetEntity = legalEntityRepository.findByBpnIgnoreCase(targetBpn)!!
 
-        val upsertRequest = IRelationUpsertStrategyService.UpsertRequest(
-            source = sourceEntity,
-            target = targetEntity,
-            validityPeriods = listOf(currentValidityPeriod()),
-            existingRelation = null,
-            reasonCode = null
-        )
-        ownedByRelationUpsertService.upsertRelation(upsertRequest)
+            val upsertRequest = IRelationUpsertStrategyService.UpsertRequest(
+                source = sourceEntity,
+                target = targetEntity,
+                validityPeriods = listOf(currentValidityPeriod()),
+                existingRelation = null,
+                reasonCode = null
+            )
+            val result = ownedByRelationUpsertService.upsertRelation(upsertRequest)
+            result.relation.validityPeriods.size
+        }
     }
 
     // Production rejects relations without validity periods (see TaskLegalEntityRelationsStepBuildService.validateValidityPeriods),
