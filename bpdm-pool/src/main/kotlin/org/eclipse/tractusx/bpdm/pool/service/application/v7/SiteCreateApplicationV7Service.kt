@@ -39,17 +39,8 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Application service for the V7 "create sites" operations: the boundary between the REST API and the domain. It accepts
- * the API site-create requests, translates them into the internal domain model, drives the parse/execute pipeline, and
- * maps the per-entry verdicts back into the API [SitePartnerCreateResponseWrapper]. It holds no business rules of its
- * own — validation, parent resolution and persistence all live in the collaborators it orchestrates.
- *
- * Two create variants share this boundary because both produce a site under a legal-entity parent:
- * [createSitesWithMainAddress] takes a distinct main address, while [createSitesWithLegalAddressAsMain] reuses the
- * parent's legal address as the site main address.
- *
- * `@Transactional` so parse and execute share one persistence context: the site-create parsers resolve the legal-entity
- * parent and validate content, then the site-create services persist the sites and their main addresses.
+ * The REST-API boundary for the V7 "create sites" operations, hosting both the distinct-main-address and
+ * legal-address-as-main variants.
  */
 @Service
 class SiteCreateApplicationV7Service(

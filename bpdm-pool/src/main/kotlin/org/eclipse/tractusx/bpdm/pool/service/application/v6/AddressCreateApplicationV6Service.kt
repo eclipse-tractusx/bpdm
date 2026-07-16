@@ -37,14 +37,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Application service for the v6 "create additional address" operation: the boundary between the legacy v6 REST API and
- * the domain. Mirrors [org.eclipse.tractusx.bpdm.pool.service.application.v7.AddressCreateApplicationV7Service] but maps
- * the per-entry verdicts back into the versioned `api.v6.model` response shapes. It holds no business rules of its own —
- * validation, parent resolution and persistence all live in the collaborators it orchestrates.
- *
- * `@Transactional` so parse and execute share one persistence context: [UntypedParentAddressCreateParser] resolves the
- * single `bpnParent` into the explicit (legalEntity, site) parents and validates content, then [AddressCreateService]
- * persists the addresses.
+ * The REST-API boundary for the legacy v6 "create additional address" operation, using the v6 request/response shapes.
  */
 @Service
 class AddressCreateApplicationV6Service(

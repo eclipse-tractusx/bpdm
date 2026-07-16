@@ -36,15 +36,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Application service for the V7 "create legal entities" operation: the boundary between the REST API and the domain. It
- * accepts the API [LegalEntityPartnerCreateRequest]s, translates them into the internal
- * [org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityCreateRequest] domain model, drives the parse/execute pipeline, and
- * maps the per-entry verdicts back into the API [LegalEntityPartnerCreateResponseWrapper]. It holds no business rules of
- * its own — validation and persistence live in the collaborators it orchestrates.
- *
- * `@Transactional` so parse and execute share one persistence context: a legal entity is the top of the hierarchy so
- * there is no parent to resolve — [LegalEntityCreateParser] validates the header, identifier uniqueness and legal-address
- * content, then [LegalEntityCreateService] persists the legal entities and their legal addresses.
+ * The REST-API boundary for the V7 "create legal entities" operation.
  */
 @Service
 class LegalEntityCreateApplicationV7Service(

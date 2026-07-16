@@ -36,13 +36,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Application service for the v6 "update sites" operation: the boundary between the legacy v6 REST API and the domain.
- * Mirrors [org.eclipse.tractusx.bpdm.pool.service.application.v7.SiteUpdateApplicationV7Service] but maps the per-entry
- * verdicts back into the versioned `api.v6.model` response shapes.
- *
- * `@Transactional` so parse and execute share one persistence context: [SiteUpdateParser] resolves the target sites by
- * BPNS and validates content, then [SiteUpdateService] mutates their lazy collections. There is no parent to resolve on
- * update.
+ * The REST-API boundary for the legacy v6 "update sites" operation, using the v6 request/response shapes.
  */
 @Service
 class SiteUpdateApplicationV6Service(

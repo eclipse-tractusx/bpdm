@@ -36,15 +36,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Application service for the v6 "update legal entities" operation: the boundary between the legacy v6 REST API and the
- * domain. Mirrors [org.eclipse.tractusx.bpdm.pool.service.application.v7.LegalEntityUpdateApplicationV7Service] but
- * consumes the versioned v6 request via the [LegalEntityDtoRequestMapper] and maps the per-entry verdicts back into the
- * `api.v6.model` response shapes. It holds no business rules of its own — validation, target resolution and persistence
- * live in the collaborators it orchestrates.
- *
- * `@Transactional` so parse and execute share one persistence context: [LegalEntityUpdateParser] resolves the target
- * legal entities by BPNL and validates content, then [LegalEntityUpdateService] mutates their lazy collections. There is
- * no parent to resolve on update.
+ * The REST-API boundary for the legacy v6 "update legal entities" operation, using the v6 request/response shapes.
  */
 @Service
 class LegalEntityUpdateApplicationV6Service(

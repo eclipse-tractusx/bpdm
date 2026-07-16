@@ -40,12 +40,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Application service for the v6 "create sites" operations: the boundary between the legacy v6 REST API and the domain.
- * Mirrors [org.eclipse.tractusx.bpdm.pool.service.application.v7.SiteCreateApplicationV7Service] but maps the per-entry
- * verdicts back into the versioned `api.v6.model` response shapes.
- *
- * `@Transactional` so parse and execute share one persistence context: the site-create parsers resolve the legal-entity
- * parent and validate content, then the site-create services persist the sites and their main addresses.
+ * The REST-API boundary for the legacy v6 "create sites" operations, using the v6 request/response shapes.
  */
 @Service
 class SiteCreateApplicationV6Service(
@@ -82,9 +77,8 @@ class SiteCreateApplicationV6Service(
     /**
      * Creates sites whose main address is the parent legal entity's own legal address.
      *
-     * The duplicate guard (a legal address may back at most one site) is a v6-only rule kept here deliberately: the shared
-     * [SiteCreateWithLegalAddressAsMainParser] intentionally does not enforce it (v7 and the cleaning/task path allow it),
-     * so this method pre-filters offenders and only delegates the survivors to the shared parse/create path.
+     * Enforces a v6-only rule that a legal address may back at most one site: offenders are pre-filtered out as errors
+     * here, because the shared parse/create path deliberately does not enforce it (v7 and the cleaning/task path allow it).
      */
     @Transactional
     fun createSitesWithLegalAddressAsMain(requests: Collection<SiteCreateRequestWithLegalAddressAsMain>): SitePartnerCreateResponseWrapper {

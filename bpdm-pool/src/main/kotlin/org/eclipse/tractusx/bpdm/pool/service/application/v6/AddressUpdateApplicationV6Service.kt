@@ -37,14 +37,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Application service for the v6 "update address" operation: the boundary between the legacy v6 REST API and the domain.
- * Mirrors [org.eclipse.tractusx.bpdm.pool.service.application.v7.AddressUpdateApplicationV7Service] but maps the per-entry
- * verdicts back into the versioned `api.v6.model` response shapes. It holds no business rules of its own — validation,
- * target resolution and persistence all live in the collaborators it orchestrates.
- *
- * `@Transactional` so parse and execute share one persistence context: [AddressUpdateParser] resolves the target
- * entities and validates content, then [AddressFullUpdateService] mutates their lazy collections. There is no parent to
- * resolve on update.
+ * The REST-API boundary for the legacy v6 "update address" operation, using the v6 request/response shapes.
  */
 @Service
 class AddressUpdateApplicationV6Service(

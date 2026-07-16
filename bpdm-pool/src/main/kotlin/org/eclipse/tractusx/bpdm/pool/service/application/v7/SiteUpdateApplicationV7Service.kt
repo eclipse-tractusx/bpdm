@@ -36,15 +36,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Application service for the V7 "update sites" operation: the boundary between the REST API and the domain. It accepts
- * the API [SitePartnerUpdateRequest]s, translates them into the internal [org.eclipse.tractusx.bpdm.pool.model.request.SiteUpdateRequest]
- * domain model, drives the parse/execute pipeline, and maps the per-entry verdicts back into the API
- * [SitePartnerUpdateResponseWrapper]. It holds no business rules of its own — validation, target resolution and
- * persistence all live in the collaborators it orchestrates.
- *
- * `@Transactional` so parse and execute share one persistence context: [SiteUpdateParser] resolves the target sites by
- * BPNS (reporting "site not found") and validates content, then [SiteUpdateService] mutates their lazy collections.
- * There is no parent to resolve on update.
+ * The REST-API boundary for the V7 "update sites" operation.
  */
 @Service
 class SiteUpdateApplicationV7Service(
