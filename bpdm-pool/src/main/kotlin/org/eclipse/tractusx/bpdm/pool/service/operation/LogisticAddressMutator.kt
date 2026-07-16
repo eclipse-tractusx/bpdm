@@ -22,12 +22,10 @@ package org.eclipse.tractusx.bpdm.pool.service.operation
 import org.eclipse.tractusx.bpdm.pool.entity.*
 
 /**
- * The permitted vocabulary of changes to an existing logistic address during a staged update
- * ([LogisticAddressStagedUpdateService.stageUpdate]). Deliberately narrow: an update revises descriptive content and
- * *adds* site membership — it never re-identifies (`bpn`), re-parents (`legalEntity`), or rewires address relations.
- * Those aspects of the backing [org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb] are simply absent here, so a
- * writer cannot reach them. Properties are readable so callers can carry forward values they do not overwrite (e.g.
- * `confidenceCriteria.numberOfSharingMembers`); the restriction is on what may be *written*.
+ * The permitted vocabulary of changes to an existing logistic address: an update may revise descriptive content and
+ * *add* site membership, but never re-identify (`bpn`), re-parent (`legalEntity`), or rewire address relations — those
+ * are absent here so a writer cannot reach them. Properties are readable so callers can carry forward values they do
+ * not overwrite; the restriction is on what may be *written*.
  */
 interface LogisticAddressMutator {
     var name: String?

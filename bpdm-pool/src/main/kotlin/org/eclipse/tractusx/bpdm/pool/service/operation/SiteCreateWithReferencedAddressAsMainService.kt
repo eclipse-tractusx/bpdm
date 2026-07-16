@@ -31,17 +31,14 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Creates sites whose main address is an *existing* address referenced by BPN (the cleaning/task path that turns an
- * additional address into a site main address) — the address-reuse counterpart of [SiteCreateService]. It consumes a
- * [SiteCreateWithReferencedAddressAsMainParsed] command (referenced address resolved, header validated by
- * [org.eclipse.tractusx.bpdm.pool.service.parser.SiteCreateWithReferencedAddressAsMainParser]), issues the site BPN and
- * persists the site, then re-parents the referenced address onto it as its main address — so, unlike [SiteCreateService],
- * it builds no new address and issues no address BPN (it does emit an ADDRESS changelog, preserving the previous
- * behavior). Order-preserving positional contract (see [org.eclipse.tractusx.bpdm.pool.model.ParseResult]).
+ * The single authority for creating a site whose main address is an *existing* address referenced by BPN, re-parenting
+ * that address onto the new site (the cleaning/task path that promotes an additional address to a site main address).
+ * Unlike an ordinary site create it builds no new address and issues no address BPN, but it does emit an ADDRESS
+ * changelog for the re-parented address.
  */
 @Service
 class SiteCreateWithReferencedAddressAsMainService(
-    private val addressStagedUpdateService: LogisticAddressStagedUpdateService,
+    private val addressUpdateService: AddressUpdateService,
     private val siteHeaderTransientCreateService: SiteHeaderTransientCreateService,
     private val siteRepository: SiteRepository,
     private val changelogService: PartnerChangelogService
@@ -52,14 +49,13 @@ class SiteCreateWithReferencedAddressAsMainService(
 
         val sites = siteHeaderTransientCreateService.createTransiently(parsed.map { SiteHeaderCreateParsed(it.mainAddress.legalEntity!!, it.siteHeader) })
 
-        //Wire sites to site main address
-        val stagedAddressUpdates = parsed.zip(sites).map { (entry, site) -> addressStagedUpdateService.stageUpdate(entry.mainAddress) { it.assignToSite(site) } }
+        val stagedAddressUpdates = parsed.zip(sites).map { (entry, site) -> addressUpdateService.stageUpdate(entry.mainAddress) { it.assignToSite(site) } }
         sites.zip(stagedAddressUpdates).forEach { (site, stagedAddressUpdate) -> site.mainAddress = stagedAddressUpdate.address }
 
         siteRepository.saveAll(sites)
         changelogService.createChangelogEntries(sites.map { ChangelogEntryCreateRequest(it.bpn, ChangelogType.CREATE, BusinessPartnerType.SITE) })
 
-        addressStagedUpdateService.commit(stagedAddressUpdates)
+        addressUpdateService.commit(stagedAddressUpdates)
 
         return sites
     }

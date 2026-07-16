@@ -55,7 +55,7 @@ import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.eclipse.tractusx.bpdm.pool.service.operation.AddressCreateService
-import org.eclipse.tractusx.bpdm.pool.service.operation.AddressUpdateService
+import org.eclipse.tractusx.bpdm.pool.service.operation.AddressFullUpdateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.LegalEntityCreateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.LegalEntityUpdateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.SiteCreateService
@@ -86,7 +86,7 @@ class TaskStepBuildService(
     private val typedParentAddressCreateParser: TypedParentAddressCreateParser,
     private val addressCreateService: AddressCreateService,
     private val addressUpdateParser: AddressUpdateParser,
-    private val addressUpdateService: AddressUpdateService,
+    private val addressFullUpdateService: AddressFullUpdateService,
     private val taskAddressRequestMapper: GoldenRecordTaskAddressRequestMapper,
     private val legalEntityCreateParser: LegalEntityCreateParser,
     private val legalEntityCreateService: LegalEntityCreateService,
@@ -414,7 +414,7 @@ class TaskStepBuildService(
             content = taskAddressRequestMapper.toContentRequest(additionalAddress)
         )
 
-        val result = parseAndExecute(listOf(request), addressUpdateParser::parse, addressUpdateService::update).single()
+        val result = parseAndExecute(listOf(request), addressUpdateParser::parse, addressFullUpdateService::update).single()
         return when (result) {
             is ParseResult.Success -> result.parsed.value.bpn
             is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { "Errors on updating Address: ${renderError(it)}" })

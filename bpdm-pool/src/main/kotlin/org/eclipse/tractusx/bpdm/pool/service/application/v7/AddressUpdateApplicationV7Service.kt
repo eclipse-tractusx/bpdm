@@ -30,7 +30,7 @@ import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressParseErrorMa
 import org.eclipse.tractusx.bpdm.pool.model.AddressUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
-import org.eclipse.tractusx.bpdm.pool.service.operation.AddressUpdateService
+import org.eclipse.tractusx.bpdm.pool.service.operation.AddressFullUpdateService
 import org.eclipse.tractusx.bpdm.pool.service.parser.AddressUpdateParser
 import org.eclipse.tractusx.bpdm.pool.service.toUpdateDto
 import org.springframework.stereotype.Service
@@ -62,13 +62,13 @@ import org.springframework.transaction.annotation.Transactional
  * persistence all live in the collaborators it orchestrates.
  *
  * `@Transactional` so parse and execute share one persistence context: [org.eclipse.tractusx.bpdm.pool.service.parser.AddressUpdateParser] resolves the target
- * entities (reporting "address not found") and validates content, then [org.eclipse.tractusx.bpdm.pool.service.operation.AddressUpdateService] mutates their lazy
+ * entities (reporting "address not found") and validates content, then [org.eclipse.tractusx.bpdm.pool.service.operation.AddressFullUpdateService] mutates their lazy
  * collections — instead of relying on Open-Session-in-View. There is no parent to resolve on update.
  */
 @Service
 class AddressUpdateApplicationV7Service(
     private val addressUpdateParser: AddressUpdateParser,
-    private val addressUpdateService: AddressUpdateService,
+    private val addressFullUpdateService: AddressFullUpdateService,
     private val addressDtoRequestMapper: AddressDtoRequestMapper,
     private val addressParseErrorMapper: AddressParseErrorMapper
 ) {
@@ -86,7 +86,7 @@ class AddressUpdateApplicationV7Service(
 
         val responses = mutableListOf<AddressPartnerUpdateVerboseDto>()
         val errors = mutableListOf<ErrorInfo<AddressUpdateError>>()
-        requestList.zip(parseAndExecute(updateRequests, addressUpdateParser::parse, addressUpdateService::update)).forEach { (request, result) ->
+        requestList.zip(parseAndExecute(updateRequests, addressUpdateParser::parse, addressFullUpdateService::update)).forEach { (request, result) ->
             when (result) {
                 is ParseResult.Success -> responses.add(result.parsed.value.toUpdateDto())
                 is ParseResult.Failure -> errors.addAll(result.errors.map { addressParseErrorMapper.toUpdateErrorInfo(it, request.bpna) })

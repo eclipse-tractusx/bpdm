@@ -37,26 +37,20 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Updates sites — the composite site-update *operation*. It consumes a [SiteUpdateParsed] command (target resolved,
- * header + main-address content validated by [org.eclipse.tractusx.bpdm.pool.service.parser.SiteUpdateParser]), applies
- * and change-detects the header, and delegates the main-address change to [AddressUpdateService] (with no site
- * assignment), netting a single UPDATE when either side changed. The main address is staged (not yet committed) so the
- * parent SITE changelog is emitted before the child ADDRESS changelog. Order-preserving positional contract (see
- * [org.eclipse.tractusx.bpdm.pool.model.ParseResult]).
+ * The single authority for updating sites together with their main address: applies and change-detects the header,
+ * applies the main-address change, and reports one UPDATE when either side actually changed. The parent SITE changelog
+ * is emitted before the child ADDRESS changelog. Returns managed entities in the caller's transaction, not response
+ * models.
  */
 @Service
 class SiteUpdateService(
-    private val addressUpdateService: AddressUpdateService,
+    private val addressFullUpdateService: AddressFullUpdateService,
     private val siteRepository: SiteRepository,
     private val changelogService: PartnerChangelogService,
     private val siteEntityMapper: SiteEntityMapper,
     private val equivalenceMapper: BusinessPartnerEquivalenceMapper
 ) {
 
-    /**
-     * Returns the updated entities (within the caller's transaction) rather than a detached response model: building
-     * version-specific responses is the job of the border/application service at the edge.
-     */
     @Transactional
     fun update(parsed: List<SiteUpdateParsed>): List<UpsertResult<SiteDb>>{
         val headerResults = parsed.map { updateHeader(it) }
@@ -69,15 +63,14 @@ class SiteUpdateService(
                 it.content.mainAddress.scriptVariants
             )
         }
-        val stagedMainAddresses = addressUpdateService.stageUpdate(mainAddressRequests)
+        val stagedMainAddresses = addressFullUpdateService.stageUpdate(mainAddressRequests)
 
         val overallResults = headerResults.zip(stagedMainAddresses){ headerResult, stagedMainAddress ->
             val changed = headerResult.upsertType == UpsertType.Updated || stagedMainAddress.upsertType == UpsertType.Updated
             UpsertResult(headerResult.value, if (changed) UpsertType.Updated else UpsertType.NoChange)
         }
 
-        // Emit the parent SITE changelog before committing the main address so the parent UPDATE precedes the child
-        // ADDRESS UPDATE. Staging above yielded the address change flag without emitting its changelog yet.
+        // Emit the parent changelog before committing the staged address so the parent UPDATE precedes the child.
         changelogService.createChangelogEntries(
             overallResults
                 .filter { it.upsertType == UpsertType.Updated }
@@ -85,7 +78,7 @@ class SiteUpdateService(
         )
         siteRepository.saveAll(headerResults.filter { it.upsertType == UpsertType.Updated }.map { it.value })
 
-        addressUpdateService.commit(stagedMainAddresses)
+        addressFullUpdateService.commit(stagedMainAddresses)
 
         return overallResults
     }
@@ -101,7 +94,7 @@ class SiteUpdateService(
     private fun doUpdateEntity(target: SiteDb, content: SiteContentParsed) {
         val header = content.header
         target.name = header.name
-        // The sharing-member count is Pool-maintained, not part of the update payload, so carry the current value forward.
+        // Sharing-member count is Pool-maintained and absent from the payload, so carry it forward.
         target.confidenceCriteria = siteEntityMapper.toConfidence(header.confidenceCriteria, target.confidenceCriteria.numberOfSharingMembers)
         target.states.replace(siteEntityMapper.toStates(header.states, target))
         target.scriptVariants.replace(siteEntityMapper.toScriptVariants(header.scriptVariants))

@@ -32,29 +32,22 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Creates sites under an existing legal entity — the single owner of the site-create *operation*. It consumes a
- * [SiteCreateParsed] command (parent resolved, header + main-address content validated by
- * [org.eclipse.tractusx.bpdm.pool.service.parser.SiteCreateParser]) and persists the site and its newly created main
- * address. Both the site ([org.eclipse.tractusx.bpdm.pool.service.writer.SiteWriter]) and its main address
- * ([LogisticAddressStagedCreateService]) are staged unsaved so the site ⇄ main-address cycle can be wired in memory
- * before persisting. Order-preserving positional contract (see [org.eclipse.tractusx.bpdm.pool.model.ParseResult]).
+ * The single authority for creating sites under an existing legal entity together with a newly created main address:
+ * issues the site BPN, builds and persists the site and its main address, and emits their CREATE changelogs. Returns
+ * managed entities in the caller's transaction, not response models.
  */
 @Service
 class SiteCreateService(
-    private val addressStagedCreateService: LogisticAddressStagedCreateService,
+    private val addressCreateService: AddressCreateService,
     private val siteHeaderTransientCreateService: SiteHeaderTransientCreateService,
     private val siteRepository: SiteRepository,
     private val changelogService: PartnerChangelogService
 ) {
 
-    /**
-     * Returns the persisted entities (within the caller's transaction) rather than a detached response model: building
-     * version-specific responses is the job of the border/application service at the edge.
-     */
     @Transactional
     fun create(parsed: List<SiteCreateParsed>): List<SiteDb> {
         val sites = siteHeaderTransientCreateService.createTransiently(parsed.map { SiteHeaderCreateParsed(it.legalEntity, it.content.header) })
-        val stagedAddresses = addressStagedCreateService.stageCreate(parsed.zip(sites).map { (entry, site) ->
+        val stagedAddresses = addressCreateService.stageCreate(parsed.zip(sites).map { (entry, site) ->
             val mainAddress = entry.content.mainAddress
             AddressCreateParsed(site.legalEntity, site, mainAddress.address, mainAddress.scriptVariants)
         })
@@ -64,7 +57,7 @@ class SiteCreateService(
         siteRepository.saveAll(sites)
         changelogService.createChangelogEntries(sites.map { ChangelogEntryCreateRequest(it.bpn, ChangelogType.CREATE, BusinessPartnerType.SITE) })
 
-        addressStagedCreateService.commit(stagedAddresses)
+        addressCreateService.commit(stagedAddresses)
 
         return sites
     }

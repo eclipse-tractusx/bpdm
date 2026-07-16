@@ -108,7 +108,10 @@ class BusinessPartnerEquivalenceMapper {
                 }
             },
             confidenceCriteria = toEquivalenceDto(logisticAddress.confidenceCriteria),
-            scriptVariants = logisticAddress.scriptVariants.map { toEquivalenceDto(it) }.toSortedSet(compareBy { it.scriptCode })
+            scriptVariants = logisticAddress.scriptVariants.map { toEquivalenceDto(it) }.toSortedSet(compareBy { it.scriptCode }),
+            // Site membership is identified by the stable site BPN; assigning/removing an address from a site must
+            // register as an address change so it emits an ADDRESS UPDATE changelog.
+            siteBpns = logisticAddress.sites.map { it.bpn }.toSortedSet()
         )
 
     fun toEquivalenceDto(logisticAddressScriptVariant: LogisticAddressScriptVariantDb ) =
@@ -209,7 +212,8 @@ class BusinessPartnerEquivalenceMapper {
         override val physicalPostalAddress: PhysicalAddressEquivalenceDto?,
         override val alternativePostalAddress: AlternativeEquivalenceDto?,
         override val confidenceCriteria: ConfidenceCriteriaEquivalenceDto?,
-        val scriptVariants: SortedSet<LogisticAddressScriptVariantEquivalenceDto>
+        val scriptVariants: SortedSet<LogisticAddressScriptVariantEquivalenceDto>,
+        val siteBpns: SortedSet<String>
     ) : IBaseLogisticAddressDto
 
     data class IdentifierEquivalenceDto(

@@ -30,6 +30,10 @@ import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerEquivalenceMapper
 import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
 import org.springframework.stereotype.Service
 
+/**
+ * Issues site BPNs and builds the (unsaved) site header entities — no address, no persistence, no changelog — for site
+ * creators that must wire the main address before persisting.
+ */
 @Service
 class SiteHeaderTransientCreateService(
     private val bpnIssuingService: BpnIssuingService,
@@ -38,7 +42,7 @@ class SiteHeaderTransientCreateService(
 
     fun createTransiently(request: List<SiteHeaderCreateParsed>): List<SiteDb>{
         val bpns = bpnIssuingService.issueSiteBpns(request.size)
-        // A new site's confidence starts with one sharing member (preserves the previous create behavior).
+        // A new site starts with one sharing member.
         return request.zip(bpns) { entry, bpn ->
             siteEntityMapper.toEntity(bpn, entry.legalEntity, entry.header, numberOfSharingMembers = 1)
         }

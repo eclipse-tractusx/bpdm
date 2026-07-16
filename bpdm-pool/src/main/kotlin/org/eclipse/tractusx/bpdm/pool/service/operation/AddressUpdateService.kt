@@ -19,66 +19,77 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation
 
+import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
-import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
-import org.eclipse.tractusx.bpdm.pool.mapper.entity.AddressEntityMapper
-import org.eclipse.tractusx.bpdm.pool.model.AddressScriptVariantParsed
-import org.eclipse.tractusx.bpdm.pool.model.AddressUpdateParsed
-import org.eclipse.tractusx.bpdm.pool.model.LogisticAddressParsed
+import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
+import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.eclipse.tractusx.bpdm.pool.model.PendingAddressWrite
+import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerEquivalenceMapper
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Updates existing logistic addresses given an already-resolved target — the single address-update *operation*. It
- * optionally assigns the address to a site and applies the content change, composing both into one
- * [LogisticAddressStagedUpdateService.stageUpdate] so a membership change and a content change net a single ADDRESS UPDATE (one
- * mutation, one change detection, one changelog). Update never re-parents. Content validation and target resolution are
- * the parser's job ([org.eclipse.tractusx.bpdm.pool.service.parser.AddressUpdateParser]); callers that already hold the
- * managed target and a validated command (e.g. the address-only update operation) call [update] directly.
- * Order-preserving positional contract (see [org.eclipse.tractusx.bpdm.pool.model.ParseResult]).
+ * The single authority for updating logistic addresses: applies a caller's mutation, detects whether it changed the
+ * address by equivalence, and persists and emits an UPDATE changelog only for those that actually changed. Mutations
+ * are confined to a [LogisticAddressMutator], so no update can touch an address's identity, parent, or relations.
  *
- * [update] is the single-call convenience that stages and immediately commits. Callers that own the *parent* changelog
- * (legal-entity / site update, passing `site = null`) instead drive [stageUpdate] and [commit] as separate phases: they
- * stage to learn whether the address changed, emit their parent changelog, and only then commit — so the parent UPDATE
- * changelog precedes the child ADDRESS UPDATE changelog. This mirrors the create side's stage/commit split.
+ * [update] does this in one call. [stageUpdate] plus [commit] split it so a caller can learn whether the address
+ * changed — and wire it into a not-yet-persisted parent — before committing.
  */
 @Service
 class AddressUpdateService(
-    private val addressStagedUpdateService: LogisticAddressStagedUpdateService,
-    private val addressEntityMapper: AddressEntityMapper
+    private val equivalenceMapper: BusinessPartnerEquivalenceMapper,
+    private val logisticAddressWriteCommitService: LogisticAddressWriteCommitService
 ) {
 
-    @Transactional
-    fun update(parsed: List<AddressUpdateParsed>): List<UpsertResult<LogisticAddressDb>> =
-        commit(stageUpdate(parsed))
+    fun update(targets: List<LogisticAddressDb>, mutate: (LogisticAddressMutator) -> Unit): List<UpsertResult<LogisticAddressDb>> =
+        commit(targets.map { stageUpdate(it, mutate) })
 
-    /**
-     * Applies each command's optional site assignment and content change to its (already-resolved) target and
-     * change-detects it, without saving or emitting a changelog — [commit] does that. Membership and content are
-     * composed into one staged mutation so they net a single ADDRESS UPDATE.
-     */
-    fun stageUpdate(parsed: List<AddressUpdateParsed>): List<PendingAddressWrite> =
-        parsed.map { entry ->
-            addressStagedUpdateService.stageUpdate(entry.target) { address ->
-                entry.site?.let { address.assignToSite(it) }
-                applyContent(address, entry.address, entry.scriptVariants)
-            }
-        }
+    fun stageUpdate(target: LogisticAddressDb, mutate: (LogisticAddressMutator) -> Unit): PendingAddressWrite {
+        val before = equivalenceMapper.toEquivalenceDto(target)
+        mutate(DefaultLogisticAddressMutator(target))
+        val changed = equivalenceMapper.toEquivalenceDto(target) != before
+        return PendingAddressWrite(target, if (changed) UpsertType.Updated else UpsertType.NoChange)
+    }
 
     @Transactional
     fun commit(staged: List<PendingAddressWrite>): List<UpsertResult<LogisticAddressDb>> =
-        addressStagedUpdateService.commit(staged)
+        logisticAddressWriteCommitService.commit(staged)
+}
 
-    private fun applyContent(target: LogisticAddressMutator, address: LogisticAddressParsed, scriptVariants: List<AddressScriptVariantParsed>) {
-        // The sharing-member count is Pool-maintained, not part of the update payload, so carry the current value forward.
-        val numberOfSharingMembers = target.confidenceCriteria.numberOfSharingMembers
-        target.name = address.name
-        target.physicalPostalAddress = addressEntityMapper.toPhysical(address.physicalPostalAddress)
-        target.alternativePostalAddress = address.alternativePostalAddress?.let { addressEntityMapper.toAlternative(it) }
-        target.confidenceCriteria = addressEntityMapper.toConfidence(address.confidenceCriteria, numberOfSharingMembers)
-        target.replaceIdentifiers(addressEntityMapper.toIdentifiers(address.identifiers))
-        target.replaceStates(addressEntityMapper.toStates(address.states))
-        target.replaceScriptVariants(addressEntityMapper.toScriptVariants(scriptVariants))
+/**
+ * Write-facade over a managed [LogisticAddressDb] that owns the back-reference wiring for the sub-entities it replaces,
+ * keeping the entity mapper a pure translation.
+ */
+private class DefaultLogisticAddressMutator(private val entity: LogisticAddressDb) : LogisticAddressMutator {
+    override var name: String?
+        get() = entity.name
+        set(value) { entity.name = value }
+    override var physicalPostalAddress: PhysicalPostalAddressDb
+        get() = entity.physicalPostalAddress
+        set(value) { entity.physicalPostalAddress = value }
+    override var alternativePostalAddress: AlternativePostalAddressDb?
+        get() = entity.alternativePostalAddress
+        set(value) { entity.alternativePostalAddress = value }
+    override var confidenceCriteria: ConfidenceCriteriaDb
+        get() = entity.confidenceCriteria
+        set(value) { entity.confidenceCriteria = value }
+
+    override fun replaceIdentifiers(identifiers: Collection<AddressIdentifierDb>) {
+        identifiers.forEach { it.address = entity }
+        entity.identifiers.replace(identifiers)
+    }
+
+    override fun replaceStates(states: Collection<AddressStateDb>) {
+        states.forEach { it.address = entity }
+        entity.states.replace(states)
+    }
+
+    override fun replaceScriptVariants(scriptVariants: Collection<LogisticAddressScriptVariantDb>) {
+        entity.scriptVariants.replace(scriptVariants)
+    }
+
+    override fun assignToSite(site: SiteDb) {
+        entity.sites.add(site)
     }
 }

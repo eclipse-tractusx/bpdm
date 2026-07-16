@@ -31,7 +31,7 @@ import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressParseErrorMa
 import org.eclipse.tractusx.bpdm.pool.model.AddressUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
-import org.eclipse.tractusx.bpdm.pool.service.operation.AddressUpdateService
+import org.eclipse.tractusx.bpdm.pool.service.operation.AddressFullUpdateService
 import org.eclipse.tractusx.bpdm.pool.service.parser.AddressUpdateParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -43,13 +43,13 @@ import org.springframework.transaction.annotation.Transactional
  * target resolution and persistence all live in the collaborators it orchestrates.
  *
  * `@Transactional` so parse and execute share one persistence context: [AddressUpdateParser] resolves the target
- * entities and validates content, then [AddressUpdateService] mutates their lazy collections. There is no parent to
+ * entities and validates content, then [AddressFullUpdateService] mutates their lazy collections. There is no parent to
  * resolve on update.
  */
 @Service
 class AddressUpdateApplicationV6Service(
     private val addressUpdateParser: AddressUpdateParser,
-    private val addressUpdateService: AddressUpdateService,
+    private val addressFullUpdateService: AddressFullUpdateService,
     private val addressDtoRequestMapper: AddressDtoRequestMapper,
     private val addressParseErrorMapper: AddressParseErrorMapper
 ) {
@@ -67,7 +67,7 @@ class AddressUpdateApplicationV6Service(
 
         val responses = mutableListOf<LogisticAddressVerboseDto>()
         val errors = mutableListOf<ErrorInfo<AddressUpdateError>>()
-        requestList.zip(parseAndExecute(updateRequests, addressUpdateParser::parse, addressUpdateService::update)).forEach { (request, result) ->
+        requestList.zip(parseAndExecute(updateRequests, addressUpdateParser::parse, addressFullUpdateService::update)).forEach { (request, result) ->
             when (result) {
                 is ParseResult.Success -> responses.add(result.parsed.value.toV6Dto())
                 is ParseResult.Failure -> errors.addAll(result.errors.map { addressParseErrorMapper.toUpdateErrorInfo(it, request.bpna) })

@@ -30,7 +30,6 @@ import org.eclipse.tractusx.bpdm.pool.mapper.entity.LegalEntityEntityMapper
 import org.eclipse.tractusx.bpdm.pool.model.AddressUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityUpdateParsed
-import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerEquivalenceMapper
 import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
@@ -40,16 +39,13 @@ import java.time.Instant
 import java.time.temporal.ChronoUnit
 
 /**
- * Updates legal entities — the composite legal-entity-update *operation*. It consumes a [LegalEntityUpdateParsed] command
- * (target resolved, header + legal-address content validated by
- * [org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntityUpdateParser]), applies and change-detects the header, and
- * delegates the legal-address change to [AddressUpdateService], netting a single UPDATE when either side changed. The
- * legal address is staged (not yet committed) so the parent LEGAL_ENTITY changelog is emitted before the child ADDRESS
- * changelog. Order-preserving positional contract (see [org.eclipse.tractusx.bpdm.pool.model.ParseResult]).
+ * The single authority for updating legal entities together with their legal address: applies and change-detects the
+ * header, applies the legal-address change, and reports one UPDATE when either side actually changed. The parent
+ * LEGAL_ENTITY changelog is emitted before the child ADDRESS changelog.
  */
 @Service
 class LegalEntityUpdateService(
-    private val addressUpdateService: AddressUpdateService,
+    private val addressFullUpdateService: AddressFullUpdateService,
     private val legalEntityEntityMapper: LegalEntityEntityMapper,
     private val repository: LegalEntityRepository,
     private val equivalenceMapper: BusinessPartnerEquivalenceMapper,
@@ -68,22 +64,21 @@ class LegalEntityUpdateService(
                 it.content.legalAddress.scriptVariants
             )
         }
-        val stagedLegalAddresses = addressUpdateService.stageUpdate(legalAddressRequests)
+        val stagedLegalAddresses = addressFullUpdateService.stageUpdate(legalAddressRequests)
 
         val overallResults = headerResults.zip(stagedLegalAddresses){ headerResult, stagedLegalAddress ->
             val changed = headerResult.upsertType == UpsertType.Updated || stagedLegalAddress.upsertType == UpsertType.Updated
             UpsertResult(headerResult.value, if (changed) UpsertType.Updated else UpsertType.NoChange)
         }
 
-        // Emit the parent LEGAL_ENTITY changelog before committing the legal address so the parent UPDATE precedes the
-        // child ADDRESS UPDATE. Staging above yielded the address change flag without emitting its changelog yet.
+        // Emit the parent changelog before committing the staged address so the parent UPDATE precedes the child.
         changelogService.createChangelogEntries(
             overallResults
                 .filter { it.upsertType == UpsertType.Updated }
                 .map { ChangelogEntryCreateRequest(it.value.bpn, ChangelogType.UPDATE, BusinessPartnerType.LEGAL_ENTITY) }
         )
 
-        addressUpdateService.commit(stagedLegalAddresses)
+        addressFullUpdateService.commit(stagedLegalAddresses)
 
         return overallResults
     }
@@ -105,14 +100,13 @@ class LegalEntityUpdateService(
         val header = content.header
         target.legalName = legalEntityEntityMapper.toLegalName(header)
         target.legalForm = header.legalForm
-        // The sharing-member count is Pool-maintained, not part of the update payload, so carry the current value forward.
+        // Sharing-member count is Pool-maintained and absent from the payload, so carry it forward.
         target.confidenceCriteria = legalEntityEntityMapper.toConfidence(header.confidenceCriteria, target.confidenceCriteria.numberOfSharingMembers)
         target.isCatenaXMemberData = header.isParticipantData
         target.identifiers.replace(legalEntityEntityMapper.toIdentifiers(header.identifiers, target))
         target.states.replace(legalEntityEntityMapper.toStates(header.states, target))
         target.scriptVariants.replace(legalEntityEntityMapper.toScriptVariants(header.scriptVariants))
-        // currentness is refreshed on every update; it is excluded from the equivalence diff, so it never by itself marks
-        // the aggregate as changed (matches the previous update behavior).
+        // currentness refreshes every update but is excluded from the equivalence diff, so it never by itself marks a change.
         target.currentness = Instant.now().truncatedTo(ChronoUnit.MICROS)
     }
 }

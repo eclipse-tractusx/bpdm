@@ -19,36 +19,43 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation
 
+import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
+import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
+import org.eclipse.tractusx.bpdm.pool.mapper.entity.AddressEntityMapper
 import org.eclipse.tractusx.bpdm.pool.model.AddressCreateParsed
+import org.eclipse.tractusx.bpdm.pool.model.PendingAddressWrite
+import org.eclipse.tractusx.bpdm.pool.service.BpnIssuingService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Creates logistic addresses from already-resolved parents — the single owner of the address-create *operation*. It
- * consumes an [AddressCreateParsed] command (content already validated, parents already resolved to entities) and
- * persists the address. Content validation and parent resolution are the parsers' job
- * ([org.eclipse.tractusx.bpdm.pool.service.parser.TypedParentAddressCreateParser] /
- * [org.eclipse.tractusx.bpdm.pool.service.parser.UntypedParentAddressCreateParser]); in-transaction creators whose
- * parent is not yet persisted build the command themselves and call [create] directly. Order-preserving positional
- * contract (see [org.eclipse.tractusx.bpdm.pool.model.ParseResult]).
+ * The single authority for creating logistic addresses: issues address BPNs, builds the entities, persists them and
+ * emits their CREATE changelog. Returns managed entities in the caller's transaction, not response models.
  *
- * This is the single-call convenience over [LogisticAddressStagedCreateService]: it stages and immediately commits.
- * Callers that own a cyclic parent relationship use the staged service's stage/commit phases directly so they can wire
- * the graph before committing.
+ * [create] does this in one call. A creator wiring a freshly created address into a not-yet-persisted parent instead
+ * uses [stageCreate] (build unsaved) and [commit] (persist + changelog), wiring the graph in between.
  */
 @Service
 class AddressCreateService(
-    private val addressStagedCreateService: LogisticAddressStagedCreateService
+    private val bpnIssuingService: BpnIssuingService,
+    private val addressEntityMapper: AddressEntityMapper,
+    private val logisticAddressWriteCommitService: LogisticAddressWriteCommitService
 ) {
 
-    /**
-     * Returns the persisted entities (within the caller's transaction) rather than a detached response model: the
-     * write is a pure in-transaction collaborator, and turning entities into version-specific responses is the job of
-     * the border/application service at the edge. No `UpsertType` here — a create always yields `Created`, unlike update
-     * which can be a no-op.
-     */
     @Transactional
     fun create(parsed: List<AddressCreateParsed>): List<LogisticAddressDb> =
-        addressStagedCreateService.commit(addressStagedCreateService.stageCreate(parsed)).map { it.value }
+        commit(stageCreate(parsed)).map { it.value }
+
+    fun stageCreate(parsed: List<AddressCreateParsed>): List<PendingAddressWrite> {
+        val bpns = bpnIssuingService.issueAddressBpns(parsed.size)
+        // A freshly created address starts with zero sharing members.
+        return parsed.zip(bpns) { entry, bpn ->
+            PendingAddressWrite(addressEntityMapper.toEntity(bpn, entry, numberOfSharingMembers = 0), UpsertType.Created)
+        }
+    }
+
+    @Transactional
+    fun commit(staged: List<PendingAddressWrite>): List<UpsertResult<LogisticAddressDb>> =
+        logisticAddressWriteCommitService.commit(staged)
 }

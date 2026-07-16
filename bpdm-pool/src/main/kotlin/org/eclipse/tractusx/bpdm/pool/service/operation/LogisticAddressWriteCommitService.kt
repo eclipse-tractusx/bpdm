@@ -32,22 +32,15 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * The single sink for staged logistic-address writes: both [LogisticAddressStagedCreateService] and
- * [LogisticAddressStagedUpdateService] produce [PendingAddressWrite]s and hand them here to be persisted. Keeping the
- * save and changelog in one place lets callers that own a cyclic parent relationship (legal entity ⇄ legal address,
- * site ⇄ main address) stage the create/update, wire the still-unsaved object graph in memory, and commit last — the
- * cyclic insert resolves at flush via the nullable `logistic_address.legal_entity_id` back-FK together with
- * `order_inserts`.
+ * The single sink that persists staged logistic-address writes and emits their CREATE/UPDATE changelog. No-change
+ * writes are neither saved nor logged but are still returned, preserving the caller's positional contract. Committing is
+ * separate from staging so a caller can wire a still-unsaved cyclic parent graph and persist it last.
  */
 @Service
 class LogisticAddressWriteCommitService(
     private val logisticAddressRepository: LogisticAddressRepository,
     private val changelogService: PartnerChangelogService
 ) {
-    /**
-     * Persists the created/updated addresses and emits their CREATE/UPDATE changelog. NoChange entries are neither saved
-     * nor logged; all entries are returned so the caller keeps the positional contract.
-     */
     @Transactional
     fun commit(staged: List<PendingAddressWrite>): List<UpsertResult<LogisticAddressDb>> {
         logisticAddressRepository.saveAll(staged.filter { it.upsertType != UpsertType.NoChange }.map { it.address })
