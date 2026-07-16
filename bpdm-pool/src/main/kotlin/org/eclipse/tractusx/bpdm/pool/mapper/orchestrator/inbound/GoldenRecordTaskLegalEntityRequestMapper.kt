@@ -20,14 +20,14 @@
 package org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.inbound
 
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
-import org.eclipse.tractusx.bpdm.pool.model.LegalEntityContentRequest
-import org.eclipse.tractusx.bpdm.pool.model.LegalEntityCreateRequest
-import org.eclipse.tractusx.bpdm.pool.model.LegalEntityHeaderRequest
-import org.eclipse.tractusx.bpdm.pool.model.LegalEntityIdentifier
+import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityContentRequest
+import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityCreateRequest
+import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityHeaderRequest
+import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityIdentifier
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityState
-import org.eclipse.tractusx.bpdm.pool.model.LegalEntityUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityUpdateRequest
 import org.springframework.stereotype.Component
-import org.eclipse.tractusx.bpdm.pool.model.LegalEntityScriptVariant as LegalEntityScriptVariantRequest
+import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityScriptVariant as LegalEntityScriptVariantRequest
 import org.eclipse.tractusx.orchestrator.api.model.BusinessState as TaskBusinessState
 import org.eclipse.tractusx.orchestrator.api.model.LegalEntity as TaskLegalEntity
 import org.eclipse.tractusx.orchestrator.api.model.PostalAddressScriptVariantWithScriptCode as TaskScriptVariant

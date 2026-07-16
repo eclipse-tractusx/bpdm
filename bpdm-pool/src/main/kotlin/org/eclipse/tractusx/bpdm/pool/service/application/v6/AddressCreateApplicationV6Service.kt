@@ -28,7 +28,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerCreate
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.toCreateResponse
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.AddressDtoRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressParseErrorMapper
-import org.eclipse.tractusx.bpdm.pool.model.AddressCreateUntypedParentRequest
+import org.eclipse.tractusx.bpdm.pool.model.request.AddressCreateUntypedParentRequest
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.service.operation.AddressCreateService

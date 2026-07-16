@@ -38,7 +38,7 @@ import org.springframework.transaction.annotation.Transactional
 /**
  * Application service for the V7 "update legal entities" operation: the boundary between the REST API and the domain. It
  * accepts the API [LegalEntityPartnerUpdateRequest]s, translates them into the internal
- * [org.eclipse.tractusx.bpdm.pool.model.LegalEntityUpdateRequest] domain model, drives the parse/execute pipeline, and
+ * [org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityUpdateRequest] domain model, drives the parse/execute pipeline, and
  * maps the per-entry verdicts back into the API [LegalEntityPartnerUpdateResponseWrapper]. It holds no business rules of
  * its own — validation, target resolution and persistence live in the collaborators it orchestrates.
  *

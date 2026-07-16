@@ -20,10 +20,10 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser
 
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.SiteContentParsed
-import org.eclipse.tractusx.bpdm.pool.model.SiteCreateParseError
-import org.eclipse.tractusx.bpdm.pool.model.SiteCreateParsed
-import org.eclipse.tractusx.bpdm.pool.model.SiteCreateRequest
+import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteContentParsed
+import org.eclipse.tractusx.bpdm.pool.model.error.SiteCreateParseError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteCreateParsed
+import org.eclipse.tractusx.bpdm.pool.model.request.SiteCreateRequest
 import org.eclipse.tractusx.bpdm.pool.model.zipParseResults
 import org.springframework.stereotype.Service
 

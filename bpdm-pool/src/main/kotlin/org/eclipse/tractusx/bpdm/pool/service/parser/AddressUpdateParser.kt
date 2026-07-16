@@ -19,9 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.parser
 
-import org.eclipse.tractusx.bpdm.pool.model.AddressUpdateParseError
-import org.eclipse.tractusx.bpdm.pool.model.AddressUpdateParsed
-import org.eclipse.tractusx.bpdm.pool.model.AddressUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.model.error.AddressUpdateParseError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressUpdateParsed
+import org.eclipse.tractusx.bpdm.pool.model.request.AddressUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.zipParseResults
 import org.springframework.stereotype.Service

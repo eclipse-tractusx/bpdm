@@ -38,7 +38,7 @@ import org.springframework.transaction.annotation.Transactional
 /**
  * Application service for the V7 "create legal entities" operation: the boundary between the REST API and the domain. It
  * accepts the API [LegalEntityPartnerCreateRequest]s, translates them into the internal
- * [org.eclipse.tractusx.bpdm.pool.model.LegalEntityCreateRequest] domain model, drives the parse/execute pipeline, and
+ * [org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityCreateRequest] domain model, drives the parse/execute pipeline, and
  * maps the per-entry verdicts back into the API [LegalEntityPartnerCreateResponseWrapper]. It holds no business rules of
  * its own — validation and persistence live in the collaborators it orchestrates.
  *

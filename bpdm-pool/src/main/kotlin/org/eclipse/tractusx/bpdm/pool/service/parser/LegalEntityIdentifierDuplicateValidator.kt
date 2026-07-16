@@ -20,8 +20,8 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser
 
 import org.eclipse.tractusx.bpdm.common.util.findDuplicates
-import org.eclipse.tractusx.bpdm.pool.model.LegalEntityContentParseError
-import org.eclipse.tractusx.bpdm.pool.model.LegalEntityHeaderRequest
+import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityContentParseError
+import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityHeaderRequest
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityIdentifierRepository
 import org.springframework.stereotype.Service
 

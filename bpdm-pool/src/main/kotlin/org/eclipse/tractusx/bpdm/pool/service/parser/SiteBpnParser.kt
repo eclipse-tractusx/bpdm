@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.service.parser
 
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.UnresolvableSite
+import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableSite
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.springframework.stereotype.Service
 
@@ -45,7 +45,7 @@ import org.springframework.stereotype.Service
  ******************************************************************************/
 /**
  * Resolves site BPNs to entities, batched and order-preserving (see [org.eclipse.tractusx.bpdm.pool.model.ParseResult]): an unresolvable BPN yields an
- * [org.eclipse.tractusx.bpdm.pool.model.UnresolvableSite] for that entry. [parse] treats the BPN as optional (a `null` means "no site parent" → `Success(null)`),
+ * [org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableSite] for that entry. [parse] treats the BPN as optional (a `null` means "no site parent" → `Success(null)`),
  * for the address-create site parent; [parseRequired] treats it as a mandatory reference (e.g. a site update target).
  * Owning the optionality here keeps callers free of the null special-casing when combining parsers via `zipParseResults`.
  */

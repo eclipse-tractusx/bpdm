@@ -27,9 +27,9 @@ import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.LegalEntityEntityMapper
-import org.eclipse.tractusx.bpdm.pool.model.AddressUpdateParsed
-import org.eclipse.tractusx.bpdm.pool.model.LegalEntityContentParsed
-import org.eclipse.tractusx.bpdm.pool.model.LegalEntityUpdateParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressUpdateParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityContentParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerEquivalenceMapper
 import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService

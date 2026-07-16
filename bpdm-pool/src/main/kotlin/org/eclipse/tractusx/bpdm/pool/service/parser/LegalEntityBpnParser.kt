@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.service.parser
 
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.UnresolvableLegalEntity
+import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableLegalEntity
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.springframework.stereotype.Service
 
@@ -45,7 +45,7 @@ import org.springframework.stereotype.Service
  ******************************************************************************/
 /**
  * Resolves legal-entity BPNs to entities, batched and order-preserving (see [org.eclipse.tractusx.bpdm.pool.model.ParseResult]): an unresolvable BPN yields
- * an [org.eclipse.tractusx.bpdm.pool.model.UnresolvableLegalEntity] for that entry. Single responsibility so any service needing a legal-entity parent can
+ * an [org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableLegalEntity] for that entry. Single responsibility so any service needing a legal-entity parent can
  * reuse it and combine its result with other parsers via `zipParseResults`.
  */
 @Service

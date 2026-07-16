@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.service.parser
 
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.UnresolvableAddress
+import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableAddress
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.springframework.stereotype.Service
 
@@ -45,7 +45,7 @@ import org.springframework.stereotype.Service
  ******************************************************************************/
 /**
  * Resolves address BPNs to their existing entities, batched and order-preserving (see [org.eclipse.tractusx.bpdm.pool.model.ParseResult]): an unresolvable
- * BPN yields an [org.eclipse.tractusx.bpdm.pool.model.UnresolvableAddress] for that entry. Single responsibility so any service that
+ * BPN yields an [org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableAddress] for that entry. Single responsibility so any service that
  * needs to look up an address by BPN (e.g. an update target) can reuse it and combine its result with other parsers via
  * `zipParseResults`.
  */

@@ -23,7 +23,7 @@ import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.SiteEntityMapper
 import org.eclipse.tractusx.bpdm.pool.model.PendingSiteWrite
-import org.eclipse.tractusx.bpdm.pool.model.SiteHeaderCreateParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderCreateParsed
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.eclipse.tractusx.bpdm.pool.service.BpnIssuingService
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerEquivalenceMapper

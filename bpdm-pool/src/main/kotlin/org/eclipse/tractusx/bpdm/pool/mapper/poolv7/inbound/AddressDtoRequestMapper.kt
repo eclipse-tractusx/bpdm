@@ -33,6 +33,9 @@ import org.eclipse.tractusx.bpdm.pool.api.model.PostalAddressScriptVariantDto
 import org.eclipse.tractusx.bpdm.pool.api.model.StreetDto
 import org.eclipse.tractusx.bpdm.pool.dto.LogisticAddressWithScriptVariantsDto
 import org.eclipse.tractusx.bpdm.pool.model.*
+import org.eclipse.tractusx.bpdm.pool.model.request.*
+import org.eclipse.tractusx.bpdm.pool.model.parsed.*
+import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 import java.time.ZoneOffset

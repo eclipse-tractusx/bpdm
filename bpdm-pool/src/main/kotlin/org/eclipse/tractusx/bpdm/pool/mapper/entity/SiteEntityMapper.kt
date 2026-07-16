@@ -24,10 +24,10 @@ import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteScriptVariantDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteStateDb
-import org.eclipse.tractusx.bpdm.pool.model.ConfidenceCriteriaParsed
-import org.eclipse.tractusx.bpdm.pool.model.SiteCreateParsed
-import org.eclipse.tractusx.bpdm.pool.model.SiteHeaderParsed
-import org.eclipse.tractusx.bpdm.pool.model.SiteScriptVariantParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.ConfidenceCriteriaParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteCreateParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteScriptVariantParsed
 import org.eclipse.tractusx.bpdm.pool.model.SiteState
 import org.springframework.stereotype.Component
 import java.time.Instant

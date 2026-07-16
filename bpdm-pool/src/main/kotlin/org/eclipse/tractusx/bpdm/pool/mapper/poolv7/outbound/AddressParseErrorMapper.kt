@@ -28,16 +28,16 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityUpdateError
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteCreateError
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteUpdateError
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
-import org.eclipse.tractusx.bpdm.pool.model.AddressConstraintParseError
-import org.eclipse.tractusx.bpdm.pool.model.AddressCreateParseError
-import org.eclipse.tractusx.bpdm.pool.model.InvalidParentBpn
-import org.eclipse.tractusx.bpdm.pool.model.UnresolvableLegalEntity
-import org.eclipse.tractusx.bpdm.pool.model.UnresolvableSite
-import org.eclipse.tractusx.bpdm.pool.model.AddressFieldParseError
-import org.eclipse.tractusx.bpdm.pool.model.AddressMetadataParseError
-import org.eclipse.tractusx.bpdm.pool.model.AddressContentParseError
-import org.eclipse.tractusx.bpdm.pool.model.AddressUpdateParseError
-import org.eclipse.tractusx.bpdm.pool.model.UnresolvableAddress
+import org.eclipse.tractusx.bpdm.pool.model.error.AddressConstraintParseError
+import org.eclipse.tractusx.bpdm.pool.model.error.AddressCreateParseError
+import org.eclipse.tractusx.bpdm.pool.model.error.InvalidParentBpn
+import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableLegalEntity
+import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableSite
+import org.eclipse.tractusx.bpdm.pool.model.error.AddressFieldParseError
+import org.eclipse.tractusx.bpdm.pool.model.error.AddressMetadataParseError
+import org.eclipse.tractusx.bpdm.pool.model.error.AddressContentParseError
+import org.eclipse.tractusx.bpdm.pool.model.error.AddressUpdateParseError
+import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableAddress
 import org.springframework.stereotype.Component
 
 /**

@@ -25,10 +25,10 @@ import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityIdentifierDb
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityScriptVariantDb
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityStateDb
 import org.eclipse.tractusx.bpdm.pool.entity.NameDb
-import org.eclipse.tractusx.bpdm.pool.model.ConfidenceCriteriaParsed
-import org.eclipse.tractusx.bpdm.pool.model.LegalEntityHeaderParsed
-import org.eclipse.tractusx.bpdm.pool.model.LegalEntityIdentifierParsed
-import org.eclipse.tractusx.bpdm.pool.model.LegalEntityScriptVariantParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.ConfidenceCriteriaParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityHeaderParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityIdentifierParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityScriptVariantParsed
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityState
 import org.springframework.stereotype.Component
 import java.time.Instant

@@ -21,6 +21,9 @@ package org.eclipse.tractusx.bpdm.pool.mapper.entity
 
 import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.eclipse.tractusx.bpdm.pool.model.*
+import org.eclipse.tractusx.bpdm.pool.model.request.*
+import org.eclipse.tractusx.bpdm.pool.model.parsed.*
+import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.springframework.stereotype.Component
 import java.time.Instant
 import java.time.ZoneOffset

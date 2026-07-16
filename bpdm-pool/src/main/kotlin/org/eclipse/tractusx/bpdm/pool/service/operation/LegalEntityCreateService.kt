@@ -24,9 +24,9 @@ import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.LegalEntityEntityMapper
-import org.eclipse.tractusx.bpdm.pool.model.AddressCreateParsed
-import org.eclipse.tractusx.bpdm.pool.model.LegalEntityCreateParsed
-import org.eclipse.tractusx.bpdm.pool.model.LegalEntityHeaderParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressCreateParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityCreateParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityHeaderParsed
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.service.BpnIssuingService
 import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService

@@ -21,16 +21,16 @@ package org.eclipse.tractusx.bpdm.pool.service.parser
 
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalFormDb
-import org.eclipse.tractusx.bpdm.pool.model.ConfidenceCriteriaParsed
-import org.eclipse.tractusx.bpdm.pool.model.ConfidenceCriteriaRequest
-import org.eclipse.tractusx.bpdm.pool.model.LegalEntityContentParseError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.ConfidenceCriteriaParsed
+import org.eclipse.tractusx.bpdm.pool.model.request.ConfidenceCriteriaRequest
+import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityContentParseError
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityHeaderMetadata
-import org.eclipse.tractusx.bpdm.pool.model.LegalEntityHeaderParsed
-import org.eclipse.tractusx.bpdm.pool.model.LegalEntityHeaderRequest
-import org.eclipse.tractusx.bpdm.pool.model.LegalEntityIdentifier
-import org.eclipse.tractusx.bpdm.pool.model.LegalEntityIdentifierParsed
-import org.eclipse.tractusx.bpdm.pool.model.LegalEntityScriptVariant
-import org.eclipse.tractusx.bpdm.pool.model.LegalEntityScriptVariantParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityHeaderParsed
+import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityHeaderRequest
+import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityIdentifier
+import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityIdentifierParsed
+import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityScriptVariant
+import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityScriptVariantParsed
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalFormRepository
@@ -57,7 +57,7 @@ import org.springframework.stereotype.Service
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 /**
- * Validates loose [org.eclipse.tractusx.bpdm.pool.model.LegalEntityHeaderRequest] content into the bounded, metadata-resolved [org.eclipse.tractusx.bpdm.pool.model.LegalEntityHeaderParsed] — the
+ * Validates loose [org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityHeaderRequest] content into the bounded, metadata-resolved [org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityHeaderParsed] — the
  * legal-entity counterpart of [org.eclipse.tractusx.bpdm.pool.service.LogisticAddressRequestParser], covering only the legal-entity header (the legal address is
  * parsed separately by the address content parser and recombined by the legal-entity service). All errors are accumulated
  * (not fail-fast) so one entry's report is complete. Legal forms, identifier types and script codes are resolved for the

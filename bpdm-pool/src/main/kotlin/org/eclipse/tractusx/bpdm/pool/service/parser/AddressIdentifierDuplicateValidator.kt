@@ -20,8 +20,8 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser
 
 import org.eclipse.tractusx.bpdm.common.util.findDuplicates
-import org.eclipse.tractusx.bpdm.pool.model.AddressConstraintParseError
-import org.eclipse.tractusx.bpdm.pool.model.AddressContentRequest
+import org.eclipse.tractusx.bpdm.pool.model.error.AddressConstraintParseError
+import org.eclipse.tractusx.bpdm.pool.model.request.AddressContentRequest
 import org.eclipse.tractusx.bpdm.pool.repository.AddressIdentifierRepository
 import org.springframework.stereotype.Service
 

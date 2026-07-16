@@ -20,15 +20,15 @@
 package org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.inbound
 
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
-import org.eclipse.tractusx.bpdm.pool.model.SiteContentRequest
-import org.eclipse.tractusx.bpdm.pool.model.SiteCreateRequest
-import org.eclipse.tractusx.bpdm.pool.model.SiteCreateWithLegalAddressAsMainRequest
-import org.eclipse.tractusx.bpdm.pool.model.SiteCreateWithReferencedAddressAsMainRequest
-import org.eclipse.tractusx.bpdm.pool.model.SiteHeaderRequest
+import org.eclipse.tractusx.bpdm.pool.model.request.SiteContentRequest
+import org.eclipse.tractusx.bpdm.pool.model.request.SiteCreateRequest
+import org.eclipse.tractusx.bpdm.pool.model.request.SiteCreateWithLegalAddressAsMainRequest
+import org.eclipse.tractusx.bpdm.pool.model.request.SiteCreateWithReferencedAddressAsMainRequest
+import org.eclipse.tractusx.bpdm.pool.model.request.SiteHeaderRequest
 import org.eclipse.tractusx.bpdm.pool.model.SiteState
-import org.eclipse.tractusx.bpdm.pool.model.SiteUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.model.request.SiteUpdateRequest
 import org.springframework.stereotype.Component
-import org.eclipse.tractusx.bpdm.pool.model.SiteScriptVariant as SiteScriptVariantRequest
+import org.eclipse.tractusx.bpdm.pool.model.request.SiteScriptVariant as SiteScriptVariantRequest
 import org.eclipse.tractusx.orchestrator.api.model.BusinessState as TaskBusinessState
 import org.eclipse.tractusx.orchestrator.api.model.PostalAddress as TaskPostalAddress
 import org.eclipse.tractusx.orchestrator.api.model.PostalAddressScriptVariantWithScriptCode as TaskScriptVariant

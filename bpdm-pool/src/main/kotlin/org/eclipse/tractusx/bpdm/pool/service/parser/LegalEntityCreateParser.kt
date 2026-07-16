@@ -19,10 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.parser
 
-import org.eclipse.tractusx.bpdm.pool.model.LegalEntityContentParsed
-import org.eclipse.tractusx.bpdm.pool.model.LegalEntityCreateParseError
-import org.eclipse.tractusx.bpdm.pool.model.LegalEntityCreateParsed
-import org.eclipse.tractusx.bpdm.pool.model.LegalEntityCreateRequest
+import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityContentParsed
+import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityCreateParseError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityCreateParsed
+import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityCreateRequest
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.combine
 import org.eclipse.tractusx.bpdm.pool.model.zipParseResults

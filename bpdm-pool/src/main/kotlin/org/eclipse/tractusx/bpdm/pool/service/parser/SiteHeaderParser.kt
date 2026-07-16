@@ -20,14 +20,14 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser
 
 import org.eclipse.tractusx.bpdm.pool.entity.ScriptCodeDb
-import org.eclipse.tractusx.bpdm.pool.model.ConfidenceCriteriaParsed
-import org.eclipse.tractusx.bpdm.pool.model.ConfidenceCriteriaRequest
+import org.eclipse.tractusx.bpdm.pool.model.parsed.ConfidenceCriteriaParsed
+import org.eclipse.tractusx.bpdm.pool.model.request.ConfidenceCriteriaRequest
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.SiteContentParseError
-import org.eclipse.tractusx.bpdm.pool.model.SiteHeaderParsed
-import org.eclipse.tractusx.bpdm.pool.model.SiteHeaderRequest
-import org.eclipse.tractusx.bpdm.pool.model.SiteScriptVariant
-import org.eclipse.tractusx.bpdm.pool.model.SiteScriptVariantParsed
+import org.eclipse.tractusx.bpdm.pool.model.error.SiteContentParseError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderParsed
+import org.eclipse.tractusx.bpdm.pool.model.request.SiteHeaderRequest
+import org.eclipse.tractusx.bpdm.pool.model.request.SiteScriptVariant
+import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteScriptVariantParsed
 import org.eclipse.tractusx.bpdm.pool.repository.ScriptCodeRepository
 import org.springframework.stereotype.Service
 
@@ -50,7 +50,7 @@ import org.springframework.stereotype.Service
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 /**
- * Validates loose [org.eclipse.tractusx.bpdm.pool.model.SiteHeaderRequest] content into the bounded [org.eclipse.tractusx.bpdm.pool.model.SiteHeaderParsed] — the site counterpart of
+ * Validates loose [org.eclipse.tractusx.bpdm.pool.model.request.SiteHeaderRequest] content into the bounded [org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderParsed] — the site counterpart of
  * [org.eclipse.tractusx.bpdm.pool.service.LogisticAddressRequestParser], covering only the site header (the main address is parsed separately by the address
  * content parser and recombined by the site service). All errors are accumulated (not fail-fast) so one entry's report
  * is complete. Script codes are resolved for the whole batch in one query, then each entry is validated against them.

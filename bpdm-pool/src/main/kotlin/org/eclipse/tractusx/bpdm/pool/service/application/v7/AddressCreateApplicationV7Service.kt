@@ -27,7 +27,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateVer
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.AddressDtoRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressParseErrorMapper
-import org.eclipse.tractusx.bpdm.pool.model.AddressCreateUntypedParentRequest
+import org.eclipse.tractusx.bpdm.pool.model.request.AddressCreateUntypedParentRequest
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.service.operation.AddressCreateService
@@ -57,7 +57,7 @@ import org.springframework.transaction.annotation.Transactional
 /**
  * Application service for the V7 "create additional address" operation: the boundary between the REST API and the
  * domain. It accepts the API [org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest]s, translates them into the loose
- * [org.eclipse.tractusx.bpdm.pool.model.AddressCreateUntypedParentRequest] domain model, drives the parse/execute pipeline, and maps the per-entry verdicts
+ * [org.eclipse.tractusx.bpdm.pool.model.request.AddressCreateUntypedParentRequest] domain model, drives the parse/execute pipeline, and maps the per-entry verdicts
  * back into the API [org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateResponseWrapper]. It holds no business rules of its own — validation, parent
  * resolution and persistence all live in the collaborators it orchestrates.
  *

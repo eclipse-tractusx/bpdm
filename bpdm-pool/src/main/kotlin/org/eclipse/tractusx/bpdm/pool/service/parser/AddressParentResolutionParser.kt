@@ -20,13 +20,13 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.model.AddressCreateParseError
-import org.eclipse.tractusx.bpdm.pool.model.AddressCreateTypedParentsRequest
-import org.eclipse.tractusx.bpdm.pool.model.AddressCreateUntypedParentRequest
-import org.eclipse.tractusx.bpdm.pool.model.InvalidParentBpn
+import org.eclipse.tractusx.bpdm.pool.model.error.AddressCreateParseError
+import org.eclipse.tractusx.bpdm.pool.model.request.AddressCreateTypedParentsRequest
+import org.eclipse.tractusx.bpdm.pool.model.request.AddressCreateUntypedParentRequest
+import org.eclipse.tractusx.bpdm.pool.model.error.InvalidParentBpn
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.UnresolvableLegalEntity
-import org.eclipse.tractusx.bpdm.pool.model.UnresolvableSite
+import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableLegalEntity
+import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableSite
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.eclipse.tractusx.bpdm.pool.service.BpnIssuingService
@@ -53,7 +53,7 @@ import org.springframework.stereotype.Service
 /**
  * Resolves each request's single, *untyped* `bpnParent` into the explicit (legalEntity, site) parents the typed create
  * stage needs, validating existence in the same pass: it determines whether the BPN is a legal entity or a site —
- * reporting the precise [org.eclipse.tractusx.bpdm.pool.model.InvalidParentBpn]/[org.eclipse.tractusx.bpdm.pool.model.UnresolvableLegalEntity]/[org.eclipse.tractusx.bpdm.pool.model.UnresolvableSite] errors the typed stage cannot
+ * reporting the precise [org.eclipse.tractusx.bpdm.pool.model.error.InvalidParentBpn]/[org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableLegalEntity]/[org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableSite] errors the typed stage cannot
  * distinguish — where a legal-entity parent resolves to itself and a site parent contributes its own legal entity.
  * Order-preserving positional contract (see [org.eclipse.tractusx.bpdm.pool.model.ParseResult]): result[i] corresponds to requests[i].
  */

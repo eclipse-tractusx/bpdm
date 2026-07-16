@@ -19,9 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.parser
 
-import org.eclipse.tractusx.bpdm.pool.model.AddressContentParseError
-import org.eclipse.tractusx.bpdm.pool.model.AddressContentParsed
-import org.eclipse.tractusx.bpdm.pool.model.AddressContentRequest
+import org.eclipse.tractusx.bpdm.pool.model.error.AddressContentParseError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressContentParsed
+import org.eclipse.tractusx.bpdm.pool.model.request.AddressContentRequest
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.combine
 import org.eclipse.tractusx.bpdm.pool.service.LogisticAddressRequestParser
