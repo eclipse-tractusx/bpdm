@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation
 
-import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.AddressEntityMapper
@@ -62,7 +61,7 @@ class AddressUpdateService(
     fun stageUpdate(parsed: List<AddressUpdateParsed>): List<PendingAddressWrite> =
         parsed.map { entry ->
             addressStagedUpdateService.stageUpdate(entry.target) { address ->
-                entry.site?.let { address.sites.add(it) }
+                entry.site?.let { address.assignToSite(it) }
                 applyContent(address, entry.address, entry.scriptVariants)
             }
         }
@@ -71,15 +70,15 @@ class AddressUpdateService(
     fun commit(staged: List<PendingAddressWrite>): List<UpsertResult<LogisticAddressDb>> =
         addressStagedUpdateService.commit(staged)
 
-    private fun applyContent(target: LogisticAddressDb, address: LogisticAddressParsed, scriptVariants: List<AddressScriptVariantParsed>) {
+    private fun applyContent(target: LogisticAddressMutator, address: LogisticAddressParsed, scriptVariants: List<AddressScriptVariantParsed>) {
         // The sharing-member count is Pool-maintained, not part of the update payload, so carry the current value forward.
         val numberOfSharingMembers = target.confidenceCriteria.numberOfSharingMembers
         target.name = address.name
         target.physicalPostalAddress = addressEntityMapper.toPhysical(address.physicalPostalAddress)
         target.alternativePostalAddress = address.alternativePostalAddress?.let { addressEntityMapper.toAlternative(it) }
         target.confidenceCriteria = addressEntityMapper.toConfidence(address.confidenceCriteria, numberOfSharingMembers)
-        target.identifiers.replace(addressEntityMapper.toIdentifiers(address.identifiers, target))
-        target.states.replace(addressEntityMapper.toStates(address.states, target))
-        target.scriptVariants.replace(addressEntityMapper.toScriptVariants(scriptVariants))
+        target.replaceIdentifiers(addressEntityMapper.toIdentifiers(address.identifiers))
+        target.replaceStates(addressEntityMapper.toStates(address.states))
+        target.replaceScriptVariants(addressEntityMapper.toScriptVariants(scriptVariants))
     }
 }

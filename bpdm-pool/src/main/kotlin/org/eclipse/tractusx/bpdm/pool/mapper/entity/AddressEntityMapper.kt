@@ -31,8 +31,9 @@ import java.time.ZoneOffset
  * preserved value for an update) and `confidenceLevel` is derived by [ConfidenceCriteriaDb] itself. The granular
  * sub-builders are reused by the update path, which assigns their outputs onto an existing managed entity.
  *
- * Sub-entities that hold a back-reference to their address ([AddressIdentifierDb], [AddressStateDb]) take the parent as
- * an input parameter; constructing them is still pure.
+ * Sub-entities that hold a back-reference to their address ([AddressIdentifierDb], [AddressStateDb]) are built without a
+ * parent here; wiring the back-reference is the caller's job (see [toEntity] for creates, the address mutator for
+ * updates), which keeps this mapper a pure translation.
  */
 @Component
 class AddressEntityMapper {
@@ -48,8 +49,8 @@ class AddressEntityMapper {
             scriptVariants = toScriptVariants(parsed.scriptVariants).toMutableList()
         )
         parsed.site?.let { entity.sites.add(it) }
-        entity.identifiers.addAll(toIdentifiers(parsed.address.identifiers, entity))
-        entity.states.addAll(toStates(parsed.address.states, entity))
+        entity.identifiers.addAll(toIdentifiers(parsed.address.identifiers).onEach { it.address = entity })
+        entity.states.addAll(toStates(parsed.address.states).onEach { it.address = entity })
         return entity
     }
 
@@ -93,11 +94,11 @@ class AddressEntityMapper {
             nextConfidenceCheckAt = parsed.nextConfidenceCheckAt.toLocalDateTime()
         )
 
-    fun toIdentifiers(parsed: List<AddressIdentifierParsed>, parent: LogisticAddressDb): List<AddressIdentifierDb> =
-        parsed.map { AddressIdentifierDb(value = it.value, type = it.type, address = parent) }
+    fun toIdentifiers(parsed: List<AddressIdentifierParsed>): List<AddressIdentifierDb> =
+        parsed.map { AddressIdentifierDb(value = it.value, type = it.type) }
 
-    fun toStates(parsed: List<AddressState>, parent: LogisticAddressDb): List<AddressStateDb> =
-        parsed.map { AddressStateDb(validFrom = it.validFrom?.toLocalDateTime(), validTo = it.validTo?.toLocalDateTime(), type = it.type, address = parent) }
+    fun toStates(parsed: List<AddressState>): List<AddressStateDb> =
+        parsed.map { AddressStateDb(validFrom = it.validFrom?.toLocalDateTime(), validTo = it.validTo?.toLocalDateTime(), type = it.type) }
 
     fun toScriptVariants(parsed: List<AddressScriptVariantParsed>): List<LogisticAddressScriptVariantDb> =
         parsed.map { variant ->

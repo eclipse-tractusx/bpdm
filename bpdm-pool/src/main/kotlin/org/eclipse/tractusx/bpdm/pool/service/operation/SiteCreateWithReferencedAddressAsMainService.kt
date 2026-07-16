@@ -53,7 +53,7 @@ class SiteCreateWithReferencedAddressAsMainService(
         val sites = siteHeaderTransientCreateService.createTransiently(parsed.map { SiteHeaderCreateParsed(it.mainAddress.legalEntity!!, it.siteHeader) })
 
         //Wire sites to site main address
-        val stagedAddressUpdates = parsed.zip(sites).map { (entry, site) -> addressStagedUpdateService.stageUpdate(entry.mainAddress) { it.sites.add(site) } }
+        val stagedAddressUpdates = parsed.zip(sites).map { (entry, site) -> addressStagedUpdateService.stageUpdate(entry.mainAddress) { it.assignToSite(site) } }
         sites.zip(stagedAddressUpdates).forEach { (site, stagedAddressUpdate) -> site.mainAddress = stagedAddressUpdate.address }
 
         siteRepository.saveAll(sites)
