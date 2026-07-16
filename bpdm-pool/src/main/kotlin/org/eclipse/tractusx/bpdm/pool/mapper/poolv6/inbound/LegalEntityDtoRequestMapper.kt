@@ -37,12 +37,9 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 
 /**
- * Pure translation of a **v6** legal-entity request into the shared loose domain [LegalEntityCreateRequest] /
- * [LegalEntityUpdateRequest] consumed by the legal-entity services. The v6 API differs from v7: the legal entity is flat
- * (no `header` wrapper), the legal address is a sibling request field rather than nested, there are no script variants,
- * and membership is `isCatenaXMemberData` (mapped to the domain's `isParticipantData`). No validation happens here — that
- * is the legal-entity service's `parse`. The legal address is delegated to the shared [AddressDtoRequestMapper] (with no
- * script variants); boundary time fields are converted from the API's `LocalDateTime` (UTC) to the domain's `Instant`.
+ * Maps a **v6** legal-entity request into the shared loose [LegalEntityCreateRequest] / [LegalEntityUpdateRequest]. v6
+ * differs from v7: the legal entity is flat (no `header` wrapper), the legal address is a sibling field (not nested),
+ * there are no script variants, and membership is `isCatenaXMemberData` (→ domain `isParticipantData`).
  */
 @Component("legalEntityDtoRequestMapperLegacy")
 class LegalEntityDtoRequestMapper(

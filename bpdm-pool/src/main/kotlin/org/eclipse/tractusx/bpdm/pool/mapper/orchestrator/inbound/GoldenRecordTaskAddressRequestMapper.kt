@@ -39,13 +39,9 @@ import org.eclipse.tractusx.orchestrator.api.model.PostalAddressWithScriptVarian
 import org.eclipse.tractusx.orchestrator.api.model.Street as TaskStreet
 
 /**
- * Pure translation of a cleaning task's address (the orchestrator business-partner model) into the loose
- * [LogisticAddressRequest] consumed by the address services. No validation happens here — that is the address services'
- * `parse` — so every field is passed through as-is (raw country strings, nullable values). The Pool-computed confidence
- * values (`numberOfSharingMembers`, `confidenceLevel`) are intentionally dropped: they are not part of an upsert.
- *
- * Orchestrator model types are aliased with a `Task` prefix to disambiguate them from the identically named loose
- * domain request types.
+ * Maps a cleaning task's address into the loose [LogisticAddressRequest]. Pool-computed confidence values
+ * (`numberOfSharingMembers`, `confidenceLevel`) are dropped — not part of an upsert. Orchestrator types are aliased
+ * `Task*` to disambiguate them from the identically named request types.
  */
 @Component
 class GoldenRecordTaskAddressRequestMapper {
@@ -53,12 +49,7 @@ class GoldenRecordTaskAddressRequestMapper {
     fun toContentRequest(address: TaskAddress): LogisticAddressRequest =
         toContentRequest(address.postalProperties, address.scriptVariants)
 
-    /**
-     * Overload for the legal / site main address, where the postal properties and the localized script variants are not
-     * bundled in a [TaskAddress] but travel separately (the postal address on the legal entity / site, the variants
-     * reconstructed per script code from its `scriptVariants`). Both callers ultimately produce the same
-     * [LogisticAddressRequest].
-     */
+    /** Legal / site main address: postal properties and script variants travel separately, not bundled in a [TaskAddress]. */
     fun toContentRequest(address: TaskPostalAddress, scriptVariants: List<TaskScriptVariant>): LogisticAddressRequest =
         LogisticAddressRequest(
             name = address.addressName,

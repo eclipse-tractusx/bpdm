@@ -34,14 +34,8 @@ import java.time.Instant
 import java.time.ZoneOffset
 
 /**
- * Pure translation from the parsed site header domain model to JPA entities. Builds only the site header — the main
- * address is built/applied by [AddressEntityMapper] / the address services. Carries no business logic and no side
- * effects: `numberOfSharingMembers` is supplied by the caller (1 for a new site, the preserved value for an update),
- * and confidence translation is delegated to [AddressEntityMapper] (it is not address-specific). The granular
- * sub-builders are reused by the update path, which assigns their outputs onto an existing managed entity.
- *
- * [toEntity] leaves `mainAddress` unset (it is `lateinit`): the create service assigns it after persisting the main
- * address, mirroring the cyclic site↔main-address relationship.
+ * Builds only the site header; the main address is [AddressEntityMapper]'s job. [toEntity] leaves `mainAddress` unset
+ * (`lateinit`) — the create service assigns it after persisting the address (cyclic site↔address relationship).
  */
 @Component
 class SiteEntityMapper(

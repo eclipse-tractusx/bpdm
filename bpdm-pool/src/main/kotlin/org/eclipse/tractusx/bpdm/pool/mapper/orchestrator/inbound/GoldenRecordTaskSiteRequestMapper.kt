@@ -35,16 +35,10 @@ import org.eclipse.tractusx.orchestrator.api.model.PostalAddressScriptVariantWit
 import org.eclipse.tractusx.orchestrator.api.model.Site as TaskSite
 
 /**
- * Pure translation of a cleaning task's site (the orchestrator business-partner model) into the loose domain site
- * requests consumed by the site services. No content validation happens here — that is the site service's `parse` — so
- * raw strings and nullable values are passed through. The main address (and its localized script variants, reconstructed
- * per script code from the site's `scriptVariants`) is delegated to [GoldenRecordTaskAddressRequestMapper]; the
- * Pool-computed confidence values are dropped there. The caller resolves which orchestrator address is the site main
- * address (the site's own or, when the site main is the legal address, the legal entity's legal address) and passes it in.
- *
- * The sole exception to pure pass-through is a missing state type: the loose request's [SiteState] type is non-null by
- * contract (the header parser reuses it as-is, see `SiteContentRequest`), so this boundary mapper enforces that
- * precondition — matching the previous throwing behavior of the task path.
+ * Maps a cleaning task's site into the loose [SiteCreateRequest] / [SiteUpdateRequest]; the main address is delegated to
+ * [GoldenRecordTaskAddressRequestMapper] and resolved by the caller (the site's own address, or the legal address when
+ * the site main is the legal address). Unlike the pass-through elsewhere, a missing [SiteState] type throws here — the
+ * loose request's type is non-null by contract.
  */
 @Component
 class GoldenRecordTaskSiteRequestMapper(

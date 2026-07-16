@@ -41,19 +41,10 @@ import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableAddress
 import org.springframework.stereotype.Component
 
 /**
- * Translates the address services' sealed parse errors into the version-specific [ErrorInfo] codes the
- * `/addresses` endpoints return. The `entityKey` (request index on create, BPN on update) is supplied by the
- * caller since it is a request-positioning concern, not part of the error.
- *
- * Two error cases have no equivalent in the public [AddressCreateError]/[AddressUpdateError] enums and are
- * treated as internal errors (throw → 500) rather than extending the API:
- *  - [AddressMetadataParseError.ScriptCodeNotFound]: the old REST path did not validate script codes and would
- *    NPE on an unknown one, so a 500 preserves that behaviour.
- *  - every [AddressFieldParseError]: unreachable here because the bounded Pool DTO already guarantees the
- *    presence/format these check; the throw asserts that invariant.
- *
- * The `when` blocks are deliberately exhaustive so a newly added parse error fails to compile here until it is
- * given a code (or an explicit internal-error decision).
+ * Maps the address services' sealed parse errors to the `/addresses` [ErrorInfo] codes. Two cases have no public enum and
+ * become internal errors (throw → 500): [AddressMetadataParseError.ScriptCodeNotFound] (the old REST path didn't validate
+ * script codes and NPE'd) and every [AddressFieldParseError] (unreachable — the bounded DTO already guarantees
+ * presence/format; the throw asserts that). The `when`s are exhaustive so a new error won't compile until it gets a code.
  */
 @Component
 class AddressParseErrorMapper {
@@ -91,10 +82,6 @@ class AddressParseErrorMapper {
             is UnresolvableSite -> throw internalError(error)
         }
 
-    /**
-     * For the legal address embedded in a legal-entity create: the content parser only ever produces
-     * [AddressContentParseError] (there is no parent to resolve here), mapped to the `LegalAddress*` codes.
-     */
     fun toLegalEntityCreateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfo<LegalEntityCreateError> =
         sharedErrorInfo(
             error,
@@ -105,10 +92,6 @@ class AddressParseErrorMapper {
             identifiersTooMany = LegalEntityCreateError.LegalAddressIdentifiersTooMany
         )
 
-    /**
-     * For the legal address embedded in a legal-entity update: the content parser only ever produces
-     * [AddressContentParseError], mapped to the `LegalAddress*` codes.
-     */
     fun toLegalEntityUpdateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfo<LegalEntityUpdateError> =
         sharedErrorInfo(
             error,
@@ -119,10 +102,6 @@ class AddressParseErrorMapper {
             identifiersTooMany = LegalEntityUpdateError.LegalAddressIdentifiersTooMany
         )
 
-    /**
-     * For the main address embedded in a site create: the content parser only ever produces
-     * [AddressContentParseError], mapped to the `MainAddress*` codes.
-     */
     fun toSiteCreateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfo<SiteCreateError> =
         sharedErrorInfo(
             error,
@@ -133,10 +112,6 @@ class AddressParseErrorMapper {
             identifiersTooMany = SiteCreateError.MainAddressIdentifiersTooMany
         )
 
-    /**
-     * For the main address embedded in a site update: the content parser only ever produces [AddressContentParseError],
-     * mapped to the `MainAddress*` codes.
-     */
     fun toSiteUpdateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfo<SiteUpdateError> =
         sharedErrorInfo(
             error,

@@ -32,16 +32,10 @@ import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableLegalEntity
 import org.springframework.stereotype.Component
 
 /**
- * Translates the legal-entity services' sealed parse errors into the version-specific [ErrorInfo] codes the
- * `/legal-entities` endpoints return. Target resolution and the embedded legal-address errors (delegated to
- * [AddressParseErrorMapper], mapped to the `LegalAddress*` codes) plus the legal-entity header content errors cover all
- * reachable cases.
- *
- * Of the [LegalEntityContentParseError] cases only legal form, identifier type, duplicate identifier and too-many
- * identifiers have a public `LegalEntity*Error` code. The presence errors (name/confidence/identifier value+type) are
- * guaranteed absent by the bounded REST DTO, and an unknown header script code previously NPE'd to a 500 — either way
- * those are treated as internal errors. The `when` blocks are exhaustive so a newly added parse error fails to compile
- * here until it is given a code.
+ * Maps the legal-entity services' sealed parse errors to the `/legal-entities` [ErrorInfo] codes (legal-address errors
+ * delegated to [AddressParseErrorMapper]). Only legal-form / identifier-type / duplicate / too-many identifiers have a
+ * public code; presence errors are guaranteed absent by the bounded DTO and an unknown header script code previously
+ * NPE'd — both become internal errors. The `when`s are exhaustive so a new error won't compile until it gets a code.
  */
 @Component
 class LegalEntityParseErrorMapper(

@@ -37,15 +37,9 @@ import org.eclipse.tractusx.bpdm.pool.service.mainSite
 import org.eclipse.tractusx.bpdm.pool.service.toDto
 
 /**
- * Shared v6 response mappers: translate persistence entities into the versioned `api.v6.model` DTOs. These previously
- * lived as duplicated member extensions inside the three `controller/v6` legacy service mappers; consolidating them here
- * removes that duplication and lets both the v6 read paths (legacy mappers) and the v6 write paths
- * (`service/application/v6` application services) share one copy. Mirrors the v7 side's `service/ResponseMappings.kt`.
- *
- * The aggregate DB→v6-DTO shapes are named `toV6Dto` rather than `toDto` on purpose: the leaf value mappers
- * (`getAddressType`, state/identifier/postal/confidence `toDto`) reused here are the shared, version-agnostic ones from
- * `service.ResponseMappings`, which also declares its own `LogisticAddressDb.toDto`/`SiteDb.toDto`/`LegalEntityDb.toDto`
- * for the current API — the distinct name keeps the two versions unambiguous wherever both are in scope.
+ * DB → `api.v6.model` DTO mappers. Aggregate shapes are named `toV6Dto`, not `toDto`, on purpose: the reused leaf value
+ * mappers from `service.ResponseMappings` also declare `toDto` for the current API, so the distinct name keeps the two
+ * versions unambiguous where both are in scope.
  */
 
 fun LogisticAddressDb.toV6Dto(): LogisticAddressVerboseDto {

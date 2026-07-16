@@ -36,13 +36,6 @@ import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
-/**
- * Pure translation of a Pool API legal-entity request into the loose domain [LegalEntityCreateRequest] /
- * [LegalEntityUpdateRequest] consumed by the legal-entity services. No validation happens here — that is the legal-entity
- * service's `parse`. The legal address (and its localized script variants, carried per-variant on the legal entity) is
- * delegated to [AddressDtoRequestMapper]; the Pool-computed confidence values are dropped there. Boundary time
- * fields are converted from the API's `LocalDateTime` (UTC) to the domain's `Instant`.
- */
 @Component
 class LegalEntityDtoRequestMapper(
     private val addressDtoRequestMapper: AddressDtoRequestMapper

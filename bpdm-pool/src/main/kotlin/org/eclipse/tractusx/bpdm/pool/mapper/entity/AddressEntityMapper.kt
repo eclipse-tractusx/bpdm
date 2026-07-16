@@ -29,14 +29,8 @@ import java.time.Instant
 import java.time.ZoneOffset
 
 /**
- * Pure translation from the parsed address domain model to JPA entities. Carries no business logic and no side effects:
- * `numberOfSharingMembers` is supplied by the caller (the create/update service decides it — 0 for a new address, the
- * preserved value for an update) and `confidenceLevel` is derived by [ConfidenceCriteriaDb] itself. The granular
- * sub-builders are reused by the update path, which assigns their outputs onto an existing managed entity.
- *
- * Sub-entities that hold a back-reference to their address ([AddressIdentifierDb], [AddressStateDb]) are built without a
- * parent here; wiring the back-reference is the caller's job (see [toEntity] for creates, the address mutator for
- * updates), which keeps this mapper a pure translation.
+ * Identifier/state sub-entities are built without their address back-reference — the caller wires it ([toEntity] for
+ * creates, the mutator for updates). `numberOfSharingMembers` is caller-supplied, not derived here.
  */
 @Component
 class AddressEntityMapper {

@@ -35,15 +35,8 @@ import java.time.Instant
 import java.time.ZoneOffset
 
 /**
- * Pure translation from the parsed legal-entity header domain model to JPA entities. Builds only the legal-entity header —
- * the legal address is built/applied by [AddressEntityMapper] / the address services. Carries no business logic and no
- * side effects: `currentness` and `numberOfSharingMembers` are supplied by the caller (the service stamps the current
- * timestamp and supplies the sharing-member count), and confidence translation is delegated to [AddressEntityMapper] (it
- * is not address-specific). The granular sub-builders are reused by the update path, which assigns their outputs onto an
- * existing managed entity.
- *
- * [toEntity] leaves `legalAddress` unset (it is `lateinit`): the create service assigns it after persisting the legal
- * address, mirroring the cyclic legal-entity↔legal-address relationship.
+ * Builds only the legal-entity header; the legal address is [AddressEntityMapper]'s job. [toEntity] leaves `legalAddress`
+ * unset (`lateinit`) — the create service assigns it after persisting the address (cyclic entity↔address relationship).
  */
 @Component
 class LegalEntityEntityMapper(

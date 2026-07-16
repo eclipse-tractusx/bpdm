@@ -41,11 +41,9 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 
 /**
- * Pure translation of a Pool API logistic address into the loose [LogisticAddressRequest] consumed by the address
- * services. No validation happens here — that is the address services' `parse` — so the country enum is passed on as its
- * raw alpha-2 string and the parser re-validates it through the single funnel. The Pool-computed confidence values
- * (`numberOfSharingMembers`, `confidenceLevel`) are intentionally dropped: they are not part of an upsert. Boundary time
- * fields are converted from the API's `LocalDateTime` (UTC) to the domain's `Instant`.
+ * Maps a Pool API logistic address into the loose [LogisticAddressRequest]. No validation here (the parser's job), so the
+ * country enum is passed on as its raw alpha-2 string for the parser to re-validate; Pool-computed confidence values are
+ * dropped (not part of an upsert).
  */
 @Component
 class AddressDtoRequestMapper {

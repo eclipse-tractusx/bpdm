@@ -34,15 +34,10 @@ import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableSite
 import org.springframework.stereotype.Component
 
 /**
- * Translates the site services' sealed parse errors into the version-specific [ErrorInfo] codes the `/sites` endpoints
- * return. Parent/target resolution and the embedded main-address errors (delegated to [AddressParseErrorMapper], mapped
- * to the `MainAddress*` codes) cover all reachable cases.
- *
- * [SiteContentParseError] (site header) has no public `Site*Error` code: name/confidence are guaranteed present by the
- * bounded REST DTO (so those are unreachable), and an unknown header script code previously NPE'd to a 500. Likewise
- * [UnresolvableAddress] (the referenced main address of the "site from additional address" path) has no public code: that
- * path's caller only invokes it for an address it just resolved. Either way it is treated as an internal error. The
- * `when` blocks are exhaustive so a newly added parse error fails to compile here until it is given a code.
+ * Maps the site services' sealed parse errors to the `/sites` [ErrorInfo] codes (main-address errors delegated to
+ * [AddressParseErrorMapper]). [SiteContentParseError] has no public code (name/confidence guaranteed by the bounded DTO;
+ * unknown header script code previously NPE'd) and neither does [UnresolvableAddress] (its path is only invoked for an
+ * address just resolved) — all internal errors. The `when`s are exhaustive so a new error won't compile until it gets a code.
  */
 @Component
 class SiteParseErrorMapper(

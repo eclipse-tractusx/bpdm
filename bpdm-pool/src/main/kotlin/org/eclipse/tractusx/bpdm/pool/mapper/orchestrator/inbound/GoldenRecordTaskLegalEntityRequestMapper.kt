@@ -33,15 +33,10 @@ import org.eclipse.tractusx.orchestrator.api.model.LegalEntity as TaskLegalEntit
 import org.eclipse.tractusx.orchestrator.api.model.PostalAddressScriptVariantWithScriptCode as TaskScriptVariant
 
 /**
- * Pure translation of a cleaning task's legal entity (the orchestrator business-partner model) into the loose domain
- * [LegalEntityCreateRequest] / [LegalEntityUpdateRequest] consumed by the legal-entity services. No content validation
- * happens here — that is the legal-entity service's `parse` — so raw strings and nullable values are passed through. The
- * legal address (and its localized script variants, reconstructed per script code from the legal entity's `scriptVariants`)
- * is delegated to [GoldenRecordTaskAddressRequestMapper]; the Pool-computed confidence values are dropped there.
- *
- * The sole exception to pure pass-through is a missing state type: the loose request's [LegalEntityState] type is
- * non-null by contract (the header parser reuses it as-is, see `LegalEntityContentRequest`), so this boundary mapper
- * enforces that precondition — matching the previous throwing behavior of the task path.
+ * Maps a cleaning task's legal entity into the loose [LegalEntityCreateRequest] / [LegalEntityUpdateRequest]; the legal
+ * address is delegated to [GoldenRecordTaskAddressRequestMapper]. Unlike the pass-through elsewhere, a missing
+ * [LegalEntityState] type throws here — the loose request's type is non-null by contract (matches the task path's prior
+ * behavior).
  */
 @Component
 class GoldenRecordTaskLegalEntityRequestMapper(
