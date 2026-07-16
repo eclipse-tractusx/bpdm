@@ -28,14 +28,6 @@ import org.eclipse.tractusx.bpdm.pool.model.combine
 import org.eclipse.tractusx.bpdm.pool.model.zipParseResults
 import org.springframework.stereotype.Service
 
-/**
- * Parses legal-entity-create requests into the [LegalEntityCreateParsed] command consumed by
- * [org.eclipse.tractusx.bpdm.pool.service.operation.LegalEntityCreateService]. A legal entity is the top of the hierarchy
- * so there is no parent to resolve: this validates the header + identifier-uniqueness (no owner BPN yet, so every
- * identifier collides only within the batch or against the DB) + legal-address content, each by a single-responsibility
- * parser, combined with `combine`/`zipParseResults`. Order-preserving positional contract (see
- * [org.eclipse.tractusx.bpdm.pool.model.ParseResult]).
- */
 @Service
 class LegalEntityCreateParser(
     private val legalEntityHeaderParser: LegalEntityHeaderParser,

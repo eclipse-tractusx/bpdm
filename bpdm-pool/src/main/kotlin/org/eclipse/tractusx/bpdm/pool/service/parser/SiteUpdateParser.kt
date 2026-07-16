@@ -27,12 +27,6 @@ import org.eclipse.tractusx.bpdm.pool.model.request.SiteUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.model.zipParseResults
 import org.springframework.stereotype.Service
 
-/**
- * Parses site-update requests into the [SiteUpdateParsed] command consumed by
- * [org.eclipse.tractusx.bpdm.pool.service.operation.SiteUpdateService]. Resolves the (mandatory) target site BPN to its
- * existing entity and validates the header + main-address content — the main address's duplicate check is scoped by the
- * resolved target's own main-address BPN. Order-preserving positional contract (see [org.eclipse.tractusx.bpdm.pool.model.ParseResult]).
- */
 @Service
 class SiteUpdateParser(
     private val siteHeaderParser: SiteHeaderParser,

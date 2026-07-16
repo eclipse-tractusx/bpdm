@@ -26,13 +26,6 @@ import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.zipParseResults
 import org.springframework.stereotype.Service
 
-/**
- * Parses address-create requests whose parents are given as *typed* BPNs into the resolved [AddressCreateParsed] command
- * consumed by [org.eclipse.tractusx.bpdm.pool.service.operation.AddressCreateService]. Validates address content (as a
- * create, so no owner BPN) and resolves the legal-entity / site BPNs to entities — yielding `UnresolvableLegalEntity` /
- * `UnresolvableSite` on a miss — combining the independent verdicts with `zipParseResults`. Order-preserving positional
- * contract (see [org.eclipse.tractusx.bpdm.pool.model.ParseResult]).
- */
 @Service
 class TypedParentAddressCreateParser(
     private val addressContentParser: AddressContentParser,

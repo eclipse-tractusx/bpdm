@@ -27,12 +27,6 @@ import org.eclipse.tractusx.bpdm.pool.model.request.SiteCreateRequest
 import org.eclipse.tractusx.bpdm.pool.model.zipParseResults
 import org.springframework.stereotype.Service
 
-/**
- * Parses site-create requests into the [SiteCreateParsed] command consumed by
- * [org.eclipse.tractusx.bpdm.pool.service.operation.SiteCreateService]. Resolves the legal-entity parent and validates
- * the site header + main-address content (as a create, so no owner BPN), each by a single-responsibility parser,
- * combined with `zipParseResults`. Order-preserving positional contract (see [org.eclipse.tractusx.bpdm.pool.model.ParseResult]).
- */
 @Service
 class SiteCreateParser(
     private val siteHeaderParser: SiteHeaderParser,

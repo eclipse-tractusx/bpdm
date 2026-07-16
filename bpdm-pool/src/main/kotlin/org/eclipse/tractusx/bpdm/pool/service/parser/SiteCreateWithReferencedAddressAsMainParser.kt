@@ -26,12 +26,6 @@ import org.eclipse.tractusx.bpdm.pool.model.request.SiteCreateWithReferencedAddr
 import org.eclipse.tractusx.bpdm.pool.model.zipParseResults
 import org.springframework.stereotype.Service
 
-/**
- * Parses "site with referenced address as main" requests into the [SiteCreateWithReferencedAddressAsMainParsed] command
- * consumed by [org.eclipse.tractusx.bpdm.pool.service.operation.SiteCreateWithReferencedAddressAsMainService]. Validates
- * the site header and resolves the referenced address BPN (the re-parent target, yielding `UnresolvableAddress` on a
- * miss). Order-preserving positional contract (see [org.eclipse.tractusx.bpdm.pool.model.ParseResult]).
- */
 @Service
 class SiteCreateWithReferencedAddressAsMainParser(
     private val siteHeaderParser: SiteHeaderParser,

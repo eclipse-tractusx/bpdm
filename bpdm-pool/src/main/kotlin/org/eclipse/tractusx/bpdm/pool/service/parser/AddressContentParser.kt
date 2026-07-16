@@ -27,13 +27,9 @@ import org.eclipse.tractusx.bpdm.pool.model.combine
 import org.springframework.stereotype.Service
 
 /**
- * The single owner of address-content validation, shared by every address create and update path. Combines the pure
- * content parse ([AddressRequestParser]) with the identity-aware identifier uniqueness check
- * ([AddressIdentifierDuplicateValidator]) into one order-preserving, per-entry result.
- *
- * [ownerBpns] is positional with [contents]: `null` for create (a new address owns no identifiers yet), the address's
- * own BPN for update (so it may legitimately re-submit its own existing identifiers). Order-preserving positional
- * contract (see [org.eclipse.tractusx.bpdm.pool.model.ParseResult]).
+ * The shared entry point for address-content validation — reused for standalone addresses, legal-entity legal addresses,
+ * and site main addresses. [ownerBpns] is positional with [contents]: `null` for create, the address's own BPN for
+ * update, so an update may re-submit its own existing identifiers.
  */
 @Service
 class AddressContentParser(

@@ -27,12 +27,9 @@ import org.eclipse.tractusx.bpdm.pool.model.zipParseResults
 import org.springframework.stereotype.Service
 
 /**
- * Parses "site with legal address as main" requests into a [SiteCreateWithReferencedAddressAsMainParsed] command: this
- * path is just the referenced-address case where the referenced main address is the parent legal entity's own legal
- * address. It resolves the legal-entity parent and validates the site header, then hands off the legal address as the
- * (already-resolved) main address — so [org.eclipse.tractusx.bpdm.pool.service.operation.SiteCreateWithReferencedAddressAsMainService]
- * can create it with no dedicated legal-address operation. Order-preserving positional contract (see
- * [org.eclipse.tractusx.bpdm.pool.model.ParseResult]).
+ * The "legal address as main" path is just the referenced-address case where the referenced main address is the parent
+ * legal entity's own legal address, so it produces a [SiteCreateWithReferencedAddressAsMainParsed] and needs no dedicated
+ * legal-address operation.
  */
 @Service
 class SiteCreateWithLegalAddressAsMainParser(

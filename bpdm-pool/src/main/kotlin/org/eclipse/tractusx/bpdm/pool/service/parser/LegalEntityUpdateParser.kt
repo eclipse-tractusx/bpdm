@@ -28,13 +28,6 @@ import org.eclipse.tractusx.bpdm.pool.model.combine
 import org.eclipse.tractusx.bpdm.pool.model.zipParseResults
 import org.springframework.stereotype.Service
 
-/**
- * Parses legal-entity-update requests into the [LegalEntityUpdateParsed] command consumed by
- * [org.eclipse.tractusx.bpdm.pool.service.operation.LegalEntityUpdateService]. Resolves the target BPN to its existing
- * entity (yielding `UnresolvableLegalEntity` on a miss) and validates the header + identifier-uniqueness + legal-address
- * content — the identifier and legal-address duplicate checks are scoped by the resolved target's own BPN so it may keep
- * its own identifiers. Order-preserving positional contract (see [org.eclipse.tractusx.bpdm.pool.model.ParseResult]).
- */
 @Service
 class LegalEntityUpdateParser(
     private val legalEntityBpnParser: LegalEntityBpnParser,

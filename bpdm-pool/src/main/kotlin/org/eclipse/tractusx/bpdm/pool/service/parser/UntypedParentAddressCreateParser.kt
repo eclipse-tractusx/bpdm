@@ -27,11 +27,8 @@ import org.eclipse.tractusx.bpdm.pool.model.chainParseResults
 import org.springframework.stereotype.Service
 
 /**
- * Parses address-create requests carrying a single, *untyped* parent BPN (the V7 "additional address" REST path) into the
- * resolved [AddressCreateParsed] command. Resolves the BPN into the explicit (legalEntity, site) parents via
- * [AddressParentResolutionParser] — reporting the precise `InvalidParentBpn`/`UnresolvableLegalEntity`/`UnresolvableSite`
- * errors the typed stage cannot distinguish — then delegates content validation to [TypedParentAddressCreateParser].
- * Order-preserving positional contract (see [org.eclipse.tractusx.bpdm.pool.model.ParseResult]).
+ * Handles the V7 "additional address" REST path, where the parent is a single *untyped* BPN: resolves it into explicit
+ * (legalEntity, site) parents via [AddressParentResolutionParser], then delegates to [TypedParentAddressCreateParser].
  */
 @Service
 class UntypedParentAddressCreateParser(

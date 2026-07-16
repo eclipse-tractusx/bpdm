@@ -26,14 +26,6 @@ import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.zipParseResults
 import org.springframework.stereotype.Service
 
-/**
- * Parses address-update requests into the resolved [AddressUpdateParsed] command consumed by
- * [org.eclipse.tractusx.bpdm.pool.service.operation.AddressFullUpdateService]. Resolves the target BPN to its existing entity
- * (yielding `UnresolvableAddress` on a miss), resolves the optional site parent, and validates address content as an
- * update — the target's own BPN is passed as the identifier-uniqueness owner so it may keep its own identifiers.
- * Verdicts are combined with `zipParseResults`. Order-preserving positional contract (see
- * [org.eclipse.tractusx.bpdm.pool.model.ParseResult]).
- */
 @Service
 class AddressUpdateParser(
     private val addressContentParser: AddressContentParser,

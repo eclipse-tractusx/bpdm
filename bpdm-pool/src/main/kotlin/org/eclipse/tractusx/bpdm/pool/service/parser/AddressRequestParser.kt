@@ -50,31 +50,9 @@ import org.eclipse.tractusx.bpdm.pool.repository.ScriptCodeRepository
 import org.eclipse.tractusx.bpdm.pool.util.ValidationLimits
 import org.springframework.stereotype.Service
 
-/*******************************************************************************
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
- *
- * See the NOTICE file(s) distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This program and the accompanying materials are made available under the
- * terms of the Apache License, Version 2.0 which is available at
- * https://www.apache.org/licenses/LICENSE-2.0.
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations
- * under the License.
- *
- * SPDX-License-Identifier: Apache-2.0
- ******************************************************************************/
 /**
- * Validates loose [org.eclipse.tractusx.bpdm.pool.model.request.LogisticAddressRequest] content into the bounded, metadata-resolved [org.eclipse.tractusx.bpdm.pool.model.parsed.LogisticAddressParsed], the
- * shared step of both address create and update parsing. All errors are accumulated (not fail-fast) so one entry's report
- * is complete, and they are [org.eclipse.tractusx.bpdm.pool.model.error.AddressContentParseError] (field + metadata), each a subtype of both operation error types.
- *
- * [fetchMetadata] resolves all metadata for a whole batch in one query per kind; [parse] then validates a single entry
- * against that pre-fetched metadata.
+ * Shared by both address create and update parsing — hence its [AddressContentParseError]s subtype both operation error
+ * types. Errors are accumulated (not fail-fast) so one entry's report is complete.
  */
 @Service
 class AddressRequestParser(
