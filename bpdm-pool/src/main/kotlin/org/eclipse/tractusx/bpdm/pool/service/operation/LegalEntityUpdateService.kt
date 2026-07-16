@@ -60,8 +60,7 @@ class LegalEntityUpdateService(
             AddressUpdateParsed(
                 it.target.legalAddress,
                 null,
-                it.content.legalAddress.address,
-                it.content.legalAddress.scriptVariants
+                it.content.legalAddress
             )
         }
         val stagedLegalAddresses = addressFullUpdateService.stageUpdate(legalAddressRequests)

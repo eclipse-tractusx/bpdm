@@ -19,16 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.request
 
-/**
- * Request to create an address whose parents are given as *typed* BPNs: the parent roles are already known — the legal
- * entity is always supplied, the site optional — but the BPNs are still unresolved strings. `parse` resolves them to
- * entities (or yields `UnresolvableLegalEntity`/`UnresolvableSite`), producing an [AddressCreateParsed].
- *
- * This is the middle stage of the parent-resolution pipeline: [AddressCreateUntypedParentRequest] (single BPN, role not
- * yet known) resolves down to this; this resolves down to [AddressCreateResolvedParentsRequest] (parent entities in hand).
- */
 data class AddressCreateTypedParentsRequest(
     val legalEntityBpn: String,
     val siteBpn: String?,
-    val content: AddressContentRequest
+    val content: LogisticAddressRequest
 )

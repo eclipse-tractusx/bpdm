@@ -23,8 +23,7 @@ import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.pool.util.ValidationLimits
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.model.error.AddressConstraintParseError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressContentParsed
-import org.eclipse.tractusx.bpdm.pool.model.request.AddressContentRequest
+import org.eclipse.tractusx.bpdm.pool.model.request.LogisticAddressRequest
 import org.eclipse.tractusx.bpdm.pool.model.error.AddressFieldParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressIdentifierParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.AddressIdentifierRequest
@@ -66,17 +65,16 @@ class LogisticAddressRequestParser(
     private val scriptCodeRepository: ScriptCodeRepository
 ) {
 
-    fun parse(contents: List<AddressContentRequest>): List<ParseResult<AddressContentParsed, AddressContentParseError>> {
+    fun parse(contents: List<LogisticAddressRequest>): List<ParseResult<LogisticAddressParsed, AddressContentParseError>> {
         val metadata = fetchMetadata(contents)
         return contents.map { parseEntry(it, metadata) }
     }
 
-    private fun fetchMetadata(contents: List<AddressContentRequest>): AddressMetadata {
-        val addresses = contents.map { it.address }
+    private fun fetchMetadata(contents: List<LogisticAddressRequest>): AddressMetadata {
         val scriptVariants = contents.flatMap { it.scriptVariants }
 
-        val idTypeKeys = addresses.flatMap { it.identifiers }.mapNotNull { it.type }.toSet()
-        val regionKeys = addresses.flatMap {
+        val idTypeKeys = contents.flatMap { it.identifiers }.mapNotNull { it.type }.toSet()
+        val regionKeys = contents.flatMap {
             listOfNotNull(it.physicalPostalAddress.administrativeAreaLevel1, it.alternativePostalAddress?.administrativeAreaLevel1)
         }.toSet()
         val scriptCodeKeys = scriptVariants.map { it.scriptCode }.toSet()
@@ -93,11 +91,9 @@ class LogisticAddressRequestParser(
     }
 
     private fun parseEntry(
-        content: AddressContentRequest,
+        request: LogisticAddressRequest,
         metadata: AddressMetadata
-    ): ParseResult<AddressContentParsed, AddressContentParseError> {
-        val request = content.address
-        val scriptVariants = content.scriptVariants
+    ): ParseResult<LogisticAddressParsed, AddressContentParseError> {
         val errors = mutableListOf<AddressContentParseError>()
 
         val physical = parsePhysical(request.physicalPostalAddress, metadata, errors)
@@ -105,21 +101,19 @@ class LogisticAddressRequestParser(
         val confidence = parseConfidence(request.confidenceCriteria, errors)
         val identifiers = parseIdentifiers(request.identifiers, metadata, errors)
         val states = parseStates(request.states, errors)
-        val parsedScriptVariants = scriptVariants.mapIndexedNotNull { index, variant -> parseScriptVariant(index, variant, metadata, errors) }
+        val parsedScriptVariants = request.scriptVariants.mapIndexedNotNull { index, variant -> parseScriptVariant(index, variant, metadata, errors) }
 
         if (errors.isNotEmpty()) return ParseResult.Failure(errors)
 
         // No errors guarantees the nullable sub-results above are present.
         return ParseResult.Success(
-            AddressContentParsed(
-                address = LogisticAddressParsed(
-                    name = request.name,
-                    states = states,
-                    identifiers = identifiers,
-                    physicalPostalAddress = physical!!,
-                    alternativePostalAddress = alternative,
-                    confidenceCriteria = confidence!!
-                ),
+            LogisticAddressParsed(
+                name = request.name,
+                states = states,
+                identifiers = identifiers,
+                physicalPostalAddress = physical!!,
+                alternativePostalAddress = alternative,
+                confidenceCriteria = confidence!!,
                 scriptVariants = parsedScriptVariants
             )
         )

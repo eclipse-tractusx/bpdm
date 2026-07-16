@@ -48,8 +48,7 @@ class SiteCreateService(
     fun create(parsed: List<SiteCreateParsed>): List<SiteDb> {
         val sites = siteHeaderTransientCreateService.createTransiently(parsed.map { SiteHeaderCreateParsed(it.legalEntity, it.content.header) })
         val stagedAddresses = addressCreateService.stageCreate(parsed.zip(sites).map { (entry, site) ->
-            val mainAddress = entry.content.mainAddress
-            AddressCreateParsed(site.legalEntity, site, mainAddress.address, mainAddress.scriptVariants)
+            AddressCreateParsed(site.legalEntity, site, entry.content.mainAddress)
         })
 
         sites.zip(stagedAddresses).forEach { (site, stagedAddress) -> site.mainAddress = stagedAddress.address }

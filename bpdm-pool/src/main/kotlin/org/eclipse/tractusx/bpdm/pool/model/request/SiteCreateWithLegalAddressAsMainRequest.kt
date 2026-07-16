@@ -19,12 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.request
 
-/**
- * Request to create a site whose main address *is* the existing legal address of the legal entity identified by
- * [legalEntityBpn] (no new address is created). Unlike [SiteCreateRequest] there is no main-address content — only the
- * site [header]. `parse` resolves the parent BPN to an entity (or yields [UnresolvableLegalEntity]) and rejects a legal
- * address that already backs another site ([LegalAddressAlreadyMainAddress]).
- */
 data class SiteCreateWithLegalAddressAsMainRequest(
     val legalEntityBpn: String,
     val header: SiteHeaderRequest

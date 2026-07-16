@@ -41,7 +41,7 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 
 /**
- * Pure translation of a Pool API logistic address into the loose [AddressContentRequest] consumed by the address
+ * Pure translation of a Pool API logistic address into the loose [LogisticAddressRequest] consumed by the address
  * services. No validation happens here — that is the address services' `parse` — so the country enum is passed on as its
  * raw alpha-2 string and the parser re-validates it through the single funnel. The Pool-computed confidence values
  * (`numberOfSharingMembers`, `confidenceLevel`) are intentionally dropped: they are not part of an upsert. Boundary time
@@ -50,24 +50,19 @@ import java.time.ZoneOffset
 @Component
 class AddressDtoRequestMapper {
 
-    fun toContentRequest(address: LogisticAddressDto, scriptVariants: List<LogisticAddressScriptVariantDto>): AddressContentRequest =
-        AddressContentRequest(
-            address = toAddressRequest(address),
-            scriptVariants = scriptVariants.map { toScriptVariant(it) }
-        )
-
-    fun toContentRequest(addressWithScriptVariants: LogisticAddressWithScriptVariantsDto): AddressContentRequest =
-        toContentRequest(addressWithScriptVariants.address, addressWithScriptVariants.scriptVariants)
-
-    private fun toAddressRequest(address: LogisticAddressDto): LogisticAddressRequest =
+    fun toContentRequest(address: LogisticAddressDto, scriptVariants: List<LogisticAddressScriptVariantDto>): LogisticAddressRequest =
         LogisticAddressRequest(
             name = address.name,
             states = address.states.map { toStateRequest(it) },
             identifiers = address.identifiers.map { toIdentifierRequest(it) },
             physicalPostalAddress = toPhysicalRequest(address.physicalPostalAddress),
             alternativePostalAddress = address.alternativePostalAddress?.let { toAlternativeRequest(it) },
-            confidenceCriteria = toConfidenceRequest(address.confidenceCriteria)
+            confidenceCriteria = toConfidenceRequest(address.confidenceCriteria),
+            scriptVariants = scriptVariants.map { toScriptVariant(it) }
         )
+
+    fun toContentRequest(addressWithScriptVariants: LogisticAddressWithScriptVariantsDto): LogisticAddressRequest =
+        toContentRequest(addressWithScriptVariants.address, addressWithScriptVariants.scriptVariants)
 
     private fun toPhysicalRequest(physical: PhysicalPostalAddressDto): PhysicalPostalAddressRequest =
         PhysicalPostalAddressRequest(

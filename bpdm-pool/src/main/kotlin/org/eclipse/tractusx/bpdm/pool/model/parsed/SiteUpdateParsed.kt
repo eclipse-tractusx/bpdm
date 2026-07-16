@@ -21,10 +21,6 @@ package org.eclipse.tractusx.bpdm.pool.model.parsed
 
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 
-/**
- * Result of parsing a [SiteUpdateRequest]: the [target] resolved to its existing entity and the loose content validated
- * to [SiteContentParsed]. `update` consumes it directly to apply changes to [target].
- */
 data class SiteUpdateParsed(
     val target: SiteDb,
     val content: SiteContentParsed

@@ -24,20 +24,11 @@ import org.eclipse.tractusx.bpdm.pool.entity.LegalFormDb
 import org.eclipse.tractusx.bpdm.pool.entity.ScriptCodeDb
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityState
 
-/**
- * Bounded counterpart of [LegalEntityContentRequest]: the validated [header] plus the legal address validated to the
- * shared [AddressContentParsed]. The entity mapper consumes it to build/mutate a legal entity.
- */
 data class LegalEntityContentParsed(
     val header: LegalEntityHeaderParsed,
-    val legalAddress: AddressContentParsed
+    val legalAddress: LogisticAddressParsed
 )
 
-/**
- * Bounded counterpart of [LegalEntityHeaderRequest]: name/confidence validated to non-null, legal form and identifier
- * types and script-variant codes resolved to entities. `legalForm` stays nullable (it is optional; only a supplied-but-
- * unknown value is an error).
- */
 data class LegalEntityHeaderParsed(
     val legalName: String,
     val legalShortName: String?,
@@ -49,14 +40,12 @@ data class LegalEntityHeaderParsed(
     val scriptVariants: List<LegalEntityScriptVariantParsed>
 )
 
-/** Parsed counterpart of [LegalEntityIdentifier] with the type resolved to its entity. */
 data class LegalEntityIdentifierParsed(
     val value: String,
     val type: IdentifierTypeDb,
     val issuingBody: String?
 )
 
-/** Parsed counterpart of [LegalEntityScriptVariant] with the script code resolved to its entity. */
 data class LegalEntityScriptVariantParsed(
     val scriptCode: ScriptCodeDb,
     val legalName: String?,

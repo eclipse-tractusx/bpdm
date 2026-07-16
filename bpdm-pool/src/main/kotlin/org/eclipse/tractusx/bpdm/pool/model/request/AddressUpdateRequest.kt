@@ -19,12 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.request
 
-/**
- * Request to update an existing address identified by [addressBpn]. Update never re-parents, so no parent fields are
- * carried. `parse` resolves the target (or yields `UnresolvableAddress`).
- */
 data class AddressUpdateRequest(
     val addressBpn: String,
     val siteBpn: String?,
-    val content: AddressContentRequest
+    val content: LogisticAddressRequest
 )

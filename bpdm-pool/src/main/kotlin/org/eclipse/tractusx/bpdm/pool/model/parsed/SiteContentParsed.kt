@@ -22,19 +22,11 @@ package org.eclipse.tractusx.bpdm.pool.model.parsed
 import org.eclipse.tractusx.bpdm.pool.entity.ScriptCodeDb
 import org.eclipse.tractusx.bpdm.pool.model.SiteState
 
-/**
- * Bounded counterpart of [SiteContentRequest]: the validated [header] plus the main address validated to the shared
- * [AddressContentParsed]. The entity mapper consumes it to build/mutate a site.
- */
 data class SiteContentParsed(
     val header: SiteHeaderParsed,
-    val mainAddress: AddressContentParsed
+    val mainAddress: LogisticAddressParsed
 )
 
-/**
- * Bounded counterpart of [SiteHeaderRequest]: name/confidence validated to non-null and script-variant codes resolved
- * to entities.
- */
 data class SiteHeaderParsed(
     val name: String,
     val states: List<SiteState>,
@@ -42,7 +34,6 @@ data class SiteHeaderParsed(
     val scriptVariants: List<SiteScriptVariantParsed>
 )
 
-/** Parsed counterpart of [SiteScriptVariant] with the script code resolved to its entity. */
 data class SiteScriptVariantParsed(
     val scriptCode: ScriptCodeDb,
     val name: String

@@ -21,11 +21,6 @@ package org.eclipse.tractusx.bpdm.pool.model.parsed
 
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 
-/**
- * Input to `SiteWriter.stageCreate`: the resolved parent legal entity and a validated site header, but no main address.
- * It carries only what is needed to build the site header — the caller pairs its own resolved parent with the header
- * validated by the site header parser. The main address is the caller's concern (see the writer doc).
- */
 data class SiteHeaderCreateParsed(
     val legalEntity: LegalEntityDb,
     val header: SiteHeaderParsed

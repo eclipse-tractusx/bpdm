@@ -19,12 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.request
 
-/**
- * Request to create a site whose main address is the *existing* address referenced by [mainAddressBpn] (an additional
- * address re-parented onto the new site, keeping its BPN). Unlike [SiteCreateRequest] no new address is minted: the
- * referenced address's content is overwritten from [content]'s main address. `parse` resolves the parent BPN
- * ([UnresolvableLegalEntity]) and the referenced address ([UnresolvableAddress]) and validates [content].
- */
 data class SiteCreateWithReferencedAddressAsMainRequest(
     val mainAddressBpn: String,
     val content: SiteContentRequest

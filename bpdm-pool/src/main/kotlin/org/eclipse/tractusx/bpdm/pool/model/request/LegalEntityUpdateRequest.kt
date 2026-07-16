@@ -19,10 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.request
 
-/**
- * Request to update the existing legal entity identified by [legalEntityBpn]. `parse` resolves the target (or yields
- * [UnresolvableLegalEntity]) and validates the [content].
- */
 data class LegalEntityUpdateRequest(
     val legalEntityBpn: String,
     val content: LegalEntityContentRequest

@@ -47,7 +47,7 @@ class AddressUpdateParser(
         val siteResults = siteBpnParser.parse(requests.map { it.siteBpn })
 
         return zipParseResults(contentResults, targetResults, siteResults) { content, target, site ->
-            AddressUpdateParsed(target, site, content.address, content.scriptVariants)
+            AddressUpdateParsed(target, site, content)
         }
     }
 }

@@ -22,14 +22,8 @@ package org.eclipse.tractusx.bpdm.pool.model.parsed
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 
-/**
- * Result of parsing an [AddressUpdateRequest]: the loose request has been validated to a bounded [LogisticAddressParsed] and
- * the target BPN resolved to its existing entity. Update never re-parents, so no parent entities are carried. `update`
- * consumes it directly to apply changes to [target].
- */
 data class AddressUpdateParsed(
     val target: LogisticAddressDb,
     val site: SiteDb?,
-    val address: LogisticAddressParsed,
-    val scriptVariants: List<AddressScriptVariantParsed>
+    val address: LogisticAddressParsed
 )

@@ -53,8 +53,7 @@ class LegalEntityCreateService(
     fun create(parsed: List<LegalEntityCreateParsed>): List<LegalEntityDb> {
         val legalEntities = createHeaders(parsed.map { it.content.header })
         val stagedAddresses = addressCreateService.stageCreate(parsed.zip(legalEntities).map { (entry, legalEntity) ->
-            val legalAddress = entry.content.legalAddress
-            AddressCreateParsed(legalEntity, site = null, legalAddress.address, legalAddress.scriptVariants)
+            AddressCreateParsed(legalEntity, site = null, entry.content.legalAddress)
         })
 
         legalEntities.zip(stagedAddresses).forEach { (legalEntity, stagedAddress) -> legalEntity.legalAddress = stagedAddress.address }

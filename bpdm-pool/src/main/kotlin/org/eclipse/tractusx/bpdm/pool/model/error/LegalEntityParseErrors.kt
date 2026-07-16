@@ -24,14 +24,9 @@ sealed interface LegalEntityCreateParseError
 sealed interface LegalEntityUpdateParseError
 
 /**
- * Errors produced by parsing legal-entity *header* content (everything but the legal address). As a subtype of both legal-
- * entity operations from a single definition, the same content errors flow into create and update without wrapping; the
- * legal address contributes its own [AddressContentParseError], which is likewise a legal-entity error directly.
- *
- * Kept flat (no Field/Metadata/Constraint sub-grouping like the address errors) because legal-entity create and update
- * share the whole set and no caller needs to match a sub-group. The identifier presence errors and `DuplicateIdentifier`
- * carry the offending entry's `index`; `DuplicateIdentifier` is produced by [org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntityIdentifierDuplicateValidator]
- * (it needs the owner BPN), the rest by the header parser.
+ * Legal-entity header parse errors, shared by create and update. Kept flat (unlike the address errors' Field/Metadata/
+ * Constraint grouping) since no caller matches a sub-group. The legal address contributes its own
+ * [AddressContentParseError] directly.
  */
 sealed interface LegalEntityContentParseError : LegalEntityCreateParseError, LegalEntityUpdateParseError {
     data object NameMissing : LegalEntityContentParseError

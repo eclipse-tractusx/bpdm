@@ -20,8 +20,8 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser
 
 import org.eclipse.tractusx.bpdm.pool.model.error.AddressContentParseError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressContentParsed
-import org.eclipse.tractusx.bpdm.pool.model.request.AddressContentRequest
+import org.eclipse.tractusx.bpdm.pool.model.parsed.LogisticAddressParsed
+import org.eclipse.tractusx.bpdm.pool.model.request.LogisticAddressRequest
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.combine
 import org.eclipse.tractusx.bpdm.pool.service.LogisticAddressRequestParser
@@ -42,7 +42,7 @@ class AddressContentParser(
     private val duplicateValidator: AddressIdentifierDuplicateValidator
 ) {
 
-    fun parse(contents: List<AddressContentRequest>, ownerBpns: List<String?>): List<ParseResult<AddressContentParsed, AddressContentParseError>> {
+    fun parse(contents: List<LogisticAddressRequest>, ownerBpns: List<String?>): List<ParseResult<LogisticAddressParsed, AddressContentParseError>> {
         val contentResults = addressRequestParser.parse(contents)
         val duplicateErrors = duplicateValidator.validate(contents, ownerBpns)
         return contentResults.mapIndexed { index, result -> result.combine(duplicateErrors[index]) { it } }

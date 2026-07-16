@@ -21,10 +21,6 @@ package org.eclipse.tractusx.bpdm.pool.model.parsed
 
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 
-/**
- * Result of parsing a [LegalEntityUpdateRequest]: the [target] resolved to its existing entity and the loose content
- * validated to [LegalEntityContentParsed]. `update` consumes it directly to apply changes to [target].
- */
 data class LegalEntityUpdateParsed(
     val target: LegalEntityDb,
     val content: LegalEntityContentParsed

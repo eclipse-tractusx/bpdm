@@ -19,10 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.request
 
-/**
- * Request to update the existing site identified by [siteBpn]. Update never re-parents, so no legal-entity parent is
- * carried. `parse` resolves the target (or yields [UnresolvableSite]) and validates the [content].
- */
 data class SiteUpdateRequest(
     val siteBpn: String,
     val content: SiteContentRequest

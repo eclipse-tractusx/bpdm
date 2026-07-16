@@ -22,7 +22,6 @@ package org.eclipse.tractusx.bpdm.pool.model.parsed
 import org.eclipse.tractusx.bpdm.pool.model.PostalAddressScriptVariant
 import org.eclipse.tractusx.bpdm.pool.entity.ScriptCodeDb
 
-/** Parsed counterpart of [org.eclipse.tractusx.bpdm.pool.model.request.AddressScriptVariant] with the script code resolved to its entity. The content has no metadata, so it is reused. */
 data class AddressScriptVariantParsed(
     val scriptCode: ScriptCodeDb,
     val address: PostalAddressScriptVariant

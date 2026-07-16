@@ -19,10 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.parsed
 
-/**
- * Result of parsing a [LegalEntityCreateRequest]: the loose content validated to [LegalEntityContentParsed]. `create`
- * consumes it directly to write the new legal entity (and its legal address).
- */
 data class LegalEntityCreateParsed(
     val content: LegalEntityContentParsed
 )

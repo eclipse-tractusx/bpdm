@@ -21,22 +21,11 @@ package org.eclipse.tractusx.bpdm.pool.model.request
 
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityState
 
-/**
- * Loose (unvalidated) inbound legal-entity content: the legal-entity [header] plus its [legalAddress]. The two are parsed
- * independently — the header by [org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntityHeaderParser], the legal address by the
- * shared address content parser — then recombined into the bounded [org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityContentParsed].
- */
 data class LegalEntityContentRequest(
     val header: LegalEntityHeaderRequest,
-    val legalAddress: AddressContentRequest
+    val legalAddress: LogisticAddressRequest
 )
 
-/**
- * Loose legal-entity header (everything but the legal address). `legalName`/`confidenceCriteria` are relaxed so the header
- * parse validates them (yielding [org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityContentParseError.NameMissing] /
- * [org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityContentParseError.ConfidenceCriteriaMissing]); `legalForm` and identifier/script-code references are loose
- * strings the parser resolves to metadata entities.
- */
 data class LegalEntityHeaderRequest(
     val legalName: String?,
     val legalShortName: String?,
@@ -48,14 +37,12 @@ data class LegalEntityHeaderRequest(
     val scriptVariants: List<LegalEntityScriptVariant>
 )
 
-/** Loose legal-entity identifier: `value`/`type` are validated by the parser, `type` additionally resolved to its entity; `issuingBody` is free text (legal-entity-only — addresses have no issuing body). */
 data class LegalEntityIdentifier(
     val value: String?,
     val type: String?,
     val issuingBody: String?
 )
 
-/** Loose legal-entity-header script variant: only `scriptCode` needs resolving to its entity; the localized legal address travels with [AddressContentRequest]. */
 data class LegalEntityScriptVariant(
     val scriptCode: String,
     val legalName: String?,

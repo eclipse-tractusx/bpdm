@@ -28,25 +28,16 @@ import org.eclipse.tractusx.bpdm.pool.model.AddressState
 import org.eclipse.tractusx.bpdm.pool.model.GeoCoordinate
 import org.eclipse.tractusx.bpdm.pool.model.Street
 
-/**
- * Bounded address whose metadata has been resolved to entities: identifier type, administrative area level 1 (region)
- * and (via [AddressScriptVariantParsed]) script code. This is the middle pipeline stage between [LogisticAddressRequest]
- * and the entity-free [LogisticAddress] result; only this stage carries persistence entities. Fields without metadata
- * (states, confidence, geo coordinate, street) reuse the bounded value types.
- */
 data class LogisticAddressParsed(
     val name: String?,
     val states: List<AddressState>,
     val identifiers: List<AddressIdentifierParsed>,
     val physicalPostalAddress: PhysicalPostalAddressParsed,
     val alternativePostalAddress: AlternativePostalAddressParsed?,
-    val confidenceCriteria: ConfidenceCriteriaParsed
+    val confidenceCriteria: ConfidenceCriteriaParsed,
+    val scriptVariants: List<AddressScriptVariantParsed>
 )
 
-/**
- * Inbound (upsert) confidence criteria: only the fields a caller actually supplies. `numberOfSharingMembers` and
- * `confidenceLevel` are Pool-computed, not upserted, so they appear solely on the outbound [ConfidenceCriteria].
- */
 data class ConfidenceCriteriaParsed(
     val sharedByOwner: Boolean,
     val checkedByExternalDataSource: Boolean,
@@ -86,10 +77,4 @@ data class AlternativePostalAddressParsed(
 data class AddressIdentifierParsed(
     val value: String,
     val type: IdentifierTypeDb
-)
-
-/** Bundle of a parsed address with its parsed script variants — the success payload of the shared content parser. */
-data class AddressContentParsed(
-    val address: LogisticAddressParsed,
-    val scriptVariants: List<AddressScriptVariantParsed>
 )

@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.service.parser
 
 import org.eclipse.tractusx.bpdm.common.util.findDuplicates
 import org.eclipse.tractusx.bpdm.pool.model.error.AddressConstraintParseError
-import org.eclipse.tractusx.bpdm.pool.model.request.AddressContentRequest
+import org.eclipse.tractusx.bpdm.pool.model.request.LogisticAddressRequest
 import org.eclipse.tractusx.bpdm.pool.repository.AddressIdentifierRepository
 import org.springframework.stereotype.Service
 
@@ -56,18 +56,18 @@ class AddressIdentifierDuplicateValidator(
     private val addressIdentifierRepository: AddressIdentifierRepository
 ) {
 
-    fun validate(contents: List<AddressContentRequest>, ownerBpns: List<String?>): List<List<AddressConstraintParseError>> {
+    fun validate(contents: List<LogisticAddressRequest>, ownerBpns: List<String?>): List<List<AddressConstraintParseError>> {
         require(contents.size == ownerBpns.size) { "contents and ownerBpns must be positionally aligned" }
         val candidates = buildCandidates(contents)
         return contents.mapIndexed { i, content -> duplicateErrorsFor(content, ownerBpns[i], candidates) }
     }
 
     private fun duplicateErrorsFor(
-        content: AddressContentRequest,
+        content: LogisticAddressRequest,
         ownerBpn: String?,
         candidates: Map<Key, Candidate>
     ): List<AddressConstraintParseError> =
-        content.address.identifiers.mapIndexedNotNull { index, identifier ->
+        content.identifiers.mapIndexedNotNull { index, identifier ->
             val type = identifier.type
             val value = identifier.value
             if (type == null || value == null) return@mapIndexedNotNull null
@@ -79,8 +79,8 @@ class AddressIdentifierDuplicateValidator(
                 null
         }
 
-    private fun buildCandidates(contents: List<AddressContentRequest>): Map<Key, Candidate> {
-        val identifiers = contents.flatMap { it.address.identifiers }
+    private fun buildCandidates(contents: List<LogisticAddressRequest>): Map<Key, Candidate> {
+        val identifiers = contents.flatMap { it.identifiers }
 
         val withinRequest = identifiers
             .mapNotNull { id -> if (id.type != null && id.value != null) Key(id.type, id.value) else null }

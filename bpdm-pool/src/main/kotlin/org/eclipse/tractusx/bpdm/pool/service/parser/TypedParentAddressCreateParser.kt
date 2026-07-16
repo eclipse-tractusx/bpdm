@@ -46,7 +46,7 @@ class TypedParentAddressCreateParser(
         val siteResults = siteBpnParser.parse(requests.map { it.siteBpn })
 
         return zipParseResults(contentResults, legalEntityResults, siteResults) { content, legalEntity, site ->
-            AddressCreateParsed(legalEntity, site, content.address, content.scriptVariants)
+            AddressCreateParsed(legalEntity, site, content)
         }
     }
 }

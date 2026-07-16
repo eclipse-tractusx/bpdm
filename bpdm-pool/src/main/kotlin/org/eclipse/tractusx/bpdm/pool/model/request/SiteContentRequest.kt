@@ -21,20 +21,11 @@ package org.eclipse.tractusx.bpdm.pool.model.request
 
 import org.eclipse.tractusx.bpdm.pool.model.SiteState
 
-/**
- * Loose (unvalidated) inbound site content: the site [header] plus its [mainAddress]. The two are parsed independently —
- * the header by [org.eclipse.tractusx.bpdm.pool.service.parser.SiteHeaderParser], the main address by the shared address
- * content parser — then recombined into the bounded [org.eclipse.tractusx.bpdm.pool.model.parsed.SiteContentParsed].
- */
 data class SiteContentRequest(
     val header: SiteHeaderRequest,
-    val mainAddress: AddressContentRequest
+    val mainAddress: LogisticAddressRequest
 )
 
-/**
- * Loose site header (everything but the main address). `name`/`confidenceCriteria` are relaxed so the header parse
- * validates them (yielding [org.eclipse.tractusx.bpdm.pool.model.error.SiteContentParseError.NameMissing] / [org.eclipse.tractusx.bpdm.pool.model.error.SiteContentParseError.ConfidenceCriteriaMissing]).
- */
 data class SiteHeaderRequest(
     val name: String?,
     val states: List<SiteState>,
@@ -42,7 +33,6 @@ data class SiteHeaderRequest(
     val scriptVariants: List<SiteScriptVariant>
 )
 
-/** Loose site-header script variant: only `scriptCode` needs resolving to its entity; the localized main address travels with [AddressContentRequest]. */
 data class SiteScriptVariant(
     val scriptCode: String,
     val name: String

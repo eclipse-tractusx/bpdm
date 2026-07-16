@@ -59,8 +59,7 @@ class SiteUpdateService(
             AddressUpdateParsed(
                 it.target.mainAddress,
                 null,
-                it.content.mainAddress.address,
-                it.content.mainAddress.scriptVariants
+                it.content.mainAddress
             )
         }
         val stagedMainAddresses = addressFullUpdateService.stageUpdate(mainAddressRequests)

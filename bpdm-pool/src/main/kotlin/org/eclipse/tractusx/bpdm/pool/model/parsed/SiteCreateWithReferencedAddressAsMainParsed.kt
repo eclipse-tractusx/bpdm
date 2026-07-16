@@ -21,12 +21,6 @@ package org.eclipse.tractusx.bpdm.pool.model.parsed
 
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 
-/**
- * Result of parsing a [SiteCreateWithReferencedAddressAsMainRequest]: the parent BPN resolved to its entity, the
- * referenced address resolved to its existing [mainAddress] entity (the re-parent target), and the loose content
- * validated to [SiteContentParsed]. `create` consumes it directly — it re-parents [mainAddress] onto the new site and
- * overwrites its content rather than building a new address.
- */
 data class SiteCreateWithReferencedAddressAsMainParsed(
     val mainAddress: LogisticAddressDb,
     val siteHeader: SiteHeaderParsed

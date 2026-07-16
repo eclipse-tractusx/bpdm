@@ -24,24 +24,13 @@ import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.bpdm.pool.model.Street
 
-/**
- * Loose (unvalidated) inbound counterpart of [LogisticAddress]: every constraint that distinguishes a valid address is
- * relaxed (country as raw String, city/delivery fields/confidence nullable) so a single `parse` can be the one validation
- * funnel for all callers. `parse` turns this into the bounded [LogisticAddressParsed]. Already-nullable value types (`Street`,
- * the script-variant types) are reused as-is rather than re-declared as request variants.
- */
 data class LogisticAddressRequest(
     val name: String?,
     val states: List<AddressStateRequest>,
     val identifiers: List<AddressIdentifierRequest>,
     val physicalPostalAddress: PhysicalPostalAddressRequest,
     val alternativePostalAddress: AlternativePostalAddressRequest?,
-    val confidenceCriteria: ConfidenceCriteriaRequest
-)
-
-/** Bundle of a loose address with its script variants — the input unit of the shared content parser, mirroring [org.eclipse.tractusx.bpdm.pool.model.parsed.AddressContentParsed]. */
-data class AddressContentRequest(
-    val address: LogisticAddressRequest,
+    val confidenceCriteria: ConfidenceCriteriaRequest,
     val scriptVariants: List<AddressScriptVariant>
 )
 

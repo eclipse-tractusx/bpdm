@@ -21,10 +21,6 @@ package org.eclipse.tractusx.bpdm.pool.model.parsed
 
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 
-/**
- * Result of parsing a [SiteCreateRequest]: the parent BPN resolved to its entity and the loose content validated to
- * [SiteContentParsed]. `create` consumes it directly to write the new site (and its main address).
- */
 data class SiteCreateParsed(
     val legalEntity: LegalEntityDb,
     val content: SiteContentParsed

@@ -40,7 +40,7 @@ import org.eclipse.tractusx.orchestrator.api.model.Street as TaskStreet
 
 /**
  * Pure translation of a cleaning task's address (the orchestrator business-partner model) into the loose
- * [AddressContentRequest] consumed by the address services. No validation happens here — that is the address services'
+ * [LogisticAddressRequest] consumed by the address services. No validation happens here — that is the address services'
  * `parse` — so every field is passed through as-is (raw country strings, nullable values). The Pool-computed confidence
  * values (`numberOfSharingMembers`, `confidenceLevel`) are intentionally dropped: they are not part of an upsert.
  *
@@ -50,18 +50,23 @@ import org.eclipse.tractusx.orchestrator.api.model.Street as TaskStreet
 @Component
 class GoldenRecordTaskAddressRequestMapper {
 
-    fun toContentRequest(address: TaskAddress): AddressContentRequest =
+    fun toContentRequest(address: TaskAddress): LogisticAddressRequest =
         toContentRequest(address.postalProperties, address.scriptVariants)
 
     /**
      * Overload for the legal / site main address, where the postal properties and the localized script variants are not
      * bundled in a [TaskAddress] but travel separately (the postal address on the legal entity / site, the variants
      * reconstructed per script code from its `scriptVariants`). Both callers ultimately produce the same
-     * [AddressContentRequest].
+     * [LogisticAddressRequest].
      */
-    fun toContentRequest(address: TaskPostalAddress, scriptVariants: List<TaskScriptVariant>): AddressContentRequest =
-        AddressContentRequest(
-            address = toAddressRequest(address),
+    fun toContentRequest(address: TaskPostalAddress, scriptVariants: List<TaskScriptVariant>): LogisticAddressRequest =
+        LogisticAddressRequest(
+            name = address.addressName,
+            states = address.states.map { toStateRequest(it) },
+            identifiers = address.identifiers.map { toIdentifierRequest(it) },
+            physicalPostalAddress = toPhysicalRequest(address.physicalAddress),
+            alternativePostalAddress = address.alternativeAddress?.let { toAlternativeRequest(it) },
+            confidenceCriteria = toConfidenceRequest(address.confidenceCriteria),
             scriptVariants = scriptVariants.map { toScriptVariant(it) }
         )
 
@@ -71,16 +76,6 @@ class GoldenRecordTaskAddressRequestMapper {
             checkedByExternalDataSource = confidence.checkedByExternalDataSource,
             lastConfidenceCheckAt = confidence.lastConfidenceCheckAt,
             nextConfidenceCheckAt = confidence.nextConfidenceCheckAt
-        )
-
-    private fun toAddressRequest(address: TaskPostalAddress): LogisticAddressRequest =
-        LogisticAddressRequest(
-            name = address.addressName,
-            states = address.states.map { toStateRequest(it) },
-            identifiers = address.identifiers.map { toIdentifierRequest(it) },
-            physicalPostalAddress = toPhysicalRequest(address.physicalAddress),
-            alternativePostalAddress = address.alternativeAddress?.let { toAlternativeRequest(it) },
-            confidenceCriteria = toConfidenceRequest(address.confidenceCriteria)
         )
 
     private fun toPhysicalRequest(physical: TaskPhysicalAddress): PhysicalPostalAddressRequest =

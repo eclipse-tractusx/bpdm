@@ -24,10 +24,8 @@ sealed interface AddressCreateParseError
 sealed interface AddressUpdateParseError
 
 /**
- * Errors produced by parsing address *content* (the shared content parser). Each case is, from a single definition, a
- * subtype of every operation that embeds an address: standalone address create/update, a site's main address and a legal
- * entity's legal address. So a site's main-address or a legal entity's legal-address content errors are that operation's
- * errors directly — no wrapping, callers match them flatly or via a single `is AddressContentParseError` branch.
+ * Address-content parse errors. Subtypes every operation embedding an address (standalone, site main address, legal
+ * address) so they surface as that operation's errors directly — no wrapping, matched flatly.
  */
 sealed interface AddressContentParseError :
     AddressCreateParseError,
@@ -37,9 +35,6 @@ sealed interface AddressContentParseError :
     LegalEntityCreateParseError,
     LegalEntityUpdateParseError
 
-/**
- * Field-presence/format errors. Cases mirror the address-relevant `TaskStepBuildService.CleaningError` entries.
- */
 sealed interface AddressFieldParseError : AddressContentParseError {
     data object PhysicalCountryMissing : AddressFieldParseError
     data object PhysicalCityMissing : AddressFieldParseError
@@ -54,10 +49,6 @@ sealed interface AddressFieldParseError : AddressContentParseError {
     data class StateTypeMissing(val index: Int) : AddressFieldParseError
 }
 
-/**
- * Metadata-resolution errors: a referenced metadata key exists in the request but no matching entity is registered.
- * Distinct from [AddressFieldParseError] (presence/format) since these are lookups against persisted metadata.
- */
 sealed interface AddressMetadataParseError : AddressContentParseError {
     data class IdentifierTypeNotFound(val index: Int, val type: String) : AddressMetadataParseError
     data class PhysicalRegionNotFound(val regionCode: String) : AddressMetadataParseError
@@ -65,10 +56,6 @@ sealed interface AddressMetadataParseError : AddressContentParseError {
     data class ScriptCodeNotFound(val index: Int, val scriptCode: String) : AddressMetadataParseError
 }
 
-/**
- * Cardinality/uniqueness constraint violations. `IdentifiersTooMany` is content-intrinsic (produced by the content parser);
- * `DuplicateIdentifier` is identity-aware and DB-backed (produced by the duplicate validator).
- */
 sealed interface AddressConstraintParseError : AddressContentParseError {
     data class IdentifiersTooMany(val count: Int) : AddressConstraintParseError
     data class DuplicateIdentifier(val index: Int, val type: String, val value: String) : AddressConstraintParseError

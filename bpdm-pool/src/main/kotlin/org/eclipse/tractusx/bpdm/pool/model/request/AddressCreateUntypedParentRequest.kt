@@ -19,16 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.request
 
-/**
- * Request to create an address under a single, *untyped* parent: [bpnParent] may be a BPNL or a BPNS and the role is not
- * yet known. Resolution must first determine the parent type (a legal-entity parent stands for itself; a site parent also
- * contributes its own legal entity) — reporting the precise `BpnNotValid`/`LegalEntityNotFound`/`SiteNotFound` errors —
- * before the request becomes an [AddressCreateTypedParentsRequest].
- *
- * This is the loosest stage of the parent-resolution pipeline: untyped BPN → typed BPNs
- * ([AddressCreateTypedParentsRequest]) → resolved entities ([AddressCreateResolvedParentsRequest]).
- */
 data class AddressCreateUntypedParentRequest(
     val bpnParent: String,
-    val content: AddressContentRequest
+    val content: LogisticAddressRequest
 )

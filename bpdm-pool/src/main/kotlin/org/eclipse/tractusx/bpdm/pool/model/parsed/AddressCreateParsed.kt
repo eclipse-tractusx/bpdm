@@ -22,14 +22,8 @@ package org.eclipse.tractusx.bpdm.pool.model.parsed
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 
-/**
- * Result of parsing an [AddressCreateTypedParentsRequest]: the loose request has been validated to a bounded [LogisticAddressParsed] and
- * the parent BPNs resolved to entities. This is the only stage that carries persistence entities — `create` consumes it
- * directly to write the new address.
- */
 data class AddressCreateParsed(
     val legalEntity: LegalEntityDb,
     val site: SiteDb?,
-    val address: LogisticAddressParsed,
-    val scriptVariants: List<AddressScriptVariantParsed>
+    val address: LogisticAddressParsed
 )

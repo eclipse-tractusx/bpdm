@@ -20,22 +20,14 @@
 package org.eclipse.tractusx.bpdm.pool.model.error
 
 /**
- * "A referenced BPN of this entity type did not resolve to an entity." These errors are keyed by the entity type that
- * failed to resolve, not by the role it played: the role (parent vs update target) is recovered from the operation that
- * produced the error — its error root and its mapper. So one error type is reused wherever that entity is looked up; e.g.
- * a site is a parent in address create and the target in site update, both reported as [UnresolvableSite].
+ * A referenced BPN of this entity type did not resolve. Keyed by entity type, not role (parent vs. target) — the role is
+ * recovered from the producing operation, so one type is reused wherever that entity is looked up.
  *
- * Caveat: this cannot distinguish two roles that resolve the *same* entity type *within the same* operation. No current
- * operation does that; if one ever resolved, say, two different sites in different roles, a role distinction would be
- * reintroduced there.
+ * Caveat: can't distinguish two roles resolving the *same* entity type within *one* operation. None do today; add a role
+ * distinction there if one ever does.
  */
 data class UnresolvableLegalEntity(val bpn: String) : AddressCreateParseError, SiteCreateParseError, LegalEntityUpdateParseError
 data class UnresolvableSite(val bpn: String) : AddressCreateParseError, SiteUpdateParseError, AddressUpdateParseError
 data class UnresolvableAddress(val bpn: String) : AddressUpdateParseError, SiteCreateParseError
 
-/**
- * A single, untyped parent BPN is neither a BPNL nor a BPNS, so its parent role can't even be determined (distinct from
- * [UnresolvableLegalEntity]/[UnresolvableSite], where the type is known but the entity is absent). Only the untyped
- * address-create stage can raise this; the typed stage already has the role decided.
- */
 data class InvalidParentBpn(val bpn: String) : AddressCreateParseError

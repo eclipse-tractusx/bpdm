@@ -49,7 +49,7 @@ class AddressEntityMapper {
             physicalPostalAddress = toPhysical(parsed.address.physicalPostalAddress),
             alternativePostalAddress = parsed.address.alternativePostalAddress?.let { toAlternative(it) },
             confidenceCriteria = toConfidence(parsed.address.confidenceCriteria, numberOfSharingMembers),
-            scriptVariants = toScriptVariants(parsed.scriptVariants).toMutableList()
+            scriptVariants = toScriptVariants(parsed.address.scriptVariants).toMutableList()
         )
         parsed.site?.let { entity.sites.add(it) }
         entity.identifiers.addAll(toIdentifiers(parsed.address.identifiers).onEach { it.address = entity })

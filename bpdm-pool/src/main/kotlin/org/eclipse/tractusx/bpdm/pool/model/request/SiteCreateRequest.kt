@@ -19,10 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.request
 
-/**
- * Request to create a site under the legal entity identified by [legalEntityBpn]. `parse` resolves the parent BPN to an
- * entity (or yields [UnresolvableLegalEntity]) and validates the [content].
- */
 data class SiteCreateRequest(
     val legalEntityBpn: String,
     val content: SiteContentRequest

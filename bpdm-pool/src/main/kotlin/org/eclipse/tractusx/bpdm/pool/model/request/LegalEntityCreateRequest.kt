@@ -19,10 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.request
 
-/**
- * Request to create a legal entity. Unlike sites and additional addresses there is no parent to resolve — a legal entity
- * is the top of the hierarchy and the create issues its BPN. `parse` only validates the [content].
- */
 data class LegalEntityCreateRequest(
     val content: LegalEntityContentRequest
 )
