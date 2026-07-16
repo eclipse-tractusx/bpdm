@@ -58,7 +58,7 @@ import org.springframework.stereotype.Service
  ******************************************************************************/
 /**
  * Validates loose [org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityHeaderRequest] content into the bounded, metadata-resolved [org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityHeaderParsed] — the
- * legal-entity counterpart of [org.eclipse.tractusx.bpdm.pool.service.LogisticAddressRequestParser], covering only the legal-entity header (the legal address is
+ * legal-entity counterpart of [AddressRequestParser], covering only the legal-entity header (the legal address is
  * parsed separately by the address content parser and recombined by the legal-entity service). All errors are accumulated
  * (not fail-fast) so one entry's report is complete. Legal forms, identifier types and script codes are resolved for the
  * whole batch in one query each, then each entry is validated against them. The identifier uniqueness check lives in

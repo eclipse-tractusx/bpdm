@@ -24,12 +24,11 @@ import org.eclipse.tractusx.bpdm.pool.model.parsed.LogisticAddressParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.LogisticAddressRequest
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.combine
-import org.eclipse.tractusx.bpdm.pool.service.LogisticAddressRequestParser
 import org.springframework.stereotype.Service
 
 /**
  * The single owner of address-content validation, shared by every address create and update path. Combines the pure
- * content parse ([LogisticAddressRequestParser]) with the identity-aware identifier uniqueness check
+ * content parse ([AddressRequestParser]) with the identity-aware identifier uniqueness check
  * ([AddressIdentifierDuplicateValidator]) into one order-preserving, per-entry result.
  *
  * [ownerBpns] is positional with [contents]: `null` for create (a new address owns no identifiers yet), the address's
@@ -38,7 +37,7 @@ import org.springframework.stereotype.Service
  */
 @Service
 class AddressContentParser(
-    private val addressRequestParser: LogisticAddressRequestParser,
+    private val addressRequestParser: AddressRequestParser,
     private val duplicateValidator: AddressIdentifierDuplicateValidator
 ) {
 
