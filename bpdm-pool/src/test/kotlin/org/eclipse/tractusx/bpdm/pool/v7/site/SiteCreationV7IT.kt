@@ -27,7 +27,9 @@ import org.eclipse.tractusx.bpdm.pool.v7.UnscheduledPoolTestBaseV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withAlternativeAdminArea
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withMainAddressIdentifiers
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withPhysicalAdminArea
+import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
+import org.springframework.web.reactive.function.client.WebClientResponseException
 
 class SiteCreationV7IT : UnscheduledPoolTestBaseV7() {
 
@@ -71,6 +73,54 @@ class SiteCreationV7IT : UnscheduledPoolTestBaseV7() {
         val expectedResponse = SitePartnerCreateResponseWrapper(listOf(expectedSite), emptyList())
 
         assertRepository.assertSiteCreateResponseWrapperIsEqual(response, expectedResponse)
+    }
+
+    /**
+     * GIVEN legal entity with a site named X
+     * WHEN operator tries to create another site named X for the same legal entity
+     * THEN the request is rejected because site names must be unique within a legal entity
+     */
+    @Test
+    fun `try create site with duplicate name for same legal entity`() {
+        //GIVEN
+        val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
+        val existingSiteRequest = requestFactory.buildSiteCreateRequest("Site 1 $testName", legalEntityResponse)
+        poolClient.sites.createSite(listOf(existingSiteRequest))
+
+        //WHEN / THEN
+        // Reuse the existing site's name but keep the distinct main address identifiers of "Site 2" so the
+        // rejection is caused by the name uniqueness constraint and not by a duplicate address identifier.
+        val duplicateNameRequest = requestFactory.buildSiteCreateRequest("Site 2 $testName", legalEntityResponse)
+            .let { it.copy(site = it.site.copy(name = existingSiteRequest.site.name)) }
+        Assertions.assertThatThrownBy { poolClient.sites.createSite(listOf(duplicateNameRequest)) }
+            .isInstanceOf(WebClientResponseException::class.java)
+    }
+
+    /**
+     * GIVEN two legal entities
+     * WHEN operator creates a site with the same name for each legal entity
+     * THEN both sites are created because uniqueness is scoped per legal entity
+     */
+    @Test
+    fun `create sites with same name for different legal entities`() {
+        //GIVEN
+        val legalEntityResponse1 = testDataClient.createParticipantLegalEntity("LE1 $testName")
+        val legalEntityResponse2 = testDataClient.createParticipantLegalEntity("LE2 $testName")
+
+        //WHEN
+        // Distinct seeds keep the main address identifiers unique; only the site name is shared across both requests.
+        val siteRequest1 = requestFactory.buildSiteCreateRequest("Site 1 $testName", legalEntityResponse1)
+        val siteRequest2 = requestFactory.buildSiteCreateRequest("Site 2 $testName", legalEntityResponse2)
+            .let { it.copy(site = it.site.copy(name = siteRequest1.site.name)) }
+        val response1 = poolClient.sites.createSite(listOf(siteRequest1))
+        val response2 = poolClient.sites.createSite(listOf(siteRequest2))
+
+        //THEN
+        val expectedResponse1 = SitePartnerCreateResponseWrapper(listOf(resultFactory.buildSiteSiteCreate(siteRequest1)), emptyList())
+        val expectedResponse2 = SitePartnerCreateResponseWrapper(listOf(resultFactory.buildSiteSiteCreate(siteRequest2)), emptyList())
+
+        assertRepository.assertSiteCreateResponseWrapperIsEqual(response1, expectedResponse1)
+        assertRepository.assertSiteCreateResponseWrapperIsEqual(response2, expectedResponse2)
     }
 
     /**
