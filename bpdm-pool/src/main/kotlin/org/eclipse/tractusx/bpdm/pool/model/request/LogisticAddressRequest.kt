@@ -19,10 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.request
 
-import java.time.Instant
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.bpdm.pool.model.Street
+import java.time.Instant
 
 data class LogisticAddressRequest(
     val name: String?,

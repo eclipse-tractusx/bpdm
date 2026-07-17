@@ -27,11 +27,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerCreate
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.RelationVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
-import org.eclipse.tractusx.bpdm.pool.entity.LegalFormDb
-import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
-import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
-import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
+import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.eclipse.tractusx.bpdm.pool.service.getAddressType
 import org.eclipse.tractusx.bpdm.pool.service.mainSite
 import org.eclipse.tractusx.bpdm.pool.service.toDto

@@ -23,14 +23,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteCreateError
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteUpdateError
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
-import org.eclipse.tractusx.bpdm.pool.model.error.AddressContentParseError
-import org.eclipse.tractusx.bpdm.pool.model.error.LegalAddressAlreadyMainAddress
-import org.eclipse.tractusx.bpdm.pool.model.error.SiteContentParseError
-import org.eclipse.tractusx.bpdm.pool.model.error.SiteCreateParseError
-import org.eclipse.tractusx.bpdm.pool.model.error.SiteUpdateParseError
-import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableAddress
-import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableLegalEntity
-import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableSite
+import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.springframework.stereotype.Component
 
 /**

@@ -19,11 +19,11 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.parser
 
+import org.eclipse.tractusx.bpdm.pool.model.ParseResult
+import org.eclipse.tractusx.bpdm.pool.model.combine
 import org.eclipse.tractusx.bpdm.pool.model.error.AddressContentParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LogisticAddressParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.LogisticAddressRequest
-import org.eclipse.tractusx.bpdm.pool.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.combine
 import org.springframework.stereotype.Service
 
 /**

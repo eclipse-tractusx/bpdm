@@ -25,13 +25,8 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntityPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntityPartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.AddressDtoRequestMapper
-import org.eclipse.tractusx.bpdm.pool.model.request.ConfidenceCriteriaRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityContentRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityCreateRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityHeaderRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityIdentifier
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityState
-import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.model.request.*
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 import java.time.ZoneOffset

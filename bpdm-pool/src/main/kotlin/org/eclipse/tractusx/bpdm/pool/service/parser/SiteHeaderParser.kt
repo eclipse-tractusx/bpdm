@@ -20,14 +20,14 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser
 
 import org.eclipse.tractusx.bpdm.pool.entity.ScriptCodeDb
-import org.eclipse.tractusx.bpdm.pool.model.parsed.ConfidenceCriteriaParsed
-import org.eclipse.tractusx.bpdm.pool.model.request.ConfidenceCriteriaRequest
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteContentParseError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.ConfidenceCriteriaParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteScriptVariantParsed
+import org.eclipse.tractusx.bpdm.pool.model.request.ConfidenceCriteriaRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteHeaderRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteScriptVariant
-import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteScriptVariantParsed
 import org.eclipse.tractusx.bpdm.pool.repository.ScriptCodeRepository
 import org.springframework.stereotype.Service
 

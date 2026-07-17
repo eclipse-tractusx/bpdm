@@ -19,7 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.inbound
 
-import org.eclipse.tractusx.bpdm.pool.model.*
+import org.eclipse.tractusx.bpdm.pool.model.AlternativeAddressScriptVariant
+import org.eclipse.tractusx.bpdm.pool.model.PhysicalAddressScriptVariant
+import org.eclipse.tractusx.bpdm.pool.model.PostalAddressScriptVariant
+import org.eclipse.tractusx.bpdm.pool.model.Street
 import org.eclipse.tractusx.bpdm.pool.model.request.*
 import org.springframework.stereotype.Component
 import org.eclipse.tractusx.orchestrator.api.model.AlternativeAddress as TaskAlternativeAddress

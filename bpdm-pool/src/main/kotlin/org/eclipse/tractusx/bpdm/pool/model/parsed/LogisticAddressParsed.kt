@@ -20,13 +20,13 @@
 package org.eclipse.tractusx.bpdm.pool.model.parsed
 
 import com.neovisionaries.i18n.CountryCode
-import java.time.Instant
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
 import org.eclipse.tractusx.bpdm.pool.entity.RegionDb
 import org.eclipse.tractusx.bpdm.pool.model.AddressState
 import org.eclipse.tractusx.bpdm.pool.model.GeoCoordinate
 import org.eclipse.tractusx.bpdm.pool.model.Street
+import java.time.Instant
 
 data class LogisticAddressParsed(
     val name: String?,

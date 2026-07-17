@@ -20,19 +20,12 @@
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound
 
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
-import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto
-import org.eclipse.tractusx.bpdm.pool.api.model.AddressStateDto
-import org.eclipse.tractusx.bpdm.pool.api.model.AlternativeAddressScriptVariantDto
-import org.eclipse.tractusx.bpdm.pool.api.model.AlternativePostalAddressDto
-import org.eclipse.tractusx.bpdm.pool.api.model.ConfidenceCriteriaDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressScriptVariantDto
-import org.eclipse.tractusx.bpdm.pool.api.model.PhysicalAddressScriptVariantDto
-import org.eclipse.tractusx.bpdm.pool.api.model.PhysicalPostalAddressDto
-import org.eclipse.tractusx.bpdm.pool.api.model.PostalAddressScriptVariantDto
-import org.eclipse.tractusx.bpdm.pool.api.model.StreetDto
+import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.dto.LogisticAddressWithScriptVariantsDto
-import org.eclipse.tractusx.bpdm.pool.model.*
+import org.eclipse.tractusx.bpdm.pool.model.AlternativeAddressScriptVariant
+import org.eclipse.tractusx.bpdm.pool.model.PhysicalAddressScriptVariant
+import org.eclipse.tractusx.bpdm.pool.model.PostalAddressScriptVariant
+import org.eclipse.tractusx.bpdm.pool.model.Street
 import org.eclipse.tractusx.bpdm.pool.model.request.*
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime

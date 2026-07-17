@@ -19,8 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.parsed
 
-import org.eclipse.tractusx.bpdm.pool.model.PostalAddressScriptVariant
 import org.eclipse.tractusx.bpdm.pool.entity.ScriptCodeDb
+import org.eclipse.tractusx.bpdm.pool.model.PostalAddressScriptVariant
 
 data class AddressScriptVariantParsed(
     val scriptCode: ScriptCodeDb,

@@ -22,9 +22,9 @@ package org.eclipse.tractusx.bpdm.pool.service.operation
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.AddressEntityMapper
+import org.eclipse.tractusx.bpdm.pool.model.PendingAddressWrite
 import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LogisticAddressParsed
-import org.eclipse.tractusx.bpdm.pool.model.PendingAddressWrite
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

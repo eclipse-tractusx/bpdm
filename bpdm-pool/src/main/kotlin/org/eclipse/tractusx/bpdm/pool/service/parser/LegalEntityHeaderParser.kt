@@ -21,17 +21,17 @@ package org.eclipse.tractusx.bpdm.pool.service.parser
 
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalFormDb
-import org.eclipse.tractusx.bpdm.pool.model.parsed.ConfidenceCriteriaParsed
-import org.eclipse.tractusx.bpdm.pool.model.request.ConfidenceCriteriaRequest
-import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityContentParseError
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityHeaderMetadata
+import org.eclipse.tractusx.bpdm.pool.model.ParseResult
+import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityContentParseError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.ConfidenceCriteriaParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityHeaderParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityIdentifierParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityScriptVariantParsed
+import org.eclipse.tractusx.bpdm.pool.model.request.ConfidenceCriteriaRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityHeaderRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityIdentifier
-import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityIdentifierParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityScriptVariant
-import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityScriptVariantParsed
-import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalFormRepository
 import org.eclipse.tractusx.bpdm.pool.repository.ScriptCodeRepository

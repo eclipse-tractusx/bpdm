@@ -25,14 +25,8 @@ import org.eclipse.tractusx.bpdm.pool.api.model.SiteDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteCreateRequestWithLegalAddressAsMain
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.ConfidenceCriteriaRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.SiteContentRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.SiteCreateRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.SiteCreateWithLegalAddressAsMainRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.SiteHeaderRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.SiteScriptVariant
 import org.eclipse.tractusx.bpdm.pool.model.SiteState
-import org.eclipse.tractusx.bpdm.pool.model.request.SiteUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.model.request.*
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 import java.time.ZoneOffset

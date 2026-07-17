@@ -20,13 +20,8 @@
 package org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.inbound
 
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
-import org.eclipse.tractusx.bpdm.pool.model.request.SiteContentRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.SiteCreateRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.SiteCreateWithLegalAddressAsMainRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.SiteCreateWithReferencedAddressAsMainRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.SiteHeaderRequest
 import org.eclipse.tractusx.bpdm.pool.model.SiteState
-import org.eclipse.tractusx.bpdm.pool.model.request.SiteUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.model.request.*
 import org.springframework.stereotype.Component
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteScriptVariant as SiteScriptVariantRequest
 import org.eclipse.tractusx.orchestrator.api.model.BusinessState as TaskBusinessState

@@ -19,12 +19,12 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.parser
 
-import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityContentParsed
-import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityUpdateParseError
-import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityUpdateParsed
-import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.combine
+import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityUpdateParseError
+import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityContentParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityUpdateParsed
+import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.model.zipParseResults
 import org.springframework.stereotype.Service
 
