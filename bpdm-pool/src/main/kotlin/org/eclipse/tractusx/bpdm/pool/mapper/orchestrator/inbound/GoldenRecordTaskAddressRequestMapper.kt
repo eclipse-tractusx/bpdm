@@ -21,8 +21,6 @@ package org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.inbound
 
 import org.eclipse.tractusx.bpdm.pool.model.*
 import org.eclipse.tractusx.bpdm.pool.model.request.*
-import org.eclipse.tractusx.bpdm.pool.model.parsed.*
-import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.springframework.stereotype.Component
 import org.eclipse.tractusx.orchestrator.api.model.AlternativeAddress as TaskAlternativeAddress
 import org.eclipse.tractusx.orchestrator.api.model.AlternativeAddressScriptVariant as TaskAlternativeAddressScriptVariant

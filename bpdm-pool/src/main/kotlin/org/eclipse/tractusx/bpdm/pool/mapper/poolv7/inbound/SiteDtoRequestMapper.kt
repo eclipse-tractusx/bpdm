@@ -29,7 +29,6 @@ import org.eclipse.tractusx.bpdm.pool.model.request.ConfidenceCriteriaRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteContentRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteCreateRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteCreateWithLegalAddressAsMainRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.SiteCreateWithReferencedAddressAsMainRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteHeaderRequest
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteScriptVariant
 import org.eclipse.tractusx.bpdm.pool.model.SiteState
@@ -58,15 +57,6 @@ class SiteDtoRequestMapper(
                 confidenceCriteria = toConfidenceRequest(request.confidenceCriteria),
                 scriptVariants = request.scriptVariants.map { SiteScriptVariant(it.scriptCode, it.name) }
             )
-        )
-
-    fun toCreateWithReferencedAddressAsMainRequest(
-        request: SitePartnerCreateRequest,
-        mainAddressBpn: String
-    ): SiteCreateWithReferencedAddressAsMainRequest =
-        SiteCreateWithReferencedAddressAsMainRequest(
-            mainAddressBpn = mainAddressBpn,
-            content = toContentRequest(request.site)
         )
 
     private fun toContentRequest(site: SiteDto): SiteContentRequest =
