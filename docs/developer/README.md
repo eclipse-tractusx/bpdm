@@ -4,6 +4,7 @@ Documentation here concerns developers who want to contribute to this repository
 
 <!-- TOC -->
 * [Developer View](#developer-view)
+  * [Application Code Guide](#application-code-guide)
   * [Testing Guide](#testing-guide)
   * [Apps and Charts](#apps-and-charts)
   * [License Check](#license-check)
@@ -14,6 +15,10 @@ Documentation here concerns developers who want to contribute to this repository
   * [Deny Requests on Unsecured Endpoints By Default](#deny-requests-on-unsecured-endpoints-by-default)
   * [NOTICE](#notice)
 <!-- TOC -->
+
+## Application Code Guide
+
+Our [application code guide](application-code-guide.md) explains how we design and organize the request-handling code in BPDM services — the layering, the models, and the binding rules to follow when writing create/update logic.
 
 ## Testing Guide
 
