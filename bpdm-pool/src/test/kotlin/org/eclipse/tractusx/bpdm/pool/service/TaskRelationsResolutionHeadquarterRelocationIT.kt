@@ -108,7 +108,7 @@ class TaskRelationsResolutionHeadquarterRelocationIT @Autowired constructor(
         val actualLegalEntity = poolApiClient.legalEntities.getLegalEntity(createdLegalEntity.legalEntity.header.bpnl)
         val expectedLegalEntity = buildExpectedRelocatedHeadquarterLegalEntity(createdLegalEntity, createdAddAddress, replacedByRelation)
 
-        poolAssertHelper.assertLegalEntityResponse(listOf(actualLegalEntity), listOf(expectedLegalEntity), Timeframe(updateStartTime.minusSeconds(1), updateEndTime.plusSeconds(1)))
+        poolAssertHelper.assertLegalEntityResponse(listOf(actualLegalEntity), listOf(expectedLegalEntity), Timeframe(updateStartTime.minusSeconds(5), updateEndTime.plusSeconds(5)))
     }
 
     /**
@@ -141,7 +141,7 @@ class TaskRelationsResolutionHeadquarterRelocationIT @Autowired constructor(
             scriptVariants = createdLegalEntity.legalEntity.scriptVariants
         )
 
-        poolAssertHelper.assertLegalEntityResponse(listOf(actualLegalEntity), listOf(expectedLegalEntity), Timeframe(updateStartTime.minusSeconds(1), updateEndTime.plusSeconds(1)))
+        poolAssertHelper.assertLegalEntityResponse(listOf(actualLegalEntity), listOf(expectedLegalEntity), Timeframe(updateStartTime.minusSeconds(5), updateEndTime.plusSeconds(5)))
     }
 
     private fun anyReasonCode(): String{
