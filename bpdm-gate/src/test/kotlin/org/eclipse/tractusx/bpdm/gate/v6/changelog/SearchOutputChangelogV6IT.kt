@@ -65,8 +65,12 @@ class SearchOutputChangelogV6IT: UnscheduledGateV6TestBase() {
         val response = gateClient.changelog.getOutputChangelog(PaginationRequest(), ChangelogSearchRequest())
 
         //THEN
-        val expectedEntry = ChangelogGateDto(testName, anyTime, ChangelogType.CREATE)
-        val expected = PageChangeLogDto(1, 1, 0, 1, listOf(expectedEntry), 0, emptyList())
+        val expectedEntries = listOf(
+            ChangelogGateDto(testName, anyTime, ChangelogType.CREATE),
+            ChangelogGateDto(testName, anyTime, ChangelogType.UPDATE),
+            ChangelogGateDto(testName, anyTime, ChangelogType.UPDATE)
+        )
+        val expected = PageChangeLogDto(expectedEntries.size.toLong(), 1, 0, expectedEntries.size, expectedEntries, 0, emptyList())
 
         assertRepo.assertChangelog(response, expected)
     }
@@ -92,6 +96,10 @@ class SearchOutputChangelogV6IT: UnscheduledGateV6TestBase() {
         val expectedEntries = listOf(
             ChangelogGateDto(testName, anyTime, ChangelogType.CREATE),
             ChangelogGateDto(testName, anyTime, ChangelogType.UPDATE),
+            ChangelogGateDto(testName, anyTime, ChangelogType.UPDATE),
+            ChangelogGateDto(testName, anyTime, ChangelogType.UPDATE),
+            ChangelogGateDto(testName, anyTime, ChangelogType.UPDATE),
+            ChangelogGateDto(testName, anyTime, ChangelogType.UPDATE)
         )
 
         val expected = PageChangeLogDto(expectedEntries.size.toLong(), 1, 0, expectedEntries.size, expectedEntries, 0, emptyList())
@@ -121,7 +129,9 @@ class SearchOutputChangelogV6IT: UnscheduledGateV6TestBase() {
 
         //THEN
         val expectedEntries = listOf(
-            ChangelogGateDto(createdInput1.externalId, anyTime, ChangelogType.CREATE)
+            ChangelogGateDto(createdInput1.externalId, anyTime, ChangelogType.CREATE),
+            ChangelogGateDto(createdInput1.externalId, anyTime, ChangelogType.UPDATE),
+            ChangelogGateDto(createdInput1.externalId, anyTime, ChangelogType.UPDATE)
         )
 
         val expected = PageChangeLogDto(expectedEntries.size.toLong(), 1, 0, expectedEntries.size, expectedEntries, 0, emptyList())
@@ -154,7 +164,9 @@ class SearchOutputChangelogV6IT: UnscheduledGateV6TestBase() {
 
         //THEN
         val expectedEntries = listOf(
-            ChangelogGateDto(createdInput3.externalId, anyTime, ChangelogType.CREATE)
+            ChangelogGateDto(createdInput3.externalId, anyTime, ChangelogType.CREATE),
+            ChangelogGateDto(createdInput3.externalId, anyTime, ChangelogType.UPDATE),
+            ChangelogGateDto(createdInput3.externalId, anyTime, ChangelogType.UPDATE)
         )
 
         val expected = PageChangeLogDto(expectedEntries.size.toLong(), 1, 0, expectedEntries.size, expectedEntries, 0, emptyList())
