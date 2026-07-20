@@ -24,6 +24,13 @@ sealed interface AddressCreateParseError
 sealed interface AddressUpdateParseError
 
 /**
+ * A parent site was referenced that does not belong to the address's own legal entity. A site may only be assigned to an
+ * address under the same legal entity. Unlike a resolution failure, both BPNs exist — they just don't belong together.
+ */
+data class SiteNotInAddressLegalEntity(val siteBpn: String, val legalEntityBpn: String) :
+    AddressCreateParseError, AddressUpdateParseError
+
+/**
  * Address-content parse errors. Subtypes every operation embedding an address (standalone, site main address, legal
  * address) so they surface as that operation's errors directly — no wrapping, matched flatly.
  */

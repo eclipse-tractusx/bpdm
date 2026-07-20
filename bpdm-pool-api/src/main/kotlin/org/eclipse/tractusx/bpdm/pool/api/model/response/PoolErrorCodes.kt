@@ -74,6 +74,7 @@ enum class SiteUpdateError : ErrorCode {
 enum class AddressCreateError : ErrorCode {
     BpnNotValid,
     SiteNotFound,
+    SiteNotInLegalEntity,
     LegalEntityNotFound,
     RegionNotFound,
     IdentifierNotFound,
@@ -84,6 +85,7 @@ enum class AddressCreateError : ErrorCode {
 @Schema(description = "AddressUpdateError")
 enum class AddressUpdateError : ErrorCode {
     AddressNotFound,
+    SiteNotInLegalEntity,
     RegionNotFound,
     IdentifierNotFound,
     AddressDuplicateIdentifier,

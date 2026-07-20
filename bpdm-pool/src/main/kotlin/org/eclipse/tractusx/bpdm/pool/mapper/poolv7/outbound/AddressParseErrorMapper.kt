@@ -41,6 +41,12 @@ class AddressParseErrorMapper {
                 ErrorInfo(AddressCreateError.LegalEntityNotFound, "Parent legal entity '${error.bpn}' not found", entityKey)
             is UnresolvableSite ->
                 ErrorInfo(AddressCreateError.SiteNotFound, "Parent site '${error.bpn}' not found", entityKey)
+            is SiteNotInAddressLegalEntity ->
+                ErrorInfo(
+                    AddressCreateError.SiteNotInLegalEntity,
+                    "Parent site '${error.siteBpn}' does not belong to legal entity '${error.legalEntityBpn}'",
+                    entityKey
+                )
             is AddressContentParseError -> sharedErrorInfo(
                 error,
                 entityKey,
@@ -63,6 +69,12 @@ class AddressParseErrorMapper {
                 duplicateIdentifier = AddressUpdateError.AddressDuplicateIdentifier,
                 identifiersTooMany = AddressUpdateError.IdentifiersTooMany
             )
+            is SiteNotInAddressLegalEntity ->
+                ErrorInfo(
+                    AddressUpdateError.SiteNotInLegalEntity,
+                    "Site '${error.siteBpn}' does not belong to legal entity '${error.legalEntityBpn}'",
+                    entityKey
+                )
             is UnresolvableSite -> throw internalError(error)
         }
 

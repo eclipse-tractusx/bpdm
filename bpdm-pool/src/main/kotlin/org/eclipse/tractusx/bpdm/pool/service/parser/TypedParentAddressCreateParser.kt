@@ -19,7 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.parser
 
+import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
+import org.eclipse.tractusx.bpdm.pool.model.crossValidateParseResults
 import org.eclipse.tractusx.bpdm.pool.model.error.AddressCreateParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressCreateParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.AddressCreateTypedParentsRequest
@@ -30,15 +32,20 @@ import org.springframework.stereotype.Service
 class TypedParentAddressCreateParser(
     private val addressContentParser: AddressContentParser,
     private val legalEntityBpnParser: LegalEntityBpnParser,
-    private val siteBpnParser: SiteBpnParser
+    private val siteBpnParser: SiteBpnParser,
+    private val siteLegalEntityConsistencyValidator: SiteLegalEntityConsistencyValidator
 ) {
 
     fun parse(requests: List<AddressCreateTypedParentsRequest>): List<ParseResult<AddressCreateParsed, AddressCreateParseError>> {
         val contentResults = addressContentParser.parse(requests.map { it.content }, requests.map { null })
         val legalEntityResults = legalEntityBpnParser.parse(requests.map { it.legalEntityBpn })
         val siteResults = siteBpnParser.parse(requests.map { it.siteBpn })
+        val consistentSiteResults: List<ParseResult<SiteDb?, AddressCreateParseError>> =
+            crossValidateParseResults(legalEntityResults, siteResults) { legalEntity, site ->
+                siteLegalEntityConsistencyValidator.check(legalEntity, site)
+            }
 
-        return zipParseResults(contentResults, legalEntityResults, siteResults) { content, legalEntity, site ->
+        return zipParseResults(contentResults, legalEntityResults, consistentSiteResults) { content, legalEntity, site ->
             AddressCreateParsed(legalEntity, site, content)
         }
     }

@@ -45,6 +45,7 @@ import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityCreateParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityUpdateParseError
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteContentParseError
+import org.eclipse.tractusx.bpdm.pool.model.error.SiteNotInAddressLegalEntity
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteCreateParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteUpdateParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableAddress
@@ -427,6 +428,7 @@ class TaskStepBuildService(
         when (error) {
             is UnresolvableLegalEntity -> "Legal entity ${error.bpn} not found"
             is UnresolvableSite -> "Site ${error.bpn} not found"
+            is SiteNotInAddressLegalEntity -> "Site ${error.siteBpn} does not belong to legal entity ${error.legalEntityBpn}"
             // Unreachable on the task path: parents arrive already typed, so the untyped-stage InvalidParentBpn never occurs here.
             is InvalidParentBpn -> "Parent ${error.bpn} is not a valid BPNL/BPNS"
             is AddressContentParseError -> renderError(error)
@@ -437,6 +439,7 @@ class TaskStepBuildService(
             is UnresolvableAddress -> "Address ${error.bpn} not found"
             is AddressContentParseError -> renderError(error)
             is UnresolvableSite -> "Site parent ${error.bpn} not found"
+            is SiteNotInAddressLegalEntity -> "Site ${error.siteBpn} does not belong to legal entity ${error.legalEntityBpn}"
         }
 
     private fun renderError(error: AddressContentParseError): String =

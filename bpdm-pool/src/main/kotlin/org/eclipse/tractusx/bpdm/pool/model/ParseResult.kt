@@ -99,6 +99,32 @@ fun <A, B, C, R, E> zipParseResults(
 }
 
 /**
+ * Cross-validates two positionally-aligned result lists against a constraint relating their two values. [validate] runs
+ * only where BOTH inputs succeeded — the only case where the constraint is meaningful — and the errors it returns (empty
+ * = satisfied) are folded into that entry's [b] result. Where either input already failed, [b] passes through unchanged:
+ * its own resolution error already surfaces, and the constraint can't be evaluated without both operands.
+ *
+ * This keeps a cross-field validator (e.g. "the parent site must belong to the address's legal entity") a pure function
+ * of resolved domain values, unaware of resolution failures — the "run only on resolved inputs, weave verdicts back"
+ * orchestration lives here, mirroring how [chainParseResults] sequences a dependent stage after a successful one.
+ */
+fun <A, B, E> crossValidateParseResults(
+    a: List<ParseResult<A, E>>,
+    b: List<ParseResult<B, E>>,
+    validate: (A, B) -> List<E>
+): List<ParseResult<B, E>> {
+    require(a.size == b.size) { "Parse result lists must align positionally: ${a.size} vs ${b.size}" }
+    return b.indices.map { index ->
+        val aResult = a[index]
+        val bResult = b[index]
+        if (aResult is ParseResult.Success && bResult is ParseResult.Success)
+            bResult.combine(validate(aResult.parsed, bResult.parsed)) { it }
+        else
+            bResult
+    }
+}
+
+/**
  * Chains a second parse stage after a first, positionally: [second] runs only on the entries [first] parsed
  * successfully, and its per-entry verdicts are woven back into [first]'s positions. Failures of [first] pass straight
  * through unchanged. Lets a higher pipeline stage delegate to a lower stage's `parse` (which itself yields per-entry
