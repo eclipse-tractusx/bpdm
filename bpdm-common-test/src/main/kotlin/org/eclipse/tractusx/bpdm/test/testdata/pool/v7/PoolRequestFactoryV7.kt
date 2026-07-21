@@ -137,5 +137,5 @@ class PoolRequestFactoryV7(
     private fun createRandom(seed: String) =  Random(seed.hashCode().toLong())
 
     private fun SiteDto.withMainAddressIsShared() =
-        copy(mainAddress = mainAddress.copy(confidenceCriteria = mainAddress.confidenceCriteria.withGivenConfidence(TestDataV7.IsShared)))
+        copy(mainAddress = mainAddress.copy(confidenceCriteria = mainAddress.confidenceCriteria.withGivenConfidence(TestDataV7.SharedByOwner)))
 }

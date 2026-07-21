@@ -35,6 +35,11 @@ object TestDataV7 {
         confidenceLevel = 5
     )
 
+    val SyncedSharedByOwnerConfidence = CalculatedConfidence(
+        numberOfSharingMembers = 1,
+        confidenceLevel = 5
+    )
+
     val DefaultSiteConfidence = CalculatedConfidence(
         numberOfSharingMembers = 1,
         confidenceLevel = 5
@@ -45,9 +50,19 @@ object TestDataV7 {
         checkedByExternalDataSource = false
     )
 
-    val IsShared = GivenConfidence(
+    val SharedByOwner = GivenConfidence(
         sharedByOwner = true,
         checkedByExternalDataSource = false
+    )
+
+    val CheckedByExternalSource = GivenConfidence(
+        sharedByOwner = false,
+        checkedByExternalDataSource = true
+    )
+
+    val SharedByOwnerAndChecked = GivenConfidence(
+        sharedByOwner = true,
+        checkedByExternalDataSource = true
     )
 
 }

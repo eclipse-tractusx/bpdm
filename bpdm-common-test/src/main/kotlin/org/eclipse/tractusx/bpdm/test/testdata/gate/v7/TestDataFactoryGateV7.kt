@@ -105,6 +105,12 @@ class TestDataFactoryGateV7(
                 additionalAddress: LogisticAddressVerboseDto,
                 additionalSites: Collection<AdditionalSiteOutputDto> = emptyList()
             ) = bpOutputDtoFactory.fromAdditionalAddressOnSite(input, legalEntity, site, additionalAddress, additionalSites)
+
+            fun fromAdditionalAddressOnLegalEntity(
+                input: BusinessPartnerInputDto,
+                legalEntity: LegalEntityWithLegalAddressVerboseDto,
+                additionalAddress: LogisticAddressVerboseDto
+            ) = bpOutputDtoFactory.fromAdditionalAddressOnLegalEntity(input, legalEntity, additionalAddress)
         }
     }
 
@@ -130,6 +136,9 @@ class TestDataFactoryGateV7(
         inner class OutputFactory {
             fun fromGoldenRecord(externalId: String, goldenRecordRelation: BusinessPartnerRelations) =
                 relationOutputDtoFactory.fromGoldenRecord(externalId, goldenRecordRelation)
+
+            fun fromInput(entry: RelationPutEntry) =
+                relationOutputDtoFactory.fromInput(entry)
         }
     }
 

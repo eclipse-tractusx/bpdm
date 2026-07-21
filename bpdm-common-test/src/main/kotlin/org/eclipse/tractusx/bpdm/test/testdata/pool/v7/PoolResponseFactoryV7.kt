@@ -167,7 +167,7 @@ class PoolResponseFactoryV7(
                 name = withValuesFrom.name,
                 states = withValuesFrom.states,
                 confidenceCriteria = withValuesFrom.confidenceCriteria,
-                scriptVariants = emptyList(),
+                scriptVariants = withValuesFrom.scriptVariants.zip(legalEntityParent.scriptVariants){ siteVariant, leVariant -> SiteScriptVariantDto(siteVariant.scriptCode, siteVariant.name, leVariant.legalAddress) },
                 bpnS = bpnS,
                 bpnLegalEntity = withValuesFrom.bpnLParent
             ),

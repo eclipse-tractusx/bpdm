@@ -40,7 +40,7 @@ class AdditionalAddressCreationV7IT : UnscheduledPoolTestBaseV7() {
         val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
 
         //WHEN
-        val addressRequest = requestFactory.buildAdditionalAddressCreateRequest(testName, legalEntityResponse).withConfidence(TestDataV7.IsShared)
+        val addressRequest = requestFactory.buildAdditionalAddressCreateRequest(testName, legalEntityResponse).withConfidence(TestDataV7.SharedByOwner)
         val addressResponse = poolClient.addresses.createAddresses(listOf(addressRequest))
 
         //THEN
@@ -83,7 +83,7 @@ class AdditionalAddressCreationV7IT : UnscheduledPoolTestBaseV7() {
         val siteResponse = testDataClient.createSite(legalEntityResponse, testName)
 
         //WHEN
-        val addressRequest = requestFactory.buildAdditionalAddressCreateRequest(testName, siteResponse).withConfidence(TestDataV7.IsShared)
+        val addressRequest = requestFactory.buildAdditionalAddressCreateRequest(testName, siteResponse).withConfidence(TestDataV7.SharedByOwner)
         val addressResponse = poolClient.addresses.createAddresses(listOf(addressRequest))
 
         //THEN

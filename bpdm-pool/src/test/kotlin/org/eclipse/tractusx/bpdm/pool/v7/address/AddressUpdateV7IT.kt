@@ -40,7 +40,7 @@ class AddressUpdateV7IT : UnscheduledPoolTestBaseV7() {
         val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
 
         //WHEN
-        val addressRequest = requestFactory.buildAddressUpdateRequest(testName, legalEntityResponse).withConfidence(TestDataV7.IsShared)
+        val addressRequest = requestFactory.buildAddressUpdateRequest(testName, legalEntityResponse).withConfidence(TestDataV7.SharedByOwner)
         val addressResponse = poolClient.addresses.updateAddresses(listOf(addressRequest))
 
         //THEN
@@ -62,7 +62,7 @@ class AddressUpdateV7IT : UnscheduledPoolTestBaseV7() {
         val siteResponse = testDataClient.createSite(legalEntityResponse, testName)
 
         //WHEN
-        val addressRequest = requestFactory.buildAddressUpdateRequest(testName, siteResponse).withConfidence(TestDataV7.IsShared)
+        val addressRequest = requestFactory.buildAddressUpdateRequest(testName, siteResponse).withConfidence(TestDataV7.SharedByOwner)
         val addressResponse = poolClient.addresses.updateAddresses(listOf(addressRequest))
 
         //THEN
@@ -84,7 +84,7 @@ class AddressUpdateV7IT : UnscheduledPoolTestBaseV7() {
         val siteResponse = testDataClient.createLegalAddressSite(legalEntityResponse, testName)
 
         //WHEN
-        val addressRequest = requestFactory.buildAddressUpdateRequest(testName, siteResponse).withConfidence(TestDataV7.IsShared)
+        val addressRequest = requestFactory.buildAddressUpdateRequest(testName, siteResponse).withConfidence(TestDataV7.SharedByOwner)
         val addressResponse = poolClient.addresses.updateAddresses(listOf(addressRequest))
 
         //THEN
@@ -106,7 +106,7 @@ class AddressUpdateV7IT : UnscheduledPoolTestBaseV7() {
         val addressCreateResponse = testDataClient.createAdditionalAddress(legalEntityResponse, testName)
 
         //WHEN
-        val addressUpdateRequest = requestFactory.buildAddressUpdateRequest("Updated $testName", addressCreateResponse).withConfidence(TestDataV7.IsShared)
+        val addressUpdateRequest = requestFactory.buildAddressUpdateRequest("Updated $testName", addressCreateResponse).withConfidence(TestDataV7.SharedByOwner)
         val addressUpdateResponse = poolClient.addresses.updateAddresses(listOf(addressUpdateRequest))
 
         //THEN
