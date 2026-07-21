@@ -6,7 +6,15 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
 For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/CHANGELOG.md) of the charts directly.
 
-## [7.4.0] - tbd
+## [7.5.0] - unreleased
+
+### Breaking
+
+### Added
+
+### Changed
+
+## [7.4.0] - 2026-06-10
 
 ### Breaking
 
@@ -20,14 +28,10 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM Gate: Golden record relations to business partner output [#1630](https://github.com/eclipse-tractusx/bpdm/issues/1630)
 - BPDM Pool: Seed default Business Partner Relation Reason Code via Flyway migration [#1679](https://github.com/eclipse-tractusx/bpdm/issues/1679)
 
-
-### Added
-
-- BPDM Gate: Migration script to enforce unique constraints to fix parallel inserts with same external id being accepted in Gate [#1546](https://github.com/eclipse-tractusx/bpdm/issues/1546)
-
 ### Changed
 
 - BPDM Gate: Fix V7 relation output changelog always showing "UPDATE" type even if the relation output has been created [#1665](https://github.com/eclipse-tractusx/bpdm/issues/1665)
+- BPDM Gate: Fix rare bug in which duplicate sharing member records with the same external-id can be created if they are shared in parallel [#1546](https://github.com/eclipse-tractusx/bpdm/issues/1546)
 
 ## [7.3.0] - 2026-03-6
 
@@ -41,6 +45,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM: Introduced support for business partner address-to-address relations with the new `IsReplacedBy` relation type. [#1561](https://github.com/eclipse-tractusx/bpdm/issues/1561)
 - BPDM Pool: Add endpoints to manage reason code metadata [1562](https://github.com/eclipse-tractusx/bpdm/issues/1562)
 - BPDM: Add reason codes to business partner relations [1562](https://github.com/eclipse-tractusx/bpdm/issues/1562)
+- BPDM Pool: Populating Golden Record Task Business Partner's UpdatedAt [#1564](https://github.com/eclipse-tractusx/bpdm/issues/1564)
 - BPDM Pool: Relocate legal entity headquarter when a replaced by relation between a legal address and an additional address activates [#1586](https://github.com/eclipse-tractusx/bpdm/issues/1586)
 
 ### Changed

@@ -126,8 +126,8 @@ In order to do so, the following changes are required:
 
 1. Adapt the available task steps in the [TaskStep Enum](../../bpdm-orchestrator-api/src/main/kotlin/org/eclipse/tractusx/orchestrator/api/model/TaskStep.kt)
 2. Change the golden record process [state machine configuration](../../bpdm-orchestrator/src/main/kotlin/org/eclipse/tractusx/bpdm/orchestrator/config/StateMachineConfig.kt)
-3. Adapt the Central-IDP configuration to include roles for the new steps. This should be done [locally](../../bpdm-common-test/src/main/resources/keycloak/CX-Central.json) as well as [remotely](https://github.com/eclipse-tractusx/portal-iam).
-    Alternatively, you can also override the generated standard permission names with ones that already exist in Central-IDP see next point)
+3. Adapt the Keycloak realm configuration to include roles for the new steps. This should be done [locally](../../bpdm-common-test/src/main/resources/keycloak/BPDM-realm.json) as well as [remotely](https://github.com/eclipse-tractusx/portal-iam).
+    Alternatively, you can also override the generated standard permission names with ones that already exist in the IdP see next point)
 4. Optionally: Adapt the step permissions in the [application properties](../../bpdm-orchestrator/src/main/resources/application.yml) for documentation purposes or for overriding the generated standard permission names
 5. Optionally: Adapt the [task worker authentication tests](../../bpdm-orchestrator/src/test/kotlin/org/eclipse/tractusx/bpdm/orchestrator/auth) for testing the new step permission configuration
 

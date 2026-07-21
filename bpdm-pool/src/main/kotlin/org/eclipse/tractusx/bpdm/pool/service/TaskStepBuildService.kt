@@ -494,7 +494,8 @@ class TaskStepBuildService(
                 identifiers = identifiers.map { assertNotNull(it).let { LegalEntityIdentifierDto(it.value!!, it.type!!, it.issuingBody) } },
                 states = states.map { assertNotNull(it).let { LegalEntityStateDto(it.validFrom.toLocalDateTime(), it.validTo.toLocalDateTime(), it.type!!) }   },
                 confidenceCriteria = toPoolDto(confidenceCriteria, CleaningError.LEGAL_ENTITY_CONFIDENCE_CRITERIA_MISSING),
-                isParticipantData = isParticipantData ?: false
+                isParticipantData = isParticipantData ?: false,
+                updatedAt = updatedAt
             )
         }
 
@@ -541,7 +542,8 @@ class TaskStepBuildService(
                 states = states.map { assertNotNull(it).let { SiteStateDto(it.validFrom.toLocalDateTime(), it.validTo.toLocalDateTime(), it.type!!) }},
                 mainAddress = toPoolDto(siteMainAddress),
                 confidenceCriteria = toPoolDto(confidenceCriteria, CleaningError.SITE_CONFIDENCE_CRITERIA_MISSING),
-                scriptVariants = scriptVariants.map { toPoolDto(it) }
+                scriptVariants = scriptVariants.map { toPoolDto(it) },
+                updatedAt = updatedAt
             )
         }
 
@@ -564,7 +566,8 @@ class TaskStepBuildService(
                 identifiers = identifiers.map { assertNotNull(it).let { AddressIdentifierDto(it.value!!, it.type!!) } },
                 physicalPostalAddress = toPoolDto(physicalAddress),
                 alternativePostalAddress = alternativeAddress?.let { toPoolDto(it) },
-                confidenceCriteria = toPoolDto(confidenceCriteria, CleaningError.ADDRESS_CONFIDENCE_CRITERIA_MISSING)
+                confidenceCriteria = toPoolDto(confidenceCriteria, CleaningError.ADDRESS_CONFIDENCE_CRITERIA_MISSING),
+                updatedAt = updatedAt
             )
         }
 

@@ -813,6 +813,74 @@ class TaskResolutionServiceTest @Autowired constructor(
     }
 
     @Test
+    fun `task result contains updatedAt timestamps from pool records`() {
+        val createRequest = orchTestDataFactory.createFullBusinessPartner("updated-at-create")
+            .copyWithBpnRequests()
+
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createRequest).first()
+        assertThat(createResult.errors).isEmpty()
+
+        val resultBusinessPartner = createResult.businessPartner
+        assertThat(resultBusinessPartner.legalEntity.updatedAt).isNotNull()
+        assertThat(resultBusinessPartner.legalEntity.legalAddress.updatedAt).isNotNull()
+
+        resultBusinessPartner.site?.let { site ->
+            assertThat(site.updatedAt).isNotNull()
+            site.siteMainAddress?.let { mainAddress ->
+                assertThat(mainAddress.updatedAt).isNotNull()
+            }
+        }
+
+        resultBusinessPartner.additionalAddress?.let { additionalAddress ->
+            assertThat(additionalAddress.updatedAt).isNotNull()
+        }
+    }
+
+    @Test
+    fun `task result keeps stored updatedAt when hasChanged is false`() {
+        val createRequest = orchTestDataFactory.createFullBusinessPartner("updated-at-no-change")
+            .copyWithBpnRequests()
+
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createRequest).first()
+        assertThat(createResult.errors).isEmpty()
+
+        val createdBusinessPartner = createResult.businessPartner
+        val storedLegalEntity = poolClient.legalEntities.getLegalEntity(createdBusinessPartner.legalEntity.bpnReference.referenceValue!!)
+        val storedSite = createdBusinessPartner.site?.bpnReference?.referenceValue?.let { poolClient.sites.getSite(it) }
+        val storedAdditionalAddress = createdBusinessPartner.additionalAddress?.bpnReference?.referenceValue?.let { poolClient.addresses.getAddress(it) }
+
+        val noChangeRequest = createdBusinessPartner.copy(
+            legalEntity = createdBusinessPartner.legalEntity.copy(
+                hasChanged = false,
+                legalAddress = createdBusinessPartner.legalEntity.legalAddress.copy(hasChanged = false)
+            ),
+            site = createdBusinessPartner.site?.let { site ->
+                site.copy(
+                    hasChanged = false,
+                    siteMainAddress = site.siteMainAddress?.copy(hasChanged = false)
+                )
+            },
+            additionalAddress = createdBusinessPartner.additionalAddress?.copyAsPostalAddress { it.copy(hasChanged = false) }
+        )
+
+        val noChangeResult = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = noChangeRequest).first()
+        assertThat(noChangeResult.errors).isEmpty()
+
+        val returnedBusinessPartner = noChangeResult.businessPartner
+        assertThat(returnedBusinessPartner.legalEntity.updatedAt).isEqualTo(storedLegalEntity.header.updatedAt)
+        assertThat(returnedBusinessPartner.legalEntity.legalAddress.updatedAt).isEqualTo(storedLegalEntity.legalAddress.updatedAt)
+
+        returnedBusinessPartner.site?.let { site ->
+            assertThat(site.updatedAt).isEqualTo(storedSite?.site?.updatedAt)
+            assertThat(site.siteMainAddress?.updatedAt).isEqualTo(storedSite?.mainAddress?.updatedAt)
+        }
+
+        returnedBusinessPartner.additionalAddress?.let { additionalAddress ->
+            assertThat(additionalAddress.updatedAt).isEqualTo(storedAdditionalAddress?.address?.updatedAt)
+        }
+    }
+
+    @Test
     fun `create multiple legal entity `() {
 
         val numberOfEntitiesToTest = 100

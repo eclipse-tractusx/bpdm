@@ -3,7 +3,7 @@
   "info" : {
     "title" : "Business Partner Data Management Orchestrator",
     "description" : "Orchestrator component acts as a passive component and offers for each processing steps individual endpoints",
-    "version" : "7.4.0-rc2"
+    "version" : "7.5.0-SNAPSHOT"
   },
   "servers" : [ {
     "url" : "http://localhost:8085",
@@ -1044,6 +1044,10 @@
               "$ref" : "#/components/schemas/LegalEntityGoldenRecordRelation"
             }
           },
+          "updatedAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
           "isParticipantData" : {
             "type" : "boolean",
             "description" : "Whether this legal entity is part of the Data Space network"
@@ -1261,6 +1265,11 @@
             "items" : {
               "$ref" : "#/components/schemas/AddressGoldenRecordRelation"
             }
+          },
+          "updatedAt" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "Timestamp when this address was last updated in the source system"
           }
         }
       },
@@ -1340,6 +1349,11 @@
             "items" : {
               "$ref" : "#/components/schemas/AddressGoldenRecordRelation"
             }
+          },
+          "updatedAt" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "Timestamp when this address was last updated in the source system"
           },
           "scriptVariants" : {
             "type" : "array",
@@ -1422,6 +1436,10 @@
             "items" : {
               "$ref" : "#/components/schemas/SiteScriptVariant"
             }
+          },
+          "updatedAt" : {
+            "type" : "string",
+            "format" : "date-time"
           },
           "siteMainIsLegalAddress" : {
             "type" : "boolean",
