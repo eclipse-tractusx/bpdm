@@ -10,7 +10,6 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 
 ### Breaking
 
-
 ### Added
 
 ### Changed
