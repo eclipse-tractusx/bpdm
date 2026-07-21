@@ -236,10 +236,7 @@ jobs:
               repository: bpdm-orchestrator
               tag: test
           bpdm-cleaning-service-dummy:
-            image:
-              registry: kind-registry:5000
-              repository: bpdm-cleaning-service-dummy
-              tag: test
+            enabled: false
           EOF
           echo "cat charts/bpdm/ci/test-upgrade-values.yaml"
           cat charts/bpdm/ci/test-upgrade-values.yaml
