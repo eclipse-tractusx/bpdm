@@ -188,14 +188,7 @@ jobs:
               repository: bpdm-orchestrator
               tag: test
           bpdm-cleaning-service-dummy:
-            image:
-              registry: kind-registry:5000
-              repository: bpdm-cleaning-service-dummy
-              tag: test
-            # Disables the cleaning service's relation-cleaning poller so it does not race the
-            # system-tester, which reserves and resolves the relation tasks itself.
-            springProfiles:
-              - system-tester
+            enabled: false
           tests:
             enabled: true
             filterTags: "$FILTER_TAGS"
@@ -236,7 +229,10 @@ jobs:
               repository: bpdm-orchestrator
               tag: test
           bpdm-cleaning-service-dummy:
-            enabled: false
+            image:
+              registry: kind-registry:5000
+              repository: bpdm-cleaning-service-dummy
+              tag: test
           EOF
           echo "cat charts/bpdm/ci/test-upgrade-values.yaml"
           cat charts/bpdm/ci/test-upgrade-values.yaml
