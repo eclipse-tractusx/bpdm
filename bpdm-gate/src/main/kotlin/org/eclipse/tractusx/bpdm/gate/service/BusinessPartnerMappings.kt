@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 
+import java.time.Instant
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
@@ -169,7 +170,7 @@ class BusinessPartnerMappings {
             ),
             states = toStateDtos(entity.states, BusinessPartnerType.LEGAL_ENTITY),
             goldenRecordRelations = entity.legalEntityGoldenRecordRelations.map { LegalEntityGoldenRecordRelationDto(toLeRelationType(it.relationType), it.sourceBpn, it.targetBpn) },
-            updatedAt = entity.legalEntityUpdatedAt
+            updatedAt = entity.legalEntityUpdatedAt ?: Instant.EPOCH
         )
     }
 
@@ -185,7 +186,7 @@ class BusinessPartnerMappings {
                         "Missing site confidence criteria"
                     ),
                     states = toStateDtos(entity.states, BusinessPartnerType.SITE),
-                    updatedAt = entity.siteUpdatedAt
+                    updatedAt = entity.siteUpdatedAt ?: Instant.EPOCH
                 )
             }
     }
@@ -208,7 +209,7 @@ class BusinessPartnerMappings {
             ),
             states = toStateDtos(entity.states, BusinessPartnerType.ADDRESS),
             goldenRecordRelations = entity.addressGoldenRecordRelations.map { AddressGoldenRecordRelationDto(toAddressRelationType(it.relationType), it.sourceBpn, it.targetBpn) },
-            updatedAt = entity.addressUpdatedAt
+            updatedAt = entity.addressUpdatedAt ?: Instant.EPOCH
         )
     }
 
