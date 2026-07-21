@@ -55,9 +55,7 @@ class GateAssertRepositoryV7(
             .usingRecursiveComparison()
             .ignoringFields(
                 BusinessPartnerOutputDto::createdAt.name,
-                BusinessPartnerOutputDto::updatedAt.name,
-                "legalEntity.updatedAt",
-                "address.updatedAt"
+                BusinessPartnerOutputDto::updatedAt.name
             )
             .withComparatorForType(instantSecondsComparator, Instant::class.java)
             .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
