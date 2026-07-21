@@ -48,10 +48,8 @@ class SearchOutputChangelogV7IT: UnscheduledGateTestBaseV7() {
         val response = gateClient.changelog.getOutputChangelog(PaginationRequest(), ChangelogSearchRequest())
 
         //THEN
-        val expected = testData.changelog.ofOnePage(
-            ChangelogGateDto(testName, anyTime, ChangelogType.CREATE),
-            ChangelogGateDto(testName, anyTime, ChangelogType.UPDATE)
-        )
+        val expectedEntry = ChangelogGateDto(testName, anyTime, ChangelogType.CREATE)
+        val expected = testData.changelog.ofOnePage(expectedEntry)
 
         assertRepo.assertChangelog(response, expected)
     }
@@ -75,8 +73,6 @@ class SearchOutputChangelogV7IT: UnscheduledGateTestBaseV7() {
         //THEN
         val expected = testData.changelog.ofOnePage(
             ChangelogGateDto(testName, anyTime, ChangelogType.CREATE),
-            ChangelogGateDto(testName, anyTime, ChangelogType.UPDATE),
-            ChangelogGateDto(testName, anyTime, ChangelogType.UPDATE),
             ChangelogGateDto(testName, anyTime, ChangelogType.UPDATE)
         )
 
@@ -101,8 +97,7 @@ class SearchOutputChangelogV7IT: UnscheduledGateTestBaseV7() {
 
         //THEN
         val expected = testData.changelog.ofOnePage(
-            ChangelogGateDto(outputToBeFound.externalId, anyTime, ChangelogType.CREATE),
-            ChangelogGateDto(outputToBeFound.externalId, anyTime, ChangelogType.UPDATE)
+            ChangelogGateDto(outputToBeFound.externalId, anyTime, ChangelogType.CREATE)
         )
         assertRepo.assertChangelog(response, expected)
     }
@@ -128,8 +123,7 @@ class SearchOutputChangelogV7IT: UnscheduledGateTestBaseV7() {
 
         //THEN
         val expected = testData.changelog.ofOnePage(
-            ChangelogGateDto(outputAfterTimeX.externalId, anyTime, ChangelogType.CREATE),
-            ChangelogGateDto(outputAfterTimeX.externalId, anyTime, ChangelogType.UPDATE)
+            ChangelogGateDto(outputAfterTimeX.externalId, anyTime, ChangelogType.CREATE)
         )
         assertRepo.assertChangelog(response, expected)
     }
@@ -155,7 +149,6 @@ class SearchOutputChangelogV7IT: UnscheduledGateTestBaseV7() {
 
         //THEN
         val expected = testData.changelog.ofOnePage(
-            ChangelogGateDto(outputA.externalId, anyTime, ChangelogType.UPDATE),
             ChangelogGateDto(outputA.externalId, anyTime, ChangelogType.UPDATE)
         )
         assertRepo.assertChangelog(response, expected)
@@ -206,13 +199,13 @@ class SearchOutputChangelogV7IT: UnscheduledGateTestBaseV7() {
 
         //THEN
         val expected = PageChangeLogDto(
-            totalElements = 6L,
-            totalPages = 3,
+            totalElements = 3L,
+            totalPages = 2,
             page = 0,
             contentSize = 2,
             content = listOf(
                 ChangelogGateDto("$testName 1", anyTime, ChangelogType.CREATE),
-                ChangelogGateDto("$testName 1", anyTime, ChangelogType.UPDATE)
+                ChangelogGateDto("$testName 2", anyTime, ChangelogType.CREATE)
             ),
             invalidEntries = 0,
             errors = emptyList<ErrorInfo<ChangeLogOutputError>>()
@@ -237,13 +230,12 @@ class SearchOutputChangelogV7IT: UnscheduledGateTestBaseV7() {
 
         //THEN
         val expected = PageChangeLogDto(
-            totalElements = 6L,
-            totalPages = 3,
+            totalElements = 3L,
+            totalPages = 2,
             page = 1,
-            contentSize = 2,
+            contentSize = 1,
             content = listOf(
-                ChangelogGateDto("$testName 2", anyTime, ChangelogType.CREATE),
-                ChangelogGateDto("$testName 2", anyTime, ChangelogType.UPDATE)
+                ChangelogGateDto("$testName 3", anyTime, ChangelogType.CREATE)
             ),
             invalidEntries = 0,
             errors = emptyList<ErrorInfo<ChangeLogOutputError>>()
