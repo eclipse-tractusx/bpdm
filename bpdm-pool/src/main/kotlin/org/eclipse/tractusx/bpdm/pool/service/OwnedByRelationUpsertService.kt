@@ -47,6 +47,9 @@ class OwnedByRelationUpsertService(
         validateSingleParent(upsertRequest)
         validateNoCycles(upsertRequest)
 
+        ultimateOwnerResolutionService.validateOnlyOneUltimateOwnerInHierarchy(proposedSource)
+        ultimateOwnerResolutionService.validateOnlyOneUltimateOwnerInHierarchy(proposedTarget)
+
 
         val result = relationUpsertService.upsertRelation(
             RelationUpsertService.UpsertRequest(
