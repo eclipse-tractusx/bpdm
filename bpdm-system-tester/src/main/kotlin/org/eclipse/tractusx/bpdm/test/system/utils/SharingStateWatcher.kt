@@ -43,7 +43,7 @@ class SharingStateWatcher(
         // criteria for up to 30 seconds after reporting Success.
         private val TERMINAL_STATES = setOf(SharingStateType.Error, SharingStateType.Initial)
         private val RELATION_TERMINAL_STATES = setOf(RelationSharingStateType.Error, RelationSharingStateType.Ready)
-        private val WAIT_TIMEOUT = Duration.ofMinutes(4)
+        private val WAIT_TIMEOUT = Duration.ofMinutes(6)
         private const val POLL_INTERVAL_SECONDS = 10L
         private const val CONFIDENCE_SYNC_DELAY_SECONDS = 35L
         private const val PAGE_SIZE = 100

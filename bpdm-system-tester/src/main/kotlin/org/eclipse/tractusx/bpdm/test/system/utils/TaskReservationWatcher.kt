@@ -36,7 +36,7 @@ class TaskReservationWatcher(
 ) {
 
     companion object {
-        private val WAIT_TIMEOUT = Duration.ofMinutes(4)
+        private val WAIT_TIMEOUT = Duration.ofMinutes(6)
         private const val POLL_INTERVAL_SECONDS = 10L
         private const val RESERVATION_AMOUNT = 10
     }
