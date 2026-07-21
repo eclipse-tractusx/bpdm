@@ -21,7 +21,7 @@ Feature: Output Reflects Own Shared Master Data
   ## The sharing member shares a record.
   ## The golden record process refines it to a legal entity with master data.
   ## The record's output reflects the legal entity master data.
-  @TEST_CXTPM-1012 @BPDM
+  @TEST_CXTPM-1012 @BPDM @Smoke
   Scenario: Legal Entity Master Data In Output
     When the sharing member shares record "acme-record"
     And the golden record process refines record "acme-record" to legal entity "acme" with master data "acme-content"

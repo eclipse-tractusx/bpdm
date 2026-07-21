@@ -14,7 +14,7 @@ Feature: Sharing Member Relation Output Reflects Golden Record Relation
   ## The sharing member shares an IsOwnedBy relation from the owned record to the owner record.
   ## The golden record process establishes the relation.
   ## The relation output reflects the established golden record relation.
-  @TEST_CXTPM-1035 @BPDM
+  @TEST_CXTPM-1035 @BPDM @Smoke
   Scenario: IsOwnedBy Relation Reflected In Sharing Member Relation Output
     Given record "owner-record" reflects legal entity "owner"
     And record "owned-record" reflects legal entity "owned"
