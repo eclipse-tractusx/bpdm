@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.api.model.request
 import com.neovisionaries.i18n.CountryCode
 import com.neovisionaries.i18n.LanguageCode
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.pool.api.model.CountrySubdivisionDto
 
 @Schema(name = "LegalFormRequest", description = "New legal form record to be referenced by business partners")
 data class LegalFormRequest(
@@ -46,8 +47,8 @@ data class LegalFormRequest(
     @Schema(description = "The language of the legal form's name")
     val language: LanguageCode?,
 
-    @Schema(description = "The administrative area level 1 this legal form belongs to")
-    val administrativeAreaLevel1: String?,
+    @Schema(description = "The administrative area level 1 (country subdivision according to ISO 3166-2) this legal form belongs to")
+    val administrativeAreaLevel1: CountrySubdivisionDto?,
 
     @get:Schema(description = "Whether this legal form is considered as active according to GLEIF", name = "isActive")
     val isActive: Boolean

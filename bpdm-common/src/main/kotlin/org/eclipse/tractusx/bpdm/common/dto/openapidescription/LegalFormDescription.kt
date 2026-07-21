@@ -26,4 +26,5 @@ object LegalFormDescription {
     const val technicalKey = "The technical identifier of the legal form according to ISO 20275."
     const val name = "The name of legal form according to ISO 20275."
     const val abbreviation = "The abbreviated name of the legal form, such as AG for German Aktiengesellschaft."
+    const val administrativeAreaLevel1 = "The administrative area level 1 (country subdivision according to ISO 3166-2) this legal form belongs to."
 }

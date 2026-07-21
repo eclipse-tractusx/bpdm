@@ -113,7 +113,7 @@ fun LegalFormDb.toDto(): LegalFormDto {
         transliteratedAbbreviations = transliteratedAbbreviations,
         country = countryCode,
         language = languageCode,
-        administrativeAreaLevel1 = administrativeArea?.regionCode,
+        administrativeAreaLevel1 = administrativeArea?.let { CountrySubdivisionDto(countryCode = it.countryCode, code = it.regionCode, name = it.regionName) },
         isActive = isActive
     )
 }

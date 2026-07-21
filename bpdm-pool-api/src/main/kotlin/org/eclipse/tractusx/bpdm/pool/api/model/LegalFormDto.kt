@@ -42,7 +42,8 @@ data class LegalFormDto(
 
     val language: LanguageCode?,
 
-    val administrativeAreaLevel1: String?,
+    @get:Schema(description = LegalFormDescription.administrativeAreaLevel1)
+    val administrativeAreaLevel1: CountrySubdivisionDto?,
 
     val transliteratedAbbreviations: String?,
 

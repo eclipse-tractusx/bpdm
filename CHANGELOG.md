@@ -12,6 +12,8 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 
 ### Added
 
+- BPDM Pool: Expand Admin Area Property in Legal Form Response [#1686](https://github.com/eclipse-tractusx/bpdm/issues/1686)
+
 ### Changed
 
 ## [7.4.0] - 2026-06-10

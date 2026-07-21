@@ -6737,7 +6737,9 @@ components:
             - zh
             - zu
         administrativeAreaLevel1:
-          type: string
+          $ref: "#/components/schemas/CountrySubdivisionDto"
+          description: The administrative area level 1 (country subdivision according
+            to ISO 3166-2) this legal form belongs to.
         transliteratedAbbreviations:
           type: string
         isActive:
@@ -7220,7 +7222,7 @@ components:
             - zh
             - zu
         administrativeAreaLevel1:
-          type: string
+          $ref: "#/components/schemas/CountrySubdivisionDto"
         isActive:
           type: boolean
           description: Whether this legal form is considered as active according to

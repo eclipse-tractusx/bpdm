@@ -99,12 +99,12 @@ class MetadataService(
         logger.info { "Create new Legal-Form with key ${request.technicalKey} and name ${request.name}" }
 
         val region: RegionDb? = request.administrativeAreaLevel1?.let { code ->
-            val regionDb = regionRepository.findByRegionCodeIn(setOf(code)).firstOrNull()
+            val regionDb = regionRepository.findByRegionCodeIn(setOf(code.code)).firstOrNull()
             if (regionDb == null) {
                 val validationError = ValidationError(
                     validationErrorCode = "AdministrativeAreaNotFound",
-                    errorDetails = "Administrative area '$code' not found in system.",
-                    erroneousValue = code,
+                    errorDetails = "Administrative area '${code.code}' not found in system.",
+                    erroneousValue = code.code,
                     context = ValidationContext.fromRoot( LegalFormRequest::class, "request", LegalFormRequest::administrativeAreaLevel1)
                 )
                 throw BpdmValidationErrorException(listOf(validationError))
