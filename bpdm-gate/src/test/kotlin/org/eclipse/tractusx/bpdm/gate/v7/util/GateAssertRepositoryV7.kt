@@ -40,7 +40,10 @@ class GateAssertRepositoryV7(
             .usingRecursiveComparison()
             .ignoringFields(
                 BusinessPartnerInputDto::createdAt.name,
-                BusinessPartnerInputDto::updatedAt.name
+                BusinessPartnerInputDto::updatedAt.name,
+                "legalEntity.updatedAt",
+                "site.updatedAt",
+                "address.updatedAt"
             )
             .isEqualTo(expected.sortedBy { it.externalId }.map { it.sortContent() })
     }
@@ -55,10 +58,7 @@ class GateAssertRepositoryV7(
             .usingRecursiveComparison()
             .ignoringFields(
                 BusinessPartnerOutputDto::createdAt.name,
-                BusinessPartnerOutputDto::updatedAt.name,
-                "legalEntity.updatedAt",
-                "site.updatedAt",
-                "address.updatedAt"
+                BusinessPartnerOutputDto::updatedAt.name
             )
             .withComparatorForType(instantSecondsComparator, Instant::class.java)
             .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
