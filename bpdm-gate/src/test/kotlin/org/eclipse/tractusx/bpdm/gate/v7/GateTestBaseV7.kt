@@ -26,7 +26,7 @@ import org.eclipse.tractusx.bpdm.gate.service.RelationTaskCreationService
 import org.eclipse.tractusx.bpdm.gate.service.RelationTaskResolutionService
 import org.eclipse.tractusx.bpdm.gate.service.TaskCreationBatchService
 import org.eclipse.tractusx.bpdm.gate.service.TaskResolutionBatchService
-import org.eclipse.tractusx.bpdm.gate.v7.util.GateAssertRepositoryV7
+import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.GateAssertRepositoryV7
 import org.eclipse.tractusx.bpdm.gate.v7.util.GateTestClientProviderV7
 import org.eclipse.tractusx.bpdm.gate.v7.util.GateTestDataClientV7
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer

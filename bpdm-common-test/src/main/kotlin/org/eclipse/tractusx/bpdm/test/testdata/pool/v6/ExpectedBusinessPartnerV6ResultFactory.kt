@@ -456,6 +456,21 @@ class ExpectedBusinessPartnerV6ResultFactory(
     }
 
     private fun mapToExpectedConfidence(confidenceCriteria: ConfidenceCriteriaDto, numberOfSharingMembers: Int = 0): ConfidenceCriteriaDto{
-        return confidenceCriteria.copy(numberOfSharingMembers = numberOfSharingMembers)
+        return confidenceCriteria.copy(
+            numberOfSharingMembers = numberOfSharingMembers,
+            // The Pool derives confidenceLevel from the flags and ignores the value sent in the request
+            // (see ConfidenceCriteriaDb.confidenceLevel), so the expectation must derive it the same way
+            // rather than echo the request's value.
+            confidenceLevel = deriveConfidenceLevel(confidenceCriteria, numberOfSharingMembers)
+        )
+    }
+
+    // Mirrors ConfidenceCriteriaDb.confidenceLevel in bpdm-pool (not reachable from this module, which
+    // only depends on bpdm-pool-api).
+    private fun deriveConfidenceLevel(confidenceCriteria: ConfidenceCriteriaDto, numberOfSharingMembers: Int): Int {
+        val sharedByOwnerLevel = if (confidenceCriteria.sharedByOwner) 5 else 0
+        val checkedByExternalDataSourceLevel = if (confidenceCriteria.checkedByExternalDataSource) 3 else 0
+        val numberOfSharingMembersLevel = if (numberOfSharingMembers >= 3) 1 else 0
+        return sharedByOwnerLevel + checkedByExternalDataSourceLevel + numberOfSharingMembersLevel
     }
 }

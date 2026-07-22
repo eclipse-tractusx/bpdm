@@ -89,6 +89,27 @@ class RefinementTestDataFactory {
         )
     }
 
+    fun buildAdditionLegalEntityAddressBusinessPartner(
+        legalEntityGoldenRecord: LegalEntityWithLegalAddressVerboseDto,
+        addressGoldenRecord: LogisticAddressVerboseDto,
+        owningCompany: String?,
+        nameParts: List<String>
+    ): BusinessPartner {
+        return BusinessPartner(
+            nameParts = listOfNotNull(
+                NamePart(legalEntityGoldenRecord.header.legalName, NamePartType.LegalName),
+                legalEntityGoldenRecord.header.legalShortName?.let { NamePart(it, NamePartType.ShortName) },
+                legalEntityGoldenRecord.header.legalForm?.let { NamePart(it, NamePartType.LegalForm) },
+                addressGoldenRecord.address.name?.let { NamePart(it, NamePartType.AddressName) }
+            ),
+            owningCompany = owningCompany,
+            uncategorized = UncategorizedProperties.empty.copy(nameParts = nameParts),
+            legalEntity = buildLegalEntityComponent(legalEntityGoldenRecord),
+            site = null,
+            additionalAddress = buildPostalAddressWithScriptVariants(addressGoldenRecord)
+        )
+    }
+
     fun buildAdditionSiteAddressBusinessPartner(
         legalEntityGoldenRecord: LegalEntityWithLegalAddressVerboseDto,
         siteGoldenRecord: SiteWithMainAddressVerboseDto,

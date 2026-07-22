@@ -46,6 +46,12 @@ spec:
       env:
         - name: SPRING_CONFIG_IMPORT
           value: "/etc/conf/application-0.yml,/etc/conf/application-1.yml"
+        {{- if .Values.tests.filterTags }}
+        # Cucumber resolves CUCUMBER_FILTER_TAGS to cucumber.filter.tags, narrowing the run to
+        # the matching scenarios. Unset (empty filterTags) runs the full suite.
+        - name: CUCUMBER_FILTER_TAGS
+          value: {{ .Values.tests.filterTags | quote }}
+        {{- end }}
       volumeMounts:
         - mountPath: /etc/conf
           name: config
