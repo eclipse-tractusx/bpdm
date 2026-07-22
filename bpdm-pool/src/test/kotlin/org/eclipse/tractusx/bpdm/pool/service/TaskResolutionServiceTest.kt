@@ -1108,6 +1108,48 @@ class TaskResolutionServiceTest @Autowired constructor(
     }
 
     @Test
+    fun `create second site sharing an existing site main address`() {
+        val leRef = "le-shared"
+        val leAddressRef = "le-addr-shared"
+        val siteARef = "site-a"
+        val siteBRef = "site-b"
+        val sharedMainAddressRef = "shared-main-addr"
+
+        // Task 1: create site A with its own (new) main address under the legal entity.
+        val createSiteA = orchTestDataFactory.createFullBusinessPartner("siteA")
+            .withLegalReferences(leRef.toBpnRequest(), leAddressRef.toBpnRequest())
+            .withSiteReferences(siteARef.toBpnRequest(), sharedMainAddressRef.toBpnRequest())
+            .copy(additionalAddress = null)
+        val resultA = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = createSiteA)
+        val siteABpns = resultA[0].businessPartner.site?.bpnReference?.referenceValue!!
+        val sharedAddressBpn = poolClient.sites.getSite(siteABpns).mainAddress.bpna
+
+        val addressAfterA = poolClient.addresses.getAddress(sharedAddressBpn).address
+        assertThat(addressAfterA.addressType).isEqualTo(AddressType.SiteMainAddress)
+        assertThat(addressAfterA.additionalSites).isEmpty()
+
+        // Task 2: create a distinct site B whose main address references the SAME address as site A's.
+        val createSiteB = orchTestDataFactory.createFullBusinessPartner("siteB")
+            .withLegalReferences(leRef.toBpnRequest(), leAddressRef.toBpnRequest())
+            .withSiteReferences(siteBRef.toBpnRequest(), sharedMainAddressRef.toBpnRequest())
+            .copy(additionalAddress = null)
+        val resultB = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = createSiteB)
+        val siteBBpns = resultB[0].businessPartner.site?.bpnReference?.referenceValue!!
+
+        assertThat(siteABpns).isNotEqualTo(siteBBpns)
+
+        // The single address now belongs to both sites: still a site main address, with the newer site B
+        // surfacing as an additional site of it.
+        val sharedAddress = poolClient.addresses.getAddress(sharedAddressBpn).address
+        assertThat(sharedAddress.addressType).isEqualTo(AddressType.SiteMainAddress)
+        assertThat(sharedAddress.additionalSites).containsExactly(siteBBpns)
+
+        // Both sites resolve their main address to the one shared BPNA (no duplicate address was created).
+        assertThat(poolClient.sites.getSite(siteABpns).mainAddress.bpna).isEqualTo(sharedAddressBpn)
+        assertThat(poolClient.sites.getSite(siteBBpns).mainAddress.bpna).isEqualTo(sharedAddressBpn)
+    }
+
+    @Test
     fun `create legal entity - too many identifiers`(){
         val legalIdentifierTypeKey = orchTestDataFactory.metadata!!.legalEntityIdentifierTypes.first()
         val addressIdentifierTypeKey = orchTestDataFactory.metadata!!.addressIdentifierTypes.first()

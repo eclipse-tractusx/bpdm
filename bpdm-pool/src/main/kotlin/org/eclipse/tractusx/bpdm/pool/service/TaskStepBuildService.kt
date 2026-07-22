@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import jakarta.transaction.Transactional
-import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
@@ -243,30 +242,33 @@ class TaskStepBuildService(
         taskEntryBpnMapping: TaskEntryBpnMapping
     ): Site {
         val address = addressService.findAddressByBpn(bpnA)
-        return if (address == null) {
-            upsertSite(site, businessPartner, legalEntityBpn, taskEntryBpnMapping)
+        val bpnS = taskEntryBpnMapping.getBpn(site.bpnReference)
+        // A NEW site (no BPN yet) whose main-address reference already resolves to a persisted address adopts
+        // that address as its main address - so several sites can share one main address - instead of creating a
+        // duplicate. An existing site being updated, and the legal-address-as-main path, stay on upsertSite (the
+        // latter already re-parents the legal address via the referenced-address service).
+        return if (address != null && bpnS == null && !site.siteMainIsLegalAddress) {
+            createSiteOnExistingAddress(site, businessPartner, address, taskEntryBpnMapping)
         } else {
-            if (getAddressType(address) == AddressType.AdditionalAddress) {
-                createSiteFromAdditionalAddress(site, businessPartner, address, taskEntryBpnMapping)
-            } else {
-                upsertSite(site, businessPartner, legalEntityBpn, taskEntryBpnMapping)
-            }
+            upsertSite(site, businessPartner, legalEntityBpn, taskEntryBpnMapping)
         }
     }
 
-    private fun createSiteFromAdditionalAddress(
+    private fun createSiteOnExistingAddress(
         site: Site,
         businessPartner: BusinessPartner,
-        additionalAddress: LogisticAddressDb,
+        existingAddress: LogisticAddressDb,
         taskEntryBpnMapping: TaskEntryBpnMapping
     ): Site {
-        // Reached only via the address-linkage path, where the site carries its own (distinct) main address; the
-        // referenced service re-parents that existing address onto the new site and derives the legal-entity parent from it.
+        // Reached only via the address-linkage path for a new site, where the site carries its own main address
+        // reference resolving to an already-persisted address (an additional address, or another site's main
+        // address). The referenced service re-parents that existing address onto the new site - adding the site to
+        // the address's site set - and derives the legal-entity parent from the address itself.
         val siteMainAddress = site.siteMainAddress ?: throw BpdmValidationException(CleaningError.MAINE_ADDRESS_IS_NULL.message)
         val bpnSReference = site.bpnReference
         val mergedSite = site.withRelevantScriptVariants(businessPartner)
 
-        val request = taskSiteRequestMapper.toCreateWithReferencedAddressAsMainRequest(additionalAddress.bpn, mergedSite, siteMainAddress)
+        val request = taskSiteRequestMapper.toCreateWithReferencedAddressAsMainRequest(existingAddress.bpn, mergedSite, siteMainAddress)
         val createdSite = when (val result = parseAndExecute(listOf(request), siteCreateWithReferencedAddressAsMainParser::parse, siteCreateWithReferencedAddressAsMainService::create).single()) {
             is ParseResult.Success -> result.parsed
             is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { renderError(it) })

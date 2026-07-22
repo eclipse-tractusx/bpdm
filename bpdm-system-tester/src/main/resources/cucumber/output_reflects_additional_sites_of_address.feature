@@ -14,10 +14,8 @@
 # entity, satisfying the Pool's same-legal-entity constraint for shared addresses.
 #
 # The shared address can be an ADDITIONAL address of the sites (first scenarios) or the sites' MAIN
-# address (last scenario). The main-address variant is currently a red spec: the golden record flow only
-# attaches a further site to an EXISTING address when that address is an additional address, so two site
-# records sharing a main address presently receive separate addresses. It is tagged @Wip until the Pool
-# is fixed; it exercises the intended behaviour and should pass unchanged once the fix lands.
+# address (last scenario): the golden record flow lets a new site adopt an already-existing address as
+# its main address, so several sites can share one main address.
 #
 # TODO: replace the placeholder @CXTPM-XXXX / @TEST_CXTPM-XXXX tags with the real Jira issue and
 # test-case ids once they exist.
@@ -109,8 +107,7 @@ Feature: Output Reflects Additional Sites Of Address
   ## The sharing member shares two records.
   ## The golden record process refines both to distinct sites of the same legal entity that share one main address.
   ## Each record's output lists the other record's site as an additional site of the shared main address, and the Pool address belongs to both sites.
-  #
-  @TEST_CXTPM-XXXX @BPDM @Wip
+  @TEST_CXTPM-XXXX @BPDM
   Scenario: Sites Sharing A Main Address Belong To Each Other
     When the sharing member shares record "hq-site-a-record"
     And the golden record process refines record "hq-site-a-record" to site "hq-site-a" with shared main address "shared-hq" of legal entity "acme" with master data "hq-a-content"
