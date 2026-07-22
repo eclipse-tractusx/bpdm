@@ -155,6 +155,9 @@ keycloak:
 tests:
   # Toggles whether the `helm test` hook pod is rendered for this release.
   enabled: false
+  # Cucumber tag expression passed to the system-tester (e.g. "@Smoke") to narrow the run.
+  # Empty runs the full suite.
+  filterTags: ""
   # The bpdm-system-tester container image run by the test pod.
   image:
     registry: docker.io

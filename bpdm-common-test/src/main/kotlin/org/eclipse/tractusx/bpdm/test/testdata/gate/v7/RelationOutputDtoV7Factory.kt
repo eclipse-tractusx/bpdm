@@ -22,9 +22,11 @@ package org.eclipse.tractusx.bpdm.test.testdata.gate.v7
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationValidityPeriodDto
 import org.eclipse.tractusx.bpdm.gate.api.model.SharableRelationType
+import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutEntry
 import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerRelations
 import org.eclipse.tractusx.orchestrator.api.model.RelationType
 import java.time.Instant
+import org.eclipse.tractusx.bpdm.gate.api.model.RelationType as GateRelationType
 
 class RelationOutputDtoV7Factory {
 
@@ -46,4 +48,19 @@ class RelationOutputDtoV7Factory {
             Instant.MIN
         )
     }
+
+    fun fromInput(entry: RelationPutEntry): RelationOutputDto = RelationOutputDto(
+        externalId = entry.externalId,
+        relationType = when (entry.relationType) {
+            GateRelationType.IsAlternativeHeadquarterFor -> SharableRelationType.IsAlternativeHeadquarterFor
+            GateRelationType.IsManagedBy -> SharableRelationType.IsManagedBy
+            GateRelationType.IsOwnedBy -> SharableRelationType.IsOwnedBy
+            GateRelationType.IsReplacedBy -> SharableRelationType.IsReplacedBy
+        },
+        sourceBpn = "",
+        targetBpn = "",
+        validityPeriods = entry.validityPeriods,
+        reasonCode = entry.reasonCode,
+        updatedAt = Instant.MIN
+    )
 }
