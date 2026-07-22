@@ -166,6 +166,22 @@ class GateAssertRepositoryV7(
         .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
         .build()
 
+    /**
+     * Compares ONLY the record's [BusinessPartnerOutputDto.additionalSites]: the further sites the
+     * record's address belongs to beyond the site the record itself follows, each surfaced as a
+     * BPNS/name pair. Everything else - master data, identifiers, states, BPNs, confidence criteria,
+     * relations, script variants and timestamps - is ignored on purpose and covered by its own tests,
+     * so additional-site assertions stay the single subject here. [sortContent] already sorts the
+     * additional sites by BPNS, so ordering does not affect the comparison.
+     */
+    val outputAdditionalSitesComparisonConfig: RecursiveComparisonConfiguration = RecursiveComparisonConfiguration.builder()
+        .withComparedFields(
+            BusinessPartnerOutputDto::additionalSites.name
+        )
+        .withComparatorForType(instantSecondsComparator, Instant::class.java)
+        .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
+        .build()
+
     fun assertBusinessPartnerInput(actual: Collection<BusinessPartnerInputDto>, expected: Collection<BusinessPartnerInputDto>) {
         Assertions.assertThat(actual.sortedBy { it.externalId }.map { it.sortContent() })
             .usingRecursiveComparison()
@@ -361,6 +377,7 @@ class GateAssertRepositoryV7(
             states = states.sortedBy { it.validFrom?.toString() },
             roles = roles.sortedBy { it.name },
             scriptVariants = scriptVariants.sortedBy { it.scriptCode },
+            additionalSites = additionalSites.sortedBy { it.siteBpn },
             legalEntity = legalEntity.sortContent(),
             site = site?.sortContent(),
             address = address.sortContent()
