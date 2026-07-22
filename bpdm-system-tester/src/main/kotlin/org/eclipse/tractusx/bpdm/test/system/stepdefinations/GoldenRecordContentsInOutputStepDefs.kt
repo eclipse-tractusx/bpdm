@@ -178,6 +178,26 @@ class GoldenRecordContentsInOutputStepDefs(
         context.sites[siteId] = siteWithParent
     }
 
+    @When("the golden record process refines record {string} to site {string} with shared main address {string} of legal entity {string} with master data {string}")
+    fun `when refines to site with shared main address`(
+        recordId: String,
+        siteId: String,
+        mainAddressId: String,
+        legalEntityId: String,
+        masterDataSeed: String
+    ) {
+        logger.info {
+            "[$scenarioName] When: the golden record process refines record '$recordId' to site '$siteId' " +
+                "with shared main address '$mainAddressId' of legal entity '$legalEntityId' with master data '$masterDataSeed'"
+        }
+        // Pin the site's main address to the shared [mainAddressId] label so several records can refine to
+        // distinct sites that all point their main address at the same address - i.e. one address belonging
+        // to several sites as their main address.
+        val siteWithParent = shareActions.refineAsSite(recordId, masterDataSeed, siteId, legalEntityId, mainAddressId)
+        context.legalEntities[legalEntityId] = siteWithParent.legalEntity
+        context.sites[siteId] = siteWithParent
+    }
+
     @When("the golden record process refines record {string} to additional address {string} of legal entity {string} with master data {string}")
     fun `when refines to additional address of legal entity`(
         recordId: String,
@@ -574,29 +594,21 @@ class GoldenRecordContentsInOutputStepDefs(
      * Asserts [recordId]'s Gate output surfaces exactly the primary sites of [otherRecordIds] as its
      * address's additional sites (and nothing else). Expected additional sites are built from the other
      * records' actual outputs so the BPNS/name are the real Pool-assigned ones; the comparison is
-     * restricted to the additionalSites field.
+     * restricted to the additionalSites field. Works regardless of what kind of record [recordId] is (an
+     * additional address of a site, or a site whose main address is shared) - it compares the actual output
+     * against itself with only the additionalSites replaced, so no reflected-entity lookup is needed.
      */
     private fun assertOutputAdditionalSites(recordId: String, otherRecordIds: List<String>) {
-        val record = context.records[recordId]
-            ?: error("record '$recordId' must be defined by an earlier refinement step")
-        val legalEntity = record.legalEntity ?: error("record '$recordId' has no refined legal entity")
-        val site = record.poolSite ?: error("record '$recordId' has no refined site")
-        val address = record.poolAddress ?: error("record '$recordId' has no refined additional address")
-
         val expectedAdditionalSites = otherRecordIds.map { other ->
-            val otherOutput = outputOf(other)
-            val otherSite = otherOutput.site
+            val otherSite = outputOf(other).site
                 ?: error("record '$other' output has no site to surface as an additional site")
             AdditionalSiteOutputDto(otherSite.siteBpn, otherSite.name)
         }
 
-        val expectedOutput = testDataFactoryGate.businessPartner.output
-            .fromAdditionalAddressOnSite(inputResponseOf(recordId), legalEntity, site, address, expectedAdditionalSites)
-            .copy(externalId = context.runId(recordId))
-
+        val actualOutput = outputOf(recordId)
         assertRepository.assertBusinessPartnerOutput(
-            listOf(outputOf(recordId)),
-            listOf(expectedOutput),
+            listOf(actualOutput),
+            listOf(actualOutput.copy(additionalSites = expectedAdditionalSites)),
             assertRepository.outputAdditionalSitesComparisonConfig
         )
     }

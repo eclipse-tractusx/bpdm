@@ -7,11 +7,17 @@
 # additional sites).
 #
 # The shape is driven with the established share -> refine flow: two (or more) records are refined to the
-# same additional address label but distinct site labels under one legal entity label. Sharing the
-# address label assigns the same BPN request identifier, so the Pool matches the same address golden
-# record and adds each new site to it. Distinct site labels give distinct sites (and distinct site names,
-# satisfying the Pool's duplicate-site-name constraint); the shared legal entity label keeps all sites
-# under one legal entity, satisfying the Pool's same-legal-entity constraint for shared addresses.
+# same address label but distinct site labels under one legal entity label. Sharing the address label
+# assigns the same BPN request identifier, so the Pool matches the same address golden record and adds
+# each new site to it. Distinct site labels give distinct sites (and distinct site names, satisfying the
+# Pool's duplicate-site-name constraint); the shared legal entity label keeps all sites under one legal
+# entity, satisfying the Pool's same-legal-entity constraint for shared addresses.
+#
+# The shared address can be an ADDITIONAL address of the sites (first scenarios) or the sites' MAIN
+# address (last scenario). The main-address variant is currently a red spec: the golden record flow only
+# attaches a further site to an EXISTING address when that address is an additional address, so two site
+# records sharing a main address presently receive separate addresses. It is tagged @Wip until the Pool
+# is fixed; it exercises the intended behaviour and should pass unchanged once the fix lands.
 #
 # TODO: replace the placeholder @CXTPM-XXXX / @TEST_CXTPM-XXXX tags with the real Jira issue and
 # test-case ids once they exist.
@@ -71,8 +77,8 @@ Feature: Output Reflects Additional Sites Of Address
   @TEST_CXTPM-XXXX @BPDM
   Scenario: New Site Merges Without Removing Existing Sites
     Given the sharing member shares record "dock-a-record"
-    And the golden record process refines record "dock-a-record" to additional address "shared-dock" of site "site-a" of legal entity "acme" with master data "dock-a-content"
     And the sharing member shares record "dock-b-record"
+    And the golden record process refines record "dock-a-record" to additional address "shared-dock" of site "site-a" of legal entity "acme" with master data "dock-a-content"
     And the golden record process refines record "dock-b-record" to additional address "shared-dock" of site "site-b" of legal entity "acme" with master data "dock-b-content"
     When the sharing member shares record "dock-c-record"
     And the golden record process refines record "dock-c-record" to additional address "shared-dock" of site "site-c" of legal entity "acme" with master data "dock-c-content"
@@ -93,3 +99,23 @@ Feature: Output Reflects Additional Sites Of Address
     And the golden record process refines record "solo-dock-record" to additional address "solo-dock" of site "solo-site" of legal entity "acme" with master data "solo-dock-content"
     Then "solo-dock-record" output lists no additional sites
     And the Pool address of "solo-dock-record" belongs to a single site
+
+  #h3. Test Objective:
+  #
+  #* Verify that when two sites share the same site main address, that address belongs to both sites: each site record's output lists the other site as an additional site, and the Pool address returns both sites.
+  #
+  #h3. Description:
+  #
+  ## The sharing member shares two records.
+  ## The golden record process refines both to distinct sites of the same legal entity that share one main address.
+  ## Each record's output lists the other record's site as an additional site of the shared main address, and the Pool address belongs to both sites.
+  #
+  @TEST_CXTPM-XXXX @BPDM @Wip
+  Scenario: Sites Sharing A Main Address Belong To Each Other
+    When the sharing member shares record "hq-site-a-record"
+    And the golden record process refines record "hq-site-a-record" to site "hq-site-a" with shared main address "shared-hq" of legal entity "acme" with master data "hq-a-content"
+    And the sharing member shares record "hq-site-b-record"
+    And the golden record process refines record "hq-site-b-record" to site "hq-site-b" with shared main address "shared-hq" of legal entity "acme" with master data "hq-b-content"
+    Then "hq-site-a-record" output lists the site of record "hq-site-b-record" as an additional site of its address
+    And "hq-site-b-record" output lists the site of record "hq-site-a-record" as an additional site of its address
+    And the Pool address of "hq-site-a-record" belongs to the sites of records "hq-site-a-record, hq-site-b-record"
