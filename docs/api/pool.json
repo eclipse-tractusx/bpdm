@@ -3189,6 +3189,11 @@
           "confidenceCriteria" : {
             "$ref" : "#/components/schemas/ConfidenceCriteriaDto"
           },
+          "updatedAt" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "The date when the data record has been last updated."
+          },
           "scriptVariants" : {
             "type" : "array",
             "items" : {
@@ -3299,6 +3304,12 @@
             "description" : "Indicates the address type, the legal address to a legal entity or the main address to a site, an additional address, or both legal and site address.The site main address is where typically the main entrance or the reception is located, or where the mail is delivered to.",
             "enum" : [ "LegalAndSiteMainAddress", "LegalAddress", "SiteMainAddress", "AdditionalAddress" ]
           },
+          "additionalSites" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
           "isParticipantData" : {
             "type" : "boolean",
             "description" : "Indicates whether the address is owned and thus provided by a Data Space Participant."
@@ -3349,6 +3360,11 @@
           },
           "confidenceCriteria" : {
             "$ref" : "#/components/schemas/ConfidenceCriteriaDto"
+          },
+          "updatedAt" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "The date when the data record has been last updated."
           },
           "scriptVariants" : {
             "type" : "array",
@@ -3452,6 +3468,12 @@
             "type" : "string",
             "description" : "Indicates the address type, the legal address to a legal entity or the main address to a site, an additional address, or both legal and site address.The site main address is where typically the main entrance or the reception is located, or where the mail is delivered to.",
             "enum" : [ "LegalAndSiteMainAddress", "LegalAddress", "SiteMainAddress", "AdditionalAddress" ]
+          },
+          "additionalSites" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
           },
           "isParticipantData" : {
             "type" : "boolean",
@@ -4018,7 +4040,7 @@
           "errorCode" : {
             "type" : "string",
             "description" : "AddressCreateError",
-            "enum" : [ "BpnNotValid", "SiteNotFound", "LegalEntityNotFound", "RegionNotFound", "IdentifierNotFound", "AddressDuplicateIdentifier", "IdentifiersTooMany" ]
+            "enum" : [ "BpnNotValid", "SiteNotFound", "SiteNotInLegalEntity", "LegalEntityNotFound", "RegionNotFound", "IdentifierNotFound", "AddressDuplicateIdentifier", "IdentifiersTooMany" ]
           },
           "message" : {
             "type" : "string"
@@ -4036,7 +4058,7 @@
           "errorCode" : {
             "type" : "string",
             "description" : "AddressUpdateError",
-            "enum" : [ "AddressNotFound", "RegionNotFound", "IdentifierNotFound", "AddressDuplicateIdentifier", "IdentifiersTooMany" ]
+            "enum" : [ "AddressNotFound", "SiteNotInLegalEntity", "RegionNotFound", "IdentifierNotFound", "AddressDuplicateIdentifier", "IdentifiersTooMany" ]
           },
           "message" : {
             "type" : "string"
@@ -4319,6 +4341,11 @@
           "confidenceCriteria" : {
             "$ref" : "#/components/schemas/ConfidenceCriteriaDto"
           },
+          "updatedAt" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "The date when the data record has been last updated."
+          },
           "isParticipantData" : {
             "type" : "boolean"
           },
@@ -4482,6 +4509,11 @@
           },
           "confidenceCriteria" : {
             "$ref" : "#/components/schemas/ConfidenceCriteriaDto"
+          },
+          "updatedAt" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "The date when the data record has been last updated."
           },
           "isParticipantData" : {
             "type" : "boolean"
@@ -4805,6 +4837,11 @@
           },
           "confidenceCriteria" : {
             "$ref" : "#/components/schemas/ConfidenceCriteriaDto"
+          },
+          "updatedAt" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "The date when the data record has been last updated."
           }
         }
       },
@@ -4874,6 +4911,12 @@
             "type" : "string",
             "description" : "Indicates the address type, the legal address to a legal entity or the main address to a site, an additional address, or both legal and site address.The site main address is where typically the main entrance or the reception is located, or where the mail is delivered to.",
             "enum" : [ "LegalAndSiteMainAddress", "LegalAddress", "SiteMainAddress", "AdditionalAddress" ]
+          },
+          "additionalSites" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
           },
           "isParticipantData" : {
             "type" : "boolean",
@@ -5756,6 +5799,11 @@
               "$ref" : "#/components/schemas/SiteScriptVariantDto"
             }
           },
+          "updatedAt" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "The date when the data record has been last updated."
+          },
           "bpnlParent" : {
             "type" : "string"
           },
@@ -5878,6 +5926,11 @@
             "items" : {
               "$ref" : "#/components/schemas/SiteScriptVariantDto"
             }
+          },
+          "updatedAt" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "The date when the data record has been last updated."
           },
           "requestKey" : {
             "type" : "string"

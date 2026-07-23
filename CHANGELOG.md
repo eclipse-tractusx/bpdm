@@ -12,6 +12,9 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 
 ### Added
 
+- BPDM Pool: Support multiple sites per address by merging incoming sites onto existing addresses instead of overwriting them; queries now return an address's main site plus all additional sites [#1661](https://github.com/eclipse-tractusx/sig-release/issues/1661)
+- BPDM Gate: Business partner output now includes additional sites belonging to an address [#1661](https://github.com/eclipse-tractusx/sig-release/issues/1661)
+
 ### Changed
 
 ## [7.4.0] - 2026-06-10
