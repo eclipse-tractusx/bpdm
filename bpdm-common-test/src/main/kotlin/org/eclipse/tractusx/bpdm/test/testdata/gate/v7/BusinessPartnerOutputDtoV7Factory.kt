@@ -159,7 +159,8 @@ class BusinessPartnerOutputDtoV7Factory {
             shortName = legalEntity.legalShortName,
             legalForm = legalEntity.legalForm,
             confidenceCriteria = buildConfidence(legalEntity.confidenceCriteria),
-            states = legalEntity.states.map { BusinessPartnerStateDto(it.validFrom, it.validTo, it.type) }
+            states = legalEntity.states.map { BusinessPartnerStateDto(it.validFrom, it.validTo, it.type) },
+            updatedAt = legalEntity.updatedAt
         )
     }
 
@@ -171,7 +172,8 @@ class BusinessPartnerOutputDtoV7Factory {
             physicalPostalAddress = buildPhysicalAddress(logisticAddress.physicalPostalAddress),
             alternativePostalAddress = logisticAddress.alternativePostalAddress?.let { buildAlternativeAddress(it) },
             confidenceCriteria = buildConfidence(logisticAddress.confidenceCriteria),
-            states = logisticAddress.states.map { BusinessPartnerStateDto(it.validFrom, it.validTo, it.type) }
+            states = logisticAddress.states.map { BusinessPartnerStateDto(it.validFrom, it.validTo, it.type) },
+            updatedAt = logisticAddress.updatedAt
         )
     }
 
@@ -227,7 +229,8 @@ class BusinessPartnerOutputDtoV7Factory {
             siteBpn = site.bpns,
             name = site.name,
             confidenceCriteria = buildConfidence(site.confidenceCriteria),
-            states = site.states.map { BusinessPartnerStateDto(it.validFrom, it.validTo, it.type) }
+            states = site.states.map { BusinessPartnerStateDto(it.validFrom, it.validTo, it.type) },
+            updatedAt = site.updatedAt
         )
     }
 

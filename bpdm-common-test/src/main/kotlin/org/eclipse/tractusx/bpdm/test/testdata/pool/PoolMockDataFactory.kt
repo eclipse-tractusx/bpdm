@@ -31,6 +31,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAdd
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
 import org.eclipse.tractusx.bpdm.test.containers.PoolMockContextInitializer
 import tools.jackson.databind.json.JsonMapper
+import java.time.Instant
 
 class PoolMockDataFactory(
     val requestFactory: BusinessPartnerRequestFactory,
@@ -41,8 +42,11 @@ class PoolMockDataFactory(
     fun mockLegalEntityAndLegalAddressSearchResult(seed: String): LegalEntityWithLegalAddressVerboseDto{
         configureWireMock()
 
+        // Advancing timestamp per refinement so a re-share carries a newer golden-record updatedAt than the
+        // stored one - otherwise the Gate's shouldWriteOutputByGoldenRecordTimestamp gate skips the update.
+        val now = Instant.now()
         val legalEntityRequest = requestFactory.createLegalEntityRequest(seed)
-        val mockedLegalEntity = expectedResultFactory.mapToExpectedLegalEntity(legalEntityRequest, givenBpnL = "BPNL$seed")
+        val mockedLegalEntity = expectedResultFactory.mapToExpectedLegalEntity(legalEntityRequest, givenBpnL = "BPNL$seed", currentness = now)
 
         mockLegalEntitySearchResult(mockedLegalEntity)
         mockAddressSearchResult(LogisticAddressVerboseDto(mockedLegalEntity.legalAddress, emptyList()))
@@ -53,11 +57,12 @@ class PoolMockDataFactory(
     fun mockSiteAndMainAddressSearchResult(seed: String): SiteWithLegalEntityParent{
         configureWireMock()
 
+        val now = Instant.now()
         val legalEntityRequest = requestFactory.createLegalEntityRequest(seed)
-        val mockedLegalEntity = expectedResultFactory.mapToExpectedLegalEntity(legalEntityRequest, givenBpnL = "BPNL$seed")
+        val mockedLegalEntity = expectedResultFactory.mapToExpectedLegalEntity(legalEntityRequest, givenBpnL = "BPNL$seed", currentness = now)
 
         val siteRequest = requestFactory.buildSiteCreateRequest(seed, mockedLegalEntity.header.bpnl)
-        val mockedSite = expectedResultFactory.mapToExpectedSite(siteRequest, mockedLegalEntity.header.isParticipantData, givenBpnS = "BPNS$seed")
+        val mockedSite = expectedResultFactory.mapToExpectedSite(siteRequest, mockedLegalEntity.header.isParticipantData, givenBpnS = "BPNS$seed", siteCreatedAt = now)
 
         mockLegalEntitySearchResult(mockedLegalEntity)
         mockSiteSearchResult(mockedSite)
@@ -69,14 +74,15 @@ class PoolMockDataFactory(
     fun mockLegalAndSiteMainAddressSearchResult(seed: String): SiteWithLegalEntityParent{
         configureWireMock()
 
+        val now = Instant.now()
         val legalEntity = requestFactory.createLegalEntityRequest(seed)
-            .let{ expectedResultFactory.mapToExpectedLegalEntity(it,  givenBpnL = "BPNL$seed") }
+            .let{ expectedResultFactory.mapToExpectedLegalEntity(it,  givenBpnL = "BPNL$seed", currentness = now) }
 
         val site = requestFactory.buildSiteCreateRequest(seed, "BPNL$seed")
-            .let { expectedResultFactory.mapToExpectedSite(it, legalEntity.header.isParticipantData, givenBpnS = "BPNS$seed") }
+            .let { expectedResultFactory.mapToExpectedSite(it, legalEntity.header.isParticipantData, givenBpnS = "BPNS$seed", siteCreatedAt = now) }
 
         val legalAndSiteMainAddress = requestFactory.buildAdditionalAddressCreateRequest(seed, bpnParent = "BPNS$seed")
-            .let { expectedResultFactory.mapToExpectedAdditionalAddress(it, legalEntity.header.isParticipantData) }
+            .let { expectedResultFactory.mapToExpectedAdditionalAddress(it, legalEntity.header.isParticipantData, createdAt = now) }
             .copy(addressType = AddressType.LegalAndSiteMainAddress)
 
 
@@ -110,9 +116,10 @@ class PoolMockDataFactory(
         configureWireMock()
         WireMock.reset()
 
-        val mockedLegalEntity = expectedResultFactory.mapToExpectedLegalEntity(legalEntityRequest, siteRequest.bpnlParent, isMaintainConfidences = true)
-        val mockedSite = expectedResultFactory.mapToExpectedSite(siteRequest, mockedLegalEntity.header.isParticipantData, additionalAddressRequest.bpnParent, isMaintainConfidences = true)
-        val mockedInvariantAddress = expectedResultFactory.mapToExpectedAdditionalAddress(additionalAddressRequest, mockedLegalEntity.header.isParticipantData, givenBpnA = "BPNA$seed", isMaintainConfidences = true)
+        val now = Instant.now()
+        val mockedLegalEntity = expectedResultFactory.mapToExpectedLegalEntity(legalEntityRequest, siteRequest.bpnlParent, currentness = now, isMaintainConfidences = true)
+        val mockedSite = expectedResultFactory.mapToExpectedSite(siteRequest, mockedLegalEntity.header.isParticipantData, additionalAddressRequest.bpnParent, siteCreatedAt = now, isMaintainConfidences = true)
+        val mockedInvariantAddress = expectedResultFactory.mapToExpectedAdditionalAddress(additionalAddressRequest, mockedLegalEntity.header.isParticipantData, givenBpnA = "BPNA$seed", createdAt = now, isMaintainConfidences = true)
         val mockedAddress = LogisticAddressVerboseDto(mockedInvariantAddress, additionalAddressRequest.scriptVariants)
 
         mockLegalEntitySearchResult(mockedLegalEntity)
