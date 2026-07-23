@@ -16,6 +16,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 
 ### Changed
 
+
 ## [7.4.0] - 2026-06-10
 
 ### Breaking
