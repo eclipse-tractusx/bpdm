@@ -104,13 +104,15 @@ class TriggerBatchProcessExecutionServiceIT @Autowired constructor(
         taskRelationsResolutionService.upsertRelationsGoldenRecordIntoPool(listOf(taskToResolve))
 
         //WHEN
+        val updateStartTime = Instant.now()
         executeAtDate(LocalDate.now().plusDays(1)){ triggerBatchProcessExecutionService.executeUnprocessedTriggers() }
+        val updateEndTime = Instant.now()
 
         //THEN
         val actualLegalEntity = poolApiClient.legalEntities.getLegalEntity(createdLegalEntity.legalEntity.header.bpnl)
         val expectedLegalEntity = buildExpectedRelocatedHeadquarterLegalEntity(createdLegalEntity, createdAddAddress, replacedByRelation)
 
-        poolAssertHelper.assertLegalEntityResponse(listOf(actualLegalEntity), listOf(expectedLegalEntity), Timeframe(Instant.now().minusSeconds(2), Instant.now()))
+        poolAssertHelper.assertLegalEntityResponse(listOf(actualLegalEntity), listOf(expectedLegalEntity), Timeframe(updateStartTime.minusSeconds(2), updateEndTime.plusSeconds(2)))
     }
 
 

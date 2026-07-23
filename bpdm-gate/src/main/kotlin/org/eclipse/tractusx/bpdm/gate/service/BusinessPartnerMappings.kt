@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 
+import java.time.Instant
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
@@ -169,7 +170,8 @@ class BusinessPartnerMappings {
                 "Missing address confidence criteria"
             ),
             states = toStateDtos(entity.states, BusinessPartnerType.LEGAL_ENTITY),
-            goldenRecordRelations = entity.legalEntityGoldenRecordRelations.map { LegalEntityGoldenRecordRelationDto(toLeRelationType(it.relationType), it.sourceBpn, it.targetBpn) }
+            goldenRecordRelations = entity.legalEntityGoldenRecordRelations.map { LegalEntityGoldenRecordRelationDto(toLeRelationType(it.relationType), it.sourceBpn, it.targetBpn) },
+            updatedAt = entity.legalEntityUpdatedAt ?: Instant.EPOCH
         )
     }
 
@@ -184,7 +186,8 @@ class BusinessPartnerMappings {
                         entity.sharingState.externalId,
                         "Missing site confidence criteria"
                     ),
-                    states = toStateDtos(entity.states, BusinessPartnerType.SITE)
+                    states = toStateDtos(entity.states, BusinessPartnerType.SITE),
+                    updatedAt = entity.siteUpdatedAt ?: Instant.EPOCH
                 )
             }
     }
@@ -206,7 +209,8 @@ class BusinessPartnerMappings {
                 "Missing legal entity confidence criteria"
             ),
             states = toStateDtos(entity.states, BusinessPartnerType.ADDRESS),
-            goldenRecordRelations = entity.addressGoldenRecordRelations.map { AddressGoldenRecordRelationDto(toAddressRelationType(it.relationType), it.sourceBpn, it.targetBpn) }
+            goldenRecordRelations = entity.addressGoldenRecordRelations.map { AddressGoldenRecordRelationDto(toAddressRelationType(it.relationType), it.sourceBpn, it.targetBpn) },
+            updatedAt = entity.addressUpdatedAt ?: Instant.EPOCH
         )
     }
 

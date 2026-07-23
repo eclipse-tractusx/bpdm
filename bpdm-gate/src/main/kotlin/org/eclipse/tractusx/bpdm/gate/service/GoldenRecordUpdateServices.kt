@@ -255,6 +255,9 @@ class GoldenRecordUpdateChunkService(
             legalEntityConfidence = legalEntityConfidence?.toUpsertData() ?: throw createMappingException(BusinessPartnerDb::legalEntityConfidence, id),
             siteConfidence = siteConfidence?.toUpsertData(),
             addressConfidence = addressConfidence?.toUpsertData() ?: throw createMappingException(BusinessPartnerDb::addressConfidence, id),
+            legalEntityUpdatedAt = legalEntityUpdatedAt,
+            siteUpdatedAt = siteUpdatedAt,
+            addressUpdatedAt = addressUpdatedAt,
             scriptVariants = scriptVariants.map { businessPartnerMappings.toScriptVariantDto(it) },
             legalEntityGoldenRecordRelations = legalEntityGoldenRecordRelations.map { it.toUpsertData() },
             addressGoldenRecordRelations = addressGoldenRecordRelations.map { it.toUpsertData() },
@@ -347,6 +350,8 @@ class GoldenRecordUpdateChunkService(
         businessPartner.legalName = header.legalName
         businessPartner.legalForm = header.legalForm
         businessPartner.shortName = header.legalShortName
+        businessPartner.legalEntityUpdatedAt = header.updatedAt
+        businessPartner.addressUpdatedAt = legalEntity.legalAddress.updatedAt
         businessPartner.legalEntityConfidence?.let { update(it,  header.confidenceCriteria) }
         businessPartner.legalEntityGoldenRecordRelations.addAll(legalEntity.header.relations.map(::toEntity))
 
@@ -364,6 +369,7 @@ class GoldenRecordUpdateChunkService(
     private fun update(businessPartner: BusinessPartnerDb, site: SiteVerboseDto){
         updateStates(businessPartner.states, site.states, BusinessPartnerType.SITE)
         businessPartner.siteName = site.name
+        businessPartner.siteUpdatedAt = site.updatedAt
         businessPartner.siteConfidence?.let { update(it,  site.confidenceCriteria) }
 
         val goldenRecordVariantByCode = businessPartner.scriptVariants.associateBy { it.scriptCode }
@@ -382,6 +388,7 @@ class GoldenRecordUpdateChunkService(
         updateIdentifiers(businessPartner.identifiers, addressProperties.identifiers.map(::toEntity), BusinessPartnerType.ADDRESS)
         updateStates(businessPartner.states, addressProperties.states, BusinessPartnerType.ADDRESS)
         businessPartner.addressName = addressProperties.name
+        businessPartner.addressUpdatedAt = addressProperties.updatedAt
         businessPartner.postalAddress.addressType = addressProperties.addressType
         businessPartner.postalAddress.physicalPostalAddress = addressProperties.physicalPostalAddress.toEntity()
         businessPartner.postalAddress.alternativePostalAddress = addressProperties.alternativePostalAddress?.toEntity()
