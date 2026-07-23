@@ -45,7 +45,7 @@ class ExpectedBusinessPartnerResultFactory(
         givenRequest: LegalEntityPartnerCreateRequest,
         givenBpnL: String = StringIgnoreComparator.IGNORE_STRING,
         givenBpnA: String = StringIgnoreComparator.IGNORE_STRING,
-        currentness: Instant = Instant.MIN,
+        currentness: Instant = Instant.EPOCH,
         legalEntityCreatedAt: Instant = currentness,
         legalEntityUpdatedAt: Instant = currentness,
         addressCreatedAt: Instant = currentness,
@@ -93,7 +93,7 @@ class ExpectedBusinessPartnerResultFactory(
         isCatenaXMemberData: Boolean,
         givenBpnS: String = StringIgnoreComparator.IGNORE_STRING,
         givenBpnA: String = StringIgnoreComparator.IGNORE_STRING,
-        siteCreatedAt: Instant = Instant.MIN,
+        siteCreatedAt: Instant = Instant.EPOCH,
         siteUpdatedAt: Instant = siteCreatedAt,
         addressCreatedAt: Instant = siteCreatedAt,
         addressUpdatedAt: Instant = siteCreatedAt,
@@ -131,7 +131,7 @@ class ExpectedBusinessPartnerResultFactory(
         isCatenaXMemberData: Boolean,
         givenBpnA: String = StringIgnoreComparator.IGNORE_STRING,
         bpnLegalEntityOverwrite: String? = null,
-        createdAt: Instant = Instant.MIN,
+        createdAt: Instant = Instant.EPOCH,
         updatedAt: Instant = createdAt,
         isMaintainConfidences: Boolean = false
     ): LogisticAddressInvariantVerboseDto {

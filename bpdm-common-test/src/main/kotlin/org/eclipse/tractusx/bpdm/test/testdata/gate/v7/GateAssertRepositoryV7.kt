@@ -81,6 +81,9 @@ class GateAssertRepositoryV7(
             "legalEntity.${LegalEntityRepresentationOutputDto::legalEntityBpn.name}",
             "site.${SiteRepresentationOutputDto::siteBpn.name}",
             "address.${AddressComponentOutputDto::addressBpn.name}",
+            "legalEntity.${LegalEntityRepresentationOutputDto::updatedAt.name}",
+            "site.${SiteRepresentationOutputDto::updatedAt.name}",
+            "address.${AddressComponentOutputDto::updatedAt.name}",
             BusinessPartnerOutputDto::nameParts.name
         )
         .withComparatorForType(instantSecondsComparator, Instant::class.java)
@@ -113,16 +116,19 @@ class GateAssertRepositoryV7(
             "legalEntity.${LegalEntityRepresentationOutputDto::confidenceCriteria.name}",
             "legalEntity.${LegalEntityRepresentationOutputDto::states.name}",
             "legalEntity.${LegalEntityRepresentationOutputDto::goldenRecordRelations.name}",
+            "legalEntity.${LegalEntityRepresentationOutputDto::updatedAt.name}",
             // site: keep only name
             "site.${SiteRepresentationOutputDto::siteBpn.name}",
             "site.${SiteRepresentationOutputDto::confidenceCriteria.name}",
             "site.${SiteRepresentationOutputDto::states.name}",
+            "site.${SiteRepresentationOutputDto::updatedAt.name}",
             // address: keep only name / addressType / physical & alternative postal address
             "address.${AddressComponentOutputDto::addressBpn.name}",
             "address.${AddressComponentOutputDto::confidenceCriteria.name}",
             "address.${AddressComponentOutputDto::states.name}",
             "address.${AddressComponentOutputDto::identifiers.name}",
-            "address.${AddressComponentOutputDto::goldenRecordRelations.name}"
+            "address.${AddressComponentOutputDto::goldenRecordRelations.name}",
+            "address.${AddressComponentOutputDto::updatedAt.name}"
         )
         .withComparatorForType(instantSecondsComparator, Instant::class.java)
         .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)

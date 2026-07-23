@@ -147,7 +147,8 @@ class RefinementTestDataFactory {
             ownershipUltimate = goldenRecord.header.ownershipUltimate,
             ultimateOwnerBpnl = goldenRecord.header.ultimateOwnerBpnl,
             legalAddress = buildPostalAddress(goldenRecord.legalAddress),
-            scriptVariants = goldenRecord.scriptVariants.map { buildLegalEntityScriptVariant(it) }
+            scriptVariants = goldenRecord.scriptVariants.map { buildLegalEntityScriptVariant(it) },
+            updatedAt = goldenRecord.header.updatedAt
         )
     }
 
@@ -159,7 +160,8 @@ class RefinementTestDataFactory {
             confidenceCriteria = buildConfidence(goldenRecord.site.confidenceCriteria),
             hasChanged = true,
             siteMainAddress = buildPostalAddress(goldenRecord.mainAddress),
-            scriptVariants = goldenRecord.site.scriptVariants.map { buildSiteScriptVariant(it) }
+            scriptVariants = goldenRecord.site.scriptVariants.map { buildSiteScriptVariant(it) },
+            updatedAt = goldenRecord.site.updatedAt
         )
     }
 
@@ -171,7 +173,8 @@ class RefinementTestDataFactory {
             confidenceCriteria = buildConfidence(goldenRecord.confidenceCriteria),
             hasChanged = true,
             siteMainAddress = null,
-            scriptVariants = goldenRecord.scriptVariants.map { buildSiteScriptVariant(it) }
+            scriptVariants = goldenRecord.scriptVariants.map { buildSiteScriptVariant(it) },
+            updatedAt = goldenRecord.updatedAt
         )
     }
 
@@ -202,7 +205,8 @@ class RefinementTestDataFactory {
             states = logisticAddress.states.map {  BusinessState(it.validFrom?.toUtcInstant(), it.validTo?.toUtcInstant(), it.type) },
             confidenceCriteria = buildConfidence(logisticAddress.confidenceCriteria),
             physicalAddress = buildPhysicalAddress(logisticAddress.physicalPostalAddress),
-            alternativeAddress = logisticAddress.alternativePostalAddress?.let { buildAlternativeAddress(it) }
+            alternativeAddress = logisticAddress.alternativePostalAddress?.let { buildAlternativeAddress(it) },
+            updatedAt = logisticAddress.updatedAt
         )
     }
 
