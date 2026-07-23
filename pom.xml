@@ -74,6 +74,8 @@
         <license-tool.version>1.1.0</license-tool.version>
         <assertj.version>3.24.2</assertj.version>
         <commons-beanutils.version>1.11.0</commons-beanutils.version>
+        <!-- Override Spring Boot's managed PostgreSQL driver to fix a vulnerability -->
+        <postgresql.version>42.7.12</postgresql.version>
         <!-- Sonar related properties -->
         <sonar.version>5.5.0.6356</sonar.version>
         <sonar.coverage.jacoco.xmlReportPaths>
