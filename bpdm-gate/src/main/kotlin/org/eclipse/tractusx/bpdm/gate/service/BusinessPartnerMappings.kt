@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 
+import java.time.Instant
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
@@ -110,8 +111,6 @@ class BusinessPartnerMappings {
             bpnL = dto.legalEntity.legalEntityBpn,
             bpnS = dto.site.siteBpn,
             bpnA = dto.address.addressBpn,
-            ownershipUltimate = dto.legalEntity.ownershipUltimate,
-            ultimateOwnerBpnl = dto.legalEntity.ultimateOwnerBpnl,
             postalAddress = toPostalAddress(dto.address),
             externalSequenceTimestamp = dto.externalSequenceTimestamp,
             legalEntityConfidence = null,
@@ -131,8 +130,6 @@ class BusinessPartnerMappings {
             legalName = entity.legalName,
             shortName = entity.shortName,
             legalForm = entity.legalForm,
-            ownershipUltimate = entity.ownershipUltimate,
-            ultimateOwnerBpnl = entity.ultimateOwnerBpnl,
             states = toStateDtos(entity.states, BusinessPartnerType.LEGAL_ENTITY)
         )
     }
@@ -171,12 +168,9 @@ class BusinessPartnerMappings {
                 entity.sharingState.externalId,
                 "Missing address confidence criteria"
             ),
-            ownershipUltimate = entity.ownershipUltimate,
-            ultimateOwnerBpnl = entity.ultimateOwnerBpnl,
             states = toStateDtos(entity.states, BusinessPartnerType.LEGAL_ENTITY),
-            goldenRecordRelations = entity.legalEntityGoldenRecordRelations
-                .distinctBy { Triple(it.relationType, it.sourceBpn, it.targetBpn) }
-                .map { LegalEntityGoldenRecordRelationDto(toLeRelationType(it.relationType), it.sourceBpn, it.targetBpn) }
+            goldenRecordRelations = entity.legalEntityGoldenRecordRelations.map { LegalEntityGoldenRecordRelationDto(toLeRelationType(it.relationType), it.sourceBpn, it.targetBpn) },
+            updatedAt = entity.legalEntityUpdatedAt ?: Instant.EPOCH
         )
     }
 
@@ -191,7 +185,8 @@ class BusinessPartnerMappings {
                         entity.sharingState.externalId,
                         "Missing site confidence criteria"
                     ),
-                    states = toStateDtos(entity.states, BusinessPartnerType.SITE)
+                    states = toStateDtos(entity.states, BusinessPartnerType.SITE),
+                    updatedAt = entity.siteUpdatedAt ?: Instant.EPOCH
                 )
             }
     }
@@ -213,9 +208,8 @@ class BusinessPartnerMappings {
                 "Missing legal entity confidence criteria"
             ),
             states = toStateDtos(entity.states, BusinessPartnerType.ADDRESS),
-            goldenRecordRelations = entity.addressGoldenRecordRelations
-                .distinctBy { Triple(it.relationType, it.sourceBpn, it.targetBpn) }
-                .map { AddressGoldenRecordRelationDto(toAddressRelationType(it.relationType), it.sourceBpn, it.targetBpn) }
+            goldenRecordRelations = entity.addressGoldenRecordRelations.map { AddressGoldenRecordRelationDto(toAddressRelationType(it.relationType), it.sourceBpn, it.targetBpn) },
+            updatedAt = entity.addressUpdatedAt ?: Instant.EPOCH
         )
     }
 
