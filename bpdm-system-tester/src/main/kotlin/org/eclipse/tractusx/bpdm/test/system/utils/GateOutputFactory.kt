@@ -65,6 +65,8 @@ class GateOutputFactory(
                     shortName = shortName,
                     legalForm = legalForm,
                     confidenceCriteria = dummyConfidence,
+                    ownershipUltimate = false,
+                    ultimateOwnerBpnl = null,
                     states = states
                 )
             },

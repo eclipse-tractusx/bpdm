@@ -82,6 +82,12 @@ class BusinessPartnerDb(
     @Column(name = "bpna")
     var bpnA: String? = null,
 
+    @Column(name = "ownership_ultimate")
+    var ownershipUltimate: Boolean? = null,
+
+    @Column(name = "ultimate_owner_bpnl")
+    var ultimateOwnerBpnl: String? = null,
+
     @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "postal_address_id", unique = true)
     var postalAddress: PostalAddressDb,

@@ -57,6 +57,10 @@ data class LegalEntityRepresentationInputDto(
     override val legalName: String? = null,
     override val shortName: String? = null,
     override val legalForm: String? = null,
+    @get:Schema(description = "Designates whether this legal entity is the ultimate owner in an ownership chain.")
+    val ownershipUltimate: Boolean? = null,
+    @get:Schema(description = "The BPNL of the designated ultimate owner up in the ownership chain.")
+    val ultimateOwnerBpnl: String? = null,
     override val states: Collection<BusinessPartnerStateDto> = emptyList(),
 ) : IBaseLegalEntityRepresentation
 

@@ -17,9 +17,20 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.entity
+package org.eclipse.tractusx.bpdm.pool.repository
 
-enum class TriggerEventType {
-    ReplacedAddress,
-    OwnershipValidityBoundary
+import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityRelationEventTriggerDb
+import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
+import org.eclipse.tractusx.bpdm.pool.entity.TriggerEventType
+import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.CrudRepository
+import java.time.LocalDate
+
+interface LegalEntityRelationEventTriggerRepository : CrudRepository<LegalEntityRelationEventTriggerDb, Long> {
+
+    fun findByRelationAndEventType(relation: RelationDb, eventType: TriggerEventType): Set<LegalEntityRelationEventTriggerDb>
+
+    @Query("SELECT trigger FROM LegalEntityRelationEventTriggerDb trigger WHERE trigger.isProcessed = FALSE AND trigger.triggerDate <= :before ORDER BY trigger.triggerDate ASC LIMIT 1")
+    fun findNextUnprocessed(before: LocalDate): LegalEntityRelationEventTriggerDb?
 }
+

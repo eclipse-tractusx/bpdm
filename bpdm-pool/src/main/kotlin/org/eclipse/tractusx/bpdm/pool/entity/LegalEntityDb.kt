@@ -48,6 +48,12 @@ class LegalEntityDb(
     @Column(name = "is_catena_member", nullable = false)
     var isCatenaXMemberData: Boolean,
 
+    @Column(name = "ownership_ultimate", nullable = false)
+    var ownershipUltimate: Boolean = false,
+
+    @Column(name = "ultimate_owner_bpnl")
+    var ultimateOwnerBpnl: String? = null,
+
     @ElementCollection
     @CollectionTable(name = "legal_entity_script_variants", joinColumns = [JoinColumn(name = "legal_entity_id")])
     val scriptVariants: MutableList<LegalEntityScriptVariantDb> = mutableListOf(),

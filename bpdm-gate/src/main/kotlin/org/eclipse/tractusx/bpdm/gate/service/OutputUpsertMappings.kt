@@ -50,6 +50,8 @@ class OutputUpsertMappings(
                 bpnL = legalEntityBpn,
                 bpnS = siteBpn,
                 bpnA = addressBpn,
+                ownershipUltimate = ownershipUltimate,
+                ultimateOwnerBpnl = ultimateOwnerBpnl,
                 postalAddress = PostalAddressDb(addressType, physicalPostalAddress.toEntity(), alternativePostalAddress?.toEntity()),
                 legalEntityConfidence = legalEntityConfidence.toEntity(),
                 siteConfidence = siteConfidence?.toEntity(),

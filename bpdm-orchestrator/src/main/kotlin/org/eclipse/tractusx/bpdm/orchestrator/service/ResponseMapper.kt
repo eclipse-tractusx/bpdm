@@ -90,6 +90,8 @@ class ResponseMapper {
                 confidenceCriteria = toConfidence(businessPartner, ConfidenceCriteriaDb.Scope.LegalEntity),
                 isParticipantData = isCatenaXMemberData,
                 hasChanged = legalEntityHasChanged,
+                ownershipUltimate = ownershipUltimate,
+                ultimateOwnerBpnl = ultimateOwnerBpnl,
                 legalAddress = toPostalAddressOrEmpty(businessPartner, PostalAddressDb.Scope.LegalAddress)!!,
                 scriptVariants = toLegalEntityScriptVariants(businessPartner),
                 goldenRecordRelations = toLegalEntityGoldenRecordRelations(businessPartner),

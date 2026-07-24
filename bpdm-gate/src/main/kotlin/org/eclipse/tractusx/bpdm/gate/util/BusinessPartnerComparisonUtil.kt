@@ -40,6 +40,8 @@ class BusinessPartnerComparisonUtil {
                 entity.bpnL != persistedBP.bpnL ||
                 entity.bpnS != persistedBP.bpnS ||
                 entity.bpnA != persistedBP.bpnA ||
+                entity.ownershipUltimate != persistedBP.ownershipUltimate ||
+                entity.ultimateOwnerBpnl != persistedBP.ultimateOwnerBpnl ||
                 entity.stage != persistedBP.stage ||
                 entity.identifiers != persistedBP.identifiers ||
                 entity.states != persistedBP.states ||

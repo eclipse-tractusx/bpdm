@@ -19,25 +19,27 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
-import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.pool.config.GoldenRecordEventTriggerConfigProperties
-import org.springframework.scheduling.annotation.Scheduled
+import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRelationEventTriggerRepository
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 
 @Service
-class TriggerBatchProcessExecutionService(
-    private val batchProcessExecutionService: BatchProcessExecutionService,
-    private val addressRelationTriggerExecutionService: AddressRelationTriggerExecutionService,
-    private val legalEntityRelationTriggerExecutionService: LegalEntityRelationTriggerExecutionService
-) {
-    private val logger = KotlinLogging.logger { }
+class LegalEntityRelationTriggerExecutionService(
+    private val ultimateOwnerResolutionService: UltimateOwnerResolutionService,
+    private val legalEntityRelationEventTriggerRepository: LegalEntityRelationEventTriggerRepository
+) : IsBatchProcessService {
+    @Transactional
+    override fun executeNextBatch(): Boolean {
+        val nextUnprocessedTrigger = legalEntityRelationEventTriggerRepository.findNextUnprocessed(LocalDate.now())
+            ?: return false
 
-    @Scheduled(cron = "#{${GoldenRecordEventTriggerConfigProperties.GET_CRON}}", zone = "UTC")
-    fun executeUnprocessedTriggers(){
-        logger.info("Execute unprocessed triggers")
-        batchProcessExecutionService.executeUntilFinished(addressRelationTriggerExecutionService)
-        batchProcessExecutionService.executeUntilFinished(legalEntityRelationTriggerExecutionService)
+        ultimateOwnerResolutionService.updateUltimateOwnerForEntityAndDescendants(nextUnprocessedTrigger.relation.startNode)
+
+        nextUnprocessedTrigger.isProcessed = true
+        legalEntityRelationEventTriggerRepository.save(nextUnprocessedTrigger)
+
+        return true
     }
-
-
 }
+

@@ -3541,6 +3541,10 @@ components:
             \ if the goods are to be picked up somewhere else."
         confidenceCriteria:
           $ref: "#/components/schemas/ConfidenceCriteriaDto"
+        updatedAt:
+          type: string
+          format: date-time
+          description: The date when the data record has been last updated.
         scriptVariants:
           type: array
           items:
@@ -3564,10 +3568,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ErrorInfoAddressCreateError"
-        entityCount:
+        errorCount:
           type: integer
           format: int32
-        errorCount:
+        entityCount:
           type: integer
           format: int32
     AddressPartnerCreateVerboseDto:
@@ -3699,6 +3703,10 @@ components:
             \ if the goods are to be picked up somewhere else."
         confidenceCriteria:
           $ref: "#/components/schemas/ConfidenceCriteriaDto"
+        updatedAt:
+          type: string
+          format: date-time
+          description: The date when the data record has been last updated.
         scriptVariants:
           type: array
           items:
@@ -3718,10 +3726,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ErrorInfoAddressUpdateError"
-        entityCount:
+        errorCount:
           type: integer
           format: int32
-        errorCount:
+        entityCount:
           type: integer
           format: int32
     AddressPartnerUpdateVerboseDto:
@@ -5652,6 +5660,16 @@ components:
             $ref: "#/components/schemas/LegalEntityStateDto"
         confidenceCriteria:
           $ref: "#/components/schemas/ConfidenceCriteriaDto"
+        ownershipUltimate:
+          type: boolean
+          description: Whether this legal entity is the ultimate owner in the ownership
+            chain. This flag is provided by the golden record process and persisted
+            in the Pool. The resulting ultimate owner BPNL is derived by the Pool
+            and only returned on read.
+        updatedAt:
+          type: string
+          format: date-time
+          description: The date when the data record has been last updated.
         isParticipantData:
           type: boolean
         legalAddress:
@@ -5681,10 +5699,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ErrorInfoLegalEntityCreateError"
-        entityCount:
+        errorCount:
           type: integer
           format: int32
-        errorCount:
+        entityCount:
           type: integer
           format: int32
     LegalEntityPartnerCreateVerboseDto:
@@ -5744,6 +5762,17 @@ components:
           type: string
           format: date-time
           description: The date when the data record has been last updated.
+        ownershipUltimate:
+          type: boolean
+          description: Whether this legal entity is the ultimate owner in the ownership
+            chain. This flag is provided by the golden record process and persisted
+            in the Pool. The ultimate owner resolution logic is not implemented in
+            this feature.
+        ultimateOwnerBpnl:
+          type: string
+          description: The BPNL of the ultimate owner in the ownership chain. This
+            field is persisted in the Pool but not resolved in this feature. It will
+            be populated by future features that implement ultimate owner resolution.
         isParticipantData:
           type: boolean
           description: Indicates whether the legal entity is owned and thus provided
@@ -5805,6 +5834,16 @@ components:
             $ref: "#/components/schemas/LegalEntityStateDto"
         confidenceCriteria:
           $ref: "#/components/schemas/ConfidenceCriteriaDto"
+        ownershipUltimate:
+          type: boolean
+          description: Whether this legal entity is the ultimate owner in the ownership
+            chain. This flag is provided by the golden record process and persisted
+            in the Pool. The resulting ultimate owner BPNL is derived by the Pool
+            and only returned on read.
+        updatedAt:
+          type: string
+          format: date-time
+          description: The date when the data record has been last updated.
         isParticipantData:
           type: boolean
         legalAddress:
@@ -5830,10 +5869,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ErrorInfoLegalEntityUpdateError"
-        entityCount:
+        errorCount:
           type: integer
           format: int32
-        errorCount:
+        entityCount:
           type: integer
           format: int32
     LegalEntityPropertiesSearchRequest:
@@ -6240,6 +6279,17 @@ components:
           type: string
           format: date-time
           description: The date when the data record has been last updated.
+        ownershipUltimate:
+          type: boolean
+          description: Whether this legal entity is the ultimate owner in the ownership
+            chain. This flag is provided by the golden record process and persisted
+            in the Pool. The ultimate owner resolution logic is not implemented in
+            this feature.
+        ultimateOwnerBpnl:
+          type: string
+          description: The BPNL of the ultimate owner in the ownership chain. This
+            field is persisted in the Pool but not resolved in this feature. It will
+            be populated by future features that implement ultimate owner resolution.
         isParticipantData:
           type: boolean
           description: Indicates whether the legal entity is owned and thus provided
@@ -7263,6 +7313,10 @@ components:
             \ if the goods are to be picked up somewhere else."
         confidenceCriteria:
           $ref: "#/components/schemas/ConfidenceCriteriaDto"
+        updatedAt:
+          type: string
+          format: date-time
+          description: The date when the data record has been last updated.
     LogisticAddressInvariantVerboseDto:
       type: object
       description: "In general, an address is a collection of information to describe\
@@ -8609,6 +8663,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SiteScriptVariantDto"
+        updatedAt:
+          type: string
+          format: date-time
+          description: The date when the data record has been last updated.
         bpnlParent:
           type: string
         index:
@@ -8628,10 +8686,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ErrorInfoSiteCreateError"
-        entityCount:
+        errorCount:
           type: integer
           format: int32
-        errorCount:
+        entityCount:
           type: integer
           format: int32
     SitePartnerCreateVerboseDto:
@@ -8726,6 +8784,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SiteScriptVariantDto"
+        updatedAt:
+          type: string
+          format: date-time
+          description: The date when the data record has been last updated.
         requestKey:
           type: string
     SitePartnerUpdateResponseWrapper:
@@ -8741,10 +8803,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ErrorInfoSiteUpdateError"
-        entityCount:
+        errorCount:
           type: integer
           format: int32
-        errorCount:
+        entityCount:
           type: integer
           format: int32
     SiteScriptVariantDto:

@@ -49,7 +49,8 @@ class BusinessPartnerBuildService(
     private val siteRepository: SiteRepository,
     private val logisticAddressRepository: LogisticAddressRepository,
     private val requestValidationService: RequestValidationService,
-    private val businessPartnerEquivalenceMapper: BusinessPartnerEquivalenceMapper
+    private val businessPartnerEquivalenceMapper: BusinessPartnerEquivalenceMapper,
+    private val ultimateOwnerResolutionService: UltimateOwnerResolutionService
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -94,6 +95,10 @@ class BusinessPartnerBuildService(
 
         }
         legalEntityRepository.saveAll(legalEntities)
+
+        legalEntities.forEach { createdEntity ->
+            ultimateOwnerResolutionService.updateUltimateOwnerForEntityAndDescendants(createdEntity)
+        }
 
         val legalEntityResponse = legalEntities.map { it.toUpsertDto(requestsByLegalEntities[it]!!.index) }
 
@@ -273,6 +278,7 @@ class BusinessPartnerBuildService(
         val legalEntityRequestPairs = legalEntities.map { legalEntity -> Pair(legalEntity, requestsByBpn[legalEntity.bpn]!!) }
         legalEntityRequestPairs.forEach { (legalEntity, request) ->
             val legalEntityBeforeUpdate = businessPartnerEquivalenceMapper.toEquivalenceDto(legalEntity)
+            val ownershipUltimateBeforeUpdate = legalEntity.ownershipUltimate
             updateLegalEntity(legalEntity, request.legalEntity.header, legalEntityMetadataMap, request.legalEntity.scriptVariants)
             updateLogisticAddress(legalEntity.legalAddress, request.legalEntity.toLegalAddressWithScriptVariants(), addressMetadataMap)
             val legalEntityAfterUpdate = businessPartnerEquivalenceMapper.toEquivalenceDto(legalEntity)
@@ -281,6 +287,10 @@ class BusinessPartnerBuildService(
                 logger.info { "Legal Entity ${legalEntity.bpn} was updated" }
 
                 legalEntityRepository.save(legalEntity)
+
+                if (ownershipUltimateBeforeUpdate != legalEntity.ownershipUltimate) {
+                    ultimateOwnerResolutionService.updateUltimateOwnerForEntityAndDescendants(legalEntity)
+                }
 
                 changelogService.createChangelogEntries(
                     listOf(
@@ -714,7 +724,9 @@ class BusinessPartnerBuildService(
                 legalForm = legalForm,
                 currentness = Instant.now().truncatedTo(ChronoUnit.MICROS),
                 confidenceCriteria = createConfidenceCriteria(legalEntityHeaderDto.confidenceCriteria),
-                isCatenaXMemberData = legalEntityHeaderDto.isParticipantData
+                isCatenaXMemberData = legalEntityHeaderDto.isParticipantData,
+                ownershipUltimate = legalEntityHeaderDto.ownershipUltimate ?: false
+                // ultimateOwnerBpnl is derived by UltimateOwnerResolutionService, never taken from the request
             )
             updateLegalEntity(newLegalEntity, legalEntityHeaderDto, metadataMap, scriptVariants)
 
@@ -736,6 +748,8 @@ class BusinessPartnerBuildService(
             legalEntity.states.replace(legalEntityHeaderDto.states.map { toLegalEntityState(it, legalEntity) })
             legalEntity.confidenceCriteria = updateConfidenceCriteria( legalEntity.confidenceCriteria, legalEntityHeaderDto.confidenceCriteria)
             legalEntity.isCatenaXMemberData = legalEntityHeaderDto.isParticipantData
+            legalEntity.ownershipUltimate = legalEntityHeaderDto.ownershipUltimate ?: legalEntity.ownershipUltimate
+            // ultimateOwnerBpnl is derived by UltimateOwnerResolutionService; the request must not overwrite it
 
             legalEntity.scriptVariants.replace(scriptVariants.map { variant -> LegalEntityScriptVariantDb(metadataMap.scriptCodes[variant.scriptCode]!!, variant.legalName, variant.shortName) })
         }
