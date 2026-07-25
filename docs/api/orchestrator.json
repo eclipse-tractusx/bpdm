@@ -1029,6 +1029,12 @@
           "hasChanged" : {
             "type" : "boolean"
           },
+          "ownershipUltimate" : {
+            "type" : "boolean"
+          },
+          "ultimateOwnerBpnl" : {
+            "type" : "string"
+          },
           "legalAddress" : {
             "$ref" : "#/components/schemas/PostalAddress"
           },

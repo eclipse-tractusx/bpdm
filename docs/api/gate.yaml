@@ -2129,6 +2129,14 @@ components:
           type: string
           description: "The legal form of the legal entity, on which the business\
             \ partner provides a view."
+        ownershipUltimate:
+          type: boolean
+          description: Designates whether this legal entity is the ultimate owner
+            in an ownership chain.
+        ultimateOwnerBpnl:
+          type: string
+          description: The BPNL of the designated ultimate owner up in the ownership
+            chain.
         states:
           type: array
           items:
@@ -2155,6 +2163,14 @@ components:
             \ partner provides a view."
         confidenceCriteria:
           $ref: "#/components/schemas/ConfidenceCriteriaDto"
+        ownershipUltimate:
+          type: boolean
+          description: Designates whether this legal entity is the ultimate owner
+            in an ownership chain.
+        ultimateOwnerBpnl:
+          type: string
+          description: The BPNL of the designated ultimate owner up in the ownership
+            chain.
         states:
           type: array
           items:
