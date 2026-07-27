@@ -23,8 +23,8 @@ import com.neovisionaries.i18n.CountryCode
 import com.neovisionaries.i18n.LanguageCode
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalFormDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalFormRequest
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalFormDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalFormRequestV6
 import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolTestBaseV6
 import org.junit.jupiter.api.Test
 import org.springframework.web.reactive.function.client.WebClientResponseException
@@ -100,13 +100,13 @@ class LegalFormCreateV6IT: UnscheduledPoolTestBaseV6(){
 
 
 
-    private fun createLegalFormRequest(seed: String): LegalFormRequest {
-        return LegalFormRequest(
+    private fun createLegalFormRequest(seed: String): LegalFormRequestV6 {
+        return LegalFormRequestV6(
             technicalKey = seed,
-            name = "$seed ${LegalFormRequest::name.name}",
-            transliteratedName = "$seed ${LegalFormRequest::transliteratedName.name}",
-            abbreviation = "$seed ${LegalFormRequest::abbreviation.name}",
-            transliteratedAbbreviations = "$seed ${LegalFormRequest::transliteratedAbbreviations.name}",
+            name = "$seed ${LegalFormRequestV6::name.name}",
+            transliteratedName = "$seed ${LegalFormRequestV6::transliteratedName.name}",
+            abbreviation = "$seed ${LegalFormRequestV6::abbreviation.name}",
+            transliteratedAbbreviations = "$seed ${LegalFormRequestV6::transliteratedAbbreviations.name}",
             country = CountryCode.DE,
             language = LanguageCode.de,
             administrativeAreaLevel1 = "DE-BW",
@@ -114,8 +114,8 @@ class LegalFormCreateV6IT: UnscheduledPoolTestBaseV6(){
         )
     }
 
-    private fun createExpectedLegalForm(request: LegalFormRequest): LegalFormDto {
-        return LegalFormDto(
+    private fun createExpectedLegalForm(request: LegalFormRequestV6): LegalFormDtoV6 {
+        return LegalFormDtoV6(
             technicalKey = request.technicalKey,
             name = request.name,
             transliteratedName = request.transliteratedName,

@@ -22,11 +22,12 @@ package org.eclipse.tractusx.bpdm.pool.service.application.v6
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityCreateError
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntityPartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateResponseWrapper
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntityPartnerCreateRequestV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateResponseWrapperV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.LegalEntityDtoRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.toUpsertDto
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.LegalEntityParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
@@ -49,13 +50,13 @@ class LegalEntityCreateApplicationV6Service(
     private val logger = KotlinLogging.logger { }
 
     @Transactional
-    fun createLegalEntities(requests: Collection<LegalEntityPartnerCreateRequest>): LegalEntityPartnerCreateResponseWrapper {
+    fun createLegalEntities(requests: Collection<LegalEntityPartnerCreateRequestV6>): LegalEntityPartnerCreateResponseWrapperV6 {
         logger.info { "Create ${requests.size} new legal entities" }
 
         val requestList = requests.toList()
         val createRequests = requestList.map { legalEntityDtoRequestMapper.toCreateRequest(it) }
 
-        val responses = mutableListOf<LegalEntityPartnerCreateVerboseDto>()
+        val responses = mutableListOf<LegalEntityPartnerCreateVerboseDtoV6>()
         val errors = mutableListOf<ErrorInfo<LegalEntityCreateError>>()
         requestList.zip(parseAndExecute(createRequests, legalEntityCreateParser::parse, legalEntityCreateService::create)).forEach { (request, result) ->
             when (result) {
@@ -64,6 +65,6 @@ class LegalEntityCreateApplicationV6Service(
             }
         }
 
-        return LegalEntityPartnerCreateResponseWrapper(responses, errors)
+        return LegalEntityPartnerCreateResponseWrapperV6(responses, errors.map { it.toV6() })
     }
 }

@@ -20,9 +20,9 @@
 package org.eclipse.tractusx.bpdm.pool.v6.bpn
 
 import org.assertj.core.api.Assertions
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.api.model.request.IdentifiersSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierBusinessPartnerTypeV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.IdentifiersSearchRequestV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.BpnIdentifierMappingDtoV6
 import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolTestBaseV6
 import org.junit.jupiter.api.Test
 
@@ -44,10 +44,10 @@ class BpnSearchV6IT: UnscheduledPoolTestBaseV6() {
         val identifierX = legalEntityResponseA.legalEntity.identifiers.first()
 
         //WHEN
-        val searchResponse = poolClient.bpns.findBpnsByIdentifiers(IdentifiersSearchRequest(IdentifierBusinessPartnerType.LEGAL_ENTITY, identifierX.type, listOf(identifierX.value))).body
+        val searchResponse = poolClient.bpns.findBpnsByIdentifiers(IdentifiersSearchRequestV6(IdentifierBusinessPartnerTypeV6.LEGAL_ENTITY, identifierX.type, listOf(identifierX.value))).body
 
         //THEN
-        val expectedBpns = setOf(BpnIdentifierMappingDto(identifierX.value, legalEntityResponseA.legalEntity.bpnl))
+        val expectedBpns = setOf(BpnIdentifierMappingDtoV6(identifierX.value, legalEntityResponseA.legalEntity.bpnl))
         Assertions.assertThat(searchResponse).isEqualTo(expectedBpns)
     }
 
@@ -66,10 +66,10 @@ class BpnSearchV6IT: UnscheduledPoolTestBaseV6() {
         val identifierX = legalEntityResponseA.legalAddress.identifiers.first()
 
         //WHEN
-        val searchResponse = poolClient.bpns.findBpnsByIdentifiers(IdentifiersSearchRequest(IdentifierBusinessPartnerType.ADDRESS, identifierX.type, listOf(identifierX.value))).body
+        val searchResponse = poolClient.bpns.findBpnsByIdentifiers(IdentifiersSearchRequestV6(IdentifierBusinessPartnerTypeV6.ADDRESS, identifierX.type, listOf(identifierX.value))).body
 
         //THEN
-        val expectedBpns = setOf(BpnIdentifierMappingDto(identifierX.value, legalEntityResponseA.legalAddress.bpna))
+        val expectedBpns = setOf(BpnIdentifierMappingDtoV6(identifierX.value, legalEntityResponseA.legalAddress.bpna))
         Assertions.assertThat(searchResponse).isEqualTo(expectedBpns)
     }
 

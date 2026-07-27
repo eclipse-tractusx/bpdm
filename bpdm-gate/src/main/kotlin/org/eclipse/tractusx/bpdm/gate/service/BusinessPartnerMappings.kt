@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 
-import java.time.Instant
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
@@ -35,6 +34,7 @@ import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidPartnerException
 import org.eclipse.tractusx.orchestrator.api.model.AddressGoldenRecordRelationType
 import org.eclipse.tractusx.orchestrator.api.model.LegalEntityGoldenRecordRelationType
 import org.springframework.stereotype.Service
+import java.time.Instant
 
 @Service
 class BusinessPartnerMappings {

@@ -20,12 +20,14 @@
 package org.eclipse.tractusx.bpdm.pool.service.application.v6
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteUpdateError
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerUpdateResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SitePartnerUpdateRequestV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateVerboseDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerUpdateResponseWrapperV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.toUpsertDto
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV6
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV7
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.SiteDtoRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.SiteParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
@@ -49,13 +51,13 @@ class SiteUpdateApplicationV6Service(
     private val logger = KotlinLogging.logger { }
 
     @Transactional
-    fun updateSites(requests: Collection<SitePartnerUpdateRequest>): SitePartnerUpdateResponseWrapper {
+    fun updateSites(requests: Collection<SitePartnerUpdateRequestV6>): SitePartnerUpdateResponseWrapperV6 {
         logger.info { "Update ${requests.size} sites" }
 
         val requestList = requests.toList()
-        val updateRequests = requestList.map { siteDtoRequestMapper.toUpdateRequest(it) }
+        val updateRequests = requestList.map { siteDtoRequestMapper.toUpdateRequest(it.toV7()) }
 
-        val responses = mutableListOf<SitePartnerCreateVerboseDto>()
+        val responses = mutableListOf<SitePartnerCreateVerboseDtoV6>()
         val errors = mutableListOf<ErrorInfo<SiteUpdateError>>()
         requestList.zip(parseAndExecute(updateRequests, siteUpdateParser::parse, siteUpdateService::update)).forEach { (request, result) ->
             when (result) {
@@ -64,6 +66,6 @@ class SiteUpdateApplicationV6Service(
             }
         }
 
-        return SitePartnerUpdateResponseWrapper(responses, errors)
+        return SitePartnerUpdateResponseWrapperV6(responses, errors.map { it.toV6() })
     }
 }

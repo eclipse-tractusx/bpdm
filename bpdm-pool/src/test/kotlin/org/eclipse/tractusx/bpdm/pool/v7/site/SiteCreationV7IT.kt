@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.v7.site
 
+import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteCreateError
@@ -27,7 +28,6 @@ import org.eclipse.tractusx.bpdm.pool.v7.UnscheduledPoolTestBaseV7
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withAlternativeAdminArea
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withMainAddressIdentifiers
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withPhysicalAdminArea
-import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import org.springframework.web.reactive.function.client.WebClientResponseException
 

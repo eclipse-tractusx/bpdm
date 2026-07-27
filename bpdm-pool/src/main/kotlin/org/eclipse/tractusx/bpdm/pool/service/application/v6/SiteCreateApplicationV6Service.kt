@@ -20,13 +20,15 @@
 package org.eclipse.tractusx.bpdm.pool.service.application.v6
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteCreateRequestWithLegalAddressAsMain
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteCreateError
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateResponseWrapper
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SiteCreateRequestWithLegalAddressAsMainV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SitePartnerCreateRequestV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateResponseWrapperV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.toUpsertDto
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV6
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV7
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.SiteDtoRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.SiteParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
@@ -56,13 +58,13 @@ class SiteCreateApplicationV6Service(
     private val logger = KotlinLogging.logger { }
 
     @Transactional
-    fun createSitesWithMainAddress(requests: Collection<SitePartnerCreateRequest>): SitePartnerCreateResponseWrapper {
+    fun createSitesWithMainAddress(requests: Collection<SitePartnerCreateRequestV6>): SitePartnerCreateResponseWrapperV6 {
         logger.info { "Create ${requests.size} new sites" }
 
         val requestList = requests.toList()
-        val createRequests = requestList.map { siteDtoRequestMapper.toCreateRequest(it) }
+        val createRequests = requestList.map { siteDtoRequestMapper.toCreateRequest(it.toV7()) }
 
-        val responses = mutableListOf<SitePartnerCreateVerboseDto>()
+        val responses = mutableListOf<SitePartnerCreateVerboseDtoV6>()
         val errors = mutableListOf<ErrorInfo<SiteCreateError>>()
         requestList.zip(parseAndExecute(createRequests, siteCreateParser::parse, siteCreateService::create)).forEach { (request, result) ->
             when (result) {
@@ -71,7 +73,7 @@ class SiteCreateApplicationV6Service(
             }
         }
 
-        return SitePartnerCreateResponseWrapper(responses, errors)
+        return SitePartnerCreateResponseWrapperV6(responses, errors.map { it.toV6() })
     }
 
     /**
@@ -81,13 +83,13 @@ class SiteCreateApplicationV6Service(
      * here, because the shared parse/create path deliberately does not enforce it (v7 and the cleaning/task path allow it).
      */
     @Transactional
-    fun createSitesWithLegalAddressAsMain(requests: Collection<SiteCreateRequestWithLegalAddressAsMain>): SitePartnerCreateResponseWrapper {
+    fun createSitesWithLegalAddressAsMain(requests: Collection<SiteCreateRequestWithLegalAddressAsMainV6>): SitePartnerCreateResponseWrapperV6 {
         logger.info { "Create ${requests.size} new sites with legal address as site main address" }
 
         val requestList = requests.toList()
         val legalEntitiesByBpn = legalEntityRepository.findDistinctByBpnIn(requestList.map { it.bpnLParent }).associateBy { it.bpn }
 
-        val responses = mutableListOf<SitePartnerCreateVerboseDto>()
+        val responses = mutableListOf<SitePartnerCreateVerboseDtoV6>()
         val errors = mutableListOf<ErrorInfo<SiteCreateError>>()
 
         val validRequests = requestList.filter { request ->
@@ -120,7 +122,7 @@ class SiteCreateApplicationV6Service(
             }
         }
 
-        val createRequests = validRequests.map { siteDtoRequestMapper.toCreateWithLegalAddressAsMainRequest(it) }
+        val createRequests = validRequests.map { siteDtoRequestMapper.toCreateWithLegalAddressAsMainRequest(it.toV7()) }
         parseAndExecute(createRequests, siteCreateWithLegalAddressAsMainParser::parse, siteCreateWithReferencedAddressAsMainService::create)
             .forEachIndexed { index, result ->
                 val entityKey = index.toString()
@@ -130,6 +132,6 @@ class SiteCreateApplicationV6Service(
                 }
             }
 
-        return SitePartnerCreateResponseWrapper(responses, errors)
+        return SitePartnerCreateResponseWrapperV6(responses, errors.map { it.toV6() })
     }
 }

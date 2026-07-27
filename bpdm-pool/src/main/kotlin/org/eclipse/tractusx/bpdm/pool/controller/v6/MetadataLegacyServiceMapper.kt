@@ -22,22 +22,24 @@ package org.eclipse.tractusx.bpdm.pool.controller.v6
 import com.neovisionaries.i18n.CountryCode
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
+import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.exception.BpdmValidationErrorException
 import org.eclipse.tractusx.bpdm.common.mapping.ValidationContext
 import org.eclipse.tractusx.bpdm.common.mapping.ValidationError
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDetailDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierTypeDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalFormDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalFormRequest
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.*
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalFormRequestV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.FieldQualityRuleDtoV6
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDetailDb
 import org.eclipse.tractusx.bpdm.pool.entity.LegalFormDb
 import org.eclipse.tractusx.bpdm.pool.entity.RegionDb
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmAlreadyExists
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV6
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV7
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalFormRepository
 import org.eclipse.tractusx.bpdm.pool.repository.RegionRepository
+import org.eclipse.tractusx.bpdm.pool.service.MetadataService
 import org.eclipse.tractusx.bpdm.pool.service.toDto
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.Specification
@@ -48,20 +50,21 @@ import org.springframework.transaction.annotation.Transactional
 class MetadataLegacyServiceMapper(
     private val identifierTypeRepository: IdentifierTypeRepository,
     private val legalFormRepository: LegalFormRepository,
-    private val regionRepository: RegionRepository
+    private val regionRepository: RegionRepository,
+    private val metadataService: MetadataService
 ) {
 
     private val logger = KotlinLogging.logger { }
 
     @Transactional
-    fun createIdentifierType(type: IdentifierTypeDto): IdentifierTypeDto {
-        if (identifierTypeRepository.findByBusinessPartnerTypeAndTechnicalKey(type.businessPartnerType, type.technicalKey) != null)
+    fun createIdentifierType(type: IdentifierTypeDtoV6): IdentifierTypeDtoV6 {
+        if (identifierTypeRepository.findByBusinessPartnerTypeAndTechnicalKey(type.businessPartnerType.toV7(), type.technicalKey) != null)
             throw BpdmAlreadyExists(IdentifierTypeDb::class.simpleName!!, "${type.technicalKey}/${type.businessPartnerType}")
 
         logger.info { "Create new Identifier-Type with key ${type.technicalKey}, businessPartnerType ${type.businessPartnerType} and name ${type.name}" }
         val entity = IdentifierTypeDb(
             technicalKey = type.technicalKey,
-            businessPartnerType = type.businessPartnerType,
+            businessPartnerType = type.businessPartnerType.toV7(),
             name = type.name,
             abbreviation = type.abbreviation,
             transliteratedName = type.transliteratedName,
@@ -73,19 +76,19 @@ class MetadataLegacyServiceMapper(
         return identifierTypeRepository.save(entity).toDto()
     }
 
-    fun IdentifierTypeDb.toDto(): IdentifierTypeDto {
-        return IdentifierTypeDto(
-            technicalKey, businessPartnerType, name, abbreviation, transliteratedName, transliteratedAbbreviation,
-            details.map { IdentifierTypeDetailDto(it.countryCode, it.mandatory) })
+    fun IdentifierTypeDb.toDto(): IdentifierTypeDtoV6 {
+        return IdentifierTypeDtoV6(
+            technicalKey, businessPartnerType.toV6(), name, abbreviation, transliteratedName, transliteratedAbbreviation,
+            details.map { IdentifierTypeDetailDtoV6(it.countryCode, it.mandatory) })
     }
 
     fun getIdentifierTypes(
         pageRequest: Pageable,
-        businessPartnerType: IdentifierBusinessPartnerType,
+        businessPartnerType: IdentifierBusinessPartnerTypeV6,
         country: CountryCode? = null
-    ): PageDto<IdentifierTypeDto> {
+    ): PageDto<IdentifierTypeDtoV6> {
         val spec = Specification.allOf(
-            IdentifierTypeRepository.Specs.byBusinessPartnerType(businessPartnerType),
+            IdentifierTypeRepository.Specs.byBusinessPartnerType(businessPartnerType.toV7()),
             IdentifierTypeRepository.Specs.byCountry(country)
         )
         val page = identifierTypeRepository.findAll(spec, pageRequest)
@@ -93,7 +96,7 @@ class MetadataLegacyServiceMapper(
     }
 
     @Transactional
-    fun createLegalForm(request: LegalFormRequest): LegalFormDto {
+    fun createLegalForm(request: LegalFormRequestV6): LegalFormDtoV6 {
         if (legalFormRepository.findByTechnicalKey(request.technicalKey) != null)
             throw BpdmAlreadyExists(LegalFormDb::class.simpleName!!, request.technicalKey)
 
@@ -128,8 +131,8 @@ class MetadataLegacyServiceMapper(
         return legalFormRepository.save(legalForm).toDto()
     }
 
-    fun LegalFormDb.toDto(): LegalFormDto {
-        return LegalFormDto(
+    fun LegalFormDb.toDto(): LegalFormDtoV6 {
+        return LegalFormDtoV6(
             technicalKey = technicalKey,
             name = name,
             transliteratedName = transliteratedName,
@@ -142,10 +145,24 @@ class MetadataLegacyServiceMapper(
         )
     }
 
-    fun getLegalForms(pageRequest: Pageable): PageDto<LegalFormDto> {
+    fun getLegalForms(pageRequest: Pageable): PageDto<LegalFormDtoV6> {
         val page = legalFormRepository.findAll(pageRequest)
         return page.toDto(page.content.map { it.toDto() })
     }
 
+    fun getFieldQualityRules(country: CountryCode): Collection<FieldQualityRuleDtoV6> {
+        return metadataService.getFieldQualityRules(country).map { it.toV6() }
+    }
+
+    fun getAdminAreasLevel1(paginationRequest: PaginationRequest): PageDto<CountrySubdivisionDtoV6> {
+        val page = metadataService.getCountrySubdivisions(paginationRequest)
+        return PageDto(
+            totalElements = page.totalElements,
+            totalPages = page.totalPages,
+            page = page.page,
+            contentSize = page.contentSize,
+            content = page.content.map { it.toV6() }
+        )
+    }
 
 }

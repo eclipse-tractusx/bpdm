@@ -23,10 +23,11 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.SiteVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SiteWithMainAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.SiteVerboseDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SiteWithMainAddressVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.toV6Dto
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV6
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.eclipse.tractusx.bpdm.pool.service.AddressService
 import org.eclipse.tractusx.bpdm.pool.service.toDto
@@ -43,21 +44,21 @@ class SiteLegacyServiceMapper(
 
     private val logger = KotlinLogging.logger { }
 
-    fun findByBpn(bpn: String): SiteWithMainAddressVerboseDto {
+    fun findByBpn(bpn: String): SiteWithMainAddressVerboseDtoV6 {
         logger.debug { "Executing findByBpn() with parameters $bpn " }
         val site = siteRepository.findByBpn(bpn) ?: throw BpdmNotFoundException("Site", bpn)
         return toPoolDto(site)
     }
 
-    fun toPoolDto(entity: SiteDb): SiteWithMainAddressVerboseDto {
-        return SiteWithMainAddressVerboseDto(
+    fun toPoolDto(entity: SiteDb): SiteWithMainAddressVerboseDtoV6 {
+        return SiteWithMainAddressVerboseDtoV6(
 
-            site = SiteVerboseDto(
+            site = SiteVerboseDtoV6(
                 entity.bpn,
                 entity.name,
-                states = entity.states.map { it.toDto() },
+                states = entity.states.map { it.toDto().toV6() },
                 bpnLegalEntity = entity.legalEntity.bpn,
-                confidenceCriteria = entity.confidenceCriteria.toDto(),
+                confidenceCriteria = entity.confidenceCriteria.toDto().toV6(),
                 isCatenaXMemberData = entity.legalEntity.isCatenaXMemberData,
                 createdAt = entity.createdAt,
                 updatedAt = entity.updatedAt,
@@ -70,7 +71,7 @@ class SiteLegacyServiceMapper(
      * Search sites per page for [searchRequest] and [paginationRequest]
      */
     @Transactional
-    fun searchSites(searchRequest: SiteSearchRequest, paginationRequest: PaginationRequest): PageDto<SiteWithMainAddressVerboseDto> {
+    fun searchSites(searchRequest: SiteSearchRequest, paginationRequest: PaginationRequest): PageDto<SiteWithMainAddressVerboseDtoV6> {
         logger.debug { "Executing site search with request: $searchRequest" }
         val spec = Specification.allOf(
             SiteRepository.byBpns(searchRequest.siteBpns),

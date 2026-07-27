@@ -19,14 +19,14 @@
 
 package org.eclipse.tractusx.bpdm.test.testdata.pool.v6
 
-import org.eclipse.tractusx.bpdm.pool.api.model.CountrySubdivisionDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierTypeDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalFormDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.CountrySubdivisionDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierTypeDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalFormDtoV6
 
 
 data class TestMetadataV6(
-    val legalForms: List<LegalFormDto>,
-    val legalEntityIdentifierTypes: List<IdentifierTypeDto>,
-    val addressIdentifierTypes: List<IdentifierTypeDto>,
-    val adminAreas: List<CountrySubdivisionDto>
+    val legalForms: List<LegalFormDtoV6>,
+    val legalEntityIdentifierTypes: List<IdentifierTypeDtoV6>,
+    val addressIdentifierTypes: List<IdentifierTypeDtoV6>,
+    val adminAreas: List<CountrySubdivisionDtoV6>
 )

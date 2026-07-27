@@ -28,12 +28,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerb
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.GivenConfidence
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.TestDataV7
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
-import org.eclipse.tractusx.orchestrator.api.model.BpnReference
-import org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartner
-import org.eclipse.tractusx.orchestrator.api.model.TaskStep
-import org.eclipse.tractusx.orchestrator.api.model.TaskStepResultEntryDto
-import org.eclipse.tractusx.orchestrator.api.model.TaskStepResultRequest
+import org.eclipse.tractusx.orchestrator.api.model.*
 import tools.jackson.databind.json.JsonMapper
 
 class BusinessPartnerShareActions(
