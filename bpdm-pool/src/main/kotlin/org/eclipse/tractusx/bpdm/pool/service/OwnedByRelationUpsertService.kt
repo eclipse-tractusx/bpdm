@@ -62,6 +62,8 @@ class OwnedByRelationUpsertService(
             )
         )
 
+        ultimateOwnerResolutionService.validateOnlyOneUltimateOwnerInHierarchy(proposedSource)
+
         ultimateOwnerResolutionService.updateUltimateOwnerForEntityAndDescendants(proposedSource)
 
         handleValidityBoundaryTriggers(result.relation)

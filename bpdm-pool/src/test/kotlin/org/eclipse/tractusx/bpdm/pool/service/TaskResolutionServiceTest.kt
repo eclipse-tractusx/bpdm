@@ -1656,6 +1656,53 @@ class TaskResolutionServiceTest @Autowired constructor(
     }
 
     @Test
+    fun `validation - reject owned-by tree merge with two flagged ultimate owners`() {
+        val childA = createLegalEntity("BPNL_VAL_MERGE_CA")
+        val rootA = createLegalEntity("BPNL_VAL_MERGE_RA")
+        val rootB = createLegalEntity("BPNL_VAL_MERGE_RB")
+
+        createIsOwnedByRelationViaService(childA.legalEntity.header.bpnl, rootA.legalEntity.header.bpnl)
+
+        val rootADb = legalEntityRepository.findByBpnIgnoreCase(rootA.legalEntity.header.bpnl)!!
+        val rootBDb = legalEntityRepository.findByBpnIgnoreCase(rootB.legalEntity.header.bpnl)!!
+        rootADb.ownershipUltimate = true
+        rootBDb.ownershipUltimate = true
+        legalEntityRepository.save(rootADb)
+        legalEntityRepository.save(rootBDb)
+
+        val exception = org.junit.jupiter.api.assertThrows<BpdmValidationException> {
+            transactionTemplate.execute {
+                val source = legalEntityRepository.findByBpnIgnoreCase(rootA.legalEntity.header.bpnl)!!
+                val target = legalEntityRepository.findByBpnIgnoreCase(rootB.legalEntity.header.bpnl)!!
+
+                ownedByRelationUpsertService.upsertRelation(
+                    IRelationUpsertStrategyService.UpsertRequest(
+                        source = source,
+                        target = target,
+                        validityPeriods = listOf(currentValidityPeriod()),
+                        existingRelation = null,
+                        reasonCode = null
+                    )
+                )
+            }
+        }
+
+        assertThat(exception.message).contains("Multiple ultimate owners detected")
+
+        val sourceAfter = legalEntityRepository.findByBpnIgnoreCase(rootA.legalEntity.header.bpnl)!!
+        val targetAfter = legalEntityRepository.findByBpnIgnoreCase(rootB.legalEntity.header.bpnl)!!
+        val mergedRelation = relationRepository.findAll(
+            RelationRepository.byRelation(
+                startNode = sourceAfter,
+                endNode = targetAfter,
+                type = LegalEntityRelationType.IsOwnedBy
+            )
+        ).singleOrNull()
+
+        assertThat(mergedRelation).isNull()
+    }
+
+    @Test
     fun `validation - reject second flag when ancestor is already flagged`() {
         val subsidiary = createLegalEntity("BPNL_VAL_S")
         val intermediate = createLegalEntity("BPNL_VAL_I")
