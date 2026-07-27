@@ -23,7 +23,7 @@ import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.AddressUpdateMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.LegalEntityHeaderUpdateMapper
-import org.eclipse.tractusx.bpdm.pool.model.LegalEntityUpdate
+import org.eclipse.tractusx.bpdm.pool.model.update.LegalEntityUpdate
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityUpdateParsed
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

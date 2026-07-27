@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model
+package org.eclipse.tractusx.bpdm.pool.model.update
 
 /**
  * A single field's contribution to a partial update: either [Set] it to a value (which, for a nullable field, includes

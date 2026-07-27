@@ -19,8 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.entity
 
-import org.eclipse.tractusx.bpdm.pool.model.FieldUpdate
-import org.eclipse.tractusx.bpdm.pool.model.SiteHeaderUpdate
+import org.eclipse.tractusx.bpdm.pool.model.update.FieldUpdate
+import org.eclipse.tractusx.bpdm.pool.model.update.SiteHeaderUpdate
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderParsed
 import org.springframework.stereotype.Component
 

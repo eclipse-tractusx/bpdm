@@ -27,11 +27,11 @@ import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.SiteEntityMapper
-import org.eclipse.tractusx.bpdm.pool.model.AddressContentUpdate
-import org.eclipse.tractusx.bpdm.pool.model.AddressUpdate
-import org.eclipse.tractusx.bpdm.pool.model.SiteHeaderUpdate
-import org.eclipse.tractusx.bpdm.pool.model.SiteUpdate
-import org.eclipse.tractusx.bpdm.pool.model.ifSet
+import org.eclipse.tractusx.bpdm.pool.model.update.AddressContentUpdate
+import org.eclipse.tractusx.bpdm.pool.model.update.AddressUpdate
+import org.eclipse.tractusx.bpdm.pool.model.update.SiteHeaderUpdate
+import org.eclipse.tractusx.bpdm.pool.model.update.SiteUpdate
+import org.eclipse.tractusx.bpdm.pool.model.update.ifSet
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerEquivalenceMapper
 import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService

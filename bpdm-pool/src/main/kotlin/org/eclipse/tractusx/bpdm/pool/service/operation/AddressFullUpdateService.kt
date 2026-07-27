@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.service.operation
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.AddressUpdateMapper
-import org.eclipse.tractusx.bpdm.pool.model.AddressUpdate
+import org.eclipse.tractusx.bpdm.pool.model.update.AddressUpdate
 import org.eclipse.tractusx.bpdm.pool.model.PendingAddressWrite
 import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressUpdateParsed
 import org.springframework.stereotype.Service
@@ -31,7 +31,7 @@ import org.springframework.transaction.annotation.Transactional
 /**
  * The single authority for applying a full parsed address-update payload — descriptive content plus an optional site
  * assignment — to an already-resolved address. It is a payload adapter: it maps the parsed content to a full-replace
- * [org.eclipse.tractusx.bpdm.pool.model.AddressContentUpdate] and delegates change detection, persistence, and the
+ * [org.eclipse.tractusx.bpdm.pool.model.update.AddressContentUpdate] and delegates change detection, persistence, and the
  * changelog to [AddressUpdateService].
  *
  * [update] does this in one call. [stageUpdate] plus [commit] split it so a caller can learn whether the address

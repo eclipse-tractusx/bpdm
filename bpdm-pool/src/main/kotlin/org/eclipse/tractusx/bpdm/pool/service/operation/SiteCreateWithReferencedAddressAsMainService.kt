@@ -23,9 +23,9 @@ import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
-import org.eclipse.tractusx.bpdm.pool.model.AddressContentUpdate
-import org.eclipse.tractusx.bpdm.pool.model.AddressUpdate
-import org.eclipse.tractusx.bpdm.pool.model.FieldUpdate
+import org.eclipse.tractusx.bpdm.pool.model.update.AddressContentUpdate
+import org.eclipse.tractusx.bpdm.pool.model.update.AddressUpdate
+import org.eclipse.tractusx.bpdm.pool.model.update.FieldUpdate
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteCreateWithReferencedAddressAsMainParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderCreateParsed
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository

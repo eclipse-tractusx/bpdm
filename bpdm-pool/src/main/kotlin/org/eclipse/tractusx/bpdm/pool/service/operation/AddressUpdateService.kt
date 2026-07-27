@@ -24,10 +24,10 @@ import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.AddressEntityMapper
-import org.eclipse.tractusx.bpdm.pool.model.AddressContentUpdate
-import org.eclipse.tractusx.bpdm.pool.model.AddressUpdate
+import org.eclipse.tractusx.bpdm.pool.model.update.AddressContentUpdate
+import org.eclipse.tractusx.bpdm.pool.model.update.AddressUpdate
 import org.eclipse.tractusx.bpdm.pool.model.PendingAddressWrite
-import org.eclipse.tractusx.bpdm.pool.model.ifSet
+import org.eclipse.tractusx.bpdm.pool.model.update.ifSet
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerEquivalenceMapper
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

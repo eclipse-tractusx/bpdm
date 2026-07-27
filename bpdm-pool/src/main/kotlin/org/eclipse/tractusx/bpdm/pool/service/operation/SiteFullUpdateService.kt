@@ -23,7 +23,7 @@ import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.AddressUpdateMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.SiteHeaderUpdateMapper
-import org.eclipse.tractusx.bpdm.pool.model.SiteUpdate
+import org.eclipse.tractusx.bpdm.pool.model.update.SiteUpdate
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteUpdateParsed
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

@@ -20,10 +20,10 @@
 package org.eclipse.tractusx.bpdm.pool.service.operation
 
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
-import org.eclipse.tractusx.bpdm.pool.model.AddressContentUpdate
-import org.eclipse.tractusx.bpdm.pool.model.FieldUpdate
-import org.eclipse.tractusx.bpdm.pool.model.LegalEntityHeaderUpdate
-import org.eclipse.tractusx.bpdm.pool.model.LegalEntityUpdate
+import org.eclipse.tractusx.bpdm.pool.model.update.AddressContentUpdate
+import org.eclipse.tractusx.bpdm.pool.model.update.FieldUpdate
+import org.eclipse.tractusx.bpdm.pool.model.update.LegalEntityHeaderUpdate
+import org.eclipse.tractusx.bpdm.pool.model.update.LegalEntityUpdate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
