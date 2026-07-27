@@ -27,9 +27,11 @@ import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.SiteEntityMapper
-import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressUpdateParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteContentParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteUpdateParsed
+import org.eclipse.tractusx.bpdm.pool.model.update.AddressContentUpdate
+import org.eclipse.tractusx.bpdm.pool.model.update.AddressUpdate
+import org.eclipse.tractusx.bpdm.pool.model.update.SiteHeaderUpdate
+import org.eclipse.tractusx.bpdm.pool.model.update.SiteUpdate
+import org.eclipse.tractusx.bpdm.pool.model.update.ifSet
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerEquivalenceMapper
 import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
@@ -37,65 +39,59 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * The single authority for updating sites together with their main address: applies and change-detects the header,
- * applies the main-address change, and reports one UPDATE when either side actually changed. The parent SITE changelog
- * is emitted before the child ADDRESS changelog. Returns managed entities in the caller's transaction, not response
- * models.
+ * The single authority for writing an existing site, treated as a whole aggregate. A caller describes the change as
+ * data: a [SiteHeaderUpdate] for the header and an [AddressContentUpdate] for the main address —
+ * [AddressContentUpdate.NoOp] to leave it alone. This service — not the caller — decides how each field is applied. It
+ * detects whether the aggregate changed, persists it, and emits exactly one SITE changelog for those that did; every
+ * writer reuses it, so none can forget to log.
+ *
+ * The header is this service's own responsibility; the main address is delegated to [AddressUpdateService], which stays
+ * the leaf owner of the ADDRESS changelog. The parent SITE changelog is emitted before the child address is committed,
+ * so the parent entry always precedes the child.
  */
 @Service
 class SiteUpdateService(
-    private val addressFullUpdateService: AddressFullUpdateService,
-    private val siteRepository: SiteRepository,
-    private val changelogService: PartnerChangelogService,
+    private val equivalenceMapper: BusinessPartnerEquivalenceMapper,
+    private val addressUpdateService: AddressUpdateService,
     private val siteEntityMapper: SiteEntityMapper,
-    private val equivalenceMapper: BusinessPartnerEquivalenceMapper
+    private val siteRepository: SiteRepository,
+    private val changelogService: PartnerChangelogService
 ) {
 
     @Transactional
-    fun update(parsed: List<SiteUpdateParsed>): List<UpsertResult<SiteDb>>{
-        val headerResults = parsed.map { updateHeader(it) }
+    fun update(requests: List<SiteUpdate>): List<UpsertResult<SiteDb>> {
+        val headerUpdates = requests.map { updateHeader(it) }
+        val stagedMainAddressUpdates = requests.map { addressUpdateService.stageUpdate(AddressUpdate(it.site.mainAddress, it.mainAddress)) }
 
-        val mainAddressRequests = parsed.map {
-            AddressUpdateParsed(
-                it.target.mainAddress,
-                null,
-                it.content.mainAddress
-            )
-        }
-        val stagedMainAddresses = addressFullUpdateService.stageUpdate(mainAddressRequests)
-
-        val overallResults = headerResults.zip(stagedMainAddresses){ headerResult, stagedMainAddress ->
-            val changed = headerResult.upsertType == UpsertType.Updated || stagedMainAddress.upsertType == UpsertType.Updated
-            UpsertResult(headerResult.value, if (changed) UpsertType.Updated else UpsertType.NoChange)
+        val siteChangeResults = headerUpdates.zip(stagedMainAddressUpdates) { headerResult, mainAddressResult ->
+            val hasChanged = headerResult.upsertType != UpsertType.NoChange || mainAddressResult.upsertType != UpsertType.NoChange
+            UpsertResult(headerResult.value, if (hasChanged) UpsertType.Updated else UpsertType.NoChange)
         }
 
-        // Emit the parent changelog before committing the staged address so the parent UPDATE precedes the child.
-        changelogService.createChangelogEntries(
-            overallResults
-                .filter { it.upsertType == UpsertType.Updated }
-                .map { ChangelogEntryCreateRequest(it.value.bpn, ChangelogType.UPDATE, BusinessPartnerType.SITE) }
-        )
-        siteRepository.saveAll(headerResults.filter { it.upsertType == UpsertType.Updated }.map { it.value })
+        val updatedSites = siteChangeResults.filter { it.upsertType == UpsertType.Updated }
 
-        addressFullUpdateService.commit(stagedMainAddresses)
+        siteRepository.saveAll(updatedSites.map { it.value })
+        changelogService.createChangelogEntries(updatedSites.map { ChangelogEntryCreateRequest(it.value.bpn, ChangelogType.UPDATE, BusinessPartnerType.SITE) })
 
-        return overallResults
+        addressUpdateService.commit(stagedMainAddressUpdates)
+
+        return siteChangeResults
     }
 
-    private fun updateHeader(request: SiteUpdateParsed): UpsertResult<SiteDb>{
-        val before = equivalenceMapper.toEquivalenceDto(request.target)
-        doUpdateEntity(request.target, request.content)
-        val after = equivalenceMapper.toEquivalenceDto(request.target)
+    private fun updateHeader(request: SiteUpdate): UpsertResult<SiteDb> {
+        val before = equivalenceMapper.toEquivalenceDto(request.site)
+        applyHeader(request.site, request.header)
+        val hasChanged = equivalenceMapper.toEquivalenceDto(request.site) != before
 
-        return UpsertResult(request.target, if (before != after) UpsertType.Updated else UpsertType.NoChange)
+        return UpsertResult(request.site, if (hasChanged) UpsertType.Updated else UpsertType.NoChange)
     }
 
-    private fun doUpdateEntity(target: SiteDb, content: SiteContentParsed) {
-        val header = content.header
-        target.name = header.name
-        // Sharing-member count is Pool-maintained and absent from the payload, so carry it forward.
-        target.confidenceCriteria = siteEntityMapper.toConfidence(header.confidenceCriteria, target.confidenceCriteria.numberOfSharingMembers)
-        target.states.replace(siteEntityMapper.toStates(header.states, target))
-        target.scriptVariants.replace(siteEntityMapper.toScriptVariants(header.scriptVariants))
+    private fun applyHeader(target: SiteDb, header: SiteHeaderUpdate) {
+        // The sharing-member count is Pool-maintained, not part of the update payload, so carry the current value forward.
+        val numberOfSharingMembers = target.confidenceCriteria.numberOfSharingMembers
+        header.name.ifSet { target.name = it }
+        header.confidenceCriteria.ifSet { target.confidenceCriteria = siteEntityMapper.toConfidence(it, numberOfSharingMembers) }
+        header.states.ifSet { target.states.replace(siteEntityMapper.toStates(it, target)) }
+        header.scriptVariants.ifSet { target.scriptVariants.replace(siteEntityMapper.toScriptVariants(it)) }
     }
 }

@@ -69,7 +69,9 @@ class ExpectedBusinessPartnerResultFactory(
                     confidenceCriteria = if(isMaintainConfidences) confidenceCriteria else mapToExpectedConfidence(confidenceCriteria),
                     isParticipantData = isParticipantData,
                     createdAt = legalEntityCreatedAt,
-                    updatedAt = legalEntityUpdatedAt
+                    updatedAt = legalEntityUpdatedAt,
+                    ownershipUltimate = false,
+                    ultimateOwnerBpnl = null
                 )
             },
             legalAddress = mapToExpectedResult(

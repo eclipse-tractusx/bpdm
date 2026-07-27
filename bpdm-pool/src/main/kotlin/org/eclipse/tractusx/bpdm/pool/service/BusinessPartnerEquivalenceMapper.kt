@@ -41,7 +41,9 @@ class BusinessPartnerEquivalenceMapper {
                 states = states.map { StateEquivalenceDto(it.validFrom, it.validTo, it.type) }.toSortedSet(compareBy { it.validFrom }),
                 confidenceCriteria = toEquivalenceDto(confidenceCriteria),
                 isCatenaXMemberData = isCatenaXMemberData,
-                scriptVariants = scriptVariants.map { toEquivalenceDto(it) }.toSortedSet(compareBy { it.scriptCode })
+                scriptVariants = scriptVariants.map { toEquivalenceDto(it) }.toSortedSet(compareBy { it.scriptCode }),
+                isUltimateOwner = legalEntity.ownershipUltimate,
+                ultimateOwnerBpnL = legalEntity.ultimateOwnerBpnl
             )
         }
 
@@ -185,6 +187,8 @@ class BusinessPartnerEquivalenceMapper {
         override val confidenceCriteria: ConfidenceCriteriaEquivalenceDto?,
         val isCatenaXMemberData: Boolean,
         val scriptVariants: SortedSet<LegalEntityScriptVariantEquivalenceDto>,
+        val isUltimateOwner: Boolean,
+        val ultimateOwnerBpnL: String?
     ) : IBaseLegalEntityDto
 
     data class LegalEntityScriptVariantEquivalenceDto(

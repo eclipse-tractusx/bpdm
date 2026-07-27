@@ -22,16 +22,22 @@ package org.eclipse.tractusx.bpdm.pool.service.operation
 import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
-import org.eclipse.tractusx.bpdm.pool.entity.*
+import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
+import org.eclipse.tractusx.bpdm.pool.mapper.entity.AddressEntityMapper
+import org.eclipse.tractusx.bpdm.pool.model.update.AddressContentUpdate
+import org.eclipse.tractusx.bpdm.pool.model.update.AddressUpdate
 import org.eclipse.tractusx.bpdm.pool.model.PendingAddressWrite
+import org.eclipse.tractusx.bpdm.pool.model.update.ifSet
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerEquivalenceMapper
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * The single authority for updating logistic addresses: applies a caller's mutation, detects whether it changed the
- * address by equivalence, and persists and emits an UPDATE changelog only for those that actually changed. Mutations
- * are confined to a [LogisticAddressMutator], so no update can touch an address's identity, parent, or relations.
+ * The single authority for updating logistic addresses: applies each [AddressUpdate]'s change to its address (how a
+ * change is applied is this service's responsibility — a caller describes *what* to change, not *how*), detects whether
+ * the address actually changed by equivalence, and persists and emits an UPDATE changelog only for those that changed.
+ * The change vocabulary is confined to [AddressContentUpdate], which has no field for the address's identity, parent, or
+ * relations, so no update can re-identify or re-parent an address.
  *
  * [update] does this in one call. [stageUpdate] plus [commit] split it so a caller can learn whether the address
  * changed — and wire it into a not-yet-persisted parent — before committing.
@@ -39,57 +45,45 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class AddressUpdateService(
     private val equivalenceMapper: BusinessPartnerEquivalenceMapper,
-    private val logisticAddressWriteCommitService: LogisticAddressWriteCommitService
+    private val addressEntityMapper: AddressEntityMapper,
+    private val addressWriteCommitService: AddressWriteCommitService
 ) {
+    @Transactional
+    fun update(requests: List<AddressUpdate>): List<UpsertResult<LogisticAddressDb>> =
+        commit(requests.map { stageUpdate(it) })
 
-    fun update(targets: List<LogisticAddressDb>, mutate: (LogisticAddressMutator) -> Unit): List<UpsertResult<LogisticAddressDb>> =
-        commit(targets.map { stageUpdate(it, mutate) })
+    fun update(request: AddressUpdate): UpsertResult<LogisticAddressDb> =
+        update(listOf(request)).single()
 
-    fun stageUpdate(target: LogisticAddressDb, mutate: (LogisticAddressMutator) -> Unit): PendingAddressWrite {
+    fun stageUpdate(request: AddressUpdate): PendingAddressWrite {
+        val target = request.address
+
+        // A change that sets nothing cannot make the address differ, so skip the equivalence snapshots — they would
+        // otherwise force the address's identifiers, states and script variants to load for nothing. This is the common
+        // case for parents whose write only touches derived fields.
+        if (request.content == AddressContentUpdate.NoOp) return PendingAddressWrite(target, UpsertType.NoChange)
+
         val before = equivalenceMapper.toEquivalenceDto(target)
-        mutate(DefaultLogisticAddressMutator(target))
+        apply(target, request.content)
         val changed = equivalenceMapper.toEquivalenceDto(target) != before
         return PendingAddressWrite(target, if (changed) UpsertType.Updated else UpsertType.NoChange)
     }
 
     @Transactional
     fun commit(staged: List<PendingAddressWrite>): List<UpsertResult<LogisticAddressDb>> =
-        logisticAddressWriteCommitService.commit(staged)
-}
+        addressWriteCommitService.commit(staged)
 
-/**
- * Write-facade over a managed [LogisticAddressDb] that owns the back-reference wiring for the sub-entities it replaces,
- * keeping the entity mapper a pure translation.
- */
-private class DefaultLogisticAddressMutator(private val entity: LogisticAddressDb) : LogisticAddressMutator {
-    override var name: String?
-        get() = entity.name
-        set(value) { entity.name = value }
-    override var physicalPostalAddress: PhysicalPostalAddressDb
-        get() = entity.physicalPostalAddress
-        set(value) { entity.physicalPostalAddress = value }
-    override var alternativePostalAddress: AlternativePostalAddressDb?
-        get() = entity.alternativePostalAddress
-        set(value) { entity.alternativePostalAddress = value }
-    override var confidenceCriteria: ConfidenceCriteriaDb
-        get() = entity.confidenceCriteria
-        set(value) { entity.confidenceCriteria = value }
-
-    override fun replaceIdentifiers(identifiers: Collection<AddressIdentifierDb>) {
-        identifiers.forEach { it.address = entity }
-        entity.identifiers.replace(identifiers)
-    }
-
-    override fun replaceStates(states: Collection<AddressStateDb>) {
-        states.forEach { it.address = entity }
-        entity.states.replace(states)
-    }
-
-    override fun replaceScriptVariants(scriptVariants: Collection<LogisticAddressScriptVariantDb>) {
-        entity.scriptVariants.replace(scriptVariants)
-    }
-
-    override fun assignToSite(site: SiteDb) {
-        entity.sites.add(site)
+    private fun apply(target: LogisticAddressDb, update: AddressContentUpdate) {
+        // The sharing-member count is Pool-maintained, not part of the update payload, so carry the current value forward.
+        val numberOfSharingMembers = target.confidenceCriteria.numberOfSharingMembers
+        update.name.ifSet { target.name = it }
+        update.physicalPostalAddress.ifSet { target.physicalPostalAddress = addressEntityMapper.toPhysical(it) }
+        update.alternativePostalAddress.ifSet { target.alternativePostalAddress = it?.let { alt -> addressEntityMapper.toAlternative(alt) } }
+        update.confidenceCriteria.ifSet { target.confidenceCriteria = addressEntityMapper.toConfidence(it, numberOfSharingMembers) }
+        update.identifiers.ifSet { target.identifiers.replace(addressEntityMapper.toIdentifiers(it).onEach { id -> id.address = target }) }
+        update.states.ifSet { target.states.replace(addressEntityMapper.toStates(it).onEach { state -> state.address = target }) }
+        update.scriptVariants.ifSet { target.scriptVariants.replace(addressEntityMapper.toScriptVariants(it)) }
+        // Site membership is add-only; assigning is idempotent and never removes.
+        update.assignToSite.ifSet { target.sites.add(it) }
     }
 }

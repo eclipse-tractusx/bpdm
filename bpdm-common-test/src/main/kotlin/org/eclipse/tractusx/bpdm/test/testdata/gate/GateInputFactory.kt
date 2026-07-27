@@ -87,7 +87,9 @@ class GateInputFactory(
                     legalEntityBpn = "BPNL $seed",
                     legalName = "Legal Name $seed",
                     shortName = "Short Name $seed",
-                    legalForm = testMetadata.legalForms.random(random)
+                    legalForm = testMetadata.legalForms.random(random),
+                    ownershipUltimate = null,
+                    ultimateOwnerBpnl = null
                 ),
                 site = SiteRepresentationInputDto(
                     siteBpn = "BPNS $seed",

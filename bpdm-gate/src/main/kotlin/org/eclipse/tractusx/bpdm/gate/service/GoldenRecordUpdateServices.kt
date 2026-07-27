@@ -261,7 +261,9 @@ class GoldenRecordUpdateChunkService(
             scriptVariants = scriptVariants.map { businessPartnerMappings.toScriptVariantDto(it) },
             legalEntityGoldenRecordRelations = legalEntityGoldenRecordRelations.map { it.toUpsertData() },
             addressGoldenRecordRelations = addressGoldenRecordRelations.map { it.toUpsertData() },
-            additionalSites = additionalSites.map { AdditionalSite(it.bpn, it.name) },
+            ownershipUltimate = ownershipUltimate,
+            ultimateOwnerBpnl = ultimateOwnerBpnl,
+            additionalSites = additionalSites.map { AdditionalSite(it.bpn, it.name) }
         )
     }
 
@@ -354,6 +356,8 @@ class GoldenRecordUpdateChunkService(
         businessPartner.addressUpdatedAt = legalEntity.legalAddress.updatedAt
         businessPartner.legalEntityConfidence?.let { update(it,  header.confidenceCriteria) }
         businessPartner.legalEntityGoldenRecordRelations.addAll(legalEntity.header.relations.map(::toEntity))
+        businessPartner.ownershipUltimate = header.ownershipUltimate
+        businessPartner.ultimateOwnerBpnl = header.ultimateOwnerBpnl
 
         val variantByCode = businessPartner.scriptVariants.associateBy { it.scriptCode }
 

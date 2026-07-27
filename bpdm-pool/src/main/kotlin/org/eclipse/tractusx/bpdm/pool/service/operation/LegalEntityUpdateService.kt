@@ -26,86 +26,92 @@ import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
+import org.eclipse.tractusx.bpdm.pool.entity.NameDb
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.LegalEntityEntityMapper
-import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressUpdateParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityContentParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityUpdateParsed
+import org.eclipse.tractusx.bpdm.pool.model.update.AddressContentUpdate
+import org.eclipse.tractusx.bpdm.pool.model.update.AddressUpdate
+import org.eclipse.tractusx.bpdm.pool.model.update.FieldUpdate
+import org.eclipse.tractusx.bpdm.pool.model.update.LegalEntityHeaderUpdate
+import org.eclipse.tractusx.bpdm.pool.model.update.LegalEntityUpdate
+import org.eclipse.tractusx.bpdm.pool.model.update.ifSet
+import org.eclipse.tractusx.bpdm.pool.model.update.orKeep
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerEquivalenceMapper
 import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.Instant
-import java.time.temporal.ChronoUnit
 
 /**
- * The single authority for updating legal entities together with their legal address: applies and change-detects the
- * header, applies the legal-address change, and reports one UPDATE when either side actually changed. The parent
- * LEGAL_ENTITY changelog is emitted before the child ADDRESS changelog.
+ * The single authority for writing an existing legal entity, treated as a whole aggregate. A caller describes the change
+ * as data: a [LegalEntityHeaderUpdate] for the header (including the derived ultimate-owner BPNL) and an
+ * [AddressContentUpdate] for the legal address — [AddressContentUpdate.NoOp] to leave it alone. This service — not the
+ * caller — decides how each field is applied. It detects whether the aggregate changed, persists it, and emits exactly
+ * one LEGAL_ENTITY changelog for those that did; every writer reuses it, so none can forget to log.
+ *
+ * The header is this service's own responsibility; the legal address is delegated to [AddressUpdateService], which stays
+ * the leaf owner of the ADDRESS changelog. The parent LEGAL_ENTITY changelog is emitted before the child address is
+ * committed, so the parent entry always precedes the child.
  */
 @Service
 class LegalEntityUpdateService(
-    private val addressFullUpdateService: AddressFullUpdateService,
+    private val equivalenceMapper: BusinessPartnerEquivalenceMapper,
+    private val addressUpdateService: AddressUpdateService,
     private val legalEntityEntityMapper: LegalEntityEntityMapper,
     private val repository: LegalEntityRepository,
-    private val equivalenceMapper: BusinessPartnerEquivalenceMapper,
     private val changelogService: PartnerChangelogService
 ) {
 
     @Transactional
-    fun update(parsed: List<LegalEntityUpdateParsed>): List<UpsertResult<LegalEntityDb>>{
-        val headerResults = parsed.map { updateHeader(it) }
+    fun update(requests: List<LegalEntityUpdate>): List<UpsertResult<LegalEntityDb>> {
+        val headerUpdates = requests.map { updateHeader(it) }
+        val stagedLegalAddressUpdates = requests.map { addressUpdateService.stageUpdate(AddressUpdate(it.legalEntity.legalAddress, it.legalAddress)) }
 
-        val legalAddressRequests = parsed.map {
-            AddressUpdateParsed(
-                it.target.legalAddress,
-                null,
-                it.content.legalAddress
-            )
-        }
-        val stagedLegalAddresses = addressFullUpdateService.stageUpdate(legalAddressRequests)
-
-        val overallResults = headerResults.zip(stagedLegalAddresses){ headerResult, stagedLegalAddress ->
-            val changed = headerResult.upsertType == UpsertType.Updated || stagedLegalAddress.upsertType == UpsertType.Updated
-            UpsertResult(headerResult.value, if (changed) UpsertType.Updated else UpsertType.NoChange)
+        val legalEntityChangeResults = headerUpdates.zip(stagedLegalAddressUpdates) { headerResult, legalAddressResult ->
+            val hasChanged = headerResult.upsertType != UpsertType.NoChange || legalAddressResult.upsertType != UpsertType.NoChange
+            UpsertResult(headerResult.value, if (hasChanged) UpsertType.Updated else UpsertType.NoChange)
         }
 
-        // Emit the parent changelog before committing the staged address so the parent UPDATE precedes the child.
-        changelogService.createChangelogEntries(
-            overallResults
-                .filter { it.upsertType == UpsertType.Updated }
-                .map { ChangelogEntryCreateRequest(it.value.bpn, ChangelogType.UPDATE, BusinessPartnerType.LEGAL_ENTITY) }
+        val updatedLegalEntities = legalEntityChangeResults.filter { it.upsertType == UpsertType.Updated }
+
+        repository.saveAll(updatedLegalEntities.map { it.value })
+        changelogService.createChangelogEntries(updatedLegalEntities.map { ChangelogEntryCreateRequest(it.value.bpn, ChangelogType.UPDATE, BusinessPartnerType.LEGAL_ENTITY) })
+
+        addressUpdateService.commit(stagedLegalAddressUpdates)
+
+        return legalEntityChangeResults
+    }
+
+    private fun updateHeader(request: LegalEntityUpdate): UpsertResult<LegalEntityDb> {
+        val before = equivalenceMapper.toEquivalenceDto(request.legalEntity)
+        applyHeader(request.legalEntity, request.header)
+        val hasChanged = equivalenceMapper.toEquivalenceDto(request.legalEntity) != before
+
+        return UpsertResult(request.legalEntity, if (hasChanged) UpsertType.Updated else UpsertType.NoChange)
+    }
+
+    private fun applyHeader(target: LegalEntityDb, header: LegalEntityHeaderUpdate) {
+        // The sharing-member count is Pool-maintained, not part of the update payload, so carry the current value forward.
+        val numberOfSharingMembers = target.confidenceCriteria.numberOfSharingMembers
+        applyLegalName(target, header)
+        header.legalForm.ifSet { target.legalForm = it }
+        header.confidenceCriteria.ifSet { target.confidenceCriteria = legalEntityEntityMapper.toConfidence(it, numberOfSharingMembers) }
+        header.isCatenaXMemberData.ifSet { target.isCatenaXMemberData = it }
+        header.ownershipUltimate.ifSet { target.ownershipUltimate = it }
+        header.ultimateOwnerBpnl.ifSet { target.ultimateOwnerBpnl = it }
+        header.currentness.ifSet { target.currentness = it }
+        header.identifiers.ifSet { target.identifiers.replace(legalEntityEntityMapper.toIdentifiers(it, target)) }
+        header.states.ifSet { target.states.replace(legalEntityEntityMapper.toStates(it, target)) }
+        header.scriptVariants.ifSet { target.scriptVariants.replace(legalEntityEntityMapper.toScriptVariants(it)) }
+    }
+
+    // Legal name and short name are separate update fields but one embedded entity value, so setting either rebuilds the
+    // pair and carries the untouched half forward.
+    private fun applyLegalName(target: LegalEntityDb, header: LegalEntityHeaderUpdate) {
+        if (header.legalName is FieldUpdate.NoOp && header.legalShortName is FieldUpdate.NoOp) return
+
+        target.legalName = NameDb(
+            value = header.legalName.orKeep(target.legalName.value),
+            shortName = header.legalShortName.orKeep(target.legalName.shortName)
         )
-
-        addressFullUpdateService.commit(stagedLegalAddresses)
-
-        return overallResults
-    }
-
-    private fun updateHeader(request: LegalEntityUpdateParsed): UpsertResult<LegalEntityDb> {
-        val before = equivalenceMapper.toEquivalenceDto(request.target)
-        doUpdateEntity(request.target, request.content)
-        val after = equivalenceMapper.toEquivalenceDto(request.target)
-
-        val changed = before != after
-
-        if(changed) repository.save(request.target)
-
-        return UpsertResult(request.target, if (changed) UpsertType.Updated else UpsertType.NoChange)
-    }
-
-
-    private fun doUpdateEntity(target: LegalEntityDb, content: LegalEntityContentParsed) {
-        val header = content.header
-        target.legalName = legalEntityEntityMapper.toLegalName(header)
-        target.legalForm = header.legalForm
-        // Sharing-member count is Pool-maintained and absent from the payload, so carry it forward.
-        target.confidenceCriteria = legalEntityEntityMapper.toConfidence(header.confidenceCriteria, target.confidenceCriteria.numberOfSharingMembers)
-        target.isCatenaXMemberData = header.isParticipantData
-        target.identifiers.replace(legalEntityEntityMapper.toIdentifiers(header.identifiers, target))
-        target.states.replace(legalEntityEntityMapper.toStates(header.states, target))
-        target.scriptVariants.replace(legalEntityEntityMapper.toScriptVariants(header.scriptVariants))
-        // currentness refreshes every update but is excluded from the equivalence diff, so it never by itself marks a change.
-        target.currentness = Instant.now().truncatedTo(ChronoUnit.MICROS)
     }
 }

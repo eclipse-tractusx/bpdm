@@ -71,7 +71,11 @@ class LegalEntityCreateService(
         val currentness = Instant.now().truncatedTo(ChronoUnit.MICROS)
         // A new legal entity starts with zero sharing members.
         return headers.zip(bpns) { header, bpn ->
-            legalEntityEntityMapper.toEntity(bpn, header, currentness, numberOfSharingMembers = 0)
+            legalEntityEntityMapper.toEntity(bpn, header, currentness, numberOfSharingMembers = 0).also {
+                // A just-issued BPNL cannot be referenced by any ownership relation yet — relations are written through
+                // their own path — so the ownership closure of a new entity is the entity itself. No recalculation needed.
+                it.ultimateOwnerBpnl = if (it.ownershipUltimate) bpn else null
+            }
         }
     }
 }

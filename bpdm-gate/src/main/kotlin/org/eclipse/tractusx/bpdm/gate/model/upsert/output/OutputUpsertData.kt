@@ -52,5 +52,7 @@ data class OutputUpsertData(
     val scriptVariants: List<BusinessPartnerScriptVariantDto>,
     val legalEntityGoldenRecordRelations: List<LegalEntityGoldenRecordRelation>,
     val addressGoldenRecordRelations: List<AddressGoldenRecordRelation>,
+    val ownershipUltimate: Boolean? = null,
+    val ultimateOwnerBpnl: String? = null,
     val additionalSites: List<AdditionalSite> = emptyList()
 )

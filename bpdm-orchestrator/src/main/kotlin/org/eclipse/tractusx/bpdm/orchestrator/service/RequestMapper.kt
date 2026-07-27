@@ -43,6 +43,8 @@ class RequestMapper {
                 isCatenaXMemberData = legalEntity.isParticipantData,
                 owningCompany = owningCompany,
                 legalEntityHasChanged = legalEntity.hasChanged,
+                ownershipUltimate = legalEntity.ownershipUltimate,
+                ultimateOwnerBpnl = legalEntity.ultimateOwnerBpnl,
                 siteHasChanged = site?.hasChanged,
                 legalEntityUpdatedAt = legalEntity.updatedAt?.toTimestamp(),
                 siteUpdatedAt = site?.updatedAt?.toTimestamp(),
