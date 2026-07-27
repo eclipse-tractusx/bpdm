@@ -55,12 +55,12 @@ import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.eclipse.tractusx.bpdm.pool.service.operation.AddressCreateService
-import org.eclipse.tractusx.bpdm.pool.service.operation.AddressFullUpdateService
+import org.eclipse.tractusx.bpdm.pool.service.operation.AddressPayloadUpdateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.LegalEntityCreateService
-import org.eclipse.tractusx.bpdm.pool.service.operation.LegalEntityFullUpdateService
+import org.eclipse.tractusx.bpdm.pool.service.operation.LegalEntityPayloadUpdateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.SiteCreateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.SiteCreateWithReferencedAddressAsMainService
-import org.eclipse.tractusx.bpdm.pool.service.operation.SiteFullUpdateService
+import org.eclipse.tractusx.bpdm.pool.service.operation.SitePayloadUpdateService
 import org.eclipse.tractusx.bpdm.pool.service.parser.AddressUpdateParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntityCreateParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntityUpdateParser
@@ -86,16 +86,16 @@ class TaskStepBuildService(
     private val typedParentAddressCreateParser: TypedParentAddressCreateParser,
     private val addressCreateService: AddressCreateService,
     private val addressUpdateParser: AddressUpdateParser,
-    private val addressFullUpdateService: AddressFullUpdateService,
+    private val addressPayloadUpdateService: AddressPayloadUpdateService,
     private val taskAddressRequestMapper: GoldenRecordTaskAddressRequestMapper,
     private val legalEntityCreateParser: LegalEntityCreateParser,
     private val legalEntityCreateService: LegalEntityCreateService,
     private val legalEntityUpdateParser: LegalEntityUpdateParser,
-    private val legalEntityFullUpdateService: LegalEntityFullUpdateService,
+    private val legalEntityPayloadUpdateService: LegalEntityPayloadUpdateService,
     private val siteCreateParser: SiteCreateParser,
     private val siteCreateService: SiteCreateService,
     private val siteUpdateParser: SiteUpdateParser,
-    private val siteFullUpdateService: SiteFullUpdateService,
+    private val sitePayloadUpdateService: SitePayloadUpdateService,
     private val siteCreateWithLegalAddressAsMainParser: SiteCreateWithLegalAddressAsMainParser,
     private val siteCreateWithReferencedAddressAsMainParser: SiteCreateWithReferencedAddressAsMainParser,
     private val siteCreateWithReferencedAddressAsMainService: SiteCreateWithReferencedAddressAsMainService,
@@ -198,7 +198,7 @@ class TaskStepBuildService(
 
     private fun updateLegalEntity(bpnL: String, legalEntity: LegalEntity): LegalEntityDb {
         val request = taskLegalEntityRequestMapper.toUpdateRequest(bpnL, legalEntity)
-        return when (val result = parseAndExecute(listOf(request), legalEntityUpdateParser::parse, legalEntityFullUpdateService::update).single()) {
+        return when (val result = parseAndExecute(listOf(request), legalEntityUpdateParser::parse, legalEntityPayloadUpdateService::update).single()) {
             is ParseResult.Success -> result.parsed.value
             is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { renderError(it) })
         }
@@ -330,7 +330,7 @@ class TaskStepBuildService(
 
     private fun updateSite(bpnS: String, site: Site, mainAddress: PostalAddress): SiteDb {
         val request = taskSiteRequestMapper.toUpdateRequest(bpnS, site, mainAddress)
-        return when (val result = parseAndExecute(listOf(request), siteUpdateParser::parse, siteFullUpdateService::update).single()) {
+        return when (val result = parseAndExecute(listOf(request), siteUpdateParser::parse, sitePayloadUpdateService::update).single()) {
             is ParseResult.Success -> result.parsed.value
             is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { renderError(it) })
         }
@@ -417,7 +417,7 @@ class TaskStepBuildService(
             content = taskAddressRequestMapper.toContentRequest(additionalAddress)
         )
 
-        val result = parseAndExecute(listOf(request), addressUpdateParser::parse, addressFullUpdateService::update).single()
+        val result = parseAndExecute(listOf(request), addressUpdateParser::parse, addressPayloadUpdateService::update).single()
         return when (result) {
             is ParseResult.Success -> result.parsed.value.bpn
             is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { "Errors on updating Address: ${renderError(it)}" })

@@ -37,7 +37,7 @@ import org.springframework.transaction.annotation.Transactional
  * separate from staging so a caller can wire a still-unsaved cyclic parent graph and persist it last.
  */
 @Service
-class LogisticAddressWriteCommitService(
+class AddressWriteCommitService(
     private val logisticAddressRepository: LogisticAddressRepository,
     private val changelogService: PartnerChangelogService
 ) {

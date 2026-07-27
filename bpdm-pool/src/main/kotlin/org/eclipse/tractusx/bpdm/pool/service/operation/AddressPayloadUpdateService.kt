@@ -38,7 +38,7 @@ import org.springframework.transaction.annotation.Transactional
  * changed before committing.
  */
 @Service
-class AddressFullUpdateService(
+class AddressPayloadUpdateService(
     private val addressStagedUpdateService: AddressUpdateService,
     private val addressUpdateMapper: AddressUpdateMapper
 ) {

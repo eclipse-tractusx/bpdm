@@ -40,7 +40,7 @@ import java.time.temporal.ChronoUnit
  * why the ownership recalculation is hooked here rather than in each caller.
  */
 @Service
-class LegalEntityFullUpdateService(
+class LegalEntityPayloadUpdateService(
     private val legalEntityUpdateService: LegalEntityUpdateService,
     private val ultimateOwnerRecalculationService: UltimateOwnerRecalculationService,
     private val legalEntityHeaderUpdateMapper: LegalEntityHeaderUpdateMapper,

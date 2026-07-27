@@ -40,7 +40,7 @@ import org.springframework.transaction.annotation.Transactional
 class AddressCreateService(
     private val bpnIssuingService: BpnIssuingService,
     private val addressEntityMapper: AddressEntityMapper,
-    private val logisticAddressWriteCommitService: LogisticAddressWriteCommitService
+    private val addressWriteCommitService: AddressWriteCommitService
 ) {
 
     @Transactional
@@ -57,5 +57,5 @@ class AddressCreateService(
 
     @Transactional
     fun commit(staged: List<PendingAddressWrite>): List<UpsertResult<LogisticAddressDb>> =
-        logisticAddressWriteCommitService.commit(staged)
+        addressWriteCommitService.commit(staged)
 }

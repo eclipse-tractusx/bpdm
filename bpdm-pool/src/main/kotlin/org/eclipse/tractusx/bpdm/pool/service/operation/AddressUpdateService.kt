@@ -46,7 +46,7 @@ import org.springframework.transaction.annotation.Transactional
 class AddressUpdateService(
     private val equivalenceMapper: BusinessPartnerEquivalenceMapper,
     private val addressEntityMapper: AddressEntityMapper,
-    private val logisticAddressWriteCommitService: LogisticAddressWriteCommitService
+    private val addressWriteCommitService: AddressWriteCommitService
 ) {
     @Transactional
     fun update(requests: List<AddressUpdate>): List<UpsertResult<LogisticAddressDb>> =
@@ -71,7 +71,7 @@ class AddressUpdateService(
 
     @Transactional
     fun commit(staged: List<PendingAddressWrite>): List<UpsertResult<LogisticAddressDb>> =
-        logisticAddressWriteCommitService.commit(staged)
+        addressWriteCommitService.commit(staged)
 
     private fun apply(target: LogisticAddressDb, update: AddressContentUpdate) {
         // The sharing-member count is Pool-maintained, not part of the update payload, so carry the current value forward.

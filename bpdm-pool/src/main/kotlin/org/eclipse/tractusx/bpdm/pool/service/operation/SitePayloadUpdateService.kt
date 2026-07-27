@@ -35,7 +35,7 @@ import org.springframework.transaction.annotation.Transactional
  * here by design.
  */
 @Service
-class SiteFullUpdateService(
+class SitePayloadUpdateService(
     private val siteUpdateService: SiteUpdateService,
     private val siteHeaderUpdateMapper: SiteHeaderUpdateMapper,
     private val addressUpdateMapper: AddressUpdateMapper
