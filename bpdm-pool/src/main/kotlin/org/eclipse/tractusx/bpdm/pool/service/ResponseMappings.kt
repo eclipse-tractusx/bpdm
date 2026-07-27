@@ -76,6 +76,8 @@ fun LegalEntityDb.toDto(): LegalEntityHeaderVerboseDto {
         isParticipantData = isCatenaXMemberData,
         createdAt = createdAt,
         updatedAt = updatedAt,
+        ownershipUltimate = ownershipUltimate,
+        ultimateOwnerBpnl = ultimateOwnerBpnl
     )
 }
 

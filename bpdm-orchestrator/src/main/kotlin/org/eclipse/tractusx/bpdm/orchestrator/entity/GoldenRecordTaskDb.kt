@@ -83,6 +83,8 @@ class GoldenRecordTaskDb(
                 isCatenaXMemberData = isCatenaXMemberData.also { businessPartner.isCatenaXMemberData = it },
                 owningCompany = owningCompany.also { businessPartner.owningCompany = it },
                 legalEntityHasChanged = legalEntityHasChanged.also { businessPartner.legalEntityHasChanged = it },
+                ownershipUltimate = ownershipUltimate.also { businessPartner.ownershipUltimate = it },
+                ultimateOwnerBpnl = ultimateOwnerBpnl.also { businessPartner.ultimateOwnerBpnl = it },
                 siteHasChanged = siteHasChanged.also { businessPartner.siteHasChanged = it },
                 legalEntityUpdatedAt = legalEntityUpdatedAt.also { businessPartner.legalEntityUpdatedAt = it },
                 siteUpdatedAt = siteUpdatedAt.also { businessPartner.siteUpdatedAt = it },
@@ -196,6 +198,10 @@ class GoldenRecordTaskDb(
         var owningCompany: String?,
         @Column(name = "legal_entity_has_changed")
         var legalEntityHasChanged: Boolean?,
+        @Column(name = "ownership_ultimate")
+        var ownershipUltimate: Boolean? = null,
+        @Column(name = "ultimate_owner_bpnl")
+        var ultimateOwnerBpnl: String? = null,
         @Column(name = "site_has_changed")
         var siteHasChanged: Boolean?,
         @Type(value = DbTimestampConverter::class)

@@ -78,6 +78,8 @@ class OrchestratorMappings(
                 confidenceCriteria = toConfidenceCriteria(entity.legalEntityConfidence),
                 isParticipantData = null,
                 hasChanged = true,
+                ownershipUltimate = entity.ownershipUltimate,
+                ultimateOwnerBpnl = entity.ultimateOwnerBpnl,
                 legalAddress = postalAddress.takeIf { isLegalAddress} ?: PostalAddress.empty,
                 scriptVariants = entity.scriptVariants.takeIf { isLegalAddress }?.map { toLegalEntityScriptVariant(it) } ?:emptyList()
             ),
@@ -252,7 +254,9 @@ class OrchestratorMappings(
                 isOwnCompanyData = if (tenantBpnl != null && owningCompany != null) tenantBpnl == owningCompany else false,
                 scriptVariants = toScriptVariants(addressType, dto),
                 legalEntityGoldenRecordRelations = legalEntity.goldenRecordRelations,
-                addressGoldenRecordRelations = toAddressGoldenRecordRelations(addressType, dto)
+                addressGoldenRecordRelations = toAddressGoldenRecordRelations(addressType, dto),
+                ownershipUltimate = legalEntity.ownershipUltimate,
+                ultimateOwnerBpnl = legalEntity.ultimateOwnerBpnl
             )
         }
     }

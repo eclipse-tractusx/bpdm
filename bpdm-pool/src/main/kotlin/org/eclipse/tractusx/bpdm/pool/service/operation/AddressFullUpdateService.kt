@@ -21,16 +21,18 @@ package org.eclipse.tractusx.bpdm.pool.service.operation
 
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
-import org.eclipse.tractusx.bpdm.pool.mapper.entity.AddressEntityMapper
+import org.eclipse.tractusx.bpdm.pool.mapper.entity.AddressUpdateMapper
+import org.eclipse.tractusx.bpdm.pool.model.AddressUpdate
 import org.eclipse.tractusx.bpdm.pool.model.PendingAddressWrite
 import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressUpdateParsed
-import org.eclipse.tractusx.bpdm.pool.model.parsed.LogisticAddressParsed
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
  * The single authority for applying a full parsed address-update payload — descriptive content plus an optional site
- * assignment — to an already-resolved address, composing both into one net change.
+ * assignment — to an already-resolved address. It is a payload adapter: it maps the parsed content to a full-replace
+ * [org.eclipse.tractusx.bpdm.pool.model.AddressContentUpdate] and delegates change detection, persistence, and the
+ * changelog to [AddressUpdateService].
  *
  * [update] does this in one call. [stageUpdate] plus [commit] split it so a caller can learn whether the address
  * changed before committing.
@@ -38,7 +40,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class AddressFullUpdateService(
     private val addressStagedUpdateService: AddressUpdateService,
-    private val addressEntityMapper: AddressEntityMapper
+    private val addressUpdateMapper: AddressUpdateMapper
 ) {
 
     @Transactional
@@ -47,25 +49,12 @@ class AddressFullUpdateService(
 
     fun stageUpdate(parsed: List<AddressUpdateParsed>): List<PendingAddressWrite> =
         parsed.map { entry ->
-            addressStagedUpdateService.stageUpdate(entry.target) { address ->
-                entry.site?.let { address.assignToSite(it) }
-                applyContent(address, entry.address)
-            }
+            addressStagedUpdateService.stageUpdate(
+                AddressUpdate(entry.target, addressUpdateMapper.toFullUpdate(entry.address, entry.site))
+            )
         }
 
     @Transactional
     fun commit(staged: List<PendingAddressWrite>): List<UpsertResult<LogisticAddressDb>> =
         addressStagedUpdateService.commit(staged)
-
-    private fun applyContent(target: LogisticAddressMutator, address: LogisticAddressParsed) {
-        // The sharing-member count is Pool-maintained, not part of the update payload, so carry the current value forward.
-        val numberOfSharingMembers = target.confidenceCriteria.numberOfSharingMembers
-        target.name = address.name
-        target.physicalPostalAddress = addressEntityMapper.toPhysical(address.physicalPostalAddress)
-        target.alternativePostalAddress = address.alternativePostalAddress?.let { addressEntityMapper.toAlternative(it) }
-        target.confidenceCriteria = addressEntityMapper.toConfidence(address.confidenceCriteria, numberOfSharingMembers)
-        target.replaceIdentifiers(addressEntityMapper.toIdentifiers(address.identifiers))
-        target.replaceStates(addressEntityMapper.toStates(address.states))
-        target.replaceScriptVariants(addressEntityMapper.toScriptVariants(address.scriptVariants))
-    }
 }

@@ -62,6 +62,8 @@ class LegalEntityDtoRequestMapper(
             states = legalEntity.states.map { LegalEntityState(it.validFrom?.toUtcInstant(), it.validTo?.toUtcInstant(), it.type) },
             confidenceCriteria = toConfidenceRequest(legalEntity.confidenceCriteria),
             isParticipantData = legalEntity.isCatenaXMemberData,
+            // V6 has no ownership flag, so a V6 write must never change it.
+            ownershipUltimate = null,
             scriptVariants = emptyList()
         )
 

@@ -27,7 +27,8 @@ import org.springframework.stereotype.Service
 @Service
 class TriggerBatchProcessExecutionService(
     private val batchProcessExecutionService: BatchProcessExecutionService,
-    private val addressRelationTriggerExecutionService: AddressRelationTriggerExecutionService
+    private val addressRelationTriggerExecutionService: AddressRelationTriggerExecutionService,
+    private val legalEntityRelationTriggerExecutionService: LegalEntityRelationTriggerExecutionService
 ) {
     private val logger = KotlinLogging.logger { }
 
@@ -35,6 +36,7 @@ class TriggerBatchProcessExecutionService(
     fun executeUnprocessedTriggers(){
         logger.info("Execute unprocessed triggers")
         batchProcessExecutionService.executeUntilFinished(addressRelationTriggerExecutionService)
+        batchProcessExecutionService.executeUntilFinished(legalEntityRelationTriggerExecutionService)
     }
 
 

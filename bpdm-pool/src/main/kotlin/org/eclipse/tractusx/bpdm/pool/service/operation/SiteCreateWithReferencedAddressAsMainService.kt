@@ -23,6 +23,9 @@ import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
+import org.eclipse.tractusx.bpdm.pool.model.AddressContentUpdate
+import org.eclipse.tractusx.bpdm.pool.model.AddressUpdate
+import org.eclipse.tractusx.bpdm.pool.model.FieldUpdate
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteCreateWithReferencedAddressAsMainParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderCreateParsed
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
@@ -49,7 +52,11 @@ class SiteCreateWithReferencedAddressAsMainService(
 
         val sites = siteHeaderTransientCreateService.createTransiently(parsed.map { SiteHeaderCreateParsed(it.mainAddress.legalEntity!!, it.siteHeader) })
 
-        val stagedAddressUpdates = parsed.zip(sites).map { (entry, site) -> addressUpdateService.stageUpdate(entry.mainAddress) { it.assignToSite(site) } }
+        val stagedAddressUpdates = parsed.zip(sites).map { (entry, site) ->
+            addressUpdateService.stageUpdate(
+                AddressUpdate(entry.mainAddress, AddressContentUpdate.NoOp.copy(assignToSite = FieldUpdate.Set(site)))
+            )
+        }
         sites.zip(stagedAddressUpdates).forEach { (site, stagedAddressUpdate) -> site.mainAddress = stagedAddressUpdate.address }
 
         siteRepository.saveAll(sites)

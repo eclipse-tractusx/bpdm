@@ -29,7 +29,7 @@ import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.LegalEntityDtoReques
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.LegalEntityParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
-import org.eclipse.tractusx.bpdm.pool.service.operation.LegalEntityUpdateService
+import org.eclipse.tractusx.bpdm.pool.service.operation.LegalEntityFullUpdateService
 import org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntityUpdateParser
 import org.eclipse.tractusx.bpdm.pool.service.toUpsertDto
 import org.springframework.stereotype.Service
@@ -41,7 +41,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class LegalEntityUpdateApplicationV7Service(
     private val legalEntityUpdateParser: LegalEntityUpdateParser,
-    private val legalEntityUpdateService: LegalEntityUpdateService,
+    private val legalEntityFullUpdateService: LegalEntityFullUpdateService,
     private val legalEntityDtoRequestMapper: LegalEntityDtoRequestMapper,
     private val legalEntityParseErrorMapper: LegalEntityParseErrorMapper
 ) {
@@ -57,7 +57,7 @@ class LegalEntityUpdateApplicationV7Service(
 
         val responses = mutableListOf<LegalEntityPartnerCreateVerboseDto>()
         val errors = mutableListOf<ErrorInfo<LegalEntityUpdateError>>()
-        requestList.zip(parseAndExecute(updateRequests, legalEntityUpdateParser::parse, legalEntityUpdateService::update)).forEach { (request, result) ->
+        requestList.zip(parseAndExecute(updateRequests, legalEntityUpdateParser::parse, legalEntityFullUpdateService::update)).forEach { (request, result) ->
             when (result) {
                 is ParseResult.Success -> responses.add(result.parsed.value.toUpsertDto(request.bpnl))
                 is ParseResult.Failure -> errors.addAll(result.errors.map { legalEntityParseErrorMapper.toUpdateErrorInfo(it, request.bpnl) })

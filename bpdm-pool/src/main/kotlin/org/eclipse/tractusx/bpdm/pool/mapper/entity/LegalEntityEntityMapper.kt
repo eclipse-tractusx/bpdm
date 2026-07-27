@@ -46,6 +46,7 @@ class LegalEntityEntityMapper(
             currentness = currentness,
             confidenceCriteria = toConfidence(header.confidenceCriteria, numberOfSharingMembers),
             isCatenaXMemberData = header.isParticipantData,
+            ownershipUltimate = header.ownershipUltimate ?: false,
             scriptVariants = toScriptVariants(header.scriptVariants).toMutableList()
         )
         entity.identifiers.addAll(toIdentifiers(header.identifiers, entity))

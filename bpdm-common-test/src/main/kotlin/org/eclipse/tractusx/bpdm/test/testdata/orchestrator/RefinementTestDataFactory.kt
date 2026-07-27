@@ -144,6 +144,8 @@ class RefinementTestDataFactory {
             confidenceCriteria = buildConfidence(goldenRecord.header.confidenceCriteria),
             isParticipantData = goldenRecord.header.isParticipantData,
             hasChanged = true,
+            ownershipUltimate = goldenRecord.header.ownershipUltimate,
+            ultimateOwnerBpnl = goldenRecord.header.ultimateOwnerBpnl,
             legalAddress = buildPostalAddress(goldenRecord.legalAddress),
             scriptVariants = goldenRecord.scriptVariants.map { buildLegalEntityScriptVariant(it) },
             updatedAt = goldenRecord.header.updatedAt

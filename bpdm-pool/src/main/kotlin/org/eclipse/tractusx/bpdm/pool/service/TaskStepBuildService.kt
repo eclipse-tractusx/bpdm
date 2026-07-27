@@ -57,10 +57,10 @@ import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.eclipse.tractusx.bpdm.pool.service.operation.AddressCreateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.AddressFullUpdateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.LegalEntityCreateService
-import org.eclipse.tractusx.bpdm.pool.service.operation.LegalEntityUpdateService
+import org.eclipse.tractusx.bpdm.pool.service.operation.LegalEntityFullUpdateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.SiteCreateService
 import org.eclipse.tractusx.bpdm.pool.service.operation.SiteCreateWithReferencedAddressAsMainService
-import org.eclipse.tractusx.bpdm.pool.service.operation.SiteUpdateService
+import org.eclipse.tractusx.bpdm.pool.service.operation.SiteFullUpdateService
 import org.eclipse.tractusx.bpdm.pool.service.parser.AddressUpdateParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntityCreateParser
 import org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntityUpdateParser
@@ -91,11 +91,11 @@ class TaskStepBuildService(
     private val legalEntityCreateParser: LegalEntityCreateParser,
     private val legalEntityCreateService: LegalEntityCreateService,
     private val legalEntityUpdateParser: LegalEntityUpdateParser,
-    private val legalEntityUpdateService: LegalEntityUpdateService,
+    private val legalEntityFullUpdateService: LegalEntityFullUpdateService,
     private val siteCreateParser: SiteCreateParser,
     private val siteCreateService: SiteCreateService,
     private val siteUpdateParser: SiteUpdateParser,
-    private val siteUpdateService: SiteUpdateService,
+    private val siteFullUpdateService: SiteFullUpdateService,
     private val siteCreateWithLegalAddressAsMainParser: SiteCreateWithLegalAddressAsMainParser,
     private val siteCreateWithReferencedAddressAsMainParser: SiteCreateWithReferencedAddressAsMainParser,
     private val siteCreateWithReferencedAddressAsMainService: SiteCreateWithReferencedAddressAsMainService,
@@ -198,7 +198,7 @@ class TaskStepBuildService(
 
     private fun updateLegalEntity(bpnL: String, legalEntity: LegalEntity): LegalEntityDb {
         val request = taskLegalEntityRequestMapper.toUpdateRequest(bpnL, legalEntity)
-        return when (val result = parseAndExecute(listOf(request), legalEntityUpdateParser::parse, legalEntityUpdateService::update).single()) {
+        return when (val result = parseAndExecute(listOf(request), legalEntityUpdateParser::parse, legalEntityFullUpdateService::update).single()) {
             is ParseResult.Success -> result.parsed.value
             is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { renderError(it) })
         }
@@ -330,7 +330,7 @@ class TaskStepBuildService(
 
     private fun updateSite(bpnS: String, site: Site, mainAddress: PostalAddress): SiteDb {
         val request = taskSiteRequestMapper.toUpdateRequest(bpnS, site, mainAddress)
-        return when (val result = parseAndExecute(listOf(request), siteUpdateParser::parse, siteUpdateService::update).single()) {
+        return when (val result = parseAndExecute(listOf(request), siteUpdateParser::parse, siteFullUpdateService::update).single()) {
             is ParseResult.Success -> result.parsed.value
             is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { renderError(it) })
         }
