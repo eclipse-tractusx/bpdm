@@ -37,6 +37,7 @@ class LegalEntityUpdateParser(
     private val legalEntityBpnParser: LegalEntityBpnParser,
     private val legalEntityHeaderParser: LegalEntityHeaderParser,
     private val duplicateValidator: LegalEntityIdentifierDuplicateValidator,
+    private val ultimateOwnerUniquenessValidator: UltimateOwnerUniquenessValidator,
     private val addressContentParser: AddressContentParser
 ) {
 
@@ -56,8 +57,15 @@ class LegalEntityUpdateParser(
         val legalAddressOwnerBpns = targetResults.map { (it as? ParseResult.Success)?.parsed?.legalAddress?.bpn }
         val legalAddressResults = addressContentParser.parse(requests.map { it.content.legalAddress }, legalAddressOwnerBpns)
 
-        return zipParseResults(mergedHeaderResults, targetResults, legalAddressResults) { header, target, legalAddress ->
+        val updateResults = zipParseResults(mergedHeaderResults, targetResults, legalAddressResults) { header, target, legalAddress ->
             LegalEntityUpdateParsed(target, LegalEntityContentParsed(header, legalAddress))
         }
+
+        // The ultimate-owner rule spans the whole batch and both the requested flag and the resolved target, so it is
+        // folded in at this level rather than into the header result.
+        val resolvedTargets = targetResults.map { (it as? ParseResult.Success)?.parsed }
+        val ownershipViolations = ultimateOwnerUniquenessValidator.validate(resolvedTargets, headers.map { it.ownershipUltimate })
+
+        return updateResults.zip(ownershipViolations) { result, violations -> result.combine(violations) { it } }
     }
 }

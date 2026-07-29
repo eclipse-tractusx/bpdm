@@ -24,6 +24,12 @@ sealed interface LegalEntityCreateParseError
 sealed interface LegalEntityUpdateParseError
 
 /**
+ * More than one legal entity in the same ownership tree would carry the ultimate-owner flag. Update-only: a legal entity
+ * being created has no ownership relations yet, so its tree is itself.
+ */
+data class MultipleUltimateOwnersInHierarchy(val conflictingBpnls: List<String>) : LegalEntityUpdateParseError
+
+/**
  * Legal-entity header parse errors, shared by create and update. Kept flat (unlike the address errors' Field/Metadata/
  * Constraint grouping) since no caller matches a sub-group. The legal address contributes its own
  * [AddressContentParseError] directly.

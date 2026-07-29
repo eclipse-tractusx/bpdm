@@ -23,6 +23,7 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
+import org.eclipse.tractusx.bpdm.pool.entity.isValidOn
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -91,8 +92,6 @@ class UltimateOwnerResolutionService(
 
     private fun currentlyValidRelations(relations: Collection<RelationDb>): List<RelationDb> {
         val today = LocalDate.now()
-        return relations.filter { relation ->
-            relation.validityPeriods.any { period -> today >= period.validFrom && (period.validTo == null || today <= period.validTo) }
-        }
+        return relations.filter { it.isValidOn(today) }
     }
 }
