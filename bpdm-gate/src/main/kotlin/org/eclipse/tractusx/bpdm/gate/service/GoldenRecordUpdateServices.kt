@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.common.dto.IBaseStateDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
 import org.eclipse.tractusx.bpdm.common.model.StageType
+import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.*
@@ -355,7 +356,7 @@ class GoldenRecordUpdateChunkService(
         businessPartner.legalEntityUpdatedAt = header.updatedAt
         businessPartner.addressUpdatedAt = legalEntity.legalAddress.updatedAt
         businessPartner.legalEntityConfidence?.let { update(it,  header.confidenceCriteria) }
-        businessPartner.legalEntityGoldenRecordRelations.addAll(legalEntity.header.relations.map(::toEntity))
+        businessPartner.legalEntityGoldenRecordRelations.replace(legalEntity.header.relations.map(::toEntity))
         businessPartner.ownershipUltimate = header.ownershipUltimate
         businessPartner.ultimateOwnerBpnl = header.ultimateOwnerBpnl
 
@@ -397,7 +398,7 @@ class GoldenRecordUpdateChunkService(
         businessPartner.postalAddress.physicalPostalAddress = addressProperties.physicalPostalAddress.toEntity()
         businessPartner.postalAddress.alternativePostalAddress = addressProperties.alternativePostalAddress?.toEntity()
         businessPartner.addressConfidence?.let { update(it,  addressProperties.confidenceCriteria) }
-        businessPartner.addressGoldenRecordRelations.addAll(addressProperties.relations.map(::toEntity))
+        businessPartner.addressGoldenRecordRelations.replace(addressProperties.relations.map(::toEntity))
 
         // Which of the address's sites is "additional" is relative to the site THIS output follows, not the Pool's
         // `bpnSite` (its oldest member): the output tracks the site that was shared (bpnS), which may be any member.

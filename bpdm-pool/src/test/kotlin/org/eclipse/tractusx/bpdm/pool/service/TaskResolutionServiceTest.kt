@@ -32,6 +32,7 @@ import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.eclipse.tractusx.bpdm.pool.service.TaskStepBuildService.CleaningError
 import org.eclipse.tractusx.bpdm.pool.service.operation.UltimateOwnerRecalculationService
 import org.eclipse.tractusx.bpdm.pool.service.operation.UltimateOwnerResolutionService
+import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.springframework.transaction.support.TransactionTemplate
 import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockConfiguration
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
@@ -202,6 +203,32 @@ class TaskResolutionServiceTest @Autowired constructor(
         assertThat(persistedEntity).isNotNull()
         assertThat(persistedEntity!!.ownershipUltimate).isFalse()
         assertThat(persistedEntity.ultimateOwnerBpnl).isNull()
+    }
+
+    @Test
+    fun `update legal entity with ownership flag only persists change`() {
+        val createRequest = minValidLegalEntity()
+            .withLegalReferences("owner-flag-update-bpnl".toBpnRequest(), "owner-flag-update-bpna".toBpnRequest())
+
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_OWNERSHIP_UPDATE_1", businessPartner = createRequest)
+        assertThat(createResult[0].errors).isEmpty()
+
+        val createdBpnl = createResult[0].businessPartner.legalEntity.bpnReference.referenceValue!!
+        val updateRequest = createRequest.copy(
+            legalEntity = createRequest.legalEntity.copy(ownershipUltimate = true)
+        )
+
+        val updateResult = upsertGoldenRecordIntoPool(taskId = "TASK_OWNERSHIP_UPDATE_2", businessPartner = updateRequest)
+        assertThat(updateResult[0].errors).isEmpty()
+
+        val updatedFromPoolApi = poolClient.legalEntities.getLegalEntity(createdBpnl)
+        assertThat(updatedFromPoolApi.header.ownershipUltimate).isTrue()
+        assertThat(updatedFromPoolApi.header.ultimateOwnerBpnl).isEqualTo(createdBpnl)
+
+        val persistedEntity = legalEntityRepository.findByBpnIgnoreCase(createdBpnl)
+        assertThat(persistedEntity).isNotNull()
+        assertThat(persistedEntity!!.ownershipUltimate).isTrue()
+        assertThat(persistedEntity.ultimateOwnerBpnl).isEqualTo(createdBpnl)
     }
 
 
@@ -1698,4 +1725,52 @@ class TaskResolutionServiceTest @Autowired constructor(
         assertThat(grand1DbAfter.ultimateOwnerBpnl).isEqualTo(parent.legalEntity.header.bpnl)
         assertThat(grand2DbAfter.ultimateOwnerBpnl).isEqualTo(parent.legalEntity.header.bpnl)
     }
+
+    @Test
+    fun `validation - reject owned-by tree merge with two flagged ultimate owners`() {
+        val childA = createLegalEntity("BPNL_VAL_MERGE_CA")
+        val rootA = createLegalEntity("BPNL_VAL_MERGE_RA")
+        val rootB = createLegalEntity("BPNL_VAL_MERGE_RB")
+
+        createIsOwnedByRelationViaService(childA.legalEntity.header.bpnl, rootA.legalEntity.header.bpnl)
+
+        val rootADb = legalEntityRepository.findByBpnIgnoreCase(rootA.legalEntity.header.bpnl)!!
+        val rootBDb = legalEntityRepository.findByBpnIgnoreCase(rootB.legalEntity.header.bpnl)!!
+        rootADb.ownershipUltimate = true
+        rootBDb.ownershipUltimate = true
+        legalEntityRepository.save(rootADb)
+        legalEntityRepository.save(rootBDb)
+
+        val exception = org.junit.jupiter.api.assertThrows<BpdmValidationException> {
+            transactionTemplate.execute {
+                val source = legalEntityRepository.findByBpnIgnoreCase(rootA.legalEntity.header.bpnl)!!
+                val target = legalEntityRepository.findByBpnIgnoreCase(rootB.legalEntity.header.bpnl)!!
+
+                ownedByRelationUpsertService.upsertRelation(
+                    IRelationUpsertStrategyService.UpsertRequest(
+                        source = source,
+                        target = target,
+                        validityPeriods = listOf(currentValidityPeriod()),
+                        existingRelation = null,
+                        reasonCode = null
+                    )
+                )
+            }
+        }
+
+        assertThat(exception.message).contains("Multiple ultimate owners in entity hierarchy")
+
+        val sourceAfter = legalEntityRepository.findByBpnIgnoreCase(rootA.legalEntity.header.bpnl)!!
+        val targetAfter = legalEntityRepository.findByBpnIgnoreCase(rootB.legalEntity.header.bpnl)!!
+        val mergedRelation = relationRepository.findAll(
+            RelationRepository.byRelation(
+                startNode = sourceAfter,
+                endNode = targetAfter,
+                type = LegalEntityRelationType.IsOwnedBy
+            )
+        ).singleOrNull()
+
+        assertThat(mergedRelation).isNull()
+    }
+
 }

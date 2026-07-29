@@ -29,11 +29,23 @@ import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.inbound.GoldenRecordTaskAddressRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.inbound.GoldenRecordTaskLegalEntityRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.inbound.GoldenRecordTaskSiteRequestMapper
+import org.eclipse.tractusx.bpdm.pool.model.error.AddressConstraintParseError
+import org.eclipse.tractusx.bpdm.pool.model.error.AddressContentParseError
+import org.eclipse.tractusx.bpdm.pool.model.error.AddressCreateParseError
+import org.eclipse.tractusx.bpdm.pool.model.request.AddressCreateTypedParentsRequest
+import org.eclipse.tractusx.bpdm.pool.model.error.AddressFieldParseError
+import org.eclipse.tractusx.bpdm.pool.model.error.AddressMetadataParseError
+import org.eclipse.tractusx.bpdm.pool.model.error.AddressUpdateParseError
+import org.eclipse.tractusx.bpdm.pool.model.request.AddressUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.model.error.InvalidParentBpn
+import org.eclipse.tractusx.bpdm.pool.model.error.LegalAddressAlreadyMainAddress
+import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityContentParseError
+import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityCreateParseError
+import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityUpdateParseError
+import org.eclipse.tractusx.bpdm.pool.model.error.MultipleUltimateOwnersInHierarchy
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
-import org.eclipse.tractusx.bpdm.pool.model.request.AddressCreateTypedParentsRequest
-import org.eclipse.tractusx.bpdm.pool.model.request.AddressUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
@@ -472,6 +484,9 @@ class TaskStepBuildService(
     private fun renderError(error: LegalEntityUpdateParseError): String =
         when (error) {
             is UnresolvableLegalEntity -> "Legal entity ${error.bpn} not found"
+            is MultipleUltimateOwnersInHierarchy ->
+                "An ownership hierarchy can have at most one ultimate owner, but these legal entities are also flagged " +
+                        "as ultimate owner: ${error.conflictingBpnls.joinToString(", ")}"
             is LegalEntityContentParseError -> renderError(error)
             is AddressContentParseError -> renderError(error)
         }
