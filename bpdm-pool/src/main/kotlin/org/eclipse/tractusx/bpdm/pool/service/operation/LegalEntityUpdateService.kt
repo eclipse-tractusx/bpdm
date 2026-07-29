@@ -28,7 +28,6 @@ import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.NameDb
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.LegalEntityEntityMapper
-import org.eclipse.tractusx.bpdm.pool.model.update.AddressContentUpdate
 import org.eclipse.tractusx.bpdm.pool.model.update.AddressUpdate
 import org.eclipse.tractusx.bpdm.pool.model.update.FieldUpdate
 import org.eclipse.tractusx.bpdm.pool.model.update.LegalEntityHeaderUpdate
@@ -43,14 +42,13 @@ import org.springframework.transaction.annotation.Transactional
 
 /**
  * The single authority for writing an existing legal entity, treated as a whole aggregate. A caller describes the change
- * as data: a [LegalEntityHeaderUpdate] for the header (including the derived ultimate-owner BPNL) and an
- * [AddressContentUpdate] for the legal address — [AddressContentUpdate.NoOp] to leave it alone. This service — not the
- * caller — decides how each field is applied. It detects whether the aggregate changed, persists it, and emits exactly
- * one LEGAL_ENTITY changelog for those that did; every writer reuses it, so none can forget to log.
+ * as data — a header change, including the derived ultimate-owner BPNL, plus a change for the legal address, either of
+ * which may leave its side alone — and this service, not the caller, decides how each field is applied. It detects
+ * whether the aggregate changed, persists it, and emits exactly one LEGAL_ENTITY changelog for those that did; every
+ * writer reuses it, so none can forget to log.
  *
- * The header is this service's own responsibility; the legal address is delegated to [AddressUpdateService], which stays
- * the leaf owner of the ADDRESS changelog. The parent LEGAL_ENTITY changelog is emitted before the child address is
- * committed, so the parent entry always precedes the child.
+ * The parent LEGAL_ENTITY changelog is emitted before the legal address is committed, so the parent entry always precedes
+ * the child.
  */
 @Service
 class LegalEntityUpdateService(
@@ -61,6 +59,10 @@ class LegalEntityUpdateService(
     private val changelogService: PartnerChangelogService
 ) {
 
+    /**
+     * Applies the given changes and reports for each legal entity whether the aggregate — its header or its legal
+     * address — actually changed.
+     */
     @Transactional
     fun update(requests: List<LegalEntityUpdate>): List<UpsertResult<LegalEntityDb>> {
         val headerUpdates = requests.map { updateHeader(it) }

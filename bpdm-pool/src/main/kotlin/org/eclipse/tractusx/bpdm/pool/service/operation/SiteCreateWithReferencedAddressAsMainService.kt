@@ -47,6 +47,9 @@ class SiteCreateWithReferencedAddressAsMainService(
     private val changelogService: PartnerChangelogService
 ) {
 
+    /**
+     * Creates the given sites on their referenced main addresses and returns the persisted entities.
+     */
     @Transactional
     fun create(parsed: List<SiteCreateWithReferencedAddressAsMainParsed>): List<SiteDb> {
 

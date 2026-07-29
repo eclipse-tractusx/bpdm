@@ -25,11 +25,17 @@ import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableLegalEntity
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.springframework.stereotype.Service
 
+/**
+ * Resolves legal-entity BPNs to the legal entities they name.
+ */
 @Service
 class LegalEntityBpnParser(
     private val legalEntityRepository: LegalEntityRepository,
 ) {
 
+    /**
+     * Resolves each BPN to its legal entity, failing the entry when no legal entity carries that BPN.
+     */
     fun parse(legalEntityBpns: List<String>): List<ParseResult<LegalEntityDb, UnresolvableLegalEntity>> {
         val legalEntitiesByBpn = legalEntityRepository
             .findDistinctByBpnIn(legalEntityBpns.toSet())

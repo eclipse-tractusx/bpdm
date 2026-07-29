@@ -28,6 +28,10 @@ import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.model.zipParseResults
 import org.springframework.stereotype.Service
 
+/**
+ * Validates legal-entity update requests: the target legal entity, the new header content with its identifier
+ * uniqueness, and the new legal address.
+ */
 @Service
 class LegalEntityUpdateParser(
     private val legalEntityBpnParser: LegalEntityBpnParser,
@@ -36,17 +40,19 @@ class LegalEntityUpdateParser(
     private val addressContentParser: AddressContentParser
 ) {
 
+    /**
+     * Validates each request and reports either the resolved target with its validated content or every problem found in
+     * that entry.
+     */
     fun parse(requests: List<LegalEntityUpdateRequest>): List<ParseResult<LegalEntityUpdateParsed, LegalEntityUpdateParseError>> {
         val targetResults = legalEntityBpnParser.parse(requests.map { it.legalEntityBpn })
 
         val headers = requests.map { it.content.header }
         val headerResults = legalEntityHeaderParser.parse(headers)
-        // An identifier already owned by the target legal entity itself is not a duplicate; its BPN comes from the target.
         val ownerBpns = targetResults.map { (it as? ParseResult.Success)?.parsed?.bpn }
         val duplicateErrors = duplicateValidator.validate(headers, ownerBpns)
         val mergedHeaderResults = headerResults.zip(duplicateErrors) { result, extra -> result.combine(extra) { it } }
 
-        // The legal address's duplicate check is scoped to its owning address; its BPN comes from the resolved target.
         val legalAddressOwnerBpns = targetResults.map { (it as? ParseResult.Success)?.parsed?.legalAddress?.bpn }
         val legalAddressResults = addressContentParser.parse(requests.map { it.content.legalAddress }, legalAddressOwnerBpns)
 

@@ -28,6 +28,10 @@ import org.eclipse.tractusx.bpdm.pool.model.request.AddressUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.model.zipParseResults
 import org.springframework.stereotype.Service
 
+/**
+ * Validates address-update requests: the target address, an optional parent site to assign it to, and the new address
+ * content.
+ */
 @Service
 class AddressUpdateParser(
     private val addressContentParser: AddressContentParser,
@@ -36,6 +40,10 @@ class AddressUpdateParser(
     private val siteLegalEntityConsistencyValidator: SiteLegalEntityConsistencyValidator
 ) {
 
+    /**
+     * Validates each request and reports either the resolved target with its validated content or every problem found in
+     * that entry.
+     */
     fun parse(requests: List<AddressUpdateRequest>): List<ParseResult<AddressUpdateParsed, AddressUpdateParseError>> {
         val contentResults = addressContentParser.parse(requests.map { it.content }, requests.map { it.addressBpn })
         val targetResults = addressBpnParser.parse(requests.map { it.addressBpn })

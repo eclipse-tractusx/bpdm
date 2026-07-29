@@ -30,8 +30,7 @@ import java.time.LocalDate
 
 /**
  * Derives which legal entity ultimately owns another, from the currently valid `IsOwnedBy` relations and the
- * `ownershipUltimate` flags. Read-only: it computes, it never writes — [UltimateOwnerRecalculationService] persists what
- * this resolves.
+ * `ownershipUltimate` flags. Read-only: it computes, it never writes.
  *
  * A chain that reaches no entity flagged as ultimate owner resolves to `null`. Ownership cycles are guarded against and
  * logged rather than throwing, so a corrupt graph degrades to "no ultimate owner" instead of failing the write.
@@ -43,7 +42,7 @@ class UltimateOwnerResolutionService(
 
     private val logger = KotlinLogging.logger { }
 
-    /** The BPNL of [legalEntity]'s ultimate owner, or null when its ownership chain reaches no ultimate owner. */
+    /** Resolves the BPNL of [legalEntity]'s ultimate owner, or null when its ownership chain reaches no ultimate owner. */
     @Transactional(readOnly = true)
     fun resolve(legalEntity: LegalEntityDb): String? =
         resolveWithCycleProtection(legalEntity, mutableSetOf())
@@ -90,7 +89,6 @@ class UltimateOwnerResolutionService(
         return owningRelations.firstNotNullOfOrNull { resolveWithCycleProtection(it.endNode, visited) }
     }
 
-    /** A relation counts only while one of its validity periods covers today; a relation without periods never counts. */
     private fun currentlyValidRelations(relations: Collection<RelationDb>): List<RelationDb> {
         val today = LocalDate.now()
         return relations.filter { relation ->

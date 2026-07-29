@@ -27,9 +27,10 @@ import org.eclipse.tractusx.bpdm.pool.model.zipParseResults
 import org.springframework.stereotype.Service
 
 /**
- * The "legal address as main" path is just the referenced-address case where the referenced main address is the parent
- * legal entity's own legal address, so it produces a [SiteCreateWithReferencedAddressAsMainParsed] and needs no dedicated
- * legal-address operation.
+ * Validates site-create requests that take the parent legal entity's legal address as the site main address.
+ *
+ * It yields the referenced-main-address model: this path is that case with the reference fixed to the parent's legal
+ * address, so it needs no operation of its own.
  */
 @Service
 class SiteCreateWithLegalAddressAsMainParser(
@@ -37,6 +38,10 @@ class SiteCreateWithLegalAddressAsMainParser(
     private val legalEntityBpnParser: LegalEntityBpnParser
 ) {
 
+    /**
+     * Validates each request and reports either the validated site on its parent's legal address or every problem found
+     * in that entry.
+     */
     fun parse(
         requests: List<SiteCreateWithLegalAddressAsMainRequest>
     ): List<ParseResult<SiteCreateWithReferencedAddressAsMainParsed, SiteCreateParseError>> {
@@ -44,8 +49,6 @@ class SiteCreateWithLegalAddressAsMainParser(
         val legalEntityResults = legalEntityBpnParser.parse(requests.map { it.legalEntityBpn })
 
         return zipParseResults(legalEntityResults, headerResults) { legalEntity, header ->
-            // The legal address is the site's main address; its own back-reference gives the parent legal entity, so the
-            // referenced-address operation derives the same parent this path used to pass explicitly.
             SiteCreateWithReferencedAddressAsMainParsed(legalEntity.legalAddress, header)
         }
     }

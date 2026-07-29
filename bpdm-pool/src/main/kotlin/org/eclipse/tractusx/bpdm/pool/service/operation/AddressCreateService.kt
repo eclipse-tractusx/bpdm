@@ -32,9 +32,6 @@ import org.springframework.transaction.annotation.Transactional
 /**
  * The single authority for creating logistic addresses: issues address BPNs, builds the entities, persists them and
  * emits their CREATE changelog. Returns managed entities in the caller's transaction, not response models.
- *
- * [create] does this in one call. A creator wiring a freshly created address into a not-yet-persisted parent instead
- * uses [stageCreate] (build unsaved) and [commit] (persist + changelog), wiring the graph in between.
  */
 @Service
 class AddressCreateService(
@@ -43,18 +40,27 @@ class AddressCreateService(
     private val addressWriteCommitService: AddressWriteCommitService
 ) {
 
+    /**
+     * Creates the given addresses in full — BPN, persistence and changelog — and returns the persisted entities.
+     */
     @Transactional
     fun create(parsed: List<AddressCreateParsed>): List<LogisticAddressDb> =
         commit(stageCreate(parsed)).map { it.value }
 
+    /**
+     * Builds the addresses with their BPNs issued but nothing yet persisted or logged, so a caller can wire them into a
+     * not-yet-persisted parent before handing them to [commit].
+     */
     fun stageCreate(parsed: List<AddressCreateParsed>): List<PendingAddressWrite> {
         val bpns = bpnIssuingService.issueAddressBpns(parsed.size)
-        // A freshly created address starts with zero sharing members.
         return parsed.zip(bpns) { entry, bpn ->
             PendingAddressWrite(addressEntityMapper.toEntity(bpn, entry, numberOfSharingMembers = 0), UpsertType.Created)
         }
     }
 
+    /**
+     * Persists the staged addresses and emits their CREATE changelog.
+     */
     @Transactional
     fun commit(staged: List<PendingAddressWrite>): List<UpsertResult<LogisticAddressDb>> =
         addressWriteCommitService.commit(staged)

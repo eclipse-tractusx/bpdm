@@ -27,9 +27,8 @@ import org.eclipse.tractusx.bpdm.pool.model.request.LogisticAddressRequest
 import org.springframework.stereotype.Service
 
 /**
- * The shared entry point for address-content validation — reused for standalone addresses, legal-entity legal addresses,
- * and site main addresses. [ownerBpns] is positional with [contents]: `null` for create, the address's own BPN for
- * update, so an update may re-submit its own existing identifiers.
+ * Validates the descriptive content of an address — the shared entry point reused for standalone addresses,
+ * legal-entity legal addresses, and site main addresses.
  */
 @Service
 class AddressContentParser(
@@ -37,6 +36,11 @@ class AddressContentParser(
     private val duplicateValidator: AddressIdentifierDuplicateValidator
 ) {
 
+    /**
+     * Validates each address content, including its identifier uniqueness, and reports either the validated address or
+     * every problem found in that entry. [ownerBpns] is positional with [contents]: null for a create, the address's own
+     * BPN for an update, so an update may re-submit its own existing identifiers.
+     */
     fun parse(contents: List<LogisticAddressRequest>, ownerBpns: List<String?>): List<ParseResult<LogisticAddressParsed, AddressContentParseError>> {
         val contentResults = addressRequestParser.parse(contents)
         val duplicateErrors = duplicateValidator.validate(contents, ownerBpns)

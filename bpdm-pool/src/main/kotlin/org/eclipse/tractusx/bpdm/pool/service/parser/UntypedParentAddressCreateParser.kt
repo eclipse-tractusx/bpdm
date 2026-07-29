@@ -27,8 +27,8 @@ import org.eclipse.tractusx.bpdm.pool.model.request.AddressCreateUntypedParentRe
 import org.springframework.stereotype.Service
 
 /**
- * Handles the V7 "additional address" REST path, where the parent is a single *untyped* BPN: resolves it into explicit
- * (legalEntity, site) parents via [AddressParentResolutionParser], then delegates to [TypedParentAddressCreateParser].
+ * Validates address-create requests that name their parent with a single BPN, whatever kind of business partner that BPN
+ * identifies.
  */
 @Service
 class UntypedParentAddressCreateParser(
@@ -36,6 +36,10 @@ class UntypedParentAddressCreateParser(
     private val typedParentAddressCreateParser: TypedParentAddressCreateParser
 ) {
 
+    /**
+     * Validates each request and reports either the validated address with its resolved parents or every problem found in
+     * that entry.
+     */
     fun parse(requests: List<AddressCreateUntypedParentRequest>): List<ParseResult<AddressCreateParsed, AddressCreateParseError>> =
         chainParseResults(addressParentResolutionParser.parse(requests)) { typed -> typedParentAddressCreateParser.parse(typed) }
 }

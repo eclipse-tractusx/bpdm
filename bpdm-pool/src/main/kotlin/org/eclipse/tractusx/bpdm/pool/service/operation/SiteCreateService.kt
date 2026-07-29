@@ -44,6 +44,9 @@ class SiteCreateService(
     private val changelogService: PartnerChangelogService
 ) {
 
+    /**
+     * Creates the given sites together with their main addresses and returns the persisted entities.
+     */
     @Transactional
     fun create(parsed: List<SiteCreateParsed>): List<SiteDb> {
         val sites = siteHeaderTransientCreateService.createTransiently(parsed.map { SiteHeaderCreateParsed(it.legalEntity, it.content.header) })

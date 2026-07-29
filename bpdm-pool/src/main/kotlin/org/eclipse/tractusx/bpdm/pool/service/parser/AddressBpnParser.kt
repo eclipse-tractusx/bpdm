@@ -25,11 +25,17 @@ import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableAddress
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.springframework.stereotype.Service
 
+/**
+ * Resolves address BPNs to the addresses they name.
+ */
 @Service
 class AddressBpnParser(
     private val logisticAddressRepository: LogisticAddressRepository,
 ) {
 
+    /**
+     * Resolves each BPN to its address, failing the entry when no address carries that BPN.
+     */
     fun parse(addressBpns: List<String>): List<ParseResult<LogisticAddressDb, UnresolvableAddress>> {
         val addressesByBpn = logisticAddressRepository
             .findDistinctByBpnIn(addressBpns.toSet())

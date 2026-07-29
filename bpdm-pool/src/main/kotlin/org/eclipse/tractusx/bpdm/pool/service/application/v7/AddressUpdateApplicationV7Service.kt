@@ -49,6 +49,10 @@ class AddressUpdateApplicationV7Service(
 
     private val logger = KotlinLogging.logger { }
 
+    /**
+     * Applies each request to the address it addresses by BPN and returns, per request, either the updated address or
+     * the errors that stopped it.
+     */
     @Transactional
     fun updateAddresses(requests: Collection<AddressPartnerUpdateRequest>): AddressPartnerUpdateResponseWrapper {
         logger.info { "Update ${requests.size} business partner addresses" }

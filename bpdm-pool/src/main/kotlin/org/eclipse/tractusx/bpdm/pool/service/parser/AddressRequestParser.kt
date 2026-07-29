@@ -39,8 +39,9 @@ import org.eclipse.tractusx.bpdm.pool.util.ValidationLimits
 import org.springframework.stereotype.Service
 
 /**
- * Shared by both address create and update parsing — hence its [AddressContentParseError]s subtype both operation error
- * types. Errors are accumulated (not fail-fast) so one entry's report is complete.
+ * Validates the fields of an address against the metadata they reference — countries, regions, identifier types and
+ * script codes. Its errors subtype both the address-create and the address-update error type, because create and update
+ * share this parser.
  */
 @Service
 class AddressRequestParser(
@@ -49,6 +50,9 @@ class AddressRequestParser(
     private val scriptCodeRepository: ScriptCodeRepository
 ) {
 
+    /**
+     * Validates each address content and reports either the validated address or every problem found in that entry.
+     */
     fun parse(contents: List<LogisticAddressRequest>): List<ParseResult<LogisticAddressParsed, AddressContentParseError>> {
         val metadata = fetchMetadata(contents)
         return contents.map { parseEntry(it, metadata) }
@@ -254,7 +258,7 @@ class AddressRequestParser(
     private fun parseGeoCoordinate(request: GeoCoordinateRequest): GeoCoordinate? {
         val longitude = request.longitude
         val latitude = request.latitude
-        // A coordinate without both longitude and latitude is treated as absent (matches existing behavior).
+        // A coordinate says nothing without both longitude and latitude, so a half-given one counts as absent.
         return if (longitude != null && latitude != null) GeoCoordinate(longitude, latitude, request.altitude) else null
     }
 }

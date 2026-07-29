@@ -26,12 +26,19 @@ import org.eclipse.tractusx.bpdm.pool.model.request.SiteCreateWithReferencedAddr
 import org.eclipse.tractusx.bpdm.pool.model.zipParseResults
 import org.springframework.stereotype.Service
 
+/**
+ * Validates site-create requests whose main address is an existing address referenced by BPN.
+ */
 @Service
 class SiteCreateWithReferencedAddressAsMainParser(
     private val siteHeaderParser: SiteHeaderParser,
     private val addressBpnParser: AddressBpnParser
 ) {
 
+    /**
+     * Validates each request and reports either the validated site with its resolved main address or every problem found
+     * in that entry.
+     */
     fun parse(
         requests: List<SiteCreateWithReferencedAddressAsMainRequest>
     ): List<ParseResult<SiteCreateWithReferencedAddressAsMainParsed, SiteCreateParseError>> {

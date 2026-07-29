@@ -33,14 +33,10 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * The single authority for updating logistic addresses: applies each [AddressUpdate]'s change to its address (how a
- * change is applied is this service's responsibility — a caller describes *what* to change, not *how*), detects whether
- * the address actually changed by equivalence, and persists and emits an UPDATE changelog only for those that changed.
- * The change vocabulary is confined to [AddressContentUpdate], which has no field for the address's identity, parent, or
- * relations, so no update can re-identify or re-parent an address.
- *
- * [update] does this in one call. [stageUpdate] plus [commit] split it so a caller can learn whether the address
- * changed — and wire it into a not-yet-persisted parent — before committing.
+ * The single authority for updating logistic addresses: applies each requested change to its address — a caller
+ * describes *what* to change, this service decides *how* — detects by equivalence whether the address actually changed,
+ * and persists and emits an UPDATE changelog only for those that did. The change vocabulary has no field for an
+ * address's identity, parent, or relations, so no update can re-identify or re-parent an address.
  */
 @Service
 class AddressUpdateService(
@@ -48,19 +44,28 @@ class AddressUpdateService(
     private val addressEntityMapper: AddressEntityMapper,
     private val addressWriteCommitService: AddressWriteCommitService
 ) {
+    /**
+     * Applies the given changes and reports for each address whether it actually changed.
+     */
     @Transactional
     fun update(requests: List<AddressUpdate>): List<UpsertResult<LogisticAddressDb>> =
         commit(requests.map { stageUpdate(it) })
 
+    /**
+     * Applies the given change to a single address and reports whether it actually changed.
+     */
     fun update(request: AddressUpdate): UpsertResult<LogisticAddressDb> =
         update(listOf(request)).single()
 
+    /**
+     * Applies one change in memory without persisting, so a caller can see whether the address changed — and wire it into
+     * a not-yet-persisted parent — before handing it to [commit].
+     */
     fun stageUpdate(request: AddressUpdate): PendingAddressWrite {
         val target = request.address
 
         // A change that sets nothing cannot make the address differ, so skip the equivalence snapshots — they would
-        // otherwise force the address's identifiers, states and script variants to load for nothing. This is the common
-        // case for parents whose write only touches derived fields.
+        // otherwise force its identifiers, states and script variants to load for nothing.
         if (request.content == AddressContentUpdate.NoOp) return PendingAddressWrite(target, UpsertType.NoChange)
 
         val before = equivalenceMapper.toEquivalenceDto(target)
@@ -69,6 +74,9 @@ class AddressUpdateService(
         return PendingAddressWrite(target, if (changed) UpsertType.Updated else UpsertType.NoChange)
     }
 
+    /**
+     * Persists the staged addresses that changed and emits their UPDATE changelog.
+     */
     @Transactional
     fun commit(staged: List<PendingAddressWrite>): List<UpsertResult<LogisticAddressDb>> =
         addressWriteCommitService.commit(staged)

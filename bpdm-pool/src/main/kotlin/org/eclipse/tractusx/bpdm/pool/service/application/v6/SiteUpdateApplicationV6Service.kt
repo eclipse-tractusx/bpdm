@@ -50,6 +50,10 @@ class SiteUpdateApplicationV6Service(
 
     private val logger = KotlinLogging.logger { }
 
+    /**
+     * Applies each request to the site it addresses by BPN and returns, per request, either the updated site or the
+     * errors that stopped it.
+     */
     @Transactional
     fun updateSites(requests: Collection<SitePartnerUpdateRequestV6>): SitePartnerUpdateResponseWrapperV6 {
         logger.info { "Update ${requests.size} sites" }

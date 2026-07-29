@@ -33,8 +33,8 @@ import org.springframework.stereotype.Service
 class SiteLegalEntityConsistencyValidator {
 
     /**
-     * The (at most one) violation of the rule. Empty when there is no site to check, no known address legal entity to
-     * check against, or the site already belongs to it.
+     * Reports the (at most one) violation of the rule. Empty when there is no site to check, no known address legal
+     * entity to check against, or the site already belongs to it.
      */
     fun check(addressLegalEntity: LegalEntityDb?, site: SiteDb?): List<SiteNotInAddressLegalEntity> =
         when {

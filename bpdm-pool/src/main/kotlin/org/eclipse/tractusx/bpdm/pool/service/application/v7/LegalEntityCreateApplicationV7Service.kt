@@ -48,6 +48,10 @@ class LegalEntityCreateApplicationV7Service(
 
     private val logger = KotlinLogging.logger { }
 
+    /**
+     * Creates the requested legal entities with their legal addresses and returns, per request, either the created legal
+     * entity or the errors that stopped it.
+     */
     @Transactional
     fun createLegalEntities(requests: Collection<LegalEntityPartnerCreateRequest>): LegalEntityPartnerCreateResponseWrapper {
         logger.info { "Create ${requests.size} new legal entities" }

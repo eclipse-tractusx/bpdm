@@ -49,6 +49,9 @@ class LegalEntityCreateService(
     private val legalEntityRepository: LegalEntityRepository
 ) {
 
+    /**
+     * Creates the given legal entities together with their legal addresses and returns the persisted entities.
+     */
     @Transactional
     fun create(parsed: List<LegalEntityCreateParsed>): List<LegalEntityDb> {
         val legalEntities = createHeaders(parsed.map { it.content.header })
@@ -69,7 +72,6 @@ class LegalEntityCreateService(
     private fun createHeaders(headers: List<LegalEntityHeaderParsed>): List<LegalEntityDb>{
         val bpns = bpnIssuingService.issueLegalEntityBpns(headers.size)
         val currentness = Instant.now().truncatedTo(ChronoUnit.MICROS)
-        // A new legal entity starts with zero sharing members.
         return headers.zip(bpns) { header, bpn ->
             legalEntityEntityMapper.toEntity(bpn, header, currentness, numberOfSharingMembers = 0).also {
                 // A just-issued BPNL cannot be referenced by any ownership relation yet — relations are written through
