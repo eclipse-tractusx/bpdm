@@ -44,16 +44,16 @@ class UltimateOwnerResolutionService(
     @Transactional(readOnly = true)
     fun resolveUltimateOwner(legalEntity: LegalEntityDb): String? {
         val visited = mutableSetOf<String>()
-        return resolveHighestFlaggedAncestorWithCycleProtection(legalEntity, visited)
+        return resolveHighestFlaggedAncestorWithCycleProtection(legalEntity, visited).ownerBpnl
     }
 
 
-    private fun resolveHighestFlaggedAncestorWithCycleProtection(legalEntity: LegalEntityDb, visited: MutableSet<String>): String? {
+    private fun resolveHighestFlaggedAncestorWithCycleProtection(legalEntity: LegalEntityDb, visited: MutableSet<String>): ResolutionResult {
         val currentBpn = legalEntity.bpn
 
         if (currentBpn in visited) {
             logger.warn { "Cycle detected in ownership chain at BPNL: $currentBpn" }
-            return null
+            return ResolutionResult(ownerBpnl = null, cycleDetected = true)
         }
         visited.add(currentBpn)
 
@@ -64,14 +64,22 @@ class UltimateOwnerResolutionService(
 
         for (relation in validOwningRelations) {
             val parent = relation.endNode
-            val parentHighestFlaggedOwner = resolveHighestFlaggedAncestorWithCycleProtection(parent, visited)
-            if (parentHighestFlaggedOwner != null) {
-                highestFlaggedOwner = parentHighestFlaggedOwner
+            val parentResolution = resolveHighestFlaggedAncestorWithCycleProtection(parent, visited)
+            if (parentResolution.cycleDetected) {
+                return parentResolution
+            }
+            if (parentResolution.ownerBpnl != null) {
+                highestFlaggedOwner = parentResolution.ownerBpnl
             }
         }
 
-        return highestFlaggedOwner
+        return ResolutionResult(ownerBpnl = highestFlaggedOwner, cycleDetected = false)
     }
+
+    private data class ResolutionResult(
+        val ownerBpnl: String?,
+        val cycleDetected: Boolean
+    )
 
     @Transactional
     fun updateUltimateOwnerForEntityAndDescendants(legalEntity: LegalEntityDb, visited: MutableSet<String> = mutableSetOf()) {
@@ -108,7 +116,7 @@ class UltimateOwnerResolutionService(
         }
     }
 
-    private fun isRelationCurrentlyValid(relation: org.eclipse.tractusx.bpdm.pool.entity.RelationDb): Boolean {
+    private fun isRelationCurrentlyValid(relation: RelationDb): Boolean {
         if (relation.validityPeriods.isEmpty()) {
             return false
         }
