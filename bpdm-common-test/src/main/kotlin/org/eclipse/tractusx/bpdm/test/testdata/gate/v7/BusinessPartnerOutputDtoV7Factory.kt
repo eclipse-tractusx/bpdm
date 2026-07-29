@@ -159,6 +159,8 @@ class BusinessPartnerOutputDtoV7Factory {
             shortName = legalEntity.legalShortName,
             legalForm = legalEntity.legalForm,
             confidenceCriteria = buildConfidence(legalEntity.confidenceCriteria),
+            ownershipUltimate = legalEntity.ownershipUltimate,
+            ultimateOwnerBpnl = legalEntity.ultimateOwnerBpnl,
             states = legalEntity.states.map { BusinessPartnerStateDto(it.validFrom, it.validTo, it.type) },
             updatedAt = legalEntity.updatedAt
         )

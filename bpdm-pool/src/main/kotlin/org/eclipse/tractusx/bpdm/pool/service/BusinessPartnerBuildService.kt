@@ -286,6 +286,10 @@ class BusinessPartnerBuildService(
             if (legalEntityBeforeUpdate != legalEntityAfterUpdate) {
                 logger.info { "Legal Entity ${legalEntity.bpn} was updated" }
 
+                if (!ownershipUltimateBeforeUpdate && legalEntity.ownershipUltimate) {
+                    ultimateOwnerResolutionService.validateOnlyOneUltimateOwnerInHierarchy(legalEntity)
+                }
+
                 legalEntityRepository.save(legalEntity)
 
                 if (ownershipUltimateBeforeUpdate != legalEntity.ownershipUltimate) {

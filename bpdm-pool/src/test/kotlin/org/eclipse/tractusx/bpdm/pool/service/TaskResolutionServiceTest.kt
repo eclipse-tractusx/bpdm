@@ -30,6 +30,7 @@ import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.eclipse.tractusx.bpdm.pool.service.TaskStepBuildService.CleaningError
+import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.springframework.transaction.support.TransactionTemplate
 import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockConfiguration
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
@@ -197,6 +198,32 @@ class TaskResolutionServiceTest @Autowired constructor(
         assertThat(persistedEntity).isNotNull()
         assertThat(persistedEntity!!.ownershipUltimate).isFalse()
         assertThat(persistedEntity.ultimateOwnerBpnl).isNull()
+    }
+
+    @Test
+    fun `update legal entity with ownership flag only persists change`() {
+        val createRequest = minValidLegalEntity()
+            .withLegalReferences("owner-flag-update-bpnl".toBpnRequest(), "owner-flag-update-bpna".toBpnRequest())
+
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_OWNERSHIP_UPDATE_1", businessPartner = createRequest)
+        assertThat(createResult[0].errors).isEmpty()
+
+        val createdBpnl = createResult[0].businessPartner.legalEntity.bpnReference.referenceValue!!
+        val updateRequest = createRequest.copy(
+            legalEntity = createRequest.legalEntity.copy(ownershipUltimate = true)
+        )
+
+        val updateResult = upsertGoldenRecordIntoPool(taskId = "TASK_OWNERSHIP_UPDATE_2", businessPartner = updateRequest)
+        assertThat(updateResult[0].errors).isEmpty()
+
+        val updatedFromPoolApi = poolClient.legalEntities.getLegalEntity(createdBpnl)
+        assertThat(updatedFromPoolApi.header.ownershipUltimate).isTrue()
+        assertThat(updatedFromPoolApi.header.ultimateOwnerBpnl).isEqualTo(createdBpnl)
+
+        val persistedEntity = legalEntityRepository.findByBpnIgnoreCase(createdBpnl)
+        assertThat(persistedEntity).isNotNull()
+        assertThat(persistedEntity!!.ownershipUltimate).isTrue()
+        assertThat(persistedEntity.ultimateOwnerBpnl).isEqualTo(createdBpnl)
     }
 
 
@@ -1652,5 +1679,221 @@ class TaskResolutionServiceTest @Autowired constructor(
         assertThat(child2DbAfter.ultimateOwnerBpnl).isEqualTo(parent.legalEntity.header.bpnl)
         assertThat(grand1DbAfter.ultimateOwnerBpnl).isEqualTo(parent.legalEntity.header.bpnl)
         assertThat(grand2DbAfter.ultimateOwnerBpnl).isEqualTo(parent.legalEntity.header.bpnl)
+    }
+
+    @Test
+    fun `validation - reject owned-by tree merge with two flagged ultimate owners`() {
+        val childA = createLegalEntity("BPNL_VAL_MERGE_CA")
+        val rootA = createLegalEntity("BPNL_VAL_MERGE_RA")
+        val rootB = createLegalEntity("BPNL_VAL_MERGE_RB")
+
+        createIsOwnedByRelationViaService(childA.legalEntity.header.bpnl, rootA.legalEntity.header.bpnl)
+
+        val rootADb = legalEntityRepository.findByBpnIgnoreCase(rootA.legalEntity.header.bpnl)!!
+        val rootBDb = legalEntityRepository.findByBpnIgnoreCase(rootB.legalEntity.header.bpnl)!!
+        rootADb.ownershipUltimate = true
+        rootBDb.ownershipUltimate = true
+        legalEntityRepository.save(rootADb)
+        legalEntityRepository.save(rootBDb)
+
+        val exception = org.junit.jupiter.api.assertThrows<BpdmValidationException> {
+            transactionTemplate.execute {
+                val source = legalEntityRepository.findByBpnIgnoreCase(rootA.legalEntity.header.bpnl)!!
+                val target = legalEntityRepository.findByBpnIgnoreCase(rootB.legalEntity.header.bpnl)!!
+
+                ownedByRelationUpsertService.upsertRelation(
+                    IRelationUpsertStrategyService.UpsertRequest(
+                        source = source,
+                        target = target,
+                        validityPeriods = listOf(currentValidityPeriod()),
+                        existingRelation = null,
+                        reasonCode = null
+                    )
+                )
+            }
+        }
+
+        assertThat(exception.message).contains("Multiple ultimate owners detected")
+
+        val sourceAfter = legalEntityRepository.findByBpnIgnoreCase(rootA.legalEntity.header.bpnl)!!
+        val targetAfter = legalEntityRepository.findByBpnIgnoreCase(rootB.legalEntity.header.bpnl)!!
+        val mergedRelation = relationRepository.findAll(
+            RelationRepository.byRelation(
+                startNode = sourceAfter,
+                endNode = targetAfter,
+                type = LegalEntityRelationType.IsOwnedBy
+            )
+        ).singleOrNull()
+
+        assertThat(mergedRelation).isNull()
+    }
+
+    @Test
+    fun `validation - reject second flag when ancestor is already flagged`() {
+        val subsidiary = createLegalEntity("BPNL_VAL_S")
+        val intermediate = createLegalEntity("BPNL_VAL_I")
+        val parent = createLegalEntity("BPNL_VAL_P")
+
+        createIsOwnedByRelationViaService(subsidiary.legalEntity.header.bpnl, intermediate.legalEntity.header.bpnl)
+        createIsOwnedByRelationViaService(intermediate.legalEntity.header.bpnl, parent.legalEntity.header.bpnl)
+
+        val parentDb = legalEntityRepository.findByBpnIgnoreCase(parent.legalEntity.header.bpnl)!!
+        parentDb.ownershipUltimate = true
+        legalEntityRepository.save(parentDb)
+
+        val subsidiaryDb = legalEntityRepository.findByBpnIgnoreCase(subsidiary.legalEntity.header.bpnl)!!
+        subsidiaryDb.ownershipUltimate = true
+        legalEntityRepository.save(subsidiaryDb)
+
+        val exception = org.junit.jupiter.api.assertThrows<BpdmValidationException> {
+            ultimateOwnerResolutionService.validateOnlyOneUltimateOwnerInHierarchy(subsidiaryDb)
+        }
+
+        assertThat(exception.message).contains("Multiple ultimate owners detected")
+        assertThat(exception.message).contains(parent.legalEntity.header.bpnl)
+    }
+
+    @Test
+    fun `validation - reject second flag when descendant is already flagged`() {
+        val subsidiary = createLegalEntity("BPNL_VAL_S2")
+        val intermediate = createLegalEntity("BPNL_VAL_I2")
+        val parent = createLegalEntity("BPNL_VAL_P2")
+
+        createIsOwnedByRelationViaService(subsidiary.legalEntity.header.bpnl, intermediate.legalEntity.header.bpnl)
+        createIsOwnedByRelationViaService(intermediate.legalEntity.header.bpnl, parent.legalEntity.header.bpnl)
+
+        val subsidiaryDb = legalEntityRepository.findByBpnIgnoreCase(subsidiary.legalEntity.header.bpnl)!!
+        subsidiaryDb.ownershipUltimate = true
+        legalEntityRepository.save(subsidiaryDb)
+
+        val parentDb = legalEntityRepository.findByBpnIgnoreCase(parent.legalEntity.header.bpnl)!!
+        parentDb.ownershipUltimate = true
+        legalEntityRepository.save(parentDb)
+
+        val exception = org.junit.jupiter.api.assertThrows<BpdmValidationException> {
+            ultimateOwnerResolutionService.validateOnlyOneUltimateOwnerInHierarchy(parentDb)
+        }
+
+        assertThat(exception.message).contains("Multiple ultimate owners detected")
+        assertThat(exception.message).contains(subsidiary.legalEntity.header.bpnl)
+    }
+
+    @Test
+    fun `validation - allow single flagged entity in hierarchy`() {
+        val subsidiary = createLegalEntity("BPNL_VAL_S3")
+        val intermediate = createLegalEntity("BPNL_VAL_I3")
+        val parent = createLegalEntity("BPNL_VAL_P3")
+
+        createIsOwnedByRelationViaService(subsidiary.legalEntity.header.bpnl, intermediate.legalEntity.header.bpnl)
+        createIsOwnedByRelationViaService(intermediate.legalEntity.header.bpnl, parent.legalEntity.header.bpnl)
+
+        val parentDb = legalEntityRepository.findByBpnIgnoreCase(parent.legalEntity.header.bpnl)!!
+        parentDb.ownershipUltimate = true
+        legalEntityRepository.save(parentDb)
+
+        ultimateOwnerResolutionService.validateOnlyOneUltimateOwnerInHierarchy(parentDb)
+
+        val verifiedParent = legalEntityRepository.findByBpnIgnoreCase(parent.legalEntity.header.bpnl)!!
+        assertThat(verifiedParent.ownershipUltimate).isTrue()
+    }
+
+    @Test
+    fun `validation - allow moving flag from one entity to another`() {
+        val subsidiary = createLegalEntity("BPNL_VAL_S4")
+        val intermediate = createLegalEntity("BPNL_VAL_I4")
+        val parent = createLegalEntity("BPNL_VAL_P4")
+
+        createIsOwnedByRelationViaService(subsidiary.legalEntity.header.bpnl, intermediate.legalEntity.header.bpnl)
+        createIsOwnedByRelationViaService(intermediate.legalEntity.header.bpnl, parent.legalEntity.header.bpnl)
+
+        val parentDb = legalEntityRepository.findByBpnIgnoreCase(parent.legalEntity.header.bpnl)!!
+        parentDb.ownershipUltimate = true
+        legalEntityRepository.save(parentDb)
+
+        parentDb.ownershipUltimate = false
+        legalEntityRepository.save(parentDb)
+
+        val subsidiaryDb = legalEntityRepository.findByBpnIgnoreCase(subsidiary.legalEntity.header.bpnl)!!
+        subsidiaryDb.ownershipUltimate = true
+        legalEntityRepository.save(subsidiaryDb)
+
+        ultimateOwnerResolutionService.validateOnlyOneUltimateOwnerInHierarchy(subsidiaryDb)
+
+        val verifiedSubsidiary = legalEntityRepository.findByBpnIgnoreCase(subsidiary.legalEntity.header.bpnl)!!
+        val verifiedParent = legalEntityRepository.findByBpnIgnoreCase(parent.legalEntity.header.bpnl)!!
+        assertThat(verifiedSubsidiary.ownershipUltimate).isTrue()
+        assertThat(verifiedParent.ownershipUltimate).isFalse()
+    }
+
+    @Test
+    fun `validation - cycle safety prevents infinite loop`() {
+        val subsidiary = createLegalEntity("BPNL_VAL_CYCLE_S")
+        val intermediate = createLegalEntity("BPNL_VAL_CYCLE_I")
+        val parent = createLegalEntity("BPNL_VAL_CYCLE_P")
+
+        createIsOwnedByRelation(subsidiary.legalEntity.header.bpnl, intermediate.legalEntity.header.bpnl)
+        createIsOwnedByRelation(intermediate.legalEntity.header.bpnl, parent.legalEntity.header.bpnl)
+        createIsOwnedByRelation(parent.legalEntity.header.bpnl, subsidiary.legalEntity.header.bpnl)
+
+        val parentDb = legalEntityRepository.findByBpnIgnoreCase(parent.legalEntity.header.bpnl)!!
+        parentDb.ownershipUltimate = true
+        legalEntityRepository.save(parentDb)
+
+        val subsidiaryDb = legalEntityRepository.findByBpnIgnoreCase(subsidiary.legalEntity.header.bpnl)!!
+        subsidiaryDb.ownershipUltimate = true
+        legalEntityRepository.save(subsidiaryDb)
+
+        val exception = org.junit.jupiter.api.assertThrows<BpdmValidationException> {
+            ultimateOwnerResolutionService.validateOnlyOneUltimateOwnerInHierarchy(subsidiaryDb)
+        }
+
+        assertThat(exception.message).contains("Multiple ultimate owners detected")
+    }
+
+    @Test
+    fun `validation - error message includes conflicting flagged entities`() {
+        val entity1 = createLegalEntity("BPNL_VAL_ERR1")
+        val entity2 = createLegalEntity("BPNL_VAL_ERR2")
+        val entity3 = createLegalEntity("BPNL_VAL_ERR3")
+
+        createIsOwnedByRelationViaService(entity1.legalEntity.header.bpnl, entity2.legalEntity.header.bpnl)
+        createIsOwnedByRelationViaService(entity2.legalEntity.header.bpnl, entity3.legalEntity.header.bpnl)
+
+        val entity3Db = legalEntityRepository.findByBpnIgnoreCase(entity3.legalEntity.header.bpnl)!!
+        entity3Db.ownershipUltimate = true
+        legalEntityRepository.save(entity3Db)
+
+        val entity1Db = legalEntityRepository.findByBpnIgnoreCase(entity1.legalEntity.header.bpnl)!!
+        entity1Db.ownershipUltimate = true
+        legalEntityRepository.save(entity1Db)
+
+        val exception = org.junit.jupiter.api.assertThrows<BpdmValidationException> {
+            ultimateOwnerResolutionService.validateOnlyOneUltimateOwnerInHierarchy(entity1Db)
+        }
+
+        assertThat(exception.message).contains("Multiple ultimate owners detected")
+        assertThat(exception.message).contains(entity3.legalEntity.header.bpnl)
+        assertThat(exception.message).contains("ownershipUltimate")
+    }
+
+    @Test
+    fun `validation - no validation when flag changes from true to false`() {
+        val subsidiary = createLegalEntity("BPNL_VAL_NOV_S")
+        val parent = createLegalEntity("BPNL_VAL_NOV_P")
+
+        createIsOwnedByRelationViaService(subsidiary.legalEntity.header.bpnl, parent.legalEntity.header.bpnl)
+
+        val subsidiaryDb = legalEntityRepository.findByBpnIgnoreCase(subsidiary.legalEntity.header.bpnl)!!
+        val parentDb = legalEntityRepository.findByBpnIgnoreCase(parent.legalEntity.header.bpnl)!!
+        
+        subsidiaryDb.ownershipUltimate = true
+        parentDb.ownershipUltimate = true
+        legalEntityRepository.save(subsidiaryDb)
+        legalEntityRepository.save(parentDb)
+
+        parentDb.ownershipUltimate = false
+        legalEntityRepository.save(parentDb)
+
+        ultimateOwnerResolutionService.updateUltimateOwnerForEntityAndDescendants(parentDb)
     }
 }

@@ -26,6 +26,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
+import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.springframework.stereotype.Service
@@ -115,6 +116,57 @@ class UltimateOwnerResolutionService(
             val isAfterOrOnStart = today >= period.validFrom
             val isBeforeOrOnEnd = period.validTo == null || today <= period.validTo
             isAfterOrOnStart && isBeforeOrOnEnd
+        }
+    }
+
+
+    @Transactional(readOnly = true)
+    fun validateOnlyOneUltimateOwnerInHierarchy(legalEntity: LegalEntityDb) {
+        val visited = mutableSetOf<String>()
+        val flaggedEntities = mutableListOf<String>()
+
+        collectAllEntitiesInHierarchy(legalEntity, visited, flaggedEntities)
+
+        if (flaggedEntities.size > 1) {
+            throw BpdmValidationException(
+                "Multiple ultimate owners detected in the same IsOwnedBy hierarchy. " +
+                "The following entities are flagged as ownership ultimate: ${flaggedEntities.joinToString(", ")}. " +
+                "An IsOwnedBy hierarchy can have at most one entity with ownershipUltimate = true."
+            )
+        }
+    }
+
+    private fun collectAllEntitiesInHierarchy(
+        legalEntity: LegalEntityDb,
+        visited: MutableSet<String>,
+        flaggedEntities: MutableList<String>
+    ) {
+        val currentBpn = legalEntity.bpn
+
+        if (currentBpn in visited) {
+            logger.debug { "Already visited $currentBpn, skipping to avoid cycle" }
+            return
+        }
+        visited.add(currentBpn)
+
+        if (legalEntity.ownershipUltimate) {
+            flaggedEntities.add(currentBpn)
+        }
+
+        val owningRelations = relationRepository.findByTypeAndStartNode(LegalEntityRelationType.IsOwnedBy, legalEntity)
+        val validOwningRelations = owningRelations.filter { isRelationCurrentlyValid(it) }
+
+        for (relation in validOwningRelations) {
+            val parent = relation.endNode
+            collectAllEntitiesInHierarchy(parent, visited, flaggedEntities)
+        }
+
+        val ownedRelations = relationRepository.findByTypeAndEndNode(LegalEntityRelationType.IsOwnedBy, legalEntity)
+        val validOwnedRelations = ownedRelations.filter { isRelationCurrentlyValid(it) }
+
+        for (relation in validOwnedRelations) {
+            val child = relation.startNode
+            collectAllEntitiesInHierarchy(child, visited, flaggedEntities)
         }
     }
 
