@@ -240,10 +240,10 @@ jobs:
 
       - name: Run helm upgrade
         env:
-          UPGRADE_FROM: ${{ github.event.inputs.upgrade_from && '--version github.event.inputs.upgrade_from' || '' }}
+          UPGRADE_FROM: ${{ inputs.upgrade_from }}
         run: |
           helm repo add tractusx-dev https://eclipse-tractusx.github.io/charts/dev
-          helm install -f charts/bpdm/ci/test-upgrade-values.yaml  bpdm-test tractusx-dev/bpdm $UPGRADE_FROM
+          helm install -f charts/bpdm/ci/test-upgrade-values.yaml  bpdm-test tractusx-dev/bpdm ${UPGRADE_FROM:+--version "$UPGRADE_FROM"}
           helm dependency update charts/bpdm
           helm upgrade -f charts/bpdm/ci/test-upgrade-values.yaml  bpdm-test charts/bpdm
 
