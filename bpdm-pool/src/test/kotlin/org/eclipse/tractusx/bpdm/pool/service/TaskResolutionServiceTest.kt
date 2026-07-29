@@ -200,6 +200,32 @@ class TaskResolutionServiceTest @Autowired constructor(
         assertThat(persistedEntity.ultimateOwnerBpnl).isNull()
     }
 
+    @Test
+    fun `update legal entity with ownership flag only persists change`() {
+        val createRequest = minValidLegalEntity()
+            .withLegalReferences("owner-flag-update-bpnl".toBpnRequest(), "owner-flag-update-bpna".toBpnRequest())
+
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_OWNERSHIP_UPDATE_1", businessPartner = createRequest)
+        assertThat(createResult[0].errors).isEmpty()
+
+        val createdBpnl = createResult[0].businessPartner.legalEntity.bpnReference.referenceValue!!
+        val updateRequest = createRequest.copy(
+            legalEntity = createRequest.legalEntity.copy(ownershipUltimate = true)
+        )
+
+        val updateResult = upsertGoldenRecordIntoPool(taskId = "TASK_OWNERSHIP_UPDATE_2", businessPartner = updateRequest)
+        assertThat(updateResult[0].errors).isEmpty()
+
+        val updatedFromPoolApi = poolClient.legalEntities.getLegalEntity(createdBpnl)
+        assertThat(updatedFromPoolApi.header.ownershipUltimate).isTrue()
+        assertThat(updatedFromPoolApi.header.ultimateOwnerBpnl).isEqualTo(createdBpnl)
+
+        val persistedEntity = legalEntityRepository.findByBpnIgnoreCase(createdBpnl)
+        assertThat(persistedEntity).isNotNull()
+        assertThat(persistedEntity!!.ownershipUltimate).isTrue()
+        assertThat(persistedEntity.ultimateOwnerBpnl).isEqualTo(createdBpnl)
+    }
+
 
     @Test
     fun `create legal entity with additional address`() {
