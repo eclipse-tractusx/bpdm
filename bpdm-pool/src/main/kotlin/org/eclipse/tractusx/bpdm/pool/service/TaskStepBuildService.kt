@@ -42,6 +42,7 @@ import org.eclipse.tractusx.bpdm.pool.model.error.LegalAddressAlreadyMainAddress
 import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityContentParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityCreateParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityUpdateParseError
+import org.eclipse.tractusx.bpdm.pool.model.error.MultipleUltimateOwnersInHierarchy
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteContentParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteNotInAddressLegalEntity
@@ -489,6 +490,9 @@ class TaskStepBuildService(
     private fun renderError(error: LegalEntityUpdateParseError): String =
         when (error) {
             is UnresolvableLegalEntity -> "Legal entity ${error.bpn} not found"
+            is MultipleUltimateOwnersInHierarchy ->
+                "An ownership hierarchy can have at most one ultimate owner, but these legal entities are also flagged " +
+                        "as ultimate owner: ${error.conflictingBpnls.joinToString(", ")}"
             is LegalEntityContentParseError -> renderError(error)
             is AddressContentParseError -> renderError(error)
         }

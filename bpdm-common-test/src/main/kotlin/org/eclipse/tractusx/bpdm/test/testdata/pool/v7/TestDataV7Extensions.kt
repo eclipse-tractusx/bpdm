@@ -99,6 +99,34 @@ fun LegalEntityPartnerUpdateRequest.withAlternativeAdminArea(code: String?) =
 fun LegalEntityPartnerUpdateRequest.withParticipantData(isParticipantData: Boolean) =
     copy(legalEntity = legalEntity.withParticipantData(isParticipantData))
 
+fun LegalEntityPartnerUpdateRequest.withOwnershipUltimate(ownershipUltimate: Boolean?) =
+    copy(legalEntity = legalEntity.withOwnershipUltimate(ownershipUltimate))
+
+fun LegalEntityDto.withOwnershipUltimate(ownershipUltimate: Boolean?) =
+    copy(header = header.copy(ownershipUltimate = ownershipUltimate))
+
+fun LegalEntityPartnerCreateVerboseDto.withUltimateOwner(ownershipUltimate: Boolean, ultimateOwnerBpnl: String?) =
+    copy(legalEntity = legalEntity.withUltimateOwner(ownershipUltimate, ultimateOwnerBpnl))
+
+fun LegalEntityWithLegalAddressVerboseDto.withUltimateOwner(ownershipUltimate: Boolean, ultimateOwnerBpnl: String?) =
+    copy(header = header.copy(ownershipUltimate = ownershipUltimate, ultimateOwnerBpnl = ultimateOwnerBpnl))
+
+fun LegalEntityPartnerCreateVerboseDto.withIsOwnedByRelation(ownedBpnL: String, owningBpnL: String) =
+    copy(legalEntity = legalEntity.withIsOwnedByRelation(ownedBpnL, owningBpnL))
+
+fun LegalEntityWithLegalAddressVerboseDto.withIsOwnedByRelation(ownedBpnL: String, owningBpnL: String) =
+    copy(
+        header = header.copy(
+            relations = header.relations + RelationVerboseDto(
+                type = LegalEntityRelationType.IsOwnedBy,
+                businessPartnerSourceBpnl = ownedBpnL,
+                businessPartnerTargetBpnl = owningBpnL,
+                validityPeriods = listOf(RelationValidityPeriod(validFrom = TestDataV7.currentRelationValidFrom, validTo = null)),
+                reasonCode = null
+            )
+        )
+    )
+
 fun LegalEntityDto.withParticipantData(isParticipantData: Boolean) =
     copy(header = header.withParticipantData(isParticipantData), legalAddress = legalAddress.withSharedByOwner(isParticipantData))
 
