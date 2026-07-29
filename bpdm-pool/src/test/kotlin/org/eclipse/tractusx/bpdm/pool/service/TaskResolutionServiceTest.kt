@@ -218,12 +218,12 @@ class TaskResolutionServiceTest @Autowired constructor(
 
         val updatedFromPoolApi = poolClient.legalEntities.getLegalEntity(createdBpnl)
         assertThat(updatedFromPoolApi.header.ownershipUltimate).isTrue()
-        assertThat(updatedFromPoolApi.header.ultimateOwnerBpnl).isNull()
+        assertThat(updatedFromPoolApi.header.ultimateOwnerBpnl).isEqualTo(createdBpnl)
 
         val persistedEntity = legalEntityRepository.findByBpnIgnoreCase(createdBpnl)
         assertThat(persistedEntity).isNotNull()
         assertThat(persistedEntity!!.ownershipUltimate).isTrue()
-        assertThat(persistedEntity.ultimateOwnerBpnl).isNull()
+        assertThat(persistedEntity.ultimateOwnerBpnl).isEqualTo(createdBpnl)
     }
 
 
