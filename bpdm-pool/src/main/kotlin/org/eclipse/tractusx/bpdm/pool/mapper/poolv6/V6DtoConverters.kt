@@ -222,24 +222,29 @@ fun V6LogisticAddressDto.toV7() = LogisticAddressDto(
     updatedAt = updatedAt
 )
 
+// v6 script variants still carry fields that are not script-dependent (postal codes, tax jurisdiction, house numbers,
+// delivery service qualifier and number). They remain in the released v6 contract but are dropped here.
 fun V6AlternativeAddressScriptVariantDto.toV7() = AlternativeAddressScriptVariantDto(
-    postalCode = postalCode,
-    city = city,
-    deliveryServiceQualifier = deliveryServiceQualifier,
-    deliveryServiceNumber = deliveryServiceNumber
+    city = city
 )
 
 fun V6PhysicalAddressScriptVariantDto.toV7() = PhysicalAddressScriptVariantDto(
-    postalCode = postalCode,
     city = city,
     district = district,
-    street = street?.toV7(),
-    companyPostalCode = companyPostalCode,
+    street = street?.toScriptVariantV7(),
     industrialZone = industrialZone,
     building = building,
     floor = floor,
-    door = door,
-    taxJurisdictionCode = taxJurisdictionCode
+    door = door
+)
+
+fun V6StreetDto.toScriptVariantV7() = StreetScriptVariantDto(
+    name = name,
+    direction = direction,
+    namePrefix = namePrefix,
+    additionalNamePrefix = additionalNamePrefix,
+    nameSuffix = nameSuffix,
+    additionalNameSuffix = additionalNameSuffix
 )
 
 fun V6PostalAddressScriptVariantDto.toV7() = PostalAddressScriptVariantDto(

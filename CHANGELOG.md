@@ -10,6 +10,10 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 
 ### Breaking
 
+- BPDM Pool, Gate and Orchestrator: Removed fields from business partner script variants that are not written differently in another script.
+  A script variant no longer contains the physical address `postalCode`, `companyPostalCode` and `taxJurisdictionCode`, its street's `houseNumber`, `houseNumberSupplement` and `milestone`, or the alternative address `postalCode`, `deliveryServiceQualifier` and `deliveryServiceNumber`.
+  The deprecated Pool v6 API keeps these fields in its request contract but ignores them [#1593](https://github.com/eclipse-tractusx/bpdm/issues/1593)
+
 ### Added
 
 - BPDM Pool: Added ultimate owner tracking fields to legal entities - `ownershipUltimate` flag and `ultimateOwnerBpnl` column - to support future ultimate owner resolution features [#1718](https://github.com/eclipse-tractusx/bpdm/issues/1718)

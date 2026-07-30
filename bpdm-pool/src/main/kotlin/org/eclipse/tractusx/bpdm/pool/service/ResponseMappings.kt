@@ -388,19 +388,27 @@ private fun LogisticAddressScriptVariantDb.toDto(): PostalAddressScriptVariantDt
 
 private fun PhysicalAddressScriptVariantDb.toDto(): PhysicalAddressScriptVariantDto{
     return PhysicalAddressScriptVariantDto(
-        postalCode = postalCode,
         city = city,
         district = district,
         street = street?.toDto(),
-        companyPostalCode = companyPostalCode,
         industrialZone = industrialZone,
         building = building,
         floor = floor,
-        door = door,
-        taxJurisdictionCode = taxJurisdictionCode
+        door = door
     )
 }
 
 private fun AlternativeAddressScriptVariantDb.toDto(): AlternativeAddressScriptVariantDto{
-    return AlternativeAddressScriptVariantDto(postalCode, city, deliveryServiceQualifier, deliveryServiceNumber)
+    return AlternativeAddressScriptVariantDto(city)
+}
+
+private fun StreetScriptVariantDb.toDto(): StreetScriptVariantDto{
+    return StreetScriptVariantDto(
+        name = name,
+        direction = direction,
+        namePrefix = namePrefix,
+        additionalNamePrefix = additionalNamePrefix,
+        nameSuffix = nameSuffix,
+        additionalNameSuffix = additionalNameSuffix
+    )
 }

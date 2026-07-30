@@ -30,21 +30,24 @@ data class PostalAddressScriptVariant(
 )
 
 data class PhysicalAddressScriptVariant(
-    val postalCode: String? = null,
     val city: String? = null,
     val district: String? = null,
-    val street: Street? = null,
-    val companyPostalCode: String? = null,
+    val street: StreetScriptVariant? = null,
     val industrialZone: String? = null,
     val building: String? = null,
     val floor: String? = null,
-    val door: String? = null,
-    val taxJurisdictionCode: String? = null
+    val door: String? = null
 )
 
 data class AlternativeAddressScriptVariant(
-    val postalCode: String? = null,
-    val city: String? = null,
-    val deliveryServiceQualifier: String? = null,
-    val deliveryServiceNumber: String? = null
+    val city: String? = null
+)
+
+data class StreetScriptVariant(
+    val name: String? = null,
+    val direction: String? = null,
+    val namePrefix: String? = null,
+    val additionalNamePrefix: String? = null,
+    val nameSuffix: String? = null,
+    val additionalNameSuffix: String? = null
 )

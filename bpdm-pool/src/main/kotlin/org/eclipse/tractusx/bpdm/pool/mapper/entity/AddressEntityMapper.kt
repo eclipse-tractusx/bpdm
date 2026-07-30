@@ -123,24 +123,28 @@ class AddressEntityMapper {
 
     private fun toPhysicalScriptVariant(variant: PhysicalAddressScriptVariant) =
         PhysicalAddressScriptVariantDb(
-            postalCode = variant.postalCode,
             city = variant.city,
             district = variant.district,
-            street = variant.street?.let { toStreet(it) },
-            companyPostalCode = variant.companyPostalCode,
+            street = variant.street?.let { toScriptVariantStreet(it) },
             industrialZone = variant.industrialZone,
             building = variant.building,
             floor = variant.floor,
-            door = variant.door,
-            taxJurisdictionCode = variant.taxJurisdictionCode
+            door = variant.door
         )
 
     private fun toAlternativeScriptVariant(variant: AlternativeAddressScriptVariant) =
         AlternativeAddressScriptVariantDb(
-            postalCode = variant.postalCode,
-            city = variant.city,
-            deliveryServiceQualifier = variant.deliveryServiceQualifier,
-            deliveryServiceNumber = variant.deliveryServiceNumber
+            city = variant.city
+        )
+
+    private fun toScriptVariantStreet(street: StreetScriptVariant) =
+        StreetScriptVariantDb(
+            name = street.name,
+            direction = street.direction,
+            namePrefix = street.namePrefix,
+            additionalNamePrefix = street.additionalNamePrefix,
+            nameSuffix = street.nameSuffix,
+            additionalNameSuffix = street.additionalNameSuffix
         )
 
     private fun Instant.toLocalDateTime() = atZone(ZoneOffset.UTC).toLocalDateTime()

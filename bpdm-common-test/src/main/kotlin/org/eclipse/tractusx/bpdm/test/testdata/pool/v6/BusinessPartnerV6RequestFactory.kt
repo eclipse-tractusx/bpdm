@@ -284,37 +284,34 @@ class BusinessPartnerV6RequestFactory(
         )
     }
 
+    // The v6 script variant contract still exposes postal codes, tax jurisdiction, house numbers and the delivery
+    // service qualifier and number, but the Pool no longer stores them for a script variant. They stay unset here so
+    // what is sent is what comes back.
     fun buildPhysicalAddressScriptVariant(scriptCode: String, seed: String): PhysicalAddressScriptVariantDtoV6{
         return PhysicalAddressScriptVariantDtoV6(
-            postalCode = buildScriptVariantStringValue("Postal Code", seed, scriptCode),
             city = buildScriptVariantStringValue("City", seed, scriptCode),
             district = buildScriptVariantStringValue("District", seed, scriptCode),
             street = StreetDtoV6(
                 name = buildScriptVariantStringValue("Street Name", seed, scriptCode),
-                houseNumber = buildScriptVariantStringValue("House Number", seed, scriptCode),
-                houseNumberSupplement = buildScriptVariantStringValue("House Number Supplement", seed, scriptCode),
-                milestone = buildScriptVariantStringValue("Milestone", seed, scriptCode),
                 direction = buildScriptVariantStringValue("Direction", seed, scriptCode),
                 namePrefix = buildScriptVariantStringValue("Name Prefix", seed, scriptCode),
                 nameSuffix = buildScriptVariantStringValue("Name Suffix", seed, scriptCode),
                 additionalNamePrefix = buildScriptVariantStringValue("Additional Name Prefix", seed, scriptCode),
                 additionalNameSuffix = buildScriptVariantStringValue("Additional Name Suffix", seed, scriptCode)
             ),
-            companyPostalCode = buildScriptVariantStringValue("Company Postal Code", seed, scriptCode),
             industrialZone = buildScriptVariantStringValue("Industrial Zone", seed, scriptCode),
             building = buildScriptVariantStringValue("Building", seed, scriptCode),
             floor = buildScriptVariantStringValue("Floor", seed, scriptCode),
-            door = buildScriptVariantStringValue("Door", seed, scriptCode),
-            taxJurisdictionCode = buildScriptVariantStringValue("Tax Jurisdiction Code", seed, scriptCode)
+            door = buildScriptVariantStringValue("Door", seed, scriptCode)
         )
     }
 
     fun buildAlternativeAddressScriptVariant(scriptCode: String, seed: String): AlternativeAddressScriptVariantDtoV6{
         return AlternativeAddressScriptVariantDtoV6(
-            postalCode = buildScriptVariantStringValue("Postal Code", seed, scriptCode),
+            postalCode = null,
             city = buildScriptVariantStringValue("City", seed, scriptCode),
-            deliveryServiceNumber = buildScriptVariantStringValue("Delivery Service Number ", seed, scriptCode),
-            deliveryServiceQualifier = buildScriptVariantStringValue("Delivery Service Qualifier ", seed, scriptCode)
+            deliveryServiceNumber = null,
+            deliveryServiceQualifier = null
         )
     }
 

@@ -19,34 +19,19 @@
 
 package org.eclipse.tractusx.bpdm.pool.entity
 
-import jakarta.persistence.AttributeOverride
 import jakarta.persistence.Column
 import jakarta.persistence.Embeddable
 import jakarta.persistence.Embedded
 
 @Embeddable
 data class PhysicalAddressScriptVariantDb(
-    @Column(name = "phy_postcode")
-    val postalCode: String?,
     @Column(name = "phy_city")
     val city: String?,
     @Column(name = "phy_district_l1")
     val district: String?,
 
     @Embedded
-    @AttributeOverride(name = "name", column = Column(name = "phy_street_name"))
-    @AttributeOverride(name = "houseNumber", column = Column(name = "phy_street_number"))
-    @AttributeOverride(name = "houseNumberSupplement", column = Column(name = "phy_street_number_supplement"))
-    @AttributeOverride(name = "milestone", column = Column(name = "phy_street_milestone"))
-    @AttributeOverride(name = "direction", column = Column(name = "phy_street_direction"))
-    @AttributeOverride(name = "namePrefix", column = Column(name = "phy_name_prefix"))
-    @AttributeOverride(name = "additionalNamePrefix", column = Column(name = "phy_additional_name_prefix"))
-    @AttributeOverride(name = "nameSuffix", column = Column(name = "phy_name_suffix"))
-    @AttributeOverride(name = "additionalNameSuffix", column = Column(name = "phy_additional_name_suffix"))
-    val street: StreetDb?,
-
-    @Column(name = "phy_company_postcode")
-    val companyPostalCode: String?,
+    val street: StreetScriptVariantDb?,
 
     @Column(name = "phy_industrial_zone")
     val industrialZone: String?,
@@ -58,8 +43,5 @@ data class PhysicalAddressScriptVariantDb(
     val floor: String?,
 
     @Column(name = "phy_door")
-    val door: String?,
-
-    @Column(name = "phy_tax_jurisdiction")
-    val taxJurisdictionCode: String?
+    val door: String?
 )

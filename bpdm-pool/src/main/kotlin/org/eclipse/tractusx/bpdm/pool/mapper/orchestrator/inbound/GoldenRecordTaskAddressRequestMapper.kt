@@ -23,6 +23,7 @@ import org.eclipse.tractusx.bpdm.pool.model.AlternativeAddressScriptVariant
 import org.eclipse.tractusx.bpdm.pool.model.PhysicalAddressScriptVariant
 import org.eclipse.tractusx.bpdm.pool.model.PostalAddressScriptVariant
 import org.eclipse.tractusx.bpdm.pool.model.Street
+import org.eclipse.tractusx.bpdm.pool.model.StreetScriptVariant
 import org.eclipse.tractusx.bpdm.pool.model.request.*
 import org.springframework.stereotype.Component
 import org.eclipse.tractusx.orchestrator.api.model.AlternativeAddress as TaskAlternativeAddress
@@ -38,6 +39,7 @@ import org.eclipse.tractusx.orchestrator.api.model.PostalAddressScriptVariant as
 import org.eclipse.tractusx.orchestrator.api.model.PostalAddressScriptVariantWithScriptCode as TaskScriptVariant
 import org.eclipse.tractusx.orchestrator.api.model.PostalAddressWithScriptVariants as TaskAddress
 import org.eclipse.tractusx.orchestrator.api.model.Street as TaskStreet
+import org.eclipse.tractusx.orchestrator.api.model.StreetScriptVariant as TaskStreetScriptVariant
 
 /**
  * Maps a cleaning task's address into the loose [LogisticAddressRequest]. Pool-computed confidence values
@@ -125,24 +127,28 @@ class GoldenRecordTaskAddressRequestMapper {
 
     private fun toPhysicalScriptVariant(variant: TaskPhysicalAddressScriptVariant): PhysicalAddressScriptVariant =
         PhysicalAddressScriptVariant(
-            postalCode = variant.postalCode,
             city = variant.city,
             district = variant.district,
-            street = toStreet(variant.street),
-            companyPostalCode = variant.companyPostalCode,
+            street = toScriptVariantStreet(variant.street),
             industrialZone = variant.industrialZone,
             building = variant.building,
             floor = variant.floor,
-            door = variant.door,
-            taxJurisdictionCode = variant.taxJurisdictionCode
+            door = variant.door
         )
 
     private fun toAlternativeScriptVariant(variant: TaskAlternativeAddressScriptVariant): AlternativeAddressScriptVariant =
         AlternativeAddressScriptVariant(
-            postalCode = variant.postalCode,
-            city = variant.city,
-            deliveryServiceQualifier = variant.deliveryServiceQualifier,
-            deliveryServiceNumber = variant.deliveryServiceNumber
+            city = variant.city
+        )
+
+    private fun toScriptVariantStreet(street: TaskStreetScriptVariant): StreetScriptVariant =
+        StreetScriptVariant(
+            name = street.name,
+            direction = street.direction,
+            namePrefix = street.namePrefix,
+            additionalNamePrefix = street.additionalNamePrefix,
+            nameSuffix = street.nameSuffix,
+            additionalNameSuffix = street.additionalNameSuffix
         )
 
     private fun toStreet(street: TaskStreet): Street =

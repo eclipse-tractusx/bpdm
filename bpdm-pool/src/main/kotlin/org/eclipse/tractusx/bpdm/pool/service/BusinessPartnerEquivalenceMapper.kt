@@ -124,39 +124,30 @@ class BusinessPartnerEquivalenceMapper {
                 name = name,
                 physicalAddress = with(physicalAddress){
                     PhysicalAddressScriptVariantEquivalenceDto(
-                        postalCode = postalCode,
                         city = city,
                         district = district,
                         street = street?.let {
                             with(it) {
-                                StreetEquivalenceDto(
+                                StreetScriptVariantEquivalenceDto(
                                     name = name,
-                                    houseNumber = houseNumber,
-                                    houseNumberSupplement = houseNumberSupplement,
-                                    milestone = milestone,
                                     direction = direction,
                                     namePrefix = namePrefix,
                                     additionalNamePrefix = additionalNamePrefix,
                                     nameSuffix = nameSuffix,
-                                    additionalNameSuffix = additionalNamePrefix
+                                    additionalNameSuffix = additionalNameSuffix
                                 )
                             }
                         },
-                        companyPostalCode = companyPostalCode,
                         industrialZone = industrialZone,
                         building = building,
                         floor = floor,
-                        door = door,
-                        taxJurisdictionCode = taxJurisdictionCode
+                        door = door
                     )
                 },
                 alternativeAddress = alternativeAddress?.let {
                     with(it){
                         AlternativeAddressScriptVariantEquivalenceDto(
-                            postalCode = postalCode,
-                            city = city,
-                            deliveryServiceQualifier = deliveryServiceQualifier,
-                            deliveryServiceNumber = deliveryServiceNumber
+                            city = city
                         )
                     }
                 }
@@ -293,22 +284,25 @@ class BusinessPartnerEquivalenceMapper {
     )
 
     data class PhysicalAddressScriptVariantEquivalenceDto(
-        val postalCode: String?,
         val city: String?,
         val district: String?,
-        val street: StreetEquivalenceDto?,
-        val companyPostalCode: String?,
+        val street: StreetScriptVariantEquivalenceDto?,
         val industrialZone: String?,
         val building: String?,
         val floor: String?,
-        val door: String?,
-        val taxJurisdictionCode: String?
+        val door: String?
     )
 
     data class AlternativeAddressScriptVariantEquivalenceDto(
-        val postalCode: String?,
-        val city: String?,
-        val deliveryServiceQualifier: String?,
-        val deliveryServiceNumber: String?
+        val city: String?
+    )
+
+    data class StreetScriptVariantEquivalenceDto(
+        val name: String?,
+        val direction: String?,
+        val namePrefix: String?,
+        val additionalNamePrefix: String?,
+        val nameSuffix: String?,
+        val additionalNameSuffix: String?
     )
 }

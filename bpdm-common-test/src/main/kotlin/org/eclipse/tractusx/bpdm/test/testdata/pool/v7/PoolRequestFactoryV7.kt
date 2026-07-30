@@ -334,35 +334,26 @@ class PoolRequestFactoryV7(
 
     fun buildPhysicalAddressScriptVariant(scriptCode: String, seed: String): PhysicalAddressScriptVariantDto{
         return PhysicalAddressScriptVariantDto(
-            postalCode = buildScriptVariantStringValue("Postal Code", seed, scriptCode),
             city = buildScriptVariantStringValue("City", seed, scriptCode),
             district = buildScriptVariantStringValue("District", seed, scriptCode),
-            street = StreetDto(
+            street = StreetScriptVariantDto(
                 name = buildScriptVariantStringValue("Street Name", seed, scriptCode),
-                houseNumber = buildScriptVariantStringValue("House Number", seed, scriptCode),
-                houseNumberSupplement = buildScriptVariantStringValue("House Number Supplement", seed, scriptCode),
-                milestone = buildScriptVariantStringValue("Milestone", seed, scriptCode),
                 direction = buildScriptVariantStringValue("Direction", seed, scriptCode),
                 namePrefix = buildScriptVariantStringValue("Name Prefix", seed, scriptCode),
                 nameSuffix = buildScriptVariantStringValue("Name Suffix", seed, scriptCode),
                 additionalNamePrefix = buildScriptVariantStringValue("Additional Name Prefix", seed, scriptCode),
                 additionalNameSuffix = buildScriptVariantStringValue("Additional Name Suffix", seed, scriptCode)
             ),
-            companyPostalCode = buildScriptVariantStringValue("Company Postal Code", seed, scriptCode),
             industrialZone = buildScriptVariantStringValue("Industrial Zone", seed, scriptCode),
             building = buildScriptVariantStringValue("Building", seed, scriptCode),
             floor = buildScriptVariantStringValue("Floor", seed, scriptCode),
-            door = buildScriptVariantStringValue("Door", seed, scriptCode),
-            taxJurisdictionCode = buildScriptVariantStringValue("Tax Jurisdiction Code", seed, scriptCode)
+            door = buildScriptVariantStringValue("Door", seed, scriptCode)
         )
     }
 
     fun buildAlternativeAddressScriptVariant(scriptCode: String, seed: String): AlternativeAddressScriptVariantDto{
         return AlternativeAddressScriptVariantDto(
-            postalCode = buildScriptVariantStringValue("Postal Code", seed, scriptCode),
-            city = buildScriptVariantStringValue("City", seed, scriptCode),
-            deliveryServiceNumber = buildScriptVariantStringValue("Delivery Service Number ", seed, scriptCode),
-            deliveryServiceQualifier = buildScriptVariantStringValue("Delivery Service Qualifier ", seed, scriptCode)
+            city = buildScriptVariantStringValue("City", seed, scriptCode)
         )
     }
 

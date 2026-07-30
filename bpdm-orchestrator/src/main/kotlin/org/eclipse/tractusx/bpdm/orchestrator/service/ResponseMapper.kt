@@ -277,26 +277,32 @@ class ResponseMapper {
     fun toPhysicalAddressScriptVariant(physicalAddressScriptVariant: PhysicalAddressScriptVariantDb) =
         with(physicalAddressScriptVariant){
             PhysicalAddressScriptVariant(
-                postalCode = postalCode,
                 city = city,
                 district = district,
-                street = toStreet(street),
-                companyPostalCode = companyPostalCode,
+                street = toScriptVariantStreet(street),
                 industrialZone = industrialZone,
                 building = building,
                 floor = floor,
-                door = door,
-                taxJurisdictionCode = taxJurisdictionCode
+                door = door
             )
         }
 
     fun toAlternativeAddressScriptVariant(alternativeAddressScriptVariant: AlternativeAddressScriptVariantDb) =
         with(alternativeAddressScriptVariant){
             AlternativeAddressScriptVariant(
-                postalCode = postalCode,
-                city = city,
-                deliveryServiceQualifier = deliveryServiceQualifier,
-                deliveryServiceNumber = deliveryServiceNumber
+                city = city
+            )
+        }
+
+    fun toScriptVariantStreet(street: StreetScriptVariantDb) =
+        with(street){
+            StreetScriptVariant(
+                name = name,
+                direction = direction,
+                namePrefix = namePrefix,
+                additionalNamePrefix = additionalNamePrefix,
+                nameSuffix = nameSuffix,
+                additionalNameSuffix = additionalNameSuffix
             )
         }
 

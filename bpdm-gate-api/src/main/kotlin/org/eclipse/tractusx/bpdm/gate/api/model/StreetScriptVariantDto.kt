@@ -17,20 +17,13 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.entity
+package org.eclipse.tractusx.bpdm.gate.api.model
 
-import jakarta.persistence.Column
-import jakarta.persistence.Embeddable
-import org.hibernate.annotations.Formula
-
-@Embeddable
-data class AlternativePostalAddressScriptVariantDb (
-    @Column(name = "alt_city")
-    val city: String?
-){
-    /**
-     * Keeps Hibernate from reading an alternative variant whose only column is null as an absent variant.
-     */
-    @Formula("1")
-    private val isNonNull = 1
-}
+data class StreetScriptVariantDto(
+    val name: String? = null,
+    val direction: String? = null,
+    val namePrefix: String? = null,
+    val additionalNamePrefix: String? = null,
+    val nameSuffix: String? = null,
+    val additionalNameSuffix: String? = null
+)

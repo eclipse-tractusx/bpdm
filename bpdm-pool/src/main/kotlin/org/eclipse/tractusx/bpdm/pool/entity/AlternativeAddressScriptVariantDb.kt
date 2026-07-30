@@ -21,18 +21,16 @@ package org.eclipse.tractusx.bpdm.pool.entity
 
 import jakarta.persistence.Column
 import jakarta.persistence.Embeddable
+import org.hibernate.annotations.Formula
 
 @Embeddable
 data class AlternativeAddressScriptVariantDb(
-    @Column(name = "alt_postcode")
-    val postalCode: String?,
-
     @Column(name = "alt_city")
-    val city: String?,
-
-    @Column(name = "alt_delivery_service_qualifier")
-    val deliveryServiceQualifier: String?,
-
-    @Column(name = "alt_delivery_service_number")
-    val deliveryServiceNumber: String?
-)
+    val city: String?
+){
+    /**
+     * Keeps Hibernate from reading an alternative variant whose only column is null as an absent variant.
+     */
+    @Formula("1")
+    private val isNonNull = 1
+}
