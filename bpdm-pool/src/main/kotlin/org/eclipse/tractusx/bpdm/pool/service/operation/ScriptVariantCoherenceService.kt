@@ -1,0 +1,62 @@
+/*******************************************************************************
+ * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Apache License, Version 2.0 which is available at
+ * https://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ ******************************************************************************/
+
+package org.eclipse.tractusx.bpdm.pool.service.operation
+
+import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
+import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+
+/**
+ * Keeps a legal entity's script variants coherent with the renderings of its legal address: a script variant renders the
+ * name *and* the address, so one whose script code the legal address does not render cannot exist.
+ *
+ * Requests that would break the rule are rejected by the parsers instead. This maintainer exists for the one writer with
+ * no request to reject — the headquarter relocation trigger, which moves a legal entity onto an address it never chose.
+ * Call it *after* the write it reacts to; it reads the legal address as it now stands.
+ */
+@Service
+class ScriptVariantCoherenceService(
+    private val legalEntityRepository: LegalEntityRepository
+) {
+
+    private val logger = KotlinLogging.logger { }
+
+    /**
+     * Removes the script variants of [legalEntity] that its legal address does not render and reports whether any were.
+     */
+    @Transactional
+    fun pruneUnrenderedScriptVariants(legalEntity: LegalEntityDb): Boolean {
+        val renderedScriptCodes = legalEntity.legalAddress.scriptVariants.map { it.scriptCode.technicalKey }.toSet()
+        val unrendered = legalEntity.scriptVariants.filterNot { it.scriptCode.technicalKey in renderedScriptCodes }
+
+        if (unrendered.isEmpty()) return false
+
+        legalEntity.scriptVariants.removeAll(unrendered)
+        legalEntityRepository.save(legalEntity)
+        logger.info {
+            "Removed script variants of legal entity '${legalEntity.bpn}' that its legal address does not render: " +
+                    unrendered.joinToString(", ") { it.scriptCode.technicalKey }
+        }
+
+        return true
+    }
+}

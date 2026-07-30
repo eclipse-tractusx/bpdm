@@ -71,7 +71,8 @@ enum class SiteCreateError : ErrorCode {
     ScriptVariantNameMissing,
     ScriptVariantDuplicateScriptCode,
     MainAddressScriptVariantCityMissing,
-    MainAddressScriptVariantDuplicateScriptCode
+    MainAddressScriptVariantDuplicateScriptCode,
+    ScriptVariantWithoutMainAddressRendering
 }
 
 @Schema(description = "SiteUpdateError")
@@ -110,5 +111,6 @@ enum class AddressUpdateError : ErrorCode {
     AddressDuplicateIdentifier,
     IdentifiersTooMany,
     ScriptVariantCityMissing,
-    ScriptVariantDuplicateScriptCode
+    ScriptVariantDuplicateScriptCode,
+    ScriptVariantRenderingStillReferenced
 }

@@ -116,7 +116,7 @@ class SiteHeaderParser(
     ): SiteScriptVariantParsed? {
         val scriptCode = scriptCodes[variant.scriptCode]
             ?: run { errors.add(SiteContentParseError.ScriptCodeNotFound(index, variant.scriptCode)); null }
-        val name = variant.name?.takeIf { it.isNotBlank() }
+        val name = variant.name.takeIf { it.isNotBlank() }
             ?: run { errors.add(SiteContentParseError.ScriptVariantNameMissing(index)); null }
 
         if (scriptCode == null || name == null) return null

@@ -25,8 +25,8 @@ import jakarta.persistence.Embedded
 
 @Embeddable
 data class PhysicalAddressScriptVariantDb(
-    @Column(name = "phy_city")
-    val city: String?,
+    @Column(name = "phy_city", nullable = false)
+    val city: String,
     @Column(name = "phy_district_l1")
     val district: String?,
 

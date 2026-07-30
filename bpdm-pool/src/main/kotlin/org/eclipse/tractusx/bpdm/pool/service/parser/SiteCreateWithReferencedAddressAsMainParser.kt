@@ -20,19 +20,23 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser
 
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
+import org.eclipse.tractusx.bpdm.pool.model.crossValidateParseResults
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteCreateParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteCreateWithReferencedAddressAsMainParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.SiteCreateWithReferencedAddressAsMainRequest
 import org.eclipse.tractusx.bpdm.pool.model.zipParseResults
 import org.springframework.stereotype.Service
 
 /**
- * Validates site-create requests whose main address is an existing address referenced by BPN.
+ * Validates site-create requests whose main address is an existing address referenced by BPN. The referenced address
+ * keeps its own content, so its existing script variants decide which of the site's script codes are rendered.
  */
 @Service
 class SiteCreateWithReferencedAddressAsMainParser(
     private val siteHeaderParser: SiteHeaderParser,
-    private val addressBpnParser: AddressBpnParser
+    private val addressBpnParser: AddressBpnParser,
+    private val renderingValidator: ScriptVariantRenderingValidator
 ) {
 
     /**
@@ -42,10 +46,17 @@ class SiteCreateWithReferencedAddressAsMainParser(
     fun parse(
         requests: List<SiteCreateWithReferencedAddressAsMainRequest>
     ): List<ParseResult<SiteCreateWithReferencedAddressAsMainParsed, SiteCreateParseError>> {
-        val headerResults = siteHeaderParser.parse(requests.map { it.content.header })
+        val headerResults = siteHeaderParser.parse(requests.map { it.header })
         val mainAddressTargetResults = addressBpnParser.parse(requests.map { it.mainAddressBpn })
+        val renderedHeaderResults: List<ParseResult<SiteHeaderParsed, SiteCreateParseError>> =
+            crossValidateParseResults(mainAddressTargetResults, headerResults) { mainAddress, header ->
+                renderingValidator.check(
+                    header.scriptVariants.map { it.scriptCode.technicalKey },
+                    mainAddress.scriptVariants.map { it.scriptCode.technicalKey }
+                )
+            }
 
-        return zipParseResults(headerResults, mainAddressTargetResults) { header, mainAddress ->
+        return zipParseResults(renderedHeaderResults, mainAddressTargetResults) { header, mainAddress ->
             SiteCreateWithReferencedAddressAsMainParsed(mainAddress, header)
         }
     }

@@ -46,6 +46,12 @@ class SiteParseErrorMapper(
             is LegalAddressAlreadyMainAddress ->
                 ErrorInfo(SiteCreateError.MainAddressDuplicateIdentifier, "Legal address already belongs to site '${error.bpnSite}'", entityKey)
             is AddressContentParseError -> addressParseErrorMapper.toSiteCreateErrorInfo(error, entityKey)
+            is ScriptVariantWithoutAddressRendering ->
+                ErrorInfo(
+                    SiteCreateError.ScriptVariantWithoutMainAddressRendering,
+                    "Script code '${error.scriptCode}' is not rendered by the site's main address",
+                    entityKey
+                )
             is UnresolvableAddress -> throw internalError(error)
             is SiteContentParseError -> contentErrorInfo(
                 error,

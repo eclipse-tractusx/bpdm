@@ -351,14 +351,15 @@ fun getAddressType(logisticAddress: LogisticAddressDb): AddressType {
 }
 
 private fun List<LegalEntityScriptVariantDb>.toLegalEntityScriptVariants(legalAddressVariants: List<LogisticAddressScriptVariantDb>): List<LegalEntityScriptVariantDto>{
-    val legalEntityVariantsByCode = associateBy { it.scriptCode.technicalKey }
     val legalAddressVariantsByCode = legalAddressVariants.associateBy { it.scriptCode.technicalKey }
 
-    val allKeys = legalEntityVariantsByCode.keys.plus(legalAddressVariantsByCode.keys)
-    return allKeys.mapNotNull { key ->
-        val legalEntityProperties = legalEntityVariantsByCode[key] ?: return@mapNotNull null
-        val legalAddressProperties = legalAddressVariantsByCode[key]
-        LegalEntityScriptVariantDto(key, legalEntityProperties.legalName, legalEntityProperties.shortName, legalAddressProperties?.toDto() ?: PostalAddressScriptVariantDto())
+    return map { variant ->
+        val scriptCode = variant.scriptCode.technicalKey
+        // Every legal-entity script variant renders the legal address too: the parsers reject a variant without that
+        // rendering and ScriptVariantCoherenceService prunes any the legal address loses.
+        val legalAddressRendering = legalAddressVariantsByCode[scriptCode]
+            ?: throw IllegalStateException("Legal entity script variant of script code '$scriptCode' has no legal address rendering.")
+        LegalEntityScriptVariantDto(scriptCode, variant.legalName, variant.shortName, legalAddressRendering.toDto())
     }
 }
 
@@ -367,14 +368,13 @@ private fun SiteDb.toSiteScriptVariants(): List<SiteScriptVariantDto>{
 }
 
 private fun List<SiteScriptVariantDb>.toSiteScriptVariants(mainAddressVariants: List<LogisticAddressScriptVariantDb>): List<SiteScriptVariantDto>{
-    val siteVariantsByCode = associateBy { it.scriptCode.technicalKey }
     val mainAddressVariantsByCode = mainAddressVariants.associateBy { it.scriptCode.technicalKey }
 
-    val allKeys = siteVariantsByCode.keys.plus(mainAddressVariantsByCode.keys)
-    return allKeys.mapNotNull { key ->
-        val siteProperties = siteVariantsByCode[key] ?: return@mapNotNull null
-        val mainAddressProperties = mainAddressVariantsByCode[key]
-        SiteScriptVariantDto(key, siteProperties.name , mainAddressProperties?.toDto() ?: PostalAddressScriptVariantDto())
+    return map { variant ->
+        val scriptCode = variant.scriptCode.technicalKey
+        val mainAddressRendering = mainAddressVariantsByCode[scriptCode]
+            ?: throw IllegalStateException("Site script variant of script code '$scriptCode' has no main address rendering.")
+        SiteScriptVariantDto(scriptCode, variant.name, mainAddressRendering.toDto())
     }
 }
 

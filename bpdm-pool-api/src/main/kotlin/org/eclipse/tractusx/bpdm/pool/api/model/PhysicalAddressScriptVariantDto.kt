@@ -19,16 +19,15 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.model
 
+import io.swagger.v3.oas.annotations.media.Schema
+
+@Schema(requiredProperties = ["city"])
 data class PhysicalAddressScriptVariantDto (
-    val city: String? = null,
+    val city: String,
     val district: String? = null,
     val street: StreetScriptVariantDto? = StreetScriptVariantDto(),
     val industrialZone: String? = null,
     val building: String? = null,
     val floor: String? = null,
     val door: String? = null,
-){
-    companion object{
-        val Empty = PhysicalAddressScriptVariantDto()
-    }
-}
+)

@@ -282,17 +282,17 @@ class AdditionalAddressCreationV7IT : UnscheduledPoolTestBaseV7() {
 
     /**
      * GIVEN legal entity
-     * WHEN operator tries to create a new additional address with a script variant that has no physical city
+     * WHEN operator tries to create a new additional address with a script variant whose physical city is blank
      * THEN operator sees ScriptVariantCityMissing error
      */
     @Test
-    fun `try create additional address with script variant without physical city`() {
+    fun `try create additional address with script variant with blank physical city`() {
         //GIVEN
         val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
 
         //WHEN
         val addressRequest = requestFactory.buildAdditionalAddressCreateRequest(testName, legalEntityResponse)
-            .withScriptVariantPhysicalCity(null)
+            .withScriptVariantPhysicalCity("  ")
         val addressResponse = poolClient.addresses.createAddresses(listOf(addressRequest))
 
         //THEN
@@ -304,17 +304,17 @@ class AdditionalAddressCreationV7IT : UnscheduledPoolTestBaseV7() {
 
     /**
      * GIVEN legal entity
-     * WHEN operator tries to create a new additional address with a script variant whose alternative address has no city
+     * WHEN operator tries to create a new additional address with a script variant whose alternative address city is blank
      * THEN operator sees ScriptVariantCityMissing error
      */
     @Test
-    fun `try create additional address with script variant without alternative city`() {
+    fun `try create additional address with script variant with blank alternative city`() {
         //GIVEN
         val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
 
         //WHEN
         val addressRequest = requestFactory.buildAdditionalAddressCreateRequest(testName, legalEntityResponse)
-            .withScriptVariantAlternativeCity(null)
+            .withScriptVariantAlternativeCity("  ")
         val addressResponse = poolClient.addresses.createAddresses(listOf(addressRequest))
 
         //THEN

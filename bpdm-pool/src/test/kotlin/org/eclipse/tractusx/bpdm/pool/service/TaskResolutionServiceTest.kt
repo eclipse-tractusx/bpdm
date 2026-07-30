@@ -1066,6 +1066,20 @@ class TaskResolutionServiceTest @Autowired constructor(
         )
     }
 
+    /**
+     * Renames the site's script variants to the script codes the given address renders. A site on an already existing
+     * main address can only be named in the scripts that address is written in, and the seeded factory picks the site's
+     * and the address's script codes independently.
+     */
+    fun BusinessPartner.withSiteScriptVariantsRenderedBy(bpna: String): BusinessPartner {
+        val renderedScriptCodes = poolClient.addresses.getAddress(bpna).scriptVariants.map { it.scriptCode }
+        return copy(
+            site = site?.copy(
+                scriptVariants = renderedScriptCodes.map { SiteScriptVariant(it, "Site Name $it", PostalAddressScriptVariant.empty) }
+            )
+        )
+    }
+
     fun BusinessPartner.withLegalReferences(legalEntityBpn: BpnReference, legalAddressBpn: BpnReference): BusinessPartner {
         return copy(
             legalEntity = legalEntity.copy(
@@ -1156,6 +1170,7 @@ class TaskResolutionServiceTest @Autowired constructor(
         val updateLinkageRequest = orchTestDataFactory.createFullBusinessPartner("test")
             .withLegalReferences(leRefValue.toBpnRequest(), leAddressRefValue.toBpnRequest())
             .withSiteReferences(siteRefValue.toBpnRequest(), addressRefValue.toBpnRequest())
+            .withSiteScriptVariantsRenderedBy(bpna)
             .copy(additionalAddress = null)
         upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = updateLinkageRequest)
         val createdAddress = poolClient.addresses.getAddress(bpna).address
@@ -1212,6 +1227,7 @@ class TaskResolutionServiceTest @Autowired constructor(
         val createSiteB = orchTestDataFactory.createFullBusinessPartner("siteB")
             .withLegalReferences(leRef.toBpnRequest(), leAddressRef.toBpnRequest())
             .withSiteReferences(siteBRef.toBpnRequest(), sharedMainAddressRef.toBpnRequest())
+            .withSiteScriptVariantsRenderedBy(sharedAddressBpn)
             .copy(additionalAddress = null)
         val resultB = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = createSiteB)
         val siteBBpns = resultB[0].businessPartner.site?.bpnReference?.referenceValue!!

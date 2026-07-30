@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.v7.legalentity
 
+import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityIdentifierDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
@@ -498,17 +499,18 @@ class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
 
     /**
      * GIVEN legal entity
-     * WHEN operator tries to update it with a script variant that has no legal name
+     * WHEN operator tries to update it with a script variant whose legal name is blank
      * THEN operator sees ScriptVariantLegalNameMissing error entry in response
      */
     @Test
-    fun `update legal entity with script variant without legal name`(){
+    fun `update legal entity with script variant with blank legal name`(){
         //GIVEN
         val givenLegalEntity = testDataClient.createLegalEntity(requestFactory.buildLegalEntity(testName))
 
         //WHEN
         val updateRequest = requestFactory.buildLegalEntityUpdateRequest("Updated $testName", givenLegalEntity.header.bpnl)
-            .withScriptVariantLegalName(null)
+            .withLegalForm(anyKnownLegalForm())
+            .withScriptVariantLegalName("  ")
         val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
 
         //THEN
@@ -520,17 +522,18 @@ class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
 
     /**
      * GIVEN legal entity
-     * WHEN operator tries to update it with a script variant whose legal address has no physical city
+     * WHEN operator tries to update it with a script variant whose legal address city is blank
      * THEN operator sees LegalAddressScriptVariantCityMissing error entry in response
      */
     @Test
-    fun `update legal entity with script variant without legal address city`(){
+    fun `update legal entity with script variant with blank legal address city`(){
         //GIVEN
         val givenLegalEntity = testDataClient.createLegalEntity(requestFactory.buildLegalEntity(testName))
 
         //WHEN
         val updateRequest = requestFactory.buildLegalEntityUpdateRequest("Updated $testName", givenLegalEntity.header.bpnl)
-            .withScriptVariantPhysicalCity(null)
+            .withLegalForm(anyKnownLegalForm())
+            .withScriptVariantPhysicalCity("  ")
         val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
 
         //THEN
@@ -552,6 +555,7 @@ class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
 
         //WHEN
         val updateRequest = requestFactory.buildLegalEntityUpdateRequest("Updated $testName", givenLegalEntity.header.bpnl)
+            .withLegalForm(anyKnownLegalForm())
             .withDuplicateScriptVariants()
         val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
 
@@ -564,4 +568,9 @@ class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
 
         assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
     }
+
+    // The v7 test metadata reads legal forms from the ELF code list, which is a superset of what the Pool's migration
+    // inserts, so a seeded pick can land on a legal form the Pool does not know. Take one the Pool actually has.
+    private fun anyKnownLegalForm(): String =
+        poolClient.metadata.getLegalForms(PaginationRequest()).content.first().technicalKey
 }

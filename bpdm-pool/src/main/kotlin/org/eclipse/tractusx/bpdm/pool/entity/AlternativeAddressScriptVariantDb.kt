@@ -21,16 +21,13 @@ package org.eclipse.tractusx.bpdm.pool.entity
 
 import jakarta.persistence.Column
 import jakarta.persistence.Embeddable
-import org.hibernate.annotations.Formula
 
+/**
+ * An alternative address's script-variant text. The city is its only column and is mandatory, so a null column is
+ * exactly an absent alternative rendering — no marker column is needed to tell the two apart.
+ */
 @Embeddable
 data class AlternativeAddressScriptVariantDb(
     @Column(name = "alt_city")
-    val city: String?
-){
-    /**
-     * Keeps Hibernate from reading an alternative variant whose only column is null as an absent variant.
-     */
-    @Formula("1")
-    private val isNonNull = 1
-}
+    val city: String
+)

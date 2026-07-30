@@ -19,6 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.model
 
+import io.swagger.v3.oas.annotations.media.Schema
+
+@Schema(requiredProperties = ["city"])
 data class AlternativeAddressScriptVariantDto(
-    val city: String?
+    val city: String
 )

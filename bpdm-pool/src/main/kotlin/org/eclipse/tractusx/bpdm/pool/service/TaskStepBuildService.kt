@@ -263,7 +263,7 @@ class TaskStepBuildService(
         val bpnSReference = site.bpnReference
         val mergedSite = site.withRelevantScriptVariants(businessPartner)
 
-        val request = taskSiteRequestMapper.toCreateWithReferencedAddressAsMainRequest(existingAddress.bpn, mergedSite, siteMainAddress)
+        val request = taskSiteRequestMapper.toCreateWithReferencedAddressAsMainRequest(existingAddress.bpn, mergedSite)
         val createdSite = when (val result = parseAndExecute(listOf(request), siteCreateWithReferencedAddressAsMainParser::parse, siteCreateWithReferencedAddressAsMainService::create).single()) {
             is ParseResult.Success -> result.parsed
             is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { renderError(it) })
@@ -433,6 +433,8 @@ class TaskStepBuildService(
 
     private fun renderError(error: AddressUpdateParseError): String =
         when (error) {
+            is ScriptVariantWithoutAddressRendering ->
+                "Script code '${error.scriptCode}' must stay rendered: the legal entity or a site of this address renders its name in that script"
             is UnresolvableAddress -> "Address ${error.bpn} not found"
             is AddressContentParseError -> renderError(error)
             is UnresolvableSite -> "Site parent ${error.bpn} not found"
@@ -520,6 +522,7 @@ class TaskStepBuildService(
             is UnresolvableLegalEntity -> "Legal entity ${error.bpn} not found"
             is UnresolvableAddress -> "Address ${error.bpn} not found"
             is LegalAddressAlreadyMainAddress -> "Legal address already is the main address of site ${error.bpnSite}"
+            is ScriptVariantWithoutAddressRendering -> "Script code '${error.scriptCode}' is not rendered by the site main address"
             is SiteContentParseError -> renderError(error)
             is AddressContentParseError -> renderError(error)
         }

@@ -15,9 +15,10 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM Pool: Removed script variants from the deprecated v6 API entirely. Script variants postdate the frozen v6 contract and should never have been added to it.
   As a consequence a business partner written over the v6 API has no script variants, and a v6 update drops the script variants that business partner gained over the v7 API or through the golden record process.
   Please consult the [MIGRATION_GUIDE](./docs/admin/MIGRATION_GUIDE.md) [#1593](https://github.com/eclipse-tractusx/bpdm/issues/1593)
-- BPDM Pool: Script variants are now validated like the invariant data they mirror, so requests that were previously accepted can be rejected.
+- BPDM Pool: Script variants now carry the same mandatory content as the invariant data they mirror, so requests that were previously accepted can be rejected.
   A legal entity script variant needs a `legalName`, a site script variant a `name`, an address script variant the `physicalAddress.city` (and the `alternativeAddress.city` if it supplies an alternative address at all), and no two script variants of one business partner may share a script code.
-  The v7 site script variant `name` became nullable in the schema so the rule surfaces as a per-entry error instead of failing the whole request.
+  These fields became non-null in the v7 API so the requirement is part of the schema, and a Flyway migration deletes stored script variants that do not meet it.
+  A legal entity or site script variant is also only valid where its legal address or site main address renders the same script code, which the site-on-existing-address endpoints now reject and a headquarter relocation now prunes.
   Please consult the [MIGRATION_GUIDE](./docs/admin/MIGRATION_GUIDE.md) [#1593](https://github.com/eclipse-tractusx/bpdm/issues/1593)
 
 ### Added

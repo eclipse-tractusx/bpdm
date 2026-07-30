@@ -79,6 +79,13 @@ class AddressParseErrorMapper {
                     "Site '${error.siteBpn}' does not belong to legal entity '${error.legalEntityBpn}'",
                     entityKey
                 )
+            is ScriptVariantWithoutAddressRendering ->
+                ErrorInfo(
+                    AddressUpdateError.ScriptVariantRenderingStillReferenced,
+                    "Script code '${error.scriptCode}' must stay rendered: the legal entity or a site of this address " +
+                            "renders its name in that script",
+                    entityKey
+                )
             is UnresolvableSite -> throw internalError(error)
         }
 

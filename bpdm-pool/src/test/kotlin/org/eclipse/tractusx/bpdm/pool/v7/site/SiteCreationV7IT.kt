@@ -20,7 +20,9 @@
 package org.eclipse.tractusx.bpdm.pool.v7.site
 
 import org.assertj.core.api.Assertions
+import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto
+import org.eclipse.tractusx.bpdm.pool.api.model.SiteHeaderScriptVariantDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteCreateError
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateResponseWrapper
@@ -276,17 +278,17 @@ class SiteCreationV7IT : UnscheduledPoolTestBaseV7() {
 
     /**
      * GIVEN legal entity
-     * WHEN operator tries to create a new site with a script variant that has no name
+     * WHEN operator tries to create a new site with a script variant whose name is blank
      * THEN operator sees ScriptVariantNameMissing error
      */
     @Test
-    fun `try create site with script variant without name`() {
+    fun `try create site with script variant with blank name`() {
         //GIVEN
         val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
 
         //WHEN
         val siteRequest = requestFactory.buildSiteCreateRequest("New Site $testName", legalEntityResponse)
-            .withScriptVariantName(null)
+            .withScriptVariantName("  ")
         val response = poolClient.sites.createSite(listOf(siteRequest))
 
         //THEN
@@ -298,17 +300,17 @@ class SiteCreationV7IT : UnscheduledPoolTestBaseV7() {
 
     /**
      * GIVEN legal entity
-     * WHEN operator tries to create a new site with a script variant whose main address has no physical city
+     * WHEN operator tries to create a new site with a script variant whose main address city is blank
      * THEN operator sees MainAddressScriptVariantCityMissing error
      */
     @Test
-    fun `try create site with script variant without main address city`() {
+    fun `try create site with script variant with blank main address city`() {
         //GIVEN
         val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
 
         //WHEN
         val siteRequest = requestFactory.buildSiteCreateRequest("New Site $testName", legalEntityResponse)
-            .withScriptVariantPhysicalCity(null)
+            .withScriptVariantPhysicalCity("  ")
         val response = poolClient.sites.createSite(listOf(siteRequest))
 
         //THEN
@@ -347,18 +349,18 @@ class SiteCreationV7IT : UnscheduledPoolTestBaseV7() {
 
     /**
      * GIVEN legal entity
-     * WHEN operator tries to create a legal address site with a script variant that has no name
+     * WHEN operator tries to create a legal address site with a script variant whose name is blank
      * THEN operator sees ScriptVariantNameMissing error
      */
     @Test
-    fun `try create legal address site with script variant without name`() {
+    fun `try create legal address site with script variant with blank name`() {
         //GIVEN
         val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
 
         //WHEN
         val siteRequest = requestFactory.buildLegalSiteCreateRequest("Site $testName", legalEntityResponse.header.bpnl)
             .let { it.copy(scriptVariants = it.scriptVariants.take(1)) }
-            .withScriptVariantName(null)
+            .withScriptVariantName("  ")
         val response = poolClient.sites.createSiteWithLegalReference(listOf(siteRequest))
 
         //THEN
@@ -391,4 +393,31 @@ class SiteCreationV7IT : UnscheduledPoolTestBaseV7() {
 
         assertRepository.assertSiteCreateResponseWrapperIsEqual(response, expectedResponse)
     }
+
+    /**
+     * GIVEN legal entity whose legal address renders one script code
+     * WHEN operator tries to create a legal address site with a script variant of another script code
+     * THEN operator sees ScriptVariantWithoutMainAddressRendering error, because the site main address is the legal
+     * address and does not render that script
+     */
+    @Test
+    fun `try create legal address site with script variant the legal address does not render`() {
+        //GIVEN
+        val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
+
+        //WHEN
+        val unrenderedScriptCode = scriptCodeOtherThan(legalEntityResponse.scriptVariants.map { it.scriptCode }.toSet())
+        val siteRequest = requestFactory.buildLegalSiteCreateRequest("Site $testName", legalEntityResponse.header.bpnl)
+            .let { it.copy(scriptVariants = listOf(SiteHeaderScriptVariantDto(unrenderedScriptCode, "Site Name $testName"))) }
+        val response = poolClient.sites.createSiteWithLegalReference(listOf(siteRequest))
+
+        //THEN
+        val expectedError = ErrorInfo(SiteCreateError.ScriptVariantWithoutMainAddressRendering, "IGNORED", "0")
+        val expectedResponse = SitePartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+
+        assertRepository.assertSiteCreateResponseWrapperIsEqual(response, expectedResponse)
+    }
+
+    private fun scriptCodeOtherThan(scriptCodes: Set<String>): String =
+        poolClient.metadata.getScriptCodes(PaginationRequest()).content.first { it.technicalKey !in scriptCodes }.technicalKey
 }

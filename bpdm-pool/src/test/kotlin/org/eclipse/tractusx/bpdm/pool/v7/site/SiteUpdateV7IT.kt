@@ -211,18 +211,18 @@ class SiteUpdateV7IT : UnscheduledPoolTestBaseV7() {
 
     /**
      * GIVEN site
-     * WHEN operator tries to update the site with a script variant that has no name
+     * WHEN operator tries to update the site with a script variant whose name is blank
      * THEN operator sees ScriptVariantNameMissing error
      */
     @Test
-    fun `try update site with script variant without name`() {
+    fun `try update site with script variant with blank name`() {
         //GIVEN
         val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
         val siteCreateResponse = testDataClient.createSite(legalEntityResponse, testName)
 
         //WHEN
         val updateRequest = requestFactory.createSiteUpdateRequest("New Site $testName", siteCreateResponse)
-            .withScriptVariantName(null)
+            .withScriptVariantName("  ")
         val response = poolClient.sites.updateSite(listOf(updateRequest))
 
         //THEN
@@ -234,18 +234,18 @@ class SiteUpdateV7IT : UnscheduledPoolTestBaseV7() {
 
     /**
      * GIVEN site
-     * WHEN operator tries to update the site with a script variant whose main address has no physical city
+     * WHEN operator tries to update the site with a script variant whose main address city is blank
      * THEN operator sees MainAddressScriptVariantCityMissing error
      */
     @Test
-    fun `try update site with script variant without main address city`() {
+    fun `try update site with script variant with blank main address city`() {
         //GIVEN
         val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
         val siteCreateResponse = testDataClient.createSite(legalEntityResponse, testName)
 
         //WHEN
         val updateRequest = requestFactory.createSiteUpdateRequest("New Site $testName", siteCreateResponse)
-            .withScriptVariantPhysicalCity(null)
+            .withScriptVariantPhysicalCity("  ")
         val response = poolClient.sites.updateSite(listOf(updateRequest))
 
         //THEN

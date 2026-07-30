@@ -129,9 +129,18 @@ class PoolRequestFactoryV7(
 
     fun buildAddressUpdateRequest(seed: String, legalEntity: LegalEntityWithLegalAddressVerboseDto): AddressPartnerUpdateRequest =
         buildAddressUpdateRequest(seed, legalEntity.legalAddress.bpna)
+            .copy(scriptVariants = buildAddressScriptVariants(legalEntity.scriptVariants.map { it.scriptCode }, seed))
 
     fun buildAddressUpdateRequest(seed: String, site: SitePartnerCreateVerboseDto): AddressPartnerUpdateRequest =
         buildAddressUpdateRequest(seed, site.mainAddress.bpna)
+            .copy(scriptVariants = buildAddressScriptVariants(site.site.scriptVariants.map { it.scriptCode }, seed))
+
+    /**
+     * Builds one address script variant per given script code. A legal or site main address has to keep rendering every
+     * script code its legal entity or site renders its name in, so an update of such an address states them explicitly.
+     */
+    fun buildAddressScriptVariants(scriptCodes: List<String>, seed: String): List<LogisticAddressScriptVariantDto> =
+        scriptCodes.map { LogisticAddressScriptVariantDto(it, buildPostalAddressScriptVariant(it, seed)) }
 
     fun buildAddressUpdateRequest(seed: String, createdAddress: AddressPartnerCreateVerboseDtoV7): AddressPartnerUpdateRequest =
         buildAddressUpdateRequest(seed, createdAddress.address.bpna)

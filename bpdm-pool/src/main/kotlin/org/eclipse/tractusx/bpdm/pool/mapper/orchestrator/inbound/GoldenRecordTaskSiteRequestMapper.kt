@@ -49,8 +49,8 @@ class GoldenRecordTaskSiteRequestMapper(
     fun toCreateWithLegalAddressAsMainRequest(legalEntityBpn: String, site: TaskSite): SiteCreateWithLegalAddressAsMainRequest =
         SiteCreateWithLegalAddressAsMainRequest(legalEntityBpn = legalEntityBpn, header = toHeaderRequest(site))
 
-    fun toCreateWithReferencedAddressAsMainRequest(mainAddressBpn: String, site: TaskSite, mainAddress: TaskPostalAddress): SiteCreateWithReferencedAddressAsMainRequest =
-        SiteCreateWithReferencedAddressAsMainRequest(mainAddressBpn = mainAddressBpn, content = toContentRequest(site, mainAddress))
+    fun toCreateWithReferencedAddressAsMainRequest(mainAddressBpn: String, site: TaskSite): SiteCreateWithReferencedAddressAsMainRequest =
+        SiteCreateWithReferencedAddressAsMainRequest(mainAddressBpn = mainAddressBpn, header = toHeaderRequest(site))
 
     private fun toContentRequest(site: TaskSite, mainAddress: TaskPostalAddress): SiteContentRequest =
         SiteContentRequest(
