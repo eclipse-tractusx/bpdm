@@ -180,7 +180,8 @@ class TaskResolutionMapper {
         return with(siteScriptVariant){
             SiteScriptVariant(
                 scriptCode = scriptCode,
-                siteName = name,
+                // Only the request side of the DTO allows a missing name; a persisted variant always carries one.
+                siteName = requireNotNull(name) { "Persisted site script variant of script code '$scriptCode' has no name" },
                 mainAddress = toTaskResult(mainAddress)
             )
         }

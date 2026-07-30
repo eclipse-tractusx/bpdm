@@ -44,4 +44,6 @@ sealed interface LegalEntityContentParseError : LegalEntityCreateParseError, Leg
     data class IdentifiersTooMany(val count: Int) : LegalEntityContentParseError
     data class DuplicateIdentifier(val index: Int, val type: String, val value: String) : LegalEntityContentParseError
     data class ScriptCodeNotFound(val index: Int, val scriptCode: String) : LegalEntityContentParseError
+    data class ScriptVariantLegalNameMissing(val index: Int) : LegalEntityContentParseError
+    data class ScriptVariantDuplicateScriptCode(val index: Int, val scriptCode: String) : LegalEntityContentParseError
 }

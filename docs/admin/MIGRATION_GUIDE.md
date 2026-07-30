@@ -4,6 +4,8 @@
 * [Migration Guide](#migration-guide)
   * [7.4.x to 7.5.x](#74x-to-75x)
     * [Unique site names per legal entity](#unique-site-names-per-legal-entity)
+    * [Script variants removed from the deprecated Pool v6 API](#script-variants-removed-from-the-deprecated-pool-v6-api)
+    * [Script variants are validated like invariant data (Pool)](#script-variants-are-validated-like-invariant-data-pool)
   * [7.3.x to 7.4.x](#73x-to-74x)
     * [Breaking rename of relation DTO fields (Gate)](#breaking-rename-of-relation-dto-fields-gate)
       * [Impact](#impact)
@@ -53,6 +55,30 @@ They should never have become part of it, and the v6 API no longer offers them:
   Mixing v6 writes with script variants is therefore not supported; use the v7 API for business partners that carry them.
 - **Consumers compiling against `bpdm-pool-api` must adjust.** The affected v6 request classes lost a constructor parameter.
   Code that constructs them positionally will no longer compile and needs the `scriptVariants` argument removed.
+
+### Script variants are validated like invariant data (Pool)
+
+A script variant is a complete rendering of a business partner in another script, so it now has to satisfy the same mandatory-field rules as the invariant data it mirrors.
+The Pool rejects a script variant that does not:
+
+- a legal entity script variant must carry a `legalName`
+- a site script variant must carry a `name`
+- an address script variant must carry `physicalAddress.city`, and — if it supplies an `alternativeAddress` at all — `alternativeAddress.city`
+- no two script variants of one business partner may share the same script code
+
+Blank and whitespace-only values count as missing.
+
+#### Impact
+
+- **No operator action is required and no data is migrated.** There is no new database constraint; script variants already stored with missing values stay as they are.
+  The rules apply to writes from this version on.
+- **Requests that were previously accepted are now rejected.** Each violation is reported per entry as an `ErrorInfo`, so a bad entry does not spoil the rest of the batch.
+  The new codes are `ScriptVariantLegalNameMissing`, `ScriptVariantNameMissing`, `ScriptVariantCityMissing`, `ScriptVariantDuplicateScriptCode` and their `LegalAddress…` / `MainAddress…` counterparts.
+- **A script variant can no longer translate only the address.** In the v7 and Orchestrator models one script variant carries the name *and* the address of a script code together.
+  A sharing member who transliterates the legal address must therefore also transliterate the legal name (and likewise for a site).
+  Golden record tasks whose script variants do not meet the rules end up in the error state, and the sharing member sees the reason in the Gate sharing state.
+- **Consumers compiling against `bpdm-pool-api` must adjust.** `SiteScriptVariantDto.name` and `SiteHeaderScriptVariantDto.name` are now nullable, so the rule is reported as a per-entry error instead of a deserialization failure for the whole request.
+  Kotlin code that reads these fields has to handle the nullable type.
 
 ## 7.3.x to 7.4.x
 

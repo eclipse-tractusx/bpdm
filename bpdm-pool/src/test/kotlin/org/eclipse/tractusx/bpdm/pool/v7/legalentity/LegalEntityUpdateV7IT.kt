@@ -495,4 +495,73 @@ class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
 
         assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
     }
+
+    /**
+     * GIVEN legal entity
+     * WHEN operator tries to update it with a script variant that has no legal name
+     * THEN operator sees ScriptVariantLegalNameMissing error entry in response
+     */
+    @Test
+    fun `update legal entity with script variant without legal name`(){
+        //GIVEN
+        val givenLegalEntity = testDataClient.createLegalEntity(requestFactory.buildLegalEntity(testName))
+
+        //WHEN
+        val updateRequest = requestFactory.buildLegalEntityUpdateRequest("Updated $testName", givenLegalEntity.header.bpnl)
+            .withScriptVariantLegalName(null)
+        val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
+
+        //THEN
+        val expectedError = ErrorInfo(LegalEntityUpdateError.ScriptVariantLegalNameMissing, "IGNORED", updateRequest.bpnl)
+        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+
+        assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
+    }
+
+    /**
+     * GIVEN legal entity
+     * WHEN operator tries to update it with a script variant whose legal address has no physical city
+     * THEN operator sees LegalAddressScriptVariantCityMissing error entry in response
+     */
+    @Test
+    fun `update legal entity with script variant without legal address city`(){
+        //GIVEN
+        val givenLegalEntity = testDataClient.createLegalEntity(requestFactory.buildLegalEntity(testName))
+
+        //WHEN
+        val updateRequest = requestFactory.buildLegalEntityUpdateRequest("Updated $testName", givenLegalEntity.header.bpnl)
+            .withScriptVariantPhysicalCity(null)
+        val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
+
+        //THEN
+        val expectedError = ErrorInfo(LegalEntityUpdateError.LegalAddressScriptVariantCityMissing, "IGNORED", updateRequest.bpnl)
+        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+
+        assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
+    }
+
+    /**
+     * GIVEN legal entity
+     * WHEN operator tries to update it with two script variants of the same script code
+     * THEN operator sees the duplicate reported for both the legal entity and its legal address
+     */
+    @Test
+    fun `update legal entity with duplicate script codes`(){
+        //GIVEN
+        val givenLegalEntity = testDataClient.createLegalEntity(requestFactory.buildLegalEntity(testName))
+
+        //WHEN
+        val updateRequest = requestFactory.buildLegalEntityUpdateRequest("Updated $testName", givenLegalEntity.header.bpnl)
+            .withDuplicateScriptVariants()
+        val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
+
+        //THEN
+        val expectedErrors = listOf(
+            ErrorInfo(LegalEntityUpdateError.ScriptVariantDuplicateScriptCode, "IGNORED", updateRequest.bpnl),
+            ErrorInfo(LegalEntityUpdateError.LegalAddressScriptVariantDuplicateScriptCode, "IGNORED", updateRequest.bpnl)
+        )
+        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), expectedErrors)
+
+        assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
+    }
 }

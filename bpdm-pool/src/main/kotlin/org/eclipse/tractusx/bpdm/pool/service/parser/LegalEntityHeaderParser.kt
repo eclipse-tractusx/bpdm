@@ -78,7 +78,7 @@ class LegalEntityHeaderParser(
         val legalForm = parseLegalForm(header.legalForm, metadata, errors)
         val confidence = parseConfidence(header.confidenceCriteria, errors)
         val identifiers = parseIdentifiers(header.identifiers, metadata, errors)
-        val scriptVariants = header.scriptVariants.mapIndexedNotNull { index, variant -> parseScriptVariant(index, variant, metadata, errors) }
+        val scriptVariants = parseScriptVariants(header.scriptVariants, metadata, errors)
 
         if (errors.isNotEmpty()) return ParseResult.Failure(errors)
 
@@ -145,6 +145,22 @@ class LegalEntityHeaderParser(
         }
     }
 
+    private fun parseScriptVariants(
+        requests: List<LegalEntityScriptVariant>,
+        metadata: LegalEntityHeaderMetadata,
+        errors: MutableList<LegalEntityContentParseError>
+    ): List<LegalEntityScriptVariantParsed> {
+        val claimedScriptCodes = mutableSetOf<String>()
+        return requests.mapIndexedNotNull { index, variant ->
+            if (!claimedScriptCodes.add(variant.scriptCode)) {
+                errors.add(LegalEntityContentParseError.ScriptVariantDuplicateScriptCode(index, variant.scriptCode))
+                null
+            } else {
+                parseScriptVariant(index, variant, metadata, errors)
+            }
+        }
+    }
+
     private fun parseScriptVariant(
         index: Int,
         variant: LegalEntityScriptVariant,
@@ -152,7 +168,12 @@ class LegalEntityHeaderParser(
         errors: MutableList<LegalEntityContentParseError>
     ): LegalEntityScriptVariantParsed? {
         val scriptCode = metadata.scriptCodes[variant.scriptCode]
-            ?: run { errors.add(LegalEntityContentParseError.ScriptCodeNotFound(index, variant.scriptCode)); return null }
-        return LegalEntityScriptVariantParsed(scriptCode, variant.legalName, variant.shortName)
+            ?: run { errors.add(LegalEntityContentParseError.ScriptCodeNotFound(index, variant.scriptCode)); null }
+        val legalName = variant.legalName?.takeIf { it.isNotBlank() }
+            ?: run { errors.add(LegalEntityContentParseError.ScriptVariantLegalNameMissing(index)); null }
+
+        if (scriptCode == null || legalName == null) return null
+
+        return LegalEntityScriptVariantParsed(scriptCode, legalName, variant.shortName)
     }
 }

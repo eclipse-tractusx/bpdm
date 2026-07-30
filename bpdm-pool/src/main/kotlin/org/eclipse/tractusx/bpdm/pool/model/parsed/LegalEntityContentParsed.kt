@@ -50,6 +50,6 @@ data class LegalEntityIdentifierParsed(
 
 data class LegalEntityScriptVariantParsed(
     val scriptCode: ScriptCodeDb,
-    val legalName: String?,
+    val legalName: String,
     val shortName: String?
 )

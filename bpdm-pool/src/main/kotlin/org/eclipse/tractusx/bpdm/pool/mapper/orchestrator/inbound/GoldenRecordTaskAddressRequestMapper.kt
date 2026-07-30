@@ -19,9 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.inbound
 
-import org.eclipse.tractusx.bpdm.pool.model.AlternativeAddressScriptVariant
-import org.eclipse.tractusx.bpdm.pool.model.PhysicalAddressScriptVariant
-import org.eclipse.tractusx.bpdm.pool.model.PostalAddressScriptVariant
 import org.eclipse.tractusx.bpdm.pool.model.Street
 import org.eclipse.tractusx.bpdm.pool.model.StreetScriptVariant
 import org.eclipse.tractusx.bpdm.pool.model.request.*

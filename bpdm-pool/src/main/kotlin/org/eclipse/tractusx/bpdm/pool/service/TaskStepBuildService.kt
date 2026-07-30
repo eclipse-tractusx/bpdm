@@ -444,6 +444,7 @@ class TaskStepBuildService(
             is AddressFieldParseError -> renderFieldError(error)
             is AddressMetadataParseError -> renderMetadataError(error)
             is AddressConstraintParseError -> renderConstraintError(error)
+            is AddressScriptVariantParseError -> renderScriptVariantError(error)
         }
 
     private fun renderFieldError(error: AddressFieldParseError): String =
@@ -475,6 +476,13 @@ class TaskStepBuildService(
             is AddressConstraintParseError.DuplicateIdentifier -> "Duplicate identifier of type '${error.type}' with value '${error.value}'"
         }
 
+    private fun renderScriptVariantError(error: AddressScriptVariantParseError): String =
+        when (error) {
+            is AddressScriptVariantParseError.PhysicalCityMissing -> "Script variant ${error.index} has no city in its physical address"
+            is AddressScriptVariantParseError.AlternativeCityMissing -> "Script variant ${error.index} has no city in its alternative address"
+            is AddressScriptVariantParseError.DuplicateScriptCode -> "Duplicate address script variant for script code '${error.scriptCode}'"
+        }
+
     private fun renderError(error: LegalEntityCreateParseError): String =
         when (error) {
             is LegalEntityContentParseError -> renderError(error)
@@ -502,6 +510,9 @@ class TaskStepBuildService(
             is LegalEntityContentParseError.IdentifiersTooMany -> "Too many identifiers: ${error.count} exceeds the allowed limit"
             is LegalEntityContentParseError.DuplicateIdentifier -> "Duplicate identifier of type '${error.type}' with value '${error.value}'"
             is LegalEntityContentParseError.ScriptCodeNotFound -> "Script code '${error.scriptCode}' is not known"
+            is LegalEntityContentParseError.ScriptVariantLegalNameMissing -> "Script variant ${error.index} has no legal name"
+            is LegalEntityContentParseError.ScriptVariantDuplicateScriptCode ->
+                "Duplicate legal entity script variant for script code '${error.scriptCode}'"
         }
 
     private fun renderError(error: SiteCreateParseError): String =
@@ -525,6 +536,8 @@ class TaskStepBuildService(
             SiteContentParseError.NameMissing -> CleaningError.SITE_NAME_MISSING.message
             SiteContentParseError.ConfidenceCriteriaMissing -> CleaningError.SITE_CONFIDENCE_CRITERIA_MISSING.message
             is SiteContentParseError.ScriptCodeNotFound -> "Script code '${error.scriptCode}' is not known"
+            is SiteContentParseError.ScriptVariantNameMissing -> "Script variant ${error.index} has no site name"
+            is SiteContentParseError.ScriptVariantDuplicateScriptCode -> "Duplicate site script variant for script code '${error.scriptCode}'"
         }
 
     private fun updateConfidences(
@@ -617,21 +630,15 @@ class TaskStepBuildService(
     }
 
     private fun Site.withRelevantScriptVariants(businessPartner: BusinessPartner): Site {
-       val scriptVariants =  if(siteMainIsLegalAddress){
-            val legalEntityVariantsByCode = businessPartner.legalEntity.scriptVariants.associateBy { it.scriptCode }
-            val siteVariantsByCode = scriptVariants.associateBy { it.scriptCode }
-            val allScriptCodes = legalEntityVariantsByCode.keys.plus(siteVariantsByCode.keys)
+        if (!siteMainIsLegalAddress) return this
 
-           allScriptCodes.map { scriptCode ->
-               val legalEntityVariant = legalEntityVariantsByCode[scriptCode]
-               val siteVariant = siteVariantsByCode[scriptCode] ?: SiteScriptVariant(scriptCode, "", org.eclipse.tractusx.orchestrator.api.model.PostalAddressScriptVariant.empty)
+        // The main address is the legal address, so its renderings are stored on the legal entity, not on the site.
+        val legalAddressVariantsByCode = businessPartner.legalEntity.scriptVariants.associate { it.scriptCode to it.legalAddress }
 
-               val mainAddressVariant = legalEntityVariant?.legalAddress ?: siteVariant.mainAddress
-
-               siteVariant.copy(mainAddress = mainAddressVariant)
-           }
-        }else { scriptVariants }
-
-        return copy(scriptVariants = scriptVariants)
+        return copy(
+            scriptVariants = scriptVariants.map { variant ->
+                variant.copy(mainAddress = legalAddressVariantsByCode[variant.scriptCode] ?: variant.mainAddress)
+            }
+        )
     }
 }

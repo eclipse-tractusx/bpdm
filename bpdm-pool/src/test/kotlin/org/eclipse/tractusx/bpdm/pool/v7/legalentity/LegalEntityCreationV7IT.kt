@@ -268,4 +268,77 @@ class LegalEntityCreationV7IT: UnscheduledPoolTestBaseV7() {
 
         assertRepository.assertLegalEntityCreateResponseWrapperIsEqual(response, expectedResponse)
     }
+
+    /**
+     * WHEN operator tries to create a new legal entity with a script variant that has no legal name
+     * THEN operator sees ScriptVariantLegalNameMissing error entry in response
+     */
+    @Test
+    fun `create legal entity with script variant without legal name`(){
+        //WHEN
+        val legalEntityRequest = requestFactory.buildLegalEntityCreateRequest(testName).withScriptVariantLegalName(null)
+        val response = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest))
+
+        //THEN
+        val expectedError = ErrorInfo(LegalEntityCreateError.ScriptVariantLegalNameMissing, "IGNORED", legalEntityRequest.index)
+        val expectedResponse = LegalEntityPartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+
+        assertRepository.assertLegalEntityCreateResponseWrapperIsEqual(response, expectedResponse)
+    }
+
+    /**
+     * WHEN operator tries to create a new legal entity with a script variant whose legal name is blank
+     * THEN operator sees ScriptVariantLegalNameMissing error entry in response
+     */
+    @Test
+    fun `create legal entity with script variant with blank legal name`(){
+        //WHEN
+        val legalEntityRequest = requestFactory.buildLegalEntityCreateRequest(testName).withScriptVariantLegalName("  ")
+        val response = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest))
+
+        //THEN
+        val expectedError = ErrorInfo(LegalEntityCreateError.ScriptVariantLegalNameMissing, "IGNORED", legalEntityRequest.index)
+        val expectedResponse = LegalEntityPartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+
+        assertRepository.assertLegalEntityCreateResponseWrapperIsEqual(response, expectedResponse)
+    }
+
+    /**
+     * WHEN operator tries to create a new legal entity with a script variant whose legal address has no physical city
+     * THEN operator sees LegalAddressScriptVariantCityMissing error entry in response
+     */
+    @Test
+    fun `create legal entity with script variant without legal address city`(){
+        //WHEN
+        val legalEntityRequest = requestFactory.buildLegalEntityCreateRequest(testName).withScriptVariantPhysicalCity(null)
+        val response = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest))
+
+        //THEN
+        val expectedError = ErrorInfo(LegalEntityCreateError.LegalAddressScriptVariantCityMissing, "IGNORED", legalEntityRequest.index)
+        val expectedResponse = LegalEntityPartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+
+        assertRepository.assertLegalEntityCreateResponseWrapperIsEqual(response, expectedResponse)
+    }
+
+    /**
+     * WHEN operator tries to create a new legal entity with two script variants of the same script code
+     * THEN operator sees the duplicate reported for both the legal entity and its legal address
+     */
+    @Test
+    fun `create legal entity with duplicate script codes`(){
+        //WHEN
+        val legalEntityRequest = requestFactory.buildLegalEntityCreateRequest(testName).withDuplicateScriptVariants()
+        val response = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest))
+
+        //THEN
+        // One script variant carries both the legal name and the legal address rendering, so a duplicated script code
+        // is reported by the legal entity and by the legal address.
+        val expectedErrors = listOf(
+            ErrorInfo(LegalEntityCreateError.ScriptVariantDuplicateScriptCode, "IGNORED", legalEntityRequest.index),
+            ErrorInfo(LegalEntityCreateError.LegalAddressScriptVariantDuplicateScriptCode, "IGNORED", legalEntityRequest.index)
+        )
+        val expectedResponse = LegalEntityPartnerCreateResponseWrapper(emptyList(), expectedErrors)
+
+        assertRepository.assertLegalEntityCreateResponseWrapperIsEqual(response, expectedResponse)
+    }
 }

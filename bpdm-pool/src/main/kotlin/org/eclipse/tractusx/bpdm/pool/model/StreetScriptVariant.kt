@@ -20,29 +20,9 @@
 package org.eclipse.tractusx.bpdm.pool.model
 
 /**
- * Shared script-variant address content, reused as-is across the loose request ([org.eclipse.tractusx.bpdm.pool.model.request.AddressScriptVariant])
- * and resolved ([org.eclipse.tractusx.bpdm.pool.model.parsed.AddressScriptVariantParsed]) stages: it carries no stage-specific metadata.
+ * A street's script-variant text, shared by the loose request and the validated stage because every one of its parts
+ * stays optional in both.
  */
-data class PostalAddressScriptVariant(
-    val addressName: String? = null,
-    val physicalAddress: PhysicalAddressScriptVariant = PhysicalAddressScriptVariant(),
-    val alternativeAddress: AlternativeAddressScriptVariant? = null
-)
-
-data class PhysicalAddressScriptVariant(
-    val city: String? = null,
-    val district: String? = null,
-    val street: StreetScriptVariant? = null,
-    val industrialZone: String? = null,
-    val building: String? = null,
-    val floor: String? = null,
-    val door: String? = null
-)
-
-data class AlternativeAddressScriptVariant(
-    val city: String? = null
-)
-
 data class StreetScriptVariant(
     val name: String? = null,
     val direction: String? = null,

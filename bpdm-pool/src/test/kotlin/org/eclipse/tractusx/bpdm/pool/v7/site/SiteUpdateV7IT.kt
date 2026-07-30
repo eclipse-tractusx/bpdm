@@ -26,9 +26,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerUpdateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteUpdateError
 import org.eclipse.tractusx.bpdm.pool.v7.UnscheduledPoolTestBaseV7
-import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withAlternativeAdminArea
-import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withMainAddressIdentifiers
-import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withPhysicalAdminArea
+import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.*
 import org.junit.jupiter.api.Test
 
 class SiteUpdateV7IT : UnscheduledPoolTestBaseV7() {
@@ -207,6 +205,78 @@ class SiteUpdateV7IT : UnscheduledPoolTestBaseV7() {
         //THEN
         val expectedError = ErrorInfo(SiteUpdateError.MainAddressIdentifiersTooMany, "IGNORED", updateRequest.bpns)
         val expectedResponse = SitePartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+
+        assertRepository.assertSiteUpdateResponseWrapperIsEqual(response, expectedResponse)
+    }
+
+    /**
+     * GIVEN site
+     * WHEN operator tries to update the site with a script variant that has no name
+     * THEN operator sees ScriptVariantNameMissing error
+     */
+    @Test
+    fun `try update site with script variant without name`() {
+        //GIVEN
+        val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
+        val siteCreateResponse = testDataClient.createSite(legalEntityResponse, testName)
+
+        //WHEN
+        val updateRequest = requestFactory.createSiteUpdateRequest("New Site $testName", siteCreateResponse)
+            .withScriptVariantName(null)
+        val response = poolClient.sites.updateSite(listOf(updateRequest))
+
+        //THEN
+        val expectedError = ErrorInfo(SiteUpdateError.ScriptVariantNameMissing, "IGNORED", updateRequest.bpns)
+        val expectedResponse = SitePartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+
+        assertRepository.assertSiteUpdateResponseWrapperIsEqual(response, expectedResponse)
+    }
+
+    /**
+     * GIVEN site
+     * WHEN operator tries to update the site with a script variant whose main address has no physical city
+     * THEN operator sees MainAddressScriptVariantCityMissing error
+     */
+    @Test
+    fun `try update site with script variant without main address city`() {
+        //GIVEN
+        val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
+        val siteCreateResponse = testDataClient.createSite(legalEntityResponse, testName)
+
+        //WHEN
+        val updateRequest = requestFactory.createSiteUpdateRequest("New Site $testName", siteCreateResponse)
+            .withScriptVariantPhysicalCity(null)
+        val response = poolClient.sites.updateSite(listOf(updateRequest))
+
+        //THEN
+        val expectedError = ErrorInfo(SiteUpdateError.MainAddressScriptVariantCityMissing, "IGNORED", updateRequest.bpns)
+        val expectedResponse = SitePartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+
+        assertRepository.assertSiteUpdateResponseWrapperIsEqual(response, expectedResponse)
+    }
+
+    /**
+     * GIVEN site
+     * WHEN operator tries to update the site with two script variants of the same script code
+     * THEN operator sees the duplicate reported for both the site and its main address
+     */
+    @Test
+    fun `try update site with duplicate script codes`() {
+        //GIVEN
+        val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
+        val siteCreateResponse = testDataClient.createSite(legalEntityResponse, testName)
+
+        //WHEN
+        val updateRequest = requestFactory.createSiteUpdateRequest("New Site $testName", siteCreateResponse)
+            .withDuplicateScriptVariants()
+        val response = poolClient.sites.updateSite(listOf(updateRequest))
+
+        //THEN
+        val expectedErrors = listOf(
+            ErrorInfo(SiteUpdateError.ScriptVariantDuplicateScriptCode, "IGNORED", updateRequest.bpns),
+            ErrorInfo(SiteUpdateError.MainAddressScriptVariantDuplicateScriptCode, "IGNORED", updateRequest.bpns)
+        )
+        val expectedResponse = SitePartnerUpdateResponseWrapper(emptyList(), expectedErrors)
 
         assertRepository.assertSiteUpdateResponseWrapperIsEqual(response, expectedResponse)
     }

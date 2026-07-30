@@ -272,7 +272,7 @@ class RefinementTestDataFactory {
         return with(siteScriptVariant){
             SiteScriptVariant(
                 scriptCode = scriptCode,
-                siteName = name,
+                siteName = requireNotNull(name) { "A site script variant without a name cannot become a golden record task result" },
                 mainAddress = buildPostalAddressScriptVariant(mainAddress)
             )
         }

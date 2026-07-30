@@ -21,5 +21,5 @@ package org.eclipse.tractusx.bpdm.pool.api.model
 
 data class SiteHeaderScriptVariantDto (
     val scriptCode: String,
-    val name: String
+    val name: String?
 )

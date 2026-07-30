@@ -19,9 +19,29 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.request
 
-import org.eclipse.tractusx.bpdm.pool.model.PostalAddressScriptVariant
+import org.eclipse.tractusx.bpdm.pool.model.StreetScriptVariant
 
 data class AddressScriptVariant(
     val scriptCode: String,
     val address: PostalAddressScriptVariant
+)
+
+data class PostalAddressScriptVariant(
+    val addressName: String? = null,
+    val physicalAddress: PhysicalAddressScriptVariant = PhysicalAddressScriptVariant(),
+    val alternativeAddress: AlternativeAddressScriptVariant? = null
+)
+
+data class PhysicalAddressScriptVariant(
+    val city: String? = null,
+    val district: String? = null,
+    val street: StreetScriptVariant? = null,
+    val industrialZone: String? = null,
+    val building: String? = null,
+    val floor: String? = null,
+    val door: String? = null
+)
+
+data class AlternativeAddressScriptVariant(
+    val city: String? = null
 )

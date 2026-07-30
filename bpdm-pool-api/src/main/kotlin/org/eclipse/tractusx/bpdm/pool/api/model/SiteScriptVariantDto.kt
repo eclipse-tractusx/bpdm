@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.api.model
 
 data class SiteScriptVariantDto(
     val scriptCode: String,
-    val name: String,
+    val name: String?,
     val mainAddress: PostalAddressScriptVariantDto
 ){
     fun toHeader(): SiteHeaderScriptVariantDto{

@@ -58,7 +58,7 @@ class SiteHeaderParser(
 
         val name = header.name ?: run { errors.add(SiteContentParseError.NameMissing); null }
         val confidence = parseConfidence(header.confidenceCriteria, errors)
-        val scriptVariants = header.scriptVariants.mapIndexedNotNull { index, variant -> parseScriptVariant(index, variant, scriptCodes, errors) }
+        val scriptVariants = parseScriptVariants(header.scriptVariants, scriptCodes, errors)
 
         if (errors.isNotEmpty()) return ParseResult.Failure(errors)
 
@@ -92,6 +92,22 @@ class SiteHeaderParser(
         return ConfidenceCriteriaParsed(sharedByOwner, checkedByExternalDataSource, lastConfidenceCheckAt, nextConfidenceCheckAt)
     }
 
+    private fun parseScriptVariants(
+        requests: List<SiteScriptVariant>,
+        scriptCodes: Map<String, ScriptCodeDb>,
+        errors: MutableList<SiteContentParseError>
+    ): List<SiteScriptVariantParsed> {
+        val claimedScriptCodes = mutableSetOf<String>()
+        return requests.mapIndexedNotNull { index, variant ->
+            if (!claimedScriptCodes.add(variant.scriptCode)) {
+                errors.add(SiteContentParseError.ScriptVariantDuplicateScriptCode(index, variant.scriptCode))
+                null
+            } else {
+                parseScriptVariant(index, variant, scriptCodes, errors)
+            }
+        }
+    }
+
     private fun parseScriptVariant(
         index: Int,
         variant: SiteScriptVariant,
@@ -99,7 +115,12 @@ class SiteHeaderParser(
         errors: MutableList<SiteContentParseError>
     ): SiteScriptVariantParsed? {
         val scriptCode = scriptCodes[variant.scriptCode]
-            ?: run { errors.add(SiteContentParseError.ScriptCodeNotFound(index, variant.scriptCode)); return null }
-        return SiteScriptVariantParsed(scriptCode, variant.name)
+            ?: run { errors.add(SiteContentParseError.ScriptCodeNotFound(index, variant.scriptCode)); null }
+        val name = variant.name?.takeIf { it.isNotBlank() }
+            ?: run { errors.add(SiteContentParseError.ScriptVariantNameMissing(index)); null }
+
+        if (scriptCode == null || name == null) return null
+
+        return SiteScriptVariantParsed(scriptCode, name)
     }
 }

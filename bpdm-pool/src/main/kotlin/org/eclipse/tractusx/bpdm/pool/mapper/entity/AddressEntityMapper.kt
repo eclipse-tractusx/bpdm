@@ -121,7 +121,7 @@ class AddressEntityMapper {
             additionalNameSuffix = street.additionalNameSuffix
         )
 
-    private fun toPhysicalScriptVariant(variant: PhysicalAddressScriptVariant) =
+    private fun toPhysicalScriptVariant(variant: PhysicalAddressScriptVariantParsed) =
         PhysicalAddressScriptVariantDb(
             city = variant.city,
             district = variant.district,
@@ -132,7 +132,7 @@ class AddressEntityMapper {
             door = variant.door
         )
 
-    private fun toAlternativeScriptVariant(variant: AlternativeAddressScriptVariant) =
+    private fun toAlternativeScriptVariant(variant: AlternativeAddressScriptVariantParsed) =
         AlternativeAddressScriptVariantDb(
             city = variant.city
         )

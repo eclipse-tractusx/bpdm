@@ -35,5 +35,5 @@ data class SiteHeaderRequest(
 
 data class SiteScriptVariant(
     val scriptCode: String,
-    val name: String
+    val name: String?
 )

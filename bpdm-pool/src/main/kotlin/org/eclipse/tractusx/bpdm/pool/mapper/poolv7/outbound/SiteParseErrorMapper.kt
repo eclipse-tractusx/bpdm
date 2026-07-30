@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound
 
+import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorCode
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteCreateError
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteUpdateError
@@ -28,9 +29,10 @@ import org.springframework.stereotype.Component
 
 /**
  * Maps the site services' sealed parse errors to the `/sites` [ErrorInfo] codes (main-address errors delegated to
- * [AddressParseErrorMapper]). [SiteContentParseError] has no public code (name/confidence guaranteed by the bounded DTO;
- * unknown header script code previously NPE'd) and neither does [UnresolvableAddress] (its path is only invoked for an
- * address just resolved) — all internal errors. The `when`s are exhaustive so a new error won't compile until it gets a code.
+ * [AddressParseErrorMapper]). The site's own name/confidence errors have no public code (guaranteed by the bounded DTO),
+ * an unknown header script code previously NPE'd, and [UnresolvableAddress] is only invoked for an address just resolved
+ * — all internal errors. Script-variant content is client-nullable and therefore does get public codes. The `when`s are
+ * exhaustive so a new error won't compile until it gets a code.
  */
 @Component
 class SiteParseErrorMapper(
@@ -45,7 +47,12 @@ class SiteParseErrorMapper(
                 ErrorInfo(SiteCreateError.MainAddressDuplicateIdentifier, "Legal address already belongs to site '${error.bpnSite}'", entityKey)
             is AddressContentParseError -> addressParseErrorMapper.toSiteCreateErrorInfo(error, entityKey)
             is UnresolvableAddress -> throw internalError(error)
-            is SiteContentParseError -> throw internalError(error)
+            is SiteContentParseError -> contentErrorInfo(
+                error,
+                entityKey,
+                scriptVariantNameMissing = SiteCreateError.ScriptVariantNameMissing,
+                scriptVariantDuplicateScriptCode = SiteCreateError.ScriptVariantDuplicateScriptCode
+            )
         }
 
     fun toUpdateErrorInfo(error: SiteUpdateParseError, entityKey: String?): ErrorInfo<SiteUpdateError> =
@@ -53,7 +60,28 @@ class SiteParseErrorMapper(
             is UnresolvableSite ->
                 ErrorInfo(SiteUpdateError.SiteNotFound, "Site '${error.bpn}' can't be updated as it doesn't exist", entityKey)
             is AddressContentParseError -> addressParseErrorMapper.toSiteUpdateErrorInfo(error, entityKey)
-            is SiteContentParseError -> throw internalError(error)
+            is SiteContentParseError -> contentErrorInfo(
+                error,
+                entityKey,
+                scriptVariantNameMissing = SiteUpdateError.ScriptVariantNameMissing,
+                scriptVariantDuplicateScriptCode = SiteUpdateError.ScriptVariantDuplicateScriptCode
+            )
+        }
+
+    private fun <E : ErrorCode> contentErrorInfo(
+        error: SiteContentParseError,
+        entityKey: String?,
+        scriptVariantNameMissing: E,
+        scriptVariantDuplicateScriptCode: E
+    ): ErrorInfo<E> =
+        when (error) {
+            is SiteContentParseError.ScriptVariantNameMissing ->
+                ErrorInfo(scriptVariantNameMissing, "Script variant ${error.index} has no site name", entityKey)
+            is SiteContentParseError.ScriptVariantDuplicateScriptCode ->
+                ErrorInfo(scriptVariantDuplicateScriptCode, "Duplicate site script variant for script code '${error.scriptCode}'", entityKey)
+            is SiteContentParseError.NameMissing,
+            is SiteContentParseError.ConfidenceCriteriaMissing,
+            is SiteContentParseError.ScriptCodeNotFound -> throw internalError(error)
         }
 
     private fun internalError(error: SiteCreateParseError) =

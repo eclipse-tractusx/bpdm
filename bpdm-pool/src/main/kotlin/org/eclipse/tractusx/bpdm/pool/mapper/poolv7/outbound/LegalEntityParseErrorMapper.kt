@@ -29,9 +29,9 @@ import org.springframework.stereotype.Component
 
 /**
  * Maps the legal-entity services' sealed parse errors to the `/legal-entities` [ErrorInfo] codes (legal-address errors
- * delegated to [AddressParseErrorMapper]). Only legal-form / identifier-type / duplicate / too-many identifiers have a
- * public code; presence errors are guaranteed absent by the bounded DTO and an unknown header script code previously
- * NPE'd — both become internal errors. The `when`s are exhaustive so a new error won't compile until it gets a code.
+ * delegated to [AddressParseErrorMapper]). Header presence errors are guaranteed absent by the bounded DTO and an
+ * unknown header script code previously NPE'd — both become internal errors. Script-variant content is client-nullable
+ * and therefore does get public codes. The `when`s are exhaustive so a new error won't compile until it gets a code.
  */
 @Component
 class LegalEntityParseErrorMapper(
@@ -47,7 +47,9 @@ class LegalEntityParseErrorMapper(
                 legalFormNotFound = LegalEntityCreateError.LegalFormNotFound,
                 identifierNotFound = LegalEntityCreateError.LegalEntityIdentifierNotFound,
                 duplicateIdentifier = LegalEntityCreateError.LegalEntityDuplicateIdentifier,
-                identifiersTooMany = LegalEntityCreateError.LegalEntityIdentifiersTooMany
+                identifiersTooMany = LegalEntityCreateError.LegalEntityIdentifiersTooMany,
+                scriptVariantLegalNameMissing = LegalEntityCreateError.ScriptVariantLegalNameMissing,
+                scriptVariantDuplicateScriptCode = LegalEntityCreateError.ScriptVariantDuplicateScriptCode
             )
         }
 
@@ -68,7 +70,9 @@ class LegalEntityParseErrorMapper(
                 legalFormNotFound = LegalEntityUpdateError.LegalFormNotFound,
                 identifierNotFound = LegalEntityUpdateError.LegalEntityIdentifierNotFound,
                 duplicateIdentifier = LegalEntityUpdateError.LegalEntityDuplicateIdentifier,
-                identifiersTooMany = LegalEntityUpdateError.LegalEntityIdentifiersTooMany
+                identifiersTooMany = LegalEntityUpdateError.LegalEntityIdentifiersTooMany,
+                scriptVariantLegalNameMissing = LegalEntityUpdateError.ScriptVariantLegalNameMissing,
+                scriptVariantDuplicateScriptCode = LegalEntityUpdateError.ScriptVariantDuplicateScriptCode
             )
         }
 
@@ -78,7 +82,9 @@ class LegalEntityParseErrorMapper(
         legalFormNotFound: E,
         identifierNotFound: E,
         duplicateIdentifier: E,
-        identifiersTooMany: E
+        identifiersTooMany: E,
+        scriptVariantLegalNameMissing: E,
+        scriptVariantDuplicateScriptCode: E
     ): ErrorInfo<E> =
         when (error) {
             is LegalEntityContentParseError.LegalFormNotFound ->
@@ -89,6 +95,10 @@ class LegalEntityParseErrorMapper(
                 ErrorInfo(duplicateIdentifier, "Duplicate Legal Entity Identifier: Value '${error.value}' of type '${error.type}'", entityKey)
             is LegalEntityContentParseError.IdentifiersTooMany ->
                 ErrorInfo(identifiersTooMany, "Amount of identifiers (${error.count}) exceeds the allowed limit", entityKey)
+            is LegalEntityContentParseError.ScriptVariantLegalNameMissing ->
+                ErrorInfo(scriptVariantLegalNameMissing, "Script variant ${error.index} has no legal name", entityKey)
+            is LegalEntityContentParseError.ScriptVariantDuplicateScriptCode ->
+                ErrorInfo(scriptVariantDuplicateScriptCode, "Duplicate legal entity script variant for script code '${error.scriptCode}'", entityKey)
             is LegalEntityContentParseError.NameMissing,
             is LegalEntityContentParseError.ConfidenceCriteriaMissing,
             is LegalEntityContentParseError.IdentifierValueMissing,

@@ -4816,11 +4816,14 @@ components:
           enum:
             - BpnNotValid
             - SiteNotFound
+            - SiteNotInLegalEntity
             - LegalEntityNotFound
             - RegionNotFound
             - IdentifierNotFound
             - AddressDuplicateIdentifier
             - IdentifiersTooMany
+            - ScriptVariantCityMissing
+            - ScriptVariantDuplicateScriptCode
         message:
           type: string
         entityKey:
@@ -4835,10 +4838,13 @@ components:
           description: AddressUpdateError
           enum:
             - AddressNotFound
+            - SiteNotInLegalEntity
             - RegionNotFound
             - IdentifierNotFound
             - AddressDuplicateIdentifier
             - IdentifiersTooMany
+            - ScriptVariantCityMissing
+            - ScriptVariantDuplicateScriptCode
         message:
           type: string
         entityKey:
@@ -4860,6 +4866,10 @@ components:
             - LegalAddressDuplicateIdentifier
             - LegalEntityIdentifiersTooMany
             - LegalAddressIdentifiersTooMany
+            - ScriptVariantLegalNameMissing
+            - ScriptVariantDuplicateScriptCode
+            - LegalAddressScriptVariantCityMissing
+            - LegalAddressScriptVariantDuplicateScriptCode
         message:
           type: string
         entityKey:
@@ -4882,6 +4892,11 @@ components:
             - LegalAddressDuplicateIdentifier
             - LegalEntityIdentifiersTooMany
             - LegalAddressIdentifiersTooMany
+            - MultipleUltimateOwnersInHierarchy
+            - ScriptVariantLegalNameMissing
+            - ScriptVariantDuplicateScriptCode
+            - LegalAddressScriptVariantCityMissing
+            - LegalAddressScriptVariantDuplicateScriptCode
         message:
           type: string
         entityKey:
@@ -4900,6 +4915,10 @@ components:
             - MainAddressRegionNotFound
             - MainAddressDuplicateIdentifier
             - MainAddressIdentifiersTooMany
+            - ScriptVariantNameMissing
+            - ScriptVariantDuplicateScriptCode
+            - MainAddressScriptVariantCityMissing
+            - MainAddressScriptVariantDuplicateScriptCode
         message:
           type: string
         entityKey:
@@ -4918,6 +4937,10 @@ components:
             - MainAddressRegionNotFound
             - MainAddressDuplicateIdentifier
             - MainAddressIdentifiersTooMany
+            - ScriptVariantNameMissing
+            - ScriptVariantDuplicateScriptCode
+            - MainAddressScriptVariantCityMissing
+            - MainAddressScriptVariantDuplicateScriptCode
         message:
           type: string
         entityKey:

@@ -67,3 +67,13 @@ sealed interface AddressConstraintParseError : AddressContentParseError {
     data class IdentifiersTooMany(val count: Int) : AddressConstraintParseError
     data class DuplicateIdentifier(val index: Int, val type: String, val value: String) : AddressConstraintParseError
 }
+
+/**
+ * Errors of an address's script variants. Kept apart from [AddressFieldParseError] because that group is unreachable by
+ * contract and therefore maps to an internal error, while every script-variant field is client-nullable.
+ */
+sealed interface AddressScriptVariantParseError : AddressContentParseError {
+    data class PhysicalCityMissing(val index: Int) : AddressScriptVariantParseError
+    data class AlternativeCityMissing(val index: Int) : AddressScriptVariantParseError
+    data class DuplicateScriptCode(val index: Int, val scriptCode: String) : AddressScriptVariantParseError
+}

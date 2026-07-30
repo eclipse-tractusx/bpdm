@@ -22,9 +22,6 @@ package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.dto.LogisticAddressWithScriptVariantsDto
-import org.eclipse.tractusx.bpdm.pool.model.AlternativeAddressScriptVariant
-import org.eclipse.tractusx.bpdm.pool.model.PhysicalAddressScriptVariant
-import org.eclipse.tractusx.bpdm.pool.model.PostalAddressScriptVariant
 import org.eclipse.tractusx.bpdm.pool.model.Street
 import org.eclipse.tractusx.bpdm.pool.model.StreetScriptVariant
 import org.eclipse.tractusx.bpdm.pool.model.request.*

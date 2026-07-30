@@ -36,7 +36,11 @@ enum class LegalEntityCreateError : ErrorCode {
     LegalAddressIdentifierNotFound,
     LegalAddressDuplicateIdentifier,
     LegalEntityIdentifiersTooMany,
-    LegalAddressIdentifiersTooMany
+    LegalAddressIdentifiersTooMany,
+    ScriptVariantLegalNameMissing,
+    ScriptVariantDuplicateScriptCode,
+    LegalAddressScriptVariantCityMissing,
+    LegalAddressScriptVariantDuplicateScriptCode
 }
 
 @Schema(description = "LegalEntityUpdateError")
@@ -50,7 +54,11 @@ enum class LegalEntityUpdateError : ErrorCode {
     LegalAddressDuplicateIdentifier,
     LegalEntityIdentifiersTooMany,
     LegalAddressIdentifiersTooMany,
-    MultipleUltimateOwnersInHierarchy
+    MultipleUltimateOwnersInHierarchy,
+    ScriptVariantLegalNameMissing,
+    ScriptVariantDuplicateScriptCode,
+    LegalAddressScriptVariantCityMissing,
+    LegalAddressScriptVariantDuplicateScriptCode
 }
 
 @Schema(description = "SiteCreateError")
@@ -59,7 +67,11 @@ enum class SiteCreateError : ErrorCode {
     MainAddressIdentifierNotFound,
     MainAddressRegionNotFound,
     MainAddressDuplicateIdentifier,
-    MainAddressIdentifiersTooMany
+    MainAddressIdentifiersTooMany,
+    ScriptVariantNameMissing,
+    ScriptVariantDuplicateScriptCode,
+    MainAddressScriptVariantCityMissing,
+    MainAddressScriptVariantDuplicateScriptCode
 }
 
 @Schema(description = "SiteUpdateError")
@@ -68,7 +80,11 @@ enum class SiteUpdateError : ErrorCode {
     MainAddressIdentifierNotFound,
     MainAddressRegionNotFound,
     MainAddressDuplicateIdentifier,
-    MainAddressIdentifiersTooMany
+    MainAddressIdentifiersTooMany,
+    ScriptVariantNameMissing,
+    ScriptVariantDuplicateScriptCode,
+    MainAddressScriptVariantCityMissing,
+    MainAddressScriptVariantDuplicateScriptCode
 }
 
 @Schema(description = "AddressCreateError")
@@ -80,7 +96,9 @@ enum class AddressCreateError : ErrorCode {
     RegionNotFound,
     IdentifierNotFound,
     AddressDuplicateIdentifier,
-    IdentifiersTooMany
+    IdentifiersTooMany,
+    ScriptVariantCityMissing,
+    ScriptVariantDuplicateScriptCode
 }
 
 @Schema(description = "AddressUpdateError")
@@ -90,5 +108,7 @@ enum class AddressUpdateError : ErrorCode {
     RegionNotFound,
     IdentifierNotFound,
     AddressDuplicateIdentifier,
-    IdentifiersTooMany
+    IdentifiersTooMany,
+    ScriptVariantCityMissing,
+    ScriptVariantDuplicateScriptCode
 }
