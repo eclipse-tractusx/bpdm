@@ -37,6 +37,23 @@ This is enforced by a new database constraint (`uc_sites_legal_entity_name`) on 
 > If your Pool already contains two or more sites with the same name under the same legal entity, the migration will fail.
 > Please make sure that site names are unique within each legal entity before upgrading, otherwise the deployment will not start.
 
+### Script variants removed from the deprecated Pool v6 API
+
+Script variants were introduced in 7.4.0, at which point the Pool v6 API was already frozen.
+They should never have become part of it, and the v6 API no longer offers them:
+`scriptVariants` is gone from the v6 address create and update requests, from the v6 site DTO used by site create and update, and from the v6 request that creates a site with the legal address as its main address.
+
+#### Impact
+
+- **No operator action is required and no data is migrated.** Script variants themselves are unchanged; only the v6 API surface loses them.
+  The v7 API and the golden record process remain the way to read and write them.
+- **v6 callers sending `scriptVariants` are not rejected.** The field is ignored rather than refused, so existing v6 requests keep working and no request needs to be changed to avoid an error.
+- **A v6 write leaves a business partner without script variants.** Because a write replaces a business partner's full content, updating over v6 a business partner that has script variants — gained over v7 or through the golden record process — removes them.
+  This also produces an `UPDATE` changelog entry, so sharing members will see the script variants disappear from their Gate output.
+  Mixing v6 writes with script variants is therefore not supported; use the v7 API for business partners that carry them.
+- **Consumers compiling against `bpdm-pool-api` must adjust.** The affected v6 request classes lost a constructor parameter.
+  Code that constructs them positionally will no longer compile and needs the `scriptVariants` argument removed.
+
 ## 7.3.x to 7.4.x
 
 ### Breaking rename of relation DTO fields (Gate)

@@ -11,8 +11,10 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 ### Breaking
 
 - BPDM Pool, Gate and Orchestrator: Removed fields from business partner script variants that are not written differently in another script.
-  A script variant no longer contains the physical address `postalCode`, `companyPostalCode` and `taxJurisdictionCode`, its street's `houseNumber`, `houseNumberSupplement` and `milestone`, or the alternative address `postalCode`, `deliveryServiceQualifier` and `deliveryServiceNumber`.
-  The deprecated Pool v6 API keeps these fields in its request contract but ignores them [#1593](https://github.com/eclipse-tractusx/bpdm/issues/1593)
+  A script variant no longer contains the physical address `postalCode`, `companyPostalCode` and `taxJurisdictionCode`, its street's `houseNumber`, `houseNumberSupplement` and `milestone`, or the alternative address `postalCode`, `deliveryServiceQualifier` and `deliveryServiceNumber` [#1593](https://github.com/eclipse-tractusx/bpdm/issues/1593)
+- BPDM Pool: Removed script variants from the deprecated v6 API entirely. Script variants postdate the frozen v6 contract and should never have been added to it.
+  As a consequence a business partner written over the v6 API has no script variants, and a v6 update drops the script variants that business partner gained over the v7 API or through the golden record process.
+  Please consult the [MIGRATION_GUIDE](./docs/admin/MIGRATION_GUIDE.md) [#1593](https://github.com/eclipse-tractusx/bpdm/issues/1593)
 
 ### Added
 

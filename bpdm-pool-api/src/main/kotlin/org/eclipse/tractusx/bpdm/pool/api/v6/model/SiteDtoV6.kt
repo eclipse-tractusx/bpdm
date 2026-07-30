@@ -35,8 +35,6 @@ data class SiteDtoV6(
 
     override val confidenceCriteria: ConfidenceCriteriaDtoV6,
 
-    val scriptVariants: List<SiteScriptVariantDtoV6> = emptyList(),
-
     @get:Schema(description = CommonDescription.updatedAt)
     val updatedAt: Instant? = null
 ) : IBaseSiteDto{
@@ -44,8 +42,7 @@ data class SiteDtoV6(
         return SiteHeaderDtoV6(
             name,
             states,
-            confidenceCriteria,
-            scriptVariants.map { it.toHeader() }
+            confidenceCriteria
         )
     }
 }

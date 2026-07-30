@@ -24,8 +24,8 @@ package org.eclipse.tractusx.bpdm.pool.mapper.poolv6
  *
  * The v6 model was split off from v7 into its own package so the two can evolve independently. The internal Pool
  * services and the shared v7 request/response mappers still speak the v7 DTOs, so the v6-specific controllers,
- * application services and mappers bridge across with these converters. The two DTO families are currently structurally
- * identical; if a v7 type diverges, its converter here is the single place that must reconcile the difference.
+ * application services and mappers bridge across with these converters. Where a v7 type carries something v6 does not
+ * - script variants, for instance - its converter here is the single place that reconciles the difference.
  */
 
 import org.eclipse.tractusx.bpdm.pool.api.model.*
@@ -37,7 +37,6 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.AddressIdentifierDtoV6 as V6A
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.AddressIdentifierVerboseDtoV6 as V6AddressIdentifierVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.AddressStateDtoV6 as V6AddressStateDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.AddressStateVerboseDtoV6 as V6AddressStateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.AlternativeAddressScriptVariantDtoV6 as V6AlternativeAddressScriptVariantDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.AlternativePostalAddressDtoV6 as V6AlternativePostalAddressDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.AlternativePostalAddressVerboseDtoV6 as V6AlternativePostalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.ChangelogTypeV6 as V6ChangelogType
@@ -48,15 +47,10 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityIdentifierVerboseD
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityRelationTypeV6 as V6LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityStateVerboseDtoV6 as V6LegalEntityStateVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressDtoV6 as V6LogisticAddressDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressScriptVariantDtoV6 as V6LogisticAddressScriptVariantDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.PhysicalAddressScriptVariantDtoV6 as V6PhysicalAddressScriptVariantDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.PhysicalPostalAddressDtoV6 as V6PhysicalPostalAddressDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.PhysicalPostalAddressVerboseDtoV6 as V6PhysicalPostalAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.PostalAddressScriptVariantDtoV6 as V6PostalAddressScriptVariantDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.RegionDtoV6 as V6RegionDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.SiteDtoV6 as V6SiteDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.SiteHeaderScriptVariantDtoV6 as V6SiteHeaderScriptVariantDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.SiteScriptVariantDtoV6 as V6SiteScriptVariantDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.SiteStateDtoV6 as V6SiteStateDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.SiteStateVerboseDtoV6 as V6SiteStateVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.StreetDtoV6 as V6StreetDto
@@ -181,7 +175,6 @@ fun V6StreetDto.toV7() = StreetDto(
 fun V6AddressStateDto.toV7() = AddressStateDto(validFrom = validFrom, validTo = validTo, type = type)
 fun V6AddressIdentifierDto.toV7() = org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto(value = value, type = type)
 fun V6SiteStateDto.toV7() = SiteStateDto(validFrom = validFrom, validTo = validTo, type = type)
-fun V6SiteHeaderScriptVariantDto.toV7() = SiteHeaderScriptVariantDto(scriptCode = scriptCode, name = name)
 
 fun V6PhysicalPostalAddressDto.toV7() = org.eclipse.tractusx.bpdm.pool.api.model.PhysicalPostalAddressDto(
     geographicCoordinates = geographicCoordinates,
@@ -222,47 +215,14 @@ fun V6LogisticAddressDto.toV7() = LogisticAddressDto(
     updatedAt = updatedAt
 )
 
-// v6 script variants still carry fields that are not script-dependent (postal codes, tax jurisdiction, house numbers,
-// delivery service qualifier and number). They remain in the released v6 contract but are dropped here.
-fun V6AlternativeAddressScriptVariantDto.toV7() = AlternativeAddressScriptVariantDto(
-    city = city
-)
-
-fun V6PhysicalAddressScriptVariantDto.toV7() = PhysicalAddressScriptVariantDto(
-    city = city,
-    district = district,
-    street = street?.toScriptVariantV7(),
-    industrialZone = industrialZone,
-    building = building,
-    floor = floor,
-    door = door
-)
-
-fun V6StreetDto.toScriptVariantV7() = StreetScriptVariantDto(
-    name = name,
-    direction = direction,
-    namePrefix = namePrefix,
-    additionalNamePrefix = additionalNamePrefix,
-    nameSuffix = nameSuffix,
-    additionalNameSuffix = additionalNameSuffix
-)
-
-fun V6PostalAddressScriptVariantDto.toV7() = PostalAddressScriptVariantDto(
-    addressName = addressName,
-    physicalAddress = physicalAddress.toV7(),
-    alternativeAddress = alternativeAddress?.toV7()
-)
-
-fun V6LogisticAddressScriptVariantDto.toV7() = LogisticAddressScriptVariantDto(scriptCode = scriptCode, address = address.toV7())
-
-fun V6SiteScriptVariantDto.toV7() = SiteScriptVariantDto(scriptCode = scriptCode, name = name, mainAddress = mainAddress.toV7())
-
+// v6 has no script variants, so every v6 write sends none. Because a v7 write replaces the full script variant list,
+// this means a v6 write drops the script variants a business partner may have gained through v7 or the task path.
 fun V6SiteDto.toV7() = SiteDto(
     name = name,
     states = states.map { it.toV7() },
     mainAddress = mainAddress.toV7(),
     confidenceCriteria = confidenceCriteria.toV7(),
-    scriptVariants = scriptVariants.map { it.toV7() },
+    scriptVariants = emptyList(),
     updatedAt = updatedAt
 )
 
@@ -275,7 +235,7 @@ fun V6SiteCreateRequestWithLegalAddressAsMain.toV7() = SiteCreateRequestWithLega
     states = states.map { it.toV7() },
     confidenceCriteria = confidenceCriteria.toV7(),
     bpnLParent = bpnLParent,
-    scriptVariants = scriptVariants.map { it.toV7() }
+    scriptVariants = emptyList()
 )
 
 /* --------------------- Outbound: v7 error info -> v6 --------------------- */

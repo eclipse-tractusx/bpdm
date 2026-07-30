@@ -25,15 +25,12 @@ import org.eclipse.tractusx.bpdm.common.dto.RequestWithKey
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LogisticAddressDescription
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressScriptVariantDtoV6
 
 @Schema(description = LogisticAddressDescription.headerCreateRequest, deprecated = true)
 data class AddressPartnerCreateRequestV6(
 
     @field:JsonUnwrapped
     val address: LogisticAddressDtoV6,
-
-    val scriptVariants: List<LogisticAddressScriptVariantDtoV6> = emptyList(),
 
     @Schema(description = LogisticAddressDescription.bpnParent)
     val bpnParent: String,

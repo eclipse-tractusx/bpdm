@@ -61,7 +61,9 @@ class AddressUpdateApplicationV6Service(
 
         val requestList = requests.toList()
         val updateRequests = requestList.map {
-            AddressUpdateRequest(addressBpn = it.bpna, siteBpn = null, content = addressDtoRequestMapper.toContentRequest(it.address.toV7(), it.scriptVariants.map { sv -> sv.toV7() }))
+            // v6 has no script variants and an update replaces the full list, so a v6 update drops the script variants
+            // the address may have gained through v7 or the task path.
+            AddressUpdateRequest(addressBpn = it.bpna, siteBpn = null, content = addressDtoRequestMapper.toContentRequest(it.address.toV7(), emptyList()))
         }
 
         val responses = mutableListOf<LogisticAddressVerboseDtoV6>()
