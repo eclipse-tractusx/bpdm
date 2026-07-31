@@ -177,16 +177,16 @@ class TaskResolutionServiceTest @Autowired constructor(
 
         val createdBpnl = createResult[0].businessPartner.legalEntity.bpnReference.referenceValue!!
         assertThat(createResult[0].businessPartner.legalEntity.ownershipUltimate).isTrue()
-        assertThat(createResult[0].businessPartner.legalEntity.ultimateOwnerBpnl).isEqualTo(createdBpnl)
+        assertThat(createResult[0].businessPartner.legalEntity.ultimateOwnerBpnl).isNull()
 
         val createdFromPoolApi = poolClient.legalEntities.getLegalEntity(createdBpnl)
         assertThat(createdFromPoolApi.header.ownershipUltimate).isTrue()
-        assertThat(createdFromPoolApi.header.ultimateOwnerBpnl).isEqualTo(createdBpnl)
+        assertThat(createdFromPoolApi.header.ultimateOwnerBpnl).isNull()
 
         val persistedEntity = legalEntityRepository.findByBpnIgnoreCase(createdBpnl)
         assertThat(persistedEntity).isNotNull()
         assertThat(persistedEntity!!.ownershipUltimate).isTrue()
-        assertThat(persistedEntity.ultimateOwnerBpnl).isEqualTo(createdBpnl)
+        assertThat(persistedEntity.ultimateOwnerBpnl).isNull()
     }
 
     @Test
@@ -223,12 +223,12 @@ class TaskResolutionServiceTest @Autowired constructor(
 
         val updatedFromPoolApi = poolClient.legalEntities.getLegalEntity(createdBpnl)
         assertThat(updatedFromPoolApi.header.ownershipUltimate).isTrue()
-        assertThat(updatedFromPoolApi.header.ultimateOwnerBpnl).isEqualTo(createdBpnl)
+        assertThat(updatedFromPoolApi.header.ultimateOwnerBpnl).isNull()
 
         val persistedEntity = legalEntityRepository.findByBpnIgnoreCase(createdBpnl)
         assertThat(persistedEntity).isNotNull()
         assertThat(persistedEntity!!.ownershipUltimate).isTrue()
-        assertThat(persistedEntity.ultimateOwnerBpnl).isEqualTo(createdBpnl)
+        assertThat(persistedEntity.ultimateOwnerBpnl).isNull()
     }
 
 
@@ -1298,7 +1298,7 @@ class TaskResolutionServiceTest @Autowired constructor(
         val persistedEntity = legalEntityRepository.findByBpnIgnoreCase(createdBpnl)
         assertThat(persistedEntity).isNotNull()
         assertThat(persistedEntity!!.ownershipUltimate).isTrue()
-        assertThat(persistedEntity.ultimateOwnerBpnl).isEqualTo(createdBpnl)
+        assertThat(persistedEntity.ultimateOwnerBpnl).isNull()
         val updateRequest = createRequest
             .copy(legalEntity = createRequest.legalEntity.copy(ownershipUltimate = false))
 
@@ -1402,6 +1402,27 @@ class TaskResolutionServiceTest @Autowired constructor(
         val ultimateOwner = ultimateOwnerResolutionService.resolve(subsidiaryEntity)
 
         assertThat(ultimateOwner).isNull()
+    }
+
+    @Test
+    fun `ultimate owner resolution - returns highest flagged ancestor even when top is unflagged`() {
+        val subsidiary = createLegalEntity("BPNL_TOPFLAG_S")
+        val intermediate = createLegalEntity("BPNL_TOPFLAG_I")
+        val groupParent = createLegalEntity("BPNL_TOPFLAG_P")
+
+        createIsOwnedByRelation(subsidiary.legalEntity.header.bpnl, intermediate.legalEntity.header.bpnl)
+        createIsOwnedByRelation(intermediate.legalEntity.header.bpnl, groupParent.legalEntity.header.bpnl)
+
+        val intermediateEntity = legalEntityRepository.findByBpnIgnoreCase(intermediate.legalEntity.header.bpnl)!!
+        intermediateEntity.ownershipUltimate = true
+        legalEntityRepository.save(intermediateEntity)
+
+        val subsidiaryEntity = legalEntityRepository.findByBpnIgnoreCase(subsidiary.legalEntity.header.bpnl)!!
+        val parentEntity = legalEntityRepository.findByBpnIgnoreCase(groupParent.legalEntity.header.bpnl)!!
+
+        assertThat(ultimateOwnerResolutionService.resolveUltimateOwner(subsidiaryEntity)).isEqualTo(intermediate.legalEntity.header.bpnl)
+        assertThat(ultimateOwnerResolutionService.resolveUltimateOwner(intermediateEntity)).isEqualTo(intermediate.legalEntity.header.bpnl)
+        assertThat(ultimateOwnerResolutionService.resolveUltimateOwner(parentEntity)).isNull()
     }
 
     @Test
@@ -1571,7 +1592,7 @@ class TaskResolutionServiceTest @Autowired constructor(
         val parentDbAfter = legalEntityRepository.findByBpnIgnoreCase(parent.legalEntity.header.bpnl)!!
 
         assertThat(parentDbAfter.ownershipUltimate).isTrue()
-        assertThat(parentDbAfter.ultimateOwnerBpnl).isEqualTo(parent.legalEntity.header.bpnl)
+        assertThat(parentDbAfter.ultimateOwnerBpnl).isNull()
         assertThat(subsidiaryDbAfter.ultimateOwnerBpnl).isEqualTo(parent.legalEntity.header.bpnl)
         assertThat(intermediateDbAfter.ultimateOwnerBpnl).isEqualTo(parent.legalEntity.header.bpnl)
     }
@@ -1590,12 +1611,15 @@ class TaskResolutionServiceTest @Autowired constructor(
         createIsOwnedByRelationViaService(subsidiary.legalEntity.header.bpnl, intermediate.legalEntity.header.bpnl)
         createIsOwnedByRelationViaService(intermediate.legalEntity.header.bpnl, parent.legalEntity.header.bpnl)
 
+        ultimateOwnerResolutionService.updateUltimateOwnerForEntityAndDescendants(parentDb)
+
+        parentDb = legalEntityRepository.findByBpnIgnoreCase(parent.legalEntity.header.bpnl)!!
         var subsidiaryDb = legalEntityRepository.findByBpnIgnoreCase(subsidiary.legalEntity.header.bpnl)!!
         var intermediateDb = legalEntityRepository.findByBpnIgnoreCase(intermediate.legalEntity.header.bpnl)!!
 
         assertThat(subsidiaryDb.ultimateOwnerBpnl).isEqualTo(parent.legalEntity.header.bpnl)
         assertThat(intermediateDb.ultimateOwnerBpnl).isEqualTo(parent.legalEntity.header.bpnl)
-        assertThat(parentDb.ultimateOwnerBpnl).isEqualTo(parent.legalEntity.header.bpnl)
+        assertThat(parentDb.ultimateOwnerBpnl).isNull()
 
         parentDb.ownershipUltimate = false
         parentDb.ultimateOwnerBpnl = null
@@ -1657,7 +1681,7 @@ class TaskResolutionServiceTest @Autowired constructor(
         val subsidiaryDbAfter = legalEntityRepository.findByBpnIgnoreCase(subsidiary.legalEntity.header.bpnl)!!
         val intermediateDbAfter = legalEntityRepository.findByBpnIgnoreCase(intermediate.legalEntity.header.bpnl)!!
 
-        assertThat(parentDb.ultimateOwnerBpnl).isEqualTo(parent.legalEntity.header.bpnl)
+        assertThat(parentDb.ultimateOwnerBpnl).isNull()
         assertThat(intermediateDbAfter.ultimateOwnerBpnl).isEqualTo(parent.legalEntity.header.bpnl)
         assertThat(subsidiaryDbAfter.ultimateOwnerBpnl).isEqualTo(parent.legalEntity.header.bpnl)
     }
@@ -1719,7 +1743,7 @@ class TaskResolutionServiceTest @Autowired constructor(
         val grand2DbAfter = legalEntityRepository.findByBpnIgnoreCase(grand2.legalEntity.header.bpnl)!!
         val parentDbAfter = legalEntityRepository.findByBpnIgnoreCase(parent.legalEntity.header.bpnl)!!
 
-        assertThat(parentDbAfter.ultimateOwnerBpnl).isEqualTo(parent.legalEntity.header.bpnl)
+        assertThat(parentDbAfter.ultimateOwnerBpnl).isNull()
         assertThat(child1DbAfter.ultimateOwnerBpnl).isEqualTo(parent.legalEntity.header.bpnl)
         assertThat(child2DbAfter.ultimateOwnerBpnl).isEqualTo(parent.legalEntity.header.bpnl)
         assertThat(grand1DbAfter.ultimateOwnerBpnl).isEqualTo(parent.legalEntity.header.bpnl)
