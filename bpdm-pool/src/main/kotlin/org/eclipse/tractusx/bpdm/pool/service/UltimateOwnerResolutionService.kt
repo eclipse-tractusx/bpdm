@@ -44,34 +44,42 @@ class UltimateOwnerResolutionService(
     @Transactional(readOnly = true)
     fun resolveUltimateOwner(legalEntity: LegalEntityDb): String? {
         val visited = mutableSetOf<String>()
-        return resolveUltimateOwnerWithCycleProtection(legalEntity, visited)
+        return resolveHighestFlaggedAncestorWithCycleProtection(legalEntity, visited).ownerBpnl
     }
 
 
-    private fun resolveUltimateOwnerWithCycleProtection(legalEntity: LegalEntityDb, visited: MutableSet<String>): String? {
+    private fun resolveHighestFlaggedAncestorWithCycleProtection(legalEntity: LegalEntityDb, visited: MutableSet<String>): ResolutionResult {
         val currentBpn = legalEntity.bpn
 
         if (currentBpn in visited) {
             logger.warn { "Cycle detected in ownership chain at BPNL: $currentBpn" }
-            return null
+            return ResolutionResult(ownerBpnl = null, cycleDetected = true)
         }
         visited.add(currentBpn)
 
         val owningRelations = relationRepository.findByTypeAndStartNode(LegalEntityRelationType.IsOwnedBy, legalEntity)
         val validOwningRelations = owningRelations.filter { isRelationCurrentlyValid(it) }
 
-        if (validOwningRelations.isEmpty()) {
-            return if (legalEntity.ownershipUltimate) currentBpn else null
-        }
+        var highestFlaggedOwner = if (legalEntity.ownershipUltimate) currentBpn else null
+
         for (relation in validOwningRelations) {
             val parent = relation.endNode
-            val parentUltimateOwner = resolveUltimateOwnerWithCycleProtection(parent, visited)
-            if (parentUltimateOwner != null) {
-                return parentUltimateOwner
+            val parentResolution = resolveHighestFlaggedAncestorWithCycleProtection(parent, visited)
+            if (parentResolution.cycleDetected) {
+                return parentResolution
+            }
+            if (parentResolution.ownerBpnl != null) {
+                highestFlaggedOwner = parentResolution.ownerBpnl
             }
         }
-        return null
+
+        return ResolutionResult(ownerBpnl = highestFlaggedOwner, cycleDetected = false)
     }
+
+    private data class ResolutionResult(
+        val ownerBpnl: String?,
+        val cycleDetected: Boolean
+    )
 
     @Transactional
     fun updateUltimateOwnerForEntityAndDescendants(legalEntity: LegalEntityDb, visited: MutableSet<String> = mutableSetOf()) {
@@ -83,18 +91,20 @@ class UltimateOwnerResolutionService(
         }
         visited.add(currentBpn)
 
-        val ultimateOwnerBpnl = resolveUltimateOwner(legalEntity)
+        val resolvedUltimateOwnerBpnl = resolveUltimateOwner(legalEntity)
+        // The flagged legal entity itself has no ultimateOwnerBpnl; only descendants point to it.
+        val ultimateOwnerBpnlToStore = if (resolvedUltimateOwnerBpnl == legalEntity.bpn) null else resolvedUltimateOwnerBpnl
         val previousUltimateOwnerBpnl = legalEntity.ultimateOwnerBpnl
 
-        if (previousUltimateOwnerBpnl != ultimateOwnerBpnl) {
-            legalEntity.ultimateOwnerBpnl = ultimateOwnerBpnl
+        if (previousUltimateOwnerBpnl != ultimateOwnerBpnlToStore) {
+            legalEntity.ultimateOwnerBpnl = ultimateOwnerBpnlToStore
             legalEntityRepository.save(legalEntity)
             changelogService.createChangelogEntry(
                 ChangelogEntryCreateRequest(legalEntity.bpn, ChangelogType.UPDATE, BusinessPartnerType.LEGAL_ENTITY)
             )
-            logger.debug { "Updated ultimateOwnerBpnl for ${legalEntity.bpn} from $previousUltimateOwnerBpnl to $ultimateOwnerBpnl" }
+            logger.debug { "Updated ultimateOwnerBpnl for ${legalEntity.bpn} from $previousUltimateOwnerBpnl to $ultimateOwnerBpnlToStore" }
         } else {
-            logger.debug { "ultimateOwnerBpnl for ${legalEntity.bpn} unchanged: $ultimateOwnerBpnl" }
+            logger.debug { "ultimateOwnerBpnl for ${legalEntity.bpn} unchanged: $ultimateOwnerBpnlToStore" }
         }
 
         val childRelations = relationRepository.findByTypeAndEndNode(LegalEntityRelationType.IsOwnedBy, legalEntity)
@@ -106,7 +116,7 @@ class UltimateOwnerResolutionService(
         }
     }
 
-    private fun isRelationCurrentlyValid(relation: org.eclipse.tractusx.bpdm.pool.entity.RelationDb): Boolean {
+    private fun isRelationCurrentlyValid(relation: RelationDb): Boolean {
         if (relation.validityPeriods.isEmpty()) {
             return false
         }
