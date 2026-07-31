@@ -22,7 +22,6 @@ package org.eclipse.tractusx.bpdm.orchestrator.v7.businesspartner
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.orchestrator.v7.UnscheduledOrchestratorTestBaseV7
 import org.eclipse.tractusx.orchestrator.api.model.*
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.web.reactive.function.client.WebClientResponseException
 
@@ -93,7 +92,6 @@ class BusinessPartnerTaskResultSearchV7IT: UnscheduledOrchestratorTestBaseV7() {
      * THEN user sees 400 BAD REQUEST error
      */
     @Test
-    @Disabled("ToDo: https://github.com/eclipse-tractusx/bpdm/issues/1597")
     fun `search no existing task id`(){
         //GIVEN
         testDataClient.createBusinessPartnerTask(testName)
