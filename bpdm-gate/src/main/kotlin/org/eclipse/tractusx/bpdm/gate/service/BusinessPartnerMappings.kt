@@ -296,7 +296,7 @@ class BusinessPartnerMappings {
                 siteName = site.name,
                 addressName = address.name,
                 physicalAddress = toPhysicalAddressScriptVariantDb(address.physicalAddress),
-                alternativeAddress = address.alternativeAddress?.let { toAlternativeAddressScriptVariantDb(it) })
+                alternativeAddress = toAlternativeAddressScriptVariantDb(address.alternativeAddress))
         }
     }
 
@@ -314,12 +314,8 @@ class BusinessPartnerMappings {
         }
     }
 
-    private fun toAlternativeAddressScriptVariantDb(dto: AlternativeAddressScriptVariantDto): AlternativePostalAddressScriptVariantDb{
-        return with(dto){
-            AlternativePostalAddressScriptVariantDb(
-                city = city
-            )
-        }
+    private fun toAlternativeAddressScriptVariantDb(dto: AlternativeAddressScriptVariantDto?): AlternativePostalAddressScriptVariantDb?{
+        return dto?.city?.let { AlternativePostalAddressScriptVariantDb(city = it) }
     }
 
     private fun toStreetScriptVariant(dto: StreetScriptVariantDto): StreetScriptVariantDb{

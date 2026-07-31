@@ -17,17 +17,10 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.entity
+package org.eclipse.tractusx.bpdm.test.testdata.gate.v7
 
-import jakarta.persistence.Column
-import jakarta.persistence.Embeddable
+import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 
-/**
- * An alternative address's script-variant text. The city is its only column and is mandatory, so a null column is
- * exactly an absent alternative address in that script — no marker column is needed to tell the two apart.
- */
-@Embeddable
-data class AlternativePostalAddressScriptVariantDb (
-    @Column(name = "alt_city")
-    val city: String
-)
+
+fun BusinessPartnerInputRequest.withoutAlternativeAddressScriptVariants() =
+    copy(scriptVariants = scriptVariants.map { it.copy(address = it.address.copy(alternativeAddress = null)) })

@@ -563,9 +563,7 @@ class GoldenRecordUpdateChunkService(
         )
 
     private fun AlternativeAddressScriptVariantDto.toEntity() =
-        AlternativePostalAddressScriptVariantDb(
-            city = city
-        )
+        city?.let { AlternativePostalAddressScriptVariantDb(city = it) }
 
     private fun StreetScriptVariantDto.toEntity() =
         StreetScriptVariantDb(
