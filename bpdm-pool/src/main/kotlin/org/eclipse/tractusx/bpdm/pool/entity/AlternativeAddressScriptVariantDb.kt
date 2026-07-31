@@ -24,7 +24,7 @@ import jakarta.persistence.Embeddable
 
 /**
  * An alternative address's script-variant text. The city is its only column and is mandatory, so a null column is
- * exactly an absent alternative rendering — no marker column is needed to tell the two apart.
+ * exactly an absent alternative address in that script — no marker column is needed to tell the two apart.
  */
 @Embeddable
 data class AlternativeAddressScriptVariantDb(

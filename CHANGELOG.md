@@ -18,7 +18,9 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM Pool: Script variants now carry the same mandatory content as the invariant data they mirror, so requests that were previously accepted can be rejected.
   A legal entity script variant needs a `legalName`, a site script variant a `name`, an address script variant the `physicalAddress.city` (and the `alternativeAddress.city` if it supplies an alternative address at all), and no two script variants of one business partner may share a script code.
   These fields became non-null in the v7 API so the requirement is part of the schema, and a Flyway migration deletes stored script variants that do not meet it.
-  A legal entity or site script variant is also only valid where its legal address or site main address renders the same script code, which the site-on-existing-address endpoints now reject and a headquarter relocation now prunes.
+  A legal entity or site script variant is also only valid where its legal address or site main address covers the same script code, which every create and update now rejects and a headquarter relocation now prunes.
+  For the same reason no write may take that coverage away from a business partner that still needs it: an address update, a site update, a legal entity update or a golden record task that drops a script code the address's legal entity or one of its sites is still named in is rejected with `ScriptVariantCoverageStillNeeded`.
+  A golden record task is judged as a whole here, so it may rewrite the business partners it carries itself and is only rejected for coverage it takes away from business partners it does not carry.
   Please consult the [MIGRATION_GUIDE](./docs/admin/MIGRATION_GUIDE.md) [#1593](https://github.com/eclipse-tractusx/bpdm/issues/1593)
 
 ### Added
@@ -29,6 +31,9 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM Gate: Business partner output now includes additional sites belonging to an address [#1661](https://github.com/eclipse-tractusx/sig-release/issues/1661)
 
 ### Changed
+
+- BPDM Pool: A golden record task that puts a new site on an already existing address now applies the site main address payload it carries to that address, instead of leaving the address content untouched.
+  This is what lets such a site be named in its own scripts; in exchange the payload has to keep covering the scripts the address's other business partners are named in [#1661](https://github.com/eclipse-tractusx/sig-release/issues/1661)
 
 ## [7.4.0] - 2026-06-10
 

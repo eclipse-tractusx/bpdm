@@ -136,8 +136,8 @@ class PoolRequestFactoryV7(
             .copy(scriptVariants = buildAddressScriptVariants(site.site.scriptVariants.map { it.scriptCode }, seed))
 
     /**
-     * Builds one address script variant per given script code. A legal or site main address has to keep rendering every
-     * script code its legal entity or site renders its name in, so an update of such an address states them explicitly.
+     * Builds one address script variant per given script code. A legal or site main address has to keep covering every
+     * script code its legal entity or site is named in, so an update of such an address states them explicitly.
      */
     fun buildAddressScriptVariants(scriptCodes: List<String>, seed: String): List<LogisticAddressScriptVariantDto> =
         scriptCodes.map { LogisticAddressScriptVariantDto(it, buildPostalAddressScriptVariant(it, seed)) }
@@ -315,6 +315,13 @@ class PoolRequestFactoryV7(
         val idKey = availableAddressIdentifiers.random(random)
         return AddressIdentifierDto("$idKey Value $seed $index", idKey)
     }
+
+    /**
+     * The script code this factory picks for [seed], so a caller can pin an entity to the code of a related seed - needed
+     * when several entities share one address and therefore have to be named in the scripts that address covers.
+     */
+    fun scriptCodeFor(seed: String, random: Random = Random(seed.hashCode().toLong())): String? =
+        availableScriptCodes.randomOrNull(random)
 
     fun buildSiteScriptVariant(seed: String, random: Random = Random(seed.hashCode().toLong())): SiteScriptVariantDto?{
         val scriptCode = availableScriptCodes.randomOrNull(random) ?: return null

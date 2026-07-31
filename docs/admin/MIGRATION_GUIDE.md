@@ -58,13 +58,14 @@ They should never have become part of it, and the v6 API no longer offers them:
 
 ### Script variants are validated like invariant data (Pool)
 
-A script variant is a complete rendering of a business partner in another script, so it now has to carry the same mandatory content as the invariant data it mirrors:
+A script variant is a business partner written out completely in another script, so it now has to carry the same mandatory content as the invariant data it mirrors:
 
 - a legal entity script variant must carry a `legalName`
 - a site script variant must carry a `name`
 - an address script variant must carry `physicalAddress.city`, and — if it supplies an `alternativeAddress` at all — `alternativeAddress.city`
 - no two script variants of one business partner may share the same script code
-- a legal entity or site script variant is only valid where its legal address or site main address renders the same script code
+- a legal entity or site script variant is only valid where its legal address or site main address covers the same script code,
+  and no write may take that coverage away from a business partner that still needs it
 
 Those fields are non-null in the v7 API, so the requirement is part of the schema rather than a check applied afterwards.
 Blank and whitespace-only values are still rejected by validation, per entry.
@@ -73,18 +74,27 @@ Blank and whitespace-only values are still rejected by validation, per entry.
 
 - **The migration deletes script variants that do not meet the rules.** `V7_5_0_5__require_script_variant_content.sql` removes
   `legal_entity_script_variants` rows without a `legal_name`, `site_script_variants` rows without a `name`, `address_script_variants` rows without a `phy_city`,
-  and legal entity or site script variants whose script code the owning legal address or site main address does not render.
+  and legal entity or site script variants whose script code the owning legal address or site main address does not cover.
   It then sets those three columns `NOT NULL`.
   If you need to keep such data, export it before upgrading — the rows are invalid under the new contract and cannot be represented by the API any more.
 - **Requests missing a required field are rejected as a whole.** Because the field is non-null in the schema, a missing value fails deserialization with a `400` for the entire request instead of a per-entry error.
   A blank value still yields a per-entry `ErrorInfo`; the new codes are `ScriptVariantLegalNameMissing`, `ScriptVariantNameMissing`, `ScriptVariantCityMissing`, `ScriptVariantDuplicateScriptCode`,
-  `ScriptVariantWithoutMainAddressRendering`, `ScriptVariantRenderingStillReferenced` and the `LegalAddress…` / `MainAddress…` counterparts.
+  `ScriptVariantNotCoveredByMainAddress`, `ScriptVariantCoverageStillNeeded` and the `LegalAddress…` / `MainAddress…` counterparts.
 - **A script variant can no longer translate only the address.** In the v7 and Orchestrator models one script variant carries the name *and* the address of a script code together.
   A sharing member who transliterates the legal address must therefore also transliterate the legal name (and likewise for a site).
   Golden record tasks whose script variants do not meet the rules end up in the error state, and the sharing member sees the reason in the Gate sharing state.
-- **A site created on an existing address can only be named in the scripts that address renders.** The endpoints that take the legal address or a referenced address as the site main address
-  reject a site script variant whose script code that address does not render, and the referenced-address request no longer accepts address content it never applied.
-- **A headquarter relocation drops the legal entity's unrendered script variants.** When the new legal address does not render a script code, the legal entity's script variant for it is removed
+- **A site created on an existing address can only be named in the scripts that address covers.** The endpoint that takes the legal address as the site main address
+  rejects a site script variant whose script code the legal address does not cover.
+- **An update may not strand another business partner's coverage.** Every write that replaces an address's script variants — an address update, a site update, a legal entity update, and the
+  golden record process creating a site on an existing address — is rejected with `ScriptVariantCoverageStillNeeded` when the new content drops a script code that the address's legal entity
+  or one of its sites is still named in. This is reachable wherever an address serves more than one business partner: a main address shared by several sites, or an address that is both a
+  legal address and a site main address. The error names the script code and the BPN that still requires it.
+- **A golden record task that puts a site on an existing address must carry that address's coverage.** The Pool now applies the site main address payload of such a task to the referenced
+  address instead of discarding it, which is what lets a newly shared site be named in its own scripts. In exchange, an enrichment service that places a site on an address another site is
+  already named on has to include that address's existing coverage in its payload — the Pool does not merge them, it rejects the task. Records that fail this way end in the error sharing state.
+  A task is judged as a whole, not per write: it may freely rewrite the business partners it carries itself — a legal entity and its site sharing one address can move to another script
+  together — and is only rejected for coverage it would take away from a business partner it does not carry.
+- **A headquarter relocation drops the legal entity's uncovered script variants.** When the new legal address does not cover a script code, the legal entity's script variant for it is removed
   and an `UPDATE` changelog entry is emitted, so sharing members will see the script variant disappear from their Gate output.
 - **Consumers compiling against `bpdm-pool-api` must adjust.** `SiteScriptVariantDto.name`, `SiteHeaderScriptVariantDto.name`, `LegalEntityScriptVariantDto.legalName`,
   `PhysicalAddressScriptVariantDto.city` and `AlternativeAddressScriptVariantDto.city` are non-null, and `PhysicalAddressScriptVariantDto.city` and `PostalAddressScriptVariantDto.physicalAddress`

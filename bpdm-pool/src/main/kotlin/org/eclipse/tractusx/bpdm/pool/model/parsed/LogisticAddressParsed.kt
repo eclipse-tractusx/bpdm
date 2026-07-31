@@ -36,7 +36,9 @@ data class LogisticAddressParsed(
     val alternativePostalAddress: AlternativePostalAddressParsed?,
     val confidenceCriteria: ConfidenceCriteriaParsed,
     val scriptVariants: List<AddressScriptVariantParsed>
-)
+) {
+    fun scriptCodes(): List<String> = scriptVariants.map { it.scriptCode.technicalKey }
+}
 
 data class ConfidenceCriteriaParsed(
     val sharedByOwner: Boolean,

@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.pool.v7.site
 
 import org.assertj.core.api.Assertions
-import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto
 import org.eclipse.tractusx.bpdm.pool.api.model.SiteHeaderScriptVariantDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
@@ -336,7 +335,7 @@ class SiteCreationV7IT : UnscheduledPoolTestBaseV7() {
         val response = poolClient.sites.createSite(listOf(siteRequest))
 
         //THEN
-        // One script variant carries both the site name and the main address rendering, so a duplicated script code is
+        // One script variant carries both the site name and the main address in that script, so a duplicated script code is
         // reported by the site and by the main address.
         val expectedErrors = listOf(
             ErrorInfo(SiteCreateError.ScriptVariantDuplicateScriptCode, "IGNORED", siteRequest.index),
@@ -395,29 +394,27 @@ class SiteCreationV7IT : UnscheduledPoolTestBaseV7() {
     }
 
     /**
-     * GIVEN legal entity whose legal address renders one script code
+     * GIVEN legal entity whose legal address covers one script code
      * WHEN operator tries to create a legal address site with a script variant of another script code
-     * THEN operator sees ScriptVariantWithoutMainAddressRendering error, because the site main address is the legal
-     * address and does not render that script
+     * THEN operator sees ScriptVariantNotCoveredByMainAddress error, because the site main address is the legal
+     * address and does not cover that script
      */
     @Test
-    fun `try create legal address site with script variant the legal address does not render`() {
+    fun `try create legal address site with script variant the legal address does not cover`() {
         //GIVEN
         val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
 
         //WHEN
-        val unrenderedScriptCode = scriptCodeOtherThan(legalEntityResponse.scriptVariants.map { it.scriptCode }.toSet())
+        val uncoveredScriptCode = scriptCodeOtherThan(legalEntityResponse.scriptVariants.map { it.scriptCode }.toSet())
         val siteRequest = requestFactory.buildLegalSiteCreateRequest("Site $testName", legalEntityResponse.header.bpnl)
-            .let { it.copy(scriptVariants = listOf(SiteHeaderScriptVariantDto(unrenderedScriptCode, "Site Name $testName"))) }
+            .let { it.copy(scriptVariants = listOf(SiteHeaderScriptVariantDto(uncoveredScriptCode, "Site Name $testName"))) }
         val response = poolClient.sites.createSiteWithLegalReference(listOf(siteRequest))
 
         //THEN
-        val expectedError = ErrorInfo(SiteCreateError.ScriptVariantWithoutMainAddressRendering, "IGNORED", "0")
+        val expectedError = ErrorInfo(SiteCreateError.ScriptVariantNotCoveredByMainAddress, "IGNORED", "0")
         val expectedResponse = SitePartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertSiteCreateResponseWrapperIsEqual(response, expectedResponse)
     }
 
-    private fun scriptCodeOtherThan(scriptCodes: Set<String>): String =
-        poolClient.metadata.getScriptCodes(PaginationRequest()).content.first { it.technicalKey !in scriptCodes }.technicalKey
 }

@@ -17,13 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.request
+package org.eclipse.tractusx.bpdm.pool.model
 
-/**
- * A site whose main address already exists, together with that address's content as this site describes it.
- */
-data class SiteCreateWithReferencedAddressAsMainRequest(
-    val mainAddressBpn: String,
-    val header: SiteHeaderRequest,
-    val mainAddress: LogisticAddressRequest
-)
+/** One business partner's script codes as they stand after the write; a null [bpn] marks the partner the request states. */
+data class PartnerScriptCodes(val bpn: String?, val scriptCodes: Collection<String>)

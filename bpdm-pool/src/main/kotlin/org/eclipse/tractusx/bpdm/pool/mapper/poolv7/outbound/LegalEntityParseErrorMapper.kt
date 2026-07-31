@@ -28,10 +28,12 @@ import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.springframework.stereotype.Component
 
 /**
- * Maps the legal-entity services' sealed parse errors to the `/legal-entities` [ErrorInfo] codes (legal-address errors
- * delegated to [AddressParseErrorMapper]). Header presence errors are guaranteed absent by the bounded DTO and an
- * unknown header script code previously NPE'd — both become internal errors. Script-variant content is client-nullable
- * and therefore does get public codes. The `when`s are exhaustive so a new error won't compile until it gets a code.
+ * Maps the legal-entity services' sealed parse errors to the `/legal-entities` [ErrorInfo] codes, delegating
+ * legal-address errors to [AddressParseErrorMapper].
+ *
+ * An error the bounded DTO already rules out, or that this operation cannot reach, gets no public code and is thrown as
+ * an internal error instead; script-variant content is client-nullable and therefore does get public codes. The `when`s
+ * are exhaustive so a new error won't compile until it gets a code.
  */
 @Component
 class LegalEntityParseErrorMapper(
@@ -41,6 +43,7 @@ class LegalEntityParseErrorMapper(
     fun toCreateErrorInfo(error: LegalEntityCreateParseError, entityKey: String?): ErrorInfo<LegalEntityCreateError> =
         when (error) {
             is AddressContentParseError -> addressParseErrorMapper.toLegalEntityCreateErrorInfo(error, entityKey)
+            is ScriptVariantCoverageParseError -> throw internalError(error)
             is LegalEntityContentParseError -> contentErrorInfo(
                 error,
                 entityKey,
@@ -64,6 +67,14 @@ class LegalEntityParseErrorMapper(
                 entityKey
             )
             is AddressContentParseError -> addressParseErrorMapper.toLegalEntityUpdateErrorInfo(error, entityKey)
+            is ScriptVariantCoverageStillNeeded ->
+                ErrorInfo(
+                    LegalEntityUpdateError.ScriptVariantCoverageStillNeeded,
+                    "Script code '${error.scriptCode}' must stay covered by the legal address: business partner " +
+                            "'${error.requiredByBpn}' is named in that script",
+                    entityKey
+                )
+            is ScriptVariantNotCoveredByAddress -> throw internalError(error)
             is LegalEntityContentParseError -> contentErrorInfo(
                 error,
                 entityKey,
@@ -106,6 +117,6 @@ class LegalEntityParseErrorMapper(
             is LegalEntityContentParseError.ScriptCodeNotFound -> throw internalError(error)
         }
 
-    private fun internalError(error: LegalEntityContentParseError) =
-        BpdmValidationException("Unexpected legal entity content parse error (no public error code): $error")
+    private fun internalError(error: LegalEntityCreateParseError) =
+        BpdmValidationException("Unexpected legal entity parse error (no public error code): $error")
 }

@@ -315,7 +315,7 @@ class LegalEntityCreationV7IT: UnscheduledPoolTestBaseV7() {
         val response = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest))
 
         //THEN
-        // One script variant carries both the legal name and the legal address rendering, so a duplicated script code
+        // One script variant carries both the legal name and the legal address in that script, so a duplicated script code
         // is reported by the legal entity and by the legal address.
         val expectedErrors = listOf(
             ErrorInfo(LegalEntityCreateError.ScriptVariantDuplicateScriptCode, "IGNORED", legalEntityRequest.index),

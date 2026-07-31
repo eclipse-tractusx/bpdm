@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.parser
 
-import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.crossValidateParseResults
@@ -29,6 +28,7 @@ import org.eclipse.tractusx.bpdm.pool.model.parsed.LogisticAddressParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.AddressUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.model.zipParseResults
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 /**
  * Validates address-update requests: the target address, an optional parent site to assign it to, and the new address
@@ -40,13 +40,15 @@ class AddressUpdateParser(
     private val addressBpnParser: AddressBpnParser,
     private val siteBpnParser: SiteBpnParser,
     private val siteLegalEntityConsistencyValidator: SiteLegalEntityConsistencyValidator,
-    private val renderingValidator: ScriptVariantRenderingValidator
+    private val scriptVariantCoverageValidator: ScriptVariantCoverageValidator,
+    private val partnerReader: AddressPartnerScriptCodeReader
 ) {
 
     /**
      * Validates each request and reports either the resolved target with its validated content or every problem found in
      * that entry.
      */
+    @Transactional(readOnly = true)
     fun parse(requests: List<AddressUpdateRequest>): List<ParseResult<AddressUpdateParsed, AddressUpdateParseError>> {
         val contentResults = addressContentParser.parse(requests.map { it.content }, requests.map { it.addressBpn })
         val targetResults = addressBpnParser.parse(requests.map { it.addressBpn })
@@ -55,32 +57,13 @@ class AddressUpdateParser(
             crossValidateParseResults(targetResults, siteResults) { target, site ->
                 siteLegalEntityConsistencyValidator.check(target.legalEntity, site)
             }
-        val renderingContentResults: List<ParseResult<LogisticAddressParsed, AddressUpdateParseError>> =
+        val coveredContentResults: List<ParseResult<LogisticAddressParsed, AddressUpdateParseError>> =
             crossValidateParseResults(targetResults, contentResults) { target, content ->
-                renderingValidator.check(
-                    dependentScriptCodesOf(target),
-                    content.scriptVariants.map { it.scriptCode.technicalKey }
-                )
+                scriptVariantCoverageValidator.check(content.scriptCodes(), partnerReader.storedPartners(target))
             }
 
-        return zipParseResults(renderingContentResults, targetResults, consistentSiteResults) { content, target, site ->
+        return zipParseResults(coveredContentResults, targetResults, consistentSiteResults) { content, target, site ->
             AddressUpdateParsed(target, site, content)
         }
-    }
-
-    /**
-     * The script codes whose renderings this address owes to the business partners built on it — its legal entity when it
-     * is that entity's legal address, and every site it is the main address of.
-     */
-    private fun dependentScriptCodesOf(address: LogisticAddressDb): List<String> {
-        val legalEntityScriptCodes = address.legalEntity
-            ?.takeIf { it.legalAddress == address }
-            ?.scriptVariants?.map { it.scriptCode.technicalKey }
-            .orEmpty()
-        val siteScriptCodes = address.sites
-            .filter { it.mainAddress == address }
-            .flatMap { site -> site.scriptVariants.map { it.scriptCode.technicalKey } }
-
-        return legalEntityScriptCodes.plus(siteScriptCodes).distinct()
     }
 }

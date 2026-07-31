@@ -28,11 +28,12 @@ import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.springframework.stereotype.Component
 
 /**
- * Maps the site services' sealed parse errors to the `/sites` [ErrorInfo] codes (main-address errors delegated to
- * [AddressParseErrorMapper]). The site's own name/confidence errors have no public code (guaranteed by the bounded DTO),
- * an unknown header script code previously NPE'd, and [UnresolvableAddress] is only invoked for an address just resolved
- * — all internal errors. Script-variant content is client-nullable and therefore does get public codes. The `when`s are
- * exhaustive so a new error won't compile until it gets a code.
+ * Maps the site services' sealed parse errors to the `/sites` [ErrorInfo] codes, delegating main-address errors to
+ * [AddressParseErrorMapper].
+ *
+ * An error the bounded DTO already rules out, or that this operation cannot reach, gets no public code and is thrown as
+ * an internal error instead; script-variant content is client-nullable and therefore does get public codes. The `when`s
+ * are exhaustive so a new error won't compile until it gets a code.
  */
 @Component
 class SiteParseErrorMapper(
@@ -46,13 +47,14 @@ class SiteParseErrorMapper(
             is LegalAddressAlreadyMainAddress ->
                 ErrorInfo(SiteCreateError.MainAddressDuplicateIdentifier, "Legal address already belongs to site '${error.bpnSite}'", entityKey)
             is AddressContentParseError -> addressParseErrorMapper.toSiteCreateErrorInfo(error, entityKey)
-            is ScriptVariantWithoutAddressRendering ->
+            is ScriptVariantNotCoveredByAddress ->
                 ErrorInfo(
-                    SiteCreateError.ScriptVariantWithoutMainAddressRendering,
-                    "Script code '${error.scriptCode}' is not rendered by the site's main address",
+                    SiteCreateError.ScriptVariantNotCoveredByMainAddress,
+                    "Script code '${error.scriptCode}' is not covered by the site's main address",
                     entityKey
                 )
-            is UnresolvableAddress -> throw internalError(error)
+            is UnresolvableAddress,
+            is ScriptVariantCoverageStillNeeded -> throw internalError(error)
             is SiteContentParseError -> contentErrorInfo(
                 error,
                 entityKey,
@@ -66,6 +68,14 @@ class SiteParseErrorMapper(
             is UnresolvableSite ->
                 ErrorInfo(SiteUpdateError.SiteNotFound, "Site '${error.bpn}' can't be updated as it doesn't exist", entityKey)
             is AddressContentParseError -> addressParseErrorMapper.toSiteUpdateErrorInfo(error, entityKey)
+            is ScriptVariantCoverageStillNeeded ->
+                ErrorInfo(
+                    SiteUpdateError.ScriptVariantCoverageStillNeeded,
+                    "Script code '${error.scriptCode}' must stay covered by the main address: business partner " +
+                            "'${error.requiredByBpn}' is named in that script",
+                    entityKey
+                )
+            is ScriptVariantNotCoveredByAddress -> throw internalError(error)
             is SiteContentParseError -> contentErrorInfo(
                 error,
                 entityKey,

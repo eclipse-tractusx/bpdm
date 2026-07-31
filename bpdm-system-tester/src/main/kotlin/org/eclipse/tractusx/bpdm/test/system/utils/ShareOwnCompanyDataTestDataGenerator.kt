@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequ
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityDto
 import org.eclipse.tractusx.bpdm.pool.api.model.SiteHeaderScriptVariantDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.TestDataFactoryGateV7
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.RefinementTestDataFactory
@@ -106,11 +107,17 @@ class ShareOwnCompanyDataTestDataGenerator(
         return LegalEntityResult(legalEntity, taskData)
     }
 
-    fun buildSite(id: String, legalEntity: LegalEntityWithLegalAddressVerboseDto): SiteResult {
+    /**
+     * Builds a site under [legalEntity], its main address included. [sharedMainAddressId] pins the site's script codes to
+     * that shared identity instead of the site's own seed: sites sharing one main address are all covered by that one
+     * address, so they have to be named in the same scripts.
+     */
+    fun buildSite(id: String, legalEntity: LegalEntityWithLegalAddressVerboseDto, sharedMainAddressId: String? = null): SiteResult {
         val context = ScenarioContext.current()!!
         val legalEntityParent = legalEntity.copy(header = legalEntity.header.withConfidence(TestDataV7.SharedByOwnerConfidence))
 
         val siteCreate = poolRequestFactory.buildSiteCreateRequest(scenarioId(id), legalEntityParent.header.bpnl)
+            .withScriptCodesOf(sharedMainAddressId)
             .let { poolResponseFactory.buildSiteSiteCreate(it, bpnS = "BPNS${context.runId(id)}", bpnA = "BPNA${context.runId(id)}") }
         val site = with(poolResponseFactory.buildSiteSearchResponse(siteCreate)){ copy(mainAddress = mainAddress.withConfidence(TestDataV7.SyncedSharedByOwnerConfidence)) }
         val siteWithParent = SiteWithParent(legalEntityParent, site)
@@ -193,6 +200,12 @@ class ShareOwnCompanyDataTestDataGenerator(
         withConfidence(TestDataV7.NotCheckedNotOwned).withConfidence(TestDataV7.NoConfidence)
 
     private fun scenarioId(id: String) = "$id${ScenarioContext.current()!!.scenarioSuffix}"
+
+    /** Rewrites the site's script variants to the script code [sharedMainAddressId] seeds, leaving them alone when null. */
+    private fun SitePartnerCreateRequest.withScriptCodesOf(sharedMainAddressId: String?): SitePartnerCreateRequest {
+        val sharedScriptCode = sharedMainAddressId?.let { poolRequestFactory.scriptCodeFor(scenarioId(it)) } ?: return this
+        return copy(site = site.copy(scriptVariants = site.scriptVariants.map { it.copy(scriptCode = sharedScriptCode) }))
+    }
 
     private fun buildLegalEntityResponse(
         scenarioUniqueId: String,

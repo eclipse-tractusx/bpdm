@@ -26,35 +26,34 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Keeps a legal entity's script variants coherent with the renderings of its legal address: a script variant renders the
- * name *and* the address, so one whose script code the legal address does not render cannot exist.
+ * Keeps a legal entity named only in the scripts its legal address covers.
  *
  * Requests that would break the rule are rejected by the parsers instead. This maintainer exists for the one writer with
  * no request to reject — the headquarter relocation trigger, which moves a legal entity onto an address it never chose.
  * Call it *after* the write it reacts to; it reads the legal address as it now stands.
  */
 @Service
-class ScriptVariantCoherenceService(
+class ScriptVariantCoverageService(
     private val legalEntityRepository: LegalEntityRepository
 ) {
 
     private val logger = KotlinLogging.logger { }
 
     /**
-     * Removes the script variants of [legalEntity] that its legal address does not render and reports whether any were.
+     * Removes the script variants of [legalEntity] that its legal address does not cover and reports whether any were.
      */
     @Transactional
-    fun pruneUnrenderedScriptVariants(legalEntity: LegalEntityDb): Boolean {
-        val renderedScriptCodes = legalEntity.legalAddress.scriptVariants.map { it.scriptCode.technicalKey }.toSet()
-        val unrendered = legalEntity.scriptVariants.filterNot { it.scriptCode.technicalKey in renderedScriptCodes }
+    fun pruneUncoveredScriptVariants(legalEntity: LegalEntityDb): Boolean {
+        val coveredScriptCodes = legalEntity.legalAddress.scriptCodes().toSet()
+        val uncovered = legalEntity.scriptVariants.filterNot { it.scriptCode.technicalKey in coveredScriptCodes }
 
-        if (unrendered.isEmpty()) return false
+        if (uncovered.isEmpty()) return false
 
-        legalEntity.scriptVariants.removeAll(unrendered)
+        legalEntity.scriptVariants.removeAll(uncovered)
         legalEntityRepository.save(legalEntity)
         logger.info {
-            "Removed script variants of legal entity '${legalEntity.bpn}' that its legal address does not render: " +
-                    unrendered.joinToString(", ") { it.scriptCode.technicalKey }
+            "Removed script variants of legal entity '${legalEntity.bpn}' that its legal address does not cover: " +
+                    uncovered.joinToString(", ") { it.scriptCode.technicalKey }
         }
 
         return true

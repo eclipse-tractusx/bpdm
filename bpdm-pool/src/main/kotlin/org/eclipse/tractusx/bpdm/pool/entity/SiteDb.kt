@@ -55,4 +55,6 @@ class SiteDb(
     @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     @JoinColumn(name = "main_address_id", nullable = false)
     lateinit var mainAddress: LogisticAddressDb
+
+    fun scriptCodes(): List<String> = scriptVariants.map { it.scriptCode.technicalKey }
 }

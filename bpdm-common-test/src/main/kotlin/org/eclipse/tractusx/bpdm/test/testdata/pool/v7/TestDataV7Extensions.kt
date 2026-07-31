@@ -279,6 +279,18 @@ fun SitePartnerUpdateRequest.withScriptVariantName(name: String) =
 fun SiteDto.withScriptVariantName(name: String) =
     copy(scriptVariants = scriptVariants.map { it.copy(name = name) })
 
+fun SitePartnerUpdateRequest.withScriptVariantScriptCode(scriptCode: String) =
+    copy(site = site.withScriptVariantScriptCode(scriptCode))
+
+fun SiteDto.withScriptVariantScriptCode(scriptCode: String) =
+    copy(scriptVariants = scriptVariants.map { it.copy(scriptCode = scriptCode) })
+
+fun LegalEntityPartnerUpdateRequest.withScriptVariantScriptCode(scriptCode: String) =
+    copy(legalEntity = legalEntity.withScriptVariantScriptCode(scriptCode))
+
+fun LegalEntityDto.withScriptVariantScriptCode(scriptCode: String) =
+    copy(scriptVariants = scriptVariants.map { it.copy(scriptCode = scriptCode) })
+
 fun SitePartnerCreateRequest.withScriptVariantPhysicalCity(city: String) =
     copy(site = site.withScriptVariantPhysicalCity(city))
 

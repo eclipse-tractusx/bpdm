@@ -355,11 +355,11 @@ private fun List<LegalEntityScriptVariantDb>.toLegalEntityScriptVariants(legalAd
 
     return map { variant ->
         val scriptCode = variant.scriptCode.technicalKey
-        // Every legal-entity script variant renders the legal address too: the parsers reject a variant without that
-        // rendering and ScriptVariantCoherenceService prunes any the legal address loses.
-        val legalAddressRendering = legalAddressVariantsByCode[scriptCode]
-            ?: throw IllegalStateException("Legal entity script variant of script code '$scriptCode' has no legal address rendering.")
-        LegalEntityScriptVariantDto(scriptCode, variant.legalName, variant.shortName, legalAddressRendering.toDto())
+        // The legal address covers every script its legal entity is named in: the parsers reject a variant it does not
+        // cover and ScriptVariantCoverageService prunes any the legal address stops covering.
+        val legalAddressVariant = legalAddressVariantsByCode[scriptCode]
+            ?: throw IllegalStateException("Legal entity script variant of script code '$scriptCode' is not covered by the legal address.")
+        LegalEntityScriptVariantDto(scriptCode, variant.legalName, variant.shortName, legalAddressVariant.toDto())
     }
 }
 
@@ -372,9 +372,9 @@ private fun List<SiteScriptVariantDb>.toSiteScriptVariants(mainAddressVariants: 
 
     return map { variant ->
         val scriptCode = variant.scriptCode.technicalKey
-        val mainAddressRendering = mainAddressVariantsByCode[scriptCode]
-            ?: throw IllegalStateException("Site script variant of script code '$scriptCode' has no main address rendering.")
-        SiteScriptVariantDto(scriptCode, variant.name, mainAddressRendering.toDto())
+        val mainAddressVariant = mainAddressVariantsByCode[scriptCode]
+            ?: throw IllegalStateException("Site script variant of script code '$scriptCode' is not covered by the main address.")
+        SiteScriptVariantDto(scriptCode, variant.name, mainAddressVariant.toDto())
     }
 }
 

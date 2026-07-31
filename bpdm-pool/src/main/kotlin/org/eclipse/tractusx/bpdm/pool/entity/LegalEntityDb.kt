@@ -80,4 +80,6 @@ class LegalEntityDb(
     @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     @JoinColumn(name = "legal_address_id", nullable = false)
     lateinit var legalAddress: LogisticAddressDb
+
+    fun scriptCodes(): List<String> = scriptVariants.map { it.scriptCode.technicalKey }
 }

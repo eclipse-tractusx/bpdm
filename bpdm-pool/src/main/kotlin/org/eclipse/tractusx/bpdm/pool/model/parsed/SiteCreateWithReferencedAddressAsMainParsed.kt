@@ -23,5 +23,6 @@ import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 
 data class SiteCreateWithReferencedAddressAsMainParsed(
     val mainAddress: LogisticAddressDb,
-    val siteHeader: SiteHeaderParsed
+    val siteHeader: SiteHeaderParsed,
+    val mainAddressContent: LogisticAddressParsed?
 )

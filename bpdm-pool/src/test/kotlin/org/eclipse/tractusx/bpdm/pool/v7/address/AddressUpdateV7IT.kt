@@ -84,7 +84,7 @@ class AddressUpdateV7IT : UnscheduledPoolTestBaseV7() {
         val siteResponse = testDataClient.createLegalAddressSite(legalEntityResponse, testName)
 
         //WHEN
-        // The site main address is the legal address, so the update has to keep rendering the legal entity's script codes.
+        // The site main address is the legal address, so the update has to keep covering the legal entity's script codes.
         val addressRequest = requestFactory.buildAddressUpdateRequest(testName, siteResponse)
             .copy(scriptVariants = requestFactory.buildAddressScriptVariants(legalEntityResponse.scriptVariants.map { it.scriptCode }, testName))
             .withConfidence(TestDataV7.SharedByOwner)
@@ -342,11 +342,11 @@ class AddressUpdateV7IT : UnscheduledPoolTestBaseV7() {
 
     /**
      * GIVEN participant legal entity with a script variant
-     * WHEN operator tries to update its legal address without the script variant the legal entity renders its name in
-     * THEN operator sees ScriptVariantRenderingStillReferenced error
+     * WHEN operator tries to update its legal address without the script variant the legal entity is named in
+     * THEN operator sees ScriptVariantCoverageStillNeeded error
      */
     @Test
-    fun `try update legal address dropping a script variant its legal entity renders`() {
+    fun `try update legal address dropping a script variant its legal entity is named in`() {
         //GIVEN
         val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
 
@@ -356,7 +356,7 @@ class AddressUpdateV7IT : UnscheduledPoolTestBaseV7() {
 
         //THEN
         val expectedErrors = legalEntityResponse.scriptVariants
-            .map { ErrorInfo(AddressUpdateError.ScriptVariantRenderingStillReferenced, "IGNORED", addressRequest.bpna) }
+            .map { ErrorInfo(AddressUpdateError.ScriptVariantCoverageStillNeeded, "IGNORED", addressRequest.bpna) }
         val expectedResponse = AddressPartnerUpdateResponseWrapper(emptyList(), expectedErrors)
 
         assertRepository.assertAddressUpdateResponseWrapperIsEqual(addressResponse, expectedResponse)

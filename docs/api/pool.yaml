@@ -4559,6 +4559,7 @@ components:
           - ScriptVariantDuplicateScriptCode
           - MainAddressScriptVariantCityMissing
           - MainAddressScriptVariantDuplicateScriptCode
+          - ScriptVariantCoverageStillNeeded
         message:
           type: string
         entityKey:
@@ -5601,6 +5602,7 @@ components:
           - ScriptVariantDuplicateScriptCode
           - LegalAddressScriptVariantCityMissing
           - LegalAddressScriptVariantDuplicateScriptCode
+          - ScriptVariantCoverageStillNeeded
         message:
           type: string
         entityKey:
@@ -6530,7 +6532,7 @@ components:
           - IdentifiersTooMany
           - ScriptVariantCityMissing
           - ScriptVariantDuplicateScriptCode
-          - ScriptVariantRenderingStillReferenced
+          - ScriptVariantCoverageStillNeeded
         message:
           type: string
         entityKey:
@@ -8956,7 +8958,7 @@ components:
           - ScriptVariantDuplicateScriptCode
           - MainAddressScriptVariantCityMissing
           - MainAddressScriptVariantDuplicateScriptCode
-          - ScriptVariantWithoutMainAddressRendering
+          - ScriptVariantNotCoveredByMainAddress
         message:
           type: string
         entityKey:

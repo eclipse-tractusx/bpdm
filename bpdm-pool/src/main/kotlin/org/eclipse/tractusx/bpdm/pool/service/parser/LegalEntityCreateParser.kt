@@ -20,22 +20,27 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser
 
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
+import org.eclipse.tractusx.bpdm.pool.model.PartnerScriptCodes
 import org.eclipse.tractusx.bpdm.pool.model.combine
+import org.eclipse.tractusx.bpdm.pool.model.crossValidateParseResults
 import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityCreateParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityContentParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityCreateParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityHeaderParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityCreateRequest
 import org.eclipse.tractusx.bpdm.pool.model.zipParseResults
 import org.springframework.stereotype.Service
 
 /**
- * Validates legal-entity create requests: the header content with its identifier uniqueness, and the legal address.
+ * Validates legal-entity create requests: the header content with its identifier uniqueness, the legal address, and that
+ * the legal address covers every script code the header names.
  */
 @Service
 class LegalEntityCreateParser(
     private val legalEntityHeaderParser: LegalEntityHeaderParser,
     private val duplicateValidator: LegalEntityIdentifierDuplicateValidator,
-    private val addressContentParser: AddressContentParser
+    private val addressContentParser: AddressContentParser,
+    private val scriptVariantCoverageValidator: ScriptVariantCoverageValidator,
 ) {
 
     /**
@@ -49,8 +54,12 @@ class LegalEntityCreateParser(
 
         val legalAddresses = requests.map { it.content.legalAddress }
         val legalAddressResults = addressContentParser.parse(legalAddresses, legalAddresses.map { null })
+        val coveredHeaderResults: List<ParseResult<LegalEntityHeaderParsed, LegalEntityCreateParseError>> =
+            crossValidateParseResults(legalAddressResults, mergedHeaderResults) { legalAddress, header ->
+                scriptVariantCoverageValidator.check(legalAddress.scriptCodes(), listOf(PartnerScriptCodes(bpn = null, header.scriptCodes())))
+            }
 
-        return zipParseResults(mergedHeaderResults, legalAddressResults) { header, legalAddress ->
+        return zipParseResults(coveredHeaderResults, legalAddressResults) { header, legalAddress ->
             LegalEntityCreateParsed(LegalEntityContentParsed(header, legalAddress))
         }
     }

@@ -25,10 +25,10 @@ import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.springframework.stereotype.Component
 
 /**
- * Maps the address services' sealed parse errors to the `/addresses` [ErrorInfo] codes. Two cases have no public enum and
- * become internal errors (throw → 500): [AddressMetadataParseError.ScriptCodeNotFound] (the old REST path didn't validate
- * script codes and NPE'd) and every [AddressFieldParseError] (unreachable — the bounded DTO already guarantees
- * presence/format; the throw asserts that). The `when`s are exhaustive so a new error won't compile until it gets a code.
+ * Maps the address services' sealed parse errors to the `/addresses` [ErrorInfo] codes.
+ *
+ * An error the bounded DTO already rules out, or that this operation cannot reach, gets no public code and is thrown as
+ * an internal error instead. The `when`s are exhaustive so a new error won't compile until it gets a code.
  */
 @Component
 class AddressParseErrorMapper {
@@ -79,14 +79,15 @@ class AddressParseErrorMapper {
                     "Site '${error.siteBpn}' does not belong to legal entity '${error.legalEntityBpn}'",
                     entityKey
                 )
-            is ScriptVariantWithoutAddressRendering ->
+            is ScriptVariantCoverageStillNeeded ->
                 ErrorInfo(
-                    AddressUpdateError.ScriptVariantRenderingStillReferenced,
-                    "Script code '${error.scriptCode}' must stay rendered: the legal entity or a site of this address " +
-                            "renders its name in that script",
+                    AddressUpdateError.ScriptVariantCoverageStillNeeded,
+                    "Script code '${error.scriptCode}' must stay covered: business partner '${error.requiredByBpn}' " +
+                            "is named in that script",
                     entityKey
                 )
-            is UnresolvableSite -> throw internalError(error)
+            is UnresolvableSite,
+            is ScriptVariantNotCoveredByAddress -> throw internalError(error)
         }
 
     fun toLegalEntityCreateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfo<LegalEntityCreateError> =

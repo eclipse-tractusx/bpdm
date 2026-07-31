@@ -19,22 +19,28 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.parser
 
-import org.eclipse.tractusx.bpdm.pool.model.error.ScriptVariantWithoutAddressRendering
+import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
+import org.eclipse.tractusx.bpdm.pool.model.PartnerScriptCodes
 import org.springframework.stereotype.Service
 
 /**
- * The rule that a legal entity's or site's script variant is rendered by its address in the same script. Pure: given
- * already resolved values it decides the rule and never looks anything up, so it is unaware of resolution failures —
- * callers apply it only to resolved inputs (see `crossValidateParseResults`).
+ * Reads the business partners whose names an address has to cover.
  */
 @Service
-class ScriptVariantRenderingValidator {
+class AddressPartnerScriptCodeReader {
 
     /**
-     * Reports one violation per script code in [nameScriptCodes] that [addressScriptCodes] does not cover.
+     * Returns the script codes the partners built on [address] are named in today, leaving out every BPN in
+     * [rewrittenBpns] whose new script codes the caller states itself.
      */
-    fun check(nameScriptCodes: Collection<String>, addressScriptCodes: Collection<String>): List<ScriptVariantWithoutAddressRendering> {
-        val rendered = addressScriptCodes.toSet()
-        return nameScriptCodes.filterNot { it in rendered }.distinct().map { ScriptVariantWithoutAddressRendering(it) }
+    fun storedPartners(address: LogisticAddressDb, rewrittenBpns: Set<String> = emptySet()): List<PartnerScriptCodes> {
+        val legalEntity = address.legalEntity
+            ?.takeIf { it.legalAddress == address && it.bpn !in rewrittenBpns }
+            ?.let { PartnerScriptCodes(it.bpn, it.scriptCodes()) }
+        val sites = address.sites
+            .filter { it.mainAddress == address && it.bpn !in rewrittenBpns }
+            .map { PartnerScriptCodes(it.bpn, it.scriptCodes()) }
+
+        return listOfNotNull(legalEntity).plus(sites)
     }
 }

@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.service.parser
 
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
+import org.eclipse.tractusx.bpdm.pool.model.PartnerScriptCodes
 import org.eclipse.tractusx.bpdm.pool.model.crossValidateParseResults
 import org.eclipse.tractusx.bpdm.pool.model.error.SiteCreateParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteCreateWithReferencedAddressAsMainParsed
@@ -38,7 +39,7 @@ import org.springframework.stereotype.Service
 class SiteCreateWithLegalAddressAsMainParser(
     private val siteHeaderParser: SiteHeaderParser,
     private val legalEntityBpnParser: LegalEntityBpnParser,
-    private val renderingValidator: ScriptVariantRenderingValidator
+    private val scriptVariantCoverageValidator: ScriptVariantCoverageValidator,
 ) {
 
     /**
@@ -50,16 +51,16 @@ class SiteCreateWithLegalAddressAsMainParser(
     ): List<ParseResult<SiteCreateWithReferencedAddressAsMainParsed, SiteCreateParseError>> {
         val headerResults = siteHeaderParser.parse(requests.map { it.header })
         val legalEntityResults = legalEntityBpnParser.parse(requests.map { it.legalEntityBpn })
-        val renderedHeaderResults: List<ParseResult<SiteHeaderParsed, SiteCreateParseError>> =
+        val coveredHeaderResults: List<ParseResult<SiteHeaderParsed, SiteCreateParseError>> =
             crossValidateParseResults(legalEntityResults, headerResults) { legalEntity, header ->
-                renderingValidator.check(
-                    header.scriptVariants.map { it.scriptCode.technicalKey },
-                    legalEntity.legalAddress.scriptVariants.map { it.scriptCode.technicalKey }
+                scriptVariantCoverageValidator.check(
+                    legalEntity.legalAddress.scriptCodes(),
+                    listOf(PartnerScriptCodes(bpn = null, header.scriptCodes()))
                 )
             }
 
-        return zipParseResults(legalEntityResults, renderedHeaderResults) { legalEntity, header ->
-            SiteCreateWithReferencedAddressAsMainParsed(legalEntity.legalAddress, header)
+        return zipParseResults(legalEntityResults, coveredHeaderResults) { legalEntity, header ->
+            SiteCreateWithReferencedAddressAsMainParsed(legalEntity.legalAddress, header, mainAddressContent = null)
         }
     }
 }

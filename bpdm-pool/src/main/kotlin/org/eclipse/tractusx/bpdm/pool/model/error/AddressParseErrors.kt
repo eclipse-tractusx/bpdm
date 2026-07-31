@@ -31,13 +31,6 @@ data class SiteNotInAddressLegalEntity(val siteBpn: String, val legalEntityBpn: 
     AddressCreateParseError, AddressUpdateParseError
 
 /**
- * A legal entity's or site's script variant would be left without the address rendering of the same script code. Both
- * halves of a script variant are written together, so this surfaces either when a site is created on an address that
- * does not render its script codes, or when an address update drops a rendering its legal entity or sites still need.
- */
-data class ScriptVariantWithoutAddressRendering(val scriptCode: String) : SiteCreateParseError, AddressUpdateParseError
-
-/**
  * Address-content parse errors. Subtypes every operation embedding an address (standalone, site main address, legal
  * address) so they surface as that operation's errors directly — no wrapping, matched flatly.
  */

@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.v7.site
 
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto
+import org.eclipse.tractusx.bpdm.pool.api.model.SiteHeaderScriptVariantDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerUpdateResponseWrapper
@@ -277,6 +278,33 @@ class SiteUpdateV7IT : UnscheduledPoolTestBaseV7() {
             ErrorInfo(SiteUpdateError.MainAddressScriptVariantDuplicateScriptCode, "IGNORED", updateRequest.bpns)
         )
         val expectedResponse = SitePartnerUpdateResponseWrapper(emptyList(), expectedErrors)
+
+        assertRepository.assertSiteUpdateResponseWrapperIsEqual(response, expectedResponse)
+    }
+
+    /**
+     * GIVEN a site whose main address is the legal address, both named in the same script
+     * WHEN operator tries to update the site with a script variant of another script code
+     * THEN operator sees ScriptVariantCoverageStillNeeded error, because the legal entity is still named in the script
+     * the update would stop covering on their shared address
+     */
+    @Test
+    fun `try update legal address site into a script its legal entity does not cover`() {
+        //GIVEN
+        val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
+        val coveredScriptCode = legalEntityResponse.scriptVariants.first().scriptCode
+        val siteCreateRequest = requestFactory.buildLegalAddressSiteCreateRequest("Site $testName", legalEntityResponse)
+            .let { it.copy(scriptVariants = listOf(SiteHeaderScriptVariantDto(coveredScriptCode, "Site Name $testName"))) }
+        val siteCreateResponse = poolClient.sites.createSiteWithLegalReference(listOf(siteCreateRequest)).entities.first()
+
+        //WHEN
+        val updateRequest = requestFactory.createSiteUpdateRequest("New Site $testName", siteCreateResponse)
+            .withScriptVariantScriptCode(scriptCodeOtherThan(setOf(coveredScriptCode)))
+        val response = poolClient.sites.updateSite(listOf(updateRequest))
+
+        //THEN
+        val expectedError = ErrorInfo(SiteUpdateError.ScriptVariantCoverageStillNeeded, "IGNORED", updateRequest.bpns)
+        val expectedResponse = SitePartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
 
         assertRepository.assertSiteUpdateResponseWrapperIsEqual(response, expectedResponse)
     }
