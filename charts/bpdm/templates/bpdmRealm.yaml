@@ -1,4 +1,4 @@
-{{- if .Values.keycloak.enabled }}
+﻿{{- if .Values.keycloak.enabled }}
 {{- $secretName := include "bpdm.realmConfig.name" . }}
 {{- $keycloakUrl := include "bpdm.keycloakUrl" . }}
 {{- $clients := (.Values.bpdmRealm | default dict).clients | default dict }}
@@ -1547,7 +1547,7 @@ stringData:
             "/*"
           ],
           "webOrigins": [
-            "/*"
+            "*"
           ],
           "notBefore": 0,
           "bearerOnly": false,
@@ -1650,7 +1650,7 @@ stringData:
             "/*"
           ],
           "webOrigins": [
-            "/*"
+            "*"
           ],
           "notBefore": 0,
           "bearerOnly": false,
@@ -1754,7 +1754,7 @@ stringData:
             "/*"
           ],
           "webOrigins": [
-            "/*"
+            "*"
           ],
           "notBefore": 0,
           "bearerOnly": false,
@@ -1858,7 +1858,7 @@ stringData:
             "/*"
           ],
           "webOrigins": [
-            "/*"
+            "*"
           ],
           "notBefore": 0,
           "bearerOnly": false,
@@ -1957,7 +1957,7 @@ stringData:
             "/*"
           ],
           "webOrigins": [
-            "/*"
+            "*"
           ],
           "notBefore": 0,
           "bearerOnly": false,
@@ -2056,7 +2056,7 @@ stringData:
             "/*"
           ],
           "webOrigins": [
-            "/*"
+            "*"
           ],
           "notBefore": 0,
           "bearerOnly": false,
@@ -2259,7 +2259,7 @@ stringData:
             "/*"
           ],
           "webOrigins": [
-            "/*"
+            "*"
           ],
           "notBefore": 0,
           "bearerOnly": false,
@@ -2358,7 +2358,7 @@ stringData:
             "/*"
           ],
           "webOrigins": [
-            "/*"
+            "*"
           ],
           "notBefore": 0,
           "bearerOnly": false,
@@ -2461,7 +2461,7 @@ stringData:
             "/*"
           ],
           "webOrigins": [
-            "/*"
+            "*"
           ],
           "notBefore": 0,
           "bearerOnly": false,
@@ -2560,7 +2560,7 @@ stringData:
             "/*"
           ],
           "webOrigins": [
-            "/*"
+            "*"
           ],
           "notBefore": 0,
           "bearerOnly": false,
@@ -2659,7 +2659,7 @@ stringData:
             "/*"
           ],
           "webOrigins": [
-            "/*"
+            "*"
           ],
           "notBefore": 0,
           "bearerOnly": false,
@@ -2758,7 +2758,7 @@ stringData:
             "/*"
           ],
           "webOrigins": [
-            "/*"
+            "*"
           ],
           "notBefore": 0,
           "bearerOnly": false,
@@ -2858,7 +2858,7 @@ stringData:
             "/*"
           ],
           "webOrigins": [
-            "/*"
+            "*"
           ],
           "notBefore": 0,
           "bearerOnly": false,
@@ -4511,7 +4511,7 @@ stringData:
         "clientSessionMaxLifespan": "0",
         "organizationsEnabled": "false"
       },
-      "keycloakVersion": "25.0.6",
+      "keycloakVersion": "26.5.6",
       "userManagedAccessAllowed": false,
       "organizationsEnabled": false,
       "clientProfiles": {

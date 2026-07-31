@@ -1,4 +1,4 @@
-{
+﻿{
   "realm": "BPDM",
   "notBefore": 0,
   "defaultSignatureAlgorithm": "RS256",
@@ -1503,7 +1503,7 @@
         "/*"
       ],
       "webOrigins": [
-        "/*"
+        "*"
       ],
       "notBefore": 0,
       "bearerOnly": false,
@@ -1606,7 +1606,7 @@
         "/*"
       ],
       "webOrigins": [
-        "/*"
+        "*"
       ],
       "notBefore": 0,
       "bearerOnly": false,
@@ -1710,7 +1710,7 @@
         "/*"
       ],
       "webOrigins": [
-        "/*"
+        "*"
       ],
       "notBefore": 0,
       "bearerOnly": false,
@@ -1814,7 +1814,7 @@
         "/*"
       ],
       "webOrigins": [
-        "/*"
+        "*"
       ],
       "notBefore": 0,
       "bearerOnly": false,
@@ -1913,7 +1913,7 @@
         "/*"
       ],
       "webOrigins": [
-        "/*"
+        "*"
       ],
       "notBefore": 0,
       "bearerOnly": false,
@@ -2012,7 +2012,7 @@
         "/*"
       ],
       "webOrigins": [
-        "/*"
+        "*"
       ],
       "notBefore": 0,
       "bearerOnly": false,
@@ -2215,7 +2215,7 @@
         "/*"
       ],
       "webOrigins": [
-        "/*"
+        "*"
       ],
       "notBefore": 0,
       "bearerOnly": false,
@@ -2314,7 +2314,7 @@
         "/*"
       ],
       "webOrigins": [
-        "/*"
+        "*"
       ],
       "notBefore": 0,
       "bearerOnly": false,
@@ -2417,7 +2417,7 @@
         "/*"
       ],
       "webOrigins": [
-        "/*"
+        "*"
       ],
       "notBefore": 0,
       "bearerOnly": false,
@@ -2516,7 +2516,7 @@
         "/*"
       ],
       "webOrigins": [
-        "/*"
+        "*"
       ],
       "notBefore": 0,
       "bearerOnly": false,
@@ -2615,7 +2615,7 @@
         "/*"
       ],
       "webOrigins": [
-        "/*"
+        "*"
       ],
       "notBefore": 0,
       "bearerOnly": false,
@@ -2714,7 +2714,7 @@
         "/*"
       ],
       "webOrigins": [
-        "/*"
+        "*"
       ],
       "notBefore": 0,
       "bearerOnly": false,
@@ -2814,7 +2814,7 @@
         "/*"
       ],
       "webOrigins": [
-        "/*"
+        "*"
       ],
       "notBefore": 0,
       "bearerOnly": false,
@@ -2917,7 +2917,7 @@
       "frontchannelLogout": false,
       "protocol": "openid-connect",
       "attributes": {
-        "post.logout.redirect.uris": "+"
+        "post.logout.redirect.uris": "*"
       },
       "authenticationFlowBindingOverrides": {},
       "fullScopeAllowed": false,
@@ -4467,7 +4467,7 @@
     "clientSessionMaxLifespan": "0",
     "organizationsEnabled": "false"
   },
-  "keycloakVersion": "25.0.6",
+  "keycloakVersion": "26.5.6",
   "userManagedAccessAllowed": false,
   "organizationsEnabled": false,
   "clientProfiles": {
