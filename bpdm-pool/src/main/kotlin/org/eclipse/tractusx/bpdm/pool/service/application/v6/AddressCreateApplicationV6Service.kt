@@ -61,7 +61,8 @@ class AddressCreateApplicationV6Service(
 
         val requestList = requests.toList()
         val createRequests = requestList.map {
-            AddressCreateUntypedParentRequest(it.bpnParent, addressDtoRequestMapper.toContentRequest(it.address.toV7(), it.scriptVariants.map { sv -> sv.toV7() }))
+            // v6 has no script variants, so an address created over v6 starts out without any.
+            AddressCreateUntypedParentRequest(it.bpnParent, addressDtoRequestMapper.toContentRequest(it.address.toV7(), emptyList()))
         }
 
         val responses = mutableListOf<AddressPartnerCreateVerboseDtoV6>()

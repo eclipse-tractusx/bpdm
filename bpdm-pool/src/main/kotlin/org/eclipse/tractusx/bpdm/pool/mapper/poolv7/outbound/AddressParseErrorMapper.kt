@@ -25,10 +25,10 @@ import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.springframework.stereotype.Component
 
 /**
- * Maps the address services' sealed parse errors to the `/addresses` [ErrorInfo] codes. Two cases have no public enum and
- * become internal errors (throw → 500): [AddressMetadataParseError.ScriptCodeNotFound] (the old REST path didn't validate
- * script codes and NPE'd) and every [AddressFieldParseError] (unreachable — the bounded DTO already guarantees
- * presence/format; the throw asserts that). The `when`s are exhaustive so a new error won't compile until it gets a code.
+ * Maps the address services' sealed parse errors to the `/addresses` [ErrorInfo] codes.
+ *
+ * An error the bounded DTO already rules out, or that this operation cannot reach, gets no public code and is thrown as
+ * an internal error instead. The `when`s are exhaustive so a new error won't compile until it gets a code.
  */
 @Component
 class AddressParseErrorMapper {
@@ -53,7 +53,9 @@ class AddressParseErrorMapper {
                 regionNotFound = AddressCreateError.RegionNotFound,
                 identifierNotFound = AddressCreateError.IdentifierNotFound,
                 duplicateIdentifier = AddressCreateError.AddressDuplicateIdentifier,
-                identifiersTooMany = AddressCreateError.IdentifiersTooMany
+                identifiersTooMany = AddressCreateError.IdentifiersTooMany,
+                scriptVariantCityMissing = AddressCreateError.ScriptVariantCityMissing,
+                scriptVariantDuplicateScriptCode = AddressCreateError.ScriptVariantDuplicateScriptCode
             )
         }
 
@@ -67,7 +69,9 @@ class AddressParseErrorMapper {
                 regionNotFound = AddressUpdateError.RegionNotFound,
                 identifierNotFound = AddressUpdateError.IdentifierNotFound,
                 duplicateIdentifier = AddressUpdateError.AddressDuplicateIdentifier,
-                identifiersTooMany = AddressUpdateError.IdentifiersTooMany
+                identifiersTooMany = AddressUpdateError.IdentifiersTooMany,
+                scriptVariantCityMissing = AddressUpdateError.ScriptVariantCityMissing,
+                scriptVariantDuplicateScriptCode = AddressUpdateError.ScriptVariantDuplicateScriptCode
             )
             is SiteNotInAddressLegalEntity ->
                 ErrorInfo(
@@ -75,7 +79,15 @@ class AddressParseErrorMapper {
                     "Site '${error.siteBpn}' does not belong to legal entity '${error.legalEntityBpn}'",
                     entityKey
                 )
-            is UnresolvableSite -> throw internalError(error)
+            is ScriptVariantCoverageStillNeeded ->
+                ErrorInfo(
+                    AddressUpdateError.ScriptVariantCoverageStillNeeded,
+                    "Script code '${error.scriptCode}' must stay covered: business partner '${error.requiredByBpn}' " +
+                            "is named in that script",
+                    entityKey
+                )
+            is UnresolvableSite,
+            is ScriptVariantNotCoveredByAddress -> throw internalError(error)
         }
 
     fun toLegalEntityCreateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfo<LegalEntityCreateError> =
@@ -85,7 +97,9 @@ class AddressParseErrorMapper {
             regionNotFound = LegalEntityCreateError.LegalAddressRegionNotFound,
             identifierNotFound = LegalEntityCreateError.LegalAddressIdentifierNotFound,
             duplicateIdentifier = LegalEntityCreateError.LegalAddressDuplicateIdentifier,
-            identifiersTooMany = LegalEntityCreateError.LegalAddressIdentifiersTooMany
+            identifiersTooMany = LegalEntityCreateError.LegalAddressIdentifiersTooMany,
+            scriptVariantCityMissing = LegalEntityCreateError.LegalAddressScriptVariantCityMissing,
+            scriptVariantDuplicateScriptCode = LegalEntityCreateError.LegalAddressScriptVariantDuplicateScriptCode
         )
 
     fun toLegalEntityUpdateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfo<LegalEntityUpdateError> =
@@ -95,7 +109,9 @@ class AddressParseErrorMapper {
             regionNotFound = LegalEntityUpdateError.LegalAddressRegionNotFound,
             identifierNotFound = LegalEntityUpdateError.LegalAddressIdentifierNotFound,
             duplicateIdentifier = LegalEntityUpdateError.LegalAddressDuplicateIdentifier,
-            identifiersTooMany = LegalEntityUpdateError.LegalAddressIdentifiersTooMany
+            identifiersTooMany = LegalEntityUpdateError.LegalAddressIdentifiersTooMany,
+            scriptVariantCityMissing = LegalEntityUpdateError.LegalAddressScriptVariantCityMissing,
+            scriptVariantDuplicateScriptCode = LegalEntityUpdateError.LegalAddressScriptVariantDuplicateScriptCode
         )
 
     fun toSiteCreateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfo<SiteCreateError> =
@@ -105,7 +121,9 @@ class AddressParseErrorMapper {
             regionNotFound = SiteCreateError.MainAddressRegionNotFound,
             identifierNotFound = SiteCreateError.MainAddressIdentifierNotFound,
             duplicateIdentifier = SiteCreateError.MainAddressDuplicateIdentifier,
-            identifiersTooMany = SiteCreateError.MainAddressIdentifiersTooMany
+            identifiersTooMany = SiteCreateError.MainAddressIdentifiersTooMany,
+            scriptVariantCityMissing = SiteCreateError.MainAddressScriptVariantCityMissing,
+            scriptVariantDuplicateScriptCode = SiteCreateError.MainAddressScriptVariantDuplicateScriptCode
         )
 
     fun toSiteUpdateErrorInfo(error: AddressContentParseError, entityKey: String?): ErrorInfo<SiteUpdateError> =
@@ -115,7 +133,9 @@ class AddressParseErrorMapper {
             regionNotFound = SiteUpdateError.MainAddressRegionNotFound,
             identifierNotFound = SiteUpdateError.MainAddressIdentifierNotFound,
             duplicateIdentifier = SiteUpdateError.MainAddressDuplicateIdentifier,
-            identifiersTooMany = SiteUpdateError.MainAddressIdentifiersTooMany
+            identifiersTooMany = SiteUpdateError.MainAddressIdentifiersTooMany,
+            scriptVariantCityMissing = SiteUpdateError.MainAddressScriptVariantCityMissing,
+            scriptVariantDuplicateScriptCode = SiteUpdateError.MainAddressScriptVariantDuplicateScriptCode
         )
 
     private fun <E : ErrorCode> sharedErrorInfo(
@@ -124,7 +144,9 @@ class AddressParseErrorMapper {
         regionNotFound: E,
         identifierNotFound: E,
         duplicateIdentifier: E,
-        identifiersTooMany: E
+        identifiersTooMany: E,
+        scriptVariantCityMissing: E,
+        scriptVariantDuplicateScriptCode: E
     ): ErrorInfo<E> =
         when (error) {
             is AddressFieldParseError -> throw internalError(error)
@@ -142,6 +164,14 @@ class AddressParseErrorMapper {
                     ErrorInfo(identifiersTooMany, "Amount of identifiers (${error.count}) exceeds the allowed limit", entityKey)
                 is AddressConstraintParseError.DuplicateIdentifier ->
                     ErrorInfo(duplicateIdentifier, "Duplicate Address Identifier: Value '${error.value}' of type '${error.type}'", entityKey)
+            }
+            is AddressScriptVariantParseError -> when (error) {
+                is AddressScriptVariantParseError.PhysicalCityMissing ->
+                    ErrorInfo(scriptVariantCityMissing, "Script variant ${error.index} has no city in its physical address", entityKey)
+                is AddressScriptVariantParseError.AlternativeCityMissing ->
+                    ErrorInfo(scriptVariantCityMissing, "Script variant ${error.index} has no city in its alternative address", entityKey)
+                is AddressScriptVariantParseError.DuplicateScriptCode ->
+                    ErrorInfo(scriptVariantDuplicateScriptCode, "Duplicate address script variant for script code '${error.scriptCode}'", entityKey)
             }
         }
 

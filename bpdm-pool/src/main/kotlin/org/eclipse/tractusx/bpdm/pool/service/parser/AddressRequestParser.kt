@@ -30,6 +30,7 @@ import org.eclipse.tractusx.bpdm.pool.model.error.AddressConstraintParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.AddressContentParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.AddressFieldParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.AddressMetadataParseError
+import org.eclipse.tractusx.bpdm.pool.model.error.AddressScriptVariantParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.*
 import org.eclipse.tractusx.bpdm.pool.model.request.*
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
@@ -89,7 +90,7 @@ class AddressRequestParser(
         val confidence = parseConfidence(request.confidenceCriteria, errors)
         val identifiers = parseIdentifiers(request.identifiers, metadata, errors)
         val states = parseStates(request.states, errors)
-        val parsedScriptVariants = request.scriptVariants.mapIndexedNotNull { index, variant -> parseScriptVariant(index, variant, metadata, errors) }
+        val parsedScriptVariants = parseScriptVariants(request.scriptVariants, metadata, errors)
 
         if (errors.isNotEmpty()) return ParseResult.Failure(errors)
 
@@ -216,6 +217,22 @@ class AddressRequestParser(
             AddressState(request.validFrom, request.validTo, type)
         }
 
+    private fun parseScriptVariants(
+        requests: List<AddressScriptVariant>,
+        metadata: AddressMetadata,
+        errors: MutableList<AddressContentParseError>
+    ): List<AddressScriptVariantParsed> {
+        val claimedScriptCodes = mutableSetOf<String>()
+        return requests.mapIndexedNotNull { index, variant ->
+            if (!claimedScriptCodes.add(variant.scriptCode)) {
+                errors.add(AddressScriptVariantParseError.DuplicateScriptCode(index, variant.scriptCode))
+                null
+            } else {
+                parseScriptVariant(index, variant, metadata, errors)
+            }
+        }
+    }
+
     private fun parseScriptVariant(
         index: Int,
         variant: AddressScriptVariant,
@@ -223,8 +240,51 @@ class AddressRequestParser(
         errors: MutableList<AddressContentParseError>
     ): AddressScriptVariantParsed? {
         val scriptCode = metadata.scriptCodes[variant.scriptCode]
-            ?: run { errors.add(AddressMetadataParseError.ScriptCodeNotFound(index, variant.scriptCode)); return null }
-        return AddressScriptVariantParsed(scriptCode, variant.address)
+            ?: run { errors.add(AddressMetadataParseError.ScriptCodeNotFound(index, variant.scriptCode)); null }
+        val physical = parsePhysicalScriptVariant(index, variant.address.physicalAddress, errors)
+        val alternativeRequest = variant.address.alternativeAddress
+        val alternative = alternativeRequest?.let { parseAlternativeScriptVariant(index, it, errors) }
+
+        if (scriptCode == null || physical == null || (alternativeRequest != null && alternative == null)) return null
+
+        return AddressScriptVariantParsed(
+            scriptCode = scriptCode,
+            address = PostalAddressScriptVariantParsed(
+                addressName = variant.address.addressName,
+                physicalAddress = physical,
+                alternativeAddress = alternative
+            )
+        )
+    }
+
+    private fun parsePhysicalScriptVariant(
+        index: Int,
+        variant: PhysicalAddressScriptVariant,
+        errors: MutableList<AddressContentParseError>
+    ): PhysicalAddressScriptVariantParsed? {
+        val city = variant.city?.takeIf { it.isNotBlank() }
+            ?: run { errors.add(AddressScriptVariantParseError.PhysicalCityMissing(index)); return null }
+
+        return PhysicalAddressScriptVariantParsed(
+            city = city,
+            district = variant.district,
+            street = variant.street,
+            industrialZone = variant.industrialZone,
+            building = variant.building,
+            floor = variant.floor,
+            door = variant.door
+        )
+    }
+
+    private fun parseAlternativeScriptVariant(
+        index: Int,
+        variant: AlternativeAddressScriptVariant,
+        errors: MutableList<AddressContentParseError>
+    ): AlternativeAddressScriptVariantParsed? {
+        val city = variant.city?.takeIf { it.isNotBlank() }
+            ?: run { errors.add(AddressScriptVariantParseError.AlternativeCityMissing(index)); return null }
+
+        return AlternativeAddressScriptVariantParsed(city)
     }
 
     private fun parseRegion(

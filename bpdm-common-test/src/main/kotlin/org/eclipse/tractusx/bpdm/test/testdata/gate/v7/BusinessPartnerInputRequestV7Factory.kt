@@ -167,24 +167,19 @@ class BusinessPartnerInputRequestV7Factory(
                     address = AddressScriptVariantDto(
                         name = "Address Name Variant $i $seed",
                         physicalAddress = PhysicalAddressScriptVariantDto(
-                            postalCode = "Postal Code Variant $i $seed",
                             city = "City Variant $i $seed",
                             district = "District Variant $i $seed",
-                            street = StreetDto(
+                            street = StreetScriptVariantDto(
                                 name = "Street Name Variant $i $seed",
-                                houseNumber = "House Number Variant $i $seed"
+                                direction = "Direction Variant $i $seed"
                             ),
-                            companyPostalCode = "Company Postal Code Variant $i $seed",
                             industrialZone = "Industrial Zone Variant $i $seed",
                             building = "Building Variant $i $seed",
                             floor = "Floor Variant $i $seed",
                             door = "Door Variant $i $seed"
                         ),
                         alternativeAddress = AlternativeAddressScriptVariantDto(
-                            postalCode = "Alt Postal Code Variant $i $seed",
-                            city = "Alt City Variant $i $seed",
-                            deliveryServiceQualifier = "Delivery Service Qualifier Variant $i $seed",
-                            deliveryServiceNumber = "Delivery Service Number Variant $i $seed"
+                            city = "Alt City Variant $i $seed"
                         )
                     )
                 )

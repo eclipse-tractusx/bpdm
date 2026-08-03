@@ -35,5 +35,6 @@ data class SiteHeaderRequest(
 
 data class SiteScriptVariant(
     val scriptCode: String,
+    /** Non-null unlike most loose request fields: no inbound source can express a missing site script variant name. */
     val name: String
 )

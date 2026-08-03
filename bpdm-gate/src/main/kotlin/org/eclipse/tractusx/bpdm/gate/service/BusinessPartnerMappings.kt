@@ -266,16 +266,13 @@ class BusinessPartnerMappings {
     private fun toPhysicalAddressScriptVariantDto(entity: PhysicalPostalAddressScriptVariantDb): PhysicalAddressScriptVariantDto{
         return with(entity) {
             PhysicalAddressScriptVariantDto(
-                postalCode = postalCode,
                 city = city,
                 district = district,
-                street = street?.toStreetDto() ?: StreetDto(),
-                companyPostalCode = companyPostalCode,
+                street = street?.toStreetScriptVariantDto() ?: StreetScriptVariantDto(),
                 industrialZone = industrialZone,
                 building = building,
                 floor = floor,
-                door = door,
-                taxJurisdictionCode = taxJurisdictionCode
+                door = door
             )
         }
     }
@@ -283,10 +280,7 @@ class BusinessPartnerMappings {
     private fun toAlternativeAddressScriptVariantDto(entity: AlternativePostalAddressScriptVariantDb): AlternativeAddressScriptVariantDto{
         return with(entity){
             AlternativeAddressScriptVariantDto(
-                postalCode = postalCode,
-                city = city,
-                deliveryServiceQualifier = deliveryServiceQualifier,
-                deliveryServiceNumber = deliveryServiceNumber
+                city = city
             )
         }
     }
@@ -302,36 +296,50 @@ class BusinessPartnerMappings {
                 siteName = site.name,
                 addressName = address.name,
                 physicalAddress = toPhysicalAddressScriptVariantDb(address.physicalAddress),
-                alternativeAddress = address.alternativeAddress?.let { toAlternativeAddressScriptVariantDb(it) })
+                alternativeAddress = toAlternativeAddressScriptVariantDb(address.alternativeAddress))
         }
     }
 
     private fun toPhysicalAddressScriptVariantDb(dto: PhysicalAddressScriptVariantDto): PhysicalPostalAddressScriptVariantDb{
         return with(dto){
             PhysicalPostalAddressScriptVariantDb(
-                postalCode = postalCode,
                 city = city,
                 district = district,
-                street = toStreet(street),
-                companyPostalCode = companyPostalCode,
+                street = toStreetScriptVariant(street),
                 industrialZone = industrialZone,
                 building = building,
                 floor = floor,
-                door = door,
-                taxJurisdictionCode = taxJurisdictionCode
+                door = door
             )
         }
     }
 
-    private fun toAlternativeAddressScriptVariantDb(dto: AlternativeAddressScriptVariantDto): AlternativePostalAddressScriptVariantDb{
+    private fun toAlternativeAddressScriptVariantDb(dto: AlternativeAddressScriptVariantDto?): AlternativePostalAddressScriptVariantDb?{
+        return dto?.city?.let { AlternativePostalAddressScriptVariantDb(city = it) }
+    }
+
+    private fun toStreetScriptVariant(dto: StreetScriptVariantDto): StreetScriptVariantDb{
         return with(dto){
-            AlternativePostalAddressScriptVariantDb(
-                postalCode = postalCode,
-                city = city,
-                deliveryServiceQualifier = deliveryServiceQualifier,
-                deliveryServiceNumber = deliveryServiceNumber
+            StreetScriptVariantDb(
+                name = name,
+                direction = direction,
+                namePrefix = namePrefix,
+                additionalNamePrefix = additionalNamePrefix,
+                nameSuffix = nameSuffix,
+                additionalNameSuffix = additionalNameSuffix
             )
         }
+    }
+
+    private fun StreetScriptVariantDb.toStreetScriptVariantDto(): StreetScriptVariantDto{
+        return StreetScriptVariantDto(
+            name = name,
+            direction = direction,
+            namePrefix = namePrefix,
+            additionalNamePrefix = additionalNamePrefix,
+            nameSuffix = nameSuffix,
+            additionalNameSuffix = additionalNameSuffix
+        )
     }
 
     // convert empty DTO to null

@@ -19,7 +19,11 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.request
 
+/**
+ * A site whose main address already exists, together with that address's content as this site describes it.
+ */
 data class SiteCreateWithReferencedAddressAsMainRequest(
     val mainAddressBpn: String,
-    val content: SiteContentRequest
+    val header: SiteHeaderRequest,
+    val mainAddress: LogisticAddressRequest
 )

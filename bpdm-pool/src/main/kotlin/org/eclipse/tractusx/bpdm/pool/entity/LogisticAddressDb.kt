@@ -79,4 +79,6 @@ class LogisticAddressDb(
         inverseJoinColumns = [JoinColumn(name = "site_id", referencedColumnName = "id")]
     )
     val sites: MutableSet<SiteDb> = mutableSetOf()
+
+    fun scriptCodes(): List<String> = scriptVariants.map { it.scriptCode.technicalKey }
 }

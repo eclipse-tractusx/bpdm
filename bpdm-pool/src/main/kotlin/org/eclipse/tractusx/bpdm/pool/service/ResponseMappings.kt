@@ -351,14 +351,15 @@ fun getAddressType(logisticAddress: LogisticAddressDb): AddressType {
 }
 
 private fun List<LegalEntityScriptVariantDb>.toLegalEntityScriptVariants(legalAddressVariants: List<LogisticAddressScriptVariantDb>): List<LegalEntityScriptVariantDto>{
-    val legalEntityVariantsByCode = associateBy { it.scriptCode.technicalKey }
     val legalAddressVariantsByCode = legalAddressVariants.associateBy { it.scriptCode.technicalKey }
 
-    val allKeys = legalEntityVariantsByCode.keys.plus(legalAddressVariantsByCode.keys)
-    return allKeys.mapNotNull { key ->
-        val legalEntityProperties = legalEntityVariantsByCode[key] ?: return@mapNotNull null
-        val legalAddressProperties = legalAddressVariantsByCode[key]
-        LegalEntityScriptVariantDto(key, legalEntityProperties.legalName, legalEntityProperties.shortName, legalAddressProperties?.toDto() ?: PostalAddressScriptVariantDto())
+    return map { variant ->
+        val scriptCode = variant.scriptCode.technicalKey
+        // The legal address covers every script its legal entity is named in: the parsers reject a variant it does not
+        // cover and ScriptVariantCoverageService prunes any the legal address stops covering.
+        val legalAddressVariant = legalAddressVariantsByCode[scriptCode]
+            ?: throw IllegalStateException("Legal entity script variant of script code '$scriptCode' is not covered by the legal address.")
+        LegalEntityScriptVariantDto(scriptCode, variant.legalName, variant.shortName, legalAddressVariant.toDto())
     }
 }
 
@@ -367,14 +368,13 @@ private fun SiteDb.toSiteScriptVariants(): List<SiteScriptVariantDto>{
 }
 
 private fun List<SiteScriptVariantDb>.toSiteScriptVariants(mainAddressVariants: List<LogisticAddressScriptVariantDb>): List<SiteScriptVariantDto>{
-    val siteVariantsByCode = associateBy { it.scriptCode.technicalKey }
     val mainAddressVariantsByCode = mainAddressVariants.associateBy { it.scriptCode.technicalKey }
 
-    val allKeys = siteVariantsByCode.keys.plus(mainAddressVariantsByCode.keys)
-    return allKeys.mapNotNull { key ->
-        val siteProperties = siteVariantsByCode[key] ?: return@mapNotNull null
-        val mainAddressProperties = mainAddressVariantsByCode[key]
-        SiteScriptVariantDto(key, siteProperties.name , mainAddressProperties?.toDto() ?: PostalAddressScriptVariantDto())
+    return map { variant ->
+        val scriptCode = variant.scriptCode.technicalKey
+        val mainAddressVariant = mainAddressVariantsByCode[scriptCode]
+            ?: throw IllegalStateException("Site script variant of script code '$scriptCode' is not covered by the main address.")
+        SiteScriptVariantDto(scriptCode, variant.name, mainAddressVariant.toDto())
     }
 }
 
@@ -388,19 +388,27 @@ private fun LogisticAddressScriptVariantDb.toDto(): PostalAddressScriptVariantDt
 
 private fun PhysicalAddressScriptVariantDb.toDto(): PhysicalAddressScriptVariantDto{
     return PhysicalAddressScriptVariantDto(
-        postalCode = postalCode,
         city = city,
         district = district,
         street = street?.toDto(),
-        companyPostalCode = companyPostalCode,
         industrialZone = industrialZone,
         building = building,
         floor = floor,
-        door = door,
-        taxJurisdictionCode = taxJurisdictionCode
+        door = door
     )
 }
 
 private fun AlternativeAddressScriptVariantDb.toDto(): AlternativeAddressScriptVariantDto{
-    return AlternativeAddressScriptVariantDto(postalCode, city, deliveryServiceQualifier, deliveryServiceNumber)
+    return AlternativeAddressScriptVariantDto(city)
+}
+
+private fun StreetScriptVariantDb.toDto(): StreetScriptVariantDto{
+    return StreetScriptVariantDto(
+        name = name,
+        direction = direction,
+        namePrefix = namePrefix,
+        additionalNamePrefix = additionalNamePrefix,
+        nameSuffix = nameSuffix,
+        additionalNameSuffix = additionalNameSuffix
+    )
 }

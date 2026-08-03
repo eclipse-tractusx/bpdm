@@ -491,39 +491,43 @@ data class PostalAddressScriptVariant(
 }
 
 data class PhysicalAddressScriptVariant(
-    val postalCode: String?,
     val city: String?,
     val district: String?,
-    val street: Street,
-    val companyPostalCode: String?,
+    val street: StreetScriptVariant,
     val industrialZone: String?,
     val building: String?,
     val floor: String?,
     val door: String?,
-    val taxJurisdictionCode: String?,
 ){
     companion object{
         val empty = PhysicalAddressScriptVariant(
-            postalCode = null,
             city = null,
             district = null,
-            street = Street.empty,
-            companyPostalCode = null,
+            street = StreetScriptVariant.empty,
             industrialZone = null,
             building = null,
             floor = null,
-            door = null,
-            taxJurisdictionCode = null
+            door = null
         )
     }
 }
 
 data class AlternativeAddressScriptVariant(
-    val postalCode: String?,
-    val city: String?,
-    val deliveryServiceQualifier: String?,
-    val deliveryServiceNumber: String?
+    val city: String?
 )
+
+data class StreetScriptVariant(
+    val name: String?,
+    val direction: String?,
+    val namePrefix: String?,
+    val additionalNamePrefix: String?,
+    val nameSuffix: String?,
+    val additionalNameSuffix: String?
+){
+    companion object{
+        val empty = StreetScriptVariant(null, null, null, null, null, null)
+    }
+}
 
 enum class NamePartType{
     LegalName,

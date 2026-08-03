@@ -95,7 +95,8 @@ class TaskStepBuildService(
     private val siteCreateWithReferencedAddressAsMainParser: SiteCreateWithReferencedAddressAsMainParser,
     private val siteCreateWithReferencedAddressAsMainService: SiteCreateWithReferencedAddressAsMainService,
     private val taskLegalEntityRequestMapper: GoldenRecordTaskLegalEntityRequestMapper,
-    private val taskSiteRequestMapper: GoldenRecordTaskSiteRequestMapper
+    private val taskSiteRequestMapper: GoldenRecordTaskSiteRequestMapper,
+    private val coverageValidator: TaskScriptVariantCoverageValidator
 ) {
 
     enum class CleaningError(val message: String) {
@@ -126,6 +127,7 @@ class TaskStepBuildService(
         val businessPartnerDto = taskEntry.businessPartner
 
         assertParentsConsistent(businessPartnerDto, taskEntryBpnMapping)
+        assertScriptVariantCoverage(businessPartnerDto, taskEntryBpnMapping)
 
         val legalEntityResult = processLegalEntity(businessPartnerDto, taskEntryBpnMapping)
         val siteResult = processSite(businessPartnerDto, legalEntityResult.bpnReference.referenceValue!!, taskEntryBpnMapping)
@@ -193,7 +195,7 @@ class TaskStepBuildService(
 
     private fun updateLegalEntity(bpnL: String, legalEntity: LegalEntity): LegalEntityDb {
         val request = taskLegalEntityRequestMapper.toUpdateRequest(bpnL, legalEntity)
-        return when (val result = parseAndExecute(listOf(request), legalEntityUpdateParser::parse, legalEntityPayloadUpdateService::update).single()) {
+        return when (val result = parseAndExecute(listOf(request), legalEntityUpdateParser::parseWithoutCoverageCheck, legalEntityPayloadUpdateService::update).single()) {
             is ParseResult.Success -> result.parsed.value
             is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { renderError(it) })
         }
@@ -258,7 +260,8 @@ class TaskStepBuildService(
         // Reached only via the address-linkage path for a new site, where the site carries its own main address
         // reference resolving to an already-persisted address (an additional address, or another site's main
         // address). The referenced service re-parents that existing address onto the new site - adding the site to
-        // the address's site set - and derives the legal-entity parent from the address itself.
+        // the address's site set - and derives the legal-entity parent from the address itself. The task states that
+        // address's content too, so it is applied: the site's own view of its main address is its golden record.
         val siteMainAddress = site.siteMainAddress ?: throw BpdmValidationException(CleaningError.MAINE_ADDRESS_IS_NULL.message)
         val bpnSReference = site.bpnReference
         val mergedSite = site.withRelevantScriptVariants(businessPartner)
@@ -293,7 +296,7 @@ class TaskStepBuildService(
             createSite(legalEntityBpn, mergedSite, siteMainAddress, isSiteMainAndLegalAddress)
         }
         else {
-            updateSite(bpnS, mergedSite, siteMainAddress)
+            updateSite(bpnS, mergedSite, siteMainAddress, businessPartner.legalAddressCoverageNotStatedBy(mergedSite))
         }
 
         taskEntryBpnMapping.addMapping(bpnSReference, upsertedSite.bpn)
@@ -323,9 +326,14 @@ class TaskStepBuildService(
         }
     }
 
-    private fun updateSite(bpnS: String, site: Site, mainAddress: PostalAddress): SiteDb {
-        val request = taskSiteRequestMapper.toUpdateRequest(bpnS, site, mainAddress)
-        return when (val result = parseAndExecute(listOf(request), siteUpdateParser::parse, sitePayloadUpdateService::update).single()) {
+    private fun updateSite(
+        bpnS: String,
+        site: Site,
+        mainAddress: PostalAddress,
+        additionalMainAddressScriptVariants: List<PostalAddressScriptVariantWithScriptCode>
+    ): SiteDb {
+        val request = taskSiteRequestMapper.toUpdateRequest(bpnS, site, mainAddress, additionalMainAddressScriptVariants)
+        return when (val result = parseAndExecute(listOf(request), siteUpdateParser::parseWithoutCoverageCheck, sitePayloadUpdateService::update).single()) {
             is ParseResult.Success -> result.parsed.value
             is ParseResult.Failure -> throw BpdmMultiValidationException(result.errors.map { renderError(it) })
         }
@@ -433,6 +441,7 @@ class TaskStepBuildService(
 
     private fun renderError(error: AddressUpdateParseError): String =
         when (error) {
+            is ScriptVariantCoverageParseError -> renderError(error)
             is UnresolvableAddress -> "Address ${error.bpn} not found"
             is AddressContentParseError -> renderError(error)
             is UnresolvableSite -> "Site parent ${error.bpn} not found"
@@ -444,6 +453,7 @@ class TaskStepBuildService(
             is AddressFieldParseError -> renderFieldError(error)
             is AddressMetadataParseError -> renderMetadataError(error)
             is AddressConstraintParseError -> renderConstraintError(error)
+            is AddressScriptVariantParseError -> renderScriptVariantError(error)
         }
 
     private fun renderFieldError(error: AddressFieldParseError): String =
@@ -475,8 +485,16 @@ class TaskStepBuildService(
             is AddressConstraintParseError.DuplicateIdentifier -> "Duplicate identifier of type '${error.type}' with value '${error.value}'"
         }
 
+    private fun renderScriptVariantError(error: AddressScriptVariantParseError): String =
+        when (error) {
+            is AddressScriptVariantParseError.PhysicalCityMissing -> "Script variant ${error.index} has no city in its physical address"
+            is AddressScriptVariantParseError.AlternativeCityMissing -> "Script variant ${error.index} has no city in its alternative address"
+            is AddressScriptVariantParseError.DuplicateScriptCode -> "Duplicate address script variant for script code '${error.scriptCode}'"
+        }
+
     private fun renderError(error: LegalEntityCreateParseError): String =
         when (error) {
+            is ScriptVariantCoverageParseError -> renderLegalAddressCoverageError(error)
             is LegalEntityContentParseError -> renderError(error)
             is AddressContentParseError -> renderError(error)
         }
@@ -487,6 +505,7 @@ class TaskStepBuildService(
             is MultipleUltimateOwnersInHierarchy ->
                 "An ownership hierarchy can have at most one ultimate owner, but these legal entities are also flagged " +
                         "as ultimate owner: ${error.conflictingBpnls.joinToString(", ")}"
+            is ScriptVariantCoverageParseError -> renderLegalAddressCoverageError(error)
             is LegalEntityContentParseError -> renderError(error)
             is AddressContentParseError -> renderError(error)
         }
@@ -502,6 +521,9 @@ class TaskStepBuildService(
             is LegalEntityContentParseError.IdentifiersTooMany -> "Too many identifiers: ${error.count} exceeds the allowed limit"
             is LegalEntityContentParseError.DuplicateIdentifier -> "Duplicate identifier of type '${error.type}' with value '${error.value}'"
             is LegalEntityContentParseError.ScriptCodeNotFound -> "Script code '${error.scriptCode}' is not known"
+            is LegalEntityContentParseError.ScriptVariantLegalNameMissing -> "Script variant ${error.index} has no legal name"
+            is LegalEntityContentParseError.ScriptVariantDuplicateScriptCode ->
+                "Duplicate legal entity script variant for script code '${error.scriptCode}'"
         }
 
     private fun renderError(error: SiteCreateParseError): String =
@@ -509,6 +531,7 @@ class TaskStepBuildService(
             is UnresolvableLegalEntity -> "Legal entity ${error.bpn} not found"
             is UnresolvableAddress -> "Address ${error.bpn} not found"
             is LegalAddressAlreadyMainAddress -> "Legal address already is the main address of site ${error.bpnSite}"
+            is ScriptVariantCoverageParseError -> renderMainAddressCoverageError(error)
             is SiteContentParseError -> renderError(error)
             is AddressContentParseError -> renderError(error)
         }
@@ -516,8 +539,28 @@ class TaskStepBuildService(
     private fun renderError(error: SiteUpdateParseError): String =
         when (error) {
             is UnresolvableSite -> "Site ${error.bpn} not found"
+            is ScriptVariantCoverageParseError -> renderMainAddressCoverageError(error)
             is SiteContentParseError -> renderError(error)
             is AddressContentParseError -> renderError(error)
+        }
+
+    private fun renderError(error: ScriptVariantCoverageParseError): String =
+        when (error) {
+            is ScriptVariantNotCoveredByAddress -> "Script code '${error.scriptCode}' is not covered by the address"
+            is ScriptVariantCoverageStillNeeded ->
+                "Script code '${error.scriptCode}' must stay covered: business partner ${error.requiredByBpn} is named in that script"
+        }
+
+    private fun renderLegalAddressCoverageError(error: ScriptVariantCoverageParseError): String =
+        when (error) {
+            is ScriptVariantNotCoveredByAddress -> "Script code '${error.scriptCode}' is not covered by the legal address"
+            is ScriptVariantCoverageStillNeeded -> renderError(error)
+        }
+
+    private fun renderMainAddressCoverageError(error: ScriptVariantCoverageParseError): String =
+        when (error) {
+            is ScriptVariantNotCoveredByAddress -> "Script code '${error.scriptCode}' is not covered by the site main address"
+            is ScriptVariantCoverageStillNeeded -> renderError(error)
         }
 
     private fun renderError(error: SiteContentParseError): String =
@@ -525,6 +568,8 @@ class TaskStepBuildService(
             SiteContentParseError.NameMissing -> CleaningError.SITE_NAME_MISSING.message
             SiteContentParseError.ConfidenceCriteriaMissing -> CleaningError.SITE_CONFIDENCE_CRITERIA_MISSING.message
             is SiteContentParseError.ScriptCodeNotFound -> "Script code '${error.scriptCode}' is not known"
+            is SiteContentParseError.ScriptVariantNameMissing -> "Script variant ${error.index} has no site name"
+            is SiteContentParseError.ScriptVariantDuplicateScriptCode -> "Duplicate site script variant for script code '${error.scriptCode}'"
         }
 
     private fun updateConfidences(
@@ -616,22 +661,35 @@ class TaskStepBuildService(
         )
     }
 
+    /**
+     * The legal address script variants of the script codes [site] does not state itself. A site whose main address is the
+     * legal address writes that one address, so its payload has to keep covering what the legal entity is named in -
+     * otherwise the last write of the task would decide which of the two partners stays readable.
+     */
+    private fun BusinessPartner.legalAddressCoverageNotStatedBy(site: Site): List<PostalAddressScriptVariantWithScriptCode> {
+        if (!site.siteMainIsLegalAddress) return emptyList()
+
+        val statedScriptCodes = site.scriptVariants.map { it.scriptCode }.toSet()
+        return legalEntity.scriptVariants
+            .filterNot { it.scriptCode in statedScriptCodes }
+            .map { PostalAddressScriptVariantWithScriptCode(it.scriptCode, it.legalAddress) }
+    }
+
+    private fun assertScriptVariantCoverage(businessPartner: BusinessPartner, taskEntryBpnMapping: TaskEntryBpnMapping) {
+        val violations = coverageValidator.validate(businessPartner, taskEntryBpnMapping)
+        if (violations.isNotEmpty()) throw BpdmMultiValidationException(violations.map { renderError(it) })
+    }
+
     private fun Site.withRelevantScriptVariants(businessPartner: BusinessPartner): Site {
-       val scriptVariants =  if(siteMainIsLegalAddress){
-            val legalEntityVariantsByCode = businessPartner.legalEntity.scriptVariants.associateBy { it.scriptCode }
-            val siteVariantsByCode = scriptVariants.associateBy { it.scriptCode }
-            val allScriptCodes = legalEntityVariantsByCode.keys.plus(siteVariantsByCode.keys)
+        if (!siteMainIsLegalAddress) return this
 
-           allScriptCodes.map { scriptCode ->
-               val legalEntityVariant = legalEntityVariantsByCode[scriptCode]
-               val siteVariant = siteVariantsByCode[scriptCode] ?: SiteScriptVariant(scriptCode, "", org.eclipse.tractusx.orchestrator.api.model.PostalAddressScriptVariant.empty)
+        // The main address is the legal address, so its script variants are stored on the legal entity, not on the site.
+        val legalAddressVariantsByCode = businessPartner.legalEntity.scriptVariants.associate { it.scriptCode to it.legalAddress }
 
-               val mainAddressVariant = legalEntityVariant?.legalAddress ?: siteVariant.mainAddress
-
-               siteVariant.copy(mainAddress = mainAddressVariant)
-           }
-        }else { scriptVariants }
-
-        return copy(scriptVariants = scriptVariants)
+        return copy(
+            scriptVariants = scriptVariants.map { variant ->
+                variant.copy(mainAddress = legalAddressVariantsByCode[variant.scriptCode] ?: variant.mainAddress)
+            }
+        )
     }
 }

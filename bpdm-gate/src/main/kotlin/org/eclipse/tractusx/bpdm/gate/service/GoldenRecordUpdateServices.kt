@@ -553,24 +553,26 @@ class GoldenRecordUpdateChunkService(
 
     private fun PhysicalAddressScriptVariantDto.toEntity() =
         PhysicalPostalAddressScriptVariantDb(
-            postalCode = postalCode,
             city = city,
             district = district,
             street = street?.toEntity(),
-            companyPostalCode = companyPostalCode,
             industrialZone = industrialZone,
             building = building,
             floor = floor,
-            door = door,
-            taxJurisdictionCode = taxJurisdictionCode
+            door = door
         )
 
     private fun AlternativeAddressScriptVariantDto.toEntity() =
-        AlternativePostalAddressScriptVariantDb(
-            postalCode = postalCode,
-            city = city,
-            deliveryServiceQualifier = deliveryServiceQualifier,
-            deliveryServiceNumber = deliveryServiceNumber
+        city?.let { AlternativePostalAddressScriptVariantDb(city = it) }
+
+    private fun StreetScriptVariantDto.toEntity() =
+        StreetScriptVariantDb(
+            name,
+            direction,
+            namePrefix,
+            additionalNamePrefix,
+            nameSuffix,
+            additionalNameSuffix
         )
 
 

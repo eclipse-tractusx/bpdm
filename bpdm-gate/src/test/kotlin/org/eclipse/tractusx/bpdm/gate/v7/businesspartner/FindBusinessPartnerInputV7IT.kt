@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.v7.businesspartner
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
+import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.withoutAlternativeAddressScriptVariants
 import org.junit.jupiter.api.Test
 
 class FindBusinessPartnerInputV7IT : UnscheduledGateTestBaseV7() {
@@ -35,6 +36,26 @@ class FindBusinessPartnerInputV7IT : UnscheduledGateTestBaseV7() {
     fun `find created business partner input`() {
         //GIVEN
         val created = testDataClient.businessPartner.upsertInput(testName)
+
+        //WHEN
+        val response = gateClient.businessParters.getBusinessPartnersInput(listOf(testName))
+
+        //THEN
+        val expected = PageDto(1, 1, 0, 1, listOf(created))
+        assertRepo.assertBusinessPartnerInput(response, expected)
+    }
+
+    /**
+     * GIVEN business partner input whose script variants carry no alternative address
+     * WHEN input consumer searches for business partner under external-ID
+     * THEN the script variants come back without an alternative address
+     */
+    @Test
+    fun `find created business partner input without alternative address script variant`() {
+        //GIVEN
+        val created = testDataClient.businessPartner.upsertInput(
+            testData.businessPartner.input.request.fromSeed(testName).withoutAlternativeAddressScriptVariants()
+        )
 
         //WHEN
         val response = gateClient.businessParters.getBusinessPartnersInput(listOf(testName))

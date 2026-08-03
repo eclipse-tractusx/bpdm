@@ -204,26 +204,33 @@ class TaskResolutionMapper {
     fun toTaskResult(physicalAddress: PhysicalAddressScriptVariantDto): PhysicalAddressScriptVariant{
         return with(physicalAddress){
             PhysicalAddressScriptVariant(
-                postalCode = postalCode,
                 city = city,
                 district = district,
-                street = street?.let { toTaskResult(it) } ?: Street.empty,
-                companyPostalCode = companyPostalCode,
+                street = street?.let { toTaskResult(it) } ?: StreetScriptVariant.empty,
                 industrialZone = industrialZone,
                 building = building,
                 floor = floor,
-                door = door,
-                taxJurisdictionCode = taxJurisdictionCode)
+                door = door)
         }
     }
 
     fun toTaskResult(alternativeAddressScriptVariant: AlternativeAddressScriptVariantDto): AlternativeAddressScriptVariant{
         return with(alternativeAddressScriptVariant){
             AlternativeAddressScriptVariant(
-                postalCode = postalCode,
-                city = city,
-                deliveryServiceQualifier = deliveryServiceQualifier,
-                deliveryServiceNumber = deliveryServiceNumber
+                city = city
+            )
+        }
+    }
+
+    fun toTaskResult(street: StreetScriptVariantDto): StreetScriptVariant{
+        return with(street){
+            StreetScriptVariant(
+                name = name,
+                direction = direction,
+                namePrefix = namePrefix,
+                additionalNamePrefix = additionalNamePrefix,
+                nameSuffix = nameSuffix,
+                additionalNameSuffix = additionalNameSuffix
             )
         }
     }

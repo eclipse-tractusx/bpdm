@@ -29,8 +29,8 @@ data class LegalEntityScriptVariantDb(
     @ManyToOne
     @JoinColumn(name = "script_code_id", nullable = false)
     val scriptCode: ScriptCodeDb,
-    @Column(name = "legal_name")
-    val legalName: String?,
+    @Column(name = "legal_name", nullable = false)
+    val legalName: String,
     @Column(name = "shortName")
     val shortName: String?
 )

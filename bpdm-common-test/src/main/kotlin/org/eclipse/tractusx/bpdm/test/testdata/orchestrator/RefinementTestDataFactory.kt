@@ -272,7 +272,7 @@ class RefinementTestDataFactory {
         return with(siteScriptVariant){
             SiteScriptVariant(
                 scriptCode = scriptCode,
-                siteName = name,
+                siteName = requireNotNull(name) { "A site script variant without a name cannot become a golden record task result" },
                 mainAddress = buildPostalAddressScriptVariant(mainAddress)
             )
         }
@@ -297,26 +297,33 @@ class RefinementTestDataFactory {
     private fun buildPhysicalAddressScriptVariant(physicalAddressScriptVariant: PhysicalAddressScriptVariantDto): PhysicalAddressScriptVariant{
         return with(physicalAddressScriptVariant){
             PhysicalAddressScriptVariant(
-                postalCode = postalCode,
                 city = city,
                 district = district,
-                street = street?.let { buildStreet(it) } ?: Street.empty,
-                companyPostalCode = companyPostalCode,
+                street = street?.let { buildScriptVariantStreet(it) } ?: StreetScriptVariant.empty,
                 industrialZone = industrialZone,
                 building = building,
                 floor = floor,
-                door = door,
-                taxJurisdictionCode = taxJurisdictionCode)
+                door = door)
         }
     }
 
     private fun buildAlternativeAddressScriptVariant(alternativeAddressScriptVariant: AlternativeAddressScriptVariantDto): AlternativeAddressScriptVariant{
         return with(alternativeAddressScriptVariant){
             AlternativeAddressScriptVariant(
-                postalCode = postalCode,
-                city = city,
-                deliveryServiceQualifier = deliveryServiceQualifier,
-                deliveryServiceNumber = deliveryServiceNumber
+                city = city
+            )
+        }
+    }
+
+    private fun buildScriptVariantStreet(street: StreetScriptVariantDto): StreetScriptVariant{
+        return with(street){
+            StreetScriptVariant(
+                name = name,
+                direction = direction,
+                namePrefix = namePrefix,
+                additionalNamePrefix = additionalNamePrefix,
+                nameSuffix = nameSuffix,
+                additionalNameSuffix = additionalNameSuffix
             )
         }
     }

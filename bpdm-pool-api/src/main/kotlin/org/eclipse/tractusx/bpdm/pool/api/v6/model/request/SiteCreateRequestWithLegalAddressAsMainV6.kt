@@ -23,7 +23,6 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.IBaseSiteDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.ConfidenceCriteriaDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.SiteHeaderDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.SiteHeaderScriptVariantDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.SiteStateDtoV6
 
 @Schema(deprecated = true)
@@ -31,11 +30,10 @@ data class SiteCreateRequestWithLegalAddressAsMainV6(
     override val name: String,
     override val states: Collection<SiteStateDtoV6>,
     override val confidenceCriteria: ConfidenceCriteriaDtoV6,
-    val bpnLParent: String,
-    val scriptVariants: List<SiteHeaderScriptVariantDtoV6> = emptyList()
+    val bpnLParent: String
 ) : IBaseSiteDto{
     fun toHeader(): SiteHeaderDtoV6{
-        return SiteHeaderDtoV6(name, states, confidenceCriteria, scriptVariants)
+        return SiteHeaderDtoV6(name, states, confidenceCriteria)
     }
 }
 

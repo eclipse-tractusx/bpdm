@@ -30,7 +30,8 @@ import org.eclipse.tractusx.orchestrator.api.model.PostalAddressScriptVariantWit
 import org.eclipse.tractusx.orchestrator.api.model.Site as TaskSite
 
 /**
- * Maps a cleaning task's site into the loose [SiteCreateRequest] / [SiteUpdateRequest]; the main address is delegated to
+ * Maps a cleaning task's site into the loose [SiteCreateRequest] / [SiteUpdateRequest] /
+ * [SiteCreateWithReferencedAddressAsMainRequest]; the main address is delegated to
  * [GoldenRecordTaskAddressRequestMapper] and resolved by the caller (the site's own address, or the legal address when
  * the site main is the legal address). Unlike the pass-through elsewhere, a missing [SiteState] type throws here — the
  * loose request's type is non-null by contract.
@@ -43,22 +44,46 @@ class GoldenRecordTaskSiteRequestMapper(
     fun toCreateRequest(legalEntityBpn: String, site: TaskSite, mainAddress: TaskPostalAddress): SiteCreateRequest =
         SiteCreateRequest(legalEntityBpn = legalEntityBpn, content = toContentRequest(site, mainAddress))
 
-    fun toUpdateRequest(siteBpn: String, site: TaskSite, mainAddress: TaskPostalAddress): SiteUpdateRequest =
-        SiteUpdateRequest(siteBpn = siteBpn, content = toContentRequest(site, mainAddress))
+    fun toUpdateRequest(
+        siteBpn: String,
+        site: TaskSite,
+        mainAddress: TaskPostalAddress,
+        additionalMainAddressScriptVariants: List<TaskScriptVariant> = emptyList()
+    ): SiteUpdateRequest =
+        SiteUpdateRequest(siteBpn = siteBpn, content = toContentRequest(site, mainAddress, additionalMainAddressScriptVariants))
 
     fun toCreateWithLegalAddressAsMainRequest(legalEntityBpn: String, site: TaskSite): SiteCreateWithLegalAddressAsMainRequest =
         SiteCreateWithLegalAddressAsMainRequest(legalEntityBpn = legalEntityBpn, header = toHeaderRequest(site))
 
-    fun toCreateWithReferencedAddressAsMainRequest(mainAddressBpn: String, site: TaskSite, mainAddress: TaskPostalAddress): SiteCreateWithReferencedAddressAsMainRequest =
-        SiteCreateWithReferencedAddressAsMainRequest(mainAddressBpn = mainAddressBpn, content = toContentRequest(site, mainAddress))
+    fun toCreateWithReferencedAddressAsMainRequest(
+        mainAddressBpn: String,
+        site: TaskSite,
+        mainAddress: TaskPostalAddress
+    ): SiteCreateWithReferencedAddressAsMainRequest =
+        SiteCreateWithReferencedAddressAsMainRequest(
+            mainAddressBpn = mainAddressBpn,
+            header = toHeaderRequest(site),
+            mainAddress = toMainAddressRequest(site, mainAddress)
+        )
 
-    private fun toContentRequest(site: TaskSite, mainAddress: TaskPostalAddress): SiteContentRequest =
+    private fun toContentRequest(
+        site: TaskSite,
+        mainAddress: TaskPostalAddress,
+        additionalMainAddressScriptVariants: List<TaskScriptVariant> = emptyList()
+    ): SiteContentRequest =
         SiteContentRequest(
             header = toHeaderRequest(site),
-            mainAddress = addressRequestMapper.toContentRequest(
-                mainAddress,
-                site.scriptVariants.map { TaskScriptVariant(it.scriptCode, it.mainAddress) }
-            )
+            mainAddress = toMainAddressRequest(site, mainAddress, additionalMainAddressScriptVariants)
+        )
+
+    private fun toMainAddressRequest(
+        site: TaskSite,
+        mainAddress: TaskPostalAddress,
+        additionalMainAddressScriptVariants: List<TaskScriptVariant> = emptyList()
+    ): LogisticAddressRequest =
+        addressRequestMapper.toContentRequest(
+            mainAddress,
+            site.scriptVariants.map { TaskScriptVariant(it.scriptCode, it.mainAddress) } + additionalMainAddressScriptVariants
         )
 
     private fun toHeaderRequest(site: TaskSite): SiteHeaderRequest =

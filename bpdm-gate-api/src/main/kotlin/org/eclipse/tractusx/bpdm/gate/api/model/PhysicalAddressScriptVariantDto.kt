@@ -20,14 +20,11 @@
 package org.eclipse.tractusx.bpdm.gate.api.model
 
 data class PhysicalAddressScriptVariantDto(
-    val postalCode: String? = null,
     val city: String? = null,
     val district: String? = null,
-    val street: StreetDto = StreetDto(),
-    val companyPostalCode: String? = null,
+    val street: StreetScriptVariantDto = StreetScriptVariantDto(),
     val industrialZone: String? = null,
     val building: String? = null,
     val floor: String? = null,
     val door: String? = null,
-    val taxJurisdictionCode: String? = null,
 )

@@ -22,10 +22,8 @@ package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.dto.LogisticAddressWithScriptVariantsDto
-import org.eclipse.tractusx.bpdm.pool.model.AlternativeAddressScriptVariant
-import org.eclipse.tractusx.bpdm.pool.model.PhysicalAddressScriptVariant
-import org.eclipse.tractusx.bpdm.pool.model.PostalAddressScriptVariant
 import org.eclipse.tractusx.bpdm.pool.model.Street
+import org.eclipse.tractusx.bpdm.pool.model.StreetScriptVariant
 import org.eclipse.tractusx.bpdm.pool.model.request.*
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
@@ -116,24 +114,28 @@ class AddressDtoRequestMapper {
 
     private fun toPhysicalScriptVariant(variant: PhysicalAddressScriptVariantDto): PhysicalAddressScriptVariant =
         PhysicalAddressScriptVariant(
-            postalCode = variant.postalCode,
             city = variant.city,
             district = variant.district,
-            street = variant.street?.let { toStreet(it) },
-            companyPostalCode = variant.companyPostalCode,
+            street = variant.street?.let { toScriptVariantStreet(it) },
             industrialZone = variant.industrialZone,
             building = variant.building,
             floor = variant.floor,
-            door = variant.door,
-            taxJurisdictionCode = variant.taxJurisdictionCode
+            door = variant.door
         )
 
     private fun toAlternativeScriptVariant(variant: AlternativeAddressScriptVariantDto): AlternativeAddressScriptVariant =
         AlternativeAddressScriptVariant(
-            postalCode = variant.postalCode,
-            city = variant.city,
-            deliveryServiceQualifier = variant.deliveryServiceQualifier,
-            deliveryServiceNumber = variant.deliveryServiceNumber
+            city = variant.city
+        )
+
+    private fun toScriptVariantStreet(street: StreetScriptVariantDto): StreetScriptVariant =
+        StreetScriptVariant(
+            name = street.name,
+            direction = street.direction,
+            namePrefix = street.namePrefix,
+            additionalNamePrefix = street.additionalNamePrefix,
+            nameSuffix = street.nameSuffix,
+            additionalNameSuffix = street.additionalNameSuffix
         )
 
     private fun toStreet(street: StreetDto): Street =

@@ -24,7 +24,6 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.RequestWithKey
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LogisticAddressDescription
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressScriptVariantDtoV6
 
 @Schema(description = LogisticAddressDescription.headerUpdateRequest, deprecated = true)
 data class AddressPartnerUpdateRequestV6(
@@ -33,9 +32,7 @@ data class AddressPartnerUpdateRequestV6(
     val bpna: String,
 
     @field:JsonUnwrapped
-    val address: LogisticAddressDtoV6,
-
-    val scriptVariants: List<LogisticAddressScriptVariantDtoV6> = emptyList()
+    val address: LogisticAddressDtoV6
 
 ): RequestWithKey {
     override fun getRequestKey(): String {

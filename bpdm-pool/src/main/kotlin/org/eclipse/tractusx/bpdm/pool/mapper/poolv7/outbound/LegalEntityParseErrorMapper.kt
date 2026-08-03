@@ -28,10 +28,12 @@ import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.springframework.stereotype.Component
 
 /**
- * Maps the legal-entity services' sealed parse errors to the `/legal-entities` [ErrorInfo] codes (legal-address errors
- * delegated to [AddressParseErrorMapper]). Only legal-form / identifier-type / duplicate / too-many identifiers have a
- * public code; presence errors are guaranteed absent by the bounded DTO and an unknown header script code previously
- * NPE'd — both become internal errors. The `when`s are exhaustive so a new error won't compile until it gets a code.
+ * Maps the legal-entity services' sealed parse errors to the `/legal-entities` [ErrorInfo] codes, delegating
+ * legal-address errors to [AddressParseErrorMapper].
+ *
+ * An error the bounded DTO already rules out, or that this operation cannot reach, gets no public code and is thrown as
+ * an internal error instead; script-variant content is client-nullable and therefore does get public codes. The `when`s
+ * are exhaustive so a new error won't compile until it gets a code.
  */
 @Component
 class LegalEntityParseErrorMapper(
@@ -41,13 +43,16 @@ class LegalEntityParseErrorMapper(
     fun toCreateErrorInfo(error: LegalEntityCreateParseError, entityKey: String?): ErrorInfo<LegalEntityCreateError> =
         when (error) {
             is AddressContentParseError -> addressParseErrorMapper.toLegalEntityCreateErrorInfo(error, entityKey)
+            is ScriptVariantCoverageParseError -> throw internalError(error)
             is LegalEntityContentParseError -> contentErrorInfo(
                 error,
                 entityKey,
                 legalFormNotFound = LegalEntityCreateError.LegalFormNotFound,
                 identifierNotFound = LegalEntityCreateError.LegalEntityIdentifierNotFound,
                 duplicateIdentifier = LegalEntityCreateError.LegalEntityDuplicateIdentifier,
-                identifiersTooMany = LegalEntityCreateError.LegalEntityIdentifiersTooMany
+                identifiersTooMany = LegalEntityCreateError.LegalEntityIdentifiersTooMany,
+                scriptVariantLegalNameMissing = LegalEntityCreateError.ScriptVariantLegalNameMissing,
+                scriptVariantDuplicateScriptCode = LegalEntityCreateError.ScriptVariantDuplicateScriptCode
             )
         }
 
@@ -62,13 +67,23 @@ class LegalEntityParseErrorMapper(
                 entityKey
             )
             is AddressContentParseError -> addressParseErrorMapper.toLegalEntityUpdateErrorInfo(error, entityKey)
+            is ScriptVariantCoverageStillNeeded ->
+                ErrorInfo(
+                    LegalEntityUpdateError.ScriptVariantCoverageStillNeeded,
+                    "Script code '${error.scriptCode}' must stay covered by the legal address: business partner " +
+                            "'${error.requiredByBpn}' is named in that script",
+                    entityKey
+                )
+            is ScriptVariantNotCoveredByAddress -> throw internalError(error)
             is LegalEntityContentParseError -> contentErrorInfo(
                 error,
                 entityKey,
                 legalFormNotFound = LegalEntityUpdateError.LegalFormNotFound,
                 identifierNotFound = LegalEntityUpdateError.LegalEntityIdentifierNotFound,
                 duplicateIdentifier = LegalEntityUpdateError.LegalEntityDuplicateIdentifier,
-                identifiersTooMany = LegalEntityUpdateError.LegalEntityIdentifiersTooMany
+                identifiersTooMany = LegalEntityUpdateError.LegalEntityIdentifiersTooMany,
+                scriptVariantLegalNameMissing = LegalEntityUpdateError.ScriptVariantLegalNameMissing,
+                scriptVariantDuplicateScriptCode = LegalEntityUpdateError.ScriptVariantDuplicateScriptCode
             )
         }
 
@@ -78,7 +93,9 @@ class LegalEntityParseErrorMapper(
         legalFormNotFound: E,
         identifierNotFound: E,
         duplicateIdentifier: E,
-        identifiersTooMany: E
+        identifiersTooMany: E,
+        scriptVariantLegalNameMissing: E,
+        scriptVariantDuplicateScriptCode: E
     ): ErrorInfo<E> =
         when (error) {
             is LegalEntityContentParseError.LegalFormNotFound ->
@@ -89,6 +106,10 @@ class LegalEntityParseErrorMapper(
                 ErrorInfo(duplicateIdentifier, "Duplicate Legal Entity Identifier: Value '${error.value}' of type '${error.type}'", entityKey)
             is LegalEntityContentParseError.IdentifiersTooMany ->
                 ErrorInfo(identifiersTooMany, "Amount of identifiers (${error.count}) exceeds the allowed limit", entityKey)
+            is LegalEntityContentParseError.ScriptVariantLegalNameMissing ->
+                ErrorInfo(scriptVariantLegalNameMissing, "Script variant ${error.index} has no legal name", entityKey)
+            is LegalEntityContentParseError.ScriptVariantDuplicateScriptCode ->
+                ErrorInfo(scriptVariantDuplicateScriptCode, "Duplicate legal entity script variant for script code '${error.scriptCode}'", entityKey)
             is LegalEntityContentParseError.NameMissing,
             is LegalEntityContentParseError.ConfidenceCriteriaMissing,
             is LegalEntityContentParseError.IdentifierValueMissing,
@@ -96,6 +117,6 @@ class LegalEntityParseErrorMapper(
             is LegalEntityContentParseError.ScriptCodeNotFound -> throw internalError(error)
         }
 
-    private fun internalError(error: LegalEntityContentParseError) =
-        BpdmValidationException("Unexpected legal entity content parse error (no public error code): $error")
+    private fun internalError(error: LegalEntityCreateParseError) =
+        BpdmValidationException("Unexpected legal entity parse error (no public error code): $error")
 }

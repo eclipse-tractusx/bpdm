@@ -29,4 +29,6 @@ sealed interface SiteContentParseError : SiteCreateParseError, SiteUpdateParseEr
     data object NameMissing : SiteContentParseError
     data object ConfidenceCriteriaMissing : SiteContentParseError
     data class ScriptCodeNotFound(val index: Int, val scriptCode: String) : SiteContentParseError
+    data class ScriptVariantNameMissing(val index: Int) : SiteContentParseError
+    data class ScriptVariantDuplicateScriptCode(val index: Int, val scriptCode: String) : SiteContentParseError
 }

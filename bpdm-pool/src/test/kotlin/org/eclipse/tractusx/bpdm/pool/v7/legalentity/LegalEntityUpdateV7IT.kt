@@ -19,8 +19,11 @@
 
 package org.eclipse.tractusx.bpdm.pool.v7.legalentity
 
+import org.assertj.core.api.Assertions.assertThat
+import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityIdentifierDto
+import org.eclipse.tractusx.bpdm.pool.api.model.SiteHeaderScriptVariantDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerUpdateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityUpdateError
@@ -495,4 +498,111 @@ class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
 
         assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
     }
+
+    /**
+     * GIVEN legal entity
+     * WHEN operator tries to update it with a script variant whose legal name is blank
+     * THEN operator sees ScriptVariantLegalNameMissing error entry in response
+     */
+    @Test
+    fun `update legal entity with script variant with blank legal name`(){
+        //GIVEN
+        val givenLegalEntity = testDataClient.createLegalEntity(requestFactory.buildLegalEntity(testName))
+
+        //WHEN
+        val updateRequest = requestFactory.buildLegalEntityUpdateRequest("Updated $testName", givenLegalEntity.header.bpnl)
+            .withLegalForm(anyKnownLegalForm())
+            .withScriptVariantLegalName("  ")
+        val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
+
+        //THEN
+        val expectedError = ErrorInfo(LegalEntityUpdateError.ScriptVariantLegalNameMissing, "IGNORED", updateRequest.bpnl)
+        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+
+        assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
+    }
+
+    /**
+     * GIVEN legal entity
+     * WHEN operator tries to update it with a script variant whose legal address city is blank
+     * THEN operator sees LegalAddressScriptVariantCityMissing error entry in response
+     */
+    @Test
+    fun `update legal entity with script variant with blank legal address city`(){
+        //GIVEN
+        val givenLegalEntity = testDataClient.createLegalEntity(requestFactory.buildLegalEntity(testName))
+
+        //WHEN
+        val updateRequest = requestFactory.buildLegalEntityUpdateRequest("Updated $testName", givenLegalEntity.header.bpnl)
+            .withLegalForm(anyKnownLegalForm())
+            .withScriptVariantPhysicalCity("  ")
+        val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
+
+        //THEN
+        val expectedError = ErrorInfo(LegalEntityUpdateError.LegalAddressScriptVariantCityMissing, "IGNORED", updateRequest.bpnl)
+        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+
+        assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
+    }
+
+    /**
+     * GIVEN legal entity
+     * WHEN operator tries to update it with two script variants of the same script code
+     * THEN operator sees the duplicate reported for both the legal entity and its legal address
+     */
+    @Test
+    fun `update legal entity with duplicate script codes`(){
+        //GIVEN
+        val givenLegalEntity = testDataClient.createLegalEntity(requestFactory.buildLegalEntity(testName))
+
+        //WHEN
+        val updateRequest = requestFactory.buildLegalEntityUpdateRequest("Updated $testName", givenLegalEntity.header.bpnl)
+            .withLegalForm(anyKnownLegalForm())
+            .withDuplicateScriptVariants()
+        val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
+
+        //THEN
+        val expectedErrors = listOf(
+            ErrorInfo(LegalEntityUpdateError.ScriptVariantDuplicateScriptCode, "IGNORED", updateRequest.bpnl),
+            ErrorInfo(LegalEntityUpdateError.LegalAddressScriptVariantDuplicateScriptCode, "IGNORED", updateRequest.bpnl)
+        )
+        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), expectedErrors)
+
+        assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
+    }
+
+    /**
+     * GIVEN legal entity with a site whose main address is the legal address, both named in the same script
+     * WHEN operator tries to update the legal entity with a script variant of another script code
+     * THEN operator sees ScriptVariantCoverageStillNeeded error, because the site is still named in the script the
+     * update would stop covering on their shared address
+     */
+    @Test
+    fun `update legal entity into a script its site does not cover`(){
+        //GIVEN
+        val givenLegalEntity = testDataClient.createParticipantLegalEntity(testName)
+        val coveredScriptCode = givenLegalEntity.scriptVariants.first().scriptCode
+        val siteCreateRequest = requestFactory.buildLegalAddressSiteCreateRequest("Site $testName", givenLegalEntity)
+            .let { it.copy(scriptVariants = listOf(SiteHeaderScriptVariantDto(coveredScriptCode, "Site Name $testName"))) }
+        val givenSite = poolClient.sites.createSiteWithLegalReference(listOf(siteCreateRequest)).entities.first()
+
+        //WHEN
+        val updateRequest = requestFactory.buildLegalEntityUpdateRequest("Updated $testName", givenLegalEntity.header.bpnl)
+            .withLegalForm(anyKnownLegalForm())
+            .withScriptVariantScriptCode(scriptCodeOtherThan(setOf(coveredScriptCode)))
+        val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
+
+        //THEN
+        val expectedError = ErrorInfo(LegalEntityUpdateError.ScriptVariantCoverageStillNeeded, "IGNORED", updateRequest.bpnl)
+        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+
+        assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
+        assertThat(poolClient.sites.getSite(givenSite.site.bpns).site.scriptVariants.map { it.scriptCode })
+            .containsExactly(coveredScriptCode)
+    }
+
+    // The v7 test metadata reads legal forms from the ELF code list, which is a superset of what the Pool's migration
+    // inserts, so a seeded pick can land on a legal form the Pool does not know. Take one the Pool actually has.
+    private fun anyKnownLegalForm(): String =
+        poolClient.metadata.getLegalForms(PaginationRequest()).content.first().technicalKey
 }

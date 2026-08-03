@@ -200,8 +200,9 @@ class BusinessPartnerShareActions(
      * Refines a record into a site exactly like the label overload above, but pins the site's MAIN ADDRESS
      * to the shared [mainAddressLabel] instead of the site label. Two records refined to distinct
      * [siteLabel]s under the same [legalEntityLabel] but the same [mainAddressLabel] therefore ask the Pool
-     * to make both sites share one main address. Returns the site together with its parent legal entity so
-     * the caller can store them as the current expectation.
+     * to make both sites share one main address. Their script codes follow [mainAddressLabel] too: one address
+     * covers every site on it, so all of them have to be named in the scripts it is written in. Returns the
+     * site together with its parent legal entity so the caller can store them as the current expectation.
      */
     fun refineAsSite(
         recordId: String,
@@ -212,7 +213,7 @@ class BusinessPartnerShareActions(
     ): SiteWithParent {
         val state = context.records[recordId]!!
         val parentResult = testDataGenerator.buildLegalEntity("${masterDataSeed}Parent")
-        val siteResult = testDataGenerator.buildSite(masterDataSeed, parentResult.legalEntity)
+        val siteResult = testDataGenerator.buildSite(masterDataSeed, parentResult.legalEntity, sharedMainAddressId = mainAddressLabel)
         resolveTask(
             recordId,
             siteResult.taskData.withGoldenRecordRequestIdentifiers(

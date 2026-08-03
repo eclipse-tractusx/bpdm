@@ -32,7 +32,9 @@ data class SiteHeaderParsed(
     val states: List<SiteState>,
     val confidenceCriteria: ConfidenceCriteriaParsed,
     val scriptVariants: List<SiteScriptVariantParsed>
-)
+) {
+    fun scriptCodes(): List<String> = scriptVariants.map { it.scriptCode.technicalKey }
+}
 
 data class SiteScriptVariantParsed(
     val scriptCode: ScriptCodeDb,

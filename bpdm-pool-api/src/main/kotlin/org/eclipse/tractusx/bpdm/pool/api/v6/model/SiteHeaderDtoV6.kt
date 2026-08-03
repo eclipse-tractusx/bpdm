@@ -26,6 +26,5 @@ import org.eclipse.tractusx.bpdm.common.dto.IBaseSiteDto
 data class SiteHeaderDtoV6 (
     override val name: String,
     override val states: Collection<SiteStateDtoV6>,
-    override val confidenceCriteria: ConfidenceCriteriaDtoV6,
-    val scriptVariants: List<SiteHeaderScriptVariantDtoV6> = emptyList()
+    override val confidenceCriteria: ConfidenceCriteriaDtoV6
 ): IBaseSiteDto

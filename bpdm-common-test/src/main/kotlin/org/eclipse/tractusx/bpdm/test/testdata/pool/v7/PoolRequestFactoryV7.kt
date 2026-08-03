@@ -129,9 +129,18 @@ class PoolRequestFactoryV7(
 
     fun buildAddressUpdateRequest(seed: String, legalEntity: LegalEntityWithLegalAddressVerboseDto): AddressPartnerUpdateRequest =
         buildAddressUpdateRequest(seed, legalEntity.legalAddress.bpna)
+            .copy(scriptVariants = buildAddressScriptVariants(legalEntity.scriptVariants.map { it.scriptCode }, seed))
 
     fun buildAddressUpdateRequest(seed: String, site: SitePartnerCreateVerboseDto): AddressPartnerUpdateRequest =
         buildAddressUpdateRequest(seed, site.mainAddress.bpna)
+            .copy(scriptVariants = buildAddressScriptVariants(site.site.scriptVariants.map { it.scriptCode }, seed))
+
+    /**
+     * Builds one address script variant per given script code. A legal or site main address has to keep covering every
+     * script code its legal entity or site is named in, so an update of such an address states them explicitly.
+     */
+    fun buildAddressScriptVariants(scriptCodes: List<String>, seed: String): List<LogisticAddressScriptVariantDto> =
+        scriptCodes.map { LogisticAddressScriptVariantDto(it, buildPostalAddressScriptVariant(it, seed)) }
 
     fun buildAddressUpdateRequest(seed: String, createdAddress: AddressPartnerCreateVerboseDtoV7): AddressPartnerUpdateRequest =
         buildAddressUpdateRequest(seed, createdAddress.address.bpna)
@@ -307,6 +316,13 @@ class PoolRequestFactoryV7(
         return AddressIdentifierDto("$idKey Value $seed $index", idKey)
     }
 
+    /**
+     * The script code this factory picks for [seed], so a caller can pin an entity to the code of a related seed - needed
+     * when several entities share one address and therefore have to be named in the scripts that address covers.
+     */
+    fun scriptCodeFor(seed: String, random: Random = Random(seed.hashCode().toLong())): String? =
+        availableScriptCodes.randomOrNull(random)
+
     fun buildSiteScriptVariant(seed: String, random: Random = Random(seed.hashCode().toLong())): SiteScriptVariantDto?{
         val scriptCode = availableScriptCodes.randomOrNull(random) ?: return null
         return SiteScriptVariantDto(
@@ -334,35 +350,26 @@ class PoolRequestFactoryV7(
 
     fun buildPhysicalAddressScriptVariant(scriptCode: String, seed: String): PhysicalAddressScriptVariantDto{
         return PhysicalAddressScriptVariantDto(
-            postalCode = buildScriptVariantStringValue("Postal Code", seed, scriptCode),
             city = buildScriptVariantStringValue("City", seed, scriptCode),
             district = buildScriptVariantStringValue("District", seed, scriptCode),
-            street = StreetDto(
+            street = StreetScriptVariantDto(
                 name = buildScriptVariantStringValue("Street Name", seed, scriptCode),
-                houseNumber = buildScriptVariantStringValue("House Number", seed, scriptCode),
-                houseNumberSupplement = buildScriptVariantStringValue("House Number Supplement", seed, scriptCode),
-                milestone = buildScriptVariantStringValue("Milestone", seed, scriptCode),
                 direction = buildScriptVariantStringValue("Direction", seed, scriptCode),
                 namePrefix = buildScriptVariantStringValue("Name Prefix", seed, scriptCode),
                 nameSuffix = buildScriptVariantStringValue("Name Suffix", seed, scriptCode),
                 additionalNamePrefix = buildScriptVariantStringValue("Additional Name Prefix", seed, scriptCode),
                 additionalNameSuffix = buildScriptVariantStringValue("Additional Name Suffix", seed, scriptCode)
             ),
-            companyPostalCode = buildScriptVariantStringValue("Company Postal Code", seed, scriptCode),
             industrialZone = buildScriptVariantStringValue("Industrial Zone", seed, scriptCode),
             building = buildScriptVariantStringValue("Building", seed, scriptCode),
             floor = buildScriptVariantStringValue("Floor", seed, scriptCode),
-            door = buildScriptVariantStringValue("Door", seed, scriptCode),
-            taxJurisdictionCode = buildScriptVariantStringValue("Tax Jurisdiction Code", seed, scriptCode)
+            door = buildScriptVariantStringValue("Door", seed, scriptCode)
         )
     }
 
     fun buildAlternativeAddressScriptVariant(scriptCode: String, seed: String): AlternativeAddressScriptVariantDto{
         return AlternativeAddressScriptVariantDto(
-            postalCode = buildScriptVariantStringValue("Postal Code", seed, scriptCode),
-            city = buildScriptVariantStringValue("City", seed, scriptCode),
-            deliveryServiceNumber = buildScriptVariantStringValue("Delivery Service Number ", seed, scriptCode),
-            deliveryServiceQualifier = buildScriptVariantStringValue("Delivery Service Qualifier ", seed, scriptCode)
+            city = buildScriptVariantStringValue("City", seed, scriptCode)
         )
     }
 

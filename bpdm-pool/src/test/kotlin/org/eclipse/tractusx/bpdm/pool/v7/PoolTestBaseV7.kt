@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.v7
 
+import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.PoolTestBase
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.v7.util.AssertRepositoryV7
@@ -38,4 +39,8 @@ abstract class PoolTestBaseV7: PoolTestBase() {
     lateinit var assertRepository: AssertRepositoryV7
     @Autowired
     lateinit var poolClient: PoolApiClient
+
+    /** A known script code that is none of [scriptCodes] - for a test that needs a script a business partner is not named in. */
+    fun scriptCodeOtherThan(scriptCodes: Set<String>): String =
+        poolClient.metadata.getScriptCodes(PaginationRequest()).content.first { it.technicalKey !in scriptCodes }.technicalKey
 }

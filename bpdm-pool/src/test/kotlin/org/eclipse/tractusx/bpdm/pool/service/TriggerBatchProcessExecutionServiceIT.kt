@@ -172,7 +172,8 @@ class TriggerBatchProcessExecutionServiceIT @Autowired constructor(
         return LegalEntityWithLegalAddressVerboseDto(
             header = legalEntity.legalEntity.header,
             legalAddress = newLegalAddress.address.copy(addressType = AddressType.LegalAddress, relations = newLegalAddress.address.relations.plus(newReplacedRelation)),
-            scriptVariants = legalEntity.legalEntity.scriptVariants.map { it.copy(legalAddress = PostalAddressScriptVariantDto()) }
+            // The new legal address covers none of the old script codes, so the legal entity keeps no script variant.
+            scriptVariants = emptyList()
         )
     }
 

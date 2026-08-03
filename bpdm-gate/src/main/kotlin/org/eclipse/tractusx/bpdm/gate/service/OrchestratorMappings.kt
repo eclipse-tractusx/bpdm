@@ -306,26 +306,20 @@ class OrchestratorMappings(
     private fun toPhysicalAddressScriptVariant(dto: PhysicalAddressScriptVariant) =
         with(dto){
             PhysicalAddressScriptVariantDto(
-                postalCode = postalCode,
                 city = city,
                 district = district,
                 street = toScriptVariantStreet(street),
-                companyPostalCode = companyPostalCode,
                 industrialZone = industrialZone,
                 building = building,
                 floor = floor,
-                door = door,
-                taxJurisdictionCode = taxJurisdictionCode
+                door = door
             )
         }
 
     private fun toAlternativeAddressScriptVariant(dto: AlternativeAddressScriptVariant?) =
         dto?.let { with(it){
             AlternativeAddressScriptVariantDto(
-                postalCode = postalCode,
-                city = city,
-                deliveryServiceQualifier = deliveryServiceQualifier,
-                deliveryServiceNumber = deliveryServiceNumber
+                city = city
             )
         }
         }
@@ -406,18 +400,29 @@ class OrchestratorMappings(
             additionalNameSuffix = dto.additionalNameSuffix
         )
 
-    private fun toScriptVariantStreet(dto: Street) =
-        StreetDto(
+    private fun toScriptVariantStreet(dto: StreetScriptVariant) =
+        StreetScriptVariantDto(
             name = dto.name,
-            houseNumber = dto.houseNumber,
-            houseNumberSupplement = dto.houseNumberSupplement,
-            milestone = dto.milestone,
             direction = dto.direction,
             namePrefix = dto.namePrefix,
             additionalNamePrefix = dto.additionalNamePrefix,
             nameSuffix = dto.nameSuffix,
             additionalNameSuffix = dto.additionalNameSuffix
         )
+
+    private fun toScriptVariantStreet(street: StreetScriptVariantDb?) =
+        street?.let {
+            with(it){
+                StreetScriptVariant(
+                    name = name,
+                    direction = direction,
+                    namePrefix = namePrefix,
+                    additionalNamePrefix = additionalNamePrefix,
+                    nameSuffix = nameSuffix,
+                    additionalNameSuffix = additionalNameSuffix
+                )
+            }
+        } ?: StreetScriptVariant.empty
 
     private fun toGeographicCoordinate(dto: GeoCoordinate) =
         dto.latitude?.let { lat ->
@@ -450,16 +455,13 @@ class OrchestratorMappings(
         scriptVariant?.let {
             with(it){
                 PhysicalAddressScriptVariant(
-                    postalCode = postalCode,
                     city = city,
                     district = district,
-                    street = toStreet(street),
-                    companyPostalCode = companyPostalCode,
+                    street = toScriptVariantStreet(street),
                     industrialZone = industrialZone,
                     building = building,
                     floor = floor,
-                    door = door,
-                    taxJurisdictionCode = taxJurisdictionCode)
+                    door = door)
             }
         } ?: PhysicalAddressScriptVariant.empty
 
@@ -468,10 +470,7 @@ class OrchestratorMappings(
         scriptVariant?.let {
             with(it){
                 AlternativeAddressScriptVariant(
-                    postalCode = postalCode,
-                    city = city,
-                    deliveryServiceQualifier = deliveryServiceQualifier,
-                    deliveryServiceNumber = deliveryServiceNumber
+                    city = city
                 )
             }
         }

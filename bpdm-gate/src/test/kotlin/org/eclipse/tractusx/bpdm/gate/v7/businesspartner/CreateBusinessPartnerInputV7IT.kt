@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.v7.businesspartner
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.v7.UnscheduledGateTestBaseV7
+import org.eclipse.tractusx.bpdm.test.testdata.gate.v7.withoutAlternativeAddressScriptVariants
 import org.junit.jupiter.api.Test
 import java.time.Instant
 
@@ -109,10 +110,51 @@ class CreateBusinessPartnerInputV7IT: UnscheduledGateTestBaseV7() {
     @Test
     fun `try update input with no changes`() {
         //GIVEN
-        testDataClient.businessPartner.upsertInput(testName)
+        // No external sequence timestamp, so that change detection alone decides whether the update is taken
+        val request = testData.businessPartner.input.request.fromSeed(testName).copy(externalSequenceTimestamp = null)
+        testDataClient.businessPartner.upsertInput(request)
 
         //WHEN
+        val response = gateClient.businessParters.upsertBusinessPartnersInput(listOf(request)).body
+
+        //THEN
+        Assertions.assertThat(response).isEmpty()
+    }
+
+    /**
+     * GIVEN business partner input whose script variants carry no alternative address
+     * WHEN input manager updates the business partner input with the same data
+     * THEN response does not contain business partner input (as it did not change)
+     */
+    @Test
+    fun `try update input without alternative address script variant and no changes`() {
+        //GIVEN
+        // No external sequence timestamp, so that change detection alone decides whether the update is taken
         val request = testData.businessPartner.input.request.fromSeed(testName)
+            .withoutAlternativeAddressScriptVariants()
+            .copy(externalSequenceTimestamp = null)
+        testDataClient.businessPartner.upsertInput(request)
+
+        //WHEN
+        val response = gateClient.businessParters.upsertBusinessPartnersInput(listOf(request)).body
+
+        //THEN
+        Assertions.assertThat(response).isEmpty()
+    }
+
+    /**
+     * GIVEN business partner input with external sequence timestamp
+     * WHEN input manager updates the business partner input with new values but the same timestamp
+     * THEN response does not contain business partner input (as the timestamp is not newer)
+     */
+    @Test
+    fun `try update input with equal external sequence timestamp`() {
+        //GIVEN
+        val created = testDataClient.businessPartner.upsertInput(testName)
+
+        //WHEN
+        val request = testData.businessPartner.input.request.fromSeed("Updated $testName")
+            .copy(externalId = testName, externalSequenceTimestamp = created.externalSequenceTimestamp)
         val response = gateClient.businessParters.upsertBusinessPartnersInput(listOf(request)).body
 
         //THEN

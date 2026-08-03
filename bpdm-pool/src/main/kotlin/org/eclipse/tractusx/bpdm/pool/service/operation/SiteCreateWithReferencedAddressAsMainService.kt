@@ -23,6 +23,7 @@ import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
+import org.eclipse.tractusx.bpdm.pool.mapper.entity.AddressUpdateMapper
 import org.eclipse.tractusx.bpdm.pool.model.update.AddressContentUpdate
 import org.eclipse.tractusx.bpdm.pool.model.update.AddressUpdate
 import org.eclipse.tractusx.bpdm.pool.model.update.FieldUpdate
@@ -38,11 +39,15 @@ import org.springframework.transaction.annotation.Transactional
  * that address onto the new site (the cleaning/task path that promotes an additional address to a site main address).
  * Unlike an ordinary site create it builds no new address and issues no address BPN, but it does emit an ADDRESS
  * changelog for the re-parented address.
+ *
+ * A parse that states the referenced address's content also applies it: a site arriving with its own view of that
+ * address is the current golden record for it. A parse without content leaves the address as it stands.
  */
 @Service
 class SiteCreateWithReferencedAddressAsMainService(
     private val addressUpdateService: AddressUpdateService,
     private val siteHeaderTransientCreateService: SiteHeaderTransientCreateService,
+    private val addressUpdateMapper: AddressUpdateMapper,
     private val siteRepository: SiteRepository,
     private val changelogService: PartnerChangelogService
 ) {
@@ -56,9 +61,7 @@ class SiteCreateWithReferencedAddressAsMainService(
         val sites = siteHeaderTransientCreateService.createTransiently(parsed.map { SiteHeaderCreateParsed(it.mainAddress.legalEntity!!, it.siteHeader) })
 
         val stagedAddressUpdates = parsed.zip(sites).map { (entry, site) ->
-            addressUpdateService.stageUpdate(
-                AddressUpdate(entry.mainAddress, AddressContentUpdate.NoOp.copy(assignToSite = FieldUpdate.Set(site)))
-            )
+            addressUpdateService.stageUpdate(AddressUpdate(entry.mainAddress, mainAddressUpdate(entry, site)))
         }
         sites.zip(stagedAddressUpdates).forEach { (site, stagedAddressUpdate) -> site.mainAddress = stagedAddressUpdate.address }
 
@@ -69,4 +72,9 @@ class SiteCreateWithReferencedAddressAsMainService(
 
         return sites
     }
+
+    private fun mainAddressUpdate(entry: SiteCreateWithReferencedAddressAsMainParsed, site: SiteDb): AddressContentUpdate =
+        entry.mainAddressContent
+            ?.let { addressUpdateMapper.toFullUpdate(it, assignToSite = site) }
+            ?: AddressContentUpdate.NoOp.copy(assignToSite = FieldUpdate.Set(site))
 }

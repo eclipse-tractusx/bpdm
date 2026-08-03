@@ -24,9 +24,11 @@ import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.crossValidateParseResults
 import org.eclipse.tractusx.bpdm.pool.model.error.AddressUpdateParseError
 import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressUpdateParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.LogisticAddressParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.AddressUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.model.zipParseResults
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 /**
  * Validates address-update requests: the target address, an optional parent site to assign it to, and the new address
@@ -37,13 +39,16 @@ class AddressUpdateParser(
     private val addressContentParser: AddressContentParser,
     private val addressBpnParser: AddressBpnParser,
     private val siteBpnParser: SiteBpnParser,
-    private val siteLegalEntityConsistencyValidator: SiteLegalEntityConsistencyValidator
+    private val siteLegalEntityConsistencyValidator: SiteLegalEntityConsistencyValidator,
+    private val scriptVariantCoverageValidator: ScriptVariantCoverageValidator,
+    private val partnerReader: AddressPartnerScriptCodeReader
 ) {
 
     /**
      * Validates each request and reports either the resolved target with its validated content or every problem found in
      * that entry.
      */
+    @Transactional(readOnly = true)
     fun parse(requests: List<AddressUpdateRequest>): List<ParseResult<AddressUpdateParsed, AddressUpdateParseError>> {
         val contentResults = addressContentParser.parse(requests.map { it.content }, requests.map { it.addressBpn })
         val targetResults = addressBpnParser.parse(requests.map { it.addressBpn })
@@ -52,8 +57,12 @@ class AddressUpdateParser(
             crossValidateParseResults(targetResults, siteResults) { target, site ->
                 siteLegalEntityConsistencyValidator.check(target.legalEntity, site)
             }
+        val coveredContentResults: List<ParseResult<LogisticAddressParsed, AddressUpdateParseError>> =
+            crossValidateParseResults(targetResults, contentResults) { target, content ->
+                scriptVariantCoverageValidator.check(content.scriptCodes(), partnerReader.storedPartners(target))
+            }
 
-        return zipParseResults(contentResults, targetResults, consistentSiteResults) { content, target, site ->
+        return zipParseResults(coveredContentResults, targetResults, consistentSiteResults) { content, target, site ->
             AddressUpdateParsed(target, site, content)
         }
     }

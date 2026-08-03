@@ -276,17 +276,13 @@ class RequestMapper {
     fun toPhysicalAddressScriptVariant(physicalAddressScriptVariant: PhysicalAddressScriptVariant): PhysicalAddressScriptVariantDb{
         return with(physicalAddressScriptVariant){
             PhysicalAddressScriptVariantDb(
-                postalCode = postalCode,
                 city = city,
                 district = district,
-                street = toStreet(street),
-                companyPostalCode = companyPostalCode,
+                street = toScriptVariantStreet(street),
                 industrialZone = industrialZone,
                 building = building,
                 floor = floor,
-                door = door,
-                taxJurisdictionCode = taxJurisdictionCode
-
+                door = door
             )
         }
     }
@@ -294,10 +290,20 @@ class RequestMapper {
     fun toAlternativeAddressScriptVariant(alternativeAddressScriptVariant: AlternativeAddressScriptVariant): AlternativeAddressScriptVariantDb{
         return with(alternativeAddressScriptVariant){
             AlternativeAddressScriptVariantDb(
-                postalCode = postalCode,
-                city = city,
-                deliveryServiceQualifier = deliveryServiceQualifier,
-                deliveryServiceNumber = deliveryServiceNumber
+                city = city
+            )
+        }
+    }
+
+    fun toScriptVariantStreet(street: StreetScriptVariant): StreetScriptVariantDb{
+        return with(street){
+            StreetScriptVariantDb(
+                name = name,
+                direction = direction,
+                namePrefix = namePrefix,
+                additionalNamePrefix = additionalNamePrefix,
+                nameSuffix = nameSuffix,
+                additionalNameSuffix = additionalNameSuffix
             )
         }
     }

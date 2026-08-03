@@ -59,6 +59,15 @@ object BusinessPartnerInputRequestValues {
         direction = "string"
     )
 
+    private val scriptVariantStreet = StreetScriptVariantDto(
+        namePrefix = "string",
+        additionalNamePrefix = "string",
+        name = "string",
+        nameSuffix = "string",
+        additionalNameSuffix = "string",
+        direction = "string"
+    )
+
     val businessPartnerInputRequest = BusinessPartnerInputRequest(
         externalId = "MB01",
         nameParts = listOf(""),
@@ -126,22 +135,16 @@ object BusinessPartnerInputRequestValues {
                 address = AddressScriptVariantDto(
                     name = "string",
                     physicalAddress = PhysicalAddressScriptVariantDto(
-                        postalCode = "string",
                         city = "string",
                         district = "string",
-                        street = street,
-                        companyPostalCode = "string",
+                        street = scriptVariantStreet,
                         industrialZone = "string",
                         building = "string",
                         floor = "string",
-                        door = "string",
-                        taxJurisdictionCode = "string"
+                        door = "string"
                     ),
                     alternativeAddress = AlternativeAddressScriptVariantDto(
-                        postalCode = "string",
-                        city = "string",
-                        deliveryServiceQualifier = "string",
-                        deliveryServiceNumber = "string"
+                        city = "string"
                     )
                 )
             )
