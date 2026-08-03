@@ -32,6 +32,8 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerUp
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
+import org.eclipse.tractusx.bpdm.pool.service.application.v6.LegalEntityCreateApplicationV6Service
+import org.eclipse.tractusx.bpdm.pool.service.application.v6.LegalEntityUpdateApplicationV6Service
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
@@ -40,6 +42,8 @@ import org.springframework.web.bind.annotation.RestController
 class LegalEntityController(
     val legalEntityLegacyServiceMapper: LegalEntityLegacyServiceMapper,
     val bpnConfigProperties: BpnConfigProperties,
+    val legalEntityCreateApplicationService: LegalEntityCreateApplicationV6Service,
+    val legalEntityUpdateApplicationService: LegalEntityUpdateApplicationV6Service
 ) : PoolLegalEntityApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
@@ -99,13 +103,13 @@ class LegalEntityController(
     override fun createBusinessPartners(
         businessPartners: Collection<LegalEntityPartnerCreateRequest>
     ): LegalEntityPartnerCreateResponseWrapper {
-        return legalEntityLegacyServiceMapper.createLegalEntities(businessPartners)
+        return legalEntityCreateApplicationService.createLegalEntities(businessPartners)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")
     override fun updateBusinessPartners(
         businessPartners: Collection<LegalEntityPartnerUpdateRequest>
     ): LegalEntityPartnerUpdateResponseWrapper {
-        return legalEntityLegacyServiceMapper.updateLegalEntities(businessPartners)
+        return legalEntityUpdateApplicationService.updateLegalEntities(businessPartners)
     }
 }

@@ -128,7 +128,8 @@ class BusinessPartnerOutputDtoV7Factory {
         input: BusinessPartnerInputDto,
         legalEntity: LegalEntityWithLegalAddressVerboseDto,
         site: SiteWithMainAddressVerboseDto,
-        additionalAddress: LogisticAddressVerboseDto
+        additionalAddress: LogisticAddressVerboseDto,
+        additionalSites: Collection<AdditionalSiteOutputDto> = emptyList()
     ): BusinessPartnerOutputDto{
         return BusinessPartnerOutputDto(
             externalId = input.externalId,
@@ -147,6 +148,7 @@ class BusinessPartnerOutputDtoV7Factory {
                 val addByCode = additionalAddress.scriptVariants.associateBy { it.scriptCode }
                 (leByCode.keys + siteByCode.keys + addByCode.keys).map { code -> buildAdditionalAddressScriptVariant(code, leByCode[code], addByCode[code], siteByCode[code]) }
             },
+            additionalSites = additionalSites,
             createdAt = Instant.MIN,
             updatedAt = Instant.MIN
         )

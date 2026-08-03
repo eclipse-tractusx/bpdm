@@ -30,15 +30,17 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateRespon
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerUpdateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
-import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
 import org.eclipse.tractusx.bpdm.pool.service.SiteService
+import org.eclipse.tractusx.bpdm.pool.service.application.v7.SiteCreateApplicationV7Service
+import org.eclipse.tractusx.bpdm.pool.service.application.v7.SiteUpdateApplicationV7Service
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class SiteController(
     private val siteService: SiteService,
-    private val businessPartnerBuildService: BusinessPartnerBuildService
+    private val siteCreateApplicationService: SiteCreateApplicationV7Service,
+    private val siteUpdateApplicationService: SiteUpdateApplicationV7Service
 ) : PoolSiteApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
@@ -68,14 +70,14 @@ class SiteController(
     override fun createSite(
         requests: Collection<SitePartnerCreateRequest>
     ): SitePartnerCreateResponseWrapper {
-        return businessPartnerBuildService.createSitesWithMainAddress(requests)
+        return siteCreateApplicationService.createSitesWithMainAddress(requests)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")
     override fun updateSite(
         requests: Collection<SitePartnerUpdateRequest>
     ): SitePartnerUpdateResponseWrapper {
-        return businessPartnerBuildService.updateSites(requests)
+        return siteUpdateApplicationService.updateSites(requests)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
@@ -90,6 +92,6 @@ class SiteController(
     override fun createSiteWithLegalReference(
         request: Collection<SiteCreateRequestWithLegalAddressAsMain>
     ): SitePartnerCreateResponseWrapper {
-        return businessPartnerBuildService.createSitesWithLegalAddressAsMain(request)
+        return siteCreateApplicationService.createSitesWithLegalAddressAsMain(request)
     }
 }

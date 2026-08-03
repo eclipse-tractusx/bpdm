@@ -53,5 +53,6 @@ data class OutputUpsertData(
     val legalEntityGoldenRecordRelations: List<LegalEntityGoldenRecordRelation>,
     val addressGoldenRecordRelations: List<AddressGoldenRecordRelation>,
     val ownershipUltimate: Boolean? = null,
-    val ultimateOwnerBpnl: String? = null
+    val ultimateOwnerBpnl: String? = null,
+    val additionalSites: List<AdditionalSite> = emptyList()
 )

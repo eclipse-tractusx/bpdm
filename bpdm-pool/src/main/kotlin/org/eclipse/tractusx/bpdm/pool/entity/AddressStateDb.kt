@@ -40,10 +40,12 @@ class AddressStateDb(
 
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
-    val type: BusinessStateType,
+    val type: BusinessStateType
 
+) : BaseEntity() {
+    // Owned by its address; the back-reference is wired by the aggregate (create mapper / address mutator) right after
+    // construction, not passed in — this keeps the entity mapper a pure translation.
     @ManyToOne
     @JoinColumn(name = "address_id", nullable = false)
-    var address: LogisticAddressDb
-
-) : BaseEntity()
+    lateinit var address: LogisticAddressDb
+}

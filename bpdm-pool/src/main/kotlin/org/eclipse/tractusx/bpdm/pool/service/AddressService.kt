@@ -91,7 +91,7 @@ class AddressService(
         logger.debug { "Executing findByPartnerBpn() with parameters $bpnl // $pageIndex // $pageSize" }
         val legalEntity = legalEntityRepository.findByBpnIgnoreCase(bpnl) ?:  throw BpdmNotFoundException("Business Partner", bpnl)
 
-        val page = logisticAddressRepository.findByLegalEntityAndSiteIsNull(legalEntity, PageRequest.of(pageIndex, pageSize))
+        val page = logisticAddressRepository.findByLegalEntityAndSitesIsEmpty(legalEntity, PageRequest.of(pageIndex, pageSize))
         fetchLogisticAddressDependencies(page.map { it }.toSet())
         return page.toDto(page.content.map { it.toDto() })
     }

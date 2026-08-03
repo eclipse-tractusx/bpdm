@@ -189,11 +189,25 @@ class GoldenRecordUpdateChunkService(
 
         val addressesByBpn = addresses.associateBy { it.address.bpna }
 
+        // Resolve names in one batch for every site an address belongs to. The Pool's `bpnSite` (its oldest member)
+        // may itself be "additional" for an output that follows a different site, so it is a name candidate too.
+        val siteNamesByBpn = resolveSiteNames(addresses.flatMap { listOfNotNull(it.address.bpnSite) + it.address.additionalSites })
+
         return businessPartnersToUpdate.mapNotNull { output ->
             val address = addressesByBpn[output.bpnA!!] ?: return@mapNotNull null
-            val upsertData = address.toUpsertData(output)
+            val upsertData = address.toUpsertData(output, siteNamesByBpn)
             businessPartnerService.updateBusinessPartnerOutput(output, upsertData)
         }
+    }
+
+    private fun resolveSiteNames(siteBpns: Collection<String>): Map<String, String> {
+        val distinctBpns = siteBpns.distinct()
+        if (distinctBpns.isEmpty()) return emptyMap()
+
+        val searchRequest = SiteSearchRequest(siteBpns = distinctBpns)
+        return poolClient.sites.getSites(searchRequest, PaginationRequest(size = distinctBpns.size)).content
+            .map { it.site }
+            .associate { it.bpns to it.name }
     }
 
     private fun LegalEntityWithLegalAddressVerboseDto.toUpsertData(existingOutput: BusinessPartnerDb): OutputUpsertData {
@@ -212,10 +226,10 @@ class GoldenRecordUpdateChunkService(
         return copy.toUpsertData()
     }
 
-    private fun LogisticAddressVerboseDto.toUpsertData(existingOutput: BusinessPartnerDb): OutputUpsertData {
+    private fun LogisticAddressVerboseDto.toUpsertData(existingOutput: BusinessPartnerDb, siteNamesByBpn: Map<String, String>): OutputUpsertData {
         val copy = BusinessPartnerDb.createEmpty(existingOutput.sharingState, existingOutput.stage)
         copyUtil.copyValues(existingOutput, copy)
-        return update(copy, this)
+        return update(copy, this, siteNamesByBpn)
     }
 
     private fun BusinessPartnerDb.toUpsertData(): OutputUpsertData {
@@ -249,7 +263,8 @@ class GoldenRecordUpdateChunkService(
             legalEntityGoldenRecordRelations = legalEntityGoldenRecordRelations.map { it.toUpsertData() },
             addressGoldenRecordRelations = addressGoldenRecordRelations.map { it.toUpsertData() },
             ownershipUltimate = ownershipUltimate,
-            ultimateOwnerBpnl = ultimateOwnerBpnl
+            ultimateOwnerBpnl = ultimateOwnerBpnl,
+            additionalSites = additionalSites.map { AdditionalSite(it.bpn, it.name) }
         )
     }
 
@@ -372,7 +387,7 @@ class GoldenRecordUpdateChunkService(
         }
     }
 
-    private fun update(businessPartner: BusinessPartnerDb, address: LogisticAddressVerboseDto) : OutputUpsertData{
+    private fun update(businessPartner: BusinessPartnerDb, address: LogisticAddressVerboseDto, siteNamesByBpn: Map<String, String>) : OutputUpsertData{
         val addressProperties = address.address
 
         updateIdentifiers(businessPartner.identifiers, addressProperties.identifiers.map(::toEntity), BusinessPartnerType.ADDRESS)
@@ -384,6 +399,17 @@ class GoldenRecordUpdateChunkService(
         businessPartner.postalAddress.alternativePostalAddress = addressProperties.alternativePostalAddress?.toEntity()
         businessPartner.addressConfidence?.let { update(it,  addressProperties.confidenceCriteria) }
         businessPartner.addressGoldenRecordRelations.replace(addressProperties.relations.map(::toEntity))
+
+        // Which of the address's sites is "additional" is relative to the site THIS output follows, not the Pool's
+        // `bpnSite` (its oldest member): the output tracks the site that was shared (bpnS), which may be any member.
+        // If the output does not yet track a site but the address is a site main, it starts tracking `bpnSite` below,
+        // so anticipate that here. Everything else the address belongs to becomes an additional site.
+        val trackedSiteBpn = businessPartner.bpnS ?: addressProperties.bpnSite
+        val additionalSiteBpns = (listOfNotNull(addressProperties.bpnSite) + addressProperties.additionalSites)
+            .distinct()
+            .filterNot { it == trackedSiteBpn }
+        businessPartner.additionalSites.clear()
+        businessPartner.additionalSites.addAll(additionalSiteBpns.map { AdditionalSiteDb(it, siteNamesByBpn[it]) })
 
         val goldenRecordVariantByCode = businessPartner.scriptVariants.associateBy { it.scriptCode }
         address.scriptVariants.groupBy { it.scriptCode }.map { it.value.first() }.forEach { goldenRecordVariant ->

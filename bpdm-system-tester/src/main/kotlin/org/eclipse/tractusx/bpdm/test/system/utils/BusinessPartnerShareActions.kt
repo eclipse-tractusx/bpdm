@@ -201,6 +201,39 @@ class BusinessPartnerShareActions(
         return siteResult.siteWithParent
     }
 
+    /**
+     * Refines a record into a site exactly like the label overload above, but pins the site's MAIN ADDRESS
+     * to the shared [mainAddressLabel] instead of the site label. Two records refined to distinct
+     * [siteLabel]s under the same [legalEntityLabel] but the same [mainAddressLabel] therefore ask the Pool
+     * to make both sites share one main address. Returns the site together with its parent legal entity so
+     * the caller can store them as the current expectation.
+     */
+    fun refineAsSite(
+        recordId: String,
+        masterDataSeed: String,
+        siteLabel: String,
+        legalEntityLabel: String,
+        mainAddressLabel: String
+    ): SiteWithParent {
+        val state = context.records[recordId]!!
+        val parentResult = testDataGenerator.buildLegalEntity("${masterDataSeed}Parent")
+        val siteResult = testDataGenerator.buildSite(masterDataSeed, parentResult.legalEntity)
+        resolveTask(
+            recordId,
+            siteResult.taskData.withGoldenRecordRequestIdentifiers(
+                legalEntityLabel,
+                siteLabel = siteLabel,
+                siteMainAddressLabel = mainAddressLabel
+            )
+        )
+        context.records[recordId] = state.copy(
+            legalEntity = siteResult.siteWithParent.legalEntity,
+            poolSite = siteResult.siteWithParent.site
+        )
+        sharingStateWatcher.waitForCompletedState(recordId)
+        return siteResult.siteWithParent
+    }
+
     fun refineAsAdditionalAddressOfLegalEntity(recordId: String, verified: Boolean) {
         val state = context.records[recordId]!!
         val contentSeed = state.contentSeed!!
@@ -418,7 +451,8 @@ class BusinessPartnerShareActions(
     private fun BusinessPartner.withGoldenRecordRequestIdentifiers(
         legalEntityLabel: String,
         siteLabel: String? = null,
-        additionalAddressLabel: String? = null
+        additionalAddressLabel: String? = null,
+        siteMainAddressLabel: String? = null
     ): BusinessPartner =
         copy(
             legalEntity = legalEntity.copy(
@@ -428,7 +462,10 @@ class BusinessPartnerShareActions(
             site = siteLabel?.let { label ->
                 site?.copy(
                     bpnReference = requestIdentifier("BPNS", label),
-                    siteMainAddress = site?.siteMainAddress?.copy(bpnReference = requestIdentifier("BPNA", label))
+                    // The site main address is keyed by [siteMainAddressLabel] when given, so two distinct sites
+                    // can point their main address at the SAME address request identifier (and thus share it);
+                    // it defaults to the site label, keeping each site's main address its own.
+                    siteMainAddress = site?.siteMainAddress?.copy(bpnReference = requestIdentifier("BPNA", siteMainAddressLabel ?: label))
                 )
             } ?: site,
             additionalAddress = additionalAddressLabel?.let { label ->

@@ -30,12 +30,16 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateRes
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerUpdateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SiteWithMainAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
+import org.eclipse.tractusx.bpdm.pool.service.application.v6.SiteCreateApplicationV6Service
+import org.eclipse.tractusx.bpdm.pool.service.application.v6.SiteUpdateApplicationV6Service
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
 @RestController("SiteControllerLegacy")
 class SiteController(
-    private val siteLegacyServiceMapper: SiteLegacyServiceMapper
+    private val siteLegacyServiceMapper: SiteLegacyServiceMapper,
+    private val siteCreateApplicationService: SiteCreateApplicationV6Service,
+    private val siteUpdateApplicationService: SiteUpdateApplicationV6Service
 ) : PoolSiteApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
@@ -65,14 +69,14 @@ class SiteController(
     override fun createSite(
         requests: Collection<SitePartnerCreateRequest>
     ): SitePartnerCreateResponseWrapper {
-        return siteLegacyServiceMapper.createSitesWithMainAddress(requests)
+        return siteCreateApplicationService.createSitesWithMainAddress(requests)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")
     override fun updateSite(
         requests: Collection<SitePartnerUpdateRequest>
     ): SitePartnerUpdateResponseWrapper {
-        return siteLegacyServiceMapper.updateSites(requests)
+        return siteUpdateApplicationService.updateSites(requests)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
@@ -87,6 +91,6 @@ class SiteController(
     override fun createSiteWithLegalReference(
         request: Collection<SiteCreateRequestWithLegalAddressAsMain>
     ): SitePartnerCreateResponseWrapper {
-        return siteLegacyServiceMapper.createSitesWithLegalAddressAsMain(request)
+        return siteCreateApplicationService.createSitesWithLegalAddressAsMain(request)
     }
 }

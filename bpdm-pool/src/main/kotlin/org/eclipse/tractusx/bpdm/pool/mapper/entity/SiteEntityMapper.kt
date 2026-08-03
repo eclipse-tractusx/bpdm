@@ -1,0 +1,66 @@
+/*******************************************************************************
+ * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Apache License, Version 2.0 which is available at
+ * https://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ ******************************************************************************/
+
+package org.eclipse.tractusx.bpdm.pool.mapper.entity
+
+import org.eclipse.tractusx.bpdm.pool.entity.*
+import org.eclipse.tractusx.bpdm.pool.model.SiteState
+import org.eclipse.tractusx.bpdm.pool.model.parsed.ConfidenceCriteriaParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteCreateParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteHeaderParsed
+import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteScriptVariantParsed
+import org.springframework.stereotype.Component
+import java.time.Instant
+import java.time.ZoneOffset
+
+/**
+ * Builds only the site header; the main address is [AddressEntityMapper]'s job. [toEntity] leaves `mainAddress` unset
+ * (`lateinit`) — the create service assigns it after persisting the address (cyclic site↔address relationship).
+ */
+@Component
+class SiteEntityMapper(
+    private val addressEntityMapper: AddressEntityMapper
+) {
+
+    fun toEntity(bpn: String, parsed: SiteCreateParsed, numberOfSharingMembers: Int): SiteDb =
+        toEntity(bpn, parsed.legalEntity, parsed.content.header, numberOfSharingMembers)
+
+    fun toEntity(bpn: String, legalEntity: LegalEntityDb, header: SiteHeaderParsed, numberOfSharingMembers: Int): SiteDb {
+        val entity = SiteDb(
+            bpn = bpn,
+            name = header.name,
+            confidenceCriteria = toConfidence(header.confidenceCriteria, numberOfSharingMembers),
+            legalEntity = legalEntity,
+            scriptVariants = toScriptVariants(header.scriptVariants).toMutableList()
+        )
+        entity.states.addAll(toStates(header.states, entity))
+        return entity
+    }
+
+    fun toConfidence(parsed: ConfidenceCriteriaParsed, numberOfSharingMembers: Int): ConfidenceCriteriaDb =
+        addressEntityMapper.toConfidence(parsed, numberOfSharingMembers)
+
+    fun toStates(parsed: List<SiteState>, parent: SiteDb): List<SiteStateDb> =
+        parsed.map { SiteStateDb(validFrom = it.validFrom?.toLocalDateTime(), validTo = it.validTo?.toLocalDateTime(), type = it.type, site = parent) }
+
+    fun toScriptVariants(parsed: List<SiteScriptVariantParsed>): List<SiteScriptVariantDb> =
+        parsed.map { SiteScriptVariantDb(scriptCode = it.scriptCode, name = it.name) }
+
+    private fun Instant.toLocalDateTime() = atZone(ZoneOffset.UTC).toLocalDateTime()
+}

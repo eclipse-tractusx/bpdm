@@ -143,7 +143,8 @@ fun LogisticAddressDb.toInvariantDto(): LogisticAddressInvariantVerboseDto {
     return LogisticAddressInvariantVerboseDto(
         bpna = bpn,
         bpnLegalEntity = legalEntity?.bpn,
-        bpnSite = site?.bpn,
+        bpnSite = mainSite?.bpn,
+        additionalSites = additionalSites.map { it.bpn },
         createdAt = createdAt,
         updatedAt = updatedAt,
         name = name,
@@ -153,7 +154,7 @@ fun LogisticAddressDb.toInvariantDto(): LogisticAddressInvariantVerboseDto {
         physicalPostalAddress = physicalPostalAddress.toDto(),
         alternativePostalAddress = alternativePostalAddress?.toDto(),
         confidenceCriteria = confidenceCriteria.toDto(),
-        isParticipantData = legalEntity?.isCatenaXMemberData ?: site?.legalEntity?.isCatenaXMemberData ?: false,
+        isParticipantData = legalEntity?.isCatenaXMemberData ?: mainSite?.legalEntity?.isCatenaXMemberData ?: false,
         addressType = getAddressType(this)
     )
 }
@@ -320,17 +321,30 @@ fun ConfidenceCriteriaDb.toDto(): ConfidenceCriteriaDto =
         confidenceLevel
     )
 
+/**
+ * The site rendered as the API's `bpnSite` for backward compatibility: the oldest member by `createdAt`, which for
+ * pre-existing data is the address's former single site. The remaining members are exposed as [additionalSites].
+ */
+val LogisticAddressDb.mainSite: SiteDb?
+    get() = sites.minByOrNull { it.createdAt }
+
+val LogisticAddressDb.additionalSites: List<SiteDb>
+    get() = sites.sortedBy { it.createdAt }.drop(1)
+
+/** An address is a site's main address iff one of the sites it belongs to has it as its main address. */
+private fun LogisticAddressDb.isSiteMainAddress() = sites.any { it.mainAddress == this }
+
 fun getAddressType(logisticAddress: LogisticAddressDb): AddressType {
     return when {
         logisticAddress.legalEntity?.legalAddress == logisticAddress &&
-                logisticAddress.site?.mainAddress == logisticAddress -> AddressType.LegalAndSiteMainAddress
+                logisticAddress.isSiteMainAddress() -> AddressType.LegalAndSiteMainAddress
 
         logisticAddress.legalEntity?.legalAddress != logisticAddress &&
-                logisticAddress.site?.mainAddress != logisticAddress -> AddressType.AdditionalAddress
+                !logisticAddress.isSiteMainAddress() -> AddressType.AdditionalAddress
 
         logisticAddress.legalEntity?.legalAddress == logisticAddress -> AddressType.LegalAddress
 
-        logisticAddress.site?.mainAddress == logisticAddress -> AddressType.SiteMainAddress
+        logisticAddress.isSiteMainAddress() -> AddressType.SiteMainAddress
 
         else -> throw IllegalStateException("Unable to determine address type.")
     }

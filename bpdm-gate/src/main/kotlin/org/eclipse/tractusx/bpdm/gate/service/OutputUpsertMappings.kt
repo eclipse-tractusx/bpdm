@@ -65,12 +65,12 @@ class OutputUpsertMappings(
         val scriptVariants = upsertData.scriptVariants.map { variant ->  businessPartnerMappings.toScriptVariantDb(businessPartner, variant) }
         scriptVariants.forEach { businessPartner.scriptVariants.add(it) }
 
-        businessPartner.legalEntityGoldenRecordRelations.addAll(
-            upsertData.legalEntityGoldenRecordRelations.map { toLegalEntityGoldenRecordRelation(it) }
-        )
-        businessPartner.addressGoldenRecordRelations.addAll(
-            upsertData.addressGoldenRecordRelations.map { toAddressGoldenRecordRelation(it) }
-        )
+        upsertData.legalEntityGoldenRecordRelations.map { toLegalEntityGoldenRecordRelation(it) }
+            .forEach { businessPartner.legalEntityGoldenRecordRelations.add(it) }
+        upsertData.addressGoldenRecordRelations.map { toAddressGoldenRecordRelation(it) }
+            .forEach { businessPartner.addressGoldenRecordRelations.add(it) }
+        upsertData.additionalSites.map { AdditionalSiteDb(it.siteBpn, it.name) }
+            .forEach { businessPartner.additionalSites.add(it) }
 
         return businessPartner
     }

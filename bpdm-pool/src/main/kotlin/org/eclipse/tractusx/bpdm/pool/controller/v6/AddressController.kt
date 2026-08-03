@@ -29,12 +29,16 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerCreateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerUpdateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
+import org.eclipse.tractusx.bpdm.pool.service.application.v6.AddressCreateApplicationV6Service
+import org.eclipse.tractusx.bpdm.pool.service.application.v6.AddressUpdateApplicationV6Service
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
 @RestController("AddressControllerLegacy")
 class AddressController(
-    private val addressLegacyServiceMapper: AddressLegacyServiceMapper
+    private val addressLegacyServiceMapper: AddressLegacyServiceMapper,
+    private val addressCreateApplicationService: AddressCreateApplicationV6Service,
+    private val addressUpdateApplicationService: AddressUpdateApplicationV6Service
 ) : PoolAddressApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
@@ -70,13 +74,13 @@ class AddressController(
     override fun createAddresses(
         requests: Collection<AddressPartnerCreateRequest>
     ): AddressPartnerCreateResponseWrapper {
-        return addressLegacyServiceMapper.createAddresses(requests)
+        return addressCreateApplicationService.createAddresses(requests)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")
     override fun updateAddresses(
         requests: Collection<AddressPartnerUpdateRequest>
     ): AddressPartnerUpdateResponseWrapper {
-        return addressLegacyServiceMapper.updateAddresses(requests)
+        return addressUpdateApplicationService.updateAddresses(requests)
     }
 }

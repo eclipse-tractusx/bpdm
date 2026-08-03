@@ -3,6 +3,7 @@
 <!-- TOC -->
 * [Migration Guide](#migration-guide)
   * [7.4.x to 7.5.x](#74x-to-75x)
+    * [Unique site names per legal entity](#unique-site-names-per-legal-entity)
   * [7.3.x to 7.4.x](#73x-to-74x)
     * [Breaking rename of relation DTO fields (Gate)](#breaking-rename-of-relation-dto-fields-gate)
       * [Impact](#impact)
@@ -26,7 +27,15 @@
 
 ## 7.4.x to 7.5.x
 
-_No migration steps yet._
+### Unique site names per legal entity
+
+A site's name must now be unique within its owning legal entity.
+This is enforced by a new database constraint (`uc_sites_legal_entity_name`) on the Pool's `sites` table.
+
+> Very important:
+> The migration adds this constraint directly and does **not** resolve pre-existing duplicates.
+> If your Pool already contains two or more sites with the same name under the same legal entity, the migration will fail.
+> Please make sure that site names are unique within each legal entity before upgrading, otherwise the deployment will not start.
 
 ## 7.3.x to 7.4.x
 
