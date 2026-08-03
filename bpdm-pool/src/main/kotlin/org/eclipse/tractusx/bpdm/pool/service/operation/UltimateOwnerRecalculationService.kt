@@ -54,11 +54,15 @@ class UltimateOwnerRecalculationService(
             .map { (legalEntity, ultimateOwnerBpnl) ->
                 LegalEntityUpdate(
                     legalEntity,
-                    LegalEntityHeaderUpdate.NoOp.copy(ultimateOwnerBpnl = FieldUpdate.Set(ultimateOwnerBpnl)),
+                    LegalEntityHeaderUpdate.NoOp.copy(ultimateOwnerBpnl = FieldUpdate.Set(storedValueOf(ultimateOwnerBpnl, legalEntity))),
                     AddressContentUpdate.NoOp
                 )
             }
 
         legalEntityUpdateService.update(updates)
     }
+
+    // The `ownershipUltimate` flag already marks the ultimate owner itself; only the entities below it carry its BPNL.
+    private fun storedValueOf(ultimateOwnerBpnl: String?, legalEntity: LegalEntityDb) =
+        ultimateOwnerBpnl.takeIf { it != legalEntity.bpn }
 }
