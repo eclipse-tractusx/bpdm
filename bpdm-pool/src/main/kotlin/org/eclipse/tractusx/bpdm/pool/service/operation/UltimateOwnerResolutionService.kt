@@ -34,7 +34,8 @@ import java.time.LocalDate
  * `ownershipUltimate` flags. Read-only: it computes, it never writes — [UltimateOwnerRecalculationService] persists what
  * this resolves.
  *
- * A chain that reaches no entity flagged as ultimate owner resolves to `null`. Ownership cycles are guarded against and
+ * The flag holder highest up the ownership chain wins, and an entity flagged itself is its own ultimate owner even when it
+ * is owned by others. A chain that reaches no flagged entity resolves to `null`. Ownership cycles are guarded against and
  * logged rather than throwing, so a corrupt graph degrades to "no ultimate owner" instead of failing the write.
  */
 @Service
@@ -44,10 +45,16 @@ class UltimateOwnerResolutionService(
 
     private val logger = KotlinLogging.logger { }
 
-    /** The BPNL of [legalEntity]'s ultimate owner, or null when its ownership chain reaches no ultimate owner. */
+    /**
+     * The BPNL of [legalEntity]'s ultimate owner — itself when it is the flag holder — or null when its ownership chain
+     * reaches no ultimate owner.
+     */
     @Transactional(readOnly = true)
     fun resolve(legalEntity: LegalEntityDb): String? =
-        resolveWithCycleProtection(legalEntity, mutableSetOf())
+        when (val resolution = resolveWithCycleProtection(legalEntity, mutableSetOf())) {
+            is Resolution.UltimateOwner -> resolution.bpnl
+            Resolution.CycleDetected -> null
+        }
 
     /**
      * Resolves [legalEntities] and every entity owned by them, transitively — the set whose ultimate owner can change
@@ -77,22 +84,36 @@ class UltimateOwnerResolutionService(
             .forEach { collectWithDescendants(it.startNode, visited, resolved) }
     }
 
-    private fun resolveWithCycleProtection(legalEntity: LegalEntityDb, visited: MutableSet<String>): String? {
+    private fun resolveWithCycleProtection(legalEntity: LegalEntityDb, visited: MutableSet<String>): Resolution {
         val currentBpn = legalEntity.bpn
 
         if (!visited.add(currentBpn)) {
             logger.warn { "Cycle detected in ownership chain at BPNL: $currentBpn" }
-            return null
+            return Resolution.CycleDetected
         }
 
+        var highestFlagHolder = currentBpn.takeIf { legalEntity.ownershipUltimate }
         val owningRelations = currentlyValidRelations(relationRepository.findByTypeAndStartNode(LegalEntityRelationType.IsOwnedBy, legalEntity))
-        if (owningRelations.isEmpty()) return if (legalEntity.ownershipUltimate) currentBpn else null
 
-        return owningRelations.firstNotNullOfOrNull { resolveWithCycleProtection(it.endNode, visited) }
+        owningRelations.forEach { relation ->
+            when (val ownerResolution = resolveWithCycleProtection(relation.endNode, visited)) {
+                // A cycle anywhere above makes the whole chain untrustworthy, so it invalidates the flag holders found below it.
+                Resolution.CycleDetected -> return Resolution.CycleDetected
+                is Resolution.UltimateOwner -> highestFlagHolder = ownerResolution.bpnl ?: highestFlagHolder
+            }
+        }
+
+        return Resolution.UltimateOwner(highestFlagHolder)
     }
 
     private fun currentlyValidRelations(relations: Collection<RelationDb>): List<RelationDb> {
         val today = LocalDate.now()
         return relations.filter { it.isValidOn(today) }
+    }
+
+    /** The outcome of walking one ownership chain: the flag holder it reached, or the cycle that stopped the walk. */
+    private sealed interface Resolution {
+        data class UltimateOwner(val bpnl: String?) : Resolution
+        data object CycleDetected : Resolution
     }
 }

@@ -413,7 +413,7 @@ class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
     /**
      * GIVEN legal entity owning another legal entity, neither of them ultimate owner
      * WHEN operator updates the owning legal entity as ultimate owner
-     * THEN legal entity is returned as ultimate owner of itself
+     * THEN legal entity is returned as ultimate owner without an ultimate owner of its own
      */
     @Test
     fun `update legal entity as ultimate owner while no legal entity in its hierarchy is`(){
@@ -428,7 +428,7 @@ class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
 
         //THEN
         val expectedLegalEntity = resultFactory.buildLegalEntityUpdate(updateRequest, owningLegalEntity)
-            .withUltimateOwner(ownershipUltimate = true, ultimateOwnerBpnl = owningLegalEntity.header.bpnl)
+            .withUltimateOwner(ownershipUltimate = true, ultimateOwnerBpnl = null)
             .withIsOwnedByRelation(ownedLegalEntity.header.bpnl, owningLegalEntity.header.bpnl)
         val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(listOf(expectedLegalEntity), emptyList())
 
@@ -482,7 +482,7 @@ class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
         val response = poolClient.legalEntities.updateBusinessPartners(listOf(owningUpdateRequest, ownedUpdateRequest))
 
         //THEN
-        // The owned legal entity is flagged but still has an owner above it, so the hierarchy resolves to no ultimate owner.
+        // The owned legal entity is now the flag holder of its hierarchy, and a flag holder carries no ultimate owner BPNL of its own.
         val expectedLegalEntities = listOf(
             resultFactory.buildLegalEntityUpdate(owningUpdateRequest, owningLegalEntity)
                 .withUltimateOwner(false, null)

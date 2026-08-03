@@ -1420,9 +1420,9 @@ class TaskResolutionServiceTest @Autowired constructor(
         val subsidiaryEntity = legalEntityRepository.findByBpnIgnoreCase(subsidiary.legalEntity.header.bpnl)!!
         val parentEntity = legalEntityRepository.findByBpnIgnoreCase(groupParent.legalEntity.header.bpnl)!!
 
-        assertThat(ultimateOwnerResolutionService.resolveUltimateOwner(subsidiaryEntity)).isEqualTo(intermediate.legalEntity.header.bpnl)
-        assertThat(ultimateOwnerResolutionService.resolveUltimateOwner(intermediateEntity)).isEqualTo(intermediate.legalEntity.header.bpnl)
-        assertThat(ultimateOwnerResolutionService.resolveUltimateOwner(parentEntity)).isNull()
+        assertThat(ultimateOwnerResolutionService.resolve(subsidiaryEntity)).isEqualTo(intermediate.legalEntity.header.bpnl)
+        assertThat(ultimateOwnerResolutionService.resolve(intermediateEntity)).isEqualTo(intermediate.legalEntity.header.bpnl)
+        assertThat(ultimateOwnerResolutionService.resolve(parentEntity)).isNull()
     }
 
     @Test
@@ -1611,7 +1611,10 @@ class TaskResolutionServiceTest @Autowired constructor(
         createIsOwnedByRelationViaService(subsidiary.legalEntity.header.bpnl, intermediate.legalEntity.header.bpnl)
         createIsOwnedByRelationViaService(intermediate.legalEntity.header.bpnl, parent.legalEntity.header.bpnl)
 
-        ultimateOwnerResolutionService.updateUltimateOwnerForEntityAndDescendants(parentDb)
+        transactionTemplate.execute {
+            val managed = legalEntityRepository.findByBpnIgnoreCase(parentDb.bpn)!!
+            ultimateOwnerRecalculationService.recalculate(listOf(managed))
+        }
 
         parentDb = legalEntityRepository.findByBpnIgnoreCase(parent.legalEntity.header.bpnl)!!
         var subsidiaryDb = legalEntityRepository.findByBpnIgnoreCase(subsidiary.legalEntity.header.bpnl)!!
@@ -1680,8 +1683,9 @@ class TaskResolutionServiceTest @Autowired constructor(
 
         val subsidiaryDbAfter = legalEntityRepository.findByBpnIgnoreCase(subsidiary.legalEntity.header.bpnl)!!
         val intermediateDbAfter = legalEntityRepository.findByBpnIgnoreCase(intermediate.legalEntity.header.bpnl)!!
+        val parentDbAfter = legalEntityRepository.findByBpnIgnoreCase(parent.legalEntity.header.bpnl)!!
 
-        assertThat(parentDb.ultimateOwnerBpnl).isNull()
+        assertThat(parentDbAfter.ultimateOwnerBpnl).isNull()
         assertThat(intermediateDbAfter.ultimateOwnerBpnl).isEqualTo(parent.legalEntity.header.bpnl)
         assertThat(subsidiaryDbAfter.ultimateOwnerBpnl).isEqualTo(parent.legalEntity.header.bpnl)
     }
