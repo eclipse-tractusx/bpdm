@@ -29,10 +29,8 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Applies a full parsed site-update payload — header content plus main address — to an already-resolved site. It is
- * purely a payload adapter: it maps [SiteUpdateParsed] into full-replace update DTOs and hands them to
- * [SiteUpdateService], which owns change detection, persistence, and the SITE changelog. There is no changelog logic
- * here by design.
+ * Applies a full parsed site-update payload — header content plus main address — to an already-resolved site, replacing
+ * every field the payload covers.
  */
 @Service
 class SitePayloadUpdateService(
@@ -41,6 +39,9 @@ class SitePayloadUpdateService(
     private val addressUpdateMapper: AddressUpdateMapper
 ) {
 
+    /**
+     * Applies the given payloads in full and reports for each site whether it actually changed.
+     */
     @Transactional
     fun update(parsed: List<SiteUpdateParsed>): List<UpsertResult<SiteDb>> {
         val updateRequests = parsed.map {

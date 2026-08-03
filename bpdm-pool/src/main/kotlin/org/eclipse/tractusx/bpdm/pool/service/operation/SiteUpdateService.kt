@@ -27,7 +27,6 @@ import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertType
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.mapper.entity.SiteEntityMapper
-import org.eclipse.tractusx.bpdm.pool.model.update.AddressContentUpdate
 import org.eclipse.tractusx.bpdm.pool.model.update.AddressUpdate
 import org.eclipse.tractusx.bpdm.pool.model.update.SiteHeaderUpdate
 import org.eclipse.tractusx.bpdm.pool.model.update.SiteUpdate
@@ -40,14 +39,12 @@ import org.springframework.transaction.annotation.Transactional
 
 /**
  * The single authority for writing an existing site, treated as a whole aggregate. A caller describes the change as
- * data: a [SiteHeaderUpdate] for the header and an [AddressContentUpdate] for the main address —
- * [AddressContentUpdate.NoOp] to leave it alone. This service — not the caller — decides how each field is applied. It
- * detects whether the aggregate changed, persists it, and emits exactly one SITE changelog for those that did; every
- * writer reuses it, so none can forget to log.
+ * data — a header change plus a change for the main address, either of which may leave its side alone — and this
+ * service, not the caller, decides how each field is applied. It detects whether the aggregate changed, persists it, and
+ * emits exactly one SITE changelog for those that did; every writer reuses it, so none can forget to log.
  *
- * The header is this service's own responsibility; the main address is delegated to [AddressUpdateService], which stays
- * the leaf owner of the ADDRESS changelog. The parent SITE changelog is emitted before the child address is committed,
- * so the parent entry always precedes the child.
+ * The parent SITE changelog is emitted before the main address is committed, so the parent entry always precedes the
+ * child.
  */
 @Service
 class SiteUpdateService(
@@ -58,6 +55,10 @@ class SiteUpdateService(
     private val changelogService: PartnerChangelogService
 ) {
 
+    /**
+     * Applies the given changes and reports for each site whether the aggregate — its header or its main address —
+     * actually changed.
+     */
     @Transactional
     fun update(requests: List<SiteUpdate>): List<UpsertResult<SiteDb>> {
         val headerUpdates = requests.map { updateHeader(it) }

@@ -33,8 +33,8 @@ import org.springframework.transaction.annotation.Transactional
  * that changes the flag, an `IsOwnedBy` relation upsert, and the trigger that fires when a relation's validity period
  * starts or ends.
  *
- * Always call it *after* the write it reacts to — it re-reads the ownership graph as it now stands. Writes go through
- * [LegalEntityUpdateService], so a value that did not actually change produces no save and no changelog entry.
+ * Always call it *after* the write it reacts to — it re-reads the ownership graph as it now stands. A value that did not
+ * actually change produces no save and no changelog entry.
  */
 @Service
 class UltimateOwnerRecalculationService(

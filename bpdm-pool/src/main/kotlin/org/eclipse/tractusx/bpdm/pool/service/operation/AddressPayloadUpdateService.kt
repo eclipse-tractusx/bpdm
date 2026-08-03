@@ -29,13 +29,8 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * The single authority for applying a full parsed address-update payload — descriptive content plus an optional site
- * assignment — to an already-resolved address. It is a payload adapter: it maps the parsed content to a full-replace
- * [org.eclipse.tractusx.bpdm.pool.model.update.AddressContentUpdate] and delegates change detection, persistence, and the
- * changelog to [AddressUpdateService].
- *
- * [update] does this in one call. [stageUpdate] plus [commit] split it so a caller can learn whether the address
- * changed before committing.
+ * Applies a full parsed address-update payload — descriptive content plus an optional site assignment — to an
+ * already-resolved address, replacing every field the payload covers.
  */
 @Service
 class AddressPayloadUpdateService(
@@ -43,10 +38,17 @@ class AddressPayloadUpdateService(
     private val addressUpdateMapper: AddressUpdateMapper
 ) {
 
+    /**
+     * Applies the given payloads in full and reports for each address whether it actually changed.
+     */
     @Transactional
     fun update(parsed: List<AddressUpdateParsed>): List<UpsertResult<LogisticAddressDb>> =
         commit(stageUpdate(parsed))
 
+    /**
+     * Applies the payloads in memory without persisting, so a caller can see which addresses changed before handing them
+     * to [commit].
+     */
     fun stageUpdate(parsed: List<AddressUpdateParsed>): List<PendingAddressWrite> =
         parsed.map { entry ->
             addressStagedUpdateService.stageUpdate(
@@ -54,6 +56,9 @@ class AddressPayloadUpdateService(
             )
         }
 
+    /**
+     * Persists the staged addresses that changed and emits their UPDATE changelog.
+     */
     @Transactional
     fun commit(staged: List<PendingAddressWrite>): List<UpsertResult<LogisticAddressDb>> =
         addressStagedUpdateService.commit(staged)

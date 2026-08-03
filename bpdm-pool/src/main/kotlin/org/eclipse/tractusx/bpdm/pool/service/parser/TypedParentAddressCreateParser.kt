@@ -28,6 +28,10 @@ import org.eclipse.tractusx.bpdm.pool.model.request.AddressCreateTypedParentsReq
 import org.eclipse.tractusx.bpdm.pool.model.zipParseResults
 import org.springframework.stereotype.Service
 
+/**
+ * Validates address-create requests whose parents are already given as an explicit legal-entity BPN and an optional site
+ * BPN: the parents, their mutual consistency, and the new address content.
+ */
 @Service
 class TypedParentAddressCreateParser(
     private val addressContentParser: AddressContentParser,
@@ -36,6 +40,10 @@ class TypedParentAddressCreateParser(
     private val siteLegalEntityConsistencyValidator: SiteLegalEntityConsistencyValidator
 ) {
 
+    /**
+     * Validates each request and reports either the validated address with its resolved parents or every problem found in
+     * that entry.
+     */
     fun parse(requests: List<AddressCreateTypedParentsRequest>): List<ParseResult<AddressCreateParsed, AddressCreateParseError>> {
         val contentResults = addressContentParser.parse(requests.map { it.content }, requests.map { null })
         val legalEntityResults = legalEntityBpnParser.parse(requests.map { it.legalEntityBpn })

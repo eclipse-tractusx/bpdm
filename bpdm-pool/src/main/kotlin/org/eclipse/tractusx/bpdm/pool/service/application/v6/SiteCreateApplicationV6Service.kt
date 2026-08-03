@@ -57,6 +57,10 @@ class SiteCreateApplicationV6Service(
 
     private val logger = KotlinLogging.logger { }
 
+    /**
+     * Creates the requested sites, each with a main address of its own, and returns, per request, either the created
+     * site or the errors that stopped it.
+     */
     @Transactional
     fun createSitesWithMainAddress(requests: Collection<SitePartnerCreateRequestV6>): SitePartnerCreateResponseWrapperV6 {
         logger.info { "Create ${requests.size} new sites" }
@@ -77,10 +81,11 @@ class SiteCreateApplicationV6Service(
     }
 
     /**
-     * Creates sites whose main address is the parent legal entity's own legal address.
+     * Creates the requested sites, each taking its parent legal entity's legal address as the site main address, and
+     * returns, per request, either the created site or the errors that stopped it.
      *
      * Enforces a v6-only rule that a legal address may back at most one site: offenders are pre-filtered out as errors
-     * here, because the shared parse/create path deliberately does not enforce it (v7 and the cleaning/task path allow it).
+     * here, because the shared parse/create path deliberately does not enforce it — v7 and the task path allow it.
      */
     @Transactional
     fun createSitesWithLegalAddressAsMain(requests: Collection<SiteCreateRequestWithLegalAddressAsMainV6>): SitePartnerCreateResponseWrapperV6 {

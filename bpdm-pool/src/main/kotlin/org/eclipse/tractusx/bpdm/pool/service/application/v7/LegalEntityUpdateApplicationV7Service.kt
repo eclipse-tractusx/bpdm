@@ -48,6 +48,10 @@ class LegalEntityUpdateApplicationV7Service(
 
     private val logger = KotlinLogging.logger { }
 
+    /**
+     * Applies each request to the legal entity it addresses by BPN and returns, per request, either the updated legal
+     * entity or the errors that stopped it.
+     */
     @Transactional
     fun updateLegalEntities(requests: Collection<LegalEntityPartnerUpdateRequest>): LegalEntityPartnerUpdateResponseWrapper {
         logger.info { "Update ${requests.size} legal entities" }

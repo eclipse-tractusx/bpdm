@@ -33,10 +33,9 @@ import org.eclipse.tractusx.bpdm.pool.service.BpnIssuingService
 import org.springframework.stereotype.Service
 
 /**
- * Resolves each request's single, *untyped* `bpnParent` into the explicit (legalEntity, site) parents the typed create
- * stage needs: it detects whether the BPN is a legal entity or a site — reporting the precise
- * [InvalidParentBpn]/[UnresolvableLegalEntity]/[UnresolvableSite] errors the typed stage cannot distinguish — where a
- * site parent contributes its own legal entity.
+ * Resolves an address-create request's single untyped parent BPN into the explicit legal-entity and site parents the
+ * typed create stage needs, telling a BPN that resolves to nothing apart from one of a kind that cannot parent an
+ * address.
  */
 @Service
 class AddressParentResolutionParser(
@@ -45,6 +44,10 @@ class AddressParentResolutionParser(
     private val bpnIssuingService: BpnIssuingService
 ) {
 
+    /**
+     * Resolves each request's parent BPN — a site parent contributing its own legal entity — and fails the entry when the
+     * BPN names neither a known legal entity nor a known site.
+     */
     fun parse(
         requests: List<AddressCreateUntypedParentRequest>
     ): List<ParseResult<AddressCreateTypedParentsRequest, AddressCreateParseError>> {

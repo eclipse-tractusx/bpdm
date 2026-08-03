@@ -39,8 +39,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * The REST-API boundary for the V7 "create sites" operations, hosting both the distinct-main-address and
- * legal-address-as-main variants.
+ * The REST-API boundary for the V7 "create sites" operations.
  */
 @Service
 class SiteCreateApplicationV7Service(
@@ -54,6 +53,10 @@ class SiteCreateApplicationV7Service(
 
     private val logger = KotlinLogging.logger { }
 
+    /**
+     * Creates the requested sites, each with a main address of its own, and returns, per request, either the created
+     * site or the errors that stopped it.
+     */
     @Transactional
     fun createSitesWithMainAddress(requests: Collection<SitePartnerCreateRequest>): SitePartnerCreateResponseWrapper {
         logger.info { "Create ${requests.size} new sites" }
@@ -73,6 +76,10 @@ class SiteCreateApplicationV7Service(
         return SitePartnerCreateResponseWrapper(responses, errors)
     }
 
+    /**
+     * Creates the requested sites, each taking its parent legal entity's legal address as the site main address, and
+     * returns, per request, either the created site or the errors that stopped it.
+     */
     @Transactional
     fun createSitesWithLegalAddressAsMain(requests: Collection<SiteCreateRequestWithLegalAddressAsMain>): SitePartnerCreateResponseWrapper {
         logger.info { "Create ${requests.size} new sites with legal address as site main address" }

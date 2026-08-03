@@ -26,8 +26,8 @@ import org.eclipse.tractusx.bpdm.pool.service.BpnIssuingService
 import org.springframework.stereotype.Service
 
 /**
- * Issues site BPNs and builds the (unsaved) site header entities — no address, no persistence, no changelog — for site
- * creators that must wire the main address before persisting.
+ * Issues site BPNs and builds the unsaved site header entities for site creators that must wire the main address before
+ * persisting.
  */
 @Service
 class SiteHeaderTransientCreateService(
@@ -35,9 +35,12 @@ class SiteHeaderTransientCreateService(
     private val siteEntityMapper: SiteEntityMapper
 ) {
 
+    /**
+     * Builds the site headers with their BPNs issued, unsaved and unlogged, leaving persistence and changelog to the
+     * caller.
+     */
     fun createTransiently(request: List<SiteHeaderCreateParsed>): List<SiteDb>{
         val bpns = bpnIssuingService.issueSiteBpns(request.size)
-        // A new site starts with one sharing member.
         return request.zip(bpns) { entry, bpn ->
             siteEntityMapper.toEntity(bpn, entry.legalEntity, entry.header, numberOfSharingMembers = 1)
         }

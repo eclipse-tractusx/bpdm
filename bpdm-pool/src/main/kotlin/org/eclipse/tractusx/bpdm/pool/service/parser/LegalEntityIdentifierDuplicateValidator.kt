@@ -26,15 +26,21 @@ import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityIdentifierRepository
 import org.springframework.stereotype.Service
 
 /**
- * Split from the header parser because it needs each entry's owner BPN, known only to the create/update services.
- * [ownerBpns] is positional with [headers] (null for create, the legal entity's own BPN for update); an existing
- * identifier owned by the entry's own BPN is not a duplicate.
+ * Reports legal-entity identifiers that are already taken — by a legal entity in the database or by another entry of the
+ * same batch.
+ *
+ * Split from the header parser because it needs each entry's owner BPN, which only the create and update parsers know.
  */
 @Service
 class LegalEntityIdentifierDuplicateValidator(
     private val legalEntityIdentifierRepository: LegalEntityIdentifierRepository
 ) {
 
+    /**
+     * Reports, per entry, every identifier that duplicates an existing or in-batch one. [ownerBpns] is positional with
+     * [headers] — null for a create, the legal entity's own BPN for an update — and an identifier owned by the entry's
+     * own BPN is not a duplicate.
+     */
     fun validate(headers: List<LegalEntityHeaderRequest>, ownerBpns: List<String?>): List<List<LegalEntityContentParseError>> {
         require(headers.size == ownerBpns.size) { "headers and ownerBpns must be positionally aligned" }
         val candidates = buildCandidates(headers)
@@ -70,7 +76,8 @@ class LegalEntityIdentifierDuplicateValidator(
             .map { Candidate(bpn = it.legalEntity.bpn, type = it.type.technicalKey, value = it.value) }
             .associateBy { Key(it.type, it.value) }
 
-        // DB candidates win over within-request ones for the same key (preserves existing behavior).
+        // A duplicate that already exists in the database outranks one seen only within the batch: its owner BPN decides
+        // whether the entry may re-submit the identifier.
         return withinRequest.plus(fromDb)
     }
 

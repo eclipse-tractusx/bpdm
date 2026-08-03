@@ -39,9 +39,9 @@ import org.eclipse.tractusx.bpdm.pool.util.ValidationLimits
 import org.springframework.stereotype.Service
 
 /**
- * Covers only the legal-entity header — the legal address is parsed separately and recombined by the legal-entity
- * service. Errors are accumulated (not fail-fast). The identifier uniqueness check lives in
- * [LegalEntityIdentifierDuplicateValidator] (it needs the owner BPN); only the size limit is checked here.
+ * Validates the fields of a legal-entity header against the metadata they reference — legal forms, identifier types and
+ * script codes. The header only: the legal address is validated separately, and of the identifiers only their number is
+ * checked here, because uniqueness needs an owner BPN this parser does not see.
  */
 @Service
 class LegalEntityHeaderParser(
@@ -50,6 +50,9 @@ class LegalEntityHeaderParser(
     private val scriptCodeRepository: ScriptCodeRepository
 ) {
 
+    /**
+     * Validates each header and reports either the validated header or every problem found in that entry.
+     */
     fun parse(headers: List<LegalEntityHeaderRequest>): List<ParseResult<LegalEntityHeaderParsed, LegalEntityContentParseError>> {
         val metadata = fetchMetadata(headers)
         return headers.map { parseEntry(it, metadata) }

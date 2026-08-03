@@ -32,14 +32,17 @@ import org.eclipse.tractusx.bpdm.pool.repository.ScriptCodeRepository
 import org.springframework.stereotype.Service
 
 /**
- * Covers only the site header — the main address is parsed separately and recombined by the site service. Errors are
- * accumulated (not fail-fast).
+ * Validates the fields of a site header against the script codes they reference. The header only: the main address is
+ * validated separately.
  */
 @Service
 class SiteHeaderParser(
     private val scriptCodeRepository: ScriptCodeRepository
 ) {
 
+    /**
+     * Validates each header and reports either the validated header or every problem found in that entry.
+     */
     fun parse(headers: List<SiteHeaderRequest>): List<ParseResult<SiteHeaderParsed, SiteContentParseError>> {
         val scriptCodes = fetchScriptCodes(headers)
         return headers.map { parseEntry(it, scriptCodes) }

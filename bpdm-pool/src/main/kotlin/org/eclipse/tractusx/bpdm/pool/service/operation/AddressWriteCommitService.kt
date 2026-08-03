@@ -41,6 +41,10 @@ class AddressWriteCommitService(
     private val logisticAddressRepository: LogisticAddressRepository,
     private val changelogService: PartnerChangelogService
 ) {
+    /**
+     * Persists the staged addresses that changed, emits their CREATE or UPDATE changelog, and returns one result per
+     * staged write.
+     */
     @Transactional
     fun commit(staged: List<PendingAddressWrite>): List<UpsertResult<LogisticAddressDb>> {
         logisticAddressRepository.saveAll(staged.filter { it.upsertType != UpsertType.NoChange }.map { it.address })

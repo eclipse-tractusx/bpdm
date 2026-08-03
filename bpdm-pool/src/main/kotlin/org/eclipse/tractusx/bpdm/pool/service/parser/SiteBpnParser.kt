@@ -26,15 +26,17 @@ import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.springframework.stereotype.Service
 
 /**
- * [parse] treats the BPN as optional (`null` → `Success(null)`, for the address-create site parent); [parseRequired]
- * treats it as a mandatory reference (e.g. a site update target). Owning the optionality here keeps callers free of null
- * special-casing when combining parsers via `zipParseResults`.
+ * Resolves site BPNs to the sites they name.
  */
 @Service
 class SiteBpnParser(
     private val siteRepository: SiteRepository,
 ) {
 
+    /**
+     * Resolves each BPN to its site and a null BPN to a legitimately absent site, failing the entry when no site carries
+     * a given BPN. Owning the optionality here keeps callers free of null special-casing.
+     */
     fun parse(siteBpns: List<String?>): List<ParseResult<SiteDb?, UnresolvableSite>> {
         val sitesByBpn = resolve(siteBpns.filterNotNull().toSet())
         return siteBpns.map { bpn ->
@@ -45,6 +47,9 @@ class SiteBpnParser(
         }
     }
 
+    /**
+     * Resolves each BPN to its site, failing the entry when no site carries that BPN.
+     */
     fun parseRequired(siteBpns: List<String>): List<ParseResult<SiteDb, UnresolvableSite>> {
         val sitesByBpn = resolve(siteBpns.toSet())
         return siteBpns.map { bpn -> resolveResult(bpn, sitesByBpn) }

@@ -51,6 +51,10 @@ class AddressCreateApplicationV6Service(
 
     private val logger = KotlinLogging.logger { }
 
+    /**
+     * Creates the requested addresses under their parent business partners and returns, per request, either the created
+     * address or the errors that stopped it.
+     */
     @Transactional
     fun createAddresses(requests: Collection<AddressPartnerCreateRequestV6>): AddressPartnerCreateResponseWrapperV6 {
         logger.info { "Create ${requests.size} new addresses" }

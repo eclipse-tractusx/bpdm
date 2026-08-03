@@ -31,8 +31,7 @@ import java.time.LocalDate
 
 /**
  * Derives which legal entity ultimately owns another, from the currently valid `IsOwnedBy` relations and the
- * `ownershipUltimate` flags. Read-only: it computes, it never writes — [UltimateOwnerRecalculationService] persists what
- * this resolves.
+ * `ownershipUltimate` flags. Read-only: it computes, it never writes.
  *
  * The flag holder highest up the ownership chain wins, and an entity flagged itself is its own ultimate owner even when it
  * is owned by others. A chain that reaches no flagged entity resolves to `null`. Ownership cycles are guarded against and

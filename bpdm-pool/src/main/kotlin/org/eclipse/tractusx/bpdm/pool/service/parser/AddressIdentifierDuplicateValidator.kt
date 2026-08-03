@@ -26,15 +26,21 @@ import org.eclipse.tractusx.bpdm.pool.repository.AddressIdentifierRepository
 import org.springframework.stereotype.Service
 
 /**
- * Split from the content parser because it needs each entry's owner BPN, known only to the create/update services.
- * [ownerBpns] is positional with [contents] (null for create, the address's own BPN for update); an existing identifier
- * owned by the entry's own BPN is not a duplicate.
+ * Reports address identifiers that are already taken — by an address in the database or by another entry of the same
+ * batch.
+ *
+ * Split from the content parser because it needs each entry's owner BPN, which only the create and update parsers know.
  */
 @Service
 class AddressIdentifierDuplicateValidator(
     private val addressIdentifierRepository: AddressIdentifierRepository
 ) {
 
+    /**
+     * Reports, per entry, every identifier that duplicates an existing or in-batch one. [ownerBpns] is positional with
+     * [contents] — null for a create, the address's own BPN for an update — and an identifier owned by the entry's own
+     * BPN is not a duplicate.
+     */
     fun validate(contents: List<LogisticAddressRequest>, ownerBpns: List<String?>): List<List<AddressConstraintParseError>> {
         require(contents.size == ownerBpns.size) { "contents and ownerBpns must be positionally aligned" }
         val candidates = buildCandidates(contents)
@@ -70,7 +76,8 @@ class AddressIdentifierDuplicateValidator(
             .map { Candidate(bpn = it.address.bpn, type = it.type.technicalKey, value = it.value) }
             .associateBy { Key(it.type, it.value) }
 
-        // DB candidates win over within-request ones for the same key (preserves existing behavior).
+        // A duplicate that already exists in the database outranks one seen only within the batch: its owner BPN decides
+        // whether the entry may re-submit the identifier.
         return withinRequest.plus(fromDb)
     }
 

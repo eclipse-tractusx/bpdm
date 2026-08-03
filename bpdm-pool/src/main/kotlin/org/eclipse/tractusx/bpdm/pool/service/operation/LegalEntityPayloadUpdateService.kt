@@ -32,12 +32,11 @@ import java.time.temporal.ChronoUnit
 
 /**
  * Applies a full parsed legal-entity-update payload — header content plus legal address — to an already-resolved legal
- * entity, and afterwards restores the ownership invariant the payload may have broken. The payload itself is mapped into
- * full-replace update DTOs and handed to [LegalEntityUpdateService], which owns change detection, persistence, and the
- * LEGAL_ENTITY changelog; there is no changelog logic here by design.
+ * entity, replacing every field the payload covers, and afterwards restores the ownership invariant the payload may have
+ * broken.
  *
- * This is the one door every payload update goes through (both API versions and the golden-record task path), which is
- * why the ownership recalculation is hooked here rather than in each caller.
+ * The ownership recalculation is hooked here rather than in each caller because this is the one door every payload update
+ * goes through: both API versions and the golden-record task path.
  */
 @Service
 class LegalEntityPayloadUpdateService(
@@ -47,10 +46,12 @@ class LegalEntityPayloadUpdateService(
     private val addressUpdateMapper: AddressUpdateMapper
 ) {
 
+    /**
+     * Applies the given payloads in full, re-derives the ultimate owners they may have moved, and reports for each legal
+     * entity whether it actually changed.
+     */
     @Transactional
     fun update(parsed: List<LegalEntityUpdateParsed>): List<UpsertResult<LegalEntityDb>> {
-        // A payload update refreshes data-currentness for the whole batch; the derived ultimate-owner BPNL is left
-        // untouched (see LegalEntityHeaderUpdateMapper).
         val currentness = Instant.now().truncatedTo(ChronoUnit.MICROS)
 
         // Read before the update mutates the targets: only a changed ownership flag can move an ultimate owner, so only

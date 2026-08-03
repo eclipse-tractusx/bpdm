@@ -27,6 +27,9 @@ import org.eclipse.tractusx.bpdm.pool.model.request.SiteCreateRequest
 import org.eclipse.tractusx.bpdm.pool.model.zipParseResults
 import org.springframework.stereotype.Service
 
+/**
+ * Validates site-create requests: the parent legal entity, the header content and the new main address.
+ */
 @Service
 class SiteCreateParser(
     private val siteHeaderParser: SiteHeaderParser,
@@ -34,6 +37,10 @@ class SiteCreateParser(
     private val addressContentParser: AddressContentParser
 ) {
 
+    /**
+     * Validates each request and reports either the validated site with its resolved parent or every problem found in
+     * that entry.
+     */
     fun parse(requests: List<SiteCreateRequest>): List<ParseResult<SiteCreateParsed, SiteCreateParseError>> {
         val headerResults = siteHeaderParser.parse(requests.map { it.content.header })
         val legalEntityResults = legalEntityBpnParser.parse(requests.map { it.legalEntityBpn })

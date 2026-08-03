@@ -28,6 +28,9 @@ import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntityCreateRequest
 import org.eclipse.tractusx.bpdm.pool.model.zipParseResults
 import org.springframework.stereotype.Service
 
+/**
+ * Validates legal-entity create requests: the header content with its identifier uniqueness, and the legal address.
+ */
 @Service
 class LegalEntityCreateParser(
     private val legalEntityHeaderParser: LegalEntityHeaderParser,
@@ -35,6 +38,9 @@ class LegalEntityCreateParser(
     private val addressContentParser: AddressContentParser
 ) {
 
+    /**
+     * Validates each request and reports either the validated legal entity or every problem found in that entry.
+     */
     fun parse(requests: List<LegalEntityCreateRequest>): List<ParseResult<LegalEntityCreateParsed, LegalEntityCreateParseError>> {
         val headers = requests.map { it.content.header }
         val headerResults = legalEntityHeaderParser.parse(headers)

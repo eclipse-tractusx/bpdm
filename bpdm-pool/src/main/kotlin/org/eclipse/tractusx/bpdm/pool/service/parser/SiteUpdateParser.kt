@@ -27,6 +27,9 @@ import org.eclipse.tractusx.bpdm.pool.model.request.SiteUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.model.zipParseResults
 import org.springframework.stereotype.Service
 
+/**
+ * Validates site-update requests: the target site, the new header content and the new main address.
+ */
 @Service
 class SiteUpdateParser(
     private val siteHeaderParser: SiteHeaderParser,
@@ -34,10 +37,13 @@ class SiteUpdateParser(
     private val addressContentParser: AddressContentParser
 ) {
 
+    /**
+     * Validates each request and reports either the resolved target with its validated content or every problem found in
+     * that entry.
+     */
     fun parse(requests: List<SiteUpdateRequest>): List<ParseResult<SiteUpdateParsed, SiteUpdateParseError>> {
         val targetResults = siteBpnParser.parseRequired(requests.map { it.siteBpn })
         val headerResults = siteHeaderParser.parse(requests.map { it.content.header })
-        // The main address's duplicate check is scoped to its owning address; its BPN comes from the resolved target.
         val ownerBpns = targetResults.map { (it as? ParseResult.Success)?.parsed?.mainAddress?.bpn }
         val mainAddressResults = addressContentParser.parse(requests.map { it.content.mainAddress }, ownerBpns)
 
