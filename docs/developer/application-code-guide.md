@@ -97,7 +97,7 @@ The four representations, by suffix:
 
 - **`ParseResult<T, E>`** — the backbone type: per entry, either `Success(parsed)` or `Failure(errors)`. It is covariant in the error type, so a parser with a narrow error type composes into an operation with a wider one.
 - **Combinators** — `zipParseResults` (combine several parsers for the same entry, accumulating errors), `chainParseResults` (feed one parse stage into the next), and `parseAndExecute` (the application-to-operation contract: parse the batch, execute only the successes, weave results back into the original positions).
-- **Mappers** — `@Component`, translation only, one per direction: *inbound* (DTO → `…Request`), *entity* (`…Parsed` → `…Db`), *outbound* (errors and results → response DTOs / `ErrorInfo`).
+- **Mappers** — `@Component`, translation only, each covering a single direction: *inbound* (DTO → `…Request`), *entity* (`…Parsed` → `…Db`), *outbound* (errors and results → response DTOs / `ErrorInfo`).
 - **`Pending…Write`** — a staged entity plus its `UpsertType` (`Created` / `Updated` / `NoChange`); the currency between staging and committing when a write must be split (see [2.4](#24-operation-layer)).
 
 ## 1.5 How a batch flows
@@ -176,14 +176,17 @@ Background jobs and internal process orchestration are not request-driven operat
 - Every representation MUST carry its suffix: `…Dto` (API), `…Request` (unified input), `…Parsed` (validated), `…Db` (entity).
 - The `…Request` model MUST be a superset that captures the content of all inbound sources (v6, v7, Orchestrator), so one parsing path feeds one domain model.
 - A `…Parsed` value MUST be fully validated and non-null — safe to persist without further checks.
-- Internal domain models (`…Request`, `…Parsed`) MUST NOT reference API DTO types.
+- Internal domain models (`…Request`, `…Parsed`) MUST NOT reference API DTO types. Where an internal model duplicates the shape of an API DTO, it SHOULD reuse the shared value types and enums rather than cloning them — only the DTO wrapper is duplicated, not the vocabulary it is built from.
 - Types SHOULD be named domain-noun first, with the role/stage as a suffix (`AddressCreateParsed`, not `ParsedAddressCreate`).
 
 ## 2.6 Mappers
 
-- A mapper MUST be a `@Component`, do translation only (no business logic, no side effects), and live in the `mapper` package.
-- There MUST be one mapper per direction: inbound (DTO → `…Request`), entity (`…Parsed` → `…Db`), and outbound (errors/results → response DTO / `ErrorInfo`).
-- All mapping — including response shaping — MUST live in the `mapper` package as a proper mapper. Mapping logic MUST NOT be left as loose extension functions in the service package. *(Current gap: outbound response mapping still lives as extension functions outside the mapper package.)*
+- A mapper MUST be a `@Component` — not a `@Service`, because it is a humble translation object and holds none of a service's authority — do translation only (no business logic, no side effects), and live in the `mapper` package.
+- A decision, a rule-based default, or a branch on business state is business logic: it MUST NOT appear in a mapper, and MUST live in the parser (if it decides) or the operation (if it acts). No size or convenience argument justifies an exception.
+- The reverse does not hold: a service MAY carry out a translation inline. Deterministic conversions — `Instant`↔`LocalDateTime`, enum and key formatting, restructuring — are translation wherever they live, and a one-off two-line conversion does not deserve its own mapper.
+- Translation SHOULD be extracted into a mapper once it grows beyond a few lines or is needed in more than one place. The threshold is a judgement call; extract before the mapping starts to obscure what the service does.
+- A mapper MUST cover exactly one direction: inbound (DTO → `…Request`), entity (`…Parsed` → `…Db`), or outbound (errors/results → response DTO / `ErrorInfo`). It MUST NOT merge two directions, and one direction MUST NOT be fragmented across several mappers for the same content.
+- Once extracted, mapping — including response shaping — MUST live in the `mapper` package as a proper `@Component` mapper. It MUST NOT be left as loose extension functions in a service package. *(Current gap: outbound response mapping still lives as extension functions outside the mapper package.)*
 
 ## 2.7 Errors
 

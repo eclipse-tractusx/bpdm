@@ -21,11 +21,11 @@ package org.eclipse.tractusx.bpdm.pool.v6.site
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteCreateError
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.AddressIdentifierDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SiteSearchRequestV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.ErrorInfoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SiteCreateErrorV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateResponseWrapperV6
 import org.eclipse.tractusx.bpdm.pool.controller.v6.LegalEntityLegacyServiceMapper
 import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolTestBaseV6
 import org.junit.jupiter.api.Test
@@ -48,7 +48,7 @@ class SiteCreationV6IT: UnscheduledPoolTestBaseV6() {
 
         //THEN
         val expectedSite = testDataFactory.result.buildExpectedSiteCreateResponse(siteRequest, legalEntityResponse)
-        val expectedResponse = SitePartnerCreateResponseWrapper(listOf(expectedSite), emptyList())
+        val expectedResponse = SitePartnerCreateResponseWrapperV6(listOf(expectedSite), emptyList())
 
         assertRepository.assertSiteCreate(response, expectedResponse)
     }
@@ -65,7 +65,7 @@ class SiteCreationV6IT: UnscheduledPoolTestBaseV6() {
         val siteResponse = testDataClient.createSiteFor(legalEntityResponse, testName)
 
         //WHEN
-        val response = poolClient.sites.postSiteSearch(SiteSearchRequest(siteBpns = listOf(siteResponse.site.bpns)), PaginationRequest())
+        val response = poolClient.sites.postSiteSearch(SiteSearchRequestV6(siteBpns = listOf(siteResponse.site.bpns)), PaginationRequest())
 
         //THEN
         val expectedSites = response.content.map { testDataFactory.result.buildExpectedSiteSearchResponse(siteResponse) }
@@ -90,7 +90,7 @@ class SiteCreationV6IT: UnscheduledPoolTestBaseV6() {
 
         //THEN
         val expectedSite = testDataFactory.result.buildExpectedLegalAddressSiteCreateResponse(siteRequest, legalEntityResponse)
-        val expectedResponse = SitePartnerCreateResponseWrapper(listOf(expectedSite), emptyList())
+        val expectedResponse = SitePartnerCreateResponseWrapperV6(listOf(expectedSite), emptyList())
 
         assertRepository.assertLegalAddressSiteCreate(response, expectedResponse)
     }
@@ -111,12 +111,12 @@ class SiteCreationV6IT: UnscheduledPoolTestBaseV6() {
         val response = poolClient.sites.createSiteWithLegalReference(listOf(siteRequest))
 
         //THEN
-        val expectedError = ErrorInfo(
-            SiteCreateError.MainAddressDuplicateIdentifier,
+        val expectedError = ErrorInfoV6(
+            SiteCreateErrorV6.MainAddressDuplicateIdentifier,
             "Can't create site for legal entity ${siteRequest.bpnLParent} with legal address as site main address: Legal address already belongs to site ${legalEntityResponse.legalAddress.bpnSite}",
             siteRequest.name
         )
-        val expectedResponse = SitePartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedResponse = SitePartnerCreateResponseWrapperV6(emptyList(), listOf(expectedError))
 
         assertRepository.assertLegalAddressSiteCreate(response, expectedResponse)
     }
@@ -137,14 +137,14 @@ class SiteCreationV6IT: UnscheduledPoolTestBaseV6() {
 
         //WHEN
         val siteRequest = with(testDataFactory.request.buildSiteCreateRequest("New Site $testName", legalEntityResponse)){
-            copy(site = site.copy(mainAddress = site.mainAddress.copy(identifiers = listOf(AddressIdentifierDto(identifierX.value, identifierX.type)))))
+            copy(site = site.copy(mainAddress = site.mainAddress.copy(identifiers = listOf(AddressIdentifierDtoV6(identifierX.value, identifierX.type)))))
         }
         val siteResponse = poolClient.sites.createSite(listOf(siteRequest))
 
 
         //THEN
-        val expectedError = ErrorInfo(SiteCreateError.MainAddressDuplicateIdentifier, "IGNORED", siteRequest.index)
-        val expectedResponse = SitePartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV6(SiteCreateErrorV6.MainAddressDuplicateIdentifier, "IGNORED", siteRequest.index)
+        val expectedResponse = SitePartnerCreateResponseWrapperV6(emptyList(), listOf(expectedError))
 
         assertRepository.assertSiteCreate(siteResponse, expectedResponse)
     }
@@ -168,8 +168,8 @@ class SiteCreationV6IT: UnscheduledPoolTestBaseV6() {
         val siteResponse = poolClient.sites.createSite(listOf(siteRequest1, siteRequest2))
 
         //THEN
-        val expectedErrors = listOf(siteRequest1, siteRequest2).map { ErrorInfo(SiteCreateError.MainAddressDuplicateIdentifier, "IGNORED", it.index) }
-        val expectedResponse = SitePartnerCreateResponseWrapper(emptyList(), expectedErrors)
+        val expectedErrors = listOf(siteRequest1, siteRequest2).map { ErrorInfoV6(SiteCreateErrorV6.MainAddressDuplicateIdentifier, "IGNORED", it.index) }
+        val expectedResponse = SitePartnerCreateResponseWrapperV6(emptyList(), expectedErrors)
 
         assertRepository.assertSiteCreate(siteResponse, expectedResponse)
     }
@@ -192,8 +192,8 @@ class SiteCreationV6IT: UnscheduledPoolTestBaseV6() {
         val siteResponse = poolClient.sites.createSite(listOf(siteRequest))
 
         //THEN
-        val expectedError = ErrorInfo(SiteCreateError.MainAddressIdentifierNotFound, "IGNORED", siteRequest.index)
-        val expectedResponse = SitePartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV6(SiteCreateErrorV6.MainAddressIdentifierNotFound, "IGNORED", siteRequest.index)
+        val expectedResponse = SitePartnerCreateResponseWrapperV6(emptyList(), listOf(expectedError))
 
         assertRepository.assertSiteCreate(siteResponse, expectedResponse)
     }
@@ -209,8 +209,8 @@ class SiteCreationV6IT: UnscheduledPoolTestBaseV6() {
         val siteResponse = poolClient.sites.createSite(listOf(siteRequest))
 
         //THEN
-        val expectedError = ErrorInfo(SiteCreateError.LegalEntityNotFound, "IGNORED", siteRequest.index)
-        val expectedResponse = SitePartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV6(SiteCreateErrorV6.LegalEntityNotFound, "IGNORED", siteRequest.index)
+        val expectedResponse = SitePartnerCreateResponseWrapperV6(emptyList(), listOf(expectedError))
 
         assertRepository.assertSiteCreate(siteResponse, expectedResponse)
     }
@@ -232,8 +232,8 @@ class SiteCreationV6IT: UnscheduledPoolTestBaseV6() {
         val siteResponse = poolClient.sites.createSite(listOf(siteRequest))
 
         //THEN
-        val expectedError = ErrorInfo(SiteCreateError.MainAddressRegionNotFound, "IGNORED", siteRequest.index)
-        val expectedResponse = SitePartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV6(SiteCreateErrorV6.MainAddressRegionNotFound, "IGNORED", siteRequest.index)
+        val expectedResponse = SitePartnerCreateResponseWrapperV6(emptyList(), listOf(expectedError))
 
         assertRepository.assertSiteCreate(siteResponse, expectedResponse)
     }
@@ -255,8 +255,8 @@ class SiteCreationV6IT: UnscheduledPoolTestBaseV6() {
         val siteResponse = poolClient.sites.createSite(listOf(siteRequest))
 
         //THEN
-        val expectedError = ErrorInfo(SiteCreateError.MainAddressRegionNotFound, "IGNORED", siteRequest.index)
-        val expectedResponse = SitePartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV6(SiteCreateErrorV6.MainAddressRegionNotFound, "IGNORED", siteRequest.index)
+        val expectedResponse = SitePartnerCreateResponseWrapperV6(emptyList(), listOf(expectedError))
 
         assertRepository.assertSiteCreate(siteResponse, expectedResponse)
     }
@@ -278,12 +278,12 @@ class SiteCreationV6IT: UnscheduledPoolTestBaseV6() {
         val siteResponse = poolClient.sites.createSite(listOf(siteRequest))
 
         //THEN
-        val expectedError = ErrorInfo(
-            SiteCreateError.MainAddressIdentifiersTooMany,
+        val expectedError = ErrorInfoV6(
+            SiteCreateErrorV6.MainAddressIdentifiersTooMany,
             "Amount of identifiers (101) exceeds limit of ${LegalEntityLegacyServiceMapper.IDENTIFIER_AMOUNT_LIMIT}",
             siteRequest.index
         )
-        val expectedResponse = SitePartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedResponse = SitePartnerCreateResponseWrapperV6(emptyList(), listOf(expectedError))
 
         assertRepository.assertSiteCreate(siteResponse, expectedResponse)
     }

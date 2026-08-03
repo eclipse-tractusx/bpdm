@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.v6
 
 import org.eclipse.tractusx.bpdm.pool.PoolTestBase
-import org.eclipse.tractusx.bpdm.pool.api.v6.client.PoolApiClient
+import org.eclipse.tractusx.bpdm.pool.api.v6.client.PoolV6ApiClient
 import org.eclipse.tractusx.bpdm.pool.v6.util.AssertRepositoryV6
 import org.eclipse.tractusx.bpdm.pool.v6.util.TestDataClientV6
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v6.TestDataV6Factory
@@ -34,5 +34,5 @@ abstract class PoolTestBaseV6: PoolTestBase() {
     @Autowired
     lateinit var assertRepository: AssertRepositoryV6
     @Autowired
-    lateinit var poolClient: PoolApiClient
+    lateinit var poolClient: PoolV6ApiClient
 }

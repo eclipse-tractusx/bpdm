@@ -20,12 +20,14 @@
 package org.eclipse.tractusx.bpdm.pool.service.application.v6
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressUpdateError
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerUpdateResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressVerboseDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.AddressPartnerUpdateRequestV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerUpdateResponseWrapperV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.toV6Dto
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV6
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV7
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.AddressDtoRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.AddressParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
@@ -50,15 +52,15 @@ class AddressUpdateApplicationV6Service(
     private val logger = KotlinLogging.logger { }
 
     @Transactional
-    fun updateAddresses(requests: Collection<AddressPartnerUpdateRequest>): AddressPartnerUpdateResponseWrapper {
+    fun updateAddresses(requests: Collection<AddressPartnerUpdateRequestV6>): AddressPartnerUpdateResponseWrapperV6 {
         logger.info { "Update ${requests.size} business partner addresses" }
 
         val requestList = requests.toList()
         val updateRequests = requestList.map {
-            AddressUpdateRequest(addressBpn = it.bpna, siteBpn = null, content = addressDtoRequestMapper.toContentRequest(it.address, it.scriptVariants))
+            AddressUpdateRequest(addressBpn = it.bpna, siteBpn = null, content = addressDtoRequestMapper.toContentRequest(it.address.toV7(), it.scriptVariants.map { sv -> sv.toV7() }))
         }
 
-        val responses = mutableListOf<LogisticAddressVerboseDto>()
+        val responses = mutableListOf<LogisticAddressVerboseDtoV6>()
         val errors = mutableListOf<ErrorInfo<AddressUpdateError>>()
         requestList.zip(parseAndExecute(updateRequests, addressUpdateParser::parse, addressPayloadUpdateService::update)).forEach { (request, result) ->
             when (result) {
@@ -67,6 +69,6 @@ class AddressUpdateApplicationV6Service(
             }
         }
 
-        return AddressPartnerUpdateResponseWrapper(responses, errors)
+        return AddressPartnerUpdateResponseWrapperV6(responses, errors.map { it.toV6() })
     }
 }

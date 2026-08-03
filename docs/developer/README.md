@@ -5,6 +5,7 @@ Documentation here concerns developers who want to contribute to this repository
 <!-- TOC -->
 * [Developer View](#developer-view)
   * [Application Code Guide](#application-code-guide)
+  * [Code Documentation Guide](#code-documentation-guide)
   * [Testing Guide](#testing-guide)
   * [Apps and Charts](#apps-and-charts)
   * [License Check](#license-check)
@@ -19,6 +20,10 @@ Documentation here concerns developers who want to contribute to this repository
 ## Application Code Guide
 
 Our [application code guide](application-code-guide.md) explains how we design and organize the request-handling code in BPDM services — the layering, the models, and the binding rules to follow when writing create/update logic.
+
+## Code Documentation Guide
+
+Our [code documentation guide](documentation-guide.md) sets out what earns a comment and what does not — class and method contracts, when a design rationale is warranted, and the things we deliberately leave undocumented.
 
 ## Testing Guide
 

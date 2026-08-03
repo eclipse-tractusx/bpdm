@@ -22,11 +22,12 @@ package org.eclipse.tractusx.bpdm.pool.service.application.v6
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityUpdateError
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntityPartnerUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerUpdateResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntityPartnerUpdateRequestV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateVerboseDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerUpdateResponseWrapperV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound.LegalEntityDtoRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.toUpsertDto
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV6
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound.LegalEntityParseErrorMapper
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
@@ -49,13 +50,13 @@ class LegalEntityUpdateApplicationV6Service(
     private val logger = KotlinLogging.logger { }
 
     @Transactional
-    fun updateLegalEntities(requests: Collection<LegalEntityPartnerUpdateRequest>): LegalEntityPartnerUpdateResponseWrapper {
+    fun updateLegalEntities(requests: Collection<LegalEntityPartnerUpdateRequestV6>): LegalEntityPartnerUpdateResponseWrapperV6 {
         logger.info { "Update ${requests.size} legal entities" }
 
         val requestList = requests.toList()
         val updateRequests = requestList.map { legalEntityDtoRequestMapper.toUpdateRequest(it) }
 
-        val responses = mutableListOf<LegalEntityPartnerCreateVerboseDto>()
+        val responses = mutableListOf<LegalEntityPartnerCreateVerboseDtoV6>()
         val errors = mutableListOf<ErrorInfo<LegalEntityUpdateError>>()
         requestList.zip(parseAndExecute(updateRequests, legalEntityUpdateParser::parse, legalEntityPayloadUpdateService::update)).forEach { (request, result) ->
             when (result) {
@@ -64,6 +65,6 @@ class LegalEntityUpdateApplicationV6Service(
             }
         }
 
-        return LegalEntityPartnerUpdateResponseWrapper(responses, errors)
+        return LegalEntityPartnerUpdateResponseWrapperV6(responses, errors.map { it.toV6() })
     }
 }

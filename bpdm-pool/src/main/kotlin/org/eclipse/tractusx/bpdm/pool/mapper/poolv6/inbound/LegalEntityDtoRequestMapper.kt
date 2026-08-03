@@ -19,11 +19,12 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv6.inbound
 
-import org.eclipse.tractusx.bpdm.pool.api.model.ConfidenceCriteriaDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntityPartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntityPartnerUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.ConfidenceCriteriaDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntityPartnerCreateRequestV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntityPartnerUpdateRequestV6
+import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV7
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound.AddressDtoRequestMapper
 import org.eclipse.tractusx.bpdm.pool.model.LegalEntityState
 import org.eclipse.tractusx.bpdm.pool.model.request.*
@@ -41,19 +42,19 @@ class LegalEntityDtoRequestMapper(
     private val addressDtoRequestMapper: AddressDtoRequestMapper
 ) {
 
-    fun toCreateRequest(request: LegalEntityPartnerCreateRequest): LegalEntityCreateRequest =
+    fun toCreateRequest(request: LegalEntityPartnerCreateRequestV6): LegalEntityCreateRequest =
         LegalEntityCreateRequest(content = toContentRequest(request.legalEntity, request.legalAddress))
 
-    fun toUpdateRequest(request: LegalEntityPartnerUpdateRequest): LegalEntityUpdateRequest =
+    fun toUpdateRequest(request: LegalEntityPartnerUpdateRequestV6): LegalEntityUpdateRequest =
         LegalEntityUpdateRequest(legalEntityBpn = request.bpnl, content = toContentRequest(request.legalEntity, request.legalAddress))
 
-    private fun toContentRequest(legalEntity: LegalEntityDto, legalAddress: LogisticAddressDto): LegalEntityContentRequest =
+    private fun toContentRequest(legalEntity: LegalEntityDtoV6, legalAddress: LogisticAddressDtoV6): LegalEntityContentRequest =
         LegalEntityContentRequest(
             header = toHeaderRequest(legalEntity),
-            legalAddress = addressDtoRequestMapper.toContentRequest(legalAddress, emptyList())
+            legalAddress = addressDtoRequestMapper.toContentRequest(legalAddress.toV7(), emptyList())
         )
 
-    private fun toHeaderRequest(legalEntity: LegalEntityDto): LegalEntityHeaderRequest =
+    private fun toHeaderRequest(legalEntity: LegalEntityDtoV6): LegalEntityHeaderRequest =
         LegalEntityHeaderRequest(
             legalName = legalEntity.legalName,
             legalShortName = legalEntity.legalShortName,
@@ -67,7 +68,7 @@ class LegalEntityDtoRequestMapper(
             scriptVariants = emptyList()
         )
 
-    private fun toConfidenceRequest(confidence: ConfidenceCriteriaDto): ConfidenceCriteriaRequest =
+    private fun toConfidenceRequest(confidence: ConfidenceCriteriaDtoV6): ConfidenceCriteriaRequest =
         ConfidenceCriteriaRequest(
             sharedByOwner = confidence.sharedByOwner,
             checkedByExternalDataSource = confidence.checkedByExternalDataSource,

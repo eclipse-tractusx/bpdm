@@ -21,14 +21,9 @@ package org.eclipse.tractusx.bpdm.pool.v6.site
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteCreateError
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteUpdateError
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateResponseWrapper
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerUpdateResponseWrapper
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SiteWithMainAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.AddressIdentifierDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SiteSearchRequestV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.*
 import org.eclipse.tractusx.bpdm.pool.controller.v6.LegalEntityLegacyServiceMapper
 import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolTestBaseV6
 import org.junit.jupiter.api.Test
@@ -52,7 +47,7 @@ class SiteUpdateV6IT: UnscheduledPoolTestBaseV6() {
 
         //THEN
         val expectedSite = testDataFactory.result.buildExpectedSiteUpdateResponse(siteUpdateRequest, siteResponse, legalEntityResponse)
-        val expectedResponse = SitePartnerUpdateResponseWrapper(listOf(expectedSite), emptyList())
+        val expectedResponse = SitePartnerUpdateResponseWrapperV6(listOf(expectedSite), emptyList())
 
         assertRepository.assertSiteUpdate(response, expectedResponse)
     }
@@ -72,10 +67,10 @@ class SiteUpdateV6IT: UnscheduledPoolTestBaseV6() {
         val updatedSiteResponse = poolClient.sites.updateSite(listOf(siteUpdateRequest)).entities.single()
 
         //WHEN
-        val response = poolClient.sites.postSiteSearch(SiteSearchRequest(siteBpns = listOf(updatedSiteResponse.site.bpns)), PaginationRequest())
+        val response = poolClient.sites.postSiteSearch(SiteSearchRequestV6(siteBpns = listOf(updatedSiteResponse.site.bpns)), PaginationRequest())
 
         //THEN
-        val expectedSite = SiteWithMainAddressVerboseDto(updatedSiteResponse.site, updatedSiteResponse.mainAddress)
+        val expectedSite = SiteWithMainAddressVerboseDtoV6(updatedSiteResponse.site, updatedSiteResponse.mainAddress)
         val expectedResponse = PageDto(1, 1, 0, 1, listOf(expectedSite))
 
         assertRepository.assertSiteSearch(response, expectedResponse)
@@ -92,8 +87,8 @@ class SiteUpdateV6IT: UnscheduledPoolTestBaseV6() {
         val response = poolClient.sites.updateSite(listOf(siteUpdateRequest))
 
         //THEN
-        val expectedError = ErrorInfo(SiteUpdateError.SiteNotFound, "IGNORED", "UNKNOWN")
-        val expectedResponse = SitePartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV6(SiteUpdateErrorV6.SiteNotFound, "IGNORED", "UNKNOWN")
+        val expectedResponse = SitePartnerUpdateResponseWrapperV6(emptyList(), listOf(expectedError))
 
         assertRepository.assertSiteUpdate(response, expectedResponse)
     }
@@ -116,13 +111,13 @@ class SiteUpdateV6IT: UnscheduledPoolTestBaseV6() {
 
         //WHEN
         val updateRequest = with(testDataFactory.request.createSiteUpdateRequest("Site B Update $testName", siteResponseB)){
-            copy(site = site.copy(mainAddress = site.mainAddress.copy(identifiers = listOf(AddressIdentifierDto(identifierX.value, identifierX.type)))))
+            copy(site = site.copy(mainAddress = site.mainAddress.copy(identifiers = listOf(AddressIdentifierDtoV6(identifierX.value, identifierX.type)))))
         }
         val siteResponse = poolClient.sites.updateSite(listOf(updateRequest))
 
         //THEN
-        val expectedError = ErrorInfo(SiteUpdateError.MainAddressDuplicateIdentifier, "IGNORED", updateRequest.bpns)
-        val expectedResponse = SitePartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV6(SiteUpdateErrorV6.MainAddressDuplicateIdentifier, "IGNORED", updateRequest.bpns)
+        val expectedResponse = SitePartnerUpdateResponseWrapperV6(emptyList(), listOf(expectedError))
 
         assertRepository.assertSiteUpdate(siteResponse, expectedResponse)
     }
@@ -147,8 +142,8 @@ class SiteUpdateV6IT: UnscheduledPoolTestBaseV6() {
         val siteResponse = poolClient.sites.createSite(listOf(siteRequest1, siteRequest2))
 
         //THEN
-        val expectedErrors = listOf(siteRequest1, siteRequest2).map { ErrorInfo(SiteCreateError.MainAddressDuplicateIdentifier, "IGNORED", it.index) }
-        val expectedResponse = SitePartnerCreateResponseWrapper(emptyList(), expectedErrors)
+        val expectedErrors = listOf(siteRequest1, siteRequest2).map { ErrorInfoV6(SiteCreateErrorV6.MainAddressDuplicateIdentifier, "IGNORED", it.index) }
+        val expectedResponse = SitePartnerCreateResponseWrapperV6(emptyList(), expectedErrors)
 
         assertRepository.assertSiteCreate(siteResponse, expectedResponse)
     }
@@ -172,8 +167,8 @@ class SiteUpdateV6IT: UnscheduledPoolTestBaseV6() {
         val siteResponse = poolClient.sites.updateSite(listOf(siteRequest))
 
         //THEN
-        val expectedError = ErrorInfo(SiteUpdateError.MainAddressIdentifierNotFound, "IGNORED", siteRequest.bpns)
-        val expectedResponse = SitePartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV6(SiteUpdateErrorV6.MainAddressIdentifierNotFound, "IGNORED", siteRequest.bpns)
+        val expectedResponse = SitePartnerUpdateResponseWrapperV6(emptyList(), listOf(expectedError))
 
         assertRepository.assertSiteUpdate(siteResponse, expectedResponse)
     }
@@ -196,8 +191,8 @@ class SiteUpdateV6IT: UnscheduledPoolTestBaseV6() {
         val siteResponse = poolClient.sites.updateSite(listOf(siteRequest))
 
         //THEN
-        val expectedError = ErrorInfo(SiteUpdateError.MainAddressRegionNotFound, "IGNORED", siteRequest.bpns)
-        val expectedResponse = SitePartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV6(SiteUpdateErrorV6.MainAddressRegionNotFound, "IGNORED", siteRequest.bpns)
+        val expectedResponse = SitePartnerUpdateResponseWrapperV6(emptyList(), listOf(expectedError))
 
         assertRepository.assertSiteUpdate(siteResponse, expectedResponse)
     }
@@ -220,8 +215,8 @@ class SiteUpdateV6IT: UnscheduledPoolTestBaseV6() {
         val siteResponse = poolClient.sites.updateSite(listOf(siteRequest))
 
         //THEN
-        val expectedError = ErrorInfo(SiteUpdateError.MainAddressRegionNotFound, "IGNORED", siteRequest.bpns)
-        val expectedResponse = SitePartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedError = ErrorInfoV6(SiteUpdateErrorV6.MainAddressRegionNotFound, "IGNORED", siteRequest.bpns)
+        val expectedResponse = SitePartnerUpdateResponseWrapperV6(emptyList(), listOf(expectedError))
 
         assertRepository.assertSiteUpdate(siteResponse, expectedResponse)
     }
@@ -244,12 +239,12 @@ class SiteUpdateV6IT: UnscheduledPoolTestBaseV6() {
         val siteResponse = poolClient.sites.updateSite(listOf(siteRequest))
 
         //THEN
-        val expectedError = ErrorInfo(
-            SiteUpdateError.MainAddressIdentifiersTooMany,
+        val expectedError = ErrorInfoV6(
+            SiteUpdateErrorV6.MainAddressIdentifiersTooMany,
             "Amount of identifiers (101) exceeds limit of ${LegalEntityLegacyServiceMapper.IDENTIFIER_AMOUNT_LIMIT}",
             siteRequest.bpns
         )
-        val expectedResponse = SitePartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+        val expectedResponse = SitePartnerUpdateResponseWrapperV6(emptyList(), listOf(expectedError))
 
         assertRepository.assertSiteUpdate(siteResponse, expectedResponse)
     }

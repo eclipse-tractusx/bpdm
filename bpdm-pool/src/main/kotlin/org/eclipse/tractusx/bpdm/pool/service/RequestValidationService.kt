@@ -24,11 +24,17 @@ import org.eclipse.tractusx.bpdm.common.dto.IBaseLogisticAddressDto
 import org.eclipse.tractusx.bpdm.common.dto.RequestWithKey
 import org.eclipse.tractusx.bpdm.common.util.findDuplicates
 import org.eclipse.tractusx.bpdm.common.util.mergeMapsWithCollectionInValue
-import org.eclipse.tractusx.bpdm.pool.util.ValidationLimits
-import org.eclipse.tractusx.bpdm.pool.api.model.request.*
+import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.dto.LegalEntityInvariantHeaderMetadataDto
-import org.eclipse.tractusx.bpdm.pool.repository.*
+import org.eclipse.tractusx.bpdm.pool.repository.AddressIdentifierRepository
+import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityIdentifierRepository
+import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
+import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
+import org.eclipse.tractusx.bpdm.pool.util.ValidationLimits
 import org.springframework.stereotype.Service
 
 @Service

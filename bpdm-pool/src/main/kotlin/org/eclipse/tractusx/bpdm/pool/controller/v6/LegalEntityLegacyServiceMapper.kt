@@ -24,9 +24,9 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.SiteVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityWithLegalAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressVerboseDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.SiteVerboseDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityWithLegalAddressVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
@@ -63,7 +63,7 @@ class LegalEntityLegacyServiceMapper(
      * Search legal entities per page for [searchRequest] and [paginationRequest]
      */
     @Transactional
-    fun searchLegalEntities(searchRequest: LegalEntitySearchRequest, paginationRequest: PaginationRequest): PageDto<LegalEntityWithLegalAddressVerboseDto> {
+    fun searchLegalEntities(searchRequest: LegalEntitySearchRequest, paginationRequest: PaginationRequest): PageDto<LegalEntityWithLegalAddressVerboseDtoV6> {
         val spec = Specification.allOf(
             LegalEntityRepository.byBpns(searchRequest.bpnLs),
             LegalEntityRepository.byLegalName(searchRequest.legalName),
@@ -76,19 +76,19 @@ class LegalEntityLegacyServiceMapper(
     }
 
     /**
-     * Fetch a business partner by [bpn] and return as [LegalEntityWithLegalAddressVerboseDto]
+     * Fetch a business partner by [bpn] and return as [LegalEntityWithLegalAddressVerboseDtoV6]
      */
-    fun findLegalEntityIgnoreCase(bpn: String): LegalEntityWithLegalAddressVerboseDto {
+    fun findLegalEntityIgnoreCase(bpn: String): LegalEntityWithLegalAddressVerboseDtoV6 {
         logger.debug { "Executing findLegalEntityIgnoreCase() with parameters $bpn" }
         val legalEntity = findLegalEntityOrThrow(bpn)
         return toLegalEntityWithLegalAddress(legalEntity)
     }
 
     /**
-     * Fetch a business partner by [identifierValue] (ignoring case) of [identifierType] and return as [LegalEntityWithLegalAddressVerboseDto]
+     * Fetch a business partner by [identifierValue] (ignoring case) of [identifierType] and return as [LegalEntityWithLegalAddressVerboseDtoV6]
      */
     @Transactional
-    fun findLegalEntityIgnoreCase(identifierType: String, identifierValue: String): LegalEntityWithLegalAddressVerboseDto {
+    fun findLegalEntityIgnoreCase(identifierType: String, identifierValue: String): LegalEntityWithLegalAddressVerboseDtoV6 {
         logger.debug { "Executing findLegalEntityIgnoreCase() with parameters $identifierType and $identifierValue" }
         val legalEntity = findLegalEntityOrThrow(identifierType, identifierValue)
         return toLegalEntityWithLegalAddress(legalEntity)
@@ -109,8 +109,8 @@ class LegalEntityLegacyServiceMapper(
             ?: throw BpdmNotFoundException(IdentifierTypeDb::class, "$identifierTypeKey/$businessPartnerType")
 
 
-    fun toLegalEntityWithLegalAddress(entity: LegalEntityDb): LegalEntityWithLegalAddressVerboseDto {
-        return LegalEntityWithLegalAddressVerboseDto(
+    fun toLegalEntityWithLegalAddress(entity: LegalEntityDb): LegalEntityWithLegalAddressVerboseDtoV6 {
+        return LegalEntityWithLegalAddressVerboseDtoV6(
             legalAddress = entity.legalAddress.toV6Dto(),
             legalEntity = entity.toV6Dto()
         )
@@ -122,7 +122,7 @@ class LegalEntityLegacyServiceMapper(
         val isCatenaXMemberData: Boolean?
     )
 
-    fun findByParentBpn(bpn: String, pageIndex: Int, pageSize: Int): PageDto<SiteVerboseDto> {
+    fun findByParentBpn(bpn: String, pageIndex: Int, pageSize: Int): PageDto<SiteVerboseDtoV6> {
         logger.debug { "Executing findByPartnerBpn() with parameters $bpn // $pageIndex // $pageSize" }
         val legalEntity = legalEntityRepository.findByBpnIgnoreCase(bpn) ?: throw BpdmNotFoundException("Business Partner", bpn)
 
@@ -141,7 +141,7 @@ class LegalEntityLegacyServiceMapper(
     /**
      * Find Addresses which directly belong to a Legal Entity
      */
-    fun findNonSiteAddressesOfLegalEntity(bpnl: String, pageIndex: Int, pageSize: Int): PageDto<LogisticAddressVerboseDto> {
+    fun findNonSiteAddressesOfLegalEntity(bpnl: String, pageIndex: Int, pageSize: Int): PageDto<LogisticAddressVerboseDtoV6> {
         logger.debug { "Executing findByPartnerBpn() with parameters $bpnl // $pageIndex // $pageSize" }
         val legalEntity = legalEntityRepository.findByBpnIgnoreCase(bpnl) ?:  throw BpdmNotFoundException("Business Partner", bpnl)
 

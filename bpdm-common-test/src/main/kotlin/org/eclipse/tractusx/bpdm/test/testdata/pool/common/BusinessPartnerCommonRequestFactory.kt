@@ -24,10 +24,12 @@ import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.bpdm.pool.api.model.*
-import org.eclipse.tractusx.bpdm.pool.api.model.request.*
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerCreateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteCreateRequestWithLegalAddressAsMain
+import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerCreateVerboseDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateVerboseDtoV6
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withSharedByOwner
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -39,55 +41,14 @@ abstract class BusinessPartnerCommonRequestFactory(
     protected val availableScriptCodes: Collection<String>
 ) {
 
-    fun buildSiteCreateRequest(seed: String, legalEntityParent: LegalEntityPartnerCreateVerboseDto): SitePartnerCreateRequest {
+    fun buildSiteCreateRequest(seed: String, legalEntityParent: LegalEntityPartnerCreateVerboseDtoV6): SitePartnerCreateRequest {
         return buildSiteCreateRequest(seed, legalEntityParent.legalEntity.bpnl)
-    }
-
-    fun buildLegalSiteCreateRequest(seed: String, bpnlParent: String, random: Random = Random(seed.hashCode().toLong())): SiteCreateRequestWithLegalAddressAsMain{
-        val timeStamp = LocalDateTime.ofEpochSecond(random.nextLong(0, 365241780471), random.nextInt(0, 999999999), ZoneOffset.UTC)
-
-        return SiteCreateRequestWithLegalAddressAsMain(
-            name = "Site Name $seed",
-            states = listOf(
-                SiteStateDto(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
-                SiteStateDto(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
-            ),
-            scriptVariants = availableScriptCodes.shuffled(random).take(2).map { scriptCode ->
-                SiteHeaderScriptVariantDto(
-                    scriptCode = scriptCode,
-                    name = buildScriptVariantStringValue("Site Name", seed, scriptCode)
-                )
-            },
-            bpnLParent = bpnlParent,
-            confidenceCriteria = ConfidenceCriteriaDto(
-                sharedByOwner = true,
-                checkedByExternalDataSource = false,
-                numberOfSharingMembers = 2,
-                lastConfidenceCheckAt = timeStamp.plusDays(10),
-                nextConfidenceCheckAt = timeStamp.plusDays(20),
-                confidenceLevel = 5
-            )
-        )
     }
 
     fun buildSiteCreateRequest(seed: String, bpnlParent: String): SitePartnerCreateRequest {
         return SitePartnerCreateRequest(
             bpnlParent = bpnlParent,
             index = seed,
-            site = createSiteDto("Main Address $seed")
-        )
-    }
-
-    fun createSiteUpdateRequest(seed: String, siteToUpdate: SitePartnerCreateVerboseDto): SitePartnerUpdateRequest {
-        return SitePartnerUpdateRequest(
-            bpns = siteToUpdate.site.bpns,
-            site = createSiteDto("Main Address $seed")
-        )
-    }
-
-    fun createSiteUpdateRequest(seed: String, bpns: String): SitePartnerUpdateRequest {
-        return SitePartnerUpdateRequest(
-            bpns = bpns,
             site = createSiteDto("Main Address $seed")
         )
     }
@@ -114,7 +75,7 @@ abstract class BusinessPartnerCommonRequestFactory(
         )
     }
 
-    fun buildLegalAddressSiteCreateRequest(seed: String, legalEntityParent: LegalEntityPartnerCreateVerboseDto, random: Random = Random(seed.hashCode().toLong())):SiteCreateRequestWithLegalAddressAsMain {
+    fun buildLegalAddressSiteCreateRequest(seed: String, legalEntityParent: LegalEntityPartnerCreateVerboseDtoV6, random: Random = Random(seed.hashCode().toLong())):SiteCreateRequestWithLegalAddressAsMain {
         return buildLegalAddressSiteCreateRequest(seed, legalEntityParent.legalEntity.bpnl, random)
     }
 
@@ -139,7 +100,7 @@ abstract class BusinessPartnerCommonRequestFactory(
         )
     }
 
-    fun buildAdditionalAddressCreateRequest(seed: String, legalEntityParent: LegalEntityPartnerCreateVerboseDto): AddressPartnerCreateRequest {
+    fun buildAdditionalAddressCreateRequest(seed: String, legalEntityParent: LegalEntityPartnerCreateVerboseDtoV6): AddressPartnerCreateRequest {
         return buildAdditionalAddressCreateRequest(seed, legalEntityParent.legalEntity.bpnl)
     }
 
@@ -155,11 +116,11 @@ abstract class BusinessPartnerCommonRequestFactory(
         )
     }
 
-    fun buildAddressUpdateRequest(seed: String, legalAddressToUpdate: LegalEntityPartnerCreateVerboseDto): AddressPartnerUpdateRequest {
+    fun buildAddressUpdateRequest(seed: String, legalAddressToUpdate: LegalEntityPartnerCreateVerboseDtoV6): AddressPartnerUpdateRequest {
         return buildAddressUpdateRequest(seed, legalAddressToUpdate.legalAddress.bpna)
     }
 
-    fun buildAddressUpdateRequest(seed: String, addressToUpdate: AddressPartnerCreateVerboseDto): AddressPartnerUpdateRequest {
+    fun buildAddressUpdateRequest(seed: String, addressToUpdate: AddressPartnerCreateVerboseDtoV6): AddressPartnerUpdateRequest {
         return buildAddressUpdateRequest(seed, addressToUpdate.address.bpna)
     }
 

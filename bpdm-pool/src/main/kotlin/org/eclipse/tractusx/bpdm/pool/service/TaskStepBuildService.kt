@@ -44,13 +44,7 @@ import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityCreateParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityUpdateParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.MultipleUltimateOwnersInHierarchy
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.error.SiteContentParseError
-import org.eclipse.tractusx.bpdm.pool.model.error.SiteNotInAddressLegalEntity
-import org.eclipse.tractusx.bpdm.pool.model.error.SiteCreateParseError
-import org.eclipse.tractusx.bpdm.pool.model.error.SiteUpdateParseError
-import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableAddress
-import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableLegalEntity
-import org.eclipse.tractusx.bpdm.pool.model.error.UnresolvableSite
+import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
 import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository

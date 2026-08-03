@@ -24,7 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.toV6Dto
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
@@ -40,7 +40,7 @@ class AddressLegacyServiceMapper(
 
     private val logger = KotlinLogging.logger { }
 
-    fun findByBpn(bpn: String): LogisticAddressVerboseDto {
+    fun findByBpn(bpn: String): LogisticAddressVerboseDtoV6 {
         val address = findAddressByBpn(bpn) ?: throw BpdmNotFoundException("Address", bpn)
         return address.toV6Dto()
     }
@@ -54,7 +54,7 @@ class AddressLegacyServiceMapper(
      * Search addresses per page for [searchRequest] and [paginationRequest]
      */
     @Transactional
-    fun searchAddresses(searchRequest: AddressSearchRequest, paginationRequest: PaginationRequest): PageDto<LogisticAddressVerboseDto> {
+    fun searchAddresses(searchRequest: AddressSearchRequest, paginationRequest: PaginationRequest): PageDto<LogisticAddressVerboseDtoV6> {
 
         val spec = Specification.allOf(
             LogisticAddressRepository.byBpns(searchRequest.addressBpns),

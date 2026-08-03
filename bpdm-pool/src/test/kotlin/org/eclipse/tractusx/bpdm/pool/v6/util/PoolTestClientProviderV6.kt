@@ -21,8 +21,8 @@ package org.eclipse.tractusx.bpdm.pool.v6.util
 
 import org.eclipse.tractusx.bpdm.common.util.BpdmClientCreateProperties
 import org.eclipse.tractusx.bpdm.common.util.BpdmWebClientProvider
-import org.eclipse.tractusx.bpdm.pool.api.v6.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.v6.client.PoolClientImpl
+import org.eclipse.tractusx.bpdm.pool.api.v6.client.PoolV6ApiClient
+import org.eclipse.tractusx.bpdm.pool.api.v6.client.PoolV6ClientImpl
 import org.springframework.boot.web.server.WebServer
 
 class PoolTestClientProviderV6 (
@@ -30,8 +30,8 @@ class PoolTestClientProviderV6 (
     private val bpdmWebClientProvider: BpdmWebClientProvider
 ) {
 
-    fun createClient(oauth2RegistrationId: String?): PoolApiClient{
-        return PoolClientImpl{
+    fun createClient(oauth2RegistrationId: String?): PoolV6ApiClient{
+        return PoolV6ClientImpl{
             bpdmWebClientProvider.builder(
                 BpdmClientCreateProperties(
                     oauth2RegistrationId ?: "",
