@@ -175,7 +175,7 @@ class RelationsGoldenRecordTaskStateMachine(
     }
 
     private fun hasAlreadyResolvedStep(state: RelationsGoldenRecordTaskDb.ProcessingState, step: TaskStep): Boolean{
-        if(state.step == step) return state.stepState != RelationsGoldenRecordTaskDb.StepState.Reserved
+        if(state.step == step) return state.stepState != RelationsGoldenRecordTaskDb.StepState.Reserved && state.stepState != RelationsGoldenRecordTaskDb.StepState.Queued
         return isStepBefore(step, state.step, state.mode)
     }
 
