@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.ReasonCodeDto
 import org.eclipse.tractusx.bpdm.pool.api.model.ScriptCodeDto
 import org.eclipse.tractusx.bpdm.pool.service.TaskBatchResolutionService
+import org.eclipse.tractusx.bpdm.pool.service.TaskRelationsResolutionService
 import org.eclipse.tractusx.bpdm.pool.util.metadata.AdminAreaLevel1EntryImporter
 import org.eclipse.tractusx.bpdm.pool.util.metadata.IdentifierTypeEntryImporter
 import org.eclipse.tractusx.bpdm.pool.util.metadata.LegalFormEntryImporter
@@ -100,9 +101,10 @@ class TestDataV7Configuration {
         poolApiClient: PoolApiClient,
         requestFactory: PoolRequestFactoryV7,
         orchestratorMockDataFactory: OrchestratorMockDataFactory,
-        taskBatchResolutionService: TaskBatchResolutionService
+        taskBatchResolutionService: TaskBatchResolutionService,
+        taskRelationsResolutionService: TaskRelationsResolutionService
     ): TestDataClientV7{
-        return TestDataClientV7(poolApiClient, requestFactory, orchestratorMockDataFactory, taskBatchResolutionService)
+        return TestDataClientV7(poolApiClient, requestFactory, orchestratorMockDataFactory, taskBatchResolutionService, taskRelationsResolutionService)
     }
 
 }

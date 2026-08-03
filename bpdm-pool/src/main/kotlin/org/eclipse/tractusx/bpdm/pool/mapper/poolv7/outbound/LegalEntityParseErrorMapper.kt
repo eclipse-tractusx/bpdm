@@ -55,6 +55,12 @@ class LegalEntityParseErrorMapper(
         when (error) {
             is UnresolvableLegalEntity ->
                 ErrorInfo(LegalEntityUpdateError.LegalEntityNotFound, "Legal entity '${error.bpn}' can't be updated as it doesn't exist", entityKey)
+            is MultipleUltimateOwnersInHierarchy -> ErrorInfo(
+                LegalEntityUpdateError.MultipleUltimateOwnersInHierarchy,
+                "An ownership hierarchy can have at most one ultimate owner, but these legal entities are also flagged " +
+                        "as ultimate owner: ${error.conflictingBpnls.joinToString(", ")}",
+                entityKey
+            )
             is AddressContentParseError -> addressParseErrorMapper.toLegalEntityUpdateErrorInfo(error, entityKey)
             is LegalEntityContentParseError -> contentErrorInfo(
                 error,

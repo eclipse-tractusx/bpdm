@@ -49,7 +49,8 @@ enum class LegalEntityUpdateError : ErrorCode {
     LegalAddressIdentifierNotFound,
     LegalAddressDuplicateIdentifier,
     LegalEntityIdentifiersTooMany,
-    LegalAddressIdentifiersTooMany
+    LegalAddressIdentifiersTooMany,
+    MultipleUltimateOwnersInHierarchy
 }
 
 @Schema(description = "SiteCreateError")
