@@ -24,5 +24,6 @@ data class AddressSearchParsed(
     val siteBpns: List<String>,
     val legalEntityBpns: List<String>,
     val name: String?,
-    val isCatenaXMemberData: Boolean?
+    val isCatenaXMemberData: Boolean?,
+    val excludesSiteAddresses: Boolean
 )

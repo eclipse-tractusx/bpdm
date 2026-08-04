@@ -17,13 +17,24 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.request
+package org.eclipse.tractusx.bpdm.pool.service.parser
 
-data class AddressSearchRequest(
-    val addressBpns: List<String>,
-    val siteBpns: List<String>,
-    val legalEntityBpns: List<String>,
-    val name: String?,
-    val isCatenaXMemberData: Boolean?,
-    val excludesSiteAddresses: Boolean
-)
+import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressGetParsed
+import org.eclipse.tractusx.bpdm.pool.model.request.AddressGetRequest
+import org.springframework.stereotype.Service
+
+/**
+ * Turns a loose address fetch request into the normalized form the fetch operation looks the address up by.
+ *
+ * Unlike the upsert parsers this one returns its parsed value directly instead of a `ParseResult`: the requested BPN
+ * cannot be rejected — that it names no address is the fetch's outcome, not a parse error.
+ */
+@Service
+class AddressGetParser {
+
+    /**
+     * Normalizes the request so the address is looked up case-insensitively by its BPN.
+     */
+    fun parse(request: AddressGetRequest): AddressGetParsed =
+        AddressGetParsed(addressBpn = request.addressBpn.uppercase())
+}

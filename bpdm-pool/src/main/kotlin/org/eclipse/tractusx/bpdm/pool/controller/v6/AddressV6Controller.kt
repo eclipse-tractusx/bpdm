@@ -30,6 +30,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerCreate
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerUpdateResponseWrapperV6
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.AddressCreateApplicationV6Service
+import org.eclipse.tractusx.bpdm.pool.service.application.v6.AddressGetApplicationV6Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.AddressSearchApplicationV6Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.AddressUpdateApplicationV6Service
 import org.springframework.security.access.prepost.PreAuthorize
@@ -37,7 +38,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController("AddressControllerLegacy")
 class AddressV6Controller(
-    private val addressLegacyServiceMapper: AddressLegacyServiceMapper,
+    private val addressGetApplicationService: AddressGetApplicationV6Service,
     private val addressSearchApplicationService: AddressSearchApplicationV6Service,
     private val addressCreateApplicationService: AddressCreateApplicationV6Service,
     private val addressUpdateApplicationService: AddressUpdateApplicationV6Service
@@ -52,7 +53,7 @@ class AddressV6Controller(
     override fun getAddress(
         bpna: String
     ): LogisticAddressVerboseDtoV6 {
-        return addressLegacyServiceMapper.findByBpn(bpna.uppercase())
+        return addressGetApplicationService.getAddress(bpna)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")

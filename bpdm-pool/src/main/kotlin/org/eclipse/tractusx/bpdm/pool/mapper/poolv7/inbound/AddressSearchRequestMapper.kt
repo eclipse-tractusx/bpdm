@@ -39,6 +39,21 @@ class AddressSearchRequestMapper {
             siteBpns = searchRequest.siteBpns,
             legalEntityBpns = searchRequest.legalEntityBpns,
             name = searchRequest.name,
-            isCatenaXMemberData = isCatenaXMemberData
+            isCatenaXMemberData = isCatenaXMemberData,
+            excludesSiteAddresses = false
+        )
+
+    /**
+     * Builds the criteria for listing the addresses that belong to a legal entity directly instead of through one of
+     * its sites.
+     */
+    fun toDirectAddressesRequest(legalEntityBpn: String): AddressSearchRequest =
+        AddressSearchRequest(
+            addressBpns = emptyList(),
+            siteBpns = emptyList(),
+            legalEntityBpns = listOf(legalEntityBpn),
+            name = null,
+            isCatenaXMemberData = null,
+            excludesSiteAddresses = true
         )
 }

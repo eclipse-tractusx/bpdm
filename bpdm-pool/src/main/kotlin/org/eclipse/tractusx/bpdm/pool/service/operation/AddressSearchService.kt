@@ -46,9 +46,23 @@ class AddressSearchService(
             LogisticAddressRepository.bySiteBpns(criteria.siteBpns),
             LogisticAddressRepository.byLegalEntityBpns(criteria.legalEntityBpns),
             LogisticAddressRepository.byName(criteria.name),
-            LogisticAddressRepository.byIsMember(criteria.isCatenaXMemberData)
+            LogisticAddressRepository.byIsMember(criteria.isCatenaXMemberData),
+            LogisticAddressRepository.withoutSites(criteria.excludesSiteAddresses)
         )
 
-        return logisticAddressRepository.findAll(specification, pageable)
+        val addressPage = logisticAddressRepository.findAll(specification, pageable)
+        fetchAssociations(addressPage.content.toSet())
+
+        return addressPage
+    }
+
+    private fun fetchAssociations(addresses: Set<LogisticAddressDb>) {
+        if (addresses.isEmpty()) return
+
+        logisticAddressRepository.joinLegalEntities(addresses)
+        logisticAddressRepository.joinSites(addresses)
+        logisticAddressRepository.joinRegions(addresses)
+        logisticAddressRepository.joinIdentifiers(addresses)
+        logisticAddressRepository.joinStates(addresses)
     }
 }

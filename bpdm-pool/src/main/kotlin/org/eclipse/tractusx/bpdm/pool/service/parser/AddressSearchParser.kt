@@ -41,7 +41,8 @@ class AddressSearchParser {
             siteBpns = normalizeBpns(request.siteBpns),
             legalEntityBpns = normalizeBpns(request.legalEntityBpns),
             name = request.name?.takeIf { it.isNotBlank() },
-            isCatenaXMemberData = request.isCatenaXMemberData
+            isCatenaXMemberData = request.isCatenaXMemberData,
+            excludesSiteAddresses = request.excludesSiteAddresses
         )
 
     private fun normalizeBpns(bpns: List<String>): List<String> =

@@ -17,30 +17,34 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.controller.v6
+package org.eclipse.tractusx.bpdm.pool.service.application.v6
 
-import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressVerboseDtoV6
-import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.toV6Dto
-import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
+import org.eclipse.tractusx.bpdm.pool.model.request.AddressGetRequest
+import org.eclipse.tractusx.bpdm.pool.service.operation.AddressGetService
+import org.eclipse.tractusx.bpdm.pool.service.parser.AddressGetParser
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
+/**
+ * The REST-API boundary for the legacy v6 "get address" operation, using the v6 response shape.
+ */
 @Service
-class AddressLegacyServiceMapper(
-    private val logisticAddressRepository: LogisticAddressRepository
+class AddressGetApplicationV6Service(
+    private val addressGetParser: AddressGetParser,
+    private val addressGetService: AddressGetService
 ) {
 
-    private val logger = KotlinLogging.logger { }
+    /**
+     * Returns the address with the given BPN and fails with a not-found error when no address carries it.
+     */
+    @Transactional(readOnly = true)
+    fun getAddress(bpna: String): LogisticAddressVerboseDtoV6 {
+        val criteria = addressGetParser.parse(AddressGetRequest(bpna))
+        val address = addressGetService.get(criteria) ?: throw BpdmNotFoundException("Address", criteria.addressBpn)
 
-    fun findByBpn(bpn: String): LogisticAddressVerboseDtoV6 {
-        val address = findAddressByBpn(bpn) ?: throw BpdmNotFoundException("Address", bpn)
         return address.toV6Dto()
-    }
-
-    fun findAddressByBpn(bpn: String): LogisticAddressDb? {
-        logger.debug { "Executing findAddressByBpn() with parameters $bpn" }
-        return logisticAddressRepository.findByBpn(bpn)
     }
 }
