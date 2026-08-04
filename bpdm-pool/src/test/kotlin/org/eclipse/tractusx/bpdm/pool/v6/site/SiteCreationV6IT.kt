@@ -26,7 +26,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SiteSearchRequestV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.ErrorInfoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SiteCreateErrorV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateResponseWrapperV6
-import org.eclipse.tractusx.bpdm.pool.controller.v6.LegalEntityLegacyServiceMapper
+import org.eclipse.tractusx.bpdm.pool.util.ValidationLimits
 import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolTestBaseV6
 import org.junit.jupiter.api.Test
 
@@ -280,7 +280,7 @@ class SiteCreationV6IT: UnscheduledPoolTestBaseV6() {
         //THEN
         val expectedError = ErrorInfoV6(
             SiteCreateErrorV6.MainAddressIdentifiersTooMany,
-            "Amount of identifiers (101) exceeds limit of ${LegalEntityLegacyServiceMapper.IDENTIFIER_AMOUNT_LIMIT}",
+            "Amount of identifiers (101) exceeds limit of ${ValidationLimits.IDENTIFIER_AMOUNT_LIMIT}",
             siteRequest.index
         )
         val expectedResponse = SitePartnerCreateResponseWrapperV6(emptyList(), listOf(expectedError))

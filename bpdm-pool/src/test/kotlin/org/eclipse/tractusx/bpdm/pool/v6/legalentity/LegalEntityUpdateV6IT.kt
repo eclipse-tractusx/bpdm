@@ -26,7 +26,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntitySearchRequ
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.ErrorInfoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerUpdateResponseWrapperV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityUpdateErrorV6
-import org.eclipse.tractusx.bpdm.pool.controller.v6.LegalEntityLegacyServiceMapper
+import org.eclipse.tractusx.bpdm.pool.util.ValidationLimits
 import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolTestBaseV6
 import org.junit.jupiter.api.Test
 
@@ -311,7 +311,7 @@ class LegalEntityUpdateV6IT: UnscheduledPoolTestBaseV6() {
         //THEN
         val expectedError = ErrorInfoV6(
             LegalEntityUpdateErrorV6.LegalAddressIdentifiersTooMany,
-            "Amount of identifiers (101) exceeds limit of ${LegalEntityLegacyServiceMapper.IDENTIFIER_AMOUNT_LIMIT}",
+            "Amount of identifiers (101) exceeds limit of ${ValidationLimits.IDENTIFIER_AMOUNT_LIMIT}",
             updateRequest.bpnl
         )
         val expectedResponse = LegalEntityPartnerUpdateResponseWrapperV6(emptyList(), listOf(expectedError))

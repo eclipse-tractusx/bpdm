@@ -20,8 +20,6 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingDto
@@ -29,10 +27,8 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnRequestIdentifierMap
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
-import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityIdentifierDb
 import org.eclipse.tractusx.bpdm.pool.repository.*
-import org.springframework.data.domain.PageRequest
-import org.springframework.data.jpa.domain.Specification
+import org.eclipse.tractusx.bpdm.pool.service.operation.LegalEntityAssociationFetchService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.stream.Collectors
@@ -47,44 +43,10 @@ class BusinessPartnerFetchService(
     private val bpnRequestIdentifierRepository: BpnRequestIdentifierRepository,
     private val legalEntityIdentifierRepository: LegalEntityIdentifierRepository,
     private val addressIdentifierRepository: AddressIdentifierRepository,
-    private val addressService: AddressService
+    private val legalEntityAssociationFetchService: LegalEntityAssociationFetchService
 ) {
 
     private val logger = KotlinLogging.logger { }
-
-    /**
-     * Search legal entities per page for [searchRequest] and [paginationRequest]
-     */
-    @Transactional
-    fun searchLegalEntities(searchRequest: LegalEntitySearchRequest, paginationRequest: PaginationRequest): PageDto<LegalEntityWithLegalAddressVerboseDto>{
-        val spec = Specification.allOf(
-            LegalEntityRepository.byBpns(searchRequest.bpnLs),
-            LegalEntityRepository.byLegalName(searchRequest.legalName),
-            LegalEntityRepository.byIsMember(searchRequest.isCatenaXMemberData)
-        )
-
-        val legalEntityPage = legalEntityRepository.findAll(spec, PageRequest.of(paginationRequest.page, paginationRequest.size))
-
-        return legalEntityPage.toDto(LegalEntityDb::toLegalEntityWithLegalAddress)
-    }
-
-    /**
-     * Fetch a business partner by [bpn] and return as [LegalEntityWithLegalAddressVerboseDto]
-     */
-    fun findLegalEntityIgnoreCase(bpn: String): LegalEntityWithLegalAddressVerboseDto {
-        logger.debug { "Executing findLegalEntityIgnoreCase() with parameters $bpn" }
-        return findLegalEntityOrThrow(bpn).toLegalEntityWithLegalAddress()
-    }
-
-
-    /**
-     * Fetch a business partner by [identifierValue] (ignoring case) of [identifierType] and return as [LegalEntityWithLegalAddressVerboseDto]
-     */
-    @Transactional
-    fun findLegalEntityIgnoreCase(identifierType: String, identifierValue: String): LegalEntityWithLegalAddressVerboseDto {
-        logger.debug { "Executing findLegalEntityIgnoreCase() with parameters $identifierType and $identifierValue" }
-        return findLegalEntityOrThrow(identifierType, identifierValue).toLegalEntityWithLegalAddress()
-    }
 
     /**
      * Fetch business partners by BPN in [bpns]
@@ -92,7 +54,10 @@ class BusinessPartnerFetchService(
     @Transactional
     fun fetchByBpns(bpns: Collection<String>): Set<LegalEntityDb> {
         logger.debug { "Executing fetchByBpns() with parameters $bpns " }
-        return fetchLegalEntityDependencies(legalEntityRepository.findDistinctByBpnIn(bpns))
+        val legalEntities = legalEntityRepository.findDistinctByBpnIn(bpns)
+        legalEntityAssociationFetchService.fetch(legalEntities)
+
+        return legalEntities
     }
 
     /**
@@ -136,54 +101,8 @@ class BusinessPartnerFetchService(
             .collect(Collectors.toSet())
     }
 
-    fun fetchDependenciesWithLegalAddress(partners: Set<LegalEntityDb>): Set<LegalEntityDb> {
-        fetchLegalEntityDependencies(partners)
-        legalEntityRepository.joinLegalAddresses(partners)
-        addressService.fetchLogisticAddressDependencies(partners.map { it.legalAddress }.toSet())
-        return partners
-    }
-
-    fun fetchLegalEntityDependencies(partners: Set<LegalEntityDb>): Set<LegalEntityDb> {
-
-        legalEntityRepository.joinIdentifiers(partners)
-        legalEntityRepository.joinStates(partners)
-        legalEntityRepository.joinRelations(partners)
-        legalEntityRepository.joinLegalForm(partners)
-
-        // don't fetch sites/addresses since those are not needed when mapping to BusinessPartnerResponse
-
-        val identifiers = partners.flatMap { it.identifiers }.toSet()
-        fetchIdentifierDependencies(identifiers)
-
-        return partners
-    }
-
-    fun fetchIdentifierDependencies(identifiers: Set<LegalEntityIdentifierDb>): Set<LegalEntityIdentifierDb> {
-        legalEntityIdentifierRepository.joinType(identifiers)
-
-        return identifiers
-    }
-
-
-    private fun findLegalEntityOrThrow(bpn: String): LegalEntityDb {
-        return legalEntityRepository.findByBpnIgnoreCase(bpn) ?: throw BpdmNotFoundException(LegalEntityDb::class.simpleName!!, bpn)
-    }
-
-    fun findLegalEntityOrThrow(identifierTypeKey: String, identifierValue: String): LegalEntityDb {
-        val identifierType = findIdentifierTypeOrThrow(identifierTypeKey, IdentifierBusinessPartnerType.LEGAL_ENTITY)
-        return legalEntityRepository.findByIdentifierTypeAndValueIgnoreCase(identifierType, identifierValue)
-            ?: throw BpdmNotFoundException("Identifier Value", identifierValue)
-    }
-
     private fun findIdentifierTypeOrThrow(identifierTypeKey: String, businessPartnerType: IdentifierBusinessPartnerType) =
         identifierTypeRepository.findByBusinessPartnerTypeAndTechnicalKey(businessPartnerType, identifierTypeKey)
             ?: throw BpdmNotFoundException(IdentifierTypeDb::class, "$identifierTypeKey/$businessPartnerType")
-
-
-    data class LegalEntitySearchRequest(
-        val bpnLs: List<String>?,
-        val legalName: String?,
-        val isCatenaXMemberData: Boolean?
-    )
 
 }

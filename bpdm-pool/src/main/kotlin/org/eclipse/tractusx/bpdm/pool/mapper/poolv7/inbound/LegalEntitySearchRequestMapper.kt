@@ -17,26 +17,26 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.service
+package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound
 
-import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.BusinessPartnerSearchFilterType
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.BusinessPartnerSearchResultDto
+import org.eclipse.tractusx.bpdm.pool.model.request.LegalEntitySearchRequest
+import org.springframework.stereotype.Component
+import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntitySearchRequest as LegalEntitySearchRequestDto
 
 /**
- * Provides search functionality on the Catena-x data for the BPDM system
+ * Maps Pool API legal entity search criteria into the loose search request the parser takes.
  */
-interface SearchService {
+@Component
+class LegalEntitySearchRequestMapper {
 
     /**
-     * Find business partner by matching their field values to [searchRequest] field query texts
+     * Combines the criteria a client sent with the Catena-X member restriction that the endpoint they sent them to
+     * imposes.
      */
-    fun searchBusinessPartner(
-        searchRequest: LegalEntityPropertiesSearchRequest,
-        searchResultFilter: Set<BusinessPartnerSearchFilterType>?,
-        paginationRequest: PaginationRequest
-    ): PageDto<BusinessPartnerSearchResultDto>
-
+    fun toSearchRequest(searchRequest: LegalEntitySearchRequestDto, isCatenaXMemberData: Boolean?): LegalEntitySearchRequest =
+        LegalEntitySearchRequest(
+            legalEntityBpns = searchRequest.bpnLs,
+            legalName = searchRequest.legalName,
+            isCatenaXMemberData = isCatenaXMemberData
+        )
 }
