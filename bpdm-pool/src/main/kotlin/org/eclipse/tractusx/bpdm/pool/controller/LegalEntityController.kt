@@ -32,9 +32,9 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerUpdat
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
-import org.eclipse.tractusx.bpdm.pool.service.AddressService
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerFetchService
 import org.eclipse.tractusx.bpdm.pool.service.SiteService
+import org.eclipse.tractusx.bpdm.pool.service.application.v7.AddressSearchApplicationV7Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.LegalEntityCreateApplicationV7Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.LegalEntityUpdateApplicationV7Service
 import org.springdoc.core.annotations.ParameterObject
@@ -46,7 +46,7 @@ class LegalEntityController(
     val businessPartnerFetchService: BusinessPartnerFetchService,
     val bpnConfigProperties: BpnConfigProperties,
     val siteService: SiteService,
-    val addressService: AddressService,
+    val addressSearchApplicationService: AddressSearchApplicationV7Service,
     val legalEntityCreateApplicationService: LegalEntityCreateApplicationV7Service,
     val legalEntityUpdateApplicationService: LegalEntityUpdateApplicationV7Service
 ) : PoolLegalEntityApi {
@@ -101,7 +101,7 @@ class LegalEntityController(
         bpnl: String,
         paginationRequest: PaginationRequest
     ): PageDto<LogisticAddressVerboseDto> {
-        return addressService.findNonSiteAddressesOfLegalEntity(bpnl.uppercase(), paginationRequest.page, paginationRequest.size)
+        return addressSearchApplicationService.searchLegalEntityAddresses(bpnl, paginationRequest)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")

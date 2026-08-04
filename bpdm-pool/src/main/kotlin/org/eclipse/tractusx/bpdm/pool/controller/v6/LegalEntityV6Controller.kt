@@ -32,6 +32,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerUp
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityWithLegalAddressVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
+import org.eclipse.tractusx.bpdm.pool.service.application.v6.AddressSearchApplicationV6Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.LegalEntityCreateApplicationV6Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.LegalEntityUpdateApplicationV6Service
 import org.springdoc.core.annotations.ParameterObject
@@ -41,6 +42,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController("LegalEntityControllerLegacy")
 class LegalEntityV6Controller(
     val legalEntityLegacyServiceMapper: LegalEntityLegacyServiceMapper,
+    val addressSearchApplicationService: AddressSearchApplicationV6Service,
     val bpnConfigProperties: BpnConfigProperties,
     val legalEntityCreateApplicationService: LegalEntityCreateApplicationV6Service,
     val legalEntityUpdateApplicationService: LegalEntityUpdateApplicationV6Service
@@ -96,7 +98,7 @@ class LegalEntityV6Controller(
         bpnl: String,
         paginationRequest: PaginationRequest
     ): PageDto<LogisticAddressVerboseDtoV6> {
-        return legalEntityLegacyServiceMapper.findNonSiteAddressesOfLegalEntity(bpnl.uppercase(), paginationRequest.page, paginationRequest.size)
+        return addressSearchApplicationService.searchLegalEntityAddresses(bpnl, paginationRequest)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")

@@ -24,7 +24,6 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.SiteVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityWithLegalAddressVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
@@ -33,7 +32,6 @@ import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.toV6Dto
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
-import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.eclipse.tractusx.bpdm.pool.service.AddressService
 import org.eclipse.tractusx.bpdm.pool.service.toDto
@@ -47,7 +45,6 @@ class LegalEntityLegacyServiceMapper(
     private val legalEntityRepository: LegalEntityRepository,
     private val identifierTypeRepository: IdentifierTypeRepository,
     private val siteRepository: SiteRepository,
-    private val logisticAddressRepository: LogisticAddressRepository,
     private val addressService: AddressService
 ) {
 
@@ -138,15 +135,4 @@ class LegalEntityLegacyServiceMapper(
         addressService.fetchLogisticAddressDependencies(addresses)
     }
 
-    /**
-     * Find Addresses which directly belong to a Legal Entity
-     */
-    fun findNonSiteAddressesOfLegalEntity(bpnl: String, pageIndex: Int, pageSize: Int): PageDto<LogisticAddressVerboseDtoV6> {
-        logger.debug { "Executing findByPartnerBpn() with parameters $bpnl // $pageIndex // $pageSize" }
-        val legalEntity = legalEntityRepository.findByBpnIgnoreCase(bpnl) ?:  throw BpdmNotFoundException("Business Partner", bpnl)
-
-        val page = logisticAddressRepository.findByLegalEntityAndSitesIsEmpty(legalEntity, PageRequest.of(pageIndex, pageSize))
-        addressService.fetchLogisticAddressDependencies(page.map { it }.toSet())
-        return page.toDto(page.content.map { it.toV6Dto() })
-    }
 }

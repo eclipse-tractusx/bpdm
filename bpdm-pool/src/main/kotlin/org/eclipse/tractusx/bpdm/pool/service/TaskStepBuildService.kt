@@ -29,41 +29,16 @@ import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.inbound.GoldenRecordTaskAddressRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.inbound.GoldenRecordTaskLegalEntityRequestMapper
 import org.eclipse.tractusx.bpdm.pool.mapper.orchestrator.inbound.GoldenRecordTaskSiteRequestMapper
-import org.eclipse.tractusx.bpdm.pool.model.error.AddressConstraintParseError
-import org.eclipse.tractusx.bpdm.pool.model.error.AddressContentParseError
-import org.eclipse.tractusx.bpdm.pool.model.error.AddressCreateParseError
-import org.eclipse.tractusx.bpdm.pool.model.request.AddressCreateTypedParentsRequest
-import org.eclipse.tractusx.bpdm.pool.model.error.AddressFieldParseError
-import org.eclipse.tractusx.bpdm.pool.model.error.AddressMetadataParseError
-import org.eclipse.tractusx.bpdm.pool.model.error.AddressUpdateParseError
-import org.eclipse.tractusx.bpdm.pool.model.request.AddressUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.model.error.InvalidParentBpn
-import org.eclipse.tractusx.bpdm.pool.model.error.LegalAddressAlreadyMainAddress
-import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityContentParseError
-import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityCreateParseError
-import org.eclipse.tractusx.bpdm.pool.model.error.LegalEntityUpdateParseError
-import org.eclipse.tractusx.bpdm.pool.model.error.MultipleUltimateOwnersInHierarchy
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
 import org.eclipse.tractusx.bpdm.pool.model.error.*
 import org.eclipse.tractusx.bpdm.pool.model.parseAndExecute
+import org.eclipse.tractusx.bpdm.pool.model.request.AddressCreateTypedParentsRequest
+import org.eclipse.tractusx.bpdm.pool.model.request.AddressUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
-import org.eclipse.tractusx.bpdm.pool.service.operation.AddressCreateService
-import org.eclipse.tractusx.bpdm.pool.service.operation.AddressPayloadUpdateService
-import org.eclipse.tractusx.bpdm.pool.service.operation.LegalEntityCreateService
-import org.eclipse.tractusx.bpdm.pool.service.operation.LegalEntityPayloadUpdateService
-import org.eclipse.tractusx.bpdm.pool.service.operation.SiteCreateService
-import org.eclipse.tractusx.bpdm.pool.service.operation.SiteCreateWithReferencedAddressAsMainService
-import org.eclipse.tractusx.bpdm.pool.service.operation.SitePayloadUpdateService
-import org.eclipse.tractusx.bpdm.pool.service.parser.AddressUpdateParser
-import org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntityCreateParser
-import org.eclipse.tractusx.bpdm.pool.service.parser.LegalEntityUpdateParser
-import org.eclipse.tractusx.bpdm.pool.service.parser.SiteCreateParser
-import org.eclipse.tractusx.bpdm.pool.service.parser.SiteCreateWithLegalAddressAsMainParser
-import org.eclipse.tractusx.bpdm.pool.service.parser.SiteCreateWithReferencedAddressAsMainParser
-import org.eclipse.tractusx.bpdm.pool.service.parser.SiteUpdateParser
-import org.eclipse.tractusx.bpdm.pool.service.parser.TypedParentAddressCreateParser
+import org.eclipse.tractusx.bpdm.pool.service.operation.*
+import org.eclipse.tractusx.bpdm.pool.service.parser.*
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.stereotype.Service
 
@@ -386,8 +361,7 @@ class TaskStepBuildService(
     }
 
     private fun fetchAddressResult(bpnA: String, hasChanged: Boolean?): PostalAddressWithScriptVariants {
-        val result = addressService.searchAddresses(AddressService.AddressSearchRequest(addressBpns = listOf(bpnA), null, null, null, null), PaginationRequest(0, 1))
-            .content.firstOrNull() ?: throw BpdmValidationException(CleaningError.BPNA_IS_NULL.message)
+        val result = addressService.findAddressByBpn(bpnA)?.toDto() ?: throw BpdmValidationException(CleaningError.BPNA_IS_NULL.message)
         return taskResolutionMapper.toTaskResult(result.address, result.scriptVariants, hasChanged)
     }
 

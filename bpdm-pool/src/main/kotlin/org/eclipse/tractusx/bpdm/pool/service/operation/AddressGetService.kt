@@ -17,31 +17,26 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.service
+package org.eclipse.tractusx.bpdm.pool.service.operation
 
-import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
+import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressGetParsed
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
+/**
+ * Fetches a single address by its BPN.
+ */
 @Service
-class AddressService(
+class AddressGetService(
     private val logisticAddressRepository: LogisticAddressRepository
 ) {
-    private val logger = KotlinLogging.logger { }
 
-    fun fetchLogisticAddressDependencies(addresses: Set<LogisticAddressDb>): Set<LogisticAddressDb> {
-        logisticAddressRepository.joinLegalEntities(addresses)
-        logisticAddressRepository.joinSites(addresses)
-        logisticAddressRepository.joinRegions(addresses)
-        logisticAddressRepository.joinIdentifiers(addresses)
-        logisticAddressRepository.joinStates(addresses)
-
-        return addresses
-    }
-
-    fun findAddressByBpn(bpn: String): LogisticAddressDb? {
-        logger.debug { "Executing findAddressByBpn() with parameters $bpn" }
-        return logisticAddressRepository.findByBpn(bpn)
-    }
+    /**
+     * Returns the address carrying the requested BPN, or null when no address carries it.
+     */
+    @Transactional(readOnly = true)
+    fun get(criteria: AddressGetParsed): LogisticAddressDb? =
+        logisticAddressRepository.findByBpn(criteria.addressBpn)
 }

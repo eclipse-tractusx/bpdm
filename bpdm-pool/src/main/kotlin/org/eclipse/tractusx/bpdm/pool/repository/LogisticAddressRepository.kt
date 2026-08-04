@@ -72,14 +72,16 @@ interface LogisticAddressRepository : JpaRepository<LogisticAddressDb, Long>, Jp
                 }
             }
 
+        fun withoutSites(excludesSiteAddresses: Boolean) =
+            Specification<LogisticAddressDb> { root, _, builder ->
+                if (excludesSiteAddresses) builder.isEmpty(root.get<MutableSet<SiteDb>>(LogisticAddressDb::sites.name)) else null
+            }
+
     }
 
     fun findByBpn(bpn: String): LogisticAddressDb?
 
     fun findDistinctByBpnIn(bpns: Collection<String>): Set<LogisticAddressDb>
-
-    @Query("SELECT a FROM LogisticAddressDb a WHERE a.legalEntity = :legalEntity AND a.sites IS EMPTY")
-    fun findByLegalEntityAndSitesIsEmpty(legalEntity: LegalEntityDb, pageable: Pageable): Page<LogisticAddressDb>
 
     @Query("SELECT a FROM LogisticAddressDb a WHERE LOWER(a.name) LIKE :addressName ORDER BY LENGTH(a.name)")
     fun findByName(addressName: String, pageable: Pageable): Page<LogisticAddressDb>
