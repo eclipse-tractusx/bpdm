@@ -29,6 +29,7 @@ package org.eclipse.tractusx.bpdm.pool.mapper.poolv6
  */
 
 import org.eclipse.tractusx.bpdm.pool.api.model.*
+import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteCreateRequestWithLegalAddressAsMain
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerUpdateRequest
@@ -54,6 +55,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.SiteDtoV6 as V6SiteDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.SiteStateDtoV6 as V6SiteStateDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.SiteStateVerboseDtoV6 as V6SiteStateVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.StreetDtoV6 as V6StreetDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.AddressSearchRequestV6 as V6AddressSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SiteCreateRequestWithLegalAddressAsMainV6 as V6SiteCreateRequestWithLegalAddressAsMain
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SitePartnerCreateRequestV6 as V6SitePartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SitePartnerUpdateRequestV6 as V6SitePartnerUpdateRequest
@@ -227,6 +229,13 @@ fun V6SiteDto.toV7() = SiteDto(
 )
 
 /* --------------------- Inbound: v6 request -> v7 request --------------------- */
+
+fun V6AddressSearchRequest.toV7() = AddressSearchRequest(
+    addressBpns = addressBpns,
+    legalEntityBpns = legalEntityBpns,
+    siteBpns = siteBpns,
+    name = name
+)
 
 fun V6SitePartnerCreateRequest.toV7() = SitePartnerCreateRequest(site = site.toV7(), bpnlParent = bpnlParent, index = index)
 fun V6SitePartnerUpdateRequest.toV7() = SitePartnerUpdateRequest(bpns = bpns, site = site.toV7())

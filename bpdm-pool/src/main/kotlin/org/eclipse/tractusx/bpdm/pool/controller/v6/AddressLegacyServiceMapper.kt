@@ -20,18 +20,12 @@
 package org.eclipse.tractusx.bpdm.pool.controller.v6
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
-import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.toV6Dto
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
-import org.eclipse.tractusx.bpdm.pool.service.toDto
-import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 
 @Service
 class AddressLegacyServiceMapper(
@@ -49,30 +43,4 @@ class AddressLegacyServiceMapper(
         logger.debug { "Executing findAddressByBpn() with parameters $bpn" }
         return logisticAddressRepository.findByBpn(bpn)
     }
-
-    /**
-     * Search addresses per page for [searchRequest] and [paginationRequest]
-     */
-    @Transactional
-    fun searchAddresses(searchRequest: AddressSearchRequest, paginationRequest: PaginationRequest): PageDto<LogisticAddressVerboseDtoV6> {
-
-        val spec = Specification.allOf(
-            LogisticAddressRepository.byBpns(searchRequest.addressBpns),
-            LogisticAddressRepository.bySiteBpns(searchRequest.siteBpns),
-            LogisticAddressRepository.byLegalEntityBpns(searchRequest.legalEntityBpns),
-            LogisticAddressRepository.byName(searchRequest.name),
-            LogisticAddressRepository.byIsMember(searchRequest.isCatenaXMemberData)
-        )
-        val addressPage = logisticAddressRepository.findAll(spec, paginationRequest.toPageRequest())
-
-        return addressPage.toDto { it.toV6Dto() }
-    }
-
-    data class AddressSearchRequest(
-        val addressBpns: List<String>?,
-        val siteBpns: List<String>?,
-        val legalEntityBpns: List<String>?,
-        val name: String?,
-        val isCatenaXMemberData: Boolean?
-    )
 }

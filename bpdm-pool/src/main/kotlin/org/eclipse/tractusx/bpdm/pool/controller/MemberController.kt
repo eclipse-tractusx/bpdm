@@ -33,10 +33,10 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerb
 import org.eclipse.tractusx.bpdm.pool.config.ControllerConfigProperties
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmRequestSizeException
-import org.eclipse.tractusx.bpdm.pool.service.AddressService
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerFetchService
 import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
 import org.eclipse.tractusx.bpdm.pool.service.SiteService
+import org.eclipse.tractusx.bpdm.pool.service.application.v7.AddressSearchApplicationV7Service
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
@@ -44,7 +44,7 @@ import org.springframework.web.bind.annotation.RestController
 class MemberController(
     private val businessPartnerFetchService: BusinessPartnerFetchService,
     private val siteService: SiteService,
-    private val addressService: AddressService,
+    private val addressSearchApplicationService: AddressSearchApplicationV7Service,
     private val changelogService: PartnerChangelogService,
     private val controllerConfigProperties: ControllerConfigProperties
 ) : PoolMembersApi {
@@ -80,13 +80,7 @@ class MemberController(
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_MEMBER_PARTNER})")
     override fun searchAddresses(searchRequest: AddressSearchRequest, paginationRequest: PaginationRequest): PageDto<LogisticAddressInvariantVerboseDto> {
-        return addressService.searchParticipantAddresses(
-            addressBpns = searchRequest.addressBpns,
-            siteBpns = searchRequest.siteBpns,
-            legalEntityBpns = searchRequest.legalEntityBpns,
-            name = searchRequest.name,
-            paginationRequest = paginationRequest
-        )
+        return addressSearchApplicationService.searchMemberAddresses(searchRequest, paginationRequest)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_MEMBER_CHANGELOG})")

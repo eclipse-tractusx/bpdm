@@ -31,6 +31,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerUpdateRes
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.service.AddressService
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.AddressCreateApplicationV7Service
+import org.eclipse.tractusx.bpdm.pool.service.application.v7.AddressSearchApplicationV7Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.AddressUpdateApplicationV7Service
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
@@ -38,6 +39,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class AddressController(
     private val addressService: AddressService,
+    private val addressSearchApplicationService: AddressSearchApplicationV7Service,
     private val addressCreateApplicationService: AddressCreateApplicationV7Service,
     private val addressUpdateApplicationService: AddressUpdateApplicationV7Service
 ) : PoolAddressApi {
@@ -59,16 +61,7 @@ class AddressController(
         searchRequest: AddressSearchRequest,
         paginationRequest: PaginationRequest
     ): PageDto<LogisticAddressVerboseDto> {
-        return addressService.searchAddresses(
-            AddressService.AddressSearchRequest(
-                addressBpns = searchRequest.addressBpns,
-                siteBpns = searchRequest.siteBpns,
-                legalEntityBpns = searchRequest.legalEntityBpns,
-                name = searchRequest.name,
-                isCatenaXMemberData = null
-            ),
-            paginationRequest
-        )
+        return addressSearchApplicationService.searchAddresses(searchRequest, paginationRequest)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")

@@ -21,16 +21,12 @@ package org.eclipse.tractusx.bpdm.pool.service
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
-import org.eclipse.tractusx.bpdm.common.service.toPageRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressInvariantVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.springframework.data.domain.PageRequest
-import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
 
 @Service
@@ -39,50 +35,6 @@ class AddressService(
     private val legalEntityRepository: LegalEntityRepository
 ) {
     private val logger = KotlinLogging.logger { }
-
-    /**
-     * Search addresses per page for [searchRequest] and [paginationRequest]
-     */
-    @org.springframework.transaction.annotation.Transactional
-    fun searchAddresses(searchRequest: AddressSearchRequest, paginationRequest: PaginationRequest): PageDto<LogisticAddressVerboseDto>{
-
-        val spec = Specification.allOf(
-            LogisticAddressRepository.byBpns(searchRequest.addressBpns),
-            LogisticAddressRepository.bySiteBpns(searchRequest.siteBpns),
-            LogisticAddressRepository.byLegalEntityBpns(searchRequest.legalEntityBpns),
-            LogisticAddressRepository.byName(searchRequest.name),
-            LogisticAddressRepository.byIsMember(searchRequest.isCatenaXMemberData)
-        )
-        val addressPage = logisticAddressRepository.findAll(spec, paginationRequest.toPageRequest())
-
-        return addressPage.toDto { it.toDto() }
-    }
-
-    fun searchParticipantAddresses(
-        addressBpns: List<String>?,
-        siteBpns: List<String>?,
-        legalEntityBpns: List<String>?,
-        name: String?,
-        paginationRequest: PaginationRequest
-    ): PageDto<LogisticAddressInvariantVerboseDto>{
-        val variantResponse = searchAddresses(
-            AddressSearchRequest(
-                addressBpns = addressBpns,
-                siteBpns = siteBpns,
-                legalEntityBpns = legalEntityBpns,
-                name = name,
-                isCatenaXMemberData = true
-            ), paginationRequest
-        )
-
-        return PageDto(
-            variantResponse.totalElements,
-            variantResponse.totalPages,
-            variantResponse.page,
-            variantResponse.contentSize,
-            variantResponse.content.map { it.address }
-        )
-    }
 
     /**
      * Find Addresses which directly belong to a Legal Entity
@@ -110,14 +62,6 @@ class AddressService(
 
         return addresses
     }
-
-    data class AddressSearchRequest(
-        val addressBpns: List<String>?,
-        val siteBpns: List<String>?,
-        val legalEntityBpns: List<String>?,
-        val name: String?,
-        val isCatenaXMemberData: Boolean?
-    )
 
     fun findAddressByBpn(bpn: String): LogisticAddressDb? {
         logger.debug { "Executing findAddressByBpn() with parameters $bpn" }
