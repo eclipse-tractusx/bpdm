@@ -23,10 +23,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalFormDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.SiteVerboseDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerCreateVerboseDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateVerboseDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.RelationVerboseDtoV6
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateVerboseDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.*
 import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV6
 import org.eclipse.tractusx.bpdm.pool.service.getAddressType
@@ -54,6 +51,13 @@ fun LogisticAddressDb.toV6Dto(): LogisticAddressVerboseDtoV6 {
         confidenceCriteria = confidenceCriteria.toDto().toV6(),
         isCatenaXMemberData = legalEntity?.isCatenaXMemberData ?: mainSite?.legalEntity?.isCatenaXMemberData ?: false,
         addressType = getAddressType(this)
+    )
+}
+
+fun SiteDb.toV6PoolDto(): SiteWithMainAddressVerboseDtoV6 {
+    return SiteWithMainAddressVerboseDtoV6(
+        site = toV6Dto(),
+        mainAddress = mainAddress.toV6Dto()
     )
 }
 

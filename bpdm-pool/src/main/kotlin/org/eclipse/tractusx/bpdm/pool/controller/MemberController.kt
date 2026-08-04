@@ -35,15 +35,15 @@ import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmRequestSizeException
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerFetchService
 import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
-import org.eclipse.tractusx.bpdm.pool.service.SiteService
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.AddressSearchApplicationV7Service
+import org.eclipse.tractusx.bpdm.pool.service.application.v7.SiteSearchApplicationV7Service
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class MemberController(
     private val businessPartnerFetchService: BusinessPartnerFetchService,
-    private val siteService: SiteService,
+    private val siteSearchApplicationService: SiteSearchApplicationV7Service,
     private val addressSearchApplicationService: AddressSearchApplicationV7Service,
     private val changelogService: PartnerChangelogService,
     private val controllerConfigProperties: ControllerConfigProperties
@@ -67,15 +67,7 @@ class MemberController(
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_MEMBER_PARTNER})")
     override fun postSiteSearch(searchRequest: SiteSearchRequest, paginationRequest: PaginationRequest): PageDto<SiteWithMainAddressVerboseDto> {
-        return siteService.searchSites(
-            SiteService.SiteSearchRequest(
-                siteBpns =  searchRequest.siteBpns,
-                legalEntityBpns = searchRequest.legalEntityBpns,
-                name = searchRequest.name,
-                isCatenaXMemberData = true
-            ),
-            paginationRequest
-        )
+        return siteSearchApplicationService.searchMemberSites(searchRequest, paginationRequest)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_MEMBER_PARTNER})")

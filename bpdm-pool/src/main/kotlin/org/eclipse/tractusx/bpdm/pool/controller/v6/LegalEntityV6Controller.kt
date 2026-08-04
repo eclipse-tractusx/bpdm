@@ -35,6 +35,7 @@ import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.AddressSearchApplicationV6Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.LegalEntityCreateApplicationV6Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.LegalEntityUpdateApplicationV6Service
+import org.eclipse.tractusx.bpdm.pool.service.application.v6.SiteSearchApplicationV6Service
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
@@ -42,6 +43,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController("LegalEntityControllerLegacy")
 class LegalEntityV6Controller(
     val legalEntityLegacyServiceMapper: LegalEntityLegacyServiceMapper,
+    val siteSearchApplicationService: SiteSearchApplicationV6Service,
     val addressSearchApplicationService: AddressSearchApplicationV6Service,
     val bpnConfigProperties: BpnConfigProperties,
     val legalEntityCreateApplicationService: LegalEntityCreateApplicationV6Service,
@@ -90,7 +92,7 @@ class LegalEntityV6Controller(
         bpnl: String,
         paginationRequest: PaginationRequest
     ): PageDto<SiteVerboseDtoV6> {
-        return legalEntityLegacyServiceMapper.findByParentBpn(bpnl.uppercase(), paginationRequest.page, paginationRequest.size)
+        return siteSearchApplicationService.searchLegalEntitySites(bpnl, paginationRequest)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")

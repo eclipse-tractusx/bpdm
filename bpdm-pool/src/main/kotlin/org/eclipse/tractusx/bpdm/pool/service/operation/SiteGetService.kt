@@ -17,29 +17,26 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.service
+package org.eclipse.tractusx.bpdm.pool.service.operation
 
-import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
-import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
-import org.eclipse.tractusx.bpdm.pool.service.operation.AddressAssociationFetchService
+import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
+import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteGetParsed
+import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
+/**
+ * Fetches a single site by its BPN.
+ */
 @Service
-class AddressService(
-    private val logisticAddressRepository: LogisticAddressRepository,
-    private val addressAssociationFetchService: AddressAssociationFetchService
+class SiteGetService(
+    private val siteRepository: SiteRepository
 ) {
-    private val logger = KotlinLogging.logger { }
 
-    fun fetchLogisticAddressDependencies(addresses: Set<LogisticAddressDb>): Set<LogisticAddressDb> {
-        addressAssociationFetchService.fetch(addresses)
-
-        return addresses
-    }
-
-    fun findAddressByBpn(bpn: String): LogisticAddressDb? {
-        logger.debug { "Executing findAddressByBpn() with parameters $bpn" }
-        return logisticAddressRepository.findByBpn(bpn)
-    }
+    /**
+     * Returns the site carrying the requested BPN, or null when no site carries it.
+     */
+    @Transactional(readOnly = true)
+    fun get(criteria: SiteGetParsed): SiteDb? =
+        siteRepository.findByBpn(criteria.siteBpn)
 }

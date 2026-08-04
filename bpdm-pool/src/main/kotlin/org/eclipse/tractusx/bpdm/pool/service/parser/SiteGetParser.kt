@@ -17,29 +17,24 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.service
+package org.eclipse.tractusx.bpdm.pool.service.parser
 
-import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
-import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
-import org.eclipse.tractusx.bpdm.pool.service.operation.AddressAssociationFetchService
+import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteGetParsed
+import org.eclipse.tractusx.bpdm.pool.model.request.SiteGetRequest
 import org.springframework.stereotype.Service
 
+/**
+ * Turns a loose site fetch request into the normalized form the fetch operation looks the site up by.
+ *
+ * Unlike the upsert parsers this one returns its parsed value directly instead of a `ParseResult`: the requested BPN
+ * cannot be rejected — that it names no site is the fetch's outcome, not a parse error.
+ */
 @Service
-class AddressService(
-    private val logisticAddressRepository: LogisticAddressRepository,
-    private val addressAssociationFetchService: AddressAssociationFetchService
-) {
-    private val logger = KotlinLogging.logger { }
+class SiteGetParser {
 
-    fun fetchLogisticAddressDependencies(addresses: Set<LogisticAddressDb>): Set<LogisticAddressDb> {
-        addressAssociationFetchService.fetch(addresses)
-
-        return addresses
-    }
-
-    fun findAddressByBpn(bpn: String): LogisticAddressDb? {
-        logger.debug { "Executing findAddressByBpn() with parameters $bpn" }
-        return logisticAddressRepository.findByBpn(bpn)
-    }
+    /**
+     * Normalizes the request so the site is looked up case-insensitively by its BPN.
+     */
+    fun parse(request: SiteGetRequest): SiteGetParsed =
+        SiteGetParsed(siteBpn = request.siteBpn.uppercase())
 }

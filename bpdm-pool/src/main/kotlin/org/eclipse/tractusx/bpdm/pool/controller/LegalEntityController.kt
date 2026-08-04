@@ -33,10 +33,10 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAdd
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerFetchService
-import org.eclipse.tractusx.bpdm.pool.service.SiteService
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.AddressSearchApplicationV7Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.LegalEntityCreateApplicationV7Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.LegalEntityUpdateApplicationV7Service
+import org.eclipse.tractusx.bpdm.pool.service.application.v7.SiteSearchApplicationV7Service
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
@@ -45,7 +45,7 @@ import org.springframework.web.bind.annotation.RestController
 class LegalEntityController(
     val businessPartnerFetchService: BusinessPartnerFetchService,
     val bpnConfigProperties: BpnConfigProperties,
-    val siteService: SiteService,
+    val siteSearchApplicationService: SiteSearchApplicationV7Service,
     val addressSearchApplicationService: AddressSearchApplicationV7Service,
     val legalEntityCreateApplicationService: LegalEntityCreateApplicationV7Service,
     val legalEntityUpdateApplicationService: LegalEntityUpdateApplicationV7Service
@@ -93,7 +93,7 @@ class LegalEntityController(
         bpnl: String,
         paginationRequest: PaginationRequest
     ): PageDto<SiteVerboseDto> {
-        return siteService.findByParentBpn(bpnl.uppercase(), paginationRequest.page, paginationRequest.size)
+        return siteSearchApplicationService.searchLegalEntitySites(bpnl, paginationRequest)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")

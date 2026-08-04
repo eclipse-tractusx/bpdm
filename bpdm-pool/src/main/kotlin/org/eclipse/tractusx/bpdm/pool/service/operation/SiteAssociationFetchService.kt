@@ -17,29 +17,30 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.service
+package org.eclipse.tractusx.bpdm.pool.service.operation
 
-import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
-import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
-import org.eclipse.tractusx.bpdm.pool.service.operation.AddressAssociationFetchService
+import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
+import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.springframework.stereotype.Service
 
+/**
+ * Loads the associations a site response is built from, one query per association instead of one per site.
+ */
 @Service
-class AddressService(
-    private val logisticAddressRepository: LogisticAddressRepository,
+class SiteAssociationFetchService(
+    private val siteRepository: SiteRepository,
     private val addressAssociationFetchService: AddressAssociationFetchService
 ) {
-    private val logger = KotlinLogging.logger { }
 
-    fun fetchLogisticAddressDependencies(addresses: Set<LogisticAddressDb>): Set<LogisticAddressDb> {
-        addressAssociationFetchService.fetch(addresses)
+    /**
+     * Loads the addresses and states of the given sites into the persistence context, along with everything those
+     * addresses are rendered from.
+     */
+    fun fetch(sites: Set<SiteDb>) {
+        if (sites.isEmpty()) return
 
-        return addresses
-    }
-
-    fun findAddressByBpn(bpn: String): LogisticAddressDb? {
-        logger.debug { "Executing findAddressByBpn() with parameters $bpn" }
-        return logisticAddressRepository.findByBpn(bpn)
+        siteRepository.joinAddresses(sites)
+        siteRepository.joinStates(sites)
+        addressAssociationFetchService.fetch(sites.flatMap { it.addresses }.toSet())
     }
 }

@@ -21,8 +21,6 @@ package org.eclipse.tractusx.bpdm.pool.repository
 
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
@@ -65,11 +63,6 @@ interface SiteRepository : JpaRepository<SiteDb, Long>, JpaSpecificationExecutor
 
     @Query("SELECT DISTINCT p FROM SiteDb p LEFT JOIN FETCH p.states WHERE p IN :partners")
     fun joinStates(partners: Set<SiteDb>): Set<SiteDb>
-
-    @Query("SELECT DISTINCT p FROM SiteDb p LEFT JOIN FETCH p.legalEntity WHERE p IN :partners")
-    fun joinLegalEntities(partners: Set<SiteDb>): Set<SiteDb>
-
-    fun findByLegalEntity(legalEntity: LegalEntityDb, pageable: Pageable): Page<SiteDb>
 
     fun findByBpn(bpn: String): SiteDb?
 
