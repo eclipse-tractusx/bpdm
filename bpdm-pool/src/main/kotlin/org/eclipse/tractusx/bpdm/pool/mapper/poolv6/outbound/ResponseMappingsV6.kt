@@ -74,6 +74,13 @@ fun SiteDb.toV6Dto(): SiteVerboseDtoV6 {
     )
 }
 
+fun LegalEntityDb.toV6PoolDto(): LegalEntityWithLegalAddressVerboseDtoV6 {
+    return LegalEntityWithLegalAddressVerboseDtoV6(
+        legalEntity = toV6Dto(),
+        legalAddress = legalAddress.toV6Dto()
+    )
+}
+
 fun LegalEntityDb.toV6Dto(): LegalEntityVerboseDtoV6 {
     return LegalEntityVerboseDtoV6(
         bpnl = bpn,

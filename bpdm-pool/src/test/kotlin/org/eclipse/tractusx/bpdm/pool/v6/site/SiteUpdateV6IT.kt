@@ -24,7 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.AddressIdentifierDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SiteSearchRequestV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.*
-import org.eclipse.tractusx.bpdm.pool.controller.v6.LegalEntityLegacyServiceMapper
+import org.eclipse.tractusx.bpdm.pool.util.ValidationLimits
 import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolTestBaseV6
 import org.junit.jupiter.api.Test
 
@@ -241,7 +241,7 @@ class SiteUpdateV6IT: UnscheduledPoolTestBaseV6() {
         //THEN
         val expectedError = ErrorInfoV6(
             SiteUpdateErrorV6.MainAddressIdentifiersTooMany,
-            "Amount of identifiers (101) exceeds limit of ${LegalEntityLegacyServiceMapper.IDENTIFIER_AMOUNT_LIMIT}",
+            "Amount of identifiers (101) exceeds limit of ${ValidationLimits.IDENTIFIER_AMOUNT_LIMIT}",
             siteRequest.bpns
         )
         val expectedResponse = SitePartnerUpdateResponseWrapperV6(emptyList(), listOf(expectedError))

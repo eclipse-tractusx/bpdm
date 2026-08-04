@@ -27,7 +27,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntitySearchRequ
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.ErrorInfoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityCreateErrorV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateResponseWrapperV6
-import org.eclipse.tractusx.bpdm.pool.controller.v6.LegalEntityLegacyServiceMapper
+import org.eclipse.tractusx.bpdm.pool.util.ValidationLimits
 import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolTestBaseV6
 import org.junit.jupiter.api.Test
 
@@ -297,7 +297,7 @@ class LegalEntityCreationV6IT: UnscheduledPoolTestBaseV6() {
         //THEN
         val expectedError = ErrorInfoV6(
             LegalEntityCreateErrorV6.LegalAddressIdentifiersTooMany,
-            "Amount of identifiers (101) exceeds limit of ${LegalEntityLegacyServiceMapper.IDENTIFIER_AMOUNT_LIMIT}",
+            "Amount of identifiers (101) exceeds limit of ${ValidationLimits.IDENTIFIER_AMOUNT_LIMIT}",
             newLegalEntityRequest.index
         )
         val expectedResponse = LegalEntityPartnerCreateResponseWrapperV6(emptyList(), listOf(expectedError))

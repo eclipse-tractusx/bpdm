@@ -36,6 +36,7 @@ import org.eclipse.tractusx.bpdm.pool.exception.BpdmRequestSizeException
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV6
 import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.AddressSearchApplicationV6Service
+import org.eclipse.tractusx.bpdm.pool.service.application.v6.LegalEntitySearchApplicationV6Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.SiteSearchApplicationV6Service
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
@@ -44,7 +45,7 @@ import org.springframework.web.bind.annotation.RestController
 class MemberV6Controller(
     private val changelogService: PartnerChangelogService,
     private val controllerConfigProperties: ControllerConfigProperties,
-    private val legalEntityLegacyServiceMapper: LegalEntityLegacyServiceMapper,
+    private val legalEntitySearchApplicationService: LegalEntitySearchApplicationV6Service,
     private val siteSearchApplicationService: SiteSearchApplicationV6Service,
     private val addressSearchApplicationService: AddressSearchApplicationV6Service
 ) : PoolMembersV6Api {
@@ -55,14 +56,7 @@ class MemberV6Controller(
         searchRequest: LegalEntitySearchRequestV6,
         paginationRequest: PaginationRequest
     ): PageDto<LegalEntityWithLegalAddressVerboseDtoV6> {
-        return legalEntityLegacyServiceMapper.searchLegalEntities(
-            LegalEntityLegacyServiceMapper.LegalEntitySearchRequest(
-                bpnLs = searchRequest.bpnLs,
-                legalName = searchRequest.legalName,
-                isCatenaXMemberData = true
-            ),
-            paginationRequest
-        )
+        return legalEntitySearchApplicationService.searchMemberLegalEntities(searchRequest, paginationRequest)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_MEMBER_PARTNER})")

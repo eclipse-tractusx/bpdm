@@ -17,26 +17,12 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.service
+package org.eclipse.tractusx.bpdm.pool.model.parsed
 
-import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.BusinessPartnerSearchFilterType
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.BusinessPartnerSearchResultDto
+/** The identifier a single legal entity is looked up by, in the shape the lookup that accepts it needs. */
+sealed interface LegalEntityGetParsed {
 
-/**
- * Provides search functionality on the Catena-x data for the BPDM system
- */
-interface SearchService {
+    data class ByBpn(val legalEntityBpn: String) : LegalEntityGetParsed
 
-    /**
-     * Find business partner by matching their field values to [searchRequest] field query texts
-     */
-    fun searchBusinessPartner(
-        searchRequest: LegalEntityPropertiesSearchRequest,
-        searchResultFilter: Set<BusinessPartnerSearchFilterType>?,
-        paginationRequest: PaginationRequest
-    ): PageDto<BusinessPartnerSearchResultDto>
-
+    data class ByIdentifier(val identifierTypeKey: String, val identifierValue: String) : LegalEntityGetParsed
 }

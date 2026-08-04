@@ -23,7 +23,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.AddressIdentifierDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerUpdateResponseWrapperV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressUpdateErrorV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.ErrorInfoV6
-import org.eclipse.tractusx.bpdm.pool.controller.v6.LegalEntityLegacyServiceMapper.Companion.IDENTIFIER_AMOUNT_LIMIT
+import org.eclipse.tractusx.bpdm.pool.util.ValidationLimits.IDENTIFIER_AMOUNT_LIMIT
 import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolTestBaseV6
 import org.junit.jupiter.api.Test
 

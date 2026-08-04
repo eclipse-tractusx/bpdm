@@ -30,22 +30,18 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntitySearchRequ
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateResponseWrapperV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerUpdateResponseWrapperV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityWithLegalAddressVerboseDtoV6
-import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
-import org.eclipse.tractusx.bpdm.pool.service.application.v6.AddressSearchApplicationV6Service
-import org.eclipse.tractusx.bpdm.pool.service.application.v6.LegalEntityCreateApplicationV6Service
-import org.eclipse.tractusx.bpdm.pool.service.application.v6.LegalEntityUpdateApplicationV6Service
-import org.eclipse.tractusx.bpdm.pool.service.application.v6.SiteSearchApplicationV6Service
+import org.eclipse.tractusx.bpdm.pool.service.application.v6.*
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
 @RestController("LegalEntityControllerLegacy")
 class LegalEntityV6Controller(
-    val legalEntityLegacyServiceMapper: LegalEntityLegacyServiceMapper,
     val siteSearchApplicationService: SiteSearchApplicationV6Service,
     val addressSearchApplicationService: AddressSearchApplicationV6Service,
-    val bpnConfigProperties: BpnConfigProperties,
+    val legalEntitySearchApplicationService: LegalEntitySearchApplicationV6Service,
+    val legalEntityGetApplicationService: LegalEntityGetApplicationV6Service,
     val legalEntityCreateApplicationService: LegalEntityCreateApplicationV6Service,
     val legalEntityUpdateApplicationService: LegalEntityUpdateApplicationV6Service
 ) : PoolLegalEntityV6Api {
@@ -55,21 +51,12 @@ class LegalEntityV6Controller(
         @ParameterObject searchRequest: LegalEntitySearchRequestV6,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageDto<LegalEntityWithLegalAddressVerboseDtoV6> {
-        return legalEntityLegacyServiceMapper.searchLegalEntities(
-            LegalEntityLegacyServiceMapper.LegalEntitySearchRequest(
-                bpnLs = searchRequest.bpnLs,
-                legalName = searchRequest.legalName,
-                isCatenaXMemberData = null
-            ),
-            paginationRequest
-        )
+        return legalEntitySearchApplicationService.searchLegalEntities(searchRequest, paginationRequest)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun getLegalEntity(idValue: String, idType: String?): LegalEntityWithLegalAddressVerboseDtoV6 {
-        val actualType = idType ?: bpnConfigProperties.id
-        return if (actualType == bpnConfigProperties.id) legalEntityLegacyServiceMapper.findLegalEntityIgnoreCase(idValue.uppercase())
-        else legalEntityLegacyServiceMapper.findLegalEntityIgnoreCase(actualType, idValue)
+        return legalEntityGetApplicationService.getLegalEntity(idValue, idType)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
@@ -77,14 +64,7 @@ class LegalEntityV6Controller(
         searchRequest: LegalEntitySearchRequestV6,
         paginationRequest: PaginationRequest
     ): PageDto<LegalEntityWithLegalAddressVerboseDtoV6> {
-        return legalEntityLegacyServiceMapper.searchLegalEntities(
-            LegalEntityLegacyServiceMapper.LegalEntitySearchRequest(
-                searchRequest.bpnLs,
-                searchRequest.legalName,
-                isCatenaXMemberData = null
-            ),
-            paginationRequest
-        )
+        return legalEntitySearchApplicationService.searchLegalEntities(searchRequest, paginationRequest)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")

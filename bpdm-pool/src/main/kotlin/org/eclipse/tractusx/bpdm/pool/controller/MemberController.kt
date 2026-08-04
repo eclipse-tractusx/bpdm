@@ -33,16 +33,16 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerb
 import org.eclipse.tractusx.bpdm.pool.config.ControllerConfigProperties
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmRequestSizeException
-import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerFetchService
 import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.AddressSearchApplicationV7Service
+import org.eclipse.tractusx.bpdm.pool.service.application.v7.LegalEntitySearchApplicationV7Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.SiteSearchApplicationV7Service
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class MemberController(
-    private val businessPartnerFetchService: BusinessPartnerFetchService,
+    private val legalEntitySearchApplicationService: LegalEntitySearchApplicationV7Service,
     private val siteSearchApplicationService: SiteSearchApplicationV7Service,
     private val addressSearchApplicationService: AddressSearchApplicationV7Service,
     private val changelogService: PartnerChangelogService,
@@ -55,14 +55,7 @@ class MemberController(
         searchRequest: LegalEntitySearchRequest,
         paginationRequest: PaginationRequest
     ): PageDto<LegalEntityWithLegalAddressVerboseDto> {
-        return businessPartnerFetchService.searchLegalEntities(
-            BusinessPartnerFetchService.LegalEntitySearchRequest(
-                bpnLs = searchRequest.bpnLs,
-                legalName = searchRequest.legalName,
-                isCatenaXMemberData = true
-            ),
-            paginationRequest
-        )
+        return legalEntitySearchApplicationService.searchMemberLegalEntities(searchRequest, paginationRequest)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_MEMBER_PARTNER})")

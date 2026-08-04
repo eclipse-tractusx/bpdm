@@ -30,23 +30,18 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntitySearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerUpdateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
-import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerFetchService
-import org.eclipse.tractusx.bpdm.pool.service.application.v7.AddressSearchApplicationV7Service
-import org.eclipse.tractusx.bpdm.pool.service.application.v7.LegalEntityCreateApplicationV7Service
-import org.eclipse.tractusx.bpdm.pool.service.application.v7.LegalEntityUpdateApplicationV7Service
-import org.eclipse.tractusx.bpdm.pool.service.application.v7.SiteSearchApplicationV7Service
+import org.eclipse.tractusx.bpdm.pool.service.application.v7.*
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class LegalEntityController(
-    val businessPartnerFetchService: BusinessPartnerFetchService,
-    val bpnConfigProperties: BpnConfigProperties,
     val siteSearchApplicationService: SiteSearchApplicationV7Service,
     val addressSearchApplicationService: AddressSearchApplicationV7Service,
+    val legalEntitySearchApplicationService: LegalEntitySearchApplicationV7Service,
+    val legalEntityGetApplicationService: LegalEntityGetApplicationV7Service,
     val legalEntityCreateApplicationService: LegalEntityCreateApplicationV7Service,
     val legalEntityUpdateApplicationService: LegalEntityUpdateApplicationV7Service
 ) : PoolLegalEntityApi {
@@ -56,21 +51,12 @@ class LegalEntityController(
         @ParameterObject searchRequest: LegalEntitySearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageDto<LegalEntityWithLegalAddressVerboseDto> {
-        return businessPartnerFetchService.searchLegalEntities(
-            BusinessPartnerFetchService.LegalEntitySearchRequest(
-                bpnLs = searchRequest.bpnLs,
-                legalName = searchRequest.legalName,
-                isCatenaXMemberData = null
-            ),
-            paginationRequest
-        )
+        return legalEntitySearchApplicationService.searchLegalEntities(searchRequest, paginationRequest)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun getLegalEntity(idValue: String, idType: String?): LegalEntityWithLegalAddressVerboseDto {
-        val actualType = idType ?: bpnConfigProperties.id
-        return if (actualType == bpnConfigProperties.id) businessPartnerFetchService.findLegalEntityIgnoreCase(idValue.uppercase())
-        else businessPartnerFetchService.findLegalEntityIgnoreCase(actualType, idValue)
+        return legalEntityGetApplicationService.getLegalEntity(idValue, idType)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
@@ -78,14 +64,7 @@ class LegalEntityController(
         searchRequest: LegalEntitySearchRequest,
         paginationRequest: PaginationRequest
     ): PageDto<LegalEntityWithLegalAddressVerboseDto> {
-        return businessPartnerFetchService.searchLegalEntities(
-            BusinessPartnerFetchService.LegalEntitySearchRequest(
-                searchRequest.bpnLs,
-                searchRequest.legalName,
-                isCatenaXMemberData = null
-            ),
-            paginationRequest
-        )
+        return legalEntitySearchApplicationService.searchLegalEntities(searchRequest, paginationRequest)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
