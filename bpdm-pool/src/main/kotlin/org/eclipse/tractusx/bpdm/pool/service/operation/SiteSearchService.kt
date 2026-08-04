@@ -19,9 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.service.operation
 
-import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
-import org.eclipse.tractusx.bpdm.pool.model.parsed.AddressSearchParsed
-import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
+import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
+import org.eclipse.tractusx.bpdm.pool.model.parsed.SiteSearchParsed
+import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.Specification
@@ -29,31 +29,29 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Queries addresses by search criteria.
+ * Queries sites by search criteria.
  */
 @Service
-class AddressSearchService(
-    private val logisticAddressRepository: LogisticAddressRepository,
-    private val addressAssociationFetchService: AddressAssociationFetchService
+class SiteSearchService(
+    private val siteRepository: SiteRepository,
+    private val siteAssociationFetchService: SiteAssociationFetchService
 ) {
 
     /**
-     * Returns the requested page of addresses matching every given criterion, where a criterion left empty matches all.
+     * Returns the requested page of sites matching every given criterion, where a criterion left empty matches all.
      */
     @Transactional(readOnly = true)
-    fun search(criteria: AddressSearchParsed, pageable: Pageable): Page<LogisticAddressDb> {
+    fun search(criteria: SiteSearchParsed, pageable: Pageable): Page<SiteDb> {
         val specification = Specification.allOf(
-            LogisticAddressRepository.byBpns(criteria.addressBpns),
-            LogisticAddressRepository.bySiteBpns(criteria.siteBpns),
-            LogisticAddressRepository.byLegalEntityBpns(criteria.legalEntityBpns),
-            LogisticAddressRepository.byName(criteria.name),
-            LogisticAddressRepository.byIsMember(criteria.isCatenaXMemberData),
-            LogisticAddressRepository.withoutSites(criteria.excludesSiteAddresses)
+            SiteRepository.byBpns(criteria.siteBpns),
+            SiteRepository.byParentBpns(criteria.legalEntityBpns),
+            SiteRepository.byName(criteria.name),
+            SiteRepository.byIsMember(criteria.isCatenaXMemberData)
         )
 
-        val addressPage = logisticAddressRepository.findAll(specification, pageable)
-        addressAssociationFetchService.fetch(addressPage.content.toSet())
+        val sitePage = siteRepository.findAll(specification, pageable)
+        siteAssociationFetchService.fetch(sitePage.content.toSet())
 
-        return addressPage
+        return sitePage
     }
 }

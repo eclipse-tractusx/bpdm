@@ -29,10 +29,7 @@ package org.eclipse.tractusx.bpdm.pool.mapper.poolv6
  */
 
 import org.eclipse.tractusx.bpdm.pool.api.model.*
-import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteCreateRequestWithLegalAddressAsMain
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.AddressIdentifierDtoV6 as V6AddressIdentifierDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.AddressIdentifierVerboseDtoV6 as V6AddressIdentifierVerboseDto
@@ -59,6 +56,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.AddressSearchRequestV
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SiteCreateRequestWithLegalAddressAsMainV6 as V6SiteCreateRequestWithLegalAddressAsMain
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SitePartnerCreateRequestV6 as V6SitePartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SitePartnerUpdateRequestV6 as V6SitePartnerUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SiteSearchRequestV6 as V6SiteSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.BpnIdentifierMappingDtoV6 as V6BpnIdentifierMappingDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.BpnRequestIdentifierMappingDtoV6 as V6BpnRequestIdentifierMappingDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.ChangelogEntryVerboseDtoV6 as V6ChangelogEntryVerboseDto
@@ -234,6 +232,12 @@ fun V6AddressSearchRequest.toV7() = AddressSearchRequest(
     addressBpns = addressBpns,
     legalEntityBpns = legalEntityBpns,
     siteBpns = siteBpns,
+    name = name
+)
+
+fun V6SiteSearchRequest.toV7() = SiteSearchRequest(
+    siteBpns = siteBpns,
+    legalEntityBpns = legalEntityBpns,
     name = name
 )
 

@@ -37,6 +37,7 @@ import org.eclipse.tractusx.bpdm.pool.exception.BusinessPartnerSearchException
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
+import org.eclipse.tractusx.bpdm.pool.service.operation.SiteAssociationFetchService
 import org.springframework.context.annotation.Primary
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
@@ -51,7 +52,7 @@ class BusinessPartnerSearchService(
     private val legalEntityRepository: LegalEntityRepository,
     private val businessPartnerFetchService: BusinessPartnerFetchService,
     private val addressService: AddressService,
-    private val siteService: SiteService,
+    private val siteAssociationFetchService: SiteAssociationFetchService,
     private val logisticAddressRepository: LogisticAddressRepository,
     private val siteRepository: SiteRepository
 ): SearchService {
@@ -186,7 +187,7 @@ class BusinessPartnerSearchService(
         paginationRequest: PaginationRequest
     ): PageDto<SiteMatchVerboseDto> {
         val sitePage = searchAndPreparePageSite(paginationRequest)
-        siteService.fetchSiteDependenciesPage(sitePage.content.map { site -> site }.toSet())
+        siteAssociationFetchService.fetch(sitePage.content.map { site -> site }.toSet())
 
         return with(sitePage) {
             PageDto(

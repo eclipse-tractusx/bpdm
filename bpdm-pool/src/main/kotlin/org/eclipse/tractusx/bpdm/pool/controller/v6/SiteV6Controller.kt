@@ -31,13 +31,16 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerUpdateRes
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SiteWithMainAddressVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.SiteCreateApplicationV6Service
+import org.eclipse.tractusx.bpdm.pool.service.application.v6.SiteGetApplicationV6Service
+import org.eclipse.tractusx.bpdm.pool.service.application.v6.SiteSearchApplicationV6Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.SiteUpdateApplicationV6Service
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
 @RestController("SiteControllerLegacy")
 class SiteV6Controller(
-    private val siteLegacyServiceMapper: SiteLegacyServiceMapper,
+    private val siteGetApplicationService: SiteGetApplicationV6Service,
+    private val siteSearchApplicationService: SiteSearchApplicationV6Service,
     private val siteCreateApplicationService: SiteCreateApplicationV6Service,
     private val siteUpdateApplicationService: SiteUpdateApplicationV6Service
 ) : PoolSiteV6Api {
@@ -46,7 +49,7 @@ class SiteV6Controller(
     override fun getSite(
         bpns: String
     ): SiteWithMainAddressVerboseDtoV6 {
-        return siteLegacyServiceMapper.findByBpn(bpns.uppercase())
+        return siteGetApplicationService.getSite(bpns)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
@@ -54,15 +57,7 @@ class SiteV6Controller(
         searchRequest: SiteSearchRequestV6,
         paginationRequest: PaginationRequest
     ): PageDto<SiteWithMainAddressVerboseDtoV6> {
-        return siteLegacyServiceMapper.searchSites(
-            SiteLegacyServiceMapper.SiteSearchRequest(
-                siteBpns = searchRequest.siteBpns,
-                legalEntityBpns = searchRequest.legalEntityBpns,
-                name = searchRequest.name,
-                isCatenaXMemberData = null
-            ),
-            paginationRequest
-        )
+        return siteSearchApplicationService.searchSites(searchRequest, paginationRequest)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")

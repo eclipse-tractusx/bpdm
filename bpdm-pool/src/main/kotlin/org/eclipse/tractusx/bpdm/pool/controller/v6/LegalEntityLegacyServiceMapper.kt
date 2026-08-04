@@ -24,16 +24,12 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.SiteVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityWithLegalAddressVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
-import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
 import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.outbound.toV6Dto
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
-import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
-import org.eclipse.tractusx.bpdm.pool.service.AddressService
 import org.eclipse.tractusx.bpdm.pool.service.toDto
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.jpa.domain.Specification
@@ -43,9 +39,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class LegalEntityLegacyServiceMapper(
     private val legalEntityRepository: LegalEntityRepository,
-    private val identifierTypeRepository: IdentifierTypeRepository,
-    private val siteRepository: SiteRepository,
-    private val addressService: AddressService
+    private val identifierTypeRepository: IdentifierTypeRepository
 ) {
 
     companion object {
@@ -118,21 +112,5 @@ class LegalEntityLegacyServiceMapper(
         val legalName: String?,
         val isCatenaXMemberData: Boolean?
     )
-
-    fun findByParentBpn(bpn: String, pageIndex: Int, pageSize: Int): PageDto<SiteVerboseDtoV6> {
-        logger.debug { "Executing findByPartnerBpn() with parameters $bpn // $pageIndex // $pageSize" }
-        val legalEntity = legalEntityRepository.findByBpnIgnoreCase(bpn) ?: throw BpdmNotFoundException("Business Partner", bpn)
-
-        val page = siteRepository.findByLegalEntity(legalEntity, PageRequest.of(pageIndex, pageSize))
-        fetchSiteDependencies(page.toSet())
-        return page.toDto(page.content.map { it.toV6Dto() })
-    }
-
-    private fun fetchSiteDependencies(sites: Set<SiteDb>) {
-        siteRepository.joinAddresses(sites)
-        siteRepository.joinStates(sites)
-        val addresses = sites.flatMap { it.addresses }.toSet()
-        addressService.fetchLogisticAddressDependencies(addresses)
-    }
 
 }

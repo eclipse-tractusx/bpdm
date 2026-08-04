@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import jakarta.transaction.Transactional
-import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.SiteDb
@@ -46,7 +45,6 @@ import org.springframework.stereotype.Service
 @Service
 class TaskStepBuildService(
     private val businessPartnerFetchService: BusinessPartnerFetchService,
-    private val siteService: SiteService,
     private val addressService: AddressService,
     private val bpnRequestIdentifierRepository: BpnRequestIdentifierRepository,
     private val taskResolutionMapper: TaskResolutionMapper,
@@ -315,8 +313,7 @@ class TaskStepBuildService(
     }
 
     private fun fetchSiteResult(bpnS: String, hasChanged: Boolean?): Site =
-        siteService.searchSites(SiteService.SiteSearchRequest(siteBpns = listOf(bpnS), null, null, null), PaginationRequest(0, 1))
-            .content.firstOrNull()
+        siteRepository.findByBpn(bpnS)?.toPoolDto()
             ?.let { taskResolutionMapper.toTaskResult(it.site, it.mainAddress, hasChanged) }
             ?: throw BpdmValidationException(CleaningError.MAINE_ADDRESS_IS_NULL.message)
 
