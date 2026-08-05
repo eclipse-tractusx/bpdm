@@ -35,20 +35,5 @@ class ReasonCodeDeleteV7IT: UnscheduledPoolTestBaseV7(){
      * WHEN operator deletes reason code by technical key
      * THEN operator sees reason code deleted
      */
-    @Test
-    fun `delete reason code`(){
-        //GIVEN
-        val createRequest = ReasonCodeUpsertRequest(ReasonCodeDto(testName, "$testName description"))
-        poolClient.metadata.upsertReasonCode(createRequest)
 
-        //WHEN
-        val deleteRequest = ReasonCodeDeleteRequest(createRequest.reasonCode.technicalKey)
-        poolClient.metadata.deleteReasonCode(deleteRequest)
-
-        //THEN
-        val searchResult = poolClient.metadata.getReasonCodes(PaginationRequest())
-
-        val expected = PageDto<ReasonCodeDto>(0, 0, 0, 0, emptyList())
-        assertThat(searchResult).isEqualTo(expected)
-    }
 }

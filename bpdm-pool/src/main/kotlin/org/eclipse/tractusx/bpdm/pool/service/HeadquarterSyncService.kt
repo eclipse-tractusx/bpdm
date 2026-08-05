@@ -30,6 +30,7 @@ import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddressDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
 import org.eclipse.tractusx.bpdm.pool.repository.AddressRelationRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
+import org.eclipse.tractusx.bpdm.pool.service.operation.ScriptVariantCoverageService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
@@ -38,6 +39,7 @@ import java.time.LocalDate
 class HeadquarterSyncService(
     private val relationRepository: AddressRelationRepository,
     private val legalEntityRepository: LegalEntityRepository,
+    private val scriptVariantCoverageService: ScriptVariantCoverageService,
     private val changelogService: PartnerChangelogService
 ) {
     private val logger = KotlinLogging.logger { }
@@ -84,6 +86,8 @@ class HeadquarterSyncService(
 
             legalEntityRepository.save(legalEntityDb)
             logger.info { "Updated legal address of legal entity '${legalEntityDb.bpn}': From '${currentLegalAddress.bpn}' to '${newLegalAddress.bpn}'" }
+
+            scriptVariantCoverageService.pruneUncoveredScriptVariants(legalEntityDb)
 
             changelogService.createChangelogEntry(ChangelogEntryCreateRequest(legalEntityDb.bpn, ChangelogType.UPDATE, BusinessPartnerType.LEGAL_ENTITY))
             changelogService.createChangelogEntry(ChangelogEntryCreateRequest(currentLegalAddress.bpn, ChangelogType.UPDATE, BusinessPartnerType.ADDRESS))

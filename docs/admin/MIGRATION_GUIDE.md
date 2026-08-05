@@ -2,17 +2,20 @@
 
 <!-- TOC -->
 * [Migration Guide](#migration-guide)
-  * [Next](#next)
+  * [7.4.x to 7.5.x](#74x-to-75x)
+    * [Unique site names per legal entity](#unique-site-names-per-legal-entity)
+    * [Script variants removed from the deprecated Pool v6 API](#script-variants-removed-from-the-deprecated-pool-v6-api)
+    * [Script variants are validated like invariant data (Pool)](#script-variants-are-validated-like-invariant-data-pool)
+  * [7.3.x to 7.4.x](#73x-to-74x)
     * [Breaking rename of relation DTO fields (Gate)](#breaking-rename-of-relation-dto-fields-gate)
       * [Impact](#impact)
       * [Rationale](#rationale)
     * [New relation type for addresses](#new-relation-type-for-addresses)
     * [No required operator actions](#no-required-operator-actions)
     * [Reason Codes](#reason-codes)
-  * [7.2.x to 7.3.x](#72x-to-73x)
     * [Postgres Upgrade (BREAKING)](#postgres-upgrade-breaking)
     * [Keycloak Upgrade (BREAKING)](#keycloak-upgrade-breaking)
-  * [7.2.x to 7.3.x](#72x-to-73x-1)
+  * [7.2.x to 7.3.x](#72x-to-73x)
     * [Automatic Confidence Level](#automatic-confidence-level)
   * [7.1.x to 7.2.x](#71x-to-72x)
     * [Alternative Headquarters Restriction](#alternative-headquarters-restriction)
@@ -24,7 +27,80 @@
 <!-- TOC -->
 
 
-## Next
+## 7.4.x to 7.5.x
+
+### Unique site names per legal entity
+
+A site's name must now be unique within its owning legal entity.
+This is enforced by a new database constraint (`uc_sites_legal_entity_name`) on the Pool's `sites` table.
+
+> Very important:
+> The migration adds this constraint directly and does **not** resolve pre-existing duplicates.
+> If your Pool already contains two or more sites with the same name under the same legal entity, the migration will fail.
+> Please make sure that site names are unique within each legal entity before upgrading, otherwise the deployment will not start.
+
+### Script variants removed from the deprecated Pool v6 API
+
+Script variants were introduced in 7.4.0, at which point the Pool v6 API was already frozen.
+They should never have become part of it, and the v6 API no longer offers them:
+`scriptVariants` is gone from the v6 address create and update requests, from the v6 site DTO used by site create and update, and from the v6 request that creates a site with the legal address as its main address.
+
+#### Impact
+
+- **No operator action is required and no data is migrated.** Script variants themselves are unchanged; only the v6 API surface loses them.
+  The v7 API and the golden record process remain the way to read and write them.
+- **v6 callers sending `scriptVariants` are not rejected.** The field is ignored rather than refused, so existing v6 requests keep working and no request needs to be changed to avoid an error.
+- **A v6 write leaves a business partner without script variants.** Because a write replaces a business partner's full content, updating over v6 a business partner that has script variants — gained over v7 or through the golden record process — removes them.
+  This also produces an `UPDATE` changelog entry, so sharing members will see the script variants disappear from their Gate output.
+  Mixing v6 writes with script variants is therefore not supported; use the v7 API for business partners that carry them.
+- **Consumers compiling against `bpdm-pool-api` must adjust.** The affected v6 request classes lost a constructor parameter.
+  Code that constructs them positionally will no longer compile and needs the `scriptVariants` argument removed.
+
+### Script variants are validated like invariant data (Pool)
+
+A script variant is a business partner written out completely in another script, so it now has to carry the same mandatory content as the invariant data it mirrors:
+
+- a legal entity script variant must carry a `legalName`
+- a site script variant must carry a `name`
+- an address script variant must carry `physicalAddress.city`, and — if it supplies an `alternativeAddress` at all — `alternativeAddress.city`
+- no two script variants of one business partner may share the same script code
+- a legal entity or site script variant is only valid where its legal address or site main address covers the same script code,
+  and no write may take that coverage away from a business partner that still needs it
+
+Those fields are non-null in the v7 API, so the requirement is part of the schema rather than a check applied afterwards.
+Blank and whitespace-only values are still rejected by validation, per entry.
+
+#### Impact
+
+- **The migration deletes script variants that do not meet the rules.** `V7_5_0_5__require_script_variant_content.sql` removes
+  `legal_entity_script_variants` rows without a `legal_name`, `site_script_variants` rows without a `name`, `address_script_variants` rows without a `phy_city`,
+  and legal entity or site script variants whose script code the owning legal address or site main address does not cover.
+  It then sets those three columns `NOT NULL`.
+  If you need to keep such data, export it before upgrading — the rows are invalid under the new contract and cannot be represented by the API any more.
+- **Requests missing a required field are rejected as a whole.** Because the field is non-null in the schema, a missing value fails deserialization with a `400` for the entire request instead of a per-entry error.
+  A blank value still yields a per-entry `ErrorInfo`; the new codes are `ScriptVariantLegalNameMissing`, `ScriptVariantNameMissing`, `ScriptVariantCityMissing`, `ScriptVariantDuplicateScriptCode`,
+  `ScriptVariantNotCoveredByMainAddress`, `ScriptVariantCoverageStillNeeded` and the `LegalAddress…` / `MainAddress…` counterparts.
+- **A script variant can no longer translate only the address.** In the v7 and Orchestrator models one script variant carries the name *and* the address of a script code together.
+  A sharing member who transliterates the legal address must therefore also transliterate the legal name (and likewise for a site).
+  Golden record tasks whose script variants do not meet the rules end up in the error state, and the sharing member sees the reason in the Gate sharing state.
+- **A site created on an existing address can only be named in the scripts that address covers.** The endpoint that takes the legal address as the site main address
+  rejects a site script variant whose script code the legal address does not cover.
+- **An update may not strand another business partner's coverage.** Every write that replaces an address's script variants — an address update, a site update, a legal entity update, and the
+  golden record process creating a site on an existing address — is rejected with `ScriptVariantCoverageStillNeeded` when the new content drops a script code that the address's legal entity
+  or one of its sites is still named in. This is reachable wherever an address serves more than one business partner: a main address shared by several sites, or an address that is both a
+  legal address and a site main address. The error names the script code and the BPN that still requires it.
+- **A golden record task that puts a site on an existing address must carry that address's coverage.** The Pool now applies the site main address payload of such a task to the referenced
+  address instead of discarding it, which is what lets a newly shared site be named in its own scripts. In exchange, an enrichment service that places a site on an address another site is
+  already named on has to include that address's existing coverage in its payload — the Pool does not merge them, it rejects the task. Records that fail this way end in the error sharing state.
+  A task is judged as a whole, not per write: it may freely rewrite the business partners it carries itself — a legal entity and its site sharing one address can move to another script
+  together — and is only rejected for coverage it would take away from a business partner it does not carry.
+- **A headquarter relocation drops the legal entity's uncovered script variants.** When the new legal address does not cover a script code, the legal entity's script variant for it is removed
+  and an `UPDATE` changelog entry is emitted, so sharing members will see the script variant disappear from their Gate output.
+- **Consumers compiling against `bpdm-pool-api` must adjust.** `SiteScriptVariantDto.name`, `SiteHeaderScriptVariantDto.name`, `LegalEntityScriptVariantDto.legalName`,
+  `PhysicalAddressScriptVariantDto.city` and `AlternativeAddressScriptVariantDto.city` are non-null, and `PhysicalAddressScriptVariantDto.city` and `PostalAddressScriptVariantDto.physicalAddress`
+  lost their default values, so they must be supplied explicitly.
+
+## 7.3.x to 7.4.x
 
 ### Breaking rename of relation DTO fields (Gate)
 
@@ -85,8 +161,6 @@ The list of available reason codes should be managed in the golden record Pool t
 > Very important:
 > Since reason codes are mandatory and there are no default reason codes this repository does not contain any migration scripts for existing relations.
 > Therefore, if there are already relations present in BPDM the operator needs to add migration scripts assigning reason codes to those relations.
-
-## 7.2.x to 7.3.x
 
 ### Postgres Upgrade (BREAKING)
 

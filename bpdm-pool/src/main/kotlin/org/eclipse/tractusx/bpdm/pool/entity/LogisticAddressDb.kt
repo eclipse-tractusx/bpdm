@@ -27,7 +27,6 @@ import org.eclipse.tractusx.bpdm.common.model.BaseEntity
     name = "logistic_addresses",
     indexes = [
         Index(columnList = "legal_entity_id"),
-        Index(columnList = "site_id"),
     ]
 )
 class LogisticAddressDb(
@@ -37,10 +36,6 @@ class LogisticAddressDb(
     @ManyToOne
     @JoinColumn(name = "legal_entity_id")
     var legalEntity: LegalEntityDb?,
-
-    @ManyToOne
-    @JoinColumn(name = "site_id")
-    var site: SiteDb?,
 
     @Column(name = "name")
     var name: String?,
@@ -70,4 +65,20 @@ class LogisticAddressDb(
 
     @OneToMany(mappedBy = "endAddress", cascade = [CascadeType.ALL], orphanRemoval = true)
     val endAddressRelations: MutableSet<AddressRelationDb> = mutableSetOf()
+
+    /**
+     * The sites this address belongs to. A single unified relationship: there is no stored "primary" site — the API's
+     * `bpnSite` is derived as the oldest member by `createdAt` and the remainder is exposed as `additionalSites`
+     * (see [mainSite] / [additionalSites] in ResponseMappings). A site's main address is also a member of its own set,
+     * which is how it is classified (see `getAddressType`).
+     */
+    @ManyToMany
+    @JoinTable(
+        name = "address_sites",
+        joinColumns = [JoinColumn(name = "address_id", referencedColumnName = "id")],
+        inverseJoinColumns = [JoinColumn(name = "site_id", referencedColumnName = "id")]
+    )
+    val sites: MutableSet<SiteDb> = mutableSetOf()
+
+    fun scriptCodes(): List<String> = scriptVariants.map { it.scriptCode.technicalKey }
 }

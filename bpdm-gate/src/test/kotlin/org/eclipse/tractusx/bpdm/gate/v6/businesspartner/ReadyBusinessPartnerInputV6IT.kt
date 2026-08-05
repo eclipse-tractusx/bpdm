@@ -25,7 +25,7 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyRequest
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.SharingStateDto
-import org.eclipse.tractusx.bpdm.gate.v6.GateUnscheduledInitialStartV6Test
+import org.eclipse.tractusx.bpdm.gate.v6.UnscheduledGateV6TestBase
 import org.junit.jupiter.api.Test
 import org.springframework.web.reactive.function.client.WebClientResponseException
 
@@ -47,7 +47,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
  *
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
-class ReadyBusinessPartnerInputV6IT: GateUnscheduledInitialStartV6Test() {
+class ReadyBusinessPartnerInputV6IT: UnscheduledGateV6TestBase() {
 
 
     /**

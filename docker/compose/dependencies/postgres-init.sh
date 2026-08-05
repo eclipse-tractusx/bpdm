@@ -1,3 +1,4 @@
+#!/bin/sh
 ################################################################################
 # Copyright (c) 2021 Contributors to the Eclipse Foundation
 #

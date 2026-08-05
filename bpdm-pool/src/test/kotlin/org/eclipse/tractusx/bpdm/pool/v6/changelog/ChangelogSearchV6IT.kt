@@ -23,9 +23,9 @@ import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
-import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.ChangelogTypeV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.ChangelogSearchRequestV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.ChangelogEntryVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolTestBaseV6
 import org.junit.jupiter.api.Test
 import java.time.Instant
@@ -52,21 +52,21 @@ class ChangelogSearchV6IT: UnscheduledPoolTestBaseV6() {
         testDataClient.updateAddress(additionalAddress, "Updated $testName")
 
         //WHEN
-        val searchResponse = poolClient.changelogs.getChangelogEntries(ChangelogSearchRequest(), PaginationRequest(0, 20))
+        val searchResponse = poolClient.changelogs.getChangelogEntries(ChangelogSearchRequestV6(), PaginationRequest(0, 20))
 
         //THEN
         val expectedEntries = listOf(
-            ChangelogEntryVerboseDto(legalEntityResponse.legalEntity.bpnl, BusinessPartnerType.LEGAL_ENTITY, anyTime, ChangelogType.CREATE),
-            ChangelogEntryVerboseDto(legalEntityResponse.legalAddress.bpna, BusinessPartnerType.ADDRESS, anyTime, ChangelogType.CREATE),
-            ChangelogEntryVerboseDto(siteResponse.site.bpns, BusinessPartnerType.SITE, anyTime, ChangelogType.CREATE),
-            ChangelogEntryVerboseDto(siteResponse.mainAddress.bpna, BusinessPartnerType.ADDRESS, anyTime, ChangelogType.CREATE),
-            ChangelogEntryVerboseDto(additionalAddress.address.bpna, BusinessPartnerType.ADDRESS, anyTime, ChangelogType.CREATE),
+            ChangelogEntryVerboseDtoV6(legalEntityResponse.legalEntity.bpnl, BusinessPartnerType.LEGAL_ENTITY, anyTime, ChangelogTypeV6.CREATE),
+            ChangelogEntryVerboseDtoV6(legalEntityResponse.legalAddress.bpna, BusinessPartnerType.ADDRESS, anyTime, ChangelogTypeV6.CREATE),
+            ChangelogEntryVerboseDtoV6(siteResponse.site.bpns, BusinessPartnerType.SITE, anyTime, ChangelogTypeV6.CREATE),
+            ChangelogEntryVerboseDtoV6(siteResponse.mainAddress.bpna, BusinessPartnerType.ADDRESS, anyTime, ChangelogTypeV6.CREATE),
+            ChangelogEntryVerboseDtoV6(additionalAddress.address.bpna, BusinessPartnerType.ADDRESS, anyTime, ChangelogTypeV6.CREATE),
 
-            ChangelogEntryVerboseDto(legalEntityResponse.legalEntity.bpnl, BusinessPartnerType.LEGAL_ENTITY, anyTime, ChangelogType.UPDATE),
-            ChangelogEntryVerboseDto(legalEntityResponse.legalAddress.bpna, BusinessPartnerType.ADDRESS, anyTime, ChangelogType.UPDATE),
-            ChangelogEntryVerboseDto(siteResponse.site.bpns, BusinessPartnerType.SITE, anyTime, ChangelogType.UPDATE),
-            ChangelogEntryVerboseDto(siteResponse.mainAddress.bpna, BusinessPartnerType.ADDRESS, anyTime, ChangelogType.UPDATE),
-            ChangelogEntryVerboseDto(additionalAddress.address.bpna, BusinessPartnerType.ADDRESS, anyTime, ChangelogType.UPDATE)
+            ChangelogEntryVerboseDtoV6(legalEntityResponse.legalEntity.bpnl, BusinessPartnerType.LEGAL_ENTITY, anyTime, ChangelogTypeV6.UPDATE),
+            ChangelogEntryVerboseDtoV6(legalEntityResponse.legalAddress.bpna, BusinessPartnerType.ADDRESS, anyTime, ChangelogTypeV6.UPDATE),
+            ChangelogEntryVerboseDtoV6(siteResponse.site.bpns, BusinessPartnerType.SITE, anyTime, ChangelogTypeV6.UPDATE),
+            ChangelogEntryVerboseDtoV6(siteResponse.mainAddress.bpna, BusinessPartnerType.ADDRESS, anyTime, ChangelogTypeV6.UPDATE),
+            ChangelogEntryVerboseDtoV6(additionalAddress.address.bpna, BusinessPartnerType.ADDRESS, anyTime, ChangelogTypeV6.UPDATE)
         )
         val expectedResponse = PageDto(expectedEntries.size.toLong(), 1, 0, expectedEntries.size, expectedEntries)
 
@@ -93,16 +93,16 @@ class ChangelogSearchV6IT: UnscheduledPoolTestBaseV6() {
         testDataClient.updateAddress(additionalAddress, "Updated $testName")
 
         //WHEN
-        val searchResponse = poolClient.changelogs.getChangelogEntries(ChangelogSearchRequest(timestampAfter = timeX), PaginationRequest(0, 20))
+        val searchResponse = poolClient.changelogs.getChangelogEntries(ChangelogSearchRequestV6(timestampAfter = timeX), PaginationRequest(0, 20))
 
         //THEN
         val expectedEntries = listOf(
-            ChangelogEntryVerboseDto(additionalAddress.address.bpna, BusinessPartnerType.ADDRESS, anyTime, ChangelogType.CREATE),
-            ChangelogEntryVerboseDto(legalEntityResponse.legalEntity.bpnl, BusinessPartnerType.LEGAL_ENTITY, anyTime, ChangelogType.UPDATE),
-            ChangelogEntryVerboseDto(legalEntityResponse.legalAddress.bpna, BusinessPartnerType.ADDRESS, anyTime, ChangelogType.UPDATE),
-            ChangelogEntryVerboseDto(siteResponse.site.bpns, BusinessPartnerType.SITE, anyTime, ChangelogType.UPDATE),
-            ChangelogEntryVerboseDto(siteResponse.mainAddress.bpna, BusinessPartnerType.ADDRESS, anyTime, ChangelogType.UPDATE),
-            ChangelogEntryVerboseDto(additionalAddress.address.bpna, BusinessPartnerType.ADDRESS, anyTime, ChangelogType.UPDATE)
+            ChangelogEntryVerboseDtoV6(additionalAddress.address.bpna, BusinessPartnerType.ADDRESS, anyTime, ChangelogTypeV6.CREATE),
+            ChangelogEntryVerboseDtoV6(legalEntityResponse.legalEntity.bpnl, BusinessPartnerType.LEGAL_ENTITY, anyTime, ChangelogTypeV6.UPDATE),
+            ChangelogEntryVerboseDtoV6(legalEntityResponse.legalAddress.bpna, BusinessPartnerType.ADDRESS, anyTime, ChangelogTypeV6.UPDATE),
+            ChangelogEntryVerboseDtoV6(siteResponse.site.bpns, BusinessPartnerType.SITE, anyTime, ChangelogTypeV6.UPDATE),
+            ChangelogEntryVerboseDtoV6(siteResponse.mainAddress.bpna, BusinessPartnerType.ADDRESS, anyTime, ChangelogTypeV6.UPDATE),
+            ChangelogEntryVerboseDtoV6(additionalAddress.address.bpna, BusinessPartnerType.ADDRESS, anyTime, ChangelogTypeV6.UPDATE)
         )
         val expectedResponse = PageDto(expectedEntries.size.toLong(), 1, 0, expectedEntries.size, expectedEntries)
 
@@ -129,17 +129,17 @@ class ChangelogSearchV6IT: UnscheduledPoolTestBaseV6() {
         testDataClient.createSiteFor(legalEntityResponse, "Other $testName")
 
         //WHEN
-        val searchResponse = poolClient.changelogs.getChangelogEntries(ChangelogSearchRequest(bpns = setOf(legalEntityResponse.legalEntity.bpnl, siteResponse.site.bpns, additionalAddress.address.bpna)), PaginationRequest(0, 20))
+        val searchResponse = poolClient.changelogs.getChangelogEntries(ChangelogSearchRequestV6(bpns = setOf(legalEntityResponse.legalEntity.bpnl, siteResponse.site.bpns, additionalAddress.address.bpna)), PaginationRequest(0, 20))
 
         //THEN
         val expectedEntries = listOf(
-            ChangelogEntryVerboseDto(legalEntityResponse.legalEntity.bpnl, BusinessPartnerType.LEGAL_ENTITY, anyTime, ChangelogType.CREATE),
-            ChangelogEntryVerboseDto(siteResponse.site.bpns, BusinessPartnerType.SITE, anyTime, ChangelogType.CREATE),
-            ChangelogEntryVerboseDto(additionalAddress.address.bpna, BusinessPartnerType.ADDRESS, anyTime, ChangelogType.CREATE),
+            ChangelogEntryVerboseDtoV6(legalEntityResponse.legalEntity.bpnl, BusinessPartnerType.LEGAL_ENTITY, anyTime, ChangelogTypeV6.CREATE),
+            ChangelogEntryVerboseDtoV6(siteResponse.site.bpns, BusinessPartnerType.SITE, anyTime, ChangelogTypeV6.CREATE),
+            ChangelogEntryVerboseDtoV6(additionalAddress.address.bpna, BusinessPartnerType.ADDRESS, anyTime, ChangelogTypeV6.CREATE),
 
-            ChangelogEntryVerboseDto(legalEntityResponse.legalEntity.bpnl, BusinessPartnerType.LEGAL_ENTITY, anyTime, ChangelogType.UPDATE),
-            ChangelogEntryVerboseDto(siteResponse.site.bpns, BusinessPartnerType.SITE, anyTime, ChangelogType.UPDATE),
-            ChangelogEntryVerboseDto(additionalAddress.address.bpna, BusinessPartnerType.ADDRESS, anyTime, ChangelogType.UPDATE),
+            ChangelogEntryVerboseDtoV6(legalEntityResponse.legalEntity.bpnl, BusinessPartnerType.LEGAL_ENTITY, anyTime, ChangelogTypeV6.UPDATE),
+            ChangelogEntryVerboseDtoV6(siteResponse.site.bpns, BusinessPartnerType.SITE, anyTime, ChangelogTypeV6.UPDATE),
+            ChangelogEntryVerboseDtoV6(additionalAddress.address.bpna, BusinessPartnerType.ADDRESS, anyTime, ChangelogTypeV6.UPDATE),
         )
         val expectedResponse = PageDto(expectedEntries.size.toLong(), 1, 0, expectedEntries.size, expectedEntries)
 
@@ -166,13 +166,13 @@ class ChangelogSearchV6IT: UnscheduledPoolTestBaseV6() {
         testDataClient.createSiteFor(legalEntityResponse, "Other $testName")
 
         //WHEN
-        val searchResponse = poolClient.changelogs.getChangelogEntries(ChangelogSearchRequest(businessPartnerTypes = setOf(BusinessPartnerType.LEGAL_ENTITY)), PaginationRequest(0, 20))
+        val searchResponse = poolClient.changelogs.getChangelogEntries(ChangelogSearchRequestV6(businessPartnerTypes = setOf(BusinessPartnerType.LEGAL_ENTITY)), PaginationRequest(0, 20))
 
         //THEN
         val expectedEntries = listOf(
-            ChangelogEntryVerboseDto(legalEntityResponse.legalEntity.bpnl, BusinessPartnerType.LEGAL_ENTITY, anyTime, ChangelogType.CREATE),
-            ChangelogEntryVerboseDto(legalEntityResponse.legalEntity.bpnl, BusinessPartnerType.LEGAL_ENTITY, anyTime, ChangelogType.UPDATE),
-            ChangelogEntryVerboseDto(otherLegalEntityResponse.legalEntity.bpnl, BusinessPartnerType.LEGAL_ENTITY, anyTime, ChangelogType.CREATE),
+            ChangelogEntryVerboseDtoV6(legalEntityResponse.legalEntity.bpnl, BusinessPartnerType.LEGAL_ENTITY, anyTime, ChangelogTypeV6.CREATE),
+            ChangelogEntryVerboseDtoV6(legalEntityResponse.legalEntity.bpnl, BusinessPartnerType.LEGAL_ENTITY, anyTime, ChangelogTypeV6.UPDATE),
+            ChangelogEntryVerboseDtoV6(otherLegalEntityResponse.legalEntity.bpnl, BusinessPartnerType.LEGAL_ENTITY, anyTime, ChangelogTypeV6.CREATE),
 
         )
         val expectedResponse = PageDto(expectedEntries.size.toLong(), 1, 0, expectedEntries.size, expectedEntries)
@@ -200,13 +200,13 @@ class ChangelogSearchV6IT: UnscheduledPoolTestBaseV6() {
         val otherSiteResponse = testDataClient.createSiteFor(legalEntityResponse, "Other $testName")
 
         //WHEN
-        val searchResponse = poolClient.changelogs.getChangelogEntries(ChangelogSearchRequest(businessPartnerTypes = setOf(BusinessPartnerType.SITE)), PaginationRequest(0, 20))
+        val searchResponse = poolClient.changelogs.getChangelogEntries(ChangelogSearchRequestV6(businessPartnerTypes = setOf(BusinessPartnerType.SITE)), PaginationRequest(0, 20))
 
         //THEN
         val expectedEntries = listOf(
-            ChangelogEntryVerboseDto(siteResponse.site.bpns, BusinessPartnerType.SITE, anyTime, ChangelogType.CREATE),
-            ChangelogEntryVerboseDto(siteResponse.site.bpns, BusinessPartnerType.SITE, anyTime, ChangelogType.UPDATE),
-            ChangelogEntryVerboseDto(otherSiteResponse.site.bpns, BusinessPartnerType.SITE, anyTime, ChangelogType.CREATE),
+            ChangelogEntryVerboseDtoV6(siteResponse.site.bpns, BusinessPartnerType.SITE, anyTime, ChangelogTypeV6.CREATE),
+            ChangelogEntryVerboseDtoV6(siteResponse.site.bpns, BusinessPartnerType.SITE, anyTime, ChangelogTypeV6.UPDATE),
+            ChangelogEntryVerboseDtoV6(otherSiteResponse.site.bpns, BusinessPartnerType.SITE, anyTime, ChangelogTypeV6.CREATE),
             )
         val expectedResponse = PageDto(expectedEntries.size.toLong(), 1, 0, expectedEntries.size, expectedEntries)
 
@@ -230,27 +230,27 @@ class ChangelogSearchV6IT: UnscheduledPoolTestBaseV6() {
         testDataClient.updateAddress(additionalAddress, "Updated $testName")
 
         //WHEN
-        val searchResponse = poolClient.changelogs.getChangelogEntries(ChangelogSearchRequest(businessPartnerTypes = setOf(BusinessPartnerType.ADDRESS)), PaginationRequest(0, 20))
+        val searchResponse = poolClient.changelogs.getChangelogEntries(ChangelogSearchRequestV6(businessPartnerTypes = setOf(BusinessPartnerType.ADDRESS)), PaginationRequest(0, 20))
 
         //THEN
         val expectedEntries = listOf(
-            ChangelogEntryVerboseDto(legalEntityResponse.legalAddress.bpna, BusinessPartnerType.ADDRESS, anyTime, ChangelogType.CREATE),
-            ChangelogEntryVerboseDto(siteResponse.mainAddress.bpna, BusinessPartnerType.ADDRESS, anyTime, ChangelogType.CREATE),
-            ChangelogEntryVerboseDto(additionalAddress.address.bpna, BusinessPartnerType.ADDRESS, anyTime, ChangelogType.CREATE),
+            ChangelogEntryVerboseDtoV6(legalEntityResponse.legalAddress.bpna, BusinessPartnerType.ADDRESS, anyTime, ChangelogTypeV6.CREATE),
+            ChangelogEntryVerboseDtoV6(siteResponse.mainAddress.bpna, BusinessPartnerType.ADDRESS, anyTime, ChangelogTypeV6.CREATE),
+            ChangelogEntryVerboseDtoV6(additionalAddress.address.bpna, BusinessPartnerType.ADDRESS, anyTime, ChangelogTypeV6.CREATE),
 
-            ChangelogEntryVerboseDto(legalEntityResponse.legalAddress.bpna, BusinessPartnerType.ADDRESS, anyTime, ChangelogType.UPDATE),
-            ChangelogEntryVerboseDto(siteResponse.mainAddress.bpna, BusinessPartnerType.ADDRESS, anyTime, ChangelogType.UPDATE),
-            ChangelogEntryVerboseDto(additionalAddress.address.bpna, BusinessPartnerType.ADDRESS, anyTime, ChangelogType.UPDATE)
+            ChangelogEntryVerboseDtoV6(legalEntityResponse.legalAddress.bpna, BusinessPartnerType.ADDRESS, anyTime, ChangelogTypeV6.UPDATE),
+            ChangelogEntryVerboseDtoV6(siteResponse.mainAddress.bpna, BusinessPartnerType.ADDRESS, anyTime, ChangelogTypeV6.UPDATE),
+            ChangelogEntryVerboseDtoV6(additionalAddress.address.bpna, BusinessPartnerType.ADDRESS, anyTime, ChangelogTypeV6.UPDATE)
         )
         val expectedResponse = PageDto(expectedEntries.size.toLong(), 1, 0, expectedEntries.size, expectedEntries)
 
         assertChangelogs(searchResponse, expectedResponse)
     }
 
-    private fun assertChangelogs(actual: PageDto<ChangelogEntryVerboseDto>, expected: PageDto<ChangelogEntryVerboseDto>){
+    private fun assertChangelogs(actual: PageDto<ChangelogEntryVerboseDtoV6>, expected: PageDto<ChangelogEntryVerboseDtoV6>){
         Assertions.assertThat(actual)
             .usingRecursiveComparison()
-            .ignoringFields("${PageDto<*>::content.name}.${ChangelogEntryVerboseDto::timestamp.name}")
+            .ignoringFields("${PageDto<*>::content.name}.${ChangelogEntryVerboseDtoV6::timestamp.name}")
             .isEqualTo(expected)
     }
 

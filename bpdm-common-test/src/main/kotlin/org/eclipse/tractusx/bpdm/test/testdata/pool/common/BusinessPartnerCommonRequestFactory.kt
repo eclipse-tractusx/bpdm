@@ -24,10 +24,13 @@ import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.bpdm.pool.api.model.*
-import org.eclipse.tractusx.bpdm.pool.api.model.request.*
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerCreateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SitePartnerCreateVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteCreateRequestWithLegalAddressAsMain
+import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.AddressPartnerCreateVerboseDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityPartnerCreateVerboseDtoV6
+import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withSharedByOwner
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import kotlin.random.Random
@@ -38,7 +41,7 @@ abstract class BusinessPartnerCommonRequestFactory(
     protected val availableScriptCodes: Collection<String>
 ) {
 
-    fun buildSiteCreateRequest(seed: String, legalEntityParent: LegalEntityPartnerCreateVerboseDto): SitePartnerCreateRequest {
+    fun buildSiteCreateRequest(seed: String, legalEntityParent: LegalEntityPartnerCreateVerboseDtoV6): SitePartnerCreateRequest {
         return buildSiteCreateRequest(seed, legalEntityParent.legalEntity.bpnl)
     }
 
@@ -46,20 +49,6 @@ abstract class BusinessPartnerCommonRequestFactory(
         return SitePartnerCreateRequest(
             bpnlParent = bpnlParent,
             index = seed,
-            site = createSiteDto("Main Address $seed")
-        )
-    }
-
-    fun createSiteUpdateRequest(seed: String, siteToUpdate: SitePartnerCreateVerboseDto): SitePartnerUpdateRequest {
-        return SitePartnerUpdateRequest(
-            bpns = siteToUpdate.site.bpns,
-            site = createSiteDto("Main Address $seed")
-        )
-    }
-
-    fun createSiteUpdateRequest(seed: String, bpns: String): SitePartnerUpdateRequest {
-        return SitePartnerUpdateRequest(
-            bpns = bpns,
             site = createSiteDto("Main Address $seed")
         )
     }
@@ -73,7 +62,7 @@ abstract class BusinessPartnerCommonRequestFactory(
                 SiteStateDto(validFrom = timeStamp, validTo = timeStamp.plusDays(10), BusinessStateType.ACTIVE),
                 SiteStateDto(validFrom = timeStamp.plusDays(10), validTo = null, BusinessStateType.INACTIVE),
             ),
-            mainAddress = createAddressDto(seed, random),
+            mainAddress = createAddressDto(seed, random).withSharedByOwner(true),
             scriptVariants = listOfNotNull(buildSiteScriptVariant(seed, random)),
             confidenceCriteria = ConfidenceCriteriaDto(
                 sharedByOwner = true,
@@ -86,7 +75,7 @@ abstract class BusinessPartnerCommonRequestFactory(
         )
     }
 
-    fun buildLegalAddressSiteCreateRequest(seed: String, legalEntityParent: LegalEntityPartnerCreateVerboseDto, random: Random = Random(seed.hashCode().toLong())):SiteCreateRequestWithLegalAddressAsMain {
+    fun buildLegalAddressSiteCreateRequest(seed: String, legalEntityParent: LegalEntityPartnerCreateVerboseDtoV6, random: Random = Random(seed.hashCode().toLong())):SiteCreateRequestWithLegalAddressAsMain {
         return buildLegalAddressSiteCreateRequest(seed, legalEntityParent.legalEntity.bpnl, random)
     }
 
@@ -111,7 +100,7 @@ abstract class BusinessPartnerCommonRequestFactory(
         )
     }
 
-    fun buildAdditionalAddressCreateRequest(seed: String, legalEntityParent: LegalEntityPartnerCreateVerboseDto): AddressPartnerCreateRequest {
+    fun buildAdditionalAddressCreateRequest(seed: String, legalEntityParent: LegalEntityPartnerCreateVerboseDtoV6): AddressPartnerCreateRequest {
         return buildAdditionalAddressCreateRequest(seed, legalEntityParent.legalEntity.bpnl)
     }
 
@@ -127,11 +116,11 @@ abstract class BusinessPartnerCommonRequestFactory(
         )
     }
 
-    fun buildAddressUpdateRequest(seed: String, legalAddressToUpdate: LegalEntityPartnerCreateVerboseDto): AddressPartnerUpdateRequest {
+    fun buildAddressUpdateRequest(seed: String, legalAddressToUpdate: LegalEntityPartnerCreateVerboseDtoV6): AddressPartnerUpdateRequest {
         return buildAddressUpdateRequest(seed, legalAddressToUpdate.legalAddress.bpna)
     }
 
-    fun buildAddressUpdateRequest(seed: String, addressToUpdate: AddressPartnerCreateVerboseDto): AddressPartnerUpdateRequest {
+    fun buildAddressUpdateRequest(seed: String, addressToUpdate: AddressPartnerCreateVerboseDtoV6): AddressPartnerUpdateRequest {
         return buildAddressUpdateRequest(seed, addressToUpdate.address.bpna)
     }
 
@@ -228,35 +217,26 @@ abstract class BusinessPartnerCommonRequestFactory(
 
     fun buildPhysicalAddressScriptVariant(scriptCode: String, seed: String): PhysicalAddressScriptVariantDto{
         return PhysicalAddressScriptVariantDto(
-            postalCode = buildScriptVariantStringValue("Postal Code", seed, scriptCode),
             city = buildScriptVariantStringValue("City", seed, scriptCode),
             district = buildScriptVariantStringValue("District", seed, scriptCode),
-            street = StreetDto(
+            street = StreetScriptVariantDto(
                 name = buildScriptVariantStringValue("Street Name", seed, scriptCode),
-                houseNumber = buildScriptVariantStringValue("House Number", seed, scriptCode),
-                houseNumberSupplement = buildScriptVariantStringValue("House Number Supplement", seed, scriptCode),
-                milestone = buildScriptVariantStringValue("Milestone", seed, scriptCode),
                 direction = buildScriptVariantStringValue("Direction", seed, scriptCode),
                 namePrefix = buildScriptVariantStringValue("Name Prefix", seed, scriptCode),
                 nameSuffix = buildScriptVariantStringValue("Name Suffix", seed, scriptCode),
                 additionalNamePrefix = buildScriptVariantStringValue("Additional Name Prefix", seed, scriptCode),
                 additionalNameSuffix = buildScriptVariantStringValue("Additional Name Suffix", seed, scriptCode)
             ),
-            companyPostalCode = buildScriptVariantStringValue("Company Postal Code", seed, scriptCode),
             industrialZone = buildScriptVariantStringValue("Industrial Zone", seed, scriptCode),
             building = buildScriptVariantStringValue("Building", seed, scriptCode),
             floor = buildScriptVariantStringValue("Floor", seed, scriptCode),
-            door = buildScriptVariantStringValue("Door", seed, scriptCode),
-            taxJurisdictionCode = buildScriptVariantStringValue("Tax Jurisdiction Code", seed, scriptCode)
+            door = buildScriptVariantStringValue("Door", seed, scriptCode)
         )
     }
 
     fun buildAlternativeAddressScriptVariant(scriptCode: String, seed: String): AlternativeAddressScriptVariantDto{
         return AlternativeAddressScriptVariantDto(
-            postalCode = buildScriptVariantStringValue("Postal Code", seed, scriptCode),
-            city = buildScriptVariantStringValue("City", seed, scriptCode),
-            deliveryServiceNumber = buildScriptVariantStringValue("Delivery Service Number ", seed, scriptCode),
-            deliveryServiceQualifier = buildScriptVariantStringValue("Delivery Service Qualifier ", seed, scriptCode)
+            city = buildScriptVariantStringValue("City", seed, scriptCode)
         )
     }
 

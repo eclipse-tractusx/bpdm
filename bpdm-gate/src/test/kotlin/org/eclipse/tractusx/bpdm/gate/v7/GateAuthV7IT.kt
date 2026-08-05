@@ -27,7 +27,6 @@ import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationPutRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.RelationSearchRequest
-import org.eclipse.tractusx.bpdm.gate.v7.util.GateTestClientProviderV7
 import org.eclipse.tractusx.bpdm.test.containers.KeyCloakInitializer
 import org.eclipse.tractusx.bpdm.test.util.AuthAssertionHelper
 import org.eclipse.tractusx.bpdm.test.util.AuthExpectationType
@@ -35,15 +34,8 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 
 class GateAuthV7IT : UnscheduledGateTestBaseV7() {
-
-    @Autowired
-    lateinit var gateClient: GateClient
-
     @Autowired
     lateinit var authAssertionHelper: AuthAssertionHelper
-
-    @Autowired
-    lateinit var testClientProvider: GateTestClientProviderV7
 
     lateinit var operatorClient: GateClient
     lateinit var inputManagerClient: GateClient
@@ -53,7 +45,7 @@ class GateAuthV7IT : UnscheduledGateTestBaseV7() {
     lateinit var anonymousClient: GateClient
 
     @PostConstruct
-    fun init() {
+    fun initAuth() {
         operatorClient = testClientProvider.createClient(KeyCloakInitializer.CLIENT_ID_OPERATOR)
         inputManagerClient = testClientProvider.createClient(KeyCloakInitializer.CLIENT_ID_GATE_INPUT_MANAGER)
         inputConsumerClient = testClientProvider.createClient(KeyCloakInitializer.CLIENT_ID_GATE_INPUT_CONSUMER)

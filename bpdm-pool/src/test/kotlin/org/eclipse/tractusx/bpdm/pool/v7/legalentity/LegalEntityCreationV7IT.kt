@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.v7.legalentity
 
+import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.AddressIdentifierDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityIdentifierDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
@@ -268,4 +269,65 @@ class LegalEntityCreationV7IT: UnscheduledPoolTestBaseV7() {
 
         assertRepository.assertLegalEntityCreateResponseWrapperIsEqual(response, expectedResponse)
     }
+
+    /**
+     * WHEN operator tries to create a new legal entity with a script variant whose legal name is blank
+     * THEN operator sees ScriptVariantLegalNameMissing error entry in response
+     */
+    @Test
+    fun `create legal entity with script variant with blank legal name`(){
+        //WHEN
+        val legalEntityRequest = requestFactory.buildLegalEntityCreateRequest(testName).withLegalForm(anyKnownLegalForm()).withScriptVariantLegalName("  ")
+        val response = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest))
+
+        //THEN
+        val expectedError = ErrorInfo(LegalEntityCreateError.ScriptVariantLegalNameMissing, "IGNORED", legalEntityRequest.index)
+        val expectedResponse = LegalEntityPartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+
+        assertRepository.assertLegalEntityCreateResponseWrapperIsEqual(response, expectedResponse)
+    }
+
+    /**
+     * WHEN operator tries to create a new legal entity with a script variant whose legal address city is blank
+     * THEN operator sees LegalAddressScriptVariantCityMissing error entry in response
+     */
+    @Test
+    fun `create legal entity with script variant with blank legal address city`(){
+        //WHEN
+        val legalEntityRequest = requestFactory.buildLegalEntityCreateRequest(testName).withLegalForm(anyKnownLegalForm()).withScriptVariantPhysicalCity("  ")
+        val response = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest))
+
+        //THEN
+        val expectedError = ErrorInfo(LegalEntityCreateError.LegalAddressScriptVariantCityMissing, "IGNORED", legalEntityRequest.index)
+        val expectedResponse = LegalEntityPartnerCreateResponseWrapper(emptyList(), listOf(expectedError))
+
+        assertRepository.assertLegalEntityCreateResponseWrapperIsEqual(response, expectedResponse)
+    }
+
+    /**
+     * WHEN operator tries to create a new legal entity with two script variants of the same script code
+     * THEN operator sees the duplicate reported for both the legal entity and its legal address
+     */
+    @Test
+    fun `create legal entity with duplicate script codes`(){
+        //WHEN
+        val legalEntityRequest = requestFactory.buildLegalEntityCreateRequest(testName).withLegalForm(anyKnownLegalForm()).withDuplicateScriptVariants()
+        val response = poolClient.legalEntities.createBusinessPartners(listOf(legalEntityRequest))
+
+        //THEN
+        // One script variant carries both the legal name and the legal address in that script, so a duplicated script code
+        // is reported by the legal entity and by the legal address.
+        val expectedErrors = listOf(
+            ErrorInfo(LegalEntityCreateError.ScriptVariantDuplicateScriptCode, "IGNORED", legalEntityRequest.index),
+            ErrorInfo(LegalEntityCreateError.LegalAddressScriptVariantDuplicateScriptCode, "IGNORED", legalEntityRequest.index)
+        )
+        val expectedResponse = LegalEntityPartnerCreateResponseWrapper(emptyList(), expectedErrors)
+
+        assertRepository.assertLegalEntityCreateResponseWrapperIsEqual(response, expectedResponse)
+    }
+
+    // The v7 test metadata reads legal forms from the ELF code list, which is a superset of what the Pool's migration
+    // inserts, so a seeded pick can land on a legal form the Pool does not know. Take one the Pool actually has.
+    private fun anyKnownLegalForm(): String =
+        poolClient.metadata.getLegalForms(PaginationRequest()).content.first().technicalKey
 }

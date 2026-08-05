@@ -57,5 +57,7 @@ interface RelationRepository : JpaRepository<RelationDb, Long>, JpaSpecification
 
     fun findByTypeAndStartNode(legalEntityRelationType: LegalEntityRelationType, legalEntity: LegalEntityDb): Set<RelationDb>
 
+    fun findByTypeAndEndNode(legalEntityRelationType: LegalEntityRelationType, legalEntity: LegalEntityDb): Set<RelationDb>
+
     fun existsByReasonCode(reasonCode: ReasonCodeDb): Boolean
 }

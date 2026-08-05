@@ -29,6 +29,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.PostalAddressScriptVariantDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
+import org.eclipse.tractusx.bpdm.test.containers.OrchestratorMockConfiguration
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerRequestFactory
 import org.eclipse.tractusx.bpdm.test.testdata.pool.ExpectedBusinessPartnerResultFactory
@@ -46,6 +47,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import java.time.Instant
@@ -55,6 +57,7 @@ import java.time.LocalDate
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class]
 )
 @ActiveProfiles("test-no-auth", "test-scheduling-disabled")
+@Import(OrchestratorMockConfiguration::class)
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class TaskRelationsResolutionHeadquarterRelocationIT @Autowired constructor(
     private val taskRelationsResolutionService: TaskRelationsResolutionService,
@@ -94,16 +97,18 @@ class TaskRelationsResolutionHeadquarterRelocationIT @Autowired constructor(
         val createdAddAddress = poolApiClient.addresses.createAddresses(listOf(addAddressRequest)).entities.single()
 
         //WHEN
+        val updateStartTime = Instant.now()
         val activeNow = listOf(RelationValidityPeriod(LocalDate.now(), null))
         val replacedByRelation = BusinessPartnerRelations(RelationType.IsReplacedBy, createdLegalEntity.legalEntity.legalAddress.bpna, createdAddAddress.address.bpna, activeNow, anyReasonCode())
         val taskToResolve = TaskRelationsStepReservationEntryDto("Any", "Any", replacedByRelation)
         taskRelationsResolutionService.upsertRelationsGoldenRecordIntoPool(listOf(taskToResolve))
+        val updateEndTime = Instant.now()
 
         //THEN
         val actualLegalEntity = poolApiClient.legalEntities.getLegalEntity(createdLegalEntity.legalEntity.header.bpnl)
         val expectedLegalEntity = buildExpectedRelocatedHeadquarterLegalEntity(createdLegalEntity, createdAddAddress, replacedByRelation)
 
-        poolAssertHelper.assertLegalEntityResponse(listOf(actualLegalEntity), listOf(expectedLegalEntity), Timeframe(Instant.now().minusSeconds(1), Instant.now()))
+        poolAssertHelper.assertLegalEntityResponse(listOf(actualLegalEntity), listOf(expectedLegalEntity), Timeframe(updateStartTime.minusSeconds(5), updateEndTime.plusSeconds(5)))
     }
 
     /**
@@ -121,10 +126,12 @@ class TaskRelationsResolutionHeadquarterRelocationIT @Autowired constructor(
         val createdAddAddress = poolApiClient.addresses.createAddresses(listOf(addAddressRequest)).entities.single()
 
         //WHEN
+        val updateStartTime = Instant.now()
         val activeLater = listOf(RelationValidityPeriod(LocalDate.now().plusDays(1), null))
         val replacedByRelation = BusinessPartnerRelations(RelationType.IsReplacedBy, createdLegalEntity.legalEntity.legalAddress.bpna, createdAddAddress.address.bpna, activeLater, anyReasonCode())
         val taskToResolve = TaskRelationsStepReservationEntryDto("Any", "Any", replacedByRelation)
         taskRelationsResolutionService.upsertRelationsGoldenRecordIntoPool(listOf(taskToResolve))
+        val updateEndTime = Instant.now()
 
         //THEN
         val actualLegalEntity = poolApiClient.legalEntities.getLegalEntity(createdLegalEntity.legalEntity.header.bpnl)
@@ -134,7 +141,7 @@ class TaskRelationsResolutionHeadquarterRelocationIT @Autowired constructor(
             scriptVariants = createdLegalEntity.legalEntity.scriptVariants
         )
 
-        poolAssertHelper.assertLegalEntityResponse(listOf(actualLegalEntity), listOf(expectedLegalEntity), Timeframe(Instant.now().minusSeconds(1), Instant.now()))
+        poolAssertHelper.assertLegalEntityResponse(listOf(actualLegalEntity), listOf(expectedLegalEntity), Timeframe(updateStartTime.minusSeconds(5), updateEndTime.plusSeconds(5)))
     }
 
     private fun anyReasonCode(): String{
@@ -151,7 +158,8 @@ class TaskRelationsResolutionHeadquarterRelocationIT @Autowired constructor(
         return LegalEntityWithLegalAddressVerboseDto(
             header = legalEntity.legalEntity.header,
             legalAddress = newLegalAddress.address.copy(addressType = AddressType.LegalAddress, relations = newLegalAddress.address.relations.plus(newReplacedRelation)),
-            scriptVariants = legalEntity.legalEntity.scriptVariants.map { it.copy(legalAddress = PostalAddressScriptVariantDto()) }
+            // The new legal address covers none of the old script codes, so the legal entity keeps no script variant.
+            scriptVariants = emptyList()
         )
     }
 

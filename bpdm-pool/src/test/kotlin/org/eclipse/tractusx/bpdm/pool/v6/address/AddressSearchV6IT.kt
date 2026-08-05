@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.v6.address
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.AddressSearchRequestV6
 import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolTestBaseV6
 import org.junit.jupiter.api.Test
 
@@ -42,8 +42,8 @@ class AddressSearchV6IT: UnscheduledPoolTestBaseV6() {
         val additionalSiteAddressResponse = testDataClient.createAdditionalAddressFor(siteResponse, "Additional Site Address $testName")
 
         //WHEN
-        val searchResponseGet = poolClient.addresses.getAddresses(AddressSearchRequest(), PaginationRequest())
-        val searchResponsePost = poolClient.addresses.searchAddresses(AddressSearchRequest(), PaginationRequest())
+        val searchResponseGet = poolClient.addresses.getAddresses(AddressSearchRequestV6(), PaginationRequest())
+        val searchResponsePost = poolClient.addresses.searchAddresses(AddressSearchRequestV6(), PaginationRequest())
 
         //THEN
         val expectedAddresses = listOf(legalAddressSiteResponse.mainAddress, siteResponse.mainAddress, additionalAddressResponse.address, additionalSiteAddressResponse.address)
@@ -68,7 +68,7 @@ class AddressSearchV6IT: UnscheduledPoolTestBaseV6() {
         testDataClient.createAdditionalAddressFor(siteResponse, "Additional Site Address $testName")
 
         //WHEN
-        val searchRequest = AddressSearchRequest(addressBpns = listOf(legalAddressSiteResponse.mainAddress.bpna, additionalAddressResponse.address.bpna))
+        val searchRequest = AddressSearchRequestV6(addressBpns = listOf(legalAddressSiteResponse.mainAddress.bpna, additionalAddressResponse.address.bpna))
         val searchResponseGet = poolClient.addresses.getAddresses(searchRequest, PaginationRequest())
         val searchResponsePost = poolClient.addresses.searchAddresses(searchRequest, PaginationRequest())
 
@@ -99,7 +99,7 @@ class AddressSearchV6IT: UnscheduledPoolTestBaseV6() {
         testDataClient.createAdditionalAddressFor(siteResponseB, "Additional Address B $testName")
 
         //WHEN
-        val searchRequest = AddressSearchRequest(legalEntityBpns = listOf(legalEntityResponseA.legalEntity.bpnl))
+        val searchRequest = AddressSearchRequestV6(legalEntityBpns = listOf(legalEntityResponseA.legalEntity.bpnl))
         val searchResponseGet = poolClient.addresses.getAddresses(searchRequest, PaginationRequest())
         val searchResponsePost = poolClient.addresses.searchAddresses(searchRequest, PaginationRequest())
 
@@ -130,7 +130,7 @@ class AddressSearchV6IT: UnscheduledPoolTestBaseV6() {
         testDataClient.createAdditionalAddressFor(siteResponseB, "Additional Address B $testName")
 
         //WHEN
-        val searchRequest = AddressSearchRequest(siteBpns = listOf(siteResponseA.site.bpns))
+        val searchRequest = AddressSearchRequestV6(siteBpns = listOf(siteResponseA.site.bpns))
         val searchResponseGet = poolClient.addresses.getAddresses(searchRequest, PaginationRequest())
         val searchResponsePost = poolClient.addresses.searchAddresses(searchRequest, PaginationRequest())
 
@@ -157,7 +157,7 @@ class AddressSearchV6IT: UnscheduledPoolTestBaseV6() {
         testDataClient.createAdditionalAddressFor(siteResponse, "Additional Site Address $testName")
 
         //WHEN
-        val searchRequest = AddressSearchRequest(name = legalAddressSiteResponse.mainAddress.name)
+        val searchRequest = AddressSearchRequestV6(name = legalAddressSiteResponse.mainAddress.name)
         val searchResponseGet = poolClient.addresses.getAddresses(searchRequest, PaginationRequest())
         val searchResponsePost = poolClient.addresses.searchAddresses(searchRequest, PaginationRequest())
 
@@ -185,8 +185,8 @@ class AddressSearchV6IT: UnscheduledPoolTestBaseV6() {
 
         //WHEN
         val paginationRequest = PaginationRequest(0, 2)
-        val searchResponseGet = poolClient.addresses.getAddresses(AddressSearchRequest(), paginationRequest)
-        val searchResponsePost = poolClient.addresses.searchAddresses(AddressSearchRequest(), paginationRequest)
+        val searchResponseGet = poolClient.addresses.getAddresses(AddressSearchRequestV6(), paginationRequest)
+        val searchResponsePost = poolClient.addresses.searchAddresses(AddressSearchRequestV6(), paginationRequest)
 
         //THEN
         val expectedAddresses = listOf(legalAddressSiteResponse.mainAddress, siteResponse.mainAddress)
