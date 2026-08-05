@@ -30,11 +30,9 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.config.ControllerConfigProperties
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
-import org.eclipse.tractusx.bpdm.pool.exception.BpdmRequestSizeException
-import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.AddressSearchApplicationV7Service
+import org.eclipse.tractusx.bpdm.pool.service.application.v7.ChangelogSearchApplicationV7Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.LegalEntitySearchApplicationV7Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v7.SiteSearchApplicationV7Service
 import org.springframework.security.access.prepost.PreAuthorize
@@ -45,8 +43,7 @@ class MemberController(
     private val legalEntitySearchApplicationService: LegalEntitySearchApplicationV7Service,
     private val siteSearchApplicationService: SiteSearchApplicationV7Service,
     private val addressSearchApplicationService: AddressSearchApplicationV7Service,
-    private val changelogService: PartnerChangelogService,
-    private val controllerConfigProperties: ControllerConfigProperties
+    private val changelogSearchApplicationService: ChangelogSearchApplicationV7Service
 ) : PoolMembersApi {
 
 
@@ -73,20 +70,7 @@ class MemberController(
         changelogSearchRequest: ChangelogSearchRequest,
         paginationRequest: PaginationRequest
     ): PageDto<ChangelogEntryVerboseDto> {
-        changelogSearchRequest.bpns?.let { bpns ->
-            if (bpns.size > controllerConfigProperties.searchRequestLimit) {
-                throw BpdmRequestSizeException(bpns.size, controllerConfigProperties.searchRequestLimit)
-            }
-        }
-
-        return changelogService.getChangeLogEntries(
-            bpns = changelogSearchRequest.bpns,
-            businessPartnerTypes = changelogSearchRequest.businessPartnerTypes,
-            fromTime = changelogSearchRequest.timestampAfter,
-            isCatenaXMemberData = true,
-            pageIndex = paginationRequest.page,
-            pageSize = paginationRequest.size
-        )
+        return changelogSearchApplicationService.searchMemberChangelogEntries(changelogSearchRequest, paginationRequest)
     }
 
 }

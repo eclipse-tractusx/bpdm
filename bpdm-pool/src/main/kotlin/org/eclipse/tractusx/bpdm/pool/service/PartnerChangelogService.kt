@@ -20,25 +20,14 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
-import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryVerboseDto
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.entity.PartnerChangelogEntryDb
 import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository
-import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository.Specs.byBpnsIn
-import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository.Specs.byBusinessPartnerTypesIn
-import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository.Specs.byIsMember
-import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository.Specs.byUpdatedGreaterThan
-import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Sort
-import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.Instant
 
 /**
- * Provides access to changelog entries of business partners. Changelog entries must be created manually via this service, when business partner (including
+ * Records changelog entries of business partners. Changelog entries must be created manually via this service, when business partner (including
  * related child entities) are created/updated/deleted.
  *
  * The changelog entries can be used during synchronization of business partner data in order to know which business partners need to be synchronized.
@@ -58,19 +47,6 @@ class PartnerChangelogService(
     fun createChangelogEntry(request: ChangelogEntryCreateRequest): PartnerChangelogEntryDb{
         logger.debug { "Create ${request.changelogType} changelog entry for ${request.bpn}" }
         return partnerChangelogEntryRepository.save(request.toEntity())
-    }
-
-    fun getChangeLogEntries(
-        bpns: Set<String>?,
-        businessPartnerTypes: Set<BusinessPartnerType>?,
-        fromTime: Instant?,
-        isCatenaXMemberData: Boolean?,
-        pageIndex: Int,
-        pageSize: Int
-    ): PageDto<ChangelogEntryVerboseDto> {
-        val spec = Specification.allOf(byBpnsIn(bpns), byBusinessPartnerTypesIn(businessPartnerTypes), byUpdatedGreaterThan(fromTime), byIsMember(isCatenaXMemberData))
-
-        return partnerChangelogEntryRepository.findAll(spec, PageRequest.of(pageIndex, pageSize, Sort.by(PartnerChangelogEntryDb::updatedAt.name))).toDto { it.toDto() }
     }
 
     private fun ChangelogEntryCreateRequest.toEntity(): PartnerChangelogEntryDb {

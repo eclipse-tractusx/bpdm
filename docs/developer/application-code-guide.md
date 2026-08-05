@@ -74,18 +74,18 @@ flowchart LR
 
 The four representations, by suffix:
 
-| Representation | Suffix | Nature |
-| --- | --- | --- |
-| API model | `…Dto` | The versioned wire contract. Lives only in the application layer and mappers. |
+| Representation  | Suffix     | Nature                                                                                                     |
+|-----------------|------------|------------------------------------------------------------------------------------------------------------|
+| API model       | `…Dto`     | The versioned wire contract. Lives only in the application layer and mappers.                              |
 | Unified request | `…Request` | A loose, source-neutral **superset** of every inbound shape (v6, v7, Orchestrator). Nullable, unvalidated. |
-| Validated model | `…Parsed` | Fully validated and non-null; carries already-resolved entities. Safe to persist as-is. |
-| Entity | `…Db` | The JPA entity. Lives only in the operation layer and the entity mapper. |
+| Validated model | `…Parsed`  | Fully validated and non-null; carries already-resolved entities. Safe to persist as-is.                    |
+| Entity          | `…Db`      | The JPA entity. Lives only in the operation layer and the entity mapper.                                   |
 
 ## 1.3 The three layers
 
 **Application** — the API boundary. One service per *(domain × operation × API version)*. It is the only layer that knows about API DTOs and API versions. It maps the incoming DTO to a `…Request`, drives the parse-then-execute flow, owns the transaction, and maps the outcome back to response DTOs and errors. It contains no validation and no business rules of its own.
 
-**Parser** — the decision layer. Its main purpose is to **validate data entering the application from outside** — requests received on our API endpoints, and responses we get back from calls the application makes to other services. Anything not coming from our own database is untrusted and must pass through a parser first; data read from our own database is trusted and is not parsed. It turns a loose `…Request` into a validated `…Parsed`, or into a list of accumulated errors. It is pure: it only reads (metadata lookups, resolving a BPN to an entity), never writes. It is API- and version-neutral — it never sees a DTO. Because it is neutral and composable, one parser serves every version and every context that embeds the same content (a standalone address, a site's main address, a legal entity's address).
+**Parser** — the decision layer. Its main purpose is to **validate data entering the application from outside** — requests received on our API endpoints, and responses we get back from calls the application makes to other services. Anything not coming from our own database is untrusted and must pass through a parser first; data read from our own database is trusted and is not parsed. It turns a loose `…Request` into a validated `…Parsed`, or into a list of accumulated errors. A rejection is data, not control flow: the parser hands it back as a `ParseResult` failure and never throws. What the client ultimately sees — an `ErrorInfo` entry, or an HTTP error for an operation that has no per-entry error channel — is the application layer's translation of that failure. It is pure: it only reads (metadata lookups, resolving a BPN to an entity), never writes. It is API- and version-neutral — it never sees a DTO. Because it is neutral and composable, one parser serves every version and every context that embeds the same content (a standalone address, a site's main address, a legal entity's address).
 
 **Operation** — the execution layer. It carries out the operation against the service's data — reading, writing, or both — and in principle spans the full range of CRUD; one operation may be composite, combining several CRUD steps, sometimes across more than one entity. For any part that writes, the operation service is *the single authority* for that entity's write — the one place it happens — so BPN issuance, persistence, and changelog live in exactly one location. It works in internal domain and managed models and returns them, never response DTOs.
 
@@ -97,7 +97,7 @@ The four representations, by suffix:
 
 - **`ParseResult<T, E>`** — the backbone type: per entry, either `Success(parsed)` or `Failure(errors)`. It is covariant in the error type, so a parser with a narrow error type composes into an operation with a wider one.
 - **Combinators** — `zipParseResults` (combine several parsers for the same entry, accumulating errors), `chainParseResults` (feed one parse stage into the next), and `parseAndExecute` (the application-to-operation contract: parse the batch, execute only the successes, weave results back into the original positions).
-- **Mappers** — `@Component`, translation only, each covering a single direction: *inbound* (DTO → `…Request`), *entity* (`…Parsed` → `…Db`), *outbound* (errors and results → response DTOs / `ErrorInfo`).
+- **Mappers** — `@Component`, translation only, each covering a single direction: *inbound* (DTO → `…Request`), *entity* (`…Parsed` → `…Db`), *outbound* (errors and results → response DTOs / `ErrorInfo` / the error an endpoint raises).
 - **`Pending…Write`** — a staged entity plus its `UpsertType` (`Created` / `Updated` / `NoChange`); the currency between staging and committing when a write must be split (see [2.4](#24-operation-layer)).
 
 ## 1.5 How a batch flows
@@ -157,6 +157,8 @@ Background jobs and internal process orchestration are not request-driven operat
 
 - A parser MUST validate all data entering the application from outside its own database — both requests received on our API endpoints and responses received from calls the application makes to other services. Data read from our own database is trusted and MUST NOT require parser validation.
 - A parser MUST be free of side effects other than database reads; it MUST NOT write.
+- A parser MUST return every rejection it decides as a `ParseResult` failure and MUST NOT throw to signal one — not even where the operation reports a single outcome and the endpoint answers with an HTTP error. Translating a failure into the client-facing error is the application layer's job, through an outbound error mapper (see [2.7](#27-errors)). This governs validation outcomes only; a genuinely exceptional failure, such as a broken database read, is unaffected.
+- A parser that can reject nothing MAY return its `…Parsed` value directly instead of a `ParseResult`. Normalizing search criteria is the typical case: an unknown or malformed filter value simply matches nothing, so there is no verdict to report. As soon as one input can be rejected, the parser MUST return a `ParseResult`.
 - A parser MUST accumulate errors, reporting every problem for an entry rather than failing on the first.
 - A parser MUST honour the positional contract: the output list has the same size and order as the input, and the i-th result is the verdict for the i-th request.
 - A parser MUST be annotated `@Transactional(readOnly = true)` when a single parse issues more than one database query. *(Current gap: several parsers do multiple reads without this annotation.)*
@@ -193,6 +195,7 @@ Background jobs and internal process orchestration are not request-driven operat
 - Parse errors MUST be modelled as sealed hierarchies.
 - A shared content error SHOULD subtype each embedding operation's error interface, so it surfaces as that operation's error directly, without wrapping.
 - Error-to-code mapping MUST be exhaustive over the sealed type, so that adding a new error fails to compile until it is mapped.
+- An operation that answers with a single result rather than per-entry outcomes — a get, a search — MUST still model its parse errors as a sealed hierarchy and map them exhaustively. The mapping yields the error the endpoint raises instead of an `ErrorInfo` entry, and the application layer raises it; the parser still only returns the failure.
 - A genuinely unreachable or internal error SHOULD map to a thrown 500, not to a client-facing error code.
 
 ## 2.8 Transactions
