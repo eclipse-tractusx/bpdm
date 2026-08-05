@@ -29,9 +29,6 @@ import org.springframework.stereotype.Component
 
 /**
  * Maps the BPN search parsers' sealed parse errors to the errors the BPN search endpoints report them with.
- *
- * A BPN search answers with a set of mappings or not at all - it has no per-entry error channel in the response - so an
- * error becomes the HTTP error the client sees. The `when` is exhaustive so a new error won't compile until it is mapped.
  */
 @Component
 class BpnSearchParseErrorMapper {

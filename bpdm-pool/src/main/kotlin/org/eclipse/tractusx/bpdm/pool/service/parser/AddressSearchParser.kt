@@ -27,7 +27,7 @@ import org.springframework.stereotype.Service
  * Turns loose address search criteria into the normalized form the search operation queries with.
  *
  * Unlike the upsert parsers this one returns its parsed value directly instead of a `ParseResult`: no search criterion
- * can be rejected — an unknown or malformed filter value simply matches nothing — so there is no failure to report.
+ * can be rejected — an unknown or malformed filter value matches nothing — so there is no failure to report.
  */
 @Service
 class AddressSearchParser {

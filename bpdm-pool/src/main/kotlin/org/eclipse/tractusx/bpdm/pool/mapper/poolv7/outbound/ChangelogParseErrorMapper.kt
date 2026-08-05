@@ -26,10 +26,6 @@ import org.springframework.stereotype.Component
 
 /**
  * Maps the changelog search parser's sealed parse errors to the errors the changelog endpoints report them with.
- *
- * A changelog search answers with a page or not at all - it has no per-entry [org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo]
- * channel - so an error becomes the HTTP error the client sees instead of an entry in the response. The `when` is
- * exhaustive so a new error won't compile until it is mapped.
  */
 @Component
 class ChangelogParseErrorMapper {

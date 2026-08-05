@@ -29,10 +29,6 @@ import org.springframework.stereotype.Service
 
 /**
  * Turns loose changelog search criteria into the normalized form the search operation queries with.
- *
- * Unlike the other search parsers this one yields a `ParseResult`: a criterion's content can never be rejected - an
- * unknown or malformed filter value simply matches nothing - but a BPN filter holding more values than the configured
- * search request limit is refused, and a refusal is reported as data for the application layer to translate.
  */
 @Service
 class ChangelogSearchParser(
