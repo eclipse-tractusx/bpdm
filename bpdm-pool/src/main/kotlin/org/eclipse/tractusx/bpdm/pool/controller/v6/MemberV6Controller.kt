@@ -30,12 +30,9 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SiteSearchRequestV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.ChangelogEntryVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.LegalEntityWithLegalAddressVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.SiteWithMainAddressVerboseDtoV6
-import org.eclipse.tractusx.bpdm.pool.config.ControllerConfigProperties
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
-import org.eclipse.tractusx.bpdm.pool.exception.BpdmRequestSizeException
-import org.eclipse.tractusx.bpdm.pool.mapper.poolv6.toV6
-import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.AddressSearchApplicationV6Service
+import org.eclipse.tractusx.bpdm.pool.service.application.v6.ChangelogSearchApplicationV6Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.LegalEntitySearchApplicationV6Service
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.SiteSearchApplicationV6Service
 import org.springframework.security.access.prepost.PreAuthorize
@@ -43,8 +40,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController("MemberControllerLegacy")
 class MemberV6Controller(
-    private val changelogService: PartnerChangelogService,
-    private val controllerConfigProperties: ControllerConfigProperties,
+    private val changelogSearchApplicationService: ChangelogSearchApplicationV6Service,
     private val legalEntitySearchApplicationService: LegalEntitySearchApplicationV6Service,
     private val siteSearchApplicationService: SiteSearchApplicationV6Service,
     private val addressSearchApplicationService: AddressSearchApplicationV6Service
@@ -74,21 +70,7 @@ class MemberV6Controller(
         changelogSearchRequest: ChangelogSearchRequestV6,
         paginationRequest: PaginationRequest
     ): PageDto<ChangelogEntryVerboseDtoV6> {
-        changelogSearchRequest.bpns?.let { bpns ->
-            if (bpns.size > controllerConfigProperties.searchRequestLimit) {
-                throw BpdmRequestSizeException(bpns.size, controllerConfigProperties.searchRequestLimit)
-            }
-        }
-
-        val page = changelogService.getChangeLogEntries(
-            bpns = changelogSearchRequest.bpns,
-            businessPartnerTypes = changelogSearchRequest.businessPartnerTypes,
-            fromTime = changelogSearchRequest.timestampAfter,
-            isCatenaXMemberData = true,
-            pageIndex = paginationRequest.page,
-            pageSize = paginationRequest.size
-        )
-        return PageDto(page.totalElements, page.totalPages, page.page, page.contentSize, page.content.map { it.toV6() })
+        return changelogSearchApplicationService.searchMemberChangelogEntries(changelogSearchRequest, paginationRequest)
     }
 
 }

@@ -28,11 +28,14 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryVerboseDto
 import org.eclipse.tractusx.bpdm.pool.v7.UnscheduledPoolTestBaseV7
 import org.junit.jupiter.api.Test
+import org.springframework.web.reactive.function.client.WebClientResponseException
 import java.time.Instant
 
 class ChangelogSearchV7IT : UnscheduledPoolTestBaseV7() {
 
     private val anyTime = Instant.MIN
+
+    private val searchRequestLimit = 100
 
     /**
      * GIVEN changelog entries
@@ -255,6 +258,22 @@ class ChangelogSearchV7IT : UnscheduledPoolTestBaseV7() {
         val expectedResponse = PageDto(expectedEntries.size.toLong(), 1, 0, expectedEntries.size, expectedEntries)
 
         assertChangelogs(searchResponse, expectedResponse)
+    }
+
+    /**
+     * GIVEN a search request filtering by more BPNs than the search request limit allows
+     * WHEN sharing member searches for changelog entries
+     * THEN 400 bad request is returned
+     */
+    @Test
+    fun `filter changelog entries by too many BPNs returns 400 bad request`() {
+        //GIVEN
+        val tooManyBpns = (1..searchRequestLimit + 1).map { "BPNL$it" }.toSet()
+
+        //WHEN / THEN
+        Assertions.assertThatThrownBy {
+            poolClient.changelogs.getChangelogEntries(ChangelogSearchRequest(bpns = tooManyBpns), PaginationRequest(0, 20))
+        }.isInstanceOf(WebClientResponseException.BadRequest::class.java)
     }
 
     private fun assertChangelogs(actual: PageDto<ChangelogEntryVerboseDto>, expected: PageDto<ChangelogEntryVerboseDto>) {

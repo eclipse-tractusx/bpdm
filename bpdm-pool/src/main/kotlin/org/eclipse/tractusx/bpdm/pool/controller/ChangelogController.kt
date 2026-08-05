@@ -24,17 +24,14 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.PoolChangelogApi
 import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryVerboseDto
-import org.eclipse.tractusx.bpdm.pool.config.ControllerConfigProperties
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
-import org.eclipse.tractusx.bpdm.pool.exception.BpdmRequestSizeException
-import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
+import org.eclipse.tractusx.bpdm.pool.service.application.v7.ChangelogSearchApplicationV7Service
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class ChangelogController(
-    private val partnerChangelogService: PartnerChangelogService,
-    private val controllerConfigProperties: ControllerConfigProperties
+    private val changelogSearchApplicationService: ChangelogSearchApplicationV7Service
 ) : PoolChangelogApi {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_CHANGELOG})")
@@ -42,20 +39,6 @@ class ChangelogController(
         changelogSearchRequest: ChangelogSearchRequest,
         paginationRequest: PaginationRequest
     ): PageDto<ChangelogEntryVerboseDto> {
-
-        changelogSearchRequest.bpns?.let { bpns ->
-            if (bpns.size > controllerConfigProperties.searchRequestLimit) {
-                throw BpdmRequestSizeException(bpns.size, controllerConfigProperties.searchRequestLimit)
-            }
-        }
-
-        return partnerChangelogService.getChangeLogEntries(
-            bpns = changelogSearchRequest.bpns,
-            businessPartnerTypes = changelogSearchRequest.businessPartnerTypes,
-            fromTime = changelogSearchRequest.timestampAfter,
-            isCatenaXMemberData = null,
-            pageIndex = paginationRequest.page,
-            pageSize = paginationRequest.size
-        )
+        return changelogSearchApplicationService.searchChangelogEntries(changelogSearchRequest, paginationRequest)
     }
 }
