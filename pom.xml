@@ -79,7 +79,7 @@
         <!-- Override Spring Boot's managed Netty version to fix a vulnerability -->
         <netty.version>4.2.16.Final</netty.version>
         <!-- Sonar related properties -->
-        <sonar.version>5.5.0.6356</sonar.version>
+        <sonar.version>5.7.0.6970</sonar.version>
         <sonar.coverage.jacoco.xmlReportPaths>
             ${maven.multiModuleProjectDirectory}/bpdm-coverage-aggregate/target/site/
             jacoco-aggregate/jacoco.xml
