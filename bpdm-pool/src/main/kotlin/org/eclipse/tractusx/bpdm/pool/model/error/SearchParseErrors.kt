@@ -19,4 +19,11 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.error
 
-sealed interface ChangelogSearchParseError
+/**
+ * A search criterion held more values than the configured search request limit allows. Subtypes every search operation
+ * enforcing the limit so it surfaces as that operation's error directly.
+ */
+data class SearchValuesTooMany(val count: Int, val maxCount: Int) :
+    ChangelogSearchParseError,
+    BpnIdentifierSearchParseError,
+    BpnRequestIdentifierSearchParseError

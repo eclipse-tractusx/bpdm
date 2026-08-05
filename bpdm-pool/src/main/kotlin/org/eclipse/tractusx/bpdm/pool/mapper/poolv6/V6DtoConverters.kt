@@ -53,7 +53,9 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.SiteStateDtoV6 as V6SiteState
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.SiteStateVerboseDtoV6 as V6SiteStateVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.StreetDtoV6 as V6StreetDto
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.AddressSearchRequestV6 as V6AddressSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.BpnRequestIdentifierSearchRequestV6 as V6BpnRequestIdentifierSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.ChangelogSearchRequestV6 as V6ChangelogSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.IdentifiersSearchRequestV6 as V6IdentifiersSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntitySearchRequestV6 as V6LegalEntitySearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SiteCreateRequestWithLegalAddressAsMainV6 as V6SiteCreateRequestWithLegalAddressAsMain
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SitePartnerCreateRequestV6 as V6SitePartnerCreateRequest
@@ -242,6 +244,14 @@ fun V6ChangelogSearchRequest.toV7() = ChangelogSearchRequest(
     bpns = bpns,
     businessPartnerTypes = businessPartnerTypes
 )
+
+fun V6IdentifiersSearchRequest.toV7() = IdentifiersSearchRequest(
+    businessPartnerType = businessPartnerType.toV7(),
+    idType = idType,
+    idValues = idValues
+)
+
+fun V6BpnRequestIdentifierSearchRequest.toV7() = BpnRequestIdentifierSearchRequest(requestedIdentifiers = requestedIdentifiers)
 
 fun V6LegalEntitySearchRequest.toV7() = LegalEntitySearchRequest(
     bpnLs = bpnLs,

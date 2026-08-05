@@ -17,6 +17,8 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.error
+package org.eclipse.tractusx.bpdm.pool.model.parsed
 
-sealed interface ChangelogSearchParseError
+data class BpnRequestIdentifierSearchParsed(
+    val requestedIdentifiers: Set<String>
+)

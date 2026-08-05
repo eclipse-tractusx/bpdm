@@ -20,8 +20,8 @@
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound
 
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmRequestSizeException
-import org.eclipse.tractusx.bpdm.pool.model.error.BpnsTooMany
 import org.eclipse.tractusx.bpdm.pool.model.error.ChangelogSearchParseError
+import org.eclipse.tractusx.bpdm.pool.model.error.SearchValuesTooMany
 import org.springframework.stereotype.Component
 
 /**
@@ -40,6 +40,6 @@ class ChangelogParseErrorMapper {
      */
     fun toSearchException(errors: List<ChangelogSearchParseError>): RuntimeException =
         when (val error = errors.first()) {
-            is BpnsTooMany -> BpdmRequestSizeException(error.count, error.maxCount)
+            is SearchValuesTooMany -> BpdmRequestSizeException(error.count, error.maxCount)
         }
 }

@@ -21,8 +21,8 @@ package org.eclipse.tractusx.bpdm.pool.service.parser
 
 import org.eclipse.tractusx.bpdm.pool.config.ControllerConfigProperties
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.error.BpnsTooMany
 import org.eclipse.tractusx.bpdm.pool.model.error.ChangelogSearchParseError
+import org.eclipse.tractusx.bpdm.pool.model.error.SearchValuesTooMany
 import org.eclipse.tractusx.bpdm.pool.model.parsed.ChangelogSearchParsed
 import org.eclipse.tractusx.bpdm.pool.model.request.ChangelogSearchRequest
 import org.springframework.stereotype.Service
@@ -46,7 +46,7 @@ class ChangelogSearchParser(
     fun parse(request: ChangelogSearchRequest): ParseResult<ChangelogSearchParsed, ChangelogSearchParseError> {
         val bpns = request.bpns.orEmpty()
         if (bpns.size > controllerConfigProperties.searchRequestLimit) {
-            return ParseResult.ofSingleFailure(BpnsTooMany(bpns.size, controllerConfigProperties.searchRequestLimit))
+            return ParseResult.ofSingleFailure(SearchValuesTooMany(bpns.size, controllerConfigProperties.searchRequestLimit))
         }
 
         return ParseResult.Success(

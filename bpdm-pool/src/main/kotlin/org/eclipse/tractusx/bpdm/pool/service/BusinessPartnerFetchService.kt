@@ -20,18 +20,12 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnRequestIdentifierMappingDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDb
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
-import org.eclipse.tractusx.bpdm.pool.repository.*
+import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.service.operation.LegalEntityAssociationFetchService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.stream.Collectors
 
 /**
  * Service for fetching business partner records from the database
@@ -39,10 +33,6 @@ import java.util.stream.Collectors
 @Service
 class BusinessPartnerFetchService(
     private val legalEntityRepository: LegalEntityRepository,
-    private val identifierTypeRepository: IdentifierTypeRepository,
-    private val bpnRequestIdentifierRepository: BpnRequestIdentifierRepository,
-    private val legalEntityIdentifierRepository: LegalEntityIdentifierRepository,
-    private val addressIdentifierRepository: AddressIdentifierRepository,
     private val legalEntityAssociationFetchService: LegalEntityAssociationFetchService
 ) {
 
@@ -68,41 +58,4 @@ class BusinessPartnerFetchService(
         logger.debug { "Executing fetchDtosByBpns() with parameters $bpns " }
         return fetchByBpns(bpns).map { it.toLegalEntityWithLegalAddress() }
     }
-
-    /**
-     * Find bpn to identifier value mappings by [idValues] of [identifierTypeKey]
-     */
-    @Transactional
-    fun findBpnsByIdentifiers(
-        identifierTypeKey: String,
-        businessPartnerType: IdentifierBusinessPartnerType,
-        idValues: Collection<String>
-    ): Set<BpnIdentifierMappingDto> {
-        logger.debug { "Executing findBpnsByIdentifiers() with parameters $identifierTypeKey // $businessPartnerType and $idValues" }
-        val identifierType = findIdentifierTypeOrThrow(identifierTypeKey, businessPartnerType)
-        return when (businessPartnerType) {
-            IdentifierBusinessPartnerType.LEGAL_ENTITY -> legalEntityIdentifierRepository.findBpnsByIdentifierTypeAndValues(identifierType, idValues)
-            IdentifierBusinessPartnerType.ADDRESS -> addressIdentifierRepository.findBpnsByIdentifierTypeAndValues(identifierType, idValues)
-        }
-    }
-
-    /**
-     * Find bpn based on request-identifier value
-     */
-    @Transactional
-    fun findBpnByRequestedIdentifiers(request: Set<String>): Set<BpnRequestIdentifierMappingDto> {
-        logger.debug { "Executing findBpnByRequestedIdentifiers() with parameters $request" }
-        if (request.isEmpty()) {
-            return emptySet()
-        }
-        var bpnRequestIdentifierMapping = bpnRequestIdentifierRepository.findDistinctByRequestIdentifierIn(request)
-        return bpnRequestIdentifierMapping.stream()
-            .map { BpnRequestIdentifierMappingDto(it.requestIdentifier, it.bpn) }
-            .collect(Collectors.toSet())
-    }
-
-    private fun findIdentifierTypeOrThrow(identifierTypeKey: String, businessPartnerType: IdentifierBusinessPartnerType) =
-        identifierTypeRepository.findByBusinessPartnerTypeAndTechnicalKey(businessPartnerType, identifierTypeKey)
-            ?: throw BpdmNotFoundException(IdentifierTypeDb::class, "$identifierTypeKey/$businessPartnerType")
-
 }
