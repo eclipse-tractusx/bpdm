@@ -29,7 +29,6 @@ import org.eclipse.tractusx.bpdm.pool.v7.UnscheduledPoolTestBaseV7
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.OrchestratorRequestFactoryV7
 import org.eclipse.tractusx.bpdm.test.testdata.orchestrator.copyWithBpnRequests
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v7.withLegalIdentifiers
-import org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.reactive.function.client.WebClientResponseException
