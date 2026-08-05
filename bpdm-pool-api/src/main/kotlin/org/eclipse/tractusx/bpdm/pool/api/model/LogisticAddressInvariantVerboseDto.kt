@@ -63,4 +63,6 @@ data class LogisticAddressInvariantVerboseDto(
 
     @get:Schema(name = "addressType", description = LogisticAddressDescription.addressType)
     val addressType: AddressType? = null,
+
+    val additionalSites: List<String> = emptyList()
 ) : IBaseLogisticAddressDto

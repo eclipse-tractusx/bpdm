@@ -50,6 +50,7 @@ class OrchestratorRequestFactoryCommon(
             hasChanged = true,
             siteMainAddress = buildPostalAddress(seed, AddressType.SiteMainAddress),
             scriptVariants = listOf(buildSiteScriptVariant(seed, random)),
+            updatedAt = buildUpdatedAt(random)
         )
     }
 
@@ -101,8 +102,13 @@ class OrchestratorRequestFactoryCommon(
                 deliveryServiceNumber = "Delivery Service Number $seed",
                 deliveryServiceType = DeliveryServiceType.entries.random(random),
                 deliveryServiceQualifier = "Delivery Service Qualifier $seed"
-            )
+            ),
+            updatedAt = buildUpdatedAt(random)
         )
+    }
+
+    fun buildUpdatedAt(random: Random): Instant {
+        return random.nextInstant()
     }
 
     fun buildBpnLReference(seed: String): BpnReference{
@@ -218,35 +224,26 @@ class OrchestratorRequestFactoryCommon(
 
     fun buildPhysicalAddressScriptVariant(scriptCode: String, seed: String): PhysicalAddressScriptVariant{
         return PhysicalAddressScriptVariant(
-            postalCode = buildScriptVariantStringValue("Postal Code", seed, scriptCode),
             city = buildScriptVariantStringValue("City", seed, scriptCode),
             district = buildScriptVariantStringValue("District", seed, scriptCode),
-            street = Street(
+            street = StreetScriptVariant(
                 name = buildScriptVariantStringValue("Street Name", seed, scriptCode),
-                houseNumber = buildScriptVariantStringValue("HouseNumber", seed, scriptCode),
-                houseNumberSupplement =  buildScriptVariantStringValue("House Number Supplement", seed, scriptCode),
-                milestone = buildScriptVariantStringValue("Milestone", seed, scriptCode),
                 direction = buildScriptVariantStringValue("Direction", seed, scriptCode),
                 namePrefix = buildScriptVariantStringValue("NamePrefix", seed, scriptCode),
                 additionalNamePrefix = buildScriptVariantStringValue("AdditionalNamePrefix", seed, scriptCode),
                 nameSuffix = buildScriptVariantStringValue("NameSuffix", seed, scriptCode),
                 additionalNameSuffix = buildScriptVariantStringValue("AdditionalNameSuffix", seed, scriptCode),
             ),
-            companyPostalCode = buildScriptVariantStringValue("CompanyPostal Code", seed, scriptCode),
             industrialZone = buildScriptVariantStringValue("IndustrialZone", seed, scriptCode),
             building = buildScriptVariantStringValue("Building", seed, scriptCode),
             floor = buildScriptVariantStringValue("Floor", seed, scriptCode),
             door = buildScriptVariantStringValue("Door", seed, scriptCode),
-            taxJurisdictionCode = buildScriptVariantStringValue("Tax Jurisdiction", seed, scriptCode),
         )
     }
 
     fun buildAlternativeAddressScriptVariant(scriptCode: String, seed: String): AlternativeAddressScriptVariant{
         return AlternativeAddressScriptVariant(
-            postalCode = buildScriptVariantStringValue("Postal Code $seed", seed, scriptCode),
-            city = buildScriptVariantStringValue("City $seed", seed, scriptCode),
-            deliveryServiceQualifier = buildScriptVariantStringValue("Delivery Service Qualifier $seed", seed, scriptCode),
-            deliveryServiceNumber = buildScriptVariantStringValue("Delivery Service Number $seed", seed, scriptCode)
+            city = buildScriptVariantStringValue("City $seed", seed, scriptCode)
         )
     }
 

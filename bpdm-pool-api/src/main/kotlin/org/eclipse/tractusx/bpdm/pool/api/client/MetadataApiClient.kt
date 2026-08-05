@@ -26,8 +26,6 @@ import org.eclipse.tractusx.bpdm.pool.api.ApiCommons
 import org.eclipse.tractusx.bpdm.pool.api.PoolMetadataApi
 import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.ReasonCodeDeleteRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.ReasonCodeUpsertRequest
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RequestBody
@@ -64,10 +62,4 @@ interface MetadataApiClient: PoolMetadataApi {
 
     @GetExchange(value = "${ApiCommons.BASE_PATH_V7}/reason-codes")
     override fun getReasonCodes(@ParameterObject paginationRequest: PaginationRequest): PageDto<ReasonCodeDto>
-
-    @PutExchange(value = "${ApiCommons.BASE_PATH_V7}/reason-codes")
-    override fun upsertReasonCode(@RequestBody request: ReasonCodeUpsertRequest): ReasonCodeDto
-
-    @DeleteExchange(value = "${ApiCommons.BASE_PATH_V7}/reason-codes")
-    override fun deleteReasonCode(@ParameterObject request: ReasonCodeDeleteRequest)
 }

@@ -4,12 +4,12 @@ This Docker directory contains all the BPDM modules dockerfiles.
 
 ### Container images
 
-For demonstration purposes, BPDM provides container images. These images are built using the `eclipse-temurin:17-jre-alpine` base image.
+For demonstration purposes, BPDM provides container images. These images are built using the `eclipse-temurin:21-jre-alpine` base image.
 
 Docker Hub:
 
 * [eclipse-temurin](https://hub.docker.com/_/eclipse-temurin)
-* [17-jre-alpine](https://hub.docker.com/layers/library/eclipse-temurin/17-jre-alpine/images/sha256-02c04793fa49ad5cd193c961403223755f9209a67894622e05438598b32f210e?context=explore)
+* [21-jre-alpine](https://hub.docker.com/_/eclipse-temurin/tags?name=21-jre-alpine)
 
 Source:
 

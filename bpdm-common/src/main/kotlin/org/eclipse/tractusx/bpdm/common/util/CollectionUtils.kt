@@ -54,6 +54,22 @@ fun <T> Collection<T>.findDuplicates(): Set<T> =
         .keys
 
 /**
+ * Selects a subset via [select] (null = excluded), hands the selected values as one batch to [transform] — whose
+ * output must align positionally with them (one result per selected element, same order) — and scatters the results
+ * back over the original list, filling excluded positions with [default]. The returned list has the same size and
+ * order as the receiver.
+ */
+fun <T, S, R> List<T>.mapSelectedBatch(
+    select: (T) -> S?,
+    default: R,
+    transform: (List<S>) -> List<R>,
+): List<R> {
+    val selections = map(select)
+    val results = transform(selections.filterNotNull()).iterator()
+    return selections.map { selection -> if (selection != null) results.next() else default }
+}
+
+/**
  * Merge Maps with collections as values.
  * The collections with the same key in the different maps are concatenated
  */

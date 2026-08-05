@@ -89,6 +89,27 @@ class RefinementTestDataFactory {
         )
     }
 
+    fun buildAdditionLegalEntityAddressBusinessPartner(
+        legalEntityGoldenRecord: LegalEntityWithLegalAddressVerboseDto,
+        addressGoldenRecord: LogisticAddressVerboseDto,
+        owningCompany: String?,
+        nameParts: List<String>
+    ): BusinessPartner {
+        return BusinessPartner(
+            nameParts = listOfNotNull(
+                NamePart(legalEntityGoldenRecord.header.legalName, NamePartType.LegalName),
+                legalEntityGoldenRecord.header.legalShortName?.let { NamePart(it, NamePartType.ShortName) },
+                legalEntityGoldenRecord.header.legalForm?.let { NamePart(it, NamePartType.LegalForm) },
+                addressGoldenRecord.address.name?.let { NamePart(it, NamePartType.AddressName) }
+            ),
+            owningCompany = owningCompany,
+            uncategorized = UncategorizedProperties.empty.copy(nameParts = nameParts),
+            legalEntity = buildLegalEntityComponent(legalEntityGoldenRecord),
+            site = null,
+            additionalAddress = buildPostalAddressWithScriptVariants(addressGoldenRecord)
+        )
+    }
+
     fun buildAdditionSiteAddressBusinessPartner(
         legalEntityGoldenRecord: LegalEntityWithLegalAddressVerboseDto,
         siteGoldenRecord: SiteWithMainAddressVerboseDto,
@@ -123,8 +144,11 @@ class RefinementTestDataFactory {
             confidenceCriteria = buildConfidence(goldenRecord.header.confidenceCriteria),
             isParticipantData = goldenRecord.header.isParticipantData,
             hasChanged = true,
+            ownershipUltimate = goldenRecord.header.ownershipUltimate,
+            ultimateOwnerBpnl = goldenRecord.header.ultimateOwnerBpnl,
             legalAddress = buildPostalAddress(goldenRecord.legalAddress),
-            scriptVariants = goldenRecord.scriptVariants.map { buildLegalEntityScriptVariant(it) }
+            scriptVariants = goldenRecord.scriptVariants.map { buildLegalEntityScriptVariant(it) },
+            updatedAt = goldenRecord.header.updatedAt
         )
     }
 
@@ -136,7 +160,8 @@ class RefinementTestDataFactory {
             confidenceCriteria = buildConfidence(goldenRecord.site.confidenceCriteria),
             hasChanged = true,
             siteMainAddress = buildPostalAddress(goldenRecord.mainAddress),
-            scriptVariants = goldenRecord.site.scriptVariants.map { buildSiteScriptVariant(it) }
+            scriptVariants = goldenRecord.site.scriptVariants.map { buildSiteScriptVariant(it) },
+            updatedAt = goldenRecord.site.updatedAt
         )
     }
 
@@ -148,7 +173,8 @@ class RefinementTestDataFactory {
             confidenceCriteria = buildConfidence(goldenRecord.confidenceCriteria),
             hasChanged = true,
             siteMainAddress = null,
-            scriptVariants = goldenRecord.scriptVariants.map { buildSiteScriptVariant(it) }
+            scriptVariants = goldenRecord.scriptVariants.map { buildSiteScriptVariant(it) },
+            updatedAt = goldenRecord.updatedAt
         )
     }
 
@@ -179,7 +205,8 @@ class RefinementTestDataFactory {
             states = logisticAddress.states.map {  BusinessState(it.validFrom?.toUtcInstant(), it.validTo?.toUtcInstant(), it.type) },
             confidenceCriteria = buildConfidence(logisticAddress.confidenceCriteria),
             physicalAddress = buildPhysicalAddress(logisticAddress.physicalPostalAddress),
-            alternativeAddress = logisticAddress.alternativePostalAddress?.let { buildAlternativeAddress(it) }
+            alternativeAddress = logisticAddress.alternativePostalAddress?.let { buildAlternativeAddress(it) },
+            updatedAt = logisticAddress.updatedAt
         )
     }
 
@@ -245,7 +272,7 @@ class RefinementTestDataFactory {
         return with(siteScriptVariant){
             SiteScriptVariant(
                 scriptCode = scriptCode,
-                siteName = name,
+                siteName = requireNotNull(name) { "A site script variant without a name cannot become a golden record task result" },
                 mainAddress = buildPostalAddressScriptVariant(mainAddress)
             )
         }
@@ -270,26 +297,33 @@ class RefinementTestDataFactory {
     private fun buildPhysicalAddressScriptVariant(physicalAddressScriptVariant: PhysicalAddressScriptVariantDto): PhysicalAddressScriptVariant{
         return with(physicalAddressScriptVariant){
             PhysicalAddressScriptVariant(
-                postalCode = postalCode,
                 city = city,
                 district = district,
-                street = street?.let { buildStreet(it) } ?: Street.empty,
-                companyPostalCode = companyPostalCode,
+                street = street?.let { buildScriptVariantStreet(it) } ?: StreetScriptVariant.empty,
                 industrialZone = industrialZone,
                 building = building,
                 floor = floor,
-                door = door,
-                taxJurisdictionCode = taxJurisdictionCode)
+                door = door)
         }
     }
 
     private fun buildAlternativeAddressScriptVariant(alternativeAddressScriptVariant: AlternativeAddressScriptVariantDto): AlternativeAddressScriptVariant{
         return with(alternativeAddressScriptVariant){
             AlternativeAddressScriptVariant(
-                postalCode = postalCode,
-                city = city,
-                deliveryServiceQualifier = deliveryServiceQualifier,
-                deliveryServiceNumber = deliveryServiceNumber
+                city = city
+            )
+        }
+    }
+
+    private fun buildScriptVariantStreet(street: StreetScriptVariantDto): StreetScriptVariant{
+        return with(street){
+            StreetScriptVariant(
+                name = name,
+                direction = direction,
+                namePrefix = namePrefix,
+                additionalNamePrefix = additionalNamePrefix,
+                nameSuffix = nameSuffix,
+                additionalNameSuffix = additionalNameSuffix
             )
         }
     }

@@ -49,7 +49,7 @@ class BpdmOAuth2ClientRegistrationConfig {
             .filter { it.securityEnabled }
             .forEach{ oauth2Properties.provider[it.registration.provider!!] = it.provider }
 
-        val registrations: List<ClientRegistration?> = OAuth2ClientPropertiesMapper(oauth2Properties).asClientRegistrations().values.toList()
+        val registrations: List<ClientRegistration> = OAuth2ClientPropertiesMapper(oauth2Properties).asClientRegistrations().values.filterNotNull()
         return InMemoryClientRegistrationRepository(registrations)
     }
 }

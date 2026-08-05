@@ -19,11 +19,15 @@
 
 package org.eclipse.tractusx.bpdm.test.testdata.pool.v7
 
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 object TestDataV7 {
 
     val anyTime: LocalDateTime = LocalDateTime.now()
+
+    /** Start of the validity a test-data relation gets: already active, so it counts wherever only current relations do. */
+    val currentRelationValidFrom: LocalDate = LocalDate.now().minusDays(1)
 
     val NoConfidence = CalculatedConfidence(
         numberOfSharingMembers = 0,
@@ -32,6 +36,11 @@ object TestDataV7 {
 
     val SharedByOwnerConfidence = CalculatedConfidence(
         numberOfSharingMembers = 0,
+        confidenceLevel = 5
+    )
+
+    val SyncedSharedByOwnerConfidence = CalculatedConfidence(
+        numberOfSharingMembers = 1,
         confidenceLevel = 5
     )
 
@@ -45,9 +54,19 @@ object TestDataV7 {
         checkedByExternalDataSource = false
     )
 
-    val IsShared = GivenConfidence(
+    val SharedByOwner = GivenConfidence(
         sharedByOwner = true,
         checkedByExternalDataSource = false
+    )
+
+    val CheckedByExternalSource = GivenConfidence(
+        sharedByOwner = false,
+        checkedByExternalDataSource = true
+    )
+
+    val SharedByOwnerAndChecked = GivenConfidence(
+        sharedByOwner = true,
+        checkedByExternalDataSource = true
     )
 
 }

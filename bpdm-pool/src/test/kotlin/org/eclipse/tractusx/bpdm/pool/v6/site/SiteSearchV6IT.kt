@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.v6.site
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SiteSearchRequestV6
 import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolTestBaseV6
 import org.junit.jupiter.api.Test
 
@@ -45,8 +45,8 @@ class SiteSearchV6IT: UnscheduledPoolTestBaseV6() {
         val siteResponseD = testDataClient.createSiteFor(legalEntityResponseB, "$testName D")
 
         //WHEN
-        val searchResponseGet = poolClient.sites.getSites(SiteSearchRequest(), PaginationRequest())
-        val searchResponsePost = poolClient.sites.postSiteSearch(SiteSearchRequest(), PaginationRequest())
+        val searchResponseGet = poolClient.sites.getSites(SiteSearchRequestV6(), PaginationRequest())
+        val searchResponsePost = poolClient.sites.postSiteSearch(SiteSearchRequestV6(), PaginationRequest())
 
         //THEN
         val expectedSites = listOf(siteResponseA, siteResponseB, siteResponseC, siteResponseD)
@@ -76,7 +76,7 @@ class SiteSearchV6IT: UnscheduledPoolTestBaseV6() {
         testDataClient.createSiteFor(legalEntityResponseB, "$testName D")
 
         //WHEN
-        val searchRequest = SiteSearchRequest(siteBpns = listOf(siteResponseA.site.bpns, siteResponseC.site.bpns))
+        val searchRequest = SiteSearchRequestV6(siteBpns = listOf(siteResponseA.site.bpns, siteResponseC.site.bpns))
         val searchResponseGet = poolClient.sites.getSites(searchRequest, PaginationRequest())
         val searchResponsePost = poolClient.sites.postSiteSearch(searchRequest, PaginationRequest())
 
@@ -108,7 +108,7 @@ class SiteSearchV6IT: UnscheduledPoolTestBaseV6() {
         testDataClient.createSiteFor(legalEntityResponseB, "$testName D")
 
         //WHEN
-        val searchRequest = SiteSearchRequest(legalEntityBpns = listOf(siteResponseA.site.bpnLegalEntity))
+        val searchRequest = SiteSearchRequestV6(legalEntityBpns = listOf(siteResponseA.site.bpnLegalEntity))
         val searchResponseGet = poolClient.sites.getSites(searchRequest, PaginationRequest())
         val searchResponsePost = poolClient.sites.postSiteSearch(searchRequest, PaginationRequest())
 
@@ -140,7 +140,7 @@ class SiteSearchV6IT: UnscheduledPoolTestBaseV6() {
         testDataClient.createSiteFor(legalEntityResponseB, "$testName D")
 
         //WHEN
-        val searchRequest = SiteSearchRequest(name = siteResponseA.site.name)
+        val searchRequest = SiteSearchRequestV6(name = siteResponseA.site.name)
         val searchResponseGet = poolClient.sites.getSites(searchRequest, PaginationRequest())
         val searchResponsePost = poolClient.sites.postSiteSearch(searchRequest, PaginationRequest())
 
@@ -173,8 +173,8 @@ class SiteSearchV6IT: UnscheduledPoolTestBaseV6() {
 
         //WHEN
         val paginationRequest = PaginationRequest(0, 2)
-        val searchResponseGet = poolClient.sites.getSites(SiteSearchRequest(), paginationRequest)
-        val searchResponsePost = poolClient.sites.postSiteSearch(SiteSearchRequest(), paginationRequest)
+        val searchResponseGet = poolClient.sites.getSites(SiteSearchRequestV6(), paginationRequest)
+        val searchResponsePost = poolClient.sites.postSiteSearch(SiteSearchRequestV6(), paginationRequest)
 
         //THEN
         val expectedSites = listOf(siteResponseA, siteResponseB)

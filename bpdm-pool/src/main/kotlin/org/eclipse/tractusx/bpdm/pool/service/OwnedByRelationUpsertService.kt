@@ -22,15 +22,24 @@ package org.eclipse.tractusx.bpdm.pool.service
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
+import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityRelationEventTriggerDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
+import org.eclipse.tractusx.bpdm.pool.entity.TriggerEventType
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
+import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRelationEventTriggerRepository
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
+import org.eclipse.tractusx.bpdm.pool.service.operation.UltimateOwnerRecalculationService
+import org.eclipse.tractusx.bpdm.pool.service.parser.UltimateOwnerUniquenessValidator
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class OwnedByRelationUpsertService(
     private val relationUpsertService: RelationUpsertService,
-    private val relationRepository: RelationRepository
+    private val relationRepository: RelationRepository,
+    private val ultimateOwnerRecalculationService: UltimateOwnerRecalculationService,
+    private val ultimateOwnerUniquenessValidator: UltimateOwnerUniquenessValidator,
+    private val legalEntityRelationEventTriggerRepository: LegalEntityRelationEventTriggerRepository
 ): IRelationUpsertStrategyService {
 
 
@@ -40,7 +49,7 @@ class OwnedByRelationUpsertService(
 
         validateSingleParent(upsertRequest)
         validateNoCycles(upsertRequest)
-
+        validateSingleUltimateOwner(upsertRequest)
 
         val result = relationUpsertService.upsertRelation(
             RelationUpsertService.UpsertRequest(
@@ -53,9 +62,66 @@ class OwnedByRelationUpsertService(
             )
         )
 
+        ultimateOwnerRecalculationService.recalculate(listOf(proposedSource))
+
+        handleValidityBoundaryTriggers(result.value)
+
         return result
     }
 
+    /**
+     * Reconcile the unprocessed OwnershipValidityBoundary triggers for the relation against the set derived
+     * from its current validity periods:
+     * - validFrom > today  →  trigger on validFrom (relation becomes active)
+     * - validTo != null && validTo+1 > today  →  trigger on validTo+1 (relation expires)
+     *
+     * Only the difference is applied (delete stale dates, insert missing ones); triggers whose date is
+     * unchanged are left in place. A blind delete+reinsert would collide on the
+     * (relation_id, event_type, trigger_date) unique constraint, because Hibernate flushes inserts before
+     * deletes within a transaction — so re-upserting a relation with unchanged trigger dates would fail.
+     */
+    private fun handleValidityBoundaryTriggers(relation: RelationDb) {
+        val today = LocalDate.now()
+
+        val validFromDates = relation.validityPeriods
+            .map { it.validFrom }
+            .filter { it > today }
+
+        val expiryDates = relation.validityPeriods
+            .mapNotNull { it.validTo }
+            .map { it.plusDays(1) }
+            .filter { it > today }
+
+        val desiredTriggerDates = (validFromDates + expiryDates).toSet()
+
+        val existingUnprocessedTriggers = legalEntityRelationEventTriggerRepository
+            .findByRelationAndEventType(relation, TriggerEventType.OwnershipValidityBoundary)
+            .filterNot { it.isProcessed }
+        val existingTriggerDates = existingUnprocessedTriggers.map { it.triggerDate }.toSet()
+
+        val triggersToDelete = existingUnprocessedTriggers.filterNot { it.triggerDate in desiredTriggerDates }
+        val triggerDatesToCreate = desiredTriggerDates - existingTriggerDates
+
+        legalEntityRelationEventTriggerRepository.deleteAll(triggersToDelete)
+        legalEntityRelationEventTriggerRepository.saveAll(
+            triggerDatesToCreate.map { LegalEntityRelationEventTriggerDb(it, false, TriggerEventType.OwnershipValidityBoundary, relation) }
+        )
+    }
+
+    // The rule itself lives in the parser layer, where the legal-entity write path applies it as a parse error. This path
+    // has no parser layer yet, so it calls the same validator and reports the violation the way its siblings do.
+    private fun validateSingleUltimateOwner(upsertRequest: IRelationUpsertStrategyService.UpsertRequest){
+        val child = upsertRequest.source
+        val parent = upsertRequest.target
+
+        ultimateOwnerUniquenessValidator.validateOwnershipEdge(child, parent).forEach { violation ->
+            throw BpdmValidationException(
+                "Multiple ultimate owners in entity hierarchy: legal entity '${child.bpn}' can't be owned by '${parent.bpn}' " +
+                        "as that would put more than one ultimate owner into one ownership hierarchy " +
+                        "(flagged: ${violation.conflictingBpnls.joinToString(", ")})."
+            )
+        }
+    }
 
     private fun validateSingleParent(upsertRequest: IRelationUpsertStrategyService.UpsertRequest){
         val child = upsertRequest.source

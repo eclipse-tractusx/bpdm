@@ -78,6 +78,8 @@ class OrchestratorMappings(
                 confidenceCriteria = toConfidenceCriteria(entity.legalEntityConfidence),
                 isParticipantData = null,
                 hasChanged = true,
+                ownershipUltimate = entity.ownershipUltimate,
+                ultimateOwnerBpnl = entity.ultimateOwnerBpnl,
                 legalAddress = postalAddress.takeIf { isLegalAddress} ?: PostalAddress.empty,
                 scriptVariants = entity.scriptVariants.takeIf { isLegalAddress }?.map { toLegalEntityScriptVariant(it) } ?:emptyList()
             ),
@@ -246,10 +248,15 @@ class OrchestratorMappings(
                 legalEntityConfidence = toConfidenceCriteria(legalEntity.confidenceCriteria),
                 siteConfidence = site?.let { toConfidenceCriteria(it.confidenceCriteria) },
                 addressConfidence = toConfidenceCriteria(postalAddress.confidenceCriteria),
+                legalEntityUpdatedAt = legalEntity.updatedAt,
+                siteUpdatedAt = site?.updatedAt,
+                addressUpdatedAt = postalAddress.updatedAt,
                 isOwnCompanyData = if (tenantBpnl != null && owningCompany != null) tenantBpnl == owningCompany else false,
                 scriptVariants = toScriptVariants(addressType, dto),
                 legalEntityGoldenRecordRelations = legalEntity.goldenRecordRelations,
-                addressGoldenRecordRelations = toAddressGoldenRecordRelations(addressType, dto)
+                addressGoldenRecordRelations = toAddressGoldenRecordRelations(addressType, dto),
+                ownershipUltimate = legalEntity.ownershipUltimate,
+                ultimateOwnerBpnl = legalEntity.ultimateOwnerBpnl
             )
         }
     }
@@ -268,15 +275,18 @@ class OrchestratorMappings(
             AddressType.AdditionalAddress -> dto.additionalAddress!!.scriptVariants.map { it }
         }
 
+        val addressVariantByCode = addressScriptVariants.associateBy { it.scriptCode }
         val legalEntityVariantsByCode = dto.legalEntity.scriptVariants.associateBy { it.scriptCode }
         val siteScriptVariantsByCode = dto.site?.scriptVariants?.associateBy { it.scriptCode } ?: emptyMap()
 
-        return addressScriptVariants.map { addressVariant ->
-            val legalEntityVariant = toLegalEntityScriptVariant(legalEntityVariantsByCode[addressVariant.scriptCode]) ?: LegalEntityScriptVariantDto()
-            val siteScriptVariant = toSiteScriptVariant(siteScriptVariantsByCode[addressVariant.scriptCode]) ?: SiteScriptVariantDto()
-            val addressScriptVariant = toAddressScriptVariant(addressVariant.postalProperties)
+        val allScriptCodes = addressVariantByCode.keys.plus(legalEntityVariantsByCode.keys).plus(siteScriptVariantsByCode.keys)
 
-            BusinessPartnerScriptVariantDto(addressVariant.scriptCode, legalEntity = legalEntityVariant, site = siteScriptVariant, address = addressScriptVariant)
+        return allScriptCodes.map { scriptCode ->
+            val legalEntityVariant = toLegalEntityScriptVariant(legalEntityVariantsByCode[scriptCode]) ?: LegalEntityScriptVariantDto()
+            val siteScriptVariant = toSiteScriptVariant(siteScriptVariantsByCode[scriptCode]) ?: SiteScriptVariantDto()
+            val addressScriptVariant = addressVariantByCode[scriptCode]?.let { toAddressScriptVariant(it.postalProperties)  }?: AddressScriptVariantDto()
+
+            BusinessPartnerScriptVariantDto(scriptCode, legalEntity = legalEntityVariant, site = siteScriptVariant, address = addressScriptVariant)
         }
     }
 
@@ -296,26 +306,20 @@ class OrchestratorMappings(
     private fun toPhysicalAddressScriptVariant(dto: PhysicalAddressScriptVariant) =
         with(dto){
             PhysicalAddressScriptVariantDto(
-                postalCode = postalCode,
                 city = city,
                 district = district,
                 street = toScriptVariantStreet(street),
-                companyPostalCode = companyPostalCode,
                 industrialZone = industrialZone,
                 building = building,
                 floor = floor,
-                door = door,
-                taxJurisdictionCode = taxJurisdictionCode
+                door = door
             )
         }
 
     private fun toAlternativeAddressScriptVariant(dto: AlternativeAddressScriptVariant?) =
         dto?.let { with(it){
             AlternativeAddressScriptVariantDto(
-                postalCode = postalCode,
-                city = city,
-                deliveryServiceQualifier = deliveryServiceQualifier,
-                deliveryServiceNumber = deliveryServiceNumber
+                city = city
             )
         }
         }
@@ -396,18 +400,29 @@ class OrchestratorMappings(
             additionalNameSuffix = dto.additionalNameSuffix
         )
 
-    private fun toScriptVariantStreet(dto: Street) =
-        StreetDto(
+    private fun toScriptVariantStreet(dto: StreetScriptVariant) =
+        StreetScriptVariantDto(
             name = dto.name,
-            houseNumber = dto.houseNumber,
-            houseNumberSupplement = dto.houseNumberSupplement,
-            milestone = dto.milestone,
             direction = dto.direction,
             namePrefix = dto.namePrefix,
             additionalNamePrefix = dto.additionalNamePrefix,
             nameSuffix = dto.nameSuffix,
             additionalNameSuffix = dto.additionalNameSuffix
         )
+
+    private fun toScriptVariantStreet(street: StreetScriptVariantDb?) =
+        street?.let {
+            with(it){
+                StreetScriptVariant(
+                    name = name,
+                    direction = direction,
+                    namePrefix = namePrefix,
+                    additionalNamePrefix = additionalNamePrefix,
+                    nameSuffix = nameSuffix,
+                    additionalNameSuffix = additionalNameSuffix
+                )
+            }
+        } ?: StreetScriptVariant.empty
 
     private fun toGeographicCoordinate(dto: GeoCoordinate) =
         dto.latitude?.let { lat ->
@@ -440,16 +455,13 @@ class OrchestratorMappings(
         scriptVariant?.let {
             with(it){
                 PhysicalAddressScriptVariant(
-                    postalCode = postalCode,
                     city = city,
                     district = district,
-                    street = toStreet(street),
-                    companyPostalCode = companyPostalCode,
+                    street = toScriptVariantStreet(street),
                     industrialZone = industrialZone,
                     building = building,
                     floor = floor,
-                    door = door,
-                    taxJurisdictionCode = taxJurisdictionCode)
+                    door = door)
             }
         } ?: PhysicalAddressScriptVariant.empty
 
@@ -458,10 +470,7 @@ class OrchestratorMappings(
         scriptVariant?.let {
             with(it){
                 AlternativeAddressScriptVariant(
-                    postalCode = postalCode,
-                    city = city,
-                    deliveryServiceQualifier = deliveryServiceQualifier,
-                    deliveryServiceNumber = deliveryServiceNumber
+                    city = city
                 )
             }
         }

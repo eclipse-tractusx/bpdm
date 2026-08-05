@@ -76,6 +76,8 @@ fun LegalEntityDb.toDto(): LegalEntityHeaderVerboseDto {
         isParticipantData = isCatenaXMemberData,
         createdAt = createdAt,
         updatedAt = updatedAt,
+        ownershipUltimate = ownershipUltimate,
+        ultimateOwnerBpnl = ultimateOwnerBpnl
     )
 }
 
@@ -141,7 +143,8 @@ fun LogisticAddressDb.toInvariantDto(): LogisticAddressInvariantVerboseDto {
     return LogisticAddressInvariantVerboseDto(
         bpna = bpn,
         bpnLegalEntity = legalEntity?.bpn,
-        bpnSite = site?.bpn,
+        bpnSite = mainSite?.bpn,
+        additionalSites = additionalSites.map { it.bpn },
         createdAt = createdAt,
         updatedAt = updatedAt,
         name = name,
@@ -151,7 +154,7 @@ fun LogisticAddressDb.toInvariantDto(): LogisticAddressInvariantVerboseDto {
         physicalPostalAddress = physicalPostalAddress.toDto(),
         alternativePostalAddress = alternativePostalAddress?.toDto(),
         confidenceCriteria = confidenceCriteria.toDto(),
-        isParticipantData = legalEntity?.isCatenaXMemberData ?: site?.legalEntity?.isCatenaXMemberData ?: false,
+        isParticipantData = legalEntity?.isCatenaXMemberData ?: mainSite?.legalEntity?.isCatenaXMemberData ?: false,
         addressType = getAddressType(this)
     )
 }
@@ -279,7 +282,7 @@ fun RelationDb.toDto(): RelationVerboseDto {
         businessPartnerSourceBpnl = startNode.bpn,
         businessPartnerTargetBpnl = endNode.bpn,
         validityPeriods = validityPeriods.sortedBy { it.validFrom }.map { it.toDto() },
-        reasonCode = reasonCode.technicalKey
+        reasonCode = reasonCode?.technicalKey
     )
 }
 
@@ -289,7 +292,7 @@ fun AddressRelationDb.toDto(): AddressRelationVerboseDto {
         businessPartnerSourceBpna = startAddress.bpn,
         businessPartnerTargetBpna = endAddress.bpn,
         validityPeriods = validityPeriods.sortedBy { it.validFrom }.map { it.toDto() },
-        reasonCode = reasonCode.technicalKey
+        reasonCode = reasonCode?.technicalKey
     )
 }
 
@@ -318,31 +321,45 @@ fun ConfidenceCriteriaDb.toDto(): ConfidenceCriteriaDto =
         confidenceLevel
     )
 
+/**
+ * The site rendered as the API's `bpnSite` for backward compatibility: the oldest member by `createdAt`, which for
+ * pre-existing data is the address's former single site. The remaining members are exposed as [additionalSites].
+ */
+val LogisticAddressDb.mainSite: SiteDb?
+    get() = sites.minByOrNull { it.createdAt }
+
+val LogisticAddressDb.additionalSites: List<SiteDb>
+    get() = sites.sortedBy { it.createdAt }.drop(1)
+
+/** An address is a site's main address iff one of the sites it belongs to has it as its main address. */
+private fun LogisticAddressDb.isSiteMainAddress() = sites.any { it.mainAddress == this }
+
 fun getAddressType(logisticAddress: LogisticAddressDb): AddressType {
     return when {
         logisticAddress.legalEntity?.legalAddress == logisticAddress &&
-                logisticAddress.site?.mainAddress == logisticAddress -> AddressType.LegalAndSiteMainAddress
+                logisticAddress.isSiteMainAddress() -> AddressType.LegalAndSiteMainAddress
 
         logisticAddress.legalEntity?.legalAddress != logisticAddress &&
-                logisticAddress.site?.mainAddress != logisticAddress -> AddressType.AdditionalAddress
+                !logisticAddress.isSiteMainAddress() -> AddressType.AdditionalAddress
 
         logisticAddress.legalEntity?.legalAddress == logisticAddress -> AddressType.LegalAddress
 
-        logisticAddress.site?.mainAddress == logisticAddress -> AddressType.SiteMainAddress
+        logisticAddress.isSiteMainAddress() -> AddressType.SiteMainAddress
 
         else -> throw IllegalStateException("Unable to determine address type.")
     }
 }
 
 private fun List<LegalEntityScriptVariantDb>.toLegalEntityScriptVariants(legalAddressVariants: List<LogisticAddressScriptVariantDb>): List<LegalEntityScriptVariantDto>{
-    val legalEntityVariantsByCode = associateBy { it.scriptCode.technicalKey }
     val legalAddressVariantsByCode = legalAddressVariants.associateBy { it.scriptCode.technicalKey }
 
-    val allKeys = legalEntityVariantsByCode.keys.plus(legalAddressVariantsByCode.keys)
-    return allKeys.mapNotNull { key ->
-        val legalEntityProperties = legalEntityVariantsByCode[key] ?: return@mapNotNull null
-        val legalAddressProperties = legalAddressVariantsByCode[key]
-        LegalEntityScriptVariantDto(key, legalEntityProperties.legalName, legalEntityProperties.shortName, legalAddressProperties?.toDto() ?: PostalAddressScriptVariantDto())
+    return map { variant ->
+        val scriptCode = variant.scriptCode.technicalKey
+        // The legal address covers every script its legal entity is named in: the parsers reject a variant it does not
+        // cover and ScriptVariantCoverageService prunes any the legal address stops covering.
+        val legalAddressVariant = legalAddressVariantsByCode[scriptCode]
+            ?: throw IllegalStateException("Legal entity script variant of script code '$scriptCode' is not covered by the legal address.")
+        LegalEntityScriptVariantDto(scriptCode, variant.legalName, variant.shortName, legalAddressVariant.toDto())
     }
 }
 
@@ -351,14 +368,13 @@ private fun SiteDb.toSiteScriptVariants(): List<SiteScriptVariantDto>{
 }
 
 private fun List<SiteScriptVariantDb>.toSiteScriptVariants(mainAddressVariants: List<LogisticAddressScriptVariantDb>): List<SiteScriptVariantDto>{
-    val siteVariantsByCode = associateBy { it.scriptCode.technicalKey }
     val mainAddressVariantsByCode = mainAddressVariants.associateBy { it.scriptCode.technicalKey }
 
-    val allKeys = siteVariantsByCode.keys.plus(mainAddressVariantsByCode.keys)
-    return allKeys.mapNotNull { key ->
-        val siteProperties = siteVariantsByCode[key] ?: return@mapNotNull null
-        val mainAddressProperties = mainAddressVariantsByCode[key]
-        SiteScriptVariantDto(key, siteProperties.name , mainAddressProperties?.toDto() ?: PostalAddressScriptVariantDto())
+    return map { variant ->
+        val scriptCode = variant.scriptCode.technicalKey
+        val mainAddressVariant = mainAddressVariantsByCode[scriptCode]
+            ?: throw IllegalStateException("Site script variant of script code '$scriptCode' is not covered by the main address.")
+        SiteScriptVariantDto(scriptCode, variant.name, mainAddressVariant.toDto())
     }
 }
 
@@ -372,19 +388,27 @@ private fun LogisticAddressScriptVariantDb.toDto(): PostalAddressScriptVariantDt
 
 private fun PhysicalAddressScriptVariantDb.toDto(): PhysicalAddressScriptVariantDto{
     return PhysicalAddressScriptVariantDto(
-        postalCode = postalCode,
         city = city,
         district = district,
         street = street?.toDto(),
-        companyPostalCode = companyPostalCode,
         industrialZone = industrialZone,
         building = building,
         floor = floor,
-        door = door,
-        taxJurisdictionCode = taxJurisdictionCode
+        door = door
     )
 }
 
 private fun AlternativeAddressScriptVariantDb.toDto(): AlternativeAddressScriptVariantDto{
-    return AlternativeAddressScriptVariantDto(postalCode, city, deliveryServiceQualifier, deliveryServiceNumber)
+    return AlternativeAddressScriptVariantDto(city)
+}
+
+private fun StreetScriptVariantDb.toDto(): StreetScriptVariantDto{
+    return StreetScriptVariantDto(
+        name = name,
+        direction = direction,
+        namePrefix = namePrefix,
+        additionalNamePrefix = additionalNamePrefix,
+        nameSuffix = nameSuffix,
+        additionalNameSuffix = additionalNameSuffix
+    )
 }

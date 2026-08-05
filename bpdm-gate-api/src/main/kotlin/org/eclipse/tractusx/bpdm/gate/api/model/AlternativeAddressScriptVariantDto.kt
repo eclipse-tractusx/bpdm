@@ -20,8 +20,5 @@
 package org.eclipse.tractusx.bpdm.gate.api.model
 
 data class AlternativeAddressScriptVariantDto(
-    val postalCode: String?,
-    val city: String?,
-    val deliveryServiceQualifier: String?,
-    val deliveryServiceNumber: String?
+    val city: String?
 )

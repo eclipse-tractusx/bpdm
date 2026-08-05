@@ -117,7 +117,7 @@ interface RelationRepository: JpaRepository<RelationDb, Long>, JpaSpecificationE
                 Specification<RelationDb> { root, _, builder ->
                     val updatedAtPath = root
                         .get<RelationOutputDb>(RelationDb::output.name)
-                        .get<Instant>(RelationOutputDb::updatedAt.name)
+                        .get<Instant>(RelationOutputDb::resultUpdatedAt.name)
 
                     builder.greaterThan(updatedAtPath, updatedAfter)
                 }
@@ -127,7 +127,7 @@ interface RelationRepository: JpaRepository<RelationDb, Long>, JpaSpecificationE
             Specification<RelationDb> { root, _, builder ->
                root
                     .get<RelationOutputDb>(RelationDb::output.name)
-                    .get<Instant>(RelationOutputDb::updatedAt.name)
+                    .get<Instant>(RelationOutputDb::resultUpdatedAt.name)
                     .isNotNull
             }
 

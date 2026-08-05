@@ -130,7 +130,8 @@ class OrchestratorRequestFactoryV7(
             isParticipantData = random.nextBoolean(),
             hasChanged = random.nextBoolean(),
             legalAddress = commonFactory.buildPostalAddress(seed, AddressType.LegalAddress, random),
-            scriptVariants = listOf(commonFactory.buildLegalEntityScriptVariant(seed, random))
+            scriptVariants = listOf(commonFactory.buildLegalEntityScriptVariant(seed, random)),
+            updatedAt = commonFactory.buildUpdatedAt(random)
         )
     }
 

@@ -40,11 +40,14 @@ class BusinessPartnerComparisonUtil {
                 entity.bpnL != persistedBP.bpnL ||
                 entity.bpnS != persistedBP.bpnS ||
                 entity.bpnA != persistedBP.bpnA ||
+                entity.ownershipUltimate != persistedBP.ownershipUltimate ||
+                entity.ultimateOwnerBpnl != persistedBP.ultimateOwnerBpnl ||
                 entity.stage != persistedBP.stage ||
                 entity.identifiers != persistedBP.identifiers ||
                 entity.states != persistedBP.states ||
                 entity.legalEntityGoldenRecordRelations != persistedBP.legalEntityGoldenRecordRelations ||
                 entity.addressGoldenRecordRelations != persistedBP.addressGoldenRecordRelations ||
+                entity.additionalSites != persistedBP.additionalSites ||
                 postalAddressHasChanges(entity.postalAddress, persistedBP.postalAddress) ||
                 scriptVariantsHaveChanges(entity.scriptVariants, persistedBP.scriptVariants)
     }
