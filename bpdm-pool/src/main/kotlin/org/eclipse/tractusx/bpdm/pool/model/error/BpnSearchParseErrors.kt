@@ -19,4 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.pool.model.error
 
-sealed interface ChangelogSearchParseError
+import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
+
+sealed interface BpnIdentifierSearchParseError {
+    data class IdentifierTypeNotFound(val typeKey: String, val businessPartnerType: IdentifierBusinessPartnerType) : BpnIdentifierSearchParseError
+}
+
+sealed interface BpnRequestIdentifierSearchParseError

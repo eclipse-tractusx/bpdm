@@ -63,9 +63,43 @@ The kind of code that earns one: a sequence whose order is load-bearing for reas
 This axis is orthogonal to the levels above; the rule is the same wherever it applies.
 
 - A rationale comment MUST be written only where the code visibly departs from a rule in these guides or from an established pattern in the repository.
+- Before writing one, you MUST be able to name the rule or the file that establishes the norm being departed from. If you cannot name it, there is no departure and the comment MUST NOT be written.
+- Existing code MUST NOT be treated as that norm. Much of the codebase predates these guides, so a neighbouring class shows what someone wrote, not what is correct; a doc MUST be derived from the rules rather than copied from a sibling file.
 - It MUST name the trigger for the departure, briefly. It MUST NOT re-explain the concept being departed from — that concept is already documented in the guide that defines it.
 - It SHOULD sit on the code that deviates, not on the code that forces the deviation.
 - Where the deviating *shape* and the deviating *sequence* are separate facts, each MUST be documented where it is visible; this is not duplication.
+
+### Worked example: is it really a departure?
+
+The hard part is not the rule, it is judging whether something departs at all. A parser that returns a `ParseResult` follows the norm — [application-code-guide.md §2.3](application-code-guide.md#23-parser-layer) requires it — so there is nothing to explain:
+
+```kotlin
+// Wrong. Presents the rule as an exception to itself, then restates the contract of the method below it.
+/**
+ * Validates the criteria of a BPN-by-request-identifier search.
+ *
+ * Unlike the other search parsers this one yields a `ParseResult`: a request identifier that was never issued a BPN is
+ * an empty result rather than a rejection, but a request exceeding the configured search request limit is refused.
+ */
+
+// Right. The responsibility, once.
+/**
+ * Validates the criteria of a BPN-by-request-identifier search.
+ */
+```
+
+The mirror case does earn a rationale, because returning the parsed value directly is the narrow exception the same rule permits, and a reader who knows the norm will otherwise look for the missing `ParseResult`:
+
+```kotlin
+/**
+ * Turns loose address search criteria into the normalized form the search operation queries with.
+ *
+ * Unlike the upsert parsers this one returns its parsed value directly instead of a `ParseResult`: no search criterion
+ * can be rejected — an unknown or malformed filter value matches nothing — so there is no failure to report.
+ */
+```
+
+The test the two cases differ on: name the rule, then check which side of it the code sits on.
 
 ## 6. Never document
 

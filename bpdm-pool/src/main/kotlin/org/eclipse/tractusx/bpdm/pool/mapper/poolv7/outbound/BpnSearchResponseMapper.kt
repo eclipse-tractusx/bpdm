@@ -19,23 +19,27 @@
 
 package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.outbound
 
-import org.eclipse.tractusx.bpdm.pool.exception.BpdmRequestSizeException
-import org.eclipse.tractusx.bpdm.pool.model.error.ChangelogSearchParseError
-import org.eclipse.tractusx.bpdm.pool.model.error.SearchValuesTooMany
+import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnRequestIdentifierMappingDto
+import org.eclipse.tractusx.bpdm.pool.entity.BpnRequestIdentifierMappingDb
+import org.eclipse.tractusx.bpdm.pool.model.BpnIdentifierMatch
 import org.springframework.stereotype.Component
 
 /**
- * Maps the changelog search parser's sealed parse errors to the errors the changelog endpoints report them with.
+ * Maps the results of the BPN search operations to the v7 API BPN mapping DTOs.
  */
 @Component
-class ChangelogParseErrorMapper {
+class BpnSearchResponseMapper {
 
     /**
-     * Returns the exception reporting a failed changelog search parse, surfacing the first error because the search
-     * fails as a whole rather than per entry.
+     * Returns the identifier-to-BPN mappings the identifier search found.
      */
-    fun toSearchException(errors: List<ChangelogSearchParseError>): RuntimeException =
-        when (val error = errors.first()) {
-            is SearchValuesTooMany -> BpdmRequestSizeException(error.count, error.maxCount)
-        }
+    fun toIdentifierMappings(matches: Set<BpnIdentifierMatch>): Set<BpnIdentifierMappingDto> =
+        matches.map { BpnIdentifierMappingDto(idValue = it.identifierValue, bpn = it.bpn) }.toSet()
+
+    /**
+     * Returns the request-identifier-to-BPN mappings the request identifier search found.
+     */
+    fun toRequestIdentifierMappings(mappings: Set<BpnRequestIdentifierMappingDb>): Set<BpnRequestIdentifierMappingDto> =
+        mappings.map { BpnRequestIdentifierMappingDto(requestedIdentifier = it.requestIdentifier, bpn = it.bpn) }.toSet()
 }

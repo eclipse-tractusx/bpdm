@@ -21,37 +21,30 @@ package org.eclipse.tractusx.bpdm.pool.service.parser
 
 import org.eclipse.tractusx.bpdm.pool.config.ControllerConfigProperties
 import org.eclipse.tractusx.bpdm.pool.model.ParseResult
-import org.eclipse.tractusx.bpdm.pool.model.error.ChangelogSearchParseError
+import org.eclipse.tractusx.bpdm.pool.model.error.BpnRequestIdentifierSearchParseError
 import org.eclipse.tractusx.bpdm.pool.model.error.SearchValuesTooMany
-import org.eclipse.tractusx.bpdm.pool.model.parsed.ChangelogSearchParsed
-import org.eclipse.tractusx.bpdm.pool.model.request.ChangelogSearchRequest
+import org.eclipse.tractusx.bpdm.pool.model.parsed.BpnRequestIdentifierSearchParsed
+import org.eclipse.tractusx.bpdm.pool.model.request.BpnRequestIdentifierSearchRequest
 import org.springframework.stereotype.Service
 
 /**
- * Turns loose changelog search criteria into the normalized form the search operation queries with.
+ * Validates the criteria of a BPN-by-request-identifier search.
  */
 @Service
-class ChangelogSearchParser(
+class BpnRequestIdentifierSearchParser(
     private val controllerConfigProperties: ControllerConfigProperties
 ) {
 
     /**
-     * Normalizes the criteria by dropping blank filter values and reading BPNs case-insensitively, failing when the BPN
-     * filter holds more values than the configured search request limit.
+     * Accepts the requested identifiers as they are, failing when the request holds more of them than the configured
+     * search request limit.
      */
-    fun parse(request: ChangelogSearchRequest): ParseResult<ChangelogSearchParsed, ChangelogSearchParseError> {
-        val bpns = request.bpns.orEmpty()
-        if (bpns.size > controllerConfigProperties.searchRequestLimit) {
-            return ParseResult.ofSingleFailure(SearchValuesTooMany(bpns.size, controllerConfigProperties.searchRequestLimit))
-        }
-
-        return ParseResult.Success(
-            ChangelogSearchParsed(
-                bpns = bpns.filter { it.isNotBlank() }.map { it.uppercase() }.toSet(),
-                businessPartnerTypes = request.businessPartnerTypes.orEmpty(),
-                timestampAfter = request.timestampAfter,
-                isCatenaXMemberData = request.isCatenaXMemberData
+    fun parse(request: BpnRequestIdentifierSearchRequest): ParseResult<BpnRequestIdentifierSearchParsed, BpnRequestIdentifierSearchParseError> {
+        if (request.requestedIdentifiers.size > controllerConfigProperties.searchRequestLimit)
+            return ParseResult.ofSingleFailure(
+                SearchValuesTooMany(request.requestedIdentifiers.size, controllerConfigProperties.searchRequestLimit)
             )
-        )
+
+        return ParseResult.Success(BpnRequestIdentifierSearchParsed(request.requestedIdentifiers))
     }
 }

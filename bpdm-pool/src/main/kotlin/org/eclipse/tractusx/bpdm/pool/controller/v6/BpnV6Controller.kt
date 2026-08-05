@@ -24,8 +24,8 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.BpnRequestIdentifierS
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.IdentifiersSearchRequestV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.BpnIdentifierMappingDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.BpnRequestIdentifierMappingDtoV6
-import org.eclipse.tractusx.bpdm.pool.config.ControllerConfigProperties
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
+import org.eclipse.tractusx.bpdm.pool.service.application.v6.BpnSearchApplicationV6Service
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
@@ -34,23 +34,16 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController("BpnControllerLegacy")
 class BpnV6Controller(
-    private val bpnLegacyServiceMapper: BpnLegacyServiceMapper,
-    private val controllerConfigProperties: ControllerConfigProperties
+    private val bpnSearchApplicationService: BpnSearchApplicationV6Service
 ) : PoolBpnV6Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun findBpnsByIdentifiers(@RequestBody request: IdentifiersSearchRequestV6): ResponseEntity<Set<BpnIdentifierMappingDtoV6>> {
-        if (request.idValues.size > controllerConfigProperties.searchRequestLimit) {
-            return ResponseEntity(HttpStatus.BAD_REQUEST)
-        }
-        return ResponseEntity(bpnLegacyServiceMapper.findBpnsByIdentifiers(request), HttpStatus.OK)
+        return ResponseEntity(bpnSearchApplicationService.searchBpnsByIdentifiers(request), HttpStatus.OK)
     }
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.READ_PARTNER})")
     override fun findBpnByRequestedIdentifiers(@RequestBody request: BpnRequestIdentifierSearchRequestV6): ResponseEntity<Set<BpnRequestIdentifierMappingDtoV6>> {
-        if (request.requestedIdentifiers.size > controllerConfigProperties.searchRequestLimit) {
-            return ResponseEntity(HttpStatus.BAD_REQUEST)
-        }
-        return ResponseEntity(bpnLegacyServiceMapper.findBpnByRequestedIdentifiers(request), HttpStatus.OK)
+        return ResponseEntity(bpnSearchApplicationService.searchBpnsByRequestedIdentifiers(request), HttpStatus.OK)
     }
 }
