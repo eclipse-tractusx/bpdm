@@ -200,7 +200,7 @@ class GoldenRecordTaskStateMachine(
     }
 
     private fun hasAlreadyResolvedStep(state: GoldenRecordTaskDb.ProcessingState, step: TaskStep): Boolean{
-        if(state.step == step) return state.stepState != GoldenRecordTaskDb.StepState.Reserved
+        if(state.step == step) return state.stepState != GoldenRecordTaskDb.StepState.Reserved && state.stepState != GoldenRecordTaskDb.StepState.Queued
         return isStepBefore(step, state.step, state.mode)
     }
 

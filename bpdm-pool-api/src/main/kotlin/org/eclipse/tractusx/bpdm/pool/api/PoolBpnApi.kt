@@ -57,7 +57,7 @@ interface PoolBpnApi {
         ]
     )
     @Tag(name = ApiCommons.BPN_NAME, description = ApiCommons.BPN_DESCRIPTION)
-    @PostMapping(value = ["${ApiCommons.BPN_BASE_PATH_V6}${CommonApiPathNames.SUBPATH_SEARCH}", "${ApiCommons.BPN_BASE_PATH_V7}${CommonApiPathNames.SUBPATH_SEARCH}"])
+    @PostMapping(value = ["${ApiCommons.BPN_BASE_PATH_V7}${CommonApiPathNames.SUBPATH_SEARCH}"])
     fun findBpnsByIdentifiers(@RequestBody request: IdentifiersSearchRequest): ResponseEntity<Set<BpnIdentifierMappingDto>>
 
     @Operation(
@@ -70,6 +70,6 @@ interface PoolBpnApi {
         ]
     )
     @Tag(name = ApiCommons.BPN_NAME, description = ApiCommons.BPN_DESCRIPTION)
-    @PostMapping(value = ["${ApiCommons.BPN_BASE_PATH_V6}/request-ids/search", "${ApiCommons.BPN_BASE_PATH_V7}/request-ids/search"])
+    @PostMapping(value = ["${ApiCommons.BPN_BASE_PATH_V7}/request-ids/search"])
     fun findBpnByRequestedIdentifiers(@RequestBody request: BpnRequestIdentifierSearchRequest): ResponseEntity<Set<BpnRequestIdentifierMappingDto>>
 }

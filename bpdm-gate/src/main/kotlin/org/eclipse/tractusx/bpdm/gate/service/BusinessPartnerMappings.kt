@@ -34,6 +34,7 @@ import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidPartnerException
 import org.eclipse.tractusx.orchestrator.api.model.AddressGoldenRecordRelationType
 import org.eclipse.tractusx.orchestrator.api.model.LegalEntityGoldenRecordRelationType
 import org.springframework.stereotype.Service
+import java.time.Instant
 
 @Service
 class BusinessPartnerMappings {
@@ -85,6 +86,7 @@ class BusinessPartnerMappings {
             address = toAddressComponentOutputDto(entity),
             externalSequenceTimestamp = entity.externalSequenceTimestamp,
             scriptVariants = entity.scriptVariants.map { variant -> toScriptVariantDto(variant) },
+            additionalSites = entity.additionalSites.map { AdditionalSiteOutputDto(siteBpn = it.bpn, name = it.name) },
             createdAt = entity.createdAt,
             updatedAt = entity.updatedAt
         )
@@ -110,6 +112,8 @@ class BusinessPartnerMappings {
             bpnL = dto.legalEntity.legalEntityBpn,
             bpnS = dto.site.siteBpn,
             bpnA = dto.address.addressBpn,
+            ownershipUltimate = dto.legalEntity.ownershipUltimate,
+            ultimateOwnerBpnl = dto.legalEntity.ultimateOwnerBpnl,
             postalAddress = toPostalAddress(dto.address),
             externalSequenceTimestamp = dto.externalSequenceTimestamp,
             legalEntityConfidence = null,
@@ -129,6 +133,8 @@ class BusinessPartnerMappings {
             legalName = entity.legalName,
             shortName = entity.shortName,
             legalForm = entity.legalForm,
+            ownershipUltimate = entity.ownershipUltimate,
+            ultimateOwnerBpnl = entity.ultimateOwnerBpnl,
             states = toStateDtos(entity.states, BusinessPartnerType.LEGAL_ENTITY)
         )
     }
@@ -167,8 +173,11 @@ class BusinessPartnerMappings {
                 entity.sharingState.externalId,
                 "Missing address confidence criteria"
             ),
+            ownershipUltimate = entity.ownershipUltimate,
+            ultimateOwnerBpnl = entity.ultimateOwnerBpnl,
             states = toStateDtos(entity.states, BusinessPartnerType.LEGAL_ENTITY),
-            goldenRecordRelations = entity.legalEntityGoldenRecordRelations.map { LegalEntityGoldenRecordRelationDto(toLeRelationType(it.relationType), it.sourceBpn, it.targetBpn) }
+            goldenRecordRelations = entity.legalEntityGoldenRecordRelations.map { LegalEntityGoldenRecordRelationDto(toLeRelationType(it.relationType), it.sourceBpn, it.targetBpn) },
+            updatedAt = entity.legalEntityUpdatedAt ?: Instant.EPOCH
         )
     }
 
@@ -183,7 +192,8 @@ class BusinessPartnerMappings {
                         entity.sharingState.externalId,
                         "Missing site confidence criteria"
                     ),
-                    states = toStateDtos(entity.states, BusinessPartnerType.SITE)
+                    states = toStateDtos(entity.states, BusinessPartnerType.SITE),
+                    updatedAt = entity.siteUpdatedAt ?: Instant.EPOCH
                 )
             }
     }
@@ -205,7 +215,8 @@ class BusinessPartnerMappings {
                 "Missing legal entity confidence criteria"
             ),
             states = toStateDtos(entity.states, BusinessPartnerType.ADDRESS),
-            goldenRecordRelations = entity.addressGoldenRecordRelations.map { AddressGoldenRecordRelationDto(toAddressRelationType(it.relationType), it.sourceBpn, it.targetBpn) }
+            goldenRecordRelations = entity.addressGoldenRecordRelations.map { AddressGoldenRecordRelationDto(toAddressRelationType(it.relationType), it.sourceBpn, it.targetBpn) },
+            updatedAt = entity.addressUpdatedAt ?: Instant.EPOCH
         )
     }
 
@@ -255,16 +266,13 @@ class BusinessPartnerMappings {
     private fun toPhysicalAddressScriptVariantDto(entity: PhysicalPostalAddressScriptVariantDb): PhysicalAddressScriptVariantDto{
         return with(entity) {
             PhysicalAddressScriptVariantDto(
-                postalCode = postalCode,
                 city = city,
                 district = district,
-                street = street?.toStreetDto() ?: StreetDto(),
-                companyPostalCode = companyPostalCode,
+                street = street?.toStreetScriptVariantDto() ?: StreetScriptVariantDto(),
                 industrialZone = industrialZone,
                 building = building,
                 floor = floor,
-                door = door,
-                taxJurisdictionCode = taxJurisdictionCode
+                door = door
             )
         }
     }
@@ -272,10 +280,7 @@ class BusinessPartnerMappings {
     private fun toAlternativeAddressScriptVariantDto(entity: AlternativePostalAddressScriptVariantDb): AlternativeAddressScriptVariantDto{
         return with(entity){
             AlternativeAddressScriptVariantDto(
-                postalCode = postalCode,
-                city = city,
-                deliveryServiceQualifier = deliveryServiceQualifier,
-                deliveryServiceNumber = deliveryServiceNumber
+                city = city
             )
         }
     }
@@ -291,36 +296,50 @@ class BusinessPartnerMappings {
                 siteName = site.name,
                 addressName = address.name,
                 physicalAddress = toPhysicalAddressScriptVariantDb(address.physicalAddress),
-                alternativeAddress = address.alternativeAddress?.let { toAlternativeAddressScriptVariantDb(it) })
+                alternativeAddress = toAlternativeAddressScriptVariantDb(address.alternativeAddress))
         }
     }
 
     private fun toPhysicalAddressScriptVariantDb(dto: PhysicalAddressScriptVariantDto): PhysicalPostalAddressScriptVariantDb{
         return with(dto){
             PhysicalPostalAddressScriptVariantDb(
-                postalCode = postalCode,
                 city = city,
                 district = district,
-                street = toStreet(street),
-                companyPostalCode = companyPostalCode,
+                street = toStreetScriptVariant(street),
                 industrialZone = industrialZone,
                 building = building,
                 floor = floor,
-                door = door,
-                taxJurisdictionCode = taxJurisdictionCode
+                door = door
             )
         }
     }
 
-    private fun toAlternativeAddressScriptVariantDb(dto: AlternativeAddressScriptVariantDto): AlternativePostalAddressScriptVariantDb{
+    private fun toAlternativeAddressScriptVariantDb(dto: AlternativeAddressScriptVariantDto?): AlternativePostalAddressScriptVariantDb?{
+        return dto?.city?.let { AlternativePostalAddressScriptVariantDb(city = it) }
+    }
+
+    private fun toStreetScriptVariant(dto: StreetScriptVariantDto): StreetScriptVariantDb{
         return with(dto){
-            AlternativePostalAddressScriptVariantDb(
-                postalCode = postalCode,
-                city = city,
-                deliveryServiceQualifier = deliveryServiceQualifier,
-                deliveryServiceNumber = deliveryServiceNumber
+            StreetScriptVariantDb(
+                name = name,
+                direction = direction,
+                namePrefix = namePrefix,
+                additionalNamePrefix = additionalNamePrefix,
+                nameSuffix = nameSuffix,
+                additionalNameSuffix = additionalNameSuffix
             )
         }
+    }
+
+    private fun StreetScriptVariantDb.toStreetScriptVariantDto(): StreetScriptVariantDto{
+        return StreetScriptVariantDto(
+            name = name,
+            direction = direction,
+            namePrefix = namePrefix,
+            additionalNamePrefix = additionalNamePrefix,
+            nameSuffix = nameSuffix,
+            additionalNameSuffix = additionalNameSuffix
+        )
     }
 
     // convert empty DTO to null

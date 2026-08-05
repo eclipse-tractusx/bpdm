@@ -2,6 +2,34 @@
 
 Documentation here concerns developers who want to contribute to this repository.
 
+<!-- TOC -->
+* [Developer View](#developer-view)
+  * [Application Code Guide](#application-code-guide)
+  * [Code Documentation Guide](#code-documentation-guide)
+  * [Testing Guide](#testing-guide)
+  * [Apps and Charts](#apps-and-charts)
+  * [License Check](#license-check)
+  * [Branching Strategy](#branching-strategy)
+  * [Adapting Golden Record Process Steps](#adapting-golden-record-process-steps)
+  * [GitHub Workflows](#github-workflows)
+  * [Create API Documentation](#create-api-documentation)
+  * [Deny Requests on Unsecured Endpoints By Default](#deny-requests-on-unsecured-endpoints-by-default)
+  * [NOTICE](#notice)
+<!-- TOC -->
+
+## Application Code Guide
+
+Our [application code guide](application-code-guide.md) explains how we design and organize the request-handling code in BPDM services — the layering, the models, and the binding rules to follow when writing create/update logic.
+
+## Code Documentation Guide
+
+Our [code documentation guide](documentation-guide.md) sets out what earns a comment and what does not — class and method contracts, when a design rationale is warranted, and the things we deliberately leave undocumented.
+
+## Testing Guide
+
+All contributions should be covered by API tests.
+Our in-depth [testing guide](testing-guide.md) how our testing setup works and what to look out for when writing your own test code.
+
 ## Apps and Charts
 
 The CICD pipeline tests new code contributions by deploying them in the current version of the BPDM chart.
@@ -108,8 +136,8 @@ In order to do so, the following changes are required:
 
 1. Adapt the available task steps in the [TaskStep Enum](../../bpdm-orchestrator-api/src/main/kotlin/org/eclipse/tractusx/orchestrator/api/model/TaskStep.kt)
 2. Change the golden record process [state machine configuration](../../bpdm-orchestrator/src/main/kotlin/org/eclipse/tractusx/bpdm/orchestrator/config/StateMachineConfig.kt)
-3. Adapt the Central-IDP configuration to include roles for the new steps. This should be done [locally](../../bpdm-common-test/src/main/resources/keycloak/CX-Central.json) as well as [remotely](https://github.com/eclipse-tractusx/portal-iam).
-    Alternatively, you can also override the generated standard permission names with ones that already exist in Central-IDP see next point)
+3. Adapt the Keycloak realm configuration to include roles for the new steps. This should be done [locally](../../bpdm-common-test/src/main/resources/keycloak/BPDM-realm.json) as well as [remotely](https://github.com/eclipse-tractusx/portal-iam).
+    Alternatively, you can also override the generated standard permission names with ones that already exist in the IdP see next point)
 4. Optionally: Adapt the step permissions in the [application properties](../../bpdm-orchestrator/src/main/resources/application.yml) for documentation purposes or for overriding the generated standard permission names
 5. Optionally: Adapt the [task worker authentication tests](../../bpdm-orchestrator/src/test/kotlin/org/eclipse/tractusx/bpdm/orchestrator/auth) for testing the new step permission configuration
 

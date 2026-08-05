@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.v6.util.metadata
 
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierBusinessPartnerTypeV6
 import org.eclipse.tractusx.bpdm.test.testdata.pool.v6.TestMetadataV6
 
 class TestMetadataV6FromResourceProvider(
@@ -33,8 +33,8 @@ class TestMetadataV6FromResourceProvider(
 
         return TestMetadataV6(
             legalForms =  legalFormImporter.importFromResource(),
-            legalEntityIdentifierTypes = allIdentifierTypes.filter { it.businessPartnerType == IdentifierBusinessPartnerType.LEGAL_ENTITY },
-            addressIdentifierTypes = allIdentifierTypes.filter { it.businessPartnerType == IdentifierBusinessPartnerType.ADDRESS },
+            legalEntityIdentifierTypes = allIdentifierTypes.filter { it.businessPartnerType == IdentifierBusinessPartnerTypeV6.LEGAL_ENTITY },
+            addressIdentifierTypes = allIdentifierTypes.filter { it.businessPartnerType == IdentifierBusinessPartnerTypeV6.ADDRESS },
             adminAreas = adminAreaLevel1Importer.importFromResource()
         )
 

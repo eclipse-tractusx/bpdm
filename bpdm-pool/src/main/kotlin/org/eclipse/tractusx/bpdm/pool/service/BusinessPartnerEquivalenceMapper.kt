@@ -37,12 +37,14 @@ class BusinessPartnerEquivalenceMapper {
                 legalForm = legalForm?.technicalKey,
                 legalName = legalName.value,
                 legalShortName = legalName.shortName,
+                ownershipUltimate = ownershipUltimate,
                 identifiers = identifiers.map { IdentifierEquivalenceDto(it.value, it.type.technicalKey) }.toSortedSet(compareBy { it.value }),
                 states = states.map { StateEquivalenceDto(it.validFrom, it.validTo, it.type) }.toSortedSet(compareBy { it.validFrom }),
                 confidenceCriteria = toEquivalenceDto(confidenceCriteria),
                 isCatenaXMemberData = isCatenaXMemberData,
-                legalAddress = toEquivalenceDto(legalEntity.legalAddress),
-                scriptVariants = scriptVariants.map { toEquivalenceDto(it) }.toSortedSet(compareBy { it.scriptCode })
+                scriptVariants = scriptVariants.map { toEquivalenceDto(it) }.toSortedSet(compareBy { it.scriptCode }),
+                isUltimateOwner = legalEntity.ownershipUltimate,
+                ultimateOwnerBpnL = legalEntity.ultimateOwnerBpnl
             )
         }
 
@@ -52,7 +54,6 @@ class BusinessPartnerEquivalenceMapper {
                 name = name,
                 states = states.map { StateEquivalenceDto(it.validFrom, it.validTo, it.type) }.toSortedSet(compareBy { it.validFrom }),
                 confidenceCriteria = toEquivalenceDto(confidenceCriteria),
-                mainAddress = toEquivalenceDto(mainAddress),
                 scriptVariants = scriptVariants.map { SiteHeaderScriptVariantEquivalenceDto(it.scriptCode.technicalKey, it.name) }.toSortedSet(compareBy { it.scriptCode })
             )
         }
@@ -110,7 +111,10 @@ class BusinessPartnerEquivalenceMapper {
                 }
             },
             confidenceCriteria = toEquivalenceDto(logisticAddress.confidenceCriteria),
-            scriptVariants = logisticAddress.scriptVariants.map { toEquivalenceDto(it) }.toSortedSet(compareBy { it.scriptCode })
+            scriptVariants = logisticAddress.scriptVariants.map { toEquivalenceDto(it) }.toSortedSet(compareBy { it.scriptCode }),
+            // Site membership is identified by the stable site BPN; assigning/removing an address from a site must
+            // register as an address change so it emits an ADDRESS UPDATE changelog.
+            siteBpns = logisticAddress.sites.map { it.bpn }.toSortedSet()
         )
 
     fun toEquivalenceDto(logisticAddressScriptVariant: LogisticAddressScriptVariantDb ) =
@@ -120,39 +124,30 @@ class BusinessPartnerEquivalenceMapper {
                 name = name,
                 physicalAddress = with(physicalAddress){
                     PhysicalAddressScriptVariantEquivalenceDto(
-                        postalCode = postalCode,
                         city = city,
                         district = district,
                         street = street?.let {
                             with(it) {
-                                StreetEquivalenceDto(
+                                StreetScriptVariantEquivalenceDto(
                                     name = name,
-                                    houseNumber = houseNumber,
-                                    houseNumberSupplement = houseNumberSupplement,
-                                    milestone = milestone,
                                     direction = direction,
                                     namePrefix = namePrefix,
                                     additionalNamePrefix = additionalNamePrefix,
                                     nameSuffix = nameSuffix,
-                                    additionalNameSuffix = additionalNamePrefix
+                                    additionalNameSuffix = additionalNameSuffix
                                 )
                             }
                         },
-                        companyPostalCode = companyPostalCode,
                         industrialZone = industrialZone,
                         building = building,
                         floor = floor,
-                        door = door,
-                        taxJurisdictionCode = taxJurisdictionCode
+                        door = door
                     )
                 },
                 alternativeAddress = alternativeAddress?.let {
                     with(it){
                         AlternativeAddressScriptVariantEquivalenceDto(
-                            postalCode = postalCode,
-                            city = city,
-                            deliveryServiceQualifier = deliveryServiceQualifier,
-                            deliveryServiceNumber = deliveryServiceNumber
+                            city = city
                         )
                     }
                 }
@@ -179,12 +174,14 @@ class BusinessPartnerEquivalenceMapper {
         override val legalForm: String?,
         val legalName: String?,
         override val legalShortName: String?,
+        val ownershipUltimate: Boolean,
         override val identifiers: SortedSet<IdentifierEquivalenceDto>,
         override val states: SortedSet<StateEquivalenceDto>,
         override val confidenceCriteria: ConfidenceCriteriaEquivalenceDto?,
-        val legalAddress: LogisticAddressEquivalenceDto?,
         val isCatenaXMemberData: Boolean,
         val scriptVariants: SortedSet<LegalEntityScriptVariantEquivalenceDto>,
+        val isUltimateOwner: Boolean,
+        val ultimateOwnerBpnL: String?
     ) : IBaseLegalEntityDto
 
     data class LegalEntityScriptVariantEquivalenceDto(
@@ -197,7 +194,6 @@ class BusinessPartnerEquivalenceMapper {
         override val name: String?,
         override val states: Collection<StateEquivalenceDto>,
         override val confidenceCriteria: ConfidenceCriteriaEquivalenceDto?,
-        val mainAddress: LogisticAddressEquivalenceDto,
         val scriptVariants: SortedSet<SiteHeaderScriptVariantEquivalenceDto>,
     ) : IBaseSiteDto
 
@@ -213,7 +209,8 @@ class BusinessPartnerEquivalenceMapper {
         override val physicalPostalAddress: PhysicalAddressEquivalenceDto?,
         override val alternativePostalAddress: AlternativeEquivalenceDto?,
         override val confidenceCriteria: ConfidenceCriteriaEquivalenceDto?,
-        val scriptVariants: SortedSet<LogisticAddressScriptVariantEquivalenceDto>
+        val scriptVariants: SortedSet<LogisticAddressScriptVariantEquivalenceDto>,
+        val siteBpns: SortedSet<String>
     ) : IBaseLogisticAddressDto
 
     data class IdentifierEquivalenceDto(
@@ -287,22 +284,25 @@ class BusinessPartnerEquivalenceMapper {
     )
 
     data class PhysicalAddressScriptVariantEquivalenceDto(
-        val postalCode: String?,
         val city: String?,
         val district: String?,
-        val street: StreetEquivalenceDto?,
-        val companyPostalCode: String?,
+        val street: StreetScriptVariantEquivalenceDto?,
         val industrialZone: String?,
         val building: String?,
         val floor: String?,
-        val door: String?,
-        val taxJurisdictionCode: String?
+        val door: String?
     )
 
     data class AlternativeAddressScriptVariantEquivalenceDto(
-        val postalCode: String?,
-        val city: String?,
-        val deliveryServiceQualifier: String?,
-        val deliveryServiceNumber: String?
+        val city: String?
+    )
+
+    data class StreetScriptVariantEquivalenceDto(
+        val name: String?,
+        val direction: String?,
+        val namePrefix: String?,
+        val additionalNamePrefix: String?,
+        val nameSuffix: String?,
+        val additionalNameSuffix: String?
     )
 }

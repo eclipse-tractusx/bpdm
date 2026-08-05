@@ -21,9 +21,15 @@ package org.eclipse.tractusx.bpdm.common.util
 
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
+import org.springframework.security.authentication.AnonymousAuthenticationToken
+import org.springframework.security.core.authority.AuthorityUtils
+import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager
-import org.springframework.security.oauth2.client.web.reactive.function.client.ServletOAuth2AuthorizedClientExchangeFilterFunction
+import org.springframework.web.reactive.function.client.ClientRequest
+import org.springframework.web.reactive.function.client.ExchangeFilterFunction
 import org.springframework.web.reactive.function.client.WebClient
+import reactor.core.publisher.Mono
+import reactor.core.scheduler.Schedulers
 
 
 interface BpdmWebClientProvider{
@@ -44,13 +50,40 @@ class BpdmOAuth2WebClientProvider(
 ): BpdmWebClientProvider{
     override fun builder(properties: BpdmClientCreateProperties): WebClient.Builder {
         return if(properties.securityEnabled) {
-            val oAuth2ExchangeFilter = ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager)
-            oAuth2ExchangeFilter.setDefaultClientRegistrationId(properties.registrationId)
-            oAuth2ExchangeFilter.setDefaultOAuth2AuthorizedClient(true)
-
-            bpdmWebClientProvider.builder(properties).apply(oAuth2ExchangeFilter.oauth2Configuration())
+            bpdmWebClientProvider.builder(properties)
+                .filter(clientCredentialsBearerTokenFilter(properties.registrationId))
         }else{
             bpdmWebClientProvider.builder(properties)
+        }
+    }
+
+    /**
+     * Attaches a client_credentials access token to every request.
+     *
+     * We deliberately do not use Spring's ServletOAuth2AuthorizedClientExchangeFilterFunction here: since Spring Security 7.1
+     * it short-circuits (no token, no error) whenever there is no bound HttpServletRequest/HttpServletResponse. Our clients are
+     * also driven from non-servlet threads (scheduled sync/cleaning jobs), where that context is absent, so it would silently
+     * emit unauthenticated requests. The AuthorizedClientServiceOAuth2AuthorizedClientManager only needs a principal to perform
+     * a client_credentials grant, so we resolve the token ourselves with a fixed anonymous principal.
+     */
+    private fun clientCredentialsBearerTokenFilter(registrationId: String): ExchangeFilterFunction {
+        val principal = AnonymousAuthenticationToken(
+            "bpdm-client", "bpdm-client",
+            AuthorityUtils.createAuthorityList("ROLE_ANONYMOUS")
+        )
+        return ExchangeFilterFunction { request, next ->
+            Mono.fromSupplier {
+                authorizedClientManager.authorize(
+                    OAuth2AuthorizeRequest.withClientRegistrationId(registrationId).principal(principal).build()
+                ) ?: throw IllegalStateException("client_credentials authorization failed for registration '$registrationId'")
+            }
+                .subscribeOn(Schedulers.boundedElastic())
+                .map { authorizedClient ->
+                    ClientRequest.from(request)
+                        .headers { it.setBearerAuth(authorizedClient.accessToken.tokenValue) }
+                        .build()
+                }
+                .flatMap(next::exchange)
         }
     }
 }

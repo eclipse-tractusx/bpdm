@@ -152,7 +152,7 @@ class CleaningServiceDummy(
             PostalAddressWithScriptVariants(
                 postalProperties = cleanAddress(
                     it.postalProperties,
-                    it.bpnReference.toRequestIfNotBpn(businessPartner.legalEntityReference(), businessPartner.siteReference(), businessPartner.addressReference()),
+                    it.bpnReference.toRequestIfNotBpn(businessPartner.legalEntityReference(), null, businessPartner.addressReference()),
                     businessPartner.type == GoldenRecordType.Address,
                     sharedByOwner
                 ),

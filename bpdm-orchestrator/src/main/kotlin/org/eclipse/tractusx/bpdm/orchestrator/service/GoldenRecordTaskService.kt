@@ -63,7 +63,7 @@ class GoldenRecordTaskService(
     fun searchTaskResultStates(stateRequest: TaskResultStateSearchRequest): TaskResultStateSearchResponse{
         logger.debug { "Search for ${stateRequest.taskIds.size} task result states" }
 
-        val uuidsToSearch = stateRequest.taskIds.map { UUID.fromString(it) }.toSet()
+        val uuidsToSearch = stateRequest.taskIds.map { toUUID(it) }.toSet()
         val tasksByUuid  = taskRepository.findByUuidIn(uuidsToSearch).associateBy { it.uuid }
 
         return TaskResultStateSearchResponse(uuidsToSearch

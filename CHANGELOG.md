@@ -6,7 +6,36 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
 For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/CHANGELOG.md) of the charts directly.
 
-## [7.4.0] - tbd
+## [7.5.0] - unreleased
+
+### Breaking
+
+- BPDM Pool, Gate and Orchestrator: Removed fields from business partner script variants that are not written differently in another script.
+  A script variant no longer contains the physical address `postalCode`, `companyPostalCode` and `taxJurisdictionCode`, its street's `houseNumber`, `houseNumberSupplement` and `milestone`, or the alternative address `postalCode`, `deliveryServiceQualifier` and `deliveryServiceNumber` [#1593](https://github.com/eclipse-tractusx/bpdm/issues/1593)
+- BPDM Pool: Removed script variants from the deprecated v6 API entirely. Script variants postdate the frozen v6 contract and should never have been added to it.
+  As a consequence a business partner written over the v6 API has no script variants, and a v6 update drops the script variants that business partner gained over the v7 API or through the golden record process.
+  Please consult the [MIGRATION_GUIDE](./docs/admin/MIGRATION_GUIDE.md) [#1593](https://github.com/eclipse-tractusx/bpdm/issues/1593)
+- BPDM Pool: Script variants now carry the same mandatory content as the invariant data they mirror, so requests that were previously accepted can be rejected.
+  A legal entity script variant needs a `legalName`, a site script variant a `name`, an address script variant the `physicalAddress.city` (and the `alternativeAddress.city` if it supplies an alternative address at all), and no two script variants of one business partner may share a script code.
+  These fields became non-null in the v7 API so the requirement is part of the schema, and a Flyway migration deletes stored script variants that do not meet it.
+  A legal entity or site script variant is also only valid where its legal address or site main address covers the same script code, which every create and update now rejects and a headquarter relocation now prunes.
+  For the same reason no write may take that coverage away from a business partner that still needs it: an address update, a site update, a legal entity update or a golden record task that drops a script code the address's legal entity or one of its sites is still named in is rejected with `ScriptVariantCoverageStillNeeded`.
+  A golden record task is judged as a whole here, so it may rewrite the business partners it carries itself and is only rejected for coverage it takes away from business partners it does not carry.
+  Please consult the [MIGRATION_GUIDE](./docs/admin/MIGRATION_GUIDE.md) [#1593](https://github.com/eclipse-tractusx/bpdm/issues/1593)
+
+### Added
+
+- BPDM Pool: Added ultimate owner tracking fields to legal entities - `ownershipUltimate` flag and `ultimateOwnerBpnl` column - to support future ultimate owner resolution features [#1718](https://github.com/eclipse-tractusx/bpdm/issues/1718)
+- BPDM Gate: Added two new fields to business partner legal entity representation - `ownershipUltimate` to designate whether a legal entity is the ultimate owner in an ownership chain, and `ultimateOwnerBpnl` to hold the BPNL of the designated ultimate owner up in the ownership chain [#1718](https://github.com/eclipse-tractusx/bpdm/issues/1718)
+- BPDM Pool: Support multiple sites per address by merging incoming sites onto existing addresses instead of overwriting them; queries now return an address's main site plus all additional sites [#1661](https://github.com/eclipse-tractusx/sig-release/issues/1661)
+- BPDM Gate: Business partner output now includes additional sites belonging to an address [#1661](https://github.com/eclipse-tractusx/sig-release/issues/1661)
+
+### Changed
+
+- BPDM Pool: A golden record task that puts a new site on an already existing address now applies the site main address payload it carries to that address, instead of leaving the address content untouched.
+  This is what lets such a site be named in its own scripts; in exchange the payload has to keep covering the scripts the address's other business partners are named in [#1661](https://github.com/eclipse-tractusx/sig-release/issues/1661)
+
+## [7.4.0] - 2026-06-10
 
 ### Breaking
 
@@ -18,6 +47,14 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 
 - Script variants and script codes for business partner data [#1593](https://github.com/eclipse-tractusx/bpdm/issues/1593)
 - BPDM Gate: Golden record relations to business partner output [#1630](https://github.com/eclipse-tractusx/bpdm/issues/1630)
+- BPDM Pool: Seed default Business Partner Relation Reason Code via Flyway migration [#1679](https://github.com/eclipse-tractusx/bpdm/issues/1679)
+- BPDM Pool: Populating Golden Record Task Business Partner's UpdatedAt [#1564](https://github.com/eclipse-tractusx/bpdm/issues/1564)
+- BPDM Gate: Persist and expose golden record component `updatedAt` timestamps in output and skip stale output updates [#1689](https://github.com/eclipse-tractusx/bpdm/issues/1689)
+
+### Changed
+
+- BPDM Gate: Fix V7 relation output changelog always showing "UPDATE" type even if the relation output has been created [#1665](https://github.com/eclipse-tractusx/bpdm/issues/1665)
+- BPDM Gate: Fix rare bug in which duplicate sharing member records with the same external-id can be created if they are shared in parallel [#1546](https://github.com/eclipse-tractusx/bpdm/issues/1546)
 
 ## [7.3.0] - 2026-03-6
 
@@ -31,6 +68,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM: Introduced support for business partner address-to-address relations with the new `IsReplacedBy` relation type. [#1561](https://github.com/eclipse-tractusx/bpdm/issues/1561)
 - BPDM Pool: Add endpoints to manage reason code metadata [1562](https://github.com/eclipse-tractusx/bpdm/issues/1562)
 - BPDM: Add reason codes to business partner relations [1562](https://github.com/eclipse-tractusx/bpdm/issues/1562)
+- BPDM Pool: Populating Golden Record Task Business Partner's UpdatedAt [#1564](https://github.com/eclipse-tractusx/bpdm/issues/1564)
 - BPDM Pool: Relocate legal entity headquarter when a replaced by relation between a legal address and an additional address activates [#1586](https://github.com/eclipse-tractusx/bpdm/issues/1586)
 
 ### Changed

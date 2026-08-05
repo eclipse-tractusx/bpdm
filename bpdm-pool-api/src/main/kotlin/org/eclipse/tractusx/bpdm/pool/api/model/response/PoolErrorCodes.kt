@@ -36,7 +36,11 @@ enum class LegalEntityCreateError : ErrorCode {
     LegalAddressIdentifierNotFound,
     LegalAddressDuplicateIdentifier,
     LegalEntityIdentifiersTooMany,
-    LegalAddressIdentifiersTooMany
+    LegalAddressIdentifiersTooMany,
+    ScriptVariantLegalNameMissing,
+    ScriptVariantDuplicateScriptCode,
+    LegalAddressScriptVariantCityMissing,
+    LegalAddressScriptVariantDuplicateScriptCode
 }
 
 @Schema(description = "LegalEntityUpdateError")
@@ -49,7 +53,13 @@ enum class LegalEntityUpdateError : ErrorCode {
     LegalAddressIdentifierNotFound,
     LegalAddressDuplicateIdentifier,
     LegalEntityIdentifiersTooMany,
-    LegalAddressIdentifiersTooMany
+    LegalAddressIdentifiersTooMany,
+    MultipleUltimateOwnersInHierarchy,
+    ScriptVariantLegalNameMissing,
+    ScriptVariantDuplicateScriptCode,
+    LegalAddressScriptVariantCityMissing,
+    LegalAddressScriptVariantDuplicateScriptCode,
+    ScriptVariantCoverageStillNeeded
 }
 
 @Schema(description = "SiteCreateError")
@@ -58,7 +68,12 @@ enum class SiteCreateError : ErrorCode {
     MainAddressIdentifierNotFound,
     MainAddressRegionNotFound,
     MainAddressDuplicateIdentifier,
-    MainAddressIdentifiersTooMany
+    MainAddressIdentifiersTooMany,
+    ScriptVariantNameMissing,
+    ScriptVariantDuplicateScriptCode,
+    MainAddressScriptVariantCityMissing,
+    MainAddressScriptVariantDuplicateScriptCode,
+    ScriptVariantNotCoveredByMainAddress
 }
 
 @Schema(description = "SiteUpdateError")
@@ -67,25 +82,37 @@ enum class SiteUpdateError : ErrorCode {
     MainAddressIdentifierNotFound,
     MainAddressRegionNotFound,
     MainAddressDuplicateIdentifier,
-    MainAddressIdentifiersTooMany
+    MainAddressIdentifiersTooMany,
+    ScriptVariantNameMissing,
+    ScriptVariantDuplicateScriptCode,
+    MainAddressScriptVariantCityMissing,
+    MainAddressScriptVariantDuplicateScriptCode,
+    ScriptVariantCoverageStillNeeded
 }
 
 @Schema(description = "AddressCreateError")
 enum class AddressCreateError : ErrorCode {
     BpnNotValid,
     SiteNotFound,
+    SiteNotInLegalEntity,
     LegalEntityNotFound,
     RegionNotFound,
     IdentifierNotFound,
     AddressDuplicateIdentifier,
-    IdentifiersTooMany
+    IdentifiersTooMany,
+    ScriptVariantCityMissing,
+    ScriptVariantDuplicateScriptCode
 }
 
 @Schema(description = "AddressUpdateError")
 enum class AddressUpdateError : ErrorCode {
     AddressNotFound,
+    SiteNotInLegalEntity,
     RegionNotFound,
     IdentifierNotFound,
     AddressDuplicateIdentifier,
-    IdentifiersTooMany
+    IdentifiersTooMany,
+    ScriptVariantCityMissing,
+    ScriptVariantDuplicateScriptCode,
+    ScriptVariantCoverageStillNeeded
 }

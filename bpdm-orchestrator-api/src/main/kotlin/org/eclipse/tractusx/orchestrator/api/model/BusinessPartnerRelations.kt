@@ -35,7 +35,7 @@ data class BusinessPartnerRelations(
     @Schema(description = RelationValidityPeriodDescription.header)
     val validityPeriods : Collection<RelationValidityPeriod>,
     @Schema(description = RelationDescription.reasonCode)
-    val reasonCode: String,
+    val reasonCode: String?,
 ) {
     companion object {
         val empty = BusinessPartnerRelations(
@@ -43,7 +43,7 @@ data class BusinessPartnerRelations(
             businessPartnerSourceBpn = "",
             businessPartnerTargetBpn = "",
             validityPeriods = emptyList(),
-            reasonCode = ""
+            reasonCode = null
         )
     }
 }

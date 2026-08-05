@@ -1,6 +1,6 @@
 # bpdm-pool
 
-![Version: 8.4.0-SNAPSHOT](https://img.shields.io/badge/Version-8.4.0--SNAPSHOT-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 7.4.0-SNAPSHOT](https://img.shields.io/badge/AppVersion-7.4.0--SNAPSHOT-informational?style=flat-square)
+![Version: 9.1.0-SNAPSHOT](https://img.shields.io/badge/Version-9.1.0--SNAPSHOT-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 7.5.0-SNAPSHOT](https://img.shields.io/badge/AppVersion-7.5.0--SNAPSHOT-informational?style=flat-square)
 
 A Helm chart for deploying the BPDM pool service
 
@@ -21,9 +21,7 @@ A Helm chart for deploying the BPDM pool service
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://../bpdm-common | bpdm-common | 1.0.5 |
-| https://charts.bitnami.com/bitnami | postgres(postgresql) | 12.12.10 |
-| https://eclipse-tractusx.github.io/charts/dev | centralidp(centralidp) | 4.2.1 |
+| file://../bpdm-common | bpdm-common | 2.0.0 |
 
 ## Values
 
@@ -34,11 +32,11 @@ A Helm chart for deploying the BPDM pool service
 | affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.topologyKey | string | `"kubernetes.io/hostname"` |  |
 | affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].weight | int | `100` |  |
 | applicationConfig | string | `nil` |  |
-| applicationSecrets.spring.dataSource.password | string | `"bpdm"` |  |
+| applicationSecrets | string | `nil` |  |
 | autoscaling.enabled | bool | `false` |  |
-| centralidp.enabled | bool | `true` |  |
 | configMountSecurity.readOnly | bool | `true` |  |
 | configMountSecurity.recursiveReadOnly | string | `"Enabled"` |  |
+| externalApplicationConfig | list | `[]` |  |
 | fullnameOverride | string | `nil` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.registry | string | `"docker.io"` |  |
@@ -60,10 +58,6 @@ A Helm chart for deploying the BPDM pool service
 | nameOverride | string | `nil` |  |
 | nodeSelector | object | `{}` |  |
 | podAnnotations | object | `{}` |  |
-| postgres.auth.database | string | `"bpdm"` |  |
-| postgres.auth.password | string | `"bpdm"` |  |
-| postgres.auth.username | string | `"bpdm"` |  |
-| postgres.enabled | bool | `false` |  |
 | readinessProbe.failureThreshold | int | `5` |  |
 | readinessProbe.httpGet.path | string | `"/actuator/health/readiness"` |  |
 | readinessProbe.httpGet.port | int | `8080` |  |

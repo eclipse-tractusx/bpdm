@@ -22,9 +22,9 @@ package org.eclipse.tractusx.bpdm.pool.v6.metadata
 import com.neovisionaries.i18n.CountryCode
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDetailDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierTypeDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierBusinessPartnerTypeV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierTypeDetailDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierTypeDtoV6
 import org.eclipse.tractusx.bpdm.pool.v6.UnscheduledPoolTestBaseV6
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
@@ -38,8 +38,8 @@ class IdentifierTypeCreateV6IT: UnscheduledPoolTestBaseV6() {
      * THEN created identifier type returned
      */
     @ParameterizedTest(name = "{displayName} - {arguments}")
-    @EnumSource(IdentifierBusinessPartnerType::class)
-    fun `create new identifier type`(type: IdentifierBusinessPartnerType){
+    @EnumSource(IdentifierBusinessPartnerTypeV6::class)
+    fun `create new identifier type`(type: IdentifierBusinessPartnerTypeV6){
         val request = createIdentifierTypeRequest(testName, type)
         val response = poolClient.metadata.createIdentifierType(request)
 
@@ -51,8 +51,8 @@ class IdentifierTypeCreateV6IT: UnscheduledPoolTestBaseV6() {
      * THEN operator can find new identifier type in available metadata
      */
     @ParameterizedTest(name = "{displayName} - {arguments}")
-    @EnumSource(IdentifierBusinessPartnerType::class)
-    fun `create new identifier type and find it`(type: IdentifierBusinessPartnerType){
+    @EnumSource(IdentifierBusinessPartnerTypeV6::class)
+    fun `create new identifier type and find it`(type: IdentifierBusinessPartnerTypeV6){
         val request = createIdentifierTypeRequest(testName, type)
         poolClient.metadata.createIdentifierType(request)
 
@@ -81,8 +81,8 @@ class IdentifierTypeCreateV6IT: UnscheduledPoolTestBaseV6() {
      * THEN 409 CONFLICT returned
      */
     @ParameterizedTest(name = "{displayName} - {arguments}")
-    @EnumSource(IdentifierBusinessPartnerType::class)
-    fun `try create new identifier type with duplicate technical key`(type: IdentifierBusinessPartnerType){
+    @EnumSource(IdentifierBusinessPartnerTypeV6::class)
+    fun `try create new identifier type with duplicate technical key`(type: IdentifierBusinessPartnerTypeV6){
         val request = createIdentifierTypeRequest(testName, type)
         poolClient.metadata.createIdentifierType(request)
 
@@ -90,20 +90,20 @@ class IdentifierTypeCreateV6IT: UnscheduledPoolTestBaseV6() {
             .isInstanceOf(WebClientResponseException.Conflict::class.java)
     }
 
-    private fun createIdentifierTypeRequest(seed: String, type: IdentifierBusinessPartnerType): IdentifierTypeDto {
+    private fun createIdentifierTypeRequest(seed: String, type: IdentifierBusinessPartnerTypeV6): IdentifierTypeDtoV6 {
        val random = Random(seed.hashCode())
 
-        return IdentifierTypeDto(
+        return IdentifierTypeDtoV6(
             technicalKey = seed,
             businessPartnerType = type,
-            name = "$seed ${IdentifierTypeDto::name.name}",
-            abbreviation = "$seed ${IdentifierTypeDto::abbreviation.name}",
-            transliteratedName = "$seed ${IdentifierTypeDto::transliteratedName.name}",
-            transliteratedAbbreviation = "$seed ${IdentifierTypeDto::transliteratedAbbreviation.name}",
+            name = "$seed ${IdentifierTypeDtoV6::name.name}",
+            abbreviation = "$seed ${IdentifierTypeDtoV6::abbreviation.name}",
+            transliteratedName = "$seed ${IdentifierTypeDtoV6::transliteratedName.name}",
+            transliteratedAbbreviation = "$seed ${IdentifierTypeDtoV6::transliteratedAbbreviation.name}",
             details = (1..random.nextInt(3, 10))
                 .map { CountryCode.entries.random(random) }
                 .toSet()
-                .map { IdentifierTypeDetailDto(it, random.nextBoolean()) }
+                .map { IdentifierTypeDetailDtoV6(it, random.nextBoolean()) }
         )
     }
 }

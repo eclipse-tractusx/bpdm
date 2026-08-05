@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.v6.relation
 
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
-import org.eclipse.tractusx.bpdm.gate.v6.GateUnscheduledInitialStartV6Test
+import org.eclipse.tractusx.bpdm.gate.v6.UnscheduledGateV6TestBase
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import java.time.Instant
@@ -44,7 +44,7 @@ import java.time.Instant
  *
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
-class RelationSearchV6IT: GateUnscheduledInitialStartV6Test() {
+class RelationSearchV6IT: UnscheduledGateV6TestBase() {
 
     /**
      * GIVEN relations

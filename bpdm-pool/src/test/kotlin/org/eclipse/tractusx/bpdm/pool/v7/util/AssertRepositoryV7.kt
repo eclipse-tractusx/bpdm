@@ -24,7 +24,9 @@ import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguratio
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityHeaderVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressInvariantVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressScriptVariantDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.SiteScriptVariantDto
 import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.test.util.InstantSecondsComparator
@@ -149,6 +151,22 @@ class AssertRepositoryV7(
         Assertions.assertThat(actual.sortLogisticAddressInvariant())
             .usingRecursiveComparison(comparisonConfigurationForExisting)
             .isEqualTo(expected.sortLogisticAddressInvariant())
+    }
+
+    /**
+     * Asserts that the address carries no script variant, having carried [previousScriptVariants] before.
+     */
+    fun assertAddressScriptVariantsCleared(actual: LogisticAddressVerboseDto, previousScriptVariants: Collection<LogisticAddressScriptVariantDto>){
+        Assertions.assertThat(previousScriptVariants).isNotEmpty()
+        Assertions.assertThat(actual.scriptVariants).isEmpty()
+    }
+
+    /**
+     * Asserts that the site carries no script variant, having carried [previousScriptVariants] before.
+     */
+    fun assertSiteScriptVariantsCleared(actual: SiteWithMainAddressVerboseDto, previousScriptVariants: Collection<SiteScriptVariantDto>){
+        Assertions.assertThat(previousScriptVariants).isNotEmpty()
+        Assertions.assertThat(actual.site.scriptVariants).isEmpty()
     }
 
     private fun LegalEntityPartnerCreateResponseWrapper.sortContent() =

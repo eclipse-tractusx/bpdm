@@ -50,10 +50,15 @@ class OutputUpsertMappings(
                 bpnL = legalEntityBpn,
                 bpnS = siteBpn,
                 bpnA = addressBpn,
+                ownershipUltimate = ownershipUltimate,
+                ultimateOwnerBpnl = ultimateOwnerBpnl,
                 postalAddress = PostalAddressDb(addressType, physicalPostalAddress.toEntity(), alternativePostalAddress?.toEntity()),
                 legalEntityConfidence = legalEntityConfidence.toEntity(),
                 siteConfidence = siteConfidence?.toEntity(),
-                addressConfidence = addressConfidence.toEntity()
+                addressConfidence = addressConfidence.toEntity(),
+                legalEntityUpdatedAt = legalEntityUpdatedAt,
+                siteUpdatedAt = siteUpdatedAt,
+                addressUpdatedAt = addressUpdatedAt
             )
         }
 
@@ -64,6 +69,8 @@ class OutputUpsertMappings(
             .forEach { businessPartner.legalEntityGoldenRecordRelations.add(it) }
         upsertData.addressGoldenRecordRelations.map { toAddressGoldenRecordRelation(it) }
             .forEach { businessPartner.addressGoldenRecordRelations.add(it) }
+        upsertData.additionalSites.map { AdditionalSiteDb(it.siteBpn, it.name) }
+            .forEach { businessPartner.additionalSites.add(it) }
 
         return businessPartner
     }
