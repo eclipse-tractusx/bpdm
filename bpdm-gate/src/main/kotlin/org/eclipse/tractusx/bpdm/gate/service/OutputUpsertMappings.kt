@@ -50,20 +50,27 @@ class OutputUpsertMappings(
                 bpnL = legalEntityBpn,
                 bpnS = siteBpn,
                 bpnA = addressBpn,
+                ownershipUltimate = ownershipUltimate,
+                ultimateOwnerBpnl = ultimateOwnerBpnl,
                 postalAddress = PostalAddressDb(addressType, physicalPostalAddress.toEntity(), alternativePostalAddress?.toEntity()),
                 legalEntityConfidence = legalEntityConfidence.toEntity(),
                 siteConfidence = siteConfidence?.toEntity(),
-                addressConfidence = addressConfidence.toEntity()
+                addressConfidence = addressConfidence.toEntity(),
+                legalEntityUpdatedAt = legalEntityUpdatedAt,
+                siteUpdatedAt = siteUpdatedAt,
+                addressUpdatedAt = addressUpdatedAt
             )
         }
 
         val scriptVariants = upsertData.scriptVariants.map { variant ->  businessPartnerMappings.toScriptVariantDb(businessPartner, variant) }
         scriptVariants.forEach { businessPartner.scriptVariants.add(it) }
 
-        upsertData.legalEntityGoldenRecordRelations.map { toLegalEntityGoldenRecordRelation(it) }
-            .forEach { businessPartner.legalEntityGoldenRecordRelations.add(it) }
-        upsertData.addressGoldenRecordRelations.map { toAddressGoldenRecordRelation(it) }
-            .forEach { businessPartner.addressGoldenRecordRelations.add(it) }
+        businessPartner.legalEntityGoldenRecordRelations.addAll(
+            upsertData.legalEntityGoldenRecordRelations.map { toLegalEntityGoldenRecordRelation(it) }
+        )
+        businessPartner.addressGoldenRecordRelations.addAll(
+            upsertData.addressGoldenRecordRelations.map { toAddressGoldenRecordRelation(it) }
+        )
 
         return businessPartner
     }

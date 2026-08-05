@@ -12,9 +12,11 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 
 ### Added
 
-- BPDM Pool: Seed Business Partner Relation Reason Codes via Flyway migration [#1679](https://github.com/eclipse-tractusx/bpdm/issues/1679)
+- BPDM Pool: Added ultimate owner tracking fields to legal entities - `ownershipUltimate` flag and `ultimateOwnerBpnl` column - to support future ultimate owner resolution features [#1718](https://github.com/eclipse-tractusx/bpdm/issues/1718)
+- BPDM Gate: Added two new fields to business partner legal entity representation - `ownershipUltimate` to designate whether a legal entity is the ultimate owner in an ownership chain, and `ultimateOwnerBpnl` to hold the BPNL of the designated ultimate owner up in the ownership chain [#1718](https://github.com/eclipse-tractusx/bpdm/issues/1718)
 
 ### Changed
+
 
 ## [7.4.0] - 2026-06-10
 
@@ -29,6 +31,8 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - Script variants and script codes for business partner data [#1593](https://github.com/eclipse-tractusx/bpdm/issues/1593)
 - BPDM Gate: Golden record relations to business partner output [#1630](https://github.com/eclipse-tractusx/bpdm/issues/1630)
 - BPDM Pool: Seed default Business Partner Relation Reason Code via Flyway migration [#1679](https://github.com/eclipse-tractusx/bpdm/issues/1679)
+- BPDM Pool: Populating Golden Record Task Business Partner's UpdatedAt [#1564](https://github.com/eclipse-tractusx/bpdm/issues/1564)
+- BPDM Gate: Persist and expose golden record component `updatedAt` timestamps in output and skip stale output updates [#1689](https://github.com/eclipse-tractusx/bpdm/issues/1689)
 
 ### Changed
 
@@ -47,6 +51,7 @@ For changes to the BPDM Helm charts please consult the [changelog](charts/bpdm/C
 - BPDM: Introduced support for business partner address-to-address relations with the new `IsReplacedBy` relation type. [#1561](https://github.com/eclipse-tractusx/bpdm/issues/1561)
 - BPDM Pool: Add endpoints to manage reason code metadata [1562](https://github.com/eclipse-tractusx/bpdm/issues/1562)
 - BPDM: Add reason codes to business partner relations [1562](https://github.com/eclipse-tractusx/bpdm/issues/1562)
+- BPDM Pool: Populating Golden Record Task Business Partner's UpdatedAt [#1564](https://github.com/eclipse-tractusx/bpdm/issues/1564)
 - BPDM Pool: Relocate legal entity headquarter when a replaced by relation between a legal address and an additional address activates [#1586](https://github.com/eclipse-tractusx/bpdm/issues/1586)
 
 ### Changed

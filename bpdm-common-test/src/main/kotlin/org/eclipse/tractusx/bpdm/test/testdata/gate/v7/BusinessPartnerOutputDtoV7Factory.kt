@@ -98,6 +98,32 @@ class BusinessPartnerOutputDtoV7Factory {
         )
     }
 
+    fun fromAdditionalAddressOnLegalEntity(
+        input: BusinessPartnerInputDto,
+        legalEntity: LegalEntityWithLegalAddressVerboseDto,
+        additionalAddress: LogisticAddressVerboseDto
+    ): BusinessPartnerOutputDto {
+        return BusinessPartnerOutputDto(
+            externalId = input.externalId,
+            nameParts = input.nameParts,
+            identifiers = additionalAddress.address.identifiers.map { BusinessPartnerIdentifierDto(it.type, it.value, null) },
+            states = additionalAddress.address.states.map { BusinessPartnerStateDto(it.validFrom, it.validTo, it.type) },
+            roles = input.roles,
+            isOwnCompanyData = input.isOwnCompanyData,
+            legalEntity = buildLegalEntityRepresentation(legalEntity.header),
+            site = null,
+            address = buildAddressRepresentation(additionalAddress.address, AddressType.AdditionalAddress),
+            externalSequenceTimestamp = null,
+            scriptVariants = run {
+                val leByCode = legalEntity.scriptVariants.associateBy { it.scriptCode }
+                val addByCode = additionalAddress.scriptVariants.associateBy { it.scriptCode }
+                (leByCode.keys + addByCode.keys).map { code -> buildAdditionalAddressScriptVariant(code, leByCode[code], addByCode[code]) }
+            },
+            createdAt = Instant.MIN,
+            updatedAt = Instant.MIN
+        )
+    }
+
     fun fromAdditionalAddressOnSite(
         input: BusinessPartnerInputDto,
         legalEntity: LegalEntityWithLegalAddressVerboseDto,
@@ -133,7 +159,10 @@ class BusinessPartnerOutputDtoV7Factory {
             shortName = legalEntity.legalShortName,
             legalForm = legalEntity.legalForm,
             confidenceCriteria = buildConfidence(legalEntity.confidenceCriteria),
-            states = legalEntity.states.map { BusinessPartnerStateDto(it.validFrom, it.validTo, it.type) }
+            ownershipUltimate = legalEntity.ownershipUltimate,
+            ultimateOwnerBpnl = legalEntity.ultimateOwnerBpnl,
+            states = legalEntity.states.map { BusinessPartnerStateDto(it.validFrom, it.validTo, it.type) },
+            updatedAt = legalEntity.updatedAt
         )
     }
 
@@ -145,7 +174,8 @@ class BusinessPartnerOutputDtoV7Factory {
             physicalPostalAddress = buildPhysicalAddress(logisticAddress.physicalPostalAddress),
             alternativePostalAddress = logisticAddress.alternativePostalAddress?.let { buildAlternativeAddress(it) },
             confidenceCriteria = buildConfidence(logisticAddress.confidenceCriteria),
-            states = logisticAddress.states.map { BusinessPartnerStateDto(it.validFrom, it.validTo, it.type) }
+            states = logisticAddress.states.map { BusinessPartnerStateDto(it.validFrom, it.validTo, it.type) },
+            updatedAt = logisticAddress.updatedAt
         )
     }
 
@@ -201,7 +231,8 @@ class BusinessPartnerOutputDtoV7Factory {
             siteBpn = site.bpns,
             name = site.name,
             confidenceCriteria = buildConfidence(site.confidenceCriteria),
-            states = site.states.map { BusinessPartnerStateDto(it.validFrom, it.validTo, it.type) }
+            states = site.states.map { BusinessPartnerStateDto(it.validFrom, it.validTo, it.type) },
+            updatedAt = site.updatedAt
         )
     }
 

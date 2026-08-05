@@ -1270,6 +1270,11 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/AddressGoldenRecordRelationDto"
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the associated address golden record was last
+            updated
       required:
         - bpnA
     AddressGoldenRecordRelationDto:
@@ -1744,7 +1749,7 @@ components:
         updatedAt:
           type: string
           format: date-time
-          description: The date when the data record has been last updated.
+          description: Timestamp when the business partner record was last updated
         isOwnCompanyData:
           type: boolean
           description: Indicates whether the sharing member claims (in the initial
@@ -1883,7 +1888,7 @@ components:
         updatedAt:
           type: string
           format: date-time
-          description: The date when the data record has been last updated.
+          description: Timestamp when the business partner record was last updated
         isOwnCompanyData:
           type: boolean
           description: Indicates whether the sharing member claims (in the initial
@@ -2124,6 +2129,14 @@ components:
           type: string
           description: "The legal form of the legal entity, on which the business\
             \ partner provides a view."
+        ownershipUltimate:
+          type: boolean
+          description: Designates whether this legal entity is the ultimate owner
+            in an ownership chain.
+        ultimateOwnerBpnl:
+          type: string
+          description: The BPNL of the designated ultimate owner up in the ownership
+            chain.
         states:
           type: array
           items:
@@ -2150,6 +2163,14 @@ components:
             \ partner provides a view."
         confidenceCriteria:
           $ref: "#/components/schemas/ConfidenceCriteriaDto"
+        ownershipUltimate:
+          type: boolean
+          description: Designates whether this legal entity is the ultimate owner
+            in an ownership chain.
+        ultimateOwnerBpnl:
+          type: string
+          description: The BPNL of the designated ultimate owner up in the ownership
+            chain.
         states:
           type: array
           items:
@@ -2158,6 +2179,11 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/LegalEntityGoldenRecordRelationDto"
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the associated legal entity golden record was
+            last updated
       required:
         - bpnL
     LegalEntityScriptVariantDto:
@@ -3113,6 +3139,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/BusinessPartnerStateDto"
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the associated site golden record was last updated
     SiteScriptVariantDto:
       type: object
       properties:

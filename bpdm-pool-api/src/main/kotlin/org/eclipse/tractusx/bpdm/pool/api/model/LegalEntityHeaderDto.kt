@@ -22,7 +22,9 @@ package org.eclipse.tractusx.bpdm.pool.api.model
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.IBaseLegalEntityDto
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityDescription
+import java.time.Instant
 
 @Schema(description = LegalEntityDescription.header)
 data class LegalEntityHeaderDto(
@@ -38,6 +40,14 @@ data class LegalEntityHeaderDto(
 
     @field:JsonProperty("isParticipantData")
     @get:Schema(description = "Indicates whether the legal entity is owned and thus provided by a Data Space Participant.", name = "isParticipantData")
-    val isParticipantData: Boolean
+    val isParticipantData: Boolean,
+
+    @get:Schema(description = "Whether this legal entity is the ultimate owner in the ownership chain. " +
+            "This flag is provided by the golden record process and persisted in the Pool. " +
+            "The resulting ultimate owner BPNL is derived by the Pool and only returned on read.")
+    val ownershipUltimate: Boolean? = null,
+
+    @get:Schema(description = CommonDescription.updatedAt)
+    val updatedAt: Instant? = null
 
 ) : IBaseLegalEntityDto

@@ -35,6 +35,11 @@ on:
         default: 'latest'
         required: false
         type: string
+      test_scope:
+        description: 'system-tester scope: "smoke" (fast round-trip only) or "full" (entire suite)'
+        default: 'smoke'
+        required: false
+        type: string
   workflow_dispatch:
     inputs:
       node_image:
@@ -49,6 +54,11 @@ on:
       helm_version:
         description: 'helm version to test (default = latest)'
         default: 'latest'
+        required: false
+        type: string
+      test_scope:
+        description: 'system-tester scope: "smoke" (fast round-trip only) or "full" (entire suite)'
+        default: 'smoke'
         required: false
         type: string
   pull_request:
@@ -154,8 +164,14 @@ jobs:
           docker push kind-registry:5000/bpdm-system-tester:test
 
       - name: Create Test Values
+        env:
+          TEST_SCOPE: ${{ inputs.test_scope }}
         run: |
           mkdir charts/bpdm/ci
+          # "full" runs the entire system-tester suite; anything else (incl. PR/push, which pass no
+          # input) narrows to the fast round-trip smoke scenarios tagged @Smoke.
+          if [ "$TEST_SCOPE" = "full" ]; then FILTER_TAGS=""; else FILTER_TAGS="@Smoke"; fi
+          echo "system-tester scope: ${TEST_SCOPE:-smoke} (filterTags='$FILTER_TAGS')"
           cat <<EOF > charts/bpdm/ci/test-values.yaml
           bpdm-pool:
             image:
@@ -173,16 +189,10 @@ jobs:
               repository: bpdm-orchestrator
               tag: test
           bpdm-cleaning-service-dummy:
-            image:
-              registry: kind-registry:5000
-              repository: bpdm-cleaning-service-dummy
-              tag: test
-            # Disables the cleaning service's relation-cleaning poller so it does not race the
-            # system-tester, which reserves and resolves the relation tasks itself.
-            springProfiles:
-              - system-tester
+            enabled: false
           tests:
             enabled: true
+            filterTags: "$FILTER_TAGS"
             image:
               registry: kind-registry:5000
               repository: bpdm-system-tester
@@ -230,10 +240,10 @@ jobs:
 
       - name: Run helm upgrade
         env:
-          UPGRADE_FROM: ${{ github.event.inputs.upgrade_from && '--version github.event.inputs.upgrade_from' || '' }}
+          UPGRADE_FROM: ${{ inputs.upgrade_from }}
         run: |
           helm repo add tractusx-dev https://eclipse-tractusx.github.io/charts/dev
-          helm install -f charts/bpdm/ci/test-upgrade-values.yaml  bpdm-test tractusx-dev/bpdm $UPGRADE_FROM
+          helm install -f charts/bpdm/ci/test-upgrade-values.yaml  bpdm-test tractusx-dev/bpdm ${UPGRADE_FROM:+--version "$UPGRADE_FROM"}
           helm dependency update charts/bpdm
           helm upgrade -f charts/bpdm/ci/test-upgrade-values.yaml  bpdm-test charts/bpdm
 

@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.common.dto.IBaseStateDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
 import org.eclipse.tractusx.bpdm.common.model.StageType
+import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.config.GoldenRecordTaskConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.*
@@ -241,9 +242,14 @@ class GoldenRecordUpdateChunkService(
             legalEntityConfidence = legalEntityConfidence?.toUpsertData() ?: throw createMappingException(BusinessPartnerDb::legalEntityConfidence, id),
             siteConfidence = siteConfidence?.toUpsertData(),
             addressConfidence = addressConfidence?.toUpsertData() ?: throw createMappingException(BusinessPartnerDb::addressConfidence, id),
+            legalEntityUpdatedAt = legalEntityUpdatedAt,
+            siteUpdatedAt = siteUpdatedAt,
+            addressUpdatedAt = addressUpdatedAt,
             scriptVariants = scriptVariants.map { businessPartnerMappings.toScriptVariantDto(it) },
             legalEntityGoldenRecordRelations = legalEntityGoldenRecordRelations.map { it.toUpsertData() },
             addressGoldenRecordRelations = addressGoldenRecordRelations.map { it.toUpsertData() },
+            ownershipUltimate = ownershipUltimate,
+            ultimateOwnerBpnl = ultimateOwnerBpnl
         )
     }
 
@@ -332,8 +338,12 @@ class GoldenRecordUpdateChunkService(
         businessPartner.legalName = header.legalName
         businessPartner.legalForm = header.legalForm
         businessPartner.shortName = header.legalShortName
+        businessPartner.legalEntityUpdatedAt = header.updatedAt
+        businessPartner.addressUpdatedAt = legalEntity.legalAddress.updatedAt
         businessPartner.legalEntityConfidence?.let { update(it,  header.confidenceCriteria) }
-        businessPartner.legalEntityGoldenRecordRelations.addAll(legalEntity.header.relations.map(::toEntity))
+        businessPartner.legalEntityGoldenRecordRelations.replace(legalEntity.header.relations.map(::toEntity))
+        businessPartner.ownershipUltimate = header.ownershipUltimate
+        businessPartner.ultimateOwnerBpnl = header.ultimateOwnerBpnl
 
         val variantByCode = businessPartner.scriptVariants.associateBy { it.scriptCode }
 
@@ -349,6 +359,7 @@ class GoldenRecordUpdateChunkService(
     private fun update(businessPartner: BusinessPartnerDb, site: SiteVerboseDto){
         updateStates(businessPartner.states, site.states, BusinessPartnerType.SITE)
         businessPartner.siteName = site.name
+        businessPartner.siteUpdatedAt = site.updatedAt
         businessPartner.siteConfidence?.let { update(it,  site.confidenceCriteria) }
 
         val goldenRecordVariantByCode = businessPartner.scriptVariants.associateBy { it.scriptCode }
@@ -367,11 +378,12 @@ class GoldenRecordUpdateChunkService(
         updateIdentifiers(businessPartner.identifiers, addressProperties.identifiers.map(::toEntity), BusinessPartnerType.ADDRESS)
         updateStates(businessPartner.states, addressProperties.states, BusinessPartnerType.ADDRESS)
         businessPartner.addressName = addressProperties.name
+        businessPartner.addressUpdatedAt = addressProperties.updatedAt
         businessPartner.postalAddress.addressType = addressProperties.addressType
         businessPartner.postalAddress.physicalPostalAddress = addressProperties.physicalPostalAddress.toEntity()
         businessPartner.postalAddress.alternativePostalAddress = addressProperties.alternativePostalAddress?.toEntity()
         businessPartner.addressConfidence?.let { update(it,  addressProperties.confidenceCriteria) }
-        businessPartner.addressGoldenRecordRelations.addAll(addressProperties.relations.map(::toEntity))
+        businessPartner.addressGoldenRecordRelations.replace(addressProperties.relations.map(::toEntity))
 
         val goldenRecordVariantByCode = businessPartner.scriptVariants.associateBy { it.scriptCode }
         address.scriptVariants.groupBy { it.scriptCode }.map { it.value.first() }.forEach { goldenRecordVariant ->

@@ -46,7 +46,7 @@ data class BusinessPartnerOutputDto(
     @get:Schema(description = CommonDescription.createdAt)
     val createdAt: Instant,
 
-    @get:Schema(description = CommonDescription.updatedAt)
+    @get:Schema(description = "Timestamp when the business partner record was last updated")
     val updatedAt: Instant
 
 ) : IBaseBusinessPartnerGateDto
@@ -61,8 +61,15 @@ data class LegalEntityRepresentationOutputDto(
     override val shortName: String? = null,
     override val legalForm: String? = null,
     val confidenceCriteria: ConfidenceCriteriaDto,
+    @get:Schema(description = "Designates whether this legal entity is the ultimate owner in an ownership chain.")
+    val ownershipUltimate: Boolean? = null,
+    @get:Schema(description = "The BPNL of the designated ultimate owner up in the ownership chain.")
+    val ultimateOwnerBpnl: String? = null,
     override val states: Collection<BusinessPartnerStateDto> = emptyList(),
-    val goldenRecordRelations: List<LegalEntityGoldenRecordRelationDto> = emptyList()
+    val goldenRecordRelations: List<LegalEntityGoldenRecordRelationDto> = emptyList(),
+
+    @get:Schema(description = "Timestamp when the associated legal entity golden record was last updated")
+    val updatedAt: Instant? = null
 ) : IBaseLegalEntityRepresentation
 
 @Schema(
@@ -72,7 +79,10 @@ data class SiteRepresentationOutputDto(
     override val siteBpn: String,
     override val name: String? = null,
     val confidenceCriteria: ConfidenceCriteriaDto,
-    override val states: Collection<BusinessPartnerStateDto> = emptyList()
+    override val states: Collection<BusinessPartnerStateDto> = emptyList(),
+
+    @get:Schema(description = "Timestamp when the associated site golden record was last updated")
+    val updatedAt: Instant? = null
 ) : IBaseSiteRepresentation
 
 @Schema(
@@ -88,5 +98,8 @@ data class AddressComponentOutputDto(
     val confidenceCriteria: ConfidenceCriteriaDto,
     override val states: Collection<BusinessPartnerStateDto> = emptyList(),
     val identifiers: Collection<AddressIdentifierDto> = emptyList(),
-    val goldenRecordRelations: List<AddressGoldenRecordRelationDto> = emptyList()
+    val goldenRecordRelations: List<AddressGoldenRecordRelationDto> = emptyList(),
+
+    @get:Schema(description = "Timestamp when the associated address golden record was last updated")
+    val updatedAt: Instant? = null
 ) : IBaseAddressRepresentation

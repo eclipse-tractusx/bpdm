@@ -43,10 +43,15 @@ class BusinessPartnerCopyUtil {
             bpnL = fromPartner.bpnL
             bpnS = fromPartner.bpnS
             bpnA = fromPartner.bpnA
+            ownershipUltimate = fromPartner.ownershipUltimate
+            ultimateOwnerBpnl = fromPartner.ultimateOwnerBpnl
             legalEntityConfidence = fromPartner.legalEntityConfidence
             siteConfidence = fromPartner.siteConfidence
             addressConfidence = fromPartner.addressConfidence
             externalSequenceTimestamp = fromPartner.externalSequenceTimestamp
+            legalEntityUpdatedAt = fromPartner.legalEntityUpdatedAt
+            siteUpdatedAt = fromPartner.siteUpdatedAt
+            addressUpdatedAt = fromPartner.addressUpdatedAt
 
             nameParts.replace(fromPartner.nameParts)
             roles.replace(fromPartner.roles)

@@ -494,7 +494,8 @@ class TaskStepBuildService(
                 identifiers = identifiers.map { assertNotNull(it).let { LegalEntityIdentifierDto(it.value!!, it.type!!, it.issuingBody) } },
                 states = states.map { assertNotNull(it).let { LegalEntityStateDto(it.validFrom.toLocalDateTime(), it.validTo.toLocalDateTime(), it.type!!) }   },
                 confidenceCriteria = toPoolDto(confidenceCriteria, CleaningError.LEGAL_ENTITY_CONFIDENCE_CRITERIA_MISSING),
-                isParticipantData = isParticipantData ?: false
+                isParticipantData = isParticipantData ?: false,
+                ownershipUltimate = ownershipUltimate
             )
         }
 
@@ -541,7 +542,8 @@ class TaskStepBuildService(
                 states = states.map { assertNotNull(it).let { SiteStateDto(it.validFrom.toLocalDateTime(), it.validTo.toLocalDateTime(), it.type!!) }},
                 mainAddress = toPoolDto(siteMainAddress),
                 confidenceCriteria = toPoolDto(confidenceCriteria, CleaningError.SITE_CONFIDENCE_CRITERIA_MISSING),
-                scriptVariants = scriptVariants.map { toPoolDto(it) }
+                scriptVariants = scriptVariants.map { toPoolDto(it) },
+                updatedAt = updatedAt
             )
         }
 
@@ -564,7 +566,8 @@ class TaskStepBuildService(
                 identifiers = identifiers.map { assertNotNull(it).let { AddressIdentifierDto(it.value!!, it.type!!) } },
                 physicalPostalAddress = toPoolDto(physicalAddress),
                 alternativePostalAddress = alternativeAddress?.let { toPoolDto(it) },
-                confidenceCriteria = toPoolDto(confidenceCriteria, CleaningError.ADDRESS_CONFIDENCE_CRITERIA_MISSING)
+                confidenceCriteria = toPoolDto(confidenceCriteria, CleaningError.ADDRESS_CONFIDENCE_CRITERIA_MISSING),
+                updatedAt = updatedAt
             )
         }
 
@@ -698,19 +701,19 @@ class TaskStepBuildService(
     }
 
     private fun Site.withRelevantScriptVariants(businessPartner: BusinessPartner): Site {
-       val scriptVariants =  if(siteMainIsLegalAddress){
+        val scriptVariants =  if(siteMainIsLegalAddress){
             val legalEntityVariantsByCode = businessPartner.legalEntity.scriptVariants.associateBy { it.scriptCode }
             val siteVariantsByCode = scriptVariants.associateBy { it.scriptCode }
             val allScriptCodes = legalEntityVariantsByCode.keys.plus(siteVariantsByCode.keys)
 
-           allScriptCodes.map { scriptCode ->
-               val legalEntityVariant = legalEntityVariantsByCode[scriptCode]
-               val siteVariant = siteVariantsByCode[scriptCode] ?: SiteScriptVariant(scriptCode, "", org.eclipse.tractusx.orchestrator.api.model.PostalAddressScriptVariant.empty)
+            allScriptCodes.map { scriptCode ->
+                val legalEntityVariant = legalEntityVariantsByCode[scriptCode]
+                val siteVariant = siteVariantsByCode[scriptCode] ?: SiteScriptVariant(scriptCode, "", org.eclipse.tractusx.orchestrator.api.model.PostalAddressScriptVariant.empty)
 
-               val mainAddressVariant = legalEntityVariant?.legalAddress ?: siteVariant.mainAddress
+                val mainAddressVariant = legalEntityVariant?.legalAddress ?: siteVariant.mainAddress
 
-               siteVariant.copy(mainAddress = mainAddressVariant)
-           }
+                siteVariant.copy(mainAddress = mainAddressVariant)
+            }
         }else { scriptVariants }
 
         return copy(scriptVariants = scriptVariants)

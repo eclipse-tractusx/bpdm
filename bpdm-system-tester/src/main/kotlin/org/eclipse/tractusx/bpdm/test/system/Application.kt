@@ -36,6 +36,6 @@ fun main(args: Array<String>) {
     //use parallel execution default if not overwritten
     //can't use cucumber.properties for this as the properties parser currently does not support it
     //see https://github.com/cucumber/cucumber-jvm/issues/2833
-    val cucumberArgs =  if(!args.contains("--threads")) args.plus(listOf("--threads", "16")) else args
+    val cucumberArgs =  if(!args.contains("--threads")) args.plus(listOf("--threads", "32")) else args
     io.cucumber.core.cli.Main.main(*cucumberArgs)
 }

@@ -90,9 +90,12 @@ class ResponseMapper {
                 confidenceCriteria = toConfidence(businessPartner, ConfidenceCriteriaDb.Scope.LegalEntity),
                 isParticipantData = isCatenaXMemberData,
                 hasChanged = legalEntityHasChanged,
+                ownershipUltimate = ownershipUltimate,
+                ultimateOwnerBpnl = ultimateOwnerBpnl,
                 legalAddress = toPostalAddressOrEmpty(businessPartner, PostalAddressDb.Scope.LegalAddress)!!,
                 scriptVariants = toLegalEntityScriptVariants(businessPartner),
-                goldenRecordRelations = toLegalEntityGoldenRecordRelations(businessPartner)
+                goldenRecordRelations = toLegalEntityGoldenRecordRelations(businessPartner),
+                updatedAt = legalEntityUpdatedAt?.instant
             )
         }
 
@@ -106,7 +109,8 @@ class ResponseMapper {
                     confidenceCriteria = toConfidence(businessPartner, ConfidenceCriteriaDb.Scope.Site),
                     hasChanged = siteHasChanged,
                     siteMainAddress = toPostalAddress(businessPartner, PostalAddressDb.Scope.SiteMainAddress),
-                    scriptVariants = toSiteScriptVariants(businessPartner)
+                    scriptVariants = toSiteScriptVariants(businessPartner),
+                    updatedAt = siteUpdatedAt?.instant
                 )
             }
         }
@@ -172,7 +176,8 @@ class ResponseMapper {
                     physicalAddress = toPhysicalAddress(physicalAddress),
                     alternativeAddress = toAlternativeAddress(alternativeAddress),
                     hasChanged = hasChanged,
-                    goldenRecordRelations = scope.addressGoldenRecordRelation?.let { toAddressGoldenRecordRelations(businessPartner, it) } ?: emptyList()
+                    goldenRecordRelations = scope.addressGoldenRecordRelation?.let { toAddressGoldenRecordRelations(businessPartner, it) } ?: emptyList(),
+                    updatedAt = updatedAt?.instant
                 )
             }
         }

@@ -75,8 +75,11 @@ class BusinessPartnerTestDataFactory(
             confidenceCriteria = orchestratorRequestFactory.buildConfidenceCriteria(random),
             isParticipantData = random.nextBoolean(),
             hasChanged = true,
+            ownershipUltimate = null,
+            ultimateOwnerBpnl = null,
             legalAddress = orchestratorRequestFactory.buildPostalAddress(seed, AddressType.LegalAddress, random),
-            scriptVariants = listOf(orchestratorRequestFactory.buildLegalEntityScriptVariant(seed, random))
+            scriptVariants = listOf(orchestratorRequestFactory.buildLegalEntityScriptVariant(seed, random)),
+            updatedAt = orchestratorRequestFactory.buildUpdatedAt(random)
         )
     }
 

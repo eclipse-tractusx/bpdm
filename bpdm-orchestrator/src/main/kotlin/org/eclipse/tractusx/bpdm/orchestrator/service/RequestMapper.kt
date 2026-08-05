@@ -43,7 +43,11 @@ class RequestMapper {
                 isCatenaXMemberData = legalEntity.isParticipantData,
                 owningCompany = owningCompany,
                 legalEntityHasChanged = legalEntity.hasChanged,
+                ownershipUltimate = legalEntity.ownershipUltimate,
+                ultimateOwnerBpnl = legalEntity.ultimateOwnerBpnl,
                 siteHasChanged = site?.hasChanged,
+                legalEntityUpdatedAt = legalEntity.updatedAt?.toTimestamp(),
+                siteUpdatedAt = site?.updatedAt?.toTimestamp(),
                 legalEntityHeaderScriptVariants = toLegalEntityScriptVariants(businessPartner),
                 siteHeaderScriptVariants = toSiteScriptVariants(businessPartner),
                 addressScriptVariants = toAddressScriptVariants(businessPartner),
@@ -130,7 +134,8 @@ class RequestMapper {
                 addressName = addressName,
                 physicalAddress = toPhysicalAddress(physicalAddress),
                 alternativeAddress = toAlternativeAddress(alternativeAddress),
-                hasChanged = hasChanged
+                hasChanged = hasChanged,
+                updatedAt = updatedAt?.toTimestamp()
             )
         }
 
