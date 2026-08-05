@@ -264,7 +264,7 @@ Description: BPDM Gate
 
 This example configuration includes the roles, clients and client scopes that BPDM currently expects.
 The actual client IDs are subject to change depending on the name they receive in the Portal Keycloak configuration.
-[CX-Central.json](../../bpdm-common-test/src/main/resources/keycloak/CX-Central.json)
+[BPDM-realm.json](../../bpdm-common-test/src/main/resources/keycloak/BPDM-realm.json)
 
 For more details see: https://github.com/eclipse-tractusx/sig-release/issues/565
 

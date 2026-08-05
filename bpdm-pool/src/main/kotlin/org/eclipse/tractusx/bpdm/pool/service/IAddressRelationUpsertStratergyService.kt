@@ -33,6 +33,6 @@ interface IAddressRelationUpsertStratergyService {
         val source: LogisticAddressDb,
         val target: LogisticAddressDb,
         val validityPeriods: Collection<RelationValidityPeriodDb>,
-        val reasonCode: ReasonCodeDb
+        val reasonCode: ReasonCodeDb?
     )
 }

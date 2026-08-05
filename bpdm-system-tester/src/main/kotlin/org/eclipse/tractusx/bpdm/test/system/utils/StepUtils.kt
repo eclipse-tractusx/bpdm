@@ -106,6 +106,9 @@ class StepUtils(
         "${BusinessPartnerOutputDto::legalEntity.name}.${LegalEntityRepresentationOutputDto::legalEntityBpn.name}",
         "${BusinessPartnerOutputDto::site.name}.${SiteRepresentationOutputDto::siteBpn.name}",
         "${BusinessPartnerOutputDto::address.name}.${AddressComponentOutputDto::addressBpn.name}",
+        "${BusinessPartnerOutputDto::legalEntity.name}.${LegalEntityRepresentationOutputDto::updatedAt.name}",
+        "${BusinessPartnerOutputDto::site.name}.${SiteRepresentationOutputDto::updatedAt.name}",
+        "${BusinessPartnerOutputDto::address.name}.${AddressComponentOutputDto::updatedAt.name}",
         // ToDo: Cleaning service dummy should have fixed confidence criteria dummy times otherwise we need to keep ignoring these fields
         "${BusinessPartnerOutputDto::legalEntity.name}.${AddressComponentOutputDto::confidenceCriteria.name}.${ConfidenceCriteriaDto::lastConfidenceCheckAt.name}",
         "${BusinessPartnerOutputDto::legalEntity.name}.${AddressComponentOutputDto::confidenceCriteria.name}.${ConfidenceCriteriaDto::nextConfidenceCheckAt.name}",

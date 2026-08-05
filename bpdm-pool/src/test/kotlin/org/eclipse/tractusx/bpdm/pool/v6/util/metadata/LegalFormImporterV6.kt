@@ -21,16 +21,16 @@ package org.eclipse.tractusx.bpdm.pool.v6.util.metadata
 
 import com.neovisionaries.i18n.CountryCode
 import com.neovisionaries.i18n.LanguageCode
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalFormDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalFormDtoV6
 import org.eclipse.tractusx.bpdm.pool.util.metadata.LegalFormEntryImporter
 
 class LegalFormImporterV6(
     private val legalFormEntryImporter: LegalFormEntryImporter
 ) {
-    fun importFromResource(): List<LegalFormDto>{
+    fun importFromResource(): List<LegalFormDtoV6>{
         val uniqueRows = legalFormEntryImporter.importFromResource()
         val legalForms = uniqueRows.map { entry ->
-            LegalFormDto(
+            LegalFormDtoV6(
                 technicalKey = entry.elfCode!!,
                 name = entry.name!!,
                 transliteratedName = entry.transliteratedName?.takeIf { it.isNotBlank() },

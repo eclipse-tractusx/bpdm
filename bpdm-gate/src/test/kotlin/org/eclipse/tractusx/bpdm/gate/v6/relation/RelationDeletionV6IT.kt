@@ -23,13 +23,13 @@ import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.gate.api.model.RelationType
 import org.eclipse.tractusx.bpdm.gate.api.v6.model.response.RelationDto
-import org.eclipse.tractusx.bpdm.gate.v6.GateUnscheduledInitialStartV6Test
+import org.eclipse.tractusx.bpdm.gate.v6.UnscheduledGateV6TestBase
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.web.reactive.function.client.WebClientResponseException
 
-class RelationDeletionV6IT: GateUnscheduledInitialStartV6Test() {
+class RelationDeletionV6IT: UnscheduledGateV6TestBase() {
 
     /**
      * GIVEN existing relation

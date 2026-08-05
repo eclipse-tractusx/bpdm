@@ -15,3 +15,15 @@ mvn -B -U clean package -pl bpdm-system-tester -am -DskipTests
 ```bash
 java -jar bpdm-system-tester/target/bpdm-system-tester.jar
 ```
+
+To run only the fast round-trip smoke scenarios (as the daily CI does), filter by tag:
+```bash
+java -jar bpdm-system-tester/target/bpdm-system-tester.jar --tags @Smoke
+```
+
+The JSON report plugin is not enabled by default, because the CI helm-test pod runs on a read-only
+filesystem and cannot write it. For a full E2E run at the end of a release cycle, enable the report
+explicitly:
+```bash
+java -jar bpdm-system-tester/target/bpdm-system-tester.jar --plugin json:target/cucumber-report.json
+```

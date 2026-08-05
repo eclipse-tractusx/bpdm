@@ -28,7 +28,8 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 @Configuration
-class MockHealthIndicatorConfig {
+class
+MockHealthIndicatorConfig {
 
     @Bean
     fun poolHealthIndicator(): PoolHealthIndicator {

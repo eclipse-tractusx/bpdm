@@ -40,7 +40,7 @@ class AddressUpdateV7IT : UnscheduledPoolTestBaseV7() {
         val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
 
         //WHEN
-        val addressRequest = requestFactory.buildAddressUpdateRequest(testName, legalEntityResponse).withConfidence(TestDataV7.IsShared)
+        val addressRequest = requestFactory.buildAddressUpdateRequest(testName, legalEntityResponse).withConfidence(TestDataV7.SharedByOwner)
         val addressResponse = poolClient.addresses.updateAddresses(listOf(addressRequest))
 
         //THEN
@@ -62,7 +62,7 @@ class AddressUpdateV7IT : UnscheduledPoolTestBaseV7() {
         val siteResponse = testDataClient.createSite(legalEntityResponse, testName)
 
         //WHEN
-        val addressRequest = requestFactory.buildAddressUpdateRequest(testName, siteResponse).withConfidence(TestDataV7.IsShared)
+        val addressRequest = requestFactory.buildAddressUpdateRequest(testName, siteResponse).withConfidence(TestDataV7.SharedByOwner)
         val addressResponse = poolClient.addresses.updateAddresses(listOf(addressRequest))
 
         //THEN
@@ -84,7 +84,10 @@ class AddressUpdateV7IT : UnscheduledPoolTestBaseV7() {
         val siteResponse = testDataClient.createLegalAddressSite(legalEntityResponse, testName)
 
         //WHEN
-        val addressRequest = requestFactory.buildAddressUpdateRequest(testName, siteResponse).withConfidence(TestDataV7.IsShared)
+        // The site main address is the legal address, so the update has to keep covering the legal entity's script codes.
+        val addressRequest = requestFactory.buildAddressUpdateRequest(testName, siteResponse)
+            .copy(scriptVariants = requestFactory.buildAddressScriptVariants(legalEntityResponse.scriptVariants.map { it.scriptCode }, testName))
+            .withConfidence(TestDataV7.SharedByOwner)
         val addressResponse = poolClient.addresses.updateAddresses(listOf(addressRequest))
 
         //THEN
@@ -106,7 +109,7 @@ class AddressUpdateV7IT : UnscheduledPoolTestBaseV7() {
         val addressCreateResponse = testDataClient.createAdditionalAddress(legalEntityResponse, testName)
 
         //WHEN
-        val addressUpdateRequest = requestFactory.buildAddressUpdateRequest("Updated $testName", addressCreateResponse).withConfidence(TestDataV7.IsShared)
+        val addressUpdateRequest = requestFactory.buildAddressUpdateRequest("Updated $testName", addressCreateResponse).withConfidence(TestDataV7.SharedByOwner)
         val addressUpdateResponse = poolClient.addresses.updateAddresses(listOf(addressUpdateRequest))
 
         //THEN
@@ -267,6 +270,94 @@ class AddressUpdateV7IT : UnscheduledPoolTestBaseV7() {
         //THEN
         val expectedError = ErrorInfo(AddressUpdateError.IdentifiersTooMany, "IGNORED", addressRequest.bpna)
         val expectedResponse = AddressPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+
+        assertRepository.assertAddressUpdateResponseWrapperIsEqual(addressResponse, expectedResponse)
+    }
+
+    /**
+     * GIVEN address
+     * WHEN operator tries to update the address with a script variant whose physical city is blank
+     * THEN operator sees ScriptVariantCityMissing error
+     */
+    @Test
+    fun `try update address with script variant with blank physical city`() {
+        //GIVEN
+        val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
+
+        //WHEN
+        val addressRequest = requestFactory.buildAddressUpdateRequest(testName, legalEntityResponse)
+            .withScriptVariantPhysicalCity("  ")
+        val addressResponse = poolClient.addresses.updateAddresses(listOf(addressRequest))
+
+        //THEN
+        val expectedError = ErrorInfo(AddressUpdateError.ScriptVariantCityMissing, "IGNORED", addressRequest.bpna)
+        val expectedResponse = AddressPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+
+        assertRepository.assertAddressUpdateResponseWrapperIsEqual(addressResponse, expectedResponse)
+    }
+
+    /**
+     * GIVEN address
+     * WHEN operator tries to update the address with a script variant whose alternative address city is blank
+     * THEN operator sees ScriptVariantCityMissing error
+     */
+    @Test
+    fun `try update address with script variant with blank alternative city`() {
+        //GIVEN
+        val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
+
+        //WHEN
+        val addressRequest = requestFactory.buildAddressUpdateRequest(testName, legalEntityResponse)
+            .withScriptVariantAlternativeCity("  ")
+        val addressResponse = poolClient.addresses.updateAddresses(listOf(addressRequest))
+
+        //THEN
+        val expectedError = ErrorInfo(AddressUpdateError.ScriptVariantCityMissing, "IGNORED", addressRequest.bpna)
+        val expectedResponse = AddressPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+
+        assertRepository.assertAddressUpdateResponseWrapperIsEqual(addressResponse, expectedResponse)
+    }
+
+    /**
+     * GIVEN address
+     * WHEN operator tries to update the address with two script variants of the same script code
+     * THEN operator sees ScriptVariantDuplicateScriptCode error
+     */
+    @Test
+    fun `try update address with duplicate script codes`() {
+        //GIVEN
+        val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
+
+        //WHEN
+        val addressRequest = requestFactory.buildAddressUpdateRequest(testName, legalEntityResponse)
+            .withDuplicateScriptVariants()
+        val addressResponse = poolClient.addresses.updateAddresses(listOf(addressRequest))
+
+        //THEN
+        val expectedError = ErrorInfo(AddressUpdateError.ScriptVariantDuplicateScriptCode, "IGNORED", addressRequest.bpna)
+        val expectedResponse = AddressPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+
+        assertRepository.assertAddressUpdateResponseWrapperIsEqual(addressResponse, expectedResponse)
+    }
+
+    /**
+     * GIVEN participant legal entity with a script variant
+     * WHEN operator tries to update its legal address without the script variant the legal entity is named in
+     * THEN operator sees ScriptVariantCoverageStillNeeded error
+     */
+    @Test
+    fun `try update legal address dropping a script variant its legal entity is named in`() {
+        //GIVEN
+        val legalEntityResponse = testDataClient.createParticipantLegalEntity(testName)
+
+        //WHEN
+        val addressRequest = requestFactory.buildAddressUpdateRequest(testName, legalEntityResponse).copy(scriptVariants = emptyList())
+        val addressResponse = poolClient.addresses.updateAddresses(listOf(addressRequest))
+
+        //THEN
+        val expectedErrors = legalEntityResponse.scriptVariants
+            .map { ErrorInfo(AddressUpdateError.ScriptVariantCoverageStillNeeded, "IGNORED", addressRequest.bpna) }
+        val expectedResponse = AddressPartnerUpdateResponseWrapper(emptyList(), expectedErrors)
 
         assertRepository.assertAddressUpdateResponseWrapperIsEqual(addressResponse, expectedResponse)
     }

@@ -39,6 +39,9 @@ fun LegalEntityDto.withLegalIdentifiers(identifiers: List<LegalEntityIdentifierD
 fun LegalEntityDto.withLegalIdentifiers(vararg identifiers: LegalEntityIdentifierDto) =
     withLegalIdentifiers(identifiers.toList())
 
+fun LegalEntityDto.withConfidence(givenConfidence: GivenConfidence) =
+    copy(header = header.withConfidence(givenConfidence), legalAddress = legalAddress.withConfidence(givenConfidence))
+
 fun LegalEntityPartnerCreateRequest.withLegalAddressIdentifiers(identifiers: List<AddressIdentifierDto>) =
     copy(legalEntity = legalEntity.withLegalAddressIdentifiers(identifiers))
 
@@ -96,11 +99,42 @@ fun LegalEntityPartnerUpdateRequest.withAlternativeAdminArea(code: String?) =
 fun LegalEntityPartnerUpdateRequest.withParticipantData(isParticipantData: Boolean) =
     copy(legalEntity = legalEntity.withParticipantData(isParticipantData))
 
+fun LegalEntityPartnerUpdateRequest.withOwnershipUltimate(ownershipUltimate: Boolean?) =
+    copy(legalEntity = legalEntity.withOwnershipUltimate(ownershipUltimate))
+
+fun LegalEntityDto.withOwnershipUltimate(ownershipUltimate: Boolean?) =
+    copy(header = header.copy(ownershipUltimate = ownershipUltimate))
+
+fun LegalEntityPartnerCreateVerboseDto.withUltimateOwner(ownershipUltimate: Boolean, ultimateOwnerBpnl: String?) =
+    copy(legalEntity = legalEntity.withUltimateOwner(ownershipUltimate, ultimateOwnerBpnl))
+
+fun LegalEntityWithLegalAddressVerboseDto.withUltimateOwner(ownershipUltimate: Boolean, ultimateOwnerBpnl: String?) =
+    copy(header = header.copy(ownershipUltimate = ownershipUltimate, ultimateOwnerBpnl = ultimateOwnerBpnl))
+
+fun LegalEntityPartnerCreateVerboseDto.withIsOwnedByRelation(ownedBpnL: String, owningBpnL: String) =
+    copy(legalEntity = legalEntity.withIsOwnedByRelation(ownedBpnL, owningBpnL))
+
+fun LegalEntityWithLegalAddressVerboseDto.withIsOwnedByRelation(ownedBpnL: String, owningBpnL: String) =
+    copy(
+        header = header.copy(
+            relations = header.relations + RelationVerboseDto(
+                type = LegalEntityRelationType.IsOwnedBy,
+                businessPartnerSourceBpnl = ownedBpnL,
+                businessPartnerTargetBpnl = owningBpnL,
+                validityPeriods = listOf(RelationValidityPeriod(validFrom = TestDataV7.currentRelationValidFrom, validTo = null)),
+                reasonCode = null
+            )
+        )
+    )
+
 fun LegalEntityDto.withParticipantData(isParticipantData: Boolean) =
     copy(header = header.withParticipantData(isParticipantData), legalAddress = legalAddress.withSharedByOwner(isParticipantData))
 
 fun LegalEntityHeaderDto.withParticipantData(isParticipantData: Boolean) =
     copy(isParticipantData = isParticipantData, confidenceCriteria = confidenceCriteria.copy(sharedByOwner = isParticipantData))
+
+fun LegalEntityHeaderDto.withConfidence(givenConfidence: GivenConfidence) =
+    copy(confidenceCriteria = confidenceCriteria.withGivenConfidence(givenConfidence))
 
 fun LogisticAddressDto.withSharedByOwner(isSharedByOwner: Boolean)  =
     copy(confidenceCriteria = confidenceCriteria.copy(sharedByOwner = isSharedByOwner))
@@ -125,6 +159,15 @@ fun LegalEntityHeaderVerboseDto.withConfidence(confidence: CalculatedConfidence)
 
 fun LogisticAddressInvariantVerboseDto.withConfidence(confidence: CalculatedConfidence) =
     copy(confidenceCriteria = confidenceCriteria.withCalculatedConfidence(confidence))
+
+fun LegalEntityWithLegalAddressVerboseDto.withConfidence(confidence: GivenConfidence) =
+    copy(header = header.withConfidence(confidence), legalAddress = legalAddress.withConfidence(confidence))
+
+fun LegalEntityHeaderVerboseDto.withConfidence(confidence: GivenConfidence) =
+    copy(confidenceCriteria = confidenceCriteria.withGivenConfidence(confidence))
+
+fun LogisticAddressInvariantVerboseDto.withConfidence(confidence: GivenConfidence) =
+    copy(confidenceCriteria = confidenceCriteria.withGivenConfidence(confidence))
 
 fun ConfidenceCriteriaDto.withCalculatedConfidence(confidence: CalculatedConfidence): ConfidenceCriteriaDto {
     return copy(
@@ -193,4 +236,100 @@ fun AddressPartnerCreateVerboseDto.withConfidence(confidence: CalculatedConfiden
 
 fun AddressPartnerUpdateVerboseDto.withConfidence(confidence: CalculatedConfidence) =
     copy(address = address.withConfidence(confidence))
+
+fun PostalAddressScriptVariantDto.withPhysicalCity(city: String) =
+    copy(physicalAddress = physicalAddress.copy(city = city))
+
+fun PostalAddressScriptVariantDto.withAlternativeCity(city: String) =
+    copy(alternativeAddress = AlternativeAddressScriptVariantDto(city))
+
+fun LegalEntityPartnerCreateRequest.withScriptVariantLegalName(legalName: String) =
+    copy(legalEntity = legalEntity.withScriptVariantLegalName(legalName))
+
+fun LegalEntityPartnerUpdateRequest.withScriptVariantLegalName(legalName: String) =
+    copy(legalEntity = legalEntity.withScriptVariantLegalName(legalName))
+
+fun LegalEntityDto.withScriptVariantLegalName(legalName: String) =
+    copy(scriptVariants = scriptVariants.map { it.copy(legalName = legalName) })
+
+fun LegalEntityPartnerCreateRequest.withScriptVariantPhysicalCity(city: String) =
+    copy(legalEntity = legalEntity.withScriptVariantPhysicalCity(city))
+
+fun LegalEntityPartnerUpdateRequest.withScriptVariantPhysicalCity(city: String) =
+    copy(legalEntity = legalEntity.withScriptVariantPhysicalCity(city))
+
+fun LegalEntityDto.withScriptVariantPhysicalCity(city: String) =
+    copy(scriptVariants = scriptVariants.map { it.copy(legalAddress = it.legalAddress.withPhysicalCity(city)) })
+
+fun LegalEntityPartnerCreateRequest.withDuplicateScriptVariants() =
+    copy(legalEntity = legalEntity.withDuplicateScriptVariants())
+
+fun LegalEntityPartnerUpdateRequest.withDuplicateScriptVariants() =
+    copy(legalEntity = legalEntity.withDuplicateScriptVariants())
+
+fun LegalEntityDto.withDuplicateScriptVariants() =
+    copy(scriptVariants = scriptVariants + scriptVariants)
+
+fun SitePartnerCreateRequest.withScriptVariantName(name: String) =
+    copy(site = site.withScriptVariantName(name))
+
+fun SitePartnerUpdateRequest.withScriptVariantName(name: String) =
+    copy(site = site.withScriptVariantName(name))
+
+fun SiteDto.withScriptVariantName(name: String) =
+    copy(scriptVariants = scriptVariants.map { it.copy(name = name) })
+
+fun SitePartnerUpdateRequest.withScriptVariantScriptCode(scriptCode: String) =
+    copy(site = site.withScriptVariantScriptCode(scriptCode))
+
+fun SiteDto.withScriptVariantScriptCode(scriptCode: String) =
+    copy(scriptVariants = scriptVariants.map { it.copy(scriptCode = scriptCode) })
+
+fun LegalEntityPartnerUpdateRequest.withScriptVariantScriptCode(scriptCode: String) =
+    copy(legalEntity = legalEntity.withScriptVariantScriptCode(scriptCode))
+
+fun LegalEntityDto.withScriptVariantScriptCode(scriptCode: String) =
+    copy(scriptVariants = scriptVariants.map { it.copy(scriptCode = scriptCode) })
+
+fun SitePartnerCreateRequest.withScriptVariantPhysicalCity(city: String) =
+    copy(site = site.withScriptVariantPhysicalCity(city))
+
+fun SitePartnerUpdateRequest.withScriptVariantPhysicalCity(city: String) =
+    copy(site = site.withScriptVariantPhysicalCity(city))
+
+fun SiteDto.withScriptVariantPhysicalCity(city: String) =
+    copy(scriptVariants = scriptVariants.map { it.copy(mainAddress = it.mainAddress.withPhysicalCity(city)) })
+
+fun SitePartnerCreateRequest.withDuplicateScriptVariants() =
+    copy(site = site.withDuplicateScriptVariants())
+
+fun SitePartnerUpdateRequest.withDuplicateScriptVariants() =
+    copy(site = site.withDuplicateScriptVariants())
+
+fun SiteDto.withDuplicateScriptVariants() =
+    copy(scriptVariants = scriptVariants + scriptVariants)
+
+fun SiteCreateRequestWithLegalAddressAsMain.withScriptVariantName(name: String) =
+    copy(scriptVariants = scriptVariants.map { it.copy(name = name) })
+
+fun SiteCreateRequestWithLegalAddressAsMain.withDuplicateScriptVariants() =
+    copy(scriptVariants = scriptVariants + scriptVariants)
+
+fun AddressPartnerCreateRequest.withScriptVariantPhysicalCity(city: String) =
+    copy(scriptVariants = scriptVariants.map { it.copy(address = it.address.withPhysicalCity(city)) })
+
+fun AddressPartnerUpdateRequest.withScriptVariantPhysicalCity(city: String) =
+    copy(scriptVariants = scriptVariants.map { it.copy(address = it.address.withPhysicalCity(city)) })
+
+fun AddressPartnerCreateRequest.withScriptVariantAlternativeCity(city: String) =
+    copy(scriptVariants = scriptVariants.map { it.copy(address = it.address.withAlternativeCity(city)) })
+
+fun AddressPartnerUpdateRequest.withScriptVariantAlternativeCity(city: String) =
+    copy(scriptVariants = scriptVariants.map { it.copy(address = it.address.withAlternativeCity(city)) })
+
+fun AddressPartnerCreateRequest.withDuplicateScriptVariants() =
+    copy(scriptVariants = scriptVariants + scriptVariants)
+
+fun AddressPartnerUpdateRequest.withDuplicateScriptVariants() =
+    copy(scriptVariants = scriptVariants + scriptVariants)
 

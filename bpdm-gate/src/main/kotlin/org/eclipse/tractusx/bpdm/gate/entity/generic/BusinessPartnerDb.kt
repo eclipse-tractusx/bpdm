@@ -82,6 +82,12 @@ class BusinessPartnerDb(
     @Column(name = "bpna")
     var bpnA: String? = null,
 
+    @Column(name = "ownership_ultimate")
+    var ownershipUltimate: Boolean? = null,
+
+    @Column(name = "ultimate_owner_bpnl")
+    var ultimateOwnerBpnl: String? = null,
+
     @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "postal_address_id", unique = true)
     var postalAddress: PostalAddressDb,
@@ -105,13 +111,26 @@ class BusinessPartnerDb(
     @Column(name = "external_sequence_timestamp")
     var externalSequenceTimestamp: Instant? = null,
 
+    @Column(name = "legal_entity_updated_at")
+    var legalEntityUpdatedAt: Instant? = null,
+
+    @Column(name = "site_updated_at")
+    var siteUpdatedAt: Instant? = null,
+
+    @Column(name = "address_updated_at")
+    var addressUpdatedAt: Instant? = null,
+
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "business_partners_le_golden_record_relations", joinColumns = [JoinColumn(name = "business_partner_id")])
     val legalEntityGoldenRecordRelations: MutableList<LegalEntityGoldenRecordRelationDb> = mutableListOf(),
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "business_partners_address_golden_record_relations", joinColumns = [JoinColumn(name = "business_partner_id")])
-    val addressGoldenRecordRelations: MutableList<AddressGoldenRecordRelationDb> = mutableListOf()
+    val addressGoldenRecordRelations: MutableList<AddressGoldenRecordRelationDb> = mutableListOf(),
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "business_partners_additional_sites", joinColumns = [JoinColumn(name = "business_partner_id")])
+    val additionalSites: MutableList<AdditionalSiteDb> = mutableListOf()
 
     ) : BaseEntity() {
 

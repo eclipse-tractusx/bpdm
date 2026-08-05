@@ -53,7 +53,7 @@ class AddressRelationDb(
     var validityPeriods: MutableList<RelationValidityPeriodDb> = mutableListOf(),
 
     @ManyToOne
-    @JoinColumn(name = "reason_code_id", nullable = false)
-    var reasonCode: ReasonCodeDb
+    @JoinColumn(name = "reason_code_id")
+    var reasonCode: ReasonCodeDb?
 
 ): BaseEntity()

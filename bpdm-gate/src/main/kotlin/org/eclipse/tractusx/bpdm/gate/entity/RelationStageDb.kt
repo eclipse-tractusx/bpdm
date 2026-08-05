@@ -55,8 +55,8 @@ class RelationStageDb (
         indexes = [Index(name = "idx_stage_validity_periods_relation_id", columnList = "relation_stage_id")]
     )
     var validityPeriods: MutableList<RelationValidityPeriodDb>,
-    @Column(name = "reason_code", nullable = false)
-    var reasonCode: String
+    @Column(name = "reason_code")
+    var reasonCode: String?
 ): BaseEntity(){
     companion object{
         const val COLUMN_RELATION = "relation_id"

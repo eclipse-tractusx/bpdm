@@ -23,10 +23,9 @@ import org.assertj.core.api.Assertions
 import org.assertj.core.api.ObjectAssert
 import org.assertj.core.api.RecursiveComparisonAssert
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.SiteVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.LegalEntityVerboseDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.LogisticAddressVerboseDtoV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.SiteVerboseDtoV6
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.response.*
 import org.eclipse.tractusx.bpdm.test.util.LocalDatetimeSecondsComparator
 import java.time.LocalDateTime
@@ -39,108 +38,108 @@ class AssertRepositoryV6(
 ) {
     companion object{
         private object LegalEntityUpsertResponsePaths{
-            val entities: String = LegalEntityPartnerCreateResponseWrapper::entities.name
-            val errors: String = LegalEntityPartnerCreateResponseWrapper::errors.name
-            val legalEntity: String = "$entities.${LegalEntityPartnerCreateVerboseDto::legalEntity.name}"
-            val legalAddress: String = "$entities.${LegalEntityPartnerCreateVerboseDto::legalAddress.name}"
-            val legalEntityCreatedAt: String = "${legalEntity}.${LegalEntityVerboseDto::createdAt.name}"
-            val legalEntityUpdatedAt: String = "${legalEntity}.${LegalEntityVerboseDto::updatedAt.name}"
-            val legalAddressCreatedAt: String = "${legalAddress}.${LegalEntityVerboseDto::createdAt.name}"
-            val legalAddressUpdatedAt: String = "${legalAddress}.${LegalEntityVerboseDto::updatedAt.name}"
-            val bpnL: String = "${legalEntity}.${LegalEntityVerboseDto::bpnl.name}"
-            val currentness: String = "${legalEntity}.${LegalEntityVerboseDto::currentness.name}"
-            val bpnA: String = "${legalAddress}.${LogisticAddressVerboseDto::bpna.name}"
-            val bpnLegalEntity: String = "${legalAddress}.${LogisticAddressVerboseDto::bpnLegalEntity.name}"
-            val errorMessage: String = "${errors}.${ErrorInfo<*>::message.name}"
+            val entities: String = LegalEntityPartnerCreateResponseWrapperV6::entities.name
+            val errors: String = LegalEntityPartnerCreateResponseWrapperV6::errors.name
+            val legalEntity: String = "$entities.${LegalEntityPartnerCreateVerboseDtoV6::legalEntity.name}"
+            val legalAddress: String = "$entities.${LegalEntityPartnerCreateVerboseDtoV6::legalAddress.name}"
+            val legalEntityCreatedAt: String = "${legalEntity}.${LegalEntityVerboseDtoV6::createdAt.name}"
+            val legalEntityUpdatedAt: String = "${legalEntity}.${LegalEntityVerboseDtoV6::updatedAt.name}"
+            val legalAddressCreatedAt: String = "${legalAddress}.${LegalEntityVerboseDtoV6::createdAt.name}"
+            val legalAddressUpdatedAt: String = "${legalAddress}.${LegalEntityVerboseDtoV6::updatedAt.name}"
+            val bpnL: String = "${legalEntity}.${LegalEntityVerboseDtoV6::bpnl.name}"
+            val currentness: String = "${legalEntity}.${LegalEntityVerboseDtoV6::currentness.name}"
+            val bpnA: String = "${legalAddress}.${LogisticAddressVerboseDtoV6::bpna.name}"
+            val bpnLegalEntity: String = "${legalAddress}.${LogisticAddressVerboseDtoV6::bpnLegalEntity.name}"
+            val errorMessage: String = "${errors}.${ErrorInfoV6<*>::message.name}"
         }
 
         private object LegalEntityWithLegalAddressVerboseDtoPaths{
             val content = PageDto<*>::content.name
-            val legalEntity = "${content}.${LegalEntityWithLegalAddressVerboseDto::legalEntity.name}"
-            val legalAddress =  "${content}.${LegalEntityWithLegalAddressVerboseDto::legalAddress.name}"
-            val legalEntityCreatedAt =  "${legalEntity}.${LegalEntityVerboseDto::createdAt.name}"
-            val legalEntityUpdatedAt =  "${legalEntity}.${LegalEntityVerboseDto::updatedAt.name}"
-            val legalAddressCreatedAt =  "${legalAddress}.${LogisticAddressVerboseDto::createdAt.name}"
-            val legalAddressUpdatedAt =  "${legalAddress}.${LogisticAddressVerboseDto::updatedAt.name}"
+            val legalEntity = "${content}.${LegalEntityWithLegalAddressVerboseDtoV6::legalEntity.name}"
+            val legalAddress =  "${content}.${LegalEntityWithLegalAddressVerboseDtoV6::legalAddress.name}"
+            val legalEntityCreatedAt =  "${legalEntity}.${LegalEntityVerboseDtoV6::createdAt.name}"
+            val legalEntityUpdatedAt =  "${legalEntity}.${LegalEntityVerboseDtoV6::updatedAt.name}"
+            val legalAddressCreatedAt =  "${legalAddress}.${LogisticAddressVerboseDtoV6::createdAt.name}"
+            val legalAddressUpdatedAt =  "${legalAddress}.${LogisticAddressVerboseDtoV6::updatedAt.name}"
         }
 
         private object LegalEntityGetPaths{
-            private val legalEntity = LegalEntityWithLegalAddressVerboseDto::legalEntity.name
-            private val  legalAddress = LegalEntityWithLegalAddressVerboseDto::legalAddress.name
-            val legalEntityCreatedAt =  "${legalEntity}.${LegalEntityVerboseDto::createdAt.name}"
-            val legalEntityUpdatedAt =  "${legalEntity}.${LegalEntityVerboseDto::updatedAt.name}"
-            val legalAddressCreatedAt =  "${legalAddress}.${LogisticAddressVerboseDto::createdAt.name}"
-            val legalAddressUpdatedAt =  "${legalAddress}.${LogisticAddressVerboseDto::updatedAt.name}"
+            private val legalEntity = LegalEntityWithLegalAddressVerboseDtoV6::legalEntity.name
+            private val  legalAddress = LegalEntityWithLegalAddressVerboseDtoV6::legalAddress.name
+            val legalEntityCreatedAt =  "${legalEntity}.${LegalEntityVerboseDtoV6::createdAt.name}"
+            val legalEntityUpdatedAt =  "${legalEntity}.${LegalEntityVerboseDtoV6::updatedAt.name}"
+            val legalAddressCreatedAt =  "${legalAddress}.${LogisticAddressVerboseDtoV6::createdAt.name}"
+            val legalAddressUpdatedAt =  "${legalAddress}.${LogisticAddressVerboseDtoV6::updatedAt.name}"
         }
 
         private object SiteUpsertResponsePaths{
-            val entities: String = SitePartnerCreateResponseWrapper::entities.name
-            val errors: String = SitePartnerCreateResponseWrapper::errors.name
-            val site: String = "$entities.${SitePartnerCreateVerboseDto::site.name}"
-            val mainAddress: String = "$entities.${SitePartnerCreateVerboseDto::mainAddress.name}"
-            val siteCreatedAt: String = "${site}.${SiteVerboseDto::createdAt.name}"
-            val siteUpdatedAt: String = "${site}.${SiteVerboseDto::updatedAt.name}"
-            val mainAddressCreatedAt: String = "${mainAddress}.${SiteVerboseDto::createdAt.name}"
-            val mainAddressUpdatedAt: String = "${mainAddress}.${SiteVerboseDto::updatedAt.name}"
-            val bpnS: String = "${site}.${SiteVerboseDto::bpns.name}"
-            val bpnA: String = "${mainAddress}.${LogisticAddressVerboseDto::bpna.name}"
-            val bpnSite: String = "${mainAddress}.${LogisticAddressVerboseDto::bpnSite.name}"
-            val errorMessage: String = "${errors}.${ErrorInfo<*>::message.name}"
+            val entities: String = SitePartnerCreateResponseWrapperV6::entities.name
+            val errors: String = SitePartnerCreateResponseWrapperV6::errors.name
+            val site: String = "$entities.${SitePartnerCreateVerboseDtoV6::site.name}"
+            val mainAddress: String = "$entities.${SitePartnerCreateVerboseDtoV6::mainAddress.name}"
+            val siteCreatedAt: String = "${site}.${SiteVerboseDtoV6::createdAt.name}"
+            val siteUpdatedAt: String = "${site}.${SiteVerboseDtoV6::updatedAt.name}"
+            val mainAddressCreatedAt: String = "${mainAddress}.${SiteVerboseDtoV6::createdAt.name}"
+            val mainAddressUpdatedAt: String = "${mainAddress}.${SiteVerboseDtoV6::updatedAt.name}"
+            val bpnS: String = "${site}.${SiteVerboseDtoV6::bpns.name}"
+            val bpnA: String = "${mainAddress}.${LogisticAddressVerboseDtoV6::bpna.name}"
+            val bpnSite: String = "${mainAddress}.${LogisticAddressVerboseDtoV6::bpnSite.name}"
+            val errorMessage: String = "${errors}.${ErrorInfoV6<*>::message.name}"
         }
 
         private object SiteSearchResponsePaths{
             val content = PageDto<*>::content.name
-            val site = "${content}.${SiteWithMainAddressVerboseDto::site.name}"
-            val mainAddress =  "${content}.${SiteWithMainAddressVerboseDto::mainAddress.name}"
-            val siteCreatedAt =  "${site}.${SiteVerboseDto::createdAt.name}"
-            val siteUpdatedAt =  "${site}.${SiteVerboseDto::updatedAt.name}"
-            val mainAddressCreatedAt =  "${mainAddress}.${LogisticAddressVerboseDto::createdAt.name}"
-            val mainAddressUpdatedAt =  "${mainAddress}.${LogisticAddressVerboseDto::updatedAt.name}"
+            val site = "${content}.${SiteWithMainAddressVerboseDtoV6::site.name}"
+            val mainAddress =  "${content}.${SiteWithMainAddressVerboseDtoV6::mainAddress.name}"
+            val siteCreatedAt =  "${site}.${SiteVerboseDtoV6::createdAt.name}"
+            val siteUpdatedAt =  "${site}.${SiteVerboseDtoV6::updatedAt.name}"
+            val mainAddressCreatedAt =  "${mainAddress}.${LogisticAddressVerboseDtoV6::createdAt.name}"
+            val mainAddressUpdatedAt =  "${mainAddress}.${LogisticAddressVerboseDtoV6::updatedAt.name}"
         }
 
         private object SiteGetResponsePaths{
-            private val site = SiteWithMainAddressVerboseDto::site.name
-            private val mainAddress =  SiteWithMainAddressVerboseDto::mainAddress.name
-            val siteCreatedAt =  "${site}.${SiteVerboseDto::createdAt.name}"
-            val siteUpdatedAt =  "${site}.${SiteVerboseDto::updatedAt.name}"
-            val mainAddressCreatedAt =  "${mainAddress}.${LogisticAddressVerboseDto::createdAt.name}"
-            val mainAddressUpdatedAt =  "${mainAddress}.${LogisticAddressVerboseDto::updatedAt.name}"
+            private val site = SiteWithMainAddressVerboseDtoV6::site.name
+            private val mainAddress =  SiteWithMainAddressVerboseDtoV6::mainAddress.name
+            val siteCreatedAt =  "${site}.${SiteVerboseDtoV6::createdAt.name}"
+            val siteUpdatedAt =  "${site}.${SiteVerboseDtoV6::updatedAt.name}"
+            val mainAddressCreatedAt =  "${mainAddress}.${LogisticAddressVerboseDtoV6::createdAt.name}"
+            val mainAddressUpdatedAt =  "${mainAddress}.${LogisticAddressVerboseDtoV6::updatedAt.name}"
         }
 
         private object AdditionalAddressUpsertPaths{
-            private val entities = AddressPartnerCreateResponseWrapper::entities.name
-            private val errors =  AddressPartnerCreateResponseWrapper::errors.name
-            private val address =  "${entities}.${AddressPartnerCreateVerboseDto::address.name}"
-            val bpnA = "${address}.${LogisticAddressVerboseDto::bpna.name}"
-            val createdAt = "${address}.${LogisticAddressVerboseDto::createdAt.name}"
-            val updatedAt = "${address}.${LogisticAddressVerboseDto::updatedAt.name}"
-            val errorMessage = "${errors}.${ErrorInfo<*>::message.name}"
+            private val entities = AddressPartnerCreateResponseWrapperV6::entities.name
+            private val errors =  AddressPartnerCreateResponseWrapperV6::errors.name
+            private val address =  "${entities}.${AddressPartnerCreateVerboseDtoV6::address.name}"
+            val bpnA = "${address}.${LogisticAddressVerboseDtoV6::bpna.name}"
+            val createdAt = "${address}.${LogisticAddressVerboseDtoV6::createdAt.name}"
+            val updatedAt = "${address}.${LogisticAddressVerboseDtoV6::updatedAt.name}"
+            val errorMessage = "${errors}.${ErrorInfoV6<*>::message.name}"
         }
 
         private object AddressUpdatePaths{
-            private val entities = AddressPartnerUpdateResponseWrapper::entities.name
-            private val errors =  AddressPartnerUpdateResponseWrapper::errors.name
-            val createdAt = "${entities}.${LogisticAddressVerboseDto::createdAt.name}"
-            val updatedAt = "${entities}.${LogisticAddressVerboseDto::updatedAt.name}"
-            val errorMessage = "${errors}.${ErrorInfo<*>::message.name}"
+            private val entities = AddressPartnerUpdateResponseWrapperV6::entities.name
+            private val errors =  AddressPartnerUpdateResponseWrapperV6::errors.name
+            val createdAt = "${entities}.${LogisticAddressVerboseDtoV6::createdAt.name}"
+            val updatedAt = "${entities}.${LogisticAddressVerboseDtoV6::updatedAt.name}"
+            val errorMessage = "${errors}.${ErrorInfoV6<*>::message.name}"
         }
 
     }
 
 
-    fun assertLegalEntityCreate(actual: LegalEntityPartnerCreateResponseWrapper, expected: LegalEntityPartnerCreateResponseWrapper){
+    fun assertLegalEntityCreate(actual: LegalEntityPartnerCreateResponseWrapperV6, expected: LegalEntityPartnerCreateResponseWrapperV6){
         Assertions.assertThat(actual)
             .usingRecursiveLegalEntityUpsertComparison()
             .isEqualTo(expected)
     }
 
-    fun assertLegalEntityUpdate(actual: LegalEntityPartnerUpdateResponseWrapper, expected: LegalEntityPartnerUpdateResponseWrapper){
+    fun assertLegalEntityUpdate(actual: LegalEntityPartnerUpdateResponseWrapperV6, expected: LegalEntityPartnerUpdateResponseWrapperV6){
         Assertions.assertThat(actual)
             .usingRecursiveLegalEntityUpsertComparison()
             .isEqualTo(expected)
     }
 
-    fun assertLegalEntitySearch(actual: PageDto<LegalEntityWithLegalAddressVerboseDto>, expected: PageDto<LegalEntityWithLegalAddressVerboseDto>) {
+    fun assertLegalEntitySearch(actual: PageDto<LegalEntityWithLegalAddressVerboseDtoV6>, expected: PageDto<LegalEntityWithLegalAddressVerboseDtoV6>) {
         Assertions.assertThat(actual)
             .usingRecursiveComparison()
             .ignoringCollectionOrder()
@@ -154,7 +153,7 @@ class AssertRepositoryV6(
             .isEqualTo(expected)
     }
 
-    fun assertLegalEntityGet(actual: LegalEntityWithLegalAddressVerboseDto, expected: LegalEntityWithLegalAddressVerboseDto) {
+    fun assertLegalEntityGet(actual: LegalEntityWithLegalAddressVerboseDtoV6, expected: LegalEntityWithLegalAddressVerboseDtoV6) {
         Assertions.assertThat(actual)
             .usingRecursiveComparison()
             .ignoringCollectionOrder()
@@ -168,7 +167,7 @@ class AssertRepositoryV6(
             .isEqualTo(expected)
     }
 
-    fun assertSiteCreate(actual: SitePartnerCreateResponseWrapper, expected: SitePartnerCreateResponseWrapper){
+    fun assertSiteCreate(actual: SitePartnerCreateResponseWrapperV6, expected: SitePartnerCreateResponseWrapperV6){
         Assertions.assertThat(actual)
             .usingRecursiveComparison()
             .ignoringCollectionOrder()
@@ -186,7 +185,7 @@ class AssertRepositoryV6(
             .isEqualTo(expected)
     }
 
-    fun assertSiteUpdate(actual: SitePartnerUpdateResponseWrapper, expected: SitePartnerUpdateResponseWrapper){
+    fun assertSiteUpdate(actual: SitePartnerUpdateResponseWrapperV6, expected: SitePartnerUpdateResponseWrapperV6){
         Assertions.assertThat(actual)
             .usingRecursiveComparison()
             .ignoringCollectionOrder()
@@ -202,7 +201,7 @@ class AssertRepositoryV6(
             .isEqualTo(expected)
     }
 
-    fun assertLegalAddressSiteCreate(actual: SitePartnerCreateResponseWrapper, expected: SitePartnerCreateResponseWrapper){
+    fun assertLegalAddressSiteCreate(actual: SitePartnerCreateResponseWrapperV6, expected: SitePartnerCreateResponseWrapperV6){
         Assertions.assertThat(actual)
             .usingRecursiveComparison()
             .ignoringCollectionOrder()
@@ -219,7 +218,7 @@ class AssertRepositoryV6(
             .isEqualTo(expected)
     }
 
-    fun assertSiteSearch(actual: PageDto<SiteWithMainAddressVerboseDto>, expected: PageDto<SiteWithMainAddressVerboseDto>){
+    fun assertSiteSearch(actual: PageDto<SiteWithMainAddressVerboseDtoV6>, expected: PageDto<SiteWithMainAddressVerboseDtoV6>){
         Assertions.assertThat(actual)
             .usingRecursiveComparison()
             .ignoringCollectionOrder()
@@ -233,19 +232,19 @@ class AssertRepositoryV6(
             .isEqualTo(expected)
     }
 
-    fun assertSiteVerbose(actual: PageDto<SiteVerboseDto>, expected: PageDto<SiteVerboseDto>){
+    fun assertSiteVerbose(actual: PageDto<SiteVerboseDtoV6>, expected: PageDto<SiteVerboseDtoV6>){
         Assertions.assertThat(actual)
             .usingRecursiveComparison()
             .ignoringCollectionOrder()
             .ignoringFields(
-                "${PageDto<*>::content.name}.${SiteVerboseDto::createdAt.name}",
-                "${PageDto<*>::content.name}.${SiteVerboseDto::updatedAt.name}",
+                "${PageDto<*>::content.name}.${SiteVerboseDtoV6::createdAt.name}",
+                "${PageDto<*>::content.name}.${SiteVerboseDtoV6::updatedAt.name}",
             )
             .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
             .isEqualTo(expected)
     }
 
-    fun assertSiteGet(actual: SiteWithMainAddressVerboseDto, expected: SiteWithMainAddressVerboseDto){
+    fun assertSiteGet(actual: SiteWithMainAddressVerboseDtoV6, expected: SiteWithMainAddressVerboseDtoV6){
         Assertions.assertThat(actual)
             .usingRecursiveComparison()
             .ignoringCollectionOrder()
@@ -259,7 +258,7 @@ class AssertRepositoryV6(
             .isEqualTo(expected)
     }
 
-    fun assertAdditionalAddressCreate(actual: AddressPartnerCreateResponseWrapper, expected: AddressPartnerCreateResponseWrapper){
+    fun assertAdditionalAddressCreate(actual: AddressPartnerCreateResponseWrapperV6, expected: AddressPartnerCreateResponseWrapperV6){
         Assertions.assertThat(actual)
             .usingRecursiveComparison()
             .ignoringFields(
@@ -271,7 +270,7 @@ class AssertRepositoryV6(
             .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
             .isEqualTo(expected)
     }
-    fun assertAddressUpdate(actual: AddressPartnerUpdateResponseWrapper, expected: AddressPartnerUpdateResponseWrapper){
+    fun assertAddressUpdate(actual: AddressPartnerUpdateResponseWrapperV6, expected: AddressPartnerUpdateResponseWrapperV6){
         Assertions.assertThat(actual)
             .usingRecursiveComparison()
             .ignoringCollectionOrder()
@@ -284,25 +283,25 @@ class AssertRepositoryV6(
             .isEqualTo(expected)
     }
 
-    fun assertAddressSearch(actual: PageDto<LogisticAddressVerboseDto>, expected: PageDto<LogisticAddressVerboseDto>){
+    fun assertAddressSearch(actual: PageDto<LogisticAddressVerboseDtoV6>, expected: PageDto<LogisticAddressVerboseDtoV6>){
         Assertions.assertThat(actual)
             .usingRecursiveComparison()
             .ignoringCollectionOrder()
             .ignoringFields(
-                "${PageDto<*>::content.name}.${LogisticAddressVerboseDto::createdAt.name}",
-                "${PageDto<*>::content.name}.${LogisticAddressVerboseDto::updatedAt.name}",
+                "${PageDto<*>::content.name}.${LogisticAddressVerboseDtoV6::createdAt.name}",
+                "${PageDto<*>::content.name}.${LogisticAddressVerboseDtoV6::updatedAt.name}",
             )
             .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
             .isEqualTo(expected)
     }
 
-    fun assertAddressGet(actual: LogisticAddressVerboseDto, expected: LogisticAddressVerboseDto){
+    fun assertAddressGet(actual: LogisticAddressVerboseDtoV6, expected: LogisticAddressVerboseDtoV6){
         Assertions.assertThat(actual)
             .usingRecursiveComparison()
             .ignoringCollectionOrder()
             .ignoringFields(
-                 LogisticAddressVerboseDto::createdAt.name,
-                 LogisticAddressVerboseDto::updatedAt.name
+                 LogisticAddressVerboseDtoV6::createdAt.name,
+                 LogisticAddressVerboseDtoV6::updatedAt.name
             )
             .withComparatorForType(localDatetimeSecondsComparator, LocalDateTime::class.java)
             .isEqualTo(expected)

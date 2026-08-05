@@ -20,17 +20,17 @@
 package org.eclipse.tractusx.bpdm.pool.v6.util.metadata
 
 import com.neovisionaries.i18n.CountryCode
-import org.eclipse.tractusx.bpdm.pool.api.model.CountrySubdivisionDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.CountrySubdivisionDtoV6
 import org.eclipse.tractusx.bpdm.pool.util.metadata.AdminAreaLevel1EntryImporter
 
 class AdminAreaLevel1ImporterV6(
     private val adminAreaLevel1EntryImporter: AdminAreaLevel1EntryImporter
 ) {
 
-    fun importFromResource(): List<CountrySubdivisionDto>{
+    fun importFromResource(): List<CountrySubdivisionDtoV6>{
         val uniqueRows = adminAreaLevel1EntryImporter.importFromResource()
         val adminAreas = uniqueRows.map { entry ->
-            CountrySubdivisionDto(
+            CountrySubdivisionDtoV6(
                 countryCode = CountryCode.getByAlpha2Code(entry.countryCode!!),
                 code = entry.code?.takeIf { it.isNotBlank() }!!,
                 name = entry.subdivisionName?.takeIf { it.isNotBlank() }!!

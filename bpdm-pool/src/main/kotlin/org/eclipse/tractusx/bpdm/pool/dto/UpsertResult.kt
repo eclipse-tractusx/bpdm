@@ -21,6 +21,6 @@ package org.eclipse.tractusx.bpdm.pool.dto
 
 
 data class UpsertResult<T>(
-    val relation: T,
+    val value: T,
     val upsertType: UpsertType
 )

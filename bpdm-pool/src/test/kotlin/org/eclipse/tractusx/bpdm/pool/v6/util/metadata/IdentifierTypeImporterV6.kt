@@ -19,18 +19,18 @@
 
 package org.eclipse.tractusx.bpdm.pool.v6.util.metadata
 
-import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierTypeDto
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierBusinessPartnerTypeV6
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.IdentifierTypeDtoV6
 import org.eclipse.tractusx.bpdm.pool.util.metadata.IdentifierTypeEntryImporter
 
 class IdentifierTypeImporterV6(
     private val identifierTypeEntryImporter: IdentifierTypeEntryImporter
 ) {
 
-    fun importFromResource(): List<IdentifierTypeDto>{
+    fun importFromResource(): List<IdentifierTypeDtoV6>{
         val uniqueRows = identifierTypeEntryImporter.importFromResource()
         val adminAreas = uniqueRows.map { entry ->
-            IdentifierTypeDto(
+            IdentifierTypeDtoV6(
                 businessPartnerType = toBusinessPartnerType(entry.businessPartnerType!!),
                 technicalKey = entry.technicalKey?.takeIf { it.isNotBlank() }!!,
                 name = entry.name?.takeIf { it.isNotBlank() }!!,
@@ -44,10 +44,10 @@ class IdentifierTypeImporterV6(
         return adminAreas
     }
 
-    private fun toBusinessPartnerType(typeDescription: String): IdentifierBusinessPartnerType{
+    private fun toBusinessPartnerType(typeDescription: String): IdentifierBusinessPartnerTypeV6{
         return when(typeDescription){
-            "L" -> IdentifierBusinessPartnerType.LEGAL_ENTITY
-            "A" -> IdentifierBusinessPartnerType.ADDRESS
+            "L" -> IdentifierBusinessPartnerTypeV6.LEGAL_ENTITY
+            "A" -> IdentifierBusinessPartnerTypeV6.ADDRESS
             else -> throw RuntimeException("Invalid business partner type '$typeDescription'")
         }
     }

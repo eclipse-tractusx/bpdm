@@ -79,7 +79,9 @@ class PoolResponseFactoryV7(
         bpnL: String = anyStringValue,
         currentness: Instant = anyDate,
         createdAt: Instant = anyDate,
-        updatedAt: Instant = anyDate
+        updatedAt: Instant = anyDate,
+        ownershipUltimate: Boolean? = false,
+        ultimateOwnerBpnl: String? = null
     ): LegalEntityHeaderVerboseDto{
         return with(withValuesFrom){
             LegalEntityHeaderVerboseDto(
@@ -94,7 +96,9 @@ class PoolResponseFactoryV7(
                 confidenceCriteria = confidenceCriteria,
                 isParticipantData = isParticipantData,
                 createdAt = createdAt,
-                updatedAt = updatedAt
+                updatedAt = updatedAt,
+                ownershipUltimate = ownershipUltimate,
+                ultimateOwnerBpnl = ultimateOwnerBpnl
             )
         }
     }
@@ -167,7 +171,7 @@ class PoolResponseFactoryV7(
                 name = withValuesFrom.name,
                 states = withValuesFrom.states,
                 confidenceCriteria = withValuesFrom.confidenceCriteria,
-                scriptVariants = emptyList(),
+                scriptVariants = withValuesFrom.scriptVariants.zip(legalEntityParent.scriptVariants){ siteVariant, leVariant -> SiteScriptVariantDto(siteVariant.scriptCode, siteVariant.name, leVariant.legalAddress) },
                 bpnS = bpnS,
                 bpnLegalEntity = withValuesFrom.bpnLParent
             ),

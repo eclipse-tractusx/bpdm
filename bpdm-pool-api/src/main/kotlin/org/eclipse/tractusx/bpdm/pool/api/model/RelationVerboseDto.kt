@@ -35,5 +35,5 @@ data class RelationVerboseDto(
 
     val validityPeriods: Collection<RelationValidityPeriod>,
 
-    val reasonCode: String
+    val reasonCode: String?
 )

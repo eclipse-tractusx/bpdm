@@ -25,7 +25,6 @@ import org.eclipse.tractusx.orchestrator.api.model.ResultState
 import org.eclipse.tractusx.orchestrator.api.model.TaskMode
 import org.eclipse.tractusx.orchestrator.api.model.TaskResultStateSearchRequest
 import org.eclipse.tractusx.orchestrator.api.model.TaskResultStateSearchResponse
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.web.reactive.function.client.WebClientResponseException
 
@@ -96,7 +95,6 @@ class RelationTaskResultSearchV7IT: UnscheduledOrchestratorTestBaseV7() {
      * THEN user sees 400 BAD REQUEST error
      */
     @Test
-    @Disabled("ToDo: https://github.com/eclipse-tractusx/bpdm/issues/1597")
     fun `search no existing relation task id`(){
         //GIVEN
         testDataClient.createRelationTask(testName)
