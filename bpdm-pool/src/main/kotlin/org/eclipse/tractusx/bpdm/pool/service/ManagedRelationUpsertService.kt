@@ -19,16 +19,16 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
-import org.eclipse.tractusx.bpdm.pool.api.model.DataSpaceParticipantDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityRelationType
-import org.eclipse.tractusx.bpdm.pool.api.model.request.DataSpaceParticipantUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.UpsertResult
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationDb
 import org.eclipse.tractusx.bpdm.pool.entity.RelationValidityPeriodDb
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
+import org.eclipse.tractusx.bpdm.pool.model.parsed.DataSpaceParticipantUpdateParsed
 import org.eclipse.tractusx.bpdm.pool.repository.RelationRepository
 import org.eclipse.tractusx.bpdm.pool.service.RelationUpsertService.TimePeriod
+import org.eclipse.tractusx.bpdm.pool.service.operation.DataSpaceParticipantUpdateService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
@@ -37,7 +37,7 @@ import java.time.LocalDate
 class ManagedRelationUpsertService(
     private val relationUpsertService: RelationUpsertService,
     private val relationRepository: RelationRepository,
-    private val dataSpaceParticipantsService: DataSpaceParticipantsService
+    private val dataSpaceParticipantUpdateService: DataSpaceParticipantUpdateService
 ):IRelationUpsertStrategyService {
 
     @Transactional
@@ -147,11 +147,7 @@ class ManagedRelationUpsertService(
 
     private fun makeManagedEntityParticipantIfRequired(source: LegalEntityDb) {
         if (!source.isDataSpaceParticipant) {
-            dataSpaceParticipantsService.updateMemberships(
-                DataSpaceParticipantUpdateRequest(
-                    listOf(DataSpaceParticipantDto(source.bpn, true))
-                )
-            )
+            dataSpaceParticipantUpdateService.update(listOf(DataSpaceParticipantUpdateParsed(source, isDataSpaceParticipant = true)))
         }
     }
 }

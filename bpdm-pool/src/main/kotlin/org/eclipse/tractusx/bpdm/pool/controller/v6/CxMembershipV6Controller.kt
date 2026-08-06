@@ -27,13 +27,14 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.CxMembershipSearchReq
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.CxMembershipUpdateRequestV6
 import org.eclipse.tractusx.bpdm.pool.config.PermissionConfigProperties
 import org.eclipse.tractusx.bpdm.pool.service.application.v6.CxMembershipSearchApplicationV6Service
+import org.eclipse.tractusx.bpdm.pool.service.application.v6.CxMembershipUpdateApplicationV6Service
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
 @RestController("CxMembershipControllerLegacy")
 class CxMembershipV6Controller(
     private val cxMembershipSearchApplicationV6Service: CxMembershipSearchApplicationV6Service,
-    private val cxMembershipLegacyServiceMapper: CxMembershipLegacyServiceMapper
+    private val cxMembershipUpdateApplicationV6Service: CxMembershipUpdateApplicationV6Service
 ): PoolCxMembershipV6Api {
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")
@@ -43,6 +44,6 @@ class CxMembershipV6Controller(
 
     @PreAuthorize("hasAuthority(${PermissionConfigProperties.WRITE_PARTNER})")
     override fun put(updateRequest: CxMembershipUpdateRequestV6) {
-        return cxMembershipLegacyServiceMapper.updateMemberships(updateRequest)
+        return cxMembershipUpdateApplicationV6Service.updateMemberships(updateRequest)
     }
 }

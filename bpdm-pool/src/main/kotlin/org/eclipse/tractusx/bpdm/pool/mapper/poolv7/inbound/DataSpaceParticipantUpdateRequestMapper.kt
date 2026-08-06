@@ -17,21 +17,23 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.model.error
+package org.eclipse.tractusx.bpdm.pool.mapper.poolv7.inbound
+
+import org.eclipse.tractusx.bpdm.pool.model.request.DataSpaceParticipantUpdateRequest
+import org.springframework.stereotype.Component
+import org.eclipse.tractusx.bpdm.pool.api.model.request.DataSpaceParticipantUpdateRequest as DataSpaceParticipantUpdateRequestDto
 
 /**
- * A referenced BPN of this entity type did not resolve. Keyed by entity type, not role (parent vs. target) — the role is
- * recovered from the producing operation, so one type is reused wherever that entity is looked up.
- *
- * Caveat: can't distinguish two roles resolving the *same* entity type within *one* operation. None do today; add a role
- * distinction there if one ever does.
+ * Creates data space participant update requests from the v7 API participant update DTO.
  */
-data class UnresolvableLegalEntity(val bpn: String) :
-    AddressCreateParseError,
-    SiteCreateParseError,
-    LegalEntityUpdateParseError,
-    DataSpaceParticipantUpdateParseError
-data class UnresolvableSite(val bpn: String) : AddressCreateParseError, SiteUpdateParseError, AddressUpdateParseError
-data class UnresolvableAddress(val bpn: String) : AddressUpdateParseError, SiteCreateParseError
+@Component
+class DataSpaceParticipantUpdateRequestMapper {
 
-data class InvalidParentBpn(val bpn: String) : AddressCreateParseError
+    /**
+     * Returns one update request per participation a client sent, in the order they were sent.
+     */
+    fun toUpdateRequests(updateRequest: DataSpaceParticipantUpdateRequestDto): List<DataSpaceParticipantUpdateRequest> =
+        updateRequest.participants.map {
+            DataSpaceParticipantUpdateRequest(legalEntityBpn = it.bpnL, isDataSpaceParticipant = it.isDataSpaceParticipant)
+        }
+}

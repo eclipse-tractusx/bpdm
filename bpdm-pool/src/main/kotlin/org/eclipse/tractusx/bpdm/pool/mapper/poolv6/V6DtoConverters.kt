@@ -57,6 +57,7 @@ import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.AddressSearchRequestV
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.BpnRequestIdentifierSearchRequestV6 as V6BpnRequestIdentifierSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.ChangelogSearchRequestV6 as V6ChangelogSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.CxMembershipSearchRequestV6 as V6CxMembershipSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.CxMembershipUpdateRequestV6 as V6CxMembershipUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.IdentifiersSearchRequestV6 as V6IdentifiersSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.LegalEntitySearchRequestV6 as V6LegalEntitySearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.v6.model.request.SiteCreateRequestWithLegalAddressAsMainV6 as V6SiteCreateRequestWithLegalAddressAsMain
@@ -252,6 +253,10 @@ fun V6ChangelogSearchRequest.toV7() = ChangelogSearchRequest(
 fun V6CxMembershipSearchRequest.toV7() = DataSpaceParticipantSearchRequest(
     bpnLs = bpnLs,
     isDataSpaceParticipant = isCatenaXMember
+)
+
+fun V6CxMembershipUpdateRequest.toV7() = DataSpaceParticipantUpdateRequest(
+    participants = memberships.map { DataSpaceParticipantDto(bpnL = it.bpnL, isDataSpaceParticipant = it.isCatenaXMember) }
 )
 
 fun V6IdentifiersSearchRequest.toV7() = IdentifiersSearchRequest(
