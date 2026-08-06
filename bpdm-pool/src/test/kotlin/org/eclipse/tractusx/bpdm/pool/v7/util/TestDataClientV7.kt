@@ -91,6 +91,28 @@ class TestDataClientV7(
         check(errors.isEmpty()) { "Could not make '$ownedBpnL' owned by '$owningBpnL': $errors" }
     }
 
+    /**
+     * Makes [alternativeBpnL] an alternative headquarter of [mainBpnL], valid from [TestDataV7.currentRelationValidFrom] on and open-ended.
+     * Relations have no Pool endpoint, so this goes through the golden-record task path, the only writer of them.
+     */
+    fun createIsAlternativeHeadquarterForRelation(alternativeBpnL: String, mainBpnL: String) {
+        val relations = BusinessPartnerRelations(
+            relationType = RelationType.IsAlternativeHeadquarterFor,
+            businessPartnerSourceBpn = alternativeBpnL,
+            businessPartnerTargetBpn = mainBpnL,
+            validityPeriods = listOf(RelationValidityPeriod(validFrom = TestDataV7.currentRelationValidFrom, validTo = null)),
+            reasonCode = null
+        )
+        val taskEntry = TaskRelationsStepReservationEntryDto(
+            taskId = "$alternativeBpnL IsAlternativeHeadquarterFor $mainBpnL",
+            recordId = UUID.randomUUID().toString(),
+            businessPartnerRelations = relations
+        )
+
+        val errors = taskRelationsResolutionService.upsertRelationsGoldenRecordIntoPool(listOf(taskEntry)).flatMap { it.errors }
+        check(errors.isEmpty()) { "Could not make '$alternativeBpnL' alternative headquarter of '$mainBpnL': $errors" }
+    }
+
     fun createSite(legalEntity: LegalEntityWithLegalAddressVerboseDto, seed: String): SitePartnerCreateVerboseDto {
         val request = requestFactory.buildSiteCreateRequest(seed, legalEntity)
         return poolClient.sites.createSite(listOf(request)).entities.first()

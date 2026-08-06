@@ -601,6 +601,30 @@ class LegalEntityUpdateV7IT: UnscheduledPoolTestBaseV7() {
             .containsExactly(coveredScriptCode)
     }
 
+    /**
+     * GIVEN legal entity A is alternative headquarter of legal entity M
+     * WHEN operator tries to update A as ultimate owner
+     * THEN operator sees AlternativeHeadquarterCannotOwnUltimately error in response
+     */
+    @Test
+    fun `update alternative headquarter as ultimate owner`() {
+        //GIVEN
+        val mainLegalEntity = testDataClient.createLegalEntity(requestFactory.buildLegalEntity("$testName main"))
+        val alternativeLegalEntity = testDataClient.createLegalEntity(requestFactory.buildLegalEntity("$testName alternative"))
+        testDataClient.createIsAlternativeHeadquarterForRelation(alternativeLegalEntity.header.bpnl, mainLegalEntity.header.bpnl)
+
+        //WHEN
+        val updateRequest = requestFactory.buildLegalEntityUpdateRequest("Updated $testName", alternativeLegalEntity.header.bpnl)
+            .withOwnershipUltimate(true)
+        val response = poolClient.legalEntities.updateBusinessPartners(listOf(updateRequest))
+
+        //THEN
+        val expectedError = ErrorInfo(LegalEntityUpdateError.AlternativeHeadquarterCannotOwnUltimately, "IGNORED", updateRequest.bpnl)
+        val expectedResponse = LegalEntityPartnerUpdateResponseWrapper(emptyList(), listOf(expectedError))
+
+        assertRepository.assertLegalEntityUpdateResponseWrapperIsEqual(response, expectedResponse)
+    }
+
     // The v7 test metadata reads legal forms from the ELF code list, which is a superset of what the Pool's migration
     // inserts, so a seeded pick can land on a legal form the Pool does not know. Take one the Pool actually has.
     private fun anyKnownLegalForm(): String =
