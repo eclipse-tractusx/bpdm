@@ -62,7 +62,7 @@ class GoldenRecordTaskLegalEntityRequestMapper(
             identifiers = legalEntity.identifiers.map { LegalEntityIdentifier(it.value, it.type, it.issuingBody) },
             states = legalEntity.states.map { toState(it) },
             confidenceCriteria = addressRequestMapper.toConfidenceRequest(legalEntity.confidenceCriteria),
-            isParticipantData = legalEntity.isParticipantData ?: false,
+            isDataSpaceParticipant = legalEntity.isParticipantData ?: false,
             ownershipUltimate = legalEntity.ownershipUltimate,
             scriptVariants = legalEntity.scriptVariants.map { LegalEntityScriptVariantRequest(it.scriptCode, it.legalName, it.legalShortName) }
         )

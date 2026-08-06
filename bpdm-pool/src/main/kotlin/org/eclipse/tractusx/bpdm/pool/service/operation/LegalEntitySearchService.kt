@@ -46,7 +46,7 @@ class LegalEntitySearchService(
         val specification = Specification.allOf(
             LegalEntityRepository.byBpns(criteria.legalEntityBpns),
             LegalEntityRepository.byLegalName(criteria.legalName),
-            LegalEntityRepository.byIsMember(criteria.isCatenaXMemberData)
+            LegalEntityRepository.byIsDataSpaceParticipant(criteria.isDataSpaceParticipant)
         )
 
         val legalEntityPage = legalEntityRepository.findAll(specification, pageable)

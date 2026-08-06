@@ -23,5 +23,5 @@ data class SiteSearchRequest(
     val siteBpns: List<String>,
     val legalEntityBpns: List<String>,
     val name: String?,
-    val isCatenaXMemberData: Boolean?
+    val isDataSpaceParticipant: Boolean?
 )

@@ -61,13 +61,13 @@ interface LogisticAddressRepository : JpaRepository<LogisticAddressDb, Long>, Jp
                 }
             }
 
-        fun byIsMember(isCatenaXMemberData: Boolean?) =
+        fun byIsDataSpaceParticipant(isDataSpaceParticipant: Boolean?) =
             Specification<LogisticAddressDb> { root, _, builder ->
-                isCatenaXMemberData?.let {
+                isDataSpaceParticipant?.let {
                     builder.equal(
                         root.get<LegalEntityDb>(LogisticAddressDb::legalEntity.name)
-                            .get<Boolean>(LegalEntityDb::isCatenaXMemberData.name),
-                        isCatenaXMemberData
+                            .get<Boolean>(LegalEntityDb::isDataSpaceParticipant.name),
+                        isDataSpaceParticipant
                     )
                 }
             }
@@ -82,9 +82,6 @@ interface LogisticAddressRepository : JpaRepository<LogisticAddressDb, Long>, Jp
     fun findByBpn(bpn: String): LogisticAddressDb?
 
     fun findDistinctByBpnIn(bpns: Collection<String>): Set<LogisticAddressDb>
-
-    @Query("SELECT a FROM LogisticAddressDb a WHERE LOWER(a.name) LIKE :addressName ORDER BY LENGTH(a.name)")
-    fun findByName(addressName: String, pageable: Pageable): Page<LogisticAddressDb>
 
     @Query("SELECT DISTINCT a FROM LogisticAddressDb a LEFT JOIN FETCH a.legalEntity LEFT JOIN FETCH a.legalEntity.legalAddress WHERE a IN :addresses")
     fun joinLegalEntities(addresses: Set<LogisticAddressDb>): Set<LogisticAddressDb>

@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.pool.model.LegalEntityState
 import org.eclipse.tractusx.bpdm.pool.model.parsed.ConfidenceCriteriaParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityIdentifierParsed
 import org.eclipse.tractusx.bpdm.pool.model.parsed.LegalEntityScriptVariantParsed
+import org.eclipse.tractusx.bpdm.pool.model.update.LegalEntityHeaderUpdate.Companion.NoOp
 import java.time.Instant
 
 /*******************************************************************************
@@ -58,7 +59,7 @@ data class LegalEntityHeaderUpdate(
     val legalShortName: FieldUpdate<String?>,
     val legalForm: FieldUpdate<LegalFormDb?>,
     val confidenceCriteria: FieldUpdate<ConfidenceCriteriaParsed>,
-    val isCatenaXMemberData: FieldUpdate<Boolean>,
+    val isDataSpaceParticipant: FieldUpdate<Boolean>,
     val ownershipUltimate: FieldUpdate<Boolean>,
     val ultimateOwnerBpnl: FieldUpdate<String?>,
     val currentness: FieldUpdate<Instant>,
@@ -72,7 +73,7 @@ data class LegalEntityHeaderUpdate(
             legalShortName = FieldUpdate.NoOp,
             legalForm = FieldUpdate.NoOp,
             confidenceCriteria = FieldUpdate.NoOp,
-            isCatenaXMemberData = FieldUpdate.NoOp,
+            isDataSpaceParticipant = FieldUpdate.NoOp,
             ownershipUltimate = FieldUpdate.NoOp,
             ultimateOwnerBpnl = FieldUpdate.NoOp,
             currentness = FieldUpdate.NoOp,
